@@ -53,24 +53,30 @@
   "latest_durable_task": {
     "task_id": "CONVERSION-DX11-00380",
     "production_id": "CONVERSION-DX11-00380",
-    "event_id": "CONVERSION-DX11-00380-E001",
+    "event_id": "CONVERSION-DX11-00380-E002",
     "event_type": "rollover",
     "attempt": "1/3",
-    "dispatch_source": "CURRENT_USER_ROLLOVER",
-    "selected_work_item": "DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS",
-    "result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
-    "source_implementation_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
-    "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
-    "validation_bearing_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
-    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+    "chat_rollover": 3,
+    "rollover_is_retry": false,
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+    "source": "CURRENT_USER_ROLLOVER",
     "runtime_validation": "UNTESTED",
-    "checkpoint": "C6_STATE",
+    "native_draw_path_activation_changed": false,
+    "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+    "source_implementation_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+    "validation_bearing_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
     "validation_run_id": 37227872328,
     "validation_run_attempt": 2,
     "validation_job_id": 111511596483,
     "readiness_smoke_job_id": 111512398861,
     "artifact_id": 11312393751,
     "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
+    "dispatch_source": "CURRENT_USER_ROLLOVER",
+    "selected_work_item": "DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS",
+    "result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+    "validation_bearing_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+    "checkpoint": "C6_STATE",
     "run_record_path": "docs/automation/runs/CONVERSION-DX11-00380.json",
     "implementation_commits": [
       "f31c90d8928f07dbca10074fd64dbc97aca76477",
@@ -79,18 +85,11 @@
       "85c1cd7923ea456a3ab2909e63df1498a45cf51e",
       "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
       "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa"
-    ],
-    "native_draw_path_activation_changed": false,
-    "source": "CURRENT_USER_ROLLOVER",
-    "rollover_is_retry": false,
-    "implementation_comment_id": 5983525887,
-    "validation_comment_id": 5983525887,
-    "chat_rollover": 2,
-    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
+    ]
   },
-  "runtime_blocker": "CONVERSION-DX11-00380/R253 is automation-complete but has no Quest 3/VDXR runtime evidence; it remains dormant pre-Draw readiness and makes no runtime claim. Existing runtime-only A/B items remain separately UNTESTED.",
-  "runtime_next_action": "Keep NativeDrawPath inactive. R253 needs no runtime claim for static/CI completion; any future activation or HMD promotion must be validated separately.",
-  "independent_static_next_action": "Preserve validated R239-R253 programmable ownership/readiness. Under a new TASK_ID, review only the next bounded programmable indexed pre-Draw readiness boundary; keep Draw*/NativeDrawPath dormant until separately validated.",
+  "runtime_blocker": "CONVERSION-DX11-00380/R253 is automation-complete but has no Quest 3/VDXR runtime evidence. It remains dormant pre-Draw readiness and makes no runtime-normality claim.",
+  "runtime_next_action": "Keep NativeDrawPath inactive. R253 needs no runtime claim for static/CI completion; any future Draw activation or HMD promotion requires separate matching runtime evidence.",
+  "independent_static_next_action": "Preserve validated R239-R253 programmable readiness. Under a new TASK_ID, review only the next bounded live IA index-buffer/format/offset reobservation binding for R253; keep Draw*/NativeDrawPath dormant until separately validated.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -2939,10 +2938,10 @@
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00380",
     "production_id": "CONVERSION-DX11-00380",
-    "event_id": "CONVERSION-DX11-00380-E001",
+    "event_id": "CONVERSION-DX11-00380-E002",
     "event_type": "rollover",
     "attempt": "1/3",
-    "chat_rollover": 2,
+    "chat_rollover": 3,
     "rollover_is_retry": false,
     "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
     "source": "CURRENT_USER_ROLLOVER",
@@ -2957,8 +2956,6 @@
     "readiness_smoke_job_id": 111512398861,
     "artifact_id": 11312393751,
     "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
-    "implementation_comment_id": 5983525887,
-    "validation_comment_id": 5983525887,
     "dispatch_source": "CURRENT_USER_ROLLOVER"
   },
   "rollover_metadata_correction": {
@@ -3052,41 +3049,25 @@
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_rollover_metadata_correction": {
-    "task_id": "CONVERSION-DX11-00373",
-    "corrected_from": [
-      {
-        "task_id": "CONVERSION-DX11-00373",
-        "production_id": "CONVERSION-DX11-00373",
-        "event_id": "CONVERSION-DX11-00373-E002",
-        "event_type": "rollover",
-        "attempt": "1/3",
-        "chat_rollover": 2
-      }
-    ],
-    "corrected_to": {
-      "task_id": "CONVERSION-DX11-00373",
-      "production_id": "CONVERSION-DX11-00373",
-      "event_id": "CONVERSION-DX11-00373-E004",
-      "event_type": "rollover",
-      "attempt": "1/3",
-      "chat_rollover": 3,
-      "rollover_is_retry": false,
-      "resume_reason": "Retry persisted after one recovery attempt",
-      "source": "CURRENT_USER_QUEUE",
-      "dispatch_source": "CURRENT_USER_QUEUE"
-    },
-    "reason": "E004 / CHAT_ROLLOVER=3 is the newest explicit user dispatch. This rollover is not a retry, so ATTEMPT remains 1/3. The completed R250 material/result SHA and exact-SHA Gate evidence remain unchanged.",
-    "material_and_validation_bearing_sha_unchanged": true
+    "task_id": "CONVERSION-DX11-00380",
+    "production_id": "CONVERSION-DX11-00380",
+    "event_id": "CONVERSION-DX11-00380-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 3,
+    "rollover_is_retry": false,
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+    "reason": "E002 / CHAT_ROLLOVER=3 supersedes E001 rollover metadata only; ATTEMPT remains 1/3 and completed R253 material/validation identity is unchanged."
   },
   "current_dispatch_reconciliation": {
     "task_id": "CONVERSION-DX11-00380",
     "authoritative": {
       "task_id": "CONVERSION-DX11-00380",
       "production_id": "CONVERSION-DX11-00380",
-      "event_id": "CONVERSION-DX11-00380-E001",
+      "event_id": "CONVERSION-DX11-00380-E002",
       "event_type": "rollover",
       "attempt": "1/3",
-      "chat_rollover": 2,
+      "chat_rollover": 3,
       "rollover_is_retry": false,
       "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
       "source": "CURRENT_USER_ROLLOVER",
@@ -3101,12 +3082,36 @@
       "readiness_smoke_job_id": 111512398861,
       "artifact_id": 11312393751,
       "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
-      "implementation_comment_id": 5983525887,
-      "validation_comment_id": 5983525887,
       "dispatch_source": "CURRENT_USER_ROLLOVER"
     },
-    "superseded": [],
-    "reason": "CONVERSION-DX11-00380-E001 / CHAT_ROLLOVER=2 is the authoritative rollover. It is not a retry, so ATTEMPT remains 1/3. Backend Conversion Gate #1996 workflow attempt 1 was cancelled during checkout only; attempt 2 completed SUCCESS on the unchanged material/validation-bearing SHA.",
+    "superseded": [
+      {
+        "task_id": "CONVERSION-DX11-00380",
+        "production_id": "CONVERSION-DX11-00380",
+        "event_id": "CONVERSION-DX11-00380-E001",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 2,
+        "rollover_is_retry": false,
+        "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+        "source": "CURRENT_USER_ROLLOVER",
+        "runtime_validation": "UNTESTED",
+        "native_draw_path_activation_changed": false,
+        "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+        "source_implementation_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+        "validation_bearing_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+        "validation_run_id": 37227872328,
+        "validation_run_attempt": 2,
+        "validation_job_id": 111511596483,
+        "readiness_smoke_job_id": 111512398861,
+        "artifact_id": 11312393751,
+        "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
+        "implementation_comment_id": 5983525887,
+        "validation_comment_id": 5983525887,
+        "dispatch_source": "CURRENT_USER_ROLLOVER"
+      }
+    ],
+    "reason": "CONVERSION-DX11-00380-E002 / CHAT_ROLLOVER=3 is the newest explicit user rollover. It is not a retry, so ATTEMPT remains 1/3. R253 material SHA 7aaa311ede6136e788b79722ed0eb3b2b2ec72aa and exact-SHA validation remain authoritative.",
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_task": {
@@ -3119,6 +3124,13 @@
     "validation_bearing_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
     "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
-    "validation_run_id": 37227872328
+    "checkpoint": "C6_STATE",
+    "state_persisted": true,
+    "validation_run_id": 37227872328,
+    "validation_run_attempt": 2,
+    "validation_job_id": 111511596483,
+    "readiness_smoke_job_id": 111512398861,
+    "artifact_id": 11312393751,
+    "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37"
   }
 }
