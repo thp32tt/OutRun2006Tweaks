@@ -158,9 +158,31 @@ Write-Host "Profile: $TestProfile"
 if($backend -eq 'd3d9'){
     $profile=Get-OutRunVRTestProfile -Name $TestProfile
     $gameArgs=@($profile.Arguments)
+}elseif($backend -eq 'dx11'){
+    # DX11 smoothness candidate: let xrWaitFrame own render pacing while the
+    # game simulation remains 60 Hz. Interpolation supplies intermediate
+    # render frames so a 90 Hz HMD no longer receives a 60->90 3:2 repeat cadence.
+    $gameArgs=@(
+        '-FramerateLimit=0',
+        '-FramerateFastLoad=0',
+        '-FramerateInterpolation=true',
+        '-FramerateUnlockExperimental=true',
+        '-FrameCadenceMode=1',
+        '-FrameCadenceTargetHz=0',
+        '-DisableDesktopVsync=true',
+        '-TargetRefreshRateHz=0',
+        '-SkyGlowFactor=1'
+    )
+    $profile=[ordered]@{
+        Name=$TestProfile
+        Description='DX11 XR-native cadence/interpolation performance launch'
+        Environment=[ordered]@{
+            OUTRUN_VR_TEST_PROFILE=$TestProfile
+            OUTRUN_VR_PERFORMANCE_PROFILE='1'
+        }
+    }
 }else{
-    # Non-DX9Ex backends are retained only for explicit legacy comparison.
-    # Keep them on the conservative startup policy until the DX9Ex reference is accepted.
+    # Other non-reference backends remain conservative for explicit comparison.
     $gameArgs=@(
         '-FramerateLimit=60',
         '-FramerateFastLoad=0',
