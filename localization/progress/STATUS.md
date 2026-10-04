@@ -1116,3 +1116,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Existing `1A43E9D9` remains HIGH_RISK pending mandatory in-game validation; `4F68708E`/`F6811E94` remain strict DXT5 no-candidate HOLD.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_C/20261005-C141-4D38BBB0/C141_4D38_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C141-4D38BBB0/C141_4D38_MACHINE_QA.json`.
+
+## 2026-10-05 08:52:54 KST — B63 HOLD + B65 D657C2EB candidate self-QA PASS
+- Refreshed current B even shard and did not repeat completed B60/C141 assets.
+- Index 152 `49BB5FE5`: B61 initially misread DXT5 payload as linear A8 and was discarded; B62 corrected the canonical DXT5 decode. B63 attempted constrained DXT5 block-splice localization of PRO./INS./G.M./E.R. while preserving '89/'86. Decoded QA still found 1,388 changed pixels outside exact source-text bboxes across 774 edited blocks, so no candidate was persisted. Queue is `HOLD_STRICT_RECHECK`; source residue=0, alpha-outside=0, year badges unchanged.
+- Per contract fail-closed continuation, selected next ready even item index 220 `D657C2EB`. B64 canonical source binding found seven physical labels, including two TIME ATTACK occurrences. B65 rendered all seven.
+- B65 candidate `6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5` from source `439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc`: exact 2048x512 RGBA32 BGRA mip1/header/raw `mirror_y`; 7/7 bbox+size+positive-margin PASS; clean/final validators PASS; source residue=0, outside=0, alpha-outside=0, overlap=0, touch=0.
+- Controller SOURCE/CLEAN/FINAL, 2x row-contact and raw mirror_y visual self-QA PASS; no visible English residue, clipping, overlap, seam, halo or orientation regression.
+- Index 220 -> `b65_self_qa_pass_pending_c`; pending_artwork localize_text=34. Independent C final QA and in-game validation remain pending.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION63/B63_DXT5_FAIL_CLOSED.json`, `localization/graphics/role_B/20261005-B-PRODUCTION65/B65_D657_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION65/B65_CONTROLLER_SELF_QA.json`.
