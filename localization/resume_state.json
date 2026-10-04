@@ -1284,5 +1284,23 @@
       "asset": "39229D64",
       "status": "rework_required_zero_pixel_or_artifact"
     }
+  },
+  "b_recovery01_fa7bbb13": {
+    "run": "20261004-B-RECOVERY01",
+    "status": "B_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
+    "reworked_elements": 10,
+    "prior_pass_elements_preserved_exact": 7,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "clean_plate_report": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_CLEAN_PLATE_VALIDATION.json",
+    "final_mask_report": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_FINAL_MASK_VALIDATION.json",
+    "production_report": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_FA7BBB13_REPORT.json",
+    "runtime_validation": "UNTESTED",
+    "next_b_target": {
+      "index": 60,
+      "asset": "A064FDFC",
+      "status": "rework_required_zero_pixel_or_artifact"
+    }
   }
 }

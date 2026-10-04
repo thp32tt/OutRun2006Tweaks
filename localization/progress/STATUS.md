@@ -620,3 +620,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
 - Next A REWORK priority: odd index 57 `39229D64`.
 - Evidence: `localization/graphics/role_A/20261004-A-RECOVERY02/`.
+
+## 2026-10-04 B recovery — FA7BBB13 clean-plate rework
+- B even-shard priority index 54 `FA7BBB13` selected from the current remote queue; A's completed odd-shard work was not repeated.
+- Reworked the 10 C85 exact-bbox failures from the exact HD source through source-text/protected masks and a transparent clean plate, then rendered Korean lettering at native resolution; no prior localized raster was scaled.
+- RGBA32 4096x2048 / 1 mip structure, raw `mirror_y` orientation and exact 128-byte source header preserved. The 7 prior PASS elements are exact-pixel preserved.
+- Final self-QA: 10/10 former failures PASS, 17/17 total containment PASS, clean-plate validator PASS, final protected-mask validator PASS, protected changed pixels 0, target-text overlap pairs 0.
+- Readable comparison visual self-QA PASS for residue, clipping, new overlap and source-family yellow/navy/white treatment. Candidate SHA-256: `b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68`.
+- `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
+- Next B REWORK priority: even index 60 `A064FDFC`.
+- Evidence: `localization/graphics/role_B/20261004-B-RECOVERY01/`.

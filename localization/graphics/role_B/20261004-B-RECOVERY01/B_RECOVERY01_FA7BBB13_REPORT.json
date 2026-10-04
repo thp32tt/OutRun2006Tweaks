@@ -1,0 +1,713 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261004-B-RECOVERY01",
+  "base_head": "203185a294cc54de4ff044c5cc4645736c51dfb5",
+  "asset": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+  "method": "exact HD source -> actual source-text mask -> protected mask -> transparent clean plate -> exact prior-PASS Korean restoration -> native-resolution Korean lettering for 10 C85 failures -> RGBA32 DDS -> static QA; no localized-raster scaling",
+  "source_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+  "before_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+  "candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+  "c85_failed_keys": [
+    "match_total",
+    "hit_boost",
+    "keep_control",
+    "hold_line",
+    "guess_sound",
+    "count_green",
+    "count_blue",
+    "count_sheep",
+    "count_red",
+    "run_green"
+  ],
+  "reworked_elements": 10,
+  "prior_pass_elements_preserved_exact": 7,
+  "structure": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "clean_plate_validator": {
+    "source": "/home/chatgpt-runner2/work/fa7_b_recovery01/_tmp_source_readable.png",
+    "candidate": "/home/chatgpt-runner2/work/fa7_b_recovery01/FA7BBB13_CLEAN_PLATE.png",
+    "size": [
+      4096,
+      2048
+    ],
+    "changed_pixels": 598897,
+    "changed_bbox": [
+      0,
+      35,
+      3978,
+      559
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_validator": {
+    "source": "/home/chatgpt-runner2/work/fa7_b_recovery01/_tmp_source_readable.png",
+    "candidate": "/home/chatgpt-runner2/work/fa7_b_recovery01/_tmp_final_decoded_readable.png",
+    "size": [
+      4096,
+      2048
+    ],
+    "changed_pixels": 690421,
+    "changed_bbox": [
+      0,
+      35,
+      3978,
+      559
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "target_overlap_pairs": [],
+  "rows": [
+    {
+      "key": "match_total",
+      "source": "Match the total!",
+      "korean": "합계를 맞히세요!",
+      "original_bbox": [
+        119,
+        35,
+        637,
+        123
+      ],
+      "previous_localized_bbox": [
+        135,
+        27,
+        637,
+        123
+      ],
+      "new_localized_bbox": [
+        122,
+        37,
+        629,
+        121
+      ],
+      "delta_left": 3,
+      "delta_right": 8,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "font": "Noto Sans CJK KR Bold",
+      "font_size": 71,
+      "outer_stroke": 8,
+      "inner_stroke": 4,
+      "localized_bbox": [
+        120,
+        37,
+        636,
+        121
+      ],
+      "overlap_with_prior_targets": 0
+    },
+    {
+      "key": "count_gifts",
+      "source": "Count the gifts!",
+      "korean": "선물을 세세요!",
+      "original_bbox": [
+        120,
+        110,
+        635,
+        208
+      ],
+      "previous_localized_bbox": [
+        178,
+        121,
+        594,
+        199
+      ],
+      "new_localized_bbox": [
+        178,
+        121,
+        594,
+        199
+      ],
+      "delta_left": 58,
+      "delta_right": 41,
+      "delta_top": 11,
+      "delta_bottom": 9,
+      "containment": "PASS",
+      "reworked": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_pixel_exact": "PASS",
+      "mode": "preserved_exact"
+    },
+    {
+      "key": "hit_boost",
+      "source": "Hit the boost!",
+      "korean": "부스트를 밟으세요!",
+      "original_bbox": [
+        914,
+        35,
+        1363,
+        123
+      ],
+      "previous_localized_bbox": [
+        885,
+        29,
+        1401,
+        123
+      ],
+      "new_localized_bbox": [
+        917,
+        45,
+        1356,
+        113
+      ],
+      "delta_left": 3,
+      "delta_right": 7,
+      "delta_top": 10,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "font": "Noto Sans CJK KR Bold",
+      "font_size": 54,
+      "outer_stroke": 8,
+      "inner_stroke": 4,
+      "localized_bbox": [
+        915,
+        45,
+        1361,
+        113
+      ],
+      "overlap_with_prior_targets": 0
+    },
+    {
+      "key": "keep_control",
+      "source": "Keep control!",
+      "korean": "차량을 제어하세요!",
+      "original_bbox": [
+        915,
+        110,
+        1363,
+        210
+      ],
+      "previous_localized_bbox": [
+        885,
+        119,
+        1401,
+        200
+      ],
+      "new_localized_bbox": [
+        917,
+        126,
+        1357,
+        194
+      ],
+      "delta_left": 2,
+      "delta_right": 6,
+      "delta_top": 16,
+      "delta_bottom": 16,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "font": "Noto Sans CJK KR Bold",
+      "font_size": 54,
+      "outer_stroke": 8,
+      "inner_stroke": 4,
+      "localized_bbox": [
+        916,
+        126,
+        1362,
+        194
+      ],
+      "overlap_with_prior_targets": 0
+    },
+    {
+      "key": "hold_line",
+      "source": "Hold the line!",
+      "korean": "라인을 유지하세요!",
+      "original_bbox": [
+        1678,
+        35,
+        2181,
+        116
+      ],
+      "previous_localized_bbox": [
+        1646,
+        28,
+        2181,
+        123
+      ],
+      "new_localized_bbox": [
+        1684,
+        39,
+        2174,
+        111
+      ],
+      "delta_left": 6,
+      "delta_right": 7,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "font": "Noto Sans CJK KR Bold",
+      "font_size": 61,
+      "outer_stroke": 7,
+      "inner_stroke": 3,
+      "localized_bbox": [
+        1680,
+        39,
+        2179,
+        111
+      ],
+      "overlap_with_prior_targets": 0
+    },
+    {
+      "key": "honk_horn",
+      "source": "Honk the horn!",
+      "korean": "경적을 울리세요!",
+      "original_bbox": [
+        1882,
+        110,
+        2470,
+        210
+      ],
+      "previous_localized_bbox": [
+        1937,
+        121,
+        2414,
+        199
+      ],
+      "new_localized_bbox": [
+        1937,
+        121,
+        2414,
+        199
+      ],
+      "delta_left": 55,
+      "delta_right": 56,
+      "delta_top": 11,
+      "delta_bottom": 11,
+      "containment": "PASS",
+      "reworked": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_pixel_exact": "PASS",
+      "mode": "preserved_exact"
+    },
+    {
+      "key": "do_math",
+      "source": "Do the math!",
+      "korean": "계산하세요!",
+      "original_bbox": [
+        2683,
+        110,
+        3143,
+        205
+      ],
+      "previous_localized_bbox": [
+        2764,
+        120,
+        3118,
+        205
+      ],
+      "new_localized_bbox": [
+        2764,
+        120,
+        3118,
+        205
+      ],
+      "delta_left": 81,
+      "delta_right": 25,
+      "delta_top": 10,
+      "delta_bottom": 0,
+      "containment": "PASS",
+      "reworked": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_pixel_exact": "PASS",
+      "mode": "preserved_exact"
+    },
+    {
+      "key": "guess_sound",
+      "source": "Guess the sound!",
+      "korean": "소리를 맞혀 보세요!",
+      "original_bbox": [
+        3398,
+        127,
+        3978,
+        205
+      ],
+      "previous_localized_bbox": [
+        3429,
+        119,
+        4012,
+        205
+      ],
+      "new_localized_bbox": [
+        3417,
+        128,
+        3955,
+        204
+      ],
+      "delta_left": 19,
+      "delta_right": 23,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "font": "Noto Sans CJK KR Bold",
+      "font_size": 65,
+      "outer_stroke": 7,
+      "inner_stroke": 3,
+      "localized_bbox": [
+        3415,
+        128,
+        3961,
+        204
+      ],
+      "overlap_with_prior_targets": 0
+    },
+    {
+      "key": "count_green",
+      "source": "Count Green Cars!",
+      "korean": "초록색 차를 세세요!",
+      "original_bbox": [
+        51,
+        230,
+        661,
+        307
+      ],
+      "previous_localized_bbox": [
+        39,
+        222,
+        671,
+        311
+      ],
+      "new_localized_bbox": [
+        89,
+        231,
+        619,
+        306
+      ],
+      "delta_left": 38,
+      "delta_right": 42,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "font": "Noto Sans CJK KR Bold",
+      "font_size": 64,
+      "outer_stroke": 7,
+      "inner_stroke": 3,
+      "localized_bbox": [
+        87,
+        231,
+        625,
+        306
+      ],
+      "overlap_with_prior_targets": 0
+    },
+    {
+      "key": "count_blue",
+      "source": "Count Blue Cars!",
+      "korean": "파란색 차를 세세요!",
+      "original_bbox": [
+        803,
+        210,
+        1361,
+        302
+      ],
+      "previous_localized_bbox": [
+        770,
+        222,
+        1393,
+        310
+      ],
+      "new_localized_bbox": [
+        805,
+        216,
+        1355,
+        295
+      ],
+      "delta_left": 2,
+      "delta_right": 6,
+      "delta_top": 6,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "font": "Noto Sans CJK KR Bold",
+      "font_size": 66,
+      "outer_stroke": 8,
+      "inner_stroke": 4,
+      "localized_bbox": [
+        804,
+        216,
+        1360,
+        295
+      ],
+      "overlap_with_prior_targets": 0
+    },
+    {
+      "key": "count_sheep",
+      "source": "Count the sheep!",
+      "korean": "양을 세세요!",
+      "original_bbox": [
+        2745,
+        223,
+        3314,
+        316
+      ],
+      "previous_localized_bbox": [
+        2845,
+        222,
+        3247,
+        310
+      ],
+      "new_localized_bbox": [
+        2819,
+        224,
+        3235,
+        315
+      ],
+      "delta_left": 74,
+      "delta_right": 79,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "font": "Noto Sans CJK KR Bold",
+      "font_size": 79,
+      "outer_stroke": 8,
+      "inner_stroke": 4,
+      "localized_bbox": [
+        2816,
+        224,
+        3243,
+        315
+      ],
+      "overlap_with_prior_targets": 0
+    },
+    {
+      "key": "count_red",
+      "source": "Count Red Cars!",
+      "korean": "빨간색 차를 세세요!",
+      "original_bbox": [
+        2802,
+        373,
+        3345,
+        450
+      ],
+      "previous_localized_bbox": [
+        2794,
+        368,
+        3376,
+        453
+      ],
+      "new_localized_bbox": [
+        2807,
+        374,
+        3336,
+        449
+      ],
+      "delta_left": 5,
+      "delta_right": 9,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "font": "Noto Sans CJK KR Bold",
+      "font_size": 64,
+      "outer_stroke": 7,
+      "inner_stroke": 3,
+      "localized_bbox": [
+        2804,
+        374,
+        3342,
+        449
+      ],
+      "overlap_with_prior_targets": 0
+    },
+    {
+      "key": "memorize_sequence",
+      "source": "Memorize the sequence!",
+      "korean": "순서를 기억하세요!",
+      "original_bbox": [
+        0,
+        456,
+        786,
+        559
+      ],
+      "previous_localized_bbox": [
+        91,
+        468,
+        695,
+        556
+      ],
+      "new_localized_bbox": [
+        91,
+        468,
+        695,
+        556
+      ],
+      "delta_left": 91,
+      "delta_right": 91,
+      "delta_top": 12,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "reworked": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_pixel_exact": "PASS",
+      "mode": "preserved_exact"
+    },
+    {
+      "key": "drive_above_speed",
+      "source": "Drive above the speed!",
+      "korean": "지정 속도 이상으로 달리세요!",
+      "original_bbox": [
+        786,
+        456,
+        1562,
+        559
+      ],
+      "previous_localized_bbox": [
+        788,
+        468,
+        1560,
+        556
+      ],
+      "new_localized_bbox": [
+        788,
+        468,
+        1560,
+        556
+      ],
+      "delta_left": 2,
+      "delta_right": 2,
+      "delta_top": 12,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "reworked": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_pixel_exact": "PASS",
+      "mode": "preserved_exact"
+    },
+    {
+      "key": "spot_odd",
+      "source": "Spot the odd one out!",
+      "korean": "다른 하나를 찾으세요!",
+      "original_bbox": [
+        1562,
+        456,
+        2324,
+        559
+      ],
+      "previous_localized_bbox": [
+        1598,
+        466,
+        2288,
+        557
+      ],
+      "new_localized_bbox": [
+        1598,
+        466,
+        2288,
+        557
+      ],
+      "delta_left": 36,
+      "delta_right": 36,
+      "delta_top": 10,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "reworked": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_pixel_exact": "PASS",
+      "mode": "preserved_exact"
+    },
+    {
+      "key": "slipstream_cars",
+      "source": "Slipstream the cars!",
+      "korean": "차량 뒤에서 슬립스트림하세요!",
+      "original_bbox": [
+        2324,
+        456,
+        2924,
+        559
+      ],
+      "previous_localized_bbox": [
+        2326,
+        475,
+        2922,
+        549
+      ],
+      "new_localized_bbox": [
+        2326,
+        475,
+        2922,
+        549
+      ],
+      "delta_left": 2,
+      "delta_right": 2,
+      "delta_top": 19,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "reworked": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_pixel_exact": "PASS",
+      "mode": "preserved_exact"
+    },
+    {
+      "key": "run_green",
+      "source": "Run through green!",
+      "korean": "초록색을 통과하세요!",
+      "original_bbox": [
+        2924,
+        470,
+        3648,
+        559
+      ],
+      "previous_localized_bbox": [
+        2949,
+        467,
+        3622,
+        556
+      ],
+      "new_localized_bbox": [
+        2952,
+        471,
+        3616,
+        558
+      ],
+      "delta_left": 28,
+      "delta_right": 32,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "font": "Noto Sans CJK KR Bold",
+      "font_size": 74,
+      "outer_stroke": 8,
+      "inner_stroke": 4,
+      "localized_bbox": [
+        2949,
+        471,
+        3622,
+        558
+      ],
+      "overlap_with_prior_targets": 0
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "status": "B_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME"
+}
