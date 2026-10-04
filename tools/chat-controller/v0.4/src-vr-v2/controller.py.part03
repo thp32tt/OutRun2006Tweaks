@@ -1576,6 +1576,23 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
     q = load_queue_state()
     active_by_lane = q.setdefault("active_by_lane", {})
 
+    if int(q.get("conversion_parallel_schema_version", 0)) < 1:
+        stale = dict(active_by_lane)
+        if stale:
+            retired = q.setdefault("retired_lane_tasks", [])
+            for lane_key, task in stale.items():
+                retired.append({
+                    **task,
+                    "retired_lane": lane_key,
+                    "retired_at": now.isoformat(),
+                    "retired_reason": "stale pre-independent-conversion active_by_lane state",
+                })
+            q["retired_lane_tasks"] = retired[-100:]
+        q["active_by_lane"] = {}
+        active_by_lane = q["active_by_lane"]
+        q["conversion_parallel_schema_version"] = 1
+        save_queue_state(q)
+
     legacy = q.get("active")
     if isinstance(legacy, dict):
         legacy_slot = str(legacy.get("slot") or "")
