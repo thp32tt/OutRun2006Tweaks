@@ -13,7 +13,10 @@
   "protected_changed": 0,
   "overlap": 0,
   "touch_pairs": 0,
-  "worker_status": "B_PRODUCTION58_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "worker_status": "B_PRODUCTION58_SELF_QA_PASS_PENDING_C_AND_INGAME",
   "runtime_validation": "UNTESTED",
-  "report": "localization/graphics/role_B/20261005-B-PRODUCTION58/B58_31C_REPORT.json"
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION58/B58_31C_REPORT.json",
+  "controller_visual_qa": "PASS",
+  "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION58/B58_CONTROLLER_SELF_QA.json",
+  "supersedes_candidate_sha256": "8e5639642409fbbba8478a61025971bd611f89ea5711cf5a4127f5201583c968"
 }
