@@ -2010,8 +2010,7 @@ namespace OutRunVRStereo
             if (!state.worldEffect)
                 R30CaptureSkyGlowSceneBeforeHud(device);
 
-            ++R9DrawCalls;
-            R9MonoBackupGap = true;
+            R9NoteStereoDrawWithoutMonoBackup();
             if (LeftDrawMayWriteDepth(device) ||
                 LeftDrawMayWriteStencil(device))
                 ++R9MainDepthContentSerial;
@@ -2808,8 +2807,7 @@ namespace OutRunVRStereo
 
             // From this point the draw is owned by R30. The steady-state frame
             // intentionally has no complete independent mono history.
-            ++R9DrawCalls;
-            R9MonoBackupGap = true;
+            R9NoteStereoDrawWithoutMonoBackup();
             if (LeftDrawMayWriteDepth(device) ||
                 LeftDrawMayWriteStencil(device))
                 ++R9MainDepthContentSerial;
@@ -3194,5 +3192,10 @@ namespace OutRunVRStereo
         };
 
         VRStereoR30HudHook VRStereoR30HudHook::instance;
+    }
+
+    inline void R30TelemetryNoteScreenSpaceFovDraw() noexcept
+    {
+        ++R30ScreenSpaceFovDraws;
     }
 }

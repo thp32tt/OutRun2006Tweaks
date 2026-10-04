@@ -966,6 +966,12 @@ namespace OutRunVRStereo
 		++R9MainDepthContentSerial;
 	}
 
+	inline void R9NoteStereoDrawWithoutMonoBackup() noexcept
+	{
+		++R9DrawCalls;
+		R9MonoBackupGap = true;
+	}
+
 	inline void R9SynchronizeDepthContentSerials() noexcept
 	{
 		std::uint64_t serial = std::max(

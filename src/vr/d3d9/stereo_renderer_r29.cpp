@@ -159,12 +159,11 @@ namespace OutRunVRStereo
             StereoR7Draw&& stereoR7Draw, bool zeroDisparity,
             const char* site)
         {
-            ++R9DrawCalls;
+            R9NoteStereoDrawWithoutMonoBackup();
 
             // This frame intentionally does not maintain a complete independent
             // mono history. R9 must therefore never restore a stale/incomplete
             // safety RT if a later hazard poisons the same Present.
-            R9MonoBackupGap = true;
 
             if (LeftDrawMayWriteDepth(device) ||
                 LeftDrawMayWriteStencil(device))
@@ -584,6 +583,11 @@ namespace OutRunVRStereo
         };
 
         VRStereoR29Hook VRStereoR29Hook::instance;
+    }
+
+    inline void R29TelemetryNoteStableTwoEyeDraw() noexcept
+    {
+        ++R29StableTwoEyeDraws;
     }
 
     struct R29EffectTelemetrySnapshot

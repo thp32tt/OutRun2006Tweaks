@@ -367,8 +367,7 @@ namespace OutRunVRStereo
                 return {};
             }
 
-            ++R9DrawCalls;
-            R9MonoBackupGap = true;
+            R9NoteStereoDrawWithoutMonoBackup();
             if (mayWriteDepth || mayWriteStencil)
                 R9NoteMainDepthContentWrite();
 
@@ -425,7 +424,7 @@ namespace OutRunVRStereo
             FrameHadWorldStereo = true;
             ++DuplicatedDraws;
             ++WorldStereoDraws;
-            ++R29StableTwoEyeDraws;
+            R29TelemetryNoteStableTwoEyeDraw();
             if (R33TelemetryEnabled())
             {
                 R31TelemetryNoteFastWorld();
@@ -534,8 +533,7 @@ namespace OutRunVRStereo
                 return {};
             }
 
-            ++R9DrawCalls;
-            R9MonoBackupGap = true;
+            R9NoteStereoDrawWithoutMonoBackup();
             if (mayWriteDepth || mayWriteStencil)
                 R9NoteMainDepthContentWrite();
 
@@ -591,8 +589,8 @@ namespace OutRunVRStereo
             FrameHadDuplicatedDraw = true;
             ++DuplicatedDraws;
             ++NonWorldDuplicatedDraws;
-            ++R29StableTwoEyeDraws;
-            ++R30ScreenSpaceFovDraws;
+            R29TelemetryNoteStableTwoEyeDraw();
+            R30TelemetryNoteScreenSpaceFovDraw();
             if (R33TelemetryEnabled())
             {
                 R31TelemetryNoteHud();

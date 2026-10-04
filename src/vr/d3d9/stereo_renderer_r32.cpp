@@ -482,8 +482,7 @@ namespace OutRunVRStereo
                 return {};
             }
 
-            ++R9DrawCalls;
-            R9MonoBackupGap = true;
+            R9NoteStereoDrawWithoutMonoBackup();
             if (LeftDrawMayWriteDepth(device) || LeftDrawMayWriteStencil(device))
                 R9NoteMainDepthContentWrite();
 
@@ -537,7 +536,7 @@ namespace OutRunVRStereo
             FrameHadWorldStereo = true;
             ++DuplicatedDraws;
             ++WorldStereoDraws;
-            ++R29StableTwoEyeDraws;
+            R29TelemetryNoteStableTwoEyeDraw();
             R31TelemetryNoteFastWorld();
 
             if (FrameStereoPoseSequence == 0)
@@ -634,8 +633,7 @@ namespace OutRunVRStereo
                 return {};
             }
 
-            ++R9DrawCalls;
-            R9MonoBackupGap = true;
+            R9NoteStereoDrawWithoutMonoBackup();
             if (LeftDrawMayWriteDepth(device) || LeftDrawMayWriteStencil(device))
                 R9NoteMainDepthContentWrite();
 
@@ -686,8 +684,8 @@ namespace OutRunVRStereo
             FrameHadDuplicatedDraw = true;
             ++DuplicatedDraws;
             ++NonWorldDuplicatedDraws;
-            ++R29StableTwoEyeDraws;
-            ++R30ScreenSpaceFovDraws;
+            R29TelemetryNoteStableTwoEyeDraw();
+            R30TelemetryNoteScreenSpaceFovDraw();
             R31TelemetryNoteHud();
 
             if (FAILED(rightHr))
@@ -1060,7 +1058,7 @@ namespace OutRunVRStereo
         bool ResolveDirectTransportR32(IDirect3DDevice9* device,
             std::uint32_t frameId) noexcept
         {
-            if (!R13OverlayReady.load(std::memory_order_acquire))
+            if (!R13OverlayReadyForTransport())
                 return R32ResolveDirectR13Hook.call<bool>(device, frameId);
             if (!frameId || !R32EnsureDirectResources(device) ||
                 !BackBuffer || !RightEyeSurface)
@@ -1081,10 +1079,10 @@ namespace OutRunVRStereo
             {
                 std::uint32_t gpuCompleted = 0;
                 const bool ackValid =
-                    R13ReadGpuCompletedFrame(slotIndex, gpuCompleted);
+                    R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted);
                 if (!ackValid || !FrameIdAtOrAfter(gpuCompleted, slot.frameId))
                 {
-                    ++R13SafeAckBackpressure;
+                    R13NoteSafeAckBackpressure();
                     ++DirectTransportRingBackpressure;
                     return false;
                 }

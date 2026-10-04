@@ -747,6 +747,22 @@ namespace OutRunVRStereo
         }
     }
 
+    inline bool R13OverlayReadyForTransport() noexcept
+    {
+        return R13OverlayReady.load(std::memory_order_acquire);
+    }
+
+    inline bool R13TryGetGpuCompletedFrame(
+        std::uint32_t slotIndex, std::uint32_t& completedFrame) noexcept
+    {
+        return R13ReadGpuCompletedFrame(slotIndex, completedFrame);
+    }
+
+    inline void R13NoteSafeAckBackpressure() noexcept
+    {
+        ++R13SafeAckBackpressure;
+    }
+
     PoseInjectionSnapshot CurrentPoseInjectionSnapshot() noexcept
     {
         // Sample all mutable D3D9 pass signals exactly once. The legacy invariant is
