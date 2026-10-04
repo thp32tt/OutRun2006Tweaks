@@ -1628,6 +1628,32 @@ struct NativeProgrammableShaderIndexedLiveIndexBindingReadiness {
     std::uint64_t snapshotToken{};
 };
 
+// R255 composes the current R252 indexed dispatch tuple, R253 source-value
+// proof and R254 fresh live IA binding into one final dormant pre-Draw receipt.
+// Every component is recomputed from the current device/context state; this does
+// not issue DrawIndexed or activate NativeDrawPath.
+struct NativeProgrammableShaderIndexedPreDrawReadiness {
+    bool inputValid{};
+    bool directDispatchReady{};
+    bool directDispatchSnapshotMatches{};
+    bool sourceValueReady{};
+    bool sourceValueSnapshotMatches{};
+    bool liveIndexBindingReady{};
+    bool liveIndexBindingSnapshotMatches{};
+    bool dispatchSourceLineageMatches{};
+    bool sourceLiveLineageMatches{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    UINT indexCount{};
+    UINT startIndexLocation{};
+    DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT indexOffset{};
+    std::uint64_t directDispatchSnapshotToken{};
+    std::uint64_t sourceValueSnapshotToken{};
+    std::uint64_t liveIndexBindingSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
 class NativeProgrammableShaderPairCache final {
 public:
     NativeProgrammableShaderPairCache() = default;
@@ -2205,6 +2231,72 @@ public:
         const NativeProgrammableShaderIndexedSourceValueReadiness& sourceValues,
         std::uint64_t sourceValueSnapshotToken,
         std::uint64_t liveIndexBindingSnapshotToken) const noexcept;
+    [[nodiscard]] NativeProgrammableShaderIndexedPreDrawReadiness
+    indexed_pre_draw_readiness(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        std::uint64_t constantStateSnapshotToken,
+        std::uint64_t constantPayloadSnapshotToken,
+        std::uint64_t constantBindingSnapshotToken,
+        std::uint64_t pipelineBindingSnapshotToken,
+        D3DPRIMITIVETYPE primitiveType,
+        std::uint64_t topologyBindingSnapshotToken,
+        const NativeManagedBufferShadow& vertexBuffer,
+        std::uint64_t vertexBufferSnapshotToken,
+        UINT vertexStride,
+        UINT vertexOffset,
+        const NativeManagedBufferShadow& indexBuffer,
+        std::uint64_t indexBufferSnapshotToken,
+        DXGI_FORMAT indexFormat,
+        UINT indexOffset,
+        std::uint64_t indexedGeometryBindingSnapshotToken,
+        UINT primitiveCount,
+        INT baseVertexIndex,
+        UINT minVertexIndex,
+        UINT numVertices,
+        UINT startIndex,
+        std::uint64_t directDispatchSnapshotToken,
+        std::uint64_t sourceValueSnapshotToken,
+        std::uint64_t liveIndexBindingSnapshotToken) const noexcept;
+    [[nodiscard]] bool validate_indexed_pre_draw_snapshot(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        std::uint64_t constantStateSnapshotToken,
+        std::uint64_t constantPayloadSnapshotToken,
+        std::uint64_t constantBindingSnapshotToken,
+        std::uint64_t pipelineBindingSnapshotToken,
+        D3DPRIMITIVETYPE primitiveType,
+        std::uint64_t topologyBindingSnapshotToken,
+        const NativeManagedBufferShadow& vertexBuffer,
+        std::uint64_t vertexBufferSnapshotToken,
+        UINT vertexStride,
+        UINT vertexOffset,
+        const NativeManagedBufferShadow& indexBuffer,
+        std::uint64_t indexBufferSnapshotToken,
+        DXGI_FORMAT indexFormat,
+        UINT indexOffset,
+        std::uint64_t indexedGeometryBindingSnapshotToken,
+        UINT primitiveCount,
+        INT baseVertexIndex,
+        UINT minVertexIndex,
+        UINT numVertices,
+        UINT startIndex,
+        std::uint64_t directDispatchSnapshotToken,
+        std::uint64_t sourceValueSnapshotToken,
+        std::uint64_t liveIndexBindingSnapshotToken,
+        std::uint64_t preDrawSnapshotToken) const noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {

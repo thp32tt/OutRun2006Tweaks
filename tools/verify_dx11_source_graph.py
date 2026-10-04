@@ -10053,6 +10053,39 @@ def main() -> None:
             + ", ".join(missing_r254_programmable_live_index_binding)
         )
 
+    r255_programmable_indexed_pre_draw_contract = [
+        ("struct NativeProgrammableShaderIndexedPreDrawReadiness",
+         NATIVE_BACKEND_HPP, "R255 programmable indexed pre-Draw readiness type"),
+        ("indexed_pre_draw_readiness(",
+         NATIVE_BACKEND_HPP, "R255 final indexed pre-Draw readiness declaration"),
+        ("validate_indexed_pre_draw_snapshot(",
+         NATIVE_BACKEND_HPP, "R255 final indexed pre-Draw snapshot validator"),
+        ("out.dispatchSourceLineageMatches =",
+         NATIVE_BACKEND_CPP, "R255 R252-to-R253 lineage seal"),
+        ("out.sourceLiveLineageMatches =",
+         NATIVE_BACKEND_CPP, "R255 R253-to-R254 live IA lineage seal"),
+        ("token, 0x255u",
+         NATIVE_BACKEND_CPP, "R255 independent snapshot-domain tag"),
+        ("R255 joins current R252 R253 and R254 receipts into final indexed pre-Draw proof",
+         CONSTANT_BUFFER_PROBE, "R255 positive final pre-Draw regression"),
+        ("R255 rejects stale R252 dispatch receipt",
+         CONSTANT_BUFFER_PROBE, "R255 stale dispatch regression"),
+        ("R255 rejects stale R253 source-value receipt",
+         CONSTANT_BUFFER_PROBE, "R255 stale source-value regression"),
+        ("R255 rejects stale R254 live IA receipt",
+         CONSTANT_BUFFER_PROBE, "R255 stale live-IA regression"),
+    ]
+    missing_r255_programmable_indexed_pre_draw = [
+        meaning for token, source, meaning
+        in r255_programmable_indexed_pre_draw_contract
+        if token not in source
+    ]
+    if missing_r255_programmable_indexed_pre_draw:
+        raise SystemExit(
+            "DX11 R255 programmable indexed pre-Draw drift: "
+            + ", ".join(missing_r255_programmable_indexed_pre_draw)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

@@ -3957,6 +3957,140 @@ int main()
             firstR254LiveIndexSnapshot),
         "R254 fresh live IA receipt revalidates after exact binding restore");
 
+    const auto r255PreDrawReadiness =
+        [&](std::uint64_t directDispatchSnapshotToken,
+            std::uint64_t sourceValueSnapshotToken,
+            std::uint64_t liveIndexBindingSnapshotToken) {
+            return programmableCache.indexed_pre_draw_readiness(
+                d3d.context, d3d.device, programmablePair,
+                r242CacheReady.snapshotToken,
+                r242SlotReady.snapshotToken,
+                r242ObjectReady.snapshotToken,
+                inputLayout, r243InputLayoutReady.snapshotToken,
+                r244ConstantStateReady.snapshotToken,
+                r245PayloadReady.snapshotToken,
+                r246BindingReady.snapshotToken,
+                r247PipelineReady.snapshotToken,
+                D3DPT_TRIANGLELIST,
+                r248TopologyReady.snapshotToken,
+                managedVertexBuffer,
+                managedVertexPostResetReady.snapshotToken,
+                geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, managedIndexReady.snapshotToken,
+                DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+                firstR249BindingSnapshot,
+                1u, 0, 0u, 4u, 0u,
+                directDispatchSnapshotToken,
+                sourceValueSnapshotToken,
+                liveIndexBindingSnapshotToken);
+        };
+    const auto validateR255PreDraw =
+        [&](std::uint64_t directDispatchSnapshotToken,
+            std::uint64_t sourceValueSnapshotToken,
+            std::uint64_t liveIndexBindingSnapshotToken,
+            std::uint64_t preDrawSnapshotToken) {
+            return programmableCache.validate_indexed_pre_draw_snapshot(
+                d3d.context, d3d.device, programmablePair,
+                r242CacheReady.snapshotToken,
+                r242SlotReady.snapshotToken,
+                r242ObjectReady.snapshotToken,
+                inputLayout, r243InputLayoutReady.snapshotToken,
+                r244ConstantStateReady.snapshotToken,
+                r245PayloadReady.snapshotToken,
+                r246BindingReady.snapshotToken,
+                r247PipelineReady.snapshotToken,
+                D3DPT_TRIANGLELIST,
+                r248TopologyReady.snapshotToken,
+                managedVertexBuffer,
+                managedVertexPostResetReady.snapshotToken,
+                geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, managedIndexReady.snapshotToken,
+                DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+                firstR249BindingSnapshot,
+                1u, 0, 0u, 4u, 0u,
+                directDispatchSnapshotToken,
+                sourceValueSnapshotToken,
+                liveIndexBindingSnapshotToken,
+                preDrawSnapshotToken);
+        };
+
+    const auto r255PreDrawReady = r255PreDrawReadiness(
+        firstR252DispatchSnapshot,
+        firstR253SourceValueSnapshot,
+        firstR254LiveIndexSnapshot);
+    require(
+        r255PreDrawReady.inputValid &&
+        r255PreDrawReady.directDispatchReady &&
+        r255PreDrawReady.directDispatchSnapshotMatches &&
+        r255PreDrawReady.sourceValueReady &&
+        r255PreDrawReady.sourceValueSnapshotMatches &&
+        r255PreDrawReady.liveIndexBindingReady &&
+        r255PreDrawReady.liveIndexBindingSnapshotMatches &&
+        r255PreDrawReady.dispatchSourceLineageMatches &&
+        r255PreDrawReady.sourceLiveLineageMatches &&
+        r255PreDrawReady.componentSnapshotsPresent &&
+        r255PreDrawReady.ready &&
+        r255PreDrawReady.indexCount == 3u &&
+        r255PreDrawReady.startIndexLocation == 0u &&
+        r255PreDrawReady.indexFormat == DXGI_FORMAT_R16_UINT &&
+        r255PreDrawReady.indexOffset == geometryIndexOffset &&
+        r255PreDrawReady.snapshotToken != 0 &&
+        validateR255PreDraw(
+            firstR252DispatchSnapshot,
+            firstR253SourceValueSnapshot,
+            firstR254LiveIndexSnapshot,
+            r255PreDrawReady.snapshotToken),
+        "R255 joins current R252 R253 and R254 receipts into final indexed pre-Draw proof");
+    const auto firstR255PreDrawSnapshot = r255PreDrawReady.snapshotToken;
+
+    const auto staleR252DispatchSnapshot =
+        firstR252DispatchSnapshot == 1ull ? 2ull : 1ull;
+    const auto r255StaleDispatch = r255PreDrawReadiness(
+        staleR252DispatchSnapshot,
+        firstR253SourceValueSnapshot,
+        firstR254LiveIndexSnapshot);
+    require(
+        !r255StaleDispatch.directDispatchSnapshotMatches &&
+        !r255StaleDispatch.ready &&
+        r255StaleDispatch.snapshotToken == 0,
+        "R255 rejects stale R252 dispatch receipt");
+
+    const auto staleR253SourceValueSnapshot =
+        firstR253SourceValueSnapshot == 1ull ? 2ull : 1ull;
+    const auto r255StaleSource = r255PreDrawReadiness(
+        firstR252DispatchSnapshot,
+        staleR253SourceValueSnapshot,
+        firstR254LiveIndexSnapshot);
+    require(
+        r255StaleSource.directDispatchSnapshotMatches &&
+        !r255StaleSource.sourceValueSnapshotMatches &&
+        !r255StaleSource.ready &&
+        r255StaleSource.snapshotToken == 0,
+        "R255 rejects stale R253 source-value receipt");
+
+    const auto staleR254LiveIndexSnapshot =
+        firstR254LiveIndexSnapshot == 1ull ? 2ull : 1ull;
+    const auto r255StaleLive = r255PreDrawReadiness(
+        firstR252DispatchSnapshot,
+        firstR253SourceValueSnapshot,
+        staleR254LiveIndexSnapshot);
+    require(
+        r255StaleLive.directDispatchSnapshotMatches &&
+        r255StaleLive.sourceValueSnapshotMatches &&
+        r255StaleLive.liveIndexBindingReady &&
+        !r255StaleLive.liveIndexBindingSnapshotMatches &&
+        !r255StaleLive.ready &&
+        r255StaleLive.snapshotToken == 0,
+        "R255 rejects stale R254 live IA receipt");
+
+    require(
+        validateR255PreDraw(
+            firstR252DispatchSnapshot,
+            firstR253SourceValueSnapshot,
+            firstR254LiveIndexSnapshot,
+            firstR255PreDrawSnapshot),
+        "R255 final indexed pre-Draw receipt revalidates while all inputs remain current");
+
     const auto r252DeclaredRangeExcludesZero =
         programmableCache.indexed_direct_dispatch_readiness(
             d3d.context, d3d.device, programmablePair,
