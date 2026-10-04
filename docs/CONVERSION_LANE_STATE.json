@@ -76,7 +76,8 @@
       "attempt": "1/3",
       "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH",
       "rollover_is_retry": false
-    }
+    },
+    "run_record_commit_sha": "daf0d671525a328eab7cb2943cf2ece3ab2897d7"
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
