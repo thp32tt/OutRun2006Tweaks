@@ -126,6 +126,11 @@ for banned in ("R23GameDrawSerial", "R23BeforeTopLevelDraw", "GetTopLevelDrawSer
     if banned in r26:
         errors.append(f"R26 regained R23 implementation dependency: {banned}")
 
+if "R23GameDrawSerial" in r30_safe:
+    errors.append("active R30-safe HUD path retained direct R23 draw-serial state")
+if "TopLevelDrawSerial() + 1u" not in r30_safe:
+    errors.append("active R30-safe HUD path missing R23 draw-serial owner query")
+
 for marker, source, owner in (
     ("InvalidateLiveStateSample()", r23, "R23"),
     ("InvalidateEffectStateCache()", r29, "R29"),
