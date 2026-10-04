@@ -1307,3 +1307,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Decision: `C133_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. Producer REWORK=0; pending_artwork localize_text=40. 1A43E9D9 remains HIGH_RISK pending in-game; 4F68708E/F6811E94 remain strict HOLD.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_C/20261005-C133-1762489B/C133_176_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C133-1762489B/C133_176_MACHINE_QA.json`.
+
+## 2026-10-05 06:28:21 KST — C135 EBFC709F corrective final PASS
+- Reviewed only current unfinished/rework index 232 `EBFC709F_512x256.dds`; completed C133 and earlier PASS assets were not repeated.
+- B48 was rejected because historical-diff discovery localized only two small headings, missed the two large blue physical JOIN/CREATE occurrences, and produced tofu. B49/B50 then failed closed because rectangular source cells captured neighboring sentence pixels.
+- C134 measured exact source line geometry directly. C135 used those measurements to isolate four physical heading occurrences: small gray JOIN GAME / CREATE GAME and large blue CREATE GAME / JOIN GAME, while preserving the explanatory English sentences and unrelated artwork.
+- Final candidate `7404fa227035e2fa003f4fa13f1bd348a050317757d7761c9d638f5fc1a01da4`: verified Noto CJK glyphs, exact 2048x1024 RGBA32 header and raw `mirror_y`; 4/4 exact bbox+size PASS with positive margins; source residue/outside/alpha/protected/target/overlap/touch all 0.
+- Controller SOURCE/CLEAN/FINAL, 2x row-contact and raw visual QA PASS: no tofu, clipping, overlap, seam, halo, residue or orientation regression.
+- Decision: `C135_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. Producer REWORK=0; pending_artwork localize_text=39. 1A43E9D9 remains HIGH_RISK pending in-game; 4F68708E/F6811E94 remain strict HOLD.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C135-EBFC709F/C135_EBFC_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C135-EBFC709F/C135_EBFC_MACHINE_QA.json`, `localization/graphics/role_C/20261005-C134-EBFC709F-DIAG/C134_EBFC_SOURCE_LINE_DIAGNOSTIC.json`.

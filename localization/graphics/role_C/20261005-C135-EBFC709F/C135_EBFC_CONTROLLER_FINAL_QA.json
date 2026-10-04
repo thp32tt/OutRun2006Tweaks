@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C135",
+  "timestamp_kst": "2026-10-05T06:28:21+09:00",
+  "scope": "current unfinished/rework index 232 EBFC709F only; completed C133 and earlier assets were not repeated",
+  "asset": "EBFC709F",
+  "queue_index": 232,
+  "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+  "candidate_sha256": "7404fa227035e2fa003f4fa13f1bd348a050317757d7761c9d638f5fc1a01da4",
+  "candidate_changed_by_C": true,
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "diagnostic_report": "localization/graphics/role_C/20261005-C134-EBFC709F-DIAG/C134_EBFC_SOURCE_LINE_DIAGNOSTIC.json",
+  "machine_report": "localization/graphics/role_C/20261005-C135-EBFC709F/C135_EBFC_MACHINE_QA.json",
+  "machine_status": "PASS",
+  "machine_checks": {
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "physical_occurrences": "4/4",
+    "semantic_labels": 2,
+    "bbox_and_size": "4/4 PASS with positive margins",
+    "font_coverage": "PASS_VERIFIED_NOTO_CJK",
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "target_pixels_outside_original_bboxes": 0,
+    "target_mask_pixels_invisible_in_candidate": 0,
+    "source_residue_pixels_outside_2px_target_guard": 0,
+    "clean_changed_pixels_outside_source": 0,
+    "clean_source_alpha_remaining": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_touch_pairs": []
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_evidence": [
+    "localization/graphics/role_C/20261005-C135-EBFC709F/C135_EBFC_COMPARE.jpg",
+    "localization/graphics/role_C/20261005-C135-EBFC709F/C135_EBFC_ROW_CONTACT_2X.jpg",
+    "localization/graphics/role_C/20261005-C135-EBFC709F/C135_EBFC_RAW_COMPARE.jpg"
+  ],
+  "controller_visual_note": "Exact-source comparison shows both small gray JOIN/CREATE headings and both large blue CREATE/JOIN headings replaced with readable Hangul. The explanatory English sentences beneath the small headings remain source pixels, no tofu remains, clean plate has no target residue, no clipping/overlap/seam/halo is visible, and raw mirror_y orientation matches source.",
+  "superseded_attempts": [
+    "B_PRODUCTION48 rejected: incomplete two-occurrence discovery + tofu",
+    "B_PRODUCTION49 fail-closed: ambiguous join_small rectangular cell",
+    "B_PRODUCTION50 fail-closed: ambiguous join_small rectangular cell",
+    "C135 first hosted retry 37235968563 failed closed on coarse diagnostic-vs-exact bbox mismatch before writing candidate; C135 exact-bbox retry succeeded"
+  ],
+  "decision": "C135_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "global_rework_remaining": [],
+  "existing_high_risk_static_pass_assets": [
+    "1A43E9D9"
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94"
+  ],
+  "pending_production_localize_text": 39,
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
