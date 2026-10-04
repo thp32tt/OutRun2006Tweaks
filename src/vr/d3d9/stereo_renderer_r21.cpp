@@ -225,11 +225,10 @@ namespace OutRunVRStereo
             {
                 const auto r9 = R9InstallStatus();
                 const auto r13 = R13InstallStatus();
-                const auto r20 = R20InstallStatus();
 
                 if (r9 == R9InstallStatusValue::Failed ||
                     r13 == R13InstallStatusValue::Failed ||
-                    r20 == State::Failed)
+                    R20InstallStatus() == State::Failed)
                 {
                     R21InstallState.store(State::Failed, std::memory_order_release);
                     spdlog::error(
@@ -239,7 +238,7 @@ namespace OutRunVRStereo
 
                 if (r9 == R9InstallStatusValue::Ready &&
                     r13 == R13InstallStatusValue::Ready &&
-                    r20 == State::Ready)
+                    R20InstallStatus() == State::Ready)
                 {
                     R21PresentR9Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&PresentDestR9), PresentDestR21,
