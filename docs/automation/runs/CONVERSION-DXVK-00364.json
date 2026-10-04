@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DXVK-00364",
-  "production_id": "CONVERSION-DX11-00363",
-  "event_id": "CONVERSION-DX11-00363-E005",
-  "event_type": "retry",
+  "production_id": "CONVERSION-DXVK-00364",
+  "event_id": "CONVERSION-DXVK-00364-E004",
+  "event_type": "rollover",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
   "base_sha": "1c92b0c753fb3344680a8e72703c8f0d308eb347",
@@ -103,7 +103,7 @@
   "pipeline": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered GitHub SSOT and completed F119 result/validation state without repeating finished work. The current controller-issued producer/event is CONVERSION-DX11-00363 / CONVERSION-DX11-00363-E005 / retry / ATTEMPT=1/3; it supersedes the concurrently persisted E004 rollover bookkeeping only. Material and validation-bearing SHA remain unchanged."
+      "evidence": "Recovered GitHub SSOT, detected and corrected a concurrent stale queue-dispatch reconciliation that had overwritten the current explicit E004 rollover metadata. ATTEMPT remains 1/3 because the current rollover is not a retry. F119 material and validation-bearing SHA are unchanged."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
@@ -128,7 +128,7 @@
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "evidence": "Durable run record and lane state persist the authoritative E005 retry dispatch, validation-bearing SHA 467937f9be4c350ea158f2b083e674372676d62d, exact-SHA gate evidence, RUNTIME_VALIDATION=UNTESTED and the exact next raw-frontier action."
+      "evidence": "Durable run record and lane state persist the authoritative E004 rollover dispatch, validation-bearing SHA 467937f9be4c350ea158f2b083e674372676d62d, exact-SHA gate evidence, RUNTIME_VALIDATION=UNTESTED, and the exact next raw-frontier action. The stale concurrent E005 queue bookkeeping is superseded only at metadata level."
     }
   },
   "blocker": null,
@@ -136,12 +136,6 @@
   "exact_next_action": "Capture the exact canonical 64-byte raw frontier 0x0018398E..0x001839CE from the validated F119 instruction boundary. Carry unresolved target debt [0x0018399B,0x001839B5,0x001839CD,0x001839D2,0x00183B6F] fail-closed, resolve targets only on exact instruction boundaries, and keep function/render/HUD/runtime semantics unresolved.",
   "validated_at_kst": "2026-10-04T18:23:42+09:00",
   "controller_dispatch": {
-    "production_id": "CONVERSION-DX11-00363",
-    "event_id": "CONVERSION-DX11-00363-E005",
-    "event_type": "retry",
-    "attempt": "1/3"
-  },
-  "prior_controller_dispatch": {
     "production_id": "CONVERSION-DXVK-00364",
     "event_id": "CONVERSION-DXVK-00364-E004",
     "event_type": "rollover",
@@ -150,9 +144,21 @@
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt"
   },
+  "prior_controller_dispatch": {
+    "production_id": "CONVERSION-DX11-00363",
+    "event_id": "CONVERSION-DX11-00363-E005",
+    "event_type": "retry",
+    "attempt": "1/3"
+  },
   "run_record_commit_sha": "d5b9e1fc6c407b2b07f7549b93e5322802b49852",
   "dispatch_metadata_correction": {
     "corrected_from": {
+      "production_id": "CONVERSION-DX11-00363",
+      "event_id": "CONVERSION-DX11-00363-E005",
+      "event_type": "retry",
+      "attempt": "1/3"
+    },
+    "corrected_to": {
       "production_id": "CONVERSION-DXVK-00364",
       "event_id": "CONVERSION-DXVK-00364-E004",
       "event_type": "rollover",
@@ -161,13 +167,10 @@
       "rollover_is_retry": false,
       "resume_reason": "Retry persisted after one recovery attempt"
     },
-    "corrected_to": {
-      "production_id": "CONVERSION-DX11-00363",
-      "event_id": "CONVERSION-DX11-00363-E005",
-      "event_type": "retry",
-      "attempt": "1/3"
-    },
-    "reason": "The current controller-issued queue message is authoritative: producer CONVERSION-DX11-00363, event CONVERSION-DX11-00363-E005, EVENT_TYPE=retry, ATTEMPT=1/3. This correction changes dispatch bookkeeping only; F119 material/result SHA and exact-SHA validation evidence remain unchanged.",
+    "reason": "The newest explicit user rollover message is authoritative: TASK/PRODUCTION CONVERSION-DXVK-00364, EVENT CONVERSION-DXVK-00364-E004, EVENT_TYPE=rollover, ATTEMPT=1/3, CHAT_ROLLOVER=3. Rollover is not a retry. The concurrent queue reconciliation at f67b633e0f12452c1c40847b173e33cd87110239 is superseded for dispatch bookkeeping only; material/result SHA and exact-SHA validation evidence remain unchanged.",
     "material_and_validation_bearing_sha_unchanged": true
-  }
+  },
+  "chat_rollover": 3,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt"
 }
