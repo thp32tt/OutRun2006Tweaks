@@ -76,6 +76,27 @@ if "StateBlockTracker::SetLifecycleHooksReady(stateBlockHooks)" not in r22.repla
 if "StateBlockTracker::SetLifecycleHooksReady(false)" not in r22:
     errors.append("R22 rollback/install path missing lifecycle coverage reset")
 
+for rel, source in (
+    ("R20", r20), ("R23", r23), ("R29", r29),
+    ("R31", r31), ("R32", r32), ("R33", r33),
+):
+    for banned in ("R9MainDepthContentSerial", "R9MonoDepthContentSerial"):
+        if banned in source:
+            errors.append(
+                f"{rel} retained direct R9 depth-content state dependency: {banned}")
+for marker in (
+    "R9SynchronizeDepthContentSerials()",
+    "R9NoteMainDepthContentWrite()",
+):
+    if marker not in r9:
+        errors.append(f"R9 missing depth-content owner API: {marker}")
+for rel, source in (("R20", r20), ("R23", r23)):
+    if "R9SynchronizeDepthContentSerials()" not in source:
+        errors.append(f"{rel} missing R9 depth-content synchronization owner API")
+for rel, source in (("R29", r29), ("R31", r31), ("R32", r32), ("R33", r33)):
+    if "R9NoteMainDepthContentWrite()" not in source:
+        errors.append(f"{rel} missing R9 main-depth write owner API")
+
 for banned in ("R23GameDrawSerial", "R23BeforeTopLevelDraw", "GetTopLevelDrawSerial()"):
     if banned in r26:
         errors.append(f"R26 regained R23 implementation dependency: {banned}")
