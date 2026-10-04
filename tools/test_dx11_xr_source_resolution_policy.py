@@ -94,14 +94,14 @@ require(
 # default scale that pulls edge HUD/menu elements back toward the centre.
 for literal, meaning in (
     ("UIScalingMode = 1", "OutRun Online Arcade UI scaling default"),
-    ("HudScale = 1.00", "VR must preserve game UI placement by default"),
+    ("HudScale = 0.55", "Quest 3 HUD size trim default"),
 ):
     require(ini, literal, meaning)
 
 require(
     vr_settings,
-    'Setting<float> VRHudScale{ "VR", "HudScale", 1.00f,',
-    "VR HUD default must be identity scale",
+    'Setting<float> VRHudScale{ "VR", "HudScale", 0.55f,',
+    "VR HUD default must restore the prior Quest 3 size trim",
 )
 for literal, meaning in (
     ("float scale = min(Game::screen_scale->x, Game::screen_scale->y);", "canonical UI contain scale"),
@@ -133,5 +133,18 @@ require(
     "Do not \"contain\" it",
     "explicit full-path game UI layout ownership contract",
 )
+
+
+# Normal CORRECTNESS sessions must not pay diagnostic per-draw/stack-walk costs.
+for literal, meaning in (
+    ("$hudInspectorProfiles=@('HUD_SCREEN','HUD_MENU','HUD_WORLD','STAGE_DIAGNOSTIC')", "HUD inspector diagnostic opt-in"),
+    ("$env:OUTRUN_VR_DX11_CENSUS='0'", "DX11 census disabled outside explicit diagnostic"),
+    ("$env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE='0'", "DX11 exhaustive census disabled for runtime tests"),
+    ("$TestProfile -eq 'STAGE_DIAGNOSTIC'", "diagnostic-only shader/census gate"),
+):
+    require(runner, literal, meaning)
+
+if "if($backend -ne '2d'){\n    $gameArgs += '-HudInspector=true'\n}" in runner:
+    raise SystemExit("HUD inspector must not be forced on for every VR run")
 
 print("DX11 XR source-resolution + UI-scaling SSOT policy: PASS")

@@ -225,8 +225,13 @@ if($backend -eq 'd3d9'){
     }
 }
 
-if($backend -ne '2d'){
+# Keep expensive HUD stack-walk tracing out of normal play/performance runs.
+# HUD-focused and stage-diagnostic profiles opt in explicitly.
+$hudInspectorProfiles=@('HUD_SCREEN','HUD_MENU','HUD_WORLD','STAGE_DIAGNOSTIC')
+if($backend -ne '2d' -and $hudInspectorProfiles -contains $TestProfile){
     $gameArgs += '-HudInspector=true'
+}else{
+    $gameArgs += '-HudInspector=false'
 }
 
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
@@ -286,6 +291,8 @@ $oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
 $oldTestProfile = $env:OUTRUN_VR_TEST_PROFILE
 $oldPerformanceProfile = $env:OUTRUN_VR_PERFORMANCE_PROFILE
 $oldShaderFingerprint = $env:OUTRUN_VR_SHADER_FINGERPRINT
+$oldDx11Census = $env:OUTRUN_VR_DX11_CENSUS
+$oldDx11CensusExhaustive = $env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE
 $identityKeys = @(
     'OUTRUN_VR_SESSION_ID',
     'OUTRUN_VR_VARIANT_ID',
@@ -316,11 +323,19 @@ if($backend -eq '2d'){
     $env:OUTRUN_VR_FORCE_DISABLED=$null
 }
 
-if($backend -ne '2d'){
+# Expensive shader fingerprint capture and DX11 draw census are diagnostics,
+# not part of the normal CORRECTNESS performance path.
+if($backend -ne '2d' -and $TestProfile -eq 'STAGE_DIAGNOSTIC'){
     $env:OUTRUN_VR_SHADER_FINGERPRINT='1'
 }else{
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$null
 }
+if($backend -eq 'dx11' -and $TestProfile -eq 'STAGE_DIAGNOSTIC'){
+    $env:OUTRUN_VR_DX11_CENSUS='1'
+}else{
+    $env:OUTRUN_VR_DX11_CENSUS='0'
+}
+$env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE='0'
 
 foreach($entry in $profile.Environment.GetEnumerator()){
     Set-Item -Path ("Env:" + $entry.Key) -Value ([string]$entry.Value)
@@ -350,6 +365,8 @@ try{
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
     $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$oldShaderFingerprint
+    $env:OUTRUN_VR_DX11_CENSUS=$oldDx11Census
+    $env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=$oldDx11CensusExhaustive
     $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$oldExeSemanticVerified
     $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$oldExeSemanticMode
     $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$oldHudExperimentMode

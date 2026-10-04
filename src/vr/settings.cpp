@@ -34,8 +34,8 @@ namespace Settings
 		"Fits the borderless PC mirror window to the current monitor even when the internal game backbuffer is larger. The VR render resolution is unchanged." };
 	Setting<bool> VRDisableDesktopVsync{ "VR", "DisableDesktopVsync", true,
 		"Uses immediate D3D9 presentation while VR is enabled so the game source is not hard-capped by the desktop VSync setting before the OpenXR host captures it." };
-	Setting<float> VRHudScale{ "VR", "HudScale", 1.00f,
-		"Optional final VR HUD size trim after the game's UIScaling transform. 1.00 preserves the canonical UI placement; lower values intentionally shrink the whole HUD toward the centre.", Range<float>{ 0.30f, 1.20f } };
+	Setting<float> VRHudScale{ "VR", "HudScale", 0.55f,
+		"Optional final VR HUD size trim after the game's UIScaling transform. 0.55 restores the proven Quest 3 HUD size while preserving the game's aspect-correct UI layout.", Range<float>{ 0.30f, 1.20f } };
 	Setting<bool> VRHeadTracking{ "VR", "HeadTracking", true,
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
