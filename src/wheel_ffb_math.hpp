@@ -33,6 +33,14 @@ namespace WheelFFBMath
         }
     }
 
+    // R10 MOZA-R3 test contract: polarity belongs to the force model, not to a
+    // stale global checkbox. Modern DD needs the R3 reversal while the
+    // Lindbergh/PS2-derived models use the opposite transport polarity.
+    inline bool model_uses_r3_reverse_polarity(Model model)
+    {
+        return model == Model::ModernDD;
+    }
+
     inline bool model_uses_modern_sat(Model model)
     {
         return model == Model::ModernDD || model == Model::ArcadeHybrid;
@@ -382,6 +390,50 @@ namespace WheelFFBMath
         return true;
     }
 
+    constexpr unsigned ImperialAvenueCompanionPavingMask = 0x00000800u;
+
+    // R10 hardware log: Imperial Avenue repeatedly alternates primary mask 0x2
+    // with 0x800 while the car is on the visual stone-paved roadway. R9 removed
+    // the erroneous water buzz but made this surface too quiet. Recognize only
+    // this exact stage/context/mask family and add a low-amplitude texture floor.
+    inline bool imperial_avenue_stone_paving_pattern(
+        int uniqueStage,
+        int collisionContext,
+        const std::array<unsigned, 4>& masks)
+    {
+        if (uniqueStage != 14 || collisionContext != 0)
+            return false;
+        bool sawPrimary = false;
+        for (unsigned mask : masks)
+        {
+            if (mask == PrimaryAsphaltSurfaceMask)
+                sawPrimary = true;
+            else if (mask != ImperialAvenueCompanionPavingMask)
+                return false;
+        }
+        return sawPrimary;
+    }
+
+    inline float imperial_avenue_stone_tactile_amplitude(
+        float speedNorm,
+        float roadSetting,
+        float outputStrength)
+    {
+        if (!std::isfinite(speedNorm) || !std::isfinite(roadSetting) ||
+            !std::isfinite(outputStrength))
+            return 0.0f;
+        const float speedGate = smoothstep01(
+            (std::clamp(speedNorm, 0.0f, 1.0f) - 0.05f) / 0.30f);
+        const float roadScale = std::clamp(roadSetting / 0.60f, 0.0f, 1.67f);
+        const float gainScale = std::clamp(outputStrength / 0.70f, 0.0f, 2.0f);
+        // Roughly one quarter of the old 0.28 full-road buzz: clearly
+        // perceptible as paving, but well below curb/grass impact texture.
+        return std::clamp(
+            (0.045f + 0.030f * speedGate) * roadScale * gainScale,
+            0.0f, 0.09f);
+    }
+
+
     // Common PC/DD contact layer used only to make the physically obvious
     // 0/1/2/3/4-wheel contact states distinguishable.  It does not replace the
     // Lindbergh or PS2 source-model effects; those remain the primary model
@@ -483,6 +535,55 @@ namespace WheelFFBMath
         const float h01 = -2.0f * t3 + 3.0f * t2;
         const float y = h00 * Knee + h10 * span + h01;
         return sign * y;
+    }
+
+    // A real rack/caster geometry aligns the front wheels with the direction
+    // of travel, not with the vehicle body's zero-steer heading. The synthetic
+    // DirectInput centre spring is useful at low slip but becomes unphysical in
+    // a drift, so fade it almost completely as chassis sideslip grows.
+    inline float drift_center_spring_scale(float bodySlip)
+    {
+        if (!std::isfinite(bodySlip))
+            return 1.0f;
+        const float t = smoothstep01(
+            (std::abs(bodySlip) - 0.10f) / 0.24f);
+        return 1.0f - 0.95f * t;
+    }
+
+    // Bounded mechanical/caster assist toward the velocity-aligned road-wheel
+    // angle. This is deliberately smaller than the tyre SAT itself and only
+    // wakes up at large chassis sideslip, where the front wheels of a real
+    // drifting car naturally self-steer into counter-steer.
+    inline float drift_velocity_alignment_assist(
+        float bodySlip,
+        float yawRate,
+        float steer,
+        float speedNorm)
+    {
+        if (!std::isfinite(bodySlip) || !std::isfinite(yawRate) ||
+            !std::isfinite(steer) || !std::isfinite(speedNorm))
+            return 0.0f;
+
+        constexpr float RoadWheelLockRad = 0.52f;
+        const float speed = std::clamp(speedNorm, 0.0f, 1.0f);
+        const float yawLeadSeconds = 0.10f - 0.045f * speed;
+        const float desiredRoadWheelAngle = std::clamp(
+            bodySlip + yawRate * yawLeadSeconds,
+            -RoadWheelLockRad, RoadWheelLockRad);
+        const float desiredSteer =
+            desiredRoadWheelAngle / RoadWheelLockRad;
+        const float error = std::clamp(
+            desiredSteer - steer, -1.0f, 1.0f);
+
+        const float slipGate = smoothstep01(
+            (std::abs(bodySlip) - 0.18f) / 0.24f);
+        const float errorGate = smoothstep01(
+            (std::abs(error) - 0.03f) / 0.30f);
+        const float speedGate = smoothstep01(
+            (speed - 0.12f) / 0.38f);
+        const float magnitude =
+            0.18f * slipGate * errorGate * speedGate;
+        return error >= 0.0f ? magnitude : -magnitude;
     }
 
     inline float physics_return_relief(float alpha, float steerRate)
