@@ -892,6 +892,26 @@ namespace OutRunVRStereo
         VRR22SafetyOverlayHook VRR22SafetyOverlayHook::instance;
     }
 
+    class R22RasterReplayGuard
+    {
+    public:
+        R22RasterReplayGuard(IDirect3DDevice9* device,
+            const char* site) noexcept
+            : replay_(device)
+        {
+            if (!replay_.stateValid)
+                R22FailClosedReplayState(device, site);
+        }
+
+        bool StateValid() const noexcept
+        {
+            return replay_.stateValid;
+        }
+
+    private:
+        R22ReplayScope replay_;
+    };
+
     inline OutRunVR::RuntimeEligibility::InstallState
     R22InstallStatus() noexcept
     {
