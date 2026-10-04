@@ -286,7 +286,7 @@ async def localization_cycle(context, pages, reg: Registry):
 
 async def conversion_cycle(context, pages, reg: Registry):
     # Separate branch-level conversion work retains its own mode and volume.
-    for lane, branch in (("A", "vr-dx11-native-r71"), ("B", "vr-dxvk-r71-disasm")):
+    for lane, branch in (("A", "vr-dx11-native-r71"), ("B", "vr-dxvk-r71-disasm"), ("C", "vr-d3d9ex-focus")):
         head = await asyncio.to_thread(github_branch_head, branch)
         if not head:
             continue
