@@ -14,8 +14,8 @@ source_url='https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f
 source_sha_expected='3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d'
 # Human source review from the hosted discovery contact sheet; coordinates are source 512x512 logical cells and scale exactly x4 in the 2048 HD atlas.
 spec=[
- ('name','NAME','이름',(10,174,90,194),0.0),
- ('status','STATUS','상태',(398,174,486,194),0.0),
+ ('name','NAME','이름',(12,177,82,191),0.0),
+ ('status','STATUS','상태',(402,177,478,191),0.0),
  ('stage','Stage','스테이지',(268,188,330,212),0.10),
  ('next_stage','Next Stage','다음 스테이지',(326,207,414,236),0.10),
  ('ghost','Ghost','고스트',(414,207,478,236),0.10),
@@ -67,9 +67,10 @@ def text_mask_for_cell(cell):
     if transparent>=0.60:
         mask=(crop[:,:,3]>2); bg=(0,0,0,0); bg_type='transparent'; variance=0.0
     else:
-        bg=mode_rgba(border.tolist()); bgv=np.array(bg,dtype=np.int16)
+        allpix=crop.reshape(-1,4); bg=mode_rgba(allpix.tolist()); bgv=np.array(bg,dtype=np.int16)
+        quant=np.array([[(int(c)//8)*8 for c in px] for px in allpix],dtype=np.int16); coverage=float(np.mean(np.all(quant==bgv,axis=1)))
         dist=np.max(np.abs(crop-bgv),axis=2); mask=(dist>10)&(crop[:,:,3]>8); bg_type='flat_or_near_flat'; variance=float(np.percentile(np.max(np.abs(border-bgv),axis=1),90))
-        if variance>36: raise RuntimeError(f'background too variable for automatic clean plate cell={cell} variance={variance}')
+        if coverage<0.30: raise RuntimeError(f'background lacks dominant flat color cell={cell} coverage={coverage} variance={variance}')
     # Remove isolated one-pixel noise while retaining punctuation/dots by keeping components >=2 px in HD.
     im=Image.fromarray((mask*255).astype(np.uint8),'L'); a=np.asarray(im)>0; seen=np.zeros(a.shape,bool); keep=np.zeros(a.shape,bool)
     H,W=a.shape
