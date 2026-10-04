@@ -182,7 +182,7 @@ switch ([string]$target.RendererTarget) {
         $runnerText = Get-Content (Join-Path $toolsRoot 'Run-OutRunVRTest.ps1') -Raw
         $dx11RunnerMatch = [regex]::Match(
             $runnerText,
-            "(?s)elseif\(\$backend -eq 'dx11'\)\{(?<body>.*?)\r?\n\}else\{")
+            '(?s)elseif\(\$backend -eq ''dx11''\)\{(?<body>.*?)\r?\n\}else\{')
         if (!$dx11RunnerMatch.Success) {
             throw 'DX11 runtime cadence policy block could not be isolated.'
         }
