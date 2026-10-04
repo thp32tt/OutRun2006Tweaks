@@ -1,0 +1,565 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261004-B-RECOVERY07",
+  "base_head": "5b296e46e79ab4d292399373af242f8557b5baa9",
+  "queue_index": 48,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+  "readiness_tier": "RENDER_READY_AFTER_PERSISTED_HD_GRID_DIAGNOSTIC",
+  "source_upstream_repo": "Sonic-TV/OR2006Sprites",
+  "source_upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+  "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+  "candidate_sha256": "13405cbc781820119e0f0295b3315c562cc2aeed301c4e6351da681f8a25ed09",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+  "method": "pinned exact HD source -> nine source glyph/effect masks -> protected mask -> transparent/row-reconstructed clean plate -> fresh native-resolution Korean lettering with measured source palette/slant -> exact source-header RGBA32 DDS -> decoded final QA",
+  "historical_full_draft_note": "used only as discovery evidence; no historical localized raster pixels reused or upscaled",
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "pf_flags": 65,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "channel_layout": "RGBA masks preserved"
+  },
+  "segments_total": 9,
+  "segments_rendered": 9,
+  "clean_plate": {
+    "changed_pixels_outside_source_text_mask": 0,
+    "transparent_source_text_residue_pixels": 0,
+    "status": "PASS"
+  },
+  "containment": {
+    "elements_total": 9,
+    "elements_pass": 9,
+    "elements_fail": 0,
+    "changed_pixels_outside_permitted_source_bboxes": 0,
+    "alpha_changed_outside_permitted_source_bboxes": 0,
+    "protected_changes": 0,
+    "target_overlap_pairs": [],
+    "status": "PASS"
+  },
+  "rows": [
+    {
+      "key": "name",
+      "source": "NAME",
+      "korean": "이름",
+      "hd_cell": [
+        48,
+        744,
+        230,
+        812
+      ],
+      "original_bbox": [
+        74,
+        769,
+        205,
+        805
+      ],
+      "localized_bbox": [
+        110,
+        770,
+        169,
+        804
+      ],
+      "delta_left": 36,
+      "delta_right": 36,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 34,
+      "stroke_width": 0,
+      "palette": {
+        "top": [
+          90,
+          93,
+          99,
+          255
+        ],
+        "bottom": [
+          90,
+          93,
+          99,
+          255
+        ],
+        "outline": [
+          90,
+          93,
+          99,
+          255
+        ]
+      },
+      "source_mask_meta": {
+        "type": "opaque_or_semitransparent_row_reconstruct",
+        "border_transparent_fraction": 0.416,
+        "color_diff_threshold": 10,
+        "alpha_diff_threshold": 10
+      },
+      "historical_localized_raster_reused": false
+    },
+    {
+      "key": "status",
+      "source": "STATUS",
+      "korean": "상태",
+      "hd_cell": [
+        1628,
+        744,
+        1818,
+        812
+      ],
+      "original_bbox": [
+        1648,
+        769,
+        1800,
+        781
+      ],
+      "localized_bbox": [
+        1717,
+        770,
+        1731,
+        780
+      ],
+      "delta_left": 69,
+      "delta_right": 69,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 8,
+      "stroke_width": 0,
+      "palette": {
+        "top": [
+          90,
+          93,
+          99,
+          255
+        ],
+        "bottom": [
+          90,
+          93,
+          99,
+          255
+        ],
+        "outline": [
+          90,
+          93,
+          99,
+          255
+        ]
+      },
+      "source_mask_meta": {
+        "type": "opaque_or_semitransparent_row_reconstruct",
+        "border_transparent_fraction": 0.4186046511627907,
+        "color_diff_threshold": 10,
+        "alpha_diff_threshold": 10
+      },
+      "historical_localized_raster_reused": false
+    },
+    {
+      "key": "stage",
+      "source": "Stage",
+      "korean": "스테이지",
+      "hd_cell": [
+        1060,
+        820,
+        1225,
+        910
+      ],
+      "original_bbox": [
+        1090,
+        835,
+        1214,
+        899
+      ],
+      "localized_bbox": [
+        1092,
+        849,
+        1212,
+        884
+      ],
+      "delta_left": 2,
+      "delta_right": 2,
+      "delta_top": 14,
+      "delta_bottom": 15,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 32,
+      "stroke_width": 2,
+      "palette": {
+        "top": [
+          249,
+          208,
+          12,
+          255
+        ],
+        "bottom": [
+          248,
+          207,
+          12,
+          255
+        ],
+        "outline": [
+          0,
+          10,
+          65,
+          255
+        ]
+      },
+      "source_mask_meta": {
+        "type": "transparent",
+        "border_transparent_fraction": 1.0
+      },
+      "historical_localized_raster_reused": false
+    },
+    {
+      "key": "next_stage",
+      "source": "Next Stage",
+      "korean": "다음 스테이지",
+      "hd_cell": [
+        1300,
+        895,
+        1640,
+        990
+      ],
+      "original_bbox": [
+        1331,
+        909,
+        1619,
+        976
+      ],
+      "localized_bbox": [
+        1334,
+        916,
+        1615,
+        968
+      ],
+      "delta_left": 3,
+      "delta_right": 4,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 49,
+      "stroke_width": 3,
+      "palette": {
+        "top": [
+          245,
+          204,
+          12,
+          255
+        ],
+        "bottom": [
+          245,
+          204,
+          12,
+          255
+        ],
+        "outline": [
+          0,
+          10,
+          65,
+          255
+        ]
+      },
+      "source_mask_meta": {
+        "type": "transparent",
+        "border_transparent_fraction": 0.9948914431673053
+      },
+      "historical_localized_raster_reused": false
+    },
+    {
+      "key": "ghost",
+      "source": "Ghost",
+      "korean": "고스트",
+      "hd_cell": [
+        1640,
+        895,
+        1840,
+        990
+      ],
+      "original_bbox": [
+        1668,
+        909,
+        1824,
+        978
+      ],
+      "localized_bbox": [
+        1669,
+        919,
+        1822,
+        968
+      ],
+      "delta_left": 1,
+      "delta_right": 2,
+      "delta_top": 10,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 54,
+      "stroke_width": 4,
+      "palette": {
+        "top": [
+          249,
+          208,
+          12,
+          255
+        ],
+        "bottom": [
+          249,
+          208,
+          12,
+          255
+        ],
+        "outline": [
+          0,
+          10,
+          65,
+          255
+        ]
+      },
+      "source_mask_meta": {
+        "type": "transparent",
+        "border_transparent_fraction": 1.0
+      },
+      "historical_localized_raster_reused": false
+    },
+    {
+      "key": "total_time",
+      "source": "Total Time",
+      "korean": "총 시간",
+      "hd_cell": [
+        36,
+        1688,
+        850,
+        1845
+      ],
+      "original_bbox": [
+        51,
+        1698,
+        841,
+        1841
+      ],
+      "localized_bbox": [
+        245,
+        1700,
+        647,
+        1838
+      ],
+      "delta_left": 194,
+      "delta_right": 194,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 131,
+      "stroke_width": 9,
+      "palette": {
+        "top": [
+          255,
+          237,
+          209,
+          254
+        ],
+        "bottom": [
+          246,
+          197,
+          149,
+          254
+        ],
+        "outline": [
+          0,
+          0,
+          0,
+          127
+        ]
+      },
+      "source_mask_meta": {
+        "type": "transparent",
+        "border_transparent_fraction": 0.9009783728115345
+      },
+      "historical_localized_raster_reused": false
+    },
+    {
+      "key": "slipstream",
+      "source": "Slipstream",
+      "korean": "슬립스트림",
+      "hd_cell": [
+        860,
+        1700,
+        1420,
+        1840
+      ],
+      "original_bbox": [
+        889,
+        1718,
+        1388,
+        1825
+      ],
+      "localized_bbox": [
+        912,
+        1719,
+        1365,
+        1823
+      ],
+      "delta_left": 23,
+      "delta_right": 23,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 98,
+      "stroke_width": 7,
+      "palette": {
+        "top": [
+          244,
+          251,
+          251,
+          255
+        ],
+        "bottom": [
+          245,
+          252,
+          252,
+          255
+        ],
+        "outline": [
+          0,
+          32,
+          255,
+          100
+        ]
+      },
+      "source_mask_meta": {
+        "type": "transparent",
+        "border_transparent_fraction": 1.0
+      },
+      "historical_localized_raster_reused": false
+    },
+    {
+      "key": "new_record",
+      "source": "NEW Record!!",
+      "korean": "신기록!!",
+      "hd_cell": [
+        1600,
+        1700,
+        1910,
+        1860
+      ],
+      "original_bbox": [
+        1618,
+        1732,
+        1877,
+        1841
+      ],
+      "localized_bbox": [
+        1619,
+        1746,
+        1876,
+        1826
+      ],
+      "delta_left": 1,
+      "delta_right": 1,
+      "delta_top": 14,
+      "delta_bottom": 15,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 75,
+      "stroke_width": 5,
+      "palette": {
+        "top": [
+          247,
+          242,
+          214,
+          67
+        ],
+        "bottom": [
+          247,
+          240,
+          225,
+          255
+        ],
+        "outline": [
+          16,
+          4,
+          8,
+          255
+        ]
+      },
+      "source_mask_meta": {
+        "type": "transparent",
+        "border_transparent_fraction": 0.9822340425531915
+      },
+      "historical_localized_raster_reused": false
+    },
+    {
+      "key": "extend_time",
+      "source": "Extend Time",
+      "korean": "시간 연장",
+      "hd_cell": [
+        800,
+        1870,
+        1820,
+        2048
+      ],
+      "original_bbox": [
+        834,
+        1899,
+        1777,
+        2043
+      ],
+      "localized_bbox": [
+        1040,
+        1901,
+        1570,
+        2040
+      ],
+      "delta_left": 206,
+      "delta_right": 207,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 132,
+      "stroke_width": 9,
+      "palette": {
+        "top": [
+          255,
+          237,
+          211,
+          254
+        ],
+        "bottom": [
+          248,
+          199,
+          146,
+          254
+        ],
+        "outline": [
+          0,
+          0,
+          0,
+          127
+        ]
+      },
+      "source_mask_meta": {
+        "type": "transparent",
+        "border_transparent_fraction": 0.9206594323873122
+      },
+      "historical_localized_raster_reused": false
+    }
+  ],
+  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B_RECOVERY07_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
