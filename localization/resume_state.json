@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_RECOVERY06 repaired 39229D64; candidate 67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a is pending independent C final QA and isolated in-game validation.",
     "C85: C4A2937B, 9F060EC1, D6DC1380, 48DEBE77 pass current exact pixel+visual static QA but remain pending isolated DDS_ONLY in-game; approved lock count 0.",
     "REWORK 12 current candidates: FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, 62BEBF33, E3FD08BE, C075FB49, FD90AA9.",
     "Full queue remains active: 63 additional localize_text rows pending production and 47 zoom_review rows HOLD_STRICT_RECHECK.",
@@ -204,13 +205,13 @@
         "runtime_validation": "UNTESTED"
       },
       "39229D64": {
-        "status": "C87_REWORK_REQUIRED_DDS_STRUCTURE_AND_CLEANPLATE_EVIDENCE",
-        "candidate_sha256": "a63dcfea0642c9bcb4cb5b41d168923404157d9b65409a3affcf72662343d2b6",
+        "status": "A_RECOVERY06_SELF_QA_PASS_PENDING_C_AND_INGAME",
+        "candidate_sha256": "67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
         "completed_transcription_entries": 13,
         "localized_regions": 15,
         "remaining_segments": 0,
-        "report": "localization/graphics/role_C/20261004-1509-C87/C87_RECOVERY_CROSS_LANE_FINAL_QA.json",
+        "report": "localization/graphics/role_A/20261004-A-RECOVERY06/A_RECOVERY06_39229D64_REPORT.json",
         "a_production_report": "localization/graphics/role_A/20260927-1330-A82/A82_39229D64_PRODUCTION_REPORT.json",
         "b_candidate_changed": false,
         "d_preflight_report": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json",
@@ -225,7 +226,10 @@
         "c_candidate_changed": false,
         "c87_bbox_pass": "15/15",
         "runtime_validation": "UNTESTED",
-        "c87_header_restore_pixel_exact_scratch_proof": true
+        "c87_header_restore_pixel_exact_scratch_proof": true,
+        "a_recovery06_report": "localization/graphics/role_A/20261004-A-RECOVERY06/A_RECOVERY06_39229D64_REPORT.json",
+        "a_recovery06_clean_plate_report": "localization/graphics/role_A/20261004-A-RECOVERY06/A_RECOVERY06_CLEAN_PLATE_VALIDATION.json",
+        "a_recovery06_final_mask_report": "localization/graphics/role_A/20261004-A-RECOVERY06/A_RECOVERY06_FINAL_MASK_VALIDATION.json"
       },
       "A064FDFC": {
         "status": "C87_PIXEL_VISUAL_PASS_PENDING_INGAME",
@@ -1646,5 +1650,33 @@
     "decoder_consistency_report": "localization/graphics/role_B/20261004-B-RECOVERY05/B_RECOVERY05_DECODER_CONSISTENCY.json",
     "production_report": "localization/graphics/role_B/20261004-B-RECOVERY05/B_RECOVERY05_2DA43E41_REPORT.json",
     "runtime_validation": "UNTESTED"
+  },
+  "a_recovery06_39229d64": {
+    "run": "20261004-A-RECOVERY06",
+    "base_head": "f674ad056f410c8a6a9fb65359e4b26ca1a3659d",
+    "reconciled_onto_head": "efaeca70a98799869a212ec7c264ef772b6b41c2",
+    "status": "A_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "candidate_sha256": "67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a",
+    "reworked_source_residue_keys": [
+      "collect_stars",
+      "exit",
+      "goal",
+      "hearts",
+      "hit_ghost",
+      "start",
+      "target"
+    ],
+    "all_15_readable_and_raw_bbox_pass": true,
+    "prior_pass_localized_bbox_exact": "8/8",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "visual_qa": "PASS",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_A/20261004-A-RECOVERY06/A_RECOVERY06_39229D64_REPORT.json",
+    "next_a_target": {
+      "index": 121,
+      "asset": "FD90AA9",
+      "status": "rework_required_zero_pixel_or_artifact"
+    }
   }
 }

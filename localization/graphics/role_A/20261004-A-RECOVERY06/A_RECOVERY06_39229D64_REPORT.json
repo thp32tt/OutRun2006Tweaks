@@ -1,0 +1,801 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261004-A-RECOVERY06",
+  "base_head": "f674ad056f410c8a6a9fb65359e4b26ca1a3659d",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+  "source_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+  "input_candidate_sha256": "a63dcfea0642c9bcb4cb5b41d168923404157d9b65409a3affcf72662343d2b6",
+  "candidate_sha256": "67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a",
+  "method": "C87 direct-return material repair: exact HD source -> text-only source-alpha masks for seven Recovery03 regions -> transparent clean plate -> reapply only candidate-vs-source localized pixel deltas -> exact canonical RGBA32 DDS header/channel layout -> decoded final QA",
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "bytes": 67108992,
+    "header_128_exact_source": true
+  },
+  "reworked_keys": [
+    "collect_stars",
+    "exit",
+    "goal",
+    "hearts",
+    "hit_ghost",
+    "start",
+    "target"
+  ],
+  "source_text_masks": {
+    "hearts": {
+      "mode": "source_alpha_within_text_only_subregion",
+      "text_subregion": [
+        1715,
+        5,
+        2020,
+        85
+      ],
+      "mask_bbox": [
+        1728,
+        5,
+        2015,
+        77
+      ],
+      "mask_pixels": 15531
+    },
+    "target": {
+      "mode": "source_alpha_within_text_only_subregion",
+      "text_subregion": [
+        2625,
+        555,
+        2825,
+        607
+      ],
+      "mask_bbox": [
+        2649,
+        555,
+        2793,
+        605
+      ],
+      "mask_pixels": 3365
+    },
+    "start": {
+      "mode": "source_alpha_within_text_only_subregion",
+      "text_subregion": [
+        2487,
+        1016,
+        2662,
+        1077
+      ],
+      "mask_bbox": [
+        2487,
+        1016,
+        2635,
+        1077
+      ],
+      "mask_pixels": 6636
+    },
+    "goal": {
+      "mode": "source_alpha_within_text_only_subregion",
+      "text_subregion": [
+        2975,
+        1016,
+        3131,
+        1077
+      ],
+      "mask_bbox": [
+        2998,
+        1016,
+        3131,
+        1077
+      ],
+      "mask_pixels": 5902
+    },
+    "hit_ghost": {
+      "mode": "source_alpha_within_text_only_subregion",
+      "text_subregion": [
+        3163,
+        1017,
+        3633,
+        1106
+      ],
+      "mask_bbox": [
+        3163,
+        1017,
+        3633,
+        1106
+      ],
+      "mask_pixels": 29507
+    },
+    "exit": {
+      "mode": "source_alpha_within_text_only_subregion",
+      "text_subregion": [
+        3083,
+        1143,
+        3494,
+        1281
+      ],
+      "mask_bbox": [
+        3083,
+        1143,
+        3494,
+        1281
+      ],
+      "mask_pixels": 40915
+    },
+    "collect_stars": {
+      "mode": "source_alpha_within_text_only_subregion",
+      "text_subregion": [
+        3469,
+        1172,
+        3998,
+        1267
+      ],
+      "mask_bbox": [
+        3469,
+        1172,
+        3998,
+        1267
+      ],
+      "mask_pixels": 32150
+    }
+  },
+  "all_15_readable_and_raw_bbox_pass": true,
+  "prior_pass_localized_bbox_pixel_diffs": {
+    "technical_bonus": 0,
+    "mission_cleared": 0,
+    "total_rank_green": 0,
+    "storing": 0,
+    "special_request": 0,
+    "mission_failed": 0,
+    "total_rank_brown": 0,
+    "total_rank_pink": 0
+  },
+  "rows": [
+    {
+      "key": "hearts",
+      "source": "Hearts",
+      "korean": "하트",
+      "original_bbox": [
+        1715,
+        5,
+        2048,
+        102
+      ],
+      "localized_changed_bbox": [
+        1728,
+        5,
+        2015,
+        100
+      ],
+      "delta_left": 13,
+      "delta_right": 33,
+      "delta_top": 0,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        1715,
+        3994,
+        2048,
+        4091
+      ],
+      "raw_localized_changed_bbox": [
+        1728,
+        3996,
+        2015,
+        4091
+      ],
+      "raw_delta_left": 13,
+      "raw_delta_right": 33,
+      "raw_delta_top": 2,
+      "raw_delta_bottom": 0,
+      "raw_containment": "PASS",
+      "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+    },
+    {
+      "key": "technical_bonus",
+      "source": "Technical Bonus",
+      "korean": "테크니컬 보너스",
+      "original_bbox": [
+        2393,
+        77,
+        3610,
+        259
+      ],
+      "localized_changed_bbox": [
+        2393,
+        77,
+        3610,
+        259
+      ],
+      "delta_left": 0,
+      "delta_right": 0,
+      "delta_top": 0,
+      "delta_bottom": 0,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        2393,
+        3837,
+        3610,
+        4019
+      ],
+      "raw_localized_changed_bbox": [
+        2393,
+        3837,
+        3610,
+        4019
+      ],
+      "raw_delta_left": 0,
+      "raw_delta_right": 0,
+      "raw_delta_top": 0,
+      "raw_delta_bottom": 0,
+      "raw_containment": "PASS",
+      "rework_status": "PRIOR_PASS_PRESERVED"
+    },
+    {
+      "key": "mission_cleared",
+      "source": "MISSION CLEARED!",
+      "korean": "미션 성공!",
+      "original_bbox": [
+        128,
+        256,
+        1587,
+        787
+      ],
+      "localized_changed_bbox": [
+        128,
+        256,
+        1587,
+        787
+      ],
+      "delta_left": 0,
+      "delta_right": 0,
+      "delta_top": 0,
+      "delta_bottom": 0,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        128,
+        3309,
+        1587,
+        3840
+      ],
+      "raw_localized_changed_bbox": [
+        128,
+        3309,
+        1587,
+        3840
+      ],
+      "raw_delta_left": 0,
+      "raw_delta_right": 0,
+      "raw_delta_top": 0,
+      "raw_delta_bottom": 0,
+      "raw_containment": "PASS",
+      "rework_status": "PRIOR_PASS_PRESERVED"
+    },
+    {
+      "key": "total_rank_green",
+      "source": "Total Rank",
+      "korean": "종합 랭크",
+      "original_bbox": [
+        512,
+        896,
+        1101,
+        1075
+      ],
+      "localized_changed_bbox": [
+        526,
+        905,
+        1087,
+        1065
+      ],
+      "delta_left": 14,
+      "delta_right": 14,
+      "delta_top": 9,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        512,
+        3021,
+        1101,
+        3200
+      ],
+      "raw_localized_changed_bbox": [
+        526,
+        3031,
+        1087,
+        3191
+      ],
+      "raw_delta_left": 14,
+      "raw_delta_right": 14,
+      "raw_delta_top": 10,
+      "raw_delta_bottom": 9,
+      "raw_containment": "PASS",
+      "rework_status": "PRIOR_PASS_PRESERVED"
+    },
+    {
+      "key": "storing",
+      "source": "STORING ONLINE RECORD...",
+      "korean": "온라인 기록 저장 중...",
+      "original_bbox": [
+        1652,
+        858,
+        2975,
+        998
+      ],
+      "localized_changed_bbox": [
+        1652,
+        858,
+        2975,
+        998
+      ],
+      "delta_left": 0,
+      "delta_right": 0,
+      "delta_top": 0,
+      "delta_bottom": 0,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        1652,
+        3098,
+        2975,
+        3238
+      ],
+      "raw_localized_changed_bbox": [
+        1652,
+        3098,
+        2975,
+        3238
+      ],
+      "raw_delta_left": 0,
+      "raw_delta_right": 0,
+      "raw_delta_top": 0,
+      "raw_delta_bottom": 0,
+      "raw_containment": "PASS",
+      "rework_status": "PRIOR_PASS_PRESERVED"
+    },
+    {
+      "key": "special_request",
+      "source": "SPECIAL REQUEST",
+      "korean": "스페셜 요청",
+      "original_bbox": [
+        1644,
+        1114,
+        2624,
+        1267
+      ],
+      "localized_changed_bbox": [
+        1644,
+        1114,
+        2624,
+        1267
+      ],
+      "delta_left": 0,
+      "delta_right": 0,
+      "delta_top": 0,
+      "delta_bottom": 0,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        1644,
+        2829,
+        2624,
+        2982
+      ],
+      "raw_localized_changed_bbox": [
+        1644,
+        2829,
+        2624,
+        2982
+      ],
+      "raw_delta_left": 0,
+      "raw_delta_right": 0,
+      "raw_delta_top": 0,
+      "raw_delta_bottom": 0,
+      "raw_containment": "PASS",
+      "rework_status": "PRIOR_PASS_PRESERVED"
+    },
+    {
+      "key": "target",
+      "source": "Target",
+      "korean": "목표",
+      "original_bbox": [
+        2625,
+        555,
+        2825,
+        640
+      ],
+      "localized_changed_bbox": [
+        2649,
+        555,
+        2796,
+        638
+      ],
+      "delta_left": 24,
+      "delta_right": 29,
+      "delta_top": 0,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        2625,
+        3456,
+        2825,
+        3541
+      ],
+      "raw_localized_changed_bbox": [
+        2649,
+        3458,
+        2796,
+        3541
+      ],
+      "raw_delta_left": 24,
+      "raw_delta_right": 29,
+      "raw_delta_top": 2,
+      "raw_delta_bottom": 0,
+      "raw_containment": "PASS",
+      "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+    },
+    {
+      "key": "start",
+      "source": "START",
+      "korean": "시작",
+      "original_bbox": [
+        2487,
+        1016,
+        2662,
+        1085
+      ],
+      "localized_changed_bbox": [
+        2487,
+        1016,
+        2635,
+        1084
+      ],
+      "delta_left": 0,
+      "delta_right": 27,
+      "delta_top": 0,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        2487,
+        3011,
+        2662,
+        3080
+      ],
+      "raw_localized_changed_bbox": [
+        2487,
+        3012,
+        2635,
+        3080
+      ],
+      "raw_delta_left": 0,
+      "raw_delta_right": 27,
+      "raw_delta_top": 1,
+      "raw_delta_bottom": 0,
+      "raw_containment": "PASS",
+      "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+    },
+    {
+      "key": "goal",
+      "source": "GOAL",
+      "korean": "골",
+      "original_bbox": [
+        2975,
+        1016,
+        3131,
+        1085
+      ],
+      "localized_changed_bbox": [
+        2998,
+        1016,
+        3131,
+        1085
+      ],
+      "delta_left": 23,
+      "delta_right": 0,
+      "delta_top": 0,
+      "delta_bottom": 0,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        2975,
+        3011,
+        3131,
+        3080
+      ],
+      "raw_localized_changed_bbox": [
+        2998,
+        3011,
+        3131,
+        3080
+      ],
+      "raw_delta_left": 23,
+      "raw_delta_right": 0,
+      "raw_delta_top": 0,
+      "raw_delta_bottom": 0,
+      "raw_containment": "PASS",
+      "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+    },
+    {
+      "key": "hit_ghost",
+      "source": "Hit the ghost!",
+      "korean": "고스트를 맞히세요!",
+      "original_bbox": [
+        3163,
+        1017,
+        3633,
+        1106
+      ],
+      "localized_changed_bbox": [
+        3163,
+        1017,
+        3633,
+        1106
+      ],
+      "delta_left": 0,
+      "delta_right": 0,
+      "delta_top": 0,
+      "delta_bottom": 0,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        3163,
+        2990,
+        3633,
+        3079
+      ],
+      "raw_localized_changed_bbox": [
+        3163,
+        2990,
+        3633,
+        3079
+      ],
+      "raw_delta_left": 0,
+      "raw_delta_right": 0,
+      "raw_delta_top": 0,
+      "raw_delta_bottom": 0,
+      "raw_containment": "PASS",
+      "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+    },
+    {
+      "key": "exit",
+      "source": "EXIT",
+      "korean": "종료",
+      "original_bbox": [
+        3083,
+        1143,
+        3494,
+        1281
+      ],
+      "localized_changed_bbox": [
+        3083,
+        1143,
+        3494,
+        1281
+      ],
+      "delta_left": 0,
+      "delta_right": 0,
+      "delta_top": 0,
+      "delta_bottom": 0,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        3083,
+        2815,
+        3494,
+        2953
+      ],
+      "raw_localized_changed_bbox": [
+        3083,
+        2815,
+        3494,
+        2953
+      ],
+      "raw_delta_left": 0,
+      "raw_delta_right": 0,
+      "raw_delta_top": 0,
+      "raw_delta_bottom": 0,
+      "raw_containment": "PASS",
+      "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+    },
+    {
+      "key": "collect_stars",
+      "source": "Collect the stars!",
+      "korean": "별을 모으세요!",
+      "original_bbox": [
+        3469,
+        1172,
+        3998,
+        1267
+      ],
+      "localized_changed_bbox": [
+        3469,
+        1172,
+        3998,
+        1267
+      ],
+      "delta_left": 0,
+      "delta_right": 0,
+      "delta_top": 0,
+      "delta_bottom": 0,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        3469,
+        2829,
+        3998,
+        2924
+      ],
+      "raw_localized_changed_bbox": [
+        3469,
+        2829,
+        3998,
+        2924
+      ],
+      "raw_delta_left": 0,
+      "raw_delta_right": 0,
+      "raw_delta_top": 0,
+      "raw_delta_bottom": 0,
+      "raw_containment": "PASS",
+      "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+    },
+    {
+      "key": "mission_failed",
+      "source": "MISSION FAILED!",
+      "korean": "미션 실패!",
+      "original_bbox": [
+        1984,
+        1280,
+        3187,
+        1792
+      ],
+      "localized_changed_bbox": [
+        1984,
+        1280,
+        3187,
+        1792
+      ],
+      "delta_left": 0,
+      "delta_right": 0,
+      "delta_top": 0,
+      "delta_bottom": 0,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        1984,
+        2304,
+        3187,
+        2816
+      ],
+      "raw_localized_changed_bbox": [
+        1984,
+        2304,
+        3187,
+        2816
+      ],
+      "raw_delta_left": 0,
+      "raw_delta_right": 0,
+      "raw_delta_top": 0,
+      "raw_delta_bottom": 0,
+      "raw_containment": "PASS",
+      "rework_status": "PRIOR_PASS_PRESERVED"
+    },
+    {
+      "key": "total_rank_brown",
+      "source": "Total Rank",
+      "korean": "종합 랭크",
+      "original_bbox": [
+        717,
+        1915,
+        1318,
+        2099
+      ],
+      "localized_changed_bbox": [
+        729,
+        1925,
+        1305,
+        2088
+      ],
+      "delta_left": 12,
+      "delta_right": 13,
+      "delta_top": 10,
+      "delta_bottom": 11,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        717,
+        1997,
+        1318,
+        2181
+      ],
+      "raw_localized_changed_bbox": [
+        729,
+        2008,
+        1305,
+        2171
+      ],
+      "raw_delta_left": 12,
+      "raw_delta_right": 13,
+      "raw_delta_top": 11,
+      "raw_delta_bottom": 10,
+      "raw_containment": "PASS",
+      "rework_status": "PRIOR_PASS_PRESERVED"
+    },
+    {
+      "key": "total_rank_pink",
+      "source": "Total Rank",
+      "korean": "종합 랭크",
+      "original_bbox": [
+        2598,
+        1900,
+        3238,
+        2099
+      ],
+      "localized_changed_bbox": [
+        2607,
+        1912,
+        3229,
+        2087
+      ],
+      "delta_left": 9,
+      "delta_right": 9,
+      "delta_top": 12,
+      "delta_bottom": 12,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        2598,
+        1997,
+        3238,
+        2196
+      ],
+      "raw_localized_changed_bbox": [
+        2607,
+        2009,
+        3229,
+        2184
+      ],
+      "raw_delta_left": 9,
+      "raw_delta_right": 9,
+      "raw_delta_top": 12,
+      "raw_delta_bottom": 12,
+      "raw_containment": "PASS",
+      "rework_status": "PRIOR_PASS_PRESERVED"
+    }
+  ],
+  "visual_qa": "PASS",
+  "runtime_validation": "UNTESTED",
+  "status": "A_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "clean_plate_validator": {
+    "source": "localization/graphics/role_A/20261004-A-RECOVERY06/_SOURCE_READABLE.png",
+    "candidate": "localization/graphics/role_A/20261004-A-RECOVERY06/39229D64_CLEAN_PLATE.png",
+    "size": [
+      4096,
+      4096
+    ],
+    "changed_pixels": 133763,
+    "changed_bbox": [
+      1728,
+      5,
+      3998,
+      1281
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_validator": {
+    "source": "localization/graphics/role_A/20261004-A-RECOVERY06/_SOURCE_READABLE.png",
+    "candidate": "localization/graphics/role_A/20261004-A-RECOVERY06/_FINAL_READABLE.png",
+    "size": [
+      4096,
+      4096
+    ],
+    "changed_pixels": 2285798,
+    "changed_bbox": [
+      128,
+      5,
+      3998,
+      2088
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "visual_qa_notes": "Manual SOURCE/CLEAN/BEFORE/FINAL and full readable-gray review: removed residual Hearts/Target/START/GOAL/Hit the ghost!/EXIT/Collect the stars source lettering while preserving heart slash/swoosh, target car silhouette, START/GOAL separator lines, neighboring sprites and prior-pass localized regions; no clipping, patch seam, source residue, or new overlap observed.",
+  "reconciled_onto_head": "efaeca70a98799869a212ec7c264ef772b6b41c2"
+}
