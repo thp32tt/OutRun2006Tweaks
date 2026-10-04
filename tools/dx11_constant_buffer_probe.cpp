@@ -3185,6 +3185,142 @@ int main()
         "R245 different same-device context cannot replace sealed receipt");
     r245ReplacementContext->Release();
 
+    const auto r246UnboundSlots =
+        programmableCache.constant_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken);
+    require(
+        r246UnboundSlots.inputValid &&
+        r246UnboundSlots.constantPayloadReceiptReady &&
+        r246UnboundSlots.deviceMatches &&
+        r246UnboundSlots.contextDeviceMatches &&
+        r246UnboundSlots.constantPayloadSnapshotMatches &&
+        !r246UnboundSlots.bindingReceiptPresent &&
+        !r246UnboundSlots.bindingReady &&
+        r246UnboundSlots.constantBindingReceiptGeneration == 0 &&
+        r246UnboundSlots.snapshotToken == 0 &&
+        !programmableCache.bind_constant_slots_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken, 0),
+        "R246 constant-payload receipt must exist before slot binding");
+
+    ID3D11DeviceContext* r246DeferredBeforeBinding = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateDeferredContext(
+            0, &r246DeferredBeforeBinding)) &&
+        r246DeferredBeforeBinding != nullptr &&
+        !programmableCache.bind_constant_slots_for_observation(
+            r246DeferredBeforeBinding, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken),
+        "R246 non-immediate context cannot establish slot binding");
+    r246DeferredBeforeBinding->Release();
+
+    require(
+        programmableCache.bind_constant_slots_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken),
+        "R246 exact VS/PS b0 constant-slot binding");
+    const auto r246BindingReady =
+        programmableCache.constant_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken);
+    require(
+        r246BindingReady.inputValid &&
+        r246BindingReady.constantPayloadReceiptReady &&
+        r246BindingReady.deviceMatches &&
+        r246BindingReady.contextDeviceMatches &&
+        r246BindingReady.constantPayloadSnapshotMatches &&
+        r246BindingReady.bindingReceiptPresent &&
+        r246BindingReady.vertexSlotMatches &&
+        r246BindingReady.pixelSlotMatches &&
+        r246BindingReady.bindingReady &&
+        r246BindingReady.constantBindingReceiptGeneration != 0 &&
+        r246BindingReady.snapshotToken != 0 &&
+        programmableCache.validate_constant_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken),
+        "R246 exact constant-slot binding receipt");
+    const auto firstR246ReceiptGeneration =
+        r246BindingReady.constantBindingReceiptGeneration;
+    const auto firstR246BindingSnapshot =
+        r246BindingReady.snapshotToken;
+    require(
+        programmableCache.bind_constant_slots_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken) &&
+        programmableCache.constant_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken).snapshotToken ==
+            firstR246BindingSnapshot,
+        "R246 same constant-slot binding is idempotent");
+
+    ID3D11Buffer* r246NullPixelSlot = nullptr;
+    d3d.context->PSSetConstantBuffers(0, 1, &r246NullPixelSlot);
+    const auto r246DriftedBinding =
+        programmableCache.constant_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken);
+    require(
+        r246DriftedBinding.bindingReceiptPresent &&
+        r246DriftedBinding.vertexSlotMatches &&
+        !r246DriftedBinding.pixelSlotMatches &&
+        !r246DriftedBinding.bindingReady &&
+        !programmableCache.validate_constant_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            firstR246BindingSnapshot),
+        "R246 external b0 slot drift invalidates binding receipt");
+
     const std::string r242AlternateVertexSource = R"(
 struct VSInput { float4 position : POSITION0; };
 struct VSOutput { float4 position : SV_Position; };
@@ -3282,6 +3418,18 @@ VSOutput main(VSInput input)
             firstR244ConstantStateSnapshot,
             firstR245PayloadSnapshot),
         "R245 device reinitialize invalidates constant-payload receipt");
+    require(
+        !programmableCache.validate_constant_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            firstR242ObjectSnapshot,
+            inputLayout,
+            firstR243InputLayoutSnapshot,
+            firstR244ConstantStateSnapshot,
+            firstR245PayloadSnapshot,
+            firstR246BindingSnapshot),
+        "R246 device reinitialize invalidates constant-binding receipt");
     require(
         programmableCache.cache_for_observation(programmablePair),
         "R242 fresh cache generation prerequisite");
@@ -3455,6 +3603,53 @@ VSOutput main(VSInput input)
             r244FreshConstantStateReady.snapshotToken,
             r245FreshPayloadReady.snapshotToken),
         "R245 fresh device generation receives distinct constant-payload receipt");
+    require(
+        !programmableCache.bind_constant_slots_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            firstR245PayloadSnapshot),
+        "R246 stale constant-payload receipt cannot bind slots");
+    require(
+        programmableCache.bind_constant_slots_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken),
+        "R246 fresh R245 receipt binds exact VS/PS b0 slots");
+    const auto r246FreshBindingReady =
+        programmableCache.constant_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken);
+    require(
+        r246FreshBindingReady.bindingReady &&
+        r246FreshBindingReady.bindingReceiptPresent &&
+        r246FreshBindingReady.vertexSlotMatches &&
+        r246FreshBindingReady.pixelSlotMatches &&
+        r246FreshBindingReady.constantBindingReceiptGeneration !=
+            firstR246ReceiptGeneration &&
+        r246FreshBindingReady.snapshotToken != firstR246BindingSnapshot &&
+        programmableCache.validate_constant_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken,
+            r246FreshBindingReady.snapshotToken),
+        "R246 fresh device generation receives distinct constant-binding receipt");
     r244VertexConstants->Release();
     r244PixelConstants->Release();
 
