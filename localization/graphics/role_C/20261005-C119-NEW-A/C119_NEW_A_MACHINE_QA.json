@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C119-NEW-A",
+  "assets": [
+    {
+      "asset": "9CE4E175",
+      "producer_run": "A_PRODUCTION20",
+      "source_sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
+      "candidate_sha256": "cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2",
+      "structure": {
+        "width": 1024,
+        "height": 128,
+        "pitch": 4096,
+        "depth": 0,
+        "mips": 1,
+        "format": "RGBA32",
+        "raw_mode": "BGRA",
+        "masks": [
+          "0xff0000",
+          "0xff00",
+          "0xff",
+          "0xff000000"
+        ],
+        "raw_orientation": "mirror_y"
+      },
+      "header_128_exact": true,
+      "source_png_vs_independent_decode_diff_pixels": 0,
+      "persisted_final_vs_independent_decode_diff_pixels": 0,
+      "clean_changed_pixels_outside_source_mask": 0,
+      "source_mask_pixels_unchanged_in_clean": 0,
+      "final_changed_pixels_outside_allowed_mask": 0,
+      "alpha_changed_pixels_outside_allowed_mask": 0,
+      "final_changed_pixels_in_protected_mask": 0,
+      "target_pixels_outside_allowed_mask": 0,
+      "localized_pair_overlap_pixels": 0,
+      "localized_touch_pairs": [],
+      "rows": [
+        {
+          "key": "not_available",
+          "original_bbox": [
+            95,
+            80,
+            490,
+            121
+          ],
+          "localized_bbox": [
+            221,
+            82,
+            363,
+            119
+          ],
+          "producer_localized_bbox": [
+            221,
+            82,
+            363,
+            119
+          ],
+          "localized_bbox_matches_producer": true,
+          "delta_left": 126,
+          "delta_right": 127,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            395,
+            41
+          ],
+          "localized_size": [
+            142,
+            37
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        }
+      ],
+      "machine_status": "PASS",
+      "controller_visual_qa": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "EBEF6D20",
+      "producer_run": "A_PRODUCTION21",
+      "source_sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+      "candidate_sha256": "005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2",
+      "structure": {
+        "width": 2048,
+        "height": 2048,
+        "pitch": 8192,
+        "depth": 1,
+        "mips": 1,
+        "format": "RGBA32",
+        "raw_mode": "RGBA",
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "raw_orientation": "mirror_y"
+      },
+      "header_128_exact": true,
+      "source_png_vs_independent_decode_diff_pixels": 0,
+      "persisted_final_vs_independent_decode_diff_pixels": 0,
+      "clean_changed_pixels_outside_source_mask": 0,
+      "source_mask_pixels_unchanged_in_clean": 0,
+      "final_changed_pixels_outside_allowed_mask": 0,
+      "alpha_changed_pixels_outside_allowed_mask": 0,
+      "final_changed_pixels_in_protected_mask": 0,
+      "target_pixels_outside_allowed_mask": 0,
+      "localized_pair_overlap_pixels": 0,
+      "localized_touch_pairs": [],
+      "rows": [
+        {
+          "key": "loading_left",
+          "original_bbox": [
+            256,
+            441,
+            672,
+            543
+          ],
+          "localized_bbox": [
+            383,
+            443,
+            545,
+            541
+          ],
+          "producer_localized_bbox": [
+            383,
+            443,
+            545,
+            541
+          ],
+          "localized_bbox_matches_producer": true,
+          "delta_left": 127,
+          "delta_right": 127,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            416,
+            102
+          ],
+          "localized_size": [
+            162,
+            98
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "loading_right",
+          "original_bbox": [
+            1176,
+            441,
+            1592,
+            543
+          ],
+          "localized_bbox": [
+            1303,
+            443,
+            1465,
+            541
+          ],
+          "producer_localized_bbox": [
+            1303,
+            443,
+            1465,
+            541
+          ],
+          "localized_bbox_matches_producer": true,
+          "delta_left": 127,
+          "delta_right": 127,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            416,
+            102
+          ],
+          "localized_size": [
+            162,
+            98
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        }
+      ],
+      "machine_status": "PASS",
+      "controller_visual_qa": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}
