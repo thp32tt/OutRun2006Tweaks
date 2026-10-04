@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261004-B-PRODUCTION20",
+  "queue_index": 164,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+  "base_head": "29f62df4cd134b4962db20028c2f3d0e48d72cb9",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+  "source_sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+  "candidate_sha256": "2ef3971842d2ea68f5f098927fb288a6f9ebfdc51a54c364372f0cd10ee70f2c",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "pitch": 8192,
+    "mips": 1,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "method": "B_PRODUCTION19 semantic region -> exact source alpha glyph mask -> transparent clean plate -> native source-family plain-white Korean render -> exact header DDS",
+  "rows": [
+    {
+      "key": "select_license",
+      "source": "SELECT LICENSE",
+      "korean": "라이선스 선택",
+      "original_bbox": [
+        590,
+        565,
+        1493,
+        659
+      ],
+      "localized_bbox": [
+        785,
+        569,
+        1297,
+        654
+      ],
+      "source_size": [
+        903,
+        94
+      ],
+      "localized_size": [
+        512,
+        85
+      ],
+      "delta_left": 195,
+      "delta_right": 196,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "zero_overlap": "PASS",
+      "positive_separation_px": 2,
+      "native_font": "Noto Sans CJK KR Black",
+      "native_font_size": 92,
+      "source_median_rgb": [
+        255,
+        255,
+        255
+      ],
+      "style": "source-faithful heavy plain white; no outline/shadow/slant invented",
+      "native_raster_resampled": false,
+      "rework_status": "NEW_CANDIDATE"
+    }
+  ],
+  "clean_plate": {
+    "source_text_residue_pixels": 0,
+    "status": "PASS"
+  },
+  "containment": {
+    "elements_total": 1,
+    "elements_pass": 1,
+    "elements_fail": 0,
+    "changed_pixels_outside_exact_source_bbox": 0,
+    "alpha_changed_outside_exact_source_bbox": 0,
+    "status": "PASS"
+  },
+  "zero_overlap": {
+    "new_vs_preserved_source_alpha_pixels": 0,
+    "two_px_guard_conflicts": 0,
+    "status": "PASS"
+  },
+  "protected_preserved": "all red panel artwork and all non-target atlas pixels",
+  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B_PRODUCTION20_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
