@@ -1595,5 +1595,56 @@
     "decoded_pipeline_reconstruction_diff_pixels": 0,
     "runtime_validation": "UNTESTED",
     "vr_ffb_dx11_dxvk_changes": false
+  },
+  "b_recovery04_19cedb9": {
+    "run": "20261004-B-RECOVERY04",
+    "worker_run_id": 37185351672,
+    "worker_trigger_head": "e13d49b8268e7c3bb8c043dca48a66c8f31cf02f",
+    "worker_output_commit": "e8af6aff7704ae364cfd0d2e92b5de4aa8cbf318",
+    "status": "B_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "queue_index": 44,
+    "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+    "source_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+    "candidate_sha256": "3090f2664bab3065502b10a98f93d17e92a64a3725dc1b7a4bb790648a5da6e7",
+    "native_rerenders": 12,
+    "preserved_original_segments": [
+      "TOP"
+    ],
+    "all_12_bbox_pass": true,
+    "format": "RGBA32",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "production_report": "localization/graphics/role_B/20261004-B-RECOVERY04/B_RECOVERY04_19CEDB9_REPORT.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "b_recovery05_2da43e41": {
+    "run": "20261004-B-RECOVERY05",
+    "worker_run_id": 37185351672,
+    "worker_trigger_head": "e13d49b8268e7c3bb8c043dca48a66c8f31cf02f",
+    "worker_output_commit": "e8af6aff7704ae364cfd0d2e92b5de4aa8cbf318",
+    "status": "B_CANONICAL_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "queue_index": 94,
+    "c88_return": "REWORK_REQUIRED_CANONICAL_DECODE_VISUAL_CORRUPTION",
+    "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+    "superseded_candidate_sha256": "9f48c04586fe8d7d446760d47345f010bc279ef21f618db44f73c3a548660fcf",
+    "candidate_sha256": "dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae",
+    "canonical_channel_layout": "raw_RGBA",
+    "reworked_elements": 7,
+    "prior_pass_elements_preserved_exact": 4,
+    "all_11_bbox_pass": true,
+    "format": "RGBA32",
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "decoder_consistency_report": "localization/graphics/role_B/20261004-B-RECOVERY05/B_RECOVERY05_DECODER_CONSISTENCY.json",
+    "production_report": "localization/graphics/role_B/20261004-B-RECOVERY05/B_RECOVERY05_2DA43E41_REPORT.json",
+    "runtime_validation": "UNTESTED"
   }
 }

@@ -1,7 +1,7 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T10:09:21+09:00",
-  "branch": "korean-localization-clean",
+  "updated_at_kst": "2026-10-04T16:21:33+09:00",
+  "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
     "ref": "master",
@@ -343,16 +343,28 @@
       "in_game_validation": "PENDING_ISOLATED_DDS_ONLY"
     },
     "latest_b_first_qa": {
-      "run": "B_RECOVERY02",
-      "report": "localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json",
-      "result": "A064FDFC_REWORK_SELF_QA_PASS_PENDING_C_INGAME",
+      "run": "B_RECOVERY04_05",
+      "worker_run_id": 37185351672,
+      "worker_output_commit": "e8af6aff7704ae364cfd0d2e92b5de4aa8cbf318",
+      "result": "TWO_B_CANDIDATES_SELF_QA_PASS_PENDING_C_INGAME",
       "assets": {
-        "A064FDFC": {
-          "candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
-          "candidate_changed_by_B": true,
-          "status": "B_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME"
+        "19CEDB9": {
+          "queue_index": 44,
+          "source_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+          "candidate_sha256": "3090f2664bab3065502b10a98f93d17e92a64a3725dc1b7a4bb790648a5da6e7",
+          "status": "B_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_AND_INGAME",
+          "report": "localization/graphics/role_B/20261004-B-RECOVERY04/B_RECOVERY04_19CEDB9_REPORT.json"
+        },
+        "2DA43E41": {
+          "queue_index": 94,
+          "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+          "superseded_c88_return_sha256": "9f48c04586fe8d7d446760d47345f010bc279ef21f618db44f73c3a548660fcf",
+          "candidate_sha256": "dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae",
+          "status": "B_CANONICAL_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
+          "report": "localization/graphics/role_B/20261004-B-RECOVERY05/B_RECOVERY05_2DA43E41_REPORT.json"
         }
-      }
+      },
+      "runtime_validation": "UNTESTED"
     },
     "c78_39229d64": {
       "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",

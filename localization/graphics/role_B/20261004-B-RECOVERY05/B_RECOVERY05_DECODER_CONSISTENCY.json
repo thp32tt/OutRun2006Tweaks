@@ -1,0 +1,21 @@
+{
+  "asset": "2DA43E41",
+  "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+  "candidate_sha256": "dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae",
+  "dds_masks": {
+    "R": "0x000000ff",
+    "G": "0x0000ff00",
+    "B": "0x00ff0000",
+    "A": "0xff000000"
+  },
+  "raw_byte_interpretation": "RGBA",
+  "readable_orientation": "FLIP_TOP_BOTTOM",
+  "encode_path": "readable -> FLIP_TOP_BOTTOM -> raw RGBA bytes under exact source header",
+  "header_128_exact": true,
+  "decode_encode_roundtrip_pixel_exact": true,
+  "c88_defect_resolved": "B_RECOVERY05 uses the same header-aware RGBA interpretation for source, clean plate, final encode, decoded QA and visual evidence; no BGRA/RB-swapped working path.",
+  "worker_run_id": 37185351672,
+  "worker_output_commit": "e8af6aff7704ae364cfd0d2e92b5de4aa8cbf318",
+  "canonical_visual_qa": "PASS",
+  "status": "PASS"
+}

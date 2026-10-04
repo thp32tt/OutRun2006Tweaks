@@ -10,5 +10,9 @@
   "target_overlap_pairs": 0,
   "header_128_exact": true,
   "raw_orientation": "mirror_y",
-  "status": "PASS"
+  "status": "B_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "worker_run_id": 37185351672,
+  "worker_output_commit": "e8af6aff7704ae364cfd0d2e92b5de4aa8cbf318",
+  "manual_visual_qa": "PASS_READABLE_DARK_WHITE",
+  "runtime_validation": "UNTESTED"
 }

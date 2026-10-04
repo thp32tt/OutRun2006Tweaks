@@ -332,7 +332,29 @@
       "prior_localized_raster_resampled": false
     }
   ],
-  "manual_visual_qa": "PENDING_SELF_QA",
+  "manual_visual_qa": "PASS",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_RECOVERY05_CANONICAL_STATIC_PASS_PENDING_MANUAL_SELF_QA_AND_C"
+  "status": "B_RECOVERY05_CANONICAL_SELFQA_PASS_PENDING_C_AND_INGAME",
+  "worker": {
+    "workflow": "Localization CPU Worker",
+    "run_id": 37185351672,
+    "trigger_head": "e13d49b8268e7c3bb8c043dca48a66c8f31cf02f",
+    "output_commit": "e8af6aff7704ae364cfd0d2e92b5de4aa8cbf318",
+    "first_attempt_run_id": 37185174318,
+    "first_attempt_result": "FAIL_FONT_PATH_ONLY_NO_OUTPUT",
+    "successful_attempt_result": "PASS"
+  },
+  "visual_qa": {
+    "canonical_readable_source_prior_clean_final": "PASS",
+    "white_background_alpha": "PASS",
+    "raw_mirror_y_source_final": "PASS",
+    "source_language_residue": "NONE_OBSERVED",
+    "clipping_or_bbox_escape": "NONE",
+    "new_overlap": "NONE",
+    "protected_artwork_damage": "NONE_OBSERVED",
+    "view_change_style": "canonical white/navy source family; B_RECOVERY03 cyan-border mismatch removed",
+    "stats_punctuation": "source colons remain protected; Korean bodies do not duplicate punctuation",
+    "expert_style": "canonical red/white/navy",
+    "special_course_style": "canonical yellow/cream/navy"
+  }
 }

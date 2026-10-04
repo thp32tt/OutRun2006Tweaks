@@ -387,7 +387,26 @@
       "prior_localized_raster_resampled": false
     }
   ],
-  "manual_visual_qa": "PENDING_SELF_QA",
+  "manual_visual_qa": "PASS_READABLE_DARK_WHITE",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_RECOVERY04_STATIC_PASS_PENDING_MANUAL_SELF_QA_AND_C"
+  "status": "B_RECOVERY04_CANDIDATE_SELFQA_PASS_PENDING_C_AND_INGAME",
+  "worker": {
+    "workflow": "Localization CPU Worker",
+    "run_id": 37185351672,
+    "trigger_head": "e13d49b8268e7c3bb8c043dca48a66c8f31cf02f",
+    "output_commit": "e8af6aff7704ae364cfd0d2e92b5de4aa8cbf318",
+    "first_attempt_run_id": 37185174318,
+    "first_attempt_result": "FAIL_FONT_PATH_ONLY_NO_OUTPUT",
+    "successful_attempt_result": "PASS"
+  },
+  "visual_qa": {
+    "readable_source_clean_final_dark": "PASS",
+    "white_background_alpha": "PASS",
+    "source_language_residue": "NONE_OBSERVED",
+    "clipping_or_bbox_escape": "NONE",
+    "new_overlap": "NONE",
+    "protected_artwork_damage": "NONE_OBSERVED",
+    "style": "source-family yellow/white/navy/orange, layered outline and slant",
+    "raw_orientation": "MACHINE_PASS_SAME_SOURCE_FLIP_TOP_BOTTOM_ENCODE_PATH; C raw-view final QA pending"
+  }
 }
