@@ -7,6 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_PRODUCTION21 produced odd index 65 EBEF6D20 candidate 005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2: two Loading→로딩 physical occurrences from authoritative 2048x2048 RGBA32 HD source. Final same-run source-weight correction uses actual NotoSansCJK-Bold plus measured dark outline/shadow; 2/2 bbox+size+positive margins and zero residue/outside/protected/overlap/touch PASS; controller visual self-QA PASS. Independent C + in-game pending; RUNTIME_VALIDATION=UNTESTED.",
+    "A_PRODUCTION20 produced odd index 195 9CE4E175 candidate cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2: NOT AVAILABLE→이용 불가 from authoritative 1024x128 RGBA32 BGRA-layout HD source. Same-run visual QA caught faint source fringe and forced full-fringe clean-plate reconstruction; final 1/1 bbox+size+positive margins and zero residue/outside/protected PASS; controller visual self-QA PASS. Independent C + in-game pending; RUNTIME_VALIDATION=UNTESTED.",
     "C118 finalized B_PRODUCTION32 788CE557 candidate cc6727baac1b6946ae92cf5bc5568145c1d3ced2248f1fc134e9cc79c5f17149: direct SHA/header and 4/4 exact bbox+size arithmetic PASS, producer zero-residue/outside/protected/overlap/guard gates PASS, and C SOURCE/CLEAN/FINAL/row/TOP_PAIR/raw visual QA PASS. C108/B31 source residue is resolved; producer REWORK remaining=0. RUNTIME_VALIDATION=UNTESTED.",
     "C117 finalized B_PRODUCTION30 53CE39D5 candidate 08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1: independent 19/19 exact bbox+size/header/mask QA PASS and C source/clean/final/row/raw visual PASS; C114 visible dash/shadow residue return is resolved. RUNTIME_VALIDATION=UNTESTED.",
     "C116/C117 finalized A_PRODUCTION19 313DB8CB candidate c44a9ccd62e2b78fb17ec10f7a50a6de32dc1a0f84a44f2595b3e7ffaa0cc0ea: independent 2/2 exact bbox+size/decode/mask QA PASS and C visual PASS after source-weight correction; heavy plain-white source style is matched. RUNTIME_VALIDATION=UNTESTED.",
@@ -180,7 +182,7 @@
     },
     "latest_hd_rework_batch": "localization/graphics/role_B/20261005-B-PRODUCTION30/B_PRODUCTION30_53CE_REPORT.json",
     "hd_rework_candidates_ready": 15,
-    "hd_rework_remaining": 1,
+    "hd_rework_remaining": 0,
     "hd_partial_rework": {
       "FF2462BB": {
         "status": "C86_PIXEL_VISUAL_PASS_PENDING_INGAME",
@@ -787,6 +789,25 @@
       "status": "A_RECOVERY13_SELF_QA_PASS_PENDING_C_AND_INGAME",
       "report": "localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FD90AA9_REPORT.json",
       "c109_source_slant_return_resolved_by_a": true,
+      "pending_independent_c_final_qa": true,
+      "runtime_validation": "UNTESTED"
+    },
+    "current_pending_artwork_localize_text": 45,
+    "current_producer_rework_remaining": 0,
+    "latest_a_production_batch": "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_EBEF6D20_REPORT.json",
+    "a_production20_9ce4e175": {
+      "timestamp_kst": "2026-10-05T02:45:00+09:00",
+      "index": 195,
+      "candidate_sha256": "cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2",
+      "status": "A_PRODUCTION20_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "pending_independent_c_final_qa": true,
+      "runtime_validation": "UNTESTED"
+    },
+    "a_production21_ebef6d20": {
+      "timestamp_kst": "2026-10-05T02:45:00+09:00",
+      "index": 65,
+      "candidate_sha256": "005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2",
+      "status": "A_PRODUCTION21_SELF_QA_PASS_PENDING_C_AND_INGAME",
       "pending_independent_c_final_qa": true,
       "runtime_validation": "UNTESTED"
     }
