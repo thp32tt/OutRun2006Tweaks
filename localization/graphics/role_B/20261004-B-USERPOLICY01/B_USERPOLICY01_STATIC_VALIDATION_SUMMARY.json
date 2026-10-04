@@ -1,0 +1,13 @@
+{
+  "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+  "candidate_sha256": "93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e",
+  "bbox_pass": "21/21",
+  "clean_plate_residue_pixels": 0,
+  "outside_permitted_bboxes": 0,
+  "alpha_outside_permitted_bboxes": 0,
+  "protected_changes": 0,
+  "target_overlap_pairs": 0,
+  "header_128_exact": true,
+  "raw_orientation": "mirror_y",
+  "status": "PASS"
+}
