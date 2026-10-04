@@ -248,7 +248,7 @@ require(
 require(
     "src/vr/d3d9/stereo_renderer_r21.cpp",
     "R21InstallState",
-    "IsFailed(R20InstallState)",
+    "R20InstallStatus()",
     "InlineHook::StartDisabled",
 )
 require(
