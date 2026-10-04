@@ -1285,22 +1285,13 @@
       "status": "rework_required_zero_pixel_or_artifact"
     }
   },
-  "b_recovery01_fa7bbb13": {
-    "run": "20261004-B-RECOVERY01",
-    "status": "B_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
-    "candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
-    "reworked_elements": 10,
-    "prior_pass_elements_preserved_exact": 7,
-    "format": "RGBA32",
-    "mipmaps": 1,
-    "clean_plate_report": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_CLEAN_PLATE_VALIDATION.json",
-    "final_mask_report": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_FINAL_MASK_VALIDATION.json",
-    "production_report": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_FA7BBB13_REPORT.json",
-    "runtime_validation": "UNTESTED",
-    "next_b_target": {
-      "index": 60,
-      "asset": "A064FDFC",
-      "status": "rework_required_zero_pixel_or_artifact"
-    }
+  "a_recovery03_39229d64": {
+    "run": "20261004-A-RECOVERY03",
+    "status": "A_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "candidate_sha256": "a63dcfea0642c9bcb4cb5b41d168923404157d9b65409a3affcf72662343d2b6",
+    "reworked_elements": 7,
+    "all_15_bbox_pass": true,
+    "prior_pass_elements_unchanged": 8,
+    "runtime_validation": "UNTESTED"
   }
 }

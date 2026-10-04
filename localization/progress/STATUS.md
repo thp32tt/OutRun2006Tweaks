@@ -621,12 +621,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Next A REWORK priority: odd index 57 `39229D64`.
 - Evidence: `localization/graphics/role_A/20261004-A-RECOVERY02/`.
 
-## 2026-10-04 B recovery — FA7BBB13 clean-plate rework
-- B even-shard priority index 54 `FA7BBB13` selected from the current remote queue; A's completed odd-shard work was not repeated.
-- Reworked the 10 C85 exact-bbox failures from the exact HD source through source-text/protected masks and a transparent clean plate, then rendered Korean lettering at native resolution; no prior localized raster was scaled.
-- RGBA32 4096x2048 / 1 mip structure, raw `mirror_y` orientation and exact 128-byte source header preserved. The 7 prior PASS elements are exact-pixel preserved.
-- Final self-QA: 10/10 former failures PASS, 17/17 total containment PASS, clean-plate validator PASS, final protected-mask validator PASS, protected changed pixels 0, target-text overlap pairs 0.
-- Readable comparison visual self-QA PASS for residue, clipping, new overlap and source-family yellow/navy/white treatment. Candidate SHA-256: `b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68`.
-- `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
-- Next B REWORK priority: even index 60 `A064FDFC`.
-- Evidence: `localization/graphics/role_B/20261004-B-RECOVERY01/`.
+
+## 2026-10-04 A recovery03 — 39229D64 bbox rework
+- Started from synchronized local/remote HEAD `203185a294cc54de4ff044c5cc4645736c51dfb5`.
+- Reworked all 7 C85 failures: lossless reposition where the raster already fit; native Noto Sans CJK Bold rerender for oversize cases; no raster scaling.
+- Final decoded DDS: **15/15 exact-bbox PASS**; all 8 prior-PASS cells pixel-identical.
+- Candidate SHA-256: `a63dcfea0642c9bcb4cb5b41d168923404157d9b65409a3affcf72662343d2b6`.
+- `RUNTIME_VALIDATION=UNTESTED`; C final QA and in-game validation pending.
+- Evidence: `localization/graphics/role_A/20261004-A-RECOVERY03/A_RECOVERY03_39229D64_REPORT.json`.

@@ -1,0 +1,338 @@
+{
+  "run": "20261004-A-RECOVERY03",
+  "asset": "39229D64",
+  "base_head": "203185a294cc54de4ff044c5cc4645736c51dfb5",
+  "candidate_sha256": "a63dcfea0642c9bcb4cb5b41d168923404157d9b65409a3affcf72662343d2b6",
+  "method": "lossless reposition where fit; native Noto Sans CJK Bold rerender for oversize failures; no raster scaling",
+  "rows": [
+    {
+      "key": "hearts",
+      "original_bbox": [
+        1715,
+        5,
+        2048,
+        102
+      ],
+      "new_bbox": [
+        1715,
+        5,
+        2048,
+        102
+      ],
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "lossless_reposition",
+      "move": [
+        0,
+        3
+      ]
+    },
+    {
+      "key": "technical_bonus",
+      "original_bbox": [
+        2393,
+        77,
+        3610,
+        259
+      ],
+      "new_bbox": [
+        2475,
+        87,
+        3501,
+        258
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "mode": null,
+      "move": null
+    },
+    {
+      "key": "mission_cleared",
+      "original_bbox": [
+        128,
+        256,
+        1587,
+        787
+      ],
+      "new_bbox": [
+        584,
+        273,
+        1092,
+        776
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "mode": null,
+      "move": null
+    },
+    {
+      "key": "total_rank_green",
+      "original_bbox": [
+        512,
+        896,
+        1101,
+        1075
+      ],
+      "new_bbox": [
+        512,
+        896,
+        1101,
+        1075
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "mode": null,
+      "move": null
+    },
+    {
+      "key": "storing",
+      "original_bbox": [
+        1652,
+        858,
+        2975,
+        998
+      ],
+      "new_bbox": [
+        1808,
+        860,
+        2850,
+        996
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "mode": null,
+      "move": null
+    },
+    {
+      "key": "special_request",
+      "original_bbox": [
+        1644,
+        1114,
+        2624,
+        1267
+      ],
+      "new_bbox": [
+        1813,
+        1116,
+        2437,
+        1265
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "mode": null,
+      "move": null
+    },
+    {
+      "key": "target",
+      "original_bbox": [
+        2625,
+        555,
+        2825,
+        640
+      ],
+      "new_bbox": [
+        2625,
+        555,
+        2825,
+        640
+      ],
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "lossless_reposition",
+      "move": [
+        -1,
+        2
+      ]
+    },
+    {
+      "key": "start",
+      "original_bbox": [
+        2487,
+        1016,
+        2662,
+        1085
+      ],
+      "new_bbox": [
+        2487,
+        1016,
+        2662,
+        1085
+      ],
+      "containment": "PASS",
+      "reworked": true,
+      "mode": {
+        "native_render": true,
+        "font_size": 60,
+        "outer": 5,
+        "inner": 3
+      },
+      "move": null
+    },
+    {
+      "key": "goal",
+      "original_bbox": [
+        2975,
+        1016,
+        3131,
+        1085
+      ],
+      "new_bbox": [
+        2975,
+        1016,
+        3131,
+        1085
+      ],
+      "containment": "PASS",
+      "reworked": true,
+      "mode": {
+        "native_render": true,
+        "font_size": 63,
+        "outer": 6,
+        "inner": 3
+      },
+      "move": null
+    },
+    {
+      "key": "hit_ghost",
+      "original_bbox": [
+        3163,
+        1017,
+        3633,
+        1106
+      ],
+      "new_bbox": [
+        3163,
+        1017,
+        3633,
+        1106
+      ],
+      "containment": "PASS",
+      "reworked": true,
+      "mode": {
+        "native_render": true,
+        "font_size": 57,
+        "outer": 7,
+        "inner": 3
+      },
+      "move": null
+    },
+    {
+      "key": "exit",
+      "original_bbox": [
+        3083,
+        1143,
+        3494,
+        1281
+      ],
+      "new_bbox": [
+        3083,
+        1143,
+        3494,
+        1281
+      ],
+      "containment": "PASS",
+      "reworked": true,
+      "mode": {
+        "native_render": true,
+        "font_size": 130,
+        "outer": 11,
+        "inner": 6
+      },
+      "move": null
+    },
+    {
+      "key": "collect_stars",
+      "original_bbox": [
+        3469,
+        1172,
+        3998,
+        1267
+      ],
+      "new_bbox": [
+        3469,
+        1172,
+        3998,
+        1267
+      ],
+      "containment": "PASS",
+      "reworked": true,
+      "mode": {
+        "native_render": true,
+        "font_size": 82,
+        "outer": 9,
+        "inner": 4
+      },
+      "move": null
+    },
+    {
+      "key": "mission_failed",
+      "original_bbox": [
+        1984,
+        1280,
+        3187,
+        1792
+      ],
+      "new_bbox": [
+        2319,
+        1280,
+        3187,
+        1786
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "mode": null,
+      "move": null
+    },
+    {
+      "key": "total_rank_brown",
+      "original_bbox": [
+        717,
+        1915,
+        1318,
+        2099
+      ],
+      "new_bbox": [
+        717,
+        1915,
+        1318,
+        2099
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "mode": null,
+      "move": null
+    },
+    {
+      "key": "total_rank_pink",
+      "original_bbox": [
+        2598,
+        1900,
+        3238,
+        2099
+      ],
+      "new_bbox": [
+        2598,
+        1900,
+        3238,
+        2099
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "mode": null,
+      "move": null
+    }
+  ],
+  "all_15_bbox_pass": true,
+  "prior_pass_cell_diffs": {
+    "technical_bonus": 0,
+    "mission_cleared": 0,
+    "total_rank_green": 0,
+    "storing": 0,
+    "special_request": 0,
+    "mission_failed": 0,
+    "total_rank_brown": 0,
+    "total_rank_pink": 0
+  },
+  "prior_pass_cells_identical": true,
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
