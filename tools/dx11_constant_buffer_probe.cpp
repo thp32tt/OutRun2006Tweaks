@@ -9684,5 +9684,3 @@ VSOutput main(VSInput input)
     std::cout << "DX11 dynamic output-state readiness R124: PASS\n";
     return 0;
 }
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
