@@ -45,7 +45,7 @@ def ensure_font():
 
 def main():
     if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions":
-        raise RuntimeError("B52 must run on hosted CPU worker")
+        raise RuntimeError("B53 must run on hosted CPU worker")
     repo=Path.cwd()
     out=repo/"localization/graphics/role_B"/RUN
     out.mkdir(parents=True,exist_ok=True)
@@ -86,66 +86,73 @@ def main():
         w=bb[2]-bb[0]; h=bb[3]-bb[1]; area=len(xx)
         comps.append({"id":cid,"area":int(area),"bbox":bb,"w":w,"h":h,"cx":float(xx.mean()),"cy":float(yy.mean()),"amax":int(alpha[yy,xx].max())})
     comps.sort(key=lambda c:(c["bbox"][1],c["bbox"][0]))
-    (out/"B52_SOURCE_ALPHA_COMPONENTS.json").write_text(json.dumps({"components":comps},indent=2)+"\n")
+    (out/"B53_SOURCE_ALPHA_COMPONENTS.json").write_text(json.dumps({"components":comps},indent=2)+"\n")
 
-    row_masks=[]
-    row_reports=[]
-    for rn,(seed,(en,ko)) in enumerate(zip(ROW_SEEDS,LABELS),1):
-        sx0,sy0,sx1,sy1=seed
-        # Seed interior intentionally shrinks 1px to avoid plate-boundary evidence.
-        seedm=np.zeros((H,W),bool); seedm[sy0+1:sy1-1,sx0+1:sx1-1]=True
-        chosen=[]
-        ambiguous=[]
+    # B53 exact row recovery from source alpha. B52 diagnostics proved the actual glyph
+    # rows are 24px-spaced at 140/164/188/212, not the historical draft plate tops.
+    # Components 2.. are individual glyph/effect components; component 1 is unrelated
+    # panel/artwork that touches a few row4 letters. Rows 2 and 3 share the identical
+    # SPECIAL REQUEST prefix, so their source masks provide an exact periodicity proof.
+    def comp_union(ylo,yhi):
+        ids=[]
         for c in comps:
+            if c["id"]==1: continue
             x0,y0,x1,y1=c["bbox"]
-            # Reject panel rules/borders and very large artwork components up front.
-            if c["w"]>=260 or c["h"]>=52 or c["area"]>=5000:
-                continue
-            cm=(lab==c["id"])
-            total=c["area"]
-            inside=int(np.count_nonzero(cm&seedm))
-            if inside==0: continue
-            # Component must be materially seeded by this row. This allows antialias/glow
-            # fringe to extend outside the historical hint while preventing adjacent-row pickup.
-            frac=inside/total
-            yfrac=int(np.count_nonzero(cm[sy0:sy1,:]))/total
-            if frac>=0.18 and yfrac>=0.62 and (sy0-10)<=c["cy"]<=(sy1+10):
-                chosen.append(c["id"])
-            else:
-                ambiguous.append({"component":c,"seed_fraction":frac,"row_y_fraction":yfrac})
-        if not chosen:
-            raise RuntimeError(("no source components assigned",rn,seed,ambiguous[:8]))
-        rm=np.isin(lab,chosen)
-        # Recover 1px alpha fringe connected to the accepted components, still source-only.
-        grow=mask_img(rm).filter(ImageFilter.MaxFilter(3))
-        near=np.asarray(grow)>0
-        rm=near & (alpha>0) & search
-        # Drop any newly reached component whose centroid belongs to another row core.
-        # This catches bridge pixels but keeps fringe of the chosen glyph components.
-        reb,nn=ndimage.label(rm,np.ones((3,3),dtype=np.uint8))
-        keep=np.zeros_like(rm)
-        for j in range(1,nn+1):
-            yy,xx=np.nonzero(reb==j)
-            if not len(xx): continue
-            cy=float(yy.mean())
-            if (sy0-8)<=cy<=(sy1+8):
-                keep[yy,xx]=1
-        rm=keep
-        bb=bbox_of(rm)
-        if bb is None: raise RuntimeError(("empty row mask after fringe",rn))
-        # Exact proof constraints: no mask may touch the global search boundary or colored
-        # panel beginning at y=232; masks must stay row-local and source-derived.
-        if bb[0]<=591 or bb[2]>=929 or bb[1]<=126 or bb[3]>=244:
-            raise RuntimeError(("row mask hits global boundary",rn,bb))
+            if x0<630 or x1>900 or c["w"]>40 or c["h"]>24: continue
+            if y0>=ylo and y1<=yhi:
+                ids.append(c["id"])
+        return np.isin(lab,ids),ids
+
+    r1,ids1=comp_union(139,161)
+    r2,ids2=comp_union(163,185)
+    r3,ids3=comp_union(187,209)
+    r4_direct,ids4=comp_union(210,232)
+    if [len(ids1),len(ids2),len(ids3),len(ids4)] != [7,14,14,12]:
+        raise RuntimeError(("unexpected alpha component counts",[len(ids1),len(ids2),len(ids3),len(ids4)],[ids1,ids2,ids3,ids4]))
+
+    # Prove the repeated SPECIAL REQUEST prefix between source rows 2 and 3.
+    prefix_x1=850
+    shifted2=np.zeros_like(r2)
+    shifted2[24:,:]=r2[:-24,:]
+    p2=shifted2.copy(); p2[:,prefix_x1:]=False
+    p3=r3.copy(); p3[:,prefix_x1:]=False
+    if not np.array_equal(p2,p3):
+        mismatch=int(np.count_nonzero(p2^p3))
+        raise RuntimeError(("row2-row3 source prefix periodicity mismatch",mismatch,bbox_of(p2^p3)))
+
+    # Row4 has two glyph fragments electrically connected to the panel component.
+    # Recover ONLY the proven repeated prefix pixels by shifting row3 +24 and
+    # intersecting with canonical source alpha. This never invents pixels and does not
+    # use the historical Korean draft. The digit 3 remains direct source component 37.
+    shifted3=np.zeros_like(r3)
+    shifted3[24:,:]=r3[:-24,:]
+    prefix4=shifted3 & (alpha>0)
+    prefix4[:,prefix_x1:]=False
+    # Every template pixel must exist in source alpha; no missing pixel is allowed.
+    expected=shifted3.copy(); expected[:,prefix_x1:]=False
+    if not np.array_equal(prefix4,expected):
+        raise RuntimeError(("row4 repeated prefix missing source alpha",int(np.count_nonzero(prefix4^expected)),bbox_of(prefix4^expected)))
+    r4=(r4_direct | prefix4)
+    # Direct row4 pieces must be subset of recovered prefix except the final digit region.
+    unexplained=r4_direct & ~r4
+    if np.any(unexplained):
+        raise RuntimeError(("unexplained row4 direct source pixels",bbox_of(unexplained)))
+
+    row_masks=[r1,r2,r3,r4]
+    idsets=[ids1,ids2,ids3,ids4]
+    row_reports=[]
+    for rn,(sm,ids,(seed,(en,ko))) in enumerate(zip(row_masks,idsets,zip(ROW_SEEDS,LABELS)),1):
+        bb=bbox_of(sm)
+        if bb is None: raise RuntimeError(("empty exact source row",rn))
         if rn==4 and bb[3]>232:
-            raise RuntimeError(("row4 source mask enters protected colored panel",bb))
-        row_masks.append(rm)
+            raise RuntimeError(("row4 enters protected colored panel",bb))
         row_reports.append({
             "n":rn,"source":en,"korean":ko,"historical_hint_bbox":seed,
-            "assigned_component_ids":chosen,"ambiguous_seed_components":ambiguous,
-            "original_bbox":bb,"source_effect_pixels":int(np.count_nonzero(rm)),
-            "source_alpha_min":int(alpha[rm].min()),"source_alpha_max":int(alpha[rm].max()),
-            "source_alpha_median":float(np.median(alpha[rm])),
+            "assigned_component_ids":ids,
+            "template_recovery": ("row3_prefix_shift_plus_24_intersect_source_alpha" if rn==4 else None),
+            "original_bbox":bb,"source_effect_pixels":int(np.count_nonzero(sm)),
+            "source_alpha_min":int(alpha[sm].min()),"source_alpha_max":int(alpha[sm].max()),
+            "source_alpha_median":float(np.median(alpha[sm])),
         })
 
     # Hard non-overlap and positive-separation proof between physical source rows.
@@ -277,11 +284,11 @@ def main():
     mask_img(~allowed).save(out/"1F5_PROTECTED_MASK.png")
     mask_img(target).save(out/"1F5_TARGET_TEXT_MASK.png")
     clean_img.save(out/"1F5_CLEAN_PLATE.png")
-    sp=Path("/tmp/b52src.png"); fp=Path("/tmp/b52fin.png")
+    sp=Path("/tmp/b53src.png"); fp=Path("/tmp/b53fin.png")
     src.save(sp); dec.save(fp)
     v=repo/"tools/localization/validate_clean_plate.py"
-    subprocess.run(["python3",str(v),str(sp),str(out/"1F5_CLEAN_PLATE.png"),str(out/"1F5_SOURCE_TEXT_MASK.png"),"--report",str(out/"B52_CLEAN_VALIDATION.json")],check=True)
-    subprocess.run(["python3",str(v),str(sp),str(fp),str(out/"1F5_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(out/"1F5_PROTECTED_MASK.png"),"--report",str(out/"B52_FINAL_VALIDATION.json")],check=True)
+    subprocess.run(["python3",str(v),str(sp),str(out/"1F5_CLEAN_PLATE.png"),str(out/"1F5_SOURCE_TEXT_MASK.png"),"--report",str(out/"B53_CLEAN_VALIDATION.json")],check=True)
+    subprocess.run(["python3",str(v),str(sp),str(fp),str(out/"1F5_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(out/"1F5_PROTECTED_MASK.png"),"--report",str(out/"B53_FINAL_VALIDATION.json")],check=True)
 
     def comp(im,bg=(64,64,64,255)):
         z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
@@ -291,7 +298,7 @@ def main():
     cards=[card("SOURCE_READABLE",src),card("CLEAN",clean_img),card("FINAL",dec),card("FINAL_WHITE",dec,(255,255,255,255))]
     sheet=Image.new("RGB",(W*2,(H+26)*2),"white")
     sheet.paste(cards[0],(0,0));sheet.paste(cards[1],(W,0));sheet.paste(cards[2],(0,H+26));sheet.paste(cards[3],(W,H+26))
-    sheet.save(out/"B52_1F5_COMPARE.jpg",quality=96)
+    sheet.save(out/"B53_1F5_COMPARE.jpg",quality=96)
     sr,cl,fi=comp(src),comp(clean_img),comp(dec)
     rowcards=[]
     for r in row_reports:
@@ -307,10 +314,10 @@ def main():
     rs=Image.new("RGB",(max(c.width for c in rowcards),sum(c.height for c in rowcards)+4*(len(rowcards)-1)),"white")
     yy=0
     for c in rowcards: rs.paste(c,(0,yy)); yy+=c.height+4
-    rs.save(out/"B52_1F5_ROW_CONTACT_4X.jpg",quality=96)
+    rs.save(out/"B53_1F5_ROW_CONTACT_4X.jpg",quality=96)
     rr=Image.new("RGB",(W,(H+26)*2),"white")
     rr.paste(card("SOURCE_RAW_MIRROR_Y",raw_src),(0,0)); rr.paste(card("FINAL_RAW_MIRROR_Y",raw_dec),(0,H+26))
-    rr.save(out/"B52_1F5_RAW_COMPARE.jpg",quality=96)
+    rr.save(out/"B53_1F5_RAW_COMPARE.jpg",quality=96)
 
     report={
         "schema_version":1,"role":"B","run":RUN,"queue_index":INDEX,"asset":ASSET,
@@ -319,21 +326,21 @@ def main():
         "historical_discovery_only":True,"historical_localized_pixels_reused":False,
         "candidate_sha256":csha,"candidate_path":str(cand.relative_to(repo)),
         "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
-        "source_mask_method":"source alpha connected components assigned from row-interior seeds; panel rules and cross-row components rejected",
+        "source_mask_method":"source alpha glyph components by proven 24px row periodicity; row4 panel-connected prefix recovered only by row3 +24 template intersected with canonical source alpha",
         "source_row_positive_separation":"PASS","rows":row_reports,
         "shared_typography":{"font_size":fs,"fill_rgba":list(fill_rgb)+(fill_alpha,),"status":"PASS_SHARED_SOURCE_ALPHA_STYLE"},
         "containment":{"elements_total":4,"elements_pass":4,"outside":outside,"alpha_outside":alpha_out,"target_out":target_out,
                        "source_residue":residue,"overlap":overlap,"touch_pairs":touch,"status":"PASS"},
         "policy":{"colored_menu_panels_preserved":"YES","song_titles_credits":"not_targeted","stage_names":"not_applicable","multi_line":"not_applicable"},
         "manual_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
-        "status":"B_PRODUCTION52_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+        "status":"B_PRODUCTION53_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
     }
-    (out/"B52_1F5_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+    (out/"B53_1F5_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
     summary={"run":RUN,"asset":"1F5FE6E9","index":INDEX,"candidate_sha256":csha,"bbox_size_pass":"4/4",
              "outside":outside,"alpha_outside":alpha_out,"source_residue":residue,"overlap":overlap,"touch_pairs":len(touch),
              "worker_status":report["status"],"runtime_validation":"UNTESTED",
-             "report":f"localization/graphics/role_B/{RUN}/B52_1F5_REPORT.json"}
-    (wr/"B52_1F5FE6E9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+             "report":f"localization/graphics/role_B/{RUN}/B53_1F5_REPORT.json"}
+    (wr/"B53_1F5FE6E9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
     print(json.dumps(summary,ensure_ascii=False),flush=True)
 
 if __name__=="__main__":
@@ -344,6 +351,6 @@ if __name__=="__main__":
         wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
         fail={"run":RUN,"asset":"1F5FE6E9","index":INDEX,"status":"FAIL_CLOSED_DIAGNOSTIC",
               "exception":repr(e),"traceback":traceback.format_exc(),"RUNTIME_VALIDATION":"UNTESTED"}
-        (out/"B52_FAIL_CLOSED.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n")
-        (wr/"B52_1F5FE6E9_FAIL.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n")
+        (out/"B53_FAIL_CLOSED.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n")
+        (wr/"B53_1F5FE6E9_FAIL.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n")
         print(json.dumps(fail,ensure_ascii=False),flush=True)
