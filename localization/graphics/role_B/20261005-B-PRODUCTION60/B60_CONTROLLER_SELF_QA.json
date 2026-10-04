@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION60",
+  "timestamp_kst": "2026-10-05T08:15:09+09:00",
+  "index": 154,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a",
+  "semantic_binding": {
+    "canonical_regions": {
+      "2": "CREATE NEW LICENSE",
+      "3": "SELECT LICENSE",
+      "4": "SINGLE PLAYER",
+      "5": "DEFAULT LICENSE",
+      "6": "MULTIPLAYER",
+      "7": "SINGLE PLAYER",
+      "8": "SHOWROOM",
+      "9": "MULTIPLAYER"
+    },
+    "stale_transcription_correction": "SHOWROOM added; duplicate SINGLE PLAYER/MULTIPLAYER physical occurrences explicitly covered",
+    "protected_regions": [
+      0,
+      1
+    ]
+  },
+  "machine_qa": {
+    "dimensions": [
+      4096,
+      1024
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "bbox_size_positive_margin": "8/8 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "exact_source_residue_pixels": 0,
+    "changed_pixels_outside_source_bboxes": 0,
+    "alpha_changed_pixels_outside_source_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "protected_artwork_pixels_changed": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": 0
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "raw_mirror_y": "PASS",
+    "observations": [
+      "All five red source-family labels and all three small gray source-family labels are replaced with readable Korean at source-consistent group weight and color.",
+      "Ferrari photo/artwork regions are unchanged and no source English text remains visibly behind the Korean labels.",
+      "No clipping, overlap, seam, halo, protected-artwork damage, or readable/raw orientation regression is visible."
+    ]
+  },
+  "decision": "B_PRODUCTION60_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
