@@ -126,23 +126,13 @@ def shear_rgba(im,s):
     if not bb: raise RuntimeError("empty sheared layer")
     return outim.crop(bb)
 
-# Build final exclusively from the already clean A10 plate.
-final=clean.copy()
+# Start from the exact accepted A_RECOVERY10 candidate so all lower nine labels and
+# unrelated atlas pixels remain byte/pixel-identical. Only the eight C109-returned
+# localized top layers are replaced from the verified A10 clean plate.
+final=cur.copy()
 masks={}
 rows=[]
 input_preserved_diffs={}
-
-# Lower nine: exact delta replay, no style or pixel changes.
-for key in preserve_keys:
-    r=bykey[key]; lb=list(map(int,r["localized_bbox"]))
-    layer=extract_delta_layer(lb)
-    # extract_delta_layer may crop transparent padding; recover its actual current delta bbox.
-    m=dmask(clean.crop(tuple(lb)),cur.crop(tuple(lb)))
-    bb=m.getbbox()
-    if not bb: raise RuntimeError(("preserve mask",key))
-    gx=lb[0]+bb[0]; gy=lb[1]+bb[1]
-    layer=layer
-    final.alpha_composite(layer,(gx,gy))
 
 # Top eight: shear the current source-family Korean raster/effects; keep bottom/left anchor close to prior placement.
 meta={}
@@ -175,6 +165,9 @@ for key in rework_keys:
         if maxh<=0: raise RuntimeError(("no vertical fit",key,ob,ty,sh.size))
         scale=maxh/sh.height
         sh=sh.resize((max(1,int(sh.width*scale)),maxh),Image.Resampling.LANCZOS)
+    # Remove only the old localized layer footprint by restoring its verified clean plate.
+    # The old localized bboxes are mutually separated and contain no preserved source labels.
+    final.paste(old_clean,(oldlb[0],oldlb[1]))
     final.alpha_composite(sh,(tx,ty))
     meta[key]={"shear":shear_by_key[key],"anchor":[tx,ty],"preencode_bbox":[tx,ty,tx+sh.width,ty+sh.height]}
 
