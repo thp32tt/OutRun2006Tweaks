@@ -1,0 +1,401 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C141-4D38BBB0",
+  "queue_index": 154,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "producer_run": "20261005-B-PRODUCTION60",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "d06a7ea1d9e9c940788be244963fcb0146fe2498",
+    "atlas_git_blob_sha1": "11f58c46008eb6ca355cd9b0d64f1fe268695838",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf"
+  },
+  "candidate_sha256": "c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a",
+  "candidate_changed_by_C": false,
+  "independent_method": "pinned canonical source+atlas; source alpha per exact text cell; exact transparent clean reconstruction; independent candidate decode/header/bbox/protected/artwork/overlap/style gates",
+  "structure": {
+    "dimensions": [
+      4096,
+      1024
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "region_idx": 2,
+      "source": "CREATE NEW LICENSE",
+      "korean": "새 라이선스 만들기",
+      "style_group": "red",
+      "cell": [
+        0,
+        532,
+        2000,
+        172
+      ],
+      "original_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "localized_bbox": [
+        15,
+        552,
+        1126,
+        692
+      ],
+      "source_size": [
+        1941,
+        148
+      ],
+      "localized_size": [
+        1111,
+        140
+      ],
+      "delta_left": 2,
+      "delta_right": 828,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 3,
+      "source": "SELECT LICENSE",
+      "korean": "라이선스 선택",
+      "style_group": "red",
+      "cell": [
+        2000,
+        532,
+        1944,
+        172
+      ],
+      "original_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "localized_bbox": [
+        2009,
+        545,
+        2817,
+        685
+      ],
+      "source_size": [
+        1461,
+        148
+      ],
+      "localized_size": [
+        808,
+        140
+      ],
+      "delta_left": 2,
+      "delta_right": 651,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 4,
+      "source": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "style_group": "red",
+      "cell": [
+        0,
+        360,
+        1760,
+        172
+      ],
+      "original_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "localized_bbox": [
+        14,
+        378,
+        693,
+        518
+      ],
+      "source_size": [
+        1376,
+        148
+      ],
+      "localized_size": [
+        679,
+        140
+      ],
+      "delta_left": 2,
+      "delta_right": 695,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 5,
+      "source": "DEFAULT LICENSE",
+      "korean": "기본 라이선스",
+      "style_group": "red",
+      "cell": [
+        1760,
+        360,
+        1688,
+        172
+      ],
+      "original_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "localized_bbox": [
+        1774,
+        378,
+        2594,
+        518
+      ],
+      "source_size": [
+        1544,
+        148
+      ],
+      "localized_size": [
+        820,
+        140
+      ],
+      "delta_left": 2,
+      "delta_right": 722,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 6,
+      "source": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "style_group": "red",
+      "cell": [
+        0,
+        188,
+        1604,
+        172
+      ],
+      "original_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "localized_bbox": [
+        17,
+        205,
+        657,
+        345
+      ],
+      "source_size": [
+        1220,
+        144
+      ],
+      "localized_size": [
+        640,
+        140
+      ],
+      "delta_left": 2,
+      "delta_right": 578,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 7,
+      "source": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "style_group": "gray",
+      "cell": [
+        1604,
+        272,
+        1056,
+        88
+      ],
+      "original_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "localized_bbox": [
+        1612,
+        289,
+        1879,
+        347
+      ],
+      "source_size": [
+        587,
+        64
+      ],
+      "localized_size": [
+        267,
+        58
+      ],
+      "delta_left": 2,
+      "delta_right": 318,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 8,
+      "source": "SHOWROOM",
+      "korean": "쇼룸",
+      "style_group": "gray",
+      "cell": [
+        2660,
+        272,
+        812,
+        88
+      ],
+      "original_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "localized_bbox": [
+        2676,
+        291,
+        2780,
+        346
+      ],
+      "source_size": [
+        420,
+        62
+      ],
+      "localized_size": [
+        104,
+        55
+      ],
+      "delta_left": 2,
+      "delta_right": 314,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 9,
+      "source": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "style_group": "gray",
+      "cell": [
+        2560,
+        936,
+        812,
+        88
+      ],
+      "original_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "localized_bbox": [
+        2568,
+        954,
+        2820,
+        1012
+      ],
+      "source_size": [
+        520,
+        62
+      ],
+      "localized_size": [
+        252,
+        58
+      ],
+      "delta_left": 2,
+      "delta_right": 266,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "producer_clean_exact_diff_pixels": 0,
+    "bbox_size_positive_margin": "8/8 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "artwork_changed": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "overlap": 0,
+    "touch_pairs": [],
+    "style": {
+      "2": {
+        "group": "red",
+        "target_pixels": 70127,
+        "source_family_fraction": 1.0
+      },
+      "3": {
+        "group": "red",
+        "target_pixels": 50815,
+        "source_family_fraction": 1.0
+      },
+      "4": {
+        "group": "red",
+        "target_pixels": 50511,
+        "source_family_fraction": 1.0
+      },
+      "5": {
+        "group": "red",
+        "target_pixels": 48553,
+        "source_family_fraction": 1.0
+      },
+      "6": {
+        "group": "red",
+        "target_pixels": 50753,
+        "source_family_fraction": 1.0
+      },
+      "7": {
+        "group": "gray",
+        "target_pixels": 10279,
+        "source_family_fraction": 1.0
+      },
+      "8": {
+        "group": "gray",
+        "target_pixels": 3893,
+        "source_family_fraction": 1.0
+      },
+      "9": {
+        "group": "gray",
+        "target_pixels": 10284,
+        "source_family_fraction": 1.0
+      }
+    }
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
