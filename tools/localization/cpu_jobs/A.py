@@ -9,6 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OU
 
 repo=Path.cwd()
 run="20261004-A-PRODUCTION16"
+RETRY_CONTEXT="prior hosted worker run cancelled by concurrent branch push after job fix; retry on latest HEAD"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 worker_out=repo/"localization/graphics/worker_results"
@@ -382,6 +383,7 @@ status_ok=(clean_rep["status"]=="PASS" and final_rep["status"]=="PASS" and all_b
 
 report={
     "schema_version":1,"role":"A","run":run,"worker":os.environ.get("OUTRUN_CPU_WORKER"),"base_head":os.environ.get("GITHUB_SHA"),
+    "retry_context":RETRY_CONTEXT,
     "index":107,"asset":asset_rel,
     "source_provenance":{
         "repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":BLOB,"sha256":SOURCE_SHA,
