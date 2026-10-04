@@ -73,56 +73,50 @@ for yy in range(ch):
 seed_bb=seed.getbbox()
 if not seed_bb: raise RuntimeError("NOT AVAILABLE bright seed missing")
 
-# Red plate background family from pixels away from the white glyphs.
-red_samples=[]
-for yy in range(ch):
-    for xx in range(cw):
-        if sp[xx,yy]: continue
-        r,g,b,a=pix[xx,yy]
-        if a>160 and r>90 and r-g>25 and r-b>25 and g<150 and b<150:
-            red_samples.append((r,g,b,a))
-if len(red_samples)<100: raise RuntimeError(("insufficient red background samples",len(red_samples)))
-global_red=median_rgba(red_samples)
-
-# Build exact glyph/effect mask only around the text seed. Include antialias/shadow pixels
-# that depart from the local red plate, while excluding the plate border/background.
+# Reconstruct the flat red plate first from verified red-family pixels outside a
+# generous text neighborhood. Then define the source glyph/effect mask as every
+# decoded pixel in that neighborhood that differs from the row background. This
+# captures the faint antialias/shadow fringe that the earlier threshold missed.
 sx1,sy1,sx2,sy2=seed_bb
 zone=(max(0,sx1-12),max(0,sy1-8),min(cw,sx2+12),min(ch,sy2+8))
+row_bg={}
+for yy in range(ch):
+    vals=[]
+    for xx in range(cw):
+        if zone[0]-8 <= xx < zone[2]+8:
+            continue
+        r,g,b,a=pix[xx,yy]
+        if a>160 and r>90 and r-g>25 and r-b>25 and g<150 and b<150:
+            vals.append((r,g,b,a))
+    if len(vals)>=8:
+        row_bg[yy]=median_rgba(vals)
+usable=sorted(row_bg)
+if not usable:
+    raise RuntimeError("row background missing")
+for yy in range(ch):
+    if yy not in row_bg:
+        row_bg[yy]=row_bg[min(usable,key=lambda z:abs(z-yy))]
+global_red=median_rgba(list(row_bg.values()))
+
 effect=Image.new("L",(cw,ch),0); ep=effect.load()
 for yy in range(zone[1],zone[3]):
+    e=row_bg[yy]
     for xx in range(zone[0],zone[2]):
         r,g,b,a=pix[xx,yy]
-        if a==0: continue
-        dist=sum(abs(v-e) for v,e in zip((r,g,b,a),global_red))
-        neutral=max(r,g,b)-min(r,g,b)<=75
-        bright=min(r,g,b)>=85
-        dark_effect=(r<80 and g<80 and b<80)
-        if sp[xx,yy] or (dist>=34 and (neutral and bright or dark_effect)):
+        if a==0:
+            continue
+        dist=max(abs(r-e[0]),abs(g-e[1]),abs(b-e[2]),abs(a-e[3]))
+        if sp[xx,yy] or dist>=2:
             ep[xx,yy]=255
 
 ebb=effect.getbbox()
-if not ebb: raise RuntimeError("source effect mask empty")
+if not ebb:
+    raise RuntimeError("source effect mask empty")
 ob=[x+ebb[0],y+ebb[1],x+ebb[2],y+ebb[3]]
 
 # The label must be materially within the dedicated red plate, not the whole cell.
 if not (ob[0]>=x and ob[1]>=y and ob[2]<=x+cw and ob[3]<=y+ch):
     raise RuntimeError(("source bbox outside cell",ob))
-
-# Reconstruct plate color by row median from red-family pixels outside effect.
-row_bg={}
-for yy in range(ch):
-    vals=[]
-    for xx in range(cw):
-        if ep[xx,yy]: continue
-        r,g,b,a=pix[xx,yy]
-        if a>120 and r>80 and r-g>20 and r-b>20 and g<170 and b<170:
-            vals.append((r,g,b,a))
-    if len(vals)>=8: row_bg[yy]=median_rgba(vals)
-usable=sorted(row_bg)
-if not usable: raise RuntimeError("row background missing")
-for yy in range(ch):
-    if yy not in row_bg:
-        row_bg[yy]=row_bg[min(usable,key=lambda z:abs(z-yy))]
 
 source_text_mask=Image.new("L",(W,H),0); source_text_mask.paste(effect,(x,y))
 allowed=Image.new("L",(W,H),0)
