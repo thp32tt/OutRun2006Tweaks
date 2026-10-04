@@ -890,4 +890,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - C075 setting-label edge case was explicitly zoom-reviewed: Tuned Setting -> 튜닝 설정 and Normal Setting -> 일반 설정 candidate render reaches the lower source-cell boundary, but complete glyph outlines remain visible and no pixels cross the cell. No clipping/escape observed, so no C repaint was justified.
 - FD90AA9 SHA 72cbf2cc... independently reviewed across all 29 semantic / 29 physical cells. 4096x4096 RGBA32/1 mip, exact header, 3,574,612 changed pixels, 0 outside cells and 0 introduced alpha outside. Maximum Speed/Transmission omissions are present; protected songs/models/speed/player/AT-MT and non-text artwork remain canonical outside cells.
 - 9F060EC1 B89 SHA 39d917ca... independently reviewed: 5/5 labels match reviewed transcription, 2048x2048 RGBA32/1 mip exact header, 62,929 changed pixels, 0 outside 5 cells; alpha changes outside = 0, introduced alpha outside = 0, minimum declared bbox margin 4 px. Row numbers, OM, barcode/legal code and repeating watermark/background remain preserved.
-- Readable/white/gray/raw mirror_y QA for all three found no source-language residue, broken 
+- Readable/white/gray/raw mirror_y QA for all three found no source-language residue, broken
+
+## 2026-10-04 C86 — FF2462BB independent final static QA
+- Revalidated A_RECOVERY01 candidate 9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08 from decoded DDS, not from A PASS flags.
+- DDS structure/header matches source; exact decoded text bbox **36/36 PASS**, including all **21/21** former C85 failures.
+- Candidate-vs-pre-A collateral guard: **0 changed pixels outside the 21 failed sprite cells**; all **15/15** prior-PASS elements remain pixel-identical.
+- Manual decoded contact-sheet visual review: **PASS**; no shrink/resampling ragged-stroke regression observed.
+- C decision: C86_PIXEL_VISUAL_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED; isolated in-game validation remains required before final approval.
+- Evidence: localization/graphics/role_C/20261004-1245-C86/C86_FF2462BB_FINAL_QA.json and localization/graphics/role_C/20261004-1245-C86/C86_FF2462BB_VISUAL_CONTACT.png.

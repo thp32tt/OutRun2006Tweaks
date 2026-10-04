@@ -1,0 +1,955 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-1245-C86",
+  "asset": "FF2462BB",
+  "base_head": "bdf19fc1d2a43f08b76058636e475d3bb0b790fb",
+  "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "candidate_sha256": "9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08",
+  "before_a_recovery_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
+  "a_recovery_commit": "15e204d6d102e8abf06cb91f7f5c9de6d380e82f",
+  "a_recovery_parent": "50623dc26ea259b4ddae1e3090f5578217867303",
+  "dimensions": [
+    4096,
+    2048
+  ],
+  "source_meta": {
+    "width": 2048,
+    "height": 135183,
+    "pitch_or_linear": 16384,
+    "mip_count": 1,
+    "pf_size": 32,
+    "pf_flags": 65,
+    "fourcc": "\u0000\u0000\u0000\u0000",
+    "rgb_bits": 32,
+    "r_mask": 255,
+    "g_mask": 65280,
+    "b_mask": 16711680,
+    "a_mask": 4278190080
+  },
+  "candidate_meta": {
+    "width": 2048,
+    "height": 135183,
+    "pitch_or_linear": 16384,
+    "mip_count": 1,
+    "pf_size": 32,
+    "pf_flags": 65,
+    "fourcc": "\u0000\u0000\u0000\u0000",
+    "rgb_bits": 32,
+    "r_mask": 255,
+    "g_mask": 65280,
+    "b_mask": 16711680,
+    "a_mask": 4278190080
+  },
+  "dds_header_128_exact_to_source": true,
+  "c85_failures_rechecked": 21,
+  "c85_prior_pass_rechecked": 15,
+  "all_36_decoded_bbox_containment_pass": true,
+  "all_21_reworked_bboxes_match_a_report": true,
+  "prior_pass_exact_count": 15,
+  "prior_pass_total": 15,
+  "runtime_validation": "UNTESTED",
+  "rows": [
+    {
+      "key": "ACCOUNT_NAME",
+      "source": "ACCOUNT NAME:",
+      "korean": "계정 이름:",
+      "original_bbox": [
+        5,
+        69,
+        394,
+        109
+      ],
+      "decoded_candidate_alpha_bbox": [
+        6,
+        69,
+        172,
+        108
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "ACCOUNT_PASSWORD",
+      "source": "ACCOUNT PASSWORD:",
+      "korean": "계정 비밀번호:",
+      "original_bbox": [
+        1,
+        132,
+        500,
+        173
+      ],
+      "decoded_candidate_alpha_bbox": [
+        6,
+        132,
+        257,
+        173
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "CURSING_LEWDNESS",
+      "source": "CURSING OR LEWDNESS",
+      "korean": "욕설 또는 음란 표현",
+      "original_bbox": [
+        4,
+        196,
+        557,
+        237
+      ],
+      "decoded_candidate_alpha_bbox": [
+        6,
+        196,
+        340,
+        237
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "SCREAMING",
+      "source": "SCREAMING",
+      "korean": "고성",
+      "original_bbox": [
+        9,
+        260,
+        285,
+        301
+      ],
+      "decoded_candidate_alpha_bbox": [
+        9,
+        261,
+        82,
+        301
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        9,
+        261,
+        82,
+        301
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "lossless_reposition"
+    },
+    {
+      "key": "ENTER_ACCOUNT_NAME",
+      "source": "ENTER ACCOUNT NAME:",
+      "korean": "계정 이름 입력:",
+      "original_bbox": [
+        2,
+        321,
+        558,
+        361
+      ],
+      "decoded_candidate_alpha_bbox": [
+        6,
+        321,
+        261,
+        361
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        6,
+        321,
+        261,
+        361
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "lossless_reposition"
+    },
+    {
+      "key": "DONT_SIGN_IN",
+      "source": "DON'T SIGN-IN",
+      "korean": "로그인 안 함",
+      "original_bbox": [
+        4,
+        388,
+        324,
+        429
+      ],
+      "decoded_candidate_alpha_bbox": [
+        6,
+        389,
+        217,
+        429
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "EXIT_OUTRUN_PLUS",
+      "source": "EXIT OUTRUN PLUS",
+      "korean": "아웃런 플러스 종료",
+      "original_bbox": [
+        1061,
+        68,
+        1528,
+        109
+      ],
+      "decoded_candidate_alpha_bbox": [
+        1061,
+        68,
+        1380,
+        108
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "ACCOUNTS",
+      "source": "ACCOUNTS:",
+      "korean": "계정:",
+      "original_bbox": [
+        1106,
+        132,
+        1363,
+        173
+      ],
+      "decoded_candidate_alpha_bbox": [
+        1106,
+        132,
+        1193,
+        173
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "CHEATING",
+      "source": "CHEATING",
+      "korean": "부정행위",
+      "original_bbox": [
+        1122,
+        197,
+        1356,
+        237
+      ],
+      "decoded_candidate_alpha_bbox": [
+        1124,
+        197,
+        1266,
+        236
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        1124,
+        197,
+        1266,
+        236
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "OFFENSIVE_MESSAGE",
+      "source": "OFFENSIVE MESSAGE",
+      "korean": "모욕적 메시지",
+      "original_bbox": [
+        1122,
+        260,
+        1623,
+        301
+      ],
+      "decoded_candidate_alpha_bbox": [
+        1123,
+        260,
+        1359,
+        301
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "GREAT_SESSION",
+      "source": "GREAT SESSION",
+      "korean": "즐거운 경기",
+      "original_bbox": [
+        1125,
+        324,
+        1486,
+        365
+      ],
+      "decoded_candidate_alpha_bbox": [
+        1126,
+        324,
+        1324,
+        365
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "ENTER_ACCOUNT_PASSWORD",
+      "source": "ENTER ACCOUNT PASSWORD:",
+      "korean": "계정 비밀번호 입력:",
+      "original_bbox": [
+        1137,
+        388,
+        1785,
+        429
+      ],
+      "decoded_candidate_alpha_bbox": [
+        1138,
+        388,
+        1476,
+        429
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        1138,
+        388,
+        1476,
+        429
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "lossless_reposition"
+    },
+    {
+      "key": "REGISTER_NEW_ACCOUNT_SMALL",
+      "source": "REGISTER NEW ACCOUNT",
+      "korean": "새 계정 등록",
+      "original_bbox": [
+        2123,
+        68,
+        2718,
+        109
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2124,
+        68,
+        2330,
+        108
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "CREATE_ACCOUNT",
+      "source": "CREATE ACCOUNT",
+      "korean": "계정 만들기",
+      "original_bbox": [
+        2180,
+        133,
+        2584,
+        173
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2182,
+        133,
+        2370,
+        172
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        2182,
+        133,
+        2370,
+        172
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "BAD_NAME",
+      "source": "BAD NAME",
+      "korean": "부적절한 이름",
+      "original_bbox": [
+        2241,
+        197,
+        2488,
+        236
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2253,
+        197,
+        2475,
+        235
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        2253,
+        197,
+        2475,
+        235
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "GOOD_ATTITUDE",
+      "source": "GOOD ATTITUDE",
+      "korean": "좋은 태도",
+      "original_bbox": [
+        2240,
+        261,
+        2603,
+        301
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2242,
+        261,
+        2396,
+        300
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        2242,
+        261,
+        2396,
+        300
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "THREATS_HARASSMENT",
+      "source": "THREATS OR HARASSMENT",
+      "korean": "협박 또는 괴롭힘",
+      "original_bbox": [
+        2243,
+        324,
+        2876,
+        365
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2244,
+        324,
+        2529,
+        365
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "DELETE_ACCOUNT_SMALL",
+      "source": "DELETE ACCOUNT",
+      "korean": "계정 삭제",
+      "original_bbox": [
+        2560,
+        393,
+        2961,
+        433
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2562,
+        393,
+        2714,
+        432
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        2562,
+        393,
+        2714,
+        432
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "SOUNDTRACK",
+      "source": "SOUNDTRACK",
+      "korean": "사운드트랙",
+      "original_bbox": [
+        3195,
+        53,
+        3500,
+        109
+      ],
+      "decoded_candidate_alpha_bbox": [
+        3200,
+        67,
+        3390,
+        108
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "LOAD_SAVE",
+      "source": "LOAD / SAVE",
+      "korean": "불러오기 / 저장",
+      "original_bbox": [
+        3253,
+        136,
+        3546,
+        181
+      ],
+      "decoded_candidate_alpha_bbox": [
+        3254,
+        137,
+        3520,
+        181
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        3254,
+        137,
+        3520,
+        181
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "lossless_reposition"
+    },
+    {
+      "key": "LOGIN_SMALL",
+      "source": "LOGIN:",
+      "korean": "로그인:",
+      "original_bbox": [
+        3348,
+        197,
+        3505,
+        252
+      ],
+      "decoded_candidate_alpha_bbox": [
+        3349,
+        202,
+        3475,
+        242
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "IN_MENU",
+      "source": "In Menu",
+      "korean": "메뉴",
+      "original_bbox": [
+        2414,
+        9,
+        2580,
+        49
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2462,
+        9,
+        2533,
+        48
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        2462,
+        9,
+        2533,
+        48
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "OK",
+      "source": "OK",
+      "korean": "확인",
+      "original_bbox": [
+        2960,
+        4,
+        3025,
+        55
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2960,
+        11,
+        3016,
+        43
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "SIGN_IN",
+      "source": "SIGN IN",
+      "korean": "로그인",
+      "original_bbox": [
+        0,
+        455,
+        268,
+        518
+      ],
+      "decoded_candidate_alpha_bbox": [
+        9,
+        455,
+        184,
+        517
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        9,
+        455,
+        184,
+        517
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "DELETE_ACCOUNT_BIG",
+      "source": "DELETE ACCOUNT",
+      "korean": "계정 삭제",
+      "original_bbox": [
+        3,
+        540,
+        641,
+        602
+      ],
+      "decoded_candidate_alpha_bbox": [
+        7,
+        540,
+        251,
+        601
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        7,
+        540,
+        251,
+        601
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "ENTER_XBOX_PASSCODE",
+      "source": "ENTER XBOX PASSCODE",
+      "korean": "XBOX 패스코드 입력",
+      "original_bbox": [
+        906,
+        456,
+        1875,
+        522
+      ],
+      "decoded_candidate_alpha_bbox": [
+        906,
+        456,
+        1487,
+        521
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        906,
+        456,
+        1487,
+        521
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "lossless_reposition"
+    },
+    {
+      "key": "REGISTER_NEW_ACCOUNT_BIG",
+      "source": "REGISTER NEW ACCOUNT",
+      "korean": "새 계정 등록",
+      "original_bbox": [
+        2470,
+        543,
+        3399,
+        606
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2477,
+        543,
+        2803,
+        605
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        2477,
+        543,
+        2803,
+        605
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "PLAYER_FEEDBACK",
+      "source": "PLAYER FEEDBACK",
+      "korean": "플레이어 피드백",
+      "original_bbox": [
+        2320,
+        633,
+        3500,
+        706
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2327,
+        635,
+        2773,
+        700
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    },
+    {
+      "key": "LOGIN_TO_ACCOUNT",
+      "source": "LOGIN TO ACCOUNT",
+      "korean": "계정 로그인",
+      "original_bbox": [
+        2470,
+        1333,
+        2920,
+        1380
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2594,
+        1333,
+        2793,
+        1374
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        2594,
+        1333,
+        2793,
+        1374
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "lossless_reposition"
+    },
+    {
+      "key": "START_1",
+      "source": "Start",
+      "korean": "시작",
+      "original_bbox": [
+        1335,
+        737,
+        1449,
+        785
+      ],
+      "decoded_candidate_alpha_bbox": [
+        1353,
+        738,
+        1431,
+        784
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        1353,
+        738,
+        1431,
+        784
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "GOAL_1",
+      "source": "Goal",
+      "korean": "골",
+      "original_bbox": [
+        1965,
+        737,
+        2068,
+        785
+      ],
+      "decoded_candidate_alpha_bbox": [
+        1994,
+        738,
+        2038,
+        784
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        1994,
+        738,
+        2038,
+        784
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "START_2",
+      "source": "Start",
+      "korean": "시작",
+      "original_bbox": [
+        2111,
+        737,
+        2225,
+        785
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2129,
+        738,
+        2207,
+        784
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        2129,
+        738,
+        2207,
+        784
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "GOAL_2",
+      "source": "Goal",
+      "korean": "골",
+      "original_bbox": [
+        2741,
+        737,
+        2844,
+        785
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2770,
+        738,
+        2814,
+        784
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        2770,
+        738,
+        2814,
+        784
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "START_3",
+      "source": "Start",
+      "korean": "시작",
+      "original_bbox": [
+        2887,
+        737,
+        3001,
+        785
+      ],
+      "decoded_candidate_alpha_bbox": [
+        2905,
+        738,
+        2983,
+        784
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        2905,
+        738,
+        2983,
+        784
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "GOAL_3",
+      "source": "Goal",
+      "korean": "골",
+      "original_bbox": [
+        3517,
+        737,
+        3620,
+        785
+      ],
+      "decoded_candidate_alpha_bbox": [
+        3546,
+        738,
+        3590,
+        784
+      ],
+      "containment": "PASS",
+      "was_c85_failure": true,
+      "a_reported_bbox": [
+        3546,
+        738,
+        3590,
+        784
+      ],
+      "matches_a_reported_bbox": true,
+      "a_rework_mode": "native_render"
+    },
+    {
+      "key": "YOU",
+      "source": "YOU",
+      "korean": "나",
+      "original_bbox": [
+        1862,
+        660,
+        1966,
+        709
+      ],
+      "decoded_candidate_alpha_bbox": [
+        1898,
+        666,
+        1933,
+        706
+      ],
+      "containment": "PASS",
+      "was_c85_failure": false,
+      "prior_pass_changed_pixels": 0,
+      "prior_pass_exact": "PASS"
+    }
+  ],
+  "static_machine_qa": "PASS",
+  "timestamp_kst": "2026-10-04T12:53:13+09:00",
+  "scope": "Independent C strict static QA of A_RECOVERY01 FF2462BB: decoded exact-bbox containment, pre-A collateral guard by sprite cell, prior-PASS preservation, structure/header, and manual visual artifact review. No game launch.",
+  "changed_pixels_outside_failed_sprite_cells_vs_pre_a": 0,
+  "collateral_gate": "PASS",
+  "bbox_gate": "PASS_36_OF_36",
+  "reworked_bbox_gate": "PASS_21_OF_21",
+  "prior_pass_preservation": "PASS_15_OF_15",
+  "visual_contact_sheet": "localization/graphics/role_C/20261004-1245-C86/C86_FF2462BB_VISUAL_CONTACT.png",
+  "visual_qa": "PASS",
+  "visual_qa_note": "Manual review of decoded source/current contact sheet: native rerenders are clean and legible; lossless-reposition elements preserve prior glyph quality; no shrink/resampling ragged-stroke regression observed.",
+  "preliminary_diagnostics": {
+    "pre_a_changed_pixels_outside_original_failure_bboxes": 94784,
+    "note_pre_a_bbox_metric": "Informational only: expected cleanup of prior overflowing failed glyph pixels lies outside the source text bbox but remains inside the failed sprite cell.",
+    "source_current_changed_pixels_outside_36_source_text_bboxes": 1003012,
+    "note_source_metric": "Informational legacy-baseline delta; C86 collateral gate is current candidate vs exact pre-A candidate, and that delta is zero outside the 21 failed sprite cells."
+  },
+  "c_decision": "C86_PIXEL_VISUAL_PASS_PENDING_INGAME",
+  "status": "PASS_STATIC_PENDING_INGAME"
+}

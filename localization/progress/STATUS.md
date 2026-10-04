@@ -629,3 +629,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Candidate SHA-256: `a63dcfea0642c9bcb4cb5b41d168923404157d9b65409a3affcf72662343d2b6`.
 - `RUNTIME_VALIDATION=UNTESTED`; C final QA and in-game validation pending.
 - Evidence: `localization/graphics/role_A/20261004-A-RECOVERY03/A_RECOVERY03_39229D64_REPORT.json`.
+
+
+## 2026-10-04 C86 — FF2462BB independent final static QA
+- Revalidated A_RECOVERY01 candidate 9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08 from decoded DDS, not from A PASS flags.
+- DDS structure/header matches source; exact decoded text bbox **36/36 PASS**, including all **21/21** former C85 failures.
+- Candidate-vs-pre-A collateral guard: **0 changed pixels outside the 21 failed sprite cells**; all **15/15** prior-PASS elements remain pixel-identical.
+- Manual decoded contact-sheet visual review: **PASS**; no shrink/resampling ragged-stroke regression observed.
+- C decision: C86_PIXEL_VISUAL_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED; isolated in-game validation remains required before final approval.
+- Evidence: localization/graphics/role_C/20261004-1245-C86/C86_FF2462BB_FINAL_QA.json and localization/graphics/role_C/20261004-1245-C86/C86_FF2462BB_VISUAL_CONTACT.png.
