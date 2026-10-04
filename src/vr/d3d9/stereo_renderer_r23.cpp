@@ -61,7 +61,7 @@ namespace OutRunVRStereo
         bool R23FirstImplicitViewportResyncLogged = false;
 
         bool R23CaptureActualGameState(IDirect3DDevice9* device,
-            R22ScissorSnapshot& out, const char* site, bool force) noexcept
+            OutRunVR::State::D3D9RasterSnapshot& out, const char* site, bool force) noexcept
         {
             // Once StateBlock::Apply interception is actually proven,
             // setter + Apply boundaries own the shadow and effect draws no
@@ -88,8 +88,8 @@ namespace OutRunVRStereo
                 return true;
             }
 
-            R22ScissorSnapshot actual{};
-            if (!R22CaptureGameScissor(device, actual))
+            OutRunVR::State::D3D9RasterSnapshot actual{};
+            if (!CaptureTrackedRasterState(device, actual))
             {
                 ++R23StateCaptureFailures;
                 return false;
@@ -150,11 +150,11 @@ namespace OutRunVRStereo
         }
 
         void R23ObservePassiveDepthClear(IDirect3DDevice9* device,
-            const R22ScissorSnapshot& state, DWORD count, const D3DRECT* rects,
+            const OutRunVR::State::D3D9RasterSnapshot& state, DWORD count, const D3DRECT* rects,
             DWORD flags, float z, DWORD stencil, HRESULT hr) noexcept
         {
             if (FAILED(hr) || !TargetIsBackBuffer() ||
-                !R22GameClearCoversBackbuffer(count, rects, state) ||
+                !TrackedGameClearCoversBackbuffer(count, rects, state) ||
                 R9DeferredDepth || !R9CurrentDepthCanMirror())
                 return;
 
@@ -214,7 +214,7 @@ namespace OutRunVRStereo
 
         bool R23RestoreActualGameState(IDirect3DDevice9* device,
             IDirect3DSurface9* savedRt, IDirect3DSurface9* savedDepth,
-            const R22ScissorSnapshot& state) noexcept
+            const OutRunVR::State::D3D9RasterSnapshot& state) noexcept
         {
             bool ok = true;
             if (FAILED(SetRenderTargetHook.stdcall<HRESULT>(device, 0u, savedRt)))
@@ -233,7 +233,7 @@ namespace OutRunVRStereo
 
         bool R23ClearPrivateDepth(IDirect3DDevice9* device,
             IDirect3DSurface9* rt, IDirect3DSurface9* depth,
-            const R22ScissorSnapshot& state, bool stencilSafe) noexcept
+            const OutRunVR::State::D3D9RasterSnapshot& state, bool stencilSafe) noexcept
         {
             if (!depth)
                 return true;
@@ -263,7 +263,7 @@ namespace OutRunVRStereo
         }
 
         bool R23InitializeStereoFromAuthoritativeBaseline(
-            IDirect3DDevice9* device, const R22ScissorSnapshot& state,
+            IDirect3DDevice9* device, const OutRunVR::State::D3D9RasterSnapshot& state,
             bool stencilSafe, DWORD colorRectCount,
             const D3DRECT* colorRects, D3DCOLOR color) noexcept
         {
@@ -405,7 +405,7 @@ namespace OutRunVRStereo
                 return R23ClearR22Hook.stdcall<HRESULT>(
                     device, count, rects, flags, color, z, stencil);
 
-            R22ScissorSnapshot actual{};
+            OutRunVR::State::D3D9RasterSnapshot actual{};
             const bool stateOk = R23CaptureActualGameState(
                 device, actual, "Clear", true);
 
@@ -437,7 +437,7 @@ namespace OutRunVRStereo
             if (FAILED(hr) || !stateOk || !mainBefore || !wantsStereo)
                 return hr;
 
-            const bool fullGameClear = R22GameClearCoversBackbuffer(
+            const bool fullGameClear = TrackedGameClearCoversBackbuffer(
                 count, rects, actual);
             R23ObservePassiveDepthClear(device, actual, count, rects,
                 flags, z, stencil, hr);
@@ -507,7 +507,7 @@ namespace OutRunVRStereo
             if (!IsGameDevice(device) || InternalStereoPass)
                 return;
             ++R23GameDrawSerial;
-            R22ScissorSnapshot ignored{};
+            OutRunVR::State::D3D9RasterSnapshot ignored{};
             R23CaptureActualGameState(device, ignored, "Draw", false);
         }
 
@@ -557,7 +557,7 @@ namespace OutRunVRStereo
             if (SUCCEEDED(hr) && index == 0 && IsGameDevice(device) &&
                 !InternalStereoPass)
             {
-                R22ScissorSnapshot actual{};
+                OutRunVR::State::D3D9RasterSnapshot actual{};
                 if (!R23CaptureActualGameState(device, actual,
                         "SetRenderTarget", true))
                 {
@@ -794,7 +794,7 @@ namespace OutRunVRStereo
                         return 0;
                     }
 
-                    R22ScissorSnapshot initial{};
+                    OutRunVR::State::D3D9RasterSnapshot initial{};
                     if (IDirect3DDevice9* device =
                             StereoInstalledDevice.load(std::memory_order_acquire))
                         R23CaptureActualGameState(device, initial, "install", true);
