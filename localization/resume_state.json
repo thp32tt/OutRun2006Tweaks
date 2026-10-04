@@ -1,5 +1,5 @@
 {
-  "schema_version": 61,
+  "schema_version": 62,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_RECOVERY10 repaired C_OVERLAP05-returned odd index 111 C075FB49; candidate fc75a1a1b267dbc43f240483ffc1ec67e3d3dddd05061e504ab4c0c4ca2efacd passed 17/17 exact bbox/size/positive-margin static QA, zero top source-residue/pair-overlap/protected-change gates, preserved OutRun2SP/OutRun2/1P exactly, and controller visual self-QA; independent C final QA plus isolated in-game validation remain pending.",
     "A_RECOVERY09 repaired C_OVERLAP05-returned odd index 57 39229D64; final candidate dbd97d30d1e14df102d5c90c5ef5e339a93a934c4b10b71e2b30fbf76db2b8f8 passed 16/16 exact bbox/size/positive-margin static QA, zero source-residue/label-overlap gates, and controller visual self-QA; independent C final QA plus isolated in-game validation remain pending.",
     "A_PRODUCTION15 produced odd index 135 2B0863D6 from authoritative 2048x256 Release HD source; final candidate 2f3e99f468367e056ee3c6edfdb412b1fe5f10f27387a463472b07aeaa335fbb passed A static/visual self-QA after same-run CLASS residue rework and awaits independent C final QA plus isolated in-game validation.",
     "A_PRODUCTION14 produced odd index 49 BF3EE5C6 from authoritative 2048x2048 Release HD source; candidate 30cc2167b1650ab0a7b1c579c7d29118065007f0474f7207ce993ab1b19e45fa passed A static/visual self-QA and awaits independent C final QA plus isolated in-game validation.",
@@ -430,8 +431,8 @@
         "runtime_validation": "UNTESTED"
       },
       "C075FB49": {
-        "status": "C88_PIXEL_VISUAL_PASS_PENDING_INGAME",
-        "candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
+        "status": "A_RECOVERY10_SELF_QA_PASS_PENDING_C_AND_INGAME",
+        "candidate_sha256": "fc75a1a1b267dbc43f240483ffc1ec67e3d3dddd05061e504ab4c0c4ca2efacd",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
         "completed_transcription_entries": 16,
         "localized_regions": 17,
@@ -463,13 +464,22 @@
         "a_recovery05_visual_qa": "PASS",
         "runtime_validation": "UNTESTED",
         "a_recovery05_changed_sha_supersedes_prior_static_qa": true,
-        "c_revalidation_status": "C88_PASS_PENDING_INGAME",
+        "c_revalidation_status": "PENDING_AFTER_A_RECOVERY10_CHANGED_SHA",
         "prior_candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
         "prior_c_strict_qa_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
         "prior_d_final_qa_report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json",
         "c88_bbox_pass": "17/17",
         "c88_clean_plate_validator": "PASS",
-        "c88_final_validator": "PASS"
+        "c88_final_validator": "PASS",
+        "a_recovery10_report": "localization/graphics/role_A/20261004-A-RECOVERY10/A_RECOVERY10_C075FB49_REPORT.json",
+        "a_recovery10_bbox_pass": "17/17",
+        "a_recovery10_size_ceiling_pass": "17/17",
+        "a_recovery10_positive_margin": "17/17",
+        "a_recovery10_clean_plate_validator": "PASS",
+        "a_recovery10_final_validator": "PASS",
+        "a_recovery10_top_source_residue_pixels": 0,
+        "a_recovery10_pair_overlap_pixels": 0,
+        "a_recovery10_visual_qa": "PASS"
       },
       "FD90AA9": {
         "status": "C92_REWORK_REQUIRED_VISUAL_SOURCE_RESIDUE_AND_LAYER_OVERDRAW",
@@ -2417,5 +2427,43 @@
     "pending_production_localize_text": 50,
     "runtime_validation": "UNTESTED",
     "vr_ffb_dx11_dxvk_changes": false
+  },
+  "a_recovery10_c075fb49": {
+    "run": "20261004-A-RECOVERY10",
+    "status": "A_RECOVERY10_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "index": 111,
+    "asset": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "source_dimensions": [
+      2048,
+      2048
+    ],
+    "source_format": "RGBA32",
+    "c_overlap05_rejected_sha256": "3e950422775def2508ea42118f41c7a1f7463e2a7106cdcfcfb907b705890c91",
+    "fallback_before_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
+    "candidate_sha256": "fc75a1a1b267dbc43f240483ffc1ec67e3d3dddd05061e504ab4c0c4ca2efacd",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "report": "localization/graphics/role_A/20261004-A-RECOVERY10/A_RECOVERY10_C075FB49_REPORT.json",
+    "top_rebuilt_occurrences": 8,
+    "localized_occurrences": 17,
+    "bbox_pass": "17/17 readable + raw",
+    "size_ceiling_pass": "17/17",
+    "positive_margin": "17/17",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "top_clean_source_residue_pixels": 0,
+    "localized_pair_overlap_pixels": 0,
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "preserved_source_label_pixel_diffs": {
+      "OutRun2SP": 0,
+      "OutRun2": 0,
+      "1P": 0
+    },
+    "controller_visual_qa": "PASS",
+    "runtime_validation": "UNTESTED",
+    "c_final_qa": "PENDING",
+    "in_game_validation": "PENDING"
   }
 }

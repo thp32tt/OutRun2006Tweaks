@@ -21,7 +21,8 @@
     "OutRun2": 0,
     "1P": 0
   },
-  "worker_status": "A_RECOVERY10_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "worker_status": "A_RECOVERY10_SELF_QA_PASS_PENDING_C_AND_INGAME",
   "runtime_validation": "UNTESTED",
-  "report": "localization/graphics/role_A/20261004-A-RECOVERY10/A_RECOVERY10_C075FB49_REPORT.json"
+  "report": "localization/graphics/role_A/20261004-A-RECOVERY10/A_RECOVERY10_C075FB49_REPORT.json",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_REJECTED_FINAL_TOP_AND_RAW"
 }

@@ -916,7 +916,8 @@
   "all_17_readable_and_raw_bbox_pass": true,
   "all_17_size_ceiling_pass": true,
   "all_17_positive_margin": true,
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_REJECTED_FINAL_TOP_AND_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A_RECOVERY10_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_RECOVERY10_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_qa_notes": "Manual readable SOURCE/A-corrected-CLEAN/C-rejected/FINAL comparison, full-atlas comparison, dense-top high-resolution evidence, and raw mirror_y review PASS. The prior C_OVERLAP05 gray-strip/source-fragment failure is gone after canonical full-band restore and native rerender of all eight dense-top labels. No source English residue, rectangular cleanup strips, clipping, localized-label overlap, preserved-label collision, alpha halo, protected-art damage, or orientation regression is visible. OutRun2SP, OutRun2, and 1P remain source-pixel exact."
 }
