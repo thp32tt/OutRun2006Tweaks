@@ -1,0 +1,570 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-C107-NEW-B",
+  "asset": "53CE39D5",
+  "candidate_sha256": "e0fc4e372f023e97706a8cee460833eaa0bfbff0164fcffb7406c3a042d4224a",
+  "source_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+  "source_header_128_exact": true,
+  "clean_changed_pixels_outside_source_text_mask": 0,
+  "source_text_mask_pixels_unchanged_in_clean_plate": 242,
+  "target_pixels_outside_allowed_mask": 0,
+  "target_protected_overlap_pixels": 0,
+  "target_2px_guard_vs_protected_conflicts": 0,
+  "rows": [
+    {
+      "key": "random_1",
+      "original_bbox": [
+        1145,
+        12,
+        1455,
+        106
+      ],
+      "localized_bbox": [
+        1177,
+        14,
+        1422,
+        104
+      ],
+      "delta_left": 32,
+      "delta_right": 33,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        310,
+        94
+      ],
+      "localized_size": [
+        245,
+        90
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_attack_or2_1",
+      "original_bbox": [
+        70,
+        1675,
+        300,
+        1719
+      ],
+      "localized_bbox": [
+        111,
+        1677,
+        258,
+        1717
+      ],
+      "delta_left": 41,
+      "delta_right": 42,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        230,
+        44
+      ],
+      "localized_size": [
+        147,
+        40
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_attack_or2_2",
+      "original_bbox": [
+        48,
+        1719,
+        163,
+        1760
+      ],
+      "localized_bbox": [
+        67,
+        1723,
+        143,
+        1756
+      ],
+      "delta_left": 19,
+      "delta_right": 20,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        115,
+        41
+      ],
+      "localized_size": [
+        76,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_attack_or2_3",
+      "original_bbox": [
+        118,
+        1760,
+        293,
+        1803
+      ],
+      "localized_bbox": [
+        143,
+        1762,
+        267,
+        1801
+      ],
+      "delta_left": 25,
+      "delta_right": 26,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        175,
+        43
+      ],
+      "localized_size": [
+        124,
+        39
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "heart_attack_or2_1",
+      "original_bbox": [
+        431,
+        1675,
+        687,
+        1719
+      ],
+      "localized_bbox": [
+        485,
+        1677,
+        632,
+        1717
+      ],
+      "delta_left": 54,
+      "delta_right": 55,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        256,
+        44
+      ],
+      "localized_size": [
+        147,
+        40
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "heart_attack_or2_2",
+      "original_bbox": [
+        416,
+        1719,
+        531,
+        1760
+      ],
+      "localized_bbox": [
+        435,
+        1723,
+        511,
+        1756
+      ],
+      "delta_left": 19,
+      "delta_right": 20,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        115,
+        41
+      ],
+      "localized_size": [
+        76,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "heart_attack_or2_3",
+      "original_bbox": [
+        486,
+        1760,
+        661,
+        1803
+      ],
+      "localized_bbox": [
+        511,
+        1762,
+        635,
+        1801
+      ],
+      "delta_left": 25,
+      "delta_right": 26,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        175,
+        43
+      ],
+      "localized_size": [
+        124,
+        39
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun_or2_1",
+      "original_bbox": [
+        802,
+        1643,
+        953,
+        1687
+      ],
+      "localized_bbox": [
+        825,
+        1645,
+        930,
+        1685
+      ],
+      "delta_left": 23,
+      "delta_right": 23,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        151,
+        44
+      ],
+      "localized_size": [
+        105,
+        40
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun_or2_2",
+      "original_bbox": [
+        784,
+        1687,
+        899,
+        1728
+      ],
+      "localized_bbox": [
+        803,
+        1691,
+        879,
+        1724
+      ],
+      "delta_left": 19,
+      "delta_right": 20,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        115,
+        41
+      ],
+      "localized_size": [
+        76,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun_or2_3",
+      "original_bbox": [
+        854,
+        1728,
+        1029,
+        1771
+      ],
+      "localized_bbox": [
+        879,
+        1730,
+        1003,
+        1769
+      ],
+      "delta_left": 25,
+      "delta_right": 26,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        175,
+        43
+      ],
+      "localized_size": [
+        124,
+        39
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_attack_special_1",
+      "original_bbox": [
+        1174,
+        1563,
+        1404,
+        1607
+      ],
+      "localized_bbox": [
+        1215,
+        1565,
+        1362,
+        1605
+      ],
+      "delta_left": 41,
+      "delta_right": 42,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        230,
+        44
+      ],
+      "localized_size": [
+        147,
+        40
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_attack_special_2",
+      "original_bbox": [
+        1152,
+        1607,
+        1267,
+        1648
+      ],
+      "localized_bbox": [
+        1171,
+        1611,
+        1247,
+        1644
+      ],
+      "delta_left": 19,
+      "delta_right": 20,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        115,
+        41
+      ],
+      "localized_size": [
+        76,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_attack_special_3",
+      "original_bbox": [
+        1155,
+        1648,
+        1397,
+        1691
+      ],
+      "localized_bbox": [
+        1186,
+        1650,
+        1365,
+        1689
+      ],
+      "delta_left": 31,
+      "delta_right": 32,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        242,
+        43
+      ],
+      "localized_size": [
+        179,
+        39
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "heart_attack_special_1",
+      "original_bbox": [
+        1535,
+        1515,
+        1791,
+        1559
+      ],
+      "localized_bbox": [
+        1589,
+        1517,
+        1736,
+        1557
+      ],
+      "delta_left": 54,
+      "delta_right": 55,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        256,
+        44
+      ],
+      "localized_size": [
+        147,
+        40
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "heart_attack_special_2",
+      "original_bbox": [
+        1520,
+        1559,
+        1635,
+        1600
+      ],
+      "localized_bbox": [
+        1539,
+        1563,
+        1615,
+        1596
+      ],
+      "delta_left": 19,
+      "delta_right": 20,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        115,
+        41
+      ],
+      "localized_size": [
+        76,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "heart_attack_special_3",
+      "original_bbox": [
+        1523,
+        1600,
+        1765,
+        1643
+      ],
+      "localized_bbox": [
+        1554,
+        1602,
+        1733,
+        1641
+      ],
+      "delta_left": 31,
+      "delta_right": 32,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        242,
+        43
+      ],
+      "localized_size": [
+        179,
+        39
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun_special_1",
+      "original_bbox": [
+        1074,
+        1851,
+        1225,
+        1895
+      ],
+      "localized_bbox": [
+        1097,
+        1853,
+        1202,
+        1893
+      ],
+      "delta_left": 23,
+      "delta_right": 23,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        151,
+        44
+      ],
+      "localized_size": [
+        105,
+        40
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun_special_2",
+      "original_bbox": [
+        1056,
+        1895,
+        1171,
+        1936
+      ],
+      "localized_bbox": [
+        1075,
+        1899,
+        1151,
+        1932
+      ],
+      "delta_left": 19,
+      "delta_right": 20,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        115,
+        41
+      ],
+      "localized_size": [
+        76,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun_special_3",
+      "original_bbox": [
+        1059,
+        1936,
+        1301,
+        1979
+      ],
+      "localized_bbox": [
+        1090,
+        1938,
+        1269,
+        1977
+      ],
+      "delta_left": 31,
+      "delta_right": 32,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        242,
+        43
+      ],
+      "localized_size": [
+        179,
+        39
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "machine_status": "FAIL",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}
