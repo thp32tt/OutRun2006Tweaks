@@ -1058,3 +1058,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Manual source/clean/final, row-contact and raw-orientation review PASS: Korean lettering is source-family styled and no residue, clipping, overlap, seam, opaque patch or orientation regression is visible.
 - Current pending_artwork localize_text count is 58. RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_A/20261004-A-PRODUCTION12/.
+## 2026-10-04 USERPOLICY02 — stage/song/size/style policy + prior-pass re-QA
+- User policy made canonical: stage names use phonetic Hangul transliteration only; song titles/music credits remain exact original English artwork.
+- Exact source glyph/effect bbox is now a hard size ceiling: localized width or height may not exceed source by even 1 pixel, irrespective of plate/cell headroom.
+- Multi-line generation/QA now compares source typography per line; shared source-line styling must remain shared, while intentional source line differences must be preserved correspondingly.
+- Translation catalogs/runtime stage-name strings were normalized; future song-title rows are protected from Korean redraw.
+- Re-QA scope: AA04D779, 39229D64, 568D3696, 2DA43E41, C075FB49, A064FDFC, FF2462BB, FA7BBB13. Authoritative current producer/final-QA bbox records and actual candidate SHA were used after a partial-mask heuristic produced false positives. Final result: 8/8 static policy PASS.
+- AA04D779 was regenerated because its previous stage labels mixed semantic translation with transliteration. New candidate SHA256: `93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e`; `Coniferous Forest -> 코니퍼러스 포레스트`, `Ancient Ruins -> 에인션트 루인스`, `Desert -> 데저트`; all 21 labels obey the exact source-size ceiling.
+- Controller visual review of the generated multi-line comparison found no unjustified top/bottom-line style mismatch. Source-intentional yellow/white differences in 2DA43E41 remain preserved.
+- Runtime validation remains `UNTESTED`; no in-game PASS is claimed.

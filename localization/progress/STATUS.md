@@ -796,3 +796,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Manual source/clean/final, row-contact and raw-orientation review PASS: Korean lettering is source-family styled and no residue, clipping, overlap, seam, opaque patch or orientation regression is visible.
 - Current pending_artwork localize_text count is 58. RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_A/20261004-A-PRODUCTION12/.
+
+### USERPOLICY02 (2026-10-04)
+- Canonical graphics rules: stage-name phonetic transliteration; preserve English song titles/credits; exact source bbox width/height ceiling with +1 px forbidden; source-faithful per-line multi-line styling.
+- Previous eight review assets re-QA: **8/8 PASS** after authoritative bbox/SHA reconciliation.
+- Regenerated: **AA04D779** for stage-name policy; new SHA256 `93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e`.
+- In-game runtime validation: **UNTESTED**.

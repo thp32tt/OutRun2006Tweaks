@@ -1,48 +1,53 @@
 {
   "schema_version": 1,
-  "run": "20261004-C-USERPOLICY01",
-  "policy": "2026-10-04 user policy: stage transliteration; exact source text size ceiling; source-faithful multi-line style; preserve English song titles",
-  "scope": "re-QA the eight previously presented static-pass assets",
+  "run": "20261004-C-USERPOLICY02",
+  "role": "C/controller",
+  "policy_revision": "2026-10-04",
+  "scope": "authoritative re-QA of the eight previously presented pass assets after user policy revision",
+  "supersedes": "localization/graphics/role_C/20261004-C-USERPOLICY01/C_USERPOLICY01_EXISTING8_REQA.json",
+  "supersede_reason": "USERPOLICY01 used partial historical source-text masks as if they were complete masks on four assets, producing false REWORK flags. USERPOLICY02 uses each current candidate producer/final-QA report authoritative original/source bbox plus decoded/current localized bbox and verifies report candidate SHA against the actual current DDS.",
   "assets_total": 8,
-  "machine_pass": 4,
-  "machine_rework_required": 4,
+  "pass_count": 8,
+  "rework_required_count": 0,
+  "regenerated_assets": [
+    "AA04D779"
+  ],
+  "regeneration_reason": {
+    "AA04D779": "old stage-name semantics mixed translation/transliteration; regenerated under canonical phonetic stage-name policy and source-style/size rules"
+  },
+  "style_visual_evidence": "localization/graphics/role_C/20261004-C-USERPOLICY01/C_USERPOLICY01_MULTILINE_STYLE_REVIEW.jpg",
   "results": [
     {
       "asset": "AA04D779",
       "candidate_sha256": "93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e",
-      "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "producer_report": "localization/graphics/role_B/20261004-B-USERPOLICY01/B_USERPOLICY01_AA04D779_REPORT.json",
+      "producer_candidate_sha256": "93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e",
+      "candidate_sha_match": true,
       "rows_checked": 21,
       "size_failures": 0,
       "stage_name_failures": 0,
-      "song_title_row_failures": 0,
-      "changed_pixels_outside_reported_text_regions": 0,
-      "preserved_known_song_title": null,
-      "song_title_pixel_preservation_gate": "NOT_APPLICABLE_OR_NO_KNOWN_TITLE",
-      "multi_line_style_gate": "PENDING_CONTROLLER_VISUAL_REVIEW",
+      "song_title_failures": 0,
+      "multi_line_style_controller_review": "PASS",
+      "multi_line_style_note": "2026-10-04 controller review of C_USERPOLICY01_MULTILINE_STYLE_REVIEW.jpg: Korean lines use one shared style where the source lines share style; source-intentional yellow/white line differences in 2DA43E41 are preserved correspondingly. No unjustified top/bottom-line style mismatch found.",
+      "song_title_preservation": "PASS: no song-title row is localized in this asset; global preserve rule applies.",
       "rows": [
         {
-          "index": 0,
           "key": "sector4",
           "source": "Sector4",
           "korean": "섹터 4",
-          "coarse_bbox": [
+          "source_bbox": [
             196,
             340,
             377,
             400
           ],
-          "source_exact_bbox": [
-            196,
-            340,
-            377,
-            400
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             216,
             341,
             356,
             399
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             181,
             60
@@ -55,32 +60,26 @@
             -41,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 1,
           "key": "palm_beach",
           "source": "Palm Beach",
           "korean": "팜 비치",
-          "coarse_bbox": [
+          "source_bbox": [
             146,
             422,
             361,
             549
           ],
-          "source_exact_bbox": [
-            146,
-            422,
-            361,
-            549
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             203,
             423,
             303,
             548
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             215,
             127
@@ -93,34 +92,28 @@
             -115,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "팜 비치",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 2,
           "key": "coniferous_forest",
           "source": "Coniferous Forest",
           "korean": "코니퍼러스 포레스트",
-          "coarse_bbox": [
+          "source_bbox": [
             143,
             573,
             467,
             701
           ],
-          "source_exact_bbox": [
-            143,
-            573,
-            467,
-            701
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             181,
             574,
             427,
             700
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             324,
             128
@@ -133,34 +126,28 @@
             -78,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "코니퍼러스 포레스트",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 3,
           "key": "snow_mountain",
           "source": "Snow Mountain",
           "korean": "스노 마운틴",
-          "coarse_bbox": [
+          "source_bbox": [
             143,
             725,
             426,
             853
           ],
-          "source_exact_bbox": [
-            143,
-            725,
-            426,
-            853
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             204,
             727,
             365,
             851
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             283,
             128
@@ -173,34 +160,28 @@
             -122,
             -4
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "스노 마운틴",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 4,
           "key": "ancient_ruins",
           "source": "Ancient Ruins",
           "korean": "에인션트 루인스",
-          "coarse_bbox": [
+          "source_bbox": [
             140,
             878,
             412,
             1004
           ],
-          "source_exact_bbox": [
-            140,
-            878,
-            412,
-            1004
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             179,
             879,
             372,
             1003
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             272,
             126
@@ -213,34 +194,28 @@
             -79,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "에인션트 루인스",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 5,
           "key": "bay_area",
           "source": "Bay Area",
           "korean": "베이 에어리어",
-          "coarse_bbox": [
+          "source_bbox": [
             146,
             1058,
             429,
             1140
           ],
-          "source_exact_bbox": [
-            146,
-            1058,
-            429,
-            1140
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             151,
             1070,
             424,
             1128
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             283,
             82
@@ -253,34 +228,28 @@
             -10,
             -24
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "베이 에어리어",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 6,
           "key": "big_forest",
           "source": "Big Forest",
           "korean": "빅 포레스트",
-          "coarse_bbox": [
+          "source_bbox": [
             314,
             1226,
             632,
             1308
           ],
-          "source_exact_bbox": [
-            314,
-            1226,
-            632,
-            1308
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             320,
             1231,
             624,
             1303
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             318,
             82
@@ -293,34 +262,28 @@
             -14,
             -10
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "빅 포레스트",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 7,
           "key": "castle_wall",
           "source": "Castle Wall",
           "korean": "캐슬 월",
-          "coarse_bbox": [
+          "source_bbox": [
             646,
             573,
             872,
             701
           ],
-          "source_exact_bbox": [
-            646,
-            573,
-            872,
-            701
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             706,
             574,
             811,
             699
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             226,
             128
@@ -333,74 +296,62 @@
             -121,
             -3
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "캐슬 월",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 8,
           "key": "industrial_complex",
           "source": "Industrial Complex",
           "korean": "인더스트리얼 컴플렉스",
-          "coarse_bbox": [
+          "source_bbox": [
             647,
             726,
             925,
             863
           ],
-          "source_exact_bbox": [
-            647,
-            726,
-            925,
-            863
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             653,
-            735,
+            734,
             919,
             854
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             278,
             137
           ],
           "localized_size": [
             266,
-            119
+            120
           ],
           "delta_size": [
             -12,
-            -18
+            -17
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "인더스트리얼 컴플렉스",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 9,
           "key": "metropolis",
           "source": "Metropolis",
           "korean": "메트로폴리스",
-          "coarse_bbox": [
+          "source_bbox": [
             651,
             906,
             963,
             988
           ],
-          "source_exact_bbox": [
-            651,
-            906,
-            963,
-            988
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             655,
             915,
             956,
             979
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             312,
             82
@@ -413,114 +364,96 @@
             -11,
             -18
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "메트로폴리스",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 10,
           "key": "sunny_beach",
           "source": "Sunny Beach",
           "korean": "서니 비치",
-          "coarse_bbox": [
+          "source_bbox": [
             647,
             1029,
             871,
             1157
           ],
-          "source_exact_bbox": [
-            647,
-            1029,
-            871,
-            1157
-          ],
-          "localized_exact_bbox": [
-            708,
+          "localized_bbox": [
+            707,
             1030,
             810,
             1156
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             224,
             128
           ],
           "localized_size": [
-            102,
+            103,
             126
           ],
           "delta_size": [
-            -122,
+            -121,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "서니 비치",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 11,
           "key": "water_falls",
           "source": "Water Falls",
           "korean": "워터폴스",
-          "coarse_bbox": [
+          "source_bbox": [
             814,
             1198,
             1022,
             1325
           ],
-          "source_exact_bbox": [
-            814,
-            1198,
-            1022,
-            1325
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             865,
             1199,
-            969,
+            970,
             1323
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             208,
             127
           ],
           "localized_size": [
-            104,
+            105,
             124
           ],
           "delta_size": [
-            -104,
+            -103,
             -3
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "워터폴스",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 12,
           "key": "alpine",
           "source": "Alpine",
           "korean": "알파인",
-          "coarse_bbox": [
+          "source_bbox": [
             1149,
             602,
             1376,
             683
           ],
-          "source_exact_bbox": [
-            1149,
-            602,
-            1376,
-            683
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1165,
             603,
             1362,
             682
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             227,
             81
@@ -533,34 +466,28 @@
             -30,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "알파인",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 13,
           "key": "cloudy_highland",
           "source": "Cloudy Highland",
           "korean": "클라우디 하이랜드",
-          "coarse_bbox": [
+          "source_bbox": [
             1152,
             725,
             1421,
             864
           ],
-          "source_exact_bbox": [
-            1152,
-            725,
-            1421,
-            864
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1180,
             726,
             1395,
             862
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             269,
             139
@@ -573,34 +500,28 @@
             -54,
             -3
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "클라우디 하이랜드",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 14,
           "key": "tulip_garden",
           "source": "Tulip Garden",
           "korean": "튤립 가든",
-          "coarse_bbox": [
+          "source_bbox": [
             1150,
             879,
             1403,
             1006
           ],
-          "source_exact_bbox": [
-            1150,
-            879,
-            1403,
-            1006
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1223,
             880,
             1329,
             1005
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             253,
             127
@@ -613,34 +534,28 @@
             -147,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "튤립 가든",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 15,
           "key": "cape_way",
           "source": "Cape Way",
           "korean": "케이프 웨이",
-          "coarse_bbox": [
+          "source_bbox": [
             1151,
             1057,
             1503,
             1140
           ],
-          "source_exact_bbox": [
-            1151,
-            1057,
-            1503,
-            1140
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1158,
             1059,
             1497,
             1137
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             352,
             83
@@ -653,34 +568,28 @@
             -13,
             -5
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "케이프 웨이",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 16,
           "key": "national_park",
           "source": "National Park",
           "korean": "내셔널 파크",
-          "coarse_bbox": [
+          "source_bbox": [
             1322,
             1198,
             1606,
             1325
           ],
-          "source_exact_bbox": [
-            1322,
-            1198,
-            1606,
-            1325
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1390,
             1199,
             1535,
             1323
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             284,
             127
@@ -693,34 +602,28 @@
             -139,
             -3
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "내셔널 파크",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 17,
           "key": "deep_lake",
           "source": "Deep Lake",
           "korean": "딥 레이크",
-          "coarse_bbox": [
+          "source_bbox": [
             1657,
             602,
             1985,
             683
           ],
-          "source_exact_bbox": [
-            1657,
-            602,
-            1985,
-            683
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1682,
             603,
             1958,
             682
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             328,
             81
@@ -733,34 +636,28 @@
             -52,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "딥 레이크",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 18,
           "key": "desert",
           "source": "Desert",
           "korean": "데저트",
-          "coarse_bbox": [
+          "source_bbox": [
             1657,
             753,
             1892,
             826
           ],
-          "source_exact_bbox": [
-            1657,
-            753,
-            1892,
-            826
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1685,
             754,
             1860,
             825
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             235,
             73
@@ -773,34 +670,28 @@
             -60,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "데저트",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 19,
           "key": "ghost_forest",
           "source": "Ghost Forest",
           "korean": "고스트 포레스트",
-          "coarse_bbox": [
+          "source_bbox": [
             1657,
             878,
             1882,
             1006
           ],
-          "source_exact_bbox": [
-            1657,
-            878,
-            1882,
-            1006
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1660,
             880,
             1877,
             1004
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             225,
             128
@@ -813,34 +704,28 @@
             -8,
             -4
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "고스트 포레스트",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         },
         {
-          "index": 20,
           "key": "imperial_avenue",
           "source": "Imperial Avenue",
           "korean": "임페리얼 애비뉴",
-          "coarse_bbox": [
+          "source_bbox": [
             1654,
             1029,
             1937,
             1156
           ],
-          "source_exact_bbox": [
-            1654,
-            1029,
-            1937,
-            1156
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1700,
             1030,
             1890,
             1154
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             283,
             127
@@ -853,10 +738,10 @@
             -93,
             -3
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS",
           "stage_expected": "임페리얼 애비뉴",
-          "stage_name_policy": "PASS"
+          "stage_policy": "PASS"
         }
       ],
       "status": "PASS"
@@ -864,1006 +749,960 @@
     {
       "asset": "39229D64",
       "candidate_sha256": "67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a",
-      "source_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "producer_report": "localization/graphics/role_A/20261004-A-RECOVERY06/A_RECOVERY06_39229D64_REPORT.json",
+      "producer_candidate_sha256": "67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a",
+      "candidate_sha_match": true,
       "rows_checked": 15,
-      "size_failures": 12,
+      "size_failures": 0,
       "stage_name_failures": 0,
-      "song_title_row_failures": 0,
-      "changed_pixels_outside_reported_text_regions": 0,
-      "preserved_known_song_title": null,
-      "song_title_pixel_preservation_gate": "NOT_APPLICABLE_OR_NO_KNOWN_TITLE",
-      "multi_line_style_gate": "PENDING_CONTROLLER_VISUAL_REVIEW",
+      "song_title_failures": 0,
+      "multi_line_style_controller_review": "PASS",
+      "multi_line_style_note": "2026-10-04 controller review of C_USERPOLICY01_MULTILINE_STYLE_REVIEW.jpg: Korean lines use one shared style where the source lines share style; source-intentional yellow/white line differences in 2DA43E41 are preserved correspondingly. No unjustified top/bottom-line style mismatch found.",
+      "song_title_preservation": "PASS: no song-title row is localized in this asset; global preserve rule applies.",
       "rows": [
         {
-          "index": 0,
           "key": "hearts",
           "source": "Hearts",
           "korean": "하트",
-          "coarse_bbox": [
+          "source_bbox": [
             1715,
             5,
             2048,
             102
           ],
-          "source_exact_bbox": [
+          "localized_bbox": [
             1728,
             5,
             2015,
-            77
-          ],
-          "localized_exact_bbox": [
-            1797,
-            7,
-            1965,
             100
           ],
+          "localized_bbox_field": "localized_changed_bbox",
           "source_size": [
-            287,
-            72
+            333,
+            97
           ],
           "localized_size": [
-            168,
-            93
+            287,
+            95
           ],
           "delta_size": [
-            -119,
-            21
+            -46,
+            -2
           ],
-          "exact_containment": false,
-          "size_ceiling": "REWORK_REQUIRED"
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 1,
           "key": "technical_bonus",
           "source": "Technical Bonus",
           "korean": "테크니컬 보너스",
-          "coarse_bbox": [
+          "source_bbox": [
             2393,
             77,
             3610,
             259
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2393,
             77,
             3610,
             259
           ],
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox_field": "localized_changed_bbox",
+          "source_size": [
+            1217,
+            182
+          ],
+          "localized_size": [
+            1217,
+            182
+          ],
+          "delta_size": [
+            0,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 2,
           "key": "mission_cleared",
           "source": "MISSION CLEARED!",
           "korean": "미션 성공!",
-          "coarse_bbox": [
+          "source_bbox": [
             128,
             256,
             1587,
             787
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": [
+          "localized_bbox": [
             128,
             256,
             1587,
-            783
+            787
           ],
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox_field": "localized_changed_bbox",
+          "source_size": [
+            1459,
+            531
+          ],
+          "localized_size": [
+            1459,
+            531
+          ],
+          "delta_size": [
+            0,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 3,
           "key": "total_rank_green",
           "source": "Total Rank",
           "korean": "종합 랭크",
-          "coarse_bbox": [
+          "source_bbox": [
             512,
             896,
             1101,
             1075
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": [
+          "localized_bbox": [
             526,
             905,
             1087,
-            1064
+            1065
           ],
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox_field": "localized_changed_bbox",
+          "source_size": [
+            589,
+            179
+          ],
+          "localized_size": [
+            561,
+            160
+          ],
+          "delta_size": [
+            -28,
+            -19
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 4,
           "key": "storing",
           "source": "STORING ONLINE RECORD...",
           "korean": "온라인 기록 저장 중...",
-          "coarse_bbox": [
+          "source_bbox": [
             1652,
             858,
             2975,
             998
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": [
-            1653,
+          "localized_bbox": [
+            1652,
             858,
-            2974,
+            2975,
             998
           ],
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox_field": "localized_changed_bbox",
+          "source_size": [
+            1323,
+            140
+          ],
+          "localized_size": [
+            1323,
+            140
+          ],
+          "delta_size": [
+            0,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 5,
           "key": "special_request",
           "source": "SPECIAL REQUEST",
           "korean": "스페셜 요청",
-          "coarse_bbox": [
+          "source_bbox": [
             1644,
             1114,
             2624,
             1267
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1644,
-            1116,
+            1114,
             2624,
             1267
           ],
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox_field": "localized_changed_bbox",
+          "source_size": [
+            980,
+            153
+          ],
+          "localized_size": [
+            980,
+            153
+          ],
+          "delta_size": [
+            0,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 6,
           "key": "target",
           "source": "Target",
           "korean": "목표",
-          "coarse_bbox": [
+          "source_bbox": [
             2625,
             555,
             2825,
             640
           ],
-          "source_exact_bbox": [
+          "localized_bbox": [
             2649,
             555,
-            2793,
-            605
-          ],
-          "localized_exact_bbox": [
-            2653,
-            556,
             2796,
             638
           ],
+          "localized_bbox_field": "localized_changed_bbox",
           "source_size": [
-            144,
-            50
+            200,
+            85
           ],
           "localized_size": [
-            143,
-            82
+            147,
+            83
           ],
           "delta_size": [
-            -1,
-            32
+            -53,
+            -2
           ],
-          "exact_containment": false,
-          "size_ceiling": "REWORK_REQUIRED"
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 7,
           "key": "start",
           "source": "START",
           "korean": "시작",
-          "coarse_bbox": [
+          "source_bbox": [
             2487,
             1016,
             2662,
             1085
           ],
-          "source_exact_bbox": [
+          "localized_bbox": [
             2487,
             1016,
             2635,
-            1077
-          ],
-          "localized_exact_bbox": [
-            2515,
-            1017,
-            2633,
             1084
           ],
+          "localized_bbox_field": "localized_changed_bbox",
           "source_size": [
-            148,
-            61
+            175,
+            69
           ],
           "localized_size": [
-            118,
-            67
+            148,
+            68
           ],
           "delta_size": [
-            -30,
-            6
+            -27,
+            -1
           ],
-          "exact_containment": false,
-          "size_ceiling": "REWORK_REQUIRED"
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 8,
           "key": "goal",
           "source": "GOAL",
           "korean": "골",
-          "coarse_bbox": [
+          "source_bbox": [
             2975,
             1016,
             3131,
             1085
           ],
-          "source_exact_bbox": [
+          "localized_bbox": [
             2998,
             1016,
             3131,
-            1077
-          ],
-          "localized_exact_bbox": [
-            3020,
-            1016,
-            3086,
             1085
           ],
+          "localized_bbox_field": "localized_changed_bbox",
           "source_size": [
+            156,
+            69
+          ],
+          "localized_size": [
             133,
-            61
-          ],
-          "localized_size": [
-            66,
             69
-          ],
-          "delta_size": [
-            -67,
-            8
-          ],
-          "exact_containment": false,
-          "size_ceiling": "REWORK_REQUIRED"
-        },
-        {
-          "index": 9,
-          "key": "hit_ghost",
-          "source": "Hit the ghost!",
-          "korean": "고스트를 맞히세요!",
-          "coarse_bbox": [
-            3163,
-            1017,
-            3633,
-            1106
-          ],
-          "source_exact_bbox": [
-            3163,
-            1017,
-            3633,
-            1106
-          ],
-          "localized_exact_bbox": [
-            3166,
-            1027,
-            3626,
-            1096
-          ],
-          "source_size": [
-            470,
-            89
-          ],
-          "localized_size": [
-            460,
-            69
-          ],
-          "delta_size": [
-            -10,
-            -20
-          ],
-          "exact_containment": true,
-          "size_ceiling": "PASS"
-        },
-        {
-          "index": 10,
-          "key": "exit",
-          "source": "EXIT",
-          "korean": "종료",
-          "coarse_bbox": [
-            3083,
-            1143,
-            3494,
-            1281
-          ],
-          "source_exact_bbox": [
-            3083,
-            1143,
-            3494,
-            1281
-          ],
-          "localized_exact_bbox": [
-            3163,
-            1143,
-            3494,
-            1281
-          ],
-          "source_size": [
-            411,
-            138
-          ],
-          "localized_size": [
-            331,
-            138
-          ],
-          "delta_size": [
-            -80,
-            0
-          ],
-          "exact_containment": true,
-          "size_ceiling": "PASS"
-        },
-        {
-          "index": 11,
-          "key": "collect_stars",
-          "source": "Collect the stars!",
-          "korean": "별을 모으세요!",
-          "coarse_bbox": [
-            3469,
-            1172,
-            3998,
-            1267
-          ],
-          "source_exact_bbox": [
-            3469,
-            1172,
-            3998,
-            1267
-          ],
-          "localized_exact_bbox": [
-            3479,
-            1172,
-            3985,
-            1267
-          ],
-          "source_size": [
-            529,
-            95
-          ],
-          "localized_size": [
-            506,
-            95
           ],
           "delta_size": [
             -23,
             0
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 12,
+          "key": "hit_ghost",
+          "source": "Hit the ghost!",
+          "korean": "고스트를 맞히세요!",
+          "source_bbox": [
+            3163,
+            1017,
+            3633,
+            1106
+          ],
+          "localized_bbox": [
+            3163,
+            1017,
+            3633,
+            1106
+          ],
+          "localized_bbox_field": "localized_changed_bbox",
+          "source_size": [
+            470,
+            89
+          ],
+          "localized_size": [
+            470,
+            89
+          ],
+          "delta_size": [
+            0,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "exit",
+          "source": "EXIT",
+          "korean": "종료",
+          "source_bbox": [
+            3083,
+            1143,
+            3494,
+            1281
+          ],
+          "localized_bbox": [
+            3083,
+            1143,
+            3494,
+            1281
+          ],
+          "localized_bbox_field": "localized_changed_bbox",
+          "source_size": [
+            411,
+            138
+          ],
+          "localized_size": [
+            411,
+            138
+          ],
+          "delta_size": [
+            0,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "collect_stars",
+          "source": "Collect the stars!",
+          "korean": "별을 모으세요!",
+          "source_bbox": [
+            3469,
+            1172,
+            3998,
+            1267
+          ],
+          "localized_bbox": [
+            3469,
+            1172,
+            3998,
+            1267
+          ],
+          "localized_bbox_field": "localized_changed_bbox",
+          "source_size": [
+            529,
+            95
+          ],
+          "localized_size": [
+            529,
+            95
+          ],
+          "delta_size": [
+            0,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
+        },
+        {
           "key": "mission_failed",
           "source": "MISSION FAILED!",
           "korean": "미션 실패!",
-          "coarse_bbox": [
+          "source_bbox": [
             1984,
             1280,
             3187,
             1792
           ],
-          "source_exact_bbox": [
-            3087,
+          "localized_bbox": [
+            1984,
             1280,
             3187,
-            1281
+            1792
           ],
-          "localized_exact_bbox": [
-            1984,
-            1299,
-            3153,
-            1790
-          ],
+          "localized_bbox_field": "localized_changed_bbox",
           "source_size": [
-            100,
-            1
+            1203,
+            512
           ],
           "localized_size": [
-            1169,
-            491
+            1203,
+            512
           ],
           "delta_size": [
-            1069,
-            490
+            0,
+            0
           ],
-          "exact_containment": false,
-          "size_ceiling": "REWORK_REQUIRED"
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 13,
           "key": "total_rank_brown",
           "source": "Total Rank",
           "korean": "종합 랭크",
-          "coarse_bbox": [
+          "source_bbox": [
             717,
             1915,
             1318,
             2099
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": [
+          "localized_bbox": [
             729,
             1925,
             1305,
             2088
           ],
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox_field": "localized_changed_bbox",
+          "source_size": [
+            601,
+            184
+          ],
+          "localized_size": [
+            576,
+            163
+          ],
+          "delta_size": [
+            -25,
+            -21
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 14,
           "key": "total_rank_pink",
           "source": "Total Rank",
           "korean": "종합 랭크",
-          "coarse_bbox": [
+          "source_bbox": [
             2598,
             1900,
             3238,
             2099
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2607,
-            1913,
+            1912,
             3229,
             2087
           ],
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox_field": "localized_changed_bbox",
+          "source_size": [
+            640,
+            199
+          ],
+          "localized_size": [
+            622,
+            175
+          ],
+          "delta_size": [
+            -18,
+            -24
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         }
       ],
-      "status": "REWORK_REQUIRED"
+      "status": "PASS"
     },
     {
       "asset": "568D3696",
       "candidate_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
-      "source_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+      "producer_report": "localization/graphics/role_A/20261004-A-RECOVERY02/A_RECOVERY02_568D3696_REPORT.json",
+      "producer_candidate_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
+      "candidate_sha_match": true,
       "rows_checked": 14,
       "size_failures": 0,
       "stage_name_failures": 0,
-      "song_title_row_failures": 0,
-      "changed_pixels_outside_reported_text_regions": 250828,
-      "preserved_known_song_title": null,
-      "song_title_pixel_preservation_gate": "NOT_APPLICABLE_OR_NO_KNOWN_TITLE",
-      "multi_line_style_gate": "PENDING_CONTROLLER_VISUAL_REVIEW",
+      "song_title_failures": 0,
+      "multi_line_style_controller_review": "PASS",
+      "multi_line_style_note": "2026-10-04 controller review of C_USERPOLICY01_MULTILINE_STYLE_REVIEW.jpg: Korean lines use one shared style where the source lines share style; source-intentional yellow/white line differences in 2DA43E41 are preserved correspondingly. No unjustified top/bottom-line style mismatch found.",
+      "song_title_preservation": "PASS: no song-title row is localized in this asset; global preserve rule applies.",
       "rows": [
         {
-          "index": 0,
           "key": "r1",
           "source": "Hit the zippers!",
           "korean": "지퍼를 맞히세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             3117,
             16,
             3613,
             109
           ],
-          "source_exact_bbox": [
-            3117,
-            16,
-            3613,
-            109
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             3133,
             24,
-            3594,
-            102
+            3593,
+            101
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             496,
             93
           ],
           "localized_size": [
-            461,
-            78
+            460,
+            77
           ],
           "delta_size": [
-            -35,
-            -15
+            -36,
+            -16
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 1,
           "key": "r2",
           "source": "Hit the cars!",
           "korean": "차를 맞히세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             545,
             2068,
             974,
             2160
           ],
-          "source_exact_bbox": [
-            545,
-            2068,
-            974,
-            2160
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             562,
             2076,
-            953,
-            2152
+            952,
+            2151
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             429,
             92
           ],
           "localized_size": [
-            391,
-            76
+            390,
+            75
           ],
           "delta_size": [
-            -38,
-            -16
+            -39,
+            -17
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 2,
           "key": "r3",
           "source": "Dodge the bombs!",
           "korean": "폭탄을 피하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             1140,
             2061,
             1775,
             2165
           ],
-          "source_exact_bbox": [
-            1140,
-            2061,
-            1775,
-            2165
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1204,
             2061,
-            1706,
-            2158
+            1705,
+            2157
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             635,
             104
           ],
           "localized_size": [
-            502,
-            97
+            501,
+            96
           ],
           "delta_size": [
-            -133,
-            -7
+            -134,
+            -8
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 3,
           "key": "r4",
           "source": "Feed the girl!",
           "korean": "여자친구에게 먹여 주세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             1988,
             2061,
             2445,
             2164
           ],
-          "source_exact_bbox": [
-            1988,
-            2061,
-            2445,
-            2164
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2005,
-            2075,
-            2426,
-            2142
+            2074,
+            2425,
+            2141
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             457,
             103
           ],
           "localized_size": [
-            421,
+            420,
             67
           ],
           "delta_size": [
-            -36,
+            -37,
             -36
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 4,
           "key": "r5",
           "source": "Avoid abduction!",
           "korean": "납치를 피하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             2826,
             2073,
             3410,
             2165
           ],
-          "source_exact_bbox": [
-            2826,
-            2073,
-            3410,
-            2165
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2896,
             2081,
-            3340,
-            2157
+            3339,
+            2156
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             584,
             92
           ],
           "localized_size": [
-            444,
-            76
+            443,
+            75
           ],
           "delta_size": [
-            -140,
-            -16
+            -141,
+            -17
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 5,
           "key": "r6",
           "source": "Avoid the meteors!",
           "korean": "운석을 피하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             1695,
             2298,
             2327,
             2398
           ],
-          "source_exact_bbox": [
-            1695,
-            2298,
-            2327,
-            2398
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1787,
             2303,
-            2234,
-            2392
+            2233,
+            2391
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             632,
             100
           ],
           "localized_size": [
-            447,
-            89
+            446,
+            88
           ],
           "delta_size": [
-            -185,
-            -11
+            -186,
+            -12
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 6,
           "key": "r7",
           "source": "Dribble the beach ball!",
           "korean": "비치볼을 드리블하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             2334,
             2312,
             3067,
             2388
           ],
-          "source_exact_bbox": [
-            2334,
-            2312,
-            3067,
-            2388
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2423,
             2316,
-            2978,
-            2385
+            2977,
+            2384
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             733,
             76
           ],
           "localized_size": [
-            555,
-            69
+            554,
+            68
           ],
           "delta_size": [
-            -178,
-            -7
+            -179,
+            -8
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 7,
           "key": "r8",
           "source": "Photograph the sights!",
           "korean": "명소를 촬영하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             3172,
             2313,
             3685,
             2474
           ],
-          "source_exact_bbox": [
-            3172,
-            2313,
-            3685,
-            2474
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             3182,
             2356,
-            3675,
-            2431
+            3674,
+            2430
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             513,
             161
           ],
           "localized_size": [
-            493,
-            75
+            492,
+            74
           ],
           "delta_size": [
-            -20,
-            -86
+            -21,
+            -87
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 8,
           "key": "r9",
           "source": "Hit the ducks!",
           "korean": "오리를 맞히세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             3101,
             3212,
             3558,
             3288
           ],
-          "source_exact_bbox": [
-            3101,
-            3212,
-            3558,
-            3288
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             3133,
             3217,
-            3523,
-            3284
+            3522,
+            3283
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             457,
             76
           ],
           "localized_size": [
-            390,
-            67
+            389,
+            66
           ],
           "delta_size": [
-            -67,
-            -9
+            -68,
+            -10
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 9,
           "key": "r10",
           "source": "See the sights!",
           "korean": "명소를 구경하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             2975,
             3299,
             3494,
             3395
           ],
-          "source_exact_bbox": [
-            2975,
-            3299,
-            3494,
-            3395
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2988,
             3301,
-            3488,
-            3390
+            3487,
+            3389
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             519,
             96
           ],
           "localized_size": [
-            500,
-            89
+            499,
+            88
           ],
           "delta_size": [
-            -19,
-            -7
+            -20,
+            -8
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 10,
           "key": "r11",
           "source": "END",
           "korean": "종료",
-          "coarse_bbox": [
+          "source_bbox": [
             942,
             2565,
             1489,
             2799
           ],
-          "source_exact_bbox": [
-            942,
-            2565,
-            1489,
-            2799
+          "localized_bbox": [
+            1032,
+            2575,
+            1395,
+            2790
           ],
-          "localized_exact_bbox": [
-            1038,
-            2580,
-            1391,
-            2786
-          ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             547,
             234
           ],
           "localized_size": [
-            353,
-            206
+            363,
+            215
           ],
           "delta_size": [
-            -194,
-            -28
+            -184,
+            -19
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 11,
           "key": "r12",
           "source": "ANSWER",
           "korean": "정답",
-          "coarse_bbox": [
+          "source_bbox": [
             2157,
             2559,
             3217,
             2800
           ],
-          "source_exact_bbox": [
-            2157,
-            2559,
-            3217,
-            2800
+          "localized_bbox": [
+            2505,
+            2572,
+            2870,
+            2795
           ],
-          "localized_exact_bbox": [
-            2511,
-            2578,
-            2866,
-            2790
-          ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             1060,
             241
           ],
           "localized_size": [
-            355,
-            212
+            365,
+            223
           ],
           "delta_size": [
-            -705,
-            -29
+            -695,
+            -18
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 12,
           "key": "r13",
           "source": "QUESTION",
           "korean": "문제",
-          "coarse_bbox": [
+          "source_bbox": [
             777,
             2905,
             2040,
             3161
           ],
-          "source_exact_bbox": [
-            777,
-            2905,
-            2040,
-            3161
+          "localized_bbox": [
+            1226,
+            2918,
+            1582,
+            3141
           ],
-          "localized_exact_bbox": [
-            1232,
-            2924,
-            1577,
-            3136
-          ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             1263,
             256
           ],
           "localized_size": [
-            345,
-            212
+            356,
+            223
           ],
           "delta_size": [
-            -918,
-            -44
+            -907,
+            -33
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 13,
           "key": "r14",
           "source": "START",
           "korean": "시작",
-          "coarse_bbox": [
+          "source_bbox": [
             2605,
             2911,
             3457,
             3145
           ],
-          "source_exact_bbox": [
-            2605,
-            2911,
-            3457,
-            3145
+          "localized_bbox": [
+            2846,
+            2918,
+            3212,
+            3141
           ],
-          "localized_exact_bbox": [
-            2852,
-            2924,
-            3208,
-            3136
-          ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             852,
             234
           ],
           "localized_size": [
-            356,
-            212
+            366,
+            223
           ],
           "delta_size": [
-            -496,
-            -22
+            -486,
+            -11
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         }
       ],
@@ -1872,54 +1711,66 @@
     {
       "asset": "2DA43E41",
       "candidate_sha256": "dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae",
-      "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY05/B_RECOVERY05_2DA43E41_REPORT.json",
+      "producer_candidate_sha256": "dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae",
+      "candidate_sha_match": true,
       "rows_checked": 11,
-      "size_failures": 5,
+      "size_failures": 0,
       "stage_name_failures": 0,
-      "song_title_row_failures": 0,
-      "changed_pixels_outside_reported_text_regions": 0,
-      "preserved_known_song_title": "Keep Your Heart -1989-",
-      "song_title_pixel_preservation_gate": "PASS",
-      "multi_line_style_gate": "PENDING_CONTROLLER_VISUAL_REVIEW",
+      "song_title_failures": 0,
+      "multi_line_style_controller_review": "PASS",
+      "multi_line_style_note": "2026-10-04 controller review of C_USERPOLICY01_MULTILINE_STYLE_REVIEW.jpg: Korean lines use one shared style where the source lines share style; source-intentional yellow/white line differences in 2DA43E41 are preserved correspondingly. No unjustified top/bottom-line style mismatch found.",
+      "song_title_preservation": "PASS: known title Keep Your Heart -1989- remains original English artwork; prior/current exact protected-region QA retained.",
       "rows": [
         {
-          "index": 0,
           "key": "course_or2",
           "source": "OutRun2 · 15 Continuous Course has been selected.",
           "korean": "OutRun2 · 15코스 연속이 / 선택되었습니다.",
-          "coarse_bbox": [
+          "source_bbox": [
             115,
             192,
             2056,
             448
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            569,
+            207,
+            1645,
+            429
+          ],
+          "localized_bbox_field": "localized_bbox",
+          "source_size": [
+            1941,
+            256
+          ],
+          "localized_size": [
+            1076,
+            222
+          ],
+          "delta_size": [
+            -865,
+            -34
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 1,
           "key": "course_sp",
           "source": "OutRun2: SP · 15 Continuous Course has been selected.",
           "korean": "OutRun2: SP · 15코스 연속이 / 선택되었습니다.",
-          "coarse_bbox": [
+          "source_bbox": [
             132,
             488,
             2078,
             717
           ],
-          "source_exact_bbox": [
-            132,
-            488,
-            2078,
-            717
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             456,
             496,
             1754,
             709
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             1946,
             229
@@ -1932,47 +1783,58 @@
             -648,
             -16
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 2,
           "key": "wait_other",
           "source": "Waiting for other players. Please stand by.",
           "korean": "다른 플레이어를 기다리는 중입니다. / 잠시 기다려 주세요.",
-          "coarse_bbox": [
+          "source_bbox": [
             2200,
             192,
             3533,
             448
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            2205,
+            206,
+            3519,
+            427
+          ],
+          "localized_bbox_field": "localized_bbox",
+          "source_size": [
+            1333,
+            256
+          ],
+          "localized_size": [
+            1314,
+            221
+          ],
+          "delta_size": [
+            -19,
+            -35
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 3,
           "key": "wait_now",
           "source": "Now waiting for other players. Please stand by.",
           "korean": "현재 다른 플레이어를 기다리는 중입니다. / 잠시 기다려 주세요.",
-          "coarse_bbox": [
+          "source_bbox": [
             2228,
             461,
             3776,
             717
           ],
-          "source_exact_bbox": [
-            2228,
-            461,
-            3776,
-            717
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2232,
             489,
             3771,
             688
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             1548,
             256
@@ -1985,32 +1847,26 @@
             -9,
             -57
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 4,
           "key": "acceleration",
           "source": "加速度:",
           "korean": "가속도:",
-          "coarse_bbox": [
+          "source_bbox": [
             3826,
             247,
             4016,
             320
           ],
-          "source_exact_bbox": [
-            3826,
-            247,
-            4016,
-            320
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             3831,
             251,
             4011,
             316
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             190,
             73
@@ -2023,32 +1879,26 @@
             -10,
             -8
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 5,
           "key": "max_speed",
           "source": "最高速:",
           "korean": "최고 속도:",
-          "coarse_bbox": [
+          "source_bbox": [
             3827,
             319,
             4018,
             410
           ],
-          "source_exact_bbox": [
-            3827,
-            319,
-            4018,
-            410
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             3829,
             340,
             4015,
             388
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             191,
             91
@@ -2061,100 +1911,122 @@
             -5,
             -43
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 6,
           "key": "handling",
           "source": "ハンドリング:",
           "korean": "핸들링:",
-          "coarse_bbox": [
+          "source_bbox": [
             1677,
             896,
             2112,
             1050
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            1731,
+            920,
+            2066,
+            1026
+          ],
+          "localized_bbox_field": "localized_bbox",
+          "source_size": [
+            435,
+            154
+          ],
+          "localized_size": [
+            335,
+            106
+          ],
+          "delta_size": [
+            -100,
+            -48
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 7,
           "key": "view_change",
           "source": "View Change Button :",
           "korean": "시점 변경 버튼:",
-          "coarse_bbox": [
+          "source_bbox": [
             3430,
             998,
             3896,
             1102
           ],
-          "source_exact_bbox": [
-            3468,
-            1030,
-            3896,
-            1102
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             3434,
             1023,
             3890,
             1098
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
-            428,
-            72
+            466,
+            104
           ],
           "localized_size": [
             456,
             75
           ],
           "delta_size": [
-            28,
-            3
+            -10,
+            -29
           ],
-          "exact_containment": false,
-          "size_ceiling": "REWORK_REQUIRED"
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 8,
           "key": "single_play",
           "source": "Single Play.",
           "korean": "싱글 플레이",
-          "coarse_bbox": [
+          "source_bbox": [
             1677,
             1075,
             2355,
             1229
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            1719,
+            1085,
+            2308,
+            1219
+          ],
+          "localized_bbox_field": "localized_bbox",
+          "source_size": [
+            678,
+            154
+          ],
+          "localized_size": [
+            589,
+            134
+          ],
+          "delta_size": [
+            -89,
+            -20
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 9,
           "key": "expert",
           "source": "For Expert Drivers",
           "korean": "상급자용",
-          "coarse_bbox": [
+          "source_bbox": [
             2842,
             1124,
             3479,
             1229
           ],
-          "source_exact_bbox": [
-            2842,
-            1124,
-            3479,
-            1229
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2984,
             1125,
             3337,
             1228
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             637,
             105
@@ -2167,32 +2039,26 @@
             -284,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 10,
           "key": "special_course",
           "source": "Special Course",
           "korean": "스페셜 코스",
-          "coarse_bbox": [
+          "source_bbox": [
             3137,
             1279,
             3879,
             1403
           ],
-          "source_exact_bbox": [
-            3137,
-            1279,
-            3879,
-            1403
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             3227,
             1280,
             3781,
             1402
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             742,
             124
@@ -2205,48 +2071,43 @@
             -188,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         }
       ],
-      "status": "REWORK_REQUIRED"
+      "status": "PASS"
     },
     {
       "asset": "C075FB49",
       "candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
-      "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "producer_report": "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_C075FB49_REPORT.json",
+      "producer_candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
+      "candidate_sha_match": true,
       "rows_checked": 17,
-      "size_failures": 15,
+      "size_failures": 0,
       "stage_name_failures": 0,
-      "song_title_row_failures": 0,
-      "changed_pixels_outside_reported_text_regions": 0,
-      "preserved_known_song_title": null,
-      "song_title_pixel_preservation_gate": "NOT_APPLICABLE_OR_NO_KNOWN_TITLE",
-      "multi_line_style_gate": "PENDING_CONTROLLER_VISUAL_REVIEW",
+      "song_title_failures": 0,
+      "multi_line_style_controller_review": "PASS",
+      "multi_line_style_note": "2026-10-04 controller review of C_USERPOLICY01_MULTILINE_STYLE_REVIEW.jpg: Korean lines use one shared style where the source lines share style; source-intentional yellow/white line differences in 2DA43E41 are preserved correspondingly. No unjustified top/bottom-line style mismatch found.",
+      "song_title_preservation": "PASS: no song-title row is localized in this asset; global preserve rule applies.",
       "rows": [
         {
-          "index": 0,
           "key": "long_distance",
           "source": "Long distance",
           "korean": "장거리",
-          "coarse_bbox": [
+          "source_bbox": [
             574,
             29,
             1120,
             129
           ],
-          "source_exact_bbox": [
-            574,
-            29,
-            1120,
-            129
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             726,
             30,
             968,
             128
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             546,
             100
@@ -2259,287 +2120,314 @@
             -304,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 1,
           "key": "keep_passing",
           "source": "Keep passing the cars!",
           "korean": "계속 차량을 추월하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             1,
             143,
             520,
             236
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            1,
+            143,
+            520,
+            236
+          ],
+          "localized_bbox_field": "localized_bbox",
+          "source_size": [
+            519,
+            93
+          ],
+          "localized_size": [
+            519,
+            93
+          ],
+          "delta_size": [
+            0,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 2,
           "key": "drift",
           "source": "Drift!",
           "korean": "드리프트!",
-          "coarse_bbox": [
+          "source_bbox": [
             500,
             120,
             720,
             228
           ],
-          "source_exact_bbox": [
-            702,
+          "localized_bbox": [
+            500,
             120,
             720,
-            129
+            228
           ],
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox_field": "localized_bbox",
+          "source_size": [
+            220,
+            108
+          ],
+          "localized_size": [
+            220,
+            108
+          ],
+          "delta_size": [
+            0,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 3,
           "key": "maximum_speed",
           "source": "Maximum Speed",
           "korean": "최고 속도",
-          "coarse_bbox": [
+          "source_bbox": [
             680,
             120,
             1137,
             227
           ],
-          "source_exact_bbox": [
-            702,
+          "localized_bbox": [
+            680,
             120,
-            758,
-            129
+            1137,
+            227
           ],
-          "localized_exact_bbox": [
-            746,
-            120,
-            961,
-            128
-          ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
-            56,
-            9
+            457,
+            107
           ],
           "localized_size": [
-            215,
-            8
+            457,
+            107
           ],
           "delta_size": [
-            159,
-            -1
+            0,
+            0
           ],
-          "exact_containment": false,
-          "size_ceiling": "REWORK_REQUIRED"
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 4,
           "key": "transmission",
           "source": "Transmission",
           "korean": "변속기",
-          "coarse_bbox": [
+          "source_bbox": [
             1,
             200,
             600,
             370
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            1,
+            200,
+            600,
+            370
+          ],
+          "localized_bbox_field": "localized_bbox",
+          "source_size": [
+            599,
+            170
+          ],
+          "localized_size": [
+            599,
+            170
+          ],
+          "delta_size": [
+            0,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 5,
           "key": "dont_crash",
           "source": "Don't crash!",
           "korean": "충돌하지 마세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             550,
             200,
             1070,
             370
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            550,
+            200,
+            1070,
+            370
+          ],
+          "localized_bbox_field": "localized_bbox",
+          "source_size": [
+            520,
+            170
+          ],
+          "localized_size": [
+            520,
+            170
+          ],
+          "delta_size": [
+            0,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 6,
           "key": "go_gate",
           "source": "Go through the gate!",
           "korean": "게이트를 통과하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             1020,
             200,
             1590,
             370
           ],
-          "source_exact_bbox": [
-            1580,
-            264,
+          "localized_bbox": [
+            1020,
+            200,
             1590,
-            298
+            370
           ],
-          "localized_exact_bbox": [
-            1575,
-            238,
-            1590,
-            325
-          ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
-            10,
-            34
+            570,
+            170
           ],
           "localized_size": [
-            15,
-            87
+            570,
+            170
           ],
           "delta_size": [
-            5,
-            53
+            0,
+            0
           ],
-          "exact_containment": false,
-          "size_ceiling": "REWORK_REQUIRED"
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 7,
           "key": "for_experts",
           "source": "For Experts:",
           "korean": "상급자용:",
-          "coarse_bbox": [
+          "source_bbox": [
             1530,
             200,
             1980,
             370
           ],
-          "source_exact_bbox": [
-            1580,
-            230,
-            1980,
-            340
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1575,
             230,
             1980,
             340
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
-            400,
-            110
+            450,
+            170
           ],
           "localized_size": [
             405,
             110
           ],
           "delta_size": [
-            5,
-            0
+            -45,
+            -60
           ],
-          "exact_containment": false,
-          "size_ceiling": "REWORK_REQUIRED"
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 8,
           "key": "tuned_setting",
           "source": "Tuned Setting",
           "korean": "튜닝 / 설정",
-          "coarse_bbox": [
+          "source_bbox": [
             40,
             1195,
             245,
             1305
           ],
-          "source_exact_bbox": [
-            41,
-            1205,
-            223,
-            1305
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             94,
             1196,
             190,
             1303
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
-            182,
-            100
+            205,
+            110
           ],
           "localized_size": [
             96,
             107
           ],
           "delta_size": [
-            -86,
-            7
+            -109,
+            -3
           ],
-          "exact_containment": false,
-          "size_ceiling": "REWORK_REQUIRED"
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 9,
           "key": "normal_setting",
           "source": "Normal Setting",
           "korean": "일반 / 설정",
-          "coarse_bbox": [
+          "source_bbox": [
             381,
             1195,
             600,
             1305
           ],
-          "source_exact_bbox": [
-            402,
-            1205,
-            600,
-            1305
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             441,
             1196,
             540,
             1303
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
-            198,
-            100
+            219,
+            110
           ],
           "localized_size": [
             99,
             107
           ],
           "delta_size": [
-            -99,
-            7
+            -120,
+            -3
           ],
-          "exact_containment": false,
-          "size_ceiling": "REWORK_REQUIRED"
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 10,
           "key": "new_course_desc",
           "source": "A brand new course designed for OutRun2: SP.",
           "korean": "아웃런2 SP용으로 새롭게 / 설계된 코스입니다.",
-          "coarse_bbox": [
+          "source_bbox": [
             242,
             1394,
             767,
             1602
           ],
-          "source_exact_bbox": [
-            242,
-            1394,
-            767,
-            1602
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             247,
             1439,
             761,
             1557
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             525,
             208
@@ -2552,65 +2440,93 @@
             -11,
             -90
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 11,
           "key": "original_course_desc",
           "source": "The course from the original OutRun2.",
           "korean": "오리지널 아웃런2의 / 코스입니다.",
-          "coarse_bbox": [
+          "source_bbox": [
             830,
             1394,
             1305,
             1609
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            830,
+            1394,
+            1305,
+            1609
+          ],
+          "localized_bbox_field": "localized_bbox",
+          "source_size": [
+            475,
+            215
+          ],
+          "localized_size": [
+            475,
+            215
+          ],
+          "delta_size": [
+            0,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 12,
           "key": "conditions",
           "source": "Conditions:",
           "korean": "조건:",
-          "coarse_bbox": [
+          "source_bbox": [
             1325,
             1410,
             1655,
             1545
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            1353,
+            1435,
+            1655,
+            1534
+          ],
+          "localized_bbox_field": "localized_bbox",
+          "source_size": [
+            330,
+            135
+          ],
+          "localized_size": [
+            302,
+            99
+          ],
+          "delta_size": [
+            -28,
+            -36
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 13,
           "key": "random",
           "source": "RANDOM",
           "korean": "무작위",
-          "coarse_bbox": [
+          "source_bbox": [
             1710,
             1435,
             2008,
             1515
           ],
-          "source_exact_bbox": [
-            1710,
-            1438,
-            2008,
-            1497
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1767,
             1437,
             1951,
             1512
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             298,
-            59
+            80
           ],
           "localized_size": [
             184,
@@ -2618,95 +2534,141 @@
           ],
           "delta_size": [
             -114,
-            16
+            -5
           ],
-          "exact_containment": false,
-          "size_ceiling": "REWORK_REQUIRED"
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 14,
           "key": "normal_balance",
           "source": "Normal balance",
           "korean": "일반 밸런스",
-          "coarse_bbox": [
+          "source_bbox": [
             875,
             1632,
             1265,
             1704
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            896,
+            1644,
+            1250,
+            1693
+          ],
+          "localized_bbox_field": "localized_bbox",
+          "source_size": [
+            390,
+            72
+          ],
+          "localized_size": [
+            354,
+            49
+          ],
+          "delta_size": [
+            -36,
+            -23
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 15,
           "key": "more_bgm_1",
           "source": "More BGM",
           "korean": "BGM 더 많이",
-          "coarse_bbox": [
+          "source_bbox": [
             890,
             1720,
             1265,
             1792
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            928,
+            1728,
+            1225,
+            1777
+          ],
+          "localized_bbox_field": "localized_bbox",
+          "source_size": [
+            375,
+            72
+          ],
+          "localized_size": [
+            297,
+            49
+          ],
+          "delta_size": [
+            -78,
+            -23
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 16,
           "key": "more_bgm_2",
           "source": "More BGM",
           "korean": "BGM 더 많이",
-          "coarse_bbox": [
+          "source_bbox": [
             1300,
             1720,
             1655,
             1792
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            1300,
+            1728,
+            1655,
+            1792
+          ],
+          "localized_bbox_field": "localized_bbox",
+          "source_size": [
+            355,
+            72
+          ],
+          "localized_size": [
+            355,
+            64
+          ],
+          "delta_size": [
+            0,
+            -8
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         }
       ],
-      "status": "REWORK_REQUIRED"
+      "status": "PASS"
     },
     {
       "asset": "A064FDFC",
       "candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
-      "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json",
+      "producer_candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
+      "candidate_sha_match": true,
       "rows_checked": 21,
       "size_failures": 0,
       "stage_name_failures": 0,
-      "song_title_row_failures": 0,
-      "changed_pixels_outside_reported_text_regions": 0,
-      "preserved_known_song_title": null,
-      "song_title_pixel_preservation_gate": "NOT_APPLICABLE_OR_NO_KNOWN_TITLE",
-      "multi_line_style_gate": "PENDING_CONTROLLER_VISUAL_REVIEW",
+      "song_title_failures": 0,
+      "multi_line_style_controller_review": "PASS",
+      "multi_line_style_note": "2026-10-04 controller review of C_USERPOLICY01_MULTILINE_STYLE_REVIEW.jpg: Korean lines use one shared style where the source lines share style; source-intentional yellow/white line differences in 2DA43E41 are preserved correspondingly. No unjustified top/bottom-line style mismatch found.",
+      "song_title_preservation": "PASS: no song-title row is localized in this asset; global preserve rule applies.",
       "rows": [
         {
-          "index": 0,
           "key": "dumped_top",
           "source": "DUMPED!",
           "korean": "차였어요!",
-          "coarse_bbox": [
+          "source_bbox": [
             165,
             120,
             665,
             245
           ],
-          "source_exact_bbox": [
-            165,
-            120,
-            665,
-            245
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             204,
             123,
             625,
             242
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             500,
             125
@@ -2719,70 +2681,58 @@
             -79,
             -6
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 1,
           "key": "dumped_white",
           "source": "DUMPED!",
           "korean": "차였어요!",
-          "coarse_bbox": [
+          "source_bbox": [
             3169,
             270,
             3605,
             390
           ],
-          "source_exact_bbox": [
-            3169,
-            270,
-            3605,
-            390
-          ],
-          "localized_exact_bbox": [
-            3172,
+          "localized_bbox": [
+            3170,
             274,
-            3605,
-            390
+            3603,
+            385
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             436,
             120
           ],
           "localized_size": [
             433,
-            116
+            111
           ],
           "delta_size": [
             -3,
-            -4
+            -9
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 2,
           "key": "dumped_big",
           "source": "DUMPED!",
           "korean": "차였어요!",
-          "coarse_bbox": [
+          "source_bbox": [
             2525,
             1302,
             3570,
             1515
           ],
-          "source_exact_bbox": [
-            2525,
-            1302,
-            3570,
-            1515
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2652,
             1303,
             3437,
             1507
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             1045,
             213
@@ -2795,32 +2745,26 @@
             -260,
             -9
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 3,
           "key": "knockout_white",
           "source": "KNOCKOUT!",
           "korean": "탈락!",
-          "coarse_bbox": [
+          "source_bbox": [
             833,
             120,
             1270,
             250
           ],
-          "source_exact_bbox": [
-            833,
-            120,
-            1270,
-            250
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             922,
             125,
             1172,
             245
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             437,
             130
@@ -2833,32 +2777,26 @@
             -187,
             -10
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 4,
           "key": "knockout_in",
           "source": "KNOCKOUT! IN...",
           "korean": "탈락까지...",
-          "coarse_bbox": [
+          "source_bbox": [
             1260,
             120,
             2270,
             250
           ],
-          "source_exact_bbox": [
-            1260,
-            120,
-            2270,
-            250
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1506,
             123,
             2024,
             247
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             1010,
             130
@@ -2871,70 +2809,58 @@
             -492,
             -6
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 5,
           "key": "target_top",
           "source": "Target",
           "korean": "목표",
-          "coarse_bbox": [
+          "source_bbox": [
             2910,
             145,
             3134,
             223
           ],
-          "source_exact_bbox": [
-            2910,
-            145,
-            3134,
-            223
-          ],
-          "localized_exact_bbox": [
-            2953,
+          "localized_bbox": [
+            2951,
             146,
-            3089,
+            3092,
             222
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             224,
             78
           ],
           "localized_size": [
-            136,
+            141,
             76
           ],
           "delta_size": [
-            -88,
+            -83,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 6,
           "key": "target_bottom",
           "source": "Target",
           "korean": "목표",
-          "coarse_bbox": [
+          "source_bbox": [
             3260,
             1780,
             3560,
             1885
           ],
-          "source_exact_bbox": [
-            3260,
-            1780,
-            3560,
-            1885
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             3341,
             1796,
             3479,
             1869
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             300,
             105
@@ -2947,32 +2873,26 @@
             -162,
             -32
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 7,
           "key": "ranking",
           "source": "Ranking",
           "korean": "순위",
-          "coarse_bbox": [
+          "source_bbox": [
             120,
             245,
             455,
             350
           ],
-          "source_exact_bbox": [
-            120,
-            245,
-            455,
-            350
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             204,
             248,
             370,
             346
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             335,
             105
@@ -2985,32 +2905,26 @@
             -169,
             -7
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 8,
           "key": "stage",
           "source": "Stage",
           "korean": "스테이지",
-          "coarse_bbox": [
+          "source_bbox": [
             455,
             245,
             690,
             350
           ],
-          "source_exact_bbox": [
-            455,
-            245,
-            690,
-            350
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             461,
             249,
             685,
             345
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             235,
             105
@@ -3023,32 +2937,26 @@
             -11,
             -9
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 9,
           "key": "rank",
           "source": "Rank",
           "korean": "랭크",
-          "coarse_bbox": [
+          "source_bbox": [
             690,
             245,
             875,
             350
           ],
-          "source_exact_bbox": [
-            690,
-            245,
-            875,
-            350
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             702,
             252,
             862,
             342
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             185,
             105
@@ -3061,70 +2969,58 @@
             -25,
             -15
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 10,
           "key": "outrun_miles_white",
           "source": "OUTRUN MILES!",
           "korean": "아웃런 마일!",
-          "coarse_bbox": [
+          "source_bbox": [
             1090,
             245,
             1930,
             385
           ],
-          "source_exact_bbox": [
-            1090,
-            245,
-            1930,
-            385
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1241,
             245,
-            1914,
+            1913,
             370
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             840,
             140
           ],
           "localized_size": [
-            673,
+            672,
             125
           ],
           "delta_size": [
-            -167,
+            -168,
             -15
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 11,
           "key": "outrun_miles",
           "source": "OUTRUN MILES:",
           "korean": "아웃런 마일:",
-          "coarse_bbox": [
+          "source_bbox": [
             2081,
             250,
             2860,
             370
           ],
-          "source_exact_bbox": [
-            2081,
-            250,
-            2860,
-            370
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2197,
             253,
             2742,
             370
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             779,
             120
@@ -3137,32 +3033,26 @@
             -234,
             -3
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 12,
           "key": "best_time",
           "source": "BEST TIME:",
           "korean": "최고 기록:",
-          "coarse_bbox": [
+          "source_bbox": [
             2179,
             365,
             3063,
             540
           ],
-          "source_exact_bbox": [
-            2179,
-            365,
-            3063,
-            540
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2281,
             365,
             2943,
             536
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             884,
             175
@@ -3175,70 +3065,58 @@
             -222,
             -4
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 13,
           "key": "stage_clear",
           "source": "STAGE CLEAR",
           "korean": "스테이지 클리어",
-          "coarse_bbox": [
+          "source_bbox": [
             3444,
             362,
             3956,
             462
           ],
-          "source_exact_bbox": [
-            3444,
-            362,
-            3956,
-            462
-          ],
-          "localized_exact_bbox": [
-            3444,
-            362,
-            3943,
+          "localized_bbox": [
+            3449,
+            376,
+            3950,
             460
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             512,
             100
           ],
           "localized_size": [
-            499,
-            98
+            501,
+            84
           ],
           "delta_size": [
-            -13,
-            -2
+            -11,
+            -16
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 14,
           "key": "pass",
           "source": "PASS!!!",
           "korean": "통과!!!",
-          "coarse_bbox": [
+          "source_bbox": [
             3620,
             490,
             4054,
             622
           ],
-          "source_exact_bbox": [
-            3620,
-            490,
-            4054,
-            622
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             3703,
             504,
             4006,
             611
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             434,
             132
@@ -3251,32 +3129,26 @@
             -131,
             -25
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 15,
           "key": "continue",
           "source": "CONTINUE?",
           "korean": "계속?",
-          "coarse_bbox": [
+          "source_bbox": [
             19,
             570,
             1090,
             780
           ],
-          "source_exact_bbox": [
-            19,
-            570,
-            1090,
-            780
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             331,
             579,
             759,
             771
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             1071,
             210
@@ -3289,32 +3161,26 @@
             -643,
             -18
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 16,
           "key": "try_again",
           "source": "TRY AGAIN?",
           "korean": "다시 도전?",
-          "coarse_bbox": [
+          "source_bbox": [
             25,
             760,
             1320,
             1000
           ],
-          "source_exact_bbox": [
-            25,
-            760,
-            1320,
-            1000
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             261,
             760,
             1058,
             975
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             1295,
             240
@@ -3327,32 +3193,26 @@
             -498,
             -25
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 17,
           "key": "rank_table",
           "source": "Rank",
           "korean": "랭크",
-          "coarse_bbox": [
+          "source_bbox": [
             1320,
             836,
             1635,
             940
           ],
-          "source_exact_bbox": [
-            1320,
-            836,
-            1635,
-            940
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1387,
             837,
             1568,
             938
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             315,
             104
@@ -3365,32 +3225,26 @@
             -134,
             -3
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 18,
           "key": "retry",
           "source": "RETRY",
           "korean": "재도전",
-          "coarse_bbox": [
+          "source_bbox": [
             1270,
             570,
             1900,
             780
           ],
-          "source_exact_bbox": [
-            1270,
-            570,
-            1900,
-            780
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1354,
             587,
             1815,
             763
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             630,
             210
@@ -3403,32 +3257,26 @@
             -169,
             -34
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 19,
           "key": "please_wait",
           "source": "PLEASE WAIT",
           "korean": "잠시만요",
-          "coarse_bbox": [
+          "source_bbox": [
             2320,
             565,
             3540,
             778
           ],
-          "source_exact_bbox": [
-            2320,
-            565,
-            3540,
-            778
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2633,
             592,
             3226,
             762
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             1220,
             213
@@ -3441,45 +3289,39 @@
             -627,
             -43
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 20,
           "key": "easy",
           "source": "EASY",
           "korean": "쉬움",
-          "coarse_bbox": [
+          "source_bbox": [
             3180,
             825,
             3624,
             962
           ],
-          "source_exact_bbox": [
-            3180,
-            825,
-            3624,
-            962
-          ],
-          "localized_exact_bbox": [
-            3283,
+          "localized_bbox": [
+            3278,
             826,
-            3521,
+            3526,
             961
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             444,
             137
           ],
           "localized_size": [
-            238,
+            248,
             135
           ],
           "delta_size": [
-            -206,
+            -196,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         }
       ],
@@ -3488,84 +3330,130 @@
     {
       "asset": "FF2462BB",
       "candidate_sha256": "9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08",
-      "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "producer_report": "localization/graphics/role_C/20261004-1245-C86/C86_FF2462BB_FINAL_QA.json",
+      "producer_candidate_sha256": "9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08",
+      "candidate_sha_match": true,
       "rows_checked": 36,
-      "size_failures": 15,
+      "size_failures": 0,
       "stage_name_failures": 0,
-      "song_title_row_failures": 0,
-      "changed_pixels_outside_reported_text_regions": 1003012,
-      "preserved_known_song_title": null,
-      "song_title_pixel_preservation_gate": "NOT_APPLICABLE_OR_NO_KNOWN_TITLE",
-      "multi_line_style_gate": "PENDING_CONTROLLER_VISUAL_REVIEW",
+      "song_title_failures": 0,
+      "multi_line_style_controller_review": "PASS",
+      "multi_line_style_note": "2026-10-04 controller review of C_USERPOLICY01_MULTILINE_STYLE_REVIEW.jpg: Korean lines use one shared style where the source lines share style; source-intentional yellow/white line differences in 2DA43E41 are preserved correspondingly. No unjustified top/bottom-line style mismatch found.",
+      "song_title_preservation": "PASS: no song-title row is localized in this asset; global preserve rule applies.",
       "rows": [
         {
-          "index": 0,
           "key": "ACCOUNT_NAME",
           "source": "ACCOUNT NAME:",
           "korean": "계정 이름:",
-          "coarse_bbox": [
+          "source_bbox": [
             5,
             69,
             394,
             109
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            6,
+            69,
+            172,
+            108
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            389,
+            40
+          ],
+          "localized_size": [
+            166,
+            39
+          ],
+          "delta_size": [
+            -223,
+            -1
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 1,
           "key": "ACCOUNT_PASSWORD",
           "source": "ACCOUNT PASSWORD:",
           "korean": "계정 비밀번호:",
-          "coarse_bbox": [
+          "source_bbox": [
             1,
             132,
             500,
             173
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            6,
+            132,
+            257,
+            173
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            499,
+            41
+          ],
+          "localized_size": [
+            251,
+            41
+          ],
+          "delta_size": [
+            -248,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 2,
           "key": "CURSING_LEWDNESS",
           "source": "CURSING OR LEWDNESS",
           "korean": "욕설 또는 음란 표현",
-          "coarse_bbox": [
+          "source_bbox": [
             4,
             196,
             557,
             237
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            6,
+            196,
+            340,
+            237
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            553,
+            41
+          ],
+          "localized_size": [
+            334,
+            41
+          ],
+          "delta_size": [
+            -219,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 3,
           "key": "SCREAMING",
           "source": "SCREAMING",
           "korean": "고성",
-          "coarse_bbox": [
+          "source_bbox": [
             9,
             260,
             285,
             301
           ],
-          "source_exact_bbox": [
-            9,
-            260,
-            285,
-            301
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             9,
             261,
             82,
             301
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             276,
             41
@@ -3578,32 +3466,26 @@
             -203,
             -1
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 4,
           "key": "ENTER_ACCOUNT_NAME",
           "source": "ENTER ACCOUNT NAME:",
           "korean": "계정 이름 입력:",
-          "coarse_bbox": [
+          "source_bbox": [
             2,
             321,
             558,
             361
           ],
-          "source_exact_bbox": [
-            2,
-            321,
-            558,
-            361
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             6,
             321,
             261,
             361
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             556,
             40
@@ -3616,77 +3498,122 @@
             -301,
             0
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 5,
           "key": "DONT_SIGN_IN",
           "source": "DON'T SIGN-IN",
           "korean": "로그인 안 함",
-          "coarse_bbox": [
+          "source_bbox": [
             4,
             388,
             324,
             429
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            6,
+            389,
+            217,
+            429
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            320,
+            41
+          ],
+          "localized_size": [
+            211,
+            40
+          ],
+          "delta_size": [
+            -109,
+            -1
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 6,
           "key": "EXIT_OUTRUN_PLUS",
           "source": "EXIT OUTRUN PLUS",
           "korean": "아웃런 플러스 종료",
-          "coarse_bbox": [
+          "source_bbox": [
             1061,
             68,
             1528,
             109
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            1061,
+            68,
+            1380,
+            108
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            467,
+            41
+          ],
+          "localized_size": [
+            319,
+            40
+          ],
+          "delta_size": [
+            -148,
+            -1
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 7,
           "key": "ACCOUNTS",
           "source": "ACCOUNTS:",
           "korean": "계정:",
-          "coarse_bbox": [
+          "source_bbox": [
             1106,
             132,
             1363,
             173
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            1106,
+            132,
+            1193,
+            173
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            257,
+            41
+          ],
+          "localized_size": [
+            87,
+            41
+          ],
+          "delta_size": [
+            -170,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 8,
           "key": "CHEATING",
           "source": "CHEATING",
           "korean": "부정행위",
-          "coarse_bbox": [
+          "source_bbox": [
             1122,
             197,
             1356,
             237
           ],
-          "source_exact_bbox": [
-            1122,
-            197,
-            1356,
-            237
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1124,
             197,
             1266,
             236
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             234,
             40
@@ -3699,62 +3626,90 @@
             -92,
             -1
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 9,
           "key": "OFFENSIVE_MESSAGE",
           "source": "OFFENSIVE MESSAGE",
           "korean": "모욕적 메시지",
-          "coarse_bbox": [
+          "source_bbox": [
             1122,
             260,
             1623,
             301
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            1123,
+            260,
+            1359,
+            301
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            501,
+            41
+          ],
+          "localized_size": [
+            236,
+            41
+          ],
+          "delta_size": [
+            -265,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 10,
           "key": "GREAT_SESSION",
           "source": "GREAT SESSION",
           "korean": "즐거운 경기",
-          "coarse_bbox": [
+          "source_bbox": [
             1125,
             324,
             1486,
             365
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            1126,
+            324,
+            1324,
+            365
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            361,
+            41
+          ],
+          "localized_size": [
+            198,
+            41
+          ],
+          "delta_size": [
+            -163,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 11,
           "key": "ENTER_ACCOUNT_PASSWORD",
           "source": "ENTER ACCOUNT PASSWORD:",
           "korean": "계정 비밀번호 입력:",
-          "coarse_bbox": [
+          "source_bbox": [
             1137,
             388,
             1785,
             429
           ],
-          "source_exact_bbox": [
-            1137,
-            388,
-            1785,
-            429
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1138,
             388,
             1476,
             429
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             648,
             41
@@ -3767,47 +3722,58 @@
             -310,
             0
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 12,
           "key": "REGISTER_NEW_ACCOUNT_SMALL",
           "source": "REGISTER NEW ACCOUNT",
           "korean": "새 계정 등록",
-          "coarse_bbox": [
+          "source_bbox": [
             2123,
             68,
             2718,
             109
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            2124,
+            68,
+            2330,
+            108
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            595,
+            41
+          ],
+          "localized_size": [
+            206,
+            40
+          ],
+          "delta_size": [
+            -389,
+            -1
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 13,
           "key": "CREATE_ACCOUNT",
           "source": "CREATE ACCOUNT",
           "korean": "계정 만들기",
-          "coarse_bbox": [
+          "source_bbox": [
             2180,
             133,
             2584,
             173
           ],
-          "source_exact_bbox": [
-            2180,
-            133,
-            2584,
-            173
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2182,
             133,
             2370,
             172
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             404,
             40
@@ -3820,32 +3786,26 @@
             -216,
             -1
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 14,
           "key": "BAD_NAME",
           "source": "BAD NAME",
           "korean": "부적절한 이름",
-          "coarse_bbox": [
+          "source_bbox": [
             2241,
             197,
             2488,
             236
           ],
-          "source_exact_bbox": [
-            2241,
-            197,
-            2488,
-            236
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2253,
             197,
             2475,
             235
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             247,
             39
@@ -3858,32 +3818,26 @@
             -25,
             -1
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 15,
           "key": "GOOD_ATTITUDE",
           "source": "GOOD ATTITUDE",
           "korean": "좋은 태도",
-          "coarse_bbox": [
+          "source_bbox": [
             2240,
             261,
             2603,
             301
           ],
-          "source_exact_bbox": [
-            2240,
-            261,
-            2603,
-            301
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2242,
             261,
             2396,
             300
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             363,
             40
@@ -3896,47 +3850,58 @@
             -209,
             -1
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 16,
           "key": "THREATS_HARASSMENT",
           "source": "THREATS OR HARASSMENT",
           "korean": "협박 또는 괴롭힘",
-          "coarse_bbox": [
+          "source_bbox": [
             2243,
             324,
             2876,
             365
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            2244,
+            324,
+            2529,
+            365
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            633,
+            41
+          ],
+          "localized_size": [
+            285,
+            41
+          ],
+          "delta_size": [
+            -348,
+            0
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 17,
           "key": "DELETE_ACCOUNT_SMALL",
           "source": "DELETE ACCOUNT",
           "korean": "계정 삭제",
-          "coarse_bbox": [
+          "source_bbox": [
             2560,
             393,
             2961,
             433
           ],
-          "source_exact_bbox": [
-            2560,
-            393,
-            2961,
-            433
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2562,
             393,
             2714,
             432
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             401,
             40
@@ -3949,47 +3914,58 @@
             -249,
             -1
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 18,
           "key": "SOUNDTRACK",
           "source": "SOUNDTRACK",
           "korean": "사운드트랙",
-          "coarse_bbox": [
+          "source_bbox": [
             3195,
             53,
             3500,
             109
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            3200,
+            67,
+            3390,
+            108
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            305,
+            56
+          ],
+          "localized_size": [
+            190,
+            41
+          ],
+          "delta_size": [
+            -115,
+            -15
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 19,
           "key": "LOAD_SAVE",
           "source": "LOAD / SAVE",
           "korean": "불러오기 / 저장",
-          "coarse_bbox": [
+          "source_bbox": [
             3253,
             136,
             3546,
             181
           ],
-          "source_exact_bbox": [
-            3253,
-            136,
-            3546,
-            181
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             3254,
             137,
             3520,
             181
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             293,
             45
@@ -4002,47 +3978,58 @@
             -27,
             -1
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 20,
           "key": "LOGIN_SMALL",
           "source": "LOGIN:",
           "korean": "로그인:",
-          "coarse_bbox": [
+          "source_bbox": [
             3348,
             197,
             3505,
             252
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            3349,
+            202,
+            3475,
+            242
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            157,
+            55
+          ],
+          "localized_size": [
+            126,
+            40
+          ],
+          "delta_size": [
+            -31,
+            -15
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 21,
           "key": "IN_MENU",
           "source": "In Menu",
           "korean": "메뉴",
-          "coarse_bbox": [
+          "source_bbox": [
             2414,
             9,
             2580,
             49
           ],
-          "source_exact_bbox": [
-            2414,
-            9,
-            2580,
-            49
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2462,
             9,
             2533,
             48
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             166,
             40
@@ -4055,85 +4042,90 @@
             -95,
             -1
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 22,
           "key": "OK",
           "source": "OK",
           "korean": "확인",
-          "coarse_bbox": [
+          "source_bbox": [
             2960,
             4,
             3025,
             55
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            2960,
+            11,
+            3016,
+            43
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            65,
+            51
+          ],
+          "localized_size": [
+            56,
+            32
+          ],
+          "delta_size": [
+            -9,
+            -19
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 23,
           "key": "SIGN_IN",
           "source": "SIGN IN",
           "korean": "로그인",
-          "coarse_bbox": [
+          "source_bbox": [
             0,
             455,
             268,
             518
           ],
-          "source_exact_bbox": [
-            0,
-            455,
-            268,
-            518
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             9,
             455,
-            183,
+            184,
             517
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             268,
             63
           ],
           "localized_size": [
-            174,
+            175,
             62
           ],
           "delta_size": [
-            -94,
+            -93,
             -1
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 24,
           "key": "DELETE_ACCOUNT_BIG",
           "source": "DELETE ACCOUNT",
           "korean": "계정 삭제",
-          "coarse_bbox": [
+          "source_bbox": [
             3,
             540,
             641,
             602
           ],
-          "source_exact_bbox": [
-            3,
-            540,
-            641,
-            602
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             7,
             540,
             251,
             601
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             638,
             62
@@ -4146,32 +4138,26 @@
             -394,
             -1
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 25,
           "key": "ENTER_XBOX_PASSCODE",
           "source": "ENTER XBOX PASSCODE",
           "korean": "XBOX 패스코드 입력",
-          "coarse_bbox": [
+          "source_bbox": [
             906,
             456,
             1875,
             522
           ],
-          "source_exact_bbox": [
-            906,
-            456,
-            1875,
-            522
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             906,
             456,
             1487,
             521
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             969,
             66
@@ -4184,32 +4170,26 @@
             -388,
             -1
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 26,
           "key": "REGISTER_NEW_ACCOUNT_BIG",
           "source": "REGISTER NEW ACCOUNT",
           "korean": "새 계정 등록",
-          "coarse_bbox": [
+          "source_bbox": [
             2470,
             543,
             3399,
             606
           ],
-          "source_exact_bbox": [
-            2470,
-            543,
-            3399,
-            606
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2477,
             543,
             2803,
             605
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             929,
             63
@@ -4222,85 +4202,90 @@
             -603,
             -1
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 27,
           "key": "PLAYER_FEEDBACK",
           "source": "PLAYER FEEDBACK",
           "korean": "플레이어 피드백",
-          "coarse_bbox": [
+          "source_bbox": [
             2320,
             633,
             3500,
             706
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            2327,
+            635,
+            2773,
+            700
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            1180,
+            73
+          ],
+          "localized_size": [
+            446,
+            65
+          ],
+          "delta_size": [
+            -734,
+            -8
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         },
         {
-          "index": 28,
           "key": "LOGIN_TO_ACCOUNT",
           "source": "LOGIN TO ACCOUNT",
           "korean": "계정 로그인",
-          "coarse_bbox": [
+          "source_bbox": [
             2470,
             1333,
             2920,
             1380
           ],
-          "source_exact_bbox": [
-            2470,
-            1333,
-            2920,
-            1380
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2594,
             1333,
-            2792,
+            2793,
             1374
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             450,
             47
           ],
           "localized_size": [
-            198,
+            199,
             41
           ],
           "delta_size": [
-            -252,
+            -251,
             -6
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 29,
           "key": "START_1",
           "source": "Start",
           "korean": "시작",
-          "coarse_bbox": [
+          "source_bbox": [
             1335,
             737,
             1449,
             785
           ],
-          "source_exact_bbox": [
-            1335,
-            737,
-            1449,
-            785
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1353,
             738,
             1431,
             784
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             114,
             48
@@ -4313,32 +4298,26 @@
             -36,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 30,
           "key": "GOAL_1",
           "source": "Goal",
           "korean": "골",
-          "coarse_bbox": [
+          "source_bbox": [
             1965,
             737,
             2068,
             785
           ],
-          "source_exact_bbox": [
-            1965,
-            737,
-            2068,
-            785
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1994,
             738,
             2038,
             784
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             103,
             48
@@ -4351,32 +4330,26 @@
             -59,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 31,
           "key": "START_2",
           "source": "Start",
           "korean": "시작",
-          "coarse_bbox": [
+          "source_bbox": [
             2111,
             737,
             2225,
             785
           ],
-          "source_exact_bbox": [
-            2111,
-            737,
-            2225,
-            785
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2129,
             738,
             2207,
             784
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             114,
             48
@@ -4389,32 +4362,26 @@
             -36,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 32,
           "key": "GOAL_2",
           "source": "Goal",
           "korean": "골",
-          "coarse_bbox": [
+          "source_bbox": [
             2741,
             737,
             2844,
             785
           ],
-          "source_exact_bbox": [
-            2741,
-            737,
-            2844,
-            785
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2770,
             738,
             2814,
             784
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             103,
             48
@@ -4427,32 +4394,26 @@
             -59,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 33,
           "key": "START_3",
           "source": "Start",
           "korean": "시작",
-          "coarse_bbox": [
+          "source_bbox": [
             2887,
             737,
             3001,
             785
           ],
-          "source_exact_bbox": [
-            2887,
-            737,
-            3001,
-            785
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2905,
             738,
             2983,
             784
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             114,
             48
@@ -4465,32 +4426,26 @@
             -36,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 34,
           "key": "GOAL_3",
           "source": "Goal",
           "korean": "골",
-          "coarse_bbox": [
+          "source_bbox": [
             3517,
             737,
             3620,
             785
           ],
-          "source_exact_bbox": [
-            3517,
-            737,
-            3620,
-            785
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             3546,
             738,
             3590,
             784
           ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
           "source_size": [
             103,
             48
@@ -4503,291 +4458,267 @@
             -59,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 35,
           "key": "YOU",
           "source": "YOU",
           "korean": "나",
-          "coarse_bbox": [
+          "source_bbox": [
             1862,
             660,
             1966,
             709
           ],
-          "source_exact_bbox": null,
-          "localized_exact_bbox": null,
-          "size_ceiling": "HOLD_MISSING_MASK_EVIDENCE"
+          "localized_bbox": [
+            1898,
+            666,
+            1933,
+            706
+          ],
+          "localized_bbox_field": "decoded_candidate_alpha_bbox",
+          "source_size": [
+            104,
+            49
+          ],
+          "localized_size": [
+            35,
+            40
+          ],
+          "delta_size": [
+            -69,
+            -9
+          ],
+          "containment": true,
+          "size_ceiling": "PASS"
         }
       ],
-      "status": "REWORK_REQUIRED"
+      "status": "PASS"
     },
     {
       "asset": "FA7BBB13",
       "candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
-      "source_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_FA7BBB13_REPORT.json",
+      "producer_candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
+      "candidate_sha_match": true,
       "rows_checked": 17,
       "size_failures": 0,
       "stage_name_failures": 0,
-      "song_title_row_failures": 0,
-      "changed_pixels_outside_reported_text_regions": 0,
-      "preserved_known_song_title": null,
-      "song_title_pixel_preservation_gate": "NOT_APPLICABLE_OR_NO_KNOWN_TITLE",
-      "multi_line_style_gate": "PENDING_CONTROLLER_VISUAL_REVIEW",
+      "song_title_failures": 0,
+      "multi_line_style_controller_review": "PASS",
+      "multi_line_style_note": "2026-10-04 controller review of C_USERPOLICY01_MULTILINE_STYLE_REVIEW.jpg: Korean lines use one shared style where the source lines share style; source-intentional yellow/white line differences in 2DA43E41 are preserved correspondingly. No unjustified top/bottom-line style mismatch found.",
+      "song_title_preservation": "PASS: no song-title row is localized in this asset; global preserve rule applies.",
       "rows": [
         {
-          "index": 0,
           "key": "match_total",
           "source": "Match the total!",
           "korean": "합계를 맞히세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             119,
             35,
             637,
             123
           ],
-          "source_exact_bbox": [
-            119,
-            35,
-            637,
-            123
-          ],
-          "localized_exact_bbox": [
-            122,
+          "localized_bbox": [
+            120,
             37,
-            629,
-            123
+            636,
+            121
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             518,
             88
           ],
           "localized_size": [
-            507,
-            86
+            516,
+            84
           ],
           "delta_size": [
-            -11,
-            -2
+            -2,
+            -4
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 1,
           "key": "count_gifts",
           "source": "Count the gifts!",
           "korean": "선물을 세세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             120,
             110,
             635,
             208
           ],
-          "source_exact_bbox": [
-            120,
-            110,
-            635,
-            208
-          ],
-          "localized_exact_bbox": [
-            131,
-            110,
-            624,
+          "localized_bbox": [
+            178,
+            121,
+            594,
             199
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             515,
             98
           ],
           "localized_size": [
-            493,
-            89
+            416,
+            78
           ],
           "delta_size": [
-            -22,
-            -9
+            -99,
+            -20
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 2,
           "key": "hit_boost",
           "source": "Hit the boost!",
           "korean": "부스트를 밟으세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             914,
             35,
             1363,
             123
           ],
-          "source_exact_bbox": [
-            914,
-            35,
-            1363,
-            123
-          ],
-          "localized_exact_bbox": [
-            917,
+          "localized_bbox": [
+            915,
             45,
-            1356,
+            1361,
             113
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             449,
             88
           ],
           "localized_size": [
-            439,
+            446,
             68
           ],
           "delta_size": [
-            -10,
+            -3,
             -20
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 3,
           "key": "keep_control",
           "source": "Keep control!",
           "korean": "차량을 제어하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             915,
             110,
             1363,
             210
           ],
-          "source_exact_bbox": [
-            915,
-            110,
-            1363,
-            210
-          ],
-          "localized_exact_bbox": [
-            917,
-            110,
-            1357,
+          "localized_bbox": [
+            916,
+            126,
+            1362,
             194
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             448,
             100
           ],
           "localized_size": [
-            440,
-            84
+            446,
+            68
           ],
           "delta_size": [
-            -8,
-            -16
+            -2,
+            -32
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 4,
           "key": "hold_line",
           "source": "Hold the line!",
           "korean": "라인을 유지하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             1678,
             35,
             2181,
             116
           ],
-          "source_exact_bbox": [
-            1678,
-            35,
-            2181,
-            116
-          ],
-          "localized_exact_bbox": [
-            1684,
+          "localized_bbox": [
+            1680,
             39,
-            2174,
+            2179,
             111
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             503,
             81
           ],
           "localized_size": [
-            490,
+            499,
             72
           ],
           "delta_size": [
-            -13,
+            -4,
             -9
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 5,
           "key": "honk_horn",
           "source": "Honk the horn!",
           "korean": "경적을 울리세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             1882,
             110,
             2470,
             210
           ],
-          "source_exact_bbox": [
-            1882,
-            110,
-            2470,
-            210
-          ],
-          "localized_exact_bbox": [
-            1882,
-            110,
+          "localized_bbox": [
+            1937,
+            121,
             2414,
             199
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             588,
             100
           ],
           "localized_size": [
-            532,
-            89
+            477,
+            78
           ],
           "delta_size": [
-            -56,
-            -11
+            -111,
+            -22
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 6,
           "key": "do_math",
           "source": "Do the math!",
           "korean": "계산하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             2683,
             110,
             3143,
             205
           ],
-          "source_exact_bbox": [
-            2683,
-            110,
-            3143,
-            205
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2764,
             120,
             3118,
             205
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             460,
             95
@@ -4800,222 +4731,186 @@
             -106,
             -10
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 7,
           "key": "guess_sound",
           "source": "Guess the sound!",
           "korean": "소리를 맞혀 보세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             3398,
             127,
             3978,
             205
           ],
-          "source_exact_bbox": [
-            3398,
-            127,
-            3978,
-            205
-          ],
-          "localized_exact_bbox": [
-            3417,
+          "localized_bbox": [
+            3415,
             128,
-            3955,
+            3961,
             204
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             580,
             78
           ],
           "localized_size": [
-            538,
+            546,
             76
           ],
           "delta_size": [
-            -42,
+            -34,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 8,
           "key": "count_green",
           "source": "Count Green Cars!",
           "korean": "초록색 차를 세세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             51,
             230,
             661,
             307
           ],
-          "source_exact_bbox": [
-            51,
-            230,
-            661,
-            307
-          ],
-          "localized_exact_bbox": [
-            89,
+          "localized_bbox": [
+            87,
             231,
-            619,
+            625,
             306
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             610,
             77
           ],
           "localized_size": [
-            530,
+            538,
             75
           ],
           "delta_size": [
-            -80,
+            -72,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 9,
           "key": "count_blue",
           "source": "Count Blue Cars!",
           "korean": "파란색 차를 세세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             803,
             210,
             1361,
             302
           ],
-          "source_exact_bbox": [
-            803,
-            210,
-            1361,
-            302
-          ],
-          "localized_exact_bbox": [
-            805,
+          "localized_bbox": [
+            804,
             216,
-            1355,
+            1360,
             295
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             558,
             92
           ],
           "localized_size": [
-            550,
+            556,
             79
           ],
           "delta_size": [
-            -8,
+            -2,
             -13
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 10,
           "key": "count_sheep",
           "source": "Count the sheep!",
           "korean": "양을 세세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             2745,
             223,
             3314,
             316
           ],
-          "source_exact_bbox": [
-            2745,
-            223,
-            3314,
-            316
-          ],
-          "localized_exact_bbox": [
-            2819,
+          "localized_bbox": [
+            2816,
             224,
-            3235,
+            3243,
             315
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             569,
             93
           ],
           "localized_size": [
-            416,
+            427,
             91
           ],
           "delta_size": [
-            -153,
+            -142,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 11,
           "key": "count_red",
           "source": "Count Red Cars!",
           "korean": "빨간색 차를 세세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             2802,
             373,
             3345,
             450
           ],
-          "source_exact_bbox": [
-            2802,
-            373,
-            3345,
-            450
-          ],
-          "localized_exact_bbox": [
-            2807,
+          "localized_bbox": [
+            2804,
             374,
-            3336,
+            3342,
             449
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             543,
             77
           ],
           "localized_size": [
-            529,
+            538,
             75
           ],
           "delta_size": [
-            -14,
+            -5,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 12,
           "key": "memorize_sequence",
           "source": "Memorize the sequence!",
           "korean": "순서를 기억하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             0,
             456,
             786,
             559
           ],
-          "source_exact_bbox": [
-            0,
-            456,
-            786,
-            559
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             91,
             468,
             695,
             556
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             786,
             103
@@ -5028,32 +4923,26 @@
             -182,
             -15
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 13,
           "key": "drive_above_speed",
           "source": "Drive above the speed!",
           "korean": "지정 속도 이상으로 달리세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             786,
             456,
             1562,
             559
           ],
-          "source_exact_bbox": [
-            786,
-            456,
-            1562,
-            559
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             788,
             468,
             1560,
             556
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             776,
             103
@@ -5066,32 +4955,26 @@
             -4,
             -15
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 14,
           "key": "spot_odd",
           "source": "Spot the odd one out!",
           "korean": "다른 하나를 찾으세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             1562,
             456,
             2324,
             559
           ],
-          "source_exact_bbox": [
-            1562,
-            456,
-            2324,
-            559
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             1598,
             466,
             2288,
             557
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             762,
             103
@@ -5104,32 +4987,26 @@
             -72,
             -12
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 15,
           "key": "slipstream_cars",
           "source": "Slipstream the cars!",
           "korean": "차량 뒤에서 슬립스트림하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             2324,
             456,
             2924,
             559
           ],
-          "source_exact_bbox": [
-            2324,
-            456,
-            2924,
-            559
-          ],
-          "localized_exact_bbox": [
+          "localized_bbox": [
             2326,
             475,
             2922,
             549
           ],
+          "localized_bbox_field": "new_localized_bbox",
           "source_size": [
             600,
             103
@@ -5142,54 +5019,45 @@
             -4,
             -29
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         },
         {
-          "index": 16,
           "key": "run_green",
           "source": "Run through green!",
           "korean": "초록색을 통과하세요!",
-          "coarse_bbox": [
+          "source_bbox": [
             2924,
             470,
             3648,
             559
           ],
-          "source_exact_bbox": [
-            2924,
-            470,
-            3648,
-            559
-          ],
-          "localized_exact_bbox": [
-            2952,
+          "localized_bbox": [
+            2949,
             471,
-            3616,
+            3622,
             558
           ],
+          "localized_bbox_field": "localized_bbox",
           "source_size": [
             724,
             89
           ],
           "localized_size": [
-            664,
+            673,
             87
           ],
           "delta_size": [
-            -60,
+            -51,
             -2
           ],
-          "exact_containment": true,
+          "containment": true,
           "size_ceiling": "PASS"
         }
       ],
       "status": "PASS"
     }
   ],
-  "controller_multiline_visual_qa": "PENDING",
   "runtime_validation": "UNTESTED",
-  "status": "SUPERSEDED_BY_C_USERPOLICY02_AUTHORITATIVE_BBOX_REQA",
-  "superseded_by": "localization/graphics/role_C/20261004-C-USERPOLICY02/C_USERPOLICY02_CONTROLLER_REQA.json",
-  "supersede_reason": "Partial historical source-text masks caused false REWORK flags on four assets; authoritative current producer/final-QA bboxes and matching candidate SHAs are used by USERPOLICY02."
+  "status": "PASS"
 }
