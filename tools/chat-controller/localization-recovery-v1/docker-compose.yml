@@ -37,7 +37,7 @@ services:
       SLOT_DEDUP_SECONDS: "180"
     ports:
       - "6082:6080"
-      - "8789:8787"
+      - "8788:8787"
     volumes:
       - outrun_chat_localization_recovery_data:/data
       - outrun_chat_localization_recovery_logs:/logs
