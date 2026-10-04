@@ -3015,6 +3015,176 @@ int main()
         "R244 different constant buffer object cannot replace sealed receipt");
     r244ReplacementVertexConstants->Release();
 
+    const std::array<std::uint32_t, 16> r245VertexPayload = {
+        0x3f800000u, 0x40000000u, 0x40400000u, 0x40800000u,
+        0x40a00000u, 0x40c00000u, 0x40e00000u, 0x41000000u,
+        0x41100000u, 0x41200000u, 0x41300000u, 0x41400000u,
+        0x41500000u, 0x41600000u, 0x41700000u, 0x41800000u,
+    };
+    const std::array<std::uint32_t, 16> r245PixelPayload = {
+        0x3dcccccdU, 0x3e4ccccdU, 0x3e99999aU, 0x3ecccccdU,
+        0x3f000000U, 0x3f19999aU, 0x3f333333U, 0x3f4ccccdU,
+        0x3f666666U, 0x3f800000U, 0x3f8ccccdU, 0x3f99999aU,
+        0x3fa66666U, 0x3fb33333U, 0x3fc00000U, 0x3fcccccdU,
+    };
+    static_assert(sizeof(r245VertexPayload) == r244ConstantBytes);
+    static_assert(sizeof(r245PixelPayload) == r244ConstantBytes);
+    const auto r245UnuploadedPayload =
+        programmableCache.constant_payload_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken);
+    require(
+        r245UnuploadedPayload.inputValid &&
+        r245UnuploadedPayload.constantStateReceiptReady &&
+        r245UnuploadedPayload.deviceMatches &&
+        r245UnuploadedPayload.contextDeviceMatches &&
+        r245UnuploadedPayload.constantStateSnapshotMatches &&
+        !r245UnuploadedPayload.payloadReceiptPresent &&
+        !r245UnuploadedPayload.uploadReady &&
+        r245UnuploadedPayload.constantPayloadReceiptGeneration == 0 &&
+        r245UnuploadedPayload.snapshotToken == 0 &&
+        !programmableCache.upload_constant_payload_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken, 0,
+            r245VertexPayload.data(), r244ConstantBytes,
+            r245PixelPayload.data(), r244ConstantBytes),
+        "R245 constant-state receipt must exist before payload upload");
+
+    ID3D11DeviceContext* r245DeferredBeforeUpload = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateDeferredContext(
+            0, &r245DeferredBeforeUpload)) &&
+        r245DeferredBeforeUpload != nullptr &&
+        !programmableCache.upload_constant_payload_for_observation(
+            r245DeferredBeforeUpload, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245VertexPayload.data(), r244ConstantBytes,
+            r245PixelPayload.data(), r244ConstantBytes),
+        "R245 deferred context cannot establish upload receipt");
+    r245DeferredBeforeUpload->Release();
+
+    DevicePair r245ForeignDevice = create_warp_device();
+    require(
+        !programmableCache.upload_constant_payload_for_observation(
+            r245ForeignDevice.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245VertexPayload.data(), r244ConstantBytes,
+            r245PixelPayload.data(), r244ConstantBytes),
+        "R245 foreign-device context fails closed");
+    r245ForeignDevice.context->Release();
+    r245ForeignDevice.device->Release();
+
+    require(
+        programmableCache.upload_constant_payload_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245VertexPayload.data(), r244ConstantBytes,
+            r245PixelPayload.data(), r244ConstantBytes),
+        "R245 exact constant payload upload to R244-owned buffers");
+    const auto r245PayloadReady =
+        programmableCache.constant_payload_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken);
+    require(
+        r245PayloadReady.inputValid &&
+        r245PayloadReady.constantStateReceiptReady &&
+        r245PayloadReady.deviceMatches &&
+        r245PayloadReady.contextDeviceMatches &&
+        r245PayloadReady.constantStateSnapshotMatches &&
+        r245PayloadReady.payloadReceiptPresent &&
+        r245PayloadReady.payloadBytesExact &&
+        r245PayloadReady.uploadReady &&
+        r245PayloadReady.constantPayloadReceiptGeneration != 0 &&
+        r245PayloadReady.vertexPayloadHash != 0 &&
+        r245PayloadReady.pixelPayloadHash != 0 &&
+        r245PayloadReady.snapshotToken != 0 &&
+        programmableCache.validate_constant_payload_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken),
+        "R245 exact constant payload upload receipt");
+    const auto firstR245ReceiptGeneration =
+        r245PayloadReady.constantPayloadReceiptGeneration;
+    const auto firstR245PayloadSnapshot = r245PayloadReady.snapshotToken;
+    require(
+        programmableCache.upload_constant_payload_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245VertexPayload.data(), r244ConstantBytes,
+            r245PixelPayload.data(), r244ConstantBytes) &&
+        programmableCache.constant_payload_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken).snapshotToken ==
+            firstR245PayloadSnapshot,
+        "R245 same constant payload upload is idempotent");
+
+    auto r245ChangedVertexPayload = r245VertexPayload;
+    r245ChangedVertexPayload[0] ^= 0x00000001u;
+    require(
+        !programmableCache.upload_constant_payload_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245ChangedVertexPayload.data(), r244ConstantBytes,
+            r245PixelPayload.data(), r244ConstantBytes),
+        "R245 changed constant payload cannot reuse sealed receipt");
+
+    ID3D11DeviceContext* r245ReplacementContext = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateDeferredContext(
+            0, &r245ReplacementContext)) &&
+        r245ReplacementContext != nullptr &&
+        r245ReplacementContext != d3d.context &&
+        !programmableCache.upload_constant_payload_for_observation(
+            r245ReplacementContext, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245VertexPayload.data(), r244ConstantBytes,
+            r245PixelPayload.data(), r244ConstantBytes),
+        "R245 different same-device context cannot replace sealed receipt");
+    r245ReplacementContext->Release();
+
     const std::string r242AlternateVertexSource = R"(
 struct VSInput { float4 position : POSITION0; };
 struct VSOutput { float4 position : SV_Position; };
@@ -3101,6 +3271,17 @@ VSOutput main(VSInput input)
             firstR243InputLayoutSnapshot,
             firstR244ConstantStateSnapshot),
         "R244 device reinitialize invalidates constant-state receipt");
+    require(
+        !programmableCache.validate_constant_payload_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            firstR242ObjectSnapshot,
+            inputLayout,
+            firstR243InputLayoutSnapshot,
+            firstR244ConstantStateSnapshot,
+            firstR245PayloadSnapshot),
+        "R245 device reinitialize invalidates constant-payload receipt");
     require(
         programmableCache.cache_for_observation(programmablePair),
         "R242 fresh cache generation prerequisite");
@@ -3228,6 +3409,52 @@ VSOutput main(VSInput input)
             inputLayout, r243FreshInputLayoutReady.snapshotToken,
             r244FreshConstantStateReady.snapshotToken),
         "R244 fresh device generation receives distinct constant-state receipt");
+    require(
+        !programmableCache.upload_constant_payload_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            firstR244ConstantStateSnapshot,
+            r245VertexPayload.data(), r244ConstantBytes,
+            r245PixelPayload.data(), r244ConstantBytes),
+        "R245 stale constant-state receipt cannot upload payload");
+    require(
+        programmableCache.upload_constant_payload_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245VertexPayload.data(), r244ConstantBytes,
+            r245PixelPayload.data(), r244ConstantBytes),
+        "R245 fresh R244 receipt accepts exact constant payload");
+    const auto r245FreshPayloadReady =
+        programmableCache.constant_payload_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken);
+    require(
+        r245FreshPayloadReady.uploadReady &&
+        r245FreshPayloadReady.payloadReceiptPresent &&
+        r245FreshPayloadReady.payloadBytesExact &&
+        r245FreshPayloadReady.constantPayloadReceiptGeneration !=
+            firstR245ReceiptGeneration &&
+        r245FreshPayloadReady.snapshotToken != firstR245PayloadSnapshot &&
+        programmableCache.validate_constant_payload_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken),
+        "R245 fresh device generation receives distinct constant-payload receipt");
     r244VertexConstants->Release();
     r244PixelConstants->Release();
 

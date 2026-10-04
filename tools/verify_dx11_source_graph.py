@@ -9595,6 +9595,55 @@ def main() -> None:
             + ", ".join(missing_r244_programmable_constant_state_receipt)
         )
 
+    r245_programmable_constant_payload_receipt_contract = [
+        ("struct NativeProgrammableShaderConstantPayloadReadiness",
+         NATIVE_BACKEND_HPP, "R245 programmable constant-payload readiness type"),
+        ("upload_constant_payload_for_observation(",
+         NATIVE_BACKEND_HPP, "R245 constant-payload upload declaration"),
+        ("constant_payload_readiness(",
+         NATIVE_BACKEND_HPP, "R245 constant-payload readiness declaration"),
+        ("validate_constant_payload_snapshot(",
+         NATIVE_BACKEND_HPP, "R245 constant-payload snapshot validation declaration"),
+        ("constantPayloadReceiptGeneration",
+         NATIVE_BACKEND_HPP, "R245 per-entry payload receipt generation"),
+        ("expectedContext->UpdateSubresource(",
+         NATIVE_BACKEND_CPP, "R245 exact constant payload upload operation"),
+        ("expectedDevice->GetImmediateContext(",
+         NATIVE_BACKEND_CPP, "R245 immediate-context ownership gate"),
+        ("entry.constantUploadContext.Get() == expectedContext",
+         NATIVE_BACKEND_CPP, "R245 exact upload-context seal"),
+        ("deferred context cannot establish upload receipt",
+         CONSTANT_BUFFER_PROBE, "R245 deferred-context regression"),
+        ("constant-state receipt must exist before payload upload",
+         CONSTANT_BUFFER_PROBE, "R245 validated R244 prerequisite"),
+        ("foreign-device context fails closed",
+         CONSTANT_BUFFER_PROBE, "R245 foreign-context regression"),
+        ("exact constant payload upload receipt",
+         CONSTANT_BUFFER_PROBE, "R245 exact payload readiness regression"),
+        ("same constant payload upload is idempotent",
+         CONSTANT_BUFFER_PROBE, "R245 idempotence regression"),
+        ("changed constant payload cannot reuse sealed receipt",
+         CONSTANT_BUFFER_PROBE, "R245 payload mismatch regression"),
+        ("different same-device context cannot replace sealed receipt",
+         CONSTANT_BUFFER_PROBE, "R245 context replacement regression"),
+        ("device reinitialize invalidates constant-payload receipt",
+         CONSTANT_BUFFER_PROBE, "R245 device-generation invalidation regression"),
+        ("stale constant-state receipt cannot upload payload",
+         CONSTANT_BUFFER_PROBE, "R245 stale R244 regression"),
+        ("fresh device generation receives distinct constant-payload receipt",
+         CONSTANT_BUFFER_PROBE, "R245 fresh receipt regression"),
+    ]
+    missing_r245_programmable_constant_payload_receipt = [
+        meaning for token, source, meaning
+        in r245_programmable_constant_payload_receipt_contract
+        if token not in source
+    ]
+    if missing_r245_programmable_constant_payload_receipt:
+        raise SystemExit(
+            "DX11 R245 programmable constant-payload receipt drift: "
+            + ", ".join(missing_r245_programmable_constant_payload_receipt)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

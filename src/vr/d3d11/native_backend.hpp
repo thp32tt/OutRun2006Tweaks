@@ -1267,6 +1267,38 @@ struct NativeProgrammableShaderConstantStateReadiness {
     std::uint64_t snapshotToken{};
 };
 
+// R245 uploads one exact VS/PS payload pair into the dormant R244-owned
+// constant buffers and seals the source payload/context receipt. It does not
+// bind constant-buffer slots, route Draw*, or activate programmable rendering.
+struct NativeProgrammableShaderConstantPayloadReadiness {
+    bool inputValid{};
+    bool constantStateReceiptReady{};
+    bool deviceMatches{};
+    bool contextDeviceMatches{};
+    bool constantStateSnapshotMatches{};
+    bool payloadReceiptPresent{};
+    bool payloadBytesExact{};
+    bool uploadReady{};
+    std::uint64_t ownerGeneration{};
+    std::uint64_t slotGeneration{};
+    std::uint64_t translationObjectReceiptGeneration{};
+    std::uint64_t inputLayoutReceiptGeneration{};
+    std::uint64_t constantStateReceiptGeneration{};
+    std::uint64_t constantPayloadReceiptGeneration{};
+    std::uint64_t cacheKey{};
+    std::uint64_t inputLayoutIdentity{};
+    UINT vertexConstantBytes{};
+    UINT pixelConstantBytes{};
+    std::uint64_t vertexPayloadHash{};
+    std::uint64_t pixelPayloadHash{};
+    std::uint64_t cacheSnapshotToken{};
+    std::uint64_t slotSnapshotToken{};
+    std::uint64_t objectSnapshotToken{};
+    std::uint64_t inputLayoutSnapshotToken{};
+    std::uint64_t constantStateSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
 class NativeProgrammableShaderPairCache final {
 public:
     NativeProgrammableShaderPairCache() = default;
@@ -1373,6 +1405,42 @@ public:
         const VertexInputLayoutTranslation& layout,
         std::uint64_t inputLayoutSnapshotToken,
         std::uint64_t constantStateSnapshotToken) const noexcept;
+    bool upload_constant_payload_for_observation(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        std::uint64_t constantStateSnapshotToken,
+        const void* vertexPayload,
+        UINT vertexPayloadBytes,
+        const void* pixelPayload,
+        UINT pixelPayloadBytes) noexcept;
+    [[nodiscard]] NativeProgrammableShaderConstantPayloadReadiness
+    constant_payload_readiness(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        std::uint64_t constantStateSnapshotToken) const noexcept;
+    [[nodiscard]] bool validate_constant_payload_snapshot(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        std::uint64_t constantStateSnapshotToken,
+        std::uint64_t constantPayloadSnapshotToken) const noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
@@ -1408,6 +1476,10 @@ private:
         UINT vertexConstantBytes{};
         UINT pixelConstantBytes{};
         std::uint64_t constantStateReceiptGeneration{};
+        Microsoft::WRL::ComPtr<ID3D11DeviceContext> constantUploadContext;
+        std::uint64_t vertexConstantPayloadHash{};
+        std::uint64_t pixelConstantPayloadHash{};
+        std::uint64_t constantPayloadReceiptGeneration{};
     };
 
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
@@ -1417,6 +1489,7 @@ private:
     std::uint64_t translation_object_receipt_generation_counter_ = 0;
     std::uint64_t input_layout_receipt_generation_counter_ = 0;
     std::uint64_t constant_state_receipt_generation_counter_ = 0;
+    std::uint64_t constant_payload_receipt_generation_counter_ = 0;
 };
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
