@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-10-05T15:35:05+09:00",
+  "updatedKst": "2026-10-05T15:56:14+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -191,17 +191,16 @@
       "dependencies": [],
       "attempts": 1,
       "runtimeCandidate": false,
-      "validationSha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
-      "validationRunId": 37271535226,
+      "validationSha": "d2872620450dc5e3604f56810721ce13470c99bb",
+      "validationRunId": 37274224163,
       "validationResult": "BUILD_VERIFIED",
-      "implementationProgress": "00405 carries bounded exact ProducerToken identity through queue/Sumo replay/c64/R30 draw correlation; 00406 removes its c64/node-relation diagnostic lookup from the telemetry-off HUD hot path and pins that invariant.",
+      "implementationProgress": "00405 carries bounded exact ProducerToken identity through queue/Sumo replay/c64/R30 draw correlation; 00406 removes its c64/node-relation diagnostic lookup from the telemetry-off HUD hot path; 00407 collapses Sumo replay scope+producer snapshot to one non-consuming semantic-tag lookup and guards against a second registry scan.",
       "validationEvidence": [
-        "N100 exact-SHA producer-provenance/Sumo/HUD-cadence/R31-R32-retirement/architecture/hook-graph/refactor static suite PASS",
-        "DX9Ex Active Validation 37271535226 policy/host/8 no-HMD smokes/game/R33 full-chain/package SUCCESS",
-        "Domain Isolation Guard 37271535231 SUCCESS",
-        "Package artifact 11328730820 digest sha256:50ddfff6a0366782aded04821af2fc3779e4572875b978b3a34d36092297bb94"
+        "DX9Ex Active Validation 37274224163 attempt 2 policy/host/8 no-HMD smokes/game/R33 full-chain/package SUCCESS at exact SHA d2872620450dc5e3604f56810721ce13470c99bb",
+        "Domain Isolation Guard 37274224244 SUCCESS at exact SHA d2872620450dc5e3604f56810721ce13470c99bb",
+        "Package artifact 11329468257 digest sha256:19fef8046ca47aea14de063899cf92cf14e8e73ed8f9aafeab86ae861ed1241f"
       ],
-      "nextAction": "Quest3/VDXR CORRECTNESS-test exact SHA 9626ce91b664d247aeea79a0b1338496d8a0792e with VRTelemetry enabled; correlate C64/DRAW producer fingerprints before any ownership behavior change."
+      "nextAction": "Quest3/VDXR CORRECTNESS-test exact SHA d2872620450dc5e3604f56810721ce13470c99bb with VRTelemetry enabled; correlate C64/DRAW producer fingerprints before any ownership behavior change."
     },
     {
       "id": "L1-VIS-001",
@@ -224,10 +223,10 @@
         "semanticOverlayBypass remained 0 for the full session",
         "world baseline remained visually correct"
       ],
-      "nextAction": "Quest3/VDXR B_HUD/HUD_SCREEN runtime capture on exact SHA 9626ce91b664d247aeea79a0b1338496d8a0792e with VRTelemetry enabled; use the evidence before any ownership behavior change.",
-      "fingerprintValidationSha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
-      "fingerprintValidationRunId": 37271535226,
-      "implementationProgress": "Exact producer/node/queue/c64/draw lifetime instrumentation is build-verified through 00405/00406 without broadening generic queue ownership."
+      "nextAction": "Quest3/VDXR B_HUD/HUD_SCREEN runtime capture on exact SHA d2872620450dc5e3604f56810721ce13470c99bb with VRTelemetry enabled; use the evidence before any ownership behavior change.",
+      "fingerprintValidationSha": "d2872620450dc5e3604f56810721ce13470c99bb",
+      "fingerprintValidationRunId": 37274224163,
+      "implementationProgress": "Exact producer/node/queue/c64/draw lifetime instrumentation is build-verified through 00405/00406; 00407 removes the duplicate Sumo replay semantic-tag scan without changing rendering authority."
     },
     {
       "id": "VR-BINARY-CONTRACT-001",
