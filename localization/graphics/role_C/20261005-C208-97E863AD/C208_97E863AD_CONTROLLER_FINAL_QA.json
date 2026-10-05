@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T22:31:00+09:00",
+  "role": "C",
+  "run": "20261005-C208-97E863AD",
+  "qa_id": "C208",
+  "queue_index": 193,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "producer_run": "20261005-A-PRODUCTION65",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "candidate_sha256": "0352a4e0eb0285f9b021fb5046da7b778e3de3317b2348efad69158e0742000d",
+  "machine_status": "PASS_AFTER_C208_VERIFIER_SCOPE_CORRECTION",
+  "row_gate": "13/13 PASS",
+  "source_bbox_exact_match_all": true,
+  "candidate_bbox_exact_match_all": true,
+  "zero_pixel_gates": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_script_exact_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "protected_changed_pixels": 0
+  },
+  "protected_original_policy": {
+    "OUTRUN2SP_logo": "pixel-exact",
+    "OutRun_inline_token": "pixel-exact",
+    "OutRun2SP_inline_token": "pixel-exact",
+    "OUTRUN_showroom_top_line": "pixel-exact",
+    "TESTAROSSA": "pixel-exact",
+    "SP_OR_product_fragments": "pixel-exact"
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": "FAIL_SOURCE_STYLE_SCALE_PROPORTION",
+  "style_observations": [
+    {
+      "region_idx": 4,
+      "source": "SHOWROOM",
+      "source_width": 389,
+      "localized_width": 88,
+      "width_ratio": 0.2262
+    },
+    {
+      "region_idx": 5,
+      "source": "MULTIPLAYER",
+      "source_width": 532,
+      "localized_width": 232,
+      "width_ratio": 0.4361
+    },
+    {
+      "region_idx": 6,
+      "source": "Goal E",
+      "source_width": 160,
+      "localized_width": 60,
+      "width_ratio": 0.375
+    },
+    {
+      "region_idx": 10,
+      "source": "Goal A",
+      "source_width": 165,
+      "localized_width": 64,
+      "width_ratio": 0.3879
+    },
+    {
+      "region_idx": 14,
+      "source": "WELCOME TO THE",
+      "source_width": 473,
+      "localized_width": 148,
+      "width_ratio": 0.3129
+    },
+    {
+      "region_idx": 16,
+      "source": "ONLINE",
+      "source_width": 172,
+      "localized_width": 64,
+      "width_ratio": 0.3721
+    }
+  ],
+  "controller_reason": "Exact containment and pixel safety pass, but mandatory SOURCE/FINAL contact review shows the Korean labels are materially underscaled/too compact relative to the source's wide bold-condensed label family. SHOWROOM/쇼룸, MULTIPLAYER/멀티플레이, Goal rows, WELCOME/환영합니다 and ONLINE/온라인 leave excessive unused horizontal footprint and do not preserve source scale/proportion/spacing. Exact bbox ceilings do not override source-style fidelity.",
+  "required_rework": "Re-render the Korean labels with source-faithful larger/wider proportions, weight and tracking while remaining strictly inside each original source bbox. Keep OutRun/OutRun2SP/OUTRUN product tokens, TESTAROSSA and protected fragments pixel-exact; preserve raw mirror_y/header.",
+  "verifier_retry_note": "Initial C208 verifier counted 7172 exact source-RGBA coincidences inside localized Hangul bboxes as residue. The C-only verifier scope was corrected to count source-script residue outside independently decoded localized bboxes; same candidate bytes then PASS with residue=0. This retry is not a producer failure or separate completion.",
+  "decision": "C208_REWORK_REQUIRED_SOURCE_STYLE_SCALE_PROPORTION",
+  "runtime_validation": "UNTESTED",
+  "exclusions": "Completed prior PASS assets were not repeated. VR/FFB/DX11/DXVK untouched.",
+  "machine_report": "localization/graphics/role_C/20261005-C208-97E863AD/C208_97E863AD_MACHINE_QA.json",
+  "contacts": "localization/graphics/role_C/20261005-C208-97E863AD/C208_TARGET_CONTACTS.jpg",
+  "raw_compare": "localization/graphics/role_C/20261005-C208-97E863AD/C208_RAW_COMPARE.jpg"
+}
