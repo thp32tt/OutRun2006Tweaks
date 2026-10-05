@@ -1,0 +1,21 @@
+{
+  "run": "20261005-C190-63C91067-DIAG",
+  "qa_id": "C190",
+  "index": 26,
+  "asset": "63C91067",
+  "candidate_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
+  "machine_status": "FAIL",
+  "machine_checks": {
+    "clean_changed_outside_c_exact_bboxes": 0,
+    "final_changed_outside_c_exact_bboxes": 0,
+    "clean_alpha_changed_outside_c_exact_bboxes": 0,
+    "final_alpha_changed_outside_c_exact_bboxes": 0,
+    "render_outside_c_exact_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_pair_1px_touch_pixels": 0,
+    "source_title_pixels_unchanged_in_clean_total": 20,
+    "source_title_pixels_unchanged_in_final_outside_korean_guard_total": 14
+  },
+  "report": "localization/graphics/role_C/20261005-C190-63C91067-DIAG/C190_63C91067_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}

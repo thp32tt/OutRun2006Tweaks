@@ -1,0 +1,475 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C190-63C91067-DIAG",
+  "qa_id": "C190",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION137",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "candidate_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
+  "independent_source_decode_matches_producer_png": true,
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "c_exact_bboxes_source": "prior C160/C184 established geometry",
+  "row_checks": [
+    {
+      "region_idx": 0,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        747,
+        1174,
+        1271,
+        1275
+      ],
+      "independent_localized_bbox": [
+        861,
+        1184,
+        1157,
+        1265
+      ],
+      "delta_left": 114,
+      "delta_right": 114,
+      "delta_top": 10,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "independent_source_title_mask_pixels": 29733,
+      "source_title_pixels_unchanged_in_clean": 20,
+      "source_title_pixels_unchanged_in_final_outside_korean_guard": 14,
+      "residue_navy_pixels": 0,
+      "residue_white_pixels": 14,
+      "residue_points": [
+        {
+          "x": 902,
+          "y": 1184,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        {
+          "x": 903,
+          "y": 1184,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        {
+          "x": 904,
+          "y": 1184,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        {
+          "x": 905,
+          "y": 1184,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            2
+          ]
+        },
+        {
+          "x": 901,
+          "y": 1185,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        {
+          "x": 902,
+          "y": 1185,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        {
+          "x": 903,
+          "y": 1185,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        {
+          "x": 904,
+          "y": 1185,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            2
+          ]
+        },
+        {
+          "x": 875,
+          "y": 1187,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            1
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            1
+          ]
+        },
+        {
+          "x": 1158,
+          "y": 1200,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            2
+          ]
+        },
+        {
+          "x": 1159,
+          "y": 1200,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            2
+          ]
+        },
+        {
+          "x": 1160,
+          "y": 1200,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            2
+          ]
+        },
+        {
+          "x": 1161,
+          "y": 1200,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            2
+          ]
+        },
+        {
+          "x": 1162,
+          "y": 1200,
+          "source_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "clean_rgba": [
+            255,
+            255,
+            255,
+            2
+          ],
+          "final_rgba": [
+            255,
+            255,
+            255,
+            2
+          ]
+        }
+      ],
+      "clean_changed_pixels_in_bbox": 45195,
+      "render_pixels_in_bbox": 18748
+    },
+    {
+      "region_idx": 1,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        599,
+        156,
+        1124,
+        246
+      ],
+      "independent_localized_bbox": [
+        713,
+        160,
+        1009,
+        241
+      ],
+      "delta_left": 114,
+      "delta_right": 115,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "independent_source_title_mask_pixels": 28393,
+      "source_title_pixels_unchanged_in_clean": 0,
+      "source_title_pixels_unchanged_in_final_outside_korean_guard": 0,
+      "residue_navy_pixels": 0,
+      "residue_white_pixels": 0,
+      "residue_points": [],
+      "clean_changed_pixels_in_bbox": 35256,
+      "render_pixels_in_bbox": 18748
+    }
+  ],
+  "all_2_bbox_size_positive_margin_pass": true,
+  "machine_checks": {
+    "clean_changed_outside_c_exact_bboxes": 0,
+    "final_changed_outside_c_exact_bboxes": 0,
+    "clean_alpha_changed_outside_c_exact_bboxes": 0,
+    "final_alpha_changed_outside_c_exact_bboxes": 0,
+    "render_outside_c_exact_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_pair_1px_touch_pixels": 0,
+    "source_title_pixels_unchanged_in_clean_total": 20,
+    "source_title_pixels_unchanged_in_final_outside_korean_guard_total": 14
+  },
+  "edge_continuity_proxy": [
+    {
+      "region_idx": 0,
+      "edges": [
+        {
+          "edge": "left",
+          "mean_abs_rgb_jump": 0.42574256658554077,
+          "max_abs_rgb_jump": 3
+        },
+        {
+          "edge": "right",
+          "mean_abs_rgb_jump": 2.1848185062408447,
+          "max_abs_rgb_jump": 73
+        },
+        {
+          "edge": "top",
+          "mean_abs_rgb_jump": 2.9732823371887207,
+          "max_abs_rgb_jump": 158
+        },
+        {
+          "edge": "bottom",
+          "mean_abs_rgb_jump": 0.5623409748077393,
+          "max_abs_rgb_jump": 3
+        }
+      ]
+    },
+    {
+      "region_idx": 1,
+      "edges": [
+        {
+          "edge": "left",
+          "mean_abs_rgb_jump": 0.0,
+          "max_abs_rgb_jump": 0
+        },
+        {
+          "edge": "right",
+          "mean_abs_rgb_jump": 0.09259258955717087,
+          "max_abs_rgb_jump": 4
+        },
+        {
+          "edge": "top",
+          "mean_abs_rgb_jump": 0.7307936549186707,
+          "max_abs_rgb_jump": 6
+        },
+        {
+          "edge": "bottom",
+          "mean_abs_rgb_jump": 0.0,
+          "max_abs_rgb_jump": 0
+        }
+      ]
+    }
+  ],
+  "machine_status": "FAIL",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "C190_DIAGNOSTIC_PENDING_CONTROLLER_ADJUDICATION",
+  "runtime_validation": "UNTESTED",
+  "preview_b64_files": [
+    "localization/graphics/role_C/20261005-C190-63C91067-DIAG/C190_ROW0_RESIDUE_MARKERS_B64.txt",
+    "localization/graphics/role_C/20261005-C190-63C91067-DIAG/C190_ROW0_DETAIL_B64.txt",
+    "localization/graphics/role_C/20261005-C190-63C91067-DIAG/C190_ROW1_RESIDUE_MARKERS_B64.txt",
+    "localization/graphics/role_C/20261005-C190-63C91067-DIAG/C190_ROW1_DETAIL_B64.txt",
+    "localization/graphics/role_C/20261005-C190-63C91067-DIAG/C190_OVERVIEW_B64.txt",
+    "localization/graphics/role_C/20261005-C190-63C91067-DIAG/C190_RAW_B64.txt"
+  ]
+}
