@@ -40,11 +40,11 @@ sa=np.asarray(src,dtype=np.uint8)
 # B174 controller-readable source probe established five text-only windows.
 # These windows exclude player markers, route bars/ticks, numerals and decorative shards.
 specs=[
- ("extra_time","Extra Time","추가 시간",[0,220,540,325],"extra"),
- ("start_left","Start","출발",[0,315,180,382],"small"),
- ("goal_left","Goal","골",[620,315,785,382],"small"),
- ("start_right","Start","출발",[775,315,945,382],"small"),
- ("goal_right","Goal","골",[1390,315,1565,382],"small"),
+ ("extra_time","Extra Time","추가 시간",[0,205,495,300],"extra"),
+ ("start_left","Start","출발",[0,295,165,352],"small"),
+ ("goal_left","Goal","골",[620,295,770,352],"small"),
+ ("start_right","Start","출발",[790,295,945,352],"small"),
+ ("goal_right","Goal","골",[1390,295,1560,352],"small"),
 ]
 
 rows=[]; source_masks=[]
@@ -62,7 +62,7 @@ for key,en,ko,win,kind in specs:
 
 # Fail closed if windows accidentally captured non-text geometry.
 guards={
- "extra_time":(250,540,35,105),
+ "extra_time":(250,495,35,95),
  "start_left":(45,180,20,67),"goal_left":(45,165,20,67),
  "start_right":(45,170,20,67),"goal_right":(45,175,20,67)
 }
