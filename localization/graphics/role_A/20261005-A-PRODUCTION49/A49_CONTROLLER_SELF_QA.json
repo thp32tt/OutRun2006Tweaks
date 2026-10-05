@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION49",
+  "index": 147,
+  "asset": "39BCA907",
+  "candidate_sha256": "6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b",
+  "prior_attempt": {
+    "run": "A48",
+    "candidate_sha256": "eec59e5c2738ef0423d75d46ccfd2c182bab1ec72b16c2fbc8952ef07e78d55d",
+    "decision": "REJECTED_SEMANTIC_BINDING_MISMATCH"
+  },
+  "semantic_binding": "PASS_15_OF_15_CANONICAL_STAGE_NAMES",
+  "machine_qa": {
+    "bbox_size_positive_margin": "15/15 PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "clean_source_unchanged": 0,
+    "source_residue": 0,
+    "overlap": 0,
+    "touch": 0
+  },
+  "controller_visual_qa": {
+    "readable_source_clean_final": "PASS",
+    "raw_mirror_y": "PASS",
+    "source_style": "PASS",
+    "protected_idx0_idx16": "PASS"
+  },
+  "naming_policy": "PASS_CANONICAL_PHONETIC_STAGE_NAMES",
+  "runtime_validation": "UNTESTED",
+  "decision": "A49_SELF_QA_PASS_PENDING_C_AND_INGAME"
+}
