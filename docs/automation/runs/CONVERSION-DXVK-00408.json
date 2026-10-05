@@ -2,7 +2,7 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DXVK-00408",
   "production_id": "CONVERSION-DXVK-00408",
-  "event_id": "CONVERSION-DXVK-00408-E004",
+  "event_id": "CONVERSION-DXVK-00408-E008",
   "event_type": "rollover",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
@@ -121,7 +121,7 @@
   "pipeline": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered GitHub SSOT after the current E004/CHAT_ROLLOVER=3 conversation rollover. This rollover is not a task retry, so ATTEMPT remains 1/3. Completed F140 and already-produced F141 material work were not repeated."
+      "evidence": "Recovered the already-complete F141 material/validation result and C6 state from GitHub SSOT. E008/CHAT_ROLLOVER=5 is a conversation rollover, not a retry; ATTEMPT remains 1/3 and no completed material work was repeated."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
@@ -146,20 +146,20 @@
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "evidence": "Durable run record, Issue #14 authoritative E004 ledger comment 5990987086, and branch-local conversion state are reconciled to the current user authority E004/CHAT_ROLLOVER=3 while preserving bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb as material/validation-bearing SHA, exact-SHA validation evidence, F142 successor, ATTEMPT=1/3 and RUNTIME_VALIDATION=UNTESTED."
+      "evidence": "Durable run record, Issue #14 ledger comment 5991041220, and branch-local conversion state are reconciled to E008/CHAT_ROLLOVER=5 while preserving bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb as material/validation-bearing SHA, exact-SHA SUCCESS evidence, F142 successor, ATTEMPT=1/3 and RUNTIME_VALIDATION=UNTESTED."
     }
   },
   "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
   "runtime_test_performed": false,
   "runtime_validation": "UNTESTED",
-  "issue14_comment_id": 5990987086,
+  "issue14_comment_id": 5991041220,
   "controller_dispatch": {
     "task_id": "CONVERSION-DXVK-00408",
     "production_id": "CONVERSION-DXVK-00408",
-    "event_id": "CONVERSION-DXVK-00408-E004",
+    "event_id": "CONVERSION-DXVK-00408-E008",
     "event_type": "rollover",
     "attempt": "1/3",
-    "chat_rollover": 3,
+    "chat_rollover": 5,
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt",
     "source": "CURRENT_USER_ROLLOVER",
@@ -181,7 +181,7 @@
   },
   "exact_next_action": "Build F142 exact raw canonical overlap provenance from 0x00183C3D for a 64-byte window through 0x00183C7D. Consume the inherited 0x00183C3D:eb only after the complete short-JMP instruction is proven from overlap, carry any direct-control-flow debt fail-closed, preserve any new trailing cut, and keep indirect-call/function/render/HUD/runtime semantics unresolved.",
   "recorded_at_kst": "2026-10-05T17:35:23+09:00",
-  "chat_rollover": 3,
+  "chat_rollover": 5,
   "rollover_is_retry": false,
   "resume_reason": "Retry persisted after one recovery attempt",
   "rollover_metadata_correction": {
@@ -204,23 +204,9 @@
     "material_and_validation_bearing_sha_unchanged": true,
     "reconciled_at_kst": "2026-10-05T17:38:00+09:00"
   },
-  "reconciled_at_kst": "2026-10-05T17:38:00+09:00",
+  "reconciled_at_kst": "2026-10-05T17:43:00+09:00",
   "dispatch_metadata_correction": {
     "corrected_from": {
-      "task_id": "CONVERSION-DXVK-00408",
-      "production_id": "CONVERSION-DXVK-00408",
-      "event_id": "CONVERSION-DXVK-00408-E002",
-      "event_type": "rollover",
-      "attempt": "1/3",
-      "chat_rollover": 2,
-      "rollover_is_retry": false,
-      "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
-      "source": "CURRENT_USER_ROLLOVER",
-      "material_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
-      "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
-      "runtime_validation": "UNTESTED"
-    },
-    "corrected_to": {
       "task_id": "CONVERSION-DXVK-00408",
       "production_id": "CONVERSION-DXVK-00408",
       "event_id": "CONVERSION-DXVK-00408-E004",
@@ -234,9 +220,23 @@
       "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
       "runtime_validation": "UNTESTED"
     },
+    "corrected_to": {
+      "task_id": "CONVERSION-DXVK-00408",
+      "production_id": "CONVERSION-DXVK-00408",
+      "event_id": "CONVERSION-DXVK-00408-E008",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 5,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_ROLLOVER",
+      "material_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+      "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+      "runtime_validation": "UNTESTED"
+    },
     "authority": "LATEST_EXPLICIT_USER_DISPATCH",
-    "reason": "The current explicit user rollover is CONVERSION-DXVK-00408-E004 with CHAT_ROLLOVER=3. It is a chat rollover, not a retry; ATTEMPT remains 1/3. Material/validation-bearing SHA and exact-SHA validation evidence are unchanged.",
+    "reason": "CONVERSION-DXVK-00408-E008 is the latest explicit user rollover. CHAT_ROLLOVER=5; rollover_is_retry=false; ATTEMPT remains 1/3. Completed F141 material/result SHA, exact-SHA validation evidence, and F142 successor are unchanged.",
     "material_and_validation_bearing_sha_unchanged": true,
-    "reconciled_at_kst": "2026-10-05T17:35:23+09:00"
+    "reconciled_at_kst": "2026-10-05T17:43:00+09:00"
   }
 }
