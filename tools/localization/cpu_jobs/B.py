@@ -7,7 +7,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("worker B only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION84"
+run="20261005-B-PRODUCTION85"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -56,7 +56,7 @@ specs=[
  (27,"SELECT NATIONALITY","국적 선택","dark_menu","left"),
  (28,"ENTER NAME","이름 입력","dark_menu","left"),
  (30,"DONE","완료","dark_done_large","left"),
- (43,"PROFESSIONAL","프로","orange_prof","left"),
+ (43,"PROFESSIONAL","프로","orange_prof","right"),
  (44,"OUTRUN","아웃런","red_small","right"),
  (53,"DONE","완료","dark_done_small","left"),
 ]
@@ -83,8 +83,8 @@ clean=src.copy(); ca=clean.getchannel("A"); ca.paste(0,(0,0,W,H),source_mask); c
 protected=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed))
 sp=out/"BA_SOURCE_READABLE.png"; cp=out/"BA_CLEAN_PLATE.png"; sm=out/"BA_SOURCE_TEXT_MASK.png"; am=out/"BA_ALLOWED_BBOX_MASK.png"; pm=out/"BA_PROTECTED_MASK.png"
 src.save(sp); clean.save(cp); source_mask.save(sm); allowed.save(am); protected.save(pm)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(sm),"--protected-mask",str(pm),"--report",str(out/"B84_CLEAN_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B84_CLEAN_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(sm),"--protected-mask",str(pm),"--report",str(out/"B85_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B85_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
@@ -134,7 +134,7 @@ for r in rows:
     if not (lb[0]>ob[0] and lb[1]>ob[1] and lb[2]<ob[2] and lb[3]<ob[3]): raise RuntimeError(("positive margin",r["region_idx"],ob,lb))
     if lb[2]-lb[0]>aw or lb[3]-lb[1]>ah: raise RuntimeError(("size ceiling",r["region_idx"],ob,lb))
     targets.append((r["region_idx"],lm))
-    outrows.append({**r,"localized_bbox":lb,"source_width":aw,"source_height":ah,"localized_width":lb[2]-lb[0],"localized_height":lb[3]-lb[1],"delta_left":lb[0]-ob[0],"delta_right":ob[2]-lb[2],"delta_top":lb[1]-ob[1],"delta_bottom":ob[3]-lb[3],"containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","font_file":Path(FONT).name,"font_face_index":FI,"font_style":FSTYLE,"lowres_font_size":st["lowres_font_size"],"pixel_scale":4,"fill_rgba":st["fill_rgba"],"rework_status":"B84_NEW_EXACT_HD_CANDIDATE"})
+    outrows.append({**r,"localized_bbox":lb,"source_width":aw,"source_height":ah,"localized_width":lb[2]-lb[0],"localized_height":lb[3]-lb[1],"delta_left":lb[0]-ob[0],"delta_right":ob[2]-lb[2],"delta_top":lb[1]-ob[1],"delta_bottom":ob[3]-lb[3],"containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","font_file":Path(FONT).name,"font_face_index":FI,"font_style":FSTYLE,"lowres_font_size":st["lowres_font_size"],"pixel_scale":4,"fill_rgba":st["fill_rgba"],"rework_status":"B85_NEW_EXACT_HD_CANDIDATE"})
 
 overlap=0; touch=[]
 for i in range(len(targets)):
@@ -150,8 +150,8 @@ candidate.write_bytes(payload); csha=sha(payload)
 dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode).transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip mismatch")
 fp=out/"BA_FINAL_DECODED_READABLE.png"; dec.save(fp)
-subprocess.run(["python3",str(validator),str(sp),str(fp),str(am),"--protected-mask",str(pm),"--report",str(out/"B84_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"B84_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(fp),str(am),"--protected-mask",str(pm),"--report",str(out/"B85_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"B85_FINAL_VALIDATION.json").read_text())
 
 diff=dmask(src,dec); outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
 alphaout=count(ImageChops.multiply(bmask(ImageChops.difference(src.getchannel("A"),dec.getchannel("A"))),ImageOps.invert(allowed)))
@@ -166,7 +166,7 @@ target.save(out/"BA_TARGET_TEXT_MASK.png")
 stack=Image.new("RGB",(1024,3*1050),"white")
 for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); stack.paste(z,(0,i*1050+26)); ImageDraw.Draw(stack).text((5,i*1050+5),label,fill="black")
-stack.save(out/"B84_BA_SOURCE_CLEAN_FINAL.jpg",quality=96)
+stack.save(out/"B85_BA_SOURCE_CLEAN_FINAL.jpg",quality=96)
 
 cards=[]
 for r in outrows:
@@ -178,15 +178,15 @@ for r in outrows:
     ImageDraw.Draw(c).text((5,5),f'{r["region_idx"]} {r["source"]} -> {r["korean"]}',fill="black"); cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+4*(len(cards)-1)),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.thumbnail((2200,16000),Image.Resampling.LANCZOS); sheet.save(out/"B84_BA_ROW_CONTACT.jpg",quality=96)
+sheet.thumbnail((2200,16000),Image.Resampling.LANCZOS); sheet.save(out/"B85_BA_ROW_CONTACT.jpg",quality=96)
 
 rr=Image.new("RGB",(1024,2*1050),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_final)]):
     z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); rr.paste(z,(0,i*1050+26)); ImageDraw.Draw(rr).text((5,i*1050+5),label,fill="black")
-rr.save(out/"B84_BA_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"B85_BA_RAW_COMPARE.jpg",quality=96)
 
-report={"schema_version":1,"role":"B","run":run,"index":212,"asset":asset,"readiness_tier":"PREFLIGHT_TO_RENDER_COMPLETED_SAME_INVOCATION","source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":commit,"git_blob_sha1":blob(sb),"atlas_git_blob_sha1":blob(ab),"source_sha256":sha(sb)},"semantic_binding":{"method":"B83 controller-reviewed numbered canonical atlas","physical_elements":len(specs),"rows":[{"region_idx":i,"source":en,"korean":ko,"group":g,"alignment":al} for i,en,ko,g,al in specs],"protected":protected_semantics},"structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},"source_styles":styles,"rows":outrows,"clean_plate_validator":cleanrep,"final_mask_validator":finalrep,"decoded_changes":{"changed_pixels_total":count(diff),"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"exact_source_residue":residue,"render_outside_target":render_out,"overlap":overlap,"touch_pairs":touch},"candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),"controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED","status":"B84_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
-(out/"B84_BA_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-summary={"run":run,"index":212,"asset":"BA0147DA","source_sha256":sha(sb),"candidate_sha256":csha,"localized_physical_elements":len(specs),"bbox_size_positive_margin":f"{len(specs)}/{len(specs)}","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],"source_residue":residue,"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"render_outside_target":render_out,"overlap":overlap,"touch_pairs":len(touch),"worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B84_BA_REPORT.json"}
-(wr/"B84_BA0147DA.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+report={"schema_version":1,"role":"B","run":run,"index":212,"asset":asset,"readiness_tier":"PREFLIGHT_TO_RENDER_COMPLETED_SAME_INVOCATION","source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":commit,"git_blob_sha1":blob(sb),"atlas_git_blob_sha1":blob(ab),"source_sha256":sha(sb)},"semantic_binding":{"method":"B83 controller-reviewed numbered canonical atlas","physical_elements":len(specs),"rows":[{"region_idx":i,"source":en,"korean":ko,"group":g,"alignment":al} for i,en,ko,g,al in specs],"protected":protected_semantics},"structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},"source_styles":styles,"rows":outrows,"clean_plate_validator":cleanrep,"final_mask_validator":finalrep,"decoded_changes":{"changed_pixels_total":count(diff),"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"exact_source_residue":residue,"render_outside_target":render_out,"overlap":overlap,"touch_pairs":touch},"candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),"controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED","status":"B85_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
+(out/"B85_BA_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+summary={"run":run,"index":212,"asset":"BA0147DA","source_sha256":sha(sb),"candidate_sha256":csha,"localized_physical_elements":len(specs),"bbox_size_positive_margin":f"{len(specs)}/{len(specs)}","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],"source_residue":residue,"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"render_outside_target":render_out,"overlap":overlap,"touch_pairs":len(touch),"worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B85_BA_REPORT.json"}
+(wr/"B85_BA0147DA.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False))
