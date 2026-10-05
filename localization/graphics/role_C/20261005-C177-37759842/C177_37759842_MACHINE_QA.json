@@ -1,0 +1,941 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C177-37759842",
+  "qa_id": "C177",
+  "queue_index": 95,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "producer_run": "20261005-A-PRODUCTION34",
+  "producer_candidate_sha256": "90b2adecf0bd22effd199f98d166e959ca1f6a7d9238d52a3cab2026753c286c",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "eeecec9ecd494270932ce97a6c38dfd05205eb24",
+    "sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+    "path": "Release/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
+  },
+  "independent_source_decode_matches_producer_png": true,
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "row_checks": [
+    {
+      "idx": 2,
+      "source_effect_bbox": [
+        3652,
+        3797,
+        3962,
+        3941
+      ],
+      "localized_bbox": [
+        3671,
+        3810,
+        3943,
+        3928
+      ],
+      "delta_left": 19,
+      "delta_right": 19,
+      "delta_top": 13,
+      "delta_bottom": 13,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "예"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 3,
+      "source_effect_bbox": [
+        158,
+        3357,
+        422,
+        3501
+      ],
+      "localized_bbox": [
+        162,
+        3379,
+        418,
+        3479
+      ],
+      "delta_left": 4,
+      "delta_right": 4,
+      "delta_top": 22,
+      "delta_bottom": 22,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "아니오"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 4,
+      "source_effect_bbox": [
+        665,
+        3295,
+        928,
+        3538
+      ],
+      "localized_bbox": [
+        681,
+        3317,
+        912,
+        3516
+      ],
+      "delta_left": 16,
+      "delta_right": 16,
+      "delta_top": 22,
+      "delta_bottom": 22,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "타임 어택",
+        "모드",
+        "15코스",
+        "연속"
+      ],
+      "style": "white_dark"
+    },
+    {
+      "idx": 5,
+      "source_effect_bbox": [
+        1249,
+        3295,
+        1512,
+        3538
+      ],
+      "localized_bbox": [
+        1265,
+        3317,
+        1496,
+        3516
+      ],
+      "delta_left": 16,
+      "delta_right": 16,
+      "delta_top": 22,
+      "delta_bottom": 22,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "아웃런",
+        "모드",
+        "15코스",
+        "연속"
+      ],
+      "style": "white_dark"
+    },
+    {
+      "idx": 6,
+      "source_effect_bbox": [
+        1845,
+        3277,
+        2102,
+        3488
+      ],
+      "localized_bbox": [
+        1849,
+        3317,
+        2097,
+        3447
+      ],
+      "delta_left": 4,
+      "delta_right": 5,
+      "delta_top": 40,
+      "delta_bottom": 41,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "타임 어택",
+        "모드"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 7,
+      "source_effect_bbox": [
+        2429,
+        3277,
+        2686,
+        3488
+      ],
+      "localized_bbox": [
+        2432,
+        3317,
+        2682,
+        3447
+      ],
+      "delta_left": 3,
+      "delta_right": 4,
+      "delta_top": 40,
+      "delta_bottom": 41,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "하트 어택",
+        "모드"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 8,
+      "source_effect_bbox": [
+        703,
+        3715,
+        934,
+        3866
+      ],
+      "localized_bbox": [
+        717,
+        3730,
+        920,
+        3851
+      ],
+      "delta_left": 14,
+      "delta_right": 14,
+      "delta_top": 15,
+      "delta_bottom": 15,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "아웃런",
+        "모드"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 9,
+      "source_effect_bbox": [
+        1261,
+        3717,
+        1518,
+        3928
+      ],
+      "localized_bbox": [
+        1265,
+        3757,
+        1513,
+        3887
+      ],
+      "delta_left": 4,
+      "delta_right": 5,
+      "delta_top": 40,
+      "delta_bottom": 41,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "타임 어택",
+        "모드"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 10,
+      "source_effect_bbox": [
+        1845,
+        3717,
+        2102,
+        3928
+      ],
+      "localized_bbox": [
+        1848,
+        3757,
+        2098,
+        3887
+      ],
+      "delta_left": 3,
+      "delta_right": 4,
+      "delta_top": 40,
+      "delta_bottom": 41,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "하트 어택",
+        "모드"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 11,
+      "source_effect_bbox": [
+        2455,
+        3715,
+        2686,
+        3866
+      ],
+      "localized_bbox": [
+        2469,
+        3730,
+        2672,
+        3851
+      ],
+      "delta_left": 14,
+      "delta_right": 14,
+      "delta_top": 15,
+      "delta_bottom": 15,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "아웃런",
+        "모드"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 29,
+      "source_effect_bbox": [
+        2223,
+        2428,
+        2418,
+        2517
+      ],
+      "localized_bbox": [
+        2230,
+        2436,
+        2410,
+        2508
+      ],
+      "delta_left": 7,
+      "delta_right": 8,
+      "delta_top": 8,
+      "delta_bottom": 9,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "무작위"
+      ],
+      "style": "white_random"
+    },
+    {
+      "idx": 43,
+      "source_effect_bbox": [
+        2738,
+        1722,
+        2992,
+        1838
+      ],
+      "localized_bbox": [
+        2753,
+        1732,
+        2976,
+        1827
+      ],
+      "delta_left": 15,
+      "delta_right": 16,
+      "delta_top": 10,
+      "delta_bottom": 11,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "예"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 44,
+      "source_effect_bbox": [
+        3138,
+        1722,
+        3355,
+        1838
+      ],
+      "localized_bbox": [
+        3142,
+        1738,
+        3351,
+        1821
+      ],
+      "delta_left": 4,
+      "delta_right": 4,
+      "delta_top": 16,
+      "delta_bottom": 17,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "아니오"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 45,
+      "source_effect_bbox": [
+        3502,
+        1698,
+        3683,
+        1863
+      ],
+      "localized_bbox": [
+        3513,
+        1713,
+        3672,
+        1848
+      ],
+      "delta_left": 11,
+      "delta_right": 11,
+      "delta_top": 15,
+      "delta_bottom": 15,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "타임 어택",
+        "모드",
+        "15코스",
+        "연속"
+      ],
+      "style": "white_dark"
+    },
+    {
+      "idx": 46,
+      "source_effect_bbox": [
+        3694,
+        2122,
+        3875,
+        2287
+      ],
+      "localized_bbox": [
+        3705,
+        2137,
+        3864,
+        2272
+      ],
+      "delta_left": 11,
+      "delta_right": 11,
+      "delta_top": 15,
+      "delta_bottom": 15,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "아웃런",
+        "모드",
+        "15코스",
+        "연속"
+      ],
+      "style": "white_dark"
+    },
+    {
+      "idx": 47,
+      "source_effect_bbox": [
+        3688,
+        2524,
+        3879,
+        2669
+      ],
+      "localized_bbox": [
+        3691,
+        2546,
+        3875,
+        2646
+      ],
+      "delta_left": 3,
+      "delta_right": 4,
+      "delta_top": 22,
+      "delta_bottom": 23,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "타임 어택",
+        "모드"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 48,
+      "source_effect_bbox": [
+        48,
+        1252,
+        239,
+        1397
+      ],
+      "localized_bbox": [
+        51,
+        1274,
+        236,
+        1374
+      ],
+      "delta_left": 3,
+      "delta_right": 3,
+      "delta_top": 22,
+      "delta_bottom": 23,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "하트 어택",
+        "모드"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 49,
+      "source_effect_bbox": [
+        459,
+        1252,
+        631,
+        1358
+      ],
+      "localized_bbox": [
+        469,
+        1262,
+        620,
+        1348
+      ],
+      "delta_left": 10,
+      "delta_right": 11,
+      "delta_top": 10,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "아웃런",
+        "모드"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 50,
+      "source_effect_bbox": [
+        832,
+        1252,
+        1023,
+        1397
+      ],
+      "localized_bbox": [
+        835,
+        1274,
+        1019,
+        1374
+      ],
+      "delta_left": 3,
+      "delta_right": 4,
+      "delta_top": 22,
+      "delta_bottom": 23,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "타임 어택",
+        "모드"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 51,
+      "source_effect_bbox": [
+        1224,
+        1252,
+        1415,
+        1397
+      ],
+      "localized_bbox": [
+        1227,
+        1274,
+        1412,
+        1374
+      ],
+      "delta_left": 3,
+      "delta_right": 3,
+      "delta_top": 22,
+      "delta_bottom": 23,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "하트 어택",
+        "모드"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 52,
+      "source_effect_bbox": [
+        1635,
+        1252,
+        1807,
+        1358
+      ],
+      "localized_bbox": [
+        1645,
+        1262,
+        1796,
+        1348
+      ],
+      "delta_left": 10,
+      "delta_right": 11,
+      "delta_top": 10,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "아웃런",
+        "모드"
+      ],
+      "style": "orange_blue"
+    },
+    {
+      "idx": 59,
+      "source_effect_bbox": [
+        1151,
+        1056,
+        1965,
+        1173
+      ],
+      "localized_bbox": [
+        1158,
+        1073,
+        1958,
+        1155
+      ],
+      "delta_left": 7,
+      "delta_right": 7,
+      "delta_top": 17,
+      "delta_bottom": 18,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "조작이 어려운 차량입니다."
+      ],
+      "style": "white_red_help"
+    },
+    {
+      "idx": 60,
+      "source_effect_bbox": [
+        2293,
+        1020,
+        2869,
+        1170
+      ],
+      "localized_bbox": [
+        2328,
+        1034,
+        2834,
+        1156
+      ],
+      "delta_left": 35,
+      "delta_right": 35,
+      "delta_top": 14,
+      "delta_bottom": 14,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "상급자용"
+      ],
+      "style": "red_white_help"
+    },
+    {
+      "idx": 61,
+      "source_effect_bbox": [
+        4,
+        737,
+        1547,
+        929
+      ],
+      "localized_bbox": [
+        11,
+        763,
+        1539,
+        903
+      ],
+      "delta_left": 7,
+      "delta_right": 8,
+      "delta_top": 26,
+      "delta_bottom": 26,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "참가자를 기다리는 중입니다."
+      ],
+      "style": "cream_help"
+    },
+    {
+      "idx": 62,
+      "source_effect_bbox": [
+        1639,
+        753,
+        3305,
+        930
+      ],
+      "localized_bbox": [
+        1672,
+        769,
+        3272,
+        914
+      ],
+      "delta_left": 33,
+      "delta_right": 33,
+      "delta_top": 16,
+      "delta_bottom": 16,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "참가 접수가 종료되었습니다."
+      ],
+      "style": "cream_help"
+    },
+    {
+      "idx": 63,
+      "source_effect_bbox": [
+        159,
+        528,
+        1369,
+        714
+      ],
+      "localized_bbox": [
+        184,
+        545,
+        1344,
+        697
+      ],
+      "delta_left": 25,
+      "delta_right": 25,
+      "delta_top": 17,
+      "delta_bottom": 17,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "잠시 기다려 주세요."
+      ],
+      "style": "cream_help"
+    },
+    {
+      "idx": 64,
+      "source_effect_bbox": [
+        1569,
+        546,
+        1806,
+        672
+      ],
+      "localized_bbox": [
+        1583,
+        557,
+        1791,
+        660
+      ],
+      "delta_left": 14,
+      "delta_right": 15,
+      "delta_top": 11,
+      "delta_bottom": 12,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "수동",
+        "변속"
+      ],
+      "style": "orange_redplate"
+    },
+    {
+      "idx": 65,
+      "source_effect_bbox": [
+        1949,
+        549,
+        2166,
+        648
+      ],
+      "localized_bbox": [
+        1962,
+        558,
+        2152,
+        639
+      ],
+      "delta_left": 13,
+      "delta_right": 14,
+      "delta_top": 9,
+      "delta_bottom": 9,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "자동",
+        "변속"
+      ],
+      "style": "yellow_greenplate"
+    },
+    {
+      "idx": 66,
+      "source_effect_bbox": [
+        2321,
+        549,
+        2548,
+        696
+      ],
+      "localized_bbox": [
+        2335,
+        562,
+        2534,
+        682
+      ],
+      "delta_left": 14,
+      "delta_right": 14,
+      "delta_top": 13,
+      "delta_bottom": 14,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "실제",
+        "플레이어",
+        "전용"
+      ],
+      "style": "orange_yellowplate"
+    },
+    {
+      "idx": 82,
+      "source_effect_bbox": [
+        2876,
+        218,
+        3276,
+        330
+      ],
+      "localized_bbox": [
+        2896,
+        230,
+        3256,
+        317
+      ],
+      "delta_left": 20,
+      "delta_right": 20,
+      "delta_top": 12,
+      "delta_bottom": 13,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "수동"
+      ],
+      "style": "red_glow"
+    },
+    {
+      "idx": 83,
+      "source_effect_bbox": [
+        12,
+        51,
+        1608,
+        157
+      ],
+      "localized_bbox": [
+        108,
+        61,
+        1512,
+        147
+      ],
+      "delta_left": 96,
+      "delta_right": 96,
+      "delta_top": 10,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "상급자용: 조작이 어려운 차량입니다."
+      ],
+      "style": "white_red_help"
+    },
+    {
+      "idx": 84,
+      "source_effect_bbox": [
+        1632,
+        47,
+        2969,
+        158
+      ],
+      "localized_bbox": [
+        1712,
+        57,
+        2888,
+        148
+      ],
+      "delta_left": 80,
+      "delta_right": 81,
+      "delta_top": 10,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "상급자용: 기어 변속이 필요합니다."
+      ],
+      "style": "white_red_help"
+    },
+    {
+      "idx": 85,
+      "source_effect_bbox": [
+        3003,
+        41,
+        3341,
+        153
+      ],
+      "localized_bbox": [
+        3020,
+        53,
+        3324,
+        140
+      ],
+      "delta_left": 17,
+      "delta_right": 17,
+      "delta_top": 12,
+      "delta_bottom": 13,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "korean_lines": [
+        "튜닝"
+      ],
+      "style": "red_glow"
+    }
+  ],
+  "all_33_bbox_size_positive_margin_pass": true,
+  "machine_checks": {
+    "clean_changed_outside_union_source_bboxes": 0,
+    "final_changed_outside_union_source_bboxes": 0,
+    "clean_alpha_outside_union_source_bboxes": 0,
+    "final_alpha_outside_union_source_bboxes": 0,
+    "protected_clean_changed": 0,
+    "protected_final_changed": 0,
+    "clean_source_core_unchanged": 0,
+    "source_core_residue_pixels": 0,
+    "render_outside_union_source_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_pair_1px_touch_pixels": 0,
+    "localized_render_on_protected_pixels": 0,
+    "localized_render_1px_near_protected_pixels": 0
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "preview_b64_files": [
+    "localization/graphics/role_C/20261005-C177-37759842/C177_CONTACTS_1_B64.txt",
+    "localization/graphics/role_C/20261005-C177-37759842/C177_CONTACTS_2_B64.txt",
+    "localization/graphics/role_C/20261005-C177-37759842/C177_CONTACTS_3_B64.txt"
+  ]
+}
