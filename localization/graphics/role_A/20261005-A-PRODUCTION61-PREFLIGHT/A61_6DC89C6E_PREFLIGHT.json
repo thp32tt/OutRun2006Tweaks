@@ -1,0 +1,513 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION61-PREFLIGHT",
+  "index": 173,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "9f6bb6ed5682119fe05d384401561ce97c4faf1a",
+    "atlas_git_blob_sha1": "7d7c1093213b4898487c254ab91cde93c174a732",
+    "source_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3"
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "region_idx": 0,
+      "cell": [
+        0,
+        1952,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        2,
+        1962,
+        585,
+        2042
+      ],
+      "width": 583,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 1,
+      "cell": [
+        0,
+        1856,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        2,
+        1862,
+        626,
+        1942
+      ],
+      "width": 624,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 2,
+      "cell": [
+        0,
+        1760,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        2,
+        1766,
+        638,
+        1846
+      ],
+      "width": 636,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 3,
+      "cell": [
+        0,
+        1664,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        8,
+        1674,
+        706,
+        1754
+      ],
+      "width": 698,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 4,
+      "cell": [
+        0,
+        1568,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        8,
+        1580,
+        516,
+        1656
+      ],
+      "width": 508,
+      "height": 76,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 5,
+      "cell": [
+        0,
+        1472,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        7,
+        1478,
+        461,
+        1558
+      ],
+      "width": 454,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 6,
+      "cell": [
+        0,
+        1376,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        6,
+        1382,
+        360,
+        1462
+      ],
+      "width": 354,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 7,
+      "cell": [
+        0,
+        1280,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        1,
+        1286,
+        351,
+        1366
+      ],
+      "width": 350,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 8,
+      "cell": [
+        0,
+        1184,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        8,
+        1190,
+        468,
+        1270
+      ],
+      "width": 460,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 9,
+      "cell": [
+        0,
+        1088,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        6,
+        1094,
+        690,
+        1174
+      ],
+      "width": 684,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 10,
+      "cell": [
+        0,
+        992,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        5,
+        1002,
+        735,
+        1082
+      ],
+      "width": 730,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 11,
+      "cell": [
+        0,
+        896,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        5,
+        906,
+        613,
+        986
+      ],
+      "width": 608,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 12,
+      "cell": [
+        0,
+        800,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        5,
+        810,
+        361,
+        890
+      ],
+      "width": 356,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 13,
+      "cell": [
+        0,
+        704,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        7,
+        714,
+        512,
+        794
+      ],
+      "width": 505,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 14,
+      "cell": [
+        0,
+        608,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        0,
+        618,
+        643,
+        698
+      ],
+      "width": 643,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 15,
+      "cell": [
+        0,
+        512,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        1,
+        522,
+        769,
+        602
+      ],
+      "width": 768,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 16,
+      "cell": [
+        0,
+        416,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        6,
+        426,
+        572,
+        506
+      ],
+      "width": 566,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 17,
+      "cell": [
+        0,
+        320,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        7,
+        330,
+        571,
+        410
+      ],
+      "width": 564,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 18,
+      "cell": [
+        0,
+        224,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        7,
+        234,
+        1017,
+        314
+      ],
+      "width": 1010,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 19,
+      "cell": [
+        0,
+        128,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        12,
+        140,
+        844,
+        218
+      ],
+      "width": 832,
+      "height": 78,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    },
+    {
+      "region_idx": 20,
+      "cell": [
+        0,
+        32,
+        1400,
+        96
+      ],
+      "source_bbox": [
+        12,
+        42,
+        666,
+        122
+      ],
+      "width": 654,
+      "height": 80,
+      "median_rgba": [
+        79,
+        97,
+        101,
+        255
+      ]
+    }
+  ],
+  "readiness_tier": "ONE_STAGE_TO_RENDER_SEMANTIC_PHYSICAL_BINDING",
+  "evidence": "localization/graphics/role_A/20261005-A-PRODUCTION61-PREFLIGHT/A61_6DC89C6E_SOURCE_ROWS.jpg",
+  "status": "A61_PREFLIGHT_SOURCE_CONTACT_READY_FOR_CONTROLLER_BINDING_AND_SAME_INVOCATION_RENDER",
+  "runtime_validation": "UNTESTED"
+}
