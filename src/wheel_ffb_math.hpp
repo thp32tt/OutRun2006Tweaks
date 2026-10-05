@@ -13,7 +13,7 @@ namespace WheelFFBMath
     {
         ModernDD = 0,
         ArcadeOriginal = 1,
-        ArcadeHybrid = 2,
+        RetiredLegacyModel2 = 2,
         PS2OriginalExperimental = 3,
     };
 
@@ -36,7 +36,6 @@ namespace WheelFFBMath
         switch (model)
         {
         case Model::ArcadeOriginal: return "ARCADE_ORIGINAL";
-        case Model::ArcadeHybrid: return "ARCADE_HYBRID";
         case Model::PS2OriginalExperimental: return "PS2_ORIGINAL_EXPERIMENTAL";
         default: return "MODERN_DD";
         }
@@ -44,12 +43,12 @@ namespace WheelFFBMath
 
     inline bool model_uses_modern_sat(Model model)
     {
-        return model == Model::ModernDD || model == Model::ArcadeHybrid;
+        return model == Model::ModernDD;
     }
 
     inline bool model_uses_arcade_events(Model model)
     {
-        return model == Model::ArcadeOriginal || model == Model::ArcadeHybrid;
+        return model == Model::ArcadeOriginal;
     }
 
     inline bool model_uses_original_condition_backbone(Model model)
@@ -59,7 +58,7 @@ namespace WheelFFBMath
     }
 
     // MOZA R3 hardware A/B establishes opposite DirectInput polarity families:
-    // Modern DD needs both output and Spring reversed, while Arcade/Hybrid/PS2
+    // Modern DD needs both output and Spring reversed, while Arcade/PS2
     // use the backend's native signs.  Keep this model rule in one place so
     // profile/UI/runtime paths cannot drift apart again.
     inline bool model_uses_reversed_r3_polarity(Model model)
@@ -478,11 +477,12 @@ namespace WheelFFBMath
             (std::clamp(speedNorm, 0.0f, 1.0f) - 0.04f) / 0.30f);
         const float roadScale = std::clamp(roadSetting / 0.60f, 0.0f, 1.67f);
         const float gainScale = std::clamp(outputStrength / 0.70f, 0.0f, 2.0f);
-        // Stronger than the earlier 4.5-7.5% prototype: the R3 test still felt
-        // nearly smooth. Keep it below curb/grass texture and hard-cap at 16%.
+        // R12 hardware follow-up: Imperial Avenue still felt too smooth on R3.
+        // Raise only this evidence-scoped stage/mask family; generic rough roads
+        // retain their existing comfort scaling.
         return std::clamp(
-            (0.080f + 0.060f * speedGate) * roadScale * gainScale,
-            0.0f, 0.16f);
+            (0.100f + 0.080f * speedGate) * roadScale * gainScale,
+            0.0f, 0.20f);
     }
 
 
@@ -537,7 +537,7 @@ namespace WheelFFBMath
     inline float collision_tactile_pulse(int impactFrame, float hostScale)
     {
         static constexpr std::array<float, 6> Pattern = {
-            0.72f, -0.56f, 0.42f, -0.30f, 0.20f, -0.12f
+            0.90f, -0.68f, 0.50f, -0.36f, 0.24f, -0.14f
         };
         if (impactFrame < 0 || impactFrame >= static_cast<int>(Pattern.size()))
             return 0.0f;
