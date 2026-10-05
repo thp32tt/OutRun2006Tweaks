@@ -155,6 +155,7 @@ if residue:raise RuntimeError(('clean residue',residue))
 # Independent clean sanity: every target-family fill seed is gone, while every preserved source alpha pixel remains byte exact.
 leftover_fill={}
 for k,info in mask_discovery.items():
+ if k not in source_masks: continue
  x0,y0,x1,y1=info['seed_bbox']; q=clean_arr[y0:y1,x0:x1]; a=q[:,:,3]>0; rr=q[:,:,0].astype(np.int16);gg=q[:,:,1].astype(np.int16);bb=q[:,:,2].astype(np.int16)
  kind=info['seed_kind']
  if kind=='red': fm=a&(rr>=125)&(rr>=gg+45)&(rr>=bb+25)
