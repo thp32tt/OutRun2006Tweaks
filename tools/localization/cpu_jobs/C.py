@@ -2,23 +2,26 @@
 import os,json,hashlib,struct,urllib.request,base64,io
 from pathlib import Path
 import numpy as np
-from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter
+from PIL import Image,ImageDraw,ImageFont,ImageChops
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
-repo=Path.cwd(); run="20261005-C186-37759842"
+repo=Path.cwd(); run="20261005-C187-25F697C6"
 out=repo/"localization/graphics/role_C"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
-pd=repo/"localization/graphics/role_A/20261005-A-PRODUCTION45"
-pr=json.loads((pd/"A45_37759842_REPORT.json").read_text())
-asset=pr["asset"]; candidate=repo/pr["candidate_path"]
-sp=pr["source_provenance"]; expected_source_sha=sp["sha256"]; expected_candidate_sha=pr["candidate_sha256"]
-tmp=Path("/tmp/c185"); tmp.mkdir(exist_ok=True); srcdds=tmp/"source.dds"
-urllib.request.urlretrieve(f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{sp['commit']}/{sp['path']}",srcdds)
+pd=repo/"localization/graphics/role_A/20261005-A-PRODUCTION47"
+pr=json.loads((pd/"A47_25F697C6_REPORT.json").read_text())
+asset=pr["asset"]; candidate=repo/pr["candidate_path"]; sp=pr["source_provenance"]
+srcurl=f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{sp['commit']}/Release/{asset.split('/')[-2]}/{asset.split('/')[-1]}"
+tmp=Path("/tmp/c187"); tmp.mkdir(exist_ok=True); srcdds=tmp/"source.dds"
+urllib.request.urlretrieve(srcurl,srcdds)
 
 def sha(b): return hashlib.sha256(b).hexdigest()
 def count(m): return int(np.count_nonzero(m))
+def bbox(m):
+    yy,xx=np.nonzero(m)
+    return None if len(xx)==0 else [int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1]
 def decode(data):
     if data[:4]!=b"DDS ": raise RuntimeError("not dds")
     H,W,pitch,depth,mips=struct.unpack_from("<5I",data,12)
@@ -27,115 +30,127 @@ def decode(data):
     if mode is None or len(data)!=128+W*H*4: raise RuntimeError(("structure",W,H,mips,masks,len(data)))
     raw=Image.frombytes("RGBA",(W,H),data[128:],"raw",mode)
     return raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM),raw,[W,H],mips,mode
-def comp(im,bg=(72,72,72,255)):
+def comp(im,bg=(75,75,75,255)):
     z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
-def saveb64(im,path,q=94):
+def saveb64(im,path,q=95):
     b=io.BytesIO(); im.save(b,"JPEG",quality=q,optimize=True); path.write_text(base64.b64encode(b.getvalue()).decode())
 
 sb=srcdds.read_bytes(); cb=candidate.read_bytes()
-if sha(sb)!=expected_source_sha: raise RuntimeError(("source sha drift",sha(sb),expected_source_sha))
-if sha(cb)!=expected_candidate_sha: raise RuntimeError(("candidate sha drift",sha(cb),expected_candidate_sha))
+if sha(sb)!=sp["sha256"]: raise RuntimeError(("source sha drift",sha(sb),sp["sha256"]))
+if sha(cb)!=pr["candidate_sha256"]: raise RuntimeError(("candidate sha drift",sha(cb),pr["candidate_sha256"]))
 src,raw_src,dims,mips,mode=decode(sb); final,raw_final,dims2,mips2,mode2=decode(cb)
-if dims!=[4096,4096] or dims2!=dims or mips2!=mips or cb[:128]!=sb[:128]: raise RuntimeError("structure/header drift")
+if dims!=[2048,2048] or dims2!=dims or mips2!=mips or cb[:128]!=sb[:128]: raise RuntimeError("structure/header drift")
 W,H=dims
-prodsrc=Image.open(pd/"37759842_HD_SOURCE_READABLE.png").convert("RGBA")
-if ImageChops.difference(src,prodsrc).getbbox(): raise RuntimeError("producer source PNG != canonical decode")
-clean=Image.open(pd/"37759842_HD_CLEAN_PLATE.png").convert("RGBA")
-sa=np.asarray(src,dtype=np.uint8); ca=np.asarray(clean,dtype=np.uint8); fa=np.asarray(final,dtype=np.uint8)
-source_core=np.asarray(Image.open(pd/"37759842_HD_SOURCE_CORE_MASK.png").convert("L"))>0
-protected=np.asarray(Image.open(pd/"37759842_HD_PROTECTED_VISIBLE_MASK.png").convert("L"))>0
-rows=pr["rows"]; allowed=np.zeros((H,W),bool); rowchecks=[]
-for r in rows:
-    ob=[int(v) for v in r["source_effect_bbox"]]; lb=[int(v) for v in r["localized_bbox"]]
-    x0,y0,x1,y1=ob; a,b,c,d=lb; allowed[y0:y1,x0:x1]=True
-    dl,dr,dt,db=a-x0,x1-c,b-y0,y1-d
-    rowchecks.append({"idx":r["idx"],"style":r.get("style"),"mode":r.get("mode"),"kind":r.get("kind"),
-      "korean_lines":r.get("korean_lines"),"source_effect_bbox":ob,"localized_bbox":lb,
-      "delta_left":dl,"delta_right":dr,"delta_top":dt,"delta_bottom":db,
-      "containment":"PASS" if a>=x0 and b>=y0 and c<=x1 and d<=y1 else "FAIL",
-      "size_ceiling":"PASS" if c-a<=x1-x0 and d-b<=y1-y0 else "FAIL",
-      "positive_margin":"PASS" if min(dl,dr,dt,db)>0 else "FAIL"})
-if len(rowchecks)!=33: raise RuntimeError(("row count",len(rowchecks)))
+sa=np.asarray(src,dtype=np.uint8); fa=np.asarray(final,dtype=np.uint8)
 
-cdiff=np.any(ca!=sa,axis=2); fdiff=np.any(fa!=sa,axis=2); render=np.any(fa!=ca,axis=2)
-guard=np.asarray(Image.fromarray((render.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(5)))>0
+rows=pr["rows"]
+# Build union of producer-declared exact source bboxes.
+allowed=np.zeros((H,W),bool)
+for r in rows:
+    x0,y0,x1,y1=map(int,r["source_effect_bbox"]); allowed[y0:y1,x0:x1]=True
+
+# Independently determine the flat background RGBA from pixels outside all target bboxes.
+# This asset is a flat selector text atlas. Use the modal RGBA among all non-target pixels,
+# which is robust against preserved Ferrari/model labels occupying a minority of the canvas.
+outside=sa[~allowed]
+vals,cnts=np.unique(outside.reshape(-1,4),axis=0,return_counts=True)
+bg=vals[int(np.argmax(cnts))]
+bg_tuple=[int(x) for x in bg]
+expected=sa.copy()
+for r in rows:
+    x0,y0,x1,y1=map(int,r["source_effect_bbox"]); expected[y0:y1,x0:x1]=bg
+expected_clean=Image.fromarray(expected,"RGBA")
+
+# Protected source must be byte/pixel exact outside source bboxes.
 machine={
- "clean_changed_outside_union_source_bboxes":count(cdiff&~allowed),
- "final_changed_outside_union_source_bboxes":count(fdiff&~allowed),
- "clean_alpha_outside_union_source_bboxes":count((ca[:,:,3]!=sa[:,:,3])&~allowed),
- "final_alpha_outside_union_source_bboxes":count((fa[:,:,3]!=sa[:,:,3])&~allowed),
- "render_outside_union_source_bboxes":count(render&~allowed),
- "protected_clean_changed":count(cdiff&protected),
- "protected_final_changed":count(fdiff&protected),
- "clean_source_core_unchanged":count(source_core & np.all(ca==sa,axis=2)),
- "source_core_residue_pixels":count(source_core & np.all(fa==sa,axis=2) & ~guard)
+ "final_changed_outside_union_source_bboxes":count(np.any(fa!=sa,axis=2)&~allowed),
+ "final_alpha_changed_outside_union_source_bboxes":count((fa[:,:,3]!=sa[:,:,3])&~allowed)
 }
-# Pairwise render separation.
+
+rowchecks=[]
+render_union=np.zeros((H,W),bool)
+for r in rows:
+    ob=list(map(int,r["source_effect_bbox"])); declared=list(map(int,r["localized_bbox"]))
+    x0,y0,x1,y1=ob
+    # Any candidate pixel different from the exact reconstructed flat background is localized content.
+    diff=np.any(fa[y0:y1,x0:x1]!=bg,axis=2)
+    actual=bbox(diff)
+    if actual is not None:
+        actual=[actual[0]+x0,actual[1]+y0,actual[2]+x0,actual[3]+y0]
+        ax0,ay0,ax1,ay1=actual; render_union[ay0:ay1,ax0:ax1] |= np.any(fa[ay0:ay1,ax0:ax1]!=bg,axis=2)
+    else:
+        actual=None
+    # Exact clean-residue gate: outside the declared localized bbox, every target-bbox pixel must be flat background.
+    lx0,ly0,lx1,ly1=declared
+    local_box=np.zeros((H,W),bool); local_box[ly0:ly1,lx0:lx1]=True
+    target=np.zeros((H,W),bool); target[y0:y1,x0:x1]=True
+    residue_mask=target & ~local_box & np.any(fa!=bg,axis=2)
+    dl=declared[0]-x0; dr=x1-declared[2]; dt=declared[1]-y0; db=y1-declared[3]
+    rowchecks.append({
+      "idx":r["idx"],"source":r["source"],"korean":r["korean"],
+      "source_effect_bbox":ob,"declared_localized_bbox":declared,"independent_actual_localized_bbox":actual,
+      "delta_left":dl,"delta_right":dr,"delta_top":dt,"delta_bottom":db,
+      "containment":"PASS" if lx0>=x0 and ly0>=y0 and lx1<=x1 and ly1<=y1 else "FAIL",
+      "size_ceiling":"PASS" if lx1-lx0<=x1-x0 and ly1-ly0<=y1-y0 else "FAIL",
+      "positive_margin":"PASS" if min(dl,dr,dt,db)>0 else "FAIL",
+      "flat_background_residue_outside_declared_localized_bbox":count(residue_mask)
+    })
+
+# Candidate text may not overlap/touch another localized target.
 masks=[]
 for rc in rowchecks:
-    x0,y0,x1,y1=rc["source_effect_bbox"]; m=np.zeros((H,W),bool); m[y0:y1,x0:x1]=render[y0:y1,x0:x1]; masks.append(m)
-ov=touch=0
+    lx0,ly0,lx1,ly1=rc["declared_localized_bbox"]
+    m=np.zeros((H,W),bool); m[ly0:ly1,lx0:lx1]=np.any(fa[ly0:ly1,lx0:lx1]!=bg,axis=2); masks.append(m)
+overlap=touch=0
+from PIL import ImageFilter
 for i,mi in enumerate(masks):
     di=np.asarray(Image.fromarray((mi.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0
     for mj in masks[i+1:]:
-        ov+=count(mi&mj); touch+=count(di&mj)
-machine["localized_pair_overlap_pixels"]=ov; machine["localized_pair_1px_touch_pixels"]=touch
-rowpass=all(x["containment"]=="PASS" and x["size_ceiling"]=="PASS" and x["positive_margin"]=="PASS" for x in rowchecks)
-status="PASS" if rowpass and all(v==0 for v in machine.values()) else "FAIL"
+        overlap+=count(mi&mj); touch+=count(di&mj)
+machine["localized_pair_overlap_pixels"]=overlap
+machine["localized_pair_1px_touch_pixels"]=touch
+machine["flat_background_residue_pixels_total"]=sum(x["flat_background_residue_outside_declared_localized_bbox"] for x in rowchecks)
 
-# Full visual contacts in 3 groups of 11, generous context to catch template-shaped reconstruction.
-font=ImageFont.load_default(); evidence=[]
-for gi,grp in enumerate((rowchecks[:11],rowchecks[11:22],rowchecks[22:]),1):
-    cards=[]
-    for rc in grp:
-        x0,y0,x1,y1=rc["source_effect_bbox"]; px=max(24,min(80,(x1-x0)//3)); py=max(20,min(60,(y1-y0)//2))
-        crop=(max(0,x0-px),max(0,y0-py),min(W,x1+px),min(H,y1+py))
-        ims=[comp(z).crop(crop) for z in (src,clean,final)]
-        th=min(230,max(100,max(z.height for z in ims))); rr=[]
-        for z in ims:
-            if z.height>th: z=z.resize((max(1,round(z.width*th/z.height)),th),Image.Resampling.LANCZOS)
-            rr.append(z)
-        pw=max(330,max(z.width for z in rr)); card=Image.new("RGB",(pw*3+24,th+34),"white"); d=ImageDraw.Draw(card)
-        for ci,(lab,z) in enumerate(zip(("SOURCE","CLEAN","FINAL"),rr)):
-            ox=ci*pw+8; card.paste(z,(ox,28)); d.text((ox,6),lab,fill="black",font=font)
-        d.text((pw*2+120,6),f"idx {rc['idx']} {rc.get('kind','')}",fill="black",font=font); cards.append(card)
-    sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+8*(len(cards)-1)),"white"); yy=0
-    for card in cards: sheet.paste(card,(0,yy)); yy+=card.height+8
-    if sheet.width>2000: sheet=sheet.resize((2000,round(sheet.height*2000/sheet.width)),Image.Resampling.LANCZOS)
-    fn=out/f"C186_CONTACTS_{gi}_B64.txt"; saveb64(sheet,fn,94); evidence.append(str(fn.relative_to(repo)))
+rowpass=all(x["containment"]=="PASS" and x["size_ceiling"]=="PASS" and x["positive_margin"]=="PASS" and x["flat_background_residue_outside_declared_localized_bbox"]==0 for x in rowchecks)
+status="PASS" if rowpass and all(machine[k]==0 for k in ["final_changed_outside_union_source_bboxes","final_alpha_changed_outside_union_source_bboxes","localized_pair_overlap_pixels","localized_pair_1px_touch_pixels","flat_background_residue_pixels_total"]) else "FAIL"
 
-# Focus specifically on plate-mode targets implicated by C177/A40.
-focus=[x for x in rowchecks if x["mode"]=="plate"]
-cards=[]
-for rc in focus:
-    x0,y0,x1,y1=rc["source_effect_bbox"]; crop=(max(0,x0-45),max(0,y0-35),min(W,x1+45),min(H,y1+35))
-    ims=[comp(z).crop(crop) for z in (src,clean,final)]; th=min(180,max(z.height for z in ims)); rr=[]
-    for z in ims:
-        if z.height>th: z=z.resize((max(1,round(z.width*th/z.height)),th),Image.Resampling.LANCZOS)
-        rr.append(z)
-    pw=max(250,max(z.width for z in rr)); card=Image.new("RGB",(pw*3+18,th+26),"white"); d=ImageDraw.Draw(card)
-    for ci,(lab,z) in enumerate(zip(("S","C","F"),rr)):
-        ox=ci*pw+6; card.paste(z,(ox,22)); d.text((ox,3),f"{lab} idx{rc['idx']}",fill="black",font=font)
+# Persist exact independent clean plate PNG as C evidence.
+expected_clean.save(out/"C187_INDEPENDENT_EXACT_CLEAN_PLATE.png")
+
+font=ImageFont.load_default(); cards=[]
+for rc in rowchecks:
+    x0,y0,x1,y1=rc["source_effect_bbox"]; pad=20
+    crop=(max(0,x0-pad),max(0,y0-pad),min(W,x1+pad),min(H,y1+pad))
+    ims=[comp(z).crop(crop) for z in (src,expected_clean,final)]
+    ch=max(i.height for i in ims); cw=max(i.width for i in ims)
+    card=Image.new("RGB",(cw*3+18,ch+28),"white"); d=ImageDraw.Draw(card)
+    for k,(lab,z) in enumerate(zip(("SOURCE","CLEAN(C)","FINAL"),ims)):
+        ox=k*cw+6; card.paste(z,(ox,24)); d.text((ox,4),lab,fill="black",font=font)
+    d.text((cw*2+110,4),f"idx {rc['idx']} {rc['source']} -> {rc['korean']}",fill="black",font=font)
     cards.append(card)
-if cards:
-    sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+5*(len(cards)-1)),"white"); yy=0
-    for card in cards: sheet.paste(card,(0,yy)); yy+=card.height+5
-    if sheet.width>1800: sheet=sheet.resize((1800,round(sheet.height*1800/sheet.width)),Image.Resampling.LANCZOS)
-    fn=out/"C186_PLATE_FOCUS_B64.txt"; saveb64(sheet,fn,95); evidence.append(str(fn.relative_to(repo)))
-
+sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+6*(len(cards)-1)),"white")
+yy=0
+for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+6
+if sheet.width>1800: sheet=sheet.resize((1800,round(sheet.height*1800/sheet.width)),Image.Resampling.LANCZOS)
+saveb64(sheet,out/"C187_CONTACTS_B64.txt",95)
 rawcard=Image.new("RGB",(1024,2070),"white")
 for i,(lab,z) in enumerate((("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_final))):
     zz=comp(z).resize((1024,1024),Image.Resampling.LANCZOS); rawcard.paste(zz,(0,i*1035+22)); ImageDraw.Draw(rawcard).text((5,i*1035+4),lab,fill="black")
-fn=out/"C186_RAW_B64.txt"; saveb64(rawcard,fn,91); evidence.append(str(fn.relative_to(repo)))
+saveb64(rawcard,out/"C187_RAW_B64.txt",92)
 
-report={"schema_version":1,"role":"C","run":run,"qa_id":"C186","queue_index":pr["index"],"asset":asset,
- "producer_run":pr["run"],"source_sha256":expected_source_sha,"candidate_sha256":expected_candidate_sha,
- "independent_source_decode_matches_producer_png":True,
- "structure":{"dimensions":dims,"format":"RGBA32","mipmaps":mips,"raw_orientation":"mirror_y","header_exact":cb[:128]==sb[:128]},
- "row_checks":rowchecks,"all_33_bbox_size_positive_margin_pass":rowpass,
+report={
+ "schema_version":1,"role":"C","run":run,"qa_id":"C187","queue_index":pr["index"],"asset":asset,
+ "producer_run":pr["run"],"source_sha256":sp["sha256"],"candidate_sha256":pr["candidate_sha256"],
+ "structure":{"dimensions":dims,"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"raw_orientation":"mirror_y","header_exact":cb[:128]==sb[:128]},
+ "independent_flat_background_rgba":bg_tuple,
+ "independent_clean_plate":"localization/graphics/role_C/20261005-C187-25F697C6/C187_INDEPENDENT_EXACT_CLEAN_PLATE.png",
+ "row_checks":rowchecks,"all_9_bbox_size_positive_margin_and_residue_pass":rowpass,
  "machine_checks":machine,"machine_status":status,
- "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","decision":"PENDING_CONTROLLER_VISUAL_QA" if status=="PASS" else "C186_REWORK_REQUIRED_MACHINE_GATE",
- "runtime_validation":"UNTESTED","preview_b64_files":evidence}
-(out/"C186_37759842_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-(wr/"C186_37759842.json").write_text(json.dumps({"run":run,"qa_id":"C186","index":pr["index"],"asset":"37759842","candidate_sha256":expected_candidate_sha,"machine_status":status,"all_33_bbox_size_positive_margin_pass":rowpass,"machine_checks":machine,"report":f"localization/graphics/role_C/{run}/C186_37759842_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"qa_id":"C186","machine_status":status,"machine_checks":machine,"evidence":evidence},ensure_ascii=False))
+ "policy_checks":{"stage_names":{"ANCIENT RUINS":"에인션트 루인스","ALPINE":"알파인"},"protected_ferrari_model_labels":"outside target bboxes exact by pixel gate"},
+ "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","decision":"PENDING_CONTROLLER_VISUAL_QA" if status=="PASS" else "C187_REWORK_REQUIRED_MACHINE_GATE",
+ "runtime_validation":"UNTESTED",
+ "preview_b64_files":["localization/graphics/role_C/20261005-C187-25F697C6/C187_CONTACTS_B64.txt","localization/graphics/role_C/20261005-C187-25F697C6/C187_RAW_B64.txt"]
+}
+(out/"C187_25F697C6_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(wr/"C187_25F697C6.json").write_text(json.dumps({"run":run,"qa_id":"C187","index":pr["index"],"asset":"25F697C6","candidate_sha256":pr["candidate_sha256"],"machine_status":status,"machine_checks":machine,"report":f"localization/graphics/role_C/{run}/C187_25F697C6_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"qa_id":"C187","machine_status":status,"background_rgba":bg_tuple,"machine_checks":machine},ensure_ascii=False))
