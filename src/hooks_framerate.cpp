@@ -164,6 +164,8 @@ namespace SumoUISpriteReplay
 		SPRARGS2 args2;
 		OutRunVR::GameSemantic::RenderScope vrScope =
 			OutRunVR::GameSemantic::RenderScope::None;
+		OutRunVR::GameSemantic::ProducerToken vrProducer =
+			OutRunVR::GameSemantic::ProducerToken::None;
 	};
 
 	static Entry Captured[Game::SpriteNodeMax];
@@ -202,6 +204,8 @@ namespace SumoUISpriteReplay
 				entry.vrScope =
 					OutRunVR::GameSemantic::PeekSpriteNodeScope(
 						node, OutRunVR::GameSemantic::RenderScope::None);
+				entry.vrProducer =
+					OutRunVR::GameSemantic::PeekSpriteNodeProducerToken(node);
 			}
 		}
 	}
@@ -249,7 +253,7 @@ namespace SumoUISpriteReplay
 				OutRunVR::GameSemantic::RenderScope::None)
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, entry.vrScope);
+					node, entry.vrScope, entry.vrProducer);
 			}
 		}
 	}
