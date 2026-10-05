@@ -1,0 +1,12 @@
+{
+  "run": "20261005-B-PRODUCTION154-HOLL",
+  "index": 34,
+  "asset": "B7E25BAD",
+  "candidate_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
+  "bbox_size_positive_margin": "1/1",
+  "outside": 0,
+  "alpha_outside": 0,
+  "worker_status": "B154_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_HOLL_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}
