@@ -1,0 +1,21 @@
+{
+  "run": "20261006-A-PRODUCTION79-C05",
+  "index": 215,
+  "asset": "C05E67EF",
+  "source_sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+  "candidate_sha256": "0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b",
+  "physical_rows": 6,
+  "bbox_size_positive_margin": "6/6 PASS",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "render_outside_target": 0,
+  "candidate_vs_clean_outside_target": 0,
+  "overlap": 0,
+  "touch_pairs": 0,
+  "worker_status": "A79_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION79-C05/A79_C05E67EF_REPORT.json"
+}
