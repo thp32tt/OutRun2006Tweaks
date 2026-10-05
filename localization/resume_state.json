@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A90 P1 IGR-013 screenshot(158): exact MIXED split. 6DC89C6E 8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830 natively rerenders all 21 stage-location rows and supersedes A62 lowres18x4; E7F6E9B7 C144 top C2C title preserved; runtime ID1123 스테이지 주행 mapped/reviewed without source change. 21/21 bbox/size/margins and zero scope/protected/residue/overlap/touch; controller visual/raw PASS. Pending C + NEW game retest; not closed.",
     "A89R P1 IGR-003 screenshot(145): exact GRAPHICS multi-asset mapping. 97E863AD cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418 natively rerenders WELCOME/SHOWROOM visible rows; B168 A9 + C171 754F + C149 E95 preserved. 2/2 bbox/size/margins and zero scope/protected gates; controller visual PASS. Pending C + NEW game retest; not closed.",
     "B168 P1 IGR-004 screenshot(146): exact GRAPHICS mapping A9ABD877(index201 header/stage family) + C05E67EF(index215 Goal A-E/15-course list), no runtime text. A9 A69 19px->4x low-res render superseded; B167 native draft failed controller weight fidelity; B168 a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8 native/source-weight retry passes 17/17 bbox/size/margins, zero scope/protected/overlap gates and controller visual QA. C05 0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b A79/C218 native candidate preserved. Hosted worker run 37366457547 attempt1 cancelled; attempt2 later succeeded at authoritative worker commit 0895f3d. N100 MCP fallback executed while the retry was queued ~9m but produced environment-dependent raster SHA d391632d..., so it was discarded after hosted SHA a7a4ea10... arrived. Pending independent C on changed A9 + NEW actual in-game retest; not closed.",
     "A88 P1 IGR-001 screenshot(143) exact GRAPHICS multi-asset repair static/controller PASS: BA0147DA 61ae0c45568e023cc258379173f8d80f43cc5257f2d8facefbcf3c87759179e1 C2C title + 8C259C68 00e16af1e3d468667fe13ed5291ec55bbfd06f18e6895a6be7e79f413ade94bd C2C help + D657C2EB 1a57c385e6c3ea2cc368888041e7106aab79bc4ab364daf0b51edd4465fcc935 C2C selector; C171 754F header preserved. 3 changed rows each 1/1 bbox/size/margin, all scope/protected gates zero, controller visual PASS. Pending independent C + NEW game retest; do not repeat A88 bytes unless C/new game evidence fails.",
@@ -1229,17 +1230,18 @@
     ],
     "latest_a_rework_attempt": "localization/graphics/role_A/20261005-A-PRODUCTION40/A40_CONTROLLER_REWORK.json",
     "current_pending_c": [
-      "97E863AD"
+      "97E863AD",
+      "6DC89C6E"
     ],
     "latest_a_production": {
-      "run": "A89R",
-      "regression": "IGR-003",
-      "asset": "97E863AD",
-      "queue_index": 193,
-      "candidate_sha256": "cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418",
-      "result": "A89R_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
-      "report": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_IGR003_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_CONTROLLER_SELF_QA.json",
+      "run": "A90",
+      "regression": "IGR-013",
+      "asset": "6DC89C6E",
+      "queue_index": 173,
+      "candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
+      "result": "A90_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+      "report": "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_IGR013_6DC89C6E_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_CONTROLLER_SELF_QA.json",
       "runtime_validation": "PENDING_NEW_INGAME_RETEST"
     }
   },
@@ -4101,7 +4103,8 @@
     "BA0147DA",
     "8C259C68",
     "D657C2EB",
-    "97E863AD"
+    "97E863AD",
+    "6DC89C6E"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -5259,6 +5262,53 @@
     "pending_new_ingame_retest": true,
     "report": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_IGR003_REPORT.json",
     "controller_report": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+  },
+  "a90_igr013": {
+    "timestamp_kst": "2026-10-06T06:22:22+09:00",
+    "run": "20261006-A-INGAME90-IGR013-BRACKET-STAGE",
+    "regression": "IGR-013",
+    "decision": "EXACT_MIXED_SPLIT_GRAPHICS_PLUS_RUNTIME_REFERENCE",
+    "assets": {
+      "6DC89C6E": {
+        "index": 173,
+        "candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
+        "action": "REWORKED_21_ROW_NATIVE_STAGE_FAMILY"
+      },
+      "E7F6E9B7": {
+        "index": 228,
+        "candidate_sha256": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607",
+        "action": "PRESERVED_C144_NATIVE"
+      }
+    },
+    "runtime_text": {
+      "id": 1123,
+      "korean": "스테이지 주행",
+      "action": "MAPPED_NO_SOURCE_CHANGE"
+    },
+    "machine_qa": {
+      "bbox_size_positive_margin": "21/21 PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "protected": 0,
+      "render_protected_overlap": 0,
+      "clean_residue": 0,
+      "overlap_pairs": 0,
+      "touch_pairs": 0
+    },
+    "controller_visual_qa": "PASS_NATIVE_HD_STAGE_FAMILY",
+    "compute_execution": {
+      "workflow_run_id": 37374013614,
+      "authoritative_output_commit": "d740369a998843abaae68e102df9f978607124c9",
+      "authoritative_candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
+      "n100_fallback_candidate_sha256": "6844e2f408fa69d5b93e4b68f4901761634e9421eea2f29b5f7c7f7df35fb587",
+      "n100_fallback_disposition": "DISCARDED_ENVIRONMENT_VARIANCE"
+    },
+    "status": "A90_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+    "pending_independent_c_static_qa": true,
+    "pending_new_ingame_retest": true,
+    "report": "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_IGR013_6DC89C6E_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_CONTROLLER_SELF_QA.json",
     "runtime_validation": "PENDING_NEW_INGAME_RETEST"
   }
 }

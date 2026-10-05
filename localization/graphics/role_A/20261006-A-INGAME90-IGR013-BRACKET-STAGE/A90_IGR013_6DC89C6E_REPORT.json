@@ -953,7 +953,9 @@
     "localized_1px_touch_pairs": [],
     "dds_roundtrip": "PASS"
   },
-  "visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "visual_qa": "PASS_CONTROLLER_SELF_QA",
   "runtime_validation": "PENDING_NEW_INGAME_RETEST",
-  "status": "A90_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "A90_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "controller_self_qa": "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_CONTROLLER_SELF_QA.json",
+  "compute_execution": "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_COMPUTE_EXECUTION.json"
 }

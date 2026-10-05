@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A90",
+  "timestamp_kst": "2026-10-06T06:22:22+09:00",
+  "scope": "A-owned P1 IGR-013 screenshot(158) C2C bracket screen. Reworked the 6DC89C6E 21-row stage-name family from prior 18px x4 bitmap construction to direct native 2048x2048 rendering. Preserved C144 E7F6E9B7 top Coast 2 Coast title and mapped runtime text ID 1123 without source change.",
+  "user_ingame_regression": [
+    "IGR-013",
+    "스크린샷(158).png"
+  ],
+  "mapping": {
+    "domain": "MIXED",
+    "status": "EXACT_MIXED_SPLIT_GRAPHICS_PLUS_RUNTIME_REFERENCE",
+    "graphics": [
+      {
+        "queue_index": 173,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds",
+        "binding": "bottom stage location labels; screenshot(158) shows SUNNY BEACH / 서니 비치",
+        "action": "21-row native-HD family rework",
+        "candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830"
+      },
+      {
+        "queue_index": 228,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+        "binding": "top COAST 2 COAST metallic header",
+        "action": "preserved C144 native candidate",
+        "candidate_sha256": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607"
+      }
+    ],
+    "runtime_text": {
+      "id": 1123,
+      "korean": "스테이지 주행",
+      "binding": "center bracket detail box",
+      "action": "mapped reference; no source change"
+    }
+  },
+  "candidate": {
+    "asset": "6DC89C6E",
+    "superseded_candidate_sha256": "b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26",
+    "candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
+    "structure": "2048x2048 BGRA32 / mip1 / exact header / raw mirror_y",
+    "rows": 21,
+    "render": "Noto Sans CJK KR Bold 71px, direct native resolution, shared blue-gray source-family fill, left source anchors",
+    "canonical_stage_names": true,
+    "upscaled_old_korean_reused": false
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "21/21 PASS",
+    "changed_pixels": 286224,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "clean_plate_residue_outside_korean_glyphs": 0,
+    "localized_overlap_pairs": [],
+    "localized_1px_touch_pairs": [],
+    "dds_roundtrip": "PASS"
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_note": "Reviewed hosted-worker SOURCE/OLD_LOWRES4X/CLEAN/A90_NATIVE 4x Sunny Beach evidence, all-21-row SOURCE/OLD/CLEAN/FINAL sheet, full readable old-vs-final and raw mirror_y comparison. The old Korean stage family is visibly 4x-blocky; A90 replaces it with smooth native-resolution glyph edges while retaining the shared bold blue-gray source family, left alignment, stage-name transliteration and row cadence. No source-script ghost, malformed Hangul, clipping, overlap/touch, foreign-image intrusion, clean-plate seam/box/halo, wrong raw orientation, or unrelated artwork change is visible. The tight ICE SCAPE row still has positive machine margins.",
+  "evidence": [
+    "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_IGR013_SUNNY_BEACH_SOURCE_OLD_CLEAN_FINAL_4X.jpg",
+    "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_6DC_21ROW_SOURCE_OLD_CLEAN_FINAL.jpg",
+    "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_6DC_READABLE_OLD_FINAL.jpg",
+    "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_6DC_RAW_OLD_FINAL.jpg"
+  ],
+  "compute_execution": {
+    "preferred": "GitHub-hosted",
+    "workflow_run_id": 37374013614,
+    "result": "SUCCESS",
+    "authoritative_worker_output_commit": "d740369a998843abaae68e102df9f978607124c9",
+    "authoritative_candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
+    "n100_fallback_attempt": {
+      "used_after_hosted_queue_delay": true,
+      "fallback_candidate_sha256": "6844e2f408fa69d5b93e4b68f4901761634e9421eea2f29b5f7c7f7df35fb587",
+      "result": "DISCARDED_RENDER_ENVIRONMENT_VARIANCE_AFTER_HOSTED_SUCCESS",
+      "note": "Hosted run remained queued without assigned runner for about 9 minutes, satisfying the contract fallback condition. The N100 result was never promoted. Once the hosted run completed successfully, its different font-raster bytes became authoritative and the local fallback outputs were discarded."
+    }
+  },
+  "status": "A90_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

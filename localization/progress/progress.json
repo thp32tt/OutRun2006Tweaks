@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T05:50:00+09:00",
+  "updated_at_kst": "2026-10-06T06:22:22+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A89R completed A-owned P1 IGR-003 screenshot(145): exact GRAPHICS multi-asset mapping 754F0599(index175 top SHOWROOM) + 97E863AD(index193 WELCOME/OUTRUN SHOWROOM body) + A9ABD877(index201 STAGES/GOALS) + E95DA5(index230 Ferrari/BGM/Car Colors). Only the two user-visible 97E low-res rows were rerendered natively; candidate cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418 passes 2/2 bbox/size/margins, zero scope/protected gates and controller visual QA. Current B168 A9 a7a4ea10... plus C171/C149 assets preserved. Hosted retry 37370378954 had no runner allocation after prior 37367610075 concurrent-drift failure, so authorized N100 MCP fallback produced the promoted candidate. Pending independent C + NEW actual in-game retest.",
+  "next_checkpoint": "A90 completed A-owned P1 IGR-013 screenshot(158): exact MIXED split maps E7F6E9B7(index228) top Coast 2 Coast header as preserved C144 native, 6DC89C6E(index173) bottom stage-name family as the material low-resolution defect, and runtime text ID1123 스테이지 주행 as reviewed reference with no source change. A90 hosted candidate 8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830 replaces prior A62 18px->4x family with 21 direct native 2048x2048 rows; 21/21 bbox/size/margins, zero scope/protected/residue/overlap/touch, controller visual/raw PASS. Pending independent C + NEW actual in-game retest.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -268,14 +268,15 @@
       "status": "PENDING_C_AND_INGAME_RETEST",
       "assets": [],
       "remaining": 0,
-      "note": "A89R 97E863AD IGR-003 plus current producer outputs await independent C/new in-game retest; do not repeat completed bytes.",
+      "note": "A90 6DC89C6E IGR-013 plus current producer outputs await independent C/new in-game retest; do not repeat completed bytes.",
       "pending_c": [
         "788CE557",
         "B1696633",
         "30CF0D",
         "BA0147DA",
         "8C259C68",
-        "97E863AD"
+        "97E863AD",
+        "6DC89C6E"
       ]
     },
     "latest_d_final_qa": {
@@ -1351,38 +1352,44 @@
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     },
     "latest_a_production": {
-      "run": "A89R",
-      "regression": "IGR-003",
-      "screen": "SHOWROOM_MAIN",
+      "run": "A90",
+      "regression": "IGR-013",
+      "screen": "C2C_BRACKET_SCREEN",
       "indices": [
-        193,
-        201,
-        175,
-        230
+        173,
+        228
       ],
-      "mapping": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+      "mapping": "EXACT_MIXED_SPLIT_GRAPHICS_PLUS_RUNTIME_REFERENCE",
       "candidate_sha256": {
-        "97E863AD": "cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418",
-        "A9ABD877": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
-        "754F0599": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
-        "E95DA5": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b"
+        "6DC89C6E": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
+        "E7F6E9B7": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607"
       },
-      "result": "A89R_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
-      "bbox_size_positive_margin": {
-        "97E863AD": "2/2 PASS"
-      },
+      "result": "A90_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+      "physical_rows_reworked": 21,
+      "bbox_size_positive_margin": "21/21 PASS",
       "pixel_gates": {
-        "97E863AD": {
-          "outside": 0,
-          "alpha_outside": 0,
-          "protected": 0,
-          "render_protected_overlap": 0
-        }
+        "outside": 0,
+        "alpha_outside": 0,
+        "protected": 0,
+        "render_protected_overlap": 0,
+        "clean_residue": 0,
+        "overlap_pairs": 0,
+        "touch_pairs": 0
       },
-      "controller_visual_qa": "PASS_NATIVE_HD_SHOWROOM_VISIBLE_ROWS",
-      "report": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_IGR003_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_CONTROLLER_SELF_QA.json",
-      "compute_executor": "N100_FALLBACK_AFTER_HOSTED_QUEUE_NO_RUNNER",
+      "controller_visual_qa": "PASS_NATIVE_HD_STAGE_FAMILY",
+      "runtime_text_reference": {
+        "id": 1123,
+        "korean": "스테이지 주행",
+        "source_changed": false
+      },
+      "report": "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_IGR013_6DC89C6E_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_CONTROLLER_SELF_QA.json",
+      "compute_execution": {
+        "workflow_run_id": 37374013614,
+        "authoritative_output_commit": "d740369a998843abaae68e102df9f978607124c9",
+        "authoritative_candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
+        "n100_fallback": "DISCARDED_ENVIRONMENT_VARIANCE"
+      },
       "runtime_validation": "PENDING_NEW_INGAME_RETEST",
       "pending_independent_c_static_qa": true
     },
@@ -1896,6 +1903,7 @@
     "8C259C68",
     "D657C2EB",
     "A9ABD877",
-    "97E863AD"
+    "97E863AD",
+    "6DC89C6E"
   ]
 }

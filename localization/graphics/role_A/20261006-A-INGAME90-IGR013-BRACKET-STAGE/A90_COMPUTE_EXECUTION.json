@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "run": "A90",
+  "role": "A",
+  "preferred_executor": "GitHub-hosted",
+  "workflow_run_id": 37374013614,
+  "workflow_conclusion": "success",
+  "authoritative_output_commit": "d740369a998843abaae68e102df9f978607124c9",
+  "authoritative_candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
+  "fallback": {
+    "executor": "N100_MCP",
+    "trigger": "hosted run queued without assigned runner for approximately 9 minutes",
+    "candidate_sha256": "6844e2f408fa69d5b93e4b68f4901761634e9421eea2f29b5f7c7f7df35fb587",
+    "disposition": "DISCARDED_AFTER_HOSTED_SUCCESS_DUE_TO_RENDER_ENVIRONMENT_VARIANCE"
+  },
+  "promoted_executor": "GitHub-hosted",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+}
