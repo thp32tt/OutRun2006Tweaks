@@ -679,7 +679,7 @@ req(ps2_event_block, 'retail directional ConstantForce remains suppressed', 'PS2
 req(ps2_event_block, 'shared host tactile pulse active', 'PS2 reports the explicit PC/DD collision tactile assist')
 forbid(ps2_event_block, 'crashImpactDirection_', 'PS2 host collision assist cannot masquerade as an unverified retail directional force')
 forbid(ps2_event_block, 'translatedSeverity', 'removed provisional PS2 collision magnitude translation cannot return')
-req(ffb, ': (arcadeOriginal || ps2Original\n                    ? false\n                    : crashImpulseTimer_ > CrashCooldownFrames);', 'PS2 Original and Arcade Original condition backbones are not suppressed by Modern collision interaction')
+req(ffb, 'const bool suppressSpringForImpact =\n                (arcadeOriginal || ps2Original)', 'PS2 Original and Arcade Original condition backbones are not suppressed by Modern collision interaction')
 forbid(ffb, 'crashImpulseForce_ * 0.45f', 'arbitrary PS2 collision multiplier removed')
 forbid(ffb, '(ps2Original ? 0.12f : 0.20f)', 'unsupported PS2 gear thunk removed')
 req(ffb, 'else if (!ps2Original)', 'PS2 original mode emits no unverified generic gear-shift thunk')
