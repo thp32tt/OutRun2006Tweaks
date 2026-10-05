@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_PRODUCTION22 completed odd index 137 30CF0D entirely without Remote Desktop Commander. Canonical source 11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc is 2048x1024 RGBA32/BGRA raw mirror_y. Six physical labels were localized (SELECT TRANSMISSION, standalone TRANSMISSION, MANUAL x2, AUTOMATIC x2). Candidate 6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b passes 6/6 exact bbox+size+positive margins; clean-source-effect unchanged/outside/alpha/protected/overlap/touch are all 0; controller SOURCE/CLEAN/FINAL, row-contact and raw mirror_y visual self-QA PASS. Pending independent C and in-game validation. pending_artwork=26, producer_rework=1. RUNTIME_VALIDATION=UNTESTED.",
     "B_PRODUCTION78/B80 completed. C151-returned even index 86 C598919A was actually reworked first: canonical 4096x4096 DXT5 stage-boundary analysis found 8/10 stage rows have mandatory source glyph/effect pixels in exact-bbox-crossing 4x4 blocks (1,435 pixels total), proving ordinary full-block splice cannot be exact decoded-pixel safe; no candidate persisted and endpoint/index-constrained solver remains required. Per fail-closed continuation B produced even index 236 FEF70E85 candidate e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086 from canonical 2048x2048 RGBA32/BGRA raw mirror_y source. 14 canonical phonetic stage names pass 14/14 exact bbox+size+positive margins, zero residue/outside/alpha/protected/render-outside/preserved/overlap/touch and controller source/clean/final/row/raw QA; REVERSED remains pixel-exact. Pending independent C and in-game. pending_artwork=27, producer_rework=1. RUNTIME_VALIDATION=UNTESTED.",
     "C151 revalidated unfinished B75 index 86 C598919A. Canonical source is 4096x4096 DXT5 (SHA 9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf), not raw RGBA. Hosted C decoded the DXT5 source and 106-region atlas successfully and controller review resolved ranking/mode/stage semantic binding. No candidate exists: exact decoded glyph/effect masks + clean plate and exact-safe DXT5 encoding remain producer REWORK_REQUIRED. OutRun2/OutRun2SP product tokens corrected to preserve-original tokens; stage names remain canonical phonetic Hangul. pending_artwork=28, producer_rework=1. RUNTIME_VALIDATION=UNTESTED.",
     "C150 corrected B_PRODUCTION77 9FC88069 semantic-policy violation: restored (GUITAR MIX)/(INSTRUMENTAL)/(PROTOTYPE) pixel-exact as protected music-title/variant artwork, retained only RANDOM/RANDOM PLAY/INTERMEDIATE B/A Korean. Corrected candidate 34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c passes 4/4 bbox+size+positive-margin and zero static gates; visual/raw mirror_y PASS. Pending production localize_text=29; 75C3586A strict HOLD no-candidate. RUNTIME_VALIDATION=UNTESTED.",
@@ -3372,6 +3373,30 @@
     "report": "localization/graphics/role_B/20261005-B-PRODUCTION80/B80_FEF_REPORT.json",
     "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION80/B80_CONTROLLER_SELF_QA.json",
     "c_final_qa": "PENDING",
+    "in_game_validation": "PENDING",
+    "runtime_validation": "UNTESTED"
+  },
+  "a_production22_30cf0d": {
+    "timestamp_kst": "2026-10-05T11:53:26+09:00",
+    "run": "20261005-A-PRODUCTION22",
+    "queue_index": 137,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+    "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+    "candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+    "physical_elements": 6,
+    "bbox_size_positive_margin": "6/6",
+    "source_residue": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected": 0,
+    "overlap": 0,
+    "touch_pairs": 0,
+    "controller_visual_qa": "PASS",
+    "status": "A_PRODUCTION22_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "report": "localization/graphics/role_A/20261005-A-PRODUCTION22/A_PRODUCTION22_30CF0D_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION22/A22_CONTROLLER_SELF_QA.json",
+    "independent_c_final_qa": "PENDING",
     "in_game_validation": "PENDING",
     "runtime_validation": "UNTESTED"
   }
