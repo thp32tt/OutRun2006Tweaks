@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C151-C598919A",
+  "queue_index": 86,
+  "asset": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+  "revalidates": "B_PRODUCTION75 failed canonical preflight",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "3ab34d5fcd66b5b8cb3d59e02d0d199e2e6b5456",
+    "atlas_git_blob_sha1": "c2d82b14396fc89ca08affcb8ff9c615d644bc82",
+    "source_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf"
+  },
+  "independent_decode": {
+    "report": "localization/graphics/role_C/20261005-C151-C598919A/C151_C598_DECODED_PREFLIGHT.json",
+    "worker_status": "PASS",
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "dds_fourcc": "DXT5",
+    "mipmaps": 1,
+    "decoded_rgba": true,
+    "raw_orientation": "mirror_y",
+    "atlas_regions": 106
+  },
+  "controller_visual_binding": {
+    "status": "PASS_BINDING_READY",
+    "stage_regions": {
+      "77": "Cape Way -> 케이프 웨이",
+      "78": "Imperial Avenue -> 임페리얼 애비뉴",
+      "79": "Ancient Ruins -> 에인션트 루인스",
+      "80": "Metropolis -> 메트로폴리스",
+      "81": "Tulip Garden -> 튤립 가든",
+      "82": "Skyscrapers -> 스카이스크레이퍼스",
+      "83": "Milky Way -> 밀키 웨이",
+      "84": "Floral Village -> 플로럴 빌리지",
+      "85": "Legend -> 레전드",
+      "86": "Giant Statues -> 자이언트 스태추스"
+    },
+    "ranking_mode_regions": {
+      "10": "OutRun2 15 Continuous Course",
+      "11": "OutRun2SP 15 Continuous Course",
+      "26": "OutRun MODE",
+      "40": "Top Runners of Each Goal",
+      "43": "Heart Attack MODE",
+      "44": "OutRun MODE",
+      "45": "Time Attack MODE",
+      "12-21": "two physical GOAL A-E sets",
+      "22-25": "Time Attack MODE with TUNED/NORMAL; MT/AT protected",
+      "46-47": "15 Continuous Course + Ranking split cells",
+      "48-49": "NORMAL / TUNED",
+      "64-65": "NORMAL / TUNED"
+    },
+    "protected": {
+      "ferrari_model_names": "PRESERVE_ORIGINAL",
+      "MT_AT": "PRESERVE_ORIGINAL",
+      "OutRun2_product_mark": "PRESERVE_ORIGINAL_TOKEN_WITH_DESCRIPTOR_LOCALIZED",
+      "OutRun2SP_product_mark": "PRESERVE_ORIGINAL_TOKEN_WITH_DESCRIPTOR_LOCALIZED"
+    },
+    "stage_name_policy": "PASS_CANONICAL_PHONETIC_TRANSLITERATIONS",
+    "evidence": [
+      "localization/graphics/role_C/20261005-C151-C598919A/C151_C598_CONTACT_000_039.jpg",
+      "localization/graphics/role_C/20261005-C151-C598919A/C151_C598_CONTACT_040_088.jpg",
+      "localization/graphics/role_C/20261005-C151-C598919A/C151_C598_CONTACT_089_END.jpg"
+    ]
+  },
+  "finding": {
+    "b75_failure": "B75 treated the authoritative Release DDS as raw RGBA and failed before output; canonical source is DXT5.",
+    "resolution": "C151 successfully decoded canonical DXT5 with Pillow and resolved the semantic/atlas binding.",
+    "remaining_work": "Producer must derive exact decoded glyph/effect masks and clean plates, then render/re-encode with exact decoded-pixel zero-overflow proof. Full-image recompression or block-only confinement is not sufficient.",
+    "candidate_present": false
+  },
+  "transcription_correction": {
+    "OutRun2SP 15 Continuous Course": "OutRun2SP 15코스 연속",
+    "OutRun2 15 Continuous Course": "OutRun2 15코스 연속",
+    "reason": "Preserve OutRun2/OutRun2SP product/brand token while localizing the descriptor."
+  },
+  "decision": "REWORK_REQUIRED_DXT5_EXACT_MASK_AND_RENDER",
+  "next_owner": "A_OR_B_PRODUCTION",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
