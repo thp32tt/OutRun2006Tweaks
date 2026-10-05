@@ -1626,6 +1626,21 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
         q.pop("next_task_not_before", None)
         save_queue_state(q)
 
+    if CONVERSION_ONLY_SLOT:
+        frozen = q.setdefault("frozen_lane_tasks", [])
+        for lane_key in list(active_by_lane):
+            if lane_key == CONVERSION_ONLY_SLOT:
+                continue
+            task = active_by_lane.pop(lane_key)
+            frozen.append({
+                **task,
+                "frozen_lane": lane_key,
+                "frozen_at": now.isoformat(),
+                "frozen_reason": f"single-lane mode active: {CONVERSION_ONLY_SLOT}",
+            })
+        q["frozen_lane_tasks"] = frozen[-100:]
+        save_queue_state(q)
+
     for lane_key in ("A", "B", "C"):
         if lane_key in active_by_lane:
             await conversion_process_lane(context, pages, q, lane_key)
@@ -1637,6 +1652,22 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
     save_queue_state(q)
 
     if rate_limit_active(load_registry(datetime.now(TZ)), datetime.now(TZ)):
+        return
+
+    if CONVERSION_ONLY_SLOT:
+        if CONVERSION_ONLY_SLOT not in active_by_lane:
+            await conversion_send_lane_task(context, pages, q, CONVERSION_ONLY_SLOT)
+        active_task = q.get("active_by_lane", {}).get(CONVERSION_ONLY_SLOT)
+        target = queue_target_for_slot(CONVERSION_ONLY_SLOT)
+        write_runtime(
+            status="conversion_single_lane_running",
+            last_action=(
+                f"Single conversion lane locked to {CONVERSION_ONLY_SLOT}({target['lane']}); "
+                f"active={active_task.get('task_id') if active_task else None}:"
+                f"{active_task.get('phase') if active_task else None}"
+            ),
+            queue=q,
+        )
         return
 
     # Priority policy:
