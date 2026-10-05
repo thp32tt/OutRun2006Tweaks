@@ -1,0 +1,425 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION86-DDF0392A-PREFLIGHT",
+  "index": 222,
+  "asset": "DDF0392A",
+  "source_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+  "source_git_blob_sha1": "1ff7680eb71750d884b0e69fe058aef3a5cf5fa2",
+  "atlas_git_blob_sha1": "819d31b1cd9c59fb6d011f3f0361d6ed7114c286",
+  "dimensions": [
+    1024,
+    2048
+  ],
+  "pitch": 2097152,
+  "mips": 1,
+  "raw_mode": null,
+  "fourcc": "DXT5",
+  "raw_orientation": "mirror_y",
+  "regions_count": 25,
+  "regions": [
+    {
+      "idx": 0,
+      "rect": [
+        0,
+        1972,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        6,
+        14,
+        548,
+        66
+      ],
+      "alpha_pixels": 11883
+    },
+    {
+      "idx": 1,
+      "rect": [
+        0,
+        1896,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        4,
+        17,
+        333,
+        61
+      ],
+      "alpha_pixels": 7402
+    },
+    {
+      "idx": 2,
+      "rect": [
+        0,
+        1820,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        2,
+        10,
+        627,
+        68
+      ],
+      "alpha_pixels": 14349
+    },
+    {
+      "idx": 3,
+      "rect": [
+        0,
+        1744,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        2,
+        17,
+        342,
+        60
+      ],
+      "alpha_pixels": 6407
+    },
+    {
+      "idx": 4,
+      "rect": [
+        0,
+        1668,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        3,
+        17,
+        310,
+        70
+      ],
+      "alpha_pixels": 6330
+    },
+    {
+      "idx": 5,
+      "rect": [
+        0,
+        1592,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        3,
+        17,
+        299,
+        70
+      ],
+      "alpha_pixels": 6197
+    },
+    {
+      "idx": 6,
+      "rect": [
+        0,
+        1516,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        3,
+        17,
+        419,
+        60
+      ],
+      "alpha_pixels": 8102
+    },
+    {
+      "idx": 7,
+      "rect": [
+        0,
+        1440,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        6,
+        17,
+        421,
+        70
+      ],
+      "alpha_pixels": 8472
+    },
+    {
+      "idx": 8,
+      "rect": [
+        0,
+        1364,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        7,
+        13,
+        255,
+        66
+      ],
+      "alpha_pixels": 5437
+    },
+    {
+      "idx": 9,
+      "rect": [
+        0,
+        1288,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        7,
+        17,
+        364,
+        70
+      ],
+      "alpha_pixels": 7198
+    },
+    {
+      "idx": 10,
+      "rect": [
+        0,
+        1212,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        3,
+        19,
+        360,
+        66
+      ],
+      "alpha_pixels": 8959
+    },
+    {
+      "idx": 11,
+      "rect": [
+        0,
+        1136,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        7,
+        19,
+        100,
+        66
+      ],
+      "alpha_pixels": 2638
+    },
+    {
+      "idx": 12,
+      "rect": [
+        0,
+        1060,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        7,
+        16,
+        137,
+        62
+      ],
+      "alpha_pixels": 3311
+    },
+    {
+      "idx": 13,
+      "rect": [
+        0,
+        984,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        7,
+        19,
+        100,
+        66
+      ],
+      "alpha_pixels": 2502
+    },
+    {
+      "idx": 14,
+      "rect": [
+        0,
+        908,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        8,
+        18,
+        356,
+        66
+      ],
+      "alpha_pixels": 8902
+    },
+    {
+      "idx": 15,
+      "rect": [
+        0,
+        832,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        6,
+        15,
+        413,
+        61
+      ],
+      "alpha_pixels": 10252
+    },
+    {
+      "idx": 16,
+      "rect": [
+        0,
+        756,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        6,
+        19,
+        367,
+        66
+      ],
+      "alpha_pixels": 9002
+    },
+    {
+      "idx": 17,
+      "rect": [
+        0,
+        680,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        3,
+        18,
+        446,
+        65
+      ],
+      "alpha_pixels": 11460
+    },
+    {
+      "idx": 18,
+      "rect": [
+        0,
+        604,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        6,
+        19,
+        449,
+        66
+      ],
+      "alpha_pixels": 11117
+    },
+    {
+      "idx": 19,
+      "rect": [
+        0,
+        528,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        6,
+        19,
+        184,
+        65
+      ],
+      "alpha_pixels": 4539
+    },
+    {
+      "idx": 20,
+      "rect": [
+        0,
+        452,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        3,
+        18,
+        517,
+        66
+      ],
+      "alpha_pixels": 12666
+    },
+    {
+      "idx": 21,
+      "rect": [
+        0,
+        376,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        3,
+        18,
+        315,
+        65
+      ],
+      "alpha_pixels": 8336
+    },
+    {
+      "idx": 22,
+      "rect": [
+        0,
+        300,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        3,
+        14,
+        214,
+        62
+      ],
+      "alpha_pixels": 5265
+    },
+    {
+      "idx": 23,
+      "rect": [
+        0,
+        224,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        5,
+        15,
+        217,
+        62
+      ],
+      "alpha_pixels": 5594
+    },
+    {
+      "idx": 24,
+      "rect": [
+        0,
+        148,
+        960,
+        76
+      ],
+      "alpha_bbox": [
+        4,
+        15,
+        220,
+        62
+      ],
+      "alpha_pixels": 5490
+    }
+  ],
+  "policy_note": "Rush A Difficulty / Shake The Street / Who Are You? are known song titles and must remain original English; target semantics are Journey Mode / Random, OutRun 1986, OutRun Mode / 15 C. only.",
+  "status": "PREFLIGHT_VISUAL_BINDING_READY_SAME_INVOCATION_CONTINUE_TO_RENDER",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
