@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PRODUCTION173-JENN-ALIAS",
+  "timestamp_kst": "2026-10-06T08:17:29+09:00",
+  "queue_index": 38,
+  "asset": "textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+  "classification": "zoom_review -> localize_text; exact numeric-hash/canonical-HD alias of queue index36",
+  "source": "Total Rank x3",
+  "korean": "종합 랭킹",
+  "canonical_source_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+  "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+  "exact_alias": {
+    "index36_path": "textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+    "index38_path": "textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+    "numeric_hash_equal": true,
+    "candidate_bytes_equal": true,
+    "canonical_source_equal": true
+  },
+  "visual_evidence_reused_by_exact_sha": {
+    "c215_contacts": "localization/graphics/role_C/20261006-C215-06AB5CEE/C215_JENN_CONTACTS.jpg",
+    "c215_raw": "localization/graphics/role_C/20261006-C215-06AB5CEE/C215_JENN_RAW_COMPARE.jpg",
+    "review_result": "PASS_SOURCE_CLEAN_FINAL_AND_RAW_MIRROR_Y"
+  },
+  "quality_checks": {
+    "native_hd_source_only": "PASS_4096x4096_CANONICAL",
+    "old_lowres_korean_reused": "NO",
+    "mixed_low_resolution": "PASS_NONE",
+    "broken_glyph": "PASS_NONE",
+    "source_residue": "PASS_NONE",
+    "foreign_image_intrusion": "PASS_NONE",
+    "layer_collision": "PASS_NONE",
+    "style_fidelity": "PASS_C215_PIXEL_IDENTICAL",
+    "bbox_size_positive_margin": "3/3 PASS_C215",
+    "outside_alpha_visible": "0/0/0_C215",
+    "raw_orientation": "PASS_MIRROR_Y"
+  },
+  "decision": "B173_EXACT_ALIAS_OF_C215_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

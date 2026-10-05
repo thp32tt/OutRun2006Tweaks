@@ -2098,3 +2098,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Evidence: `localization/graphics/role_A/20261006-A-PROBE98-4AFC1BED/A98_4AFC1BED_PROBE.json`, `A98_SOURCE_READABLE.png`, `A98_SOURCE_RAW.png`, `A98_SOURCE_COMPONENTS.png`, and `A98_CONTROLLER_CLASSIFICATION.json`.
 - Remaining blocked `zoom_review` rows: 40. Next normal A row is odd index27 `8B52FEEC` unless a higher-priority in-game/C-returned row appears. No VR/FFB/DX11/DXVK work.
 
+## 2026-10-06T08:17:29+09:00 - B173 index38 6AB5CEE JENN alias production
+- Refreshed the B shard after B172/A98 and selected the oldest unresolved even zoom_review index38; all B-owned in-game regressions are already static/build PASS pending C or new game retest, so they were not repeated.
+- Exact identity resolution: index36 06AB5CEE and index38 6AB5CEE are the same numeric texture hash 0x06AB5CEE. The recovered index38 inventory copy is only 1024x1024 (c45f8592...), while the required HD baseline is upstream 4096x4096 SHA cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a, exactly the source already used by C215.
+- B173 therefore did not rerasterize or upscale. GitHub-hosted worker 37387308163 persisted the C215-approved candidate bytes under the unpadded index38 path, SHA 0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5, byte-for-byte identical to index36.
+- Semantics/classification: zoom_review -> localize_text, Total Rank x3 -> 종합 랭킹. C215 machine evidence transfers exactly: 3/3 bbox/source-size/positive-margin PASS; outside/alpha/introduced-visible/unsafe-template/bbox mismatch all 0.
+- Controller re-reviewed the exact-SHA C215 SOURCE/CLEAN/FINAL contacts and raw mirror_y evidence: PASS; no mixed low-resolution text, residue, broken glyph, collision, foreign-image intrusion or style/orientation regression.
+- State: B173_EXACT_ALIAS_OF_C215_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED. Next B normal queue target is even index52 A8CE339F unless higher-priority work appears. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_B/20261006-B-PRODUCTION173-JENN-ALIAS/B173_6AB5CEE_ALIAS_REPORT.json, localization/graphics/role_B/20261006-B-PRODUCTION173-JENN-ALIAS/B173_CONTROLLER_SELF_QA.json.

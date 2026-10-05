@@ -73,8 +73,10 @@
     "controller_visual_qa_reference": "C215 PASS SOURCE/CLEAN/FINAL + raw mirror_y"
   },
   "worker_status": "PASS",
-  "controller_self_qa": "PENDING_CONTROLLER_EXACT_SHA_REUSE_REVIEW",
+  "controller_self_qa": "PASS_EXACT_SHA_REUSE_C215_VISUAL_EVIDENCE",
   "runtime_validation": "UNTESTED",
-  "status": "B173_ALIAS_CANDIDATE_PASS_PENDING_CONTROLLER_RECONCILE",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "status": "B173_EXACT_ALIAS_OF_C215_PASS_PENDING_INGAME",
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_self_qa_notes": "Controller re-opened C215 SOURCE/CLEAN/FINAL contacts and raw mirror_y evidence after the worker proved exact canonical source SHA and exact candidate SHA equality between index36 06AB5CEE and index38 6AB5CEE. The three Total Rank -> 종합 랭킹 plates are therefore pixel-identical to C215-approved content; no low-resolution 1024 recovered bitmap is used or upscaled.",
+  "timestamp_finalized_kst": "2026-10-06T08:17:29+09:00"
 }

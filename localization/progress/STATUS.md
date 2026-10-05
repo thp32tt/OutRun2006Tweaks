@@ -1725,3 +1725,8 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Remaining blocked zoom reviews: **40**. Next A normal shard item: index27 `8B52FEEC`, unless a higher-priority backlog/C-return appears.
 - VR/FFB/DX11/DXVK untouched.
 
+## 2026-10-06T08:17:29+09:00 — B173 index38 6AB5CEE alias PASS
+- 6AB5CEE is the unpadded hash alias of C215-approved 06AB5CEE; canonical HD source SHA cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a and localized candidate SHA 0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5 are exact matches.
+- Persisted the 4096x4096 candidate under index38 path without rerasterizing/upscaling the recovered 1024x1024 source.
+- Total Rank x3 -> 종합 랭킹; C215 3/3 bbox/size/margin + zero outside/alpha/visible gates and controller SOURCE/CLEAN/FINAL/raw PASS transfer by exact SHA identity.
+- State B173_EXACT_ALIAS_OF_C215_PASS_PENDING_INGAME; runtime/in-game validation remains UNTESTED. Next B normal queue: even index52. VR/FFB/DX11/DXVK untouched.
