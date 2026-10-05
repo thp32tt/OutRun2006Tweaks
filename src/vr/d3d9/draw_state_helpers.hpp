@@ -5,6 +5,17 @@
 
 namespace OutRunVR::D3D9
 {
+    inline bool SetVertexShaderConstantBatch(
+        IDirect3DDevice9* device,
+        UINT startRegister,
+        const float* constants,
+        UINT vector4Count) noexcept
+    {
+        return device && constants && vector4Count != 0 &&
+            SUCCEEDED(device->SetVertexShaderConstantF(
+                startRegister, constants, vector4Count));
+    }
+
     inline bool LiveVertexShaderMatches(
         IDirect3DDevice9* device,
         std::uintptr_t expected) noexcept
