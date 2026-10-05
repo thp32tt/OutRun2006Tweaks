@@ -1,0 +1,156 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00400",
+  "production_id": "CONVERSION-DX9EX-00400",
+  "event_id": "CONVERSION-DX9EX-00400-E002",
+  "event_type": "rollover",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "queue_controller_contract": {
+    "path": "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "status": "APPLIED",
+    "evidence": "Recovered GitHub branch HEAD and prior post-1000 state directly. The chat rollover was not treated as a retry and did not increment ATTEMPT. Exact-SHA validation-bearing identity is preserved separately from later bookkeeping commits."
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_SOURCE_HUD_AND_N100_EXACT_STATIC",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "cda254aec1df0b2597d22036be3ace4f98761503",
+  "source_material_sha": "511063f7f043ab809340184230a7bebc72e7b62b",
+  "result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+  "material_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+  "validation_bearing_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+  "state_commit_sha": "b52167296843424967b6dbb86401314f0a1f0c4e",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00400]",
+  "selected_work_item": "VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-OWNERSHIP-0009",
+  "summary": "Continued the post-1000 structural cleanup by moving R9-owned right depth/stencil synchronization invalidation behind R9InvalidateRightDepthStencilSync(bool,bool). R33 now routes both left-write invalidation and fail-closed invalidation through that owner API instead of mutating RightDepthSynchronized/RightStencilSynchronized directly. The verifier was updated after its stale direct-literal order check caused the first exact-source Gate failure. No projection, HUD semantic, Present ordering, D3D getter, allocation, wait, lock, or new hot-path synchronization behavior was introduced.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_refactor_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00400.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Reconstructed vr-d3d9ex-focus from GitHub SSOT. Current dispatch is PRODUCTION_ID=CONVERSION-DX9EX-00400, EVENT_ID=CONVERSION-DX9EX-00400-E002, EVENT_TYPE=rollover, CHAT_ROLLOVER=2, ATTEMPT=1/3, RESUME_REASON='Retry persisted after one recovery attempt'. This rollover is not a retry and does not consume an attempt."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R33 still directly invalidated the R9-owned RightDepthSynchronized/RightStencilSynchronized flags at two boundaries: conditional invalidation after a left-eye depth/stencil write and unconditional fail-close invalidation. The behavior-preserving owner extraction was bounded because the exact boolean conditions and depth-before-stencil mutation order could be retained inside R9."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "ef286f5a adds fail-closed verifier guards, 6ac569b7 adds R9InvalidateRightDepthStencilSync(bool,bool), 511063f7 routes R33 left-write and fail-close paths through the new owner API, and 4bccdc9e repairs the stale verifier to check cache-before-owner-call plus depth-before-stencil ordering rather than removed direct R33 literals."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_SOURCE_HUD_AND_N100_EXACT_STATIC",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Initial exact-source 511063f7 DX9Ex Active run 37249055030 failed only in policy/refactor verification because the verifier still required direct R33 flag mutations; source HUD Inspector 37249054934 and Domain Isolation 37249055055 succeeded. After verifier repair, exact validation-bearing SHA 4bccdc9e passed DX9Ex Active Validation 37249150072 (policy/host/game/full-chain-compile/package SUCCESS) and Domain Isolation Guard 37249150004. N100 detached exact-SHA architecture/R51/R32-R34/hook-graph/refactor/near-plane suite also PASS. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "source_material_sha": "511063f7f043ab809340184230a7bebc72e7b62b",
+      "result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+      "validation_bearing_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+      "messages": [
+        "test(vr): guard R33 depth sync ownership [AUTO:CONVERSION-DX9EX-00400]",
+        "refactor(vr): add R9 depth sync owner API [AUTO:CONVERSION-DX9EX-00400]",
+        "refactor(vr): route R33 depth sync invalidation through R9 [AUTO:CONVERSION-DX9EX-00400]",
+        "test(vr): align depth sync owner verifier [AUTO:CONVERSION-DX9EX-00400]"
+      ],
+      "ci_skip_on_validation_bearing_result": false,
+      "repaired_validation": {
+        "failed_sha": "511063f7f043ab809340184230a7bebc72e7b62b",
+        "dx9ex_active_run_id": 37249055030,
+        "classification": "STALE_VERIFIER_REPAIRED_WITHIN_ATTEMPT_1",
+        "consumes_queue_attempt": false
+      }
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "DX9Ex Active package artifact 11320362311, name OutRun2-VR-DX9EX-ACTIVE-4bccdc9ea361d6c2a70693d9d0a1b33980236b35, digest sha256:658ad359d886d957cbb95a1ef3ee024a3ef5f60fc532114a80bab765d6db3ec5, size 2730650 bytes. Artifact is automation/build evidence only, not Quest3/VDXR runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "state_commit_sha": "b52167296843424967b6dbb86401314f0a1f0c4e",
+      "issue14_update": "PENDING_LEDGER_COMMENT",
+      "issue13_update": "NOT_REQUIRED_NO_RUNTIME_PROBLEM_STATUS_CHANGE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37249150072,
+      "conclusion": "success",
+      "exact_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+      "jobs": {
+        "policy": 111573007558,
+        "host": 111573066829,
+        "game": 111573066834,
+        "full_chain_compile": 111573066828,
+        "package": 111573857611
+      },
+      "artifact_id": 11320362311,
+      "artifact_digest": "sha256:658ad359d886d957cbb95a1ef3ee024a3ef5f60fc532114a80bab765d6db3ec5"
+    },
+    "domain_isolation": {
+      "run_id": 37249150004,
+      "conclusion": "success",
+      "exact_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35"
+    },
+    "hud_inspector": {
+      "run_id": 37249054934,
+      "conclusion": "success",
+      "exact_sha": "511063f7f043ab809340184230a7bebc72e7b62b",
+      "jobs": {
+        "static_exe_analysis": 111572729239,
+        "build_hud_inspector": 111572729503
+      },
+      "game_artifact_id": 11320616155,
+      "game_artifact_digest": "sha256:49abdabec19571d945b9e59019ac1470bb027afc82dad0028235bd9dd581c7b7"
+    },
+    "n100_local": {
+      "conclusion": "AUXILIARY_EXACT_SHA_STATIC_PASS",
+      "exact_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+      "checks": [
+        "py_compile refactor verifier",
+        "architecture",
+        "R51 runtime contract",
+        "R32-R34 compatibility/Present",
+        "hook graph",
+        "refactor contract",
+        "near-plane active gate"
+      ],
+      "note": "Auxiliary evidence only; GitHub branch HEAD and Actions remain authoritative."
+    }
+  },
+  "next_action": "Do not repeat CONVERSION-DX9EX-00400. Preserve R9InvalidateRightDepthStencilSync() as the owner boundary and keep R33 free of direct RightDepthSynchronized/RightStencilSynchronized mutation. Continue only the next bounded post-1000 structural successor supported by current source/static evidence; runtime claims remain gated on Quest3/VDXR evidence.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00400",
+    "production_id": "CONVERSION-DX9EX-00400",
+    "event_id": "CONVERSION-DX9EX-00400-E002",
+    "event_type": "rollover",
+    "lane": "DX9EX",
+    "target_branch": "vr-d3d9ex-focus",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "chat_rollover": 2,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "rollover_is_retry": false,
+    "material_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+    "validation_bearing_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_SOURCE_HUD_AND_N100_EXACT_STATIC",
+    "runtime_validation": "UNTESTED"
+  },
+  "validated_at_kst": "2026-10-05T09:56:53+09:00",
+  "chat_rollover": 2,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "rollover_is_retry": false,
+  "completed_at_kst": "2026-10-05T09:58:21+09:00"
+}
