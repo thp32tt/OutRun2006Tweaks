@@ -52,13 +52,12 @@
   },
   "latest_durable_task": {
     "task_id": "CONVERSION-DX11-00398",
-    "production_id": "CONVERSION-DX9EX-00397",
-    "event_id": "CONVERSION-DX9EX-00397-E004",
+    "production_id": "CONVERSION-DX11-00398",
+    "event_id": "CONVERSION-DX11-00398-E002",
     "event_type": "rollover",
     "attempt": "1/3",
-    "dispatch_source": "CURRENT_USER_QUEUE",
-    "source": "CURRENT_USER_QUEUE",
-    "cross_lane_dispatch": true,
+    "dispatch_source": "CURRENT_USER_ROLLOVER",
+    "source": "CURRENT_USER_ROLLOVER",
     "selected_work_item": "DX11_R259_PROGRAMMABLE_ACTIVATION_PREREQUISITE_HANDOFF",
     "base_sha": "422059cbb606954011c617547a0b3296392fbaf5",
     "result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
@@ -84,7 +83,10 @@
     ],
     "native_draw_path_activation_changed": false,
     "implementation_comment_id": 5985903728,
-    "validation_comment_id": 5985971498
+    "validation_comment_id": 5985971498,
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt"
   },
   "runtime_blocker": "CONVERSION-DX11-00398/R259 is automation-complete but runtime-untested. R259 deliberately leaves F18 resource-behavior and F21 shader semantic-translation proof absent, so it cannot authorize NativeDrawPath or Draw/DrawIndexed.",
   "runtime_next_action": "Do not enable NativeDrawPath or programmable Draw/DrawIndexed from R259. Runtime-visible activation remains blocked until all prerequisite proof classes are closed and matching Quest 3/VDXR evidence exists.",
@@ -3131,9 +3133,6 @@
     {
       "unit_id": "DX11_R259_PROGRAMMABLE_ACTIVATION_PREREQUISITE_HANDOFF",
       "task_id": "CONVERSION-DX11-00398",
-      "supplied_production_id": "CONVERSION-DX9EX-00397",
-      "supplied_event_id": "CONVERSION-DX9EX-00397-E004",
-      "supplied_event_type": "rollover",
       "attempt": "1/3",
       "base_sha": "422059cbb606954011c617547a0b3296392fbaf5",
       "implementation_commits": [
@@ -3162,20 +3161,28 @@
       "missing_prerequisite_mask": "0x5",
       "resource_behavior_proof": "MISSING_F18",
       "input_layout_proof": "PRESENT_R243",
-      "shader_translation_proof": "MISSING_F21"
+      "shader_translation_proof": "MISSING_F21",
+      "production_id": "CONVERSION-DX11-00398",
+      "event_id": "CONVERSION-DX11-00398-E002",
+      "event_type": "rollover",
+      "chat_rollover": 2,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt"
     }
   ],
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00398",
-    "supplied_production_id": "CONVERSION-DX9EX-00397",
-    "supplied_event_id": "CONVERSION-DX9EX-00397-E004",
-    "supplied_event_type": "rollover",
+    "production_id": "CONVERSION-DX11-00398",
+    "event_id": "CONVERSION-DX11-00398-E002",
+    "event_type": "rollover",
     "attempt": "1/3",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
     "lane": "DX11",
-    "cross_lane_dispatch": true,
-    "source": "CURRENT_USER_QUEUE",
-    "dispatch_source": "CURRENT_USER_QUEUE",
-    "reconciliation": "Supplied production/event identify the preceding DX9EX rollover and are retained only as queue provenance. DX11 material/completion authority is TASK_ID CONVERSION-DX11-00398 on vr-dx11-native-r71.",
+    "target_branch": "vr-dx11-native-r71",
+    "source": "CURRENT_USER_ROLLOVER",
+    "dispatch_source": "CURRENT_USER_ROLLOVER",
     "runtime_validation": "UNTESTED",
     "native_draw_path_activation_changed": false,
     "material_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
@@ -3221,47 +3228,94 @@
     "task_id": "CONVERSION-DX11-00398",
     "authoritative": {
       "task_id": "CONVERSION-DX11-00398",
+      "production_id": "CONVERSION-DX11-00398",
+      "event_id": "CONVERSION-DX11-00398-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
       "lane": "DX11",
       "target_branch": "vr-dx11-native-r71",
-      "attempt": "1/3",
+      "source": "CURRENT_USER_ROLLOVER",
+      "dispatch_source": "CURRENT_USER_ROLLOVER",
       "material_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
       "validation_bearing_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
       "automation_validation": "PASS",
       "runtime_validation": "UNTESTED"
     },
-    "supplied_cross_lane": {
-      "production_id": "CONVERSION-DX9EX-00397",
-      "event_id": "CONVERSION-DX9EX-00397-E004",
-      "event_type": "rollover"
-    },
-    "reason": "The controller supplied a preceding DX9EX rollover pointer while dispatching a new DX11 TASK_ID. The pointer is provenance, not DX11 task ownership.",
-    "material_and_validation_bearing_sha_unchanged": false
+    "superseded": [
+      {
+        "production_id": "CONVERSION-DX9EX-00397",
+        "event_id": "CONVERSION-DX9EX-00397-E004",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "reason": "Recovered prior-chat cross-lane queue provenance is superseded by current explicit E002 rollover metadata."
+      }
+    ],
+    "reason": "E002 / CHAT_ROLLOVER=2 is the latest explicit same-task DX11 rollover. It is not a retry, so ATTEMPT remains 1/3. R259 material and exact-SHA validation identities are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
   },
   "current_task_metadata_correction": {
     "task_id": "CONVERSION-DX11-00398",
-    "source": "CURRENT_USER_QUEUE",
-    "cross_lane_production_event_preserved": true,
-    "reason": "DX11 task identity follows TASK_ID/LANE/TARGET_BRANCH; supplied DX9EX production/event remain provenance."
+    "corrected_from": [
+      {
+        "production_id": "CONVERSION-DX9EX-00397",
+        "event_id": "CONVERSION-DX9EX-00397-E004",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "reason": "Recovered checkpoint retained preceding DX9EX dispatch provenance."
+      }
+    ],
+    "corrected_to": {
+      "task_id": "CONVERSION-DX11-00398",
+      "production_id": "CONVERSION-DX11-00398",
+      "event_id": "CONVERSION-DX11-00398-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_ROLLOVER",
+      "dispatch_source": "CURRENT_USER_ROLLOVER",
+      "runtime_validation": "UNTESTED",
+      "material_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+      "validation_bearing_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348"
+    },
+    "reason": "The current user's explicit same-task DX11 rollover metadata is authoritative. ATTEMPT remains 1/3.",
+    "material_and_validation_bearing_sha_unchanged": true
   },
   "current_dispatch_reconciliation": {
     "task_id": "CONVERSION-DX11-00398",
     "authoritative": {
       "task_id": "CONVERSION-DX11-00398",
+      "production_id": "CONVERSION-DX11-00398",
+      "event_id": "CONVERSION-DX11-00398-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
       "lane": "DX11",
       "target_branch": "vr-dx11-native-r71",
-      "attempt": "1/3",
+      "source": "CURRENT_USER_ROLLOVER",
+      "dispatch_source": "CURRENT_USER_ROLLOVER",
       "material_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
       "validation_bearing_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
       "automation_validation": "PASS",
       "runtime_validation": "UNTESTED"
     },
-    "supplied_cross_lane": {
-      "production_id": "CONVERSION-DX9EX-00397",
-      "event_id": "CONVERSION-DX9EX-00397-E004",
-      "event_type": "rollover"
-    },
-    "reason": "The controller supplied a preceding DX9EX rollover pointer while dispatching a new DX11 TASK_ID. The pointer is provenance, not DX11 task ownership.",
-    "material_and_validation_bearing_sha_unchanged": false
+    "superseded": [
+      {
+        "production_id": "CONVERSION-DX9EX-00397",
+        "event_id": "CONVERSION-DX9EX-00397-E004",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "reason": "Cross-lane provenance from the recovered prior chat is older than the explicit current E002 rollover."
+      }
+    ],
+    "reason": "E002/CHAT_ROLLOVER=2 is authoritative and does not increment ATTEMPT.",
+    "material_and_validation_bearing_sha_unchanged": true
   },
   "current_task": {
     "status": "COMPLETE",
@@ -3283,6 +3337,27 @@
     "artifact_id": 11319008179,
     "artifact_digest": "sha256:a3d907f86d4ce653f33b97d683cf6901556a9ec3d6300432c74f40faa108d4dc",
     "r259_missing_prerequisite_mask": "0x5",
-    "native_draw_path_activation_changed": false
+    "native_draw_path_activation_changed": false,
+    "production_id": "CONVERSION-DX11-00398",
+    "event_id": "CONVERSION-DX11-00398-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "current_rollover_metadata_correction": {
+    "task_id": "CONVERSION-DX11-00398",
+    "production_id": "CONVERSION-DX11-00398",
+    "event_id": "CONVERSION-DX11-00398-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "source": "CURRENT_USER_ROLLOVER",
+    "dispatch_source": "CURRENT_USER_ROLLOVER",
+    "reason": "Latest explicit DX11 rollover bookkeeping is authoritative; rollover is not retry and material/validation SHA remain unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
   }
 }
