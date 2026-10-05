@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-10-05T15:21:34+09:00",
+  "updatedKst": "2026-10-05T15:35:05+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -184,7 +184,7 @@
     {
       "id": "DX9EX-FINGERPRINT-001",
       "priority": 11,
-      "status": "DONE",
+      "status": "NEED_HMD_TEST",
       "preferredRole": "B_RENDER_REVIEW",
       "summary": "Establish bounded exact draw fingerprints for unresolved HUD/white-overlay/effect classes without broad WVP ownership.",
       "testLevel": "LEVEL0",
@@ -194,14 +194,14 @@
       "validationSha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
       "validationRunId": 37271535226,
       "validationResult": "BUILD_VERIFIED",
-      "implementationProgress": "Added bounded exact ProducerToken provenance for rank-marker sprani/clip, exact ScreenHud clip, rival-marker sprani and text-glyph producers; preserved it across Sumo UI replay, captured it at c64/WVP upload, and correlated c64 scope/node identity at R30 draw time. Producer identity is telemetry-only and cannot grant HUD/world classification.",
+      "implementationProgress": "00405 carries bounded exact ProducerToken identity through queue/Sumo replay/c64/R30 draw correlation; 00406 removes its c64/node-relation diagnostic lookup from the telemetry-off HUD hot path and pins that invariant.",
       "validationEvidence": [
         "N100 exact-SHA producer-provenance/Sumo/HUD-cadence/R31-R32-retirement/architecture/hook-graph/refactor static suite PASS",
         "DX9Ex Active Validation 37271535226 policy/host/8 no-HMD smokes/game/R33 full-chain/package SUCCESS",
         "Domain Isolation Guard 37271535231 SUCCESS",
         "Package artifact 11328730820 digest sha256:50ddfff6a0366782aded04821af2fc3779e4572875b978b3a34d36092297bb94"
       ],
-      "nextAction": "Use VR R51 C64 FINGERPRINT and VR R51 DRAW FINGERPRINT telemetry in the next Quest3/VDXR HUD/rival-marker session to bind remaining white-HUD and vehicle-marker symptoms to exact producer lifetime before any behavior change."
+      "nextAction": "Quest3/VDXR CORRECTNESS-test exact SHA 9626ce91b664d247aeea79a0b1338496d8a0792e with VRTelemetry enabled; correlate C64/DRAW producer fingerprints before any ownership behavior change."
     },
     {
       "id": "L1-VIS-001",
@@ -224,9 +224,10 @@
         "semanticOverlayBypass remained 0 for the full session",
         "world baseline remained visually correct"
       ],
-      "nextAction": "Quest3/VDXR: reproduce white rank-score/6th-6/menu/YES-NO and rival-marker defects with VRTelemetry enabled; correlate exact producer, c64Scope/drawScope and SAME/OTHER/NONE queue-node relation from the new fingerprint logs before changing HUD/world ownership.",
+      "nextAction": "Quest3/VDXR B_HUD/HUD_SCREEN runtime capture on exact SHA 9626ce91b664d247aeea79a0b1338496d8a0792e with VRTelemetry enabled; use the evidence before any ownership behavior change.",
       "fingerprintValidationSha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
-      "fingerprintValidationRunId": 37271535226
+      "fingerprintValidationRunId": 37271535226,
+      "implementationProgress": "Exact producer/node/queue/c64/draw lifetime instrumentation is build-verified through 00405/00406 without broadening generic queue ownership."
     },
     {
       "id": "VR-BINARY-CONTRACT-001",

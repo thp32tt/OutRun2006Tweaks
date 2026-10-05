@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-05T14:43:12+09:00",
+  "updatedKst": "2026-10-05T15:35:05+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -162,11 +162,12 @@
     "No WVP/projection math, HUD/world semantic classification, Reset/Present ordering, lower draw target, D3D getter count, wait, allocation, or synchronization primitive changed in the 1000->1100 production closure. Physical R31/R32 hook-layer retirement remains deferred because it is not yet a mechanical equivalence transformation.",
     "Runtime remains UNTESTED; cycle 1100 is structural/static/build verification only.",
     "CONVERSION-DX9EX-00402 did not advance the structural cycle: cycle 1100 remains authoritative and physical R31/R32 hook-layer retirement stays deferred pending a bounded equivalence proof. General regression maintenance instead build-verified VR-HUD-SUMO-REPLAY-SEMANTIC-LOSS-001 by adding a deterministic non-consuming replay semantic ownership guard and wiring it into DX9Ex Active Validation. Exact validation-bearing SHA 4183a3bc6970653b5dab60a8f5c64ba1bc01c318 passed DX9Ex Active 37267187539 and Domain Isolation 37267187590; runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00403 / VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012: bounded structural proof gate only; no runtime behavior changed. RED commit 4811ab9d53b5c7ee7a60b8789916b0a6abe74c69 added tools/verify_vr_r31_r32_retirement_guard.py and failed exactly because the canonical DX9Ex Active workflow did not yet own the new guard. Validation-bearing 8b1bd6b3b6d726bec3e478ac2862bde80916a254 wired the guard into both the push path filter and architecture verification step. The guard pins four retirement prerequisites: R31/R32 install fallback ownership, R33->R32->R22 Reset plus R33->R32->R13 Present/DirectGPU ordering, R22/R31 StateBlock lifecycle/fallback coverage, and R33 final fallback through R32LowerFailClosed plus R30-owned lower-R29 calls. N100 exact-SHA py_compile + retirement guard + architecture + R51 + R32-R34 + hook graph + refactor + Sumo + near-plane + workflow YAML passed. GitHub exact-SHA DX9Ex Active 37268342455 policy/host/game/full-chain-compile/package SUCCESS and Domain Isolation Guard 37268342567 SUCCESS. Package artifact 11326909994 digest sha256:b81eb674a40841b5408f09e6e70576662a3b8b171c83b11f1237049847ebd36b. Physical retirement remains intentionally DEFERRED and runtime remains UNTESTED."
+    "CONVERSION-DX9EX-00403 / VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012: bounded structural proof gate only; no runtime behavior changed. RED commit 4811ab9d53b5c7ee7a60b8789916b0a6abe74c69 added tools/verify_vr_r31_r32_retirement_guard.py and failed exactly because the canonical DX9Ex Active workflow did not yet own the new guard. Validation-bearing 8b1bd6b3b6d726bec3e478ac2862bde80916a254 wired the guard into both the push path filter and architecture verification step. The guard pins four retirement prerequisites: R31/R32 install fallback ownership, R33->R32->R22 Reset plus R33->R32->R13 Present/DirectGPU ordering, R22/R31 StateBlock lifecycle/fallback coverage, and R33 final fallback through R32LowerFailClosed plus R30-owned lower-R29 calls. N100 exact-SHA py_compile + retirement guard + architecture + R51 + R32-R34 + hook graph + refactor + Sumo + near-plane + workflow YAML passed. GitHub exact-SHA DX9Ex Active 37268342455 policy/host/game/full-chain-compile/package SUCCESS and Domain Isolation Guard 37268342567 SUCCESS. Package artifact 11326909994 digest sha256:b81eb674a40841b5408f09e6e70576662a3b8b171c83b11f1237049847ebd36b. Physical retirement remains intentionally DEFERRED and runtime remains UNTESTED.",
+    "CONVERSION-DX9EX-00406: c64 producer provenance and semantic-HUD node-relation diagnostics are telemetry-only; VRTelemetry OFF skips diagnostic c64 provenance lookup. Rendering classification/ownership is unchanged; runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARDED",
-  "validatedSourceSha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
-  "validationRunId": 37268342455,
+  "validatedSourceSha": "9626ce91b664d247aeea79a0b1338496d8a0792e",
+  "validationRunId": 37272660121,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -397,5 +398,32 @@
     "chatRollover": 2,
     "rolloverIsRetry": false,
     "resumeReason": "Retry persisted after one recovery attempt"
+  },
+  "post1000Maintenance00406": {
+    "taskId": "CONVERSION-DX9EX-00406",
+    "eventId": "CONVERSION-DX9EX-00406-E001",
+    "attempt": "1/3",
+    "item": "DX9EX-FINGERPRINT-TELEMETRY-HOTPATH-GUARD-001",
+    "baseSha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+    "sourceMaterialSha": "cbe725042802622866e35e376db44e2ac70e9f2e",
+    "materialResultSha": "9626ce91b664d247aeea79a0b1338496d8a0792e",
+    "validationBearingResultSha": "9626ce91b664d247aeea79a0b1338496d8a0792e",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "runtimeBehaviorChanged": false,
+    "summary": "Telemetry-only c64/queue-node provenance lookup and semantic-HUD c64 relation bookkeeping are skipped when VRTelemetry is disabled; rendering classification remains unchanged.",
+    "validation": {
+      "dx9exActiveRunId": 37272660121,
+      "jobs": {
+        "policy": 111642793027,
+        "host": 111642905104,
+        "fullChainCompile": 111642905129,
+        "game": 111642905189,
+        "package": 111644219259
+      },
+      "domainIsolationRunId": 37272660120,
+      "packageArtifactId": 11329676021,
+      "packageArtifactDigest": "sha256:1f3ae6b0f1df5243b9e0014ee69afc91f24827b3fbaa2007a6dc9b93565c49d4"
+    }
   }
 }
