@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00405",
+  "production_id": "CONVERSION-DX9EX-00405",
+  "event_id": "CONVERSION-DX9EX-00405-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "queue_controller_contract": {
+    "path": "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "status": "APPLIED"
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "278425b6db18fbd1853bf9eec6b71cc92ce56f2a",
+  "source_material_sha": "3fbaa47fc5ea1de797c2c5ea0cdebb9122cc21d6",
+  "result_sha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+  "material_result_sha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+  "validation_bearing_result_sha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+  "queue_state_commit_sha": "3ece8271ecdfa1a291871d30f3e19dd1a391c17a",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00405]",
+  "selected_work_item": "DX9EX-FINGERPRINT-001",
+  "summary": "Established bounded exact sprite-producer provenance from original-mod producer wrappers through canonical SpriteNode ownership, Sumo non-tick replay, c64/WVP upload and R30 draw correlation. ProducerToken is diagnostic-only: existing RenderScope, projection and verified-world gates remain the sole rendering classifiers. HUD-external fingerprint lookup is disabled unless VRTelemetry is enabled, preserving the normal hot path. No visual/HMD correctness claim is made.",
+  "changed_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp",
+    "src/hooks_framerate.cpp",
+    "src/vr/game/outrun_renderer.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/verify_vr_producer_provenance.py",
+    ".github/workflows/vr-dx9ex-active.yml"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered HEAD 278425b6db18fbd1853bf9eec6b71cc92ce56f2a, AGENTS.md, VR_REFACTOR_STATE cycle 1100, work queue, regression/problem records and 00404 validation state. R31/R32 physical retirement remains explicitly DEFERRED until an atomic equivalence proof exists."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Highest executable static prerequisite was DX9EX-FINGERPRINT-001. Existing code already captured RenderScope/node epoch at c64, but lacked bounded exact producer identity spanning producer -> queue/replay -> c64 -> draw."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added five bounded ProducerToken families, exact wrapper tagging, replay preservation, c64 capture/first-use telemetry, draw-time scope/node correlation and a diagnostic-only verifier. Final 4f28c613 hot-path refinement keeps non-HUD provenance lookup behind VRTelemetry."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "N100 exact-SHA static suite PASS. GitHub exact-SHA DX9Ex Active 37271535226 policy/host/8 no-HMD smokes/game/R33 full-chain/package SUCCESS; Domain Isolation 37271535231 SUCCESS."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+      "validation_bearing_result_sha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Artifact 11328730820 OutRun2-VR-DX9EX-ACTIVE-4f28c61359c0dc351c6b364cd53058fa45ce55d2 digest sha256:50ddfff6a0366782aded04821af2fc3779e4572875b978b3a34d36092297bb94. Build artifact is not runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "queue_state_persisted": true,
+      "queue_state_commit_sha": "3ece8271ecdfa1a291871d30f3e19dd1a391c17a",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "evidence": {
+    "n100_local": {
+      "conclusion": "AUXILIARY_EXACT_SHA_STATIC_PASS",
+      "exact_sha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+      "checks": [
+        "py_compile producer verifier",
+        "producer provenance contract",
+        "Sumo replay semantic contract",
+        "HUD/cadence restore contract",
+        "R31/R32 retirement guard",
+        "architecture",
+        "hook graph",
+        "refactor contract",
+        "git diff --check"
+      ]
+    },
+    "dx9ex_active": {
+      "run_id": 37271535226,
+      "conclusion": "success",
+      "exact_sha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+      "jobs": {
+        "policy": 111639403906,
+        "host": 111639514698,
+        "full_chain_compile": 111639514726,
+        "game": 111639514744,
+        "package": "SUCCESS"
+      },
+      "artifact_id": 11328730820,
+      "artifact_digest": "sha256:50ddfff6a0366782aded04821af2fc3779e4572875b978b3a34d36092297bb94"
+    },
+    "domain_isolation": {
+      "run_id": 37271535231,
+      "conclusion": "success",
+      "exact_sha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2"
+    },
+    "superseded_intermediate": {
+      "sha": "3303bf0dea47d4a0e09723fe8ba6d99a058feccf",
+      "classification": "SUPERSEDED_BY_FINAL_HOT_PATH_REFINEMENT"
+    }
+  },
+  "next_action": "Quest3/VDXR runtime session with VRTelemetry enabled: correlate VR R51 C64/DRAW FINGERPRINT producer, c64Scope/drawScope and SAME/OTHER/NONE node relation for white HUD/menu/result text and rival markers before any new HUD/world ownership behavior change.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00405",
+    "production_id": "CONVERSION-DX9EX-00405",
+    "event_id": "CONVERSION-DX9EX-00405-E001",
+    "event_type": "dispatch",
+    "lane": "DX9EX",
+    "target_branch": "vr-d3d9ex-focus",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+    "validation_bearing_result_sha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
+    "runtime_validation": "UNTESTED"
+  },
+  "validated_at_kst": "2026-10-05T15:21:34+09:00",
+  "completed_at_kst": "2026-10-05T15:21:34+09:00"
+}
