@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION38",
+  "timestamp_kst": "2026-10-05T18:16:00+09:00",
+  "queue_index": 101,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+  "c_return": "C179_REWORK_REQUIRED_SOURCE_BBOX_INCOMPLETE_SOURCE_RESIDUE",
+  "source_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+  "candidate_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+  "producer_report": "localization/graphics/role_A/20261005-A-PRODUCTION38/A38_560FA536_REPORT.json",
+  "correction": {
+    "idx": 31,
+    "previous_source_effect_bbox": [
+      3074,
+      25,
+      3932,
+      168
+    ],
+    "corrected_source_effect_bbox": [
+      3006,
+      25,
+      3932,
+      168
+    ],
+    "localized_bbox": [
+      3027,
+      36,
+      3911,
+      156
+    ],
+    "delta_left": 21,
+    "delta_right": 21,
+    "delta_top": 11,
+    "delta_bottom": 12,
+    "method": "replace fixed 17% left cutoff with canonical icon-only exclusion; include all nontransparent warning text/effect pixels to the right"
+  },
+  "bbox_size_positive_margin": "13/13 PASS",
+  "zero_pixel_gates": {
+    "clean_source_core_unchanged": 0,
+    "source_core_residue": 0,
+    "changed_outside": 0,
+    "alpha_changed_outside": 0,
+    "protected_visible_changed": 0,
+    "localized_overlap": 0,
+    "localized_1px_touch": 0
+  },
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "controller_visual_qa": "PASS_OVERVIEW_PENDING_INDEPENDENT_C_DETAIL",
+  "visual_note": "Readable SOURCE/CLEAN/FINAL overview and raw mirror_y output reviewed after the C179 mask expansion. The warning row no longer shows the prior horizontal-edge source fragments at overview scale; protected song titles, OutRun2, speed values and unrelated artwork remain intact. Independent C detail review is still required.",
+  "decision": "A38_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
