@@ -1,0 +1,287 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION78-C598-REWORK",
+  "index": 86,
+  "asset": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+  "reworks": "C151_REWORK_REQUIRED_DXT5_EXACT_MASK_AND_RENDER",
+  "source_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+  "source_blob_sha1": "3ab34d5fcd66b5b8cb3d59e02d0d199e2e6b5456",
+  "atlas_blob_sha1": "c2d82b14396fc89ca08affcb8ff9c615d644bc82",
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "DXT5",
+    "raw_orientation": "mirror_y"
+  },
+  "stage_boundary_checks": [
+    {
+      "region_idx": 77,
+      "source": "Cape Way",
+      "cell": [
+        1200,
+        680,
+        168,
+        88
+      ],
+      "exact_alpha_bbox": [
+        1200,
+        688,
+        1364,
+        756
+      ],
+      "bbox_mod4": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_alpha_pixels": 10114,
+      "source_alpha_pixels_in_bbox_crossing_blocks": 0,
+      "bbox_crossing_blocks_with_source_alpha": 0,
+      "ordinary_full_block_splice_exact_safe": "PASS"
+    },
+    {
+      "region_idx": 78,
+      "source": "Imperial Avenue",
+      "cell": [
+        1368,
+        680,
+        168,
+        88
+      ],
+      "exact_alpha_bbox": [
+        1368,
+        688,
+        1532,
+        756
+      ],
+      "bbox_mod4": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_alpha_pixels": 10114,
+      "source_alpha_pixels_in_bbox_crossing_blocks": 0,
+      "bbox_crossing_blocks_with_source_alpha": 0,
+      "ordinary_full_block_splice_exact_safe": "PASS"
+    },
+    {
+      "region_idx": 79,
+      "source": "Ancient Ruins",
+      "cell": [
+        1536,
+        696,
+        360,
+        72
+      ],
+      "exact_alpha_bbox": [
+        1603,
+        704,
+        1805,
+        753
+      ],
+      "bbox_mod4": [
+        3,
+        0,
+        1,
+        1
+      ],
+      "source_alpha_pixels": 6601,
+      "source_alpha_pixels_in_bbox_crossing_blocks": 35,
+      "bbox_crossing_blocks_with_source_alpha": 11,
+      "ordinary_full_block_splice_exact_safe": "FAIL"
+    },
+    {
+      "region_idx": 80,
+      "source": "Metropolis",
+      "cell": [
+        1896,
+        696,
+        360,
+        72
+      ],
+      "exact_alpha_bbox": [
+        1897,
+        705,
+        2228,
+        753
+      ],
+      "bbox_mod4": [
+        1,
+        1,
+        0,
+        1
+      ],
+      "source_alpha_pixels": 10535,
+      "source_alpha_pixels_in_bbox_crossing_blocks": 209,
+      "bbox_crossing_blocks_with_source_alpha": 28,
+      "ordinary_full_block_splice_exact_safe": "FAIL"
+    },
+    {
+      "region_idx": 81,
+      "source": "Tulip Garden",
+      "cell": [
+        2256,
+        696,
+        360,
+        72
+      ],
+      "exact_alpha_bbox": [
+        2277,
+        705,
+        2569,
+        746
+      ],
+      "bbox_mod4": [
+        1,
+        1,
+        1,
+        2
+      ],
+      "source_alpha_pixels": 9279,
+      "source_alpha_pixels_in_bbox_crossing_blocks": 501,
+      "bbox_crossing_blocks_with_source_alpha": 95,
+      "ordinary_full_block_splice_exact_safe": "FAIL"
+    },
+    {
+      "region_idx": 82,
+      "source": "Skyscrapers",
+      "cell": [
+        2616,
+        696,
+        360,
+        72
+      ],
+      "exact_alpha_bbox": [
+        2672,
+        705,
+        2894,
+        753
+      ],
+      "bbox_mod4": [
+        0,
+        1,
+        2,
+        1
+      ],
+      "source_alpha_pixels": 7479,
+      "source_alpha_pixels_in_bbox_crossing_blocks": 212,
+      "bbox_crossing_blocks_with_source_alpha": 29,
+      "ordinary_full_block_splice_exact_safe": "FAIL"
+    },
+    {
+      "region_idx": 83,
+      "source": "Milky Way",
+      "cell": [
+        2976,
+        696,
+        360,
+        72
+      ],
+      "exact_alpha_bbox": [
+        3016,
+        704,
+        3277,
+        753
+      ],
+      "bbox_mod4": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "source_alpha_pixels": 8631,
+      "source_alpha_pixels_in_bbox_crossing_blocks": 20,
+      "bbox_crossing_blocks_with_source_alpha": 7,
+      "ordinary_full_block_splice_exact_safe": "FAIL"
+    },
+    {
+      "region_idx": 84,
+      "source": "Floral Village",
+      "cell": [
+        3336,
+        696,
+        360,
+        72
+      ],
+      "exact_alpha_bbox": [
+        3377,
+        704,
+        3629,
+        753
+      ],
+      "bbox_mod4": [
+        1,
+        0,
+        1,
+        1
+      ],
+      "source_alpha_pixels": 8190,
+      "source_alpha_pixels_in_bbox_crossing_blocks": 48,
+      "bbox_crossing_blocks_with_source_alpha": 12,
+      "ordinary_full_block_splice_exact_safe": "FAIL"
+    },
+    {
+      "region_idx": 85,
+      "source": "Legend",
+      "cell": [
+        3696,
+        696,
+        360,
+        72
+      ],
+      "exact_alpha_bbox": [
+        3757,
+        705,
+        3968,
+        753
+      ],
+      "bbox_mod4": [
+        1,
+        1,
+        0,
+        1
+      ],
+      "source_alpha_pixels": 7252,
+      "source_alpha_pixels_in_bbox_crossing_blocks": 373,
+      "bbox_crossing_blocks_with_source_alpha": 42,
+      "ordinary_full_block_splice_exact_safe": "FAIL"
+    },
+    {
+      "region_idx": 86,
+      "source": "Giant Statues",
+      "cell": [
+        3600,
+        784,
+        360,
+        72
+      ],
+      "exact_alpha_bbox": [
+        3632,
+        792,
+        3907,
+        840
+      ],
+      "bbox_mod4": [
+        0,
+        0,
+        3,
+        0
+      ],
+      "source_alpha_pixels": 9143,
+      "source_alpha_pixels_in_bbox_crossing_blocks": 37,
+      "bbox_crossing_blocks_with_source_alpha": 6,
+      "ordinary_full_block_splice_exact_safe": "FAIL"
+    }
+  ],
+  "total_source_alpha_pixels_in_bbox_crossing_blocks": 1435,
+  "finding": "FAIL_CLOSED_ORDINARY_DXT5_BLOCK_SPLICE_CANNOT_BE_EXACT_DECODED_PIXEL_SAFE",
+  "reason": "At least one mandatory source glyph/effect pixel lies in a 4x4 DXT5 block crossing the exact source bbox. Replacing that whole block can alter decoded pixels outside the permitted exact bbox; retaining it leaves source residue. An endpoint/index-constrained DXT5 solver that preserves every outside decoded pixel is required before safe candidate construction.",
+  "candidate_persisted": false,
+  "decision": "REWORK_REQUIRED_DXT5_CONSTRAINED_ENDPOINT_INDEX_SOLVER",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

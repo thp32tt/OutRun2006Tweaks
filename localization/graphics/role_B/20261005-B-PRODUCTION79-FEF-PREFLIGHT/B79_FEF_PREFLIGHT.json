@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION79-FEF-PREFLIGHT",
+  "index": 236,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "source_blob_sha1": "48fd896aaa8ff2f269b659771f2618ea6a8426d5",
+  "atlas_blob_sha1": "750c9f48f00508161f195a1a2515321cbebdab88",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "regions": [
+    {
+      "idx": 0,
+      "name": "sprite_612",
+      "cell": [
+        0,
+        1908,
+        1168,
+        140
+      ],
+      "alpha_bbox": [
+        54,
+        1937,
+        1161,
+        2024
+      ],
+      "alpha_pixels": 50903
+    },
+    {
+      "idx": 1,
+      "name": "sprite_613",
+      "cell": [
+        0,
+        1796,
+        1072,
+        112
+      ],
+      "alpha_bbox": [
+        321,
+        1804,
+        1038,
+        1899
+      ],
+      "alpha_pixels": 34348
+    },
+    {
+      "idx": 2,
+      "name": "sprite_614",
+      "cell": [
+        0,
+        1684,
+        1072,
+        112
+      ],
+      "alpha_bbox": [
+        263,
+        1694,
+        1056,
+        1788
+      ],
+      "alpha_pixels": 38353
+    },
+    {
+      "idx": 3,
+      "name": "sprite_615",
+      "cell": [
+        0,
+        1572,
+        1072,
+        112
+      ],
+      "alpha_bbox": [
+        283,
+        1580,
+        1063,
+        1675
+      ],
+      "alpha_pixels": 37623
+    },
+    {
+      "idx": 4,
+      "name": "sprite_616",
+      "cell": [
+        0,
+        1460,
+        1072,
+        112
+      ],
+      "alpha_bbox": [
+        106,
+        1464,
+        1034,
+        1559
+      ],
+      "alpha_pixels": 46922
+    },
+    {
+      "idx": 5,
+      "name": "sprite_617",
+      "cell": [
+        0,
+        1348,
+        1072,
+        112
+      ],
+      "alpha_bbox": [
+        255,
+        1356,
+        1056,
+        1451
+      ],
+      "alpha_pixels": 39204
+    },
+    {
+      "idx": 6,
+      "name": "sprite_618",
+      "cell": [
+        0,
+        1236,
+        1072,
+        112
+      ],
+      "alpha_bbox": [
+        351,
+        1241,
+        1057,
+        1335
+      ],
+      "alpha_pixels": 34035
+    },
+    {
+      "idx": 7,
+      "name": "sprite_619",
+      "cell": [
+        0,
+        1124,
+        1072,
+        112
+      ],
+      "alpha_bbox": [
+        191,
+        1134,
+        1056,
+        1227
+      ],
+      "alpha_pixels": 41589
+    },
+    {
+      "idx": 8,
+      "name": "sprite_620",
+      "cell": [
+        0,
+        1012,
+        1072,
+        112
+      ],
+      "alpha_bbox": [
+        423,
+        1023,
+        1051,
+        1112
+      ],
+      "alpha_pixels": 28237
+    },
+    {
+      "idx": 9,
+      "name": "sprite_621",
+      "cell": [
+        0,
+        900,
+        1072,
+        112
+      ],
+      "alpha_bbox": [
+        347,
+        908,
+        1057,
+        1003
+      ],
+      "alpha_pixels": 35325
+    },
+    {
+      "idx": 10,
+      "name": "sprite_622",
+      "cell": [
+        0,
+        788,
+        1072,
+        112
+      ],
+      "alpha_bbox": [
+        516,
+        795,
+        1050,
+        890
+      ],
+      "alpha_pixels": 23310
+    },
+    {
+      "idx": 11,
+      "name": "sprite_623",
+      "cell": [
+        0,
+        676,
+        1072,
+        112
+      ],
+      "alpha_bbox": [
+        632,
+        681,
+        1055,
+        775
+      ],
+      "alpha_pixels": 22506
+    },
+    {
+      "idx": 12,
+      "name": "sprite_624",
+      "cell": [
+        0,
+        564,
+        1072,
+        112
+      ],
+      "alpha_bbox": [
+        623,
+        573,
+        1043,
+        667
+      ],
+      "alpha_pixels": 20811
+    },
+    {
+      "idx": 13,
+      "name": "sprite_625",
+      "cell": [
+        0,
+        452,
+        1072,
+        112
+      ],
+      "alpha_bbox": [
+        36,
+        467,
+        1046,
+        559
+      ],
+      "alpha_pixels": 49460
+    },
+    {
+      "idx": 14,
+      "name": "sprite_626",
+      "cell": [
+        1072,
+        1840,
+        944,
+        68
+      ],
+      "alpha_bbox": [
+        1678,
+        1847,
+        1995,
+        1898
+      ],
+      "alpha_pixels": 9102
+    }
+  ],
+  "expected_stage_names": [
+    "IMPERIAL AVENUE",
+    "JUNGLE",
+    "LEGEND",
+    "LOST CITY",
+    "METROPOLIS",
+    "MILKY WAY",
+    "NATIONAL PARK",
+    "PALM BEACH",
+    "SKYSCRAPERS",
+    "SNOW MOUNTAIN",
+    "SUNNY BEACH",
+    "TULIP GARDEN",
+    "WATERFALLS",
+    "INDUSTRIAL COMPLEX"
+  ],
+  "status": "B79_CANONICAL_REGION_ORDER_VISUAL_BINDING_REQUIRED_SAME_INVOCATION",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
