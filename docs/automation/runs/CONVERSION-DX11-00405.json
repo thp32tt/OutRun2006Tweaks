@@ -10,15 +10,15 @@
   "chat_rollover": 3,
   "rollover_is_retry": false,
   "resume_reason": "Retry persisted after one recovery attempt",
-  "status": "IN_PROGRESS",
+  "status": "COMPLETE",
   "selected_work_item": "DX11_R267_PROGRAMMABLE_SHADER_INTERFACE_SEMANTICS",
   "base_sha": "bb48af41c4a56190868a2f6f8b39d03acf404bb7",
-  "result_sha": "PENDING",
-  "material_result_sha": "PENDING",
-  "source_implementation_sha": "PENDING",
-  "validation_bearing_result_sha": "PENDING",
+  "result_sha": "4967465b47ca4abf65d79ddf4db4b3c302ac5d69",
+  "material_result_sha": "4967465b47ca4abf65d79ddf4db4b3c302ac5d69",
+  "source_implementation_sha": "4967465b47ca4abf65d79ddf4db4b3c302ac5d69",
+  "validation_bearing_result_sha": "4967465b47ca4abf65d79ddf4db4b3c302ac5d69",
   "result_marker": "[AUTO:CONVERSION-DX11-00405]",
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
@@ -66,21 +66,23 @@
       "evidence": "R267 SM3 DCL interface semantic evidence is wired into census identity and hardened against invalid declaration provenance. The decoder now requires the DCL info-token marker bit, validates sampler declaration texture type/reserved bits, rejects overlapping register-component declaration masks, and keeps SM2/ambiguous layouts fail-closed. Probes cover valid SM3 input/output/sampler evidence plus missing-marker, SM2, duplicate-semantic and overlapping-mask rejection. NativeDrawPath, Draw and DrawIndexed remain unchanged."
     },
     "C3_VALIDATE": {
-      "status": "IN_PROGRESS",
-      "automation_validation": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact-SHA Backend Conversion Gate 37286098253 completed SUCCESS for 4967465b47ca4abf65d79ddf4db4b3c302ac5d69. validate job 111685498220 and DX11 readiness smoke job 111687367069 both succeeded; the smoke includes the DX11 constant-buffer probe carrying the R267 regressions. Artifact 11334955436 digest sha256:9303d3653a8f6f1d386fa187b1fb9c43f5d2219364f35b9560edb25f3900c3e3. No real HMD/game runtime test was performed."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
-      "evidence": "Material R267 implementation, DCL provenance fix and regression/source-graph guards are committed on vr-dx11-native-r71 with [AUTO:CONVERSION-DX11-00405]."
+      "evidence": "Material R267 implementation, DCL exactness repair, regression guards and source-graph enforcement are committed through 4967465b47ca4abf65d79ddf4db4b3c302ac5d69 with [AUTO:CONVERSION-DX11-00405]."
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
       "reason": "Dormant semantic-evidence increment only; no runtime candidate or package identity is promoted."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "evidence": "E005 rollover metadata, material/validation SHA, exact-SHA CI receipts and fail-closed activation scope are persisted in this run record. NativeDrawPath, Draw and DrawIndexed remain unauthorized."
     }
   },
   "controller_dispatch": {
@@ -99,5 +101,19 @@
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt"
   },
-  "exact_next_action": "Consume exact-SHA Backend Conversion Gate for the latest R267 DCL-exactness material state, then persist C3/C6 PASS state while retaining RUNTIME_VALIDATION=UNTESTED. Keep NativeDrawPath, Draw and DrawIndexed unauthorized."
+  "exact_next_action": "R268 should consume exact R267 vertex-output/pixel-input interface semantics to derive fail-closed stage-linkage compatibility evidence toward the dormant R263 semantic-translation receipt. Do not enable NativeDrawPath, Draw or DrawIndexed without separate exact production proof.",
+  "validation": {
+    "exact_sha": "4967465b47ca4abf65d79ddf4db4b3c302ac5d69",
+    "backend_conversion_gate": {
+      "run_id": 37286098253,
+      "conclusion": "success",
+      "validate_job_id": 111685498220,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 111687367069,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11334955436,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-4967465b47ca4abf65d79ddf4db4b3c302ac5d69",
+      "artifact_digest": "sha256:9303d3653a8f6f1d386fa187b1fb9c43f5d2219364f35b9560edb25f3900c3e3"
+    }
+  }
 }
