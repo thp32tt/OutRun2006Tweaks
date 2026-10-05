@@ -1341,3 +1341,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - B108 superseded B105 during this C invocation. Latest candidate `40d7a005c7978151e01099e72317df48d44629e71661626222981745d5acb963` removes the prior horizontal band, but C visual QA still FAILS: faint title/effect-shaped smudging remains in the pink cloud and dark/smeared reconstruction discontinuities remain around the upper center/spike of the lower starburst, visible through FINAL.
 - Producer static counters still report 2/2 bbox+size+positive margins and zero outside/alpha/protected/residue/overlap. Mandatory visual clean-plate gate overrides those false-negative counters.
 - Decision: `C167_REWORK_REQUIRED_CLEAN_PLATE_VISIBLE_RECONSTRUCTION_ARTIFACTS`. C164/C165 PASS decisions remain unchanged. pending_artwork localize_text=19; producer REWORK remains 2 (63C91067, C598919A). RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-05 15:22 KST — C168 latest B109 63C review
+- Reviewed only the new B109 index 26 `63C91067_512x512.dds` candidate `3876804b958513aa842966c241fcb6c9215593247b4acf719b6b1d46e6cbf2ee`; prior C164/C165 PASS assets were not repeated.
+- Producer static QA reports 2/2 exact bbox+source-size+positive-margin PASS and zero outside/alpha/protected/source-residue/render-outside/overlap.
+- Mandatory C visual QA FAILS the CLEAN plate: the lower starburst has large cut/notch damage through the top-center spike/inner glow, and the pink cloud has a triangular/faceted reconstruction wedge below its top-center border. Both remain visible around/behind the Korean title in FINAL.
+- Decision: `C168_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE`. Producer REWORK remains 2 (`63C91067`, `C598919A`); pending_artwork localize_text=19. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
