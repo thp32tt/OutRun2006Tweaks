@@ -1264,3 +1264,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Controller SOURCE/CLEAN/FINAL, row-contact and raw mirror_y visual self-QA PASS. C157 independently recomputed canonical DDS+atlas masks/bboxes/style and machine-QA PASSed the same SHA with fill median delta [0,0,0].
 - Queue index 188 -> b82_self_qa_pass_pending_c; pending_artwork localize_text=25; C598919A remains producer REWORK_REQUIRED. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_B/20261005-B-PRODUCTION81/B82_8C_REPORT.json, localization/graphics/role_B/20261005-B-PRODUCTION81/B82_CONTROLLER_SELF_QA.json, localization/graphics/role_C/20261005-C157-8C259C68/C157_8C_MACHINE_QA.json.
+## 2026-10-05 12:28:52 KST — C157 8C259C68 cross-lane final QA
+- Reviewed only the newly corrected B82 index 188 `8C259C68_512x512.dds`; completed prior PASS assets were not repeated.
+- C independently re-downloaded the pinned canonical DDS+atlas and rebuilt the six source masks/exact bboxes plus transparent clean plate without consuming producer masks. Candidate `03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03` preserves 2048x2048 RGBA32/RGBA mip1 header/raw mirror_y.
+- Machine QA: 6/6 exact source-bbox containment, source-size ceiling and positive margins PASS. Clean outside/unchanged/protected/alpha-outside=0; final outside/alpha/protected/render-outside/source-residue/target-protected overlap+1px-near/overlap/touch=0; source/localized fill median RGB both [63,71,74].
+- Controller SOURCE/CLEAN/FINAL, six row contacts and raw mirror_y visual QA PASS. Corrected readable-row semantic order is retained; shared dark-gray Bold help-copy style is source-faithful with no visible clipping, overlap, residue, seam, halo or orientation regression.
+- Decision: `C157_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`; candidate unchanged by C. C598919A remains sole producer REWORK_REQUIRED; strict HOLD remains `4F68708E/F6811E94/49BB5FE5/75C3586A`.
+- pending_artwork localize_text=25; `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C157-8C259C68/C157_8C_MACHINE_QA.json`, `localization/graphics/role_C/20261005-C157-8C259C68/C157_8C_CONTROLLER_FINAL_QA.json`.
