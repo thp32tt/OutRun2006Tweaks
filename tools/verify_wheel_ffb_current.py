@@ -570,11 +570,14 @@ forbid(ffb, 'arcadeDirectionalSurface += arcadeSurfaceTransitionForce_;', 'arcad
 req(ffb, 'crashImpactDirection_ * crashArcadeStrength_', 'arcade wall events preserve latched C2C-derived impact direction and pre-impact strength')
 req(ffb, 'impactFrame < WheelFFBMath::ArcadeConstantEventFrames', 'arcade wall output uses reference 80ms lifetime')
 req(ffb, 'const bool suppressStructuralForImpact =', 'structural crash suppression is model-aware')
-req(ffb, 'impactAge < WheelFFBMath::ArcadeConstantEventFrames', 'Arcade structural suppression ends with its 80ms event')
-req(ffb, 'ps2Original\n                        ? false', 'PS2 software condition fallback is not blanked by an unverified collision event')
+forbid(ffb, 'impactAge < WheelFFBMath::ArcadeConstantEventFrames', 'retired Hybrid no longer owns a special collision-suppression window')
+original_impact_guard = '(arcadeOriginal || ps2Original)\n                    ? false'
+if ffb.count(original_impact_guard) < 2:
+    raise SystemExit('CURRENT VERIFY FAILED [Arcade Original and PS2 must preserve both Spring and structural condition backbones through shared collision debounce]')
+print('OK [Original-model collision backbone remains active while Modern isolates impact transients]')
 forbid(ffb, 'if (crashImpulseTimer_ <= CrashCooldownFrames)', 'shared debounce timer cannot globally blank structural torque')
-# Modern DD legitimately keeps its own <6 rebound phase; Arcade is guarded by
-# the explicit ArcadeConstantEventFrames requirement above.
+# Modern DD keeps its own short kick/rebound event while Original modes keep
+# their condition backbone active through the shared collision debounce.
 req(ffb, 'const bool collisionEdge = collision && !wasCollision;', 'shared crash detector identifies explicit C2C collision edge')
 req(ffb, 'WheelFFBMath::crash_speed_drop_fallback(speedDrop, speed)', 'shared crash detector uses tested emergency deceleration fallback')
 req(ffb, 'WheelFFB: collision state edge', 'collision-state witness has distinct diagnostic')
