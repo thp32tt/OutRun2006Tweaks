@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T22:04:55+09:00",
+  "role": "C",
+  "run": "20261005-C203-59A79158",
+  "qa_id": "C203",
+  "queue_index": 163,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+  "producer_run": "20261005-A-PRODUCTION60",
+  "source_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+  "candidate_sha256": "1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583",
+  "candidate_changed_by_C": false,
+  "structure": {
+    "dimensions": [
+      1024,
+      2048
+    ],
+    "format": "RGBA32/BGRA",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "machine_status": "PASS",
+  "source_bbox_exact_match": "24/24 PASS",
+  "candidate_bbox_exact_match": "24/24 PASS",
+  "containment_size_positive_margin": "24/24 PASS",
+  "semantic_binding": "PASS_CANONICAL_STAGE_PHONETIC_24_OF_24",
+  "zero_gates": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_residue_exact_pixels_outside_localized_bboxes": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0
+  },
+  "controller_visual_qa": "PASS",
+  "visual_notes": [
+    "C203 readable contacts verify physical idx0..23 mapping Waterfalls through Castle Wall and canonical phonetic Hangul spellings.",
+    "A60 restores source-family vertical scale after A59 was rejected as undersized; Korean weight/height/left alignment are visually consistent across all 24 rows.",
+    "No source-script residue, clipping, overlap, alpha fringe, or unintended artwork is visible.",
+    "Raw mirror_y orientation is correct."
+  ],
+  "machine_report": "localization/graphics/role_C/20261005-C203-59A79158/C203_59A79158_MACHINE_QA.json",
+  "producer_controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION60/A60_CONTROLLER_SELF_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C203-59A79158/C203_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_C/20261005-C203-59A79158/C203_RAW_COMPARE.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION60/A60_ROW_CONTACTS.jpg"
+  ],
+  "decision": "C203_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED"
+}
