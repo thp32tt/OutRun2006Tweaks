@@ -1,0 +1,347 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION28",
+  "index": 175,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "worker": "github-actions",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "60cbe90be5765b4ade3ce80916d9b2c7ed23e589",
+    "sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+    "classification": "authoritative HD source; actual DDS 2048x1024 RGBA32"
+  },
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "candidate_sha256": "3d166cf12042471246ce05e89de5122f4ed77cfdbc0f175ed31d351da8ffb20d",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "pixel_raw_mode": "BGRA",
+    "pitch": 8192,
+    "depth": 0,
+    "mipmaps": 1,
+    "bytes": 8388736,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "semantic_binding": {
+    "canonical_visible_physical_rows": 3,
+    "localized": [
+      "stage select -> 스테이지 선택",
+      "showroom -> 쇼룸",
+      "single player -> 싱글 플레이"
+    ],
+    "historical_draft_rows_absent_in_canonical_hd": [
+      "system link",
+      "xbox live"
+    ],
+    "binding_evidence": "20261005-A-PRODUCTION28-PREFLIGHT full raw/flip canonical source visuals"
+  },
+  "rows": [
+    {
+      "row": 0,
+      "source": "stage select",
+      "korean": "스테이지 선택",
+      "original_bbox": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "raw_original_bbox": [
+        6,
+        627,
+        1372,
+        770
+      ],
+      "source_width": 1366,
+      "source_height": 143,
+      "localized_bbox": [
+        10,
+        258,
+        737,
+        393
+      ],
+      "raw_localized_bbox": [
+        10,
+        631,
+        737,
+        766
+      ],
+      "localized_width": 727,
+      "localized_height": 135,
+      "delta_left": 4,
+      "delta_right": 635,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Regular",
+      "font_size": 126,
+      "outer_stroke": 6,
+      "body_extra": 2,
+      "slant_px": 6,
+      "shadow_offset": [
+        5,
+        7
+      ],
+      "source_style": {
+        "dark": [
+          0,
+          0,
+          0,
+          255
+        ],
+        "bright": [
+          249,
+          249,
+          249,
+          255
+        ],
+        "profile_samples": [
+          [
+            244,
+            244,
+            244
+          ],
+          [
+            156,
+            156,
+            156
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "row": 1,
+      "source": "showroom",
+      "korean": "쇼룸",
+      "original_bbox": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "raw_original_bbox": [
+        6,
+        495,
+        956,
+        627
+      ],
+      "source_width": 950,
+      "source_height": 132,
+      "localized_bbox": [
+        10,
+        401,
+        240,
+        525
+      ],
+      "raw_localized_bbox": [
+        10,
+        499,
+        240,
+        623
+      ],
+      "localized_width": 230,
+      "localized_height": 124,
+      "delta_left": 4,
+      "delta_right": 716,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Regular",
+      "font_size": 122,
+      "outer_stroke": 5,
+      "body_extra": 2,
+      "slant_px": 6,
+      "shadow_offset": [
+        5,
+        7
+      ],
+      "source_style": {
+        "dark": [
+          0,
+          0,
+          0,
+          255
+        ],
+        "bright": [
+          248,
+          248,
+          248,
+          255
+        ],
+        "profile_samples": [
+          [
+            244,
+            244,
+            244
+          ],
+          [
+            62,
+            62,
+            62
+          ],
+          [
+            21,
+            21,
+            21
+          ]
+        ]
+      }
+    },
+    {
+      "row": 2,
+      "source": "single player",
+      "korean": "싱글 플레이",
+      "original_bbox": [
+        2,
+        566,
+        1386,
+        717
+      ],
+      "raw_original_bbox": [
+        2,
+        307,
+        1386,
+        458
+      ],
+      "source_width": 1384,
+      "source_height": 151,
+      "localized_bbox": [
+        6,
+        570,
+        648,
+        713
+      ],
+      "raw_localized_bbox": [
+        6,
+        311,
+        648,
+        454
+      ],
+      "localized_width": 642,
+      "localized_height": 143,
+      "delta_left": 4,
+      "delta_right": 738,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Regular",
+      "font_size": 134,
+      "outer_stroke": 6,
+      "body_extra": 2,
+      "slant_px": 7,
+      "shadow_offset": [
+        5,
+        8
+      ],
+      "source_style": {
+        "dark": [
+          0,
+          0,
+          0,
+          255
+        ],
+        "bright": [
+          245,
+          245,
+          245,
+          255
+        ],
+        "profile_samples": [
+          [
+            246,
+            246,
+            246
+          ],
+          [
+            89,
+            89,
+            89
+          ],
+          [
+            21,
+            21,
+            21
+          ]
+        ]
+      }
+    }
+  ],
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION28/754F0599_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION28/754F0599_HD_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 270693,
+    "changed_bbox": [
+      2,
+      254,
+      1386,
+      717
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION28/754F0599_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION28/754F0599_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 325635,
+    "changed_bbox": [
+      2,
+      254,
+      1386,
+      717
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "machine_checks": {
+    "source_mask_pixels_unchanged_in_clean": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pixels": 0,
+    "changed_pixels_outside_source_bboxes": 0,
+    "alpha_changed_pixels_outside_source_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "source_residue_visible_pixels": 0
+  },
+  "all_3_bbox_pass": true,
+  "all_3_size_ceiling_pass": true,
+  "all_3_positive_margin": true,
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A_PRODUCTION28_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
