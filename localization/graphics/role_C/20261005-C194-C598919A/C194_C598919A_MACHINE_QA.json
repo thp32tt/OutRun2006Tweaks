@@ -1,0 +1,1495 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C194-C598919A",
+  "qa_id": "C194",
+  "queue_index": 86,
+  "asset": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+  "producer_run": "20261005-B-PRODUCTION139-C598-SOLVER-FIX",
+  "source_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+  "candidate_sha256": "e3c3f78975b3dd582690a7f169c1aa364dd05e3846827340aae38631885b92bf",
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "semantic_stage_mapping_expected": {
+    "79": {
+      "source": "Cape Way",
+      "korean": "케이프 웨이"
+    },
+    "80": {
+      "source": "Imperial Avenue",
+      "korean": "임페리얼 애비뉴"
+    },
+    "81": {
+      "source": "Ancient Ruins",
+      "korean": "에인션트 루인스"
+    },
+    "82": {
+      "source": "Metropolis",
+      "korean": "메트로폴리스"
+    },
+    "83": {
+      "source": "Tulip Garden",
+      "korean": "튤립 가든"
+    },
+    "84": {
+      "source": "Skyscrapers",
+      "korean": "스카이스크레이퍼스"
+    },
+    "85": {
+      "source": "Milky Way",
+      "korean": "밀키 웨이"
+    },
+    "86": {
+      "source": "Floral Village",
+      "korean": "플로럴 빌리지"
+    },
+    "87": {
+      "source": "Legend",
+      "korean": "레전드"
+    },
+    "88": {
+      "source": "Giant Statues",
+      "korean": "자이언트 스태추스"
+    }
+  },
+  "semantic_stage_mapping_seen": {
+    "79": {
+      "source": "Cape Way",
+      "korean": "케이프 웨이"
+    },
+    "80": {
+      "source": "Imperial Avenue",
+      "korean": "임페리얼 애비뉴"
+    },
+    "81": {
+      "source": "Ancient Ruins",
+      "korean": "에인션트 루인스"
+    },
+    "82": {
+      "source": "Metropolis",
+      "korean": "메트로폴리스"
+    },
+    "83": {
+      "source": "Tulip Garden",
+      "korean": "튤립 가든"
+    },
+    "84": {
+      "source": "Skyscrapers",
+      "korean": "스카이스크레이퍼스"
+    },
+    "85": {
+      "source": "Milky Way",
+      "korean": "밀키 웨이"
+    },
+    "86": {
+      "source": "Floral Village",
+      "korean": "플로럴 빌리지"
+    },
+    "87": {
+      "source": "Legend",
+      "korean": "레전드"
+    },
+    "88": {
+      "source": "Giant Statues",
+      "korean": "자이언트 스태추스"
+    }
+  },
+  "semantic_policy_pass": true,
+  "row_checks": [
+    {
+      "region_idx": 30,
+      "source": "OutRun MODE",
+      "korean": "아웃런 모드",
+      "kind": "mode",
+      "original_bbox": [
+        1872,
+        1312,
+        2288,
+        1412
+      ],
+      "producer_localized_bbox": [
+        1879,
+        1316,
+        2280,
+        1408
+      ],
+      "independent_localized_bbox": [
+        1879,
+        1316,
+        2280,
+        1408
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 7,
+      "delta_right": 8,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 40,
+      "source": "Top Runners of Each Goal",
+      "korean": "각 골별 최고 기록",
+      "kind": "header",
+      "original_bbox": [
+        16,
+        1124,
+        1272,
+        1236
+      ],
+      "producer_localized_bbox": [
+        308,
+        1128,
+        977,
+        1232
+      ],
+      "independent_localized_bbox": [
+        308,
+        1128,
+        977,
+        1232
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 292,
+      "delta_right": 295,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 43,
+      "source": "Heart Attack MODE",
+      "korean": "하트 어택 모드",
+      "kind": "mode",
+      "original_bbox": [
+        2613,
+        1158,
+        3574,
+        1241
+      ],
+      "producer_localized_bbox": [
+        2900,
+        1164,
+        3288,
+        1236
+      ],
+      "independent_localized_bbox": [
+        2900,
+        1164,
+        3288,
+        1236
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 287,
+      "delta_right": 286,
+      "delta_top": 6,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 44,
+      "source": "OutRun MODE",
+      "korean": "아웃런 모드",
+      "kind": "mode",
+      "original_bbox": [
+        362,
+        993,
+        1078,
+        1088
+      ],
+      "producer_localized_bbox": [
+        534,
+        1000,
+        905,
+        1084
+      ],
+      "independent_localized_bbox": [
+        534,
+        1000,
+        905,
+        1084
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 172,
+      "delta_right": 173,
+      "delta_top": 7,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 45,
+      "source": "Time Attack MODE",
+      "korean": "타임 어택 모드",
+      "kind": "mode",
+      "original_bbox": [
+        1405,
+        993,
+        2317,
+        1088
+      ],
+      "producer_localized_bbox": [
+        1634,
+        1000,
+        2090,
+        1084
+      ],
+      "independent_localized_bbox": [
+        1634,
+        1000,
+        2090,
+        1084
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 229,
+      "delta_right": 227,
+      "delta_top": 7,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 46,
+      "source": "15 Continuous Course",
+      "korean": "15코스 연속",
+      "kind": "mode",
+      "original_bbox": [
+        2480,
+        992,
+        3557,
+        1088
+      ],
+      "producer_localized_bbox": [
+        2814,
+        996,
+        3221,
+        1084
+      ],
+      "independent_localized_bbox": [
+        2814,
+        996,
+        3221,
+        1084
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 334,
+      "delta_right": 336,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 47,
+      "source": "Ranking",
+      "korean": "랭킹",
+      "kind": "mode",
+      "original_bbox": [
+        3601,
+        992,
+        4022,
+        1091
+      ],
+      "producer_localized_bbox": [
+        3740,
+        996,
+        3884,
+        1084
+      ],
+      "independent_localized_bbox": [
+        3740,
+        996,
+        3884,
+        1084
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 139,
+      "delta_right": 138,
+      "delta_top": 4,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 48,
+      "source": "NORMAL",
+      "korean": "일반",
+      "kind": "badge",
+      "original_bbox": [
+        3759,
+        1164,
+        4022,
+        1242
+      ],
+      "producer_localized_bbox": [
+        3833,
+        1168,
+        3948,
+        1236
+      ],
+      "independent_localized_bbox": [
+        3833,
+        1168,
+        3948,
+        1236
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 74,
+      "delta_right": 74,
+      "delta_top": 4,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 49,
+      "source": "TUNED",
+      "korean": "튜닝",
+      "kind": "badge",
+      "original_bbox": [
+        3624,
+        2688,
+        3891,
+        2795
+      ],
+      "producer_localized_bbox": [
+        3676,
+        2692,
+        3834,
+        2788
+      ],
+      "independent_localized_bbox": [
+        3676,
+        2692,
+        3834,
+        2788
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 52,
+      "delta_right": 57,
+      "delta_top": 4,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 64,
+      "source": "NORMAL",
+      "korean": "일반",
+      "kind": "small",
+      "original_bbox": [
+        663,
+        898,
+        924,
+        960
+      ],
+      "producer_localized_bbox": [
+        748,
+        904,
+        839,
+        956
+      ],
+      "independent_localized_bbox": [
+        748,
+        904,
+        839,
+        956
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 85,
+      "delta_right": 85,
+      "delta_top": 6,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 65,
+      "source": "TUNED",
+      "korean": "튜닝",
+      "kind": "small",
+      "original_bbox": [
+        1263,
+        899,
+        1469,
+        949
+      ],
+      "producer_localized_bbox": [
+        1332,
+        904,
+        1400,
+        944
+      ],
+      "independent_localized_bbox": [
+        1332,
+        904,
+        1400,
+        944
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 69,
+      "delta_right": 69,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 16,
+      "source": "GOAL E",
+      "korean": "골 E",
+      "kind": "goal",
+      "original_bbox": [
+        1456,
+        1696,
+        1790,
+        1836
+      ],
+      "producer_localized_bbox": [
+        1508,
+        1700,
+        1735,
+        1832
+      ],
+      "independent_localized_bbox": [
+        1508,
+        1700,
+        1735,
+        1832
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 52,
+      "delta_right": 55,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 17,
+      "source": "GOAL D",
+      "korean": "골 D",
+      "kind": "goal",
+      "original_bbox": [
+        2056,
+        1694,
+        2397,
+        1834
+      ],
+      "producer_localized_bbox": [
+        2112,
+        1700,
+        2340,
+        1828
+      ],
+      "independent_localized_bbox": [
+        2112,
+        1700,
+        2340,
+        1828
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 56,
+      "delta_right": 57,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 18,
+      "source": "GOAL C",
+      "korean": "골 C",
+      "kind": "goal",
+      "original_bbox": [
+        2656,
+        1696,
+        2997,
+        1836
+      ],
+      "producer_localized_bbox": [
+        2708,
+        1700,
+        2943,
+        1832
+      ],
+      "independent_localized_bbox": [
+        2708,
+        1700,
+        2943,
+        1832
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 52,
+      "delta_right": 54,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 19,
+      "source": "GOAL B",
+      "korean": "골 B",
+      "kind": "goal",
+      "original_bbox": [
+        3256,
+        1694,
+        3599,
+        1834
+      ],
+      "producer_localized_bbox": [
+        3312,
+        1700,
+        3540,
+        1828
+      ],
+      "independent_localized_bbox": [
+        3312,
+        1700,
+        3540,
+        1828
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 56,
+      "delta_right": 59,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 20,
+      "source": "GOAL A",
+      "korean": "골 A",
+      "kind": "goal",
+      "original_bbox": [
+        3312,
+        2144,
+        3664,
+        2284
+      ],
+      "producer_localized_bbox": [
+        3368,
+        2148,
+        3607,
+        2280
+      ],
+      "independent_localized_bbox": [
+        3368,
+        2148,
+        3607,
+        2280
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 56,
+      "delta_right": 57,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 21,
+      "source": "GOAL E",
+      "korean": "골 E",
+      "kind": "goal",
+      "original_bbox": [
+        216,
+        1493,
+        550,
+        1633
+      ],
+      "producer_localized_bbox": [
+        272,
+        1500,
+        492,
+        1628
+      ],
+      "independent_localized_bbox": [
+        272,
+        1500,
+        492,
+        1628
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 56,
+      "delta_right": 58,
+      "delta_top": 7,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 22,
+      "source": "GOAL D",
+      "korean": "골 D",
+      "kind": "goal",
+      "original_bbox": [
+        816,
+        1495,
+        1159,
+        1635
+      ],
+      "producer_localized_bbox": [
+        872,
+        1500,
+        1100,
+        1628
+      ],
+      "independent_localized_bbox": [
+        872,
+        1500,
+        1100,
+        1628
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 56,
+      "delta_right": 59,
+      "delta_top": 5,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 23,
+      "source": "GOAL C",
+      "korean": "골 C",
+      "kind": "goal",
+      "original_bbox": [
+        1416,
+        1495,
+        1757,
+        1635
+      ],
+      "producer_localized_bbox": [
+        1472,
+        1500,
+        1699,
+        1628
+      ],
+      "independent_localized_bbox": [
+        1472,
+        1500,
+        1699,
+        1628
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 56,
+      "delta_right": 58,
+      "delta_top": 5,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 24,
+      "source": "GOAL B",
+      "korean": "골 B",
+      "kind": "goal",
+      "original_bbox": [
+        2016,
+        1493,
+        2359,
+        1633
+      ],
+      "producer_localized_bbox": [
+        2072,
+        1500,
+        2300,
+        1628
+      ],
+      "independent_localized_bbox": [
+        2072,
+        1500,
+        2300,
+        1628
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 56,
+      "delta_right": 59,
+      "delta_top": 7,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 25,
+      "source": "GOAL A",
+      "korean": "골 A",
+      "kind": "goal",
+      "original_bbox": [
+        2616,
+        1495,
+        2968,
+        1635
+      ],
+      "producer_localized_bbox": [
+        2676,
+        1500,
+        2908,
+        1628
+      ],
+      "independent_localized_bbox": [
+        2676,
+        1500,
+        2908,
+        1628
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 60,
+      "delta_right": 60,
+      "delta_top": 5,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 14,
+      "source": "OutRun2 15 Continuous Course descriptor",
+      "korean": "15코스 연속",
+      "kind": "product_descriptor",
+      "original_bbox": [
+        3122,
+        1896,
+        3958,
+        2032
+      ],
+      "producer_localized_bbox": [
+        3242,
+        1900,
+        3837,
+        2028
+      ],
+      "independent_localized_bbox": [
+        3242,
+        1900,
+        3837,
+        2028
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 120,
+      "delta_right": 121,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 15,
+      "source": "OutRun2SP 15 Continuous Course descriptor",
+      "korean": "15코스 연속",
+      "kind": "product_descriptor",
+      "original_bbox": [
+        439,
+        1696,
+        1232,
+        1832
+      ],
+      "producer_localized_bbox": [
+        538,
+        1700,
+        1133,
+        1828
+      ],
+      "independent_localized_bbox": [
+        538,
+        1700,
+        1133,
+        1828
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 99,
+      "delta_right": 99,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 26,
+      "source": "Time Attack MODE",
+      "korean": "타임 어택 모드",
+      "kind": "time_mode_line",
+      "original_bbox": [
+        3072,
+        1488,
+        3520,
+        1584
+      ],
+      "producer_localized_bbox": [
+        3076,
+        1495,
+        3516,
+        1576
+      ],
+      "independent_localized_bbox": [
+        3076,
+        1495,
+        3516,
+        1576
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 4,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 26,
+      "source": "TUNED",
+      "korean": "튜닝",
+      "kind": "time_variant_line",
+      "original_bbox": [
+        3080,
+        1584,
+        3460,
+        1640
+      ],
+      "producer_localized_bbox": [
+        3231,
+        1588,
+        3309,
+        1636
+      ],
+      "independent_localized_bbox": [
+        3231,
+        1588,
+        3309,
+        1636
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 151,
+      "delta_right": 151,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 27,
+      "source": "Time Attack MODE",
+      "korean": "타임 어택 모드",
+      "kind": "time_mode_line",
+      "original_bbox": [
+        72,
+        1288,
+        520,
+        1384
+      ],
+      "producer_localized_bbox": [
+        76,
+        1295,
+        516,
+        1376
+      ],
+      "independent_localized_bbox": [
+        76,
+        1295,
+        516,
+        1376
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 4,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 27,
+      "source": "TUNED",
+      "korean": "튜닝",
+      "kind": "time_variant_line",
+      "original_bbox": [
+        80,
+        1384,
+        464,
+        1440
+      ],
+      "producer_localized_bbox": [
+        232,
+        1388,
+        312,
+        1436
+      ],
+      "independent_localized_bbox": [
+        232,
+        1388,
+        312,
+        1436
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 152,
+      "delta_right": 152,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 28,
+      "source": "Time Attack MODE",
+      "korean": "타임 어택 모드",
+      "kind": "time_mode_line",
+      "original_bbox": [
+        672,
+        1288,
+        1120,
+        1384
+      ],
+      "producer_localized_bbox": [
+        676,
+        1295,
+        1116,
+        1376
+      ],
+      "independent_localized_bbox": [
+        676,
+        1295,
+        1116,
+        1376
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 4,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 28,
+      "source": "NORMAL",
+      "korean": "일반",
+      "kind": "time_variant_line",
+      "original_bbox": [
+        672,
+        1384,
+        1060,
+        1440
+      ],
+      "producer_localized_bbox": [
+        826,
+        1388,
+        905,
+        1436
+      ],
+      "independent_localized_bbox": [
+        826,
+        1388,
+        905,
+        1436
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 154,
+      "delta_right": 155,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 29,
+      "source": "Time Attack MODE",
+      "korean": "타임 어택 모드",
+      "kind": "time_mode_line",
+      "original_bbox": [
+        1272,
+        1288,
+        1720,
+        1392
+      ],
+      "producer_localized_bbox": [
+        1276,
+        1299,
+        1716,
+        1380
+      ],
+      "independent_localized_bbox": [
+        1276,
+        1299,
+        1716,
+        1380
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 4,
+      "delta_top": 11,
+      "delta_bottom": 12,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 29,
+      "source": "NORMAL",
+      "korean": "일반",
+      "kind": "time_variant_line",
+      "original_bbox": [
+        1272,
+        1392,
+        1664,
+        1440
+      ],
+      "producer_localized_bbox": [
+        1434,
+        1396,
+        1502,
+        1436
+      ],
+      "independent_localized_bbox": [
+        1434,
+        1396,
+        1502,
+        1436
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 162,
+      "delta_right": 162,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 79,
+      "source": "Cape Way",
+      "korean": "케이프 웨이",
+      "kind": "stage",
+      "original_bbox": [
+        1603,
+        704,
+        1805,
+        753
+      ],
+      "producer_localized_bbox": [
+        1616,
+        708,
+        1790,
+        748
+      ],
+      "independent_localized_bbox": [
+        1616,
+        708,
+        1790,
+        748
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 13,
+      "delta_right": 15,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 80,
+      "source": "Imperial Avenue",
+      "korean": "임페리얼 애비뉴",
+      "kind": "stage",
+      "original_bbox": [
+        1897,
+        705,
+        2228,
+        753
+      ],
+      "producer_localized_bbox": [
+        1956,
+        712,
+        2172,
+        748
+      ],
+      "independent_localized_bbox": [
+        1956,
+        712,
+        2172,
+        748
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 59,
+      "delta_right": 56,
+      "delta_top": 7,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 81,
+      "source": "Ancient Ruins",
+      "korean": "에인션트 루인스",
+      "kind": "stage",
+      "original_bbox": [
+        2277,
+        705,
+        2569,
+        746
+      ],
+      "producer_localized_bbox": [
+        2343,
+        712,
+        2505,
+        740
+      ],
+      "independent_localized_bbox": [
+        2343,
+        712,
+        2505,
+        740
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 66,
+      "delta_right": 64,
+      "delta_top": 7,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 82,
+      "source": "Metropolis",
+      "korean": "메트로폴리스",
+      "kind": "stage",
+      "original_bbox": [
+        2672,
+        705,
+        2894,
+        753
+      ],
+      "producer_localized_bbox": [
+        2692,
+        712,
+        2872,
+        748
+      ],
+      "independent_localized_bbox": [
+        2692,
+        712,
+        2872,
+        748
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 20,
+      "delta_right": 22,
+      "delta_top": 7,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 83,
+      "source": "Tulip Garden",
+      "korean": "튤립 가든",
+      "kind": "stage",
+      "original_bbox": [
+        3016,
+        704,
+        3277,
+        753
+      ],
+      "producer_localized_bbox": [
+        3075,
+        708,
+        3217,
+        748
+      ],
+      "independent_localized_bbox": [
+        3075,
+        708,
+        3217,
+        748
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 59,
+      "delta_right": 60,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 84,
+      "source": "Skyscrapers",
+      "korean": "스카이스크레이퍼스",
+      "kind": "stage",
+      "original_bbox": [
+        3377,
+        704,
+        3629,
+        753
+      ],
+      "producer_localized_bbox": [
+        3384,
+        712,
+        3624,
+        744
+      ],
+      "independent_localized_bbox": [
+        3384,
+        712,
+        3624,
+        744
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 7,
+      "delta_right": 5,
+      "delta_top": 8,
+      "delta_bottom": 9,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 85,
+      "source": "Milky Way",
+      "korean": "밀키 웨이",
+      "kind": "stage",
+      "original_bbox": [
+        3757,
+        705,
+        3968,
+        753
+      ],
+      "producer_localized_bbox": [
+        3800,
+        712,
+        3927,
+        748
+      ],
+      "independent_localized_bbox": [
+        3800,
+        712,
+        3927,
+        748
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 43,
+      "delta_right": 41,
+      "delta_top": 7,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 86,
+      "source": "Floral Village",
+      "korean": "플로럴 빌리지",
+      "kind": "stage",
+      "original_bbox": [
+        3632,
+        792,
+        3907,
+        840
+      ],
+      "producer_localized_bbox": [
+        3664,
+        796,
+        3872,
+        836
+      ],
+      "independent_localized_bbox": [
+        3664,
+        796,
+        3872,
+        836
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 32,
+      "delta_right": 35,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 87,
+      "source": "Legend",
+      "korean": "레전드",
+      "kind": "stage",
+      "original_bbox": [
+        3745,
+        911,
+        3901,
+        960
+      ],
+      "producer_localized_bbox": [
+        3774,
+        916,
+        3876,
+        956
+      ],
+      "independent_localized_bbox": [
+        3774,
+        916,
+        3876,
+        956
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 29,
+      "delta_right": 25,
+      "delta_top": 5,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 88,
+      "source": "Giant Statues",
+      "korean": "자이언트 스태추스",
+      "kind": "stage",
+      "original_bbox": [
+        31,
+        615,
+        311,
+        657
+      ],
+      "producer_localized_bbox": [
+        64,
+        620,
+        276,
+        652
+      ],
+      "independent_localized_bbox": [
+        64,
+        620,
+        276,
+        652
+      ],
+      "bbox_exact_match_producer": true,
+      "delta_left": 33,
+      "delta_right": 35,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "row_gate": "41/41 containment/size/positive-margin PASS",
+  "producer_bbox_exact_match_all": true,
+  "machine_checks": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "changed_dxt5_blocks": 88592,
+    "changed_dxt5_blocks_wholly_outside_allowed": 86058
+  },
+  "protected_region_allowed_overlap_pixels": {
+    "31": 0,
+    "32": 0,
+    "33": 0,
+    "34": 0,
+    "35": 0,
+    "36": 0,
+    "37": 0,
+    "38": 0,
+    "39": 0,
+    "50": 0,
+    "51": 0,
+    "52": 0,
+    "53": 0,
+    "54": 0,
+    "55": 0,
+    "56": 0,
+    "57": 0,
+    "58": 0,
+    "59": 0,
+    "60": 0,
+    "61": 0,
+    "62": 0,
+    "63": 0,
+    "66": 0,
+    "67": 0,
+    "68": 0,
+    "69": 0,
+    "70": 0,
+    "71": 0,
+    "72": 0,
+    "73": 0,
+    "74": 0,
+    "75": 0,
+    "76": 0,
+    "77": 0,
+    "78": 0,
+    "89": 0,
+    "90": 0,
+    "91": 0,
+    "92": 0,
+    "93": 0,
+    "94": 0,
+    "95": 0,
+    "96": 0,
+    "97": 0,
+    "98": 0,
+    "99": 0,
+    "100": 0,
+    "101": 0,
+    "102": 0,
+    "103": 0,
+    "104": 0,
+    "105": 0
+  },
+  "protected_geometry_pass": true,
+  "machine_status": "FAIL",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "C194_REWORK_REQUIRED_MACHINE_OR_POLICY_GATE",
+  "runtime_validation": "UNTESTED",
+  "preview_files": [
+    "localization/graphics/role_C/20261005-C194-C598919A/C194_SOURCE_FINAL_OVERVIEW.jpg",
+    "localization/graphics/role_C/20261005-C194-C598919A/C194_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_C/20261005-C194-C598919A/C194_RAW_COMPARE.jpg"
+  ]
+}

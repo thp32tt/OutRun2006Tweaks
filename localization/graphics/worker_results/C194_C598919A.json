@@ -1,0 +1,20 @@
+{
+  "run": "20261005-C194-C598919A",
+  "qa_id": "C194",
+  "index": 86,
+  "asset": "C598919A",
+  "candidate_sha256": "e3c3f78975b3dd582690a7f169c1aa364dd05e3846827340aae38631885b92bf",
+  "machine_status": "FAIL",
+  "semantic_policy_pass": true,
+  "protected_geometry_pass": true,
+  "machine_checks": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "changed_dxt5_blocks": 88592,
+    "changed_dxt5_blocks_wholly_outside_allowed": 86058
+  },
+  "report": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
