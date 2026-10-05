@@ -4,8 +4,8 @@
   "regression": "IGR-010",
   "queue_index": 60,
   "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
-  "input_sha256": "a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f",
-  "candidate_sha256": "9457c16db67978ee383550f9094a8862c5030fdea105deba217a4b416467fa37",
+  "input_sha256": "9457c16db67978ee383550f9094a8862c5030fdea105deba217a4b416467fa37",
+  "candidate_sha256": "77171503a7c1d089f09abcf458ee79b5aa3b52281ce8bed5f5dc234ce7dcfb9b",
   "report": "localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_IGR010_REPORT.json",
   "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
 }
