@@ -1336,3 +1336,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - C165 index 241 E1639D2E: independent hosted machine QA PASS (2/2 exact bbox/size/positive margins; outside/alpha/introduced-visible/residue/overlap/near=0) and C visual PASS. Decision `C165_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`.
 - C166 index 26 63C91067 latest B105 candidate: producer static counters PASS, but C visual FAIL on a visible horizontal interpolation/gradient seam in the lower starburst clean plate. Decision `C166_REWORK_REQUIRED_CLEAN_PLATE_GRADIENT_SEAM`.
 - pending_artwork localize_text=19; producer REWORK remains 2 (63C91067, C598919A). RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-05 15:10 KST — C167 refresh on latest B108 63C candidate
+- B108 superseded B105 during this C invocation. Latest candidate `40d7a005c7978151e01099e72317df48d44629e71661626222981745d5acb963` removes the prior horizontal band, but C visual QA still FAILS: faint title/effect-shaped smudging remains in the pink cloud and dark/smeared reconstruction discontinuities remain around the upper center/spike of the lower starburst, visible through FINAL.
+- Producer static counters still report 2/2 bbox+size+positive margins and zero outside/alpha/protected/residue/overlap. Mandatory visual clean-plate gate overrides those false-negative counters.
+- Decision: `C167_REWORK_REQUIRED_CLEAN_PLATE_VISIBLE_RECONSTRUCTION_ARTIFACTS`. C164/C165 PASS decisions remain unchanged. pending_artwork localize_text=19; producer REWORK remains 2 (63C91067, C598919A). RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
