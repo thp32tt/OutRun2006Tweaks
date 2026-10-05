@@ -138,6 +138,7 @@ for rel, source in (("R20", r20), ("R23", r23), ("R33", r33)):
 if "R9MainDepthGenerationValue()" not in r9:
     errors.append("R9 missing main-depth generation owner query API")
 
+# RED-CI: verify post-1000 dispatcher owner-boundary violations before implementation.
 # Post-1000 dispatcher flattening: R31/R33 may call the R30 lower-draw
 # boundary, but they must not reach into R30's private SafetyHookInline storage.
 for rel, source in (("R31", r31), ("R33", r33)):
