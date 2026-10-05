@@ -97,7 +97,7 @@ jobs:
             "MOZA R3 Natural SAT",
             "FFB Model",
           "Arcade Original (Lindbergh-derived)",
-          "Arcade + Modern Hybrid",
+          "legacy Model=2 is migrated to Modern DD",
           "PS2 Original topology (Experimental)",
             "Physics SAT (body slip + yaw)",
             "Mechanical / Caster Trail",
