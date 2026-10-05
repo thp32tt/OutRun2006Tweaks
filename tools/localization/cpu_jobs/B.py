@@ -153,8 +153,8 @@ if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip mis
 srcp=out/"B154_SOURCE_READABLE.png"; clnp=out/"B154_CLEAN_PLATE.png"; finp=out/"B154_FINAL_READABLE.png"
 src.save(srcp); clean.save(clnp); dec.save(finp); source_mask.save(out/"B154_SOURCE_TEXT_MASK.png"); allowed.save(out/"B154_ALLOWED_EFFECT_BBOX_MASK.png"); protected.save(out/"B154_PROTECTED_MASK.png")
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(srcp),str(clnp),str(allowed),"--protected-mask",str(protected),"--report",str(out/"B154_CLEAN_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(srcp),str(finp),str(allowed),"--protected-mask",str(protected),"--report",str(out/"B154_FINAL_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(srcp),str(clnp),str(out/"B154_ALLOWED_EFFECT_BBOX_MASK.png"),"--protected-mask",str(out/"B154_PROTECTED_MASK.png"),"--report",str(out/"B154_CLEAN_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(srcp),str(finp),str(out/"B154_ALLOWED_EFFECT_BBOX_MASK.png"),"--protected-mask",str(out/"B154_PROTECTED_MASK.png"),"--report",str(out/"B154_FINAL_VALIDATION.json")],check=True)
 cr=json.loads((out/"B154_CLEAN_VALIDATION.json").read_text()); fr=json.loads((out/"B154_FINAL_VALIDATION.json").read_text())
 if cr["status"]!="PASS" or fr["status"]!="PASS": raise RuntimeError(("validator",cr["status"],fr["status"]))
 
