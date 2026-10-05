@@ -23,6 +23,8 @@ int main() {
  require(model_uses_modern_sat(Model::ModernDD)&&model_uses_modern_sat(Model::ArcadeHybrid),"modern SAT models");
  require(!model_uses_modern_sat(Model::ArcadeOriginal)&&!model_uses_modern_sat(Model::PS2OriginalExperimental),"original modes do not claim modern SAT");
  require(model_uses_arcade_events(Model::ArcadeOriginal)&&model_uses_arcade_events(Model::ArcadeHybrid),"arcade event models");
+ require(model_requires_reversed_polarity(Model::ModernDD),"Modern owns reversed R3 polarity");
+ require(!model_requires_reversed_polarity(Model::ArcadeOriginal)&&!model_requires_reversed_polarity(Model::ArcadeHybrid)&&!model_requires_reversed_polarity(Model::PS2OriginalExperimental),"original/hybrid modes own normal R3 polarity");
  require(std::abs(frequency_hz_from_period_ms(70.0f)-(1000.0f/70.0f))<1e-6f,"arcade road 70ms period converts to host Hz");
  require(frequency_hz_from_period_ms(0.0f)==0.0f,"invalid zero period is rejected");
  require(frequency_hz_from_period_ms(std::numeric_limits<float>::quiet_NaN())==0.0f,"NaN period is rejected");
@@ -153,6 +155,10 @@ int main() {
  const float amp2=common_contact_tactile_amplitude(env2,.7f,.6f,.7f);
  const float amp4=common_contact_tactile_amplitude(env4,.7f,.6f,.7f);
  require(amp2>0.08f&&amp4>amp2&&amp4<=.32f,"two-wheel curb is tactile and four-wheel remains capped");
+ require(SnowIceComfortScale>=.20f&&SnowIceComfortScale<.30f,"snow comfort keeps a clear but bounded tactile floor");
+ require(FloralRoughPavingComfortScale>=.75f&&FloralRoughPavingComfortScale<1.0f,"sustained rough paving remains tactile without full strength");
+ const float snowComfortAmp=amp4*SnowIceComfortScale;
+ require(snowComfortAmp>.04f&&snowComfortAmp<.08f,"snow road texture is perceptible but comfort-bounded");
  require(collision_tactile_pulse(0,1.0f)>0&&collision_tactile_pulse(1,1.0f)<0,"collision tactile alternates independently of direction");
  require(collision_tactile_pulse(5,1.0f)==0,"collision tactile is short bounded pulse");
  require(!is_proven_primary_rough_road_contact(27,520,PrimaryAsphaltSurfaceMask),"ordinary asphalt is not rough-road material");
@@ -193,15 +199,25 @@ int main() {
  WheelVehicleDynamics high; EVWORK_CAR highCar; high.reset(); for(int i=0;i<80;++i)step(high,highCar,0,0,0,.90f); step(high,highCar,.01f,0,.2f,.90f);
  require(high.frontSlipBlend()>low.frontSlipBlend(),"front-slip transient speeds up with vehicle speed");
 
- // v0.2: a rapid steering reversal must change the Physics SAT tyre proxy on
- // the first valid tick instead of carrying stale opposite torque for several
+ // R10: captured game telemetry uses steering-input sign opposite to the
+ // calibrated right-positive body/yaw coordinate. A positive-steer normal
+ // corner therefore has negative yaw and must produce negative right-positive
+ // front slip before the torque is converted back to the steering input axis.
+ WheelVehicleDynamics coord; EVWORK_CAR coordCar; coord.reset();
+ for(int i=0;i<80;++i)step(coord,coordCar);
+ for(int i=0;i<20;++i)step(coord,coordCar,-i*.006f,.05f,.50f,.75f);
+ require(coord.yawRate()<0&&coord.bodySlip()>0,"captured steering/yaw coordinate relationship reproduced");
+ require(coord.frontSlip()<-.08f,"steering input is converted into right-positive vehicle coordinates");
+
+ // v0.2/R10: a rapid steering reversal must change the Physics SAT tyre proxy
+ // on the first valid tick instead of carrying stale opposite torque for several
  // frames. The steering-rate predictor should point in the new direction too.
  WheelVehicleDynamics reversal; EVWORK_CAR reversalCar; reversal.reset();
  for(int i=0;i<80;++i)step(reversal,reversalCar);
  for(int i=0;i<8;++i)step(reversal,reversalCar,0,0,.50f,.55f);
- require(reversal.frontSlip()>.08f,"front-slip positive corner established");
+ require(reversal.frontSlip()<-.08f,"front-slip negative corner established in right-positive vehicle coordinates");
  step(reversal,reversalCar,0,0,-.50f,.55f);
- require(reversal.rawFrontSlip()<0&&reversal.frontSlip()<0,"front-slip reversal crosses in one tick");
+ require(reversal.rawFrontSlip()>0&&reversal.frontSlip()>0,"front-slip reversal crosses in one tick");
  require(reversal.steerRate()<0,"steering transient lead follows counter-steer direction");
 
  float beta=d.bodySlip();d.update(nullptr,0,.5,0);require(d.bodySlip()<beta&&!d.sampleValid(),"invalid decay");
