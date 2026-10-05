@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T21:27:02+09:00",
+  "role": "C",
+  "run": "20261005-C202-8215FD25",
+  "qa_id": "C202",
+  "queue_index": 30,
+  "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+  "producer_run": "20261005-B-PRODUCTION148-8215-C200-TEMPLATE",
+  "source_sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e",
+  "candidate_sha256": "cb023fa5533b4a058c437c1a879b2952a7268308e47202f7dced32c6a563e141",
+  "candidate_changed_by_C": false,
+  "structure": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "semantic_binding": "PASS_TOTAL_RANK_X2_TO_종합_랭킹",
+  "machine_status": "PASS",
+  "row_gate": "2/2 PASS",
+  "machine_checks": {
+    "decoded_source_vs_producer_source_png_diff_pixels": 0,
+    "decoded_final_vs_producer_final_png_diff_pixels": 0,
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "localized_render_outside_union_source_bboxes": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "template_patch_diff_pixels": 0,
+    "template_patch_max_channel_delta": 0
+  },
+  "template_provenance": {
+    "source": "C193-approved B137 63C clean starburst plate",
+    "source_path": "localization/graphics/role_B/20261005-B-PRODUCTION137/63C_CLEAN_PLATE.png",
+    "shift": [
+      1088,
+      0
+    ],
+    "target_patch": [
+      1829,
+      1179,
+      2364,
+      1281
+    ],
+    "exact_copy": true
+  },
+  "controller_visual_qa": "PASS",
+  "visual_notes": [
+    "B148 removes the B146/C200 starburst haze/smear by using the already C193-approved same-family clean starburst template rather than another free-form inpaint.",
+    "C independently confirms the transplanted starburst patch is pixel-exact to the C193-approved B137 clean template after the documented +1088 x shift.",
+    "The speech-bubble clean plate remains seamless and source-residue free.",
+    "SOURCE/CLEAN/FINAL and raw mirror_y review show no Total Rank ghost, patch box, seam, clipping, overlap, protected-artwork damage or orientation regression.",
+    "The warm brown starburst gradient/glow and pink speech-bubble fill/border are visually source-faithful."
+  ],
+  "supersedes": [
+    "C196/B143 starburst blur-smear failure",
+    "C198/B144 speech-bubble source ghost",
+    "C199/B145 starburst source ghost",
+    "C200/B146 starburst texture discontinuity/smear"
+  ],
+  "machine_report": "localization/graphics/role_C/20261005-C202-8215FD25/C202_8215FD25_MACHINE_QA.json",
+  "evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION148-8215-C200-TEMPLATE/B148_8215_CONTACTS.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION148-8215-C200-TEMPLATE/B148_STARBURST_FOCUS.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION148-8215-C200-TEMPLATE/B148_RAW_COMPARE.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_63C_SOURCE_CLEAN_FINAL.jpg"
+  ],
+  "decision": "C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED"
+}
