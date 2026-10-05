@@ -137,12 +137,25 @@ int main() {
  require(proven_primary_rough_road_section(27,510)&&proven_primary_rough_road_section(27,533),"Floral Village primary rough-road bounds");
  require(is_proven_primary_rough_road_contact(27,520,PrimaryRoughRoadSurfaceMask),"Floral primary rough material accepted");
 
- // R9 hardware-log regressions: Imperial Avenue primary asphalt, per-wheel
- // tactile coverage, and direction-independent collision pulse.
- std::array<unsigned,4> asphaltMasks={PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask};
- require(primary_asphalt_water_false_positive(14,0,asphaltMasks,0x0f),"Imperial Avenue all-primary false water corrected");
- require(!primary_asphalt_water_false_positive(13,0,asphaltMasks,0x0f),"water correction is evidence-scoped to stage 14");
- require(!primary_asphalt_water_false_positive(14,1,asphaltMasks,0x0f),"nonzero collision context preserves water classification");
+ // R10 hardware-log regressions: R3 model-owned polarity, Imperial Avenue
+ // per-wheel false-water normalization, mild stone texture, drift spring relief,
+ // contact coverage, and direction-independent collision pulse.
+ require(r3_model_force_invert(Model::ModernDD)&&r3_model_spring_invert(Model::ModernDD),"R3 Modern polarity is model-owned");
+ require(!r3_model_force_invert(Model::ArcadeOriginal)&&!r3_model_spring_invert(Model::ArcadeOriginal),"R3 Arcade polarity is normal");
+ require(!r3_model_force_invert(Model::ArcadeHybrid)&&!r3_model_force_invert(Model::PS2OriginalExperimental),"R3 Hybrid/PS2 polarity is normal");
+ require(imperial_primary_asphalt_false_water_contact(14,0,PrimaryAsphaltSurfaceMask,true),"Imperial Avenue per-wheel primary asphalt false water corrected");
+ require(!imperial_primary_asphalt_false_water_contact(13,0,PrimaryAsphaltSurfaceMask,true),"water correction is evidence-scoped to stage 14");
+ require(!imperial_primary_asphalt_false_water_contact(14,1,PrimaryAsphaltSurfaceMask,true),"nonzero collision context preserves water classification");
+ require(!imperial_primary_asphalt_false_water_contact(14,0,ImperialStoneSurfaceMask,false),"Imperial stone is never rewritten as asphalt");
+ std::array<unsigned,4> stoneMix={PrimaryAsphaltSurfaceMask,ImperialStoneSurfaceMask,PrimaryAsphaltSurfaceMask,ImperialStoneSurfaceMask};
+ require(imperial_stone_road_mix(14,0,stoneMix),"Imperial 0x2/0x800 road mix identifies stone paving");
+ require(!imperial_stone_road_mix(14,1,stoneMix),"collision-context material mix is not promoted to sustained stone road");
+ std::array<unsigned,4> notStone={PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask};
+ require(!imperial_stone_road_mix(14,0,notStone),"plain Imperial asphalt is not stone paving");
+ require(std::abs(modern_drift_center_spring_scale(0.0f)-1.0f)<1e-6f,"Modern centre spring unchanged in grip driving");
+ require(modern_drift_center_spring_scale(.20f)<.60f,"Modern centre spring fades as drift develops");
+ require(modern_drift_center_spring_scale(.70f)>.049f&&modern_drift_center_spring_scale(.70f)<.051f,"Modern deep-drift centre spring nearly releases");
+ require(std::abs(modern_drift_center_spring_scale(-.70f)-modern_drift_center_spring_scale(.70f))<1e-6f,"drift spring relief is direction symmetric");
  std::array<float,4> road4={.25f,.25f,.25f,.25f};
  std::array<float,4> curb2={.35f,.35f,.25f,.25f};
  std::array<float,4> curb4={.35f,.35f,.35f,.35f};
@@ -153,6 +166,9 @@ int main() {
  const float amp2=common_contact_tactile_amplitude(env2,.7f,.6f,.7f);
  const float amp4=common_contact_tactile_amplitude(env4,.7f,.6f,.7f);
  require(amp2>0.08f&&amp4>amp2&&amp4<=.32f,"two-wheel curb is tactile and four-wheel remains capped");
+ const float stone2=amp2*ImperialStoneRoadTextureScale;
+ const float stone4=amp4*ImperialStoneRoadTextureScale;
+ require(stone2>0.03f&&stone2<0.06f&&stone4>stone2&&stone4<0.10f,"Imperial stone remains perceptible but below curb intensity");
  require(collision_tactile_pulse(0,1.0f)>0&&collision_tactile_pulse(1,1.0f)<0,"collision tactile alternates independently of direction");
  require(collision_tactile_pulse(5,1.0f)==0,"collision tactile is short bounded pulse");
  require(!is_proven_primary_rough_road_contact(27,520,PrimaryAsphaltSurfaceMask),"ordinary asphalt is not rough-road material");
