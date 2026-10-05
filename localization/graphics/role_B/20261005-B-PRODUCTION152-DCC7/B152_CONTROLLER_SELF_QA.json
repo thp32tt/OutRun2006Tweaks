@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION152-DCC7",
+  "queue_index": 32,
+  "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+  "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+  "worker_report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_DCC7_REPORT.json",
+  "classification": {
+    "source": "Total Rank",
+    "korean": "종합 랭킹",
+    "status": "POSITIVE_ZOOM_REVIEW_PROMOTED"
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "1/1 PASS",
+    "clean_validator": "PASS",
+    "final_validator": "PASS",
+    "decoded_changed_outside": 0,
+    "alpha_outside": 0,
+    "render_outside_target": 0,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "superseded_intermediates": {
+    "B150": "REJECTED_CONTROLLER_VISUAL_SOURCE_GHOST",
+    "B151": "REJECTED_CONTROLLER_VISUAL_RECTANGULAR_LUMINANCE_SHIFT"
+  },
+  "controller_visual_qa": {
+    "status": "PASS",
+    "source_clean_final": "PASS",
+    "raw_mirror_y": "PASS",
+    "source_script_residue": "NONE_VISIBLE",
+    "clean_plate_seam": "NONE_VISIBLE",
+    "clipping_overlap": "NONE_VISIBLE",
+    "border_glow_damage": "NONE_VISIBLE",
+    "source_style": "PASS_WHITE_ITALIC_DARK_NAVY_OUTLINE"
+  },
+  "decision": "B152_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
