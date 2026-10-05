@@ -4424,8 +4424,8 @@ int main()
     const auto r262IndexedOutputResourceBehavior =
         outrun::vr::dx11::
             compose_programmable_output_resource_behavior_readiness(
-                r262IndexedOutputResourceBehavior,
-                r262IndexedOutputResourceBehavior.reviewSnapshotToken,
+                r261IndexedTextureResourceBehavior,
+                r261IndexedTextureResourceBehavior.reviewSnapshotToken,
                 d3d.context, d3d.device,
                 r262SurfacePair, r262SurfacePair.snapshotToken,
                 r262SurfaceBinding,
@@ -4566,8 +4566,8 @@ int main()
             validate_programmable_activation_prerequisite_handoff_snapshot(
                 r258IndexedSourceRevalidation,
                 r258IndexedSourceRevalidation.snapshotToken,
-                r261IndexedTextureResourceBehavior,
-                r261IndexedTextureResourceBehavior.reviewSnapshotToken,
+                r262IndexedOutputResourceBehavior,
+                r262IndexedOutputResourceBehavior.reviewSnapshotToken,
                 r243InputLayoutReady,
                 r243InputLayoutReady.snapshotToken,
                 r259IndexedPrerequisiteHandoff.reviewSnapshotToken),
@@ -5536,8 +5536,8 @@ int main()
     const auto r262NonIndexedOutputResourceBehavior =
         outrun::vr::dx11::
             compose_programmable_output_resource_behavior_readiness(
-                r262NonIndexedOutputResourceBehavior,
-                r262NonIndexedOutputResourceBehavior.reviewSnapshotToken,
+                r261NonIndexedTextureResourceBehavior,
+                r261NonIndexedTextureResourceBehavior.reviewSnapshotToken,
                 d3d.context, d3d.device,
                 r262SurfacePair, r262SurfacePair.snapshotToken,
                 r262SurfaceBinding,
@@ -5600,8 +5600,8 @@ int main()
             validate_programmable_activation_prerequisite_handoff_snapshot(
                 r258NonIndexedSourceRevalidation,
                 r258NonIndexedSourceRevalidation.snapshotToken,
-                r261NonIndexedTextureResourceBehavior,
-                r261NonIndexedTextureResourceBehavior.reviewSnapshotToken,
+                r262NonIndexedOutputResourceBehavior,
+                r262NonIndexedOutputResourceBehavior.reviewSnapshotToken,
                 r243InputLayoutReady,
                 r243InputLayoutReady.snapshotToken,
                 r259NonIndexedPrerequisiteHandoff.reviewSnapshotToken),
