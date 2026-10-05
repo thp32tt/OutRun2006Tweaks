@@ -1,0 +1,22 @@
+{
+  "run": "20261005-C208-97E863AD",
+  "qa_id": "C208",
+  "index": 193,
+  "asset": "97E863AD",
+  "candidate_sha256": "0352a4e0eb0285f9b021fb5046da7b778e3de3317b2348efad69158e0742000d",
+  "machine_status": "FAIL",
+  "row_gate": "13/13 PASS",
+  "source_bbox_exact_match_all": true,
+  "candidate_bbox_exact_match_all": true,
+  "machine_checks": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_script_exact_residue_pixels": 7172,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "protected_changed_pixels": 0
+  },
+  "report": "localization/graphics/role_C/20261005-C208-97E863AD/C208_97E863AD_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
