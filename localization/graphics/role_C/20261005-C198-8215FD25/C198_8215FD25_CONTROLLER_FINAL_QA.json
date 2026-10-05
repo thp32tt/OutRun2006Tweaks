@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T20:55:21+09:00",
+  "role": "C",
+  "run": "20261005-C198-8215FD25",
+  "qa_id": "C198",
+  "queue_index": 30,
+  "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+  "producer_run": "20261005-B-PRODUCTION144-8215-C196-REWORK",
+  "source_sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e",
+  "candidate_sha256": "4473abac8660e955a3328088fab92625b758e3682a51825297a91a69800d0edd",
+  "candidate_changed_by_C": false,
+  "producer_static_qa": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "changed_outside_edit_mask": 0,
+    "alpha_outside_edit_mask": 0,
+    "protected_regions_changed": 0,
+    "localized_overlap": 0
+  },
+  "semantic_binding": "Total Rank x2 -> 종합 랭킹",
+  "controller_visual_qa": "FAIL_SPEECH_BUBBLE_SOURCE_GHOST",
+  "visual_findings": [
+    "B144 materially improves the lower starburst compared with C196; the starburst title-removal field is no longer the primary blocker.",
+    "The speech-bubble CLEAN plate now visibly retains a large translucent Total Rank-shaped source ghost across the removed-title zone.",
+    "That ghost remains plainly visible behind/around the Korean 종합 랭킹 in FINAL.",
+    "This is a mandatory clean-plate/source-residue failure even though the producer's containment and protected-mask counters are zero.",
+    "Character artwork, lens flare and B/C/D/E rank letters remain preserved."
+  ],
+  "required_rework": "Keep the improved starburst reconstruction. Rebuild only the speech-bubble title footprint to a seamless local pink interior with no source-shaped ghost, preserving the bubble border/glow pixel-exact; then re-render the same Korean title and rerun static + visual QA.",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION144-8215-C196-REWORK/B144_8215_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION144-8215-C196-REWORK/B144_8215_CONTACTS.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION144-8215-C196-REWORK/B144_STARBURST_FOCUS.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION144-8215-C196-REWORK/B144_RAW_COMPARE.jpg"
+  ],
+  "decision": "C198_REWORK_REQUIRED_SPEECH_BUBBLE_SOURCE_GHOST",
+  "runtime_validation": "UNTESTED"
+}
