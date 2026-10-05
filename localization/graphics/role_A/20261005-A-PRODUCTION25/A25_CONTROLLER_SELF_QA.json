@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION25",
+  "queue_index": 59,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+  "worker_report": "localization/graphics/role_A/20261005-A-PRODUCTION25/A25_7CE_REPORT.json",
+  "candidate_sha256": "b75102588dc30ec828fdec765658d2e25cbcee9d972832bb70b527b372008542",
+  "controller_checks": {
+    "semantic_binding": "PASS: NEXT MISSION / Race The Rivals! / Drift To Score! / Slipstream To Score! mapped to reviewed Korean strings",
+    "source_style": "PASS: large label retains italic orange-white-yellow gradient, white keyline, navy outline/shadow; three mission labels share yellow/navy/white source family",
+    "source_clean_final": "PASS: source text/effects removed before redraw; cars, speed streaks and white line remain intact",
+    "row_contact": "PASS: 4/4 rows readable with no clipping, source-English residue, unintended overlap, seam or artifact collision",
+    "raw_orientation": "PASS: mirror_y storage preserved",
+    "exact_pixel_gates": "PASS: 4/4 bbox+size+positive margins; outside/alpha/introduced-visible/protected-top/residue/overlap/touch all 0",
+    "dxt5_boundary": "PASS: partial blocks preserve source endpoints/color bytes and only clear in-bbox alpha indices"
+  },
+  "decision": "A25_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_scope_work": "No VR/FFB/DX11/DXVK work."
+}
