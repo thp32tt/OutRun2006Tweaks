@@ -12,6 +12,7 @@ HOST_CACHE_PATH = ROOT / "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp"
 HOST_PASSTHROUGH_PATH = ROOT / "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp"
 HOST_R23_RUNTIME_PATH = ROOT / "vrhost/src/runtime/r23_runtime_hardening.hpp"
 HOST_R24_PATH = ROOT / "vrhost/src/runtime/r24_black_screen_guard.hpp"
+HOST_REVIEW_PATH = ROOT / "vrhost/src/runtime/review_hardening.hpp"
 HOST_SUBMIT_PATH = ROOT / "vrhost/src/runtime/r32_direct_submit.hpp"
 
 
@@ -81,6 +82,7 @@ host_cache = load(HOST_CACHE_PATH)
 host_passthrough = load(HOST_PASSTHROUGH_PATH)
 host_r23_runtime = load(HOST_R23_RUNTIME_PATH)
 host_r24 = load(HOST_R24_PATH)
+host_review = load(HOST_REVIEW_PATH)
 host_submit = load(HOST_SUBMIT_PATH)
 
 # Reset must tear down every D3D9 DEFAULT-pool stereo/shared-eye/probe object
@@ -651,6 +653,45 @@ forbid(
     "SafeTransportGeneration ==",
     "SafeRunGeneration ==",
     "SafeGamePid ==",
+)
+
+# Classic fallback freshness must advance on a new Frame.v2 producer run even
+# when the restarted game reuses the same low frameId. Otherwise the new run's
+# first valid fallback can inherit an expired prior-run LastClassicAdvanceMs.
+classic_fallback = body(host_review, "inline bool FreshClassicFallbackAvailable() noexcept")
+require(
+    classic_fallback,
+    "classic fallback complete run freshness identity",
+    "RenderFrameRunGenerationIndex",
+    "const std::uint32_t gamePid = frame.clientPid;",
+    "if (!runGeneration || !gamePid)",
+    "frame.frameId != LastClassicFrameId",
+    "runGeneration != LastClassicRunGeneration",
+    "gamePid != LastClassicGamePid",
+    "LastClassicRunGeneration = runGeneration;",
+    "LastClassicGamePid = gamePid;",
+    "LastClassicAdvanceMs = now;",
+)
+require_order(
+    classic_fallback,
+    "classic fallback run identity before freshness timestamp",
+    "const std::uint32_t runGeneration",
+    "const std::uint32_t gamePid",
+    "runGeneration != LastClassicRunGeneration",
+    "gamePid != LastClassicGamePid",
+    "LastClassicRunGeneration = runGeneration;",
+    "LastClassicGamePid = gamePid;",
+    "LastClassicAdvanceMs = now;",
+)
+
+classic_destroy = body(host_review, "inline XrResult XRAPI_CALL DestroySession(")
+require(
+    classic_destroy,
+    "classic fallback run identity reset",
+    "LastClassicFrameId = 0;",
+    "LastClassicRunGeneration = 0;",
+    "LastClassicGamePid = 0;",
+    "LastClassicAdvanceMs = 0;",
 )
 
 # R24 flat recovery may reuse an older SafeEye frame, but only inside the

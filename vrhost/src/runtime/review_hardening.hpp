@@ -41,6 +41,8 @@ namespace OutRunVrReviewHardening
     inline constexpr ULONGLONG ClassicFallbackFreshMs = 500;
 
     inline std::uint32_t LastClassicFrameId = 0;
+    inline std::uint32_t LastClassicRunGeneration = 0;
+    inline std::uint32_t LastClassicGamePid = 0;
     inline ULONGLONG LastClassicAdvanceMs = 0;
     inline std::uint64_t ExactCoreProjectionFrames = 0;
     inline std::uint64_t PreservedNonProjectionLayers = 0;
@@ -113,10 +115,20 @@ namespace OutRunVrReviewHardening
             !ProducerPresentFresh(frame))
             return false;
 
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        const std::uint32_t gamePid = frame.clientPid;
+        if (!runGeneration || !gamePid)
+            return false;
+
         const ULONGLONG now = GetTickCount64();
-        if (frame.frameId != LastClassicFrameId)
+        if (frame.frameId != LastClassicFrameId ||
+            runGeneration != LastClassicRunGeneration ||
+            gamePid != LastClassicGamePid)
         {
             LastClassicFrameId = frame.frameId;
+            LastClassicRunGeneration = runGeneration;
+            LastClassicGamePid = gamePid;
             LastClassicAdvanceMs = now;
         }
         return LastClassicAdvanceMs != 0 &&
@@ -227,6 +239,8 @@ namespace OutRunVrReviewHardening
     inline XrResult XRAPI_CALL DestroySession(XrSession session)
     {
         LastClassicFrameId = 0;
+        LastClassicRunGeneration = 0;
+        LastClassicGamePid = 0;
         LastClassicAdvanceMs = 0;
         return OutRunVrD3D9ExDirectPassthrough::DestroySession(session);
     }
