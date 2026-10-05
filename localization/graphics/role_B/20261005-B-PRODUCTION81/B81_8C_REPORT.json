@@ -1,0 +1,412 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION81",
+  "index": 188,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "4a95a48c9c34f2ddd786340e4323d6779b7a103b",
+    "atlas_git_blob_sha1": "6061128430caeb04773ac8caa7918629eeef8ba8",
+    "source_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38"
+  },
+  "semantic_binding": {
+    "method": "six reviewed transcription segments mapped 1:1 to the six atlas regions in index order",
+    "localized": {
+      "0": "Online and LAN OutRun for up to 6 players",
+      "1": "Complete Race and Heart Attack missions to win OR Miles!",
+      "2": "Try to win Hearts by meeting your girlfriend's demands!",
+      "3": "Try to reach the goal with your girlfriend!",
+      "4": "Buy your OutRun items here!",
+      "5": "Drive against the Ghost Cars and go for the course records!"
+    },
+    "translations": {
+      "0": "온라인/LAN 아웃런 최대 6인 플레이",
+      "1": "레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!",
+      "2": "여자친구의 요구를 들어주고 하트를 획득하세요!",
+      "3": "여자친구와 함께 골에 도착하세요!",
+      "4": "여기서 아웃런 아이템을 구매하세요!",
+      "5": "고스트 카와 달리며 코스 기록에 도전하세요!"
+    }
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "source_style": {
+    "fill_median_rgba": [
+      63,
+      71,
+      74,
+      255
+    ],
+    "lum_p10": 69.33333333333333,
+    "lum_p50": 69.33333333333333,
+    "lum_p90": 69.33333333333333,
+    "family": "shared front-end help copy",
+    "font_file": "NotoSansCJK-Regular.ttc",
+    "font_face_index": 1,
+    "font_style": "Regular",
+    "shared_lowres_font_size": 8,
+    "pixel_scale": 4,
+    "alignment": "left"
+  },
+  "rows": [
+    {
+      "region_idx": 0,
+      "source": "Online and LAN OutRun for up to 6 players",
+      "korean": "온라인/LAN 아웃런 최대 6인 플레이",
+      "cell": [
+        0,
+        1888,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        4,
+        1901,
+        1720,
+        1969
+      ],
+      "source_mask_pixels": 40621,
+      "alpha_fraction": 0.1410451388888889,
+      "localized_bbox": [
+        8,
+        1915,
+        480,
+        1955
+      ],
+      "source_width": 1716,
+      "source_height": 68,
+      "localized_width": 472,
+      "localized_height": 40,
+      "delta_left": 4,
+      "delta_right": 1240,
+      "delta_top": 14,
+      "delta_bottom": 14,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_style": "Regular",
+      "lowres_font_size": 8,
+      "pixel_scale": 4,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B81_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 1,
+      "source": "Complete Race and Heart Attack missions to win OR Miles!",
+      "korean": "레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!",
+      "cell": [
+        0,
+        1728,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        6,
+        1742,
+        848,
+        1809
+      ],
+      "source_mask_pixels": 20792,
+      "alpha_fraction": 0.07219444444444445,
+      "localized_bbox": [
+        10,
+        1755,
+        762,
+        1795
+      ],
+      "source_width": 842,
+      "source_height": 67,
+      "localized_width": 752,
+      "localized_height": 40,
+      "delta_left": 4,
+      "delta_right": 86,
+      "delta_top": 13,
+      "delta_bottom": 14,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_style": "Regular",
+      "lowres_font_size": 8,
+      "pixel_scale": 4,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B81_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 2,
+      "source": "Try to win Hearts by meeting your girlfriend's demands!",
+      "korean": "여자친구의 요구를 들어주고 하트를 획득하세요!",
+      "cell": [
+        0,
+        1568,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        4,
+        1582,
+        1210,
+        1649
+      ],
+      "source_mask_pixels": 28881,
+      "alpha_fraction": 0.10028125,
+      "localized_bbox": [
+        8,
+        1595,
+        632,
+        1635
+      ],
+      "source_width": 1206,
+      "source_height": 67,
+      "localized_width": 624,
+      "localized_height": 40,
+      "delta_left": 4,
+      "delta_right": 578,
+      "delta_top": 13,
+      "delta_bottom": 14,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_style": "Regular",
+      "lowres_font_size": 8,
+      "pixel_scale": 4,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B81_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 3,
+      "source": "Try to reach the goal with your girlfriend!",
+      "korean": "여자친구와 함께 골에 도착하세요!",
+      "cell": [
+        0,
+        1408,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        0,
+        1417,
+        1623,
+        1488
+      ],
+      "source_mask_pixels": 39274,
+      "alpha_fraction": 0.13636805555555556,
+      "localized_bbox": [
+        4,
+        1432,
+        444,
+        1472
+      ],
+      "source_width": 1623,
+      "source_height": 71,
+      "localized_width": 440,
+      "localized_height": 40,
+      "delta_left": 4,
+      "delta_right": 1179,
+      "delta_top": 15,
+      "delta_bottom": 16,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_style": "Regular",
+      "lowres_font_size": 8,
+      "pixel_scale": 4,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B81_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 4,
+      "source": "Buy your OutRun items here!",
+      "korean": "여기서 아웃런 아이템을 구매하세요!",
+      "cell": [
+        0,
+        1248,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        6,
+        1259,
+        1727,
+        1325
+      ],
+      "source_mask_pixels": 42404,
+      "alpha_fraction": 0.14723611111111112,
+      "localized_bbox": [
+        10,
+        1272,
+        482,
+        1312
+      ],
+      "source_width": 1721,
+      "source_height": 66,
+      "localized_width": 472,
+      "localized_height": 40,
+      "delta_left": 4,
+      "delta_right": 1245,
+      "delta_top": 13,
+      "delta_bottom": 13,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_style": "Regular",
+      "lowres_font_size": 8,
+      "pixel_scale": 4,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B81_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 5,
+      "source": "Drive against the Ghost Cars and go for the course records!",
+      "korean": "고스트 카와 달리며 코스 기록에 도전하세요!",
+      "cell": [
+        0,
+        1088,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        10,
+        1099,
+        1243,
+        1165
+      ],
+      "source_mask_pixels": 30008,
+      "alpha_fraction": 0.10419444444444445,
+      "localized_bbox": [
+        14,
+        1112,
+        586,
+        1152
+      ],
+      "source_width": 1233,
+      "source_height": 66,
+      "localized_width": 572,
+      "localized_height": 40,
+      "delta_left": 4,
+      "delta_right": 657,
+      "delta_top": 13,
+      "delta_bottom": 13,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_style": "Regular",
+      "lowres_font_size": 8,
+      "pixel_scale": 4,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B81_NEW_EXACT_HD_CANDIDATE"
+    }
+  ],
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION81/8C_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION81/8C_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 201980,
+    "changed_bbox": [
+      0,
+      1099,
+      1727,
+      1969
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION81/8C_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION81/8C_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 230452,
+    "changed_bbox": [
+      0,
+      1099,
+      1727,
+      1969
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_total": 230452,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "exact_source_residue": 0,
+    "render_outside_target": 0,
+    "overlap": 0,
+    "touch_pairs": []
+  },
+  "candidate_sha256": "08384ab50414d5e619db70680f40b2d7d48b74f0d281a6a22d3642553af24075",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B_PRODUCTION81_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
