@@ -101,8 +101,9 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     count = int(active.get("chat_rollovers", 0))
     hard_length_limit = "length limit" in reason.lower() or "reached its length" in reason.lower()
     last_rollover = _parse_iso(active.get("last_rollover_at"))
-    if last_rollover and not hard_length_limit and CONVERSATION_ROLLOVER_MIN_SECONDS:
-        age_seconds = max(0, int((datetime.now(TZ) - last_rollover).total_seconds()))
+    rollover_anchor = last_rollover or _parse_iso(active.get("sent_at"))
+    if rollover_anchor and not hard_length_limit and CONVERSATION_ROLLOVER_MIN_SECONDS:
+        age_seconds = max(0, int((datetime.now(TZ) - rollover_anchor).total_seconds()))
         if age_seconds < CONVERSATION_ROLLOVER_MIN_SECONDS:
             remaining = CONVERSATION_ROLLOVER_MIN_SECONDS - age_seconds
             write_runtime(
