@@ -7,17 +7,16 @@ from PIL import Image,ImageDraw,ImageFont,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
-repo=Path.cwd(); run="20261005-C191-63C91067"
+repo=Path.cwd(); run="20261005-C192-39BCA907"
 out=repo/"localization/graphics/role_C"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
-pd=repo/"localization/graphics/role_B/20261005-B-PRODUCTION137"
-pr=json.loads((pd/"B137_63C_REPORT.json").read_text())
+pd=repo/"localization/graphics/role_A/20261005-A-PRODUCTION49"
+pr=json.loads((pd/"A49_39BCA907_REPORT.json").read_text())
 asset=pr["asset"]; candidate=repo/pr["candidate_path"]; sp=pr["source_provenance"]
 
-tmp=Path("/tmp/c189"); tmp.mkdir(exist_ok=True)
-srcdds=tmp/"source.dds"
-srcurl=f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{sp['commit']}/Release/{asset.split('/')[-2]}/{asset.split('/')[-1]}"
-urllib.request.urlretrieve(srcurl,srcdds)
+tmp=Path("/tmp/c192"); tmp.mkdir(exist_ok=True); srcdds=tmp/"source.dds"
+url=f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{sp['commit']}/Release/{asset.split('/')[-2]}/{asset.split('/')[-1]}"
+urllib.request.urlretrieve(url,srcdds)
 
 def sha(b): return hashlib.sha256(b).hexdigest()
 def count(m): return int(np.count_nonzero(m))
@@ -34,201 +33,149 @@ def decode(data):
     return raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM),raw,[W,H],mips,mode
 def comp(im,bg=(72,72,72,255)):
     z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
-def saveb64(im,path,q=97):
+def saveb64(im,path,q=96):
     b=io.BytesIO(); im.save(b,"JPEG",quality=q,optimize=True); path.write_text(base64.b64encode(b.getvalue()).decode())
 
 sb=srcdds.read_bytes(); cb=candidate.read_bytes()
-if sha(sb)!=sp["source_sha256"]: raise RuntimeError(("source sha drift",sha(sb),sp["source_sha256"]))
+if sha(sb)!=sp["sha256"]: raise RuntimeError(("source sha drift",sha(sb),sp["sha256"]))
 if sha(cb)!=pr["candidate_sha256"]: raise RuntimeError(("candidate sha drift",sha(cb),pr["candidate_sha256"]))
 src,raw_src,dims,mips,mode=decode(sb); final,raw_final,dims2,mips2,mode2=decode(cb)
-if dims!=[2048,2048] or dims2!=dims or mips2!=mips or cb[:128]!=sb[:128]: raise RuntimeError("structure/header drift")
+if dims!=[2048,1024] or dims2!=dims or mips2!=mips or cb[:128]!=sb[:128]: raise RuntimeError("structure/header drift")
 W,H=dims
+sa=np.asarray(src,dtype=np.uint8); fa=np.asarray(final,dtype=np.uint8)
 
-prodsrc=Image.open(pd/"63C_SOURCE_READABLE.png").convert("RGBA")
-if np.any(np.asarray(prodsrc)!=np.asarray(src)): raise RuntimeError("producer source PNG != canonical source decode")
-clean=Image.open(pd/"63C_CLEAN_PLATE.png").convert("RGBA")
-if clean.size!=src.size: raise RuntimeError("clean plate size drift")
-
-sa=np.asarray(src,dtype=np.uint8); ca=np.asarray(clean,dtype=np.uint8); fa=np.asarray(final,dtype=np.uint8)
-# C-owned exact bboxes established in earlier C160/C184 audits, not inferred from producer masks.
-c_rows=[
- {"region_idx":0,"source":"Total Rank","korean":"종합 랭킹","original_bbox":[747,1174,1271,1275]},
- {"region_idx":1,"source":"Total Rank","korean":"종합 랭킹","original_bbox":[599,156,1124,246]}
-]
+rows=pr["rows"]
 allowed=np.zeros((H,W),bool)
-for r in c_rows:
-    x0,y0,x1,y1=r["original_bbox"]; allowed[y0:y1,x0:x1]=True
+for r in rows:
+    x0,y0,x1,y1=map(int,r["source_effect_bbox"]); allowed[y0:y1,x0:x1]=True
 
-clean_changed=np.any(ca!=sa,axis=2)
-final_changed=np.any(fa!=sa,axis=2)
-render=np.any(fa!=ca,axis=2)
+changed=np.any(fa!=sa,axis=2)
+alpha_changed=fa[:,:,3]!=sa[:,:,3]
 machine={
- "clean_changed_outside_c_exact_bboxes":count(clean_changed&~allowed),
- "final_changed_outside_c_exact_bboxes":count(final_changed&~allowed),
- "clean_alpha_changed_outside_c_exact_bboxes":count((ca[:,:,3]!=sa[:,:,3])&~allowed),
- "final_alpha_changed_outside_c_exact_bboxes":count((fa[:,:,3]!=sa[:,:,3])&~allowed),
- "render_outside_c_exact_bboxes":count(render&~allowed)
+ "final_changed_outside_union_source_bboxes":count(changed&~allowed),
+ "final_alpha_changed_outside_union_source_bboxes":count(alpha_changed&~allowed)
 }
+# Outside all 15 target bboxes is protected by exact canonical pixel equality.
+machine["protected_pixels_changed"]=machine["final_changed_outside_union_source_bboxes"]
 
-rowchecks=[]
-render_masks=[]
-for r in c_rows:
-    x0,y0,x1,y1=r["original_bbox"]
-    local_render=render[y0:y1,x0:x1]
-    bb=bbox(local_render)
-    if bb is None:
-        actual=None
-    else:
-        actual=[bb[0]+x0,bb[1]+y0,bb[2]+x0,bb[3]+y0]
-    # Independently derive a source-title mask from the unique navy outline plus adjacent white fill.
-    rgb=sa[y0:y1,x0:x1,:3]
-    alpha=sa[y0:y1,x0:x1,3]>0
-    navy=(rgb[:,:,0]<45)&(rgb[:,:,1]<55)&(rgb[:,:,2]<110)&alpha
-    light=(rgb.min(axis=2)>170)&((rgb.max(axis=2)-rgb.min(axis=2))<65)&alpha
-    combined=(navy|light)
-    # Keep only connected source-text components that contain navy-outline pixels.
-    # This excludes nearby starburst white/glow artwork that caused C189/C190's 14-pixel false positive.
-    hh,ww=combined.shape
-    seen=np.zeros((hh,ww),bool); title=np.zeros((hh,ww),bool)
-    for sy in range(hh):
-      for sx in range(ww):
-        if seen[sy,sx] or not combined[sy,sx]:
-          continue
-        stack=[(sy,sx)]; seen[sy,sx]=True; pts=[]; has_navy=False
-        while stack:
-          yy0,xx0=stack.pop(); pts.append((yy0,xx0)); has_navy = has_navy or bool(navy[yy0,xx0])
-          for dy in (-1,0,1):
-            for dx in (-1,0,1):
-              if dx==0 and dy==0: continue
-              ny,nx=yy0+dy,xx0+dx
-              if 0<=ny<hh and 0<=nx<ww and combined[ny,nx] and not seen[ny,nx]:
-                seen[ny,nx]=True; stack.append((ny,nx))
-        if has_navy and len(pts)>=8:
-          for py,px in pts: title[py,px]=True
-    # guard current Korean pixels with 2px neighborhood so only old-source residue outside Korean is counted.
-    rend=local_render
-    guard=np.asarray(Image.fromarray((rend.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(5)))>0
-    unchanged_clean=title & np.all(ca[y0:y1,x0:x1]==sa[y0:y1,x0:x1],axis=2)
-    unchanged_final=title & np.all(fa[y0:y1,x0:x1]==sa[y0:y1,x0:x1],axis=2) & ~guard
+rowchecks=[]; masks=[]
+for r in rows:
+    x0,y0,x1,y1=map(int,r["source_effect_bbox"])
+    # Transparent text atlas: localized visible alpha inside each exact source bbox is the text footprint.
+    vis=fa[y0:y1,x0:x1,3]>0
+    bb=bbox(vis)
+    actual=None if bb is None else [bb[0]+x0,bb[1]+y0,bb[2]+x0,bb[3]+y0]
+    declared=list(map(int,r["localized_bbox"]))
     if actual:
-        a,b,c,d=actual
-        dl=a-x0; dr=x1-c; dt=b-y0; db=y1-d
-        contain=(a>=x0 and b>=y0 and c<=x1 and d<=y1)
-        size=(c-a<=x1-x0 and d-b<=y1-y0)
+        a,b,c,d=actual; dl=a-x0; dr=x1-c; dt=b-y0; db=y1-d
+        contain=a>=x0 and b>=y0 and c<=x1 and d<=y1
+        size=(c-a)<=x1-x0 and (d-b)<=y1-y0
         positive=min(dl,dr,dt,db)>0
     else:
         dl=dr=dt=db=-1; contain=size=positive=False
-    # Residue diagnostics: exact coordinates/colors for controller adjudication.
-    yy,xx=np.nonzero(unchanged_final)
-    residue_points=[]
-    for py,px in list(zip(yy.tolist(),xx.tolist()))[:200]:
-        residue_points.append({
-          "x":int(px+x0),"y":int(py+y0),
-          "source_rgba":[int(v) for v in sa[py+y0,px+x0]],
-          "clean_rgba":[int(v) for v in ca[py+y0,px+x0]],
-          "final_rgba":[int(v) for v in fa[py+y0,px+x0]]
-        })
-    navy_residue=int(np.count_nonzero(unchanged_final & navy))
-    light_residue=int(np.count_nonzero(unchanged_final & light))
+    local=np.zeros((H,W),bool); local[y0:y1,x0:x1]=vis
+    masks.append(local)
+    guard=np.asarray(Image.fromarray((local.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(5)))>0
+    source_visible=(sa[:,:,3]>0)
+    residue=allowed & source_visible & np.all(fa==sa,axis=2) & ~guard
+    # scope this residue to the current row only
+    rowmask=np.zeros((H,W),bool); rowmask[y0:y1,x0:x1]=True
     rc={
-      **r,
+      "idx":r["idx"],"source":r["source"],"korean":r["korean"],
+      "source_effect_bbox":[x0,y0,x1,y1],
+      "producer_localized_bbox":declared,
       "independent_localized_bbox":actual,
+      "bbox_exact_match_producer":actual==declared,
       "delta_left":dl,"delta_right":dr,"delta_top":dt,"delta_bottom":db,
       "containment":"PASS" if contain else "FAIL",
       "size_ceiling":"PASS" if size else "FAIL",
       "positive_margin":"PASS" if positive else "FAIL",
-      "independent_source_title_mask_pixels":count(title),
-      "source_title_pixels_unchanged_in_clean":count(unchanged_clean),
-      "source_title_pixels_unchanged_in_final_outside_korean_guard":count(unchanged_final),
-      "residue_navy_pixels":navy_residue,
-      "residue_light_pixels":light_residue,
-      "residue_points":residue_points,
-      "clean_changed_pixels_in_bbox":count(clean_changed[y0:y1,x0:x1]),
-      "render_pixels_in_bbox":count(local_render)
+      "visible_source_residue_outside_korean_guard":count(residue&rowmask)
     }
     rowchecks.append(rc)
-    m=np.zeros((H,W),bool); m[y0:y1,x0:x1]=local_render; render_masks.append(m)
 
-machine["localized_pair_overlap_pixels"]=count(render_masks[0]&render_masks[1])
-d0=np.asarray(Image.fromarray((render_masks[0].astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0
-machine["localized_pair_1px_touch_pixels"]=count(d0&render_masks[1])
-machine["source_title_pixels_unchanged_in_clean_total"]=sum(x["source_title_pixels_unchanged_in_clean"] for x in rowchecks)
-machine["source_title_pixels_unchanged_in_final_outside_korean_guard_total"]=sum(x["source_title_pixels_unchanged_in_final_outside_korean_guard"] for x in rowchecks)
+overlap=touch=0
+for i,mi in enumerate(masks):
+    di=np.asarray(Image.fromarray((mi.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0
+    for mj in masks[i+1:]:
+        overlap+=count(mi&mj)
+        touch+=count(di&mj)
+machine["localized_pair_overlap_pixels"]=overlap
+machine["localized_pair_1px_touch_pixels"]=touch
+machine["visible_source_residue_outside_korean_guard_total"]=sum(x["visible_source_residue_outside_korean_guard"] for x in rowchecks)
 
-# Edge continuity diagnostics: compare clean inside exact bbox edge against canonical source just outside.
-edge=[]
-for r in c_rows:
-    x0,y0,x1,y1=r["original_bbox"]; vals=[]
-    pairs=[
-      ("left",ca[y0:y1,x0,:3],sa[y0:y1,max(0,x0-1),:3]),
-      ("right",ca[y0:y1,x1-1,:3],sa[y0:y1,min(W-1,x1),:3]),
-      ("top",ca[y0,x0:x1,:3],sa[max(0,y0-1),x0:x1,:3]),
-      ("bottom",ca[y1-1,x0:x1,:3],sa[min(H-1,y1),x0:x1,:3])
-    ]
-    for name,ii,oo in pairs:
-        ii=np.asarray(ii,dtype=np.float32); oo=np.asarray(oo,dtype=np.float32)
-        vals.append({"edge":name,"mean_abs_rgb_jump":float(np.mean(np.abs(ii-oo))),"max_abs_rgb_jump":int(np.max(np.abs(ii-oo)))})
-    edge.append({"region_idx":r["region_idx"],"edges":vals})
+canonical={
+ "TULIP GARDEN":"튤립 가든","SNOW MOUNTAIN":"스노 마운틴","PALM BEACH":"팜 비치",
+ "METROPOLIS":"메트로폴리스","INDUSTRIAL COMPLEX":"인더스트리얼 컴플렉스","IMPERIAL AVENUE":"임페리얼 애비뉴",
+ "GHOST FOREST":"고스트 포레스트","DESERT":"데저트","DEEP LAKE":"딥 레이크",
+ "CONIFEROUS FOREST":"코니퍼러스 포레스트","CLOUDY HIGHLAND":"클라우디 하이랜드","CASTLE WALL":"캐슬 월",
+ "CAPE WAY":"케이프 웨이","ANCIENT RUINS":"에인션트 루인스","ALPINE":"알파인"
+}
+semantic_pass=all(canonical.get(r["source"])==r["korean"] for r in rows) and len(rows)==15
+rows_pass=all(x["containment"]=="PASS" and x["size_ceiling"]=="PASS" and x["positive_margin"]=="PASS" and x["bbox_exact_match_producer"] and x["visible_source_residue_outside_korean_guard"]==0 for x in rowchecks)
+hard_zero=["final_changed_outside_union_source_bboxes","final_alpha_changed_outside_union_source_bboxes","protected_pixels_changed","localized_pair_overlap_pixels","localized_pair_1px_touch_pixels","visible_source_residue_outside_korean_guard_total"]
+status="PASS" if semantic_pass and rows_pass and all(machine[k]==0 for k in hard_zero) else "FAIL"
 
-hard_zero=[
- "clean_changed_outside_c_exact_bboxes","final_changed_outside_c_exact_bboxes",
- "clean_alpha_changed_outside_c_exact_bboxes","final_alpha_changed_outside_c_exact_bboxes",
- "render_outside_c_exact_bboxes","localized_pair_overlap_pixels","localized_pair_1px_touch_pixels",
- "source_title_pixels_unchanged_in_clean_total","source_title_pixels_unchanged_in_final_outside_korean_guard_total"
-]
-rows_pass=all(x["containment"]=="PASS" and x["size_ceiling"]=="PASS" and x["positive_margin"]=="PASS" for x in rowchecks)
-status="PASS" if rows_pass and all(machine[k]==0 for k in hard_zero) else "FAIL"
+# C-owned exact clean plate for visual proof: clear only the 15 exact source text bboxes.
+clean_arr=sa.copy()
+for r in rows:
+    x0,y0,x1,y1=map(int,r["source_effect_bbox"]); clean_arr[y0:y1,x0:x1]=0
+clean=Image.fromarray(clean_arr,"RGBA")
+clean.save(out/"C192_INDEPENDENT_CLEAN_PLATE.png")
 
-font=ImageFont.load_default(); evidence=[]
-# High-detail SOURCE/CLEAN/FINAL around each title, 2x enlargement to expose interpolation/seam artifacts.
+font=ImageFont.load_default(); cards=[]
 for rc in rowchecks:
-    x0,y0,x1,y1=rc["original_bbox"]; padx=150; pady=95
-    crop=(max(0,x0-padx),max(0,y0-pady),min(W,x1+padx),min(H,y1+pady))
+    x0,y0,x1,y1=rc["source_effect_bbox"]; pad=10
+    crop=(max(0,x0-pad),max(0,y0-pad),min(W,x1+pad),min(H,y1+pad))
     ims=[comp(z).crop(crop) for z in (src,clean,final)]
-    ims=[im.resize((im.width*2,im.height*2),Image.Resampling.NEAREST) for im in ims]
-    cw=max(z.width for z in ims); ch=max(z.height for z in ims)
-    sheet=Image.new("RGB",(cw*3,ch+34),"white"); d=ImageDraw.Draw(sheet)
-    for k,(lab,z) in enumerate(zip(("SOURCE","CLEAN","FINAL"),ims)):
-        sheet.paste(z,(k*cw,34)); d.text((k*cw+6,7),lab,fill="black",font=font)
-    # Mark diagnostic residue coordinates on a separate CLEAN/FINAL crop.
-    mark=Image.new("RGB",(cw*2,ch+34),"white"); md=ImageDraw.Draw(mark)
-    cleanz=ims[1].copy(); finalz=ims[2].copy()
-    czd=ImageDraw.Draw(cleanz); fzd=ImageDraw.Draw(finalz)
-    for pt in rc.get("residue_points",[]):
-        px=(pt["x"]-crop[0])*2; py=(pt["y"]-crop[1])*2
-        czd.ellipse((px-8,py-8,px+8,py+8),outline=(255,0,0),width=3)
-        fzd.ellipse((px-8,py-8,px+8,py+8),outline=(255,0,0),width=3)
-    mark.paste(cleanz,(0,34)); mark.paste(finalz,(cw,34)); md.text((6,7),"CLEAN residue markers",fill="black",font=font); md.text((cw+6,7),"FINAL residue markers",fill="black",font=font)
-    mfn=out/f"C191_ROW{rc['region_idx']}_RESIDUE_MARKERS_B64.txt"; saveb64(mark,mfn,98); evidence.append(str(mfn.relative_to(repo)))
-    fn=out/f"C191_ROW{rc['region_idx']}_DETAIL_B64.txt"; saveb64(sheet,fn,98); evidence.append(str(fn.relative_to(repo)))
+    cw=max(i.width for i in ims); ch=max(i.height for i in ims)
+    card=Image.new("RGB",(cw*3+12,ch+28),"white"); d=ImageDraw.Draw(card)
+    for k,(lab,z) in enumerate(zip(("SOURCE","CLEAN(C)","FINAL"),ims)):
+        ox=k*cw+4; card.paste(z,(ox,24)); d.text((ox,4),lab,fill="black",font=font)
+    d.text((cw*2+110,4),f"idx {rc['idx']} {rc['source']} -> {rc['korean']}",fill="black",font=font)
+    cards.append(card)
+sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+4*(len(cards)-1)),"white")
+y=0
+for c in cards: sheet.paste(c,(0,y)); y+=c.height+4
+if sheet.width>1800: sheet=sheet.resize((1800,round(sheet.height*1800/sheet.width)),Image.Resampling.LANCZOS)
+saveb64(sheet,out/"C192_CONTACTS_B64.txt",96)
 
-overview=Image.new("RGB",(1536,530),"white"); d=ImageDraw.Draw(overview)
-for k,(lab,z) in enumerate(zip(("SOURCE","CLEAN","FINAL"),(src,clean,final))):
-    zz=comp(z).resize((512,512),Image.Resampling.LANCZOS); overview.paste(zz,(k*512,18)); d.text((k*512+6,2),lab,fill="black",font=font)
-fn=out/"C191_OVERVIEW_B64.txt"; saveb64(overview,fn,95); evidence.append(str(fn.relative_to(repo)))
+rawcard=Image.new("RGB",(1024,1050),"white")
+raw=comp(final).resize((1024,512),Image.Resampling.LANCZOS)
+srcraw=comp(src).resize((1024,512),Image.Resampling.LANCZOS)
+rawcard.paste(srcraw,(0,18)); rawcard.paste(raw,(0,538))
+rd=ImageDraw.Draw(rawcard); rd.text((5,2),"SOURCE_READABLE",fill="black"); rd.text((5,522),"FINAL_READABLE",fill="black")
+saveb64(rawcard,out/"C192_READABLE_OVERVIEW_B64.txt",94)
 
-rawcard=Image.new("RGB",(1024,2070),"white")
+rawmirror=Image.new("RGB",(1024,2070),"white")
 for i,(lab,z) in enumerate((("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_final))):
-    zz=comp(z).resize((1024,1024),Image.Resampling.LANCZOS); rawcard.paste(zz,(0,i*1035+22)); ImageDraw.Draw(rawcard).text((5,i*1035+4),lab,fill="black")
-fn=out/"C191_RAW_B64.txt"; saveb64(rawcard,fn,94); evidence.append(str(fn.relative_to(repo)))
+    zz=comp(z).resize((1024,512),Image.Resampling.LANCZOS)
+    yy=i*520+22; rawmirror.paste(zz,(0,yy)); ImageDraw.Draw(rawmirror).text((5,yy-18),lab,fill="black")
+# crop unused lower canvas
+rawmirror=rawmirror.crop((0,0,1024,1060))
+saveb64(rawmirror,out/"C192_RAW_B64.txt",94)
 
 report={
- "schema_version":1,"role":"C","run":run,"qa_id":"C191","queue_index":pr["queue_index"],"asset":asset,
- "producer_run":pr["run"],"source_sha256":sp["source_sha256"],"candidate_sha256":pr["candidate_sha256"],
- "independent_source_decode_matches_producer_png":True,
+ "schema_version":1,"role":"C","run":run,"qa_id":"C192","queue_index":pr["index"],"asset":asset,
+ "producer_run":pr["run"],"source_sha256":sp["sha256"],"candidate_sha256":pr["candidate_sha256"],
  "structure":{"dimensions":dims,"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"raw_orientation":"mirror_y","header_exact":cb[:128]==sb[:128]},
- "c_exact_bboxes_source":"prior C160/C184 established geometry",
- "row_checks":rowchecks,"all_2_bbox_size_positive_margin_pass":rows_pass,
- "machine_checks":machine,"edge_continuity_proxy":edge,
- "machine_status":status,
+ "row_checks":rowchecks,"all_15_bbox_size_positive_margin_exact_match_pass":rows_pass,
+ "canonical_stage_mapping":canonical,"semantic_policy_pass":semantic_pass,
+ "machine_checks":machine,"machine_status":status,
+ "a48_semantic_binding_defect":"superseded by A49 before C finalization",
  "controller_visual_qa":"PENDING_CONTROLLER_REVIEW",
- "decision":"C191_DIAGNOSTIC_PENDING_CONTROLLER_ADJUDICATION",
- "runtime_validation":"UNTESTED","preview_b64_files":evidence
+ "decision":"PENDING_CONTROLLER_VISUAL_QA" if status=="PASS" else "C192_REWORK_REQUIRED_MACHINE_OR_SEMANTIC_GATE",
+ "runtime_validation":"UNTESTED",
+ "preview_b64_files":[
+  "localization/graphics/role_C/20261005-C192-39BCA907/C192_CONTACTS_B64.txt",
+  "localization/graphics/role_C/20261005-C192-39BCA907/C192_READABLE_OVERVIEW_B64.txt",
+  "localization/graphics/role_C/20261005-C192-39BCA907/C192_RAW_B64.txt"
+ ]
 }
-(out/"C191_63C91067_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-(wr/"C191_63C91067.json").write_text(json.dumps({
- "run":run,"qa_id":"C191","index":pr["queue_index"],"asset":"63C91067","candidate_sha256":pr["candidate_sha256"],
- "machine_status":status,"machine_checks":machine,
- "report":f"localization/graphics/role_C/{run}/C191_63C91067_MACHINE_QA.json","runtime_validation":"UNTESTED"
+(out/"C192_39BCA907_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(wr/"C192_39BCA907.json").write_text(json.dumps({
+ "run":run,"qa_id":"C192","index":pr["index"],"asset":"39BCA907","candidate_sha256":pr["candidate_sha256"],
+ "machine_status":status,"semantic_policy_pass":semantic_pass,"machine_checks":machine,
+ "report":f"localization/graphics/role_C/{run}/C192_39BCA907_MACHINE_QA.json","runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"qa_id":"C191","machine_status":status,"machine_checks":machine,"row_checks":rowchecks},ensure_ascii=False))
+print(json.dumps({"qa_id":"C192","machine_status":status,"semantic_policy_pass":semantic_pass,"machine_checks":machine},ensure_ascii=False))
