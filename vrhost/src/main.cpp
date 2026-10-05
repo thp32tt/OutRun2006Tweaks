@@ -1016,6 +1016,8 @@ namespace
 
     class StereoCompositor
     {
+        // BFVR-style diagnostic granularity, independently implemented here.
+        // QPC spans only existing CPU/API work; never add a GPU wait just to time it.
         struct PhaseTimingSeries
         {
             std::array<double, 256> samples{};
