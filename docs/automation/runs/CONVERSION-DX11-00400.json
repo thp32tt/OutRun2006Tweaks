@@ -10,15 +10,15 @@
   "chat_rollover": 4,
   "rollover_is_retry": false,
   "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
-  "status": "VALIDATING",
+  "status": "COMPLETE",
   "selected_work_item": "DX11_R262_PROGRAMMABLE_OUTPUT_RESOURCE_BEHAVIOR_PROOF",
   "base_sha": "b5edab688693695510004233a405b0698c229dfe",
   "result_sha": "5528c745271811eedb0517bd96af1ce2b411e5dd",
   "material_result_sha": "5528c745271811eedb0517bd96af1ce2b411e5dd",
   "source_implementation_sha": "5528c745271811eedb0517bd96af1ce2b411e5dd",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "ed34771a6fe3bc0bb07846768ffcd52d68abaaa9",
   "result_marker": "[AUTO:CONVERSION-DX11-00400]",
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
@@ -59,16 +59,28 @@
       ]
     },
     "backend_conversion_gate": {
-      "conclusion": "PENDING"
+      "run_id": 37268485884,
+      "run_attempt": 1,
+      "conclusion": "success",
+      "exact_sha": "ed34771a6fe3bc0bb07846768ffcd52d68abaaa9",
+      "validate_job_id": 111630276099,
+      "readiness_smoke_job_id": 111631104379,
+      "artifact_id": 11327203741,
+      "artifact_digest": "sha256:b54c0fb5701d868852c39b83ec8eb7a1aa3dda2c134403b148cdb645c082fc21",
+      "artifact_size_bytes": 2366688,
+      "constant_buffer_probe": "PASS_R262_INDEXED_NONINDEXED_OUTPUT_RESOURCE_BEHAVIOR_AND_STALE_BINDING_REGRESSIONS"
     },
     "r262_contract": {
       "geometry_resource_behavior_exact": true,
       "texture_resource_behavior_exact": true,
       "output_resource_behavior_exact": true,
       "full_f18_proof_present": true,
+      "r259_resource_behavior_proof_present": true,
+      "missing_prerequisite_mask": "0x4",
       "shader_translation_proof": "MISSING_F21",
       "native_draw_path_activation_allowed": false,
-      "draw_dispatch_authorized": false
+      "draw_dispatch_authorized": false,
+      "activation_snapshot_token": "0"
     }
   },
   "stages": {
@@ -85,25 +97,42 @@
       "evidence": "R262 output resource-behavior readiness and validator are implemented; R259 consumes complete F18 while F21 remains fail-closed. Indexed/non-indexed positive cases and stale live binding lineage are covered."
     },
     "C3_VALIDATE": {
-      "status": "IN_PROGRESS",
-      "automation_validation": "PENDING",
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
       "runtime_validation": "UNTESTED",
-      "evidence": "N100 clean exact-SHA static validation passed at 5528c745; Windows exact-SHA Backend Conversion Gate and DX11 readiness smoke are pending."
+      "validation_bearing_result_sha": "ed34771a6fe3bc0bb07846768ffcd52d68abaaa9",
+      "validation_run_id": 37268485884,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111630276099,
+      "readiness_smoke_job_id": 111631104379,
+      "artifact_id": 11327203741,
+      "artifact_digest": "sha256:b54c0fb5701d868852c39b83ec8eb7a1aa3dda2c134403b148cdb645c082fc21",
+      "artifact_size_bytes": 2366688,
+      "evidence": "Exact SHA passed Backend Conversion Gate validate and DX11 readiness smoke, including Win32 build and R262 constant-buffer probe execution. N100 clean exact-SHA static validation also passed. No HMD/game runtime test was performed."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "result_sha": "5528c745271811eedb0517bd96af1ce2b411e5dd",
       "material_result_sha": "5528c745271811eedb0517bd96af1ce2b411e5dd",
-      "result_marker": "[AUTO:CONVERSION-DX11-00400]"
+      "source_implementation_sha": "5528c745271811eedb0517bd96af1ce2b411e5dd",
+      "validation_bearing_result_sha": "ed34771a6fe3bc0bb07846768ffcd52d68abaaa9",
+      "result_marker": "[AUTO:CONVERSION-DX11-00400]",
+      "implementation_commits": [
+        "68e5659c9c3389ab6a7cc01144b5940d9af95244",
+        "5528c745271811eedb0517bd96af1ce2b411e5dd"
+      ]
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
       "reason": "R262 is dormant review/readiness evidence only and does not activate or package a runtime native draw path."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "implementation_comment_id": 5988637928,
+      "validation_comment_id": 5988818305,
+      "exact_next_action": "Preserve validated R239-R262. Under a new TASK_ID, implement exact F21 programmable shader semantic-translation proof for the dormant candidate while keeping NativeDrawPath, Draw and DrawIndexed fail-closed. Runtime-visible activation remains separately gated on matching Quest 3/VDXR evidence."
     }
   },
   "controller_dispatch": {
@@ -119,7 +148,26 @@
     "source": "CURRENT_USER_QUEUE",
     "dispatch_source": "CURRENT_USER_QUEUE",
     "runtime_validation": "UNTESTED",
-    "material_result_sha": "5528c745271811eedb0517bd96af1ce2b411e5dd"
+    "material_result_sha": "5528c745271811eedb0517bd96af1ce2b411e5dd",
+    "validation_bearing_result_sha": "ed34771a6fe3bc0bb07846768ffcd52d68abaaa9",
+    "validation_run_id": 37268485884,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111630276099,
+    "readiness_smoke_job_id": 111631104379,
+    "artifact_id": 11327203741,
+    "artifact_digest": "sha256:b54c0fb5701d868852c39b83ec8eb7a1aa3dda2c134403b148cdb645c082fc21",
+    "implementation_comment_id": 5988637928,
+    "validation_comment_id": 5988818305
   },
-  "exact_next_action": "Validate the current R262 material on an exact descendant SHA with Backend Conversion Gate plus DX11 readiness smoke. If PASS, persist validation IDs/artifact and update CONVERSION_LANE_STATE.json without changing runtime validation."
+  "exact_next_action": "Preserve validated R239-R262. Under a new TASK_ID, implement exact F21 programmable shader semantic-translation proof for the dormant candidate while keeping NativeDrawPath, Draw and DrawIndexed fail-closed. Runtime-visible activation remains separately gated on matching Quest 3/VDXR evidence.",
+  "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R262_PROGRAMMABLE_OUTPUT_RESOURCE_BEHAVIOR_PROOF_SOURCE_GRAPH_DORMANT_BOUNDARY_WIN32_BUILD_READINESS_SMOKE_CONSTANT_BUFFER_PROBE",
+  "validation_run_id": 37268485884,
+  "validation_run_attempt": 1,
+  "validation_job_id": 111630276099,
+  "readiness_smoke_job_id": 111631104379,
+  "artifact_id": 11327203741,
+  "artifact_digest": "sha256:b54c0fb5701d868852c39b83ec8eb7a1aa3dda2c134403b148cdb645c082fc21",
+  "artifact_size_bytes": 2366688,
+  "implementation_comment_id": 5988637928,
+  "validation_comment_id": 5988818305
 }
