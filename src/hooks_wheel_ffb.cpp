@@ -591,24 +591,6 @@ namespace
                 lower_copy(selectedName_.c_str());
             const bool r3AutoPolarity =
                 selectedWheelLower.find("r3 racing wheel") != std::string::npos;
-            if (r3AutoPolarity)
-            {
-                const bool expectedReverse =
-                    WheelFFBMath::model_uses_reversed_r3_polarity(ffbModel);
-                const bool forceMismatch =
-                    Settings::WheelFFBInvertForce.get() != expectedReverse;
-                const bool springMismatch =
-                    Settings::WheelFFBInvertSpring.get() != expectedReverse;
-                if (forceMismatch || springMismatch)
-                {
-                    Settings::WheelFFBInvertForce = expectedReverse;
-                    Settings::WheelFFBInvertSpring = expectedReverse;
-                    spdlog::info(
-                        "WheelFFB: R3 model-polarity self-heal model={} reverseForce={} reverseSpring={}",
-                        WheelFFBMath::model_name(ffbModel),
-                        expectedReverse, expectedReverse);
-                }
-            }
 
             if (activeRuntimeModel_ != runtimeModelValue)
             {
@@ -618,6 +600,23 @@ namespace
                 {
                     disable_periodics();
                 }
+
+                // Apply the validated R3 polarity as a model-change default,
+                // not as a permanent lock. A user can immediately override the
+                // two Reverse checkboxes manually and that choice remains live
+                // until the next model change.
+                if (r3AutoPolarity && previousModel >= 0)
+                {
+                    const bool expectedReverse =
+                        WheelFFBMath::model_uses_reversed_r3_polarity(ffbModel);
+                    Settings::WheelFFBInvertForce = expectedReverse;
+                    Settings::WheelFFBInvertSpring = expectedReverse;
+                    spdlog::info(
+                        "WheelFFB: R3 model-change polarity default model={} reverseForce={} reverseSpring={} manualOverrideAllowed=true",
+                        WheelFFBMath::model_name(ffbModel),
+                        expectedReverse, expectedReverse);
+                }
+
                 activeRuntimeModel_ = runtimeModelValue;
                 periodicRecreateHoldoffUntil_ = 0;
                 updateCounter_ = 59;
@@ -868,8 +867,17 @@ namespace
                 WheelFFBMath::common_contact_tactile_amplitude(
                     contactTactileEnvelope, speedNorm, configuredRoadDetail,
                     modelOutputStrength) * materialRoadTextureScale;
-            float roadAmp = commonContactTactile;
-            float roadFreq = 25.0f + 12.0f * speedNorm;
+            const bool imperialStonePaving =
+                WheelFFBMath::imperial_avenue_stone_paving_pattern(
+                    uniqueStage, collisionContext, surfaceMasks);
+            const float imperialStoneFloor = imperialStonePaving
+                ? WheelFFBMath::imperial_avenue_stone_tactile_amplitude(
+                    speedNorm, configuredRoadDetail, modelOutputStrength)
+                : 0.0f;
+            float roadAmp = std::max(commonContactTactile, imperialStoneFloor);
+            float roadFreq = imperialStonePaving
+                ? (8.0f + 4.0f * speedNorm)
+                : (25.0f + 12.0f * speedNorm);
             float ps2SurfaceEnvelope = 0.0f;
             int ps2RoadRaw = 0;
             if (arcadeEffects)
