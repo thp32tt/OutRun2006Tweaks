@@ -22,6 +22,7 @@
 #include "../state/state_block_tracker.hpp"
 #include "../state/state_block_recovery.hpp"
 #include "../state/state_block_events.hpp"
+#include "draw_state_helpers.hpp"
 
 namespace OutRunVRStereo
 {
@@ -218,20 +219,6 @@ namespace OutRunVRStereo
             return std::memcmp(&a, &b, sizeof(D3DMATRIX)) == 0;
         }
 
-        bool R31LiveShaderMatches(IDirect3DDevice9* device,
-            std::uintptr_t expected) noexcept
-        {
-            if (!device || expected == 0)
-                return false;
-            IDirect3DVertexShader9* shader = nullptr;
-            if (FAILED(device->GetVertexShader(&shader)))
-                return false;
-            const std::uintptr_t actual =
-                reinterpret_cast<std::uintptr_t>(shader);
-            if (shader) shader->Release();
-            return actual == expected;
-        }
-
         void R31DiscardUnreliableDrawCaches() noexcept
         {
             if (OutRunVR::State::StateBlockTracker::Reliable())
@@ -298,7 +285,7 @@ namespace OutRunVRStereo
                 return false;
 
             if (!OutRunVR::State::StateBlockTracker::Reliable() &&
-                !R31LiveShaderMatches(device, verifiedShader))
+                !OutRunVR::D3D9::LiveVertexShaderMatches(device, verifiedShader))
                 return false;
 
             ++R31FastWorldCandidates;
