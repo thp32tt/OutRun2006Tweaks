@@ -362,7 +362,7 @@ namespace OutRunVRStereo
                 return false;
             if (OutRunVR::State::StateBlockTracker::Reliable())
                 return R31GetSavedViewport(device, viewport);
-            return SUCCEEDED(device->GetViewport(&viewport));
+            return OutRunVR::D3D9::ReadViewport(device, viewport);
         }
 
         bool R32RestoreRightPassState(IDirect3DDevice9* device,
