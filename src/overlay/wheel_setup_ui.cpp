@@ -1781,7 +1781,7 @@ namespace
                         track_ffb_change(true);
                         WheelFFB_ResetHeadroomStats();
                         WheelFFB_RequestSettingsTransition();
-                        status_ = std::string("FFB model + complete R9 test baseline applied: ") +
+                        status_ = std::string("FFB model + complete R10 test baseline applied: ") +
                             FfbModelNames[modelIndex] + ". Save Force Feedback to persist it.";
                     }
                     if (selected)
@@ -1790,7 +1790,9 @@ namespace
                 ImGui::EndCombo();
             }
             ImGui::TextDisabled(
-                "R9: changing FFB Model applies the complete test baseline automatically. Modern uses Reverse Force+Spring ON; Arcade/Hybrid/PS2 use both OFF.");
+                "R10: changing FFB Model applies the complete test baseline automatically. Modern uses Reverse Force+Spring ON; Arcade/Hybrid/PS2 use both OFF.");
+            ImGui::TextDisabled(
+                "MOZA R3 runtime also self-heals this polarity after profile/INI/live-setting changes so the selected model cannot keep the previous model's direction.");
 
             const int activeFfbModel = std::clamp(int(Settings::WheelFFBModel), 0, 3);
             if (activeFfbModel == 0)
@@ -1978,10 +1980,18 @@ namespace
 
             track_ffb_change(ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr()));
             track_ffb_change(ImGui::Checkbox("Record driving telemetry (5 Hz + 1 Hz detail)", Settings::WheelFFBTelemetry.ptr()));
+            const std::string ffbDeviceLower =
+                WheelProfileStore::lower_ascii(Settings::WheelFFBDeviceName.get());
+            const bool r3AutoPolarity =
+                ffbDeviceLower.find("r3 racing wheel") != std::string::npos;
+            if (r3AutoPolarity) ImGui::BeginDisabled();
             track_ffb_change(ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr()));
             ImGui::SameLine();
             track_ffb_change(ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()));
-            if (ImGui::IsItemHovered())
+            if (r3AutoPolarity) ImGui::EndDisabled();
+            if (r3AutoPolarity)
+                ImGui::TextDisabled("MOZA R3 polarity is automatic per model: Modern ON/ON, Arcade/Hybrid/PS2 OFF/OFF.");
+            else if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Use Reverse Spring only if the wheel pushes farther away from centre. ConstantForce direction is independent.");
 
             if (ffbDirty_)
