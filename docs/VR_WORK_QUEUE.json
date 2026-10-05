@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-10-06T02:44:24+09:00",
+  "updatedKst": "2026-10-06T03:00:54+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -499,13 +499,19 @@
     {
       "id": "L1-RECENTER-001",
       "priority": 7,
-      "status": "READY",
+      "status": "NEED_HMD_TEST",
       "preferredRole": "B_RENDER_REVIEW",
       "summary": "Gameplay/menu recenter application-space behavior and visual transition correctness.",
       "testLevel": "LEVEL1",
       "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": true
+      "attempts": 1,
+      "runtimeCandidate": true,
+      "validationSha": "651cadc05fb463eea2574abd548d8cd390f2ded0",
+      "validationRunId": 37351916333,
+      "validationResult": "BUILD_VERIFIED_STATIC_CONTRACT",
+      "implementationProgress": "00415 added a canonical recenter lifecycle verifier and fail-closed policy integration. Static CI now pins application-LOCAL recreation before pose/view locate, immutable base LOCAL lifetime, cache/view invalidation, focus/game request synthesis, rejection of head-locked fallback completion, and fresh-visible completion semantics.",
+      "nextAction": "Quest3/VDXR runtime-check F10 recenter, focus return, gameplay projection and menu LOCAL-fixed transition on an exact build. Static contract is complete; do not change recenter ownership without new runtime evidence or verifier failure.",
+      "runtimeValidation": "UNTESTED"
     },
     {
       "id": "L3-DX9EX-001",
