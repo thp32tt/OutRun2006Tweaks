@@ -1,0 +1,21 @@
+{
+  "run": "20261005-A-PRODUCTION35",
+  "index": 101,
+  "asset": "560FA536",
+  "candidate_sha256": "549f46249ed7b3aa1edf490bdbf88012ffc053b586731100eb91d1952e65447f",
+  "semantic_strings": 12,
+  "localized_physical_targets": 13,
+  "bbox_size_positive_margin": "13/13 PASS",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "source_residue": 0,
+  "clean_source_core_unchanged": 0,
+  "overlap": 0,
+  "touch": 0,
+  "worker_status": "A35_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION35/A35_560FA536_REPORT.json"
+}
