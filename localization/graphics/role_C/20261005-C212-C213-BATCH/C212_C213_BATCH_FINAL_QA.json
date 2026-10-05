@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T23:55:00+09:00",
+  "role": "C",
+  "run": "20261005-C212-C213-BATCH",
+  "reviewed": [
+    {
+      "qa_id": "C212",
+      "index": 193,
+      "asset": "97E863AD",
+      "producer": "A70",
+      "candidate_sha256": "b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d",
+      "machine": "PASS",
+      "controller": "PASS",
+      "decision": "C212_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    },
+    {
+      "qa_id": "C213",
+      "index": 152,
+      "asset": "49BB5FE5",
+      "producer": "B155",
+      "candidate_sha256": null,
+      "machine": "NOT_APPLICABLE_NO_CANDIDATE",
+      "controller": "POLICY_PASS",
+      "decision": "C213_PRESERVE_ORIGINAL_POLICY_PASS_NO_CANDIDATE_REQUIRED"
+    }
+  ],
+  "anti_duplication": "Only new A70/B155 results were reviewed. C211/C209 and earlier completed PASS assets were not reopened. Index95 37759842 had no newer producer candidate and was not repeated.",
+  "current_rework_remaining": [
+    "37759842"
+  ],
+  "runtime_validation": "97E863AD UNTESTED; 49BB5FE5 NOT_APPLICABLE_FOR_LOCALIZATION",
+  "vr_ffb_dx11_dxvk_changes": false
+}
