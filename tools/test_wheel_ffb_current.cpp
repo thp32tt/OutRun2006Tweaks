@@ -169,6 +169,17 @@ int main() {
  require(physics_return_relief(.15f,-.08f)>.89f&&physics_return_relief(.15f,-.08f)<.91f,"normal-corner countersteer relief remains modest");
  require(physics_return_relief(.32f,-.08f)>.969f,"deep-slip self-countersteer retains nearly all aligning torque");
  require(physics_return_relief(.15f,.08f)==1,"opposing work no relief");
+ require(model_requires_reversed_polarity(Model::ModernDD),"Modern owns reversed R3 polarity");
+ require(!model_requires_reversed_polarity(Model::ArcadeOriginal) &&
+         !model_requires_reversed_polarity(Model::ArcadeHybrid) &&
+         !model_requires_reversed_polarity(Model::PS2OriginalExperimental),
+         "original-derived models keep native polarity");
+ require(drift_countersteer_blend(-.35f,.10f,.8f)==0.0f,
+         "normal/small chassis slip keeps front-tyre SAT direction");
+ require(drift_countersteer_blend(-.35f,.65f,1.0f)>.80f,
+         "large opposing chassis slip hands authority to countersteer recovery");
+ require(drift_recovery_slip(-.35f,.65f,1.0f)>0.0f,
+         "deep oversteer recovery crosses to chassis countersteer direction");
  ResponseLUT linear{}; require(parse_response_lut("0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",linear),"linear LUT parses");
  require(std::abs(apply_response_lut(.55f,linear)-.55f)<1e-5f,"linear LUT identity");
  ResponseLUT boosted{}; require(parse_response_lut("0,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.84,0.92,1",boosted),"boost LUT parses");
