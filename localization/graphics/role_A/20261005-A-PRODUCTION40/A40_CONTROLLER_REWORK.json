@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION40",
+  "timestamp_kst": "2026-10-05T18:16:00+09:00",
+  "queue_index": 95,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "c_return": "C177_REWORK_REQUIRED_CLEAN_PLATE_SOURCE_EFFECT_RESIDUE",
+  "candidate_sha256": "040a0e9a504fdb5982db4302ded3c9c3938fa6bf88f8ced48a7ab6ce5692ce19",
+  "producer_report": "localization/graphics/role_A/20261005-A-PRODUCTION40/A40_37759842_REPORT.json",
+  "machine_status": "PASS_BUT_VISUAL_FAIL",
+  "machine_summary": "33/33 bbox/size/positive-margin PASS; clean/final outside/alpha/protected/core-residue/overlap/touch counters all zero",
+  "controller_visual_qa": "FAIL_VISIBLE_SOURCE_EFFECT_RECONSTRUCTION",
+  "visual_findings": [
+    "A40_C177_FOCUS shows readable source-word shapes remaining in CLEAN for YES/NO and multiple Time Attack/Heart Attack/OutRun mode cells.",
+    "The same brown/gray source-shaped reconstruction remains visible behind/around Korean in FINAL.",
+    "RANDOM also retains a source-word-shaped reconstruction in CLEAN.",
+    "Removing the A39 connected-component filter captured detached shadows numerically, but nearest-neighbor reconstruction still samples source text/effect colors and reproduces the glyph shapes."
+  ],
+  "decision": "A40_REWORK_REQUIRED_TEMPLATE_SPECIFIC_CLEAN_PLATE_RECONSTRUCTION",
+  "required_rework": "Do not accept nearest-neighbor cleanup for the affected selector plates. Reconstruct source-faithful plate backgrounds per template (YES/NO circle, dark continuous-course plate, blue mode/icon plates, RANDOM plate), then derive exact source-effect bounds from canonical pixels and rerun visual plus exact-pixel QA.",
+  "evidence": [
+    "localization/graphics/role_A/20261005-A-PRODUCTION40/A40_C177_FOCUS.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION40/A40_FINAL_RAW_MIRROR_Y.jpg"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
