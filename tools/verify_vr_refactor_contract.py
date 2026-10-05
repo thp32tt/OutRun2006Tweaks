@@ -153,8 +153,26 @@ for banned in ("R9MainDepthKnown", "R9MainDepthIdentity", "R9MainDepthDesc"):
 # Post-1000 successor: R33 must not directly mutate R9-owned right-depth/
 # stencil synchronization flags. Preserve exact invalidation semantics through
 # one lower-owner API so later final-dispatch cleanup cannot split ownership.
-if "inline void R9InvalidateRightDepthStencilSync(" not in r9:
+r9_depth_sync_owner = re.search(
+    r"inline void R9InvalidateRightDepthStencilSync\(\s*"
+    r"bool invalidateDepth, bool invalidateStencil\) noexcept\s*"
+    r"\{(?P<body>.*?)\n\t\}",
+    r9,
+    re.DOTALL,
+)
+if not r9_depth_sync_owner:
     errors.append("R9 missing right depth/stencil sync invalidation owner API")
+else:
+    sync_body = r9_depth_sync_owner.group("body")
+    sync_order = [
+        sync_body.find("if (invalidateDepth)"),
+        sync_body.find("RightDepthSynchronized = false;"),
+        sync_body.find("if (invalidateStencil)"),
+        sync_body.find("RightStencilSynchronized = false;"),
+    ]
+    if min(sync_order) < 0 or sync_order != sorted(sync_order):
+        errors.append(
+            "R9 right-depth sync owner API must preserve depth/stencil invalidation order")
 for banned in ("RightDepthSynchronized = false;",
                "RightStencilSynchronized = false;"):
     if banned in r33:
@@ -797,12 +815,11 @@ else:
     depth_body = fail_closed_depth.group("body")
     depth_order = [
         depth_body.find("R33InvalidateDepthStencilCache();"),
-        depth_body.find("RightDepthSynchronized = false;"),
-        depth_body.find("RightStencilSynchronized = false;"),
+        depth_body.find("R9InvalidateRightDepthStencilSync(true, true);"),
     ]
     if min(depth_order) < 0 or depth_order != sorted(depth_order):
         errors.append(
-            "R33 depth/stencil fail-close API must preserve cache/depth/stencil order")
+            "R33 depth/stencil fail-close API must preserve cache then R9 sync invalidation order")
 
 fail_closed_reset = re.search(
     r"inline void FailClosedResetBaselineState\(\) noexcept\s*\{(?P<body>.*?)\n    \}",
