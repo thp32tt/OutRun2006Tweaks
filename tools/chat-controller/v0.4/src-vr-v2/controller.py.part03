@@ -99,6 +99,21 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     if not CONVERSATION_ROLLOVER_ENABLED:
         return False
     count = int(active.get("chat_rollovers", 0))
+    hard_length_limit = "length limit" in reason.lower() or "reached its length" in reason.lower()
+    last_rollover = _parse_iso(active.get("last_rollover_at"))
+    if last_rollover and not hard_length_limit and CONVERSATION_ROLLOVER_MIN_SECONDS:
+        age_seconds = max(0, int((datetime.now(TZ) - last_rollover).total_seconds()))
+        if age_seconds < CONVERSATION_ROLLOVER_MIN_SECONDS:
+            remaining = CONVERSATION_ROLLOVER_MIN_SECONDS - age_seconds
+            write_runtime(
+                status="conversation_rollover_cooldown",
+                last_action=(
+                    f"{active['task_id']} rollover suppressed for {remaining}s; "
+                    f"minimum interval={CONVERSATION_ROLLOVER_MIN_SECONDS}s"
+                ),
+                queue=active,
+            )
+            return False
     if MAX_CHAT_ROLLOVERS_PER_TASK and count >= MAX_CHAT_ROLLOVERS_PER_TASK:
         active["failure_context"] = (
             f"conversation rollover limit reached ({MAX_CHAT_ROLLOVERS_PER_TASK}) after: {reason}"
@@ -1623,18 +1638,42 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
     if rate_limit_active(load_registry(datetime.now(TZ)), datetime.now(TZ)):
         return
 
-    # DX9Ex is considered first when opening a missing lane so its priority-zero
-    # structural-refactor chain starts before ordinary conversion work after redeploy.
-    for lane_key in ("C", "A", "B"):
-        if lane_key in active_by_lane:
-            continue
-        if await conversion_send_lane_task(context, pages, q, lane_key):
-            break
+    # Priority policy:
+    #   1) C = DX9Ex structural refactor
+    #   2) A = DX11 conversion
+    #   3) B = DXVK fallback only when both higher-priority lanes are unavailable
+    # Existing DXVK work may finish, but no new DXVK task is issued while C/A are active.
+    high_priority = ("C", "A")
+    high_active = sum(
+        1 for key in high_priority
+        if key in active_by_lane and active_by_lane[key].get("phase") != "DONE"
+    )
+
+    if high_active < CONVERSION_ACTIVE_LIMIT:
+        for lane_key in high_priority:
+            if lane_key in active_by_lane:
+                continue
+            if await conversion_send_lane_task(context, pages, q, lane_key):
+                high_active += 1
+                break
+
+    if (
+        CONVERSION_DXVK_DEFERRED
+        and high_active == 0
+        and "B" not in active_by_lane
+    ):
+        await conversion_send_lane_task(context, pages, q, "B")
+    elif (
+        not CONVERSION_DXVK_DEFERRED
+        and "B" not in active_by_lane
+        and len(active_by_lane) < CONVERSION_ACTIVE_LIMIT
+    ):
+        await conversion_send_lane_task(context, pages, q, "B")
 
     write_runtime(
         status="conversion_parallel_running",
         last_action=(
-            "Independent conversion lanes active: "
+            "Priority C(DX9Ex refactor) > A(DX11) > B(DXVK deferred); active: "
             + ", ".join(
                 f"{key}={value.get('task_id')}:{value.get('phase')}"
                 for key, value in sorted(q.get("active_by_lane", {}).items())
