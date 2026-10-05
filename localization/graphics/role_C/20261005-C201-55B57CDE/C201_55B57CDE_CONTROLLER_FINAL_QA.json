@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T21:27:02+09:00",
+  "role": "C",
+  "run": "20261005-C201-55B57CDE",
+  "qa_id": "C201",
+  "queue_index": 161,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "producer_run": "20261005-A-PRODUCTION56-DXT5",
+  "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+  "candidate_sha256": "78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812",
+  "candidate_changed_by_C": false,
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "machine_status": "PASS",
+  "source_bbox_exact_match": "38/38 PASS",
+  "candidate_bbox_exact_match": "38/38 PASS",
+  "containment_size_positive_margin": "38/38 PASS",
+  "semantic_binding": "PASS_38_OF_38",
+  "machine_checks": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_residue_exact_pixels_outside_localized_bboxes": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "changed_dxt5_blocks_wholly_outside_allowed": 0
+  },
+  "changed_dxt5_blocks": 33833,
+  "controller_visual_qa": "PASS",
+  "visual_notes": [
+    "Independent C contacts show the C197/A54 low-alpha fringe and source-shaped peripheral remnants are removed.",
+    "All 38 nationality/zodiac labels are legible, cleanly separated, and contained within the exact source bboxes.",
+    "Dark-teal source family is preserved consistently with no visible source-script residue, clipping, overlap, seam or compression halo.",
+    "Raw mirror_y orientation is correct."
+  ],
+  "machine_report": "localization/graphics/role_C/20261005-C201-55B57CDE/C201_55B57CDE_MACHINE_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C201-55B57CDE/C201_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_C/20261005-C201-55B57CDE/C201_RAW_COMPARE.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION56-DXT5/A56_55B57CDE_SOURCE_CLEAN_FINAL.jpg"
+  ],
+  "decision": "C201_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED"
+}
