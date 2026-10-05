@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T02:25:52+09:00",
+  "updatedKst": "2026-10-06T02:44:24+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -79,9 +79,10 @@
     "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-0014",
     "VR-REFACTOR-POST1100-R32-WVP-BATCH-NEUTRAL-OWNER-0015",
     "VR-REFACTOR-POST1100-R32-LIVE-EFFECT-SNAPSHOT-NEUTRAL-OWNER-0016",
-    "VR-REFACTOR-POST1100-VIEWPORT-READ-NEUTRAL-OWNER-0017"
+    "VR-REFACTOR-POST1100-VIEWPORT-READ-NEUTRAL-OWNER-0017",
+    "VR-REFACTOR-POST1100-R31-R32-OWNER-CENSUS-COMPLETION-0018"
   ],
-  "next": "Perform a terminal dependency census of the remaining R33-consumed R31/R32 helpers. If all remaining helpers are owner-specific (telemetry, cache/pose, policy, restore/lifecycle, fail-close, install state, workload), add a deterministic owner-boundary guard and mark the post-1100 neutral-helper extraction chain complete. Do not move StateBlock/Reset/Present/DirectGPU/fail-close/cache-lifetime behavior merely to reduce symbol count.",
+  "next": "Post-1100 R31/R32 neutral-helper extraction chain COMPLETE. Preserve the terminal 15-call owner census and owner-evidence map. Subsequent DX9Ex work may return to the highest executable general quality/performance/stability item; do not reopen structural extraction unless the census/verifier or new source evidence shows a real ownership regression.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -184,7 +185,8 @@
     "CONVERSION-DX9EX-00409 E002 retry closed result-identity gap: queue SHA 3060adb27c8444deb4c6094b1a15cb42fbee414f remains BOOKKEEPING_ONLY; exact validation-bearing repair SHA e3239b4959cf4759c5d7ce1395dd133297d10124 passed DX9Ex Active Validation 37343826060 and Domain Isolation 37343826037. Fail-closed workflow execution is now recognized by HUD/retirement verifiers. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00410 completed neutral WVP batch ownership extraction. Raw c64..c67 SetVertexShaderConstantF moved to draw_state_helpers; R32 telemetry/failure wrapper remains authoritative. Exact SHA e27f01f84045bd47b93ab3aecae24581e6ffd1a0 passed DX9Ex Active 37345169043 and Domain Isolation 37345169517. Intermediate run 37345097334 on 144a4abc was superseded/cancelled, not a task failure. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00411 completed neutral live effect-state snapshot extraction. Exact SHA 5875486443a60c93764c40ef6d7204f1066e452c passed DX9Ex Active 37346503785 and Domain Isolation 37346503724. Intermediate ba2c5169 run 37346444631 was superseded/cancelled, not a task failure. Runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00412 completed neutral viewport-read extraction. Exact SHA bbae4e903468703984863c0658d267ad79a538bc passed policy/game/host/full-chain/package jobs in DX9Ex Active 37347553547 and Domain Isolation 37347553486. Runtime remains UNTESTED."
+    "CONVERSION-DX9EX-00412 completed neutral viewport-read extraction. Exact SHA bbae4e903468703984863c0658d267ad79a538bc passed policy/game/host/full-chain/package jobs in DX9Ex Active 37347553547 and Domain Isolation 37347553486. Runtime remains UNTESTED.",
+    "VR-REFACTOR-POST1100-R31-R32-OWNER-CENSUS-COMPLETION-0018: exact-SHA 8b72853bb775ef77fbe1474da824e5cb513d3c78 requires the terminal 15-call R33->R31/R32 allow-list and complete owner-evidence map to have identical keys, and validates every retained helper body still carries its owner-specific evidence. DX9Ex Active 37349813274 and Domain Isolation 37349813314 SUCCESS; runtime UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
@@ -656,5 +658,27 @@
       "packageArtifactDigest": "sha256:50ee40dd4b1d280c345ba06671228fce9ec84c7d79fa8efdf603f9fb6ef90084"
     },
     "issue14CommentId": 5999496588
+  },
+  "post1000Maintenance00414": {
+    "taskId": "CONVERSION-DX9EX-00414",
+    "productionId": "CONVERSION-DX9EX-00414",
+    "eventId": "CONVERSION-DX9EX-00414-E001",
+    "eventType": "dispatch",
+    "attempt": "1/3",
+    "item": "VR-REFACTOR-POST1100-R31-R32-OWNER-CENSUS-COMPLETION-0018",
+    "baseSha": "4e8a3f67b0eb40ddb940b2b3abb1954253c3bdff",
+    "materialResultSha": "8b72853bb775ef77fbe1474da824e5cb513d3c78",
+    "validationBearingResultSha": "8b72853bb775ef77fbe1474da824e5cb513d3c78",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "runtimeBehaviorChanged": false,
+    "summary": "Closed the post-1100 neutral-helper extraction chain with an exact owner-evidence map for all terminal R33->R31/R32 calls.",
+    "validation": {
+      "dx9exActiveRunId": 37349813274,
+      "domainIsolationRunId": 37349813314,
+      "packageArtifactId": 11362750851,
+      "packageArtifactDigest": "sha256:8dc1101258290f76a2c323ce6f3a3dd325bb72c4d445239baaf566c587b200bb"
+    },
+    "issue14CommentId": 5999892417
   }
 }
