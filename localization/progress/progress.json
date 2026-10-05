@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T20:59:13+09:00",
+  "updated_at_kst": "2026-10-05T21:02:36+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C197/C199 are the latest completed C decisions. 55B57CDE A54 remains REWORK_REQUIRED because C independent decoded alpha matches producer localized bbox only 10/38; 28/38 carry extra low-alpha/source-shaped fringe despite 38/38 source containment. 8215FD25 B145 supersedes B144/C198: speech bubble is now clean, but lower starburst contains a large translucent Total Rank ghost behind/around 종합 랭킹, so C199 REWORK_REQUIRED. B Laplace-repair worker c5a7a62109f2 is compute-pending and not candidate-complete. pending-C=0; pending_artwork localize_text=12; producer REWORK=3 (37759842,8215FD25,55B57CDE). RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C197/C200 are the latest completed C decisions. 55B57CDE remains REWORK_REQUIRED: C independent source bbox exact 38/38 and containment/size/margins 38/38, but decoded candidate alpha bbox matches producer declaration only 10/38; 28/38 carry extra low-alpha/source-shaped fringe. 8215FD25 B146 supersedes B145/C199: speech bubble is clean and the large source ghost is removed, but the starburst title-removal zone still has broad non-source haze/blur, pale gray/white smears and isolated artifacts visible around Korean in FINAL. pending-C=0; pending_artwork localize_text=12; producer REWORK=3 (37759842,8215FD25,55B57CDE). RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -272,7 +272,7 @@
         "55B57CDE"
       ],
       "remaining": 3,
-      "note": "37759842 manual/template clean plate. C199 8215FD25: speech bubble fixed; starburst still has large source-shaped Total Rank ghost. C197 55B57CDE: DXT5 decoded alpha has undeclared fringe on 28/38 labels. B Laplace 8215 worker c5a7a62109f2 compute-pending; do not treat as candidate-complete. pending_artwork=12; pending-C=0; RUNTIME_VALIDATION=UNTESTED.",
+      "note": "37759842 manual/template selector clean plate. C200 8215FD25: speech bubble fixed; starburst still has haze/blur/texture discontinuity and isolated artifacts. C197 55B57CDE: DXT5 decoded alpha undeclared fringe on 28/38 labels. pending_artwork=12; pending-C=0; RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": []
     },
     "latest_d_final_qa": {
@@ -297,8 +297,8 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C197/C199",
-      "report": "localization/graphics/role_C/20261005-C197-C199-BATCH/C197_C199_BATCH_FINAL_QA.json",
+      "run": "C197/C200",
+      "report": "localization/graphics/role_C/20261005-C197-C200-BATCH/C197_C200_BATCH_FINAL_QA.json",
       "result": "2_REWORK_REQUIRED",
       "candidate_changed_by_C": false,
       "assets_checked": 2,
@@ -323,15 +323,12 @@
       "pending_production_localize_text": 12,
       "machine_evidence": {
         "55B57CDE": "localization/graphics/role_C/20261005-C197-55B57CDE/C197_55B57CDE_MACHINE_QA.json",
-        "8215FD25": "localization/graphics/role_B/20261005-B-PRODUCTION145-8215-C196-REWORK/B145_8215_REPORT.json"
+        "8215FD25": "localization/graphics/role_B/20261005-B-PRODUCTION146-8215-C196-REWORK/B146_8215_REPORT.json"
       },
       "controller_visual": {
         "55B57CDE": "FAIL_VISIBLE_DXT5_FRINGE_SPECKLE_AND_UNDECLARED_ALPHA_EXTENTS",
-        "8215FD25": "FAIL_STARBURST_SOURCE_GHOST"
+        "8215FD25": "FAIL_STARBURST_TEXTURE_DISCONTINUITY_AND_SMEAR"
       },
-      "compute_pending": [
-        "B 8215 Laplace-repair worker c5a7a62109f2"
-      ],
       "in_game_validation": "55B57CDE/8215FD25 UNTESTED; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
@@ -1242,7 +1239,7 @@
       "report": "localization/graphics/role_C/20261005-C170-754F0599/C170_754F_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C197-C199-BATCH/C197_C199_BATCH_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C197-C200-BATCH/C197_C200_BATCH_FINAL_QA.json",
     "c171_controller_final_qa": {
       "timestamp_kst": "2026-10-05T16:06:00+09:00",
       "run": "20261005-C171-754F0599",
@@ -1497,6 +1494,17 @@
       "supersedes": "C198/B144",
       "compute_pending_after_decision": "B worker c5a7a62109f2",
       "report": "localization/graphics/role_C/20261005-C199-8215FD25/C199_8215FD25_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c200_8215fd25": {
+      "timestamp_kst": "2026-10-05T21:02:36+09:00",
+      "queue_index": 30,
+      "candidate_sha256": "d8687e615007af7bdd8e4d0bf41f1830e0bf105a3ef225cc157671fc8e9fd377",
+      "producer_machine_status": "PASS_REPORTED",
+      "controller_visual_qa": "FAIL_STARBURST_TEXTURE_DISCONTINUITY_AND_SMEAR",
+      "decision": "C200_REWORK_REQUIRED_STARBURST_TEXTURE_DISCONTINUITY_AND_SMEAR",
+      "supersedes": "C199/B145 and C198/B144",
+      "report": "localization/graphics/role_C/20261005-C200-8215FD25/C200_8215FD25_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     }
   },
