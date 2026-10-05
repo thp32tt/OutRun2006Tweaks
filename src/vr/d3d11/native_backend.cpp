@@ -9117,8 +9117,12 @@ compose_programmable_shader_semantic_translation_readiness(
     std::uint64_t translatedVertexSemanticHash,
     std::uint64_t translatedPixelSemanticHash,
     std::uint64_t interfaceLinkHash,
+    std::uint64_t translatorRevisionHash,
+    std::uint64_t semanticContractHash,
     bool vertexSemanticExact,
     bool pixelSemanticExact,
+    bool constantRegisterMappingExact,
+    bool samplerMappingExact,
     bool interfaceLinkExact) noexcept {
     NativeProgrammableShaderSemanticTranslationReadiness out{};
 
@@ -9130,6 +9134,10 @@ compose_programmable_shader_semantic_translation_readiness(
     out.translatedVertexSemanticHash = translatedVertexSemanticHash;
     out.translatedPixelSemanticHash = translatedPixelSemanticHash;
     out.interfaceLinkHash = interfaceLinkHash;
+    out.translatorRevisionHash = translatorRevisionHash;
+    out.semanticContractHash = semanticContractHash;
+    out.constantRegisterMappingExact = constantRegisterMappingExact;
+    out.samplerMappingExact = samplerMappingExact;
     out.translationObjectSnapshotToken = translationObjectSnapshotToken;
     out.inputLayoutSnapshotToken = inputLayoutSnapshotToken;
 
@@ -9138,7 +9146,9 @@ compose_programmable_shader_semantic_translation_readiness(
         inputLayoutSnapshotToken != 0 &&
         translatedVertexSemanticHash != 0 &&
         translatedPixelSemanticHash != 0 &&
-        interfaceLinkHash != 0;
+        interfaceLinkHash != 0 &&
+        translatorRevisionHash != 0 &&
+        semanticContractHash != 0;
     out.sourceIdentityExact =
         sourceIdentity.exact_identity() &&
         !sourceIdentity.translationImplemented;
@@ -9197,6 +9207,8 @@ compose_programmable_shader_semantic_translation_readiness(
         out.cacheIdentityMatches &&
         out.vertexSemanticExact &&
         out.pixelSemanticExact &&
+        out.constantRegisterMappingExact &&
+        out.samplerMappingExact &&
         out.interfaceLinkExact;
 
     out.diagnosticOnly = true;
@@ -9220,6 +9232,12 @@ compose_programmable_shader_semantic_translation_readiness(
         token = mix_readiness_snapshot_token(
             token, out.translatedPixelSemanticHash);
         token = mix_readiness_snapshot_token(token, out.interfaceLinkHash);
+        token = mix_readiness_snapshot_token(token, out.translatorRevisionHash);
+        token = mix_readiness_snapshot_token(token, out.semanticContractHash);
+        token = mix_readiness_snapshot_token(
+            token, out.constantRegisterMappingExact ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.samplerMappingExact ? 1u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.translationObjectSnapshotToken);
         token = mix_readiness_snapshot_token(
@@ -9239,8 +9257,12 @@ bool validate_programmable_shader_semantic_translation_readiness_snapshot(
     std::uint64_t translatedVertexSemanticHash,
     std::uint64_t translatedPixelSemanticHash,
     std::uint64_t interfaceLinkHash,
+    std::uint64_t translatorRevisionHash,
+    std::uint64_t semanticContractHash,
     bool vertexSemanticExact,
     bool pixelSemanticExact,
+    bool constantRegisterMappingExact,
+    bool samplerMappingExact,
     bool interfaceLinkExact,
     std::uint64_t reviewSnapshotToken) noexcept {
     if (reviewSnapshotToken == 0)
@@ -9253,14 +9275,20 @@ bool validate_programmable_shader_semantic_translation_readiness_snapshot(
             translatedVertexSemanticHash,
             translatedPixelSemanticHash,
             interfaceLinkHash,
+            translatorRevisionHash,
+            semanticContractHash,
             vertexSemanticExact,
             pixelSemanticExact,
+            constantRegisterMappingExact,
+            samplerMappingExact,
             interfaceLinkExact);
     return current.reviewReady &&
         current.reviewSnapshotToken == reviewSnapshotToken &&
         current.semanticProofPresent &&
         current.vertexSemanticExact &&
         current.pixelSemanticExact &&
+        current.constantRegisterMappingExact &&
+        current.samplerMappingExact &&
         current.interfaceLinkExact;
 }
 
