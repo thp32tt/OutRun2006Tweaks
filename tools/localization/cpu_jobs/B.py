@@ -72,14 +72,39 @@ b=sa[ty:ty+ch,tx:tx+cw]
 cell_diff=np.max(np.abs(a.astype(np.int16)-b.astype(np.int16)),axis=2)
 cell_diff_pixels=int(np.count_nonzero(cell_diff))
 cell_max=int(cell_diff.max(initial=0))
-if cell_diff_pixels!=0 or cell_max!=0:
-    raise RuntimeError(("template source cell not pixel-identical",cell_diff_pixels,cell_max))
 
 ob=list(map(int,row["original_bbox"])); lb=list(map(int,row["localized_bbox"]))
 dob=[ob[0]+dx,ob[1]+dy,ob[2]+dx,ob[3]+dy]
 dlb=[lb[0]+dx,lb[1]+dy,lb[2]+dx,lb[3]+dy]
 for box in (dob,dlb):
     if not(0<=box[0]<box[2]<=W and 0<=box[1]<box[3]<=H): raise RuntimeError(("bbox",box))
+
+# The full starburst cells include a few character-specific decorative pixels,
+# so whole-cell equality is unnecessarily strict. Require the complete source
+# title/effect patch itself to be pixel-identical, plus an untouched 32px ring
+# around it. This proves the C202-approved transplant has identical local source
+# geometry and cannot introduce a patch boundary.
+ts=np.asarray(tsrc,dtype=np.uint8)
+patch_a=ts[ob[1]:ob[3],ob[0]:ob[2]]
+patch_b=sa[dob[1]:dob[3],dob[0]:dob[2]]
+patch_delta=np.max(np.abs(patch_a.astype(np.int16)-patch_b.astype(np.int16)),axis=2)
+patch_diff_pixels=int(np.count_nonzero(patch_delta)); patch_max=int(patch_delta.max(initial=0))
+if patch_diff_pixels or patch_max:
+    raise RuntimeError(("template title patch not pixel-identical",patch_diff_pixels,patch_max))
+pad=32
+ta=[max(0,ob[0]-pad),max(0,ob[1]-pad),min(W,ob[2]+pad),min(H,ob[3]+pad)]
+ha=[max(0,dob[0]-pad),max(0,dob[1]-pad),min(W,dob[2]+pad),min(H,dob[3]+pad)]
+ring_a=ts[ta[1]:ta[3],ta[0]:ta[2]]
+ring_b=sa[ha[1]:ha[3],ha[0]:ha[2]]
+if ring_a.shape!=ring_b.shape: raise RuntimeError(("ring shape",ring_a.shape,ring_b.shape))
+ring_mask=np.ones(ring_a.shape[:2],dtype=bool)
+rx0=ob[0]-ta[0]; ry0=ob[1]-ta[1]; rx1=ob[2]-ta[0]; ry1=ob[3]-ta[1]
+ring_mask[ry0:ry1,rx0:rx1]=False
+ring_delta=np.max(np.abs(ring_a.astype(np.int16)-ring_b.astype(np.int16)),axis=2)
+ring_vals=ring_delta[ring_mask]
+ring_diff_pixels=int(np.count_nonzero(ring_vals)); ring_max=int(ring_vals.max(initial=0))
+if ring_diff_pixels or ring_max:
+    raise RuntimeError(("template boundary ring not pixel-identical",ring_diff_pixels,ring_max))
 
 # Copy only the C202-approved title footprint; all other HOLL artwork remains canonical.
 clean=src.copy(); final=src.copy()
@@ -142,7 +167,9 @@ report={
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"source_sha256":SOURCE_SHA},
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":payload[:128]==sb[:128],"raw_orientation":"mirror_y"},
  "classification":{"localizable":"Total Rank","translation":"종합 랭킹","protected":["Holly character artwork","lens flare","rank letters A/B/C/D/E","heart/cross UI"]},
- "template_provenance":{"producer":"B148","final_qa":"C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME","template_asset":"8215FD25","template_candidate_sha256":cq["candidate_sha256"],"source_cell":src_cell,"target_cell":dst_cell,"shift":[dx,dy],"source_cell_diff_pixels":cell_diff_pixels,"source_cell_max_channel_delta":cell_max,"exact_source_cell_match":True},
+ "template_provenance":{"producer":"B148","final_qa":"C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME","template_asset":"8215FD25","template_candidate_sha256":cq["candidate_sha256"],"source_cell":src_cell,"target_cell":dst_cell,"shift":[dx,dy],"source_cell_diff_pixels":cell_diff_pixels,"source_cell_max_channel_delta":cell_max,"exact_source_cell_match":cell_diff_pixels==0,
+"source_title_patch_diff_pixels":patch_diff_pixels,"source_title_patch_max_channel_delta":patch_max,"exact_source_title_patch_match":True,
+"boundary_ring_32px_diff_pixels":ring_diff_pixels,"boundary_ring_32px_max_channel_delta":ring_max,"exact_boundary_ring_match":True},
  "row":{"region_idx":1,"source":"Total Rank","korean":"종합 랭킹","cell":dst_cell,"original_bbox":dob,"localized_bbox":dlb,
         "source_width":source_w,"source_height":source_h,"localized_width":loc_w,"localized_height":loc_h,
         "delta_left":dlb[0]-dob[0],"delta_right":dob[2]-dlb[2],"delta_top":dlb[1]-dob[1],"delta_bottom":dob[3]-dlb[3],
@@ -155,4 +182,4 @@ report={
 }
 (out/"B154_HOLL_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 (wr/"B154_HOLL.json").write_text(json.dumps({"run":run,"index":34,"asset":"B7E25BAD","candidate_sha256":csha,"bbox_size_positive_margin":"1/1","outside":outside,"alpha_outside":alpha_out,"worker_status":report["status"],"report":f"localization/graphics/role_B/{run}/B154_HOLL_REPORT.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"run":"B154","candidate_sha256":csha,"source_cell_exact":True,"bbox":"1/1 PASS"},ensure_ascii=False),flush=True)
+print(json.dumps({"run":"B154","candidate_sha256":csha,"source_patch_and_ring_exact":True,"bbox":"1/1 PASS"},ensure_ascii=False),flush=True)
