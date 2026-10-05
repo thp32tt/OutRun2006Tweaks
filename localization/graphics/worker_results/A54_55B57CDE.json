@@ -1,0 +1,15 @@
+{
+  "run": "20261005-A-PRODUCTION54-DXT5",
+  "index": 161,
+  "asset": "55B57CDE",
+  "candidate_sha256": "7569c51cf5ba82ce081bf09d486b8c8869560e7fae71292c613e4bf8a5b51ab8",
+  "bbox_size_positive_margin": "38/38 PASS",
+  "decoded_changed_outside": 0,
+  "alpha_outside": 0,
+  "introduced_visible_outside": 0,
+  "source_residue": 0,
+  "boundary_alpha_index_only_blocks": 922,
+  "worker_status": "A54_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION54-DXT5/A54_55B57CDE_REPORT.json"
+}
