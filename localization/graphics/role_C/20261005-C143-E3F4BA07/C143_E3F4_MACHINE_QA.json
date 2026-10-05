@@ -1,0 +1,409 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C143-E3F4BA07",
+  "queue_index": 226,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+  "producer_run": "20261005-B-PRODUCTION67",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "0ac26331b6c2765b9c46b867ff1f2151fd7a15b1",
+    "atlas_git_blob_sha1": "50256e8d4d5af1335249993d44abc5d18a4c5672",
+    "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72"
+  },
+  "candidate_sha256": "1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c",
+  "candidate_changed_by_C": false,
+  "independent_method": "pinned canonical source+atlas; exact source alpha for 8 localized regions and 2 protected OutRun marks; exact transparent clean reconstruction; independent DDS/header/bbox/protected/overlap/style validation",
+  "structure": {
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "protected_regions": {
+    "1": {
+      "name": "OUTRUN2SP",
+      "bbox": [
+        983,
+        430,
+        1416,
+        494
+      ],
+      "pixels": 15502
+    },
+    "2": {
+      "name": "OUTRUN2",
+      "bbox": [
+        3,
+        346,
+        343,
+        410
+      ],
+      "pixels": 12255
+    }
+  },
+  "rows": [
+    {
+      "region_idx": 0,
+      "source": "STAGE",
+      "korean": "스테이지",
+      "cell": [
+        0,
+        424,
+        980,
+        88
+      ],
+      "original_bbox": [
+        0,
+        436,
+        228,
+        500
+      ],
+      "localized_bbox": [
+        2,
+        438,
+        211,
+        498
+      ],
+      "source_size": [
+        228,
+        64
+      ],
+      "localized_size": [
+        209,
+        60
+      ],
+      "delta_left": 2,
+      "delta_right": 17,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 3,
+      "source": "GOAL E",
+      "korean": "골 E",
+      "cell": [
+        980,
+        336,
+        980,
+        88
+      ],
+      "original_bbox": [
+        980,
+        346,
+        1233,
+        410
+      ],
+      "localized_bbox": [
+        982,
+        350,
+        1084,
+        406
+      ],
+      "source_size": [
+        253,
+        64
+      ],
+      "localized_size": [
+        102,
+        56
+      ],
+      "delta_left": 2,
+      "delta_right": 149,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 4,
+      "source": "GOAL D",
+      "korean": "골 D",
+      "cell": [
+        0,
+        248,
+        980,
+        88
+      ],
+      "original_bbox": [
+        4,
+        262,
+        256,
+        326
+      ],
+      "localized_bbox": [
+        6,
+        266,
+        114,
+        322
+      ],
+      "source_size": [
+        252,
+        64
+      ],
+      "localized_size": [
+        108,
+        56
+      ],
+      "delta_left": 2,
+      "delta_right": 142,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 5,
+      "source": "GOAL C",
+      "korean": "골 C",
+      "cell": [
+        980,
+        248,
+        980,
+        88
+      ],
+      "original_bbox": [
+        983,
+        262,
+        1234,
+        326
+      ],
+      "localized_bbox": [
+        985,
+        266,
+        1091,
+        322
+      ],
+      "source_size": [
+        251,
+        64
+      ],
+      "localized_size": [
+        106,
+        56
+      ],
+      "delta_left": 2,
+      "delta_right": 143,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 6,
+      "source": "GOAL B",
+      "korean": "골 B",
+      "cell": [
+        0,
+        160,
+        980,
+        88
+      ],
+      "original_bbox": [
+        4,
+        170,
+        257,
+        234
+      ],
+      "localized_bbox": [
+        6,
+        174,
+        113,
+        230
+      ],
+      "source_size": [
+        253,
+        64
+      ],
+      "localized_size": [
+        107,
+        56
+      ],
+      "delta_left": 2,
+      "delta_right": 144,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 7,
+      "source": "GOAL A",
+      "korean": "골 A",
+      "cell": [
+        980,
+        160,
+        980,
+        88
+      ],
+      "original_bbox": [
+        986,
+        170,
+        1242,
+        234
+      ],
+      "localized_bbox": [
+        988,
+        174,
+        1095,
+        230
+      ],
+      "source_size": [
+        256,
+        64
+      ],
+      "localized_size": [
+        107,
+        56
+      ],
+      "delta_left": 2,
+      "delta_right": 147,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 8,
+      "source": "GOAL",
+      "korean": "골",
+      "cell": [
+        0,
+        72,
+        980,
+        88
+      ],
+      "original_bbox": [
+        4,
+        86,
+        195,
+        150
+      ],
+      "localized_bbox": [
+        6,
+        90,
+        59,
+        146
+      ],
+      "source_size": [
+        191,
+        64
+      ],
+      "localized_size": [
+        53,
+        56
+      ],
+      "delta_left": 2,
+      "delta_right": 136,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 9,
+      "source": "15 STAGE CONTINUOUS",
+      "korean": "15코스 연속",
+      "cell": [
+        980,
+        72,
+        980,
+        88
+      ],
+      "original_bbox": [
+        985,
+        86,
+        1809,
+        150
+      ],
+      "localized_bbox": [
+        987,
+        88,
+        1280,
+        147
+      ],
+      "source_size": [
+        824,
+        64
+      ],
+      "localized_size": [
+        293,
+        59
+      ],
+      "delta_left": 2,
+      "delta_right": 529,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "unclassified_visible_source_pixels": 0,
+    "producer_clean_exact_diff_pixels": 0,
+    "bbox_size_positive_margin": "8/8 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "overlap": 0,
+    "touch_pairs": [],
+    "target_protected_overlap": 0,
+    "target_protected_1px_near": 0,
+    "style": {
+      "0": {
+        "target_pixels": 7247,
+        "gray_blue_family_fraction": 1.0
+      },
+      "3": {
+        "target_pixels": 3599,
+        "gray_blue_family_fraction": 1.0
+      },
+      "4": {
+        "target_pixels": 3739,
+        "gray_blue_family_fraction": 1.0
+      },
+      "5": {
+        "target_pixels": 3450,
+        "gray_blue_family_fraction": 1.0
+      },
+      "6": {
+        "target_pixels": 3824,
+        "gray_blue_family_fraction": 1.0
+      },
+      "7": {
+        "target_pixels": 3594,
+        "gray_blue_family_fraction": 1.0
+      },
+      "8": {
+        "target_pixels": 2370,
+        "gray_blue_family_fraction": 1.0
+      },
+      "9": {
+        "target_pixels": 9382,
+        "gray_blue_family_fraction": 1.0
+      }
+    }
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
