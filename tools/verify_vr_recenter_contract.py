@@ -116,8 +116,13 @@ require_order(
     "channel.MarkReceived(requestId);",
     "PendingGameRequestId.store(requestId, std::memory_order_release);",
 )
+focus_start = poll.find("if (PendingFocusRecenter && eventData)")
+focus_end = poll.find("const XrResult result = ::xrPollEvent", focus_start)
+if focus_start < 0 or focus_end <= focus_start:
+    fail("focus recenter synthesis block missing")
+focus_block = poll[focus_start:focus_end]
 require_order(
-    poll,
+    focus_block,
     "focus recenter synthesis",
     "if (PendingFocusRecenter && eventData)",
     "QueueApplicationRecenter();",
