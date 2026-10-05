@@ -559,7 +559,7 @@ namespace OutRunVRStereo
                 R31DiscardUnreliableDrawCaches();
                 const std::uintptr_t cachedShader =
                     CurrentVertexShaderIdentity.load(std::memory_order_acquire);
-                if (!R31LiveShaderMatches(device, cachedShader))
+                if (!OutRunVR::D3D9::LiveVertexShaderMatches(device, cachedShader))
                     return {};
             }
 
