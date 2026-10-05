@@ -586,17 +586,19 @@ namespace
             // side effect. This closes profile/manual paths that could leave
             // Modern with Original polarity or vice versa while the model ID
             // itself had already changed.
-            const bool modelReversePolarity =
+            const bool modelEventReversePolarity =
                 WheelFFBMath::model_uses_r3_reverse_polarity(ffbModel);
-            if (bool(Settings::WheelFFBInvertForce) != modelReversePolarity ||
-                bool(Settings::WheelFFBInvertSpring) != modelReversePolarity)
+            const bool modelSpringReversePolarity =
+                WheelFFBMath::model_uses_r3_spring_reverse_polarity(ffbModel);
+            if (bool(Settings::WheelFFBInvertForce) != modelEventReversePolarity ||
+                bool(Settings::WheelFFBInvertSpring) != modelSpringReversePolarity)
             {
-                Settings::WheelFFBInvertForce = modelReversePolarity;
-                Settings::WheelFFBInvertSpring = modelReversePolarity;
+                Settings::WheelFFBInvertForce = modelEventReversePolarity;
+                Settings::WheelFFBInvertSpring = modelSpringReversePolarity;
                 spdlog::info(
                     "WheelFFB: R10 model-owned polarity enforced for {}: invertCF={} invertSpring={}",
                     WheelFFBMath::model_name(ffbModel),
-                    modelReversePolarity, modelReversePolarity);
+                    modelEventReversePolarity, modelSpringReversePolarity);
             }
 
             if (activeRuntimeModel_ != runtimeModelValue)
@@ -1404,10 +1406,20 @@ namespace
             // Keep SAT/spring/damper on the DD-safe slew path while allowing a
             // crash or gear thunk to arrive promptly without releasing that
             // slew limiter for the whole steering signal.
-            const float forceDirection = Settings::WheelFFBInvertForce ? -1.0f : 1.0f;
+            // Hybrid mixes Modern structural SAT with Arcade event semantics.
+            // They have opposite R3 transport polarity, so do not force both
+            // through one global sign. The UI/persisted InvertForce represents
+            // event polarity; structural polarity is derived from the model.
+            const float structuralForceDirection =
+                WheelFFBMath::model_uses_r3_structural_reverse_polarity(ffbModel)
+                    ? -1.0f : 1.0f;
+            const float eventForceDirection =
+                Settings::WheelFFBInvertForce ? -1.0f : 1.0f;
             const float outputRamp = warmupScale * recreateScale;
-            float total = structural * modelOutputStrength * forceDirection * outputRamp;
-            float eventOutput = events * outputStrength * forceDirection * outputRamp;
+            float total =
+                structural * modelOutputStrength * structuralForceDirection * outputRamp;
+            float eventOutput =
+                events * outputStrength * eventForceDirection * outputRamp;
             if (!std::isfinite(total))
                 total = 0.0f;
             if (!std::isfinite(eventOutput))
