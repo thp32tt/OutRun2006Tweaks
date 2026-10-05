@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-05T15:56:14+09:00",
+  "updatedKst": "2026-10-05T16:07:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -164,7 +164,8 @@
     "CONVERSION-DX9EX-00402 did not advance the structural cycle: cycle 1100 remains authoritative and physical R31/R32 hook-layer retirement stays deferred pending a bounded equivalence proof. General regression maintenance instead build-verified VR-HUD-SUMO-REPLAY-SEMANTIC-LOSS-001 by adding a deterministic non-consuming replay semantic ownership guard and wiring it into DX9Ex Active Validation. Exact validation-bearing SHA 4183a3bc6970653b5dab60a8f5c64ba1bc01c318 passed DX9Ex Active 37267187539 and Domain Isolation 37267187590; runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00403 / VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012: bounded structural proof gate only; no runtime behavior changed. RED commit 4811ab9d53b5c7ee7a60b8789916b0a6abe74c69 added tools/verify_vr_r31_r32_retirement_guard.py and failed exactly because the canonical DX9Ex Active workflow did not yet own the new guard. Validation-bearing 8b1bd6b3b6d726bec3e478ac2862bde80916a254 wired the guard into both the push path filter and architecture verification step. The guard pins four retirement prerequisites: R31/R32 install fallback ownership, R33->R32->R22 Reset plus R33->R32->R13 Present/DirectGPU ordering, R22/R31 StateBlock lifecycle/fallback coverage, and R33 final fallback through R32LowerFailClosed plus R30-owned lower-R29 calls. N100 exact-SHA py_compile + retirement guard + architecture + R51 + R32-R34 + hook graph + refactor + Sumo + near-plane + workflow YAML passed. GitHub exact-SHA DX9Ex Active 37268342455 policy/host/game/full-chain-compile/package SUCCESS and Domain Isolation Guard 37268342567 SUCCESS. Package artifact 11326909994 digest sha256:b81eb674a40841b5408f09e6e70576662a3b8b171c83b11f1237049847ebd36b. Physical retirement remains intentionally DEFERRED and runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00406: c64 producer provenance and semantic-HUD node-relation diagnostics are telemetry-only; VRTelemetry OFF skips diagnostic c64 provenance lookup. Rendering classification/ownership is unchanged; runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00407: Sumo replay now snapshots explicit RenderScope plus diagnostic ProducerToken in one non-consuming semantic-tag lookup; a deterministic provenance verifier forbids reintroducing the second registry scan. Rendering ownership/classification is unchanged; runtime remains UNTESTED."
+    "CONVERSION-DX9EX-00407: Sumo replay now snapshots explicit RenderScope plus diagnostic ProducerToken in one non-consuming semantic-tag lookup; a deterministic provenance verifier forbids reintroducing the second registry scan. Rendering ownership/classification is unchanged; runtime remains UNTESTED.",
+    "CONVERSION-DX9EX-00408 / VR-HOST-002 post-review: A/B/C review completed against current focus sources. Added durable architecture-verifier coverage for Frame.v2 run generation, stale-slot rejection, DirectGPU run binding, gameplay bootstrap gating, and fallback stale-run rejection. Exact material SHA 3c0ee50ba8893e94b42a5213ea36640864834553 passed GitHub-source static contract verification; no runtime behavior changed and RUNTIME_VALIDATION remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARDED",
   "validatedSourceSha": "d2872620450dc5e3604f56810721ce13470c99bb",
@@ -468,5 +469,28 @@
       "packageArtifactDigest": "sha256:19fef8046ca47aea14de063899cf92cf14e8e73ed8f9aafeab86ae861ed1241f",
       "n100": "UNAVAILABLE_DESKTOP_COMMANDER_MONTHLY_USAGE_LIMIT; NOT_USED_FOR_COMPLETION"
     }
+  },
+  "post1000Maintenance00408": {
+    "taskId": "CONVERSION-DX9EX-00408",
+    "productionId": "CONVERSION-DX9EX-00408",
+    "eventId": "CONVERSION-DX9EX-00408-E003",
+    "eventType": "rollover",
+    "chatRollover": 2,
+    "rolloverIsRetry": false,
+    "resumeReason": "Retry persisted after one recovery attempt",
+    "attempt": "1/3",
+    "item": "VR-HOST-002-POST-REVIEW-A-B-C",
+    "baseHead": "48745de334266ca2b550e53a5a90f17e1334c2e4",
+    "materialResultSha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+    "validationBearingResultSha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+    "automationValidation": "PASS_EXACT_SHA_STATIC_CONTRACT",
+    "runtimeValidation": "UNTESTED",
+    "runtimeBehaviorChanged": false,
+    "review": {
+      "A": "PASS_ARCHITECTURE",
+      "B": "PASS_RENDER_RUNTIME_CONTRACT",
+      "C": "PASS_PERFORMANCE_NO_RUNTIME_DELTA"
+    },
+    "n100": "UNAVAILABLE_DESKTOP_COMMANDER_MONTHLY_USAGE_LIMIT; NOT_USED_FOR_COMPLETION"
   }
 }
