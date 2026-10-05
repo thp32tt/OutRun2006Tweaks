@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "B_PRODUCTION86/B87/B88/B89 completed even index 222 DDF0392A. B86 canonical numbered atlas identified idx0 OutRun Mode / 15 C., idx1 OutRun 1986, idx2 Journey Mode / Random as the only localizable functional rows; known song titles idx3..9 and Ferrari model names idx10..24 are protected original. B87 failed only an incorrect diagnostic that counted intentionally preserved visible rows despite decoded outside diff=0; B88 machine PASS was visually reworked because 32px Hangul was too small. B89 final e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea uses shared Black 36px and passes 3/3 bbox+size+positive margins, clean/final validators, zero residue/decoded outside/alpha outside/introduced visible outside/protected-row changes/compressed outside-patch, plus SOURCE/CLEAN/FINAL/row/raw mirror_y visual self-QA. Index 182 7D747BED closed preserve-original (zero localizable segments). C/in-game pending. pending_artwork=22, producer_rework=1 (C598919A). RUNTIME_VALIDATION=UNTESTED.",
+    "C159 independently finalized B89 even index 222 DDF0392A DXT5 candidate e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea. Pinned canonical DDS+atlas were re-downloaded and independently decoded; three exact source-alpha bboxes re-derived without producer masks. 3/3 bbox+size+positive margins, decoded/alpha/introduced-visible outside=0, source residue/overlap/protected-near=0; song-title rows 3..9 and Ferrari rows 10..24 pixel-exact; source/localized fill median [46,53,57]. Controller SOURCE/CLEAN/FINAL,row,raw mirror_y PASS. C159_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. pending_artwork=22; producer_rework=1 (C598919A). RUNTIME_VALIDATION=UNTESTED.",
     "C158 independently finalized B85 even index 212 BA0147DA candidate 869cf1bea8b27dcc89f5b2ab68f9dd163e4bf41fa6de4b53c7b3f19b3b1c74ad. Pinned canonical DDS+atlas were re-downloaded and 12 exact source masks/bboxes/transparent clean plate/protected artwork recomputed without producer masks; 12/12 bbox+size+positive margins and alignment anchors PASS, every clean/final/protected/residue/overlap/touch gate zero. Controller SOURCE/CLEAN/FINAL, 12 row-contact and raw mirror_y visuals PASS; PROFESSIONAL/프로 + small OUTRUN/아웃런 right anchors and protected character names/VERDE MUGELLO/zodiac/logos/icons verified. C158_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. pending_artwork=24; producer_rework=1 (C598919A). RUNTIME_VALIDATION=UNTESTED.",
     "C157 independently finalized corrected B82 even index 188 8C259C68 candidate 03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03. Pinned canonical DDS+atlas were re-downloaded and exact source masks/bboxes/transparent clean plate recomputed without producer masks; 6/6 bbox+size+positive margins and every clean/final/protected/residue/overlap/touch gate PASS at zero. Controller SOURCE/CLEAN/FINAL, row-contact and raw mirror_y visuals PASS. C157_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. pending_artwork=25; producer_rework=1 (C598919A). RUNTIME_VALIDATION=UNTESTED.",
     "C153+C156 cross-lane final QA approved new B_PRODUCTION80 FEF70E85 and A_PRODUCTION22 30CF0D without repeating prior completed assets. FEF70E85 candidate e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086: independent CLEAN diff=0, 14/14 bbox+size+positive-margin, all pixel/protected/overlap gates 0, canonical phonetic stage names and REVERSED exact, visual/raw PASS. 30CF0D candidate 6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b: canonical hash/header plus producer geometry evidence independently rechecked due transparent-RGB effect pixels; 6/6 bbox+size+positive-margin, clean/final/protected/overlap gates 0, visual/raw PASS. C598919A remains sole producer REWORK_REQUIRED after B78 proved 1,435 DXT5 boundary source pixels need endpoint/index-constrained solver. pending_artwork=26, producer_rework=1. RUNTIME_VALIDATION=UNTESTED.",
@@ -131,12 +131,12 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-10-05T12:53:53+09:00",
+      "updated_at_kst": "2026-10-05T13:23:48+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20261005-C158-BA0147DA/C158_BA_CONTROLLER_FINAL_QA.json",
+      "report": "localization/graphics/role_C/20261005-C159-DDF0392A/C159_DDF_CONTROLLER_FINAL_QA.json",
       "direct_queue_scope": 126,
-      "current_candidates_scanned": 41,
-      "elements_scanned": 382,
+      "current_candidates_scanned": 42,
+      "elements_scanned": 385,
       "pixel_visual_pass_assets": [
         "FF2462BB",
         "C4A2937B",
@@ -186,25 +186,26 @@
         "FEF70E85",
         "30CF0D",
         "8C259C68",
-        "BA0147DA"
+        "BA0147DA",
+        "DDF0392A"
       ],
       "rework_required_assets": [
         "C598919A"
       ],
       "failed_elements": 0,
-      "pending_production_localize_text": 24,
+      "pending_production_localize_text": 22,
       "hold_strict_recheck_zoom_review": 47,
       "promotion_hold_for_pixel_pass": true,
-      "promotion_hold_reason": "C158 approved corrected B85 BA0147DA static candidate. C598919A remains actionable producer REWORK_REQUIRED requiring an endpoint/index-constrained exact decoded-pixel DXT5 solver. 1A43E9D9 remains HIGH_RISK pending mandatory in-game; 4F68708E/F6811E94/49BB5FE5/75C3586A remain strict HOLD.",
+      "promotion_hold_reason": "C159 approved B89 DDF0392A exact-decoded DXT5 static candidate. C598919A remains actionable producer REWORK_REQUIRED requiring an endpoint/index-constrained exact decoded-pixel DXT5 solver. 1A43E9D9 remains HIGH_RISK pending mandatory in-game; 4F68708E/F6811E94/49BB5FE5/75C3586A remain strict HOLD.",
       "user_approved_locked": 0,
       "failed_assets": 1,
       "latest_c_revalidated_assets": [
-        "BA0147DA"
+        "DDF0392A"
       ],
-      "latest_c_revalidated_physical_elements": 12,
+      "latest_c_revalidated_physical_elements": 3,
       "runtime_validation": "UNTESTED",
       "current_run_assets_scanned": 1,
-      "current_run_physical_elements_scanned": 12,
+      "current_run_physical_elements_scanned": 3,
       "high_risk_static_pass_assets": [
         "1A43E9D9"
       ]
@@ -3638,9 +3639,10 @@
     "controller_visual_qa": "PASS",
     "report": "localization/graphics/role_B/20261005-B-PRODUCTION89/B89_DDF_REPORT.json",
     "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION89/B89_CONTROLLER_SELF_QA.json",
-    "c_final_qa": "PENDING",
+    "c_final_qa": "C159_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
     "in_game_validation": "PENDING",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "c_report": "localization/graphics/role_C/20261005-C159-DDF0392A/C159_DDF_CONTROLLER_FINAL_QA.json"
   },
   "b_preserve_only_7d747bed": {
     "timestamp_kst": "2026-10-05T13:21:00+09:00",
@@ -3649,5 +3651,34 @@
     "localizable_segments": 0,
     "decision": "PRESERVE_ORIGINAL_NO_CANDIDATE_REQUIRED",
     "protected_content": "Ferrari model names and MT/AT indicators"
+  },
+  "c159_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T13:23:48+09:00",
+    "run": "20261005-C159-DDF0392A",
+    "queue_index": 222,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "source_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+    "candidate_sha256": "e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea",
+    "candidate_changed_by_C": false,
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "3/3 PASS",
+    "zero_pixel_gates": {
+      "decoded_changed_outside": 0,
+      "alpha_outside": 0,
+      "introduced_visible_outside": 0,
+      "protected_rows_changed": 0,
+      "source_residue": 0,
+      "overlap": 0,
+      "touch_pairs": 0,
+      "target_protected_overlap": 0,
+      "target_protected_1px_near": 0,
+      "changed_bc3_blocks_wholly_outside_allowed": 0
+    },
+    "controller_visual_qa": "PASS",
+    "song_title_policy": "PASS_PIXEL_EXACT",
+    "decision": "C159_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "machine_report": "localization/graphics/role_C/20261005-C159-DDF0392A/C159_DDF_MACHINE_QA.json",
+    "report": "localization/graphics/role_C/20261005-C159-DDF0392A/C159_DDF_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
   }
 }
