@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T20:03:05+09:00",
+  "updated_at_kst": "2026-10-05T20:28:46+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C194 finalized B139 C598919A after correcting the C-only raw mirror_y compressed-block audit. Candidate e3c3f78975b3dd582690a7f169c1aa364dd05e3846827340aae38631885b92bf is independent pixel/visual/policy PASS pending isolated in-game validation. 41/41 bbox/size/positive-margin PASS; all outside/protected/overlap/DXT5-scope gates zero. pending-C=0 at C194 close; pending_artwork localize_text=14 at C194 snapshot; producer REWORK=1 (37759842). RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C195/C196 consumed only new A51/B143 outputs. 4EDA9DE3 passes independent 15/15 pixel/bbox/policy + controller visual QA pending in-game. 8215FD25 zoom_review is positively classified Total Rank x2 -> 종합 랭킹 but C196 returns it for lower-starburst clean-plate gray/dark smear artifacts despite producer numeric PASS. Current queue 137 rows = 82 localize_text + 44 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit; pending_artwork localize_text=13; producer REWORK=2 (37759842,8215FD25); pending-C=0. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -155,11 +155,11 @@
   "graphics": {
     "total_dds": 243,
     "visually_reviewed": 243,
-    "localize_text": 81,
+    "localize_text": 82,
     "preserve_brand_song_credit": 33,
     "font_pipeline": 9,
     "hangul_name_entry": 1,
-    "zoom_review": 45,
+    "zoom_review": 44,
     "no_localization": 74,
     "work_queue_total": 137,
     "work_queue_file": "localization/graphics/asset_queue.csv",
@@ -181,7 +181,7 @@
     },
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
-    "artwork_plan_assets": 79,
+    "artwork_plan_assets": 80,
     "artwork_plan_segments": 723,
     "artwork_proof_candidates": 7,
     "simple6_package": {
@@ -267,10 +267,11 @@
     "next_hd_rework": {
       "status": "REWORK_REQUIRED",
       "assets": [
-        "37759842"
+        "37759842",
+        "8215FD25"
       ],
-      "remaining": 1,
-      "note": "C194 clears C598919A exact-DXT5 constrained rework. Remaining producer REWORK is 37759842 manual/template clean-plate reconstruction. C194 snapshot pending_artwork localize_text=14; pending-C=0; RUNTIME_VALIDATION=UNTESTED.",
+      "remaining": 2,
+      "note": "37759842 remains manual/template clean-plate reconstruction. C196 adds 8215FD25: lower starburst title-removal area has visible non-source gray/dark blur/smear despite producer numeric PASS; speech-bubble plate is acceptable. pending_artwork localize_text=13; pending-C=0; RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": []
     },
     "latest_d_final_qa": {
@@ -295,18 +296,21 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C194",
-      "report": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_CONTROLLER_FINAL_QA.json",
-      "result": "1_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "run": "C195/C196",
+      "report": "localization/graphics/role_C/20261005-C195-C196-BATCH/C195_C196_BATCH_FINAL_QA.json",
+      "result": "1_PIXEL_VISUAL_POLICY_PASS_1_REWORK_REQUIRED",
       "candidate_changed_by_C": false,
-      "assets_checked": 1,
-      "physical_elements_checked": 41,
+      "assets_checked": 2,
+      "physical_elements_checked": 17,
       "pixel_visual_pass_assets": [
-        "C598919A"
+        "4EDA9DE3"
       ],
-      "rework_required_assets": [],
+      "rework_required_assets": [
+        "8215FD25"
+      ],
       "global_rework_remaining": [
-        "37759842"
+        "37759842",
+        "8215FD25"
       ],
       "strict_hold_no_candidate": [
         "4F68708E",
@@ -315,14 +319,16 @@
         "75C3586A"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 14,
+      "pending_production_localize_text": 13,
       "machine_evidence": {
-        "C598919A": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_MACHINE_QA.json"
+        "4EDA9DE3": "localization/graphics/role_C/20261005-C195-4EDA9DE3/C195_4EDA9DE3_MACHINE_QA.json",
+        "8215FD25": "localization/graphics/role_B/20261005-B-PRODUCTION143-8215/B142_8215_REPORT.json"
       },
       "controller_visual": {
-        "C598919A": "PASS"
+        "4EDA9DE3": "PASS",
+        "8215FD25": "FAIL_CLEAN_PLATE_STARBURST_RECONSTRUCTION_ARTIFACT"
       },
-      "in_game_validation": "C598919A PENDING; RUNTIME_VALIDATION=UNTESTED"
+      "in_game_validation": "4EDA9DE3/8215FD25 UNTESTED; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION137",
@@ -544,8 +550,8 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 14,
-    "current_producer_rework_remaining": 1,
+    "current_pending_artwork_localize_text": 13,
+    "current_producer_rework_remaining": 2,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T19:38:00+09:00",
       "assets": [
@@ -1117,7 +1123,8 @@
       "runtime_validation": "UNTESTED"
     },
     "current_producer_rework_assets": [
-      "37759842"
+      "37759842",
+      "8215FD25"
     ],
     "a_production26_2ea557b4": {
       "index": 55,
@@ -1231,7 +1238,7 @@
       "report": "localization/graphics/role_C/20261005-C170-754F0599/C170_754F_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_CONTROLLER_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C195-C196-BATCH/C195_C196_BATCH_FINAL_QA.json",
     "c171_controller_final_qa": {
       "timestamp_kst": "2026-10-05T16:06:00+09:00",
       "run": "20261005-C171-754F0599",
@@ -1388,6 +1395,36 @@
       "decision": "C194_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
       "machine_report": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_MACHINE_QA.json",
       "report": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c195_4eda9de3": {
+      "timestamp_kst": "2026-10-05T20:28:46+09:00",
+      "queue_index": 159,
+      "candidate_sha256": "8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5",
+      "machine_status": "PASS",
+      "bbox_size_positive_margin": "15/15 PASS",
+      "semantic_stage_mapping": "PASS",
+      "zero_pixel_gates": {
+        "decoded_changed_outside_union_source_bboxes": 0,
+        "alpha_changed_outside_union_source_bboxes": 0,
+        "introduced_visible_outside_union_source_bboxes": 0,
+        "candidate_visible_outside_union_source_bboxes": 0,
+        "localized_overlap_pixels": 0,
+        "localized_1px_touch_pixels": 0
+      },
+      "controller_visual_qa": "PASS",
+      "decision": "C195_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "report": "localization/graphics/role_C/20261005-C195-4EDA9DE3/C195_4EDA9DE3_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c196_8215fd25": {
+      "timestamp_kst": "2026-10-05T20:28:46+09:00",
+      "queue_index": 30,
+      "candidate_sha256": "04d2c23333999873b7f467d0a8647c1056f40fa3bcd06e0174711bb2345277ba",
+      "producer_machine_status": "PASS_REPORTED",
+      "controller_visual_qa": "FAIL_CLEAN_PLATE_STARBURST_RECONSTRUCTION_ARTIFACT",
+      "decision": "C196_REWORK_REQUIRED_STARBURST_CLEAN_PLATE_RECONSTRUCTION_ARTIFACT",
+      "report": "localization/graphics/role_C/20261005-C196-8215FD25/C196_8215FD25_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     }
   },
