@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION22",
+  "timestamp_kst": "2026-10-05T11:53:26+09:00",
+  "queue_index": 137,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "physical_elements": 6,
+  "translations": [
+    "SELECT TRANSMISSION -> 변속 방식 선택",
+    "TRANSMISSION -> 변속 방식",
+    "MANUAL x2 -> 수동",
+    "AUTOMATIC x2 -> 자동"
+  ],
+  "machine_gates": {
+    "bbox_size_positive_margin": "6/6",
+    "clean_source_effect_unchanged": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected": 0,
+    "overlap": 0,
+    "touch": 0
+  },
+  "controller_visual_qa": "PASS",
+  "visual_checks": [
+    "source/clean/final full atlas",
+    "six SOURCE|CLEAN|FINAL row contacts",
+    "raw mirror_y final"
+  ],
+  "decision": "A_PRODUCTION22_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "independent_c_final_qa": "PENDING",
+  "in_game_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION22/A_PRODUCTION22_30CF0D_REPORT.json"
+}
