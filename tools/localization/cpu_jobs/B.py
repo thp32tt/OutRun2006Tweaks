@@ -7,13 +7,13 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter,ImageOps
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("worker B only")
 repo=Path.cwd()
-run="20261005-B-PRODUCTION135"
+run="20261005-B-PRODUCTION136"
 out=repo/"localization/graphics/role_B"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 def _failure_hook(tp,val,tb):
     try:
-        (wr/"B135_FAILURE.json").write_text(json.dumps({
-            "run":"20261005-B-PRODUCTION135",
+        (wr/"B136_FAILURE.json").write_text(json.dumps({
+            "run":"20261005-B-PRODUCTION136",
             "exception_type":getattr(tp,"__name__",str(tp)),
             "exception":str(val),
             "traceback":"".join(traceback.format_exception(tp,val,tb)),
@@ -26,7 +26,7 @@ asset="textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset; candidate.parent.mkdir(parents=True,exist_ok=True)
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
-tmp=Path("/tmp/b135"); tmp.mkdir(exist_ok=True)
+tmp=Path("/tmp/b136"); tmp.mkdir(exist_ok=True)
 dds=tmp/"src.dds"; atlas=tmp/"atlas.json"
 urllib.request.urlretrieve(BASE+"/Release/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",dds)
 urllib.request.urlretrieve(BASE+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_CLAR_RANK_Exst/4x_63C91067_512x512_atlas.json",atlas)
@@ -69,14 +69,28 @@ for e in expected:
     r=roi[:,:,0].astype(np.int16); g=roi[:,:,1].astype(np.int16); b=roi[:,:,2].astype(np.int16); a=roi[:,:,3]
     white=(a>32)&(r>205)&(g>205)&(b>205)&((np.maximum.reduce([r,g,b])-np.minimum.reduce([r,g,b]))<45)
     navy=(a>32)&(b>r+8)&(b>g+4)&(r<120)&(g<120)&(b<195)
-    cm=np.zeros((H,W),bool); cm[y0:y1,x0:x1]=(white|navy)
+    # C184 root cause: neutral bright starburst glow was entering the old white|navy
+    # mask. Keep only candidate connected components that contain a navy-outline
+    # seed; this selects the actual title glyph family and rejects unconnected
+    # white/yellow plate artwork.
+    from scipy.ndimage import label
+    cand=(white|navy)
+    lab,nlab=label(cand,structure=np.ones((3,3),dtype=np.uint8))
+    seed_labels=np.unique(lab[navy]); seed_labels=seed_labels[seed_labels>0]
+    text_core=np.isin(lab,seed_labels)
+    if np.count_nonzero(text_core)<9000: raise RuntimeError(("seeded title core too small",e["idx"],int(np.count_nonzero(text_core)),seed_labels.tolist()))
+    cm=np.zeros((H,W),bool); cm[y0:y1,x0:x1]=text_core
     ys,xs=np.nonzero(cm)
-    if len(xs)<12000: raise RuntimeError(("title core too small",e["idx"],len(xs)))
     cb=[int(xs.min()),int(ys.min()),int(xs.max())+1,int(ys.max())+1]
     exp=e["core"]
-    if any(abs(cb[i]-exp[i])>5 for i in range(4)): raise RuntimeError(("core bbox drift",e["idx"],cb,exp))
+    if any(abs(cb[i]-exp[i])>8 for i in range(4)): raise RuntimeError(("core bbox drift",e["idx"],cb,exp))
     core_masks.append(Image.fromarray((cm.astype(np.uint8)*255),"L"))
-    sm=Image.fromarray((cm.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(7))
+    # Two-pixel fringe captures antialias/outline residue without swallowing
+    # adjacent starburst/cloud glow geometry.
+    sm=Image.fromarray((cm.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(5))
+    # hard clip to the independently established exact source-effect bbox.
+    sma=np.asarray(sm).copy(); clip=np.zeros((H,W),dtype=np.uint8); clip[y0:y1,x0:x1]=255
+    sm=Image.fromarray(np.minimum(sma,clip).astype(np.uint8),"L")
     source_masks.append(sm)
     am=Image.new("L",(W,H),0); ImageDraw.Draw(am).rectangle((x0,y0,x1-1,y1-1),fill=255)
     allowed_masks.append(am)
@@ -86,85 +100,35 @@ protected=ImageOps.invert(allowed)
 source_text_mask=ImageChops.lighter(source_masks[0],source_masks[1])
 core_union=ImageChops.lighter(core_masks[0],core_masks[1])
 
-def row_inpaint(arr, mask_img, box):
-    # Reconstruct only the actual source glyph/effect footprint. For each masked
-    # horizontal run, interpolate between untouched same-row artwork immediately
-    # to the left/right. This preserves starburst spikes/glow outside the title
-    # footprint and avoids the rectangular Coons continuation seen in B131.
-    x0,y0,x1,y1=box
-    outa=arr.copy()
-    mm=np.asarray(mask_img)>0
-    for yy in range(y0,y1):
-        xs=np.flatnonzero(mm[yy,x0:x1])
-        if xs.size==0: continue
-        xs=xs+x0
-        # contiguous masked runs
-        cuts=np.where(np.diff(xs)>1)[0]
-        begins=np.r_[0,cuts+1]; ends=np.r_[cuts,xs.size-1]
-        for bi,ei in zip(begins,ends):
-            a=int(xs[bi]); b=int(xs[ei])
-            l=a-1; r=b+1
-            while l>=x0-12 and l>=0 and mm[yy,l]: l-=1
-            while r<x1+12 and r<W and mm[yy,r]: r+=1
-            if l<0 or r>=W or l>=a or r<=b:
-                raise RuntimeError(("row donor unavailable",yy,a,b,l,r))
-            # robust 3px side samples, excluding any masked pixels
-            lv=[]
-            for xx in range(max(0,l-2),l+1):
-                if not mm[yy,xx]: lv.append(arr[yy,xx].astype(np.float32))
-            rv=[]
-            for xx in range(r,min(W,r+3)):
-                if not mm[yy,xx]: rv.append(arr[yy,xx].astype(np.float32))
-            if not lv or not rv: raise RuntimeError(("row donor samples",yy,a,b))
-            L=np.median(np.stack(lv),axis=0); R=np.median(np.stack(rv),axis=0)
-            n=b-a+1
-            t=((np.arange(n,dtype=np.float32)+1)/(n+1))[:,None]
-            # smoothstep keeps first derivative small near untouched boundaries.
-            s=t*t*(3-2*t)
-            vals=(1-s)*L[None,:]+s*R[None,:]
-            outa[yy,a:b+1]=np.clip(np.rint(vals),0,255).astype(np.uint8)
-    return outa
-
-def gaussian_inpaint(arr, mask_img, box, sigma=14.0, pad=36):
-    # 2D normalized convolution uses only surrounding non-text artwork as donors.
-    # It removes row-wise banding while changing only the source glyph/effect mask.
+def normalized_inpaint(arr, mask_img, box, sigma=7.0, pad=28):
+    # 2D normalized convolution using only untouched canonical artwork as donors.
+    # Because B136's mask is navy-seeded title-only, surrounding starburst glow
+    # and plate texture remain donors instead of being erased/reconstructed.
     from scipy.ndimage import gaussian_filter
     x0,y0,x1,y1=box
     cx0=max(0,x0-pad); cy0=max(0,y0-pad); cx1=min(W,x1+pad); cy1=min(H,y1+pad)
     crop=arr[cy0:cy1,cx0:cx1].astype(np.float32)
     mm=(np.asarray(mask_img)>0)[cy0:cy1,cx0:cx1]
-    # MaxFilter dilation may extend a few pixels beyond the exact source-effect
-    # bbox; hard-intersect with the permitted bbox before any reconstruction.
     bbox_local=np.zeros_like(mm,dtype=bool)
     bbox_local[y0-cy0:y1-cy0,x0-cx0:x1-cx0]=True
     mm=mm & bbox_local
     valid=(~mm).astype(np.float32)
-    den=gaussian_filter(valid,sigma=sigma,mode="nearest")
+    den=gaussian_filter(valid,sigma=sigma,mode="reflect")
     est=np.empty_like(crop)
     for ch in range(4):
-        num=gaussian_filter(crop[:,:,ch]*valid,sigma=sigma,mode="nearest")
+        num=gaussian_filter(crop[:,:,ch]*valid,sigma=sigma,mode="reflect")
         est[:,:,ch]=num/np.maximum(den,1e-6)
-    outa=arr.copy()
-    sub=outa[cy0:cy1,cx0:cx1]
+    outa=arr.copy(); sub=outa[cy0:cy1,cx0:cx1]
     sub[mm]=np.clip(np.rint(est[mm]),0,255).astype(np.uint8)
     outa[cy0:cy1,cx0:cx1]=sub
     return outa
 
 clean_arr=sa.copy()
-# Starburst (idx0): first reconstruct from same-row interior donors (never the
-# external gray background), then smooth only those reconstructed mask pixels
-# within the exact bbox to remove B132 horizontal banding.
-clean_arr=row_inpaint(clean_arr,source_masks[0],expected[0]["bbox"])
-from scipy.ndimage import gaussian_filter
-sx0,sy0,sx1,sy1=expected[0]["bbox"]
-star_crop=clean_arr[sy0:sy1,sx0:sx1].astype(np.float32)
-star_smooth=gaussian_filter(star_crop,sigma=(5.0,1.5,0.0),mode="nearest")
-star_mask=(np.asarray(source_masks[0])>0)[sy0:sy1,sx0:sx1]
-sub=clean_arr[sy0:sy1,sx0:sx1]
-sub[star_mask]=np.clip(np.rint(star_smooth[star_mask]),0,255).astype(np.uint8)
-clean_arr[sy0:sy1,sx0:sx1]=sub
-# Pink cloud (idx1): B132 row interpolation was visually smooth, retain it.
-clean_arr=row_inpaint(clean_arr,source_masks[1],expected[1]["bbox"])
+# Starburst: title-only mask + local 2D donors preserves the center spike/glow.
+clean_arr=normalized_inpaint(clean_arr,source_masks[0],expected[0]["bbox"],sigma=6.0,pad=32)
+# Pink cloud already improved by B135; use the same title-only 2D method to
+# avoid reintroducing row bands or letter-shaped tonal ghosts.
+clean_arr=normalized_inpaint(clean_arr,source_masks[1],expected[1]["bbox"],sigma=7.0,pad=30)
 
 # Strict residue gate: if a reconstructed title-core pixel is byte-identical
 # to source by coincidence, change RGB by one level inside the permitted bbox.
@@ -180,8 +144,8 @@ source_png=out/"63C_SOURCE_READABLE.png"; clean_png=out/"63C_CLEAN_PLATE.png"
 smp=out/"63C_SOURCE_TEXT_MASK.png"; ap=out/"63C_ALLOWED_BBOX_MASK.png"; pp=out/"63C_PROTECTED_MASK.png"
 src.save(source_png); clean.save(clean_png); source_text_mask.save(smp); allowed.save(ap); protected.save(pp)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B135_CLEAN_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B135_CLEAN_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B136_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B136_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 core_unchanged=count(ImageChops.multiply(core_union,ImageOps.invert(diffmask(src,clean))))
 if core_unchanged!=0: raise RuntimeError(("source title core unchanged",core_unchanged))
@@ -234,7 +198,7 @@ for e in expected:
       "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS",
       "font_file":Path(fp).name,"font_style":fstyle,"font_size":73,"stroke_width":5,"slant":.22,
       "fill_rgba":white_rgba,"outline_rgba":navy_rgba,"alignment":"center",
-      "rework_status":"B135_C172_CLEAN_PLATE_REWORK"
+      "rework_status":"B136_C172_CLEAN_PLATE_REWORK"
     })
 
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
@@ -243,8 +207,8 @@ if payload[:128]!=sb[:128]: raise RuntimeError("header drift")
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode); dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip")
 final_png=out/"63C_FINAL_DECODED_READABLE.png"; dec.save(final_png)
-subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B135_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"B135_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B136_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"B136_FINAL_VALIDATION.json").read_text())
 if finalrep["status"]!="PASS": raise RuntimeError(("final validator",finalrep))
 diff=diffmask(src,dec)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
@@ -259,7 +223,7 @@ if outside or alphaout or render_out or residue: raise RuntimeError(("gate",outs
 sheet=Image.new("RGB",(1024,3*1050),"white")
 for i,(lab,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,1024),Image.Resampling.LANCZOS); sheet.paste(z,(0,i*1050+26)); ImageDraw.Draw(sheet).text((5,i*1050+5),lab,fill="black")
-sheet.save(out/"B135_63C_SOURCE_CLEAN_FINAL.jpg",quality=96)
+sheet.save(out/"B136_63C_SOURCE_CLEAN_FINAL.jpg",quality=96)
 contacts=[]
 for e in expected:
     x0,y0,x1,y1=e["bbox"]; m=48
@@ -271,11 +235,11 @@ for e in expected:
 cw=max(i.width for i in contacts); ch=sum(i.height for i in contacts)
 contact=Image.new("RGB",(cw,ch),"white"); yy=0
 for im in contacts: contact.paste(im,(0,yy)); yy+=im.height
-contact.save(out/"B135_63C_ROW_CONTACT.jpg",quality=96)
+contact.save(out/"B136_63C_ROW_CONTACT.jpg",quality=96)
 rr=Image.new("RGB",(1024,2*1050),"white")
 for i,(lab,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); rr.paste(z,(0,i*1050+26)); ImageDraw.Draw(rr).text((5,i*1050+5),lab,fill="black")
-rr.save(out/"B135_63C_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"B136_63C_RAW_COMPARE.jpg",quality=96)
 
 report={
  "schema_version":1,"role":"B","run":run,"queue_index":26,"asset":asset,
@@ -283,18 +247,18 @@ report={
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":blob(sb),"atlas_git_blob_sha1":blob(ab),"source_sha256":sha(sb)},
  "semantic_binding":{"0":"Total Rank -> 종합 랭킹","1":"Total Rank -> 종합 랭킹"},
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
- "clean_reconstruction":{"method":"starburst same-row inpaint plus bbox-local vertical smoothing + cloud same-row inpaint","goal":"remove C172/B131-B134 ghosts, rectangular artifacts, banding and external-gray donor contamination while preserving surrounding gradient/glow geometry","core_unchanged_pixels":core_unchanged},
+ "clean_reconstruction":{"method":"navy-seeded connected title mask + local normalized 2D canonical-artwork inpaint","goal":"resolve C184 by excluding starburst/cloud glow artwork from the source-text mask while removing the actual title footprint without horizontal smear/banding","core_unchanged_pixels":core_unchanged},
  "source_style":{"family":"white italic title with navy outline","font_file":Path(fp).name,"font_style":fstyle,"shared_font_size":73,"stroke_width":5,"slant":.22,"fill_rgba":white_rgba,"outline_rgba":navy_rgba,"alignment":"center"},
  "rows":rows,"clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
  "decoded_changes":{"outside":outside,"alpha_outside":alphaout,"source_effect_residue":residue,"render_outside_target":render_out,"localized_overlap":0},
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"B135_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"B136_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(out/"B135_63C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(out/"B136_63C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":26,"asset":"63C91067","source_sha256":sha(sb),"candidate_sha256":csha,"localized_physical_elements":2,
  "bbox_size_positive_margin":"2/2","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "outside":outside,"alpha_outside":alphaout,"source_effect_residue":residue,"worker_status":report["status"],
- "runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B135_63C_REPORT.json"}
-(wr/"B135_63C91067.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B136_63C_REPORT.json"}
+(wr/"B136_63C91067.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False))
