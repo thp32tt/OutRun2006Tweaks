@@ -239,8 +239,10 @@ require(
 forbid(
     can_fast,
     "DirectGPU game recenter path",
-    "PendingGameRequestId",
-    "PendingApplicationRecenter",
+    "PendingGameRequestId.load",
+    "PendingGameRequestId.store",
+    "PendingApplicationRecenter.load",
+    "PendingApplicationRecenter.store",
 )
 direct_end = body(r32, "inline XrResult XRAPI_CALL EndFrame(")
 require_order(
