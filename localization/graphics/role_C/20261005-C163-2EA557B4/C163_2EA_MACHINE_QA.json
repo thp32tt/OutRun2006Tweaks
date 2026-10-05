@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C163-2EA557B4",
+  "queue_index": 55,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "producer_run": "20261005-A-PRODUCTION17 / A26 reconciliation",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "bbf53949c7d9f1dc4949e661caeeaf19fe667d79",
+    "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685"
+  },
+  "candidate_sha256": "d66a110cfc5bd09201c6f1a806fd3b2fab84663294ff865415fc7fc6532d6beb",
+  "candidate_changed_by_C": false,
+  "independent_method": "C re-downloaded pinned canonical DXT5 source, decoded canonical/current reconciled candidate independently, re-derived source alpha bbox directly from canonical decoded pixels, recomputed decoded outside/alpha/introduced-visible protection and localized bbox/size/margins, audited every changed BC3 boundary block for source-exact alpha endpoints+color bytes, and generated independent source/final readable+raw evidence without producer masks.",
+  "structure": {
+    "dimensions": [
+      2048,
+      256
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "semantic_binding": {
+    "source": "NEXT ROUND",
+    "korean": "다음 라운드"
+  },
+  "original_bbox": [
+    1,
+    105,
+    1090,
+    248
+  ],
+  "localized_bbox": [
+    263,
+    113,
+    828,
+    240
+  ],
+  "source_size": [
+    1089,
+    143
+  ],
+  "localized_size": [
+    565,
+    127
+  ],
+  "delta_left": 262,
+  "delta_right": 262,
+  "delta_top": 8,
+  "delta_bottom": 8,
+  "containment": "PASS",
+  "size_ceiling": "PASS",
+  "positive_margin": "PASS",
+  "machine_checks": {
+    "decoded_changed_outside": 0,
+    "alpha_outside": 0,
+    "introduced_visible_outside": 0,
+    "protected_changed": 0,
+    "source_residue": 0,
+    "changed_bc3_blocks": 9509,
+    "changed_bc3_blocks_wholly_outside_allowed": 0,
+    "partial_boundary_changed_blocks": 24,
+    "partial_endpoint_or_color_drift": 0
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
