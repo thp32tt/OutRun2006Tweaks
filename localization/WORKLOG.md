@@ -1484,3 +1484,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Current pending_artwork localize_text=29; producer REWORK=0. Strict no-candidate HOLD now includes `75C3586A` with `4F68708E/F6811E94/49BB5FE5`.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION74-PREFLIGHT/B74_CONTROLLER_HOLD.json`, `localization/graphics/role_B/20261005-B-PRODUCTION77/B77_POST_C150_RECONCILIATION.json`, `localization/graphics/role_C/20261005-C150-9FC88069/C150_9FC_CONTROLLER_FINAL_QA.json`.
+
+## 2026-10-05 11:24:30 KST — C151 C598919A B75 DXT5 rework classification
+- Reviewed unfinished B_PRODUCTION75 index 86 `C598919A_1024x1024.dds`; completed C150-and-earlier PASS work was not repeated.
+- B75 failed before output because it assumed the authoritative Release DDS was raw RGBA. Hosted C151 pinned the canonical source/atlas and successfully decoded the real source as 4096x4096 DXT5 mip1/raw `mirror_y`, source SHA `9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf`, 106 atlas regions.
+- Controller visual binding now positively identifies the ranking/mode text family and stage-name cells. Stage names use canonical phonetic Hangul. Ferrari model names and MT/AT remain protected. `OutRun2` / `OutRun2SP` product tokens were corrected to remain original while only the descriptor is localized.
+- No candidate exists yet. Exact decoded glyph/effect masks and CLEAN_PLATE plus an exact decoded-pixel-safe DXT5 encode/splice path are still required; block-only confinement or full-image recompression is not acceptable final evidence.
+- Decision: `REWORK_REQUIRED_DXT5_EXACT_MASK_AND_RENDER`; queue index 86 is actionable producer rework. pending_artwork localize_text=28; producer REWORK=1.
+- `75C3586A`, `4F68708E`, `F6811E94`, and `49BB5FE5` remain strict HOLD no-candidate. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C151-C598919A/C151_C598_DECODED_PREFLIGHT.json`, `localization/graphics/role_C/20261005-C151-C598919A/C151_C598_CONTROLLER_REWORK.json`.
