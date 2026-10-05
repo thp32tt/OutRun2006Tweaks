@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T17:30:00+09:00",
+  "updated_at_kst": "2026-10-05T17:56:29+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B_PRODUCTION128 resolved C176-returned even index 28 A05BF610 with candidate bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8. 1/1 exact bbox/size/positive-margin, clean/final, outside/alpha/protected/overlap gates PASS; controller SOURCE/CLEAN/FINAL, row and raw mirror_y visual self-QA PASS. Right-edge source fragment and border-touch artifact are gone, oval border/glow is continuous, and Korean tracking is compact. A05BF610 now awaits independent C final QA. Producer REWORK remains 2 (63C91067,C598919A); pending-C also contains A34 37759842. pending_artwork localize_text=17; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C177/C178/C179 consumed all current pending-C assets. A05BF610 C178 PASS pending isolated in-game; 37759842 C177 REWORK_REQUIRED because visual CLEAN/FINAL shows large source-letter/shadow residue despite numeric PASS; 560FA536 C179 REWORK_REQUIRED because idx31 source bbox/mask is incomplete and source-script edge fragments remain. pending-C=0, pending_artwork localize_text=16, producer REWORK=4 (63C91067,C598919A,37759842,560FA536). RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,18 +265,16 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "REWORK_REQUIRED_WITH_PENDING_C",
+      "status": "REWORK_REQUIRED",
       "assets": [
         "63C91067",
-        "C598919A"
-      ],
-      "remaining": 2,
-      "note": "A36 adds index101 560FA536 as self-QA PASS pending C after same-invocation expert-label hierarchy correction. Existing A34 37759842 and B128 A05BF610 also await C. Remaining producer REWORK: 63C91067, C598919A. pending_artwork localize_text=16; RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": [
+        "C598919A",
         "37759842",
-        "A05BF610",
         "560FA536"
-      ]
+      ],
+      "remaining": 4,
+      "note": "C178 clears A05BF610. C177 returns 37759842 for visible clean-plate source-effect residue. C179 returns 560FA536 because idx31 canonical warning text exceeds the producer-declared bbox/mask and leaves source fragments. pending_artwork localize_text=16; RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": []
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -300,24 +298,24 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C162/C163",
-      "report": "localization/graphics/role_C/20261005-C162-C163-BATCH/C162_C163_BATCH_FINAL_QA.json",
-      "result": "1_PIXEL_VISUAL_PASS_1_NEW_REWORK_REQUIRED_PLUS_2_EXISTING_REWORK",
+      "run": "C177/C178/C179",
+      "report": "localization/graphics/role_C/20261005-C177-C179-BATCH/C177_C179_BATCH_FINAL_QA.json",
+      "result": "1_PIXEL_VISUAL_PASS_2_REWORK_REQUIRED",
       "candidate_changed_by_C": false,
-      "assets_checked": 2,
-      "physical_elements_checked": 5,
+      "assets_checked": 3,
+      "physical_elements_checked": 47,
       "pixel_visual_pass_assets": [
-        "7CE1CFC5"
+        "A05BF610"
       ],
       "rework_required_assets": [
-        "2EA557B4",
-        "C598919A",
-        "63C91067"
+        "37759842",
+        "560FA536"
       ],
       "global_rework_remaining": [
-        "C598919A",
         "63C91067",
-        "2EA557B4"
+        "C598919A",
+        "37759842",
+        "560FA536"
       ],
       "strict_hold_no_candidate": [
         "4F68708E",
@@ -329,16 +327,18 @@
         "1A43E9D9"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 21,
+      "pending_production_localize_text": 16,
       "machine_evidence": {
-        "7CE1CFC5": "localization/graphics/role_C/20261005-C162-7CE1CFC5/C162_7CE_MACHINE_QA.json",
-        "2EA557B4": "localization/graphics/role_C/20261005-C163-2EA557B4/C163_2EA_MACHINE_QA.json"
+        "37759842": "localization/graphics/role_C/20261005-C177-37759842/C177_37759842_MACHINE_QA.json",
+        "A05BF610": "localization/graphics/role_C/20261005-C178-A05BF610/C178_A05_MACHINE_QA.json",
+        "560FA536": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_MACHINE_QA.json"
       },
       "controller_visual": {
-        "7CE1CFC5": "PASS",
-        "2EA557B4": "FAIL_SOURCE_STYLE_HOLLOW_OUTLINE_VS_FILLED_GRADIENT"
+        "37759842": "FAIL_VISIBLE_SOURCE_LETTER_SHADOW_RESIDUE_IN_CLEAN_FINAL",
+        "A05BF610": "PASS",
+        "560FA536": "FAIL_IDX31_SOURCE_BBOX_INCOMPLETE_SOURCE_FRAGMENT_RESIDUE"
       },
-      "in_game_validation": "7CE1CFC5 PENDING; 2EA557B4 NOT_ELIGIBLE; RUNTIME_VALIDATION=UNTESTED"
+      "in_game_validation": "A05BF610 PENDING; 37759842/560FA536 NOT_ELIGIBLE; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION128",
