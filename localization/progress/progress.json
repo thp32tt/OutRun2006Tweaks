@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T23:30:00+09:00",
+  "updated_at_kst": "2026-10-05T23:43:55+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C210/C211 consumed the two new A results without reopening completed PASS assets. C210 revalidated A67 index193 97E863AD: 13/13 exact source/localized bbox+size+positive-margin and all outside/alpha/residue/overlap/protected zero gates PASS, but mandatory visual QA returns it again because width was achieved with source-unjustified Hangul inter-glyph tracking (쇼룸 132px, 멀티플레이 33.25px, 환영합니다 38.75px, Goal family 41-48px), creating detached syllable blocks. C210_REWORK_REQUIRED_EXCESSIVE_INTERGLYPH_TRACKING_SOURCE_SPACING. C211 independently finalized new A69 index201 A9ABD877 candidate: 17/17 exact bbox/size/positive margins, canonical phonetic stage policy PASS, Night Bird/Radiation pixel-exact, all zero-pixel gates 0, readable/raw visual PASS -> C211_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. Current queue remains 84 localize_text + 42 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit; pending_artwork localize_text=7; producer REWORK=2 (37759842,97E863AD); pending-C=0. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "A70 consumed direct C210 REWORK for index193 97E863AD. Candidate b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d: artificial tracking removed completely (0px; natural font advance only) with Black/source-height family, anchors and protected OutRun/OutRun2SP/OUTRUN/TESTAROSSA/SP/OR pixels retained. Static 13/13 exact bbox+size+positive-margin and all outside/alpha/protected/residue/render/overlap/touch/token gates PASS at zero; controller SOURCE/CLEAN/FINAL + raw mirror_y visual PASS, detached syllable gaps resolved. Queue -> a70_self_qa_pass_pending_c; producer REWORK now only 37759842; pending-C=97E863AD; pending_artwork localize_text=7. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -233,8 +233,7 @@
       }
     },
     "pending_source_faithful_rework": [
-      "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
-      "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds"
+      "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
     ],
     "current_state_file": "localization/graphics/SOURCE_FAITHFUL_CURRENT.json",
     "current_combined_package": {
@@ -268,12 +267,13 @@
     "next_hd_rework": {
       "status": "REWORK_REQUIRED",
       "assets": [
-        "37759842",
-        "97E863AD"
+        "37759842"
       ],
-      "remaining": 2,
-      "note": "C210 returned A67 97E863AD for excessive source-unjustified inter-glyph tracking despite machine PASS. 37759842 remains manual/template-only C186 REWORK. C211 approved A69 A9ABD877, reducing pending_artwork localize_text to 7. pending-C=0; RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": []
+      "remaining": 1,
+      "note": "A70 repaired C210-returned 97E863AD with 0px artificial tracking and controller visual PASS; now pending independent C. 37759842 remains manual/template-only C186 REWORK and rejected clean-plate families were not repeated. pending_artwork localize_text=7; RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": [
+        "97E863AD"
+      ]
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -553,7 +553,7 @@
       "runtime_validation": "UNTESTED"
     },
     "current_pending_artwork_localize_text": 7,
-    "current_producer_rework_remaining": 2,
+    "current_producer_rework_remaining": 1,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T20:39:22+09:00",
       "assets": [
@@ -1124,8 +1124,7 @@
       "runtime_validation": "UNTESTED"
     },
     "current_producer_rework_assets": [
-      "37759842",
-      "97E863AD"
+      "37759842"
     ],
     "a_production26_2ea557b4": {
       "index": 55,
@@ -1327,12 +1326,12 @@
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     },
     "latest_a_production": {
-      "run": "A67",
+      "run": "A70",
       "index": 193,
       "asset": "97E863AD",
-      "candidate_sha256": "ad3f42856956d15b1c0ecba032d18ebb730c375f4b0a52b456c975e89e9396b7",
-      "result": "A67_SELF_QA_PASS_PENDING_C_AND_INGAME",
-      "rework_from": "C208_REWORK_REQUIRED_SOURCE_STYLE_SCALE_PROPORTION",
+      "candidate_sha256": "b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d",
+      "result": "A70_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "rework_from": "C210_REWORK_REQUIRED_EXCESSIVE_INTERGLYPH_TRACKING_SOURCE_SPACING",
       "bbox_size_positive_margin": "13/13 PASS",
       "pixel_gates": {
         "changed_outside": 0,
@@ -1348,15 +1347,9 @@
       "source_style": {
         "family": "wide bold-condensed dark/blue-gray UI labels",
         "face": "Noto Sans CJK KR Black",
-        "method": "natural glyph geometry + moderated per-glyph tracking; no horizontal glyph scaling",
-        "width_ratios": {
-          "showroom": 0.5656,
-          "multiplayer": 0.6485,
-          "goal_family": "0.6456-0.6500",
-          "welcome": 0.649,
-          "online": 0.6744,
-          "online_sentence": 0.6796
-        }
+        "method": "natural font advance/kerning only; no artificial tracking; no horizontal glyph scaling",
+        "artificial_tracking_px": 0.0,
+        "controller_visual_qa": "PASS_C210_SPACING_REWORK_NATURAL_ADVANCE"
       },
       "structure": {
         "dimensions": [
@@ -1369,8 +1362,8 @@
         "header_128_exact": true,
         "raw_orientation": "mirror_y"
       },
-      "report": "localization/graphics/role_A/20261005-A-PRODUCTION67-STYLE/A67_97E863AD_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION67-STYLE/A67_CONTROLLER_SELF_QA.json",
+      "report": "localization/graphics/role_A/20261005-A-PRODUCTION70-REWORK/A70_97E863AD_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION70-REWORK/A70_CONTROLLER_SELF_QA.json",
       "runtime_validation": "UNTESTED"
     },
     "latest_a_rework": {

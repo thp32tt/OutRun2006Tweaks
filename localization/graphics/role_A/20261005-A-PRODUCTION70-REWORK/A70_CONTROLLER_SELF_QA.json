@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION70-REWORK",
+  "timestamp_kst": "2026-10-05T23:43:55+09:00",
+  "queue_index": 193,
+  "asset": "97E863AD",
+  "candidate_sha256": "b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d",
+  "rework_from": "C210_REWORK_REQUIRED_EXCESSIVE_INTERGLYPH_TRACKING_SOURCE_SPACING",
+  "machine_qa": {
+    "bbox_size_positive_margin": "13/13 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "source_residue": 0,
+    "render_outside_target": 0,
+    "preserved_changes": 0,
+    "inline_token_overlap": 0,
+    "overlap": 0,
+    "touch_pairs": 0
+  },
+  "style_rework": {
+    "font_face": "Noto Sans CJK KR Black",
+    "source_height_family_preserved": true,
+    "horizontal_glyph_scaling": 1.0,
+    "artificial_tracking_px": 0.0,
+    "tracking_policy": "NATURAL_FONT_ADVANCE_NO_ARTIFICIAL_TRACKING",
+    "anchors_preserved": true,
+    "protected_product_model_pixels": "PIXEL_EXACT"
+  },
+  "visual_evidence": [
+    "localization/graphics/role_A/20261005-A-PRODUCTION70-REWORK/A70_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION70-REWORK/A70_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION70-REWORK/A70_RAW_COMPARE.jpg"
+  ],
+  "controller_visual_observations": [
+    "C210-returned detached Hangul syllable blocks are removed; Korean syllables use continuous natural/tight spacing.",
+    "Black/source-height family and left/inline-token anchors remain consistent with source UI labels.",
+    "SOURCE/CLEAN/FINAL contacts show no English residue, seam, clipping, overlap, alpha halo, or protected-token/model damage.",
+    "Raw mirror_y comparison preserves orientation and protected OUTRUN2SP/OUTRUN/TESTAROSSA/SP/OR artwork."
+  ],
+  "controller_visual_qa": "PASS_C210_SPACING_REWORK_NATURAL_ADVANCE",
+  "status": "A70_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "pending_independent_c_final_qa": true,
+  "runtime_validation": "UNTESTED",
+  "producer_report": "localization/graphics/role_A/20261005-A-PRODUCTION70-REWORK/A70_97E863AD_REPORT.json"
+}
