@@ -1,0 +1,96 @@
+{
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "candidate_sha256": "0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4",
+  "mapping": "IGR-005_EXACT_TO_30CF0D_GRAPHICS",
+  "rows": [
+    {
+      "key": "select_transmission",
+      "source": "SELECT TRANSMISSION",
+      "old_korean": "변속 방식 선택",
+      "korean": "변속기 선택",
+      "original_bbox": [
+        5,
+        67,
+        868,
+        130
+      ],
+      "localized_bbox": [
+        301,
+        69,
+        572,
+        128
+      ],
+      "source_size": [
+        863,
+        63
+      ],
+      "localized_size": [
+        271,
+        59
+      ],
+      "delta_left": 296,
+      "delta_right": 296,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 56,
+      "stroke_width": 3,
+      "slant": 0.08,
+      "alignment": "center"
+    },
+    {
+      "key": "transmission_small",
+      "source": "TRANSMISSION",
+      "old_korean": "변속 방식",
+      "korean": "변속기",
+      "original_bbox": [
+        1288,
+        96,
+        1569,
+        128
+      ],
+      "localized_bbox": [
+        1391,
+        98,
+        1465,
+        126
+      ],
+      "source_size": [
+        281,
+        32
+      ],
+      "localized_size": [
+        74,
+        28
+      ],
+      "delta_left": 103,
+      "delta_right": 104,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 27,
+      "stroke_width": 1,
+      "slant": 0.04,
+      "alignment": "center"
+    }
+  ],
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "render_protected_overlap": 0,
+  "manual_automatic_rows_changed_pixels": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "header_128_exact": true,
+  "raw_orientation": "mirror_y",
+  "status": "PASS"
+}
