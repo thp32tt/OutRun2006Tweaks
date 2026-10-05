@@ -1,0 +1,58 @@
+{
+  "run": "20261005-C206-DCC7B488",
+  "qa_id": "C206",
+  "index": 32,
+  "asset": "DCC7B488",
+  "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+  "machine_status": "PASS",
+  "row_gate": "1/1 PASS",
+  "machine_checks": {
+    "decoded_source_vs_evidence_diff_pixels": 0,
+    "decoded_final_vs_evidence_diff_pixels": 0,
+    "independent_strict_source_script_bbox": [
+      547,
+      164,
+      1065,
+      248
+    ],
+    "producer_source_core_bbox": [
+      553,
+      170,
+      1058,
+      242
+    ],
+    "strict_white_fill_pixels": 15436,
+    "strict_navy_outline_pixels": 13340,
+    "independent_exact_source_script_pixels_surviving_in_clean": 0,
+    "independent_source_colored_script_pixels_surviving_in_clean": 0,
+    "localized_bbox_exact_match_producer": true,
+    "decoded_changed_outside_allowed_effect_bbox": 0,
+    "alpha_changed_outside_allowed_effect_bbox": 0,
+    "localized_render_outside_allowed_effect_bbox": 0,
+    "protected_region_changed_pixels": 0,
+    "clean_boundary_edge_delta_rgb": {
+      "left": {
+        "median": 2.0,
+        "p95": 7.0,
+        "max": 8
+      },
+      "right": {
+        "median": 2.0,
+        "p95": 5.799999999999997,
+        "max": 6
+      },
+      "top": {
+        "median": 3.0,
+        "p95": 6.0,
+        "max": 7
+      },
+      "bottom": {
+        "median": 0.0,
+        "p95": 0.0,
+        "max": 0
+      }
+    }
+  },
+  "report": "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7B488_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}

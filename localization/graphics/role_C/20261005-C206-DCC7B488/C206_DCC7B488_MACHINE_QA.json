@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C206-DCC7B488",
+  "qa_id": "C206",
+  "queue_index": 32,
+  "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+  "producer_run": "20261005-B-PRODUCTION152-DCC7",
+  "source_sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+  "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "header_exact": true,
+    "raw_orientation": "mirror_y",
+    "format": "RGBA32"
+  },
+  "classification": {
+    "source": "Total Rank",
+    "korean": "종합 랭킹",
+    "prior_queue_action": "zoom_review",
+    "positive_localize_text": true
+  },
+  "prior_verifier_retries": {
+    "C204": "false-positive exact-residue test used B152_SOURCE_TEXT_MASK.png, which producer writes as rectangular clean_scope",
+    "C205": "strict-white threshold was too low and classified pale-green bubble background as title, expanding the mask to the full effect bbox"
+  },
+  "row_checks": [
+    {
+      "original_bbox": [
+        546,
+        163,
+        1065,
+        248
+      ],
+      "independent_localized_bbox": [
+        692,
+        175,
+        919,
+        237
+      ],
+      "producer_localized_bbox": [
+        692,
+        175,
+        919,
+        237
+      ],
+      "delta_left": 146,
+      "delta_right": 146,
+      "delta_top": 12,
+      "delta_bottom": 11,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "row_gate": "1/1 PASS",
+  "machine_checks": {
+    "decoded_source_vs_evidence_diff_pixels": 0,
+    "decoded_final_vs_evidence_diff_pixels": 0,
+    "independent_strict_source_script_bbox": [
+      547,
+      164,
+      1065,
+      248
+    ],
+    "producer_source_core_bbox": [
+      553,
+      170,
+      1058,
+      242
+    ],
+    "strict_white_fill_pixels": 15436,
+    "strict_navy_outline_pixels": 13340,
+    "independent_exact_source_script_pixels_surviving_in_clean": 0,
+    "independent_source_colored_script_pixels_surviving_in_clean": 0,
+    "localized_bbox_exact_match_producer": true,
+    "decoded_changed_outside_allowed_effect_bbox": 0,
+    "alpha_changed_outside_allowed_effect_bbox": 0,
+    "localized_render_outside_allowed_effect_bbox": 0,
+    "protected_region_changed_pixels": 0,
+    "clean_boundary_edge_delta_rgb": {
+      "left": {
+        "median": 2.0,
+        "p95": 7.0,
+        "max": 8
+      },
+      "right": {
+        "median": 2.0,
+        "p95": 5.799999999999997,
+        "max": 6
+      },
+      "top": {
+        "median": 3.0,
+        "p95": 6.0,
+        "max": 7
+      },
+      "bottom": {
+        "median": 0.0,
+        "p95": 0.0,
+        "max": 0
+      }
+    }
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "preview_files": [
+    "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7_FOCUS.jpg"
+  ]
+}
