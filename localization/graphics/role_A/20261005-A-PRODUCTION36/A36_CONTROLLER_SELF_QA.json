@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION36",
+  "timestamp_kst": "2026-10-05T17:45:42+09:00",
+  "queue_index": 101,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+  "source_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+  "candidate_sha256": "4b4dbb1f645c526fb812e500c01a0fa03894dc1aff2267682ea9f8b283c05744",
+  "producer_report": "localization/graphics/role_A/20261005-A-PRODUCTION36/A36_560FA536_REPORT.json",
+  "semantic_strings": 12,
+  "localized_physical_targets": 13,
+  "bbox_size_positive_margin": "13/13 PASS",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "zero_pixel_gates": {
+    "clean_source_core_unchanged": 0,
+    "source_core_residue": 0,
+    "changed_outside": 0,
+    "alpha_changed_outside": 0,
+    "protected_visible_changed": 0,
+    "localized_overlap": 0,
+    "localized_1px_touch": 0
+  },
+  "protected_original": [
+    "song titles idx25-30",
+    "OutRun2 idx38",
+    "speed values idx45-46",
+    "unrelated artwork"
+  ],
+  "same_invocation_visual_correction": {
+    "superseded_run": "20261005-A-PRODUCTION35",
+    "reason": "A35 machine PASS but controller visual review showed beginner/intermediate source typography has a much larger colored lead phrase and smaller white tail; A35 normalized those sizes.",
+    "correction": "A36 uses source-intentional large green/orange 초급자용/중급자용 lead phrase plus smaller white 차량입니다. tail, retaining white glow/black edge and italic family."
+  },
+  "controller_visual_qa": "PASS",
+  "visual_note": "Reviewed SOURCE/CLEAN/FINAL readable overview and raw mirror_y output. A36 restores the expert-label size hierarchy; plate labels, help copy and emphasis colors remain source-family consistent. No visible English/Japanese residue, clipping, overlap, clean-plate seam, protected song/model/speed damage, or orientation regression observed at controller evidence scale.",
+  "evidence": [
+    "localization/graphics/role_A/20261005-A-PRODUCTION36/A36_SOURCE_CLEAN_FINAL_QUARTER.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION36/A36_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION36/A36_FINAL_RAW_MIRROR_Y.jpg"
+  ],
+  "decision": "A36_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
