@@ -129,15 +129,20 @@ for key,txt,cell,ix,iy,fs0 in records:
     ys,xs=np.where(mask); sbbox=[x0+int(xs.min()),y0+int(ys.min()),x0+int(xs.max())+1,y0+int(ys.max())+1]
     source48_text_union.paste(Image.fromarray((mask*255).astype(np.uint8),"L"),(x0,y0))
     ca=a.copy()
-    red=(a[:,:,0]>120)&(a[:,:,0]>a[:,:,1]*1.25)&(a[:,:,0]>a[:,:,2]*1.25)&(a[:,:,3]>0)&(~mask)
+    red=(a[:,:,0]>120)&(a[:,:,0]>a[:,:,1]*1.25)&(a[:,:,0]>a[:,:,2]*1.25)&(a[:,:,3]>0)&roi&(~mask)
     rowcols={}
     for yy in range(h):
         q=a[yy][red[yy]]
         if len(q): rowcols[yy]=np.median(q,axis=0).astype(np.uint8)
     known=sorted(rowcols)
     if not known: raise RuntimeError(("no red samples",key))
-    for yy in np.unique(ys):
-        near=min(known,key=lambda z:abs(z-int(yy))); ca[yy,mask[yy]]=rowcols[near]
+    # Mandatory visual-QA correction: the prior glyph-mask-only clean retained the
+    # darker START/GOAL outline/shadow silhouette. Reconstruct the full *interior*
+    # of the badge from source-derived row colors while leaving the outer white/red
+    # badge border and shadow pixels untouched. This is deliberately inset by ix/iy.
+    for yy in range(iy,h-iy):
+        near=min(known,key=lambda z:abs(z-int(yy)))
+        ca[yy,roi[yy]]=rowcols[near]
     clean_cell=Image.fromarray(ca,"RGBA")
     clean48.paste(clean_cell,(x0,y0)); final48.paste(clean_cell,(x0,y0))
     maxw=sbbox[2]-sbbox[0]-4; maxh=sbbox[3]-sbbox[1]-4
@@ -262,7 +267,7 @@ report={"schema_version":1,"role":"A","run":run,"regression":"IGR-012","screensh
    "input_candidate_sha256":"fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0","candidate_sha256":sha48,
    "rows":rec48,"changes_outside_three_badge_cells":out48,"source_face_residue_in_clean_plate":res48,
    "header_128_preserved_from_2048_candidate":p48.read_bytes()[:128]==cb[:128],"raw_orientation":"mirror_y",
-   "construction":"canonical stock source artwork resampled 4x special-case baseline; fresh native-resolution Korean glyphs; no old Korean raster reuse"}},
+   "construction":"canonical stock source artwork resampled 4x special-case baseline; source-derived full inset badge-interior row reconstruction removes face+outline+shadow residue while preserving outer border/shadow; fresh native-resolution Korean glyphs; no old Korean raster reuse"}},
  "producer_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"PENDING_NEW_INGAME_RETEST",
  "status":"A84_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"}
 (out/"A84_IGR012_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
