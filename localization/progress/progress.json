@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T22:13:37+09:00",
+  "updated_at_kst": "2026-10-05T22:31:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C203/C206/C207 finalized the latest completed A60/B152/A62 candidates. 59A79158 A60 passes independent 24/24 source/localized bbox exact, size/margins, canonical stage binding and zero outside/residue/overlap with controller visual PASS. DCC7B488 B152 is positively classified zoom_review Total Rank -> 종합 랭킹 and C206 passes exact bbox, strict source-script residue=0, zero outside/protected and seamless Coons clean-plate visual QA; C204/C205 are verifier-only false positives on unchanged bytes. 6DC89C6E A62 passes independent 21/21 source/localized bbox exact, canonical stage mapping, zero outside/residue/overlap and controller visual PASS. Current queue: 83 localize_text + 43 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit; pending_artwork localize_text=9; producer REWORK=1 (37759842); pending-C=0. A63/index193 is preflight-only at this checkpoint. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C208 consumed the new A65 index193 97E863AD candidate. Independent canonical/header/raw mirror_y QA PASS: 13/13 source/localized bbox exact, size/positive-margin PASS; outside/alpha/introduced-visible/source-script residue/overlap/touch/protected changes all 0 and OutRun/OutRun2SP/OUTRUN/TESTAROSSA protected pixels remain exact. Mandatory controller SOURCE/FINAL review FAILS source-style scale/proportion: the Korean labels are materially underscaled/too compact versus the source wide bold-condensed family. Decision C208_REWORK_REQUIRED_SOURCE_STYLE_SCALE_PROPORTION. Current queue remains 83 localize_text + 43 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit; pending_artwork localize_text=8; producer REWORK=2 (37759842,97E863AD); pending-C=0. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -233,7 +233,8 @@
       }
     },
     "pending_source_faithful_rework": [
-      "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
+      "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+      "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds"
     ],
     "current_state_file": "localization/graphics/SOURCE_FAITHFUL_CURRENT.json",
     "current_combined_package": {
@@ -267,10 +268,11 @@
     "next_hd_rework": {
       "status": "REWORK_REQUIRED",
       "assets": [
-        "37759842"
+        "37759842",
+        "97E863AD"
       ],
-      "remaining": 1,
-      "note": "Only 37759842 remains producer REWORK. C203/C206/C207 approved 59A79158/DCC7B488/6DC89C6E pending isolated in-game validation. pending_artwork localize_text=9; pending-C=0; A63 index193 preflight-only. RUNTIME_VALIDATION=UNTESTED.",
+      "remaining": 2,
+      "note": "C208 returned A65 index193 97E863AD for source-style scale/proportion rework after 13/13 independent static gates PASS. Existing manual/template REWORK 37759842 remains. pending_artwork localize_text=8; pending-C=0; RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": []
     },
     "latest_d_final_qa": {
@@ -295,20 +297,19 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C203/C206/C207",
-      "report": "localization/graphics/role_C/20261005-C203-C207-BATCH/C203_C207_BATCH_FINAL_QA.json",
-      "result": "3_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "run": "C208",
+      "report": "localization/graphics/role_C/20261005-C208-97E863AD/C208_97E863AD_CONTROLLER_FINAL_QA.json",
+      "result": "C208_REWORK_REQUIRED_SOURCE_STYLE_SCALE_PROPORTION",
       "candidate_changed_by_C": false,
-      "assets_checked": 3,
-      "physical_elements_checked": 46,
-      "pixel_visual_pass_assets": [
-        "59A79158",
-        "DCC7B488",
-        "6DC89C6E"
+      "assets_checked": 1,
+      "physical_elements_checked": 13,
+      "pixel_visual_pass_assets": [],
+      "rework_required_assets": [
+        "97E863AD"
       ],
-      "rework_required_assets": [],
       "global_rework_remaining": [
-        "37759842"
+        "37759842",
+        "97E863AD"
       ],
       "strict_hold_no_candidate": [
         "4F68708E",
@@ -317,19 +318,15 @@
         "75C3586A"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 9,
+      "pending_production_localize_text": 8,
       "machine_evidence": {
-        "59A79158": "localization/graphics/role_C/20261005-C203-59A79158/C203_59A79158_MACHINE_QA.json",
-        "DCC7B488": "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7B488_MACHINE_QA.json",
-        "6DC89C6E": "localization/graphics/role_C/20261005-C207-6DC89C6E/C207_6DC89C6E_MACHINE_QA.json"
+        "97E863AD": "localization/graphics/role_C/20261005-C208-97E863AD/C208_97E863AD_MACHINE_QA.json"
       },
       "controller_visual": {
-        "59A79158": "PASS",
-        "DCC7B488": "PASS",
-        "6DC89C6E": "PASS"
+        "97E863AD": "FAIL_SOURCE_STYLE_SCALE_PROPORTION"
       },
-      "verifier_retry_note": "C204/C205 were C-only verifier false positives on unchanged B152 DCC7 bytes; C206 is authoritative.",
-      "in_game_validation": "59A79158/DCC7B488/6DC89C6E UNTESTED; RUNTIME_VALIDATION=UNTESTED"
+      "verifier_retry_note": "Initial C208 residue counter was a C-only scope false positive on source-colored Hangul pixels inside localized bboxes; corrected same-candidate verifier passes residue=0.",
+      "in_game_validation": "97E863AD UNTESTED; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION137",
@@ -551,8 +548,8 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 9,
-    "current_producer_rework_remaining": 1,
+    "current_pending_artwork_localize_text": 8,
+    "current_producer_rework_remaining": 2,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T20:39:22+09:00",
       "assets": [
