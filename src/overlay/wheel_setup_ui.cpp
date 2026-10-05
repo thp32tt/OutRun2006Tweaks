@@ -1742,7 +1742,9 @@ namespace
                     Settings::WheelFFBGearShift = 1.0f;
                     Settings::WheelFFBUsePeriodicEffects = false;
                     Settings::WheelFFBInvertForce = false;
-                    Settings::WheelFFBInvertSpring = false;
+                    // Hybrid Modern structural SAT/Spring uses Modern polarity;
+                    // Arcade events keep Original polarity inside the runtime.
+                    Settings::WheelFFBInvertSpring = true;
                 }
                 else
                 {
@@ -1781,7 +1783,7 @@ namespace
                         track_ffb_change(true);
                         WheelFFB_ResetHeadroomStats();
                         WheelFFB_RequestSettingsTransition();
-                        status_ = std::string("FFB model + complete R9 test baseline applied: ") +
+                        status_ = std::string("FFB model + complete R10 test baseline applied: ") +
                             FfbModelNames[modelIndex] + ". Save Force Feedback to persist it.";
                     }
                     if (selected)
@@ -1790,7 +1792,7 @@ namespace
                 ImGui::EndCombo();
             }
             ImGui::TextDisabled(
-                "R10: model polarity is runtime-owned. Modern uses Reverse Force+Spring ON; Arcade/Hybrid/PS2 use both OFF, including profile/manual transition paths.");
+                "R10: polarity is runtime-owned. Modern uses Reverse Force+Spring ON; Arcade/PS2 use both OFF. Hybrid splits Modern structural/Spring polarity from Arcade event polarity automatically.");
 
             const int activeFfbModel = std::clamp(int(Settings::WheelFFBModel), 0, 3);
             if (activeFfbModel == 0)
@@ -1984,7 +1986,7 @@ namespace
             ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr());
             ImGui::EndDisabled();
             ImGui::TextDisabled(
-                "R10 hardware-test branch: polarity follows the selected FFB model automatically and cannot remain stale after a profile/model switch.");
+                "R10 hardware-test branch: polarity follows the selected FFB model automatically. Hybrid applies separate structural and Arcade-event signs internally.");
 
             if (ffbDirty_)
                 ImGui::TextDisabled("Unsaved FFB changes are active now but will be lost after restart.");
