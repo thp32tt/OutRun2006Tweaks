@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A89R",
+  "timestamp_kst": "2026-10-06T05:46:00+09:00",
+  "scope": "A-owned active P1 IGR-003 screenshot(145) SHOWROOM_MAIN. Reworked only 97E863AD WELCOME/SHOWROOM body rows; newer B168 A9ABD877 and C171/C149 families preserved.",
+  "user_ingame_regression": [
+    "IGR-003",
+    "스크린샷(145).png"
+  ],
+  "mapping": {
+    "domain": "GRAPHICS",
+    "status": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+    "assets": [
+      {
+        "queue_index": 193,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+        "binding": "WELCOME TO THE / OUTRUN SHOWROOM body",
+        "action": "native-HD rework"
+      },
+      {
+        "queue_index": 201,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+        "binding": "STAGES / GOALS menu rows",
+        "action": "preserved current B168 candidate",
+        "candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8"
+      },
+      {
+        "queue_index": 175,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+        "binding": "metallic SHOWROOM header",
+        "action": "preserved C171 candidate",
+        "candidate_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250"
+      },
+      {
+        "queue_index": 230,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+        "binding": "Ferrari Cars / BGM / Car Colors rows",
+        "action": "preserved C149 candidate",
+        "candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b"
+      }
+    ],
+    "runtime_text_required": false
+  },
+  "candidate": {
+    "asset": "97E863AD",
+    "superseded_candidate_sha256": "b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d",
+    "candidate_sha256": "cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418",
+    "structure": "2048x1024 RGBA32 / mip1 / exact header / raw mirror_y",
+    "rows": [
+      {
+        "source": "WELCOME TO THE",
+        "korean": "환영합니다",
+        "source_bbox": [
+          3,
+          148,
+          476,
+          195
+        ],
+        "localized_bbox": [
+          5,
+          150,
+          202,
+          193
+        ],
+        "source_size": [
+          473,
+          47
+        ],
+        "localized_size": [
+          197,
+          43
+        ],
+        "font": "Noto Sans CJK KR Black",
+        "font_size": 43
+      },
+      {
+        "source": "SHOWROOM",
+        "korean": "쇼룸",
+        "source_bbox": [
+          1205,
+          957,
+          1594,
+          1011
+        ],
+        "localized_bbox": [
+          1207,
+          959,
+          1302,
+          1009
+        ],
+        "source_size": [
+          389,
+          54
+        ],
+        "localized_size": [
+          95,
+          50
+        ],
+        "font": "Noto Sans CJK KR Black",
+        "font_size": 53
+      }
+    ]
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "changed_pixels": 8386,
+    "changed_outside_target_bboxes": 0,
+    "alpha_changed_outside_target_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_note": "SOURCE/OLD/CLEAN/A89R 3x contacts, full atlas and raw mirror_y were reviewed. Both screenshot-visible 97E rows are rendered directly at native HD resolution with smooth CJK edges, source-family dark fill, left anchor and source-relative vertical scale. The prior blocky low-resolution Hangul is removed. No source-text ghost, broken glyph, clipping, overlap, foreign-image intrusion, seam, halo, baseline/orientation regression or unrelated-atlas damage is visible. Shorter horizontal footprints reflect Korean string length; vertical scale remains 43/47 and 50/54 pixels relative to source.",
+  "evidence": [
+    "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_97E_welcome_SOURCE_OLD_CLEAN_FINAL_3X.jpg",
+    "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_97E_showroom_body_SOURCE_OLD_CLEAN_FINAL_3X.jpg",
+    "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_97E_FULL_OLD_FINAL.jpg",
+    "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_97E_RAW_OLD_FINAL.jpg"
+  ],
+  "worker_fallback": {
+    "method": "N100_MCP",
+    "reason_file": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89R_N100_FALLBACK_REASON.json",
+    "queued_hosted_run": 37370378954,
+    "prior_failed_hosted_run": 37367610075
+  },
+  "status": "A89R_STATIC_PASS_PENDING_C_AND_NEW_INGAME_RETEST",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

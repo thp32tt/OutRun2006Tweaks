@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-INGAME89R-IGR003-SHOWROOM",
+  "base_head": "4bebeeb1a9ff3307d213c8c20dcd19dfbc19bd81",
+  "user_ingame_regression": [
+    "IGR-003",
+    "스크린샷(145).png"
+  ],
+  "owner_lane": "A",
+  "mapping": {
+    "status": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+    "domain": "GRAPHICS",
+    "visible_bindings": [
+      {
+        "asset": "754F0599",
+        "queue_index": 175,
+        "screen": "metallic top SHOWROOM header",
+        "action": "PRESERVED_C171_NATIVE"
+      },
+      {
+        "asset": "97E863AD",
+        "queue_index": 193,
+        "screen": "WELCOME TO THE / OUTRUN SHOWROOM body",
+        "action": "REWORKED_NATIVE_VISIBLE_ROWS"
+      },
+      {
+        "asset": "A9ABD877",
+        "queue_index": 201,
+        "screen": "STAGES / GOALS main-list rows",
+        "action": "PRESERVED_CURRENT_B168_NATIVE"
+      },
+      {
+        "asset": "E95DA5",
+        "queue_index": 230,
+        "screen": "FERRARI CARS / BGM / CAR COLORS main-list rows",
+        "action": "PRESERVED_C149_NATIVE"
+      }
+    ],
+    "runtime_text_required": false,
+    "note": "Actual screenshot(145) shows one menu composed from four baked graphics families. A89 retry consumes newer concurrent B168 A9ABD877 rather than overwriting it: its STAGES/GOALS and stage family are native-HD and preserved. Remaining user-visible mixed-resolution work is isolated to 97E863AD WELCOME/SHOWROOM rows; E95 and 754F are also preserved."
+  },
+  "assets": {
+    "97E": {
+      "queue_index": 193,
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+      "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "superseded_candidate_sha256": "b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d",
+      "candidate_sha256": "cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+      "structure": {
+        "width": 2048,
+        "height": 1024,
+        "pitch": 8192,
+        "mips": 1,
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "raw_mode": "RGBA",
+        "header_128_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "rows": [
+        {
+          "key": "welcome",
+          "source": "WELCOME TO THE",
+          "korean": "환영합니다",
+          "original_bbox": [
+            3,
+            148,
+            476,
+            195
+          ],
+          "localized_bbox": [
+            5,
+            150,
+            202,
+            193
+          ],
+          "source_size": [
+            473,
+            47
+          ],
+          "localized_size": [
+            197,
+            43
+          ],
+          "delta_left": 2,
+          "delta_right": 274,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "positive_margin": "PASS",
+          "font": "Noto Sans CJK KR Black",
+          "font_size": 43,
+          "fill_rgba": [
+            46,
+            53,
+            57,
+            255
+          ],
+          "alignment": "left",
+          "native_resolution_render": true,
+          "upscaled_old_korean_reused": false
+        },
+        {
+          "key": "showroom_body",
+          "source": "SHOWROOM (OUTRUN line preserved)",
+          "korean": "쇼룸",
+          "original_bbox": [
+            1205,
+            957,
+            1594,
+            1011
+          ],
+          "localized_bbox": [
+            1207,
+            959,
+            1302,
+            1009
+          ],
+          "source_size": [
+            389,
+            54
+          ],
+          "localized_size": [
+            95,
+            50
+          ],
+          "delta_left": 2,
+          "delta_right": 292,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "positive_margin": "PASS",
+          "font": "Noto Sans CJK KR Black",
+          "font_size": 53,
+          "fill_rgba": [
+            46,
+            53,
+            57,
+            255
+          ],
+          "alignment": "left",
+          "native_resolution_render": true,
+          "upscaled_old_korean_reused": false
+        }
+      ],
+      "scope_qa": {
+        "changed_pixels": 8386,
+        "changed_outside_target_bboxes": 0,
+        "alpha_changed_outside_target_bboxes": 0,
+        "protected_changed_pixels": 0,
+        "render_protected_overlap_pixels": 0,
+        "status": "PASS"
+      }
+    }
+  },
+  "preserved_assets": {
+    "A9ABD877": {
+      "queue_index": 201,
+      "sha": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+      "rel": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+      "role": "current B168 native STAGES/GOALS + stage family"
+    },
+    "754F0599": {
+      "queue_index": 175,
+      "sha": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+      "rel": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+      "role": "metallic top SHOWROOM header"
+    },
+    "E95DA5": {
+      "queue_index": 230,
+      "sha": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
+      "rel": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+      "role": "native Ferrari Cars / BGM / Car Colors showroom menu rows"
+    }
+  },
+  "method": "Re-render only screenshot-visible 97E863AD legacy lowres*4 Korean rows directly at canonical HD resolution with Noto Sans CJK KR Black, exact source median fill and left alignment. Preserve newer B168 A9ABD877, C149 E95DA5, C171 754F0599 and all unrelated atlas content.",
+  "visual_qa": "PASS_CONTROLLER_SELF_QA",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "A89R_STATIC_PASS_PENDING_C_AND_NEW_INGAME_RETEST",
+  "controller_self_qa": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_CONTROLLER_SELF_QA.json",
+  "worker_fallback": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89R_N100_FALLBACK_REASON.json"
+}

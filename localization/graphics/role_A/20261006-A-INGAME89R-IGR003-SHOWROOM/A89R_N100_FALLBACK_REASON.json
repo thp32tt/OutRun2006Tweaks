@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-INGAME89R-IGR003-SHOWROOM",
+  "fallback": "N100_MCP",
+  "reason": "GitHub-hosted Localization CPU Worker retry run 37370378954 remained queued without an assigned running worker; prior hosted run 37367610075 had failed because concurrent B168 changed A9ABD877. Retry scope was narrowed to 97E863AD and executed via authorized N100 MCP while preserving current B168 A9ABD877 plus C171 754F0599 and C149 E95DA5.",
+  "queued_run": 37370378954,
+  "failed_prior_run": 37367610075,
+  "scope": "IGR-003 / 97E863AD only",
+  "candidate_sha256": "cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+}

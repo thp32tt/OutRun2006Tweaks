@@ -1,0 +1,19 @@
+{
+  "source": "/tmp/a89_97E/old.png",
+  "candidate": "/tmp/a89_97E/final.png",
+  "size": [
+    2048,
+    1024
+  ],
+  "changed_pixels": 8386,
+  "changed_bbox": [
+    5,
+    150,
+    1302,
+    1009
+  ],
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "status": "PASS"
+}

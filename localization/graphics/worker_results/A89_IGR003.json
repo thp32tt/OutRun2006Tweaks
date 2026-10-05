@@ -1,0 +1,27 @@
+{
+  "run": "20261006-A-INGAME89R-IGR003-SHOWROOM",
+  "regression": "IGR-003",
+  "mapping": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+  "assets": {
+    "97E": {
+      "queue_index": 193,
+      "candidate_sha256": "cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418",
+      "bbox_size_positive_margin": "2/2 PASS",
+      "changed_pixels": 8386,
+      "changed_outside_target_bboxes": 0,
+      "alpha_changed_outside_target_bboxes": 0,
+      "protected_changed_pixels": 0,
+      "render_protected_overlap_pixels": 0,
+      "status": "PASS"
+    }
+  },
+  "preserved": {
+    "A9ABD877": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+    "754F0599": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+    "E95DA5": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b"
+  },
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "retry_of_failed_workflow_run": 37367610075,
+  "worker_status": "A89R_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "report": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_IGR003_REPORT.json"
+}
