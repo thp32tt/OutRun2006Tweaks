@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C163-2EA557B4",
+  "timestamp_kst": "2026-10-05T14:26:14+09:00",
+  "queue_index": 55,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "producer_run": "20261005-A-PRODUCTION17 / A26 reconciliation",
+  "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+  "candidate_sha256": "d66a110cfc5bd09201c6f1a806fd3b2fab84663294ff865415fc7fc6532d6beb",
+  "candidate_changed_by_C": false,
+  "independent_machine_qa": {
+    "report": "localization/graphics/role_C/20261005-C163-2EA557B4/C163_2EA_MACHINE_QA.json",
+    "status": "PASS",
+    "dimensions": [
+      2048,
+      256
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "producer_masks_consumed": false,
+    "bbox_size_positive_margin": "1/1 PASS",
+    "decoded_changed_outside": 0,
+    "alpha_outside": 0,
+    "introduced_visible_outside": 0,
+    "protected_changed": 0,
+    "source_residue": 0,
+    "changed_bc3_blocks": 9509,
+    "changed_bc3_blocks_wholly_outside_allowed": 0,
+    "partial_boundary_changed_blocks": 24,
+    "partial_endpoint_or_color_drift": 0
+  },
+  "controller_visual_qa": {
+    "source_final": "FAIL_SOURCE_STYLE",
+    "raw_mirror_y": "FAIL_SOURCE_STYLE_SAME_DEFECT_VISIBLE",
+    "semantic_binding": "PASS_NEXT_ROUND_TO_다음_라운드",
+    "containment": "PASS",
+    "clipping": "NONE_VISIBLE",
+    "source_residue": "NONE_VISIBLE",
+    "style_failure": [
+      "Canonical NEXT ROUND is a filled bold italic title with a cyan/white/blue vertical gradient plus white/navy edging and lower-right depth.",
+      "The Korean candidate is visually hollow/outline-dominant: plate/background gray remains visible through large glyph interiors instead of the source filled gradient.",
+      "Therefore exact-pixel containment PASS does not satisfy mandatory source fill/gradient/weight fidelity."
+    ]
+  },
+  "decision": "C163_REWORK_REQUIRED_SOURCE_STYLE_FILL_GRADIENT",
+  "rework_instruction": "Regenerate 다음 라운드 with a source-faithful filled cyan-white-blue gradient, matching bold/slanted proportions and source white/navy outline/shadow family, while retaining the already-proven exact bbox/BC3 boundary constraints.",
+  "in_game_validation": "NOT_ELIGIBLE",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
