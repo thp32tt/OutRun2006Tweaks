@@ -593,8 +593,10 @@ int main()
     const auto r267DclSemanticToken =
         [](D3DDECLUSAGE usage, UINT usageIndex) noexcept -> DWORD
     {
-        return (static_cast<DWORD>(usage) & 0x0000000Fu) |
-               ((usageIndex & 0x0Fu) << 16u);
+        return 0x80000000u |
+               (static_cast<DWORD>(usage) & D3DSP_DCL_USAGE_MASK) |
+               ((usageIndex << D3DSP_DCL_USAGEINDEX_SHIFT) &
+                D3DSP_DCL_USAGEINDEX_MASK);
     };
 
     const DWORD r267VsTokens[] = {
@@ -607,6 +609,10 @@ int main()
         r267DclSemanticToken(D3DDECLUSAGE_TEXCOORD, 1u),
         r266ParameterToken(
             D3DSPR_OUTPUT, 2u, D3DSP_WRITEMASK_ALL),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        0x80000000u | static_cast<DWORD>(D3DSTT_2D),
+        r266ParameterToken(
+            D3DSPR_SAMPLER, 0u, 0u),
         static_cast<DWORD>(D3DSIO_END),
     };
     const auto r267VsEvidence =
@@ -632,11 +638,11 @@ int main()
         r267VsInterfaceSemantics.exact() &&
         r267VsInterfaceSemantics.vertexStage &&
         r267VsInterfaceSemantics.shaderModel3 &&
-        r267VsInterfaceSemantics.declarationInstructionCount == 2u &&
+        r267VsInterfaceSemantics.declarationInstructionCount == 3u &&
         r267VsInterfaceSemantics.semanticDeclarationCount == 2u &&
         r267VsInterfaceSemantics.inputSemanticCount == 1u &&
         r267VsInterfaceSemantics.outputSemanticCount == 1u &&
-        r267VsInterfaceSemantics.samplerDeclarationCount == 0u &&
+        r267VsInterfaceSemantics.samplerDeclarationCount == 1u &&
         r267VsInterfaceSemantics.semantics.size() == 2u &&
         r267VsInterfaceSemantics.semantics[0].input &&
         !r267VsInterfaceSemantics.semantics[0].output &&
@@ -662,6 +668,38 @@ int main()
         r267VsInterfaceSemantics.decoderRevisionHash != 0 &&
         r267VsInterfaceSemantics.semanticContractHash != 0,
         "R267 decodes exact SM3 DCL input/output interface semantics");
+
+    const DWORD r267MissingMarkerTokens[] = {
+        D3DVS_VERSION(3, 0),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        static_cast<DWORD>(D3DDECLUSAGE_POSITION),
+        r266ParameterToken(
+            D3DSPR_INPUT, 0u, D3DSP_WRITEMASK_ALL),
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const auto r267MissingMarkerDecode =
+        outrun::vr::dx11::
+            decode_programmable_shader_instruction_stream(
+                outrun::vr::dx11::
+                    capture_programmable_shader_function_source_evidence(
+                        r267MissingMarkerTokens,
+                        sizeof(r267MissingMarkerTokens),
+                        true));
+    const auto r267MissingMarkerRegisterSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_register_semantics(
+                r267MissingMarkerDecode);
+    const auto r267MissingMarkerInterfaceSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_interface_semantics(
+                r267MissingMarkerDecode,
+                r267MissingMarkerRegisterSemantics);
+    require(
+        r267MissingMarkerDecode.exact() &&
+        r267MissingMarkerRegisterSemantics.exact() &&
+        !r267MissingMarkerInterfaceSemantics.complete &&
+        !r267MissingMarkerInterfaceSemantics.exact(),
+        "R267 rejects DCL info tokens without parameter marker bit");
 
     const DWORD r267Sm2Tokens[] = {
         D3DVS_VERSION(2, 0),
@@ -730,6 +768,45 @@ int main()
         !r267DuplicateInterfaceSemantics.complete &&
         !r267DuplicateInterfaceSemantics.exact(),
         "R267 rejects duplicate SM3 interface semantic declarations");
+
+    const DWORD r267OverlapTokens[] = {
+        D3DVS_VERSION(3, 0),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        r267DclSemanticToken(D3DDECLUSAGE_TEXCOORD, 0u),
+        r266ParameterToken(
+            D3DSPR_OUTPUT, 0u,
+            D3DSP_WRITEMASK_0 | D3DSP_WRITEMASK_1),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        r267DclSemanticToken(D3DDECLUSAGE_COLOR, 0u),
+        r266ParameterToken(
+            D3DSPR_OUTPUT, 0u,
+            D3DSP_WRITEMASK_1 | D3DSP_WRITEMASK_2),
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const auto r267OverlapDecode =
+        outrun::vr::dx11::
+            decode_programmable_shader_instruction_stream(
+                outrun::vr::dx11::
+                    capture_programmable_shader_function_source_evidence(
+                        r267OverlapTokens,
+                        sizeof(r267OverlapTokens),
+                        true));
+    const auto r267OverlapRegisterSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_register_semantics(
+                r267OverlapDecode);
+    const auto r267OverlapInterfaceSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_interface_semantics(
+                r267OverlapDecode,
+                r267OverlapRegisterSemantics);
+    require(
+        r267OverlapDecode.exact() &&
+        r267OverlapRegisterSemantics.exact() &&
+        r267OverlapInterfaceSemantics.shaderModel3 &&
+        !r267OverlapInterfaceSemantics.complete &&
+        !r267OverlapInterfaceSemantics.exact(),
+        "R267 rejects overlapping SM3 interface declaration masks");
 
     const ProgrammableShaderFunctionIdentity programmableVs{
         true,
