@@ -164,10 +164,12 @@ int main() {
  require(!model_uses_r3_reverse_polarity(Model::PS2OriginalExperimental),"PS2 polarity is Reverse OFF");
 
  std::array<unsigned,4> imperialStoneA={PrimaryAsphaltSurfaceMask,ImperialAvenueCompanionPavingMask,PrimaryAsphaltSurfaceMask,ImperialAvenueCompanionPavingMask};
- std::array<unsigned,4> imperialStoneB={PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask};
+ std::array<unsigned,4> imperialAsphalt={PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask};
+ std::array<unsigned,4> imperialStoneFull={ImperialAvenueCompanionPavingMask,ImperialAvenueCompanionPavingMask,ImperialAvenueCompanionPavingMask,ImperialAvenueCompanionPavingMask};
  std::array<unsigned,4> imperialForeign={PrimaryAsphaltSurfaceMask,0x00002000u,PrimaryAsphaltSurfaceMask,ImperialAvenueCompanionPavingMask};
  require(imperial_avenue_stone_paving_pattern(14,0,imperialStoneA),"Imperial mixed 0x2/0x800 paving recognized");
- require(imperial_avenue_stone_paving_pattern(14,0,imperialStoneB),"Imperial all-primary paving family recognized");
+ require(!imperial_avenue_stone_paving_pattern(14,0,imperialAsphalt),"Imperial all-primary asphalt stays quiet");
+ require(imperial_avenue_stone_paving_pattern(14,0,imperialStoneFull),"Imperial full 0x800 paving recognized");
  require(!imperial_avenue_stone_paving_pattern(13,0,imperialStoneA),"stone paving is stage-scoped");
  require(!imperial_avenue_stone_paving_pattern(14,1,imperialStoneA),"stone paving rejects non-road collision context");
  require(!imperial_avenue_stone_paving_pattern(14,0,imperialForeign),"stone paving rejects unrelated surface material");
@@ -178,12 +180,22 @@ int main() {
  require(std::abs(drift_center_spring_scale(.05f)-1.0f)<1e-6f,"normal driving keeps centre spring");
  require(drift_center_spring_scale(.70f)<.051f,"deep drift removes about 95 percent of synthetic zero-centre spring");
  require(std::abs(drift_center_spring_scale(-.70f)-drift_center_spring_scale(.70f))<1e-6f,"drift spring fade is symmetric");
- const float driftRight=drift_velocity_alignment_assist(.50f,0.0f,0.0f,.80f);
- const float driftLeft=drift_velocity_alignment_assist(-.50f,0.0f,0.0f,.80f);
- require(driftRight>.10f&&driftRight<=.180001f,"positive chassis sideslip self-steers toward positive counter angle");
- require(driftLeft<-.10f&&driftLeft>=-.180001f,"negative chassis sideslip self-steers toward negative counter angle");
- require(std::abs(drift_velocity_alignment_assist(.02f,0.0f,0.0f,.80f))<1e-6f,"ordinary small sideslip gets no drift auto-steer");
- require(std::abs(drift_velocity_alignment_assist(.50f,0.0f,.96f,.80f))<.02f,"velocity-aligned steering does not keep pushing once countersteer is reached");
+
+ // The motion estimator is right-positive while OutRun steering is opposite.
+ // In a drift the front-axle velocity target must therefore cross to the
+ // counter-steer side before tyre SAT is formed.
+ require(std::abs(WheelFFB_front_alignment_target_in_steering_coords(.50f,0.0f,.06f)+.50f)<1e-6f,
+     "positive right-body slip maps to negative steering-coordinate alignment target");
+ require(std::abs(WheelFFB_front_alignment_target_in_steering_coords(-.50f,0.0f,.06f)-.50f)<1e-6f,
+     "negative right-body slip maps to positive steering-coordinate alignment target");
+ require(WheelFFB_front_slip_in_steering_coords(0.0f,.50f,0.0f,.06f)>.49f,
+     "zero steer during positive drift generates SAT toward negative counter angle");
+ require(WheelFFB_front_slip_in_steering_coords(0.0f,-.50f,0.0f,.06f)<-.49f,
+     "zero steer during negative drift generates SAT toward positive counter angle");
+ require(std::abs(WheelFFB_front_slip_in_steering_coords(-.50f,.50f,0.0f,.06f))<1e-6f,
+     "SAT vanishes when front wheels align with drift velocity target");
+ require(WheelFFB_front_slip_in_steering_coords(.10f,.01f,-.10f,.06f)>0.09f,
+     "normal corner keeps steering-dominated front-slip sign");
  require(!is_proven_primary_rough_road_contact(27,520,PrimaryAsphaltSurfaceMask),"ordinary asphalt is not rough-road material");
  require(std::abs(software_road_tactile_frequency(35.0f)-10.0f)<1e-6f,"software road carrier smoother than old 15Hz fallback");
  require(std::abs(software_slip_tactile_frequency(35.0f)-12.0f)<1e-6f,"software slip carrier remains distinct from road carrier");
