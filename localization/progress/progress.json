@@ -105,7 +105,7 @@
       "percent": 100,
       "transcribed_assets": 79,
       "localize_text_targets": 79,
-      "transcribed_segments": 725,
+      "transcribed_segments": 726,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
@@ -131,7 +131,7 @@
       "status": "done",
       "percent": 100,
       "planned_assets": 79,
-      "translated_segments": 725,
+      "translated_segments": 726,
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
@@ -165,7 +165,7 @@
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
     "transcribed_assets": 79,
-    "transcribed_segments": 725,
+    "transcribed_segments": 726,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -182,7 +182,7 @@
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
     "artwork_plan_assets": 79,
-    "artwork_plan_segments": 725,
+    "artwork_plan_segments": 726,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
