@@ -138,7 +138,6 @@ for rel, source in (("R20", r20), ("R23", r23), ("R33", r33)):
 if "R9MainDepthGenerationValue()" not in r9:
     errors.append("R9 missing main-depth generation owner query API")
 
-# RED-CI: verify post-1000 dispatcher owner-boundary violations before implementation.
 # Post-1000 dispatcher flattening: R31/R33 may call the R30 lower-draw
 # boundary, but they must not reach into R30's private SafetyHookInline storage.
 for rel, source in (("R31", r31), ("R33", r33)):
@@ -162,6 +161,21 @@ for marker in (
     if marker not in r31 or marker not in r33:
         errors.append(f"R31/R33 missing R30 lower-draw owner boundary use: {marker}")
 
+# Owner boundaries are not marker-only: each wrapper must still delegate to the
+# matching R29 hook storage so refactor flattening cannot silently reroute a
+# draw family while satisfying the public boundary name.
+for owner, lower_hook in (
+    ("R30CallLowerDrawPrimitive", "R30DrawPrimitiveR29Hook.stdcall<HRESULT>("),
+    ("R30CallLowerDrawIndexedPrimitive", "R30DrawIndexedPrimitiveR29Hook.stdcall<HRESULT>("),
+    ("R30CallLowerDrawPrimitiveUP", "R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>("),
+    ("R30CallLowerDrawIndexedPrimitiveUP", "R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>("),
+):
+    owner_start = r30.find(f"{owner}(")
+    owner_end = r30.find("\n    }", owner_start)
+    if owner_start < 0 or owner_end < 0 or lower_hook not in r30[owner_start:owner_end]:
+        errors.append(
+            f"R30 lower-draw owner boundary lost matching delegation: {owner}")
+
 # R31 prerequisite polling must observe R30 through an owner status query.
 if re.search(r"\bR30InstallState\b", r31):
     errors.append("R31 retained direct R30 install-state dependency")
@@ -169,6 +183,12 @@ if "R30InstallStatus()" not in r30:
     errors.append("R30 missing install-state owner query")
 if "R30InstallStatus()" not in r31:
     errors.append("R31 missing R30 install-state owner query")
+
+status_start = r30.find("R30InstallStatus()")
+status_end = r30.find("\n    }", status_start)
+if status_start < 0 or status_end < 0 or \
+        "R30InstallState.load(std::memory_order_acquire)" not in r30[status_start:status_end]:
+    errors.append("R30 install-state owner query lost acquire-load semantics")
 
 # R32 fail-closed gating may ask whether the R9 stereo baseline is seeded, but
 # the seed flag itself remains R9-owned.
@@ -178,6 +198,12 @@ if "R9StereoBaselineSeeded()" not in r9:
     errors.append("R9 missing stereo-seed owner query")
 if "R9StereoBaselineSeeded()" not in r32:
     errors.append("R32 missing R9 stereo-seed owner query")
+
+seed_start = r9.find("R9StereoBaselineSeeded()")
+seed_end = r9.find("\n\t}", seed_start)
+if seed_start < 0 or seed_end < 0 or \
+        "return R9StereoSeeded;" not in r9[seed_start:seed_end]:
+    errors.append("R9 stereo-seed owner query lost direct baseline-state semantics")
 
 # Post-1000 R33 owner-boundary continuation: the final dispatcher may ask R9
 # whether the currently tracked main depth carries stencil, but must not read
