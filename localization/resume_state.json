@@ -1129,7 +1129,7 @@
     },
     "current_pending_artwork_localize_text": 17,
     "current_producer_rework_remaining": 2,
-    "latest_a_production_batch": "localization/graphics/role_A/20261005-A-PRODUCTION34/A34_37759842_REPORT.json",
+    "latest_a_production_batch": "localization/graphics/role_A/20261005-A-PRODUCTION36/A36_560FA536_REPORT.json",
     "a_production20_9ce4e175": {
       "timestamp_kst": "2026-10-05T02:45:00+09:00",
       "index": 195,
@@ -1178,10 +1178,11 @@
       "runtime_validation": "UNTESTED",
       "c_final_qa": "C165_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
     },
-    "latest_a_production_candidate_sha256": "90b2adecf0bd22effd199f98d166e959ca1f6a7d9238d52a3cab2026753c286c",
-    "latest_a_controller_self_qa": "localization/graphics/role_A/20261005-A-PRODUCTION34/A34_CONTROLLER_SELF_QA.json",
+    "latest_a_production_candidate_sha256": "4b4dbb1f645c526fb812e500c01a0fa03894dc1aff2267682ea9f8b283c05744",
+    "latest_a_controller_self_qa": "localization/graphics/role_A/20261005-A-PRODUCTION36/A36_CONTROLLER_SELF_QA.json",
     "pending_c_from_a": [
-      "37759842"
+      "37759842",
+      "560FA536"
     ],
     "pending_c_from_b": [
       "A05BF610"
