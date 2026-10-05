@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T01:31:28+09:00",
+  "updated_at_kst": "2026-10-06T01:49:25+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C218 finalized A79 index215 C05E67EF candidate 0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b: independent pinned-source/current-DDS decode reproduced 6/6 source/localized bboxes exactly; containment/size/positive margins PASS, changed/alpha/introduced outside=0 and source-exact residue outside localized bboxes=0. Controller A79 contacts/raw review confirms native-resolution smooth Hangul, flat-yellow Black source family and mirror_y orientation -> C218_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. pending-C=0; pending_artwork localize_text=4. 37759842 remains P0 REWORK: A81 worker output e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7 is present at refreshed HEAD db7610bf9b40e341f7971d29d227edfeee66d784 with static QA PASS pending controller visual QA/new in-game retest, but producer controller/shared-state promotion is not complete, so C did not consume it. Active user in-game graphics rows 48/95/106 remain OPEN pending new in-game retest. B161 A8CE worker output was also not consumed because producer controller/shared-state finalization was not complete at selection. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "A81 P0 index95 37759842 e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7: IGR-014/015/016 material rework self-QA PASS after A80 fail-close. 33/33 exact bbox/size/margin and zero gates PASS; controller readable/full/raw mirror_y PASS. 37759842 moved from producer REWORK to pending C + NEW in-game retest; backlog not closed. Concurrent C218/B work preserved.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,13 +265,13 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "REWORK_REQUIRED",
-      "assets": [
+      "status": "PENDING_C_AND_INGAME_RETEST",
+      "assets": [],
+      "remaining": 0,
+      "note": "A81 materially repaired P0 37759842 and A self-QA passed; IGR-014/015/016 remain not closed pending independent C static QA + new actual game retest. Concurrent C218/B state preserved.",
+      "pending_c": [
         "37759842"
-      ],
-      "remaining": 1,
-      "note": "C218 approved A79 C05E67EF static candidate; pending-C=0. 37759842 remains P0: A81 worker candidate e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7 is static-QA PASS but still pending producer controller visual QA/new in-game retest and shared-state promotion, so no C decision yet. Active user in-game graphics queue indices 48/95/106 remain open. pending_artwork localize_text=4. RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": []
+      ]
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -550,7 +550,7 @@
       "runtime_validation": "UNTESTED"
     },
     "current_pending_artwork_localize_text": 4,
-    "current_producer_rework_remaining": 1,
+    "current_producer_rework_remaining": 0,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T20:39:22+09:00",
       "assets": [
@@ -1120,9 +1120,7 @@
       "report": "localization/graphics/role_C/20261005-C163-2EA557B4/C163_2EA_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
-    "current_producer_rework_assets": [
-      "37759842"
-    ],
+    "current_producer_rework_assets": [],
     "a_production26_2ea557b4": {
       "index": 55,
       "candidate_sha256": "b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc",
@@ -1323,42 +1321,33 @@
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     },
     "latest_a_production": {
-      "run": "A79",
-      "index": 215,
-      "asset": "C05E67EF",
-      "candidate_sha256": "0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b",
-      "result": "A79_SELF_QA_PASS_PENDING_C_AND_INGAME",
-      "physical_binding": {
-        "0": "GOAL E",
-        "1": "GOAL D",
-        "2": "GOAL C",
-        "3": "GOAL B",
-        "4": "GOAL A",
-        "5": "15con."
-      },
-      "bbox_size_positive_margin": "6/6 PASS",
+      "run": "A81",
+      "index": 95,
+      "asset": "37759842",
+      "candidate_sha256": "e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7",
+      "result": "A81_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+      "user_ingame_regressions": [
+        "IGR-014",
+        "IGR-015",
+        "IGR-016"
+      ],
+      "prior_rejected_candidate_sha256": "68e31ca94c9003cd0acd572fdcecf17d52c56b6848ee558c1359d87b6d382fcd",
+      "bbox_size_positive_margin": "33/33 PASS",
       "pixel_gates": {
-        "outside": 0,
+        "clean_outside": 0,
+        "clean_source_core_unchanged": 0,
+        "decoded_outside": 0,
         "alpha_outside": 0,
         "protected_changed": 0,
-        "render_outside_target": 0,
-        "candidate_vs_clean_outside_target": 0,
+        "source_residue": 0,
         "overlap": 0,
         "touch": 0
       },
-      "source_style": {
-        "family": "flat yellow condensed goal-label family",
-        "face": "Noto Sans CJK KR Black",
-        "native_font_size_px": 52,
-        "pixel_scale": 1,
-        "horizontal_scale": 1.0,
-        "artificial_tracking_px": 0.0,
-        "controller_visual_qa": "PASS_NATIVE_RESOLUTION_SOURCE_FAMILY"
-      },
+      "rework_method": "full exact source-effect-bbox manual vertical plate primitives; stronger selector slant; rejected C186 methods not repeated",
       "structure": {
         "dimensions": [
-          512,
-          256
+          4096,
+          4096
         ],
         "format": "RGBA32",
         "raw_mode": "RGBA",
@@ -1366,9 +1355,10 @@
         "header_128_exact": true,
         "raw_orientation": "mirror_y"
       },
-      "report": "localization/graphics/role_A/20261006-A-PRODUCTION79-C05/A79_C05E67EF_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION79-C05/A79_CONTROLLER_SELF_QA.json",
-      "runtime_validation": "UNTESTED"
+      "controller_visual_qa": "PASS_STATIC_USER_REGRESSION_REWORK_PENDING_INDEPENDENT_C_AND_NEW_INGAME_RETEST",
+      "report": "localization/graphics/role_A/20261006-A-PRODUCTION81-3775-BBOX/A81_37759842_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION81-3775-BBOX/A81_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "PENDING_NEW_INGAME_RETEST"
     },
     "latest_a_rework": {
       "run": "A45",
