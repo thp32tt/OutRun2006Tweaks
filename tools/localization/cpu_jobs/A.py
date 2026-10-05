@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted role A required")
 
 repo=Path.cwd()
-run="20261006-A-PRODUCTION84-IGR012"
+run="20261006-A-PRODUCTION85-IGR012-CLEAN"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 
@@ -99,7 +99,7 @@ def render_styled(text,kind,maxw,maxh,fs0):
 # the three START/GOAL text regions on canonical source-derived badge artwork.
 p48=repo/"localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds"
 s48=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds"
-if sha(p48)!="fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0": raise RuntimeError(("48 candidate drift",sha(p48)))
+if sha(p48)!="d1e216b41aba01cb184205c23404d9f67c9ef392499ecc58f38264b13c47d141": raise RuntimeError(("48 candidate drift",sha(p48)))
 if sha(s48)!="5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635": raise RuntimeError(("48 source drift",sha(s48)))
 sb=s48.read_bytes(); cb=p48.read_bytes()
 Hs,Ws,ps,ds,ms=struct.unpack_from("<5I",sb,12); H,W,pitch,depth,mips=struct.unpack_from("<5I",cb,12)
@@ -176,7 +176,7 @@ if ImageChops.difference(dec48,final48).getbbox() is not None: raise RuntimeErro
 pa=repo/"localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
 sa=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
 clp=repo/"localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_CLEAN_PLATE.png"
-if sha(pa)!="f822c0727e8ce9c8d0b801fe5a39dd870c43a30d872819c42829040e14474665": raise RuntimeError(("A064 candidate drift",sha(pa)))
+if sha(pa)!="a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f": raise RuntimeError(("A064 candidate drift",sha(pa)))
 if sha(sa)!="6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc": raise RuntimeError(("A064 source drift",sha(sa)))
 ab=pa.read_bytes(); asb=sa.read_bytes(); H2,W2,p2,d2,m2=struct.unpack_from("<5I",ab,12)
 oldA_raw=Image.frombytes("RGBA",(W2,H2),ab[128:],"raw","RGBA"); oldA=oldA_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
@@ -232,7 +232,7 @@ for r in rec48:
     cards.append(row)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+4 for c in cards)),(230,230,230)); y=0
 for c in cards: sheet.paste(c,(0,y)); y+=c.height+4
-sheet.save(out/"A84_48DEBE77_BADGE_CONTACTS.jpg",quality=95)
+sheet.save(out/"A85_48DEBE77_BADGE_CONTACTS.jpg",quality=95)
 
 # A064 contacts SOURCE | OLD | CLEAN | FINAL.
 cards=[]
@@ -248,11 +248,11 @@ for r in recA:
     cards.append(row)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+4 for c in cards)),(230,230,230)); y=0
 for c in cards: sheet.paste(c,(0,y)); y+=c.height+4
-sheet.save(out/"A84_A064_OUTRUN_MILES_CONTACTS.jpg",quality=95)
+sheet.save(out/"A85_A064_OUTRUN_MILES_CONTACTS.jpg",quality=95)
 
 # Raw orientation proofs.
-flatten(dec48_raw).resize((768,768),Image.Resampling.LANCZOS).save(out/"A84_48DEBE77_RAW_MIRROR_Y.jpg",quality=94)
-flatten(decA_raw).resize((1024,512),Image.Resampling.LANCZOS).save(out/"A84_A064_RAW_MIRROR_Y.jpg",quality=94)
+flatten(dec48_raw).resize((768,768),Image.Resampling.LANCZOS).save(out/"A85_48DEBE77_RAW_MIRROR_Y.jpg",quality=94)
+flatten(decA_raw).resize((1024,512),Image.Resampling.LANCZOS).save(out/"A85_A064_RAW_MIRROR_Y.jpg",quality=94)
 
 report={"schema_version":1,"role":"A","run":run,"regression":"IGR-012","screenshot":"스크린샷(157).png",
  "mapping":{"status":"EXACT_HIGH_CONFIDENCE_MULTI_ASSET","primary_queue_index":60,
@@ -260,21 +260,21 @@ report={"schema_version":1,"role":"A","run":run,"regression":"IGR-012","screensh
    "secondary_queue_index":63,"secondary_asset":"textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
    "basis":"A064 contains both baked OUTRUN MILES variants visible in the reported banner; 48DEBE77 contains the paired START/GOAL route badge art. Dynamic numeric meter is protected runtime content; no runtime-text edit is made."},
  "assets":{"A064FDFC":{"source_sha256":"6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
-   "input_candidate_sha256":"f822c0727e8ce9c8d0b801fe5a39dd870c43a30d872819c42829040e14474665","candidate_sha256":shaA,
+   "input_candidate_sha256":"a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f","candidate_sha256":shaA,
    "rows":recA,"changes_outside_two_source_bboxes":outA,"alpha_changes_outside_two_source_bboxes":alphaOutA,
    "header_128_exact":pa.read_bytes()[:128]==ab[:128],"raw_orientation":"mirror_y"},
   "48DEBE77":{"source_sha256":"5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
-   "input_candidate_sha256":"fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0","candidate_sha256":sha48,
+   "input_candidate_sha256":"d1e216b41aba01cb184205c23404d9f67c9ef392499ecc58f38264b13c47d141","candidate_sha256":sha48,
    "rows":rec48,"changes_outside_three_badge_cells":out48,"source_face_residue_in_clean_plate":res48,
    "header_128_preserved_from_2048_candidate":p48.read_bytes()[:128]==cb[:128],"raw_orientation":"mirror_y",
    "construction":"canonical stock source artwork resampled 4x special-case baseline; source-derived full inset badge-interior row reconstruction removes face+outline+shadow residue while preserving outer border/shadow; fresh native-resolution Korean glyphs; no old Korean raster reuse"}},
  "producer_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"PENDING_NEW_INGAME_RETEST",
- "status":"A84_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"}
-(out/"A84_IGR012_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A84_IGR012.json").write_text(json.dumps({"run":run,"regression":"IGR-012","assets":["A064FDFC","48DEBE77"],
+ "status":"A85_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"}
+(out/"A85_IGR012_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"A85_IGR012.json").write_text(json.dumps({"run":run,"regression":"IGR-012","assets":["A064FDFC","48DEBE77"],
  "candidate_sha256":{"A064FDFC":shaA,"48DEBE77":sha48},"bbox_size_margin":{"A064FDFC":"2/2 PASS","48DEBE77":"3/3 PASS"},
  "outside":{"A064FDFC":outA,"48DEBE77":out48},"source_face_residue_48_clean_plate":res48,
  "worker_status":report["status"],"runtime_validation":"PENDING_NEW_INGAME_RETEST",
- "report":str((out/"A84_IGR012_REPORT.json").relative_to(repo))},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+ "report":str((out/"A85_IGR012_REPORT.json").relative_to(repo))},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps({"A064FDFC":shaA,"48DEBE77":sha48,"A064_rows":recA,"badge_rows":rec48,
                   "outside":{"A064":outA,"A064_alpha":alphaOutA,"48":out48},"source_residue_48":res48},ensure_ascii=False))
