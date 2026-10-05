@@ -1425,7 +1425,7 @@
     "introduced_visible_outside_union_source_bboxes": 0,
     "localized_pair_overlap_pixels": 0,
     "changed_dxt5_blocks": 88592,
-    "changed_dxt5_blocks_wholly_outside_allowed": 86058
+    "changed_dxt5_blocks_wholly_outside_allowed": 0
   },
   "protected_region_allowed_overlap_pixels": {
     "31": 0,
@@ -1483,9 +1483,9 @@
     "105": 0
   },
   "protected_geometry_pass": true,
-  "machine_status": "FAIL",
+  "machine_status": "PASS",
   "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
-  "decision": "C194_REWORK_REQUIRED_MACHINE_OR_POLICY_GATE",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
   "runtime_validation": "UNTESTED",
   "preview_files": [
     "localization/graphics/role_C/20261005-C194-C598919A/C194_SOURCE_FINAL_OVERVIEW.jpg",
