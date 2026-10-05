@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T19:41:25+09:00",
+  "updated_at_kst": "2026-10-05T20:03:05+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C192/C193 complete current C work: corrected A49 39BCA907 and B137 63C91067 both independent pixel/visual/policy PASS pending isolated in-game validation. 63C91067 C184 starburst defect is resolved; A48 39BCA907 semantic misbinding was superseded by A49 before approval. pending-C=0; pending_artwork localize_text=14; producer REWORK=2 (C598919A,37759842). RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C194 finalized B139 C598919A after correcting the C-only raw mirror_y compressed-block audit. Candidate e3c3f78975b3dd582690a7f169c1aa364dd05e3846827340aae38631885b92bf is independent pixel/visual/policy PASS pending isolated in-game validation. 41/41 bbox/size/positive-margin PASS; all outside/protected/overlap/DXT5-scope gates zero. pending-C=0 at C194 close; pending_artwork localize_text=14 at C194 snapshot; producer REWORK=1 (37759842). RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -267,11 +267,10 @@
     "next_hd_rework": {
       "status": "REWORK_REQUIRED",
       "assets": [
-        "C598919A",
         "37759842"
       ],
-      "remaining": 2,
-      "note": "C193 clears 63C91067; C192 clears new index147 39BCA907. Remaining producer REWORK is C598919A exact-DXT5 constrained endpoint/index solver and 37759842 manual/template clean-plate reconstruction. pending_artwork localize_text=14; pending-C=0; RUNTIME_VALIDATION=UNTESTED.",
+      "remaining": 1,
+      "note": "C194 clears C598919A exact-DXT5 constrained rework. Remaining producer REWORK is 37759842 manual/template clean-plate reconstruction. C194 snapshot pending_artwork localize_text=14; pending-C=0; RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": []
     },
     "latest_d_final_qa": {
@@ -296,19 +295,17 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C192/C193",
-      "report": "localization/graphics/role_C/20261005-C192-C193-BATCH/C192_C193_BATCH_FINAL_QA.json",
-      "result": "2_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "run": "C194",
+      "report": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_CONTROLLER_FINAL_QA.json",
+      "result": "1_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
       "candidate_changed_by_C": false,
-      "assets_checked": 2,
-      "physical_elements_checked": 17,
+      "assets_checked": 1,
+      "physical_elements_checked": 41,
       "pixel_visual_pass_assets": [
-        "39BCA907",
-        "63C91067"
+        "C598919A"
       ],
       "rework_required_assets": [],
       "global_rework_remaining": [
-        "C598919A",
         "37759842"
       ],
       "strict_hold_no_candidate": [
@@ -320,14 +317,12 @@
       "pending_c_localize_text": 0,
       "pending_production_localize_text": 14,
       "machine_evidence": {
-        "39BCA907": "localization/graphics/role_C/20261005-C192-39BCA907/C192_39BCA907_MACHINE_QA.json",
-        "63C91067": "localization/graphics/role_C/20261005-C193-63C91067/C193_63C91067_ADJUDICATED_MACHINE_QA.json"
+        "C598919A": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_MACHINE_QA.json"
       },
       "controller_visual": {
-        "39BCA907": "PASS",
-        "63C91067": "PASS"
+        "C598919A": "PASS"
       },
-      "in_game_validation": "39BCA907/63C91067 PENDING; RUNTIME_VALIDATION=UNTESTED"
+      "in_game_validation": "C598919A PENDING; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION137",
@@ -550,7 +545,7 @@
       "runtime_validation": "UNTESTED"
     },
     "current_pending_artwork_localize_text": 14,
-    "current_producer_rework_remaining": 3,
+    "current_producer_rework_remaining": 1,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T19:38:00+09:00",
       "assets": [
@@ -1122,8 +1117,6 @@
       "runtime_validation": "UNTESTED"
     },
     "current_producer_rework_assets": [
-      "63C91067",
-      "C598919A",
       "37759842"
     ],
     "a_production26_2ea557b4": {
@@ -1238,7 +1231,7 @@
       "report": "localization/graphics/role_C/20261005-C170-754F0599/C170_754F_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C175-C176-BATCH/C175_C176_BATCH_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_CONTROLLER_FINAL_QA.json",
     "c171_controller_final_qa": {
       "timestamp_kst": "2026-10-05T16:06:00+09:00",
       "run": "20261005-C171-754F0599",
@@ -1373,6 +1366,28 @@
       "rejected_candidate_sha256": "68e31ca94c9003cd0acd572fdcecf17d52c56b6848ee558c1359d87b6d382fcd",
       "result": "A45_REWORK_REQUIRED_SOURCE_SHAPED_CLEAN_PLATE_ARTIFACTS",
       "report": "localization/graphics/role_A/20261005-A-PRODUCTION45/A45_CONTROLLER_REWORK.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c194_c598919a": {
+      "timestamp_kst": "2026-10-05T20:03:05+09:00",
+      "queue_index": 86,
+      "candidate_sha256": "e3c3f78975b3dd582690a7f169c1aa364dd05e3846827340aae38631885b92bf",
+      "producer_run": "20261005-B-PRODUCTION139-C598-SOLVER-FIX",
+      "machine_status": "PASS",
+      "bbox_size_positive_margin": "41/41 PASS",
+      "semantic_stage_mapping": "PASS",
+      "zero_pixel_gates": {
+        "decoded_changed_outside_union_source_bboxes": 0,
+        "alpha_changed_outside_union_source_bboxes": 0,
+        "introduced_visible_outside_union_source_bboxes": 0,
+        "localized_pair_overlap_pixels": 0,
+        "changed_dxt5_blocks_wholly_outside_allowed": 0
+      },
+      "protected_geometry_pass": true,
+      "controller_visual_qa": "PASS",
+      "decision": "C194_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "machine_report": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_MACHINE_QA.json",
+      "report": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     }
   },
