@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261006-C218-C05E67EF",
+  "qa_id": "C218",
+  "timestamp_kst": "2026-10-06T01:31:28+09:00",
+  "queue_index": 215,
+  "asset": "C05E67EF",
+  "candidate_sha256": "0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b",
+  "machine_report": "localization/graphics/role_C/20261006-C218-C05E67EF/C218_C05E67EF_MACHINE_QA.json",
+  "visual_evidence": [
+    "localization/graphics/role_A/20261006-A-PRODUCTION79-C05/A79_C05_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION79-C05/A79_C05_RAW_COMPARE.jpg"
+  ],
+  "visual_observations": [
+    "A79 removes the rejected A78 nearest-neighbor low-resolution look: Hangul edges are smooth at native resolution.",
+    "All six labels retain the source flat-yellow/Black goal-label family, source-relative height and left alignment without clipping.",
+    "SOURCE/CLEAN/FINAL contacts show no source-script ghost, patch seam, halo, unintended artwork change, localized overlap or 1-pixel touch.",
+    "Raw DDS comparison preserves mirror_y orientation and per-cell placement."
+  ],
+  "policy_checks": {
+    "native_resolution_no_upscale": "PASS",
+    "source_style_fidelity": "PASS",
+    "zero_pixel_containment": "PASS",
+    "zero_overlap": "PASS",
+    "source_residue": "PASS",
+    "raw_orientation": "PASS",
+    "dds_structure_header": "PASS"
+  },
+  "controller_visual_qa": "PASS",
+  "decision": "C218_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "candidate_changed_by_C": false,
+  "runtime_validation": "UNTESTED",
+  "ingame_rework_backlog_closed": false,
+  "notes": "C218 is a static C approval only. No OPEN_USER_INGAME_FAIL row is closed without a newer actual in-game retest."
+}

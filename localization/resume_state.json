@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "A79 index215 C05E67EF 0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b: native 52px smooth-AA candidate self-QA PASS after rejecting A78 lowres/pixelated retry; 6/6 exact bbox/size/margin + zero pixel gates; pending-C=C05E67EF. Index209 reconciled no-localizable; pending_artwork=4. 37759842 remains P0 manual/template REWORK; RUNTIME_VALIDATION=UNTESTED.",
+    "C218 finalized A79 index215 C05E67EF 0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b: independent pinned-source/current-DDS decode 6/6 exact bbox+size+positive margins, outside/alpha/introduced/residue/overlap/touch 0, native yellow Black style/raw mirror_y visual PASS. C218_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. pending-C=0; active in-game backlog remains open. Refreshed HEAD db7610bf9b40e341f7971d29d227edfeee66d784 shows A81 37759842 worker candidate e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7 static PASS pending controller visual QA/new in-game retest and B161 A8CE worker output; neither has a finalized producer controller/shared-state promotion, so neither is consumed by C218. RUNTIME_VALIDATION=UNTESTED.",
     "C215 finalized B157 index36 JENN 06AB5CEE candidate 0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5. Independent C rebuilt all three Total Rank→종합 랭킹 edits from already-C-approved C202/C206 warm-starburst/pink/green templates and got candidate diff=0, 3/3 exact bbox/size/positive margins, outside/alpha/visible/unsafe-template-variant/bbox-mismatch all 0. Controller contacts/raw mirror_y PASS; Jennifer/rank/lens-flare/UI artwork protected. C215_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "C217 finalized latest A76 index205 ACF61D7C candidate 2bbb9d19a833fb6c9ade243eb70132ef5ce46150d1fa1cb9423ff4e5101b770c. Independent canonical 4096x2048 RGBA32/header/raw mirror_y QA reproduces 23/23 localized bboxes exactly; outside/alpha/visible/protected/product-token/source-residue gates all 0. C independently recovered true idx10 phrase [1807,909,2696,975], OutRun2SP token [2356,909,2696,964], and proves Korean [2032,914,2348,970] stays before it with token pixels unchanged; detached 1px edge strip is excluded. A76 restores source-scale hierarchy (dark main 56/66px, congrats 72/82px, red headings ~0.92-0.94 source height); protected songs/product tokens remain exact. C217_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. C214/A72 and C216/A75 are superseded verifier iterations, not separate completions. RUNTIME_VALIDATION=UNTESTED.",
     "B157 completed even index36 06AB5CEE after three fail-closed template/source checks. Final candidate 0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5 localizes three physical Total Rank labels (warm starburst + pink/green speech bubbles) to 종합 랭킹. B157 reuses only already-C-approved C202/C206 title-removal/render pixels and preserves every Jennifer-specific pixel outside exact edit masks. Hosted worker: 4096x4096 RGBA32/header/raw mirror_y, 3/3 bbox+size+positive margins, CLEAN/FINAL PASS, outside/alpha/source-residue/overlap/touch=0. Controller SOURCE/CLEAN/FINAL + raw mirror_y visual PASS. Pending independent C; RUNTIME_VALIDATION=UNTESTED.",
@@ -4008,7 +4008,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261006-C215-C217-BATCH/C215_C217_BATCH_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261006-C218-BATCH/C218_BATCH_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4069,9 +4069,7 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [
-    "C05E67EF"
-  ],
+  "current_pending_c": [],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -4918,9 +4916,36 @@
       "a78_lowres_retry_rejected": true
     },
     "controller_visual_qa": "PASS_NATIVE_RESOLUTION_SOURCE_FAMILY",
-    "pending_independent_c_final_qa": true,
+    "pending_independent_c_final_qa": false,
     "report": "localization/graphics/role_A/20261006-A-PRODUCTION79-C05/A79_C05E67EF_REPORT.json",
     "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION79-C05/A79_CONTROLLER_SELF_QA.json",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "c_final_qa": "C218_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "c_machine_report": "localization/graphics/role_C/20261006-C218-C05E67EF/C218_C05E67EF_MACHINE_QA.json",
+    "c_controller_report": "localization/graphics/role_C/20261006-C218-C05E67EF/C218_C05E67EF_CONTROLLER_FINAL_QA.json"
+  },
+  "c218_controller_final_qa": {
+    "timestamp_kst": "2026-10-06T01:31:28+09:00",
+    "queue_index": 215,
+    "asset": "C05E67EF",
+    "source_sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+    "candidate_sha256": "0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b",
+    "decision": "C218_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "bbox_size_positive_margin": "6/6 PASS",
+    "outside": 0,
+    "alpha_outside": 0,
+    "introduced_alpha_outside": 0,
+    "source_exact_residue_outside_localized_bboxes": 0,
+    "controller_visual_qa": "PASS",
+    "machine_report": "localization/graphics/role_C/20261006-C218-C05E67EF/C218_C05E67EF_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261006-C218-C05E67EF/C218_C05E67EF_CONTROLLER_FINAL_QA.json",
+    "batch_report": "localization/graphics/role_C/20261006-C218-BATCH/C218_BATCH_FINAL_QA.json",
+    "runtime_validation": "UNTESTED",
+    "ingame_backlog_closed": false,
+    "branch_head_refreshed_before_persist": "db7610bf9b40e341f7971d29d227edfeee66d784",
+    "concurrent_not_consumed": {
+      "37759842": "A81 worker candidate e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7 static PASS pending producer controller visual QA/new in-game retest; shared-state finalization incomplete",
+      "A8CE339F": "B161 worker output; producer controller/shared-state finalization incomplete"
+    }
   }
 }

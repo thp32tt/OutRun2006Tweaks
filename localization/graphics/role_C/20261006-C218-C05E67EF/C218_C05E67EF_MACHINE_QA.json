@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261006-C218-C05E67EF",
+  "qa_id": "C218",
+  "queue_index": 215,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+  "producer_run": "20261006-A-PRODUCTION79-C05",
+  "producer_status": "A79_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1_verified": "6109bf8757aff5aeb11654e94356e303ed2179d4",
+    "source_sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff"
+  },
+  "candidate_sha256": "0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b",
+  "candidate_sha256_verified_on_n100": true,
+  "candidate_git_blob_sha1": "b9b3f1bb35626643b3ef1aa47f4183d984c7fa2e",
+  "independent_recompute": {
+    "method": "Pinned source DDS and current candidate DDS decoded directly from raw RGBA bytes; readable Y reconstructed as H-1-rawY. Producer bbox arithmetic was not reused.",
+    "source_and_candidate_dimensions": [
+      512,
+      256
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "source_bytes": 524416,
+    "candidate_bytes": 524416,
+    "raw_orientation": "mirror_y"
+  },
+  "row_checks": [
+    {
+      "region_idx": 0,
+      "source": "GOAL E",
+      "korean": "골 E",
+      "original_bbox": [
+        5,
+        191,
+        178,
+        244
+      ],
+      "localized_bbox": [
+        7,
+        193,
+        96,
+        241
+      ],
+      "source_width": 173,
+      "source_height": 53,
+      "localized_width": 89,
+      "localized_height": 48,
+      "delta_left": 2,
+      "delta_right": 82,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 1,
+      "source": "GOAL D",
+      "korean": "골 D",
+      "original_bbox": [
+        246,
+        192,
+        419,
+        244
+      ],
+      "localized_bbox": [
+        248,
+        194,
+        343,
+        242
+      ],
+      "source_width": 173,
+      "source_height": 52,
+      "localized_width": 95,
+      "localized_height": 48,
+      "delta_left": 2,
+      "delta_right": 76,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 2,
+      "source": "GOAL C",
+      "korean": "골 C",
+      "original_bbox": [
+        5,
+        110,
+        176,
+        165
+      ],
+      "localized_bbox": [
+        7,
+        113,
+        100,
+        161
+      ],
+      "source_width": 171,
+      "source_height": 55,
+      "localized_width": 93,
+      "localized_height": 48,
+      "delta_left": 2,
+      "delta_right": 76,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 3,
+      "source": "GOAL B",
+      "korean": "골 B",
+      "original_bbox": [
+        246,
+        112,
+        419,
+        165
+      ],
+      "localized_bbox": [
+        248,
+        114,
+        342,
+        162
+      ],
+      "source_width": 173,
+      "source_height": 53,
+      "localized_width": 94,
+      "localized_height": 48,
+      "delta_left": 2,
+      "delta_right": 77,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 4,
+      "source": "GOAL A",
+      "korean": "골 A",
+      "original_bbox": [
+        5,
+        30,
+        244,
+        83
+      ],
+      "localized_bbox": [
+        7,
+        32,
+        101,
+        80
+      ],
+      "source_width": 239,
+      "source_height": 53,
+      "localized_width": 94,
+      "localized_height": 48,
+      "delta_left": 2,
+      "delta_right": 143,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 5,
+      "source": "15con.",
+      "korean": "15코스",
+      "original_bbox": [
+        244,
+        30,
+        428,
+        84
+      ],
+      "localized_bbox": [
+        246,
+        35,
+        400,
+        79
+      ],
+      "source_width": 184,
+      "source_height": 54,
+      "localized_width": 154,
+      "localized_height": 44,
+      "delta_left": 2,
+      "delta_right": 28,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "bbox_size_positive_margin": "6/6 PASS",
+    "changed_pixels_total": 26672,
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_alpha_outside_union_source_bboxes": 0,
+    "source_alpha_pixels_in_source_bboxes": 23154,
+    "source_exact_pixels_remaining_within_source_bboxes": 4314,
+    "source_exact_residue_outside_localized_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pairs": 0
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PASS",
+  "decision": "C218_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED",
+  "ingame_backlog_closed": false,
+  "notes": "Independent C machine QA reproduces all six source/localized bboxes exactly and finds zero changed/alpha/introduced pixels outside the source-bbox union. Actual in-game backlog rows remain governed by INGAME_REWORK_BACKLOG.csv and are not closed by this static pass."
+}

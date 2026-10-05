@@ -1592,3 +1592,9 @@ B157 promoted even index36 from `zoom_review` and produced candidate `0b430a505c
 
 ## 2026-10-06 01:24 KST — A79 index215 C05E67EF native-resolution production
 A79 candidate 0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b completes odd index215 C05E67EF production. A78 low-resolution nearest-neighbor Hangul was fail-closed by controller visual QA; A79 uses native 52px smooth-AA Black glyphs in the source yellow family. 6/6 exact bbox/size/positive-margin plus all zero-pixel gates PASS and readable/raw mirror_y visual PASS. Index215 is a79_self_qa_pass_pending_c; index209 stale pending state was reconciled to preserve-original/no-localizable; pending_artwork=4. Index95 37759842 remains P0 manual/template REWORK confirmed by user in-game screenshots and was not retried with rejected inpaint families. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-06 01:31 KST — C218
+- index215 C05E67EF A79 0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b -> C218_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME.
+- Independent direct DDS QA: 6/6 exact bbox/size/positive-margin; outside/alpha/introduced/source-residue/overlap/touch = 0; header 512x256 RGBA32 mip1 and raw mirror_y preserved.
+- C visual QA: A78 low-res/blocky retry remains rejected; A79 native smooth yellow/Black source-family render PASS.
+- pending-C=0; pending_artwork localize_text=4. User in-game fail backlog remains open (graphics queue 48/95/106); C218 closes none without a new in-game retest. RUNTIME_VALIDATION=UNTESTED.

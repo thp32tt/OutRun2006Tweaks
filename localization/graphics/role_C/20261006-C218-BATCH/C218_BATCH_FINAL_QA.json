@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261006-C218-BATCH",
+  "timestamp_kst": "2026-10-06T01:31:28+09:00",
+  "result": "C218_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "assets_checked": 1,
+  "physical_elements_checked": 6,
+  "pixel_visual_pass_assets": [
+    "C05E67EF"
+  ],
+  "rework_required_assets_from_this_C_run": [],
+  "candidate_changed_by_C": false,
+  "pending_c_after_reconcile": [],
+  "pending_production_localize_text": 4,
+  "legacy_c_returned_rework_remaining": [
+    "37759842"
+  ],
+  "active_user_ingame_graphics_rework_queue_indices": [
+    48,
+    95,
+    106
+  ],
+  "active_user_ingame_fail_rows_closed": 0,
+  "machine_evidence": {
+    "C05E67EF": "localization/graphics/role_C/20261006-C218-C05E67EF/C218_C05E67EF_MACHINE_QA.json"
+  },
+  "controller_evidence": {
+    "C05E67EF": "localization/graphics/role_C/20261006-C218-C05E67EF/C218_C05E67EF_CONTROLLER_FINAL_QA.json"
+  },
+  "not_consumed": {
+    "A8CE339F": "B161 worker output exists, but producer controller self-QA/shared-state promotion was not finalized at the C selection boundary; leave for a later C run after producer finalization.",
+    "37759842": "A81 worker output e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7 is present at refreshed HEAD and is static-QA PASS pending producer controller visual QA/new in-game retest; no finalized producer controller/shared-state promotion yet, so C218 does not pre-approve it."
+  },
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false,
+  "branch_head_refreshed_before_persist": "db7610bf9b40e341f7971d29d227edfeee66d784",
+  "git_sync_refreshed_at_kst": "2026-10-06T01:41:51+09:00"
+}
