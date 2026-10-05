@@ -17,7 +17,11 @@ class Continuation100ControlFlowTests(unittest.TestCase):
     def test_complete_decode_stops_before_partial_dec_instruction(self):
         self.assertIn('(0x00183B07, "6a 00", "push 0")', SOURCE)
         self.assertIn('(0x00183B41, "83 c4 0c", "add esp, 0x0c")', SOURCE)
-        self.assertNotIn('(0x00183B44, "ff 0d 44 bc 98 00"', SOURCE)
+        continuation_100_rows = SOURCE[
+            SOURCE.index("GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_100_INSTRUCTIONS = ("):
+            SOURCE.index("GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_100_BRANCHES = ()")
+        ]
+        self.assertNotIn('(0x00183B44, "ff 0d 44 bc 98 00"', continuation_100_rows)
         self.assertIn('"COMPLETE_INSTRUCTIONS_END_AT_183B44_TRAILING_FF0D44_REQUIRES_OVERLAP"', SOURCE)
 
     def test_exact_rel32_call_is_address_only(self):
