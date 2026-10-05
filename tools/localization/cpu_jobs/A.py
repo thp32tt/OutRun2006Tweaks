@@ -22,7 +22,7 @@ source=work/"E1639D2E_HD.dds"
 atlas=work/"4x_E1639D2E_256x64_atlas.json"
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 SOURCE_BLOB_SHA1="1a119356bf20b0116d408ffe510e62ec90fc0c53"
-ATLAS_BLOB_SHA1="7dea136122a164eeb72a53f060308410facd3fd9"
+ATLAS_BLOB_SHA1="2f72b399264f3f7326ec2bc00fff77afd9525031"
 BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
 urllib.request.urlretrieve(BASE+"/Release/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",source)
 urllib.request.urlretrieve(BASE+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_sumo_loading_Exst/4x_E1639D2E_256x64_atlas.json",atlas)
