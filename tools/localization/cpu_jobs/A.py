@@ -2,7 +2,7 @@
 import os,json,hashlib,struct,subprocess
 from pathlib import Path
 import numpy as np
-from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps
+from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps,ImageFilter
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
