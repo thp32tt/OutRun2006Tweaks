@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00424",
+  "production_id": "CONVERSION-DX9EX-00424",
+  "event_id": "CONVERSION-DX9EX-00424-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "f9ed5b2a3eb15425db377529b20dcc0eedb9cfd3",
+  "material_result_sha": "3c3c8366587b5b4e49f2be3dcfd2156446322d06",
+  "validation_bearing_result_sha": "3c3c8366587b5b4e49f2be3dcfd2156446322d06",
+  "result_sha": "3c3c8366587b5b4e49f2be3dcfd2156446322d06",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00424]",
+  "selected_work_item": "L3-DX9EX-001",
+  "summary": "Retired current-run DirectGPU Frame.v2 publications under the ring/slot seqlocks before DirectGPU slot COM teardown, removing the stale shared-handle observation window during Reset/resource invalidation while preserving monotonic transport generation and existing host ACK semantics.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00424.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered vr-d3d9ex-focus HEAD f9ed5b2a3eb15425db377529b20dcc0eedb9cfd3; reread AGENTS.md, VR_REFACTOR_STATE, VR_AUTODEV_STATE, problem/history ledgers, queue contract, recent refactor/test commits, and prior 00423 validation. Post-1100 structural chain remained explicitly COMPLETE."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Reviewed DirectGPU reset/resource lifetime after 00423. Published Frame.v2 entries could continue to expose left/right shared handles and transport generation while ReleaseStereoResources/ReleaseDirectTransportSlots released the underlying D3D9Ex slot COM objects, creating a bounded stale-publication window independent of host ACK state."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "3c3c8366587b5b4e49f2be3dcfd2156446322d06 added RetireDirectTransportFramePublications(), guarded by current run identity, and clears DirectGPU frameId/flag/handle/size/format/generation/slot fields under ring and slot seqlocks before both physical teardown wrappers release slot COM objects. Verifier pins ownership, ordering, and exact call count."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 3c3c8366587b5b4e49f2be3dcfd2156446322d06: DX9Ex Active Validation 37374436277 SUCCESS; policy 111979323107, host 111979628990, full-chain-compile 111979629011, game 111979629129, package 111981142518 all SUCCESS. Domain Isolation Guard 37374436186 SUCCESS."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "3c3c8366587b5b4e49f2be3dcfd2156446322d06 fix(vr): retire DirectGPU frame publications before teardown [AUTO:CONVERSION-DX9EX-00424]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Artifact 11371680445 OutRun2-VR-DX9EX-ACTIVE-3c3c8366587b5b4e49f2be3dcfd2156446322d06 digest sha256:f590f3396b05f338cf330096bca822226334a34d82d34d6743073723c8d81abc. CI evidence only; not HMD proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37374436277,
+      "conclusion": "success",
+      "exact_sha": "3c3c8366587b5b4e49f2be3dcfd2156446322d06",
+      "jobs": {
+        "policy": 111979323107,
+        "host": 111979628990,
+        "full_chain_compile": 111979629011,
+        "game": 111979629129,
+        "package": 111981142518
+      },
+      "package_artifact_id": 11371680445,
+      "package_artifact_digest": "sha256:f590f3396b05f338cf330096bca822226334a34d82d34d6743073723c8d81abc"
+    },
+    "domain_isolation": {
+      "run_id": 37374436186,
+      "conclusion": "success",
+      "exact_sha": "3c3c8366587b5b4e49f2be3dcfd2156446322d06"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Continue the next independent DX9Ex lifecycle/stability unit from the latest branch HEAD. Do not treat runtime/HMD behavior as verified until actual Quest3/VDXR evidence exists.",
+  "completed_at_kst": "2026-10-06T06:18:47+09:00"
+}
