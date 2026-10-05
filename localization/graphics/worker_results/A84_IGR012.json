@@ -1,0 +1,24 @@
+{
+  "run": "20261006-A-PRODUCTION84-IGR012",
+  "regression": "IGR-012",
+  "assets": [
+    "A064FDFC",
+    "48DEBE77"
+  ],
+  "candidate_sha256": {
+    "A064FDFC": "a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f",
+    "48DEBE77": "d1e216b41aba01cb184205c23404d9f67c9ef392499ecc58f38264b13c47d141"
+  },
+  "bbox_size_margin": {
+    "A064FDFC": "2/2 PASS",
+    "48DEBE77": "3/3 PASS"
+  },
+  "outside": {
+    "A064FDFC": 0,
+    "48DEBE77": 0
+  },
+  "source_face_residue_48_clean_plate": 0,
+  "worker_status": "A84_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION84-IGR012/A84_IGR012_REPORT.json"
+}

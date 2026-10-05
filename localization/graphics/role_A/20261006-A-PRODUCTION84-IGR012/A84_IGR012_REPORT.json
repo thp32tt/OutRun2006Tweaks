@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION84-IGR012",
+  "regression": "IGR-012",
+  "screenshot": "스크린샷(157).png",
+  "mapping": {
+    "status": "EXACT_HIGH_CONFIDENCE_MULTI_ASSET",
+    "primary_queue_index": 60,
+    "primary_asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+    "secondary_queue_index": 63,
+    "secondary_asset": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+    "basis": "A064 contains both baked OUTRUN MILES variants visible in the reported banner; 48DEBE77 contains the paired START/GOAL route badge art. Dynamic numeric meter is protected runtime content; no runtime-text edit is made."
+  },
+  "assets": {
+    "A064FDFC": {
+      "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "input_candidate_sha256": "f822c0727e8ce9c8d0b801fe5a39dd870c43a30d872819c42829040e14474665",
+      "candidate_sha256": "a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f",
+      "rows": [
+        {
+          "key": "outrun_miles_white",
+          "source": "OUTRUN MILES!",
+          "korean": "아웃런 마일!",
+          "source_effect_bbox": [
+            1090,
+            245,
+            1930,
+            385
+          ],
+          "localized_bbox": [
+            1096,
+            262,
+            1566,
+            347
+          ],
+          "source_size": [
+            840,
+            140
+          ],
+          "localized_size": [
+            470,
+            85
+          ],
+          "delta_left": 6,
+          "delta_right": 364,
+          "delta_top": 17,
+          "delta_bottom": 38,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "positive_margin": "PASS",
+          "neighbor_positive_separation_px": 2,
+          "font": "Noto Sans CJK KR:style=Black",
+          "font_size": 92,
+          "shear": 0.22,
+          "style": "white"
+        },
+        {
+          "key": "outrun_miles",
+          "source": "OUTRUN MILES:",
+          "korean": "아웃런 마일:",
+          "source_effect_bbox": [
+            2081,
+            250,
+            2860,
+            370
+          ],
+          "localized_bbox": [
+            2087,
+            268,
+            2515,
+            345
+          ],
+          "source_size": [
+            779,
+            120
+          ],
+          "localized_size": [
+            428,
+            77
+          ],
+          "delta_left": 6,
+          "delta_right": 345,
+          "delta_top": 18,
+          "delta_bottom": 25,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "positive_margin": "PASS",
+          "neighbor_positive_separation_px": 2,
+          "font": "Noto Sans CJK KR:style=Black",
+          "font_size": 84,
+          "shear": 0.22,
+          "style": "yellow"
+        }
+      ],
+      "changes_outside_two_source_bboxes": 0,
+      "alpha_changes_outside_two_source_bboxes": 0,
+      "header_128_exact": true,
+      "raw_orientation": "mirror_y"
+    },
+    "48DEBE77": {
+      "source_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+      "input_candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+      "candidate_sha256": "d1e216b41aba01cb184205c23404d9f67c9ef392499ecc58f38264b13c47d141",
+      "rows": [
+        {
+          "key": "start_top",
+          "source": "START",
+          "korean": "출발",
+          "source_effect_bbox": [
+            124,
+            502,
+            348,
+            566
+          ],
+          "localized_bbox": [
+            178,
+            504,
+            293,
+            564
+          ],
+          "source_size": [
+            224,
+            64
+          ],
+          "localized_size": [
+            115,
+            60
+          ],
+          "delta_left": 54,
+          "delta_right": 55,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "positive_margin": "PASS",
+          "font": "Noto Sans CJK KR:style=Black",
+          "font_size": 65,
+          "shear": 0.18
+        },
+        {
+          "key": "start_bottom",
+          "source": "START",
+          "korean": "출발",
+          "source_effect_bbox": [
+            124,
+            1540,
+            348,
+            1596
+          ],
+          "localized_bbox": [
+            186,
+            1542,
+            286,
+            1594
+          ],
+          "source_size": [
+            224,
+            56
+          ],
+          "localized_size": [
+            100,
+            52
+          ],
+          "delta_left": 62,
+          "delta_right": 62,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "positive_margin": "PASS",
+          "font": "Noto Sans CJK KR:style=Black",
+          "font_size": 56,
+          "shear": 0.18
+        },
+        {
+          "key": "goal",
+          "source": "GOAL",
+          "korean": "골",
+          "source_effect_bbox": [
+            1650,
+            26,
+            1802,
+            62
+          ],
+          "localized_bbox": [
+            1710,
+            28,
+            1742,
+            60
+          ],
+          "source_size": [
+            152,
+            36
+          ],
+          "localized_size": [
+            32,
+            32
+          ],
+          "delta_left": 60,
+          "delta_right": 60,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "positive_margin": "PASS",
+          "font": "Noto Sans CJK KR:style=Black",
+          "font_size": 36,
+          "shear": 0.18
+        }
+      ],
+      "changes_outside_three_badge_cells": 0,
+      "source_face_residue_in_clean_plate": 0,
+      "header_128_preserved_from_2048_candidate": true,
+      "raw_orientation": "mirror_y",
+      "construction": "canonical stock source artwork resampled 4x special-case baseline; fresh native-resolution Korean glyphs; no old Korean raster reuse"
+    }
+  },
+  "producer_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "A84_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
