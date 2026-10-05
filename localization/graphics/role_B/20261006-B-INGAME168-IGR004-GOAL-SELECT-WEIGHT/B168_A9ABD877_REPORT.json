@@ -913,7 +913,21 @@
     "localized_overlap_pixels": 0,
     "status": "PASS"
   },
-  "visual_qa": "PENDING_CONTROLLER_SELF_QA_AFTER_B167_WEIGHT_FAIL",
+  "visual_qa": "PASS_CONTROLLER_SELF_QA",
   "runtime_validation": "PENDING_NEW_INGAME_RETEST",
-  "status": "B168_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B168_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "compute_execution": {
+    "preferred": "github-hosted",
+    "workflow_run_id": 37366457547,
+    "attempt_1": "CANCELLED_BEFORE_COMPUTE",
+    "attempt_2": "SUCCESS",
+    "authoritative_worker_output_commit": "0895f3d8cd99eec751b589f727353d3c9b691f3f",
+    "n100_fallback_attempt": {
+      "used_while_attempt_2_queued": true,
+      "candidate_sha256": "d391632d92f0337e1ca856c3de1a93a06ef4d3dae702b5f3bc613c96e28507d6",
+      "result": "DISCARDED_RENDER_ENVIRONMENT_VARIANCE",
+      "authoritative_candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+      "note": "GitHub-hosted run 37366457547 attempt 1 was cancelled. Attempt 2 remained queued without runner allocation for about 9 minutes, so the contract-authorized N100 MCP fallback was attempted while waiting. That fallback rendered SHA d391632d92f0337e1ca856c3de1a93a06ef4d3dae702b5f3bc613c96e28507d6, but the hosted retry later completed successfully with authoritative SHA a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8 and worker commit 0895f3d8cd99eec751b589f727353d3c9b691f3f. The N100 fallback was discarded because the two render environments produced different font-raster bytes; only the hosted result is promoted."
+    }
+  }
 }

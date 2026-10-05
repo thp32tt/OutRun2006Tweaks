@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B168",
+  "timestamp_kst": "2026-10-06T05:26:07+09:00",
+  "scope": "B-owned active P1 IGR-004 screenshot(146) Goal Select. Completed/PASS assets were not repeated except where user in-game evidence explicitly reopened the visible family.",
+  "user_ingame_regression": [
+    "IGR-004",
+    "스크린샷(146).png"
+  ],
+  "mapping": {
+    "domain": "GRAPHICS",
+    "status": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+    "assets": [
+      {
+        "queue_index": 201,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+        "binding": "GOALS/STAGES/Special + 14 canonical stage-name rows used by Goal Select/showroom family",
+        "action": "material native-resolution rework; A69 19px->4x low-resolution path superseded"
+      },
+      {
+        "queue_index": 215,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+        "binding": "GOAL A-E + 15-course goal-list labels",
+        "action": "preserved current A79/C218 native-resolution static-PASS candidate byte-exact",
+        "candidate_sha256": "0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b"
+      }
+    ],
+    "runtime_text_required": false,
+    "controller_evidence": "Backlog requires goal-list + header mapping. C05E67EF canonically contains GOAL A-E/15con. and already passed A79 native-resolution + C218 independent static QA. A9ABD877 contains the GOALS/STAGES/Special and stage-name family; A69 metadata explicitly used lowres_font_size=19 and pixel_scale=4, directly matching the screenshot-confirmed LOW_RES_FONT failure."
+  },
+  "a9abd877": {
+    "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+    "superseded_a69_candidate_sha256": "59b21fa3aadf86e892dbd6adee4b178b2dad09048fd314fd731135f363d6a6fe",
+    "b167_native_retry_sha256": "f4b4fab4673516f793997bb3dac132c2ceb23a7f2378808d589e2ab78f0cbeb7",
+    "candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+    "physical_elements_reworked": 17,
+    "bbox_size_positive_margin": "17/17 PASS",
+    "native_resolution_rows": 17,
+    "glyph_upscale_rows": 0,
+    "horizontal_scaled_rows": 0,
+    "tracking_rows": 0,
+    "changed_outside_pixels": 0,
+    "alpha_outside_pixels": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "localized_overlap_pixels": 0
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_evidence": [
+    "localization/graphics/role_B/20261006-B-INGAME168-IGR004-GOAL-SELECT-WEIGHT/B168_SOURCE_OLD_CLEAN_FINAL_ROWS.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME168-IGR004-GOAL-SELECT-WEIGHT/B168_FULL_SOURCE_FINAL.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME168-IGR004-GOAL-SELECT-WEIGHT/B168_FULL_OLD_FINAL.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME168-IGR004-GOAL-SELECT-WEIGHT/B168_RAW_OLD_FINAL.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION79-C05/A79_C05_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION79-C05/A79_C05_RAW_COMPARE.jpg"
+  ],
+  "controller_visual_note": "B167 successfully removed the historical low-resolution upscale but its smooth native glyph weight was visibly too light versus the source condensed-bold family, so it was rejected rather than promoted. B168 retains direct native 2048x2048 rendering and adds same-fill weight reinforcement. SOURCE/OLD/CLEAN/FINAL high-zoom and full-atlas review shows source-family heavy weight/alignment, smooth native Hangul, no broken glyphs, clipping, source residue, overlap, seam, foreign-image intrusion, or protected Night Bird/Radiation damage. Raw mirror_y review is consistent. C05 goal labels remain the existing native A79/C218 result.",
+  "compute_execution": {
+    "preferred": "github-hosted",
+    "workflow_run_id": 37366457547,
+    "attempt_1": "CANCELLED_BEFORE_COMPUTE",
+    "attempt_2": "SUCCESS",
+    "authoritative_worker_output_commit": "0895f3d8cd99eec751b589f727353d3c9b691f3f",
+    "n100_fallback_attempt": {
+      "used_while_attempt_2_queued": true,
+      "candidate_sha256": "d391632d92f0337e1ca856c3de1a93a06ef4d3dae702b5f3bc613c96e28507d6",
+      "result": "DISCARDED_RENDER_ENVIRONMENT_VARIANCE",
+      "authoritative_candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+      "note": "GitHub-hosted run 37366457547 attempt 1 was cancelled. Attempt 2 remained queued without runner allocation for about 9 minutes, so the contract-authorized N100 MCP fallback was attempted while waiting. That fallback rendered SHA d391632d92f0337e1ca856c3de1a93a06ef4d3dae702b5f3bc613c96e28507d6, but the hosted retry later completed successfully with authoritative SHA a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8 and worker commit 0895f3d8cd99eec751b589f727353d3c9b691f3f. The N100 fallback was discarded because the two render environments produced different font-raster bytes; only the hosted result is promoted."
+    }
+  },
+  "worker_report": "localization/graphics/role_B/20261006-B-INGAME168-IGR004-GOAL-SELECT-WEIGHT/B168_A9ABD877_REPORT.json",
+  "status": "B168_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

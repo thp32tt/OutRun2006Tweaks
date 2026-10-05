@@ -2011,3 +2011,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - IGR-001 -> A88_STATIC_PASS_PENDING_C_AND_INGAME_RETEST. NEW actual game evidence is still mandatory for closure. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_IGR001_REPORT.json`, `localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_CONTROLLER_SELF_QA.json`. RUNTIME_VALIDATION=PENDING_NEW_INGAME_RETEST.
 
+
+## 2026-10-06T05:26:07+09:00 - B168 IGR-004 GOAL SELECT REWORK
+
+- Exact multi-asset GRAPHICS mapping: A9ABD877 index201 = GOALS/STAGES/Special + 14 canonical stage-name rows; C05E67EF index215 = GOAL A-E + 15-course goal-list; no runtime text edit needed for mapped visible labels.
+- A9 historical A69 used lowres_font_size=19 with pixel_scale=4. B167 removed the upscale path but controller visual QA rejected its underweight source-family style. B168 rerendered all 17 A9 localized rows directly at 2048x2048 with source-family weight reinforcement.
+- B168 A9 candidate: a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8; 17/17 bbox/size/positive-margin PASS; changed/alpha outside=0; protected/render-protected/localized overlap=0; raw mirror_y checked.
+- C05E67EF A79/C218 candidate 0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b was already native-resolution/static PASS and remains byte-exact; no duplicate production.
+- Compute placement: hosted run 37366457547 attempt 1 cancelled; attempt 2 later SUCCESS and pushed authoritative worker commit 0895f3d. While retry was queued ~9 minutes, contract-authorized N100 MCP fallback ran the same script but produced font-raster SHA d391632d...; this non-authoritative fallback was discarded after hosted SHA a7a4ea10... arrived.
+- Controller visual QA: PASS. IGR-004 remains B_STATIC_PASS_PENDING_C_AND_INGAME_RETEST; independent C + NEW actual in-game retest required before closure.
+- Existing verify_state baseline remains FAIL for pre-existing artwork-plan/action-count drift; this B168 work does not alter action categories.
+- VR/FFB/DX11/DXVK: untouched.
