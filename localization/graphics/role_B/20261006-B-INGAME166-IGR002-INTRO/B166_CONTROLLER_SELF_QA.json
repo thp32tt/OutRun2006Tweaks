@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B166",
+  "timestamp_kst": "2026-10-06T04:23:30+09:00",
+  "scope": "B-owned active P1 IGR-002 screenshot(144) Heart Attack intro. Completed/PASS assets were reopened only because newer user in-game evidence overrides C157/C158 static PASS.",
+  "user_ingame_regression": [
+    "IGR-002",
+    "스크린샷(144).png"
+  ],
+  "mapping": {
+    "domain": "GRAPHICS",
+    "status": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+    "assets": [
+      {
+        "queue_index": 212,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+        "binding": "large red HEART ATTACK title + SHOWROOM state",
+        "action": "title reworked; SHOWROOM preserved"
+      },
+      {
+        "queue_index": 188,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+        "binding": "Heart Attack help description",
+        "action": "help row reworked"
+      },
+      {
+        "queue_index": 220,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+        "binding": "gray HEART ATTACK/TIME ATTACK selector rows",
+        "action": "preserved current exact static-PASS hierarchy",
+        "candidate_sha256": "6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5"
+      }
+    ],
+    "runtime_text_required": false,
+    "controller_evidence": "User screenshot(144) visible strings match the three canonical atlas families exactly; no localization runtime draw path is needed for these visible labels."
+  },
+  "assets": {
+    "BA0147DA": {
+      "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "superseded_candidate_sha256": "869cf1bea8b27dcc89f5b2ab68f9dd163e4bf41fa6de4b53c7b3f19b3b1c74ad",
+      "candidate_sha256": "f5838261bd2015ade657d51f45175f1ef1c0351252c6505dc5eaf985be54d5a1",
+      "row": {
+        "source": "HEART ATTACK",
+        "korean": "하트 어택",
+        "original_bbox": [
+          21,
+          1316,
+          1780,
+          1474
+        ],
+        "localized_bbox": [
+          25,
+          1322,
+          618,
+          1468
+        ],
+        "source_size": [
+          1759,
+          158
+        ],
+        "localized_size": [
+          593,
+          146
+        ],
+        "delta_left": 4,
+        "delta_right": 1162,
+        "delta_top": 6,
+        "delta_bottom": 6,
+        "font_size": 158,
+        "font": "Noto Sans CJK KR Black"
+      },
+      "machine_qa": {
+        "bbox_size_positive_margin": "1/1 PASS",
+        "changed_outside": 0,
+        "alpha_outside": 0,
+        "protected_changed": 0,
+        "render_protected_overlap": 0
+      }
+    },
+    "8C259C68": {
+      "source_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+      "superseded_candidate_sha256": "03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03",
+      "candidate_sha256": "8da8dbf1d5f577605e2268841667fdd64636f4358f27e17103587ee032c2575c",
+      "row": {
+        "source": "Try to win Hearts by meeting your girlfriend's demands!",
+        "korean": "여자친구의 요구를 들어주고 하트를 획득하세요!",
+        "original_bbox": [
+          0,
+          1417,
+          1623,
+          1488
+        ],
+        "localized_bbox": [
+          4,
+          1421,
+          1274,
+          1484
+        ],
+        "source_size": [
+          1623,
+          71
+        ],
+        "localized_size": [
+          1270,
+          63
+        ],
+        "delta_left": 4,
+        "delta_right": 349,
+        "delta_top": 4,
+        "delta_bottom": 4,
+        "font_size": 65,
+        "font": "Noto Sans CJK KR Bold"
+      },
+      "machine_qa": {
+        "bbox_size_positive_margin": "1/1 PASS",
+        "changed_outside": 0,
+        "alpha_outside": 0,
+        "protected_changed": 0,
+        "render_protected_overlap": 0
+      }
+    }
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_evidence": [
+    "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_BA_heart_attack_title_SOURCE_OLD_CLEAN_FINAL_2X.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_8C_heart_attack_help_SOURCE_OLD_CLEAN_FINAL_2X.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_BA_FULL_OLD_FINAL.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_8C_FULL_OLD_FINAL.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_BA_RAW_OLD_FINAL.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_8C_RAW_OLD_FINAL.jpg"
+  ],
+  "controller_visual_note": "PASS: compared SOURCE/OLD/CLEAN/B166 and raw mirror_y. Large 하트 어택 now uses more of the source title height with smooth native Black edges rather than the visibly undersized prior raster; the Heart Attack help row is raised from the prior compact 52px footprint to a source-relative 63px native Bold footprint while retaining the exact dark help-copy color and left anchor. No source-script residue, broken glyph, clipping, overlap, protected-art damage, seam, other-image intrusion or orientation regression. D657 gray tab hierarchy is intentionally preserved because its rows already nearly fill their source heights and represent the source selected/unselected hierarchy.",
+  "worker_output_commit": "6ee689d",
+  "worker_report": "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_IGR002_REPORT.json",
+  "status": "B166_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

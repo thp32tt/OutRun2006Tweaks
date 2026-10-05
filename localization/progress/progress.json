@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T03:51:50+09:00",
+  "updated_at_kst": "2026-10-06T04:23:30+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B165 resolved B-owned P0 IGR-005 mapping from SUSPECTED/MIXED queue106 to exact GRAPHICS queue137 30CF0D using user screenshot(147): visible 변속 방식 선택, 자동/수동, small 변속 방식 and AT/MT all bind to 30CF0D. Same invocation produced candidate 0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4 with title/subtitle shortened to 변속기 선택/변속기 at native HD; MANUAL/AUTOMATIC x4 byte-exact. 2/2 bbox+size+positive margins; changed/alpha outside=0, protected=0, render overlap=0; controller SOURCE/OLD/CLEAN/FINAL+full/raw PASS. IGR-005 B static PASS pending independent C + NEW actual in-game retest; not closed. 788CE557 is IGR-017 only.",
+  "next_checkpoint": "B166 completed B-owned P1 IGR-002 screenshot(144) exact GRAPHICS multi-asset mapping: BA0147DA large Heart Attack title/Showroom state, 8C259C68 help copy, D657C2EB gray Heart/Time selector. Material rework candidates BA f5838261bd2015ade657d51f45175f1ef1c0351252c6505dc5eaf985be54d5a1 and 8C 8da8dbf1d5f577605e2268841667fdd64636f4358f27e17103587ee032c2575c use more source-relative height at native HD; D657 6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5 preserved. Both touched rows 1/1 bbox+size+positive-margin and outside/alpha/protected/render-overlap=0; controller SOURCE/OLD/CLEAN/FINAL+full/raw visual PASS. IGR-002 B static PASS pending independent C + NEW actual in-game retest; not closed.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -268,11 +268,13 @@
       "status": "PENDING_C_AND_INGAME_RETEST",
       "assets": [],
       "remaining": 0,
-      "note": "B165 30CF0D, B164 B1696633 and B163 788CE557 producer static PASS pending independent C + NEW in-game retests. Remaining B-owned P1 rows require exact source/runtime mapping.",
+      "note": "B166 BA0147DA+8C259C68 IGR-002 plus prior B pending-C candidates await independent C/new in-game retest; next B open P1 rows require exact mapping.",
       "pending_c": [
         "788CE557",
         "B1696633",
-        "30CF0D"
+        "30CF0D",
+        "BA0147DA",
+        "8C259C68"
       ]
     },
     "latest_d_final_qa": {
@@ -338,34 +340,40 @@
       "in_game_validation": "37759842 PENDING_NEW_INGAME_RETEST; IGR-014/015/016 not CLOSED."
     },
     "latest_b_first_qa": {
-      "run": "B_INGAME165",
-      "worker_output_commit": "e127a62",
-      "result": "IGR005_30CF0D_EXACT_MAPPING_AND_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME_RETEST",
+      "run": "B_INGAME166",
+      "worker_output_commit": "6ee689d",
+      "result": "IGR002_HEART_ATTACK_INTRO_MULTI_ASSET_SELF_QA_PASS_PENDING_C_AND_INGAME_RETEST",
       "assets": {
-        "30CF0D": {
-          "queue_index": 137,
-          "owner_lane_override": "B",
-          "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
-          "superseded_candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
-          "candidate_sha256": "0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4",
-          "status": "B165_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
-          "report": "localization/graphics/role_B/20261006-B-INGAME165-30CF-TRANSMISSION-MODAL/B165_30CF0D_REPORT.json",
-          "controller_report": "localization/graphics/role_B/20261006-B-INGAME165-30CF-TRANSMISSION-MODAL/B165_CONTROLLER_SELF_QA.json",
-          "physical_elements_reworked": 2,
-          "bbox_size_positive_margin": "2/2 PASS",
-          "changed_outside_pixels": 0,
+        "BA0147DA": {
+          "queue_index": 212,
+          "candidate_sha256": "f5838261bd2015ade657d51f45175f1ef1c0351252c6505dc5eaf985be54d5a1",
+          "superseded_candidate_sha256": "869cf1bea8b27dcc89f5b2ab68f9dd163e4bf41fa6de4b53c7b3f19b3b1c74ad",
+          "status": "B166_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+          "report": "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_IGR002_REPORT.json",
+          "controller_report": "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_CONTROLLER_SELF_QA.json",
+          "physical_elements_reworked": 1,
+          "bbox_size_positive_margin": "1/1 PASS",
+          "outside_pixels": 0,
           "alpha_outside_pixels": 0,
-          "protected_changed_pixels": 0,
-          "manual_automatic_rows_changed_pixels": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "user_ingame_regressions": [
-            "IGR-005"
-          ],
-          "mapping": "EXACT_HIGH_CONFIDENCE_GRAPHICS"
+          "protected_pixels": 0
+        },
+        "8C259C68": {
+          "queue_index": 188,
+          "candidate_sha256": "8da8dbf1d5f577605e2268841667fdd64636f4358f27e17103587ee032c2575c",
+          "superseded_candidate_sha256": "03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03",
+          "status": "B166_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+          "report": "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_IGR002_REPORT.json",
+          "controller_report": "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_CONTROLLER_SELF_QA.json",
+          "physical_elements_reworked": 1,
+          "bbox_size_positive_margin": "1/1 PASS",
+          "outside_pixels": 0,
+          "alpha_outside_pixels": 0,
+          "protected_pixels": 0
+        },
+        "D657C2EB": {
+          "queue_index": 220,
+          "candidate_sha256": "6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5",
+          "status": "PRESERVED_CURRENT_STATIC_PASS_LINKED_IGR002"
         }
       },
       "runtime_validation": "PENDING_NEW_INGAME_RETEST"
@@ -1508,7 +1516,9 @@
     "current_pending_c": [
       "788CE557",
       "B1696633",
-      "30CF0D"
+      "30CF0D",
+      "BA0147DA",
+      "8C259C68"
     ],
     "c201_55b57cde": {
       "timestamp_kst": "2026-10-05T21:27:02+09:00",
