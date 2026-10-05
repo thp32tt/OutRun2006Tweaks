@@ -1128,8 +1128,8 @@
       "runtime_validation": "UNTESTED"
     },
     "current_pending_artwork_localize_text": 17,
-    "current_producer_rework_remaining": 2,
-    "latest_a_production_batch": "localization/graphics/role_A/20261005-A-PRODUCTION36/A36_560FA536_REPORT.json",
+    "current_producer_rework_remaining": 3,
+    "latest_a_production_batch": "localization/graphics/role_A/20261005-A-PRODUCTION38/A38_560FA536_REPORT.json",
     "a_production20_9ce4e175": {
       "timestamp_kst": "2026-10-05T02:45:00+09:00",
       "index": 195,
@@ -1158,7 +1158,8 @@
     },
     "current_producer_rework_assets": [
       "63C91067",
-      "C598919A"
+      "C598919A",
+      "37759842"
     ],
     "a_production26_2ea557b4": {
       "timestamp_kst": "2026-10-05T14:52:10+09:00",
@@ -1178,15 +1179,15 @@
       "runtime_validation": "UNTESTED",
       "c_final_qa": "C165_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
     },
-    "latest_a_production_candidate_sha256": "4b4dbb1f645c526fb812e500c01a0fa03894dc1aff2267682ea9f8b283c05744",
-    "latest_a_controller_self_qa": "localization/graphics/role_A/20261005-A-PRODUCTION36/A36_CONTROLLER_SELF_QA.json",
+    "latest_a_production_candidate_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+    "latest_a_controller_self_qa": "localization/graphics/role_A/20261005-A-PRODUCTION38/A38_CONTROLLER_SELF_QA.json",
     "pending_c_from_a": [
-      "37759842",
       "560FA536"
     ],
     "pending_c_from_b": [
       "A05BF610"
-    ]
+    ],
+    "latest_a_rework_attempt": "localization/graphics/role_A/20261005-A-PRODUCTION40/A40_CONTROLLER_REWORK.json"
   },
   "runtime_packages": {
     "k1": {
