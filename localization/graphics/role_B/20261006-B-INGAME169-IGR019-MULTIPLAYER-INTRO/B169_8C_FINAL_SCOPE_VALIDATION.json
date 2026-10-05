@@ -1,0 +1,19 @@
+{
+  "source": "/tmp/b169_8C/old.png",
+  "candidate": "/tmp/b169_8C/final.png",
+  "size": [
+    2048,
+    2048
+  ],
+  "changed_pixels": 28480,
+  "changed_bbox": [
+    13,
+    1102,
+    854,
+    1162
+  ],
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "status": "PASS"
+}

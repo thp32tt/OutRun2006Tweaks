@@ -1,0 +1,29 @@
+{
+  "assets": {
+    "97E": {
+      "queue_index": 193,
+      "candidate_sha256": "f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69",
+      "bbox_size_positive_margin": "1/1 PASS",
+      "changed_pixels": 9532,
+      "changed_outside_target_bbox": 0,
+      "alpha_changed_outside_target_bbox": 0,
+      "protected_changed_pixels": 0,
+      "render_protected_overlap_pixels": 0,
+      "exact_source_residue_pixels": 0,
+      "status": "PASS"
+    },
+    "8C": {
+      "queue_index": 188,
+      "candidate_sha256": "9fe3804a70d93277ede4e16ac8073057c6a9d969a893d05cde522d14a1f91b4d",
+      "bbox_size_positive_margin": "1/1 PASS",
+      "changed_pixels": 28480,
+      "changed_outside_target_bbox": 0,
+      "alpha_changed_outside_target_bbox": 0,
+      "protected_changed_pixels": 0,
+      "render_protected_overlap_pixels": 0,
+      "exact_source_residue_pixels": 0,
+      "status": "PASS"
+    }
+  },
+  "status": "PASS"
+}

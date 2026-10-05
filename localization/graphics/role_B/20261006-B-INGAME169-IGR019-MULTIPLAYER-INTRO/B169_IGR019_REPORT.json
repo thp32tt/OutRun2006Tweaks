@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO",
+  "base_head": "700357b12f0d0acbc92b04430795da206e7cb678",
+  "user_ingame_regression": [
+    "IGR-019",
+    "스크린샷(142).png"
+  ],
+  "owner_lane": "B",
+  "mapping": {
+    "status": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+    "domain": "GRAPHICS",
+    "visible_bindings": [
+      {
+        "screen": "WELCOME TO THE / MULTIPLAYER intro body",
+        "asset": "97E863AD",
+        "queue_index": 193,
+        "source": "MULTIPLAYER",
+        "action": "REWORKED_NATIVE",
+        "preserved": "A89R WELCOME TO THE native row"
+      },
+      {
+        "screen": "multiplayer intro help copy",
+        "asset": "8C259C68",
+        "queue_index": 188,
+        "source": "Online and LAN OutRun for up to 6 players",
+        "action": "REWORKED_NATIVE",
+        "preserved": "A88 C2C help + B166 Heart Attack help + all unrelated rows"
+      }
+    ],
+    "runtime_text_required": false,
+    "excluded_completed_asset": {
+      "asset": "4D38BBB0",
+      "queue_index": 154,
+      "reason": "B60/C141 already renders both MULTIPLAYER physical rows natively at 4096x1024 with source-family red/gray styles; screenshot-confirmed low-resolution defect is explained by still-upscaled 97E/8C rows and completed 4D38 is not repeated."
+    },
+    "note": "IGR-019 belongs to the same front-end intro/help family as IGR-001/002. Current metadata proves the screenshot-visible 97E MULTIPLAYER row remained A70 12px->4x and the 8C Online/LAN help row remained B82 12px->4x, while A89R only fixed 97E WELCOME/SHOWROOM and A88/B166 fixed different 8C rows."
+  },
+  "assets": {
+    "97E": {
+      "queue_index": 193,
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+      "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "superseded_candidate_sha256": "cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418",
+      "candidate_sha256": "f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+      "structure": {
+        "width": 2048,
+        "height": 1024,
+        "pitch": 8192,
+        "mips": 1,
+        "pf_flags": 65,
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "raw_mode": "RGBA",
+        "header_128_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "row": {
+        "key": "multiplayer_intro_title",
+        "source": "MULTIPLAYER",
+        "korean": "멀티플레이",
+        "original_bbox": [
+          8,
+          297,
+          540,
+          359
+        ],
+        "localized_bbox": [
+          10,
+          300,
+          274,
+          356
+        ],
+        "source_size": [
+          532,
+          62
+        ],
+        "localized_size": [
+          264,
+          56
+        ],
+        "delta_left": 2,
+        "delta_right": 266,
+        "delta_top": 3,
+        "delta_bottom": 3,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "font": "Noto Sans CJK KR Black",
+        "font_size": 60,
+        "fill_rgba": [
+          78,
+          96,
+          100,
+          255
+        ],
+        "alignment": "left",
+        "native_resolution_render": true,
+        "upscaled_old_korean_reused": false
+      },
+      "zero_pixel_qa": {
+        "changed_pixels": 9532,
+        "changed_outside_target_bbox": 0,
+        "alpha_changed_outside_target_bbox": 0,
+        "protected_changed_pixels": 0,
+        "render_protected_overlap_pixels": 0,
+        "exact_source_residue_pixels": 0,
+        "status": "PASS"
+      }
+    },
+    "8C": {
+      "queue_index": 188,
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+      "source_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+      "superseded_candidate_sha256": "00e16af1e3d468667fe13ed5291ec55bbfd06f18e6895a6be7e79f413ade94bd",
+      "candidate_sha256": "9fe3804a70d93277ede4e16ac8073057c6a9d969a893d05cde522d14a1f91b4d",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+      "structure": {
+        "width": 2048,
+        "height": 2048,
+        "pitch": 8192,
+        "mips": 1,
+        "pf_flags": 65,
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "raw_mode": "RGBA",
+        "header_128_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "row": {
+        "key": "multiplayer_help",
+        "source": "Online and LAN OutRun for up to 6 players",
+        "korean": "온라인/LAN 아웃런 최대 6인 플레이",
+        "original_bbox": [
+          10,
+          1099,
+          1243,
+          1165
+        ],
+        "localized_bbox": [
+          13,
+          1102,
+          854,
+          1162
+        ],
+        "source_size": [
+          1233,
+          66
+        ],
+        "localized_size": [
+          841,
+          60
+        ],
+        "delta_left": 3,
+        "delta_right": 389,
+        "delta_top": 3,
+        "delta_bottom": 3,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "font": "Noto Sans CJK KR Bold",
+        "font_size": 57,
+        "fill_rgba": [
+          63,
+          71,
+          74,
+          255
+        ],
+        "alignment": "left",
+        "native_resolution_render": true,
+        "upscaled_old_korean_reused": false
+      },
+      "zero_pixel_qa": {
+        "changed_pixels": 28480,
+        "changed_outside_target_bbox": 0,
+        "alpha_changed_outside_target_bbox": 0,
+        "protected_changed_pixels": 0,
+        "render_protected_overlap_pixels": 0,
+        "exact_source_residue_pixels": 0,
+        "status": "PASS"
+      }
+    }
+  },
+  "method": "User in-game LOW_RES_FONT override: replace only the two proven legacy 4x-upscaled Korean rows with direct canonical-HD Noto CJK rendering from validated clean plates; preserve all newer native intro-family fixes and protected artwork byte-for-pixel outside the exact source bboxes.",
+  "visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "B169_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}

@@ -1,0 +1,19 @@
+{
+  "source": "/tmp/b169_8C_source.png",
+  "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_8C_TARGET_CLEAN.png",
+  "size": [
+    2048,
+    2048
+  ],
+  "changed_pixels": 30008,
+  "changed_bbox": [
+    10,
+    1099,
+    1243,
+    1165
+  ],
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "status": "PASS"
+}
