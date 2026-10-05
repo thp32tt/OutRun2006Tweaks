@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T20:28:46+09:00",
+  "role": "C",
+  "run": "20261005-C195-C196-BATCH",
+  "assets_checked": 2,
+  "physical_elements_checked": 17,
+  "results": [
+    {
+      "qa_id": "C195",
+      "index": 159,
+      "asset": "4EDA9DE3",
+      "candidate_sha256": "8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5",
+      "machine_status": "PASS",
+      "controller_visual_qa": "PASS",
+      "decision": "C195_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "report": "localization/graphics/role_C/20261005-C195-4EDA9DE3/C195_4EDA9DE3_CONTROLLER_FINAL_QA.json"
+    },
+    {
+      "qa_id": "C196",
+      "index": 30,
+      "asset": "8215FD25",
+      "candidate_sha256": "04d2c23333999873b7f467d0a8647c1056f40fa3bcd06e0174711bb2345277ba",
+      "producer_machine_status": "PASS_REPORTED",
+      "controller_visual_qa": "FAIL_CLEAN_PLATE_STARBURST_RECONSTRUCTION_ARTIFACT",
+      "decision": "C196_REWORK_REQUIRED_STARBURST_CLEAN_PLATE_RECONSTRUCTION_ARTIFACT",
+      "report": "localization/graphics/role_C/20261005-C196-8215FD25/C196_8215FD25_CONTROLLER_FINAL_QA.json"
+    }
+  ],
+  "pixel_visual_pass_assets": [
+    "4EDA9DE3"
+  ],
+  "rework_required_assets": [
+    "8215FD25"
+  ],
+  "global_rework_remaining": [
+    "37759842",
+    "8215FD25"
+  ],
+  "pending_artwork_localize_text": 13,
+  "queue_action_counts": {
+    "localize_text": 82,
+    "zoom_review": 44,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_brand_song_credit": 1
+  },
+  "pending_c": [],
+  "runtime_validation": "UNTESTED",
+  "exclusions": "No completed prior C asset was repeated. VR/FFB/DX11/DXVK untouched."
+}
