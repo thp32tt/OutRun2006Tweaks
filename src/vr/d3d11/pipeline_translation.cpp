@@ -2051,9 +2051,10 @@ namespace outrun::vr::dx11
             return static_cast<D3DSHADER_PARAM_REGISTER_TYPE>(rawType);
         };
 
-        constexpr DWORD kDclUsageMask = 0x0000000Fu;
-        constexpr DWORD kDclUsageIndexMask = 0x000F0000u;
-        constexpr UINT kDclUsageIndexShift = 16u;
+        constexpr DWORD kDclInfoTokenMarker = 0x80000000u;
+        constexpr DWORD kDclUsageMask = D3DSP_DCL_USAGE_MASK;
+        constexpr DWORD kDclUsageIndexMask = D3DSP_DCL_USAGEINDEX_MASK;
+        constexpr UINT kDclUsageIndexShift = D3DSP_DCL_USAGEINDEX_SHIFT;
 
         try
         {
@@ -2079,6 +2080,9 @@ namespace outrun::vr::dx11
                 const UINT registerIndex =
                     static_cast<UINT>(registerToken & D3DSP_REGNUM_MASK);
 
+                if ((declarationInfo & kDclInfoTokenMarker) == 0u)
+                    return out;
+
                 mix(instruction.instructionToken);
                 mix(declarationInfo);
                 mix(registerToken);
@@ -2087,6 +2091,18 @@ namespace outrun::vr::dx11
 
                 if (registerType == D3DSPR_SAMPLER)
                 {
+                    const DWORD samplerType =
+                        declarationInfo & D3DSP_TEXTURETYPE_MASK;
+                    if ((declarationInfo &
+                         ~(kDclInfoTokenMarker |
+                           D3DSP_TEXTURETYPE_MASK)) != 0u ||
+                        (samplerType !=
+                             static_cast<DWORD>(D3DSTT_2D) &&
+                         samplerType !=
+                             static_cast<DWORD>(D3DSTT_CUBE) &&
+                         samplerType !=
+                             static_cast<DWORD>(D3DSTT_VOLUME)))
+                        return out;
                     ++out.samplerDeclarationCount;
                     continue;
                 }
@@ -2105,7 +2121,9 @@ namespace outrun::vr::dx11
                     return out;
 
                 if ((declarationInfo &
-                     ~(kDclUsageMask | kDclUsageIndexMask)) != 0u)
+                     ~(kDclInfoTokenMarker |
+                       kDclUsageMask |
+                       kDclUsageIndexMask)) != 0u)
                     return out;
                 const DWORD rawUsage =
                     declarationInfo & kDclUsageMask;
@@ -2118,12 +2136,22 @@ namespace outrun::vr::dx11
                     (declarationInfo & kDclUsageIndexMask) >>
                     kDclUsageIndexShift);
 
+                if (output &&
+                    (usage == D3DDECLUSAGE_POSITION ||
+                     usage == D3DDECLUSAGE_PSIZE) &&
+                    writeMask != D3DSP_WRITEMASK_ALL)
+                    return out;
+
                 for (const auto& existing : out.semantics)
                 {
                     if (existing.input == input &&
                         existing.output == output &&
                         existing.usage == usage &&
                         existing.usageIndex == usageIndex)
+                        return out;
+                    if (existing.registerType == registerType &&
+                        existing.registerIndex == registerIndex &&
+                        (existing.writeMask & writeMask) != 0u)
                         return out;
                 }
 
