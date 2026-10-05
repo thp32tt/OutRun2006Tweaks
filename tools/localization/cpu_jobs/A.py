@@ -8,13 +8,13 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
 
-repo=Path.cwd(); run="20261005-A-PRODUCTION44"
+repo=Path.cwd(); run="20261005-A-PRODUCTION45"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset_rel="textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset_rel; candidate.parent.mkdir(parents=True,exist_ok=True)
 validator=repo/"tools/localization/validate_clean_plate.py"
-work=Path("/tmp/outrun_A44"); work.mkdir(parents=True,exist_ok=True)
+work=Path("/tmp/outrun_A45"); work.mkdir(parents=True,exist_ok=True)
 source=work/"37759842_HD.dds"; atlasp=work/"4x_37759842_1024x1024_atlas.json"
 
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
@@ -72,7 +72,7 @@ rowsn=(len(items)+cols-1)//cols
 sheet=Image.new("RGB",(cols*cw,rowsn*ch),(190,190,190))
 for i,card in enumerate(items):
     sheet.paste(card,((i%cols)*cw,(i//cols)*ch))
-sheet.save(out/"A44_ALL_SOURCE_REGIONS.jpg",quality=82,optimize=True)
+sheet.save(out/"A45_ALL_SOURCE_REGIONS.jpg",quality=82,optimize=True)
 
 
 # Physical target binding established from A30 numbered canonical-HD atlas review.
@@ -210,80 +210,59 @@ def effect_detect(crop,core,roi,style,kind):
     return effect
 
 def template_inpaint_rgba(arr,mask,core,kind,style):
-    """Reconstruct selector plate background from a smooth source-derived field.
+    """Exact source-class donor reconstruction for selector plates.
 
-    A41/A42 proved glyph-shaped diffusion/interpolation remains visible. For the
-    known selector families, fit a robust quadratic RGBA surface only from clean
-    plate-class pixels around the text and evaluate that field at source-effect
-    pixels. Borders/icons/art outside the exact mask remain byte-identical.
+    A45's smooth fitted field still left glyph-shaped tonal seams. Only pixels
+    that are positively classified as the plate's actual background are donor
+    candidates; target effect pixels copy the nearest real canonical background
+    pixel value. Text/outline/icon/border colours are never donors.
     """
     if not mask.any(): return arr.copy()
-    a=arr.astype(np.float64); h,w=mask.shape
-    rgb=a[:,:,:3]; al=a[:,:,3]
+    a=arr.astype(np.uint8); h,w=mask.shape
+    rgb=a[:,:,:3].astype(np.int16); al=a[:,:,3]
     r,g,b=rgb[:,:,0],rgb[:,:,1],rgb[:,:,2]
     mx=np.maximum.reduce([r,g,b]); mn=np.minimum.reduce([r,g,b])
     yy0,xx0=np.where(mask)
-    x0=max(0,int(xx0.min())-72); x1=min(w,int(xx0.max())+73)
-    y0=max(0,int(yy0.min())-54); y1=min(h,int(yy0.max())+55)
+    x0=max(0,int(xx0.min())-96); x1=min(w,int(xx0.max())+97)
+    y0=max(0,int(yy0.min())-72); y1=min(h,int(yy0.max())+73)
     local=np.zeros((h,w),bool); local[y0:y1,x0:x1]=True
-    safe=local & (~ndimage.binary_dilation(mask,iterations=10)) & (al>0)
+    safe=local & (~ndimage.binary_dilation(mask,iterations=12)) & (al>0)
 
     if kind in ("full","yesno_small","mode","mode_small"):
-        # Cyan selector-card interior, excluding orange/black glyphs and white borders.
-        cls=(b>145)&(g>105)&(b>r+20)&(b>g-25)&(r<210)
+        # Canonical light-cyan card interior.
+        cls=(b>145)&(g>105)&(b>r+18)&(b>g-32)&(r<215)&((mx-mn)>18)
     elif kind in ("continuous","continuous_small"):
-        # Dark graphite course card interior, excluding white lettering/icons.
-        cls=(mx<118)&((mx-mn)<68)&(al>40)
+        # Canonical graphite card interior; exclude bright lettering and icon edge.
+        cls=(mx<105)&((mx-mn)<62)&(al>40)
     elif kind=="random":
-        # Saturated blue RANDOM card interior, excluding white title/question-mark.
-        cls=(b>70)&(b>r+22)&(b>g+5)&(r<150)
+        # Canonical saturated navy/blue card interior.
+        cls=(b>65)&(b>r+18)&(b>g+2)&(r<155)&(g<175)
     else:
         cls=np.ones((h,w),bool)
 
     sample=safe&cls
-    sy,sx=np.where(sample)
-    if len(sx)<80:
+    if int(sample.sum())<40:
         sample=safe
-        sy,sx=np.where(sample)
-    if len(sx)<40:
-        raise RuntimeError(("background field samples",kind,len(sx)))
+    if int(sample.sum())<20:
+        raise RuntimeError(("background donor samples",kind,int(sample.sum())))
 
-    def design(xs,ys):
-        xn=(xs-(w-1)/2.0)/max(1.0,w)
-        yn=(ys-(h-1)/2.0)/max(1.0,h)
-        return np.stack([np.ones_like(xn),xn,yn,xn*yn,xn*xn,yn*yn],axis=1)
-
-    X=design(sx.astype(float),sy.astype(float))
-    Y=a[sy,sx,:]
-    keep=np.ones(len(sx),bool)
-    coef=None
-    # Two robust refits discard border/icon outliers that passed the coarse class.
-    for _ in range(3):
-        coef=np.linalg.lstsq(X[keep],Y[keep],rcond=None)[0]
-        pred=X@coef
-        err=np.sqrt(np.sum((pred[:,:3]-Y[:,:3])**2,axis=1))
-        cutoff=np.quantile(err[keep],0.78) if keep.sum()>20 else err.max()
-        keep=err<=max(3.0,cutoff)
-        if keep.sum()<30:
-            keep=np.ones(len(sx),bool); break
-    coef=np.linalg.lstsq(X[keep],Y[keep],rcond=None)[0]
-
-    my,mxv=np.where(mask)
-    P=design(mxv.astype(float),my.astype(float))@coef
+    # EDT on the inverse sample gives the nearest true background-class source
+    # pixel for every target position.
+    _,inds=ndimage.distance_transform_edt(~sample,return_indices=True)
     out=a.copy()
-    out[my,mxv,:]=P
-    outa=np.clip(np.rint(out),0,255).astype(np.uint8)
+    yy,xx=np.where(mask)
+    out[yy,xx]=a[inds[0,yy,xx],inds[1,yy,xx]]
 
-    # Pixel-exhaustive residue gate: exact coincidences receive a one-level RGB
-    # disambiguation only inside the source-effect mask.
-    same=mask & np.all(outa==arr,axis=2)
-    sy2,sx2=np.where(same)
-    for y,x in zip(sy2.tolist(),sx2.tolist()):
-        px=outa[y,x].copy()
+    # If a copied source value is coincidentally byte-identical to the source
+    # effect pixel, disambiguate by one RGB level inside the effect mask only.
+    same=mask & np.all(out==arr,axis=2)
+    sy,sx=np.where(same)
+    for y,x in zip(sy.tolist(),sx.tolist()):
+        px=out[y,x].copy()
         ch=int(np.argmin(px[:3]))
         px[ch]=px[ch]+1 if px[ch]<255 else px[ch]-1
-        outa[y,x]=px
-    return outa
+        out[y,x]=px
+    return out
 
 source_text_mask=Image.new("L",(W,H),0)
 source_core_mask=Image.new("L",(W,H),0)
@@ -328,8 +307,8 @@ ap=out/"37759842_HD_ALLOWED_BBOX_MASK.png"
 src.save(sp); clean.save(cp); source_text_mask.save(smp); source_core_mask.save(scp); allowed.save(ap)
 protected=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed))
 pp=out/"37759842_HD_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--report",str(out/"A44_CLEAN_PLATE_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A44_CLEAN_PLATE_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--report",str(out/"A45_CLEAN_PLATE_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"A45_CLEAN_PLATE_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 clean_diff=dmask(src,clean)
 clean_outside=count(ImageChops.multiply(clean_diff,ImageOps.invert(source_text_mask)))
@@ -438,8 +417,8 @@ dp=out/"37759842_HD_FINAL_DECODED_READABLE.png"; decoded.save(dp)
 
 # Exhaustive decoded-pixel gates.
 subprocess.run(["python3",str(validator),str(sp),str(dp),str(ap),"--protected-mask",str(pp),
-                "--report",str(out/"A44_FINAL_MASK_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"A44_FINAL_MASK_VALIDATION.json").read_text())
+                "--report",str(out/"A45_FINAL_MASK_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"A45_FINAL_MASK_VALIDATION.json").read_text())
 diff=dmask(src,decoded)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
 alpha_diff=bmask(ImageChops.difference(src.getchannel("A"),decoded.getchannel("A")))
@@ -481,7 +460,7 @@ for im in (src,clean,decoded):
     q=flatten(im).resize((1024,1024),Image.Resampling.LANCZOS); thumbs.append(q)
 sheet=Image.new("RGB",(3072,1024),(90,90,90))
 for i,q in enumerate(thumbs): sheet.paste(q,(i*1024,0))
-sheet.save(out/"A44_SOURCE_CLEAN_FINAL_QUARTER.jpg",quality=94)
+sheet.save(out/"A45_SOURCE_CLEAN_FINAL_QUARTER.jpg",quality=94)
 
 cards=[]
 for row in rows:
@@ -501,7 +480,7 @@ for row in rows:
 cw=max(c.width for c in cards); ch=sum(c.height+3 for c in cards)
 contacts=Image.new("RGB",(cw,ch),(225,225,225)); yy=0
 for c in cards: contacts.paste(c,(0,yy)); yy+=c.height+3
-contacts.save(out/"A44_TARGET_CONTACTS.jpg",quality=94)
+contacts.save(out/"A45_TARGET_CONTACTS.jpg",quality=94)
 
 # Small C177-focused evidence that stays connector-viewable: only selector
 # plate rows whose detached source shadow/outline was reworked.
@@ -525,9 +504,9 @@ for row in rows:
 fcw=max(q.width for q in fcards); fch=sum(q.height+2 for q in fcards)
 focus=Image.new("RGB",(fcw,fch),(225,225,225)); fy=0
 for q in fcards: focus.paste(q,(0,fy)); fy+=q.height+2
-focus.save(out/"A44_C177_FOCUS.jpg",quality=84,optimize=True)
+focus.save(out/"A45_C177_FOCUS.jpg",quality=84,optimize=True)
 
-flatten(decoded_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A44_FINAL_RAW_MIRROR_Y.jpg",quality=94)
+flatten(decoded_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A45_FINAL_RAW_MIRROR_Y.jpg",quality=94)
 
 report={"schema_version":1,"role":"A","run":run,"index":95,"asset":asset_rel,"worker":"github-actions",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB_SHA1,"sha256":SOURCE_SHA,
@@ -544,10 +523,10 @@ report={"schema_version":1,"role":"A","run":run,"index":95,"asset":asset_rel,"wo
                    "protected_visible_pixels_changed":protected_changed,"localized_overlap_pixels":overlap,"localized_1px_touch_pixels":touch,
                    "source_core_residue_pixels":residue},
  "all_33_bbox_size_positive_margin_pass":allbbox,
- "c177_rework":"robust quadratic source-derived background-field reconstruction for selector plate classes; A41/A42 glyph-shaped CLEAN artifacts rejected by controller visual QA",
+ "c177_rework":"nearest real canonical background-class donor reconstruction; A41-A44 synthetic/approximate clean-plate paths rejected by controller visual QA",
  "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"UNTESTED",
- "status":"A44_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A44_WORKER_REWORK_REQUIRED"}
-(out/"A44_37759842_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "status":"A45_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A45_WORKER_REWORK_REQUIRED"}
+(out/"A45_37759842_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":95,"asset":"37759842","candidate_sha256":CANDIDATE_SHA,
          "localized_physical_targets":len(rows),"semantic_strings":20,
          "bbox_size_positive_margin":"33/33 PASS" if allbbox else "FAIL",
@@ -555,7 +534,7 @@ summary={"run":run,"index":95,"asset":"37759842","candidate_sha256":CANDIDATE_SH
          "changed_outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,
          "overlap":overlap,"touch":touch,"source_residue":residue,"clean_source_core_unchanged":clean_source_core_unchanged,
          "worker_status":report["status"],"runtime_validation":"UNTESTED",
-         "report":"localization/graphics/role_A/20261005-A-PRODUCTION44/A44_37759842_REPORT.json"}
-(wr/"A44_37759842.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+         "report":"localization/graphics/role_A/20261005-A-PRODUCTION45/A45_37759842_REPORT.json"}
+(wr/"A45_37759842.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False,indent=2))
 if not status: raise SystemExit(2)
