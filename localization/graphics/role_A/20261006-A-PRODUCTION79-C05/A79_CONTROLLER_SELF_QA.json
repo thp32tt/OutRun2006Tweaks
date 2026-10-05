@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION79-C05",
+  "timestamp_kst": "2026-10-06T01:24:11+09:00",
+  "queue_index": 215,
+  "asset": "C05E67EF",
+  "candidate_sha256": "0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b",
+  "source_sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+  "physical_binding": {
+    "0": "GOAL E",
+    "1": "GOAL D",
+    "2": "GOAL C",
+    "3": "GOAL B",
+    "4": "GOAL A",
+    "5": "15con."
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "6/6 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_outside_target": 0,
+    "candidate_vs_clean_outside_target": 0,
+    "localized_overlap": 0,
+    "localized_touch_pairs": 0
+  },
+  "style_qa": {
+    "source_family": "shared flat yellow condensed goal-label family",
+    "font_face": "Noto Sans CJK KR Black",
+    "native_font_size_px": 52,
+    "pixel_scale": 1,
+    "horizontal_scale": 1.0,
+    "artificial_tracking_px": 0.0,
+    "a78_superseded_reason": "controller self-QA rejected nearest-neighbor quarter-scale Hangul as visibly low-resolution/pixelated against source; no shared-state promotion"
+  },
+  "visual_evidence": [
+    "localization/graphics/role_A/20261006-A-PRODUCTION79-C05/A79_C05_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION79-C05/A79_C05_RAW_COMPARE.jpg"
+  ],
+  "controller_visual_observations": [
+    "SOURCE/CLEAN/FINAL contacts show smooth native-resolution antialiased Hangul; the A78 blocky nearest-neighbor glyph defect is removed.",
+    "All six Korean labels retain the source yellow family, strong Black weight, source-height hierarchy and left alignment without clipping.",
+    "CLEAN is transparent with no source-script residue; FINAL shows no overlap, halos, stray lines or unintended artwork changes.",
+    "Raw comparison preserves the source mirror_y orientation for all six atlas cells."
+  ],
+  "controller_visual_qa": "PASS_NATIVE_RESOLUTION_SOURCE_FAMILY",
+  "status": "A79_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "pending_independent_c_final_qa": true,
+  "runtime_validation": "UNTESTED",
+  "producer_report": "localization/graphics/role_A/20261006-A-PRODUCTION79-C05/A79_C05E67EF_REPORT.json",
+  "vr_ffb_dx11_dxvk_changes": false
+}
