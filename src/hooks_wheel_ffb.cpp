@@ -562,6 +562,32 @@ namespace
                 WheelFFBMath::model_uses_original_condition_backbone(ffbModel);
             const bool ps2Original =
                 ffbModel == WheelFFBMath::Model::PS2OriginalExperimental;
+
+            // R10: on the MOZA R3, polarity is model-owned at runtime rather
+            // than a fragile UI/profile side effect. Every path that changes
+            // Model (combo, profile, INI, future automation) therefore gets the
+            // same physical direction immediately.
+            const std::string activeWheelLower = lower_copy(selectedName_.c_str());
+            const bool r3ModelOwnsPolarity =
+                activeWheelLower.find("r3 racing wheel") != std::string::npos;
+            const bool effectiveInvertForce = r3ModelOwnsPolarity
+                ? WheelFFBMath::r3_model_force_invert(ffbModel)
+                : bool(Settings::WheelFFBInvertForce);
+            const bool effectiveInvertSpring = r3ModelOwnsPolarity
+                ? WheelFFBMath::r3_model_spring_invert(ffbModel)
+                : bool(Settings::WheelFFBInvertSpring);
+            if (r3ModelOwnsPolarity &&
+                (bool(Settings::WheelFFBInvertForce) != effectiveInvertForce ||
+                 bool(Settings::WheelFFBInvertSpring) != effectiveInvertSpring))
+            {
+                Settings::WheelFFBInvertForce = effectiveInvertForce;
+                Settings::WheelFFBInvertSpring = effectiveInvertSpring;
+                spdlog::info(
+                    "WheelFFB: R3 model-owned polarity synchronized for {} (invertForce={} invertSpring={})",
+                    WheelFFBMath::model_name(ffbModel),
+                    effectiveInvertForce, effectiveInvertSpring);
+            }
+
             const float ps2DriveFactor =
                 ps2Original ? WheelFFBPS2::drive_factor(speedRaw) : 0.0f;
             // Modern SAT deliberately clamps its normalized speed to 0..1,
@@ -773,23 +799,40 @@ namespace
                 roughness = std::max(roughness, wheelRoughness[i]);
             }
 
-            // Imperial Avenue and related water-capable stage tables can map
-            // ordinary all-four-wheel mask-0x2 primary road to the water branch.
-            // The hardware log showed that this produced continuous 0.76 roughness
-            // and near-full road vibration across the entire stage.  Correct only
-            // the unambiguous all-primary / all-water / collision-context-zero case.
-            if (WheelFFBMath::primary_asphalt_water_false_positive(
-                    uniqueStage, collisionContext, surfaceMasks, waterWheelMask))
+            // R10 hardware log proves the Imperial Avenue mask-0x2
+            // false-water case per wheel: in mixed 0x2/0x800 stone sections the
+            // 0x2 wheels alone were marked water. Normalize those exact contacts
+            // to ordinary asphalt and leave 0x800 as the real mild stone texture.
+            bool normalizedImperialAsphalt = false;
+            for (int i = 0; i < 4; ++i)
             {
-                roughness = 0.25f;
+                if (WheelFFBMath::imperial_primary_asphalt_false_water_contact(
+                        uniqueStage, collisionContext, surfaceMasks[i], wheelWater[i]))
+                {
+                    wheelRoughness[i] = 0.25f;
+                    wheelWater[i] = false;
+                    normalizedImperialAsphalt = true;
+                }
+            }
+            if (normalizedImperialAsphalt)
+            {
+                roughness = 0.0f;
                 waterFlag = 0;
                 waterWheelMask = 0;
                 for (int i = 0; i < 4; ++i)
                 {
-                    wheelRoughness[i] = 0.25f;
-                    wheelWater[i] = false;
+                    roughness = std::max(roughness, wheelRoughness[i]);
+                    if (wheelWater[i])
+                    {
+                        waterWheelMask |= (1u << i);
+                        waterFlag |= 1u;
+                    }
                 }
             }
+
+            const bool imperialStoneRoad =
+                WheelFFBMath::imperial_stone_road_mix(
+                    uniqueStage, collisionContext, surfaceMasks);
 
             const auto arcade_rough_contact = [&](int i)
             {
@@ -833,10 +876,13 @@ namespace
 
             const float configuredRoadDetail = std::clamp(
                 static_cast<float>(Settings::WheelFFBRoadTexture), 0.0f, 1.0f);
-            const float commonContactTactile =
+            float commonContactTactile =
                 WheelFFBMath::common_contact_tactile_amplitude(
                     contactTactileEnvelope, speedNorm, configuredRoadDetail,
                     modelOutputStrength) * materialRoadTextureScale;
+            if (imperialStoneRoad)
+                commonContactTactile *=
+                    WheelFFBMath::ImperialStoneRoadTextureScale;
             float roadAmp = commonContactTactile;
             float roadFreq = 25.0f + 12.0f * speedNorm;
             float ps2SurfaceEnvelope = 0.0f;
@@ -1059,6 +1105,16 @@ namespace
                     0.0f, 1.0f)
                 : std::clamp(
                     configuredSpringStrength * springSpeed, 0.0f, 1.0f);
+            // The generic condition spring always targets steering zero (the
+            // car's nose). In a real drift, caster/pneumatic SAT instead lets the
+            // front wheels self-steer toward their travel direction. Fade only
+            // Modern DD's nose-centred helper as body slip grows; Physics SAT
+            // remains fully active and supplies the counter-steer direction.
+            const float modernDriftSpringScale =
+                ffbModel == WheelFFBMath::Model::ModernDD
+                    ? WheelFFBMath::modern_drift_center_spring_scale(
+                        vehicleDynamics_.bodySlip())
+                    : 1.0f;
             const float configuredSpringSaturation = std::clamp(
                 static_cast<float>(Settings::WheelFFBSpringSaturation),
                 0.1f, 1.0f);
@@ -1107,18 +1163,19 @@ namespace
                 update_spring(
                     suppressSpringForImpact
                         ? 0.0f
-                        : springStrength * springRamp,
+                        : springStrength * modernDriftSpringScale * springRamp,
                     ps2Original
                         ? ps2SpringSaturation * springRamp
                         : -1.0f);
             }
 
-            const float softwareSpringSign = Settings::WheelFFBInvertSpring
+            const float softwareSpringSign = effectiveInvertSpring
                 ? 1.0f : -1.0f;
             float softwareSpring =
                 springEffect_
                     ? 0.0f
-                    : steer * softwareSpringSign * springStrength;
+                    : steer * softwareSpringSign * springStrength *
+                        modernDriftSpringScale;
             if (ps2Original && !springEffect_)
             {
                 // Retail Type 7 uses a coefficient larger than its dynamic
@@ -1365,7 +1422,7 @@ namespace
             // Keep SAT/spring/damper on the DD-safe slew path while allowing a
             // crash or gear thunk to arrive promptly without releasing that
             // slew limiter for the whole steering signal.
-            const float forceDirection = Settings::WheelFFBInvertForce ? -1.0f : 1.0f;
+            const float forceDirection = effectiveInvertForce ? -1.0f : 1.0f;
             const float outputRamp = warmupScale * recreateScale;
             float total = structural * modelOutputStrength * forceDirection * outputRamp;
             float eventOutput = events * outputStrength * forceDirection * outputRamp;
@@ -1582,8 +1639,8 @@ namespace
                     arcadeSpeedNorm, arcadeSpeedStrength, roadAmp, slipAmp,
                     structural, events, total, compressed, eventCompressed, structuralLevel, level, prevConstantLevel_,
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
-                    periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
-                    bool(Settings::WheelFFBInvertSpring));
+                    periodicsActive_, outputStrength, effectiveInvertForce,
+                    effectiveInvertSpring);
                 if (telemetryNow - lastTelemetryDetailTick_ >= 1000)
                 {
                     lastTelemetryDetailTick_ = telemetryNow;
