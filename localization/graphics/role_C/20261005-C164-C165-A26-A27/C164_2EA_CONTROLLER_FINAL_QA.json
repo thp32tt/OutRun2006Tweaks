@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C164-C165-A26-A27",
+  "qa_id": "C164",
+  "timestamp_kst": "2026-10-05T15:03:00+09:00",
+  "queue_index": 55,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+  "candidate_sha256": "b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc",
+  "candidate_changed_by_C": false,
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "1/1 PASS",
+  "zero_pixel_gates": {
+    "decoded_changed_outside": 0,
+    "alpha_outside": 0,
+    "introduced_visible_outside": 0,
+    "source_residue": 0,
+    "changed_bc3_blocks_wholly_outside_allowed": 0,
+    "partial_endpoint_or_color_drift": 0
+  },
+  "controller_visual_qa": "PASS",
+  "visual_note": "Independent SOURCE/FINAL detail and raw mirror_y review confirms C163 hollow-glyph defect resolved: filled cyan/white/blue vertical gradient, white/navy edging, lower-right depth and right slant; no visible clipping, residue, seam, halo or orientation regression.",
+  "decision": "C164_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "machine_report": "localization/graphics/role_C/20261005-C164-C165-A26-A27/C164_2EA_MACHINE_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C164-C165-A26-A27/C164_2EA_SOURCE_FINAL_DETAIL.jpg",
+    "localization/graphics/role_C/20261005-C164-C165-A26-A27/C164_2EA_RAW_COMPARE.jpg"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
