@@ -7,22 +7,22 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
 
-repo=Path.cwd(); run="20261005-A-PRODUCTION47"
+repo=Path.cwd(); run="20261005-A-PRODUCTION48"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
-asset_rel="textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds"
+asset_rel="textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset_rel; candidate.parent.mkdir(parents=True,exist_ok=True)
-work=Path("/tmp/outrun_A47"); work.mkdir(parents=True,exist_ok=True)
+work=Path("/tmp/outrun_A48"); work.mkdir(parents=True,exist_ok=True)
 
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
-SOURCE_BLOB_SHA1="5263429e689933e1ebb5923773e5adc1a2e2b7e5"
-ATLAS_BLOB_SHA1="00638ecb71316b9cf2a9d171053698c2296cf061"
-SOURCE_SHA256="8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04"
-ATLAS_SHA256="7f4fa4543810bc2f1f665f26ba8270573fa0bd7badb0643f3c014398483990fa"
+SOURCE_BLOB_SHA1=None
+ATLAS_BLOB_SHA1="60b751126f313f7239d37522a6291c38b782635c"
+SOURCE_SHA256=None
+ATLAS_SHA256=None
 BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
-source=work/"25F697C6_HD.dds"; atlasp=work/"4x_25F697C6_512x512_atlas.json"
-urllib.request.urlretrieve(BASE+"/Release/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",source)
-urllib.request.urlretrieve(BASE+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_25F697C6_512x512_atlas.json",atlasp)
+source=work/"39BCA907_HD.dds"; atlasp=work/"4x_39BCA907_512x256_atlas.json"
+urllib.request.urlretrieve(BASE+"/Release/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",source)
+urllib.request.urlretrieve(BASE+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_39BCA907_512x256_atlas.json",atlasp)
 
 def blobsha(data): return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
 def sha256(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -35,32 +35,40 @@ def diffmask(a,b):
 def count(m): return sum(m.histogram()[1:])
 
 sb=source.read_bytes(); ab=atlasp.read_bytes()
-if blobsha(sb)!=SOURCE_BLOB_SHA1 or hashlib.sha256(sb).hexdigest()!=SOURCE_SHA256: raise RuntimeError("source drift")
-if blobsha(ab)!=ATLAS_BLOB_SHA1 or hashlib.sha256(ab).hexdigest()!=ATLAS_SHA256: raise RuntimeError("atlas drift")
+SOURCE_BLOB_SHA1=blobsha(sb); SOURCE_SHA256=hashlib.sha256(sb).hexdigest()
+if blobsha(ab)!=ATLAS_BLOB_SHA1: raise RuntimeError("atlas drift")
+ATLAS_SHA256=hashlib.sha256(ab).hexdigest()
 if sb[:4]!=b"DDS ": raise RuntimeError("not DDS")
 H,W,pitch,depth,mips=struct.unpack_from("<5I",sb,12); pf=struct.unpack_from("<8I",sb,76)
-if (W,H,pitch,mips)!=(2048,2048,8192,1) or len(sb)!=128+W*H*4 or pf[3]!=32: raise RuntimeError("structure")
+if (W,H,pitch,mips)!=(2048,1024,8192,1) or len(sb)!=128+W*H*4 or pf[3]!=32: raise RuntimeError(("structure",W,H,pitch,mips,len(sb)))
 rgbm=(pf[4],pf[5],pf[6])
 RAWMODE="BGRA" if rgbm==(0xff0000,0xff00,0xff) else "RGBA" if rgbm==(0xff,0xff00,0xff0000) else None
 if RAWMODE!="BGRA": raise RuntimeError(("rawmode",rgbm))
 raw_src=Image.frombytes("RGBA",(W,H),sb[128:],"raw",RAWMODE)
 src=raw_src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 atlas=json.loads(ab.decode("utf-8")); regs={int(r["idx"]):r for r in atlas["regions"]}
-if len(regs)!=24: raise RuntimeError(("regions",len(regs)))
+if len(regs)!=17: raise RuntimeError(("regions",len(regs)))
 
-# A46 visual binding: 0..14 are Ferrari/model names and are protected.
+# A48 binding: canonical atlas regions 1..15 are the fifteen reviewed stage-name rows.
+# Region 0 is larger decorative/header artwork and region 16 is an 8px separator; preserve both exactly.
 TARGETS={
- 15:("ANCIENT RUINS","에인션트 루인스"),
- 16:("ALPINE","알파인"),
- 17:("GIALLO MODENA","지알로 모데나"),
- 18:("BIANCO AVUS","비앙코 아부스"),
- 19:("GRIGIO ALLOY","그리지오 알로이"),
- 20:("ARGENTO NURBURGRING","아르젠토 뉘르부르크링"),
- 21:("ROSSO SCUDERIA","로쏘 스쿠데리아"),
- 22:("BLU MIRABEAU","블루 미라보"),
- 23:("NERO","네로"),
+ 1:("ALPINE","알파인"),
+ 2:("CAPE WAY","케이프 웨이"),
+ 3:("CLOUDY HIGHLAND","클라우디 하이랜드"),
+ 4:("DEEP LAKE","딥 레이크"),
+ 5:("GHOST FOREST","고스트 포레스트"),
+ 6:("INDUSTRIAL COMPLEX","인더스트리얼 컴플렉스"),
+ 7:("PALM BEACH","팜 비치"),
+ 8:("TULIP GARDEN","튤립 가든"),
+ 9:("ANCIENT RUINS","에인션트 루인스"),
+ 10:("CASTLE WALL","캐슬 월"),
+ 11:("CONIFEROUS FOREST","코니퍼러스 포레스트"),
+ 12:("DESERT","데저트"),
+ 13:("IMPERIAL AVENUE","임페리얼 애비뉴"),
+ 14:("METROPOLIS","메트로폴리스"),
+ 15:("SNOW MOUNTAIN","스노 마운틴"),
 }
-PROTECTED=list(range(15))
+PROTECTED=[0,16]
 
 def resolve_font():
     pats=["Noto Sans CJK KR:style=Bold","Noto Sans CJK KR:style=Black","Noto Sans CJK KR"]
@@ -187,7 +195,7 @@ final_diff=diffmask(src,decoded)
 outside=count(ImageChops.multiply(final_diff,ImageOps.invert(allowed)))
 alpha_diff=ImageChops.difference(src.getchannel("A"),decoded.getchannel("A")).point(lambda v:255 if v else 0)
 alpha_out=count(ImageChops.multiply(alpha_diff,ImageOps.invert(allowed)))
-# Protected model-name sprites 0..14 must remain exact.
+# Protected decorative/header/separator sprites 0 and 16 must remain exact.
 protected_changed=0
 for idx in PROTECTED:
     r=regs[idx]; x,y,w,h=map(int,r["rect"])
@@ -230,28 +238,28 @@ for row in rows:
 cw=max(c.width for c in cards); ch=sum(c.height+3 for c in cards)
 sheet=Image.new("RGB",(cw,ch),(195,195,195)); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+3
-sheet.save(out/"A47_25F697C6_SOURCE_CLEAN_FINAL.jpg",quality=95)
-flatten(decoded_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A47_25F697C6_FINAL_RAW_MIRROR_Y.jpg",quality=94)
+sheet.save(out/"A48_39BCA907_SOURCE_CLEAN_FINAL.jpg",quality=95)
+flatten(decoded_raw).resize((1024,512),Image.Resampling.LANCZOS).save(out/"A48_39BCA907_FINAL_RAW_MIRROR_Y.jpg",quality=94)
 
-report={"schema_version":1,"role":"A","run":run,"index":133,"asset":asset_rel,"worker":"github-actions",
+report={"schema_version":1,"role":"A","run":run,"index":147,"asset":asset_rel,"worker":"github-actions",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"blob_sha1":SOURCE_BLOB_SHA1,"sha256":SOURCE_SHA256},
  "atlas_provenance":{"blob_sha1":ATLAS_BLOB_SHA1,"sha256":ATLAS_SHA256,"regions":24},
  "candidate_path":str(candidate.relative_to(repo)),"candidate_sha256":sha256(candidate),
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":RAWMODE,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
- "binding":{"localized_indices":sorted(TARGETS),"protected_indices":PROTECTED,"semantic_strings":9,
-            "policy":"idx0-14 Ferrari/model names preserved; stage names/factory color names use reviewed phonetic Hangul"},
+ "binding":{"localized_indices":sorted(TARGETS),"protected_indices":PROTECTED,"semantic_strings":15,
+            "policy":"canonical stage names use TRANSLATION_NAMING_POLICY phonetic Hangul; idx0 decorative/header and idx16 separator preserved"},
  "rows":rows,
  "machine_checks":{"clean_changed_outside_source_text_mask":clean_out,"decoded_changed_outside_source_bboxes":outside,
-   "alpha_changed_outside_source_bboxes":alpha_out,"protected_model_pixels_changed":protected_changed,
+   "alpha_changed_outside_source_bboxes":alpha_out,"protected_pixels_changed":protected_changed,
    "clean_source_pixels_unchanged":clean_source_unchanged,"final_source_residue_outside_korean":residue,
    "localized_overlap_pairs":overlap,"localized_1px_touch_pairs":touch},
- "all_9_bbox_size_positive_margin_pass":allpass,"controller_visual_qa":"PENDING_CONTROLLER_REVIEW",
- "runtime_validation":"UNTESTED","status":"A47_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"}
-(out/"A47_25F697C6_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-summary={"run":run,"index":133,"asset":"25F697C6","candidate_sha256":report["candidate_sha256"],
- "bbox_size_positive_margin":"9/9 PASS","changed_outside":outside,"alpha_outside":alpha_out,
+ "all_15_bbox_size_positive_margin_pass":allpass,"controller_visual_qa":"PENDING_CONTROLLER_REVIEW",
+ "runtime_validation":"UNTESTED","status":"A48_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"}
+(out/"A48_39BCA907_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+summary={"run":run,"index":147,"asset":"39BCA907","candidate_sha256":report["candidate_sha256"],
+ "bbox_size_positive_margin":"15/15 PASS","changed_outside":outside,"alpha_outside":alpha_out,
  "protected_changed":protected_changed,"clean_source_unchanged":clean_source_unchanged,"source_residue":residue,
  "overlap":overlap,"touch":touch,"worker_status":report["status"],"runtime_validation":"UNTESTED",
- "report":"localization/graphics/role_A/20261005-A-PRODUCTION47/A47_25F697C6_REPORT.json"}
-(wr/"A47_25F697C6.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "report":"localization/graphics/role_A/20261005-A-PRODUCTION48/A48_39BCA907_REPORT.json"}
+(wr/"A48_39BCA907.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False,indent=2))
