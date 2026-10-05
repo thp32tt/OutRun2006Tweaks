@@ -35551,7 +35551,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_105_provenanc
         == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_105_OVERLAP_BYTES.hex(" ")
         and predecessor["incomplete_matches"]
         and predecessor["capture_edge_matches"]
-        and predecessor["unresolved_forward_targets"] == [0x00183C10, 0x00183C27]
+        and predecessor["unresolved_forward_targets"] == []
     )
     overlap = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_105_OVERLAP_BYTES
     overlap_actual = probe[: len(overlap)]
@@ -35648,10 +35648,6 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_105_prefix_pr
         instruction_starts.add(rva)
         expected_next = rva + len(expected)
 
-    predecessor_instruction_starts = {
-        row["rva"] for row in predecessor["instructions"]
-    }
-
     def branch_target(rva: int) -> int | None:
         raw2 = pe.bytes_at_rva(rva, 2)
         if len(raw2) == 2 and (raw2[0] == 0xEB or 0x70 <= raw2[0] <= 0x7F):
@@ -35662,9 +35658,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_105_prefix_pr
     branch_rows = []
     branch_targets_match = True
     internal_branch_targets_on_boundaries = True
-    predecessor_branch_targets_on_boundaries = True
-    unresolved_external_targets: list[int] = []
-    predecessor_targets: list[int] = []
+    external_targets: list[int] = []
     for branch_rva, expected_target_rva in GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_105_BRANCHES:
         decoded_target_rva = branch_target(branch_rva)
         matches = decoded_target_rva == expected_target_rva
@@ -35674,7 +35668,6 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_105_prefix_pr
             < GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_105_PREFIX_END_RVA
         )
         target_is_boundary = decoded_target_rva in instruction_starts
-        target_is_predecessor_boundary = decoded_target_rva in predecessor_instruction_starts
         branch_rows.append({
             "branch_rva": branch_rva,
             "expected_target_rva": expected_target_rva,
@@ -35682,20 +35675,14 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_105_prefix_pr
             "matches": matches,
             "target_within_prefix": target_within_prefix,
             "target_is_instruction_boundary": target_is_boundary,
-            "target_is_predecessor_instruction_boundary": target_is_predecessor_boundary,
         })
         branch_targets_match = branch_targets_match and matches
         if target_within_prefix:
             internal_branch_targets_on_boundaries = (
                 internal_branch_targets_on_boundaries and target_is_boundary
             )
-        elif target_is_predecessor_boundary:
-            predecessor_targets.append(expected_target_rva)
-            predecessor_branch_targets_on_boundaries = (
-                predecessor_branch_targets_on_boundaries and target_is_predecessor_boundary
-            )
         else:
-            unresolved_external_targets.append(expected_target_rva)
+            external_targets.append(expected_target_rva)
 
     inherited_targets = list(
         GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_105_INHERITED_FORWARD_TARGETS
@@ -35707,7 +35694,9 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_105_prefix_pr
     resolved_predecessor_targets_on_boundaries = all(
         item["is_instruction_boundary"] for item in resolved_predecessor_targets
     )
-    resolved_predecessor_target_rvas = {item["rva"] for item in resolved_predecessor_targets}
+    resolved_predecessor_target_rvas = {
+        item["rva"] for item in resolved_predecessor_targets
+    }
     remaining_predecessor_targets = [
         rva for rva in inherited_targets if rva not in resolved_predecessor_target_rvas
     ]
@@ -35758,17 +35747,14 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_105_prefix_pr
     )
     raw_inbound_census_empty = not provenance["raw_inbound_rel32_candidates"]
     raw_call_census_empty = not provenance["raw_outbound_rel32_candidates"]
+    expected_external_targets = set()
+    unresolved_forward_targets = []
     derived_unresolved_forward_targets = sorted(
         set(remaining_predecessor_targets)
-        | {rva for rva in unresolved_external_targets if rva >= GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_105_PREFIX_END_RVA}
+        | {rva for rva in external_targets if rva >= GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_105_PREFIX_END_RVA}
     )
-    unresolved_forward_targets = []
     debt_transition_matches = (
         derived_unresolved_forward_targets == unresolved_forward_targets
-    )
-    backward_branch_contract = (
-        predecessor_targets == []
-        and predecessor_branch_targets_on_boundaries
     )
 
     proven = bool(
@@ -35781,9 +35767,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_105_prefix_pr
         and capture_edge_matches
         and branch_targets_match
         and internal_branch_targets_on_boundaries
-        and backward_branch_contract
-        and target_is_predecessor_boundary
-        and unresolved_external_targets == []
+        and set(external_targets) == expected_external_targets
         and raw_inbound_census_empty
         and raw_call_census_empty
         and predecessor_target_contract
@@ -35810,9 +35794,9 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_105_prefix_pr
         "branches": branch_rows,
         "branch_targets_match": branch_targets_match,
         "internal_branch_targets_on_boundaries": internal_branch_targets_on_boundaries,
-        "predecessor_branch_targets": predecessor_targets,
-        "predecessor_branch_targets_on_boundaries": predecessor_branch_targets_on_boundaries,
-        "external_targets": unresolved_external_targets,
+        "predecessor_branch_targets": [],
+        "predecessor_branch_targets_on_boundaries": True,
+        "external_targets": external_targets,
         "calls": [],
         "call_targets_match": True,
         "raw_inbound_census_empty": raw_inbound_census_empty,
