@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION67",
+  "timestamp_kst": "2026-10-05T09:14:20+09:00",
+  "index": 226,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+  "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+  "candidate_sha256": "1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c",
+  "semantic_binding": {
+    "localized_regions": {
+      "0": "STAGE",
+      "3": "GOAL E",
+      "4": "GOAL D",
+      "5": "GOAL C",
+      "6": "GOAL B",
+      "7": "GOAL A",
+      "8": "GOAL",
+      "9": "15 STAGE CONTINUOUS"
+    },
+    "protected_regions": {
+      "1": "OUTRUN2SP",
+      "2": "OUTRUN2"
+    }
+  },
+  "machine_qa": {
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "bbox_size_positive_margin": "8/8 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "exact_source_residue": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "protected_outrun_marks_changed": 0,
+    "overlap": 0,
+    "touch_pairs": 0
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact_2x": "PASS",
+    "raw_mirror_y": "PASS",
+    "observations": [
+      "All eight intended labels are readable in Korean and remain within the source glyph/effect envelopes.",
+      "The shared gray-blue source family is preserved consistently across STAGE, GOAL labels and 15-stage continuous label.",
+      "OUTRUN2 and OUTRUN2SP remain unchanged; no visible English residue, clipping, overlap, seam, halo, or orientation regression."
+    ]
+  },
+  "decision": "B_PRODUCTION67_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
