@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("B hosted worker only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION88"
+run="20261005-B-PRODUCTION89"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -106,9 +106,9 @@ def render(text,bb,fs):
     if not ab: return None
     a=a.crop(ab)
     tile=Image.new("RGBA",a.size,fill); tile.putalpha(a)
-    if tile.width>aw-8 or tile.height>ah-8: return None
+    if tile.width>aw-4 or tile.height>ah-4: return None
     layer=Image.new("RGBA",(W,H),(0,0,0,0))
-    px=bx0+4
+    px=bx0+2
     py=by0+(ah-tile.height)//2
     layer.alpha_composite(tile,(px,py))
     lb=layer.getchannel("A").getbbox()
@@ -141,7 +141,7 @@ for row,(layer,lb,blockbb) in zip(rows,rendered):
     row.update({"localized_bbox":lb,"source_width":sw,"source_height":sh,"localized_width":lw,"localized_height":lh,
       "delta_left":lb[0]-ob[0],"delta_right":ob[2]-lb[2],"delta_top":lb[1]-ob[1],"delta_bottom":ob[3]-lb[3],
       "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","font_file":Path(FONT).name,
-      "font_size":shared_fs,"fill_rgba":fill,"alignment":"left","block_safe_bbox":blockbb,"rework_status":"B88_NEW_EXACT_HD_DXT5_CANDIDATE"})
+      "font_size":shared_fs,"fill_rgba":fill,"alignment":"left","block_safe_bbox":blockbb,"rework_status":"B89_NEW_EXACT_HD_DXT5_CANDIDATE"})
 
 # Encode full raw mirror-y image, then splice only exact-safe BC3 blocks.
 raw=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
@@ -244,9 +244,9 @@ target_png=out/"DDF_TARGET_TEXT_MASK.png"; mask(target).save(target_png)
 clean_png=out/"DDF_CLEAN_PLATE.png"; clean.save(clean_png)
 src_png=Path("/tmp/DDF_source.png"); final_png=Path("/tmp/DDF_final.png"); src.save(src_png); dec.save(final_png)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(src_png),str(clean_png),str(source_mask_png),"--report",str(out/"B88_CLEAN_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(src_png),str(final_png),str(allowed_png),"--protected-mask",str(protected_png),"--report",str(out/"B88_FINAL_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B88_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"B88_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(src_png),str(clean_png),str(source_mask_png),"--report",str(out/"B89_CLEAN_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(src_png),str(final_png),str(allowed_png),"--protected-mask",str(protected_png),"--report",str(out/"B89_FINAL_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B89_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"B89_FINAL_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS" or finalrep["status"]!="PASS": raise RuntimeError(("validator",cleanrep["status"],finalrep["status"]))
 
 def comp(im,bg=(72,72,72,255)):
@@ -255,7 +255,7 @@ def comp(im,bg=(72,72,72,255)):
 stack=Image.new("RGB",(512,3*1050),"white")
 for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((512,1024),Image.Resampling.NEAREST); stack.paste(z,(0,i*1050+26)); ImageDraw.Draw(stack).text((5,i*1050+5),label,fill="black")
-stack.save(out/"B88_DDF_SOURCE_CLEAN_FINAL.jpg",quality=96)
+stack.save(out/"B89_DDF_SOURCE_CLEAN_FINAL.jpg",quality=96)
 # Row contacts.
 cards=[]
 for row in rows:
@@ -268,13 +268,13 @@ for row in rows:
     ImageDraw.Draw(c).text((5,5),row["source"]+" -> "+row["korean"],fill="black"); cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+4*(len(cards)-1)),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.save(out/"B88_DDF_ROW_CONTACT.jpg",quality=96)
+sheet.save(out/"B89_DDF_ROW_CONTACT.jpg",quality=96)
 # Raw mirror-Y proof.
 src_raw=Image.open(src_dds).convert("RGBA"); dec_raw=Image.open(candidate).convert("RGBA")
 rr=Image.new("RGB",(512,2*1050),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",src_raw),("FINAL_RAW_MIRROR_Y",dec_raw)]):
     z=comp(im).resize((512,1024),Image.Resampling.NEAREST); rr.paste(z,(0,i*1050+26)); ImageDraw.Draw(rr).text((5,i*1050+5),label,fill="black")
-rr.save(out/"B88_DDF_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"B89_DDF_RAW_COMPARE.jpg",quality=96)
 
 report={
  "schema_version":1,"role":"B","run":run,"queue_index":222,"asset":asset,
@@ -290,13 +290,13 @@ report={
  "compressed_patch":{"target_reencoded_blocks":len(target_blocks),"source_only_full_alpha_blocks":len(source_only_full),"partial_alpha_only_blocks":len(partial_blocks),"changed_blocks":changed_blocks,"changed_blocks_outside_patch":outside_patch,"partial_endpoints_and_color_bytes_preserved":True,"status":"PASS"},
  "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"B88_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"B89_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(out/"B88_DDF_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(out/"B89_DDF_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":222,"asset":"DDF0392A","source_sha256":sha(src_dds),"candidate_sha256":cand_sha,"localized_physical_elements":3,
  "bbox_size_positive_margin":"3/3","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "source_residue":residue,"decoded_changed_outside":diff_out,"alpha_outside":alpha_out,"visible_outside":visible_out,
  "protected_rows_changed":sum(preserved.values()),"changed_blocks_outside_patch":outside_patch,
- "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B88_DDF_REPORT.json"}
-(wr/"B88_DDF0392A.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B89_DDF_REPORT.json"}
+(wr/"B89_DDF0392A.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False))
