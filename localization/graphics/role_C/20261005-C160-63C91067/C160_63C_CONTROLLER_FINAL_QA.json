@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C160-63C91067",
+  "timestamp_kst": "2026-10-05T14:16:19+09:00",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "scope": "latest stable B101 candidate only; completed prior C PASS assets not repeated; A23 7CE1CFC5 is preflight-only and has no approval candidate",
+  "producer_run": "20261005-B-PRODUCTION101",
+  "producer_output_commit": "654e375738d4fab161940ad8bb8034856aeff3c9",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "candidate_sha256": "577e6c8d0e609f2ce6a6598f44879528d26423b11c5ad45c4e88e84ea9dfc67e",
+  "candidate_changed_by_C": false,
+  "producer_machine_qa": {
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION101/B101_63C_REPORT.json",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_orientation": "mirror_y",
+    "bbox_size_positive_margin": "2/2 PASS",
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "source_effect_residue_reported": 0,
+    "render_outside_target": 0,
+    "localized_overlap": 0
+  },
+  "c_independent_worker_attempts": [
+    {
+      "workflow_run_id": 37265606675,
+      "conclusion": "failure",
+      "note": "producer candidate changed during active B rework cycle; no C evidence committed"
+    },
+    {
+      "workflow_run_id": 37266483470,
+      "conclusion": "cancelled",
+      "note": "superseded by repository workflow concurrency; no C evidence committed"
+    },
+    {
+      "workflow_run_id": 37266793207,
+      "conclusion": "failure",
+      "note": "heavy compute step failed; no C machine PASS claimed"
+    }
+  ],
+  "controller_visual_qa": {
+    "source_clean_final": "FAIL",
+    "row_contact": "FAIL",
+    "raw_mirror_y": "FAIL_SOURCE_RESIDUE_VISIBLE",
+    "semantic_binding": "PASS_TOTAL_RANK_TO_종합_랭킹_TWO_OCCURRENCES",
+    "source_style": "NOT_APPROVABLE_WHILE_CLEAN_PLATE_FAILS",
+    "exact_bbox_machine_gate": "PRODUCER_PASS_BUT_INSUFFICIENT_FOR_APPROVAL",
+    "source_residue": "FAIL_VISIBLE_ENGLISH_TOTAL_RANK_EFFECT_REMAINS_BEHIND_KOREAN_IN_BOTH_OCCURRENCES",
+    "clean_plate": "FAIL_VISIBLE_TOTAL_RANK_GHOST_AND_PATTERN_RECONSTRUCTION_RESIDUE",
+    "zero_overlap_rule": "FAIL_SOURCE_SCRIPT_EFFECT_VISIBLE_BENEATH_LOCALIZED_GLYPHS",
+    "clipping": "NONE_MATERIAL_OBSERVED",
+    "protected_artwork": "NO_OUTSIDE_BBOX_MACHINE_DRIFT_REPORTED",
+    "orientation": "READABLE_AND_RAW_INSPECTED"
+  },
+  "fail_closed_reason": "Mandatory controller visual review overrides producer mask false-negative. B101 SOURCE/CLEAN/FINAL and row/raw evidence retain visible English Total Rank effect/ghost pixels under and around the Korean title in both physical occurrences. This violates clean-plate, source-residue and zero-overlap rules, so the candidate cannot advance even though producer containment counters are zero.",
+  "required_rework": [
+    "Reconstruct both patterned/gradient title plates without any English Total Rank glyph/effect residue.",
+    "Do not cover residue with Korean lettering; clean plate must visually pass before lettering.",
+    "Re-run exact source-bbox/source-size/protected/alpha/overlap gates after reconstruction.",
+    "Recheck readable and raw mirror_y evidence before C resubmission."
+  ],
+  "decision": "C160_REWORK_REQUIRED_CLEAN_PLATE_SOURCE_RESIDUE",
+  "global_rework_remaining": [
+    "C598919A",
+    "63C91067"
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94",
+    "49BB5FE5",
+    "75C3586A"
+  ],
+  "pending_production_localize_text": 23,
+  "in_game_validation": "NOT_ELIGIBLE_UNTIL_STATIC_REWORK_PASS",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
