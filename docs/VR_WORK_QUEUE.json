@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-10-05T16:07:00+09:00",
+  "updatedKst": "2026-10-05T16:19:38+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -307,13 +307,16 @@
       ],
       "postReviewTaskId": "CONVERSION-DX9EX-00408",
       "postReviewSha": "3c0ee50ba8893e94b42a5213ea36640864834553",
-      "postReviewValidation": "PASS_EXACT_SHA_STATIC_CONTRACT",
+      "postReviewValidation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
       "postReviewEvidence": [
         "A: Frame.v2 run generation is claimed by the game and checked by protocol/shadow/host/fallback readers, preventing stale slots from a prior game process.",
         "B: Gameplay bootstrap remains gated on complete world/effective-pose metadata with PresentInFlight rejected; the validated theater/loading projection hold remains present.",
-        "C: 00408 changes verifier coverage only. No runtime hot-path, projection, ownership, transport, or synchronization behavior was changed."
+        "C: The VR-HOST-002 post-review portion is verifier-only. The same 00408 material tree also gates a telemetry-only semantic-HUD counter write behind VRTelemetry; rendering classification, projection, world ownership, transport policy, and synchronization semantics are unchanged.",
+        "Exact SHA 3c0ee50ba8893e94b42a5213ea36640864834553 passed DX9Ex Active Validation 37275931018 attempt 2 and Domain Isolation Guard 37275930952."
       ],
-      "nextAction": "Reopen only if the architecture verifier fails or new Quest3/VDXR runtime evidence shows a stale-run, gameplay-handoff, or projection-hold regression."
+      "nextAction": "Reopen only if the architecture verifier fails or new Quest3/VDXR runtime evidence shows a stale-run, gameplay-handoff, or projection-hold regression.",
+      "postReviewValidationRunId": 37275931018,
+      "postReviewDomainIsolationRunId": 37275930952
     },
     {
       "id": "DX9EX-SKYGLOW-001",
