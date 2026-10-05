@@ -255,6 +255,23 @@ require_order(
     "DirectTransportResourcesReady=true",
 )
 
+claim_run = body(r7, "bool ClaimRenderFrameRingForCurrentRun() noexcept")
+require(
+    claim_run,
+    "Frame.v2 cross-run legacy ACK reset",
+    "EnsureSharedState()",
+    "hostDirectConsumedFrameId",
+    "InterlockedExchange(",
+    "RenderFrameRingClaimed = true;",
+)
+require_order(
+    claim_run,
+    "Frame.v2 run claim legacy ACK reset ordering",
+    "RenderFrameRing->reserved0 = RenderFrameRunGeneration;",
+    "hostDirectConsumedFrameId",
+    "RenderFrameRingClaimed = true;",
+)
+
 # R13 is the lower reset/resource owner. It releases shared resources and
 # publishes a disabled frame before ResetEx; recreation occurs only on success.
 reset_pre = body(r13, "void R13ResetCommonPre(IDirect3DDevice9*)")

@@ -618,9 +618,18 @@ namespace OutRunVRStereo
 				InterlockedIncrement(
 					reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
 
+			// The legacy R7 DirectGPU fallback has only a global frame ACK and no
+			// transport generation. If the host keeps SharedPose mapped across a fast
+			// game restart, an old high ACK could otherwise make the new run's frame
+			// IDs (which restart at 1) look consumed before the host ever samples them.
+			if (EnsureSharedState())
+				InterlockedExchange(
+					reinterpret_cast<volatile LONG*>(&SharedState->hostDirectConsumedFrameId),
+					0);
+
 			RenderFrameRingClaimed = true;
 			spdlog::info(
-				"VR Frame.v2: claimed run identity pid={} generation=0x{:08x}; stale slots from previous game runs invalidated",
+				"VR Frame.v2: claimed run identity pid={} generation=0x{:08x}; stale slots and legacy DirectGPU ACK from previous game runs invalidated",
 				self, RenderFrameRunGeneration);
 			return true;
 		}
