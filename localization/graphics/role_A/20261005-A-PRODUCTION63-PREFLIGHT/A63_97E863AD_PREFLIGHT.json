@@ -1,0 +1,444 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION63-PREFLIGHT",
+  "index": 193,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "71c9961992b6718cd3da0222c83a88bd9cd22d7f",
+    "atlas_git_blob_sha1": "2c826a5eadf4784ec50c26f4a6e269f86209be71",
+    "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451"
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "regions": [
+    {
+      "region_idx": 0,
+      "cell": [
+        0,
+        852,
+        1200,
+        172
+      ],
+      "source_bbox": [
+        20,
+        862,
+        1058,
+        1010
+      ],
+      "width": 1038,
+      "height": 148,
+      "median_rgba": [
+        186,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "region_idx": 1,
+      "cell": [
+        0,
+        692,
+        1800,
+        160
+      ],
+      "source_bbox": [
+        7,
+        704,
+        1076,
+        770
+      ],
+      "width": 1069,
+      "height": 66,
+      "median_rgba": [
+        63,
+        71,
+        74,
+        255
+      ]
+    },
+    {
+      "region_idx": 2,
+      "cell": [
+        0,
+        532,
+        1800,
+        160
+      ],
+      "source_bbox": [
+        7,
+        544,
+        1059,
+        610
+      ],
+      "width": 1052,
+      "height": 66,
+      "median_rgba": [
+        63,
+        71,
+        74,
+        255
+      ]
+    },
+    {
+      "region_idx": 3,
+      "cell": [
+        0,
+        372,
+        1800,
+        160
+      ],
+      "source_bbox": [
+        7,
+        384,
+        1137,
+        450
+      ],
+      "width": 1130,
+      "height": 66,
+      "median_rgba": [
+        63,
+        71,
+        74,
+        255
+      ]
+    },
+    {
+      "region_idx": 4,
+      "cell": [
+        1200,
+        876,
+        788,
+        148
+      ],
+      "source_bbox": [
+        1205,
+        890,
+        1594,
+        1011
+      ],
+      "width": 389,
+      "height": 121,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 5,
+      "cell": [
+        0,
+        284,
+        980,
+        88
+      ],
+      "source_bbox": [
+        8,
+        297,
+        540,
+        359
+      ],
+      "width": 532,
+      "height": 62,
+      "median_rgba": [
+        78,
+        96,
+        100,
+        255
+      ]
+    },
+    {
+      "region_idx": 6,
+      "cell": [
+        980,
+        296,
+        460,
+        76
+      ],
+      "source_bbox": [
+        1011,
+        308,
+        1171,
+        355
+      ],
+      "width": 160,
+      "height": 47,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 7,
+      "cell": [
+        1440,
+        296,
+        460,
+        76
+      ],
+      "source_bbox": [
+        1473,
+        308,
+        1629,
+        355
+      ],
+      "width": 156,
+      "height": 47,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 8,
+      "cell": [
+        0,
+        208,
+        460,
+        76
+      ],
+      "source_bbox": [
+        30,
+        221,
+        188,
+        268
+      ],
+      "width": 158,
+      "height": 47,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 9,
+      "cell": [
+        460,
+        208,
+        460,
+        76
+      ],
+      "source_bbox": [
+        492,
+        221,
+        648,
+        268
+      ],
+      "width": 156,
+      "height": 47,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 10,
+      "cell": [
+        920,
+        208,
+        460,
+        76
+      ],
+      "source_bbox": [
+        950,
+        221,
+        1115,
+        268
+      ],
+      "width": 165,
+      "height": 47,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 11,
+      "cell": [
+        1380,
+        208,
+        460,
+        76
+      ],
+      "source_bbox": [
+        1413,
+        221,
+        1622,
+        268
+      ],
+      "width": 209,
+      "height": 47,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 12,
+      "cell": [
+        1800,
+        776,
+        104,
+        76
+      ],
+      "source_bbox": [
+        1811,
+        787,
+        1882,
+        835
+      ],
+      "width": 71,
+      "height": 48,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 13,
+      "cell": [
+        1904,
+        776,
+        104,
+        76
+      ],
+      "source_bbox": [
+        1919,
+        788,
+        1990,
+        835
+      ],
+      "width": 71,
+      "height": 47,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 14,
+      "cell": [
+        0,
+        136,
+        896,
+        72
+      ],
+      "source_bbox": [
+        3,
+        148,
+        476,
+        195
+      ],
+      "width": 473,
+      "height": 47,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 15,
+      "cell": [
+        896,
+        144,
+        756,
+        64
+      ],
+      "source_bbox": [
+        900,
+        157,
+        1194,
+        195
+      ],
+      "width": 294,
+      "height": 38,
+      "median_rgba": [
+        255,
+        255,
+        255,
+        255
+      ]
+    },
+    {
+      "region_idx": 16,
+      "cell": [
+        1652,
+        144,
+        388,
+        64
+      ],
+      "source_bbox": [
+        1660,
+        156,
+        1832,
+        194
+      ],
+      "width": 172,
+      "height": 38,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 17,
+      "cell": [
+        1800,
+        648,
+        200,
+        44
+      ],
+      "source_bbox": [
+        1800,
+        648,
+        2000,
+        692
+      ],
+      "width": 200,
+      "height": 44,
+      "median_rgba": [
+        0,
+        0,
+        0,
+        255
+      ]
+    }
+  ],
+  "readiness_tier": "ONE_STAGE_TO_RENDER_SEMANTIC_PROTECTED_BINDING",
+  "evidence": "localization/graphics/role_A/20261005-A-PRODUCTION63-PREFLIGHT/A63_97E863AD_SOURCE_REGIONS.jpg",
+  "status": "A63_PREFLIGHT_SOURCE_CONTACT_READY_FOR_CONTROLLER_BINDING_AND_SAME_INVOCATION_RENDER",
+  "runtime_validation": "UNTESTED"
+}
