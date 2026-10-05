@@ -84,26 +84,30 @@ clean=Image.open(cleanp).convert("RGBA")
 if clean.size!=(W,H): raise RuntimeError("clean size")
 
 allowed=Image.new("L",(W,H),0)
-final=old.copy(); rec=[]; render_masks=[]
+final=old.copy(); rec=[]; render_masks=[]; prev_bottom=None
 for key,source,ko,bbox in rows:
  x0,y0,x1,y1=bbox
  ImageDraw.Draw(allowed).rectangle((x0,y0,x1-1,y1-1),fill=255)
  final.paste(clean.crop(bbox),(x0,y0))
- layer=render(ko,142,0.28)
+ layer=render(ko,120,0.28)
  if layer.width>x1-x0-12 or layer.height>y1-y0-10:
   raise RuntimeError(("shared fs does not fit",key,layer.size,bbox))
  # source bboxes are a centered shared header stack; preserve that center alignment.
- tx=x0+(x1-x0-layer.width)//2; ty=y0+(y1-y0-layer.height)//2
+ tx=x0+(x1-x0-layer.width)//2
+ center_ty=y0+(y1-y0-layer.height)//2
+ ty=max(y0+5,center_ty,(prev_bottom+5) if prev_bottom is not None else y0+5)
+ if ty+layer.height>=y1:
+  raise RuntimeError(("shared cadence does not fit",key,ty,layer.height,bbox,prev_bottom))
  lm=bmask(layer.getchannel("A")); tm=Image.new("L",(W,H),0); tm.paste(lm,(tx,ty))
  loc=list(tm.getbbox() or ())
  if not loc or not(loc[0]>x0 and loc[1]>y0 and loc[2]<x1 and loc[3]<y1):
   raise RuntimeError(("margin",key,loc,bbox))
- final.paste(layer,(tx,ty),lm); render_masks.append(tm)
+ final.paste(layer,(tx,ty),lm); render_masks.append(tm); prev_bottom=loc[3]
  rec.append({"key":key,"source":source,"korean":ko,"original_bbox":list(bbox),"localized_bbox":loc,
    "source_size":[x1-x0,y1-y0],"localized_size":[loc[2]-loc[0],loc[3]-loc[1]],
    "delta_left":loc[0]-x0,"delta_right":x1-loc[2],"delta_top":loc[1]-y0,"delta_bottom":y1-loc[3],
-   "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","font":FPAT,"native_font_size_px":142,
-   "shear":0.28,"alignment":"source-centered-shared-header-family"})
+   "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","font":FPAT,"native_font_size_px":120,
+   "shear":0.28,"alignment":"source-centered-horizontal-positive-vertical-cadence"})
 
 delta=dmask(old,final); outside=count(ImageChops.multiply(delta,ImageOps.invert(allowed)))
 ad=bmask(ImageChops.difference(old.getchannel("A"),final.getchannel("A"))); alpha_out=count(ImageChops.multiply(ad,ImageOps.invert(allowed)))
@@ -145,10 +149,10 @@ report={"schema_version":1,"role":"A","run":run,"queue_index":121,"asset":asset_
 "source_sha256":source_sha,"input_candidate_sha256":input_sha,"candidate_sha256":csha,"candidate_path":str(candp.relative_to(repo)),
 "structure":{"dimensions":[W,H],"format":"RGBA32","pitch":pitch,"mips":mips,"header_128_exact":candp.read_bytes()[:128]==sb[:128],"raw_orientation":"mirror_y"},
 "reworked_elements":rec,
-"family_style":{"shared_native_font":"Noto Sans CJK KR Black","font_size_px":142,"shear":0.28,"alignment":"source-centered","fill":"neutral white","outline":"light edge + dark gray keyline","shadow":"source-like offset dark depth","old_korean_bitmap_reused":False},
+"family_style":{"shared_native_font":"Noto Sans CJK KR Black","font_size_px":120,"shear":0.28,"alignment":"source-centered-horizontal + positive vertical cadence","fill":"neutral white","outline":"light edge + dark gray keyline","shadow":"source-like offset dark depth","old_korean_bitmap_reused":False},
 "preservation":{"all_pixels_outside_three_header_bboxes_vs_A86":"PIXEL_EXACT","other_26_localized_rows":"PRESERVED_BYTES"},
 "machine_checks":{"changed_pixels_outside_header_union":outside,"alpha_changed_outside_header_union":alpha_out,"clean_source_effect_unchanged_pixels":clean_res,"localized_pair_overlap":[],"localized_pair_touch":[]},
-"a86_fail_close_reason":"A86 changed only Select your car; controller family review would leave source-shared header lines in inconsistent Korean styles, so A86 is superseded before producer promotion.",
+"a86_fail_close_reason":"A86 changed only Select your car; controller family review would leave source-shared header lines in inconsistent Korean styles. The first A87 shared-family attempt at 142px was fail-closed because Select car/Course localized effects overlapped. This corrected A87 uses one 120px source-family style with explicit positive vertical cadence.",
 "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"PENDING_NEW_INGAME_RETEST",
 "status":"A87_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"}
 (out/"A87_IGR018_FD90_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
