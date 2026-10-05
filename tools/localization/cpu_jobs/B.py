@@ -1,53 +1,243 @@
 #!/usr/bin/env python3
-import os,json,hashlib,struct,urllib.request
+import os,json,hashlib,struct,urllib.request,subprocess,statistics
 from pathlib import Path
-from PIL import Image,ImageDraw
+import numpy as np
+from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter,ImageOps
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("worker B only")
 repo=Path.cwd()
-run="20261005-B-PRODUCTION90-63C91067-PREFLIGHT"
+run="20261005-B-PRODUCTION91"
 out=repo/"localization/graphics/role_B"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
+asset="textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds"
+candidate=repo/"localization/graphics/hd_candidates"/asset; candidate.parent.mkdir(parents=True,exist_ok=True)
 commit="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 base="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+commit
-work=Path("/tmp/b90"); work.mkdir(exist_ok=True)
-dds=work/"src.dds"; atlas=work/"atlas.json"
+w=Path("/tmp/b91"); w.mkdir(exist_ok=True)
+dds=w/"src.dds"; atlas=w/"atlas.json"
 urllib.request.urlretrieve(base+"/Release/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",dds)
 urllib.request.urlretrieve(base+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_CLAR_RANK_Exst/4x_63C91067_512x512_atlas.json",atlas)
 sb=dds.read_bytes(); ab=atlas.read_bytes()
 def sha(b): return hashlib.sha256(b).hexdigest()
 def blob(b): return hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
-if sb[:4]!=b"DDS ": raise RuntimeError("not DDS")
+def bmask(im): return im.point(lambda v:255 if v else 0)
+def count(im): return sum(im.histogram()[1:])
+def diffmask(a,b):
+    d=ImageChops.difference(a,b); bands=d.split(); m=bands[0]
+    for z in bands[1:]: m=ImageChops.lighter(m,z)
+    return bmask(m)
+def comp(im,bg=(72,72,72,255)):
+    z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
+
+if blob(sb)!="9f41fe44ecb17a4daba096ddbb9d2c73fa28e8f9": raise RuntimeError(("source drift",blob(sb)))
+if blob(ab)!="7f118326e34794e2ae5bf3f3b6d82b6ce566c64a": raise RuntimeError(("atlas drift",blob(ab)))
 H,W,pitch,depth,mips=struct.unpack_from("<5I",sb,12)
-fourcc=sb[84:88].decode("latin1")
-raw=Image.open(dds).convert("RGBA")
-readable=raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-regs=json.loads(ab.decode())["regions"]
-def comp(im):
-    z=Image.new("RGBA",im.size,(72,72,72,255)); z.alpha_composite(im); return z.convert("RGB")
-# evidence
-for name,im in [("READABLE",readable),("RAW",raw)]:
-    z=comp(im); z.thumbnail((1400,1400),Image.Resampling.NEAREST); z.save(out/f"B90_63C_{name}.jpg",quality=96)
-cards=[]; meta=[]
-for r in regs:
-    idx=r["idx"]; x,y,cw,ch=r["rect"]; cell=readable.crop((x,y,x+cw,y+ch)); a=cell.getchannel("A"); bb=a.getbbox()
-    gb=None if bb is None else [x+bb[0],y+bb[1],x+bb[2],y+bb[3]]
-    show=comp(cell)
-    sc=max(1,min(4,1000//max(1,cw)))
-    show=show.resize((cw*sc,ch*sc),Image.Resampling.NEAREST)
-    card=Image.new("RGB",(max(900,show.width),show.height+38),"white"); card.paste(show,(0,38))
-    ImageDraw.Draw(card).text((5,7),f"idx {idx} {r.get('name','')} cell={x},{y},{cw},{ch} bbox={gb}",fill="black")
-    cards.append(card)
-    meta.append({"idx":idx,"name":r.get("name",""),"cell":[x,y,cw,ch],"alpha_bbox":gb,"alpha_pixels":sum(a.histogram()[1:])})
-sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+5 for c in cards)),"white"); yy=0
-for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+5
-sheet.thumbnail((1600,12000),Image.Resampling.LANCZOS); sheet.save(out/"B90_63C_ATLAS_CONTACT.jpg",quality=96)
-report={"schema_version":1,"role":"B","run":run,"index":26,"asset":"textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
-"source_sha256":sha(sb),"source_git_blob_sha1":blob(sb),"atlas_git_blob_sha1":blob(ab),
-"structure":{"dimensions":[W,H],"fourcc":fourcc,"mipmaps":mips,"raw_orientation":"mirror_y"},
-"regions_count":len(regs),"regions":meta,
-"status":"PREFLIGHT_VISUAL_CLASSIFICATION_REQUIRED","RUNTIME_VALIDATION":"UNTESTED"}
-(out/"B90_63C_PREFLIGHT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-(wr/"B90_63C91067.json").write_text(json.dumps({"run":run,"index":26,"asset":"63C91067","source_sha256":sha(sb),"regions_count":len(regs),"status":report["status"],"report":f"localization/graphics/role_B/{run}/B90_63C_PREFLIGHT.json"},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps(report,ensure_ascii=False))
+pf=struct.unpack_from("<8I",sb,76); masks=(pf[4],pf[5],pf[6],pf[7])
+mode="RGBA" if masks[:3]==(0xff,0xff00,0xff0000) else ("BGRA" if masks[:3]==(0xff0000,0xff00,0xff) else None)
+if mode is None or (W,H)!=(2048,2048) or len(sb)!=128+W*H*4:
+    raise RuntimeError(("unexpected structure",W,H,mips,masks,len(sb),mode))
+raw_src=Image.frombytes("RGBA",(W,H),sb[128:],"raw",mode)
+src=raw_src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+sa=np.asarray(src,dtype=np.uint8)
+regs={r["idx"]:r for r in json.loads(ab.decode())["regions"]}
+
+# Both regions contain the same functional label Total Rank. Constrain discovery to
+# the centered upper title area to exclude the speech-bubble/starburst artwork.
+rows=[]; source_core=np.zeros((H,W),bool)
+for idx in (0,1):
+    x,y,cw,ch=regs[idx]["rect"]
+    rx0=x+int(cw*.20); rx1=x+int(cw*.80)
+    ry0=y+int(ch*.02); ry1=y+min(int(ch*.28),300)
+    roi=sa[ry0:ry1,rx0:rx1]
+    r=roi[:,:,0].astype(np.int16); g=roi[:,:,1].astype(np.int16); b=roi[:,:,2].astype(np.int16); a=roi[:,:,3]
+    white=(a>32)&(r>165)&(g>165)&(b>165)&((np.maximum.reduce([r,g,b])-np.minimum.reduce([r,g,b]))<65)
+    navy=(a>32)&(b>r+10)&(b>g+5)&(r<100)&(g<100)&(b<170)
+    core=white|navy
+    # keep only connected neighborhood around the central title by column/row support
+    ys,xs=np.nonzero(core)
+    if len(xs)<100: raise RuntimeError(("title core too small",idx,len(xs)))
+    gx0=rx0+int(xs.min()); gy0=ry0+int(ys.min()); gx1=rx0+int(xs.max())+1; gy1=ry0+int(ys.max())+1
+    # Reject a discovery spanning implausibly much of the region.
+    if gx1-gx0>cw*.65 or gy1-gy0>ch*.22: raise RuntimeError(("title discovery implausible",idx,[gx0,gy0,gx1,gy1]))
+    m=np.zeros((H,W),bool); m[ry0:ry1,rx0:rx1]=core
+    # Expand three pixels to capture antialias/outline fringe, clipped to the exact effect bbox inferred from the title neighborhood.
+    pim=Image.fromarray((m.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(7))
+    pm=np.asarray(pim)>0
+    pys,pxs=np.nonzero(pm)
+    bx0=int(pxs.min()); by0=int(pys.min()); bx1=int(pxs.max())+1; by1=int(pys.max())+1
+    # source exact permitted region is this full title effect footprint; core retained separately for residue test.
+    source_core|=m
+    rows.append({"region_idx":idx,"source":"Total Rank","korean":"종합 랭킹","cell":[x,y,cw,ch],
+      "core_bbox":[gx0,gy0,gx1,gy1],"original_bbox":[bx0,by0,bx1,by1],"source_core_pixels":int(np.count_nonzero(m)),
+      "source_mask_pixels":int(np.count_nonzero(pm))})
+
+source_mask_img=Image.new("L",(W,H),0)
+for row in rows:
+    # recreate per-row dilation from its core bounded by row core neighborhood
+    idx=row["region_idx"]; x,y,cw,ch=regs[idx]["rect"]; rx0=x+int(cw*.20); rx1=x+int(cw*.80); ry0=y+int(ch*.02); ry1=y+min(int(ch*.28),300)
+    roi=sa[ry0:ry1,rx0:rx1]; r=roi[:,:,0].astype(np.int16); g=roi[:,:,1].astype(np.int16); b=roi[:,:,2].astype(np.int16); a=roi[:,:,3]
+    core=((a>32)&(r>165)&(g>165)&(b>165)&((np.maximum.reduce([r,g,b])-np.minimum.reduce([r,g,b]))<65))|((a>32)&(b>r+10)&(b>g+5)&(r<100)&(g<100)&(b<170))
+    m=Image.new("L",(W,H),0); patch=Image.fromarray((core.astype(np.uint8)*255),"L"); m.paste(patch,(rx0,ry0))
+    m=m.filter(ImageFilter.MaxFilter(7))
+    source_mask_img=ImageChops.lighter(source_mask_img,m)
+source_mask=bmask(source_mask_img)
+allowed=Image.new("L",(W,H),0)
+for row in rows:
+    x0,y0,x1,y1=row["original_bbox"]; ImageDraw.Draw(allowed).rectangle((x0,y0,x1-1,y1-1),fill=255)
+
+# Style colors from source core.
+pix=sa[source_core]
+white_sel=(pix[:,0]>165)&(pix[:,1]>165)&(pix[:,2]>165)
+navy_sel=(pix[:,2].astype(int)>pix[:,0].astype(int)+10)&(pix[:,2].astype(int)>pix[:,1].astype(int)+5)&(pix[:,0]<100)&(pix[:,1]<100)
+white_rgb=tuple(int(round(statistics.median(pix[white_sel,k]))) for k in range(3))
+navy_rgb=tuple(int(round(statistics.median(pix[navy_sel,k]))) for k in range(3))
+white=white_rgb+(255,); navy=navy_rgb+(255,)
+
+# Smooth local vertical reconstruction, pasted only into the glyph/effect mask.
+clean_arr=sa.copy()
+sm=np.asarray(source_mask)>0
+for row in rows:
+    x0,y0,x1,y1=row["original_bbox"]; pad=10
+    xx0=max(0,x0-pad); xx1=min(W,x1+pad)
+    top0=max(0,y0-12); top1=max(0,y0-4); bot0=min(H,y1+4); bot1=min(H,y1+12)
+    if top1<=top0 or bot1<=bot0: raise RuntimeError(("reconstruction samples",row))
+    top=np.median(sa[top0:top1,xx0:xx1].astype(np.float32),axis=0)
+    bot=np.median(sa[bot0:bot1,xx0:xx1].astype(np.float32),axis=0)
+    for yy in range(y0,y1):
+        t=(yy-y0+0.5)/max(1,(y1-y0))
+        line=np.clip(np.rint(top*(1-t)+bot*t),0,255).astype(np.uint8)
+        sel=sm[yy,xx0:xx1]
+        clean_arr[yy,xx0:xx1][sel]=line[sel]
+clean=Image.fromarray(clean_arr,"RGBA")
+source_png=out/"63C_SOURCE_READABLE.png"; clean_png=out/"63C_CLEAN_PLATE.png"; smp=out/"63C_SOURCE_TEXT_MASK.png"; allowedp=out/"63C_ALLOWED_BBOX_MASK.png"
+src.save(source_png); clean.save(clean_png); source_mask.save(smp); allowed.save(allowedp)
+protected=ImageOps.invert(allowed); pp=out/"63C_PROTECTED_MASK.png"; protected.save(pp)
+validator=repo/"tools/localization/validate_clean_plate.py"
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(smp),"--protected-mask",str(pp),"--report",str(out/"B91_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B91_CLEAN_VALIDATION.json").read_text())
+if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
+
+subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
+FONT=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{style}","Noto Sans CJK KR:style=Black"],text=True).strip()
+fp,fi,fstyle=FONT.rsplit("|",2); fi=int(fi or 0)
+if not Path(fp).exists(): raise RuntimeError(("font missing",FONT))
+
+def shear_rgba(im,s):
+    shift=max(0,int(round(s*(im.height-1))))
+    o=Image.new("RGBA",(im.width+shift,im.height),(0,0,0,0))
+    for y in range(im.height):
+        o.alpha_composite(im.crop((0,y,im.width,y+1)),(int(round(s*(im.height-1-y))),y))
+    return o
+
+def make_tile(text,fs):
+    font=ImageFont.truetype(fp,fs,index=fi)
+    sw=max(2,round(fs*.075))
+    d=ImageDraw.Draw(Image.new("L",(8,8),0)); bb=d.textbbox((0,0),text,font=font,stroke_width=sw)
+    pad=sw+5; size=(bb[2]-bb[0]+2*pad,bb[3]-bb[1]+2*pad)
+    fillm=Image.new("L",size,0); outm=Image.new("L",size,0)
+    pos=(pad-bb[0],pad-bb[1])
+    ImageDraw.Draw(outm).text(pos,text,font=font,fill=255,stroke_width=sw,stroke_fill=255)
+    ImageDraw.Draw(fillm).text(pos,text,font=font,fill=255)
+    tile=Image.new("RGBA",size,(0,0,0,0)); tile.paste(navy,(0,0),outm); tile.paste(white,(0,0),fillm)
+    tile=shear_rgba(tile,.22)
+    ab=tile.getchannel("A").getbbox()
+    return tile.crop(ab) if ab else None,sw
+
+# Shared source style, maximum safe size with positive margin in both occurrences.
+shared_fs=None; shared_tile=None; shared_sw=None
+for fs in range(110,20,-1):
+    tile,sw=make_tile("종합 랭킹",fs)
+    if not tile: continue
+    ok=True
+    for row in rows:
+        x0,y0,x1,y1=row["original_bbox"]
+        if tile.width>(x1-x0)-8 or tile.height>(y1-y0)-8: ok=False; break
+    if ok: shared_fs,shared_tile,shared_sw=fs,tile,sw; break
+if shared_fs is None: raise RuntimeError("shared Korean title fit failed")
+
+final=clean.copy(); targets=[]; outrows=[]
+for row in rows:
+    x0,y0,x1,y1=row["original_bbox"]; tile=shared_tile
+    px=x0+(x1-x0-tile.width)//2; py=y0+(y1-y0-tile.height)//2
+    final.alpha_composite(tile,(px,py))
+    lm=Image.new("L",(W,H),0); lm.paste(bmask(tile.getchannel("A")),(px,py)); lb=list(lm.getbbox())
+    sw0,sh0=x1-x0,y1-y0; lw,lh=lb[2]-lb[0],lb[3]-lb[1]
+    if not(lb[0]>x0 and lb[1]>y0 and lb[2]<x1 and lb[3]<y1 and lw<=sw0 and lh<=sh0):
+        raise RuntimeError(("containment",row["region_idx"],[x0,y0,x1,y1],lb))
+    targets.append(lm)
+    outrows.append({**row,"localized_bbox":lb,"source_width":sw0,"source_height":sh0,"localized_width":lw,"localized_height":lh,
+      "delta_left":lb[0]-x0,"delta_right":x1-lb[2],"delta_top":lb[1]-y0,"delta_bottom":y1-lb[3],
+      "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","font_file":Path(fp).name,"font_style":fstyle,
+      "font_size":shared_fs,"stroke_width":shared_sw,"slant":.22,"fill_rgba":white,"outline_rgba":navy,"alignment":"center",
+      "rework_status":"B91_NEW_EXACT_HD_CANDIDATE"})
+
+if ImageChops.multiply(targets[0],targets[1]).getbbox(): raise RuntimeError("target overlap")
+target=ImageChops.lighter(targets[0],targets[1]); target.save(out/"63C_TARGET_TEXT_MASK.png")
+
+raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+payload=sb[:128]+raw_final.tobytes("raw",mode)
+candidate.write_bytes(payload); csha=sha(payload)
+if payload[:128]!=sb[:128]: raise RuntimeError("header drift")
+raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
+dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("RGBA roundtrip mismatch")
+final_png=out/"63C_FINAL_DECODED_READABLE.png"; dec.save(final_png)
+subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(allowedp),"--protected-mask",str(pp),"--report",str(out/"B91_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"B91_FINAL_VALIDATION.json").read_text())
+if finalrep["status"]!="PASS": raise RuntimeError(("final validator",finalrep))
+
+diff=diffmask(src,dec)
+outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
+alphaout=count(ImageChops.multiply(bmask(ImageChops.difference(src.getchannel("A"),dec.getchannel("A"))),ImageOps.invert(allowed)))
+render_out=count(ImageChops.multiply(target,ImageOps.invert(allowed)))
+prot=outside
+# Exact source core pixels left unchanged outside a 2px Korean guard are residue.
+guard=target.filter(ImageFilter.MaxFilter(5))
+core_img=Image.fromarray((source_core.astype(np.uint8)*255),"L")
+unchanged=ImageOps.invert(diff)
+residue=count(ImageChops.multiply(ImageChops.multiply(core_img,ImageOps.invert(guard)),unchanged))
+if outside or alphaout or render_out or prot or residue:
+    raise RuntimeError(("pixel gates",outside,alphaout,render_out,prot,residue))
+
+# Evidence.
+stack=Image.new("RGB",(1024,3*1050),"white")
+for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
+    z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); stack.paste(z,(0,i*1050+26)); ImageDraw.Draw(stack).text((5,i*1050+5),label,fill="black")
+stack.save(out/"B91_63C_SOURCE_CLEAN_FINAL.jpg",quality=96)
+cards=[]
+for row in outrows:
+    x0,y0,x1,y1=row["original_bbox"]; p=20; cr=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
+    ims=[comp(z).crop(cr) for z in (src,clean,dec)]
+    sc=max(1,min(3,1200//max(1,ims[0].width)))
+    ims=[z.resize((z.width*sc,z.height*sc),Image.Resampling.NEAREST) for z in ims]
+    c=Image.new("RGB",(sum(z.width for z in ims)+12,max(z.height for z in ims)+34),"white"); xx=0
+    for z in ims: c.paste(z,(xx,34)); xx+=z.width+6
+    ImageDraw.Draw(c).text((5,5),f'{row["region_idx"]} Total Rank -> 종합 랭킹',fill="black"); cards.append(c)
+sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+4 for c in cards)),"white"); yy=0
+for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
+sheet.save(out/"B91_63C_ROW_CONTACT.jpg",quality=96)
+rr=Image.new("RGB",(1024,2*1050),"white")
+for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
+    z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); rr.paste(z,(0,i*1050+26)); ImageDraw.Draw(rr).text((5,i*1050+5),label,fill="black")
+rr.save(out/"B91_63C_RAW_COMPARE.jpg",quality=96)
+
+report={"schema_version":1,"role":"B","run":run,"queue_index":26,"asset":asset,
+ "readiness_tier":"PREFLIGHT_PROMOTED_TO_RENDER_COMPLETED_SAME_INVOCATION",
+ "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":commit,"git_blob_sha1":blob(sb),"atlas_git_blob_sha1":blob(ab),"source_sha256":sha(sb)},
+ "semantic_binding":{"0":"Total Rank -> 종합 랭킹","1":"Total Rank -> 종합 랭킹"},
+ "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
+ "source_style":{"family":"white italic title with navy outline","font_file":Path(fp).name,"font_style":fstyle,"shared_font_size":shared_fs,"stroke_width":shared_sw,"slant":.22,"fill_rgba":white,"outline_rgba":navy,"alignment":"center"},
+ "rows":outrows,"clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
+ "decoded_changes":{"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"source_core_residue":residue,"render_outside_target":render_out,"localized_overlap":0},
+ "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
+ "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
+ "status":"B91_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
+(out/"B91_63C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+summary={"run":run,"index":26,"asset":"63C91067","source_sha256":sha(sb),"candidate_sha256":csha,"localized_physical_elements":2,
+ "bbox_size_positive_margin":"2/2","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
+ "source_residue":residue,"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"render_outside_target":render_out,"overlap":0,
+ "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B91_63C_REPORT.json"}
+(wr/"B91_63C91067.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+print(json.dumps(summary,ensure_ascii=False))
