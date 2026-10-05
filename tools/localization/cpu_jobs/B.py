@@ -107,7 +107,9 @@ removal_im=Image.fromarray((removal_delta.astype(np.uint8)*255),"L")
 removal_dil=np.asarray(removal_im.filter(ImageFilter.MaxFilter(5)))>0
 fringe_only=patch_outside & removal_dil
 fringe_outside_dilation=int(np.count_nonzero(patch_outside & (~removal_dil)))
-fringe_coords=np.argwhere(patch_outside)\nfringe_rgba=[patch_b[int(y),int(x)].tolist() for y,x in fringe_coords[:16]]\nif fringe_outside_dilation or patch_diff_outside_removal>4:
+fringe_coords=np.argwhere(patch_outside)
+fringe_rgba=[patch_b[int(y),int(x)].tolist() for y,x in fringe_coords[:16]]
+if fringe_outside_dilation or patch_diff_outside_removal>4:
     raise RuntimeError(("template patch differs beyond source-effect AA fringe",patch_diff_pixels,patch_diff_outside_removal,fringe_outside_dilation,patch_max))
 pad=32
 ta=[max(0,ob[0]-pad),max(0,ob[1]-pad),min(W,ob[2]+pad),min(H,ob[3]+pad)]
