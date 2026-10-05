@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C179-560FA536",
+  "qa_id": "C179",
+  "timestamp_kst": "2026-10-05T17:56:29+09:00",
+  "queue_index": 101,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+  "source_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+  "candidate_sha256": "4b4dbb1f645c526fb812e500c01a0fa03894dc1aff2267682ea9f8b283c05744",
+  "candidate_changed_by_C": false,
+  "machine_status": "PASS_ON_PRODUCER_DERIVED_BBOXES",
+  "bbox_size_positive_margin": "13/13 PASS",
+  "controller_visual_qa": "FAIL_IDX31_SOURCE_BBOX_INCOMPLETE_SOURCE_FRAGMENT_RESIDUE",
+  "visual_findings": [
+    "For idx31 warning text, canonical SOURCE visibly extends past the producer-declared source bbox [3074,25,3932,168].",
+    "CLEAN/FINAL retain source-script fragments at the horizontal edges of that row because the source bbox/mask is incomplete.",
+    "Therefore outside/residue counters computed from the incomplete producer bbox are false negatives; the item cannot advance."
+  ],
+  "decision": "C179_REWORK_REQUIRED_SOURCE_BBOX_INCOMPLETE_SOURCE_RESIDUE",
+  "required_rework": "Re-derive the full canonical idx31 source glyph/effect bbox and mask, remove all source-script/effect pixels without altering protected artwork, then rerun exact containment and visual QA.",
+  "machine_report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_MACHINE_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C179-560FA536/C179_CONTACTS_1_B64.txt",
+    "localization/graphics/role_C/20261005-C179-560FA536/C179_CONTACTS_2_B64.txt",
+    "localization/graphics/role_C/20261005-C179-560FA536/C179_RAW_B64.txt"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
