@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,6 +13,7 @@ R33_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r33.cpp"
 DRAW_STATE_HELPERS_PATH = ROOT / "src/vr/d3d9/draw_state_helpers.hpp"
 STATEBLOCK_PATH = ROOT / "src/vr/state/state_block_tracker.hpp"
 WORKFLOW_PATH = ROOT / ".github/workflows/vr-dx9ex-active.yml"
+RUN_RECORD_PATH = ROOT / "docs/automation/runs/CONVERSION-DX9EX-00409.json"
 
 
 def fail(message: str) -> None:
@@ -66,6 +68,28 @@ r33 = load(R33_PATH)
 draw_state_helpers = load(DRAW_STATE_HELPERS_PATH)
 stateblock = load(STATEBLOCK_PATH)
 workflow = load(WORKFLOW_PATH)
+run_record = json.loads(load(RUN_RECORD_PATH))
+
+# -1) Controller result identity is part of the retirement completion contract.
+# Bookkeeping commits may follow the material result, but they must never become
+# the Gate-owning result merely because they carry the task marker.
+if run_record.get("task_id") != "CONVERSION-DX9EX-00409":
+    fail("00409 durable record task identity changed")
+result_sha = run_record.get("result_sha")
+validation_sha = run_record.get("validation_bearing_result_sha")
+queue_sha = run_record.get("queue_commit_sha")
+state_sha = run_record.get("state_commit_sha")
+if not result_sha:
+    fail("00409 durable record is missing contract-required result_sha")
+if result_sha != validation_sha:
+    fail("00409 result_sha must equal validation_bearing_result_sha")
+if result_sha in {queue_sha, state_sha}:
+    fail("00409 bookkeeping SHA was promoted to validation-bearing result")
+identity = run_record.get("result_identity", {})
+if identity.get("queue_commit_role") != "BOOKKEEPING_ONLY":
+    fail("00409 queue commit role must remain BOOKKEEPING_ONLY")
+if identity.get("state_commit_role") != "BOOKKEEPING_ONLY":
+    fail("00409 state commit role must remain BOOKKEEPING_ONLY")
 
 # 0) R31/R32 retirement must continue reducing cross-layer helper ownership.
 # Live vertex-shader identity checking is stateless draw-state validation, so it
@@ -329,7 +353,10 @@ require(
     workflow,
     "DX9Ex Active workflow",
     "- 'tools/verify_vr_r31_r32_retirement_guard.py'",
-    "python tools/verify_vr_r31_r32_retirement_guard.py",
+    "'tools/verify_vr_r31_r32_retirement_guard.py'",
+    "foreach ($verifier in $verifiers)",
+    "python $verifier",
+    "if ($LASTEXITCODE -ne 0)",
 )
 
 print(
