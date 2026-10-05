@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION73",
+  "timestamp_kst": "2026-10-05T10:27:29+09:00",
+  "index": 230,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
+  "superseded_attempts": {
+    "B70": "REJECTED_CONTROLLER_SOURCE_STYLE_TOO_THIN_REGULAR_FALLBACK",
+    "B71": "REJECTED_CONTROLLER_PILL_CLEAN_PLATE_TEXT_AA_RESIDUE",
+    "B72": "FAIL_CLOSED_RESIDUE_GATE_ACCOUNTING_FALSE_POSITIVE_NO_SHARED_STATE",
+    "B73": "PASS"
+  },
+  "machine_qa": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "localized_physical_elements": 11,
+    "preserved_regions": 16,
+    "bbox_size_positive_margin": "11/11 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "source_residue": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "preserved_regions_changed": 0,
+    "overlap": 0,
+    "touch_pairs": 0
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "source_style": "PASS",
+    "clean_plate": "PASS",
+    "observations": [
+      "B70 was rejected because Regular CJK fallback was visibly too thin versus the source block lettering; B73 uses NotoSansCJK-Black.",
+      "B71 was rejected because faint UNAVAILABLE/SOLD antialias residue remained in the red pill clean plate; B73 removes the residue while preserving the pill background.",
+      "White block labels, dark labels, and red-pill labels retain their source-family weight/alignment. Song titles, Alberto's Antics item names, unchanged BGM, two explanatory English lines, bars, separator, and decorative panel remain pixel-exact.",
+      "No visible clipping, overlap, seam, halo, source-script residue, or orientation regression is present."
+    ]
+  },
+  "decision": "B_PRODUCTION73_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
