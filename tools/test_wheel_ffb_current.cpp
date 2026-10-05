@@ -169,6 +169,13 @@ int main() {
  require(physics_return_relief(.15f,-.08f)>.89f&&physics_return_relief(.15f,-.08f)<.91f,"normal-corner countersteer relief remains modest");
  require(physics_return_relief(.32f,-.08f)>.969f,"deep-slip self-countersteer retains nearly all aligning torque");
  require(physics_return_relief(.15f,.08f)==1,"opposing work no relief");
+ require(model_uses_reversed_r3_polarity(Model::ModernDD),"R3 Modern polarity is reversed");
+ require(!model_uses_reversed_r3_polarity(Model::ArcadeOriginal)&&!model_uses_reversed_r3_polarity(Model::ArcadeHybrid)&&!model_uses_reversed_r3_polarity(Model::PS2OriginalExperimental),"R3 original/hybrid polarity uses native sign");
+ require(std::abs(SnowIceComfortTextureScale-.22f)<1e-6f,"snow/ice comfort texture remains perceptible");
+ require(drift_countersteer_blend(.70f,-.35f,1.0f)>.80f,"deep opposed-slip drift strongly hands off to body-slip countersteer");
+ require(drift_countersteer_blend(.30f,.20f,1.0f)==0.0f,"same-sign front/body slip keeps normal SAT direction");
+ require(drift_countersteer_blend(.10f,-.20f,1.0f)==0.0f,"small body slip does not trigger drift handoff");
+ require(drift_countersteer_shape(.70f)>.89f&&drift_countersteer_shape(.05f)==0.0f,"drift recovery magnitude is bounded to developed oversteer");
  ResponseLUT linear{}; require(parse_response_lut("0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",linear),"linear LUT parses");
  require(std::abs(apply_response_lut(.55f,linear)-.55f)<1e-5f,"linear LUT identity");
  ResponseLUT boosted{}; require(parse_response_lut("0,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.84,0.92,1",boosted),"boost LUT parses");
