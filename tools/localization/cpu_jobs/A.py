@@ -7,7 +7,7 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
 
-repo=Path.cwd(); run="20261005-A-PRODUCTION48"
+repo=Path.cwd(); run="20261005-A-PRODUCTION49"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset_rel="textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds"
@@ -49,24 +49,24 @@ src=raw_src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 atlas=json.loads(ab.decode("utf-8")); regs={int(r["idx"]):r for r in atlas["regions"]}
 if len(regs)!=17: raise RuntimeError(("regions",len(regs)))
 
-# A48 binding: canonical atlas regions 1..15 are the fifteen reviewed stage-name rows.
+# A49 binding: controller visual review of A48 fixed canonical atlas idx->source semantics.
 # Region 0 is larger decorative/header artwork and region 16 is an 8px separator; preserve both exactly.
 TARGETS={
- 1:("ALPINE","알파인"),
- 2:("CAPE WAY","케이프 웨이"),
- 3:("CLOUDY HIGHLAND","클라우디 하이랜드"),
- 4:("DEEP LAKE","딥 레이크"),
- 5:("GHOST FOREST","고스트 포레스트"),
- 6:("INDUSTRIAL COMPLEX","인더스트리얼 컴플렉스"),
- 7:("PALM BEACH","팜 비치"),
- 8:("TULIP GARDEN","튤립 가든"),
- 9:("ANCIENT RUINS","에인션트 루인스"),
- 10:("CASTLE WALL","캐슬 월"),
- 11:("CONIFEROUS FOREST","코니퍼러스 포레스트"),
- 12:("DESERT","데저트"),
- 13:("IMPERIAL AVENUE","임페리얼 애비뉴"),
- 14:("METROPOLIS","메트로폴리스"),
- 15:("SNOW MOUNTAIN","스노 마운틴"),
+ 1:("TULIP GARDEN","튤립 가든"),
+ 2:("SNOW MOUNTAIN","스노 마운틴"),
+ 3:("PALM BEACH","팜 비치"),
+ 4:("METROPOLIS","메트로폴리스"),
+ 5:("INDUSTRIAL COMPLEX","인더스트리얼 컴플렉스"),
+ 6:("IMPERIAL AVENUE","임페리얼 애비뉴"),
+ 7:("GHOST FOREST","고스트 포레스트"),
+ 8:("DESERT","데저트"),
+ 9:("DEEP LAKE","딥 레이크"),
+ 10:("CONIFEROUS FOREST","코니퍼러스 포레스트"),
+ 11:("CLOUDY HIGHLAND","클라우디 하이랜드"),
+ 12:("CASTLE WALL","캐슬 월"),
+ 13:("CAPE WAY","케이프 웨이"),
+ 14:("ANCIENT RUINS","에인션트 루인스"),
+ 15:("ALPINE","알파인"),
 }
 PROTECTED=[0,16]
 
@@ -238,8 +238,8 @@ for row in rows:
 cw=max(c.width for c in cards); ch=sum(c.height+3 for c in cards)
 sheet=Image.new("RGB",(cw,ch),(195,195,195)); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+3
-sheet.save(out/"A48_39BCA907_SOURCE_CLEAN_FINAL.jpg",quality=95)
-flatten(decoded_raw).resize((1024,512),Image.Resampling.LANCZOS).save(out/"A48_39BCA907_FINAL_RAW_MIRROR_Y.jpg",quality=94)
+sheet.save(out/"A49_39BCA907_SOURCE_CLEAN_FINAL.jpg",quality=95)
+flatten(decoded_raw).resize((1024,512),Image.Resampling.LANCZOS).save(out/"A49_39BCA907_FINAL_RAW_MIRROR_Y.jpg",quality=94)
 
 report={"schema_version":1,"role":"A","run":run,"index":147,"asset":asset_rel,"worker":"github-actions",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"blob_sha1":SOURCE_BLOB_SHA1,"sha256":SOURCE_SHA256},
@@ -254,12 +254,12 @@ report={"schema_version":1,"role":"A","run":run,"index":147,"asset":asset_rel,"w
    "clean_source_pixels_unchanged":clean_source_unchanged,"final_source_residue_outside_korean":residue,
    "localized_overlap_pairs":overlap,"localized_1px_touch_pairs":touch},
  "all_15_bbox_size_positive_margin_pass":allpass,"controller_visual_qa":"PENDING_CONTROLLER_REVIEW",
- "runtime_validation":"UNTESTED","status":"A48_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"}
-(out/"A48_39BCA907_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "runtime_validation":"UNTESTED","status":"A49_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"}
+(out/"A49_39BCA907_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":147,"asset":"39BCA907","candidate_sha256":report["candidate_sha256"],
  "bbox_size_positive_margin":"15/15 PASS","changed_outside":outside,"alpha_outside":alpha_out,
  "protected_changed":protected_changed,"clean_source_unchanged":clean_source_unchanged,"source_residue":residue,
  "overlap":overlap,"touch":touch,"worker_status":report["status"],"runtime_validation":"UNTESTED",
- "report":"localization/graphics/role_A/20261005-A-PRODUCTION48/A48_39BCA907_REPORT.json"}
-(wr/"A48_39BCA907.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "report":"localization/graphics/role_A/20261005-A-PRODUCTION49/A49_39BCA907_REPORT.json"}
+(wr/"A49_39BCA907.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False,indent=2))
