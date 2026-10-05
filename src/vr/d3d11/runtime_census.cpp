@@ -199,9 +199,15 @@ namespace outrun::vr::dx11
             bool present{};
             bool observed{};
             bool sourceEvidenceExact{};
+            bool instructionDecodeExact{};
             UINT byteSize{};
             DWORD versionToken{};
             std::uint64_t hash{};
+            UINT decodedInstructionCount{};
+            UINT decodedOperandTokenCount{};
+            std::uint64_t decodedStreamHash{};
+            std::uint64_t decoderRevisionHash{};
+            std::uint64_t semanticContractHash{};
         };
 
         struct SourceSignature
@@ -561,6 +567,15 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.vertexShader.hash);
             hash = hash_mix(
                 hash, sig.vertexShader.sourceEvidenceExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.vertexShader.instructionDecodeExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.vertexShader.decodedInstructionCount);
+            hash = hash_mix(
+                hash, sig.vertexShader.decodedOperandTokenCount);
+            hash = hash_mix(hash, sig.vertexShader.decodedStreamHash);
+            hash = hash_mix(hash, sig.vertexShader.decoderRevisionHash);
+            hash = hash_mix(hash, sig.vertexShader.semanticContractHash);
             hash = hash_mix(hash, sig.pixelShader.present ? 1u : 0u);
             hash = hash_mix(hash, sig.pixelShader.observed ? 1u : 0u);
             hash = hash_mix(hash, sig.pixelShader.byteSize);
@@ -568,6 +583,15 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.pixelShader.hash);
             hash = hash_mix(
                 hash, sig.pixelShader.sourceEvidenceExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.pixelShader.instructionDecodeExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.pixelShader.decodedInstructionCount);
+            hash = hash_mix(
+                hash, sig.pixelShader.decodedOperandTokenCount);
+            hash = hash_mix(hash, sig.pixelShader.decodedStreamHash);
+            hash = hash_mix(hash, sig.pixelShader.decoderRevisionHash);
+            hash = hash_mix(hash, sig.pixelShader.semanticContractHash);
             hash = hash_mix(hash, sig.shaderIntrospectionComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderMixedPair ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderTranslationExact ? 1u : 0u);
@@ -1065,6 +1089,15 @@ namespace outrun::vr::dx11
             out.byteSize = evidence.byteSize;
             out.versionToken = evidence.versionToken;
             out.hash = evidence.bytecodeHash;
+
+            const auto decode =
+                decode_programmable_shader_instruction_stream(evidence);
+            out.instructionDecodeExact = decode.exact();
+            out.decodedInstructionCount = decode.instructionCount;
+            out.decodedOperandTokenCount = decode.operandTokenCount;
+            out.decodedStreamHash = decode.instructionStreamHash;
+            out.decoderRevisionHash = decode.decoderRevisionHash;
+            out.semanticContractHash = decode.semanticContractHash;
             return out;
         }
 
