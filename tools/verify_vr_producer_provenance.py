@@ -180,12 +180,15 @@ telemetry_guard = classify.rfind("if (Settings::VRTelemetry)", 0, getter_call)
 if telemetry_guard < 0:
     fail("c64 provenance getter is not guarded by VRTelemetry")
 semantic_hud = classify.find("if (semanticHud)")
+accepted_counter = classify.find("++R51VsSemanticHudAccepted", semantic_hud)
 same_node_counter = classify.find("++R51VsSemanticHudC64SameNode", semantic_hud)
-if min(semantic_hud, same_node_counter) < 0:
+if min(semantic_hud, accepted_counter, same_node_counter) < 0:
     fail("semantic HUD c64 relation diagnostics are missing")
 hud_telemetry_guard = classify.find(
-    "if (Settings::VRTelemetry)", semantic_hud, same_node_counter)
+    "if (Settings::VRTelemetry)", semantic_hud, accepted_counter)
 if hud_telemetry_guard < 0:
-    fail("semantic HUD c64 relation counters are not telemetry-gated")
+    fail("semantic HUD acceptance counter is not telemetry-gated")
+if not (hud_telemetry_guard < accepted_counter < same_node_counter):
+    fail("semantic HUD telemetry counters escaped their telemetry guard")
 
 print("VR producer provenance contract PASS")
