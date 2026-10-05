@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C164-C165-A26-A27",
+  "qa_id": "C165",
+  "queue_index": 241,
+  "asset": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+  "producer_run": "20261005-A-PRODUCTION27",
+  "source_sha256": "e250a41e7c59ccd5b8a68a02aace066f6578fbe0d84a365d7a0a27044b353511",
+  "candidate_sha256": "fe9bb931d94a13a44a08bcf61b6325c01080b462afff84f92c97205cbe0eea65",
+  "candidate_changed_by_C": false,
+  "independent_method": "Pinned canonical source re-download; independent RGBA decode; source/localized alpha bboxes independently split into the two physical text bands; exact source-bbox containment/size/margin, changed-pixel/alpha protection, overlap/touch and residue checks; independent readable/raw visual evidence.",
+  "structure": {
+    "dimensions": [
+      1024,
+      256
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "semantic_binding": [
+    {
+      "source": "Loading",
+      "korean": "로딩"
+    },
+    {
+      "source": "PLEASE WAIT",
+      "korean": "잠시만요"
+    }
+  ],
+  "rows": [
+    {
+      "region_idx": 0,
+      "original_bbox": [
+        1,
+        110,
+        731,
+        256
+      ],
+      "localized_bbox": [
+        9,
+        123,
+        258,
+        243
+      ],
+      "source_size": [
+        730,
+        146
+      ],
+      "localized_size": [
+        249,
+        120
+      ],
+      "delta_left": 8,
+      "delta_right": 473,
+      "delta_top": 13,
+      "delta_bottom": 13,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 1,
+      "original_bbox": [
+        4,
+        50,
+        375,
+        98
+      ],
+      "localized_bbox": [
+        6,
+        52,
+        163,
+        96
+      ],
+      "source_size": [
+        371,
+        48
+      ],
+      "localized_size": [
+        157,
+        44
+      ],
+      "delta_left": 2,
+      "delta_right": 212,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "decoded_changed_outside": 0,
+    "alpha_outside": 0,
+    "introduced_visible_outside": 0,
+    "localized_overlap": 0,
+    "localized_1px_near": 0,
+    "source_residue": 0
+  },
+  "style_profiles": {
+    "source_loading_bright_vertical": [
+      [
+        218,
+        218,
+        218
+      ],
+      [
+        235,
+        235,
+        235
+      ],
+      [
+        208,
+        208,
+        208
+      ],
+      [
+        138,
+        138,
+        138
+      ],
+      [
+        154,
+        154,
+        154
+      ]
+    ],
+    "candidate_loading_bright_vertical": [
+      [
+        221,
+        221,
+        221
+      ],
+      [
+        222,
+        222,
+        222
+      ],
+      [
+        223,
+        223,
+        223
+      ],
+      [
+        142,
+        142,
+        142
+      ],
+      [
+        58,
+        58,
+        58
+      ]
+    ]
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

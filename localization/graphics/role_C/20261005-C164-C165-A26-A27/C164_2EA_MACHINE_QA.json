@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C164-C165-A26-A27",
+  "qa_id": "C164",
+  "queue_index": 55,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "producer_run": "20261005-A-PRODUCTION26",
+  "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+  "candidate_sha256": "b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc",
+  "candidate_changed_by_C": false,
+  "independent_method": "Pinned canonical source re-download; independent DXT5 decode; source alpha bbox derivation; decoded containment/alpha/introduced-visible checks; changed-BC3 boundary audit; source-residue screen; independent visual evidence.",
+  "structure": {
+    "dimensions": [
+      2048,
+      256
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "semantic_binding": {
+    "source": "NEXT ROUND",
+    "korean": "다음 라운드"
+  },
+  "original_bbox": [
+    1,
+    105,
+    1090,
+    248
+  ],
+  "localized_bbox": [
+    278,
+    113,
+    811,
+    240
+  ],
+  "source_size": [
+    1089,
+    143
+  ],
+  "localized_size": [
+    533,
+    127
+  ],
+  "delta_left": 277,
+  "delta_right": 279,
+  "delta_top": 8,
+  "delta_bottom": 8,
+  "containment": "PASS",
+  "size_ceiling": "PASS",
+  "positive_margin": "PASS",
+  "machine_checks": {
+    "decoded_changed_outside": 0,
+    "alpha_outside": 0,
+    "introduced_visible_outside": 0,
+    "source_residue": 0,
+    "changed_bc3_blocks": 9509,
+    "partial_boundary_changed_blocks": 24,
+    "changed_bc3_blocks_wholly_outside_allowed": 0,
+    "partial_endpoint_or_color_drift": 0
+  },
+  "style_profiles": {
+    "source_bright_vertical": [
+      [
+        115,
+        180,
+        211
+      ],
+      [
+        219,
+        229,
+        225
+      ],
+      [
+        255,
+        239,
+        231
+      ],
+      [
+        208,
+        220,
+        225
+      ],
+      [
+        28,
+        44,
+        107
+      ]
+    ],
+    "candidate_bright_vertical": [
+      [
+        112,
+        180,
+        214
+      ],
+      [
+        231,
+        227,
+        231
+      ],
+      [
+        255,
+        239,
+        231
+      ],
+      [
+        200,
+        215,
+        222
+      ],
+      [
+        153,
+        176,
+        214
+      ]
+    ]
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

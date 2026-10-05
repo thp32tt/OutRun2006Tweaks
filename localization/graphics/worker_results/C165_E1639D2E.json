@@ -1,0 +1,11 @@
+{
+  "run": "20261005-C164-C165-A26-A27",
+  "qa_id": "C165",
+  "asset": "E1639D2E",
+  "index": 241,
+  "candidate_sha256": "fe9bb931d94a13a44a08bcf61b6325c01080b462afff84f92c97205cbe0eea65",
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "2/2",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_C/20261005-C164-C165-A26-A27/C165_E163_MACHINE_QA.json"
+}
