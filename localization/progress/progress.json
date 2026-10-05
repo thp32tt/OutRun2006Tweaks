@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T07:20:25+09:00",
+  "updated_at_kst": "2026-10-06T07:34:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1352,45 +1352,32 @@
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     },
     "latest_a_production": {
-      "run": "A90",
-      "regression": "IGR-013",
-      "screen": "C2C_BRACKET_SCREEN",
+      "run": "A97",
+      "decision": "FINAL_PENDING_ARTWORK_BATCH_NATIVE_HD",
       "indices": [
-        173,
-        228
+        225,
+        227,
+        231,
+        237
       ],
-      "mapping": "EXACT_MIXED_SPLIT_GRAPHICS_PLUS_RUNTIME_REFERENCE",
       "candidate_sha256": {
-        "6DC89C6E": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
-        "E7F6E9B7": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607"
+        "E3C455FA": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+        "E596B7AC": "e60eb09818ce79c1afc005905ce0d5f7d2678c7f69a2b25f418f2679200499b2",
+        "EBE401C8": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
+        "FF514CEB": "acbf42d5f8f45ee6227bb0f81a770687bba680916c828f773095b64dbc63e5a3"
       },
-      "result": "A90_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
-      "physical_rows_reworked": 21,
-      "bbox_size_positive_margin": "21/21 PASS",
-      "pixel_gates": {
-        "outside": 0,
-        "alpha_outside": 0,
-        "protected": 0,
-        "render_protected_overlap": 0,
-        "clean_residue": 0,
-        "overlap_pairs": 0,
-        "touch_pairs": 0
-      },
-      "controller_visual_qa": "PASS_NATIVE_HD_STAGE_FAMILY",
-      "runtime_text_reference": {
-        "id": 1123,
-        "korean": "스테이지 주행",
-        "source_changed": false
-      },
-      "report": "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_IGR013_6DC89C6E_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_CONTROLLER_SELF_QA.json",
-      "compute_execution": {
-        "workflow_run_id": 37374013614,
-        "authoritative_output_commit": "d740369a998843abaae68e102df9f978607124c9",
-        "authoritative_candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
-        "n100_fallback": "DISCARDED_ENVIRONMENT_VARIANCE"
-      },
-      "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+      "result": "A97_STATIC_PASS_PENDING_C",
+      "conceptual_segments": 35,
+      "localized_physical_rows": 38,
+      "machine_qa": "4/4 assets PASS; 38/38 physical rows bbox/size/positive-margin; zero outside/alpha/protected/source-residue/overlap/touch; DDS roundtrip PASS",
+      "controller_visual_qa": "4/4 PASS",
+      "corrections": [
+        "E3C455FA A95 leading Latin residue false-negative fixed in A95R",
+        "E596B7AC CAPE WAY -> 케이프 웨이; CONIFEROUS FOREST -> 코니퍼러스 포레스트; BAY AREA recovered",
+        "EBE401C8 two omitted explanatory help lines recovered"
+      ],
+      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION97-PENDING4-FINALIZE/A97_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "UNTESTED",
       "pending_independent_c_static_qa": true
     },
     "latest_a_rework": {
@@ -1517,7 +1504,11 @@
       "BA0147DA",
       "8C259C68",
       "A9ABD877",
-      "97E863AD"
+      "97E863AD",
+      "E3C455FA",
+      "E596B7AC",
+      "EBE401C8",
+      "FF514CEB"
     ],
     "c201_55b57cde": {
       "timestamp_kst": "2026-10-05T21:27:02+09:00",
@@ -1814,6 +1805,35 @@
       "report": "localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_IGR019_REPORT.json",
       "controller_report": "localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_CONTROLLER_SELF_QA.json",
       "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+    },
+    "a97_pending4_finalize": {
+      "run": "A97",
+      "decision": "FINAL_PENDING_ARTWORK_BATCH_NATIVE_HD",
+      "indices": [
+        225,
+        227,
+        231,
+        237
+      ],
+      "candidate_sha256": {
+        "E3C455FA": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+        "E596B7AC": "e60eb09818ce79c1afc005905ce0d5f7d2678c7f69a2b25f418f2679200499b2",
+        "EBE401C8": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
+        "FF514CEB": "acbf42d5f8f45ee6227bb0f81a770687bba680916c828f773095b64dbc63e5a3"
+      },
+      "result": "A97_STATIC_PASS_PENDING_C",
+      "conceptual_segments": 35,
+      "localized_physical_rows": 38,
+      "machine_qa": "4/4 assets PASS; 38/38 physical rows bbox/size/positive-margin; zero outside/alpha/protected/source-residue/overlap/touch; DDS roundtrip PASS",
+      "controller_visual_qa": "4/4 PASS",
+      "corrections": [
+        "E3C455FA A95 leading Latin residue false-negative fixed in A95R",
+        "E596B7AC CAPE WAY -> 케이프 웨이; CONIFEROUS FOREST -> 코니퍼러스 포레스트; BAY AREA recovered",
+        "EBE401C8 two omitted explanatory help lines recovered"
+      ],
+      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION97-PENDING4-FINALIZE/A97_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "UNTESTED",
+      "pending_independent_c_static_qa": true
     }
   },
   "data_build": {
@@ -1910,7 +1930,7 @@
       "source_sha256": "12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889",
       "runtime_table_rows": 1355,
       "material_fix": {
-        "compact_logical_height_max": 24.0,
+        "compact_logical_height_max": 24,
         "readability_stroke_screen_px": "1-2",
         "stroke_directions": 8,
         "stroke_clip": "existing calculated Korean text footprint",
@@ -2065,6 +2085,10 @@
     "D657C2EB",
     "A9ABD877",
     "97E863AD",
-    "6DC89C6E"
+    "6DC89C6E",
+    "E3C455FA",
+    "E596B7AC",
+    "EBE401C8",
+    "FF514CEB"
   ]
 }
