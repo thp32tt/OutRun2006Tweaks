@@ -1401,6 +1401,78 @@ namespace outrun::vr::dx11
         return out;
     }
 
+    ProgrammableShaderFunctionSourceEvidence
+    capture_programmable_shader_function_source_evidence(
+        const void* bytecode,
+        UINT byteSize,
+        bool vertexStage) noexcept
+    {
+        ProgrammableShaderFunctionSourceEvidence out{};
+        out.vertexStage = vertexStage;
+        if (!bytecode ||
+            byteSize < 2u * sizeof(DWORD) ||
+            byteSize > 1024u * 1024u ||
+            (byteSize % sizeof(DWORD)) != 0)
+            return out;
+
+        try
+        {
+            out.tokens.resize(byteSize / sizeof(DWORD));
+        }
+        catch (...)
+        {
+            return {};
+        }
+
+        std::memcpy(out.tokens.data(), bytecode, byteSize);
+        out.observed = true;
+        out.byteSize = byteSize;
+        out.versionToken = out.tokens.front();
+
+        if (vertexStage)
+        {
+            out.versionSupported =
+                out.versionToken == D3DVS_VERSION(1, 1) ||
+                out.versionToken == D3DVS_VERSION(2, 0) ||
+                out.versionToken == D3DVS_VERSION(3, 0);
+        }
+        else
+        {
+            out.versionSupported =
+                out.versionToken == D3DPS_VERSION(1, 1) ||
+                out.versionToken == D3DPS_VERSION(1, 2) ||
+                out.versionToken == D3DPS_VERSION(1, 3) ||
+                out.versionToken == D3DPS_VERSION(1, 4) ||
+                out.versionToken == D3DPS_VERSION(2, 0) ||
+                out.versionToken == D3DPS_VERSION(3, 0);
+        }
+
+        std::uint64_t hash = 1469598103934665603ull;
+        const auto* bytes =
+            reinterpret_cast<const std::uint8_t*>(out.tokens.data());
+        for (UINT i = 0; i < byteSize; ++i)
+        {
+            hash ^= static_cast<std::uint64_t>(bytes[i]);
+            hash *= 1099511628211ull;
+        }
+        out.bytecodeHash = hash;
+        return out;
+    }
+
+    bool validate_programmable_shader_function_source_evidence(
+        const ProgrammableShaderFunctionSourceEvidence& evidence,
+        const ProgrammableShaderFunctionIdentity& identity,
+        bool vertexStage) noexcept
+    {
+        return evidence.exact() &&
+               evidence.vertexStage == vertexStage &&
+               identity.present &&
+               identity.observed &&
+               identity.byteSize == evidence.byteSize &&
+               identity.versionToken == evidence.versionToken &&
+               identity.bytecodeHash == evidence.bytecodeHash;
+    }
+
     ProgrammableShaderPairCacheIdentity
     seal_programmable_shader_pair_cache_identity(
         bool observationComplete,
