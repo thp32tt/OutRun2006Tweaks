@@ -369,6 +369,89 @@ int main()
         !r264MisalignedEvidence.exact(),
         "R264 rejects source identity drift, wrong-stage bytecode, and misaligned payloads");
 
+    const DWORD r265VsTokens[] = {
+        D3DVS_VERSION(3, 0),
+        static_cast<DWORD>(D3DSIO_MOV) | (2u << 24u),
+        0x800F0000u,
+        0x80E40000u,
+        static_cast<DWORD>(D3DSIO_COMMENT) | (1u << 16u),
+        0x26500001u,
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const auto r265VsEvidence =
+        outrun::vr::dx11::
+            capture_programmable_shader_function_source_evidence(
+                r265VsTokens, sizeof(r265VsTokens), true);
+    const auto r265VsDecode =
+        outrun::vr::dx11::
+            decode_programmable_shader_instruction_stream(
+                r265VsEvidence);
+    require(
+        r265VsDecode.exact() &&
+        r265VsDecode.vertexStage &&
+        r265VsDecode.instructionCount == 1u &&
+        r265VsDecode.operandTokenCount == 2u &&
+        r265VsDecode.commentDwordCount == 1u &&
+        r265VsDecode.instructions.size() == 1u &&
+        r265VsDecode.instructions[0].opcode ==
+            static_cast<DWORD>(D3DSIO_MOV) &&
+        r265VsDecode.instructions[0].operandCount == 2u &&
+        r265VsDecode.instructions[0].operandTokens.size() == 2u &&
+        r265VsDecode.sourceBytecodeHash == r265VsEvidence.bytecodeHash &&
+        r265VsDecode.instructionStreamHash != 0 &&
+        r265VsDecode.decoderRevisionHash != 0 &&
+        r265VsDecode.semanticContractHash != 0,
+        "R265 decodes exact SM3 instruction and raw operand provenance");
+
+    const auto r265TruncatedEvidence =
+        outrun::vr::dx11::
+            capture_programmable_shader_function_source_evidence(
+                r265VsTokens,
+                static_cast<UINT>(sizeof(r265VsTokens) - sizeof(DWORD)),
+                true);
+    const DWORD r265UnknownOpcodeTokens[] = {
+        D3DVS_VERSION(3, 0),
+        0x00001234u | (1u << 24u),
+        0x80000000u,
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const auto r265UnknownOpcodeEvidence =
+        outrun::vr::dx11::
+            capture_programmable_shader_function_source_evidence(
+                r265UnknownOpcodeTokens,
+                sizeof(r265UnknownOpcodeTokens),
+                true);
+    const DWORD r265Sm1Tokens[] = {
+        D3DVS_VERSION(1, 1),
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const auto r265Sm1Evidence =
+        outrun::vr::dx11::
+            capture_programmable_shader_function_source_evidence(
+                r265Sm1Tokens, sizeof(r265Sm1Tokens), true);
+    const auto r265TruncatedDecode =
+        outrun::vr::dx11::
+            decode_programmable_shader_instruction_stream(
+                r265TruncatedEvidence);
+    const auto r265UnknownOpcodeDecode =
+        outrun::vr::dx11::
+            decode_programmable_shader_instruction_stream(
+                r265UnknownOpcodeEvidence);
+    const auto r265Sm1Decode =
+        outrun::vr::dx11::
+            decode_programmable_shader_instruction_stream(
+                r265Sm1Evidence);
+    require(
+        r265TruncatedEvidence.exact() &&
+        !r265TruncatedDecode.exact() &&
+        !r265TruncatedDecode.endSeen &&
+        r265UnknownOpcodeEvidence.exact() &&
+        !r265UnknownOpcodeDecode.exact() &&
+        r265Sm1Evidence.exact() &&
+        !r265Sm1Decode.versionSupported &&
+        !r265Sm1Decode.exact(),
+        "R265 fails closed on truncated, unknown-opcode, and SM1 streams");
+
     const ProgrammableShaderFunctionIdentity programmableVs{
         true,
         true,
