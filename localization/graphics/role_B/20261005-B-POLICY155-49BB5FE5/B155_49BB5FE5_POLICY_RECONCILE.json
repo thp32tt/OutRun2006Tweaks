@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T23:40:00+09:00",
+  "role": "B",
+  "run": "20261005-B-POLICY155-49BB5FE5",
+  "queue_index": 152,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+  "prior_state": {
+    "status": "B63_HOLD_STRICT_RECHECK_DXT5_DECODED_PIXEL_GATE",
+    "source_sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+    "decoded_changed_outside_exact_source_bboxes": 1388,
+    "candidate_written": false
+  },
+  "semantic_binding": [
+    {
+      "source": "PRO.",
+      "expanded": "PROTOTYPE",
+      "decision": "PRESERVE_ORIGINAL"
+    },
+    {
+      "source": "INS.",
+      "expanded": "INSTRUMENTAL",
+      "decision": "PRESERVE_ORIGINAL"
+    },
+    {
+      "source": "G.M.",
+      "expanded": "GUITAR MIX",
+      "decision": "PRESERVE_ORIGINAL"
+    },
+    {
+      "source": "E.R.",
+      "expanded": "EURO REMIX",
+      "decision": "PRESERVE_ORIGINAL"
+    },
+    {
+      "source": "'89",
+      "expanded": "1989 version badge",
+      "decision": "PRESERVE_ORIGINAL"
+    },
+    {
+      "source": "'86",
+      "expanded": "1986 version badge",
+      "decision": "PRESERVE_ORIGINAL"
+    }
+  ],
+  "policy_evidence": {
+    "mandatory_policy": "localization/graphics/TRANSLATION_NAMING_POLICY.md",
+    "precedent": "C150 corrected index198 by restoring PROTOTYPE/INSTRUMENTAL/GUITAR MIX music-title/variant artwork pixel-exact",
+    "conclusion": "The B63 Korean redraw attempt is semantically out of scope. Do not solve the DXT5 encoder for an asset that policy requires to remain original."
+  },
+  "final_state": {
+    "artwork_status": "preserve_original_policy_no_candidate_required",
+    "transcription_status": "transcribed_reviewed",
+    "candidate_written": false,
+    "source_pixels_modified": false,
+    "runtime_validation": "NOT_APPLICABLE_FOR_LOCALIZATION"
+  },
+  "exclusions": "No VR/FFB/DX11/DXVK work. No completed PASS asset repeated."
+}

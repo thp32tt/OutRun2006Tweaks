@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T23:43:55+09:00",
+  "updated_at_kst": "2026-10-05T23:45:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A70 consumed direct C210 REWORK for index193 97E863AD. Candidate b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d: artificial tracking removed completely (0px; natural font advance only) with Black/source-height family, anchors and protected OutRun/OutRun2SP/OUTRUN/TESTAROSSA/SP/OR pixels retained. Static 13/13 exact bbox+size+positive-margin and all outside/alpha/protected/residue/render/overlap/touch/token gates PASS at zero; controller SOURCE/CLEAN/FINAL + raw mirror_y visual PASS, detached syllable gaps resolved. Queue -> a70_self_qa_pass_pending_c; producer REWORK now only 37759842; pending-C=97E863AD; pending_artwork localize_text=7. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "B155 cleared stale even-shard index152 49BB5FE5 HOLD without generating a prohibited redraw. Mandatory TRANSLATION_NAMING_POLICY plus C150 same-family precedent classify PRO./INS./G.M./E.R. (PROTOTYPE/INSTRUMENTAL/GUITAR MIX/EURO REMIX) as protected music-version/mix artwork; '89/'86 are preserved badges. Queue row remains localize_text for stable historical indexing but artwork_status is now preserve_original_policy_no_candidate_required; no DDS candidate or runtime validation is required for localization. A70 simultaneously consumed C210 index193 97E863AD and is pending independent C, so current producer REWORK is only 37759842; pending-C=97E863AD; pending_artwork localize_text=7. Queue category counts remain 84 localize_text + 42 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit. Next B production target is oldest even zoom_review index36 06AB5CEE. No VR/FFB/DX11/DXVK work.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1613,6 +1613,27 @@
       "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_CONTROLLER_SELF_QA.json",
       "c209_report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
+    },
+    "latest_b_policy_reconciliation": {
+      "run": "B155",
+      "queue_index": 152,
+      "asset": "49BB5FE5",
+      "result": "PRESERVE_ORIGINAL_POLICY_NO_CANDIDATE_REQUIRED",
+      "preserved": [
+        "'89",
+        "'86",
+        "PRO.",
+        "INS.",
+        "G.M.",
+        "E.R."
+      ],
+      "policy_basis": [
+        "localization/graphics/TRANSLATION_NAMING_POLICY.md",
+        "C150 9FC88069 same-family music variant qualifier precedent"
+      ],
+      "prior_hold": "B63_HOLD_STRICT_RECHECK_DXT5_DECODED_PIXEL_GATE",
+      "report": "localization/graphics/role_B/20261005-B-POLICY155-49BB5FE5/B155_49BB5FE5_POLICY_RECONCILE.json",
+      "runtime_validation": "NOT_APPLICABLE_FOR_LOCALIZATION"
     }
   },
   "data_build": {
