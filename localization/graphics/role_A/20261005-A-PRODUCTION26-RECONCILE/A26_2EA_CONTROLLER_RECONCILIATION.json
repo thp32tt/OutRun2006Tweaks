@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION26-RECONCILE",
+  "queue_index": 55,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "source_worker_run": "20261005-A-PRODUCTION17",
+  "worker_report": "localization/graphics/role_A/20261005-A-PRODUCTION17/A_PRODUCTION17_2EA557B4_REPORT.json",
+  "worker_result": "localization/graphics/worker_results/A_PRODUCTION17_2EA557B4.json",
+  "candidate_sha256": "d66a110cfc5bd09201c6f1a806fd3b2fab84663294ff865415fc7fc6532d6beb",
+  "reconciliation_reason": "A17 worker produced a constrained-DXT5 candidate and static PASS evidence, but shared queue/artwork state retained the earlier A11 fail-closed note and never recorded controller self-QA.",
+  "controller_checks": {
+    "source_clean_final": "PASS: NEXT ROUND English/effect footprint fully removed in clean plate and replaced by 다음 라운드",
+    "source_style": "PASS: slanted blue-white gradient, white/navy outlines and lower-right shadow follow source family",
+    "bbox_size": "PASS: source [1,105,1090,248], localized [263,113,828,240], positive margins 262/262/8/8",
+    "exact_pixel_gates": "PASS: changed pixels outside exact source bbox 0; alpha outside 0; protected visible changed 0; source residue outside Korean guard 0",
+    "raw_orientation": "PASS: mirror_y storage evidence visually consistent",
+    "dxt5_boundary": "PASS: 343 partial boundary blocks retain source endpoint/color bytes and rewrite only permitted alpha indices"
+  },
+  "decision": "A26_RECONCILED_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "duplicate_work_avoided": true,
+  "no_scope_work": "No VR/FFB/DX11/DXVK work."
+}
