@@ -2,8 +2,8 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DXVK-00402",
   "production_id": "CONVERSION-DXVK-00402",
-  "event_id": "CONVERSION-DXVK-00402-E003",
-  "event_type": "rollover",
+  "event_id": "CONVERSION-DXVK-00402-E001",
+  "event_type": "dispatch",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
   "attempt": "1/3",
@@ -14,7 +14,7 @@
   "validation_bearing_result_sha": "e9a1b7938b9ae18f22f0bac73443c00778176e13",
   "result_sha": "e9a1b7938b9ae18f22f0bac73443c00778176e13",
   "work_item": "DXVK_F135_CANONICAL_CONTROL_FLOW_0x183B44_TO_0x183B83",
-  "summary": "Exact-decoded only complete canonical instructions from the F134 0x00183B44..0x00183B84 window, consumed the proven FF 0D 44 BC 98 00 mandatory overlap as one complete instruction, proved the sole complete-prefix branch 0x00183B50->0x00183B56 on an exact instruction boundary, resolved inherited targets 0x00183B60/0x00183B6E/0x00183B6F only as exact instruction boundaries, reduced inherited forward-target debt to empty, and stopped before the incomplete 0x00183B83:75 opcode without function/render/HUD/runtime semantic promotion.",
+  "summary": "Exact-decoded the validated F134 canonical window from 0x00183B44 through the final complete instruction at 0x00183B81. The proof consumes FF 0D 44 only as the complete FF 0D 44 BC 98 00 instruction, proves 19 complete instructions and JBE 0x00183B50->0x00183B56 on an exact boundary, resolves inherited targets 0x00183B60/0x00183B6E/0x00183B6F only as exact instruction boundaries, preserves the incomplete 0x00183B83:75 short-Jcc opcode as the next mandatory overlap, and makes no function/render/HUD/runtime semantic promotion.",
   "changed_paths": [
     "tools/analyze_outrun_exe.py",
     "tools/test_dxvk_continuation_100_control_flow.py",
@@ -24,41 +24,50 @@
   "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
   "static_evidence": {
     "provenance_status": "EXACT_EXE_183B44_TO_183B84_PROVENANCE_CAPTURED",
-    "control_flow_status": "EXACT_183B44_TO_183B83_CONTROL_FLOW_WITH_183B83_CUT_EDGE_PROVEN",
+    "proof_status": "EXACT_183B44_TO_183B83_CONTROL_FLOW_WITH_183B83_CUT_EDGE_PROVEN",
     "predecessor_status": "EXACT_183B07_TO_183B44_CONTROL_FLOW_WITH_183B44_CUT_EDGE_PROVEN",
     "start_rva": "0x00183B44",
     "prefix_end_rva": "0x00183B83",
     "capture_end_rva": "0x00183B84",
+    "probe_len": 64,
     "instruction_count": 19,
     "exact_bytes_match": true,
-    "mandatory_overlap_instruction": "ff 0d 44 bc 98 00",
+    "required_overlap_instruction": "ff 0d 44 bc 98 00",
     "internal_branch": "0x00183B50->0x00183B56",
-    "internal_branch_target_is_instruction_boundary": true,
-    "resolved_inherited_forward_targets": [
+    "inherited_forward_targets": [
       "0x00183B60",
       "0x00183B6E",
       "0x00183B6F"
     ],
-    "remaining_inherited_forward_targets": [],
+    "resolved_predecessor_targets": [
+      "0x00183B60",
+      "0x00183B6E",
+      "0x00183B6F"
+    ],
     "unresolved_forward_targets": [],
     "raw_inbound_rel32_count": 0,
     "raw_outbound_rel32_count": 0,
     "trailing_overlap_rva": "0x00183B83",
     "trailing_overlap_bytes": "75",
-    "next_overlap_required": true,
+    "next_raw_frontier_start_rva": "0x00183B83",
+    "next_raw_frontier_end_rva": "0x00183BC3",
+    "next_raw_frontier_first_bytes": "75 34",
     "semantic_effect": "BOUNDED_CONTROL_FLOW_AND_MANDATORY_OVERLAP_ONLY",
-    "semantic_promotion": "NONE",
+    "call_semantics": "NO_REL32_CALLS_IN_F135_PREFIX",
     "ownership_effect": "NONE"
   },
   "local_validation": {
-    "environment": "N100 auxiliary exact-SHA detached worktree",
-    "exact_sha": "e9a1b7938b9ae18f22f0bac73443c00778176e13",
+    "environment": "N100 auxiliary detached source tree; exact Git blob identities matched GitHub material commit",
+    "local_commit_sha": "59f9dd30c8f742dc34510eafd2c3876431ef086f",
+    "remote_exact_sha": "e9a1b7938b9ae18f22f0bac73443c00778176e13",
+    "blob_identity": "PASS",
     "py_compile": "PASS",
-    "regression_tests": "49/49 PASS",
+    "continuation_regression_tests": "128/128 PASS",
+    "continuation_window_tests": "6/6 PASS",
+    "extractor_tests": "28/28 PASS",
     "backend_disassembly_contract": "PASS",
-    "canonical_f135_analyzer": "PASS",
-    "canonical_f136_frontier_extraction": "PASS",
-    "clean_tree": "PASS"
+    "canonical_analyzer": "PASS",
+    "canonical_next_frontier": "0x00183B83..0x00183BC3 bytes prefix 75 34"
   },
   "validation": {
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
@@ -87,47 +96,45 @@
   "pipeline": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Reconstructed the current vr-dxvk-r71-disasm commit chain and branch-local durable state from GitHub. The rollover is not a retry, ATTEMPT remains 1/3, and completed F134 work was not repeated. During recovery, the required F135 material commit was found as direct child e9a1b7938b9ae18f22f0bac73443c00778176e13 of the prior durable 00401 HEAD."
+      "evidence": "Read current GitHub HEAD, review index, AGENTS.md, queue contract, lane/run/VR state, regression/problem history and Issue #14. Recovered F134 durable predecessor and did not modify vr-d3d9ex-focus."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
-      "evidence": "Reviewed F134 canonical bytes and F133/F134 cut-edge contracts. Confirmed the bounded F135 scope: complete instructions through 0x00183B83 only, one internal JBE, three inherited boundary targets, empty rel32 census, and no semantic promotion."
+      "evidence": "Selected only F135 exact decode from 0x00183B44; inherited targets were eligible only on exact instruction boundaries and the incomplete 0x00183B83 opcode remained a cut edge."
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
-      "evidence": "Material SHA e9a1b7938b9ae18f22f0bac73443c00778176e13 adds continuation-101 provenance/control-flow proof, exact boundary/debt guards, successor-aware regression coverage for continuation-100, and new continuation-101 tests."
+      "evidence": "Added continuation_101 raw lineage plus exact prefix proof, resolved three inherited boundaries, added F135 regression coverage, and scoped the F133 regression so a successor may legally consume its cut-edge bytes."
     },
     "C3_VALIDATE": {
       "status": "COMPLETE",
-      "evidence": "N100 exact-SHA py_compile, 49/49 targeted regressions, backend disassembly contract, canonical analyzer and next-frontier extraction PASS. Exact-SHA DXVK Canonical Disassembly Evidence 37270213348/111635419405 and Backend Conversion Gate 37270213353/111635419545 SUCCESS including Win32 configure/build, binary verification and artifact upload. No HMD/game runtime test performed."
+      "evidence": "N100 auxiliary static/canonical tests PASS. GitHub exact-SHA DXVK Canonical Disassembly Evidence 37270213348/111635419405 and Backend Conversion Gate 37270213353/111635419545 SUCCESS including Win32 build, binary verification and artifact upload. No HMD/game runtime test performed."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
-      "evidence": "Validation-bearing material SHA e9a1b7938b9ae18f22f0bac73443c00778176e13 is published on vr-dxvk-r71-disasm with exact marker [AUTO:CONVERSION-DXVK-00402] and no CI-skip."
+      "evidence": "Validation-bearing material SHA e9a1b7938b9ae18f22f0bac73443c00778176e13 is published with [AUTO:CONVERSION-DXVK-00402] and no CI-skip."
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Static canonical control-flow/disassembly evidence only; no runtime DXVK payload, selector, deployment content or package identity changed."
+      "reason": "Static canonical disassembly/control-flow proof only; no runtime DXVK payload, selector, deployment content or package identity changed."
     },
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "evidence": "This run record and branch-local lane state preserve material/result SHA, exact-SHA gate evidence, current rollover metadata, RUNTIME_VALIDATION=UNTESTED and the bounded F136 successor frontier."
+      "evidence": "Issue #14 comment 5989021567 plus this run record and branch-local lane state preserve the material SHA, exact-SHA gate evidence, dispatch metadata, RUNTIME_VALIDATION=UNTESTED and the F136 successor."
     }
   },
+  "issue14_comment_id": 5989021567,
   "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
   "runtime_test_performed": false,
   "runtime_validation": "UNTESTED",
   "controller_dispatch": {
     "task_id": "CONVERSION-DXVK-00402",
     "production_id": "CONVERSION-DXVK-00402",
-    "event_id": "CONVERSION-DXVK-00402-E003",
-    "event_type": "rollover",
+    "event_id": "CONVERSION-DXVK-00402-E001",
+    "event_type": "dispatch",
     "attempt": "1/3",
-    "chat_rollover": 2,
-    "rollover_is_retry": false,
-    "resume_reason": "Retry persisted after one recovery attempt",
-    "source": "CURRENT_USER_ROLLOVER",
+    "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH",
     "material_result_sha": "e9a1b7938b9ae18f22f0bac73443c00778176e13",
     "validation_bearing_result_sha": "e9a1b7938b9ae18f22f0bac73443c00778176e13",
     "runtime_validation": "UNTESTED"
@@ -136,19 +143,10 @@
     "next_action_kind": "DXVK_F136_CANONICAL_OVERLAP_PROVENANCE_0x183B83_TO_0x183BC3",
     "start_rva": "0x00183B83",
     "capture_end_rva": "0x00183BC3",
-    "frontier_basis": "INCOMPLETE_RVA",
-    "frontier_continuation_id": 101,
-    "canonical_bytes_hex": "75 34 8d 44 89 50 c1 e0 02 50 ff 35 48 bc 98 00 57 ff 35 5c bc 98 00 ff 15 68 61 59 00 3b c7 75 04 33 c0 5f c3 83 05 54 bc 98 00 10 a3 48 bc 98 00 a1 44 bc 98 00 8b 0d 48 bc 98 00 56 68 c4 41",
-    "predecessor_cut_bytes": "75",
-    "newly_captured_branch_prefix": "75 34",
-    "semantic_promotion": "NONE",
-    "ownership_effect": "NONE",
-    "runtime_validation": "UNTESTED"
+    "required_overlap_bytes": "75",
+    "required_complete_first_instruction_bytes": "75 34",
+    "inherited_unresolved_forward_targets": []
   },
-  "exact_next_action": "Promote only the exact F136 canonical raw-provenance contract for the already captured 64-byte window 0x00183B83..0x00183BC3, bind its leading 75 byte to the F135 cut edge and require the captured 75 34 short-branch bytes before any branch-target claim; preserve function/render/HUD/runtime semantics as unresolved and do not skip directly to a later decode stage.",
-  "recorded_at_kst": "2026-10-05T15:08:06+09:00",
-  "chat_rollover": 2,
-  "rollover_is_retry": false,
-  "resume_reason": "Retry persisted after one recovery attempt",
-  "recovery_note": "A duplicate auxiliary patch/apply-workflow path was staged after the branch had already advanced to the correct material commit. It was not used for the result and was removed; e9a1b7938b9ae18f22f0bac73443c00778176e13 remains the sole material/validation-bearing SHA for this task."
+  "exact_next_action": "Formalize only the F136 canonical mandatory-overlap raw provenance at 0x00183B83..0x00183BC3. Require the proven cut byte 75 to extend to the complete short-Jcc bytes 75 34, preserve the exact 64-byte canonical payload and rel32 census, keep any newly observed control-flow targets address-only until exact instruction-boundary proof, and make no function/render/HUD/runtime semantic promotion.",
+  "recorded_at_kst": "2026-10-05T15:08:00+09:00"
 }
