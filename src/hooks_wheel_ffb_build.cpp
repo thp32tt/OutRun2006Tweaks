@@ -59,7 +59,7 @@ namespace Settings
     Setting<int> WheelFFBFeelRevision{
         "WheelFFB", "FeelRevision", 0,
         "Internal one-shot migration version for wheel FFB feel defaults.",
-        Range<int>{ 0, 7 }
+        Range<int>{ 0, 8 }
     };
 }
 
@@ -196,10 +196,9 @@ namespace
 
     // Direct Stage.zip/COLI0200 analysis proves material 0x14 / mask
     // 0x100000 is PRIMARY road in these exact forward-stage ranges.
-    // Keep them out of generic curb/shoulder classification. Floral Village
-    // retains the tested 0.60 comfort attenuation; Deep Lake/Tulip keep normal
-    // Road Detail until hardware A/B justifies any stage-specific attenuation.
-    constexpr float FloralVillageRoughPavingScale = 0.60f;
+    // Keep them out of generic curb/shoulder classification. R10 raises the
+    // Floral comfort scale from 0.60 to 0.75 so sustained stone paving remains
+    // identifiable without restoring the old overpowering full-road buzz.
 
     bool is_proven_primary_rough_road(
         const StageSurfaceContext& stage,
@@ -625,7 +624,8 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                     sawSnowDisqualifier = true;
             }
             const bool snowPrimaryRoad = sawSnowPrimary && !sawSnowDisqualifier;
-            const float coreStageScale = snowPrimaryRoad ? 0.04f : 1.0f;
+            const float coreStageScale = snowPrimaryRoad
+                ? WheelFFBMath::SnowIceComfortScale : 1.0f;
 
             desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
             const float envelope =
@@ -636,7 +636,7 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                 const bool floralComfort = stage.uniqueStage == 27;
                 Settings::WheelFFBRoadTexture = std::clamp(
                     originalRoadTexture *
-                        (floralComfort ? FloralVillageRoughPavingScale : 1.0f),
+                        (floralComfort ? WheelFFBMath::FloralRoughPavingComfortScale : 1.0f),
                     0.0f, 120.0f);
             }
             else if (envelope > 0.0005f)
@@ -954,6 +954,23 @@ namespace
                 changed = true;
             }
 
+            if (revision < 8)
+            {
+                // R10: model polarity is now an invariant, not optional tuning.
+                // Persist the correct state once so user.ini/profile reloads
+                // start coherent; the runtime owner also self-heals any later
+                // live write before output is evaluated.
+                const auto model = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                const bool reverse =
+                    WheelFFBMath::model_requires_reversed_polarity(model);
+                Settings::WheelFFBInvertForce = reverse;
+                Settings::WheelFFBInvertSpring = reverse;
+                Settings::WheelFFBFeelRevision = 8;
+                revision = 8;
+                changed = true;
+            }
+
             if (!changed)
                 return true;
 
@@ -965,6 +982,11 @@ namespace
                 spdlog::warn(
                     "WheelFFBFeelRetune: applied revision {} for this session but could not persist user.ini",
                     revision);
+            }
+            else if (revision >= 8)
+            {
+                spdlog::info(
+                    "WheelFFBFeelRetune: applied revision 8 (R10 model-owned polarity invariant and comfort-surface retune)");
             }
             else if (revision >= 5)
             {
@@ -1085,7 +1107,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_physics_preset();
-                    Settings::WheelFFBFeelRevision = 7;
+                    Settings::WheelFFBFeelRevision = 8;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
@@ -1101,7 +1123,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_natural_preset();
-                    Settings::WheelFFBFeelRevision = 7;
+                    Settings::WheelFFBFeelRevision = 8;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
