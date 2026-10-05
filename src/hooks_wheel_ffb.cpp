@@ -1311,7 +1311,6 @@ namespace
             const float trailShape = pneumaticSatShape; // legacy telemetry field name
             const float physicsLoad = 0.62f + 0.48f * lateralLoadSmooth;
             const float rearSlideRelief = 1.0f - 0.15f * gripLoss * bodySlide;
-            float driftAlignmentAssistTelemetry = 0.0f;
             if (vehicleDynamics_.calibrated() && vehicleDynamics_.sampleValid())
             {
                 const float physicsReturnRelief =
@@ -1322,17 +1321,10 @@ namespace
                     physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
 
-                // At high chassis sideslip, caster/mechanical trail tends to
-                // steer the front wheels toward the velocity vector. Keep this
-                // assist bounded below the tyre SAT so it corrects the drift
-                // direction without becoming an arcade auto-steer.
-                driftAlignmentAssistTelemetry =
-                    WheelFFBMath::drift_velocity_alignment_assist(
-                        vehicleDynamics_.bodySlip(),
-                        vehicleDynamics_.yawRate(),
-                        steer, speedNorm) *
-                    std::clamp(satStrength / 1.60f, 0.0f, 1.25f);
-                physicsSatTorque += driftAlignmentAssistTelemetry;
+                // Front-slip already compares steering angle with the front-axle
+                // velocity direction in one coordinate convention. Its ordinary
+                // SAT is therefore the physical counter-steer mechanism; do not
+                // layer an extra synthetic drift auto-steer force on top.
 
                 if (!std::isfinite(physicsSatTorque))
                     physicsSatTorque = 0.0f;
@@ -1635,15 +1627,15 @@ namespace
                 {
                     lastTelemetryDetailTick_ = telemetryNow;
                     spdlog::info(
-                    "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} driftSpringScale={} driftAlign={} stonePaving={} stoneFloor={} diPreResponse={} diCorrected={} responseCorrection={}",
+                    "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} frontAlignTarget={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} driftSpringScale={} stonePaving={} stoneFloor={} diPreResponse={} diCorrected={} responseCorrection={}",
                     telemetryNow,
                     vehicleDynamics_.rawBodySlip(), vehicleDynamics_.bodySlip(), vehicleDynamics_.bodySlipBlend(),
                     vehicleDynamics_.rawYawRate(), vehicleDynamics_.yawRate(), vehicleDynamics_.yawRateBlend(),
+                    vehicleDynamics_.frontAlignmentTarget(),
                     vehicleDynamics_.rawFrontSlip(), vehicleDynamics_.frontSlip(), vehicleDynamics_.frontSlipBlend(),
                     trailResponseSlip, trailResponseLead, lateralForceShape, pneumaticTrail,
                     pneumaticSatShape, mechanicalTrailMix, mechanicalContribution, physicsShape,
-                    driftSpringScale, driftAlignmentAssistTelemetry,
-                    imperialStonePaving, imperialStoneFloor,
+                    driftSpringScale, imperialStonePaving, imperialStoneFloor,
                     levelBeforeResponse, level, bool(Settings::WheelFFBResponseCorrection));
                 // Raw horizontal bases allow row/column x X/Z candidates to be
                 // compared offline without changing the active steering model.
