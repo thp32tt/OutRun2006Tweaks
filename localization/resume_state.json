@@ -1,5 +1,5 @@
 {
-  "schema_version": 80,
+  "schema_version": 81,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C150 corrected B_PRODUCTION77 9FC88069 semantic-policy violation: restored (GUITAR MIX)/(INSTRUMENTAL)/(PROTOTYPE) pixel-exact as protected music-title/variant artwork, retained only RANDOM/RANDOM PLAY/INTERMEDIATE B/A Korean. Corrected candidate 34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c passes 4/4 bbox+size+positive-margin and zero static gates; visual/raw mirror_y PASS. Pending production localize_text=29; 75C3586A strict HOLD no-candidate. RUNTIME_VALIDATION=UNTESTED.",
     "C149 finalized B_PRODUCTION73 E95DA5 candidate d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b. GitHub-hosted C output remained unavailable after C145/C146/C147 dispatches, so contract-authorized N100 fallback independently revalidated the pinned 2048x1024 RGBA32/raw mirror_y source+atlas. Producer CLEAN matches independent reconstruction by 0px; 11/11 bbox+size+positive-margin PASS; outside/alpha/protected/preserved/render-outside-target/source-residue/overlap/touch/target-preserved-near all 0. Song titles and reviewed preserved English/art remain pixel exact; controller SOURCE/CLEAN/FINAL/row/raw visual QA PASS. C149_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; producer REWORK=0; pending production localize_text=31. RUNTIME_VALIDATION=UNTESTED.",
     "C144 finalized B_PRODUCTION68 E7F6E9B7 candidate 6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607. Independent pinned canonical source+atlas QA re-derived all 13 exact source-alpha rows and exact transparent clean plate (producer clean diff=0). 2048x2048 RGBA32 BGRA mip1/header/raw mirror_y preserved; 13/13 bbox+size+positive-margin PASS; outside/alpha/render-outside-target/source-residue/overlap/touch all 0; shared silver/grayscale family verified 13/13. Controller SOURCE/CLEAN/FINAL, row-contact and raw mirror_y visual QA PASS. C144_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; producer REWORK=0; pending production localize_text=32. RUNTIME_VALIDATION=UNTESTED.",
     "B_PRODUCTION67 completed even index 226 E3F4BA07. Authoritative HD source fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72 is 2048x512 RGBA32 BGRA/raw mirror_y. B66 canonical binding localized STAGE, GOAL/GOAL A-E and 15 STAGE CONTINUOUS while protecting OUTRUN2/OUTRUN2SP. Candidate 1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c passes 8/8 exact bbox+size+positive-margin, zero source residue/outside/alpha/protected/OutRun-mark/overlap/touch, and controller SOURCE/CLEAN/FINAL/row/raw visual self-QA. Pending independent C and in-game validation. 49BB5FE5 remains HOLD_STRICT_RECHECK. RUNTIME_VALIDATION=UNTESTED.",
@@ -123,12 +124,12 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-10-05T10:36:18+09:00",
+      "updated_at_kst": "2026-10-05T10:57:04+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20261005-C149-E95DA5/C149_E95_CONTROLLER_FINAL_QA.json",
+      "report": "localization/graphics/role_C/20261005-C150-9FC88069/C150_9FC_CONTROLLER_FINAL_QA.json",
       "direct_queue_scope": 126,
-      "current_candidates_scanned": 36,
-      "elements_scanned": 340,
+      "current_candidates_scanned": 37,
+      "elements_scanned": 344,
       "pixel_visual_pass_assets": [
         "FF2462BB",
         "C4A2937B",
@@ -173,20 +174,21 @@
         "D657C2EB",
         "E3F4BA07",
         "E7F6E9B7",
-        "E95DA5"
+        "E95DA5",
+        "9FC88069"
       ],
       "rework_required_assets": [],
       "failed_elements": 0,
-      "pending_production_localize_text": 31,
+      "pending_production_localize_text": 29,
       "hold_strict_recheck_zoom_review": 47,
       "promotion_hold_for_pixel_pass": true,
       "promotion_hold_reason": "E95DA5 passes C149 independent static pixel/visual QA; 1A43E9D9 remains HIGH_RISK edge-touch pending mandatory in-game validation; 4F68708E/F6811E94/49BB5FE5 remain strict DXT5 no-candidate HOLD; unfinished queue rows remain.",
       "user_approved_locked": 0,
       "failed_assets": 0,
       "latest_c_revalidated_assets": [
-        "E95DA5"
+        "9FC88069"
       ],
-      "latest_c_revalidated_physical_elements": 11,
+      "latest_c_revalidated_physical_elements": 4,
       "runtime_validation": "UNTESTED",
       "current_run_assets_scanned": 1,
       "current_run_physical_elements_scanned": 11,
@@ -1075,7 +1077,7 @@
       "pending_independent_c_final_qa": true,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 31,
+    "current_pending_artwork_localize_text": 29,
     "current_producer_rework_remaining": 0,
     "latest_a_production_batch": "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_EBEF6D20_REPORT.json",
     "a_production20_9ce4e175": {
@@ -1095,15 +1097,14 @@
       "runtime_validation": "UNTESTED"
     },
     "latest_b_production": {
-      "run": "B_PRODUCTION73",
-      "asset": "E95DA5",
-      "queue_index": 230,
-      "candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
-      "report": "localization/graphics/role_B/20261005-B-PRODUCTION73/B73_E95_REPORT.json",
-      "status": "C149_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "run": "B_PRODUCTION77",
+      "asset": "9FC88069",
+      "queue_index": 198,
+      "candidate_sha256": "34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c",
+      "report": "localization/graphics/role_C/20261005-C150-9FC88069/C150_9FC_CONTROLLER_FINAL_QA.json",
+      "status": "C150_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
       "runtime_validation": "UNTESTED",
-      "c_final_qa": "PASS",
-      "c_report": "localization/graphics/role_C/20261005-C149-E95DA5/C149_E95_CONTROLLER_FINAL_QA.json"
+      "c_final_qa": "PASS"
     }
   },
   "runtime_packages": {
