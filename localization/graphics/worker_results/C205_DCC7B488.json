@@ -1,0 +1,35 @@
+{
+  "run": "20261005-C205-DCC7B488",
+  "qa_id": "C205",
+  "index": 32,
+  "asset": "DCC7B488",
+  "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+  "machine_status": "FAIL",
+  "row_gate": "1/1 PASS",
+  "machine_checks": {
+    "decoded_source_vs_evidence_diff_pixels": 0,
+    "decoded_final_vs_evidence_diff_pixels": 0,
+    "independent_high_conf_source_script_bbox": [
+      546,
+      163,
+      1065,
+      248
+    ],
+    "producer_source_core_bbox": [
+      553,
+      170,
+      1058,
+      242
+    ],
+    "independent_high_conf_exact_source_pixels_surviving_in_clean": 1418,
+    "independent_high_conf_source_colored_pixels_surviving_in_clean": 17839,
+    "localized_bbox_exact_match_producer": true,
+    "decoded_changed_outside_allowed_effect_bbox": 0,
+    "alpha_changed_outside_allowed_effect_bbox": 0,
+    "localized_render_outside_allowed_effect_bbox": 0,
+    "protected_region_changed_pixels": 0,
+    "clean_outer_boundary_ring_changed_pixels": 772
+  },
+  "report": "localization/graphics/role_C/20261005-C205-DCC7B488/C205_DCC7B488_ADJUDICATED_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
