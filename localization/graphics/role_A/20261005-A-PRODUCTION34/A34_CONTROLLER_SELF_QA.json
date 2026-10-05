@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION34",
+  "timestamp_kst": "2026-10-05T17:06:30+09:00",
+  "queue_index": 95,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "c_return": "C174_REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+  "source_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+  "candidate_sha256": "90b2adecf0bd22effd199f98d166e959ca1f6a7d9238d52a3cab2026753c286c",
+  "producer_report": "localization/graphics/role_A/20261005-A-PRODUCTION34/A34_37759842_REPORT.json",
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "33/33 PASS",
+  "residue_rework": {
+    "clean_source_core_pixels_unchanged_before": 2774,
+    "clean_source_core_pixels_unchanged_after": 0,
+    "source_core_residue_pixels_before": 2573,
+    "source_core_residue_pixels_after": 0
+  },
+  "zero_pixel_gates": {
+    "changed_outside": 0,
+    "alpha_changed_outside": 0,
+    "protected_visible_changed": 0,
+    "localized_overlap": 0,
+    "localized_1px_touch": 0
+  },
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "controller_visual_qa": "PASS_OVERVIEW_PENDING_INDEPENDENT_C_DETAIL",
+  "visual_note": "A34 raw mirror_y atlas overview reviewed at controller scale: expected mirror_y orientation is preserved; no obvious source-English residue, Korean overlap, or protected song/model/logo damage is visible. Full SOURCE/CLEAN/FINAL and 33 target contacts are persisted for independent C detail review.",
+  "evidence": [
+    "localization/graphics/role_A/20261005-A-PRODUCTION34/A34_SOURCE_CLEAN_FINAL_QUARTER.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION34/A34_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION34/A34_FINAL_RAW_MIRROR_Y.jpg"
+  ],
+  "decision": "A34_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
