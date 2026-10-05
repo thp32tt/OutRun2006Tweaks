@@ -7,7 +7,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("worker B only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION70"
+run="20261005-B-PRODUCTION71"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -165,22 +165,25 @@ smp=out/"E95_SOURCE_TEXT_MASK.png"; ap=out/"E95_ALLOWED_BBOX_MASK.png"
 src.save(sp); clean.save(cp); source_mask.save(smp); allowed.save(ap)
 protected=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed))
 pp=out/"E95_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"B70_CLEAN_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B70_CLEAN_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"B71_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B71_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validation",cleanrep))
 
 def findfont():
-    for pat in ["Noto Sans CJK KR:style=Black","Noto Sans CJK KR:style=Bold"]:
-        try: s=subprocess.check_output(["fc-match","-f","%{file}|%{index}",pat],text=True).strip()
-        except Exception: s=""
-        if "|" in s:
-            fp,ix=s.rsplit("|",1)
-            if fp and Path(fp).exists() and "NotoSansCJK" in Path(fp).name:
-                return fp,int(ix or 0),pat
+    # Force a heavy CJK face; Regular fallback failed controller source-style QA in B70.
     subprocess.run(["sudo","apt-get","update","-qq"],check=True)
-    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
-    return findfont()
-FONT,FI,FPAT=findfont()
+    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
+    for pat in ["Noto Sans CJK KR:style=Black","Noto Sans CJK KR:style=Bold"]:
+        try: s=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{style}",pat],text=True).strip()
+        except Exception: s=""
+        parts=s.rsplit("|",2)
+        if len(parts)==3:
+            fp,ix,style=parts
+            name=Path(fp).name
+            if fp and Path(fp).exists() and "NotoSansCJK" in name and ("Black" in name or "Bold" in name or "Black" in style or "Bold" in style):
+                return fp,int(ix or 0),pat,style
+    raise RuntimeError("verified Noto Sans CJK Bold/Black face unavailable")
+FONT,FI,FPAT,FSTYLE=findfont()
 
 # Source-family color measurements.
 def source_colors(group):
@@ -272,9 +275,9 @@ for r in rows:
         "delta_left":lb[0]-ob[0],"delta_right":ob[2]-lb[2],
         "delta_top":lb[1]-ob[1],"delta_bottom":ob[3]-lb[3],
         "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS",
-        "font_file":Path(FONT).name,"font_face_index":FI,"font_size":fs,"fill_rgba":color,
+        "font_file":Path(FONT).name,"font_face_index":FI,"font_style":FSTYLE,"font_size":fs,"fill_rgba":color,
         "alignment":"center" if group=="pill" else "left",
-        "rework_status":"B70_NEW_EXACT_HD_CANDIDATE"
+        "rework_status":"B71_NEW_EXACT_HD_CANDIDATE"
     })
 
 ov=0; touch=[]
@@ -297,8 +300,8 @@ raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
 dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip")
 fp=out/"E95_FINAL_DECODED_READABLE.png"; dec.save(fp)
-subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"B70_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"B70_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"B71_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"B71_FINAL_VALIDATION.json").read_text())
 
 diff=dmask(src,dec)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
@@ -326,7 +329,7 @@ for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,512),Image.Resampling.NEAREST)
     full.paste(z,(0,i*540+24))
     ImageDraw.Draw(full).text((5,i*540+4),label,fill="black")
-full.save(out/"B70_E95_SOURCE_CLEAN_FINAL.jpg",quality=96)
+full.save(out/"B71_E95_SOURCE_CLEAN_FINAL.jpg",quality=96)
 
 cards=[]
 for r in outrows:
@@ -341,13 +344,13 @@ for r in outrows:
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+4*(len(cards)-1)),"white")
 yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.save(out/"B70_E95_ROW_CONTACT.jpg",quality=96)
+sheet.save(out/"B71_E95_ROW_CONTACT.jpg",quality=96)
 
 rr=Image.new("RGB",(1024,2*540),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im).resize((1024,512),Image.Resampling.NEAREST)
     rr.paste(z,(0,i*540+24)); ImageDraw.Draw(rr).text((5,i*540+4),label,fill="black")
-rr.save(out/"B70_E95_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"B71_E95_RAW_COMPARE.jpg",quality=96)
 
 report={
  "schema_version":1,"role":"B","run":run,"index":index,"asset":asset,
@@ -356,7 +359,7 @@ report={
  "semantic_binding":{"localized":{str(i):s for i,s,_,_ in specs},"preserved":{str(k):v for k,v in preserved.items()}},
  "translations":{str(i):k for i,_,k,_ in specs},
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
- "style_groups":{"dark":{"font_file":Path(FONT).name,"font_face_index":FI,"font_size":group_fs["dark"],"fill_rgba":dark_fill,"alignment":"left"},"white":{"font_file":Path(FONT).name,"font_face_index":FI,"font_size":group_fs["white"],"fill_rgba":white_fill,"alignment":"left"},"pill":{"font_file":Path(FONT).name,"font_face_index":FI,"fill_rgba":pill_fill,"alignment":"center","background_reconstruction":"per-row median of non-text opaque red plate pixels"}},
+ "style_groups":{"dark":{"font_file":Path(FONT).name,"font_face_index":FI,"font_style":FSTYLE,"font_size":group_fs["dark"],"fill_rgba":dark_fill,"alignment":"left"},"white":{"font_file":Path(FONT).name,"font_face_index":FI,"font_style":FSTYLE,"font_size":group_fs["white"],"fill_rgba":white_fill,"alignment":"left"},"pill":{"font_file":Path(FONT).name,"font_face_index":FI,"font_style":FSTYLE,"fill_rgba":pill_fill,"alignment":"center","background_reconstruction":"per-row median of non-text opaque red plate pixels"}},
  "rows":outrows,
  "preserved_regions_changed_pixels":preserved_changed,
  "clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
@@ -364,9 +367,9 @@ report={
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "RUNTIME_VALIDATION":"UNTESTED",
- "status":"B_PRODUCTION70_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"B_PRODUCTION71_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(out/"B70_E95_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(out/"B71_E95_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={
  "run":run,"index":index,"asset":"E95DA5","source_sha256":sha(sb),"candidate_sha256":csha,
  "localized_physical_elements":len(specs),"preserved_regions":len(preserved),
@@ -375,7 +378,7 @@ summary={
  "source_residue":residue,"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,
  "preserved_regions_changed":sum(preserved_changed.values()),"overlap":ov,"touch_pairs":len(touch),
  "worker_status":report["status"],"runtime_validation":"UNTESTED",
- "report":f"localization/graphics/role_B/{run}/B70_E95_REPORT.json"
+ "report":f"localization/graphics/role_B/{run}/B71_E95_REPORT.json"
 }
-(wr/"B70_E95DA5.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+(wr/"B71_E95DA5.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False))
