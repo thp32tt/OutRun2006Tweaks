@@ -1,0 +1,21 @@
+{
+  "run": "20261006-A-PRODUCTION80-3775-MANUAL",
+  "index": 95,
+  "asset": "37759842",
+  "candidate_sha256": "a606e03ce38ebeb63f66988dd5392175f2fab30c86cef2196ad19c10b4a11958",
+  "localized_physical_targets": 33,
+  "semantic_strings": 20,
+  "bbox_size_positive_margin": "33/33 PASS",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "overlap": 0,
+  "touch": 0,
+  "source_residue": 0,
+  "clean_source_core_unchanged": 0,
+  "worker_status": "A80_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION80-3775-MANUAL/A80_37759842_REPORT.json"
+}
