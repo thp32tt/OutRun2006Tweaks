@@ -8,7 +8,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
 repo=Path.cwd()
-run="20261005-C160-B99-63C91067"
+run="20261005-C160-B101-63C91067"
 out=repo/"localization/graphics/role_C"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -19,7 +19,7 @@ COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 SOURCE_BLOB_SHA1="9f41fe44ecb17a4daba096ddbb9d2c73fa28e8f9"
 ATLAS_BLOB_SHA1="7f118326e34794e2ae5bf3f3b6d82b6ce566c64a"
 SOURCE_SHA256="d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab"
-CANDIDATE_SHA256="55829559f2111526dd789e30d66c30c384755ef956fadd8e9d9ca9b36dd19660"\nCANDIDATE_COMMIT="4703bfb4b6fb7a1c5fb3712d1db0927bafccfb0f"
+CANDIDATE_SHA256="577e6c8d0e609f2ce6a6598f44879528d26423b11c5ad45c4e88e84ea9dfc67e"\nCANDIDATE_COMMIT="654e375738d4fab161940ad8bb8034856aeff3c9"
 
 tmp=Path("/tmp/outrun_C160"); tmp.mkdir(parents=True,exist_ok=True)
 sp=tmp/"source.dds"; apath=tmp/"atlas.json"
@@ -68,7 +68,7 @@ for idx in (0,1):
     core=np.zeros_like(navy); core[ny0:ny1,nx0:nx1]=(white|navy)[ny0:ny1,nx0:nx1]
     m=np.zeros((H,W),bool); m[ry0:ry1,rx0:rx1]=core
     source_core|=m
-    dil=np.asarray(Image.fromarray((m.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(41)))>0
+    dil=np.asarray(Image.fromarray((m.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(81)))>0
     ob=bbox(dil)
     if not ob: raise RuntimeError(("source effect bbox empty",idx))
     source_mask|=dil
@@ -121,14 +121,14 @@ resid_delta=np.max(np.abs(fa[:,:,:3].astype(np.int16)-blur[:,:,:3]),axis=2)
 resid_structural_pixels=count(resid_scope & (resid_delta>=18))
 resid_scope_pixels=count(resid_scope)
 
-for name,m in [("C160_B99_SOURCE_CORE_MASK.png",source_core),("C160_SOURCE_EFFECT_MASK.png",source_mask),("C160_ALLOWED_BBOX_MASK.png",allowed),("C160_TARGET_TEXT_MASK.png",target),("C160_PROTECTED_MASK.png",protected)]:
+for name,m in [("C160_B101_SOURCE_CORE_MASK.png",source_core),("C160_SOURCE_EFFECT_MASK.png",source_mask),("C160_ALLOWED_BBOX_MASK.png",allowed),("C160_TARGET_TEXT_MASK.png",target),("C160_PROTECTED_MASK.png",protected)]:
     Image.fromarray((m.astype(np.uint8)*255),"L").save(out/name)
 
 # Independent source/final evidence, plus row contacts; no producer clean/masks consumed.
 stack=Image.new("RGB",(1024,2*1050),"white")
 for i,(label,im) in enumerate([("SOURCE",src),("FINAL",fin)]):
     z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); stack.paste(z,(0,i*1050+26)); ImageDraw.Draw(stack).text((5,i*1050+5),label,fill="black")
-stack.save(out/"C160_B99_63C_SOURCE_FINAL.jpg",quality=96)
+stack.save(out/"C160_B101_63C_SOURCE_FINAL.jpg",quality=96)
 cards=[]
 for r in outrows:
     x0,y0,x1,y1=r["original_bbox"]; p=24; cr=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
@@ -138,16 +138,16 @@ for r in outrows:
     ImageDraw.Draw(c).text((5,5),f'{r["region_idx"]} Total Rank -> 종합 랭킹',fill="black"); cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+4 for c in cards)),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.save(out/"C160_B99_63C_ROW_CONTACT.jpg",quality=96)
+sheet.save(out/"C160_B101_63C_ROW_CONTACT.jpg",quality=96)
 rr=Image.new("RGB",(1024,2*1050),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_fin)]):
     z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); rr.paste(z,(0,i*1050+26)); ImageDraw.Draw(rr).text((5,i*1050+5),label,fill="black")
-rr.save(out/"C160_B99_63C_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"C160_B101_63C_RAW_COMPARE.jpg",quality=96)
 
-report={"schema_version":1,"role":"C","run":run,"queue_index":26,"asset":asset,"producer_run":"20261005-B-PRODUCTION99","candidate_commit":CANDIDATE_COMMIT,
+report={"schema_version":1,"role":"C","run":run,"queue_index":26,"asset":asset,"producer_run":"20261005-B-PRODUCTION101","candidate_commit":CANDIDATE_COMMIT,
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB_SHA1,"atlas_git_blob_sha1":ATLAS_BLOB_SHA1,"source_sha256":SOURCE_SHA256},
  "candidate_sha256":CANDIDATE_SHA256,"candidate_changed_by_C":False,
- "independent_method":"C re-downloaded pinned canonical RGBA DDS+atlas, independently re-derived the two Total Rank source cores/effect bboxes from canonical white+navy title pixels, decoded the pinned B99 candidate, independently anchored Korean masks from candidate navy+white pixels, recomputed exact-bbox/protected/overlap gates, and generated source/final visual evidence without consuming producer masks or clean plate.",
+ "independent_method":"C re-downloaded pinned canonical RGBA DDS+atlas, independently re-derived the two Total Rank source cores/effect bboxes from canonical white+navy title pixels, decoded the pinned B101 candidate, independently anchored Korean masks from candidate navy+white pixels, recomputed exact-bbox/protected/overlap gates, and generated source/final visual evidence without consuming producer masks or clean plate.",
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
  "rows":outrows,
  "machine_checks":{"final_outside":outside,"alpha_outside":alpha_out,"bbox_size_positive_margin":"2/2 PASS",
@@ -156,11 +156,11 @@ report={"schema_version":1,"role":"C","run":run,"queue_index":26,"asset":asset,"
    "residue_diagnostic_note":"diagnostic only; patterned plates require mandatory controller visual residue decision"},
  "machine_status":"PASS_CONTAINMENT_VISUAL_RESIDUE_REVIEW_REQUIRED","controller_visual_qa":"PENDING",
  "decision":"PENDING_CONTROLLER_VISUAL_QA","RUNTIME_VALIDATION":"UNTESTED"}
-(out/"C160_B99_63C_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(out/"C160_B101_63C_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"asset":"63C91067","index":26,"source_sha256":SOURCE_SHA256,"candidate_sha256":CANDIDATE_SHA256,
  "machine_status":report["machine_status"],"bbox_size_positive_margin":"2/2","outside":outside,"alpha_outside":alpha_out,
  "overlap":overlap,"touch":touch,"target_protected_overlap":target_protected_overlap,"target_protected_1px_near":target_protected_1px_near,
  "residue_diagnostic_scope_pixels":resid_scope_pixels,"residue_structural_pixels_ge18":resid_structural_pixels,
  "runtime_validation":"UNTESTED","report":f"localization/graphics/role_C/{run}/C160_63C_MACHINE_QA.json"}
-(wr/"C160_B99_63C91067.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+(wr/"C160_B101_63C91067.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False),flush=True)
