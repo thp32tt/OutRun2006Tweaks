@@ -1720,30 +1720,6 @@ namespace
                     Settings::WheelFFBInvertForce = false;
                     Settings::WheelFFBInvertSpring = false;
                 }
-                else if (modelIndex == 2)
-                {
-                    Settings::WheelFFBModel = 2;
-                    Settings::WheelFFBPhysicsSat = true;
-                    Settings::WheelFFBUseHardwareSpring = true;
-                    Settings::WheelFFBUseHardwareDamper = true;
-                    Settings::WheelFFBSpringStrength = 0.22f;
-                    Settings::WheelFFBSpringSaturation = 0.55f;
-                    Settings::WheelFFBDamperStrength = 0.28f;
-                    Settings::WheelFFBSteeringWeight = 1.60f;
-                    Settings::WheelFFBMechanicalTrail = 0.30f;
-                    Settings::WheelFFBTrailResponseLead = 0.40f;
-                    Settings::WheelFFBGripLoss = 0.65f;
-                    Settings::WheelFFBWeightTransfer = 0.15f;
-                    Settings::WheelFFBSlewRate = 0.12f;
-                    Settings::WheelFFBReversalReleaseRate = 0.30f;
-                    Settings::WheelFFBTireSlip = 0.04f;
-                    Settings::WheelFFBRoadTexture = 1.0f;
-                    Settings::WheelFFBWallImpact = 1.0f;
-                    Settings::WheelFFBGearShift = 1.0f;
-                    Settings::WheelFFBUsePeriodicEffects = false;
-                    Settings::WheelFFBInvertForce = false;
-                    Settings::WheelFFBInvertSpring = false;
-                }
                 else
                 {
                     Settings::WheelFFBModel = 3;
@@ -1794,7 +1770,7 @@ namespace
                 ImGui::EndCombo();
             }
             ImGui::TextDisabled(
-                "R10: Hybrid is retired. Model choices are Modern DD, Arcade Original and PS2 Original.");
+                "R12: legacy Model=2 is migrated to Modern DD. Model choices are Modern DD, Arcade Original and PS2 Original.");
             ImGui::TextDisabled(
                 "MOZA R3 model changes apply the tested polarity default automatically; Reverse options below remain manually editable.");
 
@@ -1811,11 +1787,6 @@ namespace
                     "Arcade Original: Lindbergh-derived drive-board semantics. Uses a condition/spring backbone plus directional wall/rail/surface-transition events and rough-surface vibration. Modern inferred SAT and tire-slip chatter are disabled.");
                 ImGui::TextDisabled(
                     "Event meanings come from the public OutRun2Real drive-board interception, not an official Sega protocol document.");
-            }
-            else if (activeFfbModel == 2)
-            {
-                ImGui::TextWrapped(
-                    "Arcade + Modern Hybrid: keeps Modern DD SAT/damping but uses the Lindbergh-derived arcade wall, surface and gear-event behavior.");
             }
             else
             {
@@ -1838,7 +1809,7 @@ namespace
                 ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f),
                     "Above 100% trades force-detail contrast for extra weight.");
             const bool modelUsesModernSat =
-                activeFfbModel == 0 || activeFfbModel == 2;
+                activeFfbModel == 0;
             if (!modelUsesModernSat) ImGui::BeginDisabled();
             track_ffb_change(ImGui::SliderFloat("Self-aligning Torque (SAT)", Settings::WheelFFBSteeringWeight.ptr(), 0.0f, 2.00f, "%.2f"));
             track_ffb_change(ImGui::Checkbox("Physics SAT (body slip + yaw)", Settings::WheelFFBPhysicsSat.ptr()));
@@ -1884,7 +1855,7 @@ namespace
             track_ffb_change(ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 1.0f, "%.2f"));
 
             const bool modelUsesModernTireSlip =
-                activeFfbModel == 0 || activeFfbModel == 2;
+                activeFfbModel == 0;
             if (!modelUsesModernTireSlip) ImGui::BeginDisabled();
             track_ffb_change(ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f"));
             if (!modelUsesModernTireSlip) ImGui::EndDisabled();
@@ -1920,7 +1891,7 @@ namespace
                     ImGui::TextDisabled(
                         "PS2 Original: gear-shift FFB stays disabled until a retail PS2 effect caller is verified.");
                 }
-                else if (activeFfbModel == 1 || activeFfbModel == 2)
+                else if (activeFfbModel == 1)
                 {
                     ImGui::TextDisabled(
                         "Arcade: Road Detail / Collision / Gear Shift at 1.00 preserve reconstructed source amplitude; lower values are PC host scaling.");
@@ -2166,7 +2137,7 @@ namespace
             }
 
             ImGui::TextDisabled(
-                "Arcade/Hybrid/PS2 no longer require separate shortcut buttons; selecting the model above applies its tested baseline, polarity and tactile transport.");
+                "Arcade/PS2 no longer require separate shortcut buttons; selecting the model above applies its tested baseline, polarity and tactile transport.");
 
             if (!Settings::UseNewInput)
             {
