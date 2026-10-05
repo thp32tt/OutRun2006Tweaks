@@ -88,6 +88,19 @@ require_order(
     "clientInteropProbeHandle),0)",
 )
 
+release_probe = body(r7, "void ReleaseDirectInteropProbe() noexcept")
+require_order(
+    release_probe,
+    "D3D9 interop probe teardown owner",
+    "RetireDirectInteropProbePublication();",
+    "ReleaseCom(DirectInteropProbeFence)",
+    "ReleaseCom(DirectInteropProbeSurface)",
+    "ReleaseCom(DirectInteropProbeTexture)",
+    "DirectInteropProbeHandle=nullptr",
+    "DirectInteropProbeToken=0",
+    "DirectInteropVerified=false",
+)
+
 release = body(r7, "void ReleaseStereoResources()")
 require(
     release,
@@ -98,26 +111,26 @@ require(
     "ReleaseCom(slot.leftTexture)",
     "ReleaseCom(slot.rightSurface)",
     "ReleaseCom(slot.rightTexture)",
-    "RetireDirectInteropProbePublication();",
+    "ReleaseDirectInteropProbe();",
+    "DirectTransportFormat=D3DFMT_UNKNOWN",
+)
+require_order(
+    release,
+    "D3D9 interop probe teardown routing",
+    "ReleaseDirectInteropProbe();",
+    "DirectTransportFormat=D3DFMT_UNKNOWN",
+)
+forbid(
+    release,
+    "reset path duplicate interop teardown ownership",
+    "clientInteropProbeToken",
+    "clientInteropProbeHandle",
     "ReleaseCom(DirectInteropProbeFence)",
     "ReleaseCom(DirectInteropProbeSurface)",
     "ReleaseCom(DirectInteropProbeTexture)",
     "DirectInteropProbeHandle=nullptr",
     "DirectInteropProbeToken=0",
     "DirectInteropVerified=false",
-    "DirectTransportFormat=D3DFMT_UNKNOWN",
-)
-require_order(
-    release,
-    "D3D9 interop probe publication retirement",
-    "RetireDirectInteropProbePublication();",
-    "ReleaseCom(DirectInteropProbeTexture)",
-)
-forbid(
-    release,
-    "reset path duplicate interop publication ownership",
-    "clientInteropProbeToken",
-    "clientInteropProbeHandle",
 )
 forbid(
     release,
@@ -190,22 +203,26 @@ require(
     "R32 host-identity interop invalidation",
     "R32ClearPendingProducerFences();",
     "ReleaseDirectTransportSlots();",
-    "RetireDirectInteropProbePublication();",
-    "ReleaseCom(DirectInteropProbeTexture);",
+    "ReleaseDirectInteropProbe();",
     "R32ForgetDirectIdentity();",
 )
 require_order(
     invalidate_direct_r32,
-    "R32 interop probe publication retirement",
-    "RetireDirectInteropProbePublication();",
-    "ReleaseCom(DirectInteropProbeTexture);",
+    "R32 interop probe teardown routing",
+    "ReleaseDirectInteropProbe();",
     "R32ForgetDirectIdentity();",
 )
 forbid(
     invalidate_direct_r32,
-    "R32 duplicate interop publication ownership",
+    "R32 duplicate interop teardown ownership",
     "clientInteropProbeToken",
     "clientInteropProbeHandle",
+    "ReleaseCom(DirectInteropProbeFence);",
+    "ReleaseCom(DirectInteropProbeSurface);",
+    "ReleaseCom(DirectInteropProbeTexture);",
+    "DirectInteropProbeHandle = nullptr;",
+    "DirectInteropProbeToken = 0;",
+    "DirectInteropVerified = false;",
 )
 
 invalidate_r32 = body(r32, "void R32InvalidateResetCaches() noexcept")
