@@ -1,0 +1,594 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C144-E7F6E9B7",
+  "queue_index": 228,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION68",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "87ff6635b287982d1dd2089f9bf9183df8a1e3ea",
+    "atlas_git_blob_sha1": "17334e7e52c6f9f1848f0753eb22e35e2f04b1af",
+    "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154"
+  },
+  "candidate_sha256": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607",
+  "candidate_changed_by_C": false,
+  "independent_method": "pinned canonical source+atlas; exact canonical alpha source mask for all 13 localized cells; exact transparent clean reconstruction; independent DDS/header/bbox/containment/overlap/shared silver-style validation",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "region_idx": 12,
+      "source": "coast 2 coast",
+      "korean": "코스트 2 코스트",
+      "cell": [
+        0,
+        20,
+        2048,
+        156
+      ],
+      "original_bbox": [
+        5,
+        26,
+        1456,
+        145
+      ],
+      "localized_bbox": [
+        9,
+        38,
+        681,
+        133
+      ],
+      "source_size": [
+        1451,
+        119
+      ],
+      "localized_size": [
+        672,
+        95
+      ],
+      "delta_left": 4,
+      "delta_right": 775,
+      "delta_top": 12,
+      "delta_bottom": 12,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 11,
+      "source": "car select",
+      "korean": "차량 선택",
+      "cell": [
+        0,
+        176,
+        2048,
+        156
+      ],
+      "original_bbox": [
+        5,
+        182,
+        1124,
+        301
+      ],
+      "localized_bbox": [
+        9,
+        186,
+        415,
+        297
+      ],
+      "source_size": [
+        1119,
+        119
+      ],
+      "localized_size": [
+        406,
+        111
+      ],
+      "delta_left": 4,
+      "delta_right": 709,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 10,
+      "source": "license select",
+      "korean": "라이선스 선택",
+      "cell": [
+        0,
+        332,
+        2048,
+        156
+      ],
+      "original_bbox": [
+        6,
+        338,
+        1500,
+        457
+      ],
+      "localized_bbox": [
+        10,
+        342,
+        601,
+        453
+      ],
+      "source_size": [
+        1494,
+        119
+      ],
+      "localized_size": [
+        591,
+        111
+      ],
+      "delta_left": 4,
+      "delta_right": 899,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 9,
+      "source": "game lobby",
+      "korean": "게임 로비",
+      "cell": [
+        0,
+        488,
+        2048,
+        156
+      ],
+      "original_bbox": [
+        7,
+        494,
+        1132,
+        644
+      ],
+      "localized_bbox": [
+        11,
+        513,
+        413,
+        624
+      ],
+      "source_size": [
+        1125,
+        150
+      ],
+      "localized_size": [
+        402,
+        111
+      ],
+      "delta_left": 4,
+      "delta_right": 719,
+      "delta_top": 19,
+      "delta_bottom": 20,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 8,
+      "source": "main menu",
+      "korean": "메인 메뉴",
+      "cell": [
+        0,
+        644,
+        2048,
+        156
+      ],
+      "original_bbox": [
+        6,
+        644,
+        1107,
+        769
+      ],
+      "localized_bbox": [
+        10,
+        651,
+        417,
+        762
+      ],
+      "source_size": [
+        1101,
+        125
+      ],
+      "localized_size": [
+        407,
+        111
+      ],
+      "delta_left": 4,
+      "delta_right": 690,
+      "delta_top": 7,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 7,
+      "source": "multiplayer",
+      "korean": "멀티플레이",
+      "cell": [
+        0,
+        800,
+        2048,
+        156
+      ],
+      "original_bbox": [
+        6,
+        806,
+        1195,
+        956
+      ],
+      "localized_bbox": [
+        10,
+        825,
+        483,
+        936
+      ],
+      "source_size": [
+        1189,
+        150
+      ],
+      "localized_size": [
+        473,
+        111
+      ],
+      "delta_left": 4,
+      "delta_right": 712,
+      "delta_top": 19,
+      "delta_bottom": 20,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 6,
+      "source": "music select",
+      "korean": "음악 선택",
+      "cell": [
+        0,
+        956,
+        2048,
+        156
+      ],
+      "original_bbox": [
+        6,
+        956,
+        1276,
+        1077
+      ],
+      "localized_bbox": [
+        10,
+        961,
+        414,
+        1072
+      ],
+      "source_size": [
+        1270,
+        121
+      ],
+      "localized_size": [
+        404,
+        111
+      ],
+      "delta_left": 4,
+      "delta_right": 862,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 5,
+      "source": "options",
+      "korean": "옵션",
+      "cell": [
+        0,
+        1112,
+        2048,
+        156
+      ],
+      "original_bbox": [
+        6,
+        1114,
+        748,
+        1265
+      ],
+      "localized_bbox": [
+        10,
+        1135,
+        205,
+        1244
+      ],
+      "source_size": [
+        742,
+        151
+      ],
+      "localized_size": [
+        195,
+        109
+      ],
+      "delta_left": 4,
+      "delta_right": 543,
+      "delta_top": 21,
+      "delta_bottom": 21,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 4,
+      "source": "network",
+      "korean": "네트워크",
+      "cell": [
+        0,
+        1268,
+        2048,
+        156
+      ],
+      "original_bbox": [
+        6,
+        1274,
+        816,
+        1424
+      ],
+      "localized_bbox": [
+        10,
+        1293,
+        395,
+        1404
+      ],
+      "source_size": [
+        810,
+        150
+      ],
+      "localized_size": [
+        385,
+        111
+      ],
+      "delta_left": 4,
+      "delta_right": 421,
+      "delta_top": 19,
+      "delta_bottom": 20,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 3,
+      "source": "rankings",
+      "korean": "랭킹",
+      "cell": [
+        0,
+        1424,
+        2048,
+        156
+      ],
+      "original_bbox": [
+        6,
+        1424,
+        792,
+        1580
+      ],
+      "localized_bbox": [
+        10,
+        1446,
+        202,
+        1557
+      ],
+      "source_size": [
+        786,
+        156
+      ],
+      "localized_size": [
+        192,
+        111
+      ],
+      "delta_left": 4,
+      "delta_right": 590,
+      "delta_top": 22,
+      "delta_bottom": 23,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 2,
+      "source": "game select",
+      "korean": "게임 선택",
+      "cell": [
+        0,
+        1580,
+        2048,
+        156
+      ],
+      "original_bbox": [
+        3,
+        1580,
+        1236,
+        1736
+      ],
+      "localized_bbox": [
+        7,
+        1602,
+        411,
+        1713
+      ],
+      "source_size": [
+        1233,
+        156
+      ],
+      "localized_size": [
+        404,
+        111
+      ],
+      "delta_left": 4,
+      "delta_right": 825,
+      "delta_top": 22,
+      "delta_bottom": 23,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 1,
+      "source": "mode select",
+      "korean": "모드 선택",
+      "cell": [
+        0,
+        1736,
+        2048,
+        156
+      ],
+      "original_bbox": [
+        2,
+        1736,
+        1252,
+        1861
+      ],
+      "localized_bbox": [
+        6,
+        1743,
+        406,
+        1854
+      ],
+      "source_size": [
+        1250,
+        125
+      ],
+      "localized_size": [
+        400,
+        111
+      ],
+      "delta_left": 4,
+      "delta_right": 846,
+      "delta_top": 7,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 0,
+      "source": "race select",
+      "korean": "레이스 선택",
+      "cell": [
+        0,
+        1892,
+        2048,
+        156
+      ],
+      "original_bbox": [
+        6,
+        1898,
+        1244,
+        2017
+      ],
+      "localized_bbox": [
+        10,
+        1902,
+        509,
+        2013
+      ],
+      "source_size": [
+        1238,
+        119
+      ],
+      "localized_size": [
+        499,
+        111
+      ],
+      "delta_left": 4,
+      "delta_right": 735,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "unclassified_visible_source_pixels": 0,
+    "producer_clean_exact_diff_pixels": 0,
+    "bbox_size_positive_margin": "13/13 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "overlap": 0,
+    "touch_pairs": [],
+    "style": {
+      "12": {
+        "target_pixels": 46106,
+        "grayscale_fraction": 1.0
+      },
+      "11": {
+        "target_pixels": 31939,
+        "grayscale_fraction": 1.0
+      },
+      "10": {
+        "target_pixels": 44348,
+        "grayscale_fraction": 1.0
+      },
+      "9": {
+        "target_pixels": 32050,
+        "grayscale_fraction": 1.0
+      },
+      "8": {
+        "target_pixels": 31654,
+        "grayscale_fraction": 1.0
+      },
+      "7": {
+        "target_pixels": 41407,
+        "grayscale_fraction": 1.0
+      },
+      "6": {
+        "target_pixels": 31797,
+        "grayscale_fraction": 1.0
+      },
+      "5": {
+        "target_pixels": 16529,
+        "grayscale_fraction": 1.0
+      },
+      "4": {
+        "target_pixels": 31154,
+        "grayscale_fraction": 1.0
+      },
+      "3": {
+        "target_pixels": 17093,
+        "grayscale_fraction": 1.0
+      },
+      "2": {
+        "target_pixels": 32185,
+        "grayscale_fraction": 1.0
+      },
+      "1": {
+        "target_pixels": 29857,
+        "grayscale_fraction": 1.0
+      },
+      "0": {
+        "target_pixels": 37407,
+        "grayscale_fraction": 1.0
+      }
+    }
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
