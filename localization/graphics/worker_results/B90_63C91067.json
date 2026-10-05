@@ -1,0 +1,9 @@
+{
+  "run": "20261005-B-PRODUCTION90-63C91067-PREFLIGHT",
+  "index": 26,
+  "asset": "63C91067",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "regions_count": 2,
+  "status": "PREFLIGHT_VISUAL_CLASSIFICATION_REQUIRED",
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION90-63C91067-PREFLIGHT/B90_63C_PREFLIGHT.json"
+}

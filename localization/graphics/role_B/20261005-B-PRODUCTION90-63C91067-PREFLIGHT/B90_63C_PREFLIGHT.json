@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION90-63C91067-PREFLIGHT",
+  "index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "source_git_blob_sha1": "9f41fe44ecb17a4daba096ddbb9d2c73fa28e8f9",
+  "atlas_git_blob_sha1": "7f118326e34794e2ae5bf3f3b6d82b6ce566c64a",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "fourcc": "\u0000\u0000\u0000\u0000",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "regions_count": 2,
+  "regions": [
+    {
+      "idx": 0,
+      "name": "sprite_14",
+      "cell": [
+        0,
+        1032,
+        2048,
+        1016
+      ],
+      "alpha_bbox": [
+        45,
+        1032,
+        1999,
+        2034
+      ],
+      "alpha_pixels": 1104169
+    },
+    {
+      "idx": 1,
+      "name": "sprite_15",
+      "cell": [
+        0,
+        16,
+        1720,
+        1016
+      ],
+      "alpha_bbox": [
+        27,
+        42,
+        1690,
+        1014
+      ],
+      "alpha_pixels": 1153646
+    }
+  ],
+  "status": "PREFLIGHT_VISUAL_CLASSIFICATION_REQUIRED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
