@@ -808,6 +808,86 @@ int main()
         !r267OverlapInterfaceSemantics.exact(),
         "R267 rejects overlapping SM3 interface declaration masks");
 
+    const DWORD r268PsTokens[] = {
+        D3DPS_VERSION(3, 0),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        r267DclSemanticToken(D3DDECLUSAGE_TEXCOORD, 1u),
+        r266ParameterToken(
+            D3DSPR_INPUT, 0u,
+            D3DSP_WRITEMASK_0 | D3DSP_WRITEMASK_1),
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const auto r268PsDecode =
+        outrun::vr::dx11::
+            decode_programmable_shader_instruction_stream(
+                outrun::vr::dx11::
+                    capture_programmable_shader_function_source_evidence(
+                        r268PsTokens, sizeof(r268PsTokens), false));
+    const auto r268PsRegisterSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_register_semantics(
+                r268PsDecode);
+    const auto r268PsInterfaceSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_interface_semantics(
+                r268PsDecode, r268PsRegisterSemantics);
+    const auto r268Linkage =
+        outrun::vr::dx11::
+            derive_programmable_shader_interface_linkage_evidence(
+                r267VsInterfaceSemantics,
+                r268PsInterfaceSemantics);
+    require(
+        r268PsDecode.exact() &&
+        r268PsRegisterSemantics.exact() &&
+        r268PsInterfaceSemantics.exact() &&
+        !r268PsInterfaceSemantics.vertexStage &&
+        r268Linkage.exact() &&
+        r268Linkage.vertexOutputSemanticCount == 1u &&
+        r268Linkage.pixelInputSemanticCount == 1u &&
+        r268Linkage.matchedSemanticCount == 1u &&
+        r268Linkage.interfaceLinkHash != 0 &&
+        r268Linkage.linkerRevisionHash != 0 &&
+        r268Linkage.semanticContractHash != 0,
+        "R268 derives exact VS-output to PS-input stage linkage");
+
+    auto r268SemanticMismatch = r268PsInterfaceSemantics;
+    r268SemanticMismatch.semantics[0].usage = D3DDECLUSAGE_COLOR;
+    const auto r268SemanticMismatchLinkage =
+        outrun::vr::dx11::
+            derive_programmable_shader_interface_linkage_evidence(
+                r267VsInterfaceSemantics,
+                r268SemanticMismatch);
+    require(
+        !r268SemanticMismatchLinkage.complete &&
+        !r268SemanticMismatchLinkage.exact(),
+        "R268 rejects unmatched pixel input semantics");
+
+    auto r268NarrowVertex = r267VsInterfaceSemantics;
+    r268NarrowVertex.semantics[1].writeMask =
+        D3DSP_WRITEMASK_0 | D3DSP_WRITEMASK_1;
+    auto r268WidePixel = r268PsInterfaceSemantics;
+    r268WidePixel.semantics[0].writeMask = D3DSP_WRITEMASK_ALL;
+    const auto r268MaskMismatchLinkage =
+        outrun::vr::dx11::
+            derive_programmable_shader_interface_linkage_evidence(
+                r268NarrowVertex,
+                r268WidePixel);
+    require(
+        !r268MaskMismatchLinkage.complete &&
+        !r268MaskMismatchLinkage.exact(),
+        "R268 rejects insufficient vertex output component coverage");
+
+    const auto r268StageSwapLinkage =
+        outrun::vr::dx11::
+            derive_programmable_shader_interface_linkage_evidence(
+                r268PsInterfaceSemantics,
+                r267VsInterfaceSemantics);
+    require(
+        !r268StageSwapLinkage.vertexInterfaceExact &&
+        !r268StageSwapLinkage.pixelInterfaceExact &&
+        !r268StageSwapLinkage.exact(),
+        "R268 rejects reversed VS and PS interface receipts");
+
     const ProgrammableShaderFunctionIdentity programmableVs{
         true,
         true,
