@@ -10347,6 +10347,39 @@ def main() -> None:
             + ", ".join(missing_r263_programmable_shader_semantic_translation)
         )
 
+    r264_programmable_shader_source_evidence_contract = [
+        ("struct ProgrammableShaderFunctionSourceEvidence",
+         PIPELINE_TRANSLATION_HPP, "R264 retained programmable source-evidence type"),
+        ("capture_programmable_shader_function_source_evidence(",
+         PIPELINE_TRANSLATION_HPP, "R264 source-evidence capture declaration"),
+        ("validate_programmable_shader_function_source_evidence(",
+         PIPELINE_TRANSLATION_HPP, "R264 source-evidence identity validator declaration"),
+        ("out.tokens.resize(",
+         PIPELINE_TRANSLATION_CPP, "R264 bounded D3D9 shader token retention"),
+        ("out.versionSupported =",
+         PIPELINE_TRANSLATION_CPP, "R264 stage/version fail-closed gate"),
+        ("evidence.bytecodeHash == identity.bytecodeHash",
+         PIPELINE_TRANSLATION_CPP, "R264 exact R239 hash binding"),
+        ("sourceEvidenceExact",
+         RUNTIME_CENSUS, "R264 production census consumes exact source evidence"),
+        ("capture_programmable_shader_function_source_evidence(",
+         RUNTIME_CENSUS, "R264 D3D9 GetFunction bytes route through evidence producer"),
+        ("R264 captures exact programmable shader source bytecode evidence",
+         CONSTANT_BUFFER_PROBE, "R264 exact source-evidence positive regression"),
+        ("R264 rejects source identity drift, wrong-stage bytecode, and misaligned payloads",
+         CONSTANT_BUFFER_PROBE, "R264 fail-closed source-evidence regression"),
+    ]
+    missing_r264_programmable_shader_source_evidence = [
+        meaning for token, source, meaning
+        in r264_programmable_shader_source_evidence_contract
+        if token not in source
+    ]
+    if missing_r264_programmable_shader_source_evidence:
+        raise SystemExit(
+            "DX11 R264 programmable shader source-evidence drift: "
+            + ", ".join(missing_r264_programmable_shader_source_evidence)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
