@@ -1771,6 +1771,55 @@ struct NativeProgrammableShaderDormantSourceRevalidationReadiness {
     std::uint64_t snapshotToken{};
 };
 
+// R259 converts the current R258 dormant source receipt into an explicit
+// activation-prerequisite review handoff. It records which Set-05 activation
+// proof classes are actually represented by current repository evidence.
+// R243 supplies an exact input-layout ownership/identity receipt, while F18
+// resource-behavior proof and F21 shader-translation semantic proof remain
+// deliberately absent. The handoff can therefore be review-ready but can
+// never authorize Draw*, NativeDrawPath, or manufacture an activation token.
+struct NativeProgrammableShaderActivationPrerequisiteHandoff {
+    bool inputValid{};
+    bool sourceRevalidationReady{};
+    bool sourceRevalidationSnapshotMatches{};
+    bool inputLayoutOwnershipReady{};
+    bool inputLayoutSnapshotMatches{};
+    bool resourceBehaviorProofPresent{};
+    bool inputLayoutProofPresent{};
+    bool shaderTranslationProofPresent{};
+    bool activationPrerequisitesSatisfied{};
+    bool diagnosticOnly{};
+    bool nativeDrawPathActivationAllowed{};
+    bool drawDispatchAuthorized{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    NativeProgrammableShaderDrawCandidateKind kind =
+        NativeProgrammableShaderDrawCandidateKind::None;
+    bool indexed{};
+    std::uint32_t missingPrerequisiteMask{};
+    std::uint64_t sourceRevalidationSnapshotToken{};
+    std::uint64_t inputLayoutSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+    std::uint64_t activationSnapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderActivationPrerequisiteHandoff
+compose_programmable_activation_prerequisite_handoff(
+    const NativeProgrammableShaderDormantSourceRevalidationReadiness&
+        sourceRevalidation,
+    std::uint64_t sourceRevalidationSnapshotToken,
+    const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
+    std::uint64_t inputLayoutSnapshotToken) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_activation_prerequisite_handoff_snapshot(
+    const NativeProgrammableShaderDormantSourceRevalidationReadiness&
+        sourceRevalidation,
+    std::uint64_t sourceRevalidationSnapshotToken,
+    const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
 class NativeProgrammableShaderPairCache final {
 public:
     NativeProgrammableShaderPairCache() = default;
