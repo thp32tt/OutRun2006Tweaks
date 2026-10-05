@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00410",
+  "production_id": "CONVERSION-DX9EX-00410",
+  "event_id": "CONVERSION-DX9EX-00410-E001",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "ddce8a108ed98253d91ea8a67d19f92499e636c7",
+  "source_material_sha": "e27f01f84045bd47b93ab3aecae24581e6ffd1a0",
+  "result_sha": "e27f01f84045bd47b93ab3aecae24581e6ffd1a0",
+  "material_result_sha": "e27f01f84045bd47b93ab3aecae24581e6ffd1a0",
+  "validation_bearing_result_sha": "e27f01f84045bd47b93ab3aecae24581e6ffd1a0",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00410]",
+  "selected_work_item": "VR-REFACTOR-POST1100-R32-WVP-BATCH-NEUTRAL-OWNER-0015",
+  "summary": "Extracted the raw D3D9 c64..c67 SetVertexShaderConstantF batch write from the R32 owner into neutral draw_state_helpers while preserving the R32 telemetry/failure wrapper and all StateBlock/Reset/Present/DirectGPU/fail-close ownership. Added a deterministic retirement guard against direct device-write reintroduction.",
+  "changed_paths": [
+    "src/vr/d3d9/draw_state_helpers.hpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r31_r32_retirement_guard.py"
+  ],
+  "failure_context": {
+    "supplied": "DX9Ex Active Validation exact run 37345097334 concluded cancelled.",
+    "classification": "SUPERSEDED_INTERMEDIATE_RUN",
+    "cancelled_run_id": 37345097334,
+    "cancelled_head_sha": "144a4abc85302e8e1b6833ba6606c4266543fb07",
+    "authoritative_result_sha": "e27f01f84045bd47b93ab3aecae24581e6ffd1a0",
+    "retry_consumed": false,
+    "actions_failure": false
+  },
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered prior 00409 closure and post-1100 dependency-census cursor. Cancelled run 37345097334 belonged to intermediate SHA 144a4abc and was superseded by later same-task pushes."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R32GetSavedViewport/R32RestoreRightPassState retain StateBlock/restore semantics; R31BuildFastWorldConstants retains fast-path cache/pose ownership. R32SetWvpBatch contains one stateless raw D3D9 shader-constant batch write plus R32 telemetry, so only the raw primitive was eligible for neutral extraction."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "144a4abc added neutral SetVertexShaderConstantBatch; a9a98c21 routed R32SetWvpBatch through it while preserving counters/logging; e27f01f8 added deterministic ownership regression guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA e27f01f84045bd47b93ab3aecae24581e6ffd1a0: DX9Ex Active Validation 37345169043 SUCCESS and Domain Isolation Guard 37345169517 SUCCESS. No Quest3/VDXR test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "144a4abc85302e8e1b6833ba6606c4266543fb07 refactor(vr): extract neutral shader-constant batch primitive [AUTO:CONVERSION-DX9EX-00410]",
+        "a9a98c216451515e286e78334838272b760b9c81 refactor(vr): route R32 WVP upload through neutral primitive [AUTO:CONVERSION-DX9EX-00410]",
+        "e27f01f84045bd47b93ab3aecae24581e6ffd1a0 test(vr): guard neutral WVP batch ownership [AUTO:CONVERSION-DX9EX-00410]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "OutRun2-VR-DX9EX-ACTIVE-e27f01f84045bd47b93ab3aecae24581e6ffd1a0 artifact 11360437554, digest sha256:edfbfd45b048733d5459458601697a65bab42cd6b2da46a29deee1fa637cc02a. Artifact is build evidence, not HMD runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37345169043,
+      "conclusion": "success",
+      "exact_sha": "e27f01f84045bd47b93ab3aecae24581e6ffd1a0",
+      "jobs": {
+        "policy": 111881914571,
+        "host": 111882069238,
+        "full_chain_compile": 111882069240,
+        "game": 111882069347,
+        "package": 111884341714
+      },
+      "package_artifact_id": 11360437554,
+      "package_artifact_digest": "sha256:edfbfd45b048733d5459458601697a65bab42cd6b2da46a29deee1fa637cc02a"
+    },
+    "domain_isolation": {
+      "run_id": 37345169517,
+      "conclusion": "success",
+      "exact_sha": "e27f01f84045bd47b93ab3aecae24581e6ffd1a0"
+    },
+    "superseded_cancelled_runs": [
+      37345097334
+    ],
+    "regression_keys": [
+      "VR-R50-WORLD-STEREO-PRESERVE-001"
+    ],
+    "issue14_comment_id": 5999207750,
+    "n100": {
+      "status": "NOT_USED",
+      "reason": "Desktop Commander monthly usage limit previously reached; GitHub remained completion authority."
+    }
+  },
+  "next_action": "Continue the post-1100 R33 dependency census. Extract at most one additional neutral helper only if it has no StateBlock/Reset/Present/DirectGPU/fail-close/cache-lifetime ownership; otherwise keep it with its current owner.",
+  "completed_at_kst": "2026-10-06T02:07:27+09:00"
+}
