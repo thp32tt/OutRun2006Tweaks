@@ -7,7 +7,7 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter,ImageOps
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("worker B only")
 repo=Path.cwd()
-run="20261005-B-PRODUCTION94"
+run="20261005-B-PRODUCTION95"
 out=repo/"localization/graphics/role_B"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds"
@@ -64,7 +64,7 @@ for idx in (0,1):
     gx0=rx0+int(xs.min()); gy0=ry0+int(ys.min()); gx1=rx0+int(xs.max())+1; gy1=ry0+int(ys.max())+1
     if gx1-gx0>cw*.50 or gy1-gy0>ch*.16: raise RuntimeError(("title discovery implausible",idx,[gx0,gy0,gx1,gy1]))
     m=np.zeros((H,W),bool); m[ry0:ry1,rx0:rx1]=core
-    pim=Image.fromarray((m.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(7))
+    pim=Image.fromarray((m.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(21))
     pm=np.asarray(pim)>0
     pys,pxs=np.nonzero(pm)
     bx0=int(pxs.min()); by0=int(pys.min()); bx1=int(pxs.max())+1; by1=int(pys.max())+1
@@ -84,7 +84,7 @@ for row in rows:
     nx0=max(0,int(nxs.min())-10); ny0=max(0,int(nys.min())-10); nx1=min(navy.shape[1],int(nxs.max())+11); ny1=min(navy.shape[0],int(nys.max())+11)
     core=np.zeros_like(navy); core[ny0:ny1,nx0:nx1]=(white|navy)[ny0:ny1,nx0:nx1]
     m=Image.new("L",(W,H),0); patch=Image.fromarray((core.astype(np.uint8)*255),"L"); m.paste(patch,(rx0,ry0))
-    m=m.filter(ImageFilter.MaxFilter(7))
+    m=m.filter(ImageFilter.MaxFilter(21))
     source_mask_img=ImageChops.lighter(source_mask_img,m)
 source_mask=bmask(source_mask_img)
 allowed=Image.new("L",(W,H),0)
@@ -116,8 +116,8 @@ source_png=out/"63C_SOURCE_READABLE.png"; clean_png=out/"63C_CLEAN_PLATE.png"; s
 src.save(source_png); clean.save(clean_png); source_mask.save(smp); allowed.save(allowedp)
 protected=ImageOps.invert(allowed); pp=out/"63C_PROTECTED_MASK.png"; protected.save(pp)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(smp),"--protected-mask",str(pp),"--report",str(out/"B94_CLEAN_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B94_CLEAN_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(smp),"--protected-mask",str(pp),"--report",str(out/"B95_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B95_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
@@ -173,7 +173,7 @@ for row in rows:
       "delta_left":lb[0]-x0,"delta_right":x1-lb[2],"delta_top":lb[1]-y0,"delta_bottom":y1-lb[3],
       "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","font_file":Path(fp).name,"font_style":fstyle,
       "font_size":shared_fs,"stroke_width":shared_sw,"slant":.22,"fill_rgba":white,"outline_rgba":navy,"alignment":"center",
-      "rework_status":"B94_NEW_EXACT_HD_CANDIDATE"})
+      "rework_status":"B95_NEW_EXACT_HD_CANDIDATE"})
 
 if ImageChops.multiply(targets[0],targets[1]).getbbox(): raise RuntimeError("target overlap")
 target=ImageChops.lighter(targets[0],targets[1]); target.save(out/"63C_TARGET_TEXT_MASK.png")
@@ -186,8 +186,8 @@ raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
 dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("RGBA roundtrip mismatch")
 final_png=out/"63C_FINAL_DECODED_READABLE.png"; dec.save(final_png)
-subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(allowedp),"--protected-mask",str(pp),"--report",str(out/"B94_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"B94_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(allowedp),"--protected-mask",str(pp),"--report",str(out/"B95_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"B95_FINAL_VALIDATION.json").read_text())
 if finalrep["status"]!="PASS": raise RuntimeError(("final validator",finalrep))
 
 diff=diffmask(src,dec)
@@ -208,7 +208,7 @@ if outside or alphaout or render_out or prot or residue:
 stack=Image.new("RGB",(1024,3*1050),"white")
 for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); stack.paste(z,(0,i*1050+26)); ImageDraw.Draw(stack).text((5,i*1050+5),label,fill="black")
-stack.save(out/"B94_63C_SOURCE_CLEAN_FINAL.jpg",quality=96)
+stack.save(out/"B95_63C_SOURCE_CLEAN_FINAL.jpg",quality=96)
 cards=[]
 for row in outrows:
     x0,y0,x1,y1=row["original_bbox"]; p=20; cr=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
@@ -220,11 +220,11 @@ for row in outrows:
     ImageDraw.Draw(c).text((5,5),f'{row["region_idx"]} Total Rank -> 종합 랭킹',fill="black"); cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+4 for c in cards)),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.save(out/"B94_63C_ROW_CONTACT.jpg",quality=96)
+sheet.save(out/"B95_63C_ROW_CONTACT.jpg",quality=96)
 rr=Image.new("RGB",(1024,2*1050),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); rr.paste(z,(0,i*1050+26)); ImageDraw.Draw(rr).text((5,i*1050+5),label,fill="black")
-rr.save(out/"B94_63C_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"B95_63C_RAW_COMPARE.jpg",quality=96)
 
 report={"schema_version":1,"role":"B","run":run,"queue_index":26,"asset":asset,
  "readiness_tier":"PREFLIGHT_PROMOTED_TO_RENDER_COMPLETED_SAME_INVOCATION",
@@ -236,11 +236,11 @@ report={"schema_version":1,"role":"B","run":run,"queue_index":26,"asset":asset,
  "decoded_changes":{"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"source_effect_residue":residue,"render_outside_target":render_out,"localized_overlap":0},
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"B94_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
-(out/"B94_63C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "status":"B95_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
+(out/"B95_63C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":26,"asset":"63C91067","source_sha256":sha(sb),"candidate_sha256":csha,"localized_physical_elements":2,
  "bbox_size_positive_margin":"2/2","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "source_residue":residue,"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"render_outside_target":render_out,"overlap":0,
- "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B94_63C_REPORT.json"}
-(wr/"B94_63C91067.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B95_63C_REPORT.json"}
+(wr/"B95_63C91067.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False))
