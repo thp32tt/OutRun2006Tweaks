@@ -74,8 +74,8 @@ def save_three(src,clean,final,boxes,path,labels=None):
     sheet.save(path,quality=95)
 
 def process_acf():
-    run="20261006-C214-ACF61D7C"; out=repo/"localization/graphics/role_C"/run; out.mkdir(parents=True,exist_ok=True)
-    pr=json.loads((repo/"localization/graphics/role_A/20261006-A-PRODUCTION72-ACF/A72_ACF61D7C_REPORT.json").read_text())
+    run="20261006-C216-ACF61D7C"; out=repo/"localization/graphics/role_C"/run; out.mkdir(parents=True,exist_ok=True)
+    pr=json.loads((repo/"localization/graphics/role_A/20261006-A-PRODUCTION75-ACF/A75_ACF61D7C_REPORT.json").read_text())
     candidate=repo/pr["candidate_path"]
     tmp=Path("/tmp/c214"); tmp.mkdir(exist_ok=True)
     sfile=tmp/"source.dds"; afile=tmp/"atlas.json"
@@ -88,7 +88,7 @@ def process_acf():
     if (W,H,mips,mode)!=(4096,2048,1,"RGBA") or (W2,H2,m2,mode2)!=(W,H,mips,mode):
         raise RuntimeError(("ACF structure",W,H,mips,mode,W2,H2,m2,mode2))
     sa=np.asarray(src,dtype=np.uint8); fa=np.asarray(final,dtype=np.uint8)
-    clean=Image.open(repo/"localization/graphics/role_A/20261006-A-PRODUCTION72-ACF/A72_ACF_CLEAN_PLATE.png").convert("RGBA")
+    clean=Image.open(repo/"localization/graphics/role_A/20261006-A-PRODUCTION75-ACF/A75_ACF_CLEAN_PLATE.png").convert("RGBA")
     ca=np.asarray(clean,dtype=np.uint8)
     regs={int(r["idx"]):r for r in json.loads(afile.read_text())["regions"]}
 
@@ -212,16 +212,16 @@ def process_acf():
     # Controller-targeted evidence: rows with strongest scale/alignment risk + idx10.
     focus_keys=["congrats_title","out_run_1p","view_rankings","enjoy_original","adjust_settings","yes","no","your_position"]
     boxes=[list(map(int,next(r for r in rows if r["key"]==k)["original_bbox"])) for k in focus_keys]
-    save_three(src,clean,final,boxes,out/"C214_ACF_RISK_CONTACTS.jpg",focus_keys)
+    save_three(src,clean,final,boxes,out/"C216_ACF_RISK_CONTACTS.jpg",focus_keys)
     # Region10 broad view.
-    save_three(src,clean,final,[[rx,ry,rx+rw,ry+rh]],out/"C214_ACF_REGION10.jpg",["atlas region10"])
+    save_three(src,clean,final,[[rx,ry,rx+rw,ry+rh]],out/"C216_ACF_REGION10.jpg",["atlas region10"])
     rawsheet=Image.new("RGB",(1200,2*630),"white")
     for i,(lab,im) in enumerate((("SOURCE_RAW_MIRROR_Y",raws),("FINAL_RAW_MIRROR_Y",rawf))):
         z=comp(im); z.thumbnail((1200,600),Image.Resampling.LANCZOS); rawsheet.paste(z,(0,i*630+25)); ImageDraw.Draw(rawsheet).text((5,i*630+5),lab,fill="black")
-    rawsheet.save(out/"C214_ACF_RAW_COMPARE.jpg",quality=92)
+    rawsheet.save(out/"C216_ACF_RAW_COMPARE.jpg",quality=92)
 
     rep={
-      "schema_version":1,"role":"C","run":run,"qa_id":"C214","queue_index":205,"asset":pr["asset"],"producer_run":pr["run"],
+      "schema_version":1,"role":"C","run":run,"qa_id":"C216","queue_index":205,"asset":pr["asset"],"producer_run":pr["run"],
       "source_sha256":pr["source_provenance"]["source_sha256"],"candidate_sha256":pr["candidate_sha256"],
       "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_exact":True,"raw_orientation":"mirror_y"},
       "row_checks":row_checks,"machine_checks":{"decoded_changed_outside_union_producer_rows":outside,"alpha_changed_outside_union_producer_rows":alpha_out,
@@ -234,13 +234,13 @@ def process_acf():
         "localized_inside_phrase_bbox":bool(loc_in_phrase)},
       "style_diagnostics":{"rows_height_ratio_below_0_70":under70},
       "machine_status":machine_status,"controller_visual_qa":"PENDING_CONTROLLER_REVIEW",
-      "decision":"PENDING_CONTROLLER_VISUAL_QA" if machine_status=="PASS" else "C214_REWORK_REQUIRED_MACHINE_OR_SEMANTIC_GEOMETRY_GATE",
+      "decision":"PENDING_CONTROLLER_VISUAL_QA" if machine_status=="PASS" else "C216_REWORK_REQUIRED_MACHINE_OR_SEMANTIC_GEOMETRY_GATE",
       "runtime_validation":"UNTESTED",
-      "preview_files":[f"localization/graphics/role_C/{run}/C214_ACF_RISK_CONTACTS.jpg",f"localization/graphics/role_C/{run}/C214_ACF_REGION10.jpg",f"localization/graphics/role_C/{run}/C214_ACF_RAW_COMPARE.jpg"]
+      "preview_files":[f"localization/graphics/role_C/{run}/C216_ACF_RISK_CONTACTS.jpg",f"localization/graphics/role_C/{run}/C216_ACF_REGION10.jpg",f"localization/graphics/role_C/{run}/C216_ACF_RAW_COMPARE.jpg"]
     }
-    (out/"C214_ACF61D7C_MACHINE_QA.json").write_text(json.dumps(rep,ensure_ascii=False,indent=2)+"\n")
-    (wr/"C214_ACF61D7C.json").write_text(json.dumps({"run":run,"qa_id":"C214","index":205,"asset":"ACF61D7C","candidate_sha256":pr["candidate_sha256"],
-       "machine_status":machine_status,"machine_checks":rep["machine_checks"],"report":f"localization/graphics/role_C/{run}/C214_ACF61D7C_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
+    (out/"C216_ACF61D7C_MACHINE_QA.json").write_text(json.dumps(rep,ensure_ascii=False,indent=2)+"\n")
+    (wr/"C216_ACF61D7C.json").write_text(json.dumps({"run":run,"qa_id":"C216","index":205,"asset":"ACF61D7C","candidate_sha256":pr["candidate_sha256"],
+       "machine_status":machine_status,"machine_checks":rep["machine_checks"],"report":f"localization/graphics/role_C/{run}/C216_ACF61D7C_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
     return {"machine_status":machine_status,"machine_checks":rep["machine_checks"],"region10":rep["region10_independent_geometry"],"token_checks":token_checks,"under70":under70}
 
 def process_jenn():
@@ -331,4 +331,4 @@ def process_jenn():
       "machine_status":machine_status,"machine_checks":rep["machine_checks"],"report":f"localization/graphics/role_C/{run}/C215_06AB5CEE_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
     return {"machine_status":machine_status,"machine_checks":rep["machine_checks"],"rows":rows}
 
-print(json.dumps({"C214":process_acf(),"C215":process_jenn()},ensure_ascii=False),flush=True)
+print(json.dumps({"C216":process_acf()},ensure_ascii=False),flush=True)
