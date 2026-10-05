@@ -7,6 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C195 finalized A51 index159 4EDA9DE3 candidate 8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5: independent canonical source+atlas QA, exact RGBA32/BGRA header/raw mirror_y, 15/15 source/localized bbox exact-match + size + positive margins, canonical phonetic stage mapping, all outside/overlap/touch gates zero, controller readable/raw visual PASS. C195_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
+    "C196 returned newly promoted localize_text index30 8215FD25 B143 candidate 04d2c23333999873b7f467d0a8647c1056f40fa3bcd06e0174711bb2345277ba. Producer 2/2 numeric containment/protected gates PASS, but mandatory C SOURCE/CLEAN/FINAL visual FAIL: lower starburst clean plate has conspicuous gray/dark blurred reconstruction patches across the former Total Rank zone under the top-center rays; artifact remains around/behind 종합 랭킹. Speech-bubble plate acceptable. REWORK_REQUIRED. RUNTIME_VALIDATION=UNTESTED.",
     "C194 finalized C598919A B139 candidate e3c3f78975b3dd582690a7f169c1aa364dd05e3846827340aae38631885b92bf. Independent C verified DXT5 4096x4096/header/raw mirror_y, 41/41 bbox+size+positive margins, canonical stage mapping, zero decoded/alpha/visible outside, overlap, protected geometry and raw DXT5 out-of-scope blocks. Controller readable SOURCE/CLEAN/FINAL and raw visual QA PASS. C598919A cleared; producer REWORK now only 37759842. RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION49 completed odd index 147 39BCA907 after rejecting A48 semantic-binding mismatch. Candidate 6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b: canonical idx1-15 stage-name mapping corrected by controller SOURCE/CLEAN/FINAL review; 15/15 bbox+size+positive margins and changed/alpha outside, protected, source-residue, overlap/touch all 0; raw mirror_y and protected idx0/16 preserved. Independent C + in-game pending. RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION47 completed odd index 133 25F697C6 after A46 canonical-HD binding review. idx15-23 map to ANCIENT RUINS/ALPINE/GIALLO MODENA/BIANCO AVUS/GRIGIO ALLOY/ARGENTO NURBURGRING/ROSSO SCUDERIA/BLU MIRABEAU/NERO; Ferrari/model idx0-14 are protected. Candidate 08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013: 9/9 bbox+size+positive margins, changed outside/alpha/protected/source-residue/overlap/touch all 0; controller SOURCE/CLEAN/FINAL visual PASS. Independent C + in-game pending. RUNTIME_VALIDATION=UNTESTED.",
@@ -3928,10 +3930,11 @@
     "c176_return_resolved": true,
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_artwork_localize_text": 14,
-  "current_producer_rework_remaining": 1,
+  "current_pending_artwork_localize_text": 13,
+  "current_producer_rework_remaining": 2,
   "current_producer_rework_assets": [
-    "37759842"
+    "37759842",
+    "8215FD25"
   ],
   "latest_b_production": {
     "run": "B_PRODUCTION137",
@@ -3982,7 +3985,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C195-C196-BATCH/C195_C196_BATCH_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4168,6 +4171,39 @@
     "decision": "C194_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
     "machine_report": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_MACHINE_QA.json",
     "report": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c195_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T20:28:46+09:00",
+    "run": "20261005-C195-4EDA9DE3",
+    "queue_index": 159,
+    "candidate_sha256": "8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "15/15 PASS",
+    "semantic_stage_mapping": "PASS",
+    "zero_pixel_gates": {
+      "decoded_changed_outside_union_source_bboxes": 0,
+      "alpha_changed_outside_union_source_bboxes": 0,
+      "introduced_visible_outside_union_source_bboxes": 0,
+      "candidate_visible_outside_union_source_bboxes": 0,
+      "localized_overlap_pixels": 0,
+      "localized_1px_touch_pixels": 0
+    },
+    "controller_visual_qa": "PASS",
+    "decision": "C195_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "machine_report": "localization/graphics/role_C/20261005-C195-4EDA9DE3/C195_4EDA9DE3_MACHINE_QA.json",
+    "report": "localization/graphics/role_C/20261005-C195-4EDA9DE3/C195_4EDA9DE3_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c196_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T20:28:46+09:00",
+    "run": "20261005-C196-8215FD25",
+    "queue_index": 30,
+    "candidate_sha256": "04d2c23333999873b7f467d0a8647c1056f40fa3bcd06e0174711bb2345277ba",
+    "producer_machine_status": "PASS_REPORTED",
+    "controller_visual_qa": "FAIL_CLEAN_PLATE_STARBURST_RECONSTRUCTION_ARTIFACT",
+    "decision": "C196_REWORK_REQUIRED_STARBURST_CLEAN_PLATE_RECONSTRUCTION_ARTIFACT",
+    "report": "localization/graphics/role_C/20261005-C196-8215FD25/C196_8215FD25_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
