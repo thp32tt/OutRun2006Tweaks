@@ -118,18 +118,44 @@ for marker in (
         fail(f"interop probe creation failure regained duplicate teardown: {marker}")
 
 
-release = body(r7, "void ReleaseStereoResources()")
+slot_release = body(r7, "void ReleaseDirectTransportSlotObjects() noexcept")
 require(
-    release,
-    "D3D9 reset resource release",
-    "StereoResourcesReady=false;DirectTransportResourcesReady=false;",
+    slot_release,
+    "DirectGPU slot teardown owner",
     "ReleaseCom(slot.fence)",
     "ReleaseCom(slot.leftSurface)",
     "ReleaseCom(slot.leftTexture)",
     "ReleaseCom(slot.rightSurface)",
     "ReleaseCom(slot.rightTexture)",
+    "slot={};",
+)
+for marker in (
+    "ReleaseCom(slot.fence)",
+    "ReleaseCom(slot.leftSurface)",
+    "ReleaseCom(slot.leftTexture)",
+    "ReleaseCom(slot.rightSurface)",
+    "ReleaseCom(slot.rightTexture)",
+):
+    if r7.count(marker) != 1:
+        fail(f"DirectGPU slot COM teardown must have one physical owner: {marker}")
+
+release = body(r7, "void ReleaseStereoResources()")
+require(
+    release,
+    "D3D9 reset resource release",
+    "StereoResourcesReady=false;DirectTransportResourcesReady=false;",
+    "ReleaseDirectTransportSlotObjects();",
     "ReleaseDirectInteropProbe();",
     "DirectTransportFormat=D3DFMT_UNKNOWN",
+)
+forbid(
+    release,
+    "reset path duplicate DirectGPU slot teardown ownership",
+    "ReleaseCom(slot.fence)",
+    "ReleaseCom(slot.leftSurface)",
+    "ReleaseCom(slot.leftTexture)",
+    "ReleaseCom(slot.rightSurface)",
+    "ReleaseCom(slot.rightTexture)",
 )
 require_order(
     release,
@@ -154,6 +180,25 @@ forbid(
     "monotonic DirectGPU generation across reset",
     "DirectTransportGeneration=0",
     "DirectTransportGeneration = 0",
+)
+
+release_slots = body(r7, "void ReleaseDirectTransportSlots()")
+require_order(
+    release_slots,
+    "DirectGPU slot teardown metadata reset",
+    "DirectTransportResourcesReady=false",
+    "DirectTransportWidth=0",
+    "DirectTransportHeight=0",
+    "ReleaseDirectTransportSlotObjects();",
+)
+forbid(
+    release_slots,
+    "DirectGPU slot teardown wrapper duplicate COM ownership",
+    "ReleaseCom(slot.fence)",
+    "ReleaseCom(slot.leftSurface)",
+    "ReleaseCom(slot.leftTexture)",
+    "ReleaseCom(slot.rightSurface)",
+    "ReleaseCom(slot.rightTexture)",
 )
 
 # The next ring recreation must bump generation before it becomes ready. The
