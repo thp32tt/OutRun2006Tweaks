@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY",
+  "timestamp_kst": "2026-10-06T08:00:19+09:00",
+  "regression": "IGR-010",
+  "screenshot": "스크린샷(153).png",
+  "screen": "STAGE_HEART_TALLY_OVERLAY",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "candidate_sha256": "77171503a7c1d089f09abcf458ee79b5aa3b52281ce8bed5f5dc234ce7dcfb9b",
+  "mandatory_views": {
+    "source_old_clean_final_4x": "B172_STAGE_SOURCE_OLD_CLEAN_FINAL_4X.jpg",
+    "family_contact": "B172_STAGE_HEART_TALLY_FAMILY_CONTACT.jpg",
+    "raw_mirror_y": "B172_RAW_FAMILY_CONTACT.jpg"
+  },
+  "first_worker_attempt": {
+    "candidate_sha256": "9457c16db67978ee383550f9094a8862c5030fdea105deba217a4b416467fa37",
+    "result": "REJECTED_NOT_PROMOTED",
+    "reason": "sparse white source-fragment residue remained in historical clean crop"
+  },
+  "final_visual_checks": {
+    "native_resolution_only": "PASS",
+    "mixed_low_resolution_or_upscale": "PASS_NONE",
+    "broken_glyph": "PASS_NONE",
+    "source_residue_or_double_draw": "PASS_NONE_AFTER_RETRY",
+    "foreign_image_intrusion_or_layer_collision": "PASS_NONE",
+    "slant_perspective": "PASS_SOURCE_FAMILY",
+    "baseline_alignment": "PASS",
+    "source_style_family": "PASS_YELLOW_NAVY_PALE_RIM",
+    "natural_hangul_advance": "PASS",
+    "protected_heart_tally_art": "PASS_PIXEL_EXACT_BY_OUTSIDE_BBOX_GATE",
+    "raw_mirror_y_orientation": "PASS",
+    "clipping_or_bbox_escape": "PASS_NONE",
+    "visual_hierarchy": "PASS_STAGE_ROW_NO_LONGER_0_7028_COMPRESSED"
+  },
+  "machine_gates": {
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "changed_pixels_outside_stage_bbox": 0,
+    "alpha_changed_outside_stage_bbox": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "all_non_stage_candidate_pixels_preserved_exact": true,
+    "a85_outrun_miles_rows_preserved_exact": true,
+    "heart_tally_art_preserved_exact": true
+  },
+  "result": "PASS",
+  "status": "B172_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "pending_independent_c": true,
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

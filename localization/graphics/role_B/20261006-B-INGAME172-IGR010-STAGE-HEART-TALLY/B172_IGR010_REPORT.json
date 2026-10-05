@@ -125,8 +125,10 @@
     "heart_tally_art_preserved_exact": true,
     "status": "PASS"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_FINAL_FAMILY_RAW",
   "runtime_validation": "PENDING_NEW_INGAME_RETEST",
-  "status": "B172_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "status": "B172_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_visual_qa_notes": "First B172 candidate was rejected in this invocation because the reused historical clean crop left sparse white source fragments. Retry uses a transparent exact Stage source-effect clean plate. SOURCE/OLD/CLEAN/FINAL 4x review confirms zero residue and natural horizontal advance; family contact confirms Ranking/Stage/Rank hierarchy improves without altering heart x /8 tally or neighboring artwork; raw mirror_y review PASS.",
+  "timestamp_finalized_kst": "2026-10-06T08:00:19+09:00"
 }

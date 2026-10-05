@@ -1711,3 +1711,9 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Controller visual QA: 4/4 PASS. A95 leading Latin residue was caught and fixed in A95R. E596 canonical naming corrected; EBE two omitted help lines recovered.
 - State: `A97_STATIC_PASS_PENDING_C`; runtime validation UNTESTED. No VR/FFB/DX11/DXVK changes.
 
+## 2026-10-06T08:00:19+09:00 — B172 IGR-010 Stage/heart tally
+- Exact GRAPHICS mapping: A064FDFC index60 Stage row; heart x /8 tally and numeric/player art are protected in the same atlas. No runtime edit.
+- Historical xscale0.7028 Stage row replaced by native-HD natural-advance Bold 60px / 0.16 shear source-family render.
+- First material candidate was controller-rejected for sparse historical-clean residue; final hosted retry 37385514683 removes residue. Candidate 77171503a7c1d089f09abcf458ee79b5aa3b52281ce8bed5f5dc234ce7dcfb9b.
+- Static gates: bbox/size/margin PASS; outside/alpha/protected=0; all non-Stage/A85/tally pixels exact. Controller readable/family/raw PASS.
+- State: B172_STATIC_PASS_PENDING_C_AND_INGAME_RETEST; independent C + NEW actual in-game retest required. VR/FFB/DX11/DXVK untouched.

@@ -2078,3 +2078,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - State: `A97_STATIC_PASS_PENDING_C`; `current_pending_artwork_localize_text=0`. Independent C verification is still required; runtime/in-game validation is UNTESTED. Evidence: `localization/graphics/role_A/20261006-A-PRODUCTION97-PENDING4-FINALIZE/A97_CONTROLLER_SELF_QA.json`.
 - VR/FFB/DX11/DXVK: untouched.
 
+## 2026-10-06T08:00:19+09:00 - B172 IGR-010 Stage/heart tally overlay
+
+- Selected the only remaining active B-owned in-game row IGR-010 screenshot(153); completed/pending-C B169-B171 work was not repeated.
+- Exact mapping resolved stale MIXED/UNRESOLVED to GRAPHICS index60 A064FDFC: baked Stage/스테이지 shares the atlas with the protected heart x /8 tally/numeric art. runtime_ko.tsv has no matching Stage-number/heart-tally localized row, so no runtime source was edited.
+- Root cause: B84 rendered Stage at font 80 with horizontal xscale=0.7028; B_RECOVERY02/B_RECOVERY09 preserved/reapplied that row and A85 only changed OUTRUN MILES. User in-game evidence therefore overrides the old bbox-only PASS.
+- Heavy production used GitHub-hosted CPU worker. Initial dispatch 37384953917 failed closed on a legacy protected-mask collision; retry 37385165000 produced a machine-PASS candidate, but mandatory controller review rejected it for sparse white residue from the historical clean crop. Final hosted retry 37385514683 rebuilt the exact Stage cell transparently and produced 77171503a7c1d089f09abcf458ee79b5aa3b52281ce8bed5f5dc234ce7dcfb9b.
+- Final Stage uses native Noto Sans CJK KR Bold 60px, natural horizontal advance, 0.16 right shear and source-derived yellow/navy/pale-rim family. Bbox/size/positive margins PASS; changed/alpha outside=0, protected=0; all non-Stage candidate pixels, A85 OUTRUN MILES, and heart/numeric tally art remain exact.
+- Controller SOURCE/OLD/CLEAN/FINAL 4x, family contact and raw mirror_y PASS: no residue, mixed-lowres, broken glyph, clipping, overlap or foreign-image intrusion; source hierarchy is materially improved.
+- State: B172_STATIC_PASS_PENDING_C_AND_INGAME_RETEST. Independent C + NEW actual in-game retest remain mandatory; not CLOSED. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_IGR010_REPORT.json; localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_CONTROLLER_SELF_QA.json.
