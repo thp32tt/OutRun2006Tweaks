@@ -1145,3 +1145,14 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Queue index 226 advanced to `b67_self_qa_pass_pending_c`; pending_artwork localize_text=33. Independent C final QA and isolated in-game validation remain pending.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION67/B67_E3F4_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION67/B67_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261005-B-PRODUCTION67/B67_FINAL_VALIDATION.json`.
+
+## 2026-10-05 09:24:29 KST — C143 E3F4BA07 B67 final PASS
+- Reviewed only the new B_PRODUCTION67 index 226 `E3F4BA07_512x128.dds`; C142-and-earlier completed PASS assets were not repeated.
+- Hosted C independently pinned the canonical 2048x512 RGBA32/BGRA source and atlas, re-derived eight exact localizable source-alpha regions and protected `OUTRUN2SP`/`OUTRUN2` regions. No canonical visible source pixels remain unclassified.
+- B67 CLEAN matches C's independent exact transparent reconstruction by 0 pixels. Candidate `1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c` preserves the exact 128-byte header and raw `mirror_y`; 8/8 bbox containment, source-size ceiling and positive margins PASS; final outside=0, alpha-outside=0, protected=0, render-outside-target=0, source residue=0, overlap=0, touch=0, target-to-protected overlap=0 and 1px-near=0.
+- Controller SOURCE/CLEAN/FINAL, per-row contacts and raw mirror_y review PASS for `스테이지 / 골 E / 골 D / 골 C / 골 B / 골 A / 골 / 15코스 연속`. The shared gray-blue source family is retained; protected OUTRUN2/OUTRUN2SP marks are unchanged; no visible English residue, clipping, overlap, seam, halo or orientation regression.
+- Decision: `C143_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. Candidate unchanged by C. Producer REWORK=0; pending_artwork localize_text=33.
+- `4F68708E`, `F6811E94`, and `49BB5FE5` remain strict DXT5 no-candidate HOLD; existing `1A43E9D9` remains HIGH_RISK pending mandatory in-game validation.
+- Queue sanity: 137 total = 79 localize_text + 47 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve-brand/song-credit.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C143-E3F4BA07/C143_E3F4_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C143-E3F4BA07/C143_E3F4_MACHINE_QA.json`.
