@@ -1442,3 +1442,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - C193 63C91067: B137 resolves C184 starburst smear. 2/2 exact bbox/size/margin PASS; structural zero-pixel gates PASS. C190 proves C189's 14 flagged white alpha 1–2 pixels are protected starburst glow, not source title; visual/raw PASS -> `C193_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`.
 - C192 39BCA907: A48 semantic-row misbinding caught and superseded by A49. Independent 15/15 bbox/size/margin + semantic policy + outside/alpha/protected/residue/overlap/touch PASS; readable/raw visual PASS -> `C192_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`.
 - Producer REWORK=2 (`C598919A`, `37759842`); pending-C=0; pending_artwork localize_text=14. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-05 20:03 KST — C194 C598919A final QA PASS
+- Refreshed the branch after C192/C193 and consumed only the new B139 C598919A candidate; prior completed C192/C193 assets were not repeated.
+- B139 candidate `e3c3f78975b3dd582690a7f169c1aa364dd05e3846827340aae38631885b92bf` uses the pinned canonical 4096x4096 DXT5/mip1/raw `mirror_y` source and corrected physical stage binding. C194 independently re-downloaded and decode-verified the source and atlas.
+- Static C QA PASS: 41/41 exact producer-bbox reproduction with containment/source-size ceiling/positive margins; canonical stage-name policy PASS; decoded changed outside=0, alpha outside=0, introduced-visible outside=0, localized overlap=0, protected geometry overlap=0, changed DXT5 blocks wholly outside allowed raw mirror_y targets=0.
+- Initial C194 compressed-block result was a C verifier coordinate bug: readable Y bboxes had been compared directly against raw mirror_y DDS block rows. The C-only verifier was corrected and rerun; candidate bytes were unchanged. Corrected hosted worker PASS.
+- Mandatory controller readable SOURCE/CLEAN/FINAL overview and raw mirror_y visual review PASS: no source-script residue, clipping, protected product/vehicle text damage, or stage-name semantic mismatch visible. Decision `C194_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`.
+- Producer REWORK now only `37759842`; C194 snapshot pending-C=0 and pending_artwork localize_text=14. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_MACHINE_QA.json`, `localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_CONTROLLER_FINAL_QA.json`, C194 readable/raw previews and B139 SOURCE/CLEAN/FINAL evidence.
