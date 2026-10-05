@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A89R P1 IGR-003 screenshot(145): exact GRAPHICS multi-asset mapping. 97E863AD cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418 natively rerenders WELCOME/SHOWROOM visible rows; B168 A9 + C171 754F + C149 E95 preserved. 2/2 bbox/size/margins and zero scope/protected gates; controller visual PASS. Pending C + NEW game retest; not closed.",
     "B168 P1 IGR-004 screenshot(146): exact GRAPHICS mapping A9ABD877(index201 header/stage family) + C05E67EF(index215 Goal A-E/15-course list), no runtime text. A9 A69 19px->4x low-res render superseded; B167 native draft failed controller weight fidelity; B168 a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8 native/source-weight retry passes 17/17 bbox/size/margins, zero scope/protected/overlap gates and controller visual QA. C05 0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b A79/C218 native candidate preserved. Hosted worker run 37366457547 attempt1 cancelled; attempt2 later succeeded at authoritative worker commit 0895f3d. N100 MCP fallback executed while the retry was queued ~9m but produced environment-dependent raster SHA d391632d..., so it was discarded after hosted SHA a7a4ea10... arrived. Pending independent C on changed A9 + NEW actual in-game retest; not closed.",
     "A88 P1 IGR-001 screenshot(143) exact GRAPHICS multi-asset repair static/controller PASS: BA0147DA 61ae0c45568e023cc258379173f8d80f43cc5257f2d8facefbcf3c87759179e1 C2C title + 8C259C68 00e16af1e3d468667fe13ed5291ec55bbfd06f18e6895a6be7e79f413ade94bd C2C help + D657C2EB 1a57c385e6c3ea2cc368888041e7106aab79bc4ab364daf0b51edd4465fcc935 C2C selector; C171 754F header preserved. 3 changed rows each 1/1 bbox/size/margin, all scope/protected gates zero, controller visual PASS. Pending independent C + NEW game retest; do not repeat A88 bytes unless C/new game evidence fails.",
     "B166 P1 IGR-002 screenshot(144) exact-mapped to GRAPHICS multi-asset BA0147DA(index212 title/Showroom), 8C259C68(index188 help copy), D657C2EB(index220 Heart/Time tabs); no runtime text. BA f5838261bd2015ade657d51f45175f1ef1c0351252c6505dc5eaf985be54d5a1 large 하트 어택 and 8C 8da8dbf1d5f577605e2268841667fdd64636f4358f27e17103587ee032c2575c help row materially rerendered at native HD/source-relative height; D657 preserved. 1/1+1/1 bbox/size/margins, all scope/protected gates zero, controller visual PASS. Pending C + NEW in-game retest; not closed.",
@@ -1226,7 +1227,21 @@
     "pending_c_from_b": [
       "A05BF610"
     ],
-    "latest_a_rework_attempt": "localization/graphics/role_A/20261005-A-PRODUCTION40/A40_CONTROLLER_REWORK.json"
+    "latest_a_rework_attempt": "localization/graphics/role_A/20261005-A-PRODUCTION40/A40_CONTROLLER_REWORK.json",
+    "current_pending_c": [
+      "97E863AD"
+    ],
+    "latest_a_production": {
+      "run": "A89R",
+      "regression": "IGR-003",
+      "asset": "97E863AD",
+      "queue_index": 193,
+      "candidate_sha256": "cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418",
+      "result": "A89R_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+      "report": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_IGR003_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+    }
   },
   "runtime_packages": {
     "k1": {
@@ -4085,7 +4100,8 @@
     "FD90AA9",
     "BA0147DA",
     "8C259C68",
-    "D657C2EB"
+    "D657C2EB",
+    "97E863AD"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -5198,6 +5214,51 @@
     "worker_output_commit": "8046312e4f79f779fb7c158fd9e3e9046eab65b3",
     "report": "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_IGR001_REPORT.json",
     "controller_report": "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+  },
+  "a89_igr003": {
+    "timestamp_kst": "2026-10-06T05:50:00+09:00",
+    "run": "20261006-A-INGAME89R-IGR003-SHOWROOM",
+    "regression": "IGR-003",
+    "decision": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+    "assets": {
+      "97E863AD": {
+        "index": 193,
+        "candidate_sha256": "cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418",
+        "action": "REWORKED_NATIVE_VISIBLE_ROWS"
+      },
+      "A9ABD877": {
+        "index": 201,
+        "candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+        "action": "PRESERVED_CURRENT_B168"
+      },
+      "754F0599": {
+        "index": 175,
+        "candidate_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+        "action": "PRESERVED_C171"
+      },
+      "E95DA5": {
+        "index": 230,
+        "candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
+        "action": "PRESERVED_C149"
+      }
+    },
+    "machine_qa": {
+      "bbox_size_positive_margin": "2/2 PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "protected": 0,
+      "render_protected_overlap": 0
+    },
+    "controller_visual_qa": "PASS_NATIVE_HD_SHOWROOM_VISIBLE_ROWS",
+    "compute_executor": "N100_FALLBACK_AFTER_HOSTED_QUEUE_NO_RUNNER",
+    "hosted_retry_run": 37370378954,
+    "prior_failed_run": 37367610075,
+    "status": "A89R_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+    "pending_independent_c_static_qa": true,
+    "pending_new_ingame_retest": true,
+    "report": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_IGR003_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_CONTROLLER_SELF_QA.json",
     "runtime_validation": "PENDING_NEW_INGAME_RETEST"
   }
 }

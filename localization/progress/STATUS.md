@@ -1670,3 +1670,12 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Controller visual QA: PASS. IGR-004 remains B_STATIC_PASS_PENDING_C_AND_INGAME_RETEST; independent C + NEW actual in-game retest required before closure.
 - Existing verify_state baseline remains FAIL for pre-existing artwork-plan/action-count drift; this B168 work does not alter action categories.
 - VR/FFB/DX11/DXVK: untouched.
+
+## 2026-10-06 05:50 KST — A89R IGR-003 Showroom visible-row native-HD repair
+
+- Consumed active A-owned P1 IGR-003 screenshot(145) instead of repeating A88/A87/pending-C work. Exact visible scope is GRAPHICS multi-asset: 754F0599 index175 top metallic SHOWROOM, 97E863AD index193 WELCOME/OUTRUN SHOWROOM body, A9ABD877 index201 STAGES/GOALS, and E95DA5 index230 Ferrari/BGM/Car Colors. No runtime text path is required for these visible labels.
+- First hosted A89 run 37367610075 failed closed on concurrent A9 candidate drift after newer B168 output. Retry was narrowed so A no longer overwrites A9. Hosted retry 37370378954 remained queued with no running worker; contract-authorized N100 MCP fallback executed only the narrowed 97E scope.
+- A89R 97E candidate cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418 supersedes C212/A70 bytes only for two screenshot-visible rows: WELCOME TO THE -> 환영합니다 (43/47px height) and SHOWROOM body -> 쇼룸 (50/54px height), direct native 2048x1024 Noto CJK Black/source dark fill/left anchor. Current B168 A9 a7a4ea10..., C171 754F 884f333b..., C149 E95 d039f8d0... are byte-preserved.
+- Static QA: 2/2 exact bbox containment/source-size/positive-margin PASS; changed=8386; changed-outside=0, alpha-outside=0, protected-changed=0, render/protected overlap=0; exact header/RGBA32/raw mirror_y preserved. Controller SOURCE/OLD/CLEAN/FINAL 3x, full and raw visual review PASS: prior blocky low-res Hangul removed with no source ghost, broken glyph, clipping, overlap, foreign-image intrusion, seam, halo or orientation regression.
+- IGR-003 -> A89R_STATIC_PASS_PENDING_C_AND_INGAME_RETEST. Independent C + NEW actual in-game retest are still mandatory before closure. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_A/20261006-A-INGAME89R-IGR003-SHOWROOM/A89_IGR003_REPORT.json, A89_CONTROLLER_SELF_QA.json, A89R_N100_FALLBACK_REASON.json. RUNTIME_VALIDATION=PENDING_NEW_INGAME_RETEST.
