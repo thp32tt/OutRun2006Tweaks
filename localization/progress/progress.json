@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T01:49:25+09:00",
+  "updated_at_kst": "2026-10-06T02:03:24.107+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A81 P0 index95 37759842 e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7: IGR-014/015/016 material rework self-QA PASS after A80 fail-close. 33/33 exact bbox/size/margin and zero gates PASS; controller readable/full/raw mirror_y PASS. 37759842 moved from producer REWORK to pending C + NEW in-game retest; backlog not closed. Concurrent C218/B work preserved.",
+  "next_checkpoint": "C219 returned A81 P0 index95 37759842 candidate e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7. Hosted independent machine QA: 33/33 exact localized bboxes, containment/size/positive margins PASS; clean/final/alpha outside=0, protected changes=0, source-core residue outside Korean render=0, overlap=0. Mandatory controller visual QA FAILS source-transform fidelity: continuous/mode selector stacks are centered and not sufficiently source-left/italic versus canonical source. Preserve A81 manual clean plate and re-render selector lettering only. IGR-014/015/016 reopened OPEN_USER_INGAME_FAIL; pending-C=0; producer REWORK=37759842; NEW in-game retest remains required.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,13 +265,13 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "PENDING_C_AND_INGAME_RETEST",
-      "assets": [],
-      "remaining": 0,
-      "note": "A81 materially repaired P0 37759842 and A self-QA passed; IGR-014/015/016 remain not closed pending independent C static QA + new actual game retest. Concurrent C218/B state preserved.",
-      "pending_c": [
+      "status": "REWORK_REQUIRED",
+      "assets": [
         "37759842"
-      ]
+      ],
+      "remaining": 1,
+      "note": "C219 machine PASS but visual source-transform/alignment/slant FAIL on A81 selector lettering. Preserve A81 clean plate; A lane must re-render left-aligned source-slanted multi-line selector families. IGR-014/015/016 remain open; pending-C=0; pending_artwork localize_text=4.",
+      "pending_c": []
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -295,16 +295,16 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C218",
-      "report": "localization/graphics/role_C/20261006-C218-BATCH/C218_BATCH_FINAL_QA.json",
-      "result": "C218_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "run": "C219",
+      "report": "localization/graphics/role_C/20261006-C219-BATCH/C219_BATCH_FINAL_QA.json",
+      "result": "C219_REWORK_REQUIRED_SOURCE_TRANSFORM_ALIGNMENT_SLANT",
       "candidate_changed_by_C": false,
       "assets_checked": 1,
-      "physical_elements_checked": 6,
-      "pixel_visual_pass_assets": [
-        "C05E67EF"
+      "physical_elements_checked": 33,
+      "pixel_visual_pass_assets": [],
+      "rework_required_assets": [
+        "37759842"
       ],
-      "rework_required_assets": [],
       "global_rework_remaining": [
         "37759842"
       ],
@@ -317,17 +317,13 @@
       "pending_c_localize_text": 0,
       "pending_production_localize_text": 4,
       "machine_evidence": {
-        "C05E67EF": "localization/graphics/role_C/20261006-C218-C05E67EF/C218_C05E67EF_MACHINE_QA.json"
+        "37759842": "localization/graphics/role_C/20261006-C219-37759842/C219_37759842_MACHINE_QA.json"
       },
       "controller_visual": {
-        "C05E67EF": "PASS"
+        "37759842": "FAIL_SOURCE_TRANSFORM_ALIGNMENT_SLANT"
       },
-      "not_consumed": {
-        "A8CE339F": "B161 producer controller/shared-state finalization pending at C selection boundary",
-        "37759842": "A81 worker candidate e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7 observed at refreshed HEAD db7610bf9b40e341f7971d29d227edfeee66d784; worker status A81_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA, producer shared-state finalization incomplete."
-      },
-      "in_game_validation": "C05E67EF UNTESTED; RUNTIME_VALIDATION=UNTESTED",
-      "branch_head_refreshed_before_persist": "db7610bf9b40e341f7971d29d227edfeee66d784"
+      "verifier_note": "Initial C219 source-core exact-match count 448 was a C-only false positive inside Korean render; corrected residue outside Korean render is 0. A subsequent C script newline syntax retry was verifier-only and did not change candidate bytes.",
+      "in_game_validation": "IGR-014/015/016 remain OPEN; candidate has not received NEW in-game retest."
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION157",
@@ -1648,6 +1644,30 @@
       "machine_report": "localization/graphics/role_C/20261006-C218-C05E67EF/C218_C05E67EF_MACHINE_QA.json",
       "controller_report": "localization/graphics/role_C/20261006-C218-C05E67EF/C218_C05E67EF_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
+    },
+    "c219_37759842": {
+      "timestamp_kst": "2026-10-06T02:03:24.107+09:00",
+      "queue_index": 95,
+      "asset": "37759842",
+      "source_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+      "candidate_sha256": "e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7",
+      "machine_status": "PASS",
+      "bbox_size_positive_margin": "33/33 PASS",
+      "pixel_gates": {
+        "clean_outside": 0,
+        "candidate_outside": 0,
+        "alpha_outside": 0,
+        "protected_clean": 0,
+        "protected_candidate": 0,
+        "source_core_residue_outside_korean_render": 0,
+        "bbox_mismatch": 0,
+        "overlap_pairs": 0
+      },
+      "controller_visual_qa": "FAIL_SOURCE_TRANSFORM_ALIGNMENT_SLANT",
+      "decision": "C219_REWORK_REQUIRED_SOURCE_TRANSFORM_ALIGNMENT_SLANT",
+      "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+      "machine_report": "localization/graphics/role_C/20261006-C219-37759842/C219_37759842_MACHINE_QA.json",
+      "controller_report": "localization/graphics/role_C/20261006-C219-37759842/C219_37759842_CONTROLLER_FINAL_QA.json"
     }
   },
   "data_build": {

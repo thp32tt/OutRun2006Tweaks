@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261006-C219-37759842",
+  "qa_id": "C219",
+  "timestamp_kst": "2026-10-06T02:03:24.107+09:00",
+  "queue_index": 95,
+  "asset": "37759842",
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "producer_run": "20261006-A-PRODUCTION81-3775-BBOX",
+  "source_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+  "candidate_sha256": "e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7",
+  "user_ingame_regressions": [
+    "IGR-014",
+    "IGR-015",
+    "IGR-016"
+  ],
+  "machine_report": "localization/graphics/role_C/20261006-C219-37759842/C219_37759842_MACHINE_QA.json",
+  "machine_summary": {
+    "status": "PASS",
+    "bbox_size_positive_margin": "33/33 PASS",
+    "clean_changed_outside": 0,
+    "candidate_changed_outside": 0,
+    "alpha_changed_outside": 0,
+    "protected_clean_changed": 0,
+    "protected_candidate_changed": 0,
+    "source_core_residue_outside_korean_render": 0,
+    "localized_bbox_mismatches": 0,
+    "localized_overlap_pairs": 0
+  },
+  "verifier_reconciliation": {
+    "initial_source_core_exact_match_count": 448,
+    "adjudication": "C-only false positive: exact source-color coincidence occurred inside Korean render pixels; CLEAN source-core exact pixels are 0 and corrected residue outside Korean render is 0.",
+    "syntax_retry": "C-only verifier script newline syntax retry; candidate bytes unchanged."
+  },
+  "visual_evidence": [
+    "localization/graphics/role_C/20261006-C219-37759842/C219_3775_FOCUS_CONTACTS.jpg",
+    "localization/graphics/role_C/20261006-C219-37759842/C219_3775_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_C/20261006-C219-37759842/C219_3775_RAW_COMPARE.jpg"
+  ],
+  "visual_observations": [
+    "A81 manual full-bbox plate reconstruction materially removes the C186/A45 English/source-shaped ghosts and donor-boundary artifacts; protected art and raw mirror_y orientation are preserved.",
+    "Canonical continuous and mode selector labels use left-aligned italic/slanted multi-line stacks.",
+    "A81 Korean continuous/mode stacks are visibly centered or re-centered per line and insufficiently source-slanted relative to the source family.",
+    "This source-transform/alignment/slant mismatch is a mandatory visual failure even though containment/protected/residue machine gates are zero."
+  ],
+  "controller_visual_qa": "FAIL_SOURCE_TRANSFORM_ALIGNMENT_SLANT",
+  "decision": "C219_REWORK_REQUIRED_SOURCE_TRANSFORM_ALIGNMENT_SLANT",
+  "correction_scope": "Preserve A81 manual clean plate; re-render selector Korean lettering only with source-left anchors, source-equivalent italic/shear, baseline and per-line spacing while keeping exact source-effect bbox ceilings and protected artwork.",
+  "candidate_changed_by_C": false,
+  "backlog_close_allowed": false,
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "vr_ffb_dx11_dxvk_changes": false
+}

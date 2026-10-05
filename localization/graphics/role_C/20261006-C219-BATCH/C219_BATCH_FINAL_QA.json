@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261006-C219-BATCH",
+  "timestamp_kst": "2026-10-06T02:03:24.107+09:00",
+  "result": "C219_REWORK_REQUIRED_SOURCE_TRANSFORM_ALIGNMENT_SLANT",
+  "assets_checked": 1,
+  "physical_elements_checked": 33,
+  "pixel_visual_pass_assets": [],
+  "rework_required_assets": [
+    "37759842"
+  ],
+  "candidate_changed_by_C": false,
+  "pending_c_after_reconcile": [],
+  "pending_production_localize_text": 4,
+  "global_rework_remaining": [
+    "37759842"
+  ],
+  "user_ingame_regressions": [
+    "IGR-014",
+    "IGR-015",
+    "IGR-016"
+  ],
+  "active_user_ingame_graphics_rework_queue_indices": [
+    48,
+    95,
+    106
+  ],
+  "active_user_ingame_fail_rows_closed": 0,
+  "machine_evidence": {
+    "37759842": "localization/graphics/role_C/20261006-C219-37759842/C219_37759842_MACHINE_QA.json"
+  },
+  "controller_evidence": {
+    "37759842": "localization/graphics/role_C/20261006-C219-37759842/C219_37759842_CONTROLLER_FINAL_QA.json"
+  },
+  "not_consumed": {
+    "788CE557": "Concurrent B P0 production/worker retries were not producer controller/shared-state finalized for C at selection boundary; no premature C approval."
+  },
+  "runtime_validation": "IGR-014/015/016 PENDING_NEW_INGAME_RETEST",
+  "vr_ffb_dx11_dxvk_changes": false
+}

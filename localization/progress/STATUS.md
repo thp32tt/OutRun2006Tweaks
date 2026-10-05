@@ -1600,3 +1600,9 @@ A79 candidate 0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b c
 - pending-C=0; pending_artwork localize_text=4. User in-game fail backlog remains open (graphics queue 48/95/106); C218 closes none without a new in-game retest. RUNTIME_VALIDATION=UNTESTED.
 ## 2026-10-06 01:49 KST — A81 P0 37759842 user in-game selector rework
 A81 e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7 materially repairs A-owned P0 IGR-014/015/016 on 37759842 after A80 was self-rejected for remaining glyph silhouettes. Full exact-source-effect-bbox manual plate reconstruction removes C186-visible ghosts and stronger slant restores selector transform; 33/33 bbox/size/margin and all zero gates PASS; readable/full/raw static controller review PASS. Producer REWORK no longer includes 37759842; independent C static QA and NEW game retest remain mandatory, backlog not closed. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-06 02:03 KST — C219
+- index95 `37759842` A81 `e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7`: hosted independent machine QA **33/33 exact bbox/size/positive-margin PASS**, outside/alpha/protected/source-core residue/overlap = 0.
+- Mandatory C visual QA **FAIL**: A81 clean plate fixes prior ghost/donor-boundary defects, but continuous/mode Korean stacks are centered and under-slanted versus the canonical left-aligned italic source family.
+- Decision **C219_REWORK_REQUIRED_SOURCE_TRANSFORM_ALIGNMENT_SLANT**. Keep A81 clean plate and re-render lettering only with source-left anchors/slant/baseline/line spacing.
+- IGR-014/015/016 remain **OPEN_USER_INGAME_FAIL**; pending-C=0; producer REWORK=`37759842`; `RUNTIME_VALIDATION=PENDING_NEW_INGAME_RETEST`. No VR/FFB/DX11/DXVK work.
