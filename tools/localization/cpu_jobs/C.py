@@ -2,199 +2,192 @@
 import os, json, hashlib, struct, urllib.request
 from pathlib import Path
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
 repo=Path.cwd()
-run="20261005-C194-C598919A"
+run="20261005-C195-4EDA9DE3"
 out=repo/"localization/graphics/role_C"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
 wr.mkdir(parents=True,exist_ok=True)
 
-producer=repo/"localization/graphics/role_B/20261005-B-PRODUCTION139-C598-SOLVER-FIX/B139_C598_REPORT.json"
+producer=repo/"localization/graphics/role_A/20261005-A-PRODUCTION51/A51_4EDA9DE3_REPORT.json"
 pr=json.loads(producer.read_text(encoding="utf-8"))
 candidate=repo/pr["candidate_path"]
-sp=pr["source_provenance"]
 asset=pr["asset"]
+sp=pr["source_provenance"]
 
-tmp=Path("/tmp/c194")
+tmp=Path("/tmp/c195")
 tmp.mkdir(exist_ok=True)
 srcdds=tmp/"source.dds"
-atlas=tmp/"atlas.json"
-base=f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{sp['commit']}"
+atlasp=tmp/"atlas.json"
 folder=asset.split("/")[-2]
 name=asset.split("/")[-1]
+base=f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{sp['commit']}"
 urllib.request.urlretrieve(base+f"/Release/{folder}/{name}",srcdds)
-urllib.request.urlretrieve(base+f"/Original%20(PC)/Original%20(Tweaks%20dumps)/{folder}/4x_{name[:-4]}_atlas.json",atlas)
+urllib.request.urlretrieve(base+f"/Original%20(PC)/Original%20(Tweaks%20dumps)/{folder}/4x_{name[:-4]}_atlas.json",atlasp)
 
 def sha(b): return hashlib.sha256(b).hexdigest()
-def count(m): return int(np.count_nonzero(m))
-def bbox(m):
-    yy,xx=np.nonzero(m)
-    return None if len(xx)==0 else [int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1]
-def dds_meta(b):
-    if b[:4]!=b"DDS ": raise RuntimeError("not DDS")
-    h=struct.unpack_from("<I",b,12)[0]
-    w=struct.unpack_from("<I",b,16)[0]
-    mips=struct.unpack_from("<I",b,28)[0]
-    fourcc=b[84:88]
-    return w,h,mips,fourcc.decode("ascii","replace")
+def bbox(mask):
+    yy,xx=np.nonzero(mask)
+    if len(xx)==0: return None
+    return [int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1]
+def count(mask): return int(np.count_nonzero(mask))
 def comp(im,bg=(54,54,54,255)):
-    z=Image.new("RGBA",im.size,bg)
-    z.alpha_composite(im)
-    return z.convert("RGB")
+    z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
+def decode_rgba32(b):
+    if b[:4]!=b"DDS ": raise RuntimeError("not DDS")
+    H,W,pitch,depth,mips=struct.unpack_from("<5I",b,12)
+    pf=struct.unpack_from("<8I",b,76)
+    if (W,H,mips,pf[3])!=(2048,1024,1,32):
+        raise RuntimeError(("structure",W,H,mips,pf))
+    masks=(pf[4],pf[5],pf[6],pf[7])
+    if masks==(0xff0000,0xff00,0xff,0xff000000): mode="BGRA"
+    elif masks==(0xff,0xff00,0xff0000,0xff000000): mode="RGBA"
+    else: raise RuntimeError(("unsupported masks",masks))
+    if len(b)!=128+W*H*4: raise RuntimeError(("length",len(b),128+W*H*4))
+    return Image.frombytes("RGBA",(W,H),b[128:],"raw",mode), {"width":W,"height":H,"pitch":pitch,"mipmaps":mips,"raw_mode":mode}
 
-sb=srcdds.read_bytes()
-cb=candidate.read_bytes()
-if sha(sb)!=sp["source_sha256"]: raise RuntimeError(("source sha drift",sha(sb),sp["source_sha256"]))
+sb=srcdds.read_bytes(); cb=candidate.read_bytes()
+if sha(sb)!=sp["sha256"]: raise RuntimeError(("source sha drift",sha(sb),sp["sha256"]))
 if sha(cb)!=pr["candidate_sha256"]: raise RuntimeError(("candidate sha drift",sha(cb),pr["candidate_sha256"]))
-sm=dds_meta(sb); cm=dds_meta(cb)
-if sm!=(4096,4096,1,"DXT5") or cm!=sm or cb[:128]!=sb[:128]:
-    raise RuntimeError(("DDS structure/header drift",sm,cm,cb[:128]==sb[:128]))
-
-raw_src=Image.open(srcdds).convert("RGBA")
-raw_final=Image.open(candidate).convert("RGBA")
+raw_src,sm=decode_rgba32(sb); raw_fin,cm=decode_rgba32(cb)
+if sm!=cm or cb[:128]!=sb[:128]: raise RuntimeError(("header/structure drift",sm,cm,cb[:128]==sb[:128]))
 src=raw_src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-final=raw_final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-sa=np.asarray(src,dtype=np.uint8)
-fa=np.asarray(final,dtype=np.uint8)
+fin=raw_fin.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+sa=np.asarray(src,dtype=np.uint8); fa=np.asarray(fin,dtype=np.uint8)
 H,W=sa.shape[:2]
 
-atlas_obj=json.loads(atlas.read_text(encoding="utf-8"))
-atlas_regs={int(r["idx"]):r for r in atlas_obj["regions"]}
-expected_stage={
- 79:("Cape Way","케이프 웨이"),
- 80:("Imperial Avenue","임페리얼 애비뉴"),
- 81:("Ancient Ruins","에인션트 루인스"),
- 82:("Metropolis","메트로폴리스"),
- 83:("Tulip Garden","튤립 가든"),
- 84:("Skyscrapers","스카이스크레이퍼스"),
- 85:("Milky Way","밀키 웨이"),
- 86:("Floral Village","플로럴 빌리지"),
- 87:("Legend","레전드"),
- 88:("Giant Statues","자이언트 스태추스"),
+atlas=json.loads(atlasp.read_text(encoding="utf-8"))
+regs={int(r["idx"]):r for r in atlas["regions"]}
+expected={
+ 0:("WATERFALLS","워터폴스"),
+ 1:("SUNNY BEACH","서니 비치"),
+ 2:("SKYSCRAPERS","스카이스크레이퍼스"),
+ 3:("NATIONAL PARK","내셔널 파크"),
+ 4:("MILKY WAY","밀키 웨이"),
+ 5:("LOST CITY","로스트 시티"),
+ 6:("LEGEND","레전드"),
+ 7:("JUNGLE","정글"),
+ 8:("ICE SCAPE","아이스스케이프"),
+ 9:("GIANT STATUES","자이언트 스태추스"),
+ 10:("FLORAL VILLAGE","플로럴 빌리지"),
+ 11:("CASINO TOWN","카지노 타운"),
+ 12:("CANYON","캐니언"),
+ 13:("BIG FOREST","빅 포레스트"),
+ 14:("BAY AREA","베이 에어리어"),
 }
-stage_rows={int(e["region_idx"]):(e["source"],e["korean"]) for e in pr["elements"] if e["kind"]=="stage"}
-semantic_policy_pass=(stage_rows==expected_stage)
-
+rows_by_idx={int(r["idx"]):r for r in pr["rows"]}
+if set(regs)!=set(expected): raise RuntimeError(("atlas region set",sorted(regs),sorted(expected)))
+semantic_policy_pass=True
+source_bbox_exact_all=True
+candidate_bbox_exact_all=True
 allowed=np.zeros((H,W),dtype=bool)
 row_checks=[]
 localized_masks=[]
-all_declared=True
-for e in pr["elements"]:
-    x0,y0,x1,y1=map(int,e["original_bbox"])
-    if not (0<=x0<x1<=W and 0<=y0<y1<=H): raise RuntimeError(("bad source bbox",e["region_idx"],e["original_bbox"]))
+
+for idx,(english,korean) in expected.items():
+    if idx not in rows_by_idx: raise RuntimeError(("missing producer row",idx))
+    prow=rows_by_idx[idx]
+    if (prow["source"].upper(),prow["korean"])!=(english,korean):
+        semantic_policy_pass=False
+    x,y,w,h=map(int,regs[idx]["rect"])
+    crop_src=sa[y:y+h,x:x+w]
+    smask=crop_src[:,:,3]>0
+    sbb0=bbox(smask)
+    if sbb0 is None: raise RuntimeError(("empty source region",idx))
+    sbb=[sbb0[0]+x,sbb0[1]+y,sbb0[2]+x,sbb0[3]+y]
+    declared_source=list(map(int,prow["source_effect_bbox"]))
+    source_bbox_exact=(sbb==declared_source)
+    source_bbox_exact_all &= source_bbox_exact
+    x0,y0,x1,y1=sbb
     allowed[y0:y1,x0:x1]=True
-    vis=fa[y0:y1,x0:x1,3]>1
-    bb=bbox(vis)
-    actual=None if bb is None else [bb[0]+x0,bb[1]+y0,bb[2]+x0,bb[3]+y0]
-    if actual:
-        a,b,c,d=actual
+
+    crop_fin=fa[y0:y1,x0:x1]
+    fmask=crop_fin[:,:,3]>0
+    fbb0=bbox(fmask)
+    fbb=None if fbb0 is None else [fbb0[0]+x0,fbb0[1]+y0,fbb0[2]+x0,fbb0[3]+y0]
+    declared_final=list(map(int,prow["localized_bbox"]))
+    final_exact=(fbb==declared_final)
+    candidate_bbox_exact_all &= final_exact
+    if fbb:
+        a,b,c,d=fbb
         dl=a-x0; dr=x1-c; dt=b-y0; db=y1-d
-        contain=(a>=x0 and b>=y0 and c<=x1 and d<=y1)
-        size=((c-a)<=x1-x0 and (d-b)<=y1-y0)
+        containment=(a>=x0 and b>=y0 and c<=x1 and d<=y1)
+        size_ok=((c-a)<=x1-x0 and (d-b)<=y1-y0)
         positive=min(dl,dr,dt,db)>0
+        full=np.zeros((H,W),dtype=bool); full[y0:y1,x0:x1]=fmask
+        localized_masks.append(full)
+        spix=sa[y0:y1,x0:x1][smask]
+        fpix=fa[y0:y1,x0:x1][fmask]
+        smed=np.median(spix,axis=0).astype(int).tolist() if len(spix) else None
+        fmed=np.median(fpix,axis=0).astype(int).tolist() if len(fpix) else None
     else:
-        dl=dr=dt=db=-1; contain=size=positive=False
-    declared=list(map(int,e["localized_bbox"]))
-    exact=(actual==declared)
-    all_declared=all_declared and exact
-    lm=np.zeros((H,W),dtype=bool); lm[y0:y1,x0:x1]=vis
-    localized_masks.append(lm)
+        dl=dr=dt=db=-1; containment=size_ok=positive=False; smed=fmed=None
     row_checks.append({
-      "region_idx":int(e["region_idx"]),"source":e["source"],"korean":e["korean"],"kind":e["kind"],
-      "original_bbox":[x0,y0,x1,y1],"producer_localized_bbox":declared,
-      "independent_localized_bbox":actual,"bbox_exact_match_producer":exact,
+      "idx":idx,"source":english,"korean":korean,
+      "atlas_rect":[x,y,w,h],
+      "independent_source_bbox":sbb,
+      "producer_source_bbox":declared_source,
+      "source_bbox_exact_match_producer":source_bbox_exact,
+      "independent_localized_bbox":fbb,
+      "producer_localized_bbox":declared_final,
+      "localized_bbox_exact_match_producer":final_exact,
       "delta_left":dl,"delta_right":dr,"delta_top":dt,"delta_bottom":db,
-      "containment":"PASS" if contain else "FAIL",
-      "size_ceiling":"PASS" if size else "FAIL",
-      "positive_margin":"PASS" if positive else "FAIL"
+      "containment":"PASS" if containment else "FAIL",
+      "size_ceiling":"PASS" if size_ok else "FAIL",
+      "positive_margin":"PASS" if positive else "FAIL",
+      "source_rgba_median":smed,"localized_rgba_median":fmed
     })
 
 changed=np.any(fa!=sa,axis=2)
 alpha_changed=fa[:,:,3]!=sa[:,:,3]
-introduced=(fa[:,:,3]>sa[:,:,3])
+introduced=fa[:,:,3]>sa[:,:,3]
+candidate_visible=fa[:,:,3]>0
 machine={
  "decoded_changed_outside_union_source_bboxes":count(changed&~allowed),
  "alpha_changed_outside_union_source_bboxes":count(alpha_changed&~allowed),
  "introduced_visible_outside_union_source_bboxes":count(introduced&~allowed),
+ "candidate_visible_outside_union_source_bboxes":count(candidate_visible&~allowed),
 }
-overlap=0
+overlap=0; touch=0
 for i,mi in enumerate(localized_masks):
     for mj in localized_masks[i+1:]:
         overlap+=count(mi&mj)
-machine["localized_pair_overlap_pixels"]=overlap
-
-# Independent DXT5 block audit: every modified 4x4 block must intersect an allowed exact source bbox.
-payload_src=np.frombuffer(sb[128:],dtype=np.uint8).reshape((-1,16))
-payload_fin=np.frombuffer(cb[128:],dtype=np.uint8).reshape((-1,16))
-block_changed=np.any(payload_src!=payload_fin,axis=1)
-bw=W//4
-allowed_blocks=np.zeros((H//4,W//4),dtype=bool)
-for e in pr["elements"]:
-    x0,y0,x1,y1=map(int,e["original_bbox"])
-    # DDS payload is raw mirror_y while producer bboxes are readable orientation.
-    # Convert readable Y bounds to raw block-row bounds before compressed-block audit.
-    ry0=H-y1
-    ry1=H-y0
-    allowed_blocks[ry0//4:(ry1+3)//4,x0//4:(x1+3)//4]=True
-machine["changed_dxt5_blocks"]=int(np.count_nonzero(block_changed))
-machine["changed_dxt5_blocks_wholly_outside_allowed"]=int(np.count_nonzero(block_changed & ~allowed_blocks.reshape(-1)))
+        # 1px dilation without scipy
+        yy,xx=np.nonzero(mi)
+        dil=np.zeros_like(mi)
+        for dy in (-1,0,1):
+            for dx in (-1,0,1):
+                ys=np.clip(yy+dy,0,H-1); xs=np.clip(xx+dx,0,W-1)
+                dil[ys,xs]=True
+        touch+=count(dil & mj)
+machine["localized_overlap_pixels"]=overlap
+machine["localized_1px_touch_pixels"]=touch
 
 row_gate=all(r["containment"]=="PASS" and r["size_ceiling"]=="PASS" and r["positive_margin"]=="PASS" for r in row_checks)
-hard_zero=[
- "decoded_changed_outside_union_source_bboxes",
- "alpha_changed_outside_union_source_bboxes",
- "introduced_visible_outside_union_source_bboxes",
- "localized_pair_overlap_pixels",
- "changed_dxt5_blocks_wholly_outside_allowed"
-]
-machine_status="PASS" if row_gate and all(machine[k]==0 for k in hard_zero) else "FAIL"
+machine_status="PASS" if (
+    row_gate and source_bbox_exact_all and candidate_bbox_exact_all and semantic_policy_pass
+    and all(machine[k]==0 for k in [
+      "decoded_changed_outside_union_source_bboxes","alpha_changed_outside_union_source_bboxes",
+      "introduced_visible_outside_union_source_bboxes","candidate_visible_outside_union_source_bboxes",
+      "localized_overlap_pixels","localized_1px_touch_pixels"
+    ])
+) else "FAIL"
 
-# Verify protected atlas regions from the producer policy are outside exact target bboxes.
-target_indices={int(e["region_idx"]) for e in pr["elements"]}
-protected_indices=[i for i in list(range(31,40))+list(range(50,64))+list(range(66,79))+list(range(89,106)) if i in atlas_regs]
-protected_overlap={}
-for idx in protected_indices:
-    x,y,w,h=map(int,atlas_regs[idx]["rect"])
-    protected_overlap[str(idx)]=count(allowed[y:y+h,x:x+w])
-protected_geometry_pass=all(v==0 for v in protected_overlap.values())
-
-# Visual evidence: full readable overview, raw mirror orientation, and per-element contacts.
-overview=Image.new("RGB",(2048,2076),"white")
-for i,(lab,im) in enumerate((("SOURCE_READABLE",src),("FINAL_READABLE",final))):
-    z=comp(im).resize((2048,2048),Image.Resampling.LANCZOS)
-    yy=i*0
-# store side-by-side instead to keep evidence compact
-overview=Image.new("RGB",(2048,1055),"white")
-sd=comp(src).resize((1024,1024),Image.Resampling.LANCZOS)
-fd=comp(final).resize((1024,1024),Image.Resampling.LANCZOS)
-overview.paste(sd,(0,28)); overview.paste(fd,(1024,28))
-od=ImageDraw.Draw(overview); od.text((5,5),"SOURCE_READABLE",fill="black"); od.text((1029,5),"FINAL_READABLE",fill="black")
-overview.save(out/"C194_SOURCE_FINAL_OVERVIEW.jpg",quality=95)
-
-rawcard=Image.new("RGB",(2048,1055),"white")
-rs=comp(raw_src).resize((1024,1024),Image.Resampling.LANCZOS)
-rf=comp(raw_final).resize((1024,1024),Image.Resampling.LANCZOS)
-rawcard.paste(rs,(0,28)); rawcard.paste(rf,(1024,28))
-rd=ImageDraw.Draw(rawcard); rd.text((5,5),"SOURCE_RAW_MIRROR_Y",fill="black"); rd.text((1029,5),"FINAL_RAW_MIRROR_Y",fill="black")
-rawcard.save(out/"C194_RAW_COMPARE.jpg",quality=95)
-
+# Compact C visual evidence: per-row SOURCE | FINAL, plus readable/raw overviews.
 cards=[]
-font=ImageFont.load_default()
 for r in row_checks:
-    x0,y0,x1,y1=r["original_bbox"]; pad=12
+    x0,y0,x1,y1=r["independent_source_bbox"]; pad=8
     crop=(max(0,x0-pad),max(0,y0-pad),min(W,x1+pad),min(H,y1+pad))
-    a=comp(src).crop(crop); b=comp(final).crop(crop)
-    cw=max(a.width,b.width); ch=max(a.height,b.height)
-    card=Image.new("RGB",(cw*2+8,ch+30),"white")
-    card.paste(a,(2,28)); card.paste(b,(cw+6,28))
-    d=ImageDraw.Draw(card)
-    d.text((3,3),f"SRC idx{r['region_idx']} {r['source']}",fill="black",font=font)
-    d.text((cw+7,3),f"FINAL {r['korean']}",fill="black",font=font)
+    a=comp(src).crop(crop); b=comp(fin).crop(crop)
+    ch=max(a.height,b.height); cw=max(a.width,b.width)
+    card=Image.new("RGB",(cw*2+8,ch+24),"white")
+    card.paste(a,(0,24)); card.paste(b,(cw+8,24))
+    d=ImageDraw.Draw(card); d.text((2,3),f"idx{r['idx']} {r['source']}",fill="black"); d.text((cw+10,3),r["korean"],fill="black")
     cards.append(card)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+4*(len(cards)-1)),"white")
 yy=0
@@ -202,33 +195,49 @@ for c in cards:
     sheet.paste(c,(0,yy)); yy+=c.height+4
 if sheet.width>1800:
     sheet=sheet.resize((1800,round(sheet.height*1800/sheet.width)),Image.Resampling.LANCZOS)
-sheet.save(out/"C194_TARGET_CONTACTS.jpg",quality=96)
+sheet.save(out/"C195_TARGET_CONTACTS.jpg",quality=96)
+
+overview=Image.new("RGB",(2048,1050),"white")
+overview.paste(comp(src).resize((1024,512),Image.Resampling.LANCZOS),(0,24))
+overview.paste(comp(fin).resize((1024,512),Image.Resampling.LANCZOS),(1024,24))
+d=ImageDraw.Draw(overview); d.text((4,4),"SOURCE_READABLE",fill="black"); d.text((1028,4),"FINAL_READABLE",fill="black")
+overview.save(out/"C195_SOURCE_FINAL_OVERVIEW.jpg",quality=95)
+
+rawcard=Image.new("RGB",(2048,1050),"white")
+rawcard.paste(comp(raw_src).resize((1024,512),Image.Resampling.LANCZOS),(0,24))
+rawcard.paste(comp(raw_fin).resize((1024,512),Image.Resampling.LANCZOS),(1024,24))
+d=ImageDraw.Draw(rawcard); d.text((4,4),"SOURCE_RAW_MIRROR_Y",fill="black"); d.text((1028,4),"FINAL_RAW_MIRROR_Y",fill="black")
+rawcard.save(out/"C195_RAW_COMPARE.jpg",quality=95)
 
 report={
- "schema_version":1,"role":"C","run":run,"qa_id":"C194","queue_index":86,"asset":asset,
- "producer_run":pr["run"],"source_sha256":sp["source_sha256"],"candidate_sha256":pr["candidate_sha256"],
- "structure":{"dimensions":[W,H],"format":"DXT5","mipmaps":sm[2],"raw_orientation":"mirror_y","header_exact":cb[:128]==sb[:128]},
- "semantic_stage_mapping_expected":{str(k):{"source":v[0],"korean":v[1]} for k,v in expected_stage.items()},
- "semantic_stage_mapping_seen":{str(k):{"source":v[0],"korean":v[1]} for k,v in stage_rows.items()},
+ "schema_version":1,"role":"C","run":run,"qa_id":"C195","queue_index":159,"asset":asset,
+ "producer_run":pr["run"],"source_sha256":sp["sha256"],"candidate_sha256":pr["candidate_sha256"],
+ "structure":{**sm,"header_exact":cb[:128]==sb[:128],"raw_orientation":"mirror_y"},
+ "semantic_expected":{str(k):{"source":v[0],"korean":v[1]} for k,v in expected.items()},
  "semantic_policy_pass":semantic_policy_pass,
- "row_checks":row_checks,"row_gate":f"{sum(1 for r in row_checks if r['containment']=='PASS' and r['size_ceiling']=='PASS' and r['positive_margin']=='PASS')}/{len(row_checks)} containment/size/positive-margin PASS",
- "producer_bbox_exact_match_all":all_declared,
- "machine_checks":machine,"protected_region_allowed_overlap_pixels":protected_overlap,
- "protected_geometry_pass":protected_geometry_pass,
+ "source_bbox_exact_match_all":source_bbox_exact_all,
+ "candidate_bbox_exact_match_all":candidate_bbox_exact_all,
+ "row_checks":row_checks,
+ "row_gate":f"{sum(1 for r in row_checks if r['containment']=='PASS' and r['size_ceiling']=='PASS' and r['positive_margin']=='PASS')}/{len(row_checks)} PASS",
+ "machine_checks":machine,
  "machine_status":machine_status,
  "controller_visual_qa":"PENDING_CONTROLLER_REVIEW",
- "decision":"PENDING_CONTROLLER_VISUAL_QA" if machine_status=="PASS" and semantic_policy_pass and protected_geometry_pass else "C194_REWORK_REQUIRED_MACHINE_OR_POLICY_GATE",
+ "decision":"PENDING_CONTROLLER_VISUAL_QA" if machine_status=="PASS" else "C195_REWORK_REQUIRED_MACHINE_OR_POLICY_GATE",
  "runtime_validation":"UNTESTED",
  "preview_files":[
-  f"localization/graphics/role_C/{run}/C194_SOURCE_FINAL_OVERVIEW.jpg",
-  f"localization/graphics/role_C/{run}/C194_TARGET_CONTACTS.jpg",
-  f"localization/graphics/role_C/{run}/C194_RAW_COMPARE.jpg"
+  f"localization/graphics/role_C/{run}/C195_TARGET_CONTACTS.jpg",
+  f"localization/graphics/role_C/{run}/C195_SOURCE_FINAL_OVERVIEW.jpg",
+  f"localization/graphics/role_C/{run}/C195_RAW_COMPARE.jpg"
  ]
 }
-(out/"C194_C598919A_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"C194_C598919A.json").write_text(json.dumps({
- "run":run,"qa_id":"C194","index":86,"asset":"C598919A","candidate_sha256":pr["candidate_sha256"],
- "machine_status":machine_status,"semantic_policy_pass":semantic_policy_pass,"protected_geometry_pass":protected_geometry_pass,
- "machine_checks":machine,"report":f"localization/graphics/role_C/{run}/C194_C598919A_MACHINE_QA.json","runtime_validation":"UNTESTED"
+(out/"C195_4EDA9DE3_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"C195_4EDA9DE3.json").write_text(json.dumps({
+ "run":run,"qa_id":"C195","index":159,"asset":"4EDA9DE3",
+ "candidate_sha256":pr["candidate_sha256"],"machine_status":machine_status,
+ "row_gate":report["row_gate"],"semantic_policy_pass":semantic_policy_pass,
+ "source_bbox_exact_match_all":source_bbox_exact_all,"candidate_bbox_exact_match_all":candidate_bbox_exact_all,
+ "machine_checks":machine,
+ "report":f"localization/graphics/role_C/{run}/C195_4EDA9DE3_MACHINE_QA.json",
+ "runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print(json.dumps({"qa_id":"C194","machine_status":machine_status,"semantic_policy_pass":semantic_policy_pass,"protected_geometry_pass":protected_geometry_pass,"machine_checks":machine},ensure_ascii=False),flush=True)
+print(json.dumps({"qa_id":"C195","machine_status":machine_status,"row_gate":report["row_gate"],"semantic_policy_pass":semantic_policy_pass,"machine_checks":machine},ensure_ascii=False),flush=True)
