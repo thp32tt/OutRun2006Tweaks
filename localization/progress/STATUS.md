@@ -1703,3 +1703,11 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Reused the existing B170 shared material fix by exact source hash (12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889); no duplicate source/DDS production. Compact translated text keeps the B170 clipped 1-2px stock-colour keyline.
 - Exact-source builds already PASS: Win32 Release 37379204456; Korean test-build/package 37379204466.
 - State: B171_SHARED_RUNTIME_FIX_BUILD_PASS_PENDING_C_AND_INGAME_RETEST; independent C + NEW actual game screenshot still required. Next B active row: IGR-010. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-06 07:34 KST — A97 final pending_artwork batch
+- A consumed indices 225/227/231/237; `current_pending_artwork_localize_text=0`.
+- Candidates: E3C455FA `37b8236f...`, E596B7AC `e60eb098...`, EBE401C8 `dc08f74a...`, FF514CEB `acbf42d5...`.
+- Machine QA: 38/38 physical rows bbox/size/positive-margin PASS; outside/alpha/protected/source-residue/overlap/touch all zero; DDS roundtrip PASS.
+- Controller visual QA: 4/4 PASS. A95 leading Latin residue was caught and fixed in A95R. E596 canonical naming corrected; EBE two omitted help lines recovered.
+- State: `A97_STATIC_PASS_PENDING_C`; runtime validation UNTESTED. No VR/FFB/DX11/DXVK changes.
+
