@@ -1771,17 +1771,74 @@ struct NativeProgrammableShaderDormantSourceRevalidationReadiness {
     std::uint64_t snapshotToken{};
 };
 
-// R259 converts the current R258 dormant source receipt into an explicit
-// activation-prerequisite review handoff. It records which Set-05 activation
-// proof classes are actually represented by current repository evidence.
-// R243 supplies an exact input-layout ownership/identity receipt, while F18
-// resource-behavior proof and F21 shader-translation semantic proof remain
-// deliberately absent. The handoff can therefore be review-ready but can
-// never authorize Draw*, NativeDrawPath, or manufacture an activation token.
+// R260 turns the current R258 source receipt plus the exact MANAGED geometry
+// mirrors into an explicit F18 resource-behavior review receipt. The receipt
+// revalidates descriptor, mutation-plan and Reset-lifetime state on the actual
+// vertex/index mirrors. Texture and output-resource behavior are deliberately
+// still unproven, so this is geometry evidence only and cannot close F18 or
+// authorize Draw*, NativeDrawPath, or any runtime-visible route.
+struct NativeProgrammableShaderResourceBehaviorReadiness {
+    bool inputValid{};
+    bool sourceRevalidationReady{};
+    bool sourceRevalidationSnapshotMatches{};
+    bool vertexMirrorReady{};
+    bool vertexMirrorSnapshotMatches{};
+    bool indexMirrorRequired{};
+    bool indexMirrorReady{};
+    bool indexMirrorSnapshotMatches{};
+    bool geometryResourceBehaviorExact{};
+    bool textureResourceBehaviorProofPresent{};
+    bool outputResourceBehaviorProofPresent{};
+    bool fullResourceBehaviorProofPresent{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    NativeProgrammableShaderDrawCandidateKind kind =
+        NativeProgrammableShaderDrawCandidateKind::None;
+    bool indexed{};
+    std::uint32_t missingResourceScopeMask{};
+    std::uint64_t sourceRevalidationSnapshotToken{};
+    std::uint64_t vertexMirrorSnapshotToken{};
+    std::uint64_t indexMirrorSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderResourceBehaviorReadiness
+compose_programmable_resource_behavior_readiness(
+    const NativeProgrammableShaderDormantSourceRevalidationReadiness&
+        sourceRevalidation,
+    std::uint64_t sourceRevalidationSnapshotToken,
+    ID3D11Device* expectedDevice,
+    const NativeManagedBufferShadow& vertexMirror,
+    std::uint64_t vertexMirrorSnapshotToken,
+    const NativeManagedBufferShadow* indexMirror,
+    std::uint64_t indexMirrorSnapshotToken) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_resource_behavior_readiness_snapshot(
+    const NativeProgrammableShaderDormantSourceRevalidationReadiness&
+        sourceRevalidation,
+    std::uint64_t sourceRevalidationSnapshotToken,
+    ID3D11Device* expectedDevice,
+    const NativeManagedBufferShadow& vertexMirror,
+    std::uint64_t vertexMirrorSnapshotToken,
+    const NativeManagedBufferShadow* indexMirror,
+    std::uint64_t indexMirrorSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
+// R259 consumes the current R258 source receipt, R260 resource-behavior review
+// and R243 input-layout ownership receipt into one activation-prerequisite
+// handoff. R260 now proves current MANAGED geometry behavior, but F18 remains
+// incomplete until texture/output resource behavior is represented. F21 shader
+// semantic translation also remains absent, so activation authority stays off.
 struct NativeProgrammableShaderActivationPrerequisiteHandoff {
     bool inputValid{};
     bool sourceRevalidationReady{};
     bool sourceRevalidationSnapshotMatches{};
+    bool resourceBehaviorReviewReady{};
+    bool resourceBehaviorSnapshotMatches{};
+    bool resourceBehaviorGeometryProofPresent{};
+    bool resourceBehaviorCoverageComplete{};
     bool inputLayoutOwnershipReady{};
     bool inputLayoutSnapshotMatches{};
     bool resourceBehaviorProofPresent{};
@@ -1798,6 +1855,7 @@ struct NativeProgrammableShaderActivationPrerequisiteHandoff {
     bool indexed{};
     std::uint32_t missingPrerequisiteMask{};
     std::uint64_t sourceRevalidationSnapshotToken{};
+    std::uint64_t resourceBehaviorSnapshotToken{};
     std::uint64_t inputLayoutSnapshotToken{};
     std::uint64_t reviewSnapshotToken{};
     std::uint64_t activationSnapshotToken{};
@@ -1808,6 +1866,8 @@ compose_programmable_activation_prerequisite_handoff(
     const NativeProgrammableShaderDormantSourceRevalidationReadiness&
         sourceRevalidation,
     std::uint64_t sourceRevalidationSnapshotToken,
+    const NativeProgrammableShaderResourceBehaviorReadiness& resourceBehavior,
+    std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken) noexcept;
 
@@ -1816,6 +1876,8 @@ validate_programmable_activation_prerequisite_handoff_snapshot(
     const NativeProgrammableShaderDormantSourceRevalidationReadiness&
         sourceRevalidation,
     std::uint64_t sourceRevalidationSnapshotToken,
+    const NativeProgrammableShaderResourceBehaviorReadiness& resourceBehavior,
+    std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken,
     std::uint64_t reviewSnapshotToken) noexcept;
