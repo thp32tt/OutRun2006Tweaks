@@ -171,6 +171,27 @@ require_order(
     "R22PrimeShadowState(device)",
 )
 
+invalidate_direct_r32 = body(
+    r32, "void R32InvalidateDirectInteropOnly() noexcept")
+require(
+    invalidate_direct_r32,
+    "R32 host-identity interop invalidation",
+    "R32ClearPendingProducerFences();",
+    "ReleaseDirectTransportSlots();",
+    "clientInteropProbeToken), 0)",
+    "clientInteropProbeHandle), 0)",
+    "ReleaseCom(DirectInteropProbeTexture);",
+    "R32ForgetDirectIdentity();",
+)
+require_order(
+    invalidate_direct_r32,
+    "R32 interop probe publication retirement",
+    "clientInteropProbeToken), 0)",
+    "clientInteropProbeHandle), 0)",
+    "ReleaseCom(DirectInteropProbeTexture);",
+    "R32ForgetDirectIdentity();",
+)
+
 invalidate_r32 = body(r32, "void R32InvalidateResetCaches() noexcept")
 require(
     invalidate_r32,
