@@ -7,7 +7,7 @@ from PIL import Image,ImageDraw,ImageFont,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
-repo=Path.cwd(); run="20261005-C189-63C91067"
+repo=Path.cwd(); run="20261005-C190-63C91067-DIAG"
 out=repo/"localization/graphics/role_C"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 pd=repo/"localization/graphics/role_B/20261005-B-PRODUCTION137"
@@ -102,6 +102,18 @@ for r in c_rows:
         positive=min(dl,dr,dt,db)>0
     else:
         dl=dr=dt=db=-1; contain=size=positive=False
+    # Residue diagnostics: exact coordinates/colors for controller adjudication.
+    yy,xx=np.nonzero(unchanged_final)
+    residue_points=[]
+    for py,px in list(zip(yy.tolist(),xx.tolist()))[:200]:
+        residue_points.append({
+          "x":int(px+x0),"y":int(py+y0),
+          "source_rgba":[int(v) for v in sa[py+y0,px+x0]],
+          "clean_rgba":[int(v) for v in ca[py+y0,px+x0]],
+          "final_rgba":[int(v) for v in fa[py+y0,px+x0]]
+        })
+    navy_residue=int(np.count_nonzero(unchanged_final & navy))
+    white_residue=int(np.count_nonzero(unchanged_final & white))
     rc={
       **r,
       "independent_localized_bbox":actual,
@@ -112,6 +124,9 @@ for r in c_rows:
       "independent_source_title_mask_pixels":count(title),
       "source_title_pixels_unchanged_in_clean":count(unchanged_clean),
       "source_title_pixels_unchanged_in_final_outside_korean_guard":count(unchanged_final),
+      "residue_navy_pixels":navy_residue,
+      "residue_white_pixels":white_residue,
+      "residue_points":residue_points,
       "clean_changed_pixels_in_bbox":count(clean_changed[y0:y1,x0:x1]),
       "render_pixels_in_bbox":count(local_render)
     }
@@ -159,20 +174,30 @@ for rc in rowchecks:
     sheet=Image.new("RGB",(cw*3,ch+34),"white"); d=ImageDraw.Draw(sheet)
     for k,(lab,z) in enumerate(zip(("SOURCE","CLEAN","FINAL"),ims)):
         sheet.paste(z,(k*cw,34)); d.text((k*cw+6,7),lab,fill="black",font=font)
-    fn=out/f"C189_ROW{rc['region_idx']}_DETAIL_B64.txt"; saveb64(sheet,fn,98); evidence.append(str(fn.relative_to(repo)))
+    # Mark diagnostic residue coordinates on a separate CLEAN/FINAL crop.
+    mark=Image.new("RGB",(cw*2,ch+34),"white"); md=ImageDraw.Draw(mark)
+    cleanz=ims[1].copy(); finalz=ims[2].copy()
+    czd=ImageDraw.Draw(cleanz); fzd=ImageDraw.Draw(finalz)
+    for pt in rc.get("residue_points",[]):
+        px=(pt["x"]-crop[0])*2; py=(pt["y"]-crop[1])*2
+        czd.ellipse((px-8,py-8,px+8,py+8),outline=(255,0,0),width=3)
+        fzd.ellipse((px-8,py-8,px+8,py+8),outline=(255,0,0),width=3)
+    mark.paste(cleanz,(0,34)); mark.paste(finalz,(cw,34)); md.text((6,7),"CLEAN residue markers",fill="black",font=font); md.text((cw+6,7),"FINAL residue markers",fill="black",font=font)
+    mfn=out/f"C190_ROW{rc['region_idx']}_RESIDUE_MARKERS_B64.txt"; saveb64(mark,mfn,98); evidence.append(str(mfn.relative_to(repo)))
+    fn=out/f"C190_ROW{rc['region_idx']}_DETAIL_B64.txt"; saveb64(sheet,fn,98); evidence.append(str(fn.relative_to(repo)))
 
 overview=Image.new("RGB",(1536,530),"white"); d=ImageDraw.Draw(overview)
 for k,(lab,z) in enumerate(zip(("SOURCE","CLEAN","FINAL"),(src,clean,final))):
     zz=comp(z).resize((512,512),Image.Resampling.LANCZOS); overview.paste(zz,(k*512,18)); d.text((k*512+6,2),lab,fill="black",font=font)
-fn=out/"C189_OVERVIEW_B64.txt"; saveb64(overview,fn,95); evidence.append(str(fn.relative_to(repo)))
+fn=out/"C190_OVERVIEW_B64.txt"; saveb64(overview,fn,95); evidence.append(str(fn.relative_to(repo)))
 
 rawcard=Image.new("RGB",(1024,2070),"white")
 for i,(lab,z) in enumerate((("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_final))):
     zz=comp(z).resize((1024,1024),Image.Resampling.LANCZOS); rawcard.paste(zz,(0,i*1035+22)); ImageDraw.Draw(rawcard).text((5,i*1035+4),lab,fill="black")
-fn=out/"C189_RAW_B64.txt"; saveb64(rawcard,fn,94); evidence.append(str(fn.relative_to(repo)))
+fn=out/"C190_RAW_B64.txt"; saveb64(rawcard,fn,94); evidence.append(str(fn.relative_to(repo)))
 
 report={
- "schema_version":1,"role":"C","run":run,"qa_id":"C189","queue_index":pr["queue_index"],"asset":asset,
+ "schema_version":1,"role":"C","run":run,"qa_id":"C190","queue_index":pr["queue_index"],"asset":asset,
  "producer_run":pr["run"],"source_sha256":sp["source_sha256"],"candidate_sha256":pr["candidate_sha256"],
  "independent_source_decode_matches_producer_png":True,
  "structure":{"dimensions":dims,"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"raw_orientation":"mirror_y","header_exact":cb[:128]==sb[:128]},
@@ -181,13 +206,13 @@ report={
  "machine_checks":machine,"edge_continuity_proxy":edge,
  "machine_status":status,
  "controller_visual_qa":"PENDING_CONTROLLER_REVIEW",
- "decision":"PENDING_CONTROLLER_VISUAL_QA" if status=="PASS" else "C189_REWORK_REQUIRED_MACHINE_GATE",
+ "decision":"C190_DIAGNOSTIC_PENDING_CONTROLLER_ADJUDICATION",
  "runtime_validation":"UNTESTED","preview_b64_files":evidence
 }
-(out/"C189_63C91067_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-(wr/"C189_63C91067.json").write_text(json.dumps({
- "run":run,"qa_id":"C189","index":pr["queue_index"],"asset":"63C91067","candidate_sha256":pr["candidate_sha256"],
+(out/"C190_63C91067_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(wr/"C190_63C91067.json").write_text(json.dumps({
+ "run":run,"qa_id":"C190","index":pr["queue_index"],"asset":"63C91067","candidate_sha256":pr["candidate_sha256"],
  "machine_status":status,"machine_checks":machine,
- "report":f"localization/graphics/role_C/{run}/C189_63C91067_MACHINE_QA.json","runtime_validation":"UNTESTED"
+ "report":f"localization/graphics/role_C/{run}/C190_63C91067_MACHINE_QA.json","runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"qa_id":"C189","machine_status":status,"machine_checks":machine,"row_checks":rowchecks},ensure_ascii=False))
+print(json.dumps({"qa_id":"C190","machine_status":status,"machine_checks":machine,"row_checks":rowchecks},ensure_ascii=False))
