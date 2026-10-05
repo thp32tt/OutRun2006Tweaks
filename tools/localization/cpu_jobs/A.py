@@ -8,7 +8,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
 
 repo=Path.cwd()
 # Retry marker after concurrent worker-output push race.
-run="20261006-A-PRODUCTION73-ACF"
+run="20261006-A-PRODUCTION74-ACF"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -223,24 +223,30 @@ if len(rows)!=23: raise RuntimeError(("physical row count",len(rows)))
 # Clean plate is exact transparent removal of approved source glyph pixels only.
 clean=src.copy()
 ca=clean.getchannel("A"); ca.paste(0,(0,0,W,H),source_mask); clean.putalpha(ca)
-sp=out/"A73_ACF_SOURCE_READABLE.png"; cp=out/"A73_ACF_CLEAN_PLATE.png"
-smp=out/"A73_ACF_SOURCE_TEXT_MASK.png"; ap=out/"A73_ACF_ALLOWED_BBOX_MASK.png"
+sp=out/"A74_ACF_SOURCE_READABLE.png"; cp=out/"A74_ACF_CLEAN_PLATE.png"
+smp=out/"A74_ACF_SOURCE_TEXT_MASK.png"; ap=out/"A74_ACF_ALLOWED_BBOX_MASK.png"
 src.save(sp); clean.save(cp); source_mask.save(smp); allowed.save(ap)
 source_visible=bmask(src.getchannel("A"))
 protected=ImageChops.multiply(source_visible,ImageOps.invert(source_mask))
 protected=ImageChops.lighter(protected,inline_global)
-pp=out/"A73_ACF_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"A73_ACF_CLEAN_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A73_ACF_CLEAN_VALIDATION.json").read_text())
+pp=out/"A74_ACF_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"A74_ACF_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"A74_ACF_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
 subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
 font_line=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{style}","Noto Sans CJK KR:style=Black"],text=True).strip()
 FONT,FI,FSTYLE=font_line.rsplit("|",2); FI=int(FI or 0)
+serif_line=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{style}","Noto Serif CJK KR:style=Black"],text=True).strip()
+SERIF_FONT,SERIF_FI,SERIF_STYLE=serif_line.rsplit("|",2); SERIF_FI=int(SERIF_FI or 0)
 
-def render_low(text,fs,fill):
-    f=ImageFont.truetype(FONT,fs,index=FI)
+def font_tuple(fam):
+    return (SERIF_FONT,SERIF_FI,SERIF_STYLE) if fam=="red_heading" else (FONT,FI,FSTYLE)
+
+def render_low(text,fs,fill,fam):
+    ff,fi,_=font_tuple(fam)
+    f=ImageFont.truetype(ff,fs,index=fi)
     dr=ImageDraw.Draw(Image.new("L",(8,8),0))
     bb=dr.textbbox((0,0),text,font=f)
     a=Image.new("L",(max(8,bb[2]-bb[0]+4),max(8,bb[3]-bb[1]+4)),0)
@@ -253,7 +259,8 @@ def render_low(text,fs,fill):
 
 # Shared-size families preserve source-intentional consistency.
 family_members={
- "message":["sorry_title","sorry_body","congrats_title","congrats_body"],
+ "message":["sorry_title","sorry_body","congrats_body"],
+ "congrats_title":["congrats_title"],
  "red_heading":["options","rankings"],
  "dark_sentence":["out_run_1p","view_rankings","enjoy_original","adjust_settings","exchange_line1","exchange_line2"],
  "license_ui":["license_details"],
@@ -264,13 +271,13 @@ family_members={
 }
 bykey={r["key"]:r for r in rows}
 
-def fits_row(r,fs):
+def fits_row(r,fs,fam):
     ob=r["original_bbox"]; aw=r["source_width"]; ah=r["source_height"]; fill=r["source_median_rgba"]
     if r["kind"]=="dark_sentence_inline_middle":
         left_text,right_text=r["korean"].split("|")
-        a=render_low(left_text,fs,fill); b=render_low(right_text,fs,fill); tb=r["preserved_inline_token_bbox"]
+        a=render_low(left_text,fs,fill,fam); b=render_low(right_text,fs,fill,fam); tb=r["preserved_inline_token_bbox"]
         return a.height<=ah-8 and b.height<=ah-8 and a.width<=max(1,tb[0]-ob[0]-12) and b.width<=max(1,ob[2]-tb[2]-12)
-    lay=render_low(r["korean"],fs,fill)
+    lay=render_low(r["korean"],fs,fill,fam)
     if lay.height>ah-8: return False
     if r["preserved_inline_token_bbox"]:
         tb=r["preserved_inline_token_bbox"]
@@ -282,7 +289,7 @@ family_fs={}
 for fam,keys in family_members.items():
     chosen=None
     for fs in range(36,2,-1):
-        if all(fits_row(bykey[k],fs) for k in keys):
+        if all(fits_row(bykey[k],fs,fam) for k in keys):
             chosen=fs; break
     if chosen is None: raise RuntimeError(("family fit",fam))
     family_fs[fam]=chosen
@@ -292,13 +299,13 @@ target_union=Image.new("L",(W,H),0)
 target_rows=[]
 outrows=[]
 for r in rows:
-    fam=("message" if r["kind"]=="message" else "red_heading" if r["kind"]=="red_heading" else "dark_sentence" if r["kind"].startswith("dark_sentence") else "license_ui" if r["key"]=="license_details" else "yesno_ui" if r["key"] in ("yes","no") else "reverse_ui" if r["key"]=="reverse" else "position_ui" if r["key"] in ("your_position","ok") else "local_ui")
+    fam=("congrats_title" if r["key"]=="congrats_title" else "message" if r["kind"]=="message" else "red_heading" if r["kind"]=="red_heading" else "dark_sentence" if r["kind"].startswith("dark_sentence") else "license_ui" if r["key"]=="license_details" else "yesno_ui" if r["key"] in ("yes","no") else "reverse_ui" if r["key"]=="reverse" else "position_ui" if r["key"] in ("your_position","ok") else "local_ui")
     fs=family_fs[fam]; ob=r["original_bbox"]; ah=r["source_height"]; fill=r["source_median_rgba"]
     rowmask=Image.new("L",(W,H),0)
     placements=[]
     if r["kind"]=="dark_sentence_inline_middle":
         left_text,right_text=r["korean"].split("|"); tb=r["preserved_inline_token_bbox"]
-        la=render_low(left_text,fs,fill); rb=render_low(right_text,fs,fill)
+        la=render_low(left_text,fs,fill,fam); rb=render_low(right_text,fs,fill,fam)
         py=ob[1]+(ah-max(la.height,rb.height))//2
         lx=tb[0]-8-la.width; rx=tb[2]+8
         if lx<=ob[0] or rx+rb.width>=ob[2]: raise RuntimeError(("inline middle placement",r["key"],ob,tb,la.size,rb.size))
@@ -337,7 +344,8 @@ for r in rows:
       "localized_bbox":lb,"localized_width":lb[2]-lb[0],"localized_height":lb[3]-lb[1],
       "delta_left":lb[0]-ob[0],"delta_right":ob[2]-lb[2],"delta_top":lb[1]-ob[1],"delta_bottom":ob[3]-lb[3],
       "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","lowres_font_size":fs,"pixel_scale":4,
-      "horizontal_scale":1.0,"tracking_px_average":0.0,"font_file":Path(FONT).name,"font_face_index":FI,"font_style":FSTYLE,
+      "horizontal_scale":1.0,"tracking_px_average":0.0,
+      "font_file":Path(font_tuple(fam)[0]).name,"font_face_index":font_tuple(fam)[1],"font_style":font_tuple(fam)[2],
       "fill_rgba":[fill[0],fill[1],fill[2],255],"placements":placements
     })
 
@@ -362,10 +370,10 @@ candidate.write_bytes(payload)
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
 dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip")
-fp=out/"A73_ACF_FINAL_DECODED_READABLE.png"; dec.save(fp)
-target_union.save(out/"A73_ACF_TARGET_TEXT_MASK.png")
-subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A73_ACF_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"A73_ACF_FINAL_VALIDATION.json").read_text())
+fp=out/"A74_ACF_FINAL_DECODED_READABLE.png"; dec.save(fp)
+target_union.save(out/"A74_ACF_TARGET_TEXT_MASK.png")
+subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A74_ACF_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"A74_ACF_FINAL_VALIDATION.json").read_text())
 
 diff=dmask(src,dec)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
@@ -406,24 +414,24 @@ sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+
 yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
 sheet.thumbnail((1900,16000),Image.Resampling.LANCZOS)
-sheet.save(out/"A73_ACF_TARGET_CONTACTS.jpg",quality=97)
+sheet.save(out/"A74_ACF_TARGET_CONTACTS.jpg",quality=97)
 
 full=Image.new("RGB",(1024,3*280),"white")
 for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,512),Image.Resampling.NEAREST)
     z=z.resize((1024,256),Image.Resampling.LANCZOS)
     full.paste(z,(0,i*280+24)); ImageDraw.Draw(full).text((4,i*280+4),label,fill="black")
-full.save(out/"A73_ACF_SOURCE_CLEAN_FINAL.jpg",quality=96)
+full.save(out/"A74_ACF_SOURCE_CLEAN_FINAL.jpg",quality=96)
 
 rr=Image.new("RGB",(1024,2*280),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im).resize((1024,256),Image.Resampling.LANCZOS)
     rr.paste(z,(0,i*280+24)); ImageDraw.Draw(rr).text((4,i*280+4),label,fill="black")
-rr.save(out/"A73_ACF_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"A74_ACF_RAW_COMPARE.jpg",quality=96)
 
 report={
  "schema_version":1,"role":"A","run":run,"index":205,"asset":asset,
- "readiness_tier":"A71_PREFLIGHT_RESOLVED_TO_RENDER_READY_COMPLETED_SAME_INVOCATION_A73_TOKEN_EDGE_FIX",
+ "readiness_tier":"A71_PREFLIGHT_RESOLVED_TO_RENDER_READY_COMPLETED_SAME_INVOCATION_A74_VISUAL_STYLE_FIX",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":commit,"git_blob_sha1":blob(sb),"atlas_git_blob_sha1":blob(ab),"source_sha256":sha(sb)},
  "semantic_binding":{"transcription_segments":len(semantic_segments),"localized_physical_rows":len(outrows),
    "protected_policy_regions":protected_policy,
@@ -432,7 +440,7 @@ report={
             "YOUR POSITION OK spans atlas regions 54+55; SORRY and Exchange are two-line physical rows; CONGRATULATIONS/You got this item are separate source lines in region 3.",
             "Song titles/music credits, OutRun2SP logo, product tokens and all unapproved atlas labels remain exact original pixels."]},
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
- "font":{"file":Path(FONT).name,"face_index":FI,"style":FSTYLE,"family_sizes_lowres":family_fs,"pixel_scale":4,"horizontal_scale":1.0,"artificial_tracking_px":0.0},
+ "font":{"sans":{"file":Path(FONT).name,"face_index":FI,"style":FSTYLE},"red_heading_serif":{"file":Path(SERIF_FONT).name,"face_index":SERIF_FI,"style":SERIF_STYLE},"family_sizes_lowres":family_fs,"pixel_scale":4,"horizontal_scale":1.0,"artificial_tracking_px":0.0},
  "rows":outrows,
  "clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
  "decoded_changes":{"changed_pixels_total":count(diff),"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,
@@ -441,16 +449,16 @@ report={
  "preserved_product_tokens":tokens,
  "candidate_sha256":sha(payload),"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","runtime_validation":"UNTESTED",
- "status":"A73_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"A74_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(out/"A73_ACF61D7C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A73_ACF61D7C.json").write_text(json.dumps({
+(out/"A74_ACF61D7C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"A74_ACF61D7C.json").write_text(json.dumps({
  "run":run,"index":205,"asset":"ACF61D7C","source_sha256":sha(sb),"candidate_sha256":sha(payload),
  "semantic_segments":len(semantic_segments),"localized_physical_rows":len(outrows),
  "bbox_size_positive_margin":f"{len(outrows)}/{len(outrows)} PASS","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"render_outside_target":render_outside,
  "candidate_vs_clean_outside_target":candidate_vs_clean_outside_target,"overlap":overlap,"touch_pairs":len(touch),
  "target_protected_overlap":target_protected_overlap,"target_protected_1px_near":target_protected_near,
- "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_A/{run}/A73_ACF61D7C_REPORT.json"
+ "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_A/{run}/A74_ACF61D7C_REPORT.json"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps({"run":run,"index":205,"asset":"ACF61D7C","candidate_sha256":sha(payload),"semantic":len(semantic_segments),"physical":len(outrows),"status":report["status"]},ensure_ascii=False))
