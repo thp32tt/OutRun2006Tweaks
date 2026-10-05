@@ -8951,12 +8951,168 @@ bool validate_programmable_texture_resource_behavior_readiness_snapshot(
         current.missingResourceScopeMask == (1u << 2);
 }
 
+NativeProgrammableShaderOutputResourceBehaviorReadiness
+compose_programmable_output_resource_behavior_readiness(
+    const NativeProgrammableShaderTextureResourceBehaviorReadiness& textureBehavior,
+    std::uint64_t textureBehaviorSnapshotToken,
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const NativeSurfacePairReadiness& surfacePair,
+    std::uint64_t surfacePairSnapshotToken,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
+    std::uint64_t surfaceBindingSnapshotToken) noexcept {
+    NativeProgrammableShaderOutputResourceBehaviorReadiness out{};
+    constexpr std::uint32_t kGeometryScopeMissing = 1u << 0;
+    constexpr std::uint32_t kTextureScopeMissing = 1u << 1;
+    constexpr std::uint32_t kOutputScopeMissing = 1u << 2;
+
+    out.kind = textureBehavior.kind;
+    out.indexed = textureBehavior.indexed;
+    out.sourceRevalidationSnapshotToken =
+        textureBehavior.sourceRevalidationSnapshotToken;
+    out.textureBehaviorSnapshotToken = textureBehaviorSnapshotToken;
+    out.surfacePairSnapshotToken = surfacePairSnapshotToken;
+    out.surfaceBindingSnapshotToken = surfaceBindingSnapshotToken;
+
+    out.inputValid =
+        textureBehaviorSnapshotToken != 0 &&
+        expectedContext != nullptr &&
+        expectedDevice != nullptr &&
+        surfacePairSnapshotToken != 0 &&
+        surfaceBindingSnapshotToken != 0;
+    out.textureReviewReady =
+        textureBehavior.reviewReady &&
+        textureBehavior.boundaryPreserved &&
+        textureBehavior.geometryResourceBehaviorExact &&
+        textureBehavior.textureResourceBehaviorExact &&
+        !textureBehavior.outputResourceBehaviorProofPresent &&
+        !textureBehavior.fullResourceBehaviorProofPresent &&
+        textureBehavior.missingResourceScopeMask == kOutputScopeMissing &&
+        textureBehavior.reviewSnapshotToken != 0;
+    out.textureSnapshotMatches =
+        out.textureReviewReady &&
+        textureBehavior.reviewSnapshotToken ==
+            textureBehaviorSnapshotToken;
+
+    out.surfacePairReady =
+        surfacePair.ready &&
+        surfacePair.snapshotToken != 0 &&
+        validate_surface_pair_snapshot(
+            expectedDevice, colorSurface, depthSurface,
+            surfacePair.snapshotToken);
+    out.surfacePairSnapshotMatches =
+        out.surfacePairReady &&
+        surfacePair.snapshotToken == surfacePairSnapshotToken;
+
+    const auto liveBinding = surfaceBinding.binding_readiness(
+        expectedContext, colorSurface, depthSurface);
+    out.surfaceBindingReady =
+        liveBinding.ready &&
+        liveBinding.surfacePairSnapshotToken == surfacePair.snapshotToken &&
+        surfaceBinding.surface_pair_snapshot_token() ==
+            surfacePair.snapshotToken;
+    out.surfaceBindingSnapshotMatches =
+        out.surfaceBindingReady &&
+        liveBinding.snapshotToken == surfaceBindingSnapshotToken &&
+        surfaceBinding.validate_binding_snapshot(
+            expectedContext, colorSurface, depthSurface,
+            surfaceBindingSnapshotToken);
+
+    out.geometryResourceBehaviorExact =
+        out.textureReviewReady &&
+        out.textureSnapshotMatches &&
+        textureBehavior.geometryResourceBehaviorExact;
+    out.textureResourceBehaviorExact =
+        out.textureReviewReady &&
+        out.textureSnapshotMatches &&
+        textureBehavior.textureResourceBehaviorExact;
+    out.outputResourceBehaviorExact =
+        out.surfacePairReady &&
+        out.surfacePairSnapshotMatches &&
+        out.surfaceBindingReady &&
+        out.surfaceBindingSnapshotMatches;
+
+    out.missingResourceScopeMask = 0;
+    if (!out.geometryResourceBehaviorExact)
+        out.missingResourceScopeMask |= kGeometryScopeMissing;
+    if (!out.textureResourceBehaviorExact)
+        out.missingResourceScopeMask |= kTextureScopeMissing;
+    if (!out.outputResourceBehaviorExact)
+        out.missingResourceScopeMask |= kOutputScopeMissing;
+    out.fullResourceBehaviorProofPresent =
+        out.missingResourceScopeMask == 0;
+
+    out.diagnosticOnly = true;
+    out.boundaryPreserved =
+        textureBehavior.boundaryPreserved &&
+        out.diagnosticOnly &&
+        out.fullResourceBehaviorProofPresent;
+    out.reviewReady =
+        out.inputValid &&
+        out.textureReviewReady &&
+        out.textureSnapshotMatches &&
+        out.fullResourceBehaviorProofPresent &&
+        out.boundaryPreserved;
+
+    if (out.reviewReady) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.kind));
+        token = mix_readiness_snapshot_token(token, out.indexed ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceRevalidationSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.textureBehaviorSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.surfacePairSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.surfaceBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.missingResourceScopeMask);
+        token = mix_readiness_snapshot_token(token, 0x262u);
+        out.reviewSnapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_programmable_output_resource_behavior_readiness_snapshot(
+    const NativeProgrammableShaderTextureResourceBehaviorReadiness& textureBehavior,
+    std::uint64_t textureBehaviorSnapshotToken,
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const NativeSurfacePairReadiness& surfacePair,
+    std::uint64_t surfacePairSnapshotToken,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
+    std::uint64_t surfaceBindingSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept {
+    if (reviewSnapshotToken == 0)
+        return false;
+    const auto current =
+        compose_programmable_output_resource_behavior_readiness(
+            textureBehavior, textureBehaviorSnapshotToken,
+            expectedContext, expectedDevice,
+            surfacePair, surfacePairSnapshotToken,
+            surfaceBinding, colorSurface, depthSurface,
+            surfaceBindingSnapshotToken);
+    return current.reviewReady &&
+        current.reviewSnapshotToken == reviewSnapshotToken &&
+        current.geometryResourceBehaviorExact &&
+        current.textureResourceBehaviorExact &&
+        current.outputResourceBehaviorExact &&
+        current.fullResourceBehaviorProofPresent &&
+        current.missingResourceScopeMask == 0;
+}
+
 NativeProgrammableShaderActivationPrerequisiteHandoff
 compose_programmable_activation_prerequisite_handoff(
     const NativeProgrammableShaderDormantSourceRevalidationReadiness&
         sourceRevalidation,
     std::uint64_t sourceRevalidationSnapshotToken,
-    const NativeProgrammableShaderTextureResourceBehaviorReadiness& resourceBehavior,
+    const NativeProgrammableShaderOutputResourceBehaviorReadiness& resourceBehavior,
     std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken) noexcept {
@@ -8989,6 +9145,9 @@ compose_programmable_activation_prerequisite_handoff(
         resourceBehavior.boundaryPreserved &&
         resourceBehavior.geometryResourceBehaviorExact &&
         resourceBehavior.textureResourceBehaviorExact &&
+        resourceBehavior.outputResourceBehaviorExact &&
+        resourceBehavior.fullResourceBehaviorProofPresent &&
+        resourceBehavior.missingResourceScopeMask == 0 &&
         resourceBehavior.reviewSnapshotToken != 0 &&
         resourceBehavior.kind == out.kind &&
         resourceBehavior.indexed == out.indexed &&
@@ -9006,9 +9165,14 @@ compose_programmable_activation_prerequisite_handoff(
         out.resourceBehaviorReviewReady &&
         out.resourceBehaviorSnapshotMatches &&
         resourceBehavior.textureResourceBehaviorExact;
+    out.resourceBehaviorOutputProofPresent =
+        out.resourceBehaviorReviewReady &&
+        out.resourceBehaviorSnapshotMatches &&
+        resourceBehavior.outputResourceBehaviorExact;
     out.resourceBehaviorCoverageComplete =
         out.resourceBehaviorGeometryProofPresent &&
         out.resourceBehaviorTextureProofPresent &&
+        out.resourceBehaviorOutputProofPresent &&
         resourceBehavior.fullResourceBehaviorProofPresent &&
         resourceBehavior.missingResourceScopeMask == 0;
 
@@ -9022,10 +9186,9 @@ compose_programmable_activation_prerequisite_handoff(
         out.inputLayoutOwnershipReady &&
         inputLayout.snapshotToken == inputLayoutSnapshotToken;
 
-    // R260+R261 now provide concrete current geometry and supplied-texture
-    // behavior proofs. F18 as a whole remains absent until output-resource
-    // behavior is equally exact. F21 semantic shader translation also remains
-    // absent.
+    // R260+R261+R262 provide concrete current geometry, supplied-texture and
+    // output-resource behavior proofs, so F18 is complete for this review
+    // receipt. F21 semantic shader translation remains absent.
     out.resourceBehaviorProofPresent =
         out.resourceBehaviorCoverageComplete;
     out.inputLayoutProofPresent =
@@ -9052,7 +9215,7 @@ compose_programmable_activation_prerequisite_handoff(
     out.drawDispatchAuthorized = false;
     out.boundaryPreserved =
         sourceRevalidation.boundaryPreserved &&
-        out.resourceBehaviorGeometryProofPresent &&
+        out.resourceBehaviorProofPresent &&
         out.diagnosticOnly &&
         !out.nativeDrawPathActivationAllowed &&
         !out.drawDispatchAuthorized &&
@@ -9063,7 +9226,7 @@ compose_programmable_activation_prerequisite_handoff(
         out.inputValid &&
         out.sourceRevalidationReady &&
         out.sourceRevalidationSnapshotMatches &&
-        out.resourceBehaviorGeometryProofPresent &&
+        out.resourceBehaviorProofPresent &&
         out.inputLayoutProofPresent &&
         out.boundaryPreserved;
 
@@ -9085,6 +9248,8 @@ compose_programmable_activation_prerequisite_handoff(
         token = mix_readiness_snapshot_token(
             token, out.resourceBehaviorTextureProofPresent ? 1u : 0u);
         token = mix_readiness_snapshot_token(
+            token, out.resourceBehaviorOutputProofPresent ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
             token, out.resourceBehaviorCoverageComplete ? 1u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.inputLayoutProofPresent ? 1u : 0u);
@@ -9102,7 +9267,7 @@ bool validate_programmable_activation_prerequisite_handoff_snapshot(
     const NativeProgrammableShaderDormantSourceRevalidationReadiness&
         sourceRevalidation,
     std::uint64_t sourceRevalidationSnapshotToken,
-    const NativeProgrammableShaderTextureResourceBehaviorReadiness& resourceBehavior,
+    const NativeProgrammableShaderOutputResourceBehaviorReadiness& resourceBehavior,
     std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken,
@@ -9117,7 +9282,10 @@ bool validate_programmable_activation_prerequisite_handoff_snapshot(
         current.reviewSnapshotToken == reviewSnapshotToken &&
         current.resourceBehaviorGeometryProofPresent &&
         current.resourceBehaviorTextureProofPresent &&
-        !current.resourceBehaviorCoverageComplete &&
+        current.resourceBehaviorOutputProofPresent &&
+        current.resourceBehaviorCoverageComplete &&
+        current.resourceBehaviorProofPresent &&
+        current.missingPrerequisiteMask == (1u << 2) &&
         !current.activationPrerequisitesSatisfied &&
         !current.nativeDrawPathActivationAllowed &&
         !current.drawDispatchAuthorized &&

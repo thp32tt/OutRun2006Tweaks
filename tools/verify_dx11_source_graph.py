@@ -10265,6 +10265,41 @@ def main() -> None:
             + ", ".join(missing_r261_programmable_texture_resource_behavior)
         )
 
+    r262_programmable_output_resource_behavior_contract = [
+        ("struct NativeProgrammableShaderOutputResourceBehaviorReadiness",
+         NATIVE_BACKEND_HPP, "R262 explicit F18 output resource-behavior receipt"),
+        ("compose_programmable_output_resource_behavior_readiness(",
+         NATIVE_BACKEND_HPP, "R262 output resource-behavior composition declaration"),
+        ("validate_programmable_output_resource_behavior_readiness_snapshot(",
+         NATIVE_BACKEND_HPP, "R262 output resource-behavior snapshot validator"),
+        ("surfaceBinding.binding_readiness(",
+         NATIVE_BACKEND_CPP, "R262 live RTV/DSV binding observation"),
+        ("surfaceBinding.validate_binding_snapshot(",
+         NATIVE_BACKEND_CPP, "R262 current output binding identity validation"),
+        ("out.outputResourceBehaviorExact =",
+         NATIVE_BACKEND_CPP, "R262 exact output resource behavior"),
+        ("out.fullResourceBehaviorProofPresent =",
+         NATIVE_BACKEND_CPP, "R262 full F18 coverage result"),
+        ("token, 0x262u",
+         NATIVE_BACKEND_CPP, "R262 independent review snapshot-domain tag"),
+        ("R262 indexed output resource behavior closes full F18 without activation authority",
+         CONSTANT_BUFFER_PROBE, "R262 indexed positive F18 regression"),
+        ("R262 rejects stale live output-binding identity",
+         CONSTANT_BUFFER_PROBE, "R262 stale output binding regression"),
+        ("R262 non-indexed output resource behavior closes full F18 on the same current output pair",
+         CONSTANT_BUFFER_PROBE, "R262 non-indexed positive F18 regression"),
+    ]
+    missing_r262_programmable_output_resource_behavior = [
+        meaning for token, source, meaning
+        in r262_programmable_output_resource_behavior_contract
+        if token not in source
+    ]
+    if missing_r262_programmable_output_resource_behavior:
+        raise SystemExit(
+            "DX11 R262 programmable output resource-behavior drift: "
+            + ", ".join(missing_r262_programmable_output_resource_behavior)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
@@ -10275,9 +10310,11 @@ def main() -> None:
         ("out.resourceBehaviorGeometryProofPresent =",
          NATIVE_BACKEND_CPP, "R259 consumes R261-carried geometry resource-behavior evidence"),
         ("out.resourceBehaviorTextureProofPresent =",
-         NATIVE_BACKEND_CPP, "R259 consumes R261 exact texture resource-behavior evidence"),
+         NATIVE_BACKEND_CPP, "R259 consumes R262-carried exact texture resource-behavior evidence"),
+        ("out.resourceBehaviorOutputProofPresent =",
+         NATIVE_BACKEND_CPP, "R259 consumes R262 exact output resource-behavior evidence"),
         ("out.resourceBehaviorCoverageComplete =",
-         NATIVE_BACKEND_CPP, "R259 keeps output-incomplete F18 scope explicit"),
+         NATIVE_BACKEND_CPP, "R259 requires complete geometry/texture/output F18 coverage"),
         ("out.resourceBehaviorProofPresent =",
          NATIVE_BACKEND_CPP, "R259 full F18 proof remains separately gated"),
         ("out.shaderTranslationProofPresent = false;",
@@ -10286,16 +10323,16 @@ def main() -> None:
          NATIVE_BACKEND_CPP, "R259 cannot manufacture activation authority"),
         ("token, 0x259u",
          NATIVE_BACKEND_CPP, "R259 independent review snapshot-domain tag"),
-        ("R259 indexed review handoff exposes F18/F21 proof debt without activation authority",
-         CONSTANT_BUFFER_PROBE, "R259 indexed positive/debt regression"),
+        ("R259 indexed review handoff consumes full F18 while F21 remains fail-closed",
+         CONSTANT_BUFFER_PROBE, "R259 indexed full-F18/F21-debt regression"),
         ("R259 rejects stale R258 source-revalidation identity",
          CONSTANT_BUFFER_PROBE, "R259 stale R258 receipt regression"),
-        ("R259 rejects stale R261 resource-behavior identity",
-         CONSTANT_BUFFER_PROBE, "R259 stale R261 receipt regression"),
+        ("R259 rejects stale R262 resource-behavior identity",
+         CONSTANT_BUFFER_PROBE, "R259 stale R262 receipt regression"),
         ("R259 rejects stale R243 input-layout identity",
          CONSTANT_BUFFER_PROBE, "R259 stale input-layout receipt regression"),
-        ("R259 non-indexed review handoff preserves F18/F21 fail-closed debt",
-         CONSTANT_BUFFER_PROBE, "R259 non-indexed positive/debt regression"),
+        ("R259 non-indexed review handoff consumes full F18 while F21 remains fail-closed",
+         CONSTANT_BUFFER_PROBE, "R259 non-indexed full-F18/F21-debt regression"),
     ]
     missing_r259_programmable_activation_prerequisite = [
         meaning for token, source, meaning

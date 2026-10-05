@@ -4275,6 +4275,52 @@ int main()
             0x1u, d3d.device, r261TextureStages.snapshotToken),
         "R261 texture stage prerequisite seals current managed texture behavior");
 
+    outrun::vr::dx11::NativeSurfaceMirror r262OutputColorSurface;
+    require(
+        r262OutputColorSurface.initialize(
+            d3d.device, ResourceRole::Color, 64u, 32u,
+            D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, D3DUSAGE_RENDERTARGET,
+            D3DMULTISAMPLE_NONE, 0u),
+        "R262 output color surface preserves exact render-target descriptor");
+    outrun::vr::dx11::NativeSurfaceMirror r262OutputDepthSurface;
+    require(
+        r262OutputDepthSurface.initialize(
+            d3d.device, ResourceRole::DepthStencil, 64u, 32u,
+            D3DFMT_D24S8, D3DPOOL_DEFAULT, D3DUSAGE_DEPTHSTENCIL,
+            D3DMULTISAMPLE_NONE, 0u),
+        "R262 output depth surface preserves exact depth-stencil descriptor");
+    const auto r262SurfacePair =
+        outrun::vr::dx11::compose_surface_pair_readiness(
+            d3d.device, r262OutputColorSurface, r262OutputDepthSurface);
+    require(
+        r262SurfacePair.ready &&
+        r262SurfacePair.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_surface_pair_snapshot(
+            d3d.device, r262OutputColorSurface, r262OutputDepthSurface,
+            r262SurfacePair.snapshotToken),
+        "R262 output surface pair seals exact descriptor and generation identity");
+    outrun::vr::dx11::NativeSurfacePairBinding r262SurfaceBinding;
+    require(
+        r262SurfaceBinding.initialize(
+            d3d.device, r262OutputColorSurface, r262OutputDepthSurface,
+            r262SurfacePair) &&
+        r262SurfaceBinding.apply(
+            d3d.context, r262OutputColorSurface, r262OutputDepthSurface),
+        "R262 output binding applies exact current RTV DSV pair");
+    const auto r262SurfaceBindingReady =
+        r262SurfaceBinding.binding_readiness(
+            d3d.context, r262OutputColorSurface, r262OutputDepthSurface);
+    require(
+        r262SurfaceBindingReady.ready &&
+        r262SurfaceBindingReady.surfacePairSnapshotToken ==
+            r262SurfacePair.snapshotToken &&
+        r262SurfaceBindingReady.unorderedAccessClear &&
+        r262SurfaceBindingReady.snapshotToken != 0 &&
+        r262SurfaceBinding.validate_binding_snapshot(
+            d3d.context, r262OutputColorSurface, r262OutputDepthSurface,
+            r262SurfaceBindingReady.snapshotToken),
+        "R262 output binding seals live RTV DSV identity with UAVs clear");
+
     const auto r260IndexedResourceBehavior =
         outrun::vr::dx11::compose_programmable_resource_behavior_readiness(
             r258IndexedSourceRevalidation,
@@ -4375,6 +4421,68 @@ int main()
                 r261IndexedTextureResourceBehavior.reviewSnapshotToken),
         "R261 indexed texture resource behavior closes supplied texture scope while output F18 remains fail-closed");
 
+    const auto r262IndexedOutputResourceBehavior =
+        outrun::vr::dx11::
+            compose_programmable_output_resource_behavior_readiness(
+                r262IndexedOutputResourceBehavior,
+                r262IndexedOutputResourceBehavior.reviewSnapshotToken,
+                d3d.context, d3d.device,
+                r262SurfacePair, r262SurfacePair.snapshotToken,
+                r262SurfaceBinding,
+                r262OutputColorSurface, r262OutputDepthSurface,
+                r262SurfaceBindingReady.snapshotToken);
+    require(
+        r262IndexedOutputResourceBehavior.inputValid &&
+        r262IndexedOutputResourceBehavior.textureReviewReady &&
+        r262IndexedOutputResourceBehavior.textureSnapshotMatches &&
+        r262IndexedOutputResourceBehavior.surfacePairReady &&
+        r262IndexedOutputResourceBehavior.surfacePairSnapshotMatches &&
+        r262IndexedOutputResourceBehavior.surfaceBindingReady &&
+        r262IndexedOutputResourceBehavior.surfaceBindingSnapshotMatches &&
+        r262IndexedOutputResourceBehavior.geometryResourceBehaviorExact &&
+        r262IndexedOutputResourceBehavior.textureResourceBehaviorExact &&
+        r262IndexedOutputResourceBehavior.outputResourceBehaviorExact &&
+        r262IndexedOutputResourceBehavior.fullResourceBehaviorProofPresent &&
+        r262IndexedOutputResourceBehavior.missingResourceScopeMask == 0 &&
+        r262IndexedOutputResourceBehavior.diagnosticOnly &&
+        r262IndexedOutputResourceBehavior.boundaryPreserved &&
+        r262IndexedOutputResourceBehavior.reviewReady &&
+        r262IndexedOutputResourceBehavior.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_output_resource_behavior_readiness_snapshot(
+                r261IndexedTextureResourceBehavior,
+                r261IndexedTextureResourceBehavior.reviewSnapshotToken,
+                d3d.context, d3d.device,
+                r262SurfacePair, r262SurfacePair.snapshotToken,
+                r262SurfaceBinding,
+                r262OutputColorSurface, r262OutputDepthSurface,
+                r262SurfaceBindingReady.snapshotToken,
+                r262IndexedOutputResourceBehavior.reviewSnapshotToken),
+        "R262 indexed output resource behavior closes full F18 without activation authority");
+
+    const auto staleR262IndexedBindingToken =
+        r262SurfaceBindingReady.snapshotToken == 1ull
+            ? 2ull
+            : (r262SurfaceBindingReady.snapshotToken ^ 1ull);
+    const auto r262IndexedStaleOutputBinding =
+        outrun::vr::dx11::
+            compose_programmable_output_resource_behavior_readiness(
+                r261IndexedTextureResourceBehavior,
+                r261IndexedTextureResourceBehavior.reviewSnapshotToken,
+                d3d.context, d3d.device,
+                r262SurfacePair, r262SurfacePair.snapshotToken,
+                r262SurfaceBinding,
+                r262OutputColorSurface, r262OutputDepthSurface,
+                staleR262IndexedBindingToken);
+    require(
+        r262IndexedStaleOutputBinding.surfaceBindingReady &&
+        !r262IndexedStaleOutputBinding.surfaceBindingSnapshotMatches &&
+        !r262IndexedStaleOutputBinding.outputResourceBehaviorExact &&
+        !r262IndexedStaleOutputBinding.fullResourceBehaviorProofPresent &&
+        !r262IndexedStaleOutputBinding.reviewReady &&
+        r262IndexedStaleOutputBinding.reviewSnapshotToken == 0,
+        "R262 rejects stale live output-binding identity");
+
     const auto staleR261TextureStageToken =
         r261TextureStages.snapshotToken == 1ull
             ? 2ull
@@ -4423,8 +4531,8 @@ int main()
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258IndexedSourceRevalidation,
             r258IndexedSourceRevalidation.snapshotToken,
-            r261IndexedTextureResourceBehavior,
-            r261IndexedTextureResourceBehavior.reviewSnapshotToken,
+            r262IndexedOutputResourceBehavior,
+            r262IndexedOutputResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
             r243InputLayoutReady.snapshotToken);
     require(
@@ -4435,10 +4543,11 @@ int main()
         r259IndexedPrerequisiteHandoff.resourceBehaviorSnapshotMatches &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorGeometryProofPresent &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorTextureProofPresent &&
-        !r259IndexedPrerequisiteHandoff.resourceBehaviorCoverageComplete &&
+        r259IndexedPrerequisiteHandoff.resourceBehaviorOutputProofPresent &&
+        r259IndexedPrerequisiteHandoff.resourceBehaviorCoverageComplete &&
         r259IndexedPrerequisiteHandoff.inputLayoutOwnershipReady &&
         r259IndexedPrerequisiteHandoff.inputLayoutSnapshotMatches &&
-        !r259IndexedPrerequisiteHandoff.resourceBehaviorProofPresent &&
+        r259IndexedPrerequisiteHandoff.resourceBehaviorProofPresent &&
         r259IndexedPrerequisiteHandoff.inputLayoutProofPresent &&
         !r259IndexedPrerequisiteHandoff.shaderTranslationProofPresent &&
         !r259IndexedPrerequisiteHandoff.activationPrerequisitesSatisfied &&
@@ -4450,7 +4559,7 @@ int main()
         r259IndexedPrerequisiteHandoff.kind ==
             outrun::vr::dx11::NativeProgrammableShaderDrawCandidateKind::Indexed &&
         r259IndexedPrerequisiteHandoff.indexed &&
-        r259IndexedPrerequisiteHandoff.missingPrerequisiteMask == 0x5u &&
+        r259IndexedPrerequisiteHandoff.missingPrerequisiteMask == 0x4u &&
         r259IndexedPrerequisiteHandoff.reviewSnapshotToken != 0 &&
         r259IndexedPrerequisiteHandoff.activationSnapshotToken == 0 &&
         outrun::vr::dx11::
@@ -4462,7 +4571,7 @@ int main()
                 r243InputLayoutReady,
                 r243InputLayoutReady.snapshotToken,
                 r259IndexedPrerequisiteHandoff.reviewSnapshotToken),
-        "R259 indexed review handoff exposes F18/F21 proof debt without activation authority");
+        "R259 indexed review handoff consumes full F18 while F21 remains fail-closed");
 
     const auto staleR258IndexedReviewToken =
         r258IndexedSourceRevalidation.snapshotToken == 1ull
@@ -4472,8 +4581,8 @@ int main()
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258IndexedSourceRevalidation,
             staleR258IndexedReviewToken,
-            r261IndexedTextureResourceBehavior,
-            r261IndexedTextureResourceBehavior.reviewSnapshotToken,
+            r262IndexedOutputResourceBehavior,
+            r262IndexedOutputResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
             r243InputLayoutReady.snapshotToken);
     require(
@@ -4485,14 +4594,14 @@ int main()
         "R259 rejects stale R258 source-revalidation identity");
 
     const auto staleR261IndexedReviewToken =
-        r261IndexedTextureResourceBehavior.reviewSnapshotToken == 1ull
+        r262IndexedOutputResourceBehavior.reviewSnapshotToken == 1ull
             ? 2ull
-            : (r261IndexedTextureResourceBehavior.reviewSnapshotToken ^ 1ull);
+            : (r262IndexedOutputResourceBehavior.reviewSnapshotToken ^ 1ull);
     const auto r259IndexedStaleResourceBehavior =
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258IndexedSourceRevalidation,
             r258IndexedSourceRevalidation.snapshotToken,
-            r261IndexedTextureResourceBehavior,
+            r262IndexedOutputResourceBehavior,
             staleR261IndexedReviewToken,
             r243InputLayoutReady,
             r243InputLayoutReady.snapshotToken);
@@ -4500,10 +4609,11 @@ int main()
         r259IndexedStaleResourceBehavior.resourceBehaviorReviewReady &&
         !r259IndexedStaleResourceBehavior.resourceBehaviorSnapshotMatches &&
         !r259IndexedStaleResourceBehavior.resourceBehaviorGeometryProofPresent &&
+        !r259IndexedStaleResourceBehavior.resourceBehaviorOutputProofPresent &&
         !r259IndexedStaleResourceBehavior.reviewReady &&
         r259IndexedStaleResourceBehavior.reviewSnapshotToken == 0 &&
         r259IndexedStaleResourceBehavior.activationSnapshotToken == 0,
-        "R259 rejects stale R261 resource-behavior identity");
+        "R259 rejects stale R262 resource-behavior identity");
 
     const auto staleR243ReviewToken =
         r243InputLayoutReady.snapshotToken == 1ull
@@ -4513,8 +4623,8 @@ int main()
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258IndexedSourceRevalidation,
             r258IndexedSourceRevalidation.snapshotToken,
-            r261IndexedTextureResourceBehavior,
-            r261IndexedTextureResourceBehavior.reviewSnapshotToken,
+            r262IndexedOutputResourceBehavior,
+            r262IndexedOutputResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
             staleR243ReviewToken);
     require(
@@ -5423,12 +5533,46 @@ int main()
                 r261NonIndexedTextureResourceBehavior.reviewSnapshotToken),
         "R261 non-indexed texture resource behavior reuses exact current texture stage without widening F18");
 
+    const auto r262NonIndexedOutputResourceBehavior =
+        outrun::vr::dx11::
+            compose_programmable_output_resource_behavior_readiness(
+                r262NonIndexedOutputResourceBehavior,
+                r262NonIndexedOutputResourceBehavior.reviewSnapshotToken,
+                d3d.context, d3d.device,
+                r262SurfacePair, r262SurfacePair.snapshotToken,
+                r262SurfaceBinding,
+                r262OutputColorSurface, r262OutputDepthSurface,
+                r262SurfaceBindingReady.snapshotToken);
+    require(
+        r262NonIndexedOutputResourceBehavior.textureReviewReady &&
+        r262NonIndexedOutputResourceBehavior.textureSnapshotMatches &&
+        r262NonIndexedOutputResourceBehavior.surfacePairSnapshotMatches &&
+        r262NonIndexedOutputResourceBehavior.surfaceBindingSnapshotMatches &&
+        r262NonIndexedOutputResourceBehavior.geometryResourceBehaviorExact &&
+        r262NonIndexedOutputResourceBehavior.textureResourceBehaviorExact &&
+        r262NonIndexedOutputResourceBehavior.outputResourceBehaviorExact &&
+        r262NonIndexedOutputResourceBehavior.fullResourceBehaviorProofPresent &&
+        r262NonIndexedOutputResourceBehavior.missingResourceScopeMask == 0 &&
+        r262NonIndexedOutputResourceBehavior.reviewReady &&
+        r262NonIndexedOutputResourceBehavior.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_output_resource_behavior_readiness_snapshot(
+                r261NonIndexedTextureResourceBehavior,
+                r261NonIndexedTextureResourceBehavior.reviewSnapshotToken,
+                d3d.context, d3d.device,
+                r262SurfacePair, r262SurfacePair.snapshotToken,
+                r262SurfaceBinding,
+                r262OutputColorSurface, r262OutputDepthSurface,
+                r262SurfaceBindingReady.snapshotToken,
+                r262NonIndexedOutputResourceBehavior.reviewSnapshotToken),
+        "R262 non-indexed output resource behavior closes full F18 on the same current output pair");
+
     const auto r259NonIndexedPrerequisiteHandoff =
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258NonIndexedSourceRevalidation,
             r258NonIndexedSourceRevalidation.snapshotToken,
-            r261NonIndexedTextureResourceBehavior,
-            r261NonIndexedTextureResourceBehavior.reviewSnapshotToken,
+            r262NonIndexedOutputResourceBehavior,
+            r262NonIndexedOutputResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
             r243InputLayoutReady.snapshotToken);
     require(
@@ -5438,9 +5582,10 @@ int main()
         r259NonIndexedPrerequisiteHandoff.resourceBehaviorSnapshotMatches &&
         r259NonIndexedPrerequisiteHandoff.resourceBehaviorGeometryProofPresent &&
         r259NonIndexedPrerequisiteHandoff.resourceBehaviorTextureProofPresent &&
-        !r259NonIndexedPrerequisiteHandoff.resourceBehaviorCoverageComplete &&
+        r259NonIndexedPrerequisiteHandoff.resourceBehaviorOutputProofPresent &&
+        r259NonIndexedPrerequisiteHandoff.resourceBehaviorCoverageComplete &&
         r259NonIndexedPrerequisiteHandoff.inputLayoutProofPresent &&
-        !r259NonIndexedPrerequisiteHandoff.resourceBehaviorProofPresent &&
+        r259NonIndexedPrerequisiteHandoff.resourceBehaviorProofPresent &&
         !r259NonIndexedPrerequisiteHandoff.shaderTranslationProofPresent &&
         !r259NonIndexedPrerequisiteHandoff.activationPrerequisitesSatisfied &&
         r259NonIndexedPrerequisiteHandoff.boundaryPreserved &&
@@ -5448,7 +5593,7 @@ int main()
         r259NonIndexedPrerequisiteHandoff.kind ==
             outrun::vr::dx11::NativeProgrammableShaderDrawCandidateKind::NonIndexed &&
         !r259NonIndexedPrerequisiteHandoff.indexed &&
-        r259NonIndexedPrerequisiteHandoff.missingPrerequisiteMask == 0x5u &&
+        r259NonIndexedPrerequisiteHandoff.missingPrerequisiteMask == 0x4u &&
         r259NonIndexedPrerequisiteHandoff.reviewSnapshotToken != 0 &&
         r259NonIndexedPrerequisiteHandoff.activationSnapshotToken == 0 &&
         outrun::vr::dx11::
@@ -5460,7 +5605,7 @@ int main()
                 r243InputLayoutReady,
                 r243InputLayoutReady.snapshotToken,
                 r259NonIndexedPrerequisiteHandoff.reviewSnapshotToken),
-        "R259 non-indexed review handoff preserves F18/F21 fail-closed debt");
+        "R259 non-indexed review handoff consumes full F18 while F21 remains fail-closed");
 
     const auto r258NonIndexedSourceDrift =
         programmableCache.nonindexed_dormant_source_revalidation_readiness(

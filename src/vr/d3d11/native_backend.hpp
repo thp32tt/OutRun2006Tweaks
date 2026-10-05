@@ -1882,12 +1882,69 @@ validate_programmable_texture_resource_behavior_readiness_snapshot(
     std::uint64_t textureStageSnapshotToken,
     std::uint64_t reviewSnapshotToken) noexcept;
 
-// R259 consumes the current R258 source receipt, R261 resource-behavior review
-// and R243 input-layout ownership receipt into one activation-prerequisite
-// handoff. R260+R261 now prove current MANAGED geometry and supplied texture
-// behavior, but F18 remains incomplete until output-resource behavior is
-// represented. F21 shader semantic translation also remains absent, so
-// activation authority stays off.
+// R262 binds the current R261 geometry+texture receipt to the exact live
+// output surface pair and OM target binding. R119 descriptor/generation identity
+// plus R145 RTV/DSV/UAV-clear observation close the remaining F18 output-resource
+// scope. This is still diagnostic-only: F21 remains absent and no Draw* or
+// NativeDrawPath activation authority is created.
+struct NativeProgrammableShaderOutputResourceBehaviorReadiness {
+    bool inputValid{};
+    bool textureReviewReady{};
+    bool textureSnapshotMatches{};
+    bool surfacePairReady{};
+    bool surfacePairSnapshotMatches{};
+    bool surfaceBindingReady{};
+    bool surfaceBindingSnapshotMatches{};
+    bool geometryResourceBehaviorExact{};
+    bool textureResourceBehaviorExact{};
+    bool outputResourceBehaviorExact{};
+    bool fullResourceBehaviorProofPresent{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    NativeProgrammableShaderDrawCandidateKind kind =
+        NativeProgrammableShaderDrawCandidateKind::None;
+    bool indexed{};
+    std::uint32_t missingResourceScopeMask{};
+    std::uint64_t sourceRevalidationSnapshotToken{};
+    std::uint64_t textureBehaviorSnapshotToken{};
+    std::uint64_t surfacePairSnapshotToken{};
+    std::uint64_t surfaceBindingSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderOutputResourceBehaviorReadiness
+compose_programmable_output_resource_behavior_readiness(
+    const NativeProgrammableShaderTextureResourceBehaviorReadiness& textureBehavior,
+    std::uint64_t textureBehaviorSnapshotToken,
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const NativeSurfacePairReadiness& surfacePair,
+    std::uint64_t surfacePairSnapshotToken,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
+    std::uint64_t surfaceBindingSnapshotToken) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_output_resource_behavior_readiness_snapshot(
+    const NativeProgrammableShaderTextureResourceBehaviorReadiness& textureBehavior,
+    std::uint64_t textureBehaviorSnapshotToken,
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const NativeSurfacePairReadiness& surfacePair,
+    std::uint64_t surfacePairSnapshotToken,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
+    std::uint64_t surfaceBindingSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
+// R259 consumes the current R258 source receipt, R262 full F18 resource-behavior
+// review and R243 input-layout ownership receipt into one activation-prerequisite
+// handoff. R260+R261+R262 now prove current MANAGED geometry, supplied texture
+// and output surface behavior. F21 shader semantic translation remains absent,
+// so activation authority stays off.
 struct NativeProgrammableShaderActivationPrerequisiteHandoff {
     bool inputValid{};
     bool sourceRevalidationReady{};
@@ -1896,6 +1953,7 @@ struct NativeProgrammableShaderActivationPrerequisiteHandoff {
     bool resourceBehaviorSnapshotMatches{};
     bool resourceBehaviorGeometryProofPresent{};
     bool resourceBehaviorTextureProofPresent{};
+    bool resourceBehaviorOutputProofPresent{};
     bool resourceBehaviorCoverageComplete{};
     bool inputLayoutOwnershipReady{};
     bool inputLayoutSnapshotMatches{};
@@ -1924,7 +1982,7 @@ compose_programmable_activation_prerequisite_handoff(
     const NativeProgrammableShaderDormantSourceRevalidationReadiness&
         sourceRevalidation,
     std::uint64_t sourceRevalidationSnapshotToken,
-    const NativeProgrammableShaderTextureResourceBehaviorReadiness& resourceBehavior,
+    const NativeProgrammableShaderOutputResourceBehaviorReadiness& resourceBehavior,
     std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken) noexcept;
@@ -1934,7 +1992,7 @@ validate_programmable_activation_prerequisite_handoff_snapshot(
     const NativeProgrammableShaderDormantSourceRevalidationReadiness&
         sourceRevalidation,
     std::uint64_t sourceRevalidationSnapshotToken,
-    const NativeProgrammableShaderTextureResourceBehaviorReadiness& resourceBehavior,
+    const NativeProgrammableShaderOutputResourceBehaviorReadiness& resourceBehavior,
     std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken,
