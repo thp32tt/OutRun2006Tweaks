@@ -1943,9 +1943,10 @@ validate_programmable_output_resource_behavior_readiness_snapshot(
 // R263 seals one exact F21 programmable-shader semantic-translation proof.
 // The proof is bound to the census-sealed R239 source VS/PS identity, the
 // exact R242 translated object receipt and the exact R243 input-layout receipt.
-// Non-zero translated semantic hashes are evidence identifiers supplied by the
-// dormant translator/probe; this review path never routes Draw* or activates
-// NativeDrawPath.
+// Non-zero translated semantic hashes plus translator-revision/semantic-contract
+// identities and explicit constant-register/sampler/linkage exactness are
+// evidence supplied by the dormant translator/probe. This review path never
+// routes Draw* or activates NativeDrawPath.
 struct NativeProgrammableShaderSemanticTranslationReadiness {
     bool inputValid{};
     bool sourceIdentityExact{};
@@ -1969,6 +1970,10 @@ struct NativeProgrammableShaderSemanticTranslationReadiness {
     std::uint64_t translatedVertexSemanticHash{};
     std::uint64_t translatedPixelSemanticHash{};
     std::uint64_t interfaceLinkHash{};
+    std::uint64_t translatorRevisionHash{};
+    std::uint64_t semanticContractHash{};
+    bool constantRegisterMappingExact{};
+    bool samplerMappingExact{};
     std::uint64_t translationObjectSnapshotToken{};
     std::uint64_t inputLayoutSnapshotToken{};
     std::uint64_t reviewSnapshotToken{};
@@ -1984,8 +1989,12 @@ compose_programmable_shader_semantic_translation_readiness(
     std::uint64_t translatedVertexSemanticHash,
     std::uint64_t translatedPixelSemanticHash,
     std::uint64_t interfaceLinkHash,
+    std::uint64_t translatorRevisionHash,
+    std::uint64_t semanticContractHash,
     bool vertexSemanticExact,
     bool pixelSemanticExact,
+    bool constantRegisterMappingExact,
+    bool samplerMappingExact,
     bool interfaceLinkExact) noexcept;
 
 [[nodiscard]] bool
@@ -1998,8 +2007,12 @@ validate_programmable_shader_semantic_translation_readiness_snapshot(
     std::uint64_t translatedVertexSemanticHash,
     std::uint64_t translatedPixelSemanticHash,
     std::uint64_t interfaceLinkHash,
+    std::uint64_t translatorRevisionHash,
+    std::uint64_t semanticContractHash,
     bool vertexSemanticExact,
     bool pixelSemanticExact,
+    bool constantRegisterMappingExact,
+    bool samplerMappingExact,
     bool interfaceLinkExact,
     std::uint64_t reviewSnapshotToken) noexcept;
 
