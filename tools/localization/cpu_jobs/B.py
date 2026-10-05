@@ -9,14 +9,14 @@ if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OU
     raise SystemExit("GitHub-hosted localization CPU worker / role B only")
 
 repo = Path.cwd()
-run = "20261006-B-INGAME167-IGR004-GOAL-SELECT"
+run = "20261006-B-INGAME168-IGR004-GOAL-SELECT-WEIGHT"
 out = repo / "localization/graphics/role_B" / run
 out.mkdir(parents=True, exist_ok=True)
 
 queue_index = 201
 rel = "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds"
 candidate = repo / "localization/graphics/hd_candidates" / rel
-old_sha = "59b21fa3aadf86e892dbd6adee4b178b2dad09048fd314fd731135f363d6a6fe"
+old_sha = "f4b4fab4673516f793997bb3dac132c2ceb23a7f2378808d589e2ab78f0cbeb7"
 source_sha = "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5"
 source_url = "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds"
 
@@ -158,8 +158,8 @@ for idx,(src_text,ko,kind,bb,fill,align) in enumerate(rows):
         f=ImageFont.truetype(fontfile,fs)
         probe=Image.new("RGBA",(max(1600,bw+300),max(260,bh+120)),(0,0,0,0))
         d=ImageDraw.Draw(probe)
-        tb=d.textbbox((0,0),ko,font=f,stroke_width=0)
-        d.text((16-tb[0],16-tb[1]),ko,font=f,fill=tuple(fill))
+        tb=d.textbbox((0,0),ko,font=f,stroke_width=(3 if kind=="stage" else 1))
+        d.text((16-tb[0],16-tb[1]),ko,font=f,fill=tuple(fill),stroke_width=(3 if kind=="stage" else 1),stroke_fill=tuple(fill))
         gb=probe.getchannel("A").getbbox()
         if not gb: continue
         glyph=probe.crop(gb)
@@ -202,7 +202,7 @@ for idx,(src_text,ko,kind,bb,fill,align) in enumerate(rows):
         "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS",
         "font":"Noto Sans CJK KR Black","native_font_size_px":fs,
         "render_resolution":[source.width,source.height],"glyph_upscale":1.0,
-        "horizontal_scale":1.0,"tracking_px":0,"alignment":align,"fill_rgba":fill
+        "horizontal_scale":1.0,"tracking_px":0,"stroke_width_px":(3 if kind=="stage" else 1),"alignment":align,"fill_rgba":fill
     })
 
 oa=np.asarray(old,dtype=np.uint8); fa=np.asarray(final,dtype=np.uint8)
@@ -221,19 +221,19 @@ if dh!=header or dmeta!=meta or ImageChops.difference(decoded,final).getbbox():
     raise RuntimeError("DDS roundtrip mismatch")
 
 # Evidence masks + generic validator.
-Image.fromarray((allowed*255).astype(np.uint8),"L").save(out/"B167_ALLOWED_BBOX_MASK.png")
-Image.fromarray((render_union*255).astype(np.uint8),"L").save(out/"B167_TARGET_TEXT_MASK.png")
-Image.fromarray((protected*255).astype(np.uint8),"L").save(out/"B167_PROTECTED_VISIBLE_MASK.png")
-source.save(out/"B167_SOURCE_READABLE.png")
-clean.save(out/"B167_CLEAN_PLATE.png")
-decoded.save(out/"B167_FINAL_DECODED_READABLE.png")
+Image.fromarray((allowed*255).astype(np.uint8),"L").save(out/"B168_ALLOWED_BBOX_MASK.png")
+Image.fromarray((render_union*255).astype(np.uint8),"L").save(out/"B168_TARGET_TEXT_MASK.png")
+Image.fromarray((protected*255).astype(np.uint8),"L").save(out/"B168_PROTECTED_VISIBLE_MASK.png")
+source.save(out/"B168_SOURCE_READABLE.png")
+clean.save(out/"B168_CLEAN_PLATE.png")
+decoded.save(out/"B168_FINAL_DECODED_READABLE.png")
 
 tmp=Path("/tmp/b167_a9"); tmp.mkdir(exist_ok=True)
 old_png=tmp/"old.png"; final_png=tmp/"final.png"; old.save(old_png); decoded.save(final_png)
 subprocess.run(["python3",str(repo/"tools/localization/validate_clean_plate.py"),
-                str(old_png),str(final_png),str(out/"B167_ALLOWED_BBOX_MASK.png"),
-                "--protected-mask",str(out/"B167_PROTECTED_VISIBLE_MASK.png"),
-                "--report",str(out/"B167_FINAL_MASK_VALIDATION.json")],check=True)
+                str(old_png),str(final_png),str(out/"B168_ALLOWED_BBOX_MASK.png"),
+                "--protected-mask",str(out/"B168_PROTECTED_VISIBLE_MASK.png"),
+                "--report",str(out/"B168_FINAL_MASK_VALIDATION.json")],check=True)
 
 # SOURCE / OLD / CLEAN / FINAL native-readable row contacts.
 cards=[]
@@ -243,7 +243,7 @@ for i,rr in enumerate(report_rows):
     one=[labeled_crop(f"{i:02d} SOURCE {rr['source']}",source,crop,1),
          labeled_crop("OLD A69 LOWRES-UPSCALED",old,crop,1),
          labeled_crop("CLEAN",clean,crop,1),
-         labeled_crop(f"B167 NATIVE {rr['korean']}",decoded,crop,1)]
+         labeled_crop(f"B168 NATIVE {rr['korean']}",decoded,crop,1)]
     W=max(x.width for x in one); H=max(x.height for x in one)
     rowimg=Image.new("RGB",(sum(x.width for x in one)+18,H),"white")
     xx=0
@@ -254,7 +254,7 @@ W=max(c.width for c in cards); H=sum(c.height for c in cards)+4*(len(cards)-1)
 sheet=Image.new("RGB",(W,H),"white"); yy=0
 for c in cards:
     sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.save(out/"B167_SOURCE_OLD_CLEAN_FINAL_ROWS.jpg",quality=96)
+sheet.save(out/"B168_SOURCE_OLD_CLEAN_FINAL_ROWS.jpg",quality=96)
 
 # Full readable and raw orientation comparisons.
 def pair_sheet(label_a,a,label_b,b,raw=False):
@@ -266,9 +266,9 @@ def pair_sheet(label_a,a,label_b,b,raw=False):
     s.paste(ca,(0,0)); s.paste(cb,(ca.width+8,0))
     s.thumbnail((2400,1400),Image.Resampling.LANCZOS)
     return s
-pair_sheet("SOURCE",source,"B167 FINAL",decoded).save(out/"B167_FULL_SOURCE_FINAL.jpg",quality=94)
-pair_sheet("OLD A69",old,"B167 FINAL",decoded).save(out/"B167_FULL_OLD_FINAL.jpg",quality=94)
-pair_sheet("OLD RAW",old,"B167 RAW",decoded,raw=True).save(out/"B167_RAW_OLD_FINAL.jpg",quality=94)
+pair_sheet("SOURCE",source,"B168 FINAL",decoded).save(out/"B168_FULL_SOURCE_FINAL.jpg",quality=94)
+pair_sheet("OLD A69",old,"B168 FINAL",decoded).save(out/"B168_FULL_OLD_FINAL.jpg",quality=94)
+pair_sheet("OLD RAW",old,"B168 RAW",decoded,raw=True).save(out/"B168_RAW_OLD_FINAL.jpg",quality=94)
 
 report={
     "schema_version":1,"role":"B","run":run,"base_head":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
@@ -285,7 +285,7 @@ report={
     "superseded_candidate_sha256":old_sha,"candidate_sha256":new_sha,
     "candidate_path":str(candidate.relative_to(repo)),
     "structure":{**meta,"header_128_exact":True,"raw_orientation":"mirror_y"},
-    "method":"Material rework of all 17 localized A9ABD877 rows from the exact 2048x2048 HD clean plate. Removed the historical 19px->4x raster path and rendered Hangul directly at native atlas resolution with Noto Sans CJK KR Black, natural font advance, no horizontal glyph scaling, no artificial tracking, source-family alignment/fill, and exact source-bbox ceilings.",
+    "method":"Material rework of all 17 localized A9ABD877 rows from the exact 2048x2048 HD clean plate. B167 native-resolution retry removed the historical 19px->4x raster path but controller visual QA found the smooth glyph weight too light versus the source condensed-bold family. B168 keeps native rendering and adds a source-faithful 3px stage / 1px UI same-fill weight reinforcement, with natural font advance, no horizontal glyph scaling, no artificial tracking, source-family alignment/fill, and exact source-bbox ceilings.",
     "rows":report_rows,
     "protected_regions":protected_labels,
     "zero_pixel_qa":{
@@ -298,13 +298,13 @@ report={
         "localized_overlap_pixels":0,
         "status":"PASS"
     },
-    "visual_qa":"PENDING_CONTROLLER_SELF_QA",
+    "visual_qa":"PENDING_CONTROLLER_SELF_QA_AFTER_B167_WEIGHT_FAIL",
     "runtime_validation":"PENDING_NEW_INGAME_RETEST",
-    "status":"B167_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+    "status":"B168_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(out/"B167_A9ABD877_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(out/"B167_STATIC_VALIDATION_SUMMARY.json").write_text(json.dumps({
-    "mapping":"IGR-004_EXACT_GRAPHICS_A9ABD877",
+(out/"B168_A9ABD877_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"B168_STATIC_VALIDATION_SUMMARY.json").write_text(json.dumps({
+    "mapping":"IGR-004_EXACT_GRAPHICS_A9ABD877_B168_WEIGHT_RETRY",
     "candidate_sha256":new_sha,
     "bbox_size_positive_margin":f"{len(report_rows)}/{len(report_rows)} PASS",
     "native_resolution_rows":len(report_rows),
@@ -313,4 +313,4 @@ report={
     "tracking_rows":0,
     **report["zero_pixel_qa"]
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("B167_DONE",new_sha)
+print("B168_DONE",new_sha)
