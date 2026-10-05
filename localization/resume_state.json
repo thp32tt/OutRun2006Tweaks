@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C160 rejected latest stable B101 index 26 63C91067 candidate 577e6c8d0e609f2ce6a6598f44879528d26423b11c5ad45c4e88e84ea9dfc67e. Producer 2/2 bbox+size+positive margins and zero outside/alpha/protected counters do not override mandatory visual QA: SOURCE/CLEAN/FINAL, row and raw mirror_y evidence retain visible English Total Rank effect ghosts underneath/around Korean in both occurrences. CLEAN_PLATE/zero-overlap/source-residue FAIL; return to REWORK_REQUIRED for patterned-plate reconstruction. Index 26 is now confirmed localize_text. A23 index 59 7CE1CFC5 is preflight-only with no C approval candidate. pending production localize_text=23; producer rework=2 (C598919A,63C91067). RUNTIME_VALIDATION=UNTESTED.",
     "C159 independently finalized B89 even index 222 DDF0392A DXT5 candidate e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea. Pinned canonical DDS+atlas were re-downloaded and independently decoded; three exact source-alpha bboxes re-derived without producer masks. 3/3 bbox+size+positive margins, decoded/alpha/introduced-visible outside=0, source residue/overlap/protected-near=0; song-title rows 3..9 and Ferrari rows 10..24 pixel-exact; source/localized fill median [46,53,57]. Controller SOURCE/CLEAN/FINAL,row,raw mirror_y PASS. C159_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. pending_artwork=22; producer_rework=1 (C598919A). RUNTIME_VALIDATION=UNTESTED.",
     "C158 independently finalized B85 even index 212 BA0147DA candidate 869cf1bea8b27dcc89f5b2ab68f9dd163e4bf41fa6de4b53c7b3f19b3b1c74ad. Pinned canonical DDS+atlas were re-downloaded and 12 exact source masks/bboxes/transparent clean plate/protected artwork recomputed without producer masks; 12/12 bbox+size+positive margins and alignment anchors PASS, every clean/final/protected/residue/overlap/touch gate zero. Controller SOURCE/CLEAN/FINAL, 12 row-contact and raw mirror_y visuals PASS; PROFESSIONAL/프로 + small OUTRUN/아웃런 right anchors and protected character names/VERDE MUGELLO/zodiac/logos/icons verified. C158_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. pending_artwork=24; producer_rework=1 (C598919A). RUNTIME_VALIDATION=UNTESTED.",
     "C157 independently finalized corrected B82 even index 188 8C259C68 candidate 03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03. Pinned canonical DDS+atlas were re-downloaded and exact source masks/bboxes/transparent clean plate recomputed without producer masks; 6/6 bbox+size+positive margins and every clean/final/protected/residue/overlap/touch gate PASS at zero. Controller SOURCE/CLEAN/FINAL, row-contact and raw mirror_y visuals PASS. C157_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. pending_artwork=25; producer_rework=1 (C598919A). RUNTIME_VALIDATION=UNTESTED.",
@@ -131,12 +132,12 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-10-05T13:23:48+09:00",
+      "updated_at_kst": "2026-10-05T14:16:19+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20261005-C159-DDF0392A/C159_DDF_CONTROLLER_FINAL_QA.json",
+      "report": "localization/graphics/role_C/20261005-C160-63C91067/C160_63C_CONTROLLER_FINAL_QA.json",
       "direct_queue_scope": 126,
-      "current_candidates_scanned": 42,
-      "elements_scanned": 385,
+      "current_candidates_scanned": 43,
+      "elements_scanned": 387,
       "pixel_visual_pass_assets": [
         "FF2462BB",
         "C4A2937B",
@@ -190,22 +191,23 @@
         "DDF0392A"
       ],
       "rework_required_assets": [
-        "C598919A"
+        "C598919A",
+        "63C91067"
       ],
       "failed_elements": 0,
-      "pending_production_localize_text": 22,
-      "hold_strict_recheck_zoom_review": 47,
+      "pending_production_localize_text": 23,
+      "hold_strict_recheck_zoom_review": 46,
       "promotion_hold_for_pixel_pass": true,
-      "promotion_hold_reason": "C159 approved B89 DDF0392A exact-decoded DXT5 static candidate. C598919A remains actionable producer REWORK_REQUIRED requiring an endpoint/index-constrained exact decoded-pixel DXT5 solver. 1A43E9D9 remains HIGH_RISK pending mandatory in-game; 4F68708E/F6811E94/49BB5FE5/75C3586A remain strict HOLD.",
+      "promotion_hold_reason": "C160 rejects B101 63C91067: visible English Total Rank source-effect ghost remains under/around Korean in both occurrences despite zero producer mask counters; source-faithful clean-plate reconstruction required. C598919A remains endpoint/index-constrained DXT5 REWORK_REQUIRED. 1A43E9D9 remains HIGH_RISK pending mandatory in-game; 4F68708E/F6811E94/49BB5FE5/75C3586A remain strict HOLD.",
       "user_approved_locked": 0,
-      "failed_assets": 1,
+      "failed_assets": 2,
       "latest_c_revalidated_assets": [
-        "DDF0392A"
+        "63C91067"
       ],
-      "latest_c_revalidated_physical_elements": 3,
+      "latest_c_revalidated_physical_elements": 2,
       "runtime_validation": "UNTESTED",
       "current_run_assets_scanned": 1,
-      "current_run_physical_elements_scanned": 3,
+      "current_run_physical_elements_scanned": 2,
       "high_risk_static_pass_assets": [
         "1A43E9D9"
       ]
@@ -3679,6 +3681,20 @@
     "decision": "C159_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
     "machine_report": "localization/graphics/role_C/20261005-C159-DDF0392A/C159_DDF_MACHINE_QA.json",
     "report": "localization/graphics/role_C/20261005-C159-DDF0392A/C159_DDF_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c160_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T14:16:19+09:00",
+    "run": "20261005-C160-63C91067",
+    "queue_index": 26,
+    "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+    "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+    "candidate_sha256": "577e6c8d0e609f2ce6a6598f44879528d26423b11c5ad45c4e88e84ea9dfc67e",
+    "candidate_changed_by_C": false,
+    "producer_machine_status": "PASS_REPORTED",
+    "controller_visual_qa": "FAIL_VISIBLE_ENGLISH_SOURCE_EFFECT_RESIDUE",
+    "decision": "C160_REWORK_REQUIRED_CLEAN_PLATE_SOURCE_RESIDUE",
+    "report": "localization/graphics/role_C/20261005-C160-63C91067/C160_63C_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
