@@ -53,10 +53,10 @@
   "latest_durable_task": {
     "task_id": "CONVERSION-DX11-00400",
     "production_id": "CONVERSION-DX11-00400",
-    "event_id": "CONVERSION-DX11-00400-E003",
+    "event_id": "CONVERSION-DX11-00400-E004",
     "event_type": "rollover",
     "attempt": "1/3",
-    "chat_rollover": 3,
+    "chat_rollover": 4,
     "rollover_is_retry": false,
     "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
     "dispatch_source": "CURRENT_USER_QUEUE",
@@ -89,9 +89,9 @@
     ],
     "native_draw_path_activation_changed": false
   },
-  "runtime_blocker": "CONVERSION-DX11-00400/R262 is automation-complete but runtime-untested. Full F18 resource behavior is now proven for the current dormant candidate, while F21 shader semantic translation remains missing; NativeDrawPath and Draw/DrawIndexed remain unauthorized.",
-  "runtime_next_action": "Keep NativeDrawPathActive disabled and Draw/DrawIndexed inactive. R262 closes F18 only; F21 semantic shader translation and a separate matching Quest 3/VDXR runtime activation gate remain required before any runtime-visible native programmable draw claim.",
-  "independent_static_next_action": "Preserve validated R239-R262. Under a new TASK_ID, implement one exact F21 programmable-shader semantic-translation proof for the current dormant candidate, feed it into R259, and keep NativeDrawPath/Draw/DrawIndexed fail-closed until the complete activation gate plus separate matching Quest 3/VDXR runtime evidence are satisfied.",
+  "runtime_blocker": "CONVERSION-DX11-00400/R262 is automation-complete but runtime-untested. F18 geometry, MANAGED texture and exact live output binding behavior are complete for the current dormant receipt. F21 shader semantic translation remains missing; NativeDrawPath and Draw/DrawIndexed remain unauthorized.",
+  "runtime_next_action": "Keep NativeDrawPathActive disabled and Draw/DrawIndexed inactive. R262 completes F18 static resource-behavior proof only; F21 and matching Quest 3/VDXR runtime evidence remain required before any runtime-visible activation claim.",
+  "independent_static_next_action": "Preserve validated R239-R262. Under a new TASK_ID, implement exact F21 programmable-shader semantic-translation proof for the dormant candidate and feed it into R259 while keeping NativeDrawPath/Draw/DrawIndexed fail-closed. Runtime-visible activation remains separately gated on matching Quest 3/VDXR evidence.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -3252,10 +3252,10 @@
       "unit_id": "DX11_R262_PROGRAMMABLE_OUTPUT_RESOURCE_BEHAVIOR_PROOF",
       "task_id": "CONVERSION-DX11-00400",
       "production_id": "CONVERSION-DX11-00400",
-      "event_id": "CONVERSION-DX11-00400-E003",
+      "event_id": "CONVERSION-DX11-00400-E004",
       "event_type": "rollover",
       "attempt": "1/3",
-      "chat_rollover": 3,
+      "chat_rollover": 4,
       "rollover_is_retry": false,
       "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
       "base_sha": "b5edab688693695510004233a405b0698c229dfe",
@@ -3296,10 +3296,10 @@
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00400",
     "production_id": "CONVERSION-DX11-00400",
-    "event_id": "CONVERSION-DX11-00400-E003",
+    "event_id": "CONVERSION-DX11-00400-E004",
     "event_type": "rollover",
     "attempt": "1/3",
-    "chat_rollover": 3,
+    "chat_rollover": 4,
     "rollover_is_retry": false,
     "lane": "DX11",
     "target_branch": "vr-dx11-native-r71",
@@ -3315,7 +3315,8 @@
     "validation_job_id": 111630276099,
     "readiness_smoke_job_id": 111631104379,
     "artifact_id": 11327203741,
-    "artifact_digest": "sha256:b54c0fb5701d868852c39b83ec8eb7a1aa3dda2c134403b148cdb645c082fc21"
+    "artifact_digest": "sha256:b54c0fb5701d868852c39b83ec8eb7a1aa3dda2c134403b148cdb645c082fc21",
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started."
   },
   "rollover_metadata_correction": {
     "task_id": "CONVERSION-DX11-00371",
@@ -3372,13 +3373,21 @@
   },
   "current_task_metadata_correction": {
     "task_id": "CONVERSION-DX11-00400",
-    "authoritative": {
-      "task_id": "CONVERSION-DX11-00400",
-      "production_id": "CONVERSION-DX11-00400",
+    "corrected_from": {
       "event_id": "CONVERSION-DX11-00400-E003",
       "event_type": "rollover",
       "attempt": "1/3",
       "chat_rollover": 3,
+      "material_result_sha": "4333cad4f6288fd4ae5f15a38e53f2b9301e7146",
+      "validation_bearing_result_sha": "ed34771a6fe3bc0bb07846768ffcd52d68abaaa9"
+    },
+    "corrected_to": {
+      "task_id": "CONVERSION-DX11-00400",
+      "production_id": "CONVERSION-DX11-00400",
+      "event_id": "CONVERSION-DX11-00400-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 4,
       "rollover_is_retry": false,
       "lane": "DX11",
       "target_branch": "vr-dx11-native-r71",
@@ -3387,7 +3396,7 @@
       "automation_validation": "PASS",
       "runtime_validation": "UNTESTED"
     },
-    "reason": "The current user dispatch explicitly specifies E003/CHAT_ROLLOVER=3. A transient E004/CHAT_ROLLOVER=4 bookkeeping value was not user-authoritative and is corrected without incrementing ATTEMPT or changing the validated material result.",
+    "reason": "E004 is the latest explicit chat-rollover metadata. It supersedes E003 metadata only; validated R262 material and ATTEMPT remain unchanged.",
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_dispatch_reconciliation": {
@@ -3395,10 +3404,10 @@
     "authoritative": {
       "task_id": "CONVERSION-DX11-00400",
       "production_id": "CONVERSION-DX11-00400",
-      "event_id": "CONVERSION-DX11-00400-E003",
+      "event_id": "CONVERSION-DX11-00400-E004",
       "event_type": "rollover",
       "attempt": "1/3",
-      "chat_rollover": 3,
+      "chat_rollover": 4,
       "rollover_is_retry": false,
       "lane": "DX11",
       "target_branch": "vr-dx11-native-r71",
@@ -3407,17 +3416,17 @@
       "automation_validation": "PASS",
       "runtime_validation": "UNTESTED"
     },
-    "reason": "The current user dispatch explicitly specifies E003/CHAT_ROLLOVER=3. A transient E004/CHAT_ROLLOVER=4 bookkeeping value was not user-authoritative and is corrected without incrementing ATTEMPT or changing the validated material result.",
+    "reason": "Current E004 rollover is not a retry. Direct commit ancestry proves ed34771a validates final material 4333cad4; no completed work is repeated.",
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_task": {
     "status": "COMPLETE",
     "task_id": "CONVERSION-DX11-00400",
     "production_id": "CONVERSION-DX11-00400",
-    "event_id": "CONVERSION-DX11-00400-E003",
+    "event_id": "CONVERSION-DX11-00400-E004",
     "event_type": "rollover",
     "attempt": "1/3",
-    "chat_rollover": 3,
+    "chat_rollover": 4,
     "rollover_is_retry": false,
     "selected_work_item": "DX11_R262_PROGRAMMABLE_OUTPUT_RESOURCE_BEHAVIOR_PROOF",
     "base_sha": "b5edab688693695510004233a405b0698c229dfe",
@@ -3443,6 +3452,16 @@
     "shader_translation_proof": "MISSING_F21",
     "missing_prerequisite_mask": "0x4",
     "native_draw_path_activation_changed": false,
-    "draw_dispatch_authorized": false
+    "draw_dispatch_authorized": false,
+    "source_implementation_sha": "4333cad4f6288fd4ae5f15a38e53f2b9301e7146",
+    "final_material_lineage": {
+      "final_material_sha": "4333cad4f6288fd4ae5f15a38e53f2b9301e7146",
+      "validation_bearing_sha": "ed34771a6fe3bc0bb07846768ffcd52d68abaaa9",
+      "validation_direct_parent": true,
+      "superseded_intermediate_shas": [
+        "68e5659c9c3389ab6a7cc01144b5940d9af95244",
+        "5528c745271811eedb0517bd96af1ce2b411e5dd"
+      ]
+    }
   }
 }
