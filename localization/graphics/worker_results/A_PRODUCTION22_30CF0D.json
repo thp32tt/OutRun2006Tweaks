@@ -1,0 +1,17 @@
+{
+  "run": "20261005-A-PRODUCTION22",
+  "queue_index": 137,
+  "asset": "30CF0D",
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
+  "physical_elements": 6,
+  "bbox_size_positive_margin": "6/6",
+  "outside": 0,
+  "alpha_outside": 0,
+  "protected": 0,
+  "overlap": 0,
+  "touch": 0,
+  "worker_status": "A_PRODUCTION22_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION22/A_PRODUCTION22_30CF0D_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}

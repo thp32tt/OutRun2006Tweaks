@@ -1,0 +1,326 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION22",
+  "worker": "github-actions",
+  "queue_index": 137,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+    "git_blob_sha1": "a17e3caff8610356d70ddc52e89a7533aa99b98c",
+    "sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc"
+  },
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "pixel_raw_mode": "BGRA",
+    "pitch": 8192,
+    "depth": 0,
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "translations": [
+    {
+      "source": "MANUAL",
+      "korean": "수동",
+      "region_idx": 2
+    },
+    {
+      "source": "AUTOMATIC",
+      "korean": "자동",
+      "region_idx": 3
+    },
+    {
+      "source": "MANUAL",
+      "korean": "수동",
+      "region_idx": 4
+    },
+    {
+      "source": "AUTOMATIC",
+      "korean": "자동",
+      "region_idx": 5
+    },
+    {
+      "source": "SELECT TRANSMISSION",
+      "korean": "변속 방식 선택",
+      "region_idx": 6
+    },
+    {
+      "source": "TRANSMISSION",
+      "korean": "변속 방식",
+      "region_idx": 7
+    }
+  ],
+  "physical_elements": 6,
+  "rows": [
+    {
+      "key": "manual_large",
+      "region_idx": 2,
+      "source": "MANUAL",
+      "korean": "수동",
+      "cell": [
+        0,
+        220,
+        888,
+        96
+      ],
+      "original_bbox": [
+        1,
+        235,
+        397,
+        315
+      ],
+      "localized_bbox": [
+        130,
+        237,
+        268,
+        313
+      ],
+      "source_width": 396,
+      "source_height": 80,
+      "localized_width": 138,
+      "localized_height": 76,
+      "delta_left": 129,
+      "delta_right": 129,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 76,
+      "stroke_width": 4,
+      "slant": 0.08
+    },
+    {
+      "key": "automatic_large",
+      "region_idx": 3,
+      "source": "AUTOMATIC",
+      "korean": "자동",
+      "cell": [
+        888,
+        220,
+        888,
+        96
+      ],
+      "original_bbox": [
+        889,
+        233,
+        1775,
+        315
+      ],
+      "localized_bbox": [
+        1263,
+        235,
+        1401,
+        313
+      ],
+      "source_width": 886,
+      "source_height": 82,
+      "localized_width": 138,
+      "localized_height": 78,
+      "delta_left": 374,
+      "delta_right": 374,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 75,
+      "stroke_width": 4,
+      "slant": 0.08
+    },
+    {
+      "key": "manual_small",
+      "region_idx": 4,
+      "source": "MANUAL",
+      "korean": "수동",
+      "cell": [
+        0,
+        136,
+        808,
+        84
+      ],
+      "original_bbox": [
+        14,
+        148,
+        339,
+        210
+      ],
+      "localized_bbox": [
+        124,
+        150,
+        229,
+        208
+      ],
+      "source_width": 325,
+      "source_height": 62,
+      "localized_width": 105,
+      "localized_height": 58,
+      "delta_left": 110,
+      "delta_right": 110,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 57,
+      "stroke_width": 3,
+      "slant": 0.04
+    },
+    {
+      "key": "automatic_small",
+      "region_idx": 5,
+      "source": "AUTOMATIC",
+      "korean": "자동",
+      "cell": [
+        808,
+        136,
+        808,
+        84
+      ],
+      "original_bbox": [
+        822,
+        147,
+        1376,
+        216
+      ],
+      "localized_bbox": [
+        1041,
+        149,
+        1157,
+        214
+      ],
+      "source_width": 554,
+      "source_height": 69,
+      "localized_width": 116,
+      "localized_height": 65,
+      "delta_left": 219,
+      "delta_right": 219,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 63,
+      "stroke_width": 3,
+      "slant": 0.04
+    },
+    {
+      "key": "select_transmission",
+      "region_idx": 6,
+      "source": "SELECT TRANSMISSION",
+      "korean": "변속 방식 선택",
+      "cell": [
+        0,
+        56,
+        1276,
+        80
+      ],
+      "original_bbox": [
+        5,
+        67,
+        868,
+        130
+      ],
+      "localized_bbox": [
+        272,
+        69,
+        601,
+        128
+      ],
+      "source_width": 863,
+      "source_height": 63,
+      "localized_width": 329,
+      "localized_height": 59,
+      "delta_left": 267,
+      "delta_right": 267,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 56,
+      "stroke_width": 3,
+      "slant": 0.08
+    },
+    {
+      "key": "transmission_small",
+      "region_idx": 7,
+      "source": "TRANSMISSION",
+      "korean": "변속 방식",
+      "cell": [
+        1276,
+        88,
+        508,
+        48
+      ],
+      "original_bbox": [
+        1288,
+        96,
+        1569,
+        128
+      ],
+      "localized_bbox": [
+        1379,
+        98,
+        1478,
+        126
+      ],
+      "source_width": 281,
+      "source_height": 32,
+      "localized_width": 99,
+      "localized_height": 28,
+      "delta_left": 91,
+      "delta_right": 91,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 26,
+      "stroke_width": 1,
+      "slant": 0.04
+    }
+  ],
+  "clean_source_mask_pixels_unchanged": 0,
+  "clean_changed_pixels_outside_source_bboxes": 0,
+  "localized_overlap_pixels": 0,
+  "localized_touch_pixels": 0,
+  "decoded_changes": {
+    "changed_pixels_total": 109984,
+    "changed_pixels_outside_source_bboxes": 0,
+    "alpha_changed_pixels_outside_source_bboxes": 0,
+    "protected_visible_pixels_changed": 0
+  },
+  "bbox_size_positive_margin": "6/6",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A_PRODUCTION22_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
