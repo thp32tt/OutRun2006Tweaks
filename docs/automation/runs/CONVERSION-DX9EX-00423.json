@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00423",
+  "production_id": "CONVERSION-DX9EX-00423",
+  "event_id": "CONVERSION-DX9EX-00423-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "VALIDATION_PENDING_INFRA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "a7b7b430cd76b178462073f422c23f759668eb3b",
+  "material_result_sha": "272274d079b13eccde0d8aa8ef8d38767cdd215e",
+  "validation_bearing_result_sha": "dc9e1cbb3769a7cbd9a6b2c0b4173f742e972579",
+  "result_sha": "dc9e1cbb3769a7cbd9a6b2c0b4173f742e972579",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00423]",
+  "selected_work_item": "L3-DX9EX-001",
+  "summary": "Centralized the physical four-slot DirectGPU COM teardown behind ReleaseDirectTransportSlotObjects while preserving the distinct reset-time target-size retention and explicit ReleaseDirectTransportSlots width/height reset semantics. Added a deterministic guard requiring one physical slot COM teardown owner.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00423.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered latest bookkeeping HEAD a7b7b430cd76b178462073f422c23f759668eb3b; reread AGENTS.md, VR_REFACTOR_STATE, VR_AUTODEV_STATE, problem history, queue contract, and recent refactor/test commits. Post-1100 R31/R32 extraction chain remains explicitly COMPLETE."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "General L3 lifecycle review found ReleaseStereoResources and ReleaseDirectTransportSlots duplicated the same physical 4-slot fence/surface/texture COM release. Review confirmed reset intentionally retains DirectTransportWidth/Height while explicit direct-slot invalidation clears them, so only physical release ownership was extracted."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "272274d079b13eccde0d8aa8ef8d38767cdd215e added ReleaseDirectTransportSlotObjects and routed both teardown paths through it without changing ordering, waits, copies, D3D getters, generation handling, or size-retention semantics. dc9e1cbb3769a7cbd9a6b2c0b4173f742e972579 added recurrence guards requiring exactly one physical slot COM teardown owner."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING_INFRA",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact-SHA DX9Ex Active Validation 37370761915 was created for dc9e1cbb3769a7cbd9a6b2c0b4173f742e972579. Its policy job 111967008654 remains queued before execution. GitHub Status reports degraded Actions performance and delays assigning GitHub-hosted runners across multiple runner configurations. No code/test failure occurred and no repair attempt is consumed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "272274d079b13eccde0d8aa8ef8d38767cdd215e refactor(vr): centralize direct transport slot teardown [AUTO:CONVERSION-DX9EX-00423]",
+        "dc9e1cbb3769a7cbd9a6b2c0b4173f742e972579 test(vr): guard single direct transport slot teardown owner [AUTO:CONVERSION-DX9EX-00423]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING_REQUIRED_GATE",
+      "evidence": "Canonical package job has not started because the required DX9Ex Active workflow is waiting for a hosted runner."
+    },
+    "C6_STATE": {
+      "status": "CHECKPOINTED_VALIDATION_PENDING_INFRA",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37370761915,
+      "exact_sha": "dc9e1cbb3769a7cbd9a6b2c0b4173f742e972579",
+      "status": "PENDING_HOSTED_RUNNER",
+      "policy_job": 111967008654
+    },
+    "domain_isolation_auxiliary": {
+      "run_id": 37370761931,
+      "exact_sha": "dc9e1cbb3769a7cbd9a6b2c0b4173f742e972579",
+      "status": "QUEUED_HOSTED_RUNNER"
+    },
+    "external_ci_status": {
+      "service": "GitHub Actions",
+      "status": "DEGRADED_PERFORMANCE",
+      "reason": "delays assigning GitHub-hosted runners",
+      "observed_utc": "2026-10-05T19:50:00Z"
+    },
+    "n100_auxiliary": {
+      "status": "UNAVAILABLE",
+      "reason": "Desktop Commander monthly usage limit; no reconnect/retry attempted."
+    }
+  },
+  "next_action": "On retry/rollover, first recover DX9Ex Active run 37370761915 for exact validation-bearing SHA dc9e1cbb3769a7cbd9a6b2c0b4173f742e972579. If it completed SUCCESS, record PASS without source changes; if still runner-pending, do not consume a repair attempt. Runtime remains UNTESTED until Quest3/VDXR evidence exists.",
+  "checkpointed_at_kst": "2026-10-06T05:51:00+09:00"
+}
