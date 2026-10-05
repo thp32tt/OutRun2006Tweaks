@@ -10451,6 +10451,40 @@ def main() -> None:
                 missing_r266_programmable_shader_register_semantics)
         )
 
+    r267_programmable_shader_interface_semantics_contract = [
+        ("struct ProgrammableShaderInterfaceSemantics",
+         PIPELINE_TRANSLATION_HPP, "R267 interface semantic evidence type"),
+        ("decode_programmable_shader_interface_semantics(",
+         PIPELINE_TRANSLATION_HPP, "R267 interface semantic decoder declaration"),
+        ("R267_D3D9_SM3_INTERFACE_DECLARATION_SEMANTICS_V1",
+         PIPELINE_TRANSLATION_CPP, "R267 interface decoder revision provenance"),
+        ("R267_EXPLICIT_DCL_USAGE_INDEX_REGISTER_WRITEMASK_PROVENANCE_V1",
+         PIPELINE_TRANSLATION_CPP, "R267 interface semantic contract provenance"),
+        ("interfaceSemanticsExact",
+         RUNTIME_CENSUS, "R267 production census records interface exactness"),
+        ("decode_programmable_shader_interface_semantics(",
+         RUNTIME_CENSUS, "R267 production census consumes exact R265/R266 evidence"),
+        ("interfaceSemanticsHash",
+         RUNTIME_CENSUS, "R267 production identity retains interface hash"),
+        ("R267 decodes exact SM3 DCL input/output interface semantics",
+         CONSTANT_BUFFER_PROBE, "R267 positive SM3 DCL interface regression"),
+        ("R267 rejects SM2 DCL interface semantics",
+         CONSTANT_BUFFER_PROBE, "R267 SM2 fail-closed regression"),
+        ("R267 rejects duplicate SM3 interface semantic declarations",
+         CONSTANT_BUFFER_PROBE, "R267 duplicate-semantic fail-closed regression"),
+    ]
+    missing_r267_programmable_shader_interface_semantics = [
+        meaning for token, source, meaning
+        in r267_programmable_shader_interface_semantics_contract
+        if token not in source
+    ]
+    if missing_r267_programmable_shader_interface_semantics:
+        raise SystemExit(
+            "DX11 R267 programmable shader interface-semantics drift: "
+            + ", ".join(
+                missing_r267_programmable_shader_interface_semantics)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
