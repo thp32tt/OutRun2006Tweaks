@@ -10313,8 +10313,16 @@ def main() -> None:
          NATIVE_BACKEND_CPP, "R263 vertex semantic exactness gate"),
         ("out.pixelSemanticExact =",
          NATIVE_BACKEND_CPP, "R263 pixel semantic exactness gate"),
+        ("out.constantRegisterMappingExact =",
+         NATIVE_BACKEND_CPP, "R263 constant-register semantic exactness gate"),
+        ("out.samplerMappingExact =",
+         NATIVE_BACKEND_CPP, "R263 sampler semantic exactness gate"),
         ("out.interfaceLinkExact =",
          NATIVE_BACKEND_CPP, "R263 stage-interface semantic exactness gate"),
+        ("out.translatorRevisionHash =",
+         NATIVE_BACKEND_CPP, "R263 translator revision provenance"),
+        ("out.semanticContractHash =",
+         NATIVE_BACKEND_CPP, "R263 semantic-contract provenance"),
         ("out.semanticProofPresent =",
          NATIVE_BACKEND_CPP, "R263 complete F21 semantic proof gate"),
         ("token, 0x263u",
@@ -10323,6 +10331,10 @@ def main() -> None:
          CONSTANT_BUFFER_PROBE, "R263 exact F21 positive regression"),
         ("R263 rejects incomplete programmable shader interface semantic proof",
          CONSTANT_BUFFER_PROBE, "R263 incomplete interface fail-closed regression"),
+        ("R263 rejects incomplete programmable constant-register semantic proof",
+         CONSTANT_BUFFER_PROBE, "R263 incomplete constant-register fail-closed regression"),
+        ("R263 rejects incomplete programmable sampler semantic proof",
+         CONSTANT_BUFFER_PROBE, "R263 incomplete sampler fail-closed regression"),
     ]
     missing_r263_programmable_shader_semantic_translation = [
         meaning for token, source, meaning
