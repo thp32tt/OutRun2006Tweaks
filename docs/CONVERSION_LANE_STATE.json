@@ -53,7 +53,7 @@
   "latest_durable_task": {
     "task_id": "CONVERSION-DX11-00402",
     "production_id": "CONVERSION-DX11-00402",
-    "event_id": "CONVERSION-DX11-00402-E007",
+    "event_id": "CONVERSION-DX11-00402-E009",
     "event_type": "rollover",
     "attempt": "1/3",
     "dispatch_source": "CURRENT_USER_QUEUE",
@@ -84,7 +84,7 @@
       "179a2f6db481df5435e012cfbf01a48179c3b4ab"
     ],
     "native_draw_path_activation_changed": false,
-    "chat_rollover": 4,
+    "chat_rollover": 5,
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt",
     "lane": "DX11",
@@ -3343,10 +3343,10 @@
       "unit_id": "DX11_R264_PROGRAMMABLE_SHADER_SOURCE_EVIDENCE_PRODUCER",
       "task_id": "CONVERSION-DX11-00402",
       "production_id": "CONVERSION-DX11-00402",
-      "event_id": "CONVERSION-DX11-00402-E007",
+      "event_id": "CONVERSION-DX11-00402-E009",
       "event_type": "rollover",
       "attempt": "1/3",
-      "chat_rollover": 4,
+      "chat_rollover": 5,
       "rollover_is_retry": false,
       "resume_reason": "Retry persisted after one recovery attempt",
       "base_sha": "fcbca61db7c226acbac135b837fa21b7f6d9ecb7",
@@ -3391,7 +3391,7 @@
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00402",
     "production_id": "CONVERSION-DX11-00402",
-    "event_id": "CONVERSION-DX11-00402-E007",
+    "event_id": "CONVERSION-DX11-00402-E009",
     "event_type": "rollover",
     "attempt": "1/3",
     "lane": "DX11",
@@ -3409,7 +3409,7 @@
     "readiness_smoke_job_id": 111650766235,
     "artifact_id": 11329673195,
     "artifact_digest": "sha256:8aa35ed8e647b5049bf25d98de61ce659fea40924aa7dca9a1dce2ffe17dcbb6",
-    "chat_rollover": 4,
+    "chat_rollover": 5,
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt"
   },
@@ -3471,10 +3471,10 @@
     "authoritative": {
       "task_id": "CONVERSION-DX11-00402",
       "production_id": "CONVERSION-DX11-00402",
-      "event_id": "CONVERSION-DX11-00402-E007",
+      "event_id": "CONVERSION-DX11-00402-E009",
       "event_type": "rollover",
       "attempt": "1/3",
-      "chat_rollover": 4,
+      "chat_rollover": 5,
       "rollover_is_retry": false,
       "resume_reason": "Retry persisted after one recovery attempt",
       "lane": "DX11",
@@ -3484,19 +3484,25 @@
       "automation_validation": "PASS",
       "runtime_validation": "UNTESTED"
     },
-    "corrected_from": [],
-    "reason": "E007/CHAT_ROLLOVER=4 is the authoritative current user dispatch. No prior durable 00402 record or material existed at recovery; the rollover is not a retry, so ATTEMPT remains 1/3. R264 was implemented from the completed 00401 next action and exact-SHA validated.",
-    "material_and_validation_bearing_sha_unchanged": false
+    "corrected_from": [
+      {
+        "event_id": "CONVERSION-DX11-00402-E007",
+        "event_type": "rollover",
+        "chat_rollover": 4
+      }
+    ],
+    "reason": "E009/CHAT_ROLLOVER=5 supersedes earlier E007 bookkeeping only. This rollover is not a retry; ATTEMPT stays 1/3 and validated R264 material is unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
   },
   "current_dispatch_reconciliation": {
     "task_id": "CONVERSION-DX11-00402",
     "authoritative": {
       "task_id": "CONVERSION-DX11-00402",
       "production_id": "CONVERSION-DX11-00402",
-      "event_id": "CONVERSION-DX11-00402-E007",
+      "event_id": "CONVERSION-DX11-00402-E009",
       "event_type": "rollover",
       "attempt": "1/3",
-      "chat_rollover": 4,
+      "chat_rollover": 5,
       "rollover_is_retry": false,
       "resume_reason": "Retry persisted after one recovery attempt",
       "lane": "DX11",
@@ -3506,15 +3512,21 @@
       "automation_validation": "PASS",
       "runtime_validation": "UNTESTED"
     },
-    "supersedes_stale_metadata": [],
-    "reason": "Current E007 rollover is authoritative and is not a retry. The prior durable task was completed 00401/R263; 00402 adds new R264 production raw-source evidence without repeating R263 or enabling native draw.",
-    "material_and_validation_bearing_sha_unchanged": false
+    "supersedes_stale_metadata": [
+      {
+        "event_id": "CONVERSION-DX11-00402-E007",
+        "event_type": "rollover",
+        "chat_rollover": 4
+      }
+    ],
+    "reason": "Current E009 rollover is authoritative and not a retry. Completed R264 source work is not repeated.",
+    "material_and_validation_bearing_sha_unchanged": true
   },
   "current_task": {
     "status": "COMPLETE",
     "task_id": "CONVERSION-DX11-00402",
     "production_id": "CONVERSION-DX11-00402",
-    "event_id": "CONVERSION-DX11-00402-E007",
+    "event_id": "CONVERSION-DX11-00402-E009",
     "event_type": "rollover",
     "attempt": "1/3",
     "selected_work_item": "DX11_R264_PROGRAMMABLE_SHADER_SOURCE_EVIDENCE_PRODUCER",
@@ -3556,7 +3568,7 @@
       ]
     },
     "evidence_scope": "PRODUCTION_RAW_SHADER_SOURCE_EVIDENCE_ONLY",
-    "chat_rollover": 4,
+    "chat_rollover": 5,
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt",
     "lane": "DX11",
