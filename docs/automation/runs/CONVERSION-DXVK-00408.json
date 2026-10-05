@@ -2,7 +2,7 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DXVK-00408",
   "production_id": "CONVERSION-DXVK-00408",
-  "event_id": "CONVERSION-DXVK-00408-E006",
+  "event_id": "CONVERSION-DXVK-00408-E002",
   "event_type": "rollover",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
@@ -121,7 +121,7 @@
   "pipeline": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered GitHub SSOT from 00407 C6 state and current branch history. E006/CHAT_ROLLOVER=4 is a conversation rollover, not a task retry, so ATTEMPT remains 1/3. No completed 00407 work was repeated."
+      "evidence": "Recovered GitHub SSOT from the completed F141 material/validation result and durable 00408 records. The current explicit event is E002/CHAT_ROLLOVER=2; this is a conversation rollover, not a task retry, so ATTEMPT remains 1/3. Completed F141 material work was not repeated."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
@@ -146,22 +146,22 @@
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "evidence": "Durable run record, Issue #14 ledger comment 5990984470, and branch-local conversion state are reconciled to E006/CHAT_ROLLOVER=4 while preserving bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb as material/validation-bearing SHA, F142 successor, ATTEMPT=1/3 and RUNTIME_VALIDATION=UNTESTED."
+      "evidence": "Durable run record, Issue #14 correction comment 5991038473, and branch-local conversion state are reconciled to the current explicit E002/CHAT_ROLLOVER=2 metadata while preserving bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb as material/validation-bearing SHA, the F142 successor, ATTEMPT=1/3 and RUNTIME_VALIDATION=UNTESTED."
     }
   },
   "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
   "runtime_test_performed": false,
   "runtime_validation": "UNTESTED",
-  "issue14_comment_id": 5990984470,
+  "issue14_comment_id": 5991038473,
   "controller_dispatch": {
     "task_id": "CONVERSION-DXVK-00408",
     "production_id": "CONVERSION-DXVK-00408",
-    "event_id": "CONVERSION-DXVK-00408-E006",
+    "event_id": "CONVERSION-DXVK-00408-E002",
     "event_type": "rollover",
     "attempt": "1/3",
-    "chat_rollover": 4,
+    "chat_rollover": 2,
     "rollover_is_retry": false,
-    "resume_reason": "Retry persisted after one recovery attempt",
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
     "source": "CURRENT_USER_ROLLOVER",
     "material_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
     "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
@@ -181,7 +181,28 @@
   },
   "exact_next_action": "Build F142 exact raw canonical overlap provenance from 0x00183C3D for a 64-byte window through 0x00183C7D. Consume the inherited 0x00183C3D:eb only after the complete short-JMP instruction is proven from overlap, carry any direct-control-flow debt fail-closed, preserve any new trailing cut, and keep indirect-call/function/render/HUD/runtime semantics unresolved.",
   "recorded_at_kst": "2026-10-05T17:35:00+09:00",
-  "chat_rollover": 4,
+  "chat_rollover": 2,
   "rollover_is_retry": false,
-  "resume_reason": "Retry persisted after one recovery attempt"
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+  "rollover_metadata_correction": {
+    "corrected_from": {
+      "event_id": "CONVERSION-DXVK-00408-E006",
+      "event_type": "rollover",
+      "chat_rollover": 4,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "issue14_comment_id": 5990984470
+    },
+    "corrected_to": {
+      "event_id": "CONVERSION-DXVK-00408-E002",
+      "event_type": "rollover",
+      "chat_rollover": 2,
+      "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+      "issue14_comment_id": 5991038473
+    },
+    "authority": "CURRENT_EXPLICIT_USER_ROLLOVER",
+    "reason": "The current user supplied E002/CHAT_ROLLOVER=2 and the queue-grace-period resume reason. This correction changes bookkeeping only; material/validation-bearing SHA, completed F141 evidence, ATTEMPT=1/3, and RUNTIME_VALIDATION=UNTESTED are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true,
+    "reconciled_at_kst": "2026-10-05T17:38:00+09:00"
+  },
+  "reconciled_at_kst": "2026-10-05T17:38:00+09:00"
 }
