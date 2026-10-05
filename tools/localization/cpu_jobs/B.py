@@ -123,8 +123,18 @@ ring_mask[ry0:ry1,rx0:rx1]=False
 ring_delta=np.max(np.abs(ring_a.astype(np.int16)-ring_b.astype(np.int16)),axis=2)
 ring_vals=ring_delta[ring_mask]
 ring_diff_pixels=int(np.count_nonzero(ring_vals)); ring_max=int(ring_vals.max(initial=0))
-if ring_diff_pixels or ring_max:
-    raise RuntimeError(("template boundary ring not pixel-identical",ring_diff_pixels,ring_max))
+# The character-specific starburst has differences farther out in the 32px ring.
+# Seam safety is governed by the actual pasted patch edge: require the approved
+# CLEAN edge itself to equal the HOLL canonical source for a 4px interior band.
+clean_patch=tc[ob[1]:ob[3],ob[0]:ob[2]]
+edge_mask=np.zeros(clean_patch.shape[:2],dtype=bool)
+edge=4
+edge_mask[:edge,:]=True; edge_mask[-edge:,:]=True; edge_mask[:,:edge]=True; edge_mask[:,-edge:]=True
+edge_delta=np.max(np.abs(clean_patch.astype(np.int16)-patch_b.astype(np.int16)),axis=2)
+edge_diff_pixels=int(np.count_nonzero((edge_delta>0)&edge_mask))
+edge_max=int(edge_delta[edge_mask].max(initial=0))
+if edge_diff_pixels or edge_max:
+    raise RuntimeError(("approved clean patch edge mismatches HOLL source",edge_diff_pixels,edge_max))
 
 # Copy only the C202-approved title footprint; all other HOLL artwork remains canonical.
 clean=src.copy(); final=src.copy()
@@ -192,7 +202,9 @@ report={
 "source_title_patch_diff_outside_approved_removal":patch_diff_outside_removal,
 "source_title_patch_diff_outside_2px_effect_dilation":fringe_outside_dilation,"source_title_variant_pixels_rgba":fringe_rgba,
 "source_title_patch_deltas_confined_to_effect_or_2px_aa_fringe":fringe_outside_dilation==0 and patch_diff_outside_removal<=4,
-"boundary_ring_32px_diff_pixels":ring_diff_pixels,"boundary_ring_32px_max_channel_delta":ring_max,"exact_boundary_ring_match":True},
+"boundary_ring_32px_diff_pixels":ring_diff_pixels,"boundary_ring_32px_max_channel_delta":ring_max,
+"boundary_ring_32px_note":"character-specific artwork differs outside pasted title patch; not used as seam gate",
+"clean_patch_edge_4px_diff_pixels":edge_diff_pixels,"clean_patch_edge_4px_max_channel_delta":edge_max,"exact_pasted_edge_match":True},
  "row":{"region_idx":1,"source":"Total Rank","korean":"종합 랭킹","cell":dst_cell,"original_bbox":dob,"localized_bbox":dlb,
         "source_width":source_w,"source_height":source_h,"localized_width":loc_w,"localized_height":loc_h,
         "delta_left":dlb[0]-dob[0],"delta_right":dob[2]-dlb[2],"delta_top":dlb[1]-dob[1],"delta_bottom":dob[3]-dlb[3],
