@@ -583,29 +583,6 @@ namespace WheelProfileStore
             if (auto v=pick("InvertForce","false")) return v;
             if (auto v=pick("InvertSpring","false")) return v;
         }
-        else if (model == 2) // Arcade + Modern Hybrid
-        {
-            if (auto v=pick("Model","2")) return v;
-            if (auto v=pick("PhysicsSAT","true")) return v;
-            if (auto v=pick("SpringStrength","0.22")) return v;
-            if (auto v=pick("SpringSaturation","0.55")) return v;
-            if (auto v=pick("DamperStrength","0.28")) return v;
-            if (auto v=pick("UseHardwareDamper","true")) return v;
-            if (auto v=pick("SteeringWeight","1.60")) return v;
-            if (auto v=pick("MechanicalTrail","0.30")) return v;
-            if (auto v=pick("TrailResponseLead","0.40")) return v;
-            if (auto v=pick("GripLoss","0.65")) return v;
-            if (auto v=pick("WeightTransfer","0.15")) return v;
-            if (auto v=pick("SlewRate","0.12")) return v;
-            if (auto v=pick("ReversalReleaseRate","0.30")) return v;
-            if (auto v=pick("RoadTexture","1.0")) return v;
-            if (auto v=pick("WallImpact","1.0")) return v;
-            if (auto v=pick("GearShift","1.0")) return v;
-            if (auto v=pick("TireSlip","0.04")) return v;
-            if (auto v=pick("UsePeriodicEffects","false")) return v;
-            if (auto v=pick("InvertForce","false")) return v;
-            if (auto v=pick("InvertSpring","false")) return v;
-        }
         else if (model == 3) // PS2 Original
         {
             if (auto v=pick("Model","3")) return v;
@@ -655,9 +632,9 @@ namespace WheelProfileStore
             }
         }
 
-        // Hybrid is retired. Loading a legacy Model=2 feel profile must not
-        // resurrect Hybrid-owned road/event/polarity values on top of Modern.
-        // Convert it to a clean Modern reference baseline instead.
+        // Model=2 is retired. Loading an old feel profile must not resurrect
+        // the experimental event/polarity mix on top of Modern. Convert it to
+        // a clean Modern reference baseline instead.
         if (profileModel == 2)
         {
             profileModel = 0;
