@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C171-754F0599",
+  "qa_id": "C171",
+  "queue_index": 175,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "producer_run": "20261005-A-PRODUCTION29",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "candidate_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+  "candidate_changed_by_C": false,
+  "independent_method": "Pinned canonical source re-download; exact DDS header/hash check; independent mirror_y decode; exact alpha bbox derivation for three physical rows; containment/size/positive-margin, outside/alpha/introduced-visible, row overlap/touch and source-residue checks.",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "semantic_binding": [
+    {
+      "source": "stage select",
+      "korean": "스테이지 선택"
+    },
+    {
+      "source": "showroom",
+      "korean": "쇼룸"
+    },
+    {
+      "source": "single player",
+      "korean": "싱글 플레이"
+    }
+  ],
+  "rows": [
+    {
+      "row": 0,
+      "original_bbox": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "localized_bbox": [
+        10,
+        274,
+        1021,
+        377
+      ],
+      "source_size": [
+        1366,
+        143
+      ],
+      "localized_size": [
+        1011,
+        103
+      ],
+      "delta_left": 4,
+      "delta_right": 351,
+      "delta_top": 20,
+      "delta_bottom": 20,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "row": 1,
+      "original_bbox": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "localized_bbox": [
+        10,
+        415,
+        561,
+        510
+      ],
+      "source_size": [
+        950,
+        132
+      ],
+      "localized_size": [
+        551,
+        95
+      ],
+      "delta_left": 4,
+      "delta_right": 395,
+      "delta_top": 18,
+      "delta_bottom": 19,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "row": 2,
+      "original_bbox": [
+        2,
+        566,
+        1386,
+        717
+      ],
+      "localized_bbox": [
+        6,
+        587,
+        1030,
+        696
+      ],
+      "source_size": [
+        1384,
+        151
+      ],
+      "localized_size": [
+        1024,
+        109
+      ],
+      "delta_left": 4,
+      "delta_right": 356,
+      "delta_top": 21,
+      "delta_bottom": 21,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "decoded_changed_outside": 0,
+    "alpha_changed_outside": 0,
+    "introduced_visible_outside": 0,
+    "localized_overlap": 0,
+    "localized_1px_touch": 0,
+    "source_residue": 0
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

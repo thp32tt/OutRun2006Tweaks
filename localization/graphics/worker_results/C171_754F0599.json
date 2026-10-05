@@ -1,0 +1,11 @@
+{
+  "run": "20261005-C171-754F0599",
+  "qa_id": "C171",
+  "asset": "754F0599",
+  "index": 175,
+  "candidate_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "3/3",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_C/20261005-C171-754F0599/C171_754F_MACHINE_QA.json"
+}
