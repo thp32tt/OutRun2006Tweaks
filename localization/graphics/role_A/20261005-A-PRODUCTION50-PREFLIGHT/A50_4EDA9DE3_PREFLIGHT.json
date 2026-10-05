@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION50-PREFLIGHT",
+  "index": 159,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+  "worker": "github-actions",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "blob_sha1": "8685dc0122bff16243faca3ca3cbc1308b241b08",
+    "sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd"
+  },
+  "atlas_provenance": {
+    "blob_sha1": "ff05bb13de866f809ea96052e72fde1a4769b3cc",
+    "sha256": "d97b656d5171b3cb74d7ecd52cf0245d073b0972c9c356e64f440dac7846a837",
+    "regions": 15
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "fourcc": "\u0000\u0000\u0000\u0000",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "regions": [
+    {
+      "idx": 0,
+      "rect": [
+        0,
+        936,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 1,
+      "rect": [
+        980,
+        936,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 2,
+      "rect": [
+        0,
+        848,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 3,
+      "rect": [
+        980,
+        848,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 4,
+      "rect": [
+        0,
+        760,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 5,
+      "rect": [
+        980,
+        760,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 6,
+      "rect": [
+        0,
+        672,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 7,
+      "rect": [
+        980,
+        672,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 8,
+      "rect": [
+        0,
+        584,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 9,
+      "rect": [
+        980,
+        584,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 10,
+      "rect": [
+        0,
+        496,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 11,
+      "rect": [
+        980,
+        496,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 12,
+      "rect": [
+        0,
+        408,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 13,
+      "rect": [
+        980,
+        408,
+        980,
+        88
+      ]
+    },
+    {
+      "idx": 14,
+      "rect": [
+        0,
+        320,
+        980,
+        88
+      ]
+    }
+  ],
+  "status": "A50_BINDING_CONTACT_READY_CONTINUE_SAME_INVOCATION",
+  "runtime_validation": "UNTESTED"
+}
