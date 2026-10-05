@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T00:26:18+09:00",
+  "updated_at_kst": "2026-10-06T00:48:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B157 completed the oldest B-even zoom_review index36 06AB5CEE without reopening prior PASS assets. Canonical 4096x4096 RGBA32/raw mirror_y JENN rank source contains three physical Total Rank labels: warm starburst, pink speech bubble and green speech bubble. B157 reused only title-removal/render pixels from already-C-approved C202/C206 same-family templates while preserving every Jennifer-specific pixel outside exact edit masks. Candidate 0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5 passes 3/3 exact bbox+size+positive margins, CLEAN/FINAL validators, outside/alpha/source-residue/overlap/touch=0 and controller SOURCE/CLEAN/FINAL + raw mirror_y visual self-QA. Queue index36 zoom_review -> localize_text; pending-C=06AB5CEE; producer REWORK remains only 37759842; pending_artwork localize_text=7. Queue counts now 85 localize_text + 41 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.",
+  "next_checkpoint": "C215/C217 consumed only the latest completed B157 and A76 candidates. C215 independently rebuilt JENN index36 06AB5CEE from C202/C206-approved same-family Total Rank templates: candidate 0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5 matches the independent composite pixel-for-pixel, 3/3 exact bbox/size/positive margins and outside/alpha/visible/unsafe-variant gates all 0; controller readable/raw visual PASS -> C215_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. C217 independently revalidated latest A76 index205 ACF61D7C candidate 2bbb9d19a833fb6c9ade243eb70132ef5ce46150d1fa1cb9423ff4e5101b770c: 23/23 exact localized bbox/size/positive margins; outside/alpha/visible/protected/product-token/source-residue all 0; true idx10 phrase/token geometry independently recovered and A72 edge-strip defect absent. A76 restores source-scale hierarchy (dark main 56/66px, congrats 72/82px, red headings ~0.92-0.94 source height) with natural spacing; protected song titles/product tokens exact. C217_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. C214/A72 and C216/A75 are superseded verifier iterations and not separate completions. Current producer REWORK=1 (37759842); pending-C=0; pending_artwork localize_text=6. Queue counts 85 localize_text + 41 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -270,10 +270,8 @@
         "37759842"
       ],
       "remaining": 1,
-      "note": "B157 promoted index36 06AB5CEE from zoom_review and produced a 3-label Korean candidate pending independent C. C212/C213 remain final for prior A70/B155 results. Only 37759842 remains producer REWORK; pending_artwork localize_text=7; pending-C=06AB5CEE; RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": [
-        "06AB5CEE"
-      ]
+      "note": "C215 approved B157 JENN 06AB5CEE and C217 approved latest A76 ACF61D7C. Only 37759842 remains producer REWORK; pending_artwork localize_text=6; pending-C=0. B158 next zoom-review preflight may proceed independently. RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": []
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -297,18 +295,15 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C212_C213",
-      "report": "localization/graphics/role_C/20261005-C212-C213-BATCH/C212_C213_BATCH_FINAL_QA.json",
-      "result": "C212_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME + C213_PRESERVE_ORIGINAL_POLICY_PASS_NO_CANDIDATE_REQUIRED",
+      "run": "C215_C217",
+      "report": "localization/graphics/role_C/20261006-C215-C217-BATCH/C215_C217_BATCH_FINAL_QA.json",
+      "result": "C215_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME + C217_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
       "candidate_changed_by_C": false,
       "assets_checked": 2,
-      "physical_elements_checked": 13,
-      "semantic_policy_items_checked": 6,
+      "physical_elements_checked": 26,
       "pixel_visual_pass_assets": [
-        "97E863AD"
-      ],
-      "policy_pass_no_candidate_assets": [
-        "49BB5FE5"
+        "06AB5CEE",
+        "ACF61D7C"
       ],
       "rework_required_assets": [],
       "global_rework_remaining": [
@@ -320,18 +315,20 @@
         "75C3586A"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 7,
+      "pending_production_localize_text": 6,
       "machine_evidence": {
-        "97E863AD": "localization/graphics/role_C/20261005-C212-97E863AD/C212_97E863AD_MACHINE_QA.json"
+        "06AB5CEE": "localization/graphics/role_C/20261006-C215-06AB5CEE/C215_06AB5CEE_MACHINE_QA.json",
+        "ACF61D7C": "localization/graphics/role_C/20261006-C217-ACF61D7C/C217_ACF61D7C_MACHINE_QA.json"
       },
       "controller_visual": {
-        "97E863AD": "PASS",
-        "49BB5FE5": "NOT_APPLICABLE_PRESERVE_ORIGINAL_POLICY"
+        "06AB5CEE": "PASS",
+        "ACF61D7C": "PASS"
       },
-      "policy_evidence": {
-        "49BB5FE5": "localization/graphics/role_C/20261005-C213-49BB5FE5-POLICY/C213_49BB5FE5_CONTROLLER_FINAL_QA.json"
-      },
-      "in_game_validation": "97E863AD UNTESTED; 49BB5FE5 NOT_APPLICABLE_FOR_LOCALIZATION; RUNTIME_VALIDATION=UNTESTED"
+      "superseded_verifier_evidence": [
+        "C214/A72",
+        "C216/A75"
+      ],
+      "in_game_validation": "06AB5CEE UNTESTED; ACF61D7C UNTESTED; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION157",
@@ -553,7 +550,7 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 7,
+    "current_pending_artwork_localize_text": 6,
     "current_producer_rework_remaining": 1,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T20:39:22+09:00",
@@ -1239,7 +1236,7 @@
       "report": "localization/graphics/role_C/20261005-C170-754F0599/C170_754F_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C212-C213-BATCH/C212_C213_BATCH_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261006-C215-C217-BATCH/C215_C217_BATCH_FINAL_QA.json",
     "c171_controller_final_qa": {
       "timestamp_kst": "2026-10-05T16:06:00+09:00",
       "run": "20261005-C171-754F0599",
