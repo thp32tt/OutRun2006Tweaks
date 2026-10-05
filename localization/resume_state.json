@@ -1,5 +1,5 @@
 {
-  "schema_version": 88,
+  "schema_version": 89,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_PRODUCTION49 completed odd index 147 39BCA907 after rejecting A48 semantic-binding mismatch. Candidate 6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b: canonical idx1-15 stage-name mapping corrected by controller SOURCE/CLEAN/FINAL review; 15/15 bbox+size+positive margins and changed/alpha outside, protected, source-residue, overlap/touch all 0; raw mirror_y and protected idx0/16 preserved. Independent C + in-game pending. RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION47 completed odd index 133 25F697C6 after A46 canonical-HD binding review. idx15-23 map to ANCIENT RUINS/ALPINE/GIALLO MODENA/BIANCO AVUS/GRIGIO ALLOY/ARGENTO NURBURGRING/ROSSO SCUDERIA/BLU MIRABEAU/NERO; Ferrari/model idx0-14 are protected. Candidate 08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013: 9/9 bbox+size+positive margins, changed outside/alpha/protected/source-residue/overlap/touch all 0; controller SOURCE/CLEAN/FINAL visual PASS. Independent C + in-game pending. RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION41-A45 retried C177-returned odd index 95 37759842. All worker numeric gates reached 33/33 PASS with zero outside/alpha/protected/residue/overlap/touch, but mandatory controller visual QA rejected every retry. Latest A45 68e31ca94c9003cd0acd572fdcecf17d52c56b6848ee558c1359d87b6d382fcd still leaves source-shaped YES/NO/mode/RANDOM clean-plate traces and donor-boundary artifacts. Remains REWORK_REQUIRED; do not repeat harmonic/row-span/fitted-field/class-donor inpaint families. RUNTIME_VALIDATION=UNTESTED.",
     "B_PRODUCTION128 completed C176-returned even index 28 A05BF610 candidate bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8. 1/1 bbox/size/positive-margin and zero outside/alpha/protected/overlap gates PASS; controller SOURCE/CLEAN/FINAL,row,raw mirror_y visual self-QA PASS. Right-edge residue and border-touch artifacts are removed, border/glow continuity is preserved, and compact tracking matches the source family. Independent C + in-game pending; RUNTIME_VALIDATION=UNTESTED.",
@@ -3926,7 +3927,7 @@
     "c176_return_resolved": true,
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_artwork_localize_text": 15,
+  "current_pending_artwork_localize_text": 14,
   "current_producer_rework_remaining": 2,
   "current_producer_rework_assets": [
     "C598919A",
@@ -4043,7 +4044,8 @@
     "runtime_validation": "UNTESTED"
   },
   "current_pending_c": [
-    "63C91067"
+    "63C91067",
+    "39BCA907"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -4110,6 +4112,24 @@
     "c184_return_resolved": true,
     "report": "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_63C_REPORT.json",
     "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "a_production49_39bca907": {
+    "timestamp_kst": "2026-10-05T19:38:00+09:00",
+    "run": "20261005-A-PRODUCTION49",
+    "queue_index": 147,
+    "asset": "39BCA907",
+    "source_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+    "candidate_sha256": "6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b",
+    "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "semantic_binding": "15/15 corrected after A48 controller rejection",
+    "machine_qa": "15/15 bbox/size/positive-margin PASS; outside/alpha/protected/clean-source-unchanged/source-residue/overlap/touch=0",
+    "controller_visual_qa": "PASS",
+    "raw_orientation": "mirror_y",
+    "report": "localization/graphics/role_A/20261005-A-PRODUCTION49/A49_39BCA907_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION49/A49_CONTROLLER_SELF_QA.json",
+    "prior_rejected_candidate_sha256": "eec59e5c2738ef0423d75d46ccfd2c182bab1ec72b16c2fbc8952ef07e78d55d",
+    "prior_rejected_reason": "SEMANTIC_BINDING_MISMATCH",
     "runtime_validation": "UNTESTED"
   }
 }
