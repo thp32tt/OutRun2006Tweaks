@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00404",
+  "production_id": "CONVERSION-DX9EX-00404",
+  "event_id": "CONVERSION-DX9EX-00404-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "queue_controller_contract": {
+    "path": "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "status": "APPLIED"
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "6a3240e2dbd13573a558cc7bee68526b290cd397",
+  "source_material_sha": "65e9f2aadef34f1a00b4c09a691f0abe45ad7c55",
+  "result_sha": "bc78913199ce141883f35e93dfe9265e903489be",
+  "material_result_sha": "bc78913199ce141883f35e93dfe9265e903489be",
+  "validation_bearing_result_sha": "bc78913199ce141883f35e93dfe9265e903489be",
+  "state_commit_sha": "7b9aa72fa55a792aa4daf5ff6ec781e58d780014",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00404]",
+  "selected_work_item": "VR-REGRESSION-DIVERGED-HUD-CADENCE-20261005-RECURRENCE-GATE",
+  "summary": "Sealed the already-restored exact HUD producer and CORRECTNESS OpenXR cadence behavior behind a fail-closed deterministic verifier and canonical DX9Ex Active workflow ownership. Added direct workflow inputs for src/hooks_uiscaling.cpp and tools/OutRunVR-TestProfiles.ps1 so isolated future edits cannot bypass the required Gate. No runtime rendering behavior, hook target, HUD placement math, OpenXR cadence algorithm or R31/R32 physical hook ownership was changed by this task.",
+  "changed_paths": [
+    "tools/verify_vr_hud_cadence_restore.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/VR_PROBLEM_HISTORY.md",
+    "docs/VR_REGRESSION_KNOWLEDGE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00404.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered latest vr-d3d9ex-focus, AGENTS.md, VR_REFACTOR_STATE cycle 1100, VR_AUTODEV_STATE, regression/problem history, queue controller contract, 00403 record and Issues #13/#14. Physical R31/R32 retirement remains explicitly DEFERRED absent atomic replacement proof."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "The current HUD producer/XR cadence restoration was present and previously build-verified, but canonical DX9Ex Active path filters did not directly include src/hooks_uiscaling.cpp or tools/OutRunVR-TestProfiles.ps1 and there was no dedicated fail-closed source contract for the restored producer bridge set."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "65e9f2aadef34f1a00b4c09a691f0abe45ad7c55 added the deterministic HUD/cadence verifier. bc78913199ce141883f35e93dfe9265e903489be made both behavior-bearing source files and the verifier direct Active workflow inputs and executes the verifier in the canonical policy job."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "N100 RED at 65e9f2a... failed only on missing Active ownership of src/hooks_uiscaling.cpp. N100 exact bc789131... passed py_compile, HUD/cadence restore, Sumo replay, R31/R32 retirement, architecture, hook graph and refactor contracts. GitHub exact-SHA DX9Ex Active 37269804032 and Domain Isolation 37269804069 succeeded."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "source_material_sha": "65e9f2aadef34f1a00b4c09a691f0abe45ad7c55",
+      "result_sha": "bc78913199ce141883f35e93dfe9265e903489be",
+      "validation_bearing_result_sha": "bc78913199ce141883f35e93dfe9265e903489be",
+      "task_tagged_commits": [
+        "65e9f2aadef34f1a00b4c09a691f0abe45ad7c55 test(vr): guard restored HUD cadence contract [AUTO:CONVERSION-DX9EX-00404]",
+        "bc78913199ce141883f35e93dfe9265e903489be ci(vr): gate restored HUD cadence ownership [AUTO:CONVERSION-DX9EX-00404]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Artifact 11328122104 OutRun2-VR-DX9EX-ACTIVE-bc78913199ce141883f35e93dfe9265e903489be digest sha256:389026efa48853e9976cbb3144e87edfdd767d73a50b9628f75c1143d4c9cc26. Build artifact is not runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_update": "RECORDED",
+      "issue14_comment_id": 5988986474,
+      "issue13_update": "RECORDED",
+      "issue13_comment_id": 5988986886,
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "evidence": {
+    "red": {
+      "sha": "65e9f2aadef34f1a00b4c09a691f0abe45ad7c55",
+      "n100": "FAIL_EXPECTED_DX9EX_ACTIVE_OWNERSHIP_MISSING_SRC_HOOKS_UISCALING"
+    },
+    "n100_local": {
+      "conclusion": "AUXILIARY_EXACT_SHA_STATIC_PASS",
+      "exact_sha": "bc78913199ce141883f35e93dfe9265e903489be",
+      "checks": [
+        "py_compile HUD/cadence verifier",
+        "HUD/cadence restore contract",
+        "Sumo replay semantic contract",
+        "R31/R32 retirement precondition guard",
+        "architecture",
+        "hook graph",
+        "refactor contract"
+      ]
+    },
+    "dx9ex_active": {
+      "run_id": 37269804032,
+      "conclusion": "success",
+      "exact_sha": "bc78913199ce141883f35e93dfe9265e903489be",
+      "jobs": {
+        "policy": 111634195060,
+        "game": 111634273208,
+        "host": 111634273367,
+        "full_chain_compile": 111634273399,
+        "package": 111635422167
+      },
+      "artifact_id": 11328122104,
+      "artifact_digest": "sha256:389026efa48853e9976cbb3144e87edfdd767d73a50b9628f75c1143d4c9cc26"
+    },
+    "domain_isolation": {
+      "run_id": 37269804069,
+      "conclusion": "success",
+      "exact_sha": "bc78913199ce141883f35e93dfe9265e903489be"
+    }
+  },
+  "next_action": "Quest 3/VDXR runtime-test the exact validated build before promoting white-HUD/rival-marker visual correctness or headset-refresh cadence smoothness to PASS. Keep R31/R32 physical retirement deferred unless an atomic replacement preserves every 00403 precondition.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00404",
+    "production_id": "CONVERSION-DX9EX-00404",
+    "event_id": "CONVERSION-DX9EX-00404-E001",
+    "event_type": "dispatch",
+    "lane": "DX9EX",
+    "target_branch": "vr-d3d9ex-focus",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "bc78913199ce141883f35e93dfe9265e903489be",
+    "validation_bearing_result_sha": "bc78913199ce141883f35e93dfe9265e903489be",
+    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
+    "runtime_validation": "UNTESTED"
+  },
+  "validated_at_kst": "2026-10-05T14:59:43+09:00",
+  "completed_at_kst": "2026-10-05T15:00:00+09:00"
+}
