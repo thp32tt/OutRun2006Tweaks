@@ -62,6 +62,8 @@ QUEUE_NEXT_TASK_DELAY_SECONDS = max(0, int(os.getenv("QUEUE_NEXT_TASK_DELAY_SECO
 QUEUE_IDLE_REARM_SECONDS = max(30, int(os.getenv("QUEUE_IDLE_REARM_SECONDS", "90")))
 LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "true"
 CONVERSION_PARALLEL = os.getenv("CONVERSION_PARALLEL", "true").lower() == "true"
+CONVERSION_ACTIVE_LIMIT = max(1, int(os.getenv("CONVERSION_ACTIVE_LIMIT", "2")))
+CONVERSION_DXVK_DEFERRED = os.getenv("CONVERSION_DXVK_DEFERRED", "true").lower() == "true"
 PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECONDS", "15")))
 PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS", "15")))
 HEARTBEAT_SECONDS = max(5, int(os.getenv("HEARTBEAT_SECONDS", "15")))
@@ -71,7 +73,8 @@ LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SAM
 LOCALIZATION_SLOT_DEDUP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SLOT_DEDUP_SECONDS", "30")))
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
 CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
-MAX_CHAT_ROLLOVERS_PER_TASK = max(0, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "5")))
+CONVERSATION_ROLLOVER_MIN_SECONDS = max(0, int(os.getenv("CONVERSATION_ROLLOVER_MIN_SECONDS", "900")))
+MAX_CHAT_ROLLOVERS_PER_TASK = max(0, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "3")))
 TASK_EVENT_MODEL = os.getenv("TASK_EVENT_MODEL", "v2").strip().lower()
 PRODUCTION_COUNTER_MODE = os.getenv("PRODUCTION_COUNTER_MODE", "lane").strip().lower()
 GITHUB_REPO = os.getenv("GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
@@ -258,6 +261,8 @@ runtime = {
     "queue_idle_rearm_seconds": QUEUE_IDLE_REARM_SECONDS,
     "localization_parallel": LOCALIZATION_PARALLEL,
     "conversion_parallel": CONVERSION_PARALLEL,
+    "conversion_active_limit": CONVERSION_ACTIVE_LIMIT,
+    "conversion_dxvk_deferred": CONVERSION_DXVK_DEFERRED,
     "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
     "parallel_distinct_slot_send_gap_seconds": PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS,
     "heartbeat_seconds": HEARTBEAT_SECONDS,
@@ -267,6 +272,7 @@ runtime = {
     "localization_slot_dedup_seconds": LOCALIZATION_SLOT_DEDUP_SECONDS,
     "max_task_attempts": MAX_TASK_ATTEMPTS,
     "conversation_rollover_enabled": CONVERSATION_ROLLOVER_ENABLED,
+    "conversation_rollover_min_seconds": CONVERSATION_ROLLOVER_MIN_SECONDS,
     "max_chat_rollovers_per_task": MAX_CHAT_ROLLOVERS_PER_TASK,
     "project_url_configured": bool(CHATGPT_PROJECT_URL),
     "require_project_url": REQUIRE_PROJECT_URL,
