@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T11:53:26+09:00",
+  "updated_at_kst": "2026-10-05T12:03:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -270,7 +270,7 @@
         "C598919A"
       ],
       "remaining": 1,
-      "note": "C151 corrected B75's failed RGBA assumption by independently decoding canonical 4096x4096 DXT5 and resolving the 106-region semantic binding. No candidate exists. Producer must derive exact decoded glyph/effect masks + clean plate and use an exact decoded-pixel-safe DXT5 encode/splice path. Full-image recompression or block-only confinement is insufficient. OutRun2/OutRun2SP product tokens are preserved; stage names use canonical phonetic Hangul. RUNTIME_VALIDATION=UNTESTED.",
+      "note": "C153/C156 cross-lane final QA approved new B80 FEF70E85 and A22 30CF0D static candidates. C598919A remains the sole producer REWORK_REQUIRED item: B78 proved 1,435 mandatory source glyph/effect pixels in DXT5 boundary-crossing blocks, so an endpoint/index-constrained exact decoded-pixel solver is required. Strict HOLD no-candidate remains 4F68708E/F6811E94/49BB5FE5/75C3586A. RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": []
     },
     "latest_d_final_qa": {
@@ -295,15 +295,16 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C151",
-      "report": "localization/graphics/role_C/20261005-C151-C598919A/C151_C598_CONTROLLER_REWORK.json",
-      "result": "1_REWORK_REQUIRED_DXT5_EXACT_MASK_AND_RENDER",
+      "run": "C153+C156",
+      "report": "localization/graphics/role_C/20261005-C156-30CF0D/C156_CONTROLLER_CYCLE_QA.json",
+      "result": "2_PIXEL_VISUAL_PASS_1_PRODUCER_REWORK_REMAINS",
       "candidate_changed_by_C": false,
-      "candidate_present": false,
-      "assets_checked": 1,
-      "physical_elements_checked": 0,
-      "logical_segments_bound": 24,
-      "pixel_visual_pass_assets": [],
+      "assets_checked": 2,
+      "physical_elements_checked": 20,
+      "pixel_visual_pass_assets": [
+        "FEF70E85",
+        "30CF0D"
+      ],
       "rework_required_assets": [
         "C598919A"
       ],
@@ -316,15 +317,20 @@
         "49BB5FE5",
         "75C3586A"
       ],
+      "high_risk_static_pass_assets_existing": [
+        "1A43E9D9"
+      ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 28,
+      "pending_production_localize_text": 26,
       "machine_evidence": {
-        "C598919A": "localization/graphics/role_C/20261005-C151-C598919A/C151_C598_DECODED_PREFLIGHT.json"
+        "FEF70E85": "localization/graphics/role_C/20261005-C153-FEF70E85/C153_FEF_MACHINE_QA.json",
+        "30CF0D": "localization/graphics/role_C/20261005-C156-30CF0D/C156_30CF_MACHINE_QA.json"
       },
       "controller_visual": {
-        "C598919A": "SEMANTIC_BINDING_READY_REWORK_REQUIRED"
+        "FEF70E85": "PASS",
+        "30CF0D": "PASS"
       },
-      "in_game_validation": "UNTESTED_NO_CANDIDATE"
+      "in_game_validation": "PENDING; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION80",
@@ -850,6 +856,28 @@
       "controller_visual_qa": "PASS",
       "report": "localization/graphics/role_A/20261005-A-PRODUCTION22/A_PRODUCTION22_30CF0D_REPORT.json",
       "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION22/A22_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c153_fef70e85": {
+      "queue_index": 236,
+      "status": "C153_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+      "candidate_sha256": "e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086",
+      "physical_elements": 14,
+      "candidate_changed_by_C": false,
+      "machine_report": "localization/graphics/role_C/20261005-C153-FEF70E85/C153_FEF_MACHINE_QA.json",
+      "controller_report": "localization/graphics/role_C/20261005-C153-FEF70E85/C153_FEF_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c156_30cf0d": {
+      "queue_index": 137,
+      "status": "C156_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+      "candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
+      "physical_elements": 6,
+      "candidate_changed_by_C": false,
+      "machine_report": "localization/graphics/role_C/20261005-C156-30CF0D/C156_30CF_MACHINE_QA.json",
+      "controller_report": "localization/graphics/role_C/20261005-C156-30CF0D/C156_30CF_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     }
   },
