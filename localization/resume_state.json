@@ -3951,13 +3951,14 @@
     "97E863AD"
   ],
   "latest_b_production": {
-    "run": "B_PRODUCTION152",
-    "asset": "DCC7B488",
-    "queue_index": 32,
-    "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
-    "report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_DCC7_REPORT.json",
-    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_CONTROLLER_SELF_QA.json",
-    "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "run": "B_PRODUCTION154",
+    "asset": "B7E25BAD",
+    "queue_index": 34,
+    "candidate_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_HOLL_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_CONTROLLER_SELF_QA.json",
+    "c_final_report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_CONTROLLER_FINAL_QA.json",
+    "status": "C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
     "runtime_validation": "UNTESTED"
   },
   "c177_controller_final_qa": {
@@ -4587,6 +4588,26 @@
     "decision": "C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
     "machine_report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_MACHINE_QA.json",
     "report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "b_production154_b7e25bad": {
+    "timestamp_kst": "2026-10-05T22:57:50+09:00",
+    "queue_index": 34,
+    "source_sha256": "3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
+    "candidate_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
+    "status": "C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "classification": "zoom_review -> localize_text; Total Rank -> 종합 랭킹",
+    "bbox_size_positive_margin": "1/1 PASS",
+    "pixel_gates": {
+      "outside": 0,
+      "alpha_outside": 0,
+      "source_title_residue": 0,
+      "overlap": 0
+    },
+    "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_AND_RAW_MIRROR_Y",
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_HOLL_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_CONTROLLER_SELF_QA.json",
+    "c209_report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
