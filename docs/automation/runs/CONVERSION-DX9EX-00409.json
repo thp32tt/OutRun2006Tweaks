@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "2/3",
-  "status": "IN_PROGRESS",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "7c58922a54d7b2557479e39ad7ac9286499060fd",
-  "source_material_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
-  "material_result_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
-  "validation_bearing_result_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+  "source_material_sha": "e3239b4959cf4759c5d7ce1395dd133297d10124",
+  "material_result_sha": "e3239b4959cf4759c5d7ce1395dd133297d10124",
+  "validation_bearing_result_sha": "e3239b4959cf4759c5d7ce1395dd133297d10124",
   "queue_commit_sha": "3060adb27c8444deb4c6094b1a15cb42fbee414f",
   "state_commit_sha": "793d68c97febe970a99d26f36aa64f04e34bfa03",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00409]",
@@ -38,55 +38,55 @@
       "evidence": "Queue Controller Contract requires result_sha and forbids later bookkeeping/checkpoint commits from silently replacing validation_bearing_result_sha. Current fail-closed workflow also exposed stale verifier literals after the verifier runner changed to an explicit $verifiers loop."
     },
     "C2_IMPLEMENT": {
-      "status": "IN_PROGRESS",
-      "evidence": "Staged explicit result_sha/bookkeeping roles; verifier repair material commit pending."
+      "status": "COMPLETE",
+      "evidence": "E002 repaired durable result identity, aligned HUD verifier ownership checks with the fail-closed $verifiers runner, and added a deterministic 00409 bookkeeping/result-identity guard."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
-      "automation_validation": "PENDING",
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
       "runtime_validation": "UNTESTED",
-      "evidence": "New exact-SHA Gate pending for E002 repair."
+      "evidence": "Exact SHA e3239b4959cf4759c5d7ce1395dd133297d10124: DX9Ex Active Validation 37343826060 SUCCESS (policy 111877358304, host 111877510779, game 111877510751, full-chain-compile 111877510609, package 111879522864). Domain Isolation Guard 37343826037 SUCCESS. No Quest3/VDXR runtime test performed."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "task_tagged_commits": [
-        "cabc25a7f7793e9a1333ecd3db6e4cc04074187e refactor(vr): remove dead R31 draw executors [AUTO:CONVERSION-DX9EX-00409]",
-        "45995627ff252ffa8596b6340f8e3135bdac51b7 refactor(vr): remove dead R32 draw executors [AUTO:CONVERSION-DX9EX-00409]",
-        "117d6b7980dd41c8504558b6bafc38dda01e184b test(vr): guard dead R31 R32 executor cleanup [AUTO:CONVERSION-DX9EX-00409]"
+        "500451a848604de4b6a45955bd6420784ad1fe9d test(vr): align HUD verifier with fail-closed runner [AUTO:CONVERSION-DX9EX-00409]",
+        "e3239b4959cf4759c5d7ce1395dd133297d10124 test(vr): pin 00409 result identity against bookkeeping [AUTO:CONVERSION-DX9EX-00409]"
       ],
       "ci_skip_on_validation_bearing_result": false
     },
     "C5_PACKAGE": {
       "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
-      "evidence": "OutRun2-VR-DX9EX-ACTIVE-117d6b7980dd41c8504558b6bafc38dda01e184b artifact 11339248938, digest sha256:ee0383cd9e70a6ebec451b778e3625e6b2c131b0358303c7021fffb9ee7a5867. Artifact is not runtime proof."
+      "evidence": "OutRun2-VR-DX9EX-ACTIVE-e3239b4959cf4759c5d7ce1395dd133297d10124 artifact 11359758201, digest sha256:a1c29d3e1d90c7acae201e8990dd32b4cabb0ee3fbe2bc209bd529fcea399279. Artifact is automation evidence, not runtime proof."
     },
     "C6_STATE": {
       "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
       "queue_commit_sha": "3060adb27c8444deb4c6094b1a15cb42fbee414f",
       "state_commit_sha": "793d68c97febe970a99d26f36aa64f04e34bfa03",
-      "runtime_validation": "UNTESTED"
+      "result_identity_repaired": true
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "dx9ex_active": {
-      "run_id": 37297954231,
+      "run_id": 37343826060,
       "conclusion": "success",
-      "exact_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+      "exact_sha": "e3239b4959cf4759c5d7ce1395dd133297d10124",
       "jobs": {
-        "policy": 111723598839,
-        "host": 111723726505,
-        "full_chain_compile": 111723726549,
-        "game": 111723726635,
-        "package": 111725245114
+        "policy": 111877358304,
+        "host": 111877510779,
+        "game": 111877510751,
+        "full_chain_compile": 111877510609,
+        "package": 111879522864
       },
-      "package_artifact_id": 11339248938,
-      "package_artifact_digest": "sha256:ee0383cd9e70a6ebec451b778e3625e6b2c131b0358303c7021fffb9ee7a5867"
+      "package_artifact_id": 11359758201,
+      "package_artifact_digest": "sha256:a1c29d3e1d90c7acae201e8990dd32b4cabb0ee3fbe2bc209bd529fcea399279"
     },
     "domain_isolation": {
-      "run_id": 37297954242,
+      "run_id": 37343826037,
       "conclusion": "success",
-      "exact_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b"
+      "exact_sha": "e3239b4959cf4759c5d7ce1395dd133297d10124"
     },
     "diff": {
       "files": 3,
@@ -99,8 +99,8 @@
     }
   },
   "next_action": "Keep all non-DX9Ex tracks frozen. Next bounded structural unit: census the remaining R33-consumed fast-path helpers still defined in R31/R32 and extract one neutral shared owner only where lifecycle ownership is not implied.",
-  "completed_at_kst": null,
-  "result_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+  "completed_at_kst": "2026-10-06T01:56:53+09:00",
+  "result_sha": "e3239b4959cf4759c5d7ce1395dd133297d10124",
   "failure_context": {
     "supplied": "No authoritative DX9Ex Active Validation run was created for result SHA 3060adb27c8444deb4c6094b1a15cb42fbee414f after 697s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
     "classification": "BOOKKEEPING_SHA_MISIDENTIFIED_AS_RESULT_DUE_MISSING_RESULT_SHA",
@@ -111,9 +111,9 @@
     "repairable": true
   },
   "result_identity": {
-    "source_material_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
-    "result_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
-    "validation_bearing_result_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+    "source_material_sha": "e3239b4959cf4759c5d7ce1395dd133297d10124",
+    "result_sha": "e3239b4959cf4759c5d7ce1395dd133297d10124",
+    "validation_bearing_result_sha": "e3239b4959cf4759c5d7ce1395dd133297d10124",
     "queue_commit_sha": "3060adb27c8444deb4c6094b1a15cb42fbee414f",
     "queue_commit_role": "BOOKKEEPING_ONLY",
     "state_commit_sha": "793d68c97febe970a99d26f36aa64f04e34bfa03",
@@ -134,6 +134,10 @@
     "prior_dx9ex_active_conclusion": "success",
     "prior_domain_isolation_run_id": 37297954242,
     "prior_domain_isolation_conclusion": "success",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "final_result_sha": "e3239b4959cf4759c5d7ce1395dd133297d10124",
+    "final_dx9ex_active_run_id": 37343826060,
+    "final_domain_isolation_run_id": 37343826037,
+    "status": "COMPLETE"
   }
 }
