@@ -10,6 +10,8 @@ R22_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r22.cpp"
 R32_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r32.cpp"
 HOST_CACHE_PATH = ROOT / "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp"
 HOST_PASSTHROUGH_PATH = ROOT / "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp"
+HOST_R23_RUNTIME_PATH = ROOT / "vrhost/src/runtime/r23_runtime_hardening.hpp"
+HOST_R24_PATH = ROOT / "vrhost/src/runtime/r24_black_screen_guard.hpp"
 HOST_SUBMIT_PATH = ROOT / "vrhost/src/runtime/r32_direct_submit.hpp"
 
 
@@ -77,6 +79,8 @@ r22 = load(R22_PATH)
 r32 = load(R32_PATH)
 host_cache = load(HOST_CACHE_PATH)
 host_passthrough = load(HOST_PASSTHROUGH_PATH)
+host_r23_runtime = load(HOST_R23_RUNTIME_PATH)
+host_r24 = load(HOST_R24_PATH)
 host_submit = load(HOST_SUBMIT_PATH)
 
 # Reset must tear down every D3D9 DEFAULT-pool stereo/shared-eye/probe object
@@ -523,6 +527,63 @@ require_order(
     "SafeGamePid == gamePid",
     "return true;",
     "CopySharedFrameToSafeEyes(frame)",
+)
+
+# R23/R24 may reuse an already-owned SafeEye without calling EnsureSafeFrame.
+# Those bypasses must carry the same complete game-run identity as the cache
+# itself so a fast restart cannot revive prior-run eye content.
+r23_direct = body(host_r23_runtime, "inline XrResult RenderCommittedDirect(")
+require(
+    r23_direct,
+    "R23 SafeEye owned-cache complete run identity",
+    "const std::uint32_t generation",
+    "RenderFrameDirectGenerationIndex",
+    "const std::uint32_t runGeneration",
+    "RenderFrameRunGenerationIndex",
+    "const std::uint32_t gamePid = frame.clientPid;",
+    "SafeFrameId == frame.frameId",
+    "SafeTransportGeneration == generation",
+    "SafeRunGeneration == runGeneration",
+    "SafeGamePid == gamePid",
+)
+require_order(
+    r23_direct,
+    "R23 SafeEye complete identity before owned-cache reuse",
+    "const std::uint32_t generation",
+    "const std::uint32_t runGeneration",
+    "const std::uint32_t gamePid",
+    "SafeFrameId == frame.frameId",
+    "SafeTransportGeneration == generation",
+    "SafeRunGeneration == runGeneration",
+    "SafeGamePid == gamePid",
+    "if (!safeAlreadyOwned && !EnsureSafeFrame(frame.frameId))",
+)
+
+r24_direct = body(host_r24, "inline bool TryBuildDirectSafeProjection(")
+require(
+    r24_direct,
+    "R24 SafeEye owned-cache complete run identity",
+    "const std::uint32_t generation",
+    "RenderFrameDirectGenerationIndex",
+    "const std::uint32_t runGeneration",
+    "RenderFrameRunGenerationIndex",
+    "const std::uint32_t gamePid = snapshot.frame.clientPid;",
+    "SafeFrameId == snapshot.frameId",
+    "SafeTransportGeneration == generation",
+    "SafeRunGeneration == runGeneration",
+    "SafeGamePid == gamePid",
+)
+require_order(
+    r24_direct,
+    "R24 SafeEye complete identity before owned-cache reuse",
+    "const std::uint32_t generation",
+    "const std::uint32_t runGeneration",
+    "const std::uint32_t gamePid",
+    "SafeFrameId == snapshot.frameId",
+    "SafeTransportGeneration == generation",
+    "SafeRunGeneration == runGeneration",
+    "SafeGamePid == gamePid",
+    "if (!safeAlreadyOwned && !EnsureSafeFrame(snapshot.frameId))",
 )
 
 # Host opened-shared-resource caches must be scoped to the complete Frame.v2

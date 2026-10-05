@@ -217,11 +217,20 @@ namespace OutRunVrR23RuntimeHardening
         }
 
         // Once CopySharedFrameToSafeEyes completed, SafeEye is host-owned and
-        // independent of producer ring reuse. Reuse it directly even when the
-        // original Frame.v2 slot has already advanced/been overwritten.
-        const bool safeAlreadyOwned = SafeFrameId == frame.frameId &&
-            SafeTransportGeneration ==
-                frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex] &&
+        // independent of producer ring reuse. Reuse it only for the complete
+        // Frame.v2 game-run identity; frame/generation values can collide after
+        // a fast producer-process restart.
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        const std::uint32_t gamePid = frame.clientPid;
+        const bool safeAlreadyOwned = frame.frameId != 0 &&
+            generation != 0 && runGeneration != 0 && gamePid != 0 &&
+            SafeFrameId == frame.frameId &&
+            SafeTransportGeneration == generation &&
+            SafeRunGeneration == runGeneration &&
+            SafeGamePid == gamePid &&
             SafeEyeSrv[0] && SafeEyeSrv[1];
         if (!safeAlreadyOwned && !EnsureSafeFrame(frame.frameId))
         {
