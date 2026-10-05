@@ -1711,3 +1711,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Retry/supersession: C183(B134) is superseded by B135/C184; C185(A42) is superseded by A45/C186. Initial C187 incorrectly treated alpha=0 RGB payload as visible residue and its worker push also lost a concurrent-update race; no decision was based on it. Correct visible-alpha retry is C188.
 - Current producer REWORK=3: `63C91067`, `C598919A`, `37759842`; pending-C=0; pending_artwork localize_text=15. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Batch evidence: `localization/graphics/role_C/20261005-C180-C188-BATCH/C180_C188_BATCH_FINAL_QA.json`.
+
+## 2026-10-05 19:18 KST — B136/B137 index 26 63C91067 C184 repair
+- Refreshed the even B shard and consumed the highest-priority C184 return at index 26; completed C178 A05BF610 and other PASS assets were not repeated.
+- B136 corrected source-text discovery to navy-seeded connected title components. Its machine gates passed but controller self-QA rejected residual navy/patch artifacts, so B136 was not promoted.
+- B137 expanded the full title/effect fringe and replaced Gaussian/row reconstruction with discrete harmonic/Laplace inpainting constrained by untouched canonical boundary pixels. Candidate `4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4` preserves 2048x2048 RGBA32/mip1/header/raw mirror_y.
+- Static QA PASS: 2/2 exact source-effect bbox containment, source-size ceiling and positive margins; CLEAN/FINAL validators PASS; changed outside=0, alpha outside=0, source-effect residue=0, render outside=0, localized overlap=0.
+- Controller SOURCE/CLEAN/FINAL, per-row and raw mirror_y self-QA PASS: C184/B135 horizontal starburst smear is gone, center spike/glow and brown interior are visually continuous, pink cloud is seamless, and no source-script residue/clipping/unintended artwork damage is visible.
+- Queue index 26 -> `b137_self_qa_pass_pending_c`. Producer REWORK now 2 (`C598919A`, `37759842`); pending-C=1 (`63C91067`); pending_artwork localize_text=15. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION137/B137_63C_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION137/B137_CONTROLLER_SELF_QA.json`.
