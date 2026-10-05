@@ -1330,3 +1330,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - `2EA557B4` C163 REWORK resolved by A26 candidate `b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc`: filled source-derived cyan/white/blue gradient, actual Bold Hangul face, navy/white edging, lower-right depth and slant; constrained DXT5 boundary safety retained. 1/1 bbox+size+margin and zero outside/alpha/protected/residue gates PASS; visual self-QA PASS.
 - `E1639D2E` A27 candidate `fe9bb931d94a13a44a08bcf61b6325c01080b462afff84f92c97205cbe0eea65`: `Loading -> 로딩`, `PLEASE WAIT -> 잠시만요`. Same-run visual correction restored source left alignment and wide/low Loading proportions. 2/2 bbox+size+margin, clean/final, zero residue/outside/alpha/protected/overlap/touch PASS; visual self-QA PASS.
 - Both await independent C final QA and isolated in-game validation. pending_artwork localize_text=19; remaining producer REWORK rows=2 (`63C91067`, `C598919A`, both even lane). `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-05 15:03 KST — C164/C165 PASS, C166 REWORK
+- C164 index 55 2EA557B4: independent hosted machine QA PASS (1/1 exact bbox/size/positive margin; outside/alpha/introduced-visible/residue=0; DXT5 boundary safety PASS) and C visual PASS. Decision `C164_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`.
+- C165 index 241 E1639D2E: independent hosted machine QA PASS (2/2 exact bbox/size/positive margins; outside/alpha/introduced-visible/residue/overlap/near=0) and C visual PASS. Decision `C165_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`.
+- C166 index 26 63C91067 latest B105 candidate: producer static counters PASS, but C visual FAIL on a visible horizontal interpolation/gradient seam in the lower starburst clean plate. Decision `C166_REWORK_REQUIRED_CLEAN_PLATE_GRADIENT_SEAM`.
+- pending_artwork localize_text=19; producer REWORK remains 2 (63C91067, C598919A). RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
