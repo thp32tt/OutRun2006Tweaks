@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("B hosted worker only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION151-DCC7"
+run="20261005-B-PRODUCTION152-DCC7"
 out=repo/"localization/graphics/role_B"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds"
@@ -18,7 +18,7 @@ COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 SOURCE_BLOB="7f8f0d10f2ac8a19bda1933d6a324a37123b48c0"
 SOURCE_SHA="ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e"
 BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
-tmp=Path("/tmp/outrun_B151"); tmp.mkdir(parents=True,exist_ok=True)
+tmp=Path("/tmp/outrun_B152"); tmp.mkdir(parents=True,exist_ok=True)
 dds=tmp/"DCC7B488.dds"; atlas=tmp/"atlas.json"
 urllib.request.urlretrieve(BASE+"/Release/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",dds)
 urllib.request.urlretrieve(BASE+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_FLAG_RANK_Exst/4x_DCC7B488_512x256_atlas.json",atlas)
@@ -122,13 +122,29 @@ if not(effect_bbox[0]<core_bbox[0] and effect_bbox[1]<=core_bbox[1] and effect_b
     raise RuntimeError(("effect does not cover core",effect_bbox,core_bbox))
 if np.count_nonzero(effect)>65000: raise RuntimeError(("effect too broad",int(np.count_nonzero(effect)),effect_bbox))
 
-pglobal=np.zeros((H,W,4),np.uint8); pglobal[sy0:sy1,sx0:sx1]=pred
-# B150 controller visual QA found a faint low-contrast Total Rank silhouette outside the
-# residual-connected mask. Reconstruct the entire exact effect bbox from the fitted
-# speech-bubble field; the box is fully inside the smooth interior and never touches
-# the navy border/glow. This removes all source-shaped low-alpha/low-contrast residue.
-clean_scope=np.zeros((H,W),bool)
-clean_scope[effect_bbox[1]:effect_bbox[3],effect_bbox[0]:effect_bbox[2]]=True
+# B152 controller correction: B151's quadratic field removed the text but left a faint
+# rectangular luminance shift. Reconstruct the exact effect bbox with a Coons surface
+# whose four boundary curves are sampled from untouched canonical pixels immediately
+# outside the bbox. This matches left/right/top/bottom background continuously.
+ex0,ey0,ex1,ey1=effect_bbox
+pw,ph=ex1-ex0,ey1-ey0
+band=12
+if ex0-band<0 or ex1+band>=W or ey0-band<0 or ey1+band>=H:
+    raise RuntimeError(("coons boundary unavailable",effect_bbox))
+L=np.median(sa[ey0:ey1,ex0-band:ex0-2].astype(np.float64),axis=1)
+R=np.median(sa[ey0:ey1,ex1+2:ex1+band].astype(np.float64),axis=1)
+T=np.median(sa[ey0-band:ey0-2,ex0:ex1].astype(np.float64),axis=0)
+D=np.median(sa[ey1+2:ey1+band,ex0:ex1].astype(np.float64),axis=0)
+u=np.linspace(0.0,1.0,pw,dtype=np.float64)[None,:,None]
+v=np.linspace(0.0,1.0,ph,dtype=np.float64)[:,None,None]
+Hsurf=(1.0-u)*L[:,None,:]+u*R[:,None,:]
+Vsurf=(1.0-v)*T[None,:,:]+v*D[None,:,:]
+P00=(L[0]+T[0])/2.0; P10=(R[0]+T[-1])/2.0
+P01=(L[-1]+D[0])/2.0; P11=(R[-1]+D[-1])/2.0
+Bilin=(1-u)*(1-v)*P00 + u*(1-v)*P10 + (1-u)*v*P01 + u*v*P11
+coons=np.clip(np.rint(Hsurf+Vsurf-Bilin),0,255).astype(np.uint8)
+pglobal=np.zeros((H,W,4),np.uint8); pglobal[ey0:ey1,ex0:ex1]=coons
+clean_scope=np.zeros((H,W),bool); clean_scope[ey0:ey1,ex0:ex1]=True
 clean_arr=sa.copy(); clean_arr[clean_scope]=pglobal[clean_scope]
 same=effect&np.all(clean_arr==sa,axis=2)
 if np.any(same):
@@ -207,14 +223,14 @@ row={
  "slant":.22,"fill_rgba":list(fill),"outline_rgba":list(outline),"alignment":"center"
 }
 
-source_png=out/"B151_SOURCE_READABLE.png"; clean_png=out/"B151_CLEAN_PLATE.png"; final_png=out/"B151_FINAL_READABLE.png"
-smp=out/"B151_SOURCE_TEXT_MASK.png"; ap=out/"B151_ALLOWED_EFFECT_BBOX_MASK.png"; pp=out/"B151_PROTECTED_MASK.png"
+source_png=out/"B152_SOURCE_READABLE.png"; clean_png=out/"B152_CLEAN_PLATE.png"; final_png=out/"B152_FINAL_READABLE.png"
+smp=out/"B152_SOURCE_TEXT_MASK.png"; ap=out/"B152_ALLOWED_EFFECT_BBOX_MASK.png"; pp=out/"B152_PROTECTED_MASK.png"
 src.save(source_png); clean.save(clean_png); dec.save(final_png)
 Image.fromarray((clean_scope.astype(np.uint8)*255),"L").save(smp); allowed.save(ap); protected.save(pp)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B151_CLEAN_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B151_FINAL_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B151_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"B151_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B152_CLEAN_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B152_FINAL_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B152_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"B152_FINAL_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS" or finalrep["status"]!="PASS": raise RuntimeError(("validator",cleanrep["status"],finalrep["status"]))
 
 # Controller evidence.
@@ -224,16 +240,16 @@ scale=min(2.2,1500/max(1,ims[0].width)); ims=[z.resize((int(z.width*scale),int(z
 card=Image.new("RGB",(sum(z.width for z in ims)+16,max(z.height for z in ims)+46),"white"); xx1=0
 for labtxt,z in zip(("SOURCE","CLEAN","FINAL"),ims):
     card.paste(z,(xx1,46)); ImageDraw.Draw(card).text((xx1+4,9),labtxt,fill="black"); xx1+=z.width+8
-save_b64(card,out/"B151_DCC7_FOCUS.jpg",out/"B151_DCC7_FOCUS_B64.txt",95)
+save_b64(card,out/"B152_DCC7_FOCUS.jpg",out/"B152_DCC7_FOCUS_B64.txt",95)
 ov=Image.new("RGB",(1024,3*550),"white")
 for i,(labtxt,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im); z.thumbnail((1024,512),Image.Resampling.LANCZOS); ov.paste(z,(0,i*550+26)); ImageDraw.Draw(ov).text((5,i*550+5),labtxt,fill="black")
-save_b64(ov,out/"B151_DCC7_SOURCE_CLEAN_FINAL.jpg",out/"B151_DCC7_SOURCE_CLEAN_FINAL_B64.txt",92)
+save_b64(ov,out/"B152_DCC7_SOURCE_CLEAN_FINAL.jpg",out/"B152_DCC7_SOURCE_CLEAN_FINAL_B64.txt",92)
 rr=Image.new("RGB",(1024,2*550),"white")
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
 for i,(labtxt,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im); z.thumbnail((1024,512),Image.Resampling.LANCZOS); rr.paste(z,(0,i*550+26)); ImageDraw.Draw(rr).text((5,i*550+5),labtxt,fill="black")
-save_b64(rr,out/"B151_DCC7_RAW_COMPARE.jpg",out/"B151_DCC7_RAW_COMPARE_B64.txt",92)
+save_b64(rr,out/"B152_DCC7_RAW_COMPARE.jpg",out/"B152_DCC7_RAW_COMPARE_B64.txt",92)
 
 report={
  "schema_version":1,"role":"B","run":run,"queue_index":32,"asset":asset,
@@ -241,20 +257,20 @@ report={
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB,"source_sha256":SOURCE_SHA},
  "classification":{"localizable":"Total Rank","translation":"종합 랭킹","prior_queue_action":"zoom_review"},
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":payload[:128]==sb[:128],"raw_orientation":"mirror_y"},
- "clean_reconstruction":{"method":"B151 full exact effect-bbox quadratic pale-green field reconstruction after B150 visual ghost rejection","background_fit_samples":int(np.count_nonzero(use)),"clean_source_residue":source_residue,"clean_scope_pixels":int(np.count_nonzero(clean_scope))},
+ "clean_reconstruction":{"method":"B152 exact effect-bbox Coons surface from untouched canonical four-side boundary curves after B151 rectangular luminance-shift rejection","background_fit_samples":int(np.count_nonzero(use)),"clean_source_residue":source_residue,"clean_scope_pixels":int(np.count_nonzero(clean_scope)),"boundary_band_px":band},
  "source_style":{"family":"white italic Total Rank with dark navy outline","font_file":Path(fp).name,"font_style":fstyle,"font_size":chosen_fs,"stroke_width":chosen_sw,"slant":.22,"fill_rgba":list(fill),"outline_rgba":list(outline)},
  "rows":[row],"clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
  "decoded_changes":{"outside_allowed_effect_bbox":outside,"alpha_outside":alphaout,"render_outside_target":renderout,"localized_overlap":0},
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
- "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","status":"B151_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","status":"B152_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "RUNTIME_VALIDATION":"UNTESTED"
 }
-(out/"B151_DCC7_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-(wr/"B151_DCC7B488.json").write_text(json.dumps({
+(out/"B152_DCC7_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(wr/"B152_DCC7B488.json").write_text(json.dumps({
  "run":run,"index":32,"asset":"DCC7B488","candidate_sha256":csha,
  "localized_physical_elements":1,"bbox_size_positive_margin":"1/1",
  "clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "outside":outside,"alpha_outside":alphaout,"worker_status":report["status"],
- "report":f"localization/graphics/role_B/{run}/B151_DCC7_REPORT.json","runtime_validation":"UNTESTED"
+ "report":f"localization/graphics/role_B/{run}/B152_DCC7_REPORT.json","runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"run":run,"index":32,"candidate_sha256":csha,"bbox":lb,"source_bbox":core_bbox,"effect_bbox":effect_bbox},ensure_ascii=False))
