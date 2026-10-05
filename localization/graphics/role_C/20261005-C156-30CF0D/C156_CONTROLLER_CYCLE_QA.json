@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C156-CROSS_LANE-CYCLE",
+  "timestamp_kst": "2026-10-05T12:03:00+09:00",
+  "reviewed_new_results": [
+    {
+      "lane": "B",
+      "producer_run": "B_PRODUCTION80",
+      "queue_index": 236,
+      "asset": "FEF70E85",
+      "candidate_sha256": "e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086",
+      "c_run": "C153",
+      "decision": "PASS_PENDING_INGAME",
+      "physical_elements": 14,
+      "report": "localization/graphics/role_C/20261005-C153-FEF70E85/C153_FEF_CONTROLLER_FINAL_QA.json"
+    },
+    {
+      "lane": "A",
+      "producer_run": "A_PRODUCTION22",
+      "queue_index": 137,
+      "asset": "30CF0D",
+      "candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
+      "c_run": "C156",
+      "decision": "PASS_PENDING_INGAME",
+      "physical_elements": 6,
+      "report": "localization/graphics/role_C/20261005-C156-30CF0D/C156_30CF_CONTROLLER_FINAL_QA.json"
+    }
+  ],
+  "remaining_producer_rework": [
+    {
+      "queue_index": 86,
+      "asset": "C598919A",
+      "decision": "REWORK_REQUIRED_DXT5_CONSTRAINED_ENDPOINT_INDEX_SOLVER",
+      "boundary_source_alpha_pixels": 1435
+    }
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94",
+    "49BB5FE5",
+    "75C3586A"
+  ],
+  "high_risk_static_pass_assets": [
+    "1A43E9D9"
+  ],
+  "result": "2_PIXEL_VISUAL_PASS_1_PRODUCER_REWORK_REMAINS",
+  "candidate_changes_by_C": 0,
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
