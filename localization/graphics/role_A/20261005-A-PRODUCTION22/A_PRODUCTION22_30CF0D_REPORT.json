@@ -320,7 +320,9 @@
     "protected_visible_pixels_changed": 0
   },
   "bbox_size_positive_margin": "6/6",
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS",
   "runtime_validation": "UNTESTED",
-  "status": "A_PRODUCTION22_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_PRODUCTION22_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_notes": "SOURCE/CLEAN/FINAL full atlas, six row-contact crops and raw mirror_y inspected. Korean weight/color families track source large/small labels; no visible English residue, clipping, overlap, seam, halo, protected-artwork damage or orientation regression.",
+  "self_qa_decision": "A_PRODUCTION22_SELF_QA_PASS_PENDING_C_AND_INGAME"
 }
