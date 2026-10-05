@@ -1,0 +1,17 @@
+{
+  "run": "20261005-C188-25F697C6",
+  "qa_id": "C188",
+  "index": 133,
+  "asset": "25F697C6",
+  "candidate_sha256": "08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013",
+  "machine_status": "PASS",
+  "machine_checks": {
+    "final_changed_outside_union_source_bboxes": 0,
+    "final_alpha_changed_outside_union_source_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_pair_1px_touch_pixels": 0,
+    "flat_background_residue_pixels_total": 0
+  },
+  "report": "localization/graphics/role_C/20261005-C188-25F697C6/C188_25F697C6_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}

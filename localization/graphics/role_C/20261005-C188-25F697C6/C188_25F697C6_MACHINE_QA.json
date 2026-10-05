@@ -1,0 +1,328 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C188-25F697C6",
+  "qa_id": "C188",
+  "queue_index": 133,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+  "producer_run": "20261005-A-PRODUCTION47",
+  "source_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+  "candidate_sha256": "08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "independent_visible_background": "transparent_alpha0",
+  "independent_clean_plate": "localization/graphics/role_C/20261005-C188-25F697C6/C188_INDEPENDENT_EXACT_CLEAN_PLATE.png",
+  "row_checks": [
+    {
+      "idx": 15,
+      "source": "ANCIENT RUINS",
+      "korean": "에인션트 루인스",
+      "source_effect_bbox": [
+        549,
+        1220,
+        1391,
+        1315
+      ],
+      "declared_localized_bbox": [
+        585,
+        1228,
+        1355,
+        1306
+      ],
+      "independent_actual_localized_bbox": [
+        585,
+        1228,
+        1355,
+        1306
+      ],
+      "delta_left": 36,
+      "delta_right": 36,
+      "delta_top": 8,
+      "delta_bottom": 9,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "flat_background_residue_outside_declared_localized_bbox": 0
+    },
+    {
+      "idx": 16,
+      "source": "ALPINE",
+      "korean": "알파인",
+      "source_effect_bbox": [
+        664,
+        1103,
+        1067,
+        1192
+      ],
+      "declared_localized_bbox": [
+        682,
+        1111,
+        1049,
+        1184
+      ],
+      "independent_actual_localized_bbox": [
+        682,
+        1111,
+        1049,
+        1184
+      ],
+      "delta_left": 18,
+      "delta_right": 18,
+      "delta_top": 8,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "flat_background_residue_outside_declared_localized_bbox": 0
+    },
+    {
+      "idx": 17,
+      "source": "GIALLO MODENA",
+      "korean": "지알로 모데나",
+      "source_effect_bbox": [
+        1528,
+        1152,
+        2012,
+        1204
+      ],
+      "declared_localized_bbox": [
+        1549,
+        1157,
+        1990,
+        1198
+      ],
+      "independent_actual_localized_bbox": [
+        1549,
+        1157,
+        1990,
+        1198
+      ],
+      "delta_left": 21,
+      "delta_right": 22,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "flat_background_residue_outside_declared_localized_bbox": 0
+    },
+    {
+      "idx": 18,
+      "source": "BIANCO AVUS",
+      "korean": "비앙코 아부스",
+      "source_effect_bbox": [
+        544,
+        1040,
+        940,
+        1092
+      ],
+      "declared_localized_bbox": [
+        562,
+        1045,
+        922,
+        1086
+      ],
+      "independent_actual_localized_bbox": [
+        562,
+        1045,
+        922,
+        1086
+      ],
+      "delta_left": 18,
+      "delta_right": 18,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "flat_background_residue_outside_declared_localized_bbox": 0
+    },
+    {
+      "idx": 19,
+      "source": "GRIGIO ALLOY",
+      "korean": "그리지오 알로이",
+      "source_effect_bbox": [
+        1480,
+        1040,
+        1888,
+        1092
+      ],
+      "declared_localized_bbox": [
+        1498,
+        1045,
+        1869,
+        1086
+      ],
+      "independent_actual_localized_bbox": [
+        1498,
+        1045,
+        1869,
+        1086
+      ],
+      "delta_left": 18,
+      "delta_right": 19,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "flat_background_residue_outside_declared_localized_bbox": 0
+    },
+    {
+      "idx": 20,
+      "source": "ARGENTO NURBURGRING",
+      "korean": "아르젠토 뉘르부르크링",
+      "source_effect_bbox": [
+        216,
+        960,
+        932,
+        1024
+      ],
+      "declared_localized_bbox": [
+        246,
+        967,
+        901,
+        1017
+      ],
+      "independent_actual_localized_bbox": [
+        246,
+        967,
+        901,
+        1017
+      ],
+      "delta_left": 30,
+      "delta_right": 31,
+      "delta_top": 7,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "flat_background_residue_outside_declared_localized_bbox": 0
+    },
+    {
+      "idx": 21,
+      "source": "ROSSO SCUDERIA",
+      "korean": "로쏘 스쿠데리아",
+      "source_effect_bbox": [
+        1368,
+        972,
+        1884,
+        1024
+      ],
+      "declared_localized_bbox": [
+        1390,
+        977,
+        1861,
+        1018
+      ],
+      "independent_actual_localized_bbox": [
+        1390,
+        977,
+        1861,
+        1018
+      ],
+      "delta_left": 22,
+      "delta_right": 23,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "flat_background_residue_outside_declared_localized_bbox": 0
+    },
+    {
+      "idx": 22,
+      "source": "BLU MIRABEAU",
+      "korean": "블루 미라보",
+      "source_effect_bbox": [
+        492,
+        904,
+        940,
+        956
+      ],
+      "declared_localized_bbox": [
+        512,
+        909,
+        920,
+        950
+      ],
+      "independent_actual_localized_bbox": [
+        512,
+        909,
+        920,
+        950
+      ],
+      "delta_left": 20,
+      "delta_right": 20,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "flat_background_residue_outside_declared_localized_bbox": 0
+    },
+    {
+      "idx": 23,
+      "source": "NERO",
+      "korean": "네로",
+      "source_effect_bbox": [
+        1728,
+        904,
+        1884,
+        956
+      ],
+      "declared_localized_bbox": [
+        1736,
+        909,
+        1875,
+        950
+      ],
+      "independent_actual_localized_bbox": [
+        1736,
+        909,
+        1875,
+        950
+      ],
+      "delta_left": 8,
+      "delta_right": 9,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "flat_background_residue_outside_declared_localized_bbox": 0
+    }
+  ],
+  "all_9_bbox_size_positive_margin_and_residue_pass": true,
+  "machine_checks": {
+    "final_changed_outside_union_source_bboxes": 0,
+    "final_alpha_changed_outside_union_source_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_pair_1px_touch_pixels": 0,
+    "flat_background_residue_pixels_total": 0
+  },
+  "machine_status": "PASS",
+  "policy_checks": {
+    "stage_names": {
+      "ANCIENT RUINS": "에인션트 루인스",
+      "ALPINE": "알파인"
+    },
+    "protected_ferrari_model_labels": "outside target bboxes exact by pixel gate"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "preview_b64_files": [
+    "localization/graphics/role_C/20261005-C188-25F697C6/C188_CONTACTS_B64.txt",
+    "localization/graphics/role_C/20261005-C188-25F697C6/C188_RAW_B64.txt"
+  ]
+}
