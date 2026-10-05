@@ -150,6 +150,20 @@ for banned in ("R9MainDepthKnown", "R9MainDepthIdentity", "R9MainDepthDesc"):
         errors.append(
             f"R33 retained direct R9 main-depth metadata dependency: {banned}")
 
+# Post-1000 successor: R33 must not directly mutate R9-owned right-depth/
+# stencil synchronization flags. Preserve exact invalidation semantics through
+# one lower-owner API so later final-dispatch cleanup cannot split ownership.
+if "inline void R9InvalidateRightDepthStencilSync(" not in r9:
+    errors.append("R9 missing right depth/stencil sync invalidation owner API")
+for banned in ("RightDepthSynchronized = false;",
+               "RightStencilSynchronized = false;"):
+    if banned in r33:
+        errors.append(
+            f"R33 retained direct R9 right-depth sync mutation: {banned}")
+if r33.count("R9InvalidateRightDepthStencilSync(") < 2:
+    errors.append(
+        "R33 missing R9 right-depth sync owner API at left-write and fail-close boundaries")
+
 if "R9DrawCalls" in r20:
     errors.append("R20 retained direct R9 draw-count dependency")
 if "R9DrawCallCount()" not in r20:
