@@ -42,20 +42,21 @@ masks=(pf[4],pf[5],pf[6],pf[7])
 fourcc=struct.pack("<I",pffourcc).decode("latin1")
 mode="RGBA" if masks[:3]==(0xff,0xff00,0xff0000) else ("BGRA" if masks[:3]==(0xff0000,0xff00,0xff) else None)
 if not mode or (W,H)!=(2048,2048) or len(sb)!=128+W*H*4:
-    raise RuntimeError(("B81 fail-closed unsupported source structure",W,H,pitch,mips,pfflags,fourcc,masks,len(sb)))
+    raise RuntimeError(("B82 fail-closed unsupported source structure",W,H,pitch,mips,pfflags,fourcc,masks,len(sb)))
 raw_src=Image.frombytes("RGBA",(W,H),sb[128:],"raw",mode)
 src=raw_src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 at=json.loads(ab.decode())
 if at.get("regions_count")!=6: raise RuntimeError(("atlas drift",at.get("regions_count")))
 regions={r["idx"]:r for r in at["regions"]}
 
+# Readable source is mirror-Y relative to atlas index order: idx0 is the lowest visible row.
 specs=[
- (0,"Online and LAN OutRun for up to 6 players","온라인/LAN 아웃런 최대 6인 플레이"),
- (1,"Complete Race and Heart Attack missions to win OR Miles!","레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!"),
- (2,"Try to win Hearts by meeting your girlfriend's demands!","여자친구의 요구를 들어주고 하트를 획득하세요!"),
- (3,"Try to reach the goal with your girlfriend!","여자친구와 함께 골에 도착하세요!"),
- (4,"Buy your OutRun items here!","여기서 아웃런 아이템을 구매하세요!"),
- (5,"Drive against the Ghost Cars and go for the course records!","고스트 카와 달리며 코스 기록에 도전하세요!"),
+ (0,"Drive against the Ghost Cars and go for the course records!","고스트 카와 달리며 코스 기록에 도전하세요!"),
+ (1,"Buy your OutRun items here!","여기서 아웃런 아이템을 구매하세요!"),
+ (2,"Try to reach the goal with your girlfriend!","여자친구와 함께 골에 도착하세요!"),
+ (3,"Try to win Hearts by meeting your girlfriend's demands!","여자친구의 요구를 들어주고 하트를 획득하세요!"),
+ (4,"Complete Race and Heart Attack missions to win OR Miles!","레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!"),
+ (5,"Online and LAN OutRun for up to 6 players","온라인/LAN 아웃런 최대 6인 플레이"),
 ]
 
 source_mask=Image.new("L",(W,H),0)
@@ -87,13 +88,13 @@ clean=src.copy(); ca=clean.getchannel("A"); ca.paste(0,(0,0,W,H),source_mask); c
 sp=out/"8C_SOURCE_READABLE.png"; cp=out/"8C_CLEAN_PLATE.png"; smp=out/"8C_SOURCE_TEXT_MASK.png"; ap=out/"8C_ALLOWED_BBOX_MASK.png"
 src.save(sp); clean.save(cp); source_mask.save(smp); allowed.save(ap)
 protected=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed)); pp=out/"8C_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"B81_CLEAN_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B81_CLEAN_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"B82_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B82_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
 subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
-font_line=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{style}","Noto Sans CJK KR:style=Regular"],text=True).strip()
+font_line=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{style}","Noto Sans CJK KR:style=Bold"],text=True).strip()
 FONT,FI,FSTYLE=font_line.rsplit("|",2); FI=int(FI or 0)
 if "NotoSansCJK" not in Path(FONT).name: raise RuntimeError(("CJK face unavailable",font_line))
 
@@ -110,21 +111,28 @@ def render_low(text,fs):
     return rgba.resize((rgba.width*4,rgba.height*4),Image.Resampling.NEAREST)
 
 MARGIN=4
-shared_fs=None
+# Match source line height first. The source help font is horizontally condensed,
+# so apply one shared horizontal scale to all six Korean lines instead of shrinking height.
+shared_fs=None; common_x_scale=None
 for fs in range(18,5,-1):
-    ok=True
+    lays=[]; height_ok=True
     for r in rows:
         ob=r["original_bbox"]; aw=ob[2]-ob[0]; ah=ob[3]-ob[1]
-        lay=render_low(r["korean"],fs)
-        if lay.width>aw-2*MARGIN or lay.height>ah-2*MARGIN:
-            ok=False; break
-    if ok: shared_fs=fs; break
-if shared_fs is None: raise RuntimeError("shared help font fit failed")
+        lay=render_low(r["korean"],fs); lays.append((r,lay))
+        if lay.height>ah-2*MARGIN:
+            height_ok=False; break
+    if not height_ok: continue
+    sx=min(1.0,min((r["original_bbox"][2]-r["original_bbox"][0]-2*MARGIN)/lay.width for r,lay in lays))
+    if sx>=0.65:
+        shared_fs=fs; common_x_scale=sx; break
+if shared_fs is None: raise RuntimeError("shared help height/condense fit failed")
 
 final=clean.copy(); targets=[]; outrows=[]
 for r in rows:
     ob=r["original_bbox"]; aw=ob[2]-ob[0]; ah=ob[3]-ob[1]
     lay=render_low(r["korean"],shared_fs)
+    if common_x_scale < 0.999:
+        lay=lay.resize((max(1,int(lay.width*common_x_scale)),lay.height),Image.Resampling.NEAREST)
     px=ob[0]+MARGIN; py=ob[1]+(ah-lay.height)//2
     py=max(ob[1]+MARGIN,min(py,ob[3]-MARGIN-lay.height))
     final.alpha_composite(lay,(px,py))
@@ -137,8 +145,8 @@ for r in rows:
       "localized_width":lb[2]-lb[0],"localized_height":lb[3]-lb[1],
       "delta_left":lb[0]-ob[0],"delta_right":ob[2]-lb[2],"delta_top":lb[1]-ob[1],"delta_bottom":ob[3]-lb[3],
       "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","font_file":Path(FONT).name,
-      "font_face_index":FI,"font_style":FSTYLE,"lowres_font_size":shared_fs,"pixel_scale":4,"fill_rgba":fill,
-      "alignment":"left","rework_status":"B81_NEW_EXACT_HD_CANDIDATE"})
+      "font_face_index":FI,"font_style":FSTYLE,"lowres_font_size":shared_fs,"pixel_scale":4,"horizontal_scale":common_x_scale,"fill_rgba":fill,
+      "alignment":"left","rework_status":"B82_NEW_EXACT_HD_CANDIDATE"})
 
 ov=0; touch=[]
 for i in range(len(targets)):
@@ -156,8 +164,8 @@ candidate.write_bytes(payload); csha=sha(payload)
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode); dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip")
 fp=out/"8C_FINAL_DECODED_READABLE.png"; dec.save(fp)
-subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"B81_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"B81_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"B82_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"B82_FINAL_VALIDATION.json").read_text())
 
 diff=dmask(src,dec); outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
 alphaout=count(ImageChops.multiply(bmask(ImageChops.difference(src.getchannel("A"),dec.getchannel("A"))),ImageOps.invert(allowed)))
@@ -173,7 +181,7 @@ target.save(out/"8C_TARGET_TEXT_MASK.png")
 full=Image.new("RGB",(1024,3*536),"white")
 for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,512),Image.Resampling.NEAREST); full.paste(z,(0,i*536+24)); ImageDraw.Draw(full).text((5,i*536+4),label,fill="black")
-full.save(out/"B81_8C_SOURCE_CLEAN_FINAL.jpg",quality=96)
+full.save(out/"B82_8C_SOURCE_CLEAN_FINAL.jpg",quality=96)
 
 cards=[]
 for r in outrows:
@@ -187,28 +195,28 @@ for r in outrows:
     cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+4*(len(cards)-1)),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.thumbnail((2200,12000),Image.Resampling.LANCZOS); sheet.save(out/"B81_8C_ROW_CONTACT.jpg",quality=96)
+sheet.thumbnail((2200,12000),Image.Resampling.LANCZOS); sheet.save(out/"B82_8C_ROW_CONTACT.jpg",quality=96)
 
 rr=Image.new("RGB",(1024,2*536),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im).resize((1024,512),Image.Resampling.NEAREST); rr.paste(z,(0,i*536+24)); ImageDraw.Draw(rr).text((5,i*536+4),label,fill="black")
-rr.save(out/"B81_8C_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"B82_8C_RAW_COMPARE.jpg",quality=96)
 
 report={"schema_version":1,"role":"B","run":run,"index":188,"asset":asset,
  "readiness_tier":"ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":commit,"git_blob_sha1":blob(sb),"atlas_git_blob_sha1":blob(ab),"source_sha256":sha(sb)},
- "semantic_binding":{"method":"six reviewed transcription segments mapped 1:1 to the six atlas regions in index order","localized":{str(i):en for i,en,_ in specs},"translations":{str(i):ko for i,_,ko in specs}},
+ "semantic_binding":{"method":"six reviewed transcription segments bound to readable mirror_y rows; atlas indices map in reverse visual order (5..0)","localized":{str(i):en for i,en,_ in specs},"translations":{str(i):ko for i,_,ko in specs}},
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
- "source_style":{**style_diag,"family":"shared front-end help copy","font_file":Path(FONT).name,"font_face_index":FI,"font_style":FSTYLE,"shared_lowres_font_size":shared_fs,"pixel_scale":4,"alignment":"left"},
+ "source_style":{**style_diag,"family":"shared front-end help copy","font_file":Path(FONT).name,"font_face_index":FI,"font_style":FSTYLE,"shared_lowres_font_size":shared_fs,"pixel_scale":4,"shared_horizontal_scale":common_x_scale,"alignment":"left"},
  "rows":outrows,"clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
  "decoded_changes":{"changed_pixels_total":count(diff),"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"exact_source_residue":residue,"render_outside_target":render_outside,"overlap":ov,"touch_pairs":touch},
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
  "status":"B_PRODUCTION81_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
-(out/"B81_8C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(out/"B82_8C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":188,"asset":"8C259C68","source_sha256":sha(sb),"candidate_sha256":csha,"localized_physical_elements":len(specs),
  "bbox_size_positive_margin":f"{len(specs)}/{len(specs)}","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "source_residue":residue,"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"render_outside_target":render_outside,"overlap":ov,"touch_pairs":len(touch),
- "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B81_8C_REPORT.json"}
-(wr/"B81_8C259C68.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B82_8C_REPORT.json"}
+(wr/"B82_8C259C68.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False))
