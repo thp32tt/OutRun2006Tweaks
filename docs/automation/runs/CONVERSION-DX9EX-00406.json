@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00406",
+  "production_id": "CONVERSION-DX9EX-00406",
+  "event_id": "CONVERSION-DX9EX-00406-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "queue_controller_contract": {
+    "path": "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "status": "APPLIED"
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+  "source_material_sha": "cbe725042802622866e35e376db44e2ac70e9f2e",
+  "result_sha": "9626ce91b664d247aeea79a0b1338496d8a0792e",
+  "material_result_sha": "9626ce91b664d247aeea79a0b1338496d8a0792e",
+  "validation_bearing_result_sha": "9626ce91b664d247aeea79a0b1338496d8a0792e",
+  "state_commit_sha": "9dfbe10eca6a20d539661229d93b12a2e5891863",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00406]",
+  "selected_work_item": "DX9EX-FINGERPRINT-TELEMETRY-HOTPATH-GUARD-001",
+  "summary": "Completed the bounded follow-up to 00405 producer fingerprinting: c64 semantic provenance lookup and semantic-HUD c64 node-relation bookkeeping now execute only when VRTelemetry is enabled. The existing RenderScope/projection/world classification remains authoritative and unchanged. The producer-provenance verifier now fails closed if the diagnostics leak back onto the telemetry-off HUD hot path.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/verify_vr_producer_provenance.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/VR_WORK_QUEUE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00406.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read current vr-d3d9ex-focus HEAD 4f28c613, AGENTS.md, VR_REFACTOR_STATE cycle 1100, queue controller contract, work queue/regression/problem records, and 00405 Issue #13/#14 validation evidence. R31/R32 physical retirement remains DEFERRED; 00405 behavior follow-up is HMD-dependent."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "00405 kept producer fingerprint work off the generic non-HUD path, but ScreenHud draws still called GetLastGameWvpSemanticProvenance with VRTelemetry disabled even though c64/node-relation outputs are emitted only by telemetry."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "cbe725042802622866e35e376db44e2ac70e9f2e telemetry-gated the c64 provenance lookup and HUD node-relation counters; 9626ce91b664d247aeea79a0b1338496d8a0792e added the deterministic hot-path regression guard."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact-SHA DX9Ex Active 37272660121 succeeded for policy/host/game/full-chain/package; Domain Isolation 37272660120 succeeded. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "source_material_sha": "cbe725042802622866e35e376db44e2ac70e9f2e",
+      "result_sha": "9626ce91b664d247aeea79a0b1338496d8a0792e",
+      "validation_bearing_result_sha": "9626ce91b664d247aeea79a0b1338496d8a0792e",
+      "task_tagged_commits": [
+        "cbe725042802622866e35e376db44e2ac70e9f2e perf(vr): telemetry-gate HUD c64 provenance [AUTO:CONVERSION-DX9EX-00406]",
+        "9626ce91b664d247aeea79a0b1338496d8a0792e test(vr): guard telemetry-only c64 provenance [AUTO:CONVERSION-DX9EX-00406]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Artifact 11329676021 OutRun2-VR-DX9EX-ACTIVE-9626ce91b664d247aeea79a0b1338496d8a0792e digest sha256:1f3ae6b0f1df5243b9e0014ee69afc91f24827b3fbaa2007a6dc9b93565c49d4. Build artifact is not runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "state_commit_sha": "9dfbe10eca6a20d539661229d93b12a2e5891863",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37272660121,
+      "conclusion": "success",
+      "exact_sha": "9626ce91b664d247aeea79a0b1338496d8a0792e",
+      "jobs": {
+        "policy": 111642793027,
+        "host": 111642905104,
+        "full_chain_compile": 111642905129,
+        "game": 111642905189,
+        "package": 111644219259
+      },
+      "artifact_id": 11329676021,
+      "artifact_digest": "sha256:1f3ae6b0f1df5243b9e0014ee69afc91f24827b3fbaa2007a6dc9b93565c49d4"
+    },
+    "domain_isolation": {
+      "run_id": 37272660120,
+      "conclusion": "success",
+      "exact_sha": "9626ce91b664d247aeea79a0b1338496d8a0792e"
+    },
+    "n100_local": {
+      "conclusion": "AUXILIARY_ANALYSIS_ONLY",
+      "note": "Used only to fetch/read current GitHub branch state and inspect source/static context; no local result was treated as completion evidence."
+    }
+  },
+  "next_action": "Quest3/VDXR CORRECTNESS-test exact build 9626ce91 with VRTelemetry enabled and inspect C64/DRAW producer fingerprints. Do not promote ProducerToken into rendering authority. Keep R31/R32 physical retirement deferred until an atomic replacement preserves all guarded preconditions.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00406",
+    "production_id": "CONVERSION-DX9EX-00406",
+    "event_id": "CONVERSION-DX9EX-00406-E001",
+    "event_type": "dispatch",
+    "lane": "DX9EX",
+    "target_branch": "vr-d3d9ex-focus",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "9626ce91b664d247aeea79a0b1338496d8a0792e",
+    "validation_bearing_result_sha": "9626ce91b664d247aeea79a0b1338496d8a0792e",
+    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+    "runtime_validation": "UNTESTED"
+  },
+  "validated_at_kst": "2026-10-05T15:35:05+09:00",
+  "completed_at_kst": "2026-10-05T15:35:05+09:00"
+}
