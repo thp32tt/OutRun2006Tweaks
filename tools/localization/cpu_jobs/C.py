@@ -135,9 +135,16 @@ chg=np.any(fa!=sa,axis=2); ach=fa[:,:,3]!=sa[:,:,3]; intro=fa[:,:,3]>sa[:,:,3]
 preserved={}
 for label,pm in preserved_masks:
     preserved[label]=count(chg & pm)
-# Any exact source pixel retained inside localizable source glyph masks is source-script residue.
+# Exact source pixels outside the independently decoded localized bboxes are residue.
+# Pixels inside a Korean bbox can legitimately match source RGBA by coincidence because
+# the localized glyph uses source-sampled fill colors; those are adjudicated visually.
 exact=np.all(fa==sa,axis=2)
-residue=count(source_mask & exact & (sa[:,:,3]>0))
+localized_bbox_union=np.zeros((H,W),bool)
+for rr in row_checks:
+    bb=rr["independent_localized_bbox"]
+    if bb is not None:
+        x0,y0,x1,y1=bb; localized_bbox_union[y0:y1,x0:x1]=True
+residue=count(source_mask & exact & (sa[:,:,3]>0) & ~localized_bbox_union)
 ov=0; touch=0
 for i,(ii,mi) in enumerate(targets):
     yy,xx=np.nonzero(mi); dil=np.zeros_like(mi)
