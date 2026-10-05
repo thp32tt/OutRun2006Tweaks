@@ -59,7 +59,7 @@ namespace Settings
     Setting<int> WheelFFBFeelRevision{
         "WheelFFB", "FeelRevision", 0,
         "Internal one-shot migration version for wheel FFB feel defaults.",
-        Range<int>{ 0, 7 }
+        Range<int>{ 0, 8 }
     };
 }
 
@@ -953,6 +953,34 @@ namespace
                     Settings::WheelFFBWallImpact = 0.80f;
                 Settings::WheelFFBFeelRevision = 7;
                 revision = 7;
+                changed = true;
+            }
+
+            if (revision < 8)
+            {
+                // R11 hardware follow-up:
+                // - retire persisted Hybrid (Model=2) into a complete Modern DD baseline;
+                // - lift the R9/R10 Modern wall default from 0.55 to 0.80 for users
+                //   already stamped at FeelRevision 7;
+                // - preserve any deliberate manual Reverse override for an existing
+                //   Modern/Arcade/PS2 profile. Model-change defaults remain runtime-owned.
+                const int rawModel = static_cast<int>(Settings::WheelFFBModel);
+                if (rawModel == 2)
+                {
+                    apply_universal_physics_preset();
+                    Settings::WheelFFBModel = 0;
+                }
+
+                const auto model = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                if (model == WheelFFBMath::Model::ModernDD &&
+                    nearly(static_cast<float>(Settings::WheelFFBWallImpact), 0.55f))
+                {
+                    Settings::WheelFFBWallImpact = 0.80f;
+                }
+
+                Settings::WheelFFBFeelRevision = 8;
+                revision = 8;
                 changed = true;
             }
 
