@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C159-DDF0392A",
+  "queue_index": 222,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+  "producer_run": "20261005-B-PRODUCTION89",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "1ff7680eb71750d884b0e69fe058aef3a5cf5fa2",
+    "atlas_git_blob_sha1": "819d31b1cd9c59fb6d011f3f0361d6ed7114c286",
+    "source_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72"
+  },
+  "candidate_sha256": "e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea",
+  "candidate_changed_by_C": false,
+  "independent_method": "C re-downloaded pinned canonical DXT5 DDS+atlas, independently decoded source/candidate, re-derived the three exact source-alpha bboxes from canonical regions, required byte-identical decoded RGBA outside their union, explicitly compared protected song-title/Ferrari regions 3..24, rebuilt the transparent-alpha clean plate, remeasured decoded localized bboxes/residue/overlap/protected separation, and independently audited BC3 changed-block scope.",
+  "structure": {
+    "dimensions": [
+      1024,
+      2048
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "semantic_binding": {
+    "localized": [
+      {
+        "region_idx": 0,
+        "source": "OutRun Mode / 15 C.",
+        "korean": "아웃런 모드 / 15코스"
+      },
+      {
+        "region_idx": 1,
+        "source": "OutRun 1986",
+        "korean": "아웃런 1986"
+      },
+      {
+        "region_idx": 2,
+        "source": "Journey Mode / Random",
+        "korean": "저니 모드 / 무작위"
+      }
+    ],
+    "protected_song_titles": {
+      "3": "Who Are You?",
+      "4": "Splash Wave",
+      "5": "Shiny World",
+      "6": "Shake The Street",
+      "7": "Rush A Difficulty",
+      "8": "Risky Ride",
+      "9": "Passing Breeze"
+    },
+    "protected_rows_10_24": "Ferrari model names"
+  },
+  "rows": [
+    {
+      "region_idx": 0,
+      "source": "OutRun Mode / 15 C.",
+      "korean": "아웃런 모드 / 15코스",
+      "cell": [
+        0,
+        1972,
+        960,
+        76
+      ],
+      "original_bbox": [
+        6,
+        1986,
+        548,
+        2038
+      ],
+      "source_mask_pixels": 11883,
+      "localized_bbox": [
+        10,
+        1992,
+        322,
+        2031
+      ],
+      "source_size": [
+        542,
+        52
+      ],
+      "localized_size": [
+        312,
+        39
+      ],
+      "delta_left": 4,
+      "delta_right": 226,
+      "delta_top": 6,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 1,
+      "source": "OutRun 1986",
+      "korean": "아웃런 1986",
+      "cell": [
+        0,
+        1896,
+        960,
+        76
+      ],
+      "original_bbox": [
+        4,
+        1913,
+        333,
+        1957
+      ],
+      "source_mask_pixels": 7402,
+      "localized_bbox": [
+        6,
+        1918,
+        199,
+        1954
+      ],
+      "source_size": [
+        329,
+        44
+      ],
+      "localized_size": [
+        193,
+        36
+      ],
+      "delta_left": 2,
+      "delta_right": 134,
+      "delta_top": 5,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 2,
+      "source": "Journey Mode / Random",
+      "korean": "저니 모드 / 무작위",
+      "cell": [
+        0,
+        1820,
+        960,
+        76
+      ],
+      "original_bbox": [
+        2,
+        1830,
+        627,
+        1888
+      ],
+      "source_mask_pixels": 14349,
+      "localized_bbox": [
+        6,
+        1840,
+        273,
+        1879
+      ],
+      "source_size": [
+        625,
+        58
+      ],
+      "localized_size": [
+        267,
+        39
+      ],
+      "delta_left": 4,
+      "delta_right": 354,
+      "delta_top": 10,
+      "delta_bottom": 9,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "decoded_pixels_changed_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "introduced_visible_outside_exact_source_bboxes": 0,
+    "protected_rows_3_24_changed_pixels": {
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0,
+      "14": 0,
+      "15": 0,
+      "16": 0,
+      "17": 0,
+      "18": 0,
+      "19": 0,
+      "20": 0,
+      "21": 0,
+      "22": 0,
+      "23": 0,
+      "24": 0
+    },
+    "clean_changed_outside_source_mask": 0,
+    "clean_unchanged_inside_source_mask": 0,
+    "bbox_size_positive_margin": "3/3 PASS",
+    "source_residue": 0,
+    "overlap": 0,
+    "touch_pairs": [],
+    "target_protected_overlap": 0,
+    "target_protected_1px_near": 0,
+    "source_fill_median_rgb": [
+      46,
+      53,
+      57
+    ],
+    "localized_fill_median_rgb": [
+      46,
+      53,
+      57
+    ],
+    "fill_median_abs_delta": [
+      0,
+      0,
+      0
+    ],
+    "changed_bc3_blocks": 3269,
+    "changed_bc3_blocks_wholly_outside_allowed": 0
+  },
+  "song_title_policy": "PASS_PRESERVE_ORIGINAL_ENGLISH_PIXEL_EXACT",
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
