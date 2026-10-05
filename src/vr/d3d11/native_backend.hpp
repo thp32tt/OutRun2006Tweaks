@@ -1826,11 +1826,68 @@ validate_programmable_resource_behavior_readiness_snapshot(
     std::uint64_t indexMirrorSnapshotToken,
     std::uint64_t reviewSnapshotToken) noexcept;
 
-// R259 consumes the current R258 source receipt, R260 resource-behavior review
+// R261 binds the current R260 geometry receipt to one exact MANAGED texture
+// stage readiness snapshot. The required mask is explicit and every required
+// stage must have current shadow, mirror lifetime, device and descriptor
+// evidence. This proves texture resource behavior only for that supplied stage
+// set; output-resource behavior stays absent and no shader semantic claim is
+// inferred from the mask.
+struct NativeProgrammableShaderTextureResourceBehaviorReadiness {
+    bool inputValid{};
+    bool geometryReviewReady{};
+    bool geometrySnapshotMatches{};
+    bool requiredTextureScopePresent{};
+    bool textureStagesInputValid{};
+    bool textureStageSnapshotMatches{};
+    bool geometryResourceBehaviorExact{};
+    bool textureResourceBehaviorExact{};
+    bool outputResourceBehaviorProofPresent{};
+    bool fullResourceBehaviorProofPresent{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    NativeProgrammableShaderDrawCandidateKind kind =
+        NativeProgrammableShaderDrawCandidateKind::None;
+    bool indexed{};
+    std::uint32_t requiredTextureMask{};
+    std::uint32_t readyTextureMask{};
+    std::uint32_t pendingTextureMask{};
+    std::uint32_t missingResourceScopeMask{};
+    std::uint64_t sourceRevalidationSnapshotToken{};
+    std::uint64_t geometrySnapshotToken{};
+    std::uint64_t textureStageSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderTextureResourceBehaviorReadiness
+compose_programmable_texture_resource_behavior_readiness(
+    const NativeProgrammableShaderResourceBehaviorReadiness& geometryBehavior,
+    std::uint64_t geometrySnapshotToken,
+    const NativeManagedTextureRegistry& textureRegistry,
+    const void* const* textureKeys,
+    std::size_t textureCount,
+    ID3D11Device* expectedDevice,
+    const NativeManagedTextureStageReadiness& textureStages,
+    std::uint64_t textureStageSnapshotToken) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_texture_resource_behavior_readiness_snapshot(
+    const NativeProgrammableShaderResourceBehaviorReadiness& geometryBehavior,
+    std::uint64_t geometrySnapshotToken,
+    const NativeManagedTextureRegistry& textureRegistry,
+    const void* const* textureKeys,
+    std::size_t textureCount,
+    ID3D11Device* expectedDevice,
+    const NativeManagedTextureStageReadiness& textureStages,
+    std::uint64_t textureStageSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
+// R259 consumes the current R258 source receipt, R261 resource-behavior review
 // and R243 input-layout ownership receipt into one activation-prerequisite
-// handoff. R260 now proves current MANAGED geometry behavior, but F18 remains
-// incomplete until texture/output resource behavior is represented. F21 shader
-// semantic translation also remains absent, so activation authority stays off.
+// handoff. R260+R261 now prove current MANAGED geometry and supplied texture
+// behavior, but F18 remains incomplete until output-resource behavior is
+// represented. F21 shader semantic translation also remains absent, so
+// activation authority stays off.
 struct NativeProgrammableShaderActivationPrerequisiteHandoff {
     bool inputValid{};
     bool sourceRevalidationReady{};
@@ -1838,6 +1895,7 @@ struct NativeProgrammableShaderActivationPrerequisiteHandoff {
     bool resourceBehaviorReviewReady{};
     bool resourceBehaviorSnapshotMatches{};
     bool resourceBehaviorGeometryProofPresent{};
+    bool resourceBehaviorTextureProofPresent{};
     bool resourceBehaviorCoverageComplete{};
     bool inputLayoutOwnershipReady{};
     bool inputLayoutSnapshotMatches{};
@@ -1866,7 +1924,7 @@ compose_programmable_activation_prerequisite_handoff(
     const NativeProgrammableShaderDormantSourceRevalidationReadiness&
         sourceRevalidation,
     std::uint64_t sourceRevalidationSnapshotToken,
-    const NativeProgrammableShaderResourceBehaviorReadiness& resourceBehavior,
+    const NativeProgrammableShaderTextureResourceBehaviorReadiness& resourceBehavior,
     std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken) noexcept;
@@ -1876,7 +1934,7 @@ validate_programmable_activation_prerequisite_handoff_snapshot(
     const NativeProgrammableShaderDormantSourceRevalidationReadiness&
         sourceRevalidation,
     std::uint64_t sourceRevalidationSnapshotToken,
-    const NativeProgrammableShaderResourceBehaviorReadiness& resourceBehavior,
+    const NativeProgrammableShaderTextureResourceBehaviorReadiness& resourceBehavior,
     std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken,
