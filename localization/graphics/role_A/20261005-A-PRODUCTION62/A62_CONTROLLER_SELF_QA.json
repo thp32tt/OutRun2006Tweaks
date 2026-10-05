@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION62",
+  "timestamp_kst": "2026-10-05T22:10:36+09:00",
+  "queue_index": 173,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds",
+  "source_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+  "candidate_sha256": "b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26",
+  "semantic_binding": {
+    "evidence": "localization/graphics/role_A/20261005-A-PRODUCTION61-PREFLIGHT/A61_6DC89C6E_SOURCE_ROWS.jpg",
+    "physical_order": "idx0..20 = WATERFALLS, SUNNY BEACH, SKYSCRAPERS, NATIONAL PARK, MILKY WAY, LOST CITY, LEGEND, JUNGLE, ICE SCAPE, GIANT STATUES, FLORAL VILLAGE, CASINO TOWN, CANYON, BIG FOREST, TULIP GARDEN, SNOW MOUNTAIN, PALM BEACH, METROPOLIS, INDUSTRIAL COMPLEX, IMPERIAL AVENUE, GHOST FOREST",
+    "result": "PASS_21_OF_21"
+  },
+  "stage_name_policy": "PASS_CANONICAL_PHONETIC_TRANSLITERATION",
+  "machine_qa": {
+    "structure": "2048x2048 RGBA32/BGRA mip1 raw mirror_y header exact",
+    "bbox_size_positive_margin": "21/21 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "source_residue": 0,
+    "render_outside_target": 0,
+    "overlap": 0,
+    "touch_pairs": 0
+  },
+  "source_style": {
+    "family": "shared blue-gray bold condensed all-caps stage list",
+    "shared_lowres_font_size": 18,
+    "pixel_scale": 4,
+    "alignment": "left",
+    "fill_median_rgba": [
+      79,
+      97,
+      101,
+      255
+    ],
+    "note": "Source-height family retained with positive vertical margins; only ICE SCAPE requires modest horizontal condensation (0.9739), all other rows use 1.0 horizontal scale."
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "readable_contacts": "PASS_21_OF_21_SEMANTIC_STYLE_ORIENTATION",
+    "clean_plate": "PASS_TRANSPARENT_NO_SOURCE_SCRIPT_RESIDUE",
+    "final": "PASS_SOURCE_FAMILY_COLOR_WEIGHT_HEIGHT_LEFT_ALIGNMENT",
+    "raw_mirror_y": "PASS"
+  },
+  "decision": "A62_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
