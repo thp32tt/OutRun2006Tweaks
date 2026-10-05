@@ -1,0 +1,1235 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261006-C217-ACF61D7C",
+  "qa_id": "C217",
+  "queue_index": 205,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+  "producer_run": "20261006-A-PRODUCTION76-ACF",
+  "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+  "candidate_sha256": "2bbb9d19a833fb6c9ade243eb70132ef5ce46150d1fa1cb9423ff4e5101b770c",
+  "structure": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "row_checks": [
+    {
+      "key": "sorry_title",
+      "region_idx": 2,
+      "source": "SORRY!",
+      "korean": "죄송합니다!",
+      "producer_original_bbox": [
+        1846,
+        1893,
+        2097,
+        1946
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        1846,
+        1893,
+        2097,
+        1946
+      ],
+      "producer_localized_bbox": [
+        1850,
+        1897,
+        2026,
+        1941
+      ],
+      "independent_clean_to_final_bbox": [
+        1850,
+        1897,
+        2026,
+        1941
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 251,
+      "source_height": 53,
+      "localized_width": 176,
+      "localized_height": 44,
+      "width_ratio": 0.7012,
+      "height_ratio": 0.8302,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "sorry_body",
+      "region_idx": 2,
+      "source": "You need more miles!",
+      "korean": "마일이 더 필요합니다!",
+      "producer_original_bbox": [
+        1843,
+        1973,
+        2412,
+        2025
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        1843,
+        1973,
+        2412,
+        2025
+      ],
+      "producer_localized_bbox": [
+        1847,
+        1977,
+        2175,
+        2021
+      ],
+      "independent_clean_to_final_bbox": [
+        1847,
+        1977,
+        2175,
+        2021
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 569,
+      "source_height": 52,
+      "localized_width": 328,
+      "localized_height": 44,
+      "width_ratio": 0.5764,
+      "height_ratio": 0.8462,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "congrats_title",
+      "region_idx": 3,
+      "source": "CONGRATULATIONS!",
+      "korean": "축하합니다!",
+      "producer_original_bbox": [
+        17,
+        1388,
+        891,
+        1470
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        17,
+        1388,
+        891,
+        1470
+      ],
+      "producer_localized_bbox": [
+        21,
+        1393,
+        357,
+        1465
+      ],
+      "independent_clean_to_final_bbox": [
+        21,
+        1393,
+        357,
+        1465
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 874,
+      "source_height": 82,
+      "localized_width": 336,
+      "localized_height": 72,
+      "width_ratio": 0.3844,
+      "height_ratio": 0.878,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "congrats_body",
+      "region_idx": 3,
+      "source": "You got this item",
+      "korean": "이 아이템을 획득했습니다",
+      "producer_original_bbox": [
+        11,
+        1503,
+        459,
+        1559
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        11,
+        1503,
+        459,
+        1559
+      ],
+      "producer_localized_bbox": [
+        15,
+        1509,
+        399,
+        1553
+      ],
+      "independent_clean_to_final_bbox": [
+        15,
+        1509,
+        399,
+        1553
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 448,
+      "source_height": 56,
+      "localized_width": 384,
+      "localized_height": 44,
+      "width_ratio": 0.8571,
+      "height_ratio": 0.7857,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "options",
+      "region_idx": 4,
+      "source": "OPTIONS",
+      "korean": "옵션",
+      "producer_original_bbox": [
+        1591,
+        1423,
+        2316,
+        1568
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        1591,
+        1423,
+        2316,
+        1568
+      ],
+      "producer_localized_bbox": [
+        1595,
+        1427,
+        1843,
+        1563
+      ],
+      "independent_clean_to_final_bbox": [
+        1595,
+        1427,
+        1843,
+        1563
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 725,
+      "source_height": 145,
+      "localized_width": 248,
+      "localized_height": 136,
+      "width_ratio": 0.3421,
+      "height_ratio": 0.9379,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "rankings",
+      "region_idx": 5,
+      "source": "RANKINGS",
+      "korean": "랭킹",
+      "producer_original_bbox": [
+        33,
+        1245,
+        930,
+        1388
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        33,
+        1245,
+        930,
+        1388
+      ],
+      "producer_localized_bbox": [
+        37,
+        1250,
+        269,
+        1382
+      ],
+      "independent_clean_to_final_bbox": [
+        37,
+        1250,
+        269,
+        1382
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 897,
+      "source_height": 143,
+      "localized_width": 232,
+      "localized_height": 132,
+      "width_ratio": 0.2586,
+      "height_ratio": 0.9231,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "out_run_1p",
+      "region_idx": 8,
+      "source": "OutRun for 1 player!",
+      "korean": "1인 플레이!",
+      "producer_original_bbox": [
+        1959,
+        1066,
+        2569,
+        1132
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        1959,
+        1066,
+        2569,
+        1132
+      ],
+      "producer_localized_bbox": [
+        2192,
+        1071,
+        2424,
+        1127
+      ],
+      "independent_clean_to_final_bbox": [
+        2192,
+        1071,
+        2424,
+        1127
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 610,
+      "source_height": 66,
+      "localized_width": 232,
+      "localized_height": 56,
+      "width_ratio": 0.3803,
+      "height_ratio": 0.8485,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "view_rankings",
+      "region_idx": 9,
+      "source": "View single player and multiplayer rankings",
+      "korean": "싱글/멀티플레이 랭킹 보기",
+      "producer_original_bbox": [
+        3,
+        911,
+        1334,
+        977
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        3,
+        911,
+        1334,
+        977
+      ],
+      "producer_localized_bbox": [
+        7,
+        916,
+        531,
+        972
+      ],
+      "independent_clean_to_final_bbox": [
+        7,
+        916,
+        531,
+        972
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 1331,
+      "source_height": 66,
+      "localized_width": 524,
+      "localized_height": 56,
+      "width_ratio": 0.3937,
+      "height_ratio": 0.8485,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "enjoy_original",
+      "region_idx": 10,
+      "source": "Enjoy the original OutRun2SP",
+      "korean": "오리지널 즐기기",
+      "producer_original_bbox": [
+        1807,
+        909,
+        2696,
+        975
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        1807,
+        909,
+        2696,
+        975
+      ],
+      "producer_localized_bbox": [
+        2032,
+        914,
+        2348,
+        970
+      ],
+      "independent_clean_to_final_bbox": [
+        2032,
+        914,
+        2348,
+        970
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 889,
+      "source_height": 66,
+      "localized_width": 316,
+      "localized_height": 56,
+      "width_ratio": 0.3555,
+      "height_ratio": 0.8485,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "adjust_settings",
+      "region_idx": 11,
+      "source": "Adjust your Game settings",
+      "korean": "게임 설정 조정",
+      "producer_original_bbox": [
+        1,
+        748,
+        1800,
+        814
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        1,
+        748,
+        1800,
+        814
+      ],
+      "producer_localized_bbox": [
+        5,
+        753,
+        289,
+        809
+      ],
+      "independent_clean_to_final_bbox": [
+        5,
+        753,
+        289,
+        809
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 1799,
+      "source_height": 66,
+      "localized_width": 284,
+      "localized_height": 56,
+      "width_ratio": 0.1579,
+      "height_ratio": 0.8485,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "exchange_line1",
+      "region_idx": 12,
+      "source": "Exchange OutRun miles",
+      "korean": "이 아이템을|마일로",
+      "producer_original_bbox": [
+        10,
+        598,
+        641,
+        655
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        10,
+        598,
+        641,
+        655
+      ],
+      "producer_localized_bbox": [
+        87,
+        602,
+        597,
+        650
+      ],
+      "independent_clean_to_final_bbox": [
+        87,
+        602,
+        597,
+        650
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 631,
+      "source_height": 57,
+      "localized_width": 510,
+      "localized_height": 48,
+      "width_ratio": 0.8082,
+      "height_ratio": 0.8421,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "exchange_line2",
+      "region_idx": 12,
+      "source": "for this item?",
+      "korean": "교환할까요?",
+      "producer_original_bbox": [
+        7,
+        670,
+        360,
+        717
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        7,
+        670,
+        360,
+        717
+      ],
+      "producer_localized_bbox": [
+        11,
+        675,
+        155,
+        711
+      ],
+      "independent_clean_to_final_bbox": [
+        11,
+        675,
+        155,
+        711
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 353,
+      "source_height": 47,
+      "localized_width": 144,
+      "localized_height": 36,
+      "width_ratio": 0.4079,
+      "height_ratio": 0.766,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "license_details",
+      "region_idx": 44,
+      "source": "LICENSE DETAILS",
+      "korean": "라이선스 정보",
+      "producer_original_bbox": [
+        864,
+        435,
+        1383,
+        486
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        864,
+        435,
+        1383,
+        486
+      ],
+      "producer_localized_bbox": [
+        868,
+        440,
+        1056,
+        480
+      ],
+      "independent_clean_to_final_bbox": [
+        868,
+        440,
+        1056,
+        480
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 519,
+      "source_height": 51,
+      "localized_width": 188,
+      "localized_height": 40,
+      "width_ratio": 0.3622,
+      "height_ratio": 0.7843,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "yes",
+      "region_idx": 45,
+      "source": "YES",
+      "korean": "예",
+      "producer_original_bbox": [
+        1512,
+        425,
+        1632,
+        478
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        1512,
+        425,
+        1632,
+        478
+      ],
+      "producer_localized_bbox": [
+        1516,
+        435,
+        1540,
+        467
+      ],
+      "independent_clean_to_final_bbox": [
+        1516,
+        435,
+        1540,
+        467
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 120,
+      "source_height": 53,
+      "localized_width": 24,
+      "localized_height": 32,
+      "width_ratio": 0.2,
+      "height_ratio": 0.6038,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "no",
+      "region_idx": 46,
+      "source": "NO",
+      "korean": "아니오",
+      "producer_original_bbox": [
+        1849,
+        425,
+        1925,
+        478
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        1849,
+        425,
+        1925,
+        478
+      ],
+      "producer_localized_bbox": [
+        1853,
+        435,
+        1921,
+        467
+      ],
+      "independent_clean_to_final_bbox": [
+        1853,
+        435,
+        1921,
+        467
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 76,
+      "source_height": 53,
+      "localized_width": 68,
+      "localized_height": 32,
+      "width_ratio": 0.8947,
+      "height_ratio": 0.6038,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "reverse",
+      "region_idx": 48,
+      "source": "REVERSE",
+      "korean": "반전",
+      "producer_original_bbox": [
+        3624,
+        434,
+        3864,
+        478
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        3624,
+        434,
+        3864,
+        478
+      ],
+      "producer_localized_bbox": [
+        3812,
+        440,
+        3860,
+        472
+      ],
+      "independent_clean_to_final_bbox": [
+        3812,
+        440,
+        3860,
+        472
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 240,
+      "source_height": 44,
+      "localized_width": 48,
+      "localized_height": 32,
+      "width_ratio": 0.2,
+      "height_ratio": 0.7273,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "your_position",
+      "region_idx": 54,
+      "source": "YOUR POSITION",
+      "korean": "현재 순위",
+      "producer_original_bbox": [
+        2544,
+        363,
+        2907,
+        401
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        2544,
+        363,
+        2907,
+        401
+      ],
+      "producer_localized_bbox": [
+        2548,
+        368,
+        2628,
+        396
+      ],
+      "independent_clean_to_final_bbox": [
+        2548,
+        368,
+        2628,
+        396
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 363,
+      "source_height": 38,
+      "localized_width": 80,
+      "localized_height": 28,
+      "width_ratio": 0.2204,
+      "height_ratio": 0.7368,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "ok",
+      "region_idx": 55,
+      "source": "OK",
+      "korean": "확인",
+      "producer_original_bbox": [
+        2933,
+        363,
+        2991,
+        401
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        2933,
+        363,
+        2991,
+        401
+      ],
+      "producer_localized_bbox": [
+        2937,
+        368,
+        2977,
+        396
+      ],
+      "independent_clean_to_final_bbox": [
+        2937,
+        368,
+        2977,
+        396
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 58,
+      "source_height": 38,
+      "localized_width": 40,
+      "localized_height": 28,
+      "width_ratio": 0.6897,
+      "height_ratio": 0.7368,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "local_mixed",
+      "region_idx": 59,
+      "source": "LOCAL MIXED",
+      "korean": "로컬 혼합",
+      "producer_original_bbox": [
+        4,
+        297,
+        328,
+        337
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        4,
+        297,
+        328,
+        337
+      ],
+      "producer_localized_bbox": [
+        8,
+        301,
+        104,
+        333
+      ],
+      "independent_clean_to_final_bbox": [
+        8,
+        301,
+        104,
+        333
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 324,
+      "source_height": 40,
+      "localized_width": 96,
+      "localized_height": 32,
+      "width_ratio": 0.2963,
+      "height_ratio": 0.8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "local_mt",
+      "region_idx": 60,
+      "source": "LOCAL MT",
+      "korean": "로컬 MT",
+      "producer_original_bbox": [
+        389,
+        297,
+        625,
+        337
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        389,
+        297,
+        625,
+        337
+      ],
+      "producer_localized_bbox": [
+        393,
+        301,
+        481,
+        333
+      ],
+      "independent_clean_to_final_bbox": [
+        393,
+        301,
+        481,
+        333
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 236,
+      "source_height": 40,
+      "localized_width": 88,
+      "localized_height": 32,
+      "width_ratio": 0.3729,
+      "height_ratio": 0.8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "local_at",
+      "region_idx": 61,
+      "source": "LOCAL AT",
+      "korean": "로컬 AT",
+      "producer_original_bbox": [
+        777,
+        297,
+        1001,
+        337
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        777,
+        297,
+        1001,
+        337
+      ],
+      "producer_localized_bbox": [
+        781,
+        301,
+        861,
+        333
+      ],
+      "independent_clean_to_final_bbox": [
+        781,
+        301,
+        861,
+        333
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 224,
+      "source_height": 40,
+      "localized_width": 80,
+      "localized_height": 32,
+      "width_ratio": 0.3571,
+      "height_ratio": 0.8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "friends",
+      "region_idx": 62,
+      "source": "FRIENDS",
+      "korean": "친구",
+      "producer_original_bbox": [
+        1165,
+        296,
+        1372,
+        337
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        1165,
+        296,
+        1372,
+        337
+      ],
+      "producer_localized_bbox": [
+        1169,
+        300,
+        1217,
+        332
+      ],
+      "independent_clean_to_final_bbox": [
+        1169,
+        300,
+        1217,
+        332
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 207,
+      "source_height": 41,
+      "localized_width": 48,
+      "localized_height": 32,
+      "width_ratio": 0.2319,
+      "height_ratio": 0.7805,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "cancel",
+      "region_idx": 63,
+      "source": "CANCEL",
+      "korean": "취소",
+      "producer_original_bbox": [
+        1559,
+        297,
+        1743,
+        337
+      ],
+      "independent_source_alpha_bbox_within_row": [
+        1559,
+        297,
+        1743,
+        337
+      ],
+      "producer_localized_bbox": [
+        1563,
+        301,
+        1611,
+        333
+      ],
+      "independent_clean_to_final_bbox": [
+        1563,
+        301,
+        1611,
+        333
+      ],
+      "localized_bbox_exact_match": true,
+      "source_width": 184,
+      "source_height": 40,
+      "localized_width": 48,
+      "localized_height": 32,
+      "width_ratio": 0.2609,
+      "height_ratio": 0.8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "decoded_changed_outside_union_producer_rows": 0,
+    "alpha_changed_outside_union_producer_rows": 0,
+    "introduced_visible_outside_union_producer_rows": 0,
+    "protected_full_region_changed_pixels": 0,
+    "protected_inline_token_changed_pixels": 0,
+    "token_relation_failures": 0,
+    "localized_bbox_clean_to_final_mismatches": 0,
+    "source_exact_residue_outside_localized_bboxes": 0
+  },
+  "protected_region_changes": {
+    "0": 0,
+    "1": 0,
+    "6": 0,
+    "7": 0,
+    "17": 0,
+    "18": 0,
+    "19": 0,
+    "20": 0,
+    "21": 0,
+    "22": 0,
+    "23": 0,
+    "24": 0,
+    "25": 0,
+    "27": 0,
+    "29": 0,
+    "30": 0,
+    "31": 0,
+    "32": 0,
+    "33": 0,
+    "34": 0,
+    "35": 0,
+    "36": 0,
+    "37": 0,
+    "38": 0,
+    "39": 0,
+    "40": 0,
+    "41": 0,
+    "42": 0,
+    "43": 0,
+    "47": 0,
+    "49": 0,
+    "50": 0,
+    "51": 0,
+    "52": 0,
+    "53": 0,
+    "56": 0,
+    "57": 0,
+    "58": 0,
+    "64": 0,
+    "65": 0,
+    "66": 0,
+    "67": 0,
+    "68": 0,
+    "69": 0,
+    "70": 0,
+    "71": 0,
+    "72": 0,
+    "73": 0,
+    "74": 0
+  },
+  "inline_product_token_checks": [
+    {
+      "row_key": "out_run_1p",
+      "source": "OutRun for 1 player!",
+      "token_bbox": [
+        1959,
+        1066,
+        2184,
+        1121
+      ],
+      "changed_source_token_pixels": 0,
+      "localized_bbox": [
+        2192,
+        1071,
+        2424,
+        1127
+      ],
+      "required_relation": "after",
+      "relation_pass": true,
+      "word_groups_relative": [
+        [
+          0,
+          225
+        ],
+        [
+          249,
+          333
+        ],
+        [
+          355,
+          387
+        ],
+        [
+          411,
+          610
+        ]
+      ]
+    },
+    {
+      "row_key": "exchange_line1",
+      "source": "Exchange OutRun miles",
+      "token_bbox": [
+        287,
+        598,
+        481,
+        646
+      ],
+      "changed_source_token_pixels": 0,
+      "localized_bbox": [
+        87,
+        602,
+        597,
+        650
+      ],
+      "required_relation": null,
+      "relation_pass": true,
+      "word_groups_relative": [
+        [
+          0,
+          252
+        ],
+        [
+          277,
+          471
+        ],
+        [
+          498,
+          631
+        ]
+      ]
+    },
+    {
+      "row_key": "enjoy_original",
+      "source": "Enjoy the original OutRun2SP",
+      "independent_phrase_bbox": [
+        1807,
+        909,
+        2696,
+        975
+      ],
+      "region10_y_runs": [
+        {
+          "y_run": [
+            13,
+            79
+          ],
+          "bbox": [
+            1807,
+            909,
+            2696,
+            975
+          ],
+          "width": 889,
+          "pixels": 22909
+        },
+        {
+          "y_run": [
+            90,
+            148
+          ],
+          "bbox": [
+            3599,
+            986,
+            3600,
+            1044
+          ],
+          "width": 1,
+          "pixels": 58
+        }
+      ],
+      "token_bbox": [
+        2356,
+        909,
+        2696,
+        964
+      ],
+      "changed_source_token_pixels": 0,
+      "localized_bbox": [
+        2032,
+        914,
+        2348,
+        970
+      ],
+      "localized_inside_independent_phrase_bbox": true,
+      "required_relation": "before",
+      "relation_pass": true,
+      "word_groups_relative": [
+        [
+          0,
+          166
+        ],
+        [
+          186,
+          280
+        ],
+        [
+          304,
+          523
+        ],
+        [
+          549,
+          889
+        ]
+      ]
+    }
+  ],
+  "region10_independent_geometry": {
+    "atlas_rect": [
+      1800,
+      896,
+      1800,
+      160
+    ],
+    "y_runs": [
+      {
+        "y_run": [
+          13,
+          79
+        ],
+        "bbox": [
+          1807,
+          909,
+          2696,
+          975
+        ],
+        "width": 889,
+        "pixels": 22909
+      },
+      {
+        "y_run": [
+          90,
+          148
+        ],
+        "bbox": [
+          3599,
+          986,
+          3600,
+          1044
+        ],
+        "width": 1,
+        "pixels": 58
+      }
+    ],
+    "selected_phrase_bbox": [
+      1807,
+      909,
+      2696,
+      975
+    ],
+    "producer_original_bbox": [
+      1807,
+      909,
+      2696,
+      975
+    ],
+    "producer_localized_bbox": [
+      2032,
+      914,
+      2348,
+      970
+    ],
+    "localized_inside_phrase_bbox": true
+  },
+  "style_diagnostics": {
+    "rows_height_ratio_below_0_70": [
+      {
+        "key": "yes",
+        "source": "YES",
+        "korean": "예",
+        "height_ratio": 0.6038,
+        "width_ratio": 0.2
+      },
+      {
+        "key": "no",
+        "source": "NO",
+        "korean": "아니오",
+        "height_ratio": 0.6038,
+        "width_ratio": 0.8947
+      }
+    ]
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "preview_files": [
+    "localization/graphics/role_C/20261006-C217-ACF61D7C/C217_ACF_RISK_CONTACTS.jpg",
+    "localization/graphics/role_C/20261006-C217-ACF61D7C/C217_ACF_REGION10.jpg",
+    "localization/graphics/role_C/20261006-C217-ACF61D7C/C217_ACF_RAW_COMPARE.jpg"
+  ]
+}
