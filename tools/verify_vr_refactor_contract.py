@@ -138,6 +138,46 @@ for rel, source in (("R20", r20), ("R23", r23), ("R33", r33)):
 if "R9MainDepthGenerationValue()" not in r9:
     errors.append("R9 missing main-depth generation owner query API")
 
+# Post-1000 dispatcher flattening: R31/R33 may call the R30 lower-draw
+# boundary, but they must not reach into R30's private SafetyHookInline storage.
+for rel, source in (("R31", r31), ("R33", r33)):
+    for banned in (
+        "R30DrawPrimitiveR29Hook",
+        "R30DrawIndexedPrimitiveR29Hook",
+        "R30DrawPrimitiveUPR29Hook",
+        "R30DrawIndexedPrimitiveUPR29Hook",
+    ):
+        if banned in source:
+            errors.append(
+                f"{rel} retained direct R30 lower-hook storage dependency: {banned}")
+for marker in (
+    "R30CallLowerDrawPrimitive(",
+    "R30CallLowerDrawIndexedPrimitive(",
+    "R30CallLowerDrawPrimitiveUP(",
+    "R30CallLowerDrawIndexedPrimitiveUP(",
+):
+    if marker not in r30:
+        errors.append(f"R30 missing lower-draw owner boundary: {marker}")
+    if marker not in r31 or marker not in r33:
+        errors.append(f"R31/R33 missing R30 lower-draw owner boundary use: {marker}")
+
+# R31 prerequisite polling must observe R30 through an owner status query.
+if re.search(r"\\bR30InstallState\\b", r31):
+    errors.append("R31 retained direct R30 install-state dependency")
+if "R30InstallStatus()" not in r30:
+    errors.append("R30 missing install-state owner query")
+if "R30InstallStatus()" not in r31:
+    errors.append("R31 missing R30 install-state owner query")
+
+# R32 fail-closed gating may ask whether the R9 stereo baseline is seeded, but
+# the seed flag itself remains R9-owned.
+if re.search(r"\\bR9StereoSeeded\\b", r32):
+    errors.append("R32 retained direct R9 stereo-seed dependency")
+if "R9StereoBaselineSeeded()" not in r9:
+    errors.append("R9 missing stereo-seed owner query")
+if "R9StereoBaselineSeeded()" not in r32:
+    errors.append("R32 missing R9 stereo-seed owner query")
+
 # Post-1000 R33 owner-boundary continuation: the final dispatcher may ask R9
 # whether the currently tracked main depth carries stencil, but must not read
 # R9's private identity/descriptor/known-state tuple directly.
