@@ -224,14 +224,21 @@ namespace OutRunVR::GameSemantic
 
     inline RenderScope PeekSpriteNodeScope(
         const void* node,
-        RenderScope fallback = RenderScope::None) noexcept
+        RenderScope fallback = RenderScope::None,
+        ProducerToken* producer = nullptr) noexcept
     {
+        if (producer)
+            *producer = ProducerToken::None;
         if (node)
         {
             for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
             {
                 if (SpriteNodeSemanticTags[i].node == node)
+                {
+                    if (producer)
+                        *producer = SpriteNodeSemanticTags[i].producer;
                     return SpriteNodeSemanticTags[i].scope;
+                }
             }
         }
         return fallback;
@@ -240,15 +247,10 @@ namespace OutRunVR::GameSemantic
     inline ProducerToken PeekSpriteNodeProducerToken(
         const void* node) noexcept
     {
-        if (node)
-        {
-            for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
-            {
-                if (SpriteNodeSemanticTags[i].node == node)
-                    return SpriteNodeSemanticTags[i].producer;
-            }
-        }
-        return ProducerToken::None;
+        ProducerToken producer = ProducerToken::None;
+        (void)PeekSpriteNodeScope(
+            node, RenderScope::None, &producer);
+        return producer;
     }
 
     inline RenderScope ConsumeSpriteNodeScope(
