@@ -21,7 +21,7 @@
   "result_sha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
   "material_result_sha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
   "validation_bearing_result_sha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
-  "state_commit_sha": "5e67987d1cf007bf45f6669915b4fa975104aa29",
+  "state_commit_sha": "514ecd5973b92e5ed941c3de16b5fd63b38ebd7c",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00403]",
   "selected_work_item": "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012",
   "summary": "Added a bounded fail-closed proof gate before any physical R31/R32 hook-layer retirement. The verifier freezes the currently required install fallback, Reset/Present/DirectGPU chain, StateBlock coverage/fallback and final lower-R29 ownership so a later flattening cannot silently remove behavior-bearing layers. The task changes verification/workflow/state only; no runtime rendering path, hook target, draw math, resource lifetime, copy/wait/lock or OpenXR behavior was changed. Physical retirement remains explicitly DEFERRED.",
@@ -68,7 +68,7 @@
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "state_commit_sha": "5e67987d1cf007bf45f6669915b4fa975104aa29",
+      "state_commit_sha": "514ecd5973b92e5ed941c3de16b5fd63b38ebd7c",
       "issue14_update": "RECORDED",
       "issue14_comment_id": 5988809644,
       "issue13_update": "NOT_REQUIRED_NO_RUNTIME_BEHAVIOR_CHANGE",
@@ -135,8 +135,9 @@
     "resume_reason": "Retry persisted after one recovery attempt"
   },
   "validated_at_kst": "2026-10-05T14:41:00+09:00",
-  "completed_at_kst": "2026-10-05T14:42:22+09:00",
+  "completed_at_kst": "2026-10-05T14:46:45+09:00",
   "chat_rollover": 2,
   "rollover_is_retry": false,
-  "resume_reason": "Retry persisted after one recovery attempt"
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "metadata_reconciled_at_kst": "2026-10-05T14:46:45+09:00"
 }
