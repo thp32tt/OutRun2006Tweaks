@@ -1,0 +1,771 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION76-PREFLIGHT",
+  "index": 198,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+  "source_repository": "Sonic-TV/OR2006Sprites",
+  "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_blob_sha1": "e97d852a905aa8a219b786b843089e0998037f52",
+  "atlas_blob_sha1": "77904226ad9347044c4c091575efbe0aba72717a",
+  "source_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+  "structure": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_sha256": "25620ea389d11b2cb525fb8b688455fe97cedab100a22b93850d41686143e82e",
+    "raw_orientation": "mirror_y"
+  },
+  "regions": [
+    {
+      "idx": 0,
+      "name": "sprite_789",
+      "cell": [
+        0,
+        1544,
+        544,
+        504
+      ],
+      "alpha_bbox": [
+        0,
+        1549,
+        512,
+        2048
+      ],
+      "alpha_pixels": 211941
+    },
+    {
+      "idx": 1,
+      "name": "sprite_790",
+      "cell": [
+        544,
+        1968,
+        1604,
+        80
+      ],
+      "alpha_bbox": [
+        548,
+        1984,
+        1128,
+        2036
+      ],
+      "alpha_pixels": 12160
+    },
+    {
+      "idx": 2,
+      "name": "sprite_791",
+      "cell": [
+        2148,
+        1968,
+        1376,
+        80
+      ],
+      "alpha_bbox": [
+        2156,
+        1984,
+        2604,
+        2036
+      ],
+      "alpha_pixels": 10624
+    },
+    {
+      "idx": 3,
+      "name": "sprite_792",
+      "cell": [
+        0,
+        1464,
+        1376,
+        80
+      ],
+      "alpha_bbox": [
+        8,
+        1480,
+        224,
+        1536
+      ],
+      "alpha_pixels": 5760
+    },
+    {
+      "idx": 4,
+      "name": "sprite_793",
+      "cell": [
+        1376,
+        1464,
+        1376,
+        80
+      ],
+      "alpha_bbox": [
+        1384,
+        1480,
+        1964,
+        1532
+      ],
+      "alpha_pixels": 12896
+    },
+    {
+      "idx": 5,
+      "name": "sprite_794",
+      "cell": [
+        0,
+        1384,
+        1376,
+        80
+      ],
+      "alpha_bbox": [
+        8,
+        1400,
+        472,
+        1452
+      ],
+      "alpha_pixels": 10624
+    },
+    {
+      "idx": 6,
+      "name": "sprite_795",
+      "cell": [
+        1376,
+        1384,
+        1376,
+        80
+      ],
+      "alpha_bbox": [
+        1384,
+        1400,
+        1772,
+        1452
+      ],
+      "alpha_pixels": 8720
+    },
+    {
+      "idx": 7,
+      "name": "sprite_796",
+      "cell": [
+        0,
+        1304,
+        1376,
+        80
+      ],
+      "alpha_bbox": [
+        8,
+        1320,
+        628,
+        1372
+      ],
+      "alpha_pixels": 16192
+    },
+    {
+      "idx": 8,
+      "name": "sprite_797",
+      "cell": [
+        1376,
+        1304,
+        1376,
+        80
+      ],
+      "alpha_bbox": [
+        1384,
+        1320,
+        1812,
+        1372
+      ],
+      "alpha_pixels": 10736
+    },
+    {
+      "idx": 9,
+      "name": "sprite_798",
+      "cell": [
+        0,
+        1224,
+        1376,
+        80
+      ],
+      "alpha_bbox": [
+        8,
+        1240,
+        396,
+        1292
+      ],
+      "alpha_pixels": 9568
+    },
+    {
+      "idx": 10,
+      "name": "sprite_799",
+      "cell": [
+        1376,
+        1224,
+        1376,
+        80
+      ],
+      "alpha_bbox": [
+        1384,
+        1240,
+        1912,
+        1292
+      ],
+      "alpha_pixels": 13088
+    },
+    {
+      "idx": 11,
+      "name": "sprite_800",
+      "cell": [
+        0,
+        1144,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        1160,
+        456,
+        1212
+      ],
+      "alpha_pixels": 11280
+    },
+    {
+      "idx": 12,
+      "name": "sprite_801",
+      "cell": [
+        1372,
+        1144,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1376,
+        1160,
+        1596,
+        1212
+      ],
+      "alpha_pixels": 5376
+    },
+    {
+      "idx": 13,
+      "name": "sprite_802",
+      "cell": [
+        0,
+        1064,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        1080,
+        236,
+        1132
+      ],
+      "alpha_pixels": 5248
+    },
+    {
+      "idx": 14,
+      "name": "sprite_803",
+      "cell": [
+        1372,
+        1064,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1376,
+        1080,
+        1608,
+        1132
+      ],
+      "alpha_pixels": 5424
+    },
+    {
+      "idx": 15,
+      "name": "sprite_804",
+      "cell": [
+        0,
+        984,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        1000,
+        236,
+        1052
+      ],
+      "alpha_pixels": 5120
+    },
+    {
+      "idx": 16,
+      "name": "sprite_805",
+      "cell": [
+        1372,
+        984,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1376,
+        1000,
+        1608,
+        1052
+      ],
+      "alpha_pixels": 5296
+    },
+    {
+      "idx": 17,
+      "name": "sprite_806",
+      "cell": [
+        0,
+        904,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        920,
+        236,
+        972
+      ],
+      "alpha_pixels": 5248
+    },
+    {
+      "idx": 18,
+      "name": "sprite_807",
+      "cell": [
+        1372,
+        904,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1376,
+        920,
+        1600,
+        972
+      ],
+      "alpha_pixels": 5024
+    },
+    {
+      "idx": 19,
+      "name": "sprite_808",
+      "cell": [
+        0,
+        824,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        840,
+        468,
+        892
+      ],
+      "alpha_pixels": 10624
+    },
+    {
+      "idx": 20,
+      "name": "sprite_809",
+      "cell": [
+        1372,
+        824,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1376,
+        840,
+        1804,
+        892
+      ],
+      "alpha_pixels": 10000
+    },
+    {
+      "idx": 21,
+      "name": "sprite_810",
+      "cell": [
+        0,
+        744,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        760,
+        548,
+        812
+      ],
+      "alpha_pixels": 14400
+    },
+    {
+      "idx": 22,
+      "name": "sprite_811",
+      "cell": [
+        1372,
+        744,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1376,
+        760,
+        1880,
+        812
+      ],
+      "alpha_pixels": 12624
+    },
+    {
+      "idx": 23,
+      "name": "sprite_812",
+      "cell": [
+        0,
+        664,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        680,
+        432,
+        732
+      ],
+      "alpha_pixels": 10224
+    },
+    {
+      "idx": 24,
+      "name": "sprite_813",
+      "cell": [
+        1372,
+        664,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1376,
+        680,
+        1956,
+        736
+      ],
+      "alpha_pixels": 15728
+    },
+    {
+      "idx": 25,
+      "name": "sprite_814",
+      "cell": [
+        0,
+        584,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        600,
+        432,
+        652
+      ],
+      "alpha_pixels": 10496
+    },
+    {
+      "idx": 26,
+      "name": "sprite_815",
+      "cell": [
+        1372,
+        584,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1376,
+        600,
+        1764,
+        652
+      ],
+      "alpha_pixels": 9648
+    },
+    {
+      "idx": 27,
+      "name": "sprite_816",
+      "cell": [
+        0,
+        504,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        520,
+        236,
+        572
+      ],
+      "alpha_pixels": 5808
+    },
+    {
+      "idx": 28,
+      "name": "sprite_817",
+      "cell": [
+        1372,
+        504,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1376,
+        520,
+        1920,
+        572
+      ],
+      "alpha_pixels": 16352
+    },
+    {
+      "idx": 29,
+      "name": "sprite_818",
+      "cell": [
+        0,
+        424,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        440,
+        508,
+        492
+      ],
+      "alpha_pixels": 13232
+    },
+    {
+      "idx": 30,
+      "name": "sprite_819",
+      "cell": [
+        1372,
+        424,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1376,
+        440,
+        1804,
+        492
+      ],
+      "alpha_pixels": 11216
+    },
+    {
+      "idx": 31,
+      "name": "sprite_820",
+      "cell": [
+        0,
+        344,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        8,
+        360,
+        356,
+        412
+      ],
+      "alpha_pixels": 9040
+    },
+    {
+      "idx": 32,
+      "name": "sprite_821",
+      "cell": [
+        1372,
+        344,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1380,
+        360,
+        1728,
+        416
+      ],
+      "alpha_pixels": 9376
+    },
+    {
+      "idx": 33,
+      "name": "sprite_822",
+      "cell": [
+        0,
+        264,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        280,
+        584,
+        336
+      ],
+      "alpha_pixels": 14624
+    },
+    {
+      "idx": 34,
+      "name": "sprite_823",
+      "cell": [
+        1372,
+        264,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1376,
+        280,
+        1840,
+        332
+      ],
+      "alpha_pixels": 11568
+    },
+    {
+      "idx": 35,
+      "name": "sprite_824",
+      "cell": [
+        0,
+        184,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        200,
+        548,
+        252
+      ],
+      "alpha_pixels": 16416
+    },
+    {
+      "idx": 36,
+      "name": "sprite_825",
+      "cell": [
+        1372,
+        184,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1376,
+        200,
+        1880,
+        252
+      ],
+      "alpha_pixels": 13136
+    },
+    {
+      "idx": 37,
+      "name": "sprite_826",
+      "cell": [
+        0,
+        104,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        120,
+        432,
+        172
+      ],
+      "alpha_pixels": 11216
+    },
+    {
+      "idx": 38,
+      "name": "sprite_827",
+      "cell": [
+        1372,
+        104,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        1376,
+        120,
+        1608,
+        176
+      ],
+      "alpha_pixels": 7792
+    },
+    {
+      "idx": 39,
+      "name": "sprite_828",
+      "cell": [
+        0,
+        24,
+        1372,
+        80
+      ],
+      "alpha_bbox": [
+        4,
+        40,
+        416,
+        92
+      ],
+      "alpha_pixels": 9584
+    },
+    {
+      "idx": 40,
+      "name": "sprite_829",
+      "cell": [
+        1372,
+        24,
+        640,
+        80
+      ],
+      "alpha_bbox": [
+        1561,
+        43,
+        1984,
+        84
+      ],
+      "alpha_pixels": 10549
+    },
+    {
+      "idx": 41,
+      "name": "sprite_830",
+      "cell": [
+        2012,
+        24,
+        640,
+        80
+      ],
+      "alpha_bbox": [
+        2198,
+        43,
+        2624,
+        84
+      ],
+      "alpha_pixels": 10389
+    },
+    {
+      "idx": 42,
+      "name": "sprite_831",
+      "cell": [
+        2652,
+        100,
+        12,
+        4
+      ],
+      "alpha_bbox": [
+        2652,
+        100,
+        2664,
+        104
+      ],
+      "alpha_pixels": 48
+    }
+  ],
+  "expected_segments": [
+    "(PROTOTYPE)",
+    "INTERMEDIATE B",
+    "INTERMEDIATE A",
+    "RANDOM",
+    "- RANDOM PLAY -",
+    "(GUITAR MIX)",
+    "(INSTRUMENTAL)"
+  ],
+  "protected_semantics": [
+    "all song titles",
+    "numbered TBD labels"
+  ],
+  "status": "B76_CANONICAL_HD_TEXT_BINDING_REQUIRED_SAME_INVOCATION",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
