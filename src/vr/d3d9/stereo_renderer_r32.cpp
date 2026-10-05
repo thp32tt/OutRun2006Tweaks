@@ -709,7 +709,7 @@ namespace OutRunVRStereo
             LowerDraw&& lowerDraw) noexcept
         {
             if (!IsGameDevice(device) || InternalStereoPass ||
-                !TargetIsBackBuffer() || !StereoWanted() || !R9StereoSeeded)
+                !TargetIsBackBuffer() || !StereoWanted() || !R9StereoBaselineSeeded())
                 return lowerDraw();
 
             R32EffectSnapshot snapshot{};

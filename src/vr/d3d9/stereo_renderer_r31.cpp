@@ -727,7 +727,7 @@ namespace OutRunVRStereo
                     device, type, startVertex, primitiveCount);
             };
             auto r29 = [&]() {
-                return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
+                return R30CallLowerDrawPrimitive(
                     device, type, startVertex, primitiveCount);
             };
             return R31Dispatch(device, actual, r29, "R31/DrawPrimitive");
@@ -744,7 +744,7 @@ namespace OutRunVRStereo
                     primitiveCount);
             };
             auto r29 = [&]() {
-                return R30DrawIndexedPrimitiveR29Hook.stdcall<HRESULT>(device, type,
+                return R30CallLowerDrawIndexedPrimitive(device, type,
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
                     primitiveCount);
             };
@@ -761,7 +761,7 @@ namespace OutRunVRStereo
                     device, type, primitiveCount, data, stride);
             };
             auto r29 = [&]() {
-                return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
+                return R30CallLowerDrawPrimitiveUP(
                     device, type, primitiveCount, data, stride);
             };
             return R31Dispatch(device, actual, r29, "R31/DrawPrimitiveUP");
@@ -779,7 +779,7 @@ namespace OutRunVRStereo
                     indexFormat, vertexData, stride);
             };
             auto r29 = [&]() {
-                return R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>(device,
+                return R30CallLowerDrawIndexedPrimitiveUP(device,
                     type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride);
             };
@@ -999,7 +999,7 @@ namespace OutRunVRStereo
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const auto r30 = R30InstallState.load(std::memory_order_acquire);
+                const auto r30 = R30InstallStatus();
                 const auto renderer = OutRunVRRenderer::R29RendererState();
                 if (r30 == State::Failed || renderer == State::Failed)
                 {

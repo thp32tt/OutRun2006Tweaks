@@ -1013,6 +1013,11 @@ namespace OutRunVRStereo
 		return RightStencilSynchronized;
 	}
 
+	inline bool R9StereoBaselineSeeded() noexcept
+	{
+		return R9StereoSeeded;
+	}
+
 	inline void R9SynchronizeDepthContentSerials() noexcept
 	{
 		std::uint64_t serial = std::max(

@@ -129,7 +129,7 @@ for rel, source in (("R30", r30), ("R30_SAFE", r30_safe)):
         errors.append(f"{rel} missing R9 main-depth write owner API")
 
 for rel, source in (("R20", r20), ("R23", r23), ("R33", r33)):
-    if re.search(r"\\bR9MainDepthGeneration\\b", source):
+    if re.search(r"\bR9MainDepthGeneration\b", source):
         errors.append(
             f"{rel} retained direct R9 main-depth generation dependency")
     if "R9MainDepthGenerationValue()" not in source:
@@ -163,7 +163,7 @@ for marker in (
         errors.append(f"R31/R33 missing R30 lower-draw owner boundary use: {marker}")
 
 # R31 prerequisite polling must observe R30 through an owner status query.
-if re.search(r"\\bR30InstallState\\b", r31):
+if re.search(r"\bR30InstallState\b", r31):
     errors.append("R31 retained direct R30 install-state dependency")
 if "R30InstallStatus()" not in r30:
     errors.append("R30 missing install-state owner query")
@@ -172,7 +172,7 @@ if "R30InstallStatus()" not in r31:
 
 # R32 fail-closed gating may ask whether the R9 stereo baseline is seeded, but
 # the seed flag itself remains R9-owned.
-if re.search(r"\\bR9StereoSeeded\\b", r32):
+if re.search(r"\bR9StereoSeeded\b", r32):
     errors.append("R32 retained direct R9 stereo-seed dependency")
 if "R9StereoBaselineSeeded()" not in r9:
     errors.append("R9 missing stereo-seed owner query")
