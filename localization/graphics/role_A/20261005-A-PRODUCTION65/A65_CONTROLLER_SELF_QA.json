@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION65",
+  "timestamp_kst": "2026-10-05T22:24:00+09:00",
+  "queue_index": 193,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "candidate_sha256": "0352a4e0eb0285f9b021fb5046da7b778e3de3317b2348efad69158e0742000d",
+  "supersedes": {
+    "run": "20261005-A-PRODUCTION64",
+    "candidate_sha256": "98fbeb14b6eeadc5b6ff5002377d025409da14fe7272829bf14383b38af14be4",
+    "reason": "A64 re-rendered inline OutRun / OutRun2SP product tokens instead of preserving original source pixels"
+  },
+  "semantic_binding": {
+    "localized_indices": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      14,
+      16
+    ],
+    "protected_regions": [
+      "idx0 OUTRUN2SP logo",
+      "idx12 SP",
+      "idx13 OR",
+      "idx15 TESTAROSSA",
+      "idx17 non-text black artwork"
+    ],
+    "product_token_policy": {
+      "idx1": "original OutRun word pixels preserved exact; only 싱글 플레이 랭킹 보기 rendered",
+      "idx2": "original OutRun2SP word pixels preserved exact; only 아케이드 랭킹 보기 rendered",
+      "idx4": "top OUTRUN line preserved exact; only SHOWROOM -> 쇼룸"
+    }
+  },
+  "machine_qa": {
+    "structure": "2048x1024 RGBA32/RGBA mip1 raw mirror_y header exact",
+    "bbox_size_positive_margin": "13/13 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "source_residue": 0,
+    "render_outside_target": 0,
+    "localized_overlap": 0,
+    "touch_pairs": 0,
+    "inline_token_overlap": 0,
+    "preserved_region_changes": 0,
+    "inline_token_changes": {
+      "OutRun": 0,
+      "OutRun2SP": 0,
+      "OUTRUN_SHOWROOM_top": 0
+    }
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "target_contacts": "PASS",
+    "inline_tokens": "PASS_SOURCE_PIXELS_RETAINED_AND_KOREAN_DESCRIPTOR_SEPARATED",
+    "protected_artwork": "PASS",
+    "raw_mirror_y": "PASS",
+    "source_style": "PASS_MATCHING_FAMILY_HEIGHT_WEIGHT_COLOR"
+  },
+  "decision": "A65_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
