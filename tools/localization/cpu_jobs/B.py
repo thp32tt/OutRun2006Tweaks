@@ -11,7 +11,7 @@ if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OU
     raise SystemExit("B hosted worker only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION141-8215"
+run="20261005-B-PRODUCTION142-8215"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -59,55 +59,69 @@ if regs[1]["rect"]!=[1088,1032,2048,1016] or regs[2]["rect"]!=[1088,16,1720,1016
     raise RuntimeError(("atlas geometry drift",regs[1]["rect"],regs[2]["rect"]))
 
 # B140 controller classification: only the two Total Rank title sprites are localizable.
-# Character, lens flare and B/C/D/E rank letters are protected original artwork.
+# B141's navy-only seed saw just one glyph, so B142 uses the aligned white-fill
+# component row as the deterministic title core, then grows only a tight effect fringe.
 targets=[1,2]
 cores=[]; source_masks=[]; allowed_masks=[]; rows=[]
 for idx in targets:
     x,y,cw,ch=map(int,regs[idx]["rect"])
     roi=sa[y:y+ch,x:x+cw]
     r=roi[:,:,0].astype(np.int16); g=roi[:,:,1].astype(np.int16); b=roi[:,:,2].astype(np.int16); a=roi[:,:,3]
-    white=(a>32)&(r>185)&(g>185)&(b>185)&((np.maximum.reduce([r,g,b])-np.minimum.reduce([r,g,b]))<55)
-    navy=(a>32)&(b>r+8)&(b>g+4)&(r<135)&(g<135)&(b<210)
-    cand=white|navy
-    lab,nlab=label(cand,structure=np.ones((3,3),dtype=np.uint8))
-    selected=np.zeros_like(cand,dtype=bool)
-    for labid in np.unique(lab[navy]):
-        if labid<=0: continue
+    white=(a>32)&(r>175)&(g>175)&(b>175)&((np.maximum.reduce([r,g,b])-np.minimum.reduce([r,g,b]))<72)
+    band=np.zeros_like(white,dtype=bool)
+    band[int(ch*0.08):int(ch*0.38),int(cw*0.18):int(cw*0.82)]=True
+    lab,nlab=label(white & band,structure=np.ones((3,3),dtype=np.uint8))
+    comps=[]
+    for labid in range(1,nlab+1):
         yy,xx=np.nonzero(lab==labid)
-        if len(xx)<8: continue
-        cx=float(xx.mean()); cy=float(yy.mean())
-        # Title sits in the top/central area of each ranking panel.
-        if cy < ch*0.40 and cw*0.12 < cx < cw*0.88:
-            selected |= (lab==labid)
-    if np.count_nonzero(selected)<1500:
-        raise RuntimeError(("title core too small",idx,int(np.count_nonzero(selected))))
+        if len(xx)<18: continue
+        w0=int(xx.max()-xx.min()+1); h0=int(yy.max()-yy.min()+1)
+        if 4<=w0<=180 and 12<=h0<=130:
+            comps.append({"id":labid,"area":len(xx),"cx":float(xx.mean()),"cy":float(yy.mean()),"w":w0,"h":h0})
+    if len(comps)<4:
+        raise RuntimeError(("too few white title components",idx,comps))
+    # Total Rank letters share one baseline. Select the densest 24px vertical centroid bin.
+    bins={}
+    for q in comps:
+        k=int(q["cy"]//24); bins.setdefault(k,[]).append(q)
+    best=max(bins.items(),key=lambda kv:(len(kv[1]),sum(z["area"] for z in kv[1])))[0]
+    selected_ids={q["id"] for q in comps if abs(int(q["cy"]//24)-best)<=1}
+    selected=np.isin(lab,list(selected_ids))
+    # Drop isolated selected components outside the central cluster span.
+    yy,xx=np.nonzero(selected)
+    if len(xx)<1500:
+        raise RuntimeError(("title white core too small",idx,int(len(xx)),comps,best))
+    medy=float(np.median(yy))
+    keep=np.zeros_like(selected,dtype=bool)
+    for labid in selected_ids:
+        cyy,cxx=np.nonzero(lab==labid)
+        if not len(cxx): continue
+        if abs(float(cyy.mean())-medy)<=42:
+            keep |= (lab==labid)
+    selected=keep
     ys,xs=np.nonzero(selected)
     cb=[x+int(xs.min()),y+int(ys.min()),x+int(xs.max())+1,y+int(ys.max())+1]
-    # Reject implausible title geometry before any write.
-    if not(250 <= cb[2]-cb[0] <= 900 and 35 <= cb[3]-cb[1] <= 180):
-        raise RuntimeError(("title core bbox implausible",idx,cb))
+    if not(220 <= cb[2]-cb[0] <= 900 and 28 <= cb[3]-cb[1] <= 150):
+        raise RuntimeError(("title core bbox implausible",idx,cb,comps,best))
     cm=np.zeros((H,W),bool); cm[y:y+ch,x:x+cw]=selected
     core=Image.fromarray((cm.astype(np.uint8)*255),"L")
-    # Capture antialias/outline fringe conservatively around the detected title core.
-    sm=core.filter(ImageFilter.MaxFilter(13))
+    # 7px radius captures outline/AA/shadow; cleanup is clipped to a tight neighborhood.
+    sm=core.filter(ImageFilter.MaxFilter(15))
     eb=sm.getbbox()
     if not eb: raise RuntimeError(("empty effect mask",idx))
-    # Clip all cleanup to a tight source-title neighborhood.
-    pad=2
-    ex0=max(x,eb[0]-pad); ey0=max(y,eb[1]-pad); ex1=min(x+cw,eb[2]+pad); ey1=min(y+ch,eb[3]+pad)
+    ex0=max(x,eb[0]-2); ey0=max(y,eb[1]-2); ex1=min(x+cw,eb[2]+2); ey1=min(y+ch,eb[3]+2)
     clip=Image.new("L",(W,H),0); ImageDraw.Draw(clip).rectangle((ex0,ey0,ex1-1,ey1-1),fill=255)
     sm=ImageChops.multiply(sm,clip)
     effect_bbox=list(sm.getbbox())
-    if not effect_bbox: raise RuntimeError(("empty clipped effect",idx))
-    # Localized lettering must fit inside the stricter detected title core, not merely effect fringe.
     cores.append(core); source_masks.append(sm)
-    am=Image.new("L",(W,H),0); ImageDraw.Draw(am).rectangle(tuple(effect_bbox),fill=255)
+    am=Image.new("L",(W,H),0); ImageDraw.Draw(am).rectangle((effect_bbox[0],effect_bbox[1],effect_bbox[2]-1,effect_bbox[3]-1),fill=255)
     allowed_masks.append(am)
     rows.append({
       "region_idx":idx,"source":"Total Rank","korean":"종합 랭킹",
       "cell":[x,y,cw,ch],"source_core_bbox":cb,"original_bbox":effect_bbox,
       "source_core_pixels":int(np.count_nonzero(cm)),
-      "source_effect_mask_pixels":count(sm)
+      "source_effect_mask_pixels":count(sm),
+      "white_component_count":len(selected_ids)
     })
 
 core_union=ImageChops.lighter(cores[0],cores[1])
@@ -152,13 +166,18 @@ clean=Image.fromarray(clean_arr,"RGBA")
 core_unchanged=int(np.count_nonzero(core_np & np.all(clean_arr==sa,axis=2)))
 if core_unchanged: raise RuntimeError(("source title core unchanged",core_unchanged))
 
-# Derive shared source title colors from the detected core family.
+# Derive shared source title colors from the white core and its darkest nearby outline ring.
 pix=sa[core_np]
-bright=(pix[:,0]>170)&(pix[:,1]>170)&(pix[:,2]>170)
-dark=(pix[:,2].astype(np.int16)>pix[:,0].astype(np.int16)+5)&(pix[:,0]<150)&(pix[:,1]<150)
-if not np.any(bright) or not np.any(dark): raise RuntimeError("style samples missing")
+bright=(pix[:,0]>165)&(pix[:,1]>165)&(pix[:,2]>165)
+if not np.any(bright): raise RuntimeError("bright style sample missing")
 white_rgb=tuple(int(round(float(np.median(pix[bright,k])))) for k in range(3))
-navy_rgb=tuple(int(round(float(np.median(pix[dark,k])))) for k in range(3))
+ring=(np.asarray(source_text_mask)>0) & ~core_np
+rpix=sa[ring]
+if not len(rpix): raise RuntimeError("outline ring sample missing")
+lum=rpix[:,:3].astype(np.float32) @ np.array([0.2126,0.7152,0.0722],dtype=np.float32)
+dark=rpix[lum<=np.quantile(lum,0.22)]
+if not len(dark): dark=rpix
+navy_rgb=tuple(int(round(float(np.median(dark[:,k])))) for k in range(3))
 white_rgba=white_rgb+(255,); navy_rgba=navy_rgb+(255,)
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
@@ -217,7 +236,7 @@ for row in rows:
       "font_file":Path(fp).name,"font_style":fstyle,"font_size":chosen_fs,
       "stroke_width":chosen_sw,"slant":.22,"fill_rgba":white_rgba,
       "outline_rgba":navy_rgba,"alignment":"center",
-      "rework_status":"B141_NEW_ZOOM_REVIEW_PROMOTED_CANDIDATE"
+      "rework_status":"B142_NEW_ZOOM_REVIEW_PROMOTED_CANDIDATE"
     })
 
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
@@ -244,13 +263,13 @@ for idx in protected_indices:
 if any(protected_changed.values()):
     raise RuntimeError(("protected atlas region changed",protected_changed))
 
-source_png=out/"B141_SOURCE_READABLE.png"; clean_png=out/"B141_CLEAN_PLATE.png"; final_png=out/"B141_FINAL_READABLE.png"
-smp=out/"B141_SOURCE_TEXT_MASK.png"; ap=out/"B141_ALLOWED_EFFECT_BBOX_MASK.png"; pp=out/"B141_PROTECTED_MASK.png"
+source_png=out/"B142_SOURCE_READABLE.png"; clean_png=out/"B142_CLEAN_PLATE.png"; final_png=out/"B142_FINAL_READABLE.png"
+smp=out/"B142_SOURCE_TEXT_MASK.png"; ap=out/"B142_ALLOWED_EFFECT_BBOX_MASK.png"; pp=out/"B142_PROTECTED_MASK.png"
 src.save(source_png); clean.save(clean_png); dec.save(final_png); source_text_mask.save(smp); allowed.save(ap); protected.save(pp)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B141_CLEAN_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B141_FINAL_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B141_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"B141_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B142_CLEAN_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B142_FINAL_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B142_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"B142_FINAL_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS" or finalrep["status"]!="PASS":
     raise RuntimeError(("validator",cleanrep["status"],finalrep["status"]))
 
@@ -270,19 +289,19 @@ for row in rows:
 cw=max(c.width for c in cards); sheet=Image.new("RGB",(cw,sum(c.height for c in cards)+8),"white")
 yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-save_b64_jpeg(sheet,out/"B141_8215_CONTACTS.jpg",out/"B141_8215_CONTACTS_B64.txt",92)
+save_b64_jpeg(sheet,out/"B142_8215_CONTACTS.jpg",out/"B142_8215_CONTACTS_B64.txt",92)
 
 ov=Image.new("RGB",(1024,3*550),"white")
 for i,(lab,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im); z.thumbnail((1024,512),Image.Resampling.LANCZOS)
     ov.paste(z,(0,i*550+26)); ImageDraw.Draw(ov).text((5,i*550+5),lab,fill="black")
-save_b64_jpeg(ov,out/"B141_8215_SOURCE_CLEAN_FINAL.jpg",out/"B141_8215_SOURCE_CLEAN_FINAL_B64.txt",90)
+save_b64_jpeg(ov,out/"B142_8215_SOURCE_CLEAN_FINAL.jpg",out/"B142_8215_SOURCE_CLEAN_FINAL_B64.txt",90)
 
 rr=Image.new("RGB",(1024,2*550),"white")
 for i,(lab,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im); z.thumbnail((1024,512),Image.Resampling.LANCZOS)
     rr.paste(z,(0,i*550+26)); ImageDraw.Draw(rr).text((5,i*550+5),lab,fill="black")
-save_b64_jpeg(rr,out/"B141_8215_RAW_COMPARE.jpg",out/"B141_8215_RAW_COMPARE_B64.txt",90)
+save_b64_jpeg(rr,out/"B142_8215_RAW_COMPARE.jpg",out/"B142_8215_RAW_COMPARE_B64.txt",90)
 
 report={
  "schema_version":1,"role":"B","run":run,"queue_index":30,"asset":asset,
@@ -297,14 +316,14 @@ report={
  "protected_region_changed_pixels":protected_changed,
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"B141_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"B142_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(out/"B141_8215_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(out/"B142_8215_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":30,"asset":"8215FD25","source_sha256":sha(sb),"candidate_sha256":csha,
  "localized_physical_elements":2,"bbox_size_positive_margin":"2/2",
  "clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "outside":outside,"alpha_outside":alphaout,"protected_regions_changed":sum(protected_changed.values()),
  "worker_status":report["status"],"runtime_validation":"UNTESTED",
- "report":f"localization/graphics/role_B/{run}/B141_8215_REPORT.json"}
-(wr/"B141_8215FD25.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "report":f"localization/graphics/role_B/{run}/B142_8215_REPORT.json"}
+(wr/"B142_8215FD25.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False),flush=True)
