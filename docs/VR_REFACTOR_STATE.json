@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-05T09:57:20+09:00",
+  "updatedKst": "2026-10-05T10:15:23+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -70,9 +70,10 @@
     "VR-REFACTOR-POST1000-R34-OBSERVER-RETIREMENT-0006",
     "VR-REFACTOR-POST1000-R33-INSTALL-STATE-RETIREMENT-0007",
     "VR-REFACTOR-POST1000-R9-DEPTH-STENCIL-METADATA-OWNERSHIP-0008",
-    "VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-OWNERSHIP-0009"
+    "VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-OWNERSHIP-0009",
+    "VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-READ-OWNERSHIP-0010"
   ],
-  "next": "Do not repeat cycles 0..1000 or CONVERSION-DX9EX-00376/00379/00382/00385/00388/00391/00394/00397/00400. Preserve R9TrackedMainDepthHasStencil() for main-depth stencil eligibility and R9InvalidateRightDepthStencilSync() as the sole R9-owned right depth/stencil synchronization invalidation boundary; R33 must not directly read R9MainDepthKnown/R9MainDepthIdentity/R9MainDepthDesc or mutate RightDepthSynchronized/RightStencilSynchronized. Continue only the next bounded post-1000 structural successor supported by current source/static evidence; if none exists, return to explicit DX9Ex runtime/general maintenance. Quest3/VDXR runtime remains UNTESTED.",
+  "next": "Do not repeat cycles 0..1000 or completed post-1000 items through CONVERSION-DX9EX-00400 E003. Preserve R9TrackedMainDepthHasStencil(), R9InvalidateRightDepthStencilSync(), R9IsRightDepthInSync(), and R9IsRightStencilInSync() as R9 owner boundaries. R33 must not directly read or write RightDepthSynchronized/RightStencilSynchronized. Continue only the next bounded post-1000 structural successor supported by current source/static evidence; runtime claims remain gated on Quest3/VDXR evidence.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -146,7 +147,8 @@
     "Post-1000 maintenance VR-REFACTOR-POST1000-R34-OBSERVER-RETIREMENT-0006: verifier RED commits a9a94968d69c65f2d637d3eb78c1438d5d065c04 and c01cd01df67bac8828e4ecfe9748e47eb31fb458 made the stale R34 compatibility observer/status alias fail closed. Material eaddb4da311c8942b57a5caed7706b96a3f55c4e removes OpenXRVRStereoR34ResetGuard publication, R33InstallStatus(), and VRStereoR34ResetGuardHook while retaining R33-owned reset replay-health/raster behavior. Exact-SHA DX9Ex Active Validation 37238918151 policy/full-chain/host/game/package SUCCESS; Domain Isolation 37238918252 SUCCESS; HUD Inspector 37238918123 SUCCESS; N100 architecture/R51/R32-R34/hook-graph/refactor/near-plane plus workflow YAML parse and git diff checks PASS. Package artifact 11316702996 digest sha256:5ed689ef85d5a07dbc5eb89f2e4115a38de4e9f752f62cc57f7f084cc5287840. Runtime remains UNTESTED.",
     "Post-1000 maintenance VR-REFACTOR-POST1000-R33-INSTALL-STATE-RETIREMENT-0007: verifier guard 229cfe2582894ffb534c3c816170531d22b5a8d6 forbids reintroduction of the now-unobserved R33InstallState. Material 8d44a9298867d30b8ada0aeb3c05e37a380147fb removes the write-only Pending/Ready/Failed atomic and its stores while preserving R32InstallStatus prerequisite polling and R33ReportInstallResult terminal publication. Exact-SHA DX9Ex Active Validation 37241351866 policy/full-chain/host/game/package SUCCESS; Domain Isolation 37241351730 SUCCESS; HUD Inspector 37241351791 SUCCESS; N100 architecture/R51/R32-R34/hook-graph/refactor/near-plane plus workflow YAML parse and git diff checks PASS. Package artifact 11317817554 digest sha256:72b6da2986641fc7c3e9f22c0fd398993972fdfa35fdd7bc50442e04c7b20872. Runtime remains UNTESTED.",
     "Post-1000 maintenance VR-REFACTOR-POST1000-R9-DEPTH-STENCIL-METADATA-OWNERSHIP-0008: semantic material 41b0f5ee29438f81d35d29db32b550959cd6435e adds R9TrackedMainDepthHasStencil() as the R9-owned query and removes R33 direct reads of R9MainDepthKnown/R9MainDepthIdentity/R9MainDepthDesc while preserving the prior tracked-depth identity and FormatHasStencil predicate. Validation-bearing 583c17035766c0594a52720047b2c00c6e07655c restores EOF newlines only. Exact-SHA 583c17035766c0594a52720047b2c00c6e07655c passed DX9Ex Active Validation 37245601542 (policy/host/game/full-chain-compile/package SUCCESS), Domain Isolation Guard 37245601527 SUCCESS, HUD Inspector 37245601510 SUCCESS, and N100 detached exact-SHA architecture/R51/R32-R34/hook-graph/refactor/near-plane plus workflow YAML parse and git diff checks PASS. Package artifact 11318917608 digest sha256:0320c25b0173ea514a352ce58442a233f540e084728c354d3c8b4afa9e4ee1a6. Runtime remains UNTESTED.",
-    "Post-1000 maintenance VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-OWNERSHIP-0009: material sequence ef286f5a5dd6902c4c73565824a593f5a3277031 -> 6ac569b733fbfa35898cf88cdac4fad21804823f -> 511063f7f043ab809340184230a7bebc72e7b62b adds R9InvalidateRightDepthStencilSync(bool,bool), routes R33 left-write and fail-close invalidation through that R9 owner API, and forbids direct R33 mutation of RightDepthSynchronized/RightStencilSynchronized. Initial exact-source DX9Ex Active run 37249055030 failed only because the refactor verifier still required the removed direct flag literals; verifier repair 4bccdc9ea361d6c2a70693d9d0a1b33980236b35 preserves cache-before-owner-call and depth-before-stencil ordering. Exact-SHA 4bccdc9ea361d6c2a70693d9d0a1b33980236b35 passed DX9Ex Active Validation 37249150072 (policy/host/game/full-chain-compile/package SUCCESS) and Domain Isolation Guard 37249150004; semantic source 511063f7f043ab809340184230a7bebc72e7b62b passed HUD Inspector 37249054934. N100 detached exact-SHA architecture/R51/R32-R34/hook-graph/refactor/near-plane suite PASS. Package artifact 11320362311 digest sha256:658ad359d886d957cbb95a1ef3ee024a3ef5f60fc532114a80bab765d6db3ec5. Runtime remains UNTESTED."
+    "Post-1000 maintenance VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-OWNERSHIP-0009: material sequence ef286f5a5dd6902c4c73565824a593f5a3277031 -> 6ac569b733fbfa35898cf88cdac4fad21804823f -> 511063f7f043ab809340184230a7bebc72e7b62b adds R9InvalidateRightDepthStencilSync(bool,bool), routes R33 left-write and fail-close invalidation through that R9 owner API, and forbids direct R33 mutation of RightDepthSynchronized/RightStencilSynchronized. Initial exact-source DX9Ex Active run 37249055030 failed only because the refactor verifier still required the removed direct flag literals; verifier repair 4bccdc9ea361d6c2a70693d9d0a1b33980236b35 preserves cache-before-owner-call and depth-before-stencil ordering. Exact-SHA 4bccdc9ea361d6c2a70693d9d0a1b33980236b35 passed DX9Ex Active Validation 37249150072 (policy/host/game/full-chain-compile/package SUCCESS) and Domain Isolation Guard 37249150004; semantic source 511063f7f043ab809340184230a7bebc72e7b62b passed HUD Inspector 37249054934. N100 detached exact-SHA architecture/R51/R32-R34/hook-graph/refactor/near-plane suite PASS. Package artifact 11320362311 digest sha256:658ad359d886d957cbb95a1ef3ee024a3ef5f60fc532114a80bab765d6db3ec5. Runtime remains UNTESTED.",
+    "CONVERSION-DX9EX-00400 E003 / VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-READ-OWNERSHIP-0010: prior failure-context run 37249044356 on intermediate 6ac569b733fbfa35898cf88cdac4fad21804823f was cancelled by newer pushes and is SUPERSEDED, not an unresolved failure. New semantic source sequence e7ab024b8f1b746c92c98b17d7a4d31fbf036ec0 -> 3d371018c8908042cbae9ffb2b1b2163e7cd1d95 exposes R9IsRightDepthInSync()/R9IsRightStencilInSync() and removes R33 direct reads of RightDepthSynchronized/RightStencilSynchronized from both world and HUD readiness gates. Validation-bearing 778fe8b1882ffdb14eddca54191a6ce431cee91d adds recurrence guards. Exact-SHA DX9Ex Active Validation 37250263373 policy/host/game/full-chain/package SUCCESS; Domain Isolation Guard 37250263384 SUCCESS; N100 detached exact-SHA architecture/R51/R32-R34/hook-graph/refactor/near-plane suite PASS. Package artifact 11320364280 digest sha256:0a4df85dc378156c8bf495194daf76c9a011e55c704e80e336615490de6c5be1. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-1000_BUILD_VERIFIED",
   "validatedSourceSha": "245c35ca3ce07b304526312eab14d6f4c1f09ecd",
@@ -283,5 +285,37 @@
       "n100": "AUXILIARY_EXACT_SHA_4BCCD_STATIC_PASS"
     },
     "issue14CommentId": 5986315823
+  },
+  "post1000Maintenance00400E003": {
+    "taskId": "CONVERSION-DX9EX-00400",
+    "eventId": "CONVERSION-DX9EX-00400-E003",
+    "attempt": "2/3",
+    "item": "VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-READ-OWNERSHIP-0010",
+    "baseSha": "74d14a7223933aaf012ea2c10f53f4349a2b45f8",
+    "sourceMaterialSha": "3d371018c8908042cbae9ffb2b1b2163e7cd1d95",
+    "materialResultSha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+    "validationBearingResultSha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "failureContext": {
+      "runId": 37249044356,
+      "headSha": "6ac569b733fbfa35898cf88cdac4fad21804823f",
+      "conclusion": "cancelled",
+      "classification": "SUPERSEDED_BY_NEWER_PUSHES"
+    },
+    "validation": {
+      "dx9exActiveRunId": 37250263373,
+      "jobs": {
+        "policy": 111576304334,
+        "host": 111576363304,
+        "game": 111576363275,
+        "fullChainCompile": 111576363300,
+        "package": 111577342886
+      },
+      "domainIsolationRunId": 37250263384,
+      "packageArtifactId": 11320364280,
+      "packageArtifactDigest": "sha256:0a4df85dc378156c8bf495194daf76c9a011e55c704e80e336615490de6c5be1",
+      "n100": "AUXILIARY_EXACT_SHA_778FE8B1_STATIC_PASS"
+    }
   }
 }
