@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T12:03:00+09:00",
+  "updated_at_kst": "2026-10-05T12:25:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B_PRODUCTION78 reworked C151-returned C598919A and proved ordinary DXT5 full-block splice cannot satisfy exact decoded-pixel bbox rules: 10 stage rows tested, 8 fail, 1,435 mandatory source glyph/effect pixels live in bbox-crossing 4x4 blocks. No C598 candidate persisted; constrained endpoint/index solver remains required. Per fail-closed continuation, B_PRODUCTION80 produced even index 236 FEF70E85 candidate e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086 from canonical 2048x2048 RGBA32/BGRA source. 14 canonical phonetic stage names pass 14/14 bbox+size+positive margins, clean/final validators, zero residue/outside/alpha/protected/render-outside/preserved/overlap/touch and controller source/clean/final/row/raw mirror_y QA. pending_artwork localize_text=27; producer REWORK=1 (C598919A). RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "B82 corrective producer self-QA completed even index 188 8C259C68 after B81 was visually rejected for mirror_y row reversal and undersized/thin text. Candidate 03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03: corrected six-row binding, shared Bold 12px x4 source style, 6/6 bbox+size+positive margins, clean/final PASS, zero residue/outside/alpha/protected/render-outside/overlap/touch, readable/raw controller visual PASS. C157 independently recomputed canonical DDS+atlas gates and machine-PASSed the same SHA. pending_artwork localize_text=25; producer REWORK=1 (C598919A constrained DXT5 solver). RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -270,7 +270,7 @@
         "C598919A"
       ],
       "remaining": 1,
-      "note": "C153/C156 cross-lane final QA approved new B80 FEF70E85 and A22 30CF0D static candidates. C598919A remains the sole producer REWORK_REQUIRED item: B78 proved 1,435 mandatory source glyph/effect pixels in DXT5 boundary-crossing blocks, so an endpoint/index-constrained exact decoded-pixel solver is required. Strict HOLD no-candidate remains 4F68708E/F6811E94/49BB5FE5/75C3586A. RUNTIME_VALIDATION=UNTESTED.",
+      "note": "B82 produced 8C259C68 03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03 and controller self-QA PASS; C157 independent machine QA PASS same SHA. C598919A remains sole producer REWORK_REQUIRED requiring endpoint/index-constrained exact decoded-pixel DXT5 solver. Strict HOLD no-candidate remains 4F68708E/F6811E94/49BB5FE5/75C3586A. pending_artwork localize_text=25. RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": []
     },
     "latest_d_final_qa": {
@@ -333,25 +333,20 @@
       "in_game_validation": "PENDING; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
-      "run": "B_PRODUCTION80",
-      "worker_run_id": 37256770174,
-      "worker_output_commit": "4f796aa6af143749202ce3f1fc9067a95266c21e",
-      "result": "B78_REWORK_BLOCKER_PROVED_AND_ONE_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_INGAME",
+      "run": "B_PRODUCTION81/B82_CORRECTIVE",
+      "worker_run_id": 37259084543,
+      "worker_output_commit": "922c3422ac5f7db71d27cde4a3d125d034c91cc1",
+      "result": "B81_VISUAL_REJECTED_B82_CORRECTIVE_SELF_QA_PASS_PENDING_C_INGAME",
       "assets": {
-        "C598919A": {
-          "queue_index": 86,
-          "status": "REWORK_REQUIRED_DXT5_CONSTRAINED_ENDPOINT_INDEX_SOLVER",
-          "candidate_present": false,
-          "boundary_source_alpha_pixels": 1435,
-          "report": "localization/graphics/role_B/20261005-B-PRODUCTION78-C598-REWORK/B78_CONTROLLER_REWORK.json"
-        },
-        "FEF70E85": {
-          "queue_index": 236,
-          "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
-          "candidate_sha256": "e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086",
-          "status": "B_PRODUCTION80_SELF_QA_PASS_PENDING_C_AND_INGAME",
-          "report": "localization/graphics/role_B/20261005-B-PRODUCTION80/B80_FEF_REPORT.json",
-          "physical_elements": 14
+        "8C259C68": {
+          "queue_index": 188,
+          "source_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+          "candidate_sha256": "03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03",
+          "status": "B82_CORRECTIVE_SELF_QA_PASS_PENDING_C_AND_INGAME",
+          "report": "localization/graphics/role_B/20261005-B-PRODUCTION81/B82_8C_REPORT.json",
+          "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION81/B82_CONTROLLER_SELF_QA.json",
+          "c157_machine_qa": "PASS",
+          "physical_elements": 6
         }
       },
       "runtime_validation": "UNTESTED"
@@ -554,7 +549,7 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 26,
+    "current_pending_artwork_localize_text": 25,
     "current_producer_rework_remaining": 1,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T11:53:26+09:00",
@@ -878,6 +873,30 @@
       "candidate_changed_by_C": false,
       "machine_report": "localization/graphics/role_C/20261005-C156-30CF0D/C156_30CF_MACHINE_QA.json",
       "controller_report": "localization/graphics/role_C/20261005-C156-30CF0D/C156_30CF_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "latest_hd_rework_batch": "localization/graphics/role_B/20261005-B-PRODUCTION81/B82_8C_REPORT.json",
+    "hd_rework_candidates_ready": 17,
+    "b82_8c259c68": {
+      "queue_index": 188,
+      "source_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+      "candidate_sha256": "03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+      "status": "B82_CORRECTIVE_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "bbox_size_positive_margin": "6/6",
+      "zero_pixel_gates": {
+        "source_residue": 0,
+        "outside": 0,
+        "alpha_outside": 0,
+        "protected": 0,
+        "render_outside_target": 0,
+        "overlap": 0,
+        "touch_pairs": 0
+      },
+      "controller_visual_qa": "PASS",
+      "c157_machine_qa": "PASS",
+      "report": "localization/graphics/role_B/20261005-B-PRODUCTION81/B82_8C_REPORT.json",
+      "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION81/B82_CONTROLLER_SELF_QA.json",
       "runtime_validation": "UNTESTED"
     }
   },
