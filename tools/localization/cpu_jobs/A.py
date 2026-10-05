@@ -7,7 +7,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("worker A only")
 
 repo=Path.cwd()
-run="20261006-A-PRODUCTION78-C05"
+run="20261006-A-PRODUCTION79-C05"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -80,13 +80,13 @@ for yy in range(H):
         if source_mask.getpixel((xx,yy)):
             clean_px[xx,yy]=(0,0,0,0)
 
-sp=out/"A78_C05_SOURCE_READABLE.png"; cp=out/"A78_C05_CLEAN_PLATE.png"
-smp=out/"A78_C05_SOURCE_TEXT_MASK.png"; ap=out/"A78_C05_ALLOWED_BBOX_MASK.png"
+sp=out/"A79_C05_SOURCE_READABLE.png"; cp=out/"A79_C05_CLEAN_PLATE.png"
+smp=out/"A79_C05_SOURCE_TEXT_MASK.png"; ap=out/"A79_C05_ALLOWED_BBOX_MASK.png"
 src.save(sp); clean.save(cp); source_mask.save(smp); allowed.save(ap)
 protected=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(source_mask))
-pp=out/"A78_C05_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"A78_C05_CLEAN_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A78_C05_CLEAN_VALIDATION.json").read_text())
+pp=out/"A79_C05_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"A79_C05_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"A79_C05_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
@@ -94,24 +94,26 @@ subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-no
 font_line=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{style}","Noto Sans CJK KR:style=Black"],text=True).strip()
 FONT,FI,FSTYLE=font_line.rsplit("|",2); FI=int(FI or 0)
 
-def render_low(text,fs,fill):
+def render_native(text,fs,fill):
     f=ImageFont.truetype(FONT,fs,index=FI)
     dr=ImageDraw.Draw(Image.new("L",(8,8),0))
     bb=dr.textbbox((0,0),text,font=f)
-    a=Image.new("L",(max(8,bb[2]-bb[0]+4),max(8,bb[3]-bb[1]+4)),0)
-    ImageDraw.Draw(a).text((2-bb[0],2-bb[1]),text,font=f,fill=255)
+    a=Image.new("L",(max(8,bb[2]-bb[0]+8),max(8,bb[3]-bb[1]+8)),0)
+    ImageDraw.Draw(a).text((4-bb[0],4-bb[1]),text,font=f,fill=255)
     ab=a.getbbox()
     if not ab: raise RuntimeError(("render empty",text,fs))
     a=a.crop(ab)
     rgba=Image.new("RGBA",a.size,(fill[0],fill[1],fill[2],255)); rgba.putalpha(a)
-    return rgba.resize((rgba.width*4,rgba.height*4),Image.Resampling.NEAREST)
+    return rgba
 
-# Preserve one shared source family size across all six labels.
+# Preserve one shared source family size across all six labels at native HD resolution.
+# A78 nearest-neighbor quarter-scale rendering is intentionally superseded because controller
+# self-QA found visibly pixelated Hangul compared with the anti-aliased source.
 chosen=None
-for fs in range(18,4,-1):
+for fs in range(64,8,-1):
     ok=True
     for r in rows:
-        lay=render_low(r["korean"],fs,r["source_median_rgba"])
+        lay=render_native(r["korean"],fs,r["source_median_rgba"])
         if lay.width>r["source_width"]-4 or lay.height>r["source_height"]-4:
             ok=False; break
     if ok:
@@ -123,7 +125,7 @@ targets=[]
 outrows=[]
 for r in rows:
     ob=r["original_bbox"]; fill=r["source_median_rgba"]
-    lay=render_low(r["korean"],chosen,fill)
+    lay=render_native(r["korean"],chosen,fill)
     # Source labels are left aligned within their physical text bbox.
     px=ob[0]+2
     py=ob[1]+(r["source_height"]-lay.height)//2
@@ -134,7 +136,7 @@ for r in rows:
     lb=list(lm.getbbox()); targets.append((r["region_idx"],lm))
     outrows.append({**r,"localized_bbox":lb,"localized_width":lb[2]-lb[0],"localized_height":lb[3]-lb[1],
       "delta_left":lb[0]-ob[0],"delta_right":ob[2]-lb[2],"delta_top":lb[1]-ob[1],"delta_bottom":ob[3]-lb[3],
-      "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","lowres_font_size":chosen,"pixel_scale":4,
+      "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","native_font_size_px":chosen,"pixel_scale":1,
       "horizontal_scale":1.0,"tracking_px_average":0.0,"alignment":"left","font_file":Path(FONT).name,
       "font_face_index":FI,"font_style":FSTYLE,"fill_rgba":[fill[0],fill[1],fill[2],255]})
 
@@ -156,10 +158,10 @@ candidate.write_bytes(payload)
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
 dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip")
-fp=out/"A78_C05_FINAL_DECODED_READABLE.png"; dec.save(fp)
-target.save(out/"A78_C05_TARGET_TEXT_MASK.png")
-subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A78_C05_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"A78_C05_FINAL_VALIDATION.json").read_text())
+fp=out/"A79_C05_FINAL_DECODED_READABLE.png"; dec.save(fp)
+target.save(out/"A79_C05_TARGET_TEXT_MASK.png")
+subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A79_C05_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"A79_C05_FINAL_VALIDATION.json").read_text())
 
 diff=dmask(src,dec)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
@@ -177,37 +179,37 @@ for r in outrows:
     c=Image.new("RGB",(sum(z.width for z in ims)+12,max(z.height for z in ims)+30),"white")
     xx=0
     for z in ims: c.paste(z,(xx,30)); xx+=z.width+6
-    ImageDraw.Draw(c).text((5,5),f'{r["region_idx"]} {r["source"]} -> {r["korean"]} fs={chosen}',fill="black")
+    ImageDraw.Draw(c).text((5,5),f'{r["region_idx"]} {r["source"]} -> {r["korean"]} native_fs={chosen}',fill="black")
     cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+4*(len(cards)-1)),"white")
 yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.save(out/"A78_C05_TARGET_CONTACTS.jpg",quality=98)
+sheet.save(out/"A79_C05_TARGET_CONTACTS.jpg",quality=98)
 
 rawcmp=Image.new("RGB",(W*2,H+30),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW",raw_src),("FINAL_RAW",raw_dec)]):
     z=comp(im); rawcmp.paste(z,(i*W,30)); ImageDraw.Draw(rawcmp).text((i*W+4,5),label,fill="black")
-rawcmp.save(out/"A78_C05_RAW_COMPARE.jpg",quality=98)
+rawcmp.save(out/"A79_C05_RAW_COMPARE.jpg",quality=98)
 
 report={"schema_version":1,"role":"A","run":run,"index":215,"asset":asset,
  "readiness_tier":"A77_ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":commit,"git_blob_sha1":blob(sb),"atlas_git_blob_sha1":blob(ab),"source_sha256":sha(sb)},
  "physical_binding":{"0":"GOAL E","1":"GOAL D","2":"GOAL C","3":"GOAL B","4":"GOAL A","5":"15con."},
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
- "font":{"file":Path(FONT).name,"face_index":FI,"style":FSTYLE,"shared_lowres_font_size":chosen,"pixel_scale":4,"horizontal_scale":1.0,"artificial_tracking_px":0.0},
+ "font":{"file":Path(FONT).name,"face_index":FI,"style":FSTYLE,"shared_native_font_size_px":chosen,"pixel_scale":1,"horizontal_scale":1.0,"artificial_tracking_px":0.0},
  "rows":outrows,"clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
  "decoded_changes":{"changed_pixels_total":count(diff),"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,
    "render_outside_target":render_outside,"candidate_vs_clean_outside_korean_target":candidate_vs_clean_outside_target,
    "localized_overlap":overlap,"localized_touch_pairs":touch},
  "candidate_sha256":sha(payload),"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","runtime_validation":"UNTESTED",
- "status":"A78_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
-(out/"A78_C05E67EF_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A78_C05E67EF.json").write_text(json.dumps({
+ "status":"A79_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
+(out/"A79_C05E67EF_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"A79_C05E67EF.json").write_text(json.dumps({
  "run":run,"index":215,"asset":"C05E67EF","source_sha256":sha(sb),"candidate_sha256":sha(payload),
  "physical_rows":6,"bbox_size_positive_margin":"6/6 PASS","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"render_outside_target":render_outside,
  "candidate_vs_clean_outside_target":candidate_vs_clean_outside_target,"overlap":overlap,"touch_pairs":len(touch),
- "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_A/{run}/A78_C05E67EF_REPORT.json"
+ "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_A/{run}/A79_C05E67EF_REPORT.json"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print(json.dumps({"run":run,"index":215,"asset":"C05E67EF","candidate_sha256":sha(payload),"font_size":chosen,"status":report["status"]},ensure_ascii=False))
+print(json.dumps({"run":run,"index":215,"asset":"C05E67EF","candidate_sha256":sha(payload),"native_font_size_px":chosen,"status":report["status"]},ensure_ascii=False))
