@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B_PRODUCTION128 completed C176-returned even index 28 A05BF610 candidate bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8. 1/1 bbox/size/positive-margin and zero outside/alpha/protected/overlap gates PASS; controller SOURCE/CLEAN/FINAL,row,raw mirror_y visual self-QA PASS. Right-edge residue and border-touch artifacts are removed, border/glow continuity is preserved, and compact tracking matches the source family. Independent C + in-game pending; RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION27 completed odd index 241 E1639D2E candidate fe9bb931d94a13a44a08bcf61b6325c01080b462afff84f92c97205cbe0eea65: Loading→로딩 and PLEASE WAIT→잠시만요 from authoritative 1024x256 RGBA32/BGRA HD. Same-run controller review corrected centered/tall Hangul to source-left alignment and wide/low Loading proportions. Final 2/2 readable+raw bbox, source-size ceiling, positive margins; clean/final validators and zero residue/outside/alpha/protected/overlap/touch PASS; visual self-QA PASS. Independent C + in-game pending; RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION26 completed C163-returned odd index 55 2EA557B4 candidate b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc: NEXT ROUND→다음 라운드 now uses actual NotoSansCJK-Bold, source-derived filled cyan/white/blue vertical gradient, navy outer edge, white mid edge, lower-right depth and source-like slant while retaining constrained DXT5 boundary safety. 1/1 bbox+size+positive margin, clean/final and zero outside/alpha/protected/residue PASS; visual self-QA PASS. Independent C + in-game pending; RUNTIME_VALIDATION=UNTESTED.",
     "C162/C163 consumed both A pending-C outputs. 7CE1CFC5 A25 b75102588dc30ec828fdec765658d2e25cbcee9d972832bb70b527b372008542: independent DXT5 4/4 exact bbox+size+positive margins, outside/alpha/visible/residue/overlap/touch/protected gates zero, BC3 scope PASS, controller SOURCE/CLEAN/FINAL,row,raw style PASS -> C162_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. 2EA557B4 d66a110cfc5bd09201c6f1a806fd3b2fab84663294ff865415fc7fc6532d6beb: independent 1/1 exact DXT5 and boundary-block gates PASS, but mandatory visual source-style FAIL: 다음 라운드 is hollow/outline-dominant rather than filled cyan-white-blue italic gradient -> C163_REWORK_REQUIRED_SOURCE_STYLE_FILL_GRADIENT. pending C=0; pending production=21; rework=3 (C598919A,63C91067,2EA557B4). RUNTIME_VALIDATION=UNTESTED.",
@@ -997,23 +998,17 @@
       "report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json"
     },
     "next_hd_rework": {
-      "asset": "FF2462BB",
-      "status": "ZERO_PIXEL_OR_ARTIFACT_REWORK_REQUIRED",
+      "status": "REWORK_REQUIRED_WITH_PENDING_C",
       "assets": [
-        "FF2462BB",
-        "568D3696",
-        "FA7BBB13",
-        "39229D64",
-        "A064FDFC",
-        "2DA43E41",
-        "411827E",
-        "571E78F3",
-        "62BEBF33",
-        "E3FD08BE",
-        "C075FB49",
-        "FD90AA9"
+        "63C91067",
+        "C598919A"
       ],
-      "remaining": 12
+      "remaining": 2,
+      "pending_c": [
+        "37759842",
+        "A05BF610"
+      ],
+      "runtime_validation": "UNTESTED"
     },
     "c80": {
       "timestamp_kst": "2026-09-27T18:29:48+09:00",
@@ -1133,7 +1128,7 @@
       "runtime_validation": "UNTESTED"
     },
     "current_pending_artwork_localize_text": 17,
-    "current_producer_rework_remaining": 3,
+    "current_producer_rework_remaining": 2,
     "latest_a_production_batch": "localization/graphics/role_A/20261005-A-PRODUCTION34/A34_37759842_REPORT.json",
     "a_production20_9ce4e175": {
       "timestamp_kst": "2026-10-05T02:45:00+09:00",
@@ -1152,19 +1147,18 @@
       "runtime_validation": "UNTESTED"
     },
     "latest_b_production": {
-      "run": "B_PRODUCTION86/B87/B88/B89",
-      "asset": "DDF0392A",
-      "queue_index": 222,
-      "candidate_sha256": "e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea",
-      "report": "localization/graphics/role_B/20261005-B-PRODUCTION89/B89_DDF_REPORT.json",
-      "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION89/B89_CONTROLLER_SELF_QA.json",
+      "run": "B_PRODUCTION128",
+      "asset": "A05BF610",
+      "queue_index": 28,
+      "candidate_sha256": "bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8",
+      "report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_A05_REPORT.json",
+      "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_CONTROLLER_SELF_QA.json",
       "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
       "runtime_validation": "UNTESTED"
     },
     "current_producer_rework_assets": [
       "63C91067",
-      "C598919A",
-      "A05BF610"
+      "C598919A"
     ],
     "a_production26_2ea557b4": {
       "timestamp_kst": "2026-10-05T14:52:10+09:00",
@@ -1188,6 +1182,9 @@
     "latest_a_controller_self_qa": "localization/graphics/role_A/20261005-A-PRODUCTION34/A34_CONTROLLER_SELF_QA.json",
     "pending_c_from_a": [
       "37759842"
+    ],
+    "pending_c_from_b": [
+      "A05BF610"
     ]
   },
   "runtime_packages": {
@@ -3907,6 +3904,38 @@
     "controller_visual_qa": "FAIL_CLEAN_PLATE_RESIDUE_AND_BORDER_TOUCH",
     "decision": "C176_REWORK_REQUIRED_CLEAN_PLATE_RESIDUE_BORDER_TOUCH_AND_SPACING",
     "report": "localization/graphics/role_C/20261005-C176-A05BF610/C176_A05_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "b_production128_a05bf610": {
+    "timestamp_kst": "2026-10-05T17:30:00+09:00",
+    "run": "20261005-B-PRODUCTION128",
+    "queue_index": 28,
+    "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+    "candidate_sha256": "bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8",
+    "status": "B128_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_A05_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_CONTROLLER_SELF_QA.json",
+    "bbox_size_positive_margin": "1/1",
+    "outside_pixels": 0,
+    "alpha_outside_pixels": 0,
+    "protected_lens_flare_cell_changed": 0,
+    "c176_return_resolved": true,
+    "runtime_validation": "UNTESTED"
+  },
+  "current_pending_artwork_localize_text": 17,
+  "current_producer_rework_remaining": 2,
+  "current_producer_rework_assets": [
+    "63C91067",
+    "C598919A"
+  ],
+  "latest_b_production": {
+    "run": "B_PRODUCTION128",
+    "asset": "A05BF610",
+    "queue_index": 28,
+    "candidate_sha256": "bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8",
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_A05_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_CONTROLLER_SELF_QA.json",
+    "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
     "runtime_validation": "UNTESTED"
   }
 }
