@@ -8,7 +8,7 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
 
-repo=Path.cwd(); run="20261006-A-PRODUCTION80-3775-MANUAL"
+repo=Path.cwd(); run="20261006-A-PRODUCTION81-3775-BBOX"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset_rel="textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
@@ -72,7 +72,7 @@ rowsn=(len(items)+cols-1)//cols
 sheet=Image.new("RGB",(cols*cw,rowsn*ch),(190,190,190))
 for i,card in enumerate(items):
     sheet.paste(card,((i%cols)*cw,(i//cols)*ch))
-sheet.save(out/"A80_ALL_SOURCE_REGIONS.jpg",quality=82,optimize=True)
+sheet.save(out/"A81_ALL_SOURCE_REGIONS.jpg",quality=82,optimize=True)
 
 
 # Physical target binding established from A30 numbered canonical-HD atlas review.
@@ -278,7 +278,19 @@ def manual_plate_primitive_rgba(arr,mask,core,kind,style):
         top=bot=np.median(vals2,axis=0)
 
     out=a.copy()
-    my,mxpos=np.where(mask)
+    # C186/ingame fail families need the whole exact source-effect bbox rebuilt,
+    # not only glyph-shaped pixels. Painting only the glyph mask left a visible
+    # letter silhouette even with correct replacement colors. The bbox is the
+    # contract's hard permitted region and these ROIs were defined to stop
+    # before preserved icons/decorative art.
+    paint=mask.copy()
+    if fail_family:
+        py,pxs=np.where(mask)
+        bx0,bx1=int(pxs.min()),int(pxs.max())+1
+        by0,by1=int(py.min()),int(py.max())+1
+        paint=np.zeros_like(mask,dtype=bool)
+        paint[by0:by1,bx0:bx1]=True
+    my,mxpos=np.where(paint)
     denom=max(1.0,float(max(sy2)-min(sy2)))
     ymin=float(min(sy2))
     for y,x in zip(my.tolist(),mxpos.tolist()):
@@ -330,11 +342,11 @@ ap=out/"37759842_HD_ALLOWED_BBOX_MASK.png"
 src.save(sp); clean.save(cp); source_text_mask.save(smp); source_core_mask.save(scp); allowed.save(ap)
 protected=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed))
 pp=out/"37759842_HD_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--report",str(out/"A80_CLEAN_PLATE_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A80_CLEAN_PLATE_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A81_CLEAN_PLATE_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"A81_CLEAN_PLATE_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 clean_diff=dmask(src,clean)
-clean_outside=count(ImageChops.multiply(clean_diff,ImageOps.invert(source_text_mask)))
+clean_outside=count(ImageChops.multiply(clean_diff,ImageOps.invert(allowed)))
 if clean_outside: raise RuntimeError(("clean outside source mask",clean_outside))
 
 def resolve_font():
@@ -441,8 +453,8 @@ dp=out/"37759842_HD_FINAL_DECODED_READABLE.png"; decoded.save(dp)
 
 # Exhaustive decoded-pixel gates.
 subprocess.run(["python3",str(validator),str(sp),str(dp),str(ap),"--protected-mask",str(pp),
-                "--report",str(out/"A80_FINAL_MASK_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"A80_FINAL_MASK_VALIDATION.json").read_text())
+                "--report",str(out/"A81_FINAL_MASK_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"A81_FINAL_MASK_VALIDATION.json").read_text())
 diff=dmask(src,decoded)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
 alpha_diff=bmask(ImageChops.difference(src.getchannel("A"),decoded.getchannel("A")))
@@ -484,7 +496,7 @@ for im in (src,clean,decoded):
     q=flatten(im).resize((1024,1024),Image.Resampling.LANCZOS); thumbs.append(q)
 sheet=Image.new("RGB",(3072,1024),(90,90,90))
 for i,q in enumerate(thumbs): sheet.paste(q,(i*1024,0))
-sheet.save(out/"A80_SOURCE_CLEAN_FINAL_QUARTER.jpg",quality=94)
+sheet.save(out/"A81_SOURCE_CLEAN_FINAL_QUARTER.jpg",quality=94)
 
 cards=[]
 for row in rows:
@@ -504,7 +516,7 @@ for row in rows:
 cw=max(c.width for c in cards); ch=sum(c.height+3 for c in cards)
 contacts=Image.new("RGB",(cw,ch),(225,225,225)); yy=0
 for c in cards: contacts.paste(c,(0,yy)); yy+=c.height+3
-contacts.save(out/"A80_TARGET_CONTACTS.jpg",quality=94)
+contacts.save(out/"A81_TARGET_CONTACTS.jpg",quality=94)
 
 # Small C177-focused evidence that stays connector-viewable: only selector
 # plate rows whose detached source shadow/outline was reworked.
@@ -528,9 +540,9 @@ for row in rows:
 fcw=max(q.width for q in fcards); fch=sum(q.height+2 for q in fcards)
 focus=Image.new("RGB",(fcw,fch),(225,225,225)); fy=0
 for q in fcards: focus.paste(q,(0,fy)); fy+=q.height+2
-focus.save(out/"A80_C177_FOCUS.jpg",quality=84,optimize=True)
+focus.save(out/"A81_C177_FOCUS.jpg",quality=84,optimize=True)
 
-flatten(decoded_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A80_FINAL_RAW_MIRROR_Y.jpg",quality=94)
+flatten(decoded_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A81_FINAL_RAW_MIRROR_Y.jpg",quality=94)
 
 report={"schema_version":1,"role":"A","run":run,"index":95,"asset":asset_rel,"worker":"github-actions",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB_SHA1,"sha256":SOURCE_SHA,
@@ -542,15 +554,15 @@ report={"schema_version":1,"role":"A","run":run,"index":95,"asset":asset_rel,"wo
             "localized_indices":sorted(SPECS),"protected_indices":PROTECTED_INDICES,
             "preserve_original":"song titles/music credits, Ferrari/model names, MT/AT icon badges, logos and non-text decorative art"},
  "rows":rows,"clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
- "machine_checks":{"clean_changed_outside_source_text_mask":clean_outside,"clean_source_core_pixels_unchanged":clean_source_core_unchanged,
+ "machine_checks":{"clean_changed_outside_source_effect_bboxes":clean_outside,"clean_source_core_pixels_unchanged":clean_source_core_unchanged,
                    "decoded_changed_outside_source_effect_bboxes":outside,"alpha_changed_outside_source_effect_bboxes":alpha_out,
                    "protected_visible_pixels_changed":protected_changed,"localized_overlap_pixels":overlap,"localized_1px_touch_pixels":touch,
                    "source_core_residue_pixels":residue},
  "all_33_bbox_size_positive_margin_pass":allbbox,
- "c186_ingame_rework":"manual vertical plate primitives for C186-visible selector families; no donor/inpaint/row-span/fitted-field reuse; stronger source-faithful slant for selector labels",
+ "c186_ingame_rework":"manual exact-source-effect-bbox plate reconstruction for C186/IGR-014/015/016 fail families; vertical plate primitives fill the full permitted bbox to eliminate glyph silhouettes; no donor/inpaint/row-span/fitted-field reuse; stronger source-faithful slant",
  "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"PENDING_NEW_INGAME_RETEST",
- "status":"A80_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A80_WORKER_REWORK_REQUIRED"}
-(out/"A80_37759842_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "status":"A81_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A81_WORKER_REWORK_REQUIRED"}
+(out/"A81_37759842_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":95,"asset":"37759842","candidate_sha256":CANDIDATE_SHA,
          "localized_physical_targets":len(rows),"semantic_strings":20,
          "bbox_size_positive_margin":"33/33 PASS" if allbbox else "FAIL",
@@ -558,7 +570,7 @@ summary={"run":run,"index":95,"asset":"37759842","candidate_sha256":CANDIDATE_SH
          "changed_outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,
          "overlap":overlap,"touch":touch,"source_residue":residue,"clean_source_core_unchanged":clean_source_core_unchanged,
          "worker_status":report["status"],"runtime_validation":"PENDING_NEW_INGAME_RETEST",
-         "report":"localization/graphics/role_A/20261006-A-PRODUCTION80-3775-MANUAL/A80_37759842_REPORT.json"}
-(wr/"A80_37759842.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+         "report":"localization/graphics/role_A/20261006-A-PRODUCTION81-3775-BBOX/A81_37759842_REPORT.json"}
+(wr/"A81_37759842.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False,indent=2))
 if not status: raise SystemExit(2)
