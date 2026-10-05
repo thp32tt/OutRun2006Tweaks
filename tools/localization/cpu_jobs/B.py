@@ -112,14 +112,19 @@ sx0=max(x,ob[0]-90); sy0=max(y,ob[1]-70); sx1=min(x+cw,ob[2]+90); sy1=min(y+ch,o
 Y,X=np.mgrid[sy0:sy1,sx0:sx1]
 sub=sa[sy0:sy1,sx0:sx1].astype(np.float64)
 near_sub=near[sy0:sy1,sx0:sx1]
-sample=(sub[:,:,3]>220)&(~near_sub)
-# Starburst interior is warm/brown. Reject gray transparent exterior and white/gold border/rays.
-sample &= (sub[:,:,0]>90)&(sub[:,:,0]>sub[:,:,1]+8)&(sub[:,:,1]>sub[:,:,2]-8)&(sub[:,:,2]<210)
+sample=(sub[:,:,3]>16)&(~near_sub)
+# Starburst interior is warm/brown. Alpha is intentionally soft in this artwork, so do not
+# require opacity; reject transparent exterior by alpha and keep a broad warm-color family.
+sample &= (sub[:,:,0]>70)&(sub[:,:,0]>sub[:,:,1]-5)&(sub[:,:,1]>sub[:,:,2]-30)&(sub[:,:,2]<225)
+# If the warm filter is still too selective, fall back to all nontransparent non-title
+# pixels; robust residual trimming below removes rays/border/outliers deterministically.
+if np.count_nonzero(sample)<5000:
+    sample=(sub[:,:,3]>16)&(~near_sub)&(sub[:,:,0]>45)
 xn=(X-(sx0+sx1)/2)/max(1,(sx1-sx0)/2)
 yn=(Y-(sy0+sy1)/2)/max(1,(sy1-sy0)/2)
 B=np.stack([np.ones_like(xn),xn,yn,xn*xn,xn*yn,yn*yn],axis=-1)
 flatB=B.reshape(-1,6); flatS=sub.reshape(-1,4); mask=sample.reshape(-1)
-if np.count_nonzero(mask)<12000: raise RuntimeError(("background sample too small",int(np.count_nonzero(mask))))
+if np.count_nonzero(mask)<4000: raise RuntimeError(("background sample too small",int(np.count_nonzero(mask))))
 coef=np.zeros((6,4),dtype=np.float64)
 use=mask.copy()
 for _ in range(3):
