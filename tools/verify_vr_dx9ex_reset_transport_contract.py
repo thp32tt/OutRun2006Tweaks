@@ -368,6 +368,13 @@ require(
 # generation-scoped per-slot mapping, while the lower R7 fallback still consumes
 # SharedPose.hostDirectConsumedFrameId. Keep the legacy bridge monotonic so late
 # async completions cannot move the global ACK backwards.
+require(
+    load(ROOT / "src/vr/ipc/direct_ack_r13.hpp"),
+    "dedicated ACK run-generation ABI field",
+    "DirectGpuAckRunGenerationIndex = 0",
+    "std::uint32_t reserved[2]",
+    "static_assert(sizeof(DirectGpuAckState) == 48)",
+)
 ensure_pose_host = body(host_passthrough, "inline bool EnsurePoseState() noexcept")
 require(
     ensure_pose_host,
@@ -411,6 +418,22 @@ require_order(
     "BeginAckWrite();",
     "DirectAckState->completedFrameId[slot] = frame.frameId;",
 )
+require(
+    publish_completed,
+    "host dedicated ACK game-run scope",
+    "RenderFrameRunGenerationIndex",
+    "DirectGpuAckRunGenerationIndex",
+    "runGeneration",
+)
+require_order(
+    publish_completed,
+    "host dedicated ACK game-run publication",
+    "const std::uint32_t runGeneration",
+    "BeginAckWrite();",
+    "DirectGpuAckRunGenerationIndex] = runGeneration;",
+    "DirectAckState->completedFrameId[slot] = frame.frameId;",
+    "EndAckWrite();",
+)
 require_order(
     publish_completed,
     "host dual ACK publication",
@@ -418,6 +441,27 @@ require_order(
     "EndAckWrite();",
     "PublishLegacyConsumedFrame(frame);",
     "return true;",
+)
+
+# The game may only accept a dedicated ACK that belongs to its current Frame.v2
+# game run as well as the current DirectGPU resource generation. This closes the
+# remaining race where an old host completion lands after a fast game restart.
+read_gpu_ack = body(r13, "bool R13ReadGpuCompletedFrame(")
+require(
+    read_gpu_ack,
+    "game dedicated ACK run-generation validation",
+    "DirectGpuAckRunGenerationIndex",
+    "RenderFrameRunGeneration",
+    "snapshot.transportGeneration != DirectTransportGeneration",
+)
+require_order(
+    read_gpu_ack,
+    "game dedicated ACK identity validation",
+    "snapshot.hostPid != SharedState->hostPid",
+    "snapshot.transportGeneration != DirectTransportGeneration",
+    "DirectGpuAckRunGenerationIndex",
+    "RenderFrameRunGeneration",
+    "completedFrame = snapshot.completedFrameId[slotIndex];",
 )
 
 # Host shared-resource caches must key on the new producer generation and both

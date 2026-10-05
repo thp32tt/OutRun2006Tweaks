@@ -10,6 +10,10 @@ namespace OutRunVR::R13
     inline constexpr std::uint32_t DirectGpuAckMagic = 0x334B4341u; // 'ACK3'
     inline constexpr std::uint32_t DirectGpuAckVersion = 1;
     inline constexpr std::uint32_t DirectGpuAckRingSize = 4;
+    // Reuse reserved storage without changing the 48-byte IPC ABI. The host
+    // stamps the Frame.v2 game-run generation that produced each ACK batch so
+    // a restarted game can reject late completions from the previous process.
+    inline constexpr std::uint32_t DirectGpuAckRunGenerationIndex = 0;
 
 #pragma pack(push, 4)
     struct DirectGpuAckState

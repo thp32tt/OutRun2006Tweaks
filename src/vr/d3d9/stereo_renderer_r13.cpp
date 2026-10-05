@@ -155,7 +155,11 @@ namespace OutRunVRStereo
                     snapshot.structSize != sizeof(snapshot) ||
                     !snapshot.hostPid || !SharedState ||
                     snapshot.hostPid != SharedState->hostPid ||
-                    snapshot.transportGeneration != DirectTransportGeneration)
+                    snapshot.transportGeneration != DirectTransportGeneration ||
+                    !RenderFrameRunGeneration ||
+                    snapshot.reserved[
+                        OutRunVR::R13::DirectGpuAckRunGenerationIndex] !=
+                        RenderFrameRunGeneration)
                     return false;
 
                 completedFrame = snapshot.completedFrameId[slotIndex];

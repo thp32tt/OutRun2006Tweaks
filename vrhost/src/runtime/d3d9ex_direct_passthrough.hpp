@@ -312,6 +312,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
             DirectAckState->structSize = sizeof(*DirectAckState);
             DirectAckState->hostPid = GetCurrentProcessId();
             DirectAckState->transportGeneration = 0;
+            DirectAckState->reserved[
+                OutRunVR::R13::DirectGpuAckRunGenerationIndex] = 0;
             std::memset(DirectAckState->completedFrameId, 0,
                 sizeof(DirectAckState->completedFrameId));
             EndAckWrite();
@@ -545,16 +547,24 @@ namespace OutRunVrD3D9ExDirectPassthrough
             frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
         const std::uint32_t generation =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        if (slot >= OutRunVR::R13::DirectGpuAckRingSize || !generation)
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        if (slot >= OutRunVR::R13::DirectGpuAckRingSize || !generation ||
+            !runGeneration)
             return false;
 
-        // Dedicated ACK state is generation-scoped but not game-run-scoped.
-        // Refuse a late completion from a superseded Frame.v2 run before it can
-        // roll transportGeneration backwards or clear the new run's slot ACKs.
+        // Scope the dedicated ACK to both the DirectGPU resource generation and
+        // the Frame.v2 game-run generation. The latter is stored in reserved
+        // ABI space so a late completion from the previous game process cannot
+        // be accepted by a restarted producer even if it races this write.
         BeginAckWrite();
-        if (DirectAckState->transportGeneration != generation)
+        if (DirectAckState->transportGeneration != generation ||
+            DirectAckState->reserved[
+                OutRunVR::R13::DirectGpuAckRunGenerationIndex] != runGeneration)
         {
             DirectAckState->transportGeneration = generation;
+            DirectAckState->reserved[
+                OutRunVR::R13::DirectGpuAckRunGenerationIndex] = runGeneration;
             std::memset(DirectAckState->completedFrameId, 0,
                 sizeof(DirectAckState->completedFrameId));
         }
