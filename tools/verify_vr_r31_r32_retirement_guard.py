@@ -144,6 +144,50 @@ forbid(
 if r33.count("R32SetWvpBatch(") < 4:
     fail("R33 WVP sites unexpectedly stopped using the telemetry-preserving wrapper")
 
+# Raw live effect render-state reads are ownership-neutral D3D9 observations.
+# R32 keeps fail-close telemetry/warnings and effect policy classification.
+require(
+    draw_state_helpers,
+    "neutral live effect-state snapshot",
+    "struct LiveEffectRenderStateSnapshot",
+    "inline bool ReadLiveEffectRenderStateSnapshot(",
+    "D3DRS_ALPHABLENDENABLE",
+    "D3DRS_ALPHATESTENABLE",
+    "D3DRS_ZWRITEENABLE",
+    "D3DRS_ZENABLE",
+    "D3DRS_CULLMODE",
+)
+r32_effect_snapshot = function_body(r32, "bool R32ReadEffectSnapshot(")
+require(
+    r32_effect_snapshot,
+    "R32 effect snapshot telemetry wrapper",
+    "OutRunVR::D3D9::ReadLiveEffectRenderStateSnapshot(device, out)",
+    "++R32StateSnapshotFailures",
+    "R32FirstStateSnapshotFailureLogged",
+    "draw is forced to stock-WVP zero disparity instead of fail-open world stereo",
+)
+forbid(
+    r32_effect_snapshot,
+    "R32 effect snapshot telemetry wrapper",
+    "device->GetRenderState(",
+)
+r32_effect_policy = function_body(r32, "bool R32EffectIsFragileLive(")
+require(
+    r32_effect_policy,
+    "R32 live effect policy",
+    "OutRunVR::D3D9::LiveEffectRenderStateSnapshot state{}",
+    "R32ReadEffectSnapshot(device, state)",
+    "OutRunVR::PassPolicy::ClassifyEffectStereo(",
+    "OutRunVR::PassPolicy::AllowsEffectWorldStereo(policy)",
+)
+lower_fail_closed = function_body(r32, "HRESULT R32LowerFailClosed(")
+require(
+    lower_fail_closed,
+    "R32 lower fail-close live-state probe",
+    "OutRunVR::D3D9::LiveEffectRenderStateSnapshot snapshot{}",
+    "R32ReadEffectSnapshot(device, snapshot)",
+)
+
 # 1) R31 is retained only for StateBlock/state-cache ownership. Its physical
 # draw overlay over R30 must be gone.
 forbid(
@@ -387,5 +431,5 @@ require(
 print(
     "VR R31/R32 draw-retirement guard PASS "
     "(R31=StateBlock owner, R32=Reset/Present/DirectGPU owner, "
-    "R33=sole physical draw dispatcher over R30, live shader identity=neutral helper, WVP batch primitive=neutral helper)"
+    "R33=sole physical draw dispatcher over R30, live shader identity=neutral helper, WVP batch primitive=neutral helper, live effect snapshot=neutral helper)"
 )
