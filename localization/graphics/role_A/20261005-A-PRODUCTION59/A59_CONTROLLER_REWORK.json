@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION59",
+  "timestamp_kst": "2026-10-05T22:00:20+09:00",
+  "queue_index": 163,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+  "candidate_sha256": "af8699f82c1a16c127b4e60adccf3d5cc6ca9139781709b14a3fea79502e5857",
+  "machine_status": "PASS",
+  "visual_qa": "FAIL_SOURCE_STYLE_SCALE_UNDERSIZED",
+  "findings": [
+    "A58 source-contact review corrected physical binding to atlas idx0..23 = Waterfalls..Castle Wall in reverse artwork-plan order.",
+    "A59 is semantically correct and machine-safe, but all 24 Korean rows use lowres font size 7 and are visibly smaller/lighter than the source-family stage labels.",
+    "The source uses a shared tall dark-gray bold/condensed family; source-style fidelity requires a larger shared vertical scale while preserving exact source bboxes."
+  ],
+  "decision": "A59_REWORK_REQUIRED_SOURCE_SCALE",
+  "superseded_by": "A60",
+  "runtime_validation": "UNTESTED"
+}
