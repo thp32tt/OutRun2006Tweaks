@@ -205,7 +205,7 @@
       ],
       "layout": {
         "alignment": "left",
-        "xscale": 1.0,
+        "xscale": 1,
         "target_height": 44
       },
       "source_style": {
@@ -297,7 +297,13 @@
   "all_2_bbox_pass": true,
   "all_2_size_ceiling_pass": true,
   "all_2_positive_margin": true,
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS",
   "runtime_validation": "UNTESTED",
-  "status": "A_PRODUCTION27_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_PRODUCTION27_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_evidence": [
+    "localization/graphics/role_A/20261005-A-PRODUCTION27/A_PRODUCTION27_ROW_CONTACT.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION27/A_PRODUCTION27_SOURCE_CLEAN_FINAL_GRAY.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION27/A_PRODUCTION27_FINAL_RAW_GRAY.jpg"
+  ],
+  "controller_visual_note": "PASS after same-run alignment/proportion correction. Canonical Loading and PLEASE WAIT are left-anchored sprites; the final Korean layers preserve that anchor. 로딩 is reduced to the source's wide/low metallic family, widened modestly, and retains the canonical silver vertical profile, dark edge/depth and slight slant. 잠시만요 retains the flat dark-gray source family. SOURCE|CLEAN|FINAL row contacts, full readable, and raw mirror_y views show no source residue, clipping, overlap, seam, halo, protected-art damage, or orientation regression."
 }
