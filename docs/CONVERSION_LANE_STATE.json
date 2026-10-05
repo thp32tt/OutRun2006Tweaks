@@ -3546,7 +3546,7 @@
         "event_type": "dispatch"
       }
     ],
-    "reason": "E003/CHAT_ROLLOVER=2 supersedes E001 bookkeeping only. This rollover is not a retry; ATTEMPT stays 1/3 and validated R265 material is unchanged.",
+    "reason": "E003/CHAT_ROLLOVER=2 is the latest explicit user dispatch persisted in the durable run record. The rollover is not a retry; completed R265 material and exact-SHA validation are unchanged and ATTEMPT remains 1/3.",
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_dispatch_reconciliation": {
@@ -3573,7 +3573,7 @@
         "event_type": "dispatch"
       }
     ],
-    "reason": "Current E003 rollover is authoritative and not a retry. Completed R265 decoder material and exact-SHA validation are not repeated.",
+    "reason": "Current E003 rollover metadata supersedes E001 dispatch metadata only. R265 result/validation-bearing SHA and PASS evidence remain unchanged, so no implementation or validation is repeated.",
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_task": {
