@@ -20,6 +20,7 @@ void step(WheelVehicleDynamics& d, EVWORK_CAR& c, float a=0, float beta=0, float
 int main() {
  using namespace WheelFFBMath;
  require(sanitize_model(-10)==Model::ModernDD&&sanitize_model(99)==Model::PS2OriginalExperimental,"FFB model setting clamps");
+ require(sanitize_model(2)==Model::ModernDD,"retired Hybrid model ID folds to Modern DD");
  require(model_uses_modern_sat(Model::ModernDD)&&model_uses_modern_sat(Model::ArcadeHybrid),"modern SAT models");
  require(!model_uses_modern_sat(Model::ArcadeOriginal)&&!model_uses_modern_sat(Model::PS2OriginalExperimental),"original modes do not claim modern SAT");
  require(model_uses_arcade_events(Model::ArcadeOriginal)&&model_uses_arcade_events(Model::ArcadeHybrid),"arcade event models");
@@ -153,8 +154,14 @@ int main() {
  const float amp2=common_contact_tactile_amplitude(env2,.7f,.6f,.7f);
  const float amp4=common_contact_tactile_amplitude(env4,.7f,.6f,.7f);
  require(amp2>0.08f&&amp4>amp2&&amp4<=.32f,"two-wheel curb is tactile and four-wheel remains capped");
- require(collision_tactile_pulse(0,1.0f)>0&&collision_tactile_pulse(1,1.0f)<0,"collision tactile alternates independently of direction");
- require(collision_tactile_pulse(5,1.0f)==0,"collision tactile is short bounded pulse");
+ require(collision_tactile_pulse(0,1.0f)>.70f&&collision_tactile_pulse(1,1.0f)<-.50f,"collision tactile is strong and alternates independently of direction");
+ require(collision_tactile_pulse(6,1.0f)==0,"collision tactile is short bounded pulse");
+ std::array<unsigned,4> imperialStone={PrimaryAsphaltSurfaceMask,ImperialAvenueCompanionPavingMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask};
+ std::array<unsigned,4> imperialAsphalt={PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask};
+ require(imperial_avenue_stone_paving_pattern(14,0,imperialStone),"Imperial brick/stone mask family is recognized");
+ require(!imperial_avenue_stone_paving_pattern(14,0,imperialAsphalt),"ordinary Imperial all-asphalt stays quiet");
+ const float stoneAmp=imperial_avenue_stone_tactile_amplitude(.70f,.60f,.70f);
+ require(stoneAmp>.12f&&stoneAmp<=.16f,"Imperial brick/stone tactile floor is clearly perceptible but capped");
  require(!is_proven_primary_rough_road_contact(27,520,PrimaryAsphaltSurfaceMask),"ordinary asphalt is not rough-road material");
  require(std::abs(software_road_tactile_frequency(35.0f)-10.0f)<1e-6f,"software road carrier smoother than old 15Hz fallback");
  require(std::abs(software_slip_tactile_frequency(35.0f)-12.0f)<1e-6f,"software slip carrier remains distinct from road carrier");
@@ -169,6 +176,13 @@ int main() {
  require(physics_return_relief(.15f,-.08f)>.89f&&physics_return_relief(.15f,-.08f)<.91f,"normal-corner countersteer relief remains modest");
  require(physics_return_relief(.32f,-.08f)>.969f,"deep-slip self-countersteer retains nearly all aligning torque");
  require(physics_return_relief(.15f,.08f)==1,"opposing work no relief");
+ require(model_uses_reversed_r3_polarity(Model::ModernDD),"R3 Modern polarity is reversed");
+ require(!model_uses_reversed_r3_polarity(Model::ArcadeOriginal)&&!model_uses_reversed_r3_polarity(Model::ArcadeHybrid)&&!model_uses_reversed_r3_polarity(Model::PS2OriginalExperimental),"R3 original/hybrid polarity uses native sign");
+ require(std::abs(SnowIceComfortTextureScale-.22f)<1e-6f,"snow/ice comfort texture remains perceptible");
+ require(drift_countersteer_blend(.70f,-.35f,1.0f)>.80f,"deep opposed-slip drift strongly hands off to body-slip countersteer");
+ require(drift_countersteer_blend(.30f,.20f,1.0f)==0.0f,"same-sign front/body slip keeps normal SAT direction");
+ require(drift_countersteer_blend(.10f,-.20f,1.0f)==0.0f,"small body slip does not trigger drift handoff");
+ require(drift_countersteer_shape(.70f)>.89f&&drift_countersteer_shape(.05f)==0.0f,"drift recovery magnitude is bounded to developed oversteer");
  ResponseLUT linear{}; require(parse_response_lut("0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",linear),"linear LUT parses");
  require(std::abs(apply_response_lut(.55f,linear)-.55f)<1e-5f,"linear LUT identity");
  ResponseLUT boosted{}; require(parse_response_lut("0,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.84,0.92,1",boosted),"boost LUT parses");

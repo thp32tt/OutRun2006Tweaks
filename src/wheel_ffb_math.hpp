@@ -19,7 +19,16 @@ namespace WheelFFBMath
 
     inline Model sanitize_model(int value)
     {
-        return static_cast<Model>(std::clamp(value, 0, 3));
+        // R10 follow-up: Hybrid is retired from the selectable/runtime model set.
+        // Preserve legacy numeric compatibility by treating saved Model=2 as
+        // Modern DD; Model=3 remains PS2 so old profiles do not renumber.
+        if (value == 2)
+            return Model::ModernDD;
+        if (value <= 0)
+            return Model::ModernDD;
+        if (value == 1)
+            return Model::ArcadeOriginal;
+        return Model::PS2OriginalExperimental;
     }
 
     inline const char* model_name(Model model)
@@ -47,6 +56,15 @@ namespace WheelFFBMath
     {
         return model == Model::ArcadeOriginal ||
                model == Model::PS2OriginalExperimental;
+    }
+
+    // MOZA R3 hardware A/B establishes opposite DirectInput polarity families:
+    // Modern DD needs both output and Spring reversed, while Arcade/Hybrid/PS2
+    // use the backend's native signs.  Keep this model rule in one place so
+    // profile/UI/runtime paths cannot drift apart again.
+    inline bool model_uses_reversed_r3_polarity(Model model)
+    {
+        return model == Model::ModernDD;
     }
 
     // Boomslangnz/FFBArcadePlugin OutRun2Real.cpp derives a 10%-step
@@ -297,6 +315,42 @@ namespace WheelFFBMath
             0.0f, 0.60f);
     }
 
+    // During a real drift the front-wheel slip sign can cross the body-slip
+    // sign as the rack countersteers.  At that point blindly following frontSlip
+    // can pull the wheel back toward the car heading instead of letting caster/
+    // trail align the front wheels with the velocity vector.  Blend toward a
+    // body-slip recovery direction only for a developed oversteer state and only
+    // while front/body slip signs oppose; ordinary cornering/understeer is untouched.
+    constexpr float DriftCountersteerStartRad = 0.16f;
+    constexpr float DriftCountersteerFullRad = 0.42f;
+    constexpr float DriftCountersteerMaxBlend = 0.85f;
+
+    inline float drift_countersteer_blend(
+        float bodySlip, float frontSlip, float bodySlide)
+    {
+        if (!std::isfinite(bodySlip) || !std::isfinite(frontSlip) ||
+            !std::isfinite(bodySlide))
+            return 0.0f;
+        if (bodySlip * frontSlip >= 0.0f)
+            return 0.0f;
+
+        const float slipT = smoothstep01(
+            (std::abs(bodySlip) - DriftCountersteerStartRad) /
+                (DriftCountersteerFullRad - DriftCountersteerStartRad));
+        const float slideT = smoothstep01(
+            (std::clamp(bodySlide, 0.0f, 1.0f) - 0.20f) / 0.55f);
+        return DriftCountersteerMaxBlend * slipT * slideT;
+    }
+
+    inline float drift_countersteer_shape(float bodySlip)
+    {
+        if (!std::isfinite(bodySlip))
+            return 0.0f;
+        const float t = smoothstep01(
+            (std::abs(bodySlip) - 0.12f) / 0.38f);
+        return t > 0.0f ? 0.45f + 0.45f * t : 0.0f;
+    }
+
     // Total aligning moment follows Fy * (pneumatic trail + mechanical trail).
     // Normalize the total pseudo-trail so enabling mechanical trail reshapes
     // the SAT curve without silently turning SteeringWeight into a second gain.
@@ -345,6 +399,12 @@ namespace WheelFFBMath
     constexpr unsigned PrimaryRoughRoadSurfaceMask = 0x00100000u;
     constexpr unsigned PrimarySnowIceSurfaceMask = 0x00800000u;
 
+    // R10 R3 hardware retune. R9's 0.04 snow/ice comfort factor reduced a
+    // rough=0.50 road to roughly 0.011 roadAmp in the supplied run, effectively
+    // erasing the surface. 22% keeps sustained snow/rough paving comfortable
+    // while leaving a clearly perceptible low-amplitude texture.
+    constexpr float SnowIceComfortTextureScale = 0.22f;
+
     inline bool proven_primary_rough_road_section(int uniqueStage, int roadSection)
     {
         return (uniqueStage == 1 && roadSection >= 419 && roadSection <= 458) ||
@@ -381,6 +441,50 @@ namespace WheelFFBMath
                 return false;
         return true;
     }
+
+    constexpr unsigned ImperialAvenueCompanionPavingMask = 0x00000800u;
+
+    // R10 hardware follow-up: Imperial Avenue alternates 0x2 and 0x800 while
+    // visually on the brick/stone roadway. R9 correctly removed the false-water
+    // full-stage buzz, but that also left the paving too quiet. Require at least
+    // one 0x800 contact so ordinary all-0x2 asphalt stays quiet.
+    inline bool imperial_avenue_stone_paving_pattern(
+        int uniqueStage,
+        int collisionContext,
+        const std::array<unsigned, 4>& masks)
+    {
+        if (uniqueStage != 14 || collisionContext != 0)
+            return false;
+        bool sawCompanionPaving = false;
+        for (unsigned mask : masks)
+        {
+            if (mask == ImperialAvenueCompanionPavingMask)
+                sawCompanionPaving = true;
+            else if (mask != PrimaryAsphaltSurfaceMask)
+                return false;
+        }
+        return sawCompanionPaving;
+    }
+
+    inline float imperial_avenue_stone_tactile_amplitude(
+        float speedNorm,
+        float roadSetting,
+        float outputStrength)
+    {
+        if (!std::isfinite(speedNorm) || !std::isfinite(roadSetting) ||
+            !std::isfinite(outputStrength))
+            return 0.0f;
+        const float speedGate = smoothstep01(
+            (std::clamp(speedNorm, 0.0f, 1.0f) - 0.04f) / 0.30f);
+        const float roadScale = std::clamp(roadSetting / 0.60f, 0.0f, 1.67f);
+        const float gainScale = std::clamp(outputStrength / 0.70f, 0.0f, 2.0f);
+        // Stronger than the earlier 4.5-7.5% prototype: the R3 test still felt
+        // nearly smooth. Keep it below curb/grass texture and hard-cap at 16%.
+        return std::clamp(
+            (0.080f + 0.060f * speedGate) * roadScale * gainScale,
+            0.0f, 0.16f);
+    }
+
 
     // Common PC/DD contact layer used only to make the physically obvious
     // 0/1/2/3/4-wheel contact states distinguishable.  It does not replace the
@@ -432,8 +536,8 @@ namespace WheelFFBMath
     // ConstantForce event.
     inline float collision_tactile_pulse(int impactFrame, float hostScale)
     {
-        static constexpr std::array<float, 5> Pattern = {
-            0.32f, -0.28f, 0.20f, -0.14f, 0.08f
+        static constexpr std::array<float, 6> Pattern = {
+            0.72f, -0.56f, 0.42f, -0.30f, 0.20f, -0.12f
         };
         if (impactFrame < 0 || impactFrame >= static_cast<int>(Pattern.size()))
             return 0.0f;

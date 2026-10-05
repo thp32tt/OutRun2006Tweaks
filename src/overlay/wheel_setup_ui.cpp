@@ -1696,7 +1696,7 @@ namespace
                     Settings::WheelFFBReversalReleaseRate = 0.30f;
                     Settings::WheelFFBRoadTexture = 0.60f;
                     Settings::WheelFFBTireSlip = 0.04f;
-                    Settings::WheelFFBWallImpact = 0.55f;
+                    Settings::WheelFFBWallImpact = 0.80f;
                     Settings::WheelFFBGearShift = 0.60f;
                     Settings::WheelFFBUsePeriodicEffects = false;
                     Settings::WheelFFBInvertForce = true;
@@ -1766,23 +1766,27 @@ namespace
             static constexpr const char* FfbModelNames[] = {
                 "Modern DD Physics",
                 "Arcade Original (Lindbergh-derived)",
-                "Arcade + Modern Hybrid",
                 "PS2 Original topology (Experimental)"
             };
-            int selectedFfbModel = std::clamp(int(Settings::WheelFFBModel), 0, 3);
+            static constexpr int FfbModelValues[] = { 0, 1, 3 };
+            const int rawFfbModel = int(Settings::WheelFFBModel);
+            int selectedFfbModel =
+                rawFfbModel == 1 ? 1 :
+                rawFfbModel == 3 ? 2 : 0; // legacy Hybrid (2) displays as Modern
             if (ImGui::BeginCombo("FFB Model", FfbModelNames[selectedFfbModel]))
             {
-                for (int modelIndex = 0; modelIndex < 4; ++modelIndex)
+                for (int optionIndex = 0; optionIndex < 3; ++optionIndex)
                 {
-                    const bool selected = selectedFfbModel == modelIndex;
-                    if (ImGui::Selectable(FfbModelNames[modelIndex], selected))
+                    const bool selected = selectedFfbModel == optionIndex;
+                    if (ImGui::Selectable(FfbModelNames[optionIndex], selected))
                     {
+                        const int modelIndex = FfbModelValues[optionIndex];
                         apply_ffb_model_test_baseline(modelIndex);
                         track_ffb_change(true);
                         WheelFFB_ResetHeadroomStats();
                         WheelFFB_RequestSettingsTransition();
-                        status_ = std::string("FFB model + complete R9 test baseline applied: ") +
-                            FfbModelNames[modelIndex] + ". Save Force Feedback to persist it.";
+                        status_ = std::string("FFB model + complete R10 test baseline applied: ") +
+                            FfbModelNames[optionIndex] + ". Save Force Feedback to persist it.";
                     }
                     if (selected)
                         ImGui::SetItemDefaultFocus();
@@ -1790,9 +1794,12 @@ namespace
                 ImGui::EndCombo();
             }
             ImGui::TextDisabled(
-                "R9: changing FFB Model applies the complete test baseline automatically. Modern uses Reverse Force+Spring ON; Arcade/Hybrid/PS2 use both OFF.");
+                "R10: Hybrid is retired. Model choices are Modern DD, Arcade Original and PS2 Original.");
+            ImGui::TextDisabled(
+                "MOZA R3 model changes apply the tested polarity default automatically; Reverse options below remain manually editable.");
 
-            const int activeFfbModel = std::clamp(int(Settings::WheelFFBModel), 0, 3);
+            const int activeFfbModel =
+                rawFfbModel == 2 ? 0 : std::clamp(rawFfbModel, 0, 3);
             if (activeFfbModel == 0)
             {
                 ImGui::TextWrapped(
@@ -1978,9 +1985,15 @@ namespace
 
             track_ffb_change(ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr()));
             track_ffb_change(ImGui::Checkbox("Record driving telemetry (5 Hz + 1 Hz detail)", Settings::WheelFFBTelemetry.ptr()));
+            const std::string ffbDeviceLower =
+                WheelProfileStore::lower_ascii(Settings::WheelFFBDeviceName.get());
+            const bool r3AutoPolarity =
+                ffbDeviceLower.find("r3 racing wheel") != std::string::npos;
             track_ffb_change(ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr()));
             ImGui::SameLine();
             track_ffb_change(ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()));
+            if (r3AutoPolarity)
+                ImGui::TextDisabled("MOZA R3: model change sets Modern ON/ON and Arcade/PS2 OFF/OFF; manual override is allowed until the next model change.");
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Use Reverse Spring only if the wheel pushes farther away from centre. ConstantForce direction is independent.");
 

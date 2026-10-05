@@ -581,6 +581,17 @@ namespace
             // an Original model. F11/profile transitions already do this too;
             // this runtime guard covers every other live settings path.
             const int runtimeModelValue = static_cast<int>(ffbModel);
+
+            // R10: model changes can arrive through the combo, named profiles,
+            // user.ini reloads or other live settings paths. The R3 log proved
+            // that relying on the UI baseline alone can leave Modern running
+            // with Arcade/PS2 polarity (or vice versa). Self-heal only the
+            // validated R3 identity; other wheels retain manual polarity control.
+            const std::string selectedWheelLower =
+                lower_copy(selectedName_.c_str());
+            const bool r3AutoPolarity =
+                selectedWheelLower.find("r3 racing wheel") != std::string::npos;
+
             if (activeRuntimeModel_ != runtimeModelValue)
             {
                 const int previousModel = activeRuntimeModel_;
@@ -589,6 +600,23 @@ namespace
                 {
                     disable_periodics();
                 }
+
+                // Apply the validated R3 polarity as a model-change default,
+                // not as a permanent lock. A user can immediately override the
+                // two Reverse checkboxes manually and that choice remains live
+                // until the next model change.
+                if (r3AutoPolarity && previousModel >= 0)
+                {
+                    const bool expectedReverse =
+                        WheelFFBMath::model_uses_reversed_r3_polarity(ffbModel);
+                    Settings::WheelFFBInvertForce = expectedReverse;
+                    Settings::WheelFFBInvertSpring = expectedReverse;
+                    spdlog::info(
+                        "WheelFFB: R3 model-change polarity default model={} reverseForce={} reverseSpring={} manualOverrideAllowed=true",
+                        WheelFFBMath::model_name(ffbModel),
+                        expectedReverse, expectedReverse);
+                }
+
                 activeRuntimeModel_ = runtimeModelValue;
                 periodicRecreateHoldoffUntil_ = 0;
                 updateCounter_ = 59;
@@ -719,8 +747,9 @@ namespace
                 return;
             }
 
+            const float bodySlip = vehicleDynamics_.bodySlip();
             const float bodySlideT = std::clamp(
-                (std::abs(vehicleDynamics_.bodySlip()) - 0.10f) / 0.22f,
+                (std::abs(bodySlip) - 0.10f) / 0.22f,
                 0.0f, 1.0f);
             const float bodySlide =
                 bodySlideT * bodySlideT * (3.0f - 2.0f * bodySlideT);
@@ -827,9 +856,10 @@ namespace
                     sawNonPrimarySnowMix = true;
             }
             const bool snowPrimaryRoad = sawSnowPrimary && !sawNonPrimarySnowMix;
-            constexpr float SnowIceRoadTextureScale = 0.04f;
             const float materialRoadTextureScale =
-                snowPrimaryRoad ? SnowIceRoadTextureScale : 1.0f;
+                snowPrimaryRoad
+                    ? WheelFFBMath::SnowIceComfortTextureScale
+                    : 1.0f;
 
             const float configuredRoadDetail = std::clamp(
                 static_cast<float>(Settings::WheelFFBRoadTexture), 0.0f, 1.0f);
@@ -837,8 +867,17 @@ namespace
                 WheelFFBMath::common_contact_tactile_amplitude(
                     contactTactileEnvelope, speedNorm, configuredRoadDetail,
                     modelOutputStrength) * materialRoadTextureScale;
-            float roadAmp = commonContactTactile;
-            float roadFreq = 25.0f + 12.0f * speedNorm;
+            const bool imperialStonePaving =
+                WheelFFBMath::imperial_avenue_stone_paving_pattern(
+                    uniqueStage, collisionContext, surfaceMasks);
+            const float imperialStoneFloor = imperialStonePaving
+                ? WheelFFBMath::imperial_avenue_stone_tactile_amplitude(
+                    speedNorm, configuredRoadDetail, modelOutputStrength)
+                : 0.0f;
+            float roadAmp = std::max(commonContactTactile, imperialStoneFloor);
+            float roadFreq = imperialStonePaving
+                ? (8.0f + 4.0f * speedNorm)
+                : (25.0f + 12.0f * speedNorm);
             float ps2SurfaceEnvelope = 0.0f;
             int ps2RoadRaw = 0;
             if (arcadeEffects)
@@ -1278,6 +1317,9 @@ namespace
             const float trailShape = pneumaticSatShape; // legacy telemetry field name
             const float physicsLoad = 0.62f + 0.48f * lateralLoadSmooth;
             const float rearSlideRelief = 1.0f - 0.15f * gripLoss * bodySlide;
+            const float driftCountersteerBlend =
+                WheelFFBMath::drift_countersteer_blend(
+                    bodySlip, frontSlip, bodySlide);
             if (vehicleDynamics_.calibrated() && vehicleDynamics_.sampleValid())
             {
                 const float physicsReturnRelief =
@@ -1287,6 +1329,24 @@ namespace
                     (frontSlip > 0.0f ? -1.0f : 1.0f) *
                     physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
+
+                // In a developed drift, frontSlip may reverse sign because the
+                // front wheels have already started countersteering. Do not let
+                // that sign reversal command the rack back toward the car nose.
+                // Blend toward the body-slip/caster recovery direction instead.
+                if (driftCountersteerBlend > 0.0f)
+                {
+                    const float driftCountersteerShape =
+                        WheelFFBMath::drift_countersteer_shape(bodySlip);
+                    const float driftCountersteerTorque =
+                        (bodySlip > 0.0f ? -1.0f : 1.0f) *
+                        driftCountersteerShape * satSpeed * physicsLoad *
+                        rearSlideRelief * satStrength;
+                    physicsSatTorque +=
+                        (driftCountersteerTorque - physicsSatTorque) *
+                        driftCountersteerBlend;
+                }
+
                 if (!std::isfinite(physicsSatTorque))
                     physicsSatTorque = 0.0f;
             }

@@ -553,7 +553,7 @@ namespace WheelProfileStore
             {"SteeringWeight","1.60"}, {"MechanicalTrail","0.30"},
             {"TrailResponseLead","0.40"}, {"PhysicsSAT","true"},
             {"GripLoss","0.65"}, {"LateralDeadzone","1.5"},
-            {"WeightTransfer","0.15"}, {"WallImpact","0.55"},
+            {"WeightTransfer","0.15"}, {"WallImpact","0.80"},
             {"GearShift","0.60"}, {"RoadTexture","0.60"},
             {"TireSlip","0.04"}, {"EngineVibration","false"},
             {"EngineIdle","0.20"}, {"SlewRate","0.12"},
@@ -653,6 +653,16 @@ namespace WheelProfileStore
                 if (error) *error = "FFB profile contains an invalid Model value.";
                 return false;
             }
+        }
+
+        // Hybrid is retired. Loading a legacy Model=2 feel profile must not
+        // resurrect Hybrid-owned road/event/polarity values on top of Modern.
+        // Convert it to a clean Modern reference baseline instead.
+        if (profileModel == 2)
+        {
+            profileModel = 0;
+            values.clear();
+            values.emplace("model", "0");
         }
 
         auto settings = ffb_settings();
