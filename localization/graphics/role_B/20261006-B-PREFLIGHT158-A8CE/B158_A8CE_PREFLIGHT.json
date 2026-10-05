@@ -1,0 +1,339 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PREFLIGHT158-A8CE",
+  "queue_index": 52,
+  "queue_asset": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+  "readiness_tier": "PREFLIGHT_ONLY_CONTROLLER_VISUAL_CLASSIFICATION_REQUIRED",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "release_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+    "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b"
+  },
+  "decoded": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "mode": "RGBA",
+    "pil_format": "DDS"
+  },
+  "orientation_evidence": "B158_A8CE_ORIENTATION_SHEET.jpg",
+  "atlas": {
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_fight_Exst/4x_A8CE339F_512x256_atlas.json",
+    "error_if_missing": null,
+    "regions": [
+      {
+        "idx": 0,
+        "rect": [
+          0,
+          792,
+          280,
+          232
+        ]
+      },
+      {
+        "idx": 1,
+        "rect": [
+          280,
+          792,
+          280,
+          232
+        ]
+      },
+      {
+        "idx": 2,
+        "rect": [
+          560,
+          792,
+          280,
+          232
+        ]
+      },
+      {
+        "idx": 3,
+        "rect": [
+          840,
+          792,
+          280,
+          232
+        ]
+      },
+      {
+        "idx": 4,
+        "rect": [
+          1120,
+          792,
+          280,
+          232
+        ]
+      },
+      {
+        "idx": 5,
+        "rect": [
+          1400,
+          792,
+          280,
+          232
+        ]
+      },
+      {
+        "idx": 6,
+        "rect": [
+          1680,
+          792,
+          232,
+          232
+        ]
+      },
+      {
+        "idx": 7,
+        "rect": [
+          0,
+          560,
+          232,
+          232
+        ]
+      },
+      {
+        "idx": 8,
+        "rect": [
+          232,
+          560,
+          232,
+          232
+        ]
+      },
+      {
+        "idx": 9,
+        "rect": [
+          464,
+          560,
+          232,
+          232
+        ]
+      },
+      {
+        "idx": 10,
+        "rect": [
+          696,
+          560,
+          232,
+          232
+        ]
+      },
+      {
+        "idx": 11,
+        "rect": [
+          928,
+          560,
+          232,
+          232
+        ]
+      },
+      {
+        "idx": 12,
+        "rect": [
+          1160,
+          560,
+          232,
+          232
+        ]
+      },
+      {
+        "idx": 13,
+        "rect": [
+          1392,
+          560,
+          232,
+          232
+        ]
+      },
+      {
+        "idx": 14,
+        "rect": [
+          1624,
+          580,
+          196,
+          212
+        ]
+      },
+      {
+        "idx": 15,
+        "rect": [
+          1820,
+          584,
+          192,
+          208
+        ]
+      },
+      {
+        "idx": 16,
+        "rect": [
+          0,
+          408,
+          264,
+          152
+        ]
+      },
+      {
+        "idx": 17,
+        "rect": [
+          264,
+          408,
+          264,
+          152
+        ]
+      },
+      {
+        "idx": 18,
+        "rect": [
+          528,
+          408,
+          264,
+          152
+        ]
+      },
+      {
+        "idx": 19,
+        "rect": [
+          792,
+          408,
+          264,
+          152
+        ]
+      },
+      {
+        "idx": 20,
+        "rect": [
+          1056,
+          440,
+          200,
+          120
+        ]
+      },
+      {
+        "idx": 21,
+        "rect": [
+          1256,
+          440,
+          200,
+          120
+        ]
+      },
+      {
+        "idx": 22,
+        "rect": [
+          1456,
+          440,
+          200,
+          120
+        ]
+      },
+      {
+        "idx": 23,
+        "rect": [
+          1656,
+          440,
+          200,
+          120
+        ]
+      },
+      {
+        "idx": 24,
+        "rect": [
+          0,
+          304,
+          776,
+          104
+        ]
+      },
+      {
+        "idx": 25,
+        "rect": [
+          776,
+          304,
+          776,
+          104
+        ]
+      },
+      {
+        "idx": 26,
+        "rect": [
+          0,
+          200,
+          504,
+          104
+        ]
+      },
+      {
+        "idx": 27,
+        "rect": [
+          504,
+          200,
+          88,
+          104
+        ]
+      },
+      {
+        "idx": 28,
+        "rect": [
+          592,
+          200,
+          88,
+          104
+        ]
+      },
+      {
+        "idx": 29,
+        "rect": [
+          680,
+          200,
+          88,
+          104
+        ]
+      },
+      {
+        "idx": 30,
+        "rect": [
+          768,
+          200,
+          88,
+          104
+        ]
+      },
+      {
+        "idx": 31,
+        "rect": [
+          856,
+          200,
+          88,
+          104
+        ]
+      },
+      {
+        "idx": 32,
+        "rect": [
+          944,
+          200,
+          88,
+          104
+        ]
+      },
+      {
+        "idx": 33,
+        "rect": [
+          1032,
+          248,
+          648,
+          56
+        ]
+      }
+    ]
+  },
+  "atlas_contact": "B158_A8CE_ATLAS_CONTACT.jpg",
+  "candidate_written": false,
+  "status": "B158_PREFLIGHT_PREVIEW_READY_CONTROLLER_CLASSIFICATION_REQUIRED",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,13 @@
+{
+  "run": "B158",
+  "index": 52,
+  "asset": "A8CE339F",
+  "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+  "dimensions": [
+    2048,
+    1024
+  ],
+  "atlas_regions": 34,
+  "worker_status": "B158_PREFLIGHT_PREVIEW_READY_CONTROLLER_CLASSIFICATION_REQUIRED",
+  "report": "localization/graphics/role_B/20261006-B-PREFLIGHT158-A8CE/B158_A8CE_PREFLIGHT.json"
+}
