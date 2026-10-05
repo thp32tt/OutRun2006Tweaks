@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T03:09:02+09:00",
+  "updated_at_kst": "2026-10-06T03:12:13+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A82 IGR-008/011 graphics portion index49 BF3EE5C6 candidate 3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37: native-HD Rank label static/controller self-QA PASS, 1/1 exact bbox/size/margin and all zero gates PASS; A-E grade art/other BF3 rows preserved. MIXED runtime/modal source remains unresolved, backlog OPEN. Pending independent C + NEW in-game retest. A-owned P0 IGR-012 A85 clean-plate retry is compute-pending. Concurrent C221/B163 state preserved.",
+  "next_checkpoint": "A85 IGR-012 exact multi-asset graphics repair static/controller PASS: A064FDFC a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f OUTRUN MILES x2 and 48DEBE77 a6161cfaedb9ab83c311b3aa78cf3ae3e18ca333fc52e1e31a8d6055e21797ea START x2/GOAL. A84 badge English face/outline/shadow residue removed by full inset source-derived reconstruction; A064 overlap/baseline risk reduced with positive neighbor gap. Pending independent C + NEW actual in-game retest; no backlog closure. A82 BF3 Rank also pending C while IGR-008/011 MIXED runtime mapping remains OPEN. Concurrent C221/B163 preserved.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -270,10 +270,12 @@
         "B1696633"
       ],
       "remaining": 1,
-      "note": "788CE557 B163 static self-QA PASS pending independent C + NEW in-game retest; IGR-005 mixed/runtime mapping remains open. Next exact-mapped B graphics rework is index48 Slipstream B1696633. A82 repaired IGR-008/011 BF3 graphics Rank sprite; pending C. MIXED runtime mapping remains OPEN.",
+      "note": "788CE557 B163 static self-QA PASS pending independent C + NEW in-game retest; IGR-005 mixed/runtime mapping remains open. Next exact-mapped B graphics rework is index48 Slipstream B1696633. A82 repaired IGR-008/011 BF3 graphics Rank sprite; pending C. MIXED runtime mapping remains OPEN. A85 IGR-012 multi-asset graphics repair static PASS; A064FDFC+48DEBE77 pending C/new in-game retest.",
       "pending_c": [
         "788CE557",
-        "BF3EE5C6"
+        "BF3EE5C6",
+        "A064FDFC",
+        "48DEBE77"
       ]
     },
     "latest_d_final_qa": {
@@ -1338,46 +1340,39 @@
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     },
     "latest_a_production": {
-      "run": "A82",
-      "index": 49,
-      "asset": "BF3EE5C6",
-      "candidate_sha256": "3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37",
-      "result": "A82_GRAPHICS_STATIC_PASS_PENDING_C_MIXED_RUNTIME_MAPPING_AND_INGAME_RETEST",
-      "user_ingame_regressions": [
-        "IGR-008",
-        "IGR-011"
+      "run": "A85",
+      "asset": "IGR-012:A064FDFC+48DEBE77",
+      "indices": [
+        60,
+        63
       ],
-      "prior_candidate_sha256": "7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68",
-      "bbox_size_positive_margin": "1/1 PASS",
+      "candidate_sha256": {
+        "A064FDFC": "a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f",
+        "48DEBE77": "a6161cfaedb9ab83c311b3aa78cf3ae3e18ca333fc52e1e31a8d6055e21797ea"
+      },
+      "result": "A85_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+      "user_ingame_regressions": [
+        "IGR-012"
+      ],
+      "bbox_size_positive_margin": {
+        "A064FDFC": "2/2 PASS",
+        "48DEBE77": "3/3 PASS"
+      },
       "pixel_gates": {
-        "outside": 0,
-        "alpha_outside": 0,
-        "protected_changed": 0,
-        "clean_outside": 0,
-        "clean_protected": 0,
-        "render_outside": 0,
-        "source_residue": 0
+        "A064FDFC": {
+          "outside": 0,
+          "alpha_outside": 0,
+          "neighbor_gap_px": 2
+        },
+        "48DEBE77": {
+          "outside": 0,
+          "source_face_residue_clean": 0
+        }
       },
-      "style": {
-        "font": "Noto Sans CJK KR Black",
-        "native_font_size_px": 112,
-        "horizontal_scale": 1.2,
-        "shear": 0.29,
-        "old_bitmap_reused": false
-      },
-      "structure": {
-        "dimensions": [
-          2048,
-          2048
-        ],
-        "format": "RGBA32",
-        "mipmaps": 1,
-        "header_128_exact": true,
-        "raw_orientation": "mirror_y"
-      },
-      "controller_visual_qa": "PASS_GRAPHICS_PORTION_NATIVE_RANK_LABEL_PENDING_C_MIXED_RUNTIME_MAPPING_AND_INGAME",
-      "report": "localization/graphics/role_A/20261006-A-PRODUCTION82-IGR008-RANK/A82_IGR008_BF3_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION82-IGR008-RANK/A82_CONTROLLER_SELF_QA.json",
+      "mapping": "EXACT_HIGH_CONFIDENCE_MULTI_ASSET; dynamic numeric meter protected runtime content",
+      "controller_visual_qa": "PASS_MULTI_ASSET_IGR012_GRAPHICS_REPAIR_PENDING_C_AND_NEW_INGAME_RETEST",
+      "report": "localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_IGR012_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_CONTROLLER_SELF_QA.json",
       "runtime_validation": "PENDING_NEW_INGAME_RETEST"
     },
     "latest_a_rework": {

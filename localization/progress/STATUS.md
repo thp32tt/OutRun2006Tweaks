@@ -1623,3 +1623,6 @@ A81 e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7 materially 
 
 ## 2026-10-06 03:09 KST — A82 IGR-008/011 BF3 native Rank graphics repair
 A82 3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37 repairs the exact BF3 Rank graphics portion for IGR-008/011 with a fresh native-HD source-family render. 1/1 exact bbox/size/positive margin and all zero-pixel gates PASS; controller readable/raw visual PASS; other BF3 localized rows and A-E grade art are unchanged. Rows remain OPEN because MIXED runtime/modal source is still unresolved; independent C + NEW in-game retest required. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-06 03:12 KST — A85 IGR-012 START/OutRun Miles multi-asset repair
+A85 resolves the static graphics portion of P0 IGR-012 across A064FDFC a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f and 48DEBE77 a6161cfaedb9ab83c311b3aa78cf3ae3e18ca333fc52e1e31a8d6055e21797ea. Full inset badge reconstruction removes the remaining English outline/shadow silhouette; OUTRUN MILES labels keep positive separation from protected neighbor art. All bbox/size/margin and zero-pixel gates PASS; controller readable/raw review PASS. Pending independent C + NEW actual in-game retest; not closed. No VR/FFB/DX11/DXVK work.

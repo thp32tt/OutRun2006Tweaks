@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION85-IGR012-CLEAN",
+  "timestamp_kst": "2026-10-06T03:12:13+09:00",
+  "user_ingame_regression": "IGR-012",
+  "screenshot": "스크린샷(157).png",
+  "mapping": {
+    "status": "EXACT_HIGH_CONFIDENCE_MULTI_ASSET",
+    "primary": {
+      "queue_index": 60,
+      "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
+    },
+    "secondary": {
+      "queue_index": 63,
+      "asset": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds"
+    },
+    "runtime_split": "Dynamic numeric meter is protected runtime content rather than localizable text; no runtime-text source change is required for this graphics repair."
+  },
+  "candidate_sha256": {
+    "A064FDFC": "a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f",
+    "48DEBE77": "a6161cfaedb9ab83c311b3aa78cf3ae3e18ca333fc52e1e31a8d6055e21797ea"
+  },
+  "machine_qa": {
+    "A064FDFC": {
+      "bbox_size_positive_margin": "2/2 PASS",
+      "changes_outside": 0,
+      "alpha_outside": 0,
+      "neighbor_positive_separation_px": 2
+    },
+    "48DEBE77": {
+      "bbox_size_positive_margin": "3/3 PASS",
+      "changes_outside": 0,
+      "source_face_residue_clean": 0
+    }
+  },
+  "controller_visual_observations": [
+    "A064 SOURCE/OLD/CLEAN/A85 contacts show both OUTRUN MILES variants rebuilt with fresh native-resolution Hangul, source white/yellow families and right slant; labels stay separated from adjacent BEST TIME/numeric artwork.",
+    "A85 48DEBE77 CLEAN reconstructs the full inset START/GOAL badge interiors and removes the English face/outline/shadow silhouette that remained in A84 while preserving the outer red/white badge border, glow and route artwork.",
+    "A85 START/GOAL Hangul is sharp, native-resolution, source-height matched and slanted; no old Korean bitmap is reused.",
+    "Raw mirror_y reviews preserve both atlas orientations and show no clipping, foreign-image intrusion, badge-border break, text collision or unintended protected-art change."
+  ],
+  "controller_visual_qa": "PASS_MULTI_ASSET_IGR012_GRAPHICS_REPAIR_PENDING_C_AND_NEW_INGAME_RETEST",
+  "status": "A85_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "pending_independent_c_static_qa": true,
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "backlog_close_allowed": false,
+  "producer_report": "localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_IGR012_REPORT.json",
+  "visual_evidence": [
+    "localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_A064_OUTRUN_MILES_CONTACTS.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_48DEBE77_BADGE_CONTACTS.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_A064_RAW_MIRROR_Y.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_48DEBE77_RAW_MIRROR_Y.jpg"
+  ],
+  "vr_ffb_dx11_dxvk_changes": false
+}
