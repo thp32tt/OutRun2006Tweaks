@@ -10,7 +10,7 @@ if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OU
     raise SystemExit("B hosted worker only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION147-8215-C200-REWORK"
+run="20261005-B-PRODUCTION148-8215-C200-TEMPLATE"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -105,115 +105,88 @@ core=np.zeros((H,W),bool); core[y:y+ch,x:x+cw]=sel
 core_im=Image.fromarray((core.astype(np.uint8)*255),"L")
 near=np.asarray(core_im.filter(ImageFilter.MaxFilter(25)))>0
 
-# Build a robust quadratic brown-field model from canonical pixels surrounding the title.
-# This deliberately excludes the old 15px edit footprint and any low-alpha/ray/background outliers.
+# B148 reuses the C193-approved B137 63C clean starburst as a same-family
+# canonical template. Both starburst atlas cells are 2048x1016 at y=1032; the
+# current FLAG_RANK cell is x-shifted by about +1088. We fail closed unless the
+# two canonical source backgrounds match outside their source-title footprints.
 ob=list(map(int,star_row["original_bbox"]))
-sx0=max(x,ob[0]-90); sy0=max(y,ob[1]-70); sx1=min(x+cw,ob[2]+90); sy1=min(y+ch,ob[3]+120)
-Y,X=np.mgrid[sy0:sy1,sx0:sx1]
-sub=sa[sy0:sy1,sx0:sx1].astype(np.float64)
-near_sub=near[sy0:sy1,sx0:sx1]
-sample=(sub[:,:,3]>16)&(~near_sub)
-# Starburst interior is warm/brown. Alpha is intentionally soft in this artwork, so do not
-# require opacity; reject transparent exterior by alpha and keep a broad warm-color family.
-sample &= (sub[:,:,0]>70)&(sub[:,:,0]>sub[:,:,1]-5)&(sub[:,:,1]>sub[:,:,2]-30)&(sub[:,:,2]<225)
-# If the warm filter is still too selective, fall back to all nontransparent non-title
-# pixels; robust residual trimming below removes rays/border/outliers deterministically.
-if np.count_nonzero(sample)<5000:
-    sample=(sub[:,:,3]>16)&(~near_sub)&(sub[:,:,0]>45)
-xn=(X-(sx0+sx1)/2)/max(1,(sx1-sx0)/2)
-yn=(Y-(sy0+sy1)/2)/max(1,(sy1-sy0)/2)
-B=np.stack([np.ones_like(xn),xn,yn,xn*xn,xn*yn,yn*yn],axis=-1)
-flatB=B.reshape(-1,6); flatS=sub.reshape(-1,4); mask=sample.reshape(-1)
-if np.count_nonzero(mask)<4000: raise RuntimeError(("background sample too small",int(np.count_nonzero(mask))))
-coef=np.zeros((6,4),dtype=np.float64)
-use=mask.copy()
-for _ in range(3):
-    for c in range(4): coef[:,c]=np.linalg.lstsq(flatB[use],flatS[use,c],rcond=None)[0]
-    pred=flatB@coef
-    resid=np.max(np.abs(pred[:,:3]-flatS[:,:3]),axis=1)
-    vals=resid[mask]
-    lim=max(18.0,float(np.quantile(vals,0.68)))
-    use=mask&(resid<=lim)
-pred=(flatB@coef).reshape(sub.shape)
-pred=np.clip(np.rint(pred),0,255).astype(np.uint8)
+template_dir=repo/"localization/graphics/role_B/20261005-B-PRODUCTION137"
+tpl_src=Image.open(template_dir/"63C_SOURCE_READABLE.png").convert("RGBA")
+tpl_clean=Image.open(template_dir/"63C_CLEAN_PLATE.png").convert("RGBA")
+tpl_rep=json.loads((template_dir/"B137_63C_REPORT.json").read_text())
+tpl_row=next(r for r in tpl_rep["rows"] if int(r["region_idx"])==0)
+tpl_cell=list(map(int,tpl_row["cell"]))
+tpl_box=list(map(int,tpl_row["original_bbox"]))
+if tpl_cell != [0,1032,2048,1016] or [x,y,cw,ch] != [1088,1032,2048,1016]:
+    raise RuntimeError(("starburst cell geometry drift",tpl_cell,[x,y,cw,ch]))
 
-# Exact source title/effect mask: classify the proven source-family white fill and
-# dark navy outline inside a tight neighborhood of the white glyph core. This removes
-# B143/B146 broad geometric halos that admitted unrelated starburst glow/ray pixels.
-core_sub=core[sy0:sy1,sx0:sx1]
-sr=sub[:,:,0].astype(np.int16); sg=sub[:,:,1].astype(np.int16); sbc=sub[:,:,2].astype(np.int16); sal=sub[:,:,3]
-mx=np.maximum.reduce([sr,sg,sbc]); mn=np.minimum.reduce([sr,sg,sbc])
-near10=np.asarray(core_im.filter(ImageFilter.MaxFilter(21)))>0
-near10=near10[sy0:sy1,sx0:sx1]
-white_style=(sal>8)&(sr>135)&(sg>135)&(sbc>135)&((mx-mn)<80)
-navy_style=(sal>8)&(sr<105)&(sg<120)&(sbc<175)&(sbc>sr+12)&(sbc>sg+5)
-# Neutral AA between white and navy remains low-chroma; warm brown background is excluded.
-neutral_aa=(sal>8)&((mx-mn)<52)&(((sr+sg+sbc)/3)>55)&(((sr+sg+sbc)/3)<210)
-seed=(white_style|navy_style|neutral_aa)&near10
-cl,nc=label(seed,structure=np.ones((3,3),dtype=np.uint8))
-keep_ids=set(np.unique(cl[core_sub]).tolist()); keep_ids.discard(0)
-text_local=np.isin(cl,list(keep_ids))|core_sub
-# One-pixel AA safety fringe only.
-text_local=np.asarray(Image.fromarray((text_local.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0
-text_mask=np.zeros((H,W),bool); text_mask[sy0:sy1,sx0:sx1]=text_local
-# Never escape C200's exact permitted source-effect bbox.
-obmask=np.zeros((H,W),dtype=bool); obmask[ob[1]:ob[3],ob[0]:ob[2]]=True
-text_mask &= obmask
-ty,tx=np.nonzero(text_mask)
-if not len(tx): raise RuntimeError("empty exact title mask")
-text_bbox=[int(tx.min()),int(ty.min()),int(tx.max())+1,int(ty.max())+1]
-ntext=int(np.count_nonzero(text_mask))
-if not(17000 <= ntext <= 36000):
-    raise RuntimeError(("exact title mask implausible",ntext,text_bbox))
+tsa=np.asarray(tpl_src,dtype=np.uint8)
+tca=np.asarray(tpl_clean,dtype=np.uint8)
+best=None
+for dx in range(1082,1095):
+    dy=0
+    tx0=max(0,ob[0]-dx-170); ty0=max(0,ob[1]-90)
+    tx1=min(tpl_src.width,ob[2]-dx+170); ty1=min(tpl_src.height,ob[3]+120)
+    cx0=tx0+dx; cy0=ty0+dy; cx1=tx1+dx; cy1=ty1+dy
+    if cx0<0 or cy0<0 or cx1>W or cy1>H: continue
+    a=tsa[ty0:ty1,tx0:tx1].astype(np.int16)
+    b=sa[cy0:cy1,cx0:cx1].astype(np.int16)
+    mask=np.ones(a.shape[:2],dtype=bool)
+    ex=16
+    ax0=max(0,tpl_box[0]-ex-tx0); ay0=max(0,tpl_box[1]-ex-ty0)
+    ax1=min(mask.shape[1],tpl_box[2]+ex-tx0); ay1=min(mask.shape[0],tpl_box[3]+ex-ty0)
+    if ax1>ax0 and ay1>ay0: mask[ay0:ay1,ax0:ax1]=False
+    bx0=max(0,ob[0]-ex-cx0); by0=max(0,ob[1]-ex-cy0)
+    bx1=min(mask.shape[1],ob[2]+ex-cx0); by1=min(mask.shape[0],ob[3]+ex-cy0)
+    if bx1>bx0 and by1>by0: mask[by0:by1,bx0:bx1]=False
+    vis=mask & (a[:,:,3]>8) & (b[:,:,3]>8)
+    if np.count_nonzero(vis)<20000: continue
+    d=np.max(np.abs(a[:,:,:3]-b[:,:,:3]),axis=2)
+    vals=d[vis]
+    score=(float(np.median(vals)),float(np.mean(vals)),float(np.quantile(vals,.95)),int(np.count_nonzero(vals==0)),int(len(vals)))
+    if best is None or score[:3] < best[0][:3]:
+        best=(score,dx,dy)
+if best is None: raise RuntimeError("no template alignment candidate")
+(score,shift_x,shift_y)=best
+median_diff,mean_diff,p95_diff,exact_rgb,total_cmp=score
+if median_diff>2.0 or mean_diff>8.0 or p95_diff>20.0:
+    raise RuntimeError(("63C template background mismatch",best))
 
-# C200 rejects Laplace blur because bright ray/glow boundary values diffuse through
-# the title footprint. Instead interpolate ONLY from clean warm-brown canonical source
-# pixels around the title. Rays, gray exterior, orange border and title/effect pixels are
-# excluded from the donor set. Inverse-distance weighting preserves the local brown
-# gradient without importing white/gray cloud values.
-tx0,ty0,tx1,ty1=text_bbox
-padx=100; pady=90
-dx0=max(x,tx0-padx); dy0=max(y,ty0-pady); dx1=min(x+cw,tx1+padx); dy1=min(y+ch,ty1+pady)
-crop=sa[dy0:dy1,dx0:dx1].astype(np.float64)
-Yd,Xd=np.mgrid[dy0:dy1,dx0:dx1]
-cr=crop[:,:,0]; cg=crop[:,:,1]; cbg=crop[:,:,2]; ca=crop[:,:,3]
-# Warm source interior: red/brown dominance, moderate saturation, no orange border/rays.
-warm=(ca>12)&(cr>70)&(cr<235)&(cg>45)&(cg<205)&(cbg>35)&(cbg<190)
-warm &= (cr>=cg-4)&(cg>=cbg-28)&((cr-cbg)>8)
-warm &= ~text_mask[dy0:dy1,dx0:dx1]
-# Keep donors at least 4 px from source title/effect so anti-alias/shadow never leaks back.
-excl=np.asarray(Image.fromarray((text_mask.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(9)))>0
-warm &= ~excl[dy0:dy1,dx0:dx1]
-don_y,don_x=np.nonzero(warm)
-if len(don_x)<12000:
-    raise RuntimeError(("insufficient warm donors",len(don_x)))
-don_xy=np.column_stack((don_y+dy0,don_x+dx0)).astype(np.float64)
-don_rgba=crop[don_y,don_x]
-tree=cKDTree(don_xy)
-qy,qx=np.nonzero(text_mask)
-qxy=np.column_stack((qy,qx)).astype(np.float64)
-dist,idxs=tree.query(qxy,k=24,workers=-1)
-# Prevent a single nearest donor from copying local artifacts; smooth IDW with 2px floor.
-weights=1.0/np.maximum(dist,2.0)**2
-weights/=weights.sum(axis=1,keepdims=True)
-vals=(don_rgba[idxs]*weights[:,:,None]).sum(axis=1)
-# Robustly clamp each predicted channel to the local donor 10..90% interval.
-gather=don_rgba[idxs]
-lo=np.quantile(gather,0.10,axis=1); hi=np.quantile(gather,0.90,axis=1)
-vals=np.minimum(np.maximum(vals,lo),hi)
-clean_arr=sa.copy()
-clean_arr[qy,qx]=np.clip(np.rint(vals),0,255).astype(np.uint8)
-# Preserve canonical alpha median from clean warm donors rather than title alpha.
-# The warm starburst interior is softly antialiased at ray edges; donor-weighted alpha
-# follows that local field while all non-title pixels remain byte-exact source.
-# Source white core must be completely replaced.
-same=core&np.all(clean_arr==sa,axis=2)
-if np.any(same):
-    for yy0,xx0 in zip(*np.nonzero(same)):
-        v=int(clean_arr[yy0,xx0,0]); clean_arr[yy0,xx0,0]=v+1 if v<255 else v-1
-if np.count_nonzero(core&np.all(clean_arr==sa,axis=2)):
-    raise RuntimeError("source title core unchanged")
+# Replace the entire current source-title footprint from the approved clean template.
+# Using the whole permitted bbox guarantees no source-letter fringe can survive while
+# retaining the source-family starburst gradient/glow/rays from the matched template.
+sx0=ob[0]-shift_x; sy0=ob[1]-shift_y; sx1=ob[2]-shift_x; sy1=ob[3]-shift_y
+if sx0<0 or sy0<0 or sx1>tpl_clean.width or sy1>tpl_clean.height:
+    raise RuntimeError(("template patch bounds",ob,shift_x,shift_y,[sx0,sy0,sx1,sy1]))
+patch=tca[sy0:sy1,sx0:sx1]
+if patch.shape[:2] != (ob[3]-ob[1],ob[2]-ob[0]):
+    raise RuntimeError(("template patch shape",patch.shape,ob))
+clean_arr[ob[1]:ob[3],ob[0]:ob[2]]=patch
+
+# Edit mask/evidence is the exact C200-permitted source-effect bbox.
+text_mask=np.zeros((H,W),dtype=bool)
+text_mask[ob[1]:ob[3],ob[0]:ob[2]]=True
+text_bbox=list(ob)
+
+# Boundary seam gate: compare canonical source backgrounds on a 4px ring outside patch.
+ring=np.zeros((H,W),dtype=bool)
+ring[max(0,ob[1]-4):min(H,ob[3]+4),max(0,ob[0]-4):min(W,ob[2]+4)]=True
+ring[ob[1]:ob[3],ob[0]:ob[2]]=False
+qy,qx=np.nonzero(ring)
+valid=(qx-shift_x>=0)&(qx-shift_x<tpl_src.width)&(qy-shift_y>=0)&(qy-shift_y<tpl_src.height)
+qy=qy[valid]; qx=qx[valid]
+if len(qx)<1000: raise RuntimeError(("template ring too small",len(qx)))
+ring_tpl=tsa[qy-shift_y,qx-shift_x,:3].astype(np.int16)
+ring_cur=sa[qy,qx,:3].astype(np.int16)
+ring_diff=np.max(np.abs(ring_tpl-ring_cur),axis=1)
+ring_med=float(np.median(ring_diff)); ring_p95=float(np.quantile(ring_diff,.95))
+if ring_med>2.0 or ring_p95>20.0:
+    raise RuntimeError(("template ring mismatch",ring_med,ring_p95))
+
 clean=Image.fromarray(clean_arr,"RGBA")
+core_same=int(np.count_nonzero(core & np.all(clean_arr==sa,axis=2)))
+if core_same:
+    raise RuntimeError(("template clean left source core unchanged",core_same))
 
 # Re-render the same Korean source-family title, now over the corrected starburst clean field.
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
@@ -271,7 +244,7 @@ rows=[]
 for old in (star_row,bubble_row):
     z=dict(old)
     if int(z["region_idx"])==2:
-        z["rework_status"]="B147_C196_ACCEPTED_SPEECH_BUBBLE_PRESERVED_EXACT"
+        z["rework_status"]="B148_C200_ACCEPTED_SPEECH_BUBBLE_PRESERVED_EXACT"
     else:
         z["source_effect_mask_pixels"]=int(np.count_nonzero(text_mask))
         z["original_bbox"]=ob
@@ -282,8 +255,8 @@ for old in (star_row,bubble_row):
         z["delta_left"]=lb[0]-core_bbox[0]; z["delta_right"]=core_bbox[2]-lb[2]
         z["delta_top"]=lb[1]-core_bbox[1]; z["delta_bottom"]=core_bbox[3]-lb[3]
         z["containment"]="PASS"; z["size_ceiling"]="PASS"; z["positive_margin"]="PASS"
-        z["rework_status"]="B147_C196_STARBURST_GLYPH_HALO_QUADRATIC_FIELD_RECONSTRUCTION"
-        z["precise_text_mask_bbox"]=text_bbox
+        z["rework_status"]="B148_C200_C193_TEMPLATE_STARBRUST_RECONSTRUCTION"
+        z["template_patch_bbox"]=text_bbox; z["template_shift"]=[shift_x,shift_y]
     rows.append(z)
 
 source_text_mask=Image.new("L",(W,H),0)
@@ -292,13 +265,13 @@ prior_sm=Image.open(repo/"localization/graphics/role_B/20261005-B-PRODUCTION143-
 source_text_mask.paste(prior_sm.crop(bubble_box),(bubble_box[0],bubble_box[1]))
 source_text_mask=ImageChops.lighter(source_text_mask,Image.fromarray((text_mask.astype(np.uint8)*255),"L"))
 
-source_png=out/"B147_SOURCE_READABLE.png"; clean_png=out/"B147_CLEAN_PLATE.png"; final_png=out/"B147_FINAL_READABLE.png"
-smp=out/"B147_SOURCE_TEXT_MASK.png"; ap=out/"B147_ALLOWED_EFFECT_BBOX_MASK.png"; pp=out/"B147_PROTECTED_MASK.png"
+source_png=out/"B148_SOURCE_READABLE.png"; clean_png=out/"B148_CLEAN_PLATE.png"; final_png=out/"B148_FINAL_READABLE.png"
+smp=out/"B148_SOURCE_TEXT_MASK.png"; ap=out/"B148_ALLOWED_EFFECT_BBOX_MASK.png"; pp=out/"B148_PROTECTED_MASK.png"
 src.save(source_png); clean.save(clean_png); dec.save(final_png); source_text_mask.save(smp); allowed.save(ap); protected.save(pp)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B147_CLEAN_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B147_FINAL_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B147_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"B147_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B148_CLEAN_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B148_FINAL_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B148_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"B148_FINAL_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS" or finalrep["status"]!="PASS": raise RuntimeError(("validator",cleanrep["status"],finalrep["status"]))
 
 # Focused controller evidence.
@@ -316,7 +289,7 @@ for r in rows:
     cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+5 for c in cards)),"white"); yy1=0
 for c in cards: sheet.paste(c,(0,yy1)); yy1+=c.height+5
-save_b64_jpeg(sheet,out/"B147_8215_CONTACTS.jpg",out/"B147_8215_CONTACTS_B64.txt",94)
+save_b64_jpeg(sheet,out/"B148_8215_CONTACTS.jpg",out/"B148_8215_CONTACTS_B64.txt",94)
 
 # Extra starburst closeup makes C196 defect directly reviewable.
 x0,y0,x1,y1=ob; p=110; box=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
@@ -325,13 +298,13 @@ scale=min(2.8,1500/max(1,ims[0].width)); ims=[z.resize((int(z.width*scale),int(z
 focus=Image.new("RGB",(sum(z.width for z in ims)+16,max(z.height for z in ims)+44),"white"); xx1=0
 for labtxt,z in zip(("SOURCE","CLEAN","FINAL"),ims):
     focus.paste(z,(xx1,44)); ImageDraw.Draw(focus).text((xx1+4,8),labtxt,fill="black"); xx1+=z.width+8
-save_b64_jpeg(focus,out/"B147_STARBURST_FOCUS.jpg",out/"B147_STARBURST_FOCUS_B64.txt",95)
+save_b64_jpeg(focus,out/"B148_STARBURST_FOCUS.jpg",out/"B148_STARBURST_FOCUS_B64.txt",95)
 
 rrim=Image.new("RGB",(1024,2*550),"white")
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
 for i,(labtxt,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im); z.thumbnail((1024,512),Image.Resampling.LANCZOS); rrim.paste(z,(0,i*550+26)); ImageDraw.Draw(rrim).text((5,i*550+5),labtxt,fill="black")
-save_b64_jpeg(rrim,out/"B147_RAW_COMPARE.jpg",out/"B147_RAW_COMPARE_B64.txt",90)
+save_b64_jpeg(rrim,out/"B148_RAW_COMPARE.jpg",out/"B148_RAW_COMPARE_B64.txt",90)
 
 report={
  "schema_version":1,"role":"B","run":run,"queue_index":30,"asset":asset,
@@ -342,11 +315,11 @@ report={
  "classification":{"localizable":"Total Rank x2","translation":"종합 랭킹","protected":["character artwork","lens flare","rank letters B/C/D/E"]},
  "clean_reconstruction":{
    "idx2":"C196-accepted B143 speech-bubble clean/final preserved exact inside prior allowed bbox",
-   "idx1":"exact source-family white/navy/neutral-AA title mask + 24-nearest warm-brown canonical donor IDW reconstruction",
+   "idx1":"C193-approved B137 63C same-family starburst CLEAN template aligned to canonical source and copied across current source-title footprint",
    "idx1_prior_effect_mask_pixels":int(star_row["source_effect_mask_pixels"]),
-   "idx1_precise_effect_mask_pixels":int(np.count_nonzero(text_mask)),
-   "idx1_precise_mask_bbox":text_bbox,
-   "idx1_warm_donor_samples":int(len(don_x))
+   "idx1_template_patch_pixels":int(np.count_nonzero(text_mask)),
+   "idx1_template_patch_bbox":text_bbox,
+   "idx1_template_alignment":{"shift_x":shift_x,"shift_y":shift_y,"median_rgb_diff":median_diff,"mean_rgb_diff":mean_diff,"p95_rgb_diff":p95_diff,"exact_rgb":exact_rgb,"compared_pixels":total_cmp,"ring_median_rgb_diff":ring_med,"ring_p95_rgb_diff":ring_p95}
  },
  "source_style":prior_report["source_style"],
  "rows":rows,
@@ -355,16 +328,16 @@ report={
  "protected_region_changed_pixels":protected_changed,
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
- "status":"B147_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"B148_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "RUNTIME_VALIDATION":"UNTESTED"
 }
-(out/"B147_8215_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(out/"B148_8215_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":30,"asset":"8215FD25","candidate_sha256":csha,
  "localized_physical_elements":2,"bbox_size_positive_margin":"2/2",
  "idx1_precise_effect_mask_pixels":int(np.count_nonzero(text_mask)),
  "clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "outside":outside,"alpha_outside":alphaout,"protected_regions_changed":sum(protected_changed.values()),
  "worker_status":report["status"],"runtime_validation":"UNTESTED",
- "report":f"localization/graphics/role_B/{run}/B147_8215_REPORT.json"}
-(wr/"B147_8215FD25.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "report":f"localization/graphics/role_B/{run}/B148_8215_REPORT.json"}
+(wr/"B148_8215FD25.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False),flush=True)
