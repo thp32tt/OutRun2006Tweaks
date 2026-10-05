@@ -158,3 +158,12 @@ A build PASS is not runtime proof. `RUNTIME_VALIDATION=UNTESTED` until HMD evide
 - SkyGlow and lens-flare ownership are unchanged in this candidate.
 
 `RUNTIME_VALIDATION=UNTESTED` until Quest 3 / VDXR confirmation.
+
+
+### CONVERSION-DX9EX-00404 — recurrence gate sealed
+
+The restored producer/cadence behavior is unchanged by this task. A new deterministic verifier now pins the exact menu/option/result/text producer bridges, the 15 TimeAttack/result ScreenHud handoffs, the exact 0xBB796 WorldBillboard producer, generic ScreenOverlay2D fallback, and the corrected CORRECTNESS OpenXR cadence profile.
+
+Validation-bearing SHA `bc78913199ce141883f35e93dfe9265e903489be` makes `src/hooks_uiscaling.cpp`, `tools/OutRunVR-TestProfiles.ps1`, and `tools/verify_vr_hud_cadence_restore.py` direct DX9Ex Active workflow inputs and executes the verifier in the canonical policy job. N100 exact-SHA static verification passed. DX9Ex Active Validation `37269804032` passed policy/host/game/R33 full-chain/package; Domain Isolation Guard `37269804069` also passed. Artifact `11328122104` digest is `sha256:389026efa48853e9976cbb3144e87edfdd767d73a50b9628f75c1143d4c9cc26`.
+
+This is regression protection/build evidence only. No Quest 3/VDXR test was performed, so `RUNTIME_VALIDATION=UNTESTED`; the white-HUD/rival-marker visual state and cadence smoothness are not promoted to runtime PASS by this gate.
