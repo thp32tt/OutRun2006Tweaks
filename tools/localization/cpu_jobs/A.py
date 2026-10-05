@@ -302,15 +302,22 @@ outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
 alpha_diff=bmask(ImageChops.difference(src.getchannel("A"),decoded.getchannel("A")))
 alpha_out=count(ImageChops.multiply(alpha_diff,ImageOps.invert(allowed)))
 protected_changed=count(ImageChops.multiply(diff,protected))
-overlap=0; touch=0; keys=sorted(target_masks)
+# Atlas target regions are disjoint. Prove overlap/touch cheaply from localized bounding boxes
+# instead of O(N^2) full-4096 mask multiplications.
+lbs={r["idx"]:r["localized_bbox"] for r in rows}
+keys=sorted(lbs); overlap=0; touch=0
 for i in range(len(keys)):
+    a=lbs[keys[i]]
     for j in range(i+1,len(keys)):
-        overlap+=count(ImageChops.multiply(target_masks[keys[i]],target_masks[keys[j]]))
-        touch+=count(ImageChops.multiply(target_masks[keys[i]].filter(ImageFilter.MaxFilter(3)),target_masks[keys[j]]))
-# Every positively detected source core pixel must be removed/replaced; exact unchanged core
-# outside a 2px expansion of the Korean glyphs is source-script residue.
-guard=Image.new("L",(W,H),0)
-for tm in target_masks.values(): guard=ImageChops.lighter(guard,tm.filter(ImageFilter.MaxFilter(5)))
+        b=lbs[keys[j]]
+        if max(a[0],b[0]) < min(a[2],b[2]) and max(a[1],b[1]) < min(a[3],b[3]):
+            overlap=1
+        if max(a[0]-1,b[0]-1) < min(a[2]+1,b[2]+1) and max(a[1]-1,b[1]-1) < min(a[3]+1,b[3]+1):
+            touch=1
+# Build one union then dilate once; avoids 33 full-frame morphology passes.
+target_union=Image.new("L",(W,H),0)
+for tm in target_masks.values(): target_union=ImageChops.lighter(target_union,tm)
+guard=target_union.filter(ImageFilter.MaxFilter(5))
 same=ImageOps.invert(dmask(src,decoded))
 residue=count(ImageChops.multiply(source_core_mask,ImageChops.multiply(same,ImageOps.invert(guard))))
 clean_same=ImageOps.invert(dmask(src,clean))
