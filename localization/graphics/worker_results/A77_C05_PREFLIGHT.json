@@ -1,0 +1,11 @@
+{
+  "run": "20261006-A-PRODUCTION77-C05-PREFLIGHT",
+  "index": 215,
+  "asset": "C05E67EF",
+  "source_sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+  "regions": 6,
+  "candidate_written": false,
+  "worker_status": "A77_PREFLIGHT_BINDING_PENDING_CONTROLLER_SAME_INVOCATION_RENDER",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION77-C05-PREFLIGHT/A77_C05_PREFLIGHT.json"
+}

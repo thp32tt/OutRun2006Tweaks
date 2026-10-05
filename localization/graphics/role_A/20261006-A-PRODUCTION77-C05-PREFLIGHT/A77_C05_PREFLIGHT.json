@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION77-C05-PREFLIGHT",
+  "index": 215,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_PHYSICAL_BINDING",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "6109bf8757aff5aeb11654e94356e303ed2179d4",
+    "atlas_git_blob_sha1": "d59e6fed81902cbadb2aa962d30e2eafa230669f",
+    "source_sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff"
+  },
+  "structure": {
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "atlas_region_count": 6,
+  "atlas_regions": [
+    {
+      "idx": 0,
+      "rect": [
+        0,
+        176,
+        244,
+        80
+      ],
+      "alpha_bbox": [
+        5,
+        15,
+        178,
+        68
+      ]
+    },
+    {
+      "idx": 1,
+      "rect": [
+        244,
+        176,
+        244,
+        80
+      ],
+      "alpha_bbox": [
+        2,
+        16,
+        175,
+        68
+      ]
+    },
+    {
+      "idx": 2,
+      "rect": [
+        0,
+        96,
+        244,
+        80
+      ],
+      "alpha_bbox": [
+        5,
+        14,
+        176,
+        69
+      ]
+    },
+    {
+      "idx": 3,
+      "rect": [
+        244,
+        96,
+        244,
+        80
+      ],
+      "alpha_bbox": [
+        2,
+        16,
+        175,
+        69
+      ]
+    },
+    {
+      "idx": 4,
+      "rect": [
+        0,
+        16,
+        244,
+        80
+      ],
+      "alpha_bbox": [
+        5,
+        14,
+        244,
+        67
+      ]
+    },
+    {
+      "idx": 5,
+      "rect": [
+        244,
+        16,
+        244,
+        80
+      ],
+      "alpha_bbox": [
+        0,
+        14,
+        184,
+        68
+      ]
+    }
+  ],
+  "expected_transcription": [
+    "GOAL A",
+    "GOAL B",
+    "GOAL C",
+    "GOAL D",
+    "GOAL E",
+    "15con."
+  ],
+  "candidate_written": false,
+  "runtime_validation": "UNTESTED",
+  "status": "A77_PREFLIGHT_BINDING_PENDING_CONTROLLER_SAME_INVOCATION_RENDER"
+}
