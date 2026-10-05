@@ -3982,7 +3982,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C180-C188-BATCH/C180_C188_BATCH_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C192-C193-BATCH/C192_C193_BATCH_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4043,10 +4043,7 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [
-    "63C91067",
-    "39BCA907"
-  ],
+  "current_pending_c": [],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -4115,21 +4112,40 @@
     "runtime_validation": "UNTESTED"
   },
   "a_production49_39bca907": {
-    "timestamp_kst": "2026-10-05T19:38:00+09:00",
+    "timestamp_kst": "2026-10-05T19:41:25+09:00",
     "run": "20261005-A-PRODUCTION49",
     "queue_index": 147,
     "asset": "39BCA907",
-    "source_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
     "candidate_sha256": "6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b",
-    "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
-    "semantic_binding": "15/15 corrected after A48 controller rejection",
-    "machine_qa": "15/15 bbox/size/positive-margin PASS; outside/alpha/protected/clean-source-unchanged/source-residue/overlap/touch=0",
-    "controller_visual_qa": "PASS",
-    "raw_orientation": "mirror_y",
     "report": "localization/graphics/role_A/20261005-A-PRODUCTION49/A49_39BCA907_REPORT.json",
-    "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION49/A49_CONTROLLER_SELF_QA.json",
-    "prior_rejected_candidate_sha256": "eec59e5c2738ef0423d75d46ccfd2c182bab1ec72b16c2fbc8952ef07e78d55d",
-    "prior_rejected_reason": "SEMANTIC_BINDING_MISMATCH",
+    "status": "C192_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "runtime_validation": "UNTESTED"
+  },
+  "c192_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T19:41:25+09:00",
+    "run": "20261005-C192-39BCA907",
+    "queue_index": 147,
+    "candidate_sha256": "6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "15/15 PASS",
+    "semantic_policy_pass": true,
+    "controller_visual_qa": "PASS",
+    "decision": "C192_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "machine_report": "localization/graphics/role_C/20261005-C192-39BCA907/C192_39BCA907_MACHINE_QA.json",
+    "report": "localization/graphics/role_C/20261005-C192-39BCA907/C192_39BCA907_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c193_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T19:41:25+09:00",
+    "run": "20261005-C193-63C91067",
+    "queue_index": 26,
+    "candidate_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
+    "machine_status": "PASS_AFTER_MASK_ADJUDICATION",
+    "bbox_size_positive_margin": "2/2 PASS",
+    "controller_visual_qa": "PASS",
+    "decision": "C193_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "machine_report": "localization/graphics/role_C/20261005-C193-63C91067/C193_63C91067_ADJUDICATED_MACHINE_QA.json",
+    "report": "localization/graphics/role_C/20261005-C193-63C91067/C193_63C91067_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
