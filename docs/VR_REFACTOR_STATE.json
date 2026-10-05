@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-05T09:04:30+09:00",
+  "updatedKst": "2026-10-05T09:05:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -69,10 +69,9 @@
     "VR-REFACTOR-POST1000-R34-SHIM-RETIREMENT-0005",
     "VR-REFACTOR-POST1000-R34-OBSERVER-RETIREMENT-0006",
     "VR-REFACTOR-POST1000-R33-INSTALL-STATE-RETIREMENT-0007",
-    "VR-REFACTOR-POST1000-R9-DEPTH-STENCIL-METADATA-OWNERSHIP-0008",
-    "VR-REFACTOR-POST1000-R33-R9-DEPTH-METADATA-OWNER-0008"
+    "VR-REFACTOR-POST1000-R9-DEPTH-STENCIL-METADATA-OWNERSHIP-0008"
   ],
-  "next": "Do not repeat cycles 0..1000 or CONVERSION-DX9EX-00376/00379/00382/00385/00388/00391/00394/00397. R33 remains the sole final stereo dispatcher/status publisher and now consumes R9 tracked-main-depth stencil state only through R9TrackedMainDepthHasStencil(), with direct R9MainDepthKnown/Identity/Desc access guarded against reintroduction. Continue only the next bounded post-1000 structural owner-boundary successor supported by current source/static evidence; if none exists, return to explicit DX9Ex runtime/general maintenance. Quest3/VDXR runtime remains UNTESTED.",
+  "next": "Do not repeat cycles 0..1000 or CONVERSION-DX9EX-00376/00379/00382/00385/00388/00391/00394/00397. R33 must consume R9 main-depth stencil eligibility only through R9TrackedMainDepthHasStencil(); do not reintroduce direct R9MainDepthKnown/R9MainDepthIdentity/R9MainDepthDesc reads in R33. Continue only the next bounded post-1000 structural successor supported by current source/static evidence; if none exists, return to explicit DX9Ex runtime/general maintenance. Quest3/VDXR runtime remains UNTESTED.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -145,8 +144,7 @@
     "Post-1000 maintenance VR-REFACTOR-POST1000-R34-SHIM-RETIREMENT-0005: material d45764f10c0810b9d815ed1b8748ec14f3366477 deletes the now-zero-owner stereo_renderer_r34.cpp include shim, removes it from cmkr/generated CMake and CI source graphs, moves HUD-inspector change detection to R33, and changes hook-graph/R32/refactor verifiers to require the retired source to stay absent while preserving the historical OpenXRVRStereoR34ResetGuard compatibility status in R33. Exact-SHA DX9Ex Active Validation 37235159510 policy/game/R33-full-chain/host/package SUCCESS; Domain Isolation 37235159354 SUCCESS; HUD Inspector 37235159352 SUCCESS; N100 architecture/R51/R32-R34/hook-graph/refactor/near-plane plus workflow YAML parse and git diff checks PASS. Package artifact 11314988857 digest sha256:b02697a1ff1b782775db15023209c74900fad8b69aa23c9a2072d7ed6808ba59. Runtime remains UNTESTED.",
     "Post-1000 maintenance VR-REFACTOR-POST1000-R34-OBSERVER-RETIREMENT-0006: verifier RED commits a9a94968d69c65f2d637d3eb78c1438d5d065c04 and c01cd01df67bac8828e4ecfe9748e47eb31fb458 made the stale R34 compatibility observer/status alias fail closed. Material eaddb4da311c8942b57a5caed7706b96a3f55c4e removes OpenXRVRStereoR34ResetGuard publication, R33InstallStatus(), and VRStereoR34ResetGuardHook while retaining R33-owned reset replay-health/raster behavior. Exact-SHA DX9Ex Active Validation 37238918151 policy/full-chain/host/game/package SUCCESS; Domain Isolation 37238918252 SUCCESS; HUD Inspector 37238918123 SUCCESS; N100 architecture/R51/R32-R34/hook-graph/refactor/near-plane plus workflow YAML parse and git diff checks PASS. Package artifact 11316702996 digest sha256:5ed689ef85d5a07dbc5eb89f2e4115a38de4e9f752f62cc57f7f084cc5287840. Runtime remains UNTESTED.",
     "Post-1000 maintenance VR-REFACTOR-POST1000-R33-INSTALL-STATE-RETIREMENT-0007: verifier guard 229cfe2582894ffb534c3c816170531d22b5a8d6 forbids reintroduction of the now-unobserved R33InstallState. Material 8d44a9298867d30b8ada0aeb3c05e37a380147fb removes the write-only Pending/Ready/Failed atomic and its stores while preserving R32InstallStatus prerequisite polling and R33ReportInstallResult terminal publication. Exact-SHA DX9Ex Active Validation 37241351866 policy/full-chain/host/game/package SUCCESS; Domain Isolation 37241351730 SUCCESS; HUD Inspector 37241351791 SUCCESS; N100 architecture/R51/R32-R34/hook-graph/refactor/near-plane plus workflow YAML parse and git diff checks PASS. Package artifact 11317817554 digest sha256:72b6da2986641fc7c3e9f22c0fd398993972fdfa35fdd7bc50442e04c7b20872. Runtime remains UNTESTED.",
-    "Post-1000 maintenance VR-REFACTOR-POST1000-R9-DEPTH-STENCIL-METADATA-OWNERSHIP-0008: semantic material 41b0f5ee29438f81d35d29db32b550959cd6435e adds R9TrackedMainDepthHasStencil() as the R9-owned query and removes R33 direct reads of R9MainDepthKnown/R9MainDepthIdentity/R9MainDepthDesc while preserving the existing tracked-depth identity and FormatHasStencil predicate. Clean follow-up 583c17035766c0594a52720047b2c00c6e07655c restores EOF newlines only. Exact-SHA 583c17035766c0594a52720047b2c00c6e07655c passed DX9Ex Active Validation 37245601542 (policy/game/full-chain-compile/host/package SUCCESS), Domain Isolation Guard 37245601527 SUCCESS, and HUD Inspector 37245601510 SUCCESS. Package artifact 11318917608 digest sha256:0320c25b0173ea514a352ce58442a233f540e084728c354d3c8b4afa9e4ee1a6. N100 Desktop Commander was checked and offline, so no N100 validation claim is made. Runtime remains UNTESTED.",
-    "Post-1000 maintenance VR-REFACTOR-POST1000-R33-R9-DEPTH-METADATA-OWNER-0008: source material 41b0f5ee29438f81d35d29db32b550959cd6435e adds inline R9TrackedMainDepthHasStencil() with the exact prior R33 predicate and removes R33 direct reads of R9MainDepthKnown/R9MainDepthIdentity/R9MainDepthDesc. Validation-bearing 583c17035766c0594a52720047b2c00c6e07655c restores only EOF newlines introduced by connector transfer. Exact-SHA DX9Ex Active Validation 37245601542 policy/host/game/full-chain/package SUCCESS; Domain Isolation 37245601527 SUCCESS; HUD Inspector 37245601510 SUCCESS; N100 architecture/R51/R32-R34/hook-graph/refactor/near-plane plus workflow YAML parse and git diff checks PASS. Package artifact 11318917608 digest sha256:0320c25b0173ea514a352ce58442a233f540e084728c354d3c8b4afa9e4ee1a6. Runtime remains UNTESTED."
+    "Post-1000 maintenance VR-REFACTOR-POST1000-R9-DEPTH-STENCIL-METADATA-OWNERSHIP-0008: semantic material 41b0f5ee29438f81d35d29db32b550959cd6435e adds R9TrackedMainDepthHasStencil() as the R9-owned query and removes R33 direct reads of R9MainDepthKnown/R9MainDepthIdentity/R9MainDepthDesc while preserving the prior tracked-depth identity and FormatHasStencil predicate. Validation-bearing 583c17035766c0594a52720047b2c00c6e07655c restores EOF newlines only. Exact-SHA 583c17035766c0594a52720047b2c00c6e07655c passed DX9Ex Active Validation 37245601542 (policy/host/game/full-chain-compile/package SUCCESS), Domain Isolation Guard 37245601527 SUCCESS, and HUD Inspector 37245601510 SUCCESS. Package artifact 11318917608 digest sha256:0320c25b0173ea514a352ce58442a233f540e084728c354d3c8b4afa9e4ee1a6. Auxiliary N100 static validation passed on the semantically identical 41b0f5ee material before the newline-only correction; exact final automation validation is GitHub Actions on 583c1703. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-1000_BUILD_VERIFIED",
   "validatedSourceSha": "245c35ca3ce07b304526312eab14d6f4c1f09ecd",
@@ -222,7 +220,7 @@
   },
   "post1000Maintenance00397": {
     "taskId": "CONVERSION-DX9EX-00397",
-    "item": "VR-REFACTOR-POST1000-R33-R9-DEPTH-METADATA-OWNER-0008",
+    "item": "VR-REFACTOR-POST1000-R9-DEPTH-STENCIL-METADATA-OWNERSHIP-0008",
     "baseSha": "d6b8b44015935a8dc626f231c512a52f08765d48",
     "sourceMaterialSha": "41b0f5ee29438f81d35d29db32b550959cd6435e",
     "materialResultSha": "583c17035766c0594a52720047b2c00c6e07655c",
@@ -230,6 +228,7 @@
     "automationValidation": "PASS",
     "runtimeValidation": "UNTESTED",
     "validation": {
+      "supersededCancelledRunId": 37245544417,
       "dx9exActiveRunId": 37245601542,
       "jobs": {
         "policy": 111562788183,
@@ -240,8 +239,13 @@
       },
       "domainIsolationRunId": 37245601527,
       "hudInspectorRunId": 37245601510,
+      "hudJobs": {
+        "buildHudInspector": 111562769612,
+        "staticExeAnalysis": 111562769840
+      },
       "packageArtifactId": 11318917608,
-      "packageArtifactDigest": "sha256:0320c25b0173ea514a352ce58442a233f540e084728c354d3c8b4afa9e4ee1a6"
+      "packageArtifactDigest": "sha256:0320c25b0173ea514a352ce58442a233f540e084728c354d3c8b4afa9e4ee1a6",
+      "n100": "AUXILIARY_STATIC_PASS_ON_SEMANTIC_41B0_BEFORE_NEWLINE_ONLY_583C_CORRECTION"
     },
     "issue14CommentId": 5985850851
   }
