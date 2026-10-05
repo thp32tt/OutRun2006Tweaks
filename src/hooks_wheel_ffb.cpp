@@ -581,6 +581,35 @@ namespace
             // an Original model. F11/profile transitions already do this too;
             // this runtime guard covers every other live settings path.
             const int runtimeModelValue = static_cast<int>(ffbModel);
+
+            // R10: model changes can arrive through the combo, named profiles,
+            // user.ini reloads or other live settings paths. The R3 log proved
+            // that relying on the UI baseline alone can leave Modern running
+            // with Arcade/PS2 polarity (or vice versa). Self-heal only the
+            // validated R3 identity; other wheels retain manual polarity control.
+            const std::string selectedWheelLower =
+                lower_copy(selectedName_.c_str());
+            const bool r3AutoPolarity =
+                selectedWheelLower.find("r3 racing wheel") != std::string::npos;
+            if (r3AutoPolarity)
+            {
+                const bool expectedReverse =
+                    WheelFFBMath::model_uses_reversed_r3_polarity(ffbModel);
+                const bool forceMismatch =
+                    Settings::WheelFFBInvertForce.get() != expectedReverse;
+                const bool springMismatch =
+                    Settings::WheelFFBInvertSpring.get() != expectedReverse;
+                if (forceMismatch || springMismatch)
+                {
+                    Settings::WheelFFBInvertForce = expectedReverse;
+                    Settings::WheelFFBInvertSpring = expectedReverse;
+                    spdlog::info(
+                        "WheelFFB: R3 model-polarity self-heal model={} reverseForce={} reverseSpring={}",
+                        WheelFFBMath::model_name(ffbModel),
+                        expectedReverse, expectedReverse);
+                }
+            }
+
             if (activeRuntimeModel_ != runtimeModelValue)
             {
                 const int previousModel = activeRuntimeModel_;
@@ -719,8 +748,9 @@ namespace
                 return;
             }
 
+            const float bodySlip = vehicleDynamics_.bodySlip();
             const float bodySlideT = std::clamp(
-                (std::abs(vehicleDynamics_.bodySlip()) - 0.10f) / 0.22f,
+                (std::abs(bodySlip) - 0.10f) / 0.22f,
                 0.0f, 1.0f);
             const float bodySlide =
                 bodySlideT * bodySlideT * (3.0f - 2.0f * bodySlideT);
@@ -827,9 +857,10 @@ namespace
                     sawNonPrimarySnowMix = true;
             }
             const bool snowPrimaryRoad = sawSnowPrimary && !sawNonPrimarySnowMix;
-            constexpr float SnowIceRoadTextureScale = 0.04f;
             const float materialRoadTextureScale =
-                snowPrimaryRoad ? SnowIceRoadTextureScale : 1.0f;
+                snowPrimaryRoad
+                    ? WheelFFBMath::SnowIceComfortTextureScale
+                    : 1.0f;
 
             const float configuredRoadDetail = std::clamp(
                 static_cast<float>(Settings::WheelFFBRoadTexture), 0.0f, 1.0f);
@@ -1278,6 +1309,9 @@ namespace
             const float trailShape = pneumaticSatShape; // legacy telemetry field name
             const float physicsLoad = 0.62f + 0.48f * lateralLoadSmooth;
             const float rearSlideRelief = 1.0f - 0.15f * gripLoss * bodySlide;
+            const float driftCountersteerBlend =
+                WheelFFBMath::drift_countersteer_blend(
+                    bodySlip, frontSlip, bodySlide);
             if (vehicleDynamics_.calibrated() && vehicleDynamics_.sampleValid())
             {
                 const float physicsReturnRelief =
@@ -1287,6 +1321,24 @@ namespace
                     (frontSlip > 0.0f ? -1.0f : 1.0f) *
                     physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
+
+                // In a developed drift, frontSlip may reverse sign because the
+                // front wheels have already started countersteering. Do not let
+                // that sign reversal command the rack back toward the car nose.
+                // Blend toward the body-slip/caster recovery direction instead.
+                if (driftCountersteerBlend > 0.0f)
+                {
+                    const float driftCountersteerShape =
+                        WheelFFBMath::drift_countersteer_shape(bodySlip);
+                    const float driftCountersteerTorque =
+                        (bodySlip > 0.0f ? -1.0f : 1.0f) *
+                        driftCountersteerShape * satSpeed * physicsLoad *
+                        rearSlideRelief * satStrength;
+                    physicsSatTorque +=
+                        (driftCountersteerTorque - physicsSatTorque) *
+                        driftCountersteerBlend;
+                }
+
                 if (!std::isfinite(physicsSatTorque))
                     physicsSatTorque = 0.0f;
             }
