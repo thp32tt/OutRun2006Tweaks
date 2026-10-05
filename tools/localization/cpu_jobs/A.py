@@ -3,13 +3,13 @@ import os,json,hashlib,struct,subprocess,urllib.request,statistics
 from pathlib import Path
 from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A": raise SystemExit("worker A only")
-repo=Path.cwd(); run="20261005-A-PRODUCTION66-STYLE"
+repo=Path.cwd(); run="20261005-A-PRODUCTION67-STYLE"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds"; candidate=repo/"localization/graphics/hd_candidates"/asset; candidate.parent.mkdir(parents=True,exist_ok=True)
 validator=repo/"tools/localization/validate_clean_plate.py"
 commit="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"; base="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+commit
-work=Path("/tmp/a66"); work.mkdir(exist_ok=True); dds=work/"src.dds"; atlas=work/"atlas.json"
+work=Path("/tmp/a67"); work.mkdir(exist_ok=True); dds=work/"src.dds"; atlas=work/"atlas.json"
 urllib.request.urlretrieve(base+"/Release/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",dds)
 urllib.request.urlretrieve(base+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_97E863AD_512x256_atlas.json",atlas)
 sb=dds.read_bytes(); ab=atlas.read_bytes()
@@ -113,11 +113,11 @@ for idx in range(18):
  rows.append({"region_idx":idx,"source":en,"korean":ko,"render_text":render_text,"kind":kind,"cell":[x,y,cw,ch],"original_bbox":ob,"source_width":ob[2]-ob[0],"source_height":ob[3]-ob[1],"source_median_rgba":med,
               "preserved_inline_token":token_label,"preserved_inline_token_bbox":token_bbox_abs,"token_detection":token_gap_evidence})
 clean=src.copy(); ca=clean.getchannel("A"); ca.paste(0,(0,0,W,H),source_mask); clean.putalpha(ca)
-sp=out/"A66_SOURCE_READABLE.png"; cp=out/"A66_CLEAN_PLATE.png"; smp=out/"A66_SOURCE_TEXT_MASK.png"; ap=out/"A66_ALLOWED_BBOX_MASK.png"
+sp=out/"A67_SOURCE_READABLE.png"; cp=out/"A67_CLEAN_PLATE.png"; smp=out/"A67_SOURCE_TEXT_MASK.png"; ap=out/"A67_ALLOWED_BBOX_MASK.png"
 src.save(sp); clean.save(cp); source_mask.save(smp); allowed.save(ap)
-protected=ImageChops.lighter(ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed)),inline_global); pp=out/"A66_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"A66_CLEAN_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A66_CLEAN_VALIDATION.json").read_text()); 
+protected=ImageChops.lighter(ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed)),inline_global); pp=out/"A67_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"A67_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"A67_CLEAN_VALIDATION.json").read_text()); 
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean",cleanrep))
 subprocess.run(["sudo","apt-get","update","-qq"],check=True); subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
 font_line=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{style}","Noto Sans CJK KR:style=Black"],text=True).strip(); FONT,FI,FSTYLE=font_line.rsplit("|",2); FI=int(FI or 0)
@@ -140,7 +140,7 @@ def render_tracked(text,fs,fill,target_width,max_width):
   if i<gaps: x+=gapw[i]
  return out,(sum(gapw)/gaps if gaps else 0.0),total
 
-style_ratio={"sentence":0.76,"sentence_token":0.86,"showroom_bottom":0.65,"multiplayer":0.82,"goal":0.80,"welcome":0.80,"online":0.82}
+style_ratio={"sentence":0.68,"sentence_token":0.76,"showroom_bottom":0.60,"multiplayer":0.65,"goal":0.65,"welcome":0.65,"online":0.68}
 # Shared sizes only within matching source families. Inline product tokens stay source-pixel exact.
 groups={"sentence":[1,2,3],"goal":[6,7,8,9,10,11]}
 fs_group={}
@@ -192,9 +192,9 @@ if ov or touch: raise RuntimeError(("overlap/touch",ov,touch))
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM); payload=sb[:128]+raw_final.tobytes("raw",mode); candidate.write_bytes(payload)
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode); dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip")
-fp=out/"A66_FINAL_DECODED_READABLE.png"; dec.save(fp)
-subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A66_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"A66_FINAL_VALIDATION.json").read_text())
+fp=out/"A67_FINAL_DECODED_READABLE.png"; dec.save(fp)
+subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A67_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"A67_FINAL_VALIDATION.json").read_text())
 diff=dmask(src,dec); outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed))); alphaout=count(ImageChops.multiply(bmask(ImageChops.difference(src.getchannel("A"),dec.getchannel("A"))),ImageOps.invert(allowed))); prot=count(ImageChops.multiply(diff,protected))
 target=Image.new("L",(W,H),0)
 for _,m in targets: target=ImageChops.lighter(target,m)
@@ -208,7 +208,7 @@ for idx,label in ((1,"OutRun inline token"),(2,"OutRun2SP inline token")):
  preserved[f"{idx}_INLINE_TOKEN"]={"label":label,"bbox":next(r["preserved_inline_token_bbox"] for r in rows if r["region_idx"]==idx),"changed_pixels":count(ImageChops.multiply(dd,tok))}
 token_overlap=count(ImageChops.multiply(target,inline_global))
 if finalrep["status"]!="PASS" or outside or alphaout or prot or residue or render_outside or ov or touch or token_overlap or any(v["changed_pixels"] for v in preserved.values()): raise RuntimeError(("gates",finalrep["status"],outside,alphaout,prot,residue,render_outside,ov,touch,token_overlap,preserved))
-target.save(out/"A66_TARGET_TEXT_MASK.png")
+target.save(out/"A67_TARGET_TEXT_MASK.png")
 cards=[]
 for r in outrows:
  ob=r["original_bbox"]; cr=(max(0,ob[0]-12),max(0,ob[1]-12),min(W,ob[2]+12),min(H,ob[3]+12)); ims=[comp(z).crop(cr) for z in (src,clean,dec)]; sc=max(1,min(2,1200//max(1,ims[0].width))); ims=[z.resize((z.width*sc,z.height*sc),Image.Resampling.NEAREST) for z in ims]
@@ -217,23 +217,23 @@ for r in outrows:
  ImageDraw.Draw(c).text((5,5),f'{r["region_idx"]} {r["source"]} -> {r["korean"]} fs={r["lowres_font_size"]} track={r["tracking_px_average"]} token={r["preserved_inline_token"]}',fill="black"); cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+4*(len(cards)-1)),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.thumbnail((1800,12000),Image.Resampling.LANCZOS); sheet.save(out/"A66_TARGET_CONTACTS.jpg",quality=97)
+sheet.thumbnail((1800,12000),Image.Resampling.LANCZOS); sheet.save(out/"A67_TARGET_CONTACTS.jpg",quality=97)
 full=Image.new("RGB",(1024,3*536),"white")
 for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
  z=comp(im).resize((1024,512),Image.Resampling.NEAREST); full.paste(z,(0,i*536+24)); ImageDraw.Draw(full).text((4,i*536+4),label,fill="black")
-full.save(out/"A66_SOURCE_CLEAN_FINAL.jpg",quality=96)
+full.save(out/"A67_SOURCE_CLEAN_FINAL.jpg",quality=96)
 raw_final_img=dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM); rr=Image.new("RGB",(1024,2*536),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_final_img)]):
  z=comp(im).resize((1024,512),Image.Resampling.NEAREST); rr.paste(z,(0,i*536+24)); ImageDraw.Draw(rr).text((4,i*536+4),label,fill="black")
-rr.save(out/"A66_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"A67_RAW_COMPARE.jpg",quality=96)
 rep={"schema_version":1,"role":"A","run":run,"index":193,"asset":asset,"readiness_tier":"A63_ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":commit,"git_blob_sha1":blob(sb),"atlas_git_blob_sha1":blob(ab),"source_sha256":sha(sb)},
  "rework_from":"C208_REWORK_REQUIRED_SOURCE_STYLE_SCALE_PROPORTION",
- "style_rework":"Black face plus expanded per-glyph tracking; glyph geometry is not horizontally scaled",
+ "style_rework":"C208 scale rework, A67 moderate source-family tracking after A66 controller rejected excessive spacing; Black face, no horizontal glyph scaling",
  "semantic_binding":{"localized_indices":sorted(specs),"protected_regions":protected_regions,"product_token_policy":{"idx1":"OutRun original word pixels preserved exact; only descriptor -> 싱글 플레이 랭킹 보기","idx2":"OutRun2SP original word pixels preserved exact; only descriptor -> 아케이드 랭킹 보기","idx4":"OUTRUN top line preserved pixel-exact; only SHOWROOM -> 쇼룸"}},
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},"rows":outrows,"preserved_regions":preserved,
  "clean_plate_validator":cleanrep,"final_mask_validator":finalrep,"decoded_changes":{"changed_pixels_total":count(diff),"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"exact_source_residue":residue,"render_outside_target":render_outside,"overlap":ov,"touch_pairs":touch,"inline_token_overlap":token_overlap},
- "candidate_sha256":sha(payload),"candidate_path":str(candidate.relative_to(repo)),"controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","runtime_validation":"UNTESTED","status":"A66_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
-(out/"A66_97E863AD_REPORT.json").write_text(json.dumps(rep,ensure_ascii=False,indent=2)+"\n")
-(wr/"A66_97E863AD.json").write_text(json.dumps({"run":run,"index":193,"asset":"97E863AD","source_sha256":sha(sb),"candidate_sha256":sha(payload),"localized_physical_elements":len(specs),"protected_regions":len(protected_regions)+1,"bbox_size_positive_margin":f"{len(specs)}/{len(specs)} PASS","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],"source_residue":residue,"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"render_outside_target":render_outside,"preserved_changes":sum(v["changed_pixels"] for v in preserved.values()),"inline_token_overlap":token_overlap,"overlap":ov,"touch_pairs":len(touch),"worker_status":rep["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_A/{run}/A66_97E863AD_REPORT.json"},ensure_ascii=False,indent=2)+"\n")
+ "candidate_sha256":sha(payload),"candidate_path":str(candidate.relative_to(repo)),"controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","runtime_validation":"UNTESTED","status":"A67_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
+(out/"A67_97E863AD_REPORT.json").write_text(json.dumps(rep,ensure_ascii=False,indent=2)+"\n")
+(wr/"A67_97E863AD.json").write_text(json.dumps({"run":run,"index":193,"asset":"97E863AD","source_sha256":sha(sb),"candidate_sha256":sha(payload),"localized_physical_elements":len(specs),"protected_regions":len(protected_regions)+1,"bbox_size_positive_margin":f"{len(specs)}/{len(specs)} PASS","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],"source_residue":residue,"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"render_outside_target":render_outside,"preserved_changes":sum(v["changed_pixels"] for v in preserved.values()),"inline_token_overlap":token_overlap,"overlap":ov,"touch_pairs":len(touch),"worker_status":rep["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_A/{run}/A67_97E863AD_REPORT.json"},ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"run":run,"asset":"97E863AD","candidate_sha256":sha(payload),"localized":len(specs),"preserved_changed":sum(v["changed_pixels"] for v in preserved.values()),"status":rep["status"]},ensure_ascii=False))
