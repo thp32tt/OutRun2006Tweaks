@@ -10230,6 +10230,41 @@ def main() -> None:
             + ", ".join(missing_r260_programmable_resource_behavior)
         )
 
+    r261_programmable_texture_resource_behavior_contract = [
+        ("struct NativeProgrammableShaderTextureResourceBehaviorReadiness",
+         NATIVE_BACKEND_HPP, "R261 explicit F18 texture resource-behavior receipt"),
+        ("compose_programmable_texture_resource_behavior_readiness(",
+         NATIVE_BACKEND_HPP, "R261 texture resource-behavior composition declaration"),
+        ("validate_programmable_texture_resource_behavior_readiness_snapshot(",
+         NATIVE_BACKEND_HPP, "R261 texture resource-behavior snapshot validator"),
+        ("textureRegistry.validate_mirror_readiness_snapshot_for_stages(",
+         NATIVE_BACKEND_CPP, "R261 current managed texture-stage identity validation"),
+        ("out.textureResourceBehaviorExact =",
+         NATIVE_BACKEND_CPP, "R261 exact supplied texture-stage resource behavior"),
+        ("out.outputResourceBehaviorProofPresent = false;",
+         NATIVE_BACKEND_CPP, "R261 output resource scope remains fail-closed"),
+        ("token, 0x261u",
+         NATIVE_BACKEND_CPP, "R261 independent review snapshot-domain tag"),
+        ("R261 indexed texture resource behavior closes supplied texture scope while output F18 remains fail-closed",
+         CONSTANT_BUFFER_PROBE, "R261 indexed positive/output-debt regression"),
+        ("R261 rejects stale managed texture-stage identity",
+         CONSTANT_BUFFER_PROBE, "R261 stale texture-stage receipt regression"),
+        ("R261 rejects stale R260 geometry resource-behavior identity",
+         CONSTANT_BUFFER_PROBE, "R261 stale geometry receipt regression"),
+        ("R261 non-indexed texture resource behavior reuses exact current texture stage without widening F18",
+         CONSTANT_BUFFER_PROBE, "R261 non-indexed positive/output-debt regression"),
+    ]
+    missing_r261_programmable_texture_resource_behavior = [
+        meaning for token, source, meaning
+        in r261_programmable_texture_resource_behavior_contract
+        if token not in source
+    ]
+    if missing_r261_programmable_texture_resource_behavior:
+        raise SystemExit(
+            "DX11 R261 programmable texture resource-behavior drift: "
+            + ", ".join(missing_r261_programmable_texture_resource_behavior)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
@@ -10238,9 +10273,11 @@ def main() -> None:
         ("validate_programmable_activation_prerequisite_handoff_snapshot(",
          NATIVE_BACKEND_HPP, "R259 review snapshot validator declaration"),
         ("out.resourceBehaviorGeometryProofPresent =",
-         NATIVE_BACKEND_CPP, "R259 consumes R260 geometry resource-behavior evidence"),
+         NATIVE_BACKEND_CPP, "R259 consumes R261-carried geometry resource-behavior evidence"),
+        ("out.resourceBehaviorTextureProofPresent =",
+         NATIVE_BACKEND_CPP, "R259 consumes R261 exact texture resource-behavior evidence"),
         ("out.resourceBehaviorCoverageComplete =",
-         NATIVE_BACKEND_CPP, "R259 keeps incomplete F18 scope explicit"),
+         NATIVE_BACKEND_CPP, "R259 keeps output-incomplete F18 scope explicit"),
         ("out.resourceBehaviorProofPresent =",
          NATIVE_BACKEND_CPP, "R259 full F18 proof remains separately gated"),
         ("out.shaderTranslationProofPresent = false;",
@@ -10253,8 +10290,8 @@ def main() -> None:
          CONSTANT_BUFFER_PROBE, "R259 indexed positive/debt regression"),
         ("R259 rejects stale R258 source-revalidation identity",
          CONSTANT_BUFFER_PROBE, "R259 stale R258 receipt regression"),
-        ("R259 rejects stale R260 resource-behavior identity",
-         CONSTANT_BUFFER_PROBE, "R259 stale R260 receipt regression"),
+        ("R259 rejects stale R261 resource-behavior identity",
+         CONSTANT_BUFFER_PROBE, "R259 stale R261 receipt regression"),
         ("R259 rejects stale R243 input-layout identity",
          CONSTANT_BUFFER_PROBE, "R259 stale input-layout receipt regression"),
         ("R259 non-indexed review handoff preserves F18/F21 fail-closed debt",
