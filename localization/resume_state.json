@@ -1,5 +1,5 @@
 {
-  "schema_version": 87,
+  "schema_version": 88,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_PRODUCTION47 completed odd index 133 25F697C6 after A46 canonical-HD binding review. idx15-23 map to ANCIENT RUINS/ALPINE/GIALLO MODENA/BIANCO AVUS/GRIGIO ALLOY/ARGENTO NURBURGRING/ROSSO SCUDERIA/BLU MIRABEAU/NERO; Ferrari/model idx0-14 are protected. Candidate 08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013: 9/9 bbox+size+positive margins, changed outside/alpha/protected/source-residue/overlap/touch all 0; controller SOURCE/CLEAN/FINAL visual PASS. Independent C + in-game pending. RUNTIME_VALIDATION=UNTESTED.",
+    "A_PRODUCTION41-A45 retried C177-returned odd index 95 37759842. All worker numeric gates reached 33/33 PASS with zero outside/alpha/protected/residue/overlap/touch, but mandatory controller visual QA rejected every retry. Latest A45 68e31ca94c9003cd0acd572fdcecf17d52c56b6848ee558c1359d87b6d382fcd still leaves source-shaped YES/NO/mode/RANDOM clean-plate traces and donor-boundary artifacts. Remains REWORK_REQUIRED; do not repeat harmonic/row-span/fitted-field/class-donor inpaint families. RUNTIME_VALIDATION=UNTESTED.",
     "B_PRODUCTION128 completed C176-returned even index 28 A05BF610 candidate bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8. 1/1 bbox/size/positive-margin and zero outside/alpha/protected/overlap gates PASS; controller SOURCE/CLEAN/FINAL,row,raw mirror_y visual self-QA PASS. Right-edge residue and border-touch artifacts are removed, border/glow continuity is preserved, and compact tracking matches the source family. Independent C + in-game pending; RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION27 completed odd index 241 E1639D2E candidate fe9bb931d94a13a44a08bcf61b6325c01080b462afff84f92c97205cbe0eea65: Loading→로딩 and PLEASE WAIT→잠시만요 from authoritative 1024x256 RGBA32/BGRA HD. Same-run controller review corrected centered/tall Hangul to source-left alignment and wide/low Loading proportions. Final 2/2 readable+raw bbox, source-size ceiling, positive margins; clean/final validators and zero residue/outside/alpha/protected/overlap/touch PASS; visual self-QA PASS. Independent C + in-game pending; RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION26 completed C163-returned odd index 55 2EA557B4 candidate b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc: NEXT ROUND→다음 라운드 now uses actual NotoSansCJK-Bold, source-derived filled cyan/white/blue vertical gradient, navy outer edge, white mid edge, lower-right depth and source-like slant while retaining constrained DXT5 boundary safety. 1/1 bbox+size+positive margin, clean/final and zero outside/alpha/protected/residue PASS; visual self-QA PASS. Independent C + in-game pending; RUNTIME_VALIDATION=UNTESTED.",
@@ -3924,13 +3926,12 @@
     "c176_return_resolved": true,
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_artwork_localize_text": 16,
-  "current_producer_rework_remaining": 4,
+  "current_pending_artwork_localize_text": 15,
+  "current_producer_rework_remaining": 3,
   "current_producer_rework_assets": [
     "63C91067",
     "C598919A",
-    "37759842",
-    "560FA536"
+    "37759842"
   ],
   "latest_b_production": {
     "run": "B_PRODUCTION128",
@@ -3981,5 +3982,65 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C177-C179-BATCH/C177_C179_BATCH_FINAL_QA.json"
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C177-C179-BATCH/C177_C179_BATCH_FINAL_QA.json",
+  "a_production45_37759842_rework": {
+    "run": "20261005-A-PRODUCTION45",
+    "index": 95,
+    "asset": "37759842",
+    "rejected_candidate_sha256": "68e31ca94c9003cd0acd572fdcecf17d52c56b6848ee558c1359d87b6d382fcd",
+    "status": "REWORK_REQUIRED_VISUAL_CLEAN_PLATE_GHOSTS",
+    "numeric_qa": "33/33 PASS; zero reported outside/alpha/protected/residue/overlap/touch",
+    "controller_visual_qa": "FAIL",
+    "report": "localization/graphics/role_A/20261005-A-PRODUCTION45/A45_CONTROLLER_REWORK.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "a_production47_25f697c6": {
+    "run": "20261005-A-PRODUCTION47",
+    "index": 133,
+    "asset": "25F697C6",
+    "candidate_sha256": "08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013",
+    "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "localized_indices": [
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "protected_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "machine_qa": {
+      "bbox_size_positive_margin": "9/9 PASS",
+      "changed_outside": 0,
+      "alpha_outside": 0,
+      "protected_changed": 0,
+      "clean_source_unchanged": 0,
+      "source_residue": 0,
+      "overlap": 0,
+      "touch": 0
+    },
+    "controller_visual_qa": "PASS",
+    "report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_25F697C6_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
+  }
 }
