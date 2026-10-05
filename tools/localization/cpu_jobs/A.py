@@ -159,7 +159,7 @@ render_out=count(ImageChops.multiply(newmask,ImageOps.invert(allowed)))
 
 # Exact source text residue check outside the newly rendered Hangul footprint within the Rank bbox.
 same=ImageOps.invert(dmask(src,dec))
-source_alpha=bmask(src.getchannel("A"))
+source_alpha=ImageChops.multiply(bmask(src.getchannel("A")),allowed)
 guard=newmask.filter(ImageFilter.MaxFilter(5))
 residue=count(ImageChops.multiply(source_alpha,ImageChops.multiply(same,ImageOps.invert(guard))))
 if any(v!=0 for v in [outside,alpha_out,protected_changed,clean_out,clean_protected,render_out,residue]):
