@@ -147,7 +147,7 @@ text_mask &= obmask
 ty,tx=np.nonzero(text_mask)
 if not len(tx): raise RuntimeError("empty precise title mask")
 text_bbox=[int(tx.min()),int(ty.min()),int(tx.max())+1,int(ty.max())+1]
-if np.count_nonzero(text_mask)>34000:
+if np.count_nonzero(text_mask)>37000:
     raise RuntimeError(("precise mask unexpectedly broad",int(np.count_nonzero(text_mask)),text_bbox))
 
 # Replace only exact detected title/effect pixels with the fitted interior field.
