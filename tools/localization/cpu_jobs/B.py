@@ -64,7 +64,7 @@ for idx in (0,1):
     gx0=rx0+int(xs.min()); gy0=ry0+int(ys.min()); gx1=rx0+int(xs.max())+1; gy1=ry0+int(ys.max())+1
     if gx1-gx0>cw*.50 or gy1-gy0>ch*.16: raise RuntimeError(("title discovery implausible",idx,[gx0,gy0,gx1,gy1]))
     m=np.zeros((H,W),bool); m[ry0:ry1,rx0:rx1]=core
-    pim=Image.fromarray((m.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(25))
+    pim=Image.fromarray((m.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(7))
     pm=np.asarray(pim)>0
     pys,pxs=np.nonzero(pm)
     bx0=int(pxs.min()); by0=int(pys.min()); bx1=int(pxs.max())+1; by1=int(pys.max())+1
@@ -84,7 +84,7 @@ for row in rows:
     nx0=max(0,int(nxs.min())-10); ny0=max(0,int(nys.min())-10); nx1=min(navy.shape[1],int(nxs.max())+11); ny1=min(navy.shape[0],int(nys.max())+11)
     core=np.zeros_like(navy); core[ny0:ny1,nx0:nx1]=(white|navy)[ny0:ny1,nx0:nx1]
     m=Image.new("L",(W,H),0); patch=Image.fromarray((core.astype(np.uint8)*255),"L"); m.paste(patch,(rx0,ry0))
-    m=m.filter(ImageFilter.MaxFilter(25))
+    m=m.filter(ImageFilter.MaxFilter(7))
     source_mask_img=ImageChops.lighter(source_mask_img,m)
 source_mask=bmask(source_mask_img)
 allowed=Image.new("L",(W,H),0)
@@ -99,7 +99,7 @@ white_rgb=tuple(int(round(float(np.median(pix[white_sel,k].astype(np.float32))))
 navy_rgb=tuple(int(round(float(np.median(pix[navy_sel,k].astype(np.float32))))) for k in range(3))
 white=white_rgb+(255,); navy=navy_rgb+(255,)
 
-# Patterned/gradient plate reconstruction. B104 scanline interpolation produced
+# Exact source-text mask uses the strict white/navy glyph/effect core plus only a 3px antialias fringe; B104's wider dilation still reached plate border artwork.\n# Patterned/gradient plate reconstruction. B105 scanline interpolation produced
 # vertical banding because letter-shaped mask fragments used different anchors.
 # Use normalized Gaussian surface reconstruction: masked source-text/effect pixels
 # have zero sampling weight, surrounding protected plate pixels contribute smoothly.
