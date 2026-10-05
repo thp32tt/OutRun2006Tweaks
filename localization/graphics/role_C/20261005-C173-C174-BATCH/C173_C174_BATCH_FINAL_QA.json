@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C173-C174-BATCH",
+  "timestamp_kst": "2026-10-05T16:35:00+09:00",
+  "results": [
+    {
+      "qa_id": "C173",
+      "queue_index": 28,
+      "asset": "A05BF610",
+      "candidate_sha256": "d124775363f3e989a312d13fa0ee17436a28cd927837933b0ea9c8a98a89e6a2",
+      "decision": "C173_REWORK_REQUIRED_SOURCE_TEXT_RESIDUE"
+    },
+    {
+      "qa_id": "C174",
+      "queue_index": 95,
+      "asset": "37759842",
+      "candidate_sha256": "d43a8476c72552486dd2352740e21cf87a0767765ef6440111d1be02e37ba825",
+      "decision": "C174_REWORK_REQUIRED_SOURCE_TEXT_RESIDUE"
+    }
+  ],
+  "completed_prior_pass_repeated": false,
+  "queue_counts": {
+    "localize_text": 81,
+    "zoom_review": 45,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_brand_song_credit": 1
+  },
+  "pending_artwork_localize_text": 17,
+  "producer_rework_assets": [
+    "63C91067",
+    "C598919A",
+    "A05BF610",
+    "37759842"
+  ],
+  "strict_hold_assets": [
+    "4F68708E",
+    "F6811E94",
+    "49BB5FE5",
+    "75C3586A"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
