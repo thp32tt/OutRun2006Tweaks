@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C177-C179-BATCH",
+  "timestamp_kst": "2026-10-05T17:56:29+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "candidate_changed_by_C": false,
+  "assets_checked": [
+    {
+      "qa_id": "C177",
+      "asset": "37759842",
+      "decision": "C177_REWORK_REQUIRED_CLEAN_PLATE_SOURCE_EFFECT_RESIDUE"
+    },
+    {
+      "qa_id": "C178",
+      "asset": "A05BF610",
+      "decision": "C178_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    },
+    {
+      "qa_id": "C179",
+      "asset": "560FA536",
+      "decision": "C179_REWORK_REQUIRED_SOURCE_BBOX_INCOMPLETE_SOURCE_RESIDUE"
+    }
+  ],
+  "result": "1_PIXEL_VISUAL_PASS_2_REWORK_REQUIRED",
+  "pixel_visual_pass_assets": [
+    "A05BF610"
+  ],
+  "rework_required_assets": [
+    "37759842",
+    "560FA536"
+  ],
+  "global_rework_remaining": [
+    "63C91067",
+    "C598919A",
+    "37759842",
+    "560FA536"
+  ],
+  "pending_c_localize_text": 0,
+  "pending_artwork_localize_text": 16,
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94",
+    "49BB5FE5",
+    "75C3586A"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
