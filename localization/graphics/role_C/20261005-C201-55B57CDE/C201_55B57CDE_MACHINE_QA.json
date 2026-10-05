@@ -1,0 +1,1487 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C201-55B57CDE",
+  "qa_id": "C201",
+  "queue_index": 161,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "producer_run": "20261005-A-PRODUCTION56-DXT5",
+  "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+  "candidate_sha256": "78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812",
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "mipmaps": 1,
+    "format": "DXT5",
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "semantic_policy_pass": true,
+  "source_bbox_exact_match_all": true,
+  "candidate_bbox_exact_match_all": true,
+  "row_checks": [
+    {
+      "idx": 0,
+      "source": "VIRGO",
+      "korean": "처녀자리",
+      "independent_source_bbox": [
+        1,
+        1991,
+        177,
+        2042
+      ],
+      "producer_source_bbox": [
+        1,
+        1991,
+        177,
+        2042
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        17,
+        1996,
+        162,
+        2036
+      ],
+      "producer_localized_bbox": [
+        17,
+        1996,
+        162,
+        2036
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 16,
+      "delta_right": 15,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 1,
+      "source": "TAURUS",
+      "korean": "황소자리",
+      "independent_source_bbox": [
+        717,
+        1991,
+        948,
+        2042
+      ],
+      "producer_source_bbox": [
+        717,
+        1991,
+        948,
+        2042
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        761,
+        1996,
+        906,
+        2036
+      ],
+      "producer_localized_bbox": [
+        761,
+        1996,
+        906,
+        2036
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 44,
+      "delta_right": 42,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 2,
+      "source": "SCORPIO",
+      "korean": "전갈자리",
+      "independent_source_bbox": [
+        2,
+        1927,
+        246,
+        1978
+      ],
+      "producer_source_bbox": [
+        2,
+        1927,
+        246,
+        1978
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        51,
+        1932,
+        196,
+        1972
+      ],
+      "producer_localized_bbox": [
+        51,
+        1932,
+        196,
+        1972
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 49,
+      "delta_right": 50,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 3,
+      "source": "SAGITTARIUS",
+      "korean": "사수자리",
+      "independent_source_bbox": [
+        717,
+        1927,
+        1089,
+        1978
+      ],
+      "producer_source_bbox": [
+        717,
+        1927,
+        1089,
+        1978
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        831,
+        1932,
+        976,
+        1972
+      ],
+      "producer_localized_bbox": [
+        831,
+        1932,
+        976,
+        1972
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 114,
+      "delta_right": 113,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 4,
+      "source": "PISCES",
+      "korean": "물고기자리",
+      "independent_source_bbox": [
+        6,
+        1863,
+        209,
+        1914
+      ],
+      "producer_source_bbox": [
+        6,
+        1863,
+        209,
+        1914
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        16,
+        1868,
+        199,
+        1908
+      ],
+      "producer_localized_bbox": [
+        16,
+        1868,
+        199,
+        1908
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 10,
+      "delta_right": 10,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 5,
+      "source": "LIBRA",
+      "korean": "천칭자리",
+      "independent_source_bbox": [
+        717,
+        1864,
+        888,
+        1912
+      ],
+      "producer_source_bbox": [
+        717,
+        1864,
+        888,
+        1912
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        731,
+        1868,
+        876,
+        1908
+      ],
+      "producer_localized_bbox": [
+        731,
+        1868,
+        876,
+        1908
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 14,
+      "delta_right": 12,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 6,
+      "source": "LEO",
+      "korean": "사자자리",
+      "independent_source_bbox": [
+        5,
+        1799,
+        110,
+        1850
+      ],
+      "producer_source_bbox": [
+        5,
+        1799,
+        110,
+        1850
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        12,
+        1811,
+        104,
+        1836
+      ],
+      "producer_localized_bbox": [
+        12,
+        1811,
+        104,
+        1836
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 7,
+      "delta_right": 6,
+      "delta_top": 12,
+      "delta_bottom": 14,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 7,
+      "source": "GEMINI",
+      "korean": "쌍둥이자리",
+      "independent_source_bbox": [
+        717,
+        1799,
+        924,
+        1850
+      ],
+      "producer_source_bbox": [
+        717,
+        1799,
+        924,
+        1850
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        730,
+        1804,
+        913,
+        1844
+      ],
+      "producer_localized_bbox": [
+        730,
+        1804,
+        913,
+        1844
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 13,
+      "delta_right": 11,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 8,
+      "source": "CAPRICORN",
+      "korean": "염소자리",
+      "independent_source_bbox": [
+        5,
+        1735,
+        332,
+        1786
+      ],
+      "producer_source_bbox": [
+        5,
+        1735,
+        332,
+        1786
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        98,
+        1740,
+        242,
+        1780
+      ],
+      "producer_localized_bbox": [
+        98,
+        1740,
+        242,
+        1780
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 93,
+      "delta_right": 90,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 9,
+      "source": "CANCER",
+      "korean": "게자리",
+      "independent_source_bbox": [
+        717,
+        1735,
+        952,
+        1786
+      ],
+      "producer_source_bbox": [
+        717,
+        1735,
+        952,
+        1786
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        782,
+        1740,
+        890,
+        1780
+      ],
+      "producer_localized_bbox": [
+        782,
+        1740,
+        890,
+        1780
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 65,
+      "delta_right": 62,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 10,
+      "source": "ARIES",
+      "korean": "양자리",
+      "independent_source_bbox": [
+        1,
+        1671,
+        174,
+        1722
+      ],
+      "producer_source_bbox": [
+        1,
+        1671,
+        174,
+        1722
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        34,
+        1676,
+        141,
+        1716
+      ],
+      "producer_localized_bbox": [
+        34,
+        1676,
+        141,
+        1716
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 33,
+      "delta_right": 33,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 11,
+      "source": "AQUARIUS",
+      "korean": "물병자리",
+      "independent_source_bbox": [
+        717,
+        1671,
+        1013,
+        1725
+      ],
+      "producer_source_bbox": [
+        717,
+        1671,
+        1013,
+        1725
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        785,
+        1676,
+        947,
+        1720
+      ],
+      "producer_localized_bbox": [
+        785,
+        1676,
+        947,
+        1720
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 68,
+      "delta_right": 66,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 12,
+      "source": "THAILAND",
+      "korean": "태국",
+      "independent_source_bbox": [
+        0,
+        1608,
+        288,
+        1656
+      ],
+      "producer_source_bbox": [
+        0,
+        1608,
+        288,
+        1656
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        108,
+        1612,
+        180,
+        1652
+      ],
+      "producer_localized_bbox": [
+        108,
+        1612,
+        180,
+        1652
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 108,
+      "delta_right": 108,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 13,
+      "source": "SWITZERLAND",
+      "korean": "스위스",
+      "independent_source_bbox": [
+        717,
+        1607,
+        1137,
+        1658
+      ],
+      "producer_source_bbox": [
+        717,
+        1607,
+        1137,
+        1658
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        871,
+        1612,
+        984,
+        1652
+      ],
+      "producer_localized_bbox": [
+        871,
+        1612,
+        984,
+        1652
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 154,
+      "delta_right": 153,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 14,
+      "source": "SWEDEN",
+      "korean": "스웨덴",
+      "independent_source_bbox": [
+        2,
+        1543,
+        251,
+        1594
+      ],
+      "producer_source_bbox": [
+        2,
+        1543,
+        251,
+        1594
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        71,
+        1548,
+        181,
+        1588
+      ],
+      "producer_localized_bbox": [
+        71,
+        1548,
+        181,
+        1588
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 69,
+      "delta_right": 70,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 15,
+      "source": "SPAIN",
+      "korean": "스페인",
+      "independent_source_bbox": [
+        717,
+        1543,
+        884,
+        1594
+      ],
+      "producer_source_bbox": [
+        717,
+        1543,
+        884,
+        1594
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        747,
+        1548,
+        856,
+        1588
+      ],
+      "producer_localized_bbox": [
+        747,
+        1548,
+        856,
+        1588
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 30,
+      "delta_right": 28,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 16,
+      "source": "SOUTH KOREA",
+      "korean": "대한민국",
+      "independent_source_bbox": [
+        2,
+        1479,
+        403,
+        1530
+      ],
+      "producer_source_bbox": [
+        2,
+        1479,
+        403,
+        1530
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        127,
+        1484,
+        277,
+        1524
+      ],
+      "producer_localized_bbox": [
+        127,
+        1484,
+        277,
+        1524
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 125,
+      "delta_right": 126,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 17,
+      "source": "SINGAPORE",
+      "korean": "싱가포르",
+      "independent_source_bbox": [
+        717,
+        1479,
+        1047,
+        1530
+      ],
+      "producer_source_bbox": [
+        717,
+        1479,
+        1047,
+        1530
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        806,
+        1484,
+        957,
+        1524
+      ],
+      "producer_localized_bbox": [
+        806,
+        1484,
+        957,
+        1524
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 89,
+      "delta_right": 90,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 18,
+      "source": "OTHER",
+      "korean": "기타",
+      "independent_source_bbox": [
+        5,
+        1415,
+        194,
+        1466
+      ],
+      "producer_source_bbox": [
+        5,
+        1415,
+        194,
+        1466
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        64,
+        1420,
+        136,
+        1460
+      ],
+      "producer_localized_bbox": [
+        64,
+        1420,
+        136,
+        1460
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 59,
+      "delta_right": 58,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 19,
+      "source": "NORWAY",
+      "korean": "노르웨이",
+      "independent_source_bbox": [
+        717,
+        1415,
+        964,
+        1466
+      ],
+      "producer_source_bbox": [
+        717,
+        1415,
+        964,
+        1466
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        769,
+        1420,
+        914,
+        1460
+      ],
+      "producer_localized_bbox": [
+        769,
+        1420,
+        914,
+        1460
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 52,
+      "delta_right": 50,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 20,
+      "source": "NORTH KOREA",
+      "korean": "북한",
+      "independent_source_bbox": [
+        6,
+        1351,
+        404,
+        1402
+      ],
+      "producer_source_bbox": [
+        6,
+        1351,
+        404,
+        1402
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        169,
+        1356,
+        242,
+        1396
+      ],
+      "producer_localized_bbox": [
+        169,
+        1356,
+        242,
+        1396
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 163,
+      "delta_right": 162,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 21,
+      "source": "NEW ZEALAND",
+      "korean": "뉴질랜드",
+      "independent_source_bbox": [
+        717,
+        1352,
+        1132,
+        1400
+      ],
+      "producer_source_bbox": [
+        717,
+        1352,
+        1132,
+        1400
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        852,
+        1356,
+        1000,
+        1396
+      ],
+      "producer_localized_bbox": [
+        852,
+        1356,
+        1000,
+        1396
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 135,
+      "delta_right": 132,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 22,
+      "source": "MEXICO",
+      "korean": "멕시코",
+      "independent_source_bbox": [
+        6,
+        1287,
+        230,
+        1338
+      ],
+      "producer_source_bbox": [
+        6,
+        1287,
+        230,
+        1338
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        63,
+        1292,
+        172,
+        1332
+      ],
+      "producer_localized_bbox": [
+        63,
+        1292,
+        172,
+        1332
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 57,
+      "delta_right": 58,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 23,
+      "source": "JAPAN",
+      "korean": "일본",
+      "independent_source_bbox": [
+        717,
+        1288,
+        898,
+        1338
+      ],
+      "producer_source_bbox": [
+        717,
+        1288,
+        898,
+        1338
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        771,
+        1292,
+        844,
+        1332
+      ],
+      "producer_localized_bbox": [
+        771,
+        1292,
+        844,
+        1332
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 54,
+      "delta_right": 54,
+      "delta_top": 4,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 24,
+      "source": "ITALY",
+      "korean": "이탈리아",
+      "independent_source_bbox": [
+        6,
+        1224,
+        160,
+        1272
+      ],
+      "producer_source_bbox": [
+        6,
+        1224,
+        160,
+        1272
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        12,
+        1228,
+        156,
+        1267
+      ],
+      "producer_localized_bbox": [
+        12,
+        1228,
+        156,
+        1267
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 6,
+      "delta_right": 4,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 25,
+      "source": "HONG KONG",
+      "korean": "홍콩",
+      "independent_source_bbox": [
+        717,
+        1223,
+        1052,
+        1274
+      ],
+      "producer_source_bbox": [
+        717,
+        1223,
+        1052,
+        1274
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        849,
+        1228,
+        923,
+        1268
+      ],
+      "producer_localized_bbox": [
+        849,
+        1228,
+        923,
+        1268
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 132,
+      "delta_right": 129,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 26,
+      "source": "GERMANY",
+      "korean": "독일",
+      "independent_source_bbox": [
+        5,
+        1159,
+        293,
+        1210
+      ],
+      "producer_source_bbox": [
+        5,
+        1159,
+        293,
+        1210
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        114,
+        1164,
+        185,
+        1204
+      ],
+      "producer_localized_bbox": [
+        114,
+        1164,
+        185,
+        1204
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 109,
+      "delta_right": 108,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 27,
+      "source": "FRANCE",
+      "korean": "프랑스",
+      "independent_source_bbox": [
+        717,
+        1159,
+        945,
+        1210
+      ],
+      "producer_source_bbox": [
+        717,
+        1159,
+        945,
+        1210
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        775,
+        1164,
+        888,
+        1204
+      ],
+      "producer_localized_bbox": [
+        775,
+        1164,
+        888,
+        1204
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 58,
+      "delta_right": 57,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 28,
+      "source": "FINLAND",
+      "korean": "핀란드",
+      "independent_source_bbox": [
+        5,
+        1096,
+        254,
+        1144
+      ],
+      "producer_source_bbox": [
+        5,
+        1096,
+        254,
+        1144
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        72,
+        1100,
+        187,
+        1140
+      ],
+      "producer_localized_bbox": [
+        72,
+        1100,
+        187,
+        1140
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 67,
+      "delta_right": 67,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 29,
+      "source": "NETHERLANDS",
+      "korean": "네덜란드",
+      "independent_source_bbox": [
+        717,
+        1095,
+        1137,
+        1146
+      ],
+      "producer_source_bbox": [
+        717,
+        1095,
+        1137,
+        1146
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        853,
+        1100,
+        1003,
+        1140
+      ],
+      "producer_localized_bbox": [
+        853,
+        1100,
+        1003,
+        1140
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 136,
+      "delta_right": 134,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 30,
+      "source": "DENMARK",
+      "korean": "덴마크",
+      "independent_source_bbox": [
+        5,
+        1032,
+        294,
+        1080
+      ],
+      "producer_source_bbox": [
+        5,
+        1032,
+        294,
+        1080
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        94,
+        1036,
+        205,
+        1076
+      ],
+      "producer_localized_bbox": [
+        94,
+        1036,
+        205,
+        1076
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 89,
+      "delta_right": 89,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 31,
+      "source": "CHINA",
+      "korean": "중국",
+      "independent_source_bbox": [
+        717,
+        1031,
+        899,
+        1082
+      ],
+      "producer_source_bbox": [
+        717,
+        1031,
+        899,
+        1082
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        769,
+        1036,
+        847,
+        1076
+      ],
+      "producer_localized_bbox": [
+        769,
+        1036,
+        847,
+        1076
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 52,
+      "delta_right": 52,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 32,
+      "source": "CANADA",
+      "korean": "캐나다",
+      "independent_source_bbox": [
+        5,
+        967,
+        241,
+        1018
+      ],
+      "producer_source_bbox": [
+        5,
+        967,
+        241,
+        1018
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        68,
+        972,
+        180,
+        1012
+      ],
+      "producer_localized_bbox": [
+        68,
+        972,
+        180,
+        1012
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 63,
+      "delta_right": 61,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 33,
+      "source": "BRITAIN",
+      "korean": "영국",
+      "independent_source_bbox": [
+        717,
+        968,
+        944,
+        1016
+      ],
+      "producer_source_bbox": [
+        717,
+        968,
+        944,
+        1016
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        795,
+        972,
+        868,
+        1012
+      ],
+      "producer_localized_bbox": [
+        795,
+        972,
+        868,
+        1012
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 78,
+      "delta_right": 76,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 34,
+      "source": "BELGIUM",
+      "korean": "벨기에",
+      "independent_source_bbox": [
+        6,
+        903,
+        262,
+        954
+      ],
+      "producer_source_bbox": [
+        6,
+        903,
+        262,
+        954
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        79,
+        908,
+        189,
+        948
+      ],
+      "producer_localized_bbox": [
+        79,
+        908,
+        189,
+        948
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 73,
+      "delta_right": 73,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 35,
+      "source": "AUSTRIA",
+      "korean": "오스트리아",
+      "independent_source_bbox": [
+        717,
+        903,
+        970,
+        954
+      ],
+      "producer_source_bbox": [
+        717,
+        903,
+        970,
+        954
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        751,
+        908,
+        937,
+        948
+      ],
+      "producer_localized_bbox": [
+        751,
+        908,
+        937,
+        948
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 34,
+      "delta_right": 33,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 36,
+      "source": "AUSTRALIA",
+      "korean": "호주",
+      "independent_source_bbox": [
+        1,
+        839,
+        337,
+        890
+      ],
+      "producer_source_bbox": [
+        1,
+        839,
+        337,
+        890
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        133,
+        844,
+        207,
+        884
+      ],
+      "producer_localized_bbox": [
+        133,
+        844,
+        207,
+        884
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 132,
+      "delta_right": 130,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 37,
+      "source": "USA",
+      "korean": "미국",
+      "independent_source_bbox": [
+        717,
+        839,
+        832,
+        890
+      ],
+      "producer_source_bbox": [
+        717,
+        839,
+        832,
+        890
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        740,
+        844,
+        811,
+        884
+      ],
+      "producer_localized_bbox": [
+        740,
+        844,
+        811,
+        884
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 23,
+      "delta_right": 21,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "row_gate": "38/38 PASS",
+  "machine_checks": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_residue_exact_pixels_outside_localized_bboxes": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "changed_dxt5_blocks": 33833,
+    "changed_dxt5_blocks_wholly_outside_allowed": 0
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "preview_files": [
+    "localization/graphics/role_C/20261005-C201-55B57CDE/C201_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_C/20261005-C201-55B57CDE/C201_RAW_COMPARE.jpg"
+  ]
+}

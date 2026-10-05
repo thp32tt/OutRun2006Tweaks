@@ -1,0 +1,24 @@
+{
+  "run": "20261005-C201-55B57CDE",
+  "qa_id": "C201",
+  "index": 161,
+  "asset": "55B57CDE",
+  "candidate_sha256": "78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812",
+  "machine_status": "PASS",
+  "row_gate": "38/38 PASS",
+  "semantic_policy_pass": true,
+  "source_bbox_exact_match_all": true,
+  "candidate_bbox_exact_match_all": true,
+  "machine_checks": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_residue_exact_pixels_outside_localized_bboxes": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "changed_dxt5_blocks": 33833,
+    "changed_dxt5_blocks_wholly_outside_allowed": 0
+  },
+  "report": "localization/graphics/role_C/20261005-C201-55B57CDE/C201_55B57CDE_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}

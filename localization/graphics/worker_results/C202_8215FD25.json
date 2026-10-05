@@ -1,0 +1,22 @@
+{
+  "run": "20261005-C202-8215FD25",
+  "qa_id": "C202",
+  "index": 30,
+  "asset": "8215FD25",
+  "candidate_sha256": "cb023fa5533b4a058c437c1a879b2952a7268308e47202f7dced32c6a563e141",
+  "machine_status": "PASS",
+  "row_gate": "2/2 PASS",
+  "machine_checks": {
+    "decoded_source_vs_producer_source_png_diff_pixels": 0,
+    "decoded_final_vs_producer_final_png_diff_pixels": 0,
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "localized_render_outside_union_source_bboxes": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "template_patch_diff_pixels": 0,
+    "template_patch_max_channel_delta": 0
+  },
+  "report": "localization/graphics/role_C/20261005-C202-8215FD25/C202_8215FD25_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}

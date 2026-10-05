@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C202-8215FD25",
+  "qa_id": "C202",
+  "queue_index": 30,
+  "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+  "producer_run": "20261005-B-PRODUCTION148-8215-C200-TEMPLATE",
+  "source_sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e",
+  "candidate_sha256": "cb023fa5533b4a058c437c1a879b2952a7268308e47202f7dced32c6a563e141",
+  "structure": {
+    "width": 4096,
+    "height": 2048,
+    "mipmaps": 1,
+    "format": "\u0000\u0000\u0000\u0000",
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "semantic_binding": "PASS_TOTAL_RANK_X2_TO_종합_랭킹",
+  "row_checks": [
+    {
+      "region_idx": 1,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        1829,
+        1179,
+        2364,
+        1281
+      ],
+      "independent_localized_bbox": [
+        1980,
+        1198,
+        2212,
+        1262
+      ],
+      "producer_localized_bbox": [
+        1980,
+        1198,
+        2212,
+        1262
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 151,
+      "delta_right": 152,
+      "delta_top": 19,
+      "delta_bottom": 19,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 2,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        1682,
+        150,
+        2216,
+        252
+      ],
+      "independent_localized_bbox": [
+        1833,
+        169,
+        2065,
+        233
+      ],
+      "producer_localized_bbox": [
+        1833,
+        169,
+        2065,
+        233
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 151,
+      "delta_right": 151,
+      "delta_top": 19,
+      "delta_bottom": 19,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "row_gate": "2/2 PASS",
+  "machine_checks": {
+    "decoded_source_vs_producer_source_png_diff_pixels": 0,
+    "decoded_final_vs_producer_final_png_diff_pixels": 0,
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "localized_render_outside_union_source_bboxes": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "template_patch_diff_pixels": 0,
+    "template_patch_max_channel_delta": 0
+  },
+  "machine_status": "PASS",
+  "template_provenance": {
+    "source": "C193-approved B137 63C_CLEAN_PLATE.png",
+    "shift": [
+      1088,
+      0
+    ],
+    "target_patch": [
+      1829,
+      1179,
+      2364,
+      1281
+    ]
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "preview_files": [
+    "localization/graphics/role_C/20261005-C202-8215FD25/C202_STARBURST_FOCUS.jpg"
+  ]
+}
