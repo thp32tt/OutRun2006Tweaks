@@ -604,7 +604,7 @@ namespace WheelProfileStore
             if (auto v=pick("TireSlip","0.04")) return v;
             if (auto v=pick("UsePeriodicEffects","false")) return v;
             if (auto v=pick("InvertForce","false")) return v;
-            if (auto v=pick("InvertSpring","false")) return v;
+            if (auto v=pick("InvertSpring","true")) return v;
         }
         else if (model == 3) // PS2 Original
         {
