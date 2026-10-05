@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION74-PREFLIGHT",
+  "timestamp_kst": "2026-10-05T10:53:51+09:00",
+  "index": 176,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "expected_transcription": [
+    "FLAGMAN 4",
+    "HOLLY",
+    "JENNIFER",
+    "CLARISSA"
+  ],
+  "controller_observation": "Canonical 2048x2048 RGBA32 source/atlas contains portraits, route/map and UI artwork but no source glyph/effect pixels for the four transcribed names. Exact original text bboxes therefore cannot be established from the authoritative HD source.",
+  "decision": "HOLD_STRICT_RECHECK_SOURCE_TEXT_ABSENT_CANONICAL_HD",
+  "candidate_persisted": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
