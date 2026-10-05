@@ -1,0 +1,17 @@
+{
+  "run": "20261005-B-PRODUCTION126",
+  "index": 28,
+  "asset": "A05BF610",
+  "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+  "candidate_sha256": "c6363f69034001252b5cd67577c3ace4e89a5aa8e5d69d75adf1ad9da7094cb1",
+  "localized_physical_elements": 1,
+  "bbox_size_positive_margin": "1/1",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "outside": 0,
+  "alpha_outside": 0,
+  "protected_lens_flare_cell_changed": 0,
+  "worker_status": "B126_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION126/B126_A05_REPORT.json"
+}
