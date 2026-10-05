@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C184-63C91067",
+  "qa_id": "C184",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION135",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "candidate_sha256": "ef51bc2653cc52796c632e57c53dfb8ac27c40706059881960ea030810a1cdd0",
+  "independent_source_decode_matches_producer_png": true,
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "row_checks": [
+    {
+      "region_idx": 0,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        747,
+        1174,
+        1271,
+        1275
+      ],
+      "localized_bbox": [
+        861,
+        1184,
+        1157,
+        1265
+      ],
+      "delta_left": 114,
+      "delta_right": 114,
+      "delta_top": 10,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "clean_changed_pixels": 40148,
+      "source_equal_final_outside_korean_guard": 0
+    },
+    {
+      "region_idx": 1,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        599,
+        156,
+        1124,
+        246
+      ],
+      "localized_bbox": [
+        713,
+        160,
+        1009,
+        241
+      ],
+      "delta_left": 114,
+      "delta_right": 115,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "clean_changed_pixels": 32669,
+      "source_equal_final_outside_korean_guard": 0
+    }
+  ],
+  "all_2_bbox_size_positive_margin_pass": true,
+  "machine_checks": {
+    "clean_changed_outside_union_source_bboxes": 0,
+    "final_changed_outside_union_source_bboxes": 0,
+    "clean_alpha_outside_union_source_bboxes": 0,
+    "final_alpha_outside_union_source_bboxes": 0,
+    "render_outside_union_source_bboxes": 0,
+    "protected_clean_changed": 0,
+    "protected_final_changed": 0,
+    "removed_source_pixels_unchanged_in_final_outside_korean_guard": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_pair_1px_touch_pixels": 0
+  },
+  "edge_continuity_proxy": [
+    {
+      "region_idx": 0,
+      "edges": [
+        {
+          "edge": "left",
+          "mean_abs_rgb_jump": 0.5214521288871765,
+          "max_abs_rgb_jump": 3
+        },
+        {
+          "edge": "right",
+          "mean_abs_rgb_jump": 3.4785478115081787,
+          "max_abs_rgb_jump": 167
+        },
+        {
+          "edge": "top",
+          "mean_abs_rgb_jump": 14.433842658996582,
+          "max_abs_rgb_jump": 248
+        },
+        {
+          "edge": "bottom",
+          "mean_abs_rgb_jump": 1.2264630794525146,
+          "max_abs_rgb_jump": 8
+        }
+      ]
+    },
+    {
+      "region_idx": 1,
+      "edges": [
+        {
+          "edge": "left",
+          "mean_abs_rgb_jump": 0.0,
+          "max_abs_rgb_jump": 0
+        },
+        {
+          "edge": "right",
+          "mean_abs_rgb_jump": 0.09259258955717087,
+          "max_abs_rgb_jump": 4
+        },
+        {
+          "edge": "top",
+          "mean_abs_rgb_jump": 1.3511110544204712,
+          "max_abs_rgb_jump": 19
+        },
+        {
+          "edge": "bottom",
+          "mean_abs_rgb_jump": 0.0,
+          "max_abs_rgb_jump": 0
+        }
+      ]
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "preview_b64_files": [
+    "localization/graphics/role_C/20261005-C184-63C91067/C184_ROW0_DETAIL_B64.txt",
+    "localization/graphics/role_C/20261005-C184-63C91067/C184_ROW1_DETAIL_B64.txt",
+    "localization/graphics/role_C/20261005-C184-63C91067/C184_OVERVIEW_B64.txt",
+    "localization/graphics/role_C/20261005-C184-63C91067/C184_RAW_B64.txt"
+  ]
+}
