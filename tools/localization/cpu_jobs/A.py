@@ -8,13 +8,13 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
 
-repo=Path.cwd(); run="20261005-A-PRODUCTION35"
+repo=Path.cwd(); run="20261005-A-PRODUCTION36"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset_rel="textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset_rel; candidate.parent.mkdir(parents=True,exist_ok=True)
 validator=repo/"tools/localization/validate_clean_plate.py"
-work=Path("/tmp/outrun_A35"); work.mkdir(parents=True,exist_ok=True)
+work=Path("/tmp/outrun_A36"); work.mkdir(parents=True,exist_ok=True)
 
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
@@ -187,6 +187,45 @@ def line_width(font,segments,stroke,gap):
     return total,max(hs or [1])
 
 def build_layer(lines,kind,bw,bh):
+    # Japanese expert labels intentionally use a much larger colored lead phrase
+    # and a smaller white tail. Preserve that source-intentional hierarchy.
+    if kind in ("expert_green","expert_orange"):
+        accent_txt,accent_role=lines[0][0]
+        tail_txt,tail_role=lines[0][1]
+        for bigfs in range(max(30,int(bh*.86)),20,-1):
+            smallfs=max(18,int(round(bigfs*.62)))
+            big=ImageFont.truetype(FONT,bigfs,index=FONT_INDEX)
+            small=ImageFont.truetype(FONT,smallfs,index=FONT_INDEX)
+            sb=max(2,min(8,int(round(bigfs*.055))))
+            ss=max(2,min(6,int(round(smallfs*.055))))
+            bb1=big.getbbox(accent_txt,stroke_width=sb); bb2=small.getbbox(tail_txt,stroke_width=ss)
+            w1=bb1[2]-bb1[0]; h1=bb1[3]-bb1[1]; w2=bb2[2]-bb2[0]; h2=bb2[3]-bb2[1]
+            gap=max(5,int(bigfs*.06)); maxh=max(h1,h2)
+            base=Image.new("RGBA",(w1+w2+gap+80,maxh+80),(0,0,0,0)); d=ImageDraw.Draw(base)
+            x=30; y1=35+(maxh-h1); y2=35+(maxh-h2)
+            f1,e1,sh1=palette(kind,accent_role); f2,e2,sh2=palette(kind,tail_role)
+            d.text((x-bb1[0]+3,y1-bb1[1]+4),accent_txt,font=big,fill=sh1,stroke_width=sb,stroke_fill=e1)
+            d.text((x-bb1[0],y1-bb1[1]),accent_txt,font=big,fill=f1,stroke_width=sb,stroke_fill=e1)
+            x+=w1+gap
+            d.text((x-bb2[0]+2,y2-bb2[1]+3),tail_txt,font=small,fill=sh2,stroke_width=ss,stroke_fill=e2)
+            d.text((x-bb2[0],y2-bb2[1]),tail_txt,font=small,fill=f2,stroke_width=ss,stroke_fill=e2)
+            alpha=base.getchannel("A"); glow=alpha.filter(ImageFilter.MaxFilter(9)).filter(ImageFilter.GaussianBlur(3))
+            gl=Image.new("RGBA",base.size,(250,250,250,0)); gl.putalpha(glow.point(lambda v:min(190,v)))
+            gl.alpha_composite(base); base=shear(gl,max(3,int(bigfs*.09)))
+            bb=base.getchannel("A").getbbox()
+            if not bb: continue
+            base=base.crop(bb)
+            target_w=int(bw*.94); target_h=int(bh*.90)
+            if base.height>target_h:
+                nw=max(1,int(round(base.width*target_h/base.height))); base=base.resize((nw,target_h),Image.Resampling.LANCZOS)
+            if base.width>target_w:
+                nh=max(1,int(round(base.height*target_w/base.width))); base=base.resize((target_w,nh),Image.Resampling.LANCZOS)
+            if base.width<target_w:
+                base=base.resize((target_w,base.height),Image.Resampling.LANCZOS)
+            if base.width<=bw-4 and base.height<=bh-4:
+                return base,bigfs,max(sb,ss)
+        raise RuntimeError(("cannot fit expert",kind,bw,bh))
+
     nlines=len(lines)
     maxfs=max(18,int(bh/max(1,nlines)*.78))
     for fs in range(maxfs,13,-1):
@@ -203,24 +242,16 @@ def build_layer(lines,kind,bw,bh):
             for txt,role in line:
                 fill,edge,shadow=palette(kind,role)
                 b=font.getbbox(txt,stroke_width=stroke); tw=b[2]-b[0]
-                # low-right shadow/depth then source-color fill + edge.
                 d.text((x-b[0]+max(2,stroke//2),y-b[1]+max(2,stroke//2)),txt,font=font,fill=shadow,stroke_width=stroke,stroke_fill=edge)
                 d.text((x-b[0],y-b[1]),txt,font=font,fill=fill,stroke_width=stroke,stroke_fill=edge)
                 x+=tw+seggap
             y+=lh+linegap
-        # Expert labels have an outer white glow around black outline.
-        if kind in ("expert_green","expert_orange"):
-            alpha=base.getchannel("A"); glow=alpha.filter(ImageFilter.MaxFilter(9)).filter(ImageFilter.GaussianBlur(3))
-            gl=Image.new("RGBA",base.size,(250,250,250,0)); gl.putalpha(glow.point(lambda v:min(190,v)))
-            gl.alpha_composite(base); base=gl
         amt=max(2,int(fs*.10)) if kind!="steering" else max(2,int(fs*.08))
         base=shear(base,amt)
         bb=base.getchannel("A").getbbox()
         if not bb: continue
         base=base.crop(bb)
-        # Fit height first, then widen Korean to preserve the source's long/low italic family.
         target_h=max(1,int(bh*.84)); target_w=max(1,int(bw*.90))
-        if kind in ("expert_green","expert_orange"): target_w=int(bw*.92); target_h=int(bh*.86)
         if kind in ("plate_tuned","plate_normal","plate_random"): target_w=int(bw*.84); target_h=int(bh*.78)
         if base.height>target_h:
             nw=max(1,int(round(base.width*target_h/base.height))); base=base.resize((nw,target_h),Image.Resampling.LANCZOS)
@@ -256,8 +287,8 @@ smp=out/"560FA536_HD_SOURCE_TEXT_MASK.png"; scp=out/"560FA536_HD_SOURCE_CORE_MAS
 ap=out/"560FA536_HD_ALLOWED_BBOX_MASK.png"; pp=out/"560FA536_HD_PROTECTED_VISIBLE_MASK.png"
 src.save(sp); clean.save(cp); source_text_mask.save(smp); source_core_mask.save(scp); allowed.save(ap)
 protected=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed)); protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--report",str(out/"A35_CLEAN_PLATE_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A35_CLEAN_PLATE_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--report",str(out/"A36_CLEAN_PLATE_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"A36_CLEAN_PLATE_VALIDATION.json").read_text())
 clean_diff=dmask(src,clean); clean_outside=count(ImageChops.multiply(clean_diff,ImageOps.invert(source_text_mask)))
 clean_same=ImageOps.invert(dmask(src,clean)); clean_core_unchanged=count(ImageChops.multiply(source_core_mask,clean_same))
 if cleanrep["status"]!="PASS" or clean_outside!=0 or clean_core_unchanged!=0:
@@ -287,8 +318,8 @@ decoded=decoded_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(decoded,final).getbbox() is not None: raise RuntimeError("roundtrip")
 dp=out/"560FA536_HD_FINAL_DECODED_READABLE.png"; decoded.save(dp)
 
-subprocess.run(["python3",str(validator),str(sp),str(dp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A35_FINAL_MASK_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"A35_FINAL_MASK_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(dp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A36_FINAL_MASK_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"A36_FINAL_MASK_VALIDATION.json").read_text())
 diff=dmask(src,decoded); outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
 alpha_diff=bmask(ImageChops.difference(src.getchannel("A"),decoded.getchannel("A"))); alpha_out=count(ImageChops.multiply(alpha_diff,ImageOps.invert(allowed)))
 protected_changed=count(ImageChops.multiply(diff,protected))
@@ -313,7 +344,7 @@ status=(cleanrep["status"]=="PASS" and finalrep["status"]=="PASS" and clean_outs
 thumbs=[flatten(z).resize((1024,1024),Image.Resampling.LANCZOS) for z in (src,clean,decoded)]
 sheet=Image.new("RGB",(3072,1024),(90,90,90))
 for i,q in enumerate(thumbs): sheet.paste(q,(i*1024,0))
-sheet.save(out/"A35_SOURCE_CLEAN_FINAL_QUARTER.jpg",quality=94)
+sheet.save(out/"A36_SOURCE_CLEAN_FINAL_QUARTER.jpg",quality=94)
 
 cards=[]
 for row in rows:
@@ -328,8 +359,8 @@ for row in rows:
     cards.append(card)
 cw=max(c.width for c in cards); ch=sum(c.height+3 for c in cards); contacts=Image.new("RGB",(cw,ch),(225,225,225)); yy=0
 for c in cards: contacts.paste(c,(0,yy)); yy+=c.height+3
-contacts.save(out/"A35_TARGET_CONTACTS.jpg",quality=95)
-flatten(decoded_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A35_FINAL_RAW_MIRROR_Y.jpg",quality=94)
+contacts.save(out/"A36_TARGET_CONTACTS.jpg",quality=95)
+flatten(decoded_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A36_FINAL_RAW_MIRROR_Y.jpg",quality=94)
 
 report={"schema_version":1,"role":"A","run":run,"index":101,"asset":asset_rel,"worker":"github-actions",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB_SHA1,"sha256":SOURCE_SHA},
@@ -344,13 +375,13 @@ report={"schema_version":1,"role":"A","run":run,"index":101,"asset":asset_rel,"w
                    "protected_visible_pixels_changed":protected_changed,"source_core_residue_pixels":residue,
                    "localized_overlap_pixels":overlap,"localized_1px_touch_pixels":touch},
  "all_13_bbox_size_positive_margin_pass":allbbox,"controller_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"UNTESTED",
- "status":"A35_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A35_WORKER_REWORK_REQUIRED"}
-(out/"A35_560FA536_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "status":"A36_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A36_WORKER_REWORK_REQUIRED"}
+(out/"A36_560FA536_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":101,"asset":"560FA536","candidate_sha256":CANDIDATE_SHA,"semantic_strings":12,"localized_physical_targets":13,
  "bbox_size_positive_margin":"13/13 PASS" if allbbox else "FAIL","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "changed_outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,"source_residue":residue,
  "clean_source_core_unchanged":clean_core_unchanged,"overlap":overlap,"touch":touch,"worker_status":report["status"],
- "runtime_validation":"UNTESTED","report":"localization/graphics/role_A/20261005-A-PRODUCTION35/A35_560FA536_REPORT.json"}
-(wr/"A35_560FA536.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "runtime_validation":"UNTESTED","report":"localization/graphics/role_A/20261005-A-PRODUCTION36/A36_560FA536_REPORT.json"}
+(wr/"A36_560FA536.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False,indent=2))
 if not status: raise SystemExit(2)
