@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C188-25F697C6",
+  "qa_id": "C188",
+  "timestamp_kst": "2026-10-05T19:02:14+09:00",
+  "queue_index": 133,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+  "source_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+  "candidate_sha256": "08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013",
+  "candidate_changed_by_C": false,
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "9/9 PASS",
+  "controller_visual_qa": "PASS",
+  "policy_checks": {
+    "stage_names": {
+      "ANCIENT RUINS": "에인션트 루인스",
+      "ALPINE": "알파인"
+    },
+    "protected_ferrari_model_labels": "pixel-exact outside target bboxes",
+    "raw_orientation": "mirror_y preserved"
+  },
+  "visual_findings": [
+    "Independent visible-alpha audit reproduces every actual localized bbox exactly and finds zero visible residue outside the localized bboxes, zero outside/alpha changes, and zero overlap/touch.",
+    "C independently generated an exact transparent clean plate for the nine localized cells; SOURCE/CLEAN/FINAL contacts show no source-script residue or patch artifact.",
+    "Wide/low gray wordmark proportions and relative tone remain materially source-like; protected Ferrari/model labels remain untouched."
+  ],
+  "decision": "C188_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "machine_report": "localization/graphics/role_C/20261005-C188-25F697C6/C188_25F697C6_MACHINE_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C188-25F697C6/C188_INDEPENDENT_EXACT_CLEAN_PLATE.png",
+    "localization/graphics/role_C/20261005-C188-25F697C6/C188_CONTACTS_B64.txt",
+    "localization/graphics/role_C/20261005-C188-25F697C6/C188_RAW_B64.txt"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
