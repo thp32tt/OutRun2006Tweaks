@@ -49,6 +49,14 @@ namespace WheelFFBMath
                model == Model::PS2OriginalExperimental;
     }
 
+    // MOZA R3 hardware validation shows the Modern DD DirectInput sign is the
+    // inverse of the reconstructed Original-model sign. Keep this mapping in
+    // one place so every model-switch path can apply it atomically.
+    inline bool moza_r3_model_inverted_polarity(Model model)
+    {
+        return model == Model::ModernDD;
+    }
+
     // Boomslangnz/FFBArcadePlugin OutRun2Real.cpp derives a 10%-step
     // SpeedStrength from Lindbergh's speed value: 0.1..80=>10%, 80.1..130=>20%,
     // 130.1..180=>30%, 180.1..220=>40%, 220.1..270=>50%, 270.1..320=>60%,
@@ -332,6 +340,49 @@ namespace WheelFFBMath
         const float raw = lateral_force_shape(forceAlpha) *
             (pneumatic_trail_factor(trailAlpha) + effectiveRatio);
         return std::clamp(raw / denominator, 0.0f, 1.0f);
+    }
+
+    // In a sustained oversteer/drift state the steering should self-steer
+    // toward opposite lock. The front-slip SAT remains authoritative in normal
+    // cornering; only a large chassis sideslip with coherent yaw and a
+    // conflicting/near-zero front-slip direction can hand authority to the
+    // chassis recovery direction.
+    inline float drift_countersteer_blend(
+        float bodySlip, float frontSlip, float yawRate)
+    {
+        if (!std::isfinite(bodySlip) || !std::isfinite(frontSlip) ||
+            !std::isfinite(yawRate))
+            return 0.0f;
+
+        const float betaAbs = std::abs(bodySlip);
+        const float yawAbs = std::abs(yawRate);
+        if (betaAbs <= 0.14f || yawAbs <= 0.12f)
+            return 0.0f;
+
+        // Runtime traces use opposite beta/yaw signs during established
+        // oversteer. Matching signs are left to front-tyre SAT to avoid
+        // injecting drift steering into ordinary cornering/understeer.
+        if (bodySlip * yawRate >= 0.0f)
+            return 0.0f;
+
+        const bool frontDirectionConflicts =
+            std::abs(frontSlip) < 0.06f || bodySlip * frontSlip < 0.0f;
+        if (!frontDirectionConflicts)
+            return 0.0f;
+
+        const float betaT = smoothstep01((betaAbs - 0.14f) / 0.22f);
+        const float yawT = smoothstep01((yawAbs - 0.12f) / 0.70f);
+        return std::clamp(betaT * (0.70f + 0.30f * yawT), 0.0f, 1.0f);
+    }
+
+    inline float drift_countersteer_shape(float bodySlip)
+    {
+        if (!std::isfinite(bodySlip))
+            return 0.0f;
+        const float t = smoothstep01((std::abs(bodySlip) - 0.10f) / 0.36f);
+        // Keep the recovery torque substantial but below full-scale SAT so a
+        // 3 Nm DD base self-steers without snapping violently to opposite lock.
+        return 0.78f * t;
     }
 
     inline float impact_direction_from_lateral(float lateral, float deadband = 0.04f)

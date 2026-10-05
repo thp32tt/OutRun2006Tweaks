@@ -169,6 +169,21 @@ int main() {
  require(physics_return_relief(.15f,-.08f)>.89f&&physics_return_relief(.15f,-.08f)<.91f,"normal-corner countersteer relief remains modest");
  require(physics_return_relief(.32f,-.08f)>.969f,"deep-slip self-countersteer retains nearly all aligning torque");
  require(physics_return_relief(.15f,.08f)==1,"opposing work no relief");
+
+ // R10: model-owned R3 polarity and drift self-steer recovery. Normal
+ // cornering stays front-slip driven; large beta with opposite-sign yaw and a
+ // conflicting front-slip direction transitions toward chassis countersteer.
+ require(moza_r3_model_inverted_polarity(Model::ModernDD),"Modern R3 polarity is reversed");
+ require(!moza_r3_model_inverted_polarity(Model::ArcadeOriginal),"Arcade R3 polarity is normal");
+ require(!moza_r3_model_inverted_polarity(Model::ArcadeHybrid),"Hybrid R3 polarity is normal");
+ require(!moza_r3_model_inverted_polarity(Model::PS2OriginalExperimental),"PS2 R3 polarity is normal");
+ require(drift_countersteer_blend(.08f,-.20f,-.80f)==0,"small body slip cannot trigger drift steering");
+ require(drift_countersteer_blend(.40f,.20f,.80f)==0,"same-sign beta/yaw cannot trigger drift steering");
+ require(drift_countersteer_blend(.40f,.20f,-.80f)==0,"front slip agreeing with beta stays tyre-SAT driven");
+ const float driftBlend=drift_countersteer_blend(.45f,-.20f,-.90f);
+ require(driftBlend>.70f&&driftBlend<=1.0f,"deep oversteer hands authority to body-slip countersteer");
+ require(drift_countersteer_shape(.45f)>.70f,"deep oversteer retains substantial recovery torque");
+ require(drift_countersteer_shape(.05f)==0,"small sideslip adds no recovery torque");
  ResponseLUT linear{}; require(parse_response_lut("0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",linear),"linear LUT parses");
  require(std::abs(apply_response_lut(.55f,linear)-.55f)<1e-5f,"linear LUT identity");
  ResponseLUT boosted{}; require(parse_response_lut("0,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.84,0.92,1",boosted),"boost LUT parses");

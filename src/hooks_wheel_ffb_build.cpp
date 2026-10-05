@@ -196,10 +196,11 @@ namespace
 
     // Direct Stage.zip/COLI0200 analysis proves material 0x14 / mask
     // 0x100000 is PRIMARY road in these exact forward-stage ranges.
-    // Keep them out of generic curb/shoulder classification. Floral Village
-    // retains the tested 0.60 comfort attenuation; Deep Lake/Tulip keep normal
-    // Road Detail until hardware A/B justifies any stage-specific attenuation.
-    constexpr float FloralVillageRoughPavingScale = 0.60f;
+    // Keep them out of generic curb/shoulder classification. R10 raises the
+    // Floral Village comfort floor from 0.60 to 0.72: sustained paving remains
+    // quieter than curb/off-road events but is no longer visually rough and
+    // tactilely silent on the R3.
+    constexpr float FloralVillageRoughPavingScale = 0.72f;
 
     bool is_proven_primary_rough_road(
         const StageSurfaceContext& stage,
@@ -625,7 +626,7 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                     sawSnowDisqualifier = true;
             }
             const bool snowPrimaryRoad = sawSnowPrimary && !sawSnowDisqualifier;
-            const float coreStageScale = snowPrimaryRoad ? 0.04f : 1.0f;
+            const float coreStageScale = snowPrimaryRoad ? 0.24f : 1.0f;
 
             desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
             const float envelope =

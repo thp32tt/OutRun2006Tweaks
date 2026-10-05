@@ -589,14 +589,24 @@ namespace
                 {
                     disable_periodics();
                 }
+
+                // R10: polarity belongs to the selected force model. Applying it
+                // here makes every live model-switch route deterministic instead
+                // of relying on the F11 combo/preset callback having been used.
+                const bool modelInvert =
+                    WheelFFBMath::moza_r3_model_inverted_polarity(ffbModel);
+                Settings::WheelFFBInvertForce = modelInvert;
+                Settings::WheelFFBInvertSpring = modelInvert;
+
                 activeRuntimeModel_ = runtimeModelValue;
                 periodicRecreateHoldoffUntil_ = 0;
                 updateCounter_ = 59;
                 if (previousModel >= 0)
                 {
                     spdlog::info(
-                        "WheelFFB: live force-model change {} -> {}; recreating model-owned periodic set",
-                        previousModel, runtimeModelValue);
+                        "WheelFFB: live force-model change {} -> {}; polarity={} recreating model-owned periodic set",
+                        previousModel, runtimeModelValue,
+                        modelInvert ? "REVERSED" : "NORMAL");
                 }
             }
 
@@ -827,7 +837,7 @@ namespace
                     sawNonPrimarySnowMix = true;
             }
             const bool snowPrimaryRoad = sawSnowPrimary && !sawNonPrimarySnowMix;
-            constexpr float SnowIceRoadTextureScale = 0.04f;
+            constexpr float SnowIceRoadTextureScale = 0.24f;
             const float materialRoadTextureScale =
                 snowPrimaryRoad ? SnowIceRoadTextureScale : 1.0f;
 
@@ -1278,15 +1288,35 @@ namespace
             const float trailShape = pneumaticSatShape; // legacy telemetry field name
             const float physicsLoad = 0.62f + 0.48f * lateralLoadSmooth;
             const float rearSlideRelief = 1.0f - 0.15f * gripLoss * bodySlide;
+            const float driftCountersteerBlend =
+                WheelFFBMath::drift_countersteer_blend(
+                    vehicleDynamics_.bodySlip(), frontSlip,
+                    vehicleDynamics_.yawRate());
+            const float driftRecoveryShape =
+                WheelFFBMath::drift_countersteer_shape(
+                    vehicleDynamics_.bodySlip());
             if (vehicleDynamics_.calibrated() && vehicleDynamics_.sampleValid())
             {
                 const float physicsReturnRelief =
                     WheelFFBMath::physics_return_relief(frontSlip, steerRate);
+                const float commonPhysicsScale =
+                    satSpeed * physicsLoad * rearSlideRelief *
+                    physicsReturnRelief * satStrength;
+
+                const float frontSatTorque =
+                    (frontSlip > 0.0f ? -1.0f : 1.0f) *
+                    physicsShape * commonPhysicsScale;
+                const float bodyRecoveryDirection =
+                    vehicleDynamics_.bodySlip() > 0.0f ? -1.0f : 1.0f;
+                const float driftRecoveryTorque =
+                    bodyRecoveryDirection *
+                    std::max(physicsShape, driftRecoveryShape) *
+                    commonPhysicsScale;
 
                 physicsSatTorque =
-                    (frontSlip > 0.0f ? -1.0f : 1.0f) *
-                    physicsShape * satSpeed * physicsLoad * rearSlideRelief *
-                    physicsReturnRelief * satStrength;
+                    frontSatTorque +
+                    (driftRecoveryTorque - frontSatTorque) *
+                        driftCountersteerBlend;
                 if (!std::isfinite(physicsSatTorque))
                     physicsSatTorque = 0.0f;
             }
@@ -1588,13 +1618,14 @@ namespace
                 {
                     lastTelemetryDetailTick_ = telemetryNow;
                     spdlog::info(
-                    "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} diPreResponse={} diCorrected={} responseCorrection={}",
+                    "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} driftBlend={} driftShape={} diPreResponse={} diCorrected={} responseCorrection={}",
                     telemetryNow,
                     vehicleDynamics_.rawBodySlip(), vehicleDynamics_.bodySlip(), vehicleDynamics_.bodySlipBlend(),
                     vehicleDynamics_.rawYawRate(), vehicleDynamics_.yawRate(), vehicleDynamics_.yawRateBlend(),
                     vehicleDynamics_.rawFrontSlip(), vehicleDynamics_.frontSlip(), vehicleDynamics_.frontSlipBlend(),
                     trailResponseSlip, trailResponseLead, lateralForceShape, pneumaticTrail,
                     pneumaticSatShape, mechanicalTrailMix, mechanicalContribution, physicsShape,
+                    driftCountersteerBlend, driftRecoveryShape,
                     levelBeforeResponse, level, bool(Settings::WheelFFBResponseCorrection));
                 // Raw horizontal bases allow row/column x X/Z candidates to be
                 // compared offline without changing the active steering model.
