@@ -138,8 +138,9 @@ for rel, source in (("R20", r20), ("R23", r23), ("R33", r33)):
 if "R9MainDepthGenerationValue()" not in r9:
     errors.append("R9 missing main-depth generation owner query API")
 
-# Post-1000 dispatcher flattening: R31/R33 may call the R30 lower-draw
-# boundary, but they must not reach into R30's private SafetyHookInline storage.
+# Post-1100 dispatcher flattening: R33 is the sole draw dispatcher allowed to
+# call the R30 lower-draw boundary. R31 is StateBlock/cache-only and must not
+# regain either the public lower-draw calls or R30 private hook storage.
 for rel, source in (("R31", r31), ("R33", r33)):
     for banned in (
         "R30DrawPrimitiveR29Hook",
@@ -158,8 +159,10 @@ for marker in (
 ):
     if marker not in r30:
         errors.append(f"R30 missing lower-draw owner boundary: {marker}")
-    if marker not in r31 or marker not in r33:
-        errors.append(f"R31/R33 missing R30 lower-draw owner boundary use: {marker}")
+    if marker not in r33:
+        errors.append(f"R33 missing R30 lower-draw owner boundary use: {marker}")
+    if marker in r31:
+        errors.append(f"R31 regained retired R30 lower-draw owner boundary use: {marker}")
 
 # Owner boundaries are not marker-only: each wrapper must still delegate to the
 # matching R29 hook storage so refactor flattening cannot silently reroute a
@@ -285,9 +288,12 @@ for rel, source in (("R30", r30), ("R30_SAFE", r30_safe)):
 if "R9UndoStereoDrawCount()" not in r9:
     errors.append("R9 missing draw-count rollback owner API")
 
-for rel, source in (("R29", r29), ("R31", r31), ("R32", r32), ("R33", r33)):
+for rel, source in (("R29", r29), ("R33", r33)):
     if "R9NoteMainDepthContentWrite()" not in source:
         errors.append(f"{rel} missing R9 main-depth write owner API")
+for rel, source in (("R31", r31), ("R32", r32)):
+    if "R9NoteMainDepthContentWrite()" in source:
+        errors.append(f"{rel} regained retired draw-side main-depth accounting")
 
 for banned in ("R23GameDrawSerial", "R23BeforeTopLevelDraw", "GetTopLevelDrawSerial()"):
     if banned in r26:
@@ -322,7 +328,6 @@ for marker in (
     "InvalidateTrackedRasterShadow()",
     "InvalidateLiveStateSample()",
     "TryGetTrackedViewport(viewport)",
-    "ArmStereoRecoverySafety()",
 ):
     if marker not in r31:
         errors.append(
@@ -511,8 +516,7 @@ if "R30TelemetryNoteScreenSpaceFovDraw()" not in r30:
 # R9-owned accounting transition: increment draw calls + mark the mono backup
 # incomplete. Upper layers must not reproduce that state pair themselves.
 for rel, source in (
-    ("R29", r29), ("R30", r30), ("R30_SAFE", r30_safe),
-    ("R31", r31), ("R32", r32), ("R33", r33),
+    ("R29", r29), ("R30", r30), ("R30_SAFE", r30_safe), ("R33", r33),
 ):
     for banned in ("++R9DrawCalls;", "R9MonoBackupGap = true;"):
         if banned in source:
@@ -521,6 +525,12 @@ for rel, source in (
     if "R9NoteStereoDrawWithoutMonoBackup();" not in source:
         errors.append(
             f"{rel} missing R9 stereo-draw accounting owner API use")
+for rel, source in (("R31", r31), ("R32", r32)):
+    for banned in ("++R9DrawCalls;", "R9MonoBackupGap = true;",
+                   "R9NoteStereoDrawWithoutMonoBackup();"):
+        if banned in source:
+            errors.append(
+                f"{rel} regained retired stereo-draw accounting: {banned}")
 if "R9NoteStereoDrawWithoutMonoBackup()" not in r9:
     errors.append("R9 missing stereo-draw accounting owner API")
 
@@ -678,13 +688,12 @@ for banned in ("R29ArmMonoSafety(", "R29MonoSafetyThroughEpoch"):
     if banned in r32:
         errors.append(
             f"R32 retained private R29 recovery-safety dependency: {banned}")
-for marker in (
-    "ArmStereoRecoverySafety(",
-    "SetStereoRecoverySafetyThroughEpoch(",
-):
-    if marker not in r32:
-        errors.append(
-            f"R32 missing R29 recovery-safety owner API: {marker}")
+if "ArmStereoRecoverySafety(" in r32:
+    errors.append(
+        "R32 regained final-draw recovery-safety arming after R33 ownership")
+if "SetStereoRecoverySafetyThroughEpoch(" not in r32:
+    errors.append(
+        "R32 missing exact-epoch R29 recovery-safety owner API")
 if "SetStereoRecoverySafetyThroughEpoch(" not in r29:
     errors.append("R29 missing exact-epoch recovery-safety owner API")
 
@@ -967,21 +976,20 @@ else:
     install_body = r31[install_start:install_end]
     recovery_configure_pos = install_body.find("StateBlockRecovery::Configure(")
     configure_pos = install_body.find("StateBlockEvents::Configure(")
-    enable_draw_pos = install_body.find("if (!R31EnableDrawHooks())")
     lifecycle_owner_pos = install_body.find("StateBlockTracker::LifecycleHooksReady()")
     fallback_end_pos = install_body.find("fallbackEndArmed = R31EndStateBlockHook.enable().has_value()")
     fallback_begin_pos = install_body.find("fallbackBeginArmed = R31BeginStateBlockHook.enable().has_value()")
     fallback_create_pos = install_body.find("fallbackCreateArmed = R31CreateStateBlockHook.enable().has_value()")
     consumer_ready_pos = install_body.find("StateBlockTracker::SetEventConsumerReady(true)")
     ready_pos = install_body.find("R31InstallState.store(State::Ready", consumer_ready_pos)
-    if min(recovery_configure_pos, configure_pos, enable_draw_pos,
-            lifecycle_owner_pos, fallback_end_pos, fallback_begin_pos,
-            fallback_create_pos, consumer_ready_pos, ready_pos) < 0 or not (
-            recovery_configure_pos < configure_pos < enable_draw_pos <
-            lifecycle_owner_pos < fallback_end_pos < fallback_begin_pos <
-            fallback_create_pos < consumer_ready_pos < ready_pos):
+    if min(recovery_configure_pos, configure_pos, lifecycle_owner_pos,
+            fallback_end_pos, fallback_begin_pos, fallback_create_pos,
+            consumer_ready_pos, ready_pos) < 0 or not (
+            recovery_configure_pos < configure_pos < lifecycle_owner_pos <
+            fallback_end_pos < fallback_begin_pos < fallback_create_pos <
+            consumer_ready_pos < ready_pos):
         errors.append(
-            "R31 must establish physical StateBlock ownership before publishing readiness")
+            "R31 must establish StateBlock lifecycle/fallback ownership before publishing readiness")
 
     if "R31EndStateBlockHook.enable().has_value() &&" in install_body or \
             "R31BeginStateBlockHook.enable().has_value() &&" in install_body:
