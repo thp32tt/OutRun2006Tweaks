@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION47",
+  "index": 133,
+  "asset": "25F697C6",
+  "candidate_sha256": "08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013",
+  "binding": {
+    "localized_indices": [
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "protected_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "semantics": [
+      "ANCIENT RUINS→에인션트 루인스",
+      "ALPINE→알파인",
+      "GIALLO MODENA→지알로 모데나",
+      "BIANCO AVUS→비앙코 아부스",
+      "GRIGIO ALLOY→그리지오 알로이",
+      "ARGENTO NURBURGRING→아르젠토 뉘르부르크링",
+      "ROSSO SCUDERIA→로쏘 스쿠데리아",
+      "BLU MIRABEAU→블루 미라보",
+      "NERO→네로"
+    ]
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "9/9 PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_model_pixels_changed": 0,
+    "clean_source_unchanged": 0,
+    "source_residue": 0,
+    "overlap": 0,
+    "touch": 0,
+    "header_128_exact": true,
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "clean_plate": "PASS_NO_VISIBLE_SOURCE_TEXT_RESIDUE",
+    "style": "PASS_SOURCE_LIKE_WIDE_LOW_GRAY_WORDMARK_PROPORTIONS",
+    "protected_ferrari_model_names": "PASS_MACHINE_PIXEL_EXACT"
+  },
+  "decision": "A47_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "evidence": [
+    "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_25F697C6_REPORT.json",
+    "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_25F697C6_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_25F697C6_FINAL_RAW_MIRROR_Y.jpg"
+  ],
+  "prohibited_domains_untouched": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
