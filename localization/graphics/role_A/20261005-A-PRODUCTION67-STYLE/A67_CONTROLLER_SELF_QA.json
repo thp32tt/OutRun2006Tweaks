@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION67-STYLE",
+  "timestamp_kst": "2026-10-05T23:10:00+09:00",
+  "queue_index": 193,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "candidate_sha256": "ad3f42856956d15b1c0ecba032d18ebb730c375f4b0a52b456c975e89e9396b7",
+  "rework_from": "C208_REWORK_REQUIRED_SOURCE_STYLE_SCALE_PROPORTION",
+  "machine_qa": {
+    "bbox_size_positive_margin": "13/13 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "source_residue": 0,
+    "render_outside_target": 0,
+    "preserved_changes": 0,
+    "inline_token_overlap": 0,
+    "localized_overlap": 0,
+    "touch_pairs": 0,
+    "structure": "2048x1024 RGBA32, header exact, mip1, raw mirror_y"
+  },
+  "source_style_qa": {
+    "face": "Noto Sans CJK KR Black",
+    "method": "natural glyph geometry at source-height family with moderate per-glyph tracking; no horizontal glyph scaling",
+    "width_ratios": {
+      "sentence_full": 0.6796,
+      "showroom": 0.5656,
+      "multiplayer": 0.6485,
+      "goal_family": "0.6456-0.6500",
+      "welcome": 0.649,
+      "online": 0.6744
+    },
+    "comparison_to_A65": "C208 examples improve from SHOWROOM 0.2262->0.5656, MULTIPLAYER 0.4361->0.6485, Goal E 0.3750->0.6500, WELCOME 0.3129->0.6490, ONLINE 0.3721->0.6744.",
+    "a66_retry": "A66 0.80-class targets were rejected by A controller for excessive spacing; A67 moderates tracking to source-faithful balance."
+  },
+  "protected_original_policy": {
+    "OutRun_inline_token": "pixel-exact",
+    "OutRun2SP_inline_token": "pixel-exact",
+    "OUTRUN_showroom_top_line": "pixel-exact",
+    "TESTAROSSA": "pixel-exact",
+    "SP_OR_fragments": "pixel-exact"
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "target_contacts": "PASS",
+    "raw_mirror_y": "PASS",
+    "no_source_residue": true,
+    "no_patch_artifact": true,
+    "no_clipping": true,
+    "no_overlap": true,
+    "no_alpha_halo": true,
+    "source_style_scale_proportion": "PASS_C208_REWORK_ADDRESSED"
+  },
+  "decision": "A67_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
