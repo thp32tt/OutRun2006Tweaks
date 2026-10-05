@@ -827,7 +827,7 @@ namespace
                     sawNonPrimarySnowMix = true;
             }
             const bool snowPrimaryRoad = sawSnowPrimary && !sawNonPrimarySnowMix;
-            constexpr float SnowIceRoadTextureScale = 0.04f;
+            constexpr float SnowIceRoadTextureScale = 0.18f;
             const float materialRoadTextureScale =
                 snowPrimaryRoad ? SnowIceRoadTextureScale : 1.0f;
 
