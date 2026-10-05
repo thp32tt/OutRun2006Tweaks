@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C168-63C91067",
+  "qa_id": "C168",
+  "timestamp_kst": "2026-10-05T15:22:00+09:00",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION109",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "candidate_sha256": "3876804b958513aa842966c241fcb6c9215593247b4acf719b6b1d46e6cbf2ee",
+  "candidate_changed_by_C": false,
+  "producer_machine_status": "PASS_REPORTED",
+  "producer_bbox_size_positive_margin": "2/2 PASS",
+  "producer_zero_pixel_gates": {
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "decoded_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "source_effect_residue": 0,
+    "render_outside_target": 0,
+    "localized_overlap": 0
+  },
+  "controller_visual_qa": "FAIL_CLEAN_PLATE_ARTWORK_DAMAGE",
+  "visual_failures": [
+    "Lower starburst clean plate has large cut/notch damage through the top-center spike/inner glow directly beneath the removed Total Rank region.",
+    "Pink cloud clean plate has a visible triangular/faceted reconstruction wedge below the top-center border in the removed-title area.",
+    "The same reconstructed artifacts remain present around/behind the Korean title in FINAL."
+  ],
+  "reasoning": "B109 narrowed the source-effect mask and reports zero machine residue/outside counters, but the contract requires source-faithful clean-plate reconstruction and mandatory visual review. The clean plate visibly damages patterned/decorative plate artwork, so machine counters are a false negative and the candidate cannot advance.",
+  "decision": "C168_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE",
+  "required_rework": "Reconstruct both Total Rank plate backgrounds without changing the starburst spike/inner glow geometry or introducing faceted cloud gradients. Restore source-faithful plate artwork first, then render Korean and rerun clean/final exact-pixel plus controller visual QA.",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION109/B109_63C_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION109/B109_63C_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION109/B109_63C_ROW_CONTACT.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION109/B109_63C_RAW_COMPARE.jpg"
+  ],
+  "supersedes_controller_decision": "C167_REWORK_REQUIRED_CLEAN_PLATE_VISIBLE_RECONSTRUCTION_ARTIFACTS",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
