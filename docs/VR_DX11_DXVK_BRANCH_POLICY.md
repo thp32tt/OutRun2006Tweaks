@@ -63,6 +63,27 @@ semantics. Port individual ideas only after they are reconciled with the R70 con
 Start with provider/capability detection and stock two-pass parity. Multiview and custom
 DXVK-fork interfaces stay opt-in until stock DXVK rendering has passed the graphics gate.
 
+
+### External interop evidence: GeneralsVR (2026-10-06 review)
+
+GeneralsVR is useful evidence for a later hosted-DXVK experiment, not a reason to bypass the
+stock-DXVK gate above. Its current VR host contract documents a driver-tested resource direction:
+the x64 host creates D3D11 shared eye textures/fence and the 32-bit game imports those resources
+into the DXVK-owned Vulkan device. That project reports the reverse Vulkan-export -> D3D11-open
+direction failing with `E_INVALIDARG` on its tested Windows hardware.
+
+For OutRun this becomes a bounded future experiment only:
+
+- keep stock DXVK two-pass rendering and current graphics-correctness gate authoritative;
+- do not copy GeneralsVR's game-specific interop code or private DXVK assumptions;
+- if a custom DXVK interop lane is later enabled, test host-owned resources first rather than
+  assuming Vulkan-export -> D3D11-open will work;
+- require adapter-LUID identity, explicit lifetime/fence ownership, exact eye-frame provenance,
+  and a fallback that leaves the validated stock provider unchanged;
+- compare the experiment with the x64-host timing counters before promoting it for performance.
+
+This is design evidence only. It does not change the current provider or enable a custom DXVK fork.
+
 ## DX11 rule
 
 R71 remains dormant until explicit activation work. State/resource translation must report
