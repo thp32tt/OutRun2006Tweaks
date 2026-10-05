@@ -18,7 +18,7 @@ source=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"/rel
 clean_path=repo/"localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_CLEAN_PLATE.png"
 protected_path=repo/"localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_PROTECTED_MASK.png"
 
-INPUT_SHA="a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f"
+INPUT_SHA="9457c16db67978ee383550f9094a8862c5030fdea105deba217a4b416467fa37"
 SOURCE_SHA="6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
 CLEAN_SHA="bc25fc34d95b0d9977ca4af5f8df6c590a654e91f6890f621be18cc6785027ee"
 PROTECTED_SHA="0d95f62263989b1e1371bdff67844a42b47db55199d345f452c65aca9008a56e"
@@ -146,8 +146,11 @@ font=font_path("Bold")
 glyph,fs=render_candidate(font,palette,bw,bh,margin=6,shear=0.16)
 
 final=old.copy()
-# Exact established clean plate only inside Stage source-effect bbox; preserves A85 and all other rows.
-final.paste(clean.crop(tuple(STAGE_BB)),(x0,y0))
+# Controller review of the first B172 worker output exposed sparse white source
+# fragments in the historical B_RECOVERY02 clean crop. The canonical Stage cell
+# is a transparent sprite cell, so rebuild the exact reopened source-effect bbox
+# as transparent instead of reusing that stale numeric-PASS clean plate.
+final.paste((0,0,0,0),tuple(STAGE_BB))
 px=x0+(bw-glyph.width)//2
 py=y0+(bh-glyph.height)//2
 layer=Image.new("RGBA",src.size,(0,0,0,0)); layer.alpha_composite(glyph,(px,py))
@@ -177,7 +180,7 @@ if dh!=header or dmeta!=meta or ImageChops.difference(decoded,final).getbbox():
 # Evidence masks.
 Image.fromarray((allowed*255).astype(np.uint8),"L").save(out/"B172_STAGE_EDIT_MASK.png")
 Image.fromarray((protected_effective*255).astype(np.uint8),"L").save(out/"B172_PROTECTED_MASK.png")
-target_clean=old.copy(); target_clean.paste(clean.crop(tuple(STAGE_BB)),(x0,y0))
+target_clean=old.copy(); target_clean.paste((0,0,0,0),tuple(STAGE_BB))
 target_clean.save(out/"B172_STAGE_CLEAN.png")
 decoded.save(out/"B172_FINAL_READABLE.png")
 
@@ -245,12 +248,13 @@ report={
  },
  "material_fix":{
    "input_candidate_sha256":INPUT_SHA,
+   "superseded_first_b172_sha256":"9457c16db67978ee383550f9094a8862c5030fdea105deba217a4b416467fa37",
    "candidate_sha256":new_sha,
    "source_sha256":SOURCE_SHA,
    "source_file":str(source.relative_to(repo)),
-   "clean_plate":str(clean_path.relative_to(repo)),
+   "clean_plate":"B172 exact Stage source-effect bbox transparent reconstruction; historical B_RECOVERY02 clean crop rejected by controller for sparse white residue",
    "changed_row":"Stage -> 스테이지",
-   "method":"replace only exact Stage source-effect bbox with established clean plate; fresh native-resolution Noto Sans CJK KR Bold render at natural horizontal advance, source-derived yellow/navy/pale family, 0.16 right shear; preserve all other candidate pixels exact",
+   "method":"replace only exact Stage source-effect bbox with transparent source-class clean plate after controller rejected the historical clean crop for sparse white residue; fresh native-resolution Noto Sans CJK KR Bold render at natural horizontal advance, source-derived yellow/navy/pale family, 0.16 right shear; preserve all other candidate pixels exact",
    "font":"Noto Sans CJK KR Bold",
    "font_size":fs,
    "horizontal_scale":1.0,
@@ -265,6 +269,7 @@ report={
    "delta_top":lb[1]-y0,
    "delta_bottom":y1-lb[3]
  },
+ "controller_retry_reason":"First B172 worker candidate was NOT promoted: mandatory readable visual QA found sparse white source-fragment residue in the reused historical clean crop. Retry reconstructs the reopened Stage cell transparently before lettering.",
  "static_qa":{
    "containment":"PASS",
    "size_ceiling":"PASS",
@@ -278,6 +283,7 @@ report={
    "header_128_exact":True,
    "raw_orientation":"mirror_y",
    "all_non_stage_candidate_pixels_preserved_exact":True,
+   "clean_plate_source_residue_visual":"NONE_AFTER_TRANSPARENT_RECONSTRUCTION",
    "a85_outrun_miles_rows_preserved_exact":True,
    "heart_tally_art_preserved_exact":True,
    "status":"PASS"
