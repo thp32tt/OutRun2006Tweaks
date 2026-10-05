@@ -101,6 +101,23 @@ require_order(
     "DirectInteropVerified=false",
 )
 
+ensure_probe = body(r7, "bool EnsureDirectInteropProbe(IDirect3DDevice9* device)")
+failure_pos = ensure_probe.find("++DirectInteropProbeFailures;")
+release_pos = ensure_probe.find("ReleaseDirectInteropProbe();", failure_pos)
+if failure_pos < 0 or release_pos < 0 or release_pos < failure_pos:
+    fail("interop probe creation failure must route through teardown owner")
+for marker in (
+    "ReleaseCom(DirectInteropProbeFence)",
+    "ReleaseCom(DirectInteropProbeSurface)",
+    "ReleaseCom(DirectInteropProbeTexture)",
+    "DirectInteropProbeHandle=nullptr",
+    "DirectInteropProbeToken=0",
+    "DirectInteropVerified=false",
+):
+    if marker in ensure_probe:
+        fail(f"interop probe creation failure regained duplicate teardown: {marker}")
+
+
 release = body(r7, "void ReleaseStereoResources()")
 require(
     release,
