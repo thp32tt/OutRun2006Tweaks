@@ -738,12 +738,12 @@ class FrontierDiscoveryTests(unittest.TestCase):
         self.assertIn("validate_f138_frontier_contract", sut.main.__code__.co_names)
 
 
-    def test_f137_prefix_proof_advances_frontier_to_183bc0(self):
+    def test_f139_prefix_proof_advances_frontier_to_183bfe(self):
         result = sut.discover_frontier_rva(
             Path(__file__).with_name("analyze_outrun_exe.py")
         )
-        self.assertEqual(result["continuation_id"], 102)
-        self.assertEqual(result["rva"], 0x00183BC0)
+        self.assertEqual(result["continuation_id"], 103)
+        self.assertEqual(result["rva"], 0x00183BFE)
         self.assertEqual(result["basis"], "INCOMPLETE_RVA")
 
 
