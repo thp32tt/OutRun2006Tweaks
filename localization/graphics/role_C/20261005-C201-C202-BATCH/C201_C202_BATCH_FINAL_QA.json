@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T21:27:02+09:00",
+  "role": "C",
+  "run": "20261005-C201-C202-BATCH",
+  "assets_checked": 2,
+  "physical_elements_checked": 40,
+  "results": [
+    {
+      "qa_id": "C201",
+      "index": 161,
+      "asset": "55B57CDE",
+      "candidate_sha256": "78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812",
+      "machine_status": "PASS",
+      "row_gate": "38/38 PASS",
+      "semantic_policy_pass": true,
+      "controller_visual_qa": "PASS",
+      "decision": "C201_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "report": "localization/graphics/role_C/20261005-C201-55B57CDE/C201_55B57CDE_CONTROLLER_FINAL_QA.json"
+    },
+    {
+      "qa_id": "C202",
+      "index": 30,
+      "asset": "8215FD25",
+      "candidate_sha256": "cb023fa5533b4a058c437c1a879b2952a7268308e47202f7dced32c6a563e141",
+      "machine_status": "PASS",
+      "row_gate": "2/2 PASS",
+      "template_patch_diff_pixels": 0,
+      "template_patch_max_channel_delta": 0,
+      "controller_visual_qa": "PASS",
+      "decision": "C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "report": "localization/graphics/role_C/20261005-C202-8215FD25/C202_8215FD25_CONTROLLER_FINAL_QA.json"
+    }
+  ],
+  "pixel_visual_pass_assets": [
+    "55B57CDE",
+    "8215FD25"
+  ],
+  "rework_required_assets": [],
+  "global_rework_remaining": [
+    "37759842"
+  ],
+  "pending_artwork_localize_text": 12,
+  "pending_c": [],
+  "queue_action_counts": {
+    "localize_text": 82,
+    "zoom_review": 44,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_brand_song_credit": 1
+  },
+  "runtime_validation": "UNTESTED",
+  "exclusions": "Completed prior PASS assets were not repeated. C201 supersedes C197/A54. C202 supersedes C196/C198/C199/C200 8215 failures. VR/FFB/DX11/DXVK untouched."
+}
