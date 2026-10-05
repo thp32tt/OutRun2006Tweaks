@@ -8,7 +8,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
 repo=Path.cwd()
-run="20261005-C147-E95DA5"
+run="20261005-C149-E95DA5"
 out=repo/"localization/graphics/role_C"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -236,7 +236,8 @@ alpha_out=count(alpha_diff&~allowed&~preserved_mask)
 protected_changed=count(final_diff&preserved_mask)
 render_out=count(render_diff&~target&~preserved_mask)
 equal_source=np.all(fa==sa,axis=2)
-source_residue=count(source_mask&~target&equal_source)
+clean_change=np.any(sa!=expected_clean,axis=2)
+source_residue=count(clean_change&~target&equal_source)
 
 overlap=0
 touch=[]
@@ -255,14 +256,14 @@ if any([outside,alpha_out,protected_changed,render_out,source_residue,overlap,ta
     raise RuntimeError(("gates",outside,alpha_out,protected_changed,render_out,source_residue,overlap,target_preserved_overlap,target_preserved_near,touch))
 
 for name,m in [
-    ("C147_SOURCE_TEXT_MASK.png",source_mask),
-    ("C147_ALLOWED_BBOX_MASK.png",allowed),
-    ("C147_TARGET_TEXT_MASK.png",target),
-    ("C147_PRESERVED_REGION_MASK.png",preserved_mask),
+    ("C149_SOURCE_TEXT_MASK.png",source_mask),
+    ("C149_ALLOWED_BBOX_MASK.png",allowed),
+    ("C149_TARGET_TEXT_MASK.png",target),
+    ("C149_PRESERVED_REGION_MASK.png",preserved_mask),
 ]:
     Image.fromarray((m.astype(np.uint8)*255),"L").save(out/name)
 clean_img=Image.fromarray(expected_clean,"RGBA")
-clean_img.save(out/"C147_EXACT_CLEAN_PLATE.png")
+clean_img.save(out/"C149_EXACT_CLEAN_PLATE.png")
 
 cards=[]
 for label,im in [("SOURCE",src),("CLEAN",clean_img),("FINAL",fin)]:
@@ -274,7 +275,7 @@ for label,im in [("SOURCE",src),("CLEAN",clean_img),("FINAL",fin)]:
 sheet=Image.new("RGB",(1024,1620),"white")
 for i,c in enumerate(cards):
     sheet.paste(c,(0,i*540))
-sheet.save(out/"C147_E95_COMPARE.jpg",quality=96)
+sheet.save(out/"C149_E95_COMPARE.jpg",quality=96)
 
 contacts=[]
 for r in row_results:
@@ -296,14 +297,14 @@ yy=0
 for c in contacts:
     rs.paste(c,(0,yy))
     yy+=c.height+4
-rs.save(out/"C147_E95_ROW_CONTACT.jpg",quality=96)
+rs.save(out/"C149_E95_ROW_CONTACT.jpg",quality=96)
 
 rr=Image.new("RGB",(1024,1080),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_fin)]):
     z=comp(im).resize((1024,512),Image.Resampling.NEAREST)
     rr.paste(z,(0,i*540+24))
     ImageDraw.Draw(rr).text((5,i*540+4),label,fill="black")
-rr.save(out/"C147_E95_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"C149_E95_RAW_COMPARE.jpg",quality=96)
 
 report={
     "schema_version":1,"role":"C","run":run,"queue_index":230,"asset":asset,
@@ -314,10 +315,10 @@ report={
     "independent_method":"pinned canonical source+atlas; exact alpha masks for transparent rows; strengthened pill source/effect separation and independent row-background clean reconstruction; exact preserved-cell comparison; producer Korean target rechecked for bbox/size/positive margin/overlap/protected relation; decoded DDS/header/raw orientation validation",
     "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":rawmode,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
     "rows":row_results,
-    "machine_checks":{"producer_clean_exact_diff_pixels":count(clean_diff),"target_outside_allowed":target_outside_allowed,"bbox_size_positive_margin":"11/11 PASS","final_outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,"render_outside_target":render_out,"source_residue":source_residue,"overlap":overlap,"touch_pairs":touch,"target_preserved_overlap":target_preserved_overlap,"target_preserved_1px_near":target_preserved_near,"preserved_regions_changed_pixels":preserved_changed,"style":style},
+    "machine_checks":{"producer_clean_exact_diff_pixels":count(clean_diff),"target_outside_allowed":target_outside_allowed,"bbox_size_positive_margin":"11/11 PASS","final_outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,"render_outside_target":render_out,"source_residue":source_residue,"source_residue_basis":"source_to_independent_clean_changed_pixels","overlap":overlap,"touch_pairs":touch,"target_preserved_overlap":target_preserved_overlap,"target_preserved_1px_near":target_preserved_near,"preserved_regions_changed_pixels":preserved_changed,"style":style},
     "machine_status":"PASS","controller_visual_qa":"PENDING","decision":"PENDING_CONTROLLER_VISUAL_QA","RUNTIME_VALIDATION":"UNTESTED"
 }
-(out/"C147_E95_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-summary={"run":run,"asset":"E95DA5","index":230,"source_sha256":SOURCE_SHA256,"candidate_sha256":CANDIDATE_SHA256,"machine_status":"PASS","bbox_size_positive_margin":"11/11","clean_exact_diff_pixels":count(clean_diff),"outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,"render_outside_target":render_out,"source_residue":source_residue,"overlap":overlap,"touch_pairs":len(touch),"target_preserved_overlap":target_preserved_overlap,"target_preserved_1px_near":target_preserved_near,"preserved_regions_changed":sum(preserved_changed.values()),"runtime_validation":"UNTESTED","report":f"localization/graphics/role_C/{run}/C147_E95_MACHINE_QA.json"}
-(wr/"C147_E95DA5.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"C149_E95_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+summary={"run":run,"asset":"E95DA5","index":230,"source_sha256":SOURCE_SHA256,"candidate_sha256":CANDIDATE_SHA256,"machine_status":"PASS","bbox_size_positive_margin":"11/11","clean_exact_diff_pixels":count(clean_diff),"outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,"render_outside_target":render_out,"source_residue":source_residue,"source_residue_basis":"source_to_independent_clean_changed_pixels","overlap":overlap,"touch_pairs":len(touch),"target_preserved_overlap":target_preserved_overlap,"target_preserved_1px_near":target_preserved_near,"preserved_regions_changed":sum(preserved_changed.values()),"runtime_validation":"UNTESTED","report":f"localization/graphics/role_C/{run}/C149_E95_MACHINE_QA.json"}
+(wr/"C149_E95DA5.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False),flush=True)
