@@ -1,5 +1,5 @@
 {
-  "schema_version": 89,
+  "schema_version": 90,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_PRODUCTION54 completed odd index161 55B57CDE exact-DXT5 nationality/zodiac candidate 7569c51cf5ba82ce081bf09d486b8c8869560e7fae71292c613e4bf8a5b51ab8. A52 contact fixed all 38 physical labels; A53 failed closed on format misclassification before writing a candidate. A54 reused the C194-proven constrained BC3 method: 38/38 bbox/size/positive margins, decoded/alpha/introduced-visible outside=0, source residue/overlap/touch=0, 922 partial boundary blocks alpha-index-only with original endpoint/color bytes preserved; controller SOURCE/CLEAN/FINAL + raw mirror_y visual self-QA PASS. Independent C + in-game pending. RUNTIME_VALIDATION=UNTESTED.",
     "C195 finalized A51 index159 4EDA9DE3 candidate 8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5: independent canonical source+atlas QA, exact RGBA32/BGRA header/raw mirror_y, 15/15 source/localized bbox exact-match + size + positive margins, canonical phonetic stage mapping, all outside/overlap/touch gates zero, controller readable/raw visual PASS. C195_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "C196 returned newly promoted localize_text index30 8215FD25 B143 candidate 04d2c23333999873b7f467d0a8647c1056f40fa3bcd06e0174711bb2345277ba. Producer 2/2 numeric containment/protected gates PASS, but mandatory C SOURCE/CLEAN/FINAL visual FAIL: lower starburst clean plate has conspicuous gray/dark blurred reconstruction patches across the former Total Rank zone under the top-center rays; artifact remains around/behind 종합 랭킹. Speech-bubble plate acceptable. REWORK_REQUIRED. RUNTIME_VALIDATION=UNTESTED.",
     "C194 finalized C598919A B139 candidate e3c3f78975b3dd582690a7f169c1aa364dd05e3846827340aae38631885b92bf. Independent C verified DXT5 4096x4096/header/raw mirror_y, 41/41 bbox+size+positive margins, canonical stage mapping, zero decoded/alpha/visible outside, overlap, protected geometry and raw DXT5 out-of-scope blocks. Controller readable SOURCE/CLEAN/FINAL and raw visual QA PASS. C598919A cleared; producer REWORK now only 37759842. RUNTIME_VALIDATION=UNTESTED.",
@@ -3930,7 +3931,7 @@
     "c176_return_resolved": true,
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_artwork_localize_text": 13,
+  "current_pending_artwork_localize_text": 12,
   "current_producer_rework_remaining": 2,
   "current_producer_rework_assets": [
     "37759842",
@@ -4046,7 +4047,9 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [],
+  "current_pending_c": [
+    "55B57CDE"
+  ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -4204,6 +4207,30 @@
     "controller_visual_qa": "FAIL_CLEAN_PLATE_STARBURST_RECONSTRUCTION_ARTIFACT",
     "decision": "C196_REWORK_REQUIRED_STARBURST_CLEAN_PLATE_RECONSTRUCTION_ARTIFACT",
     "report": "localization/graphics/role_C/20261005-C196-8215FD25/C196_8215FD25_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "a_production54_55b57cde": {
+    "timestamp_kst": "2026-10-05T20:39:22+09:00",
+    "run": "20261005-A-PRODUCTION54-DXT5",
+    "queue_index": 161,
+    "asset": "55B57CDE",
+    "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+    "candidate_sha256": "7569c51cf5ba82ce081bf09d486b8c8869560e7fae71292c613e4bf8a5b51ab8",
+    "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "binding": "A52_CONTROLLER_CONTACT_38_OF_38",
+    "prior_attempt": {
+      "run": "A53",
+      "status": "FAIL_CLOSED_FORMAT_MISCLASSIFICATION_NO_CANDIDATE"
+    },
+    "machine_qa": "38/38 bbox/size/positive-margin PASS; decoded/alpha/introduced-visible outside=0; source residue/overlap/touch=0; changed blocks outside patch=0",
+    "dxt5_solver": {
+      "boundary_alpha_index_only_blocks": 922,
+      "boundary_endpoints_and_color_bytes_preserved": true
+    },
+    "controller_visual_qa": "PASS",
+    "raw_orientation": "mirror_y",
+    "report": "localization/graphics/role_A/20261005-A-PRODUCTION54-DXT5/A54_55B57CDE_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION54-DXT5/A54_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
