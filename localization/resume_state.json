@@ -1,5 +1,5 @@
 {
-  "schema_version": 84,
+  "schema_version": 85,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B_PRODUCTION81/B82 corrective completed even index 188 8C259C68. Controller rejected B81 despite machine PASS because readable mirror_y semantic rows were bound in reverse and Regular 8px x4 Hangul was visibly too small/thin. B82 corrected the row binding and used shared Bold 12px x4 source style; candidate 03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03 passes 6/6 bbox+size+positive margins, clean/final validators and zero residue/outside/alpha/protected/render-outside/overlap/touch, plus SOURCE/CLEAN/FINAL/row/raw visual self-QA. C157 independently re-downloaded canonical DDS+atlas and machine-PASSed the same SHA without producer masks. C controller/in-game pending. pending_artwork=25, producer_rework=1 (C598919A). RUNTIME_VALIDATION=UNTESTED.",
     "C153+C156 cross-lane final QA approved new B_PRODUCTION80 FEF70E85 and A_PRODUCTION22 30CF0D without repeating prior completed assets. FEF70E85 candidate e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086: independent CLEAN diff=0, 14/14 bbox+size+positive-margin, all pixel/protected/overlap gates 0, canonical phonetic stage names and REVERSED exact, visual/raw PASS. 30CF0D candidate 6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b: canonical hash/header plus producer geometry evidence independently rechecked due transparent-RGB effect pixels; 6/6 bbox+size+positive-margin, clean/final/protected/overlap gates 0, visual/raw PASS. C598919A remains sole producer REWORK_REQUIRED after B78 proved 1,435 DXT5 boundary source pixels need endpoint/index-constrained solver. pending_artwork=26, producer_rework=1. RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION22 completed odd index 137 30CF0D entirely without Remote Desktop Commander. Canonical source 11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc is 2048x1024 RGBA32/BGRA raw mirror_y. Six physical labels were localized (SELECT TRANSMISSION, standalone TRANSMISSION, MANUAL x2, AUTOMATIC x2). Candidate 6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b passes 6/6 exact bbox+size+positive margins; clean-source-effect unchanged/outside/alpha/protected/overlap/touch are all 0; controller SOURCE/CLEAN/FINAL, row-contact and raw mirror_y visual self-QA PASS. Pending independent C and in-game validation. pending_artwork=26, producer_rework=1. RUNTIME_VALIDATION=UNTESTED.",
     "B_PRODUCTION78/B80 completed. C151-returned even index 86 C598919A was actually reworked first: canonical 4096x4096 DXT5 stage-boundary analysis found 8/10 stage rows have mandatory source glyph/effect pixels in exact-bbox-crossing 4x4 blocks (1,435 pixels total), proving ordinary full-block splice cannot be exact decoded-pixel safe; no candidate persisted and endpoint/index-constrained solver remains required. Per fail-closed continuation B produced even index 236 FEF70E85 candidate e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086 from canonical 2048x2048 RGBA32/BGRA raw mirror_y source. 14 canonical phonetic stage names pass 14/14 exact bbox+size+positive margins, zero residue/outside/alpha/protected/render-outside/preserved/overlap/touch and controller source/clean/final/row/raw QA; REVERSED remains pixel-exact. Pending independent C and in-game. pending_artwork=27, producer_rework=1. RUNTIME_VALIDATION=UNTESTED.",
@@ -216,8 +217,8 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_B/20261005-B-PRODUCTION80/B80_FEF_REPORT.json",
-    "hd_rework_candidates_ready": 16,
+    "latest_hd_rework_batch": "localization/graphics/role_B/20261005-B-PRODUCTION81/B82_8C_REPORT.json",
+    "hd_rework_candidates_ready": 17,
     "hd_rework_remaining": 0,
     "hd_partial_rework": {
       "12519155": {
@@ -1119,7 +1120,7 @@
       "pending_independent_c_final_qa": true,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 26,
+    "current_pending_artwork_localize_text": 25,
     "current_producer_rework_remaining": 1,
     "latest_a_production_batch": "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_EBEF6D20_REPORT.json",
     "a_production20_9ce4e175": {
@@ -1139,15 +1140,15 @@
       "runtime_validation": "UNTESTED"
     },
     "latest_b_production": {
-      "run": "B_PRODUCTION80",
-      "asset": "FEF70E85",
-      "queue_index": 236,
-      "candidate_sha256": "e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086",
-      "report": "localization/graphics/role_B/20261005-B-PRODUCTION80/B80_FEF_REPORT.json",
-      "status": "C153_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
-      "runtime_validation": "UNTESTED",
-      "c_final_qa": "PASS",
-      "c_report": "localization/graphics/role_C/20261005-C153-FEF70E85/C153_FEF_CONTROLLER_FINAL_QA.json"
+      "run": "B_PRODUCTION81/B82_CORRECTIVE",
+      "asset": "8C259C68",
+      "queue_index": 188,
+      "candidate_sha256": "03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03",
+      "report": "localization/graphics/role_B/20261005-B-PRODUCTION81/B82_8C_REPORT.json",
+      "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION81/B82_CONTROLLER_SELF_QA.json",
+      "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "c157_machine_qa": "PASS",
+      "runtime_validation": "UNTESTED"
     }
   },
   "runtime_packages": {
@@ -3485,6 +3486,38 @@
     "decision": "C156_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
     "machine_report": "localization/graphics/role_C/20261005-C156-30CF0D/C156_30CF_MACHINE_QA.json",
     "report": "localization/graphics/role_C/20261005-C156-30CF0D/C156_30CF_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "b_production81_b82_8c259c68": {
+    "timestamp_kst": "2026-10-05T12:25:00+09:00",
+    "run": "20261005-B-PRODUCTION81",
+    "corrective_revision": "B82",
+    "queue_index": 188,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+    "source_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+    "rejected_b81_candidate_sha256": "08384ab50414d5e619db70680f40b2d7d48b74f0d281a6a22d3642553af24075",
+    "rejected_b81_reasons": [
+      "mirror_y semantic binding reversed six help rows",
+      "Korean Regular 8px x4 visibly smaller/thinner than source"
+    ],
+    "candidate_sha256": "03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+    "physical_elements": 6,
+    "bbox_size_positive_margin": "6/6",
+    "source_residue": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected": 0,
+    "render_outside_target": 0,
+    "overlap": 0,
+    "touch_pairs": 0,
+    "controller_visual_qa": "PASS",
+    "c157_independent_machine_qa": "PASS",
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION81/B82_8C_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION81/B82_CONTROLLER_SELF_QA.json",
+    "c157_report": "localization/graphics/role_C/20261005-C157-8C259C68/C157_8C_MACHINE_QA.json",
+    "c_final_qa": "PENDING_CONTROLLER_VISUAL",
+    "in_game_validation": "PENDING",
     "runtime_validation": "UNTESTED"
   }
 }
