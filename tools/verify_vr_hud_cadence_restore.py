@@ -192,10 +192,17 @@ for marker in (
     "- 'src/hooks_uiscaling.cpp'",
     "- 'tools/OutRunVR-TestProfiles.ps1'",
     "- 'tools/verify_vr_hud_cadence_restore.py'",
-    "python tools/verify_vr_hud_cadence_restore.py",
 ):
     if marker not in workflow:
         fail(f"DX9Ex Active workflow does not own regression input: {marker}")
+for marker in (
+    "'tools/verify_vr_hud_cadence_restore.py'",
+    "foreach ($verifier in $verifiers)",
+    "python $verifier",
+    "if ($LASTEXITCODE -ne 0)",
+):
+    if marker not in workflow:
+        fail(f"DX9Ex Active workflow lost fail-closed verifier execution: {marker}")
 if "./tools/Test-OutRunVRTestPolicy.ps1" not in workflow:
     fail("DX9Ex Active workflow stopped executing the runtime-test policy")
 
