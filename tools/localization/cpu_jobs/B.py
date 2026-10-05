@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("B hosted worker only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION150-DCC7"
+run="20261005-B-PRODUCTION151-DCC7"
 out=repo/"localization/graphics/role_B"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds"
@@ -18,7 +18,7 @@ COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 SOURCE_BLOB="7f8f0d10f2ac8a19bda1933d6a324a37123b48c0"
 SOURCE_SHA="ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e"
 BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
-tmp=Path("/tmp/outrun_B150"); tmp.mkdir(parents=True,exist_ok=True)
+tmp=Path("/tmp/outrun_B151"); tmp.mkdir(parents=True,exist_ok=True)
 dds=tmp/"DCC7B488.dds"; atlas=tmp/"atlas.json"
 urllib.request.urlretrieve(BASE+"/Release/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",dds)
 urllib.request.urlretrieve(BASE+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_FLAG_RANK_Exst/4x_DCC7B488_512x256_atlas.json",atlas)
@@ -123,7 +123,13 @@ if not(effect_bbox[0]<core_bbox[0] and effect_bbox[1]<=core_bbox[1] and effect_b
 if np.count_nonzero(effect)>65000: raise RuntimeError(("effect too broad",int(np.count_nonzero(effect)),effect_bbox))
 
 pglobal=np.zeros((H,W,4),np.uint8); pglobal[sy0:sy1,sx0:sx1]=pred
-clean_arr=sa.copy(); clean_arr[effect]=pglobal[effect]
+# B150 controller visual QA found a faint low-contrast Total Rank silhouette outside the
+# residual-connected mask. Reconstruct the entire exact effect bbox from the fitted
+# speech-bubble field; the box is fully inside the smooth interior and never touches
+# the navy border/glow. This removes all source-shaped low-alpha/low-contrast residue.
+clean_scope=np.zeros((H,W),bool)
+clean_scope[effect_bbox[1]:effect_bbox[3],effect_bbox[0]:effect_bbox[2]]=True
+clean_arr=sa.copy(); clean_arr[clean_scope]=pglobal[clean_scope]
 same=effect&np.all(clean_arr==sa,axis=2)
 if np.any(same):
     for yy0,xx0 in zip(*np.nonzero(same)):
@@ -201,14 +207,14 @@ row={
  "slant":.22,"fill_rgba":list(fill),"outline_rgba":list(outline),"alignment":"center"
 }
 
-source_png=out/"B150_SOURCE_READABLE.png"; clean_png=out/"B150_CLEAN_PLATE.png"; final_png=out/"B150_FINAL_READABLE.png"
-smp=out/"B150_SOURCE_TEXT_MASK.png"; ap=out/"B150_ALLOWED_EFFECT_BBOX_MASK.png"; pp=out/"B150_PROTECTED_MASK.png"
+source_png=out/"B151_SOURCE_READABLE.png"; clean_png=out/"B151_CLEAN_PLATE.png"; final_png=out/"B151_FINAL_READABLE.png"
+smp=out/"B151_SOURCE_TEXT_MASK.png"; ap=out/"B151_ALLOWED_EFFECT_BBOX_MASK.png"; pp=out/"B151_PROTECTED_MASK.png"
 src.save(source_png); clean.save(clean_png); dec.save(final_png)
-Image.fromarray((effect.astype(np.uint8)*255),"L").save(smp); allowed.save(ap); protected.save(pp)
+Image.fromarray((clean_scope.astype(np.uint8)*255),"L").save(smp); allowed.save(ap); protected.save(pp)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B150_CLEAN_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B150_FINAL_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B150_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"B150_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B151_CLEAN_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B151_FINAL_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B151_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"B151_FINAL_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS" or finalrep["status"]!="PASS": raise RuntimeError(("validator",cleanrep["status"],finalrep["status"]))
 
 # Controller evidence.
@@ -218,16 +224,16 @@ scale=min(2.2,1500/max(1,ims[0].width)); ims=[z.resize((int(z.width*scale),int(z
 card=Image.new("RGB",(sum(z.width for z in ims)+16,max(z.height for z in ims)+46),"white"); xx1=0
 for labtxt,z in zip(("SOURCE","CLEAN","FINAL"),ims):
     card.paste(z,(xx1,46)); ImageDraw.Draw(card).text((xx1+4,9),labtxt,fill="black"); xx1+=z.width+8
-save_b64(card,out/"B150_DCC7_FOCUS.jpg",out/"B150_DCC7_FOCUS_B64.txt",95)
+save_b64(card,out/"B151_DCC7_FOCUS.jpg",out/"B151_DCC7_FOCUS_B64.txt",95)
 ov=Image.new("RGB",(1024,3*550),"white")
 for i,(labtxt,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im); z.thumbnail((1024,512),Image.Resampling.LANCZOS); ov.paste(z,(0,i*550+26)); ImageDraw.Draw(ov).text((5,i*550+5),labtxt,fill="black")
-save_b64(ov,out/"B150_DCC7_SOURCE_CLEAN_FINAL.jpg",out/"B150_DCC7_SOURCE_CLEAN_FINAL_B64.txt",92)
+save_b64(ov,out/"B151_DCC7_SOURCE_CLEAN_FINAL.jpg",out/"B151_DCC7_SOURCE_CLEAN_FINAL_B64.txt",92)
 rr=Image.new("RGB",(1024,2*550),"white")
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
 for i,(labtxt,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im); z.thumbnail((1024,512),Image.Resampling.LANCZOS); rr.paste(z,(0,i*550+26)); ImageDraw.Draw(rr).text((5,i*550+5),labtxt,fill="black")
-save_b64(rr,out/"B150_DCC7_RAW_COMPARE.jpg",out/"B150_DCC7_RAW_COMPARE_B64.txt",92)
+save_b64(rr,out/"B151_DCC7_RAW_COMPARE.jpg",out/"B151_DCC7_RAW_COMPARE_B64.txt",92)
 
 report={
  "schema_version":1,"role":"B","run":run,"queue_index":32,"asset":asset,
@@ -235,20 +241,20 @@ report={
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB,"source_sha256":SOURCE_SHA},
  "classification":{"localizable":"Total Rank","translation":"종합 랭킹","prior_queue_action":"zoom_review"},
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":payload[:128]==sb[:128],"raw_orientation":"mirror_y"},
- "clean_reconstruction":{"method":"white-title component seed + connected effect residual mask + robust local quadratic pale-green field","background_fit_samples":int(np.count_nonzero(use)),"clean_source_residue":source_residue},
+ "clean_reconstruction":{"method":"B151 full exact effect-bbox quadratic pale-green field reconstruction after B150 visual ghost rejection","background_fit_samples":int(np.count_nonzero(use)),"clean_source_residue":source_residue,"clean_scope_pixels":int(np.count_nonzero(clean_scope))},
  "source_style":{"family":"white italic Total Rank with dark navy outline","font_file":Path(fp).name,"font_style":fstyle,"font_size":chosen_fs,"stroke_width":chosen_sw,"slant":.22,"fill_rgba":list(fill),"outline_rgba":list(outline)},
  "rows":[row],"clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
  "decoded_changes":{"outside_allowed_effect_bbox":outside,"alpha_outside":alphaout,"render_outside_target":renderout,"localized_overlap":0},
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
- "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","status":"B150_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","status":"B151_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "RUNTIME_VALIDATION":"UNTESTED"
 }
-(out/"B150_DCC7_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-(wr/"B150_DCC7B488.json").write_text(json.dumps({
+(out/"B151_DCC7_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(wr/"B151_DCC7B488.json").write_text(json.dumps({
  "run":run,"index":32,"asset":"DCC7B488","candidate_sha256":csha,
  "localized_physical_elements":1,"bbox_size_positive_margin":"1/1",
  "clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "outside":outside,"alpha_outside":alphaout,"worker_status":report["status"],
- "report":f"localization/graphics/role_B/{run}/B150_DCC7_REPORT.json","runtime_validation":"UNTESTED"
+ "report":f"localization/graphics/role_B/{run}/B151_DCC7_REPORT.json","runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"run":run,"index":32,"candidate_sha256":csha,"bbox":lb,"source_bbox":core_bbox,"effect_bbox":effect_bbox},ensure_ascii=False))
