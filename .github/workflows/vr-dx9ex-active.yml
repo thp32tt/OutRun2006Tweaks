@@ -82,15 +82,23 @@ jobs:
       - name: Verify reconstructed VR architecture boundaries
         shell: pwsh
         run: |
-          python tools/verify_vr_architecture.py
-          python tools/verify_vr_r51_runtime_contract.py
-          python tools/verify_vr_r32_review.py
-          python tools/verify_vr_hook_graph.py
-          python tools/verify_vr_refactor_contract.py
-          python tools/verify_vr_sumo_replay_semantics.py
-          python tools/verify_vr_hud_cadence_restore.py
-          python tools/verify_vr_producer_provenance.py
-          python tools/verify_vr_r31_r32_retirement_guard.py
+          $verifiers = @(
+            'tools/verify_vr_architecture.py',
+            'tools/verify_vr_r51_runtime_contract.py',
+            'tools/verify_vr_r32_review.py',
+            'tools/verify_vr_hook_graph.py',
+            'tools/verify_vr_refactor_contract.py',
+            'tools/verify_vr_sumo_replay_semantics.py',
+            'tools/verify_vr_hud_cadence_restore.py',
+            'tools/verify_vr_producer_provenance.py',
+            'tools/verify_vr_r31_r32_retirement_guard.py'
+          )
+          foreach ($verifier in $verifiers) {
+            python $verifier
+            if ($LASTEXITCODE -ne 0) {
+              throw "$verifier failed with exit code $LASTEXITCODE"
+            }
+          }
       - name: Verify near-plane active stereo eligibility
         shell: pwsh
         run: python tools/verify_vr_nearplane_active_gate.py
