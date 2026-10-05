@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-05T14:41:29+09:00",
+  "updatedKst": "2026-10-05T14:43:12+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -367,7 +367,7 @@
   },
   "post1000Maintenance00403": {
     "taskId": "CONVERSION-DX9EX-00403",
-    "eventId": "CONVERSION-DX9EX-00403-E001",
+    "eventId": "CONVERSION-DX9EX-00403-E003",
     "attempt": "1/3",
     "item": "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012",
     "baseSha": "8fa7a10f3f9a13d2bc5ccce29a2cbbd82cddb520",
@@ -391,6 +391,11 @@
       "packageArtifactId": 11326909994,
       "packageArtifactDigest": "sha256:b81eb674a40841b5408f09e6e70576662a3b8b171c83b11f1237049847ebd36b",
       "n100": "AUXILIARY_EXACT_SHA_8B1BD6B3_STATIC_PASS"
-    }
+    },
+    "eventType": "rollover",
+    "productionId": "CONVERSION-DX9EX-00403",
+    "chatRollover": 2,
+    "rolloverIsRetry": false,
+    "resumeReason": "Retry persisted after one recovery attempt"
   }
 }
