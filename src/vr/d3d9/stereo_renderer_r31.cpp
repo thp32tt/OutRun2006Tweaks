@@ -210,7 +210,7 @@ namespace OutRunVRStereo
         {
             if (TryGetTrackedViewport(viewport))
                 return true;
-            return device && SUCCEEDED(device->GetViewport(&viewport));
+            return OutRunVR::D3D9::ReadViewport(device, viewport);
         }
 
         bool R31ProjectionMatches(const D3DMATRIX& a,
