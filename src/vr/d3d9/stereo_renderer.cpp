@@ -994,6 +994,15 @@ namespace OutRunVRStereo
 			FormatHasStencil(R9MainDepthDesc.Format);
 	}
 
+	inline void R9InvalidateRightDepthStencilSync(
+		bool invalidateDepth, bool invalidateStencil) noexcept
+	{
+		if (invalidateDepth)
+			RightDepthSynchronized = false;
+		if (invalidateStencil)
+			RightStencilSynchronized = false;
+	}
+
 	inline void R9SynchronizeDepthContentSerials() noexcept
 	{
 		std::uint64_t serial = std::max(
