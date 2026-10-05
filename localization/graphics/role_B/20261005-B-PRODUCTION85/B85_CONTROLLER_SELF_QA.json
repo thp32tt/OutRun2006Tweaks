@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION85",
+  "timestamp_kst": "2026-10-05T12:50:00+09:00",
+  "index": 212,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "superseded_b84": {
+    "candidate_sha256": "45003b9f0965b62a623c77d89a7dcbe8aa35a183e348c570c177492c48dce8ec",
+    "reason": "PROFESSIONAL source alignment is right-anchored; B84 left placement failed controller visual source-alignment review"
+  },
+  "candidate_sha256": "869cf1bea8b27dcc89f5b2ab68f9dd163e4bf41fa6de4b53c7b3f19b3b1c74ad",
+  "machine_qa": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y",
+    "localized_elements": 12,
+    "bbox_size_positive_margin": "12/12 PASS",
+    "clean_validator": "PASS",
+    "final_validator": "PASS",
+    "source_residue": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_outside_target": 0,
+    "overlap": 0,
+    "touch_pairs": 0
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "semantic_binding": "PASS",
+    "source_style": "PASS",
+    "protected_art": "PASS",
+    "observations": [
+      "B83 numbered canonical atlas resolved all 12 physical occurrences for the 10 reviewed semantic strings; character names, VERDE MUGELLO, zodiac graphics and logos/icons are preserved.",
+      "B85 corrects PROFESSIONAL/프로 to the source right-anchored alignment; other target families retain their source left/right alignment and sampled source fill colors.",
+      "Large red menu labels, dark menu labels, orange Professional, small red OutRun and both DONE occurrences remain strictly inside their exact source bboxes with positive margins.",
+      "No visible English source residue, clipping, overlap, seam, halo, protected-art change or orientation regression."
+    ]
+  },
+  "decision": "B85_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
