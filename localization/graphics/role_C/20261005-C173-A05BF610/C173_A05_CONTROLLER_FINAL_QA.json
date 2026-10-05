@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C173-A05BF610",
+  "qa_id": "C173",
+  "timestamp_kst": "2026-10-05T16:33:00+09:00",
+  "queue_index": 28,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION115",
+  "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+  "candidate_sha256": "d124775363f3e989a312d13fa0ee17436a28cd927837933b0ea9c8a98a89e6a2",
+  "candidate_changed_by_C": false,
+  "machine_status": "REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+  "independent_machine_checks": {
+    "decoded_changed_outside_source_effect_bbox": 0,
+    "alpha_changed_outside_source_effect_bbox": 0,
+    "unchanged_source_title_core_residue_pixels": 20638,
+    "source_residue_bbox": [
+      400,
+      1120,
+      1050,
+      1272
+    ]
+  },
+  "controller_visual_qa": "FAIL_SOURCE_TEXT_RESIDUE_AND_GHOST_CLEAN_PLATE",
+  "visual_note": "Independent C detail/raw review shows the English source title was not removed: a large trailing 'Rank' remains fully visible beside/behind 종합 랭킹, and the CLEAN plate contains text-shaped replacement/ghost blocks. This violates the zero-overlap/source-residue rule even though producer outside/alpha checks passed.",
+  "decision": "C173_REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+  "required_rework": "Rebuild the exact source-title mask to cover all Total Rank glyph/effect pixels, produce a source-faithful smooth oval clean plate with zero English residue/ghost blocks, then render Korean inside the exact canonical source effect bbox and rerun residue/overlap/raw-orientation QA.",
+  "machine_report": "localization/graphics/role_C/20261005-C173-A05BF610/C173_A05_MACHINE_QA.json",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION115/B115_A05_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C173-A05BF610/C173_A05_SOURCE_FINAL_DETAIL.jpg",
+    "localization/graphics/role_C/20261005-C173-A05BF610/C173_A05_RAW_COMPARE.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION115/B115_A05_SOURCE_CLEAN_FINAL.jpg"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
