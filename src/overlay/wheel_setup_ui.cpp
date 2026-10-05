@@ -1677,9 +1677,9 @@ namespace
 
                 if (modelIndex == 0)
                 {
-                    // R9 MOZA R3 hardware baseline. The user's physical wheel
-                    // requires both DirectInput polarities reversed for correct
-                    // SAT/centering direction.
+                    // R10 MOZA R3 hardware baseline. Modern DD owns reversed
+                    // DirectInput ConstantForce/Spring polarity; the runtime
+                    // enforces it atomically with the selected force model.
                     Settings::WheelFFBModel = 0;
                     Settings::WheelFFBPhysicsSat = true;
                     Settings::WheelFFBSpringStrength = 0.22f;
@@ -1781,8 +1781,8 @@ namespace
                         track_ffb_change(true);
                         WheelFFB_ResetHeadroomStats();
                         WheelFFB_RequestSettingsTransition();
-                        status_ = std::string("FFB model + complete R9 test baseline applied: ") +
-                            FfbModelNames[modelIndex] + ". Save Force Feedback to persist it.";
+                        status_ = std::string("FFB model + complete R10 test baseline applied: ") +
+                            FfbModelNames[modelIndex] + ". Polarity is automatic; save to persist the feel values.";
                     }
                     if (selected)
                         ImGui::SetItemDefaultFocus();
@@ -1790,7 +1790,7 @@ namespace
                 ImGui::EndCombo();
             }
             ImGui::TextDisabled(
-                "R9: changing FFB Model applies the complete test baseline automatically. Modern uses Reverse Force+Spring ON; Arcade/Hybrid/PS2 use both OFF.");
+                "R10: changing FFB Model applies the complete test baseline automatically. Polarity is model-owned: Modern Reverse Force+Spring ON; Arcade/Hybrid/PS2 both OFF.");
 
             const int activeFfbModel = std::clamp(int(Settings::WheelFFBModel), 0, 3);
             if (activeFfbModel == 0)
@@ -1978,11 +1978,12 @@ namespace
 
             track_ffb_change(ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr()));
             track_ffb_change(ImGui::Checkbox("Record driving telemetry (5 Hz + 1 Hz detail)", Settings::WheelFFBTelemetry.ptr()));
-            track_ffb_change(ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr()));
-            ImGui::SameLine();
-            track_ffb_change(ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()));
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Use Reverse Spring only if the wheel pushes farther away from centre. ConstantForce direction is independent.");
+            const bool modelAutoReverse = activeFfbModel == 0;
+            ImGui::Text("FFB polarity: %s", modelAutoReverse
+                ? "AUTO - Reverse ConstantForce + Spring"
+                : "AUTO - Normal ConstantForce + Spring");
+            ImGui::TextDisabled(
+                "R10 locks polarity to the selected model so profile/revert/settings changes cannot leave the previous model's direction active.");
 
             if (ffbDirty_)
                 ImGui::TextDisabled("Unsaved FFB changes are active now but will be lost after restart.");
