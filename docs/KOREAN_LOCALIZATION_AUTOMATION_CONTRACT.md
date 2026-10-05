@@ -2,7 +2,7 @@
 
 > Recovery baseline: 2026-09-28 10:12 KST (`11631c5f12037bcd01cda1af57ec9bc564af4bcf`). Keep this branch intentionally small and production-focused. Do not import later controller schemas, event-ID layers, queue engines, or VR/FFB rules unless separately proven necessary.
 
-This is the canonical contract for the N100 A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md, localization/WORKLOG.md, localization/progress/progress.json, localization/resume_state.json, localization/graphics/README.md, localization/graphics/ORIENTATION_POLICY.md and localization/graphics/TRANSLATION_NAMING_POLICY.md. Repository state on korean-localization-recovery-20260928 is the only work state; do not use GPT Library as a work store.
+This is the canonical contract for the N100 A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md, localization/WORKLOG.md, localization/progress/progress.json, localization/resume_state.json, localization/graphics/README.md, localization/graphics/ORIENTATION_POLICY.md, localization/graphics/TRANSLATION_NAMING_POLICY.md and localization/graphics/INGAME_REWORK_BACKLOG.csv. Repository state on korean-localization-recovery-20260928 is the only work state; do not use GPT Library as a work store.
 
 ## Isolation and source rules
 - Work only on korean-localization-recovery-20260928. Never merge VR/FFB source or history.
@@ -39,6 +39,26 @@ Machine-readable QA must record per asset/element: original_bbox, localized_bbox
 - QA/report state must distinguish `PASS`, `REWORK_REQUIRED`, and `HOLD_STRICT_RECHECK`; do not collapse HOLD into PASS.
 - PNG comparison/proof images are evidence only and do not count as completed deployable DDS assets.
 
+## User in-game regression override
+
+`localization/graphics/INGAME_REWORK_BACKLOG.csv` is the authoritative user-visible regression backlog. It records defects confirmed from actual in-game screenshots and overrides prior static PASS/approval state until a newer in-game retest closes the row.
+
+- Every A/B/C run MUST read the backlog before generic queue selection.
+- Any row with `status=OPEN_USER_INGAME_FAIL` is actionable even if `asset_queue.csv` currently says PASS or `*_pass_pending_ingame`. Screenshot-confirmed failure reopens the work; historical PASS is not grandfathered.
+- A/B production priority is: active P0 in-game backlog -> active P1 in-game backlog -> C-returned `REWORK_REQUIRED` -> normal readiness tiers. Do not select unrelated new production while an owned P0/P1 regression is actionable.
+- `owner_lane` in the backlog overrides normal odd/even queue parity for that regression only. The non-owner lane must skip the active regression asset unless the backlog is explicitly reassigned or the owner is blocked and work-steal is recorded.
+- `mapping_status=UNRESOLVED` or `SUSPECTED` means the first step is exact source/asset/runtime-ID mapping. Once exact mapping is obtained, continue through material rework in the SAME invocation when safe; do not stop at mapping-only evidence.
+- Never guess the defect domain. `GRAPHICS` means DDS/artwork rework; `RUNTIME_TEXT` means localization text/runtime draw-path rework; `MIXED` must be split by source before changes. A/B must not create a fake DDS fix for a runtime-overlay defect or edit runtime code for a raster-only defect.
+- Runtime-text fixes are allowed only inside the Korean-localization domain (for example `src/hooks_localization.cpp`, `localization/text/runtime_ko.tsv`, localization runtime docs/evidence). Do not touch VR/FFB/DX11/DXVK work. Any runtime source change requires current Win32 Release build validation before static completion.
+- Low-resolution mixed-font evidence is a hard failure. Re-render from the native-resolution/HD source and source-faithful typography; never upscale a prior Korean bitmap candidate to hide blur.
+- Broken glyphs, source-script residue, duplicate English/Korean, other-image intrusion, protected-art damage, wrong slant/perspective, bad baseline, clipping, or visible layer collision are hard failures even when numeric bbox/mask checks previously passed.
+- For card/popup/HUD/title families, preserve the source transform: slant/perspective, baseline, alignment, fill/gradient, outline, shadow/glow, relative scale, line spacing and protected artwork. Source-style mismatch seen in-game is sufficient to reopen a candidate.
+- User screenshot evidence outranks earlier controller visual PASS when they conflict. Numeric false negatives must be recorded as such and the visual defect must be repaired.
+- A/B may reach `STATIC_PASS_PENDING_INGAME_RETEST` (or `BUILD_PASS_PENDING_INGAME_RETEST` for runtime changes) after repair. They MUST NOT set an in-game backlog row to CLOSED without a newer actual in-game retest.
+- C must revalidate repaired backlog items but likewise cannot erase the user-visible defect based only on static evidence. C may mark `C_STATIC_PASS_PENDING_INGAME_RETEST`; final closure requires later in-game evidence.
+- When one DDS causes multiple screenshot defects (for example the selector card family), treat them as one material asset rework while keeping every backlog row linked for retest. Do not award/record duplicate production completion for the same bytes.
+- Preserve the screenshot filename, defect tags, mapping provenance, before/after asset hash, and remaining retest state in role reports/WORKLOG so later A/B/C runs do not repeat closed work.
+
 ## Short controller dispatch
 The controller prompt may be intentionally minimal. The following commands are sufficient entry points once this repository/branch is selected:
 - `OutRun 한글화 A 실행`
@@ -72,12 +92,14 @@ Classify unfinished A/B work from current Git evidence:
 3. **PREFLIGHT_ONLY** — source identity, semantic binding, effect geometry or another prerequisite still requires broader investigation before candidate construction can safely begin.
 
 ### Mandatory producer order
-A/B select work in this order within their shard:
-1. directly repairable C-returned `REWORK_REQUIRED`;
-2. `RENDER_READY` assets without a current acceptable Korean candidate;
-3. `ONE_STAGE_TO_RENDER` assets;
-4. existing candidate DDS needing material rework;
-5. only when 1-4 are exhausted, new `PREFLIGHT_ONLY` work.
+A/B select work in this order:
+1. assigned active P0 rows from `localization/graphics/INGAME_REWORK_BACKLOG.csv`;
+2. assigned active P1 rows from that backlog;
+3. directly repairable C-returned `REWORK_REQUIRED`;
+4. `RENDER_READY` assets without a current acceptable Korean candidate;
+5. `ONE_STAGE_TO_RENDER` assets;
+6. existing candidate DDS needing material rework;
+7. only when 1-6 are exhausted, new `PREFLIGHT_ONLY` work.
 
 When a RENDER_READY or ONE_STAGE_TO_RENDER item exists, do not open unrelated preflight/work-order work merely to record progress.
 
