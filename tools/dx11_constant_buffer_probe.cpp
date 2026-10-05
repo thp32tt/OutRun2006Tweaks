@@ -452,6 +452,143 @@ int main()
         !r265Sm1Decode.exact(),
         "R265 fails closed on truncated, unknown-opcode, and SM1 streams");
 
+    const auto r266ParameterToken =
+        [](D3DSHADER_PARAM_REGISTER_TYPE type,
+           UINT index,
+           DWORD payload) noexcept -> DWORD
+    {
+        const DWORD rawType = static_cast<DWORD>(type);
+        return 0x80000000u |
+               (index & D3DSP_REGNUM_MASK) |
+               ((rawType << D3DSP_REGTYPE_SHIFT) &
+                D3DSP_REGTYPE_MASK) |
+               ((rawType << D3DSP_REGTYPE_SHIFT2) &
+                D3DSP_REGTYPE_MASK2) |
+               payload;
+    };
+
+    const DWORD r266VsTokens[] = {
+        D3DVS_VERSION(3, 0),
+        static_cast<DWORD>(D3DSIO_MOV) | (3u << 24u),
+        r266ParameterToken(
+            D3DSPR_TEMP, 0u, D3DSP_WRITEMASK_ALL),
+        r266ParameterToken(
+            D3DSPR_CONST2,
+            7u,
+            D3DSP_NOSWIZZLE | D3DSHADER_ADDRMODE_RELATIVE),
+        r266ParameterToken(
+            D3DSPR_ADDR, 0u, D3DSP_REPLICATERED),
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const auto r266VsEvidence =
+        outrun::vr::dx11::
+            capture_programmable_shader_function_source_evidence(
+                r266VsTokens, sizeof(r266VsTokens), true);
+    const auto r266VsDecode =
+        outrun::vr::dx11::
+            decode_programmable_shader_instruction_stream(
+                r266VsEvidence);
+    const auto r266VsSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_register_semantics(
+                r266VsDecode);
+    require(
+        r266VsSemantics.exact() &&
+        r266VsSemantics.vertexStage &&
+        r266VsSemantics.semanticInstructionCount == 1u &&
+        r266VsSemantics.destinationOperandCount == 1u &&
+        r266VsSemantics.sourceOperandCount == 1u &&
+        r266VsSemantics.relativeAddressOperandCount == 1u &&
+        r266VsSemantics.floatConstantReferenceCount == 1u &&
+        r266VsSemantics.samplerReferenceCount == 0u &&
+        r266VsSemantics.operands.size() == 3u &&
+        r266VsSemantics.operands[0].role ==
+            ProgrammableShaderRegisterOperandRole::Destination &&
+        r266VsSemantics.operands[1].role ==
+            ProgrammableShaderRegisterOperandRole::Source &&
+        r266VsSemantics.operands[1].registerType ==
+            D3DSPR_CONST2 &&
+        r266VsSemantics.operands[1].registerIndex == 7u &&
+        r266VsSemantics.operands[1].constantReference &&
+        r266VsSemantics.operands[1].normalizedConstantIndex ==
+            2055u &&
+        r266VsSemantics.operands[1].relativeAddressing &&
+        r266VsSemantics.operands[2].role ==
+            ProgrammableShaderRegisterOperandRole::RelativeAddress &&
+        r266VsSemantics.operands[2].registerType ==
+            D3DSPR_ADDR &&
+        r266VsSemantics.registerSemanticsHash != 0 &&
+        r266VsSemantics.decoderRevisionHash != 0 &&
+        r266VsSemantics.semanticContractHash != 0,
+        "R266 decodes destination/source register semantics, relative addressing, and normalized constant provenance");
+
+    const DWORD r266PsTokens[] = {
+        D3DPS_VERSION(3, 0),
+        static_cast<DWORD>(D3DSIO_TEX) | (3u << 24u),
+        r266ParameterToken(
+            D3DSPR_TEMP, 0u, D3DSP_WRITEMASK_ALL),
+        r266ParameterToken(
+            D3DSPR_INPUT, 0u, D3DSP_NOSWIZZLE),
+        r266ParameterToken(
+            D3DSPR_SAMPLER, 3u, D3DSP_NOSWIZZLE),
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const auto r266PsEvidence =
+        outrun::vr::dx11::
+            capture_programmable_shader_function_source_evidence(
+                r266PsTokens, sizeof(r266PsTokens), false);
+    const auto r266PsSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_register_semantics(
+                outrun::vr::dx11::
+                    decode_programmable_shader_instruction_stream(
+                        r266PsEvidence));
+    require(
+        r266PsSemantics.exact() &&
+        !r266PsSemantics.vertexStage &&
+        r266PsSemantics.destinationOperandCount == 1u &&
+        r266PsSemantics.sourceOperandCount == 2u &&
+        r266PsSemantics.samplerReferenceCount == 1u &&
+        r266PsSemantics.operands.size() == 3u &&
+        r266PsSemantics.operands[2].samplerReference &&
+        r266PsSemantics.operands[2].registerType ==
+            D3DSPR_SAMPLER &&
+        r266PsSemantics.operands[2].registerIndex == 3u,
+        "R266 derives exact TEX sampler provenance");
+
+    const DWORD r266UnsupportedTokens[] = {
+        D3DVS_VERSION(3, 0),
+        static_cast<DWORD>(D3DSIO_SGN) | (4u << 24u),
+        r266ParameterToken(
+            D3DSPR_TEMP, 0u, D3DSP_WRITEMASK_ALL),
+        r266ParameterToken(
+            D3DSPR_TEMP, 1u, D3DSP_NOSWIZZLE),
+        r266ParameterToken(
+            D3DSPR_CONST, 0u, D3DSP_NOSWIZZLE),
+        r266ParameterToken(
+            D3DSPR_CONST, 1u, D3DSP_NOSWIZZLE),
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const auto r266UnsupportedEvidence =
+        outrun::vr::dx11::
+            capture_programmable_shader_function_source_evidence(
+                r266UnsupportedTokens,
+                sizeof(r266UnsupportedTokens),
+                true);
+    const auto r266UnsupportedDecode =
+        outrun::vr::dx11::
+            decode_programmable_shader_instruction_stream(
+                r266UnsupportedEvidence);
+    const auto r266UnsupportedSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_register_semantics(
+                r266UnsupportedDecode);
+    require(
+        r266UnsupportedDecode.exact() &&
+        !r266UnsupportedSemantics.complete &&
+        !r266UnsupportedSemantics.exact(),
+        "R266 preserves R265 structure but fails closed on model-dependent register-role layouts");
+
     const ProgrammableShaderFunctionIdentity programmableVs{
         true,
         true,
