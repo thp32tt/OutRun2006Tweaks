@@ -1697,3 +1697,9 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Compact translated cells <=24 logical px now use a clipped, stock-colour-derived 1-2px dark keyline; larger text unchanged.
 - Win32 Release 37379204456 PASS; Korean test-build 37379204466 package verification PASS.
 - State: B170_BUILD_PASS_PENDING_C_AND_INGAME_RETEST; NEW actual screenshot required before closure. IGR-007/010 remain OPEN. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-06T07:20:25+09:00 — B171 IGR-007 Heart Attack speech-bubble
+- Runtime path resolved: text resolver -> sprPrintf/Sumo_Printf -> Queue -> Korean ImGui redraw; FF2462BB index51 provides the blank speech-bubble/HUD artwork, not baked Korean bubble lettering.
+- Reused the existing B170 shared material fix by exact source hash (12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889); no duplicate source/DDS production. Compact translated text keeps the B170 clipped 1-2px stock-colour keyline.
+- Exact-source builds already PASS: Win32 Release 37379204456; Korean test-build/package 37379204466.
+- State: B171_SHARED_RUNTIME_FIX_BUILD_PASS_PENDING_C_AND_INGAME_RETEST; independent C + NEW actual game screenshot still required. Next B active row: IGR-010. VR/FFB/DX11/DXVK untouched.

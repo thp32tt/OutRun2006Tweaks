@@ -2057,3 +2057,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Domain isolation PASS. verify_state.py still reports only the pre-existing artwork-plan index/count/action-count baseline drift.
 - IGR-006 -> B170_BUILD_PASS_PENDING_C_AND_INGAME_RETEST. No in-game closure claimed; independent C review and NEW actual in-game retest remain mandatory. IGR-007/010 remain OPEN. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/runtime/B170_IGR006_RUNTIME_HUD_READABILITY.json.
+
+## 2026-10-06T07:20:25+09:00 - B171 IGR-007 Heart Attack speech-bubble runtime reconcile
+
+- Selected the next B-owned active P1 IGR-007 screenshot(149); completed B163-B170 material work was not regenerated.
+- Exact domain/path reconcile: the Korean speech-bubble lettering is RUNTIME_TEXT through resolver EXE+0x65EB0 -> sprPrintf/Sumo_Printf -> Queue -> KoreanRuntime::Draw/ImGui. FF2462BB index51 supplies the Heart Attack speech-bubble/HUD artwork, but the bubble panel is not a baked localized text cell.
+- B170 already made the material change for the shared compact runtime path and explicitly scopes its readability policy to IGR-006/007 HUD/speech-bubble regressions: valid translated draws <=24 logical px receive a stock-colour-derived dark 8-direction 1-2px keyline clipped to the existing Korean text rectangle. No layout region expansion.
+- Current src/hooks_localization.cpp SHA-256 is still 12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889, exact to the validation-bearing B170 source. Therefore Win32 Release 37379204456 PASS and Korean test-build 37379204466/package PASS remain exact-source-valid for IGR-007; identical source bytes were not reworked or rebuilt.
+- IGR-007 -> B171_SHARED_RUNTIME_FIX_BUILD_PASS_PENDING_C_AND_INGAME_RETEST. Independent C and a NEW actual in-game screenshot remain mandatory; no closure claimed. Next B active row is IGR-010. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/runtime/B171_IGR007_SPEECH_BUBBLE_RUNTIME_RECONCILE.json.

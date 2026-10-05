@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-INGAME171-IGR007-SPEECH-BUBBLE-RUNTIME",
+  "timestamp_kst": "2026-10-06T07:20:25+09:00",
+  "base_head": "365d64d1e5258436844718eda30b8a8ea55d24f1",
+  "user_ingame_regression": [
+    "IGR-007",
+    "스크린샷(149).png"
+  ],
+  "screen": "HEART_ATTACK_SPEECH_BUBBLE",
+  "owner_lane": "B",
+  "priority": "P1",
+  "defect_tags": [
+    "LOW_RES_FONT",
+    "READABILITY",
+    "OUTLINE_TOO_WEAK"
+  ],
+  "mapping": {
+    "domain": "RUNTIME_TEXT",
+    "status": "EXACT_RUNTIME_RENDER_PATH_SHARED_COMPACT_POLICY",
+    "translation_table": "localization/text/runtime_ko.tsv",
+    "resolver": "EXE+0x65EB0 -> KoreanRuntime::RememberText",
+    "print_hooks": [
+      "EXE+0x2CCE0 sprPrintf",
+      "EXE+0x2CDD0 Sumo_Printf"
+    ],
+    "render_path": "KoreanRuntime::InterceptPrint -> Queue -> KoreanRuntime::Draw -> ImGui foreground D3D9 overlay",
+    "supporting_graphics_atlas": {
+      "index": 51,
+      "path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+      "note": "The atlas contains the Heart Attack speech-bubble panel and related HUD art; the bubble panel itself carries no localized baked text, so the reported Korean bubble lettering is a runtime draw rather than a DDS text cell."
+    },
+    "exact_text_id_required_for_material_coverage": false,
+    "reason": "KoreanTextOverlayTest suppresses resolved stock glyph output and redraws every resolved Korean runtime draw through the same DrawCommand path. B170's compact policy is ID-agnostic for valid translated rows and is selected from captured stock cellHeight/scaleY state."
+  },
+  "shared_material_fix": {
+    "origin_run": "20261006-B-INGAME170-IGR006-RUNTIME-HUD",
+    "source_commit": "dced451f375ae98e3cc0273caead947f634bff6f",
+    "source_file": "src/hooks_localization.cpp",
+    "source_sha256": "12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889",
+    "current_branch_source_sha256": "12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889",
+    "source_unchanged_since_validated_build": true,
+    "policy": "valid translated draws with logical font height <=24 receive an 8-direction dark keyline derived from stock ARGB, 1-2 screen px, clipped to the pre-existing calculated Korean text rectangle",
+    "source_comment_scope": "The implementation explicitly records IGR-006/007 as the compact HUD/speech-bubble readability regressions addressed by this policy.",
+    "new_runtime_source_bytes_this_run": false,
+    "new_dds_bytes_this_run": false,
+    "duplicate_material_rework_avoided": true
+  },
+  "build_validation_reused_exact_source": {
+    "win32_release": {
+      "status": "PASS",
+      "workflow_run_id": 37379204456,
+      "artifact_id": 11373576031,
+      "digest": "sha256:0afdf711d2aa3b8fb717586c00b0ce3cc3bfe8e5d694a90e9047ff70a2ee6f01"
+    },
+    "korean_test_build": {
+      "status": "PASS",
+      "workflow_run_id": 37379204466,
+      "artifact_id": 11373183170,
+      "digest": "sha256:76bb44f7439f92a8ca2be64e7e1d8cc486dec217aaf4afb43134cd7983e11706",
+      "package_verify_step": "PASS"
+    },
+    "reuse_basis": "Current hooks_localization.cpp SHA-256 exactly matches the validation-bearing B170 source bytes."
+  },
+  "qa": {
+    "no_layout_region_expansion": true,
+    "stroke_clip": "exact calculated Korean text rectangle",
+    "larger_runtime_text_unchanged": true,
+    "runtime_table_changed": false,
+    "graphics_dds_changed": false,
+    "runtime_source_changed": false,
+    "domain_isolation": "PASS_BY_EXACT_VALIDATED_SOURCE_REUSE"
+  },
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "pending_independent_c_review": true,
+  "pending_new_ingame_retest": true,
+  "status": "B171_SHARED_RUNTIME_FIX_BUILD_PASS_PENDING_C_AND_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

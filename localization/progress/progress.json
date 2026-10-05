@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T07:05:07+09:00",
+  "updated_at_kst": "2026-10-06T07:20:25+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B170 completed B-owned P1 IGR-006 runtime HUD readability rework. Exact Korean runtime overlay draw path was materially repaired for compact cells with clipped 1-2px source-colour-derived keyline; Win32 Release and Korean test-package verification both PASS. IGR-006 requires independent C review + NEW actual in-game retest. Next B active rows remain IGR-007 and IGR-010; do not repeat B169/B170 unless returned REWORK.",
+  "next_checkpoint": "B171 reconciled B-owned P1 IGR-007 Heart Attack speech-bubble regression onto the already validated B170 shared compact-runtime material fix without regenerating identical bytes. Current hooks_localization.cpp is SHA-exact to the B170 Win32/Korean-test validated source. IGR-007 now awaits independent C + NEW actual in-game retest; it is not CLOSED. Next B active row is IGR-010 STAGE_HEART_TALLY_OVERLAY exact MIXED source split/material repair.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1934,37 +1934,51 @@
       "runtime_validation": "PENDING_NEW_INGAME_RETEST"
     },
     "latest_b_runtime_rework": {
-      "timestamp_kst": "2026-10-06T07:05:07+09:00",
-      "run": "20261006-B-INGAME170-IGR006-RUNTIME-HUD",
-      "regression": "IGR-006",
-      "screen": "INGAME_HUD_CITY_START",
-      "decision": "EXACT_RUNTIME_RENDER_PATH_COMPACT_TEXT",
+      "timestamp_kst": "2026-10-06T07:20:25+09:00",
+      "run": "20261006-B-INGAME171-IGR007-SPEECH-BUBBLE-RUNTIME",
+      "regression": "IGR-007",
+      "screen": "HEART_ATTACK_SPEECH_BUBBLE",
+      "decision": "EXACT_RUNTIME_RENDER_PATH_SHARED_COMPACT_POLICY",
+      "shared_material_origin": "B170",
       "source_commit": "dced451f375ae98e3cc0273caead947f634bff6f",
       "source_file": "src/hooks_localization.cpp",
       "source_sha256": "12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889",
-      "runtime_table_rows": 1355,
-      "material_fix": {
-        "compact_logical_height_max": 24.0,
-        "readability_stroke_screen_px": "1-2",
-        "stroke_directions": 8,
-        "stroke_clip": "existing calculated Korean text footprint",
-        "larger_runtime_text_unchanged": true,
-        "dds_changed": false
-      },
+      "current_source_hash_exact": true,
+      "supporting_graphics_index": 51,
+      "supporting_graphics_path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
       "build_validation": {
         "win32_release_run": 37379204456,
-        "win32_release_artifact": 11373576031,
-        "win32_release_digest": "sha256:0afdf711d2aa3b8fb717586c00b0ce3cc3bfe8e5d694a90e9047ff70a2ee6f01",
         "korean_test_build_run": 37379204466,
-        "korean_test_artifact": 11373183170,
-        "korean_test_digest": "sha256:76bb44f7439f92a8ca2be64e7e1d8cc486dec217aaf4afb43134cd7983e11706",
-        "result": "PASS"
+        "result": "PASS_EXACT_SOURCE_REUSE"
       },
-      "domain_isolation": "PASS",
-      "status": "B170_BUILD_PASS_PENDING_C_AND_INGAME_RETEST",
+      "status": "B171_SHARED_RUNTIME_FIX_BUILD_PASS_PENDING_C_AND_INGAME_RETEST",
       "pending_independent_c_review": true,
       "pending_new_ingame_retest": true,
-      "report": "localization/runtime/B170_IGR006_RUNTIME_HUD_READABILITY.json",
+      "report": "localization/runtime/B171_IGR007_SPEECH_BUBBLE_RUNTIME_RECONCILE.json",
+      "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+    },
+    "b171_igr007_speech_bubble": {
+      "timestamp_kst": "2026-10-06T07:20:25+09:00",
+      "run": "20261006-B-INGAME171-IGR007-SPEECH-BUBBLE-RUNTIME",
+      "regression": "IGR-007",
+      "screen": "HEART_ATTACK_SPEECH_BUBBLE",
+      "decision": "EXACT_RUNTIME_RENDER_PATH_SHARED_COMPACT_POLICY",
+      "shared_material_origin": "B170",
+      "source_commit": "dced451f375ae98e3cc0273caead947f634bff6f",
+      "source_file": "src/hooks_localization.cpp",
+      "source_sha256": "12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889",
+      "current_source_hash_exact": true,
+      "supporting_graphics_index": 51,
+      "supporting_graphics_path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+      "build_validation": {
+        "win32_release_run": 37379204456,
+        "korean_test_build_run": 37379204466,
+        "result": "PASS_EXACT_SOURCE_REUSE"
+      },
+      "status": "B171_SHARED_RUNTIME_FIX_BUILD_PASS_PENDING_C_AND_INGAME_RETEST",
+      "pending_independent_c_review": true,
+      "pending_new_ingame_retest": true,
+      "report": "localization/runtime/B171_IGR007_SPEECH_BUBBLE_RUNTIME_RECONCILE.json",
       "runtime_validation": "PENDING_NEW_INGAME_RETEST"
     }
   },
