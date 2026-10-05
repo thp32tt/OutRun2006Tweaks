@@ -35175,7 +35175,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_104_provenanc
         == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_104_OVERLAP_BYTES.hex(" ")
         and predecessor["incomplete_matches"]
         and predecessor["capture_edge_matches"]
-        and predecessor["unresolved_forward_targets"] == inherited_targets
+        and predecessor["unresolved_forward_targets"] == [0x00183C10, 0x00183C27]
     )
     overlap = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_104_OVERLAP_BYTES
     overlap_actual = probe[: len(overlap)]
