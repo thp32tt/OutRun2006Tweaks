@@ -62,6 +62,12 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('high_active == 0', SOURCE)
         self.assertIn('Priority C(DX9Ex refactor) > A(DX11) > B(DXVK deferred)', SOURCE)
 
+    def test_single_lane_policy_freezes_non_dx9ex(self):
+        self.assertIn('CONVERSION_ONLY_SLOT', SOURCE)
+        self.assertIn('frozen_lane_tasks', SOURCE)
+        self.assertIn('conversion_single_lane_running', SOURCE)
+        self.assertIn('await conversion_send_lane_task(context, pages, q, CONVERSION_ONLY_SLOT)', SOURCE)
+
     def test_rollover_throttle_policy(self):
         self.assertIn('CONVERSATION_ROLLOVER_MIN_SECONDS', SOURCE)
         self.assertIn('conversation_rollover_cooldown', SOURCE)
@@ -73,7 +79,8 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('dockerfile: Dockerfile.portainer-vr', compose)
         self.assertIn('CHAT_SLOTS: "3"', compose)
         self.assertIn('CONVERSION_PARALLEL: "true"', compose)
-        self.assertIn('CONVERSION_ACTIVE_LIMIT: "2"', compose)
+        self.assertIn('CONVERSION_ACTIVE_LIMIT: "1"', compose)
+        self.assertIn('CONVERSION_ONLY_SLOT: "C"', compose)
         self.assertIn('CONVERSION_DXVK_DEFERRED: "true"', compose)
         self.assertIn('QUEUE_RESULT_GRACE_SECONDS: "600"', compose)
         self.assertIn('CONVERSATION_ROLLOVER_MIN_SECONDS: "900"', compose)
