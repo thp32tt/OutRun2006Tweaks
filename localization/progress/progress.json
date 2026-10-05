@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T19:38:00+09:00",
+  "updated_at_kst": "2026-10-05T19:41:25+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A49 index 147 39BCA907 producer self-QA PASS pending independent C. A48 semantic binding was rejected and corrected in the same task. Candidate 6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b has 15/15 bbox+size+positive-margin PASS and zero outside/alpha/protected/source-residue/overlap/touch; controller readable/raw mirror_y visual PASS. Producer REWORK remains 2; pending-C=2; pending_artwork localize_text=14. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C192/C193 complete current C work: corrected A49 39BCA907 and B137 63C91067 both independent pixel/visual/policy PASS pending isolated in-game validation. 63C91067 C184 starburst defect is resolved; A48 39BCA907 semantic misbinding was superseded by A49 before approval. pending-C=0; pending_artwork localize_text=14; producer REWORK=2 (C598919A,37759842). RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,17 +265,14 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "REWORK_REQUIRED_WITH_PENDING_C",
+      "status": "REWORK_REQUIRED",
       "assets": [
         "C598919A",
         "37759842"
       ],
       "remaining": 2,
-      "note": "A49 39BCA907 self-QA PASS pending C. Existing producer REWORK preserved: C598919A,37759842. pending_artwork localize_text=14; pending-C=63C91067+39BCA907; RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": [
-        "63C91067",
-        "39BCA907"
-      ]
+      "note": "C193 clears 63C91067; C192 clears new index147 39BCA907. Remaining producer REWORK is C598919A exact-DXT5 constrained endpoint/index solver and 37759842 manual/template clean-plate reconstruction. pending_artwork localize_text=14; pending-C=0; RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": []
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -299,22 +296,18 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C180/C184/C186/C188",
-      "report": "localization/graphics/role_C/20261005-C180-C188-BATCH/C180_C188_BATCH_FINAL_QA.json",
-      "result": "2_PIXEL_VISUAL_PASS_2_REWORK_REQUIRED",
+      "run": "C192/C193",
+      "report": "localization/graphics/role_C/20261005-C192-C193-BATCH/C192_C193_BATCH_FINAL_QA.json",
+      "result": "2_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
       "candidate_changed_by_C": false,
-      "assets_checked": 4,
-      "physical_elements_checked": 57,
+      "assets_checked": 2,
+      "physical_elements_checked": 17,
       "pixel_visual_pass_assets": [
-        "560FA536",
-        "25F697C6"
+        "39BCA907",
+        "63C91067"
       ],
-      "rework_required_assets": [
-        "63C91067",
-        "37759842"
-      ],
+      "rework_required_assets": [],
       "global_rework_remaining": [
-        "63C91067",
         "C598919A",
         "37759842"
       ],
@@ -324,24 +317,17 @@
         "49BB5FE5",
         "75C3586A"
       ],
-      "high_risk_static_pass_assets_existing": [
-        "1A43E9D9"
-      ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 15,
+      "pending_production_localize_text": 14,
       "machine_evidence": {
-        "37759842": "localization/graphics/role_C/20261005-C186-37759842/C186_37759842_MACHINE_QA.json",
-        "560FA536": "localization/graphics/role_C/20261005-C180-560FA536/C180_560FA536_MACHINE_QA.json",
-        "63C91067": "localization/graphics/role_C/20261005-C184-63C91067/C184_63C91067_MACHINE_QA.json",
-        "25F697C6": "localization/graphics/role_C/20261005-C188-25F697C6/C188_25F697C6_MACHINE_QA.json"
+        "39BCA907": "localization/graphics/role_C/20261005-C192-39BCA907/C192_39BCA907_MACHINE_QA.json",
+        "63C91067": "localization/graphics/role_C/20261005-C193-63C91067/C193_63C91067_ADJUDICATED_MACHINE_QA.json"
       },
       "controller_visual": {
-        "37759842": "FAIL_VISIBLE_SOURCE_SHAPED_CLEAN_PLATE_GHOSTS_AND_DONOR_BOUNDARIES",
-        "560FA536": "PASS",
-        "63C91067": "FAIL_STARBURST_CLEAN_PLATE_RECONSTRUCTION_ARTIFACTS",
-        "25F697C6": "PASS"
+        "39BCA907": "PASS",
+        "63C91067": "PASS"
       },
-      "in_game_validation": "560FA536/25F697C6 PENDING; 63C91067/37759842 NOT_ELIGIBLE; RUNTIME_VALIDATION=UNTESTED"
+      "in_game_validation": "39BCA907/63C91067 PENDING; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION137",
