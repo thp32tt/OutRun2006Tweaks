@@ -857,6 +857,121 @@ class FrontierDiscoveryTests(unittest.TestCase):
         self.assertIn("validate_f140_frontier_contract", sut.main.__code__.co_names)
 
 
+
+    def test_f142_contract_metadata_is_pinned(self):
+        self.assertEqual(sut._F142_FRONTIER_CONTINUATION_ID, 104)
+        self.assertEqual(sut._F142_START_RVA, 0x00183C3D)
+        self.assertEqual(sut._F142_END_RVA, 0x00183C7D)
+        self.assertEqual(len(sut._F142_EXPECTED_BYTES), 64)
+        self.assertEqual(sut._F142_INHERITED_FORWARD_TARGETS, [])
+        self.assertEqual(
+            sut._F142_PREDECESSOR_STATUS,
+            "EXACT_183BFE_TO_183C3D_CONTROL_FLOW_WITH_183C3D_CUT_EDGE_PROVEN",
+        )
+        self.assertEqual(sut._F142_PREDECESSOR_CUT_BYTES, bytes.fromhex("eb"))
+        self.assertEqual(
+            sut._F142_REQUIRED_OVERLAP_INSTRUCTION,
+            bytes.fromhex("eb 03"),
+        )
+        self.assertEqual(sut._F142_TRAILING_OVERLAP_RVA, 0x00183C7C)
+        self.assertEqual(sut._F142_TRAILING_OVERLAP_BYTES, bytes.fromhex("ff"))
+
+    def test_f142_nonmatching_frontier_is_not_promoted(self):
+        result = sut.validate_f142_frontier_contract(
+            frontier={"continuation_id": 103, "rva": 0x00183BFE},
+            payload={},
+            exe_path=Path("unused"),
+            source_path=Path("unused"),
+            length=64,
+        )
+        self.assertEqual(result, {})
+
+    def test_f142_mismatched_payload_fails_closed_before_analyzer_load(self):
+        with self.assertRaisesRegex(ValueError, "F142 canonical frontier contract mismatch"):
+            sut.validate_f142_frontier_contract(
+                frontier={"continuation_id": 104, "rva": 0x00183C3D},
+                payload={
+                    "rva_start": "0x00183C3D",
+                    "rva_end_exclusive": "0x00183C7D",
+                    "section": ".text",
+                    "bytes_hex": "eb",
+                },
+                exe_path=Path("unused"),
+                source_path=Path("unused"),
+                length=64,
+            )
+
+    def test_f142_positive_contract_consumes_short_jump_and_preserves_next_cut(self):
+        class FakeAnalyzer:
+            @staticmethod
+            def parse_pe(_data):
+                return object()
+
+            @staticmethod
+            def collect_guarded_gf_target_c_helper_1_third_callee_continuation_104_prefix_proof(_pe):
+                return {
+                    "status": "EXACT_183BFE_TO_183C3D_CONTROL_FLOW_WITH_183C3D_CUT_EDGE_PROVEN",
+                    "prefix_end_rva": 0x00183C3D,
+                    "incomplete_rva": 0x00183C3D,
+                    "incomplete_bytes": "eb",
+                    "capture_edge_matches": True,
+                    "unresolved_forward_targets": [],
+                    "remaining_predecessor_external_targets": [],
+                    "continuation_status": "COMPLETE_INSTRUCTIONS_END_AT_183C3D_TRAILING_EB_REQUIRES_OVERLAP",
+                }
+
+            @staticmethod
+            def collect_raw_inbound_rel32_candidates(_pe, _rva):
+                return []
+
+            @staticmethod
+            def collect_raw_rel32_call_candidates(_pe, _rva, _length):
+                return []
+
+        original_loader = sut._load_frontier_analyzer
+        try:
+            sut._load_frontier_analyzer = lambda _source_path: FakeAnalyzer
+            with tempfile.TemporaryDirectory() as td:
+                exe = Path(td) / "canonical.exe"
+                exe.write_bytes(b"fixture")
+                result = sut.validate_f142_frontier_contract(
+                    frontier={"continuation_id": 104, "rva": 0x00183C3D},
+                    payload={
+                        "rva_start": "0x00183C3D",
+                        "rva_end_exclusive": "0x00183C7D",
+                        "section": ".text",
+                        "bytes_hex": sut._F142_EXPECTED_BYTES.hex(" "),
+                    },
+                    exe_path=exe,
+                    source_path=Path("unused"),
+                    length=64,
+                )
+        finally:
+            sut._load_frontier_analyzer = original_loader
+
+        self.assertEqual(
+            result["frontier_contract_status"],
+            "EXACT_EXE_183C3D_TO_183C7D_PROVENANCE_CAPTURED",
+        )
+        self.assertEqual(
+            result["frontier_start_boundary_status"],
+            "F141_MANDATORY_OVERLAP_FULL_INSTRUCTION_CONSUMED",
+        )
+        self.assertEqual(result["frontier_predecessor_cut_bytes"], "eb")
+        self.assertEqual(result["frontier_required_overlap_instruction"], "eb 03")
+        self.assertEqual(result["frontier_inherited_unresolved_forward_targets"], [])
+        self.assertEqual(result["frontier_raw_inbound_rel32_count"], 0)
+        self.assertEqual(result["frontier_raw_outbound_rel32_count"], 0)
+        self.assertEqual(result["frontier_trailing_overlap_rva"], "0x00183C7C")
+        self.assertEqual(result["frontier_trailing_overlap_bytes"], "ff")
+        self.assertTrue(result["frontier_next_overlap_required"])
+        self.assertEqual(result["frontier_call_semantics"], "UNRESOLVED")
+        self.assertEqual(result["frontier_runtime_validation"], "UNTESTED")
+
+    def test_f142_validator_is_wired_into_frontier_main(self):
+        self.assertIn("validate_f142_frontier_contract", sut.main.__code__.co_names)
+
+
     def test_f141_prefix_proof_advances_frontier_to_183c3d(self):
         result = sut.discover_frontier_rva(
             Path(__file__).with_name("analyze_outrun_exe.py")
