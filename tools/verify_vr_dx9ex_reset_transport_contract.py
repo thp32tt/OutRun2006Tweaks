@@ -459,8 +459,8 @@ require_order(
     "game dedicated ACK identity validation",
     "snapshot.hostPid != SharedState->hostPid",
     "snapshot.transportGeneration != DirectTransportGeneration",
+    "!RenderFrameRunGeneration",
     "DirectGpuAckRunGenerationIndex",
-    "RenderFrameRunGeneration",
     "completedFrame = snapshot.completedFrameId[slotIndex];",
 )
 
