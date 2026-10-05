@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T22:13:37+09:00",
+  "role": "C",
+  "run": "20261005-C207-6DC89C6E",
+  "qa_id": "C207",
+  "queue_index": 173,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds",
+  "producer_run": "20261005-A-PRODUCTION62",
+  "source_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+  "candidate_sha256": "b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26",
+  "candidate_changed_by_C": false,
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32/BGRA",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "machine_status": "PASS",
+  "source_bbox_exact_match": "21/21 PASS",
+  "candidate_bbox_exact_match": "21/21 PASS",
+  "containment_size_positive_margin": "21/21 PASS",
+  "semantic_binding": "PASS_CANONICAL_STAGE_PHONETIC_21_OF_21",
+  "zero_gates": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_residue_exact_pixels_outside_localized_bboxes": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0
+  },
+  "controller_visual_qa": "PASS",
+  "visual_notes": [
+    "C207 contacts verify physical idx0..20 WATERFALLS through GHOST FOREST and canonical phonetic Hangul mapping.",
+    "The shared blue-gray bold condensed stage-list family, left alignment and vertical source scale are preserved; ICE SCAPE's modest horizontal condensation remains source-bbox-safe.",
+    "No source residue, clipping, overlap, alpha fringe or unintended background/artwork change is visible.",
+    "Producer raw mirror_y evidence is consistent with the independently verified readable orientation."
+  ],
+  "machine_report": "localization/graphics/role_C/20261005-C207-6DC89C6E/C207_6DC89C6E_MACHINE_QA.json",
+  "producer_controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION62/A62_CONTROLLER_SELF_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C207-6DC89C6E/C207_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION62/A62_RAW_COMPARE.jpg"
+  ],
+  "decision": "C207_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED"
+}
