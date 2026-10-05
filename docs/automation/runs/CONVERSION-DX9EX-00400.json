@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX9EX-00400",
-  "production_id": "CONVERSION-DXVK-00399",
-  "event_id": "CONVERSION-DXVK-00399-E003",
-  "event_type": "retry",
+  "production_id": "CONVERSION-DX9EX-00400",
+  "event_id": "CONVERSION-DX9EX-00400-E002",
+  "event_type": "rollover",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
@@ -36,7 +36,7 @@
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Reconstructed vr-d3d9ex-focus from GitHub SSOT, read AGENTS.md, queue contract, refactor/automation/run/review/regression history and recent validation. Current controller dispatch is TASK_ID=CONVERSION-DX9EX-00400, PRODUCTION_ID=CONVERSION-DXVK-00399, EVENT_ID=CONVERSION-DXVK-00399-E003, EVENT_TYPE=retry, LANE=DX9EX, ATTEMPT=1/3."
+      "evidence": "Reconstructed current vr-d3d9ex-focus from GitHub SSOT without repeating already-landed 00400 implementation. Authoritative current-user dispatch is TASK_ID=CONVERSION-DX9EX-00400, PRODUCTION_ID=CONVERSION-DX9EX-00400, EVENT_ID=CONVERSION-DX9EX-00400-E002, EVENT_TYPE=rollover, LANE=DX9EX, CHAT_ROLLOVER=2, ATTEMPT=1/3, RESUME_REASON='Retry persisted after one recovery attempt'. This chat rollover is not a retry and does not consume an attempt."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
@@ -135,9 +135,9 @@
   "next_action": "Do not repeat CONVERSION-DX9EX-00400. Preserve R9InvalidateRightDepthStencilSync() as the owner boundary and keep R33 free of direct RightDepthSynchronized/RightStencilSynchronized mutation. Continue only the next bounded post-1000 structural successor supported by current source/static evidence; runtime claims remain gated on Quest3/VDXR evidence.",
   "controller_dispatch": {
     "task_id": "CONVERSION-DX9EX-00400",
-    "production_id": "CONVERSION-DXVK-00399",
-    "event_id": "CONVERSION-DXVK-00399-E003",
-    "event_type": "retry",
+    "production_id": "CONVERSION-DX9EX-00400",
+    "event_id": "CONVERSION-DX9EX-00400-E002",
+    "event_type": "rollover",
     "lane": "DX9EX",
     "target_branch": "vr-d3d9ex-focus",
     "attempt": "1/3",
@@ -146,8 +146,14 @@
     "source_material_sha": "511063f7f043ab809340184230a7bebc72e7b62b",
     "validation_bearing_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
     "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_SOURCE_HUD_AND_N100_EXACT_STATIC",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "chat_rollover": 2,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "rollover_is_retry": false
   },
   "validated_at_kst": "2026-10-05T09:56:53+09:00",
-  "completed_at_kst": "2026-10-05T09:59:30+09:00"
+  "completed_at_kst": "2026-10-05T09:59:30+09:00",
+  "chat_rollover": 2,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "rollover_is_retry": false
 }
