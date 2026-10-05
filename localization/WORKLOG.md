@@ -1464,3 +1464,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - `4F68708E`, `F6811E94`, and `49BB5FE5` remain strict DXT5 no-candidate HOLD; existing `1A43E9D9` remains HIGH_RISK pending mandatory in-game validation.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_C/20261005-C149-E95DA5/C149_E95_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C149-E95DA5/C149_E95_MACHINE_QA.json`.
+
+## 2026-10-05 10:57:04 KST — C150 9FC88069 B77 corrective final PASS
+- Reviewed the new B_PRODUCTION77 index 198 `9FC88069_1024x512.dds`; completed C149-and-earlier PASS assets were not repeated.
+- C detected a semantic-policy violation in B77: `(GUITAR MIX)`, `(INSTRUMENTAL)`, and `(PROTOTYPE)` are music-title/variant artwork and must remain original English under the song-title protection rule. Hosted C150 restored those three regions pixel-exact from the canonical source while retaining Korean only for `RANDOM / RANDOM PLAY / INTERMEDIATE B / INTERMEDIATE A`.
+- Corrected candidate `34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c` preserves exact 4096x2048 RGBA32/BGRA mip1/header/raw `mirror_y`. 4/4 bbox+size+positive-margin PASS; outside=0, alpha-outside=0, protected=0, render-outside-target=0, source residue=0, overlap=0, touch=0, preserved-region changes=0 and RANDOM card-art changes=0.
+- Controller SOURCE/B77/CLEAN/FINAL, row-contact and raw mirror_y visual QA PASS. Restored music qualifiers exactly match source; no visible clipping, overlap, seam, halo or orientation regression.
+- Queue/transcription/artwork plan corrected to four localizable functional labels. Current pending_artwork=29. `75C3586A` is strict HOLD because canonical HD contains no source glyph/effect pixels for its transcribed names.
+- Decision: `C150_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`; producer REWORK=0. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C150-9FC88069/C150_9FC_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C150-9FC88069/C150_9FC_MACHINE_QA.json`.
