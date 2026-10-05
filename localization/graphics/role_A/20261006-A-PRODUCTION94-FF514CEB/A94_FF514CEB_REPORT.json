@@ -1,0 +1,480 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION94-FF514CEB",
+  "queue_index": 237,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+    "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds"
+  },
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "bpp": 32,
+    "masks": [
+      "0xff0000",
+      "0xff00",
+      "0xff",
+      "0xff000000"
+    ],
+    "raw_mode": "BGRA",
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "candidate_sha256": "acbf42d5f8f45ee6227bb0f81a770687bba680916c828f773095b64dbc63e5a3",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+  "conceptual_segments": 6,
+  "localized_physical_rows": 9,
+  "shared_family_font_sizes": {
+    "gray_title": 57,
+    "gray_help": 71,
+    "red_big": 139
+  },
+  "protected_unrelated_token": "K1/right-side cluster pixel exact",
+  "rows": [
+    {
+      "key": "small_create",
+      "source": "CREATE GAME",
+      "korean": "게임 만들기",
+      "family": "gray_title",
+      "original_bbox": [
+        14,
+        775,
+        536,
+        838
+      ],
+      "localized_bbox": [
+        16,
+        777,
+        288,
+        836
+      ],
+      "source_width": 522,
+      "source_height": 63,
+      "localized_width": 272,
+      "localized_height": 59,
+      "delta_left": 2,
+      "delta_right": 248,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 57,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "shadow_rgba": [
+        63,
+        70,
+        73,
+        120
+      ],
+      "shadow_offset": 3,
+      "stroke_width": 1,
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x2048"
+    },
+    {
+      "key": "small_custom",
+      "source": "CUSTOM GAME",
+      "korean": "커스텀 게임",
+      "family": "gray_title",
+      "original_bbox": [
+        12,
+        863,
+        521,
+        926
+      ],
+      "localized_bbox": [
+        14,
+        865,
+        286,
+        924
+      ],
+      "source_width": 509,
+      "source_height": 63,
+      "localized_width": 272,
+      "localized_height": 59,
+      "delta_left": 2,
+      "delta_right": 235,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 57,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "shadow_rgba": [
+        63,
+        70,
+        73,
+        120
+      ],
+      "shadow_offset": 3,
+      "stroke_width": 1,
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x2048"
+    },
+    {
+      "key": "small_quick",
+      "source": "QUICK GAME",
+      "korean": "빠른 게임",
+      "family": "gray_title",
+      "original_bbox": [
+        13,
+        951,
+        469,
+        1018
+      ],
+      "localized_bbox": [
+        15,
+        955,
+        233,
+        1014
+      ],
+      "source_width": 456,
+      "source_height": 67,
+      "localized_width": 218,
+      "localized_height": 59,
+      "delta_left": 2,
+      "delta_right": 236,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 57,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "shadow_rgba": [
+        63,
+        70,
+        73,
+        120
+      ],
+      "shadow_offset": 3,
+      "stroke_width": 1,
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x2048"
+    },
+    {
+      "key": "help_create",
+      "source": "Create a game and invite your friends!",
+      "korean": "게임을 만들고 친구를 초대하세요!",
+      "family": "gray_help",
+      "original_bbox": [
+        8,
+        1015,
+        1160,
+        1101
+      ],
+      "localized_bbox": [
+        10,
+        1022,
+        991,
+        1093
+      ],
+      "source_width": 1152,
+      "source_height": 86,
+      "localized_width": 981,
+      "localized_height": 71,
+      "delta_left": 2,
+      "delta_right": 169,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 71,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "shadow_rgba": [
+        63,
+        69,
+        73,
+        120
+      ],
+      "shadow_offset": 3,
+      "stroke_width": 1,
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x2048"
+    },
+    {
+      "key": "help_custom",
+      "source": "Specify what gametype you'd like to play!",
+      "korean": "플레이할 게임 유형을 설정하세요!",
+      "family": "gray_help",
+      "original_bbox": [
+        0,
+        1175,
+        1263,
+        1272
+      ],
+      "localized_bbox": [
+        2,
+        1187,
+        983,
+        1259
+      ],
+      "source_width": 1263,
+      "source_height": 97,
+      "localized_width": 981,
+      "localized_height": 72,
+      "delta_left": 2,
+      "delta_right": 280,
+      "delta_top": 12,
+      "delta_bottom": 13,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 71,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "shadow_rgba": [
+        62,
+        70,
+        73,
+        120
+      ],
+      "shadow_offset": 3,
+      "stroke_width": 1,
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x2048"
+    },
+    {
+      "key": "help_quick",
+      "source": "Jump into a quick game of OutRun!",
+      "korean": "빠른 아웃런 게임에 참가하세요!",
+      "family": "gray_help",
+      "original_bbox": [
+        4,
+        1344,
+        1047,
+        1419
+      ],
+      "localized_bbox": [
+        6,
+        1346,
+        921,
+        1417
+      ],
+      "source_width": 1043,
+      "source_height": 75,
+      "localized_width": 915,
+      "localized_height": 71,
+      "delta_left": 2,
+      "delta_right": 126,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 71,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "shadow_rgba": [
+        63,
+        70,
+        73,
+        120
+      ],
+      "shadow_offset": 3,
+      "stroke_width": 1,
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x2048"
+    },
+    {
+      "key": "big_create",
+      "source": "CREATE GAME",
+      "korean": "게임 만들기",
+      "family": "red_big",
+      "original_bbox": [
+        17,
+        1517,
+        1243,
+        1662
+      ],
+      "localized_bbox": [
+        19,
+        1519,
+        679,
+        1660
+      ],
+      "source_width": 1226,
+      "source_height": 145,
+      "localized_width": 660,
+      "localized_height": 141,
+      "delta_left": 2,
+      "delta_right": 564,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 139,
+      "fill_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "shadow_rgba": [
+        185,
+        0,
+        0,
+        120
+      ],
+      "shadow_offset": 7,
+      "stroke_width": 3,
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x2048"
+    },
+    {
+      "key": "big_quick",
+      "source": "QUICK GAME",
+      "korean": "빠른 게임",
+      "family": "red_big",
+      "original_bbox": [
+        17,
+        1695,
+        1086,
+        1849
+      ],
+      "localized_bbox": [
+        19,
+        1701,
+        548,
+        1842
+      ],
+      "source_width": 1069,
+      "source_height": 154,
+      "localized_width": 529,
+      "localized_height": 141,
+      "delta_left": 2,
+      "delta_right": 538,
+      "delta_top": 6,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 139,
+      "fill_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "shadow_rgba": [
+        185,
+        0,
+        0,
+        120
+      ],
+      "shadow_offset": 7,
+      "stroke_width": 3,
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x2048"
+    },
+    {
+      "key": "big_custom",
+      "source": "CUSTOM GAME",
+      "korean": "커스텀 게임",
+      "family": "red_big",
+      "original_bbox": [
+        15,
+        1894,
+        1260,
+        2040
+      ],
+      "localized_bbox": [
+        17,
+        1896,
+        676,
+        2037
+      ],
+      "source_width": 1245,
+      "source_height": 146,
+      "localized_width": 659,
+      "localized_height": 141,
+      "delta_left": 2,
+      "delta_right": 584,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 139,
+      "fill_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "shadow_rgba": [
+        185,
+        0,
+        0,
+        120
+      ],
+      "shadow_offset": 7,
+      "stroke_width": 3,
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x2048"
+    }
+  ],
+  "machine_qa": {
+    "bbox_size_positive_margin": "9/9 PASS",
+    "changed_pixels": 507340,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "source_exact_residue_pixels": 0,
+    "clean_plate_residue_outside_korean_glyphs": 0,
+    "localized_overlap_pairs": [],
+    "localized_1px_touch_pairs": [],
+    "dds_roundtrip": "PASS"
+  },
+  "visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "A94_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}

@@ -1,0 +1,24 @@
+{
+  "run": "20261006-A-PRODUCTION94-FF514CEB",
+  "queue_index": 237,
+  "asset": "FF514CEB",
+  "candidate_sha256": "acbf42d5f8f45ee6227bb0f81a770687bba680916c828f773095b64dbc63e5a3",
+  "localized_physical_rows": 9,
+  "bbox_size_positive_margin": "9/9 PASS",
+  "machine_qa": {
+    "bbox_size_positive_margin": "9/9 PASS",
+    "changed_pixels": 507340,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "source_exact_residue_pixels": 0,
+    "clean_plate_residue_outside_korean_glyphs": 0,
+    "localized_overlap_pairs": [],
+    "localized_1px_touch_pairs": [],
+    "dds_roundtrip": "PASS"
+  },
+  "worker_status": "A94_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION94-FF514CEB/A94_FF514CEB_REPORT.json"
+}
