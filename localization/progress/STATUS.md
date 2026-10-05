@@ -1730,3 +1730,11 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Persisted the 4096x4096 candidate under index38 path without rerasterizing/upscaling the recovered 1024x1024 source.
 - Total Rank x3 -> 종합 랭킹; C215 3/3 bbox/size/margin + zero outside/alpha/visible gates and controller SOURCE/CLEAN/FINAL/raw PASS transfer by exact SHA identity.
 - State B173_EXACT_ALIAS_OF_C215_PASS_PENDING_INGAME; runtime/in-game validation remains UNTESTED. Next B normal queue: even index52. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-06 08:34 KST — A99 index27 zoom review
+- `8B52FEEC_1024x512.dds`: exact-HD 1024x512 RGBA32/mip1/raw mirror_y inspected in readable and raw orientations.
+- Positive classification: **NO_LOCALIZABLE_TEXT / PRESERVE_ORIGINAL**. Source contains three character portrait/pose sprites only; localizable segments=0.
+- No DDS candidate generated because none is required. Queue/transcription/artwork-plan state closes this stale blocked review.
+- Current blocked zoom-review count at checkpoint: **38**. Next normal A item: index29 `F043316B`, unless a higher-priority backlog/C-return appears.
+- VR/FFB/DX11/DXVK untouched.
+
