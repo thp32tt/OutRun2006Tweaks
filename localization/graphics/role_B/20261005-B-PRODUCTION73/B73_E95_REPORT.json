@@ -1,0 +1,714 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION73",
+  "index": 230,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "ee939d33fd363be135e681b076021c92cddcb489",
+    "atlas_git_blob_sha1": "d1cbe695add81e599424c29aa40539bb6875ef5a",
+    "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81"
+  },
+  "semantic_binding": {
+    "localized": {
+      "5": "FERRARI CARS",
+      "6": "CAR COLORS",
+      "13": "SHOWROOM ITEMS",
+      "14": "GAME MODES",
+      "15": "FERRARI'S",
+      "16": "COURSES",
+      "17": "CAR COLOURS",
+      "18": "BONUS MATERIAL",
+      "19": "BGMUSIC",
+      "24": "UNAVAILABLE",
+      "25": "SOLD"
+    },
+    "preserved": {
+      "1": "Night Flight (song title)",
+      "2": "Magical Sound Shower (song title)",
+      "3": "Life Was A Bore (song title)",
+      "4": "Keep Your Heart (song title)",
+      "7": "BGM (translation unchanged)",
+      "8": "Alberto's Antics Vol.5",
+      "9": "Alberto's Antics Vol.4",
+      "10": "Alberto's Antics Vol.3",
+      "11": "Alberto's Antics Vol.2",
+      "12": "Alberto's Antics Vol.1",
+      "20": "You cannot buy this item yet",
+      "21": "You already own this item",
+      "22": "yellow bar artwork",
+      "23": "gray bar artwork",
+      "26": "separator artwork",
+      "0": "decorative panel"
+    }
+  },
+  "translations": {
+    "5": "페라리 차량",
+    "6": "차량 색상",
+    "13": "쇼룸 아이템",
+    "14": "게임 모드",
+    "15": "페라리",
+    "16": "코스",
+    "17": "차량 색상",
+    "18": "보너스 자료",
+    "19": "BGM",
+    "24": "이용 불가",
+    "25": "판매 완료"
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "style_groups": {
+    "dark": {
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 48,
+      "fill_rgba": [
+        46,
+        54,
+        57,
+        255
+      ],
+      "alignment": "left"
+    },
+    "white": {
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 49,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "alignment": "left"
+    },
+    "pill": {
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "fill_rgba": [
+        247,
+        247,
+        247,
+        255
+      ],
+      "alignment": "center",
+      "background_reconstruction": "per-row median of non-text opaque red plate pixels"
+    }
+  },
+  "rows": [
+    {
+      "region_idx": 5,
+      "source": "FERRARI CARS",
+      "korean": "페라리 차량",
+      "group": "dark",
+      "cell": [
+        960,
+        772,
+        960,
+        76
+      ],
+      "original_bbox": [
+        972,
+        788,
+        1375,
+        839
+      ],
+      "source_mask_pixels": 11669,
+      "localized_bbox": [
+        974,
+        790,
+        1204,
+        837
+      ],
+      "source_width": 403,
+      "source_height": 51,
+      "localized_width": 230,
+      "localized_height": 47,
+      "delta_left": 2,
+      "delta_right": 171,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 48,
+      "fill_rgba": [
+        46,
+        54,
+        57,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B73_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 6,
+      "source": "CAR COLORS",
+      "korean": "차량 색상",
+      "group": "dark",
+      "cell": [
+        0,
+        696,
+        960,
+        76
+      ],
+      "original_bbox": [
+        12,
+        709,
+        363,
+        760
+      ],
+      "source_mask_pixels": 9637,
+      "localized_bbox": [
+        14,
+        711,
+        200,
+        758
+      ],
+      "source_width": 351,
+      "source_height": 51,
+      "localized_width": 186,
+      "localized_height": 47,
+      "delta_left": 2,
+      "delta_right": 163,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 48,
+      "fill_rgba": [
+        46,
+        54,
+        57,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B73_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 13,
+      "source": "SHOWROOM ITEMS",
+      "korean": "쇼룸 아이템",
+      "group": "white",
+      "cell": [
+        960,
+        468,
+        956,
+        76
+      ],
+      "original_bbox": [
+        964,
+        484,
+        1528,
+        536
+      ],
+      "source_mask_pixels": 20976,
+      "localized_bbox": [
+        966,
+        486,
+        1199,
+        534
+      ],
+      "source_width": 564,
+      "source_height": 52,
+      "localized_width": 233,
+      "localized_height": 48,
+      "delta_left": 2,
+      "delta_right": 329,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 49,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B73_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 14,
+      "source": "GAME MODES",
+      "korean": "게임 모드",
+      "group": "white",
+      "cell": [
+        0,
+        392,
+        956,
+        76
+      ],
+      "original_bbox": [
+        4,
+        404,
+        408,
+        456
+      ],
+      "source_mask_pixels": 14672,
+      "localized_bbox": [
+        6,
+        406,
+        196,
+        454
+      ],
+      "source_width": 404,
+      "source_height": 52,
+      "localized_width": 190,
+      "localized_height": 48,
+      "delta_left": 2,
+      "delta_right": 212,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 49,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B73_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 15,
+      "source": "FERRARI'S",
+      "korean": "페라리",
+      "group": "white",
+      "cell": [
+        956,
+        392,
+        956,
+        76
+      ],
+      "original_bbox": [
+        960,
+        404,
+        1280,
+        456
+      ],
+      "source_mask_pixels": 11616,
+      "localized_bbox": [
+        962,
+        406,
+        1092,
+        454
+      ],
+      "source_width": 320,
+      "source_height": 52,
+      "localized_width": 130,
+      "localized_height": 48,
+      "delta_left": 2,
+      "delta_right": 188,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 49,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B73_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 16,
+      "source": "COURSES",
+      "korean": "코스",
+      "group": "white",
+      "cell": [
+        0,
+        316,
+        956,
+        76
+      ],
+      "original_bbox": [
+        0,
+        328,
+        280,
+        380
+      ],
+      "source_mask_pixels": 10320,
+      "localized_bbox": [
+        2,
+        333,
+        90,
+        374
+      ],
+      "source_width": 280,
+      "source_height": 52,
+      "localized_width": 88,
+      "localized_height": 41,
+      "delta_left": 2,
+      "delta_right": 190,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 49,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B73_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 17,
+      "source": "CAR COLOURS",
+      "korean": "차량 색상",
+      "group": "white",
+      "cell": [
+        956,
+        316,
+        956,
+        76
+      ],
+      "original_bbox": [
+        960,
+        320,
+        1376,
+        384
+      ],
+      "source_mask_pixels": 14736,
+      "localized_bbox": [
+        962,
+        328,
+        1152,
+        376
+      ],
+      "source_width": 416,
+      "source_height": 64,
+      "localized_width": 190,
+      "localized_height": 48,
+      "delta_left": 2,
+      "delta_right": 224,
+      "delta_top": 8,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 49,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B73_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 18,
+      "source": "BONUS MATERIAL",
+      "korean": "보너스 자료",
+      "group": "white",
+      "cell": [
+        0,
+        240,
+        956,
+        76
+      ],
+      "original_bbox": [
+        4,
+        252,
+        536,
+        304
+      ],
+      "source_mask_pixels": 18736,
+      "localized_bbox": [
+        6,
+        254,
+        241,
+        302
+      ],
+      "source_width": 532,
+      "source_height": 52,
+      "localized_width": 235,
+      "localized_height": 48,
+      "delta_left": 2,
+      "delta_right": 295,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 49,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B73_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 19,
+      "source": "BGMUSIC",
+      "korean": "BGM",
+      "group": "white",
+      "cell": [
+        956,
+        240,
+        956,
+        76
+      ],
+      "original_bbox": [
+        960,
+        252,
+        1236,
+        304
+      ],
+      "source_mask_pixels": 10752,
+      "localized_bbox": [
+        962,
+        259,
+        1067,
+        297
+      ],
+      "source_width": 276,
+      "source_height": 52,
+      "localized_width": 105,
+      "localized_height": 38,
+      "delta_left": 2,
+      "delta_right": 169,
+      "delta_top": 7,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 49,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "alignment": "left",
+      "rework_status": "B73_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 24,
+      "source": "UNAVAILABLE",
+      "korean": "이용 불가",
+      "group": "pill",
+      "cell": [
+        0,
+        40,
+        536,
+        60
+      ],
+      "original_bbox": [
+        94,
+        49,
+        447,
+        88
+      ],
+      "source_mask_pixels": 9101,
+      "localized_bbox": [
+        203,
+        51,
+        338,
+        86
+      ],
+      "source_width": 353,
+      "source_height": 39,
+      "localized_width": 135,
+      "localized_height": 35,
+      "delta_left": 109,
+      "delta_right": 109,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 35,
+      "fill_rgba": [
+        247,
+        247,
+        247,
+        255
+      ],
+      "alignment": "center",
+      "rework_status": "B73_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 25,
+      "source": "SOLD",
+      "korean": "판매 완료",
+      "group": "pill",
+      "cell": [
+        536,
+        40,
+        300,
+        60
+      ],
+      "original_bbox": [
+        624,
+        47,
+        745,
+        88
+      ],
+      "source_mask_pixels": 3467,
+      "localized_bbox": [
+        626,
+        52,
+        743,
+        82
+      ],
+      "source_width": 121,
+      "source_height": 41,
+      "localized_width": 117,
+      "localized_height": 30,
+      "delta_left": 2,
+      "delta_right": 2,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 30,
+      "fill_rgba": [
+        247,
+        247,
+        247,
+        255
+      ],
+      "alignment": "center",
+      "rework_status": "B73_NEW_EXACT_HD_CANDIDATE"
+    }
+  ],
+  "preserved_regions_changed_pixels": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0,
+    "11": 0,
+    "12": 0,
+    "20": 0,
+    "21": 0,
+    "22": 0,
+    "23": 0,
+    "26": 0,
+    "0": 0
+  },
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION73/E95_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION73/E95_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 133358,
+    "changed_bbox": [
+      0,
+      47,
+      1528,
+      839
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION73/E95_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION73/E95_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 137224,
+    "changed_bbox": [
+      0,
+      47,
+      1528,
+      839
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_total": 137224,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "exact_source_residue": 0,
+    "source_residue_basis": "source_to_clean_changed_pixels",
+    "overlap": 0,
+    "touch_pairs": []
+  },
+  "candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B_PRODUCTION73_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
