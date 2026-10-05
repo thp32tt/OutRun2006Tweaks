@@ -63,6 +63,29 @@ Use `tools/localization/validate_clean_plate.py` where decoded RGBA source/candi
 
 `tools/localization/render_artwork.py` is proof-only. Its transparent lettering output is never a deployable localized DDS by itself.
 
+## In-game regression QA
+
+Actual in-game screenshots are a higher-level visual gate than static mask/bbox checks. If a user screenshot shows a concrete defect, reopen the affected asset/runtime path even when earlier static QA passed.
+
+Hard in-game failures include:
+- visibly mixed low-resolution/upscaled Korean fonts;
+- broken glyphs, jagged/garbled lettering or inconsistent antialiasing;
+- source English residue or duplicate English/Korean layers;
+- text-to-text overlap, text-to-icon/art intrusion, or other-image intrusion;
+- wrong slant, perspective, baseline, alignment, relative scale, line spacing or source-style transform;
+- clean-plate seams, donor boundaries, ghost silhouettes or residual source-shaped effects;
+- HUD text that becomes unreadable against normal game backgrounds because weight/outline/effect does not match the source family.
+
+For a screenshot-confirmed failure:
+1. record/reuse the row in `localization/graphics/INGAME_REWORK_BACKLOG.csv`;
+2. map the exact DDS atlas cell and/or runtime text ID/draw path before modifying files;
+3. re-render raster text from exact native-resolution/HD source; never upscale an old Korean bitmap;
+4. preserve protected artwork and source transform;
+5. run normal static QA again;
+6. keep the result as `*_PASS_PENDING_INGAME_RETEST` until a newer actual game screenshot confirms the defect is gone.
+
+Static numeric PASS does not overrule visible in-game residue, overlap, low-resolution mismatch, or transform/style defects. Record such cases as numeric false negatives and repair them.
+
 ## Evidence
 
 For newly produced or materially reworked assets retain enough evidence to reproduce the decision:
