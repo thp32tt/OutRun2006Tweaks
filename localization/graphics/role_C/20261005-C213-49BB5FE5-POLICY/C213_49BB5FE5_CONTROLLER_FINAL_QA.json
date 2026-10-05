@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T23:53:00+09:00",
+  "role": "C",
+  "run": "20261005-C213-49BB5FE5-POLICY",
+  "qa_id": "C213",
+  "queue_index": 152,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+  "producer_run": "20261005-B-POLICY155-49BB5FE5",
+  "prior_state": "B63_HOLD_STRICT_RECHECK_DXT5_DECODED_PIXEL_GATE",
+  "review_scope": "semantic/policy final QA only; no Korean candidate exists or is permitted",
+  "independent_policy_check": {
+    "mandatory_policy": "localization/graphics/TRANSLATION_NAMING_POLICY.md",
+    "precedent": "C150 index198 restored (PROTOTYPE)/(INSTRUMENTAL)/(GUITAR MIX) music-title/variant qualifiers to original pixels",
+    "bindings": [
+      {
+        "source": "PRO.",
+        "expanded": "PROTOTYPE",
+        "decision": "PRESERVE_ORIGINAL"
+      },
+      {
+        "source": "INS.",
+        "expanded": "INSTRUMENTAL",
+        "decision": "PRESERVE_ORIGINAL"
+      },
+      {
+        "source": "G.M.",
+        "expanded": "GUITAR MIX",
+        "decision": "PRESERVE_ORIGINAL"
+      },
+      {
+        "source": "E.R.",
+        "expanded": "EURO REMIX",
+        "decision": "PRESERVE_ORIGINAL"
+      },
+      {
+        "source": "'89",
+        "expanded": "1989 version badge",
+        "decision": "PRESERVE_ORIGINAL"
+      },
+      {
+        "source": "'86",
+        "expanded": "1986 version badge",
+        "decision": "PRESERVE_ORIGINAL"
+      }
+    ],
+    "conclusion": "PASS. These are music-version/mix/badge artwork, not functional UI labels. The former Korean redraw attempt was semantically out of scope; preserving exact original artwork is the correct localization result."
+  },
+  "candidate_sha256": null,
+  "candidate_required": false,
+  "source_pixels_modified": false,
+  "controller_visual_qa": "NOT_APPLICABLE_NO_LOCALIZED_PIXELS",
+  "decision": "C213_PRESERVE_ORIGINAL_POLICY_PASS_NO_CANDIDATE_REQUIRED",
+  "runtime_validation": "NOT_APPLICABLE_FOR_LOCALIZATION",
+  "notes": "This closes the stale DXT5 HOLD by semantic policy, not by weakening the pixel gate. If the asset were ever localized despite policy, exact decoded-pixel DXT5 containment would still be required.",
+  "exclusions": "Completed PASS assets were not repeated. VR/FFB/DX11/DXVK untouched."
+}
