@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00398",
+  "production_id": "CONVERSION-DX9EX-00397",
+  "event_id": "CONVERSION-DX9EX-00397-E004",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R259_PROGRAMMABLE_ACTIVATION_PREREQUISITE_HANDOFF_SOURCE_GRAPH_DORMANT_BOUNDARY_WIN32_BUILD_READINESS_SMOKE_CONSTANT_BUFFER_PROBE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "base_sha": "422059cbb606954011c617547a0b3296392fbaf5",
+  "result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+  "material_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+  "source_implementation_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+  "validation_bearing_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+  "result_marker": "[AUTO:CONVERSION-DX11-00398]",
+  "selected_work_item": "DX11_R259_PROGRAMMABLE_ACTIVATION_PREREQUISITE_HANDOFF",
+  "summary": "R259 converts the current R258 dormant source-revalidation receipt into an explicit fail-closed activation-prerequisite review handoff. Current repository evidence recognizes the exact R243 input-layout ownership/identity proof while deliberately keeping Set-05 F18 resource-behavior and F21 shader semantic-translation proof absent. A coherent review handoff therefore reports missingPrerequisiteMask=0x5, activationPrerequisitesSatisfied=false, NativeDrawPathActivationAllowed=false, DrawDispatchAuthorized=false and activationSnapshotToken=0.",
+  "evidence": "Exact SHA b0fd81ac8ad40139bc72da8b5ab219a617385348 passed Backend Conversion Gate 37246405775 attempt 1. validate job 111565091638 passed queue/baseline/one-click contracts, DX11 source hygiene/source graph, dormant activation boundary, census, Win32 configure/build/binary and artifact upload. DX11 readiness smoke job 111565921255 passed the R259 constant-buffer probe plus the full smoke chain. Artifact 11319008179 digest sha256:a3d907f86d4ce653f33b97d683cf6901556a9ec3d6300432c74f40faa108d4dc, size 2366689 bytes. No HMD/game runtime test was performed.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "cb209e29b0b9b50afd8745d55b2a89493bb0ad34",
+    "5a5b41b42fc11423408648efae795e371295bcd8",
+    "9e601d6e65275ff33095fdbe0829737124bf4732",
+    "b0fd81ac8ad40139bc72da8b5ab219a617385348"
+  ],
+  "validation_candidate_commit": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub HEAD 422059cbb606954011c617547a0b3296392fbaf5, AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, inherited VR automation/run state, Set-05 findings, regression knowledge/history and Issue #14. The current DX11 exact-next-action after R258 was to formalize the remaining activation-prerequisite handoff without enabling native draw."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Set-05 F18/F19/F21/F23 define the next safe boundary: sampled translation exactness cannot activate native draw; resource-behavior, input-layout and shader semantic-translation proof classes must be explicit. R243 already supplies current input-layout ownership/identity evidence, while F18 resource-behavior and F21 semantic shader-translation proof remain unclosed.",
+      "review_lenses": {
+        "architecture": "Add one value/snapshot-only R259 handoff after R258; do not add Draw/DrawIndexed routing or NativeDrawPath authority.",
+        "ownership_lifetime": "R259 owns no COM/device/context/resource objects and only consumes current R258/R243 receipt identities.",
+        "stereo_correctness": "No WVP, projection, HUD, eye surface, pose, recenter or stereo routing behavior changes.",
+        "performance": "Dormant review/probe path only; no production render hot-path work is enabled.",
+        "adversarial": "Caller cannot assert F18/F21 completion. Stale R258 or R243 identities fail reviewReady, missing proof bits remain explicit, and activationSnapshotToken is always zero."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderActivationPrerequisiteHandoff plus compose/validate functions. R243 input-layout proof is accepted only with exact current snapshot identity. F18 resourceBehaviorProofPresent and F21 shaderTranslationProofPresent are implementation-fixed false. Indexed/non-indexed positive debt probes and stale R258/R243 regressions were added, together with source-graph guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R259_PROGRAMMABLE_ACTIVATION_PREREQUISITE_HANDOFF_SOURCE_GRAPH_DORMANT_BOUNDARY_WIN32_BUILD_READINESS_SMOKE_CONSTANT_BUFFER_PROBE",
+      "runtime_validation": "UNTESTED",
+      "validation_bearing_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+      "validation_run_id": 37246405775,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111565091638,
+      "readiness_smoke_job_id": 111565921255,
+      "artifact_id": 11319008179,
+      "artifact_digest": "sha256:a3d907f86d4ce653f33b97d683cf6901556a9ec3d6300432c74f40faa108d4dc",
+      "artifact_size_bytes": 2366689,
+      "evidence": "Exact-SHA Gate passed source graph and dormant activation boundary, compiled the Win32 game DLL, and executed the readiness smoke suite. Build and Run DX11 constant buffer probe both succeeded with the R259 tests. No Quest 3/VDXR runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+      "material_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+      "source_implementation_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+      "validation_bearing_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+      "result_marker": "[AUTO:CONVERSION-DX11-00398]",
+      "implementation_commits": [
+        "cb209e29b0b9b50afd8745d55b2a89493bb0ad34",
+        "5a5b41b42fc11423408648efae795e371295bcd8",
+        "9e601d6e65275ff33095fdbe0829737124bf4732",
+        "b0fd81ac8ad40139bc72da8b5ab219a617385348"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R259 is a dormant activation-prerequisite review handoff only. It adds no selector route, Draw/DrawIndexed dispatch, NativeDrawPath activation or runtime candidate that needs HMD distribution packaging."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "issue14_implementation_comment_id": 5985903728,
+      "issue14_validation_comment_id": 5985971498,
+      "exact_next_action": "Preserve the validated R239-R259 dormant chain. Under a new TASK_ID, implement one concrete missing activation prerequisite proof class, prioritizing F18 resource-behavior semantics before F21 shader semantic-translation proof, then feed that evidence into the R259 handoff without enabling Draw/DrawIndexed or NativeDrawPath. Any runtime-visible activation remains separately gated on matching Quest 3/VDXR evidence."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": true,
+    "runtime_behavior_changed": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F18_RESOURCE_USAGE_LOCK_POOL_SEMANTICS",
+      "VR_BACKEND_SET05_F19_INPUT_LAYOUT_TRANSLATABILITY",
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS",
+      "VR_BACKEND_SET05_F23_SAMPLE_EXACT_NOT_ACTIVATION_GATE"
+    ],
+    "evidence": "The changed source is under src/vr/d3d11 and therefore intersects broad VR risk-path policy, but the new R259 path is dormant/value-only and does not alter DX9Ex, OpenXR transport, selector, production Draw* routing or NativeDrawPath activation. Runtime remains UNTESTED."
+  },
+  "scope_guards": {
+    "native_draw_path_activation_changed": false,
+    "draw_dispatch_changed": false,
+    "dx9ex_branch_modified": false
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00398",
+    "supplied_production_id": "CONVERSION-DX9EX-00397",
+    "supplied_event_id": "CONVERSION-DX9EX-00397-E004",
+    "supplied_event_type": "rollover",
+    "attempt": "1/3",
+    "lane": "DX11",
+    "cross_lane_dispatch": true,
+    "reconciliation": "The supplied PRODUCTION_ID/EVENT_ID point to the immediately preceding DX9EX rollover and are retained as queue provenance only. Material ownership and completion authority belong to TASK_ID CONVERSION-DX11-00398 on vr-dx11-native-r71.",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "material_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+    "source_implementation_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+    "validation_bearing_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+    "validation_run_id": 37246405775,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111565091638,
+    "readiness_smoke_job_id": 111565921255,
+    "artifact_id": 11319008179,
+    "artifact_digest": "sha256:a3d907f86d4ce653f33b97d683cf6901556a9ec3d6300432c74f40faa108d4dc",
+    "implementation_comment_id": 5985903728,
+    "validation_comment_id": 5985971498
+  },
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 37246405775,
+      "run_attempt": 1,
+      "conclusion": "success",
+      "exact_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+      "validate_job_id": 111565091638,
+      "readiness_smoke_job_id": 111565921255,
+      "artifact_id": 11319008179,
+      "artifact_digest": "sha256:a3d907f86d4ce653f33b97d683cf6901556a9ec3d6300432c74f40faa108d4dc",
+      "artifact_size_bytes": 2366689
+    },
+    "r259_contract": {
+      "input_layout_proof": "PRESENT_CURRENT_R243_OWNERSHIP_IDENTITY",
+      "resource_behavior_proof": "MISSING_F18",
+      "shader_translation_proof": "MISSING_F21",
+      "coherent_missing_prerequisite_mask": "0x5",
+      "activation_prerequisites_satisfied": false,
+      "native_draw_path_activation_allowed": false,
+      "draw_dispatch_authorized": false,
+      "activation_snapshot_token": "0"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5985903728,
+    "validation_comment_id": 5985971498
+  },
+  "exact_next_action": "Preserve the validated R239-R259 dormant chain. Under a new TASK_ID, implement one concrete missing activation prerequisite proof class, prioritizing F18 resource-behavior semantics before F21 shader semantic-translation proof, then feed that evidence into the R259 handoff without enabling Draw/DrawIndexed or NativeDrawPath. Any runtime-visible activation remains separately gated on matching Quest 3/VDXR evidence."
+}
