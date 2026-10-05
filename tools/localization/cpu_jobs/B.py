@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OU
     raise SystemExit("B hosted worker only")
 
 repo = Path.cwd()
-run = "20261005-B-PRODUCTION138-C598-SOLVER"
+run = "20261005-B-PRODUCTION139-C598-SOLVER-FIX"
 out = repo / "localization/graphics/role_B" / run
 out.mkdir(parents=True, exist_ok=True)
 wr = repo / "localization/graphics/worker_results"
@@ -23,7 +23,7 @@ SOURCE_BLOB = "3ab34d5fcd66b5b8cb3d59e02d0d199e2e6b5456"
 ATLAS_BLOB = "c2d82b14396fc89ca08affcb8ff9c615d644bc82"
 SOURCE_SHA256 = "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf"
 base = "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/" + COMMIT
-tmp = Path("/tmp/outrun_B138")
+tmp = Path("/tmp/outrun_B139")
 tmp.mkdir(parents=True, exist_ok=True)
 dds = tmp / "C598_HD.dds"
 atlas = tmp / "C598_atlas.json"
@@ -92,16 +92,16 @@ goal_specs = [
     (24, "GOAL B", "골 B"), (25, "GOAL A", "골 A"),
 ]
 stage_specs = [
-    (78, "Imperial Avenue", "임페리얼 애비뉴"),
     (79, "Cape Way", "케이프 웨이"),
-    (80, "Metropolis", "메트로폴리스"),
+    (80, "Imperial Avenue", "임페리얼 애비뉴"),
     (81, "Ancient Ruins", "에인션트 루인스"),
-    (82, "Skyscrapers", "스카이스크레이퍼스"),
+    (82, "Metropolis", "메트로폴리스"),
     (83, "Tulip Garden", "튤립 가든"),
-    (84, "Floral Village", "플로럴 빌리지"),
+    (84, "Skyscrapers", "스카이스크레이퍼스"),
     (85, "Milky Way", "밀키 웨이"),
-    (86, "Giant Statues", "자이언트 스태추스"),
+    (86, "Floral Village", "플로럴 빌리지"),
     (87, "Legend", "레전드"),
+    (88, "Giant Statues", "자이언트 스태추스"),
 ]
 product_specs = [
     (14, "OutRun2 15 Continuous Course", "15코스 연속", "OutRun2"),
@@ -142,6 +142,19 @@ def choose_vertical_gap(alpha, lo_frac, hi_frac):
     if not cand:
         raise RuntimeError(("no vertical split gap", alpha.shape, lo_frac, hi_frac))
     a,b = max(cand, key=lambda z: z[1]-z[0])
+    return (a+b)//2, [a,b]
+
+def choose_product_gap(alpha, token):
+    cols = np.any(alpha, axis=0)
+    runs = [(a,b) for a,b in runs_of_false(cols) if b-a >= 4]
+    # Preserve exactly the OutRun2/OutRun2SP mark. Choose the inter-word gap nearest
+    # the expected end of that mark, not the widest later word gap (which can fall after "15").
+    frac = 0.27 if token == "OutRun2" else 0.34
+    target = alpha.shape[1] * frac
+    cand = [(a,b) for a,b in runs if a >= int(alpha.shape[1]*0.12) and b <= int(alpha.shape[1]*0.52)]
+    if not cand:
+        raise RuntimeError(("no product token split gap", token, alpha.shape))
+    a,b = min(cand, key=lambda z: abs(((z[0]+z[1])/2)-target))
     return (a+b)//2, [a,b]
 
 def choose_horizontal_gap(alpha, lo_frac, hi_frac):
@@ -199,7 +212,7 @@ for idx, source, korean in goal_specs:
 # Product cells: preserve OutRun2/OutRun2SP token, localize only descriptor after the largest product/descriptor gap.
 for idx, source, korean, token in product_specs:
     cell, arr, alpha = region_arrays(idx)
-    split, gap = choose_vertical_gap(alpha, 0.12, 0.50)
+    split, gap = choose_product_gap(alpha, token)
     m = alpha.copy()
     m[:, :split] = False
     add_element(idx, source + " descriptor", korean, m, "product_descriptor",
@@ -239,7 +252,7 @@ for e in elements:
     allowed[y0:y1,x0:x1] = True
 
 # Ensure known protected atlas cells remain outside target geometry.
-protected_region_indices = list(range(31,40)) + list(range(50,64)) + list(range(66,78)) + list(range(88,106))
+protected_region_indices = list(range(31,40)) + list(range(50,64)) + list(range(66,79)) + list(range(89,106))
 protected_region_indices = sorted(set(i for i in protected_region_indices if i in regs))
 protected_before = {}
 for idx in protected_region_indices:
@@ -507,7 +520,7 @@ for e in elements:
         "delta_left":db[0]-x0,"delta_right":x1-db[2],
         "delta_top":db[1]-y0,"delta_bottom":y1-db[3],
         "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS",
-        "rework_status":"B138_DXT5_SOLVER_CANDIDATE"
+        "rework_status":"B139_DXT5_SOLVER_CANDIDATE"
     })
     e.pop("source_mask",None)
 
@@ -526,11 +539,11 @@ if changed_outside_patch:
 # Evidence masks / validator evidence.
 def save_mask(m,path):
     Image.fromarray((m.astype(np.uint8)*255),"L").save(path)
-source_mask_png=out/"B138_SOURCE_TEXT_MASK.png"
-allowed_png=out/"B138_ALLOWED_EXACT_BBOX_MASK.png"
-protected_png=out/"B138_PROTECTED_MASK.png"
-target_png=out/"B138_TARGET_TEXT_MASK.png"
-clean_png=out/"B138_CLEAN_PLATE.png"
+source_mask_png=out/"B139_SOURCE_TEXT_MASK.png"
+allowed_png=out/"B139_ALLOWED_EXACT_BBOX_MASK.png"
+protected_png=out/"B139_PROTECTED_MASK.png"
+target_png=out/"B139_TARGET_TEXT_MASK.png"
+clean_png=out/"B139_CLEAN_PLATE.png"
 save_mask(source_union,source_mask_png)
 save_mask(allowed,allowed_png)
 save_mask(~allowed,protected_png)
@@ -540,11 +553,11 @@ src_png=tmp/"source_readable.png"; dec_png=tmp/"candidate_readable.png"
 src.save(src_png); dec.save(dec_png)
 validator=repo/"tools/localization/validate_clean_plate.py"
 subprocess.run(["python3",str(validator),str(src_png),str(clean_png),str(source_mask_png),
-                "--report",str(out/"B138_CLEAN_VALIDATION.json")],check=True)
+                "--report",str(out/"B139_CLEAN_VALIDATION.json")],check=True)
 subprocess.run(["python3",str(validator),str(src_png),str(dec_png),str(allowed_png),
-                "--protected-mask",str(protected_png),"--report",str(out/"B138_FINAL_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B138_CLEAN_VALIDATION.json").read_text())
-finalrep=json.loads((out/"B138_FINAL_VALIDATION.json").read_text())
+                "--protected-mask",str(protected_png),"--report",str(out/"B139_FINAL_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B139_CLEAN_VALIDATION.json").read_text())
+finalrep=json.loads((out/"B139_FINAL_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS" or finalrep["status"]!="PASS":
     raise RuntimeError(("validator",cleanrep["status"],finalrep["status"]))
 
@@ -557,7 +570,7 @@ for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,1024),Image.Resampling.NEAREST)
     overview.paste(z,(0,i*1050+26))
     ImageDraw.Draw(overview).text((5,i*1050+5),label,fill="black")
-overview.save(out/"B138_SOURCE_CLEAN_FINAL.jpg",quality=96)
+overview.save(out/"B139_SOURCE_CLEAN_FINAL.jpg",quality=96)
 
 # Target contact proof.
 cards=[]
@@ -579,7 +592,7 @@ yy=0
 for c in cards:
     sheet.paste(c,(0,yy)); yy+=c.height+5
 sheet.thumbnail((1800,14000),Image.Resampling.LANCZOS)
-sheet.save(out/"B138_TARGET_CONTACTS.jpg",quality=96)
+sheet.save(out/"B139_TARGET_CONTACTS.jpg",quality=96)
 
 # Raw orientation proof.
 raw_compare=Image.new("RGB",(1024,2*1050),"white")
@@ -587,14 +600,14 @@ for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRRO
     z=comp(im).resize((1024,1024),Image.Resampling.NEAREST)
     raw_compare.paste(z,(0,i*1050+26))
     ImageDraw.Draw(raw_compare).text((5,i*1050+5),label,fill="black")
-raw_compare.save(out/"B138_RAW_COMPARE.jpg",quality=96)
+raw_compare.save(out/"B139_RAW_COMPARE.jpg",quality=96)
 
 binding_correction={
     "prior_c151_stage_mapping":"77..86 as Cape/Imperial/Ancient/Metropolis/Tulip/Skyscrapers/Milky/Floral/Legend/Giant",
     "prior_b78_tested_stage_ids":list(range(77,87)),
     "canonical_contact_corrected_stage_mapping":{str(i):s for i,s,_ in stage_specs},
-    "reason":"C151 canonical contact sheet row order plus atlas geometry shows idx76=AT artwork, idx77=MT artwork, with ten stage labels at idx78..87. B78 therefore tested an offset stage set and omitted idx87 Legend.",
-    "status":"CORRECTED_IN_B138"
+    "reason":"B138 controller visual review caught idx78 as green AT artwork. Canonical C151 atlas/contact geometry resolves idx77=red MT, idx78=green AT, and ten stage labels at idx79..88. B78/C151 prose numbering was offset by two and omitted idx88 Giant Statues.",
+    "status":"CORRECTED_IN_B139"
 }
 
 report={
@@ -620,10 +633,10 @@ report={
     "protected_region_changed_pixels":protected_changed,
     "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
     "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
-    "status":"B138_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+    "status":"B139_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
     "RUNTIME_VALIDATION":"UNTESTED"
 }
-(out/"B138_C598_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(out/"B139_C598_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":86,"asset":"C598919A","candidate_sha256":cand_sha,
          "localized_physical_elements":len(elements),"bbox_size_positive_margin":f"{len(elements)}/{len(elements)}",
          "clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
@@ -631,6 +644,6 @@ summary={"run":run,"index":86,"asset":"C598919A","candidate_sha256":cand_sha,
          "protected_regions_changed":sum(protected_changed.values()),
          "boundary_alpha_index_only_blocks":len(source_partial_blocks),
          "worker_status":report["status"],"runtime_validation":"UNTESTED",
-         "report":f"localization/graphics/role_B/{run}/B138_C598_REPORT.json"}
-(wr/"B138_C598919A.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+         "report":f"localization/graphics/role_B/{run}/B139_C598_REPORT.json"}
+(wr/"B139_C598919A.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False),flush=True)
