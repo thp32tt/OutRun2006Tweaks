@@ -441,7 +441,7 @@ namespace outrun::vr::dx11
     // modifiers, relative-address tokens, and constant/sampler provenance.
     // This remains evidence only; it does not translate HLSL, create D3D11
     // shader objects, or authorize NativeDrawPath/Draw/DrawIndexed.
-    enum class ProgrammableShaderOperandRole : std::uint8_t
+    enum class ProgrammableShaderSemanticOperandRole : std::uint8_t
     {
         Destination,
         Source,
@@ -452,8 +452,8 @@ namespace outrun::vr::dx11
 
     struct ProgrammableShaderOperandSemantic
     {
-        ProgrammableShaderOperandRole role =
-            ProgrammableShaderOperandRole::Immediate;
+        ProgrammableShaderSemanticOperandRole role =
+            ProgrammableShaderSemanticOperandRole::Immediate;
         DWORD rawToken = 0;
         UINT registerType = 0;
         UINT registerIndex = 0;
