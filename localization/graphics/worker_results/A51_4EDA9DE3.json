@@ -1,0 +1,16 @@
+{
+  "run": "20261005-A-PRODUCTION51",
+  "index": 159,
+  "asset": "4EDA9DE3",
+  "candidate_sha256": "8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5",
+  "bbox_size_positive_margin": "15/15 PASS",
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "clean_source_unchanged": 0,
+  "source_residue": 0,
+  "overlap": 0,
+  "touch": 0,
+  "worker_status": "A51_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION51/A51_4EDA9DE3_REPORT.json"
+}
