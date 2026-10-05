@@ -9107,6 +9107,163 @@ bool validate_programmable_output_resource_behavior_readiness_snapshot(
         current.missingResourceScopeMask == 0;
 }
 
+NativeProgrammableShaderSemanticTranslationReadiness
+compose_programmable_shader_semantic_translation_readiness(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectReadiness& translationObject,
+    std::uint64_t translationObjectSnapshotToken,
+    const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t translatedVertexSemanticHash,
+    std::uint64_t translatedPixelSemanticHash,
+    std::uint64_t interfaceLinkHash,
+    bool vertexSemanticExact,
+    bool pixelSemanticExact,
+    bool interfaceLinkExact) noexcept {
+    NativeProgrammableShaderSemanticTranslationReadiness out{};
+
+    out.cacheKey = sourceIdentity.cacheKey;
+    out.vertexVersionToken = sourceIdentity.vertexShader.versionToken;
+    out.pixelVersionToken = sourceIdentity.pixelShader.versionToken;
+    out.vertexBytecodeHash = sourceIdentity.vertexShader.bytecodeHash;
+    out.pixelBytecodeHash = sourceIdentity.pixelShader.bytecodeHash;
+    out.translatedVertexSemanticHash = translatedVertexSemanticHash;
+    out.translatedPixelSemanticHash = translatedPixelSemanticHash;
+    out.interfaceLinkHash = interfaceLinkHash;
+    out.translationObjectSnapshotToken = translationObjectSnapshotToken;
+    out.inputLayoutSnapshotToken = inputLayoutSnapshotToken;
+
+    out.inputValid =
+        translationObjectSnapshotToken != 0 &&
+        inputLayoutSnapshotToken != 0 &&
+        translatedVertexSemanticHash != 0 &&
+        translatedPixelSemanticHash != 0 &&
+        interfaceLinkHash != 0;
+    out.sourceIdentityExact =
+        sourceIdentity.exact_identity() &&
+        !sourceIdentity.translationImplemented;
+
+    out.translationObjectReady =
+        translationObject.attachmentReady &&
+        translationObject.objectsAttached &&
+        translationObject.objectDevicesMatch &&
+        translationObject.cacheKey != 0 &&
+        translationObject.snapshotToken != 0;
+    out.translationObjectSnapshotMatches =
+        out.translationObjectReady &&
+        translationObject.snapshotToken == translationObjectSnapshotToken;
+
+    out.inputLayoutReady =
+        inputLayout.attachmentReady &&
+        inputLayout.layoutIdentityExact &&
+        inputLayout.inputLayoutAttached &&
+        inputLayout.inputLayoutDeviceMatches &&
+        inputLayout.cacheKey != 0 &&
+        inputLayout.objectSnapshotToken != 0 &&
+        inputLayout.snapshotToken != 0;
+    out.inputLayoutSnapshotMatches =
+        out.inputLayoutReady &&
+        inputLayout.snapshotToken == inputLayoutSnapshotToken;
+
+    out.cacheIdentityMatches =
+        out.sourceIdentityExact &&
+        translationObject.cacheKey == sourceIdentity.cacheKey &&
+        inputLayout.cacheKey == sourceIdentity.cacheKey &&
+        inputLayout.objectSnapshotToken == translationObjectSnapshotToken;
+
+    out.vertexSemanticExact =
+        vertexSemanticExact &&
+        sourceIdentity.vertexShader.present &&
+        sourceIdentity.vertexShader.observed &&
+        sourceIdentity.vertexShader.versionToken != 0 &&
+        sourceIdentity.vertexShader.bytecodeHash != 0 &&
+        translatedVertexSemanticHash != 0;
+    out.pixelSemanticExact =
+        pixelSemanticExact &&
+        sourceIdentity.pixelShader.present &&
+        sourceIdentity.pixelShader.observed &&
+        sourceIdentity.pixelShader.versionToken != 0 &&
+        sourceIdentity.pixelShader.bytecodeHash != 0 &&
+        translatedPixelSemanticHash != 0;
+    out.interfaceLinkExact =
+        interfaceLinkExact &&
+        interfaceLinkHash != 0 &&
+        inputLayout.inputLayoutIdentity != 0;
+
+    out.semanticProofPresent =
+        out.sourceIdentityExact &&
+        out.translationObjectSnapshotMatches &&
+        out.inputLayoutSnapshotMatches &&
+        out.cacheIdentityMatches &&
+        out.vertexSemanticExact &&
+        out.pixelSemanticExact &&
+        out.interfaceLinkExact;
+
+    out.diagnosticOnly = true;
+    out.boundaryPreserved =
+        out.semanticProofPresent &&
+        out.diagnosticOnly;
+    out.reviewReady =
+        out.inputValid &&
+        out.semanticProofPresent &&
+        out.boundaryPreserved;
+
+    if (out.reviewReady) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
+        token = mix_readiness_snapshot_token(token, out.vertexVersionToken);
+        token = mix_readiness_snapshot_token(token, out.pixelVersionToken);
+        token = mix_readiness_snapshot_token(token, out.vertexBytecodeHash);
+        token = mix_readiness_snapshot_token(token, out.pixelBytecodeHash);
+        token = mix_readiness_snapshot_token(
+            token, out.translatedVertexSemanticHash);
+        token = mix_readiness_snapshot_token(
+            token, out.translatedPixelSemanticHash);
+        token = mix_readiness_snapshot_token(token, out.interfaceLinkHash);
+        token = mix_readiness_snapshot_token(
+            token, out.translationObjectSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.inputLayoutSnapshotToken);
+        token = mix_readiness_snapshot_token(token, 0x263u);
+        out.reviewSnapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_programmable_shader_semantic_translation_readiness_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectReadiness& translationObject,
+    std::uint64_t translationObjectSnapshotToken,
+    const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t translatedVertexSemanticHash,
+    std::uint64_t translatedPixelSemanticHash,
+    std::uint64_t interfaceLinkHash,
+    bool vertexSemanticExact,
+    bool pixelSemanticExact,
+    bool interfaceLinkExact,
+    std::uint64_t reviewSnapshotToken) noexcept {
+    if (reviewSnapshotToken == 0)
+        return false;
+    const auto current =
+        compose_programmable_shader_semantic_translation_readiness(
+            sourceIdentity,
+            translationObject, translationObjectSnapshotToken,
+            inputLayout, inputLayoutSnapshotToken,
+            translatedVertexSemanticHash,
+            translatedPixelSemanticHash,
+            interfaceLinkHash,
+            vertexSemanticExact,
+            pixelSemanticExact,
+            interfaceLinkExact);
+    return current.reviewReady &&
+        current.reviewSnapshotToken == reviewSnapshotToken &&
+        current.semanticProofPresent &&
+        current.vertexSemanticExact &&
+        current.pixelSemanticExact &&
+        current.interfaceLinkExact;
+}
+
 NativeProgrammableShaderActivationPrerequisiteHandoff
 compose_programmable_activation_prerequisite_handoff(
     const NativeProgrammableShaderDormantSourceRevalidationReadiness&
@@ -9115,7 +9272,9 @@ compose_programmable_activation_prerequisite_handoff(
     const NativeProgrammableShaderOutputResourceBehaviorReadiness& resourceBehavior,
     std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
-    std::uint64_t inputLayoutSnapshotToken) noexcept {
+    std::uint64_t inputLayoutSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationReadiness& shaderTranslation,
+    std::uint64_t shaderTranslationSnapshotToken) noexcept {
     NativeProgrammableShaderActivationPrerequisiteHandoff out{};
     constexpr std::uint32_t kResourceBehaviorMissing = 1u << 0;
     constexpr std::uint32_t kInputLayoutMissing = 1u << 1;
@@ -9126,10 +9285,12 @@ compose_programmable_activation_prerequisite_handoff(
     out.sourceRevalidationSnapshotToken = sourceRevalidationSnapshotToken;
     out.resourceBehaviorSnapshotToken = resourceBehaviorSnapshotToken;
     out.inputLayoutSnapshotToken = inputLayoutSnapshotToken;
+    out.shaderTranslationSnapshotToken = shaderTranslationSnapshotToken;
     out.inputValid =
         sourceRevalidationSnapshotToken != 0 &&
         resourceBehaviorSnapshotToken != 0 &&
-        inputLayoutSnapshotToken != 0;
+        inputLayoutSnapshotToken != 0 &&
+        shaderTranslationSnapshotToken != 0;
 
     out.sourceRevalidationReady =
         sourceRevalidation.ready &&
@@ -9186,15 +9347,30 @@ compose_programmable_activation_prerequisite_handoff(
         out.inputLayoutOwnershipReady &&
         inputLayout.snapshotToken == inputLayoutSnapshotToken;
 
-    // R260+R261+R262 provide concrete current geometry, supplied-texture and
-    // output-resource behavior proofs, so F18 is complete for this review
-    // receipt. F21 semantic shader translation remains absent.
+    out.shaderTranslationReviewReady =
+        shaderTranslation.reviewReady &&
+        shaderTranslation.boundaryPreserved &&
+        shaderTranslation.semanticProofPresent &&
+        shaderTranslation.cacheKey == inputLayout.cacheKey &&
+        shaderTranslation.inputLayoutSnapshotToken == inputLayoutSnapshotToken &&
+        shaderTranslation.reviewSnapshotToken != 0;
+    out.shaderTranslationSnapshotMatches =
+        out.shaderTranslationReviewReady &&
+        shaderTranslation.reviewSnapshotToken ==
+            shaderTranslationSnapshotToken;
+
+    // R260+R261+R262 provide complete F18 resource behavior. R263 now binds
+    // the exact R239 source identity to the R242/R243 translated-object and
+    // input-layout receipts, closing the static F21 semantic-translation proof.
+    // This still does not authorize NativeDrawPath or any Draw* dispatch.
     out.resourceBehaviorProofPresent =
         out.resourceBehaviorCoverageComplete;
     out.inputLayoutProofPresent =
         out.inputLayoutOwnershipReady &&
         out.inputLayoutSnapshotMatches;
-    out.shaderTranslationProofPresent = false;
+    out.shaderTranslationProofPresent =
+        out.shaderTranslationReviewReady &&
+        out.shaderTranslationSnapshotMatches;
 
     out.missingPrerequisiteMask = 0;
     if (!out.resourceBehaviorProofPresent)
@@ -9216,11 +9392,11 @@ compose_programmable_activation_prerequisite_handoff(
     out.boundaryPreserved =
         sourceRevalidation.boundaryPreserved &&
         out.resourceBehaviorProofPresent &&
+        out.inputLayoutProofPresent &&
+        out.shaderTranslationProofPresent &&
         out.diagnosticOnly &&
         !out.nativeDrawPathActivationAllowed &&
-        !out.drawDispatchAuthorized &&
-        !out.activationPrerequisitesSatisfied &&
-        out.missingPrerequisiteMask != 0;
+        !out.drawDispatchAuthorized;
 
     out.reviewReady =
         out.inputValid &&
@@ -9228,6 +9404,7 @@ compose_programmable_activation_prerequisite_handoff(
         out.sourceRevalidationSnapshotMatches &&
         out.resourceBehaviorProofPresent &&
         out.inputLayoutProofPresent &&
+        out.shaderTranslationProofPresent &&
         out.boundaryPreserved;
 
     if (out.reviewReady) {
@@ -9241,6 +9418,8 @@ compose_programmable_activation_prerequisite_handoff(
             token, out.resourceBehaviorSnapshotToken);
         token = mix_readiness_snapshot_token(
             token, out.inputLayoutSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.shaderTranslationSnapshotToken);
         token = mix_readiness_snapshot_token(
             token, out.missingPrerequisiteMask);
         token = mix_readiness_snapshot_token(
@@ -9271,13 +9450,16 @@ bool validate_programmable_activation_prerequisite_handoff_snapshot(
     std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationReadiness& shaderTranslation,
+    std::uint64_t shaderTranslationSnapshotToken,
     std::uint64_t reviewSnapshotToken) noexcept {
     if (reviewSnapshotToken == 0)
         return false;
     const auto current = compose_programmable_activation_prerequisite_handoff(
         sourceRevalidation, sourceRevalidationSnapshotToken,
         resourceBehavior, resourceBehaviorSnapshotToken,
-        inputLayout, inputLayoutSnapshotToken);
+        inputLayout, inputLayoutSnapshotToken,
+        shaderTranslation, shaderTranslationSnapshotToken);
     return current.reviewReady &&
         current.reviewSnapshotToken == reviewSnapshotToken &&
         current.resourceBehaviorGeometryProofPresent &&
@@ -9285,8 +9467,10 @@ bool validate_programmable_activation_prerequisite_handoff_snapshot(
         current.resourceBehaviorOutputProofPresent &&
         current.resourceBehaviorCoverageComplete &&
         current.resourceBehaviorProofPresent &&
-        current.missingPrerequisiteMask == (1u << 2) &&
-        !current.activationPrerequisitesSatisfied &&
+        current.inputLayoutProofPresent &&
+        current.shaderTranslationProofPresent &&
+        current.missingPrerequisiteMask == 0 &&
+        current.activationPrerequisitesSatisfied &&
         !current.nativeDrawPathActivationAllowed &&
         !current.drawDispatchAuthorized &&
         current.activationSnapshotToken == 0;

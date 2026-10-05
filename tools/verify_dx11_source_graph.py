@@ -10300,6 +10300,41 @@ def main() -> None:
             + ", ".join(missing_r262_programmable_output_resource_behavior)
         )
 
+    r263_programmable_shader_semantic_translation_contract = [
+        ("struct NativeProgrammableShaderSemanticTranslationReadiness",
+         NATIVE_BACKEND_HPP, "R263 exact F21 semantic-translation readiness type"),
+        ("compose_programmable_shader_semantic_translation_readiness(",
+         NATIVE_BACKEND_HPP, "R263 semantic-translation composition declaration"),
+        ("validate_programmable_shader_semantic_translation_readiness_snapshot(",
+         NATIVE_BACKEND_HPP, "R263 semantic-translation snapshot validator"),
+        ("out.cacheIdentityMatches =",
+         NATIVE_BACKEND_CPP, "R263 source/object/layout cache identity binding"),
+        ("out.vertexSemanticExact =",
+         NATIVE_BACKEND_CPP, "R263 vertex semantic exactness gate"),
+        ("out.pixelSemanticExact =",
+         NATIVE_BACKEND_CPP, "R263 pixel semantic exactness gate"),
+        ("out.interfaceLinkExact =",
+         NATIVE_BACKEND_CPP, "R263 stage-interface semantic exactness gate"),
+        ("out.semanticProofPresent =",
+         NATIVE_BACKEND_CPP, "R263 complete F21 semantic proof gate"),
+        ("token, 0x263u",
+         NATIVE_BACKEND_CPP, "R263 independent semantic review snapshot-domain tag"),
+        ("R263 exact programmable shader semantic translation proof binds source identity to translated object/layout receipts",
+         CONSTANT_BUFFER_PROBE, "R263 exact F21 positive regression"),
+        ("R263 rejects incomplete programmable shader interface semantic proof",
+         CONSTANT_BUFFER_PROBE, "R263 incomplete interface fail-closed regression"),
+    ]
+    missing_r263_programmable_shader_semantic_translation = [
+        meaning for token, source, meaning
+        in r263_programmable_shader_semantic_translation_contract
+        if token not in source
+    ]
+    if missing_r263_programmable_shader_semantic_translation:
+        raise SystemExit(
+            "DX11 R263 programmable shader semantic-translation drift: "
+            + ", ".join(missing_r263_programmable_shader_semantic_translation)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
@@ -10317,22 +10352,28 @@ def main() -> None:
          NATIVE_BACKEND_CPP, "R259 requires complete geometry/texture/output F18 coverage"),
         ("out.resourceBehaviorProofPresent =",
          NATIVE_BACKEND_CPP, "R259 full F18 proof remains separately gated"),
-        ("out.shaderTranslationProofPresent = false;",
-         NATIVE_BACKEND_CPP, "R259 F21 shader semantic translation debt remains explicit"),
+        ("out.shaderTranslationReviewReady =",
+         NATIVE_BACKEND_CPP, "R259 consumes R263 semantic-translation review"),
+        ("out.shaderTranslationSnapshotMatches =",
+         NATIVE_BACKEND_CPP, "R259 requires exact current R263 semantic snapshot"),
+        ("out.shaderTranslationProofPresent =",
+         NATIVE_BACKEND_CPP, "R259 consumes exact F21 shader semantic proof"),
         ("out.activationSnapshotToken = 0;",
          NATIVE_BACKEND_CPP, "R259 cannot manufacture activation authority"),
         ("token, 0x259u",
          NATIVE_BACKEND_CPP, "R259 independent review snapshot-domain tag"),
-        ("R259 indexed review handoff consumes full F18 while F21 remains fail-closed",
-         CONSTANT_BUFFER_PROBE, "R259 indexed full-F18/F21-debt regression"),
+        ("R259 indexed review handoff consumes exact F18+F21 while activation remains fail-closed",
+         CONSTANT_BUFFER_PROBE, "R259 indexed full-F18/F21 static-prerequisite regression"),
         ("R259 rejects stale R258 source-revalidation identity",
          CONSTANT_BUFFER_PROBE, "R259 stale R258 receipt regression"),
         ("R259 rejects stale R262 resource-behavior identity",
          CONSTANT_BUFFER_PROBE, "R259 stale R262 receipt regression"),
         ("R259 rejects stale R243 input-layout identity",
          CONSTANT_BUFFER_PROBE, "R259 stale input-layout receipt regression"),
-        ("R259 non-indexed review handoff consumes full F18 while F21 remains fail-closed",
-         CONSTANT_BUFFER_PROBE, "R259 non-indexed full-F18/F21-debt regression"),
+        ("R259 rejects stale R263 shader semantic-translation identity",
+         CONSTANT_BUFFER_PROBE, "R259 stale R263 semantic receipt regression"),
+        ("R259 non-indexed review handoff consumes exact F18+F21 while activation remains fail-closed",
+         CONSTANT_BUFFER_PROBE, "R259 non-indexed full-F18/F21 static-prerequisite regression"),
     ]
     missing_r259_programmable_activation_prerequisite = [
         meaning for token, source, meaning

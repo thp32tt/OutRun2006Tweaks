@@ -1940,11 +1940,73 @@ validate_programmable_output_resource_behavior_readiness_snapshot(
     std::uint64_t surfaceBindingSnapshotToken,
     std::uint64_t reviewSnapshotToken) noexcept;
 
+// R263 seals one exact F21 programmable-shader semantic-translation proof.
+// The proof is bound to the census-sealed R239 source VS/PS identity, the
+// exact R242 translated object receipt and the exact R243 input-layout receipt.
+// Non-zero translated semantic hashes are evidence identifiers supplied by the
+// dormant translator/probe; this review path never routes Draw* or activates
+// NativeDrawPath.
+struct NativeProgrammableShaderSemanticTranslationReadiness {
+    bool inputValid{};
+    bool sourceIdentityExact{};
+    bool translationObjectReady{};
+    bool translationObjectSnapshotMatches{};
+    bool inputLayoutReady{};
+    bool inputLayoutSnapshotMatches{};
+    bool cacheIdentityMatches{};
+    bool vertexSemanticExact{};
+    bool pixelSemanticExact{};
+    bool interfaceLinkExact{};
+    bool semanticProofPresent{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    std::uint64_t cacheKey{};
+    DWORD vertexVersionToken{};
+    DWORD pixelVersionToken{};
+    std::uint64_t vertexBytecodeHash{};
+    std::uint64_t pixelBytecodeHash{};
+    std::uint64_t translatedVertexSemanticHash{};
+    std::uint64_t translatedPixelSemanticHash{};
+    std::uint64_t interfaceLinkHash{};
+    std::uint64_t translationObjectSnapshotToken{};
+    std::uint64_t inputLayoutSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderSemanticTranslationReadiness
+compose_programmable_shader_semantic_translation_readiness(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectReadiness& translationObject,
+    std::uint64_t translationObjectSnapshotToken,
+    const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t translatedVertexSemanticHash,
+    std::uint64_t translatedPixelSemanticHash,
+    std::uint64_t interfaceLinkHash,
+    bool vertexSemanticExact,
+    bool pixelSemanticExact,
+    bool interfaceLinkExact) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_shader_semantic_translation_readiness_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectReadiness& translationObject,
+    std::uint64_t translationObjectSnapshotToken,
+    const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t translatedVertexSemanticHash,
+    std::uint64_t translatedPixelSemanticHash,
+    std::uint64_t interfaceLinkHash,
+    bool vertexSemanticExact,
+    bool pixelSemanticExact,
+    bool interfaceLinkExact,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
 // R259 consumes the current R258 source receipt, R262 full F18 resource-behavior
-// review and R243 input-layout ownership receipt into one activation-prerequisite
-// handoff. R260+R261+R262 now prove current MANAGED geometry, supplied texture
-// and output surface behavior. F21 shader semantic translation remains absent,
-// so activation authority stays off.
+// review, R243 input-layout ownership and the exact R263 F21 semantic proof into
+// one activation-prerequisite handoff. Static prerequisites may become complete,
+// but activation authority stays off until the separate activation/runtime gate.
 struct NativeProgrammableShaderActivationPrerequisiteHandoff {
     bool inputValid{};
     bool sourceRevalidationReady{};
@@ -1957,6 +2019,8 @@ struct NativeProgrammableShaderActivationPrerequisiteHandoff {
     bool resourceBehaviorCoverageComplete{};
     bool inputLayoutOwnershipReady{};
     bool inputLayoutSnapshotMatches{};
+    bool shaderTranslationReviewReady{};
+    bool shaderTranslationSnapshotMatches{};
     bool resourceBehaviorProofPresent{};
     bool inputLayoutProofPresent{};
     bool shaderTranslationProofPresent{};
@@ -1973,6 +2037,7 @@ struct NativeProgrammableShaderActivationPrerequisiteHandoff {
     std::uint64_t sourceRevalidationSnapshotToken{};
     std::uint64_t resourceBehaviorSnapshotToken{};
     std::uint64_t inputLayoutSnapshotToken{};
+    std::uint64_t shaderTranslationSnapshotToken{};
     std::uint64_t reviewSnapshotToken{};
     std::uint64_t activationSnapshotToken{};
 };
@@ -1985,7 +2050,9 @@ compose_programmable_activation_prerequisite_handoff(
     const NativeProgrammableShaderOutputResourceBehaviorReadiness& resourceBehavior,
     std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
-    std::uint64_t inputLayoutSnapshotToken) noexcept;
+    std::uint64_t inputLayoutSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationReadiness& shaderTranslation,
+    std::uint64_t shaderTranslationSnapshotToken) noexcept;
 
 [[nodiscard]] bool
 validate_programmable_activation_prerequisite_handoff_snapshot(
@@ -1996,6 +2063,8 @@ validate_programmable_activation_prerequisite_handoff_snapshot(
     std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationReadiness& shaderTranslation,
+    std::uint64_t shaderTranslationSnapshotToken,
     std::uint64_t reviewSnapshotToken) noexcept;
 
 class NativeProgrammableShaderPairCache final {

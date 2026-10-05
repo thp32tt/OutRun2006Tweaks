@@ -4527,6 +4527,75 @@ int main()
         r261IndexedStaleGeometry.reviewSnapshotToken == 0,
         "R261 rejects stale R260 geometry resource-behavior identity");
 
+    constexpr std::uint64_t r263VertexSemanticHash =
+        0x2631000000000001ull;
+    constexpr std::uint64_t r263PixelSemanticHash =
+        0x2632000000000002ull;
+    constexpr std::uint64_t r263InterfaceLinkHash =
+        0x2633000000000003ull;
+    const auto r263SemanticTranslation =
+        outrun::vr::dx11::
+            compose_programmable_shader_semantic_translation_readiness(
+                programmablePair,
+                r242ObjectReady, r242ObjectReady.snapshotToken,
+                r243InputLayoutReady, r243InputLayoutReady.snapshotToken,
+                r263VertexSemanticHash,
+                r263PixelSemanticHash,
+                r263InterfaceLinkHash,
+                true, true, true);
+    require(
+        r263SemanticTranslation.inputValid &&
+        r263SemanticTranslation.sourceIdentityExact &&
+        r263SemanticTranslation.translationObjectReady &&
+        r263SemanticTranslation.translationObjectSnapshotMatches &&
+        r263SemanticTranslation.inputLayoutReady &&
+        r263SemanticTranslation.inputLayoutSnapshotMatches &&
+        r263SemanticTranslation.cacheIdentityMatches &&
+        r263SemanticTranslation.vertexSemanticExact &&
+        r263SemanticTranslation.pixelSemanticExact &&
+        r263SemanticTranslation.interfaceLinkExact &&
+        r263SemanticTranslation.semanticProofPresent &&
+        r263SemanticTranslation.diagnosticOnly &&
+        r263SemanticTranslation.boundaryPreserved &&
+        r263SemanticTranslation.reviewReady &&
+        r263SemanticTranslation.cacheKey == programmablePair.cacheKey &&
+        r263SemanticTranslation.vertexBytecodeHash ==
+            programmablePair.vertexShader.bytecodeHash &&
+        r263SemanticTranslation.pixelBytecodeHash ==
+            programmablePair.pixelShader.bytecodeHash &&
+        r263SemanticTranslation.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_shader_semantic_translation_readiness_snapshot(
+                programmablePair,
+                r242ObjectReady, r242ObjectReady.snapshotToken,
+                r243InputLayoutReady, r243InputLayoutReady.snapshotToken,
+                r263VertexSemanticHash,
+                r263PixelSemanticHash,
+                r263InterfaceLinkHash,
+                true, true, true,
+                r263SemanticTranslation.reviewSnapshotToken),
+        "R263 exact programmable shader semantic translation proof binds source identity to translated object/layout receipts");
+
+    const auto r263MissingInterfaceProof =
+        outrun::vr::dx11::
+            compose_programmable_shader_semantic_translation_readiness(
+                programmablePair,
+                r242ObjectReady, r242ObjectReady.snapshotToken,
+                r243InputLayoutReady, r243InputLayoutReady.snapshotToken,
+                r263VertexSemanticHash,
+                r263PixelSemanticHash,
+                r263InterfaceLinkHash,
+                true, true, false);
+    require(
+        r263MissingInterfaceProof.sourceIdentityExact &&
+        r263MissingInterfaceProof.translationObjectSnapshotMatches &&
+        r263MissingInterfaceProof.inputLayoutSnapshotMatches &&
+        !r263MissingInterfaceProof.interfaceLinkExact &&
+        !r263MissingInterfaceProof.semanticProofPresent &&
+        !r263MissingInterfaceProof.reviewReady &&
+        r263MissingInterfaceProof.reviewSnapshotToken == 0,
+        "R263 rejects incomplete programmable shader interface semantic proof");
+
     const auto r259IndexedPrerequisiteHandoff =
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258IndexedSourceRevalidation,
@@ -4534,7 +4603,9 @@ int main()
             r262IndexedOutputResourceBehavior,
             r262IndexedOutputResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
-            r243InputLayoutReady.snapshotToken);
+            r243InputLayoutReady.snapshotToken,
+            r263SemanticTranslation,
+            r263SemanticTranslation.reviewSnapshotToken);
     require(
         r259IndexedPrerequisiteHandoff.inputValid &&
         r259IndexedPrerequisiteHandoff.sourceRevalidationReady &&
@@ -4547,10 +4618,12 @@ int main()
         r259IndexedPrerequisiteHandoff.resourceBehaviorCoverageComplete &&
         r259IndexedPrerequisiteHandoff.inputLayoutOwnershipReady &&
         r259IndexedPrerequisiteHandoff.inputLayoutSnapshotMatches &&
+        r259IndexedPrerequisiteHandoff.shaderTranslationReviewReady &&
+        r259IndexedPrerequisiteHandoff.shaderTranslationSnapshotMatches &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorProofPresent &&
         r259IndexedPrerequisiteHandoff.inputLayoutProofPresent &&
-        !r259IndexedPrerequisiteHandoff.shaderTranslationProofPresent &&
-        !r259IndexedPrerequisiteHandoff.activationPrerequisitesSatisfied &&
+        r259IndexedPrerequisiteHandoff.shaderTranslationProofPresent &&
+        r259IndexedPrerequisiteHandoff.activationPrerequisitesSatisfied &&
         r259IndexedPrerequisiteHandoff.diagnosticOnly &&
         !r259IndexedPrerequisiteHandoff.nativeDrawPathActivationAllowed &&
         !r259IndexedPrerequisiteHandoff.drawDispatchAuthorized &&
@@ -4559,7 +4632,7 @@ int main()
         r259IndexedPrerequisiteHandoff.kind ==
             outrun::vr::dx11::NativeProgrammableShaderDrawCandidateKind::Indexed &&
         r259IndexedPrerequisiteHandoff.indexed &&
-        r259IndexedPrerequisiteHandoff.missingPrerequisiteMask == 0x4u &&
+        r259IndexedPrerequisiteHandoff.missingPrerequisiteMask == 0 &&
         r259IndexedPrerequisiteHandoff.reviewSnapshotToken != 0 &&
         r259IndexedPrerequisiteHandoff.activationSnapshotToken == 0 &&
         outrun::vr::dx11::
@@ -4570,8 +4643,35 @@ int main()
                 r262IndexedOutputResourceBehavior.reviewSnapshotToken,
                 r243InputLayoutReady,
                 r243InputLayoutReady.snapshotToken,
+                r263SemanticTranslation,
+                r263SemanticTranslation.reviewSnapshotToken,
                 r259IndexedPrerequisiteHandoff.reviewSnapshotToken),
-        "R259 indexed review handoff consumes full F18 while F21 remains fail-closed");
+        "R259 indexed review handoff consumes exact F18+F21 while activation remains fail-closed");
+
+    const auto staleR263ReviewToken =
+        r263SemanticTranslation.reviewSnapshotToken == 1ull
+            ? 2ull
+            : (r263SemanticTranslation.reviewSnapshotToken ^ 1ull);
+    const auto r259IndexedStaleShaderTranslation =
+        outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
+            r258IndexedSourceRevalidation,
+            r258IndexedSourceRevalidation.snapshotToken,
+            r262IndexedOutputResourceBehavior,
+            r262IndexedOutputResourceBehavior.reviewSnapshotToken,
+            r243InputLayoutReady,
+            r243InputLayoutReady.snapshotToken,
+            r263SemanticTranslation,
+            staleR263ReviewToken);
+    require(
+        r259IndexedStaleShaderTranslation.shaderTranslationReviewReady &&
+        !r259IndexedStaleShaderTranslation.shaderTranslationSnapshotMatches &&
+        !r259IndexedStaleShaderTranslation.shaderTranslationProofPresent &&
+        (r259IndexedStaleShaderTranslation.missingPrerequisiteMask & 0x4u) != 0 &&
+        !r259IndexedStaleShaderTranslation.activationPrerequisitesSatisfied &&
+        !r259IndexedStaleShaderTranslation.reviewReady &&
+        r259IndexedStaleShaderTranslation.reviewSnapshotToken == 0 &&
+        r259IndexedStaleShaderTranslation.activationSnapshotToken == 0,
+        "R259 rejects stale R263 shader semantic-translation identity");
 
     const auto staleR258IndexedReviewToken =
         r258IndexedSourceRevalidation.snapshotToken == 1ull
@@ -4584,7 +4684,9 @@ int main()
             r262IndexedOutputResourceBehavior,
             r262IndexedOutputResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
-            r243InputLayoutReady.snapshotToken);
+            r243InputLayoutReady.snapshotToken,
+            r263SemanticTranslation,
+            r263SemanticTranslation.reviewSnapshotToken);
     require(
         r259IndexedStaleSource.sourceRevalidationReady &&
         !r259IndexedStaleSource.sourceRevalidationSnapshotMatches &&
@@ -4604,7 +4706,9 @@ int main()
             r262IndexedOutputResourceBehavior,
             staleR261IndexedReviewToken,
             r243InputLayoutReady,
-            r243InputLayoutReady.snapshotToken);
+            r243InputLayoutReady.snapshotToken,
+            r263SemanticTranslation,
+            r263SemanticTranslation.reviewSnapshotToken);
     require(
         r259IndexedStaleResourceBehavior.resourceBehaviorReviewReady &&
         !r259IndexedStaleResourceBehavior.resourceBehaviorSnapshotMatches &&
@@ -4626,7 +4730,9 @@ int main()
             r262IndexedOutputResourceBehavior,
             r262IndexedOutputResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
-            staleR243ReviewToken);
+            staleR243ReviewToken,
+            r263SemanticTranslation,
+            r263SemanticTranslation.reviewSnapshotToken);
     require(
         r259IndexedStaleInputLayout.inputLayoutOwnershipReady &&
         !r259IndexedStaleInputLayout.inputLayoutSnapshotMatches &&
@@ -5574,7 +5680,9 @@ int main()
             r262NonIndexedOutputResourceBehavior,
             r262NonIndexedOutputResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
-            r243InputLayoutReady.snapshotToken);
+            r243InputLayoutReady.snapshotToken,
+            r263SemanticTranslation,
+            r263SemanticTranslation.reviewSnapshotToken);
     require(
         r259NonIndexedPrerequisiteHandoff.sourceRevalidationReady &&
         r259NonIndexedPrerequisiteHandoff.sourceRevalidationSnapshotMatches &&
@@ -5586,14 +5694,16 @@ int main()
         r259NonIndexedPrerequisiteHandoff.resourceBehaviorCoverageComplete &&
         r259NonIndexedPrerequisiteHandoff.inputLayoutProofPresent &&
         r259NonIndexedPrerequisiteHandoff.resourceBehaviorProofPresent &&
-        !r259NonIndexedPrerequisiteHandoff.shaderTranslationProofPresent &&
-        !r259NonIndexedPrerequisiteHandoff.activationPrerequisitesSatisfied &&
+        r259NonIndexedPrerequisiteHandoff.shaderTranslationReviewReady &&
+        r259NonIndexedPrerequisiteHandoff.shaderTranslationSnapshotMatches &&
+        r259NonIndexedPrerequisiteHandoff.shaderTranslationProofPresent &&
+        r259NonIndexedPrerequisiteHandoff.activationPrerequisitesSatisfied &&
         r259NonIndexedPrerequisiteHandoff.boundaryPreserved &&
         r259NonIndexedPrerequisiteHandoff.reviewReady &&
         r259NonIndexedPrerequisiteHandoff.kind ==
             outrun::vr::dx11::NativeProgrammableShaderDrawCandidateKind::NonIndexed &&
         !r259NonIndexedPrerequisiteHandoff.indexed &&
-        r259NonIndexedPrerequisiteHandoff.missingPrerequisiteMask == 0x4u &&
+        r259NonIndexedPrerequisiteHandoff.missingPrerequisiteMask == 0 &&
         r259NonIndexedPrerequisiteHandoff.reviewSnapshotToken != 0 &&
         r259NonIndexedPrerequisiteHandoff.activationSnapshotToken == 0 &&
         outrun::vr::dx11::
@@ -5604,8 +5714,10 @@ int main()
                 r262NonIndexedOutputResourceBehavior.reviewSnapshotToken,
                 r243InputLayoutReady,
                 r243InputLayoutReady.snapshotToken,
+                r263SemanticTranslation,
+                r263SemanticTranslation.reviewSnapshotToken,
                 r259NonIndexedPrerequisiteHandoff.reviewSnapshotToken),
-        "R259 non-indexed review handoff consumes full F18 while F21 remains fail-closed");
+        "R259 non-indexed review handoff consumes exact F18+F21 while activation remains fail-closed");
 
     const auto r258NonIndexedSourceDrift =
         programmableCache.nonindexed_dormant_source_revalidation_readiness(
