@@ -13,9 +13,9 @@ services:
     environment:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
-      AUTO_SEND: "${AUTO_SEND:-false}"
+      AUTO_SEND: "false"
       QUEUE_MODE: "true"
-      LOCALIZATION_PARALLEL: "true"
+      LOCALIZATION_PARALLEL: "false"
       PARALLEL_LANE_STAGGER_SECONDS: "15"
       PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS: "15"
       HEARTBEAT_SECONDS: "15"
