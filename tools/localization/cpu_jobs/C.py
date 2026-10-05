@@ -75,9 +75,9 @@ def make_raw(raws,rawf,outpath):
         sh.paste(z,(0,i*536+24)); ImageDraw.Draw(sh).text((4,i*536+4),lab,fill="black")
     sh.save(outpath,quality=94)
 
-def process_a67():
-    run="20261005-C210-97E863AD"; out=repo/"localization/graphics/role_C"/run; out.mkdir(parents=True,exist_ok=True)
-    pr=json.loads((repo/"localization/graphics/role_A/20261005-A-PRODUCTION67-STYLE/A67_97E863AD_REPORT.json").read_text())
+def process_a70():
+    run="20261005-C212-97E863AD"; out=repo/"localization/graphics/role_C"/run; out.mkdir(parents=True,exist_ok=True)
+    pr=json.loads((repo/"localization/graphics/role_A/20261005-A-PRODUCTION70-REWORK/A70_97E863AD_REPORT.json").read_text())
     asset=pr["asset"]; sp=pr["source_provenance"]; cand=repo/pr["candidate_path"]
     folder=asset.split("/")[-2]; name=asset.split("/")[-1]
     tmp=Path("/tmp/c210"); tmp.mkdir(exist_ok=True); sfile=tmp/"source.dds"; afile=tmp/"atlas.json"
@@ -86,9 +86,9 @@ def process_a67():
     urllib.request.urlretrieve(base+f"/Original%20(PC)/Original%20(Tweaks%20dumps)/{folder}/4x_{name[:-4]}_atlas.json",afile)
     sb=sfile.read_bytes(); cb=cand.read_bytes()
     if sha(sb)!=sp["source_sha256"] or sha(cb)!=pr["candidate_sha256"] or sb[:128]!=cb[:128]:
-        raise RuntimeError(("C210 identity/header",sha(sb),sha(cb),sb[:128]==cb[:128]))
+        raise RuntimeError(("C212 identity/header",sha(sb),sha(cb),sb[:128]==cb[:128]))
     W,H,mips,mode,raws,src=dds_decode(sb); W2,H2,m2,mode2,rawf,fin=dds_decode(cb)
-    if (W,H,mips,mode)!=(2048,1024,1,"RGBA") or (W2,H2,m2,mode2)!=(W,H,mips,mode): raise RuntimeError(("C210 structure",W,H,mips,mode,W2,H2,m2,mode2))
+    if (W,H,mips,mode)!=(2048,1024,1,"RGBA") or (W2,H2,m2,mode2)!=(W,H,mips,mode): raise RuntimeError(("C212 structure",W,H,mips,mode,W2,H2,m2,mode2))
     sa=np.asarray(src,dtype=np.uint8); fa=np.asarray(fin,dtype=np.uint8)
     regs={int(r["idx"]):r for r in json.loads(afile.read_text())["regions"]}
     prows={int(r["region_idx"]):r for r in pr["rows"]}
@@ -114,7 +114,7 @@ def process_a67():
                     if yy==p+1: p=yy
                     else: yr.append((s,p+1)); s=p=yy
                 yr.append((s,p+1))
-            if len(yr)<2: raise RuntimeError(("C210 idx4 split",yr))
+            if len(yr)<2: raise RuntimeError(("C212 idx4 split",yr))
             bottom=yr[-1]; keep=np.zeros_like(a); keep[bottom[0]:bottom[1],:]=a[bottom[0]:bottom[1],:]
             top=a & ~keep; lm=keep
             pm=np.zeros((H,W),bool); pm[y:y+h,x:x+w]=top; protected.append(("idx4_OUTRUN_top",pm))
@@ -128,7 +128,7 @@ def process_a67():
         p=prows[idx]; ob=source_bboxes[idx]; pob=list(map(int,p["original_bbox"])); se=(ob==pob); source_exact &= se
         x0,y0,x1,y1=ob; tm=np.zeros((H,W),bool); tm[y0:y1,x0:x1]=final_alpha[y0:y1,x0:x1] & (clean_arr[y0:y1,x0:x1,3]==0)
         lbb=bbox(tm); plb=list(map(int,p["localized_bbox"])); te=(lbb==plb); target_exact &= te
-        if lbb is None: raise RuntimeError(("C210 empty target",idx))
+        if lbb is None: raise RuntimeError(("C212 empty target",idx))
         a,b,c,d=lbb; margins=[a-x0,x1-c,b-y0,y1-d]
         contain=a>=x0 and b>=y0 and c<=x1 and d<=y1; sizeok=(c-a)<=x1-x0 and (d-b)<=y1-y0; pos=min(margins)>0
         targets.append((idx,tm))
@@ -150,16 +150,16 @@ def process_a67():
              "localized_overlap_pixels":ov,"localized_1px_touch_pixels":touch,"protected_changed_pixels":sum(protected_changes.values())}
     rowpass=sum(1 for r in rows if r["containment"]=="PASS" and r["size_ceiling"]=="PASS" and r["positive_margin"]=="PASS")
     status="PASS" if source_exact and target_exact and rowpass==len(rows) and all(v==0 for v in machine.values()) else "FAIL"
-    make_contacts(src,clean,fin,rows,out/"C210_SOURCE_CLEAN_FINAL_CONTACTS.jpg")
-    make_raw(raws,rawf,out/"C210_RAW_COMPARE.jpg")
-    rep={"schema_version":1,"role":"C","run":run,"qa_id":"C210","queue_index":193,"asset":asset,"producer_run":pr["run"],
+    make_contacts(src,clean,fin,rows,out/"C212_SOURCE_CLEAN_FINAL_CONTACTS.jpg")
+    make_raw(raws,rawf,out/"C212_RAW_COMPARE.jpg")
+    rep={"schema_version":1,"role":"C","run":run,"qa_id":"C212","queue_index":193,"asset":asset,"producer_run":pr["run"],
          "source_sha256":sp["source_sha256"],"candidate_sha256":pr["candidate_sha256"],"structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_exact":True,"raw_orientation":"mirror_y"},
          "source_bbox_exact_match_all":source_exact,"candidate_bbox_exact_match_all":target_exact,"row_checks":rows,"row_gate":f"{rowpass}/{len(rows)} PASS",
          "machine_checks":machine,"protected_pixel_changes":protected_changes,"machine_status":status,"controller_visual_qa":"PENDING_CONTROLLER_REVIEW",
-         "decision":"PENDING_CONTROLLER_VISUAL_QA" if status=="PASS" else "C210_REWORK_REQUIRED_MACHINE_GATE","runtime_validation":"UNTESTED",
-         "preview_files":[f"localization/graphics/role_C/{run}/C210_SOURCE_CLEAN_FINAL_CONTACTS.jpg",f"localization/graphics/role_C/{run}/C210_RAW_COMPARE.jpg"]}
-    (out/"C210_97E863AD_MACHINE_QA.json").write_text(json.dumps(rep,ensure_ascii=False,indent=2)+"\n")
-    (wr/"C210_97E863AD.json").write_text(json.dumps({"run":run,"qa_id":"C210","index":193,"asset":"97E863AD","candidate_sha256":pr["candidate_sha256"],"machine_status":status,"row_gate":rep["row_gate"],"machine_checks":machine,"report":f"localization/graphics/role_C/{run}/C210_97E863AD_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
+         "decision":"PENDING_CONTROLLER_VISUAL_QA" if status=="PASS" else "C212_REWORK_REQUIRED_MACHINE_GATE","runtime_validation":"UNTESTED",
+         "preview_files":[f"localization/graphics/role_C/{run}/C212_SOURCE_CLEAN_FINAL_CONTACTS.jpg",f"localization/graphics/role_C/{run}/C212_RAW_COMPARE.jpg"]}
+    (out/"C212_97E863AD_MACHINE_QA.json").write_text(json.dumps(rep,ensure_ascii=False,indent=2)+"\n")
+    (wr/"C212_97E863AD.json").write_text(json.dumps({"run":run,"qa_id":"C212","index":193,"asset":"97E863AD","candidate_sha256":pr["candidate_sha256"],"machine_status":status,"row_gate":rep["row_gate"],"machine_checks":machine,"report":f"localization/graphics/role_C/{run}/C212_97E863AD_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
     return {"machine_status":status,"row_gate":rep["row_gate"],"machine_checks":machine}
 
 def process_a69():
@@ -236,4 +236,4 @@ def process_a69():
     (wr/"C211_A9ABD877.json").write_text(json.dumps({"run":run,"qa_id":"C211","index":201,"asset":"A9ABD877","candidate_sha256":pr["candidate_sha256"],"machine_status":status,"row_gate":rep["row_gate"],"semantic_binding_policy_pass":semantic_ok,"machine_checks":machine,"report":f"localization/graphics/role_C/{run}/C211_A9ABD877_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
     return {"machine_status":status,"row_gate":rep["row_gate"],"semantic_binding_policy_pass":semantic_ok,"machine_checks":machine}
 
-print(json.dumps({"C210":process_a67(),"C211":process_a69()},ensure_ascii=False),flush=True)
+print(json.dumps({"C212":process_a70()},ensure_ascii=False),flush=True)
