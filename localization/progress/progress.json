@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T10:57:04+09:00",
+  "updated_at_kst": "2026-10-05T11:00:19+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B_PRODUCTION73 completed even index 230 E95DA5 candidate d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b from authoritative 2048x1024 RGBA32 raw mirror_y HD source. 11 physical text elements localized; reviewed BGM, song titles, Alberto's Antics names, explanatory English lines and non-text art preserved pixel-exact. B70 thin Regular fallback and B71 red-pill AA residue were rejected by controller; B73 NotoSansCJK-Black + residue-free pill reconstruction passes 11/11 exact bbox+size+positive margins and zero source residue/outside/alpha/protected/preserved-change/overlap/touch; controller SOURCE/CLEAN/FINAL/row/raw mirror_y PASS. pending_artwork localize_text=31; independent C final QA and in-game validation pending. Producer REWORK=0; 1A43E9D9 remains HIGH_RISK pending in-game; 4F68708E/F6811E94/49BB5FE5 remain strict HOLD. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "B lane latest: index 176 75C3586A is HOLD_STRICT_RECHECK because pinned canonical 2048x2048 RGBA32 HD source/atlas contains no source glyph/effect pixels for transcribed FLAGMAN 4/HOLLY/JENNIFER/CLARISSA, so no candidate was persisted. Index 86 C598919A canonical Release is 4096x4096 DXT5 and the RGBA assumption failed closed; it remains pending. B76/B77 then produced index 198 9FC88069 from canonical 4096x2048 RGBA32/BGRA raw mirror_y source. B77 machine/controller self-QA passed, but C150 immediately corrected the mandatory song-title preserve scope by restoring (GUITAR MIX)/(INSTRUMENTAL)/(PROTOTYPE) pixel-exact. Current candidate 34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c retains Korean only for RANDOM/RANDOM PLAY/INTERMEDIATE B/A and passes C150 4/4 bbox+size+positive-margin with zero outside/alpha/protected/render/residue/overlap/touch/preserved/card-art changes plus visual/raw mirror_y QA. pending_artwork localize_text=29; producer REWORK=0; strict holds include 75C3586A plus 4F68708E/F6811E94/49BB5FE5. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -747,6 +747,25 @@
       "c_final_qa": "PASS",
       "c_machine_report": "localization/graphics/role_C/20261005-C149-E95DA5/C149_E95_MACHINE_QA.json",
       "c_controller_report": "localization/graphics/role_C/20261005-C149-E95DA5/C149_E95_CONTROLLER_FINAL_QA.json"
+    },
+    "b74_75c3586a": {
+      "queue_index": 176,
+      "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+      "status": "HOLD_STRICT_RECHECK_SOURCE_TEXT_ABSENT_CANONICAL_HD",
+      "candidate_persisted": false,
+      "report": "localization/graphics/role_B/20261005-B-PRODUCTION74-PREFLIGHT/B74_CONTROLLER_HOLD.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "b77_9fc88069": {
+      "queue_index": 198,
+      "producer_candidate_sha256": "667b64ac0336c7ae3f7b1f4b79f36c7237225104a4c948ac7158da9805d7e1a7",
+      "current_candidate_sha256": "34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c",
+      "status": "C150_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "producer_self_qa": "SUPERSEDED_BY_C150_PROTECTED_SONG_TITLE_CORRECTION",
+      "localized_functional_regions": 4,
+      "c150_report": "localization/graphics/role_C/20261005-C150-9FC88069/C150_9FC_CONTROLLER_FINAL_QA.json",
+      "reconciliation_report": "localization/graphics/role_B/20261005-B-PRODUCTION77/B77_POST_C150_RECONCILIATION.json",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
