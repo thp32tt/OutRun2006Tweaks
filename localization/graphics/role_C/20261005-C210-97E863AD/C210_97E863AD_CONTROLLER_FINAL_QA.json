@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T23:28:00+09:00",
+  "role": "C",
+  "run": "20261005-C210-97E863AD",
+  "qa_id": "C210",
+  "queue_index": 193,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "producer_run": "20261005-A-PRODUCTION67-STYLE",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "candidate_sha256": "ad3f42856956d15b1c0ecba032d18ebb730c375f4b0a52b456c975e89e9396b7",
+  "machine_status": "PASS",
+  "row_gate": "13/13 PASS",
+  "machine_checks": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_script_exact_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "protected_changed_pixels": 0
+  },
+  "protected_original_policy": {
+    "OUTRUN2SP_logo": "pixel-exact",
+    "OutRun_inline_token": "pixel-exact",
+    "OutRun2SP_inline_token": "pixel-exact",
+    "OUTRUN_showroom_top_line": "pixel-exact",
+    "TESTAROSSA": "pixel-exact",
+    "SP_OR_product_fragments": "pixel-exact"
+  },
+  "controller_visual_qa": "FAIL_SOURCE_STYLE_EXCESSIVE_INTERGLYPH_TRACKING",
+  "visual_findings": [
+    "A67 corrects A65's undersized footprint and keeps the Black/source-height family, but it obtains much of the added width by inserting large source-unjustified gaps between Hangul glyphs.",
+    "SHOWROOM -> 쇼룸 is 220px wide with producer tracking_px_average=132px; the two Hangul blocks are visibly isolated rather than a compact word.",
+    "MULTIPLAYER -> 멀티플레이 uses tracking_px_average=33.25px and WELCOME -> 환영합니다 uses 38.75px; C210 contacts show repeated detached syllable blocks unlike the source's continuous condensed word spacing.",
+    "Goal rows similarly use 41-48px tracking. Machine-safe width ratios do not override the contract requirement to preserve source spacing/proportions."
+  ],
+  "required_rework": "Keep A67's corrected Black weight, vertical/source-height scale, left anchors and exact protected product/model pixels, but remove the width-ratio-driven artificial tracking. Use natural/tight Korean spacing consistent with the source condensed family; do not chase English-string width by separating Hangul syllables. Re-run exact bbox/zero-overlap/raw mirror_y gates.",
+  "decision": "C210_REWORK_REQUIRED_EXCESSIVE_INTERGLYPH_TRACKING_SOURCE_SPACING",
+  "runtime_validation": "UNTESTED",
+  "machine_report": "localization/graphics/role_C/20261005-C210-97E863AD/C210_97E863AD_MACHINE_QA.json",
+  "previews": [
+    "localization/graphics/role_C/20261005-C210-97E863AD/C210_SOURCE_CLEAN_FINAL_CONTACTS.jpg",
+    "localization/graphics/role_C/20261005-C210-97E863AD/C210_RAW_COMPARE.jpg"
+  ],
+  "exclusions": "Completed prior PASS assets were not reopened. VR/FFB/DX11/DXVK untouched."
+}
