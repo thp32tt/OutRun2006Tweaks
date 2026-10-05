@@ -99,7 +99,7 @@ def line_bands(row,n):
 
 def render_line(text,style,fs,stroke,maxw,maxh):
     fill,edge,shadow=palette(style)
-    for fsz in range(fs,max(13,fs-28),-1):
+    for fsz in range(fs,13,-1):
         font=ImageFont.truetype(FONT,fsz,index=FI)
         sw=max(2,min(7,int(round(fsz*0.055))))
         dr=ImageDraw.Draw(Image.new("L",(8,8),0)); bb=dr.textbbox((0,0),text,font=font,stroke_width=sw)
