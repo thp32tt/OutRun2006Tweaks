@@ -1,0 +1,19 @@
+{
+  "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION66-STYLE/A66_SOURCE_READABLE.png",
+  "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION66-STYLE/A66_CLEAN_PLATE.png",
+  "size": [
+    2048,
+    1024
+  ],
+  "changed_pixels": 129429,
+  "changed_bbox": [
+    3,
+    148,
+    1832,
+    1011
+  ],
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "status": "PASS"
+}
