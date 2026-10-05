@@ -962,7 +962,7 @@
       "status": "PENDING_B_C_D_STRICT_QA"
     },
     "latest_d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json",
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C168-63C91067/C168_63C_CONTROLLER_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C169-C170-BATCH/C169_C170_BATCH_FINAL_QA.json",
     "c77_fa7bbb13": {
       "timestamp_kst": "2026-09-27T14:05:02+09:00",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
@@ -1132,8 +1132,8 @@
       "pending_independent_c_final_qa": true,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 19,
-    "current_producer_rework_remaining": 2,
+    "current_pending_artwork_localize_text": 18,
+    "current_producer_rework_remaining": 3,
     "latest_a_production_batch": "localization/graphics/role_A/20261005-A-PRODUCTION27/A_PRODUCTION27_E1639D2E_REPORT.json",
     "a_production20_9ce4e175": {
       "timestamp_kst": "2026-10-05T02:45:00+09:00",
@@ -1163,7 +1163,8 @@
     },
     "current_producer_rework_assets": [
       "63C91067",
-      "C598919A"
+      "C598919A",
+      "754F0599"
     ],
     "a_production26_2ea557b4": {
       "timestamp_kst": "2026-10-05T14:52:10+09:00",
@@ -3806,6 +3807,29 @@
     "decision": "C168_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE",
     "supersedes": "C167_REWORK_REQUIRED_CLEAN_PLATE_VISIBLE_RECONSTRUCTION_ARTIFACTS",
     "report": "localization/graphics/role_C/20261005-C168-63C91067/C168_63C_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c169_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T15:56:00+09:00",
+    "run": "20261005-C169-63C91067",
+    "queue_index": 26,
+    "candidate_sha256": "6e08528dc031e0032fc2f2545a3aca280596986b7c62290c2ecded80484cf7ff",
+    "producer_machine_status": "PASS_REPORTED",
+    "controller_visual_qa": "FAIL_CLEAN_PLATE_ARTWORK_DAMAGE",
+    "decision": "C169_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE",
+    "supersedes": "C168_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE",
+    "report": "localization/graphics/role_C/20261005-C169-63C91067/C169_63C_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c170_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T15:56:00+09:00",
+    "run": "20261005-C170-754F0599",
+    "queue_index": 175,
+    "candidate_sha256": "3d166cf12042471246ce05e89de5122f4ed77cfdbc0f175ed31d351da8ffb20d",
+    "producer_machine_status": "PASS_REPORTED",
+    "controller_visual_qa": "FAIL_SOURCE_STYLE_PROPORTION_WEIGHT",
+    "decision": "C170_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
+    "report": "localization/graphics/role_C/20261005-C170-754F0599/C170_754F_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
