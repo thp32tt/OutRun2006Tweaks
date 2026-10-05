@@ -216,8 +216,11 @@ require(
     "StateBlockEvents::NotifyBegin(device)",
     "StateBlockTracker::Reliable()",
     "per-draw live WVP/shader/render-state validation",
-    "R31 fast left-eye c64 rollback",
-    "R31 HUD left-eye c64 rollback",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "R33 fast left-eye c64 rollback",
+    "R33 HUD left-eye c64 rollback",
 )
 
 # R14 shadows are resource-lifetime-bound and fail closed to one direct path on
