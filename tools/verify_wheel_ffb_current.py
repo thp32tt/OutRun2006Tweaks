@@ -320,7 +320,7 @@ req(ffb, 'vehicleDynamics_.reset_dynamic();', 'engine transitions preserve dynam
 req(dyn, 'calibrationSamples_ >= CalibrationSamplesRequired * 4', 'ambiguous basis calibration retries with a fresh window')
 forbid(ffb, 'bypassSlew', 'events never bypass sustained steering slew')
 req(ffb, 'const LONG eventLevel = static_cast<LONG>', 'events have an independent immediate output path')
-req(ffb, 'const float softwareSpringSign = Settings::WheelFFBInvertSpring', 'Reverse Spring also controls software fallback')
+req(ffb, 'const float softwareSpringSign = effectiveInvertSpring', 'effective model-owned Reverse Spring controls software fallback')
 req(ffb, 'driver autocenter state could not be read; leaving it unchanged', 'unknown driver autocenter state is never mutated')
 req(ffb, 'smoothedLongAccel_ +=', 'weight-transfer acceleration is filtered')
 req(ffb, 'std::clamp(configuredWeightTransfer, 0.0f, 1.5f)', 'weight-transfer setting is finite and bounded')
