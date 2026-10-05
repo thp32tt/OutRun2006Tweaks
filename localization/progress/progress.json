@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T08:17:29+09:00",
+  "updated_at_kst": "2026-10-06T08:34:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1864,21 +1864,21 @@
       "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION"
     },
     "latest_a_zoom_review": {
-      "run": "A98",
-      "queue_index": 25,
-      "asset": "4AFC1BED",
+      "run": "A99",
+      "queue_index": 27,
+      "asset": "8B52FEEC",
       "action": "zoom_review",
-      "source_sha256": "542025bee37f371b236d77854b4b7f95574ae051b91bc31a205af03dfd1adb7f",
-      "source_structure": "2048x2048 RGBA32 mip1 raw mirror_y",
+      "source_sha256": "a11b32753655d25dbf95baf808af90a3cc3f65fb1083db0bb1db8fad80cdcf47",
+      "source_structure": "1024x512 RGBA32 mip1 raw mirror_y",
       "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
       "localizable_segments": 0,
       "candidate_required": false,
       "controller_visual_qa": "PASS_READABLE_AND_RAW",
-      "evidence": "localization/graphics/role_A/20261006-A-PROBE98-4AFC1BED/A98_CONTROLLER_CLASSIFICATION.json",
-      "status": "A98_ZOOM_REVIEW_COMPLETE_PRESERVE_ORIGINAL",
+      "evidence": "localization/graphics/role_A/20261006-A-PROBE99-8B52FEEC/A99_CONTROLLER_CLASSIFICATION.json",
+      "status": "A99_ZOOM_REVIEW_COMPLETE_PRESERVE_ORIGINAL",
       "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION"
     },
-    "current_blocked_zoom_review": 40,
+    "current_blocked_zoom_review": 38,
     "b173_6ab5cee_alias": {
       "timestamp_kst": "2026-10-06T08:17:29+09:00",
       "run": "20261006-B-PRODUCTION173-JENN-ALIAS",
@@ -1895,6 +1895,21 @@
       "runtime_validation": "UNTESTED",
       "report": "localization/graphics/role_B/20261006-B-PRODUCTION173-JENN-ALIAS/B173_6AB5CEE_ALIAS_REPORT.json",
       "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION173-JENN-ALIAS/B173_CONTROLLER_SELF_QA.json"
+    },
+    "a99_zoom_review_8b52feec": {
+      "run": "A99",
+      "queue_index": 27,
+      "asset": "8B52FEEC",
+      "action": "zoom_review",
+      "source_sha256": "a11b32753655d25dbf95baf808af90a3cc3f65fb1083db0bb1db8fad80cdcf47",
+      "source_structure": "1024x512 RGBA32 mip1 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "localizable_segments": 0,
+      "candidate_required": false,
+      "controller_visual_qa": "PASS_READABLE_AND_RAW",
+      "evidence": "localization/graphics/role_A/20261006-A-PROBE99-8B52FEEC/A99_CONTROLLER_CLASSIFICATION.json",
+      "status": "A99_ZOOM_REVIEW_COMPLETE_PRESERVE_ORIGINAL",
+      "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION"
     }
   },
   "data_build": {
