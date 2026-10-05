@@ -1,0 +1,21 @@
+{
+  "run": "20261005-A-PRODUCTION62",
+  "index": 173,
+  "asset": "6DC89C6E",
+  "source_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+  "candidate_sha256": "b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26",
+  "localized_physical_elements": 21,
+  "bbox_size_positive_margin": "21/21 PASS",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "source_residue": 0,
+  "outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "render_outside_target": 0,
+  "overlap": 0,
+  "touch_pairs": 0,
+  "worker_status": "A62_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION62/A62_6DC89C6E_REPORT.json"
+}
