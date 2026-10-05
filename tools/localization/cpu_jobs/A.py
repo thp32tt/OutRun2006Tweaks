@@ -252,8 +252,11 @@ family_members={
  "message":["sorry_title","sorry_body","congrats_title","congrats_body"],
  "red_heading":["options","rankings"],
  "dark_sentence":["out_run_1p","view_rankings","enjoy_original","adjust_settings","exchange_line1","exchange_line2"],
- "mid_ui":["license_details","yes","no"],
- "small_ui":["reverse","your_position","ok","local_mixed","local_mt","local_at","friends","cancel"]
+ "license_ui":["license_details"],
+ "yesno_ui":["yes","no"],
+ "reverse_ui":["reverse"],
+ "position_ui":["your_position","ok"],
+ "local_ui":["local_mixed","local_mt","local_at","friends","cancel"]
 }
 bykey={r["key"]:r for r in rows}
 
@@ -274,7 +277,7 @@ def fits_row(r,fs):
 family_fs={}
 for fam,keys in family_members.items():
     chosen=None
-    for fs in range(36,5,-1):
+    for fs in range(36,2,-1):
         if all(fits_row(bykey[k],fs) for k in keys):
             chosen=fs; break
     if chosen is None: raise RuntimeError(("family fit",fam))
@@ -285,7 +288,7 @@ target_union=Image.new("L",(W,H),0)
 target_rows=[]
 outrows=[]
 for r in rows:
-    fam=("message" if r["kind"]=="message" else "red_heading" if r["kind"]=="red_heading" else "dark_sentence" if r["kind"].startswith("dark_sentence") else "mid_ui" if r["kind"]=="mid_ui" else "small_ui")
+    fam=("message" if r["kind"]=="message" else "red_heading" if r["kind"]=="red_heading" else "dark_sentence" if r["kind"].startswith("dark_sentence") else "license_ui" if r["key"]=="license_details" else "yesno_ui" if r["key"] in ("yes","no") else "reverse_ui" if r["key"]=="reverse" else "position_ui" if r["key"] in ("your_position","ok") else "local_ui")
     fs=family_fs[fam]; ob=r["original_bbox"]; ah=r["source_height"]; fill=r["source_median_rgba"]
     rowmask=Image.new("L",(W,H),0)
     placements=[]
