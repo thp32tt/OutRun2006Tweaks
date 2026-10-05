@@ -54,7 +54,7 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('q.setdefault("active_by_lane", {})', SOURCE)
         self.assertIn('conversion_parallel_schema_version', SOURCE)
         self.assertIn('stale pre-independent-conversion active_by_lane state', SOURCE)
-        self.assertIn('for lane_key in ("C", "A", "B")', SOURCE)
+        self.assertIn('for lane_key in ("A", "B", "C")', SOURCE)
 
     def test_priority_policy_defers_dxvk(self):
         self.assertIn('high_priority = ("C", "A")', SOURCE)
