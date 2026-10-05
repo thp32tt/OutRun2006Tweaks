@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T20:03:05+09:00",
+  "role": "C",
+  "run": "20261005-C194-C598919A",
+  "qa_id": "C194",
+  "queue_index": 86,
+  "asset": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+  "producer_run": "20261005-B-PRODUCTION139-C598-SOLVER-FIX",
+  "candidate_sha256": "e3c3f78975b3dd582690a7f169c1aa364dd05e3846827340aae38631885b92bf",
+  "candidate_changed_by_C": false,
+  "source_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "41/41 PASS",
+  "producer_bbox_exact_match_all": true,
+  "semantic_stage_mapping": "PASS_CANONICAL_PHONETIC",
+  "zero_pixel_gates": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "changed_dxt5_blocks_wholly_outside_allowed": 0
+  },
+  "changed_dxt5_blocks": 88592,
+  "protected_geometry_pass": true,
+  "controller_visual_qa": "PASS",
+  "controller_visual_evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION139-C598-SOLVER-FIX/B139_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_C/20261005-C194-C598919A/C194_SOURCE_FINAL_OVERVIEW.jpg",
+    "localization/graphics/role_C/20261005-C194-C598919A/C194_RAW_COMPARE.jpg"
+  ],
+  "visual_notes": [
+    "No visible source-script residue or clean-plate artifact in targeted labels.",
+    "No clipping or overlap; localized text remains inside each exact source bbox with positive margins.",
+    "OutRun2/OutRun2SP product tokens and unrelated vehicle/ranking artwork remain preserved.",
+    "Stage-name physical mapping matches canonical phonetic policy after B139 correction."
+  ],
+  "diagnostic_retry": {
+    "issue": "Initial C compressed-block audit compared readable Y bboxes directly against raw mirror_y DDS block rows.",
+    "verifier_fix_commit": "fc9b2e5349d75b7b2c1a4acdeec947ef93f6cf26",
+    "corrected_worker_commit": "98ea879668d4",
+    "candidate_bytes_changed": false
+  },
+  "machine_report": "localization/graphics/role_C/20261005-C194-C598919A/C194_C598919A_MACHINE_QA.json",
+  "decision": "C194_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED"
+}
