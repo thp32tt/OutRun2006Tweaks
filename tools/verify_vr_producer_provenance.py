@@ -157,4 +157,24 @@ if re.search(r"c64Producer\s*==\s*OutRunVR::GameSemantic::ProducerToken::", clas
 if "existing RenderScope + projection/world gates remain authoritative" not in classify:
     fail("diagnostic-only ownership invariant comment is missing")
 
+# Producer/c64 correlation is telemetry-only. The latest DX9Ex maintenance
+# deliberately keeps the provenance getter and node-relation bookkeeping off
+# the normal HUD draw path when telemetry is disabled.
+if "if (semanticHud || Settings::VRTelemetry)" in classify:
+    fail("producer provenance lookup leaked back onto the telemetry-off HUD hot path")
+getter_call = classify.find("GetLastGameWvpSemanticProvenance(")
+if getter_call < 0:
+    fail("draw classifier lost c64 provenance getter")
+telemetry_guard = classify.rfind("if (Settings::VRTelemetry)", 0, getter_call)
+if telemetry_guard < 0:
+    fail("c64 provenance getter is not guarded by VRTelemetry")
+semantic_hud = classify.find("if (semanticHud)")
+same_node_counter = classify.find("++R51VsSemanticHudC64SameNode", semantic_hud)
+if min(semantic_hud, same_node_counter) < 0:
+    fail("semantic HUD c64 relation diagnostics are missing")
+hud_telemetry_guard = classify.find(
+    "if (Settings::VRTelemetry)", semantic_hud, same_node_counter)
+if hud_telemetry_guard < 0:
+    fail("semantic HUD c64 relation counters are not telemetry-gated")
+
 print("VR producer provenance contract PASS")
