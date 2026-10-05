@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00418",
+  "production_id": "CONVERSION-DX9EX-00418",
+  "event_id": "CONVERSION-DX9EX-00418-E002",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "25fa508521a0e9bf1519bc23bdf70df093632198",
+  "red_contract_sha": "1e8cd582a174cf4b047c128cabcac2471b26038b",
+  "material_result_sha": "facc23dae90e9ef7dd219d0c4e29e3b31c7a780e",
+  "validation_bearing_result_sha": "facc23dae90e9ef7dd219d0c4e29e3b31c7a780e",
+  "result_sha": "facc23dae90e9ef7dd219d0c4e29e3b31c7a780e",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00418]",
+  "selected_work_item": "L3-DX9EX-001",
+  "summary": "Closed the remaining R32 host-identity invalidation race by retiring the shared interop probe token then handle before releasing probe COM resources; preserved DirectGPU slot teardown, identity reset, and fallback behavior.",
+  "changed_paths": [
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00418.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered completed 00417 and current focus HEAD. Refactor cycle 1100 owner-census chain is terminal; general DX9Ex stability work is executable."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Found R32InvalidateDirectInteropOnly still released DirectInteropProbe COM objects before clearing SharedState clientInteropProbeHandle/token, unlike the reset path fixed in 00417."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "TDD RED 1e8cd582 added an ordering contract and failed exactly at R32 interop publication retirement. GREEN facc23da changes only R32InvalidateDirectInteropOnly to retire token -> handle before probe COM release."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA facc23dae90e9ef7dd219d0c4e29e3b31c7a780e: DX9Ex Active Validation 37358763078 SUCCESS (policy 111927769613, host 111927968027, full-chain-compile 111927968064, game 111927968165, package 111930151931); Domain Isolation Guard 37358763120 SUCCESS."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "1e8cd582a174cf4b047c128cabcac2471b26038b test(vr): expose R32 interop invalidation race [AUTO:CONVERSION-DX9EX-00418]",
+        "facc23dae90e9ef7dd219d0c4e29e3b31c7a780e fix(vr): retire R32 interop publication before release [AUTO:CONVERSION-DX9EX-00418]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "OutRun2-VR-DX9EX-ACTIVE-facc23dae90e9ef7dd219d0c4e29e3b31c7a780e artifact 11365722860 digest sha256:89ef5eeddc7bd4b6c0edba12dca308a1d40fa2690dcc79ebc5123cbde1366376. CI evidence only, not HMD proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+  "evidence": {
+    "expected_red": {
+      "sha": "1e8cd582a174cf4b047c128cabcac2471b26038b",
+      "run_id": 37358646421,
+      "conclusion": "failure",
+      "failure": "DX9Ex reset/transport contract FAILED: R32 interop probe publication retirement order changed",
+      "classification": "EXPECTED_TDD_RED_NOT_REPAIR_FAILURE"
+    },
+    "dx9ex_active": {
+      "run_id": 37358763078,
+      "conclusion": "success",
+      "exact_sha": "facc23dae90e9ef7dd219d0c4e29e3b31c7a780e",
+      "jobs": {
+        "policy": 111927769613,
+        "host": 111927968027,
+        "full_chain_compile": 111927968064,
+        "game": 111927968165,
+        "package": 111930151931
+      },
+      "package_artifact_id": 11365722860,
+      "package_artifact_digest": "sha256:89ef5eeddc7bd4b6c0edba12dca308a1d40fa2690dcc79ebc5123cbde1366376"
+    },
+    "domain_isolation": {
+      "run_id": 37358763120,
+      "conclusion": "success",
+      "exact_sha": "facc23dae90e9ef7dd219d0c4e29e3b31c7a780e"
+    }
+  },
+  "next_action": "Treat both reset-time and R32 host-identity interop probe retirement ordering as statically guarded. Runtime remains UNTESTED; continue the next independent DX9Ex stability item.",
+  "completed_at_kst": "2026-10-06T03:55:16+09:00"
+}
