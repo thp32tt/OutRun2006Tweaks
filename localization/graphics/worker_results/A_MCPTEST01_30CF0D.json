@@ -1,0 +1,15 @@
+{
+  "run": "20261005-A-MCPTEST01",
+  "queue_index": 137,
+  "asset": "30CF0D",
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "dimensions": [
+    2048,
+    1024
+  ],
+  "pixel_raw_mode": "BGRA",
+  "candidate_written": false,
+  "status": "RDS_FREE_TOOLCHAIN_PREFLIGHT_PASS",
+  "report": "localization/graphics/role_A/20261005-A-MCPTEST01/A_MCPTEST01_30CF0D_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}

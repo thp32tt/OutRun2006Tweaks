@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-MCPTEST01",
+  "purpose": "RDS-free A toolchain capability test; no candidate/state mutation",
+  "queue_index": 137,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+    "git_blob_sha1": "a17e3caff8610356d70ddc52e89a7533aa99b98c",
+    "sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc"
+  },
+  "atlas_git_blob_sha1": "05aef390b13b39d3c9cd74d5c50f8291273fb0d9",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "pitch": 8192,
+    "depth": 0,
+    "mipmaps": 1,
+    "pixel_raw_mode": "BGRA",
+    "bytes": 8388736,
+    "raw_orientation": "mirror_y"
+  },
+  "target_region_preflight": [
+    {
+      "region_idx": 4,
+      "rect": [
+        0,
+        136,
+        808,
+        84
+      ],
+      "expected_semantic": "MANUAL -> 수동"
+    },
+    {
+      "region_idx": 5,
+      "rect": [
+        808,
+        136,
+        808,
+        84
+      ],
+      "expected_semantic": "AUTOMATIC -> 자동"
+    },
+    {
+      "region_idx": 6,
+      "rect": [
+        0,
+        56,
+        1276,
+        80
+      ],
+      "expected_semantic": "SELECT TRANSMISSION -> 변속 방식 선택"
+    }
+  ],
+  "evidence": "localization/graphics/role_A/20261005-A-MCPTEST01/A_MCPTEST01_30CF0D_SOURCE_REGIONS.jpg",
+  "candidate_written": false,
+  "shared_state_mutated": false,
+  "runtime_validation": "UNTESTED",
+  "status": "RDS_FREE_TOOLCHAIN_PREFLIGHT_PASS"
+}
