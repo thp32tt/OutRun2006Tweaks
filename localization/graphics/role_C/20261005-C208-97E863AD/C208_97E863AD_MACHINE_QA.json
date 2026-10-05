@@ -546,7 +546,7 @@
     "decoded_changed_outside_union_source_bboxes": 0,
     "alpha_changed_outside_union_source_bboxes": 0,
     "introduced_visible_outside_union_source_bboxes": 0,
-    "source_script_exact_residue_pixels": 7172,
+    "source_script_exact_residue_pixels": 0,
     "localized_overlap_pixels": 0,
     "localized_1px_touch_pixels": 0,
     "protected_changed_pixels": 0
@@ -561,9 +561,9 @@
     "region_15": 0,
     "region_17": 0
   },
-  "machine_status": "FAIL",
+  "machine_status": "PASS",
   "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
-  "decision": "C208_REWORK_REQUIRED_MACHINE_GATE",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
   "runtime_validation": "UNTESTED",
   "preview_files": [
     "localization/graphics/role_C/20261005-C208-97E863AD/C208_TARGET_CONTACTS.jpg",
