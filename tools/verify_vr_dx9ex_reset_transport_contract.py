@@ -713,6 +713,77 @@ require_order(
     "SourceSrv = SafeEyeSrv[0];",
 )
 
+# R24's released-image cache must not outlive the DirectGPU producer run that
+# populated it. Swapchain generation proves release ownership only inside that
+# swapchain creation; it does not distinguish a restarted game process/run.
+cache_quad = body(host_r24, "inline bool BuildCachedVisibleQuad(")
+require(
+    host_r24,
+    "R24 released-image direct run provenance",
+    "struct DirectCacheRunIdentity",
+    "ProjectionCommittedRun",
+    "TheaterCommittedDirectRun",
+    "DirectRunIdentityFor(",
+    "DirectCacheRunMatchesLatest(",
+)
+require(
+    cache_quad,
+    "R24 cached projection current direct run guard",
+    "DirectCacheRunMatchesLatest(ProjectionCommittedRun)",
+    "(!TheaterCommittedDirectRun.Valid() ||",
+    "DirectCacheRunMatchesLatest(TheaterCommittedDirectRun)",
+)
+require_order(
+    cache_quad,
+    "R24 cached projection ownership before theater fallback",
+    "DirectCacheRunMatchesLatest(ProjectionCommittedRun)",
+    "BuildViewQuad(Projection.handle",
+    "TheaterCommittedDirectRun.Valid()",
+    "BuildViewQuad(Theater.handle",
+)
+
+direct_projection = body(host_r24, "inline bool TryBuildDirectSafeProjection(")
+require_order(
+    direct_projection,
+    "R24 projection provenance after successful release",
+    "RenderSafeProjectionChecked(session, endInfo, projection, views)",
+    "ProjectionCommittedRun = DirectRunIdentityFor(snapshot.frame);",
+    "return ProjectionCommittedRun.Valid();",
+)
+require_order(
+    direct_flat,
+    "R24 direct-flat provenance after successful release",
+    "TheaterCommittedGeneration = OutRunVrSbsCaptureOverride::Theater.generation;",
+    "TheaterCommittedDirectRun = DirectRunIdentityFor(latest);",
+    "if (!TheaterCommittedDirectRun.Valid())",
+    "BuildViewQuad(Theater.handle",
+)
+
+emergency_quad = body(host_r24, "inline bool BuildEmergencyVisibleQuad(")
+require_order(
+    emergency_quad,
+    "R24 emergency theater clears direct provenance",
+    "TheaterCommittedGeneration = OutRunVrSbsCaptureOverride::Theater.generation;",
+    "TheaterCommittedDirectRun = {};",
+    "BuildViewQuad(Theater.handle",
+)
+
+visible_fallback = body(host_r24, "inline XrResult SubmitVisibleFallback(")
+require(
+    visible_fallback,
+    "R24 live theater clears direct provenance",
+    "if (live)",
+    "TheaterCommittedDirectRun = {};",
+)
+
+r24_destroy = body(host_r24, "inline XrResult XRAPI_CALL DestroySession(")
+require(
+    r24_destroy,
+    "R24 released-image provenance reset",
+    "ProjectionCommittedRun = {};",
+    "TheaterCommittedDirectRun = {};",
+)
+
 # Host ACK ownership may observe late completions from a pre-reset generation
 # or a prior game run. Cache reuse, pending EVENT reuse and fault suppression
 # must all be scoped to the complete Frame.v2 identity, not generation alone.

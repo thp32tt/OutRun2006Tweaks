@@ -69,6 +69,48 @@ namespace OutRunVrR24BlackScreenGuard
     inline std::uint64_t ProjectionCommittedGeneration = 0;
     inline std::uint64_t TheaterCommittedGeneration = 0;
 
+    struct DirectCacheRunIdentity
+    {
+        std::uint32_t transportGeneration = 0;
+        std::uint32_t runGeneration = 0;
+        std::uint32_t gamePid = 0;
+
+        bool Valid() const noexcept
+        {
+            return transportGeneration != 0 && runGeneration != 0 && gamePid != 0;
+        }
+    };
+
+    inline DirectCacheRunIdentity ProjectionCommittedRun{};
+    inline DirectCacheRunIdentity TheaterCommittedDirectRun{};
+
+    inline DirectCacheRunIdentity DirectRunIdentityFor(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        return {
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex],
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex],
+            frame.clientPid
+        };
+    }
+
+    inline bool DirectCacheRunMatchesLatest(
+        const DirectCacheRunIdentity& cached) noexcept
+    {
+        if (!cached.Valid() ||
+            !OutRunVrR21RuntimeHardening::DirectTransportRequested())
+            return false;
+
+        OutRunVR::SharedRenderFrameState latest{};
+        if (!OutRunVrReviewHardening::LatestCompleteDirectFrame(latest))
+            return false;
+        const DirectCacheRunIdentity current = DirectRunIdentityFor(latest);
+        return current.Valid() &&
+            cached.transportGeneration == current.transportGeneration &&
+            cached.runGeneration == current.runGeneration &&
+            cached.gamePid == current.gamePid;
+    }
+
     struct ProjectionSelection
     {
         const XrCompositionLayerBaseHeader* header = nullptr;
@@ -281,7 +323,10 @@ namespace OutRunVrR24BlackScreenGuard
 
         if (!OutRunVrR21RuntimeHardening::BindLegacyBlitConstantBufferToVs())
             return false;
-        return RenderSafeProjectionChecked(session, endInfo, projection, views);
+        if (!RenderSafeProjectionChecked(session, endInfo, projection, views))
+            return false;
+        ProjectionCommittedRun = DirectRunIdentityFor(snapshot.frame);
+        return ProjectionCommittedRun.Valid();
     }
 
     inline bool TrySubmitDirectSafeProjection(
@@ -356,6 +401,9 @@ namespace OutRunVrR24BlackScreenGuard
             return false;
 
         TheaterCommittedGeneration = OutRunVrSbsCaptureOverride::Theater.generation;
+        TheaterCommittedDirectRun = DirectRunIdentityFor(latest);
+        if (!TheaterCommittedDirectRun.Valid())
+            return false;
         BuildViewQuad(Theater.handle, Theater.width, Theater.height, 0, quad);
         const float aspect = SafeEyeHeight
             ? static_cast<float>(SafeEyeWidth) / static_cast<float>(SafeEyeHeight)
@@ -377,7 +425,8 @@ namespace OutRunVrR24BlackScreenGuard
         if (Projection.handle != XR_NULL_HANDLE && Projection.width &&
             Projection.height && Projection.generation != 0 &&
             Projection.committedGeneration == Projection.generation &&
-            ProjectionCommittedGeneration == Projection.generation)
+            ProjectionCommittedGeneration == Projection.generation &&
+            DirectCacheRunMatchesLatest(ProjectionCommittedRun))
         {
             BuildViewQuad(Projection.handle, Projection.width, Projection.height, 0, quad);
             return true;
@@ -385,7 +434,9 @@ namespace OutRunVrR24BlackScreenGuard
         if (Theater.handle != XR_NULL_HANDLE && Theater.width && Theater.height &&
             Theater.generation != 0 &&
             Theater.committedGeneration == Theater.generation &&
-            TheaterCommittedGeneration == Theater.generation)
+            TheaterCommittedGeneration == Theater.generation &&
+            (!TheaterCommittedDirectRun.Valid() ||
+                DirectCacheRunMatchesLatest(TheaterCommittedDirectRun)))
         {
             BuildViewQuad(Theater.handle, Theater.width, Theater.height, 0, quad);
             return true;
@@ -418,6 +469,7 @@ namespace OutRunVrR24BlackScreenGuard
             return false;
 
         TheaterCommittedGeneration = OutRunVrSbsCaptureOverride::Theater.generation;
+        TheaterCommittedDirectRun = {};
         BuildViewQuad(Theater.handle, Theater.width, Theater.height, 0, quad);
         return true;
     }
@@ -440,7 +492,10 @@ namespace OutRunVrR24BlackScreenGuard
         const bool live = !cached && !directFlat &&
             OutRunVrSbsCaptureOverride::RenderTheaterOverride(session, quad);
         if (live)
+        {
             TheaterCommittedGeneration = OutRunVrSbsCaptureOverride::Theater.generation;
+            TheaterCommittedDirectRun = {};
+        }
 
         const bool emergency = !cached && !directFlat && !live &&
             BuildEmergencyVisibleQuad(session, quad);
@@ -656,6 +711,8 @@ namespace OutRunVrR24BlackScreenGuard
         MixedValidatedSubmits = 0;
         ProjectionCommittedGeneration = 0;
         TheaterCommittedGeneration = 0;
+        ProjectionCommittedRun = {};
+        TheaterCommittedDirectRun = {};
         return OutRunVrR23RuntimeHardening::DestroySession(session);
     }
 }
