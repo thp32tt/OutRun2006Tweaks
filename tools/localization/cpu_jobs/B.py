@@ -137,24 +137,28 @@ for _ in range(3):
 pred=(flatB@coef).reshape(sub.shape)
 pred=np.clip(np.rint(pred),0,255).astype(np.uint8)
 
-# Exact text/effect mask: keep only source pixels that substantially deviate from the fitted
-# interior and belong to components connected to the white title core. This avoids deleting rays.
-resid=np.max(np.abs(sub[:,:,:3]-pred[:,:,:3].astype(np.float64)),axis=2)
-cand_local=(resid>20)&near_sub&(sub[:,:,3]>12)
-cl,nc=label(cand_local,structure=np.ones((3,3),dtype=np.uint8))
+# Exact text/effect mask: classify the source-family white fill + navy outline/AA directly,
+# then retain only connected components touching the already-proven white title core.
+# This avoids the C196 failure mode where a residual field connected through the warm plate.
 core_sub=core[sy0:sy1,sx0:sx1]
+sr=sub[:,:,0]; sg=sub[:,:,1]; sbc=sub[:,:,2]; sal=sub[:,:,3]
+mx=np.maximum.reduce([sr,sg,sbc]); mn=np.minimum.reduce([sr,sg,sbc])
+white_style=(sal>10)&(sr>145)&(sg>145)&(sbc>145)&((mx-mn)<95)
+navy_style=(sal>10)&(sr<125)&(sg<135)&(sbc<190)&(sbc>sr+10)&(sbc>sg+5)
+style=(white_style|navy_style)&near_sub
+cl,nc=label(style,structure=np.ones((3,3),dtype=np.uint8))
 keep_ids=set(np.unique(cl[core_sub]).tolist()); keep_ids.discard(0)
 text_local=np.isin(cl,list(keep_ids))|core_sub
-# One-pixel AA fringe, but only where source still differs measurably from fitted background.
-text_d=np.asarray(Image.fromarray((text_local.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0
-text_local |= text_d&(resid>9)&near_sub
+# Add only a one-pixel fringe around connected glyph effects. Do not use the old 15px bbox dilation.
+fr=np.asarray(Image.fromarray((text_local.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0
+text_local=fr&near_sub
 text_mask=np.zeros((H,W),bool); text_mask[sy0:sy1,sx0:sx1]=text_local
 ty,tx=np.nonzero(text_mask)
 if not len(tx): raise RuntimeError("empty precise title mask")
 text_bbox=[int(tx.min()),int(ty.min()),int(tx.max())+1,int(ty.max())+1]
 if not(ob[0]<=text_bbox[0] and ob[1]<=text_bbox[1] and text_bbox[2]<=ob[2] and text_bbox[3]<=ob[3]):
     raise RuntimeError(("precise mask escapes prior allowed bbox",text_bbox,ob))
-if np.count_nonzero(text_mask)>36000:
+if np.count_nonzero(text_mask)>30000:
     raise RuntimeError(("precise mask unexpectedly broad",int(np.count_nonzero(text_mask)),text_bbox))
 
 # Replace only exact detected title/effect pixels with the fitted interior field.
