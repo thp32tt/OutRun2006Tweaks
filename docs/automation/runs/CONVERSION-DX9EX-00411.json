@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00411",
+  "production_id": "CONVERSION-DX9EX-00411",
+  "event_id": "CONVERSION-DX9EX-00411-E002",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "97bc1a5fb8cc667fed2a7e8e7c7927e8951a54b5",
+  "source_material_sha": "5875486443a60c93764c40ef6d7204f1066e452c",
+  "result_sha": "5875486443a60c93764c40ef6d7204f1066e452c",
+  "material_result_sha": "5875486443a60c93764c40ef6d7204f1066e452c",
+  "validation_bearing_result_sha": "5875486443a60c93764c40ef6d7204f1066e452c",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00411]",
+  "selected_work_item": "VR-REFACTOR-POST1100-R32-LIVE-EFFECT-SNAPSHOT-NEUTRAL-OWNER-0016",
+  "summary": "Extracted the raw five-GetRenderState live effect snapshot into neutral draw_state_helpers while preserving R32 snapshot-failure telemetry/warning, PassPolicy classification, and fail-close shader-identity behavior.",
+  "changed_paths": [
+    "src/vr/d3d9/draw_state_helpers.hpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r31_r32_retirement_guard.py"
+  ],
+  "failure_context": {
+    "supplied": "DX9Ex Active Validation exact run 37346444631 concluded cancelled.",
+    "classification": "SUPERSEDED_INTERMEDIATE_RUN",
+    "cancelled_run_id": 37346444631,
+    "cancelled_head_sha": "ba2c516908d72ed27cc96f7ab490d1a3be9242f9",
+    "authoritative_result_sha": "5875486443a60c93764c40ef6d7204f1066e452c",
+    "actions_failure": false
+  },
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "E002 confirmed run 37346444631 belonged to intermediate SHA ba2c5169 and was superseded by later same-task push 58754864."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Raw ALPHABLEND/ALPHATEST/ZWRITE/ZENABLE/CULLMODE reads are ownership-neutral observations; R32 keeps failure telemetry, classification, and fail-close decisions."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "b8c25a92 added neutral snapshot type/reader; ba2c5169 routed R32 through it; 58754864 added deterministic ownership guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 5875486443a60c93764c40ef6d7204f1066e452c: DX9Ex Active 37346503785 SUCCESS; Domain Isolation 37346503724 SUCCESS. No Quest3/VDXR test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "b8c25a92dc9c56c654c0a2e9674a5085ffdcf5ec refactor(vr): extract neutral live effect-state snapshot [AUTO:CONVERSION-DX9EX-00411]",
+        "ba2c516908d72ed27cc96f7ab490d1a3be9242f9 refactor(vr): route R32 live effect snapshot through neutral helper [AUTO:CONVERSION-DX9EX-00411]",
+        "5875486443a60c93764c40ef6d7204f1066e452c test(vr): guard neutral live effect-state ownership [AUTO:CONVERSION-DX9EX-00411]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "OutRun2-VR-DX9EX-ACTIVE-5875486443a60c93764c40ef6d7204f1066e452c artifact 11360837795, digest sha256:7ba45020fb3d7953b5d5afce9779f0022617df9a9dd1caf66995e3a68dacc128."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37346503785,
+      "conclusion": "success",
+      "exact_sha": "5875486443a60c93764c40ef6d7204f1066e452c",
+      "jobs": {
+        "policy": 111886306113,
+        "game": 111886441624,
+        "host": 111886441628,
+        "full_chain_compile": 111886441975,
+        "package": 111888393558
+      },
+      "package_artifact_id": 11360837795,
+      "package_artifact_digest": "sha256:7ba45020fb3d7953b5d5afce9779f0022617df9a9dd1caf66995e3a68dacc128"
+    },
+    "domain_isolation": {
+      "run_id": 37346503724,
+      "conclusion": "success",
+      "exact_sha": "5875486443a60c93764c40ef6d7204f1066e452c"
+    },
+    "superseded_cancelled_runs": [
+      37346444631
+    ],
+    "issue14_comment_id": 5999348901
+  },
+  "next_action": "Continue post-1100 R33 dependency census; extract only one remaining stateless helper with no StateBlock/Reset/Present/DirectGPU/fail-close/cache-lifetime ownership.",
+  "completed_at_kst": "2026-10-06T02:17:04+09:00"
+}
