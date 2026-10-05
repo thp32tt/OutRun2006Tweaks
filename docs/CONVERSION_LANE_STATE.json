@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "6a2eec351435edf748711cde7e52fba0b6e2684b",
+  "state_parent_head": "a8bbddf77da4b5e58c30c28da36d0968ff3d5f34",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -60,21 +60,21 @@
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
     "production_id": "CONVERSION-DXVK-00408",
-    "event_id": "CONVERSION-DXVK-00408-E004",
+    "event_id": "CONVERSION-DXVK-00408-E008",
     "event_type": "rollover",
     "dxvk_disassembly_evidence_run_id": 37283908451,
     "dxvk_disassembly_evidence_job_id": 111678158420,
     "backend_conversion_gate_run_id": 37283908436,
     "backend_conversion_gate_job_id": 111678158476,
     "runtime_test_performed": false,
-    "issue14_comment_id": 5990987086,
+    "issue14_comment_id": 5991041220,
     "controller_dispatch": {
       "task_id": "CONVERSION-DXVK-00408",
       "production_id": "CONVERSION-DXVK-00408",
-      "event_id": "CONVERSION-DXVK-00408-E004",
+      "event_id": "CONVERSION-DXVK-00408-E008",
       "event_type": "rollover",
       "attempt": "1/3",
-      "chat_rollover": 3,
+      "chat_rollover": 5,
       "rollover_is_retry": false,
       "resume_reason": "Retry persisted after one recovery attempt",
       "source": "CURRENT_USER_ROLLOVER",
@@ -82,7 +82,7 @@
       "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
       "runtime_validation": "UNTESTED"
     },
-    "chat_rollover": 3,
+    "chat_rollover": 5,
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt"
   },
@@ -5580,10 +5580,10 @@
   "controller_dispatch": {
     "task_id": "CONVERSION-DXVK-00408",
     "production_id": "CONVERSION-DXVK-00408",
-    "event_id": "CONVERSION-DXVK-00408-E004",
+    "event_id": "CONVERSION-DXVK-00408-E008",
     "event_type": "rollover",
     "attempt": "1/3",
-    "chat_rollover": 3,
+    "chat_rollover": 5,
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt",
     "source": "CURRENT_USER_ROLLOVER",
@@ -5595,20 +5595,6 @@
     "corrected_from": {
       "task_id": "CONVERSION-DXVK-00408",
       "production_id": "CONVERSION-DXVK-00408",
-      "event_id": "CONVERSION-DXVK-00408-E006",
-      "event_type": "rollover",
-      "attempt": "1/3",
-      "chat_rollover": 4,
-      "rollover_is_retry": false,
-      "resume_reason": "Retry persisted after one recovery attempt",
-      "source": "CURRENT_USER_ROLLOVER",
-      "material_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
-      "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
-      "runtime_validation": "UNTESTED"
-    },
-    "corrected_to": {
-      "task_id": "CONVERSION-DXVK-00408",
-      "production_id": "CONVERSION-DXVK-00408",
       "event_id": "CONVERSION-DXVK-00408-E004",
       "event_type": "rollover",
       "attempt": "1/3",
@@ -5620,29 +5606,29 @@
       "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
       "runtime_validation": "UNTESTED"
     },
+    "corrected_to": {
+      "task_id": "CONVERSION-DXVK-00408",
+      "production_id": "CONVERSION-DXVK-00408",
+      "event_id": "CONVERSION-DXVK-00408-E008",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 5,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_ROLLOVER",
+      "material_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+      "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+      "runtime_validation": "UNTESTED"
+    },
     "authority": "LATEST_EXPLICIT_USER_DISPATCH",
-    "reason": "CONVERSION-DXVK-00408-E004 is the current explicit user rollover. CHAT_ROLLOVER=3; rollover_is_retry=false; ATTEMPT remains 1/3. Completed F141 material/result and exact-SHA validation evidence are unchanged.",
+    "reason": "CONVERSION-DXVK-00408-E008 is the latest explicit user rollover. CHAT_ROLLOVER=5; rollover_is_retry=false; ATTEMPT remains 1/3. Completed F141 material/result SHA, exact-SHA validation evidence, and F142 successor are unchanged.",
     "material_and_validation_bearing_sha_unchanged": true,
-    "reconciled_at_kst": "2026-10-05T17:35:23+09:00"
+    "reconciled_at_kst": "2026-10-05T17:43:00+09:00"
   },
   "current_dispatch_metadata_correction": {
     "corrected_from": {
       "task_id": "CONVERSION-DXVK-00408",
       "production_id": "CONVERSION-DXVK-00408",
-      "event_id": "CONVERSION-DXVK-00408-E006",
-      "event_type": "rollover",
-      "attempt": "1/3",
-      "chat_rollover": 4,
-      "rollover_is_retry": false,
-      "resume_reason": "Retry persisted after one recovery attempt",
-      "source": "CURRENT_USER_ROLLOVER",
-      "material_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
-      "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
-      "runtime_validation": "UNTESTED"
-    },
-    "corrected_to": {
-      "task_id": "CONVERSION-DXVK-00408",
-      "production_id": "CONVERSION-DXVK-00408",
       "event_id": "CONVERSION-DXVK-00408-E004",
       "event_type": "rollover",
       "attempt": "1/3",
@@ -5654,29 +5640,29 @@
       "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
       "runtime_validation": "UNTESTED"
     },
+    "corrected_to": {
+      "task_id": "CONVERSION-DXVK-00408",
+      "production_id": "CONVERSION-DXVK-00408",
+      "event_id": "CONVERSION-DXVK-00408-E008",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 5,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_ROLLOVER",
+      "material_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+      "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+      "runtime_validation": "UNTESTED"
+    },
     "authority": "LATEST_EXPLICIT_USER_DISPATCH",
-    "reason": "CONVERSION-DXVK-00408-E004 is the current explicit user rollover. CHAT_ROLLOVER=3; rollover_is_retry=false; ATTEMPT remains 1/3. Completed F141 material/result and exact-SHA validation evidence are unchanged.",
+    "reason": "CONVERSION-DXVK-00408-E008 is the latest explicit user rollover. CHAT_ROLLOVER=5; rollover_is_retry=false; ATTEMPT remains 1/3. Completed F141 material/result SHA, exact-SHA validation evidence, and F142 successor are unchanged.",
     "material_and_validation_bearing_sha_unchanged": true,
-    "reconciled_at_kst": "2026-10-05T17:35:23+09:00"
+    "reconciled_at_kst": "2026-10-05T17:43:00+09:00"
   },
   "latest_dispatch_metadata_correction": {
     "corrected_from": {
       "task_id": "CONVERSION-DXVK-00408",
       "production_id": "CONVERSION-DXVK-00408",
-      "event_id": "CONVERSION-DXVK-00408-E006",
-      "event_type": "rollover",
-      "attempt": "1/3",
-      "chat_rollover": 4,
-      "rollover_is_retry": false,
-      "resume_reason": "Retry persisted after one recovery attempt",
-      "source": "CURRENT_USER_ROLLOVER",
-      "material_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
-      "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
-      "runtime_validation": "UNTESTED"
-    },
-    "corrected_to": {
-      "task_id": "CONVERSION-DXVK-00408",
-      "production_id": "CONVERSION-DXVK-00408",
       "event_id": "CONVERSION-DXVK-00408-E004",
       "event_type": "rollover",
       "attempt": "1/3",
@@ -5688,22 +5674,36 @@
       "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
       "runtime_validation": "UNTESTED"
     },
+    "corrected_to": {
+      "task_id": "CONVERSION-DXVK-00408",
+      "production_id": "CONVERSION-DXVK-00408",
+      "event_id": "CONVERSION-DXVK-00408-E008",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 5,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_ROLLOVER",
+      "material_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+      "validation_bearing_result_sha": "bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb",
+      "runtime_validation": "UNTESTED"
+    },
     "authority": "LATEST_EXPLICIT_USER_DISPATCH",
-    "reason": "CONVERSION-DXVK-00408-E004 is the current explicit user rollover. CHAT_ROLLOVER=3; rollover_is_retry=false; ATTEMPT remains 1/3. Completed F141 material/result and exact-SHA validation evidence are unchanged.",
+    "reason": "CONVERSION-DXVK-00408-E008 is the latest explicit user rollover. CHAT_ROLLOVER=5; rollover_is_retry=false; ATTEMPT remains 1/3. Completed F141 material/result SHA, exact-SHA validation evidence, and F142 successor are unchanged.",
     "material_and_validation_bearing_sha_unchanged": true,
-    "reconciled_at_kst": "2026-10-05T17:35:23+09:00"
+    "reconciled_at_kst": "2026-10-05T17:43:00+09:00"
   },
   "current_task_dispatch_authority": {
     "authority": "LATEST_EXPLICIT_USER_DISPATCH",
     "task_id": "CONVERSION-DXVK-00408",
     "production_id": "CONVERSION-DXVK-00408",
-    "event_id": "CONVERSION-DXVK-00408-E004",
+    "event_id": "CONVERSION-DXVK-00408-E008",
     "event_type": "rollover",
-    "chat_rollover": 3,
+    "chat_rollover": 5,
     "rollover_is_retry": false,
     "attempt": "1/3",
     "resume_reason": "Retry persisted after one recovery attempt",
     "source": "CURRENT_USER_ROLLOVER",
-    "note": "Current rollover authority only; completed F141 material/result SHA bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb and exact-SHA validation remain unchanged. Runtime validation remains UNTESTED."
+    "note": "Current E008 rollover authority only; completed F141 material/result SHA bd28eb296b589c3fb6c00ad81e242a8b34d1a0fb and exact-SHA validation remain unchanged. Runtime validation remains UNTESTED."
   }
 }
