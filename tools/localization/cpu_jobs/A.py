@@ -120,7 +120,8 @@ for key,txt,cell,ix,iy,fs0 in records:
     base=src48_4.crop(cell).copy(); a=np.array(base)
     h,w=a.shape[:2]
     roi=np.zeros((h,w),bool); roi[iy:h-iy,ix:w-ix]=True
-    # Isolate the canonical cream/white glyph face, not red/orange badge highlights.\n    bright=(a[:,:,0]>200)&(a[:,:,1]>185)&(a[:,:,2]>130)&(a[:,:,3]>0)&roi
+    # Isolate the canonical cream/white glyph face, not red/orange badge highlights.
+    bright=(a[:,:,0]>200)&(a[:,:,1]>185)&(a[:,:,2]>130)&(a[:,:,3]>0)&roi
     source48_face_union.paste(Image.fromarray((bright*255).astype(np.uint8),"L"),(x0,y0))
     # Source lettering includes cream face + glow; expand the measured bright face.
     mask=ndimage.binary_dilation(bright,iterations=5)&roi
