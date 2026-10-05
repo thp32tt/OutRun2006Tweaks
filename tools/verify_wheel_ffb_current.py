@@ -759,7 +759,7 @@ print('OK [R9 model polarity + original-mode isolation + course collision guards
 
 # r7 review100 fixes
 forbid(build, 'normalize_legacy_preset(true);', 'legacy numeric signature migration cannot run every physics tick')
-req(build, 'Range<int>{ 0, 7 }', 'feel revision records the R9 hardware migration boundary')
+req(build, 'Range<int>{ 0, 8 }', 'feel revision records the R11 hardware migration boundary')
 req(build, 'Settings::WheelFFBInvertForce = modern;', 'R9 migration derives ConstantForce polarity from active model')
 req(profiles, 'Version = 2', 'named FFB profiles use deterministic-baseline schema version')
 req(profiles, 'canonical_ffb_profile_default(', 'partial FFB profiles start from deterministic canonical baseline')
@@ -820,6 +820,11 @@ req(ffb, 'driftCountersteerTorque', 'Modern runtime applies body-slip/caster cou
 req(ffb, '(bodySlip > 0.0f ? -1.0f : 1.0f)', 'drift recovery direction follows body slip rather than reversed front-slip sign')
 req(wheel_ui, 'manual override is allowed until the next model change', 'F11 keeps R3 polarity manually editable after automatic model defaults')
 print('OK [R10 R3 polarity + drift countersteer + snow comfort guards]')
+req(build, 'if (revision < 8)', 'R11 migration exists for already-stamped R10 users')
+req(build, 'nearly(static_cast<float>(Settings::WheelFFBWallImpact), 0.55f)', 'R11 lifts the stock R10 Modern wall baseline without overwriting custom values')
+req(build, 'apply_universal_physics_preset();\n                    Settings::WheelFFBModel = 0;', 'R11 converts persisted Hybrid state to complete Modern DD')
+req(profiles, 'values.clear();\n            values.emplace("model", "0");', 'legacy Hybrid profiles load as a clean Modern baseline')
+print('OK [R11 migration + retired Hybrid profile guards]')
 
 req(ffb, 'telemetryNow - lastTelemetryTick_ >= 200', 'high-volume telemetry is reduced to 5Hz')
 req(ffb, 'telemetryNow - lastTelemetryDetailTick_ >= 1000', 'deep telemetry detail is limited to 1Hz')

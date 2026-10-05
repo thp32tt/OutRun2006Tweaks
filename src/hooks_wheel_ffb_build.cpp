@@ -59,7 +59,7 @@ namespace Settings
     Setting<int> WheelFFBFeelRevision{
         "WheelFFB", "FeelRevision", 0,
         "Internal one-shot migration version for wheel FFB feel defaults.",
-        Range<int>{ 0, 7 }
+        Range<int>{ 0, 8 }
     };
 }
 
@@ -953,6 +953,32 @@ namespace
                     Settings::WheelFFBWallImpact = 0.80f;
                 Settings::WheelFFBFeelRevision = 7;
                 revision = 7;
+                changed = true;
+            }
+
+            if (revision < 8)
+            {
+                // R11 hardware follow-up for already-stamped R10 users.
+                // Retired Hybrid state becomes the complete Modern DD baseline,
+                // while a stock Modern WallImpact=0.55 is lifted to the new
+                // stronger 0.80 baseline. Deliberate custom values are preserved.
+                const int rawModel = static_cast<int>(Settings::WheelFFBModel);
+                if (rawModel == 2)
+                {
+                    apply_universal_physics_preset();
+                    Settings::WheelFFBModel = 0;
+                }
+
+                const auto model = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                if (model == WheelFFBMath::Model::ModernDD &&
+                    nearly(static_cast<float>(Settings::WheelFFBWallImpact), 0.55f))
+                {
+                    Settings::WheelFFBWallImpact = 0.80f;
+                }
+
+                Settings::WheelFFBFeelRevision = 8;
+                revision = 8;
                 changed = true;
             }
 
