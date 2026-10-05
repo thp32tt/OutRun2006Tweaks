@@ -1510,3 +1510,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - C202 independently verifies the repaired starburst patch is **pixel-exact** to the already C193-approved B137 same-family clean starburst template after the documented +1088 x shift: template diff=0 pixels and max channel delta=0. This resolves the earlier C200 haze/smear without another free-form inpaint. Speech-bubble CLEAN remains seamless; SOURCE/CLEAN/FINAL + raw visual QA PASS. Decision `C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`, superseding C196/C198/C199/C200 8215 failures.
 - Current queue: 137 rows = 82 localize_text + 44 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit. pending_artwork localize_text=12; pending-C=0; producer REWORK=1 (`37759842`). `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_C/20261005-C201-C202-BATCH/C201_C202_BATCH_FINAL_QA.json` plus C201/C202 machine/controller reports.
+
+## 2026-10-05 21:53 KST — B152 DCC7B488 producer PASS
+- Even index32 `DCC7B488` promoted from zoom_review after B149 canonical visual classification: `Total Rank -> 종합 랭킹`.
+- B150/B151 intermediate candidates were fail-closed by B controller visual QA (source ghost, then rectangular luminance shift) and are not completion. B152 `958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14`: 1/1 bbox/size/positive-margin + CLEAN/FINAL + outside/alpha/render zero gates PASS; Coons-boundary clean plate and SOURCE/CLEAN/FINAL/raw mirror_y visual PASS.
+- Queue -> `b152_self_qa_pass_pending_c`; pending-C=`DCC7B488`; pending_artwork localize_text=12; producer REWORK=1 (`37759842`). `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+
