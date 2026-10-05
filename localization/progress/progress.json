@@ -329,23 +329,24 @@
       "in_game_validation": "B7E25BAD UNTESTED; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
-      "run": "B_PRODUCTION137",
-      "worker_output_commit": "79bb468e1e911dc4da3b4b2bfa745e5bccfb1871",
-      "result": "63C91067_C184_REWORK_RESOLVED_SELF_QA_PASS_PENDING_C_INGAME",
+      "run": "B_PRODUCTION154",
+      "worker_output_commit": "bebcf3b09e3d0c592177023bfe7adfb1382b4dd9",
+      "result": "B7E25BAD_ZOOM_REVIEW_PROMOTED_SELF_QA_PASS_C209_FINAL_STATIC_PASS_PENDING_INGAME",
       "assets": {
-        "63C91067": {
-          "queue_index": 26,
-          "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
-          "candidate_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
-          "status": "B137_SELF_QA_PASS_PENDING_C_AND_INGAME",
-          "report": "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_63C_REPORT.json",
-          "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_CONTROLLER_SELF_QA.json",
-          "physical_elements": 2,
-          "bbox_size_positive_margin": "2/2",
+        "B7E25BAD": {
+          "queue_index": 34,
+          "source_sha256": "3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
+          "candidate_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
+          "status": "C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+          "report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_HOLL_REPORT.json",
+          "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_CONTROLLER_SELF_QA.json",
+          "c_final_report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_CONTROLLER_FINAL_QA.json",
+          "physical_elements": 1,
+          "bbox_size_positive_margin": "1/1",
           "outside_pixels": 0,
           "alpha_outside_pixels": 0,
-          "source_effect_residue": 0,
-          "c184_return_resolved": true
+          "source_title_residue": 0,
+          "zoom_review_promoted": true
         }
       },
       "runtime_validation": "UNTESTED"
@@ -1120,7 +1121,8 @@
       "runtime_validation": "UNTESTED"
     },
     "current_producer_rework_assets": [
-      "37759842"
+      "37759842",
+      "97E863AD"
     ],
     "a_production26_2ea557b4": {
       "index": 55,
@@ -1588,6 +1590,26 @@
       "machine_report": "localization/graphics/role_C/20261005-C207-6DC89C6E/C207_6DC89C6E_MACHINE_QA.json",
       "report": "localization/graphics/role_C/20261005-C207-6DC89C6E/C207_6DC89C6E_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
+    },
+    "b154_b7e25bad": {
+      "timestamp_kst": "2026-10-05T22:57:50+09:00",
+      "queue_index": 34,
+      "source_sha256": "3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
+      "candidate_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
+      "classification": "zoom_review -> localize_text; Total Rank -> 종합 랭킹",
+      "producer_status": "B154_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "c_final_qa": "C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "bbox_size_positive_margin": "1/1 PASS",
+      "pixel_gates": {
+        "outside": 0,
+        "alpha_outside": 0,
+        "source_title_residue": 0,
+        "overlap": 0
+      },
+      "report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_HOLL_REPORT.json",
+      "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_CONTROLLER_SELF_QA.json",
+      "c209_report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
@@ -1711,23 +1733,24 @@
     ]
   },
   "latest_b_first_qa": {
-    "run": "B_PRODUCTION152",
-    "worker_output_commit": "612d7034f2e88356465acc0e52d44032c344a77f",
-    "result": "DCC7B488_ZOOM_REVIEW_PROMOTED_SELF_QA_PASS_PENDING_C_INGAME",
+    "run": "B_PRODUCTION154",
+    "worker_output_commit": "bebcf3b09e3d0c592177023bfe7adfb1382b4dd9",
+    "result": "B7E25BAD_ZOOM_REVIEW_PROMOTED_SELF_QA_PASS_C209_FINAL_STATIC_PASS_PENDING_INGAME",
     "assets": {
-      "DCC7B488": {
-        "queue_index": 32,
-        "source_sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
-        "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
-        "status": "B152_SELF_QA_PASS_PENDING_C_AND_INGAME",
-        "report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_DCC7_REPORT.json",
-        "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_CONTROLLER_SELF_QA.json",
+      "B7E25BAD": {
+        "queue_index": 34,
+        "source_sha256": "3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
+        "candidate_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
+        "status": "C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+        "report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_HOLL_REPORT.json",
+        "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_CONTROLLER_SELF_QA.json",
+        "c_final_report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_CONTROLLER_FINAL_QA.json",
         "physical_elements": 1,
         "bbox_size_positive_margin": "1/1",
         "outside_pixels": 0,
         "alpha_outside_pixels": 0,
-        "render_outside_pixels": 0,
-        "b150_b151_rejected_visual": true
+        "source_title_residue": 0,
+        "zoom_review_promoted": true
       }
     },
     "runtime_validation": "UNTESTED"
