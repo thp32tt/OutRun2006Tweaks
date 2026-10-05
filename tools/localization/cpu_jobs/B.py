@@ -326,7 +326,8 @@ alphaout=count(ImageChops.multiply(bmask(ImageChops.difference(src.getchannel("A
 prot=count(ImageChops.multiply(diff,protected))
 target=Image.new("L",(W,H),0)
 for _,m in targets: target=ImageChops.lighter(target,m)
-clean_change=dmask(src,clean)\nresidue=count(ImageChops.multiply(ImageChops.multiply(clean_change,ImageOps.invert(target)),ImageOps.invert(diff)))
+clean_change=dmask(src,clean)
+residue=count(ImageChops.multiply(ImageChops.multiply(clean_change,ImageOps.invert(target)),ImageOps.invert(diff)))
 if finalrep["status"]!="PASS" or outside or alphaout or prot or residue or ov or touch:
     raise RuntimeError(("gates",finalrep["status"],outside,alphaout,prot,residue,ov,touch))
 target.save(out/"E95_TARGET_TEXT_MASK.png")
