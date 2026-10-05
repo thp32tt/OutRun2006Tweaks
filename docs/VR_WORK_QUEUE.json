@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-10-05T19:53:24+09:00",
+  "updatedKst": "2026-10-06T02:44:24+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -11,7 +11,7 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "EXCLUSIVE: DX9Ex structural refactor on vr-d3d9ex-focus. DX11 Native, DXVK, HUD/performance side tracks and HMD matrix work are frozen until the user explicitly reopens them.",
+    "primaryBackend": "EXCLUSIVE: DX9Ex quality/stability on vr-d3d9ex-focus. Post-1100 structural neutral-helper extraction is complete; continue the highest executable DX9Ex quality/performance/HUD/OpenXR/lifecycle item. DX11 Native and DXVK remain frozen until explicitly reopened.",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -23,8 +23,8 @@
     "parallelBackendDevelopment": false,
     "backendReplacementGate": "DX11 Native and DXVK are downstream ports deferred until the stable DX9Ex reference is accepted. DX12/D3D9On12 remains reference-only unless explicitly reopened.",
     "parallelTracks": {
-      "HUD": "FROZEN_BY_USER: do not schedule HUD work while DX9Ex structural refactor is exclusive.",
-      "PERFORMANCE": "FROZEN_BY_USER: do not schedule performance side work while DX9Ex structural refactor is exclusive.",
+      "HUD": "DX9EX_ONLY: general HUD/visual work may resume after structural completion when it is the highest executable item; do not touch downstream branches.",
+      "PERFORMANCE": "DX9EX_ONLY: general performance/telemetry work may resume after structural completion when evidence supports a bounded source/static unit; do not change synchronization semantics without evidence.",
       "DXVK": "FROZEN_BY_USER: keep evidence/history only; no implementation or validation scheduling.",
       "DX12": "FROZEN_REFERENCE_ONLY: unchanged; no implementation/build/HMD work."
     },
@@ -55,7 +55,7 @@
       "disabledReason": "Frozen by user while DX9Ex structural refactor is the exclusive active track."
     },
     "automationCycle": {
-      "mode": "DX9EX_STRUCTURAL_SINGLE_LANE",
+      "mode": "DX9EX_QUALITY_SINGLE_LANE",
       "schedules": [
         ":00",
         ":30"
@@ -65,7 +65,7 @@
         "6ab45ed52f548191b94c90af792116fb"
       ],
       "productionIntegrationWip": 1,
-      "rule": "Each cycle may only continue the next bounded DX9Ex structural-refactor unit. Do not schedule DX11, DXVK, HUD/performance side work, or HMD matrix work until explicitly reopened."
+      "rule": "At each cycle, first honor any reopened structural regression. Otherwise select the highest executable bounded DX9Ex quality/performance/HUD/OpenXR/lifecycle item. Do not schedule DX11, DXVK or HMD-matrix work unless explicitly reopened."
     },
     "implementationFirstEnforcement": {
       "enabled": true,
@@ -83,19 +83,17 @@
     },
     "exclusiveFocus": {
       "enabled": true,
-      "mode": "DX9EX_STRUCTURAL_REFACTOR_SINGLE_LANE",
+      "mode": "DX9EX_QUALITY_STABILITY_SINGLE_LANE",
       "lane": "DX9EX",
       "branch": "vr-d3d9ex-focus",
-      "track": "VR_REFACTOR_POST1100",
+      "track": "DX9EX_GENERAL_QUALITY",
       "frozenTracks": [
         "DX11",
         "DXVK",
-        "HUD",
-        "PERFORMANCE",
         "HMD_MATRIX"
       ],
       "reopenRule": "Only explicit user instruction may reopen a frozen track.",
-      "reason": "User requested serial DX9Ex structural optimization because concurrent lanes were reducing throughput."
+      "reason": "Post-1100 R31/R32 neutral-helper extraction completed at 8b72853bb775ef77fbe1474da824e5cb513d3c78; serial DX9Ex work now returns to general quality/stability priorities."
     }
   },
   "candidateWip": {
