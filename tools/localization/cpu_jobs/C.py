@@ -136,7 +136,11 @@ bw=W//4
 allowed_blocks=np.zeros((H//4,W//4),dtype=bool)
 for e in pr["elements"]:
     x0,y0,x1,y1=map(int,e["original_bbox"])
-    allowed_blocks[y0//4:(y1+3)//4,x0//4:(x1+3)//4]=True
+    # DDS payload is raw mirror_y while producer bboxes are readable orientation.
+    # Convert readable Y bounds to raw block-row bounds before compressed-block audit.
+    ry0=H-y1
+    ry1=H-y0
+    allowed_blocks[ry0//4:(ry1+3)//4,x0//4:(x1+3)//4]=True
 machine["changed_dxt5_blocks"]=int(np.count_nonzero(block_changed))
 machine["changed_dxt5_blocks_wholly_outside_allowed"]=int(np.count_nonzero(block_changed & ~allowed_blocks.reshape(-1)))
 
