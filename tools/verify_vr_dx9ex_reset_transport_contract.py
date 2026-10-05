@@ -96,7 +96,16 @@ require(
     "DirectInteropProbeHandle=nullptr",
     "DirectInteropProbeToken=0",
     "DirectInteropVerified=false",
+    "clientInteropProbeToken),0)",
+    "clientInteropProbeHandle),0)",
     "DirectTransportFormat=D3DFMT_UNKNOWN",
+)
+require_order(
+    release,
+    "D3D9 interop probe publication retirement",
+    "clientInteropProbeToken),0)",
+    "clientInteropProbeHandle),0)",
+    "ReleaseCom(DirectInteropProbeTexture)",
 )
 forbid(
     release,
