@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION86-IGR018-CARSELECT",
+  "queue_index": 121,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "user_regression": {
+    "id": "IGR-018",
+    "screenshot": "스크린샷(141).png",
+    "screen": "CAR_SELECT_BLUE",
+    "defect_tags": [
+      "SOURCE_RESIDUE",
+      "LOW_RES_FONT",
+      "HEADER_GHOST",
+      "STYLE_INCONSISTENCY"
+    ]
+  },
+  "mapping": {
+    "status": "EXACT_HIGH_CONFIDENCE_GRAPHICS",
+    "basis": "FD90AA9 contains the unique Select your car selector-header sprite; rework is scoped to that exact source effect bbox only."
+  },
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "input_candidate_sha256": "c8b13421e97d81a0d9e874bceaec41134041d5a30ccd51529d74ff456d9ab401",
+  "candidate_sha256": "16f605a90a072b39c071e24edae578f181afd8d229e2238a9f6100815420da94",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "pitch": 16384,
+    "mips": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "touched_element": {
+    "source": "Select your car",
+    "korean": "차량 선택",
+    "original_bbox": [
+      243,
+      947,
+      1156,
+      1111
+    ],
+    "localized_bbox": [
+      261,
+      964,
+      878,
+      1094
+    ],
+    "source_size": [
+      913,
+      164
+    ],
+    "localized_size": [
+      617,
+      130
+    ],
+    "delta_left": 18,
+    "delta_right": 278,
+    "delta_top": 17,
+    "delta_bottom": 17,
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "font": "Noto Sans CJK KR:style=Black",
+    "native_font_size_px": 142,
+    "horizontal_source_proportion_scale": 1.1,
+    "shear": 0.28,
+    "alignment": "source-left-positive-inset",
+    "render_basis": "fresh native-resolution glyph; no previous Korean bitmap reuse"
+  },
+  "preservation": {
+    "all_pixels_outside_select_car_bbox_vs_C114_candidate": "PIXEL_EXACT",
+    "other_28_localized_rows": "PRESERVED_C114_BYTES"
+  },
+  "machine_checks": {
+    "changed_pixels_outside_bbox": 0,
+    "alpha_changed_outside_bbox": 0,
+    "clean_source_effect_unchanged_pixels": 0
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "A86_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
