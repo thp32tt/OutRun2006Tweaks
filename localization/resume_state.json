@@ -962,7 +962,7 @@
       "status": "PENDING_B_C_D_STRICT_QA"
     },
     "latest_d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json",
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C171-C172-BATCH/C171_C172_BATCH_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C173-C174-BATCH/C173_C174_BATCH_FINAL_QA.json",
     "c77_fa7bbb13": {
       "timestamp_kst": "2026-09-27T14:05:02+09:00",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
@@ -1132,8 +1132,8 @@
       "pending_independent_c_final_qa": true,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 18,
-    "current_producer_rework_remaining": 2,
+    "current_pending_artwork_localize_text": 17,
+    "current_producer_rework_remaining": 4,
     "latest_a_production_batch": "localization/graphics/role_A/20261005-A-PRODUCTION27/A_PRODUCTION27_E1639D2E_REPORT.json",
     "a_production20_9ce4e175": {
       "timestamp_kst": "2026-10-05T02:45:00+09:00",
@@ -1163,7 +1163,9 @@
     },
     "current_producer_rework_assets": [
       "63C91067",
-      "C598919A"
+      "C598919A",
+      "A05BF610",
+      "37759842"
     ],
     "a_production26_2ea557b4": {
       "timestamp_kst": "2026-10-05T14:52:10+09:00",
@@ -3853,6 +3855,28 @@
     "decision": "C172_REWORK_REQUIRED_CLEAN_PLATE_GHOSTING_AND_ARTWORK_DAMAGE",
     "supersedes": "C169_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE",
     "report": "localization/graphics/role_C/20261005-C172-63C91067/C172_63C_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c173_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T16:35:00+09:00",
+    "run": "20261005-C173-A05BF610",
+    "queue_index": 28,
+    "candidate_sha256": "d124775363f3e989a312d13fa0ee17436a28cd927837933b0ea9c8a98a89e6a2",
+    "machine_status": "REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+    "controller_visual_qa": "FAIL_SOURCE_TEXT_RESIDUE_AND_GHOST_CLEAN_PLATE",
+    "decision": "C173_REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+    "report": "localization/graphics/role_C/20261005-C173-A05BF610/C173_A05_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c174_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T16:35:00+09:00",
+    "run": "20261005-C174-37759842",
+    "queue_index": 95,
+    "candidate_sha256": "d43a8476c72552486dd2352740e21cf87a0767765ef6440111d1be02e37ba825",
+    "producer_source_core_residue_pixels": 2573,
+    "producer_clean_source_core_unchanged": 2774,
+    "decision": "C174_REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+    "report": "localization/graphics/role_C/20261005-C174-37759842/C174_37759842_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
