@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T22:04:55+09:00",
+  "updated_at_kst": "2026-10-05T22:10:36+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C203/C206 finalized the latest completed A60/B152 candidates only; prior PASS assets were not repeated. 59A79158 A60 candidate 1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583 independently passes source/localized bbox exact 24/24, bbox/size/positive margins 24/24, canonical stage-name phonetic binding, all outside/alpha/residue/overlap/touch zero and controller readable/raw mirror_y visual QA. DCC7B488 B152 candidate 958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14 is positively classified zoom_review Total Rank -> 종합 랭킹; C206 passes 1/1 exact bbox and zero outside/protected/source-script residue with visually seamless Coons clean plate. C204/C205 were C verifier-scope false positives on the same B152 bytes, not producer failures. Current queue: 83 localize_text + 43 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit; pending_artwork localize_text=10; producer REWORK=1 (37759842); pending-C=0. A61 index173 is preflight-only and not a C approval candidate yet. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "A62 odd index173 6DC89C6E candidate b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26 completed from A61 source-contact binding in the same controller invocation. Physical idx0..20 map WATERFALLS..GHOST FOREST; all stage names use canonical phonetic Hangul. Shared blue-gray bold condensed source family restored at lowres fs18 x4, left aligned; only ICE SCAPE uses 0.9739 horizontal scale. 21/21 bbox/size/positive-margin, CLEAN/FINAL validators PASS, outside/alpha/protected/source-residue/render/overlap/touch=0; readable + raw mirror_y self-QA PASS. pending_artwork localize_text=9; producer REWORK=1 (37759842); pending-C=1 (6DC89C6E). C203/C206 remain latest completed C approvals. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,13 +265,15 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "REWORK_REQUIRED",
+      "status": "REWORK_REQUIRED_WITH_PENDING_C",
       "assets": [
         "37759842"
       ],
       "remaining": 1,
-      "note": "Only 37759842 remains producer REWORK and still requires manual/template source-faithful selector clean-plate reconstruction. C203 approved 59A79158 A60 and C206 approved DCC7B488 B152 pending isolated in-game validation. pending_artwork localize_text=10; pending-C=0; A61 index173 is preflight-only. RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": []
+      "note": "37759842 remains manual/template-only producer REWORK. A62 6DC89C6E self-QA PASS pending independent C. pending_artwork localize_text=9; pending-C=1 (6DC89C6E); RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": [
+        "6DC89C6E"
+      ]
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -1322,14 +1324,14 @@
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     },
     "latest_a_production": {
-      "run": "A60",
-      "index": 163,
-      "asset": "59A79158",
-      "candidate_sha256": "1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583",
-      "result": "A60_SELF_QA_PASS_PENDING_C_AND_INGAME",
-      "semantic_binding": "A58_SOURCE_CONTACT_REVERSE_ARTWORK_PLAN_ORDER_IDX0_23_WATERFALLS_TO_CASTLE_WALL",
+      "run": "A62",
+      "index": 173,
+      "asset": "6DC89C6E",
+      "candidate_sha256": "b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26",
+      "result": "A62_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "semantic_binding": "A61_CONTROLLER_SOURCE_CONTACT_21_OF_21",
       "stage_name_policy": "PASS_CANONICAL_PHONETIC_TRANSLITERATION",
-      "bbox_size_positive_margin": "24/24 PASS",
+      "bbox_size_positive_margin": "21/21 PASS",
       "pixel_gates": {
         "changed_outside": 0,
         "alpha_outside": 0,
@@ -1340,15 +1342,15 @@
         "touch": 0
       },
       "source_style": {
-        "family": "shared dark-gray bold condensed stage-list labels",
-        "shared_lowres_font_size": 9,
+        "family": "shared blue-gray bold condensed all-caps stage list",
+        "shared_lowres_font_size": 18,
         "pixel_scale": 4,
         "alignment": "left",
-        "skyscrapers_horizontal_scale": 0.9899
+        "ice_scape_horizontal_scale": 0.9739
       },
       "structure": {
         "dimensions": [
-          1024,
+          2048,
           2048
         ],
         "format": "RGBA32",
@@ -1357,9 +1359,8 @@
         "header_128_exact": true,
         "raw_orientation": "mirror_y"
       },
-      "report": "localization/graphics/role_A/20261005-A-PRODUCTION60/A60_59A79158_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION60/A60_CONTROLLER_SELF_QA.json",
-      "c203_machine_report": "localization/graphics/role_C/20261005-C203-59A79158/C203_59A79158_MACHINE_QA.json",
+      "report": "localization/graphics/role_A/20261005-A-PRODUCTION62/A62_6DC89C6E_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION62/A62_CONTROLLER_SELF_QA.json",
       "runtime_validation": "UNTESTED"
     },
     "latest_a_rework": {
