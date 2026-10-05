@@ -562,6 +562,25 @@ namespace
                 WheelFFBMath::model_uses_original_condition_backbone(ffbModel);
             const bool ps2Original =
                 ffbModel == WheelFFBMath::Model::PS2OriginalExperimental;
+
+            // R10: polarity is part of the selected force model, not a second
+            // live tuning state. The R9 log proved model changes can be followed
+            // by profile/UI writes that leave Modern on Arcade polarity (or vice
+            // versa). Self-heal every update before any Spring/ConstantForce is
+            // evaluated so switching models is always atomic on the tested R3.
+            const bool requiredReversePolarity =
+                WheelFFBMath::model_requires_reversed_polarity(ffbModel);
+            if (bool(Settings::WheelFFBInvertForce) != requiredReversePolarity ||
+                bool(Settings::WheelFFBInvertSpring) != requiredReversePolarity)
+            {
+                Settings::WheelFFBInvertForce = requiredReversePolarity;
+                Settings::WheelFFBInvertSpring = requiredReversePolarity;
+                spdlog::info(
+                    "WheelFFB: auto polarity self-heal model={} invertCF={} invertSpring={}",
+                    WheelFFBMath::model_name(ffbModel),
+                    requiredReversePolarity, requiredReversePolarity);
+            }
+
             const float ps2DriveFactor =
                 ps2Original ? WheelFFBPS2::drive_factor(speedRaw) : 0.0f;
             // Modern SAT deliberately clamps its normalized speed to 0..1,
@@ -827,9 +846,8 @@ namespace
                     sawNonPrimarySnowMix = true;
             }
             const bool snowPrimaryRoad = sawSnowPrimary && !sawNonPrimarySnowMix;
-            constexpr float SnowIceRoadTextureScale = 0.04f;
             const float materialRoadTextureScale =
-                snowPrimaryRoad ? SnowIceRoadTextureScale : 1.0f;
+                snowPrimaryRoad ? WheelFFBMath::SnowIceComfortScale : 1.0f;
 
             const float configuredRoadDetail = std::clamp(
                 static_cast<float>(Settings::WheelFFBRoadTexture), 0.0f, 1.0f);
@@ -1283,8 +1301,17 @@ namespace
                 const float physicsReturnRelief =
                     WheelFFBMath::physics_return_relief(frontSlip, steerRate);
 
+                // frontSlip is right-positive vehicle coordinates, while the
+                // game's steering input axis is the opposite sign. The vehicle
+                // estimator converts steer into that coordinate system; convert
+                // the aligning moment back to input-axis torque here. This keeps
+                // normal corner centering unchanged but makes deep oversteer
+                // drive the wheel toward opposite lock instead of the car nose.
+                const float physicsDirection =
+                    frontSlip > 0.0f ? 1.0f :
+                    (frontSlip < 0.0f ? -1.0f : 0.0f);
                 physicsSatTorque =
-                    (frontSlip > 0.0f ? -1.0f : 1.0f) *
+                    physicsDirection *
                     physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
                 if (!std::isfinite(physicsSatTorque))

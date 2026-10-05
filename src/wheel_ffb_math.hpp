@@ -49,6 +49,15 @@ namespace WheelFFBMath
                model == Model::PS2OriginalExperimental;
     }
 
+    // R10 MOZA R3 hardware rule: Modern DD uses the reversed DirectInput
+    // ConstantForce/Spring polarity, while Arcade/Hybrid/PS2 use normal
+    // polarity. Keep this model-owned so profile/UI changes cannot silently
+    // leave the previous model's direction behind.
+    inline bool model_requires_reversed_polarity(Model model)
+    {
+        return model == Model::ModernDD;
+    }
+
     // Boomslangnz/FFBArcadePlugin OutRun2Real.cpp derives a 10%-step
     // SpeedStrength from Lindbergh's speed value: 0.1..80=>10%, 80.1..130=>20%,
     // 130.1..180=>30%, 180.1..220=>40%, 220.1..270=>50%, 270.1..320=>60%,
@@ -344,6 +353,13 @@ namespace WheelFFBMath
     constexpr unsigned PrimaryAsphaltSurfaceMask = 0x00000002u;
     constexpr unsigned PrimaryRoughRoadSurfaceMask = 0x00100000u;
     constexpr unsigned PrimarySnowIceSurfaceMask = 0x00800000u;
+
+    // R10 comfort floors from the R3 hardware pass. Snow/ice should remain
+    // clearly identifiable without returning to the old continuous buzz, and
+    // Floral Village's sustained rough paving keeps more tactile information
+    // than the R9 0.60 attenuation while remaining below full-strength roughness.
+    constexpr float SnowIceComfortScale = 0.20f;
+    constexpr float FloralRoughPavingComfortScale = 0.75f;
 
     inline bool proven_primary_rough_road_section(int uniqueStage, int roadSection)
     {

@@ -290,11 +290,18 @@ public:
 
         // Bicycle-model-inspired front-slip proxy:
         // alpha_f ~= road-wheel-angle - beta - a*r/v.
+        //
+        // Runtime telemetry establishes that the game's steering input sign is
+        // opposite the calibrated right-positive local-motion/yaw coordinate:
+        // normal positive-steer corners carry negative yaw, and vice versa.
+        // Convert steering into the vehicle coordinate before forming alpha_f.
+        // This preserves normal-corner restoring direction while allowing a
+        // large beta (drift) to pull the rack naturally into opposite lock.
         constexpr float RoadWheelLockRad = 0.52f;
         const float steeringLeadSeconds = 0.018f + 0.012f * transientT;
         const float steeringLead = std::clamp(
             steerRate_ * steeringLeadSeconds, -0.10f, 0.10f);
-        const float roadWheelAngle = std::clamp(
+        const float roadWheelAngle = -std::clamp(
             steer + steeringLead, -1.0f, 1.0f) * RoadWheelLockRad;
         const float yawLeadSeconds = 0.10f - 0.045f * speedNorm;
         const float baseFrontSlip =
