@@ -1,0 +1,31 @@
+{
+  "run": "20261005-C180-560FA536",
+  "qa_id": "C180",
+  "index": 101,
+  "asset": "560FA536",
+  "candidate_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+  "machine_status": "PASS",
+  "all_13_bbox_size_positive_margin_pass": true,
+  "warning_material_fix_present": true,
+  "machine_checks": {
+    "clean_changed_outside_union_source_bboxes": 0,
+    "final_changed_outside_union_source_bboxes": 0,
+    "clean_alpha_outside_union_source_bboxes": 0,
+    "final_alpha_outside_union_source_bboxes": 0,
+    "render_outside_union_source_bboxes": 0,
+    "a38_vs_a36_changed_outside_corrected_warning_bbox": 0,
+    "a38_vs_a36_changed_inside_corrected_warning_bbox": 76830,
+    "a38_vs_a36_changed_in_new_left_strip": 4120,
+    "warning_clean_changed_pixels": 77026,
+    "warning_removed_source_pixels_unchanged_in_final_outside_korean_guard": 0,
+    "warning_clean_changed_in_new_left_strip": 3950,
+    "warning_clean_changed_in_left_audit_ring_outside_bbox": 0,
+    "warning_final_changed_in_left_audit_ring_outside_bbox": 0,
+    "protected_clean_changed": 0,
+    "protected_final_changed": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_pair_1px_touch_pixels": 0
+  },
+  "report": "localization/graphics/role_C/20261005-C180-560FA536/C180_560FA536_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
