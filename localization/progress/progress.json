@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T10:29:06+09:00",
+  "updated_at_kst": "2026-10-05T10:36:18+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -268,10 +268,8 @@
       "status": "ZERO_PRODUCER_REWORK_REQUIRED",
       "assets": [],
       "remaining": 0,
-      "note": "B73 E95DA5 candidate d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b passes producer machine/controller self-QA and awaits independent C. 1A43E9D9 remains HIGH_RISK pending in-game; 4F68708E/F6811E94/49BB5FE5 remain strict no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": [
-        "E95DA5"
-      ]
+      "note": "C149 finalized B73 E95DA5 candidate d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b by contract-authorized N100 fallback after GitHub-hosted C output remained unavailable. Independent CLEAN diff=0; 11/11 bbox+size+positive-margin; zero outside/alpha/protected/preserved-change/render-outside-target/source-residue/overlap/touch/target-preserved-near. 1A43E9D9 remains HIGH_RISK pending mandatory in-game; 4F68708E/F6811E94/49BB5FE5 remain strict no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": []
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -295,14 +293,14 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C144",
-      "report": "localization/graphics/role_C/20261005-C144-E7F6E9B7/C144_E7F6_CONTROLLER_FINAL_QA.json",
+      "run": "C149",
+      "report": "localization/graphics/role_C/20261005-C149-E95DA5/C149_E95_CONTROLLER_FINAL_QA.json",
       "result": "1_PIXEL_VISUAL_PASS_GLOBAL_0_REWORK_REMAIN",
       "candidate_changed_by_C": false,
       "assets_checked": 1,
-      "physical_elements_checked": 13,
+      "physical_elements_checked": 11,
       "pixel_visual_pass_assets": [
-        "E7F6E9B7"
+        "E95DA5"
       ],
       "high_risk_static_pass_assets_existing": [
         "1A43E9D9"
@@ -315,14 +313,15 @@
         "49BB5FE5"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 32,
+      "pending_production_localize_text": 31,
       "machine_evidence": {
-        "E7F6E9B7": "localization/graphics/role_C/20261005-C144-E7F6E9B7/C144_E7F6_MACHINE_QA.json"
+        "E95DA5": "localization/graphics/role_C/20261005-C149-E95DA5/C149_E95_MACHINE_QA.json"
       },
       "controller_visual": {
-        "E7F6E9B7": "PASS"
+        "E95DA5": "PASS"
       },
-      "in_game_validation": "PENDING; 1A43E9D9 remains REQUIRED_BEFORE_FINAL_APPROVAL; C144 RUNTIME_VALIDATION=UNTESTED"
+      "compute_executor": "N100_FALLBACK_AFTER_HOSTED_C_NO_OUTPUT",
+      "in_game_validation": "PENDING; 1A43E9D9 remains REQUIRED_BEFORE_FINAL_APPROVAL; C149 RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION73",
@@ -740,7 +739,7 @@
       "queue_index": 230,
       "candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
-      "status": "B_PRODUCTION73_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "status": "C149_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
       "bbox_size_positive_margin": "11/11",
       "zero_pixel_gates": {
         "source_residue": 0,
@@ -754,7 +753,10 @@
       "controller_visual_qa": "PASS",
       "report": "localization/graphics/role_B/20261005-B-PRODUCTION73/B73_E95_REPORT.json",
       "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION73/B73_CONTROLLER_SELF_QA.json",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "c_final_qa": "PASS",
+      "c_machine_report": "localization/graphics/role_C/20261005-C149-E95DA5/C149_E95_MACHINE_QA.json",
+      "c_controller_report": "localization/graphics/role_C/20261005-C149-E95DA5/C149_E95_CONTROLLER_FINAL_QA.json"
     }
   },
   "data_build": {
