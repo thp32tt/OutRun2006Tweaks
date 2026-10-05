@@ -7,6 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C212 finalized A70 index193 97E863AD candidate b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d. Independent canonical 2048x1024 RGBA32/header/raw mirror_y QA reproduces 13/13 source/localized bboxes exactly with containment/size/positive margins and outside/alpha/visible/source-residue/overlap/touch/protected all 0. C210 detached-syllable defect is resolved: 0px artificial tracking, natural font advance, no horizontal glyph scaling, Black/source-height family retained with ~0.84-0.91 source-height ratios and exact OutRun/OutRun2SP/OUTRUN/TESTAROSSA/SP/OR protected pixels. Controller SOURCE/CLEAN/FINAL/raw visual PASS. C212_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
+    "C213 independently confirms B155 index152 49BB5FE5 preserve-original policy. PRO./INS./G.M./E.R. expand to PROTOTYPE/INSTRUMENTAL/GUITAR MIX/EURO REMIX music-version/mix artwork and '89/'86 are version badges; TRANSLATION_NAMING_POLICY plus C150 same-family precedent require exact original pixels. The former B63 Korean DXT5 redraw was semantically out of scope, so its HOLD is closed by scope correction rather than weakening decoded-pixel gates. C213_PRESERVE_ORIGINAL_POLICY_PASS_NO_CANDIDATE_REQUIRED; runtime validation is not applicable for localization.",
     "B155 closed stale even index152 49BB5FE5 B63 DXT5 hold by mandatory policy reconciliation, not by weakening pixel gates. PRO./INS./G.M./E.R. map to PROTOTYPE/INSTRUMENTAL/GUITAR MIX/EURO REMIX music-version/mix artwork and C150 established same-family variant qualifiers as protected original; '89/'86 badges are also preserved. Queue status -> preserve_original_policy_no_candidate_required, no DDS candidate required. Next B target: oldest even zoom_review index36 06AB5CEE. RUNTIME_VALIDATION=NOT_APPLICABLE_FOR_LOCALIZATION.",
     "A70 repaired direct C210-returned index193 97E863AD: candidate b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d; artificial tracking=0px/natural font advance, Black/source-height/anchors/protected tokens retained; 13/13 bbox+size+positive margins and zero-pixel gates PASS; controller SOURCE/CLEAN/FINAL+raw visual PASS. pending-C=97E863AD; producer REWORK only 37759842; RUNTIME_VALIDATION=UNTESTED.",
     "C210 revalidated A67 index193 97E863AD candidate ad3f42856956d15b1c0ecba032d18ebb730c375f4b0a52b456c975e89e9396b7. Independent canonical QA reproduces 13/13 source/localized bboxes exactly with size/positive margins and all outside/alpha/source-residue/overlap/touch/protected gates zero, but mandatory C visual QA returns it again: width-ratio-driven tracking visibly detaches Hangul syllables (쇼룸 132px tracking, 멀티플레이 33.25px, 환영합니다 38.75px, Goal rows 41-48px) unlike the source condensed continuous spacing. Keep Black/source-height/anchors/protected tokens, remove artificial tracking. C210_REWORK_REQUIRED_EXCESSIVE_INTERGLYPH_TRACKING_SOURCE_SPACING. RUNTIME_VALIDATION=UNTESTED.",
@@ -4004,7 +4006,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C210-C211-BATCH/C210_C211_BATCH_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C212-C213-BATCH/C212_C213_BATCH_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4065,9 +4067,7 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [
-    "97E863AD"
-  ],
+  "current_pending_c": [],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -4731,7 +4731,7 @@
       "face": "Noto Sans CJK KR Black",
       "source_height_family_preserved": true,
       "no_horizontal_glyph_scaling": true,
-      "artificial_tracking_px": 0.0,
+      "artificial_tracking_px": 0,
       "tracking_policy": "NATURAL_FONT_ADVANCE_NO_ARTIFICIAL_TRACKING"
     },
     "protected_original_policy": "PASS_PIXEL_EXACT_OUTRUN_OUTRUN2SP_OUTRUN_TESTAROSSA_SP_OR",
@@ -4767,6 +4767,39 @@
     ],
     "policy_basis": "TRANSLATION_NAMING_POLICY + C150 same-family variant qualifier precedent",
     "report": "localization/graphics/role_B/20261005-B-POLICY155-49BB5FE5/B155_49BB5FE5_POLICY_RECONCILE.json",
+    "runtime_validation": "NOT_APPLICABLE_FOR_LOCALIZATION"
+  },
+  "c212_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T23:56:00+09:00",
+    "run": "20261005-C212-97E863AD",
+    "queue_index": 193,
+    "candidate_sha256": "b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "13/13 PASS",
+    "zero_pixel_gates": {
+      "outside": 0,
+      "alpha_outside": 0,
+      "introduced_visible_outside": 0,
+      "source_residue": 0,
+      "overlap": 0,
+      "touch": 0,
+      "protected_changed": 0
+    },
+    "spacing_policy": "PASS_NATURAL_FONT_ADVANCE_0PX_ARTIFICIAL_TRACKING",
+    "controller_visual_qa": "PASS",
+    "decision": "C212_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "report": "localization/graphics/role_C/20261005-C212-97E863AD/C212_97E863AD_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c213_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T23:56:00+09:00",
+    "run": "20261005-C213-49BB5FE5-POLICY",
+    "queue_index": 152,
+    "candidate_required": false,
+    "source_pixels_modified": false,
+    "policy_status": "PASS_PRESERVE_ORIGINAL",
+    "decision": "C213_PRESERVE_ORIGINAL_POLICY_PASS_NO_CANDIDATE_REQUIRED",
+    "report": "localization/graphics/role_C/20261005-C213-49BB5FE5-POLICY/C213_49BB5FE5_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "NOT_APPLICABLE_FOR_LOCALIZATION"
   }
 }
