@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-INGAME88-IGR001-C2C",
+  "timestamp_kst": "2026-10-06T04:54:42+09:00",
+  "user_ingame_regression": {
+    "id": "IGR-001",
+    "screenshot": "스크린샷(143).png",
+    "screen": "SINGLE_PLAY_C2C_INTRO"
+  },
+  "mapping": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+  "worker": {
+    "workflow_run_id": 37364801116,
+    "trigger_commit": "dda45a754960fe4879d6f0a7b92c6e333486bed4",
+    "output_commit": "8046312e4f79f779fb7c158fd9e3e9046eab65b3",
+    "conclusion": "success"
+  },
+  "assets": {
+    "BA0147DA": {
+      "queue_index": 212,
+      "candidate_sha256": "61ae0c45568e023cc258379173f8d80f43cc5257f2d8facefbcf3c87759179e1",
+      "source_size": [1760, 160],
+      "localized_size": [1029, 123],
+      "bbox_size_positive_margin": "PASS"
+    },
+    "8C259C68": {
+      "queue_index": 188,
+      "candidate_sha256": "00e16af1e3d468667fe13ed5291ec55bbfd06f18e6895a6be7e79f413ade94bd",
+      "source_size": [1721, 66],
+      "localized_size": [1459, 60],
+      "bbox_size_positive_margin": "PASS"
+    },
+    "D657C2EB": {
+      "queue_index": 220,
+      "candidate_sha256": "1a57c385e6c3ea2cc368888041e7106aab79bc4ab364daf0b51edd4465fcc935",
+      "source_size": [606, 64],
+      "localized_size": [420, 55],
+      "bbox_size_positive_margin": "PASS"
+    },
+    "754F0599": {
+      "queue_index": 175,
+      "candidate_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+      "action": "PRESERVE_C171_COMPLETED_NATIVE_SOURCE_STYLE"
+    }
+  },
+  "machine_qa": {
+    "changed_rows": "3/3 PASS",
+    "bbox_size_positive_margin": "3/3 PASS",
+    "changed_outside_target_bboxes": 0,
+    "alpha_changed_outside_target_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "dds_header_and_raw_orientation": "PASS"
+  },
+  "controller_visual_observations": [
+    "BA SOURCE/OLD/CLEAN/FINAL: A88 replaces the visibly underscaled/block-like C2C title with a direct native-HD Black render using stronger source-relative height/weight; left anchor is retained and no clipping/art intrusion is visible.",
+    "8C SOURCE/OLD/CLEAN/FINAL: A88 enlarges only the C2C help row toward the source height while retaining the shared dark help-copy family; full-atlas OLD/FINAL shows the other help rows, including B166 Heart Attack, unchanged.",
+    "D657 SOURCE/OLD/CLEAN/FINAL: A88 C2C selector occupies more of the source row height with source-family gray weight/stroke; full-atlas OLD/FINAL shows TIME ATTACK/OUTRUN/HEART ATTACK and other rows unchanged.",
+    "No visible English residue, low-resolution bitmap reuse, clipping, collision, wrong-image intrusion, or unrelated-row change."
+  ],
+  "controller_visual_qa": "PASS_NATIVE_HD_C2C_HIERARCHY_AND_SCOPE",
+  "status": "A88_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "pending_independent_c_static_qa": true,
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "backlog_close_allowed": false,
+  "evidence": [
+    "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_BA_coast2coast_title_SOURCE_OLD_CLEAN_FINAL_2X.jpg",
+    "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_8C_coast2coast_help_SOURCE_OLD_CLEAN_FINAL_2X.jpg",
+    "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_D657_coast2coast_selector_SOURCE_OLD_CLEAN_FINAL_2X.jpg",
+    "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_BA_FULL_OLD_FINAL.jpg",
+    "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_8C_FULL_OLD_FINAL.jpg",
+    "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_D657_FULL_OLD_FINAL.jpg"
+  ],
+  "n100_fallback_note": "Initial hosted queue delay triggered a permitted MCP N100 fallback attempt, but SSH clone authentication failed before any rendering/QA started. Hosted worker then completed successfully; no duplicate heavy computation occurred.",
+  "vr_ffb_dx11_dxvk_changes": false
+}
