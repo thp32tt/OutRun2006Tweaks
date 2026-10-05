@@ -1,0 +1,468 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION68-PREFLIGHT",
+  "index": 201,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "8d4c508477442b5278c3bda3ba4fc5efcbdc1027",
+    "atlas_git_blob_sha1": "805d46d27b32d09f8eecb553095e3f3fc65d7167",
+    "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5"
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "region_idx": 0,
+      "cell": [
+        0,
+        1908,
+        1168,
+        140
+      ],
+      "source_bbox": [
+        119,
+        1938,
+        1157,
+        2023
+      ],
+      "width": 1038,
+      "height": 85,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 1,
+      "cell": [
+        0,
+        1796,
+        1072,
+        112
+      ],
+      "source_bbox": [
+        482,
+        1805,
+        1050,
+        1900
+      ],
+      "width": 568,
+      "height": 95,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 2,
+      "cell": [
+        0,
+        1684,
+        1072,
+        112
+      ],
+      "source_bbox": [
+        212,
+        1692,
+        1049,
+        1787
+      ],
+      "width": 837,
+      "height": 95,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 3,
+      "cell": [
+        0,
+        1572,
+        1072,
+        112
+      ],
+      "source_bbox": [
+        248,
+        1580,
+        1049,
+        1675
+      ],
+      "width": 801,
+      "height": 95,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 4,
+      "cell": [
+        0,
+        1460,
+        1072,
+        112
+      ],
+      "source_bbox": [
+        146,
+        1469,
+        1050,
+        1563
+      ],
+      "width": 904,
+      "height": 94,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 5,
+      "cell": [
+        0,
+        1348,
+        1072,
+        112
+      ],
+      "source_bbox": [
+        618,
+        1356,
+        1048,
+        1451
+      ],
+      "width": 430,
+      "height": 95,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 6,
+      "cell": [
+        0,
+        1236,
+        1072,
+        112
+      ],
+      "source_bbox": [
+        453,
+        1243,
+        1050,
+        1332
+      ],
+      "width": 597,
+      "height": 89,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 7,
+      "cell": [
+        0,
+        1124,
+        1072,
+        112
+      ],
+      "source_bbox": [
+        32,
+        1129,
+        1049,
+        1223
+      ],
+      "width": 1017,
+      "height": 94,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 8,
+      "cell": [
+        0,
+        1012,
+        1072,
+        112
+      ],
+      "source_bbox": [
+        293,
+        1017,
+        1048,
+        1111
+      ],
+      "width": 755,
+      "height": 94,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 9,
+      "cell": [
+        0,
+        900,
+        1072,
+        112
+      ],
+      "source_bbox": [
+        289,
+        909,
+        1048,
+        1003
+      ],
+      "width": 759,
+      "height": 94,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 10,
+      "cell": [
+        0,
+        788,
+        1072,
+        112
+      ],
+      "source_bbox": [
+        482,
+        798,
+        1047,
+        892
+      ],
+      "width": 565,
+      "height": 94,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 11,
+      "cell": [
+        0,
+        676,
+        1072,
+        112
+      ],
+      "source_bbox": [
+        606,
+        681,
+        1048,
+        775
+      ],
+      "width": 442,
+      "height": 94,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 12,
+      "cell": [
+        0,
+        564,
+        1072,
+        112
+      ],
+      "source_bbox": [
+        415,
+        568,
+        1048,
+        663
+      ],
+      "width": 633,
+      "height": 95,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 13,
+      "cell": [
+        0,
+        452,
+        1072,
+        112
+      ],
+      "source_bbox": [
+        502,
+        467,
+        1049,
+        556
+      ],
+      "width": 547,
+      "height": 89,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 14,
+      "cell": [
+        1072,
+        1832,
+        956,
+        76
+      ],
+      "source_bbox": [
+        1086,
+        1845,
+        1267,
+        1903
+      ],
+      "width": 181,
+      "height": 58,
+      "median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 15,
+      "cell": [
+        1168,
+        1972,
+        612,
+        76
+      ],
+      "source_bbox": [
+        1173,
+        1986,
+        1379,
+        2037
+      ],
+      "width": 206,
+      "height": 51,
+      "median_rgba": [
+        46,
+        54,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 16,
+      "cell": [
+        1072,
+        1720,
+        612,
+        76
+      ],
+      "source_bbox": [
+        1079,
+        1734,
+        1255,
+        1785
+      ],
+      "width": 176,
+      "height": 51,
+      "median_rgba": [
+        46,
+        54,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 17,
+      "cell": [
+        1072,
+        1608,
+        524,
+        76
+      ],
+      "source_bbox": [
+        1076,
+        1629,
+        1325,
+        1682
+      ],
+      "width": 249,
+      "height": 53,
+      "median_rgba": [
+        49,
+        56,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 18,
+      "cell": [
+        1596,
+        1608,
+        404,
+        76
+      ],
+      "source_bbox": [
+        1600,
+        1629,
+        1824,
+        1672
+      ],
+      "width": 224,
+      "height": 43,
+      "median_rgba": [
+        49,
+        56,
+        57,
+        255
+      ]
+    }
+  ],
+  "policy_note": "17 reviewed localize_text segments; Night Bird and Radiation song-title artwork must remain protected original English",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_SEMANTIC_PHYSICAL_BINDING",
+  "evidence": "localization/graphics/role_A/20261005-A-PRODUCTION68-PREFLIGHT/A68_A9ABD877_SOURCE_ROWS.jpg",
+  "status": "A68_PREFLIGHT_SOURCE_CONTACT_READY_FOR_CONTROLLER_BINDING_AND_SAME_INVOCATION_RENDER",
+  "runtime_validation": "UNTESTED"
+}

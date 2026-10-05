@@ -1,0 +1,10 @@
+{
+  "run": "20261005-A-PRODUCTION68-PREFLIGHT",
+  "index": 201,
+  "asset": "A9ABD877",
+  "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+  "regions": 19,
+  "status": "A68_PREFLIGHT_SOURCE_CONTACT_READY_FOR_CONTROLLER_BINDING_AND_SAME_INVOCATION_RENDER",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION68-PREFLIGHT/A68_A9ABD877_PREFLIGHT.json",
+  "runtime_validation": "UNTESTED"
+}
