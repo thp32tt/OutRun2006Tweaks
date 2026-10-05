@@ -1,5 +1,5 @@
 {
-  "schema_version": 76,
+  "schema_version": 77,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B_PRODUCTION68 completed even index 228 E7F6E9B7. Authoritative HD source 3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154 is 2048x2048 RGBA32 BGRA/raw mirror_y. Canonical atlas binds 13 menu-name rows (coast 2 coast through race select) to Korean. Candidate 6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607 passes 13/13 exact bbox+size+positive-margin, zero source residue/outside/alpha/protected/overlap/touch, and controller SOURCE/CLEAN/FINAL/row/raw visual self-QA. Silver gradient/dark outline-shadow/right-slant source family retained. Pending independent C and in-game validation. RUNTIME_VALIDATION=UNTESTED.",
     "B_PRODUCTION67 completed even index 226 E3F4BA07. Authoritative HD source fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72 is 2048x512 RGBA32 BGRA/raw mirror_y. B66 canonical binding localized STAGE, GOAL/GOAL A-E and 15 STAGE CONTINUOUS while protecting OUTRUN2/OUTRUN2SP. Candidate 1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c passes 8/8 exact bbox+size+positive-margin, zero source residue/outside/alpha/protected/OutRun-mark/overlap/touch, and controller SOURCE/CLEAN/FINAL/row/raw visual self-QA. Pending independent C and in-game validation. 49BB5FE5 remains HOLD_STRICT_RECHECK. RUNTIME_VALIDATION=UNTESTED.",
     "B_PRODUCTION65 completed even index 220 D657C2EB after B63 fail-closed index 152 49BB5FE5. B63 correctly decoded DXT5 and preserved '89/'86 but decoded block splice changed 1,388 pixels outside exact source bboxes, so no candidate was persisted and index 152 is HOLD_STRICT_RECHECK. B64/B65 then bound and rendered all seven D657 physical labels, including duplicate TIME ATTACK. Candidate 6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5 preserves 2048x512 RGBA32 BGRA mip1/header/raw mirror_y, passes 7/7 bbox+size+positive margins and zero residue/outside/alpha/overlap/touch with controller visual/raw PASS. Pending C and in-game. RUNTIME_VALIDATION=UNTESTED.",
     "B_PRODUCTION60 completed even index 154 4D38BBB0. Authoritative HD source 15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf is 4096x1024 RGBA32/raw mirror_y. B59 canonical binding found 8 physical text rows and corrected the stale five-item transcription by adding SHOWROOM plus duplicate SINGLE PLAYER/MULTIPLAYER occurrences. B60 candidate c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a localizes all 8 text regions, preserves Ferrari artwork regions 0/1, passes 8/8 exact bbox+size+positive-margin and zero residue/outside/alpha/protected/artwork/overlap/touch, with controller SOURCE/CLEAN/FINAL/raw visual self-QA PASS. Pending independent C and in-game validation. RUNTIME_VALIDATION=UNTESTED.",
@@ -201,7 +202,7 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_B/20261005-B-PRODUCTION67/B67_E3F4_REPORT.json",
+    "latest_hd_rework_batch": "localization/graphics/role_B/20261005-B-PRODUCTION68/B68_E7F6_REPORT.json",
     "hd_rework_candidates_ready": 16,
     "hd_rework_remaining": 0,
     "hd_partial_rework": {
@@ -1016,7 +1017,7 @@
       "pending_independent_c_final_qa": true,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 33,
+    "current_pending_artwork_localize_text": 32,
     "current_producer_rework_remaining": 0,
     "latest_a_production_batch": "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_EBEF6D20_REPORT.json",
     "a_production20_9ce4e175": {
@@ -1036,11 +1037,11 @@
       "runtime_validation": "UNTESTED"
     },
     "latest_b_production": {
-      "run": "B_PRODUCTION43",
-      "asset": "D41D0B1",
-      "queue_index": 112,
-      "candidate_sha256": "0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80",
-      "report": "localization/graphics/role_B/20261005-B-PRODUCTION43/B_PRODUCTION43_D41_REPORT.json",
+      "run": "B_PRODUCTION68",
+      "asset": "E7F6E9B7",
+      "queue_index": 228,
+      "candidate_sha256": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607",
+      "report": "localization/graphics/role_B/20261005-B-PRODUCTION68/B68_E7F6_REPORT.json",
       "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
       "runtime_validation": "UNTESTED"
     }
@@ -3110,6 +3111,29 @@
     ],
     "machine_report": "localization/graphics/role_C/20261005-C143-E3F4BA07/C143_E3F4_MACHINE_QA.json",
     "report": "localization/graphics/role_C/20261005-C143-E3F4BA07/C143_E3F4_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "b_production68_e7f6e9b7": {
+    "timestamp_kst": "2026-10-05T09:52:00+09:00",
+    "run": "20261005-B-PRODUCTION68",
+    "queue_index": 228,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+    "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+    "candidate_sha256": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+    "physical_elements": 13,
+    "bbox_size_positive_margin": "13/13",
+    "source_residue": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected": 0,
+    "overlap": 0,
+    "touch_pairs": 0,
+    "controller_visual_qa": "PASS",
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION68/B68_E7F6_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION68/B68_CONTROLLER_SELF_QA.json",
+    "c_final_qa": "PENDING",
+    "in_game_validation": "PENDING",
     "runtime_validation": "UNTESTED"
   }
 }
