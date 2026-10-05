@@ -7,6 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C210 revalidated A67 index193 97E863AD candidate ad3f42856956d15b1c0ecba032d18ebb730c375f4b0a52b456c975e89e9396b7. Independent canonical QA reproduces 13/13 source/localized bboxes exactly with size/positive margins and all outside/alpha/source-residue/overlap/touch/protected gates zero, but mandatory C visual QA returns it again: width-ratio-driven tracking visibly detaches Hangul syllables (쇼룸 132px tracking, 멀티플레이 33.25px, 환영합니다 38.75px, Goal rows 41-48px) unlike the source condensed continuous spacing. Keep Black/source-height/anchors/protected tokens, remove artificial tracking. C210_REWORK_REQUIRED_EXCESSIVE_INTERGLYPH_TRACKING_SOURCE_SPACING. RUNTIME_VALIDATION=UNTESTED.",
+    "C211 independently finalized new A69 index201 A9ABD877 candidate 59b21fa3aadf86e892dbd6adee4b178b2dad09048fd314fd731135f363d6a6fe. Canonical 2048x2048 BGRA/header/raw mirror_y QA reproduces source/localized bboxes 17/17 exactly; containment/size/positive margins and canonical phonetic stage mapping PASS; outside/alpha/visible/source-residue/overlap/touch/protected all 0; Night Bird and Radiation song-title regions pixel-exact. Controller readable/raw visual PASS with shared Black stage family/right alignment and UI left alignment, no artificial spacing. C211_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION67 consumed C208 odd index193 97E863AD scale/proportion REWORK. A66 was fail-closed by controller for excessive tracking; A67 ad3f42856956d15b1c0ecba032d18ebb730c375f4b0a52b456c975e89e9396b7 uses Black source-family weight plus moderated tracking without horizontal glyph distortion. 13/13 bbox/size/positive-margin and CLEAN/FINAL PASS; all zero-pixel/protected/product-token gates 0; readable/raw mirror_y visual PASS. Pending independent C. RUNTIME_VALIDATION=UNTESTED.",
     "C209 finalized new B154 index34 B7E25BAD candidate 7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800 and positively classified zoom_review Total Rank -> 종합 랭킹. Independent canonical 4096x2048 RGBA32/header/raw mirror_y QA and C202-approved same-family template reconstruction reproduce localized bbox [2172,1198,2404,1262] inside source core [2036,1194,2541,1266] with positive margins; decoded/alpha/introduced-visible outside=0 and source-title residue=0. Template/HOLL differences are confined to 240 title/effect pixels plus one alpha-1 white AA pixel; all other HOLL artwork remains canonical. Controller SOURCE/CLEAN/FINAL/raw visual PASS. C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "C208 returned new A65 index193 97E863AD candidate 0352a4e0eb0285f9b021fb5046da7b778e3de3317b2348efad69158e0742000d. Independent canonical/header/raw mirror_y QA passes 13/13 source/localized bbox exact + size + positive margins and all outside/alpha/introduced-visible/source-residue/overlap/touch/protected gates at zero; OutRun/OutRun2SP/OUTRUN/TESTAROSSA protected pixels remain exact. Mandatory controller visual QA fails source-style scale/proportion: Korean labels are materially underscaled/too compact versus the wide bold-condensed source family (e.g. SHOWROOM 88/389px, MULTIPLAYER 232/532px, WELCOME 148/473px, ONLINE 64/172px). C208_REWORK_REQUIRED_SOURCE_STYLE_SCALE_PROPORTION; re-render larger/wider inside exact source bboxes. RUNTIME_VALIDATION=UNTESTED.",
@@ -3945,10 +3947,11 @@
     "c176_return_resolved": true,
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_artwork_localize_text": 8,
-  "current_producer_rework_remaining": 1,
+  "current_pending_artwork_localize_text": 7,
+  "current_producer_rework_remaining": 2,
   "current_producer_rework_assets": [
-    "37759842"
+    "37759842",
+    "97E863AD"
   ],
   "latest_b_production": {
     "run": "B_PRODUCTION154",
@@ -4000,7 +4003,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C210-C211-BATCH/C210_C211_BATCH_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4061,9 +4064,7 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [
-    "97E863AD"
-  ],
+  "current_pending_c": [],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -4654,6 +4655,50 @@
     "pending_independent_c_final_qa": true,
     "report": "localization/graphics/role_A/20261005-A-PRODUCTION67-STYLE/A67_97E863AD_REPORT.json",
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION67-STYLE/A67_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c210_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T23:30:00+09:00",
+    "run": "20261005-C210-97E863AD",
+    "queue_index": 193,
+    "candidate_sha256": "ad3f42856956d15b1c0ecba032d18ebb730c375f4b0a52b456c975e89e9396b7",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "13/13 PASS",
+    "zero_pixel_gates": {
+      "outside": 0,
+      "alpha_outside": 0,
+      "introduced_visible_outside": 0,
+      "source_residue": 0,
+      "overlap": 0,
+      "touch": 0,
+      "protected_changed": 0
+    },
+    "controller_visual_qa": "FAIL_SOURCE_STYLE_EXCESSIVE_INTERGLYPH_TRACKING",
+    "decision": "C210_REWORK_REQUIRED_EXCESSIVE_INTERGLYPH_TRACKING_SOURCE_SPACING",
+    "report": "localization/graphics/role_C/20261005-C210-97E863AD/C210_97E863AD_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c211_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T23:30:00+09:00",
+    "run": "20261005-C211-A9ABD877",
+    "queue_index": 201,
+    "candidate_sha256": "59b21fa3aadf86e892dbd6adee4b178b2dad09048fd314fd731135f363d6a6fe",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "17/17 PASS",
+    "semantic_binding_policy_pass": true,
+    "protected_song_titles": "Night Bird/Radiation pixel-exact",
+    "zero_pixel_gates": {
+      "outside": 0,
+      "alpha_outside": 0,
+      "introduced_visible_outside": 0,
+      "source_residue": 0,
+      "overlap": 0,
+      "touch": 0,
+      "protected_changed": 0
+    },
+    "controller_visual_qa": "PASS",
+    "decision": "C211_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "report": "localization/graphics/role_C/20261005-C211-A9ABD877/C211_A9ABD877_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
