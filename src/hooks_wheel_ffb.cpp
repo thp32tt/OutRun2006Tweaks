@@ -500,7 +500,9 @@ namespace
                 splashAmp_ = 0.0f;
 
                 LONG testLevel = manualTestDirection_ * 2000L;
-                if (Settings::WheelFFBInvertForce)
+                const auto testModel = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                if (WheelFFBMath::model_invert_force(testModel))
                     testLevel = -testLevel;
                 set_constant_force(testLevel);
                 --manualTestFrames_;
@@ -562,6 +564,23 @@ namespace
                 WheelFFBMath::model_uses_original_condition_backbone(ffbModel);
             const bool ps2Original =
                 ffbModel == WheelFFBMath::Model::PS2OriginalExperimental;
+            const bool modelInvertForce =
+                WheelFFBMath::model_invert_force(ffbModel);
+            const bool modelInvertSpring =
+                WheelFFBMath::model_invert_spring(ffbModel);
+            if (bool(Settings::WheelFFBInvertForce) != modelInvertForce ||
+                bool(Settings::WheelFFBInvertSpring) != modelInvertSpring)
+            {
+                Settings::WheelFFBInvertForce = modelInvertForce;
+                Settings::WheelFFBInvertSpring = modelInvertSpring;
+                if (Settings::WheelFFBDebugLog)
+                {
+                    spdlog::info(
+                        "WheelFFB: model-owned polarity self-heal model={} invertCF={} invertSpring={}",
+                        WheelFFBMath::model_name(ffbModel),
+                        modelInvertForce, modelInvertSpring);
+                }
+            }
             const float ps2DriveFactor =
                 ps2Original ? WheelFFBPS2::drive_factor(speedRaw) : 0.0f;
             // Modern SAT deliberately clamps its normalized speed to 0..1,
@@ -837,7 +856,16 @@ namespace
                 WheelFFBMath::common_contact_tactile_amplitude(
                     contactTactileEnvelope, speedNorm, configuredRoadDetail,
                     modelOutputStrength) * materialRoadTextureScale;
-            float roadAmp = commonContactTactile;
+            const float imperialStoneCoverage =
+                WheelFFBMath::imperial_stone_paving_coverage(
+                    uniqueStage, collisionContext, surfaceMasks);
+            const float imperialStoneTactile =
+                WheelFFBMath::imperial_stone_paving_amplitude(
+                    imperialStoneCoverage, speedNorm, configuredRoadDetail,
+                    modelOutputStrength);
+            const float commonSurfaceTactile =
+                std::max(commonContactTactile, imperialStoneTactile);
+            float roadAmp = commonSurfaceTactile;
             float roadFreq = 25.0f + 12.0f * speedNorm;
             float ps2SurfaceEnvelope = 0.0f;
             int ps2RoadRaw = 0;
@@ -968,7 +996,7 @@ namespace
             // stronger, but the common DD contact layer fills silent curb/contact
             // gaps.  In particular, PS2 raw magnitudes below its recovered retail
             // Type-4 threshold still get a modest PC tactile cue instead of silence.
-            roadAmp = std::max(roadAmp, commonContactTactile);
+            roadAmp = std::max(roadAmp, commonSurfaceTactile);
 
             if (!arcadeEffects && !ps2Original &&
                 waterFlag && roughness > 0.7f && speedNorm > 0.70f && splashTimer_ <= 0)
@@ -1053,12 +1081,19 @@ namespace
                 static_cast<float>(Settings::WheelFFBSpringStrength), 0.0f, 1.5f);
             const float ps2SpringUserScale =
                 configuredSpringStrength / 0.65f;
+            const float modernDriftSpringScale =
+                ffbModel == WheelFFBMath::Model::ModernDD
+                    ? WheelFFBMath::modern_drift_spring_scale(
+                        vehicleDynamics_.bodySlip())
+                    : 1.0f;
             const float springStrength = ps2Original
                 ? std::clamp(
                     WheelFFBPS2::spring_coefficient_norm() * ps2SpringUserScale,
                     0.0f, 1.0f)
                 : std::clamp(
-                    configuredSpringStrength * springSpeed, 0.0f, 1.0f);
+                    configuredSpringStrength * springSpeed *
+                        modernDriftSpringScale,
+                    0.0f, 1.0f);
             const float configuredSpringSaturation = std::clamp(
                 static_cast<float>(Settings::WheelFFBSpringSaturation),
                 0.1f, 1.0f);
@@ -1113,7 +1148,7 @@ namespace
                         : -1.0f);
             }
 
-            const float softwareSpringSign = Settings::WheelFFBInvertSpring
+            const float softwareSpringSign = modelInvertSpring
                 ? 1.0f : -1.0f;
             float softwareSpring =
                 springEffect_
@@ -1287,6 +1322,21 @@ namespace
                     (frontSlip > 0.0f ? -1.0f : 1.0f) *
                     physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
+
+                // In substantial oversteer, the front contact patches try to
+                // roll into their actual travel direction. Add a bounded caster
+                // follow term toward zero raw front-slip and fade the artificial
+                // centre spring above, so the wheel can pass through centre into
+                // natural countersteer instead of stopping at the car's heading.
+                const float driftCasterAssist =
+                    ffbModel == WheelFFBMath::Model::ModernDD
+                        ? WheelFFBMath::drift_caster_follow_assist(
+                            rawFrontSlip,
+                            vehicleDynamics_.bodySlip(),
+                            speedNorm,
+                            mechanicalTrailMix) * satStrength
+                        : 0.0f;
+                physicsSatTorque += driftCasterAssist;
                 if (!std::isfinite(physicsSatTorque))
                     physicsSatTorque = 0.0f;
             }
@@ -1365,7 +1415,7 @@ namespace
             // Keep SAT/spring/damper on the DD-safe slew path while allowing a
             // crash or gear thunk to arrive promptly without releasing that
             // slew limiter for the whole steering signal.
-            const float forceDirection = Settings::WheelFFBInvertForce ? -1.0f : 1.0f;
+            const float forceDirection = modelInvertForce ? -1.0f : 1.0f;
             const float outputRamp = warmupScale * recreateScale;
             float total = structural * modelOutputStrength * forceDirection * outputRamp;
             float eventOutput = events * outputStrength * forceDirection * outputRamp;
@@ -1582,8 +1632,8 @@ namespace
                     arcadeSpeedNorm, arcadeSpeedStrength, roadAmp, slipAmp,
                     structural, events, total, compressed, eventCompressed, structuralLevel, level, prevConstantLevel_,
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
-                    periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
-                    bool(Settings::WheelFFBInvertSpring));
+                    periodicsActive_, outputStrength, modelInvertForce,
+                    modelInvertSpring);
                 if (telemetryNow - lastTelemetryDetailTick_ >= 1000)
                 {
                     lastTelemetryDetailTick_ = telemetryNow;
@@ -4405,9 +4455,11 @@ namespace
                 vehicleDynamics_.spdCorrelation(),
                 Settings::UseNewInput ? "SDL" : "legacy",
                 static_cast<int>(level),
-                bool(Settings::WheelFFBInvertForce),
+                WheelFFBMath::model_invert_force(
+                    WheelFFBMath::sanitize_model(static_cast<int>(Settings::WheelFFBModel))),
                 springEffect_ ? "HW" : "SW",
-                bool(Settings::WheelFFBInvertSpring),
+                WheelFFBMath::model_invert_spring(
+                    WheelFFBMath::sanitize_model(static_cast<int>(Settings::WheelFFBModel))),
                 static_cast<int>(prevSpringCoefficient_),
                 damperEffect_ ? "HW" : "SW",
                 static_cast<int>(prevDamperCoefficient_),
