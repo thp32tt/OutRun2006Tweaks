@@ -403,12 +403,12 @@ namespace OutRunVRStereo
             if (!EnsureStereoResources(device))
                 return {};
             if (TrackedDepthStencil &&
-                (!RightDepthSynchronized || !RightStencilSynchronized))
+                (!R9IsRightDepthInSync() || !R9IsRightStencilInSync()))
                 TryBootstrapRightDepthFromRecentClear(device);
-            if (TrackedDepthStencil && !RightDepthSynchronized &&
+            if (TrackedDepthStencil && !R9IsRightDepthInSync() &&
                 DepthTestActive(device))
                 return {};
-            if (TrackedDepthStencil && !RightStencilSynchronized &&
+            if (TrackedDepthStencil && !R9IsRightStencilInSync() &&
                 StencilTestActive(device))
                 return {};
 
@@ -565,12 +565,12 @@ namespace OutRunVRStereo
             if (!EnsureStereoResources(device))
                 return {};
             if (TrackedDepthStencil &&
-                (!RightDepthSynchronized || !RightStencilSynchronized))
+                (!R9IsRightDepthInSync() || !R9IsRightStencilInSync()))
                 TryBootstrapRightDepthFromRecentClear(device);
-            if (TrackedDepthStencil && !RightDepthSynchronized &&
+            if (TrackedDepthStencil && !R9IsRightDepthInSync() &&
                 DepthTestActive(device))
                 return {};
-            if (TrackedDepthStencil && !RightStencilSynchronized &&
+            if (TrackedDepthStencil && !R9IsRightStencilInSync() &&
                 StencilTestActive(device))
                 return {};
 
