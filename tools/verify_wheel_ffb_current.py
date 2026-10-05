@@ -759,13 +759,13 @@ print('OK [R9 model polarity + original-mode isolation + course collision guards
 
 # r7 review100 fixes
 forbid(build, 'normalize_legacy_preset(true);', 'legacy numeric signature migration cannot run every physics tick')
-req(build, 'Range<int>{ 0, 7 }', 'feel revision records the R9 hardware migration boundary')
+req(build, 'Range<int>{ 0, 8 }', 'feel revision records the R11 hardware migration boundary')
 req(build, 'Settings::WheelFFBInvertForce = modern;', 'R9 migration derives ConstantForce polarity from active model')
 req(profiles, 'Version = 2', 'named FFB profiles use deterministic-baseline schema version')
 req(profiles, 'canonical_ffb_profile_default(', 'partial FFB profiles start from deterministic canonical baseline')
 req(profiles, 'canonical_ffb_profile_default(\n        std::string_view key, int model)', 'canonical FFB baseline is model-aware')
 req(profiles, 'if (model == 1) // Arcade Original', 'partial Arcade Original profiles receive Arcade baseline')
-req(profiles, 'else if (model == 2) // Arcade + Modern Hybrid', 'partial Hybrid profiles receive Hybrid baseline')
+req(profiles, 'if (model == 2)\n            model = 0;', 'retired Hybrid canonical profiles fold to Modern baseline')
 req(profiles, 'else if (model == 3) // PS2 Original', 'partial PS2 profiles receive PS2 baseline')
 req(profiles, 'key != "MaxTorqueNm" && key != "FeelRevision"', 'internal migration revision is excluded from feel profiles')
 req(profiles, '{"PS2HostGain","1.0"}, {"SpringStrength","0.22"}', 'partial Modern profiles inherit the current Universal spring baseline')
@@ -820,6 +820,10 @@ req(ffb, 'driftCountersteerTorque', 'Modern runtime applies body-slip/caster cou
 req(ffb, '(bodySlip > 0.0f ? -1.0f : 1.0f)', 'drift recovery direction follows body slip rather than reversed front-slip sign')
 req(wheel_ui, 'manual override is allowed until the next model change', 'F11 keeps R3 polarity manually editable after automatic model defaults')
 print('OK [R10 R3 polarity + drift countersteer + snow comfort guards]')
+req(build, 'if (revision < 8)', 'R11 migration exists for already-stamped R10 users')
+req(build, 'nearly(static_cast<float>(Settings::WheelFFBWallImpact), 0.55f)', 'R11 lifts the old Modern wall baseline without overwriting custom values')
+req(profiles, 'values.clear();\n            values.emplace("model", "0");', 'saved Hybrid profiles cannot leak obsolete Hybrid tuning into Modern')
+print('OK [R11 retired-Hybrid migration + wall-impact baseline guards]')
 
 req(ffb, 'telemetryNow - lastTelemetryTick_ >= 200', 'high-volume telemetry is reduced to 5Hz')
 req(ffb, 'telemetryNow - lastTelemetryDetailTick_ >= 1000', 'deep telemetry detail is limited to 1Hz')
