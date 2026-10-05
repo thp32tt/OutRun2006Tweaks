@@ -1781,3 +1781,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - C197 for `55B57CDE` remains unchanged REWORK_REQUIRED. Current producer REWORK remains `37759842`, `8215FD25`, `55B57CDE`; pending-C=0; pending_artwork localize_text=12.
 - A still newer B Laplace-repair script at `c5a7a62109f2` was GitHub-hosted compute-pending at this checkpoint and therefore is not candidate-complete and was not approved. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Current batch evidence: `localization/graphics/role_C/20261005-C197-C199-BATCH/C197_C199_BATCH_FINAL_QA.json`.
+
+## 2026-10-05 21:02 KST — C200 supersedes C199 for latest 8215FD25
+- B146 landed after the C199/B145 decision, so C refreshed again and reviewed the newest completed candidate rather than leaving a stale B145 result current.
+- **C200 / index 30 `8215FD25`** candidate `d8687e615007af7bdd8e4d0bf41f1830e0bf105a3ef225cc157671fc8e9fd377`: producer numeric gates remain 2/2 bbox/size/positive-margin PASS with zero outside/alpha/protected/overlap counters.
+- B146 fixes the speech-bubble clean plate and removes the large source-shaped starburst ghost seen in B145/C199.
+- Mandatory C visual QA still FAILS the starburst clean plate: a broad non-source hazy/blurred field, pale gray/white smears and isolated bright/dark artifacts remain beneath the top-center rays and are visible around the Korean title in FINAL. This violates clean-plate texture/gradient continuity. Decision `C200_REWORK_REQUIRED_STARBURST_TEXTURE_DISCONTINUITY_AND_SMEAR`.
+- C197 for `55B57CDE` remains REWORK_REQUIRED. Current producer REWORK remains `37759842`, `8215FD25`, `55B57CDE`; pending-C=0; pending_artwork localize_text=12. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Current batch evidence: `localization/graphics/role_C/20261005-C197-C200-BATCH/C197_C200_BATCH_FINAL_QA.json`.
