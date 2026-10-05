@@ -403,15 +403,18 @@ namespace WheelFFBMath
     {
         if (uniqueStage != 14 || collisionContext != 0)
             return false;
-        bool sawPrimary = false;
+        bool sawCompanionPaving = false;
         for (unsigned mask : masks)
         {
-            if (mask == PrimaryAsphaltSurfaceMask)
-                sawPrimary = true;
-            else if (mask != ImperialAvenueCompanionPavingMask)
+            if (mask == ImperialAvenueCompanionPavingMask)
+                sawCompanionPaving = true;
+            else if (mask != PrimaryAsphaltSurfaceMask)
                 return false;
         }
-        return sawPrimary;
+        // All-0x2 is the ordinary primary-road case that R9 deliberately made
+        // quiet. Require at least one observed 0x800 paving contact so this
+        // subtle texture cannot leak across the whole stage.
+        return sawCompanionPaving;
     }
 
     inline float imperial_avenue_stone_tactile_amplitude(
@@ -550,41 +553,10 @@ namespace WheelFFBMath
         return 1.0f - 0.95f * t;
     }
 
-    // Bounded mechanical/caster assist toward the velocity-aligned road-wheel
-    // angle. This is deliberately smaller than the tyre SAT itself and only
-    // wakes up at large chassis sideslip, where the front wheels of a real
-    // drifting car naturally self-steer into counter-steer.
-    inline float drift_velocity_alignment_assist(
-        float bodySlip,
-        float yawRate,
-        float steer,
-        float speedNorm)
-    {
-        if (!std::isfinite(bodySlip) || !std::isfinite(yawRate) ||
-            !std::isfinite(steer) || !std::isfinite(speedNorm))
-            return 0.0f;
-
-        constexpr float RoadWheelLockRad = 0.52f;
-        const float speed = std::clamp(speedNorm, 0.0f, 1.0f);
-        const float yawLeadSeconds = 0.10f - 0.045f * speed;
-        const float desiredRoadWheelAngle = std::clamp(
-            bodySlip + yawRate * yawLeadSeconds,
-            -RoadWheelLockRad, RoadWheelLockRad);
-        const float desiredSteer =
-            desiredRoadWheelAngle / RoadWheelLockRad;
-        const float error = std::clamp(
-            desiredSteer - steer, -1.0f, 1.0f);
-
-        const float slipGate = smoothstep01(
-            (std::abs(bodySlip) - 0.18f) / 0.24f);
-        const float errorGate = smoothstep01(
-            (std::abs(error) - 0.03f) / 0.30f);
-        const float speedGate = smoothstep01(
-            (speed - 0.12f) / 0.38f);
-        const float magnitude =
-            0.18f * slipGate * errorGate * speedGate;
-        return error >= 0.0f ? magnitude : -magnitude;
-    }
+    // Drift steering direction is now solved in the front-slip estimator by
+    // converting the right-positive vehicle kinematics into OutRun's steering
+    // coordinate convention. Do not add a second synthetic auto-steer torque
+    // here: SAT itself should reduce physical front-tyre slip toward zero.
 
     inline float physics_return_relief(float alpha, float steerRate)
     {
