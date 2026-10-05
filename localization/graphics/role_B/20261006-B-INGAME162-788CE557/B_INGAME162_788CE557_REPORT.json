@@ -2,7 +2,7 @@
   "schema_version": 1,
   "role": "B",
   "run": "20261006-B-INGAME162-788CE557",
-  "base_head": "e75f2c7cb03c555ebe21d4e7f74d42e27ee729da",
+  "base_head": "4f90ea9ff502a66b93aec91db2f5bf21d6d570c1",
   "queue_index": 106,
   "asset": "textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
   "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
@@ -60,7 +60,10 @@
         826,
         173
       ],
-      "policy": "PRESERVE_PRODUCT_ARTWORK"
+      "policy": "PRESERVE_PRODUCT_ARTWORK",
+      "reviewed_mask": "localization/graphics/role_B/20261005-B-PRODUCTION32/788CE557_SOURCE_MASK_outrun2sp.png",
+      "red_mask_pixels_excluded_for_product_protection": 0,
+      "candidate_must_preserve_product_mask_exact": true
     },
     "transmission_black": {
       "window": [
@@ -397,8 +400,8 @@
     "status": "PASS"
   },
   "containment": {
-    "elements_total": 4,
-    "elements_pass": 4,
+    "elements_total": 5,
+    "elements_pass": 5,
     "elements_fail": 0,
     "changed_pixels_outside_exact_source_bboxes": 0,
     "alpha_changed_outside_exact_source_bboxes": 0,
@@ -408,6 +411,10 @@
     "new_vs_preserved_source_alpha_pixels": 0,
     "two_px_guard_vs_preserved_conflicts": 0,
     "new_pair_overlap_or_2px_guard_conflicts": [],
+    "status": "PASS"
+  },
+  "product_protection": {
+    "OutRun2SP_mask_changed_pixels": 0,
     "status": "PASS"
   },
   "protected_preserved": [
