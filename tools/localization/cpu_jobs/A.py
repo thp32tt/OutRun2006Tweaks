@@ -198,8 +198,12 @@ def gradient(size,profile):
 def render(row):
     ob=row["original_bbox"]; aw,ah=ob[2]-ob[0],ob[3]-ob[1]
     st=styles[row["idx"]]
-    # Loading source is visibly techno/slanted; small PLEASE WAIT stays conservative.
+    # Both source sprites are left-anchored at their atlas origins. Keep that anchor.
+    # The large metallic Loading word is deliberately wide/low-profile; Hangul is
+    # vertically reduced then modestly widened so it does not become a tall square badge.
     slant_ratio=0.10 if row["idx"]==0 else 0.03
+    target_h=int(round(ah*0.82)) if row["idx"]==0 else ah-4
+    xscale=1.22 if row["idx"]==0 else 1.0
     for fs in range(max(18,int(ah*1.05)),12,-1):
         f=ImageFont.truetype(FONT,fs,index=FONT_INDEX)
         outline=max(1,min(8,int(round(ah*0.045))))
@@ -229,16 +233,22 @@ def render(row):
         lb=layer.getchannel("A").getbbox()
         if not lb: continue
         layer=layer.crop(lb)
-        if layer.width<=aw-4 and layer.height<=ah-4:
-            tx=ob[0]+(aw-layer.width)//2; ty=ob[1]+(ah-layer.height)//2
+        if row["idx"]==0 and xscale!=1.0:
+            layer=layer.resize((int(round(layer.width*xscale)),layer.height),Image.Resampling.LANCZOS)
+            lb=layer.getchannel("A").getbbox()
+            if lb: layer=layer.crop(lb)
+        if layer.width<=aw-4 and layer.height<=target_h:
+            left_margin=8 if row["idx"]==0 else 2
+            tx=ob[0]+left_margin
+            ty=ob[1]+(ah-layer.height)//2
             if tx>ob[0] and ty>ob[1] and tx+layer.width<ob[2] and ty+layer.height<ob[3]:
-                return layer,(tx,ty),fs,outline,body_extra,slant,[sw,sh]
+                return layer,(tx,ty),fs,outline,body_extra,slant,[sw,sh],{"alignment":"left","xscale":xscale,"target_height":target_h}
     raise RuntimeError(("fit",row))
 
 final=clean.copy()
 target_masks={}
 for row in rows:
-    layer,(tx,ty),fs,outline,body_extra,slant,shadow=render(row)
+    layer,(tx,ty),fs,outline,body_extra,slant,shadow,layout=render(row)
     layer.save(out/f"A_PRODUCTION27_REGION_{row['idx']}_KOREAN_LAYER.png")
     lm=bmask(layer.getchannel("A"))
     final.paste(layer,(tx,ty),lm)
@@ -255,7 +265,7 @@ for row in rows:
                 "positive_margin":"PASS" if positive else "FAIL",
                 "raw_localized_bbox":[loc[0],H-loc[3],loc[2],H-loc[1]],
                 "font_file":FONT,"font_face_index":FONT_INDEX,"font_pattern":FONT_PATTERN,"font_size":fs,
-                "outline_px":outline,"body_extra_px":body_extra,"slant_px":slant,"shadow_offset":shadow,
+                "outline_px":outline,"body_extra_px":body_extra,"slant_px":slant,"shadow_offset":shadow,"layout":layout,
                 "source_style":{"dark":styles[row["idx"]]["dark"],"bright":styles[row["idx"]]["bright"],
                                 "margins":styles[row["idx"]]["margins"],
                                 "profile_samples":[styles[row["idx"]]["profile"][0],
