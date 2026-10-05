@@ -10380,6 +10380,43 @@ def main() -> None:
             + ", ".join(missing_r264_programmable_shader_source_evidence)
         )
 
+    r265_programmable_shader_instruction_decoder_contract = [
+        ("struct ProgrammableShaderInstructionDecode",
+         PIPELINE_TRANSLATION_HPP, "R265 decoded instruction-stream evidence type"),
+        ("decode_programmable_shader_instruction_stream(",
+         PIPELINE_TRANSLATION_HPP, "R265 instruction decoder declaration"),
+        ("R265_D3D9_SM2_SM3_INSTRUCTION_OPERAND_DECODER_V1",
+         PIPELINE_TRANSLATION_CPP, "R265 decoder revision provenance"),
+        ("R265_RAW_OPCODE_OPERANDS_NO_REGISTER_SAMPLER_LINKAGE_SEMANTICS_V1",
+         PIPELINE_TRANSLATION_CPP, "R265 bounded semantic-contract provenance"),
+        ("opcode == static_cast<DWORD>(D3DSIO_COMMENT)",
+         PIPELINE_TRANSLATION_CPP, "R265 COMMENT boundary handling"),
+        ("opcode == static_cast<DWORD>(D3DSIO_END)",
+         PIPELINE_TRANSLATION_CPP, "R265 exact END boundary"),
+        ("opcode > static_cast<DWORD>(D3DSIO_BREAKP)",
+         PIPELINE_TRANSLATION_CPP, "R265 unknown opcode fail-closed gate"),
+        ("instructionDecodeExact",
+         RUNTIME_CENSUS, "R265 production census records decoder exactness"),
+        ("decode_programmable_shader_instruction_stream(evidence)",
+         RUNTIME_CENSUS, "R265 production GetFunction evidence feeds decoder"),
+        ("decodedStreamHash",
+         RUNTIME_CENSUS, "R265 source-derived stream provenance retained"),
+        ("R265 decodes exact SM3 instruction and raw operand provenance",
+         CONSTANT_BUFFER_PROBE, "R265 positive structural decoder regression"),
+        ("R265 fails closed on truncated, unknown-opcode, and SM1 streams",
+         CONSTANT_BUFFER_PROBE, "R265 malformed/unsupported fail-closed regression"),
+    ]
+    missing_r265_programmable_shader_instruction_decoder = [
+        meaning for token, source, meaning
+        in r265_programmable_shader_instruction_decoder_contract
+        if token not in source
+    ]
+    if missing_r265_programmable_shader_instruction_decoder:
+        raise SystemExit(
+            "DX11 R265 programmable shader instruction-decoder drift: "
+            + ", ".join(missing_r265_programmable_shader_instruction_decoder)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
