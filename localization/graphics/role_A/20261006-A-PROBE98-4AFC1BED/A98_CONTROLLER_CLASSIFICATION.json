@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PROBE98-4AFC1BED",
+  "queue_index": 25,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/4AFC1BED_512x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_sha256": "542025bee37f371b236d77854b4b7f95574ae051b91bc31a205af03dfd1adb7f",
+    "worker_probe": "localization/graphics/role_A/20261006-A-PROBE98-4AFC1BED/A98_4AFC1BED_PROBE.json"
+  },
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "format": "RGBA32",
+    "mips": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+  "visual_findings": {
+    "readable_orientation": [
+      "Rank-grade artwork A/B/C/D/E only",
+      "heart-plus-x status icon and sparkle",
+      "character portrait/artwork",
+      "no language-bearing word, sentence, menu label, stage name, title, or credit"
+    ],
+    "raw_orientation": "PASS_MIRROR_Y_SOURCE_ART_PRESERVED",
+    "source_components": 9,
+    "localizable_segments": 0
+  },
+  "decision": {
+    "korean_candidate_required": false,
+    "preserve_original_entire_dds": true,
+    "reason": "The visible Latin A-E are grade/rank symbols, not translatable prose or labels. Replacing them would alter grade semantics/artwork rather than localize language.",
+    "queue_disposition": "ZOOM_REVIEW_COMPLETE_NO_LOCALIZABLE_TEXT",
+    "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION"
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261006-A-PROBE98-4AFC1BED/A98_SOURCE_READABLE.png",
+    "localization/graphics/role_A/20261006-A-PROBE98-4AFC1BED/A98_SOURCE_RAW.png",
+    "localization/graphics/role_A/20261006-A-PROBE98-4AFC1BED/A98_SOURCE_COMPONENTS.png"
+  ],
+  "status": "A98_ZOOM_REVIEW_COMPLETE_PRESERVE_ORIGINAL"
+}
