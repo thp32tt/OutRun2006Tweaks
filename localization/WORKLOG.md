@@ -2088,3 +2088,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/OLD/CLEAN/FINAL 4x, family contact and raw mirror_y PASS: no residue, mixed-lowres, broken glyph, clipping, overlap or foreign-image intrusion; source hierarchy is materially improved.
 - State: B172_STATIC_PASS_PENDING_C_AND_INGAME_RETEST. Independent C + NEW actual in-game retest remain mandatory; not CLOSED. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_IGR010_REPORT.json; localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_CONTROLLER_SELF_QA.json.
+
+## 2026-10-06 08:05 KST — A98 index25 4AFC1BED zoom-review classification
+
+- Refreshed the current branch after A97/B172 activity. A has no active owned in-game P0/P1 row, no C-returned REWORK_REQUIRED row, and no remaining `pending_artwork` localize_text row, so the next contract tier is the oldest odd-shard `zoom_review`: index25 `4AFC1BED_512x512.dds`.
+- GitHub-hosted A worker decoded the exact Sonic-TV/OR2006Sprites pinned source SHA-256 `542025bee37f371b236d77854b4b7f95574ae051b91bc31a205af03dfd1adb7f`: 2048x2048 RGBA32, mip1, raw mirror_y. Readable and raw controller inspection shows only A/B/C/D/E rank-grade symbols, heart+x status icon, sparkle and character portrait/artwork.
+- No language-bearing word, sentence, menu label, stage name, title or credit exists in this DDS. The A-E letters are grade/rank symbols and remain source artwork; translating/redrawing them would alter grade semantics rather than localize language.
+- Result: `A98_ZOOM_REVIEW_COMPLETE_PRESERVE_ORIGINAL`. Localizable segments=0; entire DDS preserved; no Korean DDS candidate is required. Queue/transcription/artwork-plan state now records the positive no-text classification so the asset is not re-reviewed.
+- Evidence: `localization/graphics/role_A/20261006-A-PROBE98-4AFC1BED/A98_4AFC1BED_PROBE.json`, `A98_SOURCE_READABLE.png`, `A98_SOURCE_RAW.png`, `A98_SOURCE_COMPONENTS.png`, and `A98_CONTROLLER_CLASSIFICATION.json`.
+- Remaining blocked `zoom_review` rows: 40. Next normal A row is odd index27 `8B52FEEC` unless a higher-priority in-game/C-returned row appears. No VR/FFB/DX11/DXVK work.
+
