@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00401",
+  "production_id": "CONVERSION-DX9EX-00401",
+  "event_id": "CONVERSION-DX9EX-00401-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "queue_controller_contract": {
+    "path": "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "status": "APPLIED"
+  },
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "b2d974faff6057250d58dcc1bd91911d79a72f79",
+  "source_material_sha": "1b0483d045b1b357ebe4a24b0071b416186bd9b5",
+  "result_sha": "7b5d43886b552f07a02c354ac240943a066d76bc",
+  "material_result_sha": "7b5d43886b552f07a02c354ac240943a066d76bc",
+  "validation_bearing_result_sha": "7b5d43886b552f07a02c354ac240943a066d76bc",
+  "state_commit_sha": "72c9f1ee4fa868a84763441fea8b4a3a65b29aee",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00401]",
+  "selected_work_item": "VR-REFACTOR-POST1000-DISPATCHER-OWNER-BOUNDARIES-0011",
+  "summary": "Closed the next post-1000 dispatcher ownership boundary batch from the latest RED checkpoint. R30 now owns lower R29 draw-hook storage behind four R30CallLowerDraw* APIs, R31 observes R30 readiness through R30InstallStatus(), and R32 observes the R9 seed state through R9StereoBaselineSeeded(). Task-tagged verifier commits lock the matching lower-hook delegation, acquire-load semantics and direct seed-state semantics, and update the R32/R33 compatibility verifier to require the new owner APIs rather than the retired raw hook symbol. No rendering math, draw order, hook target, D3D call set, OpenXR state, resource allocation, wait or lock behavior was changed by the task-tagged commits.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_refactor_contract.py",
+    "tools/verify_vr_r32_review.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00401.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read branch HEAD, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, VR_REFACTOR_STATE, VR_AUTODEV_STATE, VR_PROBLEM_HISTORY, VR_REGRESSION_KNOWLEDGE, Issue #14 and recent refactor/test history. HEAD advanced concurrently from 00400 bookkeeping to explicit owner-boundary RED checkpoints; latest GitHub state was treated as SSOT."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Exact b2d974fa RED verification reported 20 owner-boundary violations: R31/R33 directly referenced four R30 lower-hook storage objects; R30 owner call APIs were absent; R31 directly read R30InstallState; R32 directly read R9StereoSeeded."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Concurrent latest-SSOT source closure 1b0483d0 introduced and routed R30CallLowerDraw* APIs, R30InstallStatus() and R9StereoBaselineSeeded(). Task-tagged 8b752bba strengthened semantic delegation/status/seed guards; task-tagged 7b5d4388 repaired stale verify_vr_r32_review.py to require all four R30 owner calls."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact 7b5d43886b552f07a02c354ac240943a066d76bc: DX9Ex Active Validation 37266115464 SUCCESS (policy 111623225504, host 111623298288, game 111623298564, full-chain-compile 111623298252, package 111624380421); Domain Isolation Guard 37266115453 SUCCESS. N100 detached exact-SHA py_compile + architecture + R51 + R32/R33 + hook graph + refactor contract + near-plane suite PASS. No HMD/game runtime test."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "source_material_sha": "1b0483d045b1b357ebe4a24b0071b416186bd9b5",
+      "result_sha": "7b5d43886b552f07a02c354ac240943a066d76bc",
+      "validation_bearing_result_sha": "7b5d43886b552f07a02c354ac240943a066d76bc",
+      "task_tagged_commits": [
+        "8b752bbaf86e4fde7f2dc943f5e3536ee6291e57 test(vr): lock dispatcher owner boundary semantics [AUTO:CONVERSION-DX9EX-00401]",
+        "7b5d43886b552f07a02c354ac240943a066d76bc test(vr): align R32 review with R30 owner boundary [AUTO:CONVERSION-DX9EX-00401]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Artifact 11326970477 OutRun2-VR-DX9EX-ACTIVE-7b5d43886b552f07a02c354ac240943a066d76bc digest sha256:21aa57138006f8d6006166e70dfaebc274994c2b5f010c17e98c540527163b69 size 2730668 bytes. Build artifact is not runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "state_commit_sha": "72c9f1ee4fa868a84763441fea8b4a3a65b29aee",
+      "issue14_update": "PENDING_LEDGER_COMMENT",
+      "issue13_update": "NOT_REQUIRED_NO_RUNTIME_PROBLEM_STATUS_CHANGE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "evidence": {
+    "red": {
+      "sha": "b2d974faff6057250d58dcc1bd91911d79a72f79",
+      "n100_refactor_contract": "FAIL_20_OWNER_BOUNDARY_VIOLATIONS"
+    },
+    "source_closure": {
+      "sha": "1b0483d045b1b357ebe4a24b0071b416186bd9b5",
+      "n100_refactor_contract": "PASS"
+    },
+    "dx9ex_active": {
+      "run_id": 37266115464,
+      "conclusion": "success",
+      "exact_sha": "7b5d43886b552f07a02c354ac240943a066d76bc",
+      "jobs": {
+        "policy": 111623225504,
+        "host": 111623298288,
+        "game": 111623298564,
+        "full_chain_compile": 111623298252,
+        "package": 111624380421
+      },
+      "artifact_id": 11326970477,
+      "artifact_digest": "sha256:21aa57138006f8d6006166e70dfaebc274994c2b5f010c17e98c540527163b69"
+    },
+    "domain_isolation": {
+      "run_id": 37266115453,
+      "conclusion": "success",
+      "exact_sha": "7b5d43886b552f07a02c354ac240943a066d76bc"
+    },
+    "n100_local": {
+      "conclusion": "AUXILIARY_EXACT_SHA_STATIC_PASS",
+      "exact_sha": "7b5d43886b552f07a02c354ac240943a066d76bc",
+      "checks": [
+        "py_compile refactor/r32 verifiers",
+        "architecture",
+        "R51 runtime contract",
+        "R32-R34 compatibility/Present",
+        "hook graph",
+        "refactor contract",
+        "near-plane active gate"
+      ]
+    }
+  },
+  "next_action": "Do not repeat 0011. Preserve R30 lower-draw wrappers, R30InstallStatus(), R9StereoBaselineSeeded(), and their semantic verifier guards. Continue only the next bounded post-1000 structural successor supported by current source/static evidence.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00401",
+    "production_id": "CONVERSION-DX9EX-00401",
+    "event_id": "CONVERSION-DX9EX-00401-E001",
+    "event_type": "dispatch",
+    "lane": "DX9EX",
+    "target_branch": "vr-d3d9ex-focus",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "7b5d43886b552f07a02c354ac240943a066d76bc",
+    "validation_bearing_result_sha": "7b5d43886b552f07a02c354ac240943a066d76bc",
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "validated_at_kst": "2026-10-05T14:09:36+09:00",
+  "completed_at_kst": "2026-10-05T14:09:57+09:00"
+}
