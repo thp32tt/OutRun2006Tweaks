@@ -11,6 +11,7 @@ on:
       - 'tools/test_extract_dxvk_canonical_window.py'
       - 'tools/test_dxvk_continuation_102_control_flow.py'
       - 'tools/test_dxvk_continuation_103_control_flow.py'
+      - 'tools/test_dxvk_continuation_104_control_flow.py'
       - 'tools/test_verify_dxvk_continuation_window.py'
       - 'tools/extract_dxvk_canonical_window.py'
       - '.github/workflows/dxvk-disasm-evidence.yml'
@@ -51,6 +52,10 @@ jobs:
       - name: Verify F139 control-flow regression
         shell: pwsh
         run: python -m unittest discover -s tools -p 'test_dxvk_continuation_103_control_flow.py' -v
+
+      - name: Verify F141 control-flow regression
+        shell: pwsh
+        run: python -m unittest discover -s tools -p 'test_dxvk_continuation_104_control_flow.py' -v
 
       - name: Verify canonical window extractor
         shell: pwsh
