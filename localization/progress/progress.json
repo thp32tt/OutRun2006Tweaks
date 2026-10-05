@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T23:45:00+09:00",
+  "updated_at_kst": "2026-10-05T23:56:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B155 cleared stale even-shard index152 49BB5FE5 HOLD without generating a prohibited redraw. Mandatory TRANSLATION_NAMING_POLICY plus C150 same-family precedent classify PRO./INS./G.M./E.R. (PROTOTYPE/INSTRUMENTAL/GUITAR MIX/EURO REMIX) as protected music-version/mix artwork; '89/'86 are preserved badges. Queue row remains localize_text for stable historical indexing but artwork_status is now preserve_original_policy_no_candidate_required; no DDS candidate or runtime validation is required for localization. A70 simultaneously consumed C210 index193 97E863AD and is pending independent C, so current producer REWORK is only 37759842; pending-C=97E863AD; pending_artwork localize_text=7. Queue category counts remain 84 localize_text + 42 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit. Next B production target is oldest even zoom_review index36 06AB5CEE. No VR/FFB/DX11/DXVK work.",
+  "next_checkpoint": "C212/C213 consumed only the new A70/B155 results. C212 independently revalidated A70 index193 97E863AD candidate b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d: canonical 2048x1024 RGBA32/header/raw mirror_y, 13/13 exact source/localized bbox+size+positive margins, outside/alpha/introduced-visible/source-residue/overlap/touch/protected all 0. C210 detached-syllable defect is resolved with 0px artificial tracking/natural font advance and no horizontal glyph scaling while retaining Black/source-height family (~0.84-0.91 height ratio), anchors and exact product/model tokens. Visual PASS -> C212_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. C213 independently confirms B155 index152 49BB5FE5 preserve-original policy: PRO./INS./G.M./E.R. are music-version/mix qualifiers and '89/'86 badges; no Korean candidate is permitted or required, closing B63 HOLD by semantic scope correction rather than relaxing pixel gates. Current producer REWORK=1 (37759842); pending-C=0; pending_artwork localize_text=7. Queue counts remain 84 localize_text + 42 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit. RUNTIME_VALIDATION=UNTESTED for 97E863AD; 49BB5FE5 runtime N/A.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -270,10 +270,8 @@
         "37759842"
       ],
       "remaining": 1,
-      "note": "A70 repaired C210-returned 97E863AD with 0px artificial tracking and controller visual PASS; now pending independent C. 37759842 remains manual/template-only C186 REWORK and rejected clean-plate families were not repeated. pending_artwork localize_text=7; RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": [
-        "97E863AD"
-      ]
+      "note": "C212 approved A70 97E863AD spacing repair; C213 closed 49BB5FE5 as preserve-original policy/no candidate. Only 37759842 remains producer REWORK. pending_artwork localize_text=7; pending-C=0; RUNTIME_VALIDATION=UNTESTED for localized candidates.",
+      "pending_c": []
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -297,39 +295,41 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C210_C211",
-      "report": "localization/graphics/role_C/20261005-C210-C211-BATCH/C210_C211_BATCH_FINAL_QA.json",
-      "result": "C210_REWORK_REQUIRED + C211_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "run": "C212_C213",
+      "report": "localization/graphics/role_C/20261005-C212-C213-BATCH/C212_C213_BATCH_FINAL_QA.json",
+      "result": "C212_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME + C213_PRESERVE_ORIGINAL_POLICY_PASS_NO_CANDIDATE_REQUIRED",
       "candidate_changed_by_C": false,
       "assets_checked": 2,
-      "physical_elements_checked": 30,
+      "physical_elements_checked": 13,
+      "semantic_policy_items_checked": 6,
       "pixel_visual_pass_assets": [
-        "A9ABD877"
-      ],
-      "rework_required_assets": [
         "97E863AD"
       ],
+      "policy_pass_no_candidate_assets": [
+        "49BB5FE5"
+      ],
+      "rework_required_assets": [],
       "global_rework_remaining": [
-        "37759842",
-        "97E863AD"
+        "37759842"
       ],
       "strict_hold_no_candidate": [
         "4F68708E",
         "F6811E94",
-        "49BB5FE5",
         "75C3586A"
       ],
       "pending_c_localize_text": 0,
       "pending_production_localize_text": 7,
       "machine_evidence": {
-        "97E863AD": "localization/graphics/role_C/20261005-C210-97E863AD/C210_97E863AD_MACHINE_QA.json",
-        "A9ABD877": "localization/graphics/role_C/20261005-C211-A9ABD877/C211_A9ABD877_MACHINE_QA.json"
+        "97E863AD": "localization/graphics/role_C/20261005-C212-97E863AD/C212_97E863AD_MACHINE_QA.json"
       },
       "controller_visual": {
-        "97E863AD": "FAIL_SOURCE_STYLE_EXCESSIVE_INTERGLYPH_TRACKING",
-        "A9ABD877": "PASS"
+        "97E863AD": "PASS",
+        "49BB5FE5": "NOT_APPLICABLE_PRESERVE_ORIGINAL_POLICY"
       },
-      "in_game_validation": "97E863AD UNTESTED; A9ABD877 UNTESTED; RUNTIME_VALIDATION=UNTESTED"
+      "policy_evidence": {
+        "49BB5FE5": "localization/graphics/role_C/20261005-C213-49BB5FE5-POLICY/C213_49BB5FE5_CONTROLLER_FINAL_QA.json"
+      },
+      "in_game_validation": "97E863AD UNTESTED; 49BB5FE5 NOT_APPLICABLE_FOR_LOCALIZATION; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION154",
@@ -1238,7 +1238,7 @@
       "report": "localization/graphics/role_C/20261005-C170-754F0599/C170_754F_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C203-C207-BATCH/C203_C207_BATCH_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C212-C213-BATCH/C212_C213_BATCH_FINAL_QA.json",
     "c171_controller_final_qa": {
       "timestamp_kst": "2026-10-05T16:06:00+09:00",
       "run": "20261005-C171-754F0599",
@@ -1348,7 +1348,7 @@
         "family": "wide bold-condensed dark/blue-gray UI labels",
         "face": "Noto Sans CJK KR Black",
         "method": "natural font advance/kerning only; no artificial tracking; no horizontal glyph scaling",
-        "artificial_tracking_px": 0.0,
+        "artificial_tracking_px": 0,
         "controller_visual_qa": "PASS_C210_SPACING_REWORK_NATURAL_ADVANCE"
       },
       "structure": {
