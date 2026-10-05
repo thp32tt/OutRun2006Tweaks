@@ -1060,12 +1060,17 @@ namespace OutRunVRStereo
 			if(SharedState&&SharedState->magic==OutRunVR::SharedMagic){InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeToken),0);InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeHandle),0);}
 		}
 
+		void ReleaseDirectInteropProbe() noexcept
+		{
+			RetireDirectInteropProbePublication();
+			ReleaseCom(DirectInteropProbeFence);ReleaseCom(DirectInteropProbeSurface);ReleaseCom(DirectInteropProbeTexture);DirectInteropProbeHandle=nullptr;DirectInteropProbeToken=0;DirectInteropVerified=false;
+		}
+
 		void ReleaseStereoResources()
 		{
 			StereoResourcesReady=false;DirectTransportResourcesReady=false;
 			for(auto&slot:DirectTransportSlots){ReleaseCom(slot.fence);ReleaseCom(slot.leftSurface);ReleaseCom(slot.leftTexture);ReleaseCom(slot.rightSurface);ReleaseCom(slot.rightTexture);slot={};}
-			RetireDirectInteropProbePublication();
-			ReleaseCom(DirectInteropProbeFence);ReleaseCom(DirectInteropProbeSurface);ReleaseCom(DirectInteropProbeTexture);DirectInteropProbeHandle=nullptr;DirectInteropProbeToken=0;DirectInteropVerified=false;
+			ReleaseDirectInteropProbe();
 			DirectTransportFormat=D3DFMT_UNKNOWN;ProjectionInverseValid=false;ReleaseCom(RightEyeSurface);ReleaseCom(RightEyeDepth);ReleaseCom(LeftResolveSurface);ReleaseCom(LeftResolveTexture);ReleaseCom(RightResolveSurface);ReleaseCom(RightResolveTexture);ReleaseCom(BackBuffer);ReleaseCom(TrackedRenderTarget);ReleaseCom(TrackedDepthStencil);RightDepthSynchronized=true;RightStencilSynchronized=true;BackBufferDesc={};
 		}
 		bool CreateRightDepthForTracked(IDirect3DDevice9* device)

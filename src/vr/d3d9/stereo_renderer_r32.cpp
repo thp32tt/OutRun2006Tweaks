@@ -437,13 +437,7 @@ namespace OutRunVRStereo
             R32DirectCopyPathRejected = false;
             R32DirectCopyRejectHr = D3D_OK;
             ReleaseDirectTransportSlots();
-            RetireDirectInteropProbePublication();
-            ReleaseCom(DirectInteropProbeFence);
-            ReleaseCom(DirectInteropProbeSurface);
-            ReleaseCom(DirectInteropProbeTexture);
-            DirectInteropProbeHandle = nullptr;
-            DirectInteropProbeToken = 0;
-            DirectInteropVerified = false;
+            ReleaseDirectInteropProbe();
             R32ForgetDirectIdentity();
             ++R32DirectIdentityInvalidations;
         }
