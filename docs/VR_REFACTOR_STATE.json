@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T08:30:00+09:00",
+  "updatedKst": "2026-10-06T08:42:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -81,7 +81,8 @@
     "VR-REFACTOR-POST1100-R32-LIVE-EFFECT-SNAPSHOT-NEUTRAL-OWNER-0016",
     "VR-REFACTOR-POST1100-VIEWPORT-READ-NEUTRAL-OWNER-0017",
     "VR-REFACTOR-POST1100-R31-R32-OWNER-CENSUS-COMPLETION-0018",
-    "VR-REFACTOR-POST1100-SAFEEYE-IDENTITY-OWNER-0019"
+    "VR-REFACTOR-POST1100-SAFEEYE-IDENTITY-OWNER-0019",
+    "VR-REFACTOR-POST1100-SAFEEYE-FLAT-RUN-GUARD-0020"
   ],
   "next": "Post-1100 R31/R32 neutral-helper extraction chain COMPLETE. Preserve the terminal 15-call owner census and owner-evidence map. Subsequent DX9Ex work may return to the highest executable general quality/performance/stability item; do not reopen structural extraction unless the census/verifier or new source evidence shows a real ownership regression.",
   "runtimeValidation": "UNTESTED",
@@ -188,7 +189,8 @@
     "CONVERSION-DX9EX-00411 completed neutral live effect-state snapshot extraction. Exact SHA 5875486443a60c93764c40ef6d7204f1066e452c passed DX9Ex Active 37346503785 and Domain Isolation 37346503724. Intermediate ba2c5169 run 37346444631 was superseded/cancelled, not a task failure. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00412 completed neutral viewport-read extraction. Exact SHA bbae4e903468703984863c0658d267ad79a538bc passed policy/game/host/full-chain/package jobs in DX9Ex Active 37347553547 and Domain Isolation 37347553486. Runtime remains UNTESTED.",
     "VR-REFACTOR-POST1100-R31-R32-OWNER-CENSUS-COMPLETION-0018: exact-SHA 8b72853bb775ef77fbe1474da824e5cb513d3c78 requires the terminal 15-call R33->R31/R32 allow-list and complete owner-evidence map to have identical keys, and validates every retained helper body still carries its owner-specific evidence. DX9Ex Active 37349813274 and Domain Isolation 37349813314 SUCCESS; runtime UNTESTED.",
-    "CONVERSION-DX9EX-00436 / VR-REFACTOR-POST1100-SAFEEYE-IDENTITY-OWNER-0019 centralizes complete host SafeEye cache ownership in SafeEyesOwnFrame(frame). Legacy EnsureSafeFrame, R32 A/B EnsureSafeFrameR32, R23 RenderCommittedDirect and R24 TryBuildDirectSafeProjection now delegate to the same frameId + transport generation + run generation + game PID + SRV predicate; duplicate consumer-side identity logic is verifier-forbidden. Runtime remains UNTESTED pending Quest3/VDXR."
+    "CONVERSION-DX9EX-00436 / VR-REFACTOR-POST1100-SAFEEYE-IDENTITY-OWNER-0019 centralizes complete host SafeEye cache ownership in SafeEyesOwnFrame(frame). Legacy EnsureSafeFrame, R32 A/B EnsureSafeFrameR32, R23 RenderCommittedDirect and R24 TryBuildDirectSafeProjection now delegate to the same frameId + transport generation + run generation + game PID + SRV predicate; duplicate consumer-side identity logic is verifier-forbidden. Runtime remains UNTESTED pending Quest3/VDXR.",
+    "CONVERSION-DX9EX-00437 / VR-REFACTOR-POST1100-SAFEEYE-FLAT-RUN-GUARD-0020 adds SafeEyesBelongToTransportRun(frame) as the transport/run owner beneath SafeEyesOwnFrame(frame). R24 RenderDirectFlatFallback now requires DirectGPU transport requested + latest complete direct Frame.v2 + matching transport generation/run generation/game PID before sampling SafeEye. This intentionally allows an older SafeEye frame from the same live transport run for visible recovery while rejecting superseded game-process/pre-reset content. Runtime remains UNTESTED pending Quest3/VDXR."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "117d6b7980dd41c8504558b6bafc38dda01e184b",

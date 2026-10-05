@@ -320,7 +320,14 @@ namespace OutRunVrR24BlackScreenGuard
         using namespace OutRunVrSbsCaptureOverride;
         using namespace OutRunVrD3D9ExDirectPassthrough;
 
-        if (!SafeFrameId || !SafeEyeSrv[0] || !SafeEyeWidth || !SafeEyeHeight ||
+        // A flat recovery view may reuse an older SafeEye frame from the same
+        // live DirectGPU transport run, but must never revive SafeEye content
+        // from a superseded game process or pre-reset transport generation.
+        OutRunVR::SharedRenderFrameState latest{};
+        if (!OutRunVrR21RuntimeHardening::DirectTransportRequested() ||
+            !OutRunVrReviewHardening::LatestCompleteDirectFrame(latest) ||
+            !SafeEyesBelongToTransportRun(latest) ||
+            !SafeEyeWidth || !SafeEyeHeight ||
             !EnsureViewSpace(session) || !CreateShaders() ||
             !EnsureSwapchain(Theater, session, 1920, 1080, 1))
             return false;

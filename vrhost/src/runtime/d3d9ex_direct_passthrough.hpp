@@ -115,7 +115,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
         SafeGamePid = 0;
     }
 
-    inline bool SafeEyesOwnFrame(
+    inline bool SafeEyesBelongToTransportRun(
         const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
         const std::uint32_t generation =
@@ -123,13 +123,19 @@ namespace OutRunVrD3D9ExDirectPassthrough
         const std::uint32_t runGeneration =
             frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
         const std::uint32_t gamePid = frame.clientPid;
-        return frame.frameId != 0 && generation != 0 &&
-            runGeneration != 0 && gamePid != 0 &&
-            SafeFrameId == frame.frameId &&
+        return generation != 0 && runGeneration != 0 && gamePid != 0 &&
+            SafeFrameId != 0 &&
             SafeTransportGeneration == generation &&
             SafeRunGeneration == runGeneration &&
             SafeGamePid == gamePid &&
             SafeEyeSrv[0] && SafeEyeSrv[1];
+    }
+
+    inline bool SafeEyesOwnFrame(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        return frame.frameId != 0 && SafeFrameId == frame.frameId &&
+            SafeEyesBelongToTransportRun(frame);
     }
 
     inline void CloseDirectAckMapping() noexcept

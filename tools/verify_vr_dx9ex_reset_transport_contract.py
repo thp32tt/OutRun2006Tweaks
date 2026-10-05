@@ -490,22 +490,39 @@ require(
     "SafeGamePid = 0;",
 )
 
-safe_eye_owner = body(host_passthrough, "inline bool SafeEyesOwnFrame(")
+safe_eye_run_owner = body(
+    host_passthrough, "inline bool SafeEyesBelongToTransportRun("
+)
 require(
-    safe_eye_owner,
-    "SafeEye owner complete run identity",
+    safe_eye_run_owner,
+    "SafeEye transport-run owner complete identity",
     "RenderFrameDirectGenerationIndex",
     "RenderFrameRunGenerationIndex",
     "const std::uint32_t gamePid = frame.clientPid;",
-    "frame.frameId != 0",
     "generation != 0",
     "runGeneration != 0",
     "gamePid != 0",
-    "SafeFrameId == frame.frameId",
+    "SafeFrameId != 0",
     "SafeTransportGeneration == generation",
     "SafeRunGeneration == runGeneration",
     "SafeGamePid == gamePid",
     "SafeEyeSrv[0] && SafeEyeSrv[1]",
+)
+
+safe_eye_owner = body(host_passthrough, "inline bool SafeEyesOwnFrame(")
+require(
+    safe_eye_owner,
+    "SafeEye exact-frame owner delegation",
+    "frame.frameId != 0",
+    "SafeFrameId == frame.frameId",
+    "SafeEyesBelongToTransportRun(frame)",
+)
+forbid(
+    safe_eye_owner,
+    "SafeEye exact-frame owner duplicated transport identity",
+    "SafeTransportGeneration ==",
+    "SafeRunGeneration ==",
+    "SafeGamePid ==",
 )
 
 copy_safe = body(host_passthrough, "inline bool CopySharedFrameToSafeEyes(")
@@ -634,6 +651,25 @@ forbid(
     "SafeTransportGeneration ==",
     "SafeRunGeneration ==",
     "SafeGamePid ==",
+)
+
+# R24 flat recovery may reuse an older SafeEye frame, but only inside the
+# currently live DirectGPU transport/game run. This preserves same-run visual
+# recovery without reviving prior-process or pre-reset eye content.
+direct_flat = body(host_r24, "inline bool RenderDirectFlatFallback(")
+require(
+    direct_flat,
+    "R24 direct-flat current transport-run guard",
+    "OutRunVrR21RuntimeHardening::DirectTransportRequested()",
+    "OutRunVrReviewHardening::LatestCompleteDirectFrame(latest)",
+    "SafeEyesBelongToTransportRun(latest)",
+)
+require_order(
+    direct_flat,
+    "R24 direct-flat identity before SafeEye sampling",
+    "LatestCompleteDirectFrame(latest)",
+    "SafeEyesBelongToTransportRun(latest)",
+    "SourceSrv = SafeEyeSrv[0];",
 )
 
 # Host ACK ownership may observe late completions from a pre-reset generation
