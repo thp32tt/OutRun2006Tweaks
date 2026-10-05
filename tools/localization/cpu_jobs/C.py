@@ -8,20 +8,20 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
 repo=Path.cwd()
-run="20261005-C161-7CE1CFC5"
+run="20261005-C162-7CE1CFC5"
 out=repo/"localization/graphics/role_C"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 
 asset="textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds"
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
-CANDIDATE_COMMIT="909f5796accf27c97b55f9a6d9a4ff4307bdca7f"
+CANDIDATE_COMMIT="e5a80269a745140c4928b97c15a20d0532b56ecf"
 SOURCE_BLOB_SHA1="8e79a14a4453c7e015144c1c2e25a4aacc633645"
 ATLAS_BLOB_SHA1="1a13020899080238d4177800382137f0a3e291a5"
 SOURCE_SHA256="9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f"
-CANDIDATE_SHA256="c1bfad9f88034167d56d3e0186b305caf25318692207f84e6de8474f0b27ceae"
+CANDIDATE_SHA256="b75102588dc30ec828fdec765658d2e25cbcee9d972832bb70b527b372008542"
 
-tmp=Path("/tmp/outrun_C161"); tmp.mkdir(parents=True,exist_ok=True)
+tmp=Path("/tmp/outrun_C162"); tmp.mkdir(parents=True,exist_ok=True)
 sp=tmp/"source.dds"; apath=tmp/"atlas.json"; cp=tmp/"candidate.dds"
 base="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
 urllib.request.urlretrieve(base+"/Release/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",sp)
@@ -136,7 +136,7 @@ for name,m in [("C161_SOURCE_TEXT_MASK.png",source_mask),("C161_ALLOWED_BBOX_MAS
 stack=Image.new("RGB",(1024,2*300),"white")
 for i,(label,im) in enumerate([("SOURCE",src),("FINAL",fin)]):
     z=comp(im).resize((1024,256),Image.Resampling.NEAREST); stack.paste(z,(0,i*300+28)); ImageDraw.Draw(stack).text((5,i*300+5),label,fill="black")
-stack.save(out/"C161_7CE_SOURCE_FINAL.jpg",quality=96)
+stack.save(out/"C162_7CE_SOURCE_FINAL.jpg",quality=96)
 
 cards=[]
 for r in outrows:
@@ -148,18 +148,18 @@ for r in outrows:
     ImageDraw.Draw(c).text((5,5),f'{r["region_idx"]} {r["source"]} -> {r["korean"]}',fill="black"); cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+4 for c in cards)),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.save(out/"C161_7CE_ROW_CONTACT.jpg",quality=96)
+sheet.save(out/"C162_7CE_ROW_CONTACT.jpg",quality=96)
 
 rr=Image.new("RGB",(1024,2*300),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_fin)]):
     z=comp(im).resize((1024,256),Image.Resampling.NEAREST); rr.paste(z,(0,i*300+28)); ImageDraw.Draw(rr).text((5,i*300+5),label,fill="black")
-rr.save(out/"C161_7CE_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"C162_7CE_RAW_COMPARE.jpg",quality=96)
 
-report={"schema_version":1,"role":"C","run":run,"queue_index":59,"asset":asset,"producer_run":"20261005-A-PRODUCTION24",
+report={"schema_version":1,"role":"C","run":run,"queue_index":59,"asset":asset,"producer_run":"20261005-A-PRODUCTION25",
  "candidate_commit":CANDIDATE_COMMIT,
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB_SHA1,"atlas_git_blob_sha1":ATLAS_BLOB_SHA1,"source_sha256":SOURCE_SHA256},
  "candidate_sha256":CANDIDATE_SHA256,"candidate_changed_by_C":False,
- "independent_method":"C re-downloaded pinned canonical DXT5 DDS+atlas and pinned A24 candidate, independently re-derived source alpha masks/exact bboxes from reviewed text ROIs, decoded both images, recomputed exact decoded-pixel containment/alpha/residue/label separation/protected-art and BC3 scope without consuming producer masks.",
+ "independent_method":"C re-downloaded pinned canonical DXT5 DDS+atlas and pinned A25 candidate, independently re-derived source alpha masks/exact bboxes from reviewed text ROIs, decoded both images, recomputed exact decoded-pixel containment/alpha/residue/label separation/protected-art and BC3 scope without consuming producer masks.",
  "structure":{"dimensions":[W,H],"format":"DXT5","mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
  "rows":outrows,
  "machine_checks":{"bbox_size_positive_margin":"4/4 PASS","decoded_changed_outside":outside,"alpha_outside":alpha_out,
@@ -167,12 +167,12 @@ report={"schema_version":1,"role":"C","run":run,"queue_index":59,"asset":asset,"
    "target_protected_overlap":target_protected_overlap,"target_protected_1px_near":target_protected_1px_near,
    "protected_source_changed":protected_changed,"changed_bc3_blocks":changed_blocks,"changed_bc3_blocks_wholly_outside_allowed":changed_blocks_wholly_outside},
  "machine_status":"PASS","controller_visual_qa":"PENDING","decision":"PENDING_CONTROLLER_VISUAL_QA","RUNTIME_VALIDATION":"UNTESTED"}
-(out/"C161_7CE_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(out/"C162_7CE_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"asset":"7CE1CFC5","index":59,"source_sha256":SOURCE_SHA256,"candidate_sha256":CANDIDATE_SHA256,
  "machine_status":"PASS","bbox_size_positive_margin":"4/4","decoded_changed_outside":outside,"alpha_outside":alpha_out,
  "introduced_visible_outside":introduced_visible_out,"source_residue":source_residue,"overlap":overlap,"touch_pairs":len(touch),
  "target_protected_overlap":target_protected_overlap,"target_protected_1px_near":target_protected_1px_near,"protected_source_changed":protected_changed,
  "changed_bc3_blocks":changed_blocks,"changed_bc3_blocks_wholly_outside_allowed":changed_blocks_wholly_outside,
- "runtime_validation":"UNTESTED","report":f"localization/graphics/role_C/{run}/C161_7CE_MACHINE_QA.json"}
-(wr/"C161_7CE1CFC5.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "runtime_validation":"UNTESTED","report":f"localization/graphics/role_C/{run}/C162_7CE_MACHINE_QA.json"}
+(wr/"C162_7CE1CFC5.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False),flush=True)
