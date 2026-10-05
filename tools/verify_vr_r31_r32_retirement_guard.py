@@ -245,7 +245,7 @@ expected_owner_calls = {
     "R32RestoreRightPassState",
     "R32SetWvpBatch",
 }
-observed_owner_calls = set(re.findall(r"\\b(R3[12]\\w+)\\s*\\(", r33))
+observed_owner_calls = set(re.findall(r"\b(R3[12]\w+)\s*\(", r33))
 if observed_owner_calls != expected_owner_calls:
     missing = sorted(expected_owner_calls - observed_owner_calls)
     added = sorted(observed_owner_calls - expected_owner_calls)
