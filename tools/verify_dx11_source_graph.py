@@ -10422,14 +10422,6 @@ def main() -> None:
          PIPELINE_TRANSLATION_HPP, "R266 R265-stream operand-classification receipt"),
         ("R266_D3D9_SM2_SM3_OPCODE_REGISTER_OPERAND_CLASSIFIER_V1",
          PIPELINE_TRANSLATION_CPP, "R266 opcode/register classifier provenance"),
-        ("struct ProgrammableShaderOperandSemanticDecode",
-         PIPELINE_TRANSLATION_HPP, "R266 bounded operand-semantic receipt type"),
-        ("classify_programmable_shader_operands(",
-         PIPELINE_TRANSLATION_HPP, "R266 operand-semantic classifier declaration"),
-        ("R266_D3D9_SM2_SM3_OPERAND_SEMANTIC_CLASSIFIER_V1",
-         PIPELINE_TRANSLATION_CPP, "R266 semantic-classifier revision provenance"),
-        ("R266_REGISTER_ROLE_TYPE_INDEX_MODIFIER_ADDRESSING_CONSTANT_SAMPLER_PROVENANCE_V1",
-         PIPELINE_TRANSLATION_CPP, "R266 semantic-classifier contract provenance"),
         ("struct ProgrammableShaderRegisterSemantics",
          PIPELINE_TRANSLATION_HPP, "R266 register/constant/sampler evidence type"),
         ("decode_programmable_shader_register_semantics(",
@@ -10450,10 +10442,6 @@ def main() -> None:
          CONSTANT_BUFFER_PROBE, "R266 sampler provenance regression"),
         ("R266 preserves R265 structure but fails closed on model-dependent register-role layouts",
          CONSTANT_BUFFER_PROBE, "R266 unsupported-layout fail-closed regression"),
-        ("R266 classifies register roles, modifiers, addressing, constants and samplers",
-         CONSTANT_BUFFER_PROBE, "R266 semantic classifier positive regression"),
-        ("R266 fails closed on invalid source modifiers and opcode arity drift",
-         CONSTANT_BUFFER_PROBE, "R266 semantic classifier fail-closed regression"),
     ]
     missing_r266_programmable_shader_register_semantics = [
         meaning for token, source, meaning
