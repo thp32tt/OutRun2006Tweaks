@@ -1479,6 +1479,7 @@ namespace outrun::vr::dx11
     {
         ProgrammableShaderInstructionDecode out{};
         out.vertexStage = evidence.vertexStage;
+        out.versionToken = evidence.versionToken;
         out.sourceExact = evidence.exact();
         out.sourceBytecodeHash = evidence.bytecodeHash;
         if (!out.sourceExact)
@@ -1991,6 +1992,171 @@ namespace outrun::vr::dx11
         out.complete =
             out.semanticInstructionCount == out.instructionCount;
         out.registerSemanticsHash = semanticHash;
+        return out;
+    }
+
+    ProgrammableShaderInterfaceSemantics
+    decode_programmable_shader_interface_semantics(
+        const ProgrammableShaderInstructionDecode& decode,
+        const ProgrammableShaderRegisterSemantics& registerSemantics) noexcept
+    {
+        ProgrammableShaderInterfaceSemantics out{};
+        out.vertexStage = decode.vertexStage;
+        out.instructionDecodeExact = decode.exact();
+        out.registerSemanticsExact =
+            registerSemantics.exact() &&
+            registerSemantics.vertexStage == decode.vertexStage &&
+            registerSemantics.instructionCount == decode.instructionCount;
+        const auto shaderMajor =
+            static_cast<UINT>((decode.versionToken >> 8u) & 0xFFu);
+        out.shaderModel3 = shaderMajor == 3u;
+        if (!out.instructionDecodeExact ||
+            !out.registerSemanticsExact ||
+            !out.shaderModel3)
+            return out;
+
+        static constexpr char kDecoderRevision[] =
+            "R267_D3D9_SM3_INTERFACE_DECLARATION_SEMANTICS_V1";
+        static constexpr char kSemanticContract[] =
+            "R267_EXPLICIT_DCL_USAGE_INDEX_REGISTER_WRITEMASK_PROVENANCE_V1";
+        out.decoderRevisionHash =
+            hash_bytes(kDecoderRevision, sizeof(kDecoderRevision) - 1u);
+        out.semanticContractHash =
+            hash_bytes(kSemanticContract, sizeof(kSemanticContract) - 1u);
+
+        std::uint64_t semanticHash = 1469598103934665603ull;
+        const auto mix = [&semanticHash](std::uint64_t value) noexcept
+        {
+            for (unsigned shift = 0; shift < 64u; shift += 8u)
+            {
+                semanticHash ^=
+                    static_cast<std::uint8_t>((value >> shift) & 0xFFu);
+                semanticHash *= 1099511628211ull;
+            }
+        };
+        mix(decode.sourceBytecodeHash);
+        mix(registerSemantics.registerSemanticsHash);
+        mix(out.decoderRevisionHash);
+        mix(out.semanticContractHash);
+        mix(out.vertexStage ? 1u : 0u);
+
+        const auto decode_register_type =
+            [](DWORD token) noexcept -> D3DSHADER_PARAM_REGISTER_TYPE
+        {
+            const DWORD rawType =
+                ((token & D3DSP_REGTYPE_MASK) >> D3DSP_REGTYPE_SHIFT) |
+                ((token & D3DSP_REGTYPE_MASK2) >> D3DSP_REGTYPE_SHIFT2);
+            if (rawType > static_cast<DWORD>(D3DSPR_PREDICATE))
+                return D3DSPR_FORCE_DWORD;
+            return static_cast<D3DSHADER_PARAM_REGISTER_TYPE>(rawType);
+        };
+
+        constexpr DWORD kDclUsageMask = 0x0000000Fu;
+        constexpr DWORD kDclUsageIndexMask = 0x000F0000u;
+        constexpr UINT kDclUsageIndexShift = 16u;
+
+        try
+        {
+            for (const auto& instruction : decode.instructions)
+            {
+                if (instruction.opcode != static_cast<DWORD>(D3DSIO_DCL))
+                    continue;
+
+                ++out.declarationInstructionCount;
+                if (instruction.operandTokens.size() != 2u)
+                    return out;
+
+                const DWORD declarationInfo = instruction.operandTokens[0];
+                const DWORD registerToken = instruction.operandTokens[1];
+                if ((registerToken & 0x80000000u) == 0u ||
+                    (registerToken & D3DSHADER_ADDRESSMODE_MASK) != 0u)
+                    return out;
+
+                const auto registerType =
+                    decode_register_type(registerToken);
+                if (registerType == D3DSPR_FORCE_DWORD)
+                    return out;
+                const UINT registerIndex =
+                    static_cast<UINT>(registerToken & D3DSP_REGNUM_MASK);
+
+                mix(instruction.instructionToken);
+                mix(declarationInfo);
+                mix(registerToken);
+                mix(static_cast<DWORD>(registerType));
+                mix(registerIndex);
+
+                if (registerType == D3DSPR_SAMPLER)
+                {
+                    ++out.samplerDeclarationCount;
+                    continue;
+                }
+
+                const bool input =
+                    registerType == D3DSPR_INPUT;
+                const bool output =
+                    decode.vertexStage &&
+                    registerType == D3DSPR_OUTPUT;
+                if (!input && !output)
+                    return out;
+
+                const DWORD writeMask =
+                    registerToken & D3DSP_WRITEMASK_ALL;
+                if (writeMask == 0u)
+                    return out;
+
+                if ((declarationInfo &
+                     ~(kDclUsageMask | kDclUsageIndexMask)) != 0u)
+                    return out;
+                const DWORD rawUsage =
+                    declarationInfo & kDclUsageMask;
+                if (rawUsage >
+                    static_cast<DWORD>(D3DDECLUSAGE_SAMPLE))
+                    return out;
+                const auto usage =
+                    static_cast<D3DDECLUSAGE>(rawUsage);
+                const UINT usageIndex = static_cast<UINT>(
+                    (declarationInfo & kDclUsageIndexMask) >>
+                    kDclUsageIndexShift);
+
+                for (const auto& existing : out.semantics)
+                {
+                    if (existing.input == input &&
+                        existing.output == output &&
+                        existing.usage == usage &&
+                        existing.usageIndex == usageIndex)
+                        return out;
+                }
+
+                ProgrammableShaderInterfaceSemantic semantic{};
+                semantic.input = input;
+                semantic.output = output;
+                semantic.usage = usage;
+                semantic.usageIndex = usageIndex;
+                semantic.registerType = registerType;
+                semantic.registerIndex = registerIndex;
+                semantic.writeMask = writeMask;
+                out.semantics.push_back(semantic);
+
+                ++out.semanticDeclarationCount;
+                if (input)
+                    ++out.inputSemanticCount;
+                if (output)
+                    ++out.outputSemanticCount;
+
+                mix(input ? 1u : 0u);
+                mix(output ? 1u : 0u);
+                mix(static_cast<DWORD>(usage));
+                mix(usageIndex);
+                mix(writeMask);
+            }
+        }
+        catch (...)
+        {
+            return {};
+        }
+
+        out.complete = true;
+        out.interfaceSemanticsHash = semanticHash;
         return out;
     }
 
