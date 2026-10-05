@@ -165,7 +165,7 @@ smp=out/"E95_SOURCE_TEXT_MASK.png"; ap=out/"E95_ALLOWED_BBOX_MASK.png"
 src.save(sp); clean.save(cp); source_mask.save(smp); allowed.save(ap)
 protected=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed))
 pp=out/"E95_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(protected),"--report",str(out/"B70_CLEAN_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"B70_CLEAN_VALIDATION.json")],check=True)
 cleanrep=json.loads((out/"B70_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validation",cleanrep))
 
@@ -297,7 +297,7 @@ raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
 dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip")
 fp=out/"E95_FINAL_DECODED_READABLE.png"; dec.save(fp)
-subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(protected),"--report",str(out/"B70_FINAL_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"B70_FINAL_VALIDATION.json")],check=True)
 finalrep=json.loads((out/"B70_FINAL_VALIDATION.json").read_text())
 
 diff=dmask(src,dec)
