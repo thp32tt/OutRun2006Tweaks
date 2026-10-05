@@ -66,6 +66,7 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('CONVERSATION_ROLLOVER_MIN_SECONDS', SOURCE)
         self.assertIn('conversation_rollover_cooldown', SOURCE)
         self.assertIn('hard_length_limit', SOURCE)
+        self.assertIn('rollover_anchor = last_rollover or _parse_iso(active.get("sent_at"))', SOURCE)
 
     def test_vr_compose_pins_v2_and_three_slots(self):
         compose = (ROOT / 'docker-compose.portainer-vr.yml').read_text()
