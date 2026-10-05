@@ -1,0 +1,14 @@
+{
+  "run": "20261006-A-PRODUCTION83-C219-TRANSFORM",
+  "index": 95,
+  "asset": "37759842",
+  "candidate_sha256": "2dac8ee099120f2978eaf8ba992ffff11ecad7c11912a98aca9269a1a78f6988",
+  "c219_transform_rows": 16,
+  "bbox_size_margin": "16/16 PASS",
+  "outside": 0,
+  "alpha_outside": 0,
+  "source_residue": 0,
+  "worker_status": "A83_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION83-C219-TRANSFORM/A83_37759842_REPORT.json"
+}
