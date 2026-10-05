@@ -501,12 +501,19 @@ namespace OutRunVrD3D9ExDirectPassthrough
         return static_cast<std::int32_t>(candidate - reference) >= 0;
     }
 
-    inline void PublishLegacyConsumedFrame(std::uint32_t frameId) noexcept
+    inline void PublishLegacyConsumedFrame(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
-        if (!frameId || !EnsurePoseState() ||
-            PoseState->hostPid != GetCurrentProcessId())
+        if (!frame.frameId || !EnsurePoseState() || !EnsureFrameRing() ||
+            PoseState->hostPid != GetCurrentProcessId() ||
+            !OutRunVR::RenderFrameRunIdentityMatches(*FrameRing, frame))
             return;
 
+        // The legacy ACK has no generation field. A completion from the old
+        // game run can arrive after the new game has reset this value to zero
+        // but before R32 observes the new transport generation. Validate the
+        // completed frame against the live Frame.v2 run identity before allowing
+        // that late completion to repopulate the generation-less ACK.
         auto* ack = reinterpret_cast<volatile LONG*>(
             &PoseState->hostDirectConsumedFrameId);
         LONG current = *ack;
@@ -514,11 +521,11 @@ namespace OutRunVrD3D9ExDirectPassthrough
         {
             const auto currentFrame = static_cast<std::uint32_t>(current);
             if (currentFrame != 0 &&
-                !LegacyFrameAtOrAfter(frameId, currentFrame))
+                !LegacyFrameAtOrAfter(frame.frameId, currentFrame))
                 return;
 
             const LONG observed = InterlockedCompareExchange(
-                ack, static_cast<LONG>(frameId), current);
+                ack, static_cast<LONG>(frame.frameId), current);
             if (observed == current)
                 return;
             current = observed;
@@ -553,7 +560,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
         // calls the old SharedWriter::AckDirectFrame path, so without this
         // bridge a lower-chain fallback could fill all four producer slots and
         // never observe consumption despite the primary per-slot ACK succeeding.
-        PublishLegacyConsumedFrame(frame.frameId);
+        PublishLegacyConsumedFrame(frame);
         return true;
     }
 

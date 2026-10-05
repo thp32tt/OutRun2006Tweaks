@@ -381,7 +381,17 @@ require(
     "host legacy global ACK bridge",
     "hostDirectConsumedFrameId",
     "GetCurrentProcessId()",
+    "EnsureFrameRing()",
+    "RenderFrameRunIdentityMatches(*FrameRing, frame)",
     "LegacyFrameAtOrAfter",
+    "InterlockedCompareExchange",
+)
+require_order(
+    legacy_ack,
+    "legacy ACK live-run identity guard",
+    "EnsureFrameRing()",
+    "RenderFrameRunIdentityMatches(*FrameRing, frame)",
+    "hostDirectConsumedFrameId",
     "InterlockedCompareExchange",
 )
 publish_completed = body(host_passthrough, "inline bool PublishCompletedFrame(")
@@ -390,7 +400,7 @@ require_order(
     "host dual ACK publication",
     "DirectAckState->completedFrameId[slot] = frame.frameId;",
     "EndAckWrite();",
-    "PublishLegacyConsumedFrame(frame.frameId);",
+    "PublishLegacyConsumedFrame(frame);",
     "return true;",
 )
 
