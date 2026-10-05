@@ -1165,3 +1165,14 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Queue index 228 advanced to `b68_self_qa_pass_pending_c`; pending_artwork localize_text=32. Independent C final QA and isolated in-game validation remain pending.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION68/B68_E7F6_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION68/B68_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261005-B-PRODUCTION68/B68_FINAL_VALIDATION.json`.
+
+## 2026-10-05 09:58:22 KST — C144 E7F6E9B7 B68 final PASS
+- Reviewed only the new B_PRODUCTION68 index 228 `E7F6E9B7_512x512.dds`; C143-and-earlier completed PASS assets were not repeated.
+- Hosted C independently pinned the canonical 2048x2048 RGBA32/BGRA source and atlas, re-derived all 13 exact localizable source-alpha rows, and reconstructed the exact transparent clean plate. B68 CLEAN differs from C's reconstruction by 0 pixels.
+- Candidate `6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607` preserves the exact 128-byte header and raw `mirror_y`; 13/13 bbox containment, source-size ceilings and positive margins PASS; final outside=0, alpha-outside=0, render-outside-target=0, source residue=0, overlap=0, touch=0. Shared grayscale/silver-family check is 13/13 PASS.
+- Controller SOURCE/CLEAN/FINAL, per-row contacts and raw mirror_y review PASS for all 13 menu-name rows. Silver gradient, dark outline/shadow, left alignment and rightward techno-slant remain source-faithful; no visible English residue, clipping, overlap, seam, halo or orientation regression.
+- Decision: `C144_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. Candidate unchanged by C. Producer REWORK=0; pending_artwork localize_text=32.
+- `4F68708E`, `F6811E94`, and `49BB5FE5` remain strict DXT5 no-candidate HOLD; existing `1A43E9D9` remains HIGH_RISK pending mandatory in-game validation.
+- Queue sanity: 137 total = 79 localize_text + 47 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve-brand/song-credit.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C144-E7F6E9B7/C144_E7F6_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C144-E7F6E9B7/C144_E7F6_MACHINE_QA.json`.
