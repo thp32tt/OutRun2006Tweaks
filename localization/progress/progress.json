@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T19:18:00+09:00",
+  "updated_at_kst": "2026-10-05T19:38:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B137 producer-side C184 repair self-QA PASS for 63C91067; independent C final QA pending. Producer REWORK now 2 (C598919A,37759842); pending-C=1 (63C91067); pending_artwork localize_text=15. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "A49 index 147 39BCA907 producer self-QA PASS pending independent C. A48 semantic binding was rejected and corrected in the same task. Candidate 6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b has 15/15 bbox+size+positive-margin PASS and zero outside/alpha/protected/source-residue/overlap/touch; controller readable/raw mirror_y visual PASS. Producer REWORK remains 2; pending-C=2; pending_artwork localize_text=14. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,15 +265,16 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "REWORK_REQUIRED",
+      "status": "REWORK_REQUIRED_WITH_PENDING_C",
       "assets": [
         "C598919A",
         "37759842"
       ],
       "remaining": 2,
-      "note": "B137 63C91067 self-QA PASS pending independent C; remaining producer REWORK is C598919A exact-DXT5 solver and 37759842 manual/template clean-plate reconstruction. pending_artwork localize_text=15; RUNTIME_VALIDATION=UNTESTED.",
+      "note": "A49 39BCA907 self-QA PASS pending C. Existing producer REWORK preserved: C598919A,37759842. pending_artwork localize_text=14; pending-C=63C91067+39BCA907; RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": [
-        "63C91067"
+        "63C91067",
+        "39BCA907"
       ]
     },
     "latest_d_final_qa": {
@@ -562,23 +563,23 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 17,
+    "current_pending_artwork_localize_text": 14,
     "current_producer_rework_remaining": 3,
     "latest_a_production_batch": {
-      "timestamp_kst": "2026-10-05T18:16:00+09:00",
+      "timestamp_kst": "2026-10-05T19:38:00+09:00",
       "assets": [
-        "560FA536"
+        "39BCA907"
       ],
-      "result": "A38_SELF_QA_PASS_PENDING_C_AND_INGAME",
-      "candidate_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
-      "report": "localization/graphics/role_A/20261005-A-PRODUCTION38/A38_560FA536_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION38/A38_CONTROLLER_SELF_QA.json",
+      "result": "A49_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "candidate_sha256": "6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b",
+      "report": "localization/graphics/role_A/20261005-A-PRODUCTION49/A49_39BCA907_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION49/A49_CONTROLLER_SELF_QA.json",
       "pending_c_assets": [
-        "560FA536"
-      ],
-      "pending_artwork_localize_text": 16,
-      "producer_rework_remaining": [
         "63C91067",
+        "39BCA907"
+      ],
+      "pending_artwork_localize_text": 14,
+      "producer_rework_remaining": [
         "C598919A",
         "37759842"
       ],
@@ -1339,24 +1340,12 @@
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     },
     "latest_a_production": {
-      "run": "A47",
-      "index": 133,
-      "asset": "25F697C6",
-      "candidate_sha256": "08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013",
-      "result": "A47_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "run": "A49",
+      "index": 147,
+      "asset": "39BCA907",
+      "candidate_sha256": "6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b",
+      "result": "A49_SELF_QA_PASS_PENDING_C_AND_INGAME",
       "localized_indices": [
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23
-      ],
-      "protected_indices": [
-        0,
         1,
         2,
         3,
@@ -1370,9 +1359,14 @@
         11,
         12,
         13,
-        14
+        14,
+        15
       ],
-      "bbox_size_positive_margin": "9/9 PASS",
+      "protected_indices": [
+        0,
+        16
+      ],
+      "bbox_size_positive_margin": "15/15 PASS",
       "pixel_gates": {
         "changed_outside": 0,
         "alpha_outside": 0,
@@ -1382,8 +1376,8 @@
         "overlap": 0,
         "touch": 0
       },
-      "report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_25F697C6_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
+      "report": "localization/graphics/role_A/20261005-A-PRODUCTION49/A49_39BCA907_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION49/A49_CONTROLLER_SELF_QA.json",
       "runtime_validation": "UNTESTED"
     },
     "latest_a_rework": {
