@@ -726,7 +726,7 @@ namespace OutRunVRStereo
             return hr;
         }
 
-                                        void R32ForgetDirectIdentity() noexcept
+        void R32ForgetDirectIdentity() noexcept
         {
             R32DirectHostPid = 0;
             R32DirectHostLuidLow = 0;

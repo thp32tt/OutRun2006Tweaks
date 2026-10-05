@@ -683,7 +683,7 @@ namespace OutRunVRStereo
             return result;
         }
 
-                                        void R31BlockCurrentVerifiedGeneration() noexcept
+        void R31BlockCurrentVerifiedGeneration() noexcept
         {
             float ignored[16]{};
             std::uint32_t generation = 0, pose = 0;
