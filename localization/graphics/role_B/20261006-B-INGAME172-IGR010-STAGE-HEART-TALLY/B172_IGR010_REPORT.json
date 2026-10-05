@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY",
+  "base_head": "37a8345bef95908c4f005e9df3e9d607dd82bf2a",
+  "user_ingame_regression": [
+    "IGR-010",
+    "스크린샷(153).png"
+  ],
+  "screen": "STAGE_HEART_TALLY_OVERLAY",
+  "owner_lane": "B",
+  "priority": "P1",
+  "mapping": {
+    "status": "EXACT_GRAPHICS_A064_STAGE_PLUS_PROTECTED_TALLY_ART",
+    "domain": "GRAPHICS",
+    "queue_index": 60,
+    "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+    "localized_binding": {
+      "source": "Stage",
+      "korean": "스테이지",
+      "source_effect_bbox": [
+        455,
+        245,
+        690,
+        350
+      ]
+    },
+    "protected_screen_components": [
+      "stage numeral/player marker sprites",
+      "heart icon",
+      "x /8 tally glyphs/numerals"
+    ],
+    "runtime_text_required": false,
+    "runtime_table_evidence": "runtime_ko.tsv contains only unrelated stage phrases (IDs 195/381 전체 스테이지, 1123 스테이지 주행, 1133 unlock guidance); no Stage <number> / heart-tally localized runtime row exists.",
+    "provenance": "A064 B84 readable atlas visibly contains Ranking/Stage/Rank together with the heart x /8 tally HUD art. The user screenshot regression is therefore the baked Stage sprite plus protected numeric/icon art, not a Korean runtime-overlay string."
+  },
+  "regression_cause": {
+    "producer_origin": "B84",
+    "historical_stage_font_size": 80,
+    "historical_horizontal_scale": 0.7028,
+    "historical_localized_bbox": [
+      461,
+      249,
+      685,
+      345
+    ],
+    "later_preservation": "B_RECOVERY02 preserved the row byte-exact; B_RECOVERY09 re-applied it pixel-exact after clean-plate correction; A85 modified OUTRUN MILES only and kept Stage unchanged.",
+    "numeric_false_negative": "Prior bbox/overlap static PASS did not catch the in-game compressed/hierarchy/readability defect.",
+    "user_screenshot_override": true
+  },
+  "material_fix": {
+    "input_candidate_sha256": "a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f",
+    "candidate_sha256": "9457c16db67978ee383550f9094a8862c5030fdea105deba217a4b416467fa37",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "source_file": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+    "clean_plate": "localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_CLEAN_PLATE.png",
+    "changed_row": "Stage -> 스테이지",
+    "method": "replace only exact Stage source-effect bbox with established clean plate; fresh native-resolution Noto Sans CJK KR Bold render at natural horizontal advance, source-derived yellow/navy/pale family, 0.16 right shear; preserve all other candidate pixels exact",
+    "font": "Noto Sans CJK KR Bold",
+    "font_size": 60,
+    "horizontal_scale": 1.0,
+    "shear": 0.16,
+    "palette_rgba": {
+      "face": [
+        245,
+        204,
+        12,
+        255
+      ],
+      "inner": [
+        0,
+        10,
+        65,
+        255
+      ],
+      "outer": [
+        255,
+        255,
+        255,
+        255
+      ]
+    },
+    "old_localized_bbox": [
+      461,
+      249,
+      685,
+      345
+    ],
+    "new_localized_bbox": [
+      461,
+      264,
+      683,
+      331
+    ],
+    "source_size": [
+      235,
+      105
+    ],
+    "new_localized_size": [
+      222,
+      67
+    ],
+    "delta_left": 6,
+    "delta_right": 7,
+    "delta_top": 19,
+    "delta_bottom": 19
+  },
+  "static_qa": {
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "changed_pixels": 17274,
+    "changed_pixels_outside_stage_bbox": 0,
+    "alpha_changed_outside_stage_bbox": 0,
+    "legacy_protected_pixels_inside_reopened_stage_bbox": 3724,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "all_non_stage_candidate_pixels_preserved_exact": true,
+    "a85_outrun_miles_rows_preserved_exact": true,
+    "heart_tally_art_preserved_exact": true,
+    "status": "PASS"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "B172_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
