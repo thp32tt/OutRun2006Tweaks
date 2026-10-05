@@ -1,0 +1,341 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C157-8C259C68",
+  "queue_index": 188,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION81",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "4a95a48c9c34f2ddd786340e4323d6779b7a103b",
+    "atlas_git_blob_sha1": "6061128430caeb04773ac8caa7918629eeef8ba8",
+    "source_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38"
+  },
+  "candidate_sha256": "03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03",
+  "candidate_changed_by_C": false,
+  "independent_method": "C re-downloaded pinned canonical DDS+atlas, independently reconstructed each row alpha source mask and exact bbox, rebuilt the transparent clean plate, decoded the committed candidate, and recomputed containment/protected/overlap/style gates without consuming producer masks.",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "semantic_binding": {
+    "readable_mirror_y_order": true,
+    "rows": [
+      {
+        "region_idx": 0,
+        "source": "Drive against the Ghost Cars and go for the course records!",
+        "korean": "고스트 카와 달리며 코스 기록에 도전하세요!"
+      },
+      {
+        "region_idx": 1,
+        "source": "Buy your OutRun items here!",
+        "korean": "여기서 아웃런 아이템을 구매하세요!"
+      },
+      {
+        "region_idx": 2,
+        "source": "Try to reach the goal with your girlfriend!",
+        "korean": "여자친구와 함께 골에 도착하세요!"
+      },
+      {
+        "region_idx": 3,
+        "source": "Try to win Hearts by meeting your girlfriend's demands!",
+        "korean": "여자친구의 요구를 들어주고 하트를 획득하세요!"
+      },
+      {
+        "region_idx": 4,
+        "source": "Complete Race and Heart Attack missions to win OR Miles!",
+        "korean": "레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!"
+      },
+      {
+        "region_idx": 5,
+        "source": "Online and LAN OutRun for up to 6 players",
+        "korean": "온라인/LAN 아웃런 최대 6인 플레이"
+      }
+    ]
+  },
+  "rows": [
+    {
+      "region_idx": 0,
+      "source": "Drive against the Ghost Cars and go for the course records!",
+      "korean": "고스트 카와 달리며 코스 기록에 도전하세요!",
+      "cell": [
+        0,
+        1888,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        4,
+        1901,
+        1720,
+        1969
+      ],
+      "source_mask_pixels": 40621,
+      "alpha_fraction": 0.1410451388888889,
+      "localized_bbox": [
+        8,
+        1907,
+        872,
+        1963
+      ],
+      "source_size": [
+        1716,
+        68
+      ],
+      "localized_size": [
+        864,
+        56
+      ],
+      "delta_left": 4,
+      "delta_right": 848,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 1,
+      "source": "Buy your OutRun items here!",
+      "korean": "여기서 아웃런 아이템을 구매하세요!",
+      "cell": [
+        0,
+        1728,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        6,
+        1742,
+        848,
+        1809
+      ],
+      "source_mask_pixels": 20792,
+      "alpha_fraction": 0.07219444444444445,
+      "localized_bbox": [
+        10,
+        1747,
+        722,
+        1803
+      ],
+      "source_size": [
+        842,
+        67
+      ],
+      "localized_size": [
+        712,
+        56
+      ],
+      "delta_left": 4,
+      "delta_right": 126,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 2,
+      "source": "Try to reach the goal with your girlfriend!",
+      "korean": "여자친구와 함께 골에 도착하세요!",
+      "cell": [
+        0,
+        1568,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        4,
+        1582,
+        1210,
+        1649
+      ],
+      "source_mask_pixels": 28881,
+      "alpha_fraction": 0.10028125,
+      "localized_bbox": [
+        8,
+        1587,
+        676,
+        1643
+      ],
+      "source_size": [
+        1206,
+        67
+      ],
+      "localized_size": [
+        668,
+        56
+      ],
+      "delta_left": 4,
+      "delta_right": 534,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 3,
+      "source": "Try to win Hearts by meeting your girlfriend's demands!",
+      "korean": "여자친구의 요구를 들어주고 하트를 획득하세요!",
+      "cell": [
+        0,
+        1408,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        0,
+        1417,
+        1623,
+        1488
+      ],
+      "source_mask_pixels": 39274,
+      "alpha_fraction": 0.13636805555555556,
+      "localized_bbox": [
+        4,
+        1426,
+        948,
+        1478
+      ],
+      "source_size": [
+        1623,
+        71
+      ],
+      "localized_size": [
+        944,
+        52
+      ],
+      "delta_left": 4,
+      "delta_right": 675,
+      "delta_top": 9,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 4,
+      "source": "Complete Race and Heart Attack missions to win OR Miles!",
+      "korean": "레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!",
+      "cell": [
+        0,
+        1248,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        6,
+        1259,
+        1727,
+        1325
+      ],
+      "source_mask_pixels": 42404,
+      "alpha_fraction": 0.14723611111111112,
+      "localized_bbox": [
+        10,
+        1264,
+        1142,
+        1320
+      ],
+      "source_size": [
+        1721,
+        66
+      ],
+      "localized_size": [
+        1132,
+        56
+      ],
+      "delta_left": 4,
+      "delta_right": 585,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 5,
+      "source": "Online and LAN OutRun for up to 6 players",
+      "korean": "온라인/LAN 아웃런 최대 6인 플레이",
+      "cell": [
+        0,
+        1088,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        10,
+        1099,
+        1243,
+        1165
+      ],
+      "source_mask_pixels": 30008,
+      "alpha_fraction": 0.10419444444444445,
+      "localized_bbox": [
+        14,
+        1104,
+        726,
+        1160
+      ],
+      "source_size": [
+        1233,
+        66
+      ],
+      "localized_size": [
+        712,
+        56
+      ],
+      "delta_left": 4,
+      "delta_right": 517,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "clean_changed_outside_source_mask": 0,
+    "clean_unchanged_inside_source_mask": 0,
+    "clean_protected_changed": 0,
+    "clean_alpha_changed_outside_source_mask": 0,
+    "bbox_size_positive_margin": "6/6 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "target_protected_overlap": 0,
+    "target_protected_1px_near": 0,
+    "overlap": 0,
+    "touch_pairs": [],
+    "source_fill_median_rgb": [
+      63,
+      71,
+      74
+    ],
+    "localized_fill_median_rgb": [
+      63,
+      71,
+      74
+    ],
+    "fill_median_abs_delta": [
+      0,
+      0,
+      0
+    ]
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
