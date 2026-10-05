@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION97-PENDING4-FINALIZE",
+  "timestamp_kst": "2026-10-06T07:32:00+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "decision": "PRODUCER_SELF_QA_PASS_PENDING_INDEPENDENT_C",
+  "assets": {
+    "E3C455FA": {
+      "queue_index": 225,
+      "candidate_sha256": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+      "report": "localization/graphics/role_A/20261006-A-REWORK95R-E3C455FA/A95R_E3C455FA_REPORT.json",
+      "evidence": [
+        "localization/graphics/role_A/20261006-A-REWORK95R-E3C455FA/A95R_SOURCE_CLEAN_FINAL_CONTACTS.jpg",
+        "localization/graphics/role_A/20261006-A-REWORK95R-E3C455FA/A95R_READABLE_SOURCE_FINAL.jpg",
+        "localization/graphics/role_A/20261006-A-REWORK95R-E3C455FA/A95R_RAW_SOURCE_FINAL.jpg"
+      ],
+      "machine_qa": "9/9 bbox-size-positive-margin PASS; outside/alpha/protected/source-residue/overlap/touch all zero; DDS roundtrip PASS",
+      "visual_qa": "PASS",
+      "visual_notes": "A95 numeric false-negative was rejected because six small labels retained a leading Latin fragment. A95R exact source-RGB isolation removes all six remnants; readable and raw mirror_y reviews show no duplicate English/Korean, broken glyph, clipping, foreign-art intrusion, seam, halo, or orientation regression.",
+      "runtime_validation": "UNTESTED"
+    },
+    "E596B7AC": {
+      "queue_index": 227,
+      "candidate_sha256": "e60eb09818ce79c1afc005905ce0d5f7d2678c7f69a2b25f418f2679200499b2",
+      "report": "localization/graphics/role_A/20261006-A-REWORK96R-E596B7AC/A96R_E596B7AC_REPORT.json",
+      "evidence": [
+        "localization/graphics/role_A/20261006-A-REWORK96R-E596B7AC/A96R_SOURCE_CLEAN_FINAL_CONTACTS.jpg",
+        "localization/graphics/role_A/20261006-A-REWORK96R-E596B7AC/A96R_READABLE_SOURCE_FINAL.jpg",
+        "localization/graphics/role_A/20261006-A-REWORK96R-E596B7AC/A96R_RAW_SOURCE_FINAL.jpg"
+      ],
+      "machine_qa": "16/16 bbox-size-positive-margin PASS; outside/alpha/protected/source-residue/overlap/touch all zero; DDS roundtrip PASS",
+      "visual_qa": "PASS",
+      "visual_notes": "Controller corrected two semantic/transcription errors before promotion: CAPE WAY -> 케이프 웨이 and CONIFEROUS FOREST -> 코니퍼러스 포레스트, matching TRANSLATION_NAMING_POLICY. Native readable/raw review passes with artwork/icons preserved.",
+      "runtime_validation": "UNTESTED"
+    },
+    "EBE401C8": {
+      "queue_index": 231,
+      "candidate_sha256": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
+      "report": "localization/graphics/role_A/20261006-A-PRODUCTION93-EBE401C8/A93_EBE401C8_REPORT.json",
+      "evidence": [
+        "localization/graphics/role_A/20261006-A-PRODUCTION93-EBE401C8/A93_SOURCE_CLEAN_FINAL_CONTACTS.jpg",
+        "localization/graphics/role_A/20261006-A-PRODUCTION93-EBE401C8/A93_READABLE_SOURCE_FINAL.jpg",
+        "localization/graphics/role_A/20261006-A-PRODUCTION93-EBE401C8/A93_RAW_SOURCE_FINAL.jpg"
+      ],
+      "machine_qa": "4/4 bbox-size-positive-margin PASS; outside/alpha/protected/source-residue/overlap/touch all zero; DDS roundtrip PASS; LAN rows pixel-exact outside scope",
+      "visual_qa": "PASS",
+      "visual_notes": "Recovered two previously omitted explanatory source lines and localized them at native HD. Both LAN labels remain original; both ONLINE occurrences and both help lines are clean, aligned, and source-contained.",
+      "runtime_validation": "UNTESTED"
+    },
+    "FF514CEB": {
+      "queue_index": 237,
+      "candidate_sha256": "acbf42d5f8f45ee6227bb0f81a770687bba680916c828f773095b64dbc63e5a3",
+      "report": "localization/graphics/role_A/20261006-A-PRODUCTION94-FF514CEB/A94_FF514CEB_REPORT.json",
+      "evidence": [
+        "localization/graphics/role_A/20261006-A-PRODUCTION94-FF514CEB/A94_SOURCE_CLEAN_FINAL_CONTACTS.jpg",
+        "localization/graphics/role_A/20261006-A-PRODUCTION94-FF514CEB/A94_READABLE_SOURCE_FINAL.jpg",
+        "localization/graphics/role_A/20261006-A-PRODUCTION94-FF514CEB/A94_RAW_SOURCE_FINAL.jpg"
+      ],
+      "machine_qa": "9/9 bbox-size-positive-margin PASS; outside/alpha/protected/source-residue/overlap/touch all zero; DDS roundtrip PASS",
+      "visual_qa": "PASS",
+      "visual_notes": "CREATE/CUSTOM/QUICK families and three help lines retain source hierarchy/color family; no low-resolution mixing, English residue, clipping, overlap, foreign-image intrusion, or raw-orientation regression.",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "summary": {
+    "assets_promoted_to_c_queue": 4,
+    "conceptual_segments": 35,
+    "localized_physical_rows": 38,
+    "controller_visual_qa": "4/4 PASS",
+    "producer_status": "STATIC_PASS_PENDING_C",
+    "ingame_closure_claimed": false,
+    "vr_ffb_dx11_dxvk_touched": false
+  }
+}
