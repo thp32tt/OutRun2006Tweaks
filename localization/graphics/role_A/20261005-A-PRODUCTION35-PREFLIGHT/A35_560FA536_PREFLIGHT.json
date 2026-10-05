@@ -1,0 +1,1609 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION35-PREFLIGHT",
+  "queue_index": 101,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+  "readiness": "ONE_STAGE_TO_RENDER",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "path": "Release/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+    "git_blob_sha1": "1e95df72109411fb1f9c398445db583ed31de2a1",
+    "sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa"
+  },
+  "atlas_provenance": {
+    "git_blob_sha1": "90b0122b7fdc44a553eff3f3e83278725ad0f24b",
+    "regions": 48,
+    "sha256": "b912144af6f111dc6db03a21e63fd9cf439d04d9cc3ce463da33a074f9447d95"
+  },
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "pitch": 16384,
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "physical_targets": [
+    {
+      "idx": 11,
+      "label": "TUNED",
+      "rect": [
+        3304,
+        2656,
+        584,
+        440
+      ],
+      "alpha_bbox_local": [
+        58,
+        56,
+        531,
+        384
+      ],
+      "visible_pixels": 125513,
+      "opaque_pixels": 124674,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "dominant_rgb_q16": [
+        {
+          "rgb": [
+            192,
+            0,
+            0
+          ],
+          "count": 92427
+        },
+        {
+          "rgb": [
+            240,
+            144,
+            0
+          ],
+          "count": 9932
+        },
+        {
+          "rgb": [
+            48,
+            0,
+            0
+          ],
+          "count": 7517
+        },
+        {
+          "rgb": [
+            224,
+            128,
+            128
+          ],
+          "count": 5972
+        },
+        {
+          "rgb": [
+            16,
+            0,
+            0
+          ],
+          "count": 4826
+        },
+        {
+          "rgb": [
+            112,
+            0,
+            0
+          ],
+          "count": 503
+        },
+        {
+          "rgb": [
+            192,
+            16,
+            16
+          ],
+          "count": 491
+        },
+        {
+          "rgb": [
+            208,
+            64,
+            64
+          ],
+          "count": 443
+        },
+        {
+          "rgb": [
+            224,
+            64,
+            0
+          ],
+          "count": 247
+        },
+        {
+          "rgb": [
+            176,
+            0,
+            0
+          ],
+          "count": 223
+        },
+        {
+          "rgb": [
+            160,
+            0,
+            0
+          ],
+          "count": 188
+        },
+        {
+          "rgb": [
+            128,
+            0,
+            0
+          ],
+          "count": 186
+        }
+      ]
+    },
+    {
+      "idx": 12,
+      "label": "NORMAL",
+      "rect": [
+        2800,
+        3656,
+        584,
+        440
+      ],
+      "alpha_bbox_local": [
+        58,
+        56,
+        531,
+        384
+      ],
+      "visible_pixels": 125513,
+      "opaque_pixels": 124674,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "dominant_rgb_q16": [
+        {
+          "rgb": [
+            0,
+            144,
+            0
+          ],
+          "count": 91544
+        },
+        {
+          "rgb": [
+            240,
+            240,
+            112
+          ],
+          "count": 10070
+        },
+        {
+          "rgb": [
+            0,
+            32,
+            0
+          ],
+          "count": 7470
+        },
+        {
+          "rgb": [
+            128,
+            192,
+            128
+          ],
+          "count": 5715
+        },
+        {
+          "rgb": [
+            0,
+            16,
+            0
+          ],
+          "count": 5042
+        },
+        {
+          "rgb": [
+            0,
+            80,
+            0
+          ],
+          "count": 583
+        },
+        {
+          "rgb": [
+            64,
+            176,
+            64
+          ],
+          "count": 443
+        },
+        {
+          "rgb": [
+            0,
+            128,
+            0
+          ],
+          "count": 308
+        },
+        {
+          "rgb": [
+            16,
+            160,
+            16
+          ],
+          "count": 302
+        },
+        {
+          "rgb": [
+            112,
+            192,
+            112
+          ],
+          "count": 291
+        },
+        {
+          "rgb": [
+            128,
+            208,
+            128
+          ],
+          "count": 257
+        },
+        {
+          "rgb": [
+            0,
+            48,
+            0
+          ],
+          "count": 254
+        }
+      ]
+    },
+    {
+      "idx": 14,
+      "label": "RANDOM",
+      "rect": [
+        0,
+        768,
+        520,
+        424
+      ],
+      "alpha_bbox_local": [
+        70,
+        68,
+        444,
+        356
+      ],
+      "visible_pixels": 85554,
+      "opaque_pixels": 84815,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "dominant_rgb_q16": [
+        {
+          "rgb": [
+            0,
+            64,
+            144
+          ],
+          "count": 33395
+        },
+        {
+          "rgb": [
+            96,
+            144,
+            208
+          ],
+          "count": 14866
+        },
+        {
+          "rgb": [
+            240,
+            240,
+            240
+          ],
+          "count": 11564
+        },
+        {
+          "rgb": [
+            0,
+            96,
+            192
+          ],
+          "count": 6339
+        },
+        {
+          "rgb": [
+            0,
+            16,
+            32
+          ],
+          "count": 6161
+        },
+        {
+          "rgb": [
+            128,
+            160,
+            208
+          ],
+          "count": 4700
+        },
+        {
+          "rgb": [
+            0,
+            0,
+            16
+          ],
+          "count": 2605
+        },
+        {
+          "rgb": [
+            0,
+            32,
+            80
+          ],
+          "count": 362
+        },
+        {
+          "rgb": [
+            0,
+            80,
+            160
+          ],
+          "count": 331
+        },
+        {
+          "rgb": [
+            16,
+            80,
+            160
+          ],
+          "count": 319
+        },
+        {
+          "rgb": [
+            64,
+            128,
+            176
+          ],
+          "count": 296
+        },
+        {
+          "rgb": [
+            16,
+            96,
+            160
+          ],
+          "count": 283
+        }
+      ]
+    },
+    {
+      "idx": 21,
+      "label": "初級者向けの車です。",
+      "rect": [
+        2200,
+        936,
+        1024,
+        256
+      ],
+      "alpha_bbox_local": [
+        17,
+        51,
+        917,
+        202
+      ],
+      "visible_pixels": 88885,
+      "opaque_pixels": 75127,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "dominant_rgb_q16": [
+        {
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "count": 29436
+        },
+        {
+          "rgb": [
+            240,
+            240,
+            240
+          ],
+          "count": 27515
+        },
+        {
+          "rgb": [
+            32,
+            208,
+            32
+          ],
+          "count": 25263
+        },
+        {
+          "rgb": [
+            208,
+            208,
+            208
+          ],
+          "count": 740
+        },
+        {
+          "rgb": [
+            144,
+            144,
+            144
+          ],
+          "count": 535
+        },
+        {
+          "rgb": [
+            96,
+            96,
+            96
+          ],
+          "count": 474
+        },
+        {
+          "rgb": [
+            32,
+            32,
+            32
+          ],
+          "count": 336
+        },
+        {
+          "rgb": [
+            0,
+            16,
+            0
+          ],
+          "count": 323
+        },
+        {
+          "rgb": [
+            224,
+            224,
+            224
+          ],
+          "count": 320
+        },
+        {
+          "rgb": [
+            16,
+            176,
+            16
+          ],
+          "count": 318
+        },
+        {
+          "rgb": [
+            32,
+            192,
+            32
+          ],
+          "count": 284
+        },
+        {
+          "rgb": [
+            16,
+            128,
+            16
+          ],
+          "count": 272
+        }
+      ]
+    },
+    {
+      "idx": 22,
+      "label": "中級者向けの車です。",
+      "rect": [
+        0,
+        512,
+        1024,
+        256
+      ],
+      "alpha_bbox_local": [
+        15,
+        52,
+        917,
+        202
+      ],
+      "visible_pixels": 86795,
+      "opaque_pixels": 72767,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "dominant_rgb_q16": [
+        {
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "count": 28702
+        },
+        {
+          "rgb": [
+            240,
+            240,
+            240
+          ],
+          "count": 27956
+        },
+        {
+          "rgb": [
+            224,
+            112,
+            0
+          ],
+          "count": 23647
+        },
+        {
+          "rgb": [
+            208,
+            208,
+            208
+          ],
+          "count": 743
+        },
+        {
+          "rgb": [
+            144,
+            144,
+            144
+          ],
+          "count": 558
+        },
+        {
+          "rgb": [
+            192,
+            96,
+            0
+          ],
+          "count": 453
+        },
+        {
+          "rgb": [
+            32,
+            32,
+            32
+          ],
+          "count": 414
+        },
+        {
+          "rgb": [
+            96,
+            96,
+            96
+          ],
+          "count": 403
+        },
+        {
+          "rgb": [
+            224,
+            224,
+            224
+          ],
+          "count": 332
+        },
+        {
+          "rgb": [
+            112,
+            112,
+            112
+          ],
+          "count": 276
+        },
+        {
+          "rgb": [
+            208,
+            112,
+            0
+          ],
+          "count": 257
+        },
+        {
+          "rgb": [
+            176,
+            176,
+            176
+          ],
+          "count": 241
+        }
+      ]
+    },
+    {
+      "idx": 24,
+      "label": "To switch to \"Single Player Mode\", press the \"View Change Button\" and the \"Brake Pedal\" at the same time.",
+      "rect": [
+        1272,
+        584,
+        1848,
+        184
+      ],
+      "alpha_bbox_local": [
+        157,
+        14,
+        1694,
+        168
+      ],
+      "visible_pixels": 118735,
+      "opaque_pixels": 112228,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "dominant_rgb_q16": [
+        {
+          "rgb": [
+            0,
+            0,
+            48
+          ],
+          "count": 70733
+        },
+        {
+          "rgb": [
+            240,
+            176,
+            16
+          ],
+          "count": 20054
+        },
+        {
+          "rgb": [
+            240,
+            240,
+            240
+          ],
+          "count": 15871
+        },
+        {
+          "rgb": [
+            144,
+            112,
+            32
+          ],
+          "count": 931
+        },
+        {
+          "rgb": [
+            144,
+            144,
+            160
+          ],
+          "count": 753
+        },
+        {
+          "rgb": [
+            32,
+            32,
+            48
+          ],
+          "count": 661
+        },
+        {
+          "rgb": [
+            224,
+            176,
+            16
+          ],
+          "count": 621
+        },
+        {
+          "rgb": [
+            32,
+            32,
+            64
+          ],
+          "count": 508
+        },
+        {
+          "rgb": [
+            224,
+            160,
+            16
+          ],
+          "count": 498
+        },
+        {
+          "rgb": [
+            80,
+            64,
+            48
+          ],
+          "count": 490
+        },
+        {
+          "rgb": [
+            192,
+            144,
+            32
+          ],
+          "count": 489
+        },
+        {
+          "rgb": [
+            48,
+            48,
+            48
+          ],
+          "count": 471
+        }
+      ]
+    },
+    {
+      "idx": 31,
+      "label": "Every player must participate at the same time to play this mode.",
+      "rect": [
+        2896,
+        8,
+        1048,
+        168
+      ],
+      "alpha_bbox_local": [
+        9,
+        9,
+        1036,
+        160
+      ],
+      "visible_pixels": 81123,
+      "opaque_pixels": 76970,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "dominant_rgb_q16": [
+        {
+          "rgb": [
+            0,
+            0,
+            48
+          ],
+          "count": 47843
+        },
+        {
+          "rgb": [
+            240,
+            176,
+            16
+          ],
+          "count": 25309
+        },
+        {
+          "rgb": [
+            144,
+            112,
+            32
+          ],
+          "count": 764
+        },
+        {
+          "rgb": [
+            192,
+            144,
+            32
+          ],
+          "count": 703
+        },
+        {
+          "rgb": [
+            224,
+            176,
+            16
+          ],
+          "count": 680
+        },
+        {
+          "rgb": [
+            176,
+            128,
+            32
+          ],
+          "count": 653
+        },
+        {
+          "rgb": [
+            224,
+            160,
+            16
+          ],
+          "count": 631
+        },
+        {
+          "rgb": [
+            32,
+            32,
+            48
+          ],
+          "count": 606
+        },
+        {
+          "rgb": [
+            128,
+            96,
+            32
+          ],
+          "count": 523
+        },
+        {
+          "rgb": [
+            80,
+            64,
+            48
+          ],
+          "count": 510
+        },
+        {
+          "rgb": [
+            96,
+            80,
+            48
+          ],
+          "count": 507
+        },
+        {
+          "rgb": [
+            208,
+            160,
+            32
+          ],
+          "count": 502
+        }
+      ]
+    },
+    {
+      "idx": 32,
+      "label": "Versus Special Course has been selected.",
+      "rect": [
+        1400,
+        1504,
+        2216,
+        136
+      ],
+      "alpha_bbox_local": [
+        121,
+        12,
+        2086,
+        133
+      ],
+      "visible_pixels": 129338,
+      "opaque_pixels": 122255,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "dominant_rgb_q16": [
+        {
+          "rgb": [
+            0,
+            0,
+            48
+          ],
+          "count": 75147
+        },
+        {
+          "rgb": [
+            240,
+            176,
+            16
+          ],
+          "count": 24541
+        },
+        {
+          "rgb": [
+            240,
+            240,
+            240
+          ],
+          "count": 20730
+        },
+        {
+          "rgb": [
+            96,
+            80,
+            48
+          ],
+          "count": 926
+        },
+        {
+          "rgb": [
+            144,
+            112,
+            32
+          ],
+          "count": 910
+        },
+        {
+          "rgb": [
+            144,
+            144,
+            160
+          ],
+          "count": 816
+        },
+        {
+          "rgb": [
+            96,
+            96,
+            128
+          ],
+          "count": 801
+        },
+        {
+          "rgb": [
+            208,
+            208,
+            208
+          ],
+          "count": 435
+        },
+        {
+          "rgb": [
+            32,
+            32,
+            48
+          ],
+          "count": 415
+        },
+        {
+          "rgb": [
+            192,
+            144,
+            32
+          ],
+          "count": 406
+        },
+        {
+          "rgb": [
+            224,
+            176,
+            16
+          ],
+          "count": 390
+        },
+        {
+          "rgb": [
+            32,
+            32,
+            64
+          ],
+          "count": 333
+        }
+      ]
+    },
+    {
+      "idx": 33,
+      "label": "Time Attack Mode",
+      "rect": [
+        2896,
+        224,
+        808,
+        120
+      ],
+      "alpha_bbox_local": [
+        4,
+        4,
+        808,
+        112
+      ],
+      "visible_pixels": 82111,
+      "opaque_pixels": 81846,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "dominant_rgb_q16": [
+        {
+          "rgb": [
+            224,
+            144,
+            144
+          ],
+          "count": 50739
+        },
+        {
+          "rgb": [
+            240,
+            240,
+            112
+          ],
+          "count": 13696
+        },
+        {
+          "rgb": [
+            240,
+            240,
+            240
+          ],
+          "count": 7664
+        },
+        {
+          "rgb": [
+            32,
+            16,
+            16
+          ],
+          "count": 5783
+        },
+        {
+          "rgb": [
+            240,
+            224,
+            112
+          ],
+          "count": 320
+        },
+        {
+          "rgb": [
+            240,
+            208,
+            112
+          ],
+          "count": 289
+        },
+        {
+          "rgb": [
+            240,
+            192,
+            128
+          ],
+          "count": 242
+        },
+        {
+          "rgb": [
+            160,
+            144,
+            64
+          ],
+          "count": 188
+        },
+        {
+          "rgb": [
+            128,
+            80,
+            80
+          ],
+          "count": 175
+        },
+        {
+          "rgb": [
+            240,
+            224,
+            96
+          ],
+          "count": 161
+        },
+        {
+          "rgb": [
+            112,
+            96,
+            48
+          ],
+          "count": 142
+        },
+        {
+          "rgb": [
+            176,
+            112,
+            112
+          ],
+          "count": 141
+        }
+      ]
+    },
+    {
+      "idx": 34,
+      "label": "Time Attack Mode",
+      "rect": [
+        2896,
+        392,
+        808,
+        120
+      ],
+      "alpha_bbox_local": [
+        4,
+        4,
+        808,
+        112
+      ],
+      "visible_pixels": 82121,
+      "opaque_pixels": 81846,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "dominant_rgb_q16": [
+        {
+          "rgb": [
+            128,
+            192,
+            128
+          ],
+          "count": 50713
+        },
+        {
+          "rgb": [
+            240,
+            240,
+            112
+          ],
+          "count": 13828
+        },
+        {
+          "rgb": [
+            240,
+            240,
+            240
+          ],
+          "count": 7668
+        },
+        {
+          "rgb": [
+            16,
+            16,
+            16
+          ],
+          "count": 5636
+        },
+        {
+          "rgb": [
+            160,
+            208,
+            128
+          ],
+          "count": 201
+        },
+        {
+          "rgb": [
+            224,
+            224,
+            112
+          ],
+          "count": 189
+        },
+        {
+          "rgb": [
+            160,
+            144,
+            64
+          ],
+          "count": 188
+        },
+        {
+          "rgb": [
+            208,
+            224,
+            112
+          ],
+          "count": 183
+        },
+        {
+          "rgb": [
+            80,
+            112,
+            80
+          ],
+          "count": 175
+        },
+        {
+          "rgb": [
+            192,
+            208,
+            112
+          ],
+          "count": 174
+        },
+        {
+          "rgb": [
+            64,
+            96,
+            64
+          ],
+          "count": 173
+        },
+        {
+          "rgb": [
+            240,
+            224,
+            96
+          ],
+          "count": 160
+        }
+      ]
+    },
+    {
+      "idx": 36,
+      "label": "The distance to the final goal will be very long.",
+      "rect": [
+        2200,
+        832,
+        1160,
+        104
+      ],
+      "alpha_bbox_local": [
+        4,
+        2,
+        1156,
+        99
+      ],
+      "visible_pixels": 62086,
+      "opaque_pixels": 52390,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "dominant_rgb_q16": [
+        {
+          "rgb": [
+            0,
+            0,
+            48
+          ],
+          "count": 32539
+        },
+        {
+          "rgb": [
+            240,
+            240,
+            240
+          ],
+          "count": 14785
+        },
+        {
+          "rgb": [
+            192,
+            48,
+            48
+          ],
+          "count": 3255
+        },
+        {
+          "rgb": [
+            16,
+            16,
+            64
+          ],
+          "count": 710
+        },
+        {
+          "rgb": [
+            112,
+            112,
+            144
+          ],
+          "count": 652
+        },
+        {
+          "rgb": [
+            176,
+            176,
+            192
+          ],
+          "count": 623
+        },
+        {
+          "rgb": [
+            96,
+            96,
+            128
+          ],
+          "count": 557
+        },
+        {
+          "rgb": [
+            192,
+            192,
+            208
+          ],
+          "count": 555
+        },
+        {
+          "rgb": [
+            32,
+            32,
+            80
+          ],
+          "count": 551
+        },
+        {
+          "rgb": [
+            208,
+            208,
+            224
+          ],
+          "count": 539
+        },
+        {
+          "rgb": [
+            160,
+            160,
+            176
+          ],
+          "count": 523
+        },
+        {
+          "rgb": [
+            224,
+            224,
+            240
+          ],
+          "count": 518
+        }
+      ]
+    },
+    {
+      "idx": 37,
+      "label": "You will run 15 courses continuously.",
+      "rect": [
+        3120,
+        664,
+        936,
+        104
+      ],
+      "alpha_bbox_local": [
+        15,
+        14,
+        924,
+        88
+      ],
+      "visible_pixels": 42643,
+      "opaque_pixels": 40367,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "dominant_rgb_q16": [
+        {
+          "rgb": [
+            0,
+            0,
+            48
+          ],
+          "count": 26164
+        },
+        {
+          "rgb": [
+            240,
+            240,
+            240
+          ],
+          "count": 12587
+        },
+        {
+          "rgb": [
+            144,
+            144,
+            160
+          ],
+          "count": 419
+        },
+        {
+          "rgb": [
+            32,
+            32,
+            64
+          ],
+          "count": 418
+        },
+        {
+          "rgb": [
+            208,
+            208,
+            208
+          ],
+          "count": 388
+        },
+        {
+          "rgb": [
+            128,
+            128,
+            144
+          ],
+          "count": 362
+        },
+        {
+          "rgb": [
+            176,
+            176,
+            192
+          ],
+          "count": 296
+        },
+        {
+          "rgb": [
+            112,
+            128,
+            128
+          ],
+          "count": 276
+        },
+        {
+          "rgb": [
+            224,
+            224,
+            224
+          ],
+          "count": 273
+        },
+        {
+          "rgb": [
+            192,
+            192,
+            192
+          ],
+          "count": 268
+        },
+        {
+          "rgb": [
+            80,
+            80,
+            112
+          ],
+          "count": 264
+        },
+        {
+          "rgb": [
+            96,
+            96,
+            128
+          ],
+          "count": 244
+        }
+      ]
+    },
+    {
+      "idx": 44,
+      "label": "Steering Wheel :",
+      "rect": [
+        3360,
+        864,
+        552,
+        72
+      ],
+      "alpha_bbox_local": [
+        88,
+        7,
+        462,
+        67
+      ],
+      "visible_pixels": 10030,
+      "opaque_pixels": 5224,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "dominant_rgb_q16": [
+        {
+          "rgb": [
+            240,
+            240,
+            240
+          ],
+          "count": 5415
+        },
+        {
+          "rgb": [
+            0,
+            16,
+            16
+          ],
+          "count": 1873
+        },
+        {
+          "rgb": [
+            0,
+            64,
+            96
+          ],
+          "count": 210
+        },
+        {
+          "rgb": [
+            0,
+            16,
+            32
+          ],
+          "count": 159
+        },
+        {
+          "rgb": [
+            0,
+            80,
+            112
+          ],
+          "count": 146
+        },
+        {
+          "rgb": [
+            144,
+            144,
+            160
+          ],
+          "count": 136
+        },
+        {
+          "rgb": [
+            96,
+            144,
+            176
+          ],
+          "count": 126
+        },
+        {
+          "rgb": [
+            0,
+            48,
+            64
+          ],
+          "count": 124
+        },
+        {
+          "rgb": [
+            208,
+            208,
+            208
+          ],
+          "count": 115
+        },
+        {
+          "rgb": [
+            144,
+            176,
+            192
+          ],
+          "count": 100
+        },
+        {
+          "rgb": [
+            0,
+            96,
+            144
+          ],
+          "count": 92
+        },
+        {
+          "rgb": [
+            0,
+            32,
+            48
+          ],
+          "count": 92
+        }
+      ]
+    }
+  ],
+  "semantic_strings": 12,
+  "physical_target_count": 13,
+  "protected_text_indices": {
+    "25": "song title",
+    "26": "song title",
+    "27": "song title",
+    "28": "song title",
+    "29": "song title",
+    "30": "song title",
+    "38": "OutRun2",
+    "45": "speed value",
+    "46": "speed value"
+  },
+  "next_stage": "bind per-target source masks/style from canonical HD contacts and render in this invocation",
+  "runtime_validation": "UNTESTED",
+  "status": "A35_PREFLIGHT_COMPLETE_CONTINUE_TO_RENDER"
+}

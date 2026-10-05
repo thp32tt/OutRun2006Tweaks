@@ -1,0 +1,10 @@
+{
+  "run": "20261005-A-PRODUCTION35-PREFLIGHT",
+  "index": 101,
+  "asset": "560FA536",
+  "source_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+  "physical_targets": 13,
+  "semantic_strings": 12,
+  "status": "A35_PREFLIGHT_COMPLETE_CONTINUE_TO_RENDER",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION35-PREFLIGHT/A35_560FA536_PREFLIGHT.json"
+}
