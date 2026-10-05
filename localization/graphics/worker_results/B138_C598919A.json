@@ -1,0 +1,18 @@
+{
+  "run": "20261005-B-PRODUCTION138-C598-SOLVER",
+  "index": 86,
+  "asset": "C598919A",
+  "candidate_sha256": "12d1e25906782aad431b5c0254412abab387e5e9b7d711d1af765d2d28ec4fcf",
+  "localized_physical_elements": 41,
+  "bbox_size_positive_margin": "41/41",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "source_residue": 0,
+  "decoded_changed_outside": 0,
+  "alpha_outside": 0,
+  "protected_regions_changed": 0,
+  "boundary_alpha_index_only_blocks": 1281,
+  "worker_status": "B138_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION138-C598-SOLVER/B138_C598_REPORT.json"
+}
