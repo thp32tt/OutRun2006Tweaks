@@ -7,6 +7,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("worker A only")
 
 repo=Path.cwd()
+# Retry marker after concurrent worker-output push race.
 run="20261006-A-PRODUCTION73-ACF"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
