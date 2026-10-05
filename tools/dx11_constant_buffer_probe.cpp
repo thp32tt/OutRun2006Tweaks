@@ -4231,16 +4231,82 @@ int main()
         r258IndexedSourceRevalidation.snapshotToken != 0,
         "R258 indexed final dormant handoff revalidates current R255 source state");
 
+    const auto r260IndexedResourceBehavior =
+        outrun::vr::dx11::compose_programmable_resource_behavior_readiness(
+            r258IndexedSourceRevalidation,
+            r258IndexedSourceRevalidation.snapshotToken,
+            d3d.device,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            &managedIndexBuffer,
+            managedIndexReady.snapshotToken);
+    require(
+        r260IndexedResourceBehavior.inputValid &&
+        r260IndexedResourceBehavior.sourceRevalidationReady &&
+        r260IndexedResourceBehavior.sourceRevalidationSnapshotMatches &&
+        r260IndexedResourceBehavior.vertexMirrorReady &&
+        r260IndexedResourceBehavior.vertexMirrorSnapshotMatches &&
+        r260IndexedResourceBehavior.indexMirrorRequired &&
+        r260IndexedResourceBehavior.indexMirrorReady &&
+        r260IndexedResourceBehavior.indexMirrorSnapshotMatches &&
+        r260IndexedResourceBehavior.geometryResourceBehaviorExact &&
+        !r260IndexedResourceBehavior.textureResourceBehaviorProofPresent &&
+        !r260IndexedResourceBehavior.outputResourceBehaviorProofPresent &&
+        !r260IndexedResourceBehavior.fullResourceBehaviorProofPresent &&
+        r260IndexedResourceBehavior.missingResourceScopeMask == 0x6u &&
+        r260IndexedResourceBehavior.diagnosticOnly &&
+        r260IndexedResourceBehavior.boundaryPreserved &&
+        r260IndexedResourceBehavior.reviewReady &&
+        r260IndexedResourceBehavior.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_resource_behavior_readiness_snapshot(
+                r258IndexedSourceRevalidation,
+                r258IndexedSourceRevalidation.snapshotToken,
+                d3d.device,
+                managedVertexBuffer,
+                managedVertexPostResetReady.snapshotToken,
+                &managedIndexBuffer,
+                managedIndexReady.snapshotToken,
+                r260IndexedResourceBehavior.reviewSnapshotToken),
+        "R260 indexed geometry resource behavior is exact while texture/output F18 scopes remain fail-closed");
+
+    const auto staleR260IndexedVertexToken =
+        managedVertexPostResetReady.snapshotToken == 1ull
+            ? 2ull
+            : (managedVertexPostResetReady.snapshotToken ^ 1ull);
+    const auto r260IndexedStaleVertex =
+        outrun::vr::dx11::compose_programmable_resource_behavior_readiness(
+            r258IndexedSourceRevalidation,
+            r258IndexedSourceRevalidation.snapshotToken,
+            d3d.device,
+            managedVertexBuffer,
+            staleR260IndexedVertexToken,
+            &managedIndexBuffer,
+            managedIndexReady.snapshotToken);
+    require(
+        r260IndexedStaleVertex.vertexMirrorReady &&
+        !r260IndexedStaleVertex.vertexMirrorSnapshotMatches &&
+        !r260IndexedStaleVertex.geometryResourceBehaviorExact &&
+        !r260IndexedStaleVertex.reviewReady &&
+        r260IndexedStaleVertex.reviewSnapshotToken == 0,
+        "R260 indexed resource behavior rejects stale vertex mirror identity");
+
     const auto r259IndexedPrerequisiteHandoff =
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258IndexedSourceRevalidation,
             r258IndexedSourceRevalidation.snapshotToken,
+            r260IndexedResourceBehavior,
+            r260IndexedResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
             r243InputLayoutReady.snapshotToken);
     require(
         r259IndexedPrerequisiteHandoff.inputValid &&
         r259IndexedPrerequisiteHandoff.sourceRevalidationReady &&
         r259IndexedPrerequisiteHandoff.sourceRevalidationSnapshotMatches &&
+        r259IndexedPrerequisiteHandoff.resourceBehaviorReviewReady &&
+        r259IndexedPrerequisiteHandoff.resourceBehaviorSnapshotMatches &&
+        r259IndexedPrerequisiteHandoff.resourceBehaviorGeometryProofPresent &&
+        !r259IndexedPrerequisiteHandoff.resourceBehaviorCoverageComplete &&
         r259IndexedPrerequisiteHandoff.inputLayoutOwnershipReady &&
         r259IndexedPrerequisiteHandoff.inputLayoutSnapshotMatches &&
         !r259IndexedPrerequisiteHandoff.resourceBehaviorProofPresent &&
@@ -4262,6 +4328,8 @@ int main()
             validate_programmable_activation_prerequisite_handoff_snapshot(
                 r258IndexedSourceRevalidation,
                 r258IndexedSourceRevalidation.snapshotToken,
+                r260IndexedResourceBehavior,
+                r260IndexedResourceBehavior.reviewSnapshotToken,
                 r243InputLayoutReady,
                 r243InputLayoutReady.snapshotToken,
                 r259IndexedPrerequisiteHandoff.reviewSnapshotToken),
@@ -4275,6 +4343,8 @@ int main()
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258IndexedSourceRevalidation,
             staleR258IndexedReviewToken,
+            r260IndexedResourceBehavior,
+            r260IndexedResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
             r243InputLayoutReady.snapshotToken);
     require(
@@ -4285,6 +4355,27 @@ int main()
         r259IndexedStaleSource.activationSnapshotToken == 0,
         "R259 rejects stale R258 source-revalidation identity");
 
+    const auto staleR260IndexedReviewToken =
+        r260IndexedResourceBehavior.reviewSnapshotToken == 1ull
+            ? 2ull
+            : (r260IndexedResourceBehavior.reviewSnapshotToken ^ 1ull);
+    const auto r259IndexedStaleResourceBehavior =
+        outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
+            r258IndexedSourceRevalidation,
+            r258IndexedSourceRevalidation.snapshotToken,
+            r260IndexedResourceBehavior,
+            staleR260IndexedReviewToken,
+            r243InputLayoutReady,
+            r243InputLayoutReady.snapshotToken);
+    require(
+        r259IndexedStaleResourceBehavior.resourceBehaviorReviewReady &&
+        !r259IndexedStaleResourceBehavior.resourceBehaviorSnapshotMatches &&
+        !r259IndexedStaleResourceBehavior.resourceBehaviorGeometryProofPresent &&
+        !r259IndexedStaleResourceBehavior.reviewReady &&
+        r259IndexedStaleResourceBehavior.reviewSnapshotToken == 0 &&
+        r259IndexedStaleResourceBehavior.activationSnapshotToken == 0,
+        "R259 rejects stale R260 resource-behavior identity");
+
     const auto staleR243ReviewToken =
         r243InputLayoutReady.snapshotToken == 1ull
             ? 2ull
@@ -4293,6 +4384,8 @@ int main()
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258IndexedSourceRevalidation,
             r258IndexedSourceRevalidation.snapshotToken,
+            r260IndexedResourceBehavior,
+            r260IndexedResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
             staleR243ReviewToken);
     require(
@@ -5134,15 +5227,55 @@ int main()
         r258NonIndexedSourceRevalidation.snapshotToken != 0,
         "R258 non-indexed final dormant handoff revalidates current R251 source state");
 
+    const auto r260NonIndexedResourceBehavior =
+        outrun::vr::dx11::compose_programmable_resource_behavior_readiness(
+            r258NonIndexedSourceRevalidation,
+            r258NonIndexedSourceRevalidation.snapshotToken,
+            d3d.device,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            nullptr,
+            0);
+    require(
+        r260NonIndexedResourceBehavior.sourceRevalidationReady &&
+        r260NonIndexedResourceBehavior.sourceRevalidationSnapshotMatches &&
+        r260NonIndexedResourceBehavior.vertexMirrorReady &&
+        r260NonIndexedResourceBehavior.vertexMirrorSnapshotMatches &&
+        !r260NonIndexedResourceBehavior.indexMirrorRequired &&
+        r260NonIndexedResourceBehavior.indexMirrorReady &&
+        r260NonIndexedResourceBehavior.indexMirrorSnapshotMatches &&
+        r260NonIndexedResourceBehavior.geometryResourceBehaviorExact &&
+        !r260NonIndexedResourceBehavior.fullResourceBehaviorProofPresent &&
+        r260NonIndexedResourceBehavior.missingResourceScopeMask == 0x6u &&
+        r260NonIndexedResourceBehavior.reviewReady &&
+        r260NonIndexedResourceBehavior.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_resource_behavior_readiness_snapshot(
+                r258NonIndexedSourceRevalidation,
+                r258NonIndexedSourceRevalidation.snapshotToken,
+                d3d.device,
+                managedVertexBuffer,
+                managedVertexPostResetReady.snapshotToken,
+                nullptr,
+                0,
+                r260NonIndexedResourceBehavior.reviewSnapshotToken),
+        "R260 non-indexed geometry resource behavior is exact without inventing index coverage");
+
     const auto r259NonIndexedPrerequisiteHandoff =
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258NonIndexedSourceRevalidation,
             r258NonIndexedSourceRevalidation.snapshotToken,
+            r260NonIndexedResourceBehavior,
+            r260NonIndexedResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
             r243InputLayoutReady.snapshotToken);
     require(
         r259NonIndexedPrerequisiteHandoff.sourceRevalidationReady &&
         r259NonIndexedPrerequisiteHandoff.sourceRevalidationSnapshotMatches &&
+        r259NonIndexedPrerequisiteHandoff.resourceBehaviorReviewReady &&
+        r259NonIndexedPrerequisiteHandoff.resourceBehaviorSnapshotMatches &&
+        r259NonIndexedPrerequisiteHandoff.resourceBehaviorGeometryProofPresent &&
+        !r259NonIndexedPrerequisiteHandoff.resourceBehaviorCoverageComplete &&
         r259NonIndexedPrerequisiteHandoff.inputLayoutProofPresent &&
         !r259NonIndexedPrerequisiteHandoff.resourceBehaviorProofPresent &&
         !r259NonIndexedPrerequisiteHandoff.shaderTranslationProofPresent &&
@@ -5159,6 +5292,8 @@ int main()
             validate_programmable_activation_prerequisite_handoff_snapshot(
                 r258NonIndexedSourceRevalidation,
                 r258NonIndexedSourceRevalidation.snapshotToken,
+                r260NonIndexedResourceBehavior,
+                r260NonIndexedResourceBehavior.reviewSnapshotToken,
                 r243InputLayoutReady,
                 r243InputLayoutReady.snapshotToken,
                 r259NonIndexedPrerequisiteHandoff.reviewSnapshotToken),
