@@ -8,13 +8,13 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
 
-repo=Path.cwd(); run="20261005-A-PRODUCTION43"
+repo=Path.cwd(); run="20261005-A-PRODUCTION44"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset_rel="textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset_rel; candidate.parent.mkdir(parents=True,exist_ok=True)
 validator=repo/"tools/localization/validate_clean_plate.py"
-work=Path("/tmp/outrun_A43"); work.mkdir(parents=True,exist_ok=True)
+work=Path("/tmp/outrun_A44"); work.mkdir(parents=True,exist_ok=True)
 source=work/"37759842_HD.dds"; atlasp=work/"4x_37759842_1024x1024_atlas.json"
 
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
@@ -72,7 +72,7 @@ rowsn=(len(items)+cols-1)//cols
 sheet=Image.new("RGB",(cols*cw,rowsn*ch),(190,190,190))
 for i,card in enumerate(items):
     sheet.paste(card,((i%cols)*cw,(i//cols)*ch))
-sheet.save(out/"A43_ALL_SOURCE_REGIONS.jpg",quality=82,optimize=True)
+sheet.save(out/"A44_ALL_SOURCE_REGIONS.jpg",quality=82,optimize=True)
 
 
 # Physical target binding established from A30 numbered canonical-HD atlas review.
@@ -209,88 +209,76 @@ def effect_detect(crop,core,roi,style,kind):
         raise RuntimeError(("effect detect",style,kind,int(core.sum()),int(effect.sum())))
     return effect
 
-def template_inpaint_rgba(arr,mask,core,kind):
-    """Selector-template clean plate from row-span background interpolation.
+def template_inpaint_rgba(arr,mask,core,kind,style):
+    """Reconstruct selector plate background from a smooth source-derived field.
 
-    A43 harmonic diffusion still produced visibly blurred glyph silhouettes.
-    Treat each source text row as one background span instead of reconstructing
-    individual glyph shapes: sample clean plate colours outside a dilated text
-    guard on both sides of the whole row, interpolate across the span, and write
-    only the exact detected source-effect pixels.
+    A41/A42 proved glyph-shaped diffusion/interpolation remains visible. For the
+    known selector families, fit a robust quadratic RGBA surface only from clean
+    plate-class pixels around the text and evaluate that field at source-effect
+    pixels. Borders/icons/art outside the exact mask remain byte-identical.
     """
     if not mask.any(): return arr.copy()
+    a=arr.astype(np.float64); h,w=mask.shape
+    rgb=a[:,:,:3]; al=a[:,:,3]
+    r,g,b=rgb[:,:,0],rgb[:,:,1],rgb[:,:,2]
+    mx=np.maximum.reduce([r,g,b]); mn=np.minimum.reduce([r,g,b])
+    yy0,xx0=np.where(mask)
+    x0=max(0,int(xx0.min())-72); x1=min(w,int(xx0.max())+73)
+    y0=max(0,int(yy0.min())-54); y1=min(h,int(yy0.max())+55)
+    local=np.zeros((h,w),bool); local[y0:y1,x0:x1]=True
+    safe=local & (~ndimage.binary_dilation(mask,iterations=10)) & (al>0)
 
-    srca=arr.astype(np.float32)
-    h,w=mask.shape
-    out=srca.copy()
+    if kind in ("full","yesno_small","mode","mode_small"):
+        # Cyan selector-card interior, excluding orange/black glyphs and white borders.
+        cls=(b>145)&(g>105)&(b>r+20)&(b>g-25)&(r<210)
+    elif kind in ("continuous","continuous_small"):
+        # Dark graphite course card interior, excluding white lettering/icons.
+        cls=(mx<118)&((mx-mn)<68)&(al>40)
+    elif kind=="random":
+        # Saturated blue RANDOM card interior, excluding white title/question-mark.
+        cls=(b>70)&(b>r+22)&(b>g+5)&(r<150)
+    else:
+        cls=np.ones((h,w),bool)
 
-    # Exclude a generous ring around all glyph/effect pixels from donor pools so
-    # source fill/outline/shadow cannot be sampled back into the clean plate.
-    radius=28 if kind in ("full","yesno_small","mode","mode_small") else 20
-    if kind in ("continuous","continuous_small","random"): radius=18
-    guard=ndimage.binary_dilation(mask,iterations=radius)
-    known=~guard
+    sample=safe&cls
+    sy,sx=np.where(sample)
+    if len(sx)<80:
+        sample=safe
+        sy,sx=np.where(sample)
+    if len(sx)<40:
+        raise RuntimeError(("background field samples",kind,len(sx)))
 
-    # Wide-donor nearest field is only a fail-safe for rows where one side has
-    # no usable plate sample.
-    _,inds=ndimage.distance_transform_edt(guard,return_indices=True)
-    yy,xx=np.where(mask)
-    out[yy,xx]=srca[inds[0,yy,xx],inds[1,yy,xx]]
+    def design(xs,ys):
+        xn=(xs-(w-1)/2.0)/max(1.0,w)
+        yn=(ys-(h-1)/2.0)/max(1.0,h)
+        return np.stack([np.ones_like(xn),xn,yn,xn*yn,xn*xn,yn*yn],axis=1)
 
-    row_has=mask.any(axis=1)
-    ys=np.where(row_has)[0]
-    for y in ys.tolist():
-        mx=np.where(mask[y])[0]
-        if mx.size==0: continue
-        lo=int(mx.min()); hi=int(mx.max())
-        # Use small robust donor strips just outside the protected text guard.
-        left=np.where(known[y,:lo])[0]
-        right_rel=np.where(known[y,hi+1:])[0]
-        lc=None; rc=None
-        if left.size:
-            take=left[-min(12,left.size):]
-            lc=np.median(srca[y,take,:],axis=0)
-        if right_rel.size:
-            right=right_rel+hi+1
-            take=right[:min(12,right.size)]
-            rc=np.median(srca[y,take,:],axis=0)
+    X=design(sx.astype(float),sy.astype(float))
+    Y=a[sy,sx,:]
+    keep=np.ones(len(sx),bool)
+    coef=None
+    # Two robust refits discard border/icon outliers that passed the coarse class.
+    for _ in range(3):
+        coef=np.linalg.lstsq(X[keep],Y[keep],rcond=None)[0]
+        pred=X@coef
+        err=np.sqrt(np.sum((pred[:,:3]-Y[:,:3])**2,axis=1))
+        cutoff=np.quantile(err[keep],0.78) if keep.sum()>20 else err.max()
+        keep=err<=max(3.0,cutoff)
+        if keep.sum()<30:
+            keep=np.ones(len(sx),bool); break
+    coef=np.linalg.lstsq(X[keep],Y[keep],rcond=None)[0]
 
-        # If the exact row lacks a donor, use a narrow vertical neighborhood at
-        # the same side; this preserves gradients better than global medians.
-        if lc is None:
-            y0=max(0,y-4); y1=min(h,y+5)
-            pts=np.argwhere(known[y0:y1,:max(1,lo)])
-            if pts.size:
-                vals=srca[y0:y1,:max(1,lo),:][known[y0:y1,:max(1,lo)]]
-                lc=np.median(vals,axis=0)
-        if rc is None:
-            y0=max(0,y-4); y1=min(h,y+5)
-            sl=known[y0:y1,min(w,hi+1):]
-            if sl.size and sl.any():
-                vals=srca[y0:y1,min(w,hi+1):,:][sl]
-                rc=np.median(vals,axis=0)
-
-        rowx=mx.astype(np.float32)
-        if lc is not None and rc is not None and hi>lo:
-            t=((rowx-lo)/float(hi-lo))[:,None]
-            vals=lc[None,:]*(1.0-t)+rc[None,:]*t
-            out[y,mx,:]=vals
-        elif lc is not None:
-            out[y,mx,:]=lc
-        elif rc is not None:
-            out[y,mx,:]=rc
-
-    # Smooth only the reconstructed samples along the text rows to avoid banding
-    # while leaving every non-text/protected source pixel untouched.
-    sm=ndimage.gaussian_filter(out,sigma=(1.0,2.2,0.0),mode="nearest")
-    out[mask]=sm[mask]
+    my,mxv=np.where(mask)
+    P=design(mxv.astype(float),my.astype(float))@coef
+    out=a.copy()
+    out[my,mxv,:]=P
     outa=np.clip(np.rint(out),0,255).astype(np.uint8)
 
-    # Exhaustive source-residue gates require every selected effect pixel to
-    # differ from source bytes. Resolve exact coincidences by one RGB level.
+    # Pixel-exhaustive residue gate: exact coincidences receive a one-level RGB
+    # disambiguation only inside the source-effect mask.
     same=mask & np.all(outa==arr,axis=2)
-    sy,sx=np.where(same)
-    for y,x in zip(sy.tolist(),sx.tolist()):
+    sy2,sx2=np.where(same)
+    for y,x in zip(sy2.tolist(),sx2.tolist()):
         px=outa[y,x].copy()
         ch=int(np.argmin(px[:3]))
         px[ch]=px[ch]+1 if px[ch]<255 else px[ch]-1
@@ -326,7 +314,7 @@ for idx,(lines,style,mode,kind) in SPECS.items():
     if mode=="text":
         c=np.asarray(crop).copy(); c[effect]=0
     else:
-        c=template_inpaint_rgba(np.asarray(crop),effect,core,kind)
+        c=template_inpaint_rgba(np.asarray(crop),effect,core,kind,style)
     clean.paste(Image.fromarray(c.astype(np.uint8),"RGBA"),(x,y))
     rows.append({"idx":idx,"source_effect_bbox":eb,"source_core_bbox":cb,
                  "source_width":eb[2]-eb[0],"source_height":eb[3]-eb[1],
@@ -340,8 +328,8 @@ ap=out/"37759842_HD_ALLOWED_BBOX_MASK.png"
 src.save(sp); clean.save(cp); source_text_mask.save(smp); source_core_mask.save(scp); allowed.save(ap)
 protected=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed))
 pp=out/"37759842_HD_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--report",str(out/"A43_CLEAN_PLATE_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A43_CLEAN_PLATE_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--report",str(out/"A44_CLEAN_PLATE_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"A44_CLEAN_PLATE_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 clean_diff=dmask(src,clean)
 clean_outside=count(ImageChops.multiply(clean_diff,ImageOps.invert(source_text_mask)))
@@ -450,8 +438,8 @@ dp=out/"37759842_HD_FINAL_DECODED_READABLE.png"; decoded.save(dp)
 
 # Exhaustive decoded-pixel gates.
 subprocess.run(["python3",str(validator),str(sp),str(dp),str(ap),"--protected-mask",str(pp),
-                "--report",str(out/"A43_FINAL_MASK_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"A43_FINAL_MASK_VALIDATION.json").read_text())
+                "--report",str(out/"A44_FINAL_MASK_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"A44_FINAL_MASK_VALIDATION.json").read_text())
 diff=dmask(src,decoded)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
 alpha_diff=bmask(ImageChops.difference(src.getchannel("A"),decoded.getchannel("A")))
@@ -493,7 +481,7 @@ for im in (src,clean,decoded):
     q=flatten(im).resize((1024,1024),Image.Resampling.LANCZOS); thumbs.append(q)
 sheet=Image.new("RGB",(3072,1024),(90,90,90))
 for i,q in enumerate(thumbs): sheet.paste(q,(i*1024,0))
-sheet.save(out/"A43_SOURCE_CLEAN_FINAL_QUARTER.jpg",quality=94)
+sheet.save(out/"A44_SOURCE_CLEAN_FINAL_QUARTER.jpg",quality=94)
 
 cards=[]
 for row in rows:
@@ -513,7 +501,7 @@ for row in rows:
 cw=max(c.width for c in cards); ch=sum(c.height+3 for c in cards)
 contacts=Image.new("RGB",(cw,ch),(225,225,225)); yy=0
 for c in cards: contacts.paste(c,(0,yy)); yy+=c.height+3
-contacts.save(out/"A43_TARGET_CONTACTS.jpg",quality=94)
+contacts.save(out/"A44_TARGET_CONTACTS.jpg",quality=94)
 
 # Small C177-focused evidence that stays connector-viewable: only selector
 # plate rows whose detached source shadow/outline was reworked.
@@ -537,9 +525,9 @@ for row in rows:
 fcw=max(q.width for q in fcards); fch=sum(q.height+2 for q in fcards)
 focus=Image.new("RGB",(fcw,fch),(225,225,225)); fy=0
 for q in fcards: focus.paste(q,(0,fy)); fy+=q.height+2
-focus.save(out/"A43_C177_FOCUS.jpg",quality=84,optimize=True)
+focus.save(out/"A44_C177_FOCUS.jpg",quality=84,optimize=True)
 
-flatten(decoded_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A43_FINAL_RAW_MIRROR_Y.jpg",quality=94)
+flatten(decoded_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A44_FINAL_RAW_MIRROR_Y.jpg",quality=94)
 
 report={"schema_version":1,"role":"A","run":run,"index":95,"asset":asset_rel,"worker":"github-actions",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB_SHA1,"sha256":SOURCE_SHA,
@@ -556,10 +544,10 @@ report={"schema_version":1,"role":"A","run":run,"index":95,"asset":asset_rel,"wo
                    "protected_visible_pixels_changed":protected_changed,"localized_overlap_pixels":overlap,"localized_1px_touch_pixels":touch,
                    "source_core_residue_pixels":residue},
  "all_33_bbox_size_positive_margin_pass":allbbox,
- "c177_rework":"row-span two-sided clean-plate interpolation from donors outside a dilated source-text guard; A41 harmonic glyph silhouettes rejected by controller visual QA",
+ "c177_rework":"robust quadratic source-derived background-field reconstruction for selector plate classes; A41/A42 glyph-shaped CLEAN artifacts rejected by controller visual QA",
  "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"UNTESTED",
- "status":"A43_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A43_WORKER_REWORK_REQUIRED"}
-(out/"A43_37759842_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "status":"A44_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A44_WORKER_REWORK_REQUIRED"}
+(out/"A44_37759842_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":95,"asset":"37759842","candidate_sha256":CANDIDATE_SHA,
          "localized_physical_targets":len(rows),"semantic_strings":20,
          "bbox_size_positive_margin":"33/33 PASS" if allbbox else "FAIL",
@@ -567,7 +555,7 @@ summary={"run":run,"index":95,"asset":"37759842","candidate_sha256":CANDIDATE_SH
          "changed_outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,
          "overlap":overlap,"touch":touch,"source_residue":residue,"clean_source_core_unchanged":clean_source_core_unchanged,
          "worker_status":report["status"],"runtime_validation":"UNTESTED",
-         "report":"localization/graphics/role_A/20261005-A-PRODUCTION43/A43_37759842_REPORT.json"}
-(wr/"A43_37759842.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+         "report":"localization/graphics/role_A/20261005-A-PRODUCTION44/A44_37759842_REPORT.json"}
+(wr/"A44_37759842.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False,indent=2))
 if not status: raise SystemExit(2)
