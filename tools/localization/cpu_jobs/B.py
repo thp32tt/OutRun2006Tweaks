@@ -40,36 +40,35 @@ sa=np.asarray(src,dtype=np.uint8)
 # B174 controller-readable source probe established five text-only windows.
 # These windows exclude player markers, route bars/ticks, numerals and decorative shards.
 specs=[
- ("extra_time","Extra Time","추가 시간",[0,205,495,300],"extra"),
- ("start_left","Start","출발",[0,295,165,352],"small"),
- ("goal_left","Goal","골",[620,295,770,352],"small"),
- ("start_right","Start","출발",[790,295,945,352],"small"),
- ("goal_right","Goal","골",[1390,295,1560,352],"small"),
+ ("extra_time","Extra Time","추가 시간",[16,213,485,284],"extra"),
+ ("start_left","Start","출발",[24,308,131,349],"small"),
+ ("goal_left","Goal","골",[649,308,744,349],"small"),
+ ("start_right","Start","출발",[801,309,908,350],"small"),
+ ("goal_right","Goal","골",[1426,308,1521,349],"small"),
 ]
 
 rows=[]; source_masks=[]
-for key,en,ko,win,kind in specs:
-    x0,y0,x1,y1=win
+for key,en,ko,bb,kind in specs:
+    x0,y0,x1,y1=bb
     a=sa[y0:y1,x0:x1,3]>0
-    ys,xs=np.nonzero(a)
-    if not len(xs): raise RuntimeError(("empty source target",key,win))
-    bb=[x0+int(xs.min()),y0+int(ys.min()),x0+int(xs.max())+1,y0+int(ys.max())+1]
+    if not np.any(a): raise RuntimeError(("empty source target",key,bb))
+    # Exact bboxes come from B174 connected-component review of the readable canonical source.
+    # Use only source alpha inside the component bbox; neighboring player/timeline/numeric art is excluded.
     m=np.zeros((H,W),bool)
     m[y0:y1,x0:x1]=a
-    m[:,:bb[0]]=False; m[:,bb[2]:]=False; m[:bb[1],:]=False; m[bb[3]:,:]=False
     source_masks.append(m)
-    rows.append({"key":key,"source":en,"korean":ko,"kind":kind,"window":win,"original_bbox":bb,"source_mask_pixels":int(m.sum())})
+    rows.append({"key":key,"source":en,"korean":ko,"kind":kind,"original_bbox":bb,"source_mask_pixels":int(m.sum())})
 
-# Fail closed if windows accidentally captured non-text geometry.
-guards={
- "extra_time":(250,495,35,95),
- "start_left":(45,180,20,67),"goal_left":(45,165,20,67),
- "start_right":(45,170,20,67),"goal_right":(45,175,20,67)
-}
+# Exact source bbox sanity, including a one-pixel outside-alpha check on isolated text components.
 for row in rows:
-    bb=row["original_bbox"]; w=bb[2]-bb[0]; h=bb[3]-bb[1]
-    a,b,c,d=guards[row["key"]]
-    if not(a<=w<=b and c<=h<=d): raise RuntimeError(("bbox guard",row["key"],bb,(w,h),guards[row["key"]]))
+    bb=row["original_bbox"]; x0,y0,x1,y1=bb
+    outside_ring=np.zeros((H,W),bool)
+    outside_ring[max(0,y0-1):min(H,y1+1),max(0,x0-1):min(W,x1+1)]=True
+    outside_ring[y0:y1,x0:x1]=False
+    # Neighbor art may exist elsewhere, but none of the five isolated text components may continue directly across its bbox.
+    direct=int(np.count_nonzero(outside_ring & (sa[:,:,3]>0)))
+    if direct:
+        raise RuntimeError(("exact text bbox touches other alpha; reclassify",row["key"],bb,direct))
 
 source_mask=np.zeros((H,W),bool)
 for m in source_masks: source_mask|=m
