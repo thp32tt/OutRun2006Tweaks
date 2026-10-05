@@ -21,7 +21,9 @@
   "alpha_changed_pixels_outside_source_bboxes": 0,
   "protected_visible_pixels_changed": 0,
   "source_residue_visible_pixels": 0,
-  "worker_status": "A_PRODUCTION27_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "worker_status": "A_PRODUCTION27_SELF_QA_PASS_PENDING_C_AND_INGAME",
   "runtime_validation": "UNTESTED",
-  "report": "localization/graphics/role_A/20261005-A-PRODUCTION27/A_PRODUCTION27_E1639D2E_REPORT.json"
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION27/A_PRODUCTION27_E1639D2E_REPORT.json",
+  "controller_visual_qa": "PASS",
+  "alignment_proportion_rework": "PASS_SOURCE_LEFT_ANCHOR_WIDE_LOW_LOADING"
 }
