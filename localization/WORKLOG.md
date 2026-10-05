@@ -1503,3 +1503,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Queue: index 86 -> `b78_rework_required_dxt5_constrained_endpoint_index_solver`; index 236 -> `b80_self_qa_pass_pending_c`. pending_artwork localize_text=27; producer REWORK=1.
 - Independent C final QA and isolated in-game validation remain pending for FEF70E85. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION78-C598-REWORK/B78_CONTROLLER_REWORK.json`, `localization/graphics/role_B/20261005-B-PRODUCTION80/B80_FEF_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION80/B80_CONTROLLER_SELF_QA.json`.
+
+## 2026-10-05 11:53:26 KST — A_PRODUCTION22 30CF0D RDS-free candidate self-QA PASS
+- Remote Desktop Commander was not used. Latest GitHub state was refreshed, then the GitHub-hosted A worker produced odd index 137 `30CF0D_512x256.dds` from the pinned canonical OR2006Sprites source.
+- Canonical source `11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc`: 2048x1024 RGBA32/BGRA, mip1, exact 128-byte header preserved, raw `mirror_y`.
+- Localized all six physical labels represented by the three reviewed semantics: `SELECT TRANSMISSION -> 변속 방식 선택`, standalone `TRANSMISSION -> 변속 방식`, `MANUAL x2 -> 수동`, `AUTOMATIC x2 -> 자동`.
+- Candidate `6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b`: 6/6 exact source-bbox containment, source-size ceiling and positive-margin PASS. Clean source-effect unchanged=0; final outside=0, alpha-outside=0, protected=0, overlap=0, touch=0.
+- Controller SOURCE/CLEAN/FINAL full-atlas, six row contacts and raw mirror_y visual self-QA PASS; no visible English residue, clipping, overlap, seam, halo, protected-artwork damage or orientation regression.
+- Queue index 137 -> `a22_self_qa_pass_pending_c`; pending_artwork localize_text=26; producer REWORK remains 1 (C598919A DXT5 solver). Independent C final QA and isolated in-game validation remain pending.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_A/20261005-A-PRODUCTION22/A_PRODUCTION22_30CF0D_REPORT.json`, `localization/graphics/role_A/20261005-A-PRODUCTION22/A22_CONTROLLER_SELF_QA.json`.
