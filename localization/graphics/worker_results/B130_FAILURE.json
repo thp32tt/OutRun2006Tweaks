@@ -1,0 +1,7 @@
+{
+  "run": "20261005-B-PRODUCTION130",
+  "exception_type": "RuntimeError",
+  "exception": "('source title core unchanged', 6)",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 121, in <module>\n    if core_unchanged!=0: raise RuntimeError((\"source title core unchanged\",core_unchanged))\n                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: ('source title core unchanged', 6)\n",
+  "status": "WORKER_EXCEPTION_DIAGNOSTIC"
+}
