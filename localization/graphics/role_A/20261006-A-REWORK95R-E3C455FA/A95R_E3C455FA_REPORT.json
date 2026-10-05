@@ -1,0 +1,420 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-REWORK95R-E3C455FA",
+  "queue_index": 225,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+  "supersedes_candidate_sha256": "218ae18ba9a79d1c509aac0e0c532b1fb91be3a7e995ffd6b74488f9c84be222",
+  "rework_reason": "A95 controller visual QA found leading Latin source-glyph fragments on six small lobby labels because connected-component masking joined the first glyph to adjacent UI; A95R uses exact source RGB isolation for those rows.",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+    "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds"
+  },
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "pitch": 8192,
+    "mips": 1,
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "raw_mode": "RGBA",
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "candidate_sha256": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+  "conceptual_segments": 9,
+  "localized_physical_rows": 9,
+  "shared_family_font_sizes": {
+    "dark_big": 59,
+    "white_big": 58,
+    "dark_small": 35
+  },
+  "rows": [
+    {
+      "key": "game_lobby",
+      "source": "GAME LOBBY",
+      "korean": "게임 로비",
+      "family": "dark_big",
+      "mask_method": "component",
+      "original_bbox": [
+        1,
+        24,
+        460,
+        86
+      ],
+      "localized_bbox": [
+        3,
+        27,
+        223,
+        83
+      ],
+      "source_width": 459,
+      "source_height": 62,
+      "localized_width": 220,
+      "localized_height": 56,
+      "delta_left": 2,
+      "delta_right": 237,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 59,
+      "fill_rgba": [
+        71,
+        77,
+        79,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "game_list",
+      "source": "GAME LIST",
+      "korean": "게임 목록",
+      "family": "dark_big",
+      "mask_method": "component",
+      "original_bbox": [
+        961,
+        136,
+        1344,
+        198
+      ],
+      "localized_bbox": [
+        963,
+        139,
+        1188,
+        194
+      ],
+      "source_width": 383,
+      "source_height": 62,
+      "localized_width": 225,
+      "localized_height": 55,
+      "delta_left": 2,
+      "delta_right": 156,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 59,
+      "fill_rgba": [
+        71,
+        77,
+        79,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "setup",
+      "source": "SETUP",
+      "korean": "설정",
+      "family": "white_big",
+      "mask_method": "component",
+      "original_bbox": [
+        962,
+        512,
+        1180,
+        573
+      ],
+      "localized_bbox": [
+        964,
+        515,
+        1062,
+        569
+      ],
+      "source_width": 218,
+      "source_height": 61,
+      "localized_width": 98,
+      "localized_height": 54,
+      "delta_left": 2,
+      "delta_right": 118,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 58,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "course_type",
+      "source": "COURSE TYPE",
+      "korean": "코스 유형",
+      "family": "dark_small",
+      "mask_method": "rgb",
+      "original_bbox": [
+        960,
+        711,
+        1257,
+        749
+      ],
+      "localized_bbox": [
+        962,
+        713,
+        1093,
+        746
+      ],
+      "source_width": 297,
+      "source_height": 38,
+      "localized_width": 131,
+      "localized_height": 33,
+      "delta_left": 2,
+      "delta_right": 164,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 35,
+      "fill_rgba": [
+        66,
+        70,
+        71,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "course",
+      "source": "COURSE",
+      "korean": "코스",
+      "family": "dark_small",
+      "mask_method": "rgb",
+      "original_bbox": [
+        960,
+        763,
+        1135,
+        801
+      ],
+      "localized_bbox": [
+        962,
+        768,
+        1024,
+        795
+      ],
+      "source_width": 175,
+      "source_height": 38,
+      "localized_width": 62,
+      "localized_height": 27,
+      "delta_left": 2,
+      "delta_right": 111,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 35,
+      "fill_rgba": [
+        66,
+        70,
+        71,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "car_type",
+      "source": "CAR TYPE",
+      "korean": "차량 유형",
+      "family": "dark_small",
+      "mask_method": "rgb",
+      "original_bbox": [
+        960,
+        815,
+        1172,
+        853
+      ],
+      "localized_bbox": [
+        962,
+        817,
+        1093,
+        851
+      ],
+      "source_width": 212,
+      "source_height": 38,
+      "localized_width": 131,
+      "localized_height": 34,
+      "delta_left": 2,
+      "delta_right": 79,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 35,
+      "fill_rgba": [
+        66,
+        70,
+        71,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "catch_up",
+      "source": "CATCH-UP",
+      "korean": "추격 보정",
+      "family": "dark_small",
+      "mask_method": "rgb",
+      "original_bbox": [
+        960,
+        867,
+        1177,
+        905
+      ],
+      "localized_bbox": [
+        962,
+        869,
+        1093,
+        903
+      ],
+      "source_width": 217,
+      "source_height": 38,
+      "localized_width": 131,
+      "localized_height": 34,
+      "delta_left": 2,
+      "delta_right": 84,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 35,
+      "fill_rgba": [
+        66,
+        70,
+        71,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "collision",
+      "source": "COLLISION",
+      "korean": "충돌",
+      "family": "dark_small",
+      "mask_method": "rgb",
+      "original_bbox": [
+        960,
+        919,
+        1190,
+        957
+      ],
+      "localized_bbox": [
+        962,
+        921,
+        1024,
+        954
+      ],
+      "source_width": 230,
+      "source_height": 38,
+      "localized_width": 62,
+      "localized_height": 33,
+      "delta_left": 2,
+      "delta_right": 166,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 35,
+      "fill_rgba": [
+        66,
+        70,
+        71,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "players",
+      "source": "PLAYERS",
+      "korean": "플레이어",
+      "family": "dark_small",
+      "mask_method": "rgb",
+      "original_bbox": [
+        960,
+        971,
+        1155,
+        1015
+      ],
+      "localized_bbox": [
+        962,
+        976,
+        1086,
+        1010
+      ],
+      "source_width": 195,
+      "source_height": 44,
+      "localized_width": 124,
+      "localized_height": 34,
+      "delta_left": 2,
+      "delta_right": 69,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 35,
+      "fill_rgba": [
+        66,
+        70,
+        71,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    }
+  ],
+  "machine_qa": {
+    "bbox_size_positive_margin": "9/9 PASS",
+    "changed_pixels": 66089,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "source_exact_residue_pixels": 0,
+    "clean_plate_residue_outside_korean_glyphs": 0,
+    "small_row_source_rgb_residue_outside_korean_glyphs": 0,
+    "localized_overlap_pairs": [],
+    "localized_1px_touch_pairs": [],
+    "dds_roundtrip": "PASS",
+    "controller_defect_regression_guard": "ALL_6_SMALL_ROWS_CAPTURE_LEADING_SOURCE_GLYPH_AT_X960"
+  },
+  "visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "A95R_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
