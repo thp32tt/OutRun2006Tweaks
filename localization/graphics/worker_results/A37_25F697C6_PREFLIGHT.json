@@ -1,0 +1,9 @@
+{
+  "run": "20261005-A-PRODUCTION37-PREFLIGHT",
+  "index": 133,
+  "asset": "25F697C6",
+  "source_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+  "regions": 24,
+  "status": "A37_PREFLIGHT_COMPLETE_CONTINUE_TO_RENDER",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION37-PREFLIGHT/A37_25F697C6_PREFLIGHT.json"
+}

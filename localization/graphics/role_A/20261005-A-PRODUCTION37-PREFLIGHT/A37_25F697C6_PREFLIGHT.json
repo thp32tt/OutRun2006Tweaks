@@ -1,0 +1,468 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION37-PREFLIGHT",
+  "index": 133,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+  "readiness": "ONE_STAGE_TO_RENDER",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "5263429e689933e1ebb5923773e5adc1a2e2b7e5",
+    "sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04"
+  },
+  "atlas_provenance": {
+    "git_blob_sha1": "00638ecb71316b9cf2a9d171053698c2296cf061",
+    "sha256": "7f4fa4543810bc2f1f665f26ba8270573fa0bd7badb0643f3c014398483990fa",
+    "regions": 24
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "pitch": 8192,
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "regions": [
+    {
+      "idx": 0,
+      "name": "sprite_531",
+      "rect": [
+        0,
+        1808,
+        1168,
+        240
+      ],
+      "alpha_bbox_local": [
+        313,
+        25,
+        1165,
+        115
+      ],
+      "visible_pixels": 39767,
+      "opaque_pixels": 35104
+    },
+    {
+      "idx": 1,
+      "name": "sprite_532",
+      "rect": [
+        0,
+        1688,
+        1160,
+        120
+      ],
+      "alpha_bbox_local": [
+        303,
+        16,
+        1156,
+        107
+      ],
+      "visible_pixels": 41571,
+      "opaque_pixels": 36733
+    },
+    {
+      "idx": 2,
+      "name": "sprite_533",
+      "rect": [
+        0,
+        1568,
+        1160,
+        120
+      ],
+      "alpha_bbox_local": [
+        104,
+        17,
+        1148,
+        108
+      ],
+      "visible_pixels": 45947,
+      "opaque_pixels": 40137
+    },
+    {
+      "idx": 3,
+      "name": "sprite_534",
+      "rect": [
+        1168,
+        1928,
+        816,
+        120
+      ],
+      "alpha_bbox_local": [
+        125,
+        16,
+        813,
+        107
+      ],
+      "visible_pixels": 32034,
+      "opaque_pixels": 28121
+    },
+    {
+      "idx": 4,
+      "name": "sprite_535",
+      "rect": [
+        1160,
+        1688,
+        800,
+        120
+      ],
+      "alpha_bbox_local": [
+        12,
+        17,
+        797,
+        107
+      ],
+      "visible_pixels": 37314,
+      "opaque_pixels": 33210
+    },
+    {
+      "idx": 5,
+      "name": "sprite_536",
+      "rect": [
+        1160,
+        1568,
+        800,
+        120
+      ],
+      "alpha_bbox_local": [
+        192,
+        18,
+        792,
+        109
+      ],
+      "visible_pixels": 29748,
+      "opaque_pixels": 26194
+    },
+    {
+      "idx": 6,
+      "name": "sprite_537",
+      "rect": [
+        1168,
+        1808,
+        792,
+        120
+      ],
+      "alpha_bbox_local": [
+        122,
+        16,
+        791,
+        107
+      ],
+      "visible_pixels": 32197,
+      "opaque_pixels": 28333
+    },
+    {
+      "idx": 7,
+      "name": "sprite_538",
+      "rect": [
+        0,
+        1448,
+        792,
+        120
+      ],
+      "alpha_bbox_local": [
+        97,
+        18,
+        792,
+        109
+      ],
+      "visible_pixels": 32221,
+      "opaque_pixels": 28315
+    },
+    {
+      "idx": 8,
+      "name": "sprite_539",
+      "rect": [
+        792,
+        1448,
+        568,
+        120
+      ],
+      "alpha_bbox_local": [
+        147,
+        17,
+        563,
+        107
+      ],
+      "visible_pixels": 19678,
+      "opaque_pixels": 17256
+    },
+    {
+      "idx": 9,
+      "name": "sprite_540",
+      "rect": [
+        1360,
+        1448,
+        552,
+        120
+      ],
+      "alpha_bbox_local": [
+        135,
+        19,
+        543,
+        109
+      ],
+      "visible_pixels": 20194,
+      "opaque_pixels": 17727
+    },
+    {
+      "idx": 10,
+      "name": "sprite_541",
+      "rect": [
+        0,
+        1328,
+        532,
+        120
+      ],
+      "alpha_bbox_local": [
+        185,
+        17,
+        527,
+        106
+      ],
+      "visible_pixels": 16305,
+      "opaque_pixels": 14394
+    },
+    {
+      "idx": 11,
+      "name": "sprite_542",
+      "rect": [
+        532,
+        1328,
+        516,
+        120
+      ],
+      "alpha_bbox_local": [
+        106,
+        16,
+        512,
+        107
+      ],
+      "visible_pixels": 19128,
+      "opaque_pixels": 16646
+    },
+    {
+      "idx": 12,
+      "name": "sprite_543",
+      "rect": [
+        1048,
+        1328,
+        364,
+        120
+      ],
+      "alpha_bbox_local": [
+        181,
+        17,
+        360,
+        107
+      ],
+      "visible_pixels": 9530,
+      "opaque_pixels": 8334
+    },
+    {
+      "idx": 13,
+      "name": "sprite_544",
+      "rect": [
+        1412,
+        1328,
+        352,
+        120
+      ],
+      "alpha_bbox_local": [
+        173,
+        17,
+        352,
+        107
+      ],
+      "visible_pixels": 9048,
+      "opaque_pixels": 7962
+    },
+    {
+      "idx": 14,
+      "name": "sprite_545",
+      "rect": [
+        0,
+        1208,
+        332,
+        120
+      ],
+      "alpha_bbox_local": [
+        82,
+        19,
+        332,
+        108
+      ],
+      "visible_pixels": 11893,
+      "opaque_pixels": 10387
+    },
+    {
+      "idx": 15,
+      "name": "sprite_546",
+      "rect": [
+        332,
+        1216,
+        1072,
+        112
+      ],
+      "alpha_bbox_local": [
+        217,
+        4,
+        1059,
+        99
+      ],
+      "visible_pixels": 41813,
+      "opaque_pixels": 37103
+    },
+    {
+      "idx": 16,
+      "name": "sprite_547",
+      "rect": [
+        0,
+        1096,
+        1072,
+        112
+      ],
+      "alpha_bbox_local": [
+        664,
+        7,
+        1067,
+        96
+      ],
+      "visible_pixels": 19619,
+      "opaque_pixels": 17534
+    },
+    {
+      "idx": 17,
+      "name": "sprite_548",
+      "rect": [
+        1072,
+        1140,
+        944,
+        68
+      ],
+      "alpha_bbox_local": [
+        456,
+        12,
+        940,
+        64
+      ],
+      "visible_pixels": 15008,
+      "opaque_pixels": 6784
+    },
+    {
+      "idx": 18,
+      "name": "sprite_549",
+      "rect": [
+        0,
+        1028,
+        944,
+        68
+      ],
+      "alpha_bbox_local": [
+        544,
+        12,
+        940,
+        64
+      ],
+      "visible_pixels": 12544,
+      "opaque_pixels": 5488
+    },
+    {
+      "idx": 19,
+      "name": "sprite_550",
+      "rect": [
+        944,
+        1028,
+        944,
+        68
+      ],
+      "alpha_bbox_local": [
+        536,
+        12,
+        944,
+        64
+      ],
+      "visible_pixels": 11968,
+      "opaque_pixels": 5472
+    },
+    {
+      "idx": 20,
+      "name": "sprite_551",
+      "rect": [
+        0,
+        960,
+        944,
+        68
+      ],
+      "alpha_bbox_local": [
+        216,
+        0,
+        932,
+        64
+      ],
+      "visible_pixels": 24224,
+      "opaque_pixels": 11136
+    },
+    {
+      "idx": 21,
+      "name": "sprite_552",
+      "rect": [
+        944,
+        960,
+        944,
+        68
+      ],
+      "alpha_bbox_local": [
+        424,
+        12,
+        940,
+        64
+      ],
+      "visible_pixels": 16752,
+      "opaque_pixels": 7360
+    },
+    {
+      "idx": 22,
+      "name": "sprite_553",
+      "rect": [
+        0,
+        892,
+        944,
+        68
+      ],
+      "alpha_bbox_local": [
+        492,
+        12,
+        940,
+        64
+      ],
+      "visible_pixels": 14176,
+      "opaque_pixels": 6992
+    },
+    {
+      "idx": 23,
+      "name": "sprite_554",
+      "rect": [
+        944,
+        892,
+        944,
+        68
+      ],
+      "alpha_bbox_local": [
+        784,
+        12,
+        940,
+        64
+      ],
+      "visible_pixels": 5584,
+      "opaque_pixels": 2544
+    }
+  ],
+  "reviewed_segments": 9,
+  "policy": "Ferrari/model names protected. Stage names use canonical phonetic Hangul. Factory color names may be transliterated only where the canonical sprite cell positively binds.",
+  "status": "A37_PREFLIGHT_COMPLETE_CONTINUE_TO_RENDER",
+  "runtime_validation": "UNTESTED"
+}
