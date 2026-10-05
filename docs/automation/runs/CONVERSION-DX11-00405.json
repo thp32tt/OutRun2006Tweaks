@@ -37,7 +37,10 @@
     "ca06b03f4544357933f9d30ef146f4f834ce6464",
     "7dbb454a29adbdd6f32d958f2a34f9bb490268e5",
     "e457504def80eab5e14e70493c21e376f8b73bee",
-    "f3cc44fe18732fd0e6e887635a45aa9f5ef32cd2"
+    "f3cc44fe18732fd0e6e887635a45aa9f5ef32cd2",
+    "2065c3012ac6e2d6ed0f7f5d18112a44548aec48",
+    "9ea634dab1be6bf313fc64b4f34ce6fba6fb90ec",
+    "eeaf15688f5ec19625a2e23c603e75feafd07371"
   ],
   "native_draw_path_activation_changed": false,
   "scope_guards": {
@@ -60,7 +63,7 @@
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
-      "evidence": "R267 SM3 DCL interface semantic evidence is implemented and wired into census identity. Positive SM3 input/output provenance, SM2 fail-closed, duplicate-semantic fail-closed regressions, and source-graph enforcement were added without enabling NativeDrawPath, Draw or DrawIndexed."
+      "evidence": "R267 SM3 DCL interface semantic evidence is wired into census identity and hardened against invalid declaration provenance. The decoder now requires the DCL info-token marker bit, validates sampler declaration texture type/reserved bits, rejects overlapping register-component declaration masks, and keeps SM2/ambiguous layouts fail-closed. Probes cover valid SM3 input/output/sampler evidence plus missing-marker, SM2, duplicate-semantic and overlapping-mask rejection. NativeDrawPath, Draw and DrawIndexed remain unchanged."
     },
     "C3_VALIDATE": {
       "status": "IN_PROGRESS",
@@ -69,7 +72,7 @@
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
-      "evidence": "Material implementation and regression commits are present on vr-dx11-native-r71 with [AUTO:CONVERSION-DX11-00405]."
+      "evidence": "Material R267 implementation, DCL provenance fix and regression/source-graph guards are committed on vr-dx11-native-r71 with [AUTO:CONVERSION-DX11-00405]."
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
@@ -96,5 +99,5 @@
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt"
   },
-  "exact_next_action": "Consume exact-SHA Backend Conversion Gate for the latest R267 regression-bearing material commit, then persist C3/C6 PASS state while retaining RUNTIME_VALIDATION=UNTESTED. Keep NativeDrawPath, Draw and DrawIndexed unauthorized."
+  "exact_next_action": "Consume exact-SHA Backend Conversion Gate for the latest R267 DCL-exactness material state, then persist C3/C6 PASS state while retaining RUNTIME_VALIDATION=UNTESTED. Keep NativeDrawPath, Draw and DrawIndexed unauthorized."
 }
