@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION68",
+  "timestamp_kst": "2026-10-05T09:52:00+09:00",
+  "index": 228,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+  "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+  "candidate_sha256": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607",
+  "semantic_binding": {
+    "0": "race select -> 레이스 선택",
+    "1": "mode select -> 모드 선택",
+    "2": "game select -> 게임 선택",
+    "3": "rankings -> 랭킹",
+    "4": "network -> 네트워크",
+    "5": "options -> 옵션",
+    "6": "music select -> 음악 선택",
+    "7": "multiplayer -> 멀티플레이",
+    "8": "main menu -> 메인 메뉴",
+    "9": "game lobby -> 게임 로비",
+    "10": "license select -> 라이선스 선택",
+    "11": "car select -> 차량 선택",
+    "12": "coast 2 coast -> 코스트 2 코스트"
+  },
+  "machine_qa": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "bbox_size_positive_margin": "13/13 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "exact_source_residue": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "overlap": 0,
+    "touch_pairs": 0
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "source_style_family": "PASS",
+    "observations": [
+      "All 13 menu-name rows are mapped in canonical atlas order and are readable in Korean.",
+      "The source silver gradient, dark outline/shadow, left alignment and rightward techno slant family are retained; Korean glyph geometry necessarily follows the verified CJK font rather than the Latin-only source face.",
+      "No visible English residue, clipping, row collision, seam, halo, or orientation regression is present in SOURCE/CLEAN/FINAL, per-row contact, or raw mirror_y evidence."
+    ]
+  },
+  "decision": "B_PRODUCTION68_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
