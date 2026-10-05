@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-05T16:19:38+09:00",
+  "updatedKst": "2026-10-05T18:06:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -74,9 +74,10 @@
     "VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-READ-OWNERSHIP-0010",
     "VR-REFACTOR-POST1000-DISPATCHER-OWNER-BOUNDARIES-0011",
     "VR-REFACTOR-REVIEW-1100",
-    "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012"
+    "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012",
+    "VR-REFACTOR-POST1100-R31-R32-PHYSICAL-DRAW-HOOK-RETIREMENT-0013"
   ],
-  "next": "Do not repeat structural review cycles 0..1100, completed post-1000 items through VR-REFACTOR-POST1000-DISPATCHER-OWNER-BOUNDARIES-0011, or VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012. Preserve the exact R31/R32 retirement preconditions enforced by tools/verify_vr_r31_r32_retirement_guard.py: install fallback, R33->R32->R22 Reset, R33->R32->R13 Present/DirectGPU, R22/R31 StateBlock coverage, and R33->R32 fail-close->R30 lower-R29 fallback. Physical R31/R32 hook-layer retirement remains DEFERRED until a future bounded task provides an atomic replacement design that preserves all of those contracts; absent that proof, return to explicit DX9Ex runtime/regression maintenance. Runtime claims remain gated on Quest3/VDXR evidence.",
+  "next": "Do not reintroduce R31/R32 physical draw hooks. R31 is now StateBlock/cache-recovery ownership only; R32 is Reset/Present/DirectGPU lifecycle plus fail-close/workload helper ownership; R33 is the sole physical draw dispatcher and hooks R30 directly. The next bounded structural successor is dead draw-executor cleanup: prove and remove unreachable R31TryFastWorld/R31TryHud/R32TryFastWorld/R32TryHud and any now-unreferenced draw-only telemetry/helpers, while preserving helper functions still consumed by R33. Runtime remains gated on Quest3/VDXR evidence.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -165,11 +166,19 @@
     "CONVERSION-DX9EX-00403 / VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012: bounded structural proof gate only; no runtime behavior changed. RED commit 4811ab9d53b5c7ee7a60b8789916b0a6abe74c69 added tools/verify_vr_r31_r32_retirement_guard.py and failed exactly because the canonical DX9Ex Active workflow did not yet own the new guard. Validation-bearing 8b1bd6b3b6d726bec3e478ac2862bde80916a254 wired the guard into both the push path filter and architecture verification step. The guard pins four retirement prerequisites: R31/R32 install fallback ownership, R33->R32->R22 Reset plus R33->R32->R13 Present/DirectGPU ordering, R22/R31 StateBlock lifecycle/fallback coverage, and R33 final fallback through R32LowerFailClosed plus R30-owned lower-R29 calls. N100 exact-SHA py_compile + retirement guard + architecture + R51 + R32-R34 + hook graph + refactor + Sumo + near-plane + workflow YAML passed. GitHub exact-SHA DX9Ex Active 37268342455 policy/host/game/full-chain-compile/package SUCCESS and Domain Isolation Guard 37268342567 SUCCESS. Package artifact 11326909994 digest sha256:b81eb674a40841b5408f09e6e70576662a3b8b171c83b11f1237049847ebd36b. Physical retirement remains intentionally DEFERRED and runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00406: c64 producer provenance and semantic-HUD node-relation diagnostics are telemetry-only; VRTelemetry OFF skips diagnostic c64 provenance lookup. Rendering classification/ownership is unchanged; runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00407: Sumo replay now snapshots explicit RenderScope plus diagnostic ProducerToken in one non-consuming semantic-tag lookup; a deterministic provenance verifier forbids reintroducing the second registry scan. Rendering ownership/classification is unchanged; runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00408 / VR-HOST-002 post-review: A/B/C review completed against current focus sources. Added durable architecture-verifier coverage for Frame.v2 run generation, stale-slot rejection, DirectGPU run binding, gameplay bootstrap gating, and fallback stale-run rejection. Exact material SHA 3c0ee50ba8893e94b42a5213ea36640864834553 passed GitHub-source static contract verification; no runtime behavior changed and RUNTIME_VALIDATION remains UNTESTED."
+    "CONVERSION-DX9EX-00408 / VR-HOST-002 post-review: A/B/C review completed against current focus sources. Added durable architecture-verifier coverage for Frame.v2 run generation, stale-slot rejection, DirectGPU run binding, gameplay bootstrap gating, and fallback stale-run rejection. Exact material SHA 3c0ee50ba8893e94b42a5213ea36640864834553 passed GitHub-source static contract verification; no runtime behavior changed and RUNTIME_VALIDATION remains UNTESTED.",
+    "VR-REFACTOR-POST1100-R31-R32-PHYSICAL-DRAW-HOOK-RETIREMENT-0013 RED contract 10644e014bec5d217b7bdcfc3ef55606938a55cc / DX9Ex Active 37286335194 failed exactly because R31 physical draw hook storage still existed.",
+    "Material 9bbe3630b7edd28c410cf741c1e489ecbfffd2b7 removes four R31-over-R30 draw hooks plus R31Dispatch/draw entry points, removes four R32-over-R31 draw hooks plus R32Dispatch/draw entry points, and retargets R33's four draw hooks directly to R30. R31 retains only four StateBlock hooks; R32 retains only Reset/DirectGPU/Present hooks; R33 remains seven hooks total.",
+    "R32ObserveFrameWorkload is preserved and moved to the four R33 top-level draw entries with the same primitive/indexed/UP flags, so workload telemetry is owned once at the final physical draw boundary instead of residing behind the now-retired R32 draw layer.",
+    "Install fallback remains explicit: R31 still publishes StateBlock readiness, R32 still owns Reset/Present/DirectGPU readiness, and if R33 hook transaction fails the R30 draw path plus R32 lifecycle remain authoritative. R33 Reset/Present continue chaining through R32 and final fallback continues through R32LowerFailClosed -> R30CallLowerDraw* -> R29.",
+    "Style-only d45090cebdef9409713de9d75aa848180a2a538c normalizes two indentation artifacts left by function removal; no runtime semantics changed after 9bbe3630.",
+    "Exact-SHA d45090cebdef9409713de9d75aa848180a2a538c passed DX9Ex Active Validation 37287121778: policy/host/game/R33 final-chain-compile/package SUCCESS; Domain Isolation SUCCESS. Package artifact 11334673407 digest sha256:ed390040d6c53cf476c4e981e84c9e84b047e78f96acdf1189d4a53c0e92ab7d; inner ZIP SHA256 46610cb4dba3e7aa54f15d37e3596143a8a74b84c40367ef33032932f5857d46.",
+    "Physical hook count after retirement: R31=4 StateBlock-only, R32=3 Reset/ResolveDirect/Present-only, R33=7 final reset/present/state/draw hooks. No R31Draw*R30Hook, R32Draw*R31Hook, Draw*DestR31, Draw*DestR32, R31Dispatch or R32Dispatch remain in production source.",
+    "Runtime remains UNTESTED; build/static success does not prove Quest3/VDXR visual or pacing behavior."
   ],
-  "batchStatus": "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARDED",
-  "validatedSourceSha": "3c0ee50ba8893e94b42a5213ea36640864834553",
-  "validationRunId": 37275931018,
+  "batchStatus": "VR-REFACTOR-POST1100-R31-R32-PHYSICAL-DRAW-HOOK-RETIREMENT-BUILD_VERIFIED",
+  "validatedSourceSha": "d45090cebdef9409713de9d75aa848180a2a538c",
+  "validationRunId": 37287121778,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -180,13 +189,14 @@
     "domainIsolation": "SUCCESS"
   },
   "testCandidate": {
-    "sourceSha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
-    "runtimeSourceChangeSha": "36f0f3949bd18993cba3f46585659874e3d7a89f",
-    "workflowRunId": 37268342455,
-    "artifactId": 11326909994,
-    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-8b1bd6b3b6d726bec3e478ac2862bde80916a254",
-    "artifactSizeBytes": 2730691,
-    "artifactDigestSha256": "b81eb674a40841b5408f09e6e70576662a3b8b171c83b11f1237049847ebd36b",
+    "sourceSha": "d45090cebdef9409713de9d75aa848180a2a538c",
+    "runtimeSourceChangeSha": "9bbe3630b7edd28c410cf741c1e489ecbfffd2b7",
+    "workflowRunId": 37287121778,
+    "artifactId": 11334673407,
+    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-d45090cebdef9409713de9d75aa848180a2a538c",
+    "artifactSizeBytes": 2732627,
+    "artifactDigestSha256": "ed390040d6c53cf476c4e981e84c9e84b047e78f96acdf1189d4a53c0e92ab7d",
+    "innerPackageSha256": "46610cb4dba3e7aa54f15d37e3596143a8a74b84c40367ef33032932f5857d46",
     "defaultProfile": "CORRECTNESS",
     "userRuntimeVerified": false
   },
