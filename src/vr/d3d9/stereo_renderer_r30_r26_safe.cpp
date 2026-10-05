@@ -1437,8 +1437,11 @@ namespace OutRunVRStereo
             const void* c64Node = nullptr;
             OutRunVR::GameSemantic::ProducerToken c64Producer =
                 OutRunVR::GameSemantic::ProducerToken::None;
+            // All c64/node-relation counters below are diagnostics emitted
+            // only by R30MaybeLogTelemetry(). Keep their provenance lookup off
+            // the normal HUD draw path when telemetry is disabled.
             bool c64Provenance = false;
-            if (semanticHud || Settings::VRTelemetry)
+            if (Settings::VRTelemetry)
             {
                 c64Provenance =
                     OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
@@ -1531,23 +1534,26 @@ namespace OutRunVRStereo
             if (semanticHud)
             {
                 ++R51VsSemanticHudAccepted;
-                if (c64Provenance)
+                if (Settings::VRTelemetry)
                 {
-                    const auto drawNode =
-                        OutRunVR::GameSemantic::CurrentQueueNode();
-                    const auto drawEpoch =
-                        OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
-                    if (drawNode && c64Node == drawNode &&
-                        c64NodeEpoch == drawEpoch)
-                        ++R51VsSemanticHudC64SameNode;
-                    else if (c64Node)
-                        ++R51VsSemanticHudC64OtherNode;
+                    if (c64Provenance)
+                    {
+                        const auto drawNode =
+                            OutRunVR::GameSemantic::CurrentQueueNode();
+                        const auto drawEpoch =
+                            OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
+                        if (drawNode && c64Node == drawNode &&
+                            c64NodeEpoch == drawEpoch)
+                            ++R51VsSemanticHudC64SameNode;
+                        else if (c64Node)
+                            ++R51VsSemanticHudC64OtherNode;
+                        else
+                            ++R51VsSemanticHudC64NoNode;
+                    }
                     else
+                    {
                         ++R51VsSemanticHudC64NoNode;
-                }
-                else
-                {
-                    ++R51VsSemanticHudC64NoNode;
+                    }
                 }
             }
 
