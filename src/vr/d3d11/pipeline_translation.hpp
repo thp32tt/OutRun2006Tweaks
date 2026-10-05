@@ -336,13 +336,50 @@ namespace outrun::vr::dx11
     // their raw operand-token ranges for shader model 2.x/3.x only. This is a
     // fail-closed structural decoder: it does not yet claim register, constant,
     // sampler, linkage, or HLSL translation semantics.
+    // R266 classifies the R265 raw parameter DWORDs without translating them.
+    // Register type/index and modifier/mask/swizzle fields are preserved exactly
+    // from the D3D9 parameter token. Relative-address tokens remain separate
+    // evidence so a later R263 semantic producer can prove its inputs.
+    enum class ProgrammableShaderOperandRole : std::uint8_t
+    {
+        DestinationRegister = 0,
+        PredicateRegister,
+        SourceRegister,
+        RelativeAddressRegister,
+        DeclarationToken,
+        ImmediateDword,
+    };
+
+    struct ProgrammableShaderDecodedOperand
+    {
+        DWORD token = 0;
+        UINT tokenOffset = 0;
+        ProgrammableShaderOperandRole role =
+            ProgrammableShaderOperandRole::ImmediateDword;
+        bool registerToken = false;
+        bool relativeAddressed = false;
+        UINT registerType = 0;
+        UINT registerIndex = 0;
+        UINT modifier = 0;
+        UINT shift = 0;
+        UINT componentSelection = 0;
+    };
+
     struct ProgrammableShaderDecodedInstruction
     {
         DWORD instructionToken = 0;
         DWORD opcode = 0;
         UINT tokenOffset = 0;
         UINT operandCount = 0;
+        bool operandClassificationExact = false;
+        UINT destinationRegisterCount = 0;
+        UINT predicateRegisterCount = 0;
+        UINT sourceRegisterCount = 0;
+        UINT relativeAddressRegisterCount = 0;
+        UINT declarationTokenCount = 0;
+        UINT immediateDwordCount = 0;
         std::vector<DWORD> operandTokens;
+        std::vector<ProgrammableShaderDecodedOperand> classifiedOperands;
     };
 
     struct ProgrammableShaderInstructionDecode
@@ -352,13 +389,23 @@ namespace outrun::vr::dx11
         bool versionSupported = false;
         bool endSeen = false;
         bool complete = false;
+        bool operandClassificationComplete = false;
         UINT instructionCount = 0;
         UINT operandTokenCount = 0;
         UINT commentDwordCount = 0;
+        UINT classifiedOperandCount = 0;
+        UINT destinationRegisterCount = 0;
+        UINT predicateRegisterCount = 0;
+        UINT sourceRegisterCount = 0;
+        UINT relativeAddressRegisterCount = 0;
+        UINT declarationTokenCount = 0;
+        UINT immediateDwordCount = 0;
         std::uint64_t sourceBytecodeHash = 0;
         std::uint64_t instructionStreamHash = 0;
         std::uint64_t decoderRevisionHash = 0;
         std::uint64_t semanticContractHash = 0;
+        std::uint64_t operandClassificationRevisionHash = 0;
+        std::uint64_t operandClassificationHash = 0;
         std::vector<ProgrammableShaderDecodedInstruction> instructions;
 
         [[nodiscard]] bool exact() const noexcept
@@ -374,11 +421,97 @@ namespace outrun::vr::dx11
                    decoderRevisionHash != 0 &&
                    semanticContractHash != 0;
         }
+
+        [[nodiscard]] bool operands_exact() const noexcept
+        {
+            return exact() &&
+                   operandClassificationComplete &&
+                   classifiedOperandCount != 0 &&
+                   operandClassificationRevisionHash != 0 &&
+                   operandClassificationHash != 0;
+        }
     };
 
     [[nodiscard]] ProgrammableShaderInstructionDecode
     decode_programmable_shader_instruction_stream(
         const ProgrammableShaderFunctionSourceEvidence& evidence) noexcept;
+
+    // R266 classifies the R265 raw operand stream into a bounded semantic
+    // receipt: per-opcode destination/source roles, register type/index,
+    // modifiers, relative-address tokens, and constant/sampler provenance.
+    // This remains evidence only; it does not translate HLSL, create D3D11
+    // shader objects, or authorize NativeDrawPath/Draw/DrawIndexed.
+    enum class ProgrammableShaderOperandRole : std::uint8_t
+    {
+        Destination,
+        Source,
+        RelativeAddress,
+        Declaration,
+        Immediate,
+    };
+
+    struct ProgrammableShaderOperandSemantic
+    {
+        ProgrammableShaderOperandRole role =
+            ProgrammableShaderOperandRole::Immediate;
+        DWORD rawToken = 0;
+        UINT registerType = 0;
+        UINT registerIndex = 0;
+        bool relativeAddressing = false;
+        UINT writeMask = 0;
+        UINT destinationModifier = 0;
+        UINT destinationShift = 0;
+        UINT sourceSwizzle = 0;
+        UINT sourceModifier = 0;
+    };
+
+    struct ProgrammableShaderInstructionOperandSemantics
+    {
+        DWORD opcode = 0;
+        UINT tokenOffset = 0;
+        UINT destinationRegisterCount = 0;
+        UINT sourceRegisterCount = 0;
+        UINT relativeAddressTokenCount = 0;
+        UINT constantRegisterReferenceCount = 0;
+        UINT samplerRegisterReferenceCount = 0;
+        bool complete = false;
+        std::uint64_t semanticHash = 0;
+        std::vector<ProgrammableShaderOperandSemantic> operands;
+    };
+
+    struct ProgrammableShaderOperandSemanticDecode
+    {
+        bool instructionDecodeExact = false;
+        bool complete = false;
+        UINT instructionCount = 0;
+        UINT destinationRegisterCount = 0;
+        UINT sourceRegisterCount = 0;
+        UINT relativeAddressTokenCount = 0;
+        UINT constantRegisterReferenceCount = 0;
+        UINT samplerRegisterReferenceCount = 0;
+        std::uint64_t sourceInstructionStreamHash = 0;
+        std::uint64_t operandSemanticHash = 0;
+        std::uint64_t classifierRevisionHash = 0;
+        std::uint64_t semanticContractHash = 0;
+        std::vector<ProgrammableShaderInstructionOperandSemantics>
+            instructions;
+
+        [[nodiscard]] bool exact() const noexcept
+        {
+            return instructionDecodeExact &&
+                   complete &&
+                   instructionCount != 0 &&
+                   instructions.size() == instructionCount &&
+                   sourceInstructionStreamHash != 0 &&
+                   operandSemanticHash != 0 &&
+                   classifierRevisionHash != 0 &&
+                   semanticContractHash != 0;
+        }
+    };
+
+    [[nodiscard]] ProgrammableShaderOperandSemanticDecode
+    classify_programmable_shader_operands(
+        const ProgrammableShaderInstructionDecode& decode) noexcept;
 
     // R266 derives fail-closed register-level semantics from the exact R265
     // instruction stream. It classifies opcode-specific destination/source
