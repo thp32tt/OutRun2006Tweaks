@@ -1,303 +1,137 @@
 #!/usr/bin/env python3
-import hashlib,json,os,struct,subprocess
+import hashlib,json,os,shutil,struct,urllib.request,subprocess
 from pathlib import Path
-import numpy as np
-from PIL import Image,ImageChops,ImageDraw,ImageFont
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("GitHub-hosted localization CPU worker / role B only")
 
 repo=Path.cwd()
-run="20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY"
+run="20261006-B-PRODUCTION173-JENN-ALIAS"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 
-rel="textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
-candidate=repo/"localization/graphics/hd_candidates"/rel
-source=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"/rel
-clean_path=repo/"localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_CLEAN_PLATE.png"
-protected_path=repo/"localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_PROTECTED_MASK.png"
+src_rel="textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds"
+alias_candidate=repo/"localization/graphics/hd_candidates"/src_rel
+approved_rel="textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds"
+approved_candidate=repo/"localization/graphics/hd_candidates"/approved_rel
+c215_report=repo/"localization/graphics/role_C/20261006-C215-06AB5CEE/C215_06AB5CEE_CONTROLLER_FINAL_QA.json"
+inventory=repo/"localization/graphics/inventory.csv"
 
-INPUT_SHA="9457c16db67978ee383550f9094a8862c5030fdea105deba217a4b416467fa37"
-SOURCE_SHA="6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
-CLEAN_SHA="bc25fc34d95b0d9977ca4af5f8df6c590a654e91f6890f621be18cc6785027ee"
-PROTECTED_SHA="0d95f62263989b1e1371bdff67844a42b47db55199d345f452c65aca9008a56e"
-STAGE_BB=[455,245,690,350]
-OLD_STAGE_BB=[461,249,685,345]
-KOREAN="스테이지"
+APPROVED_CANDIDATE_SHA="0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5"
+CANONICAL_SOURCE_SHA="cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a"
+RECOVERED_LOWRES_SHA="c45f8592260ad9f1d077b54f17c3d71a9b210081e7ab4c0114aa8368908d109b"
+UPSTREAM="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds"
 
-def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def sha(p):
+    return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
-def load_dds(p):
+def dds_meta(p):
     b=Path(p).read_bytes()
-    if b[:4]!=b"DDS ": raise RuntimeError(("not dds",str(p)))
-    h=struct.unpack_from("<I",b,12)[0]; w=struct.unpack_from("<I",b,16)[0]
-    pitch=struct.unpack_from("<I",b,20)[0]; mips=struct.unpack_from("<I",b,28)[0]
-    fourcc=b[84:88]; bpp=struct.unpack_from("<I",b,88)[0]; masks=struct.unpack_from("<IIII",b,92)
-    if bpp!=32 or fourcc!=b"\0\0\0\0" or mips!=1 or len(b)!=128+w*h*4:
-        raise RuntimeError(("unsupported dds",w,h,mips,fourcc,bpp,len(b)))
-    if masks==(0xff,0xff00,0xff0000,0xff000000): mode="RGBA"
-    elif masks==(0xff0000,0xff00,0xff,0xff000000): mode="BGRA"
-    else: raise RuntimeError(("masks",masks))
-    raw=Image.frombytes("RGBA",(w,h),b[128:],"raw",mode)
-    return b[:128],raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM),{
-      "width":w,"height":h,"pitch":pitch,"mips":mips,"bpp":bpp,
-      "masks":[hex(x) for x in masks],"raw_mode":mode
-    }
+    if b[:4]!=b"DDS ": raise RuntimeError(("not_dds",str(p)))
+    h=struct.unpack_from("<I",b,12)[0]
+    w=struct.unpack_from("<I",b,16)[0]
+    pitch=struct.unpack_from("<I",b,20)[0]
+    mips=struct.unpack_from("<I",b,28)[0]
+    pf_flags=struct.unpack_from("<I",b,80)[0]
+    fourcc=b[84:88].hex()
+    bpp=struct.unpack_from("<I",b,88)[0]
+    masks=[hex(x) for x in struct.unpack_from("<IIII",b,92)]
+    return {"width":w,"height":h,"pitch":pitch,"mips":mips,"pf_flags":pf_flags,"fourcc":fourcc,"bpp":bpp,"masks":masks,"bytes":len(b)}
 
-def write_dds(header,readable,p,mode):
-    payload=header+readable.transpose(Image.Transpose.FLIP_TOP_BOTTOM).tobytes("raw",mode)
-    Path(p).write_bytes(payload)
-    return hashlib.sha256(payload).hexdigest()
+if not approved_candidate.exists() or sha(approved_candidate)!=APPROVED_CANDIDATE_SHA:
+    raise RuntimeError(("approved candidate drift",sha(approved_candidate) if approved_candidate.exists() else None))
+c215=json.loads(c215_report.read_text(encoding="utf-8"))
+if c215.get("candidate_sha256")!=APPROVED_CANDIDATE_SHA or c215.get("source_sha256")!=CANONICAL_SOURCE_SHA:
+    raise RuntimeError(("C215 provenance drift",c215.get("candidate_sha256"),c215.get("source_sha256")))
+if c215.get("decision")!="C215_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME":
+    raise RuntimeError(("C215 approval drift",c215.get("decision")))
 
-def font_path(style="Bold"):
-    q=subprocess.check_output(["fc-match","-f","%{file}",f"Noto Sans CJK KR:style={style}"],text=True).strip()
-    if not q or not Path(q).exists() or "NotoSansCJK" not in Path(q).name:
-        subprocess.run(["sudo","apt-get","update","-qq"],check=True)
-        subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
-        q=subprocess.check_output(["fc-match","-f","%{file}",f"Noto Sans CJK KR:style={style}"],text=True).strip()
-    if not q or not Path(q).exists(): raise RuntimeError(("font",style,q))
-    return q
+inv=inventory.read_text(encoding="utf-8")
+expected_low=f"{src_rel},{RECOVERED_LOWRES_SHA},1024,1024,RGBA,language_specific,inspect,unknown,,"
+expected_hd=f"{approved_rel},e02db9b4e04747e2a74295e8f5a01e07f0ed88d31832f4169b1e5996bc30f1eb,4096,4096,RGBA,language_specific,inspect,unknown,,"
+if expected_low not in inv or expected_hd not in inv:
+    raise RuntimeError("inventory alias evidence drift")
+if int("06AB5CEE",16)!=int("6AB5CEE",16):
+    raise RuntimeError("numeric texture hash alias check failed")
 
-def bbox_mask(m):
-    ys,xs=np.nonzero(m)
-    return None if not len(xs) else [int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
+tmp=Path("/tmp/B173_6AB5CEE_HD_SOURCE.dds")
+urllib.request.urlretrieve(UPSTREAM,tmp)
+if sha(tmp)!=CANONICAL_SOURCE_SHA:
+    raise RuntimeError(("canonical source drift",sha(tmp)))
+source_meta=dds_meta(tmp)
+approved_meta=dds_meta(approved_candidate)
+if source_meta!=approved_meta:
+    raise RuntimeError(("structure mismatch source vs approved candidate",source_meta,approved_meta))
+if source_meta["width"]!=4096 or source_meta["height"]!=4096 or source_meta["mips"]!=1 or source_meta["bpp"]!=32:
+    raise RuntimeError(("unexpected canonical structure",source_meta))
 
-def sample_palette(src,bb):
-    a=np.asarray(src,dtype=np.uint8)
-    x0,y0,x1,y1=bb
-    q=a[y0:y1,x0:x1,:]
-    rgb=q[:,:,:3].reshape(-1,3); al=q[:,:,3].reshape(-1)
-    rgb=rgb[al>32]
-    if len(rgb)<100: raise RuntimeError("stage source palette too small")
-    lum=rgb.mean(axis=1)
-    yellow=rgb[(rgb[:,0]>160)&(rgb[:,1]>110)&(rgb[:,2]<140)]
-    navy=rgb[(rgb[:,2]>rgb[:,0]*0.8)&(lum<90)]
-    pale=rgb[(lum>170)&((rgb.max(axis=1)-rgb.min(axis=1))<95)]
-    def med(arr,default):
-        return tuple(int(x) for x in (np.median(arr,axis=0) if len(arr) else np.array(default)))+(255,)
-    return {
-      "face":med(yellow,(250,205,25)),
-      "inner":med(navy,(5,15,70)),
-      "outer":med(pale,(240,240,235))
-    }
+alias_candidate.parent.mkdir(parents=True,exist_ok=True)
+shutil.copyfile(approved_candidate,alias_candidate)
+alias_sha=sha(alias_candidate)
+if alias_sha!=APPROVED_CANDIDATE_SHA:
+    raise RuntimeError(("alias copy drift",alias_sha))
+if dds_meta(alias_candidate)!=source_meta:
+    raise RuntimeError("alias structure mismatch")
 
-def shear_rgba(im,amount):
-    if amount<=0: return im
-    add=int(round(amount*im.height))
-    return im.transform((im.width+add,im.height),Image.Transform.AFFINE,
-                        (1,-amount,add,0,1,0),resample=Image.Resampling.BICUBIC)
-
-def render_candidate(fontfile,palette,bw,bh,margin=6,shear=0.16):
-    for fs in range(76,31,-1):
-        f=ImageFont.truetype(fontfile,fs)
-        probe=Image.new("RGBA",(700,180),(0,0,0,0))
-        d=ImageDraw.Draw(probe)
-        tb=d.textbbox((0,0),KOREAN,font=f,stroke_width=5)
-        base=Image.new("RGBA",(tb[2]-tb[0]+30,tb[3]-tb[1]+30),(0,0,0,0))
-        bd=ImageDraw.Draw(base)
-        xy=(15-tb[0],15-tb[1])
-        # Source family: pale outer rim, dark navy inner keyline, yellow face.
-        bd.text(xy,KOREAN,font=f,fill=palette["face"],stroke_width=5,stroke_fill=palette["outer"])
-        bd.text(xy,KOREAN,font=f,fill=palette["face"],stroke_width=3,stroke_fill=palette["inner"])
-        gb=base.getchannel("A").getbbox()
-        if not gb: continue
-        glyph=base.crop(gb)
-        glyph=shear_rgba(glyph,shear)
-        gb2=glyph.getchannel("A").getbbox()
-        if gb2: glyph=glyph.crop(gb2)
-        if glyph.width<=bw-2*margin and glyph.height<=bh-2*margin:
-            return glyph,fs
-    raise RuntimeError("no natural-advance stage fit")
-
-def comp(im,bg=(82,82,82,255)):
-    z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
-
-def labeled(label,im,crop,scale=1):
-    v=comp(im).crop(crop)
-    if scale!=1: v=v.resize((v.width*scale,v.height*scale),Image.Resampling.NEAREST)
-    c=Image.new("RGB",(v.width,v.height+30),"white"); c.paste(v,(0,30))
-    ImageDraw.Draw(c).text((5,6),label,fill="black")
-    return c
-
-if sha(candidate)!=INPUT_SHA: raise RuntimeError(("candidate drift",sha(candidate),INPUT_SHA))
-if sha(source)!=SOURCE_SHA: raise RuntimeError(("source drift",sha(source),SOURCE_SHA))
-if sha(clean_path)!=CLEAN_SHA: raise RuntimeError(("clean drift",sha(clean_path),CLEAN_SHA))
-if sha(protected_path)!=PROTECTED_SHA: raise RuntimeError(("protected drift",sha(protected_path),PROTECTED_SHA))
-
-header,src,meta=load_dds(source)
-ch,old,cmeta=load_dds(candidate)
-if header!=ch or meta!=cmeta: raise RuntimeError(("structure drift",meta,cmeta))
-clean=Image.open(clean_path).convert("RGBA")
-protected=np.asarray(Image.open(protected_path).convert("L"))>0
-if clean.size!=src.size or protected.shape!=(src.height,src.width): raise RuntimeError("evidence size drift")
-
-x0,y0,x1,y1=STAGE_BB; bw=x1-x0; bh=y1-y0
-allowed=np.zeros((src.height,src.width),bool); allowed[y0:y1,x0:x1]=True
-# B_RECOVERY02 protected mask predates this screenshot override and includes some
-# pixels inside the then-approved Stage cell. IGR-010 explicitly reopens that
-# Stage row, so exclude only this exact target bbox from the legacy protected
-# mask while keeping every neighboring/numeric/heart/art pixel protected.
-legacy_protected_inside_stage=int(np.logical_and(protected,allowed).sum())
-protected_effective=np.logical_and(protected,~allowed)
-
-palette=sample_palette(src,STAGE_BB)
-font=font_path("Bold")
-glyph,fs=render_candidate(font,palette,bw,bh,margin=6,shear=0.16)
-
-final=old.copy()
-# Controller review of the first B172 worker output exposed sparse white source
-# fragments in the historical B_RECOVERY02 clean crop. The canonical Stage cell
-# is a transparent sprite cell, so rebuild the exact reopened source-effect bbox
-# as transparent instead of reusing that stale numeric-PASS clean plate.
-final.paste((0,0,0,0),tuple(STAGE_BB))
-px=x0+(bw-glyph.width)//2
-py=y0+(bh-glyph.height)//2
-layer=Image.new("RGBA",src.size,(0,0,0,0)); layer.alpha_composite(glyph,(px,py))
-render=np.asarray(layer.getchannel("A"))>0
-final.alpha_composite(layer)
-lb=bbox_mask(render)
-if lb is None: raise RuntimeError("empty stage render")
-if not (x0<lb[0] and y0<lb[1] and lb[2]<x1 and lb[3]<y1):
-    raise RuntimeError(("positive margin fail",lb,STAGE_BB))
-if lb[2]-lb[0]>bw or lb[3]-lb[1]>bh:
-    raise RuntimeError(("size ceiling fail",lb,STAGE_BB))
-
-oa=np.asarray(old,dtype=np.uint8); fa=np.asarray(final,dtype=np.uint8)
-changed=np.any(oa!=fa,axis=2)
-outside=int(np.logical_and(changed,~allowed).sum())
-alpha_out=int(np.logical_and(oa[:,:,3]!=fa[:,:,3],~allowed).sum())
-prot_changed=int(np.logical_and(changed,protected_effective).sum())
-render_prot=int(np.logical_and(render,protected_effective).sum())
-if outside or alpha_out or prot_changed or render_prot:
-    raise RuntimeError(("scope fail",outside,alpha_out,prot_changed,render_prot))
-
-new_sha=write_dds(header,final,candidate,meta["raw_mode"])
-dh,decoded,dmeta=load_dds(candidate)
-if dh!=header or dmeta!=meta or ImageChops.difference(decoded,final).getbbox():
-    raise RuntimeError("dds roundtrip fail")
-
-# Evidence masks.
-Image.fromarray((allowed*255).astype(np.uint8),"L").save(out/"B172_STAGE_EDIT_MASK.png")
-Image.fromarray((protected_effective*255).astype(np.uint8),"L").save(out/"B172_PROTECTED_MASK.png")
-target_clean=old.copy(); target_clean.paste((0,0,0,0),tuple(STAGE_BB))
-target_clean.save(out/"B172_STAGE_CLEAN.png")
-decoded.save(out/"B172_FINAL_READABLE.png")
-
-# Visual contacts: source / old squeezed row / clean / new natural-advance row.
-pad=28
-crop=(max(0,x0-pad),max(0,y0-pad),min(src.width,x1+pad),min(src.height,y1+pad))
-cards=[
- labeled("SOURCE Stage",src,crop,4),
- labeled("OLD Korean xscale=0.7028",old,crop,4),
- labeled("CLEAN",target_clean,crop,4),
- labeled("B172 natural advance",decoded,crop,4)
-]
-W=max(c.width for c in cards); H=sum(c.height for c in cards)+8*(len(cards)-1)
-sheet=Image.new("RGB",(W,H),"white"); yy=0
-for c in cards:
-    sheet.paste(c,(0,yy)); yy+=c.height+8
-sheet.save(out/"B172_STAGE_SOURCE_OLD_CLEAN_FINAL_4X.jpg",quality=97)
-
-# Family contact includes Ranking / Stage / Rank and right-hand heart tally art.
-family_crop=(90,105,4070,1020)
-co=labeled("A85 BEFORE",old,family_crop,1)
-cn=labeled("B172 AFTER",decoded,family_crop,1)
-fam=Image.new("RGB",(max(co.width,cn.width),co.height+cn.height+8),"white")
-fam.paste(co,(0,0)); fam.paste(cn,(0,co.height+8)); fam.thumbnail((2200,1300),Image.Resampling.LANCZOS)
-fam.save(out/"B172_STAGE_HEART_TALLY_FAMILY_CONTACT.jpg",quality=96)
-
-ro=old.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-rf=decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-raw_crop=(90,2048-1020,4070,2048-105)
-co=labeled("A85 RAW",ro,raw_crop,1); cn=labeled("B172 RAW",rf,raw_crop,1)
-raw=Image.new("RGB",(max(co.width,cn.width),co.height+cn.height+8),"white")
-raw.paste(co,(0,0)); raw.paste(cn,(0,co.height+8)); raw.thumbnail((2200,1300),Image.Resampling.LANCZOS)
-raw.save(out/"B172_RAW_FAMILY_CONTACT.jpg",quality=96)
-
-# Exact preservation outside Stage bbox, including A85 OUTRUN MILES rows and numeric/heart tally art.
-stage_changed=int(changed.sum())
 report={
- "schema_version":1,
- "role":"B",
- "run":run,
- "base_head":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
- "user_ingame_regression":["IGR-010","스크린샷(153).png"],
- "screen":"STAGE_HEART_TALLY_OVERLAY",
- "owner_lane":"B",
- "priority":"P1",
- "mapping":{
-   "status":"EXACT_GRAPHICS_A064_STAGE_PLUS_PROTECTED_TALLY_ART",
-   "domain":"GRAPHICS",
-   "queue_index":60,
-   "asset":rel,
-   "localized_binding":{"source":"Stage","korean":KOREAN,"source_effect_bbox":STAGE_BB},
-   "protected_screen_components":["stage numeral/player marker sprites","heart icon","x /8 tally glyphs/numerals"],
-   "runtime_text_required":False,
-   "runtime_table_evidence":"runtime_ko.tsv contains only unrelated stage phrases (IDs 195/381 전체 스테이지, 1123 스테이지 주행, 1133 unlock guidance); no Stage <number> / heart-tally localized runtime row exists.",
-   "provenance":"A064 B84 readable atlas visibly contains Ranking/Stage/Rank together with the heart x /8 tally HUD art. The user screenshot regression is therefore the baked Stage sprite plus protected numeric/icon art, not a Korean runtime-overlay string."
- },
- "regression_cause":{
-   "producer_origin":"B84",
-   "historical_stage_font_size":80,
-   "historical_horizontal_scale":0.7028,
-   "historical_localized_bbox":OLD_STAGE_BB,
-   "later_preservation":"B_RECOVERY02 preserved the row byte-exact; B_RECOVERY09 re-applied it pixel-exact after clean-plate correction; A85 modified OUTRUN MILES only and kept Stage unchanged.",
-   "numeric_false_negative":"Prior bbox/overlap static PASS did not catch the in-game compressed/hierarchy/readability defect.",
-   "user_screenshot_override":True
- },
- "material_fix":{
-   "input_candidate_sha256":INPUT_SHA,
-   "superseded_first_b172_sha256":"9457c16db67978ee383550f9094a8862c5030fdea105deba217a4b416467fa37",
-   "candidate_sha256":new_sha,
-   "source_sha256":SOURCE_SHA,
-   "source_file":str(source.relative_to(repo)),
-   "clean_plate":"B172 exact Stage source-effect bbox transparent reconstruction; historical B_RECOVERY02 clean crop rejected by controller for sparse white residue",
-   "changed_row":"Stage -> 스테이지",
-   "method":"replace only exact Stage source-effect bbox with transparent source-class clean plate after controller rejected the historical clean crop for sparse white residue; fresh native-resolution Noto Sans CJK KR Bold render at natural horizontal advance, source-derived yellow/navy/pale family, 0.16 right shear; preserve all other candidate pixels exact",
-   "font":"Noto Sans CJK KR Bold",
-   "font_size":fs,
-   "horizontal_scale":1.0,
-   "shear":0.16,
-   "palette_rgba":palette,
-   "old_localized_bbox":OLD_STAGE_BB,
-   "new_localized_bbox":lb,
-   "source_size":[bw,bh],
-   "new_localized_size":[lb[2]-lb[0],lb[3]-lb[1]],
-   "delta_left":lb[0]-x0,
-   "delta_right":x1-lb[2],
-   "delta_top":lb[1]-y0,
-   "delta_bottom":y1-lb[3]
- },
- "controller_retry_reason":"First B172 worker candidate was NOT promoted: mandatory readable visual QA found sparse white source-fragment residue in the reused historical clean crop. Retry reconstructs the reopened Stage cell transparently before lettering.",
- "static_qa":{
-   "containment":"PASS",
-   "size_ceiling":"PASS",
-   "positive_margin":"PASS",
-   "changed_pixels":stage_changed,
-   "changed_pixels_outside_stage_bbox":outside,
-   "alpha_changed_outside_stage_bbox":alpha_out,
-   "legacy_protected_pixels_inside_reopened_stage_bbox":legacy_protected_inside_stage,
-   "protected_changed_pixels":prot_changed,
-   "render_protected_overlap_pixels":render_prot,
-   "header_128_exact":True,
-   "raw_orientation":"mirror_y",
-   "all_non_stage_candidate_pixels_preserved_exact":True,
-   "clean_plate_source_residue_visual":"NONE_AFTER_TRANSPARENT_RECONSTRUCTION",
-   "a85_outrun_miles_rows_preserved_exact":True,
-   "heart_tally_art_preserved_exact":True,
-   "status":"PASS"
- },
- "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
- "runtime_validation":"PENDING_NEW_INGAME_RETEST",
- "status":"B172_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
- "no_vr_ffb_dx11_dxvk_work":True
+  "schema_version":1,
+  "role":"B",
+  "run":run,
+  "base_head":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
+  "queue_index":38,
+  "asset":src_rel,
+  "prior_action":"zoom_review",
+  "readiness_tier":"ZOOM_REVIEW_EXACT_CANONICAL_ALIAS_OF_C215_APPROVED_TEXTURE",
+  "classification":{
+    "result":"LOCALIZABLE_EXACT_ALIAS",
+    "source":"Total Rank x3",
+    "korean":"종합 랭킹",
+    "numeric_texture_hash":"0x06AB5CEE",
+    "leading_zero_alias":{"index36":"06AB5CEE","index38":"6AB5CEE","numeric_equal":True},
+    "reason":"Index38 recovered source is the 1024x1024 low-resolution form, while the HD baseline resolves to the exact same canonical upstream 6AB5CEE payload already used and independently C-approved for index36."
+  },
+  "provenance":{
+    "recovered_index38_inventory_sha256":RECOVERED_LOWRES_SHA,
+    "recovered_index38_dimensions":[1024,1024],
+    "canonical_hd_url":UPSTREAM,
+    "canonical_hd_sha256":CANONICAL_SOURCE_SHA,
+    "canonical_hd_dimensions":[source_meta["width"],source_meta["height"]],
+    "approved_index36_candidate":approved_rel,
+    "approved_index36_candidate_sha256":APPROVED_CANDIDATE_SHA,
+    "c215_report":str(c215_report.relative_to(repo)),
+    "c215_decision":c215["decision"]
+  },
+  "production":{
+    "method":"byte-exact deployable alias copy of independently C215-approved canonical-HD candidate; no low-resolution Korean bitmap or recovered 1024x1024 raster is reused/upscaled",
+    "candidate_path":str(alias_candidate.relative_to(repo)),
+    "candidate_sha256":alias_sha,
+    "candidate_byte_exact_to_c215":True,
+    "new_rasterization":False,
+    "reason_no_rerender":"canonical source SHA and localized candidate bytes are identical to C215-approved index36 texture identity; rerendering would duplicate completed work and risk environment-dependent pixel drift"
+  },
+  "structure":{**source_meta,"header_and_payload_candidate_byte_exact_to_c215":True,"raw_orientation":"mirror_y"},
+  "transferred_static_qa":{
+    "basis":"exact canonical source SHA + exact localized candidate SHA + exact DDS structure",
+    "bbox_size_positive_margin":"3/3 PASS via C215",
+    "decoded_changed_outside_union_source_bboxes":0,
+    "alpha_changed_outside_union_source_bboxes":0,
+    "introduced_visible_outside_union_source_bboxes":0,
+    "unsafe_target_template_variant_pixels":0,
+    "localized_bbox_mismatches":0,
+    "controller_visual_qa_reference":"C215 PASS SOURCE/CLEAN/FINAL + raw mirror_y"
+  },
+  "worker_status":"PASS",
+  "controller_self_qa":"PENDING_CONTROLLER_EXACT_SHA_REUSE_REVIEW",
+  "runtime_validation":"UNTESTED",
+  "status":"B173_ALIAS_CANDIDATE_PASS_PENDING_CONTROLLER_RECONCILE",
+  "no_vr_ffb_dx11_dxvk_work":True
 }
-(out/"B172_IGR010_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(repo/"localization/graphics/worker_results/B172_IGR010.json").write_text(json.dumps({
- "role":"B","run":run,"regression":"IGR-010","queue_index":60,"asset":rel,
- "input_sha256":INPUT_SHA,"candidate_sha256":new_sha,
- "report":str((out/"B172_IGR010_REPORT.json").relative_to(repo)),
- "status":"WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
+(out/"B173_6AB5CEE_ALIAS_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(repo/"localization/graphics/worker_results/B173_6AB5CEE.json").write_text(json.dumps({
+ "role":"B","run":run,"queue_index":38,"asset":"6AB5CEE","candidate_sha256":alias_sha,
+ "canonical_source_sha256":CANONICAL_SOURCE_SHA,
+ "exact_alias_of_queue_index":36,"exact_alias_candidate_sha256":APPROVED_CANDIDATE_SHA,
+ "report":str((out/"B173_6AB5CEE_ALIAS_REPORT.json").relative_to(repo)),
+ "status":"WORKER_PASS_PENDING_CONTROLLER_RECONCILE"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("B172_DONE",new_sha,"font_size",fs,"bbox",lb,"palette",palette)
+print("B173_DONE",alias_sha,source_meta)
