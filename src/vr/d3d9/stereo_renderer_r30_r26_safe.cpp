@@ -1533,9 +1533,9 @@ namespace OutRunVRStereo
 
             if (semanticHud)
             {
-                ++R51VsSemanticHudAccepted;
                 if (Settings::VRTelemetry)
                 {
+                    ++R51VsSemanticHudAccepted;
                     if (c64Provenance)
                     {
                         const auto drawNode =
