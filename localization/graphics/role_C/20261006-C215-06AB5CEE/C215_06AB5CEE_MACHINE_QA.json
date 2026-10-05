@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261006-C215-06AB5CEE",
+  "qa_id": "C215",
+  "queue_index": 36,
+  "asset": "textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+  "producer_run": "20261006-B-PRODUCTION157-JENN",
+  "source_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+  "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "template_approvals": {
+    "C202": "C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "C206": "C206_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+  },
+  "row_checks": [
+    {
+      "region_idx": 1,
+      "approval": "C202",
+      "independent_original_bbox": [
+        1829,
+        3227,
+        2364,
+        3329
+      ],
+      "producer_original_bbox": [
+        1829,
+        3227,
+        2364,
+        3329
+      ],
+      "independent_source_core_bbox": [
+        1844,
+        3242,
+        2349,
+        3314
+      ],
+      "producer_source_core_bbox": [
+        1844,
+        3242,
+        2349,
+        3314
+      ],
+      "independent_localized_bbox": [
+        1980,
+        3246,
+        2212,
+        3310
+      ],
+      "producer_localized_bbox": [
+        1980,
+        3246,
+        2212,
+        3310
+      ],
+      "localized_bbox_exact_match": true,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "target_variant_outside_removal_pixels": 1,
+      "unsafe_variant_pixels": 0
+    },
+    {
+      "region_idx": 2,
+      "approval": "C202",
+      "independent_original_bbox": [
+        594,
+        1622,
+        1128,
+        1724
+      ],
+      "producer_original_bbox": [
+        594,
+        1622,
+        1128,
+        1724
+      ],
+      "independent_source_core_bbox": [
+        609,
+        1637,
+        1113,
+        1709
+      ],
+      "producer_source_core_bbox": [
+        609,
+        1637,
+        1113,
+        1709
+      ],
+      "independent_localized_bbox": [
+        745,
+        1641,
+        977,
+        1705
+      ],
+      "producer_localized_bbox": [
+        745,
+        1641,
+        977,
+        1705
+      ],
+      "localized_bbox_exact_match": true,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "target_variant_outside_removal_pixels": 0,
+      "unsafe_variant_pixels": 0
+    },
+    {
+      "region_idx": 3,
+      "approval": "C206",
+      "independent_original_bbox": [
+        2266,
+        1643,
+        2785,
+        1728
+      ],
+      "producer_original_bbox": [
+        2266,
+        1643,
+        2785,
+        1728
+      ],
+      "independent_source_core_bbox": [
+        2273,
+        1650,
+        2778,
+        1722
+      ],
+      "producer_source_core_bbox": [
+        2273,
+        1650,
+        2778,
+        1722
+      ],
+      "independent_localized_bbox": [
+        2412,
+        1655,
+        2639,
+        1717
+      ],
+      "producer_localized_bbox": [
+        2412,
+        1655,
+        2639,
+        1717
+      ],
+      "localized_bbox_exact_match": true,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "target_variant_outside_removal_pixels": 0,
+      "unsafe_variant_pixels": 0
+    }
+  ],
+  "machine_checks": {
+    "candidate_vs_independently_rebuilt_approved_template_composite_diff_pixels": 0,
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "unsafe_target_template_variant_pixels": 0,
+    "localized_bbox_mismatches": 0
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "preview_files": [
+    "localization/graphics/role_C/20261006-C215-06AB5CEE/C215_JENN_CONTACTS.jpg",
+    "localization/graphics/role_C/20261006-C215-06AB5CEE/C215_JENN_RAW_COMPARE.jpg"
+  ]
+}
