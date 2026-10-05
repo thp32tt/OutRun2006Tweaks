@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T23:55:00+09:00",
+  "role": "C",
+  "run": "20261005-C212-97E863AD",
+  "qa_id": "C212",
+  "queue_index": 193,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "producer_run": "20261005-A-PRODUCTION70-REWORK",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "candidate_sha256": "b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d",
+  "rework_from": "C210_REWORK_REQUIRED_EXCESSIVE_INTERGLYPH_TRACKING_SOURCE_SPACING",
+  "machine_status": "PASS",
+  "row_gate": "13/13 PASS",
+  "machine_checks": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_script_exact_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "protected_changed_pixels": 0
+  },
+  "protected_original_policy": {
+    "OUTRUN2SP_logo": "pixel-exact",
+    "OutRun_inline_token": "pixel-exact",
+    "OutRun2SP_inline_token": "pixel-exact",
+    "OUTRUN_showroom_top_line": "pixel-exact",
+    "TESTAROSSA": "pixel-exact",
+    "SP_OR_product_fragments": "pixel-exact"
+  },
+  "controller_visual_qa": "PASS",
+  "visual_findings": [
+    "C210's detached Hangul syllable blocks are gone. A70 uses natural font advance/kerning with zero artificial tracking and no horizontal glyph scaling.",
+    "The Korean labels retain the source-height Black family: measured localized/source height ratios remain about 0.84-0.91, so the shorter horizontal footprints now reflect Korean string length rather than a reduced overall type scale.",
+    "SOURCE/CLEAN/FINAL contacts show natural continuous Korean word spacing with the established left/inline-token anchors; no source residue, seam, clipping, overlap, halo or protected product/model damage is visible.",
+    "Raw mirror_y orientation and exact header/format/mip structure are preserved."
+  ],
+  "interpretation_of_prior_returns": "C208 correctly rejected the earlier Bold/compact source-style result and C210 correctly rejected width-ratio-driven artificial tracking. A70 resolves the spacing return without reintroducing an overall scale shrink: it keeps the Black/source-height family and accepts script-length-driven width instead of forcing English-width parity.",
+  "decision": "C212_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED",
+  "machine_report": "localization/graphics/role_C/20261005-C212-97E863AD/C212_97E863AD_MACHINE_QA.json",
+  "previews": [
+    "localization/graphics/role_C/20261005-C212-97E863AD/C212_SOURCE_CLEAN_FINAL_CONTACTS.jpg",
+    "localization/graphics/role_C/20261005-C212-97E863AD/C212_RAW_COMPARE.jpg"
+  ],
+  "exclusions": "Completed prior PASS assets were not reopened. VR/FFB/DX11/DXVK untouched."
+}
