@@ -8,119 +8,92 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
 repo=Path.cwd()
-run="20261005-C171-754F0599"
+run="20261005-C173-A05BF610"
 out=repo/"localization/graphics/role_C"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
-
-COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
-source_url=f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{COMMIT}/Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
-asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
+asset="textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds"
 cand=repo/"localization/graphics/hd_candidates"/asset
-srcp=Path("/tmp/C171_754F_source.dds")
-urllib.request.urlretrieve(source_url,srcp)
+srcp=Path("/tmp/C173_A05_source.dds")
+COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
+urllib.request.urlretrieve(f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{COMMIT}/Release/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",srcp)
 
 def sha(b): return hashlib.sha256(b).hexdigest()
 def bbox(m):
     yy,xx=np.nonzero(m)
-    return None if not len(xx) else [int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1]
+    return None if len(xx)==0 else [int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1]
 def count(m): return int(np.count_nonzero(m))
-def comp(im,bg=(96,96,96,255)):
+def comp(im,bg=(72,72,72,255)):
     z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
-def mask_png(m,p): Image.fromarray((m.astype(np.uint8)*255),"L").save(p)
 
 sb=srcp.read_bytes(); cb=cand.read_bytes()
-SOURCE_SHA="9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5"
-CAND_SHA="884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250"
-if sha(sb)!=SOURCE_SHA: raise RuntimeError(("source sha drift",sha(sb)))
-if sha(cb)!=CAND_SHA: raise RuntimeError(("candidate sha drift",sha(cb)))
+SOURCE_SHA="52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129"
+CAND_SHA="d124775363f3e989a312d13fa0ee17436a28cd927837933b0ea9c8a98a89e6a2"
+if sha(sb)!=SOURCE_SHA: raise RuntimeError(("source drift",sha(sb)))
+if sha(cb)!=CAND_SHA: raise RuntimeError(("candidate drift",sha(cb)))
 if sb[:128]!=cb[:128] or len(sb)!=len(cb): raise RuntimeError("DDS header/length drift")
-H,W=struct.unpack_from("<II",sb,12)
-mips=struct.unpack_from("<I",sb,28)[0]
-fourcc=sb[84:88]
-if (W,H)!=(2048,1024) or mips not in (0,1) or fourcc!=b"\x00\x00\x00\x00" or len(sb)!=(128+W*H*4):
-    raise RuntimeError(("DDS structure drift",W,H,mips,fourcc,len(sb)))
+H,W=struct.unpack_from("<II",sb,12); mips=struct.unpack_from("<I",sb,28)[0]
+if (W,H)!=(2048,2048) or len(sb)!=128+W*H*4: raise RuntimeError(("structure",W,H,mips,len(sb)))
 
 raws=Image.open(srcp).convert("RGBA"); rawf=Image.open(cand).convert("RGBA")
-src=raws.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-fin=rawf.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+src=raws.transpose(Image.Transpose.FLIP_TOP_BOTTOM); fin=rawf.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 sa=np.asarray(src,dtype=np.uint8); fa=np.asarray(fin,dtype=np.uint8)
-sm=sa[:,:,3]>0; tm=fa[:,:,3]>0
 
-bands=[(230,397),(397,550),(550,740)]
-expected_src=[[6,254,1372,397],[6,397,956,529],[2,566,1386,717]]
-expected_fin=[[10,274,1021,377],[10,415,561,510],[6,587,1030,696]]
-rows=[]; allowed=np.zeros((H,W),bool); row_targets=[]
-for i,(ya,yb) in enumerate(bands):
-    s=sm.copy(); s[:ya,:]=False; s[yb:,:]=False
-    t=tm.copy(); t[:ya,:]=False; t[yb:,:]=False
-    ob=bbox(s); lb=bbox(t)
-    if ob!=expected_src[i]: raise RuntimeError(("source bbox drift",i,ob,expected_src[i]))
-    if lb!=expected_fin[i]: raise RuntimeError(("candidate bbox drift",i,lb,expected_fin[i]))
-    sw,sh=ob[2]-ob[0],ob[3]-ob[1]; lw,lh=lb[2]-lb[0],lb[3]-lb[1]
-    ds=[lb[0]-ob[0],ob[2]-lb[2],lb[1]-ob[1],ob[3]-lb[3]]
-    if lw>sw or lh>sh or min(ds)<=0: raise RuntimeError(("containment/size/margin fail",i,ob,lb,ds))
-    allowed[ob[1]:ob[3],ob[0]:ob[2]]=True
-    row_targets.append(t)
-    rows.append({"row":i,"original_bbox":ob,"localized_bbox":lb,"source_size":[sw,sh],"localized_size":[lw,lh],
-                 "delta_left":ds[0],"delta_right":ds[1],"delta_top":ds[2],"delta_bottom":ds[3],
-                 "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS"})
+# Independently find Total Rank source core only in the oval title band.
+x0,x1=400,1050; y0,y1=1120,1330
+roi=sa[y0:y1,x0:x1]
+r=roi[:,:,0].astype(np.int16); g=roi[:,:,1].astype(np.int16); b=roi[:,:,2].astype(np.int16); a=roi[:,:,3]
+white=(a>40)&(r>215)&(g>215)&(b>215)&((np.maximum.reduce([r,g,b])-np.minimum.reduce([r,g,b]))<35)
+navy=(a>40)&(b>r+8)&(b>g+4)&(r<125)&(g<125)&(b<190)
+core=np.zeros((H,W),bool); core[y0:y1,x0:x1]=(white|navy)
+# Grow to include antialias/effect fringe and derive exact source title effect bbox.
+effect=np.asarray(Image.fromarray((core.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(7)))>0
+ob=bbox(effect)
+if not ob: raise RuntimeError("source title not found")
+# Candidate changed pixels should remain inside source title bbox; this is necessary but not sufficient.
+allowed=np.zeros((H,W),bool); allowed[ob[1]:ob[3],ob[0]:ob[2]]=True
+diff=np.any(sa!=fa,axis=2); ad=sa[:,:,3]!=fa[:,:,3]
+outside=count(diff&~allowed); alpha_out=count(ad&~allowed)
+# Exact unchanged source-title core proves source-script residue. Remove a small guard around all candidate pixels
+# that differ from source; unchanged original core outside that guard is residue even if producer mask missed it.
+changed_guard=np.asarray(Image.fromarray((diff.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(5)))>0
+residue_mask=core & ~changed_guard & np.all(sa==fa,axis=2)
+residue=count(residue_mask)
+rb=bbox(residue_mask)
+if residue==0: raise RuntimeError("expected source-script residue was not independently reproduced")
 
-diff=np.any(sa!=fa,axis=2)
-ad=sa[:,:,3]!=fa[:,:,3]
-outside=count(diff&~allowed)
-alpha_out=count(ad&~allowed)
-introduced=count(tm&~allowed)
-if outside or alpha_out or introduced: raise RuntimeError(("outside change",outside,alpha_out,introduced))
-
-overlap=0; touch=0
-for i in range(len(row_targets)):
-    for j in range(i+1,len(row_targets)):
-        overlap += count(row_targets[i]&row_targets[j])
-        dil=np.asarray(Image.fromarray((row_targets[i].astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0
-        touch += count(dil&row_targets[j])
-if overlap or touch: raise RuntimeError(("row overlap/touch",overlap,touch))
-
-guard=np.asarray(Image.fromarray((tm.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(9)))>0
-same=np.all(sa==fa,axis=2)
-residue=count(sm&~guard&tm&same)
-if residue: raise RuntimeError(("source residue",residue))
-
-mask_png(sm,out/"C171_SOURCE_ALPHA_MASK.png")
-mask_png(tm,out/"C171_TARGET_ALPHA_MASK.png")
-
-full=Image.new("RGB",(1024,1100),"white")
-for i,(label,im) in enumerate([("SOURCE",src),("FINAL",fin)]):
-    z=comp(im).resize((1024,512),Image.Resampling.NEAREST)
-    full.paste(z,(0,i*550+28)); ImageDraw.Draw(full).text((6,i*550+6),label,fill="black")
-full.save(out/"C171_754F_SOURCE_FINAL.jpg",quality=96)
-
-cards=[]
-for i,(ob,lb) in enumerate(zip(expected_src,expected_fin)):
-    x0=min(ob[0],lb[0]); y0=min(ob[1],lb[1]); x1=max(ob[2],lb[2]); y1=max(ob[3],lb[3]); p=12
-    cr=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
-    cw,ch=cr[2]-cr[0],cr[3]-cr[1]
-    card=Image.new("RGB",(cw*2,ch*2+26),"white")
-    card.paste(comp(src).crop(cr),(0,26))
-    card.paste(comp(fin).crop(cr),(cw,26))
-    d=ImageDraw.Draw(card); d.text((5,5),f"ROW {i} SOURCE",fill="black"); d.text((cw+5,5),f"ROW {i} FINAL",fill="black")
-    cards.append(card)
-sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+6 for c in cards)),"white")
-y=0
-for c in cards: sheet.paste(c,(0,y)); y+=c.height+6
-sheet.save(out/"C171_754F_ROW_CONTACT.jpg",quality=96)
+# Evidence, readable and raw.
+crop=(max(0,ob[0]-40),max(0,ob[1]-45),min(W,ob[2]+180),min(H,ob[3]+45))
+ims=[("SOURCE",src),("FINAL",fin)]
+cw,ch=crop[2]-crop[0],crop[3]-crop[1]
+sheet=Image.new("RGB",(cw*2,ch+28),"white")
+d=ImageDraw.Draw(sheet)
+for i,(lab,im) in enumerate(ims):
+    sheet.paste(comp(im).crop(crop),(i*cw,28)); d.text((i*cw+4,5),lab,fill="black")
+sheet.save(out/"C173_A05_SOURCE_FINAL_DETAIL.jpg",quality=97)
+rm=Image.fromarray((residue_mask.astype(np.uint8)*255),"L"); rm.save(out/"C173_A05_SOURCE_RESIDUE_MASK.png")
+raw=Image.new("RGB",(1024,1070),"white")
+for i,(lab,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raws),("FINAL_RAW_MIRROR_Y",rawf)]):
+    z=comp(im).resize((1024,1024),Image.Resampling.LANCZOS)
+    raw.paste(z,(0,i*535+25)); ImageDraw.Draw(raw).text((5,i*535+5),lab,fill="black")
+raw.save(out/"C173_A05_RAW_COMPARE.jpg",quality=94)
 
 report={
- "schema_version":1,"role":"C","run":run,"qa_id":"C171","queue_index":175,"asset":asset,
- "producer_run":"20261005-A-PRODUCTION29","source_sha256":SOURCE_SHA,"candidate_sha256":CAND_SHA,
+ "schema_version":1,"role":"C","run":run,"qa_id":"C173","queue_index":28,"asset":asset,
+ "producer_run":"20261005-B-PRODUCTION115","source_sha256":SOURCE_SHA,"candidate_sha256":CAND_SHA,
  "candidate_changed_by_C":False,
- "independent_method":"Pinned canonical source re-download; exact DDS header/hash check; independent mirror_y decode; exact alpha bbox derivation for three physical rows; containment/size/positive-margin, outside/alpha/introduced-visible, row overlap/touch and source-residue checks.",
+ "independent_method":"Pinned canonical source re-download; exact DDS header/hash/readable+raw orientation; independent white/navy title-core detection in oval title band; exact changed-pixel containment; unchanged canonical source-core residue detection outside changed-pixel guard.",
  "structure":{"dimensions":[W,H],"format":"RGBA32","mipmaps":mips,"raw_orientation":"mirror_y"},
- "semantic_binding":[{"source":"stage select","korean":"스테이지 선택"},{"source":"showroom","korean":"쇼룸"},{"source":"single player","korean":"싱글 플레이"}],
- "rows":rows,
- "machine_checks":{"decoded_changed_outside":outside,"alpha_changed_outside":alpha_out,"introduced_visible_outside":introduced,"localized_overlap":overlap,"localized_1px_touch":touch,"source_residue":residue},
- "machine_status":"PASS","controller_visual_qa":"PENDING","decision":"PENDING_CONTROLLER_VISUAL_QA","RUNTIME_VALIDATION":"UNTESTED"
+ "source_effect_bbox":ob,
+ "machine_checks":{"decoded_changed_outside_source_effect_bbox":outside,"alpha_changed_outside_source_effect_bbox":alpha_out,
+                   "unchanged_source_title_core_residue_pixels":residue,"source_residue_bbox":rb},
+ "machine_status":"REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+ "controller_visual_qa":"PENDING",
+ "decision":"C173_REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+ "RUNTIME_VALIDATION":"UNTESTED"
 }
-(out/"C171_754F_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-(wr/"C171_754F0599.json").write_text(json.dumps({"run":run,"qa_id":"C171","asset":"754F0599","index":175,"candidate_sha256":CAND_SHA,"machine_status":"PASS","bbox_size_positive_margin":"3/3","runtime_validation":"UNTESTED","report":f"localization/graphics/role_C/{run}/C171_754F_MACHINE_QA.json"},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"qa_id":"C171","candidate_sha256":CAND_SHA,"machine_status":"PASS","rows":rows},ensure_ascii=False),flush=True)
+(out/"C173_A05_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(wr/"C173_A05BF610.json").write_text(json.dumps({"run":run,"qa_id":"C173","asset":"A05BF610","index":28,"candidate_sha256":CAND_SHA,
+ "machine_status":"REWORK_REQUIRED_SOURCE_TEXT_RESIDUE","source_residue_pixels":residue,
+ "report":f"localization/graphics/role_C/{run}/C173_A05_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"qa_id":"C173","source_effect_bbox":ob,"outside":outside,"alpha_outside":alpha_out,"source_residue_pixels":residue,"source_residue_bbox":rb},ensure_ascii=False))
