@@ -69,7 +69,7 @@ alpha_outside=int(np.count_nonzero(alpha_changed & ~allowed))
 protected_clean=int(np.count_nonzero(np.any(ca!=sa,axis=2) & protected_mask))
 protected_final=int(np.count_nonzero(np.any(fa!=sa,axis=2) & protected_mask))
 core_clean_unchanged=int(np.count_nonzero(np.all(ca==sa,axis=2) & core_mask))
-core_final_source_exact=int(np.count_nonzero(np.all(fa==sa,axis=2) & core_mask))
+core_final_source_exact_total=int(np.count_nonzero(np.all(fa==sa,axis=2) & core_mask))\ncore_final_source_exact=int(np.count_nonzero(np.all(fa==sa,axis=2) & core_mask & ~np.any(fa!=ca,axis=2)))
 
 render=np.any(fa!=ca,axis=2)
 
@@ -171,7 +171,7 @@ rep={
    "protected_clean_changed_pixels":protected_clean,
    "protected_candidate_changed_pixels":protected_final,
    "source_core_exact_pixels_remaining_in_clean":core_clean_unchanged,
-   "source_core_exact_pixels_remaining_in_candidate":core_final_source_exact,
+   "source_core_exact_pixels_matching_candidate_total_including_korean_render":core_final_source_exact_total,\n   "source_core_exact_residue_pixels_outside_korean_render":core_final_source_exact,
    "localized_bbox_mismatches":bbox_mismatch,
    "row_containment_size_margin_failures":row_fail,
    "localized_pair_overlap_count":len(overlap_pairs),
