@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-06T00:26:18+09:00",
+  "role": "B",
+  "run": "20261006-B-PRODUCTION157-JENN",
+  "queue_index": 36,
+  "asset": "textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+  "source_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+  "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+  "classification": "zoom_review -> localize_text; Total Rank x3 -> 종합 랭킹",
+  "machine_qa": {
+    "structure": "4096x4096 RGBA32 mip1 header exact raw mirror_y",
+    "bbox_size_positive_margin": "3/3 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "decoded_changed_outside_allowed_effect_bboxes": 0,
+    "alpha_changed_outside_allowed_effect_bboxes": 0,
+    "localized_overlap": 0,
+    "localized_1px_touch": 0,
+    "source_script_residue": 0
+  },
+  "template_provenance": [
+    {
+      "region_idx": 1,
+      "kind": "warm starburst",
+      "approval": "C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "target_vs_template_variant_pixels": 240,
+      "target_variant_outside_removal_pixels": 1,
+      "outside_variant_rgba": [
+        255,
+        255,
+        255,
+        1
+      ]
+    },
+    {
+      "region_idx": 2,
+      "kind": "pink speech bubble",
+      "approval": "C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "target_vs_template_variant_pixels": 0,
+      "target_variant_outside_removal_pixels": 0
+    },
+    {
+      "region_idx": 3,
+      "kind": "green speech bubble",
+      "approval": "C206_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "target_vs_template_variant_pixels": 0,
+      "target_variant_outside_removal_pixels": 0
+    }
+  ],
+  "controller_visual_qa": "PASS",
+  "controller_visual_notes": [
+    "Reviewed all three B157 SOURCE/CLEAN/FINAL focus contacts at readable zoom. The warm-starburst, pink-bubble and green-bubble clean plates contain no readable Total Rank ghost, patch box, seam, clipped edge or damaged border/glow.",
+    "The two speech-bubble target patches are source-identical to their already C-approved template families before title removal. The starburst differs only by 240 source-title/effect variant pixels; the sole pixel outside the approved removal footprint is white alpha=1 AA and is explicitly cleared.",
+    "Final 종합 랭킹 uses the same already-approved white fill, dark navy outline, right slant, centered alignment and source-height family as C202/C206. All three localized bboxes retain positive margins inside the source-title core bboxes.",
+    "Full readable overview preserves Jennifer artwork, lens flare, A/B/C/D/E rank letters and heart/cross UI. Raw mirror_y comparison shows expected raw orientation with no unrelated artwork change."
+  ],
+  "decision": "B157_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "machine_report": "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_JENN_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_IDX1_FOCUS.jpg",
+    "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_IDX2_FOCUS.jpg",
+    "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_IDX3_FOCUS.jpg",
+    "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_JENN_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_JENN_RAW_COMPARE.jpg"
+  ],
+  "exclusions": "Completed PASS assets were not repeated. Existing odd-lane 37759842 C186 REWORK was not touched. VR/FFB/DX11/DXVK untouched."
+}
