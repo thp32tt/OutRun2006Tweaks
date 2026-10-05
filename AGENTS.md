@@ -12,6 +12,7 @@ Before substantial work, read:
 - `docs/VR_RUN_STATE.md` — concise human handoff, when present.
 - `docs/VR_REVIEW_FINDINGS.md` — cumulative deduplicated findings, when present.
 - `docs/VR_HOURLY_REVIEW_LOG.txt` and `docs/VR_BUILD_MATRIX_LOG.txt` when relevant.
+- `docs/VR_UPSTREAM_REFERENCES.md` and `docs/VR_REFERENCE_HARVEST.md` when the task touches stereo/HUD/effects/frame identity/backend architecture; treat them as design evidence only and re-verify applicability before implementation.
 
 If the human-readable state files do not exist, create them during the next safe checkpoint.
 
