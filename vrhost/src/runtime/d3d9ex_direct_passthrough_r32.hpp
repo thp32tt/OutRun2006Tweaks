@@ -23,6 +23,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
     struct R32SharedSlotCache
     {
         std::uint32_t generation = 0;
+        std::uint32_t runGeneration = 0;
+        std::uint32_t gamePid = 0;
         std::uint32_t leftHandle = 0;
         std::uint32_t rightHandle = 0;
         std::uint32_t width = 0;
@@ -87,6 +89,9 @@ namespace OutRunVrD3D9ExDirectPassthrough
             frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
         const std::uint32_t generation =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        const std::uint32_t gamePid = frame.clientPid;
         const std::uint32_t left =
             frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex];
         const std::uint32_t right =
@@ -98,13 +103,16 @@ namespace OutRunVrD3D9ExDirectPassthrough
         const DXGI_FORMAT declared = ExpectedDeclaredFormat(
             frame.reserved[OutRunVR::RenderFrameDirectFormatIndex]);
 
-        if (slotIndex >= R32SharedSlots.size() || !generation || !left ||
-            !right || !width || !height || declared == DXGI_FORMAT_UNKNOWN)
+        if (slotIndex >= R32SharedSlots.size() || !generation ||
+            !runGeneration || !gamePid || !left || !right || !width ||
+            !height || declared == DXGI_FORMAT_UNKNOWN)
             return false;
 
         auto& cache = R32SharedSlots[slotIndex];
         if (cache.eye[0] && cache.eye[1] &&
             cache.generation == generation &&
+            cache.runGeneration == runGeneration &&
+            cache.gamePid == gamePid &&
             cache.leftHandle == left && cache.rightHandle == right &&
             cache.width == width && cache.height == height &&
             cache.format == declared)
@@ -156,6 +164,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         }
 
         cache.generation = generation;
+        cache.runGeneration = runGeneration;
+        cache.gamePid = gamePid;
         cache.leftHandle = left;
         cache.rightHandle = right;
         cache.width = width;
@@ -258,6 +268,9 @@ namespace OutRunVrD3D9ExDirectPassthrough
         SafeFrameId = frame.frameId;
         SafeTransportGeneration =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        SafeRunGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        SafeGamePid = frame.clientPid;
         ++SafeCopySuccess;
         ++R32SafeSwaps;
         if (!R32FirstSafeSwapLogged)
@@ -277,8 +290,14 @@ namespace OutRunVrD3D9ExDirectPassthrough
             return false;
         const std::uint32_t generation =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        if (frameId && generation && SafeFrameId == frameId &&
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        const std::uint32_t gamePid = frame.clientPid;
+        if (frameId && generation && runGeneration && gamePid &&
+            SafeFrameId == frameId &&
             SafeTransportGeneration == generation &&
+            SafeRunGeneration == runGeneration &&
+            SafeGamePid == gamePid &&
             SafeEyeSrv[0] && SafeEyeSrv[1])
             return true;
         return CopySharedFrameToSafeEyesR32(frame);

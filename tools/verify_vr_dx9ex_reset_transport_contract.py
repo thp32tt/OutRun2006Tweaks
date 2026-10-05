@@ -525,26 +525,80 @@ require_order(
     "CopySharedFrameToSafeEyes(frame)",
 )
 
-# Host shared-resource caches must key on the new producer generation and both
-# shared handles. A mismatch releases the old COM resources before reopening.
+# Host opened-shared-resource caches must be scoped to the complete Frame.v2
+# game run as well as resource generation and HANDLE values. Windows may recycle
+# HANDLE numeric values after a fast producer-process restart.
 open_slot = body(host_cache, "inline bool R32OpenSharedSlot(")
 require(
     open_slot,
-    "host shared-eye cache identity",
+    "host shared-eye complete run cache identity",
+    "RenderFrameRunGenerationIndex",
+    "const std::uint32_t gamePid = frame.clientPid;",
     "cache.generation == generation",
+    "cache.runGeneration == runGeneration",
+    "cache.gamePid == gamePid",
     "cache.leftHandle == left && cache.rightHandle == right",
     "R32ReleaseSharedSlot(cache);",
     "OpenSharedResource(",
     "cache.generation = generation",
+    "cache.runGeneration = runGeneration",
+    "cache.gamePid = gamePid",
     "cache.leftHandle = left",
     "cache.rightHandle = right",
 )
 require_order(
     open_slot,
-    "host shared-eye reopen",
+    "host shared-eye reopen with complete run identity",
+    "const std::uint32_t generation",
+    "const std::uint32_t runGeneration",
+    "const std::uint32_t gamePid",
+    "cache.generation == generation",
+    "cache.runGeneration == runGeneration",
+    "cache.gamePid == gamePid",
     "R32ReleaseSharedSlot(cache);",
     "OpenSharedResource(",
     "cache.generation = generation",
+    "cache.runGeneration = runGeneration",
+    "cache.gamePid = gamePid",
+)
+
+copy_safe_r32 = body(host_cache, "inline bool CopySharedFrameToSafeEyesR32(")
+require_order(
+    copy_safe_r32,
+    "R32 SafeEye complete identity publication",
+    "PublishCompletedFrame(frame)",
+    "SafeFrameId = frame.frameId;",
+    "SafeTransportGeneration =",
+    "RenderFrameDirectGenerationIndex",
+    "SafeRunGeneration =",
+    "RenderFrameRunGenerationIndex",
+    "SafeGamePid = frame.clientPid;",
+)
+
+ensure_safe_r32 = body(host_cache, "inline bool EnsureSafeFrameR32(")
+require(
+    ensure_safe_r32,
+    "R32 SafeEye complete run cache key",
+    "RenderFrameDirectGenerationIndex",
+    "RenderFrameRunGenerationIndex",
+    "const std::uint32_t gamePid = frame.clientPid;",
+    "SafeFrameId == frameId",
+    "SafeTransportGeneration == generation",
+    "SafeRunGeneration == runGeneration",
+    "SafeGamePid == gamePid",
+)
+require_order(
+    ensure_safe_r32,
+    "R32 SafeEye identity before reuse",
+    "const std::uint32_t generation",
+    "const std::uint32_t runGeneration",
+    "const std::uint32_t gamePid",
+    "SafeFrameId == frameId",
+    "SafeTransportGeneration == generation",
+    "SafeRunGeneration == runGeneration",
+    "SafeGamePid == gamePid",
+    "return true;",
+    "CopySharedFrameToSafeEyesR32(frame)",
 )
 
 # Host ACK ownership may observe late completions from a pre-reset generation
