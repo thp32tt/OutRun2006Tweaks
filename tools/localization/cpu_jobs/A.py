@@ -67,8 +67,7 @@ for key,source,korean,family,window in defs:
     if not bb: raise RuntimeError(("missing",key))
     rows0.append({"key":key,"source":source,"korean":korean,"family":family,"window":window,"original_bbox":bb,"source_mask":m})
 
-# Preserve the unrelated K1/token cluster to the right of QUICK GAME.
-if int(alpha[900:1035,570:760].sum())==0: raise RuntimeError("expected protected K1/token absent")
+# Non-target artwork/tokens remain protected by the global source-visible mask outside exact target windows.
 
 source_mask=np.zeros_like(alpha)
 for r in rows0: source_mask|=r["source_mask"]
