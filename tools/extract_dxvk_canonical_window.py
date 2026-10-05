@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+[Reading 647 lines from line 1 (total: 648 lines, 0 remaining)]
+
 """Extract a SHA-bound canonical PE RVA window for DXVK disassembly evidence."""
 
 from __future__ import annotations
@@ -85,6 +86,26 @@ _F130_EXPECTED_BYTES = bytes.fromhex(
 _F130_INHERITED_FORWARD_TARGETS = [0x00183B60, 0x00183B6E, 0x00183B6F]
 _F130_PREDECESSOR_STATUS = "EXACT_183A8A_TO_183AC7_CONTROL_FLOW_WITH_183AC7_CUT_EDGE_PROVEN"
 _F130_CAPTURE_STATUS = "EXACT_EXE_183AC7_TO_183B07_PROVENANCE_CAPTURED"
+
+
+# CONVERSION-DXVK-00399/F132: capture the next canonical raw frontier from the
+# F131 exact instruction boundary. Preserve the one observed direct rel32 call
+# as address provenance only and carry the trailing raw cut bytes forward.
+_F132_FRONTIER_CONTINUATION_ID = 99
+_F132_START_RVA = 0x00183B07
+_F132_END_RVA = 0x00183B47
+_F132_EXPECTED_BYTES = bytes.fromhex(
+    "6a 00 ff 35 5c bc 98 00 ff 15 4c 61 59 00 a1 44 "
+    "bc 98 00 8b 15 48 bc 98 00 8d 04 80 c1 e0 02 8b "
+    "c8 a1 40 bc 98 00 2b c8 8d 4c 11 ec 51 8d 48 14 "
+    "51 50 e8 02 c8 ff ff 8b 45 08 83 c4 0c ff 0d 44"
+)
+_F132_INHERITED_FORWARD_TARGETS = [0x00183B60, 0x00183B6E, 0x00183B6F]
+_F132_PREDECESSOR_STATUS = "EXACT_183AC7_TO_183B07_CONTROL_FLOW_BOUNDARY_PROVEN"
+_F132_CAPTURE_STATUS = "EXACT_EXE_183B07_TO_183B47_PROVENANCE_CAPTURED"
+_F132_RAW_OUTBOUND_REL32 = [(0x00183B39, 0x00180340)]
+_F132_TRAILING_OVERLAP_RVA = 0x00183B44
+_F132_TRAILING_OVERLAP_BYTES = bytes.fromhex("ff 0d 44")
 
 
 def discover_frontier_rva(source_path: Path) -> dict:
@@ -494,6 +515,82 @@ def validate_f130_frontier_contract(
     }
 
 
+def validate_f132_frontier_contract(
+    *, frontier: dict, payload: dict, exe_path: Path, source_path: Path, length: int
+) -> dict:
+    """Fail closed on F132 raw provenance from the exact F131 boundary."""
+    if frontier.get("continuation_id") != _F132_FRONTIER_CONTINUATION_ID:
+        return {}
+    actual = bytes.fromhex(payload.get("bytes_hex", ""))
+    trailing_offset = _F132_TRAILING_OVERLAP_RVA - _F132_START_RVA
+    if (
+        frontier.get("rva") != _F132_START_RVA
+        or length != len(_F132_EXPECTED_BYTES)
+        or payload.get("rva_start") != f"0x{_F132_START_RVA:08X}"
+        or payload.get("rva_end_exclusive") != f"0x{_F132_END_RVA:08X}"
+        or payload.get("section") != ".text"
+        or actual != _F132_EXPECTED_BYTES
+        or trailing_offset < 0
+        or actual[trailing_offset:] != _F132_TRAILING_OVERLAP_BYTES
+    ):
+        raise ValueError("F132 canonical frontier contract mismatch")
+
+    analyzer = _load_frontier_analyzer(source_path)
+    pe = analyzer.parse_pe(exe_path.read_bytes())
+    predecessor = analyzer.collect_guarded_gf_target_c_helper_1_third_callee_continuation_99_prefix_proof(pe)
+    if (
+        predecessor.get("status") != _F132_PREDECESSOR_STATUS
+        or predecessor.get("prefix_end_rva") != _F132_START_RVA
+        or predecessor.get("capture_end_rva") != _F132_START_RVA
+        or not predecessor.get("prefix_end_matches")
+        or not predecessor.get("capture_boundary_matches")
+        or predecessor.get("unresolved_forward_targets") != _F132_INHERITED_FORWARD_TARGETS
+        or predecessor.get("continuation_status")
+        != "COMPLETE_INSTRUCTIONS_END_AT_183B07_EXACT_CAPTURE_BOUNDARY_NO_OVERLAP_DEBT"
+    ):
+        raise ValueError("F132 predecessor proof/debt mismatch")
+
+    inbound = analyzer.collect_raw_inbound_rel32_candidates(pe, _F132_START_RVA)
+    outbound = analyzer.collect_raw_rel32_call_candidates(pe, _F132_START_RVA, length)
+    outbound_identity = [
+        (row.get("call_rva"), row.get("target_rva"))
+        for row in outbound
+    ]
+    if inbound:
+        raise ValueError("F132 raw inbound rel32 census is not empty")
+    if outbound_identity != _F132_RAW_OUTBOUND_REL32:
+        raise ValueError(
+            "F132 raw outbound rel32 census mismatch: "
+            f"expected={_F132_RAW_OUTBOUND_REL32} actual={outbound_identity}"
+        )
+
+    return {
+        "frontier_contract_status": _F132_CAPTURE_STATUS,
+        "frontier_predecessor_status": predecessor["status"],
+        "frontier_start_boundary_status": "EXACT_F131_CAPTURE_BOUNDARY_NO_OVERLAP",
+        "frontier_exact_bytes_match": True,
+        "frontier_inherited_unresolved_forward_targets": [
+            f"0x{rva:08X}" for rva in _F132_INHERITED_FORWARD_TARGETS
+        ],
+        "frontier_raw_inbound_rel32_count": 0,
+        "frontier_raw_outbound_rel32_count": len(outbound),
+        "frontier_raw_outbound_rel32": [
+            {
+                "call_rva": f"0x{call_rva:08X}",
+                "target_rva": f"0x{target_rva:08X}",
+            }
+            for call_rva, target_rva in _F132_RAW_OUTBOUND_REL32
+        ],
+        "frontier_trailing_overlap_rva": f"0x{_F132_TRAILING_OVERLAP_RVA:08X}",
+        "frontier_trailing_overlap_bytes": _F132_TRAILING_OVERLAP_BYTES.hex(" "),
+        "frontier_next_overlap_required": True,
+        "frontier_semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+        "frontier_call_semantics": "REL32_TARGET_ADDRESS_PROVEN_SEMANTICS_UNRESOLVED",
+        "frontier_ownership_effect": "NONE",
+        "frontier_runtime_validation": "UNTESTED",
+    }
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--exe", type=Path, required=True)
@@ -528,6 +625,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             validate_f126_frontier_contract,
             validate_f128_frontier_contract,
             validate_f130_frontier_contract,
+            validate_f132_frontier_contract,
         ):
             payload.update(
                 validator(
@@ -549,3 +647,5 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
