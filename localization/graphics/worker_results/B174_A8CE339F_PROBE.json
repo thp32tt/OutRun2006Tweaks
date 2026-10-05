@@ -1,0 +1,9 @@
+{
+  "role": "B",
+  "run": "20261006-B-PROBE174-A8CE339F",
+  "queue_index": 52,
+  "asset": "A8CE339F",
+  "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+  "report": "localization/graphics/role_B/20261006-B-PROBE174-A8CE339F/B174_A8CE339F_PROBE.json",
+  "status": "PROBE_READY_CONTROLLER_CLASSIFICATION"
+}

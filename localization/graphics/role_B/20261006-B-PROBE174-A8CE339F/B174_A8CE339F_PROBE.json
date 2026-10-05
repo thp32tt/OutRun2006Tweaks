@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PROBE174-A8CE339F",
+  "base_head": "b0894be4a9f3a95b240bc00ffce41a0bdd47afcc",
+  "queue_index": 52,
+  "asset": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+  "prior_action": "zoom_review",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+  "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+  "decoded": {
+    "width": 2048,
+    "height": 1024,
+    "mode": "RGBA"
+  },
+  "orientation_probe": "READABLE_ASSUMED_FLIP_Y_PLUS_RAW_SAVED_FOR_CONTROLLER",
+  "status": "B174_SOURCE_PROBE_READY_FOR_CONTROLLER_CLASSIFICATION",
+  "same_invocation_rule": "If controller identifies localizable text and safe canonical geometry, continue to render in this user invocation.",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
