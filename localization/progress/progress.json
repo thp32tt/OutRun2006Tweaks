@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T22:57:50+09:00",
+  "updated_at_kst": "2026-10-05T23:10:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C209 consumed the new B154 index34 B7E25BAD HOLL rank candidate and positively classified zoom_review Total Rank -> 종합 랭킹. Independent canonical 4096x2048 RGBA32/header/raw mirror_y and C202-approved same-family template revalidation PASS: localized bbox exact [2172,1198,2404,1262] within source core [2036,1194,2541,1266] with positive margins; decoded/alpha/introduced-visible outside=0 and opaque source-title residue=0. HOLL/template deltas are confined to 240 title/effect pixels plus one alpha-1 white AA variant; all other HOLL artwork remains canonical. Controller SOURCE/CLEAN/FINAL/raw visual PASS. Decision C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. Current queue: 84 localize_text + 42 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit; pending_artwork localize_text=8; producer REWORK=2 (37759842,97E863AD); pending-C=0. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "A67 completed direct C208 REWORK for odd index193 97E863AD. A66 first widened A65 but was A-controller rejected for excessive tracking; A67 moderates source-family tracking while keeping Black weight and no horizontal glyph scaling. Candidate ad3f42856956d15b1c0ecba032d18ebb730c375f4b0a52b456c975e89e9396b7: 13/13 bbox/size/positive-margin, CLEAN/FINAL validators PASS, outside/alpha/protected/source-residue/render/inline-token/overlap/touch=0; preserved OutRun/OutRun2SP/OUTRUN/TESTAROSSA/SP/OR pixels exact; SOURCE/CLEAN/FINAL + raw mirror_y visual PASS. pending-C=97E863AD; producer REWORK=1 (37759842); pending_artwork localize_text=8. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -266,14 +266,15 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "REWORK_REQUIRED",
+      "status": "REWORK_REQUIRED_WITH_PENDING_C",
       "assets": [
-        "37759842",
-        "97E863AD"
+        "37759842"
       ],
-      "remaining": 2,
-      "note": "C208 returned A65 index193 97E863AD for source-style scale/proportion rework after 13/13 independent static gates PASS. Existing manual/template REWORK 37759842 remains. pending_artwork localize_text=8; pending-C=0; RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": []
+      "remaining": 1,
+      "note": "A67 resolves producer-side C208 scale/proportion return for 97E863AD and is pending independent C. 37759842 remains manual/template-only C186 REWORK; rejected inpaint families not repeated. pending_artwork localize_text=8; pending-C=1 (97E863AD); RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": [
+        "97E863AD"
+      ]
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -1324,43 +1325,50 @@
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     },
     "latest_a_production": {
-      "run": "A62",
-      "index": 173,
-      "asset": "6DC89C6E",
-      "candidate_sha256": "b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26",
-      "result": "A62_SELF_QA_PASS_PENDING_C_AND_INGAME",
-      "semantic_binding": "A61_CONTROLLER_SOURCE_CONTACT_21_OF_21",
-      "stage_name_policy": "PASS_CANONICAL_PHONETIC_TRANSLITERATION",
-      "bbox_size_positive_margin": "21/21 PASS",
+      "run": "A67",
+      "index": 193,
+      "asset": "97E863AD",
+      "candidate_sha256": "ad3f42856956d15b1c0ecba032d18ebb730c375f4b0a52b456c975e89e9396b7",
+      "result": "A67_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "rework_from": "C208_REWORK_REQUIRED_SOURCE_STYLE_SCALE_PROPORTION",
+      "bbox_size_positive_margin": "13/13 PASS",
       "pixel_gates": {
         "changed_outside": 0,
         "alpha_outside": 0,
         "protected_changed": 0,
         "source_residue": 0,
         "render_outside_target": 0,
+        "preserved_changes": 0,
+        "inline_token_overlap": 0,
         "overlap": 0,
         "touch": 0
       },
       "source_style": {
-        "family": "shared blue-gray bold condensed all-caps stage list",
-        "shared_lowres_font_size": 18,
-        "pixel_scale": 4,
-        "alignment": "left",
-        "ice_scape_horizontal_scale": 0.9739
+        "family": "wide bold-condensed dark/blue-gray UI labels",
+        "face": "Noto Sans CJK KR Black",
+        "method": "natural glyph geometry + moderated per-glyph tracking; no horizontal glyph scaling",
+        "width_ratios": {
+          "showroom": 0.5656,
+          "multiplayer": 0.6485,
+          "goal_family": "0.6456-0.6500",
+          "welcome": 0.649,
+          "online": 0.6744,
+          "online_sentence": 0.6796
+        }
       },
       "structure": {
         "dimensions": [
           2048,
-          2048
+          1024
         ],
         "format": "RGBA32",
-        "raw_mode": "BGRA",
+        "raw_mode": "RGBA",
         "mipmaps": 1,
         "header_128_exact": true,
         "raw_orientation": "mirror_y"
       },
-      "report": "localization/graphics/role_A/20261005-A-PRODUCTION62/A62_6DC89C6E_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION62/A62_CONTROLLER_SELF_QA.json",
+      "report": "localization/graphics/role_A/20261005-A-PRODUCTION67-STYLE/A67_97E863AD_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION67-STYLE/A67_CONTROLLER_SELF_QA.json",
       "runtime_validation": "UNTESTED"
     },
     "latest_a_rework": {
