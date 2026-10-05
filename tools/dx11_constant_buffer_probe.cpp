@@ -629,17 +629,17 @@ int main()
         r266PsSemantics.instructions.size() == 2u &&
         r266PsSemantics.instructions[0].operands.size() == 3u &&
         r266PsSemantics.instructions[0].operands[0].role ==
-            ProgrammableShaderOperandRole::Destination &&
+            ProgrammableShaderSemanticOperandRole::Destination &&
         r266PsSemantics.instructions[0].operands[0].destinationModifier ==
             1u &&
         r266PsSemantics.instructions[0].operands[1].role ==
-            ProgrammableShaderOperandRole::Source &&
+            ProgrammableShaderSemanticOperandRole::Source &&
         r266PsSemantics.instructions[0].operands[1].registerType == 2u &&
         r266PsSemantics.instructions[0].operands[1].registerIndex == 2u &&
         r266PsSemantics.instructions[0].operands[1].sourceModifier == 1u &&
         r266PsSemantics.instructions[0].operands[1].relativeAddressing &&
         r266PsSemantics.instructions[0].operands[2].role ==
-            ProgrammableShaderOperandRole::RelativeAddress &&
+            ProgrammableShaderSemanticOperandRole::RelativeAddress &&
         r266PsSemantics.instructions[0].operands[2].registerType == 3u &&
         r266PsSemantics.instructions[1].operands.size() == 3u &&
         r266PsSemantics.instructions[1].operands[2].registerType == 10u &&
