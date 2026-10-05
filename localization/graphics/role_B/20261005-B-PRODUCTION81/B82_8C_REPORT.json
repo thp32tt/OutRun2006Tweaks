@@ -58,7 +58,7 @@
     "font_style": "Bold",
     "shared_lowres_font_size": 12,
     "pixel_scale": 4,
-    "shared_horizontal_scale": 1.0,
+    "shared_horizontal_scale": 1,
     "alignment": "left"
   },
   "rows": [
@@ -102,7 +102,7 @@
       "font_style": "Bold",
       "lowres_font_size": 12,
       "pixel_scale": 4,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "fill_rgba": [
         63,
         71,
@@ -152,7 +152,7 @@
       "font_style": "Bold",
       "lowres_font_size": 12,
       "pixel_scale": 4,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "fill_rgba": [
         63,
         71,
@@ -202,7 +202,7 @@
       "font_style": "Bold",
       "lowres_font_size": 12,
       "pixel_scale": 4,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "fill_rgba": [
         63,
         71,
@@ -252,7 +252,7 @@
       "font_style": "Bold",
       "lowres_font_size": 12,
       "pixel_scale": 4,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "fill_rgba": [
         63,
         71,
@@ -302,7 +302,7 @@
       "font_style": "Bold",
       "lowres_font_size": 12,
       "pixel_scale": 4,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "fill_rgba": [
         63,
         71,
@@ -352,7 +352,7 @@
       "font_style": "Bold",
       "lowres_font_size": 12,
       "pixel_scale": 4,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "fill_rgba": [
         63,
         71,
@@ -413,7 +413,8 @@
   },
   "candidate_sha256": "03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
-  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_ROW_RAW_BINDING_STYLE",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_PRODUCTION81_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B82_CORRECTIVE_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_self_qa_report": "localization/graphics/role_B/20261005-B-PRODUCTION81/B82_CONTROLLER_SELF_QA.json"
 }
