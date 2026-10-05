@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "20261006-B-PRODUCTION175-A8CE339F-DXT5",
+  "queue_index": 52,
+  "asset": "A8CE339F",
+  "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+  "candidate_sha256": "d23a6cd866fef15d44b86094e22fe6055efd183183039a260af8c1a6f7d7b582",
+  "report": "localization/graphics/role_B/20261006-B-PRODUCTION175-A8CE339F-DXT5/B175_A8CE339F_REPORT.json",
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
+}
