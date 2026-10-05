@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B169",
+  "timestamp_kst": "2026-10-06T06:31:45+09:00",
+  "scope": "B-owned active P1 IGR-019 screenshot(142) MULTIPLAYER_INTRO; completed B60/C141 4D38 MULTIPLAYER rows were not repeated.",
+  "user_ingame_regression": [
+    "IGR-019",
+    "스크린샷(142).png"
+  ],
+  "mapping": {
+    "domain": "GRAPHICS",
+    "status": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+    "assets": [
+      {
+        "queue_index": 193,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+        "binding": "MULTIPLAYER intro body",
+        "candidate_sha256": "f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69",
+        "action": "REWORKED_NATIVE"
+      },
+      {
+        "queue_index": 188,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+        "binding": "Online/LAN multiplayer help copy",
+        "candidate_sha256": "9fe3804a70d93277ede4e16ac8073057c6a9d969a893d05cde522d14a1f91b4d",
+        "action": "REWORKED_NATIVE"
+      }
+    ],
+    "excluded_completed_asset": {
+      "queue_index": 154,
+      "asset": "4D38BBB0",
+      "reason": "B60/C141 already native source-family PASS; no duplicate production."
+    },
+    "runtime_text_required": false
+  },
+  "machine_qa": {
+    "97E": {
+      "bbox_size_positive_margin": "1/1 PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "protected_changed": 0,
+      "render_protected_overlap": 0,
+      "source_residue": 0
+    },
+    "8C": {
+      "bbox_size_positive_margin": "1/1 PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "protected_changed": 0,
+      "render_protected_overlap": 0,
+      "source_residue": 0
+    }
+  },
+  "controller_visual_qa": "PASS",
+  "visual_observations": {
+    "97E": "SOURCE/OLD/CLEAN/FINAL 3x confirms the old 4x-upscaled Hangul was visibly coarse; B169 is smooth native-resolution Black, source-family dark teal/gray, left aligned, with clean plate free of English residue/seams and no clipping or foreign-art intrusion.",
+    "8C": "SOURCE/OLD/CLEAN/FINAL 3x confirms the old help row was visibly pixelated; B169 is smooth native-resolution Bold, source-family dark help-copy style, left aligned, with no residue/clipping/overlap.",
+    "full_atlas": "97E preserves A89R welcome/showroom plus TESTAROSSA/product/goal artwork; 8C preserves A88 C2C help, B166 Heart Attack help and all other rows outside the exact B169 bboxes.",
+    "raw_orientation": "PASS mirror_y for both assets."
+  },
+  "worker": {
+    "workflow_run_id": 37374877813,
+    "output_commit": "98e4bd833660fe8e28275c72df1781e59d9a60c1",
+    "conclusion": "SUCCESS"
+  },
+  "worker_report": "localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_IGR019_REPORT.json",
+  "status": "B169_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

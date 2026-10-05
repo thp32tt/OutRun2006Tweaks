@@ -1,5 +1,5 @@
 {
-  "schema_version": 95,
+  "schema_version": 96,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B169 IGR-019 producer static/controller PASS: 97E MULTIPLAYER + 8C Online/LAN help are native-HD; independent C and NEW actual in-game retest required. Do not repeat B169 bytes unless returned REWORK.",
     "A90 P1 IGR-013 screenshot(158): exact MIXED split. 6DC89C6E 8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830 natively rerenders all 21 stage-location rows and supersedes A62 lowres18x4; E7F6E9B7 C144 top C2C title preserved; runtime ID1123 스테이지 주행 mapped/reviewed without source change. 21/21 bbox/size/margins and zero scope/protected/residue/overlap/touch; controller visual/raw PASS. Pending C + NEW game retest; not closed.",
     "A89R P1 IGR-003 screenshot(145): exact GRAPHICS multi-asset mapping. 97E863AD cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418 natively rerenders WELCOME/SHOWROOM visible rows; B168 A9 + C171 754F + C149 E95 preserved. 2/2 bbox/size/margins and zero scope/protected gates; controller visual PASS. Pending C + NEW game retest; not closed.",
     "B168 P1 IGR-004 screenshot(146): exact GRAPHICS mapping A9ABD877(index201 header/stage family) + C05E67EF(index215 Goal A-E/15-course list), no runtime text. A9 A69 19px->4x low-res render superseded; B167 native draft failed controller weight fidelity; B168 a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8 native/source-weight retry passes 17/17 bbox/size/margins, zero scope/protected/overlap gates and controller visual QA. C05 0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b A79/C218 native candidate preserved. Hosted worker run 37366457547 attempt1 cancelled; attempt2 later succeeded at authoritative worker commit 0895f3d. N100 MCP fallback executed while the retry was queued ~9m but produced environment-dependent raster SHA d391632d..., so it was discarded after hosted SHA a7a4ea10... arrived. Pending independent C on changed A9 + NEW actual in-game retest; not closed.",
@@ -1188,14 +1189,43 @@
       "runtime_validation": "UNTESTED"
     },
     "latest_b_production": {
-      "run": "B_PRODUCTION128",
-      "asset": "A05BF610",
-      "queue_index": 28,
-      "candidate_sha256": "bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8",
-      "report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_A05_REPORT.json",
-      "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_CONTROLLER_SELF_QA.json",
-      "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
-      "runtime_validation": "UNTESTED"
+      "timestamp_kst": "2026-10-06T06:31:45+09:00",
+      "run": "20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO",
+      "regression": "IGR-019",
+      "decision": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+      "assets": {
+        "97E863AD": {
+          "index": 193,
+          "candidate_sha256": "f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69",
+          "action": "REWORKED_NATIVE_MULTIPLAYER"
+        },
+        "8C259C68": {
+          "index": 188,
+          "candidate_sha256": "9fe3804a70d93277ede4e16ac8073057c6a9d969a893d05cde522d14a1f91b4d",
+          "action": "REWORKED_NATIVE_ONLINE_LAN_HELP"
+        },
+        "4D38BBB0": {
+          "index": 154,
+          "action": "PRESERVED_B60_C141_NATIVE_COMPLETED"
+        }
+      },
+      "machine_qa": {
+        "bbox_size_positive_margin": "2/2 PASS",
+        "outside": 0,
+        "alpha_outside": 0,
+        "protected": 0,
+        "render_protected_overlap": 0,
+        "source_residue": 0
+      },
+      "controller_visual_qa": "PASS_NATIVE_HD_MULTIPLAYER_INTRO_FAMILY",
+      "worker_run_id": 37374877813,
+      "worker_output_commit": "98e4bd833660fe8e28275c72df1781e59d9a60c1",
+      "status": "B169_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+      "pending_independent_c_static_qa": true,
+      "pending_new_ingame_retest": true,
+      "report": "localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_IGR019_REPORT.json",
+      "controller_report": "localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "PENDING_NEW_INGAME_RETEST"
     },
     "current_producer_rework_assets": [
       "63C91067",
@@ -1231,7 +1261,8 @@
     "latest_a_rework_attempt": "localization/graphics/role_A/20261005-A-PRODUCTION40/A40_CONTROLLER_REWORK.json",
     "current_pending_c": [
       "97E863AD",
-      "6DC89C6E"
+      "6DC89C6E",
+      "8C259C68"
     ],
     "latest_a_production": {
       "run": "A90",
@@ -5309,6 +5340,45 @@
     "pending_new_ingame_retest": true,
     "report": "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_IGR013_6DC89C6E_REPORT.json",
     "controller_report": "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+  },
+  "b169_igr019": {
+    "timestamp_kst": "2026-10-06T06:31:45+09:00",
+    "run": "20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO",
+    "regression": "IGR-019",
+    "decision": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+    "assets": {
+      "97E863AD": {
+        "index": 193,
+        "candidate_sha256": "f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69",
+        "action": "REWORKED_NATIVE_MULTIPLAYER"
+      },
+      "8C259C68": {
+        "index": 188,
+        "candidate_sha256": "9fe3804a70d93277ede4e16ac8073057c6a9d969a893d05cde522d14a1f91b4d",
+        "action": "REWORKED_NATIVE_ONLINE_LAN_HELP"
+      },
+      "4D38BBB0": {
+        "index": 154,
+        "action": "PRESERVED_B60_C141_NATIVE_COMPLETED"
+      }
+    },
+    "machine_qa": {
+      "bbox_size_positive_margin": "2/2 PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "protected": 0,
+      "render_protected_overlap": 0,
+      "source_residue": 0
+    },
+    "controller_visual_qa": "PASS_NATIVE_HD_MULTIPLAYER_INTRO_FAMILY",
+    "worker_run_id": 37374877813,
+    "worker_output_commit": "98e4bd833660fe8e28275c72df1781e59d9a60c1",
+    "status": "B169_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+    "pending_independent_c_static_qa": true,
+    "pending_new_ingame_retest": true,
+    "report": "localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_IGR019_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_CONTROLLER_SELF_QA.json",
     "runtime_validation": "PENDING_NEW_INGAME_RETEST"
   }
 }

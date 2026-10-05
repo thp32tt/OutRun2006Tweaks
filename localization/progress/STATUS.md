@@ -1686,3 +1686,8 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Hosted CPU run 37374013614 SUCCESS and worker commit d740369a998843abaae68e102df9f978607124c9 are authoritative. A contract-allowed N100 fallback was attempted after about 9 minutes without runner allocation and produced 6844e2f408fa69d5b93e4b68f4901761634e9421eea2f29b5f7c7f7df35fb587, but it was discarded when hosted output arrived with different environment-dependent font raster bytes.
 - Static QA: 21/21 exact source-bbox containment/size/positive-margin PASS; changed/alpha outside=0, protected/render-protected=0, clean residue=0, localized overlap/touch=0, DDS roundtrip PASS. Controller SOURCE/OLD_LOWRES4X/CLEAN/A90_NATIVE Sunny Beach 4x, all-21-row, readable and raw mirror_y visual QA PASS; blocky old Hangul is removed with no source ghost, broken glyph, clipping, foreign-art intrusion, seam/halo or orientation regression.
 - IGR-013 -> A90_STATIC_PASS_PENDING_C_AND_INGAME_RETEST. Independent C + NEW actual in-game retest remain mandatory before closure. No VR/FFB/DX11/DXVK work. RUNTIME_VALIDATION=PENDING_NEW_INGAME_RETEST.
+
+## 2026-10-06T06:31:45+09:00 — B169 IGR-019 multiplayer intro
+- 97E MULTIPLAYER -> native candidate f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69; 8C Online/LAN help -> native candidate 9fe3804a70d93277ede4e16ac8073057c6a9d969a893d05cde522d14a1f91b4d.
+- 2/2 exact bbox/size/positive-margin and all zero-pixel gates PASS; readable/full/raw controller visual PASS.
+- State: B169_STATIC_PASS_PENDING_C_AND_INGAME_RETEST. No in-game closure claimed; VR/FFB/DX11/DXVK untouched.

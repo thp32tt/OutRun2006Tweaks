@@ -2038,3 +2038,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Hosted CPU run 37374013614 SUCCESS and worker commit d740369a998843abaae68e102df9f978607124c9 are authoritative. A contract-allowed N100 fallback was attempted after about 9 minutes without runner allocation and produced 6844e2f408fa69d5b93e4b68f4901761634e9421eea2f29b5f7c7f7df35fb587, but it was discarded when hosted output arrived with different environment-dependent font raster bytes.
 - Static QA: 21/21 exact source-bbox containment/size/positive-margin PASS; changed/alpha outside=0, protected/render-protected=0, clean residue=0, localized overlap/touch=0, DDS roundtrip PASS. Controller SOURCE/OLD_LOWRES4X/CLEAN/A90_NATIVE Sunny Beach 4x, all-21-row, readable and raw mirror_y visual QA PASS; blocky old Hangul is removed with no source ghost, broken glyph, clipping, foreign-art intrusion, seam/halo or orientation regression.
 - IGR-013 -> A90_STATIC_PASS_PENDING_C_AND_INGAME_RETEST. Independent C + NEW actual in-game retest remain mandatory before closure. No VR/FFB/DX11/DXVK work. RUNTIME_VALIDATION=PENDING_NEW_INGAME_RETEST.
+
+## 2026-10-06T06:31:45+09:00 - B169 IGR-019 MULTIPLAYER INTRO REWORK
+
+- Exact GRAPHICS multi-asset mapping: 97E863AD index193 MULTIPLAYER body + 8C259C68 index188 Online/LAN help; completed B60/C141 4D38 MULTIPLAYER rows were not repeated.
+- Replaced the two proven legacy 12px->4x Korean rows with direct canonical-HD render. 97E candidate f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69; 8C candidate 9fe3804a70d93277ede4e16ac8073057c6a9d969a893d05cde522d14a1f91b4d. A89R WELCOME/SHOWROOM, A88 C2C help, B166 Heart Attack help and protected product/model artwork preserved.
+- Machine QA: 2/2 bbox/size/positive-margin PASS; outside/alpha/protected/render-protected/source-residue all 0. SOURCE/OLD/CLEAN/FINAL high-zoom, full-atlas and raw mirror_y controller visual QA PASS.
+- GitHub-hosted Localization CPU Worker run 37374877813 SUCCESS; output commit 98e4bd833660fe8e28275c72df1781e59d9a60c1.
+- IGR-019 remains B169_STATIC_PASS_PENDING_C_AND_INGAME_RETEST; NEW actual game retest required before closure. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_IGR019_REPORT.json, localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_CONTROLLER_SELF_QA.json.
