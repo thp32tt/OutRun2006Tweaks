@@ -8657,11 +8657,169 @@ compose_programmable_dormant_source_revalidation_readiness(
 
 } // namespace
 
+NativeProgrammableShaderResourceBehaviorReadiness
+compose_programmable_resource_behavior_readiness(
+    const NativeProgrammableShaderDormantSourceRevalidationReadiness&
+        sourceRevalidation,
+    std::uint64_t sourceRevalidationSnapshotToken,
+    ID3D11Device* expectedDevice,
+    const NativeManagedBufferShadow& vertexMirror,
+    std::uint64_t vertexMirrorSnapshotToken,
+    const NativeManagedBufferShadow* indexMirror,
+    std::uint64_t indexMirrorSnapshotToken) noexcept {
+    NativeProgrammableShaderResourceBehaviorReadiness out{};
+    constexpr std::uint32_t kGeometryScopeMissing = 1u << 0;
+    constexpr std::uint32_t kTextureScopeMissing = 1u << 1;
+    constexpr std::uint32_t kOutputScopeMissing = 1u << 2;
+
+    out.kind = sourceRevalidation.kind;
+    out.indexed = sourceRevalidation.indexed;
+    out.indexMirrorRequired = out.indexed;
+    out.sourceRevalidationSnapshotToken = sourceRevalidationSnapshotToken;
+    out.vertexMirrorSnapshotToken = vertexMirrorSnapshotToken;
+    out.indexMirrorSnapshotToken = indexMirrorSnapshotToken;
+
+    const bool kindValid =
+        (out.kind == NativeProgrammableShaderDrawCandidateKind::NonIndexed &&
+         !out.indexed) ||
+        (out.kind == NativeProgrammableShaderDrawCandidateKind::Indexed &&
+         out.indexed);
+    const bool indexInputsValid =
+        out.indexMirrorRequired
+            ? indexMirror != nullptr && indexMirrorSnapshotToken != 0
+            : indexMirror == nullptr && indexMirrorSnapshotToken == 0;
+    out.inputValid =
+        kindValid &&
+        expectedDevice != nullptr &&
+        sourceRevalidationSnapshotToken != 0 &&
+        vertexMirrorSnapshotToken != 0 &&
+        indexInputsValid;
+
+    out.sourceRevalidationReady =
+        sourceRevalidation.ready &&
+        sourceRevalidation.boundaryPreserved &&
+        sourceRevalidation.snapshotToken != 0;
+    out.sourceRevalidationSnapshotMatches =
+        out.sourceRevalidationReady &&
+        sourceRevalidation.snapshotToken ==
+            sourceRevalidationSnapshotToken;
+
+    const auto vertex = vertexMirror.mirror_readiness(expectedDevice);
+    out.vertexMirrorReady =
+        vertex.ready &&
+        vertex.role == ResourceRole::Vertex &&
+        vertex.shadowValid &&
+        vertex.lifetimeCurrent &&
+        vertex.descriptorExact &&
+        vertex.mutationPlanExact;
+    out.vertexMirrorSnapshotMatches =
+        out.vertexMirrorReady &&
+        vertex.snapshotToken == vertexMirrorSnapshotToken &&
+        vertexMirror.validate_mirror_readiness_snapshot(
+            expectedDevice, vertexMirrorSnapshotToken);
+
+    if (out.indexMirrorRequired && indexMirror) {
+        const auto index = indexMirror->mirror_readiness(expectedDevice);
+        out.indexMirrorReady =
+            index.ready &&
+            index.role == ResourceRole::Index &&
+            index.shadowValid &&
+            index.lifetimeCurrent &&
+            index.descriptorExact &&
+            index.mutationPlanExact;
+        out.indexMirrorSnapshotMatches =
+            out.indexMirrorReady &&
+            index.snapshotToken == indexMirrorSnapshotToken &&
+            indexMirror->validate_mirror_readiness_snapshot(
+                expectedDevice, indexMirrorSnapshotToken);
+    } else if (!out.indexMirrorRequired) {
+        out.indexMirrorReady = true;
+        out.indexMirrorSnapshotMatches = true;
+    }
+
+    out.geometryResourceBehaviorExact =
+        out.vertexMirrorReady &&
+        out.vertexMirrorSnapshotMatches &&
+        out.indexMirrorReady &&
+        out.indexMirrorSnapshotMatches;
+
+    // R260 deliberately closes only the geometry portion of F18. The current
+    // dormant programmable candidate does not yet carry equivalent exact
+    // texture/output behavior receipts, so those scopes remain fail-closed.
+    out.textureResourceBehaviorProofPresent = false;
+    out.outputResourceBehaviorProofPresent = false;
+    out.missingResourceScopeMask = 0;
+    if (!out.geometryResourceBehaviorExact)
+        out.missingResourceScopeMask |= kGeometryScopeMissing;
+    if (!out.textureResourceBehaviorProofPresent)
+        out.missingResourceScopeMask |= kTextureScopeMissing;
+    if (!out.outputResourceBehaviorProofPresent)
+        out.missingResourceScopeMask |= kOutputScopeMissing;
+    out.fullResourceBehaviorProofPresent =
+        out.missingResourceScopeMask == 0;
+
+    out.diagnosticOnly = true;
+    out.boundaryPreserved =
+        sourceRevalidation.boundaryPreserved &&
+        out.diagnosticOnly &&
+        !out.fullResourceBehaviorProofPresent &&
+        out.missingResourceScopeMask != 0;
+    out.reviewReady =
+        out.inputValid &&
+        out.sourceRevalidationReady &&
+        out.sourceRevalidationSnapshotMatches &&
+        out.geometryResourceBehaviorExact &&
+        out.boundaryPreserved;
+
+    if (out.reviewReady) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.kind));
+        token = mix_readiness_snapshot_token(token, out.indexed ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceRevalidationSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.vertexMirrorSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.indexMirrorSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.missingResourceScopeMask);
+        token = mix_readiness_snapshot_token(token, 0x260u);
+        out.reviewSnapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_programmable_resource_behavior_readiness_snapshot(
+    const NativeProgrammableShaderDormantSourceRevalidationReadiness&
+        sourceRevalidation,
+    std::uint64_t sourceRevalidationSnapshotToken,
+    ID3D11Device* expectedDevice,
+    const NativeManagedBufferShadow& vertexMirror,
+    std::uint64_t vertexMirrorSnapshotToken,
+    const NativeManagedBufferShadow* indexMirror,
+    std::uint64_t indexMirrorSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept {
+    if (reviewSnapshotToken == 0)
+        return false;
+    const auto current = compose_programmable_resource_behavior_readiness(
+        sourceRevalidation, sourceRevalidationSnapshotToken,
+        expectedDevice, vertexMirror, vertexMirrorSnapshotToken,
+        indexMirror, indexMirrorSnapshotToken);
+    return current.reviewReady &&
+        current.reviewSnapshotToken == reviewSnapshotToken &&
+        current.geometryResourceBehaviorExact &&
+        !current.fullResourceBehaviorProofPresent &&
+        current.missingResourceScopeMask != 0;
+}
+
 NativeProgrammableShaderActivationPrerequisiteHandoff
 compose_programmable_activation_prerequisite_handoff(
     const NativeProgrammableShaderDormantSourceRevalidationReadiness&
         sourceRevalidation,
     std::uint64_t sourceRevalidationSnapshotToken,
+    const NativeProgrammableShaderResourceBehaviorReadiness& resourceBehavior,
+    std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken) noexcept {
     NativeProgrammableShaderActivationPrerequisiteHandoff out{};
@@ -8672,9 +8830,11 @@ compose_programmable_activation_prerequisite_handoff(
     out.kind = sourceRevalidation.kind;
     out.indexed = sourceRevalidation.indexed;
     out.sourceRevalidationSnapshotToken = sourceRevalidationSnapshotToken;
+    out.resourceBehaviorSnapshotToken = resourceBehaviorSnapshotToken;
     out.inputLayoutSnapshotToken = inputLayoutSnapshotToken;
     out.inputValid =
         sourceRevalidationSnapshotToken != 0 &&
+        resourceBehaviorSnapshotToken != 0 &&
         inputLayoutSnapshotToken != 0;
 
     out.sourceRevalidationReady =
@@ -8686,6 +8846,27 @@ compose_programmable_activation_prerequisite_handoff(
         sourceRevalidation.snapshotToken ==
             sourceRevalidationSnapshotToken;
 
+    out.resourceBehaviorReviewReady =
+        resourceBehavior.reviewReady &&
+        resourceBehavior.boundaryPreserved &&
+        resourceBehavior.geometryResourceBehaviorExact &&
+        resourceBehavior.reviewSnapshotToken != 0 &&
+        resourceBehavior.kind == out.kind &&
+        resourceBehavior.indexed == out.indexed &&
+        resourceBehavior.sourceRevalidationSnapshotToken ==
+            sourceRevalidationSnapshotToken;
+    out.resourceBehaviorSnapshotMatches =
+        out.resourceBehaviorReviewReady &&
+        resourceBehavior.reviewSnapshotToken ==
+            resourceBehaviorSnapshotToken;
+    out.resourceBehaviorGeometryProofPresent =
+        out.resourceBehaviorReviewReady &&
+        out.resourceBehaviorSnapshotMatches;
+    out.resourceBehaviorCoverageComplete =
+        out.resourceBehaviorGeometryProofPresent &&
+        resourceBehavior.fullResourceBehaviorProofPresent &&
+        resourceBehavior.missingResourceScopeMask == 0;
+
     out.inputLayoutOwnershipReady =
         inputLayout.attachmentReady &&
         inputLayout.layoutIdentityExact &&
@@ -8696,12 +8877,11 @@ compose_programmable_activation_prerequisite_handoff(
         out.inputLayoutOwnershipReady &&
         inputLayout.snapshotToken == inputLayoutSnapshotToken;
 
-    // R259 is intentionally honest about current Set-05 evidence. R243 closes
-    // the input-layout ownership/identity portion of F19 for this dormant
-    // branch, but the repository still has no exact F18 resource-behavior
-    // proof object and no F21 semantic shader-translation proof object. Do not
-    // infer either one from a live D3D11 object attachment.
-    out.resourceBehaviorProofPresent = false;
+    // R260 now provides a concrete, current geometry-behavior proof. F18 as a
+    // whole remains absent until texture/output resource behavior is equally
+    // exact. F21 semantic shader translation also remains absent.
+    out.resourceBehaviorProofPresent =
+        out.resourceBehaviorCoverageComplete;
     out.inputLayoutProofPresent =
         out.inputLayoutOwnershipReady &&
         out.inputLayoutSnapshotMatches;
@@ -8721,14 +8901,12 @@ compose_programmable_activation_prerequisite_handoff(
         out.shaderTranslationProofPresent &&
         out.missingPrerequisiteMask == 0;
 
-    // As with R257/R258, execution authority is fixed by implementation rather
-    // than caller input. Even a coherent review handoff cannot activate the
-    // native path while any prerequisite proof class remains absent.
     out.diagnosticOnly = true;
     out.nativeDrawPathActivationAllowed = false;
     out.drawDispatchAuthorized = false;
     out.boundaryPreserved =
         sourceRevalidation.boundaryPreserved &&
+        out.resourceBehaviorGeometryProofPresent &&
         out.diagnosticOnly &&
         !out.nativeDrawPathActivationAllowed &&
         !out.drawDispatchAuthorized &&
@@ -8739,6 +8917,7 @@ compose_programmable_activation_prerequisite_handoff(
         out.inputValid &&
         out.sourceRevalidationReady &&
         out.sourceRevalidationSnapshotMatches &&
+        out.resourceBehaviorGeometryProofPresent &&
         out.inputLayoutProofPresent &&
         out.boundaryPreserved;
 
@@ -8750,21 +8929,23 @@ compose_programmable_activation_prerequisite_handoff(
         token = mix_readiness_snapshot_token(
             token, out.sourceRevalidationSnapshotToken);
         token = mix_readiness_snapshot_token(
+            token, out.resourceBehaviorSnapshotToken);
+        token = mix_readiness_snapshot_token(
             token, out.inputLayoutSnapshotToken);
         token = mix_readiness_snapshot_token(
             token, out.missingPrerequisiteMask);
         token = mix_readiness_snapshot_token(
-            token, out.inputLayoutProofPresent ? 1u : 0u);
+            token, out.resourceBehaviorGeometryProofPresent ? 1u : 0u);
         token = mix_readiness_snapshot_token(
-            token, out.resourceBehaviorProofPresent ? 1u : 0u);
+            token, out.resourceBehaviorCoverageComplete ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.inputLayoutProofPresent ? 1u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.shaderTranslationProofPresent ? 1u : 0u);
         token = mix_readiness_snapshot_token(token, 0x259u);
         out.reviewSnapshotToken = token == 0 ? 1 : token;
     }
 
-    // R259 has no activation proof object by design. Keeping this zero makes
-    // accidental "nonzero token means executable" interpretations fail closed.
     out.activationSnapshotToken = 0;
     return out;
 }
@@ -8773,6 +8954,8 @@ bool validate_programmable_activation_prerequisite_handoff_snapshot(
     const NativeProgrammableShaderDormantSourceRevalidationReadiness&
         sourceRevalidation,
     std::uint64_t sourceRevalidationSnapshotToken,
+    const NativeProgrammableShaderResourceBehaviorReadiness& resourceBehavior,
+    std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken,
     std::uint64_t reviewSnapshotToken) noexcept {
@@ -8780,15 +8963,17 @@ bool validate_programmable_activation_prerequisite_handoff_snapshot(
         return false;
     const auto current = compose_programmable_activation_prerequisite_handoff(
         sourceRevalidation, sourceRevalidationSnapshotToken,
+        resourceBehavior, resourceBehaviorSnapshotToken,
         inputLayout, inputLayoutSnapshotToken);
     return current.reviewReady &&
         current.reviewSnapshotToken == reviewSnapshotToken &&
+        current.resourceBehaviorGeometryProofPresent &&
+        !current.resourceBehaviorCoverageComplete &&
         !current.activationPrerequisitesSatisfied &&
         !current.nativeDrawPathActivationAllowed &&
         !current.drawDispatchAuthorized &&
         current.activationSnapshotToken == 0;
 }
-
 NativeProgrammableShaderDormantSourceRevalidationReadiness
 NativeProgrammableShaderPairCache::
 nonindexed_dormant_source_revalidation_readiness(
