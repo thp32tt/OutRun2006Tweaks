@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C175-A05BF610",
+  "qa_id": "C175",
+  "timestamp_kst": "2026-10-05T17:02:00+09:00",
+  "queue_index": 28,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+  "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+  "candidate_sha256": "60bceae994a26e21cba719908340cd1eade7902b66077fda2b982d99ab22f6c2",
+  "corrective_rework_by_C": true,
+  "machine_status": "PASS",
+  "machine_checks": {
+    "bbox_size_positive_margin": "1/1 PASS",
+    "clean_changed_outside_source_effect_bbox": 0,
+    "clean_alpha_changed_outside": 0,
+    "clean_source_core_unchanged": 0,
+    "decoded_changed_outside_source_effect_bbox": 0,
+    "alpha_changed_outside_source_effect_bbox": 0,
+    "source_core_residue_pixels": 0,
+    "localized_overlap_pixels": 0
+  },
+  "controller_visual_qa": "FAIL_CLEAN_PLATE_RECTANGLE_AND_BORDER_DAMAGE",
+  "visual_note": "C175 machine gates passed but mandatory SOURCE/CLEAN/FINAL + raw review exposed a large rectangular cyan/green reconstruction block behind the Korean title and visible plate-border continuity damage. This revealed that the broad C173 audit envelope [397,1117,1053,1275] included non-title oval-border/artwork pixels and is unsuitable as a final exact source-title bbox. C173's residue conclusion remains valid because English Rank was visibly present, but its broad machine envelope is superseded for geometry by the later border-free producer refinement.",
+  "decision": "C175_REWORK_REQUIRED_CLEAN_PLATE_RECTANGLE_AND_BORDER_DAMAGE",
+  "required_rework": "Use a border-free source-title mask/effect bbox derived from actual title components only; modify only title/effect pixels, preserve oval border/glow exactly, and rebuild a smooth source-faithful interior without rectangular reconstruction blocks.",
+  "machine_report": "localization/graphics/role_C/20261005-C175-A05BF610/C175_A05_MACHINE_REWORK_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C175-A05BF610/C175_A05_SOURCE_CLEAN_FINAL_DETAIL.jpg",
+    "localization/graphics/role_C/20261005-C175-A05BF610/C175_A05_RAW_COMPARE.jpg"
+  ],
+  "superseded_by_latest_candidate": "B124 candidate 205d756d9f163dfd6abee9facb6a92588f7654981a5e3c284a37574da5310b4c",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
