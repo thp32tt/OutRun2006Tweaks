@@ -1,0 +1,23 @@
+{
+  "run": "20261006-A-PROBE98-4AFC1BED",
+  "queue_index": 25,
+  "source_sha256": "542025bee37f371b236d77854b4b7f95574ae051b91bc31a205af03dfd1adb7f",
+  "source_meta": {
+    "width": 2048,
+    "height": 2048,
+    "mips": 1,
+    "fourcc": "\u0000\u0000\u0000\u0000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "raw_mode": "RGBA",
+    "sha256": "542025bee37f371b236d77854b4b7f95574ae051b91bc31a205af03dfd1adb7f",
+    "bytes": 16777344
+  },
+  "report": "localization/graphics/role_A/20261006-A-PROBE98-4AFC1BED/A98_4AFC1BED_PROBE.json",
+  "status": "A98_SOURCE_PROBE_COMPLETE_CONTROLLER_CLASSIFICATION_REQUIRED"
+}

@@ -1,0 +1,107 @@
+{
+  "run": "20261006-A-PROBE98-4AFC1BED",
+  "queue_index": 25,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/4AFC1BED_512x512.dds",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_CLAR_RANK_Exst/4AFC1BED_512x512.dds",
+  "source": {
+    "width": 2048,
+    "height": 2048,
+    "mips": 1,
+    "fourcc": "\u0000\u0000\u0000\u0000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "raw_mode": "RGBA",
+    "sha256": "542025bee37f371b236d77854b4b7f95574ae051b91bc31a205af03dfd1adb7f",
+    "bytes": 16777344
+  },
+  "component_count": 9,
+  "components": [
+    {
+      "bbox": [
+        8,
+        824,
+        1240,
+        2048
+      ],
+      "area": 779296
+    },
+    {
+      "bbox": [
+        82,
+        420,
+        421,
+        739
+      ],
+      "area": 78978
+    },
+    {
+      "bbox": [
+        1098,
+        419,
+        1421,
+        738
+      ],
+      "area": 77312
+    },
+    {
+      "bbox": [
+        1366,
+        1701,
+        1697,
+        2018
+      ],
+      "area": 74032
+    },
+    {
+      "bbox": [
+        1599,
+        425,
+        1927,
+        750
+      ],
+      "area": 73759
+    },
+    {
+      "bbox": [
+        595,
+        414,
+        916,
+        745
+      ],
+      "area": 65399
+    },
+    {
+      "bbox": [
+        280,
+        272,
+        400,
+        392
+      ],
+      "area": 14400
+    },
+    {
+      "bbox": [
+        38,
+        268,
+        150,
+        364
+      ],
+      "area": 7543
+    },
+    {
+      "bbox": [
+        149,
+        289,
+        235,
+        364
+      ],
+      "area": 4010
+    }
+  ],
+  "status": "A98_SOURCE_PROBE_COMPLETE_CONTROLLER_CLASSIFICATION_REQUIRED"
+}
