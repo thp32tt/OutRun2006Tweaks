@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261006-C221-37759842-A83",
+  "qa_id": "C221",
+  "timestamp_kst": "2026-10-06T02:33:06.745+09:00",
+  "queue_index": 95,
+  "asset": "37759842",
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "producer_run": "20261006-A-PRODUCTION83-C219-TRANSFORM",
+  "source_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+  "candidate_sha256": "2dac8ee099120f2978eaf8ba992ffff11ecad7c11912a98aca9269a1a78f6988",
+  "user_ingame_regressions": [
+    "IGR-014",
+    "IGR-015",
+    "IGR-016"
+  ],
+  "machine_report": "localization/graphics/role_C/20261006-C221-37759842-A83/C221_37759842_MACHINE_QA.json",
+  "machine_summary": {
+    "status": "PASS",
+    "bbox_size_positive_margin": "16/16 PASS",
+    "changes_outside_returned_rows": 0,
+    "alpha_outside_returned_rows": 0,
+    "protected_source_pixels_changed": 0,
+    "source_core_residue_outside_korean_render": 0,
+    "localized_bbox_mismatches": 0,
+    "line_overlap_pairs": 0
+  },
+  "visual_evidence": [
+    "localization/graphics/role_C/20261006-C221-37759842-A83/C221_A83_TRANSFORM_CONTACTS.jpg",
+    "localization/graphics/role_C/20261006-C221-37759842-A83/C221_A83_RAW_COMPARE.jpg"
+  ],
+  "visual_observations": [
+    "A83 retains A81 full-bbox manual clean plates; prior source-shaped ghosts/donor boundaries do not reappear.",
+    "Continuous and mode families are now left anchored per source instead of centered/recentered; 0.24 shear reproduces the source right-italic transform.",
+    "Four-line continuous stacks and two-line mode stacks use regular source-family cadence without clipping or line collision.",
+    "Orange/navy selector family and white/dark continuous family remain internally consistent with smooth native-resolution glyph edges.",
+    "No source-script residue, double drawing, foreign-image intrusion, protected-art damage, clipping, or raw mirror_y regression is visible."
+  ],
+  "controller_visual_qa": "PASS_SOURCE_LEFT_ALIGNMENT_SLANT_LINE_CADENCE",
+  "decision": "C221_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME_RETEST",
+  "candidate_changed_by_C": false,
+  "backlog_close_allowed": false,
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "vr_ffb_dx11_dxvk_changes": false
+}

@@ -1606,3 +1606,8 @@ A81 e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7 materially 
 - Mandatory C visual QA **FAIL**: A81 clean plate fixes prior ghost/donor-boundary defects, but continuous/mode Korean stacks are centered and under-slanted versus the canonical left-aligned italic source family.
 - Decision **C219_REWORK_REQUIRED_SOURCE_TRANSFORM_ALIGNMENT_SLANT**. Keep A81 clean plate and re-render lettering only with source-left anchors/slant/baseline/line spacing.
 - IGR-014/015/016 remain **OPEN_USER_INGAME_FAIL**; pending-C=0; producer REWORK=`37759842`; `RUNTIME_VALIDATION=PENDING_NEW_INGAME_RETEST`. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-06 02:33 KST — C221
+- index95 `37759842` A83 `2dac8ee099120f2978eaf8ba992ffff11ecad7c11912a98aca9269a1a78f6988`: independent C machine QA **16/16 exact bbox/size/positive-margin PASS**, changes/alpha outside returned rows=0, protected=0, source-core residue=0, bbox mismatch=0, line overlap=0.
+- Controller visual **PASS**: C219 center-alignment/under-slant return is resolved by source-left stacks, 0.24 shear and regular line cadence; A81 clean plate remains ghost/seam free; raw `mirror_y` preserved.
+- Decision **C221_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME_RETEST**. IGR-014/015/016 = **C_STATIC_PASS_PENDING_INGAME_RETEST**, not CLOSED. Remaining explicit graphics user rework includes index48 and index106. No VR/FFB/DX11/DXVK work.
