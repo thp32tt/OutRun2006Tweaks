@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C162-C163-BATCH",
+  "timestamp_kst": "2026-10-05T14:26:14+09:00",
+  "scope": "Only newly pending-C A outputs: A25 7CE1CFC5 and reconciled A17/A26 2EA557B4. Completed prior PASS assets not repeated; C160 63C91067 rework retained.",
+  "results": {
+    "7CE1CFC5": {
+      "decision": "C162_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "candidate_sha256": "b75102588dc30ec828fdec765658d2e25cbcee9d972832bb70b527b372008542",
+      "machine_report": "localization/graphics/role_C/20261005-C162-7CE1CFC5/C162_7CE_MACHINE_QA.json",
+      "controller_report": "localization/graphics/role_C/20261005-C162-7CE1CFC5/C162_7CE_CONTROLLER_FINAL_QA.json",
+      "physical_elements": 4
+    },
+    "2EA557B4": {
+      "decision": "C163_REWORK_REQUIRED_SOURCE_STYLE_FILL_GRADIENT",
+      "candidate_sha256": "d66a110cfc5bd09201c6f1a806fd3b2fab84663294ff865415fc7fc6532d6beb",
+      "machine_report": "localization/graphics/role_C/20261005-C163-2EA557B4/C163_2EA_MACHINE_QA.json",
+      "controller_report": "localization/graphics/role_C/20261005-C163-2EA557B4/C163_2EA_CONTROLLER_FINAL_QA.json",
+      "physical_elements": 1
+    }
+  },
+  "pixel_visual_pass_assets": [
+    "7CE1CFC5"
+  ],
+  "rework_required_assets": [
+    "2EA557B4",
+    "63C91067",
+    "C598919A"
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94",
+    "49BB5FE5",
+    "75C3586A"
+  ],
+  "pending_c_localize_text": 0,
+  "pending_production_localize_text": 21,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
