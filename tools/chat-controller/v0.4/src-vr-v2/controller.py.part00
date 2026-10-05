@@ -63,6 +63,9 @@ QUEUE_IDLE_REARM_SECONDS = max(30, int(os.getenv("QUEUE_IDLE_REARM_SECONDS", "90
 LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "true"
 CONVERSION_PARALLEL = os.getenv("CONVERSION_PARALLEL", "true").lower() == "true"
 CONVERSION_ACTIVE_LIMIT = max(1, int(os.getenv("CONVERSION_ACTIVE_LIMIT", "2")))
+CONVERSION_ONLY_SLOT = os.getenv("CONVERSION_ONLY_SLOT", "").strip().upper()
+if CONVERSION_ONLY_SLOT not in {"", "A", "B", "C"}:
+    raise ValueError(f"Unsupported CONVERSION_ONLY_SLOT={CONVERSION_ONLY_SLOT!r}; expected A, B, C, or empty")
 CONVERSION_DXVK_DEFERRED = os.getenv("CONVERSION_DXVK_DEFERRED", "true").lower() == "true"
 PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECONDS", "15")))
 PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS", "15")))
@@ -262,6 +265,7 @@ runtime = {
     "localization_parallel": LOCALIZATION_PARALLEL,
     "conversion_parallel": CONVERSION_PARALLEL,
     "conversion_active_limit": CONVERSION_ACTIVE_LIMIT,
+    "conversion_only_slot": CONVERSION_ONLY_SLOT,
     "conversion_dxvk_deferred": CONVERSION_DXVK_DEFERRED,
     "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
     "parallel_distinct_slot_send_gap_seconds": PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS,
