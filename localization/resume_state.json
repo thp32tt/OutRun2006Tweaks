@@ -7,6 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C197 returned A54 index161 55B57CDE candidate 7569c51cf5ba82ce081bf09d486b8c8869560e7fae71292c613e4bf8a5b51ab8. Independent canonical DXT5 source+atlas audit reproduces 38/38 source bboxes and all 38 containment/size/positive-margin gates, with zero outside/overlap/out-of-allowed-block changes. But decoded candidate alpha bbox matches A54 declaration only 10/38; 28/38 labels carry extra low-alpha/source-shaped fringe, visible as speckle/fringe in C contacts. REWORK_REQUIRED; derive QA bbox from decoded alpha and re-encode cleanly. RUNTIME_VALIDATION=UNTESTED.",
+    "C198 returned latest B144 index30 8215FD25 candidate 4473abac8660e955a3328088fab92625b758e3682a51825297a91a69800d0edd. Lower starburst is materially improved versus C196, but C visual finds a large translucent Total Rank source ghost remaining in the speech-bubble CLEAN and behind/around 종합 랭킹 in FINAL. Keep improved starburst and rebuild only speech-bubble title footprint. Later B atlas-target script attempt failed before a newer candidate. RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION54 completed odd index161 55B57CDE exact-DXT5 nationality/zodiac candidate 7569c51cf5ba82ce081bf09d486b8c8869560e7fae71292c613e4bf8a5b51ab8. A52 contact fixed all 38 physical labels; A53 failed closed on format misclassification before writing a candidate. A54 reused the C194-proven constrained BC3 method: 38/38 bbox/size/positive margins, decoded/alpha/introduced-visible outside=0, source residue/overlap/touch=0, 922 partial boundary blocks alpha-index-only with original endpoint/color bytes preserved; controller SOURCE/CLEAN/FINAL + raw mirror_y visual self-QA PASS. Independent C + in-game pending. RUNTIME_VALIDATION=UNTESTED.",
     "C195 finalized A51 index159 4EDA9DE3 candidate 8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5: independent canonical source+atlas QA, exact RGBA32/BGRA header/raw mirror_y, 15/15 source/localized bbox exact-match + size + positive margins, canonical phonetic stage mapping, all outside/overlap/touch gates zero, controller readable/raw visual PASS. C195_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "C196 returned newly promoted localize_text index30 8215FD25 B143 candidate 04d2c23333999873b7f467d0a8647c1056f40fa3bcd06e0174711bb2345277ba. Producer 2/2 numeric containment/protected gates PASS, but mandatory C SOURCE/CLEAN/FINAL visual FAIL: lower starburst clean plate has conspicuous gray/dark blurred reconstruction patches across the former Total Rank zone under the top-center rays; artifact remains around/behind 종합 랭킹. Speech-bubble plate acceptable. REWORK_REQUIRED. RUNTIME_VALIDATION=UNTESTED.",
@@ -3932,10 +3934,11 @@
     "runtime_validation": "UNTESTED"
   },
   "current_pending_artwork_localize_text": 12,
-  "current_producer_rework_remaining": 2,
+  "current_producer_rework_remaining": 3,
   "current_producer_rework_assets": [
     "37759842",
-    "8215FD25"
+    "8215FD25",
+    "55B57CDE"
   ],
   "latest_b_production": {
     "run": "B_PRODUCTION137",
@@ -3986,7 +3989,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C195-C196-BATCH/C195_C196_BATCH_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C197-C198-BATCH/C197_C198_BATCH_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4047,9 +4050,7 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [
-    "55B57CDE"
-  ],
+  "current_pending_c": [],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -4231,6 +4232,33 @@
     "raw_orientation": "mirror_y",
     "report": "localization/graphics/role_A/20261005-A-PRODUCTION54-DXT5/A54_55B57CDE_REPORT.json",
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION54-DXT5/A54_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c197_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T20:55:21+09:00",
+    "run": "20261005-C197-55B57CDE",
+    "queue_index": 161,
+    "candidate_sha256": "7569c51cf5ba82ce081bf09d486b8c8869560e7fae71292c613e4bf8a5b51ab8",
+    "machine_status": "FAIL",
+    "source_bbox_exact": "38/38",
+    "bbox_size_positive_margin": "38/38 PASS",
+    "decoded_localized_bbox_exact_match_producer": "10/38",
+    "mismatched_decoded_bbox_count": 28,
+    "controller_visual_qa": "FAIL_VISIBLE_DXT5_FRINGE_SPECKLE_AND_UNDECLARED_ALPHA_EXTENTS",
+    "decision": "C197_REWORK_REQUIRED_DXT5_VISIBLE_FRINGE_AND_UNDECLARED_ALPHA_EXTENTS",
+    "machine_report": "localization/graphics/role_C/20261005-C197-55B57CDE/C197_55B57CDE_MACHINE_QA.json",
+    "report": "localization/graphics/role_C/20261005-C197-55B57CDE/C197_55B57CDE_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c198_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T20:55:21+09:00",
+    "run": "20261005-C198-8215FD25",
+    "queue_index": 30,
+    "candidate_sha256": "4473abac8660e955a3328088fab92625b758e3682a51825297a91a69800d0edd",
+    "producer_machine_status": "PASS_REPORTED",
+    "controller_visual_qa": "FAIL_SPEECH_BUBBLE_SOURCE_GHOST",
+    "decision": "C198_REWORK_REQUIRED_SPEECH_BUBBLE_SOURCE_GHOST",
+    "report": "localization/graphics/role_C/20261005-C198-8215FD25/C198_8215FD25_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
