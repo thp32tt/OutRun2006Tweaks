@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B165",
+  "timestamp_kst": "2026-10-06T03:51:50+09:00",
+  "scope": "B-owned active P0 IGR-005. Owner-lane override permits odd index137 after exact mapping; completed/PASS work was not repeated.",
+  "user_ingame_regression": [
+    "IGR-005",
+    "스크린샷(147).png"
+  ],
+  "queue_index": 137,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "mapping": {
+    "previous": {
+      "domain": "MIXED",
+      "queue_index": 106,
+      "asset": "textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+      "status": "SUSPECTED"
+    },
+    "resolved": {
+      "domain": "GRAPHICS",
+      "queue_index": 137,
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+      "status": "EXACT_HIGH_CONFIDENCE"
+    },
+    "screenshot_observation": [
+      "modal title: 변속 방식 선택",
+      "main choices: 자동 / 수동",
+      "small subtitle: 변속 방식",
+      "protected badges: AT / MT"
+    ],
+    "binding": [
+      "SELECT TRANSMISSION -> modal title",
+      "AUTOMATIC/MANUAL -> main choices",
+      "TRANSMISSION -> small subtitle",
+      "AT/MT -> protected same-atlas artwork"
+    ],
+    "conclusion": "All visible IGR-005 modal text/art is explained by 30CF0D baked graphics. No runtime-text source is needed for the visible defect. 788CE557 remains linked to IGR-017 only."
+  },
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "superseded_candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
+  "candidate_sha256": "0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4",
+  "worker_output_commit": "e127a62",
+  "worker_report": "localization/graphics/role_B/20261006-B-INGAME165-30CF-TRANSMISSION-MODAL/B165_30CF0D_REPORT.json",
+  "material_rework": {
+    "reason": "User in-game screenshot post-dates prior C156 static PASS and overrides it; prior Korean title/subtitle are overlong/weak at actual screen scale.",
+    "changes": [
+      {
+        "source": "SELECT TRANSMISSION",
+        "old_korean": "변속 방식 선택",
+        "korean": "변속기 선택",
+        "original_bbox": [
+          5,
+          67,
+          868,
+          130
+        ],
+        "localized_bbox": [
+          301,
+          69,
+          572,
+          128
+        ],
+        "font_size": 56,
+        "slant": 0.08
+      },
+      {
+        "source": "TRANSMISSION",
+        "old_korean": "변속 방식",
+        "korean": "변속기",
+        "original_bbox": [
+          1288,
+          96,
+          1569,
+          128
+        ],
+        "localized_bbox": [
+          1391,
+          98,
+          1465,
+          126
+        ],
+        "font_size": 27,
+        "slant": 0.04
+      }
+    ],
+    "preserved": "MANUAL/AUTOMATIC x4 and AT/MT artwork unchanged"
+  },
+  "machine_qa": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32/BGRA",
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "bbox_size_positive_margin": "2/2 PASS",
+    "changed_outside_target_bboxes": 0,
+    "alpha_changed_outside_target_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "manual_automatic_rows_changed_pixels": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "final_mask_validator": "PASS"
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_evidence": [
+    "localization/graphics/role_B/20261006-B-INGAME165-30CF-TRANSMISSION-MODAL/B165_TITLE_SOURCE_OLD_CLEAN_FINAL_2X.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME165-30CF-TRANSMISSION-MODAL/B165_SUBTITLE_SOURCE_OLD_CLEAN_FINAL_2X.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME165-30CF-TRANSMISSION-MODAL/B165_FULL_OLD_FINAL.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME165-30CF-TRANSMISSION-MODAL/B165_RAW_OLD_FINAL.jpg"
+  ],
+  "controller_visual_note": "PASS: shortened title/subtitle are visibly cleaner and more readable at native resolution while keeping source white/gray hierarchy, source-relative slight slant and centered placement. CLEAN is ghost-free; no broken glyph, source residue, clipping, overlap, protected AT/MT damage, seam, other-image intrusion, or raw mirror_y regression. The four 수동/자동 rows remain byte-exact.",
+  "backlog_status": "B_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
