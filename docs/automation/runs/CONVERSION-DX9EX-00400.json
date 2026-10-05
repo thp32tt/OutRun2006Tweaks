@@ -2,30 +2,30 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX9EX-00400",
   "production_id": "CONVERSION-DX9EX-00400",
-  "event_id": "CONVERSION-DX9EX-00400-E002",
-  "event_type": "rollover",
+  "event_id": "CONVERSION-DX9EX-00400-E003",
+  "event_type": "retry",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "status": "COMPLETE",
   "queue_controller_contract": {
     "path": "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
     "status": "APPLIED",
-    "evidence": "Recovered GitHub branch HEAD and prior post-1000 state directly. The chat rollover was not treated as a retry and did not increment ATTEMPT. Exact-SHA validation-bearing identity is preserved separately from later bookkeeping commits."
+    "evidence": "Inspected explicit FAILURE_CONTEXT run 37249044356. It was a cancelled Gate on intermediate SHA 6ac569b7 and was superseded by later successful 00400 material/Gates, so no rollback/repetition was performed. Current retry then advanced the next bounded post-1000 successor."
   },
-  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_SOURCE_HUD_AND_N100_EXACT_STATIC",
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
-  "base_sha": "cda254aec1df0b2597d22036be3ace4f98761503",
-  "source_material_sha": "511063f7f043ab809340184230a7bebc72e7b62b",
-  "result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
-  "material_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
-  "validation_bearing_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
-  "state_commit_sha": "b52167296843424967b6dbb86401314f0a1f0c4e",
+  "base_sha": "74d14a7223933aaf012ea2c10f53f4349a2b45f8",
+  "source_material_sha": "3d371018c8908042cbae9ffb2b1b2163e7cd1d95",
+  "result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+  "material_result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+  "validation_bearing_result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+  "state_commit_sha": "ccd5553122a64aad2648b53f4b3093b646820ec3",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00400]",
-  "selected_work_item": "VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-OWNERSHIP-0009",
-  "summary": "Continued the post-1000 structural cleanup by moving R9-owned right depth/stencil synchronization invalidation behind R9InvalidateRightDepthStencilSync(bool,bool). R33 now routes both left-write invalidation and fail-closed invalidation through that owner API instead of mutating RightDepthSynchronized/RightStencilSynchronized directly. The verifier was updated after its stale direct-literal order check caused the first exact-source Gate failure. No projection, HUD semantic, Present ordering, D3D getter, allocation, wait, lock, or new hot-path synchronization behavior was introduced.",
+  "selected_work_item": "VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-READ-OWNERSHIP-0010",
+  "summary": "Continued the post-1000 R33 final-dispatch ownership cleanup by encapsulating R33 reads of R9-owned RightDepthSynchronized/RightStencilSynchronized behind R9IsRightDepthInSync()/R9IsRightStencilInSync(). Both world and HUD readiness gates preserve their exact bootstrap, depth-test and stencil-test conditions while direct R33 reads are now forbidden by the refactor verifier. No projection, HUD semantic, Present ordering, resource allocation, wait, lock, D3D getter, or new synchronization operation was introduced.",
   "changed_paths": [
     "src/vr/d3d9/stereo_renderer.cpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -33,93 +33,80 @@
     "docs/VR_REFACTOR_STATE.json",
     "docs/automation/runs/CONVERSION-DX9EX-00400.json"
   ],
+  "failure_context": {
+    "run_id": 37249044356,
+    "head_sha": "6ac569b733fbfa35898cf88cdac4fad21804823f",
+    "conclusion": "cancelled",
+    "classification": "SUPERSEDED",
+    "reason": "The cancelled run belonged to an intermediate 00400 SHA and was superseded by later pushes and successful exact-SHA validation. It is not the validation-bearing result of E003."
+  },
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Reconstructed current vr-d3d9ex-focus from GitHub SSOT without repeating already-landed 00400 implementation. Authoritative current-user dispatch is TASK_ID=CONVERSION-DX9EX-00400, PRODUCTION_ID=CONVERSION-DX9EX-00400, EVENT_ID=CONVERSION-DX9EX-00400-E002, EVENT_TYPE=rollover, LANE=DX9EX, CHAT_ROLLOVER=2, ATTEMPT=1/3, RESUME_REASON='Retry persisted after one recovery attempt'. This chat rollover is not a retry and does not consume an attempt."
+      "evidence": "Read current branch HEAD, AGENTS.md, queue contract, VR_REFACTOR_STATE, VR_AUTODEV_STATE, VR_PROBLEM_HISTORY, VR_REGRESSION_KNOWLEDGE, VR_RUN_STATE/VR_REVIEW_FINDINGS, recent refactor/test commits, current 00400 record, and explicit cancelled run 37249044356. Current user dispatch is E003 retry, ATTEMPT=2/3."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
-      "finding": "R33 still directly invalidated the R9-owned RightDepthSynchronized/RightStencilSynchronized flags at two boundaries: conditional invalidation after a left-eye depth/stencil write and unconditional fail-close invalidation. The behavior-preserving owner extraction was bounded because the exact boolean conditions and depth-before-stencil mutation order could be retained inside R9."
+      "finding": "00400 E002 moved R33 right depth/stencil sync writes behind R9InvalidateRightDepthStencilSync(), but R33 still directly read RightDepthSynchronized/RightStencilSynchronized in both world and HUD readiness paths. The next bounded successor is read ownership encapsulation with exact conditions preserved."
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
-      "evidence": "ef286f5a adds fail-closed verifier guards, 6ac569b7 adds R9InvalidateRightDepthStencilSync(bool,bool), 511063f7 routes R33 left-write and fail-close paths through the new owner API, and 4bccdc9e repairs the stale verifier to check cache-before-owner-call plus depth-before-stencil ordering rather than removed direct R33 literals."
+      "evidence": "e7ab024b adds R9IsRightDepthInSync()/R9IsRightStencilInSync(); 3d371018 replaces the six direct read expressions across both R33 readiness paths; 778fe8b1 adds verifier guards requiring the owner queries and rejecting raw R33 sync-state reads."
     },
     "C3_VALIDATE": {
       "status": "COMPLETE",
-      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_SOURCE_HUD_AND_N100_EXACT_STATIC",
+      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
       "runtime_validation": "UNTESTED",
-      "evidence": "Initial exact-source 511063f7 DX9Ex Active run 37249055030 failed only in policy/refactor verification because the verifier still required direct R33 flag mutations; source HUD Inspector 37249054934 and Domain Isolation 37249055055 succeeded. After verifier repair, exact validation-bearing SHA 4bccdc9e passed DX9Ex Active Validation 37249150072 (policy/host/game/full-chain-compile/package SUCCESS) and Domain Isolation Guard 37249150004. N100 detached exact-SHA architecture/R51/R32-R34/hook-graph/refactor/near-plane suite also PASS. No HMD/game runtime test was performed."
+      "evidence": "Exact validation-bearing SHA 778fe8b1882ffdb14eddca54191a6ce431cee91d: DX9Ex Active Validation 37250263373 SUCCESS with policy 111576304334, host 111576363304, game 111576363275, full-chain-compile 111576363300, package 111577342886; Domain Isolation Guard 37250263384 SUCCESS. N100 detached exact-SHA architecture/R51/R32-R34/hook-graph/refactor/near-plane suite PASS. No HMD/game runtime test performed."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
-      "source_material_sha": "511063f7f043ab809340184230a7bebc72e7b62b",
-      "result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
-      "validation_bearing_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+      "source_material_sha": "3d371018c8908042cbae9ffb2b1b2163e7cd1d95",
+      "result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+      "validation_bearing_result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
       "messages": [
-        "test(vr): guard R33 depth sync ownership [AUTO:CONVERSION-DX9EX-00400]",
-        "refactor(vr): add R9 depth sync owner API [AUTO:CONVERSION-DX9EX-00400]",
-        "refactor(vr): route R33 depth sync invalidation through R9 [AUTO:CONVERSION-DX9EX-00400]",
-        "test(vr): align depth sync owner verifier [AUTO:CONVERSION-DX9EX-00400]"
+        "refactor(vr): expose R9 depth sync readiness queries [AUTO:CONVERSION-DX9EX-00400]",
+        "refactor(vr): route R33 depth sync reads through R9 [AUTO:CONVERSION-DX9EX-00400]",
+        "test(vr): guard R33 depth sync readiness ownership [AUTO:CONVERSION-DX9EX-00400]"
       ],
-      "ci_skip_on_validation_bearing_result": false,
-      "repaired_validation": {
-        "failed_sha": "511063f7f043ab809340184230a7bebc72e7b62b",
-        "dx9ex_active_run_id": 37249055030,
-        "classification": "STALE_VERIFIER_REPAIRED_WITHIN_ATTEMPT_1",
-        "consumes_queue_attempt": false
-      }
+      "ci_skip_on_validation_bearing_result": false
     },
     "C5_PACKAGE": {
       "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
-      "evidence": "DX9Ex Active package artifact 11320362311, name OutRun2-VR-DX9EX-ACTIVE-4bccdc9ea361d6c2a70693d9d0a1b33980236b35, digest sha256:658ad359d886d957cbb95a1ef3ee024a3ef5f60fc532114a80bab765d6db3ec5, size 2730650 bytes. Artifact is automation/build evidence only, not Quest3/VDXR runtime proof."
+      "evidence": "DX9Ex Active package artifact 11320364280, name OutRun2-VR-DX9EX-ACTIVE-778fe8b1882ffdb14eddca54191a6ce431cee91d, digest sha256:0a4df85dc378156c8bf495194daf76c9a011e55c704e80e336615490de6c5be1, size 2730711 bytes. Build artifact is not runtime proof."
     },
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "state_commit_sha": "b52167296843424967b6dbb86401314f0a1f0c4e",
-      "issue14_update": "COMPLETE",
+      "state_commit_sha": "ccd5553122a64aad2648b53f4b3093b646820ec3",
+      "issue14_update": "PENDING_LEDGER_COMMENT",
       "issue13_update": "NOT_REQUIRED_NO_RUNTIME_PROBLEM_STATUS_CHANGE",
-      "runtime_validation": "UNTESTED",
-      "issue14_comment_id": 5986315823,
-      "issue14_validation_comment_id": 5986305976
+      "runtime_validation": "UNTESTED"
     }
   },
   "evidence": {
     "dx9ex_active": {
-      "run_id": 37249150072,
+      "run_id": 37250263373,
       "conclusion": "success",
-      "exact_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+      "exact_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
       "jobs": {
-        "policy": 111573007558,
-        "host": 111573066829,
-        "game": 111573066834,
-        "full_chain_compile": 111573066828,
-        "package": 111573857611
+        "policy": 111576304334,
+        "host": 111576363304,
+        "game": 111576363275,
+        "full_chain_compile": 111576363300,
+        "package": 111577342886
       },
-      "artifact_id": 11320362311,
-      "artifact_digest": "sha256:658ad359d886d957cbb95a1ef3ee024a3ef5f60fc532114a80bab765d6db3ec5"
+      "artifact_id": 11320364280,
+      "artifact_digest": "sha256:0a4df85dc378156c8bf495194daf76c9a011e55c704e80e336615490de6c5be1"
     },
     "domain_isolation": {
-      "run_id": 37249150004,
+      "run_id": 37250263384,
       "conclusion": "success",
-      "exact_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35"
-    },
-    "hud_inspector": {
-      "run_id": 37249054934,
-      "conclusion": "success",
-      "exact_sha": "511063f7f043ab809340184230a7bebc72e7b62b",
-      "jobs": {
-        "static_exe_analysis": 111572729239,
-        "build_hud_inspector": 111572729503
-      },
-      "game_artifact_id": 11320616155,
-      "game_artifact_digest": "sha256:49abdabec19571d945b9e59019ac1470bb027afc82dad0028235bd9dd581c7b7"
+      "exact_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d"
     },
     "n100_local": {
       "conclusion": "AUXILIARY_EXACT_SHA_STATIC_PASS",
-      "exact_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+      "exact_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
       "checks": [
         "py_compile refactor verifier",
         "architecture",
@@ -128,32 +115,33 @@
         "hook graph",
         "refactor contract",
         "near-plane active gate"
-      ],
-      "note": "Auxiliary evidence only; GitHub branch HEAD and Actions remain authoritative."
+      ]
     }
   },
-  "next_action": "Do not repeat CONVERSION-DX9EX-00400. Preserve R9InvalidateRightDepthStencilSync() as the owner boundary and keep R33 free of direct RightDepthSynchronized/RightStencilSynchronized mutation. Continue only the next bounded post-1000 structural successor supported by current source/static evidence; runtime claims remain gated on Quest3/VDXR evidence.",
+  "prior_event_snapshot": {
+    "event_id": "CONVERSION-DX9EX-00400-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "material_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+    "validation_bearing_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+    "status": "COMPLETE"
+  },
+  "next_action": "Do not repeat E003. Preserve R9IsRightDepthInSync()/R9IsRightStencilInSync() as R9 read-owner boundaries and keep R33 free of direct RightDepthSynchronized/RightStencilSynchronized access. Continue only the next bounded post-1000 structural successor supported by source/static evidence.",
   "controller_dispatch": {
     "task_id": "CONVERSION-DX9EX-00400",
     "production_id": "CONVERSION-DX9EX-00400",
-    "event_id": "CONVERSION-DX9EX-00400-E002",
-    "event_type": "rollover",
+    "event_id": "CONVERSION-DX9EX-00400-E003",
+    "event_type": "retry",
     "lane": "DX9EX",
     "target_branch": "vr-d3d9ex-focus",
-    "attempt": "1/3",
+    "attempt": "2/3",
     "source": "CURRENT_USER_QUEUE",
-    "material_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
-    "source_material_sha": "511063f7f043ab809340184230a7bebc72e7b62b",
-    "validation_bearing_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
-    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_SOURCE_HUD_AND_N100_EXACT_STATIC",
-    "runtime_validation": "UNTESTED",
-    "chat_rollover": 2,
-    "resume_reason": "Retry persisted after one recovery attempt",
-    "rollover_is_retry": false
+    "material_result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+    "source_material_sha": "3d371018c8908042cbae9ffb2b1b2163e7cd1d95",
+    "validation_bearing_result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
+    "runtime_validation": "UNTESTED"
   },
-  "validated_at_kst": "2026-10-05T09:56:53+09:00",
-  "completed_at_kst": "2026-10-05T09:59:30+09:00",
-  "chat_rollover": 2,
-  "resume_reason": "Retry persisted after one recovery attempt",
-  "rollover_is_retry": false
+  "validated_at_kst": "2026-10-05T10:14:30+09:00",
+  "completed_at_kst": "2026-10-05T10:15:23+09:00"
 }
