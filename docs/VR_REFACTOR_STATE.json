@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-05T15:35:05+09:00",
+  "updatedKst": "2026-10-05T15:56:14+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -163,11 +163,12 @@
     "Runtime remains UNTESTED; cycle 1100 is structural/static/build verification only.",
     "CONVERSION-DX9EX-00402 did not advance the structural cycle: cycle 1100 remains authoritative and physical R31/R32 hook-layer retirement stays deferred pending a bounded equivalence proof. General regression maintenance instead build-verified VR-HUD-SUMO-REPLAY-SEMANTIC-LOSS-001 by adding a deterministic non-consuming replay semantic ownership guard and wiring it into DX9Ex Active Validation. Exact validation-bearing SHA 4183a3bc6970653b5dab60a8f5c64ba1bc01c318 passed DX9Ex Active 37267187539 and Domain Isolation 37267187590; runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00403 / VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012: bounded structural proof gate only; no runtime behavior changed. RED commit 4811ab9d53b5c7ee7a60b8789916b0a6abe74c69 added tools/verify_vr_r31_r32_retirement_guard.py and failed exactly because the canonical DX9Ex Active workflow did not yet own the new guard. Validation-bearing 8b1bd6b3b6d726bec3e478ac2862bde80916a254 wired the guard into both the push path filter and architecture verification step. The guard pins four retirement prerequisites: R31/R32 install fallback ownership, R33->R32->R22 Reset plus R33->R32->R13 Present/DirectGPU ordering, R22/R31 StateBlock lifecycle/fallback coverage, and R33 final fallback through R32LowerFailClosed plus R30-owned lower-R29 calls. N100 exact-SHA py_compile + retirement guard + architecture + R51 + R32-R34 + hook graph + refactor + Sumo + near-plane + workflow YAML passed. GitHub exact-SHA DX9Ex Active 37268342455 policy/host/game/full-chain-compile/package SUCCESS and Domain Isolation Guard 37268342567 SUCCESS. Package artifact 11326909994 digest sha256:b81eb674a40841b5408f09e6e70576662a3b8b171c83b11f1237049847ebd36b. Physical retirement remains intentionally DEFERRED and runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00406: c64 producer provenance and semantic-HUD node-relation diagnostics are telemetry-only; VRTelemetry OFF skips diagnostic c64 provenance lookup. Rendering classification/ownership is unchanged; runtime remains UNTESTED."
+    "CONVERSION-DX9EX-00406: c64 producer provenance and semantic-HUD node-relation diagnostics are telemetry-only; VRTelemetry OFF skips diagnostic c64 provenance lookup. Rendering classification/ownership is unchanged; runtime remains UNTESTED.",
+    "CONVERSION-DX9EX-00407: Sumo replay now snapshots explicit RenderScope plus diagnostic ProducerToken in one non-consuming semantic-tag lookup; a deterministic provenance verifier forbids reintroducing the second registry scan. Rendering ownership/classification is unchanged; runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARDED",
-  "validatedSourceSha": "9626ce91b664d247aeea79a0b1338496d8a0792e",
-  "validationRunId": 37272660121,
+  "validatedSourceSha": "d2872620450dc5e3604f56810721ce13470c99bb",
+  "validationRunId": 37274224163,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -424,6 +425,48 @@
       "domainIsolationRunId": 37272660120,
       "packageArtifactId": 11329676021,
       "packageArtifactDigest": "sha256:1f3ae6b0f1df5243b9e0014ee69afc91f24827b3fbaa2007a6dc9b93565c49d4"
+    }
+  },
+  "post1000Maintenance00407": {
+    "taskId": "CONVERSION-DX9EX-00407",
+    "productionId": "CONVERSION-DX9EX-00407",
+    "eventId": "CONVERSION-DX9EX-00407-E003",
+    "eventType": "rollover",
+    "chatRollover": 2,
+    "rolloverIsRetry": false,
+    "resumeReason": "Retry persisted after one recovery attempt",
+    "attempt": "1/3",
+    "item": "DX9EX-FINGERPRINT-SUMO-REPLAY-ONEPASS-001",
+    "baseSha": "86ac52ad6c07ef9df6276c10d127fba1887e4d3d",
+    "sourceMaterialSha": "4e7ad58fae536a9e2d18543789b31fc9f6c28a38",
+    "materialResultSha": "d2872620450dc5e3604f56810721ce13470c99bb",
+    "validationBearingResultSha": "d2872620450dc5e3604f56810721ce13470c99bb",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "runtimeBehaviorChanged": false,
+    "summary": "Collapsed Sumo replay scope+producer provenance capture from two semantic-registry scans to one output-parameter peek; compatibility producer peek remains non-consuming and the exact one-pass invariant is regression-guarded.",
+    "taskCommits": [
+      "4e7ad58fae536a9e2d18543789b31fc9f6c28a38 refactor(vr): expose one-pass replay semantic peek [AUTO:CONVERSION-DX9EX-00407]",
+      "16173d54a1cfe4920da1cca691c92cddde8b75ac perf(vr): collapse replay semantic lookup [AUTO:CONVERSION-DX9EX-00407]",
+      "d2872620450dc5e3604f56810721ce13470c99bb test(vr): guard one-pass replay provenance snapshot [AUTO:CONVERSION-DX9EX-00407]"
+    ],
+    "validation": {
+      "supersededCancelledRuns": [
+        37273959953
+      ],
+      "dx9exActiveRunId": 37274224163,
+      "dx9exActiveRunAttempt": 2,
+      "jobs": {
+        "policy": 111648506125,
+        "host": 111648505359,
+        "game": 111648504977,
+        "fullChainCompile": 111648505398,
+        "package": 111649624497
+      },
+      "domainIsolationRunId": 37274224244,
+      "packageArtifactId": 11329468257,
+      "packageArtifactDigest": "sha256:19fef8046ca47aea14de063899cf92cf14e8e73ed8f9aafeab86ae861ed1241f",
+      "n100": "UNAVAILABLE_DESKTOP_COMMANDER_MONTHLY_USAGE_LIMIT; NOT_USED_FOR_COMPLETION"
     }
   }
 }
