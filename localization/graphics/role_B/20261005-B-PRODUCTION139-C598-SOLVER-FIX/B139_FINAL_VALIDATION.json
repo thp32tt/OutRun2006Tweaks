@@ -1,0 +1,19 @@
+{
+  "source": "/tmp/outrun_B139/source_readable.png",
+  "candidate": "/tmp/outrun_B139/candidate_readable.png",
+  "size": [
+    4096,
+    4096
+  ],
+  "changed_pixels": 1322895,
+  "changed_bbox": [
+    16,
+    615,
+    4022,
+    2795
+  ],
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "status": "PASS"
+}
