@@ -1,0 +1,22 @@
+{
+  "run": "20261006-A-PROBE91-E3C455FA",
+  "queue_index": 225,
+  "source_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+  "source_meta": {
+    "width": 2048,
+    "height": 1024,
+    "mips": 1,
+    "fourcc": "\u0000\u0000\u0000\u0000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+    "bytes": 8388736
+  },
+  "report": "localization/graphics/role_A/20261006-A-PROBE91-E3C455FA/A91_E3C455FA_PROBE.json",
+  "status": "A91_SOURCE_PROBE_COMPLETE_RENDER_DECISION_PENDING_CONTROLLER"
+}
