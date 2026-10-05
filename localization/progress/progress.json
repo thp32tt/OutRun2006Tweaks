@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T22:31:00+09:00",
+  "updated_at_kst": "2026-10-05T22:57:50+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C208 consumed the new A65 index193 97E863AD candidate. Independent canonical/header/raw mirror_y QA PASS: 13/13 source/localized bbox exact, size/positive-margin PASS; outside/alpha/introduced-visible/source-script residue/overlap/touch/protected changes all 0 and OutRun/OutRun2SP/OUTRUN/TESTAROSSA protected pixels remain exact. Mandatory controller SOURCE/FINAL review FAILS source-style scale/proportion: the Korean labels are materially underscaled/too compact versus the source wide bold-condensed family. Decision C208_REWORK_REQUIRED_SOURCE_STYLE_SCALE_PROPORTION. Current queue remains 83 localize_text + 43 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit; pending_artwork localize_text=8; producer REWORK=2 (37759842,97E863AD); pending-C=0. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C209 consumed the new B154 index34 B7E25BAD HOLL rank candidate and positively classified zoom_review Total Rank -> 종합 랭킹. Independent canonical 4096x2048 RGBA32/header/raw mirror_y and C202-approved same-family template revalidation PASS: localized bbox exact [2172,1198,2404,1262] within source core [2036,1194,2541,1266] with positive margins; decoded/alpha/introduced-visible outside=0 and opaque source-title residue=0. HOLL/template deltas are confined to 240 title/effect pixels plus one alpha-1 white AA variant; all other HOLL artwork remains canonical. Controller SOURCE/CLEAN/FINAL/raw visual PASS. Decision C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. Current queue: 84 localize_text + 42 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit; pending_artwork localize_text=8; producer REWORK=2 (37759842,97E863AD); pending-C=0. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -155,17 +155,17 @@
   "graphics": {
     "total_dds": 243,
     "visually_reviewed": 243,
-    "localize_text": 83,
+    "localize_text": 84,
     "preserve_brand_song_credit": 33,
     "font_pipeline": 9,
     "hangul_name_entry": 1,
-    "zoom_review": 43,
+    "zoom_review": 42,
     "no_localization": 74,
     "work_queue_total": 137,
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
-    "transcribed_assets": 80,
-    "transcribed_segments": 721,
+    "transcribed_assets": 81,
+    "transcribed_segments": 722,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -181,8 +181,8 @@
     },
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
-    "artwork_plan_assets": 82,
-    "artwork_plan_segments": 721,
+    "artwork_plan_assets": 83,
+    "artwork_plan_segments": 722,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -297,16 +297,16 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C208",
-      "report": "localization/graphics/role_C/20261005-C208-97E863AD/C208_97E863AD_CONTROLLER_FINAL_QA.json",
-      "result": "C208_REWORK_REQUIRED_SOURCE_STYLE_SCALE_PROPORTION",
+      "run": "C209",
+      "report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_CONTROLLER_FINAL_QA.json",
+      "result": "C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
       "candidate_changed_by_C": false,
       "assets_checked": 1,
-      "physical_elements_checked": 13,
-      "pixel_visual_pass_assets": [],
-      "rework_required_assets": [
-        "97E863AD"
+      "physical_elements_checked": 1,
+      "pixel_visual_pass_assets": [
+        "B7E25BAD"
       ],
+      "rework_required_assets": [],
       "global_rework_remaining": [
         "37759842",
         "97E863AD"
@@ -320,13 +320,13 @@
       "pending_c_localize_text": 0,
       "pending_production_localize_text": 8,
       "machine_evidence": {
-        "97E863AD": "localization/graphics/role_C/20261005-C208-97E863AD/C208_97E863AD_MACHINE_QA.json"
+        "B7E25BAD": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_MACHINE_QA.json"
       },
       "controller_visual": {
-        "97E863AD": "FAIL_SOURCE_STYLE_SCALE_PROPORTION"
+        "B7E25BAD": "PASS"
       },
-      "verifier_retry_note": "Initial C208 residue counter was a C-only scope false positive on source-colored Hangul pixels inside localized bboxes; corrected same-candidate verifier passes residue=0.",
-      "in_game_validation": "97E863AD UNTESTED; RUNTIME_VALIDATION=UNTESTED"
+      "template_reference": "C202-approved same-family Total Rank style/clean reconstruction; HOLL shift +192 x",
+      "in_game_validation": "B7E25BAD UNTESTED; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION137",
