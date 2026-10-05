@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A97 consumed the four remaining pending_artwork localize_text rows 225/227/231/237. Do not repeat them unless independent C returns REWORK_REQUIRED. C should independently verify E3C455FA/E596B7AC/EBE401C8/FF514CEB next; producer runtime validation remains UNTESTED.",
     "B171 IGR-007 speech-bubble regression is mapped to the SHA-exact, already build-validated B170 compact runtime keyline path; do not duplicate B170 source bytes. Await independent C + NEW actual in-game retest. Next B active P1 is IGR-010 STAGE_HEART_TALLY_OVERLAY exact MIXED split/material repair.",
     "B170 IGR-006 runtime HUD compact-text repair is Win32 Release + Korean test-package PASS. Await independent C review and NEW actual in-game screenshot before closure; do not repeat B170. Next B active P1 rows: IGR-007, then IGR-010 exact mapping/material repair.",
     "B169 IGR-019 producer static/controller PASS: 97E MULTIPLAYER + 8C Online/LAN help are native-HD; independent C and NEW actual in-game retest required. Do not repeat B169 bytes unless returned REWORK.",
@@ -4013,7 +4014,7 @@
     "c176_return_resolved": true,
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_artwork_localize_text": 4,
+  "current_pending_artwork_localize_text": 0,
   "current_producer_rework_remaining": 0,
   "current_producer_rework_assets": [],
   "latest_b_production": {
@@ -4137,7 +4138,11 @@
     "8C259C68",
     "D657C2EB",
     "97E863AD",
-    "6DC89C6E"
+    "6DC89C6E",
+    "E3C455FA",
+    "E596B7AC",
+    "EBE401C8",
+    "FF514CEB"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -5394,7 +5399,7 @@
     "source_sha256": "12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889",
     "runtime_table_rows": 1355,
     "material_fix": {
-      "compact_logical_height_max": 24.0,
+      "compact_logical_height_max": 24,
       "readability_stroke_screen_px": "1-2",
       "stroke_directions": 8,
       "stroke_clip": "existing calculated Korean text footprint",
@@ -5464,5 +5469,26 @@
     "pending_new_ingame_retest": true,
     "report": "localization/runtime/B171_IGR007_SPEECH_BUBBLE_RUNTIME_RECONCILE.json",
     "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+  },
+  "a97_pending4_finalize": {
+    "timestamp_kst": "2026-10-06T07:34:00+09:00",
+    "indices": [
+      225,
+      227,
+      231,
+      237
+    ],
+    "assets": {
+      "E3C455FA": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
+      "E596B7AC": "e60eb09818ce79c1afc005905ce0d5f7d2678c7f69a2b25f418f2679200499b2",
+      "EBE401C8": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
+      "FF514CEB": "acbf42d5f8f45ee6227bb0f81a770687bba680916c828f773095b64dbc63e5a3"
+    },
+    "result": "A97_STATIC_PASS_PENDING_C",
+    "current_pending_artwork_localize_text": 0,
+    "machine_qa": "38/38 physical rows PASS; zero outside/alpha/protected/residue/overlap/touch",
+    "controller_visual_qa": "PASS_4_OF_4",
+    "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION97-PENDING4-FINALIZE/A97_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
   }
 }
