@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C150-9FC88069",
+  "queue_index": 198,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+  "producer_run": "20261005-B-PRODUCTION77",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "e97d852a905aa8a219b786b843089e0998037f52",
+    "atlas_git_blob_sha1": "77904226ad9347044c4c091575efbe0aba72717a",
+    "source_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4"
+  },
+  "input_candidate_sha256": "667b64ac0336c7ae3f7b1f4b79f36c7237225104a4c948ac7158da9805d7e1a7",
+  "candidate_sha256": "34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c",
+  "candidate_changed_by_C": true,
+  "semantic_policy_correction": {
+    "reason": "Song titles/music-title artwork must remain original English. B77 localized three parenthetical title/variant qualifiers.",
+    "restored_original_regions": {
+      "2": "(GUITAR MIX) song-title/variant qualifier",
+      "10": "(INSTRUMENTAL) song-title/variant qualifier",
+      "39": "(PROTOTYPE) song-title/variant qualifier"
+    },
+    "retained_localized_functional_regions": {
+      "0": {
+        "source": "RANDOM",
+        "korean": "무작위"
+      },
+      "1": {
+        "source": "= RANDOM PLAY =",
+        "korean": "- 무작위 재생 -"
+      },
+      "40": {
+        "source": "INTERMEDIATE B",
+        "korean": "중급 B"
+      },
+      "41": {
+        "source": "INTERMEDIATE A",
+        "korean": "중급 A"
+      }
+    },
+    "corrective_pixels": 41696,
+    "changes_outside_restore_regions": 0
+  },
+  "structure": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "region_idx": 0,
+      "source": "RANDOM",
+      "korean": "무작위",
+      "cell": [
+        0,
+        1544,
+        544,
+        504
+      ],
+      "original_bbox": [
+        116,
+        1922,
+        434,
+        1984
+      ],
+      "localized_bbox": [
+        215,
+        1927,
+        335,
+        1979
+      ],
+      "source_size": [
+        318,
+        62
+      ],
+      "localized_size": [
+        120,
+        52
+      ],
+      "delta_left": 99,
+      "delta_right": 99,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 1,
+      "source": "= RANDOM PLAY =",
+      "korean": "- 무작위 재생 -",
+      "cell": [
+        544,
+        1968,
+        1604,
+        80
+      ],
+      "original_bbox": [
+        548,
+        1984,
+        1128,
+        2036
+      ],
+      "localized_bbox": [
+        552,
+        1988,
+        748,
+        2032
+      ],
+      "source_size": [
+        580,
+        52
+      ],
+      "localized_size": [
+        196,
+        44
+      ],
+      "delta_left": 4,
+      "delta_right": 380,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 40,
+      "source": "INTERMEDIATE B",
+      "korean": "중급 B",
+      "cell": [
+        1372,
+        24,
+        640,
+        80
+      ],
+      "original_bbox": [
+        1561,
+        43,
+        1984,
+        84
+      ],
+      "localized_bbox": [
+        1565,
+        47,
+        1645,
+        79
+      ],
+      "source_size": [
+        423,
+        41
+      ],
+      "localized_size": [
+        80,
+        32
+      ],
+      "delta_left": 4,
+      "delta_right": 339,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 41,
+      "source": "INTERMEDIATE A",
+      "korean": "중급 A",
+      "cell": [
+        2012,
+        24,
+        640,
+        80
+      ],
+      "original_bbox": [
+        2198,
+        43,
+        2624,
+        84
+      ],
+      "localized_bbox": [
+        2202,
+        47,
+        2282,
+        79
+      ],
+      "source_size": [
+        426,
+        41
+      ],
+      "localized_size": [
+        80,
+        32
+      ],
+      "delta_left": 4,
+      "delta_right": 342,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "bbox_size_positive_margin": "4/4 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "overlap": 0,
+    "touch_pairs": [],
+    "card_art_changed_outside_random_text_bbox": 0,
+    "restored_qualifier_changed_pixels": {
+      "2": 0,
+      "10": 0,
+      "39": 0
+    },
+    "all_preserved_regions_changed_pixels": {
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0,
+      "14": 0,
+      "15": 0,
+      "16": 0,
+      "17": 0,
+      "18": 0,
+      "19": 0,
+      "20": 0,
+      "21": 0,
+      "22": 0,
+      "23": 0,
+      "24": 0,
+      "25": 0,
+      "26": 0,
+      "27": 0,
+      "28": 0,
+      "29": 0,
+      "30": 0,
+      "31": 0,
+      "32": 0,
+      "33": 0,
+      "34": 0,
+      "35": 0,
+      "36": 0,
+      "37": 0,
+      "38": 0,
+      "39": 0,
+      "42": 0
+    }
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
