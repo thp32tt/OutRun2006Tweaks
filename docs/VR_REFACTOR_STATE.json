@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T02:17:04+09:00",
+  "updatedKst": "2026-10-06T02:25:52+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -78,9 +78,10 @@
     "VR-REFACTOR-POST1100-R31-R32-PHYSICAL-DRAW-HOOK-RETIREMENT-0013",
     "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-0014",
     "VR-REFACTOR-POST1100-R32-WVP-BATCH-NEUTRAL-OWNER-0015",
-    "VR-REFACTOR-POST1100-R32-LIVE-EFFECT-SNAPSHOT-NEUTRAL-OWNER-0016"
+    "VR-REFACTOR-POST1100-R32-LIVE-EFFECT-SNAPSHOT-NEUTRAL-OWNER-0016",
+    "VR-REFACTOR-POST1100-VIEWPORT-READ-NEUTRAL-OWNER-0017"
   ],
-  "next": "Post-1100 dependency census continues after neutralizing the live effect render-state snapshot primitive. R31 remains StateBlock/cache-recovery owner; R32 remains Reset/Present/DirectGPU/fail-close/workload/policy owner; R33 remains sole physical draw executor. Inspect one remaining R33-consumed helper and extract only if its implementation is stateless and ownership-neutral.",
+  "next": "Perform a terminal dependency census of the remaining R33-consumed R31/R32 helpers. If all remaining helpers are owner-specific (telemetry, cache/pose, policy, restore/lifecycle, fail-close, install state, workload), add a deterministic owner-boundary guard and mark the post-1100 neutral-helper extraction chain complete. Do not move StateBlock/Reset/Present/DirectGPU/fail-close/cache-lifetime behavior merely to reduce symbol count.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -182,7 +183,8 @@
     "CONVERSION-DX9EX-00408 E005 retry: repaired controller result identity only. fda9413593d3e1b79ab45cd73269d368d3a16f6c is bookkeeping-only and never owned the required Gate. The authoritative material/validation-bearing SHA remains 3c0ee50ba8893e94b42a5213ea36640864834553 with DX9Ex Active 37275931018 SUCCESS and Domain Isolation 37275930952 SUCCESS. No new runtime behavior was introduced; RUNTIME_VALIDATION remains UNTESTED. Current structural successor from 00409 is unchanged.",
     "CONVERSION-DX9EX-00409 E002 retry closed result-identity gap: queue SHA 3060adb27c8444deb4c6094b1a15cb42fbee414f remains BOOKKEEPING_ONLY; exact validation-bearing repair SHA e3239b4959cf4759c5d7ce1395dd133297d10124 passed DX9Ex Active Validation 37343826060 and Domain Isolation 37343826037. Fail-closed workflow execution is now recognized by HUD/retirement verifiers. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00410 completed neutral WVP batch ownership extraction. Raw c64..c67 SetVertexShaderConstantF moved to draw_state_helpers; R32 telemetry/failure wrapper remains authoritative. Exact SHA e27f01f84045bd47b93ab3aecae24581e6ffd1a0 passed DX9Ex Active 37345169043 and Domain Isolation 37345169517. Intermediate run 37345097334 on 144a4abc was superseded/cancelled, not a task failure. Runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00411 completed neutral live effect-state snapshot extraction. Exact SHA 5875486443a60c93764c40ef6d7204f1066e452c passed DX9Ex Active 37346503785 and Domain Isolation 37346503724. Intermediate ba2c5169 run 37346444631 was superseded/cancelled, not a task failure. Runtime remains UNTESTED."
+    "CONVERSION-DX9EX-00411 completed neutral live effect-state snapshot extraction. Exact SHA 5875486443a60c93764c40ef6d7204f1066e452c passed DX9Ex Active 37346503785 and Domain Isolation 37346503724. Intermediate ba2c5169 run 37346444631 was superseded/cancelled, not a task failure. Runtime remains UNTESTED.",
+    "CONVERSION-DX9EX-00412 completed neutral viewport-read extraction. Exact SHA bbae4e903468703984863c0658d267ad79a538bc passed policy/game/host/full-chain/package jobs in DX9Ex Active 37347553547 and Domain Isolation 37347553486. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
@@ -632,5 +634,27 @@
       ]
     },
     "issue14CommentId": 5999348901
+  },
+  "post1000Maintenance00412": {
+    "taskId": "CONVERSION-DX9EX-00412",
+    "productionId": "CONVERSION-DX9EX-00412",
+    "eventId": "CONVERSION-DX9EX-00412-E001",
+    "eventType": "dispatch",
+    "attempt": "1/3",
+    "item": "VR-REFACTOR-POST1100-VIEWPORT-READ-NEUTRAL-OWNER-0017",
+    "baseSha": "daffb7787eac9f7bf2a3de481209a6824ebd7efb",
+    "materialResultSha": "bbae4e903468703984863c0658d267ad79a538bc",
+    "validationBearingResultSha": "bbae4e903468703984863c0658d267ad79a538bc",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "runtimeBehaviorChanged": false,
+    "summary": "Raw GetViewport fallback moved to neutral D3D9 helper; tracked viewport and StateBlock-aware ownership policy preserved.",
+    "validation": {
+      "dx9exActiveRunId": 37347553547,
+      "domainIsolationRunId": 37347553486,
+      "packageArtifactId": 11360624512,
+      "packageArtifactDigest": "sha256:50ee40dd4b1d280c345ba06671228fce9ec84c7d79fa8efdf603f9fb6ef90084"
+    },
+    "issue14CommentId": 5999496588
   }
 }
