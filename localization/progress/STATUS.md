@@ -1136,3 +1136,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - B63 index 152 `49BB5FE5` remains `HOLD_STRICT_RECHECK_DXT5_DECODED_PIXEL_GATE` with no candidate; together with `4F68708E` and `F6811E94` it is a strict no-candidate HOLD. Existing `1A43E9D9` remains HIGH_RISK pending mandatory in-game validation.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_C/20261005-C142-D657C2EB/C142_D657_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C142-D657C2EB/C142_D657_MACHINE_QA.json`.
+
+## 2026-10-05 09:14:20 KST — B67 E3F4BA07 exact-HD candidate self-QA PASS
+- Refreshed current Git/queue; completed B65/C142 work was not repeated. Index 152 49BB5FE5 remains fail-closed HOLD_STRICT_RECHECK, so B selected renderable even index 226 `E3F4BA07_512x128.dds`.
+- B66 canonical readable binding identified regions 0/3-9 as STAGE, GOAL E/D/C/B/A, GOAL, 15 STAGE CONTINUOUS and protected regions 1/2 as OUTRUN2SP/OUTRUN2.
+- Final candidate `1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c` from source `fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72`: 2048x512 RGBA32 BGRA mip1/header exact/raw `mirror_y`; 8/8 exact bbox+size+positive-margin PASS; clean/final validators PASS; source residue=0, outside=0, alpha-outside=0, protected=0, protected OutRun marks changed=0, overlap=0, touch=0.
+- Controller SOURCE/CLEAN/FINAL, 2x row-contact and raw mirror_y visual self-QA PASS. Shared gray-blue source-family weight is consistent; no visible residue, clipping, overlap, seam, halo, protected-mark damage, or orientation regression.
+- Queue index 226 advanced to `b67_self_qa_pass_pending_c`; pending_artwork localize_text=33. Independent C final QA and isolated in-game validation remain pending.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION67/B67_E3F4_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION67/B67_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261005-B-PRODUCTION67/B67_FINAL_VALIDATION.json`.
