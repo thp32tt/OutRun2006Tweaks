@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION154-HOLL",
+  "queue_index": 34,
+  "asset": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+  "candidate_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
+  "source_clean_final_visual": "PASS",
+  "raw_mirror_y_visual": "PASS",
+  "checks": {
+    "source_script_residue": "PASS_NONE_VISIBLE",
+    "clean_plate_continuity": "PASS",
+    "source_style_fidelity": "PASS_C202_APPROVED_TOTAL_RANK_FAMILY",
+    "containment": "PASS_1_OF_1",
+    "size_ceiling": "PASS_1_OF_1",
+    "positive_margin": "PASS_1_OF_1",
+    "outside_pixels": 0,
+    "alpha_outside_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "protected_artwork": "PASS_UNCHANGED"
+  },
+  "decision": "B154_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_HOLL_REPORT.json",
+    "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_HOLL_FOCUS.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_HOLL_RAW_COMPARE.jpg"
+  ]
+}
