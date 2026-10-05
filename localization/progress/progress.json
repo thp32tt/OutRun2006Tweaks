@@ -265,15 +265,17 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "REWORK_REQUIRED",
+      "status": "REWORK_REQUIRED_WITH_PENDING_C",
       "assets": [
-        "C598919A",
         "63C91067",
-        "2EA557B4"
+        "C598919A",
+        "A05BF610"
       ],
       "remaining": 3,
-      "note": "C163 adds 2EA557B4 source-style rework: exact DXT5 containment passes but Hangul must be regenerated as a source-faithful filled cyan-white-blue italic gradient rather than hollow/outline-dominant. C160 63C91067 clean-plate source-residue rework and C598919A endpoint/index-constrained DXT5 rework remain. Strict HOLD: 4F68708E/F6811E94/49BB5FE5/75C3586A. pending production=21; pending C=0. RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": []
+      "note": "A34 resolves C174 producer-side source-core residue on 37759842: 33/33 bbox/size/positive-margin PASS and both residue gates 0. 37759842 now awaits independent C final QA. Remaining producer REWORK: 63C91067, C598919A, A05BF610. pending_artwork=17; RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": [
+        "37759842"
+      ]
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -558,22 +560,24 @@
       "runtime_validation": "UNTESTED"
     },
     "current_pending_artwork_localize_text": 17,
-    "current_producer_rework_remaining": 4,
+    "current_producer_rework_remaining": 3,
     "latest_a_production_batch": {
-      "timestamp_kst": "2026-10-05T14:52:10+09:00",
+      "timestamp_kst": "2026-10-05T17:06:30+09:00",
       "assets": [
-        "2EA557B4",
-        "E1639D2E"
+        "37759842"
       ],
-      "result": "2_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "result": "A34_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "candidate_sha256": "90b2adecf0bd22effd199f98d166e959ca1f6a7d9238d52a3cab2026753c286c",
+      "report": "localization/graphics/role_A/20261005-A-PRODUCTION34/A34_37759842_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION34/A34_CONTROLLER_SELF_QA.json",
       "pending_c_assets": [
-        "2EA557B4",
-        "E1639D2E"
+        "37759842"
       ],
-      "pending_artwork_localize_text": 19,
+      "pending_artwork_localize_text": 17,
       "producer_rework_remaining": [
         "63C91067",
-        "C598919A"
+        "C598919A",
+        "A05BF610"
       ],
       "runtime_validation": "UNTESTED"
     },
@@ -1130,8 +1134,7 @@
     "current_producer_rework_assets": [
       "63C91067",
       "C598919A",
-      "A05BF610",
-      "37759842"
+      "A05BF610"
     ],
     "a_production26_2ea557b4": {
       "index": 55,
