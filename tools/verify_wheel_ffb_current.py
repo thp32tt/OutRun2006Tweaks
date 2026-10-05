@@ -587,7 +587,7 @@ req(wheel_ui, 'Arcade Original (Lindbergh-derived)', 'F11 exposes Arcade Origina
 req(wheel_ui, 'Arcade + Modern Hybrid', 'F11 exposes Arcade Hybrid model')
 req(wheel_ui, 'PS2 Original topology (Experimental)', 'F11 exposes PS2 experimental model')
 req(wheel_ui, 'auto apply_ffb_model_test_baseline = [&](int modelIndex)', 'FFB model selector owns complete R9 baselines')
-req(wheel_ui, 'FFB model + complete R9 test baseline applied:', 'model change reports complete baseline application')
+req(wheel_ui, 'FFB model + complete R10 test baseline applied:', 'model change reports complete baseline application')
 req(wheel_ui, 'Arcade/Hybrid/PS2 no longer require separate shortcut buttons', 'obsolete duplicate original-mode shortcut UI is removed')
 forbid(wheel_ui, 'ImGui::Button("Use Arcade Original")', 'Arcade model no longer depends on a second shortcut button')
 forbid(wheel_ui, 'ImGui::Button("Use Arcade Hybrid")', 'Hybrid model no longer depends on a second shortcut button')
