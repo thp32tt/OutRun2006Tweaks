@@ -100,29 +100,29 @@ mask_discovery={}
 ty0,ty1=60,210;tx0,tx1=0,900
 tsub=alpha[ty0:ty1,tx0:tx1];trgb=sa[ty0:ty1,tx0:tx1,:3].astype(np.int16);R,G,B=trgb[:,:,0],trgb[:,:,1],trgb[:,:,2]
 tx=np.indices(tsub.shape)[1]
-red_seed=tsub&(R>=125)&(R>=G+45)&(R>=B+25)&(tx<560)
-orange_seed=tsub&(R>=165)&(G>=55)&(R>=G+32)&(B<=125)&(tx>300)
+# Red and orange fills overlap under the old broad red threshold. Make the
+# families mutually exclusive first; otherwise the OutRun2SP orange face is
+# incorrectly owned by For Experts and gets erased.
+red_seed=tsub&(R>=125)&(R>=G+45)&(R>=B+25)&(G<=108)&(B>=24)&(tx<560)
+orange_seed=tsub&(R>=165)&(G>=90)&(R>=G+32)&(B<=90)&(tx>300)
 if red_seed.sum()<100 or orange_seed.sum()<100: raise RuntimeError(('top seed count',int(red_seed.sum()),int(orange_seed.sum())))
 dr=distance_transform_edt(~red_seed); do=distance_transform_edt(~orange_seed)
-near=tsub & (np.minimum(dr,do)<=26.0)
-red_local=near & (dr<=do)
+# Product artwork gets protection precedence for its full fill/outline/glow family.
+product_local=tsub & (do<=30.0) & (tx>=360)
+red_local=tsub & (dr<=26.0) & ~product_local
 red=np.zeros((H,W),bool); red[ty0:ty1,tx0:tx1]=red_local
+product_mask=np.zeros((H,W),bool); product_mask[ty0:ty1,tx0:tx1]=product_local
 ry,rx=np.nonzero(red_seed); oy,ox=np.nonzero(orange_seed)
 mask_discovery['for_experts']={'window':[tx0,ty0,tx1,ty1],'seed_kind':'red','seed_pixels':int(red_seed.sum()),'seed_bbox':[tx0+int(rx.min()),ty0+int(ry.min()),tx0+int(rx.max())+1,ty0+int(ry.max())+1],'assignment':'nearest_fill_seed_vs_protected_OutRun2SP_within_26px'}
 mask_discovery['outrun2sp_protected']={'window':[tx0,ty0,tx1,ty1],'seed_kind':'orange','seed_pixels':int(orange_seed.sum()),'seed_bbox':[tx0+int(ox.min()),ty0+int(oy.min()),tx0+int(ox.max())+1,ty0+int(oy.max())+1],'policy':'PRESERVE_PRODUCT_ARTWORK'}
-# Reuse the C118-reviewed exact source mask only as a protection boundary for the
-# OutRun2SP product artwork. The prior B162 nearest-seed split visibly clipped the
-# product in controller review, so product pixels now have precedence over the
-# For Experts cleanup mask.
-product_mask_path=repo/'localization/graphics/role_B/20261005-B-PRODUCTION32/788CE557_SOURCE_MASK_outrun2sp.png'
-if not product_mask_path.exists(): raise RuntimeError(('missing reviewed product mask',str(product_mask_path)))
-product_mask=np.asarray(Image.open(product_mask_path).convert('L'))>0
-if product_mask.shape!=(H,W): raise RuntimeError(('product mask shape',product_mask.shape,(H,W)))
-if np.any(product_mask & ~alpha): raise RuntimeError(('product mask contains non-source-alpha',int(np.count_nonzero(product_mask & ~alpha))))
+# Protect the full source OutRun2SP family derived from its exclusive orange
+# fill seed. This supersedes the incomplete historical mask that covered only
+# Run2SP and caused the controller-visible clipped 'Out' regression.
 product_red_overlap=int(np.count_nonzero(red & product_mask))
 red &= ~product_mask
 mask_discovery['outrun2sp_protected'].update({
- 'reviewed_mask':'localization/graphics/role_B/20261005-B-PRODUCTION32/788CE557_SOURCE_MASK_outrun2sp.png',
+ 'method':'exclusive_orange_fill_plus_30px_source_alpha_effect_family',
+ 'protected_pixels':int(np.count_nonzero(product_mask)),
  'red_mask_pixels_excluded_for_product_protection':product_red_overlap,
  'candidate_must_preserve_product_mask_exact':True
 })
