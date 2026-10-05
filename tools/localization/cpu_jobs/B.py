@@ -2,7 +2,7 @@
 import base64, hashlib, json, os, struct, subprocess, urllib.request
 from pathlib import Path
 import numpy as np
-from PIL import Image, ImageChops, ImageDraw, ImageOps
+from PIL import Image, ImageChops, ImageDraw, ImageOps, ImageFilter
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("B hosted worker only")
@@ -104,7 +104,7 @@ patch_diff_outside_removal=int(np.count_nonzero(patch_outside))
 # template-vs-HOLL delta outside the template's removal delta only when every
 # such pixel lies in the immediate 1px dilation of that removal footprint.
 removal_im=Image.fromarray((removal_delta.astype(np.uint8)*255),"L")
-removal_dil=np.asarray(removal_im.filter(__import__("PIL").ImageFilter.MaxFilter(3)))>0
+removal_dil=np.asarray(removal_im.filter(ImageFilter.MaxFilter(3)))>0
 fringe_only=patch_outside & removal_dil
 fringe_outside_dilation=int(np.count_nonzero(patch_outside & (~removal_dil)))
 if fringe_outside_dilation or patch_diff_outside_removal>4:
