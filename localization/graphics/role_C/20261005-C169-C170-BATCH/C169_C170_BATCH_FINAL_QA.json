@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C169-C170-BATCH",
+  "timestamp_kst": "2026-10-05T15:56:00+09:00",
+  "results": [
+    {
+      "qa_id": "C169",
+      "queue_index": 26,
+      "asset": "63C91067",
+      "candidate_sha256": "6e08528dc031e0032fc2f2545a3aca280596986b7c62290c2ecded80484cf7ff",
+      "decision": "C169_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE"
+    },
+    {
+      "qa_id": "C170",
+      "queue_index": 175,
+      "asset": "754F0599",
+      "candidate_sha256": "3d166cf12042471246ce05e89de5122f4ed77cfdbc0f175ed31d351da8ffb20d",
+      "decision": "C170_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT"
+    }
+  ],
+  "completed_prior_pass_repeated": false,
+  "pending_artwork_localize_text": 18,
+  "producer_rework_assets": [
+    "63C91067",
+    "C598919A",
+    "754F0599"
+  ],
+  "strict_hold_assets": [
+    "4F68708E",
+    "F6811E94",
+    "49BB5FE5",
+    "75C3586A"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
