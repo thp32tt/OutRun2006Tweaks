@@ -38,6 +38,20 @@ namespace WheelFFBMath
         return model == Model::ModernDD || model == Model::ArcadeHybrid;
     }
 
+    // R10 MOZA R3 hardware rule.  Model selection owns the default DirectInput
+    // polarity so changing force models cannot silently inherit the previous
+    // model's direction.  Manual inversion is still possible after selection;
+    // this default is re-applied only when the active model actually changes.
+    inline bool model_default_invert_force(Model model)
+    {
+        return model == Model::ModernDD;
+    }
+
+    inline bool model_default_invert_spring(Model model)
+    {
+        return model == Model::ModernDD;
+    }
+
     inline bool model_uses_arcade_events(Model model)
     {
         return model == Model::ArcadeOriginal || model == Model::ArcadeHybrid;
@@ -344,6 +358,24 @@ namespace WheelFFBMath
     constexpr unsigned PrimaryAsphaltSurfaceMask = 0x00000002u;
     constexpr unsigned PrimaryRoughRoadSurfaceMask = 0x00100000u;
     constexpr unsigned PrimarySnowIceSurfaceMask = 0x00800000u;
+
+    // R10 hardware A/B target: R9's 0.04 snow-primary scalar produced about
+    // 0.011 road amplitude in the supplied R3 log, which was effectively
+    // silent.  0.18 keeps continuous snow texture well below curb/rough-road
+    // events while making the surface identifiable.  Floral remains comfort
+    // attenuated, but 0.72 preserves more stone/paving texture than R9's 0.60.
+    constexpr float SnowPrimaryRoadTextureScale = 0.18f;
+    constexpr float FloralVillageRoughPavingScale = 0.72f;
+
+    // With alpha_f ~= delta - beta - a*r/v, aligning torque must act in the
+    // direction that reduces alpha_f.  Keeping this sign contract explicit
+    // prevents drift/counter-steer fixes from accidentally reversing SAT.
+    inline float front_slip_recovery_direction(float frontSlip)
+    {
+        if (!std::isfinite(frontSlip) || std::abs(frontSlip) <= 0.000001f)
+            return 0.0f;
+        return frontSlip > 0.0f ? -1.0f : 1.0f;
+    }
 
     inline bool proven_primary_rough_road_section(int uniqueStage, int roadSection)
     {
