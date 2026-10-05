@@ -10418,10 +10418,6 @@ def main() -> None:
         )
 
     r266_programmable_shader_register_semantics_contract = [
-        ("operandClassificationComplete",
-         PIPELINE_TRANSLATION_HPP, "R266 R265-stream operand-classification receipt"),
-        ("R266_D3D9_SM2_SM3_OPCODE_REGISTER_OPERAND_CLASSIFIER_V1",
-         PIPELINE_TRANSLATION_CPP, "R266 opcode/register classifier provenance"),
         ("struct ProgrammableShaderRegisterSemantics",
          PIPELINE_TRANSLATION_HPP, "R266 register/constant/sampler evidence type"),
         ("decode_programmable_shader_register_semantics(",
