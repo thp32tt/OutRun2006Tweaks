@@ -7,7 +7,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("worker B only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION71"
+run="20261005-B-PRODUCTION72"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -99,7 +99,24 @@ def pill_text_mask(cell):
             # White/gray glyph and antialias pixels rise strongly in G/B above the red plate.
             if (g-bg_g)>=18 and (b-bb)>=18 and r>=br-28 and max(r,g,b)-min(r,g,b)<=115:
                 mp[x,y]=255
-    # Remove isolated one-pixel noise but keep AA fringe.
+    # Strengthen the text/effect footprint inside the tight detected bbox.
+    # This catches low-contrast antialias/shadow residue without enlarging the hard source bbox.
+    tight=m.getbbox()
+    if tight:
+        x0,y0,x1,y1=tight
+        for y in range(y0,y1):
+            bg=row_bg.get(y)
+            if not bg: continue
+            br,bg_g,bb,ba=bg
+            for x in range(x0,x1):
+                r,g,b,a=pix[x,y]
+                if a<16: continue
+                if max(abs(r-br),abs(g-bg_g),abs(b-bb))>6:
+                    mp[x,y]=255
+        grown=bmask(m.filter(ImageFilter.MaxFilter(3)))
+        clipped=Image.new("L",(w,h),0)
+        clipped.paste(grown.crop(tight),(x0,y0))
+        m=clipped
     return bmask(m)
 
 source_mask=Image.new("L",(W,H),0)
@@ -165,8 +182,8 @@ smp=out/"E95_SOURCE_TEXT_MASK.png"; ap=out/"E95_ALLOWED_BBOX_MASK.png"
 src.save(sp); clean.save(cp); source_mask.save(smp); allowed.save(ap)
 protected=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed))
 pp=out/"E95_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"B71_CLEAN_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B71_CLEAN_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"B72_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B72_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validation",cleanrep))
 
 def findfont():
@@ -277,7 +294,7 @@ for r in rows:
         "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS",
         "font_file":Path(FONT).name,"font_face_index":FI,"font_style":FSTYLE,"font_size":fs,"fill_rgba":color,
         "alignment":"center" if group=="pill" else "left",
-        "rework_status":"B71_NEW_EXACT_HD_CANDIDATE"
+        "rework_status":"B72_NEW_EXACT_HD_CANDIDATE"
     })
 
 ov=0; touch=[]
@@ -300,8 +317,8 @@ raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
 dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip")
 fp=out/"E95_FINAL_DECODED_READABLE.png"; dec.save(fp)
-subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"B71_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"B71_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"B72_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"B72_FINAL_VALIDATION.json").read_text())
 
 diff=dmask(src,dec)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
@@ -329,7 +346,7 @@ for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,512),Image.Resampling.NEAREST)
     full.paste(z,(0,i*540+24))
     ImageDraw.Draw(full).text((5,i*540+4),label,fill="black")
-full.save(out/"B71_E95_SOURCE_CLEAN_FINAL.jpg",quality=96)
+full.save(out/"B72_E95_SOURCE_CLEAN_FINAL.jpg",quality=96)
 
 cards=[]
 for r in outrows:
@@ -344,13 +361,13 @@ for r in outrows:
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+4*(len(cards)-1)),"white")
 yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.save(out/"B71_E95_ROW_CONTACT.jpg",quality=96)
+sheet.save(out/"B72_E95_ROW_CONTACT.jpg",quality=96)
 
 rr=Image.new("RGB",(1024,2*540),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im).resize((1024,512),Image.Resampling.NEAREST)
     rr.paste(z,(0,i*540+24)); ImageDraw.Draw(rr).text((5,i*540+4),label,fill="black")
-rr.save(out/"B71_E95_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"B72_E95_RAW_COMPARE.jpg",quality=96)
 
 report={
  "schema_version":1,"role":"B","run":run,"index":index,"asset":asset,
@@ -367,9 +384,9 @@ report={
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "RUNTIME_VALIDATION":"UNTESTED",
- "status":"B_PRODUCTION71_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"B_PRODUCTION72_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(out/"B71_E95_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(out/"B72_E95_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={
  "run":run,"index":index,"asset":"E95DA5","source_sha256":sha(sb),"candidate_sha256":csha,
  "localized_physical_elements":len(specs),"preserved_regions":len(preserved),
@@ -378,7 +395,7 @@ summary={
  "source_residue":residue,"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,
  "preserved_regions_changed":sum(preserved_changed.values()),"overlap":ov,"touch_pairs":len(touch),
  "worker_status":report["status"],"runtime_validation":"UNTESTED",
- "report":f"localization/graphics/role_B/{run}/B71_E95_REPORT.json"
+ "report":f"localization/graphics/role_B/{run}/B72_E95_REPORT.json"
 }
-(wr/"B71_E95DA5.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+(wr/"B72_E95DA5.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False))
