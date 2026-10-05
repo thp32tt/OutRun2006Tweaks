@@ -11,7 +11,7 @@ if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OU
     raise SystemExit("B hosted worker only")
 
 repo = Path.cwd()
-run = "20261006-B-PRODUCTION159-A8CE-BC3"
+run = "20261006-B-PRODUCTION160-A8CE-BC3-SCALE"
 out = repo / "localization/graphics/role_B" / run
 out.mkdir(parents=True, exist_ok=True)
 wr = repo / "localization/graphics/worker_results"
@@ -24,7 +24,7 @@ candidate.parent.mkdir(parents=True, exist_ok=True)
 COMMIT = "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 SOURCE_SHA256 = "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b"
 BASE = "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/" + COMMIT
-tmp = Path("/tmp/outrun_B159_A8CE")
+tmp = Path("/tmp/outrun_B160_A8CE")
 tmp.mkdir(parents=True, exist_ok=True)
 dds = tmp / "A8CE339F_HD.dds"
 atlasp = tmp / "A8CE339F_atlas.json"
@@ -314,12 +314,19 @@ def render_element(e):
     by1 = (y1 // 4) * 4
     if bx1 - bx0 < 12 or by1 - by0 < 12:
         raise RuntimeError(("no DXT5-safe interior", e["region_idx"], e["source"], e["original_bbox"]))
-    maxw = bx1 - bx0 - 8
-    maxh = by1 - by0 - 8
+    # Keep only the policy-required positive pixel margin; do not shrink the source hierarchy
+    # with an arbitrary 4px inner inset. Any target-containing 4x4 block still remains wholly
+    # inside [bx0,by0,bx1,by1].
+    ax0 = bx0 + (1 if bx0 == x0 else 0)
+    ay0 = by0 + (1 if by0 == y0 else 0)
+    ax1 = bx1 - (1 if bx1 == x1 else 0)
+    ay1 = by1 - (1 if by1 == y1 else 0)
+    maxw = ax1 - ax0
+    maxh = ay1 - ay0
 
     fill, stroke = style_from_mask(e["source_mask"])
     italic = e["kind"] == "extra_time"
-    start_fs = min(160, max(16, int((y1-y0) * (0.90 if e["kind"] == "bar_label" else 0.86))))
+    start_fs = min(160, max(16, int((y1-y0) * (1.02 if e["kind"] == "bar_label" else 0.94))))
     best = None
     for fs in range(start_fs, 11, -1):
         stroke_w = max(1, int(round(fs * (0.085 if e["kind"] == "bar_label" else 0.075))))
@@ -352,8 +359,8 @@ def render_element(e):
     fill_layer.putalpha(inner)
     tile.alpha_composite(fill_layer)
 
-    px = bx0 + 4 + max(0, (maxw - a.width) // 2)
-    py = by0 + 4 + max(0, (maxh - a.height) // 2)
+    px = ax0 + max(0, (maxw - a.width) // 2)
+    py = ay0 + max(0, (maxh - a.height) // 2)
     layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     layer.alpha_composite(tile, (px, py))
     lb = layer.getchannel("A").getbbox()
@@ -566,30 +573,30 @@ def save_mask(arr, name):
     Image.fromarray((arr.astype(np.uint8) * 255), "L").save(p)
     return p
 
-source_png = out / "B159_SOURCE_READABLE.png"
-clean_png = out / "B159_CLEAN_READABLE.png"
-final_png = out / "B159_FINAL_READABLE.png"
+source_png = out / "B160_SOURCE_READABLE.png"
+clean_png = out / "B160_CLEAN_READABLE.png"
+final_png = out / "B160_FINAL_READABLE.png"
 src.save(source_png)
 clean.save(clean_png)
 dec.save(final_png)
-allowed_path = save_mask(allowed, "B159_ALLOWED_BBOX_MASK.png")
-protected_path = save_mask(~allowed, "B159_PROTECTED_MASK.png")
-save_mask(source_union, "B159_SOURCE_TEXT_MASK.png")
-save_mask(target_union, "B159_LOCALIZED_RENDER_MASK.png")
+allowed_path = save_mask(allowed, "B160_ALLOWED_BBOX_MASK.png")
+protected_path = save_mask(~allowed, "B160_PROTECTED_MASK.png")
+save_mask(source_union, "B160_SOURCE_TEXT_MASK.png")
+save_mask(target_union, "B160_LOCALIZED_RENDER_MASK.png")
 
 validator = repo / "tools/localization/validate_clean_plate.py"
 subprocess.run(
     ["python3", str(validator), str(source_png), str(clean_png), str(allowed_path),
-     "--protected-mask", str(protected_path), "--report", str(out / "B159_CLEAN_VALIDATION.json")],
+     "--protected-mask", str(protected_path), "--report", str(out / "B160_CLEAN_VALIDATION.json")],
     check=True,
 )
 subprocess.run(
     ["python3", str(validator), str(source_png), str(final_png), str(allowed_path),
-     "--protected-mask", str(protected_path), "--report", str(out / "B159_FINAL_VALIDATION.json")],
+     "--protected-mask", str(protected_path), "--report", str(out / "B160_FINAL_VALIDATION.json")],
     check=True,
 )
-clean_validation = json.loads((out / "B159_CLEAN_VALIDATION.json").read_text())
-final_validation = json.loads((out / "B159_FINAL_VALIDATION.json").read_text())
+clean_validation = json.loads((out / "B160_CLEAN_VALIDATION.json").read_text())
+final_validation = json.loads((out / "B160_FINAL_VALIDATION.json").read_text())
 if clean_validation.get("status") != "PASS" or final_validation.get("status") != "PASS":
     raise RuntimeError(("decoded PNG validator", clean_validation.get("status"), final_validation.get("status")))
 
@@ -618,7 +625,7 @@ for idx in (24, 25, 26):
         card.paste(im, (xx, 50))
         dr.text((xx+6, 12), label, fill="black")
         xx += im.width + 10
-    save_jpg_b64(card, f"B159_IDX{idx}_SOURCE_CLEAN_FINAL.jpg", 96)
+    save_jpg_b64(card, f"B160_IDX{idx}_SOURCE_CLEAN_FINAL.jpg", 96)
 
 overview = Image.new("RGB", (1600, 3*830), "white")
 for i, (label, im) in enumerate((("SOURCE", src), ("CLEAN", clean), ("FINAL", dec))):
@@ -626,7 +633,7 @@ for i, (label, im) in enumerate((("SOURCE", src), ("CLEAN", clean), ("FINAL", de
     z.thumbnail((1580, 790), Image.Resampling.LANCZOS)
     overview.paste(z, (0, i*830+32))
     ImageDraw.Draw(overview).text((8, i*830+8), label, fill="black")
-save_jpg_b64(overview, "B159_A8CE_SOURCE_CLEAN_FINAL.jpg", 93)
+save_jpg_b64(overview, "B160_A8CE_SOURCE_CLEAN_FINAL.jpg", 93)
 
 raw_overview = Image.new("RGB", (1600, 2*830), "white")
 for i, (label, im) in enumerate((("SOURCE_RAW_MIRROR_Y", raw_src), ("FINAL_RAW_MIRROR_Y", dec_raw))):
@@ -634,7 +641,7 @@ for i, (label, im) in enumerate((("SOURCE_RAW_MIRROR_Y", raw_src), ("FINAL_RAW_M
     z.thumbnail((1580, 790), Image.Resampling.LANCZOS)
     raw_overview.paste(z, (0, i*830+32))
     ImageDraw.Draw(raw_overview).text((8, i*830+8), label, fill="black")
-save_jpg_b64(raw_overview, "B159_A8CE_RAW_COMPARE.jpg", 93)
+save_jpg_b64(raw_overview, "B160_A8CE_RAW_COMPARE.jpg", 93)
 
 serial_elements = []
 for e in elements:
@@ -703,13 +710,13 @@ report = {
     "candidate_path": str(candidate.relative_to(repo)),
     "worker_static_qa": "PASS",
     "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
-    "status": "B159_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+    "status": "B160_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
     "runtime_validation": "UNTESTED",
 }
-(out / "B159_A8CE_REPORT.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+(out / "B160_A8CE_REPORT.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
 
-(wr / "B159_A8CE339F.json").write_text(json.dumps({
-    "run": "B159",
+(wr / "B160_A8CE339F.json").write_text(json.dumps({
+    "run": "B160",
     "index": 52,
     "asset": "A8CE339F",
     "candidate_sha256": candidate_sha,
@@ -724,12 +731,12 @@ report = {
     "overlap": post_overlap,
     "touch": post_touch,
     "worker_status": report["status"],
-    "report": f"localization/graphics/role_B/{run}/B159_A8CE_REPORT.json",
+    "report": f"localization/graphics/role_B/{run}/B160_A8CE_REPORT.json",
     "runtime_validation": "UNTESTED",
 }, ensure_ascii=False, indent=2) + "\n")
 
 print(json.dumps({
-    "run": "B159",
+    "run": "B160",
     "asset": "A8CE339F",
     "candidate_sha256": candidate_sha,
     "structure": "2048x1024 DXT5 mirror_y",
