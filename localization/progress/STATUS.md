@@ -1626,3 +1626,12 @@ A82 3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37 repairs the
 
 ## 2026-10-06 03:12 KST — A85 IGR-012 START/OutRun Miles multi-asset repair
 A85 resolves the static graphics portion of P0 IGR-012 across A064FDFC a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f and 48DEBE77 a6161cfaedb9ab83c311b3aa78cf3ae3e18ca333fc52e1e31a8d6055e21797ea. Full inset badge reconstruction removes the remaining English outline/shadow silhouette; OUTRUN MILES labels keep positive separation from protected neighbor art. All bbox/size/margin and zero-pixel gates PASS; controller readable/raw review PASS. Pending independent C + NEW actual in-game retest; not closed. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-06 03:19 KST — B164 P1 B1696633 Slipstream in-game rework
+
+- Selected active B-owned P1 IGR-009 / queue index 48 after B163 moved IGR-017 to pending-C/retest; completed static-PASS assets were not repeated. Exact HD source SHA 3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d.
+- Prior C104 candidate 448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21 was reopened by actual in-game screenshot(152) for low-resolution/effect-style/readability failure. B164 changes only Slipstream and produces candidate 31a73348657620a4e7c7adc66a65e07f95a35a6b61266b48f9409e835b7f12be.
+- Rework: restore the prior validated native clean plate under exact source bbox [889,1718,1388,1825], then render 슬립스트림 with Noto Sans CJK KR Black at native resolution, natural glyph advance, 0.26 right shear, white face, navy inner line and cobalt outer line/glow. The source cyan/blue speed-streak field remains visible; no prior Korean bitmap was upscaled.
+- Static QA: localized bbox [956,1722,1321,1821], source 499x107 vs localized 365x99 with positive margins. changed-outside=0, alpha-outside=0, protected-changed=0, localized/protected overlap=0; all eight non-Slipstream localized rows changed=0; exact RGBA32 header/raw mirror_y preserved. Controller SOURCE/OLD/CLEAN/FINAL, 2x detail and raw mirror_y visual QA PASS.
+- IGR-009 advances only to B_STATIC_PASS_PENDING_C_AND_INGAME_RETEST; NEW actual in-game evidence is still required for closure. IGR-005 remains OPEN MIXED because its runtime/modal split is unresolved. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_B/20261006-B-INGAME164-B169-SLIPSTREAM/B164_B1696633_REPORT.json, localization/graphics/role_B/20261006-B-INGAME164-B169-SLIPSTREAM/B164_CONTROLLER_SELF_QA.json. RUNTIME_VALIDATION=PENDING_NEW_INGAME_RETEST.

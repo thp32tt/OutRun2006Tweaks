@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B164",
+  "timestamp_kst": "2026-10-06T03:19:01+09:00",
+  "scope": "B-owned active P1 user in-game regression IGR-009 / queue index 48 B1696633 only; completed/PASS assets were not repeated.",
+  "queue_index": 48,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+  "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+  "superseded_candidate_sha256": "448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21",
+  "candidate_sha256": "31a73348657620a4e7c7adc66a65e07f95a35a6b61266b48f9409e835b7f12be",
+  "worker_output_commit": "002ae0c",
+  "worker_report": "localization/graphics/role_B/20261006-B-INGAME164-B169-SLIPSTREAM/B164_B1696633_REPORT.json",
+  "material_change": {
+    "source": "Slipstream",
+    "korean": "슬립스트림",
+    "original_bbox": [
+      889,
+      1718,
+      1388,
+      1825
+    ],
+    "prior_localized_bbox": [
+      892,
+      1719,
+      1385,
+      1823
+    ],
+    "localized_bbox": [
+      956,
+      1722,
+      1321,
+      1821
+    ],
+    "source_size": [
+      499,
+      107
+    ],
+    "localized_size": [
+      365,
+      99
+    ],
+    "font": "Noto Sans CJK KR Black",
+    "font_size": 74,
+    "slant": 0.26,
+    "artificial_tracking_px": 0,
+    "style": "white face + navy inner line + cobalt outer line/glow over preserved source streak field"
+  },
+  "machine_qa": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "bbox_size_positive_margin": "1/1 PASS",
+    "changed_pixels": 41387,
+    "changed_outside_exact_source_bbox": 0,
+    "alpha_changed_outside_exact_source_bbox": 0,
+    "protected_changed_pixels": 0,
+    "localized_to_protected_overlap_pixels": 0,
+    "other_8_localized_row_changed_pixels": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "final_mask_validator": "PASS"
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_evidence": [
+    "localization/graphics/role_B/20261006-B-INGAME164-B169-SLIPSTREAM/B164_SLIPSTREAM_SOURCE_OLD_CLEAN_FINAL.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME164-B169-SLIPSTREAM/B164_SLIPSTREAM_2X.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME164-B169-SLIPSTREAM/B164_RAW_COMPARE.jpg"
+  ],
+  "controller_visual_note": "PASS: prior blocky/upright Korean Slipstream is replaced by a native-resolution natural-advance rendering with clear right italic, white face, navy/cobalt outline and source-family glow. The horizontal cyan/blue speed streak field remains visible and source-relative; no mixed low-resolution raster, broken glyph, source-script residue, clipping, other-image intrusion, layer collision, bad baseline, or orientation regression is visible. Full/raw comparison confirms the other eight localized rows and unrelated artwork remain unchanged.",
+  "backlog": {
+    "IGR-009": "B_STATIC_PASS_PENDING_C_AND_INGAME_RETEST"
+  },
+  "next_b_actionable": {
+    "P0_blocked": "IGR-005 remains OPEN MIXED: graphics portion is repaired by B163, exact modal/runtime split still unresolved.",
+    "P1_unresolved": [
+      "IGR-002",
+      "IGR-004",
+      "IGR-006",
+      "IGR-007",
+      "IGR-010",
+      "IGR-019"
+    ]
+  },
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "B164_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
