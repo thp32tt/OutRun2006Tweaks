@@ -10195,6 +10195,41 @@ def main() -> None:
             + ", ".join(missing_r258_programmable_source_revalidation)
         )
 
+    r260_programmable_resource_behavior_contract = [
+        ("struct NativeProgrammableShaderResourceBehaviorReadiness",
+         NATIVE_BACKEND_HPP, "R260 explicit F18 geometry resource-behavior receipt"),
+        ("compose_programmable_resource_behavior_readiness(",
+         NATIVE_BACKEND_HPP, "R260 resource-behavior composition declaration"),
+        ("validate_programmable_resource_behavior_readiness_snapshot(",
+         NATIVE_BACKEND_HPP, "R260 resource-behavior snapshot validator"),
+        ("vertexMirror.validate_mirror_readiness_snapshot(",
+         NATIVE_BACKEND_CPP, "R260 current vertex mirror identity validation"),
+        ("indexMirror->validate_mirror_readiness_snapshot(",
+         NATIVE_BACKEND_CPP, "R260 current index mirror identity validation"),
+        ("out.textureResourceBehaviorProofPresent = false;",
+         NATIVE_BACKEND_CPP, "R260 texture behavior scope remains fail-closed"),
+        ("out.outputResourceBehaviorProofPresent = false;",
+         NATIVE_BACKEND_CPP, "R260 output behavior scope remains fail-closed"),
+        ("token, 0x260u",
+         NATIVE_BACKEND_CPP, "R260 independent review snapshot-domain tag"),
+        ("R260 indexed geometry resource behavior is exact while texture/output F18 scopes remain fail-closed",
+         CONSTANT_BUFFER_PROBE, "R260 indexed positive/debt regression"),
+        ("R260 indexed resource behavior rejects stale vertex mirror identity",
+         CONSTANT_BUFFER_PROBE, "R260 stale vertex mirror regression"),
+        ("R260 non-indexed geometry resource behavior is exact without inventing index coverage",
+         CONSTANT_BUFFER_PROBE, "R260 non-indexed positive/debt regression"),
+    ]
+    missing_r260_programmable_resource_behavior = [
+        meaning for token, source, meaning
+        in r260_programmable_resource_behavior_contract
+        if token not in source
+    ]
+    if missing_r260_programmable_resource_behavior:
+        raise SystemExit(
+            "DX11 R260 programmable resource-behavior drift: "
+            + ", ".join(missing_r260_programmable_resource_behavior)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
@@ -10202,8 +10237,12 @@ def main() -> None:
          NATIVE_BACKEND_HPP, "R259 prerequisite handoff declaration"),
         ("validate_programmable_activation_prerequisite_handoff_snapshot(",
          NATIVE_BACKEND_HPP, "R259 review snapshot validator declaration"),
-        ("out.resourceBehaviorProofPresent = false;",
-         NATIVE_BACKEND_CPP, "R259 F18 resource-behavior debt remains explicit"),
+        ("out.resourceBehaviorGeometryProofPresent =",
+         NATIVE_BACKEND_CPP, "R259 consumes R260 geometry resource-behavior evidence"),
+        ("out.resourceBehaviorCoverageComplete =",
+         NATIVE_BACKEND_CPP, "R259 keeps incomplete F18 scope explicit"),
+        ("out.resourceBehaviorProofPresent =",
+         NATIVE_BACKEND_CPP, "R259 full F18 proof remains separately gated"),
         ("out.shaderTranslationProofPresent = false;",
          NATIVE_BACKEND_CPP, "R259 F21 shader semantic translation debt remains explicit"),
         ("out.activationSnapshotToken = 0;",
@@ -10214,6 +10253,8 @@ def main() -> None:
          CONSTANT_BUFFER_PROBE, "R259 indexed positive/debt regression"),
         ("R259 rejects stale R258 source-revalidation identity",
          CONSTANT_BUFFER_PROBE, "R259 stale R258 receipt regression"),
+        ("R259 rejects stale R260 resource-behavior identity",
+         CONSTANT_BUFFER_PROBE, "R259 stale R260 receipt regression"),
         ("R259 rejects stale R243 input-layout identity",
          CONSTANT_BUFFER_PROBE, "R259 stale input-layout receipt regression"),
         ("R259 non-indexed review handoff preserves F18/F21 fail-closed debt",
