@@ -3923,11 +3923,13 @@
     "c176_return_resolved": true,
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_artwork_localize_text": 17,
-  "current_producer_rework_remaining": 2,
+  "current_pending_artwork_localize_text": 16,
+  "current_producer_rework_remaining": 4,
   "current_producer_rework_assets": [
     "63C91067",
-    "C598919A"
+    "C598919A",
+    "37759842",
+    "560FA536"
   ],
   "latest_b_production": {
     "run": "B_PRODUCTION128",
@@ -3938,5 +3940,45 @@
     "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_CONTROLLER_SELF_QA.json",
     "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
     "runtime_validation": "UNTESTED"
-  }
+  },
+  "c177_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T17:56:29+09:00",
+    "run": "20261005-C177-37759842",
+    "queue_index": 95,
+    "candidate_sha256": "90b2adecf0bd22effd199f98d166e959ca1f6a7d9238d52a3cab2026753c286c",
+    "machine_status": "PASS",
+    "producer_bbox_size_positive_margin": "33/33 PASS",
+    "controller_visual_qa": "FAIL_VISIBLE_SOURCE_LETTER_SHADOW_RESIDUE_IN_CLEAN_FINAL",
+    "decision": "C177_REWORK_REQUIRED_CLEAN_PLATE_SOURCE_EFFECT_RESIDUE",
+    "machine_report": "localization/graphics/role_C/20261005-C177-37759842/C177_37759842_MACHINE_QA.json",
+    "report": "localization/graphics/role_C/20261005-C177-37759842/C177_37759842_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c178_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T17:56:29+09:00",
+    "run": "20261005-C178-A05BF610",
+    "queue_index": 28,
+    "candidate_sha256": "bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "1/1 PASS",
+    "controller_visual_qa": "PASS",
+    "decision": "C178_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "machine_report": "localization/graphics/role_C/20261005-C178-A05BF610/C178_A05_MACHINE_QA.json",
+    "report": "localization/graphics/role_C/20261005-C178-A05BF610/C178_A05_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c179_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T17:56:29+09:00",
+    "run": "20261005-C179-560FA536",
+    "queue_index": 101,
+    "candidate_sha256": "4b4dbb1f645c526fb812e500c01a0fa03894dc1aff2267682ea9f8b283c05744",
+    "machine_status": "PASS_REPORTED_ON_PRODUCER_BBOX",
+    "producer_bbox_size_positive_margin": "13/13 PASS",
+    "controller_visual_qa": "FAIL_IDX31_SOURCE_BBOX_INCOMPLETE_SOURCE_FRAGMENT_RESIDUE",
+    "decision": "C179_REWORK_REQUIRED_SOURCE_BBOX_INCOMPLETE_SOURCE_RESIDUE",
+    "machine_report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_MACHINE_QA.json",
+    "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C177-C179-BATCH/C177_C179_BATCH_FINAL_QA.json"
 }
