@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-05T14:29:32+09:00",
+  "updatedKst": "2026-10-05T14:41:29+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -73,9 +73,10 @@
     "VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-OWNERSHIP-0009",
     "VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-READ-OWNERSHIP-0010",
     "VR-REFACTOR-POST1000-DISPATCHER-OWNER-BOUNDARIES-0011",
-    "VR-REFACTOR-REVIEW-1100"
+    "VR-REFACTOR-REVIEW-1100",
+    "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012"
   ],
-  "next": "Do not repeat structural review cycles 0..1100 or completed post-1000 items through CONVERSION-DX9EX-00401 / VR-REFACTOR-POST1000-DISPATCHER-OWNER-BOUNDARIES-0011. Preserve R30InstallStatus(), the four R30CallLowerDraw* owner boundaries, and R9StereoBaselineSeeded(). R33 remains the sole final dispatcher. The next structural successor is physical R31/R32 hook-layer retirement only if a separate bounded proof can preserve install fallback, Reset/Present lifecycle, StateBlock coverage and lower R29 fallback exactly; otherwise return to explicit DX9Ex runtime/regression maintenance. Runtime claims remain gated on Quest3/VDXR evidence.",
+  "next": "Do not repeat structural review cycles 0..1100, completed post-1000 items through VR-REFACTOR-POST1000-DISPATCHER-OWNER-BOUNDARIES-0011, or VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012. Preserve the exact R31/R32 retirement preconditions enforced by tools/verify_vr_r31_r32_retirement_guard.py: install fallback, R33->R32->R22 Reset, R33->R32->R13 Present/DirectGPU, R22/R31 StateBlock coverage, and R33->R32 fail-close->R30 lower-R29 fallback. Physical R31/R32 hook-layer retirement remains DEFERRED until a future bounded task provides an atomic replacement design that preserves all of those contracts; absent that proof, return to explicit DX9Ex runtime/regression maintenance. Runtime claims remain gated on Quest3/VDXR evidence.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -160,11 +161,12 @@
     "Exact-SHA 7b5d43886b552f07a02c354ac240943a066d76bc passed DX9Ex Active Validation 37266115464: policy/host/game/R33 final-chain-compile/package SUCCESS; Domain Isolation Guard 37266115453 SUCCESS. Package artifact 11326970477 digest sha256:21aa57138006f8d6006166e70dfaebc274994c2b5f010c17e98c540527163b69; inner ZIP SHA256 05f61cc21d6e2a0163ec27a45a6106580e40f1955c7af7d2993a64d2e0463169.",
     "No WVP/projection math, HUD/world semantic classification, Reset/Present ordering, lower draw target, D3D getter count, wait, allocation, or synchronization primitive changed in the 1000->1100 production closure. Physical R31/R32 hook-layer retirement remains deferred because it is not yet a mechanical equivalence transformation.",
     "Runtime remains UNTESTED; cycle 1100 is structural/static/build verification only.",
-    "CONVERSION-DX9EX-00402 did not advance the structural cycle: cycle 1100 remains authoritative and physical R31/R32 hook-layer retirement stays deferred pending a bounded equivalence proof. General regression maintenance instead build-verified VR-HUD-SUMO-REPLAY-SEMANTIC-LOSS-001 by adding a deterministic non-consuming replay semantic ownership guard and wiring it into DX9Ex Active Validation. Exact validation-bearing SHA 4183a3bc6970653b5dab60a8f5c64ba1bc01c318 passed DX9Ex Active 37267187539 and Domain Isolation 37267187590; runtime remains UNTESTED."
+    "CONVERSION-DX9EX-00402 did not advance the structural cycle: cycle 1100 remains authoritative and physical R31/R32 hook-layer retirement stays deferred pending a bounded equivalence proof. General regression maintenance instead build-verified VR-HUD-SUMO-REPLAY-SEMANTIC-LOSS-001 by adding a deterministic non-consuming replay semantic ownership guard and wiring it into DX9Ex Active Validation. Exact validation-bearing SHA 4183a3bc6970653b5dab60a8f5c64ba1bc01c318 passed DX9Ex Active 37267187539 and Domain Isolation 37267187590; runtime remains UNTESTED.",
+    "CONVERSION-DX9EX-00403 / VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012: bounded structural proof gate only; no runtime behavior changed. RED commit 4811ab9d53b5c7ee7a60b8789916b0a6abe74c69 added tools/verify_vr_r31_r32_retirement_guard.py and failed exactly because the canonical DX9Ex Active workflow did not yet own the new guard. Validation-bearing 8b1bd6b3b6d726bec3e478ac2862bde80916a254 wired the guard into both the push path filter and architecture verification step. The guard pins four retirement prerequisites: R31/R32 install fallback ownership, R33->R32->R22 Reset plus R33->R32->R13 Present/DirectGPU ordering, R22/R31 StateBlock lifecycle/fallback coverage, and R33 final fallback through R32LowerFailClosed plus R30-owned lower-R29 calls. N100 exact-SHA py_compile + retirement guard + architecture + R51 + R32-R34 + hook graph + refactor + Sumo + near-plane + workflow YAML passed. GitHub exact-SHA DX9Ex Active 37268342455 policy/host/game/full-chain-compile/package SUCCESS and Domain Isolation Guard 37268342567 SUCCESS. Package artifact 11326909994 digest sha256:b81eb674a40841b5408f09e6e70576662a3b8b171c83b11f1237049847ebd36b. Physical retirement remains intentionally DEFERRED and runtime remains UNTESTED."
   ],
-  "batchStatus": "VR-REFACTOR-1100_BUILD_VERIFIED",
-  "validatedSourceSha": "7b5d43886b552f07a02c354ac240943a066d76bc",
-  "validationRunId": 37266115464,
+  "batchStatus": "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARDED",
+  "validatedSourceSha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+  "validationRunId": 37268342455,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -175,14 +177,13 @@
     "domainIsolation": "SUCCESS"
   },
   "testCandidate": {
-    "sourceSha": "7b5d43886b552f07a02c354ac240943a066d76bc",
-    "runtimeSourceChangeSha": "1b0483d045b1b357ebe4a24b0071b416186bd9b5",
-    "workflowRunId": 37266115464,
-    "artifactId": 11326970477,
-    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-7b5d43886b552f07a02c354ac240943a066d76bc",
-    "artifactSizeBytes": 2730668,
-    "artifactDigestSha256": "21aa57138006f8d6006166e70dfaebc274994c2b5f010c17e98c540527163b69",
-    "innerPackageSha256": "05f61cc21d6e2a0163ec27a45a6106580e40f1955c7af7d2993a64d2e0463169",
+    "sourceSha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+    "runtimeSourceChangeSha": "36f0f3949bd18993cba3f46585659874e3d7a89f",
+    "workflowRunId": 37268342455,
+    "artifactId": 11326909994,
+    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+    "artifactSizeBytes": 2730691,
+    "artifactDigestSha256": "b81eb674a40841b5408f09e6e70576662a3b8b171c83b11f1237049847ebd36b",
     "defaultProfile": "CORRECTNESS",
     "userRuntimeVerified": false
   },
@@ -363,5 +364,33 @@
       "n100": "AUXILIARY_EXACT_SHA_7B5D4388_STATIC_PASS"
     },
     "issue14CommentId": 5988509110
+  },
+  "post1000Maintenance00403": {
+    "taskId": "CONVERSION-DX9EX-00403",
+    "eventId": "CONVERSION-DX9EX-00403-E001",
+    "attempt": "1/3",
+    "item": "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012",
+    "baseSha": "8fa7a10f3f9a13d2bc5ccce29a2cbbd82cddb520",
+    "redVerifierSha": "4811ab9d53b5c7ee7a60b8789916b0a6abe74c69",
+    "materialResultSha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+    "validationBearingResultSha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "runtimeBehaviorChanged": false,
+    "retirementStatus": "DEFERRED_PRECONDITIONS_GUARDED",
+    "validation": {
+      "dx9exActiveRunId": 37268342455,
+      "jobs": {
+        "policy": 111629818012,
+        "host": 111629975614,
+        "game": 111629975647,
+        "fullChainCompile": 111629975679,
+        "package": 111631323827
+      },
+      "domainIsolationRunId": 37268342567,
+      "packageArtifactId": 11326909994,
+      "packageArtifactDigest": "sha256:b81eb674a40841b5408f09e6e70576662a3b8b171c83b11f1237049847ebd36b",
+      "n100": "AUXILIARY_EXACT_SHA_8B1BD6B3_STATIC_PASS"
+    }
   }
 }
