@@ -179,9 +179,9 @@
       2048,
       2048
     ],
-    "changed_pixels": 107091,
+    "changed_pixels": 94587,
     "changed_bbox": [
-      590,
+      596,
       147,
       1280,
       1284
@@ -198,9 +198,9 @@
       2048,
       2048
     ],
-    "changed_pixels": 94439,
+    "changed_pixels": 84960,
     "changed_bbox": [
-      590,
+      596,
       147,
       1280,
       1284
@@ -218,7 +218,7 @@
     "render_outside_target": 0,
     "localized_overlap": 0
   },
-  "candidate_sha256": "3876804b958513aa842966c241fcb6c9215593247b4acf719b6b1d46e6cbf2ee",
+  "candidate_sha256": "959d17cf21765e0ba4addad4ea0d1c4f3bfd5d6e87624244e879ab13b8ba3e97",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
   "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
   "RUNTIME_VALIDATION": "UNTESTED",
