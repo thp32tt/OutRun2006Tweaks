@@ -7,6 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C203 finalized A60 index163 59A79158 candidate 1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583. Independent canonical source+atlas QA reproduces source/localized bboxes 24/24 exactly, 24/24 containment/size/positive-margin and canonical phonetic stage binding PASS; outside/alpha/introduced-visible/source-residue/overlap/touch all 0. Controller contacts/raw mirror_y PASS. C203_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
+    "C206 finalized B152 index32 DCC7B488 candidate 958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14 and positively classifies zoom_review Total Rank -> 종합 랭킹. Corrected C verifier shows strict source-script residue=0, exact localized bbox 1/1, outside/alpha/render/protected all 0; Coons clean plate is visually seamless with low boundary RGB deltas, controller SOURCE/CLEAN/FINAL/raw mirror_y PASS. C204/C205 were verifier-only false positives on same candidate bytes. C206_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION60 completed odd index163 59A79158 candidate 1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583. A58 source contact proved physical order idx0..23 = Waterfalls..Castle Wall (reverse artwork-plan list). A59 was machine-safe but rejected as visually undersized; A60 restored source-family shared vertical scale. 24/24 bbox/size/positive-margin, CLEAN/FINAL PASS, outside/alpha/protected/residue/render/overlap/touch=0, readable/raw mirror_y self-QA PASS. C203 machine QA independently matches 24/24 source/localized bboxes but C controller remains pending. Index143 stale pending state reconciled to preserve-original song-title policy. RUNTIME_VALIDATION=UNTESTED.",
     "C201 finalized A56 index161 55B57CDE candidate 78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812. Independent canonical DXT5+atlas revalidation: source/localized bbox exact 38/38, containment/size/positive margins 38/38, semantic mapping PASS, outside/alpha/introduced-visible/source-residue/overlap/touch/out-of-allowed DXT5 blocks all 0; controller contacts/raw mirror_y PASS. C201_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "C202 finalized B148 index30 8215FD25 candidate cb023fa5533b4a058c437c1a879b2952a7268308e47202f7dced32c6a563e141. Independent C machine QA: 2/2 exact localized bbox containment/size/positive margins, decoded/alpha/render outside=0, overlap/touch=0; starburst clean patch is pixel-exact to C193-approved B137 same-family clean template after +1088 x shift (diff=0/max channel delta=0). Controller SOURCE/CLEAN/FINAL/raw visual PASS; speech bubble remains seamless. Supersedes C196/C198/C199/C200. C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
@@ -3993,7 +3995,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C201-C202-BATCH/C201_C202_BATCH_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C203-C206-BATCH/C203_C206_BATCH_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4054,10 +4056,7 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [
-    "DCC7B488",
-    "59A79158"
-  ],
+  "current_pending_c": [],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -4445,5 +4444,41 @@
     "asset": "34923C8A",
     "status": "PRESERVE_ORIGINAL_POLICY_NO_CANDIDATE_REQUIRED",
     "reason": "song-title artwork per TRANSLATION_NAMING_POLICY"
+  },
+  "c203_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T22:04:55+09:00",
+    "run": "20261005-C203-59A79158",
+    "queue_index": 163,
+    "candidate_sha256": "1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583",
+    "machine_status": "PASS",
+    "source_bbox_exact": "24/24 PASS",
+    "candidate_bbox_exact": "24/24 PASS",
+    "bbox_size_positive_margin": "24/24 PASS",
+    "semantic_stage_mapping": "PASS_CANONICAL_PHONETIC_24_OF_24",
+    "controller_visual_qa": "PASS",
+    "decision": "C203_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "machine_report": "localization/graphics/role_C/20261005-C203-59A79158/C203_59A79158_MACHINE_QA.json",
+    "report": "localization/graphics/role_C/20261005-C203-59A79158/C203_59A79158_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c206_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T22:04:55+09:00",
+    "run": "20261005-C206-DCC7B488",
+    "queue_index": 32,
+    "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+    "classification": "zoom_review -> localize_text; Total Rank -> 종합 랭킹",
+    "machine_status": "PASS_AFTER_VERIFIER_CORRECTION",
+    "bbox_size_positive_margin": "1/1 PASS",
+    "strict_source_script_residue": 0,
+    "decoded_changed_outside": 0,
+    "alpha_outside": 0,
+    "render_outside": 0,
+    "protected_changed": 0,
+    "controller_visual_qa": "PASS",
+    "decision": "C206_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "verifier_retry_note": "C204/C205 were C-only verifier scope/threshold false positives on unchanged B152 bytes.",
+    "machine_report": "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7B488_MACHINE_QA.json",
+    "report": "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7B488_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
   }
 }
