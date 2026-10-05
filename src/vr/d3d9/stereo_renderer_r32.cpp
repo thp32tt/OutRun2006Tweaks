@@ -298,30 +298,11 @@ namespace OutRunVRStereo
                 frame.fenceWaitUs, frame.fencePolls);
         }
 
-        struct R32EffectSnapshot
-        {
-            DWORD alphaBlend = FALSE;
-            DWORD alphaTest = FALSE;
-            DWORD zWrite = TRUE;
-            DWORD zEnable = D3DZB_TRUE;
-            DWORD cullMode = D3DCULL_CCW;
-        };
-
         bool R32ReadEffectSnapshot(IDirect3DDevice9* device,
-            R32EffectSnapshot& out) noexcept
+            OutRunVR::D3D9::LiveEffectRenderStateSnapshot& out) noexcept
         {
-            if (!device)
-                return false;
             const bool ok =
-                SUCCEEDED(device->GetRenderState(
-                    D3DRS_ALPHABLENDENABLE, &out.alphaBlend)) &&
-                SUCCEEDED(device->GetRenderState(
-                    D3DRS_ALPHATESTENABLE, &out.alphaTest)) &&
-                SUCCEEDED(device->GetRenderState(
-                    D3DRS_ZWRITEENABLE, &out.zWrite)) &&
-                SUCCEEDED(device->GetRenderState(
-                    D3DRS_ZENABLE, &out.zEnable)) &&
-                SUCCEEDED(device->GetRenderState(D3DRS_CULLMODE, &out.cullMode));
+                OutRunVR::D3D9::ReadLiveEffectRenderStateSnapshot(device, out);
             if (!ok)
             {
                 ++R32StateSnapshotFailures;
@@ -338,7 +319,7 @@ namespace OutRunVRStereo
         bool R32EffectIsFragileLive(IDirect3DDevice9* device,
             bool& fragile) noexcept
         {
-            R32EffectSnapshot state{};
+            OutRunVR::D3D9::LiveEffectRenderStateSnapshot state{};
             if (!R32ReadEffectSnapshot(device, state))
                 return false;
             const auto policy = OutRunVR::PassPolicy::ClassifyEffectStereo(
@@ -410,7 +391,7 @@ namespace OutRunVRStereo
                 !TargetIsBackBuffer() || !StereoWanted() || !R9StereoBaselineSeeded())
                 return lowerDraw();
 
-            R32EffectSnapshot snapshot{};
+            OutRunVR::D3D9::LiveEffectRenderStateSnapshot snapshot{};
             if (R32ReadEffectSnapshot(device, snapshot))
                 return lowerDraw();
 
