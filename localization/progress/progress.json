@@ -265,16 +265,17 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "REWORK_REQUIRED",
+      "status": "REWORK_REQUIRED_WITH_PENDING_C",
       "assets": [
         "63C91067",
         "C598919A",
-        "37759842",
-        "560FA536"
+        "37759842"
       ],
-      "remaining": 4,
-      "note": "C178 clears A05BF610. C177 returns 37759842 for visible clean-plate source-effect residue. C179 returns 560FA536 because idx31 canonical warning text exceeds the producer-declared bbox/mask and leaves source fragments. pending_artwork localize_text=16; RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": []
+      "remaining": 3,
+      "note": "A38 resolves C179 producer-side idx31 warning bbox/mask defect and moves 560FA536 back to independent C. A40 retry on 37759842 remains REWORK_REQUIRED because controller visual still sees source-shaped reconstruction on selector plates despite numeric PASS. Remaining producer REWORK: 63C91067, C598919A, 37759842. pending_artwork localize_text=16; RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": [
+        "560FA536"
+      ]
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -561,24 +562,24 @@
       "runtime_validation": "UNTESTED"
     },
     "current_pending_artwork_localize_text": 17,
-    "current_producer_rework_remaining": 2,
+    "current_producer_rework_remaining": 3,
     "latest_a_production_batch": {
-      "timestamp_kst": "2026-10-05T17:45:42+09:00",
+      "timestamp_kst": "2026-10-05T18:16:00+09:00",
       "assets": [
         "560FA536"
       ],
-      "result": "A36_SELF_QA_PASS_PENDING_C_AND_INGAME",
-      "candidate_sha256": "4b4dbb1f645c526fb812e500c01a0fa03894dc1aff2267682ea9f8b283c05744",
-      "report": "localization/graphics/role_A/20261005-A-PRODUCTION36/A36_560FA536_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION36/A36_CONTROLLER_SELF_QA.json",
+      "result": "A38_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "candidate_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+      "report": "localization/graphics/role_A/20261005-A-PRODUCTION38/A38_560FA536_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION38/A38_CONTROLLER_SELF_QA.json",
       "pending_c_assets": [
-        "37759842",
         "560FA536"
       ],
       "pending_artwork_localize_text": 16,
       "producer_rework_remaining": [
         "63C91067",
-        "C598919A"
+        "C598919A",
+        "37759842"
       ],
       "runtime_validation": "UNTESTED"
     },
@@ -1134,7 +1135,8 @@
     },
     "current_producer_rework_assets": [
       "63C91067",
-      "C598919A"
+      "C598919A",
+      "37759842"
     ],
     "a_production26_2ea557b4": {
       "index": 55,
@@ -1324,6 +1326,16 @@
       "decision": "C176_REWORK_REQUIRED_CLEAN_PLATE_RESIDUE_BORDER_TOUCH_AND_SPACING",
       "report": "localization/graphics/role_C/20261005-C176-A05BF610/C176_A05_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
+    },
+    "latest_a_rework_attempt": {
+      "timestamp_kst": "2026-10-05T18:16:00+09:00",
+      "asset": "37759842",
+      "queue_index": 95,
+      "run": "A_PRODUCTION40",
+      "result": "REWORK_REQUIRED_TEMPLATE_SPECIFIC_CLEAN_PLATE",
+      "rejected_candidate_sha256": "040a0e9a504fdb5982db4302ded3c9c3938fa6bf88f8ced48a7ab6ce5692ce19",
+      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION40/A40_CONTROLLER_REWORK.json",
+      "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     }
   },
   "data_build": {
