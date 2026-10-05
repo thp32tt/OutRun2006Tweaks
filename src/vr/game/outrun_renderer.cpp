@@ -174,6 +174,9 @@ namespace OutRunVRRenderer
 			OutRunVR::GameSemantic::RenderScope::None;
 		std::uint64_t LastGameWvpQueueNodeEpoch = 0;
 		const void* LastGameWvpQueueNode = nullptr;
+		OutRunVR::GameSemantic::ProducerToken LastGameWvpProducerToken =
+			OutRunVR::GameSemantic::ProducerToken::None;
+		std::uint32_t LoggedProducerC64Mask = 0;
 
 		D3DVECTOR CullingCameraSavedPos{};
 		D3DVECTOR CullingCameraSavedLook{};
@@ -1468,6 +1471,8 @@ namespace OutRunVRRenderer
 			LastGameWvpSemanticScope = OutRunVR::GameSemantic::RenderScope::None;
 			LastGameWvpQueueNodeEpoch = 0;
 			LastGameWvpQueueNode = nullptr;
+			LastGameWvpProducerToken =
+				OutRunVR::GameSemantic::ProducerToken::None;
 		}
 
 		void RecordGameWvpWrite(const float* constants,
@@ -1499,7 +1504,34 @@ namespace OutRunVRRenderer
 				OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
 			LastGameWvpQueueNode =
 				OutRunVR::GameSemantic::CurrentQueueNode();
+			LastGameWvpProducerToken =
+				OutRunVR::GameSemantic::CurrentQueueProducerToken();
 			LastGameWvpWriteValid = true;
+
+			if (Settings::VRTelemetry &&
+				LastGameWvpProducerToken !=
+					OutRunVR::GameSemantic::ProducerToken::None)
+			{
+				const auto producerIndex = static_cast<unsigned>(
+					LastGameWvpProducerToken);
+				if (producerIndex < 32)
+				{
+					const std::uint32_t producerBit = 1u << producerIndex;
+					if ((LoggedProducerC64Mask & producerBit) == 0)
+					{
+						LoggedProducerC64Mask |= producerBit;
+						spdlog::info(
+							"VR R51 C64 FINGERPRINT: producer={} scope={} queueEpoch={} drawSerial={} shaderSerial={}",
+							OutRunVR::GameSemantic::Name(
+								LastGameWvpProducerToken),
+							OutRunVR::GameSemantic::Name(
+								LastGameWvpSemanticScope),
+							LastGameWvpQueueNodeEpoch,
+							LastGameWvpTopLevelDrawSerial,
+							LastGameWvpShaderSerial);
+					}
+				}
+			}
 		}
 
 		void RecordVerifiedWvp(const float* constants)
@@ -1858,13 +1890,15 @@ namespace OutRunVRRenderer
 	bool GetLastGameWvpSemanticProvenance(
 		OutRunVR::GameSemantic::RenderScope& semanticScope,
 		std::uint64_t& queueNodeEpoch,
-		const void*& queueNode) noexcept
+		const void*& queueNode,
+		OutRunVR::GameSemantic::ProducerToken& producerToken) noexcept
 	{
 		if (!LastGameWvpWriteValid || LastGameWvpWriteSerial == 0)
 			return false;
 		semanticScope = LastGameWvpSemanticScope;
 		queueNodeEpoch = LastGameWvpQueueNodeEpoch;
 		queueNode = LastGameWvpQueueNode;
+		producerToken = LastGameWvpProducerToken;
 		return true;
 	}
 
