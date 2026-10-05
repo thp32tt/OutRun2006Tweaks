@@ -113,7 +113,7 @@ records=[
  ("start_bottom","출발",(104,1532,368,1604),20,8,64),
  ("goal","골",(1632,20,1820,68),18,6,48),
 ]
-cells_mask=Image.new("L",(W,H),0); source48_text_union=Image.new("L",(W,H),0); new48_union=Image.new("L",(W,H),0); rec48=[]
+cells_mask=Image.new("L",(W,H),0); source48_face_union=Image.new("L",(W,H),0); source48_text_union=Image.new("L",(W,H),0); new48_union=Image.new("L",(W,H),0); rec48=[]
 clean48=old48.copy()
 for key,txt,cell,ix,iy,fs0 in records:
     x0,y0,x1,y1=cell; ImageDraw.Draw(cells_mask).rectangle((x0,y0,x1-1,y1-1),fill=255)
@@ -121,6 +121,7 @@ for key,txt,cell,ix,iy,fs0 in records:
     h,w=a.shape[:2]
     roi=np.zeros((h,w),bool); roi[iy:h-iy,ix:w-ix]=True
     bright=(a[:,:,0]>170)&(a[:,:,1]>135)&(a[:,:,2]>85)&(a[:,:,3]>0)&roi
+    source48_face_union.paste(Image.fromarray((bright*255).astype(np.uint8),"L"),(x0,y0))
     # Source lettering includes cream face + glow; expand the measured bright face.
     mask=ndimage.binary_dilation(bright,iterations=5)&roi
     if mask.sum()<150: raise RuntimeError(("48 source text mask too small",key,int(mask.sum())))
@@ -154,13 +155,12 @@ for key,txt,cell,ix,iy,fs0 in records:
 # Strict change scope vs prior candidate.
 diff48=dmask(old48,final48); out48=count(ImageChops.multiply(diff48,ImageOps.invert(cells_mask)))
 if out48: raise RuntimeError(("48 outside",out48))
-# Clean-plate source-script gate: evaluate only the measured inset source-text mask.
-# Badge borders are intentionally bright and protected, so broad grayscale-equality tests
-# would count preserved border pixels as false source-letter residue.
-c48=np.asarray(clean48)
-cream48=((c48[:,:,0]>170)&(c48[:,:,1]>135)&(c48[:,:,2]>85)&(c48[:,:,3]>0)).astype(np.uint8)*255
-res48=count(ImageChops.multiply(source48_text_union,Image.fromarray(cream48,"L")))
-if res48: raise RuntimeError(("48 clean source-script residue",res48))
+# Clean-plate source-script gate: every detected canonical cream-face pixel in
+# the inset text mask must change. Dilation fringe is excluded because it intentionally
+# contains source-red background; badge borders are outside the inset ROI.
+same48_clean=ImageOps.invert(dmask(src48_4,clean48))
+res48=count(ImageChops.multiply(source48_face_union,same48_clean))
+if res48: raise RuntimeError(("48 clean source-face residue",res48))
 raw48=final48.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 p48.write_bytes(cb[:128]+raw48.tobytes("raw","BGRA")); sha48=sha(p48)
 dec48_raw=Image.frombytes("RGBA",(W,H),p48.read_bytes()[128:],"raw","BGRA"); dec48=dec48_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
@@ -259,7 +259,7 @@ report={"schema_version":1,"role":"A","run":run,"regression":"IGR-012","screensh
    "header_128_exact":pa.read_bytes()[:128]==ab[:128],"raw_orientation":"mirror_y"},
   "48DEBE77":{"source_sha256":"5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
    "input_candidate_sha256":"fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0","candidate_sha256":sha48,
-   "rows":rec48,"changes_outside_three_badge_cells":out48,"source_script_residue_in_clean_plate":res48,
+   "rows":rec48,"changes_outside_three_badge_cells":out48,"source_face_residue_in_clean_plate":res48,
    "header_128_preserved_from_2048_candidate":p48.read_bytes()[:128]==cb[:128],"raw_orientation":"mirror_y",
    "construction":"canonical stock source artwork resampled 4x special-case baseline; fresh native-resolution Korean glyphs; no old Korean raster reuse"}},
  "producer_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"PENDING_NEW_INGAME_RETEST",
@@ -267,7 +267,7 @@ report={"schema_version":1,"role":"A","run":run,"regression":"IGR-012","screensh
 (out/"A84_IGR012_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 (wr/"A84_IGR012.json").write_text(json.dumps({"run":run,"regression":"IGR-012","assets":["A064FDFC","48DEBE77"],
  "candidate_sha256":{"A064FDFC":shaA,"48DEBE77":sha48},"bbox_size_margin":{"A064FDFC":"2/2 PASS","48DEBE77":"3/3 PASS"},
- "outside":{"A064FDFC":outA,"48DEBE77":out48},"source_residue_48_clean_plate":res48,
+ "outside":{"A064FDFC":outA,"48DEBE77":out48},"source_face_residue_48_clean_plate":res48,
  "worker_status":report["status"],"runtime_validation":"PENDING_NEW_INGAME_RETEST",
  "report":str((out/"A84_IGR012_REPORT.json").relative_to(repo))},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps({"A064FDFC":shaA,"48DEBE77":sha48,"A064_rows":recA,"badge_rows":rec48,
