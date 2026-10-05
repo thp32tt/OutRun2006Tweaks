@@ -814,8 +814,8 @@ req(math, 'model_uses_r3_structural_reverse_polarity(Model model)', 'Hybrid can 
 req(ffb, 'const float structuralForceDirection =', 'runtime separates structural force direction from event direction')
 req(ffb, 'const float eventForceDirection =', 'runtime separates Arcade event direction from Modern structural direction')
 req(ffb, 'R10 model-owned polarity enforced for {}', 'runtime polarity repair is observable')
-req(wheel_ui, 'R10: model polarity is runtime-owned.', 'F11 explains automatic model polarity')
-req(wheel_ui, 'R10 hardware-test branch: polarity follows the selected FFB model automatically', 'manual polarity controls are explicitly model-owned')
+req(wheel_ui, 'R10: polarity is runtime-owned.', 'F11 explains automatic model polarity')
+req(wheel_ui, 'R10 hardware-test branch: polarity follows the selected FFB model automatically.', 'manual polarity controls are explicitly model-owned')
 
 req(math, 'ImperialAvenueCompanionPavingMask = 0x00000800u', 'Imperial Avenue companion paving mask is evidence-pinned')
 req(math, 'imperial_avenue_stone_paving_pattern(', 'Imperial Avenue stone pattern has a narrow classifier')
