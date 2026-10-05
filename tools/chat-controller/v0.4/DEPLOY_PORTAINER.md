@@ -17,6 +17,12 @@ Repository:
 Reference:
 `refs/heads/chat-controller-downloads`
 
+> Portainer에서 **Reference를 비워두지 마세요.** 이 저장소의 기본 브랜치는 `master`이며,
+> `master`에는 `tools/chat-controller/v0.4/docker-compose.portainer-vr.yml`이 없습니다.
+> 따라서 Reference가 비어 있거나 `master`이면
+> `Unable to retrieve stack file: Could not get the contents of the file ...` 오류가 발생합니다.
+> 저장소는 public이므로 별도 Git 인증이 필요하지 않습니다.
+
 ## VR stack
 
 Stack name:
@@ -114,8 +120,10 @@ The VR compose uses `Dockerfile.portainer-vr`, which pins the proven Controller 
 - lane C: DX9Ex improvement -> `vr-d3d9ex-focus`
 - DX11/DXVK required workflow: `Backend Conversion Gate`
 - DX9Ex required workflow: `DX9Ex Active Validation`
-- up to three independent conversion/improvement lanes may be active at once
-- successful automatic validation advances immediately to the next independent lane
+- active priority: C (DX9Ex structural refactor) first, A (DX11) second
+- up to two high-priority lanes (C + A) may be active at once
+- B (DXVK) is deferred and is only dispatched as fallback when both higher-priority lanes are unavailable
+- successful automatic validation advances without allowing a stalled lane to block the other active priority lane
 - runtime/HMD validation remains `UNTESTED` unless separately proven
 
 ### Localization stack
