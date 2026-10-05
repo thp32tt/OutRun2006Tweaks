@@ -11,7 +11,7 @@ if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OU
     raise SystemExit("B hosted worker only")
 
 repo = Path.cwd()
-run = "20261006-B-PRODUCTION160-A8CE-BC3-SCALE"
+run = "20261006-B-PRODUCTION161-A8CE-BC3-GRADIENT"
 out = repo / "localization/graphics/role_B" / run
 out.mkdir(parents=True, exist_ok=True)
 wr = repo / "localization/graphics/worker_results"
@@ -24,7 +24,7 @@ candidate.parent.mkdir(parents=True, exist_ok=True)
 COMMIT = "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 SOURCE_SHA256 = "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b"
 BASE = "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/" + COMMIT
-tmp = Path("/tmp/outrun_B160_A8CE")
+tmp = Path("/tmp/outrun_B161_A8CE")
 tmp.mkdir(parents=True, exist_ok=True)
 dds = tmp / "A8CE339F_HD.dds"
 atlasp = tmp / "A8CE339F_atlas.json"
@@ -275,6 +275,52 @@ def style_from_mask(mask):
         stroke = tuple(max(0, int(v) - 45) for v in stroke[:3]) + (255,)
     return fill, stroke
 
+def source_gradient_stops(mask):
+    # Reproduce the source's non-flat Extra Time fill with three vertical color stops.
+    # Bright interior pixels are sampled independently from the top/middle/bottom thirds;
+    # the dark navy outline is excluded by a per-band luminance quantile.
+    ys, xs = np.nonzero(mask)
+    if not len(xs):
+        raise RuntimeError("gradient mask empty")
+    y0, y1 = int(ys.min()), int(ys.max()) + 1
+    h = max(1, y1 - y0)
+    stops = []
+    for frac0, frac1 in ((0.0, 0.33), (0.33, 0.66), (0.66, 1.0)):
+        a0 = y0 + int(h * frac0)
+        a1 = y0 + max(int(h * frac1), int(h * frac0) + 1)
+        a1 = min(H, max(a0 + 1, a1))
+        band_mask = mask[a0:a1]
+        band = sa[a0:a1]
+        valid = band_mask & (band[:, :, 3] > 24)
+        if not np.any(valid):
+            stops.append((247, 243, 200))
+            continue
+        rgb = band[:, :, :3].astype(np.float32)
+        lum = rgb[:, :, 0] * 0.2126 + rgb[:, :, 1] * 0.7152 + rgb[:, :, 2] * 0.0722
+        vals = lum[valid]
+        q = float(np.quantile(vals, 0.72))
+        pts = rgb[valid & (lum >= q)]
+        if len(pts) < 8:
+            pts = rgb[valid]
+        stops.append(tuple(int(v) for v in np.median(pts, axis=0).round()))
+    return stops
+
+def gradient_rgba(size, stops, alpha_mask):
+    w, h = size
+    top, mid, bottom = [np.array(c, dtype=np.float32) for c in stops]
+    arr = np.zeros((h, w, 4), dtype=np.uint8)
+    for yy in range(h):
+        t = yy / max(1, h - 1)
+        if t <= 0.5:
+            u = t * 2.0
+            c = top * (1.0 - u) + mid * u
+        else:
+            u = (t - 0.5) * 2.0
+            c = mid * (1.0 - u) + bottom * u
+        arr[yy, :, 0:3] = np.clip(np.rint(c), 0, 255).astype(np.uint8)
+    arr[:, :, 3] = np.asarray(alpha_mask, dtype=np.uint8)
+    return Image.fromarray(arr, "RGBA")
+
 def shear_alpha(alpha, shear=0.14):
     w, h = alpha.size
     extra = int(math.ceil(abs(shear) * h)) + 2
@@ -355,8 +401,15 @@ def render_element(e):
     outline_layer = Image.new("RGBA", a.size, stroke)
     outline_layer.putalpha(a)
     tile.alpha_composite(outline_layer)
-    fill_layer = Image.new("RGBA", a.size, fill)
-    fill_layer.putalpha(inner)
+    if e["kind"] == "extra_time":
+        gradient_stops = source_gradient_stops(e["source_mask"])
+        fill_layer = gradient_rgba(a.size, gradient_stops, inner)
+        e["source_fill_gradient_rgb"] = [list(c) for c in gradient_stops]
+        e["fill_mode"] = "SOURCE_SAMPLED_THREE_STOP_VERTICAL_GRADIENT"
+    else:
+        fill_layer = Image.new("RGBA", a.size, fill)
+        fill_layer.putalpha(inner)
+        e["fill_mode"] = "SOURCE_SAMPLED_SOLID"
     tile.alpha_composite(fill_layer)
 
     px = ax0 + max(0, (maxw - a.width) // 2)
@@ -573,30 +626,30 @@ def save_mask(arr, name):
     Image.fromarray((arr.astype(np.uint8) * 255), "L").save(p)
     return p
 
-source_png = out / "B160_SOURCE_READABLE.png"
-clean_png = out / "B160_CLEAN_READABLE.png"
-final_png = out / "B160_FINAL_READABLE.png"
+source_png = out / "B161_SOURCE_READABLE.png"
+clean_png = out / "B161_CLEAN_READABLE.png"
+final_png = out / "B161_FINAL_READABLE.png"
 src.save(source_png)
 clean.save(clean_png)
 dec.save(final_png)
-allowed_path = save_mask(allowed, "B160_ALLOWED_BBOX_MASK.png")
-protected_path = save_mask(~allowed, "B160_PROTECTED_MASK.png")
-save_mask(source_union, "B160_SOURCE_TEXT_MASK.png")
-save_mask(target_union, "B160_LOCALIZED_RENDER_MASK.png")
+allowed_path = save_mask(allowed, "B161_ALLOWED_BBOX_MASK.png")
+protected_path = save_mask(~allowed, "B161_PROTECTED_MASK.png")
+save_mask(source_union, "B161_SOURCE_TEXT_MASK.png")
+save_mask(target_union, "B161_LOCALIZED_RENDER_MASK.png")
 
 validator = repo / "tools/localization/validate_clean_plate.py"
 subprocess.run(
     ["python3", str(validator), str(source_png), str(clean_png), str(allowed_path),
-     "--protected-mask", str(protected_path), "--report", str(out / "B160_CLEAN_VALIDATION.json")],
+     "--protected-mask", str(protected_path), "--report", str(out / "B161_CLEAN_VALIDATION.json")],
     check=True,
 )
 subprocess.run(
     ["python3", str(validator), str(source_png), str(final_png), str(allowed_path),
-     "--protected-mask", str(protected_path), "--report", str(out / "B160_FINAL_VALIDATION.json")],
+     "--protected-mask", str(protected_path), "--report", str(out / "B161_FINAL_VALIDATION.json")],
     check=True,
 )
-clean_validation = json.loads((out / "B160_CLEAN_VALIDATION.json").read_text())
-final_validation = json.loads((out / "B160_FINAL_VALIDATION.json").read_text())
+clean_validation = json.loads((out / "B161_CLEAN_VALIDATION.json").read_text())
+final_validation = json.loads((out / "B161_FINAL_VALIDATION.json").read_text())
 if clean_validation.get("status") != "PASS" or final_validation.get("status") != "PASS":
     raise RuntimeError(("decoded PNG validator", clean_validation.get("status"), final_validation.get("status")))
 
@@ -625,7 +678,7 @@ for idx in (24, 25, 26):
         card.paste(im, (xx, 50))
         dr.text((xx+6, 12), label, fill="black")
         xx += im.width + 10
-    save_jpg_b64(card, f"B160_IDX{idx}_SOURCE_CLEAN_FINAL.jpg", 96)
+    save_jpg_b64(card, f"B161_IDX{idx}_SOURCE_CLEAN_FINAL.jpg", 96)
 
 overview = Image.new("RGB", (1600, 3*830), "white")
 for i, (label, im) in enumerate((("SOURCE", src), ("CLEAN", clean), ("FINAL", dec))):
@@ -633,7 +686,7 @@ for i, (label, im) in enumerate((("SOURCE", src), ("CLEAN", clean), ("FINAL", de
     z.thumbnail((1580, 790), Image.Resampling.LANCZOS)
     overview.paste(z, (0, i*830+32))
     ImageDraw.Draw(overview).text((8, i*830+8), label, fill="black")
-save_jpg_b64(overview, "B160_A8CE_SOURCE_CLEAN_FINAL.jpg", 93)
+save_jpg_b64(overview, "B161_A8CE_SOURCE_CLEAN_FINAL.jpg", 93)
 
 raw_overview = Image.new("RGB", (1600, 2*830), "white")
 for i, (label, im) in enumerate((("SOURCE_RAW_MIRROR_Y", raw_src), ("FINAL_RAW_MIRROR_Y", dec_raw))):
@@ -641,7 +694,7 @@ for i, (label, im) in enumerate((("SOURCE_RAW_MIRROR_Y", raw_src), ("FINAL_RAW_M
     z.thumbnail((1580, 790), Image.Resampling.LANCZOS)
     raw_overview.paste(z, (0, i*830+32))
     ImageDraw.Draw(raw_overview).text((8, i*830+8), label, fill="black")
-save_jpg_b64(raw_overview, "B160_A8CE_RAW_COMPARE.jpg", 93)
+save_jpg_b64(raw_overview, "B161_A8CE_RAW_COMPARE.jpg", 93)
 
 serial_elements = []
 for e in elements:
@@ -710,13 +763,13 @@ report = {
     "candidate_path": str(candidate.relative_to(repo)),
     "worker_static_qa": "PASS",
     "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
-    "status": "B160_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+    "status": "B161_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
     "runtime_validation": "UNTESTED",
 }
-(out / "B160_A8CE_REPORT.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+(out / "B161_A8CE_REPORT.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
 
-(wr / "B160_A8CE339F.json").write_text(json.dumps({
-    "run": "B160",
+(wr / "B161_A8CE339F.json").write_text(json.dumps({
+    "run": "B161",
     "index": 52,
     "asset": "A8CE339F",
     "candidate_sha256": candidate_sha,
@@ -731,12 +784,12 @@ report = {
     "overlap": post_overlap,
     "touch": post_touch,
     "worker_status": report["status"],
-    "report": f"localization/graphics/role_B/{run}/B160_A8CE_REPORT.json",
+    "report": f"localization/graphics/role_B/{run}/B161_A8CE_REPORT.json",
     "runtime_validation": "UNTESTED",
 }, ensure_ascii=False, indent=2) + "\n")
 
 print(json.dumps({
-    "run": "B160",
+    "run": "B161",
     "asset": "A8CE339F",
     "candidate_sha256": candidate_sha,
     "structure": "2048x1024 DXT5 mirror_y",
