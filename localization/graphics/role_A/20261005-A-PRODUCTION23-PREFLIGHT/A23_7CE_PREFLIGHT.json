@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION23-PREFLIGHT",
+  "queue_index": 59,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_PREFLIGHT",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_git_blob_sha1": "8e79a14a4453c7e015144c1c2e25a4aacc633645",
+    "atlas_git_blob_sha1": "1a13020899080238d4177800382137f0a3e291a5",
+    "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f"
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      512
+    ],
+    "dds_pixel_format_words": [
+      32,
+      4,
+      894720068,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "native_pillow_mode": "RGBA",
+    "mipmaps": 1,
+    "payload_bytes": 1048576,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "region_idx": 0,
+      "source": "NEXT MISSION",
+      "korean": "다음 미션",
+      "cell": [
+        0,
+        344,
+        1756,
+        168
+      ],
+      "original_bbox": [
+        8,
+        353,
+        1293,
+        500
+      ],
+      "source_width": 1285,
+      "source_height": 147,
+      "alpha_pixels": 160460
+    },
+    {
+      "region_idx": 1,
+      "source": "Race The Rivals!",
+      "korean": "라이벌과 레이스!",
+      "cell": [
+        0,
+        176,
+        704,
+        168
+      ],
+      "original_bbox": [
+        75,
+        222,
+        625,
+        304
+      ],
+      "source_width": 550,
+      "source_height": 82,
+      "alpha_pixels": 39329
+    },
+    {
+      "region_idx": 2,
+      "source": "Drift To Score!",
+      "korean": "드리프트 점수 도전!",
+      "cell": [
+        0,
+        8,
+        704,
+        168
+      ],
+      "original_bbox": [
+        119,
+        11,
+        704,
+        137
+      ],
+      "source_width": 585,
+      "source_height": 126,
+      "alpha_pixels": 35196
+    },
+    {
+      "region_idx": 8,
+      "source": "Slipstream To Score!",
+      "korean": "슬립스트림 점수 도전!",
+      "cell": [
+        704,
+        176,
+        704,
+        168
+      ],
+      "original_bbox": [
+        717,
+        176,
+        1408,
+        320
+      ],
+      "source_width": 691,
+      "source_height": 144,
+      "alpha_pixels": 48571
+    }
+  ],
+  "next": "controller confirms semantic/style binding then render same invocation",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "A23_PREFLIGHT_READY_TO_RENDER"
+}
