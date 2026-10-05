@@ -1,0 +1,21 @@
+{
+  "run": "20261005-A-PRODUCTION44",
+  "index": 95,
+  "asset": "37759842",
+  "candidate_sha256": "acfcbc80440ffc9023cd7c6f172e45a896acfe2e470ad77b56054f7f5fa5226d",
+  "localized_physical_targets": 33,
+  "semantic_strings": 20,
+  "bbox_size_positive_margin": "33/33 PASS",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "overlap": 0,
+  "touch": 0,
+  "source_residue": 0,
+  "clean_source_core_unchanged": 0,
+  "worker_status": "A44_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION44/A44_37759842_REPORT.json"
+}
