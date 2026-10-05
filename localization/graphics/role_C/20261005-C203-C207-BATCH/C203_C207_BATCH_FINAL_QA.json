@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T22:13:37+09:00",
+  "role": "C",
+  "run": "20261005-C203-C207-BATCH",
+  "assets_checked": 3,
+  "physical_elements_checked": 46,
+  "results": [
+    {
+      "qa_id": "C203",
+      "index": 163,
+      "asset": "59A79158",
+      "candidate_sha256": "1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583",
+      "machine_status": "PASS",
+      "row_gate": "24/24 PASS",
+      "controller_visual_qa": "PASS",
+      "decision": "C203_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "report": "localization/graphics/role_C/20261005-C203-59A79158/C203_59A79158_CONTROLLER_FINAL_QA.json"
+    },
+    {
+      "qa_id": "C206",
+      "index": 32,
+      "asset": "DCC7B488",
+      "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+      "machine_status": "PASS_AFTER_VERIFIER_CORRECTION",
+      "row_gate": "1/1 PASS",
+      "classification": "zoom_review -> localize_text Total Rank -> 종합 랭킹",
+      "controller_visual_qa": "PASS",
+      "decision": "C206_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "report": "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7B488_CONTROLLER_FINAL_QA.json"
+    },
+    {
+      "qa_id": "C207",
+      "index": 173,
+      "asset": "6DC89C6E",
+      "candidate_sha256": "b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26",
+      "machine_status": "PASS",
+      "row_gate": "21/21 PASS",
+      "semantic_policy_pass": true,
+      "controller_visual_qa": "PASS",
+      "decision": "C207_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "report": "localization/graphics/role_C/20261005-C207-6DC89C6E/C207_6DC89C6E_CONTROLLER_FINAL_QA.json"
+    }
+  ],
+  "verifier_retries": [
+    "C204/C205 are C-only verifier retries on unchanged DCC7B488 B152 bytes; C206 is authoritative and they are not counted as producer failures/completions."
+  ],
+  "pixel_visual_pass_assets": [
+    "59A79158",
+    "DCC7B488",
+    "6DC89C6E"
+  ],
+  "rework_required_assets": [],
+  "global_rework_remaining": [
+    "37759842"
+  ],
+  "pending_artwork_localize_text": 9,
+  "pending_c": [],
+  "queue_action_counts": {
+    "localize_text": 83,
+    "zoom_review": 43,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_brand_song_credit": 1
+  },
+  "runtime_validation": "UNTESTED",
+  "exclusions": "Completed prior PASS assets were not repeated. A63/index193 is preflight-only at batch close and not C-approvable. VR/FFB/DX11/DXVK untouched."
+}
