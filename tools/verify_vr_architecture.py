@@ -88,6 +88,50 @@ protocol_v2 = require(
     "hostDirectConsumedFrameId",
     "SharedRenderFrameRing",
 )
+# VR-HOST-002 post-review: Frame.v2 run identity must remain end-to-end.
+# These are safety/ownership invariants only; they do not change projection or
+# render behavior. The host and all fallback readers must reject stale slots
+# from a previous game process before consuming frame or DirectGPU metadata.
+require(
+    "src/vr/ipc/protocol.hpp",
+    "RenderFrameRunGenerationIndex = 11",
+    "RenderFrameRunIdentityMatches",
+    "ring.reserved0 != 0",
+    "frame.reserved[RenderFrameRunGenerationIndex] == ring.reserved0",
+)
+require(
+    "src/vr/ipc/shadow_legacy_v2.hpp",
+    "RenderFrameRunIdentityMatches(ring, out)",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "ClaimRenderFrameRingForCurrentRun",
+    "slot.reserved[OutRunVR::RenderFrameRunGenerationIndex]",
+    "frame.reserved[OutRunVR::RenderFrameRunGenerationIndex]=RenderFrameRunGeneration",
+    "DirectTransportGeneration=RenderFrameRunGeneration",
+)
+require(
+    "vrhost/src/main.cpp",
+    "ringBefore == ringAfter",
+    "RenderFrameRunIdentityMatches(*state_, out)",
+)
+require(
+    "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp",
+    "RenderFrameRunIdentityMatches(*FrameRing, candidate)",
+    "ringBefore == ringAfter",
+    "RenderFrameDirectGenerationIndex",
+)
+require(
+    "vrhost/src/runtime/openxr_api_compat.hpp",
+    "RenderFrameRunIdentityMatches(*FrameRing, out)",
+)
+require(
+    "vrhost/src/main_r23.cpp",
+    "R23CachedProjectionHoldMs = 1000",
+    "R23UsableGameplayBootstrapFrame",
+    "(frame.flags & OutRunVR::RenderFramePresentInFlight) != 0",
+)
+
 protocol_v3 = require(
     "src/vr/ipc/protocol_v3.hpp",
     "ProtocolVersion = 3",
