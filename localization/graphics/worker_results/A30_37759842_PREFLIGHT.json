@@ -1,0 +1,15 @@
+{
+  "run": "20261005-A-PRODUCTION30-PREFLIGHT",
+  "index": 95,
+  "asset": "37759842",
+  "source_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+  "source_dimensions": [
+    4096,
+    4096
+  ],
+  "format": "RGBA32",
+  "regions": 87,
+  "status": "A30_PREFLIGHT_COMPLETE_CONTINUE_TO_RENDER",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION30-PREFLIGHT/A30_37759842_PREFLIGHT.json"
+}
