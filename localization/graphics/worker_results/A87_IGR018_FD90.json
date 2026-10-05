@@ -1,0 +1,16 @@
+{
+  "run": "20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY",
+  "index": 121,
+  "asset": "FD90AA9",
+  "candidate_sha256": "3d000de4c8c88645f4f50deb388e2538a00154783a1db4b848f15f7e7bf86894",
+  "regression": "IGR-018",
+  "bbox_size_margin": "3/3 PASS",
+  "outside": 0,
+  "alpha_outside": 0,
+  "clean_residue": 0,
+  "overlap": 0,
+  "touch": 0,
+  "worker_status": "A87_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_IGR018_FD90_REPORT.json"
+}
