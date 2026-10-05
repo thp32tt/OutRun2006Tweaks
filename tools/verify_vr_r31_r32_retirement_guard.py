@@ -119,6 +119,31 @@ require(
     "OutRunVR::D3D9::LiveVertexShaderMatches(device, cachedShader)",
 )
 
+# The raw D3D9 c64..c67 batch upload is also a neutral draw-state primitive.
+# R32 keeps telemetry/failure accounting, but must not own the device write.
+require(
+    draw_state_helpers,
+    "neutral shader-constant batch primitive",
+    "inline bool SetVertexShaderConstantBatch(",
+    "device->SetVertexShaderConstantF(",
+)
+r32_wvp_batch = function_body(r32, "bool R32SetWvpBatch(")
+require(
+    r32_wvp_batch,
+    "R32 WVP telemetry wrapper",
+    "++R32BatchWvpUploads",
+    "OutRunVR::D3D9::SetVertexShaderConstantBatch(",
+    "++R32BatchWvpFailures",
+    "R32FirstBatchWvpLogged",
+)
+forbid(
+    r32_wvp_batch,
+    "R32 WVP telemetry wrapper",
+    "device->SetVertexShaderConstantF(",
+)
+if r33.count("R32SetWvpBatch(") < 4:
+    fail("R33 WVP sites unexpectedly stopped using the telemetry-preserving wrapper")
+
 # 1) R31 is retained only for StateBlock/state-cache ownership. Its physical
 # draw overlay over R30 must be gone.
 forbid(
@@ -362,5 +387,5 @@ require(
 print(
     "VR R31/R32 draw-retirement guard PASS "
     "(R31=StateBlock owner, R32=Reset/Present/DirectGPU owner, "
-    "R33=sole physical draw dispatcher over R30, live shader identity=neutral helper)"
+    "R33=sole physical draw dispatcher over R30, live shader identity=neutral helper, WVP batch primitive=neutral helper)"
 )
