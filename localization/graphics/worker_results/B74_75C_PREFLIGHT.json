@@ -1,0 +1,7 @@
+{
+  "run": "20261005-B-PRODUCTION74-PREFLIGHT",
+  "index": 176,
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "region_count": 53,
+  "status": "B74_CANONICAL_HD_REGION_BINDING_REQUIRED_SAME_INVOCATION"
+}

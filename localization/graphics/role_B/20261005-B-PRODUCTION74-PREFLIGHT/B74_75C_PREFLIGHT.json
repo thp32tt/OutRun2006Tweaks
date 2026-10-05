@@ -1,0 +1,987 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION74-PREFLIGHT",
+  "index": 176,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "source_repository": "Sonic-TV/OR2006Sprites",
+  "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "source_blob_sha1": "9d21e4fb47d3b17dab89a05b9552cfeaa913eac9",
+  "atlas_blob_sha1": "07620598cd03cc6d62455b57d3537158cabfc21a",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_128_sha256": "5f6f54e05a1dd82f4f01f2643e4bc68077a43ced65717a99ef65be0588e0a46f",
+    "raw_orientation": "mirror_y"
+  },
+  "regions": [
+    {
+      "idx": 0,
+      "name": "sprite_932",
+      "cell": [
+        0,
+        1680,
+        688,
+        368
+      ],
+      "alpha_bbox": [
+        2,
+        1680,
+        687,
+        2048
+      ],
+      "alpha_pixels": 29973,
+      "opaque_alpha_pixels": 28205
+    },
+    {
+      "idx": 1,
+      "name": "sprite_933",
+      "cell": [
+        688,
+        1680,
+        688,
+        368
+      ],
+      "alpha_bbox": [
+        690,
+        1680,
+        1376,
+        2048
+      ],
+      "alpha_pixels": 31163,
+      "opaque_alpha_pixels": 28208
+    },
+    {
+      "idx": 2,
+      "name": "sprite_934",
+      "cell": [
+        0,
+        1372,
+        860,
+        308
+      ],
+      "alpha_bbox": [
+        0,
+        1376,
+        860,
+        1680
+      ],
+      "alpha_pixels": 39627,
+      "opaque_alpha_pixels": 35275
+    },
+    {
+      "idx": 3,
+      "name": "sprite_935",
+      "cell": [
+        860,
+        1372,
+        860,
+        308
+      ],
+      "alpha_bbox": [
+        860,
+        1376,
+        1720,
+        1680
+      ],
+      "alpha_pixels": 39626,
+      "opaque_alpha_pixels": 35274
+    },
+    {
+      "idx": 4,
+      "name": "sprite_936",
+      "cell": [
+        1720,
+        1416,
+        288,
+        264
+      ],
+      "alpha_bbox": [
+        1724,
+        1420,
+        2006,
+        1678
+      ],
+      "alpha_pixels": 4335,
+      "opaque_alpha_pixels": 3376
+    },
+    {
+      "idx": 5,
+      "name": "sprite_937",
+      "cell": [
+        1376,
+        1812,
+        176,
+        236
+      ],
+      "alpha_bbox": [
+        1376,
+        1812,
+        1552,
+        2046
+      ],
+      "alpha_pixels": 22519,
+      "opaque_alpha_pixels": 10754
+    },
+    {
+      "idx": 6,
+      "name": "sprite_938",
+      "cell": [
+        1552,
+        1824,
+        220,
+        224
+      ],
+      "alpha_bbox": [
+        1552,
+        1824,
+        1771,
+        2046
+      ],
+      "alpha_pixels": 21633,
+      "opaque_alpha_pixels": 11505
+    },
+    {
+      "idx": 7,
+      "name": "sprite_939",
+      "cell": [
+        0,
+        1156,
+        844,
+        216
+      ],
+      "alpha_bbox": [
+        2,
+        1157,
+        844,
+        1371
+      ],
+      "alpha_pixels": 22919,
+      "opaque_alpha_pixels": 21688
+    },
+    {
+      "idx": 8,
+      "name": "sprite_940",
+      "cell": [
+        844,
+        1156,
+        844,
+        216
+      ],
+      "alpha_bbox": [
+        844,
+        1157,
+        1688,
+        1371
+      ],
+      "alpha_pixels": 22927,
+      "opaque_alpha_pixels": 21682
+    },
+    {
+      "idx": 9,
+      "name": "sprite_941",
+      "cell": [
+        1688,
+        1164,
+        244,
+        208
+      ],
+      "alpha_bbox": [
+        1688,
+        1168,
+        1932,
+        1368
+      ],
+      "alpha_pixels": 3196,
+      "opaque_alpha_pixels": 2928
+    },
+    {
+      "idx": 10,
+      "name": "sprite_942",
+      "cell": [
+        1772,
+        1840,
+        152,
+        208
+      ],
+      "alpha_bbox": [
+        1772,
+        1840,
+        1924,
+        2048
+      ],
+      "alpha_pixels": 18547,
+      "opaque_alpha_pixels": 18480
+    },
+    {
+      "idx": 11,
+      "name": "sprite_943",
+      "cell": [
+        0,
+        948,
+        152,
+        208
+      ],
+      "alpha_bbox": [
+        0,
+        948,
+        152,
+        1156
+      ],
+      "alpha_pixels": 18547,
+      "opaque_alpha_pixels": 18480
+    },
+    {
+      "idx": 12,
+      "name": "sprite_944",
+      "cell": [
+        152,
+        948,
+        152,
+        208
+      ],
+      "alpha_bbox": [
+        152,
+        948,
+        304,
+        1156
+      ],
+      "alpha_pixels": 18547,
+      "opaque_alpha_pixels": 18480
+    },
+    {
+      "idx": 13,
+      "name": "sprite_945",
+      "cell": [
+        304,
+        948,
+        152,
+        208
+      ],
+      "alpha_bbox": [
+        304,
+        948,
+        456,
+        1156
+      ],
+      "alpha_pixels": 31478,
+      "opaque_alpha_pixels": 31428
+    },
+    {
+      "idx": 14,
+      "name": "sprite_946",
+      "cell": [
+        456,
+        948,
+        152,
+        208
+      ],
+      "alpha_bbox": [
+        456,
+        948,
+        608,
+        1156
+      ],
+      "alpha_pixels": 18547,
+      "opaque_alpha_pixels": 18480
+    },
+    {
+      "idx": 15,
+      "name": "sprite_947",
+      "cell": [
+        608,
+        948,
+        152,
+        208
+      ],
+      "alpha_bbox": [
+        608,
+        948,
+        760,
+        1156
+      ],
+      "alpha_pixels": 18547,
+      "opaque_alpha_pixels": 18480
+    },
+    {
+      "idx": 16,
+      "name": "sprite_948",
+      "cell": [
+        760,
+        952,
+        620,
+        204
+      ],
+      "alpha_bbox": [
+        762,
+        952,
+        1380,
+        1153
+      ],
+      "alpha_pixels": 12229,
+      "opaque_alpha_pixels": 11087
+    },
+    {
+      "idx": 17,
+      "name": "sprite_949",
+      "cell": [
+        1380,
+        952,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        1380,
+        952,
+        1584,
+        1156
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 18,
+      "name": "sprite_950",
+      "cell": [
+        1584,
+        952,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        1584,
+        952,
+        1788,
+        1156
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 19,
+      "name": "sprite_951",
+      "cell": [
+        1788,
+        952,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        1788,
+        952,
+        1992,
+        1156
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 20,
+      "name": "sprite_952",
+      "cell": [
+        0,
+        744,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        0,
+        744,
+        204,
+        948
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 21,
+      "name": "sprite_953",
+      "cell": [
+        204,
+        744,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        204,
+        744,
+        408,
+        948
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 22,
+      "name": "sprite_954",
+      "cell": [
+        408,
+        744,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        408,
+        744,
+        612,
+        948
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 23,
+      "name": "sprite_955",
+      "cell": [
+        612,
+        744,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        612,
+        744,
+        816,
+        948
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 24,
+      "name": "sprite_956",
+      "cell": [
+        816,
+        744,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        816,
+        744,
+        1020,
+        948
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 25,
+      "name": "sprite_957",
+      "cell": [
+        1020,
+        744,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        1020,
+        744,
+        1224,
+        948
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 26,
+      "name": "sprite_958",
+      "cell": [
+        1224,
+        744,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        1224,
+        744,
+        1428,
+        948
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 27,
+      "name": "sprite_959",
+      "cell": [
+        1428,
+        744,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        1428,
+        744,
+        1632,
+        948
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 28,
+      "name": "sprite_960",
+      "cell": [
+        1632,
+        744,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        1632,
+        744,
+        1836,
+        948
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 29,
+      "name": "sprite_961",
+      "cell": [
+        1836,
+        744,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        1836,
+        744,
+        2040,
+        948
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 30,
+      "name": "sprite_962",
+      "cell": [
+        0,
+        540,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        0,
+        540,
+        204,
+        744
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 31,
+      "name": "sprite_963",
+      "cell": [
+        204,
+        540,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        204,
+        540,
+        408,
+        744
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 32,
+      "name": "sprite_964",
+      "cell": [
+        408,
+        540,
+        204,
+        204
+      ],
+      "alpha_bbox": [
+        408,
+        540,
+        612,
+        744
+      ],
+      "alpha_pixels": 40852,
+      "opaque_alpha_pixels": 40688
+    },
+    {
+      "idx": 33,
+      "name": "sprite_965",
+      "cell": [
+        612,
+        560,
+        436,
+        184
+      ],
+      "alpha_bbox": [
+        612,
+        564,
+        1048,
+        740
+      ],
+      "alpha_pixels": 4326,
+      "opaque_alpha_pixels": 3642
+    },
+    {
+      "idx": 34,
+      "name": "sprite_966",
+      "cell": [
+        1048,
+        572,
+        792,
+        172
+      ],
+      "alpha_bbox": [
+        1048,
+        576,
+        1836,
+        740
+      ],
+      "alpha_pixels": 7082,
+      "opaque_alpha_pixels": 6447
+    },
+    {
+      "idx": 35,
+      "name": "sprite_967",
+      "cell": [
+        0,
+        372,
+        892,
+        168
+      ],
+      "alpha_bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "alpha_pixels": 72799,
+      "opaque_alpha_pixels": 67245
+    },
+    {
+      "idx": 36,
+      "name": "sprite_968",
+      "cell": [
+        892,
+        372,
+        880,
+        168
+      ],
+      "alpha_bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "alpha_pixels": 68689,
+      "opaque_alpha_pixels": 63333
+    },
+    {
+      "idx": 37,
+      "name": "sprite_969",
+      "cell": [
+        0,
+        204,
+        580,
+        168
+      ],
+      "alpha_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "alpha_pixels": 41097,
+      "opaque_alpha_pixels": 38679
+    },
+    {
+      "idx": 38,
+      "name": "sprite_970",
+      "cell": [
+        580,
+        204,
+        460,
+        168
+      ],
+      "alpha_bbox": [
+        590,
+        204,
+        966,
+        365
+      ],
+      "alpha_pixels": 19599,
+      "opaque_alpha_pixels": 17644
+    },
+    {
+      "idx": 39,
+      "name": "sprite_971",
+      "cell": [
+        0,
+        40,
+        1036,
+        164
+      ],
+      "alpha_bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "alpha_pixels": 75687,
+      "opaque_alpha_pixels": 70773
+    },
+    {
+      "idx": 40,
+      "name": "sprite_972",
+      "cell": [
+        1036,
+        92,
+        276,
+        112
+      ],
+      "alpha_bbox": [
+        1036,
+        96,
+        1312,
+        204
+      ],
+      "alpha_pixels": 2706,
+      "opaque_alpha_pixels": 2294
+    },
+    {
+      "idx": 41,
+      "name": "sprite_973",
+      "cell": [
+        1312,
+        108,
+        68,
+        96
+      ],
+      "alpha_bbox": [
+        1315,
+        120,
+        1365,
+        197
+      ],
+      "alpha_pixels": 2537,
+      "opaque_alpha_pixels": 2200
+    },
+    {
+      "idx": 42,
+      "name": "sprite_974",
+      "cell": [
+        1380,
+        108,
+        68,
+        96
+      ],
+      "alpha_bbox": [
+        1385,
+        120,
+        1436,
+        197
+      ],
+      "alpha_pixels": 2676,
+      "opaque_alpha_pixels": 2339
+    },
+    {
+      "idx": 43,
+      "name": "sprite_975",
+      "cell": [
+        1448,
+        108,
+        68,
+        96
+      ],
+      "alpha_bbox": [
+        1452,
+        124,
+        1504,
+        196
+      ],
+      "alpha_pixels": 1720,
+      "opaque_alpha_pixels": 1484
+    },
+    {
+      "idx": 44,
+      "name": "sprite_976",
+      "cell": [
+        1516,
+        108,
+        68,
+        96
+      ],
+      "alpha_bbox": [
+        1521,
+        120,
+        1571,
+        197
+      ],
+      "alpha_pixels": 2539,
+      "opaque_alpha_pixels": 2208
+    },
+    {
+      "idx": 45,
+      "name": "sprite_977",
+      "cell": [
+        1584,
+        108,
+        68,
+        96
+      ],
+      "alpha_bbox": [
+        1587,
+        120,
+        1637,
+        195
+      ],
+      "alpha_pixels": 2449,
+      "opaque_alpha_pixels": 2124
+    },
+    {
+      "idx": 46,
+      "name": "sprite_978",
+      "cell": [
+        1652,
+        108,
+        68,
+        96
+      ],
+      "alpha_bbox": [
+        1657,
+        124,
+        1708,
+        196
+      ],
+      "alpha_pixels": 2128,
+      "opaque_alpha_pixels": 1860
+    },
+    {
+      "idx": 47,
+      "name": "sprite_979",
+      "cell": [
+        1720,
+        108,
+        68,
+        96
+      ],
+      "alpha_bbox": [
+        1724,
+        118,
+        1774,
+        195
+      ],
+      "alpha_pixels": 2244,
+      "opaque_alpha_pixels": 1920
+    },
+    {
+      "idx": 48,
+      "name": "sprite_980",
+      "cell": [
+        1788,
+        108,
+        68,
+        96
+      ],
+      "alpha_bbox": [
+        1792,
+        122,
+        1842,
+        196
+      ],
+      "alpha_pixels": 2271,
+      "opaque_alpha_pixels": 1997
+    },
+    {
+      "idx": 49,
+      "name": "sprite_981",
+      "cell": [
+        1856,
+        108,
+        68,
+        96
+      ],
+      "alpha_bbox": [
+        1859,
+        125,
+        1893,
+        196
+      ],
+      "alpha_pixels": 1481,
+      "opaque_alpha_pixels": 1302
+    },
+    {
+      "idx": 50,
+      "name": "sprite_982",
+      "cell": [
+        1924,
+        108,
+        68,
+        96
+      ],
+      "alpha_bbox": [
+        1929,
+        120,
+        1990,
+        199
+      ],
+      "alpha_pixels": 2309,
+      "opaque_alpha_pixels": 1987
+    },
+    {
+      "idx": 51,
+      "name": "sprite_983",
+      "cell": [
+        1040,
+        300,
+        200,
+        72
+      ],
+      "alpha_bbox": [
+        1040,
+        300,
+        1240,
+        372
+      ],
+      "alpha_pixels": 13408,
+      "opaque_alpha_pixels": 13236
+    },
+    {
+      "idx": 52,
+      "name": "sprite_984",
+      "cell": [
+        1992,
+        180,
+        24,
+        24
+      ],
+      "alpha_bbox": [
+        1992,
+        180,
+        2016,
+        204
+      ],
+      "alpha_pixels": 484,
+      "opaque_alpha_pixels": 432
+    }
+  ],
+  "expected_transcription": [
+    "FLAGMAN 4",
+    "HOLLY",
+    "JENNIFER",
+    "CLARISSA"
+  ],
+  "status": "B74_CANONICAL_HD_REGION_BINDING_REQUIRED_SAME_INVOCATION",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
