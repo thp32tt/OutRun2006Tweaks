@@ -198,6 +198,7 @@ namespace outrun::vr::dx11
         {
             bool present{};
             bool observed{};
+            bool sourceEvidenceExact{};
             UINT byteSize{};
             DWORD versionToken{};
             std::uint64_t hash{};
@@ -558,11 +559,15 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.vertexShader.byteSize);
             hash = hash_mix(hash, sig.vertexShader.versionToken);
             hash = hash_mix(hash, sig.vertexShader.hash);
+            hash = hash_mix(
+                hash, sig.vertexShader.sourceEvidenceExact ? 1u : 0u);
             hash = hash_mix(hash, sig.pixelShader.present ? 1u : 0u);
             hash = hash_mix(hash, sig.pixelShader.observed ? 1u : 0u);
             hash = hash_mix(hash, sig.pixelShader.byteSize);
             hash = hash_mix(hash, sig.pixelShader.versionToken);
             hash = hash_mix(hash, sig.pixelShader.hash);
+            hash = hash_mix(
+                hash, sig.pixelShader.sourceEvidenceExact ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderIntrospectionComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderMixedPair ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderTranslationExact ? 1u : 0u);
@@ -1027,20 +1032,23 @@ namespace outrun::vr::dx11
 
         template <typename TShader>
         ShaderFunctionSignature inspect_shader_function(
-            TShader* shader) noexcept
+            TShader* shader,
+            bool vertexStage) noexcept
         {
             ShaderFunctionSignature out{};
             out.present = shader != nullptr;
             if (!shader)
             {
                 out.observed = true;
+                out.sourceEvidenceExact = true;
                 return out;
             }
 
             UINT byteSize = 0;
             if (FAILED(shader->GetFunction(nullptr, &byteSize)) ||
-                byteSize < sizeof(DWORD) ||
-                byteSize > (1024u * 1024u))
+                byteSize < 2u * sizeof(DWORD) ||
+                byteSize > (1024u * 1024u) ||
+                (byteSize % sizeof(DWORD)) != 0)
                 return out;
 
             std::vector<std::uint8_t> bytecode(byteSize);
@@ -1049,18 +1057,14 @@ namespace outrun::vr::dx11
                 actual != byteSize)
                 return out;
 
-            out.observed = true;
-            out.byteSize = actual;
-            std::memcpy(
-                &out.versionToken, bytecode.data(), sizeof(out.versionToken));
-
-            std::uint64_t hash = 1469598103934665603ull;
-            for (const auto byte : bytecode)
-            {
-                hash ^= static_cast<std::uint64_t>(byte);
-                hash *= 1099511628211ull;
-            }
-            out.hash = hash;
+            const auto evidence =
+                capture_programmable_shader_function_source_evidence(
+                    bytecode.data(), actual, vertexStage);
+            out.observed = evidence.observed;
+            out.sourceEvidenceExact = evidence.exact();
+            out.byteSize = evidence.byteSize;
+            out.versionToken = evidence.versionToken;
+            out.hash = evidence.bytecodeHash;
             return out;
         }
 
@@ -1074,12 +1078,16 @@ namespace outrun::vr::dx11
         {
             SourceSignature sig{};
             sig.fixedFunction = fixedFunction;
-            sig.vertexShader = inspect_shader_function(vertexShader);
-            sig.pixelShader = inspect_shader_function(pixelShader);
+            sig.vertexShader =
+                inspect_shader_function(vertexShader, true);
+            sig.pixelShader =
+                inspect_shader_function(pixelShader, false);
             sig.shaderIntrospectionComplete =
                 shaderQueryComplete &&
                 sig.vertexShader.observed &&
-                sig.pixelShader.observed;
+                sig.pixelShader.observed &&
+                sig.vertexShader.sourceEvidenceExact &&
+                sig.pixelShader.sourceEvidenceExact;
             sig.shaderMixedPair =
                 shaderQueryComplete &&
                 ((vertexShader != nullptr) != (pixelShader != nullptr));
