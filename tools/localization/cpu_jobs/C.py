@@ -7,7 +7,7 @@ from PIL import Image,ImageDraw,ImageFont,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
-repo=Path.cwd(); run="20261005-C190-63C91067-DIAG"
+repo=Path.cwd(); run="20261005-C191-63C91067"
 out=repo/"localization/graphics/role_C"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 pd=repo/"localization/graphics/role_B/20261005-B-PRODUCTION137"
@@ -84,11 +84,27 @@ for r in c_rows:
     rgb=sa[y0:y1,x0:x1,:3]
     alpha=sa[y0:y1,x0:x1,3]>0
     navy=(rgb[:,:,0]<45)&(rgb[:,:,1]<55)&(rgb[:,:,2]<110)&alpha
-    white=(rgb.min(axis=2)>220)&((rgb.max(axis=2)-rgb.min(axis=2))<35)&alpha
-    navy_img=Image.fromarray((navy.astype(np.uint8)*255),"L")
-    near=np.asarray(navy_img.filter(ImageFilter.MaxFilter(17)))>0
-    title=(navy | (white&near))
-    # retain components tied to navy; title mask itself is already within exact C bbox.
+    light=(rgb.min(axis=2)>170)&((rgb.max(axis=2)-rgb.min(axis=2))<65)&alpha
+    combined=(navy|light)
+    # Keep only connected source-text components that contain navy-outline pixels.
+    # This excludes nearby starburst white/glow artwork that caused C189/C190's 14-pixel false positive.
+    hh,ww=combined.shape
+    seen=np.zeros((hh,ww),bool); title=np.zeros((hh,ww),bool)
+    for sy in range(hh):
+      for sx in range(ww):
+        if seen[sy,sx] or not combined[sy,sx]:
+          continue
+        stack=[(sy,sx)]; seen[sy,sx]=True; pts=[]; has_navy=False
+        while stack:
+          yy0,xx0=stack.pop(); pts.append((yy0,xx0)); has_navy = has_navy or bool(navy[yy0,xx0])
+          for dy in (-1,0,1):
+            for dx in (-1,0,1):
+              if dx==0 and dy==0: continue
+              ny,nx=yy0+dy,xx0+dx
+              if 0<=ny<hh and 0<=nx<ww and combined[ny,nx] and not seen[ny,nx]:
+                seen[ny,nx]=True; stack.append((ny,nx))
+        if has_navy and len(pts)>=8:
+          for py,px in pts: title[py,px]=True
     # guard current Korean pixels with 2px neighborhood so only old-source residue outside Korean is counted.
     rend=local_render
     guard=np.asarray(Image.fromarray((rend.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(5)))>0
@@ -113,7 +129,7 @@ for r in c_rows:
           "final_rgba":[int(v) for v in fa[py+y0,px+x0]]
         })
     navy_residue=int(np.count_nonzero(unchanged_final & navy))
-    white_residue=int(np.count_nonzero(unchanged_final & white))
+    light_residue=int(np.count_nonzero(unchanged_final & light))
     rc={
       **r,
       "independent_localized_bbox":actual,
@@ -125,7 +141,7 @@ for r in c_rows:
       "source_title_pixels_unchanged_in_clean":count(unchanged_clean),
       "source_title_pixels_unchanged_in_final_outside_korean_guard":count(unchanged_final),
       "residue_navy_pixels":navy_residue,
-      "residue_white_pixels":white_residue,
+      "residue_light_pixels":light_residue,
       "residue_points":residue_points,
       "clean_changed_pixels_in_bbox":count(clean_changed[y0:y1,x0:x1]),
       "render_pixels_in_bbox":count(local_render)
@@ -183,21 +199,21 @@ for rc in rowchecks:
         czd.ellipse((px-8,py-8,px+8,py+8),outline=(255,0,0),width=3)
         fzd.ellipse((px-8,py-8,px+8,py+8),outline=(255,0,0),width=3)
     mark.paste(cleanz,(0,34)); mark.paste(finalz,(cw,34)); md.text((6,7),"CLEAN residue markers",fill="black",font=font); md.text((cw+6,7),"FINAL residue markers",fill="black",font=font)
-    mfn=out/f"C190_ROW{rc['region_idx']}_RESIDUE_MARKERS_B64.txt"; saveb64(mark,mfn,98); evidence.append(str(mfn.relative_to(repo)))
-    fn=out/f"C190_ROW{rc['region_idx']}_DETAIL_B64.txt"; saveb64(sheet,fn,98); evidence.append(str(fn.relative_to(repo)))
+    mfn=out/f"C191_ROW{rc['region_idx']}_RESIDUE_MARKERS_B64.txt"; saveb64(mark,mfn,98); evidence.append(str(mfn.relative_to(repo)))
+    fn=out/f"C191_ROW{rc['region_idx']}_DETAIL_B64.txt"; saveb64(sheet,fn,98); evidence.append(str(fn.relative_to(repo)))
 
 overview=Image.new("RGB",(1536,530),"white"); d=ImageDraw.Draw(overview)
 for k,(lab,z) in enumerate(zip(("SOURCE","CLEAN","FINAL"),(src,clean,final))):
     zz=comp(z).resize((512,512),Image.Resampling.LANCZOS); overview.paste(zz,(k*512,18)); d.text((k*512+6,2),lab,fill="black",font=font)
-fn=out/"C190_OVERVIEW_B64.txt"; saveb64(overview,fn,95); evidence.append(str(fn.relative_to(repo)))
+fn=out/"C191_OVERVIEW_B64.txt"; saveb64(overview,fn,95); evidence.append(str(fn.relative_to(repo)))
 
 rawcard=Image.new("RGB",(1024,2070),"white")
 for i,(lab,z) in enumerate((("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_final))):
     zz=comp(z).resize((1024,1024),Image.Resampling.LANCZOS); rawcard.paste(zz,(0,i*1035+22)); ImageDraw.Draw(rawcard).text((5,i*1035+4),lab,fill="black")
-fn=out/"C190_RAW_B64.txt"; saveb64(rawcard,fn,94); evidence.append(str(fn.relative_to(repo)))
+fn=out/"C191_RAW_B64.txt"; saveb64(rawcard,fn,94); evidence.append(str(fn.relative_to(repo)))
 
 report={
- "schema_version":1,"role":"C","run":run,"qa_id":"C190","queue_index":pr["queue_index"],"asset":asset,
+ "schema_version":1,"role":"C","run":run,"qa_id":"C191","queue_index":pr["queue_index"],"asset":asset,
  "producer_run":pr["run"],"source_sha256":sp["source_sha256"],"candidate_sha256":pr["candidate_sha256"],
  "independent_source_decode_matches_producer_png":True,
  "structure":{"dimensions":dims,"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"raw_orientation":"mirror_y","header_exact":cb[:128]==sb[:128]},
@@ -206,13 +222,13 @@ report={
  "machine_checks":machine,"edge_continuity_proxy":edge,
  "machine_status":status,
  "controller_visual_qa":"PENDING_CONTROLLER_REVIEW",
- "decision":"C190_DIAGNOSTIC_PENDING_CONTROLLER_ADJUDICATION",
+ "decision":"C191_DIAGNOSTIC_PENDING_CONTROLLER_ADJUDICATION",
  "runtime_validation":"UNTESTED","preview_b64_files":evidence
 }
-(out/"C190_63C91067_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-(wr/"C190_63C91067.json").write_text(json.dumps({
- "run":run,"qa_id":"C190","index":pr["queue_index"],"asset":"63C91067","candidate_sha256":pr["candidate_sha256"],
+(out/"C191_63C91067_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(wr/"C191_63C91067.json").write_text(json.dumps({
+ "run":run,"qa_id":"C191","index":pr["queue_index"],"asset":"63C91067","candidate_sha256":pr["candidate_sha256"],
  "machine_status":status,"machine_checks":machine,
- "report":f"localization/graphics/role_C/{run}/C190_63C91067_MACHINE_QA.json","runtime_validation":"UNTESTED"
+ "report":f"localization/graphics/role_C/{run}/C191_63C91067_MACHINE_QA.json","runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"qa_id":"C190","machine_status":status,"machine_checks":machine,"row_checks":rowchecks},ensure_ascii=False))
+print(json.dumps({"qa_id":"C191","machine_status":status,"machine_checks":machine,"row_checks":rowchecks},ensure_ascii=False))
