@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C167-63C91067",
+  "qa_id": "C167",
+  "timestamp_kst": "2026-10-05T15:10:00+09:00",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION108",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "candidate_sha256": "40d7a005c7978151e01099e72317df48d44629e71661626222981745d5acb963",
+  "candidate_changed_by_C": false,
+  "producer_machine_status": "PASS_REPORTED",
+  "producer_bbox_size_positive_margin": "2/2 PASS",
+  "controller_visual_qa": "FAIL_CLEAN_PLATE_VISIBLE_RECONSTRUCTION_ARTIFACTS",
+  "visual_note": "Latest B108 removes the B105 horizontal band, but mandatory C SOURCE/CLEAN/FINAL review still finds visible reconstruction artifacts in both plates: faint title/effect-shaped smudging in the pink cloud and dark/smeared discontinuities around the upper center/spike of the lower starburst. These artifacts remain visible in FINAL around the Korean title area. Machine residue/outside counters are therefore a visual false negative.",
+  "decision": "C167_REWORK_REQUIRED_CLEAN_PLATE_VISIBLE_RECONSTRUCTION_ARTIFACTS",
+  "required_rework": "Reconstruct both clean plates from source-faithful neighboring texture without title/effect-shaped smudges or gradient/edge discontinuities, then rerun exact-pixel and controller visual QA.",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION108/B108_63C_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION108/B108_63C_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION108/B108_63C_ROW_CONTACT.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION108/B108_63C_RAW_COMPARE.jpg"
+  ],
+  "supersedes_controller_decision": "C166_REWORK_REQUIRED_CLEAN_PLATE_GRADIENT_SEAM",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
