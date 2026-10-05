@@ -46,7 +46,12 @@ OutRun2Real creates its infinite Spring and ConstantForce in separate SDL haptic
 
 The Lindbergh plugin's speed-strength staircase is retained as a comparative shape. Its thresholds were defined in a different speed scale, so C2C uses the same ten-step structure after scaling `speedRaw / 2`; this is a porting approximation, not a claim that the raw speed units are identical. Modern DD still clamps its own `speedNorm` to 0..1, while Arcade preserves 0..1.25 headroom so the reference final >500 / 100% strength band remains reachable. Captured C2C telemetry reaches `speedRaw ~= 2.239`, i.e. Arcade normalized speed ~=1.12.
 
-## Model 2 — Arcade + Modern Hybrid
+## Model 2 — Arcade + Modern Hybrid (Retired)
+
+**R11 retirement note:** this model is no longer selectable. Legacy `Model=2`
+state is folded into the complete Modern DD baseline, and saved Hybrid profiles
+are loaded as clean Modern profiles. The historical notes below are retained
+only to document the earlier experiment.
 
 Keeps the Modern DD structural steering model but swaps surface/wall/gear event behavior to the Lindbergh-derived arcade reconstruction.
 
