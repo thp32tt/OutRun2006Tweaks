@@ -1,0 +1,15 @@
+{
+  "run": "20261005-B-PRODUCTION152-DCC7",
+  "index": 32,
+  "asset": "DCC7B488",
+  "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+  "localized_physical_elements": 1,
+  "bbox_size_positive_margin": "1/1",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "outside": 0,
+  "alpha_outside": 0,
+  "worker_status": "B152_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_DCC7_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}

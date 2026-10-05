@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION152-DCC7",
+  "queue_index": 32,
+  "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+  "readiness_tier": "ZOOM_REVIEW_POSITIVELY_CLASSIFIED_AND_RENDERED_SAME_INVOCATION",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "7f8f0d10f2ac8a19bda1933d6a324a37123b48c0",
+    "source_sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e"
+  },
+  "classification": {
+    "localizable": "Total Rank",
+    "translation": "종합 랭킹",
+    "prior_queue_action": "zoom_review"
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "clean_reconstruction": {
+    "method": "B152 exact effect-bbox Coons surface from untouched canonical four-side boundary curves after B151 rectangular luminance-shift rejection",
+    "background_fit_samples": 54655,
+    "clean_source_residue": 0,
+    "clean_scope_pixels": 44115,
+    "boundary_band_px": 12
+  },
+  "source_style": {
+    "family": "white italic Total Rank with dark navy outline",
+    "font_file": "NotoSansCJK-Black.ttc",
+    "font_style": "Black,Regular",
+    "font_size": 56,
+    "stroke_width": 4,
+    "slant": 0.22,
+    "fill_rgba": [
+      255,
+      255,
+      255,
+      255
+    ],
+    "outline_rgba": [
+      8,
+      16,
+      57,
+      255
+    ]
+  },
+  "rows": [
+    {
+      "region_idx": 0,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "cell": [
+        0,
+        8,
+        1640,
+        1016
+      ],
+      "source_core_bbox": [
+        553,
+        170,
+        1058,
+        242
+      ],
+      "original_bbox": [
+        546,
+        163,
+        1065,
+        248
+      ],
+      "source_core_pixels": 16256,
+      "source_effect_mask_pixels": 31648,
+      "localized_bbox": [
+        692,
+        175,
+        919,
+        237
+      ],
+      "source_width": 505,
+      "source_height": 72,
+      "localized_width": 227,
+      "localized_height": 62,
+      "delta_left": 139,
+      "delta_right": 139,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_style": "Black,Regular",
+      "font_size": 56,
+      "stroke_width": 4,
+      "slant": 0.22,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outline_rgba": [
+        8,
+        16,
+        57,
+        255
+      ],
+      "alignment": "center"
+    }
+  ],
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 42697,
+    "changed_bbox": [
+      546,
+      163,
+      1065,
+      248
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_FINAL_READABLE.png",
+    "size": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 39578,
+    "changed_bbox": [
+      546,
+      163,
+      1065,
+      248
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "outside_allowed_effect_bbox": 0,
+    "alpha_outside": 0,
+    "render_outside_target": 0,
+    "localized_overlap": 0
+  },
+  "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "status": "B152_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
