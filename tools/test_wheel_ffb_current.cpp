@@ -160,8 +160,14 @@ int main() {
  // stone paving, and velocity-aligned drift self-steer.
  require(model_uses_r3_reverse_polarity(Model::ModernDD),"Modern R3 polarity is Reverse ON");
  require(!model_uses_r3_reverse_polarity(Model::ArcadeOriginal),"Arcade Original polarity is Reverse OFF");
- require(!model_uses_r3_reverse_polarity(Model::ArcadeHybrid),"Arcade Hybrid polarity is Reverse OFF");
+ require(!model_uses_r3_reverse_polarity(Model::ArcadeHybrid),"Arcade Hybrid Arcade-event polarity is Reverse OFF");
  require(!model_uses_r3_reverse_polarity(Model::PS2OriginalExperimental),"PS2 polarity is Reverse OFF");
+ require(model_uses_r3_structural_reverse_polarity(Model::ModernDD),"Modern structural SAT uses R3 reverse polarity");
+ require(model_uses_r3_structural_reverse_polarity(Model::ArcadeHybrid),"Hybrid Modern structural SAT uses R3 reverse polarity");
+ require(!model_uses_r3_structural_reverse_polarity(Model::ArcadeOriginal),"Arcade Original structural fallback keeps Original polarity");
+ require(model_uses_r3_spring_reverse_polarity(Model::ModernDD),"Modern Spring uses R3 reverse polarity");
+ require(model_uses_r3_spring_reverse_polarity(Model::ArcadeHybrid),"Hybrid Spring follows Modern structural polarity");
+ require(!model_uses_r3_spring_reverse_polarity(Model::PS2OriginalExperimental),"PS2 Spring keeps Original polarity");
 
  std::array<unsigned,4> imperialStoneA={PrimaryAsphaltSurfaceMask,ImperialAvenueCompanionPavingMask,PrimaryAsphaltSurfaceMask,ImperialAvenueCompanionPavingMask};
  std::array<unsigned,4> imperialAsphalt={PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask};
