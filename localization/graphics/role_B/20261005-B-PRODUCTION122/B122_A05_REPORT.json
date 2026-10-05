@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION122",
+  "queue_index": 28,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+  "readiness_tier": "ZOOM_REVIEW_PROMOTED_TO_RENDER_COMPLETED_SAME_INVOCATION",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "1ed3fc83fc0501ac6420c0b3e3c51b7f0c9b1374",
+    "atlas_git_blob_sha1": "a3e4b8b6cdc953ad1f83a7bbba679f1f71fbf2b2",
+    "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129"
+  },
+  "semantic_binding": {
+    "region0": "Total Rank -> 종합 랭킹",
+    "region1": "lens flare artwork -> preserve"
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "row": {
+    "region_idx": 0,
+    "source": "Total Rank",
+    "korean": "종합 랭킹",
+    "original_bbox": [
+      397,
+      1117,
+      1053,
+      1275
+    ],
+    "localized_bbox": [
+      456,
+      1144,
+      994,
+      1248
+    ],
+    "source_width": 656,
+    "source_height": 158,
+    "localized_width": 538,
+    "localized_height": 104,
+    "delta_left": 59,
+    "delta_right": 59,
+    "delta_top": 27,
+    "delta_bottom": 27,
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "font_file": "NotoSansCJK-Black.ttc",
+    "font_style": "Black,Regular",
+    "font_size": 95,
+    "stroke_width": 7,
+    "slant": 0.22,
+    "tracking_px": 36,
+    "fill_rgba": [
+      255,
+      255,
+      255,
+      255
+    ],
+    "outline_rgba": [
+      8,
+      16,
+      57,
+      255
+    ],
+    "alignment": "center"
+  },
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION122/A05_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION122/A05_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 45057,
+    "changed_bbox": [
+      397,
+      1117,
+      1053,
+      1272
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION122/A05_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION122/A05_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 63960,
+    "changed_bbox": [
+      397,
+      1117,
+      1053,
+      1272
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "outside": 0,
+    "alpha_outside": 0,
+    "render_outside_target": 0,
+    "protected_lens_flare_cell_changed": 0,
+    "localized_overlap": 0
+  },
+  "candidate_sha256": "242868cabaf5641dd82f22f906c2e711d4222a7c51c4867d29c5f215be1c4973",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B122_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
