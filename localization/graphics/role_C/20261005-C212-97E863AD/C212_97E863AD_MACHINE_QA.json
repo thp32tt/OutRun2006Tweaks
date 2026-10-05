@@ -1,0 +1,574 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C212-97E863AD",
+  "qa_id": "C212",
+  "queue_index": 193,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "producer_run": "20261005-A-PRODUCTION70-REWORK",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "candidate_sha256": "b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "source_bbox_exact_match_all": true,
+  "candidate_bbox_exact_match_all": true,
+  "row_checks": [
+    {
+      "region_idx": 1,
+      "source": "View OutRun single player rankings!",
+      "korean": "OutRun 싱글 플레이 랭킹 보기",
+      "independent_source_bbox": [
+        7,
+        704,
+        1076,
+        770
+      ],
+      "producer_source_bbox": [
+        7,
+        704,
+        1076,
+        770
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        406,
+        707,
+        870,
+        767
+      ],
+      "producer_localized_bbox": [
+        406,
+        707,
+        870,
+        767
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 399,
+      "delta_right": 206,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.4341,
+      "localized_to_source_height_ratio": 0.9091
+    },
+    {
+      "region_idx": 2,
+      "source": "View OutRun2SP arcade rankings!",
+      "korean": "OutRun2SP 아케이드 랭킹 보기",
+      "independent_source_bbox": [
+        7,
+        544,
+        1059,
+        610
+      ],
+      "producer_source_bbox": [
+        7,
+        544,
+        1059,
+        610
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        540,
+        547,
+        944,
+        607
+      ],
+      "producer_localized_bbox": [
+        540,
+        547,
+        944,
+        607
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 533,
+      "delta_right": 115,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.384,
+      "localized_to_source_height_ratio": 0.9091
+    },
+    {
+      "region_idx": 3,
+      "source": "View the online multiplayer rankings!",
+      "korean": "온라인 멀티플레이 랭킹 보기",
+      "independent_source_bbox": [
+        7,
+        384,
+        1137,
+        450
+      ],
+      "producer_source_bbox": [
+        7,
+        384,
+        1137,
+        450
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        11,
+        387,
+        615,
+        447
+      ],
+      "producer_localized_bbox": [
+        11,
+        387,
+        615,
+        447
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 522,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.5345,
+      "localized_to_source_height_ratio": 0.9091
+    },
+    {
+      "region_idx": 4,
+      "source": "SHOWROOM (OUTRUN line preserved)",
+      "korean": "쇼룸",
+      "independent_source_bbox": [
+        1205,
+        957,
+        1594,
+        1011
+      ],
+      "producer_source_bbox": [
+        1205,
+        957,
+        1594,
+        1011
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        1209,
+        960,
+        1297,
+        1008
+      ],
+      "producer_localized_bbox": [
+        1209,
+        960,
+        1297,
+        1008
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 297,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.2262,
+      "localized_to_source_height_ratio": 0.8889
+    },
+    {
+      "region_idx": 5,
+      "source": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "independent_source_bbox": [
+        8,
+        297,
+        540,
+        359
+      ],
+      "producer_source_bbox": [
+        8,
+        297,
+        540,
+        359
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        12,
+        300,
+        228,
+        356
+      ],
+      "producer_localized_bbox": [
+        12,
+        300,
+        228,
+        356
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 312,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.406,
+      "localized_to_source_height_ratio": 0.9032
+    },
+    {
+      "region_idx": 6,
+      "source": "Goal E",
+      "korean": "골 E",
+      "independent_source_bbox": [
+        1011,
+        308,
+        1171,
+        355
+      ],
+      "producer_source_bbox": [
+        1011,
+        308,
+        1171,
+        355
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        1015,
+        311,
+        1079,
+        351
+      ],
+      "producer_localized_bbox": [
+        1015,
+        311,
+        1079,
+        351
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 92,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.4,
+      "localized_to_source_height_ratio": 0.8511
+    },
+    {
+      "region_idx": 7,
+      "source": "Goal D",
+      "korean": "골 D",
+      "independent_source_bbox": [
+        1473,
+        308,
+        1629,
+        355
+      ],
+      "producer_source_bbox": [
+        1473,
+        308,
+        1629,
+        355
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        1477,
+        311,
+        1545,
+        351
+      ],
+      "producer_localized_bbox": [
+        1477,
+        311,
+        1545,
+        351
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 84,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.4359,
+      "localized_to_source_height_ratio": 0.8511
+    },
+    {
+      "region_idx": 8,
+      "source": "Goal C",
+      "korean": "골 C",
+      "independent_source_bbox": [
+        30,
+        221,
+        188,
+        268
+      ],
+      "producer_source_bbox": [
+        30,
+        221,
+        188,
+        268
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        34,
+        224,
+        98,
+        264
+      ],
+      "producer_localized_bbox": [
+        34,
+        224,
+        98,
+        264
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 90,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.4051,
+      "localized_to_source_height_ratio": 0.8511
+    },
+    {
+      "region_idx": 9,
+      "source": "Goal B",
+      "korean": "골 B",
+      "independent_source_bbox": [
+        492,
+        221,
+        648,
+        268
+      ],
+      "producer_source_bbox": [
+        492,
+        221,
+        648,
+        268
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        496,
+        224,
+        560,
+        264
+      ],
+      "producer_localized_bbox": [
+        496,
+        224,
+        560,
+        264
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 88,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.4103,
+      "localized_to_source_height_ratio": 0.8511
+    },
+    {
+      "region_idx": 10,
+      "source": "Goal A",
+      "korean": "골 A",
+      "independent_source_bbox": [
+        950,
+        221,
+        1115,
+        268
+      ],
+      "producer_source_bbox": [
+        950,
+        221,
+        1115,
+        268
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        954,
+        224,
+        1018,
+        264
+      ],
+      "producer_localized_bbox": [
+        954,
+        224,
+        1018,
+        264
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 97,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.3879,
+      "localized_to_source_height_ratio": 0.8511
+    },
+    {
+      "region_idx": 11,
+      "source": "15 Cont.",
+      "korean": "15코스",
+      "independent_source_bbox": [
+        1413,
+        221,
+        1622,
+        268
+      ],
+      "producer_source_bbox": [
+        1413,
+        221,
+        1622,
+        268
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        1417,
+        226,
+        1525,
+        262
+      ],
+      "producer_localized_bbox": [
+        1417,
+        226,
+        1525,
+        262
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 97,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.5167,
+      "localized_to_source_height_ratio": 0.766
+    },
+    {
+      "region_idx": 14,
+      "source": "WELCOME TO THE",
+      "korean": "환영합니다",
+      "independent_source_bbox": [
+        3,
+        148,
+        476,
+        195
+      ],
+      "producer_source_bbox": [
+        3,
+        148,
+        476,
+        195
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        7,
+        151,
+        155,
+        191
+      ],
+      "producer_localized_bbox": [
+        7,
+        151,
+        155,
+        191
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 321,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.3129,
+      "localized_to_source_height_ratio": 0.8511
+    },
+    {
+      "region_idx": 16,
+      "source": "ONLINE",
+      "korean": "온라인",
+      "independent_source_bbox": [
+        1660,
+        156,
+        1832,
+        194
+      ],
+      "producer_source_bbox": [
+        1660,
+        156,
+        1832,
+        194
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        1664,
+        159,
+        1732,
+        191
+      ],
+      "producer_localized_bbox": [
+        1664,
+        159,
+        1732,
+        191
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 4,
+      "delta_right": 100,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.3953,
+      "localized_to_source_height_ratio": 0.8421
+    }
+  ],
+  "row_gate": "13/13 PASS",
+  "machine_checks": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_script_exact_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "protected_changed_pixels": 0
+  },
+  "protected_pixel_changes": {
+    "region_0": 0,
+    "inline_token_1": 0,
+    "inline_token_2": 0,
+    "idx4_OUTRUN_top": 0,
+    "region_12": 0,
+    "region_13": 0,
+    "region_15": 0,
+    "region_17": 0
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "preview_files": [
+    "localization/graphics/role_C/20261005-C212-97E863AD/C212_SOURCE_CLEAN_FINAL_CONTACTS.jpg",
+    "localization/graphics/role_C/20261005-C212-97E863AD/C212_RAW_COMPARE.jpg"
+  ]
+}
