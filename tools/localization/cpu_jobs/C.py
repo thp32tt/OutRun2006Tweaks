@@ -7,11 +7,11 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
-repo=Path.cwd(); run="20261005-C181-63C91067"
+repo=Path.cwd(); run="20261005-C182-63C91067"
 out=repo/"localization/graphics/role_C"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
-pd=repo/"localization/graphics/role_B/20261005-B-PRODUCTION131"
-pr=json.loads((pd/"B131_63C_REPORT.json").read_text())
+pd=repo/"localization/graphics/role_B/20261005-B-PRODUCTION132"
+pr=json.loads((pd/"B132_63C_REPORT.json").read_text())
 asset=pr["asset"]; candidate=repo/pr["candidate_path"]
 sp=pr["source_provenance"]; expected_source_sha=sp["source_sha256"]; expected_candidate_sha=pr["candidate_sha256"]
 folder=asset.split("/")[-2]; name=asset.split("/")[-1]
@@ -114,25 +114,25 @@ for i,rc in enumerate(rowchecks):
     sheet=Image.new("RGB",(cw*3,ch+30),"white"); d=ImageDraw.Draw(sheet)
     for k,(lab,z) in enumerate(zip(("SOURCE","CLEAN","FINAL"),ims)):
         sheet.paste(z,(k*cw,30)); d.text((k*cw+5,6),lab,fill="black",font=font)
-    fn=out/f"C181_ROW{i}_DETAIL_B64.txt"; saveb64(sheet,fn,97); evidence.append(str(fn.relative_to(repo)))
+    fn=out/f"C182_ROW{i}_DETAIL_B64.txt"; saveb64(sheet,fn,97); evidence.append(str(fn.relative_to(repo)))
 # overview source/clean/final downscaled.
 overview=Image.new("RGB",(1536,530),"white"); od=ImageDraw.Draw(overview)
 for k,(lab,z) in enumerate(zip(("SOURCE","CLEAN","FINAL"),(src,clean,final))):
     zz=comp(z).resize((512,512),Image.Resampling.LANCZOS); overview.paste(zz,(k*512,18)); od.text((k*512+5,2),lab,fill="black",font=font)
-fn=out/"C181_OVERVIEW_B64.txt"; saveb64(overview,fn,94); evidence.append(str(fn.relative_to(repo)))
+fn=out/"C182_OVERVIEW_B64.txt"; saveb64(overview,fn,94); evidence.append(str(fn.relative_to(repo)))
 rawcard=Image.new("RGB",(1024,2070),"white")
 for i,(lab,z) in enumerate((("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_final))):
     zz=comp(z).resize((1024,1024),Image.Resampling.LANCZOS); rawcard.paste(zz,(0,i*1035+22)); ImageDraw.Draw(rawcard).text((5,i*1035+4),lab,fill="black")
-fn=out/"C181_RAW_B64.txt"; saveb64(rawcard,fn,92); evidence.append(str(fn.relative_to(repo)))
+fn=out/"C182_RAW_B64.txt"; saveb64(rawcard,fn,92); evidence.append(str(fn.relative_to(repo)))
 
-report={"schema_version":1,"role":"C","run":run,"qa_id":"C181","queue_index":pr["queue_index"],"asset":asset,
+report={"schema_version":1,"role":"C","run":run,"qa_id":"C182","queue_index":pr["queue_index"],"asset":asset,
  "producer_run":pr["run"],"source_sha256":expected_source_sha,"candidate_sha256":expected_candidate_sha,
  "independent_source_decode_matches_producer_png":True,
  "structure":{"dimensions":dims,"format":"RGBA32","mipmaps":mips,"raw_orientation":"mirror_y","header_exact":cb[:128]==sb[:128]},
  "row_checks":rowchecks,"all_2_bbox_size_positive_margin_pass":rowpass,"machine_checks":machine,"edge_continuity_proxy":edge_stats,
  "machine_status":status,"controller_visual_qa":"PENDING_CONTROLLER_REVIEW",
- "decision":"PENDING_CONTROLLER_VISUAL_QA" if status=="PASS" else "C181_REWORK_REQUIRED_MACHINE_GATE",
+ "decision":"PENDING_CONTROLLER_VISUAL_QA" if status=="PASS" else "C182_REWORK_REQUIRED_MACHINE_GATE",
  "runtime_validation":"UNTESTED","preview_b64_files":evidence}
-(out/"C181_63C91067_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-(wr/"C181_63C91067.json").write_text(json.dumps({"run":run,"qa_id":"C181","index":pr["queue_index"],"asset":"63C91067","candidate_sha256":expected_candidate_sha,"machine_status":status,"machine_checks":machine,"report":f"localization/graphics/role_C/{run}/C181_63C91067_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"qa_id":"C181","machine_status":status,"machine_checks":machine,"edge_continuity_proxy":edge_stats},ensure_ascii=False))
+(out/"C182_63C91067_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(wr/"C182_63C91067.json").write_text(json.dumps({"run":run,"qa_id":"C182","index":pr["queue_index"],"asset":"63C91067","candidate_sha256":expected_candidate_sha,"machine_status":status,"machine_checks":machine,"report":f"localization/graphics/role_C/{run}/C182_63C91067_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"qa_id":"C182","machine_status":status,"machine_checks":machine,"edge_continuity_proxy":edge_stats},ensure_ascii=False))
