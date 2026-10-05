@@ -1,0 +1,19 @@
+{
+  "run": "B160",
+  "index": 52,
+  "asset": "A8CE339F",
+  "candidate_sha256": "cb3912619253e9697487807ce50e0b3bc76ffb3a196e5b9c8723474f22170136",
+  "localized_semantic_segments": 3,
+  "localized_physical_elements": 5,
+  "bbox_size_positive_margin": "5/5 PASS",
+  "outside": 0,
+  "alpha_outside": 0,
+  "introduced_visible_outside": 0,
+  "source_residue": 0,
+  "protected_atlas_changed_pixels": 0,
+  "overlap": 0,
+  "touch": 0,
+  "worker_status": "B160_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "report": "localization/graphics/role_B/20261006-B-PRODUCTION160-A8CE-BC3-SCALE/B160_A8CE_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}
