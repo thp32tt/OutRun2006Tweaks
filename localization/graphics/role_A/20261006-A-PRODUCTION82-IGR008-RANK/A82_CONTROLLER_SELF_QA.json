@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION82-IGR008-RANK",
+  "timestamp_kst": "2026-10-06T03:09:02+09:00",
+  "queue_index": 49,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+  "user_ingame_regressions": [
+    "IGR-008",
+    "IGR-011"
+  ],
+  "input_candidate_sha256": "7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68",
+  "candidate_sha256": "3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37",
+  "mapping": {
+    "graphics_status": "EXACT_HIGH_CONFIDENCE",
+    "graphics_asset": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+    "basis": "Reported rank popup family combines B1696633 Next Stage UI with BF3EE5C6 localized Rank sprite and preserved A-E rank-grade glyph artwork. A82 changes only the BF3 Rank sprite; A/B/C/D/E badge-grade art remains source/C111-exact.",
+    "mixed_runtime_status": "UNRESOLVED",
+    "backlog_rows_remain_open": true
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "1/1 PASS",
+    "changed_outside_rank_bbox": 0,
+    "alpha_outside_rank_bbox": 0,
+    "protected_pixels_changed": 0,
+    "clean_changed_outside_rank_bbox": 0,
+    "clean_protected_changed": 0,
+    "render_outside_rank_bbox": 0,
+    "source_rank_residue_outside_new_glyph_guard": 0
+  },
+  "style_qa": {
+    "native_hd_render": true,
+    "font": "Noto Sans CJK KR Black",
+    "native_font_size_px": 112,
+    "horizontal_source_proportion_scale": 1.2,
+    "shear": 0.29,
+    "old_low_resolution_bitmap_reused": false,
+    "source_family": "silver/lavender glossy italic rank label with dark keyline, pale rim and offset depth"
+  },
+  "controller_visual_observations": [
+    "SOURCE/CLEAN/OLD/A82 focus shows the old Korean Rank label replaced by a visibly sharper native-resolution Hangul render with source-family silver/lavender gloss, dark inner keyline, pale rim and offset depth.",
+    "A82 Rank keeps the source right-leaning transform and materially improves width/proportion versus the old compact label while staying inside the exact Rank effect bbox with positive margins.",
+    "Full readable comparison shows the other 12 localized BF3 labels and all protected joystick/car/heart/rank-grade/numeric artwork unchanged.",
+    "Raw mirror_y comparison preserves atlas orientation and shows no clipping, overlap, English residue, foreign-image intrusion or broken Hangul in the touched Rank sprite."
+  ],
+  "controller_visual_qa": "PASS_GRAPHICS_PORTION_NATIVE_RANK_LABEL_PENDING_C_MIXED_RUNTIME_MAPPING_AND_INGAME",
+  "status": "A82_GRAPHICS_STATIC_PASS_PENDING_C_MIXED_RUNTIME_MAPPING_AND_INGAME_RETEST",
+  "pending_independent_c_static_qa": true,
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "backlog_close_allowed": false,
+  "producer_report": "localization/graphics/role_A/20261006-A-PRODUCTION82-IGR008-RANK/A82_IGR008_BF3_REPORT.json",
+  "visual_evidence": [
+    "localization/graphics/role_A/20261006-A-PRODUCTION82-IGR008-RANK/A82_IGR008_RANK_CONTEXT.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION82-IGR008-RANK/A82_BF3_SOURCE_OLD_FINAL.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION82-IGR008-RANK/A82_BF3_FINAL_RAW_MIRROR_Y.jpg"
+  ],
+  "vr_ffb_dx11_dxvk_changes": false
+}

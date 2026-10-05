@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A82 P0 IGR-008 (+IGR-011 template) BF3 graphics portion 3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37 static self-QA PASS; pending C. MIXED runtime/modal mapping remains OPEN; do not redraw BF3 Rank again unless C/new game evidence fails. A85 IGR-012 clean-plate retry compute pending.",
     "B163 P0 index106 788CE557 candidate bb8f96c0590c350c99fcd0414db33249451400d49eb46852ccb7cc82c3725d0c static self-QA PASS after B162 visual rejection. Exact-HD 2048x1024 RGBA32/raw mirror_y; For Experts + Transmission x2 + Music Change + Time remaining localized, OutRun2SP exact-protected; 5/5 bbox/size/margin and zero residue/outside/protected/overlap/touch; controller SOURCE/CLEAN/FINAL+raw visual PASS. IGR-017 pending independent C + NEW in-game retest, not closed. IGR-005 remains OPEN MIXED with graphics portion repaired but modal/runtime source split unresolved. Next B exact-mapped P1 is IGR-009 index48 B1696633.",
     "C221 approved A83 index95 37759842 static graphics QA; IGR-014/015/016 remain pending NEW actual in-game retest. Do not rework 37759842 again unless new game evidence fails. Continue active user backlog by owner lane (notably index106 B and index48 B) and consume only producer-finalized candidates.",
     "A81 P0 37759842 e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7: IGR-014/015/016 material rework static self-QA PASS; pending independent C and NEW in-game retest; backlog not closed.",
@@ -4070,7 +4071,9 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [],
+  "current_pending_c": [
+    "BF3EE5C6"
+  ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -5050,5 +5053,35 @@
     "machine_report": "localization/graphics/role_C/20261006-C221-37759842-A83/C221_37759842_MACHINE_QA.json",
     "controller_report": "localization/graphics/role_C/20261006-C221-37759842-A83/C221_37759842_CONTROLLER_FINAL_QA.json",
     "batch_report": "localization/graphics/role_C/20261006-C221-BATCH/C221_BATCH_FINAL_QA.json"
+  },
+  "a_production82_igr008_bf3": {
+    "timestamp_kst": "2026-10-06T03:09:02+09:00",
+    "run": "20261006-A-PRODUCTION82-IGR008-RANK",
+    "queue_index": 49,
+    "asset": "BF3EE5C6",
+    "candidate_sha256": "3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37",
+    "prior_candidate_sha256": "7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68",
+    "status": "A82_GRAPHICS_STATIC_PASS_PENDING_C_MIXED_RUNTIME_MAPPING_AND_INGAME_RETEST",
+    "user_ingame_regressions": [
+      "IGR-008",
+      "IGR-011"
+    ],
+    "machine_qa": {
+      "bbox_size_positive_margin": "1/1 PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "protected_changed": 0,
+      "clean_outside": 0,
+      "clean_protected": 0,
+      "render_outside": 0,
+      "source_residue": 0
+    },
+    "controller_visual_qa": "PASS_GRAPHICS_PORTION_NATIVE_RANK_LABEL_PENDING_C_MIXED_RUNTIME_MAPPING_AND_INGAME",
+    "mixed_runtime_mapping": "UNRESOLVED",
+    "pending_independent_c_static_qa": true,
+    "pending_new_ingame_retest": true,
+    "report": "localization/graphics/role_A/20261006-A-PRODUCTION82-IGR008-RANK/A82_IGR008_BF3_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION82-IGR008-RANK/A82_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "PENDING_NEW_INGAME_RETEST"
   }
 }
