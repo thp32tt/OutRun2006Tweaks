@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION45",
+  "index": 95,
+  "asset": "37759842",
+  "candidate_sha256": "68e31ca94c9003cd0acd572fdcecf17d52c56b6848ee558c1359d87b6d382fcd",
+  "worker_static_qa": "PASS_33_OF_33_ALL_REPORTED_ZERO_GATES",
+  "controller_visual_qa": "FAIL",
+  "findings": [
+    "CLEAN retains visible YES/NO letter silhouettes.",
+    "CLEAN retains Time Attack/Heart Attack/OutRun source-word contours on multiple mode plates.",
+    "Continuous-course clean plates show non-source polygonal donor boundaries.",
+    "RANDOM clean plate retains source-title tonal structure."
+  ],
+  "decision": "A45_REWORK_REQUIRED_SOURCE_SHAPED_CLEAN_PLATE_ARTIFACTS",
+  "retry_history": "A41 harmonic, A42 row-span interpolation, A44 fitted source field and A45 exact background-class donor were all rejected by mandatory controller visual QA; numeric zero-residue counters do not override visible artifacts.",
+  "next_required_method": "manual/template reconstruction from source-faithful plate geometry; do not repeat the rejected inpaint families",
+  "runtime_validation": "UNTESTED",
+  "prohibited_domains_untouched": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
