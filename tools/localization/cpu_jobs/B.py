@@ -7,14 +7,14 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter,ImageOps
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("worker B only")
 repo=Path.cwd()
-run="20261005-B-PRODUCTION112"
+run="20261005-B-PRODUCTION113"
 out=repo/"localization/graphics/role_B"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset; candidate.parent.mkdir(parents=True,exist_ok=True)
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
-tmp=Path("/tmp/b112"); tmp.mkdir(exist_ok=True)
+tmp=Path("/tmp/b113"); tmp.mkdir(exist_ok=True)
 dds=tmp/"src.dds"; atlas=tmp/"atlas.json"
 urllib.request.urlretrieve(BASE+"/Release/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",dds)
 urllib.request.urlretrieve(BASE+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_CLAR_RANK_Exst/4x_A05BF610_512x512_atlas.json",atlas)
@@ -44,31 +44,47 @@ if regs[0]["rect"]!=[0,1032,1640,1016] or regs[1]["rect"]!=[0,16,1016,1016]: rai
 
 # Region 0 is the oval Total Rank plate; region 1 is protected lens-flare artwork.
 x,y,cw,ch=regs[0]["rect"]
-rx0=x+int(cw*.18); rx1=x+int(cw*.82)
-ry0=y+int(ch*.02); ry1=y+int(ch*.38)
+rx0=x+int(cw*.12); rx1=x+int(cw*.88)
+ry0=y+int(ch*.02); ry1=y+int(ch*.34)
 roi=sa[ry0:ry1,rx0:rx1]
 r=roi[:,:,0].astype(np.int16); g=roi[:,:,1].astype(np.int16); b=roi[:,:,2].astype(np.int16); a=roi[:,:,3]
 white=(a>32)&(r>220)&(g>220)&(b>220)&((np.maximum.reduce([r,g,b])-np.minimum.reduce([r,g,b]))<24)
 navy=(a>32)&(b>r+10)&(b>g+5)&(r<110)&(g<110)&(b<180)
-# White fill seeds isolate title from cyan/navy oval border.
-ys,xs=np.nonzero(white)
-if len(xs)<500: raise RuntimeError(("white title seed too small",len(xs)))
-# Restrict to the central title cluster, rejecting isolated highlight pixels.
-mx=np.median(xs); my=np.median(ys)
-sel=(np.abs(xs-mx)<cw*.24)&(np.abs(ys-my)<ch*.10)
-sx=xs[sel]; sy=ys[sel]
-if len(sx)<500: raise RuntimeError(("title cluster too small",len(sx)))
-ux0=max(0,int(sx.min())-18); ux1=min(roi.shape[1],int(sx.max())+19)
-uy0=max(0,int(sy.min())-18); uy1=min(roi.shape[0],int(sy.max())+19)
-core=np.zeros_like(white); core[uy0:uy1,ux0:ux1]=(white|navy)[uy0:uy1,ux0:ux1]
+
+# Isolate the dark title outline by connected components. The oval navy border is one
+# very large component; title letters are compact components near the upper center.
+from scipy import ndimage as ndi
+lab,ncomp=ndi.label(navy)
+parts=[]
+for k in range(1,ncomp+1):
+    yy,xx=np.nonzero(lab==k)
+    if len(xx)<80:
+        continue
+    x0=int(xx.min()); x1=int(xx.max())+1; y0=int(yy.min()); y1=int(yy.max())+1
+    bw=x1-x0; bh=y1-y0; cx=(x0+x1)/2; cy=(y0+y1)/2
+    if 8<=bw<=260 and 18<=bh<=150 and roi.shape[1]*.15<cx<roi.shape[1]*.85 and roi.shape[0]*.05<cy<roi.shape[0]*.70:
+        parts.append((len(xx),x0,y0,x1,y1))
+if len(parts)<4:
+    raise RuntimeError(("insufficient title navy components",len(parts),sorted(parts,reverse=True)[:12]))
+# Keep the compact letter components clustered around the median component y-center.
+centers=np.array([((p[1]+p[3])/2,(p[2]+p[4])/2) for p in parts],dtype=np.float32)
+medy=float(np.median(centers[:,1]))
+parts=[p for p in parts if abs(((p[2]+p[4])/2)-medy)<70]
+if len(parts)<4:
+    raise RuntimeError(("title component y cluster too small",len(parts),medy))
+ux0=max(0,min(p[1] for p in parts)-5); uy0=max(0,min(p[2] for p in parts)-5)
+ux1=min(roi.shape[1],max(p[3] for p in parts)+5); uy1=min(roi.shape[0],max(p[4] for p in parts)+5)
+core=np.zeros_like(white)
+core[uy0:uy1,ux0:ux1]=(white|navy)[uy0:uy1,ux0:ux1]
 cy,cx=np.nonzero(core)
-if len(cx)<1000: raise RuntimeError(("title core too small",len(cx)))
+if len(cx)<1000: raise RuntimeError(("title core too small",len(cx),[ux0,uy0,ux1,uy1]))
 m=np.zeros((H,W),bool); m[ry0:ry1,rx0:rx1]=core
 source_mask=Image.fromarray((m.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(7))
 sm=np.asarray(source_mask)>0
 ys2,xs2=np.nonzero(sm)
 ob=[int(xs2.min()),int(ys2.min()),int(xs2.max())+1,int(ys2.max())+1]
-if (ob[2]-ob[0])>cw*.55 or (ob[3]-ob[1])>ch*.16: raise RuntimeError(("title bbox implausible",ob))
+if (ob[2]-ob[0])>cw*.48 or (ob[3]-ob[1])>ch*.16:
+    raise RuntimeError(("title bbox implausible",ob,"parts",parts))
 allowed=Image.new("L",(W,H),0); ImageDraw.Draw(allowed).rectangle((ob[0],ob[1],ob[2]-1,ob[3]-1),fill=255)
 protected=ImageOps.invert(allowed)
 
@@ -106,8 +122,8 @@ clean=Image.fromarray(clean_arr,"RGBA")
 source_png=out/"A05_SOURCE_READABLE.png"; clean_png=out/"A05_CLEAN_PLATE.png"; smp=out/"A05_SOURCE_TEXT_MASK.png"; ap=out/"A05_ALLOWED_BBOX_MASK.png"; pp=out/"A05_PROTECTED_MASK.png"
 src.save(source_png); clean.save(clean_png); source_mask.save(smp); allowed.save(ap); protected.save(pp)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(smp),"--protected-mask",str(pp),"--report",str(out/"B112_CLEAN_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B112_CLEAN_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(smp),"--protected-mask",str(pp),"--report",str(out/"B113_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B113_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 unchanged=count(ImageChops.multiply(source_mask,ImageOps.invert(diffmask(src,clean))))
 if unchanged!=0: raise RuntimeError(("source mask unchanged",unchanged))
@@ -156,8 +172,8 @@ if payload[:128]!=sb[:128]: raise RuntimeError("header drift")
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode); dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip")
 final_png=out/"A05_FINAL_DECODED_READABLE.png"; dec.save(final_png)
-subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B112_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"B112_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B113_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"B113_FINAL_VALIDATION.json").read_text())
 if finalrep["status"]!="PASS": raise RuntimeError(("final validator",finalrep))
 diff=diffmask(src,dec); outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
 alphaout=count(ImageChops.multiply(bmask(ImageChops.difference(src.getchannel("A"),dec.getchannel("A"))),ImageOps.invert(allowed)))
@@ -171,16 +187,16 @@ if outside or alphaout or render_out or protected_cell_changes: raise RuntimeErr
 sheet=Image.new("RGB",(1024,3*1050),"white")
 for i,(lab,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,1024),Image.Resampling.LANCZOS); sheet.paste(z,(0,i*1050+26)); ImageDraw.Draw(sheet).text((5,i*1050+5),lab,fill="black")
-sheet.save(out/"B112_A05_SOURCE_CLEAN_FINAL.jpg",quality=96)
+sheet.save(out/"B113_A05_SOURCE_CLEAN_FINAL.jpg",quality=96)
 margin=40; box=(max(0,ob[0]-margin),max(0,ob[1]-margin),min(W,ob[2]+margin),min(H,ob[3]+margin))
 ims=[comp(z.crop(box)) for z in [src,clean,dec]]
 row=Image.new("RGB",(sum(i.width for i in ims)+16,max(i.height for i in ims)+28),"white"); xx=0
 for im in ims: row.paste(im,(xx,28)); xx+=im.width+8
-ImageDraw.Draw(row).text((4,4),"Total Rank -> 종합 랭킹   SOURCE | CLEAN | FINAL",fill="black"); row.save(out/"B112_A05_ROW_CONTACT.jpg",quality=96)
+ImageDraw.Draw(row).text((4,4),"Total Rank -> 종합 랭킹   SOURCE | CLEAN | FINAL",fill="black"); row.save(out/"B113_A05_ROW_CONTACT.jpg",quality=96)
 rr=Image.new("RGB",(1024,2*1050),"white")
 for i,(lab,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); rr.paste(z,(0,i*1050+26)); ImageDraw.Draw(rr).text((5,i*1050+5),lab,fill="black")
-rr.save(out/"B112_A05_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"B113_A05_RAW_COMPARE.jpg",quality=96)
 
 report={"schema_version":1,"role":"B","run":run,"queue_index":28,"asset":asset,
  "readiness_tier":"ZOOM_REVIEW_PROMOTED_TO_RENDER_COMPLETED_SAME_INVOCATION",
@@ -196,11 +212,11 @@ report={"schema_version":1,"role":"B","run":run,"queue_index":28,"asset":asset,
  "decoded_changes":{"outside":outside,"alpha_outside":alphaout,"render_outside_target":render_out,"protected_lens_flare_cell_changed":protected_cell_changes,"localized_overlap":0},
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"B112_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
-(out/"B112_A05_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "status":"B113_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
+(out/"B113_A05_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":28,"asset":"A05BF610","source_sha256":sha(sb),"candidate_sha256":csha,"localized_physical_elements":1,
  "bbox_size_positive_margin":"1/1","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "outside":outside,"alpha_outside":alphaout,"protected_lens_flare_cell_changed":protected_cell_changes,
- "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B112_A05_REPORT.json"}
-(wr/"B112_A05BF610.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B113_A05_REPORT.json"}
+(wr/"B113_A05BF610.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False))
