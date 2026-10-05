@@ -1,0 +1,11 @@
+{
+  "run": "20261005-C173-A05BF610",
+  "qa_id": "C173",
+  "asset": "A05BF610",
+  "index": 28,
+  "candidate_sha256": "d124775363f3e989a312d13fa0ee17436a28cd927837933b0ea9c8a98a89e6a2",
+  "machine_status": "REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+  "source_residue_pixels": 20638,
+  "report": "localization/graphics/role_C/20261005-C173-A05BF610/C173_A05_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}

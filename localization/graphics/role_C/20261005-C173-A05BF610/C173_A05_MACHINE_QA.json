@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C173-A05BF610",
+  "qa_id": "C173",
+  "queue_index": 28,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION115",
+  "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+  "candidate_sha256": "d124775363f3e989a312d13fa0ee17436a28cd927837933b0ea9c8a98a89e6a2",
+  "candidate_changed_by_C": false,
+  "independent_method": "Pinned canonical source re-download; exact DDS header/hash/readable+raw orientation; independent white/navy title-core detection in oval title band; exact changed-pixel containment; unchanged canonical source-core residue detection outside changed-pixel guard.",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "source_effect_bbox": [
+    397,
+    1117,
+    1053,
+    1275
+  ],
+  "machine_checks": {
+    "decoded_changed_outside_source_effect_bbox": 0,
+    "alpha_changed_outside_source_effect_bbox": 0,
+    "unchanged_source_title_core_residue_pixels": 20638,
+    "source_residue_bbox": [
+      400,
+      1120,
+      1050,
+      1272
+    ]
+  },
+  "machine_status": "REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+  "controller_visual_qa": "PENDING",
+  "decision": "C173_REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
