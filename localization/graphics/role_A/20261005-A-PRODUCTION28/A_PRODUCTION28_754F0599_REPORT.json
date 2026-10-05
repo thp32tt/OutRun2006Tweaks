@@ -341,7 +341,15 @@
   "all_3_bbox_pass": true,
   "all_3_size_ceiling_pass": true,
   "all_3_positive_margin": true,
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS",
   "runtime_validation": "UNTESTED",
-  "status": "A_PRODUCTION28_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_PRODUCTION28_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_evidence": [
+    "localization/graphics/role_A/20261005-A-PRODUCTION28/A_PRODUCTION28_ROW_CONTACT.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION28/A_PRODUCTION28_SOURCE_CLEAN_FINAL_GRAY.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION28/A_PRODUCTION28_FINAL_RAW_GRAY.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION28-PREFLIGHT/A28_SOURCE_RAW_GRAY.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION28-PREFLIGHT/A28_SOURCE_FLIP_GRAY.jpg"
+  ],
+  "controller_visual_note": "PASS. Canonical readable HD source physically contains only stage select, showroom and single player; historical system link/xbox live rows are absent and were not invented. SOURCE/CLEAN/FINAL and raw mirror_y review confirm the three Korean replacements retain the source silver-to-dark vertical metallic family, thin dark edge/depth, slight techno slant and left alignment, with no visible residue, seam, clipping, overlap, halo or protected-art damage."
 }
