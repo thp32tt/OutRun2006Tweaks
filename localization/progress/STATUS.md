@@ -1424,3 +1424,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - C186 37759842: 33/33 numeric PASS, visual FAIL — source-shaped YES/NO/mode/RANDOM ghosts and donor boundaries remain in CLEAN/FINAL -> manual/template reconstruction required.
 - C188 25F697C6: independent visible-alpha 9/9 exact bbox/size/margin, zero residue/outside/overlap and SOURCE/CLEAN/FINAL/raw visual PASS -> `C188_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`.
 - Producer REWORK=3 (`63C91067`, `C598919A`, `37759842`); pending-C=0; pending_artwork localize_text=15. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-05 19:18 KST — B137 63C91067 self-QA PASS
+- B136 mask correction exposed/rejected residual patch artifacts; B137 used navy-seeded title-only masks plus harmonic canonical-boundary reconstruction.
+- Candidate `4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4`: 2/2 bbox/size/positive-margin PASS; CLEAN/FINAL PASS; outside/alpha/residue/render-outside/overlap all 0; controller readable/raw mirror_y visual PASS.
+- index 26 -> `b137_self_qa_pass_pending_c`; producer REWORK=`C598919A`+`37759842`, pending-C=`63C91067`, pending_artwork localize_text=15. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
