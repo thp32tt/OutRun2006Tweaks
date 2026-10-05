@@ -1,0 +1,24 @@
+{
+  "run": "20261005-C179-560FA536",
+  "qa_id": "C179",
+  "index": 101,
+  "asset": "560FA536",
+  "candidate_sha256": "4b4dbb1f645c526fb812e500c01a0fa03894dc1aff2267682ea9f8b283c05744",
+  "machine_status": "PASS",
+  "machine_checks": {
+    "clean_changed_outside_union_source_bboxes": 0,
+    "final_changed_outside_union_source_bboxes": 0,
+    "clean_alpha_outside_union_source_bboxes": 0,
+    "final_alpha_outside_union_source_bboxes": 0,
+    "protected_clean_changed": 0,
+    "protected_final_changed": 0,
+    "clean_source_core_unchanged": 0,
+    "source_core_residue_pixels": 0,
+    "render_outside_union_source_bboxes": 0,
+    "localized_render_on_protected_pixels": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_pair_1px_touch_pixels": 0
+  },
+  "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
