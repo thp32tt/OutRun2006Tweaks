@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION128",
+  "queue_index": 28,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+  "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+  "candidate_sha256": "bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8",
+  "worker_report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_A05_REPORT.json",
+  "machine_qa": {
+    "original_bbox": [
+      543,
+      1185,
+      1068,
+      1275
+    ],
+    "localized_bbox": [
+      642,
+      1190,
+      969,
+      1269
+    ],
+    "bbox_size_positive_margin": "1/1 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changed_pixels_outside_edit_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "protected_lens_flare_cell_changed": 0,
+    "localized_overlap": 0
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "source_text_residue": "PASS_ZERO_VISIBLE",
+    "right_edge_fragment": "PASS_REMOVED",
+    "oval_border_glow_continuity": "PASS",
+    "spacing": "PASS_COMPACT_SOURCE_FAMILY",
+    "style_fidelity": "PASS_WHITE_FILL_NAVY_OUTLINE_ITALIC",
+    "orientation": "PASS_RAW_MIRROR_Y"
+  },
+  "supersedes": {
+    "c176_candidate_sha256": "205d756d9f163dfd6abee9facb6a92588f7654981a5e3c284a37574da5310b4c",
+    "b126_candidate_sha256": "c6363f69034001252b5cd67577c3ace4e89a5aa8e5d69d75adf1ad9da7094cb1",
+    "b126_controller_result": "REWORK_EXCESSIVE_TRACKING",
+    "b127_result": "NO_CANDIDATE_WORKER_SCRIPT_DEFECT_CORRECTED_IN_B128"
+  },
+  "decision": "B128_SELF_QA_PASS_PENDING_C",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
