@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T23:28:00+09:00",
+  "role": "C",
+  "run": "20261005-C210-C211-BATCH",
+  "reviewed": [
+    {
+      "qa_id": "C210",
+      "index": 193,
+      "asset": "97E863AD",
+      "producer": "A67",
+      "candidate_sha256": "ad3f42856956d15b1c0ecba032d18ebb730c375f4b0a52b456c975e89e9396b7",
+      "machine": "PASS",
+      "controller": "REWORK_REQUIRED",
+      "decision": "C210_REWORK_REQUIRED_EXCESSIVE_INTERGLYPH_TRACKING_SOURCE_SPACING"
+    },
+    {
+      "qa_id": "C211",
+      "index": 201,
+      "asset": "A9ABD877",
+      "producer": "A69",
+      "candidate_sha256": "59b21fa3aadf86e892dbd6adee4b178b2dad09048fd314fd731135f363d6a6fe",
+      "machine": "PASS",
+      "controller": "PASS",
+      "decision": "C211_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    }
+  ],
+  "anti_duplication": "Completed C209 and earlier PASS assets were not reopened. C186 index95 had no newer producer candidate and was not repeated.",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
