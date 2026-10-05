@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION66-PREFLIGHT",
+  "index": 226,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_SEMANTIC_BINDING",
+  "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+  "structure": {
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "regions": [
+    {
+      "region_idx": 0,
+      "cell": [
+        0,
+        424,
+        980,
+        88
+      ],
+      "source_alpha_bbox": [
+        0,
+        436,
+        228,
+        500
+      ]
+    },
+    {
+      "region_idx": 1,
+      "cell": [
+        980,
+        424,
+        980,
+        88
+      ],
+      "source_alpha_bbox": [
+        983,
+        430,
+        1416,
+        494
+      ]
+    },
+    {
+      "region_idx": 2,
+      "cell": [
+        0,
+        336,
+        980,
+        88
+      ],
+      "source_alpha_bbox": [
+        3,
+        346,
+        343,
+        410
+      ]
+    },
+    {
+      "region_idx": 3,
+      "cell": [
+        980,
+        336,
+        980,
+        88
+      ],
+      "source_alpha_bbox": [
+        980,
+        346,
+        1233,
+        410
+      ]
+    },
+    {
+      "region_idx": 4,
+      "cell": [
+        0,
+        248,
+        980,
+        88
+      ],
+      "source_alpha_bbox": [
+        4,
+        262,
+        256,
+        326
+      ]
+    },
+    {
+      "region_idx": 5,
+      "cell": [
+        980,
+        248,
+        980,
+        88
+      ],
+      "source_alpha_bbox": [
+        983,
+        262,
+        1234,
+        326
+      ]
+    },
+    {
+      "region_idx": 6,
+      "cell": [
+        0,
+        160,
+        980,
+        88
+      ],
+      "source_alpha_bbox": [
+        4,
+        170,
+        257,
+        234
+      ]
+    },
+    {
+      "region_idx": 7,
+      "cell": [
+        980,
+        160,
+        980,
+        88
+      ],
+      "source_alpha_bbox": [
+        986,
+        170,
+        1242,
+        234
+      ]
+    },
+    {
+      "region_idx": 8,
+      "cell": [
+        0,
+        72,
+        980,
+        88
+      ],
+      "source_alpha_bbox": [
+        4,
+        86,
+        195,
+        150
+      ]
+    },
+    {
+      "region_idx": 9,
+      "cell": [
+        980,
+        72,
+        980,
+        88
+      ],
+      "source_alpha_bbox": [
+        985,
+        86,
+        1809,
+        150
+      ]
+    }
+  ],
+  "expected_semantics": [
+    "GOAL",
+    "GOAL A",
+    "GOAL B",
+    "GOAL C",
+    "GOAL D",
+    "GOAL E",
+    "15 STAGE CONTINUOUS",
+    "STAGE"
+  ],
+  "preserve": [
+    "OutRun2",
+    "OutRun2SP"
+  ],
+  "status": "B66_ONE_STAGE_TO_RENDER_DIAGNOSTIC_COMPLETE",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
