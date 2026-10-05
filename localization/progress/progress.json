@@ -271,10 +271,11 @@
         "C598919A"
       ],
       "remaining": 2,
-      "note": "B128 resolves C176-returned A05BF610 and moves it to pending C. A34 37759842 also remains pending C. Remaining producer REWORK: 63C91067, C598919A. Current queue=137 rows (81 localize_text,45 zoom_review,9 font_pipeline,1 hangul_name_entry,1 preserve_brand_song_credit); pending_artwork localize_text=17; RUNTIME_VALIDATION=UNTESTED.",
+      "note": "A36 adds index101 560FA536 as self-QA PASS pending C after same-invocation expert-label hierarchy correction. Existing A34 37759842 and B128 A05BF610 also await C. Remaining producer REWORK: 63C91067, C598919A. pending_artwork localize_text=16; RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": [
         "37759842",
-        "A05BF610"
+        "A05BF610",
+        "560FA536"
       ]
     },
     "latest_d_final_qa": {
@@ -560,24 +561,24 @@
       "runtime_validation": "UNTESTED"
     },
     "current_pending_artwork_localize_text": 17,
-    "current_producer_rework_remaining": 3,
+    "current_producer_rework_remaining": 2,
     "latest_a_production_batch": {
-      "timestamp_kst": "2026-10-05T17:06:30+09:00",
+      "timestamp_kst": "2026-10-05T17:45:42+09:00",
       "assets": [
-        "37759842"
+        "560FA536"
       ],
-      "result": "A34_SELF_QA_PASS_PENDING_C_AND_INGAME",
-      "candidate_sha256": "90b2adecf0bd22effd199f98d166e959ca1f6a7d9238d52a3cab2026753c286c",
-      "report": "localization/graphics/role_A/20261005-A-PRODUCTION34/A34_37759842_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION34/A34_CONTROLLER_SELF_QA.json",
+      "result": "A36_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "candidate_sha256": "4b4dbb1f645c526fb812e500c01a0fa03894dc1aff2267682ea9f8b283c05744",
+      "report": "localization/graphics/role_A/20261005-A-PRODUCTION36/A36_560FA536_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION36/A36_CONTROLLER_SELF_QA.json",
       "pending_c_assets": [
-        "37759842"
+        "37759842",
+        "560FA536"
       ],
-      "pending_artwork_localize_text": 17,
+      "pending_artwork_localize_text": 16,
       "producer_rework_remaining": [
         "63C91067",
-        "C598919A",
-        "A05BF610"
+        "C598919A"
       ],
       "runtime_validation": "UNTESTED"
     },
@@ -1133,8 +1134,7 @@
     },
     "current_producer_rework_assets": [
       "63C91067",
-      "C598919A",
-      "A05BF610"
+      "C598919A"
     ],
     "a_production26_2ea557b4": {
       "index": 55,
