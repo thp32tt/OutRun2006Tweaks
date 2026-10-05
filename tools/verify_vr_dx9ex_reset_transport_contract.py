@@ -139,14 +139,45 @@ for marker in (
     if r7.count(marker) != 1:
         fail(f"DirectGPU slot COM teardown must have one physical owner: {marker}")
 
+retire_frames = body(r7, "void RetireDirectTransportFramePublications() noexcept")
+require(
+    retire_frames,
+    "DirectGPU Frame.v2 retirement owner",
+    "RenderFrameRingClaimed",
+    "RenderFrameRing->publishSequence",
+    "frame.sequence",
+    "RenderFrameRunGenerationIndex",
+    "RenderFrameDirectGpuTransport",
+    "frame.frameId=0",
+    "RenderFrameDirectLeftHandleIndex",
+    "RenderFrameDirectRightHandleIndex",
+    "RenderFrameDirectWidthIndex",
+    "RenderFrameDirectHeightIndex",
+    "RenderFrameDirectFormatIndex",
+    "RenderFrameDirectGenerationIndex",
+    "RenderFrameDirectSlotIndex",
+)
+if r7.count("RetireDirectTransportFramePublications();") != 2:
+    fail("DirectGPU Frame.v2 retirement must be owned by both stereo-resource and direct-slot teardown wrappers")
+
 release = body(r7, "void ReleaseStereoResources()")
 require(
     release,
     "D3D9 reset resource release",
-    "StereoResourcesReady=false;DirectTransportResourcesReady=false;",
+    "StereoResourcesReady=false;",
+    "RetireDirectTransportFramePublications();",
+    "DirectTransportResourcesReady=false;",
     "ReleaseDirectTransportSlotObjects();",
     "ReleaseDirectInteropProbe();",
     "DirectTransportFormat=D3DFMT_UNKNOWN",
+)
+require_order(
+    release,
+    "D3D9 reset DirectGPU publication retirement",
+    "StereoResourcesReady=false;",
+    "RetireDirectTransportFramePublications();",
+    "DirectTransportResourcesReady=false;",
+    "ReleaseDirectTransportSlotObjects();",
 )
 forbid(
     release,
@@ -185,7 +216,8 @@ forbid(
 release_slots = body(r7, "void ReleaseDirectTransportSlots()")
 require_order(
     release_slots,
-    "DirectGPU slot teardown metadata reset",
+    "DirectGPU slot publication retirement and metadata reset",
+    "RetireDirectTransportFramePublications();",
     "DirectTransportResourcesReady=false",
     "DirectTransportWidth=0",
     "DirectTransportHeight=0",

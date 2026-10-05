@@ -1071,9 +1071,47 @@ namespace OutRunVRStereo
 			for(auto&slot:DirectTransportSlots){ReleaseCom(slot.fence);ReleaseCom(slot.leftSurface);ReleaseCom(slot.leftTexture);ReleaseCom(slot.rightSurface);ReleaseCom(slot.rightTexture);slot={};}
 		}
 
+		void RetireDirectTransportFramePublications() noexcept
+		{
+			if(!RenderFrameRing||!RenderFrameRingClaimed||
+				RenderFrameRing->clientPid!=GetCurrentProcessId()||
+				RenderFrameRing->reserved0!=RenderFrameRunGeneration)return;
+
+			LONG ringSeq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
+			if((ringSeq&1)==0)ringSeq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
+			MemoryBarrier();
+			for(auto&frame:RenderFrameRing->slots)
+			{
+				LONG seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));
+				if((seq&1)==0)seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));
+				MemoryBarrier();
+				if(frame.reserved[OutRunVR::RenderFrameRunGenerationIndex]==RenderFrameRunGeneration&&
+					(frame.flags&OutRunVR::RenderFrameDirectGpuTransport)!=0)
+				{
+					frame.frameId=0;
+					frame.flags&=~OutRunVR::RenderFrameDirectGpuTransport;
+					frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex]=0;
+					frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex]=0;
+					frame.reserved[OutRunVR::RenderFrameDirectWidthIndex]=0;
+					frame.reserved[OutRunVR::RenderFrameDirectHeightIndex]=0;
+					frame.reserved[OutRunVR::RenderFrameDirectFormatIndex]=0;
+					frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex]=0;
+					frame.reserved[OutRunVR::RenderFrameDirectSlotIndex]=0;
+				}
+				MemoryBarrier();
+				seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));
+				if(seq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));
+			}
+			MemoryBarrier();
+			ringSeq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
+			if(ringSeq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
+		}
+
 		void ReleaseStereoResources()
 		{
-			StereoResourcesReady=false;DirectTransportResourcesReady=false;
+			StereoResourcesReady=false;
+			RetireDirectTransportFramePublications();
+			DirectTransportResourcesReady=false;
 			ReleaseDirectTransportSlotObjects();
 			ReleaseDirectInteropProbe();
 			DirectTransportFormat=D3DFMT_UNKNOWN;ProjectionInverseValid=false;ReleaseCom(RightEyeSurface);ReleaseCom(RightEyeDepth);ReleaseCom(LeftResolveSurface);ReleaseCom(LeftResolveTexture);ReleaseCom(RightResolveSurface);ReleaseCom(RightResolveTexture);ReleaseCom(BackBuffer);ReleaseCom(TrackedRenderTarget);ReleaseCom(TrackedDepthStencil);RightDepthSynchronized=true;RightStencilSynchronized=true;BackBufferDesc={};
@@ -1096,7 +1134,7 @@ namespace OutRunVRStereo
 		{
 			if(!HostDirectTransportSupported()||!EnsureSharedState()||(SharedState->flags&OutRunVR::HostAdapterLuidValid)==0)return false;LUID gameLuid{};if(!QueryGameAdapterLuid(device,gameLuid))return false;InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientAdapterLuidLow),static_cast<LONG>(gameLuid.LowPart));InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientAdapterLuidHigh),static_cast<LONG>(gameLuid.HighPart));const bool adapterMatches=SharedState->hostAdapterLuidLow==gameLuid.LowPart&&SharedState->hostAdapterLuidHigh==static_cast<std::uint32_t>(gameLuid.HighPart);if(!adapterMatches){if(!FirstAdapterMismatchLogged){FirstAdapterMismatchLogged=true;spdlog::warn("VR direct transport: OpenXR D3D11 adapter LUID does not match the game D3D9Ex adapter; forcing SBS fallback");}return false;}if(DirectInteropProbeToken&&SharedState->hostInteropProbeAckToken==DirectInteropProbeToken){DirectInteropVerified=true;if(!FirstInteropVerifiedLogged){FirstInteropVerifiedLogged=true;spdlog::info("VR direct transport: D3D9Ex -> D3D11 shared-resource probe verified on the OpenXR adapter");}return true;}if(!DirectInteropProbeTexture){HANDLE handle=nullptr;if(FAILED(device->CreateTexture(1,1,1,D3DUSAGE_RENDERTARGET,D3DFMT_A8R8G8B8,D3DPOOL_DEFAULT,&DirectInteropProbeTexture,&handle))||!DirectInteropProbeTexture||!handle||FAILED(DirectInteropProbeTexture->GetSurfaceLevel(0,&DirectInteropProbeSurface))||FAILED(device->ColorFill(DirectInteropProbeSurface,nullptr,D3DCOLOR_ARGB(0xFF,0x7B,0x7B,0x7B)))||FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT,&DirectInteropProbeFence))||!DirectInteropProbeFence||FAILED(DirectInteropProbeFence->Issue(D3DISSUE_END))||!WaitForEventQuery(DirectInteropProbeFence,50)){++DirectInteropProbeFailures;ReleaseDirectInteropProbe();return false;}DirectInteropProbeHandle=handle;DirectInteropProbeToken=static_cast<std::uint32_t>(GetTickCount())^GetCurrentProcessId()^0x4F525652u;if(!DirectInteropProbeToken)DirectInteropProbeToken=1;InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->hostInteropProbeAckToken),0);InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeHandle),static_cast<LONG>(reinterpret_cast<std::uintptr_t>(DirectInteropProbeHandle)));InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeToken),static_cast<LONG>(DirectInteropProbeToken));}return false;
 		}
-		void ReleaseDirectTransportSlots(){DirectTransportResourcesReady=false;DirectTransportWidth=0;DirectTransportHeight=0;ReleaseDirectTransportSlotObjects();}
+		void ReleaseDirectTransportSlots(){RetireDirectTransportFramePublications();DirectTransportResourcesReady=false;DirectTransportWidth=0;DirectTransportHeight=0;ReleaseDirectTransportSlotObjects();}
 		void DirectTransportTargetSize(IDirect3DDevice9* device,UINT& width,UINT& height)
 		{
 			// Once a DirectGPU eye size is active, keep it as the fallback for an
