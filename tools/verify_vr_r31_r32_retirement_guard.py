@@ -15,7 +15,7 @@ WORKFLOW_PATH = ROOT / ".github/workflows/vr-dx9ex-active.yml"
 
 def fail(message: str) -> None:
     raise SystemExit(
-        "VR R31/R32 retirement precondition guard FAILED\n"
+        "VR R31/R32 draw-retirement guard FAILED\n"
         f" - {message}"
     )
 
@@ -30,6 +30,12 @@ def require(text: str, owner: str, *markers: str) -> None:
     for marker in markers:
         if marker not in text:
             fail(f"{owner} missing retirement invariant: {marker}")
+
+
+def forbid(text: str, owner: str, *markers: str) -> None:
+    for marker in markers:
+        if marker in text:
+            fail(f"{owner} retained retired draw-layer marker: {marker}")
 
 
 def function_body(source: str, marker: str) -> str:
@@ -59,19 +65,34 @@ r33 = load(R33_PATH)
 stateblock = load(STATEBLOCK_PATH)
 workflow = load(WORKFLOW_PATH)
 
-# 1) R31 remains the fallback-capable R30 successor until a replacement
-# transaction proves equivalent draw and StateBlock ownership.
-require(
+# 1) R31 is retained only for StateBlock/state-cache ownership. Its physical
+# draw overlay over R30 must be gone.
+forbid(
     r31,
     "R31",
     "SafetyHookInline R31DrawPrimitiveR30Hook{};",
     "SafetyHookInline R31DrawIndexedPrimitiveR30Hook{};",
     "SafetyHookInline R31DrawPrimitiveUPR30Hook{};",
     "SafetyHookInline R31DrawIndexedPrimitiveUPR30Hook{};",
+    "HRESULT R31Dispatch(",
+    "HRESULT __stdcall DrawPrimitiveDestR31(",
+    "HRESULT __stdcall DrawIndexedPrimitiveDestR31(",
+    "HRESULT __stdcall DrawPrimitiveUPDestR31(",
+    "HRESULT __stdcall DrawIndexedPrimitiveUPDestR31(",
+    "R31RollbackDrawHooks()",
+    "R31EnableDrawHooks()",
+)
+require(
+    r31,
+    "R31 StateBlock owner",
     "SafetyHookInline R31CreateStateBlockHook{};",
     "SafetyHookInline R31BeginStateBlockHook{};",
     "SafetyHookInline R31EndStateBlockHook{};",
     "SafetyHookInline R31StateBlockApplyHook{};",
+    "StateBlockRecovery::Configure(",
+    "StateBlockEvents::Configure(",
+    "StateBlockTracker::SetEventConsumerReady(true)",
+    "R31InstallStatus() noexcept",
 )
 r31_install = function_body(r31, "DWORD WINAPI R31InstallThread(void*)")
 require(
@@ -79,25 +100,24 @@ require(
     "R31 install",
     "const auto r30 = R30InstallStatus();",
     "const auto renderer = OutRunVRRenderer::R29RendererState();",
-    "R30 or renderer prerequisite failed; R30 remains authoritative",
-    "reinterpret_cast<void*>(&DrawPrimitiveDestR30)",
-    "DrawPrimitiveDestR31, disabled",
-    "reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR30)",
-    "DrawIndexedPrimitiveDestR31, disabled",
-    "reinterpret_cast<void*>(&DrawPrimitiveUPDestR30)",
-    "DrawPrimitiveUPDestR31, disabled",
-    "reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30)",
-    "DrawIndexedPrimitiveUPDestR31, disabled",
     "StateBlockTracker::LifecycleHooksReady()",
     "R22 lifecycle hooks are authoritative; R31 physical StateBlock hooks are not installed",
     "R31 fallback StateBlock hooks armed",
     "fallbackEndArmed = R31EndStateBlockHook.enable().has_value();",
     "fallbackBeginArmed = R31BeginStateBlockHook.enable().has_value();",
     "fallbackCreateArmed = R31CreateStateBlockHook.enable().has_value();",
-    "R31RollbackDrawHooks();",
     "StateBlockEvents::Clear();",
     "StateBlockRecovery::Clear();",
     "StateBlockTracker::MarkCoverageLost();",
+)
+forbid(
+    r31_install,
+    "R31 install",
+    "DrawPrimitiveDestR30",
+    "DrawIndexedPrimitiveDestR30",
+    "DrawPrimitiveUPDestR30",
+    "DrawIndexedPrimitiveUPDestR30",
+    "draw hooks unavailable",
 )
 fallback_end = r31_install.find(
     "fallbackEndArmed = R31EndStateBlockHook.enable().has_value();")
@@ -124,18 +144,30 @@ require(
     "static bool LifecycleHooksReady() noexcept",
 )
 
-# 2) R32 is still a behavior-bearing owner, not a removable alias. It joins
-# R31 draw behavior with R22 Reset and R13 Present/DirectGPU ownership.
-require(
+# 2) R32 is retained only for Reset/Present/DirectGPU and fail-close helpers.
+# Its physical draw overlay over R31 must be gone.
+forbid(
     r32,
     "R32",
-    "SafetyHookInline R32ResetR22Hook{};",
-    "SafetyHookInline R32ResolveDirectR13Hook{};",
-    "SafetyHookInline R32PresentR13Hook{};",
     "SafetyHookInline R32DrawPrimitiveR31Hook{};",
     "SafetyHookInline R32DrawIndexedPrimitiveR31Hook{};",
     "SafetyHookInline R32DrawPrimitiveUPR31Hook{};",
     "SafetyHookInline R32DrawIndexedPrimitiveUPR31Hook{};",
+    "HRESULT R32Dispatch(",
+    "HRESULT __stdcall DrawPrimitiveDestR32(",
+    "HRESULT __stdcall DrawIndexedPrimitiveDestR32(",
+    "HRESULT __stdcall DrawPrimitiveUPDestR32(",
+    "HRESULT __stdcall DrawIndexedPrimitiveUPDestR32(",
+)
+require(
+    r32,
+    "R32 lifecycle owner",
+    "SafetyHookInline R32ResetR22Hook{};",
+    "SafetyHookInline R32ResolveDirectR13Hook{};",
+    "SafetyHookInline R32PresentR13Hook{};",
+    "void R32ObserveFrameWorkload(",
+    "HRESULT R32LowerFailClosed(",
+    "R32InstallStatus() noexcept",
 )
 r32_install = function_body(r32, "DWORD WINAPI R32InstallThread(void*)")
 require(
@@ -150,91 +182,77 @@ require(
     "reinterpret_cast<void*>(&ResolveDirectTransportR13)",
     "ResolveDirectTransportR32, disabled",
     "reinterpret_cast<void*>(&PresentDestR13), PresentDestR32, disabled",
-    "reinterpret_cast<void*>(&DrawPrimitiveDestR31)",
-    "DrawPrimitiveDestR32, disabled",
-    "reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR31)",
-    "DrawIndexedPrimitiveDestR32, disabled",
-    "reinterpret_cast<void*>(&DrawPrimitiveUPDestR31)",
-    "DrawPrimitiveUPDestR32, disabled",
-    "reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR31)",
-    "DrawIndexedPrimitiveUPDestR32, disabled",
-    "R32RollbackHooks();",
-    "R31/R22 remain authoritative",
+)
+forbid(
+    r32_install,
+    "R32 install",
+    "DrawPrimitiveDestR31",
+    "DrawIndexedPrimitiveDestR31",
+    "DrawPrimitiveUPDestR31",
+    "DrawIndexedPrimitiveUPDestR31",
 )
 reset32 = function_body(r32, "HRESULT __stdcall ResetDestR32(")
-reset_lower = reset32.find("R32ResetR22Hook.stdcall<HRESULT>")
-reset_rearm = reset32.find("R32ResetAfterGameReset();")
-if min(reset_lower, reset_rearm) < 0 or reset_lower > reset_rearm:
-    fail("R32 Reset must complete the R22 lifecycle before R32 cache/safety rearm")
-
+if reset32.find("R32ResetR22Hook.stdcall<HRESULT>") > reset32.find(
+        "R32ResetAfterGameReset();"):
+    fail("R32 Reset must complete R22 before R32 rearm")
 present32 = function_body(r32, "HRESULT __stdcall PresentDestR32(")
-require(
-    present32,
-    "R32 Present",
-    "R32PresentR13Hook.stdcall<HRESULT>",
-)
+require(present32, "R32 Present", "R32PresentR13Hook.stdcall<HRESULT>")
 resolve32 = function_body(r32, "bool ResolveDirectTransportR32(")
-require(
-    resolve32,
-    "R32 DirectGPU",
-    "R32ResolveDirectR13Hook.call<bool>",
-)
+require(resolve32, "R32 DirectGPU", "R32ResolveDirectR13Hook.call<bool>")
 lower_fail_closed = function_body(r32, "HRESULT R32LowerFailClosed(")
 require(
     lower_fail_closed,
     "R32 lower fail-close",
     "!R9StereoBaselineSeeded()",
-    "return lowerDraw();",
     "CurrentVertexShaderIdentity.exchange(0",
     "const HRESULT hr = lowerDraw();",
     "R32FailClosedZeroDisparityDraws",
 )
 
-# 3) R33 is the final dispatcher, but its physical entry chain still depends
-# on R32 for Reset/Present and every draw entry. A safe retirement must replace
-# these targets atomically while preserving the lower owners on failure.
-r33_install = function_body(r33, "DWORD WINAPI R33InstallThread(void*)")
-require(
-    r33_install,
-    "R33 install",
-    "const auto r32 = R32InstallStatus();",
-    "if (r32 == State::Failed)",
-    "if (r32 == State::Ready)",
-    "reinterpret_cast<void*>(&ResetDestR32)",
-    "ResetDestR33, disabled",
-    "reinterpret_cast<void*>(&PresentDestR32)",
-    "PresentDestR33, disabled",
+# 3) R33 is the only physical draw dispatcher. Reset/Present intentionally
+# remain chained through R32, while all four draw families hook R30 directly.
+forbid(
+    r33,
+    "R33",
+    "R33DrawPrimitiveR32Hook",
+    "R33DrawIndexedPrimitiveR32Hook",
+    "R33DrawPrimitiveUPR32Hook",
+    "R33DrawIndexedPrimitiveUPR32Hook",
     "reinterpret_cast<void*>(&DrawPrimitiveDestR32)",
-    "DrawPrimitiveDestR33, disabled",
     "reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR32)",
-    "DrawIndexedPrimitiveDestR33, disabled",
     "reinterpret_cast<void*>(&DrawPrimitiveUPDestR32)",
-    "DrawPrimitiveUPDestR33, disabled",
     "reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR32)",
-    "DrawIndexedPrimitiveUPDestR33, disabled",
-    "R33RollbackHooks();",
-    "corrected R32 remains authoritative",
 )
-reset33 = function_body(r33, "HRESULT __stdcall ResetDestR33(")
 require(
-    reset33,
-    "R33 Reset",
+    r33,
+    "R33",
+    "SafetyHookInline R33DrawPrimitiveR30Hook{};",
+    "SafetyHookInline R33DrawIndexedPrimitiveR30Hook{};",
+    "SafetyHookInline R33DrawPrimitiveUPR30Hook{};",
+    "SafetyHookInline R33DrawIndexedPrimitiveUPR30Hook{};",
+    "reinterpret_cast<void*>(&DrawPrimitiveDestR30)",
+    "reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR30)",
+    "reinterpret_cast<void*>(&DrawPrimitiveUPDestR30)",
+    "reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30)",
     "R33ResetR32Hook.stdcall<HRESULT>",
-    "R33 -> R32 -> R22",
-)
-present33 = function_body(r33, "HRESULT __stdcall PresentDestR33(")
-require(
-    present33,
-    "R33 Present",
     "R33PresentR32Hook.stdcall<HRESULT>",
 )
 
-# 4) R33's final fallback intentionally bypasses the R31/R32 stereo overlays
-# but still passes through R32's fail-close guard and R30-owned lower-R29
-# storage. This exact ownership must survive any future physical flattening.
+# R32 workload telemetry used to live at its draw entry. Once R33 hooks R30
+# directly, R33 must preserve the same one-call-per-top-level-draw accounting.
+for marker, expected in (
+    ("HRESULT __stdcall DrawPrimitiveDestR33(", "R32ObserveFrameWorkload(device, type, primitiveCount, false, false);"),
+    ("HRESULT __stdcall DrawIndexedPrimitiveDestR33(", "R32ObserveFrameWorkload(device, type, primitiveCount, true, false);"),
+    ("HRESULT __stdcall DrawPrimitiveUPDestR33(", "R32ObserveFrameWorkload(device, type, primitiveCount, false, true);"),
+    ("HRESULT __stdcall DrawIndexedPrimitiveUPDestR33(", "R32ObserveFrameWorkload(device, type, primitiveCount, true, true);"),
+):
+    body = function_body(r33, marker)
+    if expected not in body:
+        fail(f"R33 draw entry lost R32 workload accounting: {expected}")
+
+# 4) Final fallback remains fail-closed through R32 and then R30-owned lower R29.
 dispatch33 = function_body(
-    r33,
-    "HRESULT R33Dispatch(IDirect3DDevice9* device,")
+    r33, "HRESULT R33Dispatch(IDirect3DDevice9* device,")
 require(
     dispatch33,
     "R33 dispatch",
@@ -242,24 +260,21 @@ require(
     "return R32LowerFailClosed(device,",
     "std::forward<LowerR29Draw>(lowerR29Draw)",
 )
-
-r33_lower_calls = (
+for marker in (
     "R30CallLowerDrawPrimitive(",
     "R30CallLowerDrawIndexedPrimitive(",
     "R30CallLowerDrawPrimitiveUP(",
     "R30CallLowerDrawIndexedPrimitiveUP(",
-)
-for marker in r33_lower_calls:
+):
     if marker not in r33:
-        fail(f"R33 final fallback lost lower-R29 owner call: {marker}")
+        fail(f"R33 final fallback lost R30 owner call: {marker}")
 
-lower_owner_pairs = (
+for function_marker, owner_marker in (
     ("R30CallLowerDrawPrimitive(", "R30DrawPrimitiveR29Hook.stdcall<HRESULT>"),
     ("R30CallLowerDrawIndexedPrimitive(", "R30DrawIndexedPrimitiveR29Hook.stdcall<HRESULT>"),
     ("R30CallLowerDrawPrimitiveUP(", "R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>"),
     ("R30CallLowerDrawIndexedPrimitiveUP(", "R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>"),
-)
-for function_marker, owner_marker in lower_owner_pairs:
+):
     body = function_body(r30, f"inline HRESULT {function_marker}")
     if owner_marker not in body:
         fail(
@@ -267,8 +282,7 @@ for function_marker, owner_marker in lower_owner_pairs:
             f"{owner_marker}"
         )
 
-# 5) The guard itself must be owned by the canonical DX9Ex Active Gate. The
-# first TDD commit intentionally fails here until the workflow wiring lands.
+# 5) Canonical DX9Ex Active CI owns this guard.
 require(
     workflow,
     "DX9Ex Active workflow",
@@ -277,8 +291,7 @@ require(
 )
 
 print(
-    "VR R31/R32 retirement precondition guard PASS "
-    "(physical retirement remains DEFERRED until an atomic replacement "
-    "preserves install fallback, Reset/Present/DirectGPU, StateBlock coverage "
-    "and lower-R29 fallback)"
+    "VR R31/R32 draw-retirement guard PASS "
+    "(R31=StateBlock owner, R32=Reset/Present/DirectGPU owner, "
+    "R33=sole physical draw dispatcher over R30)"
 )
