@@ -203,9 +203,8 @@ namespace SumoUISpriteReplay
 				entry.args2 = node->args2_58;
 				entry.vrScope =
 					OutRunVR::GameSemantic::PeekSpriteNodeScope(
-						node, OutRunVR::GameSemantic::RenderScope::None);
-				entry.vrProducer =
-					OutRunVR::GameSemantic::PeekSpriteNodeProducerToken(node);
+						node, OutRunVR::GameSemantic::RenderScope::None,
+						&entry.vrProducer);
 			}
 		}
 	}
