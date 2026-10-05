@@ -1,0 +1,25 @@
+{
+  "run": "20261005-C204-DCC7B488",
+  "qa_id": "C204",
+  "index": 32,
+  "asset": "DCC7B488",
+  "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+  "machine_status": "FAIL",
+  "row_gate": "1/1 PASS",
+  "machine_checks": {
+    "decoded_source_vs_evidence_diff_pixels": 0,
+    "decoded_final_vs_evidence_diff_pixels": 0,
+    "source_text_mask_bbox_matches_original_bbox": true,
+    "allowed_mask_bbox_matches_original_bbox": true,
+    "localized_bbox_exact_match_producer": true,
+    "decoded_changed_outside_allowed_effect_bbox": 0,
+    "alpha_changed_outside_allowed_effect_bbox": 0,
+    "localized_render_outside_allowed_effect_bbox": 0,
+    "protected_region_changed_pixels": 0,
+    "clean_exact_source_residue_pixels_in_source_text_mask": 1418,
+    "localized_overlap_pixels": 0,
+    "clean_boundary_safe_ring_changed_pixels": 0
+  },
+  "report": "localization/graphics/role_C/20261005-C204-DCC7B488/C204_DCC7B488_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
