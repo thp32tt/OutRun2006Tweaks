@@ -1,0 +1,15 @@
+{
+  "run": "20261005-C151-C598919A",
+  "asset": "C598919A",
+  "index": 86,
+  "source_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "dds_fourcc": "DXT5",
+  "regions": 106,
+  "status": "C151_DECODED_EVIDENCE_READY_PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_C/20261005-C151-C598919A/C151_C598_DECODED_PREFLIGHT.json"
+}
