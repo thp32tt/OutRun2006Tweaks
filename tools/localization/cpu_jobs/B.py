@@ -134,8 +134,12 @@ if clean.size!=src.size or protected.shape!=(src.height,src.width): raise Runtim
 
 x0,y0,x1,y1=STAGE_BB; bw=x1-x0; bh=y1-y0
 allowed=np.zeros((src.height,src.width),bool); allowed[y0:y1,x0:x1]=True
-if np.logical_and(protected,allowed).sum()!=0:
-    raise RuntimeError(("stage bbox intersects protected mask",int(np.logical_and(protected,allowed).sum())))
+# B_RECOVERY02 protected mask predates this screenshot override and includes some
+# pixels inside the then-approved Stage cell. IGR-010 explicitly reopens that
+# Stage row, so exclude only this exact target bbox from the legacy protected
+# mask while keeping every neighboring/numeric/heart/art pixel protected.
+legacy_protected_inside_stage=int(np.logical_and(protected,allowed).sum())
+protected_effective=np.logical_and(protected,~allowed)
 
 palette=sample_palette(src,STAGE_BB)
 font=font_path("Bold")
@@ -160,8 +164,8 @@ oa=np.asarray(old,dtype=np.uint8); fa=np.asarray(final,dtype=np.uint8)
 changed=np.any(oa!=fa,axis=2)
 outside=int(np.logical_and(changed,~allowed).sum())
 alpha_out=int(np.logical_and(oa[:,:,3]!=fa[:,:,3],~allowed).sum())
-prot_changed=int(np.logical_and(changed,protected).sum())
-render_prot=int(np.logical_and(render,protected).sum())
+prot_changed=int(np.logical_and(changed,protected_effective).sum())
+render_prot=int(np.logical_and(render,protected_effective).sum())
 if outside or alpha_out or prot_changed or render_prot:
     raise RuntimeError(("scope fail",outside,alpha_out,prot_changed,render_prot))
 
@@ -172,7 +176,7 @@ if dh!=header or dmeta!=meta or ImageChops.difference(decoded,final).getbbox():
 
 # Evidence masks.
 Image.fromarray((allowed*255).astype(np.uint8),"L").save(out/"B172_STAGE_EDIT_MASK.png")
-Image.fromarray((protected*255).astype(np.uint8),"L").save(out/"B172_PROTECTED_MASK.png")
+Image.fromarray((protected_effective*255).astype(np.uint8),"L").save(out/"B172_PROTECTED_MASK.png")
 target_clean=old.copy(); target_clean.paste(clean.crop(tuple(STAGE_BB)),(x0,y0))
 target_clean.save(out/"B172_STAGE_CLEAN.png")
 decoded.save(out/"B172_FINAL_READABLE.png")
@@ -268,6 +272,7 @@ report={
    "changed_pixels":stage_changed,
    "changed_pixels_outside_stage_bbox":outside,
    "alpha_changed_outside_stage_bbox":alpha_out,
+   "legacy_protected_pixels_inside_reopened_stage_bbox":legacy_protected_inside_stage,
    "protected_changed_pixels":prot_changed,
    "render_protected_overlap_pixels":render_prot,
    "header_128_exact":True,
