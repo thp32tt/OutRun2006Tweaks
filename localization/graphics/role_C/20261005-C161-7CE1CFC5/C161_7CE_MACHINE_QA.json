@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C161-7CE1CFC5",
+  "queue_index": 59,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+  "producer_run": "20261005-A-PRODUCTION24",
+  "candidate_commit": "909f5796accf27c97b55f9a6d9a4ff4307bdca7f",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "8e79a14a4453c7e015144c1c2e25a4aacc633645",
+    "atlas_git_blob_sha1": "1a13020899080238d4177800382137f0a3e291a5",
+    "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f"
+  },
+  "candidate_sha256": "c1bfad9f88034167d56d3e0186b305caf25318692207f84e6de8474f0b27ceae",
+  "candidate_changed_by_C": false,
+  "independent_method": "C re-downloaded pinned canonical DXT5 DDS+atlas and pinned A24 candidate, independently re-derived source alpha masks/exact bboxes from reviewed text ROIs, decoded both images, recomputed exact decoded-pixel containment/alpha/residue/label separation/protected-art and BC3 scope without consuming producer masks.",
+  "structure": {
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "region_idx": 0,
+      "source": "NEXT MISSION",
+      "korean": "다음 미션",
+      "family": "big",
+      "cell": [
+        0,
+        344,
+        1756,
+        168
+      ],
+      "text_roi": [
+        0,
+        344,
+        1756,
+        168
+      ],
+      "original_bbox": [
+        8,
+        353,
+        1293,
+        500
+      ],
+      "source_mask_pixels": 160177,
+      "localized_bbox": [
+        408,
+        356,
+        892,
+        496
+      ],
+      "source_size": [
+        1285,
+        147
+      ],
+      "localized_size": [
+        484,
+        140
+      ],
+      "delta_left": 400,
+      "delta_right": 401,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 1,
+      "source": "Race The Rivals!",
+      "korean": "라이벌과 레이스!",
+      "family": "small",
+      "cell": [
+        0,
+        176,
+        704,
+        168
+      ],
+      "text_roi": [
+        0,
+        200,
+        704,
+        144
+      ],
+      "original_bbox": [
+        75,
+        222,
+        625,
+        304
+      ],
+      "source_mask_pixels": 39249,
+      "localized_bbox": [
+        150,
+        226,
+        550,
+        300
+      ],
+      "source_size": [
+        550,
+        82
+      ],
+      "localized_size": [
+        400,
+        74
+      ],
+      "delta_left": 75,
+      "delta_right": 75,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 2,
+      "source": "Drift To Score!",
+      "korean": "드리프트 점수 도전!",
+      "family": "small",
+      "cell": [
+        0,
+        8,
+        704,
+        168
+      ],
+      "text_roi": [
+        0,
+        40,
+        704,
+        136
+      ],
+      "original_bbox": [
+        119,
+        53,
+        609,
+        137
+      ],
+      "source_mask_pixels": 35097,
+      "localized_bbox": [
+        131,
+        58,
+        596,
+        132
+      ],
+      "source_size": [
+        490,
+        84
+      ],
+      "localized_size": [
+        465,
+        74
+      ],
+      "delta_left": 12,
+      "delta_right": 13,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 8,
+      "source": "Slipstream To Score!",
+      "korean": "슬립스트림 점수 도전!",
+      "family": "small",
+      "cell": [
+        704,
+        176,
+        704,
+        168
+      ],
+      "text_roi": [
+        704,
+        200,
+        704,
+        144
+      ],
+      "original_bbox": [
+        717,
+        225,
+        1408,
+        320
+      ],
+      "source_mask_pixels": 48374,
+      "localized_bbox": [
+        804,
+        236,
+        1320,
+        309
+      ],
+      "source_size": [
+        691,
+        95
+      ],
+      "localized_size": [
+        516,
+        73
+      ],
+      "delta_left": 87,
+      "delta_right": 88,
+      "delta_top": 11,
+      "delta_bottom": 11,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "bbox_size_positive_margin": "4/4 PASS",
+    "decoded_changed_outside": 0,
+    "alpha_outside": 0,
+    "introduced_visible_outside": 0,
+    "source_residue": 0,
+    "localized_overlap": 0,
+    "touch_pairs": [],
+    "target_protected_overlap": 0,
+    "target_protected_1px_near": 0,
+    "protected_source_changed": 0,
+    "changed_bc3_blocks": 19306,
+    "changed_bc3_blocks_wholly_outside_allowed": 0
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
