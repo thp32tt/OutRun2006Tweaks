@@ -69,6 +69,7 @@ namespace KoreanRuntime
 
     struct DrawCommand
     {
+        uint32_t textId = TextEntryCount;
         std::string text;
         int16_t x = 0;
         int16_t y = 0;
@@ -458,12 +459,13 @@ namespace KoreanRuntime
         return hidden;
     }
 
-    static void Queue(std::string formatted)
+    static void Queue(uint32_t id, std::string formatted)
     {
         if (formatted.empty())
             return;
 
         DrawCommand cmd;
+        cmd.textId = id;
         cmd.text = std::move(formatted);
         cmd.x = *Module::exe_ptr<int16_t>(0x556BB8);
         cmd.y = *Module::exe_ptr<int16_t>(0x556BBA);
@@ -497,7 +499,7 @@ namespace KoreanRuntime
         if (!FormatTranslation(id, *formatSlot, stack + 8, formatted))
             return;
 
-        Queue(formatted);
+        Queue(id, formatted);
 
         thread_local std::string hiddenLayout;
         hiddenLayout = BuildHiddenLayout(formatted);
@@ -514,6 +516,36 @@ namespace KoreanRuntime
         const uint8_t g = static_cast<uint8_t>((argb >> 8) & 0xFF);
         const uint8_t b = static_cast<uint8_t>(argb & 0xFF);
         return IM_COL32(r, g, b, a);
+    }
+
+    static ImU32 CompactOutlineColor(uint32_t argb)
+    {
+        const uint8_t a = static_cast<uint8_t>((argb >> 24) & 0xFF);
+        const uint8_t r = static_cast<uint8_t>((argb >> 16) & 0xFF);
+        const uint8_t g = static_cast<uint8_t>((argb >> 8) & 0xFF);
+        const uint8_t b = static_cast<uint8_t>(argb & 0xFF);
+
+        // Keep the stock alpha while deriving a dark keyline from the stock
+        // text colour. This follows the game's compact HUD/speech-bubble
+        // treatment without inventing a new palette.
+        return IM_COL32(
+            static_cast<uint8_t>(r / 5),
+            static_cast<uint8_t>(g / 5),
+            static_cast<uint8_t>(b / 5),
+            a);
+    }
+
+    static bool NeedsCompactReadabilityStroke(const DrawCommand& cmd)
+    {
+        const float cellHeight =
+            static_cast<float>(cmd.cellHeight == 0 ? 16 : std::abs(cmd.cellHeight));
+        const float logicalFontHeight =
+            cellHeight * (std::max)(0.05f, std::fabs(cmd.scaleY));
+
+        // User in-game regressions IGR-006/007 show the compact runtime path
+        // losing the source HUD/bubble weight. Keep larger menu/body copy
+        // unchanged and reinforce only the small stock cells.
+        return cmd.textId < TextEntryCount && logicalFontHeight <= 24.0f;
     }
 
     static void Draw()
@@ -584,6 +616,40 @@ namespace KoreanRuntime
                     x -= size.x * 0.5f;
                 else
                     x -= size.x;
+            }
+
+            if (NeedsCompactReadabilityStroke(cmd))
+            {
+                // Reinforce compact Korean glyphs inside their existing
+                // calculated text footprint. The fine clip rectangle prevents
+                // the readability stroke from expanding the prior layout box,
+                // which is required for dense HUD and speech-bubble regions.
+                const float stroke = std::clamp(fontSize * 0.055f, 1.0f, 2.0f);
+                const ImVec4 clip(x, y, x + size.x, y + size.y);
+                const ImU32 outline = CompactOutlineColor(cmd.color);
+                const ImVec2 offsets[] = {
+                    ImVec2(-stroke, 0.0f),
+                    ImVec2(stroke, 0.0f),
+                    ImVec2(0.0f, -stroke),
+                    ImVec2(0.0f, stroke),
+                    ImVec2(-stroke, -stroke),
+                    ImVec2(stroke, -stroke),
+                    ImVec2(-stroke, stroke),
+                    ImVec2(stroke, stroke)
+                };
+
+                for (const ImVec2& offset : offsets)
+                {
+                    drawList->AddText(
+                        font,
+                        fontSize,
+                        ImVec2(x + offset.x, y + offset.y),
+                        outline,
+                        cmd.text.c_str(),
+                        nullptr,
+                        0.0f,
+                        &clip);
+                }
             }
 
             drawList->AddText(

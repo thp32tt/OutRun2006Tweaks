@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-INGAME170-IGR006-RUNTIME-HUD",
+  "timestamp_kst": "2026-10-06T06:55:50+09:00",
+  "base_head": "9821f310f0101601f48b7e046f90b1ab22f6d0fd",
+  "user_ingame_regression": [
+    "IGR-006",
+    "스크린샷(148).png"
+  ],
+  "screen": "INGAME_HUD_CITY_START",
+  "owner_lane": "B",
+  "priority": "P1",
+  "defect_tags": [
+    "LOW_RES_FONT",
+    "HUD_WEIGHT_MISMATCH",
+    "READABILITY"
+  ],
+  "mapping": {
+    "domain": "RUNTIME_TEXT",
+    "status": "EXACT_RUNTIME_RENDER_PATH_COMPACT_TEXT",
+    "translation_table": "localization/text/runtime_ko.tsv",
+    "translation_rows": 1355,
+    "resolver": "EXE+0x65EB0 -> KoreanRuntime::RememberText",
+    "print_hooks": [
+      "EXE+0x2CCE0 sprPrintf",
+      "EXE+0x2CDD0 Sumo_Printf"
+    ],
+    "render_path": "KoreanRuntime::InterceptPrint -> Queue -> KoreanRuntime::Draw -> ImGui foreground D3D9 overlay",
+    "game_font_state_inputs": [
+      "cursor x/y",
+      "cellHeight",
+      "scaleY",
+      "ARGB color",
+      "alignment flags"
+    ],
+    "dds_fix_required": false,
+    "note": "The backlog originally classifies screenshot(148) as RUNTIME_TEXT. Current test config has KoreanTextOverlayTest=true, and all resolved Korean runtime draws pass through this single overlay path. The pre-B170 path used the stock colour and regular ImGui font with no compact-HUD weight/keyline treatment."
+  },
+  "material_fix": {
+    "source_file": "src/hooks_localization.cpp",
+    "source_sha256": "12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889",
+    "changes": [
+      "carry resolved text ID into DrawCommand so compact policy applies only to valid localization-table draws",
+      "classify compact runtime cells by stock logical font height <= 24",
+      "derive a dark keyline from the stock ARGB colour while preserving alpha",
+      "draw an 8-direction 1-2 screen-pixel readability stroke under the Korean fill",
+      "clip the readability stroke to the already-calculated Korean text footprint so the policy does not expand the prior layout box",
+      "leave larger menu/body runtime text unchanged"
+    ],
+    "runtime_table_changed": false,
+    "graphics_dds_changed": false
+  },
+  "static_qa": {
+    "runtime_rows": "1355 unique IDs",
+    "compact_threshold_logical_px": 24.0,
+    "stroke_screen_px_range": [
+      1.0,
+      2.0
+    ],
+    "stroke_clip": "exact calculated Korean text rectangle",
+    "larger_text_unchanged": true,
+    "translation_table_unchanged": true,
+    "status": "PASS"
+  },
+  "build_validation": {
+    "status": "PENDING_WIN32_RELEASE_GITHUB_ACTIONS"
+  },
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "B170_RUNTIME_REWORK_BUILD_PENDING",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
