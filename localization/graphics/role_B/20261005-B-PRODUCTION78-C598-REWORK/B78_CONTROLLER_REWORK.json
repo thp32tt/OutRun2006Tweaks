@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION78-C598-REWORK",
+  "timestamp_kst": "2026-10-05T11:49:30+09:00",
+  "index": 86,
+  "asset": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+  "reworks": "C151_REWORK_REQUIRED_DXT5_EXACT_MASK_AND_RENDER",
+  "machine_evidence": "localization/graphics/role_B/20261005-B-PRODUCTION78-C598-REWORK/B78_C598_DXT5_BOUNDARY_BLOCKER.json",
+  "source_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+  "finding": {
+    "stage_regions_tested": 10,
+    "ordinary_block_splice_pass": 2,
+    "ordinary_block_splice_fail": 8,
+    "boundary_source_alpha_pixels": 1435,
+    "reason": "mandatory source glyph/effect pixels exist in DXT5 blocks that cross exact source bboxes; whole-block replacement risks outside-bbox decoded changes, while retaining those blocks leaves source residue"
+  },
+  "decision": "REWORK_REQUIRED_DXT5_CONSTRAINED_ENDPOINT_INDEX_SOLVER",
+  "candidate_persisted": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
