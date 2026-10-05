@@ -188,6 +188,42 @@ require(
     "R32ReadEffectSnapshot(device, snapshot)",
 )
 
+# Raw viewport reads are neutral D3D9 observations. R31/R32 keep their tracked
+# viewport and StateBlock reliability policies; only the final device read moves.
+require(
+    draw_state_helpers,
+    "neutral viewport read primitive",
+    "inline bool ReadViewport(",
+    "device->GetViewport(&viewport)",
+)
+r31_viewport = function_body(r31, "bool R31GetSavedViewport(")
+require(
+    r31_viewport,
+    "R31 saved viewport policy",
+    "TryGetTrackedViewport(viewport)",
+    "OutRunVR::D3D9::ReadViewport(device, viewport)",
+)
+forbid(
+    r31_viewport,
+    "R31 saved viewport policy",
+    "device->GetViewport(&viewport)",
+)
+r32_viewport = function_body(r32, "bool R32GetSavedViewport(")
+require(
+    r32_viewport,
+    "R32 saved viewport policy",
+    "OutRunVR::State::StateBlockTracker::Reliable()",
+    "R31GetSavedViewport(device, viewport)",
+    "OutRunVR::D3D9::ReadViewport(device, viewport)",
+)
+forbid(
+    r32_viewport,
+    "R32 saved viewport policy",
+    "device->GetViewport(&viewport)",
+)
+if r33.count("R32GetSavedViewport(") < 2:
+    fail("R33 viewport sites unexpectedly stopped using the R32 StateBlock-aware wrapper")
+
 # 1) R31 is retained only for StateBlock/state-cache ownership. Its physical
 # draw overlay over R30 must be gone.
 forbid(
@@ -431,5 +467,5 @@ require(
 print(
     "VR R31/R32 draw-retirement guard PASS "
     "(R31=StateBlock owner, R32=Reset/Present/DirectGPU owner, "
-    "R33=sole physical draw dispatcher over R30, live shader identity=neutral helper, WVP batch primitive=neutral helper, live effect snapshot=neutral helper)"
+    "R33=sole physical draw dispatcher over R30, live shader identity=neutral helper, WVP batch primitive=neutral helper, live effect snapshot=neutral helper, viewport read=neutral helper)"
 )
