@@ -7,7 +7,7 @@ from scipy.ndimage import distance_transform_edt
 
 if os.environ.get('OUTRUN_CPU_WORKER')!='github-actions' or os.environ.get('OUTRUN_CPU_ROLE')!='B':
     raise SystemExit('GitHub-hosted localization CPU worker / role B only')
-repo=Path.cwd();run='20261006-B-INGAME162-788CE557';out=repo/'localization/graphics/role_B'/run;out.mkdir(parents=True,exist_ok=True)
+repo=Path.cwd();run='20261006-B-INGAME163-788CE557-SLANT-ALIGN';out=repo/'localization/graphics/role_B'/run;out.mkdir(parents=True,exist_ok=True)
 asset_rel='textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds'
 url='https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds'
 source_sha_expected='4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b'
@@ -145,11 +145,11 @@ source_masks={
  'time_remaining':time,
 }
 expected={
- 'for_experts':{'x':(0,600),'y':(60,210),'text':'상급자용','source':'For Experts','style':'red_white_navy','slant':0.24},
- 'transmission_black':{'x':(0,620),'y':(196,320),'text':'변속기','source':'Transmission','style':'black_transmission','slant':0.18},
- 'transmission_white':{'x':(520,1120),'y':(196,320),'text':'변속기','source':'Transmission','style':'white_transmission','slant':0.18},
- 'music_change':{'x':(900,1500),'y':(45,176),'text':'음악 변경','source':'Music Change','style':'white_shadow','slant':0.16},
- 'time_remaining':{'x':(1120,1960),'y':(176,310),'text':'남은 시간:','source':'Time remaining :','style':'white_navy','slant':0.16},
+ 'for_experts':{'x':(0,600),'y':(60,210),'text':'상급자용','source':'For Experts','style':'red_white_navy','slant':0.30,'align':'center'},
+ 'transmission_black':{'x':(0,620),'y':(196,320),'text':'변속기','source':'Transmission','style':'black_transmission','slant':0.30,'align':'left'},
+ 'transmission_white':{'x':(520,1120),'y':(196,320),'text':'변속기','source':'Transmission','style':'white_transmission','slant':0.30,'align':'left'},
+ 'music_change':{'x':(900,1500),'y':(45,176),'text':'음악 변경','source':'Music Change','style':'white_shadow','slant':0.20,'align':'center'},
+ 'time_remaining':{'x':(1120,1960),'y':(176,310),'text':'남은 시간:','source':'Time remaining :','style':'white_navy','slant':0.20,'align':'center'},
 }
 source_bboxes={};source_text=np.zeros((H,W),bool)
 for k,m in source_masks.items():
@@ -207,7 +207,7 @@ def render(k,cfg,occupied):
   else:raise RuntimeError(cfg['style'])
   gb=g.getchannel('A').getbbox();g=shear(g.crop(gb),cfg['slant']);gb=g.getchannel('A').getbbox();g=g.crop(gb)
   if g.width>SW-4 or g.height>SH-4:continue
-  gm=np.asarray(g.getchannel('A'))>0;cx=sx0+(SW-g.width)//2;cy=sy0+(SH-g.height)//2
+  gm=np.asarray(g.getchannel('A'))>0;cx=(sx0+2 if cfg.get('align')=='left' else sx0+(SW-g.width)//2);cy=sy0+(SH-g.height)//2
   for dx,dy in [(0,0),(0,-2),(0,2),(-2,0),(2,0),(-4,0),(4,0)]:
    px=max(sx0+2,min(sx1-g.width-2,cx+dx));py=max(sy0+2,min(sy1-g.height-2,cy+dy))
    if np.any(gm & protected_guard[py:py+g.height,px:px+g.width]):continue
@@ -242,13 +242,13 @@ if ch!=header or cm!=meta or ImageChops.difference(decoded,final).getbbox() is n
 Image.fromarray((source_text*255).astype(np.uint8),'L').save(out/'788CE557_SOURCE_TEXT_MASK.png');Image.fromarray((allowed*255).astype(np.uint8),'L').save(out/'788CE557_ALLOWED_TEXT_REGION_MASK.png');Image.fromarray(((~allowed)*255).astype(np.uint8),'L').save(out/'788CE557_PROTECTED_MASK.png');Image.fromarray((occupied*255).astype(np.uint8),'L').save(out/'788CE557_TARGET_TEXT_MASK.png');clean.save(out/'788CE557_CLEAN_PLATE.png')
 for k,m in source_masks.items():Image.fromarray((m*255).astype(np.uint8),'L').save(out/f'788CE557_SOURCE_MASK_{k}.png')
 work=Path('/tmp/b21');work.mkdir(exist_ok=True);sp=work/'source.png';cp=work/'clean.png';fp=work/'final.png';src.save(sp);clean.save(cp);decoded.save(fp)
-subprocess.run(['python3',str(repo/'tools/localization/validate_clean_plate.py'),str(sp),str(cp),str(out/'788CE557_SOURCE_TEXT_MASK.png'),'--report',str(out/'B_INGAME162_CLEAN_PLATE_VALIDATION.json')],check=True)
-subprocess.run(['python3',str(repo/'tools/localization/validate_clean_plate.py'),str(sp),str(fp),str(out/'788CE557_ALLOWED_TEXT_REGION_MASK.png'),'--protected-mask',str(out/'788CE557_PROTECTED_MASK.png'),'--report',str(out/'B_INGAME162_FINAL_MASK_VALIDATION.json')],check=True)
+subprocess.run(['python3',str(repo/'tools/localization/validate_clean_plate.py'),str(sp),str(cp),str(out/'788CE557_SOURCE_TEXT_MASK.png'),'--report',str(out/'B_INGAME163_CLEAN_PLATE_VALIDATION.json')],check=True)
+subprocess.run(['python3',str(repo/'tools/localization/validate_clean_plate.py'),str(sp),str(fp),str(out/'788CE557_ALLOWED_TEXT_REGION_MASK.png'),'--protected-mask',str(out/'788CE557_PROTECTED_MASK.png'),'--report',str(out/'B_INGAME163_FINAL_MASK_VALIDATION.json')],check=True)
 # Readable/raw/source-clean-final visual proof.
 def comp(im,bg):z=Image.new('RGBA',im.size,bg);z.alpha_composite(im);return z.convert('RGB')
 def card(label,im,bg=(55,55,55,255)):
  v=comp(im,bg);v.thumbnail((900,480),Image.Resampling.LANCZOS);c=Image.new('RGB',(v.width,v.height+30),'white');c.paste(v,(0,30));ImageDraw.Draw(c).text((5,5),label,fill='black');return c
-cards=[card('SOURCE',src),card('CLEAN',clean),card('FINAL',decoded),card('FINAL_WHITE',decoded,(255,255,255,255))];ww=cards[0].width+cards[1].width+8;hh=cards[0].height+cards[2].height+8;sheet=Image.new('RGB',(ww,hh),'white');sheet.paste(cards[0],(0,0));sheet.paste(cards[1],(cards[0].width+8,0));sheet.paste(cards[2],(0,cards[0].height+8));sheet.paste(cards[3],(cards[2].width+8,cards[1].height+8));sheet.save(out/'B_INGAME162_788CE557_COMPARE.jpg',quality=95)
+cards=[card('SOURCE',src),card('CLEAN',clean),card('FINAL',decoded),card('FINAL_WHITE',decoded,(255,255,255,255))];ww=cards[0].width+cards[1].width+8;hh=cards[0].height+cards[2].height+8;sheet=Image.new('RGB',(ww,hh),'white');sheet.paste(cards[0],(0,0));sheet.paste(cards[1],(cards[0].width+8,0));sheet.paste(cards[2],(0,cards[0].height+8));sheet.paste(cards[3],(cards[2].width+8,cards[1].height+8));sheet.save(out/'B_INGAME163_788CE557_COMPARE.jpg',quality=95)
 contacts=[]
 for rr in rows:
  sb=rr['original_bbox'];pad=34;cr=(max(0,sb[0]-pad),max(0,sb[1]-pad),min(W,sb[2]+pad),min(H,sb[3]+pad));ims=[]
@@ -261,16 +261,16 @@ for rr in rows:
  contacts.append(c)
 CW=max(x.width for x in contacts);CH=sum(x.height for x in contacts)+6*(len(contacts)-1);cs=Image.new('RGB',(CW,CH),'white');y=0
 for c in contacts:cs.paste(c,(0,y));y+=c.height+6
-cs.save(out/'B_INGAME162_788CE557_ROW_CONTACT.jpg',quality=96)
+cs.save(out/'B_INGAME163_788CE557_ROW_CONTACT.jpg',quality=96)
 # Dense top pair 2x for semantic split visual check.
 cr=(0,55,800,195);dense=[]
 for tag,im in [('SOURCE',src),('CLEAN',clean),('FINAL',decoded)]:
  v=comp(im,(55,55,55,255)).crop(cr).resize(((cr[2]-cr[0])*2,(cr[3]-cr[1])*2),Image.Resampling.NEAREST);c=Image.new('RGB',(v.width,v.height+30),'white');c.paste(v,(0,30));ImageDraw.Draw(c).text((5,5),tag,fill='black');dense.append(c)
 dw=max(x.width for x in dense);dh=sum(x.height for x in dense)+12;ds=Image.new('RGB',(dw,dh),'white');y=0
 for c in dense:ds.paste(c,(0,y));y+=c.height+6
-ds.save(out/'B_INGAME162_788CE557_TOP_PAIR_2X.jpg',quality=96)
-raws=src.transpose(Image.Transpose.FLIP_TOP_BOTTOM);rawf=decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM);r1=card('SOURCE_RAW',raws);r2=card('FINAL_RAW',rawf);rs=Image.new('RGB',(r1.width+r2.width+8,max(r1.height,r2.height)),'white');rs.paste(r1,(0,0));rs.paste(r2,(r1.width+8,0));rs.save(out/'B_INGAME162_788CE557_RAW_COMPARE.jpg',quality=94)
-report={'schema_version':1,'role':'B','run':run,'base_head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'queue_index':106,'asset':asset_rel,'source_url':url,'source_sha256':source_sha_expected,'candidate_sha256':candidate_sha,'candidate_path':str(candidate.relative_to(repo)),'readiness_tier':'P0_USER_INGAME_FAIL_REWORK_COMPLETED_SAME_INVOCATION','structure':{**meta,'header_128_exact':True,'raw_orientation':'mirror_y'},'method':'P0 IGR-017 in-game rework: exact-HD semantic masks for For Experts + both Transmission states + Music Change + Time remaining; preserve OutRun2SP/product and selector artwork; smooth native-resolution affine Hangul; transparent clean plate; exact-header DDS','mask_discovery':mask_discovery,'rows':rows,'clean_plate':{'source_text_residue_pixels':residue,'leftover_target_fill_pixels':leftover_fill,'preserved_source_changed_pixels':preserved_clean_exact,'status':'PASS'},'containment':{'elements_total':5,'elements_pass':5,'elements_fail':0,'changed_pixels_outside_exact_source_bboxes':outside,'alpha_changed_outside_exact_source_bboxes':alpha_out,'status':'PASS'},'zero_overlap':{'new_vs_preserved_source_alpha_pixels':protected_overlap,'two_px_guard_vs_preserved_conflicts':guard_conflict,'new_pair_overlap_or_2px_guard_conflicts':pair,'status':'PASS'},'product_protection':{'OutRun2SP_mask_changed_pixels':product_changed,'status':'PASS'},'protected_preserved':['OutRun2SP product artwork','selector arrows','warning icon','vehicle silhouettes','steering wheels','numeric row','all unrelated atlas alpha'],'user_ingame_backlog':['IGR-017','IGR-005_LINKED_MAPPING_STILL_OPEN'],'manual_visual_qa':'PENDING_CONTROLLER_SELF_QA','RUNTIME_VALIDATION':'UNTESTED','status':'B_INGAME162_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C'}
-(out/'B_INGAME162_788CE557_REPORT.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-(out/'B_INGAME162_STATIC_VALIDATION_SUMMARY.json').write_text(json.dumps({'source_sha256':source_sha_expected,'candidate_sha256':candidate_sha,'bbox_and_size_pass':'5/5','changed_outside':outside,'alpha_outside':alpha_out,'source_residue':residue,'leftover_target_fill_pixels':leftover_fill,'preserved_source_changed_pixels':preserved_clean_exact,'protected_overlap':protected_overlap,'two_px_guard_vs_preserved_conflicts':guard_conflict,'new_pair_overlap_or_2px_guard_conflicts':len(pair),'header_128_exact':True,'raw_orientation':'mirror_y','status':'PASS'},indent=2)+'\n')
-print('B_INGAME162_DONE',candidate_sha,'bboxes',source_bboxes,'mask_discovery',mask_discovery)
+ds.save(out/'B_INGAME163_788CE557_TOP_PAIR_2X.jpg',quality=96)
+raws=src.transpose(Image.Transpose.FLIP_TOP_BOTTOM);rawf=decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM);r1=card('SOURCE_RAW',raws);r2=card('FINAL_RAW',rawf);rs=Image.new('RGB',(r1.width+r2.width+8,max(r1.height,r2.height)),'white');rs.paste(r1,(0,0));rs.paste(r2,(r1.width+8,0));rs.save(out/'B_INGAME163_788CE557_RAW_COMPARE.jpg',quality=94)
+report={'schema_version':1,'role':'B','run':run,'base_head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'queue_index':106,'asset':asset_rel,'source_url':url,'source_sha256':source_sha_expected,'candidate_sha256':candidate_sha,'candidate_path':str(candidate.relative_to(repo)),'readiness_tier':'P0_USER_INGAME_FAIL_REWORK_COMPLETED_SAME_INVOCATION','structure':{**meta,'header_128_exact':True,'raw_orientation':'mirror_y'},'method':'P0 IGR-017 visual rework of B162: same exact-HD semantic masks, stronger source-family 0.30 selector slant, source-left Transmission alignment, native-resolution smooth affine Hangul; preserve OutRun2SP/product and selector artwork; exact-header DDS','mask_discovery':mask_discovery,'rows':rows,'clean_plate':{'source_text_residue_pixels':residue,'leftover_target_fill_pixels':leftover_fill,'preserved_source_changed_pixels':preserved_clean_exact,'status':'PASS'},'containment':{'elements_total':5,'elements_pass':5,'elements_fail':0,'changed_pixels_outside_exact_source_bboxes':outside,'alpha_changed_outside_exact_source_bboxes':alpha_out,'status':'PASS'},'zero_overlap':{'new_vs_preserved_source_alpha_pixels':protected_overlap,'two_px_guard_vs_preserved_conflicts':guard_conflict,'new_pair_overlap_or_2px_guard_conflicts':pair,'status':'PASS'},'product_protection':{'OutRun2SP_mask_changed_pixels':product_changed,'status':'PASS'},'protected_preserved':['OutRun2SP product artwork','selector arrows','warning icon','vehicle silhouettes','steering wheels','numeric row','all unrelated atlas alpha'],'user_ingame_backlog':['IGR-017','IGR-005_LINKED_MAPPING_STILL_OPEN'],'manual_visual_qa':'PENDING_CONTROLLER_SELF_QA','RUNTIME_VALIDATION':'UNTESTED','status':'B_INGAME163_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C'}
+(out/'B_INGAME163_788CE557_REPORT.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+(out/'B_INGAME163_STATIC_VALIDATION_SUMMARY.json').write_text(json.dumps({'source_sha256':source_sha_expected,'candidate_sha256':candidate_sha,'bbox_and_size_pass':'5/5','changed_outside':outside,'alpha_outside':alpha_out,'source_residue':residue,'leftover_target_fill_pixels':leftover_fill,'preserved_source_changed_pixels':preserved_clean_exact,'protected_overlap':protected_overlap,'two_px_guard_vs_preserved_conflicts':guard_conflict,'new_pair_overlap_or_2px_guard_conflicts':len(pair),'header_128_exact':True,'raw_orientation':'mirror_y','status':'PASS'},indent=2)+'\n')
+print('B_INGAME163_DONE',candidate_sha,'bboxes',source_bboxes,'mask_discovery',mask_discovery)
