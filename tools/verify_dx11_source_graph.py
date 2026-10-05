@@ -10358,7 +10358,7 @@ def main() -> None:
          PIPELINE_TRANSLATION_CPP, "R264 bounded D3D9 shader token retention"),
         ("out.versionSupported =",
          PIPELINE_TRANSLATION_CPP, "R264 stage/version fail-closed gate"),
-        ("evidence.bytecodeHash == identity.bytecodeHash",
+        ("identity.bytecodeHash == evidence.bytecodeHash",
          PIPELINE_TRANSLATION_CPP, "R264 exact R239 hash binding"),
         ("sourceEvidenceExact",
          RUNTIME_CENSUS, "R264 production census consumes exact source evidence"),
