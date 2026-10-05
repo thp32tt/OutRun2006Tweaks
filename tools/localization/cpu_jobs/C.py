@@ -121,8 +121,8 @@ for idx,(english,korean) in expected.items():
         positive=min(dl,dr,dt,db)>0
         full=np.zeros((H,W),dtype=bool); full[y0:y1,x0:x1]=fmask
         localized_masks.append(full)
-        spix=sa[y0:y1,x0:x1][smask]
-        fpix=fa[y0:y1,x0:x1][fmask]
+        spix=crop_src[smask]
+        fpix=crop_fin[fmask]
         smed=np.median(spix,axis=0).astype(int).tolist() if len(spix) else None
         fmed=np.median(fpix,axis=0).astype(int).tolist() if len(fpix) else None
     else:
