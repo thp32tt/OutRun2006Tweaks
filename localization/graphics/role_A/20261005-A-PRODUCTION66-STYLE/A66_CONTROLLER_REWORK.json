@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION66-STYLE",
+  "timestamp_kst": "2026-10-05T23:10:00+09:00",
+  "queue_index": 193,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "candidate_sha256": "50135201eede51d52ffdaf9f4a9c05f60d25af1c9150b903ec87bec61b99601d",
+  "machine_qa": "PASS_13_OF_13_ALL_ZERO_PIXEL_GATES",
+  "controller_visual_qa": "FAIL_EXCESSIVE_INTER_GLYPH_TRACKING",
+  "findings": [
+    "C208 underscale was materially improved, but 0.80-0.82 width targets made short Korean labels visually over-spaced.",
+    "MULTIPLAYER, Goal rows, WELCOME and ONLINE showed source-unjustified large inter-glyph gaps; SHOWROOM remained especially sparse because only two Hangul syllables fill a very wide Latin source box.",
+    "Candidate was not promoted. A67 retains Black source-family weight but reduces tracking targets while preserving exact containment."
+  ],
+  "decision": "A66_REWORK_REQUIRED_EXCESSIVE_TRACKING",
+  "superseded_by": "A67",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
