@@ -1,5 +1,5 @@
 {
-  "schema_version": 91,
+  "schema_version": 92,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -3944,12 +3944,12 @@
     "37759842"
   ],
   "latest_b_production": {
-    "run": "B_PRODUCTION137",
-    "asset": "63C91067",
-    "queue_index": 26,
-    "candidate_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
-    "report": "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_63C_REPORT.json",
-    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_CONTROLLER_SELF_QA.json",
+    "run": "B_PRODUCTION152",
+    "asset": "DCC7B488",
+    "queue_index": 32,
+    "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_DCC7_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_CONTROLLER_SELF_QA.json",
     "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
     "runtime_validation": "UNTESTED"
   },
@@ -4053,7 +4053,9 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [],
+  "current_pending_c": [
+    "DCC7B488"
+  ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -4362,6 +4364,28 @@
       "C200"
     ],
     "report": "localization/graphics/role_C/20261005-C202-8215FD25/C202_8215FD25_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "b_production152_dcc7b488": {
+    "timestamp_kst": "2026-10-05T21:53:30+09:00",
+    "queue_index": 32,
+    "source_sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+    "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+    "status": "B152_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "classification": "Total Rank -> 종합 랭킹",
+    "bbox_size_positive_margin": "1/1 PASS",
+    "pixel_gates": {
+      "outside": 0,
+      "alpha_outside": 0,
+      "render_outside": 0
+    },
+    "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_AND_RAW_MIRROR_Y",
+    "rejected_intermediates": [
+      "B150_SOURCE_GHOST",
+      "B151_RECTANGULAR_LUMINANCE_SHIFT"
+    ],
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_DCC7_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
