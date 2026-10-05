@@ -1978,11 +1978,12 @@ namespace
 
             track_ffb_change(ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr()));
             track_ffb_change(ImGui::Checkbox("Record driving telemetry (5 Hz + 1 Hz detail)", Settings::WheelFFBTelemetry.ptr()));
-            track_ffb_change(ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr()));
+            ImGui::BeginDisabled();
+            ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr());
             ImGui::SameLine();
-            track_ffb_change(ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()));
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Use Reverse Spring only if the wheel pushes farther away from centre. ConstantForce direction is independent.");
+            ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr());
+            ImGui::EndDisabled();
+            ImGui::TextDisabled("R10: polarity is automatic by model (Modern ON/ON; Arcade/Hybrid/PS2 OFF/OFF).");
 
             if (ffbDirty_)
                 ImGui::TextDisabled("Unsaved FFB changes are active now but will be lost after restart.");
