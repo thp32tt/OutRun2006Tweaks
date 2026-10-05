@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T22:10:36+09:00",
+  "updated_at_kst": "2026-10-05T22:13:37+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A62 odd index173 6DC89C6E candidate b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26 completed from A61 source-contact binding in the same controller invocation. Physical idx0..20 map WATERFALLS..GHOST FOREST; all stage names use canonical phonetic Hangul. Shared blue-gray bold condensed source family restored at lowres fs18 x4, left aligned; only ICE SCAPE uses 0.9739 horizontal scale. 21/21 bbox/size/positive-margin, CLEAN/FINAL validators PASS, outside/alpha/protected/source-residue/render/overlap/touch=0; readable + raw mirror_y self-QA PASS. pending_artwork localize_text=9; producer REWORK=1 (37759842); pending-C=1 (6DC89C6E). C203/C206 remain latest completed C approvals. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C203/C206/C207 finalized the latest completed A60/B152/A62 candidates. 59A79158 A60 passes independent 24/24 source/localized bbox exact, size/margins, canonical stage binding and zero outside/residue/overlap with controller visual PASS. DCC7B488 B152 is positively classified zoom_review Total Rank -> 종합 랭킹 and C206 passes exact bbox, strict source-script residue=0, zero outside/protected and seamless Coons clean-plate visual QA; C204/C205 are verifier-only false positives on unchanged bytes. 6DC89C6E A62 passes independent 21/21 source/localized bbox exact, canonical stage mapping, zero outside/residue/overlap and controller visual PASS. Current queue: 83 localize_text + 43 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit; pending_artwork localize_text=9; producer REWORK=1 (37759842); pending-C=0. A63/index193 is preflight-only at this checkpoint. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,15 +265,13 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "REWORK_REQUIRED_WITH_PENDING_C",
+      "status": "REWORK_REQUIRED",
       "assets": [
         "37759842"
       ],
       "remaining": 1,
-      "note": "37759842 remains manual/template-only producer REWORK. A62 6DC89C6E self-QA PASS pending independent C. pending_artwork localize_text=9; pending-C=1 (6DC89C6E); RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": [
-        "6DC89C6E"
-      ]
+      "note": "Only 37759842 remains producer REWORK. C203/C206/C207 approved 59A79158/DCC7B488/6DC89C6E pending isolated in-game validation. pending_artwork localize_text=9; pending-C=0; A63 index193 preflight-only. RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": []
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -297,15 +295,16 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C203/C206",
-      "report": "localization/graphics/role_C/20261005-C203-C206-BATCH/C203_C206_BATCH_FINAL_QA.json",
-      "result": "2_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "run": "C203/C206/C207",
+      "report": "localization/graphics/role_C/20261005-C203-C207-BATCH/C203_C207_BATCH_FINAL_QA.json",
+      "result": "3_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
       "candidate_changed_by_C": false,
-      "assets_checked": 2,
-      "physical_elements_checked": 25,
+      "assets_checked": 3,
+      "physical_elements_checked": 46,
       "pixel_visual_pass_assets": [
         "59A79158",
-        "DCC7B488"
+        "DCC7B488",
+        "6DC89C6E"
       ],
       "rework_required_assets": [],
       "global_rework_remaining": [
@@ -318,17 +317,19 @@
         "75C3586A"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 10,
+      "pending_production_localize_text": 9,
       "machine_evidence": {
         "59A79158": "localization/graphics/role_C/20261005-C203-59A79158/C203_59A79158_MACHINE_QA.json",
-        "DCC7B488": "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7B488_MACHINE_QA.json"
+        "DCC7B488": "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7B488_MACHINE_QA.json",
+        "6DC89C6E": "localization/graphics/role_C/20261005-C207-6DC89C6E/C207_6DC89C6E_MACHINE_QA.json"
       },
       "controller_visual": {
         "59A79158": "PASS",
-        "DCC7B488": "PASS"
+        "DCC7B488": "PASS",
+        "6DC89C6E": "PASS"
       },
-      "verifier_retry_note": "C204/C205 were C-only verifier false positives on unchanged B152 candidate bytes; corrected C206 is authoritative.",
-      "in_game_validation": "59A79158/DCC7B488 UNTESTED; RUNTIME_VALIDATION=UNTESTED"
+      "verifier_retry_note": "C204/C205 were C-only verifier false positives on unchanged B152 DCC7 bytes; C206 is authoritative.",
+      "in_game_validation": "59A79158/DCC7B488/6DC89C6E UNTESTED; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION137",
@@ -550,7 +551,7 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 10,
+    "current_pending_artwork_localize_text": 9,
     "current_producer_rework_remaining": 1,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T20:39:22+09:00",
@@ -1236,7 +1237,7 @@
       "report": "localization/graphics/role_C/20261005-C170-754F0599/C170_754F_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C203-C206-BATCH/C203_C206_BATCH_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C203-C207-BATCH/C203_C207_BATCH_FINAL_QA.json",
     "c171_controller_final_qa": {
       "timestamp_kst": "2026-10-05T16:06:00+09:00",
       "run": "20261005-C171-754F0599",
@@ -1566,6 +1567,29 @@
       ],
       "machine_report": "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7B488_MACHINE_QA.json",
       "report": "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7B488_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c207_6dc89c6e": {
+      "timestamp_kst": "2026-10-05T22:13:37+09:00",
+      "queue_index": 173,
+      "candidate_sha256": "b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26",
+      "machine_status": "PASS",
+      "source_bbox_exact": "21/21 PASS",
+      "candidate_bbox_exact": "21/21 PASS",
+      "bbox_size_positive_margin": "21/21 PASS",
+      "semantic_stage_mapping": "PASS_CANONICAL_PHONETIC_21_OF_21",
+      "zero_pixel_gates": {
+        "decoded_changed_outside_union_source_bboxes": 0,
+        "alpha_changed_outside_union_source_bboxes": 0,
+        "introduced_visible_outside_union_source_bboxes": 0,
+        "source_residue_exact_pixels_outside_localized_bboxes": 0,
+        "localized_overlap_pixels": 0,
+        "localized_1px_touch_pixels": 0
+      },
+      "controller_visual_qa": "PASS",
+      "decision": "C207_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "machine_report": "localization/graphics/role_C/20261005-C207-6DC89C6E/C207_6DC89C6E_MACHINE_QA.json",
+      "report": "localization/graphics/role_C/20261005-C207-6DC89C6E/C207_6DC89C6E_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     }
   },
