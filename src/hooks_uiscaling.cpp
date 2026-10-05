@@ -265,7 +265,8 @@ class UIScaling : public Hook
 			SpriteNode* node = root ? root->tail_4 : nullptr;
 			if (node && node != tailsBefore[prio])
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+					node, OutRunVR::GameSemantic::RenderScope::WorldBillboard,
+					OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani);
 		}
 		return result;
 	}
@@ -293,7 +294,8 @@ class UIScaling : public Hook
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
 			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-				node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+				node, OutRunVR::GameSemantic::RenderScope::WorldBillboard,
+				OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite);
 		}
 
 		return result;
@@ -302,7 +304,9 @@ class UIScaling : public Hook
 
 	static void TagAppendedNodes(
 		const std::array<SpriteNode*, Game::SpritePriorityCount>& before,
-		OutRunVR::GameSemantic::RenderScope scope)
+		OutRunVR::GameSemantic::RenderScope scope,
+		OutRunVR::GameSemantic::ProducerToken producer =
+			OutRunVR::GameSemantic::ProducerToken::None)
 	{
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
@@ -315,7 +319,8 @@ class UIScaling : public Hook
 				? before[prio]->next_0 : root->next_0;
 			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
 			{
-				OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, scope, producer);
 				if (node == tailAfter)
 					break;
 				node = node->next_0;
@@ -340,7 +345,8 @@ class UIScaling : public Hook
 		SpriteNode* node = root ? root->tail_4 : nullptr;
 		if (node && node != tailBefore)
 			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud,
+				OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite);
 		return result;
 	}
 
@@ -361,7 +367,8 @@ class UIScaling : public Hook
 		// carries the old projected-marker payload, so preserve its spatial
 		// ownership as WORLD_BILLBOARD and let R30's strict world gates decide.
 		TagAppendedNodes(
-			before, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+			before, OutRunVR::GameSemantic::RenderScope::WorldBillboard,
+			OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani);
 		return result;
 	}
 
@@ -382,7 +389,8 @@ class UIScaling : public Hook
 		SpriteNode* node = root ? root->tail_4 : nullptr;
 		if (node && node != tailBefore)
 			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud,
+				OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite);
 		return result;
 	}
 
