@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B163",
+  "timestamp_kst": "2026-10-06T02:52:30+09:00",
+  "scope": "B-owned active P0 user in-game regression IGR-017 on index106 788CE557 only; completed/PASS assets were not repeated.",
+  "queue_index": 106,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+  "source_sha256": "4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b",
+  "candidate_sha256": "bb8f96c0590c350c99fcd0414db33249451400d49eb46852ccb7cc82c3725d0c",
+  "worker_output_commit": "7abae9a0c71f2c820cebbedea01f545aadd74609",
+  "worker_report": "localization/graphics/role_B/20261006-B-INGAME163-788CE557-SLANT-ALIGN/B_INGAME163_788CE557_REPORT.json",
+  "supersedes_worker_only": {
+    "B162_candidate_sha256": "86fb9246aac7e4a0d0e1a84b113d194439cc96bc236213d5a7faeab1ea451119",
+    "reason": "B162 machine gates passed, but producer visual review rejected its Transmission presentation as relatively under-slanted and center-aligned versus the exact-HD source; it was never promoted to shared state."
+  },
+  "localized_semantics": [
+    {
+      "source": "For Experts",
+      "korean": "상급자용",
+      "physical_occurrences": 1
+    },
+    {
+      "source": "Transmission",
+      "korean": "변속기",
+      "physical_occurrences": 2
+    },
+    {
+      "source": "Music Change",
+      "korean": "음악 변경",
+      "physical_occurrences": 1
+    },
+    {
+      "source": "Time remaining :",
+      "korean": "남은 시간:",
+      "physical_occurrences": 1
+    }
+  ],
+  "protected": [
+    "OutRun2SP product artwork",
+    "selector arrows",
+    "warning icon",
+    "vehicle silhouettes",
+    "steering wheels",
+    "numeric row",
+    "unrelated atlas artwork"
+  ],
+  "machine_qa": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "bbox_size_positive_margin": "5/5 PASS",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_pixels_outside_exact_source_bboxes": 0,
+    "source_text_residue_pixels": 0,
+    "preserved_source_changed_pixels": 0,
+    "protected_overlap_pixels": 0,
+    "two_px_guard_conflicts": 0,
+    "localized_pair_overlap_or_touch": 0,
+    "OutRun2SP_mask_changed_pixels": 0,
+    "clean_validator": "PASS",
+    "final_validator": "PASS"
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_evidence": [
+    "localization/graphics/role_B/20261006-B-INGAME163-788CE557-SLANT-ALIGN/B_INGAME163_788CE557_COMPARE.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME163-788CE557-SLANT-ALIGN/B_INGAME163_788CE557_ROW_CONTACT.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME163-788CE557-SLANT-ALIGN/B_INGAME163_788CE557_TOP_PAIR_2X.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME163-788CE557-SLANT-ALIGN/B_INGAME163_788CE557_RAW_COMPARE.jpg"
+  ],
+  "controller_visual_note": "PASS: SOURCE/CLEAN/FINAL and raw mirror_y review show both baked Transmission states rebuilt as native-resolution Hangul with source-left anchoring and stronger 0.30 right slant; For Experts uses the same 0.30 selector-family lean, while Music Change and Time remaining retain their source-relative italic treatment. No English source residue, broken glyph, clipping, Korean/Korean collision, protected-art damage, seam, other-image intrusion, or orientation regression is visible. OutRun2SP remains pixel-protected original artwork.",
+  "backlog": {
+    "IGR-017": "B_STATIC_PASS_PENDING_C_AND_NEW_INGAME_RETEST",
+    "IGR-005": "OPEN_USER_INGAME_FAIL; B163 confirms/reworks the 788CE557 graphics portion, but the MIXED modal/runtime source split remains unresolved and is not closed."
+  },
+  "next_b_actionable": {
+    "id": "IGR-009",
+    "priority": "P1",
+    "queue_index": 48,
+    "asset": "textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+    "reason": "Exact-high-confidence mapped Slipstream graphics regression; IGR-005 remains P0 but is blocked on unresolved MIXED runtime/modal mapping after the graphics portion was repaired."
+  },
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "B163_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

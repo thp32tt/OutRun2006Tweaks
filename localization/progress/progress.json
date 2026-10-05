@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T02:33:06.745+09:00",
+  "updated_at_kst": "2026-10-06T02:52:30+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C221 approved A83 P0 index95 37759842 candidate 2dac8ee099120f2978eaf8ba992ffff11ecad7c11912a98aca9269a1a78f6988 for static graphics QA. Independent canonical/current DDS revalidation of all 16 C219-changed transform rows: exact bbox match + containment/size/positive margins 16/16, outside/alpha/protected/source-core residue/line-overlap=0; readable/raw visual PASS resolves C219 center-alignment/under-slant return with source-left stacks and 0.24 shear. IGR-014/015/016 remain C_STATIC_PASS_PENDING_INGAME_RETEST and are not closed. Remaining explicit graphics user-rework queue includes index48 B1696633 and index106 788CE557; A82 rank/B162 transmission worker-only results were not promoted by C without producer controller/shared-state finalization.",
+  "next_checkpoint": "B163 finalized B-owned P0 index106 788CE557 user in-game graphics rework candidate bb8f96c0590c350c99fcd0414db33249451400d49eb46852ccb7cc82c3725d0c: exact-HD 2048x1024 RGBA32/header/raw mirror_y; For Experts + Transmission x2 + Music Change + Time remaining localized, OutRun2SP protected exact. 5/5 bbox+size+positive-margin and all outside/alpha/residue/protected/overlap/touch gates PASS; controller SOURCE/CLEAN/FINAL + raw visual PASS after B162 was rejected for insufficient slant/center alignment. IGR-017 is B static PASS pending independent C + NEW actual in-game retest; IGR-005 remains OPEN MIXED because modal/runtime split is unresolved. Next B exact-mapped graphics regression is P1 IGR-009 index48 B1696633.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -267,12 +267,13 @@
     "next_hd_rework": {
       "status": "PENDING_OTHER_USER_REWORK_AND_INGAME_RETEST",
       "assets": [
-        "B1696633",
-        "788CE557"
+        "B1696633"
       ],
-      "remaining": 2,
-      "note": "37759842 C221 static PASS pending NEW in-game retest. Explicit graphics rework remains index48 Slipstream and index106 Transmission; other mixed/runtime backlog remains separately open.",
-      "pending_c": []
+      "remaining": 1,
+      "note": "788CE557 B163 static self-QA PASS pending independent C + NEW in-game retest; IGR-005 mixed/runtime mapping remains open. Next exact-mapped B graphics rework is index48 Slipstream B1696633.",
+      "pending_c": [
+        "788CE557"
+      ]
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -337,26 +338,34 @@
       "in_game_validation": "37759842 PENDING_NEW_INGAME_RETEST; IGR-014/015/016 not CLOSED."
     },
     "latest_b_first_qa": {
-      "run": "B_PRODUCTION157",
-      "worker_output_commit": "daa16fc7761153c02d3a72daa4b405a2bf5bffc5",
-      "result": "06AB5CEE_ZOOM_REVIEW_PROMOTED_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "run": "B_INGAME163",
+      "worker_output_commit": "7abae9a0c71f2c820cebbedea01f545aadd74609",
+      "result": "788CE557_P0_USER_INGAME_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME_RETEST",
       "assets": {
-        "06AB5CEE": {
-          "queue_index": 36,
-          "source_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
-          "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
-          "status": "B157_SELF_QA_PASS_PENDING_C_AND_INGAME",
-          "report": "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_JENN_REPORT.json",
-          "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_CONTROLLER_SELF_QA.json",
-          "physical_elements": 3,
-          "bbox_size_positive_margin": "3/3",
+        "788CE557": {
+          "queue_index": 106,
+          "source_sha256": "4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b",
+          "candidate_sha256": "bb8f96c0590c350c99fcd0414db33249451400d49eb46852ccb7cc82c3725d0c",
+          "status": "B163_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+          "report": "localization/graphics/role_B/20261006-B-INGAME163-788CE557-SLANT-ALIGN/B_INGAME163_788CE557_REPORT.json",
+          "controller_report": "localization/graphics/role_B/20261006-B-INGAME163-788CE557-SLANT-ALIGN/B163_CONTROLLER_SELF_QA.json",
+          "physical_elements": 5,
+          "bbox_size_positive_margin": "5/5 PASS",
           "outside_pixels": 0,
           "alpha_outside_pixels": 0,
-          "source_title_residue": 0,
-          "zoom_review_promoted": true
+          "source_text_residue": 0,
+          "protected_overlap": 0,
+          "localized_overlap_or_touch": 0,
+          "OutRun2SP_changed_pixels": 0,
+          "user_ingame_regressions": [
+            "IGR-017"
+          ],
+          "related_mixed_open": [
+            "IGR-005"
+          ]
         }
       },
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "PENDING_NEW_INGAME_RETEST"
     },
     "c78_39229d64": {
       "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
@@ -1484,7 +1493,9 @@
       "report": "localization/graphics/role_C/20261005-C200-8215FD25/C200_8215FD25_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_c": [],
+    "current_pending_c": [
+      "788CE557"
+    ],
     "c201_55b57cde": {
       "timestamp_kst": "2026-10-05T21:27:02+09:00",
       "queue_index": 161,
