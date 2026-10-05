@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C209 finalized new B154 index34 B7E25BAD candidate 7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800 and positively classified zoom_review Total Rank -> 종합 랭킹. Independent canonical 4096x2048 RGBA32/header/raw mirror_y QA and C202-approved same-family template reconstruction reproduce localized bbox [2172,1198,2404,1262] inside source core [2036,1194,2541,1266] with positive margins; decoded/alpha/introduced-visible outside=0 and source-title residue=0. Template/HOLL differences are confined to 240 title/effect pixels plus one alpha-1 white AA pixel; all other HOLL artwork remains canonical. Controller SOURCE/CLEAN/FINAL/raw visual PASS. C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "C208 returned new A65 index193 97E863AD candidate 0352a4e0eb0285f9b021fb5046da7b778e3de3317b2348efad69158e0742000d. Independent canonical/header/raw mirror_y QA passes 13/13 source/localized bbox exact + size + positive margins and all outside/alpha/introduced-visible/source-residue/overlap/touch/protected gates at zero; OutRun/OutRun2SP/OUTRUN/TESTAROSSA protected pixels remain exact. Mandatory controller visual QA fails source-style scale/proportion: Korean labels are materially underscaled/too compact versus the wide bold-condensed source family (e.g. SHOWROOM 88/389px, MULTIPLAYER 232/532px, WELCOME 148/473px, ONLINE 64/172px). C208_REWORK_REQUIRED_SOURCE_STYLE_SCALE_PROPORTION; re-render larger/wider inside exact source bboxes. RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION62 completed odd index173 6DC89C6E candidate b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26. A61 readable source-contact fixed all 21 physical stage rows, then A62 rendered in the same invocation using canonical phonetic Hangul and the shared blue-gray bold condensed source family. 21/21 bbox/size/positive-margin, CLEAN/FINAL PASS, outside/alpha/protected/residue/render/overlap/touch=0, readable/raw mirror_y visual PASS. Pending independent C and in-game. RUNTIME_VALIDATION=UNTESTED.",
     "C203 finalized A60 index163 59A79158 candidate 1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583. Independent canonical source+atlas QA reproduces source/localized bboxes 24/24 exactly, 24/24 containment/size/positive-margin and canonical phonetic stage binding PASS; outside/alpha/introduced-visible/source-residue/overlap/touch all 0. Controller contacts/raw mirror_y PASS. C203_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
@@ -3998,7 +3999,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C208-97E863AD/C208_97E863AD_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_CONTROLLER_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4553,6 +4554,39 @@
     "verifier_retry_note": "Initial C208 source-residue counter was a C-only scope false positive inside localized Hangul bboxes; corrected same candidate passes residue=0.",
     "machine_report": "localization/graphics/role_C/20261005-C208-97E863AD/C208_97E863AD_MACHINE_QA.json",
     "report": "localization/graphics/role_C/20261005-C208-97E863AD/C208_97E863AD_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c209_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T22:57:50+09:00",
+    "run": "20261005-C209-B7E25BAD",
+    "queue_index": 34,
+    "candidate_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
+    "classification": "zoom_review -> localize_text; Total Rank -> 종합 랭킹",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "1/1 PASS",
+    "localized_bbox": [
+      2172,
+      1198,
+      2404,
+      1262
+    ],
+    "source_core_bbox": [
+      2036,
+      1194,
+      2541,
+      1266
+    ],
+    "zero_pixel_gates": {
+      "decoded_changed_outside": 0,
+      "alpha_changed_outside": 0,
+      "introduced_visible_outside": 0,
+      "source_title_residue": 0
+    },
+    "template_reference": "C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME / 8215FD25 / +192x",
+    "controller_visual_qa": "PASS",
+    "decision": "C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "machine_report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_MACHINE_QA.json",
+    "report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
