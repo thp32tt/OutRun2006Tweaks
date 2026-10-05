@@ -1,71 +1,48 @@
 #!/usr/bin/env python3
-import hashlib,json,os,struct,subprocess,urllib.request
+import hashlib,json,os,struct,subprocess
 from pathlib import Path
 import numpy as np
-from PIL import Image,ImageChops,ImageDraw,ImageFont,ImageFilter
+from PIL import Image,ImageChops,ImageDraw,ImageFont
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("GitHub-hosted localization CPU worker / role B only")
 
 repo=Path.cwd()
-run="20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO"
+run="20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 
-assets={
- "97E":{
-   "queue_index":193,
-   "rel":"textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
-   "current_sha":"cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418",
-   "source_sha":"d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
-   "source_url":"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
-   "clean":"localization/graphics/role_A/20261005-A-PRODUCTION70-REWORK/A70_CLEAN_PLATE.png",
-   "clean_sha":"a8b16f437f565a70aa5447c51023dc6baf75df36f8da780bc14fd43ac4f07c68",
-   "protected":"localization/graphics/role_A/20261005-A-PRODUCTION70-REWORK/A70_PROTECTED_VISIBLE_MASK.png",
-   "protected_sha":"12228745cf607194a590bdf9e2a729b29803702e4c011e499f0ef80ff58aa829",
-   "source_text":"localization/graphics/role_A/20261005-A-PRODUCTION70-REWORK/A70_SOURCE_TEXT_MASK.png",
-   "source_text_sha":"ee9b7212dd5c3d430bf6fb6eb0060eaa3a92221554999f6ad2ca18974927ad88",
-   "target":{"key":"multiplayer_intro_title","source":"MULTIPLAYER","korean":"멀티플레이",
-             "bb":[8,297,540,359],"font_style":"Black","font_start":60,
-             "fill":[78,96,100,255],"stroke":0,"align":"left","margin":2}
- },
- "8C":{
-   "queue_index":188,
-   "rel":"textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
-   "current_sha":"00e16af1e3d468667fe13ed5291ec55bbfd06f18e6895a6be7e79f413ade94bd",
-   "source_sha":"dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
-   "source_url":"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
-   "clean":"localization/graphics/role_B/20261005-B-PRODUCTION81/8C_CLEAN_PLATE.png",
-   "clean_sha":"859259fa90a6d70e86f788914c36604b05dfee939f740d215486981fa5ff9b49",
-   "protected":"localization/graphics/role_B/20261005-B-PRODUCTION81/8C_PROTECTED_VISIBLE_MASK.png",
-   "protected_sha":"e7e746011b4aa5eb384e36b062d5d0689172afe30d3a2e0a40cd35696ea12d0b",
-   "source_text":"localization/graphics/role_B/20261005-B-PRODUCTION81/8C_SOURCE_TEXT_MASK.png",
-   "source_text_sha":"6ea5b0c415a8e70c70437040f56b9be41e4f2a549bae11a9bb8081c1b88feadd",
-   "target":{"key":"multiplayer_help","source":"Online and LAN OutRun for up to 6 players",
-             "korean":"온라인/LAN 아웃런 최대 6인 플레이",
-             "bb":[10,1099,1243,1165],"font_style":"Bold","font_start":62,
-             "fill":[63,71,74,255],"stroke":0,"align":"left","margin":3}
- }
-}
+rel="textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
+candidate=repo/"localization/graphics/hd_candidates"/rel
+source=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"/rel
+clean_path=repo/"localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_CLEAN_PLATE.png"
+protected_path=repo/"localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_PROTECTED_MASK.png"
+
+INPUT_SHA="a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f"
+SOURCE_SHA="6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
+CLEAN_SHA="bc25fc34d95b0d9977ca4af5f8df6c590a654e91f6890f621be18cc6785027ee"
+PROTECTED_SHA="0d95f62263989b1e1371bdff67844a42b47db55199d345f452c65aca9008a56e"
+STAGE_BB=[455,245,690,350]
+OLD_STAGE_BB=[461,249,685,345]
+KOREAN="스테이지"
 
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 def load_dds(p):
     b=Path(p).read_bytes()
-    if b[:4]!=b"DDS ": raise RuntimeError(("not DDS",str(p)))
+    if b[:4]!=b"DDS ": raise RuntimeError(("not dds",str(p)))
     h=struct.unpack_from("<I",b,12)[0]; w=struct.unpack_from("<I",b,16)[0]
     pitch=struct.unpack_from("<I",b,20)[0]; mips=struct.unpack_from("<I",b,28)[0]
-    pf_flags=struct.unpack_from("<I",b,80)[0]; fourcc=b[84:88]
-    bpp=struct.unpack_from("<I",b,88)[0]; masks=struct.unpack_from("<IIII",b,92)
+    fourcc=b[84:88]; bpp=struct.unpack_from("<I",b,88)[0]; masks=struct.unpack_from("<IIII",b,92)
     if bpp!=32 or fourcc!=b"\0\0\0\0" or mips!=1 or len(b)!=128+w*h*4:
-        raise RuntimeError(("unsupported DDS",str(p),w,h,mips,fourcc,bpp,len(b)))
+        raise RuntimeError(("unsupported dds",w,h,mips,fourcc,bpp,len(b)))
     if masks==(0xff,0xff00,0xff0000,0xff000000): mode="RGBA"
     elif masks==(0xff0000,0xff00,0xff,0xff000000): mode="BGRA"
     else: raise RuntimeError(("masks",masks))
     raw=Image.frombytes("RGBA",(w,h),b[128:],"raw",mode)
     return b[:128],raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM),{
-      "width":w,"height":h,"pitch":pitch,"mips":mips,"pf_flags":pf_flags,
-      "bpp":bpp,"masks":[hex(x) for x in masks],"raw_mode":mode
+      "width":w,"height":h,"pitch":pitch,"mips":mips,"bpp":bpp,
+      "masks":[hex(x) for x in masks],"raw_mode":mode
     }
 
 def write_dds(header,readable,p,mode):
@@ -73,7 +50,7 @@ def write_dds(header,readable,p,mode):
     Path(p).write_bytes(payload)
     return hashlib.sha256(payload).hexdigest()
 
-def font_path(style):
+def font_path(style="Bold"):
     q=subprocess.check_output(["fc-match","-f","%{file}",f"Noto Sans CJK KR:style={style}"],text=True).strip()
     if not q or not Path(q).exists() or "NotoSansCJK" not in Path(q).name:
         subprocess.run(["sudo","apt-get","update","-qq"],check=True)
@@ -82,181 +59,234 @@ def font_path(style):
     if not q or not Path(q).exists(): raise RuntimeError(("font",style,q))
     return q
 
-FONT={"Black":font_path("Black"),"Bold":font_path("Bold")}
-
 def bbox_mask(m):
     ys,xs=np.nonzero(m)
     return None if not len(xs) else [int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
 
-def comp(im,bg=(96,96,96,255)):
-    z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
-
-def card(label,im,crop,scale=1):
-    v=comp(im).crop(crop)
-    if scale!=1: v=v.resize((v.width*scale,v.height*scale),Image.Resampling.NEAREST)
-    c=Image.new("RGB",(v.width,v.height+28),"white"); c.paste(v,(0,28))
-    ImageDraw.Draw(c).text((5,5),label,fill="black")
-    return c
-
-reports={}
-for tag,cfg in assets.items():
-    candidate=repo/"localization/graphics/hd_candidates"/cfg["rel"]
-    if not candidate.exists() or sha(candidate)!=cfg["current_sha"]:
-        raise RuntimeError(("candidate drift",tag,sha(candidate) if candidate.exists() else None,cfg["current_sha"]))
-    for k in ["clean","protected","source_text"]:
-        p=repo/cfg[k]
-        expected=cfg[k+"_sha"]
-        if not p.exists() or sha(p)!=expected: raise RuntimeError(("evidence drift",tag,k,sha(p) if p.exists() else None,expected))
-
-    source=Path(f"/tmp/b169_{tag}_source.dds")
-    urllib.request.urlretrieve(cfg["source_url"],source)
-    if sha(source)!=cfg["source_sha"]: raise RuntimeError(("source drift",tag,sha(source),cfg["source_sha"]))
-
-    header,src,meta=load_dds(source)
-    oh,old,ometa=load_dds(candidate)
-    if header!=oh or meta!=ometa: raise RuntimeError(("structure drift",tag))
-
-    master_clean=Image.open(repo/cfg["clean"]).convert("RGBA")
-    protected=np.asarray(Image.open(repo/cfg["protected"]).convert("L"))>0
-    source_text=np.asarray(Image.open(repo/cfg["source_text"]).convert("L"))>0
-    if master_clean.size!=src.size or protected.shape!=(src.height,src.width) or source_text.shape!=protected.shape:
-        raise RuntimeError(("evidence size",tag))
-
-    t=cfg["target"]; x0,y0,x1,y1=t["bb"]; bw=x1-x0; bh=y1-y0
-    allowed=np.zeros((src.height,src.width),bool); allowed[y0:y1,x0:x1]=1
-    if np.any(protected & allowed): raise RuntimeError(("target intersects protected",tag,int(np.logical_and(protected,allowed).sum())))
-
-    # Reproducible target-only clean plate: exact source everywhere except this exact source bbox.
-    clean_target=src.copy()
-    clean_target.paste(master_clean.crop((x0,y0,x1,y1)),(x0,y0))
-    clean_target.save(out/f"B169_{tag}_TARGET_CLEAN.png")
-    Image.fromarray((allowed*255).astype(np.uint8),"L").save(out/f"B169_{tag}_EDIT_MASK.png")
-    Image.fromarray((protected*255).astype(np.uint8),"L").save(out/f"B169_{tag}_PROTECTED_MASK.png")
-    src_png=Path(f"/tmp/b169_{tag}_source.png"); src.save(src_png)
-    subprocess.run(["python3",str(repo/"tools/localization/validate_clean_plate.py"),
-                    str(src_png),str(out/f"B169_{tag}_TARGET_CLEAN.png"),str(out/f"B169_{tag}_EDIT_MASK.png"),
-                    "--protected-mask",str(out/f"B169_{tag}_PROTECTED_MASK.png"),
-                    "--report",str(out/f"B169_{tag}_CLEAN_VALIDATION.json")],check=True)
-
-    final=old.copy()
-    final.paste(master_clean.crop((x0,y0,x1,y1)),(x0,y0))
-    chosen=None
-    for fs in range(t["font_start"],15,-1):
-        f=ImageFont.truetype(FONT[t["font_style"]],fs)
-        probe=Image.new("RGBA",(max(1800,bw+400),max(240,bh+100)),(0,0,0,0))
-        d=ImageDraw.Draw(probe)
-        tb=d.textbbox((0,0),t["korean"],font=f,stroke_width=t["stroke"])
-        d.text((12-tb[0],12-tb[1]),t["korean"],font=f,fill=tuple(t["fill"]),
-               stroke_width=t["stroke"],stroke_fill=tuple(t["fill"]))
-        gb=probe.getchannel("A").getbbox()
-        if not gb: continue
-        g=probe.crop(gb)
-        m=t["margin"]
-        if g.width>bw-2*m or g.height>bh-2*m: continue
-        px=x0+m if t["align"]=="left" else x0+(bw-g.width)//2
-        py=y0+(bh-g.height)//2
-        gm=np.asarray(g.getchannel("A"))>0
-        if px<x0+m or py<y0+m or px+g.width>x1-m or py+g.height>y1-m: continue
-        if np.any(gm & protected[py:py+g.height,px:px+g.width]): continue
-        chosen=(g,px,py,fs); break
-    if chosen is None: raise RuntimeError(("fit",tag,t["key"]))
-
-    g,px,py,fs=chosen
-    layer=Image.new("RGBA",src.size,(0,0,0,0)); layer.alpha_composite(g,(px,py))
-    render=np.asarray(layer.getchannel("A"))>0
-    final.alpha_composite(layer)
-    lb=bbox_mask(render)
-    if not (x0<lb[0] and y0<lb[1] and lb[2]<x1 and lb[3]<y1): raise RuntimeError(("margin",tag,lb,t["bb"]))
-    if lb[2]-lb[0]>bw or lb[3]-lb[1]>bh: raise RuntimeError(("size ceiling",tag,lb,t["bb"]))
-
-    oa=np.asarray(old,dtype=np.uint8); fa=np.asarray(final,dtype=np.uint8); sa=np.asarray(src,dtype=np.uint8)
-    changed=np.any(oa!=fa,axis=2)
-    outside=int(np.logical_and(changed,~allowed).sum())
-    alpha_out=int(np.logical_and(oa[:,:,3]!=fa[:,:,3],~allowed).sum())
-    protected_changed=int(np.logical_and(changed,protected).sum())
-    render_protected=int(np.logical_and(render,protected).sum())
-    exact_source=np.all(fa==sa,axis=2)
-    residue=int(np.logical_and(np.logical_and(source_text,allowed),np.logical_and(exact_source,~render)).sum())
-    if outside or alpha_out or protected_changed or render_protected or residue:
-        raise RuntimeError(("scope/residue",tag,outside,alpha_out,protected_changed,render_protected,residue))
-
-    new_sha=write_dds(header,final,candidate,meta["raw_mode"])
-    dh,decoded,dmeta=load_dds(candidate)
-    if dh!=header or dmeta!=meta or ImageChops.difference(decoded,final).getbbox():
-        raise RuntimeError(("roundtrip",tag))
-
-    tmp=Path(f"/tmp/b169_{tag}"); tmp.mkdir(exist_ok=True)
-    old_png=tmp/"old.png"; final_png=tmp/"final.png"; old.save(old_png); decoded.save(final_png)
-    subprocess.run(["python3",str(repo/"tools/localization/validate_clean_plate.py"),
-                    str(old_png),str(final_png),str(out/f"B169_{tag}_EDIT_MASK.png"),
-                    "--protected-mask",str(out/f"B169_{tag}_PROTECTED_MASK.png"),
-                    "--report",str(out/f"B169_{tag}_FINAL_SCOPE_VALIDATION.json")],check=True)
-
-    pad=24; crop=(max(0,x0-pad),max(0,y0-pad),min(src.width,x1+pad),min(src.height,y1+pad))
-    cards=[card(t["key"]+"_SOURCE",src,crop,3),card(t["key"]+"_OLD",old,crop,3),
-           card(t["key"]+"_CLEAN",clean_target,crop,3),card(t["key"]+"_B169",decoded,crop,3)]
-    W=max(c.width for c in cards); H=sum(c.height for c in cards)+8*(len(cards)-1)
-    sh=Image.new("RGB",(W,H),"white"); yy=0
-    for c in cards: sh.paste(c,(0,yy)); yy+=c.height+8
-    sh.save(out/f"B169_{tag}_{t['key']}_SOURCE_OLD_CLEAN_FINAL_3X.jpg",quality=97)
-
-    ca=card("OLD",old,(0,0,src.width,src.height)); cb=card("B169_FINAL",decoded,(0,0,src.width,src.height))
-    full=Image.new("RGB",(ca.width+cb.width+8,max(ca.height,cb.height)),"white")
-    full.paste(ca,(0,0)); full.paste(cb,(ca.width+8,0)); full.thumbnail((2200,1200),Image.Resampling.LANCZOS)
-    full.save(out/f"B169_{tag}_FULL_OLD_FINAL.jpg",quality=94)
-    ro=old.transpose(Image.Transpose.FLIP_TOP_BOTTOM); rf=decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-    ca=card("OLD_RAW",ro,(0,0,src.width,src.height)); cb=card("B169_RAW",rf,(0,0,src.width,src.height))
-    raw=Image.new("RGB",(ca.width+cb.width+8,max(ca.height,cb.height)),"white")
-    raw.paste(ca,(0,0)); raw.paste(cb,(ca.width+8,0)); raw.thumbnail((2200,1200),Image.Resampling.LANCZOS)
-    raw.save(out/f"B169_{tag}_RAW_OLD_FINAL.jpg",quality=94)
-
-    reports[tag]={
-      "queue_index":cfg["queue_index"],"asset":cfg["rel"],"source_sha256":cfg["source_sha"],
-      "superseded_candidate_sha256":cfg["current_sha"],"candidate_sha256":new_sha,
-      "candidate_path":str(candidate.relative_to(repo)),
-      "structure":{**meta,"header_128_exact":True,"raw_orientation":"mirror_y"},
-      "row":{"key":t["key"],"source":t["source"],"korean":t["korean"],
-             "original_bbox":t["bb"],"localized_bbox":lb,
-             "source_size":[bw,bh],"localized_size":[lb[2]-lb[0],lb[3]-lb[1]],
-             "delta_left":lb[0]-x0,"delta_right":x1-lb[2],
-             "delta_top":lb[1]-y0,"delta_bottom":y1-lb[3],
-             "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS",
-             "font":f"Noto Sans CJK KR {t['font_style']}","font_size":fs,
-             "fill_rgba":t["fill"],"alignment":t["align"],
-             "native_resolution_render":True,"upscaled_old_korean_reused":False},
-      "zero_pixel_qa":{"changed_pixels":int(changed.sum()),"changed_outside_target_bbox":outside,
-                       "alpha_changed_outside_target_bbox":alpha_out,
-                       "protected_changed_pixels":protected_changed,
-                       "render_protected_overlap_pixels":render_protected,
-                       "exact_source_residue_pixels":residue,"status":"PASS"}
+def sample_palette(src,bb):
+    a=np.asarray(src,dtype=np.uint8)
+    x0,y0,x1,y1=bb
+    q=a[y0:y1,x0:x1,:]
+    rgb=q[:,:,:3].reshape(-1,3); al=q[:,:,3].reshape(-1)
+    rgb=rgb[al>32]
+    if len(rgb)<100: raise RuntimeError("stage source palette too small")
+    lum=rgb.mean(axis=1)
+    yellow=rgb[(rgb[:,0]>160)&(rgb[:,1]>110)&(rgb[:,2]<140)]
+    navy=rgb[(rgb[:,2]>rgb[:,0]*0.8)&(lum<90)]
+    pale=rgb[(lum>170)&((rgb.max(axis=1)-rgb.min(axis=1))<95)]
+    def med(arr,default):
+        return tuple(int(x) for x in (np.median(arr,axis=0) if len(arr) else np.array(default)))+(255,)
+    return {
+      "face":med(yellow,(250,205,25)),
+      "inner":med(navy,(5,15,70)),
+      "outer":med(pale,(240,240,235))
     }
 
+def shear_rgba(im,amount):
+    if amount<=0: return im
+    add=int(round(amount*im.height))
+    return im.transform((im.width+add,im.height),Image.Transform.AFFINE,
+                        (1,-amount,add,0,1,0),resample=Image.Resampling.BICUBIC)
+
+def render_candidate(fontfile,palette,bw,bh,margin=6,shear=0.16):
+    for fs in range(76,31,-1):
+        f=ImageFont.truetype(fontfile,fs)
+        probe=Image.new("RGBA",(700,180),(0,0,0,0))
+        d=ImageDraw.Draw(probe)
+        tb=d.textbbox((0,0),KOREAN,font=f,stroke_width=5)
+        base=Image.new("RGBA",(tb[2]-tb[0]+30,tb[3]-tb[1]+30),(0,0,0,0))
+        bd=ImageDraw.Draw(base)
+        xy=(15-tb[0],15-tb[1])
+        # Source family: pale outer rim, dark navy inner keyline, yellow face.
+        bd.text(xy,KOREAN,font=f,fill=palette["face"],stroke_width=5,stroke_fill=palette["outer"])
+        bd.text(xy,KOREAN,font=f,fill=palette["face"],stroke_width=3,stroke_fill=palette["inner"])
+        gb=base.getchannel("A").getbbox()
+        if not gb: continue
+        glyph=base.crop(gb)
+        glyph=shear_rgba(glyph,shear)
+        gb2=glyph.getchannel("A").getbbox()
+        if gb2: glyph=glyph.crop(gb2)
+        if glyph.width<=bw-2*margin and glyph.height<=bh-2*margin:
+            return glyph,fs
+    raise RuntimeError("no natural-advance stage fit")
+
+def comp(im,bg=(82,82,82,255)):
+    z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
+
+def labeled(label,im,crop,scale=1):
+    v=comp(im).crop(crop)
+    if scale!=1: v=v.resize((v.width*scale,v.height*scale),Image.Resampling.NEAREST)
+    c=Image.new("RGB",(v.width,v.height+30),"white"); c.paste(v,(0,30))
+    ImageDraw.Draw(c).text((5,6),label,fill="black")
+    return c
+
+if sha(candidate)!=INPUT_SHA: raise RuntimeError(("candidate drift",sha(candidate),INPUT_SHA))
+if sha(source)!=SOURCE_SHA: raise RuntimeError(("source drift",sha(source),SOURCE_SHA))
+if sha(clean_path)!=CLEAN_SHA: raise RuntimeError(("clean drift",sha(clean_path),CLEAN_SHA))
+if sha(protected_path)!=PROTECTED_SHA: raise RuntimeError(("protected drift",sha(protected_path),PROTECTED_SHA))
+
+header,src,meta=load_dds(source)
+ch,old,cmeta=load_dds(candidate)
+if header!=ch or meta!=cmeta: raise RuntimeError(("structure drift",meta,cmeta))
+clean=Image.open(clean_path).convert("RGBA")
+protected=np.asarray(Image.open(protected_path).convert("L"))>0
+if clean.size!=src.size or protected.shape!=(src.height,src.width): raise RuntimeError("evidence size drift")
+
+x0,y0,x1,y1=STAGE_BB; bw=x1-x0; bh=y1-y0
+allowed=np.zeros((src.height,src.width),bool); allowed[y0:y1,x0:x1]=True
+if np.logical_and(protected,allowed).sum()!=0:
+    raise RuntimeError(("stage bbox intersects protected mask",int(np.logical_and(protected,allowed).sum())))
+
+palette=sample_palette(src,STAGE_BB)
+font=font_path("Bold")
+glyph,fs=render_candidate(font,palette,bw,bh,margin=6,shear=0.16)
+
+final=old.copy()
+# Exact established clean plate only inside Stage source-effect bbox; preserves A85 and all other rows.
+final.paste(clean.crop(tuple(STAGE_BB)),(x0,y0))
+px=x0+(bw-glyph.width)//2
+py=y0+(bh-glyph.height)//2
+layer=Image.new("RGBA",src.size,(0,0,0,0)); layer.alpha_composite(glyph,(px,py))
+render=np.asarray(layer.getchannel("A"))>0
+final.alpha_composite(layer)
+lb=bbox_mask(render)
+if lb is None: raise RuntimeError("empty stage render")
+if not (x0<lb[0] and y0<lb[1] and lb[2]<x1 and lb[3]<y1):
+    raise RuntimeError(("positive margin fail",lb,STAGE_BB))
+if lb[2]-lb[0]>bw or lb[3]-lb[1]>bh:
+    raise RuntimeError(("size ceiling fail",lb,STAGE_BB))
+
+oa=np.asarray(old,dtype=np.uint8); fa=np.asarray(final,dtype=np.uint8)
+changed=np.any(oa!=fa,axis=2)
+outside=int(np.logical_and(changed,~allowed).sum())
+alpha_out=int(np.logical_and(oa[:,:,3]!=fa[:,:,3],~allowed).sum())
+prot_changed=int(np.logical_and(changed,protected).sum())
+render_prot=int(np.logical_and(render,protected).sum())
+if outside or alpha_out or prot_changed or render_prot:
+    raise RuntimeError(("scope fail",outside,alpha_out,prot_changed,render_prot))
+
+new_sha=write_dds(header,final,candidate,meta["raw_mode"])
+dh,decoded,dmeta=load_dds(candidate)
+if dh!=header or dmeta!=meta or ImageChops.difference(decoded,final).getbbox():
+    raise RuntimeError("dds roundtrip fail")
+
+# Evidence masks.
+Image.fromarray((allowed*255).astype(np.uint8),"L").save(out/"B172_STAGE_EDIT_MASK.png")
+Image.fromarray((protected*255).astype(np.uint8),"L").save(out/"B172_PROTECTED_MASK.png")
+target_clean=old.copy(); target_clean.paste(clean.crop(tuple(STAGE_BB)),(x0,y0))
+target_clean.save(out/"B172_STAGE_CLEAN.png")
+decoded.save(out/"B172_FINAL_READABLE.png")
+
+# Visual contacts: source / old squeezed row / clean / new natural-advance row.
+pad=28
+crop=(max(0,x0-pad),max(0,y0-pad),min(src.width,x1+pad),min(src.height,y1+pad))
+cards=[
+ labeled("SOURCE Stage",src,crop,4),
+ labeled("OLD Korean xscale=0.7028",old,crop,4),
+ labeled("CLEAN",target_clean,crop,4),
+ labeled("B172 natural advance",decoded,crop,4)
+]
+W=max(c.width for c in cards); H=sum(c.height for c in cards)+8*(len(cards)-1)
+sheet=Image.new("RGB",(W,H),"white"); yy=0
+for c in cards:
+    sheet.paste(c,(0,yy)); yy+=c.height+8
+sheet.save(out/"B172_STAGE_SOURCE_OLD_CLEAN_FINAL_4X.jpg",quality=97)
+
+# Family contact includes Ranking / Stage / Rank and right-hand heart tally art.
+family_crop=(90,105,4070,1020)
+co=labeled("A85 BEFORE",old,family_crop,1)
+cn=labeled("B172 AFTER",decoded,family_crop,1)
+fam=Image.new("RGB",(max(co.width,cn.width),co.height+cn.height+8),"white")
+fam.paste(co,(0,0)); fam.paste(cn,(0,co.height+8)); fam.thumbnail((2200,1300),Image.Resampling.LANCZOS)
+fam.save(out/"B172_STAGE_HEART_TALLY_FAMILY_CONTACT.jpg",quality=96)
+
+ro=old.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+rf=decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+raw_crop=(90,2048-1020,4070,2048-105)
+co=labeled("A85 RAW",ro,raw_crop,1); cn=labeled("B172 RAW",rf,raw_crop,1)
+raw=Image.new("RGB",(max(co.width,cn.width),co.height+cn.height+8),"white")
+raw.paste(co,(0,0)); raw.paste(cn,(0,co.height+8)); raw.thumbnail((2200,1300),Image.Resampling.LANCZOS)
+raw.save(out/"B172_RAW_FAMILY_CONTACT.jpg",quality=96)
+
+# Exact preservation outside Stage bbox, including A85 OUTRUN MILES rows and numeric/heart tally art.
+stage_changed=int(changed.sum())
 report={
- "schema_version":1,"role":"B","run":run,
+ "schema_version":1,
+ "role":"B",
+ "run":run,
  "base_head":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
- "user_ingame_regression":["IGR-019","스크린샷(142).png"],"owner_lane":"B",
- "mapping":{"status":"EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT","domain":"GRAPHICS",
-   "visible_bindings":[
-      {"screen":"WELCOME TO THE / MULTIPLAYER intro body","asset":"97E863AD","queue_index":193,
-       "source":"MULTIPLAYER","action":"REWORKED_NATIVE","preserved":"A89R WELCOME TO THE native row"},
-      {"screen":"multiplayer intro help copy","asset":"8C259C68","queue_index":188,
-       "source":"Online and LAN OutRun for up to 6 players","action":"REWORKED_NATIVE",
-       "preserved":"A88 C2C help + B166 Heart Attack help + all unrelated rows"}
-   ],
+ "user_ingame_regression":["IGR-010","스크린샷(153).png"],
+ "screen":"STAGE_HEART_TALLY_OVERLAY",
+ "owner_lane":"B",
+ "priority":"P1",
+ "mapping":{
+   "status":"EXACT_GRAPHICS_A064_STAGE_PLUS_PROTECTED_TALLY_ART",
+   "domain":"GRAPHICS",
+   "queue_index":60,
+   "asset":rel,
+   "localized_binding":{"source":"Stage","korean":KOREAN,"source_effect_bbox":STAGE_BB},
+   "protected_screen_components":["stage numeral/player marker sprites","heart icon","x /8 tally glyphs/numerals"],
    "runtime_text_required":False,
-   "excluded_completed_asset":{"asset":"4D38BBB0","queue_index":154,
-      "reason":"B60/C141 already renders both MULTIPLAYER physical rows natively at 4096x1024 with source-family red/gray styles; screenshot-confirmed low-resolution defect is explained by still-upscaled 97E/8C rows and completed 4D38 is not repeated."},
-   "note":"IGR-019 belongs to the same front-end intro/help family as IGR-001/002. Current metadata proves the screenshot-visible 97E MULTIPLAYER row remained A70 12px->4x and the 8C Online/LAN help row remained B82 12px->4x, while A89R only fixed 97E WELCOME/SHOWROOM and A88/B166 fixed different 8C rows."
+   "runtime_table_evidence":"runtime_ko.tsv contains only unrelated stage phrases (IDs 195/381 전체 스테이지, 1123 스테이지 주행, 1133 unlock guidance); no Stage <number> / heart-tally localized runtime row exists.",
+   "provenance":"A064 B84 readable atlas visibly contains Ranking/Stage/Rank together with the heart x /8 tally HUD art. The user screenshot regression is therefore the baked Stage sprite plus protected numeric/icon art, not a Korean runtime-overlay string."
  },
- "assets":reports,
- "method":"User in-game LOW_RES_FONT override: replace only the two proven legacy 4x-upscaled Korean rows with direct canonical-HD Noto CJK rendering from validated clean plates; preserve all newer native intro-family fixes and protected artwork byte-for-pixel outside the exact source bboxes.",
- "visual_qa":"PENDING_CONTROLLER_SELF_QA","runtime_validation":"PENDING_NEW_INGAME_RETEST",
- "status":"B169_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "regression_cause":{
+   "producer_origin":"B84",
+   "historical_stage_font_size":80,
+   "historical_horizontal_scale":0.7028,
+   "historical_localized_bbox":OLD_STAGE_BB,
+   "later_preservation":"B_RECOVERY02 preserved the row byte-exact; B_RECOVERY09 re-applied it pixel-exact after clean-plate correction; A85 modified OUTRUN MILES only and kept Stage unchanged.",
+   "numeric_false_negative":"Prior bbox/overlap static PASS did not catch the in-game compressed/hierarchy/readability defect.",
+   "user_screenshot_override":True
+ },
+ "material_fix":{
+   "input_candidate_sha256":INPUT_SHA,
+   "candidate_sha256":new_sha,
+   "source_sha256":SOURCE_SHA,
+   "source_file":str(source.relative_to(repo)),
+   "clean_plate":str(clean_path.relative_to(repo)),
+   "changed_row":"Stage -> 스테이지",
+   "method":"replace only exact Stage source-effect bbox with established clean plate; fresh native-resolution Noto Sans CJK KR Bold render at natural horizontal advance, source-derived yellow/navy/pale family, 0.16 right shear; preserve all other candidate pixels exact",
+   "font":"Noto Sans CJK KR Bold",
+   "font_size":fs,
+   "horizontal_scale":1.0,
+   "shear":0.16,
+   "palette_rgba":palette,
+   "old_localized_bbox":OLD_STAGE_BB,
+   "new_localized_bbox":lb,
+   "source_size":[bw,bh],
+   "new_localized_size":[lb[2]-lb[0],lb[3]-lb[1]],
+   "delta_left":lb[0]-x0,
+   "delta_right":x1-lb[2],
+   "delta_top":lb[1]-y0,
+   "delta_bottom":y1-lb[3]
+ },
+ "static_qa":{
+   "containment":"PASS",
+   "size_ceiling":"PASS",
+   "positive_margin":"PASS",
+   "changed_pixels":stage_changed,
+   "changed_pixels_outside_stage_bbox":outside,
+   "alpha_changed_outside_stage_bbox":alpha_out,
+   "protected_changed_pixels":prot_changed,
+   "render_protected_overlap_pixels":render_prot,
+   "header_128_exact":True,
+   "raw_orientation":"mirror_y",
+   "all_non_stage_candidate_pixels_preserved_exact":True,
+   "a85_outrun_miles_rows_preserved_exact":True,
+   "heart_tally_art_preserved_exact":True,
+   "status":"PASS"
+ },
+ "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
+ "runtime_validation":"PENDING_NEW_INGAME_RETEST",
+ "status":"B172_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "no_vr_ffb_dx11_dxvk_work":True
 }
-(out/"B169_IGR019_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(out/"B169_STATIC_VALIDATION_SUMMARY.json").write_text(json.dumps({
- "assets":{k:{"queue_index":v["queue_index"],"candidate_sha256":v["candidate_sha256"],
-              "bbox_size_positive_margin":"1/1 PASS",**v["zero_pixel_qa"]} for k,v in reports.items()},
- "status":"PASS"
+(out/"B172_IGR010_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(repo/"localization/graphics/worker_results/B172_IGR010.json").write_text(json.dumps({
+ "role":"B","run":run,"regression":"IGR-010","queue_index":60,"asset":rel,
+ "input_sha256":INPUT_SHA,"candidate_sha256":new_sha,
+ "report":str((out/"B172_IGR010_REPORT.json").relative_to(repo)),
+ "status":"WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("B169_DONE",json.dumps({k:v["candidate_sha256"] for k,v in reports.items()}))
+print("B172_DONE",new_sha,"font_size",fs,"bbox",lb,"palette",palette)
