@@ -1494,20 +1494,32 @@ namespace outrun::vr::dx11
             "R265_D3D9_SM2_SM3_INSTRUCTION_OPERAND_DECODER_V1";
         static constexpr char kSemanticContract[] =
             "R265_RAW_OPCODE_OPERANDS_NO_REGISTER_SAMPLER_LINKAGE_SEMANTICS_V1";
+        static constexpr char kOperandClassificationRevision[] =
+            "R266_D3D9_SM2_SM3_OPCODE_REGISTER_OPERAND_CLASSIFIER_V1";
         out.decoderRevisionHash =
             hash_bytes(kDecoderRevision, sizeof(kDecoderRevision) - 1u);
         out.semanticContractHash =
             hash_bytes(kSemanticContract, sizeof(kSemanticContract) - 1u);
+        out.operandClassificationRevisionHash =
+            hash_bytes(
+                kOperandClassificationRevision,
+                sizeof(kOperandClassificationRevision) - 1u);
 
         std::uint64_t streamHash = 1469598103934665603ull;
-        const auto mixToken = [&streamHash](DWORD token) noexcept
+        std::uint64_t operandClassificationHash = 1469598103934665603ull;
+        bool allOperandsClassified = true;
+        const auto mixDword = [](std::uint64_t& hash, DWORD value) noexcept
         {
             for (unsigned shift = 0; shift < 32u; shift += 8u)
             {
-                streamHash ^=
-                    static_cast<std::uint64_t>((token >> shift) & 0xFFu);
-                streamHash *= 1099511628211ull;
+                hash ^= static_cast<std::uint64_t>(
+                    (value >> shift) & 0xFFu);
+                hash *= 1099511628211ull;
             }
+        };
+        const auto mixToken = [&streamHash, &mixDword](DWORD token) noexcept
+        {
+            mixDword(streamHash, token);
         };
 
         try
@@ -1526,6 +1538,11 @@ namespace outrun::vr::dx11
                     ++index;
                     out.complete = index == evidence.tokens.size();
                     out.instructionStreamHash = streamHash;
+                    out.operandClassificationComplete =
+                        out.complete && allOperandsClassified;
+                    if (out.operandClassificationComplete)
+                        out.operandClassificationHash =
+                            operandClassificationHash;
                     return out;
                 }
 
@@ -1571,6 +1588,382 @@ namespace outrun::vr::dx11
                 for (const auto token : decoded.operandTokens)
                     mixToken(token);
 
+                UINT destinationCount = 0;
+                UINT sourceCount = 0;
+                UINT declarationCount = 0;
+                UINT immediateCount = 0;
+                bool opcodeShapeKnown = true;
+
+                switch (static_cast<D3DSHADER_INSTRUCTION_OPCODE_TYPE>(opcode))
+                {
+                case D3DSIO_NOP:
+                case D3DSIO_RET:
+                case D3DSIO_ENDLOOP:
+                case D3DSIO_ENDREP:
+                case D3DSIO_ELSE:
+                case D3DSIO_ENDIF:
+                case D3DSIO_BREAK:
+                    break;
+
+                case D3DSIO_MOV:
+                case D3DSIO_RCP:
+                case D3DSIO_RSQ:
+                case D3DSIO_EXP:
+                case D3DSIO_LOG:
+                case D3DSIO_LIT:
+                case D3DSIO_FRC:
+                case D3DSIO_ABS:
+                case D3DSIO_NRM:
+                case D3DSIO_MOVA:
+                case D3DSIO_EXPP:
+                case D3DSIO_LOGP:
+                case D3DSIO_DSX:
+                case D3DSIO_DSY:
+                    destinationCount = 1u;
+                    sourceCount = 1u;
+                    break;
+
+                case D3DSIO_ADD:
+                case D3DSIO_SUB:
+                case D3DSIO_MUL:
+                case D3DSIO_DP3:
+                case D3DSIO_DP4:
+                case D3DSIO_MIN:
+                case D3DSIO_MAX:
+                case D3DSIO_SLT:
+                case D3DSIO_SGE:
+                case D3DSIO_DST:
+                case D3DSIO_M4x4:
+                case D3DSIO_M4x3:
+                case D3DSIO_M3x4:
+                case D3DSIO_M3x3:
+                case D3DSIO_M3x2:
+                case D3DSIO_POW:
+                case D3DSIO_CRS:
+                case D3DSIO_BEM:
+                case D3DSIO_SETP:
+                    destinationCount = 1u;
+                    sourceCount = 2u;
+                    break;
+
+                case D3DSIO_MAD:
+                case D3DSIO_LRP:
+                case D3DSIO_SGN:
+                case D3DSIO_CND:
+                case D3DSIO_CMP:
+                case D3DSIO_DP2ADD:
+                    destinationCount = 1u;
+                    sourceCount = 3u;
+                    break;
+
+                case D3DSIO_SINCOS:
+                    destinationCount = 1u;
+                    sourceCount = shaderMajor >= 3u ? 1u : 3u;
+                    break;
+
+                case D3DSIO_CALL:
+                case D3DSIO_LABEL:
+                case D3DSIO_REP:
+                case D3DSIO_IF:
+                case D3DSIO_BREAKP:
+                    sourceCount = 1u;
+                    break;
+
+                case D3DSIO_CALLNZ:
+                case D3DSIO_LOOP:
+                case D3DSIO_IFC:
+                case D3DSIO_BREAKC:
+                    sourceCount = 2u;
+                    break;
+
+                case D3DSIO_DCL:
+                    declarationCount = 1u;
+                    destinationCount = 1u;
+                    break;
+
+                case D3DSIO_DEFB:
+                    destinationCount = 1u;
+                    immediateCount = 1u;
+                    break;
+
+                case D3DSIO_DEFI:
+                case D3DSIO_DEF:
+                    destinationCount = 1u;
+                    immediateCount = 4u;
+                    break;
+
+                case D3DSIO_TEXKILL:
+                    // D3D9 encodes texkill's source-like argument with the
+                    // destination-parameter token format.
+                    destinationCount = 1u;
+                    break;
+
+                case D3DSIO_TEX:
+                case D3DSIO_TEXLDL:
+                    destinationCount = 1u;
+                    sourceCount = 2u;
+                    break;
+
+                case D3DSIO_TEXLDD:
+                    destinationCount = 1u;
+                    sourceCount = 4u;
+                    break;
+
+                default:
+                    // Legacy pixel-shader 1.x texture opcodes are not valid
+                    // R266 semantic evidence for the SM2/SM3-only decoder.
+                    opcodeShapeKnown = false;
+                    break;
+                }
+
+                std::size_t cursor = 0u;
+                const bool predicated =
+                    (instructionToken & 0x10000000u) != 0u;
+
+                const auto appendNonRegister =
+                    [&](ProgrammableShaderOperandRole role) -> bool
+                {
+                    if (cursor >= decoded.operandTokens.size())
+                        return false;
+                    ProgrammableShaderDecodedOperand operand{};
+                    operand.token = decoded.operandTokens[cursor];
+                    operand.tokenOffset =
+                        decoded.tokenOffset + 1u +
+                        static_cast<UINT>(cursor);
+                    operand.role = role;
+                    decoded.classifiedOperands.push_back(operand);
+                    ++cursor;
+                    return true;
+                };
+
+                const auto appendRegister =
+                    [&](ProgrammableShaderOperandRole role) -> bool
+                {
+                    if (cursor >= decoded.operandTokens.size())
+                        return false;
+
+                    const DWORD token = decoded.operandTokens[cursor];
+                    if ((token & 0x80000000u) == 0u)
+                        return false;
+
+                    ProgrammableShaderDecodedOperand operand{};
+                    operand.token = token;
+                    operand.tokenOffset =
+                        decoded.tokenOffset + 1u +
+                        static_cast<UINT>(cursor);
+                    operand.role = role;
+                    operand.registerToken = true;
+                    operand.relativeAddressed =
+                        (token & 0x00002000u) != 0u;
+                    operand.registerType =
+                        ((token >> 28u) & 0x7u) |
+                        ((token >> 8u) & 0x18u);
+                    operand.registerIndex = token & 0x000007FFu;
+                    if (role ==
+                        ProgrammableShaderOperandRole::DestinationRegister)
+                    {
+                        operand.modifier = (token >> 20u) & 0xFu;
+                        operand.shift = (token >> 24u) & 0xFu;
+                        operand.componentSelection =
+                            (token >> 16u) & 0xFu;
+                    }
+                    else
+                    {
+                        operand.modifier = (token >> 24u) & 0xFu;
+                        operand.componentSelection =
+                            (token >> 16u) & 0xFFu;
+                    }
+                    decoded.classifiedOperands.push_back(operand);
+                    ++cursor;
+
+                    if (!operand.relativeAddressed)
+                        return true;
+
+                    // D3D9 relative addressing has an additional DWORD. It is
+                    // legal here only for VS 2+ or PS 3+, and its register is
+                    // restricted to ADDR/LOOP with no nested relative address.
+                    if (!out.vertexStage && shaderMajor < 3u)
+                        return false;
+                    if (cursor >= decoded.operandTokens.size())
+                        return false;
+
+                    const DWORD relativeToken =
+                        decoded.operandTokens[cursor];
+                    if ((relativeToken & 0x80000000u) == 0u ||
+                        (relativeToken & 0x00002000u) != 0u)
+                        return false;
+
+                    ProgrammableShaderDecodedOperand relative{};
+                    relative.token = relativeToken;
+                    relative.tokenOffset =
+                        decoded.tokenOffset + 1u +
+                        static_cast<UINT>(cursor);
+                    relative.role =
+                        ProgrammableShaderOperandRole::
+                            RelativeAddressRegister;
+                    relative.registerToken = true;
+                    relative.registerType =
+                        ((relativeToken >> 28u) & 0x7u) |
+                        ((relativeToken >> 8u) & 0x18u);
+                    relative.registerIndex =
+                        relativeToken & 0x000007FFu;
+                    relative.modifier =
+                        (relativeToken >> 24u) & 0xFu;
+                    relative.componentSelection =
+                        (relativeToken >> 16u) & 0xFFu;
+                    if (relative.registerType !=
+                            static_cast<UINT>(D3DSPR_ADDR) &&
+                        relative.registerType !=
+                            static_cast<UINT>(D3DSPR_LOOP))
+                        return false;
+
+                    decoded.classifiedOperands.push_back(relative);
+                    ++cursor;
+                    return true;
+                };
+
+                bool classificationExact = opcodeShapeKnown;
+                if (classificationExact && declarationCount != 0u)
+                {
+                    // DCL uniquely places its declaration-info token before
+                    // the destination parameter token.
+                    for (UINT i = 0; i < declarationCount; ++i)
+                    {
+                        classificationExact =
+                            appendNonRegister(
+                                ProgrammableShaderOperandRole::
+                                    DeclarationToken);
+                        if (!classificationExact)
+                            break;
+                    }
+                }
+
+                if (classificationExact)
+                {
+                    for (UINT i = 0; i < destinationCount; ++i)
+                    {
+                        classificationExact =
+                            appendRegister(
+                                ProgrammableShaderOperandRole::
+                                    DestinationRegister);
+                        if (!classificationExact)
+                            break;
+                    }
+                }
+
+                if (classificationExact && predicated)
+                {
+                    classificationExact =
+                        appendRegister(
+                            ProgrammableShaderOperandRole::
+                                PredicateRegister);
+                }
+
+                if (classificationExact)
+                {
+                    for (UINT i = 0; i < sourceCount; ++i)
+                    {
+                        classificationExact =
+                            appendRegister(
+                                ProgrammableShaderOperandRole::
+                                    SourceRegister);
+                        if (!classificationExact)
+                            break;
+                    }
+                }
+
+                if (classificationExact)
+                {
+                    for (UINT i = 0; i < immediateCount; ++i)
+                    {
+                        classificationExact =
+                            appendNonRegister(
+                                ProgrammableShaderOperandRole::
+                                    ImmediateDword);
+                        if (!classificationExact)
+                            break;
+                    }
+                }
+
+                classificationExact =
+                    classificationExact &&
+                    cursor == decoded.operandTokens.size();
+
+                decoded.operandClassificationExact =
+                    classificationExact;
+                if (classificationExact)
+                {
+                    for (const auto& operand : decoded.classifiedOperands)
+                    {
+                        switch (operand.role)
+                        {
+                        case ProgrammableShaderOperandRole::
+                                DestinationRegister:
+                            ++decoded.destinationRegisterCount;
+                            ++out.destinationRegisterCount;
+                            break;
+                        case ProgrammableShaderOperandRole::
+                                PredicateRegister:
+                            ++decoded.predicateRegisterCount;
+                            ++out.predicateRegisterCount;
+                            break;
+                        case ProgrammableShaderOperandRole::
+                                SourceRegister:
+                            ++decoded.sourceRegisterCount;
+                            ++out.sourceRegisterCount;
+                            break;
+                        case ProgrammableShaderOperandRole::
+                                RelativeAddressRegister:
+                            ++decoded.relativeAddressRegisterCount;
+                            ++out.relativeAddressRegisterCount;
+                            break;
+                        case ProgrammableShaderOperandRole::
+                                DeclarationToken:
+                            ++decoded.declarationTokenCount;
+                            ++out.declarationTokenCount;
+                            break;
+                        case ProgrammableShaderOperandRole::
+                                ImmediateDword:
+                            ++decoded.immediateDwordCount;
+                            ++out.immediateDwordCount;
+                            break;
+                        }
+
+                        mixDword(
+                            operandClassificationHash,
+                            static_cast<DWORD>(operand.role));
+                        mixDword(
+                            operandClassificationHash,
+                            operand.token);
+                        mixDword(
+                            operandClassificationHash,
+                            operand.registerType);
+                        mixDword(
+                            operandClassificationHash,
+                            operand.registerIndex);
+                        mixDword(
+                            operandClassificationHash,
+                            operand.modifier);
+                        mixDword(
+                            operandClassificationHash,
+                            operand.shift);
+                        mixDword(
+                            operandClassificationHash,
+                            operand.componentSelection);
+                        mixDword(
+                            operandClassificationHash,
+                            operand.relativeAddressed ? 1u : 0u);
+                    }
+                    out.classifiedOperandCount +=
+                        static_cast<UINT>(
+                            decoded.classifiedOperands.size());
+                }
+                else
+                {
+                    allOperandsClassified = false;
+                    decoded.classifiedOperands.clear();
+                }
+
                 out.operandTokenCount += decoded.operandCount;
                 out.instructions.push_back(std::move(decoded));
                 ++out.instructionCount;
@@ -1582,415 +1975,6 @@ namespace outrun::vr::dx11
             return {};
         }
 
-        return out;
-    }
-
-    ProgrammableShaderRegisterSemantics
-    decode_programmable_shader_register_semantics(
-        const ProgrammableShaderInstructionDecode& decode) noexcept
-    {
-        ProgrammableShaderRegisterSemantics out{};
-        out.vertexStage = decode.vertexStage;
-        out.instructionDecodeExact = decode.exact();
-        out.instructionCount = decode.instructionCount;
-        if (!out.instructionDecodeExact)
-            return out;
-
-        static constexpr char kDecoderRevision[] =
-            "R266_D3D9_SM2_SM3_REGISTER_SEMANTICS_DECODER_V1";
-        static constexpr char kSemanticContract[] =
-            "R266_OPCODE_ROLE_REGISTER_MODIFIER_ADDRESS_CONSTANT_SAMPLER_PROVENANCE_V1";
-        out.decoderRevisionHash =
-            hash_bytes(kDecoderRevision, sizeof(kDecoderRevision) - 1u);
-        out.semanticContractHash =
-            hash_bytes(kSemanticContract, sizeof(kSemanticContract) - 1u);
-
-        enum class PlanKind : std::uint8_t
-        {
-            Registers,
-            Declaration,
-            DefFloat,
-            DefInt,
-            DefBool,
-            Unsupported,
-        };
-        struct OpcodePlan
-        {
-            PlanKind kind = PlanKind::Unsupported;
-            UINT destinations = 0;
-            UINT sources = 0;
-        };
-
-        const auto plan_for = [](DWORD opcode) noexcept -> OpcodePlan
-        {
-            switch (opcode)
-            {
-            case D3DSIO_NOP:
-            case D3DSIO_RET:
-            case D3DSIO_ENDLOOP:
-            case D3DSIO_ENDREP:
-            case D3DSIO_ELSE:
-            case D3DSIO_ENDIF:
-            case D3DSIO_BREAK:
-                return { PlanKind::Registers, 0u, 0u };
-
-            case D3DSIO_MOV:
-            case D3DSIO_RCP:
-            case D3DSIO_RSQ:
-            case D3DSIO_EXP:
-            case D3DSIO_LOG:
-            case D3DSIO_LIT:
-            case D3DSIO_FRC:
-            case D3DSIO_ABS:
-            case D3DSIO_NRM:
-            case D3DSIO_MOVA:
-            case D3DSIO_DSX:
-            case D3DSIO_DSY:
-                return { PlanKind::Registers, 1u, 1u };
-
-            case D3DSIO_ADD:
-            case D3DSIO_SUB:
-            case D3DSIO_MUL:
-            case D3DSIO_DP3:
-            case D3DSIO_DP4:
-            case D3DSIO_MIN:
-            case D3DSIO_MAX:
-            case D3DSIO_SLT:
-            case D3DSIO_SGE:
-            case D3DSIO_DST:
-            case D3DSIO_M4x4:
-            case D3DSIO_M4x3:
-            case D3DSIO_M3x4:
-            case D3DSIO_M3x3:
-            case D3DSIO_M3x2:
-            case D3DSIO_POW:
-            case D3DSIO_CRS:
-            case D3DSIO_TEX:
-            case D3DSIO_SETP:
-            case D3DSIO_TEXLDL:
-                return { PlanKind::Registers, 1u, 2u };
-
-            case D3DSIO_MAD:
-            case D3DSIO_LRP:
-            case D3DSIO_CMP:
-            case D3DSIO_DP2ADD:
-                return { PlanKind::Registers, 1u, 3u };
-
-            case D3DSIO_TEXLDD:
-                return { PlanKind::Registers, 1u, 4u };
-
-            case D3DSIO_CALL:
-            case D3DSIO_LABEL:
-            case D3DSIO_REP:
-            case D3DSIO_IF:
-            case D3DSIO_TEXKILL:
-            case D3DSIO_BREAKP:
-                return { PlanKind::Registers, 0u, 1u };
-
-            case D3DSIO_CALLNZ:
-            case D3DSIO_LOOP:
-            case D3DSIO_IFC:
-            case D3DSIO_BREAKC:
-                return { PlanKind::Registers, 0u, 2u };
-
-            case D3DSIO_DCL:
-                return { PlanKind::Declaration, 0u, 0u };
-            case D3DSIO_DEF:
-                return { PlanKind::DefFloat, 1u, 0u };
-            case D3DSIO_DEFI:
-                return { PlanKind::DefInt, 1u, 0u };
-            case D3DSIO_DEFB:
-                return { PlanKind::DefBool, 1u, 0u };
-            default:
-                // SGN/SINCOS have shader-model-dependent operand layouts.
-                // Legacy texture opcodes are outside the R266 SM2/SM3 exact
-                // role table. Preserve R265 evidence but fail R266 closed.
-                return {};
-            }
-        };
-
-        std::uint64_t semanticHash = 1469598103934665603ull;
-        const auto mix = [&semanticHash](std::uint64_t value) noexcept
-        {
-            for (unsigned shift = 0; shift < 64u; shift += 8u)
-            {
-                semanticHash ^=
-                    static_cast<std::uint8_t>((value >> shift) & 0xFFu);
-                semanticHash *= 1099511628211ull;
-            }
-        };
-        mix(decode.sourceBytecodeHash);
-        mix(out.decoderRevisionHash);
-        mix(out.semanticContractHash);
-
-        const auto decode_register_type =
-            [](DWORD token) noexcept -> D3DSHADER_PARAM_REGISTER_TYPE
-        {
-            const DWORD rawType =
-                ((token & D3DSP_REGTYPE_MASK) >> D3DSP_REGTYPE_SHIFT) |
-                ((token & D3DSP_REGTYPE_MASK2) >> D3DSP_REGTYPE_SHIFT2);
-            if (rawType > static_cast<DWORD>(D3DSPR_PREDICATE))
-                return D3DSPR_FORCE_DWORD;
-            return static_cast<D3DSHADER_PARAM_REGISTER_TYPE>(rawType);
-        };
-
-        try
-        {
-            for (const auto& instruction : decode.instructions)
-            {
-                const auto plan = plan_for(instruction.opcode);
-                if (plan.kind == PlanKind::Unsupported)
-                    return out;
-
-                mix(instruction.opcode);
-                mix(instruction.instructionToken);
-
-                std::size_t rawIndex = 0u;
-                const auto parse_parameter =
-                    [&](ProgrammableShaderRegisterOperandRole role) -> bool
-                {
-                    if (rawIndex >= instruction.operandTokens.size())
-                        return false;
-                    const DWORD token = instruction.operandTokens[rawIndex++];
-                    if ((token & 0x80000000u) == 0u)
-                        return false;
-
-                    ProgrammableShaderRegisterOperand operand{};
-                    operand.role = role;
-                    operand.token = token;
-                    operand.registerType = decode_register_type(token);
-                    if (operand.registerType == D3DSPR_FORCE_DWORD)
-                        return false;
-                    operand.registerIndex =
-                        static_cast<UINT>(token & D3DSP_REGNUM_MASK);
-                    operand.relativeAddressing =
-                        (token & D3DSHADER_ADDRESSMODE_MASK) != 0u;
-
-                    if (role ==
-                        ProgrammableShaderRegisterOperandRole::Destination)
-                    {
-                        operand.writeMask =
-                            token & D3DSP_WRITEMASK_ALL;
-                        operand.destinationModifier =
-                            (token & D3DSP_DSTMOD_MASK) >>
-                            D3DSP_DSTMOD_SHIFT;
-                        operand.destinationShift =
-                            (token & D3DSP_DSTSHIFT_MASK) >>
-                            D3DSP_DSTSHIFT_SHIFT;
-                        ++out.destinationOperandCount;
-                    }
-                    else if (
-                        role ==
-                        ProgrammableShaderRegisterOperandRole::Source ||
-                        role ==
-                        ProgrammableShaderRegisterOperandRole::RelativeAddress)
-                    {
-                        operand.sourceSwizzle =
-                            (token & D3DSP_SWIZZLE_MASK) >>
-                            D3DSP_SWIZZLE_SHIFT;
-                        operand.sourceModifier =
-                            (token & D3DSP_SRCMOD_MASK) >>
-                            D3DSP_SRCMOD_SHIFT;
-                        if (role ==
-                            ProgrammableShaderRegisterOperandRole::Source)
-                            ++out.sourceOperandCount;
-                        else
-                            ++out.relativeAddressOperandCount;
-                    }
-                    else
-                    {
-                        ++out.declarationOperandCount;
-                    }
-
-                    if (role ==
-                        ProgrammableShaderRegisterOperandRole::Source)
-                    {
-                        switch (operand.registerType)
-                        {
-                        case D3DSPR_CONST:
-                            operand.constantReference = true;
-                            operand.normalizedConstantIndex =
-                                operand.registerIndex;
-                            ++out.floatConstantReferenceCount;
-                            break;
-                        case D3DSPR_CONST2:
-                            operand.constantReference = true;
-                            operand.normalizedConstantIndex =
-                                2048u + operand.registerIndex;
-                            ++out.floatConstantReferenceCount;
-                            break;
-                        case D3DSPR_CONST3:
-                            operand.constantReference = true;
-                            operand.normalizedConstantIndex =
-                                4096u + operand.registerIndex;
-                            ++out.floatConstantReferenceCount;
-                            break;
-                        case D3DSPR_CONST4:
-                            operand.constantReference = true;
-                            operand.normalizedConstantIndex =
-                                6144u + operand.registerIndex;
-                            ++out.floatConstantReferenceCount;
-                            break;
-                        case D3DSPR_CONSTINT:
-                            operand.constantReference = true;
-                            operand.normalizedConstantIndex =
-                                operand.registerIndex;
-                            ++out.intConstantReferenceCount;
-                            break;
-                        case D3DSPR_CONSTBOOL:
-                            operand.constantReference = true;
-                            operand.normalizedConstantIndex =
-                                operand.registerIndex;
-                            ++out.boolConstantReferenceCount;
-                            break;
-                        case D3DSPR_SAMPLER:
-                            operand.samplerReference = true;
-                            ++out.samplerReferenceCount;
-                            break;
-                        default:
-                            break;
-                        }
-                    }
-
-                    mix(static_cast<std::uint64_t>(operand.role));
-                    mix(token);
-                    mix(static_cast<DWORD>(operand.registerType));
-                    mix(operand.registerIndex);
-                    mix(operand.writeMask);
-                    mix(operand.destinationModifier);
-                    mix(operand.destinationShift);
-                    mix(operand.sourceSwizzle);
-                    mix(operand.sourceModifier);
-                    mix(operand.relativeAddressing ? 1u : 0u);
-                    mix(operand.constantReference ? 1u : 0u);
-                    mix(operand.samplerReference ? 1u : 0u);
-                    mix(operand.normalizedConstantIndex);
-                    out.operands.push_back(operand);
-
-                    if (!operand.relativeAddressing)
-                        return true;
-                    if (role ==
-                        ProgrammableShaderRegisterOperandRole::RelativeAddress ||
-                        rawIndex >= instruction.operandTokens.size())
-                        return false;
-
-                    const DWORD addressToken =
-                        instruction.operandTokens[rawIndex++];
-                    if ((addressToken & 0x80000000u) == 0u ||
-                        (addressToken & D3DSHADER_ADDRESSMODE_MASK) != 0u)
-                        return false;
-                    const auto addressType =
-                        decode_register_type(addressToken);
-                    if (addressType != D3DSPR_ADDR &&
-                        addressType != D3DSPR_LOOP)
-                        return false;
-
-                    ProgrammableShaderRegisterOperand address{};
-                    address.role =
-                        ProgrammableShaderRegisterOperandRole::RelativeAddress;
-                    address.token = addressToken;
-                    address.registerType = addressType;
-                    address.registerIndex =
-                        static_cast<UINT>(
-                            addressToken & D3DSP_REGNUM_MASK);
-                    address.sourceSwizzle =
-                        (addressToken & D3DSP_SWIZZLE_MASK) >>
-                        D3DSP_SWIZZLE_SHIFT;
-                    address.sourceModifier =
-                        (addressToken & D3DSP_SRCMOD_MASK) >>
-                        D3DSP_SRCMOD_SHIFT;
-                    ++out.relativeAddressOperandCount;
-
-                    mix(static_cast<std::uint64_t>(address.role));
-                    mix(addressToken);
-                    mix(static_cast<DWORD>(address.registerType));
-                    mix(address.registerIndex);
-                    mix(address.sourceSwizzle);
-                    mix(address.sourceModifier);
-                    out.operands.push_back(address);
-                    return true;
-                };
-
-                if (plan.kind == PlanKind::Declaration)
-                {
-                    if (instruction.operandTokens.size() != 2u)
-                        return out;
-                    const DWORD declarationInfo =
-                        instruction.operandTokens[rawIndex++];
-                    mix(declarationInfo);
-                    ++out.literalDwordCount;
-                    if (!parse_parameter(
-                            ProgrammableShaderRegisterOperandRole::Declaration) ||
-                        out.operands.back().relativeAddressing)
-                        return out;
-                }
-                else if (
-                    plan.kind == PlanKind::DefFloat ||
-                    plan.kind == PlanKind::DefInt ||
-                    plan.kind == PlanKind::DefBool)
-                {
-                    const UINT literalCount =
-                        plan.kind == PlanKind::DefBool ? 1u : 4u;
-                    if (instruction.operandTokens.size() !=
-                        static_cast<std::size_t>(1u + literalCount))
-                        return out;
-                    if (!parse_parameter(
-                            ProgrammableShaderRegisterOperandRole::Destination) ||
-                        out.operands.back().relativeAddressing)
-                        return out;
-
-                    const auto definedType = out.operands.back().registerType;
-                    const bool typeMatches =
-                        (plan.kind == PlanKind::DefFloat &&
-                         (definedType == D3DSPR_CONST ||
-                          definedType == D3DSPR_CONST2 ||
-                          definedType == D3DSPR_CONST3 ||
-                          definedType == D3DSPR_CONST4)) ||
-                        (plan.kind == PlanKind::DefInt &&
-                         definedType == D3DSPR_CONSTINT) ||
-                        (plan.kind == PlanKind::DefBool &&
-                         definedType == D3DSPR_CONSTBOOL);
-                    if (!typeMatches)
-                        return out;
-                    ++out.constantDefinitionCount;
-
-                    for (UINT i = 0; i < literalCount; ++i)
-                    {
-                        if (rawIndex >= instruction.operandTokens.size())
-                            return out;
-                        mix(instruction.operandTokens[rawIndex++]);
-                        ++out.literalDwordCount;
-                    }
-                }
-                else
-                {
-                    for (UINT i = 0; i < plan.destinations; ++i)
-                    {
-                        if (!parse_parameter(
-                                ProgrammableShaderRegisterOperandRole::Destination))
-                            return out;
-                    }
-                    for (UINT i = 0; i < plan.sources; ++i)
-                    {
-                        if (!parse_parameter(
-                                ProgrammableShaderRegisterOperandRole::Source))
-                            return out;
-                    }
-                }
-
-                if (rawIndex != instruction.operandTokens.size())
-                    return out;
-                ++out.semanticInstructionCount;
-            }
-        }
-        catch (...)
-        {
-            return {};
-        }
-
-        out.complete =
-            out.semanticInstructionCount == out.instructionCount;
-        out.registerSemanticsHash = semanticHash;
         return out;
     }
 
