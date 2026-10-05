@@ -8,24 +8,24 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
 repo=Path.cwd()
-run="20261005-C158-BA0147DA"
+run="20261005-C159-DDF0392A"
 out=repo/"localization/graphics/role_C"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 
-asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds"
+asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds"
 cand=repo/"localization/graphics/hd_candidates"/asset
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
-SOURCE_BLOB_SHA1="4a0ffb723e48313e3bdd7106dfadacd36cb212e8"
-ATLAS_BLOB_SHA1="7f7432f469c86362670c8e2ca7a2f0473b64f694"
-SOURCE_SHA256="f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61"
-CANDIDATE_SHA256="869cf1bea8b27dcc89f5b2ab68f9dd163e4bf41fa6de4b53c7b3f19b3b1c74ad"
+SOURCE_BLOB_SHA1="1ff7680eb71750d884b0e69fe058aef3a5cf5fa2"
+ATLAS_BLOB_SHA1="819d31b1cd9c59fb6d011f3f0361d6ed7114c286"
+SOURCE_SHA256="bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72"
+CANDIDATE_SHA256="e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea"
 
-tmp=Path("/tmp/outrun_C158"); tmp.mkdir(parents=True,exist_ok=True)
+tmp=Path("/tmp/outrun_C159"); tmp.mkdir(parents=True,exist_ok=True)
 sp=tmp/"source.dds"; apath=tmp/"atlas.json"
 base="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
-urllib.request.urlretrieve(base+"/Release/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",sp)
-urllib.request.urlretrieve(base+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_BA0147DA_512x512_atlas.json",apath)
+urllib.request.urlretrieve(base+"/Release/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",sp)
+urllib.request.urlretrieve(base+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_DDF0392A_256x512_atlas.json",apath)
 
 def gitblob(b): return hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
 def sha(b): return hashlib.sha256(b).hexdigest()
@@ -40,175 +40,179 @@ sb=sp.read_bytes(); ab=apath.read_bytes(); cb=cand.read_bytes()
 if gitblob(sb)!=SOURCE_BLOB_SHA1 or gitblob(ab)!=ATLAS_BLOB_SHA1 or sha(sb)!=SOURCE_SHA256 or sha(cb)!=CANDIDATE_SHA256:
     raise RuntimeError(("provenance/hash drift",gitblob(sb),gitblob(ab),sha(sb),sha(cb)))
 if sb[:128]!=cb[:128] or len(sb)!=len(cb):
-    raise RuntimeError("DDS structure/header mismatch")
-H,W,pitch,depth,mips=struct.unpack_from("<5I",sb,12)
-pf=struct.unpack_from("<8I",sb,76); masks=(pf[4],pf[5],pf[6])
-mode="RGBA" if masks==(0xff,0xff00,0xff0000) else ("BGRA" if masks==(0xff0000,0xff00,0xff) else None)
-if (W,H,pitch,mips)!=(2048,2048,8192,1) or mode!="RGBA":
-    raise RuntimeError(("structure",W,H,pitch,mips,masks))
+    raise RuntimeError("DDS header/length drift")
+H,W=struct.unpack_from("<II",sb,12)
+mips=struct.unpack_from("<I",sb,28)[0]; fourcc=sb[84:88]
+need=128+((W+3)//4)*((H+3)//4)*16
+if (W,H)!=(1024,2048) or fourcc!=b"DXT5" or mips not in (0,1) or len(sb)!=need:
+    raise RuntimeError(("structure",W,H,mips,fourcc,len(sb),need))
 
-raw_src=Image.frombytes("RGBA",(W,H),sb[128:],"raw",mode)
-raw_fin=Image.frombytes("RGBA",(W,H),cb[128:],"raw",mode)
+raw_src=Image.open(sp).convert("RGBA")
+raw_fin=Image.open(cand).convert("RGBA")
 src=raw_src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 fin=raw_fin.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 sa=np.asarray(src,dtype=np.uint8); fa=np.asarray(fin,dtype=np.uint8)
 
 atlas=json.loads(ab.decode())
-if atlas.get("regions_count")!=60: raise RuntimeError(("atlas drift",atlas.get("regions_count")))
 regions={r["idx"]:r for r in atlas["regions"]}
 specs=[
- (14,"HEART ATTACK","하트 어택","red_big","left"),
- (15,"SHOWROOM","쇼룸","red_big","left"),
- (16,"COAST 2 COAST","코스트 2 코스트","red_big","left"),
- (17,"OUTRUN","아웃런","red_big","left"),
- (25,"SELECT STAR SIGN","별자리 선택","dark_menu","left"),
- (26,"SELECT PHOTO","사진 선택","dark_menu","left"),
- (27,"SELECT NATIONALITY","국적 선택","dark_menu","left"),
- (28,"ENTER NAME","이름 입력","dark_menu","left"),
- (30,"DONE","완료","dark_done_large","left"),
- (43,"PROFESSIONAL","프로","orange_prof","right"),
- (44,"OUTRUN","아웃런","red_small","right"),
- (53,"DONE","완료","dark_done_small","left"),
+ (0,"OutRun Mode / 15 C.","아웃런 모드 / 15코스"),
+ (1,"OutRun 1986","아웃런 1986"),
+ (2,"Journey Mode / Random","저니 모드 / 무작위"),
 ]
-protected_semantics={"character_names":["CLARISSA","JENNIFER","WOLF","ALBERTO","HOLLY","SAM"],"car_color":["VERDE MUGELLO"],"zodiac_icons":"preserve","logos_icons":"preserve"}
+songs={3:"Who Are You?",4:"Splash Wave",5:"Shiny World",6:"Shake The Street",7:"Rush A Difficulty",8:"Risky Ride",9:"Passing Breeze"}
 
 source_mask=np.zeros((H,W),bool)
 allowed=np.zeros((H,W),bool)
-rows=[]; group_source={}
-for idx,en,ko,group,align in specs:
+rows=[]
+for idx,en,ko in specs:
     x,y,cw,ch=regions[idx]["rect"]
-    alpha=sa[y:y+ch,x:x+cw,3]
-    lm=alpha>0
+    lm=sa[y:y+ch,x:x+cw,3]>0
     bb=bbox(lm)
-    if not bb: raise RuntimeError(("empty canonical alpha",idx,en))
-    pix=count(lm)
+    if not bb: raise RuntimeError(("empty source target",idx,en))
     ob=[x+bb[0],y+bb[1],x+bb[2],y+bb[3]]
     source_mask[y:y+ch,x:x+cw] |= lm
     allowed[ob[1]:ob[3],ob[0]:ob[2]]=True
-    hi=alpha>=192
-    vals=sa[y:y+ch,x:x+cw,:3][hi]
-    if len(vals): group_source.setdefault(group,[]).append(vals)
-    rows.append({"region_idx":idx,"source":en,"korean":ko,"group":group,"alignment":align,
-                 "cell":[x,y,cw,ch],"original_bbox":ob,"source_mask_pixels":pix})
+    rows.append({"region_idx":idx,"source":en,"korean":ko,"cell":[x,y,cw,ch],"original_bbox":ob,"source_mask_pixels":count(lm)})
 
-protected=(sa[:,:,3]>0)&~allowed
+# Exact decoded protection: every RGBA pixel outside exact source bboxes must be byte-identical.
+diff=np.any(sa!=fa,axis=2)
+alpha_diff=sa[:,:,3]!=fa[:,:,3]
+outside=count(diff & ~allowed)
+alpha_out=count(alpha_diff & ~allowed)
+introduced_visible_out=count((fa[:,:,3]>1)&(sa[:,:,3]<=1)&~allowed)
+if outside or alpha_out or introduced_visible_out:
+    raise RuntimeError(("decoded outside drift",outside,alpha_out,introduced_visible_out))
+
+# Explicit song-title/Ferrari region equality independent of producer masks.
+preserved={}
+for idx in range(3,25):
+    x,y,cw,ch=regions[idx]["rect"]
+    changed=count(np.any(sa[y:y+ch,x:x+cw]!=fa[y:y+ch,x:x+cw],axis=2))
+    preserved[str(idx)]=changed
+if any(preserved.values()): raise RuntimeError(("protected row changed",preserved))
+
+# Reconstruct a source-alpha clean plate and independently measure decoded localized pixels.
 clean=sa.copy(); clean[source_mask,3]=0
 clean_diff=np.any(clean!=sa,axis=2)
 clean_outside=count(clean_diff & ~source_mask)
 clean_unchanged_inside=count(source_mask & ~clean_diff)
-clean_protected=count(clean_diff & protected)
-clean_alpha_outside=count((clean[:,:,3]!=sa[:,:,3]) & ~source_mask)
-if any([clean_outside,clean_unchanged_inside,clean_protected,clean_alpha_outside]):
-    raise RuntimeError(("clean gates",clean_outside,clean_unchanged_inside,clean_protected,clean_alpha_outside))
+if clean_outside or clean_unchanged_inside:
+    raise RuntimeError(("clean reconstruction",clean_outside,clean_unchanged_inside))
 
-render_diff=np.any(fa!=clean,axis=2)
-row_results=[]; target_masks=[]; group_candidate={}
-alignment_fail=[]
+target=np.zeros((H,W),bool); target_masks=[]; row_results=[]
 for r in rows:
     x0,y0,x1,y1=r["original_bbox"]
-    am=np.zeros((H,W),bool); am[y0:y1,x0:x1]=True
-    tm=render_diff & am
+    tm=np.zeros((H,W),bool)
+    tm[y0:y1,x0:x1]=(fa[y0:y1,x0:x1,3]>1)
     lb=bbox(tm)
-    if not lb: raise RuntimeError(("missing target",r["region_idx"]))
+    if not lb: raise RuntimeError(("decoded localized target empty",r["region_idx"]))
     sw,sh=x1-x0,y1-y0; lw,lh=lb[2]-lb[0],lb[3]-lb[1]
     d=[lb[0]-x0,x1-lb[2],lb[1]-y0,y1-lb[3]]
     if lw>sw or lh>sh or min(d)<=0:
         raise RuntimeError(("bbox/size/margin",r["region_idx"],r["original_bbox"],lb,d))
-    if r["alignment"]=="left" and d[0]>8: alignment_fail.append([r["region_idx"],"left",d[0]])
-    if r["alignment"]=="right" and d[1]>8: alignment_fail.append([r["region_idx"],"right",d[1]])
-    target_masks.append(tm)
-    cvals=fa[:,:,:3][tm & (fa[:,:,3]>=192)]
-    if len(cvals): group_candidate.setdefault(r["group"],[]).append(cvals)
+    target|=tm; target_masks.append(tm)
     row_results.append({**r,"localized_bbox":lb,"source_size":[sw,sh],"localized_size":[lw,lh],
-        "delta_left":d[0],"delta_right":d[1],"delta_top":d[2],"delta_bottom":d[3],
-        "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS",
-        "source_alignment_anchor":"PASS" if not ((r["alignment"]=="left" and d[0]>8) or (r["alignment"]=="right" and d[1]>8)) else "FAIL"})
-if alignment_fail: raise RuntimeError(("alignment anchor drift",alignment_fail))
+      "delta_left":d[0],"delta_right":d[1],"delta_top":d[2],"delta_bottom":d[3],
+      "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS"})
 
-target=np.logical_or.reduce(target_masks)
-final_diff=np.any(fa!=sa,axis=2); alpha_diff=fa[:,:,3]!=sa[:,:,3]
-outside=count(final_diff & ~allowed)
-alpha_out=count(alpha_diff & ~allowed)
-protected_changed=count(final_diff & protected)
-render_out=count(render_diff & ~target)
-source_residue=count(source_mask & (fa[:,:,3]>0) & ~target)
-target_protected_overlap=count(target & protected)
-target_protected_near=count((np.asarray(Image.fromarray((target.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0)&protected)
+# Source residue: source alpha footprint must not remain away from localized target with a 2px guard.
+guard=np.asarray(Image.fromarray((target.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(5)))>0
+source_residue=count(source_mask & (fa[:,:,3]>8) & ~guard)
+if source_residue: raise RuntimeError(("source residue",source_residue))
 
+# Localized labels must not overlap or touch each other, and must stay separated from protected source pixels.
 overlap=0; touch=[]
 for i in range(len(target_masks)):
     ag=np.asarray(Image.fromarray((target_masks[i].astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0
     for j in range(i+1,len(target_masks)):
         ov=count(target_masks[i]&target_masks[j]); near=count(ag&target_masks[j]); overlap+=ov
         if ov or near: touch.append([row_results[i]["region_idx"],row_results[j]["region_idx"],ov,near])
+protected_source=(sa[:,:,3]>0)&~allowed
+target_protected_overlap=count(target&protected_source)
+target_protected_1px_near=count((np.asarray(Image.fromarray((target.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0)&protected_source)
+if overlap or touch or target_protected_overlap or target_protected_1px_near:
+    raise RuntimeError(("overlap/protected-near",overlap,touch,target_protected_overlap,target_protected_1px_near))
 
-if any([outside,alpha_out,protected_changed,render_out,source_residue,target_protected_overlap,target_protected_near,overlap]) or touch:
-    raise RuntimeError(("final gates",outside,alpha_out,protected_changed,render_out,source_residue,target_protected_overlap,target_protected_near,overlap,touch))
+# Source family color diagnostic on high-alpha glyph pixels.
+sv=sa[source_mask & (sa[:,:,3]>=128),:3]
+cv=fa[target & (fa[:,:,3]>=128),:3]
+if len(sv)<30 or len(cv)<30: raise RuntimeError(("style samples",len(sv),len(cv)))
+sm=[int(np.median(sv[:,k])) for k in range(3)]
+cm=[int(np.median(cv[:,k])) for k in range(3)]
+delta=[abs(cm[k]-sm[k]) for k in range(3)]
+if max(delta)>8: raise RuntimeError(("fill style drift",sm,cm,delta))
 
-style_checks={}
-for g in sorted(group_source):
-    svals=np.concatenate(group_source[g],axis=0)
-    cvals=np.concatenate(group_candidate.get(g,[]),axis=0) if group_candidate.get(g) else np.empty((0,3),dtype=np.uint8)
-    if len(svals)<30 or len(cvals)<30: raise RuntimeError(("style sample small",g,len(svals),len(cvals)))
-    sm=[int(np.median(svals[:,k])) for k in range(3)]
-    cm=[int(np.median(cvals[:,k])) for k in range(3)]
-    delta=[abs(cm[k]-sm[k]) for k in range(3)]
-    if max(delta)>3: raise RuntimeError(("fill style drift",g,sm,cm,delta))
-    style_checks[g]={"source_fill_median_rgb":sm,"localized_fill_median_rgb":cm,"fill_median_abs_delta":delta,"status":"PASS"}
+# Compressed byte-change accounting: no changed BC3 block may be wholly outside exact bbox-derived patch coverage.
+bw=(W+3)//4; bh=(H+3)//4
+allowed_raw=np.flipud(allowed)
+changed_blocks=0; changed_blocks_wholly_outside=0
+for by in range(bh):
+    for bx in range(bw):
+        off=128+(by*bw+bx)*16
+        if sb[off:off+16]!=cb[off:off+16]:
+            changed_blocks+=1
+            if not np.any(allowed_raw[by*4:min(H,by*4+4),bx*4:min(W,bx*4+4)]):
+                changed_blocks_wholly_outside+=1
+if changed_blocks_wholly_outside:
+    raise RuntimeError(("changed BC3 blocks wholly outside allowed",changed_blocks_wholly_outside))
 
 for name,m in [
-    ("C158_SOURCE_TEXT_MASK.png",source_mask),
-    ("C158_ALLOWED_BBOX_MASK.png",allowed),
-    ("C158_TARGET_TEXT_MASK.png",target),
-    ("C158_PROTECTED_MASK.png",protected)
+ ("C159_SOURCE_TEXT_MASK.png",source_mask),
+ ("C159_ALLOWED_BBOX_MASK.png",allowed),
+ ("C159_TARGET_TEXT_MASK.png",target),
+ ("C159_PROTECTED_SOURCE_MASK.png",protected_source)
 ]:
     Image.fromarray((m.astype(np.uint8)*255),"L").save(out/name)
-clean_img=Image.fromarray(clean,"RGBA"); clean_img.save(out/"C158_VERIFIED_CLEAN_PLATE.png")
+clean_img=Image.fromarray(clean,"RGBA"); clean_img.save(out/"C159_VERIFIED_CLEAN_PLATE.png")
 
-stack=Image.new("RGB",(1024,3*1050),"white")
+stack=Image.new("RGB",(512,3*1050),"white")
 for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean_img),("FINAL",fin)]):
-    z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); stack.paste(z,(0,i*1050+26)); ImageDraw.Draw(stack).text((5,i*1050+5),label,fill="black")
-stack.save(out/"C158_BA_COMPARE.jpg",quality=96)
+    z=comp(im).resize((512,1024),Image.Resampling.NEAREST); stack.paste(z,(0,i*1050+26)); ImageDraw.Draw(stack).text((5,i*1050+5),label,fill="black")
+stack.save(out/"C159_DDF_COMPARE.jpg",quality=96)
 
 cards=[]
 for r in row_results:
-    x0,y0,x1,y1=r["original_bbox"]; p=14
+    x0,y0,x1,y1=r["original_bbox"]; p=12
     cr=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
     ims=[comp(z).crop(cr) for z in (src,clean_img,fin)]
-    maxw=max(z.width for z in ims); sc=min(2.0,650/max(1,maxw))
+    sc=min(2.0,1000/max(1,ims[0].width))
     ims=[z.resize((max(1,int(z.width*sc)),max(1,int(z.height*sc))),Image.Resampling.NEAREST) for z in ims]
     c=Image.new("RGB",(sum(z.width for z in ims)+12,max(z.height for z in ims)+34),"white"); xx=0
     for z in ims: c.paste(z,(xx,34)); xx+=z.width+6
-    ImageDraw.Draw(c).text((5,5),f'{r["region_idx"]} {r["source"]} -> {r["korean"]} [{r["alignment"]}]',fill="black"); cards.append(c)
+    ImageDraw.Draw(c).text((5,5),r["source"]+" -> "+r["korean"],fill="black"); cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+4*(len(cards)-1)),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.thumbnail((2200,16000),Image.Resampling.LANCZOS); sheet.save(out/"C158_BA_ROW_CONTACT.jpg",quality=96)
+sheet.save(out/"C159_DDF_ROW_CONTACT.jpg",quality=96)
 
-rr=Image.new("RGB",(1024,2*1050),"white")
+rr=Image.new("RGB",(512,2*1050),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_fin)]):
-    z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); rr.paste(z,(0,i*1050+26)); ImageDraw.Draw(rr).text((5,i*1050+5),label,fill="black")
-rr.save(out/"C158_BA_RAW_COMPARE.jpg",quality=96)
+    z=comp(im).resize((512,1024),Image.Resampling.NEAREST); rr.paste(z,(0,i*1050+26)); ImageDraw.Draw(rr).text((5,i*1050+5),label,fill="black")
+rr.save(out/"C159_DDF_RAW_COMPARE.jpg",quality=96)
 
-report={"schema_version":1,"role":"C","run":run,"queue_index":212,"asset":asset,"producer_run":"20261005-B-PRODUCTION85",
+report={"schema_version":1,"role":"C","run":run,"queue_index":222,"asset":asset,"producer_run":"20261005-B-PRODUCTION89",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB_SHA1,"atlas_git_blob_sha1":ATLAS_BLOB_SHA1,"source_sha256":SOURCE_SHA256},
  "candidate_sha256":CANDIDATE_SHA256,"candidate_changed_by_C":False,
- "independent_method":"C re-downloaded pinned canonical DDS+atlas, used only the controller-reviewed semantic region IDs, independently rebuilt canonical alpha source masks/exact bboxes/transparent clean plate and protected artwork from source pixels, decoded the committed candidate, and recomputed containment/protected/overlap/alignment/style gates without producer masks.",
- "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
- "semantic_binding":{"rows":[{"region_idx":i,"source":en,"korean":ko,"group":g,"alignment":al} for i,en,ko,g,al in specs],"protected":protected_semantics},
- "rows":row_results,"style_checks":style_checks,
- "machine_checks":{"clean_changed_outside_source_mask":clean_outside,"clean_unchanged_inside_source_mask":clean_unchanged_inside,
-   "clean_protected_changed":clean_protected,"clean_alpha_changed_outside_source_mask":clean_alpha_outside,
-   "bbox_size_positive_margin":"12/12 PASS","source_alignment_anchor":"12/12 PASS",
-   "final_outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,"render_outside_target":render_out,
-   "source_residue":source_residue,"target_protected_overlap":target_protected_overlap,"target_protected_1px_near":target_protected_near,
-   "overlap":overlap,"touch_pairs":touch},
+ "independent_method":"C re-downloaded pinned canonical DXT5 DDS+atlas, independently decoded source/candidate, re-derived the three exact source-alpha bboxes from canonical regions, required byte-identical decoded RGBA outside their union, explicitly compared protected song-title/Ferrari regions 3..24, rebuilt the transparent-alpha clean plate, remeasured decoded localized bboxes/residue/overlap/protected separation, and independently audited BC3 changed-block scope.",
+ "structure":{"dimensions":[W,H],"format":"DXT5","mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
+ "semantic_binding":{"localized":[{"region_idx":i,"source":en,"korean":ko} for i,en,ko in specs],"protected_song_titles":songs,"protected_rows_10_24":"Ferrari model names"},
+ "rows":row_results,
+ "machine_checks":{"decoded_pixels_changed_outside_exact_source_bboxes":outside,"alpha_changed_outside_exact_source_bboxes":alpha_out,
+   "introduced_visible_outside_exact_source_bboxes":introduced_visible_out,"protected_rows_3_24_changed_pixels":preserved,
+   "clean_changed_outside_source_mask":clean_outside,"clean_unchanged_inside_source_mask":clean_unchanged_inside,
+   "bbox_size_positive_margin":"3/3 PASS","source_residue":source_residue,"overlap":overlap,"touch_pairs":touch,
+   "target_protected_overlap":target_protected_overlap,"target_protected_1px_near":target_protected_1px_near,
+   "source_fill_median_rgb":sm,"localized_fill_median_rgb":cm,"fill_median_abs_delta":delta,
+   "changed_bc3_blocks":changed_blocks,"changed_bc3_blocks_wholly_outside_allowed":changed_blocks_wholly_outside},
+ "song_title_policy":"PASS_PRESERVE_ORIGINAL_ENGLISH_PIXEL_EXACT",
  "machine_status":"PASS","controller_visual_qa":"PENDING","decision":"PENDING_CONTROLLER_VISUAL_QA","RUNTIME_VALIDATION":"UNTESTED"}
-(out/"C158_BA_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-summary={"run":run,"asset":"BA0147DA","index":212,"source_sha256":SOURCE_SHA256,"candidate_sha256":CANDIDATE_SHA256,
- "machine_status":"PASS","bbox_size_positive_margin":"12/12","source_alignment_anchor":"12/12",
- "clean_outside":clean_outside,"clean_unchanged_inside":clean_unchanged_inside,"clean_protected":clean_protected,
- "outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,"render_outside_target":render_out,"source_residue":source_residue,
- "target_protected_overlap":target_protected_overlap,"target_protected_1px_near":target_protected_near,"overlap":overlap,"touch_pairs":len(touch),
- "style_checks":style_checks,"runtime_validation":"UNTESTED","report":f"localization/graphics/role_C/{run}/C158_BA_MACHINE_QA.json"}
-(wr/"C158_BA0147DA.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"C159_DDF_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+summary={"run":run,"asset":"DDF0392A","index":222,"source_sha256":SOURCE_SHA256,"candidate_sha256":CANDIDATE_SHA256,
+ "machine_status":"PASS","bbox_size_positive_margin":"3/3","decoded_changed_outside":outside,"alpha_outside":alpha_out,
+ "introduced_visible_outside":introduced_visible_out,"protected_rows_changed":sum(preserved.values()),"source_residue":source_residue,
+ "overlap":overlap,"touch_pairs":len(touch),"target_protected_overlap":target_protected_overlap,"target_protected_1px_near":target_protected_1px_near,
+ "source_fill_median_rgb":sm,"localized_fill_median_rgb":cm,"fill_median_abs_delta":delta,
+ "changed_bc3_blocks":changed_blocks,"changed_bc3_blocks_wholly_outside_allowed":changed_blocks_wholly_outside,
+ "runtime_validation":"UNTESTED","report":f"localization/graphics/role_C/{run}/C159_DDF_MACHINE_QA.json"}
+(wr/"C159_DDF0392A.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False),flush=True)
