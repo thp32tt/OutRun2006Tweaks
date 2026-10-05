@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C169-63C91067",
+  "qa_id": "C169",
+  "timestamp_kst": "2026-10-05T15:55:00+09:00",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION109",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "candidate_sha256": "6e08528dc031e0032fc2f2545a3aca280596986b7c62290c2ecded80484cf7ff",
+  "candidate_changed_by_C": false,
+  "producer_machine_status": "PASS_REPORTED",
+  "producer_bbox_size_positive_margin": "2/2 PASS",
+  "producer_zero_pixel_gates": {
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "decoded_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "source_effect_residue": 0,
+    "render_outside_target": 0,
+    "localized_overlap": 0
+  },
+  "controller_visual_qa": "FAIL_CLEAN_PLATE_ARTWORK_DAMAGE",
+  "visual_failures": [
+    "Lower starburst still has non-source orange/brown blobs and clipped/faceted inner-glow geometry along the top-center area where Total Rank was removed.",
+    "Pink cloud still shows a triangular/faceted light wedge directly below the top-center border in the removed-title area.",
+    "The same background reconstruction artifacts remain visible immediately behind/adjacent to the Korean title in FINAL."
+  ],
+  "reasoning": "Latest B109 tightened the source mask and reduced the modified area, but the contract requires source-faithful patterned-artwork reconstruction and mandatory visual review. Zero outside/residue counters do not prove that edited in-mask artwork is visually faithful.",
+  "decision": "C169_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE",
+  "required_rework": "Restore source-faithful starburst inner-glow/spike geometry and the smooth pink-cloud gradient beneath the title, without blobs, clipped glow, facets or seams; then rerun exact-pixel and controller visual QA.",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION109/B109_63C_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION109/B109_63C_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION109/B109_63C_ROW_CONTACT.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION109/B109_63C_RAW_COMPARE.jpg"
+  ],
+  "supersedes_controller_decision": "C168_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
