@@ -334,6 +334,42 @@ namespace WheelFFBMath
         return std::clamp(raw / denominator, 0.0f, 1.0f);
     }
 
+    // R10: during a sustained oversteer/drift, front-slip alone can point the
+    // rack toward the vehicle heading instead of toward the velocity vector.
+    // Blend into a body-sideslip recovery direction only once both body slip
+    // and the existing bodySlide confidence indicate a real drift. Normal
+    // cornering remains entirely front-tyre SAT-driven.
+    inline float drift_countersteer_blend(float bodySlip, float bodySlide)
+    {
+        if (!std::isfinite(bodySlip) || !std::isfinite(bodySlide))
+            return 0.0f;
+        const float slipGate = smoothstep01(
+            (std::abs(bodySlip) - 0.18f) / (0.52f - 0.18f));
+        const float slideGate = smoothstep01(
+            (std::clamp(bodySlide, 0.0f, 1.0f) - 0.30f) / 0.45f);
+        return slipGate * slideGate;
+    }
+
+    inline float drift_countersteer_shape(float bodySlip)
+    {
+        if (!std::isfinite(bodySlip))
+            return 0.0f;
+        return std::clamp(
+            0.55f + 0.45f * smoothstep01(
+                (std::abs(bodySlip) - 0.18f) / (0.70f - 0.18f)),
+            0.0f, 1.0f);
+    }
+
+    inline float drift_countersteer_direction(float bodySlip)
+    {
+        if (!std::isfinite(bodySlip) || std::abs(bodySlip) < 0.001f)
+            return 0.0f;
+        // Positive body slip means the velocity vector is displaced toward the
+        // positive steering side, so the pre-device torque must steer that way.
+        // Modern R3 output is inverted at the DirectInput boundary afterwards.
+        return bodySlip > 0.0f ? -1.0f : 1.0f;
+    }
+
     inline float impact_direction_from_lateral(float lateral, float deadband = 0.04f)
     {
         if (!std::isfinite(lateral) || std::abs(lateral) <= std::max(0.0f, deadband))

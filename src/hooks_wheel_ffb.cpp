@@ -590,13 +590,25 @@ namespace
                     disable_periodics();
                 }
                 activeRuntimeModel_ = runtimeModelValue;
+
+                // R10 hardware rule for the MOZA R3: Modern uses the opposite
+                // ConstantForce/Spring polarity from the source-faithful
+                // Arcade/Hybrid/PS2 modes. Enforce it at the runtime ownership
+                // boundary as well as in the F11 baseline so profile/manual
+                // edits cannot leave the newly-selected model backwards.
+                const bool modelInvert =
+                    ffbModel == WheelFFBMath::Model::ModernDD;
+                Settings::WheelFFBInvertForce = modelInvert;
+                Settings::WheelFFBInvertSpring = modelInvert;
+
                 periodicRecreateHoldoffUntil_ = 0;
                 updateCounter_ = 59;
                 if (previousModel >= 0)
                 {
                     spdlog::info(
-                        "WheelFFB: live force-model change {} -> {}; recreating model-owned periodic set",
-                        previousModel, runtimeModelValue);
+                        "WheelFFB: live force-model change {} -> {}; polarity CF/Spring={}/{}, recreating model-owned periodic set",
+                        previousModel, runtimeModelValue,
+                        modelInvert, modelInvert);
                 }
             }
 
@@ -827,7 +839,11 @@ namespace
                     sawNonPrimarySnowMix = true;
             }
             const bool snowPrimaryRoad = sawSnowPrimary && !sawNonPrimarySnowMix;
-            constexpr float SnowIceRoadTextureScale = 0.04f;
+            // R10 hardware A/B: R9's 4% snow comfort scale was effectively
+            // silent on the R3 (rough=0.50 often produced roadAmp ~= 0.011).
+            // Keep sustained snow restrained, but leave enough texture to
+            // identify the surface without disturbing steering.
+            constexpr float SnowIceRoadTextureScale = 0.18f;
             const float materialRoadTextureScale =
                 snowPrimaryRoad ? SnowIceRoadTextureScale : 1.0f;
 
@@ -1283,10 +1299,28 @@ namespace
                 const float physicsReturnRelief =
                     WheelFFBMath::physics_return_relief(frontSlip, steerRate);
 
-                physicsSatTorque =
+                const float frontSatTorque =
                     (frontSlip > 0.0f ? -1.0f : 1.0f) *
                     physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
+
+                // In a real sustained oversteer state the steering tends to
+                // self-rotate toward countersteer. Front-slip can change sign
+                // after the rear has stepped out, so blend the deep-drift
+                // recovery direction from body sideslip instead of continuing
+                // to pull the rack toward the vehicle heading.
+                const float driftBlend =
+                    WheelFFBMath::drift_countersteer_blend(
+                        bodySlip, bodySlide);
+                const float driftTorque =
+                    WheelFFBMath::drift_countersteer_direction(bodySlip) *
+                    std::max(
+                        physicsShape,
+                        WheelFFBMath::drift_countersteer_shape(bodySlip)) *
+                    satSpeed * physicsLoad * rearSlideRelief *
+                    physicsReturnRelief * satStrength;
+                physicsSatTorque =
+                    frontSatTorque + (driftTorque - frontSatTorque) * driftBlend;
                 if (!std::isfinite(physicsSatTorque))
                     physicsSatTorque = 0.0f;
             }
