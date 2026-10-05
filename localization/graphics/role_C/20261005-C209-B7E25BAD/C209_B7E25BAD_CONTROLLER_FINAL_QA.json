@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T22:57:50+09:00",
+  "role": "C",
+  "run": "20261005-C209-B7E25BAD",
+  "qa_id": "C209",
+  "queue_index": 34,
+  "asset": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+  "producer_run": "20261005-B-PRODUCTION154-HOLL",
+  "source_sha256": "3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
+  "candidate_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
+  "machine_status": "PASS",
+  "classification": "zoom_review -> localize_text; Total Rank -> 종합 랭킹",
+  "structure": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "bbox_gate": {
+    "independent_original_bbox": [
+      2021,
+      1179,
+      2556,
+      1281
+    ],
+    "independent_source_core_bbox": [
+      2036,
+      1194,
+      2541,
+      1266
+    ],
+    "independent_localized_bbox": [
+      2172,
+      1198,
+      2404,
+      1262
+    ],
+    "producer_localized_bbox_exact_match": true,
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "margins": [
+      136,
+      137,
+      4,
+      4
+    ],
+    "source_size": [
+      505,
+      72
+    ],
+    "localized_size": [
+      232,
+      64
+    ]
+  },
+  "zero_pixel_gates": {
+    "decoded_changed_outside_effect_bbox": 0,
+    "alpha_changed_outside_effect_bbox": 0,
+    "introduced_visible_outside_effect_bbox": 0,
+    "opaque_source_title_residue_pixels": 0
+  },
+  "template_provenance": {
+    "reference": "C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "template_asset": "8215FD25",
+    "shift": [
+      192,
+      0
+    ],
+    "template_vs_holl_variant_pixels": 240,
+    "extra_title_aa_pixels": 1,
+    "extra_title_aa_rgba": [
+      [
+        255,
+        255,
+        255,
+        1
+      ]
+    ],
+    "conclusion": "HOLL differs from the already C202-approved same-family source only inside the proven title/effect removal footprint plus one alpha-1 white AA pixel. All other HOLL artwork remains canonical."
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_reason": "C209 SOURCE/CLEAN/FINAL and raw mirror_y review shows no English source ghost, seam, patch box, glow/border damage, clipping, overlap, alpha halo, or protected Holly/rank/UI damage. The Korean white fill, navy outline, right slant, centered alignment and scale exactly reuse the C202-approved same-family Total Rank styling, so the 232x64 localized footprint is not a new source-style regression.",
+  "decision": "C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED",
+  "machine_report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_MACHINE_QA.json",
+  "previews": [
+    "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_RAW_COMPARE.jpg"
+  ],
+  "exclusions": "Completed prior PASS assets were not repeated. Existing REWORK 37759842 and 97E863AD were not re-reviewed because no newer producer candidate exists. VR/FFB/DX11/DXVK untouched."
+}
