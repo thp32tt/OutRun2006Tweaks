@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T03:19:01+09:00",
+  "updated_at_kst": "2026-10-06T03:52:10+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B164 completed B-owned P1 IGR-009 / index48 B1696633 Slipstream material rework. Candidate 31a73348657620a4e7c7adc66a65e07f95a35a6b61266b48f9409e835b7f12be replaces prior 448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21 only inside exact source Slipstream bbox: native Noto CJK Black, natural advance, 0.26 right slant, white/navy/cobalt glow, preserved source streak field. 1/1 bbox+size+positive-margin PASS; changed/alpha outside=0, protected=0, localized-protected overlap=0, other 8 localized rows exact; controller SOURCE/OLD/CLEAN/FINAL+2x+raw mirror_y visual PASS. IGR-009 now B static PASS pending independent C + NEW actual in-game retest, not closed. B163 788CE557 and A pending-C assets remain preserved. IGR-005 stays OPEN MIXED; remaining B P1 rows require exact source/runtime mapping.",
+  "next_checkpoint": "A87 IGR-018 index121 FD90AA9 3d000de4c8c88645f4f50deb388e2538a00154783a1db4b848f15f7e7bf86894: shared Game Mode/Car/Course selector-header native family static/controller PASS after A86 family-consistency fail-close and first A87 overlap fail-close. 3/3 bbox/size/positive margins, outside/alpha/residue/overlap/touch=0; other 26 rows exact; raw mirror_y PASS. IGR-008/011 mapping reconciled to exact graphics multi-asset BF3 3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37 + B169 31a73348657620a4e7c7adc66a65e07f95a35a6b61266b48f9409e835b7f12be, with zero localization runtime Rank/Next Stage string hits. All remain pending independent C + NEW actual in-game retest; none closed.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -268,10 +268,14 @@
       "status": "PENDING_C_AND_INGAME_RETEST",
       "assets": [],
       "remaining": 0,
-      "note": "B1696633 B164 and 788CE557 B163 producer static PASS pending independent C + NEW in-game retest. No exact-mapped B graphics rework remains; IGR-005 and remaining P1 MIXED/RUNTIME rows require source/runtime mapping.",
+      "note": "Producer rework=0. Pending C/retest includes finalized B163/B164 and A82/A85/A87 user-regression repairs. IGR-008/011 exact raster mapping is resolved; IGR-018 FD90 header-family A87 static PASS. Actual game retest still mandatory.",
       "pending_c": [
         "788CE557",
-        "B1696633"
+        "B1696633",
+        "BF3EE5C6",
+        "A064FDFC",
+        "48DEBE77",
+        "FD90AA9"
       ]
     },
     "latest_d_final_qa": {
@@ -1341,40 +1345,53 @@
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     },
     "latest_a_production": {
-      "run": "A85",
-      "asset": "IGR-012:A064FDFC+48DEBE77",
-      "indices": [
-        60,
-        63
-      ],
-      "candidate_sha256": {
-        "A064FDFC": "a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f",
-        "48DEBE77": "a6161cfaedb9ab83c311b3aa78cf3ae3e18ca333fc52e1e31a8d6055e21797ea"
-      },
-      "result": "A85_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+      "run": "A87",
+      "index": 121,
+      "asset": "FD90AA9",
+      "candidate_sha256": "3d000de4c8c88645f4f50deb388e2538a00154783a1db4b848f15f7e7bf86894",
+      "result": "A87_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
       "user_ingame_regressions": [
-        "IGR-012"
+        "IGR-018"
       ],
-      "bbox_size_positive_margin": {
-        "A064FDFC": "2/2 PASS",
-        "48DEBE77": "3/3 PASS"
-      },
+      "prior_candidate_sha256": "16f605a90a072b39c071e24edae578f181afd8d229e2238a9f6100815420da94",
+      "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "bbox_size_positive_margin": "3/3 PASS",
       "pixel_gates": {
-        "A064FDFC": {
-          "outside": 0,
-          "alpha_outside": 0,
-          "neighbor_gap_px": 2
-        },
-        "48DEBE77": {
-          "outside": 0,
-          "source_face_residue_clean": 0
-        }
+        "outside": 0,
+        "alpha_outside": 0,
+        "clean_residue": 0,
+        "localized_overlap": 0,
+        "localized_touch": 0
       },
-      "mapping": "EXACT_HIGH_CONFIDENCE_MULTI_ASSET; dynamic numeric meter protected runtime content",
-      "controller_visual_qa": "PASS_MULTI_ASSET_IGR012_GRAPHICS_REPAIR_PENDING_C_AND_NEW_INGAME_RETEST",
-      "report": "localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_IGR012_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_CONTROLLER_SELF_QA.json",
-      "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+      "style": {
+        "font": "Noto Sans CJK KR Black",
+        "native_font_size_px": 120,
+        "shear": 0.28,
+        "alignment": "source-centered horizontal + positive vertical cadence",
+        "old_bitmap_reused": false
+      },
+      "structure": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "header_128_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "controller_visual_qa": "PASS_IGR018_SHARED_HEADER_FAMILY_NATIVE_STYLE_AND_CADENCE",
+      "report": "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_IGR018_FD90_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+      "additional_mapping_reconcile": {
+        "regressions": [
+          "IGR-008",
+          "IGR-011"
+        ],
+        "report": "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_IGR008_011_MAPPING_RECONCILE.json",
+        "decision": "EXACT_GRAPHICS_MULTI_ASSET_NO_LOCALIZATION_RUNTIME_TEXT"
+      }
     },
     "latest_a_rework": {
       "run": "A45",

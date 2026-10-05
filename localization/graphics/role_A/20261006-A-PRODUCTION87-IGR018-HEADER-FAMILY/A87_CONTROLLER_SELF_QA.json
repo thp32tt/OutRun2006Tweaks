@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY",
+  "timestamp_kst": "2026-10-06T03:52:10+09:00",
+  "queue_index": 121,
+  "asset": "FD90AA9",
+  "candidate_sha256": "3d000de4c8c88645f4f50deb388e2538a00154783a1db4b848f15f7e7bf86894",
+  "input_candidate_sha256": "16f605a90a072b39c071e24edae578f181afd8d229e2238a9f6100815420da94",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "user_ingame_regression": {
+    "id": "IGR-018",
+    "screenshot": "스크린샷(141).png",
+    "screen": "CAR_SELECT_BLUE"
+  },
+  "controller_visual_observations": [
+    "A86 single-row native re-render fixed the target car label itself but was fail-closed before producer promotion because it left the source-shared three-line selector header family with visibly inconsistent Korean style/alignment.",
+    "The first A87 shared-family worker retry at 142px was fail-closed by the zero-overlap gate because the Select-car and Select-Course localized effect masks overlapped; it produced no candidate output.",
+    "Final A87 uses one native Noto Sans CJK KR Black 120px family, 0.28 right shear, neutral white face, light rim, dark keyline/offset depth, centered horizontal anchors and explicit positive vertical cadence across Game Mode / Car / Course.",
+    "SOURCE/CLEAN/A86/A87 readable contact shows the three Korean rows now share one source-faithful size/weight/slant/effect family. No English ghost, mixed low-resolution member, clipping, pair overlap/touch, or source-unjustified recentering is visible.",
+    "Raw mirror_y review preserves atlas orientation; unrelated 26 localized rows and protected artwork remain unchanged from the input candidate."
+  ],
+  "machine_qa": {
+    "bbox_size_positive_margin": "3/3 PASS",
+    "changed_outside_header_union": 0,
+    "alpha_changed_outside_header_union": 0,
+    "clean_source_effect_unchanged_pixels": 0,
+    "localized_pair_overlap": 0,
+    "localized_pair_touch": 0
+  },
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": "PASS_IGR018_SHARED_HEADER_FAMILY_NATIVE_STYLE_AND_CADENCE",
+  "status": "A87_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "pending_independent_c_static_qa": true,
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "backlog_close_allowed": false,
+  "producer_report": "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_IGR018_FD90_REPORT.json",
+  "visual_evidence": [
+    "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_IGR018_HEADER_FAMILY_CONTACT.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_IGR018_HEADER_FAMILY_2X.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_FD90_FINAL_RAW_MIRROR_Y.jpg"
+  ],
+  "vr_ffb_dx11_dxvk_changes": false
+}

@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A87 IGR-018 FD90AA9 3d000de4c8c88645f4f50deb388e2538a00154783a1db4b848f15f7e7bf86894 shared selector-header family static self-QA PASS; pending C + NEW game retest. IGR-008/011 exact graphics mapping resolved to BF3 3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37 + B169 31a73348657620a4e7c7adc66a65e07f95a35a6b61266b48f9409e835b7f12be, no localization runtime text hits; pending C + NEW game retest.",
     "B164 P1 IGR-009 / index48 B1696633 candidate 31a73348657620a4e7c7adc66a65e07f95a35a6b61266b48f9409e835b7f12be static self-QA PASS. Slipstream alone was materially rerendered from exact-HD clean plate with natural Hangul advance, 0.26 source-family right slant, white/navy/cobalt glow and preserved speed streak field; 1/1 bbox/size/margin and zero outside/protected/overlap gates, other 8 localized rows exact; controller SOURCE/OLD/CLEAN/FINAL+2x+raw visual PASS. Pending independent C + NEW in-game retest; not closed. IGR-005 remains OPEN MIXED; remaining B P1 rows require exact source/runtime mapping.",
     "A85 P0 IGR-012: A064FDFC a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f + 48DEBE77 a6161cfaedb9ab83c311b3aa78cf3ae3e18ca333fc52e1e31a8d6055e21797ea multi-asset graphics repair static self-QA PASS; pending C + NEW game retest; do not close. A82 BF3 Rank pending C; IGR-008/011 remaining MIXED runtime mapping stays OPEN.",
     "A82 P0 IGR-008 (+IGR-011 template) BF3 graphics portion 3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37 static self-QA PASS; pending C. MIXED runtime/modal mapping remains OPEN; do not redraw BF3 Rank again unless C/new game evidence fails. A85 IGR-012 clean-plate retry compute pending.",
@@ -4076,7 +4077,10 @@
   "current_pending_c": [
     "BF3EE5C6",
     "A064FDFC",
-    "48DEBE77"
+    "48DEBE77",
+    "788CE557",
+    "B1696633",
+    "FD90AA9"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -5112,5 +5116,42 @@
     "report": "localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_IGR012_REPORT.json",
     "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_CONTROLLER_SELF_QA.json",
     "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+  },
+  "a_production87_igr018": {
+    "timestamp_kst": "2026-10-06T03:52:10+09:00",
+    "run": "20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY",
+    "queue_index": 121,
+    "asset": "FD90AA9",
+    "candidate_sha256": "3d000de4c8c88645f4f50deb388e2538a00154783a1db4b848f15f7e7bf86894",
+    "prior_candidate_sha256": "16f605a90a072b39c071e24edae578f181afd8d229e2238a9f6100815420da94",
+    "status": "A87_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+    "user_ingame_regression": "IGR-018",
+    "machine_qa": {
+      "bbox_size_positive_margin": "3/3 PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "clean_residue": 0,
+      "overlap": 0,
+      "touch": 0
+    },
+    "controller_visual_qa": "PASS_IGR018_SHARED_HEADER_FAMILY_NATIVE_STYLE_AND_CADENCE",
+    "pending_independent_c_static_qa": true,
+    "pending_new_ingame_retest": true,
+    "report": "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_IGR018_FD90_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+  },
+  "a87_igr008_011_mapping_reconcile": {
+    "timestamp_kst": "2026-10-06T03:52:10+09:00",
+    "regressions": [
+      "IGR-008",
+      "IGR-011"
+    ],
+    "decision": "EXACT_GRAPHICS_MULTI_ASSET_NO_LOCALIZATION_RUNTIME_TEXT",
+    "BF3EE5C6": "3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37",
+    "B1696633": "31a73348657620a4e7c7adc66a65e07f95a35a6b61266b48f9409e835b7f12be",
+    "runtime_text_hits": 0,
+    "report": "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_IGR008_011_MAPPING_RECONCILE.json",
+    "pending_c_and_new_ingame_retest": true
   }
 }

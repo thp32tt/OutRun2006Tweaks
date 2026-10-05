@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY",
+  "timestamp_kst": "2026-10-06T03:52:10+09:00",
+  "regressions": [
+    "IGR-008",
+    "IGR-011"
+  ],
+  "screens": [
+    "RANK_B_POPUP",
+    "RANK_C_POPUP"
+  ],
+  "decision": "EXACT_GRAPHICS_MULTI_ASSET_NO_LOCALIZATION_RUNTIME_TEXT",
+  "graphics_sources": [
+    {
+      "queue_index": 49,
+      "asset": "BF3EE5C6",
+      "role": "Rank label plus A-E rank-grade sprite family",
+      "candidate_sha256": "3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37",
+      "producer_status": "A82_GRAPHICS_STATIC_PASS_PENDING_C_AND_INGAME_RETEST"
+    },
+    {
+      "queue_index": 48,
+      "asset": "B1696633",
+      "role": "Next Stage text",
+      "candidate_sha256": "31a73348657620a4e7c7adc66a65e07f95a35a6b61266b48f9409e835b7f12be",
+      "provenance": "B169 transcription uniquely contains Next Stage; B164 changes Slipstream only and records all other eight localized rows pixel-exact, so Next Stage remains byte-preserved from the previously C95/C99-validated native-HD row."
+    }
+  ],
+  "runtime_trace": {
+    "files_checked": [
+      "localization/text/runtime_ko.tsv",
+      "src/hooks_localization.cpp"
+    ],
+    "queries": [
+      "Next Stage",
+      "Rank",
+      "Rank B",
+      "Rank C"
+    ],
+    "matching_rows": 0,
+    "conclusion": "No localization runtime-table or localization hook string/draw-path source exists for the visible Rank/Next Stage wording; the observed localized screen text is raster graphics for this defect scope."
+  },
+  "remaining_gates": [
+    "independent C revalidation of current A82 BF3 candidate",
+    "independent C revalidation/current preservation check of B169 candidate",
+    "NEW actual in-game retest"
+  ],
+  "backlog_close_allowed": false,
+  "vr_ffb_dx11_dxvk_changes": false
+}
