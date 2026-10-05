@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C159-DDF0392A",
+  "timestamp_kst": "2026-10-05T13:23:48+09:00",
+  "queue_index": 222,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+  "scope": "new B_PRODUCTION89 candidate only; completed prior PASS assets not repeated",
+  "producer_run": "20261005-B-PRODUCTION89",
+  "source_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+  "candidate_sha256": "e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea",
+  "candidate_changed_by_C": false,
+  "independent_machine_qa": {
+    "report": "localization/graphics/role_C/20261005-C159-DDF0392A/C159_DDF_MACHINE_QA.json",
+    "status": "PASS",
+    "dimensions": [
+      1024,
+      2048
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "canonical_source_and_atlas_redownloaded": true,
+    "producer_masks_consumed": false,
+    "decoded_pixels_changed_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "introduced_visible_outside_exact_source_bboxes": 0,
+    "protected_rows_3_24_changed_pixels": 0,
+    "clean_changed_outside_source_mask": 0,
+    "clean_unchanged_inside_source_mask": 0,
+    "bbox_size_positive_margin": "3/3 PASS",
+    "source_residue": 0,
+    "overlap": 0,
+    "touch_pairs": 0,
+    "target_protected_overlap": 0,
+    "target_protected_1px_near": 0,
+    "source_fill_median_rgb": [
+      46,
+      53,
+      57
+    ],
+    "localized_fill_median_rgb": [
+      46,
+      53,
+      57
+    ],
+    "fill_median_abs_delta": [
+      0,
+      0,
+      0
+    ],
+    "changed_bc3_blocks": 3269,
+    "changed_bc3_blocks_wholly_outside_allowed": 0
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "semantic_binding": "PASS",
+    "source_style": "PASS_SHARED_DARK_CONDENSED_UPRIGHT_FAMILY",
+    "source_scale": "PASS_B89_36PX_CORRECTS_B88_UNDERSIZE_WITH_POSITIVE_MARGINS",
+    "song_title_policy": "PASS_WHO_ARE_YOU_SPLASH_WAVE_SHINY_WORLD_SHAKE_THE_STREET_RUSH_A_DIFFICULTY_RISKY_RIDE_PASSING_BREEZE_PIXEL_EXACT",
+    "ferrari_model_rows": "PASS_PIXEL_EXACT",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "residue": "NONE_VISIBLE",
+    "seam_or_halo": "NONE_VISIBLE",
+    "orientation_regression": "NONE_VISIBLE"
+  },
+  "decision": "C159_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "producer_rework_remaining": [
+    "C598919A"
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94",
+    "49BB5FE5",
+    "75C3586A"
+  ],
+  "high_risk_static_pass_assets_existing": [
+    "1A43E9D9"
+  ],
+  "pending_production_localize_text": 22,
+  "in_game_validation": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
