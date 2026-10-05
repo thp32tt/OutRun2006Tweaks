@@ -1,0 +1,10 @@
+{
+  "run": "20261006-A-PROBE92-PENDING3",
+  "indices": [
+    227,
+    231,
+    237
+  ],
+  "status": "A92_SOURCE_PROBE_COMPLETE_RENDER_DECISION_PENDING_CONTROLLER",
+  "report": "localization/graphics/role_A/20261006-A-PROBE92-PENDING3/A92_PENDING3_PROBE.json"
+}
