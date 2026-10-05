@@ -20,6 +20,7 @@ void step(WheelVehicleDynamics& d, EVWORK_CAR& c, float a=0, float beta=0, float
 int main() {
  using namespace WheelFFBMath;
  require(sanitize_model(-10)==Model::ModernDD&&sanitize_model(99)==Model::PS2OriginalExperimental,"FFB model setting clamps");
+ require(sanitize_model(2)==Model::ModernDD,"retired Hybrid model ID folds to Modern DD");
  require(model_uses_modern_sat(Model::ModernDD)&&model_uses_modern_sat(Model::ArcadeHybrid),"modern SAT models");
  require(!model_uses_modern_sat(Model::ArcadeOriginal)&&!model_uses_modern_sat(Model::PS2OriginalExperimental),"original modes do not claim modern SAT");
  require(model_uses_arcade_events(Model::ArcadeOriginal)&&model_uses_arcade_events(Model::ArcadeHybrid),"arcade event models");
@@ -153,8 +154,14 @@ int main() {
  const float amp2=common_contact_tactile_amplitude(env2,.7f,.6f,.7f);
  const float amp4=common_contact_tactile_amplitude(env4,.7f,.6f,.7f);
  require(amp2>0.08f&&amp4>amp2&&amp4<=.32f,"two-wheel curb is tactile and four-wheel remains capped");
- require(collision_tactile_pulse(0,1.0f)>0&&collision_tactile_pulse(1,1.0f)<0,"collision tactile alternates independently of direction");
- require(collision_tactile_pulse(5,1.0f)==0,"collision tactile is short bounded pulse");
+ require(collision_tactile_pulse(0,1.0f)>.70f&&collision_tactile_pulse(1,1.0f)<-.50f,"collision tactile is strong and alternates independently of direction");
+ require(collision_tactile_pulse(6,1.0f)==0,"collision tactile is short bounded pulse");
+ std::array<unsigned,4> imperialStone={PrimaryAsphaltSurfaceMask,ImperialAvenueCompanionPavingMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask};
+ std::array<unsigned,4> imperialAsphalt={PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask};
+ require(imperial_avenue_stone_paving_pattern(14,0,imperialStone),"Imperial brick/stone mask family is recognized");
+ require(!imperial_avenue_stone_paving_pattern(14,0,imperialAsphalt),"ordinary Imperial all-asphalt stays quiet");
+ const float stoneAmp=imperial_avenue_stone_tactile_amplitude(.70f,.60f,.70f);
+ require(stoneAmp>.12f&&stoneAmp<=.16f,"Imperial brick/stone tactile floor is clearly perceptible but capped");
  require(!is_proven_primary_rough_road_contact(27,520,PrimaryAsphaltSurfaceMask),"ordinary asphalt is not rough-road material");
  require(std::abs(software_road_tactile_frequency(35.0f)-10.0f)<1e-6f,"software road carrier smoother than old 15Hz fallback");
  require(std::abs(software_slip_tactile_frequency(35.0f)-12.0f)<1e-6f,"software slip carrier remains distinct from road carrier");
