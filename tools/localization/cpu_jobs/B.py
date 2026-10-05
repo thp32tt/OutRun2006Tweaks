@@ -110,6 +110,22 @@ red=np.zeros((H,W),bool); red[ty0:ty1,tx0:tx1]=red_local
 ry,rx=np.nonzero(red_seed); oy,ox=np.nonzero(orange_seed)
 mask_discovery['for_experts']={'window':[tx0,ty0,tx1,ty1],'seed_kind':'red','seed_pixels':int(red_seed.sum()),'seed_bbox':[tx0+int(rx.min()),ty0+int(ry.min()),tx0+int(rx.max())+1,ty0+int(ry.max())+1],'assignment':'nearest_fill_seed_vs_protected_OutRun2SP_within_26px'}
 mask_discovery['outrun2sp_protected']={'window':[tx0,ty0,tx1,ty1],'seed_kind':'orange','seed_pixels':int(orange_seed.sum()),'seed_bbox':[tx0+int(ox.min()),ty0+int(oy.min()),tx0+int(ox.max())+1,ty0+int(oy.max())+1],'policy':'PRESERVE_PRODUCT_ARTWORK'}
+# Reuse the C118-reviewed exact source mask only as a protection boundary for the
+# OutRun2SP product artwork. The prior B162 nearest-seed split visibly clipped the
+# product in controller review, so product pixels now have precedence over the
+# For Experts cleanup mask.
+product_mask_path=repo/'localization/graphics/role_B/20261005-B-PRODUCTION32/788CE557_SOURCE_MASK_outrun2sp.png'
+if not product_mask_path.exists(): raise RuntimeError(('missing reviewed product mask',str(product_mask_path)))
+product_mask=np.asarray(Image.open(product_mask_path).convert('L'))>0
+if product_mask.shape!=(H,W): raise RuntimeError(('product mask shape',product_mask.shape,(H,W)))
+if np.any(product_mask & ~alpha): raise RuntimeError(('product mask contains non-source-alpha',int(np.count_nonzero(product_mask & ~alpha))))
+product_red_overlap=int(np.count_nonzero(red & product_mask))
+red &= ~product_mask
+mask_discovery['outrun2sp_protected'].update({
+ 'reviewed_mask':'localization/graphics/role_B/20261005-B-PRODUCTION32/788CE557_SOURCE_MASK_outrun2sp.png',
+ 'red_mask_pixels_excluded_for_product_protection':product_red_overlap,
+ 'candidate_must_preserve_product_mask_exact':True
+})
 
 # Two physical Transmission labels are baked into this atlas and were left English
 # in B32. The user screenshot shows duplicate/ghost English/Korean selector text, so
@@ -211,7 +227,8 @@ for k in ['for_experts','transmission_black','transmission_white','music_change'
 allowed=np.zeros((H,W),bool)
 for bb in source_bboxes.values():allowed[bb[1]:bb[3],bb[0]:bb[2]]=1
 fa=np.asarray(final,dtype=np.uint8);changed=np.any(fa!=sa,axis=2);outside=int(np.logical_and(changed,~allowed).sum());alpha_out=int(np.logical_and(fa[:,:,3]!=sa[:,:,3],~allowed).sum());protected_overlap=int(np.logical_and(occupied,protected_source).sum());guard_conflict=int(np.logical_and(dil(occupied,2),protected_source).sum())
-if outside or alpha_out or protected_overlap or guard_conflict:raise RuntimeError(('global qa',outside,alpha_out,protected_overlap,guard_conflict))
+product_changed=int(np.count_nonzero(np.any(fa[product_mask]!=sa[product_mask],axis=1)))
+if outside or alpha_out or protected_overlap or guard_conflict or product_changed:raise RuntimeError(('global qa',outside,alpha_out,protected_overlap,guard_conflict,product_changed))
 pair=[]
 for i in range(len(keys)):
  for j in range(i+1,len(keys)):
@@ -253,7 +270,7 @@ dw=max(x.width for x in dense);dh=sum(x.height for x in dense)+12;ds=Image.new('
 for c in dense:ds.paste(c,(0,y));y+=c.height+6
 ds.save(out/'B_INGAME162_788CE557_TOP_PAIR_2X.jpg',quality=96)
 raws=src.transpose(Image.Transpose.FLIP_TOP_BOTTOM);rawf=decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM);r1=card('SOURCE_RAW',raws);r2=card('FINAL_RAW',rawf);rs=Image.new('RGB',(r1.width+r2.width+8,max(r1.height,r2.height)),'white');rs.paste(r1,(0,0));rs.paste(r2,(r1.width+8,0));rs.save(out/'B_INGAME162_788CE557_RAW_COMPARE.jpg',quality=94)
-report={'schema_version':1,'role':'B','run':run,'base_head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'queue_index':106,'asset':asset_rel,'source_url':url,'source_sha256':source_sha_expected,'candidate_sha256':candidate_sha,'candidate_path':str(candidate.relative_to(repo)),'readiness_tier':'P0_USER_INGAME_FAIL_REWORK_COMPLETED_SAME_INVOCATION','structure':{**meta,'header_128_exact':True,'raw_orientation':'mirror_y'},'method':'P0 IGR-017 in-game rework: exact-HD semantic masks for For Experts + both Transmission states + Music Change + Time remaining; preserve OutRun2SP/product and selector artwork; smooth native-resolution affine Hangul; transparent clean plate; exact-header DDS','mask_discovery':mask_discovery,'rows':rows,'clean_plate':{'source_text_residue_pixels':residue,'leftover_target_fill_pixels':leftover_fill,'preserved_source_changed_pixels':preserved_clean_exact,'status':'PASS'},'containment':{'elements_total':4,'elements_pass':4,'elements_fail':0,'changed_pixels_outside_exact_source_bboxes':outside,'alpha_changed_outside_exact_source_bboxes':alpha_out,'status':'PASS'},'zero_overlap':{'new_vs_preserved_source_alpha_pixels':protected_overlap,'two_px_guard_vs_preserved_conflicts':guard_conflict,'new_pair_overlap_or_2px_guard_conflicts':pair,'status':'PASS'},'protected_preserved':['OutRun2SP product artwork','selector arrows','warning icon','vehicle silhouettes','steering wheels','numeric row','all unrelated atlas alpha'],'user_ingame_backlog':['IGR-017','IGR-005_LINKED_MAPPING_STILL_OPEN'],'manual_visual_qa':'PENDING_CONTROLLER_SELF_QA','RUNTIME_VALIDATION':'UNTESTED','status':'B_INGAME162_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C'}
+report={'schema_version':1,'role':'B','run':run,'base_head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'queue_index':106,'asset':asset_rel,'source_url':url,'source_sha256':source_sha_expected,'candidate_sha256':candidate_sha,'candidate_path':str(candidate.relative_to(repo)),'readiness_tier':'P0_USER_INGAME_FAIL_REWORK_COMPLETED_SAME_INVOCATION','structure':{**meta,'header_128_exact':True,'raw_orientation':'mirror_y'},'method':'P0 IGR-017 in-game rework: exact-HD semantic masks for For Experts + both Transmission states + Music Change + Time remaining; preserve OutRun2SP/product and selector artwork; smooth native-resolution affine Hangul; transparent clean plate; exact-header DDS','mask_discovery':mask_discovery,'rows':rows,'clean_plate':{'source_text_residue_pixels':residue,'leftover_target_fill_pixels':leftover_fill,'preserved_source_changed_pixels':preserved_clean_exact,'status':'PASS'},'containment':{'elements_total':5,'elements_pass':5,'elements_fail':0,'changed_pixels_outside_exact_source_bboxes':outside,'alpha_changed_outside_exact_source_bboxes':alpha_out,'status':'PASS'},'zero_overlap':{'new_vs_preserved_source_alpha_pixels':protected_overlap,'two_px_guard_vs_preserved_conflicts':guard_conflict,'new_pair_overlap_or_2px_guard_conflicts':pair,'status':'PASS'},'product_protection':{'OutRun2SP_mask_changed_pixels':product_changed,'status':'PASS'},'protected_preserved':['OutRun2SP product artwork','selector arrows','warning icon','vehicle silhouettes','steering wheels','numeric row','all unrelated atlas alpha'],'user_ingame_backlog':['IGR-017','IGR-005_LINKED_MAPPING_STILL_OPEN'],'manual_visual_qa':'PENDING_CONTROLLER_SELF_QA','RUNTIME_VALIDATION':'UNTESTED','status':'B_INGAME162_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C'}
 (out/'B_INGAME162_788CE557_REPORT.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 (out/'B_INGAME162_STATIC_VALIDATION_SUMMARY.json').write_text(json.dumps({'source_sha256':source_sha_expected,'candidate_sha256':candidate_sha,'bbox_and_size_pass':'5/5','changed_outside':outside,'alpha_outside':alpha_out,'source_residue':residue,'leftover_target_fill_pixels':leftover_fill,'preserved_source_changed_pixels':preserved_clean_exact,'protected_overlap':protected_overlap,'two_px_guard_vs_preserved_conflicts':guard_conflict,'new_pair_overlap_or_2px_guard_conflicts':len(pair),'header_128_exact':True,'raw_orientation':'mirror_y','status':'PASS'},indent=2)+'\n')
 print('B_INGAME162_DONE',candidate_sha,'bboxes',source_bboxes,'mask_discovery',mask_discovery)
