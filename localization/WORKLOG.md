@@ -2047,3 +2047,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - GitHub-hosted Localization CPU Worker run 37374877813 SUCCESS; output commit 98e4bd833660fe8e28275c72df1781e59d9a60c1.
 - IGR-019 remains B169_STATIC_PASS_PENDING_C_AND_INGAME_RETEST; NEW actual game retest required before closure. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_IGR019_REPORT.json, localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_CONTROLLER_SELF_QA.json.
+
+## 2026-10-06T07:05:07+09:00 - B170 IGR-006 COMPACT RUNTIME HUD READABILITY
+
+- Selected oldest remaining B-owned active P1 row IGR-006 screenshot(148) (INGAME_HUD_CITY_START); completed B163-B169 assets were not repeated.
+- Exact defect domain remains RUNTIME_TEXT: KoreanTextOverlayTest=true resolves text at EXE+0x65EB0, intercepts sprPrintf/Sumo_Printf at EXE+0x2CCE0/0x2CDD0, then redraws Korean via KoreanRuntime::Draw/ImGui. No DDS correction was used.
+- Material runtime fix in validation-bearing commit dced451f375ae98e3cc0273caead947f634bff6f: compact translated cells (stock logical font height <=24) receive an 8-direction dark keyline derived from the stock ARGB colour, 1-2 screen px, clipped to the already-calculated Korean text footprint. Larger menu/body runtime text is unchanged; runtime_ko.tsv remains 1,355 unique rows.
+- Win32 Release workflow 37379204456 PASS, artifact 11373576031 digest sha256:0afdf711d2aa3b8fb717586c00b0ce3cc3bfe8e5d694a90e9047ff70a2ee6f01. Korean test build 37379204466 also PASS including package verification, artifact 11373183170 digest sha256:76bb44f7439f92a8ca2be64e7e1d8cc486dec217aaf4afb43134cd7983e11706.
+- Domain isolation PASS. verify_state.py still reports only the pre-existing artwork-plan index/count/action-count baseline drift.
+- IGR-006 -> B170_BUILD_PASS_PENDING_C_AND_INGAME_RETEST. No in-game closure claimed; independent C review and NEW actual in-game retest remain mandatory. IGR-007/010 remain OPEN. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/runtime/B170_IGR006_RUNTIME_HUD_READABILITY.json.

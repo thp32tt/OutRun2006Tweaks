@@ -1691,3 +1691,9 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - 97E MULTIPLAYER -> native candidate f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69; 8C Online/LAN help -> native candidate 9fe3804a70d93277ede4e16ac8073057c6a9d969a893d05cde522d14a1f91b4d.
 - 2/2 exact bbox/size/positive-margin and all zero-pixel gates PASS; readable/full/raw controller visual PASS.
 - State: B169_STATIC_PASS_PENDING_C_AND_INGAME_RETEST. No in-game closure claimed; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-06T07:05:07+09:00 — B170 IGR-006 runtime HUD readability
+- Exact runtime path: text resolver -> sprPrintf/Sumo_Printf interception -> Korean ImGui redraw. No DDS bytes changed.
+- Compact translated cells <=24 logical px now use a clipped, stock-colour-derived 1-2px dark keyline; larger text unchanged.
+- Win32 Release 37379204456 PASS; Korean test-build 37379204466 package verification PASS.
+- State: B170_BUILD_PASS_PENDING_C_AND_INGAME_RETEST; NEW actual screenshot required before closure. IGR-007/010 remain OPEN. VR/FFB/DX11/DXVK untouched.

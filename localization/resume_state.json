@@ -1,5 +1,5 @@
 {
-  "schema_version": 96,
+  "schema_version": 97,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B170 IGR-006 runtime HUD compact-text repair is Win32 Release + Korean test-package PASS. Await independent C review and NEW actual in-game screenshot before closure; do not repeat B170. Next B active P1 rows: IGR-007, then IGR-010 exact mapping/material repair.",
     "B169 IGR-019 producer static/controller PASS: 97E MULTIPLAYER + 8C Online/LAN help are native-HD; independent C and NEW actual in-game retest required. Do not repeat B169 bytes unless returned REWORK.",
     "A90 P1 IGR-013 screenshot(158): exact MIXED split. 6DC89C6E 8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830 natively rerenders all 21 stage-location rows and supersedes A62 lowres18x4; E7F6E9B7 C144 top C2C title preserved; runtime ID1123 스테이지 주행 mapped/reviewed without source change. 21/21 bbox/size/margins and zero scope/protected/residue/overlap/touch; controller visual/raw PASS. Pending C + NEW game retest; not closed.",
     "A89R P1 IGR-003 screenshot(145): exact GRAPHICS multi-asset mapping. 97E863AD cb9cfaab87891c9c7edc047d43fc2e55c512e1bc5c9ccb8fbb5ba9bbb0215418 natively rerenders WELCOME/SHOWROOM visible rows; B168 A9 + C171 754F + C149 E95 preserved. 2/2 bbox/size/margins and zero scope/protected gates; controller visual PASS. Pending C + NEW game retest; not closed.",
@@ -5379,6 +5380,74 @@
     "pending_new_ingame_retest": true,
     "report": "localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_IGR019_REPORT.json",
     "controller_report": "localization/graphics/role_B/20261006-B-INGAME169-IGR019-MULTIPLAYER-INTRO/B169_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+  },
+  "b170_igr006_runtime": {
+    "timestamp_kst": "2026-10-06T07:05:07+09:00",
+    "run": "20261006-B-INGAME170-IGR006-RUNTIME-HUD",
+    "regression": "IGR-006",
+    "screen": "INGAME_HUD_CITY_START",
+    "decision": "EXACT_RUNTIME_RENDER_PATH_COMPACT_TEXT",
+    "source_commit": "dced451f375ae98e3cc0273caead947f634bff6f",
+    "source_file": "src/hooks_localization.cpp",
+    "source_sha256": "12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889",
+    "runtime_table_rows": 1355,
+    "material_fix": {
+      "compact_logical_height_max": 24.0,
+      "readability_stroke_screen_px": "1-2",
+      "stroke_directions": 8,
+      "stroke_clip": "existing calculated Korean text footprint",
+      "larger_runtime_text_unchanged": true,
+      "dds_changed": false
+    },
+    "build_validation": {
+      "win32_release_run": 37379204456,
+      "win32_release_artifact": 11373576031,
+      "win32_release_digest": "sha256:0afdf711d2aa3b8fb717586c00b0ce3cc3bfe8e5d694a90e9047ff70a2ee6f01",
+      "korean_test_build_run": 37379204466,
+      "korean_test_artifact": 11373183170,
+      "korean_test_digest": "sha256:76bb44f7439f92a8ca2be64e7e1d8cc486dec217aaf4afb43134cd7983e11706",
+      "result": "PASS"
+    },
+    "domain_isolation": "PASS",
+    "status": "B170_BUILD_PASS_PENDING_C_AND_INGAME_RETEST",
+    "pending_independent_c_review": true,
+    "pending_new_ingame_retest": true,
+    "report": "localization/runtime/B170_IGR006_RUNTIME_HUD_READABILITY.json",
+    "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+  },
+  "latest_b_runtime_rework": {
+    "timestamp_kst": "2026-10-06T07:05:07+09:00",
+    "run": "20261006-B-INGAME170-IGR006-RUNTIME-HUD",
+    "regression": "IGR-006",
+    "screen": "INGAME_HUD_CITY_START",
+    "decision": "EXACT_RUNTIME_RENDER_PATH_COMPACT_TEXT",
+    "source_commit": "dced451f375ae98e3cc0273caead947f634bff6f",
+    "source_file": "src/hooks_localization.cpp",
+    "source_sha256": "12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889",
+    "runtime_table_rows": 1355,
+    "material_fix": {
+      "compact_logical_height_max": 24.0,
+      "readability_stroke_screen_px": "1-2",
+      "stroke_directions": 8,
+      "stroke_clip": "existing calculated Korean text footprint",
+      "larger_runtime_text_unchanged": true,
+      "dds_changed": false
+    },
+    "build_validation": {
+      "win32_release_run": 37379204456,
+      "win32_release_artifact": 11373576031,
+      "win32_release_digest": "sha256:0afdf711d2aa3b8fb717586c00b0ce3cc3bfe8e5d694a90e9047ff70a2ee6f01",
+      "korean_test_build_run": 37379204466,
+      "korean_test_artifact": 11373183170,
+      "korean_test_digest": "sha256:76bb44f7439f92a8ca2be64e7e1d8cc486dec217aaf4afb43134cd7983e11706",
+      "result": "PASS"
+    },
+    "domain_isolation": "PASS",
+    "status": "B170_BUILD_PASS_PENDING_C_AND_INGAME_RETEST",
+    "pending_independent_c_review": true,
+    "pending_new_ingame_retest": true,
+    "report": "localization/runtime/B170_IGR006_RUNTIME_HUD_READABILITY.json",
     "runtime_validation": "PENDING_NEW_INGAME_RETEST"
   }
 }

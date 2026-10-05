@@ -49,7 +49,8 @@
       "leave larger menu/body runtime text unchanged"
     ],
     "runtime_table_changed": false,
-    "graphics_dds_changed": false
+    "graphics_dds_changed": false,
+    "source_commit": "dced451f375ae98e3cc0273caead947f634bff6f"
   },
   "static_qa": {
     "runtime_rows": "1355 unique IDs",
@@ -61,12 +62,32 @@
     "stroke_clip": "exact calculated Korean text rectangle",
     "larger_text_unchanged": true,
     "translation_table_unchanged": true,
-    "status": "PASS"
+    "status": "PASS",
+    "imgui_version": "1.92.9b / 19291",
+    "fine_clip_addtext_api_verified": true,
+    "domain_isolation": "PASS",
+    "verify_state": "BASELINE_FAIL_ONLY_ARTWORK_PLAN_AND_ACTION_COUNT_DRIFT"
   },
   "build_validation": {
-    "status": "PENDING_WIN32_RELEASE_GITHUB_ACTIONS"
+    "status": "PASS",
+    "platform": "windows-2022",
+    "arch": "Win32",
+    "configuration": "Release",
+    "workflow_run_id": 37379204456,
+    "artifact_id": 11373576031,
+    "artifact_name": "outrun2006tweaks-dced451f375ae98e3cc0273caead947f634bff6f",
+    "artifact_digest": "sha256:0afdf711d2aa3b8fb717586c00b0ce3cc3bfe8e5d694a90e9047ff70a2ee6f01"
   },
   "runtime_validation": "PENDING_NEW_INGAME_RETEST",
-  "status": "B170_RUNTIME_REWORK_BUILD_PENDING",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "status": "B170_BUILD_PASS_PENDING_C_AND_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "timestamp_finalized_kst": "2026-10-06T07:05:07+09:00",
+  "korean_test_build": {
+    "status": "PASS",
+    "workflow_run_id": 37379204466,
+    "artifact_id": 11373183170,
+    "artifact_name": "OutRun2-Korean-Test-dced451f375ae98e3cc0273caead947f634bff6f",
+    "artifact_digest": "sha256:76bb44f7439f92a8ca2be64e7e1d8cc486dec217aaf4afb43134cd7983e11706",
+    "package_verify_step": "PASS"
+  }
 }
