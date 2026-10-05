@@ -43,6 +43,7 @@ on:
       - 'tools/verify_vr_refactor_contract.py'
       - 'tools/verify_vr_sumo_replay_semantics.py'
       - 'tools/verify_vr_hud_cadence_restore.py'
+      - 'tools/verify_vr_producer_provenance.py'
       - 'tools/verify_vr_r31_r32_retirement_guard.py'
       - 'docs/VR_REFACTOR_STATE.json'
       - 'tools/Test-VRRegressionKnowledge.ps1'
@@ -88,6 +89,7 @@ jobs:
           python tools/verify_vr_refactor_contract.py
           python tools/verify_vr_sumo_replay_semantics.py
           python tools/verify_vr_hud_cadence_restore.py
+          python tools/verify_vr_producer_provenance.py
           python tools/verify_vr_r31_r32_retirement_guard.py
       - name: Verify near-plane active stereo eligibility
         shell: pwsh
