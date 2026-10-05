@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T15:22:00+09:00",
+  "updated_at_kst": "2026-10-05T15:56:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -557,8 +557,8 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 19,
-    "current_producer_rework_remaining": 2,
+    "current_pending_artwork_localize_text": 18,
+    "current_producer_rework_remaining": 3,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T14:52:10+09:00",
       "assets": [
@@ -1129,7 +1129,8 @@
     },
     "current_producer_rework_assets": [
       "63C91067",
-      "C598919A"
+      "C598919A",
+      "754F0599"
     ],
     "a_production26_2ea557b4": {
       "index": 55,
@@ -1219,7 +1220,31 @@
       "supersedes": "C167_REWORK_REQUIRED_CLEAN_PLATE_VISIBLE_RECONSTRUCTION_ARTIFACTS",
       "report": "localization/graphics/role_C/20261005-C168-63C91067/C168_63C_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
-    }
+    },
+    "c169_controller_final_qa": {
+      "timestamp_kst": "2026-10-05T15:56:00+09:00",
+      "run": "20261005-C169-63C91067",
+      "queue_index": 26,
+      "candidate_sha256": "6e08528dc031e0032fc2f2545a3aca280596986b7c62290c2ecded80484cf7ff",
+      "producer_machine_status": "PASS_REPORTED",
+      "controller_visual_qa": "FAIL_CLEAN_PLATE_ARTWORK_DAMAGE",
+      "decision": "C169_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE",
+      "supersedes": "C168_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE",
+      "report": "localization/graphics/role_C/20261005-C169-63C91067/C169_63C_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c170_controller_final_qa": {
+      "timestamp_kst": "2026-10-05T15:56:00+09:00",
+      "run": "20261005-C170-754F0599",
+      "queue_index": 175,
+      "candidate_sha256": "3d166cf12042471246ce05e89de5122f4ed77cfdbc0f175ed31d351da8ffb20d",
+      "producer_machine_status": "PASS_REPORTED",
+      "controller_visual_qa": "FAIL_SOURCE_STYLE_PROPORTION_WEIGHT",
+      "decision": "C170_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
+      "report": "localization/graphics/role_C/20261005-C170-754F0599/C170_754F_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C169-C170-BATCH/C169_C170_BATCH_FINAL_QA.json"
   },
   "data_build": {
     "draft_bin_entries": 1356,
