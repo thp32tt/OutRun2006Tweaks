@@ -200,6 +200,7 @@ namespace outrun::vr::dx11
             bool observed{};
             bool sourceEvidenceExact{};
             bool instructionDecodeExact{};
+            bool registerSemanticsExact{};
             UINT byteSize{};
             DWORD versionToken{};
             std::uint64_t hash{};
@@ -208,6 +209,18 @@ namespace outrun::vr::dx11
             std::uint64_t decodedStreamHash{};
             std::uint64_t decoderRevisionHash{};
             std::uint64_t semanticContractHash{};
+            UINT registerSemanticInstructionCount{};
+            UINT destinationOperandCount{};
+            UINT sourceOperandCount{};
+            UINT relativeAddressOperandCount{};
+            UINT floatConstantReferenceCount{};
+            UINT intConstantReferenceCount{};
+            UINT boolConstantReferenceCount{};
+            UINT samplerReferenceCount{};
+            UINT constantDefinitionCount{};
+            std::uint64_t registerSemanticsHash{};
+            std::uint64_t registerDecoderRevisionHash{};
+            std::uint64_t registerSemanticContractHash{};
         };
 
         struct SourceSignature
@@ -576,6 +589,28 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.vertexShader.decodedStreamHash);
             hash = hash_mix(hash, sig.vertexShader.decoderRevisionHash);
             hash = hash_mix(hash, sig.vertexShader.semanticContractHash);
+            hash = hash_mix(
+                hash, sig.vertexShader.registerSemanticsExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.vertexShader.registerSemanticInstructionCount);
+            hash = hash_mix(
+                hash, sig.vertexShader.destinationOperandCount);
+            hash = hash_mix(hash, sig.vertexShader.sourceOperandCount);
+            hash = hash_mix(
+                hash, sig.vertexShader.relativeAddressOperandCount);
+            hash = hash_mix(
+                hash, sig.vertexShader.floatConstantReferenceCount);
+            hash = hash_mix(
+                hash, sig.vertexShader.intConstantReferenceCount);
+            hash = hash_mix(
+                hash, sig.vertexShader.boolConstantReferenceCount);
+            hash = hash_mix(hash, sig.vertexShader.samplerReferenceCount);
+            hash = hash_mix(hash, sig.vertexShader.constantDefinitionCount);
+            hash = hash_mix(hash, sig.vertexShader.registerSemanticsHash);
+            hash = hash_mix(
+                hash, sig.vertexShader.registerDecoderRevisionHash);
+            hash = hash_mix(
+                hash, sig.vertexShader.registerSemanticContractHash);
             hash = hash_mix(hash, sig.pixelShader.present ? 1u : 0u);
             hash = hash_mix(hash, sig.pixelShader.observed ? 1u : 0u);
             hash = hash_mix(hash, sig.pixelShader.byteSize);
@@ -592,6 +627,28 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.pixelShader.decodedStreamHash);
             hash = hash_mix(hash, sig.pixelShader.decoderRevisionHash);
             hash = hash_mix(hash, sig.pixelShader.semanticContractHash);
+            hash = hash_mix(
+                hash, sig.pixelShader.registerSemanticsExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.pixelShader.registerSemanticInstructionCount);
+            hash = hash_mix(
+                hash, sig.pixelShader.destinationOperandCount);
+            hash = hash_mix(hash, sig.pixelShader.sourceOperandCount);
+            hash = hash_mix(
+                hash, sig.pixelShader.relativeAddressOperandCount);
+            hash = hash_mix(
+                hash, sig.pixelShader.floatConstantReferenceCount);
+            hash = hash_mix(
+                hash, sig.pixelShader.intConstantReferenceCount);
+            hash = hash_mix(
+                hash, sig.pixelShader.boolConstantReferenceCount);
+            hash = hash_mix(hash, sig.pixelShader.samplerReferenceCount);
+            hash = hash_mix(hash, sig.pixelShader.constantDefinitionCount);
+            hash = hash_mix(hash, sig.pixelShader.registerSemanticsHash);
+            hash = hash_mix(
+                hash, sig.pixelShader.registerDecoderRevisionHash);
+            hash = hash_mix(
+                hash, sig.pixelShader.registerSemanticContractHash);
             hash = hash_mix(hash, sig.shaderIntrospectionComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderMixedPair ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderTranslationExact ? 1u : 0u);
@@ -1098,6 +1155,34 @@ namespace outrun::vr::dx11
             out.decodedStreamHash = decode.instructionStreamHash;
             out.decoderRevisionHash = decode.decoderRevisionHash;
             out.semanticContractHash = decode.semanticContractHash;
+
+            const auto registerSemantics =
+                decode_programmable_shader_register_semantics(decode);
+            out.registerSemanticsExact = registerSemantics.exact();
+            out.registerSemanticInstructionCount =
+                registerSemantics.semanticInstructionCount;
+            out.destinationOperandCount =
+                registerSemantics.destinationOperandCount;
+            out.sourceOperandCount =
+                registerSemantics.sourceOperandCount;
+            out.relativeAddressOperandCount =
+                registerSemantics.relativeAddressOperandCount;
+            out.floatConstantReferenceCount =
+                registerSemantics.floatConstantReferenceCount;
+            out.intConstantReferenceCount =
+                registerSemantics.intConstantReferenceCount;
+            out.boolConstantReferenceCount =
+                registerSemantics.boolConstantReferenceCount;
+            out.samplerReferenceCount =
+                registerSemantics.samplerReferenceCount;
+            out.constantDefinitionCount =
+                registerSemantics.constantDefinitionCount;
+            out.registerSemanticsHash =
+                registerSemantics.registerSemanticsHash;
+            out.registerDecoderRevisionHash =
+                registerSemantics.decoderRevisionHash;
+            out.registerSemanticContractHash =
+                registerSemantics.semanticContractHash;
             return out;
         }
 
