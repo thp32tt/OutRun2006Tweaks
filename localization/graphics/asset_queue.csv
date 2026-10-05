@@ -77,7 +77,7 @@ index,path,action,artwork_status,transcription_status,notes
 143,textures/load/spr_sprani_sumo_fe_cvt_Exst/34923C8A_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass8 transcription saved
 144,textures/load/spr_sprani_sumo_fe_cvt_Exst/35361191_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
 146,textures/load/spr_sprani_sumo_fe_cvt_Exst/39018963_512x256.dds,zoom_review,blocked_review,needs_zoom_review,
-147,textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass8 transcription saved
+147,textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds,localize_text,a49_self_qa_pass_pending_c,transcribed_reviewed,"A49 corrected A48 semantic binding after controller SOURCE/CLEAN/FINAL review. Candidate 6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b: canonical idx1-15 stage-name mapping confirmed; 15/15 exact bbox+size+positive-margin PASS; changed/alpha outside=0, protected=0, clean source unchanged=0, final source residue=0, overlap/touch=0. Controller readable and raw mirror_y visual PASS; idx0 decorative/header and idx16 separator preserved. Pending independent C and isolated in-game validation. RUNTIME_VALIDATION=UNTESTED."
 148,textures/load/spr_sprani_sumo_fe_cvt_Exst/3AE1BB60_256x256.dds,zoom_review,blocked_review,needs_zoom_review,
 150,textures/load/spr_sprani_sumo_fe_cvt_Exst/40A4D914_256x128.dds,zoom_review,blocked_review,needs_zoom_review,
 151,textures/load/spr_sprani_sumo_fe_cvt_Exst/4668C688_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
