@@ -7,11 +7,11 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
-repo=Path.cwd(); run="20261005-C185-37759842"
+repo=Path.cwd(); run="20261005-C186-37759842"
 out=repo/"localization/graphics/role_C"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
-pd=repo/"localization/graphics/role_A/20261005-A-PRODUCTION42"
-pr=json.loads((pd/"A42_37759842_REPORT.json").read_text())
+pd=repo/"localization/graphics/role_A/20261005-A-PRODUCTION45"
+pr=json.loads((pd/"A45_37759842_REPORT.json").read_text())
 asset=pr["asset"]; candidate=repo/pr["candidate_path"]
 sp=pr["source_provenance"]; expected_source_sha=sp["sha256"]; expected_candidate_sha=pr["candidate_sha256"]
 tmp=Path("/tmp/c185"); tmp.mkdir(exist_ok=True); srcdds=tmp/"source.dds"
@@ -102,7 +102,7 @@ for gi,grp in enumerate((rowchecks[:11],rowchecks[11:22],rowchecks[22:]),1):
     sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+8*(len(cards)-1)),"white"); yy=0
     for card in cards: sheet.paste(card,(0,yy)); yy+=card.height+8
     if sheet.width>2000: sheet=sheet.resize((2000,round(sheet.height*2000/sheet.width)),Image.Resampling.LANCZOS)
-    fn=out/f"C185_CONTACTS_{gi}_B64.txt"; saveb64(sheet,fn,94); evidence.append(str(fn.relative_to(repo)))
+    fn=out/f"C186_CONTACTS_{gi}_B64.txt"; saveb64(sheet,fn,94); evidence.append(str(fn.relative_to(repo)))
 
 # Focus specifically on plate-mode targets implicated by C177/A40.
 focus=[x for x in rowchecks if x["mode"]=="plate"]
@@ -121,21 +121,21 @@ if cards:
     sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+5*(len(cards)-1)),"white"); yy=0
     for card in cards: sheet.paste(card,(0,yy)); yy+=card.height+5
     if sheet.width>1800: sheet=sheet.resize((1800,round(sheet.height*1800/sheet.width)),Image.Resampling.LANCZOS)
-    fn=out/"C185_PLATE_FOCUS_B64.txt"; saveb64(sheet,fn,95); evidence.append(str(fn.relative_to(repo)))
+    fn=out/"C186_PLATE_FOCUS_B64.txt"; saveb64(sheet,fn,95); evidence.append(str(fn.relative_to(repo)))
 
 rawcard=Image.new("RGB",(1024,2070),"white")
 for i,(lab,z) in enumerate((("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_final))):
     zz=comp(z).resize((1024,1024),Image.Resampling.LANCZOS); rawcard.paste(zz,(0,i*1035+22)); ImageDraw.Draw(rawcard).text((5,i*1035+4),lab,fill="black")
-fn=out/"C185_RAW_B64.txt"; saveb64(rawcard,fn,91); evidence.append(str(fn.relative_to(repo)))
+fn=out/"C186_RAW_B64.txt"; saveb64(rawcard,fn,91); evidence.append(str(fn.relative_to(repo)))
 
-report={"schema_version":1,"role":"C","run":run,"qa_id":"C185","queue_index":pr["index"],"asset":asset,
+report={"schema_version":1,"role":"C","run":run,"qa_id":"C186","queue_index":pr["index"],"asset":asset,
  "producer_run":pr["run"],"source_sha256":expected_source_sha,"candidate_sha256":expected_candidate_sha,
  "independent_source_decode_matches_producer_png":True,
  "structure":{"dimensions":dims,"format":"RGBA32","mipmaps":mips,"raw_orientation":"mirror_y","header_exact":cb[:128]==sb[:128]},
  "row_checks":rowchecks,"all_33_bbox_size_positive_margin_pass":rowpass,
  "machine_checks":machine,"machine_status":status,
- "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","decision":"PENDING_CONTROLLER_VISUAL_QA" if status=="PASS" else "C185_REWORK_REQUIRED_MACHINE_GATE",
+ "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","decision":"PENDING_CONTROLLER_VISUAL_QA" if status=="PASS" else "C186_REWORK_REQUIRED_MACHINE_GATE",
  "runtime_validation":"UNTESTED","preview_b64_files":evidence}
-(out/"C185_37759842_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-(wr/"C185_37759842.json").write_text(json.dumps({"run":run,"qa_id":"C185","index":pr["index"],"asset":"37759842","candidate_sha256":expected_candidate_sha,"machine_status":status,"all_33_bbox_size_positive_margin_pass":rowpass,"machine_checks":machine,"report":f"localization/graphics/role_C/{run}/C185_37759842_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"qa_id":"C185","machine_status":status,"machine_checks":machine,"evidence":evidence},ensure_ascii=False))
+(out/"C186_37759842_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(wr/"C186_37759842.json").write_text(json.dumps({"run":run,"qa_id":"C186","index":pr["index"],"asset":"37759842","candidate_sha256":expected_candidate_sha,"machine_status":status,"all_33_bbox_size_positive_margin_pass":rowpass,"machine_checks":machine,"report":f"localization/graphics/role_C/{run}/C186_37759842_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"qa_id":"C186","machine_status":status,"machine_checks":machine,"evidence":evidence},ensure_ascii=False))
