@@ -74,7 +74,11 @@ namespace OutRunVrR32DirectSubmit
     inline std::array<std::uint64_t,
         static_cast<std::size_t>(FastRejectReason::Count)> RejectReasons{};
     inline std::uint32_t AckFaultGeneration = 0;
+    inline std::uint32_t AckFaultRunGeneration = 0;
+    inline std::uint32_t AckFaultGamePid = 0;
     inline std::uint32_t ActiveAckGeneration = 0;
+    inline std::uint32_t ActiveAckRunGeneration = 0;
+    inline std::uint32_t ActiveAckGamePid = 0;
     inline ULONGLONG LastPerfLogMs = 0;
     inline bool FirstFastSubmitLogged = false;
     inline bool FirstAsyncAckLogged = false;
@@ -116,16 +120,33 @@ namespace OutRunVrR32DirectSubmit
         AckedFrame.fill(0);
         AckedGeneration.fill(0);
         AckFaultGeneration = 0;
+        AckFaultRunGeneration = 0;
+        AckFaultGamePid = 0;
         ActiveAckGeneration = 0;
+        ActiveAckRunGeneration = 0;
+        ActiveAckGamePid = 0;
         AckSameFramePendingReuse = 0;
         RejectReasons.fill(0);
     }
 
-    inline void ObserveGeneration(std::uint32_t generation) noexcept
+    inline void ObserveAckIdentity(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
-        if (!generation || ActiveAckGeneration == generation)
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        const std::uint32_t gamePid = frame.clientPid;
+        if (!generation || !runGeneration || !gamePid)
             return;
+        if (ActiveAckGeneration == generation &&
+            ActiveAckRunGeneration == runGeneration &&
+            ActiveAckGamePid == gamePid)
+            return;
+
         ActiveAckGeneration = generation;
+        ActiveAckRunGeneration = runGeneration;
+        ActiveAckGamePid = gamePid;
         AckedFrame.fill(0);
         AckedGeneration.fill(0);
     }
@@ -163,8 +184,16 @@ namespace OutRunVrR32DirectSubmit
                 const std::uint32_t generation =
                     pending.frame.reserved[
                         OutRunVR::RenderFrameDirectGenerationIndex];
-                if (generation)
+                const std::uint32_t runGeneration =
+                    pending.frame.reserved[
+                        OutRunVR::RenderFrameRunGenerationIndex];
+                const std::uint32_t gamePid = pending.frame.clientPid;
+                if (generation && runGeneration && gamePid)
+                {
                     AckFaultGeneration = generation;
+                    AckFaultRunGeneration = runGeneration;
+                    AckFaultGamePid = gamePid;
+                }
                 ++AckQueryErrors;
                 pending.armed = false;
                 pending.flushIssued = false;
@@ -176,12 +205,18 @@ namespace OutRunVrR32DirectSubmit
             const std::uint32_t completedGeneration =
                 pending.frame.reserved[
                     OutRunVR::RenderFrameDirectGenerationIndex];
+            const std::uint32_t completedRunGeneration =
+                pending.frame.reserved[
+                    OutRunVR::RenderFrameRunGenerationIndex];
+            const std::uint32_t completedGamePid = pending.frame.clientPid;
             if (ActiveAckGeneration != 0 &&
-                completedGeneration != ActiveAckGeneration)
+                (completedGeneration != ActiveAckGeneration ||
+                 completedRunGeneration != ActiveAckRunGeneration ||
+                 completedGamePid != ActiveAckGamePid))
             {
-                // Late completion from a superseded shared-eye generation is
-                // safe to forget, but must never roll the global ACK generation
-                // backwards and stall the producer's new ring.
+                // Late completion from a superseded shared-eye generation or
+                // game run is safe to forget, but must never publish into the
+                // active run's ACK state or stall its producer ring.
                 pending.armed = false;
                 pending.flushIssued = false;
                 pending.frame = {};
@@ -241,7 +276,11 @@ namespace OutRunVrR32DirectSubmit
         if (pending.armed &&
             pending.frame.frameId == frame.frameId &&
             pending.frame.reserved[
-                OutRunVR::RenderFrameDirectGenerationIndex] == generation)
+                OutRunVR::RenderFrameDirectGenerationIndex] == generation &&
+            pending.frame.reserved[
+                OutRunVR::RenderFrameRunGenerationIndex] ==
+                frame.reserved[OutRunVR::RenderFrameRunGenerationIndex] &&
+            pending.frame.clientPid == frame.clientPid)
         {
             // R42: xrWaitFrame can submit the same already-rendered projection
             // more than once before the first EVENT is observed complete. The
@@ -340,7 +379,13 @@ namespace OutRunVrR32DirectSubmit
 
         const std::uint32_t generation =
             verified.frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        if (generation != 0 && AckFaultGeneration == generation)
+        const std::uint32_t runGeneration =
+            verified.frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        const std::uint32_t gamePid = verified.frame.clientPid;
+        if (generation != 0 && runGeneration != 0 && gamePid != 0 &&
+            AckFaultGeneration == generation &&
+            AckFaultRunGeneration == runGeneration &&
+            AckFaultGamePid == gamePid)
         { reject = FastRejectReason::GenerationFault; return false; }
 
         // main_r23 has already staged this exact immutable slot and rendered the
@@ -434,8 +479,7 @@ namespace OutRunVrR32DirectSubmit
                 OutRunVrR23VerifiedBundle::SourceKind::DirectGpu &&
             MetadataValid(observed.frame))
         {
-            ObserveGeneration(observed.frame.reserved[
-                OutRunVR::RenderFrameDirectGenerationIndex]);
+            ObserveAckIdentity(observed.frame);
         }
         PollCompletedAcks();
 
