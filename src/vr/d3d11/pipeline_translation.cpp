@@ -1473,6 +1473,118 @@ namespace outrun::vr::dx11
                identity.bytecodeHash == evidence.bytecodeHash;
     }
 
+    ProgrammableShaderInstructionDecode
+    decode_programmable_shader_instruction_stream(
+        const ProgrammableShaderFunctionSourceEvidence& evidence) noexcept
+    {
+        ProgrammableShaderInstructionDecode out{};
+        out.vertexStage = evidence.vertexStage;
+        out.sourceExact = evidence.exact();
+        out.sourceBytecodeHash = evidence.bytecodeHash;
+        if (!out.sourceExact)
+            return out;
+
+        const auto shaderMajor =
+            static_cast<UINT>((evidence.versionToken >> 8u) & 0xFFu);
+        out.versionSupported = shaderMajor == 2u || shaderMajor == 3u;
+        if (!out.versionSupported)
+            return out;
+
+        static constexpr char kDecoderRevision[] =
+            "R265_D3D9_SM2_SM3_INSTRUCTION_OPERAND_DECODER_V1";
+        static constexpr char kSemanticContract[] =
+            "R265_RAW_OPCODE_OPERANDS_NO_REGISTER_SAMPLER_LINKAGE_SEMANTICS_V1";
+        out.decoderRevisionHash =
+            hash_bytes(kDecoderRevision, sizeof(kDecoderRevision) - 1u);
+        out.semanticContractHash =
+            hash_bytes(kSemanticContract, sizeof(kSemanticContract) - 1u);
+
+        std::uint64_t streamHash = 1469598103934665603ull;
+        const auto mixToken = [&streamHash](DWORD token) noexcept
+        {
+            for (unsigned shift = 0; shift < 32u; shift += 8u)
+            {
+                streamHash ^=
+                    static_cast<std::uint64_t>((token >> shift) & 0xFFu);
+                streamHash *= 1099511628211ull;
+            }
+        };
+
+        try
+        {
+            std::size_t index = 1u;
+            while (index < evidence.tokens.size())
+            {
+                const DWORD instructionToken = evidence.tokens[index];
+                const DWORD opcode = instructionToken & 0xFFFFu;
+
+                if (opcode == static_cast<DWORD>(D3DSIO_END))
+                {
+                    if (instructionToken != static_cast<DWORD>(D3DSIO_END))
+                        return out;
+                    out.endSeen = true;
+                    ++index;
+                    out.complete = index == evidence.tokens.size();
+                    out.instructionStreamHash = streamHash;
+                    return out;
+                }
+
+                if (opcode == static_cast<DWORD>(D3DSIO_COMMENT))
+                {
+                    const auto commentDwords = static_cast<std::size_t>(
+                        (instructionToken >> 16u) & 0x7FFFu);
+                    if (commentDwords >
+                        evidence.tokens.size() - index - 1u)
+                        return out;
+                    out.commentDwordCount +=
+                        static_cast<UINT>(commentDwords);
+                    index += 1u + commentDwords;
+                    continue;
+                }
+
+                // D3DSIO_NOP..D3DSIO_BREAKP is the bounded SM2/SM3 opcode
+                // domain. RESERVED0 is intentionally rejected; PHASE is a
+                // shader-model-1.x special opcode and is outside this range.
+                if (opcode > static_cast<DWORD>(D3DSIO_BREAKP) ||
+                    opcode == static_cast<DWORD>(D3DSIO_RESERVED0))
+                    return out;
+
+                const auto operandCount = static_cast<std::size_t>(
+                    (instructionToken >> 24u) & 0x0Fu);
+                if (operandCount >
+                    evidence.tokens.size() - index - 1u)
+                    return out;
+
+                ProgrammableShaderDecodedInstruction decoded{};
+                decoded.instructionToken = instructionToken;
+                decoded.opcode = opcode;
+                decoded.tokenOffset = static_cast<UINT>(index);
+                decoded.operandCount = static_cast<UINT>(operandCount);
+                decoded.operandTokens.assign(
+                    evidence.tokens.begin() +
+                        static_cast<std::ptrdiff_t>(index + 1u),
+                    evidence.tokens.begin() +
+                        static_cast<std::ptrdiff_t>(
+                            index + 1u + operandCount));
+
+                mixToken(instructionToken);
+                for (const auto token : decoded.operandTokens)
+                    mixToken(token);
+
+                out.operandTokenCount += decoded.operandCount;
+                out.instructions.push_back(std::move(decoded));
+                ++out.instructionCount;
+                index += 1u + operandCount;
+            }
+        }
+        catch (...)
+        {
+            return {};
+        }
+
+        return out;
+    }
+
     ProgrammableShaderPairCacheIdentity
     seal_programmable_shader_pair_cache_identity(
         bool observationComplete,
