@@ -13,10 +13,11 @@ services:
     environment:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "conversion"
-      AUTO_SEND: "${AUTO_SEND:-false}"
+      AUTO_SEND: "true"
       QUEUE_MODE: "true"
       CONVERSION_PARALLEL: "true"
-      CONVERSION_ACTIVE_LIMIT: "2"
+      CONVERSION_ACTIVE_LIMIT: "1"
+      CONVERSION_ONLY_SLOT: "C"
       CONVERSION_DXVK_DEFERRED: "true"
       QUEUE_CHECK_SECONDS: "15"
       QUEUE_STABLE_SECONDS: "30"
