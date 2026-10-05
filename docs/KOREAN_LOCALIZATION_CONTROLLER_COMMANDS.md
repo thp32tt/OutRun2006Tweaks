@@ -22,12 +22,13 @@ Each command means:
 
 ## Role summary
 
-- A: odd-index production lane + self-QA.
-- B: even-index production lane + self-QA. B is production, not review-only.
+- A: odd-index production lane + self-QA, except active user in-game regression rows assigned to A override parity.
+- B: even-index production lane + self-QA. B is production, not review-only; active user in-game regression rows assigned to B override parity.
 - C: both-lane final QA/approval; may fix small failures immediately.
 - A/B may safely work-steal only under the anti-duplication rules in the contract.
 - Zero-pixel-overflow is mandatory. One pixel outside the original/HD permitted text region => `REWORK_REQUIRED`.
 - Work scope comes from `localization/graphics/asset_queue.csv`, never from the count of DDS binaries currently committed.
+- Before normal queue selection, read `localization/graphics/INGAME_REWORK_BACKLOG.csv`. Active P0/P1 user screenshot regressions override prior static PASS and normal producer order until reworked and held for in-game retest.
 - Rules must be changed in Git, not duplicated into Docker prompts.
 
 
