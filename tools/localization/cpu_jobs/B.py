@@ -99,24 +99,20 @@ white_rgb=tuple(int(round(float(np.median(pix[white_sel,k].astype(np.float32))))
 navy_rgb=tuple(int(round(float(np.median(pix[navy_sel,k].astype(np.float32))))) for k in range(3))
 white=white_rgb+(255,); navy=navy_rgb+(255,)
 
-# Exact source-text mask uses the strict white/navy glyph/effect core plus only a 3px antialias fringe; B104's wider dilation still reached plate border artwork.\n# Patterned/gradient plate reconstruction. B105 scanline interpolation produced
-# vertical banding because letter-shaped mask fragments used different anchors.
-# Use normalized Gaussian surface reconstruction: masked source-text/effect pixels
-# have zero sampling weight, surrounding protected plate pixels contribute smoothly.
-# This reconstructs one coherent low-frequency plate surface without source glyph
-# bleed-through and without letter-by-letter seams.
+# Exact source-text mask uses the strict white/navy glyph/effect core plus only a 3px antialias fringe; B104's wider dilation still reached plate border artwork.\n# Patterned/gradient plate reconstruction. The tight B106 mask is now safely
+# inside plate artwork, so use local Navier-Stokes inpainting on that exact mask.
+# This avoids B104's border pull and B106's low-frequency horizontal smearing.
 subprocess.run(["python3","-m","pip","install","--disable-pip-version-check","opencv-python-headless"],check=True,stdout=subprocess.DEVNULL)
 import cv2
 sm=np.asarray(source_mask)>0
-valid=(~sm).astype(np.float32)
-sigma=34.0
-den=cv2.GaussianBlur(valid,(0,0),sigmaX=sigma,sigmaY=sigma,borderType=cv2.BORDER_REFLECT)
-clean_f=sa.astype(np.float32).copy()
-for cc in range(4):
-    num=cv2.GaussianBlur(sa[:,:,cc].astype(np.float32)*valid,(0,0),sigmaX=sigma,sigmaY=sigma,borderType=cv2.BORDER_REFLECT)
-    fill=num/np.maximum(den,1e-6)
-    clean_f[:,:,cc][sm]=fill[sm]
-clean_arr=np.clip(np.rint(clean_f),0,255).astype(np.uint8)
+mask8=(sm.astype(np.uint8)*255)
+bgr=cv2.cvtColor(sa[:,:,:3],cv2.COLOR_RGB2BGR)
+inp_bgr=cv2.inpaint(bgr,mask8,12,cv2.INPAINT_NS)
+inp_rgb=cv2.cvtColor(inp_bgr,cv2.COLOR_BGR2RGB)
+inp_alpha=cv2.inpaint(sa[:,:,3],mask8,12,cv2.INPAINT_NS)
+clean_arr=sa.copy()
+clean_arr[sm,:3]=inp_rgb[sm]
+clean_arr[sm,3]=inp_alpha[sm]
 clean=Image.fromarray(clean_arr,"RGBA")
 source_png=out/"63C_SOURCE_READABLE.png"; clean_png=out/"63C_CLEAN_PLATE.png"; smp=out/"63C_SOURCE_TEXT_MASK.png"; allowedp=out/"63C_ALLOWED_BBOX_MASK.png"
 src.save(source_png); clean.save(clean_png); source_mask.save(smp); allowed.save(allowedp)
