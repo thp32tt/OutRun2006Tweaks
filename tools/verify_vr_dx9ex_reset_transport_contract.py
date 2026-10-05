@@ -473,6 +473,58 @@ require_order(
     "completedFrame = snapshot.completedFrameId[slotIndex];",
 )
 
+# Host-owned SafeEye fallback cache must also be scoped to the complete
+# Frame.v2 game-run identity. A fast game restart may reuse frameId and even a
+# transport-generation value; cached eyes from that prior run must never be
+# treated as the current frame.
+reset_safe_eyes = body(host_passthrough, "inline void ResetSafeEyes() noexcept")
+require(
+    reset_safe_eyes,
+    "SafeEye complete identity reset",
+    "SafeFrameId = 0;",
+    "SafeTransportGeneration = 0;",
+    "SafeRunGeneration = 0;",
+    "SafeGamePid = 0;",
+)
+
+copy_safe = body(host_passthrough, "inline bool CopySharedFrameToSafeEyes(")
+require_order(
+    copy_safe,
+    "SafeEye complete identity publication",
+    "PublishCompletedFrame(frame)",
+    "SafeFrameId = frame.frameId;",
+    "RenderFrameDirectGenerationIndex",
+    "SafeRunGeneration =",
+    "RenderFrameRunGenerationIndex",
+    "SafeGamePid = frame.clientPid;",
+)
+
+ensure_safe = body(host_passthrough, "inline bool EnsureSafeFrame(")
+require(
+    ensure_safe,
+    "SafeEye complete run cache key",
+    "RenderFrameDirectGenerationIndex",
+    "RenderFrameRunGenerationIndex",
+    "const std::uint32_t gamePid = frame.clientPid;",
+    "SafeFrameId == frameId",
+    "SafeTransportGeneration == generation",
+    "SafeRunGeneration == runGeneration",
+    "SafeGamePid == gamePid",
+)
+require_order(
+    ensure_safe,
+    "SafeEye cache identity before reuse",
+    "const std::uint32_t generation",
+    "const std::uint32_t runGeneration",
+    "const std::uint32_t gamePid",
+    "SafeFrameId == frameId",
+    "SafeTransportGeneration == generation",
+    "SafeRunGeneration == runGeneration",
+    "SafeGamePid == gamePid",
+    "return true;",
+    "CopySharedFrameToSafeEyes(frame)",
+)
+
 # Host shared-resource caches must key on the new producer generation and both
 # shared handles. A mismatch releases the old COM resources before reopening.
 open_slot = body(host_cache, "inline bool R32OpenSharedSlot(")
