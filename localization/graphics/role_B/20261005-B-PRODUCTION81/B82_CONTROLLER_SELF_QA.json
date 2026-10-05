@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION81",
+  "corrective_revision": "B82",
+  "timestamp_kst": "2026-10-05T12:25:00+09:00",
+  "index": 188,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+  "source_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+  "rejected_b81": {
+    "candidate_sha256": "08384ab50414d5e619db70680f40b2d7d48b74f0d281a6a22d3642553af24075",
+    "machine_qa": "PASS",
+    "controller_visual_qa": "FAIL",
+    "reasons": [
+      "mirror_y semantic binding reversed the six help rows",
+      "Regular 8px x4 Korean was visibly smaller/thinner than source"
+    ]
+  },
+  "candidate_sha256": "03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03",
+  "machine_qa": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y",
+    "localized_elements": 6,
+    "bbox_size_positive_margin": "6/6 PASS",
+    "clean_validator": "PASS",
+    "final_validator": "PASS",
+    "source_residue": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_outside_target": 0,
+    "overlap": 0,
+    "touch_pairs": 0
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "semantic_binding": "PASS",
+    "source_style": "PASS",
+    "observations": [
+      "All six source/help rows match the reviewed transcription after the B82 mirror_y correction.",
+      "Shared Noto Sans CJK KR Bold 12px x4 is closer to source height/weight than rejected B81 while remaining inside source bboxes.",
+      "No visible English residue, clipping, overlap, seam, halo, or orientation regression."
+    ]
+  },
+  "independent_c157_machine_qa": {
+    "status": "PASS",
+    "candidate_changed_by_c": false,
+    "report": "localization/graphics/role_C/20261005-C157-8C259C68/C157_8C_MACHINE_QA.json",
+    "fill_median_abs_delta": [
+      0,
+      0,
+      0
+    ]
+  },
+  "decision": "B82_CORRECTIVE_SELF_QA_PASS_PENDING_C_CONTROLLER_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
