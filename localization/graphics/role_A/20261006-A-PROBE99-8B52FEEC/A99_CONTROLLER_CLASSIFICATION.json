@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PROBE99-8B52FEEC",
+  "queue_index": 27,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/8B52FEEC_1024x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_sha256": "a11b32753655d25dbf95baf808af90a3cc3f65fb1083db0bb1db8fad80cdcf47",
+    "worker_probe": "localization/graphics/role_A/20261006-A-PROBE99-8B52FEEC/A99_8B52FEEC_PROBE.json"
+  },
+  "structure": {
+    "width": 1024,
+    "height": 512,
+    "format": "RGBA32/BGRA-mask order",
+    "mips": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+  "visual_findings": {
+    "readable_orientation": [
+      "three character portrait/pose sprites only",
+      "no word, menu label, rank title, stage name, sentence, song credit or other language-bearing text"
+    ],
+    "raw_orientation": "PASS_MIRROR_Y_SOURCE_ART_PRESERVED",
+    "source_components": 3,
+    "localizable_segments": 0
+  },
+  "decision": {
+    "korean_candidate_required": false,
+    "preserve_original_entire_dds": true,
+    "reason": "The DDS contains character artwork only; there is no language-bearing text to localize.",
+    "queue_disposition": "ZOOM_REVIEW_COMPLETE_NO_LOCALIZABLE_TEXT",
+    "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION"
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261006-A-PROBE99-8B52FEEC/A99_SOURCE_READABLE.png",
+    "localization/graphics/role_A/20261006-A-PROBE99-8B52FEEC/A99_SOURCE_RAW.png",
+    "localization/graphics/role_A/20261006-A-PROBE99-8B52FEEC/A99_SOURCE_COMPONENTS.png"
+  ],
+  "status": "A99_ZOOM_REVIEW_COMPLETE_PRESERVE_ORIGINAL"
+}
