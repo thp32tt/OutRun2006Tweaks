@@ -2130,12 +2130,12 @@ namespace outrun::vr::dx11
                         ++out.relativeAddressTokenCount;
                         break;
 
-                    case ProgrammableShaderSemanticOperandRole::DeclarationToken:
+                    case ProgrammableShaderOperandRole::DeclarationToken:
                         operand.role =
                             ProgrammableShaderSemanticOperandRole::Declaration;
                         break;
 
-                    case ProgrammableShaderSemanticOperandRole::ImmediateDword:
+                    case ProgrammableShaderOperandRole::ImmediateDword:
                         operand.role =
                             ProgrammableShaderSemanticOperandRole::Immediate;
                         break;
