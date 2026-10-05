@@ -332,6 +332,54 @@ namespace outrun::vr::dx11
         const ProgrammableShaderFunctionIdentity& identity,
         bool vertexStage) noexcept;
 
+    // R265 decodes the bounded R264 DWORD stream into instruction tokens plus
+    // their raw operand-token ranges for shader model 2.x/3.x only. This is a
+    // fail-closed structural decoder: it does not yet claim register, constant,
+    // sampler, linkage, or HLSL translation semantics.
+    struct ProgrammableShaderDecodedInstruction
+    {
+        DWORD instructionToken = 0;
+        DWORD opcode = 0;
+        UINT tokenOffset = 0;
+        UINT operandCount = 0;
+        std::vector<DWORD> operandTokens;
+    };
+
+    struct ProgrammableShaderInstructionDecode
+    {
+        bool vertexStage = false;
+        bool sourceExact = false;
+        bool versionSupported = false;
+        bool endSeen = false;
+        bool complete = false;
+        UINT instructionCount = 0;
+        UINT operandTokenCount = 0;
+        UINT commentDwordCount = 0;
+        std::uint64_t sourceBytecodeHash = 0;
+        std::uint64_t instructionStreamHash = 0;
+        std::uint64_t decoderRevisionHash = 0;
+        std::uint64_t semanticContractHash = 0;
+        std::vector<ProgrammableShaderDecodedInstruction> instructions;
+
+        [[nodiscard]] bool exact() const noexcept
+        {
+            return sourceExact &&
+                   versionSupported &&
+                   endSeen &&
+                   complete &&
+                   instructionCount != 0 &&
+                   instructions.size() == instructionCount &&
+                   sourceBytecodeHash != 0 &&
+                   instructionStreamHash != 0 &&
+                   decoderRevisionHash != 0 &&
+                   semanticContractHash != 0;
+        }
+    };
+
+    [[nodiscard]] ProgrammableShaderInstructionDecode
+    decode_programmable_shader_instruction_stream(
+        const ProgrammableShaderFunctionSourceEvidence& evidence) noexcept;
+
     [[nodiscard]] ProgrammableShaderPairCacheIdentity
     seal_programmable_shader_pair_cache_identity(
         bool observationComplete,
