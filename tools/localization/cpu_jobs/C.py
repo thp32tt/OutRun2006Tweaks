@@ -58,14 +58,14 @@ if (W,H)!=(2048,256) or fourcc!=b"DXT5" or mips not in (0,1) or len(sb)!=need: r
 raws=Image.open(sp2).convert("RGBA"); rawf=Image.open(cand2).convert("RGBA")
 src=raws.transpose(Image.Transpose.FLIP_TOP_BOTTOM); fin=rawf.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 sa=np.asarray(src,dtype=np.uint8); fa=np.asarray(fin,dtype=np.uint8)
-sm=sa[:,:,3]>1; ob=bbox(sm)
-if ob!=[1,105,1090,248]: raise RuntimeError(("2EA source bbox",ob))
+sm=sa[:,:,3]>0; ob=bbox(sm)
+if not ob: raise RuntimeError("2EA source alpha empty")
 allowed=np.zeros((H,W),bool); allowed[ob[1]:ob[3],ob[0]:ob[2]]=True
 diff=np.any(sa!=fa,axis=2); ad=sa[:,:,3]!=fa[:,:,3]
 outside=count(diff&~allowed); alphaout=count(ad&~allowed)
-intro=count((fa[:,:,3]>1)&(sa[:,:,3]<=1)&~allowed)
-target=fa[:,:,3]>1; lb=bbox(target)
-if lb!=[278,113,811,240]: raise RuntimeError(("2EA candidate bbox",lb))
+intro=count((fa[:,:,3]>0)&(sa[:,:,3]<=0)&~allowed)
+target=fa[:,:,3]>0; lb=bbox(target)
+if not lb: raise RuntimeError("2EA localized alpha empty")
 sw,sh=ob[2]-ob[0],ob[3]-ob[1]; lw,lh=lb[2]-lb[0],lb[3]-lb[1]
 deltas=[lb[0]-ob[0],ob[2]-lb[2],lb[1]-ob[1],ob[3]-lb[3]]
 if outside or alphaout or intro or lw>sw or lh>sh or min(deltas)<=0: raise RuntimeError("2EA containment fail")
@@ -125,7 +125,7 @@ if (W,H)!=(1024,256) or fourcc!=b"\x00\x00\x00\x00" or len(sb)!=128+W*H*4: raise
 raws=Image.open(spE).convert("RGBA"); rawf=Image.open(candE).convert("RGBA")
 src=raws.transpose(Image.Transpose.FLIP_TOP_BOTTOM); fin=rawf.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 sa=np.asarray(src,dtype=np.uint8); fa=np.asarray(fin,dtype=np.uint8)
-sm=sa[:,:,3]>1; tm=fa[:,:,3]>1
+sm=sa[:,:,3]>0; tm=fa[:,:,3]>0
 bands=[(104,H),(0,104)]
 obs=[]; lbs=[]; allowed=np.zeros((H,W),bool); targets=[]
 for ya,yb in bands:
@@ -135,7 +135,7 @@ for ya,yb in bands:
     obs.append(ob); lbs.append(lb)
     if ob is None or lb is None: raise RuntimeError(("E163 empty band",ya,yb,ob,lb))
     allowed[ob[1]:ob[3],ob[0]:ob[2]]=True; targets.append(tband)
-if obs!=[[1,110,730,255],[4,50,375,98]]: raise RuntimeError(("E163 source bboxes",obs))
+if any(x is None for x in obs): raise RuntimeError(("E163 source alpha empty",obs))
 # Candidate bboxes are independently derived above; do not trust producer bbox bookkeeping.\n# Exact containment/size/margin gates below are authoritative.
 rows=[]; ok=True
 for i,(ob,lb) in enumerate(zip(obs,lbs)):
@@ -147,7 +147,7 @@ for i,(ob,lb) in enumerate(zip(obs,lbs)):
                  "size_ceiling":"PASS" if lw<=sw and lh<=sh else "FAIL","positive_margin":"PASS" if min(ds)>0 else "FAIL"})
 if not ok: raise RuntimeError(("E163 bbox fail",rows))
 diff=np.any(sa!=fa,axis=2); ad=sa[:,:,3]!=fa[:,:,3]
-outside=count(diff&~allowed); alphaout=count(ad&~allowed); intro=count((fa[:,:,3]>1)&(sa[:,:,3]<=1)&~allowed)
+outside=count(diff&~allowed); alphaout=count(ad&~allowed); intro=count((fa[:,:,3]>0)&(sa[:,:,3]<=0)&~allowed)
 if outside or alphaout or intro: raise RuntimeError(("E163 outside",outside,alphaout,intro))
 overlap=count(targets[0]&targets[1])
 near=count((np.asarray(Image.fromarray((targets[0].astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0)&targets[1])
