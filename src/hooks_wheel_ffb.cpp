@@ -152,7 +152,7 @@ namespace Settings
     };
 
     Setting<float> WheelFFBWallImpact{
-        "WheelFFB", "WallImpact", 0.38f,
+        "WheelFFB", "WallImpact", 0.80f,
         "Collision impulse strength.", Range<float>{ 0.0f, 1.0f }
     };
 
@@ -548,16 +548,24 @@ namespace
             const float speedRaw = car->field_1C4;
             const float speed = std::isfinite(speedRaw) ? speedRaw : 0.0f;
             const float speedNorm = std::clamp(speed / 2.0f, 0.0f, 1.0f);
+            int rawFfbModel = static_cast<int>(Settings::WheelFFBModel);
+            if (rawFfbModel == 2)
+            {
+                // Model 2 was the retired Hybrid experiment. Rewrite the live
+                // setting too, so diagnostics and subsequent profile saves cannot
+                // preserve stale model-owned polarity or event behavior.
+                Settings::WheelFFBModel = 0;
+                rawFfbModel = 0;
+                spdlog::info("WheelFFB: migrated retired Model=2 to Modern DD at runtime");
+            }
             const WheelFFBMath::Model ffbModel =
-                WheelFFBMath::sanitize_model(static_cast<int>(Settings::WheelFFBModel));
+                WheelFFBMath::sanitize_model(rawFfbModel);
             const bool modernStructural =
                 WheelFFBMath::model_uses_modern_sat(ffbModel);
             const bool arcadeEffects =
                 WheelFFBMath::model_uses_arcade_events(ffbModel);
             const bool arcadeOriginal =
                 ffbModel == WheelFFBMath::Model::ArcadeOriginal;
-            const bool arcadeHybrid =
-                ffbModel == WheelFFBMath::Model::ArcadeHybrid;
             const bool originalConditionBackbone =
                 WheelFFBMath::model_uses_original_condition_backbone(ffbModel);
             const bool ps2Original =
@@ -577,7 +585,7 @@ namespace
             // The periodic effect set is model-owned, not just waveform-owned.
             // Any live model-ID change atomically drops the old set so a
             // road-only Original model cannot masquerade as a complete
-            // Modern/Hybrid pair, and a stale TireSlip Sine cannot survive in
+            // Modern model, and a stale TireSlip Sine cannot survive in
             // an Original model. F11/profile transitions already do this too;
             // this runtime guard covers every other live settings path.
             const int runtimeModelValue = static_cast<int>(ffbModel);
@@ -1108,21 +1116,13 @@ namespace
                     0.0f, 1.0f)
                 : -1.0f;
 
-            const int impactAge =
-                crashImpulseTimer_ > 0
-                    ? CrashTimerFrames - crashImpulseTimer_
-                    : CrashTimerFrames;
             // OutRun2Real keeps its infinite Spring and Constant effects in
             // separate SDL effect slots. Arcade Original therefore preserves the
             // servo-style condition backbone during 0x0B/0x1B/0x10/0x00 events.
-            // Hybrid may still briefly unload its Modern assist so the arcade
-            // directional event is not masked by inferred structural torque.
-            const bool suppressSpringForImpact = arcadeHybrid
-                ? (crashImpulseTimer_ > 0 &&
-                   impactAge < WheelFFBMath::ArcadeConstantEventFrames)
-                : (arcadeOriginal || ps2Original
+            const bool suppressSpringForImpact =
+                (arcadeOriginal || ps2Original)
                     ? false
-                    : crashImpulseTimer_ > CrashCooldownFrames);
+                    : crashImpulseTimer_ > CrashCooldownFrames;
 
             // Make UseHardwareSpring a real live F11 switch.  Previously
             // changing it to false after startup left the already-created
@@ -1386,12 +1386,9 @@ namespace
             }
 
             const bool suppressStructuralForImpact =
-                arcadeHybrid
-                    ? (crashImpulseTimer_ > 0 &&
-                       impactAge < WheelFFBMath::ArcadeConstantEventFrames)
-                    : (arcadeOriginal || ps2Original
-                        ? false
-                        : crashImpulseTimer_ > CrashCooldownFrames);
+                (arcadeOriginal || ps2Original)
+                    ? false
+                    : crashImpulseTimer_ > CrashCooldownFrames;
 
             float structural = 0.0f;
             if (!suppressStructuralForImpact)
