@@ -48,7 +48,7 @@ namespace Settings
 
     Setting<int> WheelFFBModel{
         "WheelFFB", "Model", 0,
-        "0=Modern DD, 1=Arcade Original (Lindbergh-derived), 2=Arcade + Modern Hybrid, 3=PS2 Original topology (experimental).",
+        "0=Modern DD, 1=Arcade Original (Lindbergh-derived), 2=retired legacy Hybrid (maps to Modern DD), 3=PS2 Original topology (experimental).",
         Range<int>{ 0, 3 }
     };
 
