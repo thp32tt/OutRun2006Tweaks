@@ -1994,6 +1994,201 @@ namespace outrun::vr::dx11
         return out;
     }
 
+    ProgrammableShaderOperandSemanticDecode
+    classify_programmable_shader_operands(
+        const ProgrammableShaderInstructionDecode& decode) noexcept
+    {
+        ProgrammableShaderOperandSemanticDecode out{};
+        out.instructionDecodeExact = decode.exact();
+        out.instructionCount = decode.instructionCount;
+        out.sourceInstructionStreamHash = decode.instructionStreamHash;
+        if (!out.instructionDecodeExact || !decode.operands_exact())
+            return out;
+
+        static constexpr char kClassifierRevision[] =
+            "R266_D3D9_SM2_SM3_OPERAND_SEMANTIC_CLASSIFIER_V1";
+        static constexpr char kSemanticContract[] =
+            "R266_REGISTER_ROLE_TYPE_INDEX_MODIFIER_ADDRESSING_CONSTANT_SAMPLER_PROVENANCE_V1";
+        out.classifierRevisionHash =
+            hash_bytes(
+                kClassifierRevision, sizeof(kClassifierRevision) - 1u);
+        out.semanticContractHash =
+            hash_bytes(kSemanticContract, sizeof(kSemanticContract) - 1u);
+
+        std::uint64_t aggregateHash = 1469598103934665603ull;
+        const auto mix = [](std::uint64_t& hash, std::uint64_t value) noexcept
+        {
+            for (unsigned shift = 0; shift < 64u; shift += 8u)
+            {
+                hash ^=
+                    static_cast<std::uint8_t>((value >> shift) & 0xFFu);
+                hash *= 1099511628211ull;
+            }
+        };
+        mix(aggregateHash, decode.sourceBytecodeHash);
+        mix(aggregateHash, decode.instructionStreamHash);
+        mix(aggregateHash, decode.operandClassificationRevisionHash);
+        mix(aggregateHash, decode.operandClassificationHash);
+        mix(aggregateHash, out.classifierRevisionHash);
+        mix(aggregateHash, out.semanticContractHash);
+
+        const auto constant_register = [](UINT type) noexcept
+        {
+            return type == static_cast<UINT>(D3DSPR_CONST) ||
+                   type == static_cast<UINT>(D3DSPR_CONSTINT) ||
+                   type == static_cast<UINT>(D3DSPR_CONST2) ||
+                   type == static_cast<UINT>(D3DSPR_CONST3) ||
+                   type == static_cast<UINT>(D3DSPR_CONST4) ||
+                   type == static_cast<UINT>(D3DSPR_CONSTBOOL);
+        };
+
+        try
+        {
+            out.instructions.reserve(decode.instructions.size());
+            for (const auto& instruction : decode.instructions)
+            {
+                if (!instruction.operandClassificationExact)
+                    return out;
+
+                ProgrammableShaderInstructionOperandSemantics semantic{};
+                semantic.opcode = instruction.opcode;
+                semantic.tokenOffset = instruction.tokenOffset;
+
+                std::uint64_t instructionHash = 1469598103934665603ull;
+                mix(instructionHash, instruction.instructionToken);
+
+                semantic.operands.reserve(
+                    instruction.classifiedOperands.size());
+                for (const auto& classified : instruction.classifiedOperands)
+                {
+                    ProgrammableShaderOperandSemantic operand{};
+                    operand.rawToken = classified.token;
+                    operand.registerType = classified.registerType;
+                    operand.registerIndex = classified.registerIndex;
+                    operand.relativeAddressing =
+                        classified.relativeAddressed;
+
+                    switch (classified.role)
+                    {
+                    case ProgrammableShaderOperandRole::DestinationRegister:
+                        operand.role =
+                            ProgrammableShaderOperandRole::Destination;
+                        operand.writeMask =
+                            classified.componentSelection;
+                        operand.destinationModifier =
+                            classified.modifier;
+                        operand.destinationShift =
+                            classified.shift;
+                        if (operand.writeMask == 0u ||
+                            (operand.destinationModifier & ~0x7u) != 0u)
+                            return out;
+                        ++semantic.destinationRegisterCount;
+                        ++out.destinationRegisterCount;
+                        break;
+
+                    case ProgrammableShaderOperandRole::SourceRegister:
+                        operand.role =
+                            ProgrammableShaderOperandRole::Source;
+                        operand.sourceSwizzle =
+                            classified.componentSelection;
+                        operand.sourceModifier =
+                            classified.modifier;
+                        if (operand.sourceModifier >
+                            static_cast<UINT>(D3DSPSM_NOT))
+                            return out;
+                        ++semantic.sourceRegisterCount;
+                        ++out.sourceRegisterCount;
+                        if (constant_register(operand.registerType))
+                        {
+                            ++semantic.constantRegisterReferenceCount;
+                            ++out.constantRegisterReferenceCount;
+                        }
+                        if (operand.registerType ==
+                            static_cast<UINT>(D3DSPR_SAMPLER))
+                        {
+                            ++semantic.samplerRegisterReferenceCount;
+                            ++out.samplerRegisterReferenceCount;
+                        }
+                        break;
+
+                    case ProgrammableShaderOperandRole::
+                            RelativeAddressRegister:
+                        operand.role =
+                            ProgrammableShaderOperandRole::RelativeAddress;
+                        operand.sourceSwizzle =
+                            classified.componentSelection;
+                        operand.sourceModifier =
+                            classified.modifier;
+                        if (operand.sourceModifier >
+                                static_cast<UINT>(D3DSPSM_NOT) ||
+                            (operand.registerType !=
+                                 static_cast<UINT>(D3DSPR_ADDR) &&
+                             operand.registerType !=
+                                 static_cast<UINT>(D3DSPR_LOOP)))
+                            return out;
+                        ++semantic.relativeAddressTokenCount;
+                        ++out.relativeAddressTokenCount;
+                        break;
+
+                    case ProgrammableShaderOperandRole::DeclarationToken:
+                        operand.role =
+                            ProgrammableShaderOperandRole::Declaration;
+                        break;
+
+                    case ProgrammableShaderOperandRole::ImmediateDword:
+                        operand.role =
+                            ProgrammableShaderOperandRole::Immediate;
+                        break;
+
+                    case ProgrammableShaderOperandRole::PredicateRegister:
+                        // Predicate semantics are deliberately outside this
+                        // bounded R266 receipt. Keep them fail-closed until a
+                        // dedicated predicate/control-flow unit is proven.
+                        return out;
+                    }
+
+                    mix(
+                        instructionHash,
+                        static_cast<std::uint64_t>(operand.role));
+                    mix(instructionHash, operand.rawToken);
+                    mix(instructionHash, operand.registerType);
+                    mix(instructionHash, operand.registerIndex);
+                    mix(
+                        instructionHash,
+                        operand.relativeAddressing ? 1u : 0u);
+                    mix(instructionHash, operand.writeMask);
+                    mix(instructionHash, operand.destinationModifier);
+                    mix(instructionHash, operand.destinationShift);
+                    mix(instructionHash, operand.sourceSwizzle);
+                    mix(instructionHash, operand.sourceModifier);
+                    semantic.operands.push_back(operand);
+                }
+
+                semantic.complete = true;
+                semantic.semanticHash =
+                    instructionHash == 0 ? 1 : instructionHash;
+                mix(aggregateHash, semantic.semanticHash);
+                mix(
+                    aggregateHash,
+                    semantic.constantRegisterReferenceCount);
+                mix(
+                    aggregateHash,
+                    semantic.samplerRegisterReferenceCount);
+                out.instructions.push_back(std::move(semantic));
+            }
+        }
+        catch (...)
+        {
+            return {};
+        }
+
+        out.complete =
+            out.instructions.size() == out.instructionCount;
+        out.operandSemanticHash =
+            aggregateHash == 0 ? 1 : aggregateHash;
+        return out;
+    }
+
     ProgrammableShaderPairCacheIdentity
     seal_programmable_shader_pair_cache_identity(
         bool observationComplete,
