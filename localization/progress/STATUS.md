@@ -1717,3 +1717,11 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - First material candidate was controller-rejected for sparse historical-clean residue; final hosted retry 37385514683 removes residue. Candidate 77171503a7c1d089f09abcf458ee79b5aa3b52281ce8bed5f5dc234ce7dcfb9b.
 - Static gates: bbox/size/margin PASS; outside/alpha/protected=0; all non-Stage/A85/tally pixels exact. Controller readable/family/raw PASS.
 - State: B172_STATIC_PASS_PENDING_C_AND_INGAME_RETEST; independent C + NEW actual in-game retest required. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-06 08:05 KST — A98 index25 zoom review
+- `4AFC1BED_512x512.dds`: exact-HD 2048x2048 RGBA32/mip1/raw mirror_y inspected in readable and raw orientations.
+- Positive classification: **NO_LOCALIZABLE_TEXT / PRESERVE_ORIGINAL**. Visible content is A/B/C/D/E grade artwork, heart+x icon, sparkle and character art only; localizable segments=0.
+- No DDS candidate generated because none is required. Queue/transcription/artwork-plan state closed the stale blocked review.
+- Remaining blocked zoom reviews: **40**. Next A normal shard item: index27 `8B52FEEC`, unless a higher-priority backlog/C-return appears.
+- VR/FFB/DX11/DXVK untouched.
+
