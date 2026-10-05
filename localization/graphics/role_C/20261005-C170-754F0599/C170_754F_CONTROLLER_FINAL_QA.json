@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C170-754F0599",
+  "qa_id": "C170",
+  "timestamp_kst": "2026-10-05T15:55:00+09:00",
+  "queue_index": 175,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "producer_run": "20261005-A-PRODUCTION28",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "candidate_sha256": "3d166cf12042471246ce05e89de5122f4ed77cfdbc0f175ed31d351da8ffb20d",
+  "candidate_changed_by_C": false,
+  "producer_machine_status": "PASS_REPORTED",
+  "producer_bbox_size_positive_margin": "3/3 PASS",
+  "producer_zero_pixel_gates": {
+    "changed_pixels_outside_source_bboxes": 0,
+    "alpha_changed_pixels_outside_source_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "source_residue_visible_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pixels": 0
+  },
+  "semantic_binding": [
+    "stage select -> 스테이지 선택",
+    "showroom -> 쇼룸",
+    "single player -> 싱글 플레이"
+  ],
+  "controller_visual_qa": "FAIL_SOURCE_STYLE_PROPORTION_WEIGHT",
+  "visual_failures": [
+    "The canonical source is an extremely wide, low, geometric metallic techno family; the Korean render is much more compact and conventional, especially 쇼룸 (230 px wide versus 950 px source) and 싱글 플레이 (642 px versus 1384 px source).",
+    "The Korean lettering uses a heavy full black outline/body treatment that is visually stronger than the source's thin geometric strokes with metallic fill and lower dark extrusion/shadow.",
+    "The source's wide spacing and horizontal visual mass are not reproduced, so line-to-line proportions and source-family typography are not faithful despite bbox containment."
+  ],
+  "reasoning": "Exact containment and positive margins are necessary but cannot override the contract's source-style requirements for fill/gradient, weight, proportions, alignment, scale and spacing. Readable and raw mirror_y evidence both show the same style mismatch.",
+  "decision": "C170_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
+  "required_rework": "Re-render the three Korean rows in a wider/lower geometric family: increase horizontal glyph scale/tracking within each exact source bbox, reduce the heavy full black outline, preserve the metallic vertical grayscale fill and lower dark extrusion/shadow, and keep positive margins. Do not add the two historical rows absent from canonical HD.",
+  "producer_report": "localization/graphics/role_A/20261005-A-PRODUCTION28/A_PRODUCTION28_754F0599_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_A/20261005-A-PRODUCTION28/A_PRODUCTION28_SOURCE_CLEAN_FINAL_GRAY.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION28/A_PRODUCTION28_ROW_CONTACT.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION28/A_PRODUCTION28_FINAL_RAW_GRAY.jpg"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
