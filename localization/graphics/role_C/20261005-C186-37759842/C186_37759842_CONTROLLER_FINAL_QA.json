@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C186-37759842",
+  "qa_id": "C186",
+  "timestamp_kst": "2026-10-05T19:02:14+09:00",
+  "queue_index": 95,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "source_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+  "candidate_sha256": "68e31ca94c9003cd0acd572fdcecf17d52c56b6848ee558c1359d87b6d382fcd",
+  "candidate_changed_by_C": false,
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "33/33 PASS",
+  "controller_visual_qa": "FAIL_VISIBLE_SOURCE_SHAPED_CLEAN_PLATE_GHOSTS_AND_DONOR_BOUNDARIES",
+  "visual_findings": [
+    "C186 independently verifies exact source/header/raw mirror_y and 33/33 bbox/size/positive-margin with all recorded outside/alpha/protected/residue/overlap/touch counters at zero.",
+    "Mandatory contact-sheet review nevertheless shows strong readable source-shaped silhouettes in CLEAN for YES/NO, Time/Heart/OutRun mode plates and RANDOM, with those structures still visible around/behind Korean in FINAL.",
+    "Dark continuous-course plates also show non-source donor/reconstruction boundaries. These are visual false negatives of the numeric masks."
+  ],
+  "decision": "C186_REWORK_REQUIRED_MANUAL_TEMPLATE_CLEAN_PLATE_RECONSTRUCTION",
+  "required_rework": "Do not repeat the rejected harmonic/row-span/fitted-field/class-donor inpaint families. Rebuild each selector template from source-faithful plate geometry/background primitives or manual/template reconstruction, then rerun exact-pixel plus controller visual QA.",
+  "machine_report": "localization/graphics/role_C/20261005-C186-37759842/C186_37759842_MACHINE_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C186-37759842/C186_CONTACTS_1_B64.txt",
+    "localization/graphics/role_C/20261005-C186-37759842/C186_CONTACTS_2_B64.txt",
+    "localization/graphics/role_C/20261005-C186-37759842/C186_CONTACTS_3_B64.txt",
+    "localization/graphics/role_C/20261005-C186-37759842/C186_RAW_B64.txt"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
