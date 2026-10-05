@@ -53,6 +53,8 @@ state is folded into the complete Modern DD baseline, and saved Hybrid profiles
 are loaded as clean Modern profiles. The historical notes below are retained
 only to document the earlier experiment.
 
+R3 model changes still apply the tested polarity default, but both Reverse controls remain manually editable until the next model change.
+
 Keeps the Modern DD structural steering model but swaps surface/wall/gear event behavior to the Lindbergh-derived arcade reconstruction.
 
 This is intended for modern DD hardware when the user wants current SAT quality with arcade-style transient timing. Collision debounce remains shared, but Hybrid only unloads its Modern structural torque during the active Arcade directional event window (~80 ms); the rest of the debounce interval no longer leaves SAT artificially blank.
