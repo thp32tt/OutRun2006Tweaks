@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C175-A05BF610",
+  "qa_id": "C175",
+  "queue_index": 28,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+  "corrective_rework_by_C": true,
+  "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+  "candidate_sha256": "60bceae994a26e21cba719908340cd1eade7902b66077fda2b982d99ab22f6c2",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "row": {
+    "source": "Total Rank",
+    "korean": "종합 랭킹",
+    "original_bbox": [
+      397,
+      1117,
+      1053,
+      1275
+    ],
+    "localized_bbox": [
+      472,
+      1126,
+      985,
+      1266
+    ],
+    "source_width": 656,
+    "source_height": 158,
+    "localized_width": 513,
+    "localized_height": 140,
+    "delta_left": 75,
+    "delta_right": 68,
+    "delta_top": 9,
+    "delta_bottom": 9,
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "font_file": "NotoSansCJK-Black.ttc",
+    "font_style": "Black,Regular",
+    "font_size": 128,
+    "stroke_width": 7,
+    "slant": 0.2,
+    "alignment": "center"
+  },
+  "machine_checks": {
+    "clean_changed_outside_source_effect_bbox": 0,
+    "clean_alpha_changed_outside": 0,
+    "clean_source_core_unchanged": 0,
+    "decoded_changed_outside_source_effect_bbox": 0,
+    "alpha_changed_outside_source_effect_bbox": 0,
+    "source_core_residue_pixels": 0,
+    "localized_overlap_pixels": 0
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

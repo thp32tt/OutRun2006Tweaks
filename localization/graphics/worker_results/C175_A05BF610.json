@@ -1,0 +1,12 @@
+{
+  "run": "20261005-C175-A05BF610",
+  "qa_id": "C175",
+  "index": 28,
+  "asset": "A05BF610",
+  "candidate_sha256": "60bceae994a26e21cba719908340cd1eade7902b66077fda2b982d99ab22f6c2",
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "1/1 PASS",
+  "source_residue": 0,
+  "report": "localization/graphics/role_C/20261005-C175-A05BF610/C175_A05_MACHINE_REWORK_QA.json",
+  "runtime_validation": "UNTESTED"
+}
