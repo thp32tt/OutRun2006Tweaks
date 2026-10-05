@@ -81,6 +81,8 @@ forbid(
     "HRESULT __stdcall DrawIndexedPrimitiveUPDestR31(",
     "R31RollbackDrawHooks()",
     "R31EnableDrawHooks()",
+    "R31OwnedResult R31TryFastWorld(",
+    "R31OwnedResult R31TryHud(",
 )
 require(
     r31,
@@ -93,6 +95,10 @@ require(
     "StateBlockEvents::Configure(",
     "StateBlockTracker::SetEventConsumerReady(true)",
     "R31InstallStatus() noexcept",
+    "R31OwnedResult",
+    "R31BuildFastWorldConstants(",
+    "R31TelemetryNoteFastWorld()",
+    "R31TelemetryNoteHud()",
 )
 r31_install = function_body(r31, "DWORD WINAPI R31InstallThread(void*)")
 require(
@@ -158,6 +164,8 @@ forbid(
     "HRESULT __stdcall DrawIndexedPrimitiveDestR32(",
     "HRESULT __stdcall DrawPrimitiveUPDestR32(",
     "HRESULT __stdcall DrawIndexedPrimitiveUPDestR32(",
+    "R31OwnedResult R32TryFastWorld(",
+    "R31OwnedResult R32TryHud(",
 )
 require(
     r32,
@@ -168,6 +176,10 @@ require(
     "void R32ObserveFrameWorkload(",
     "HRESULT R32LowerFailClosed(",
     "R32InstallStatus() noexcept",
+    "R32EffectIsFragileLive(",
+    "R32SetWvpBatch(",
+    "R32GetSavedViewport(",
+    "R32RestoreRightPassState(",
 )
 r32_install = function_body(r32, "DWORD WINAPI R32InstallThread(void*)")
 require(
