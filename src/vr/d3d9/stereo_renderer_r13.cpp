@@ -159,7 +159,10 @@ namespace OutRunVRStereo
                     !RenderFrameRunGeneration ||
                     snapshot.reserved[
                         OutRunVR::R13::DirectGpuAckRunGenerationIndex] !=
-                        RenderFrameRunGeneration)
+                        RenderFrameRunGeneration ||
+                    snapshot.reserved[
+                        OutRunVR::R13::DirectGpuAckGamePidIndex] !=
+                        GetCurrentProcessId())
                     return false;
 
                 completedFrame = snapshot.completedFrameId[slotIndex];

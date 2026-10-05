@@ -370,8 +370,9 @@ require(
 # async completions cannot move the global ACK backwards.
 require(
     load(ROOT / "src/vr/ipc/direct_ack_r13.hpp"),
-    "dedicated ACK run-generation ABI field",
+    "dedicated ACK complete run-identity ABI fields",
     "DirectGpuAckRunGenerationIndex = 0",
+    "DirectGpuAckGamePidIndex = 1",
     "std::uint32_t reserved[2]",
     "static_assert(sizeof(DirectGpuAckState) == 48)",
 )
@@ -420,17 +421,21 @@ require_order(
 )
 require(
     publish_completed,
-    "host dedicated ACK game-run scope",
+    "host dedicated ACK complete game-run scope",
     "RenderFrameRunGenerationIndex",
     "DirectGpuAckRunGenerationIndex",
+    "DirectGpuAckGamePidIndex",
     "runGeneration",
+    "gamePid",
 )
 require_order(
     publish_completed,
-    "host dedicated ACK game-run publication",
+    "host dedicated ACK complete game-run publication",
     "const std::uint32_t runGeneration",
+    "const std::uint32_t gamePid = frame.clientPid;",
     "BeginAckWrite();",
     "DirectGpuAckRunGenerationIndex] = runGeneration;",
+    "DirectGpuAckGamePidIndex] = gamePid;",
     "DirectAckState->completedFrameId[slot] = frame.frameId;",
     "EndAckWrite();",
 )
@@ -449,9 +454,11 @@ require_order(
 read_gpu_ack = body(r13, "bool R13ReadGpuCompletedFrame(")
 require(
     read_gpu_ack,
-    "game dedicated ACK run-generation validation",
+    "game dedicated ACK complete run-identity validation",
     "DirectGpuAckRunGenerationIndex",
+    "DirectGpuAckGamePidIndex",
     "RenderFrameRunGeneration",
+    "GetCurrentProcessId()",
     "snapshot.transportGeneration != DirectTransportGeneration",
 )
 require_order(
@@ -461,6 +468,8 @@ require_order(
     "snapshot.transportGeneration != DirectTransportGeneration",
     "!RenderFrameRunGeneration",
     "DirectGpuAckRunGenerationIndex",
+    "DirectGpuAckGamePidIndex",
+    "GetCurrentProcessId()",
     "completedFrame = snapshot.completedFrameId[slotIndex];",
 )
 

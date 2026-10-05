@@ -314,6 +314,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
             DirectAckState->transportGeneration = 0;
             DirectAckState->reserved[
                 OutRunVR::R13::DirectGpuAckRunGenerationIndex] = 0;
+            DirectAckState->reserved[
+                OutRunVR::R13::DirectGpuAckGamePidIndex] = 0;
             std::memset(DirectAckState->completedFrameId, 0,
                 sizeof(DirectAckState->completedFrameId));
             EndAckWrite();
@@ -549,22 +551,27 @@ namespace OutRunVrD3D9ExDirectPassthrough
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
         const std::uint32_t runGeneration =
             frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        const std::uint32_t gamePid = frame.clientPid;
         if (slot >= OutRunVR::R13::DirectGpuAckRingSize || !generation ||
-            !runGeneration)
+            !runGeneration || !gamePid)
             return false;
 
-        // Scope the dedicated ACK to both the DirectGPU resource generation and
-        // the Frame.v2 game-run generation. The latter is stored in reserved
-        // ABI space so a late completion from the previous game process cannot
-        // be accepted by a restarted producer even if it races this write.
+        // Scope the dedicated ACK to the complete Frame.v2 run identity plus
+        // the DirectGPU resource generation. Keeping PID and run generation
+        // together closes both overlapping-process and rare generation-collision
+        // cases without changing the 48-byte ACK ABI.
         BeginAckWrite();
         if (DirectAckState->transportGeneration != generation ||
             DirectAckState->reserved[
-                OutRunVR::R13::DirectGpuAckRunGenerationIndex] != runGeneration)
+                OutRunVR::R13::DirectGpuAckRunGenerationIndex] != runGeneration ||
+            DirectAckState->reserved[
+                OutRunVR::R13::DirectGpuAckGamePidIndex] != gamePid)
         {
             DirectAckState->transportGeneration = generation;
             DirectAckState->reserved[
                 OutRunVR::R13::DirectGpuAckRunGenerationIndex] = runGeneration;
+            DirectAckState->reserved[
+                OutRunVR::R13::DirectGpuAckGamePidIndex] = gamePid;
             std::memset(DirectAckState->completedFrameId, 0,
                 sizeof(DirectAckState->completedFrameId));
         }
