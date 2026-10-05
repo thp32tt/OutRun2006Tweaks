@@ -43,7 +43,7 @@ H,W,pitch,depth,mips=struct.unpack_from("<5I",sb,12); pf=struct.unpack_from("<8I
 if (W,H,pitch,mips)!=(2048,1024,8192,1) or len(sb)!=128+W*H*4 or pf[3]!=32: raise RuntimeError(("structure",W,H,pitch,mips,len(sb)))
 rgbm=(pf[4],pf[5],pf[6])
 RAWMODE="BGRA" if rgbm==(0xff0000,0xff00,0xff) else "RGBA" if rgbm==(0xff,0xff00,0xff0000) else None
-if RAWMODE!="BGRA": raise RuntimeError(("rawmode",rgbm))
+if RAWMODE not in ("RGBA","BGRA"): raise RuntimeError(("rawmode",rgbm))
 raw_src=Image.frombytes("RGBA",(W,H),sb[128:],"raw",RAWMODE)
 src=raw_src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 atlas=json.loads(ab.decode("utf-8")); regs={int(r["idx"]):r for r in atlas["regions"]}
