@@ -8,13 +8,13 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
 
-repo=Path.cwd(); run="20261005-A-PRODUCTION39"
+repo=Path.cwd(); run="20261005-A-PRODUCTION40"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset_rel="textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset_rel; candidate.parent.mkdir(parents=True,exist_ok=True)
 validator=repo/"tools/localization/validate_clean_plate.py"
-work=Path("/tmp/outrun_A39"); work.mkdir(parents=True,exist_ok=True)
+work=Path("/tmp/outrun_A40"); work.mkdir(parents=True,exist_ok=True)
 source=work/"37759842_HD.dds"; atlasp=work/"4x_37759842_1024x1024_atlas.json"
 
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
@@ -179,20 +179,15 @@ def effect_detect(crop,core,roi,style,kind):
     else:
         family=np.ones_like(core,dtype=bool)
 
+    # C177 contact sheets show the black source extrusion/shadow is often a
+    # disconnected component. The A39 connected-component filter therefore
+    # dropped exactly the residue C asked us to remove. "near" is already
+    # spatially bounded by the canonical bright glyph core and semantic ROI, so
+    # retain all nearby source-family pixels, including disconnected shadows.
     effect=(near&family)|core
-    # Keep only candidate components that are spatially connected to a seeded
-    # glyph neighborhood; this rejects unrelated plate lines/icons that happen
-    # to share text colors farther away.
-    lab,n=ndimage.label(effect)
-    out=np.zeros_like(effect)
-    seed=ndimage.binary_dilation(core,iterations=3)
-    for k in range(1,n+1):
-        comp=(lab==k)
-        if np.any(comp&seed):
-            out|=comp
-    if int(out.sum())<int(core.sum()):
-        raise RuntimeError(("effect detect",style,kind,int(core.sum()),int(out.sum())))
-    return out
+    if int(effect.sum())<int(core.sum()):
+        raise RuntimeError(("effect detect",style,kind,int(core.sum()),int(effect.sum())))
+    return effect
 
 def nearest_inpaint_rgba(arr,mask,core):
     if not mask.any(): return arr.copy()
@@ -280,8 +275,8 @@ ap=out/"37759842_HD_ALLOWED_BBOX_MASK.png"
 src.save(sp); clean.save(cp); source_text_mask.save(smp); source_core_mask.save(scp); allowed.save(ap)
 protected=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed))
 pp=out/"37759842_HD_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--report",str(out/"A39_CLEAN_PLATE_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A39_CLEAN_PLATE_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--report",str(out/"A40_CLEAN_PLATE_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"A40_CLEAN_PLATE_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 clean_diff=dmask(src,clean)
 clean_outside=count(ImageChops.multiply(clean_diff,ImageOps.invert(source_text_mask)))
@@ -390,8 +385,8 @@ dp=out/"37759842_HD_FINAL_DECODED_READABLE.png"; decoded.save(dp)
 
 # Exhaustive decoded-pixel gates.
 subprocess.run(["python3",str(validator),str(sp),str(dp),str(ap),"--protected-mask",str(pp),
-                "--report",str(out/"A39_FINAL_MASK_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"A39_FINAL_MASK_VALIDATION.json").read_text())
+                "--report",str(out/"A40_FINAL_MASK_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"A40_FINAL_MASK_VALIDATION.json").read_text())
 diff=dmask(src,decoded)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
 alpha_diff=bmask(ImageChops.difference(src.getchannel("A"),decoded.getchannel("A")))
@@ -433,7 +428,7 @@ for im in (src,clean,decoded):
     q=flatten(im).resize((1024,1024),Image.Resampling.LANCZOS); thumbs.append(q)
 sheet=Image.new("RGB",(3072,1024),(90,90,90))
 for i,q in enumerate(thumbs): sheet.paste(q,(i*1024,0))
-sheet.save(out/"A39_SOURCE_CLEAN_FINAL_QUARTER.jpg",quality=94)
+sheet.save(out/"A40_SOURCE_CLEAN_FINAL_QUARTER.jpg",quality=94)
 
 cards=[]
 for row in rows:
@@ -453,8 +448,33 @@ for row in rows:
 cw=max(c.width for c in cards); ch=sum(c.height+3 for c in cards)
 contacts=Image.new("RGB",(cw,ch),(225,225,225)); yy=0
 for c in cards: contacts.paste(c,(0,yy)); yy+=c.height+3
-contacts.save(out/"A39_TARGET_CONTACTS.jpg",quality=94)
-flatten(decoded_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A39_FINAL_RAW_MIRROR_Y.jpg",quality=94)
+contacts.save(out/"A40_TARGET_CONTACTS.jpg",quality=94)
+
+# Small C177-focused evidence that stays connector-viewable: only selector
+# plate rows whose detached source shadow/outline was reworked.
+focus_ids={2,3,4,5,6,7,8,9,10,11,29,43,44,45,46,47,48,49,50,51,52}
+fcards=[]
+for row in rows:
+    if row["idx"] not in focus_ids: continue
+    ob=row["source_effect_bbox"]; pad=10
+    box=(max(0,ob[0]-pad),max(0,ob[1]-pad),min(W,ob[2]+pad),min(H,ob[3]+pad))
+    ims=[flatten(z.crop(box)) for z in (src,clean,decoded)]
+    scaled=[]
+    for q in ims:
+        sc=min(1.0,95/max(1,q.height),250/max(1,q.width))
+        scaled.append(q.resize((max(1,int(q.width*sc)),max(1,int(q.height*sc))),Image.Resampling.LANCZOS) if sc<1 else q)
+    cw=sum(q.width for q in scaled)+12; ch=max(q.height for q in scaled)+20
+    card=Image.new("RGB",(cw,ch),(230,230,230)); d=ImageDraw.Draw(card)
+    d.text((3,3),f"idx {row['idx']} S|C|F",fill=(0,0,0))
+    xx=0
+    for q in scaled: card.paste(q,(xx,20)); xx+=q.width+6
+    fcards.append(card)
+fcw=max(q.width for q in fcards); fch=sum(q.height+2 for q in fcards)
+focus=Image.new("RGB",(fcw,fch),(225,225,225)); fy=0
+for q in fcards: focus.paste(q,(0,fy)); fy+=q.height+2
+focus.save(out/"A40_C177_FOCUS.jpg",quality=84,optimize=True)
+
+flatten(decoded_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A40_FINAL_RAW_MIRROR_Y.jpg",quality=94)
 
 report={"schema_version":1,"role":"A","run":run,"index":95,"asset":asset_rel,"worker":"github-actions",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB_SHA1,"sha256":SOURCE_SHA,
@@ -473,8 +493,8 @@ report={"schema_version":1,"role":"A","run":run,"index":95,"asset":asset_rel,"wo
  "all_33_bbox_size_positive_margin_pass":allbbox,
  "c177_rework":"per-cell source glyph/effect masks re-derived from canonical text-family source pixels; expanded mode/continuous ROIs; selected effect pixels forced changed in CLEAN",
  "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"UNTESTED",
- "status":"A39_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A39_WORKER_REWORK_REQUIRED"}
-(out/"A39_37759842_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "status":"A40_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A40_WORKER_REWORK_REQUIRED"}
+(out/"A40_37759842_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":95,"asset":"37759842","candidate_sha256":CANDIDATE_SHA,
          "localized_physical_targets":len(rows),"semantic_strings":20,
          "bbox_size_positive_margin":"33/33 PASS" if allbbox else "FAIL",
@@ -482,7 +502,7 @@ summary={"run":run,"index":95,"asset":"37759842","candidate_sha256":CANDIDATE_SH
          "changed_outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,
          "overlap":overlap,"touch":touch,"source_residue":residue,"clean_source_core_unchanged":clean_source_core_unchanged,
          "worker_status":report["status"],"runtime_validation":"UNTESTED",
-         "report":"localization/graphics/role_A/20261005-A-PRODUCTION39/A39_37759842_REPORT.json"}
-(wr/"A39_37759842.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+         "report":"localization/graphics/role_A/20261005-A-PRODUCTION40/A40_37759842_REPORT.json"}
+(wr/"A40_37759842.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False,indent=2))
 if not status: raise SystemExit(2)
