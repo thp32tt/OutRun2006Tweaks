@@ -86,7 +86,7 @@ report={"schema_version":1,"role":"A","run":run,"queue_index":59,
  "readiness_tier":"ONE_STAGE_TO_RENDER_PREFLIGHT",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":commit,
    "source_git_blob_sha1":blob(sb),"atlas_git_blob_sha1":blob(ab),"source_sha256":sha(sb)},
- "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact_target":True,"raw_orientation":"mirror_y"},
+ "structure":{"dimensions":[W,H],"dds_pixel_format_words":list(pf),"native_pillow_mode":native_mode,"raw_mode":mode,"mipmaps":mips,"payload_bytes":len(sb)-128,"header_128_exact_target":True,"raw_orientation":"mirror_y"},
  "rows":rows,"next":"controller confirms semantic/style binding then render same invocation",
  "RUNTIME_VALIDATION":"UNTESTED","status":"A23_PREFLIGHT_READY_TO_RENDER"}
 (out/"A23_7CE_PREFLIGHT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
