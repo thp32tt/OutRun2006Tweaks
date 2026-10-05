@@ -67,7 +67,11 @@
       "status": "COMPLETE",
       "queue_state_persisted": true,
       "queue_state_commit_sha": "3ece8271ecdfa1a291871d30f3e19dd1a391c17a",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "issue13_update": "RECORDED",
+      "issue13_comment_id": 5989226594,
+      "issue14_update": "RECORDED",
+      "issue14_comment_id": 5989226956
     }
   },
   "evidence": {
@@ -126,5 +130,6 @@
     "runtime_validation": "UNTESTED"
   },
   "validated_at_kst": "2026-10-05T15:21:34+09:00",
-  "completed_at_kst": "2026-10-05T15:21:34+09:00"
+  "completed_at_kst": "2026-10-05T15:21:34+09:00",
+  "state_commit_sha": "85ba221e1d62408d5c11a81fd3562070fe595b4a"
 }
