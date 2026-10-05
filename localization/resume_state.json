@@ -1,5 +1,5 @@
 {
-  "schema_version": 93,
+  "schema_version": 94,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_PRODUCTION62 completed odd index173 6DC89C6E candidate b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26. A61 readable source-contact fixed all 21 physical stage rows, then A62 rendered in the same invocation using canonical phonetic Hangul and the shared blue-gray bold condensed source family. 21/21 bbox/size/positive-margin, CLEAN/FINAL PASS, outside/alpha/protected/residue/render/overlap/touch=0, readable/raw mirror_y visual PASS. Pending independent C and in-game. RUNTIME_VALIDATION=UNTESTED.",
     "C203 finalized A60 index163 59A79158 candidate 1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583. Independent canonical source+atlas QA reproduces source/localized bboxes 24/24 exactly, 24/24 containment/size/positive-margin and canonical phonetic stage binding PASS; outside/alpha/introduced-visible/source-residue/overlap/touch all 0. Controller contacts/raw mirror_y PASS. C203_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "C206 finalized B152 index32 DCC7B488 candidate 958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14 and positively classifies zoom_review Total Rank -> 종합 랭킹. Corrected C verifier shows strict source-script residue=0, exact localized bbox 1/1, outside/alpha/render/protected all 0; Coons clean plate is visually seamless with low boundary RGB deltas, controller SOURCE/CLEAN/FINAL/raw mirror_y PASS. C204/C205 were verifier-only false positives on same candidate bytes. C206_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION60 completed odd index163 59A79158 candidate 1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583. A58 source contact proved physical order idx0..23 = Waterfalls..Castle Wall (reverse artwork-plan list). A59 was machine-safe but rejected as visually undersized; A60 restored source-family shared vertical scale. 24/24 bbox/size/positive-margin, CLEAN/FINAL PASS, outside/alpha/protected/residue/render/overlap/touch=0, readable/raw mirror_y self-QA PASS. C203 machine QA independently matches 24/24 source/localized bboxes but C controller remains pending. Index143 stale pending state reconciled to preserve-original song-title policy. RUNTIME_VALIDATION=UNTESTED.",
@@ -3941,7 +3942,7 @@
     "c176_return_resolved": true,
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_artwork_localize_text": 10,
+  "current_pending_artwork_localize_text": 9,
   "current_producer_rework_remaining": 1,
   "current_producer_rework_assets": [
     "37759842"
@@ -4056,7 +4057,9 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [],
+  "current_pending_c": [
+    "6DC89C6E"
+  ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -4432,11 +4435,12 @@
       "raw_orientation": "mirror_y"
     },
     "controller_visual_qa": "PASS",
-    "pending_independent_c_final_qa": true,
+    "pending_independent_c_final_qa": false,
     "c203_machine_observation": "PASS_MACHINE_ONLY_CONTROLLER_C_PENDING",
     "report": "localization/graphics/role_A/20261005-A-PRODUCTION60/A60_59A79158_REPORT.json",
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION60/A60_CONTROLLER_SELF_QA.json",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "c_final_qa": "C203_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
   },
   "index143_preserve_original_reconciliation": {
     "timestamp_kst": "2026-10-05T22:00:20+09:00",
@@ -4479,6 +4483,50 @@
     "verifier_retry_note": "C204/C205 were C-only verifier scope/threshold false positives on unchanged B152 bytes.",
     "machine_report": "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7B488_MACHINE_QA.json",
     "report": "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7B488_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "a_production62_6dc89c6e": {
+    "timestamp_kst": "2026-10-05T22:10:36+09:00",
+    "run": "20261005-A-PRODUCTION62",
+    "queue_index": 173,
+    "asset": "6DC89C6E",
+    "source_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+    "candidate_sha256": "b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26",
+    "status": "A62_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "a61_binding": "21/21 physical rows bound by controller source-contact",
+    "machine_qa": {
+      "bbox_size_positive_margin": "21/21 PASS",
+      "clean_plate_validator": "PASS",
+      "final_mask_validator": "PASS",
+      "changed_outside": 0,
+      "alpha_outside": 0,
+      "protected_changed": 0,
+      "source_residue": 0,
+      "render_outside_target": 0,
+      "overlap": 0,
+      "touch": 0
+    },
+    "source_style": {
+      "family": "shared blue-gray bold condensed all-caps stage list",
+      "shared_lowres_font_size": 18,
+      "pixel_scale": 4,
+      "alignment": "left",
+      "ice_scape_horizontal_scale": 0.9739
+    },
+    "structure": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "format": "RGBA32",
+      "raw_mode": "BGRA",
+      "mipmaps": 1,
+      "raw_orientation": "mirror_y"
+    },
+    "controller_visual_qa": "PASS",
+    "pending_independent_c_final_qa": true,
+    "report": "localization/graphics/role_A/20261005-A-PRODUCTION62/A62_6DC89C6E_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION62/A62_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
