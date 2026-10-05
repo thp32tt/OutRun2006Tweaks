@@ -123,23 +123,25 @@ for row in targets:
     ad.rectangle((x0,y0,x1-1,y1-1),fill=255)
     # Preserve A81 manual clean plate exactly; only lettering is reworked.
     final.paste(clean.crop((x0,y0,x1,y1)),(x0,y0))
-    lines=row["korean_lines"]; bands=line_bands(row,len(lines))
-    centers=[b["center"] for b in bands]
-    boundaries=[y0+2]
-    for i in range(len(centers)-1): boundaries.append(int(round((centers[i]+centers[i+1])/2)))
-    boundaries.append(y1-2)
+    lines=row["korean_lines"]
+    # C219's visual finding is a transform/alignment failure, not a semantic one.
+    # The canonical mode/continuous families use one left anchor and regular line
+    # cadence. Use the exact source-effect bbox as the stack envelope, reserve
+    # positive top/bottom margins, and divide it into equal source-style line
+    # slots; do not recenter individual Korean lines.
+    inner_top=y0+4; inner_bottom=y1-4
+    total_h=max(1,inner_bottom-inner_top)
+    boundaries=[int(round(inner_top + total_h*i/len(lines))) for i in range(len(lines)+1)]
     line_meta=[]; row_mask=Image.new("L",(W,H),0)
-    for i,(txt,b) in enumerate(zip(lines,bands)):
+    for i,txt in enumerate(lines):
         sy0,sy1=boundaries[i],boundaries[i+1]
-        slot_h=max(8,sy1-sy0-4)
-        # Preserve source indentation between lines; all new effect pixels remain
-        # positively inside the exact source effect bbox.
-        anchor=x0+3+b["source_indent"]
-        maxw=max(8,x1-anchor-3)
+        slot_h=max(12,sy1-sy0-6)
+        anchor=x0+4
+        maxw=max(8,x1-anchor-4)
         layer,fs,sw=render_line(txt,row["style"],int(row["font_size"]),int(row["stroke_px"]),maxw,slot_h)
         tx=anchor
-        ty=int(round(b["center"]-layer.height/2))
-        ty=max(sy0+2,min(ty,sy1-layer.height-2))
+        ty=sy0 + max(2,(sy1-sy0-layer.height)//2)
+        if ty+layer.height>=sy1: ty=sy1-layer.height-2
         if ty<=y0: ty=y0+2
         if ty+layer.height>=y1: ty=y1-layer.height-2
         lm=bmask(layer.getchannel("A")); tm=Image.new("L",(W,H),0); tm.paste(lm,(tx,ty))
@@ -149,7 +151,7 @@ for row in targets:
         if count(ImageChops.multiply(row_mask,tm))!=0: raise RuntimeError(("line overlap",row["idx"],i))
         row_mask=ImageChops.lighter(row_mask,tm); new_union=ImageChops.lighter(new_union,tm)
         final.paste(layer,(tx,ty),lm)
-        line_meta.append({"line":txt,"source_core_band":[b["y0"],b["y1"]],"source_indent_px":b["source_indent"],
+        line_meta.append({"line":txt,"source_left_anchor_px":x0,"localized_left_anchor_px":tx,
                           "slot":[sy0,sy1],"localized_bbox":lb,"font_size":fs,"stroke_px":sw,"shear":0.24})
     rb=list(row_mask.getbbox() or ())
     if not rb or not (rb[0]>x0 and rb[1]>y0 and rb[2]<x1 and rb[3]<y1): raise RuntimeError(("row bbox",row["idx"],rb))
@@ -216,7 +218,7 @@ report={"schema_version":1,"role":"A","run":run,"queue_index":95,"asset":asset_r
  "source_sha256":source_sha,"input_candidate_sha256":input_sha,"candidate_sha256":csha,
  "candidate_path":str(candidate.relative_to(repo)),"c219_return":"FAIL_SOURCE_TRANSFORM_ALIGNMENT_SLANT",
  "user_ingame_regressions":["IGR-014","IGR-015","IGR-016"],
- "method":"preserve A81 full-bbox manual clean plate and all non-returned candidate pixels; rerender only 16 continuous/mode rows using source line-band vertical centers, preserved per-line source indents, true 0.24 shear, left anchors and native Korean glyphs",
+ "method":"preserve A81 full-bbox manual clean plate and all non-returned candidate pixels; rerender only 16 continuous/mode rows using one shared source-left anchor, regular source-stack line cadence, true 0.24 shear and native Korean glyphs",
  "structure":{"dimensions":[W,H],"format":"RGBA32","pitch":pitch,"mipmaps":mips,"header_128_exact":candidate.read_bytes()[:128]==cb[:128],"raw_orientation":"mirror_y"},
  "rows":row_results,"all_16_containment_size_positive_margin_pass":all(r["containment"]=="PASS" and r["size_ceiling"]=="PASS" and r["positive_margin"]=="PASS" for r in row_results),
  "machine_checks":{"changes_outside_c219_transform_rows":outside,"alpha_changes_outside_c219_transform_rows":alpha_out,
