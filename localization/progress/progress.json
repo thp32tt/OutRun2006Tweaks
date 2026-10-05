@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T04:23:30+09:00",
+  "updated_at_kst": "2026-10-06T04:54:42+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B166 completed B-owned P1 IGR-002 screenshot(144) exact GRAPHICS multi-asset mapping: BA0147DA large Heart Attack title/Showroom state, 8C259C68 help copy, D657C2EB gray Heart/Time selector. Material rework candidates BA f5838261bd2015ade657d51f45175f1ef1c0351252c6505dc5eaf985be54d5a1 and 8C 8da8dbf1d5f577605e2268841667fdd64636f4358f27e17103587ee032c2575c use more source-relative height at native HD; D657 6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5 preserved. Both touched rows 1/1 bbox+size+positive-margin and outside/alpha/protected/render-overlap=0; controller SOURCE/OLD/CLEAN/FINAL+full/raw visual PASS. IGR-002 B static PASS pending independent C + NEW actual in-game retest; not closed.",
+  "next_checkpoint": "A88 completed A-owned P1 IGR-001 screenshot(143) exact GRAPHICS multi-asset repair. BA0147DA(212) C2C title -> 61ae0c45568e023cc258379173f8d80f43cc5257f2d8facefbcf3c87759179e1; 8C259C68(188) C2C help -> 00e16af1e3d468667fe13ed5291ec55bbfd06f18e6895a6be7e79f413ade94bd; D657C2EB(220) C2C selector -> 1a57c385e6c3ea2cc368888041e7106aab79bc4ab364daf0b51edd4465fcc935; C171 754F0599 top SINGLE PLAYER header preserved. Each changed row 1/1 exact bbox+size+positive-margin with outside/alpha/protected/render-overlap=0; controller SOURCE/OLD/CLEAN/FINAL and full-atlas review PASS. IGR-001 is producer static PASS only, pending independent C + NEW actual in-game retest; not closed.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1348,53 +1348,53 @@
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     },
     "latest_a_production": {
-      "run": "A87",
-      "index": 121,
-      "asset": "FD90AA9",
-      "candidate_sha256": "3d000de4c8c88645f4f50deb388e2538a00154783a1db4b848f15f7e7bf86894",
-      "result": "A87_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
-      "user_ingame_regressions": [
-        "IGR-018"
+      "run": "A88",
+      "regression": "IGR-001",
+      "screen": "SINGLE_PLAY_C2C_INTRO",
+      "indices": [
+        212,
+        188,
+        220,
+        175
       ],
-      "prior_candidate_sha256": "16f605a90a072b39c071e24edae578f181afd8d229e2238a9f6100815420da94",
-      "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
-      "bbox_size_positive_margin": "3/3 PASS",
+      "mapping": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+      "candidate_sha256": {
+        "BA0147DA": "61ae0c45568e023cc258379173f8d80f43cc5257f2d8facefbcf3c87759179e1",
+        "8C259C68": "00e16af1e3d468667fe13ed5291ec55bbfd06f18e6895a6be7e79f413ade94bd",
+        "D657C2EB": "1a57c385e6c3ea2cc368888041e7106aab79bc4ab364daf0b51edd4465fcc935",
+        "754F0599": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250"
+      },
+      "result": "A88_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+      "bbox_size_positive_margin": {
+        "BA0147DA": "1/1 PASS",
+        "8C259C68": "1/1 PASS",
+        "D657C2EB": "1/1 PASS"
+      },
       "pixel_gates": {
-        "outside": 0,
-        "alpha_outside": 0,
-        "clean_residue": 0,
-        "localized_overlap": 0,
-        "localized_touch": 0
+        "BA0147DA": {
+          "outside": 0,
+          "alpha_outside": 0,
+          "protected": 0,
+          "render_protected_overlap": 0
+        },
+        "8C259C68": {
+          "outside": 0,
+          "alpha_outside": 0,
+          "protected": 0,
+          "render_protected_overlap": 0
+        },
+        "D657C2EB": {
+          "outside": 0,
+          "alpha_outside": 0,
+          "protected": 0,
+          "render_protected_overlap": 0
+        }
       },
-      "style": {
-        "font": "Noto Sans CJK KR Black",
-        "native_font_size_px": 120,
-        "shear": 0.28,
-        "alignment": "source-centered horizontal + positive vertical cadence",
-        "old_bitmap_reused": false
-      },
-      "structure": {
-        "dimensions": [
-          4096,
-          4096
-        ],
-        "format": "RGBA32",
-        "mipmaps": 1,
-        "header_128_exact": true,
-        "raw_orientation": "mirror_y"
-      },
-      "controller_visual_qa": "PASS_IGR018_SHARED_HEADER_FAMILY_NATIVE_STYLE_AND_CADENCE",
-      "report": "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_IGR018_FD90_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_CONTROLLER_SELF_QA.json",
+      "controller_visual_qa": "PASS_NATIVE_HD_C2C_HIERARCHY_AND_SCOPE",
+      "report": "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_IGR001_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_CONTROLLER_SELF_QA.json",
       "runtime_validation": "PENDING_NEW_INGAME_RETEST",
-      "additional_mapping_reconcile": {
-        "regressions": [
-          "IGR-008",
-          "IGR-011"
-        ],
-        "report": "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_IGR008_011_MAPPING_RECONCILE.json",
-        "decision": "EXACT_GRAPHICS_MULTI_ASSET_NO_LOCALIZATION_RUNTIME_TEXT"
-      }
+      "pending_independent_c_static_qa": true
     },
     "latest_a_rework": {
       "run": "A45",
@@ -1881,5 +1881,10 @@
       }
     },
     "runtime_validation": "UNTESTED"
-  }
+  },
+  "current_pending_c": [
+    "BA0147DA",
+    "8C259C68",
+    "D657C2EB"
+  ]
 }
