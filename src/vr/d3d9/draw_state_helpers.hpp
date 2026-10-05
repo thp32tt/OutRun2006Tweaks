@@ -5,6 +5,13 @@
 
 namespace OutRunVR::D3D9
 {
+    inline bool ReadViewport(
+        IDirect3DDevice9* device,
+        D3DVIEWPORT9& viewport) noexcept
+    {
+        return device && SUCCEEDED(device->GetViewport(&viewport));
+    }
+
     struct LiveEffectRenderStateSnapshot
     {
         DWORD alphaBlend = FALSE;
