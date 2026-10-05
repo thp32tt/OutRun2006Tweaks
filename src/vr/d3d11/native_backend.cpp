@@ -8813,12 +8813,150 @@ bool validate_programmable_resource_behavior_readiness_snapshot(
         current.missingResourceScopeMask != 0;
 }
 
+NativeProgrammableShaderTextureResourceBehaviorReadiness
+compose_programmable_texture_resource_behavior_readiness(
+    const NativeProgrammableShaderResourceBehaviorReadiness& geometryBehavior,
+    std::uint64_t geometrySnapshotToken,
+    const NativeManagedTextureRegistry& textureRegistry,
+    const void* const* textureKeys,
+    std::size_t textureCount,
+    ID3D11Device* expectedDevice,
+    const NativeManagedTextureStageReadiness& textureStages,
+    std::uint64_t textureStageSnapshotToken) noexcept {
+    NativeProgrammableShaderTextureResourceBehaviorReadiness out{};
+    constexpr std::uint32_t kGeometryScopeMissing = 1u << 0;
+    constexpr std::uint32_t kTextureScopeMissing = 1u << 1;
+    constexpr std::uint32_t kOutputScopeMissing = 1u << 2;
+
+    out.kind = geometryBehavior.kind;
+    out.indexed = geometryBehavior.indexed;
+    out.requiredTextureMask = textureStages.requiredMask;
+    out.readyTextureMask = textureStages.readyMask;
+    out.pendingTextureMask = textureStages.pendingMask;
+    out.sourceRevalidationSnapshotToken =
+        geometryBehavior.sourceRevalidationSnapshotToken;
+    out.geometrySnapshotToken = geometrySnapshotToken;
+    out.textureStageSnapshotToken = textureStageSnapshotToken;
+
+    out.inputValid =
+        geometrySnapshotToken != 0 &&
+        textureStageSnapshotToken != 0 &&
+        expectedDevice != nullptr;
+    out.geometryReviewReady =
+        geometryBehavior.reviewReady &&
+        geometryBehavior.boundaryPreserved &&
+        geometryBehavior.geometryResourceBehaviorExact &&
+        geometryBehavior.reviewSnapshotToken != 0;
+    out.geometrySnapshotMatches =
+        out.geometryReviewReady &&
+        geometryBehavior.reviewSnapshotToken == geometrySnapshotToken;
+
+    out.requiredTextureScopePresent = textureStages.requiredMask != 0;
+    out.textureStagesInputValid = textureStages.inputValid;
+    const bool allMasksExact =
+        textureStages.registeredMask == textureStages.requiredMask &&
+        textureStages.shadowValidMask == textureStages.requiredMask &&
+        textureStages.resourcesOwnedMask == textureStages.requiredMask &&
+        textureStages.lifetimeCurrentMask == textureStages.requiredMask &&
+        textureStages.deviceMatchesMask == textureStages.requiredMask &&
+        textureStages.descriptorExactMask == textureStages.requiredMask &&
+        textureStages.readyMask == textureStages.requiredMask &&
+        textureStages.pendingMask == 0;
+    out.textureStageSnapshotMatches =
+        out.requiredTextureScopePresent &&
+        out.textureStagesInputValid &&
+        textureStages.allRequiredReady &&
+        allMasksExact &&
+        textureStages.snapshotToken != 0 &&
+        textureStages.snapshotToken == textureStageSnapshotToken &&
+        textureRegistry.validate_mirror_readiness_snapshot_for_stages(
+            textureKeys, textureCount, textureStages.requiredMask,
+            expectedDevice, textureStageSnapshotToken);
+
+    out.geometryResourceBehaviorExact =
+        out.geometryReviewReady &&
+        out.geometrySnapshotMatches;
+    out.textureResourceBehaviorExact =
+        out.textureStageSnapshotMatches;
+
+    // R261 deliberately leaves output-resource behavior unproven. It also
+    // treats the required texture mask as an explicit caller-supplied scope;
+    // F21 remains responsible for shader semantic translation/readiness.
+    out.outputResourceBehaviorProofPresent = false;
+    out.missingResourceScopeMask = 0;
+    if (!out.geometryResourceBehaviorExact)
+        out.missingResourceScopeMask |= kGeometryScopeMissing;
+    if (!out.textureResourceBehaviorExact)
+        out.missingResourceScopeMask |= kTextureScopeMissing;
+    if (!out.outputResourceBehaviorProofPresent)
+        out.missingResourceScopeMask |= kOutputScopeMissing;
+    out.fullResourceBehaviorProofPresent =
+        out.missingResourceScopeMask == 0;
+
+    out.diagnosticOnly = true;
+    out.boundaryPreserved =
+        geometryBehavior.boundaryPreserved &&
+        out.diagnosticOnly &&
+        !out.fullResourceBehaviorProofPresent &&
+        out.missingResourceScopeMask != 0;
+    out.reviewReady =
+        out.inputValid &&
+        out.geometryReviewReady &&
+        out.geometrySnapshotMatches &&
+        out.textureResourceBehaviorExact &&
+        out.boundaryPreserved;
+
+    if (out.reviewReady) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.kind));
+        token = mix_readiness_snapshot_token(token, out.indexed ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceRevalidationSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.geometrySnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.requiredTextureMask);
+        token = mix_readiness_snapshot_token(
+            token, out.textureStageSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.missingResourceScopeMask);
+        token = mix_readiness_snapshot_token(token, 0x261u);
+        out.reviewSnapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_programmable_texture_resource_behavior_readiness_snapshot(
+    const NativeProgrammableShaderResourceBehaviorReadiness& geometryBehavior,
+    std::uint64_t geometrySnapshotToken,
+    const NativeManagedTextureRegistry& textureRegistry,
+    const void* const* textureKeys,
+    std::size_t textureCount,
+    ID3D11Device* expectedDevice,
+    const NativeManagedTextureStageReadiness& textureStages,
+    std::uint64_t textureStageSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept {
+    if (reviewSnapshotToken == 0)
+        return false;
+    const auto current =
+        compose_programmable_texture_resource_behavior_readiness(
+            geometryBehavior, geometrySnapshotToken,
+            textureRegistry, textureKeys, textureCount, expectedDevice,
+            textureStages, textureStageSnapshotToken);
+    return current.reviewReady &&
+        current.reviewSnapshotToken == reviewSnapshotToken &&
+        current.geometryResourceBehaviorExact &&
+        current.textureResourceBehaviorExact &&
+        !current.outputResourceBehaviorProofPresent &&
+        !current.fullResourceBehaviorProofPresent &&
+        current.missingResourceScopeMask == (1u << 2);
+}
+
 NativeProgrammableShaderActivationPrerequisiteHandoff
 compose_programmable_activation_prerequisite_handoff(
     const NativeProgrammableShaderDormantSourceRevalidationReadiness&
         sourceRevalidation,
     std::uint64_t sourceRevalidationSnapshotToken,
-    const NativeProgrammableShaderResourceBehaviorReadiness& resourceBehavior,
+    const NativeProgrammableShaderTextureResourceBehaviorReadiness& resourceBehavior,
     std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken) noexcept {
@@ -8850,6 +8988,7 @@ compose_programmable_activation_prerequisite_handoff(
         resourceBehavior.reviewReady &&
         resourceBehavior.boundaryPreserved &&
         resourceBehavior.geometryResourceBehaviorExact &&
+        resourceBehavior.textureResourceBehaviorExact &&
         resourceBehavior.reviewSnapshotToken != 0 &&
         resourceBehavior.kind == out.kind &&
         resourceBehavior.indexed == out.indexed &&
@@ -8861,9 +9000,15 @@ compose_programmable_activation_prerequisite_handoff(
             resourceBehaviorSnapshotToken;
     out.resourceBehaviorGeometryProofPresent =
         out.resourceBehaviorReviewReady &&
-        out.resourceBehaviorSnapshotMatches;
+        out.resourceBehaviorSnapshotMatches &&
+        resourceBehavior.geometryResourceBehaviorExact;
+    out.resourceBehaviorTextureProofPresent =
+        out.resourceBehaviorReviewReady &&
+        out.resourceBehaviorSnapshotMatches &&
+        resourceBehavior.textureResourceBehaviorExact;
     out.resourceBehaviorCoverageComplete =
         out.resourceBehaviorGeometryProofPresent &&
+        out.resourceBehaviorTextureProofPresent &&
         resourceBehavior.fullResourceBehaviorProofPresent &&
         resourceBehavior.missingResourceScopeMask == 0;
 
@@ -8877,9 +9022,10 @@ compose_programmable_activation_prerequisite_handoff(
         out.inputLayoutOwnershipReady &&
         inputLayout.snapshotToken == inputLayoutSnapshotToken;
 
-    // R260 now provides a concrete, current geometry-behavior proof. F18 as a
-    // whole remains absent until texture/output resource behavior is equally
-    // exact. F21 semantic shader translation also remains absent.
+    // R260+R261 now provide concrete current geometry and supplied-texture
+    // behavior proofs. F18 as a whole remains absent until output-resource
+    // behavior is equally exact. F21 semantic shader translation also remains
+    // absent.
     out.resourceBehaviorProofPresent =
         out.resourceBehaviorCoverageComplete;
     out.inputLayoutProofPresent =
@@ -8937,6 +9083,8 @@ compose_programmable_activation_prerequisite_handoff(
         token = mix_readiness_snapshot_token(
             token, out.resourceBehaviorGeometryProofPresent ? 1u : 0u);
         token = mix_readiness_snapshot_token(
+            token, out.resourceBehaviorTextureProofPresent ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
             token, out.resourceBehaviorCoverageComplete ? 1u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.inputLayoutProofPresent ? 1u : 0u);
@@ -8954,7 +9102,7 @@ bool validate_programmable_activation_prerequisite_handoff_snapshot(
     const NativeProgrammableShaderDormantSourceRevalidationReadiness&
         sourceRevalidation,
     std::uint64_t sourceRevalidationSnapshotToken,
-    const NativeProgrammableShaderResourceBehaviorReadiness& resourceBehavior,
+    const NativeProgrammableShaderTextureResourceBehaviorReadiness& resourceBehavior,
     std::uint64_t resourceBehaviorSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken,
@@ -8968,6 +9116,7 @@ bool validate_programmable_activation_prerequisite_handoff_snapshot(
     return current.reviewReady &&
         current.reviewSnapshotToken == reviewSnapshotToken &&
         current.resourceBehaviorGeometryProofPresent &&
+        current.resourceBehaviorTextureProofPresent &&
         !current.resourceBehaviorCoverageComplete &&
         !current.activationPrerequisitesSatisfied &&
         !current.nativeDrawPathActivationAllowed &&
