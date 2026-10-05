@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C184-63C91067",
+  "qa_id": "C184",
+  "timestamp_kst": "2026-10-05T19:02:14+09:00",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "candidate_sha256": "ef51bc2653cc52796c632e57c53dfb8ac27c40706059881960ea030810a1cdd0",
+  "candidate_changed_by_C": false,
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "2/2 PASS",
+  "controller_visual_qa": "FAIL_STARBURST_CLEAN_PLATE_RECONSTRUCTION_ARTIFACTS",
+  "visual_findings": [
+    "Pink cloud clean plate is materially improved and no source title is visible.",
+    "Lower starburst CLEAN still contains non-source horizontal/smeared interpolation structure across the top-center title-removal zone and irregular glow/texture continuity; the artifact remains visible behind the Korean title in FINAL.",
+    "All exact-pixel counters being zero does not override the clean-plate visual fidelity gate."
+  ],
+  "decision": "C184_REWORK_REQUIRED_STARBURST_CLEAN_PLATE_RECONSTRUCTION_ARTIFACTS",
+  "required_rework": "Reconstruct only the starburst title-removal area from source-faithful interior texture/gradient without horizontal bands, smears, donor boundaries or spike/glow damage, then rerun exact-pixel and C visual QA.",
+  "machine_report": "localization/graphics/role_C/20261005-C184-63C91067/C184_63C91067_MACHINE_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C184-63C91067/C184_ROW0_DETAIL_B64.txt",
+    "localization/graphics/role_C/20261005-C184-63C91067/C184_ROW1_DETAIL_B64.txt",
+    "localization/graphics/role_C/20261005-C184-63C91067/C184_OVERVIEW_B64.txt",
+    "localization/graphics/role_C/20261005-C184-63C91067/C184_RAW_B64.txt"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
