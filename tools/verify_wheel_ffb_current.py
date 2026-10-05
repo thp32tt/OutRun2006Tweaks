@@ -185,6 +185,8 @@ req(math, '(0.100f + 0.080f * speedGate)', 'Imperial brick/stone tactile floor h
 req(ffb, 'imperialStoneFloor', 'runtime applies the brick/stone tactile floor')
 req(math, '0.90f, -0.68f, 0.50f', 'shared wall collision pulse has the R12 tactile gain')
 req(wheel_ui, 'legacy Model=2 is migrated to Modern DD', 'retired Model=2 is absent from selectable FFB models')
+req(ini, '; 2 = retired legacy Hybrid (automatically migrates to Modern DD)', 'shipped INI marks Model 2 retired')
+forbid(ini, '; 2 = Arcade + Modern Hybrid', 'shipped INI does not advertise retired Hybrid as selectable')
 req(math, 'if (value == 2)', 'legacy Hybrid model ID maps safely to Modern DD')
 req(ffb, 'WheelFFBMath::SnowIceComfortTextureScale', 'core consumes the shared R10 snow comfort scale')
 req(build, 'WheelFFBMath::SnowIceComfortTextureScale', 'compatibility wrapper consumes the same R10 snow comfort scale')
