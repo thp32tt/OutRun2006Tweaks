@@ -2072,7 +2072,7 @@ namespace outrun::vr::dx11
                     {
                     case ProgrammableShaderOperandRole::DestinationRegister:
                         operand.role =
-                            ProgrammableShaderOperandRole::Destination;
+                            ProgrammableShaderSemanticOperandRole::Destination;
                         operand.writeMask =
                             classified.componentSelection;
                         operand.destinationModifier =
@@ -2088,7 +2088,7 @@ namespace outrun::vr::dx11
 
                     case ProgrammableShaderOperandRole::SourceRegister:
                         operand.role =
-                            ProgrammableShaderOperandRole::Source;
+                            ProgrammableShaderSemanticOperandRole::Source;
                         operand.sourceSwizzle =
                             classified.componentSelection;
                         operand.sourceModifier =
@@ -2114,7 +2114,7 @@ namespace outrun::vr::dx11
                     case ProgrammableShaderOperandRole::
                             RelativeAddressRegister:
                         operand.role =
-                            ProgrammableShaderOperandRole::RelativeAddress;
+                            ProgrammableShaderSemanticOperandRole::RelativeAddress;
                         operand.sourceSwizzle =
                             classified.componentSelection;
                         operand.sourceModifier =
@@ -2130,14 +2130,14 @@ namespace outrun::vr::dx11
                         ++out.relativeAddressTokenCount;
                         break;
 
-                    case ProgrammableShaderOperandRole::DeclarationToken:
+                    case ProgrammableShaderSemanticOperandRole::DeclarationToken:
                         operand.role =
-                            ProgrammableShaderOperandRole::Declaration;
+                            ProgrammableShaderSemanticOperandRole::Declaration;
                         break;
 
-                    case ProgrammableShaderOperandRole::ImmediateDword:
+                    case ProgrammableShaderSemanticOperandRole::ImmediateDword:
                         operand.role =
-                            ProgrammableShaderOperandRole::Immediate;
+                            ProgrammableShaderSemanticOperandRole::Immediate;
                         break;
 
                     case ProgrammableShaderOperandRole::PredicateRegister:
