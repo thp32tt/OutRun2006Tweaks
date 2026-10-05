@@ -114,8 +114,8 @@ mask_discovery['outrun2sp_protected']={'window':[tx0,ty0,tx1,ty1],'seed_kind':'o
 # Two physical Transmission labels are baked into this atlas and were left English
 # in B32. The user screenshot shows duplicate/ghost English/Korean selector text, so
 # both native-HD source labels are now part of the graphics rework.
-trans_black,mask_discovery['transmission_black']=semantic_mask('transmission_black',(0,175,620,320),'black',12)
-trans_white,mask_discovery['transmission_white']=semantic_mask('transmission_white',(520,175,1145,320),'white',12)
+trans_black,mask_discovery['transmission_black']=semantic_mask('transmission_black',(0,196,620,320),'black',8)
+trans_white,mask_discovery['transmission_white']=semantic_mask('transmission_white',(520,196,1120,320),'white',8)
 
 # The remaining user-visible labels retain their exact source masks.
 music,mask_discovery['music_change']=semantic_mask('music_change',(900,45,1500,176),'white',12)
@@ -130,8 +130,8 @@ source_masks={
 }
 expected={
  'for_experts':{'x':(0,600),'y':(60,210),'text':'상급자용','source':'For Experts','style':'red_white_navy','slant':0.24},
- 'transmission_black':{'x':(0,620),'y':(175,320),'text':'변속기','source':'Transmission','style':'black_transmission','slant':0.18},
- 'transmission_white':{'x':(520,1145),'y':(175,320),'text':'변속기','source':'Transmission','style':'white_transmission','slant':0.18},
+ 'transmission_black':{'x':(0,620),'y':(196,320),'text':'변속기','source':'Transmission','style':'black_transmission','slant':0.18},
+ 'transmission_white':{'x':(520,1120),'y':(196,320),'text':'변속기','source':'Transmission','style':'white_transmission','slant':0.18},
  'music_change':{'x':(900,1500),'y':(45,176),'text':'음악 변경','source':'Music Change','style':'white_shadow','slant':0.16},
  'time_remaining':{'x':(1120,1960),'y':(176,310),'text':'남은 시간:','source':'Time remaining :','style':'white_navy','slant':0.16},
 }
