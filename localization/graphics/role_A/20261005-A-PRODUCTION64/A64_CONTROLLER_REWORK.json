@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION64",
+  "timestamp_kst": "2026-10-05T22:18:30+09:00",
+  "queue_index": 193,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "candidate_sha256": "98fbeb14b6eeadc5b6ff5002377d025409da14fe7272829bf14383b38af14be4",
+  "machine_status": "PASS",
+  "controller_visual_qa": "REWORK_REQUIRED_PRODUCT_TOKEN_PIXEL_PRESERVATION",
+  "findings": [
+    "Static geometry and protected-region gates pass for all 13 localized targets.",
+    "A64 correctly preserves the large OUTRUN2SP logo, SP/OR fragments, TESTAROSSA, non-text region, and the top OUTRUN line of OUTRUN SHOWROOM.",
+    "However, sentence rows idx1 and idx2 re-render the Latin product tokens OutRun / OutRun2SP together with the Korean descriptor. The established C151 policy requires these product tokens to remain original source pixels while only the descriptor is localized."
+  ],
+  "required_rework": "Preserve the original inline OutRun / OutRun2SP word pixels exactly in idx1/idx2, remove only the surrounding generic sentence text, render only the Korean descriptor without overlap, and rerun exact-pixel plus visual QA.",
+  "decision": "A64_REWORK_REQUIRED_INLINE_PRODUCT_TOKEN_PIXEL_PRESERVATION",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
