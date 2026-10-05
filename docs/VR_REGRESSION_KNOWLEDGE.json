@@ -283,7 +283,7 @@
         "preserve improved frame stability",
         "do not restore blanket queue-to-HUD ownership"
       ],
-      "nextAction": "Trace producer -> node tag -> queue SelectSpriteQueueNode -> renderer SetVertexShaderConstantF(c64) -> R30 draw ordering. Make exact semantic ownership visible at c64 time or move the renderer bypass to an equally exact producer-safe boundary; no blanket queue-to-HUD promotion.",
+      "nextAction": "Quest3/VDXR CORRECTNESS-test exact build 4f28c61359c0dc351c6b364cd53058fa45ce55d2 with VRTelemetry enabled. Use exact C64/DRAW producer fingerprints to determine whether ScreenHud producer identity is visible at c64 and survives to the same queued draw. Keep ProducerToken diagnostic-only; do not promote or classify rendering from token identity. RUNTIME_VALIDATION remains UNTESTED until matching HMD evidence exists.",
       "recurrenceCount": 1,
       "testLevel": 1,
       "riskPaths": [
@@ -318,6 +318,25 @@
         "packageSha256": "701a57ca5e4a1ba413bcdd75ad6fc6ecc320f6fc3dbb0dbd5a0597cb6ba81d89",
         "result": "white HUD/position rank HUD still doubled and headset-following; R51 world stereo preserved",
         "telemetry": "semanticHudAccepted=93681; semanticOverlayBypass=0"
+      },
+      "diagnosticInstrumentation": {
+        "taskId": "CONVERSION-DX9EX-00405",
+        "validationBearingSha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+        "producerTokens": [
+          "RankMarkerSprani",
+          "RankMarkerClipSprite",
+          "ExactScreenHudClipSprite",
+          "RivalMarkerSprani",
+          "TextGlyphPutSprite"
+        ],
+        "evidence": "Exact producer identity now follows already-explicit RenderScope through SpriteNode registration, Sumo replay, queue selection and renderer c64 provenance into draw-time telemetry. ProducerToken is diagnostic-only and does not grant rendering classification authority.",
+        "telemetry": [
+          "VR R51 C64 FINGERPRINT: producer/scope/queueEpoch/drawSerial/shaderSerial",
+          "VR R51 DRAW FINGERPRINT: producer/c64Scope/drawScope/nodeRelation",
+          "R51 producer fingerprint draws/sameNode/otherNode/noNode/scopeMismatch counters"
+        ],
+        "staticValidation": "N100 exact-SHA producer provenance + HUD/cadence + Sumo replay + R31/R32 retirement + architecture + hook graph + refactor contracts PASS; GitHub DX9Ex Active 37271535226 SUCCESS; Domain Isolation 37271535231 SUCCESS.",
+        "runtimeValidation": "UNTESTED"
       }
     },
     {
@@ -338,7 +357,7 @@
         "do not flatten rank markers into generic SCREEN_HUD",
         "preserve verified-good R51 world stereo and frame stability"
       ],
-      "nextAction": "Use EXE map to reconstruct the exact Calc3D2D/vehicle anchor data flow for BAD20 plus BBC5A/BC2E5/BC346 sibling producers. Preserve anchor metadata through every queued node/digit and consume it in per-eye world projection rather than only assigning WORLD_BILLBOARD scope.",
+      "nextAction": "Quest3/VDXR CORRECTNESS-test exact build 4f28c61359c0dc351c6b364cd53058fa45ce55d2 with VRTelemetry enabled and correlate RankMarker/RivalMarker producer fingerprints from c64 to draw. Use that evidence to separate semantic-lifetime loss from the still-unrecovered vehicle/world anchor transform. Do not treat producer identity as WORLD_BILLBOARD classification authority; RUNTIME_VALIDATION remains UNTESTED.",
       "recurrenceCount": 1,
       "testLevel": 1,
       "riskPaths": [
@@ -369,6 +388,31 @@
         "sessionId": "20260923T164207853Z-2202b186",
         "result": "vehicle rank labels remain detached from vehicles, move with headset, and affected rank/position elements are doubled",
         "telemetry": "R30 screen worldBillboard counter remained 0 while r44 spatial reached 5154"
+      },
+      "diagnosticInstrumentation": {
+        "taskId": "CONVERSION-DX9EX-00405",
+        "validationBearingSha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+        "producerTokens": [
+          "RankMarkerSprani",
+          "RankMarkerClipSprite",
+          "ExactScreenHudClipSprite",
+          "RivalMarkerSprani",
+          "TextGlyphPutSprite"
+        ],
+        "evidence": "Exact producer identity now follows already-explicit RenderScope through SpriteNode registration, Sumo replay, queue selection and renderer c64 provenance into draw-time telemetry. ProducerToken is diagnostic-only and does not grant rendering classification authority.",
+        "telemetry": [
+          "VR R51 C64 FINGERPRINT: producer/scope/queueEpoch/drawSerial/shaderSerial",
+          "VR R51 DRAW FINGERPRINT: producer/c64Scope/drawScope/nodeRelation",
+          "R51 producer fingerprint draws/sameNode/otherNode/noNode/scopeMismatch counters"
+        ],
+        "staticValidation": "N100 exact-SHA producer provenance + HUD/cadence + Sumo replay + R31/R32 retirement + architecture + hook graph + refactor contracts PASS; GitHub DX9Ex Active 37271535226 SUCCESS; Domain Isolation 37271535231 SUCCESS.",
+        "runtimeValidation": "UNTESTED",
+        "focus": [
+          "RankMarkerSprani",
+          "RankMarkerClipSprite",
+          "RivalMarkerSprani"
+        ],
+        "note": "This instrumentation identifies producer lifetime/c64 correlation only; it does not reconstruct the missing vehicle/world anchor transform and does not claim the rank-anchor defect fixed."
       }
     },
     {
@@ -492,7 +536,14 @@
         "artifactId": 11327231626,
         "artifactDigestSha256": "44a63e786dbd2a304de8b4a8b248d407aa30e2eb2b3cd4a4520ed5661cf8aa52"
       },
-      "nextAction": "Quest3/VDXR runtime-test exact build 4183a3bc6970653b5dab60a8f5c64ba1bc01c318. Keep RUNTIME_VALIDATION=UNTESTED and do not mark DONE until matching runtime evidence passes."
+      "nextAction": "Quest3/VDXR runtime-test exact build 4f28c61359c0dc351c6b364cd53058fa45ce55d2. Verify replayed exact HUD/world producer fingerprints remain coherent on non-tick frames while ordinary untagged replay stays ScreenOverlay2D. Keep RUNTIME_VALIDATION=UNTESTED and do not mark DONE until matching runtime evidence passes.",
+      "producerProvenanceExtension": {
+        "taskId": "CONVERSION-DX9EX-00405",
+        "validationBearingSha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+        "summary": "SumoUISpriteReplay now snapshots and restores ProducerToken together with the existing explicit RenderScope on fresh replay nodes, preserving diagnostic producer lineage without changing the ScreenOverlay2D fallback or render classification.",
+        "validation": "Exact-SHA static + DX9Ex Active 37271535226 + Domain Isolation 37271535231 PASS",
+        "runtimeValidation": "UNTESTED"
+      }
     },
     {
       "key": "VR-REGRESSION-DIVERGED-HUD-CADENCE-20261005",
