@@ -151,3 +151,70 @@ The policy differs by branch:
 - Full GPLv3 terms are stored in `COPYING.GPL3`.
 
 Further GPL/LGPL imports must be added to this ledger before release.
+
+
+## 2026-10-05 retained patterns from current VR mods
+
+A fresh review of actively developed flat-to-VR projects did not justify replacing the OutRun architecture. It did strengthen four design rules that should be used in future implementation/review work.
+
+### 1. UI composition is a presentation responsibility
+
+Recent game-specific VR ports increasingly separate world stereo from screen UI. For OutRun, the retained rule is:
+
+```text
+world geometry / world markers -> per-eye world projection
+screen HUD / menus             -> common binocular source
+optional future VR UI          -> host/compositor composition layer
+```
+
+This is compatible with the existing semantic split in `VR_HUD_SEMANTIC_BASELINE.md`. A future composition-layer prototype must not move WORLD_RIVAL_MARKER, WORLD_HEART or other world-attached families into a head-locked/common HUD plane.
+
+The experiment belongs behind host compositor/layer ownership. R33 remains the final physical D3D9 stereo draw owner and should not absorb UI-compositor responsibilities.
+
+### 2. Separate frame-global effect production from per-eye projection
+
+Cyberpunk VR's recent fixes provide a useful failure-mode pattern: temporal/environment/shadow state can break when both eyes independently regenerate state that the original engine treats as authoritative/shared.
+
+For OutRun lens-flare, SkyGlow and similar effects, future root-cause work should trace four boundaries independently:
+
+```text
+producer state
+    -> frame/global accumulated state
+        -> eye-space projection/placement
+            -> physical eye draw
+```
+
+Do not assume the fix is merely "draw once" or "draw twice." Only state proven to be frame-global should be produced once; eye-dependent projection and visibility remain per-eye.
+
+### 3. Make stereo-pair identity explicit at submission
+
+OutRun already carries most of the required identity: frame ID, pose sequence/render-pose identity, transport generation/slot and effective rendered eye metadata.
+
+Future hardening should prefer a deterministic final-submit invariant equivalent to:
+
+```text
+left.frame       == right.frame
+left.pose        == right.pose
+submitted.pose   == rendered.pose
+transport.gen    == accepted.gen
+stale generation == reject/fallback
+```
+
+A compact `StereoPairIdentity { frameId, poseSequence, transportGeneration }` diagnostic/verifier is preferred over additional heuristic eye detection. This should be verifier/telemetry first; no runtime authority change is implied by the reference review itself.
+
+### 4. Backend changes remain measurement-driven
+
+DXVK 3.1 includes current presentation/overlay/D3D9 compatibility work, but that is not evidence that DXVK is faster for OutRun VR. DX9Ex remains the primary correctness reference. DX11 Native and DXVK remain downstream ports until identical-scene Quest3/VDXR measurements prove parity or advantage.
+
+### Deferred techniques
+
+The following recent techniques are intentionally not adopted into the current correctness path:
+
+- native/interpolated VR frame generation;
+- optical-flow eye synthesis;
+- single-pass stereo research paths;
+- aggressive OpenXR FOV cropping/FFR as a substitute for fixing renderer cost.
+
+These may be revisited only after world stereo, HUD ownership, effect placement and 72/90-Hz frame pacing have a stable runtime baseline.
+
+Source identities and provenance notes are catalogued in `docs/VR_UPSTREAM_REFERENCES.md`.
