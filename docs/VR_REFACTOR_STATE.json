@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-05T14:12:30+09:00",
+  "updatedKst": "2026-10-05T14:29:32+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -159,7 +159,8 @@
     "Verifier continuation 8b752bbaf86e4fde7f2dc943f5e3536ee6291e57 pins exact R30 lower-hook delegation, acquire-load readiness, and direct R9 seed semantics. 7b5d43886b552f07a02c354ac240943a066d76bc aligns R32 review requirements with the four R30 owner passthroughs.",
     "Exact-SHA 7b5d43886b552f07a02c354ac240943a066d76bc passed DX9Ex Active Validation 37266115464: policy/host/game/R33 final-chain-compile/package SUCCESS; Domain Isolation Guard 37266115453 SUCCESS. Package artifact 11326970477 digest sha256:21aa57138006f8d6006166e70dfaebc274994c2b5f010c17e98c540527163b69; inner ZIP SHA256 05f61cc21d6e2a0163ec27a45a6106580e40f1955c7af7d2993a64d2e0463169.",
     "No WVP/projection math, HUD/world semantic classification, Reset/Present ordering, lower draw target, D3D getter count, wait, allocation, or synchronization primitive changed in the 1000->1100 production closure. Physical R31/R32 hook-layer retirement remains deferred because it is not yet a mechanical equivalence transformation.",
-    "Runtime remains UNTESTED; cycle 1100 is structural/static/build verification only."
+    "Runtime remains UNTESTED; cycle 1100 is structural/static/build verification only.",
+    "CONVERSION-DX9EX-00402 did not advance the structural cycle: cycle 1100 remains authoritative and physical R31/R32 hook-layer retirement stays deferred pending a bounded equivalence proof. General regression maintenance instead build-verified VR-HUD-SUMO-REPLAY-SEMANTIC-LOSS-001 by adding a deterministic non-consuming replay semantic ownership guard and wiring it into DX9Ex Active Validation. Exact validation-bearing SHA 4183a3bc6970653b5dab60a8f5c64ba1bc01c318 passed DX9Ex Active 37267187539 and Domain Isolation 37267187590; runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-1100_BUILD_VERIFIED",
   "validatedSourceSha": "7b5d43886b552f07a02c354ac240943a066d76bc",
