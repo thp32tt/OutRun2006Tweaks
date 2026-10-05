@@ -10195,6 +10195,41 @@ def main() -> None:
             + ", ".join(missing_r258_programmable_source_revalidation)
         )
 
+    r259_programmable_activation_prerequisite_contract = [
+        ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
+         NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
+        ("compose_programmable_activation_prerequisite_handoff(",
+         NATIVE_BACKEND_HPP, "R259 prerequisite handoff declaration"),
+        ("validate_programmable_activation_prerequisite_handoff_snapshot(",
+         NATIVE_BACKEND_HPP, "R259 review snapshot validator declaration"),
+        ("out.resourceBehaviorProofPresent = false;",
+         NATIVE_BACKEND_CPP, "R259 F18 resource-behavior debt remains explicit"),
+        ("out.shaderTranslationProofPresent = false;",
+         NATIVE_BACKEND_CPP, "R259 F21 shader semantic translation debt remains explicit"),
+        ("out.activationSnapshotToken = 0;",
+         NATIVE_BACKEND_CPP, "R259 cannot manufacture activation authority"),
+        ("token, 0x259u",
+         NATIVE_BACKEND_CPP, "R259 independent review snapshot-domain tag"),
+        ("R259 indexed review handoff exposes F18/F21 proof debt without activation authority",
+         CONSTANT_BUFFER_PROBE, "R259 indexed positive/debt regression"),
+        ("R259 rejects stale R258 source-revalidation identity",
+         CONSTANT_BUFFER_PROBE, "R259 stale R258 receipt regression"),
+        ("R259 rejects stale R243 input-layout identity",
+         CONSTANT_BUFFER_PROBE, "R259 stale input-layout receipt regression"),
+        ("R259 non-indexed review handoff preserves F18/F21 fail-closed debt",
+         CONSTANT_BUFFER_PROBE, "R259 non-indexed positive/debt regression"),
+    ]
+    missing_r259_programmable_activation_prerequisite = [
+        meaning for token, source, meaning
+        in r259_programmable_activation_prerequisite_contract
+        if token not in source
+    ]
+    if missing_r259_programmable_activation_prerequisite:
+        raise SystemExit(
+            "DX11 R259 programmable activation-prerequisite drift: "
+            + ", ".join(missing_r259_programmable_activation_prerequisite)
+        )
+
     source_hygiene_marker = "[" + "executed on device:"
     source_hygiene_contract = [
         (NATIVE_BACKEND_HPP, "native backend header"),
