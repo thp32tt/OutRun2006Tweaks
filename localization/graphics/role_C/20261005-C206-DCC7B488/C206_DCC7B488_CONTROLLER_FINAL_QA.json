@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T22:04:55+09:00",
+  "role": "C",
+  "run": "20261005-C206-DCC7B488",
+  "qa_id": "C206",
+  "queue_index": 32,
+  "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+  "producer_run": "20261005-B-PRODUCTION152-DCC7",
+  "source_sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+  "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+  "candidate_changed_by_C": false,
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "classification": {
+    "prior_action": "zoom_review",
+    "result": "POSITIVE_LOCALIZE_TEXT",
+    "source": "Total Rank",
+    "korean": "종합 랭킹"
+  },
+  "machine_status": "PASS_AFTER_C206_VERIFIER_CORRECTION",
+  "row_gate": "1/1 PASS",
+  "machine_checks": {
+    "independent_strict_source_script_bbox": [
+      547,
+      164,
+      1065,
+      248
+    ],
+    "independent_exact_source_script_pixels_surviving_in_clean": 0,
+    "independent_source_colored_script_pixels_surviving_in_clean": 0,
+    "localized_bbox_exact_match_producer": true,
+    "decoded_changed_outside_allowed_effect_bbox": 0,
+    "alpha_changed_outside_allowed_effect_bbox": 0,
+    "localized_render_outside_allowed_effect_bbox": 0,
+    "protected_region_changed_pixels": 0,
+    "clean_boundary_edge_delta_rgb": {
+      "left": {
+        "median": 2,
+        "p95": 7,
+        "max": 8
+      },
+      "right": {
+        "median": 2,
+        "p95": 5.8,
+        "max": 6
+      },
+      "top": {
+        "median": 3,
+        "p95": 6,
+        "max": 7
+      },
+      "bottom": {
+        "median": 0,
+        "p95": 0,
+        "max": 0
+      }
+    }
+  },
+  "verifier_retry_adjudication": {
+    "C204": "discarded: B152_SOURCE_TEXT_MASK.png is the rectangular clean_scope, not a precise glyph mask, so exact-pixel residue count was a false-positive scope test",
+    "C205": "discarded: white threshold was too permissive and classified pale-green bubble background as title",
+    "C206": "corrected strict-white + adjacent navy title mask; no source-script pixels survive"
+  },
+  "controller_visual_qa": "PASS",
+  "visual_notes": [
+    "C SOURCE/CLEAN/FINAL focus shows a seamless pale-green speech-bubble interior with no readable Total Rank ghost or source-shaped residue.",
+    "No rectangular luminance patch is visible; B152 corrects B151 using a four-side boundary Coons reconstruction.",
+    "Measured clean-boundary RGB deltas are small and visually continuous; bubble border/glow is preserved.",
+    "Final 종합 랭킹 preserves the white italic/dark-navy outlined source family and remains fully inside the exact source effect bbox.",
+    "Raw mirror_y orientation is correct."
+  ],
+  "machine_report": "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7B488_MACHINE_QA.json",
+  "producer_controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_CONTROLLER_SELF_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C206-DCC7B488/C206_DCC7_FOCUS.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_DCC7_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_DCC7_RAW_COMPARE.jpg"
+  ],
+  "decision": "C206_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED"
+}
