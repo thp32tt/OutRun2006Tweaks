@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00403",
+  "production_id": "CONVERSION-DX11-00403",
+  "event_id": "CONVERSION-DX11-00403-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "IN_PROGRESS",
+  "selected_work_item": "DX11_R265_PROGRAMMABLE_SHADER_INSTRUCTION_OPERAND_DECODER",
+  "base_sha": "eeca669377e58b95532d622dc2cee98f6e3593bd",
+  "result_sha": "PENDING",
+  "material_result_sha": "PENDING",
+  "source_implementation_sha": "PENDING",
+  "validation_bearing_result_sha": "PENDING",
+  "result_marker": "[AUTO:CONVERSION-DX11-00403]",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "summary": "R265 implements the first fail-closed D3D9 programmable SM2/SM3 instruction/raw-operand decoder over exact R264 source evidence and emits source-derived decoder provenance for later R263 semantic translation work. NativeDrawPath/Draw/DrawIndexed remain unauthorized.",
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub HEAD eeca669377e58b95532d622dc2cee98f6e3593bd, branch-local state, R264 run record, AGENTS.md, review index and queue-controller contract."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R264 captures exact D3D9 function tokens but no production instruction/operand decoder exists. The smallest executable next step is a bounded SM2/SM3 token decoder that handles COMMENT/END and instruction-length boundaries, rejects unknown/malformed streams, and emits source-derived provenance without claiming register/sampler/linkage semantics."
+    },
+    "C2_IMPLEMENT": {"status": "IN_PROGRESS"},
+    "C3_VALIDATE": {"status": "PENDING", "automation_validation": "PENDING", "runtime_validation": "UNTESTED"},
+    "C4_COMMIT": {"status": "PENDING"},
+    "C5_PACKAGE": {"status": "PENDING"},
+    "C6_STATE": {"status": "PENDING", "runtime_validation": "UNTESTED"}
+  },
+  "exact_next_action": "Complete R265 source/test/verifier changes, run exact-SHA Backend Conversion Gate, then persist PASS evidence and the next semantic-decoder action without authorizing native draw."
+}
