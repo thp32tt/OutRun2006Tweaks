@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C200 supersedes C199/C198 for index30 8215FD25. Latest completed B146 candidate d8687e615007af7bdd8e4d0bf41f1830e0bf105a3ef225cc157671fc8e9fd377 fixes the speech bubble and removes the large starburst source ghost, but C visual still finds broad non-source haze/blur, pale gray/white smears and isolated artifacts in the starburst title-removal zone, visible around 종합 랭킹 in FINAL. REWORK_REQUIRED. RUNTIME_VALIDATION=UNTESTED.",
     "C199 supersedes C198 for index30 8215FD25. Latest completed B145 candidate e9d999eaa5a416c05c8ecf527c220645bf9097d3177611c5da1c40f2bff7b793 fixes the speech-bubble ghost, but C visual shows a large translucent Total Rank-shaped ghost across the starburst CLEAN and behind/around 종합 랭킹 in FINAL. Keep speech bubble; rebuild only starburst. B Laplace-repair worker c5a7a62109f2 is compute-pending, not candidate-complete. RUNTIME_VALIDATION=UNTESTED.",
     "C197 returned A54 index161 55B57CDE candidate 7569c51cf5ba82ce081bf09d486b8c8869560e7fae71292c613e4bf8a5b51ab8. Independent canonical DXT5 source+atlas audit reproduces 38/38 source bboxes and all 38 containment/size/positive-margin gates, with zero outside/overlap/out-of-allowed-block changes. But decoded candidate alpha bbox matches A54 declaration only 10/38; 28/38 labels carry extra low-alpha/source-shaped fringe, visible as speckle/fringe in C contacts. REWORK_REQUIRED; derive QA bbox from decoded alpha and re-encode cleanly. RUNTIME_VALIDATION=UNTESTED.",
     "C198 returned latest B144 index30 8215FD25 candidate 4473abac8660e955a3328088fab92625b758e3682a51825297a91a69800d0edd. Lower starburst is materially improved versus C196, but C visual finds a large translucent Total Rank source ghost remaining in the speech-bubble CLEAN and behind/around 종합 랭킹 in FINAL. Keep improved starburst and rebuild only speech-bubble title footprint. Later B atlas-target script attempt failed before a newer candidate. RUNTIME_VALIDATION=UNTESTED.",
@@ -3990,7 +3991,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C197-C199-BATCH/C197_C199_BATCH_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C197-C200-BATCH/C197_C200_BATCH_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4273,6 +4274,18 @@
     "supersedes": "C198/B144",
     "compute_pending_after_decision": "B 8215 Laplace-repair worker c5a7a62109f2",
     "report": "localization/graphics/role_C/20261005-C199-8215FD25/C199_8215FD25_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c200_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T21:02:36+09:00",
+    "run": "20261005-C200-8215FD25",
+    "queue_index": 30,
+    "candidate_sha256": "d8687e615007af7bdd8e4d0bf41f1830e0bf105a3ef225cc157671fc8e9fd377",
+    "producer_machine_status": "PASS_REPORTED",
+    "controller_visual_qa": "FAIL_STARBURST_TEXTURE_DISCONTINUITY_AND_SMEAR",
+    "decision": "C200_REWORK_REQUIRED_STARBURST_TEXTURE_DISCONTINUITY_AND_SMEAR",
+    "supersedes": "C199/B145 and C198/B144",
+    "report": "localization/graphics/role_C/20261005-C200-8215FD25/C200_8215FD25_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
