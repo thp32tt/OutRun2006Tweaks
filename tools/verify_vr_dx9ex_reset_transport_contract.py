@@ -395,6 +395,22 @@ require_order(
     "InterlockedCompareExchange",
 )
 publish_completed = body(host_passthrough, "inline bool PublishCompletedFrame(")
+require(
+    publish_completed,
+    "host dedicated ACK live-run identity guard",
+    "EnsureFrameRing()",
+    "RenderFrameRunIdentityMatches(*FrameRing, frame)",
+    "EnsureDirectAckState()",
+)
+require_order(
+    publish_completed,
+    "host live-run guard before dedicated ACK write",
+    "EnsureFrameRing()",
+    "RenderFrameRunIdentityMatches(*FrameRing, frame)",
+    "EnsureDirectAckState()",
+    "BeginAckWrite();",
+    "DirectAckState->completedFrameId[slot] = frame.frameId;",
+)
 require_order(
     publish_completed,
     "host dual ACK publication",

@@ -535,16 +535,22 @@ namespace OutRunVrD3D9ExDirectPassthrough
     inline bool PublishCompletedFrame(
         const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
+        if (!frame.frameId || !EnsureFrameRing() ||
+            !OutRunVR::RenderFrameRunIdentityMatches(*FrameRing, frame))
+            return false;
         if (!EnsureDirectAckState())
             return false;
+
         const std::uint32_t slot =
             frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
         const std::uint32_t generation =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        if (slot >= OutRunVR::R13::DirectGpuAckRingSize || !generation ||
-            !frame.frameId)
+        if (slot >= OutRunVR::R13::DirectGpuAckRingSize || !generation)
             return false;
 
+        // Dedicated ACK state is generation-scoped but not game-run-scoped.
+        // Refuse a late completion from a superseded Frame.v2 run before it can
+        // roll transportGeneration backwards or clear the new run's slot ACKs.
         BeginAckWrite();
         if (DirectAckState->transportGeneration != generation)
         {
