@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T11:00:19+09:00",
+  "updated_at_kst": "2026-10-05T11:24:30+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -265,10 +265,12 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "ZERO_PRODUCER_REWORK_REQUIRED",
-      "assets": [],
-      "remaining": 0,
-      "note": "C150 corrected B77 9FC88069 by restoring protected music-title/variant qualifiers (GUITAR MIX)/(INSTRUMENTAL)/(PROTOTYPE) exactly. Corrected candidate 34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c passes 4/4 exact bbox+size+positive-margin and zero outside/alpha/protected/render/residue/overlap/touch/preserved/card-art changes. 75C3586A joins strict HOLD no-candidate. RUNTIME_VALIDATION=UNTESTED.",
+      "status": "REWORK_REQUIRED",
+      "assets": [
+        "C598919A"
+      ],
+      "remaining": 1,
+      "note": "C151 corrected B75's failed RGBA assumption by independently decoding canonical 4096x4096 DXT5 and resolving the 106-region semantic binding. No candidate exists. Producer must derive exact decoded glyph/effect masks + clean plate and use an exact decoded-pixel-safe DXT5 encode/splice path. Full-image recompression or block-only confinement is insufficient. OutRun2/OutRun2SP product tokens are preserved; stage names use canonical phonetic Hangul. RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": []
     },
     "latest_d_final_qa": {
@@ -293,17 +295,21 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C150",
-      "report": "localization/graphics/role_C/20261005-C150-9FC88069/C150_9FC_CONTROLLER_FINAL_QA.json",
-      "result": "1_CORRECTIVE_PIXEL_VISUAL_PASS_GLOBAL_0_REWORK_REMAIN",
-      "candidate_changed_by_C": true,
+      "run": "C151",
+      "report": "localization/graphics/role_C/20261005-C151-C598919A/C151_C598_CONTROLLER_REWORK.json",
+      "result": "1_REWORK_REQUIRED_DXT5_EXACT_MASK_AND_RENDER",
+      "candidate_changed_by_C": false,
+      "candidate_present": false,
       "assets_checked": 1,
-      "physical_elements_checked": 4,
-      "pixel_visual_pass_assets": [
-        "9FC88069"
+      "physical_elements_checked": 0,
+      "logical_segments_bound": 24,
+      "pixel_visual_pass_assets": [],
+      "rework_required_assets": [
+        "C598919A"
       ],
-      "rework_required_assets": [],
-      "global_rework_remaining": [],
+      "global_rework_remaining": [
+        "C598919A"
+      ],
       "strict_hold_no_candidate": [
         "4F68708E",
         "F6811E94",
@@ -311,14 +317,14 @@
         "75C3586A"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 29,
+      "pending_production_localize_text": 28,
       "machine_evidence": {
-        "9FC88069": "localization/graphics/role_C/20261005-C150-9FC88069/C150_9FC_MACHINE_QA.json"
+        "C598919A": "localization/graphics/role_C/20261005-C151-C598919A/C151_C598_DECODED_PREFLIGHT.json"
       },
       "controller_visual": {
-        "9FC88069": "PASS"
+        "C598919A": "SEMANTIC_BINDING_READY_REWORK_REQUIRED"
       },
-      "in_game_validation": "PENDING; RUNTIME_VALIDATION=UNTESTED"
+      "in_game_validation": "UNTESTED_NO_CANDIDATE"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION77",
@@ -533,8 +539,8 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 29,
-    "current_producer_rework_remaining": 0,
+    "current_pending_artwork_localize_text": 28,
+    "current_producer_rework_remaining": 1,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T02:45:00+09:00",
       "reports": [
@@ -765,6 +771,21 @@
       "localized_functional_regions": 4,
       "c150_report": "localization/graphics/role_C/20261005-C150-9FC88069/C150_9FC_CONTROLLER_FINAL_QA.json",
       "reconciliation_report": "localization/graphics/role_B/20261005-B-PRODUCTION77/B77_POST_C150_RECONCILIATION.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c151_c598919a": {
+      "status": "REWORK_REQUIRED_DXT5_EXACT_MASK_AND_RENDER",
+      "queue_index": 86,
+      "source_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "dimensions": [
+        4096,
+        4096
+      ],
+      "dds_fourcc": "DXT5",
+      "atlas_regions": 106,
+      "semantic_binding": "READY",
+      "candidate_present": false,
+      "report": "localization/graphics/role_C/20261005-C151-C598919A/C151_C598_CONTROLLER_REWORK.json",
       "runtime_validation": "UNTESTED"
     }
   },
