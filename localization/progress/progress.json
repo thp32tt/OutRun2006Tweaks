@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T18:57:43+09:00",
+  "updated_at_kst": "2026-10-05T19:02:14+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A47 completed odd index 133 25F697C6 producer candidate 08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013 after A46 visual binding: idx15-23 localized, Ferrari/model idx0-14 protected. 9/9 bbox/size/positive-margin PASS; outside/alpha/protected/source-residue/overlap/touch=0; controller SOURCE/CLEAN/FINAL PASS. A45 index95 37759842 remains REWORK_REQUIRED because mandatory visual QA still sees source-shaped CLEAN artifacts despite numeric PASS. pending-C=2 (560FA536,25F697C6), pending_artwork localize_text=15, producer REWORK=3 (63C91067,C598919A,37759842). RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C180/C184/C186/C188 consumed all current pending-C/latest changed approval candidates. PASS pending in-game: 560FA536 (C180), 25F697C6 (C188). REWORK_REQUIRED: 63C91067 (C184 starburst clean-plate interpolation/glow artifacts), 37759842 (C186 persistent source-shaped selector ghosts/donor boundaries). C598919A remains producer DXT5 constrained-solver REWORK. pending-C=0; pending_artwork localize_text=15; producer REWORK=3 (63C91067,C598919A,37759842). RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,18 +265,15 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "REWORK_REQUIRED_WITH_PENDING_C",
+      "status": "REWORK_REQUIRED",
       "assets": [
         "63C91067",
         "C598919A",
         "37759842"
       ],
       "remaining": 3,
-      "note": "A45 controller rejected 37759842 again: numeric 33/33 PASS is overridden by visible source-shaped YES/NO/mode/RANDOM clean-plate artifacts and donor boundaries. A47 produced new odd index133 25F697C6 candidate with 9/9 static + controller visual producer PASS. pending_artwork localize_text=15; RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": [
-        "560FA536",
-        "25F697C6"
-      ]
+      "note": "C180 clears 560FA536; C188 clears 25F697C6. C184 returns 63C91067 for visible starburst clean-plate interpolation/glow artifacts despite numeric PASS. C186 confirms latest A45 37759842 still requires manual/template reconstruction because source-shaped selector ghosts/donor boundaries remain despite 33/33 numeric PASS. pending_artwork localize_text=15; RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": []
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -300,24 +297,24 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C177/C178/C179",
-      "report": "localization/graphics/role_C/20261005-C177-C179-BATCH/C177_C179_BATCH_FINAL_QA.json",
-      "result": "1_PIXEL_VISUAL_PASS_2_REWORK_REQUIRED",
+      "run": "C180/C184/C186/C188",
+      "report": "localization/graphics/role_C/20261005-C180-C188-BATCH/C180_C188_BATCH_FINAL_QA.json",
+      "result": "2_PIXEL_VISUAL_PASS_2_REWORK_REQUIRED",
       "candidate_changed_by_C": false,
-      "assets_checked": 3,
-      "physical_elements_checked": 47,
+      "assets_checked": 4,
+      "physical_elements_checked": 57,
       "pixel_visual_pass_assets": [
-        "A05BF610"
+        "560FA536",
+        "25F697C6"
       ],
       "rework_required_assets": [
-        "37759842",
-        "560FA536"
+        "63C91067",
+        "37759842"
       ],
       "global_rework_remaining": [
         "63C91067",
         "C598919A",
-        "37759842",
-        "560FA536"
+        "37759842"
       ],
       "strict_hold_no_candidate": [
         "4F68708E",
@@ -329,18 +326,20 @@
         "1A43E9D9"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 16,
+      "pending_production_localize_text": 15,
       "machine_evidence": {
-        "37759842": "localization/graphics/role_C/20261005-C177-37759842/C177_37759842_MACHINE_QA.json",
-        "A05BF610": "localization/graphics/role_C/20261005-C178-A05BF610/C178_A05_MACHINE_QA.json",
-        "560FA536": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_MACHINE_QA.json"
+        "37759842": "localization/graphics/role_C/20261005-C186-37759842/C186_37759842_MACHINE_QA.json",
+        "560FA536": "localization/graphics/role_C/20261005-C180-560FA536/C180_560FA536_MACHINE_QA.json",
+        "63C91067": "localization/graphics/role_C/20261005-C184-63C91067/C184_63C91067_MACHINE_QA.json",
+        "25F697C6": "localization/graphics/role_C/20261005-C188-25F697C6/C188_25F697C6_MACHINE_QA.json"
       },
       "controller_visual": {
-        "37759842": "FAIL_VISIBLE_SOURCE_LETTER_SHADOW_RESIDUE_IN_CLEAN_FINAL",
-        "A05BF610": "PASS",
-        "560FA536": "FAIL_IDX31_SOURCE_BBOX_INCOMPLETE_SOURCE_FRAGMENT_RESIDUE"
+        "37759842": "FAIL_VISIBLE_SOURCE_SHAPED_CLEAN_PLATE_GHOSTS_AND_DONOR_BOUNDARIES",
+        "560FA536": "PASS",
+        "63C91067": "FAIL_STARBURST_CLEAN_PLATE_RECONSTRUCTION_ARTIFACTS",
+        "25F697C6": "PASS"
       },
-      "in_game_validation": "A05BF610 PENDING; 37759842/560FA536 NOT_ELIGIBLE; RUNTIME_VALIDATION=UNTESTED"
+      "in_game_validation": "560FA536/25F697C6 PENDING; 63C91067/37759842 NOT_ELIGIBLE; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION128",
