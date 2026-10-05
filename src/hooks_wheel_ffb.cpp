@@ -550,6 +550,18 @@ namespace
             const float speedNorm = std::clamp(speed / 2.0f, 0.0f, 1.0f);
             const WheelFFBMath::Model ffbModel =
                 WheelFFBMath::sanitize_model(static_cast<int>(Settings::WheelFFBModel));
+            const bool modelReversePolarity =
+                WheelFFBMath::model_requires_reversed_polarity(ffbModel);
+            if (bool(Settings::WheelFFBInvertForce) != modelReversePolarity ||
+                bool(Settings::WheelFFBInvertSpring) != modelReversePolarity)
+            {
+                Settings::WheelFFBInvertForce = modelReversePolarity;
+                Settings::WheelFFBInvertSpring = modelReversePolarity;
+                spdlog::info(
+                    "WheelFFB: model-owned polarity self-heal model={} invertCF={} invertSpring={}",
+                    WheelFFBMath::model_name(ffbModel),
+                    modelReversePolarity, modelReversePolarity);
+            }
             const bool modernStructural =
                 WheelFFBMath::model_uses_modern_sat(ffbModel);
             const bool arcadeEffects =
@@ -1283,8 +1295,16 @@ namespace
                 const float physicsReturnRelief =
                     WheelFFBMath::physics_return_relief(frontSlip, steerRate);
 
+                const float driftRecoverySlip =
+                    WheelFFBMath::drift_recovery_slip(
+                        frontSlip, vehicleDynamics_.bodySlip(),
+                        vehicleDynamics_.yawRate());
+                const float recoveryDirection =
+                    driftRecoverySlip > 0.0f ? -1.0f :
+                    (driftRecoverySlip < 0.0f ? 1.0f : 0.0f);
+
                 physicsSatTorque =
-                    (frontSlip > 0.0f ? -1.0f : 1.0f) *
+                    recoveryDirection *
                     physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
                 if (!std::isfinite(physicsSatTorque))
