@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C178-A05BF610",
+  "qa_id": "C178",
+  "queue_index": 28,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION128",
+  "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+  "candidate_sha256": "bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "independent_source_decode_matches_producer_png": true,
+  "row": {
+    "original_bbox": [
+      543,
+      1185,
+      1068,
+      1275
+    ],
+    "localized_bbox": [
+      642,
+      1190,
+      969,
+      1269
+    ],
+    "delta_left": 99,
+    "delta_right": 99,
+    "delta_top": 5,
+    "delta_bottom": 6,
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS"
+  },
+  "source_core_pixels": 29667,
+  "machine_checks": {
+    "clean_changed_outside_original_bbox": 0,
+    "final_changed_outside_original_bbox": 0,
+    "clean_alpha_outside_original_bbox": 0,
+    "final_alpha_outside_original_bbox": 0,
+    "render_outside_original_bbox": 0,
+    "clean_source_core_unchanged": 0,
+    "source_core_residue_pixels": 0,
+    "unchanged_title_like_pixels_in_24px_outer_ring": 0
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "preview_b64": [
+    "C178_DETAIL_B64.txt",
+    "C178_RAW_B64.txt"
+  ]
+}
