@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-06T00:46:00+09:00",
+  "role": "C",
+  "run": "20261006-C215-C217-BATCH",
+  "reviewed": [
+    {
+      "qa_id": "C215",
+      "index": 36,
+      "asset": "06AB5CEE",
+      "producer": "B157",
+      "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+      "decision": "C215_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    },
+    {
+      "qa_id": "C217",
+      "index": 205,
+      "asset": "ACF61D7C",
+      "producer": "A76",
+      "candidate_sha256": "2bbb9d19a833fb6c9ade243eb70132ef5ce46150d1fa1cb9423ff4e5101b770c",
+      "decision": "C217_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    }
+  ],
+  "superseded_compute": [
+    "C214/A72 failed stale product-token geometry and was fixed by A73 before shared-state reconciliation.",
+    "C216/A75 completed as verifier-only evidence but was superseded by A76 before shared-state reconciliation; no duplicate completion is counted."
+  ],
+  "anti_duplication": "Only latest new B157 and A76 candidate results advanced. Completed prior PASS assets were not reopened; index95 37759842 has no newer producer candidate.",
+  "current_rework_remaining": [
+    "37759842"
+  ],
+  "runtime_validation": "UNTESTED for both localized candidates",
+  "vr_ffb_dx11_dxvk_changes": false
+}
