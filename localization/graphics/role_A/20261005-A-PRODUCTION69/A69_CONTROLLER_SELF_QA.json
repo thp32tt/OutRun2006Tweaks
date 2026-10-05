@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION69",
+  "timestamp_kst": "2026-10-05T23:19:00+09:00",
+  "queue_index": 201,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+  "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+  "candidate_sha256": "59b21fa3aadf86e892dbd6adee4b178b2dad09048fd314fd731135f363d6a6fe",
+  "same_invocation_preflight": "A68 source-contact mapped 19 physical regions; A69 immediately rendered after the last deterministic semantic prerequisite.",
+  "semantic_binding": {
+    "localized": "idx0 CONIFEROUS FOREST; 1 ICE SCAPE; 2 GIANT STATUES; 3 GHOST FOREST; 4 FLORAL VILLAGE; 5 DESERT; 6 DEEP LAKE; 7 CLOUDY HIGHLAND; 8 CASTLE WALL; 9 CASINO TOWN; 10 CAPE WAY; 11 CANYON; 12 BIG FOREST; 13 BAY AREA; 14 Special; 15 STAGES; 16 GOALS",
+    "protected": "idx17 Night Bird, idx18 Radiation",
+    "stage_name_policy": "PASS_CANONICAL_PHONETIC_TRANSLITERATION",
+    "song_title_policy": "PASS_PIXEL_EXACT"
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "17/17 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "source_residue": 0,
+    "render_outside_target": 0,
+    "overlap": 0,
+    "touch": 0,
+    "protected_song_changes": 0,
+    "structure": "2048x2048 RGBA32/BGRA mip1 header exact raw mirror_y"
+  },
+  "source_style_qa": {
+    "stage_family": "dark-gray/blue-gray Black condensed all-caps; shared fs19 x4; right aligned",
+    "ui_family": "dark-gray Black labels; left aligned; individually fit to exact source bbox",
+    "horizontal_glyph_scaling": "none"
+  },
+  "controller_visual_qa": {
+    "source_clean_final_contacts": "PASS",
+    "raw_mirror_y": "PASS",
+    "no_source_residue": true,
+    "no_seams": true,
+    "no_clipping": true,
+    "no_overlap": true,
+    "no_song_title_change": true
+  },
+  "decision": "A69_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
