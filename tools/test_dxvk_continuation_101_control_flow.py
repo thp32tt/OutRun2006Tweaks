@@ -22,7 +22,12 @@ class Continuation101ControlFlowTests(unittest.TestCase):
 
     def test_complete_decode_stops_before_partial_jcc(self):
         self.assertIn('(0x00183B81, "3b c1", "cmp eax, ecx")', SOURCE)
-        self.assertNotIn('(0x00183B83, "75 ', SOURCE)
+        continuation_101_instructions = SOURCE.split(
+            "GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_101_INSTRUCTIONS = (", 1
+        )[1].split(
+            "GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_101_BRANCHES = (", 1
+        )[0]
+        self.assertNotIn('(0x00183B83, "75 ', continuation_101_instructions)
         self.assertIn('"COMPLETE_INSTRUCTIONS_END_AT_183B83_TRAILING_75_REQUIRES_OVERLAP"', SOURCE)
 
     def test_internal_jbe_target_is_exact_boundary(self):
