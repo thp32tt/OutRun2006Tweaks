@@ -108,7 +108,7 @@ orange_seed=tsub&(R>=165)&(G>=90)&(R>=G+32)&(B<=90)&(tx>300)
 if red_seed.sum()<100 or orange_seed.sum()<100: raise RuntimeError(('top seed count',int(red_seed.sum()),int(orange_seed.sum())))
 dr=distance_transform_edt(~red_seed); do=distance_transform_edt(~orange_seed)
 # Product artwork gets protection precedence for its full fill/outline/glow family.
-product_local=tsub & (do<=30.0) & (tx>=360)
+product_local=tsub & (do<=30.0) & (do<=dr+4.0) & ~red_seed & (tx>=360)
 red_local=tsub & (dr<=26.0) & ~product_local
 red=np.zeros((H,W),bool); red[ty0:ty1,tx0:tx1]=red_local
 product_mask=np.zeros((H,W),bool); product_mask[ty0:ty1,tx0:tx1]=product_local
@@ -121,7 +121,7 @@ mask_discovery['outrun2sp_protected']={'window':[tx0,ty0,tx1,ty1],'seed_kind':'o
 product_red_overlap=int(np.count_nonzero(red & product_mask))
 red &= ~product_mask
 mask_discovery['outrun2sp_protected'].update({
- 'method':'exclusive_orange_fill_plus_30px_source_alpha_effect_family',
+ 'method':'exclusive_orange_fill_plus_biased_nearest_effect_family',
  'protected_pixels':int(np.count_nonzero(product_mask)),
  'red_mask_pixels_excluded_for_product_protection':product_red_overlap,
  'candidate_must_preserve_product_mask_exact':True
