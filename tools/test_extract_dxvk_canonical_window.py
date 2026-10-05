@@ -1,5 +1,3 @@
-[Reading 401 lines from line 1 (total: 402 lines, 0 remaining)]
-
 import hashlib
 import json
 import struct
