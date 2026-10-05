@@ -35406,6 +35406,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_104_prefix_pr
         and branch_targets_match
         and internal_branch_targets_on_boundaries
         and backward_branch_contract
+        and target_is_predecessor_boundary
         and unresolved_external_targets == []
         and raw_inbound_census_empty
         and raw_call_census_empty
