@@ -1,0 +1,20 @@
+{
+  "run": "20261005-C210-97E863AD",
+  "qa_id": "C210",
+  "index": 193,
+  "asset": "97E863AD",
+  "candidate_sha256": "ad3f42856956d15b1c0ecba032d18ebb730c375f4b0a52b456c975e89e9396b7",
+  "machine_status": "PASS",
+  "row_gate": "13/13 PASS",
+  "machine_checks": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_script_exact_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "protected_changed_pixels": 0
+  },
+  "report": "localization/graphics/role_C/20261005-C210-97E863AD/C210_97E863AD_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}

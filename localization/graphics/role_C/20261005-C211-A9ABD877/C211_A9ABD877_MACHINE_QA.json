@@ -1,0 +1,747 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C211-A9ABD877",
+  "qa_id": "C211",
+  "queue_index": 201,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+  "producer_run": "20261005-A-PRODUCTION69",
+  "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+  "candidate_sha256": "59b21fa3aadf86e892dbd6adee4b178b2dad09048fd314fd731135f363d6a6fe",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "source_bbox_exact_match_all": true,
+  "candidate_bbox_exact_match_all": true,
+  "semantic_binding_policy_pass": true,
+  "song_title_protection": "idx17 Night Bird + idx18 Radiation full atlas regions exact",
+  "row_checks": [
+    {
+      "region_idx": 0,
+      "source": "CONIFEROUS FOREST",
+      "korean": "코니퍼러스 포레스트",
+      "kind": "stage",
+      "independent_source_bbox": [
+        119,
+        1938,
+        1157,
+        2023
+      ],
+      "producer_source_bbox": [
+        119,
+        1938,
+        1157,
+        2023
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        507,
+        1940,
+        1151,
+        2020
+      ],
+      "producer_localized_bbox": [
+        507,
+        1940,
+        1151,
+        2020
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 388,
+      "delta_right": 6,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.6204,
+      "localized_to_source_height_ratio": 0.9412
+    },
+    {
+      "region_idx": 1,
+      "source": "ICE SCAPE",
+      "korean": "아이스스케이프",
+      "kind": "stage",
+      "independent_source_bbox": [
+        482,
+        1805,
+        1050,
+        1900
+      ],
+      "producer_source_bbox": [
+        482,
+        1805,
+        1050,
+        1900
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        556,
+        1812,
+        1044,
+        1892
+      ],
+      "producer_localized_bbox": [
+        556,
+        1812,
+        1044,
+        1892
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 74,
+      "delta_right": 6,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.8592,
+      "localized_to_source_height_ratio": 0.8421
+    },
+    {
+      "region_idx": 2,
+      "source": "GIANT STATUES",
+      "korean": "자이언트 스태추스",
+      "kind": "stage",
+      "independent_source_bbox": [
+        212,
+        1692,
+        1049,
+        1787
+      ],
+      "producer_source_bbox": [
+        212,
+        1692,
+        1049,
+        1787
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        467,
+        1699,
+        1043,
+        1779
+      ],
+      "producer_localized_bbox": [
+        467,
+        1699,
+        1043,
+        1779
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 255,
+      "delta_right": 6,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.6882,
+      "localized_to_source_height_ratio": 0.8421
+    },
+    {
+      "region_idx": 3,
+      "source": "GHOST FOREST",
+      "korean": "고스트 포레스트",
+      "kind": "stage",
+      "independent_source_bbox": [
+        248,
+        1580,
+        1049,
+        1675
+      ],
+      "producer_source_bbox": [
+        248,
+        1580,
+        1049,
+        1675
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        539,
+        1589,
+        1043,
+        1665
+      ],
+      "producer_localized_bbox": [
+        539,
+        1589,
+        1043,
+        1665
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 291,
+      "delta_right": 6,
+      "delta_top": 9,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.6292,
+      "localized_to_source_height_ratio": 0.8
+    },
+    {
+      "region_idx": 4,
+      "source": "FLORAL VILLAGE",
+      "korean": "플로럴 빌리지",
+      "kind": "stage",
+      "independent_source_bbox": [
+        146,
+        1469,
+        1050,
+        1563
+      ],
+      "producer_source_bbox": [
+        146,
+        1469,
+        1050,
+        1563
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        612,
+        1476,
+        1044,
+        1556
+      ],
+      "producer_localized_bbox": [
+        612,
+        1476,
+        1044,
+        1556
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 466,
+      "delta_right": 6,
+      "delta_top": 7,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.4779,
+      "localized_to_source_height_ratio": 0.8511
+    },
+    {
+      "region_idx": 5,
+      "source": "DESERT",
+      "korean": "데저트",
+      "kind": "stage",
+      "independent_source_bbox": [
+        618,
+        1356,
+        1048,
+        1451
+      ],
+      "producer_source_bbox": [
+        618,
+        1356,
+        1048,
+        1451
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        838,
+        1363,
+        1042,
+        1443
+      ],
+      "producer_localized_bbox": [
+        838,
+        1363,
+        1042,
+        1443
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 220,
+      "delta_right": 6,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.4744,
+      "localized_to_source_height_ratio": 0.8421
+    },
+    {
+      "region_idx": 6,
+      "source": "DEEP LAKE",
+      "korean": "딥 레이크",
+      "kind": "stage",
+      "independent_source_bbox": [
+        453,
+        1243,
+        1050,
+        1332
+      ],
+      "producer_source_bbox": [
+        453,
+        1243,
+        1050,
+        1332
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        752,
+        1247,
+        1044,
+        1327
+      ],
+      "producer_localized_bbox": [
+        752,
+        1247,
+        1044,
+        1327
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 299,
+      "delta_right": 6,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.4891,
+      "localized_to_source_height_ratio": 0.8989
+    },
+    {
+      "region_idx": 7,
+      "source": "CLOUDY HIGHLAND",
+      "korean": "클라우디 하이랜드",
+      "kind": "stage",
+      "independent_source_bbox": [
+        32,
+        1129,
+        1049,
+        1223
+      ],
+      "producer_source_bbox": [
+        32,
+        1129,
+        1049,
+        1223
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        467,
+        1136,
+        1043,
+        1216
+      ],
+      "producer_localized_bbox": [
+        467,
+        1136,
+        1043,
+        1216
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 435,
+      "delta_right": 6,
+      "delta_top": 7,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.5664,
+      "localized_to_source_height_ratio": 0.8511
+    },
+    {
+      "region_idx": 8,
+      "source": "CASTLE WALL",
+      "korean": "캐슬 월",
+      "kind": "stage",
+      "independent_source_bbox": [
+        293,
+        1017,
+        1048,
+        1111
+      ],
+      "producer_source_bbox": [
+        293,
+        1017,
+        1048,
+        1111
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        818,
+        1024,
+        1042,
+        1104
+      ],
+      "producer_localized_bbox": [
+        818,
+        1024,
+        1042,
+        1104
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 525,
+      "delta_right": 6,
+      "delta_top": 7,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.2967,
+      "localized_to_source_height_ratio": 0.8511
+    },
+    {
+      "region_idx": 9,
+      "source": "CASINO TOWN",
+      "korean": "카지노 타운",
+      "kind": "stage",
+      "independent_source_bbox": [
+        289,
+        909,
+        1048,
+        1003
+      ],
+      "producer_source_bbox": [
+        289,
+        909,
+        1048,
+        1003
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        678,
+        916,
+        1042,
+        996
+      ],
+      "producer_localized_bbox": [
+        678,
+        916,
+        1042,
+        996
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 389,
+      "delta_right": 6,
+      "delta_top": 7,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.4796,
+      "localized_to_source_height_ratio": 0.8511
+    },
+    {
+      "region_idx": 10,
+      "source": "CAPE WAY",
+      "korean": "케이프 웨이",
+      "kind": "stage",
+      "independent_source_bbox": [
+        482,
+        798,
+        1047,
+        892
+      ],
+      "producer_source_bbox": [
+        482,
+        798,
+        1047,
+        892
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        681,
+        805,
+        1041,
+        885
+      ],
+      "producer_localized_bbox": [
+        681,
+        805,
+        1041,
+        885
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 199,
+      "delta_right": 6,
+      "delta_top": 7,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.6372,
+      "localized_to_source_height_ratio": 0.8511
+    },
+    {
+      "region_idx": 11,
+      "source": "CANYON",
+      "korean": "캐니언",
+      "kind": "stage",
+      "independent_source_bbox": [
+        606,
+        681,
+        1048,
+        775
+      ],
+      "producer_source_bbox": [
+        606,
+        681,
+        1048,
+        775
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        834,
+        690,
+        1042,
+        766
+      ],
+      "producer_localized_bbox": [
+        834,
+        690,
+        1042,
+        766
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 228,
+      "delta_right": 6,
+      "delta_top": 9,
+      "delta_bottom": 9,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.4706,
+      "localized_to_source_height_ratio": 0.8085
+    },
+    {
+      "region_idx": 12,
+      "source": "BIG FOREST",
+      "korean": "빅 포레스트",
+      "kind": "stage",
+      "independent_source_bbox": [
+        415,
+        568,
+        1048,
+        663
+      ],
+      "producer_source_bbox": [
+        415,
+        568,
+        1048,
+        663
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        682,
+        577,
+        1042,
+        653
+      ],
+      "producer_localized_bbox": [
+        682,
+        577,
+        1042,
+        653
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 267,
+      "delta_right": 6,
+      "delta_top": 9,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.5687,
+      "localized_to_source_height_ratio": 0.8
+    },
+    {
+      "region_idx": 13,
+      "source": "BAY AREA",
+      "korean": "베이 에어리어",
+      "kind": "stage",
+      "independent_source_bbox": [
+        502,
+        467,
+        1049,
+        556
+      ],
+      "producer_source_bbox": [
+        502,
+        467,
+        1049,
+        556
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        615,
+        471,
+        1043,
+        551
+      ],
+      "producer_localized_bbox": [
+        615,
+        471,
+        1043,
+        551
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 113,
+      "delta_right": 6,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.7824,
+      "localized_to_source_height_ratio": 0.8989
+    },
+    {
+      "region_idx": 14,
+      "source": "Special",
+      "korean": "스페셜",
+      "kind": "ui",
+      "independent_source_bbox": [
+        1086,
+        1845,
+        1267,
+        1903
+      ],
+      "producer_source_bbox": [
+        1086,
+        1845,
+        1267,
+        1903
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        1092,
+        1848,
+        1212,
+        1900
+      ],
+      "producer_localized_bbox": [
+        1092,
+        1848,
+        1212,
+        1900
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 6,
+      "delta_right": 55,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.663,
+      "localized_to_source_height_ratio": 0.8966
+    },
+    {
+      "region_idx": 15,
+      "source": "STAGES",
+      "korean": "스테이지",
+      "kind": "ui",
+      "independent_source_bbox": [
+        1173,
+        1986,
+        1379,
+        2037
+      ],
+      "producer_source_bbox": [
+        1173,
+        1986,
+        1379,
+        2037
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        1179,
+        1989,
+        1311,
+        2033
+      ],
+      "producer_localized_bbox": [
+        1179,
+        1989,
+        1311,
+        2033
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 6,
+      "delta_right": 68,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.6408,
+      "localized_to_source_height_ratio": 0.8627
+    },
+    {
+      "region_idx": 16,
+      "source": "GOALS",
+      "korean": "골",
+      "kind": "ui",
+      "independent_source_bbox": [
+        1079,
+        1734,
+        1255,
+        1785
+      ],
+      "producer_source_bbox": [
+        1079,
+        1734,
+        1255,
+        1785
+      ],
+      "source_bbox_exact_match_producer": true,
+      "independent_localized_bbox": [
+        1085,
+        1737,
+        1121,
+        1781
+      ],
+      "producer_localized_bbox": [
+        1085,
+        1737,
+        1121,
+        1781
+      ],
+      "localized_bbox_exact_match_producer": true,
+      "delta_left": 6,
+      "delta_right": 134,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "localized_to_source_width_ratio": 0.2045,
+      "localized_to_source_height_ratio": 0.8627
+    }
+  ],
+  "row_gate": "17/17 PASS",
+  "machine_checks": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_script_exact_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "protected_changed_pixels": 0
+  },
+  "protected_pixel_changes": {
+    "protected_region_17": 0,
+    "protected_region_18": 0
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "preview_files": [
+    "localization/graphics/role_C/20261005-C211-A9ABD877/C211_SOURCE_CLEAN_FINAL_CONTACTS.jpg",
+    "localization/graphics/role_C/20261005-C211-A9ABD877/C211_RAW_COMPARE.jpg"
+  ]
+}
