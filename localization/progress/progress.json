@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T23:10:00+09:00",
+  "updated_at_kst": "2026-10-05T23:30:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A67 completed direct C208 REWORK for odd index193 97E863AD. A66 first widened A65 but was A-controller rejected for excessive tracking; A67 moderates source-family tracking while keeping Black weight and no horizontal glyph scaling. Candidate ad3f42856956d15b1c0ecba032d18ebb730c375f4b0a52b456c975e89e9396b7: 13/13 bbox/size/positive-margin, CLEAN/FINAL validators PASS, outside/alpha/protected/source-residue/render/inline-token/overlap/touch=0; preserved OutRun/OutRun2SP/OUTRUN/TESTAROSSA/SP/OR pixels exact; SOURCE/CLEAN/FINAL + raw mirror_y visual PASS. pending-C=97E863AD; producer REWORK=1 (37759842); pending_artwork localize_text=8. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C210/C211 consumed the two new A results without reopening completed PASS assets. C210 revalidated A67 index193 97E863AD: 13/13 exact source/localized bbox+size+positive-margin and all outside/alpha/residue/overlap/protected zero gates PASS, but mandatory visual QA returns it again because width was achieved with source-unjustified Hangul inter-glyph tracking (쇼룸 132px, 멀티플레이 33.25px, 환영합니다 38.75px, Goal family 41-48px), creating detached syllable blocks. C210_REWORK_REQUIRED_EXCESSIVE_INTERGLYPH_TRACKING_SOURCE_SPACING. C211 independently finalized new A69 index201 A9ABD877 candidate: 17/17 exact bbox/size/positive margins, canonical phonetic stage policy PASS, Night Bird/Radiation pixel-exact, all zero-pixel gates 0, readable/raw visual PASS -> C211_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. Current queue remains 84 localize_text + 42 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit; pending_artwork localize_text=7; producer REWORK=2 (37759842,97E863AD); pending-C=0. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -266,15 +266,14 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "REWORK_REQUIRED_WITH_PENDING_C",
+      "status": "REWORK_REQUIRED",
       "assets": [
-        "37759842"
-      ],
-      "remaining": 1,
-      "note": "A67 resolves producer-side C208 scale/proportion return for 97E863AD and is pending independent C. 37759842 remains manual/template-only C186 REWORK; rejected inpaint families not repeated. pending_artwork localize_text=8; pending-C=1 (97E863AD); RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": [
+        "37759842",
         "97E863AD"
-      ]
+      ],
+      "remaining": 2,
+      "note": "C210 returned A67 97E863AD for excessive source-unjustified inter-glyph tracking despite machine PASS. 37759842 remains manual/template-only C186 REWORK. C211 approved A69 A9ABD877, reducing pending_artwork localize_text to 7. pending-C=0; RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": []
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -298,16 +297,18 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C209",
-      "report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_CONTROLLER_FINAL_QA.json",
-      "result": "C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "run": "C210_C211",
+      "report": "localization/graphics/role_C/20261005-C210-C211-BATCH/C210_C211_BATCH_FINAL_QA.json",
+      "result": "C210_REWORK_REQUIRED + C211_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
       "candidate_changed_by_C": false,
-      "assets_checked": 1,
-      "physical_elements_checked": 1,
+      "assets_checked": 2,
+      "physical_elements_checked": 30,
       "pixel_visual_pass_assets": [
-        "B7E25BAD"
+        "A9ABD877"
       ],
-      "rework_required_assets": [],
+      "rework_required_assets": [
+        "97E863AD"
+      ],
       "global_rework_remaining": [
         "37759842",
         "97E863AD"
@@ -319,15 +320,16 @@
         "75C3586A"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 8,
+      "pending_production_localize_text": 7,
       "machine_evidence": {
-        "B7E25BAD": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_MACHINE_QA.json"
+        "97E863AD": "localization/graphics/role_C/20261005-C210-97E863AD/C210_97E863AD_MACHINE_QA.json",
+        "A9ABD877": "localization/graphics/role_C/20261005-C211-A9ABD877/C211_A9ABD877_MACHINE_QA.json"
       },
       "controller_visual": {
-        "B7E25BAD": "PASS"
+        "97E863AD": "FAIL_SOURCE_STYLE_EXCESSIVE_INTERGLYPH_TRACKING",
+        "A9ABD877": "PASS"
       },
-      "template_reference": "C202-approved same-family Total Rank style/clean reconstruction; HOLL shift +192 x",
-      "in_game_validation": "B7E25BAD UNTESTED; RUNTIME_VALIDATION=UNTESTED"
+      "in_game_validation": "97E863AD UNTESTED; A9ABD877 UNTESTED; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION154",
@@ -550,7 +552,7 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 8,
+    "current_pending_artwork_localize_text": 7,
     "current_producer_rework_remaining": 2,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T20:39:22+09:00",
