@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-06T00:38:00+09:00",
+  "role": "C",
+  "run": "20261006-C215-06AB5CEE",
+  "qa_id": "C215",
+  "queue_index": 36,
+  "asset": "textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+  "producer_run": "20261006-B-PRODUCTION157-JENN",
+  "source_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+  "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+  "classification": "zoom_review -> localize_text; Total Rank x3 -> 종합 랭킹",
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "independent_machine_qa": {
+    "status": "PASS",
+    "bbox_size_positive_margin": "3/3 PASS",
+    "candidate_vs_independently_rebuilt_approved_template_composite_diff_pixels": 0,
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "unsafe_target_template_variant_pixels": 0,
+    "localized_bbox_mismatches": 0
+  },
+  "approved_template_provenance": [
+    {
+      "region_idx": 1,
+      "kind": "warm starburst",
+      "approval": "C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "target_variant_outside_removal_pixels": 1,
+      "variant": "white alpha=1 title AA",
+      "unsafe_variant_pixels": 0
+    },
+    {
+      "region_idx": 2,
+      "kind": "pink speech bubble",
+      "approval": "C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "target_variant_outside_removal_pixels": 0,
+      "unsafe_variant_pixels": 0
+    },
+    {
+      "region_idx": 3,
+      "kind": "green speech bubble",
+      "approval": "C206_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "target_variant_outside_removal_pixels": 0,
+      "unsafe_variant_pixels": 0
+    }
+  ],
+  "controller_visual_qa": "PASS",
+  "controller_visual_findings": [
+    "All three SOURCE/CLEAN/FINAL contacts are seamless: no Total Rank source ghost, rectangular patch boundary, clipping, border/glow damage, alpha halo or overlap.",
+    "종합 랭킹 reuses the already C-approved white fill, dark navy outline, right slant, centered alignment and source-height family on all three title plates.",
+    "Jennifer character artwork, lens flare, A/B/C/D/E rank letters and heart/cross UI remain unchanged outside the exact title edit masks.",
+    "Raw mirror_y evidence preserves the canonical orientation and unrelated artwork."
+  ],
+  "decision": "C215_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED",
+  "machine_report": "localization/graphics/role_C/20261006-C215-06AB5CEE/C215_06AB5CEE_MACHINE_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261006-C215-06AB5CEE/C215_JENN_CONTACTS.jpg",
+    "localization/graphics/role_C/20261006-C215-06AB5CEE/C215_JENN_RAW_COMPARE.jpg",
+    "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_IDX1_FOCUS.jpg",
+    "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_IDX2_FOCUS.jpg",
+    "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_IDX3_FOCUS.jpg"
+  ],
+  "exclusions": "Completed prior PASS assets were not reopened. Index95 37759842 had no newer producer candidate and was not repeated. VR/FFB/DX11/DXVK untouched."
+}
