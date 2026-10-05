@@ -11,7 +11,7 @@ if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OU
     raise SystemExit("B hosted worker only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION142-8215"
+run="20261005-B-PRODUCTION143-8215"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -106,7 +106,7 @@ for idx in targets:
     cm=np.zeros((H,W),bool); cm[y:y+ch,x:x+cw]=selected
     core=Image.fromarray((cm.astype(np.uint8)*255),"L")
     # 7px radius captures outline/AA/shadow; cleanup is clipped to a tight neighborhood.
-    sm=core.filter(ImageFilter.MaxFilter(15))
+    sm=core.filter(ImageFilter.MaxFilter(31))
     eb=sm.getbbox()
     if not eb: raise RuntimeError(("empty effect mask",idx))
     ex0=max(x,eb[0]-2); ey0=max(y,eb[1]-2); ex1=min(x+cw,eb[2]+2); ey1=min(y+ch,eb[3]+2)
@@ -236,7 +236,7 @@ for row in rows:
       "font_file":Path(fp).name,"font_style":fstyle,"font_size":chosen_fs,
       "stroke_width":chosen_sw,"slant":.22,"fill_rgba":white_rgba,
       "outline_rgba":navy_rgba,"alignment":"center",
-      "rework_status":"B142_NEW_ZOOM_REVIEW_PROMOTED_CANDIDATE"
+      "rework_status":"B143_NEW_ZOOM_REVIEW_PROMOTED_CANDIDATE"
     })
 
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
@@ -309,14 +309,14 @@ report={
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB,"source_sha256":sha(sb)},
  "classification":{"localizable":"Total Rank x2","translation":"종합 랭킹","protected":["character artwork","lens flare","rank letters B/C/D/E"],"prior_queue_action":"zoom_review"},
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
- "clean_reconstruction":{"method":"navy-seeded title-core detection + tight effect fringe + discrete harmonic/Laplace inpaint","core_unchanged_pixels":core_unchanged},
+ "clean_reconstruction":{"method":"aligned white-title component detection + expanded outline/shadow fringe + discrete harmonic/Laplace inpaint","core_unchanged_pixels":core_unchanged},
  "source_style":{"family":"white italic Total Rank with dark navy outline","font_file":Path(fp).name,"font_style":fstyle,"shared_font_size":chosen_fs,"stroke_width":chosen_sw,"slant":.22,"fill_rgba":white_rgba,"outline_rgba":navy_rgba},
  "rows":rows,"clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
  "decoded_changes":{"outside_allowed_effect_bbox":outside,"alpha_outside":alphaout,"render_outside_target":render_out,"localized_overlap":0},
  "protected_region_changed_pixels":protected_changed,
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"B142_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"B143_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
 (out/"B142_8215_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":30,"asset":"8215FD25","source_sha256":sha(sb),"candidate_sha256":csha,
