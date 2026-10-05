@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION100-CLAR-SIBLING-COMPARE",
+  "purpose": "Find same-family clean/title reconstruction evidence for 63C91067 after B93-B99 controller visual rejects source-effect ghost residue.",
+  "siblings": [
+    {
+      "name": "63C91067_512x512.dds",
+      "sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "fourcc": "\u0000\u0000\u0000\u0000"
+    },
+    {
+      "name": "4AFC1BED_512x512.dds",
+      "sha256": "542025bee37f371b236d77854b4b7f95574ae051b91bc31a205af03dfd1adb7f",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "fourcc": "\u0000\u0000\u0000\u0000"
+    },
+    {
+      "name": "A05BF610_512x512.dds",
+      "sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "fourcc": "\u0000\u0000\u0000\u0000"
+    }
+  ],
+  "status": "SIBLING_VISUAL_COMPARE_READY",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
