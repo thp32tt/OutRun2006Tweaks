@@ -99,39 +99,24 @@ white_rgb=tuple(int(round(float(np.median(pix[white_sel,k].astype(np.float32))))
 navy_rgb=tuple(int(round(float(np.median(pix[navy_sel,k].astype(np.float32))))) for k in range(3))
 white=white_rgb+(255,); navy=navy_rgb+(255,)
 
-# Patterned/gradient plate reconstruction. B103 removed the English residue but
-# Navier-Stokes alpha/RGB inpainting pulled bright border pixels vertically into the
-# title footprint, creating visible columns/seams. Reconstruct each masked scanline
-# from the nearest protected left/right plate pixels instead. The title masks are
-# interior to the two plates, so this preserves the plate's local horizontal gradient
-# while changing only measured source-text/effect pixels.
+# Patterned/gradient plate reconstruction. B104 scanline interpolation produced
+# vertical banding because letter-shaped mask fragments used different anchors.
+# Use normalized Gaussian surface reconstruction: masked source-text/effect pixels
+# have zero sampling weight, surrounding protected plate pixels contribute smoothly.
+# This reconstructs one coherent low-frequency plate surface without source glyph
+# bleed-through and without letter-by-letter seams.
+subprocess.run(["python3","-m","pip","install","--disable-pip-version-check","opencv-python-headless"],check=True,stdout=subprocess.DEVNULL)
+import cv2
 sm=np.asarray(source_mask)>0
-clean_arr=sa.copy()
-for yy in range(H):
-    xs=np.flatnonzero(sm[yy])
-    if xs.size==0:
-        continue
-    # Process each contiguous masked span independently.
-    cuts=np.where(np.diff(xs)>1)[0]
-    groups=np.split(xs,cuts+1)
-    for g in groups:
-        if g.size==0:
-            continue
-        x0=int(g[0]); x1=int(g[-1])
-        l=x0-1
-        while l>=0 and sm[yy,l]:
-            l-=1
-        r=x1+1
-        while r<W and sm[yy,r]:
-            r+=1
-        if l<0 or r>=W:
-            raise RuntimeError(("scanline reconstruction lacks protected anchors",yy,x0,x1,l,r))
-        lp=sa[yy,l].astype(np.float32)
-        rp=sa[yy,r].astype(np.float32)
-        denom=float(r-l)
-        for xx in range(x0,x1+1):
-            t=(xx-l)/denom
-            clean_arr[yy,xx]=np.clip(np.rint(lp*(1.0-t)+rp*t),0,255).astype(np.uint8)
+valid=(~sm).astype(np.float32)
+sigma=34.0
+den=cv2.GaussianBlur(valid,(0,0),sigmaX=sigma,sigmaY=sigma,borderType=cv2.BORDER_REFLECT)
+clean_f=sa.astype(np.float32).copy()
+for cc in range(4):
+    num=cv2.GaussianBlur(sa[:,:,cc].astype(np.float32)*valid,(0,0),sigmaX=sigma,sigmaY=sigma,borderType=cv2.BORDER_REFLECT)
+    fill=num/np.maximum(den,1e-6)
+    clean_f[:,:,cc][sm]=fill[sm]
+clean_arr=np.clip(np.rint(clean_f),0,255).astype(np.uint8)
 clean=Image.fromarray(clean_arr,"RGBA")
 source_png=out/"63C_SOURCE_READABLE.png"; clean_png=out/"63C_CLEAN_PLATE.png"; smp=out/"63C_SOURCE_TEXT_MASK.png"; allowedp=out/"63C_ALLOWED_BBOX_MASK.png"
 src.save(source_png); clean.save(clean_png); source_mask.save(smp); allowed.save(allowedp)
