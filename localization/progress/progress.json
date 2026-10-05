@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T17:56:29+09:00",
+  "updated_at_kst": "2026-10-05T18:57:43+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C177/C178/C179 consumed all current pending-C assets. A05BF610 C178 PASS pending isolated in-game; 37759842 C177 REWORK_REQUIRED because visual CLEAN/FINAL shows large source-letter/shadow residue despite numeric PASS; 560FA536 C179 REWORK_REQUIRED because idx31 source bbox/mask is incomplete and source-script edge fragments remain. pending-C=0, pending_artwork localize_text=16, producer REWORK=4 (63C91067,C598919A,37759842,560FA536). RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "A47 completed odd index 133 25F697C6 producer candidate 08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013 after A46 visual binding: idx15-23 localized, Ferrari/model idx0-14 protected. 9/9 bbox/size/positive-margin PASS; outside/alpha/protected/source-residue/overlap/touch=0; controller SOURCE/CLEAN/FINAL PASS. A45 index95 37759842 remains REWORK_REQUIRED because mandatory visual QA still sees source-shaped CLEAN artifacts despite numeric PASS. pending-C=2 (560FA536,25F697C6), pending_artwork localize_text=15, producer REWORK=3 (63C91067,C598919A,37759842). RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -272,9 +272,10 @@
         "37759842"
       ],
       "remaining": 3,
-      "note": "A38 resolves C179 producer-side idx31 warning bbox/mask defect and moves 560FA536 back to independent C. A40 retry on 37759842 remains REWORK_REQUIRED because controller visual still sees source-shaped reconstruction on selector plates despite numeric PASS. Remaining producer REWORK: 63C91067, C598919A, 37759842. pending_artwork localize_text=16; RUNTIME_VALIDATION=UNTESTED.",
+      "note": "A45 controller rejected 37759842 again: numeric 33/33 PASS is overridden by visible source-shaped YES/NO/mode/RANDOM clean-plate artifacts and donor boundaries. A47 produced new odd index133 25F697C6 candidate with 9/9 static + controller visual producer PASS. pending_artwork localize_text=15; RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": [
-        "560FA536"
+        "560FA536",
+        "25F697C6"
       ]
     },
     "latest_d_final_qa": {
@@ -1336,6 +1337,63 @@
       "rejected_candidate_sha256": "040a0e9a504fdb5982db4302ded3c9c3938fa6bf88f8ced48a7ab6ce5692ce19",
       "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION40/A40_CONTROLLER_REWORK.json",
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
+    },
+    "latest_a_production": {
+      "run": "A47",
+      "index": 133,
+      "asset": "25F697C6",
+      "candidate_sha256": "08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013",
+      "result": "A47_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "localized_indices": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "protected_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "bbox_size_positive_margin": "9/9 PASS",
+      "pixel_gates": {
+        "changed_outside": 0,
+        "alpha_outside": 0,
+        "protected_changed": 0,
+        "clean_source_unchanged": 0,
+        "source_residue": 0,
+        "overlap": 0,
+        "touch": 0
+      },
+      "report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_25F697C6_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "latest_a_rework": {
+      "run": "A45",
+      "index": 95,
+      "asset": "37759842",
+      "rejected_candidate_sha256": "68e31ca94c9003cd0acd572fdcecf17d52c56b6848ee558c1359d87b6d382fcd",
+      "result": "A45_REWORK_REQUIRED_SOURCE_SHAPED_CLEAN_PLATE_ARTIFACTS",
+      "report": "localization/graphics/role_A/20261005-A-PRODUCTION45/A45_CONTROLLER_REWORK.json",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
