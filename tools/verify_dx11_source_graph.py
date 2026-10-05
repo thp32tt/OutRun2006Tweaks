@@ -10468,10 +10468,14 @@ def main() -> None:
          RUNTIME_CENSUS, "R267 production identity retains interface hash"),
         ("R267 decodes exact SM3 DCL input/output interface semantics",
          CONSTANT_BUFFER_PROBE, "R267 positive SM3 DCL interface regression"),
+        ("R267 rejects DCL info tokens without parameter marker bit",
+         CONSTANT_BUFFER_PROBE, "R267 DCL token-marker fail-closed regression"),
         ("R267 rejects SM2 DCL interface semantics",
          CONSTANT_BUFFER_PROBE, "R267 SM2 fail-closed regression"),
         ("R267 rejects duplicate SM3 interface semantic declarations",
          CONSTANT_BUFFER_PROBE, "R267 duplicate-semantic fail-closed regression"),
+        ("R267 rejects overlapping SM3 interface declaration masks",
+         CONSTANT_BUFFER_PROBE, "R267 overlapping-mask fail-closed regression"),
     ]
     missing_r267_programmable_shader_interface_semantics = [
         meaning for token, source, meaning
