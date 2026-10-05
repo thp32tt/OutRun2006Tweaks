@@ -221,6 +221,15 @@ namespace outrun::vr::dx11
             std::uint64_t registerSemanticsHash{};
             std::uint64_t registerDecoderRevisionHash{};
             std::uint64_t registerSemanticContractHash{};
+            bool interfaceSemanticsExact{};
+            UINT interfaceDeclarationInstructionCount{};
+            UINT interfaceSemanticDeclarationCount{};
+            UINT interfaceInputSemanticCount{};
+            UINT interfaceOutputSemanticCount{};
+            UINT interfaceSamplerDeclarationCount{};
+            std::uint64_t interfaceSemanticsHash{};
+            std::uint64_t interfaceDecoderRevisionHash{};
+            std::uint64_t interfaceSemanticContractHash{};
         };
 
         struct SourceSignature
@@ -611,6 +620,24 @@ namespace outrun::vr::dx11
                 hash, sig.vertexShader.registerDecoderRevisionHash);
             hash = hash_mix(
                 hash, sig.vertexShader.registerSemanticContractHash);
+            hash = hash_mix(
+                hash, sig.vertexShader.interfaceSemanticsExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.vertexShader.interfaceDeclarationInstructionCount);
+            hash = hash_mix(
+                hash, sig.vertexShader.interfaceSemanticDeclarationCount);
+            hash = hash_mix(
+                hash, sig.vertexShader.interfaceInputSemanticCount);
+            hash = hash_mix(
+                hash, sig.vertexShader.interfaceOutputSemanticCount);
+            hash = hash_mix(
+                hash, sig.vertexShader.interfaceSamplerDeclarationCount);
+            hash = hash_mix(
+                hash, sig.vertexShader.interfaceSemanticsHash);
+            hash = hash_mix(
+                hash, sig.vertexShader.interfaceDecoderRevisionHash);
+            hash = hash_mix(
+                hash, sig.vertexShader.interfaceSemanticContractHash);
             hash = hash_mix(hash, sig.pixelShader.present ? 1u : 0u);
             hash = hash_mix(hash, sig.pixelShader.observed ? 1u : 0u);
             hash = hash_mix(hash, sig.pixelShader.byteSize);
@@ -649,6 +676,24 @@ namespace outrun::vr::dx11
                 hash, sig.pixelShader.registerDecoderRevisionHash);
             hash = hash_mix(
                 hash, sig.pixelShader.registerSemanticContractHash);
+            hash = hash_mix(
+                hash, sig.pixelShader.interfaceSemanticsExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.pixelShader.interfaceDeclarationInstructionCount);
+            hash = hash_mix(
+                hash, sig.pixelShader.interfaceSemanticDeclarationCount);
+            hash = hash_mix(
+                hash, sig.pixelShader.interfaceInputSemanticCount);
+            hash = hash_mix(
+                hash, sig.pixelShader.interfaceOutputSemanticCount);
+            hash = hash_mix(
+                hash, sig.pixelShader.interfaceSamplerDeclarationCount);
+            hash = hash_mix(
+                hash, sig.pixelShader.interfaceSemanticsHash);
+            hash = hash_mix(
+                hash, sig.pixelShader.interfaceDecoderRevisionHash);
+            hash = hash_mix(
+                hash, sig.pixelShader.interfaceSemanticContractHash);
             hash = hash_mix(hash, sig.shaderIntrospectionComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderMixedPair ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderTranslationExact ? 1u : 0u);
@@ -1183,6 +1228,27 @@ namespace outrun::vr::dx11
                 registerSemantics.decoderRevisionHash;
             out.registerSemanticContractHash =
                 registerSemantics.semanticContractHash;
+
+            const auto interfaceSemantics =
+                decode_programmable_shader_interface_semantics(
+                    decode, registerSemantics);
+            out.interfaceSemanticsExact = interfaceSemantics.exact();
+            out.interfaceDeclarationInstructionCount =
+                interfaceSemantics.declarationInstructionCount;
+            out.interfaceSemanticDeclarationCount =
+                interfaceSemantics.semanticDeclarationCount;
+            out.interfaceInputSemanticCount =
+                interfaceSemantics.inputSemanticCount;
+            out.interfaceOutputSemanticCount =
+                interfaceSemantics.outputSemanticCount;
+            out.interfaceSamplerDeclarationCount =
+                interfaceSemantics.samplerDeclarationCount;
+            out.interfaceSemanticsHash =
+                interfaceSemantics.interfaceSemanticsHash;
+            out.interfaceDecoderRevisionHash =
+                interfaceSemantics.decoderRevisionHash;
+            out.interfaceSemanticContractHash =
+                interfaceSemantics.semanticContractHash;
             return out;
         }
 
