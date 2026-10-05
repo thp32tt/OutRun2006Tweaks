@@ -1677,7 +1677,7 @@ namespace
 
                 if (modelIndex == 0)
                 {
-                    // R9 MOZA R3 hardware baseline. The user's physical wheel
+                    // R10 MOZA R3 hardware baseline. The user's physical wheel
                     // requires both DirectInput polarities reversed for correct
                     // SAT/centering direction.
                     Settings::WheelFFBModel = 0;
@@ -1781,7 +1781,7 @@ namespace
                         track_ffb_change(true);
                         WheelFFB_ResetHeadroomStats();
                         WheelFFB_RequestSettingsTransition();
-                        status_ = std::string("FFB model + complete R9 test baseline applied: ") +
+                        status_ = std::string("FFB model + complete R10 test baseline applied: ") +
                             FfbModelNames[modelIndex] + ". Save Force Feedback to persist it.";
                     }
                     if (selected)
@@ -1790,7 +1790,7 @@ namespace
                 ImGui::EndCombo();
             }
             ImGui::TextDisabled(
-                "R9: changing FFB Model applies the complete test baseline automatically. Modern uses Reverse Force+Spring ON; Arcade/Hybrid/PS2 use both OFF.");
+                "R10: changing FFB Model applies the complete test baseline and model polarity automatically. Modern uses Reverse Force+Spring ON; Arcade/Hybrid/PS2 use both OFF.");
 
             const int activeFfbModel = std::clamp(int(Settings::WheelFFBModel), 0, 3);
             if (activeFfbModel == 0)
