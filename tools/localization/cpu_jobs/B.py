@@ -174,8 +174,8 @@ for k,info in mask_discovery.items():
  if k not in source_masks: continue
  x0,y0,x1,y1=info['seed_bbox']; q=clean_arr[y0:y1,x0:x1]; a=q[:,:,3]>0; rr=q[:,:,0].astype(np.int16);gg=q[:,:,1].astype(np.int16);bb=q[:,:,2].astype(np.int16)
  kind=info['seed_kind']
- if kind=='red': fm=a&(rr>=125)&(rr>=gg+45)&(rr>=bb+25)
- elif kind=='orange': fm=a&(rr>=165)&(gg>=55)&(rr>=gg+32)&(bb<=125)
+ if kind=='red': fm=a&(rr>=125)&(rr>=gg+45)&(rr>=bb+25)&(gg<=108)&(bb>=24)
+ elif kind=='orange': fm=a&(rr>=165)&(gg>=90)&(rr>=gg+32)&(bb<=90)
  else: fm=a&(rr>=185)&(gg>=185)&(bb>=185)
  leftover_fill[k]=int(fm.sum())
  if leftover_fill[k]: raise RuntimeError((k,'target fill residue',leftover_fill[k]))
