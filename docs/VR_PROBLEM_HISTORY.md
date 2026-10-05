@@ -100,7 +100,7 @@ This is not runtime proof. `RUNTIME_VALIDATION=UNTESTED` until Quest 3/VDXR conf
 
 ## VR-HUD-SUMO-REPLAY-SEMANTIC-LOSS-001 — replayed UI loses explicit VR ownership
 
-**Status:** FIX_CANDIDATE / BUILD_PENDING / NEED_HMD_TEST  
+**Status:** BUILD_VERIFIED / NEED_HMD_TEST  
 **Recorded:** 2026-10-05 KST  
 **Scope:** DX9Ex Active (R26 world + R30 HUD)
 
@@ -115,6 +115,12 @@ This is not runtime proof. `RUNTIME_VALIDATION=UNTESTED` until Quest 3/VDXR conf
 - after replay allocates the fresh node, re-register only a non-`None` explicit scope on that node;
 - do not promote untagged nodes and do not change the canonical queue fallback;
 - do not change UIScaling coordinates, SkyGlow, lens-flare behavior, world projection, or R30 HUD placement math.
+
+### Automated validation
+
+The source candidate remains `36f0f3949bd18993cba3f46585659874e3d7a89f`. CONVERSION-DX9EX-00402 added deterministic guard `tools/verify_vr_sumo_replay_semantics.py` and wired it into the canonical DX9Ex Active policy gate. Validation-bearing SHA `4183a3bc6970653b5dab60a8f5c64ba1bc01c318` passed DX9Ex Active Validation `37267187539` (policy/host/game/R33 full-chain/package all SUCCESS) and Domain Isolation Guard `37267187590`; N100 exact-SHA static verification also passed. Package artifact `11327231626` has digest `sha256:44a63e786dbd2a304de8b4a8b248d407aa30e2eb2b3cd4a4520ed5661cf8aa52`.
+
+This is build/static evidence only. No Quest 3/VDXR game test was performed, so `RUNTIME_VALIDATION=UNTESTED`.
 
 ### Runtime gate
 
