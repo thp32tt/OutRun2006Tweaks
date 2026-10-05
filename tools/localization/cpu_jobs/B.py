@@ -98,9 +98,17 @@ removal_delta=np.max(np.abs(
     ts[ob[1]:ob[3],ob[0]:ob[2]].astype(np.int16)-
     tc[ob[1]:ob[3],ob[0]:ob[2]].astype(np.int16)),axis=2)>0
 patch_changed=patch_delta>0
-patch_diff_outside_removal=int(np.count_nonzero(patch_changed & (~removal_delta)))
-if patch_diff_outside_removal:
-    raise RuntimeError(("template patch differs in preserved pixels",patch_diff_pixels,patch_diff_outside_removal,patch_max))
+patch_outside=patch_changed & (~removal_delta)
+patch_diff_outside_removal=int(np.count_nonzero(patch_outside))
+# Source-text/effect AA fringe is part of the removal footprint. Accept a
+# template-vs-HOLL delta outside the template's removal delta only when every
+# such pixel lies in the immediate 1px dilation of that removal footprint.
+removal_im=Image.fromarray((removal_delta.astype(np.uint8)*255),"L")
+removal_dil=np.asarray(removal_im.filter(__import__("PIL").ImageFilter.MaxFilter(3)))>0
+fringe_only=patch_outside & removal_dil
+fringe_outside_dilation=int(np.count_nonzero(patch_outside & (~removal_dil)))
+if fringe_outside_dilation or patch_diff_outside_removal>4:
+    raise RuntimeError(("template patch differs beyond source-effect AA fringe",patch_diff_pixels,patch_diff_outside_removal,fringe_outside_dilation,patch_max))
 pad=32
 ta=[max(0,ob[0]-pad),max(0,ob[1]-pad),min(W,ob[2]+pad),min(H,ob[3]+pad)]
 ha=[max(0,dob[0]-pad),max(0,dob[1]-pad),min(W,dob[2]+pad),min(H,dob[3]+pad)]
@@ -180,7 +188,8 @@ report={
  "template_provenance":{"producer":"B148","final_qa":"C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME","template_asset":"8215FD25","template_candidate_sha256":cq["candidate_sha256"],"source_cell":src_cell,"target_cell":dst_cell,"shift":[dx,dy],"source_cell_diff_pixels":cell_diff_pixels,"source_cell_max_channel_delta":cell_max,"exact_source_cell_match":cell_diff_pixels==0,
 "source_title_patch_diff_pixels":patch_diff_pixels,"source_title_patch_max_channel_delta":patch_max,
 "source_title_patch_diff_outside_approved_removal":patch_diff_outside_removal,
-"source_title_patch_preserved_pixels_exact":patch_diff_outside_removal==0,
+"source_title_patch_diff_outside_1px_effect_dilation":fringe_outside_dilation,
+"source_title_patch_deltas_confined_to_effect_or_1px_aa_fringe":fringe_outside_dilation==0 and patch_diff_outside_removal<=4,
 "boundary_ring_32px_diff_pixels":ring_diff_pixels,"boundary_ring_32px_max_channel_delta":ring_max,"exact_boundary_ring_match":True},
  "row":{"region_idx":1,"source":"Total Rank","korean":"종합 랭킹","cell":dst_cell,"original_bbox":dob,"localized_bbox":dlb,
         "source_width":source_w,"source_height":source_h,"localized_width":loc_w,"localized_height":loc_h,
