@@ -52,7 +52,21 @@
       "No visible English residue, clipping, overlap, seam, halo, unintended artwork change, or orientation regression is present."
     ]
   },
-  "decision": "B_PRODUCTION77_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "decision": "B77_SELF_QA_SUPERSEDED_BY_C150_POLICY_CORRECTION",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "post_self_qa_refresh": {
+    "current_candidate_sha256": "34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c",
+    "superseded_by": "20261005-C150-9FC88069",
+    "reason": "C150 restored protected song-title/variant qualifier regions 2/10/39",
+    "retained_localized_regions": [
+      0,
+      1,
+      40,
+      41
+    ],
+    "c150_machine_status": "PASS",
+    "c150_controller_visual_qa": "PENDING",
+    "reconciliation_report": "localization/graphics/role_B/20261005-B-PRODUCTION77/B77_POST_C150_RECONCILIATION.json"
+  }
 }
