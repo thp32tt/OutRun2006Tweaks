@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A99 positively classified odd index27 8B52FEEC zoom_review as NO_LOCALIZABLE_TEXT/PRESERVE_ORIGINAL from exact HD readable+raw evidence. Do not revisit it. With no A-owned active in-game backlog, no C-returned REWORK and no pending_artwork, next A normal queue item is odd index29 F043316B zoom_review unless a higher-priority row appears.",
     "B173 resolved even index38 6AB5CEE zoom_review: exact numeric-hash/canonical-HD alias of C215-approved index36 06AB5CEE. Candidate 0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5 persisted under the unpadded path byte-exact; Total Rank x3 -> 종합 랭킹; no low-res upscale. Do not repeat. Next B normal queue target: even index52 A8CE339F zoom_review unless higher priority appears.",
     "A98 positively classified odd index25 4AFC1BED zoom_review as NO_LOCALIZABLE_TEXT/PRESERVE_ORIGINAL from exact 2048x2048 HD readable+raw evidence. Do not revisit it. With no A-owned active in-game backlog, no C-returned REWORK and no pending_artwork, next A normal queue item is odd index27 8B52FEEC zoom_review unless a higher-priority row appears.",
     "B172 IGR-010 Stage/heart-tally regression producer PASS: index60 A064FDFC Stage row natural-advance native-HD candidate 77171503a7c1d089f09abcf458ee79b5aa3b52281ce8bed5f5dc234ce7dcfb9b. First B172 attempt was rejected for clean residue; final retry passes controller. Await independent C + NEW actual in-game retest; do not repeat unless returned REWORK.",
@@ -5536,7 +5537,7 @@
     "report": "localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_IGR010_REPORT.json",
     "controller_report": "localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_CONTROLLER_SELF_QA.json"
   },
-  "current_blocked_zoom_review": 40,
+  "current_blocked_zoom_review": 38,
   "a98_zoom_review_4afc1bed": {
     "timestamp_kst": "2026-10-06T08:05:00+09:00",
     "queue_index": 25,
@@ -5564,5 +5565,16 @@
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_B/20261006-B-PRODUCTION173-JENN-ALIAS/B173_6AB5CEE_ALIAS_REPORT.json",
     "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION173-JENN-ALIAS/B173_CONTROLLER_SELF_QA.json"
+  },
+  "a99_zoom_review_8b52feec": {
+    "timestamp_kst": "2026-10-06T08:34:00+09:00",
+    "queue_index": 27,
+    "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/8B52FEEC_1024x512.dds",
+    "source_sha256": "a11b32753655d25dbf95baf808af90a3cc3f65fb1083db0bb1db8fad80cdcf47",
+    "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+    "localizable_segments": 0,
+    "candidate_required": false,
+    "report": "localization/graphics/role_A/20261006-A-PROBE99-8B52FEEC/A99_CONTROLLER_CLASSIFICATION.json",
+    "status": "A99_ZOOM_REVIEW_COMPLETE_PRESERVE_ORIGINAL"
   }
 }
