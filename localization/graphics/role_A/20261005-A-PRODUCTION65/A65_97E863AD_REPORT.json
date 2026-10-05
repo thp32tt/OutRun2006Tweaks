@@ -1,0 +1,1019 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION65",
+  "index": 193,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "readiness_tier": "A63_ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "71c9961992b6718cd3da0222c83a88bd9cd22d7f",
+    "atlas_git_blob_sha1": "2c826a5eadf4784ec50c26f4a6e269f86209be71",
+    "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451"
+  },
+  "semantic_binding": {
+    "localized_indices": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      14,
+      16
+    ],
+    "protected_regions": {
+      "0": "OUTRUN2SP logo",
+      "12": "SP product fragment",
+      "13": "OR product fragment",
+      "15": "TESTAROSSA model name",
+      "17": "non-text black artwork"
+    },
+    "product_token_policy": {
+      "idx1": "OutRun original word pixels preserved exact; only descriptor -> 싱글 플레이 랭킹 보기",
+      "idx2": "OutRun2SP original word pixels preserved exact; only descriptor -> 아케이드 랭킹 보기",
+      "idx4": "OUTRUN top line preserved pixel-exact; only SHOWROOM -> 쇼룸"
+    }
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "region_idx": 1,
+      "source": "View OutRun single player rankings!",
+      "korean": "OutRun 싱글 플레이 랭킹 보기",
+      "render_text": "싱글 플레이 랭킹 보기",
+      "kind": "sentence_token",
+      "cell": [
+        0,
+        692,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        7,
+        704,
+        1076,
+        770
+      ],
+      "source_width": 1069,
+      "source_height": 66,
+      "source_median_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "preserved_inline_token": "OutRun",
+      "preserved_inline_token_bbox": [
+        169,
+        704,
+        394,
+        759
+      ],
+      "token_detection": {
+        "word_spans": [
+          [
+            7,
+            153
+          ],
+          [
+            169,
+            394
+          ],
+          [
+            413,
+            583
+          ],
+          [
+            601,
+            781
+          ],
+          [
+            798,
+            1076
+          ]
+        ],
+        "largest_gaps": [
+          [
+            19,
+            9
+          ],
+          [
+            18,
+            15
+          ],
+          [
+            17,
+            21
+          ],
+          [
+            16,
+            3
+          ],
+          [
+            13,
+            29
+          ],
+          [
+            9,
+            4
+          ],
+          [
+            8,
+            27
+          ]
+        ]
+      },
+      "localized_bbox": [
+        406,
+        707,
+        906,
+        767
+      ],
+      "localized_width": 500,
+      "localized_height": 60,
+      "delta_left": 399,
+      "delta_right": 170,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "lowres_font_size": 14,
+      "pixel_scale": 4,
+      "horizontal_scale": 1.0,
+      "alignment": "after_preserved_token",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ]
+    },
+    {
+      "region_idx": 2,
+      "source": "View OutRun2SP arcade rankings!",
+      "korean": "OutRun2SP 아케이드 랭킹 보기",
+      "render_text": "아케이드 랭킹 보기",
+      "kind": "sentence_token",
+      "cell": [
+        0,
+        532,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        7,
+        544,
+        1059,
+        610
+      ],
+      "source_width": 1052,
+      "source_height": 66,
+      "source_median_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "preserved_inline_token": "OutRun2SP",
+      "preserved_inline_token_bbox": [
+        177,
+        544,
+        528,
+        599
+      ],
+      "token_detection": {
+        "word_spans": [
+          [
+            7,
+            153
+          ],
+          [
+            177,
+            528
+          ],
+          [
+            558,
+            753
+          ],
+          [
+            783,
+            1059
+          ]
+        ],
+        "largest_gaps": [
+          [
+            30,
+            18
+          ],
+          [
+            30,
+            12
+          ],
+          [
+            24,
+            3
+          ],
+          [
+            11,
+            26
+          ],
+          [
+            9,
+            4
+          ],
+          [
+            8,
+            24
+          ]
+        ]
+      },
+      "localized_bbox": [
+        540,
+        547,
+        972,
+        607
+      ],
+      "localized_width": 432,
+      "localized_height": 60,
+      "delta_left": 533,
+      "delta_right": 87,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "lowres_font_size": 14,
+      "pixel_scale": 4,
+      "horizontal_scale": 1.0,
+      "alignment": "after_preserved_token",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ]
+    },
+    {
+      "region_idx": 3,
+      "source": "View the online multiplayer rankings!",
+      "korean": "온라인 멀티플레이 랭킹 보기",
+      "render_text": "온라인 멀티플레이 랭킹 보기",
+      "kind": "sentence",
+      "cell": [
+        0,
+        372,
+        1800,
+        160
+      ],
+      "original_bbox": [
+        7,
+        384,
+        1137,
+        450
+      ],
+      "source_width": 1130,
+      "source_height": 66,
+      "source_median_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "preserved_inline_token": null,
+      "preserved_inline_token_bbox": null,
+      "token_detection": null,
+      "localized_bbox": [
+        11,
+        387,
+        663,
+        447
+      ],
+      "localized_width": 652,
+      "localized_height": 60,
+      "delta_left": 4,
+      "delta_right": 474,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "lowres_font_size": 14,
+      "pixel_scale": 4,
+      "horizontal_scale": 1.0,
+      "alignment": "left",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ]
+    },
+    {
+      "region_idx": 4,
+      "source": "SHOWROOM (OUTRUN line preserved)",
+      "korean": "쇼룸",
+      "render_text": "쇼룸",
+      "kind": "showroom_bottom",
+      "cell": [
+        1200,
+        876,
+        788,
+        148
+      ],
+      "original_bbox": [
+        1205,
+        957,
+        1594,
+        1011
+      ],
+      "source_width": 389,
+      "source_height": 54,
+      "source_median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "preserved_inline_token": null,
+      "preserved_inline_token_bbox": null,
+      "token_detection": null,
+      "localized_bbox": [
+        1209,
+        960,
+        1297,
+        1008
+      ],
+      "localized_width": 88,
+      "localized_height": 48,
+      "delta_left": 4,
+      "delta_right": 297,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "lowres_font_size": 12,
+      "pixel_scale": 4,
+      "horizontal_scale": 1.0,
+      "alignment": "left",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 5,
+      "source": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "render_text": "멀티플레이",
+      "kind": "multiplayer",
+      "cell": [
+        0,
+        284,
+        980,
+        88
+      ],
+      "original_bbox": [
+        8,
+        297,
+        540,
+        359
+      ],
+      "source_width": 532,
+      "source_height": 62,
+      "source_median_rgba": [
+        78,
+        96,
+        100,
+        255
+      ],
+      "preserved_inline_token": null,
+      "preserved_inline_token_bbox": null,
+      "token_detection": null,
+      "localized_bbox": [
+        12,
+        300,
+        244,
+        356
+      ],
+      "localized_width": 232,
+      "localized_height": 56,
+      "delta_left": 4,
+      "delta_right": 296,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "lowres_font_size": 13,
+      "pixel_scale": 4,
+      "horizontal_scale": 1.0,
+      "alignment": "left",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "fill_rgba": [
+        78,
+        96,
+        100,
+        255
+      ]
+    },
+    {
+      "region_idx": 6,
+      "source": "Goal E",
+      "korean": "골 E",
+      "render_text": "골 E",
+      "kind": "goal",
+      "cell": [
+        980,
+        296,
+        460,
+        76
+      ],
+      "original_bbox": [
+        1011,
+        308,
+        1171,
+        355
+      ],
+      "source_width": 160,
+      "source_height": 47,
+      "source_median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "preserved_inline_token": null,
+      "preserved_inline_token_bbox": null,
+      "token_detection": null,
+      "localized_bbox": [
+        1015,
+        313,
+        1075,
+        349
+      ],
+      "localized_width": 60,
+      "localized_height": 36,
+      "delta_left": 4,
+      "delta_right": 96,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "lowres_font_size": 9,
+      "pixel_scale": 4,
+      "horizontal_scale": 1.0,
+      "alignment": "left",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 7,
+      "source": "Goal D",
+      "korean": "골 D",
+      "render_text": "골 D",
+      "kind": "goal",
+      "cell": [
+        1440,
+        296,
+        460,
+        76
+      ],
+      "original_bbox": [
+        1473,
+        308,
+        1629,
+        355
+      ],
+      "source_width": 156,
+      "source_height": 47,
+      "source_median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "preserved_inline_token": null,
+      "preserved_inline_token_bbox": null,
+      "token_detection": null,
+      "localized_bbox": [
+        1477,
+        313,
+        1541,
+        349
+      ],
+      "localized_width": 64,
+      "localized_height": 36,
+      "delta_left": 4,
+      "delta_right": 88,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "lowres_font_size": 9,
+      "pixel_scale": 4,
+      "horizontal_scale": 1.0,
+      "alignment": "left",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 8,
+      "source": "Goal C",
+      "korean": "골 C",
+      "render_text": "골 C",
+      "kind": "goal",
+      "cell": [
+        0,
+        208,
+        460,
+        76
+      ],
+      "original_bbox": [
+        30,
+        221,
+        188,
+        268
+      ],
+      "source_width": 158,
+      "source_height": 47,
+      "source_median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "preserved_inline_token": null,
+      "preserved_inline_token_bbox": null,
+      "token_detection": null,
+      "localized_bbox": [
+        34,
+        226,
+        98,
+        262
+      ],
+      "localized_width": 64,
+      "localized_height": 36,
+      "delta_left": 4,
+      "delta_right": 90,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "lowres_font_size": 9,
+      "pixel_scale": 4,
+      "horizontal_scale": 1.0,
+      "alignment": "left",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 9,
+      "source": "Goal B",
+      "korean": "골 B",
+      "render_text": "골 B",
+      "kind": "goal",
+      "cell": [
+        460,
+        208,
+        460,
+        76
+      ],
+      "original_bbox": [
+        492,
+        221,
+        648,
+        268
+      ],
+      "source_width": 156,
+      "source_height": 47,
+      "source_median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "preserved_inline_token": null,
+      "preserved_inline_token_bbox": null,
+      "token_detection": null,
+      "localized_bbox": [
+        496,
+        226,
+        560,
+        262
+      ],
+      "localized_width": 64,
+      "localized_height": 36,
+      "delta_left": 4,
+      "delta_right": 88,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "lowres_font_size": 9,
+      "pixel_scale": 4,
+      "horizontal_scale": 1.0,
+      "alignment": "left",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 10,
+      "source": "Goal A",
+      "korean": "골 A",
+      "render_text": "골 A",
+      "kind": "goal",
+      "cell": [
+        920,
+        208,
+        460,
+        76
+      ],
+      "original_bbox": [
+        950,
+        221,
+        1115,
+        268
+      ],
+      "source_width": 165,
+      "source_height": 47,
+      "source_median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "preserved_inline_token": null,
+      "preserved_inline_token_bbox": null,
+      "token_detection": null,
+      "localized_bbox": [
+        954,
+        226,
+        1018,
+        262
+      ],
+      "localized_width": 64,
+      "localized_height": 36,
+      "delta_left": 4,
+      "delta_right": 97,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "lowres_font_size": 9,
+      "pixel_scale": 4,
+      "horizontal_scale": 1.0,
+      "alignment": "left",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 11,
+      "source": "15 Cont.",
+      "korean": "15코스",
+      "render_text": "15코스",
+      "kind": "goal",
+      "cell": [
+        1380,
+        208,
+        460,
+        76
+      ],
+      "original_bbox": [
+        1413,
+        221,
+        1622,
+        268
+      ],
+      "source_width": 209,
+      "source_height": 47,
+      "source_median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "preserved_inline_token": null,
+      "preserved_inline_token_bbox": null,
+      "token_detection": null,
+      "localized_bbox": [
+        1417,
+        228,
+        1525,
+        260
+      ],
+      "localized_width": 108,
+      "localized_height": 32,
+      "delta_left": 4,
+      "delta_right": 97,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "lowres_font_size": 9,
+      "pixel_scale": 4,
+      "horizontal_scale": 1.0,
+      "alignment": "left",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 14,
+      "source": "WELCOME TO THE",
+      "korean": "환영합니다",
+      "render_text": "환영합니다",
+      "kind": "welcome",
+      "cell": [
+        0,
+        136,
+        896,
+        72
+      ],
+      "original_bbox": [
+        3,
+        148,
+        476,
+        195
+      ],
+      "source_width": 473,
+      "source_height": 47,
+      "source_median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "preserved_inline_token": null,
+      "preserved_inline_token_bbox": null,
+      "token_detection": null,
+      "localized_bbox": [
+        7,
+        151,
+        155,
+        191
+      ],
+      "localized_width": 148,
+      "localized_height": 40,
+      "delta_left": 4,
+      "delta_right": 321,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "lowres_font_size": 8,
+      "pixel_scale": 4,
+      "horizontal_scale": 1.0,
+      "alignment": "left",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    },
+    {
+      "region_idx": 16,
+      "source": "ONLINE",
+      "korean": "온라인",
+      "render_text": "온라인",
+      "kind": "online",
+      "cell": [
+        1652,
+        144,
+        388,
+        64
+      ],
+      "original_bbox": [
+        1660,
+        156,
+        1832,
+        194
+      ],
+      "source_width": 172,
+      "source_height": 38,
+      "source_median_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "preserved_inline_token": null,
+      "preserved_inline_token_bbox": null,
+      "token_detection": null,
+      "localized_bbox": [
+        1664,
+        159,
+        1728,
+        191
+      ],
+      "localized_width": 64,
+      "localized_height": 32,
+      "delta_left": 4,
+      "delta_right": 104,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "lowres_font_size": 6,
+      "pixel_scale": 4,
+      "horizontal_scale": 1.0,
+      "alignment": "left",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ]
+    }
+  ],
+  "preserved_regions": {
+    "0": {
+      "label": "OUTRUN2SP logo",
+      "changed_pixels": 0
+    },
+    "12": {
+      "label": "SP product fragment",
+      "changed_pixels": 0
+    },
+    "13": {
+      "label": "OR product fragment",
+      "changed_pixels": 0
+    },
+    "15": {
+      "label": "TESTAROSSA model name",
+      "changed_pixels": 0
+    },
+    "17": {
+      "label": "non-text black artwork",
+      "changed_pixels": 0
+    },
+    "4_OUTRUN_TOP": {
+      "label": "OUTRUN product token line",
+      "changed_pixels": 0
+    },
+    "1_INLINE_TOKEN": {
+      "label": "OutRun inline token",
+      "bbox": [
+        169,
+        704,
+        394,
+        759
+      ],
+      "changed_pixels": 0
+    },
+    "2_INLINE_TOKEN": {
+      "label": "OutRun2SP inline token",
+      "bbox": [
+        177,
+        544,
+        528,
+        599
+      ],
+      "changed_pixels": 0
+    }
+  },
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION65/A65_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION65/A65_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 129429,
+    "changed_bbox": [
+      3,
+      148,
+      1832,
+      1011
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION65/A65_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION65/A65_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 163718,
+    "changed_bbox": [
+      3,
+      148,
+      1832,
+      1011
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_total": 163718,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "exact_source_residue": 0,
+    "render_outside_target": 0,
+    "overlap": 0,
+    "touch_pairs": [],
+    "inline_token_overlap": 0
+  },
+  "candidate_sha256": "0352a4e0eb0285f9b021fb5046da7b778e3de3317b2348efad69158e0742000d",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "A65_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
