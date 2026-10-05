@@ -4231,6 +4231,80 @@ int main()
         r258IndexedSourceRevalidation.snapshotToken != 0,
         "R258 indexed final dormant handoff revalidates current R255 source state");
 
+    const auto r259IndexedPrerequisiteHandoff =
+        outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
+            r258IndexedSourceRevalidation,
+            r258IndexedSourceRevalidation.snapshotToken,
+            r243InputLayoutReady,
+            r243InputLayoutReady.snapshotToken);
+    require(
+        r259IndexedPrerequisiteHandoff.inputValid &&
+        r259IndexedPrerequisiteHandoff.sourceRevalidationReady &&
+        r259IndexedPrerequisiteHandoff.sourceRevalidationSnapshotMatches &&
+        r259IndexedPrerequisiteHandoff.inputLayoutOwnershipReady &&
+        r259IndexedPrerequisiteHandoff.inputLayoutSnapshotMatches &&
+        !r259IndexedPrerequisiteHandoff.resourceBehaviorProofPresent &&
+        r259IndexedPrerequisiteHandoff.inputLayoutProofPresent &&
+        !r259IndexedPrerequisiteHandoff.shaderTranslationProofPresent &&
+        !r259IndexedPrerequisiteHandoff.activationPrerequisitesSatisfied &&
+        r259IndexedPrerequisiteHandoff.diagnosticOnly &&
+        !r259IndexedPrerequisiteHandoff.nativeDrawPathActivationAllowed &&
+        !r259IndexedPrerequisiteHandoff.drawDispatchAuthorized &&
+        r259IndexedPrerequisiteHandoff.boundaryPreserved &&
+        r259IndexedPrerequisiteHandoff.reviewReady &&
+        r259IndexedPrerequisiteHandoff.kind ==
+            outrun::vr::dx11::NativeProgrammableShaderDrawCandidateKind::Indexed &&
+        r259IndexedPrerequisiteHandoff.indexed &&
+        r259IndexedPrerequisiteHandoff.missingPrerequisiteMask == 0x5u &&
+        r259IndexedPrerequisiteHandoff.reviewSnapshotToken != 0 &&
+        r259IndexedPrerequisiteHandoff.activationSnapshotToken == 0 &&
+        outrun::vr::dx11::
+            validate_programmable_activation_prerequisite_handoff_snapshot(
+                r258IndexedSourceRevalidation,
+                r258IndexedSourceRevalidation.snapshotToken,
+                r243InputLayoutReady,
+                r243InputLayoutReady.snapshotToken,
+                r259IndexedPrerequisiteHandoff.reviewSnapshotToken),
+        "R259 indexed review handoff exposes F18/F21 proof debt without activation authority");
+
+    const auto staleR258IndexedReviewToken =
+        r258IndexedSourceRevalidation.snapshotToken == 1ull
+            ? 2ull
+            : (r258IndexedSourceRevalidation.snapshotToken ^ 1ull);
+    const auto r259IndexedStaleSource =
+        outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
+            r258IndexedSourceRevalidation,
+            staleR258IndexedReviewToken,
+            r243InputLayoutReady,
+            r243InputLayoutReady.snapshotToken);
+    require(
+        r259IndexedStaleSource.sourceRevalidationReady &&
+        !r259IndexedStaleSource.sourceRevalidationSnapshotMatches &&
+        !r259IndexedStaleSource.reviewReady &&
+        r259IndexedStaleSource.reviewSnapshotToken == 0 &&
+        r259IndexedStaleSource.activationSnapshotToken == 0,
+        "R259 rejects stale R258 source-revalidation identity");
+
+    const auto staleR243ReviewToken =
+        r243InputLayoutReady.snapshotToken == 1ull
+            ? 2ull
+            : (r243InputLayoutReady.snapshotToken ^ 1ull);
+    const auto r259IndexedStaleInputLayout =
+        outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
+            r258IndexedSourceRevalidation,
+            r258IndexedSourceRevalidation.snapshotToken,
+            r243InputLayoutReady,
+            staleR243ReviewToken);
+    require(
+        r259IndexedStaleInputLayout.inputLayoutOwnershipReady &&
+        !r259IndexedStaleInputLayout.inputLayoutSnapshotMatches &&
+        !r259IndexedStaleInputLayout.inputLayoutProofPresent &&
+        (r259IndexedStaleInputLayout.missingPrerequisiteMask & 0x2u) != 0 &&
+        !r259IndexedStaleInputLayout.reviewReady &&
+        r259IndexedStaleInputLayout.reviewSnapshotToken == 0 &&
+        r259IndexedStaleInputLayout.activationSnapshotToken == 0,
+        "R259 rejects stale R243 input-layout identity");
+
     const auto r258IndexedSourceDrift =
         programmableCache.indexed_dormant_source_revalidation_readiness(
             d3d.context, d3d.device, programmablePair,
@@ -5059,6 +5133,36 @@ int main()
             r257NonIndexedPreActivation.snapshotToken &&
         r258NonIndexedSourceRevalidation.snapshotToken != 0,
         "R258 non-indexed final dormant handoff revalidates current R251 source state");
+
+    const auto r259NonIndexedPrerequisiteHandoff =
+        outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
+            r258NonIndexedSourceRevalidation,
+            r258NonIndexedSourceRevalidation.snapshotToken,
+            r243InputLayoutReady,
+            r243InputLayoutReady.snapshotToken);
+    require(
+        r259NonIndexedPrerequisiteHandoff.sourceRevalidationReady &&
+        r259NonIndexedPrerequisiteHandoff.sourceRevalidationSnapshotMatches &&
+        r259NonIndexedPrerequisiteHandoff.inputLayoutProofPresent &&
+        !r259NonIndexedPrerequisiteHandoff.resourceBehaviorProofPresent &&
+        !r259NonIndexedPrerequisiteHandoff.shaderTranslationProofPresent &&
+        !r259NonIndexedPrerequisiteHandoff.activationPrerequisitesSatisfied &&
+        r259NonIndexedPrerequisiteHandoff.boundaryPreserved &&
+        r259NonIndexedPrerequisiteHandoff.reviewReady &&
+        r259NonIndexedPrerequisiteHandoff.kind ==
+            outrun::vr::dx11::NativeProgrammableShaderDrawCandidateKind::NonIndexed &&
+        !r259NonIndexedPrerequisiteHandoff.indexed &&
+        r259NonIndexedPrerequisiteHandoff.missingPrerequisiteMask == 0x5u &&
+        r259NonIndexedPrerequisiteHandoff.reviewSnapshotToken != 0 &&
+        r259NonIndexedPrerequisiteHandoff.activationSnapshotToken == 0 &&
+        outrun::vr::dx11::
+            validate_programmable_activation_prerequisite_handoff_snapshot(
+                r258NonIndexedSourceRevalidation,
+                r258NonIndexedSourceRevalidation.snapshotToken,
+                r243InputLayoutReady,
+                r243InputLayoutReady.snapshotToken,
+                r259NonIndexedPrerequisiteHandoff.reviewSnapshotToken),
+        "R259 non-indexed review handoff preserves F18/F21 fail-closed debt");
 
     const auto r258NonIndexedSourceDrift =
         programmableCache.nonindexed_dormant_source_revalidation_readiness(
