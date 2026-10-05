@@ -1,0 +1,20 @@
+{
+  "run": "20261006-C216-ACF61D7C",
+  "qa_id": "C216",
+  "index": 205,
+  "asset": "ACF61D7C",
+  "candidate_sha256": "a6406a4a6acf8e1e3f3b4e6ff86a588247b245a428ac3c55cc89b65b4f7f400a",
+  "machine_status": "PASS",
+  "machine_checks": {
+    "decoded_changed_outside_union_producer_rows": 0,
+    "alpha_changed_outside_union_producer_rows": 0,
+    "introduced_visible_outside_union_producer_rows": 0,
+    "protected_full_region_changed_pixels": 0,
+    "protected_inline_token_changed_pixels": 0,
+    "token_relation_failures": 0,
+    "localized_bbox_clean_to_final_mismatches": 0,
+    "source_exact_residue_outside_localized_bboxes": 0
+  },
+  "report": "localization/graphics/role_C/20261006-C216-ACF61D7C/C216_ACF61D7C_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
