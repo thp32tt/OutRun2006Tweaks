@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C208 returned new A65 index193 97E863AD candidate 0352a4e0eb0285f9b021fb5046da7b778e3de3317b2348efad69158e0742000d. Independent canonical/header/raw mirror_y QA passes 13/13 source/localized bbox exact + size + positive margins and all outside/alpha/introduced-visible/source-residue/overlap/touch/protected gates at zero; OutRun/OutRun2SP/OUTRUN/TESTAROSSA protected pixels remain exact. Mandatory controller visual QA fails source-style scale/proportion: Korean labels are materially underscaled/too compact versus the wide bold-condensed source family (e.g. SHOWROOM 88/389px, MULTIPLAYER 232/532px, WELCOME 148/473px, ONLINE 64/172px). C208_REWORK_REQUIRED_SOURCE_STYLE_SCALE_PROPORTION; re-render larger/wider inside exact source bboxes. RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION62 completed odd index173 6DC89C6E candidate b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26. A61 readable source-contact fixed all 21 physical stage rows, then A62 rendered in the same invocation using canonical phonetic Hangul and the shared blue-gray bold condensed source family. 21/21 bbox/size/positive-margin, CLEAN/FINAL PASS, outside/alpha/protected/residue/render/overlap/touch=0, readable/raw mirror_y visual PASS. Pending independent C and in-game. RUNTIME_VALIDATION=UNTESTED.",
     "C203 finalized A60 index163 59A79158 candidate 1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583. Independent canonical source+atlas QA reproduces source/localized bboxes 24/24 exactly, 24/24 containment/size/positive-margin and canonical phonetic stage binding PASS; outside/alpha/introduced-visible/source-residue/overlap/touch all 0. Controller contacts/raw mirror_y PASS. C203_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "C206 finalized B152 index32 DCC7B488 candidate 958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14 and positively classifies zoom_review Total Rank -> 종합 랭킹. Corrected C verifier shows strict source-script residue=0, exact localized bbox 1/1, outside/alpha/render/protected all 0; Coons clean plate is visually seamless with low boundary RGB deltas, controller SOURCE/CLEAN/FINAL/raw mirror_y PASS. C204/C205 were verifier-only false positives on same candidate bytes. C206_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
@@ -3942,10 +3943,11 @@
     "c176_return_resolved": true,
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_artwork_localize_text": 9,
-  "current_producer_rework_remaining": 1,
+  "current_pending_artwork_localize_text": 8,
+  "current_producer_rework_remaining": 2,
   "current_producer_rework_assets": [
-    "37759842"
+    "37759842",
+    "97E863AD"
   ],
   "latest_b_production": {
     "run": "B_PRODUCTION152",
@@ -3996,7 +3998,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C203-C206-BATCH/C203_C206_BATCH_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C208-97E863AD/C208_97E863AD_CONTROLLER_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4057,9 +4059,7 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [
-    "6DC89C6E"
-  ],
+  "current_pending_c": [],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -4527,6 +4527,32 @@
     "pending_independent_c_final_qa": true,
     "report": "localization/graphics/role_A/20261005-A-PRODUCTION62/A62_6DC89C6E_REPORT.json",
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION62/A62_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c208_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T22:31:00+09:00",
+    "run": "20261005-C208-97E863AD",
+    "queue_index": 193,
+    "candidate_sha256": "0352a4e0eb0285f9b021fb5046da7b778e3de3317b2348efad69158e0742000d",
+    "machine_status": "PASS_AFTER_C208_VERIFIER_SCOPE_CORRECTION",
+    "bbox_size_positive_margin": "13/13 PASS",
+    "source_bbox_exact": "13/13 PASS",
+    "candidate_bbox_exact": "13/13 PASS",
+    "zero_pixel_gates": {
+      "decoded_changed_outside": 0,
+      "alpha_changed_outside": 0,
+      "introduced_visible_outside": 0,
+      "source_script_residue": 0,
+      "overlap": 0,
+      "touch": 0,
+      "protected_changed": 0
+    },
+    "protected_product_model_pixels": "PASS",
+    "controller_visual_qa": "FAIL_SOURCE_STYLE_SCALE_PROPORTION",
+    "decision": "C208_REWORK_REQUIRED_SOURCE_STYLE_SCALE_PROPORTION",
+    "verifier_retry_note": "Initial C208 source-residue counter was a C-only scope false positive inside localized Hangul bboxes; corrected same candidate passes residue=0.",
+    "machine_report": "localization/graphics/role_C/20261005-C208-97E863AD/C208_97E863AD_MACHINE_QA.json",
+    "report": "localization/graphics/role_C/20261005-C208-97E863AD/C208_97E863AD_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
