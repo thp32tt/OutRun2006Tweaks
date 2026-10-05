@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T20:28:46+09:00",
+  "role": "C",
+  "run": "20261005-C195-4EDA9DE3",
+  "qa_id": "C195",
+  "queue_index": 159,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+  "producer_run": "20261005-A-PRODUCTION51",
+  "source_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+  "candidate_sha256": "8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5",
+  "candidate_changed_by_C": false,
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "15/15 PASS",
+  "source_bbox_exact_match_all": true,
+  "candidate_bbox_exact_match_all": true,
+  "semantic_stage_mapping": "PASS_CANONICAL_PHONETIC",
+  "zero_pixel_gates": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "candidate_visible_outside_union_source_bboxes": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0
+  },
+  "style_check": "PASS_SHARED_DARK_TEAL_RGB_79_97_101",
+  "controller_visual_qa": "PASS",
+  "visual_notes": [
+    "All 15 readable stage-name rows are complete and legible with no clipping or overlap.",
+    "No source English residue is visible in SOURCE/FINAL contacts; the dark teal source family is preserved consistently.",
+    "Raw DDS mirror_y orientation matches the canonical source.",
+    "Canonical phonetic stage-name policy is respected, including ICE SCAPE -> 아이스스케이프 and WATERFALLS -> 워터폴스."
+  ],
+  "machine_report": "localization/graphics/role_C/20261005-C195-4EDA9DE3/C195_4EDA9DE3_MACHINE_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C195-4EDA9DE3/C195_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_C/20261005-C195-4EDA9DE3/C195_SOURCE_FINAL_OVERVIEW.jpg",
+    "localization/graphics/role_C/20261005-C195-4EDA9DE3/C195_RAW_COMPARE.jpg"
+  ],
+  "decision": "C195_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED"
+}
