@@ -34535,7 +34535,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_102_provenanc
         "start_boundary_status": "F135_MANDATORY_OVERLAP_FULL_INSTRUCTION_CONSUMED",
         "function_entry_status": "F137_FUNCTION_SEMANTICS_UNRESOLVED",
         "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
-        "call_semantics": "INDIRECT_CALL_TARGET_AND_EFFECT_UNRESOLVED",
+        "call_semantics": "UNRESOLVED",
         "continuation_status": "RAW_CAPTURE_READY_FOR_EXACT_DECODE",
         "ownership_effect": "NONE",
         "continuation_scope": "EXACT_RAW_BYTES_MANDATORY_OVERLAP_EMPTY_INHERITED_DEBT_AND_EMPTY_REL32_CENSUS_ONLY",
