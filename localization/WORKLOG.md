@@ -1423,3 +1423,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Queue sanity: 137 total = 79 localize_text + 47 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve-brand/song-credit.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_C/20261005-C143-E3F4BA07/C143_E3F4_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C143-E3F4BA07/C143_E3F4_MACHINE_QA.json`.
+
+## 2026-10-05 09:52:00 KST — B68 E7F6E9B7 exact-HD candidate self-QA PASS
+- Refreshed current Git/queue; completed B67/C143 work was not repeated. B selected the next renderable even index 228 `E7F6E9B7_512x512.dds`.
+- Pinned canonical OR2006Sprites source/atlas and bound all 13 menu-name rows in atlas order: coast 2 coast, car select, license select, game lobby, main menu, multiplayer, music select, options, network, rankings, game select, mode select, race select.
+- Final candidate `6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607` from source `3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154`: 2048x2048 RGBA32 BGRA mip1/header exact/raw `mirror_y`; 13/13 exact bbox+size+positive-margin PASS; clean/final validators PASS; source residue=0, outside=0, alpha-outside=0, protected=0, overlap=0, touch=0.
+- Controller SOURCE/CLEAN/FINAL, row-contact and raw mirror_y visual self-QA PASS. Silver gradient, dark outline/shadow, left alignment and rightward techno-slant source family are retained; no visible English residue, clipping, overlap, seam, halo, or orientation regression.
+- Queue index 228 advanced to `b68_self_qa_pass_pending_c`; pending_artwork localize_text=32. Independent C final QA and isolated in-game validation remain pending.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION68/B68_E7F6_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION68/B68_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261005-B-PRODUCTION68/B68_FINAL_VALIDATION.json`.
