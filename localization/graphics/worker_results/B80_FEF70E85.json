@@ -1,0 +1,23 @@
+{
+  "run": "20261005-B-PRODUCTION80",
+  "index": 236,
+  "asset": "FEF70E85",
+  "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "candidate_sha256": "e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086",
+  "localized_physical_elements": 14,
+  "preserved_regions": 1,
+  "bbox_size_positive_margin": "14/14",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "source_residue": 0,
+  "outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "render_outside_target": 0,
+  "preserved_regions_changed": 0,
+  "overlap": 0,
+  "touch_pairs": 0,
+  "worker_status": "B_PRODUCTION80_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION80/B80_FEF_REPORT.json"
+}
