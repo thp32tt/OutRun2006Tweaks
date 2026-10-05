@@ -1,0 +1,479 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PRODUCTION161-A8CE-BC3-GRADIENT",
+  "queue_index": 52,
+  "asset": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+  "readiness_tier": "ZOOM_REVIEW_POSITIVE_CLASSIFICATION_AND_PRODUCTION_SAME_INVOCATION",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b"
+  },
+  "classification": {
+    "prior_action": "zoom_review",
+    "decision": "LOCALIZE_TEXT",
+    "semantic_segments": [
+      {
+        "source": "Extra Time",
+        "korean": "추가 시간",
+        "physical_occurrences": 1
+      },
+      {
+        "source": "Start",
+        "korean": "시작",
+        "physical_occurrences": 2
+      },
+      {
+        "source": "Goal",
+        "korean": "골",
+        "physical_occurrences": 2
+      }
+    ],
+    "protected": [
+      "0-9 numeric sprites",
+      "1P-6P player identifiers",
+      "progress bars/ticks/arrows",
+      "track fragments and non-text artwork"
+    ]
+  },
+  "same_family_precedent": {
+    "asset": "FF2462BB",
+    "candidate_sha256": "9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08",
+    "decision": "C86_PIXEL_VISUAL_PASS_PENDING_INGAME",
+    "start_source_size": [
+      114,
+      48
+    ],
+    "goal_source_size": [
+      103,
+      48
+    ],
+    "start_korean": "시작",
+    "goal_korean": "골"
+  },
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "elements": [
+    {
+      "region_idx": 24,
+      "source": "Start",
+      "korean": "시작",
+      "kind": "bar_label",
+      "cell": [
+        0,
+        304,
+        776,
+        104
+      ],
+      "original_bbox": [
+        24,
+        308,
+        131,
+        349
+      ],
+      "source_mask_pixels": 3530,
+      "fill_mode": "SOURCE_SAMPLED_SOLID",
+      "block_safe_bbox": [
+        24,
+        308,
+        128,
+        348
+      ],
+      "localized_bbox_preencode": [
+        42,
+        309,
+        110,
+        348
+      ],
+      "source_width": 107,
+      "source_height": 41,
+      "localized_width_preencode": 68,
+      "localized_height_preencode": 39,
+      "delta_left_preencode": 18,
+      "delta_right_preencode": 21,
+      "delta_top_preencode": 1,
+      "delta_bottom_preencode": 1,
+      "containment_preencode": "PASS",
+      "size_ceiling_preencode": "PASS",
+      "positive_margin_preencode": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_size": 41,
+      "stroke_width": 3,
+      "italic_shear": 0.0,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "stroke_rgba": [
+        0,
+        12,
+        57,
+        255
+      ],
+      "localized_bbox": [
+        42,
+        309,
+        110,
+        348
+      ],
+      "localized_width": 68,
+      "localized_height": 39,
+      "delta_left": 18,
+      "delta_right": 21,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 24,
+      "source": "Goal",
+      "korean": "골",
+      "kind": "bar_label",
+      "cell": [
+        0,
+        304,
+        776,
+        104
+      ],
+      "original_bbox": [
+        649,
+        308,
+        744,
+        349
+      ],
+      "source_mask_pixels": 3225,
+      "fill_mode": "SOURCE_SAMPLED_SOLID",
+      "block_safe_bbox": [
+        652,
+        308,
+        744,
+        348
+      ],
+      "localized_bbox_preencode": [
+        679,
+        309,
+        715,
+        348
+      ],
+      "source_width": 95,
+      "source_height": 41,
+      "localized_width_preencode": 36,
+      "localized_height_preencode": 39,
+      "delta_left_preencode": 30,
+      "delta_right_preencode": 29,
+      "delta_top_preencode": 1,
+      "delta_bottom_preencode": 1,
+      "containment_preencode": "PASS",
+      "size_ceiling_preencode": "PASS",
+      "positive_margin_preencode": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_size": 41,
+      "stroke_width": 3,
+      "italic_shear": 0.0,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "stroke_rgba": [
+        0,
+        12,
+        57,
+        255
+      ],
+      "localized_bbox": [
+        679,
+        309,
+        715,
+        348
+      ],
+      "localized_width": 36,
+      "localized_height": 39,
+      "delta_left": 30,
+      "delta_right": 29,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 25,
+      "source": "Start",
+      "korean": "시작",
+      "kind": "bar_label",
+      "cell": [
+        776,
+        304,
+        776,
+        104
+      ],
+      "original_bbox": [
+        801,
+        309,
+        908,
+        350
+      ],
+      "source_mask_pixels": 3528,
+      "fill_mode": "SOURCE_SAMPLED_SOLID",
+      "block_safe_bbox": [
+        804,
+        312,
+        908,
+        348
+      ],
+      "localized_bbox_preencode": [
+        824,
+        312,
+        887,
+        348
+      ],
+      "source_width": 107,
+      "source_height": 41,
+      "localized_width_preencode": 63,
+      "localized_height_preencode": 36,
+      "delta_left_preencode": 23,
+      "delta_right_preencode": 21,
+      "delta_top_preencode": 3,
+      "delta_bottom_preencode": 2,
+      "containment_preencode": "PASS",
+      "size_ceiling_preencode": "PASS",
+      "positive_margin_preencode": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_size": 41,
+      "stroke_width": 3,
+      "italic_shear": 0.0,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "stroke_rgba": [
+        0,
+        12,
+        57,
+        255
+      ],
+      "localized_bbox": [
+        824,
+        312,
+        887,
+        348
+      ],
+      "localized_width": 63,
+      "localized_height": 36,
+      "delta_left": 23,
+      "delta_right": 21,
+      "delta_top": 3,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 25,
+      "source": "Goal",
+      "korean": "골",
+      "kind": "bar_label",
+      "cell": [
+        776,
+        304,
+        776,
+        104
+      ],
+      "original_bbox": [
+        1426,
+        308,
+        1521,
+        349
+      ],
+      "source_mask_pixels": 3226,
+      "fill_mode": "SOURCE_SAMPLED_SOLID",
+      "block_safe_bbox": [
+        1428,
+        308,
+        1520,
+        348
+      ],
+      "localized_bbox_preencode": [
+        1456,
+        309,
+        1492,
+        348
+      ],
+      "source_width": 95,
+      "source_height": 41,
+      "localized_width_preencode": 36,
+      "localized_height_preencode": 39,
+      "delta_left_preencode": 30,
+      "delta_right_preencode": 29,
+      "delta_top_preencode": 1,
+      "delta_bottom_preencode": 1,
+      "containment_preencode": "PASS",
+      "size_ceiling_preencode": "PASS",
+      "positive_margin_preencode": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_size": 41,
+      "stroke_width": 3,
+      "italic_shear": 0.0,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "stroke_rgba": [
+        0,
+        12,
+        57,
+        255
+      ],
+      "localized_bbox": [
+        1456,
+        309,
+        1492,
+        348
+      ],
+      "localized_width": 36,
+      "localized_height": 39,
+      "delta_left": 30,
+      "delta_right": 29,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 26,
+      "source": "Extra Time",
+      "korean": "추가 시간",
+      "kind": "extra_time",
+      "cell": [
+        0,
+        200,
+        504,
+        104
+      ],
+      "original_bbox": [
+        16,
+        214,
+        484,
+        283
+      ],
+      "source_mask_pixels": 23322,
+      "source_fill_gradient_rgb": [
+        [
+          214,
+          186,
+          115
+        ],
+        [
+          247,
+          247,
+          214
+        ],
+        [
+          239,
+          228,
+          165
+        ]
+      ],
+      "fill_mode": "SOURCE_SAMPLED_THREE_STOP_VERTICAL_GRADIENT",
+      "block_safe_bbox": [
+        16,
+        216,
+        484,
+        280
+      ],
+      "localized_bbox_preencode": [
+        138,
+        216,
+        361,
+        280
+      ],
+      "source_width": 468,
+      "source_height": 69,
+      "localized_width_preencode": 223,
+      "localized_height_preencode": 64,
+      "delta_left_preencode": 122,
+      "delta_right_preencode": 123,
+      "delta_top_preencode": 2,
+      "delta_bottom_preencode": 3,
+      "containment_preencode": "PASS",
+      "size_ceiling_preencode": "PASS",
+      "positive_margin_preencode": "PASS",
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_size": 64,
+      "stroke_width": 5,
+      "italic_shear": 0.16,
+      "fill_rgba": [
+        247,
+        243,
+        200,
+        255
+      ],
+      "stroke_rgba": [
+        0,
+        12,
+        57,
+        255
+      ],
+      "localized_bbox": [
+        138,
+        216,
+        361,
+        280
+      ],
+      "localized_width": 223,
+      "localized_height": 64,
+      "delta_left": 122,
+      "delta_right": 123,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "bbox_size_positive_margin": "5/5 PASS",
+    "decoded_changed_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "introduced_visible_outside_exact_source_bboxes": 0,
+    "source_script_residue_pixels": 0,
+    "protected_atlas_changed_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pairs": 0,
+    "clean_png_validator": "PASS",
+    "final_png_validator": "PASS"
+  },
+  "compressed_patch": {
+    "target_reencoded_blocks": 1266,
+    "source_only_full_alpha_blocks": 1314,
+    "boundary_alpha_index_only_blocks": 235,
+    "changed_blocks": 2815,
+    "boundary_endpoints_and_color_bytes_preserved": true,
+    "target_block_rule": "WHOLE_4X4_BLOCK_MUST_BE_INSIDE_EXACT_SOURCE_BBOX",
+    "source_boundary_rule": "PRESERVE_ALPHA_ENDPOINTS_AND_BC1_COLOR_BYTES_CHANGE_SOURCE_OWNED_ALPHA_INDICES_ONLY"
+  },
+  "candidate_sha256": "b3b215fb1d32baa5188a799bfebb9b42d18754c045b54661fa5a642b590f4441",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+  "worker_static_qa": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "status": "B161_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED"
+}
