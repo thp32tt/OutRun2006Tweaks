@@ -1,5 +1,3 @@
-[Reading 647 lines from line 1 (total: 648 lines, 0 remaining)]
-
 """Extract a SHA-bound canonical PE RVA window for DXVK disassembly evidence."""
 
 from __future__ import annotations
