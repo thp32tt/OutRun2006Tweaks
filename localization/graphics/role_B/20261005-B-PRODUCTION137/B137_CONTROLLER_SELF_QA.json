@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION137",
+  "timestamp_kst": "2026-10-05T19:18:00+09:00",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "candidate_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
+  "machine_qa": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changed_pixels_outside_edit_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "source_effect_residue": 0,
+    "render_outside_target": 0,
+    "localized_overlap": 0
+  },
+  "controller_visual_qa": "PASS",
+  "visual_checks": [
+    "Pink cloud CLEAN is visually continuous with no title-shaped tonal ghosts, rectangular repair boundary, or border/glow damage.",
+    "Lower starburst CLEAN no longer shows the C184/B135 horizontal smear; center spike/glow and brown interior transition continuously across the removed-title footprint.",
+    "FINAL Korean titles preserve the shared white-fill/navy-outline italic family with positive separation and no visible source-script residue.",
+    "Readable and raw mirror_y evidence show correct orientation with no clipping or unintended artwork change."
+  ],
+  "decision": "B137_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "supersedes_producer_candidate": "ef51bc2653cc52796c632e57c53dfb8ac27c40706059881960ea030810a1cdd0",
+  "c_return_resolved": "C184_REWORK_REQUIRED_STARBURST_CLEAN_PLATE_RECONSTRUCTION_ARTIFACTS",
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_63C_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_63C_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_63C_ROW_CONTACT.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_63C_RAW_COMPARE.jpg"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
