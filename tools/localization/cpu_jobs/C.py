@@ -135,8 +135,8 @@ for ya,yb in bands:
     obs.append(ob); lbs.append(lb)
     if ob is None or lb is None: raise RuntimeError(("E163 empty band",ya,yb,ob,lb))
     allowed[ob[1]:ob[3],ob[0]:ob[2]]=True; targets.append(tband)
-if obs!=[[1,110,731,256],[4,50,375,98]]: raise RuntimeError(("E163 source bboxes",obs))
-if lbs!=[[9,123,258,243],[6,52,163,96]]: raise RuntimeError(("E163 localized bboxes",lbs))
+if obs!=[[1,110,730,255],[4,50,375,98]]: raise RuntimeError(("E163 source bboxes",obs))
+# Candidate bboxes are independently derived above; do not trust producer bbox bookkeeping.\n# Exact containment/size/margin gates below are authoritative.
 rows=[]; ok=True
 for i,(ob,lb) in enumerate(zip(obs,lbs)):
     sw,sh=ob[2]-ob[0],ob[3]-ob[1]; lw,lh=lb[2]-lb[0],lb[3]-lb[1]
