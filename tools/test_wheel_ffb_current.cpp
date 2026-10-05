@@ -169,6 +169,29 @@ int main() {
  require(physics_return_relief(.15f,-.08f)>.89f&&physics_return_relief(.15f,-.08f)<.91f,"normal-corner countersteer relief remains modest");
  require(physics_return_relief(.32f,-.08f)>.969f,"deep-slip self-countersteer retains nearly all aligning torque");
  require(physics_return_relief(.15f,.08f)==1,"opposing work no relief");
+
+ require(model_invert_force(Model::ModernDD)&&model_invert_spring(Model::ModernDD),"Modern owns reversed R3 polarity");
+ require(!model_invert_force(Model::ArcadeOriginal)&&!model_invert_spring(Model::ArcadeOriginal),"Arcade owns normal polarity");
+ require(!model_invert_force(Model::ArcadeHybrid)&&!model_invert_spring(Model::PS2OriginalExperimental),"Hybrid/PS2 own normal polarity");
+
+ std::array<unsigned,4> imperialStone2={PrimaryAsphaltSurfaceMask,ImperialStoneSurfaceMask,PrimaryAsphaltSurfaceMask,ImperialStoneSurfaceMask};
+ std::array<unsigned,4> imperialStone4={ImperialStoneSurfaceMask,ImperialStoneSurfaceMask,ImperialStoneSurfaceMask,ImperialStoneSurfaceMask};
+ const float stoneCov2=imperial_stone_paving_coverage(14,0,imperialStone2);
+ const float stoneCov4=imperial_stone_paving_coverage(14,0,imperialStone4);
+ require(std::abs(stoneCov2-.5f)<1e-6f&&std::abs(stoneCov4-1.0f)<1e-6f,"Imperial stone coverage follows 2/4 wheel 0x800 contact");
+ require(imperial_stone_paving_coverage(14,0,asphaltMasks)==0,"all-primary Imperial asphalt stays silent");
+ require(imperial_stone_paving_coverage(13,0,imperialStone4)==0,"stone classifier is stage-14 scoped");
+ const float stoneAmp2=imperial_stone_paving_amplitude(stoneCov2,.8f,.6f,.7f);
+ const float stoneAmp4=imperial_stone_paving_amplitude(stoneCov4,.8f,.6f,.7f);
+ require(stoneAmp2>.04f&&stoneAmp4>stoneAmp2&&stoneAmp4<=.090001f,"Imperial stone texture is perceptible but comfort-capped");
+
+ require(modern_drift_spring_scale(0.0f)==1.0f,"normal corner keeps Modern centre spring");
+ require(modern_drift_spring_scale(.50f)<.10f,"deep drift releases artificial centre spring");
+ const float driftAssistRight=drift_caster_follow_assist(.40f,.50f,.75f,.30f);
+ const float driftAssistLeft=drift_caster_follow_assist(-.40f,-.50f,.75f,.30f);
+ require(driftAssistRight<-.10f&&driftAssistLeft>.10f,"drift caster assist steers toward zero front-slip target");
+ require(std::abs(driftAssistRight+driftAssistLeft)<1e-6f,"drift caster assist is symmetric");
+ require(drift_caster_follow_assist(.40f,.02f,.75f,.30f)==0,"normal low-body-slip corner gets no drift assist");
  ResponseLUT linear{}; require(parse_response_lut("0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",linear),"linear LUT parses");
  require(std::abs(apply_response_lut(.55f,linear)-.55f)<1e-5f,"linear LUT identity");
  ResponseLUT boosted{}; require(parse_response_lut("0,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.84,0.92,1",boosted),"boost LUT parses");
