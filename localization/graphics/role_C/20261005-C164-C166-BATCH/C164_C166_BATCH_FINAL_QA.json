@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C164-C166-BATCH",
+  "timestamp_kst": "2026-10-05T15:03:00+09:00",
+  "results": [
+    {
+      "qa_id": "C164",
+      "queue_index": 55,
+      "decision": "C164_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "candidate_sha256": "b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc"
+    },
+    {
+      "qa_id": "C165",
+      "queue_index": 241,
+      "decision": "C165_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "candidate_sha256": "fe9bb931d94a13a44a08bcf61b6325c01080b462afff84f92c97205cbe0eea65"
+    },
+    {
+      "qa_id": "C166",
+      "queue_index": 26,
+      "decision": "C166_REWORK_REQUIRED_CLEAN_PLATE_GRADIENT_SEAM",
+      "candidate_sha256": "4eda98aa3749618530f702fb614db54b7cec7a9f4ba427875495d0d1d379e38c"
+    }
+  ],
+  "completed_prior_pass_repeated": false,
+  "pending_artwork_localize_text": 19,
+  "producer_rework_remaining": [
+    "63C91067",
+    "C598919A"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
