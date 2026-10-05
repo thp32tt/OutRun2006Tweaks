@@ -16,6 +16,7 @@ on:
     paths:
       - 'src/vr/**'
       - 'src/hooks_framerate.cpp'
+      - 'src/hooks_uiscaling.cpp'
       - 'src/interpolation.cpp'
       - 'src/hooks_graphics.cpp'
       - 'src/hooks_exceptions.cpp'
@@ -28,6 +29,7 @@ on:
       - 'docs/VR_REGRESSION_KNOWLEDGE.json'
       - 'docs/VR_AUTODEV_PROTOCOL.md'
       - 'docs/VR_AUTODEV_STATE.json'
+      - 'tools/OutRunVR-TestProfiles.ps1'
       - 'tools/Test-OutRunVRTestPolicy.ps1'
       - 'docs/VR_PROBLEM_HISTORY.md'
       - 'docs/VR_BINARY_CONTRACT.json'
@@ -40,6 +42,7 @@ on:
       - 'tools/verify_vr_hook_graph.py'
       - 'tools/verify_vr_refactor_contract.py'
       - 'tools/verify_vr_sumo_replay_semantics.py'
+      - 'tools/verify_vr_hud_cadence_restore.py'
       - 'tools/verify_vr_r31_r32_retirement_guard.py'
       - 'docs/VR_REFACTOR_STATE.json'
       - 'tools/Test-VRRegressionKnowledge.ps1'
@@ -84,6 +87,7 @@ jobs:
           python tools/verify_vr_hook_graph.py
           python tools/verify_vr_refactor_contract.py
           python tools/verify_vr_sumo_replay_semantics.py
+          python tools/verify_vr_hud_cadence_restore.py
           python tools/verify_vr_r31_r32_retirement_guard.py
       - name: Verify near-plane active stereo eligibility
         shell: pwsh
