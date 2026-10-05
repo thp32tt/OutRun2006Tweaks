@@ -36,7 +36,8 @@ namespace OutRunVRRenderer
     bool GetLastGameWvpSemanticProvenance(
         OutRunVR::GameSemantic::RenderScope& semanticScope,
         std::uint64_t& queueNodeEpoch,
-        const void*& queueNode) noexcept;
+        const void*& queueNode,
+        OutRunVR::GameSemantic::ProducerToken& producerToken) noexcept;
 }
 
 namespace OutRunVRStereo
@@ -97,6 +98,12 @@ namespace OutRunVRStereo
         std::uint64_t R51VsSemanticHudC64SameNode = 0;
         std::uint64_t R51VsSemanticHudC64OtherNode = 0;
         std::uint64_t R51VsSemanticHudC64NoNode = 0;
+        std::uint64_t R51ProducerFingerprintDraws = 0;
+        std::uint64_t R51ProducerFingerprintSameNode = 0;
+        std::uint64_t R51ProducerFingerprintOtherNode = 0;
+        std::uint64_t R51ProducerFingerprintNoNode = 0;
+        std::uint64_t R51ProducerFingerprintScopeMismatch = 0;
+        std::uint32_t R51ProducerFingerprintLoggedMask = 0;
         std::uint64_t R47SemanticUnknownRejected = 0;
         std::uint64_t R50SemanticOverlay2DAccepted = 0;
         std::uint64_t R50ScreenOverlay2DDraws = 0;
@@ -1126,7 +1133,7 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] fingerprint[draws={},sameNode={},otherNode={},noNode={},scopeMismatch={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
@@ -1148,6 +1155,11 @@ namespace OutRunVRStereo
                 R51VsSemanticHudC64SameNode,
                 R51VsSemanticHudC64OtherNode,
                 R51VsSemanticHudC64NoNode,
+                R51ProducerFingerprintDraws,
+                R51ProducerFingerprintSameNode,
+                R51ProducerFingerprintOtherNode,
+                R51ProducerFingerprintNoNode,
+                R51ProducerFingerprintScopeMismatch,
                 R44OverlayOwnedWvpHits, R44OverlayOwnedWvpGroupHits,
                 R44SpatialBillboardClassifications,
                 R44FlatOverlayClassifications,
@@ -1416,6 +1428,61 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
 
+            // Diagnostic-only exact-producer fingerprint. This deliberately
+            // does not participate in any return/classification decision:
+            // existing RenderScope + projection/world gates remain authoritative.
+            OutRunVR::GameSemantic::RenderScope c64Scope =
+                OutRunVR::GameSemantic::RenderScope::None;
+            std::uint64_t c64NodeEpoch = 0;
+            const void* c64Node = nullptr;
+            OutRunVR::GameSemantic::ProducerToken c64Producer =
+                OutRunVR::GameSemantic::ProducerToken::None;
+            const bool c64Provenance =
+                OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                    c64Scope, c64NodeEpoch, c64Node, c64Producer);
+            if (c64Provenance &&
+                c64Producer != OutRunVR::GameSemantic::ProducerToken::None)
+            {
+                ++R51ProducerFingerprintDraws;
+                const auto drawNode =
+                    OutRunVR::GameSemantic::CurrentQueueNode();
+                const auto drawEpoch =
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
+                const bool sameNode = drawNode && c64Node == drawNode &&
+                    c64NodeEpoch == drawEpoch;
+                if (sameNode)
+                    ++R51ProducerFingerprintSameNode;
+                else if (c64Node)
+                    ++R51ProducerFingerprintOtherNode;
+                else
+                    ++R51ProducerFingerprintNoNode;
+                if (c64Scope != semanticScope)
+                    ++R51ProducerFingerprintScopeMismatch;
+
+                if (Settings::VRTelemetry)
+                {
+                    const auto producerIndex =
+                        static_cast<unsigned>(c64Producer);
+                    if (producerIndex < 32)
+                    {
+                        const std::uint32_t producerBit =
+                            1u << producerIndex;
+                        if ((R51ProducerFingerprintLoggedMask &
+                                producerBit) == 0)
+                        {
+                            R51ProducerFingerprintLoggedMask |= producerBit;
+                            spdlog::info(
+                                "VR R51 DRAW FINGERPRINT: producer={} c64Scope={} drawScope={} nodeRelation={}",
+                                OutRunVR::GameSemantic::Name(c64Producer),
+                                OutRunVR::GameSemantic::Name(c64Scope),
+                                OutRunVR::GameSemantic::Name(semanticScope),
+                                sameNode ? "SAME" :
+                                    (c64Node ? "OTHER" : "NONE"));
+                        }
+                    }
+                }
+            }
+
             // R50: canonical queue membership proves generic 2D ownership but
             // not finite/world-locked HUD ownership. This class receives only
             // the per-eye asymmetric-FOV affine.
@@ -1463,14 +1530,10 @@ namespace OutRunVRStereo
             if (semanticHud)
             {
                 ++R51VsSemanticHudAccepted;
-                OutRunVR::GameSemantic::RenderScope c64Scope =
-                    OutRunVR::GameSemantic::RenderScope::None;
-                std::uint64_t c64NodeEpoch = 0;
-                const void* c64Node = nullptr;
-                if (OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
-                        c64Scope, c64NodeEpoch, c64Node))
+                if (c64Provenance)
                 {
-                    const auto drawNode = OutRunVR::GameSemantic::CurrentQueueNode();
+                    const auto drawNode =
+                        OutRunVR::GameSemantic::CurrentQueueNode();
                     const auto drawEpoch =
                         OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
                     if (drawNode && c64Node == drawNode &&
