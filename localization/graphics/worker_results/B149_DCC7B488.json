@@ -1,0 +1,11 @@
+{
+  "run": "20261005-B-PRODUCTION149-DCC7-PREFLIGHT",
+  "index": 32,
+  "asset": "DCC7B488",
+  "source_sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+  "regions": 1,
+  "decision": "PREFLIGHT_EVIDENCE_READY",
+  "candidate_persisted": false,
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION149-DCC7-PREFLIGHT/B149_DCC7_PREFLIGHT.json",
+  "runtime_validation": "UNTESTED"
+}
