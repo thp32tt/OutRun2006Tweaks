@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C174-37759842",
+  "qa_id": "C174",
+  "timestamp_kst": "2026-10-05T16:33:00+09:00",
+  "queue_index": 95,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "producer_run": "20261005-A-PRODUCTION33",
+  "source_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+  "candidate_sha256": "d43a8476c72552486dd2352740e21cf87a0767765ef6440111d1be02e37ba825",
+  "candidate_changed_by_C": false,
+  "producer_bbox_size_positive_margin": "33/33 PASS",
+  "producer_machine_checks": {
+    "clean_changed_outside_source_text_mask": 0,
+    "decoded_changed_outside_source_effect_bboxes": 0,
+    "alpha_changed_outside_source_effect_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "clean_source_core_pixels_unchanged": 2774,
+    "source_core_residue_pixels": 2573
+  },
+  "controller_visual_qa": "FAIL_CANNOT_ADVANCE_MACHINE_ZERO_OVERLAP_VIOLATION",
+  "visual_note": "Readable/raw orientation evidence was inspected, but final approval is already impossible under the contract because A33's own exhaustive counters report 2,573 unchanged source-core residue pixels and 2,774 source-core pixels unchanged in the CLEAN plate. A producer status string cannot override those non-zero residue gates.",
+  "decision": "C174_REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+  "required_rework": "Expand/correct the affected per-region source masks/clean-plate removal until clean_source_core_pixels_unchanged=0 and source_core_residue_pixels=0 for every localized target. Then regenerate the candidate, retain all 33 exact source-bbox/size/positive-margin passes and protected original assets, and rerun controller visual QA.",
+  "producer_report": "localization/graphics/role_A/20261005-A-PRODUCTION33/A33_37759842_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_A/20261005-A-PRODUCTION33/A33_FINAL_RAW_MIRROR_Y.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION33/A33_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION33/A33_SOURCE_CLEAN_FINAL_QUARTER.jpg"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
