@@ -31,8 +31,8 @@
     "family": "white italic title with navy outline",
     "font_file": "NotoSansCJK-Black.ttc",
     "font_style": "Black,Regular",
-    "shared_font_size": 89,
-    "stroke_width": 7,
+    "shared_font_size": 73,
+    "stroke_width": 5,
     "slant": 0.22,
     "fill_rgba": [
       255,
@@ -66,25 +66,25 @@
         1272
       ],
       "original_bbox": [
-        738,
-        1165,
-        1280,
-        1284
+        747,
+        1174,
+        1271,
+        1275
       ],
       "source_core_pixels": 31202,
-      "source_mask_pixels": 57786,
+      "source_mask_pixels": 40459,
       "localized_bbox": [
-        827,
-        1175,
-        1190,
-        1274
+        861,
+        1184,
+        1157,
+        1265
       ],
-      "source_width": 542,
-      "source_height": 119,
-      "localized_width": 363,
-      "localized_height": 99,
-      "delta_left": 89,
-      "delta_right": 90,
+      "source_width": 524,
+      "source_height": 101,
+      "localized_width": 296,
+      "localized_height": 81,
+      "delta_left": 114,
+      "delta_right": 114,
       "delta_top": 10,
       "delta_bottom": 10,
       "containment": "PASS",
@@ -92,8 +92,8 @@
       "positive_margin": "PASS",
       "font_file": "NotoSansCJK-Black.ttc",
       "font_style": "Black,Regular",
-      "font_size": 89,
-      "stroke_width": 7,
+      "font_size": 73,
+      "stroke_width": 5,
       "slant": 0.22,
       "fill_rgba": [
         255,
@@ -127,25 +127,25 @@
         243
       ],
       "original_bbox": [
-        590,
-        147,
-        1133,
-        255
+        599,
+        156,
+        1124,
+        246
       ],
       "source_core_pixels": 29316,
-      "source_mask_pixels": 52678,
+      "source_mask_pixels": 37088,
       "localized_bbox": [
-        680,
-        151,
-        1043,
-        250
+        713,
+        160,
+        1009,
+        241
       ],
-      "source_width": 543,
-      "source_height": 108,
-      "localized_width": 363,
-      "localized_height": 99,
-      "delta_left": 90,
-      "delta_right": 90,
+      "source_width": 525,
+      "source_height": 90,
+      "localized_width": 296,
+      "localized_height": 81,
+      "delta_left": 114,
+      "delta_right": 115,
       "delta_top": 4,
       "delta_bottom": 5,
       "containment": "PASS",
@@ -153,8 +153,8 @@
       "positive_margin": "PASS",
       "font_file": "NotoSansCJK-Black.ttc",
       "font_style": "Black,Regular",
-      "font_size": 89,
-      "stroke_width": 7,
+      "font_size": 73,
+      "stroke_width": 5,
       "slant": 0.22,
       "fill_rgba": [
         255,
@@ -179,12 +179,12 @@
       2048,
       2048
     ],
-    "changed_pixels": 104787,
+    "changed_pixels": 76480,
     "changed_bbox": [
-      590,
-      147,
-      1280,
-      1284
+      602,
+      156,
+      1271,
+      1275
     ],
     "changed_pixels_outside_edit_mask": 0,
     "changed_pixels_in_protected_mask": 0,
@@ -198,12 +198,12 @@
       2048,
       2048
     ],
-    "changed_pixels": 92411,
+    "changed_pixels": 68320,
     "changed_bbox": [
-      590,
-      147,
-      1280,
-      1284
+      602,
+      156,
+      1271,
+      1275
     ],
     "changed_pixels_outside_edit_mask": 0,
     "changed_pixels_in_protected_mask": 0,
@@ -218,7 +218,7 @@
     "render_outside_target": 0,
     "localized_overlap": 0
   },
-  "candidate_sha256": "e9334f2c4270985510728ee827dff52e97142563d0d0af0eda06e326679689aa",
+  "candidate_sha256": "f7e2ed5faae959c80d51f6194b55111d328b98b45b1a6e9a565ff0aaba391fcb",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
   "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
   "RUNTIME_VALIDATION": "UNTESTED",
