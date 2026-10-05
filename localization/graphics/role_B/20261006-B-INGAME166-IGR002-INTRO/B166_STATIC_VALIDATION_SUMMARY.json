@@ -1,0 +1,29 @@
+{
+  "mapping": "IGR-002_EXACT_GRAPHICS_MULTI_ASSET",
+  "assets": {
+    "BA": {
+      "queue_index": 212,
+      "candidate_sha256": "f5838261bd2015ade657d51f45175f1ef1c0351252c6505dc5eaf985be54d5a1",
+      "bbox_size_positive_margin": "1/1 PASS",
+      "changed_pixels": 37135,
+      "changed_outside_target_bboxes": 0,
+      "alpha_changed_outside_target_bboxes": 0,
+      "protected_changed_pixels": 0,
+      "render_protected_overlap_pixels": 0,
+      "status": "PASS"
+    },
+    "8C": {
+      "queue_index": 188,
+      "candidate_sha256": "8da8dbf1d5f577605e2268841667fdd64636f4358f27e17103587ee032c2575c",
+      "bbox_size_positive_margin": "1/1 PASS",
+      "changed_pixels": 44460,
+      "changed_outside_target_bboxes": 0,
+      "alpha_changed_outside_target_bboxes": 0,
+      "protected_changed_pixels": 0,
+      "render_protected_overlap_pixels": 0,
+      "status": "PASS"
+    }
+  },
+  "preserved_D657_sha256": "6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5",
+  "status": "PASS"
+}

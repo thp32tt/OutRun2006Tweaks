@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-INGAME166-IGR002-INTRO",
+  "base_head": "618d63aca95ac9491aa56ef39befb3a139755136",
+  "user_ingame_regression": [
+    "IGR-002",
+    "스크린샷(144).png"
+  ],
+  "owner_lane": "B",
+  "mapping": {
+    "status": "EXACT_HIGH_CONFIDENCE_MULTI_ASSET",
+    "domain": "GRAPHICS",
+    "visible_bindings": [
+      {
+        "screen": "large red 하트 어택 title",
+        "asset": "BA0147DA",
+        "queue_index": 212,
+        "source": "HEART ATTACK",
+        "action": "REWORKED"
+      },
+      {
+        "screen": "gray 하트 어택 / 타임 어택 tabs",
+        "asset": "D657C2EB",
+        "queue_index": 220,
+        "source": "HEART ATTACK / TIME ATTACK",
+        "action": "PRESERVED_SOURCE_HIERARCHY"
+      },
+      {
+        "screen": "쇼룸 tab/state",
+        "asset": "BA0147DA",
+        "queue_index": 212,
+        "source": "SHOWROOM",
+        "action": "PRESERVED_EXISTING"
+      },
+      {
+        "screen": "여자친구의 요구... help line",
+        "asset": "8C259C68",
+        "queue_index": 188,
+        "source": "Try to win Hearts by meeting your girlfriend's demands!",
+        "action": "REWORKED"
+      }
+    ],
+    "runtime_text_search": "No localization runtime source is required for these screenshot-visible labels; all mapped elements are baked graphics assets.",
+    "note": "IGR-002 is the Heart Attack intro member of the same front-end family as IGR-001/019, but this B run modifies only screenshot(144)-visible B-owned mapped rows."
+  },
+  "assets": {
+    "BA": {
+      "queue_index": 212,
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+      "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "superseded_candidate_sha256": "869cf1bea8b27dcc89f5b2ab68f9dd163e4bf41fa6de4b53c7b3f19b3b1c74ad",
+      "candidate_sha256": "f5838261bd2015ade657d51f45175f1ef1c0351252c6505dc5eaf985be54d5a1",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+      "structure": {
+        "width": 2048,
+        "height": 2048,
+        "pitch": 8192,
+        "mips": 1,
+        "pf_flags": 65,
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "raw_mode": "RGBA",
+        "header_128_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "rows": [
+        {
+          "key": "heart_attack_title",
+          "source": "HEART ATTACK",
+          "korean": "하트 어택",
+          "original_bbox": [
+            21,
+            1316,
+            1780,
+            1474
+          ],
+          "localized_bbox": [
+            25,
+            1322,
+            618,
+            1468
+          ],
+          "source_size": [
+            1759,
+            158
+          ],
+          "localized_size": [
+            593,
+            146
+          ],
+          "delta_left": 4,
+          "delta_right": 1162,
+          "delta_top": 6,
+          "delta_bottom": 6,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "positive_margin": "PASS",
+          "font": "Noto Sans CJK KR Black",
+          "font_size": 158,
+          "fill_rgba": [
+            186,
+            0,
+            0,
+            255
+          ],
+          "slant": 0.0,
+          "alignment": "left"
+        }
+      ],
+      "scope_qa": {
+        "changed_pixels": 37135,
+        "changed_outside_target_bboxes": 0,
+        "alpha_changed_outside_target_bboxes": 0,
+        "protected_changed_pixels": 0,
+        "render_protected_overlap_pixels": 0,
+        "status": "PASS"
+      }
+    },
+    "8C": {
+      "queue_index": 188,
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+      "source_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+      "superseded_candidate_sha256": "03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03",
+      "candidate_sha256": "8da8dbf1d5f577605e2268841667fdd64636f4358f27e17103587ee032c2575c",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+      "structure": {
+        "width": 2048,
+        "height": 2048,
+        "pitch": 8192,
+        "mips": 1,
+        "pf_flags": 65,
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "raw_mode": "RGBA",
+        "header_128_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "rows": [
+        {
+          "key": "heart_attack_help",
+          "source": "Try to win Hearts by meeting your girlfriend's demands!",
+          "korean": "여자친구의 요구를 들어주고 하트를 획득하세요!",
+          "original_bbox": [
+            0,
+            1417,
+            1623,
+            1488
+          ],
+          "localized_bbox": [
+            4,
+            1421,
+            1274,
+            1484
+          ],
+          "source_size": [
+            1623,
+            71
+          ],
+          "localized_size": [
+            1270,
+            63
+          ],
+          "delta_left": 4,
+          "delta_right": 349,
+          "delta_top": 4,
+          "delta_bottom": 4,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "positive_margin": "PASS",
+          "font": "Noto Sans CJK KR Bold",
+          "font_size": 65,
+          "fill_rgba": [
+            63,
+            71,
+            74,
+            255
+          ],
+          "slant": 0.0,
+          "alignment": "left"
+        }
+      ],
+      "scope_qa": {
+        "changed_pixels": 44460,
+        "changed_outside_target_bboxes": 0,
+        "alpha_changed_outside_target_bboxes": 0,
+        "protected_changed_pixels": 0,
+        "render_protected_overlap_pixels": 0,
+        "status": "PASS"
+      }
+    }
+  },
+  "preserved_asset": {
+    "queue_index": 220,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+    "candidate_sha256": "6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5",
+    "reason": "gray selector rows already fill source-height hierarchy with exact static PASS; user defect is addressed in title/help copy without flattening intentional selected/unselected tab hierarchy"
+  },
+  "method": "User screenshot override of earlier static PASS: exact multi-asset mapping, native-resolution rerender only of the large Heart Attack title and Heart Attack help copy from already-validated clean plates. Increase title/help source-relative height/weight while preserving exact source bboxes, fills, alignment, protected artwork, and raw orientation.",
+  "visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "B166_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
