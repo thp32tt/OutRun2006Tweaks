@@ -1,0 +1,23 @@
+{
+  "run": "20261006-A-PRODUCTION95-PENDING2",
+  "queue_index": 227,
+  "asset": "E596B7AC",
+  "candidate_sha256": "7d2ccd1f8030060720916d02de09ef2d093b2cb25c616ce61f0457aa28a58386",
+  "localized_physical_rows": 16,
+  "machine_qa": {
+    "bbox_size_positive_margin": "16/16 PASS",
+    "changed_pixels": 547554,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "source_exact_residue_pixels": 0,
+    "clean_plate_residue_outside_korean_glyphs": 0,
+    "localized_overlap_pairs": [],
+    "localized_1px_touch_pairs": [],
+    "dds_roundtrip": "PASS"
+  },
+  "worker_status": "A96_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION95-PENDING2/A96_E596B7AC_REPORT.json"
+}

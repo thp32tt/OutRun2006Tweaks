@@ -1,0 +1,417 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION95-PENDING2",
+  "queue_index": 225,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+    "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds"
+  },
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "pitch": 8192,
+    "mips": 1,
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "raw_mode": "RGBA",
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "transcription_correction": null,
+  "candidate_sha256": "218ae18ba9a79d1c509aac0e0c532b1fb91be3a7e995ffd6b74488f9c84be222",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+  "conceptual_segments": 9,
+  "localized_physical_rows": 9,
+  "shared_family_font_sizes": {
+    "dark_big": 59,
+    "dark_small": 33,
+    "white_big": 58
+  },
+  "rows": [
+    {
+      "key": "game_lobby",
+      "source": "GAME LOBBY",
+      "korean": "게임 로비",
+      "family": "dark_big",
+      "original_bbox": [
+        1,
+        24,
+        460,
+        86
+      ],
+      "localized_bbox": [
+        3,
+        27,
+        223,
+        83
+      ],
+      "component_count": 9,
+      "source_width": 459,
+      "source_height": 62,
+      "localized_width": 220,
+      "localized_height": 56,
+      "delta_left": 2,
+      "delta_right": 237,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 59,
+      "fill_rgba": [
+        71,
+        77,
+        79,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "game_list",
+      "source": "GAME LIST",
+      "korean": "게임 목록",
+      "family": "dark_big",
+      "original_bbox": [
+        961,
+        136,
+        1344,
+        198
+      ],
+      "localized_bbox": [
+        963,
+        139,
+        1188,
+        194
+      ],
+      "component_count": 8,
+      "source_width": 383,
+      "source_height": 62,
+      "localized_width": 225,
+      "localized_height": 55,
+      "delta_left": 2,
+      "delta_right": 156,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 59,
+      "fill_rgba": [
+        71,
+        77,
+        79,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "setup",
+      "source": "SETUP",
+      "korean": "설정",
+      "family": "white_big",
+      "original_bbox": [
+        962,
+        512,
+        1180,
+        573
+      ],
+      "localized_bbox": [
+        964,
+        515,
+        1062,
+        569
+      ],
+      "component_count": 5,
+      "source_width": 218,
+      "source_height": 61,
+      "localized_width": 98,
+      "localized_height": 54,
+      "delta_left": 2,
+      "delta_right": 118,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 58,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "course_type",
+      "source": "COURSE TYPE",
+      "korean": "코스 유형",
+      "family": "dark_small",
+      "original_bbox": [
+        990,
+        711,
+        1257,
+        749
+      ],
+      "localized_bbox": [
+        992,
+        714,
+        1116,
+        746
+      ],
+      "component_count": 8,
+      "source_width": 267,
+      "source_height": 38,
+      "localized_width": 124,
+      "localized_height": 32,
+      "delta_left": 2,
+      "delta_right": 141,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 33,
+      "fill_rgba": [
+        66,
+        70,
+        71,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "course",
+      "source": "COURSE",
+      "korean": "코스",
+      "family": "dark_small",
+      "original_bbox": [
+        990,
+        763,
+        1135,
+        801
+      ],
+      "localized_bbox": [
+        992,
+        769,
+        1050,
+        794
+      ],
+      "component_count": 5,
+      "source_width": 145,
+      "source_height": 38,
+      "localized_width": 58,
+      "localized_height": 25,
+      "delta_left": 2,
+      "delta_right": 85,
+      "delta_top": 6,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 33,
+      "fill_rgba": [
+        66,
+        70,
+        71,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "car_type",
+      "source": "CAR TYPE",
+      "korean": "차량 유형",
+      "family": "dark_small",
+      "original_bbox": [
+        987,
+        816,
+        1172,
+        852
+      ],
+      "localized_bbox": [
+        989,
+        818,
+        1113,
+        850
+      ],
+      "component_count": 6,
+      "source_width": 185,
+      "source_height": 36,
+      "localized_width": 124,
+      "localized_height": 32,
+      "delta_left": 2,
+      "delta_right": 59,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 33,
+      "fill_rgba": [
+        66,
+        70,
+        71,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "catch_up",
+      "source": "CATCH-UP",
+      "korean": "추격 보정",
+      "family": "dark_small",
+      "original_bbox": [
+        985,
+        867,
+        1177,
+        905
+      ],
+      "localized_bbox": [
+        987,
+        870,
+        1111,
+        902
+      ],
+      "component_count": 7,
+      "source_width": 192,
+      "source_height": 38,
+      "localized_width": 124,
+      "localized_height": 32,
+      "delta_left": 2,
+      "delta_right": 66,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 33,
+      "fill_rgba": [
+        66,
+        70,
+        71,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "collision",
+      "source": "COLLISION",
+      "korean": "충돌",
+      "family": "dark_small",
+      "original_bbox": [
+        990,
+        919,
+        1190,
+        957
+      ],
+      "localized_bbox": [
+        992,
+        922,
+        1050,
+        953
+      ],
+      "component_count": 8,
+      "source_width": 200,
+      "source_height": 38,
+      "localized_width": 58,
+      "localized_height": 31,
+      "delta_left": 2,
+      "delta_right": 140,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 33,
+      "fill_rgba": [
+        66,
+        70,
+        71,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    },
+    {
+      "key": "players",
+      "source": "PLAYERS",
+      "korean": "플레이어",
+      "family": "dark_small",
+      "original_bbox": [
+        987,
+        971,
+        1155,
+        1015
+      ],
+      "localized_bbox": [
+        989,
+        977,
+        1106,
+        1009
+      ],
+      "component_count": 7,
+      "source_width": 168,
+      "source_height": 44,
+      "localized_width": 117,
+      "localized_height": 32,
+      "delta_left": 2,
+      "delta_right": 49,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 33,
+      "fill_rgba": [
+        66,
+        70,
+        71,
+        255
+      ],
+      "alignment": "source-left+2 / vertical-center",
+      "render_resolution": "native_2048x1024"
+    }
+  ],
+  "machine_qa": {
+    "bbox_size_positive_margin": "9/9 PASS",
+    "changed_pixels": 61717,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "source_exact_residue_pixels": 0,
+    "clean_plate_residue_outside_korean_glyphs": 0,
+    "localized_overlap_pairs": [],
+    "localized_1px_touch_pairs": [],
+    "dds_roundtrip": "PASS"
+  },
+  "visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "A95_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}

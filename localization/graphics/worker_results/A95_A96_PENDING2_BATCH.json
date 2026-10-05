@@ -1,0 +1,18 @@
+{
+  "run": "20261006-A-PRODUCTION95-PENDING2",
+  "results": [
+    {
+      "index": 225,
+      "stem": "E3C455FA",
+      "candidate_sha256": "218ae18ba9a79d1c509aac0e0c532b1fb91be3a7e995ffd6b74488f9c84be222",
+      "rows": 9
+    },
+    {
+      "index": 227,
+      "stem": "E596B7AC",
+      "candidate_sha256": "7d2ccd1f8030060720916d02de09ef2d093b2cb25c616ce61f0457aa28a58386",
+      "rows": 16
+    }
+  ],
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
