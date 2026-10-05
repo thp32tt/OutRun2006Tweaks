@@ -1,0 +1,20 @@
+{
+  "run": "20261005-B-PRODUCTION89",
+  "index": 222,
+  "asset": "DDF0392A",
+  "source_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+  "candidate_sha256": "e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea",
+  "localized_physical_elements": 3,
+  "bbox_size_positive_margin": "3/3",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "source_residue": 0,
+  "decoded_changed_outside": 0,
+  "alpha_outside": 0,
+  "visible_outside": 0,
+  "protected_rows_changed": 0,
+  "changed_blocks_outside_patch": 0,
+  "worker_status": "B89_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION89/B89_DDF_REPORT.json"
+}
