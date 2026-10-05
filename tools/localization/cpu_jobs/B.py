@@ -89,8 +89,18 @@ patch_a=ts[ob[1]:ob[3],ob[0]:ob[2]]
 patch_b=sa[dob[1]:dob[3],dob[0]:dob[2]]
 patch_delta=np.max(np.abs(patch_a.astype(np.int16)-patch_b.astype(np.int16)),axis=2)
 patch_diff_pixels=int(np.count_nonzero(patch_delta)); patch_max=int(patch_delta.max(initial=0))
-if patch_diff_pixels or patch_max:
-    raise RuntimeError(("template title patch not pixel-identical",patch_diff_pixels,patch_max))
+
+# Minor per-character source-title AA differences are allowed only where the
+# C202-approved template actually removes/reconstructs source pixels. Any HOLL
+# vs template difference in preserved background/artwork is a hard failure.
+tc=np.asarray(tclean,dtype=np.uint8)
+removal_delta=np.max(np.abs(
+    ts[ob[1]:ob[3],ob[0]:ob[2]].astype(np.int16)-
+    tc[ob[1]:ob[3],ob[0]:ob[2]].astype(np.int16)),axis=2)>0
+patch_changed=patch_delta>0
+patch_diff_outside_removal=int(np.count_nonzero(patch_changed & (~removal_delta)))
+if patch_diff_outside_removal:
+    raise RuntimeError(("template patch differs in preserved pixels",patch_diff_pixels,patch_diff_outside_removal,patch_max))
 pad=32
 ta=[max(0,ob[0]-pad),max(0,ob[1]-pad),min(W,ob[2]+pad),min(H,ob[3]+pad)]
 ha=[max(0,dob[0]-pad),max(0,dob[1]-pad),min(W,dob[2]+pad),min(H,dob[3]+pad)]
@@ -168,7 +178,9 @@ report={
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":payload[:128]==sb[:128],"raw_orientation":"mirror_y"},
  "classification":{"localizable":"Total Rank","translation":"종합 랭킹","protected":["Holly character artwork","lens flare","rank letters A/B/C/D/E","heart/cross UI"]},
  "template_provenance":{"producer":"B148","final_qa":"C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME","template_asset":"8215FD25","template_candidate_sha256":cq["candidate_sha256"],"source_cell":src_cell,"target_cell":dst_cell,"shift":[dx,dy],"source_cell_diff_pixels":cell_diff_pixels,"source_cell_max_channel_delta":cell_max,"exact_source_cell_match":cell_diff_pixels==0,
-"source_title_patch_diff_pixels":patch_diff_pixels,"source_title_patch_max_channel_delta":patch_max,"exact_source_title_patch_match":True,
+"source_title_patch_diff_pixels":patch_diff_pixels,"source_title_patch_max_channel_delta":patch_max,
+"source_title_patch_diff_outside_approved_removal":patch_diff_outside_removal,
+"source_title_patch_preserved_pixels_exact":patch_diff_outside_removal==0,
 "boundary_ring_32px_diff_pixels":ring_diff_pixels,"boundary_ring_32px_max_channel_delta":ring_max,"exact_boundary_ring_match":True},
  "row":{"region_idx":1,"source":"Total Rank","korean":"종합 랭킹","cell":dst_cell,"original_bbox":dob,"localized_bbox":dlb,
         "source_width":source_w,"source_height":source_h,"localized_width":loc_w,"localized_height":loc_h,
@@ -182,4 +194,4 @@ report={
 }
 (out/"B154_HOLL_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 (wr/"B154_HOLL.json").write_text(json.dumps({"run":run,"index":34,"asset":"B7E25BAD","candidate_sha256":csha,"bbox_size_positive_margin":"1/1","outside":outside,"alpha_outside":alpha_out,"worker_status":report["status"],"report":f"localization/graphics/role_B/{run}/B154_HOLL_REPORT.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"run":"B154","candidate_sha256":csha,"source_patch_and_ring_exact":True,"bbox":"1/1 PASS"},ensure_ascii=False),flush=True)
+print(json.dumps({"run":"B154","candidate_sha256":csha,"source_preserved_patch_and_ring_exact":True,"bbox":"1/1 PASS"},ensure_ascii=False),flush=True)
