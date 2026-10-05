@@ -564,13 +564,23 @@ require(
     "RenderFrameRunGenerationIndex",
     "pending.frame.clientPid == frame.clientPid",
 )
-require_order(
+pending_reuse = """if (pending.armed &&
+            pending.frame.frameId == frame.frameId &&
+            pending.frame.reserved[
+                OutRunVR::RenderFrameDirectGenerationIndex] == generation &&
+            pending.frame.reserved[
+                OutRunVR::RenderFrameRunGenerationIndex] ==
+                frame.reserved[OutRunVR::RenderFrameRunGenerationIndex] &&
+            pending.frame.clientPid == frame.clientPid)"""
+require(
     arm_ack,
+    "pending EVENT complete identity reuse gate",
+    pending_reuse,
+)
+require_order(
+    arm_ack[arm_ack.find(pending_reuse):],
     "pending EVENT identity before reuse",
-    "pending.frame.frameId == frame.frameId",
-    "RenderFrameDirectGenerationIndex",
-    "RenderFrameRunGenerationIndex",
-    "pending.frame.clientPid == frame.clientPid",
+    pending_reuse,
     "++AckSameFramePendingReuse;",
 )
 
