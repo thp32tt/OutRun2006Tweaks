@@ -8,7 +8,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
 repo=Path.cwd()
-run="20261005-C152-FEF70E85"
+run="20261005-C153-FEF70E85"
 out=repo/"localization/graphics/role_C"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -109,7 +109,7 @@ allowed=np.logical_or.reduce(allowed_masks)
 
 # Independent clean plate: localized source regions are transparent; protected REVERSED remains untouched.
 expected_clean=sa.copy()
-expected_clean[source_mask]=0
+expected_clean[source_mask,3]=0
 producer_clean=np.asarray(Image.open(bdir/"FEF_CLEAN_PLATE.png").convert("RGBA"),dtype=np.uint8)
 clean_diff=np.any(expected_clean!=producer_clean,axis=2)
 if count(clean_diff):
@@ -171,11 +171,11 @@ if any([outside,alpha_out,protected_out,render_out,source_residue,overlap,target
     raise RuntimeError(("gates",outside,alpha_out,protected_out,render_out,source_residue,overlap,target_protected_overlap,target_protected_near,touch))
 
 for name,m in [
- ("C152_SOURCE_TEXT_MASK.png",source_mask),("C152_ALLOWED_BBOX_MASK.png",allowed),
- ("C152_TARGET_TEXT_MASK.png",target),("C152_PROTECTED_MASK.png",protected_mask)
+ ("C153_SOURCE_TEXT_MASK.png",source_mask),("C153_ALLOWED_BBOX_MASK.png",allowed),
+ ("C153_TARGET_TEXT_MASK.png",target),("C153_PROTECTED_MASK.png",protected_mask)
 ]:
     Image.fromarray((m.astype(np.uint8)*255),"L").save(out/name)
-clean_img=Image.fromarray(expected_clean,"RGBA"); clean_img.save(out/"C152_EXACT_CLEAN_PLATE.png")
+clean_img=Image.fromarray(expected_clean,"RGBA"); clean_img.save(out/"C153_EXACT_CLEAN_PLATE.png")
 
 cards=[]
 for label,im in [("SOURCE",src),("CLEAN",clean_img),("FINAL",fin)]:
@@ -183,7 +183,7 @@ for label,im in [("SOURCE",src),("CLEAN",clean_img),("FINAL",fin)]:
     c=Image.new("RGB",(768,794),"white"); c.paste(z,(0,26)); ImageDraw.Draw(c).text((5,5),label,fill="black"); cards.append(c)
 sheet=Image.new("RGB",(768,2382),"white")
 for i,c in enumerate(cards): sheet.paste(c,(0,i*794))
-sheet.save(out/"C152_FEF_COMPARE.jpg",quality=96)
+sheet.save(out/"C153_FEF_COMPARE.jpg",quality=96)
 
 contacts=[]
 for r in row_results:
@@ -203,12 +203,12 @@ for r in row_results:
 rw=max(c.width for c in contacts); rh=sum(c.height for c in contacts)+4*(len(contacts)-1)
 rs=Image.new("RGB",(rw,rh),"white"); yy=0
 for c in contacts: rs.paste(c,(0,yy)); yy+=c.height+4
-rs.save(out/"C152_FEF_ROW_CONTACT.jpg",quality=96)
+rs.save(out/"C153_FEF_ROW_CONTACT.jpg",quality=96)
 
 rr=Image.new("RGB",(768,1588),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_fin)]):
     z=comp(im).resize((768,768),Image.Resampling.NEAREST); rr.paste(z,(0,i*794+26)); ImageDraw.Draw(rr).text((5,i*794+5),label,fill="black")
-rr.save(out/"C152_FEF_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"C153_FEF_RAW_COMPARE.jpg",quality=96)
 
 report={
  "schema_version":1,"role":"C","run":run,"queue_index":236,"asset":asset,"producer_run":"20261005-B-PRODUCTION80",
@@ -224,11 +224,11 @@ report={
     "protected_regions_changed_pixels":protected_changed},
  "machine_status":"PASS","controller_visual_qa":"PENDING","decision":"PENDING_CONTROLLER_VISUAL_QA","RUNTIME_VALIDATION":"UNTESTED"
 }
-(out/"C152_FEF_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"C153_FEF_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 summary={"run":run,"asset":"FEF70E85","index":236,"source_sha256":SOURCE_SHA256,"candidate_sha256":CANDIDATE_SHA256,
  "machine_status":"PASS","bbox_size_positive_margin":"14/14","clean_exact_diff_pixels":count(clean_diff),"outside":outside,"alpha_outside":alpha_out,
  "protected_changed":protected_out,"render_outside_target":render_out,"source_residue":source_residue,"overlap":overlap,"touch_pairs":len(touch),
  "target_protected_overlap":target_protected_overlap,"target_protected_1px_near":target_protected_near,
- "runtime_validation":"UNTESTED","report":f"localization/graphics/role_C/{run}/C152_FEF_MACHINE_QA.json"}
-(wr/"C152_FEF70E85.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+ "runtime_validation":"UNTESTED","report":f"localization/graphics/role_C/{run}/C153_FEF_MACHINE_QA.json"}
+(wr/"C153_FEF70E85.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False),flush=True)
