@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T23:28:00+09:00",
+  "role": "C",
+  "run": "20261005-C211-A9ABD877",
+  "qa_id": "C211",
+  "queue_index": 201,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+  "producer_run": "20261005-A-PRODUCTION69",
+  "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+  "candidate_sha256": "59b21fa3aadf86e892dbd6adee4b178b2dad09048fd314fd731135f363d6a6fe",
+  "machine_status": "PASS",
+  "row_gate": "17/17 PASS",
+  "source_bbox_exact_match_all": true,
+  "candidate_bbox_exact_match_all": true,
+  "semantic_binding_policy_pass": true,
+  "song_title_policy": "PASS_PIXEL_EXACT_NIGHT_BIRD_AND_RADIATION",
+  "machine_checks": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_script_exact_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "protected_changed_pixels": 0
+  },
+  "controller_visual_qa": "PASS",
+  "visual_findings": [
+    "C211 SOURCE/CLEAN/FINAL contacts preserve the shared dark-gray/blue-gray Black condensed stage family, source-height scale and right alignment without artificial syllable spacing.",
+    "All 14 stage names follow the canonical phonetic Hangul policy; Special/STAGES/GOALS retain the corresponding dark-gray UI family and left alignment.",
+    "Night Bird and Radiation remain original English artwork and the protected atlas regions are pixel-exact.",
+    "No source-script residue, seam, clipping, overlap, alpha halo or orientation regression is visible in readable or raw mirror_y evidence."
+  ],
+  "decision": "C211_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED",
+  "machine_report": "localization/graphics/role_C/20261005-C211-A9ABD877/C211_A9ABD877_MACHINE_QA.json",
+  "previews": [
+    "localization/graphics/role_C/20261005-C211-A9ABD877/C211_SOURCE_CLEAN_FINAL_CONTACTS.jpg",
+    "localization/graphics/role_C/20261005-C211-A9ABD877/C211_RAW_COMPARE.jpg"
+  ],
+  "exclusions": "Completed prior PASS assets were not reopened. VR/FFB/DX11/DXVK untouched."
+}
