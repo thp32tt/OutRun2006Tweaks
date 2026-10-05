@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
+#include <vector>
 #include <d3d9.h>
 #include <d3d11.h>
 
@@ -293,6 +294,43 @@ namespace outrun::vr::dx11
                    cacheKey != 0;
         }
     };
+
+    // R264 preserves the exact D3D9 programmable-shader function bytes that
+    // produced an R239 identity. This is source evidence for a future
+    // translator only: no D3D11 object is created or bound here.
+    struct ProgrammableShaderFunctionSourceEvidence
+    {
+        bool vertexStage = false;
+        bool observed = false;
+        bool versionSupported = false;
+        UINT byteSize = 0;
+        DWORD versionToken = 0;
+        std::uint64_t bytecodeHash = 0;
+        std::vector<DWORD> tokens;
+
+        [[nodiscard]] bool exact() const noexcept
+        {
+            return observed &&
+                   versionSupported &&
+                   byteSize >= 2u * sizeof(DWORD) &&
+                   byteSize <= 1024u * 1024u &&
+                   (byteSize % sizeof(DWORD)) == 0 &&
+                   tokens.size() == byteSize / sizeof(DWORD) &&
+                   bytecodeHash != 0;
+        }
+    };
+
+    [[nodiscard]] ProgrammableShaderFunctionSourceEvidence
+    capture_programmable_shader_function_source_evidence(
+        const void* bytecode,
+        UINT byteSize,
+        bool vertexStage) noexcept;
+
+    [[nodiscard]] bool
+    validate_programmable_shader_function_source_evidence(
+        const ProgrammableShaderFunctionSourceEvidence& evidence,
+        const ProgrammableShaderFunctionIdentity& identity,
+        bool vertexStage) noexcept;
 
     [[nodiscard]] ProgrammableShaderPairCacheIdentity
     seal_programmable_shader_pair_cache_identity(
