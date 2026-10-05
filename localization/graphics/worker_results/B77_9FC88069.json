@@ -33,7 +33,9 @@
       41
     ],
     "c150_machine_status": "PASS",
-    "c150_controller_visual_qa": "PENDING",
-    "reconciliation_report": "localization/graphics/role_B/20261005-B-PRODUCTION77/B77_POST_C150_RECONCILIATION.json"
+    "c150_controller_visual_qa": "PASS",
+    "reconciliation_report": "localization/graphics/role_B/20261005-B-PRODUCTION77/B77_POST_C150_RECONCILIATION.json",
+    "c150_decision": "C150_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "c150_controller_report": "localization/graphics/role_C/20261005-C150-9FC88069/C150_9FC_CONTROLLER_FINAL_QA.json"
   }
 }
