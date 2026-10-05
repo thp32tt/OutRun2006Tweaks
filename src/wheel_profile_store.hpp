@@ -655,6 +655,16 @@ namespace WheelProfileStore
             }
         }
 
+        // Hybrid is retired. Loading a legacy Model=2 feel profile must not
+        // resurrect Hybrid-owned road/event/polarity values on top of Modern.
+        // Convert it to a clean Modern reference baseline instead.
+        if (profileModel == 2)
+        {
+            profileModel = 0;
+            values.clear();
+            values.emplace("model", "0");
+        }
+
         auto settings = ffb_settings();
         std::vector<std::string> before;
         before.reserve(settings.size());
