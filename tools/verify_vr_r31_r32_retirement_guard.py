@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -223,6 +224,93 @@ forbid(
 )
 if r33.count("R32GetSavedViewport(") < 2:
     fail("R33 viewport sites unexpectedly stopped using the R32 StateBlock-aware wrapper")
+
+# Terminal post-1100 dependency census: every remaining R33 -> R31/R32 call is
+# intentionally owner-specific. Any new cross-layer call must be reviewed rather
+# than silently growing this dependency surface.
+expected_owner_calls = {
+    "R31BuildFastWorldConstants",
+    "R31DiscardUnreliableDrawCaches",
+    "R31ObserveDraw",
+    "R31TelemetryNoteFallback",
+    "R31TelemetryNoteFastWorld",
+    "R31TelemetryNoteFragile",
+    "R31TelemetryNoteHud",
+    "R31TelemetryNoteUnstable",
+    "R32EffectIsFragileLive",
+    "R32GetSavedViewport",
+    "R32InstallStatus",
+    "R32LowerFailClosed",
+    "R32ObserveFrameWorkload",
+    "R32RestoreRightPassState",
+    "R32SetWvpBatch",
+}
+observed_owner_calls = set(re.findall(r"\\b(R3[12]\\w+)\\s*\\(", r33))
+if observed_owner_calls != expected_owner_calls:
+    missing = sorted(expected_owner_calls - observed_owner_calls)
+    added = sorted(observed_owner_calls - expected_owner_calls)
+    fail(
+        "terminal R33 owner-boundary census changed: "
+        f"missing={missing}, added={added}"
+    )
+
+require(
+    function_body(r31, "bool R31BuildFastWorldConstants("),
+    "R31 fast-world cache/pose owner",
+    "GetLastVerifiedWvp(",
+    "R31BlockedVerifiedGeneration",
+    "StateBlockTracker::Reliable()",
+    "R31PrepareEyeTailCache(",
+)
+require(
+    function_body(r31, "void R31DiscardUnreliableDrawCaches("),
+    "R31 unreliable-cache owner",
+    "StateBlockTracker::Reliable()",
+    "InvalidateEffectStateCache()",
+    "InvalidateTrackedRasterShadow()",
+    "InvalidateLiveStateSample()",
+)
+require(
+    function_body(r31, "void R31ObserveDraw("),
+    "R31 draw-telemetry owner",
+    "R31Frame.epoch",
+    "++R31Frame.draws",
+    "TargetIsBackBuffer()",
+)
+require(
+    function_body(r32, "bool R32EffectIsFragileLive("),
+    "R32 effect-policy owner",
+    "R32ReadEffectSnapshot(device, state)",
+    "PassPolicy::ClassifyEffectStereo(",
+    "PassPolicy::AllowsEffectWorldStereo(policy)",
+)
+require(
+    function_body(r32, "HRESULT R32LowerFailClosed("),
+    "R32 fail-close owner",
+    "R32ReadEffectSnapshot(device, snapshot)",
+    "CurrentVertexShaderIdentity.exchange(0",
+    "R32FailClosedZeroDisparityDraws",
+)
+require(
+    function_body(r32, "void R32ObserveFrameWorkload("),
+    "R32 workload-telemetry owner",
+    "R32FrameWorkloadCounters",
+    "frame.primitives += primitiveCount",
+    "TryGetEffectTelemetrySnapshot(effect)",
+)
+require(
+    function_body(r32, "bool R32RestoreRightPassState("),
+    "R32 right-pass restore owner",
+    "SetRenderTargetHook.stdcall<HRESULT>",
+    "SetDepthStencilSurfaceHook",
+    "device->SetViewport(&savedViewport)",
+    "R32SetWvpBatch(device, originalConstants)",
+)
+require(
+    function_body(r32, "R32InstallStatus() noexcept"),
+    "R32 install-state owner",
+    "R32InstallState.load(std::memory_order_acquire)",
+)
 
 # 1) R31 is retained only for StateBlock/state-cache ownership. Its physical
 # draw overlay over R30 must be gone.
@@ -467,5 +555,5 @@ require(
 print(
     "VR R31/R32 draw-retirement guard PASS "
     "(R31=StateBlock owner, R32=Reset/Present/DirectGPU owner, "
-    "R33=sole physical draw dispatcher over R30, live shader identity=neutral helper, WVP batch primitive=neutral helper, live effect snapshot=neutral helper, viewport read=neutral helper)"
+    "R33=sole physical draw dispatcher over R30, neutral-helper census=terminal, remaining R31/R32 calls=owner-specific)"
 )
