@@ -79,9 +79,10 @@
       "status": "COMPLETE",
       "state_persisted": true,
       "state_commit_sha": "ccd5553122a64aad2648b53f4b3093b646820ec3",
-      "issue14_update": "PENDING_LEDGER_COMMENT",
+      "issue14_update": "RECORDED",
       "issue13_update": "NOT_REQUIRED_NO_RUNTIME_PROBLEM_STATUS_CHANGE",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 5986466286
     }
   },
   "evidence": {
