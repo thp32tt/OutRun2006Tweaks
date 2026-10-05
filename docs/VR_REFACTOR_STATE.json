@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-05T18:06:00+09:00",
+  "updatedKst": "2026-10-05T19:45:19+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -75,9 +75,10 @@
     "VR-REFACTOR-POST1000-DISPATCHER-OWNER-BOUNDARIES-0011",
     "VR-REFACTOR-REVIEW-1100",
     "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012",
-    "VR-REFACTOR-POST1100-R31-R32-PHYSICAL-DRAW-HOOK-RETIREMENT-0013"
+    "VR-REFACTOR-POST1100-R31-R32-PHYSICAL-DRAW-HOOK-RETIREMENT-0013",
+    "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-0014"
   ],
-  "next": "Do not reintroduce R31/R32 physical draw hooks. R31 is now StateBlock/cache-recovery ownership only; R32 is Reset/Present/DirectGPU lifecycle plus fail-close/workload helper ownership; R33 is the sole physical draw dispatcher and hooks R30 directly. The next bounded structural successor is dead draw-executor cleanup: prove and remove unreachable R31TryFastWorld/R31TryHud/R32TryFastWorld/R32TryHud and any now-unreferenced draw-only telemetry/helpers, while preserving helper functions still consumed by R33. Runtime remains gated on Quest3/VDXR evidence.",
+  "next": "R31/R32 physical draw hooks and their unreachable duplicate draw executors are retired. R31 remains StateBlock/cache-recovery ownership, R32 remains Reset/Present/DirectGPU lifecycle plus fail-close/workload ownership, and R33 is the sole physical draw executor. The next bounded structural successor is a dependency census for the remaining R33-consumed fast-path helpers still physically defined in R31/R32, followed by one atomic neutral-owner extraction only where lifecycle ownership is not implied. Do not move StateBlock or R32 lifecycle/fail-close responsibilities.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -174,11 +175,12 @@
     "Style-only d45090cebdef9409713de9d75aa848180a2a538c normalizes two indentation artifacts left by function removal; no runtime semantics changed after 9bbe3630.",
     "Exact-SHA d45090cebdef9409713de9d75aa848180a2a538c passed DX9Ex Active Validation 37287121778: policy/host/game/R33 final-chain-compile/package SUCCESS; Domain Isolation SUCCESS. Package artifact 11334673407 digest sha256:ed390040d6c53cf476c4e981e84c9e84b047e78f96acdf1189d4a53c0e92ab7d; inner ZIP SHA256 46610cb4dba3e7aa54f15d37e3596143a8a74b84c40367ef33032932f5857d46.",
     "Physical hook count after retirement: R31=4 StateBlock-only, R32=3 Reset/ResolveDirect/Present-only, R33=7 final reset/present/state/draw hooks. No R31Draw*R30Hook, R32Draw*R31Hook, Draw*DestR31, Draw*DestR32, R31Dispatch or R32Dispatch remain in production source.",
-    "Runtime remains UNTESTED; build/static success does not prove Quest3/VDXR visual or pacing behavior."
+    "Runtime remains UNTESTED; build/static success does not prove Quest3/VDXR visual or pacing behavior.",
+    "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-0014: exact source 117d6b7980dd41c8504558b6bafc38dda01e184b removes 615 lines of unreachable duplicate R31/R32 world/HUD draw executors and two R31-only first-log flags, preserves helpers proven live in R33, and adds fail-closed verifier guards. DX9Ex Active 37297954231 and Domain Isolation 37297954242 SUCCESS; runtime remains UNTESTED."
   ],
-  "batchStatus": "VR-REFACTOR-POST1100-R31-R32-PHYSICAL-DRAW-HOOK-RETIREMENT-BUILD_VERIFIED",
-  "validatedSourceSha": "d45090cebdef9409713de9d75aa848180a2a538c",
-  "validationRunId": 37287121778,
+  "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
+  "validatedSourceSha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+  "validationRunId": 37297954231,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -516,5 +518,41 @@
       "packageArtifactDigest": "sha256:990cb69ce501641c21c6d20f3ec79a267f3e5637ec54df922bc7c4576d0204c6"
     },
     "n100": "UNAVAILABLE_DESKTOP_COMMANDER_MONTHLY_USAGE_LIMIT; NOT_USED_FOR_COMPLETION"
+  },
+  "post1000Maintenance00409": {
+    "taskId": "CONVERSION-DX9EX-00409",
+    "productionId": "CONVERSION-DX9EX-00409",
+    "eventId": "CONVERSION-DX9EX-00409-E001",
+    "eventType": "dispatch",
+    "attempt": "1/3",
+    "item": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-0014",
+    "baseSha": "7c58922a54d7b2557479e39ad7ac9286499060fd",
+    "sourceMaterialSha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+    "materialResultSha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+    "validationBearingResultSha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "runtimeBehaviorChanged": false,
+    "summary": "Removed unreachable R31TryFastWorld/R31TryHud and R32TryFastWorld/R32TryHud duplicate draw executors plus R31-only first-log flags after R33 became the sole physical draw dispatcher. Preserved R31/R32 shared helpers still consumed by R33 and added a deterministic retirement guard against reintroduction.",
+    "diff": {
+      "files": 3,
+      "additions": 14,
+      "deletions": 615
+    },
+    "validation": {
+      "dx9exActiveRunId": 37297954231,
+      "jobs": {
+        "policy": 111723598839,
+        "host": 111723726505,
+        "fullChainCompile": 111723726549,
+        "game": 111723726635,
+        "package": 111725245114
+      },
+      "domainIsolationRunId": 37297954242,
+      "packageArtifactId": 11339248938,
+      "packageArtifactDigest": "sha256:ee0383cd9e70a6ebec451b778e3625e6b2c131b0358303c7021fffb9ee7a5867",
+      "n100": "UNAVAILABLE_DESKTOP_COMMANDER_MONTHLY_USAGE_LIMIT; NOT_USED_FOR_COMPLETION"
+    },
+    "queuePolicyCommit": "3060adb27c8444deb4c6094b1a15cb42fbee414f"
   }
 }
