@@ -23,6 +23,20 @@ namespace OutRunVR::GameSemantic
         ScreenHud,
     };
 
+    // Bounded diagnostic identity for exact producer families recovered from
+    // original-mod callsites. This token never grants render ownership by
+    // itself; it only follows already-explicit semantic tags so queue -> c64 ->
+    // draw lifetime can be correlated without broadening HUD/world heuristics.
+    enum class ProducerToken : std::uint8_t
+    {
+        None = 0,
+        RankMarkerSprani,
+        RankMarkerClipSprite,
+        ExactScreenHudClipSprite,
+        RivalMarkerSprani,
+        TextGlyphPutSprite,
+    };
+
     inline thread_local RenderScope CurrentScope = RenderScope::None;
     inline thread_local RenderScope NextDrawScope = RenderScope::None;
     inline thread_local unsigned ExternalOverlaySemanticDepth = 0;
@@ -38,6 +52,19 @@ namespace OutRunVR::GameSemantic
         case RenderScope::ReflectionCube: return "REFLECTION_CUBE";
         case RenderScope::ScreenOverlay2D: return "SCREEN_OVERLAY_2D";
         case RenderScope::ScreenHud: return "SCREEN_HUD";
+        default: return "NONE";
+        }
+    }
+
+    inline const char* Name(ProducerToken token) noexcept
+    {
+        switch (token)
+        {
+        case ProducerToken::RankMarkerSprani: return "RANK_MARKER_SPRANI";
+        case ProducerToken::RankMarkerClipSprite: return "RANK_MARKER_CLIP";
+        case ProducerToken::ExactScreenHudClipSprite: return "EXACT_SCREEN_HUD_CLIP";
+        case ProducerToken::RivalMarkerSprani: return "RIVAL_MARKER_SPRANI";
+        case ProducerToken::TextGlyphPutSprite: return "TEXT_GLYPH_PUTSPRITE";
         default: return "NONE";
         }
     }
@@ -136,6 +163,7 @@ namespace OutRunVR::GameSemantic
     {
         const void* node = nullptr;
         RenderScope scope = RenderScope::None;
+        ProducerToken producer = ProducerToken::None;
     };
 
     inline constexpr std::size_t SpriteNodeSemanticCapacity = 0x230;
@@ -149,6 +177,8 @@ namespace OutRunVR::GameSemantic
     // change semantic classification or draw ownership.
     inline thread_local const void* CurrentSpriteQueueNode = nullptr;
     inline thread_local std::uint64_t SpriteQueueNodeEpoch = 0;
+    inline thread_local ProducerToken CurrentSpriteQueueProducer =
+        ProducerToken::None;
 
     inline const void* CurrentQueueNode() noexcept
     {
@@ -160,13 +190,19 @@ namespace OutRunVR::GameSemantic
         return SpriteQueueNodeEpoch;
     }
 
+    inline ProducerToken CurrentQueueProducerToken() noexcept
+    {
+        return CurrentSpriteQueueProducer;
+    }
+
     inline bool QueueRenderActive() noexcept
     {
         return SpriteQueueDepth != 0;
     }
 
     inline void RegisterSpriteNodeScope(
-        const void* node, RenderScope scope) noexcept
+        const void* node, RenderScope scope,
+        ProducerToken producer = ProducerToken::None) noexcept
     {
         if (!node || scope == RenderScope::None)
             return;
@@ -175,13 +211,14 @@ namespace OutRunVR::GameSemantic
             if (SpriteNodeSemanticTags[i].node == node)
             {
                 SpriteNodeSemanticTags[i].scope = scope;
+                SpriteNodeSemanticTags[i].producer = producer;
                 return;
             }
         }
         if (SpriteNodeSemanticCount < SpriteNodeSemanticTags.size())
         {
             SpriteNodeSemanticTags[SpriteNodeSemanticCount++] =
-                { node, scope };
+                { node, scope, producer };
         }
     }
 
@@ -200,10 +237,27 @@ namespace OutRunVR::GameSemantic
         return fallback;
     }
 
+    inline ProducerToken PeekSpriteNodeProducerToken(
+        const void* node) noexcept
+    {
+        if (node)
+        {
+            for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
+            {
+                if (SpriteNodeSemanticTags[i].node == node)
+                    return SpriteNodeSemanticTags[i].producer;
+            }
+        }
+        return ProducerToken::None;
+    }
+
     inline RenderScope ConsumeSpriteNodeScope(
         const void* node,
-        RenderScope fallback = RenderScope::ScreenOverlay2D) noexcept
+        RenderScope fallback = RenderScope::ScreenOverlay2D,
+        ProducerToken* producer = nullptr) noexcept
     {
+        if (producer)
+            *producer = ProducerToken::None;
         if (node)
         {
             for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
@@ -211,6 +265,8 @@ namespace OutRunVR::GameSemantic
                 if (SpriteNodeSemanticTags[i].node != node)
                     continue;
                 const RenderScope scope = SpriteNodeSemanticTags[i].scope;
+                if (producer)
+                    *producer = SpriteNodeSemanticTags[i].producer;
                 SpriteNodeSemanticTags[i] =
                     SpriteNodeSemanticTags[--SpriteNodeSemanticCount];
                 SpriteNodeSemanticTags[SpriteNodeSemanticCount] = {};
@@ -250,8 +306,10 @@ namespace OutRunVR::GameSemantic
         CurrentSpriteQueueNode = node;
         if (++SpriteQueueNodeEpoch == 0)
             ++SpriteQueueNodeEpoch;
+        CurrentSpriteQueueProducer = ProducerToken::None;
         CurrentScope = ConsumeSpriteNodeScope(
-            node, RenderScope::ScreenOverlay2D);
+            node, RenderScope::ScreenOverlay2D,
+            &CurrentSpriteQueueProducer);
     }
 
     inline void EndSpriteQueueRender() noexcept
@@ -263,6 +321,7 @@ namespace OutRunVR::GameSemantic
             CurrentScope = SpriteQueuePreviousScope;
             SpriteQueuePreviousScope = RenderScope::None;
             CurrentSpriteQueueNode = nullptr;
+            CurrentSpriteQueueProducer = ProducerToken::None;
             SpriteNodeSemanticCount = 0;
         }
     }
