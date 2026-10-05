@@ -1443,3 +1443,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Queue sanity: 137 total = 79 localize_text + 47 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve-brand/song-credit.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_C/20261005-C144-E7F6E9B7/C144_E7F6_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C144-E7F6E9B7/C144_E7F6_MACHINE_QA.json`.
+
+## 2026-10-05 10:29:06 KST — B73 E95DA5 exact-HD candidate self-QA PASS
+- Refreshed current Git/queue and skipped completed C144/B68 work. B had no direct `REWORK_REQUIRED`, so it selected even index 230 `E95DA5_512x256.dds` as ONE_STAGE_TO_RENDER.
+- B69 pinned the canonical OR2006Sprites 2048x1024 RGBA32/raw-mirror_y source and 27-region atlas. Localized physical regions are 5/6, 13-19 and 24/25. Region 7 `BGM` is unchanged by the reviewed translation and is preserved exactly. Song titles, Alberto's Antics names, explanatory English lines and bar/separator/decorative regions are protected/preserved.
+- B70 was rejected by controller visual self-QA because a Regular CJK fallback was too thin versus the source block lettering. B71 switched to NotoSansCJK-Black and passed machine gates but was rejected because faint `UNAVAILABLE/SOLD` antialias residue remained on the red pill clean plate. B72 strengthened the pill clean mask but exposed a false-positive residue accounting gate; B73 corrected the residue basis to actual source->clean changed pixels.
+- Final B73 candidate `d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b` from source `33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81`: exact 2048x1024 RGBA32 header/raw `mirror_y`; 11/11 exact bbox+size+positive-margin PASS; clean/final validators PASS; source residue=0, outside=0, alpha-outside=0, protected=0, preserved-region changes=0, overlap=0, touch=0.
+- Controller SOURCE/CLEAN/FINAL, per-row contacts and raw mirror_y visual self-QA PASS. White block, dark block and red-pill style families now retain source-like weight/alignment; the pill clean plate is residue-free with no visible seam, clipping, overlap or halo.
+- Queue index 230 advanced to `b73_self_qa_pass_pending_c`; pending_artwork localize_text=31. Independent C final QA and isolated in-game validation remain pending.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION73/B73_E95_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION73/B73_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261005-B-PRODUCTION73/B73_FINAL_VALIDATION.json`.
