@@ -58,26 +58,33 @@ src=raw_src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 # replacement contains exactly three visible labels: stage select, showroom, single player.
 # Historical "system link" and "xbox live" draft rows are absent from canonical HD pixels.
 alpha=src.getchannel("A")
+# Strong-alpha projection yields one seed band per visible source label. Low-alpha
+# shadow/fringe can bridge rows, so it is assigned afterward by midpoint partitions.
+strong=alpha.point(lambda v:255 if v>=128 else 0)
 proj=[]
 for y in range(H):
-    crop=alpha.crop((0,y,W,y+1))
-    proj.append(count(bmask(crop))>0)
-bands=[]
+    crop=strong.crop((0,y,W,y+1))
+    proj.append(count(crop)>=20)
+seed=[]
 s=None
 for y,on in enumerate(proj+[False]):
     if on and s is None: s=y
     if not on and s is not None:
-        bands.append([s,y]); s=None
-# Merge tiny gaps inside one stylized line, then require exactly three physical rows.
+        seed.append([s,y]); s=None
 merged=[]
-for b in bands:
-    if merged and b[0]-merged[-1][1]<=8:
+for b in seed:
+    if merged and b[0]-merged[-1][1]<=3:
         merged[-1][1]=b[1]
     else:
         merged.append(b)
-bands=merged
-if len(bands)!=3:
-    raise RuntimeError(("canonical visible row count drift",bands))
+seed=merged
+if len(seed)!=3:
+    raise RuntimeError(("canonical strong row seeds drift",seed))
+centers=[(a+b)//2 for a,b in seed]
+gb=alpha.getbbox()
+if not gb: raise RuntimeError("global alpha empty")
+cuts=[gb[1],(centers[0]+centers[1])//2,(centers[1]+centers[2])//2,gb[3]]
+bands=[[cuts[i],cuts[i+1]] for i in range(3)]
 
 sem=[("stage select","스테이지 선택"),("showroom","쇼룸"),("single player","싱글 플레이")]
 rows=[]; source_text_mask=Image.new("L",(W,H),0); allowed=Image.new("L",(W,H),0); styles={}
