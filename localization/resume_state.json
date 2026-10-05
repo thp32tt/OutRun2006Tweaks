@@ -7,6 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C215 finalized B157 index36 JENN 06AB5CEE candidate 0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5. Independent C rebuilt all three Total Rank→종합 랭킹 edits from already-C-approved C202/C206 warm-starburst/pink/green templates and got candidate diff=0, 3/3 exact bbox/size/positive margins, outside/alpha/visible/unsafe-template-variant/bbox-mismatch all 0. Controller contacts/raw mirror_y PASS; Jennifer/rank/lens-flare/UI artwork protected. C215_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
+    "C217 finalized latest A76 index205 ACF61D7C candidate 2bbb9d19a833fb6c9ade243eb70132ef5ce46150d1fa1cb9423ff4e5101b770c. Independent canonical 4096x2048 RGBA32/header/raw mirror_y QA reproduces 23/23 localized bboxes exactly; outside/alpha/visible/protected/product-token/source-residue gates all 0. C independently recovered true idx10 phrase [1807,909,2696,975], OutRun2SP token [2356,909,2696,964], and proves Korean [2032,914,2348,970] stays before it with token pixels unchanged; detached 1px edge strip is excluded. A76 restores source-scale hierarchy (dark main 56/66px, congrats 72/82px, red headings ~0.92-0.94 source height); protected songs/product tokens remain exact. C217_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. C214/A72 and C216/A75 are superseded verifier iterations, not separate completions. RUNTIME_VALIDATION=UNTESTED.",
     "B157 completed even index36 06AB5CEE after three fail-closed template/source checks. Final candidate 0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5 localizes three physical Total Rank labels (warm starburst + pink/green speech bubbles) to 종합 랭킹. B157 reuses only already-C-approved C202/C206 title-removal/render pixels and preserves every Jennifer-specific pixel outside exact edit masks. Hosted worker: 4096x4096 RGBA32/header/raw mirror_y, 3/3 bbox+size+positive margins, CLEAN/FINAL PASS, outside/alpha/source-residue/overlap/touch=0. Controller SOURCE/CLEAN/FINAL + raw mirror_y visual PASS. Pending independent C; RUNTIME_VALIDATION=UNTESTED.",
     "C212 finalized A70 index193 97E863AD candidate b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d. Independent canonical 2048x1024 RGBA32/header/raw mirror_y QA reproduces 13/13 source/localized bboxes exactly with containment/size/positive margins and outside/alpha/visible/source-residue/overlap/touch/protected all 0. C210 detached-syllable defect is resolved: 0px artificial tracking, natural font advance, no horizontal glyph scaling, Black/source-height family retained with ~0.84-0.91 source-height ratios and exact OutRun/OutRun2SP/OUTRUN/TESTAROSSA/SP/OR protected pixels. Controller SOURCE/CLEAN/FINAL/raw visual PASS. C212_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "C213 independently confirms B155 index152 49BB5FE5 preserve-original policy. PRO./INS./G.M./E.R. expand to PROTOTYPE/INSTRUMENTAL/GUITAR MIX/EURO REMIX music-version/mix artwork and '89/'86 are version badges; TRANSLATION_NAMING_POLICY plus C150 same-family precedent require exact original pixels. The former B63 Korean DXT5 redraw was semantically out of scope, so its HOLD is closed by scope correction rather than weakening decoded-pixel gates. C213_PRESERVE_ORIGINAL_POLICY_PASS_NO_CANDIDATE_REQUIRED; runtime validation is not applicable for localization.",
@@ -3951,7 +3953,7 @@
     "c176_return_resolved": true,
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_artwork_localize_text": 7,
+  "current_pending_artwork_localize_text": 6,
   "current_producer_rework_remaining": 1,
   "current_producer_rework_assets": [
     "37759842"
@@ -4005,7 +4007,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C212-C213-BATCH/C212_C213_BATCH_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261006-C215-C217-BATCH/C215_C217_BATCH_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4066,9 +4068,7 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [
-    "06AB5CEE"
-  ],
+  "current_pending_c": [],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -4828,6 +4828,54 @@
     "worker_output_commit": "daa16fc7761153c02d3a72daa4b405a2bf5bffc5",
     "report": "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_JENN_REPORT.json",
     "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c215_controller_final_qa": {
+    "timestamp_kst": "2026-10-06T00:48:00+09:00",
+    "run": "20261006-C215-06AB5CEE",
+    "queue_index": 36,
+    "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "3/3 PASS",
+    "independent_template_composite_diff_pixels": 0,
+    "zero_pixel_gates": {
+      "outside": 0,
+      "alpha_outside": 0,
+      "introduced_visible_outside": 0,
+      "unsafe_template_variant": 0,
+      "bbox_mismatch": 0
+    },
+    "controller_visual_qa": "PASS",
+    "decision": "C215_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "report": "localization/graphics/role_C/20261006-C215-06AB5CEE/C215_06AB5CEE_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c217_controller_final_qa": {
+    "timestamp_kst": "2026-10-06T00:48:00+09:00",
+    "run": "20261006-C217-ACF61D7C",
+    "queue_index": 205,
+    "candidate_sha256": "2bbb9d19a833fb6c9ade243eb70132ef5ce46150d1fa1cb9423ff4e5101b770c",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "23/23 PASS",
+    "zero_pixel_gates": {
+      "outside": 0,
+      "alpha_outside": 0,
+      "introduced_visible_outside": 0,
+      "protected_changed": 0,
+      "inline_token_changed": 0,
+      "token_relation_failures": 0,
+      "bbox_mismatch": 0,
+      "source_residue": 0
+    },
+    "product_token_geometry": "PASS_INDEPENDENT_IDX8_IDX10_IDX12",
+    "source_style_hierarchy": "PASS_A76_RESTORED",
+    "controller_visual_qa": "PASS",
+    "decision": "C217_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "superseded_verifier_iterations": [
+      "C214/A72",
+      "C216/A75"
+    ],
+    "report": "localization/graphics/role_C/20261006-C217-ACF61D7C/C217_ACF61D7C_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
