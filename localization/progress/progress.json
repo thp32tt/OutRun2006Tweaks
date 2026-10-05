@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T15:10:00+09:00",
+  "updated_at_kst": "2026-10-05T15:22:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1206,6 +1206,18 @@
       "decision": "C167_REWORK_REQUIRED_CLEAN_PLATE_VISIBLE_RECONSTRUCTION_ARTIFACTS",
       "supersedes": "C166_REWORK_REQUIRED_CLEAN_PLATE_GRADIENT_SEAM",
       "report": "localization/graphics/role_C/20261005-C167-63C91067/C167_63C_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c168_controller_final_qa": {
+      "timestamp_kst": "2026-10-05T15:22:00+09:00",
+      "run": "20261005-C168-63C91067",
+      "queue_index": 26,
+      "candidate_sha256": "3876804b958513aa842966c241fcb6c9215593247b4acf719b6b1d46e6cbf2ee",
+      "producer_machine_status": "PASS_REPORTED",
+      "controller_visual_qa": "FAIL_CLEAN_PLATE_ARTWORK_DAMAGE",
+      "decision": "C168_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE",
+      "supersedes": "C167_REWORK_REQUIRED_CLEAN_PLATE_VISIBLE_RECONSTRUCTION_ARTIFACTS",
+      "report": "localization/graphics/role_C/20261005-C168-63C91067/C168_63C_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     }
   },
