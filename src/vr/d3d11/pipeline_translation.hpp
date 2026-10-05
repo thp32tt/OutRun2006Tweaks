@@ -348,6 +348,7 @@ namespace outrun::vr::dx11
     struct ProgrammableShaderInstructionDecode
     {
         bool vertexStage = false;
+        DWORD versionToken = 0;
         bool sourceExact = false;
         bool versionSupported = false;
         bool endSeen = false;
@@ -446,6 +447,57 @@ namespace outrun::vr::dx11
     [[nodiscard]] ProgrammableShaderRegisterSemantics
     decode_programmable_shader_register_semantics(
         const ProgrammableShaderInstructionDecode& decode) noexcept;
+
+    // R267 derives explicit shader-model-3 interface declaration semantics
+    // from the exact R265/R266 stream. It records DCL usage/index/register
+    // and write-mask provenance for vertex inputs/outputs and pixel inputs.
+    // Sampler declarations are counted but are not treated as inter-stage
+    // semantics. Shader-model-2 and ambiguous declaration layouts stay
+    // fail-closed; this is evidence only and does not emit/bind shaders.
+    struct ProgrammableShaderInterfaceSemantic
+    {
+        bool input = false;
+        bool output = false;
+        D3DDECLUSAGE usage = D3DDECLUSAGE_POSITION;
+        UINT usageIndex = 0;
+        D3DSHADER_PARAM_REGISTER_TYPE registerType = D3DSPR_FORCE_DWORD;
+        UINT registerIndex = 0;
+        DWORD writeMask = 0;
+    };
+
+    struct ProgrammableShaderInterfaceSemantics
+    {
+        bool vertexStage = false;
+        bool instructionDecodeExact = false;
+        bool registerSemanticsExact = false;
+        bool shaderModel3 = false;
+        bool complete = false;
+        UINT declarationInstructionCount = 0;
+        UINT semanticDeclarationCount = 0;
+        UINT inputSemanticCount = 0;
+        UINT outputSemanticCount = 0;
+        UINT samplerDeclarationCount = 0;
+        std::uint64_t interfaceSemanticsHash = 0;
+        std::uint64_t decoderRevisionHash = 0;
+        std::uint64_t semanticContractHash = 0;
+        std::vector<ProgrammableShaderInterfaceSemantic> semantics;
+
+        [[nodiscard]] bool exact() const noexcept
+        {
+            return instructionDecodeExact &&
+                   registerSemanticsExact &&
+                   shaderModel3 &&
+                   complete &&
+                   interfaceSemanticsHash != 0 &&
+                   decoderRevisionHash != 0 &&
+                   semanticContractHash != 0;
+        }
+    };
+
+    [[nodiscard]] ProgrammableShaderInterfaceSemantics
+    decode_programmable_shader_interface_semantics(
+        const ProgrammableShaderInstructionDecode& decode,
+        const ProgrammableShaderRegisterSemantics& registerSemantics) noexcept;
 
     [[nodiscard]] ProgrammableShaderPairCacheIdentity
     seal_programmable_shader_pair_cache_identity(
