@@ -29,6 +29,7 @@ namespace
     using outrun::vr::dx11::NativeManagedTextureStageReadiness;
     using outrun::vr::dx11::NativeProgrammableShaderPairCache;
     using outrun::vr::dx11::ProgrammableShaderFunctionIdentity;
+    using outrun::vr::dx11::ProgrammableShaderRegisterOperandRole;
     using outrun::vr::dx11::NativeSurfacePairReadiness;
     using outrun::vr::dx11::NativeTriangleFanIndexBuffer;
     using outrun::vr::dx11::NativeTriangleFanIndexBufferReadiness;
