@@ -19,7 +19,16 @@ namespace WheelFFBMath
 
     inline Model sanitize_model(int value)
     {
-        return static_cast<Model>(std::clamp(value, 0, 3));
+        // R10 follow-up: Hybrid is retired from the selectable/runtime model set.
+        // Preserve legacy numeric compatibility by treating saved Model=2 as
+        // Modern DD; Model=3 remains PS2 so old profiles do not renumber.
+        if (value == 2)
+            return Model::ModernDD;
+        if (value <= 0)
+            return Model::ModernDD;
+        if (value == 1)
+            return Model::ArcadeOriginal;
+        return Model::PS2OriginalExperimental;
     }
 
     inline const char* model_name(Model model)
@@ -433,6 +442,50 @@ namespace WheelFFBMath
         return true;
     }
 
+    constexpr unsigned ImperialAvenueCompanionPavingMask = 0x00000800u;
+
+    // R10 hardware follow-up: Imperial Avenue alternates 0x2 and 0x800 while
+    // visually on the brick/stone roadway. R9 correctly removed the false-water
+    // full-stage buzz, but that also left the paving too quiet. Require at least
+    // one 0x800 contact so ordinary all-0x2 asphalt stays quiet.
+    inline bool imperial_avenue_stone_paving_pattern(
+        int uniqueStage,
+        int collisionContext,
+        const std::array<unsigned, 4>& masks)
+    {
+        if (uniqueStage != 14 || collisionContext != 0)
+            return false;
+        bool sawCompanionPaving = false;
+        for (unsigned mask : masks)
+        {
+            if (mask == ImperialAvenueCompanionPavingMask)
+                sawCompanionPaving = true;
+            else if (mask != PrimaryAsphaltSurfaceMask)
+                return false;
+        }
+        return sawCompanionPaving;
+    }
+
+    inline float imperial_avenue_stone_tactile_amplitude(
+        float speedNorm,
+        float roadSetting,
+        float outputStrength)
+    {
+        if (!std::isfinite(speedNorm) || !std::isfinite(roadSetting) ||
+            !std::isfinite(outputStrength))
+            return 0.0f;
+        const float speedGate = smoothstep01(
+            (std::clamp(speedNorm, 0.0f, 1.0f) - 0.04f) / 0.30f);
+        const float roadScale = std::clamp(roadSetting / 0.60f, 0.0f, 1.67f);
+        const float gainScale = std::clamp(outputStrength / 0.70f, 0.0f, 2.0f);
+        // Stronger than the earlier 4.5-7.5% prototype: the R3 test still felt
+        // nearly smooth. Keep it below curb/grass texture and hard-cap at 16%.
+        return std::clamp(
+            (0.080f + 0.060f * speedGate) * roadScale * gainScale,
+            0.0f, 0.16f);
+    }
+
+
     // Common PC/DD contact layer used only to make the physically obvious
     // 0/1/2/3/4-wheel contact states distinguishable.  It does not replace the
     // Lindbergh or PS2 source-model effects; those remain the primary model
@@ -483,8 +536,8 @@ namespace WheelFFBMath
     // ConstantForce event.
     inline float collision_tactile_pulse(int impactFrame, float hostScale)
     {
-        static constexpr std::array<float, 5> Pattern = {
-            0.32f, -0.28f, 0.20f, -0.14f, 0.08f
+        static constexpr std::array<float, 6> Pattern = {
+            0.72f, -0.56f, 0.42f, -0.30f, 0.20f, -0.12f
         };
         if (impactFrame < 0 || impactFrame >= static_cast<int>(Pattern.size()))
             return 0.0f;
