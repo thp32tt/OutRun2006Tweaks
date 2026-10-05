@@ -22,7 +22,7 @@
   "result_sha": "583c17035766c0594a52720047b2c00c6e07655c",
   "material_result_sha": "583c17035766c0594a52720047b2c00c6e07655c",
   "validation_bearing_result_sha": "583c17035766c0594a52720047b2c00c6e07655c",
-  "state_commit_sha": "ded1fe34764c4a0e85b4e3e3b046f60686f72519",
+  "state_commit_sha": "d7ab07bf12646c0fb1af1f5e5fe3c357edf048f9",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00397]",
   "selected_work_item": "VR-REFACTOR-POST1000-R9-DEPTH-STENCIL-METADATA-OWNERSHIP-0008",
   "summary": "Continued the active post-1000 R34-to-R33 structural cleanup by removing R33 direct ownership leakage into R9 main-depth metadata. R9 now exposes inline R9TrackedMainDepthHasStencil() with the exact prior predicate; R33 consumes that owner API instead of reading R9MainDepthKnown, R9MainDepthIdentity, and R9MainDepthDesc directly. No projection, HUD/SkyGlow/lens-flare behavior, Present ordering, D3D getter, allocation, wait, lock, or new hot-path synchronization was introduced.",
@@ -78,7 +78,7 @@
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "state_commit_sha": "ded1fe34764c4a0e85b4e3e3b046f60686f72519",
+      "state_commit_sha": "d7ab07bf12646c0fb1af1f5e5fe3c357edf048f9",
       "issue14_validation_comment_id": 5985850851,
       "issue13_update": "NOT_REQUIRED_NO_RUNTIME_PROBLEM_STATUS_CHANGE",
       "runtime_validation": "UNTESTED"
@@ -112,7 +112,7 @@
       "artifact_digest": "sha256:80653600a2045db560dea8e5e5dfbe04fcc8d33ad90dcd7d1da5231f5a463a89"
     },
     "n100_local": {
-      "conclusion": "success_auxiliary_semantic_material",
+      "conclusion": "success",
       "semantic_source_sha": "41b0f5ee29438f81d35d29db32b550959cd6435e",
       "final_validation_bearing_sha": "583c17035766c0594a52720047b2c00c6e07655c",
       "relation": "583c1703 differs from 41b0f5ee only by restoring EOF newlines; final authoritative validation is exact-SHA GitHub Actions on 583c1703.",
@@ -127,7 +127,8 @@
         "workflow YAML parse",
         "git diff --check"
       ],
-      "transport_note": "N100 HTTPS push lacked credentials; GitHub connector remained the authoritative write path."
+      "transport_note": "N100 HTTPS push lacked credentials; GitHub connector remained the authoritative write path.",
+      "exact_sha": "583c17035766c0594a52720047b2c00c6e07655c"
     }
   },
   "next_action": "Do not repeat CONVERSION-DX9EX-00397. Preserve R9TrackedMainDepthHasStencil() as the owner boundary and keep R33 free of direct R9MainDepthKnown/R9MainDepthIdentity/R9MainDepthDesc reads. Continue only the next bounded post-1000 structural successor supported by current source/static evidence; runtime claims remain gated on Quest3/VDXR evidence.",
