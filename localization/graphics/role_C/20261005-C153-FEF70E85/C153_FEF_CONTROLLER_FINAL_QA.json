@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C153-FEF70E85",
+  "timestamp_kst": "2026-10-05T11:57:30+09:00",
+  "queue_index": 236,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "scope": "new B_PRODUCTION80 candidate only; completed prior PASS assets not repeated",
+  "producer_run": "20261005-B-PRODUCTION80",
+  "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "candidate_sha256": "e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086",
+  "candidate_changed_by_C": false,
+  "retry_note": "C152 first independent clean reconstruction zeroed transparent RGB as well as alpha and correctly failed closed; C153 corrected the clean model to preserve hidden RGB while clearing alpha. Same asset/task retry, no duplicate completion credit.",
+  "independent_machine_qa": {
+    "report": "localization/graphics/role_C/20261005-C153-FEF70E85/C153_FEF_MACHINE_QA.json",
+    "status": "PASS",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "producer_clean_exact_diff_pixels": 0,
+    "bbox_size_positive_margin": "14/14 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "overlap": 0,
+    "touch_pairs": [],
+    "target_protected_overlap": 0,
+    "target_protected_1px_near": 0,
+    "protected_regions_changed_pixels": {
+      "14": 0
+    }
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "stage_name_policy": "PASS_CANONICAL_PHONETIC_HANGUL",
+    "shared_source_style": "PASS_DARK_CONDENSED_RIGHT_ALIGNED_FAMILY",
+    "protected_REVERSED": "PASS_PIXEL_EXACT",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "residue": "NONE_VISIBLE",
+    "seam_or_halo": "NONE_VISIBLE",
+    "orientation_regression": "NONE_VISIBLE"
+  },
+  "decision": "C153_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "producer_rework_remaining": [
+    "C598919A"
+  ],
+  "in_game_validation": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
