@@ -1,0 +1,11 @@
+{
+  "run": "20261005-A-PRODUCTION28-PREFLIGHT",
+  "asset": "754F0599",
+  "dimensions": [
+    2048,
+    1024
+  ],
+  "raw_mode": "BGRA",
+  "purpose": "semantic/orientation binding before same-invocation candidate construction",
+  "runtime_validation": "UNTESTED"
+}
