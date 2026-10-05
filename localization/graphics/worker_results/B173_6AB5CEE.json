@@ -1,0 +1,12 @@
+{
+  "role": "B",
+  "run": "20261006-B-PRODUCTION173-JENN-ALIAS",
+  "queue_index": 38,
+  "asset": "6AB5CEE",
+  "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+  "canonical_source_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+  "exact_alias_of_queue_index": 36,
+  "exact_alias_candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+  "report": "localization/graphics/role_B/20261006-B-PRODUCTION173-JENN-ALIAS/B173_6AB5CEE_ALIAS_REPORT.json",
+  "status": "WORKER_PASS_PENDING_CONTROLLER_RECONCILE"
+}

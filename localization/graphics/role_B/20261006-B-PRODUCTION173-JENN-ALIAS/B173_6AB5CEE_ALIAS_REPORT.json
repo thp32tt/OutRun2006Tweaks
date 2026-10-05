@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PRODUCTION173-JENN-ALIAS",
+  "base_head": "ef639dd365f928f4a0e3be8d8500d5525d045368",
+  "queue_index": 38,
+  "asset": "textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+  "prior_action": "zoom_review",
+  "readiness_tier": "ZOOM_REVIEW_EXACT_CANONICAL_ALIAS_OF_C215_APPROVED_TEXTURE",
+  "classification": {
+    "result": "LOCALIZABLE_EXACT_ALIAS",
+    "source": "Total Rank x3",
+    "korean": "종합 랭킹",
+    "numeric_texture_hash": "0x06AB5CEE",
+    "leading_zero_alias": {
+      "index36": "06AB5CEE",
+      "index38": "6AB5CEE",
+      "numeric_equal": true
+    },
+    "reason": "Index38 recovered source is the 1024x1024 low-resolution form, while the HD baseline resolves to the exact same canonical upstream 6AB5CEE payload already used and independently C-approved for index36."
+  },
+  "provenance": {
+    "recovered_index38_inventory_sha256": "c45f8592260ad9f1d077b54f17c3d71a9b210081e7ab4c0114aa8368908d109b",
+    "recovered_index38_dimensions": [
+      1024,
+      1024
+    ],
+    "canonical_hd_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+    "canonical_hd_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+    "canonical_hd_dimensions": [
+      4096,
+      4096
+    ],
+    "approved_index36_candidate": "textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+    "approved_index36_candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+    "c215_report": "localization/graphics/role_C/20261006-C215-06AB5CEE/C215_06AB5CEE_CONTROLLER_FINAL_QA.json",
+    "c215_decision": "C215_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+  },
+  "production": {
+    "method": "byte-exact deployable alias copy of independently C215-approved canonical-HD candidate; no low-resolution Korean bitmap or recovered 1024x1024 raster is reused/upscaled",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+    "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+    "candidate_byte_exact_to_c215": true,
+    "new_rasterization": false,
+    "reason_no_rerender": "canonical source SHA and localized candidate bytes are identical to C215-approved index36 texture identity; rerendering would duplicate completed work and risk environment-dependent pixel drift"
+  },
+  "structure": {
+    "width": 4096,
+    "height": 4096,
+    "pitch": 16384,
+    "mips": 1,
+    "pf_flags": 65,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "bytes": 67108992,
+    "header_and_payload_candidate_byte_exact_to_c215": true,
+    "raw_orientation": "mirror_y"
+  },
+  "transferred_static_qa": {
+    "basis": "exact canonical source SHA + exact localized candidate SHA + exact DDS structure",
+    "bbox_size_positive_margin": "3/3 PASS via C215",
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "unsafe_target_template_variant_pixels": 0,
+    "localized_bbox_mismatches": 0,
+    "controller_visual_qa_reference": "C215 PASS SOURCE/CLEAN/FINAL + raw mirror_y"
+  },
+  "worker_status": "PASS",
+  "controller_self_qa": "PENDING_CONTROLLER_EXACT_SHA_REUSE_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "B173_ALIAS_CANDIDATE_PASS_PENDING_CONTROLLER_RECONCILE",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
