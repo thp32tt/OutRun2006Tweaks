@@ -7,12 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A88 P1 IGR-001 screenshot(143) exact GRAPHICS multi-asset repair static/controller PASS: BA0147DA 61ae0c45568e023cc258379173f8d80f43cc5257f2d8facefbcf3c87759179e1 C2C title + 8C259C68 00e16af1e3d468667fe13ed5291ec55bbfd06f18e6895a6be7e79f413ade94bd C2C help + D657C2EB 1a57c385e6c3ea2cc368888041e7106aab79bc4ab364daf0b51edd4465fcc935 C2C selector; C171 754F header preserved. 3 changed rows each 1/1 bbox/size/margin, all scope/protected gates zero, controller visual PASS. Pending independent C + NEW game retest; do not repeat A88 bytes unless C/new game evidence fails.",
     "B166 P1 IGR-002 screenshot(144) exact-mapped to GRAPHICS multi-asset BA0147DA(index212 title/Showroom), 8C259C68(index188 help copy), D657C2EB(index220 Heart/Time tabs); no runtime text. BA f5838261bd2015ade657d51f45175f1ef1c0351252c6505dc5eaf985be54d5a1 large 하트 어택 and 8C 8da8dbf1d5f577605e2268841667fdd64636f4358f27e17103587ee032c2575c help row materially rerendered at native HD/source-relative height; D657 preserved. 1/1+1/1 bbox/size/margins, all scope/protected gates zero, controller visual PASS. Pending C + NEW in-game retest; not closed.",
     "B165 P0 IGR-005 exact-mapped screenshot(147) from stale SUSPECTED queue106 to GRAPHICS queue137 30CF0D. Visible modal title/options/subtitle/AT-MT all bind to 30CF0D; no runtime text is needed for the visible defect. Candidate 0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4 shortens 변속 방식 선택/변속 방식 to native-HD 변속기 선택/변속기; MANUAL/AUTOMATIC x4 and AT/MT art unchanged. 2/2 bbox/size/margin and zero scope/protected gates; controller visual PASS. Pending C + NEW in-game retest; not closed. 788CE557 remains IGR-017 only.",
     "A87 IGR-018 FD90AA9 3d000de4c8c88645f4f50deb388e2538a00154783a1db4b848f15f7e7bf86894 shared selector-header family static self-QA PASS; pending C + NEW game retest. IGR-008/011 exact graphics mapping resolved to BF3 3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37 + B169 31a73348657620a4e7c7adc66a65e07f95a35a6b61266b48f9409e835b7f12be, no localization runtime text hits; pending C + NEW game retest.",
     "B164 P1 IGR-009 / index48 B1696633 candidate 31a73348657620a4e7c7adc66a65e07f95a35a6b61266b48f9409e835b7f12be static self-QA PASS. Slipstream alone was materially rerendered from exact-HD clean plate with natural Hangul advance, 0.26 source-family right slant, white/navy/cobalt glow and preserved speed streak field; 1/1 bbox/size/margin and zero outside/protected/overlap gates, other 8 localized rows exact; controller SOURCE/OLD/CLEAN/FINAL+2x+raw visual PASS. Pending independent C + NEW in-game retest; not closed. IGR-005 remains OPEN MIXED; remaining B P1 rows require exact source/runtime mapping.",
-    "A85 P0 IGR-012: A064FDFC a2785ce88703b9997b1a80b9e7cc624508463fd62671d3dc920d41d78444785f + 48DEBE77 a6161cfaedb9ab83c311b3aa78cf3ae3e18ca333fc52e1e31a8d6055e21797ea multi-asset graphics repair static self-QA PASS; pending C + NEW game retest; do not close. A82 BF3 Rank pending C; IGR-008/011 remaining MIXED runtime mapping stays OPEN.",
-    "A82 P0 IGR-008 (+IGR-011 template) BF3 graphics portion 3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37 static self-QA PASS; pending C. MIXED runtime/modal mapping remains OPEN; do not redraw BF3 Rank again unless C/new game evidence fails. A85 IGR-012 clean-plate retry compute pending.",
     "B163 P0 index106 788CE557 candidate bb8f96c0590c350c99fcd0414db33249451400d49eb46852ccb7cc82c3725d0c static self-QA PASS after B162 visual rejection. Exact-HD 2048x1024 RGBA32/raw mirror_y; For Experts + Transmission x2 + Music Change + Time remaining localized, OutRun2SP exact-protected; 5/5 bbox/size/margin and zero residue/outside/protected/overlap/touch; controller SOURCE/CLEAN/FINAL+raw visual PASS. IGR-017 pending independent C + NEW in-game retest, not closed. IGR-005 remains OPEN MIXED with graphics portion repaired but modal/runtime source split unresolved. Next B exact-mapped P1 is IGR-009 index48 B1696633.",
     "C221 approved A83 index95 37759842 static graphics QA; IGR-014/015/016 remain pending NEW actual in-game retest. Do not rework 37759842 again unless new game evidence fails. Continue active user backlog by owner lane (notably index106 B and index48 B) and consume only producer-finalized candidates.",
     "A81 P0 37759842 e581da473a69acf8b2dbb651fb44668b5d61177459bc556fcf775a15bfef86a7: IGR-014/015/016 material rework static self-QA PASS; pending independent C and NEW in-game retest; backlog not closed.",
@@ -4082,7 +4081,10 @@
     "48DEBE77",
     "788CE557",
     "B1696633",
-    "FD90AA9"
+    "FD90AA9",
+    "BA0147DA",
+    "8C259C68",
+    "D657C2EB"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -5155,5 +5157,46 @@
     "runtime_text_hits": 0,
     "report": "localization/graphics/role_A/20261006-A-PRODUCTION87-IGR018-HEADER-FAMILY/A87_IGR008_011_MAPPING_RECONCILE.json",
     "pending_c_and_new_ingame_retest": true
+  },
+  "a88_igr001": {
+    "timestamp_kst": "2026-10-06T04:54:42+09:00",
+    "run": "20261006-A-INGAME88-IGR001-C2C",
+    "regression": "IGR-001",
+    "decision": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+    "assets": {
+      "BA0147DA": {
+        "index": 212,
+        "candidate_sha256": "61ae0c45568e023cc258379173f8d80f43cc5257f2d8facefbcf3c87759179e1"
+      },
+      "8C259C68": {
+        "index": 188,
+        "candidate_sha256": "00e16af1e3d468667fe13ed5291ec55bbfd06f18e6895a6be7e79f413ade94bd"
+      },
+      "D657C2EB": {
+        "index": 220,
+        "candidate_sha256": "1a57c385e6c3ea2cc368888041e7106aab79bc4ab364daf0b51edd4465fcc935"
+      },
+      "754F0599": {
+        "index": 175,
+        "candidate_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+        "action": "PRESERVED_C171_COMPLETED"
+      }
+    },
+    "machine_qa": {
+      "bbox_size_positive_margin": "3/3 rows PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "protected": 0,
+      "render_protected_overlap": 0
+    },
+    "controller_visual_qa": "PASS_NATIVE_HD_C2C_HIERARCHY_AND_SCOPE",
+    "status": "A88_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+    "pending_independent_c_static_qa": true,
+    "pending_new_ingame_retest": true,
+    "worker_trigger_commit": "dda45a754960fe4879d6f0a7b92c6e333486bed4",
+    "worker_output_commit": "8046312e4f79f779fb7c158fd9e3e9046eab65b3",
+    "report": "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_IGR001_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "PENDING_NEW_INGAME_RETEST"
   }
 }
