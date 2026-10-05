@@ -1,0 +1,9 @@
+{
+  "run": "20261005-A-PRODUCTION58-PREFLIGHT",
+  "index": 163,
+  "asset": "59A79158",
+  "source_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+  "status": "A58_PREFLIGHT_SOURCE_CONTACT_READY_FOR_SAME_CONTROLLER_INVOCATION_BINDING",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION58-PREFLIGHT/A58_59A79158_PREFLIGHT.json",
+  "runtime_validation": "UNTESTED"
+}
