@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C144-E7F6E9B7",
+  "timestamp_kst": "2026-10-05T09:58:22+09:00",
+  "queue_index": 228,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+  "scope": "new B_PRODUCTION68 handoff only; C143-and-earlier completed PASS assets not repeated",
+  "producer_run": "20261005-B-PRODUCTION68",
+  "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+  "candidate_sha256": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607",
+  "candidate_changed_by_C": false,
+  "semantic_binding": {
+    "localized_regions": {
+      "0": "race select -> 레이스 선택",
+      "1": "mode select -> 모드 선택",
+      "2": "game select -> 게임 선택",
+      "3": "rankings -> 랭킹",
+      "4": "network -> 네트워크",
+      "5": "options -> 옵션",
+      "6": "music select -> 음악 선택",
+      "7": "multiplayer -> 멀티플레이",
+      "8": "main menu -> 메인 메뉴",
+      "9": "game lobby -> 게임 로비",
+      "10": "license select -> 라이선스 선택",
+      "11": "car select -> 차량 선택",
+      "12": "coast 2 coast -> 코스트 2 코스트"
+    }
+  },
+  "independent_machine_qa": {
+    "report": "localization/graphics/role_C/20261005-C144-E7F6E9B7/C144_E7F6_MACHINE_QA.json",
+    "status": "PASS",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "unclassified_visible_source_pixels": 0,
+    "producer_clean_exact_diff_pixels": 0,
+    "bbox_size_positive_margin": "13/13 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "shared_grayscale_family": "13/13 PASS"
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "shared_silver_techno_family": "PASS",
+    "shared_rightward_slant": "PASS",
+    "english_source_residue": "NONE_VISIBLE",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "seam_or_halo": "NONE_VISIBLE",
+    "orientation_regression": "NONE_VISIBLE"
+  },
+  "decision": "C144_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "producer_rework_remaining": 0,
+  "pending_artwork_localize_text": 32,
+  "high_risk_static_pass_assets_existing": [
+    "1A43E9D9"
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94",
+    "49BB5FE5"
+  ],
+  "in_game_validation": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
