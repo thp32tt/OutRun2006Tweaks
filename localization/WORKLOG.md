@@ -2066,3 +2066,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Current src/hooks_localization.cpp SHA-256 is still 12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889, exact to the validation-bearing B170 source. Therefore Win32 Release 37379204456 PASS and Korean test-build 37379204466/package PASS remain exact-source-valid for IGR-007; identical source bytes were not reworked or rebuilt.
 - IGR-007 -> B171_SHARED_RUNTIME_FIX_BUILD_PASS_PENDING_C_AND_INGAME_RETEST. Independent C and a NEW actual in-game screenshot remain mandatory; no closure claimed. Next B active row is IGR-010. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/runtime/B171_IGR007_SPEECH_BUBBLE_RUNTIME_RECONCILE.json.
+
+## 2026-10-06 07:34 KST — A97 final pending_artwork native-HD batch
+
+- Consumed the four remaining A-shard `pending_artwork` localize_text rows: index225 E3C455FA, 227 E596B7AC, 231 EBE401C8, 237 FF514CEB. No completed A88/A89R/A90 or active B-owned in-game regression work was repeated.
+- E3C455FA: A95 controller review caught a numeric false-negative: six small lobby rows retained a leading Latin source fragment because connected-component masking joined the first glyph to adjacent UI. A95R candidate `37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d` switches those six rows to exact source-RGB isolation; 9/9 bbox/size/positive margins, all zero-pixel gates, DDS roundtrip, readable/raw visual QA PASS.
+- E596B7AC: A96 review corrected source/transcription policy errors before promotion: `CAPE WAY -> 케이프 웨이`, `CONIFEROUS FOREST -> 코니퍼러스 포레스트`, and recovered `BAY AREA -> 베이 에어리어`. A96R candidate `e60eb09818ce79c1afc005905ce0d5f7d2678c7f69a2b25f418f2679200499b2`; 16/16 bbox/size/positive margins and all zero-pixel gates PASS.
+- EBE401C8: pass1 transcription had omitted two visible explanatory help lines. A93 recovered/localized both help lines plus both physical ONLINE rows while preserving both LAN rows. Candidate `dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499`; 4/4 bbox/size/positive margins, all zero-pixel gates, LAN preservation and DDS roundtrip PASS.
+- FF514CEB: A94 candidate `acbf42d5f8f45ee6227bb0f81a770687bba680916c828f773095b64dbc63e5a3` localizes CREATE/CUSTOM/QUICK title families plus three help lines at native 2048x2048; 9/9 bbox/size/positive margins and all zero-pixel gates PASS.
+- Batch total: 4 DDS candidates, 35 conceptual segments, 38 localized physical rows. Controller readable SOURCE/CLEAN/FINAL and raw mirror_y review: 4/4 PASS. No low-resolution mixing, broken glyphs, source residue/double drawing, foreign-image intrusion, clipping, overlap, seam/halo or orientation regression remain in the promoted batch.
+- State: `A97_STATIC_PASS_PENDING_C`; `current_pending_artwork_localize_text=0`. Independent C verification is still required; runtime/in-game validation is UNTESTED. Evidence: `localization/graphics/role_A/20261006-A-PRODUCTION97-PENDING4-FINALIZE/A97_CONTROLLER_SELF_QA.json`.
+- VR/FFB/DX11/DXVK: untouched.
+
