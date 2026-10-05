@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-10-05T15:56:14+09:00",
+  "updatedKst": "2026-10-05T16:07:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -277,22 +277,18 @@
     {
       "id": "VR-HOST-002",
       "priority": 10,
-      "status": "NEEDS_POST_REVIEW",
+      "status": "DONE",
       "preferredRole": "C_PERF_REVIEW",
       "summary": "Restore omitted post-test runtime safety fixes: loading/stall projection hold, Frame.v2 run-generation identity, stale slot/run rejection, DirectGPU run binding, validated gameplay handoff, fallback stale-run rejection, and matching verifiers.",
       "testLevel": "LEVEL0",
       "dependencies": [],
-      "attempts": 0,
+      "attempts": 1,
       "runtimeCandidate": false,
       "candidateBranch": "vr-d3d9ex-candidate/VR-HOST-002-reconcile",
       "candidateSha": "a2b2e4d0168c311e8998df4dc6c012c47e855558",
       "validationRunId": 35531382160,
       "validationResult": "BUILD_VERIFIED",
-      "postReviewRequired": [
-        "A",
-        "B",
-        "C"
-      ],
+      "postReviewRequired": [],
       "provenance": [
         "ad14ed6c6757634233ec79b71f42be53c563edb7",
         "edee6b911198f4ab1fd9bd0e36ca3a5cf54a6162",
@@ -303,7 +299,21 @@
         "94be96fb8bbdc20ac53349707d53111d8d5ae885",
         "256fd8c5867042d73458a2f58f125c01352c76b3",
         "6585f9c7770de4e1c68bd16ffeb6ddeb9b3b8a4d"
-      ]
+      ],
+      "postReviewCompleted": [
+        "A_ARCHITECTURE",
+        "B_RENDER_RUNTIME",
+        "C_PERFORMANCE"
+      ],
+      "postReviewTaskId": "CONVERSION-DX9EX-00408",
+      "postReviewSha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+      "postReviewValidation": "PASS_EXACT_SHA_STATIC_CONTRACT",
+      "postReviewEvidence": [
+        "A: Frame.v2 run generation is claimed by the game and checked by protocol/shadow/host/fallback readers, preventing stale slots from a prior game process.",
+        "B: Gameplay bootstrap remains gated on complete world/effective-pose metadata with PresentInFlight rejected; the validated theater/loading projection hold remains present.",
+        "C: 00408 changes verifier coverage only. No runtime hot-path, projection, ownership, transport, or synchronization behavior was changed."
+      ],
+      "nextAction": "Reopen only if the architecture verifier fails or new Quest3/VDXR runtime evidence shows a stale-run, gameplay-handoff, or projection-hold regression."
     },
     {
       "id": "DX9EX-SKYGLOW-001",
