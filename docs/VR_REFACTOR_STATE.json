@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T01:56:53+09:00",
+  "updatedKst": "2026-10-06T02:07:27+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -76,9 +76,10 @@
     "VR-REFACTOR-REVIEW-1100",
     "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012",
     "VR-REFACTOR-POST1100-R31-R32-PHYSICAL-DRAW-HOOK-RETIREMENT-0013",
-    "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-0014"
+    "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-0014",
+    "VR-REFACTOR-POST1100-R32-WVP-BATCH-NEUTRAL-OWNER-0015"
   ],
-  "next": "R31/R32 physical draw hooks and their unreachable duplicate draw executors are retired. R31 remains StateBlock/cache-recovery ownership, R32 remains Reset/Present/DirectGPU lifecycle plus fail-close/workload ownership, and R33 is the sole physical draw executor. The next bounded structural successor is a dependency census for the remaining R33-consumed fast-path helpers still physically defined in R31/R32, followed by one atomic neutral-owner extraction only where lifecycle ownership is not implied. Do not move StateBlock or R32 lifecycle/fail-close responsibilities.",
+  "next": "Post-1100 dependency census continues after neutralizing the raw c64..c67 WVP batch-write primitive. R31 remains StateBlock/cache-recovery owner; R32 remains Reset/Present/DirectGPU/fail-close/workload owner; R33 remains sole physical draw executor. Inspect the remaining R33-consumed R31/R32 helpers and extract only one helper whose implementation is stateless and ownership-neutral. Keep viewport restore, StateBlock reliability, Reset/Present/DirectGPU, fail-close, and cache-lifetime behavior with their current owners.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -178,7 +179,8 @@
     "Runtime remains UNTESTED; build/static success does not prove Quest3/VDXR visual or pacing behavior.",
     "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-0014: exact source 117d6b7980dd41c8504558b6bafc38dda01e184b removes 615 lines of unreachable duplicate R31/R32 world/HUD draw executors and two R31-only first-log flags, preserves helpers proven live in R33, and adds fail-closed verifier guards. DX9Ex Active 37297954231 and Domain Isolation 37297954242 SUCCESS; runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00408 E005 retry: repaired controller result identity only. fda9413593d3e1b79ab45cd73269d368d3a16f6c is bookkeeping-only and never owned the required Gate. The authoritative material/validation-bearing SHA remains 3c0ee50ba8893e94b42a5213ea36640864834553 with DX9Ex Active 37275931018 SUCCESS and Domain Isolation 37275930952 SUCCESS. No new runtime behavior was introduced; RUNTIME_VALIDATION remains UNTESTED. Current structural successor from 00409 is unchanged.",
-    "CONVERSION-DX9EX-00409 E002 retry closed result-identity gap: queue SHA 3060adb27c8444deb4c6094b1a15cb42fbee414f remains BOOKKEEPING_ONLY; exact validation-bearing repair SHA e3239b4959cf4759c5d7ce1395dd133297d10124 passed DX9Ex Active Validation 37343826060 and Domain Isolation 37343826037. Fail-closed workflow execution is now recognized by HUD/retirement verifiers. Runtime remains UNTESTED."
+    "CONVERSION-DX9EX-00409 E002 retry closed result-identity gap: queue SHA 3060adb27c8444deb4c6094b1a15cb42fbee414f remains BOOKKEEPING_ONLY; exact validation-bearing repair SHA e3239b4959cf4759c5d7ce1395dd133297d10124 passed DX9Ex Active Validation 37343826060 and Domain Isolation 37343826037. Fail-closed workflow execution is now recognized by HUD/retirement verifiers. Runtime remains UNTESTED.",
+    "CONVERSION-DX9EX-00410 completed neutral WVP batch ownership extraction. Raw c64..c67 SetVertexShaderConstantF moved to draw_state_helpers; R32 telemetry/failure wrapper remains authoritative. Exact SHA e27f01f84045bd47b93ab3aecae24581e6ffd1a0 passed DX9Ex Active 37345169043 and Domain Isolation 37345169517. Intermediate run 37345097334 on 144a4abc was superseded/cancelled, not a task failure. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
@@ -566,5 +568,41 @@
       "n100": "UNAVAILABLE_DESKTOP_COMMANDER_MONTHLY_USAGE_LIMIT; NOT_USED_FOR_COMPLETION"
     },
     "queuePolicyCommit": "3060adb27c8444deb4c6094b1a15cb42fbee414f"
+  },
+  "post1000Maintenance00410": {
+    "taskId": "CONVERSION-DX9EX-00410",
+    "productionId": "CONVERSION-DX9EX-00410",
+    "eventId": "CONVERSION-DX9EX-00410-E001",
+    "eventType": "retry",
+    "attempt": "2/3",
+    "item": "VR-REFACTOR-POST1100-R32-WVP-BATCH-NEUTRAL-OWNER-0015",
+    "baseSha": "ddce8a108ed98253d91ea8a67d19f92499e636c7",
+    "sourceMaterialSha": "e27f01f84045bd47b93ab3aecae24581e6ffd1a0",
+    "materialResultSha": "e27f01f84045bd47b93ab3aecae24581e6ffd1a0",
+    "validationBearingResultSha": "e27f01f84045bd47b93ab3aecae24581e6ffd1a0",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "runtimeBehaviorChanged": false,
+    "summary": "Moved the raw SetVertexShaderConstantF c64..c67 batch write into neutral draw_state_helpers while preserving R32 telemetry/failure semantics and all lifecycle/fail-close ownership.",
+    "validation": {
+      "dx9exActiveRunId": 37345169043,
+      "jobs": {
+        "policy": 111881914571,
+        "host": 111882069238,
+        "fullChainCompile": 111882069240,
+        "game": 111882069347,
+        "package": 111884341714
+      },
+      "domainIsolationRunId": 37345169517,
+      "packageArtifactId": 11360437554,
+      "packageArtifactDigest": "sha256:edfbfd45b048733d5459458601697a65bab42cd6b2da46a29deee1fa637cc02a",
+      "supersededCancelledRuns": [
+        37345097334
+      ]
+    },
+    "regressionKeys": [
+      "VR-R50-WORLD-STEREO-PRESERVE-001"
+    ],
+    "issue14CommentId": 5999207750
   }
 }
