@@ -538,6 +538,11 @@ namespace WheelProfileStore
     {
         const std::string wanted = lower_ascii(std::string(key));
 
+        // R11: Hybrid is retired. Treat legacy Model=2 profiles as Modern DD
+        // before selecting a canonical baseline; PS2 keeps legacy ID 3.
+        if (model == 2)
+            model = 0;
+
         // Common clean baseline. Model-specific reference values below override
         // only settings owned by that model; device routing/calibration and
         // diagnostics are excluded from FFB feel profiles entirely.
@@ -579,29 +584,6 @@ namespace WheelProfileStore
             if (auto v=pick("RoadTexture","1.0")) return v;
             if (auto v=pick("WallImpact","1.0")) return v;
             if (auto v=pick("GearShift","1.0")) return v;
-            if (auto v=pick("UsePeriodicEffects","false")) return v;
-            if (auto v=pick("InvertForce","false")) return v;
-            if (auto v=pick("InvertSpring","false")) return v;
-        }
-        else if (model == 2) // Arcade + Modern Hybrid
-        {
-            if (auto v=pick("Model","2")) return v;
-            if (auto v=pick("PhysicsSAT","true")) return v;
-            if (auto v=pick("SpringStrength","0.22")) return v;
-            if (auto v=pick("SpringSaturation","0.55")) return v;
-            if (auto v=pick("DamperStrength","0.28")) return v;
-            if (auto v=pick("UseHardwareDamper","true")) return v;
-            if (auto v=pick("SteeringWeight","1.60")) return v;
-            if (auto v=pick("MechanicalTrail","0.30")) return v;
-            if (auto v=pick("TrailResponseLead","0.40")) return v;
-            if (auto v=pick("GripLoss","0.65")) return v;
-            if (auto v=pick("WeightTransfer","0.15")) return v;
-            if (auto v=pick("SlewRate","0.12")) return v;
-            if (auto v=pick("ReversalReleaseRate","0.30")) return v;
-            if (auto v=pick("RoadTexture","1.0")) return v;
-            if (auto v=pick("WallImpact","1.0")) return v;
-            if (auto v=pick("GearShift","1.0")) return v;
-            if (auto v=pick("TireSlip","0.04")) return v;
             if (auto v=pick("UsePeriodicEffects","false")) return v;
             if (auto v=pick("InvertForce","false")) return v;
             if (auto v=pick("InvertSpring","false")) return v;
@@ -653,6 +635,16 @@ namespace WheelProfileStore
                 if (error) *error = "FFB profile contains an invalid Model value.";
                 return false;
             }
+        }
+
+        if (profileModel == 2)
+        {
+            // A retired Hybrid profile must not re-apply Hybrid steering/event
+            // values on top of Modern DD. Load it as a complete canonical Modern
+            // profile instead of preserving the obsolete mixed-model tuning.
+            profileModel = 0;
+            values.clear();
+            values.emplace("model", "0");
         }
 
         auto settings = ffb_settings();
