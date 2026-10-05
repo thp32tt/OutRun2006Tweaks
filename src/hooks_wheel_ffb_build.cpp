@@ -536,27 +536,62 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
     if (car && ffbModel == WheelFFBMath::Model::ModernDD)
     {
         RoadSurfaceProfile surface = sample_surface_profile(car);
+        const std::array<unsigned, 4> surfaceMasks = {
+            surface.surfaceMask[0], surface.surfaceMask[1],
+            surface.surfaceMask[2], surface.surfaceMask[3]
+        };
+        bool normalizedImperialAsphalt = false;
+        for (int i = 0; i < 4; ++i)
         {
-            const std::array<unsigned, 4> masks = {
-                surface.surfaceMask[0], surface.surfaceMask[1],
-                surface.surfaceMask[2], surface.surfaceMask[3]
-            };
-            if (WheelFFBMath::primary_asphalt_water_false_positive(
+            const unsigned int bit = 1u << i;
+            if ((surface.validWheelMask & bit) == 0)
+                continue;
+            const bool water = (surface.waterWheelMask & bit) != 0;
+            if (WheelFFBMath::imperial_primary_asphalt_false_water_contact(
                     stage.uniqueStage, surface.collisionContext,
-                    masks, surface.waterWheelMask))
+                    surface.surfaceMask[i], water))
             {
-                surface.minimum = 0.25f;
-                surface.maximum = 0.25f;
-                surface.spread = 0.0f;
-                surface.nonWaterMinimum = 0.25f;
-                surface.nonWaterMaximum = 0.25f;
-                surface.waterWheelMask = 0;
-                surface.validSamples = 4;
-                surface.nonWaterSamples = 4;
-                for (int i = 0; i < 4; ++i)
-                    surface.wheelRoughness[i] = 0.25f;
+                surface.waterWheelMask &= ~bit;
+                surface.wheelRoughness[i] = 0.25f;
+                normalizedImperialAsphalt = true;
             }
         }
+        if (normalizedImperialAsphalt)
+        {
+            surface.minimum = 1.0f;
+            surface.maximum = 0.0f;
+            surface.nonWaterMinimum = 1.0f;
+            surface.nonWaterMaximum = 0.0f;
+            surface.validSamples = 0;
+            surface.nonWaterSamples = 0;
+            for (int i = 0; i < 4; ++i)
+            {
+                const unsigned int bit = 1u << i;
+                if ((surface.validWheelMask & bit) == 0)
+                    continue;
+                const float roughness = surface.wheelRoughness[i];
+                surface.minimum = std::min(surface.minimum, roughness);
+                surface.maximum = std::max(surface.maximum, roughness);
+                ++surface.validSamples;
+                if ((surface.waterWheelMask & bit) == 0)
+                {
+                    surface.nonWaterMinimum =
+                        std::min(surface.nonWaterMinimum, roughness);
+                    surface.nonWaterMaximum =
+                        std::max(surface.nonWaterMaximum, roughness);
+                    ++surface.nonWaterSamples;
+                }
+            }
+            if (surface.validSamples == 0)
+                surface.minimum = 0.0f;
+            if (surface.nonWaterSamples == 0)
+                surface.nonWaterMinimum = 0.0f;
+            surface.spread =
+                std::max(0.0f, surface.maximum - surface.minimum);
+        }
+        const bool imperialStoneRoad =
+            WheelFFBMath::imperial_stone_road_mix(
+                stage.uniqueStage, surface.collisionContext, surfaceMasks);
         const bool rawMixedSurface =
             surface.validSamples >= 2 && surface.spread >= 0.08f;
 
@@ -686,15 +721,15 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
         }
 
         if (Settings::WheelFFBDebugLog &&
-            (tactileSurface || surface.waterWheelMask != 0) &&
+            (tactileSurface || surface.waterWheelMask != 0 || imperialStoneRoad) &&
             now - lastRoadCompatibilityLogTick >= 750)
         {
             lastRoadCompatibilityLogTick = now;
             spdlog::info(
-                "WheelFFB ROAD: stage={} roadSection={} primaryRoughRoad={} min={:.2f} max={:.2f} spread={:.2f} nonWaterMin={:.2f} nonWaterMax={:.2f} mixed={} fullRough={} snow={} snowLatch={} waterWheels=0x{:X} waterOnlyRough={} masks={:08X}/{:08X}/{:08X}/{:08X} rough={:.2f}/{:.2f}/{:.2f}/{:.2f} collisionCtx={} coreFloor={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
+                "WheelFFB ROAD: stage={} roadSection={} primaryRoughRoad={} imperialStone={} min={:.2f} max={:.2f} spread={:.2f} nonWaterMin={:.2f} nonWaterMax={:.2f} mixed={} fullRough={} snow={} snowLatch={} waterWheels=0x{:X} waterOnlyRough={} masks={:08X}/{:08X}/{:08X}/{:08X} rough={:.2f}/{:.2f}/{:.2f}/{:.2f} collisionCtx={} coreFloor={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
                 stage.uniqueStage,
                 static_cast<int>(car->OnRoadPlace_5C.roadSectionNum_8),
-                primaryRoughRoad,
+                primaryRoughRoad, imperialStoneRoad,
                 surface.minimum, surface.maximum, surface.spread,
                 surface.nonWaterMinimum, surface.nonWaterMaximum,
                 mixedSurface, fullyRough, snowStage, snowCurbHeld,
