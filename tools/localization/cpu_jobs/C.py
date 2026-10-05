@@ -63,8 +63,9 @@ ringmask=np.ones((yy1-yy0,xx1-xx0),bool)
 ringmask[(Y>=by0)&(Y<by1)&(X>=bx0)&(X<bx1)]=False
 pix=sa[yy0:yy1,xx0:xx1]
 # Keep opaque midtone oval interior; reject white/navy title, cyan border/glow, gray canvas.
-mx=pix[:,:,:3].max(axis=2); mn=pix[:,:,:3].min(axis=2)
-valid=ringmask&(pix[:,:,3]>180)&(mn>75)&(mx<210)&(pix[:,:,1]>pix[:,:,2]-30)&(pix[:,:,1]>pix[:,:,0]-30)
+rgb=pix[:,:,:3].astype(np.int16)
+mx=rgb.max(axis=2); mn=rgb.min(axis=2)
+valid=ringmask&(pix[:,:,3]>180)&(mn>75)&(mx<225)&(rgb[:,:,1]>rgb[:,:,2]-45)&(rgb[:,:,1]>rgb[:,:,0]-45)
 ys,xs=np.nonzero(valid)
 if len(xs)<4000: raise RuntimeError(("insufficient clean ring samples",len(xs)))
 gx=(xs+xx0).astype(np.float64); gy=(ys+yy0).astype(np.float64)
