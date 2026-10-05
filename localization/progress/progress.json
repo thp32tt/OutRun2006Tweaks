@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T14:52:10+09:00",
+  "updated_at_kst": "2026-10-05T15:03:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1143,7 +1143,8 @@
       "outside_alpha_protected_residue": 0,
       "controller_visual_qa": "PASS",
       "report": "localization/graphics/role_A/20261005-A-PRODUCTION26/A_PRODUCTION26_2EA557B4_REPORT.json",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "c_final_qa": "C164_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
     },
     "a_production27_e1639d2e": {
       "index": 241,
@@ -1157,6 +1158,42 @@
       "overlap_touch_outside_alpha_protected_residue": 0,
       "controller_visual_qa": "PASS",
       "report": "localization/graphics/role_A/20261005-A-PRODUCTION27/A_PRODUCTION27_E1639D2E_REPORT.json",
+      "runtime_validation": "UNTESTED",
+      "c_final_qa": "C165_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    },
+    "c164_controller_final_qa": {
+      "timestamp_kst": "2026-10-05T15:03:00+09:00",
+      "run": "20261005-C164-C165-A26-A27",
+      "queue_index": 55,
+      "candidate_sha256": "b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc",
+      "machine_status": "PASS",
+      "controller_visual_qa": "PASS",
+      "decision": "C164_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "machine_report": "localization/graphics/role_C/20261005-C164-C165-A26-A27/C164_2EA_MACHINE_QA.json",
+      "report": "localization/graphics/role_C/20261005-C164-C165-A26-A27/C164_2EA_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c165_controller_final_qa": {
+      "timestamp_kst": "2026-10-05T15:03:00+09:00",
+      "run": "20261005-C164-C165-A26-A27",
+      "queue_index": 241,
+      "candidate_sha256": "fe9bb931d94a13a44a08bcf61b6325c01080b462afff84f92c97205cbe0eea65",
+      "machine_status": "PASS",
+      "controller_visual_qa": "PASS",
+      "decision": "C165_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "machine_report": "localization/graphics/role_C/20261005-C164-C165-A26-A27/C165_E163_MACHINE_QA.json",
+      "report": "localization/graphics/role_C/20261005-C164-C165-A26-A27/C165_E163_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c166_controller_final_qa": {
+      "timestamp_kst": "2026-10-05T15:03:00+09:00",
+      "run": "20261005-C166-63C91067",
+      "queue_index": 26,
+      "candidate_sha256": "4eda98aa3749618530f702fb614db54b7cec7a9f4ba427875495d0d1d379e38c",
+      "producer_machine_status": "PASS_REPORTED",
+      "controller_visual_qa": "FAIL_CLEAN_PLATE_GRADIENT_SEAM",
+      "decision": "C166_REWORK_REQUIRED_CLEAN_PLATE_GRADIENT_SEAM",
+      "report": "localization/graphics/role_C/20261005-C166-63C91067/C166_63C_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     }
   },
