@@ -590,6 +590,147 @@ int main()
         !r266UnsupportedSemantics.exact(),
         "R266 preserves R265 structure but fails closed on model-dependent register-role layouts");
 
+    const auto r267DclSemanticToken =
+        [](D3DDECLUSAGE usage, UINT usageIndex) noexcept -> DWORD
+    {
+        return (static_cast<DWORD>(usage) & 0x0000000Fu) |
+               ((usageIndex & 0x0Fu) << 16u);
+    };
+
+    const DWORD r267VsTokens[] = {
+        D3DVS_VERSION(3, 0),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        r267DclSemanticToken(D3DDECLUSAGE_POSITION, 0u),
+        r266ParameterToken(
+            D3DSPR_INPUT, 0u, D3DSP_WRITEMASK_ALL),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        r267DclSemanticToken(D3DDECLUSAGE_TEXCOORD, 1u),
+        r266ParameterToken(
+            D3DSPR_OUTPUT, 2u, D3DSP_WRITEMASK_ALL),
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const auto r267VsEvidence =
+        outrun::vr::dx11::
+            capture_programmable_shader_function_source_evidence(
+                r267VsTokens, sizeof(r267VsTokens), true);
+    const auto r267VsDecode =
+        outrun::vr::dx11::
+            decode_programmable_shader_instruction_stream(
+                r267VsEvidence);
+    const auto r267VsRegisterSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_register_semantics(
+                r267VsDecode);
+    const auto r267VsInterfaceSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_interface_semantics(
+                r267VsDecode, r267VsRegisterSemantics);
+    require(
+        r267VsDecode.exact() &&
+        r267VsDecode.versionToken == D3DVS_VERSION(3, 0) &&
+        r267VsRegisterSemantics.exact() &&
+        r267VsInterfaceSemantics.exact() &&
+        r267VsInterfaceSemantics.vertexStage &&
+        r267VsInterfaceSemantics.shaderModel3 &&
+        r267VsInterfaceSemantics.declarationInstructionCount == 2u &&
+        r267VsInterfaceSemantics.semanticDeclarationCount == 2u &&
+        r267VsInterfaceSemantics.inputSemanticCount == 1u &&
+        r267VsInterfaceSemantics.outputSemanticCount == 1u &&
+        r267VsInterfaceSemantics.samplerDeclarationCount == 0u &&
+        r267VsInterfaceSemantics.semantics.size() == 2u &&
+        r267VsInterfaceSemantics.semantics[0].input &&
+        !r267VsInterfaceSemantics.semantics[0].output &&
+        r267VsInterfaceSemantics.semantics[0].usage ==
+            D3DDECLUSAGE_POSITION &&
+        r267VsInterfaceSemantics.semantics[0].usageIndex == 0u &&
+        r267VsInterfaceSemantics.semantics[0].registerType ==
+            D3DSPR_INPUT &&
+        r267VsInterfaceSemantics.semantics[0].registerIndex == 0u &&
+        r267VsInterfaceSemantics.semantics[0].writeMask ==
+            D3DSP_WRITEMASK_ALL &&
+        !r267VsInterfaceSemantics.semantics[1].input &&
+        r267VsInterfaceSemantics.semantics[1].output &&
+        r267VsInterfaceSemantics.semantics[1].usage ==
+            D3DDECLUSAGE_TEXCOORD &&
+        r267VsInterfaceSemantics.semantics[1].usageIndex == 1u &&
+        r267VsInterfaceSemantics.semantics[1].registerType ==
+            D3DSPR_OUTPUT &&
+        r267VsInterfaceSemantics.semantics[1].registerIndex == 2u &&
+        r267VsInterfaceSemantics.semantics[1].writeMask ==
+            D3DSP_WRITEMASK_ALL &&
+        r267VsInterfaceSemantics.interfaceSemanticsHash != 0 &&
+        r267VsInterfaceSemantics.decoderRevisionHash != 0 &&
+        r267VsInterfaceSemantics.semanticContractHash != 0,
+        "R267 decodes exact SM3 DCL input/output interface semantics");
+
+    const DWORD r267Sm2Tokens[] = {
+        D3DVS_VERSION(2, 0),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        r267DclSemanticToken(D3DDECLUSAGE_POSITION, 0u),
+        r266ParameterToken(
+            D3DSPR_INPUT, 0u, D3DSP_WRITEMASK_ALL),
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const auto r267Sm2Decode =
+        outrun::vr::dx11::
+            decode_programmable_shader_instruction_stream(
+                outrun::vr::dx11::
+                    capture_programmable_shader_function_source_evidence(
+                        r267Sm2Tokens, sizeof(r267Sm2Tokens), true));
+    const auto r267Sm2RegisterSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_register_semantics(
+                r267Sm2Decode);
+    const auto r267Sm2InterfaceSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_interface_semantics(
+                r267Sm2Decode, r267Sm2RegisterSemantics);
+    require(
+        r267Sm2Decode.exact() &&
+        r267Sm2Decode.versionToken == D3DVS_VERSION(2, 0) &&
+        r267Sm2RegisterSemantics.exact() &&
+        !r267Sm2InterfaceSemantics.shaderModel3 &&
+        !r267Sm2InterfaceSemantics.complete &&
+        !r267Sm2InterfaceSemantics.exact(),
+        "R267 rejects SM2 DCL interface semantics");
+
+    const DWORD r267DuplicateTokens[] = {
+        D3DVS_VERSION(3, 0),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        r267DclSemanticToken(D3DDECLUSAGE_TEXCOORD, 0u),
+        r266ParameterToken(
+            D3DSPR_OUTPUT, 0u, D3DSP_WRITEMASK_ALL),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        r267DclSemanticToken(D3DDECLUSAGE_TEXCOORD, 0u),
+        r266ParameterToken(
+            D3DSPR_OUTPUT, 1u, D3DSP_WRITEMASK_ALL),
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const auto r267DuplicateDecode =
+        outrun::vr::dx11::
+            decode_programmable_shader_instruction_stream(
+                outrun::vr::dx11::
+                    capture_programmable_shader_function_source_evidence(
+                        r267DuplicateTokens,
+                        sizeof(r267DuplicateTokens),
+                        true));
+    const auto r267DuplicateRegisterSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_register_semantics(
+                r267DuplicateDecode);
+    const auto r267DuplicateInterfaceSemantics =
+        outrun::vr::dx11::
+            decode_programmable_shader_interface_semantics(
+                r267DuplicateDecode,
+                r267DuplicateRegisterSemantics);
+    require(
+        r267DuplicateDecode.exact() &&
+        r267DuplicateRegisterSemantics.exact() &&
+        r267DuplicateInterfaceSemantics.shaderModel3 &&
+        !r267DuplicateInterfaceSemantics.complete &&
+        !r267DuplicateInterfaceSemantics.exact(),
+        "R267 rejects duplicate SM3 interface semantic declarations");
+
     const ProgrammableShaderFunctionIdentity programmableVs{
         true,
         true,
