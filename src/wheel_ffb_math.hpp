@@ -49,6 +49,20 @@ namespace WheelFFBMath
                model == Model::PS2OriginalExperimental;
     }
 
+    // R10 MOZA R3 polarity ownership.  The hardware sign is a property of the
+    // selected force model/backend pair and must not depend on which UI/profile
+    // path changed Model.  Modern's reconstructed ConstantForce/Spring signs are
+    // opposite to the original-model condition/event lanes on the R3.
+    inline bool r3_model_force_invert(Model model)
+    {
+        return model == Model::ModernDD;
+    }
+
+    inline bool r3_model_spring_invert(Model model)
+    {
+        return model == Model::ModernDD;
+    }
+
     // Boomslangnz/FFBArcadePlugin OutRun2Real.cpp derives a 10%-step
     // SpeedStrength from Lindbergh's speed value: 0.1..80=>10%, 80.1..130=>20%,
     // 130.1..180=>30%, 180.1..220=>40%, 220.1..270=>50%, 270.1..320=>60%,
@@ -342,6 +356,7 @@ namespace WheelFFBMath
     }
 
     constexpr unsigned PrimaryAsphaltSurfaceMask = 0x00000002u;
+    constexpr unsigned ImperialStoneSurfaceMask = 0x00000800u;
     constexpr unsigned PrimaryRoughRoadSurfaceMask = 0x00100000u;
     constexpr unsigned PrimarySnowIceSurfaceMask = 0x00800000u;
 
@@ -360,27 +375,45 @@ namespace WheelFFBMath
     }
 
 
-    // R9 runtime-log fix: several water-capable stages report mask 0x2 as a
-    // water material even while every wheel is on the ordinary primary road.
-    // Treat only the unambiguous all-four / collision-context-zero case as the
-    // primary-asphalt false positive. Actual mixed/water contacts remain intact.
-    inline bool primary_asphalt_water_false_positive(
+    // R10 runtime log proves the Imperial Avenue false-water case per wheel,
+    // not only when all four wheels are on mask 0x2. Mixed 0x2/0x800 samples
+    // reported water exactly on the 0x2 wheels while 0x800 remained non-water.
+    // Normalize only that exact stage/context/material combination.
+    inline bool imperial_primary_asphalt_false_water_contact(
         int uniqueStage,
         int collisionContext,
-        const std::array<unsigned, 4>& masks,
-        unsigned waterWheelMask)
+        unsigned surfaceMask,
+        bool water)
     {
-        // Hardware evidence currently proves this false-positive only on
-        // Imperial Avenue (unique stage 14). Keep other water-capable stages
-        // untouched until their own runtime traces establish the same case.
-        if (uniqueStage != 14 ||
-            collisionContext != 0 || waterWheelMask != 0x0Fu)
-            return false;
-        for (unsigned mask : masks)
-            if (mask != PrimaryAsphaltSurfaceMask)
-                return false;
-        return true;
+        return uniqueStage == 14 &&
+            collisionContext == 0 &&
+            surfaceMask == PrimaryAsphaltSurfaceMask &&
+            water;
     }
+
+    inline bool imperial_stone_road_mix(
+        int uniqueStage,
+        int collisionContext,
+        const std::array<unsigned, 4>& masks)
+    {
+        if (uniqueStage != 14 || collisionContext != 0)
+            return false;
+
+        bool sawStone = false;
+        for (unsigned mask : masks)
+        {
+            if (mask == ImperialStoneSurfaceMask)
+                sawStone = true;
+            else if (mask != PrimaryAsphaltSurfaceMask)
+                return false;
+        }
+        return sawStone;
+    }
+
+    // Sustained cobble/stone should be perceptible, not a full curb/off-road
+    // strike. With the common 0/1/2/3/4-wheel envelope this yields roughly
+    // 2%/4%/7%/9% peak tactile amplitude for 1/2/3/4 stone contacts at speed.
+    constexpr float ImperialStoneRoadTextureScale = 0.38f;
 
     // Common PC/DD contact layer used only to make the physically obvious
     // 0/1/2/3/4-wheel contact states distinguishable.  It does not replace the
@@ -423,6 +456,20 @@ namespace WheelFFBMath
             0.28f * std::clamp(contactEnvelope, 0.0f, 1.0f) *
                 speedGate * roadScale * gainScale,
             0.0f, 0.32f);
+    }
+
+    // The generic GUID_Spring is centred on the vehicle steering zero, which is
+    // useful at low slip but physically wrong as the dominant cue in a drift.
+    // Real caster/pneumatic aligning torque steers the front tyres toward their
+    // direction of travel. The Physics-SAT/front-slip path owns that behaviour,
+    // so fade the nose-centred spring away as chassis sideslip becomes large.
+    inline float modern_drift_center_spring_scale(float bodySlip)
+    {
+        if (!std::isfinite(bodySlip))
+            return 1.0f;
+        const float t = smoothstep01(
+            (std::abs(bodySlip) - 0.08f) / 0.24f);
+        return 1.0f - 0.95f * t;
     }
 
     // Direction-independent collision texture.  The directional rack kick is
