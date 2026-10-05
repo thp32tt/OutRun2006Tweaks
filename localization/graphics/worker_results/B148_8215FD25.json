@@ -1,0 +1,17 @@
+{
+  "run": "20261005-B-PRODUCTION148-8215-C200-TEMPLATE",
+  "index": 30,
+  "asset": "8215FD25",
+  "candidate_sha256": "cb023fa5533b4a058c437c1a879b2952a7268308e47202f7dced32c6a563e141",
+  "localized_physical_elements": 2,
+  "bbox_size_positive_margin": "2/2",
+  "idx1_precise_effect_mask_pixels": 54570,
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "outside": 0,
+  "alpha_outside": 0,
+  "protected_regions_changed": 0,
+  "worker_status": "B148_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION148-8215-C200-TEMPLATE/B148_8215_REPORT.json"
+}
