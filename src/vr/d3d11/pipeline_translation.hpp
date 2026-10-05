@@ -380,6 +380,73 @@ namespace outrun::vr::dx11
     decode_programmable_shader_instruction_stream(
         const ProgrammableShaderFunctionSourceEvidence& evidence) noexcept;
 
+    // R266 derives fail-closed register-level semantics from the exact R265
+    // instruction stream. It classifies opcode-specific destination/source
+    // parameter roles, register file/index/modifier/addressing fields, and
+    // constant/sampler provenance without translating or binding shaders.
+    enum class ProgrammableShaderRegisterOperandRole : std::uint8_t
+    {
+        Destination = 0,
+        Source = 1,
+        RelativeAddress = 2,
+        Declaration = 3,
+    };
+
+    struct ProgrammableShaderRegisterOperand
+    {
+        ProgrammableShaderRegisterOperandRole role =
+            ProgrammableShaderRegisterOperandRole::Source;
+        DWORD token = 0;
+        D3DSHADER_PARAM_REGISTER_TYPE registerType = D3DSPR_FORCE_DWORD;
+        UINT registerIndex = 0;
+        DWORD writeMask = 0;
+        DWORD destinationModifier = 0;
+        DWORD destinationShift = 0;
+        DWORD sourceSwizzle = 0;
+        DWORD sourceModifier = 0;
+        bool relativeAddressing = false;
+        bool constantReference = false;
+        bool samplerReference = false;
+        UINT normalizedConstantIndex = 0;
+    };
+
+    struct ProgrammableShaderRegisterSemantics
+    {
+        bool vertexStage = false;
+        bool instructionDecodeExact = false;
+        bool complete = false;
+        UINT instructionCount = 0;
+        UINT semanticInstructionCount = 0;
+        UINT destinationOperandCount = 0;
+        UINT sourceOperandCount = 0;
+        UINT relativeAddressOperandCount = 0;
+        UINT declarationOperandCount = 0;
+        UINT literalDwordCount = 0;
+        UINT floatConstantReferenceCount = 0;
+        UINT intConstantReferenceCount = 0;
+        UINT boolConstantReferenceCount = 0;
+        UINT samplerReferenceCount = 0;
+        UINT constantDefinitionCount = 0;
+        std::uint64_t registerSemanticsHash = 0;
+        std::uint64_t decoderRevisionHash = 0;
+        std::uint64_t semanticContractHash = 0;
+        std::vector<ProgrammableShaderRegisterOperand> operands;
+
+        [[nodiscard]] bool exact() const noexcept
+        {
+            return instructionDecodeExact &&
+                   complete &&
+                   semanticInstructionCount == instructionCount &&
+                   registerSemanticsHash != 0 &&
+                   decoderRevisionHash != 0 &&
+                   semanticContractHash != 0;
+        }
+    };
+
+    [[nodiscard]] ProgrammableShaderRegisterSemantics
+    decode_programmable_shader_register_semantics(
+        const ProgrammableShaderInstructionDecode& decode) noexcept;
+
     [[nodiscard]] ProgrammableShaderPairCacheIdentity
     seal_programmable_shader_pair_cache_identity(
         bool observationComplete,
