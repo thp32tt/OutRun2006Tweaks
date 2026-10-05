@@ -1,576 +1,208 @@
 #!/usr/bin/env python3
-import os,json,hashlib,struct,subprocess,urllib.request,statistics
+import os,json,hashlib,struct,subprocess,urllib.request
 from pathlib import Path
-import numpy as np
-from scipy import ndimage
 from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps,ImageFilter
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
 
-repo=Path.cwd(); run="20261006-A-PRODUCTION81-3775-BBOX"
+repo=Path.cwd()
+run="20261006-A-PRODUCTION82-IGR008-RANK"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
-asset_rel="textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
-candidate=repo/"localization/graphics/hd_candidates"/asset_rel; candidate.parent.mkdir(parents=True,exist_ok=True)
-validator=repo/"tools/localization/validate_clean_plate.py"
-work=Path("/tmp/outrun_A45"); work.mkdir(parents=True,exist_ok=True)
-source=work/"37759842_HD.dds"; atlasp=work/"4x_37759842_1024x1024_atlas.json"
-
+asset_rel="textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds"
+candidate=repo/"localization/graphics/hd_candidates"/asset_rel
+source_sha="b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887"
+input_sha="7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68"
+rank_bbox=(1068,756,1413,882)
+work=Path("/tmp/outrun_A82"); work.mkdir(parents=True,exist_ok=True)
+source=work/"BF3EE5C6_HD.dds"
+COMMIT="3ce344e7ed6b535f5e4d34c1192071ff7afbe6"
+# Correct canonical commit is fixed below before download.
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
-SOURCE_BLOB_SHA1="eeecec9ecd494270932ce97a6c38dfd05205eb24"
-ATLAS_BLOB_SHA1="581d42b49da9b882f2a54cdfef7675d147afacaa"
-BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
-urllib.request.urlretrieve(BASE+"/Release/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",source)
-urllib.request.urlretrieve(BASE+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_selector_cvt_Exst/4x_37759842_1024x1024_atlas.json",atlasp)
+urllib.request.urlretrieve("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT+"/Release/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",source)
 
-def blobsha(data): return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
-def sha256(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def bmask(m): return m.point(lambda v:255 if v else 0)
 def count(m): return sum(m.histogram()[1:])
 def dmask(a,b):
-    d=ImageChops.difference(a,b); parts=d.split(); m=parts[0]
-    for p in parts[1:]: m=ImageChops.lighter(m,p)
+    d=ImageChops.difference(a,b); z=d.split(); m=z[0]
+    for q in z[1:]: m=ImageChops.lighter(m,q)
     return bmask(m)
 def flatten(im):
-    z=Image.new("RGBA",im.size,(90,90,90,255)); z.alpha_composite(im); return z.convert("RGB")
+    bg=Image.new("RGBA",im.size,(88,88,88,255)); bg.alpha_composite(im); return bg.convert("RGB")
 
-sb=source.read_bytes(); ab=atlasp.read_bytes()
-if blobsha(sb)!=SOURCE_BLOB_SHA1: raise RuntimeError(("source blob drift",blobsha(sb)))
-if blobsha(ab)!=ATLAS_BLOB_SHA1: raise RuntimeError(("atlas blob drift",blobsha(ab)))
-SOURCE_SHA=hashlib.sha256(sb).hexdigest()
-if sb[:4]!=b"DDS ": raise RuntimeError("not DDS")
+if sha(source)!=source_sha: raise RuntimeError(("source SHA drift",sha(source)))
+if sha(candidate)!=input_sha: raise RuntimeError(("candidate SHA drift",sha(candidate)))
+sb=source.read_bytes(); cb=candidate.read_bytes()
+if sb[:4]!=b"DDS " or cb[:128]!=sb[:128]: raise RuntimeError("DDS header mismatch")
 H,W,pitch,depth,mips=struct.unpack_from("<5I",sb,12)
-pf=struct.unpack_from("<8I",sb,76)
-if (W,H,pitch,mips)!=(4096,4096,16384,1) or len(sb)!=128+W*H*4:
-    raise RuntimeError(("structure",W,H,pitch,depth,mips,len(sb)))
-rgbm=(pf[4],pf[5],pf[6])
-if pf[3]!=32: raise RuntimeError(("bpp",pf))
-if rgbm==(0xff,0xff00,0xff0000): RAWMODE="RGBA"
-elif rgbm==(0xff0000,0xff00,0xff): RAWMODE="BGRA"
-else: raise RuntimeError(("masks",rgbm))
-raw_src=Image.frombytes("RGBA",(W,H),sb[128:],"raw",RAWMODE)
-src=raw_src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-atlas=json.loads(ab.decode("utf-8"))
-regions={int(r["idx"]):r for r in atlas["regions"]}
-if len(regions)!=87: raise RuntimeError(("atlas count",len(regions)))
+if (W,H,pitch,depth,mips)!=(2048,2048,8192,1,1): raise RuntimeError((W,H,pitch,depth,mips))
+src_raw=Image.frombytes("RGBA",(W,H),sb[128:],"raw","RGBA")
+src=src_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+old_raw=Image.frombytes("RGBA",(W,H),cb[128:],"raw","RGBA")
+old=old_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 
-# Controller diagnostic: compact numbered canonical-source contact for all 87
-# atlas regions. This is small enough for connector visual inspection and lets
-# A choose real blank/template donors rather than inventing plate backgrounds.
-cols=7; cw=170; ch=118
-items=[]
-for ridx in sorted(regions):
-    rr=regions[ridx]; x,y,w,h=map(int,rr["rect"])
-    q=flatten(src.crop((x,y,x+w,y+h)))
-    q.thumbnail((158,90),Image.Resampling.LANCZOS)
-    card=Image.new("RGB",(cw,ch),(210,210,210)); d=ImageDraw.Draw(card)
-    d.text((4,3),f"idx {ridx} {w}x{h}",fill=(0,0,0))
-    card.paste(q,((cw-q.width)//2,22+(90-q.height)//2))
-    items.append(card)
-rowsn=(len(items)+cols-1)//cols
-sheet=Image.new("RGB",(cols*cw,rowsn*ch),(190,190,190))
-for i,card in enumerate(items):
-    sheet.paste(card,((i%cols)*cw,(i//cols)*ch))
-sheet.save(out/"A81_ALL_SOURCE_REGIONS.jpg",quality=82,optimize=True)
+# Exact rank-label source region from the previously C111-approved BF3 family report.
+x0,y0,x1,y1=rank_bbox
+source_rank=src.crop(rank_bbox)
+if source_rank.getchannel("A").getbbox() is None: raise RuntimeError("empty canonical Rank source")
 
+allowed=Image.new("L",(W,H),0); ImageDraw.Draw(allowed).rectangle((x0,y0,x1-1,y1-1),fill=255)
+protected_old=ImageChops.multiply(bmask(old.getchannel("A")),ImageOps.invert(allowed))
+protected_source=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed))
 
-# Physical target binding established from A30 numbered canonical-HD atlas review.
-# Duplicate sprites intentionally map to the same reviewed semantic translation.
-SPECS={
- 2:(["예"],"orange_blue","plate","full"), 3:(["아니오"],"orange_blue","plate","full"),
- 4:(["타임 어택","모드","15코스","연속"],"white_dark","plate","continuous"),
- 5:(["아웃런","모드","15코스","연속"],"white_dark","plate","continuous"),
- 6:(["타임 어택","모드"],"orange_blue","plate","mode"), 7:(["하트 어택","모드"],"orange_blue","plate","mode"),
- 8:(["아웃런","모드"],"orange_blue","plate","mode"), 9:(["타임 어택","모드"],"orange_blue","plate","mode"),
- 10:(["하트 어택","모드"],"orange_blue","plate","mode"), 11:(["아웃런","모드"],"orange_blue","plate","mode"),
- 29:(["무작위"],"white_random","plate","random"),
- 43:(["예"],"orange_blue","plate","yesno_small"), 44:(["아니오"],"orange_blue","plate","yesno_small"),
- 45:(["타임 어택","모드","15코스","연속"],"white_dark","plate","continuous_small"),
- 46:(["아웃런","모드","15코스","연속"],"white_dark","plate","continuous_small"),
- 47:(["타임 어택","모드"],"orange_blue","plate","mode_small"), 48:(["하트 어택","모드"],"orange_blue","plate","mode_small"),
- 49:(["아웃런","모드"],"orange_blue","plate","mode_small"), 50:(["타임 어택","모드"],"orange_blue","plate","mode_small"),
- 51:(["하트 어택","모드"],"orange_blue","plate","mode_small"), 52:(["아웃런","모드"],"orange_blue","plate","mode_small"),
- 59:(["조작이 어려운 차량입니다."],"white_red_help","text","text"),
- 60:(["상급자용"],"red_white_help","text","text"),
- 61:(["참가자를 기다리는 중입니다."],"cream_help","text","text"),
- 62:(["참가 접수가 종료되었습니다."],"cream_help","text","text"),
- 63:(["잠시 기다려 주세요."],"cream_help","text","text"),
- 64:(["수동","변속"],"orange_redplate","plate","transmission"),
- 65:(["자동","변속"],"yellow_greenplate","plate","transmission"),
- 66:(["실제","플레이어","전용"],"orange_yellowplate","plate","realplayer"),
- 82:(["수동"],"red_glow","text","text"),
- 83:(["상급자용: 조작이 어려운 차량입니다."],"white_red_help","text","text"),
- 84:(["상급자용: 기어 변속이 필요합니다."],"white_red_help","text","text"),
- 85:(["튜닝"],"red_glow","text","text"),
-}
-if len(SPECS)!=33: raise RuntimeError(("target count",len(SPECS)))
+# Rank clean plate is transparent: this source sprite is isolated baked lettering.
+source_clean=src.copy()
+source_clean.paste(Image.new("RGBA",(x1-x0,y1-y0),(0,0,0,0)),(x0,y0))
+srcp=out/"BF3EE5C6_HD_SOURCE_READABLE.png"; cleanp=out/"BF3EE5C6_RANK_CLEAN_PLATE.png"
+src.save(srcp); source_clean.save(cleanp); allowed.save(out/"BF3EE5C6_RANK_ALLOWED_MASK.png"); protected_source.save(out/"BF3EE5C6_SOURCE_PROTECTED_MASK.png")
 
-# Protected canonical content deliberately excluded:
-# idx0/1 & 41/42 MT/AT icon badges, idx12-28/30-40/54-58/67-81 Ferrari/model/song/logo art,
-# idx37/38/53/86 non-text/decorative plates/lines.
-PROTECTED_INDICES=sorted(set(regions)-set(SPECS))
+# Resolve a native Korean Black face and render directly at the 2048x2048 HD resolution.
+def fontspec():
+    for pat in ["Noto Sans CJK KR:style=Black","Noto Sans CJK KR:style=Bold","Noto Sans CJK KR"]:
+        try: q=subprocess.check_output(["fc-match","-f","%{file}|%{index}",pat],text=True).strip()
+        except Exception: q=""
+        if "|" in q:
+            p,ix=q.rsplit("|",1)
+            if p and Path(p).exists() and "NotoSansCJK" in Path(p).name:
+                return p,int(ix or 0),pat
+    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
+    q=subprocess.check_output(["fc-match","-f","%{file}|%{index}","Noto Sans CJK KR:style=Black"],text=True).strip()
+    p,ix=q.rsplit("|",1); return p,int(ix or 0),"Noto Sans CJK KR:style=Black"
+FONT,FI,FPAT=fontspec()
 
-def roi_for(idx,w,h,kind):
-    # C177 visual QA proved the prior semantic ROIs clipped real source
-    # glyph/effect pixels, especially the right edge of mode/continuous rows.
-    # These limits still stop before preserved icon/decorative zones.
-    if kind=="full": return (int(.10*w),int(.12*h),int(.91*w),int(.78*h))
-    if kind=="continuous": return (int(.06*w),int(.10*h),int(.76*w),int(.90*h))
-    if kind=="mode": return (int(.05*w),int(.08*h),int(.76*w),int(.76*h))
-    if kind=="random": return (int(.10*w),int(.10*h),int(.76*w),int(.48*h))
-    if kind=="yesno_small": return (int(.10*w),int(.10*h),int(.90*w),int(.76*h))
-    if kind=="continuous_small": return (int(.06*w),int(.10*h),int(.76*w),int(.90*h))
-    if kind=="mode_small": return (int(.05*w),int(.08*h),int(.76*w),int(.76*h))
-    if kind=="transmission": return (int(.05*w),int(.05*h),int(.76*w),int(.78*h))
-    if kind=="realplayer": return (int(.05*w),int(.06*h),int(.82*w),int(.88*h))
-    return (0,0,w,h)
+def shear_mask(mask,k):
+    pad=max(8,int(mask.height*abs(k))+8)
+    c=Image.new("L",(mask.width+pad*2,mask.height),0); c.paste(mask,(pad,0))
+    o=c.transform(c.size,Image.Transform.AFFINE,(1,-k,k*c.height,0,1,0),resample=Image.Resampling.BICUBIC)
+    bb=o.getbbox(); return o.crop(bb) if bb else o
 
-def core_detect(crop,style,kind):
-    a=np.asarray(crop,dtype=np.uint8)
-    rgb=a[:,:,:3].astype(np.int16); al=a[:,:,3]
-    r,g,b=rgb[:,:,0],rgb[:,:,1],rgb[:,:,2]
-    h,w=al.shape
-    x0,y0,x1,y1=roi_for(0,w,h,kind)
-    roi=np.zeros((h,w),bool); roi[y0:y1,x0:x1]=True
-    if style in ("orange_blue","orange_redplate"):
-        m=(r>165)&(g>65)&(g<205)&(b<125)&((r-g)>35)&roi&(al>40)
-    elif style=="yellow_greenplate":
-        m=(r>165)&(g>125)&(b<130)&roi&(al>40)
-    elif style=="orange_yellowplate":
-        m=(r>150)&(g<180)&(b<125)&((r-g)>25)&roi&(al>40)
-    elif style in ("white_dark","white_random"):
-        mx=np.maximum.reduce([r,g,b]); mn=np.minimum.reduce([r,g,b])
-        m=(mn>150)&((mx-mn)<75)&roi&(al>40)
-    else:
-        m=(al>0)&roi
-    # Remove tiny specks and retain glyph-scale connected components only.
-    lab,n=ndimage.label(m)
-    keep=np.zeros_like(m)
-    roi_area=max(1,int(roi.sum()))
-    for k in range(1,n+1):
-        yy,xx=np.where(lab==k)
-        if len(xx)<18: continue
-        bwc=int(xx.max()-xx.min()+1); bhc=int(yy.max()-yy.min()+1)
-        # Selector plate bevels/borders can share the white/yellow palette with text.
-        # Reject long thin border components and implausibly large plate-background blobs.
-        if style in ("white_dark","white_random") and (bwc>7*max(1,bhc) or bhc>7*max(1,bwc)):
-            continue
-        if len(xx)>int(roi_area*0.12):
-            continue
-        keep[yy,xx]=True
-    if keep.sum()<40: raise RuntimeError(("core detect",style,kind,int(m.sum()),int(keep.sum())))
-    return keep,roi
+def offset_mask(m,dx,dy):
+    o=Image.new("L",m.size,0)
+    sx0=max(0,-dx); sy0=max(0,-dy); sx1=m.width-max(0,dx); sy1=m.height-max(0,dy)
+    if sx1>sx0 and sy1>sy0: o.paste(m.crop((sx0,sy0,sx1,sy1)),(max(0,dx),max(0,dy)))
+    return o
 
-def effect_detect(crop,core,roi,style,kind):
-    """Select actual source glyph/effect pixels, not a synthetic dilation bbox.
+def make_rank_layer():
+    # Current in-game regression shows the prior Korean rank label as low-resolution/broken.
+    # Render a fresh native-resolution Black glyph with source-like silver/lavender gloss,
+    # dark keyline, pale rim and offset depth; mild source-proportion width correction only.
+    for fs in range(112,88,-1):
+        f=ImageFont.truetype(FONT,fs,index=FI)
+        d=ImageDraw.Draw(Image.new("L",(8,8),0))
+        bb=d.textbbox((0,0),"랭크",font=f)
+        pad=24
+        m=Image.new("L",(bb[2]-bb[0]+pad*2,bb[3]-bb[1]+pad*2),0)
+        ImageDraw.Draw(m).text((pad-bb[0],pad-bb[1]),"랭크",font=f,fill=255)
+        m=shear_mask(m,0.29)
+        mb=m.getbbox()
+        if not mb: continue
+        m=m.crop(mb)
+        # Source Rank is materially wider than two Hangul syllables; a 1.20x source-proportion
+        # correction keeps Hangul legible without reusing/upscaling any old Korean bitmap.
+        m=m.resize((int(round(m.width*1.20)),m.height),Image.Resampling.LANCZOS)
+        outer=m.filter(ImageFilter.MaxFilter(15))
+        key=m.filter(ImageFilter.MaxFilter(9))
+        shadow=offset_mask(outer,7,8)
+        w,h=outer.size
+        layer=Image.new("RGBA",(w,h),(0,0,0,0))
+        layer.alpha_composite(Image.composite(Image.new("RGBA",(w,h),(16,17,25,235)),Image.new("RGBA",(w,h),(0,0,0,0)),shadow))
+        layer.alpha_composite(Image.composite(Image.new("RGBA",(w,h),(235,232,246,255)),Image.new("RGBA",(w,h),(0,0,0,0)),outer))
+        layer.alpha_composite(Image.composite(Image.new("RGBA",(w,h),(54,55,68,255)),Image.new("RGBA",(w,h),(0,0,0,0)),key))
+        grad=Image.new("RGBA",(w,h),(0,0,0,0)); gp=grad.load()
+        for yy in range(h):
+            t=yy/max(1,h-1)
+            top=(255,255,255,255); bot=(211,205,232,255)
+            c=tuple(round(top[i]*(1-t)+bot[i]*t) for i in range(4))
+            for xx in range(w): gp[xx,yy]=c
+        layer.alpha_composite(Image.composite(grad,Image.new("RGBA",(w,h),(0,0,0,0)),m))
+        lb=layer.getchannel("A").getbbox()
+        if not lb: continue
+        layer=layer.crop(lb)
+        if layer.width<=x1-x0-8 and layer.height<=y1-y0-8:
+            return layer,fs
+    raise RuntimeError("rank native render does not fit")
+layer,fs=make_rank_layer()
 
-    C177 showed that bright-core+dilation under-described black source shadows
-    while the dilation bbox itself was not an exact source-effect bound.
-    We therefore use the bright core only as a spatial seed and admit nearby
-    pixels only when their canonical source colors belong to the text family
-    (fill/AA/outline/shadow). The resulting bbox is derived from selected
-    source pixels and is the source-size ceiling.
-    """
-    a=np.asarray(crop,dtype=np.uint8)
-    rgb=a[:,:,:3].astype(np.int16); al=a[:,:,3]
-    r,g,b=rgb[:,:,0],rgb[:,:,1],rgb[:,:,2]
-    mx=np.maximum.reduce([r,g,b]); mn=np.minimum.reduce([r,g,b])
-    radius=36 if kind in ("full","yesno_small") else 30 if kind in ("mode","mode_small") else 24
-    if kind in ("continuous","continuous_small"): radius=22
-    if kind=="random": radius=22
-    if kind in ("transmission","realplayer"): radius=20
-    near=ndimage.binary_dilation(core,iterations=radius)&roi&(al>0)
+# Rework only the Rank sprite region. Every other previously C111-approved BF3 pixel stays exact.
+final=old.copy()
+final.paste(Image.new("RGBA",(x1-x0,y1-y0),(0,0,0,0)),(x0,y0))
+tx=x0+(x1-x0-layer.width)//2; ty=y0+(y1-y0-layer.height)//2
+final.alpha_composite(layer,(tx,ty))
+loc=[tx,ty,tx+layer.width,ty+layer.height]
+if not (loc[0]>x0 and loc[1]>y0 and loc[2]<x1 and loc[3]<y1): raise RuntimeError(("positive margin",loc,rank_bbox))
+if (loc[2]-loc[0])>(x1-x0) or (loc[3]-loc[1])>(y1-y0): raise RuntimeError("size ceiling")
 
-    dark=(mx<58)
-    near_dark=(mx<92)&((mx-mn)<46)
-    orange=(r>105)&(g>35)&(g<210)&(b<145)&((r-g)>18)
-    yellow=(r>135)&(g>105)&(b<155)&((r-b)>25)
-    neutral=(mn>105)&((mx-mn)<88)
-
-    if style in ("orange_blue","orange_redplate"):
-        family=orange|dark|near_dark
-    elif style=="yellow_greenplate":
-        family=yellow|dark|near_dark
-    elif style=="orange_yellowplate":
-        family=orange|yellow|dark|near_dark
-    elif style in ("white_dark","white_random"):
-        family=neutral|dark
-    else:
-        family=np.ones_like(core,dtype=bool)
-
-    # C177 contact sheets show the black source extrusion/shadow is often a
-    # disconnected component. The A39 connected-component filter therefore
-    # dropped exactly the residue C asked us to remove. "near" is already
-    # spatially bounded by the canonical bright glyph core and semantic ROI, so
-    # retain all nearby source-family pixels, including disconnected shadows.
-    effect=(near&family)|core
-    if int(effect.sum())<int(core.sum()):
-        raise RuntimeError(("effect detect",style,kind,int(core.sum()),int(effect.sum())))
-    return effect
-
-def manual_plate_primitive_rgba(arr,mask,core,kind,style):
-    """Manual/template clean-plate reconstruction for C186/IGR-014/015/016.
-
-    Unlike A41-A45, this does not copy donor pixels, interpolate across glyph
-    spans, or fit a free-form source field. For the source-flat selector plate
-    families that C186 visibly rejected, derive one source-faithful vertical
-    plate primitive from untouched canonical background samples and paint the
-    exact source-effect mask from that primitive. This deliberately removes
-    source-shaped tonal ghosts instead of reproducing them.
-    """
-    if not mask.any(): return arr.copy()
-    a=arr.astype(np.uint8); h,w=mask.shape
-    rgb=a[:,:,:3].astype(np.int16); al=a[:,:,3]
-    r,g,b=rgb[:,:,0],rgb[:,:,1],rgb[:,:,2]
-    mx=np.maximum.reduce([r,g,b]); mn=np.minimum.reduce([r,g,b])
-
-    # Only the C186-visible fail families use manual primitives. Other plate
-    # families keep A45's accepted source pixels outside their source glyph
-    # masks and use a conservative local background median.
-    fail_family = kind in ("full","yesno_small","mode","mode_small","continuous","continuous_small","random")
-    safe=(~ndimage.binary_dilation(mask,iterations=18))&(al>0)
-    yy,xx=np.where(mask)
-    if len(xx)==0: return a.copy()
-    x0=max(0,int(xx.min())-96); x1=min(w,int(xx.max())+97)
-    y0=max(0,int(yy.min())-84); y1=min(h,int(yy.max())+85)
-    local=np.zeros((h,w),bool); local[y0:y1,x0:x1]=True
-    safe &= local
-
-    if kind in ("full","yesno_small","mode","mode_small"):
-        cls=(b>135)&(g>100)&(b>r+12)&(r<225)&(al>100)
-    elif kind in ("continuous","continuous_small"):
-        cls=(mx<118)&((mx-mn)<66)&(al>100)
-    elif kind=="random":
-        cls=(b>55)&(b>r+12)&(g<185)&(r<170)&(al>100)
-    elif kind=="transmission":
-        # red/green plate interiors: reject bright glyphs and border highlights.
-        cls=(al>100)&(mx<220)&(~((r>160)&(g>70)&(b<120)))
-    elif kind=="realplayer":
-        cls=(al>100)&(mx<225)&(~((r>145)&(g<180)&(b<135)))
-    else:
-        cls=(al>100)
-
-    sample=safe&cls
-    if int(sample.sum())<80:
-        sample=safe
-    if int(sample.sum())<40:
-        raise RuntimeError(("manual primitive samples",kind,int(sample.sum())))
-
-    sy,sx=np.where(sample)
-    vals=a[sy,sx].astype(np.float64)
-    # Trim channel outliers so text AA/icon colors never define the primitive.
-    med=np.median(vals,axis=0)
-    dist=np.sum(np.abs(vals[:,:3]-med[:3]),axis=1)
-    keep=dist<=np.percentile(dist,65)
-    sy2=sy[keep]; vals2=vals[keep]
-    if len(vals2)<20:
-        sy2=sy; vals2=vals
-
-    # Source plates are flat or gentle vertical gradients. Define explicit
-    # top/bottom palette anchors from untouched source pixels and interpolate
-    # only by normalized plate Y; X/source glyph colors never influence fill.
-    q1=np.percentile(sy2,30); q2=np.percentile(sy2,70)
-    topvals=vals2[sy2<=q1]; botvals=vals2[sy2>=q2]
-    top=np.median(topvals if len(topvals) else vals2,axis=0)
-    bot=np.median(botvals if len(botvals) else vals2,axis=0)
-    if not fail_family:
-        top=bot=np.median(vals2,axis=0)
-
-    out=a.copy()
-    # C186/ingame fail families need the whole exact source-effect bbox rebuilt,
-    # not only glyph-shaped pixels. Painting only the glyph mask left a visible
-    # letter silhouette even with correct replacement colors. The bbox is the
-    # contract's hard permitted region and these ROIs were defined to stop
-    # before preserved icons/decorative art.
-    paint=mask.copy()
-    if fail_family:
-        py,pxs=np.where(mask)
-        bx0,bx1=int(pxs.min()),int(pxs.max())+1
-        by0,by1=int(py.min()),int(py.max())+1
-        paint=np.zeros_like(mask,dtype=bool)
-        paint[by0:by1,bx0:bx1]=True
-    my,mxpos=np.where(paint)
-    denom=max(1.0,float(max(sy2)-min(sy2)))
-    ymin=float(min(sy2))
-    for y,x in zip(my.tolist(),mxpos.tolist()):
-        t=max(0.0,min(1.0,(float(y)-ymin)/denom))
-        px=np.rint(top*(1.0-t)+bot*t).clip(0,255).astype(np.uint8)
-        out[y,x]=px
-    return out
-
-source_text_mask=Image.new("L",(W,H),0)
-source_core_mask=Image.new("L",(W,H),0)
-allowed=Image.new("L",(W,H),0)
-clean=src.copy()
-rows=[]
-masks={}
-cores={}
-for idx,(lines,style,mode,kind) in SPECS.items():
-    r=regions[idx]; x,y,w,h=map(int,r["rect"]); crop=src.crop((x,y,x+w,y+h))
-    if mode=="text":
-        core=(np.asarray(crop.getchannel("A"))>0)
-        effect=core.copy()
-    else:
-        core,roi=core_detect(crop,style,kind)
-        effect=effect_detect(crop,core,roi,style,kind)
-    yy,xx=np.where(effect)
-    if len(xx)==0: raise RuntimeError(("empty effect",idx))
-    eb=[x+int(xx.min()),y+int(yy.min()),x+int(xx.max())+1,y+int(yy.max())+1]
-    cy,cx=np.where(core)
-    cb=[x+int(cx.min()),y+int(cy.min()),x+int(cx.max())+1,y+int(cy.max())+1]
-    em=Image.new("L",(W,H),0); em.paste(Image.fromarray((effect*255).astype(np.uint8)),(x,y))
-    cm=Image.new("L",(W,H),0); cm.paste(Image.fromarray((core*255).astype(np.uint8)),(x,y))
-    source_text_mask=ImageChops.lighter(source_text_mask,em)
-    source_core_mask=ImageChops.lighter(source_core_mask,cm)
-    ImageDraw.Draw(allowed).rectangle((eb[0],eb[1],eb[2]-1,eb[3]-1),fill=255)
-    masks[idx]=em; cores[idx]=cm
-    if mode=="text":
-        c=np.asarray(crop).copy(); c[effect]=0
-    else:
-        c=manual_plate_primitive_rgba(np.asarray(crop),effect,core,kind,style)
-    clean.paste(Image.fromarray(c.astype(np.uint8),"RGBA"),(x,y))
-    rows.append({"idx":idx,"source_effect_bbox":eb,"source_core_bbox":cb,
-                 "source_width":eb[2]-eb[0],"source_height":eb[3]-eb[1],
-                 "korean_lines":lines,"style":style,"mode":mode,"kind":kind,
-                 "source_effect_pixels":int(effect.sum()),"source_core_pixels":int(core.sum())})
-
-# Static clean-plate gate.
-sp=out/"37759842_HD_SOURCE_READABLE.png"; cp=out/"37759842_HD_CLEAN_PLATE.png"
-smp=out/"37759842_HD_SOURCE_TEXT_MASK.png"; scp=out/"37759842_HD_SOURCE_CORE_MASK.png"
-ap=out/"37759842_HD_ALLOWED_BBOX_MASK.png"
-src.save(sp); clean.save(cp); source_text_mask.save(smp); source_core_mask.save(scp); allowed.save(ap)
-protected=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed))
-pp=out/"37759842_HD_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A81_CLEAN_PLATE_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A81_CLEAN_PLATE_VALIDATION.json").read_text())
-if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
-clean_diff=dmask(src,clean)
-clean_outside=count(ImageChops.multiply(clean_diff,ImageOps.invert(allowed)))
-if clean_outside: raise RuntimeError(("clean outside source mask",clean_outside))
-
-def resolve_font():
-    pats=["Noto Sans CJK KR:style=Bold","Noto Sans CJK KR:style=Black","Noto Sans CJK KR"]
-    for install in (False,True):
-        for pat in pats:
-            try: spec=subprocess.check_output(["fc-match","-f","%{file}|%{index}",pat],text=True).strip()
-            except Exception: spec=""
-            if "|" in spec:
-                fp,ix=spec.rsplit("|",1)
-                if fp and Path(fp).exists() and "NotoSansCJK" in Path(fp).name:
-                    return fp,int(ix or 0),pat
-        if not install:
-            subprocess.run(["sudo","apt-get","update","-qq"],check=True)
-            subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
-    raise RuntimeError("Noto CJK font unavailable")
-FONT,FONT_INDEX,FONT_PATTERN=resolve_font()
-
-def palette(style):
-    return {
-      "orange_blue":((244,148,25,255),(25,35,55,255),(8,12,18,205)),
-      "white_dark":((235,235,230,255),(30,30,35,255),(5,5,8,205)),
-      "white_random":((245,245,245,255),(25,35,55,255),(8,12,18,205)),
-      "white_red_help":((242,242,238,255),(22,29,48,255),(168,32,40,170)),
-      "red_white_help":((225,45,50,255),(250,250,245,255),(25,25,32,190)),
-      "cream_help":((248,235,184,255),(36,42,70,255),(10,12,18,190)),
-      "orange_redplate":((245,147,25,255),(88,20,18,255),(30,8,8,190)),
-      "yellow_greenplate":((250,224,50,255),(25,75,25,255),(8,30,8,190)),
-      "orange_yellowplate":((221,94,25,255),(92,45,12,255),(40,20,8,160)),
-      "red_glow":((205,45,48,255),(25,31,66,255),(248,248,240,190)),
-    }[style]
-
-def shear(im,amount):
-    if amount<=0:return im
-    w,h=im.size; k=amount/max(1,h-1)
-    return im.transform((w+amount+3,h),Image.Transform.AFFINE,(1,k,-amount,0,1,0),resample=Image.Resampling.BICUBIC)
-
-def build_layer(lines,style,bw,bh):
-    fill,edge,shadow=palette(style)
-    # Preserve source line count; fit a shared font size across all lines.
-    target_w=int(bw*0.88); target_h=int(bh*0.82)
-    if style=="red_glow": target_w=int(bw*0.90); target_h=int(bh*0.78)
-    for fs in range(max(18,int(bh/max(1,len(lines))*0.78)),13,-1):
-        font=ImageFont.truetype(FONT,fs,index=FONT_INDEX)
-        stroke=max(2,min(7,int(round(fs*0.055))))
-        gap=max(1,int(round(fs*0.08)))
-        boxes=[font.getbbox(t,stroke_width=stroke) for t in lines]
-        widths=[b[2]-b[0] for b in boxes]; heights=[b[3]-b[1] for b in boxes]
-        cw=max(widths)+stroke*8+20; ch=sum(heights)+gap*(len(lines)-1)+stroke*8+20
-        base=Image.new("RGBA",(cw,ch),(0,0,0,0)); dr=ImageDraw.Draw(base)
-        yy=stroke*4+8
-        for t,bx,lh in zip(lines,boxes,heights):
-            tw=bx[2]-bx[0]; tx=stroke*4+8+(max(widths)-tw)//2
-            dr.text((tx-bx[0]+3,yy-bx[1]+4),t,font=font,fill=shadow,stroke_width=stroke,stroke_fill=edge)
-            dr.text((tx-bx[0],yy-bx[1]),t,font=font,fill=fill,stroke_width=stroke,stroke_fill=edge)
-            yy+=lh+gap
-        if style=="red_glow":
-            alpha=base.getchannel("A")
-            glow=alpha.filter(ImageFilter.GaussianBlur(max(3,fs//12)))
-            gl=Image.new("RGBA",base.size,(248,248,240,0)); gl.putalpha(glow.point(lambda v:min(150,v)))
-            gl.alpha_composite(base); base=gl
-        slant = 0.22 if style in ("orange_blue","white_dark","white_random") else 0.12
-        base=shear(base,max(2,int(fs*slant)))
-        bb=base.getchannel("A").getbbox()
-        if not bb: continue
-        base=base.crop(bb)
-        # Source sprites are wide/low. Widen the Korean block after fitting height.
-        if base.height>target_h:
-            nw=max(1,int(round(base.width*target_h/base.height)))
-            base=base.resize((nw,target_h),Image.Resampling.LANCZOS)
-        desired=min(target_w,bw-8)
-        if base.width<desired:
-            base=base.resize((desired,base.height),Image.Resampling.LANCZOS)
-        if base.width<=bw-6 and base.height<=bh-6:
-            return base,fs,stroke
-    raise RuntimeError(("cannot fit",lines,style,bw,bh))
-
-final=clean.copy(); target_masks={}
-for row in rows:
-    ob=row["source_effect_bbox"]; bw,bh=ob[2]-ob[0],ob[3]-ob[1]
-    layer,fs,stroke=build_layer(row["korean_lines"],row["style"],bw,bh)
-    tx=ob[0]+(bw-layer.width)//2; ty=ob[1]+(bh-layer.height)//2
-    lm=bmask(layer.getchannel("A")); tm=Image.new("L",(W,H),0); tm.paste(lm,(tx,ty))
-    lb=list(tm.getbbox() or ())
-    contain=len(lb)==4 and lb[0]>ob[0] and lb[1]>ob[1] and lb[2]<ob[2] and lb[3]<ob[3]
-    sizeok=contain and (lb[2]-lb[0])<=bw and (lb[3]-lb[1])<=bh
-    if not (contain and sizeok): raise RuntimeError(("bbox fail",row["idx"],ob,lb))
-    final.paste(layer,(tx,ty),lm)
-    target_masks[row["idx"]]=tm
-    row.update({"localized_bbox":lb,"localized_width":lb[2]-lb[0],"localized_height":lb[3]-lb[1],
-                "delta_left":lb[0]-ob[0],"delta_right":ob[2]-lb[2],"delta_top":lb[1]-ob[1],"delta_bottom":ob[3]-lb[3],
-                "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS",
-                "font_size":fs,"stroke_px":stroke,"font_pattern":FONT_PATTERN})
-
-# Encode exact DDS structure/header/raw mirror_y.
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-candidate.write_bytes(sb[:128]+raw_final.tobytes("raw",RAWMODE))
-CANDIDATE_SHA=sha256(candidate)
-if candidate.read_bytes()[:128]!=sb[:128]: raise RuntimeError("DDS header changed")
-decoded_raw=Image.frombytes("RGBA",(W,H),candidate.read_bytes()[128:],"raw",RAWMODE)
-decoded=decoded_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-if ImageChops.difference(decoded,final).getbbox() is not None: raise RuntimeError("DDS decoded roundtrip drift")
-dp=out/"37759842_HD_FINAL_DECODED_READABLE.png"; decoded.save(dp)
+candidate.write_bytes(sb[:128]+raw_final.tobytes("raw","RGBA"))
+csha=sha(candidate)
+dec_raw=Image.frombytes("RGBA",(W,H),candidate.read_bytes()[128:],"raw","RGBA")
+dec=dec_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+if ImageChops.difference(dec,final).getbbox() is not None: raise RuntimeError("DDS roundtrip")
+decp=out/"BF3EE5C6_A82_FINAL_READABLE.png"; dec.save(decp)
 
-# Exhaustive decoded-pixel gates.
-subprocess.run(["python3",str(validator),str(sp),str(dp),str(ap),"--protected-mask",str(pp),
-                "--report",str(out/"A81_FINAL_MASK_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"A81_FINAL_MASK_VALIDATION.json").read_text())
-diff=dmask(src,decoded)
-outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
-alpha_diff=bmask(ImageChops.difference(src.getchannel("A"),decoded.getchannel("A")))
-alpha_out=count(ImageChops.multiply(alpha_diff,ImageOps.invert(allowed)))
-protected_changed=count(ImageChops.multiply(diff,protected))
-# Atlas target regions are disjoint. Prove overlap/touch cheaply from localized bounding boxes
-# instead of O(N^2) full-4096 mask multiplications.
-lbs={r["idx"]:r["localized_bbox"] for r in rows}
-keys=sorted(lbs); overlap=0; touch=0
-for i in range(len(keys)):
-    a=lbs[keys[i]]
-    for j in range(i+1,len(keys)):
-        b=lbs[keys[j]]
-        if max(a[0],b[0]) < min(a[2],b[2]) and max(a[1],b[1]) < min(a[3],b[3]):
-            overlap=1
-        if max(a[0]-1,b[0]-1) < min(a[2]+1,b[2]+1) and max(a[1]-1,b[1]-1) < min(a[3]+1,b[3]+1):
-            touch=1
-# Build one union then dilate once; avoids 33 full-frame morphology passes.
-target_union=Image.new("L",(W,H),0)
-for tm in target_masks.values(): target_union=ImageChops.lighter(target_union,tm)
-guard=target_union.filter(ImageFilter.MaxFilter(5))
-same=ImageOps.invert(dmask(src,decoded))
-residue=count(ImageChops.multiply(source_core_mask,ImageChops.multiply(same,ImageOps.invert(guard))))
-clean_same=ImageOps.invert(dmask(src,clean))
-clean_source_core_unchanged=count(ImageChops.multiply(source_core_mask,clean_same))
-for row in rows:
-    idx=row["idx"]
-    row["clean_source_core_unchanged_pixels"]=count(ImageChops.multiply(cores[idx],clean_same))
-    row["candidate_source_core_residue_pixels"]=count(ImageChops.multiply(cores[idx],ImageChops.multiply(same,ImageOps.invert(guard))))
-allbbox=all(r["containment"]=="PASS" and r["size_ceiling"]=="PASS" and r["positive_margin"]=="PASS" for r in rows)
-# C174 requires the source-core removal gates to be strict zeros in addition
-# to the ordinary bbox/protected/outside gates.
-status=(cleanrep["status"]=="PASS" and finalrep["status"]=="PASS" and clean_outside==0 and outside==0 and alpha_out==0
-        and protected_changed==0 and overlap==0 and touch==0 and clean_source_core_unchanged==0 and residue==0 and allbbox)
+# Scoped exact-pixel gates: source geometry for the touched Rank row; previous C111 candidate is
+# the preservation baseline for every untouched localized/protected pixel.
+delta=dmask(old,dec)
+outside=count(ImageChops.multiply(delta,ImageOps.invert(allowed)))
+alpha_delta=bmask(ImageChops.difference(old.getchannel("A"),dec.getchannel("A")))
+alpha_out=count(ImageChops.multiply(alpha_delta,ImageOps.invert(allowed)))
+protected_changed=count(ImageChops.multiply(delta,protected_old))
+clean_diff=dmask(src,source_clean)
+clean_out=count(ImageChops.multiply(clean_diff,ImageOps.invert(allowed)))
+clean_protected=count(ImageChops.multiply(clean_diff,protected_source))
+newmask=Image.new("L",(W,H),0); newmask.paste(bmask(layer.getchannel("A")),(tx,ty))
+new_vs_clean=dmask(source_clean,Image.composite(dec,source_clean,allowed))
+render_out=count(ImageChops.multiply(newmask,ImageOps.invert(allowed)))
 
-# Compact controller visual evidence: full SOURCE/CLEAN/FINAL at 1/4 plus one contact card per target.
-thumbs=[]
-for im in (src,clean,decoded):
-    q=flatten(im).resize((1024,1024),Image.Resampling.LANCZOS); thumbs.append(q)
-sheet=Image.new("RGB",(3072,1024),(90,90,90))
-for i,q in enumerate(thumbs): sheet.paste(q,(i*1024,0))
-sheet.save(out/"A81_SOURCE_CLEAN_FINAL_QUARTER.jpg",quality=94)
+# Exact source text residue check outside the newly rendered Hangul footprint within the Rank bbox.
+same=ImageOps.invert(dmask(src,dec))
+source_alpha=bmask(src.getchannel("A"))
+guard=newmask.filter(ImageFilter.MaxFilter(5))
+residue=count(ImageChops.multiply(source_alpha,ImageChops.multiply(same,ImageOps.invert(guard))))
+if any(v!=0 for v in [outside,alpha_out,protected_changed,clean_out,clean_protected,render_out,residue]):
+    raise RuntimeError(("zero gate fail",outside,alpha_out,protected_changed,clean_out,clean_protected,render_out,residue))
 
-cards=[]
-for row in rows:
-    ob=row["source_effect_bbox"]; pad=18
-    box=(max(0,ob[0]-pad),max(0,ob[1]-pad),min(W,ob[2]+pad),min(H,ob[3]+pad))
-    ims=[flatten(z.crop(box)) for z in (src,clean,decoded)]
-    maxh=180
-    scaled=[]
-    for q in ims:
-        sc=min(1.0,maxh/max(1,q.height)); scaled.append(q.resize((max(1,int(q.width*sc)),max(1,int(q.height*sc))),Image.Resampling.LANCZOS) if sc<1 else q)
-    cw=sum(q.width for q in scaled)+16; ch=max(q.height for q in scaled)+26
-    card=Image.new("RGB",(cw,ch),(230,230,230)); cd=ImageDraw.Draw(card)
-    cd.text((4,4),f"idx {row['idx']}  {' / '.join(row['korean_lines'])}  SOURCE | CLEAN | FINAL",fill=(0,0,0))
-    xx=0
-    for q in scaled: card.paste(q,(xx,26)); xx+=q.width+8
-    cards.append(card)
-cw=max(c.width for c in cards); ch=sum(c.height+3 for c in cards)
-contacts=Image.new("RGB",(cw,ch),(225,225,225)); yy=0
-for c in cards: contacts.paste(c,(0,yy)); yy+=c.height+3
-contacts.save(out/"A81_TARGET_CONTACTS.jpg",quality=94)
+# Visual evidence with nearby source rank letters B/C and the old/new Rank sprite.
+ctx=(930,675,1540,1045)
+ims=[flatten(z.crop(ctx)) for z in (src,source_clean,old,dec)]
+labels=["SOURCE","CLEAN","OLD","A82 FINAL"]
+card=Image.new("RGB",(sum(i.width for i in ims)+24*(len(ims)-1),max(i.height for i in ims)+34),(225,225,225))
+x=0; dr=ImageDraw.Draw(card)
+for lab,im in zip(labels,ims):
+    dr.text((x+4,4),lab,fill=(0,0,0)); card.paste(im,(x,34)); x+=im.width+24
+card.save(out/"A82_IGR008_RANK_CONTEXT.jpg",quality=95)
 
-# Small C177-focused evidence that stays connector-viewable: only selector
-# plate rows whose detached source shadow/outline was reworked.
-focus_ids={2,3,4,5,6,7,8,9,10,11,29,43,44,45,46,47,48,49,50,51,52}
-fcards=[]
-for row in rows:
-    if row["idx"] not in focus_ids: continue
-    ob=row["source_effect_bbox"]; pad=10
-    box=(max(0,ob[0]-pad),max(0,ob[1]-pad),min(W,ob[2]+pad),min(H,ob[3]+pad))
-    ims=[flatten(z.crop(box)) for z in (src,clean,decoded)]
-    scaled=[]
-    for q in ims:
-        sc=min(1.0,95/max(1,q.height),250/max(1,q.width))
-        scaled.append(q.resize((max(1,int(q.width*sc)),max(1,int(q.height*sc))),Image.Resampling.LANCZOS) if sc<1 else q)
-    cw=sum(q.width for q in scaled)+12; ch=max(q.height for q in scaled)+20
-    card=Image.new("RGB",(cw,ch),(230,230,230)); d=ImageDraw.Draw(card)
-    d.text((3,3),f"idx {row['idx']} S|C|F",fill=(0,0,0))
-    xx=0
-    for q in scaled: card.paste(q,(xx,20)); xx+=q.width+6
-    fcards.append(card)
-fcw=max(q.width for q in fcards); fch=sum(q.height+2 for q in fcards)
-focus=Image.new("RGB",(fcw,fch),(225,225,225)); fy=0
-for q in fcards: focus.paste(q,(0,fy)); fy+=q.height+2
-focus.save(out/"A81_C177_FOCUS.jpg",quality=84,optimize=True)
+full=Image.new("RGB",(1024*3,1024),(80,80,80))
+for i,z in enumerate((src,old,dec)):
+    full.paste(flatten(z).resize((1024,1024),Image.Resampling.LANCZOS),(i*1024,0))
+full.save(out/"A82_BF3_SOURCE_OLD_FINAL.jpg",quality=94)
+flatten(dec_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A82_BF3_FINAL_RAW_MIRROR_Y.jpg",quality=94)
 
-flatten(decoded_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A81_FINAL_RAW_MIRROR_Y.jpg",quality=94)
-
-report={"schema_version":1,"role":"A","run":run,"index":95,"asset":asset_rel,"worker":"github-actions",
- "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB_SHA1,"sha256":SOURCE_SHA,
-                      "path":"Release/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"},
- "atlas_provenance":{"git_blob_sha1":ATLAS_BLOB_SHA1,"regions":87},
- "candidate_path":str(candidate.relative_to(repo)),"candidate_sha256":CANDIDATE_SHA,
- "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":RAWMODE,"pitch":pitch,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
- "binding":{"physical_localized_targets":len(rows),"reviewed_semantic_strings":20,
-            "localized_indices":sorted(SPECS),"protected_indices":PROTECTED_INDICES,
-            "preserve_original":"song titles/music credits, Ferrari/model names, MT/AT icon badges, logos and non-text decorative art"},
- "rows":rows,"clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
- "machine_checks":{"clean_changed_outside_source_effect_bboxes":clean_outside,"clean_source_core_pixels_unchanged":clean_source_core_unchanged,
-                   "decoded_changed_outside_source_effect_bboxes":outside,"alpha_changed_outside_source_effect_bboxes":alpha_out,
-                   "protected_visible_pixels_changed":protected_changed,"localized_overlap_pixels":overlap,"localized_1px_touch_pixels":touch,
-                   "source_core_residue_pixels":residue},
- "all_33_bbox_size_positive_margin_pass":allbbox,
- "c186_ingame_rework":"manual exact-source-effect-bbox plate reconstruction for C186/IGR-014/015/016 fail families; vertical plate primitives fill the full permitted bbox to eliminate glyph silhouettes; no donor/inpaint/row-span/fitted-field reuse; stronger source-faithful slant",
+report={
+ "schema_version":1,"role":"A","run":run,"queue_index":49,"asset":asset_rel,
+ "user_regression_ids":["IGR-008","IGR-011"],"mapping_basis":"IGR-008 screen contains Next Stage plus Rank B; B1696633 uniquely supplies Next Stage while BF3EE5C6 uniquely supplies localized Rank plus preserved A-E rank glyphs. Rank-label material defect is BF3EE5C6; B/C glyph art remains exact source pixels.",
+ "source_sha256":source_sha,"input_candidate_sha256":input_sha,"candidate_sha256":csha,
+ "candidate_path":str(candidate.relative_to(repo)),
+ "structure":{"dimensions":[W,H],"format":"RGBA32","pitch":pitch,"mipmaps":mips,"header_128_exact":candidate.read_bytes()[:128]==sb[:128],"raw_orientation":"mirror_y"},
+ "touched_element":{"source":"Rank","korean":"랭크","original_bbox":list(rank_bbox),"localized_bbox":loc,
+   "source_size":[x1-x0,y1-y0],"localized_size":[loc[2]-loc[0],loc[3]-loc[1]],
+   "delta_left":loc[0]-x0,"delta_right":x1-loc[2],"delta_top":loc[1]-y0,"delta_bottom":y1-loc[3],
+   "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","font":FPAT,"native_font_size_px":fs,
+   "horizontal_source_proportion_scale":1.20,"shear":0.29,"render_basis":"fresh native-resolution glyph; no previous Korean bitmap reuse"},
+ "preservation":{"all_pixels_outside_rank_bbox_vs_C111_candidate":"PIXEL_EXACT","rank_letters_A_B_C_D_E":"PRESERVED_SOURCE_ART","other_12_localized_rows":"PRESERVED_C111_BYTES"},
+ "machine_checks":{"changed_pixels_outside_rank_bbox":outside,"alpha_changed_outside_rank_bbox":alpha_out,
+   "protected_pixels_changed":protected_changed,"clean_changed_outside_rank_bbox":clean_out,"clean_protected_changed":clean_protected,
+   "render_pixels_outside_rank_bbox":render_out,"source_rank_residue_outside_new_glyph_guard":residue},
  "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"PENDING_NEW_INGAME_RETEST",
- "status":"A81_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A81_WORKER_REWORK_REQUIRED"}
-(out/"A81_37759842_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-summary={"run":run,"index":95,"asset":"37759842","candidate_sha256":CANDIDATE_SHA,
-         "localized_physical_targets":len(rows),"semantic_strings":20,
-         "bbox_size_positive_margin":"33/33 PASS" if allbbox else "FAIL",
-         "clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
-         "changed_outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,
-         "overlap":overlap,"touch":touch,"source_residue":residue,"clean_source_core_unchanged":clean_source_core_unchanged,
-         "worker_status":report["status"],"runtime_validation":"PENDING_NEW_INGAME_RETEST",
-         "report":"localization/graphics/role_A/20261006-A-PRODUCTION81-3775-BBOX/A81_37759842_REPORT.json"}
-(wr/"A81_37759842.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
-print(json.dumps(summary,ensure_ascii=False,indent=2))
-if not status: raise SystemExit(2)
+ "status":"A82_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"}
+(out/"A82_IGR008_BF3_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(wr/"A82_IGR008_BF3.json").write_text(json.dumps({
+ "run":run,"index":49,"asset":"BF3EE5C6","candidate_sha256":csha,"regressions":["IGR-008","IGR-011"],
+ "bbox_size_margin":"1/1 PASS","outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,
+ "source_residue":residue,"worker_status":report["status"],"runtime_validation":"PENDING_NEW_INGAME_RETEST",
+ "report":str((out/"A82_IGR008_BF3_REPORT.json").relative_to(repo))
+},ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"candidate_sha256":csha,"localized_bbox":loc,"font_size":fs,"outside":outside,"alpha_outside":alpha_out,"protected_changed":protected_changed,"residue":residue},ensure_ascii=False))
