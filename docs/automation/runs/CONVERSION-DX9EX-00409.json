@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00409",
+  "production_id": "CONVERSION-DX9EX-00409",
+  "event_id": "CONVERSION-DX9EX-00409-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "7c58922a54d7b2557479e39ad7ac9286499060fd",
+  "source_material_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+  "material_result_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+  "validation_bearing_result_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+  "queue_commit_sha": "3060adb27c8444deb4c6094b1a15cb42fbee414f",
+  "state_commit_sha": "793d68c97febe970a99d26f36aa64f04e34bfa03",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00409]",
+  "selected_work_item": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-0014",
+  "summary": "Removed unreachable duplicate R31/R32 world/HUD draw executors after R33 became the sole physical draw dispatcher. R31/R32 shared helpers still consumed by R33 were preserved, two now-dead R31 first-log flags were removed, and the retirement verifier now fails closed if any of the four dead executors are reintroduced.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r31_r32_retirement_guard.py",
+    "docs/VR_WORK_QUEUE.json",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00409.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered VR_REFACTOR_STATE at cycle 1100. The declared next bounded successor was dead draw-executor cleanup after R31/R32 physical draw-hook retirement."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R31TryFastWorld/R31TryHud and R32TryFastWorld/R32TryHud had no live callers after R33 direct-to-R30 hook retirement. R31BuildFastWorldConstants, R31TelemetryNoteFastWorld/Hud, R32EffectIsFragileLive, R32SetWvpBatch, R32GetSavedViewport, R32RestoreRightPassState and R32ObserveFrameWorkload remain live through R33 and were preserved."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "cabc25a removed dead R31 executors and R31-only first-log flags; 45995627 removed dead R32 executors; 117d6b79 added fail-closed reintroduction guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 117d6b7980dd41c8504558b6bafc38dda01e184b: DX9Ex Active Validation 37297954231 SUCCESS (policy 111723598839, host 111723726505, full-chain-compile 111723726549, game 111723726635, package 111725245114). Domain Isolation Guard 37297954242 SUCCESS. No Quest3/VDXR runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "cabc25a7f7793e9a1333ecd3db6e4cc04074187e refactor(vr): remove dead R31 draw executors [AUTO:CONVERSION-DX9EX-00409]",
+        "45995627ff252ffa8596b6340f8e3135bdac51b7 refactor(vr): remove dead R32 draw executors [AUTO:CONVERSION-DX9EX-00409]",
+        "117d6b7980dd41c8504558b6bafc38dda01e184b test(vr): guard dead R31 R32 executor cleanup [AUTO:CONVERSION-DX9EX-00409]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "OutRun2-VR-DX9EX-ACTIVE-117d6b7980dd41c8504558b6bafc38dda01e184b artifact 11339248938, digest sha256:ee0383cd9e70a6ebec451b778e3625e6b2c131b0358303c7021fffb9ee7a5867. Artifact is not runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "queue_commit_sha": "3060adb27c8444deb4c6094b1a15cb42fbee414f",
+      "state_commit_sha": "793d68c97febe970a99d26f36aa64f04e34bfa03",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37297954231,
+      "conclusion": "success",
+      "exact_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+      "jobs": {
+        "policy": 111723598839,
+        "host": 111723726505,
+        "full_chain_compile": 111723726549,
+        "game": 111723726635,
+        "package": 111725245114
+      },
+      "package_artifact_id": 11339248938,
+      "package_artifact_digest": "sha256:ee0383cd9e70a6ebec451b778e3625e6b2c131b0358303c7021fffb9ee7a5867"
+    },
+    "domain_isolation": {
+      "run_id": 37297954242,
+      "conclusion": "success",
+      "exact_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b"
+    },
+    "diff": {
+      "files": 3,
+      "additions": 14,
+      "deletions": 615
+    },
+    "n100": {
+      "status": "NOT_USED",
+      "reason": "Desktop Commander monthly usage limit reached; do not retry or reconnect."
+    }
+  },
+  "next_action": "Keep all non-DX9Ex tracks frozen. Next bounded structural unit: census the remaining R33-consumed fast-path helpers still defined in R31/R32 and extract one neutral shared owner only where lifecycle ownership is not implied.",
+  "completed_at_kst": "2026-10-05T19:45:19+09:00"
+}
