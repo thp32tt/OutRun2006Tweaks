@@ -38,6 +38,11 @@ namespace WheelFFBMath
         return model == Model::ModernDD || model == Model::ArcadeHybrid;
     }
 
+    inline bool model_requires_reversed_polarity(Model model)
+    {
+        return model == Model::ModernDD;
+    }
+
     inline bool model_uses_arcade_events(Model model)
     {
         return model == Model::ArcadeOriginal || model == Model::ArcadeHybrid;
@@ -483,6 +488,24 @@ namespace WheelFFBMath
         const float h01 = -2.0f * t3 + 3.0f * t2;
         const float y = h00 * Knee + h10 * span + h01;
         return sign * y;
+    }
+
+    inline float drift_countersteer_blend(float frontSlip, float bodySlip, float yawRate)
+    {
+        if (!std::isfinite(frontSlip) || !std::isfinite(bodySlip) || !std::isfinite(yawRate))
+            return 0.0f;
+        if (frontSlip * bodySlip >= 0.0f)
+            return 0.0f;
+
+        const float slipT = smoothstep01((std::abs(bodySlip) - 0.22f) / 0.30f);
+        const float yawT = smoothstep01((std::abs(yawRate) - 0.18f) / 0.72f);
+        return std::clamp(slipT * (0.65f + 0.35f * yawT), 0.0f, 1.0f);
+    }
+
+    inline float drift_recovery_slip(float frontSlip, float bodySlip, float yawRate)
+    {
+        const float blend = drift_countersteer_blend(frontSlip, bodySlip, yawRate);
+        return frontSlip + (bodySlip - frontSlip) * blend;
     }
 
     inline float physics_return_relief(float alpha, float steerRate)
