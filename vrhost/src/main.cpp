@@ -1016,6 +1016,72 @@ namespace
 
     class StereoCompositor
     {
+        struct PhaseTimingSeries
+        {
+            std::array<double, 256> samples{};
+            std::size_t count = 0;
+            std::size_t cursor = 0;
+
+            void Add(double ms)
+            {
+                samples[cursor++ % samples.size()] = ms;
+                if (count < samples.size())
+                    ++count;
+            }
+
+            double Percentile(double p) const
+            {
+                if (!count)
+                    return 0.0;
+                auto copy = samples;
+                std::sort(copy.begin(), copy.begin() + count);
+                const std::size_t index = std::min<std::size_t>(
+                    count - 1,
+                    static_cast<std::size_t>(std::ceil(p * count)) - 1);
+                return copy[index];
+            }
+        };
+
+        struct SwapchainPhaseTimings
+        {
+            PhaseTimingSeries acquire;
+            PhaseTimingSeries wait;
+            PhaseTimingSeries release;
+            PhaseTimingSeries blit;
+            PhaseTimingSeries menuBlit;
+            LARGE_INTEGER frequency{};
+            ULONGLONG lastLogMs = 0;
+
+            SwapchainPhaseTimings()
+            {
+                QueryPerformanceFrequency(&frequency);
+            }
+
+            double Ms(const LARGE_INTEGER& begin, const LARGE_INTEGER& end) const
+            {
+                return frequency.QuadPart
+                    ? double(end.QuadPart - begin.QuadPart) * 1000.0 /
+                        double(frequency.QuadPart)
+                    : 0.0;
+            }
+
+            void MaybeLog()
+            {
+                const ULONGLONG now = GetTickCount64();
+                if (now - lastLogMs < 5000)
+                    return;
+                lastLogMs = now;
+                std::cout
+                    << "VR compositor timing ms p95/p99: acquire "
+                    << acquire.Percentile(.95) << "/" << acquire.Percentile(.99)
+                    << " wait " << wait.Percentile(.95) << "/" << wait.Percentile(.99)
+                    << " release " << release.Percentile(.95) << "/" << release.Percentile(.99)
+                    << " blit " << blit.Percentile(.95) << "/" << blit.Percentile(.99)
+                    << " menuBlit " << menuBlit.Percentile(.95) << "/" << menuBlit.Percentile(.99)
+                    << "\n";
+            }
+        };
+
     public:
         StereoCompositor(XrSession session, ID3D11Device* device, ID3D11DeviceContext* context,
             HWND hwnd, const std::array<XrViewConfigurationView, 2>& configs,
@@ -1423,6 +1489,8 @@ namespace
                 !menuConstantBuffer_ || !menuVs_)
                 return false;
 
+            LARGE_INTEGER blitBegin{}, blitEnd{};
+            QueryPerformanceCounter(&blitBegin);
             D3D11_MAPPED_SUBRESOURCE map{};
             if (FAILED(context_->Map(
                     constantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &map)))
@@ -1469,6 +1537,9 @@ namespace
             context_->PSSetShaderResources(0, 1, &nullSrv);
             ID3D11RenderTargetView* nullRtv = nullptr;
             context_->OMSetRenderTargets(1, &nullRtv, nullptr);
+            QueryPerformanceCounter(&blitEnd);
+            swapchainTimings_.menuBlit.Add(
+                swapchainTimings_.Ms(blitBegin, blitEnd));
             return true;
         }
 
@@ -1899,16 +1970,33 @@ namespace
         void Acquire(SwapchainSet& s, std::uint32_t& image)
         {
             XrSwapchainImageAcquireInfo ai{ XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
+            LARGE_INTEGER acquireBegin{}, acquireEnd{};
+            QueryPerformanceCounter(&acquireBegin);
             CheckXr(xrAcquireSwapchainImage(s.handle, &ai, &image), "xrAcquireSwapchainImage");
+            QueryPerformanceCounter(&acquireEnd);
+            swapchainTimings_.acquire.Add(
+                swapchainTimings_.Ms(acquireBegin, acquireEnd));
+
             XrSwapchainImageWaitInfo wi{ XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO };
             wi.timeout = XR_INFINITE_DURATION;
+            LARGE_INTEGER waitBegin{}, waitEnd{};
+            QueryPerformanceCounter(&waitBegin);
             CheckXr(xrWaitSwapchainImage(s.handle, &wi), "xrWaitSwapchainImage");
+            QueryPerformanceCounter(&waitEnd);
+            swapchainTimings_.wait.Add(
+                swapchainTimings_.Ms(waitBegin, waitEnd));
         }
 
         void Release(SwapchainSet& s)
         {
             XrSwapchainImageReleaseInfo ri{ XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO };
+            LARGE_INTEGER releaseBegin{}, releaseEnd{};
+            QueryPerformanceCounter(&releaseBegin);
             CheckXr(xrReleaseSwapchainImage(s.handle, &ri), "xrReleaseSwapchainImage");
+            QueryPerformanceCounter(&releaseEnd);
+            swapchainTimings_.release.Add(
+                swapchainTimings_.Ms(releaseBegin, releaseEnd));
+            swapchainTimings_.MaybeLog();
         }
 
         void CreateShaders()
@@ -2079,6 +2167,8 @@ namespace
             const UvRect& uv, ID3D11ShaderResourceView* sourceSrv, DXGI_FORMAT sourceFormat)
         {
             if (!rtv || !sourceSrv || !constantBuffer_) return false;
+            LARGE_INTEGER blitBegin{}, blitEnd{};
+            QueryPerformanceCounter(&blitBegin);
             D3D11_MAPPED_SUBRESOURCE map{};
             if (FAILED(context_->Map(constantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &map)))
                 return false;
@@ -2109,6 +2199,9 @@ namespace
             context_->PSSetShaderResources(0, 1, &nullSrv);
             ID3D11RenderTargetView* nullRtv = nullptr;
             context_->OMSetRenderTargets(1, &nullRtv, nullptr);
+            QueryPerformanceCounter(&blitEnd);
+            swapchainTimings_.blit.Add(
+                swapchainTimings_.Ms(blitBegin, blitEnd));
             return true;
         }
 
@@ -2129,6 +2222,7 @@ namespace
             return true;
         }
 
+        SwapchainPhaseTimings swapchainTimings_{};
         XrSession session_ = XR_NULL_HANDLE;
         ID3D11Device* device_ = nullptr;
         ID3D11DeviceContext* context_ = nullptr;
@@ -2194,7 +2288,7 @@ namespace
 
     bool QpcAtOrAfter(std::int64_t capture,std::int64_t present){return capture>0&&present>0&&capture>=present;}
     struct TimingSeries{std::array<double,256>samples{};std::size_t count=0,cursor=0;void Add(double ms){samples[cursor++%samples.size()]=ms;if(count<samples.size())++count;}double Percentile(double p)const{if(!count)return 0;auto c=samples;std::sort(c.begin(),c.begin()+count);const std::size_t i=std::min<std::size_t>(count-1,static_cast<std::size_t>(std::ceil(p*count))-1);return c[i];}};
-    struct HostTimings{TimingSeries wait,capture,render,end;LARGE_INTEGER f{};ULONGLONG last=0;HostTimings(){QueryPerformanceFrequency(&f);}double Ms(const LARGE_INTEGER&a,const LARGE_INTEGER&b)const{return f.QuadPart?double(b.QuadPart-a.QuadPart)*1000.0/double(f.QuadPart):0;}void MaybeLog(){const auto n=GetTickCount64();if(n-last<5000)return;last=n;std::cout<<"VR host timing ms p95/p99: wait "<<wait.Percentile(.95)<<"/"<<wait.Percentile(.99)<<" capture "<<capture.Percentile(.95)<<"/"<<capture.Percentile(.99)<<" render "<<render.Percentile(.95)<<"/"<<render.Percentile(.99)<<" end "<<end.Percentile(.95)<<"/"<<end.Percentile(.99)<<"\n";}};
+    struct HostTimings{TimingSeries wait,begin,locate,capture,render,end;LARGE_INTEGER f{};ULONGLONG last=0;HostTimings(){QueryPerformanceFrequency(&f);}double Ms(const LARGE_INTEGER&a,const LARGE_INTEGER&b)const{return f.QuadPart?double(b.QuadPart-a.QuadPart)*1000.0/double(f.QuadPart):0;}void MaybeLog(){const auto n=GetTickCount64();if(n-last<5000)return;last=n;std::cout<<"VR host timing ms p95/p99: wait "<<wait.Percentile(.95)<<"/"<<wait.Percentile(.99)<<" begin "<<begin.Percentile(.95)<<"/"<<begin.Percentile(.99)<<" locate "<<locate.Percentile(.95)<<"/"<<locate.Percentile(.99)<<" capture "<<capture.Percentile(.95)<<"/"<<capture.Percentile(.99)<<" render "<<render.Percentile(.95)<<"/"<<render.Percentile(.99)<<" end "<<end.Percentile(.95)<<"/"<<end.Percentile(.99)<<"\n";}};
 
     XrEnvironmentBlendMode ChooseBlendMode(XrInstance instance, XrSystemId system)
     {
@@ -2519,8 +2613,14 @@ int main(int argc, char** argv)
             LARGE_INTEGER ws{},we{};QueryPerformanceCounter(&ws);CheckXr(xrWaitFrame(session,&wi,&fs),"xrWaitFrame");QueryPerformanceCounter(&we);timings.wait.Add(timings.Ms(ws,we));
             if(pendingReferenceSpaceChange&&(pendingReferenceSpaceChangeTime==0||fs.predictedDisplayTime>=pendingReferenceSpaceChangeTime)){shared.ReferenceSpaceChanged();compositor.ReferenceSpaceChanged();viewHistory.Clear();matchedStereoValid=false;OutRunVR::SharedRenderFrameState rf{};lastProcessedStereoFrame=renderFrames.Read(rf)?rf.frameId:shared.ReadStereoMeta().frame;pendingReferenceSpaceChange=false;pendingReferenceSpaceChangeTime=0;}
             XrFrameBeginInfo bi{ XR_TYPE_FRAME_BEGIN_INFO };
+            LARGE_INTEGER beginStart{}, beginEnd{};
+            QueryPerformanceCounter(&beginStart);
             CheckXr(xrBeginFrame(session, &bi), "xrBeginFrame");
+            QueryPerformanceCounter(&beginEnd);
+            timings.begin.Add(timings.Ms(beginStart, beginEnd));
 
+            LARGE_INTEGER locateStart{}, locateEnd{};
+            QueryPerformanceCounter(&locateStart);
             XrSpaceLocation head{ XR_TYPE_SPACE_LOCATION };
             CheckXr(xrLocateSpace(viewSpace, localSpace, fs.predictedDisplayTime, &head), "xrLocateSpace");
             std::array<XrView, 2> views{};
@@ -2532,6 +2632,8 @@ int main(int argc, char** argv)
             vl.space = localSpace;
             std::uint32_t vc = 0;
             CheckXr(xrLocateViews(session, &vl, &vs, 2, &vc, views.data()), "xrLocateViews");
+            QueryPerformanceCounter(&locateEnd);
+            timings.locate.Add(timings.Ms(locateStart, locateEnd));
 
             const std::uint32_t hostSequence = shared.Write(head, views, vc, configs,
                 state, vs.viewStateFlags, fs.shouldRender == XR_TRUE, directTransportEnabled,
