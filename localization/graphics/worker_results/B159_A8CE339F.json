@@ -1,0 +1,19 @@
+{
+  "run": "B159",
+  "index": 52,
+  "asset": "A8CE339F",
+  "candidate_sha256": "f142c7d9169df47143fb7bcb7e606b3e15561fb38cd7387d0eb618c0d1ba5d8d",
+  "localized_semantic_segments": 3,
+  "localized_physical_elements": 5,
+  "bbox_size_positive_margin": "5/5 PASS",
+  "outside": 0,
+  "alpha_outside": 0,
+  "introduced_visible_outside": 0,
+  "source_residue": 0,
+  "protected_atlas_changed_pixels": 0,
+  "overlap": 0,
+  "touch": 0,
+  "worker_status": "B159_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "report": "localization/graphics/role_B/20261006-B-PRODUCTION159-A8CE-BC3/B159_A8CE_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}
