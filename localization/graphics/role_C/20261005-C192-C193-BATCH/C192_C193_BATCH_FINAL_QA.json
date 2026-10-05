@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C192-C193-BATCH",
+  "timestamp_kst": "2026-10-05T19:41:25+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "candidate_changed_by_C": false,
+  "assets_checked": [
+    {
+      "qa_id": "C192",
+      "asset": "39BCA907",
+      "decision": "C192_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    },
+    {
+      "qa_id": "C193",
+      "asset": "63C91067",
+      "decision": "C193_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    }
+  ],
+  "result": "2_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "pixel_visual_pass_assets": [
+    "39BCA907",
+    "63C91067"
+  ],
+  "rework_required_assets": [],
+  "global_producer_rework_remaining": [
+    "C598919A",
+    "37759842"
+  ],
+  "pending_c_localize_text": 0,
+  "pending_artwork_localize_text": 14,
+  "superseded_or_retry_notes": [
+    "A48 39BCA907 machine-safe candidate had incorrect physical semantic binding and was superseded by corrected A49 before C approval.",
+    "C189/C190/C191 are one 63C QA chain, not separate accomplishments. C190 localized the C189 false-positive pixels to protected starburst glow; C191 broad-component experiment is discarded."
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94",
+    "49BB5FE5",
+    "75C3586A"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
