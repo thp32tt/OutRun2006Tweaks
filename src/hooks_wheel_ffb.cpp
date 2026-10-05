@@ -584,6 +584,15 @@ namespace
             if (activeRuntimeModel_ != runtimeModelValue)
             {
                 const int previousModel = activeRuntimeModel_;
+
+                // R10: model polarity is part of the force model contract.
+                // Re-apply it on every actual model transition, including
+                // profile/INI paths that bypass the F11 model-combo helper.
+                Settings::WheelFFBInvertForce =
+                    WheelFFBMath::model_default_invert_force(ffbModel);
+                Settings::WheelFFBInvertSpring =
+                    WheelFFBMath::model_default_invert_spring(ffbModel);
+
                 if (activeRuntimeModel_ >= 0 &&
                     (roadTextureEffect_ || tireSlipEffect_))
                 {
@@ -592,6 +601,11 @@ namespace
                 activeRuntimeModel_ = runtimeModelValue;
                 periodicRecreateHoldoffUntil_ = 0;
                 updateCounter_ = 59;
+                spdlog::info(
+                    "WheelFFB: model polarity auto-applied model={} invCF={} invSpring={}",
+                    WheelFFBMath::model_name(ffbModel),
+                    bool(Settings::WheelFFBInvertForce),
+                    bool(Settings::WheelFFBInvertSpring));
                 if (previousModel >= 0)
                 {
                     spdlog::info(
@@ -827,9 +841,10 @@ namespace
                     sawNonPrimarySnowMix = true;
             }
             const bool snowPrimaryRoad = sawSnowPrimary && !sawNonPrimarySnowMix;
-            constexpr float SnowIceRoadTextureScale = 0.04f;
             const float materialRoadTextureScale =
-                snowPrimaryRoad ? SnowIceRoadTextureScale : 1.0f;
+                snowPrimaryRoad
+                    ? WheelFFBMath::SnowPrimaryRoadTextureScale
+                    : 1.0f;
 
             const float configuredRoadDetail = std::clamp(
                 static_cast<float>(Settings::WheelFFBRoadTexture), 0.0f, 1.0f);
@@ -1284,7 +1299,7 @@ namespace
                     WheelFFBMath::physics_return_relief(frontSlip, steerRate);
 
                 physicsSatTorque =
-                    (frontSlip > 0.0f ? -1.0f : 1.0f) *
+                    WheelFFBMath::front_slip_recovery_direction(frontSlip) *
                     physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
                 if (!std::isfinite(physicsSatTorque))
