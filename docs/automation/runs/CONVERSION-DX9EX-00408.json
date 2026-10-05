@@ -14,8 +14,8 @@
   "base_sha": "48745de334266ca2b550e53a5a90f17e1334c2e4",
   "material_result_sha": "3c0ee50ba8893e94b42a5213ea36640864834553",
   "validation_bearing_result_sha": "3c0ee50ba8893e94b42a5213ea36640864834553",
-  "queue_commit_sha": "1145641c8cc392c82d337107ff1b16eef2970eec",
-  "state_commit_sha": "b58417feb2622a27d0f74ee03aebd231246aac70",
+  "queue_commit_sha": "03fda5f576996f9a968877fee4025d28df1b4b65",
+  "state_commit_sha": "239d0f503a6ea538c89631a7b98a3b23f0bc4146",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00408]",
   "selected_work_item": "DX9EX-HUD-TELEMETRY-HOTPATH-COUNTER-GUARD + VR-HOST-002-POST-REVIEW-A-B-C",
   "summary": "Removed the telemetry-off R51 semantic-HUD acceptance-counter write from the existing VRTelemetry branch, pinned that hot-path invariant in the producer-provenance verifier, and completed the concurrent VR-HOST-002 A/B/C post-review by pinning Frame.v2 run identity/stale-run/DirectGPU/gameplay-handoff/fallback-reader contracts. Rendering classification, projection, world ownership, transport policy, and synchronization semantics are unchanged; runtime/HMD behavior remains untested.",
@@ -65,8 +65,8 @@
     },
     "C6_STATE": {
       "status": "COMPLETE",
-      "queue_commit_sha": "1145641c8cc392c82d337107ff1b16eef2970eec",
-      "state_commit_sha": "b58417feb2622a27d0f74ee03aebd231246aac70",
+      "queue_commit_sha": "03fda5f576996f9a968877fee4025d28df1b4b65",
+      "state_commit_sha": "239d0f503a6ea538c89631a7b98a3b23f0bc4146",
       "runtime_validation": "UNTESTED",
       "metadata_correction": "Current user dispatch E001 is authoritative; the provisional E003 rollover metadata was superseded without changing material/result SHA."
     }
