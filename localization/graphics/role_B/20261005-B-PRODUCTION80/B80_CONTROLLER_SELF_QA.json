@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION80",
+  "timestamp_kst": "2026-10-05T11:49:30+09:00",
+  "index": 236,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "candidate_sha256": "e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086",
+  "machine_qa": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y",
+    "localized_elements": 14,
+    "bbox_size_positive_margin": "14/14 PASS",
+    "clean_validator": "PASS",
+    "final_validator": "PASS",
+    "source_residue": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_outside_target": 0,
+    "preserved_regions_changed": 0,
+    "overlap": 0,
+    "touch_pairs": 0
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "stage_name_policy": "PASS",
+    "source_style": "PASS",
+    "observations": [
+      "All 14 stage names use canonical phonetic Hangul transliterations.",
+      "The shared dark condensed pixel-label family is retained with one shared Korean style, 4x nearest pixel scaling and source-right alignment.",
+      "REVERSED is outside the reviewed translation set and remains pixel-exact.",
+      "No visible English residue, clipping, overlap, seam, halo, or orientation regression is present."
+    ]
+  },
+  "decision": "B_PRODUCTION80_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
