@@ -1,0 +1,33 @@
+{
+  "run": "20261005-C209-B7E25BAD",
+  "qa_id": "C209",
+  "index": 34,
+  "asset": "B7E25BAD",
+  "candidate_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
+  "machine_status": "PASS",
+  "bbox_gate": {
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "margins": [
+      136,
+      137,
+      4,
+      4
+    ],
+    "source_width": 505,
+    "source_height": 72,
+    "localized_width": 232,
+    "localized_height": 64,
+    "width_ratio": 0.4594,
+    "height_ratio": 0.8889
+  },
+  "machine_checks": {
+    "decoded_changed_outside_effect_bbox": 0,
+    "alpha_changed_outside_effect_bbox": 0,
+    "introduced_visible_outside_effect_bbox": 0,
+    "opaque_source_title_residue_pixels": 0
+  },
+  "report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
