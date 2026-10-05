@@ -9,6 +9,7 @@ R30_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp"
 R31_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r31.cpp"
 R32_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r32.cpp"
 R33_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r33.cpp"
+DRAW_STATE_HELPERS_PATH = ROOT / "src/vr/d3d9/draw_state_helpers.hpp"
 STATEBLOCK_PATH = ROOT / "src/vr/state/state_block_tracker.hpp"
 WORKFLOW_PATH = ROOT / ".github/workflows/vr-dx9ex-active.yml"
 
@@ -62,8 +63,37 @@ r30 = load(R30_PATH)
 r31 = load(R31_PATH)
 r32 = load(R32_PATH)
 r33 = load(R33_PATH)
+draw_state_helpers = load(DRAW_STATE_HELPERS_PATH)
 stateblock = load(STATEBLOCK_PATH)
 workflow = load(WORKFLOW_PATH)
+
+# 0) R31/R32 retirement must continue reducing cross-layer helper ownership.
+# Live vertex-shader identity checking is stateless draw-state validation, so it
+# belongs to the neutral D3D9 helper boundary rather than the retained R31 owner.
+require(
+    draw_state_helpers,
+    "neutral draw-state helper",
+    "namespace OutRunVR::D3D9",
+    "inline bool LiveVertexShaderMatches(",
+    "device->GetVertexShader(&shader)",
+    "reinterpret_cast<std::uintptr_t>(shader)",
+    "shader->Release();",
+)
+if draw_state_helpers.count("LiveVertexShaderMatches(") != 1:
+    fail("neutral LiveVertexShaderMatches must have exactly one definition")
+for owner, source in (("R31", r31), ("R33", r33)):
+    forbid(source, owner, "R31LiveShaderMatches(")
+require(
+    r31,
+    "R31 neutral shader dependency",
+    "#include \"draw_state_helpers.hpp\"",
+    "OutRunVR::D3D9::LiveVertexShaderMatches(device, verifiedShader)",
+)
+require(
+    r33,
+    "R33 neutral shader dependency",
+    "OutRunVR::D3D9::LiveVertexShaderMatches(device, cachedShader)",
+)
 
 # 1) R31 is retained only for StateBlock/state-cache ownership. Its physical
 # draw overlay over R30 must be gone.
@@ -305,5 +335,5 @@ require(
 print(
     "VR R31/R32 draw-retirement guard PASS "
     "(R31=StateBlock owner, R32=Reset/Present/DirectGPU owner, "
-    "R33=sole physical draw dispatcher over R30)"
+    "R33=sole physical draw dispatcher over R30, live shader identity=neutral helper)"
 )
