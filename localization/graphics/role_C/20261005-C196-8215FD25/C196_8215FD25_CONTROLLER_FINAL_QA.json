@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T20:28:46+09:00",
+  "role": "C",
+  "run": "20261005-C196-8215FD25",
+  "qa_id": "C196",
+  "queue_index": 30,
+  "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+  "producer_run": "20261005-B-PRODUCTION143-8215",
+  "source_sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e",
+  "candidate_sha256": "04d2c23333999873b7f467d0a8647c1056f40fa3bcd06e0174711bb2345277ba",
+  "candidate_changed_by_C": false,
+  "producer_machine_status": "PASS_REPORTED",
+  "producer_bbox_size_positive_margin": "2/2 PASS",
+  "producer_zero_gates": {
+    "outside_allowed_effect_bbox": 0,
+    "alpha_outside": 0,
+    "render_outside_target": 0,
+    "localized_overlap": 0,
+    "protected_regions_changed": 0
+  },
+  "classification": "ZOOM_REVIEW_POSITIVELY_CLASSIFIED_LOCALIZE_TEXT",
+  "semantic_binding": "Total Rank x2 -> 종합 랭킹",
+  "controller_visual_qa": "FAIL_CLEAN_PLATE_STARBURST_RECONSTRUCTION_ARTIFACT",
+  "visual_findings": [
+    "The speech-bubble title removal is visually acceptable.",
+    "The lower starburst CLEAN plate contains conspicuous non-source gray/dark blurred reconstruction patches across the former Total Rank zone under the top-center rays.",
+    "The artifact remains visible around/behind the Korean title in FINAL; numeric containment/protected-mask PASS does not override the mandatory clean-plate visual failure.",
+    "Character artwork, lens flare, and B/C/D/E rank letters appear preserved."
+  ],
+  "required_rework": "Reconstruct only the lower starburst title footprint from source-faithful local gradient/texture without gray smear/cloud patches; keep border/glow and protected art pixel-exact, then re-render the same Korean title and rerun static + visual QA.",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION143-8215/B142_8215_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION143-8215/B142_8215_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION143-8215/B142_8215_CONTACTS.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION143-8215/B142_8215_RAW_COMPARE.jpg"
+  ],
+  "decision": "C196_REWORK_REQUIRED_STARBURST_CLEAN_PLATE_RECONSTRUCTION_ARTIFACT",
+  "runtime_validation": "UNTESTED"
+}
