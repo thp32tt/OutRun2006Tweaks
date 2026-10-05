@@ -1,0 +1,462 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION67",
+  "index": 226,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
+  "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+  "semantic_binding": {
+    "localized": {
+      "0": "STAGE",
+      "3": "GOAL E",
+      "4": "GOAL D",
+      "5": "GOAL C",
+      "6": "GOAL B",
+      "7": "GOAL A",
+      "8": "GOAL",
+      "9": "15 STAGE CONTINUOUS"
+    },
+    "protected": {
+      "1": "OUTRUN2SP",
+      "2": "OUTRUN2"
+    }
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "shared_source_style": {
+    "font_file": "NotoSansCJK-Bold.ttc",
+    "font_size": 58,
+    "fill_rgba": [
+      79,
+      97,
+      101,
+      255
+    ],
+    "same_color_weight_stroke": 2
+  },
+  "rows": [
+    {
+      "region_idx": 0,
+      "source": "STAGE",
+      "korean": "스테이지",
+      "cell": [
+        0,
+        424,
+        980,
+        88
+      ],
+      "original_bbox": [
+        0,
+        436,
+        228,
+        500
+      ],
+      "localized_bbox": [
+        2,
+        438,
+        211,
+        498
+      ],
+      "source_width": 228,
+      "source_height": 64,
+      "localized_width": 209,
+      "localized_height": 60,
+      "delta_left": 2,
+      "delta_right": 17,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "rework_status": "B67_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 3,
+      "source": "GOAL E",
+      "korean": "골 E",
+      "cell": [
+        980,
+        336,
+        980,
+        88
+      ],
+      "original_bbox": [
+        980,
+        346,
+        1233,
+        410
+      ],
+      "localized_bbox": [
+        982,
+        350,
+        1084,
+        406
+      ],
+      "source_width": 253,
+      "source_height": 64,
+      "localized_width": 102,
+      "localized_height": 56,
+      "delta_left": 2,
+      "delta_right": 149,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "rework_status": "B67_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 4,
+      "source": "GOAL D",
+      "korean": "골 D",
+      "cell": [
+        0,
+        248,
+        980,
+        88
+      ],
+      "original_bbox": [
+        4,
+        262,
+        256,
+        326
+      ],
+      "localized_bbox": [
+        6,
+        266,
+        114,
+        322
+      ],
+      "source_width": 252,
+      "source_height": 64,
+      "localized_width": 108,
+      "localized_height": 56,
+      "delta_left": 2,
+      "delta_right": 142,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "rework_status": "B67_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 5,
+      "source": "GOAL C",
+      "korean": "골 C",
+      "cell": [
+        980,
+        248,
+        980,
+        88
+      ],
+      "original_bbox": [
+        983,
+        262,
+        1234,
+        326
+      ],
+      "localized_bbox": [
+        985,
+        266,
+        1091,
+        322
+      ],
+      "source_width": 251,
+      "source_height": 64,
+      "localized_width": 106,
+      "localized_height": 56,
+      "delta_left": 2,
+      "delta_right": 143,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "rework_status": "B67_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 6,
+      "source": "GOAL B",
+      "korean": "골 B",
+      "cell": [
+        0,
+        160,
+        980,
+        88
+      ],
+      "original_bbox": [
+        4,
+        170,
+        257,
+        234
+      ],
+      "localized_bbox": [
+        6,
+        174,
+        113,
+        230
+      ],
+      "source_width": 253,
+      "source_height": 64,
+      "localized_width": 107,
+      "localized_height": 56,
+      "delta_left": 2,
+      "delta_right": 144,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "rework_status": "B67_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 7,
+      "source": "GOAL A",
+      "korean": "골 A",
+      "cell": [
+        980,
+        160,
+        980,
+        88
+      ],
+      "original_bbox": [
+        986,
+        170,
+        1242,
+        234
+      ],
+      "localized_bbox": [
+        988,
+        174,
+        1095,
+        230
+      ],
+      "source_width": 256,
+      "source_height": 64,
+      "localized_width": 107,
+      "localized_height": 56,
+      "delta_left": 2,
+      "delta_right": 147,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "rework_status": "B67_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 8,
+      "source": "GOAL",
+      "korean": "골",
+      "cell": [
+        0,
+        72,
+        980,
+        88
+      ],
+      "original_bbox": [
+        4,
+        86,
+        195,
+        150
+      ],
+      "localized_bbox": [
+        6,
+        90,
+        59,
+        146
+      ],
+      "source_width": 191,
+      "source_height": 64,
+      "localized_width": 53,
+      "localized_height": 56,
+      "delta_left": 2,
+      "delta_right": 136,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "rework_status": "B67_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "region_idx": 9,
+      "source": "15 STAGE CONTINUOUS",
+      "korean": "15코스 연속",
+      "cell": [
+        980,
+        72,
+        980,
+        88
+      ],
+      "original_bbox": [
+        985,
+        86,
+        1809,
+        150
+      ],
+      "localized_bbox": [
+        987,
+        88,
+        1280,
+        147
+      ],
+      "source_width": 824,
+      "source_height": 64,
+      "localized_width": 293,
+      "localized_height": 59,
+      "delta_left": 2,
+      "delta_right": 529,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "rework_status": "B67_NEW_EXACT_HD_CANDIDATE"
+    }
+  ],
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION67/E3F4_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION67/E3F4_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      512
+    ],
+    "changed_pixels": 84629,
+    "changed_bbox": [
+      0,
+      86,
+      1809,
+      500
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION67/E3F4_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION67/E3F4_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      512
+    ],
+    "changed_pixels": 85182,
+    "changed_bbox": [
+      0,
+      86,
+      1809,
+      500
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_total": 85182,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "protected_outrun_marks_changed": 0,
+    "exact_source_residue": 0,
+    "overlap": 0,
+    "touch_pairs": []
+  },
+  "candidate_sha256": "1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B_PRODUCTION67_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
