@@ -584,8 +584,8 @@ req(wrapper_block, 'Do not rewrite WheelFFBUsePeriodicEffects here.', 'wrapper d
 req(wheel_ui, 'Arcade Original (Lindbergh-derived)', 'F11 exposes Arcade Original model')
 req(wheel_ui, 'Arcade + Modern Hybrid', 'F11 exposes Arcade Hybrid model')
 req(wheel_ui, 'PS2 Original topology (Experimental)', 'F11 exposes PS2 experimental model')
-req(wheel_ui, 'auto apply_ffb_model_test_baseline = [&](int modelIndex)', 'FFB model selector owns complete R9 baselines')
-req(wheel_ui, 'FFB model + complete R9 test baseline applied:', 'model change reports complete baseline application')
+req(wheel_ui, 'auto apply_ffb_model_test_baseline = [&](int modelIndex)', 'FFB model selector owns complete R10 baselines')
+req(wheel_ui, 'FFB model + complete R10 test baseline applied:', 'model change reports complete baseline application')
 req(wheel_ui, 'Arcade/Hybrid/PS2 no longer require separate shortcut buttons', 'obsolete duplicate original-mode shortcut UI is removed')
 forbid(wheel_ui, 'ImGui::Button("Use Arcade Original")', 'Arcade model no longer depends on a second shortcut button')
 forbid(wheel_ui, 'ImGui::Button("Use Arcade Hybrid")', 'Hybrid model no longer depends on a second shortcut button')
@@ -597,8 +597,10 @@ req(model_baseline, 'Settings::WheelFFBInvertSpring = true;', 'Modern baseline u
 req(model_baseline, 'Settings::WheelFFBModel = 1;', 'Arcade Original baseline is complete')
 req(model_baseline, 'Settings::WheelFFBModel = 2;', 'Arcade Hybrid baseline is complete')
 req(model_baseline, 'Settings::WheelFFBModel = 3;', 'PS2 baseline is complete')
-if model_baseline.count('Settings::WheelFFBInvertForce = false;') < 3 or model_baseline.count('Settings::WheelFFBInvertSpring = false;') < 3:
-    raise SystemExit('CURRENT VERIFY FAILED [Arcade/Hybrid/PS2 polarity baselines must all be Reverse OFF]')
+if model_baseline.count('Settings::WheelFFBInvertForce = false;') < 3:
+    raise SystemExit('CURRENT VERIFY FAILED [Arcade/Hybrid/PS2 event polarity baselines must be Reverse OFF]')
+if model_baseline.count('Settings::WheelFFBInvertSpring = false;') < 2 or model_baseline.count('Settings::WheelFFBInvertSpring = true;') < 2:
+    raise SystemExit('CURRENT VERIFY FAILED [Modern/Hybrid Spring must be Reverse ON while Arcade/PS2 Spring stays OFF]')
 if model_baseline.count('Settings::WheelFFBUsePeriodicEffects = false;') < 4:
     raise SystemExit('CURRENT VERIFY FAILED [all R9 model baselines must prefer reliable ConstantForce tactile fallback on R3]')
 req(model_baseline, 'Settings::WheelFFBSpringStrength = 0.50f;', 'Arcade Original preserves OutRun2Real spring baseline')
@@ -804,9 +806,13 @@ req(ffb, 'shared host tactile pulse active', 'PS2 collision compatibility assist
 
 # R10 hardware-log + vehicle-dynamics guards
 req(math, 'model_uses_r3_reverse_polarity(Model model)', 'force-model owns the R3 polarity contract')
-req(ffb, 'const bool modelReversePolarity =', 'runtime derives polarity from the active model every tick')
-req(ffb, 'Settings::WheelFFBInvertForce = modelReversePolarity;', 'runtime repairs stale ConstantForce polarity')
-req(ffb, 'Settings::WheelFFBInvertSpring = modelReversePolarity;', 'runtime repairs stale Spring polarity')
+req(ffb, 'const bool modelEventReversePolarity =', 'runtime derives event polarity from the active model every tick')
+req(ffb, 'const bool modelSpringReversePolarity =', 'runtime derives Spring polarity from the active model every tick')
+req(ffb, 'Settings::WheelFFBInvertForce = modelEventReversePolarity;', 'runtime repairs stale ConstantForce/event polarity')
+req(ffb, 'Settings::WheelFFBInvertSpring = modelSpringReversePolarity;', 'runtime repairs stale Spring polarity')
+req(math, 'model_uses_r3_structural_reverse_polarity(Model model)', 'Hybrid can keep Modern structural polarity independently of Arcade events')
+req(ffb, 'const float structuralForceDirection =', 'runtime separates structural force direction from event direction')
+req(ffb, 'const float eventForceDirection =', 'runtime separates Arcade event direction from Modern structural direction')
 req(ffb, 'R10 model-owned polarity enforced for {}', 'runtime polarity repair is observable')
 req(wheel_ui, 'R10: model polarity is runtime-owned.', 'F11 explains automatic model polarity')
 req(wheel_ui, 'R10 hardware-test branch: polarity follows the selected FFB model automatically', 'manual polarity controls are explicitly model-owned')
