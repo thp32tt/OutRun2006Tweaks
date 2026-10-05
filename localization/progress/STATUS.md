@@ -1397,3 +1397,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Controller SOURCE/CLEAN/FINAL readable overview plus raw mirror_y self-QA PASS after A36 correction. No visible source-script residue, clipping, overlap, clean-plate seam, protected song/OutRun2/speed damage or orientation regression. Queue index 101 -> `a36_self_qa_pass_pending_c`.
 - pending_artwork localize_text=16. Pending C now includes A34 `37759842`, B128 `A05BF610`, A36 `560FA536`; remaining producer REWORK is `63C91067` + `C598919A`. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_A/20261005-A-PRODUCTION35-PREFLIGHT/A35_560FA536_PREFLIGHT.json`, `localization/graphics/role_A/20261005-A-PRODUCTION36/A36_560FA536_REPORT.json`, `localization/graphics/role_A/20261005-A-PRODUCTION36/A36_CONTROLLER_SELF_QA.json`.
+
+## 2026-10-05 17:56 KST — C177/C178/C179 final QA: 1 PASS / 2 REWORK
+- C177 37759842: numeric PASS, visual FAIL — visible source-letter/shadow residue remains in CLEAN/FINAL; `REWORK_REQUIRED`.
+- C178 A05BF610: independent machine + visual PASS; `C178_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`.
+- C179 560FA536: numeric PASS on producer bbox, visual FAIL — idx31 source bbox/mask incomplete with source-script edge residue; `REWORK_REQUIRED`.
+- Producer REWORK=4 (`63C91067`, `C598919A`, `37759842`, `560FA536`); pending-C=0; pending_artwork localize_text=16. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
