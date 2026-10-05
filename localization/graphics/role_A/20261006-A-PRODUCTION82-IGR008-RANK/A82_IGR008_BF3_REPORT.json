@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION82-IGR008-RANK",
+  "queue_index": 49,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+  "user_regression_ids": [
+    "IGR-008",
+    "IGR-011"
+  ],
+  "mapping_basis": "IGR-008 screen contains Next Stage plus Rank B; B1696633 uniquely supplies Next Stage while BF3EE5C6 uniquely supplies localized Rank plus preserved A-E rank glyphs. Rank-label material defect is BF3EE5C6; B/C glyph art remains exact source pixels.",
+  "source_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+  "input_candidate_sha256": "7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68",
+  "candidate_sha256": "3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "pitch": 8192,
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "touched_element": {
+    "source": "Rank",
+    "korean": "랭크",
+    "original_bbox": [
+      1068,
+      756,
+      1413,
+      882
+    ],
+    "localized_bbox": [
+      1112,
+      767,
+      1369,
+      870
+    ],
+    "source_size": [
+      345,
+      126
+    ],
+    "localized_size": [
+      257,
+      103
+    ],
+    "delta_left": 44,
+    "delta_right": 44,
+    "delta_top": 11,
+    "delta_bottom": 12,
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "font": "Noto Sans CJK KR:style=Black",
+    "native_font_size_px": 112,
+    "horizontal_source_proportion_scale": 1.2,
+    "shear": 0.29,
+    "render_basis": "fresh native-resolution glyph; no previous Korean bitmap reuse"
+  },
+  "preservation": {
+    "all_pixels_outside_rank_bbox_vs_C111_candidate": "PIXEL_EXACT",
+    "rank_letters_A_B_C_D_E": "PRESERVED_SOURCE_ART",
+    "other_12_localized_rows": "PRESERVED_C111_BYTES"
+  },
+  "machine_checks": {
+    "changed_pixels_outside_rank_bbox": 0,
+    "alpha_changed_outside_rank_bbox": 0,
+    "protected_pixels_changed": 0,
+    "clean_changed_outside_rank_bbox": 0,
+    "clean_protected_changed": 0,
+    "render_pixels_outside_rank_bbox": 0,
+    "source_rank_residue_outside_new_glyph_guard": 0
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "A82_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
