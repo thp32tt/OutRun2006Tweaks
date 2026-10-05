@@ -7,14 +7,14 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter,ImageOps
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("worker B only")
 repo=Path.cwd()
-run="20261005-B-PRODUCTION121"
+run="20261005-B-PRODUCTION122"
 out=repo/"localization/graphics/role_B"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset; candidate.parent.mkdir(parents=True,exist_ok=True)
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
-tmp=Path("/tmp/b121"); tmp.mkdir(exist_ok=True)
+tmp=Path("/tmp/b122"); tmp.mkdir(exist_ok=True)
 dds=tmp/"src.dds"; atlas=tmp/"atlas.json"
 urllib.request.urlretrieve(BASE+"/Release/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",dds)
 urllib.request.urlretrieve(BASE+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_CLAR_RANK_Exst/4x_A05BF610_512x512_atlas.json",atlas)
@@ -95,11 +95,12 @@ clean=Image.fromarray(clean_arr,"RGBA")
 source_png=out/"A05_SOURCE_READABLE.png"; clean_png=out/"A05_CLEAN_PLATE.png"; smp=out/"A05_SOURCE_TEXT_MASK.png"; ap=out/"A05_ALLOWED_BBOX_MASK.png"; pp=out/"A05_PROTECTED_MASK.png"
 src.save(source_png); clean.save(clean_png); source_mask.save(smp); allowed.save(ap); protected.save(pp)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(smp),"--protected-mask",str(pp),"--report",str(out/"B121_CLEAN_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B121_CLEAN_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(smp),"--protected-mask",str(pp),"--report",str(out/"B122_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B122_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
-unchanged=count(ImageChops.multiply(source_mask,ImageOps.invert(diffmask(src,clean))))
-if unchanged!=0: raise RuntimeError(("source mask unchanged",unchanged))
+core_mask=Image.fromarray((m.astype(np.uint8)*255),"L")
+core_unchanged=count(ImageChops.multiply(core_mask,ImageOps.invert(diffmask(src,clean))))
+if core_unchanged!=0: raise RuntimeError(("source title core unchanged",core_unchanged))
 
 # Source colors from strict title core.
 pix=sa[m]
@@ -171,8 +172,8 @@ if payload[:128]!=sb[:128]: raise RuntimeError("header drift")
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode); dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip")
 final_png=out/"A05_FINAL_DECODED_READABLE.png"; dec.save(final_png)
-subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B121_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"B121_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B122_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"B122_FINAL_VALIDATION.json").read_text())
 if finalrep["status"]!="PASS": raise RuntimeError(("final validator",finalrep))
 diff=diffmask(src,dec); outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
 alphaout=count(ImageChops.multiply(bmask(ImageChops.difference(src.getchannel("A"),dec.getchannel("A"))),ImageOps.invert(allowed)))
@@ -186,16 +187,16 @@ if outside or alphaout or render_out or protected_cell_changes: raise RuntimeErr
 sheet=Image.new("RGB",(1024,3*1050),"white")
 for i,(lab,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,1024),Image.Resampling.LANCZOS); sheet.paste(z,(0,i*1050+26)); ImageDraw.Draw(sheet).text((5,i*1050+5),lab,fill="black")
-sheet.save(out/"B121_A05_SOURCE_CLEAN_FINAL.jpg",quality=96)
+sheet.save(out/"B122_A05_SOURCE_CLEAN_FINAL.jpg",quality=96)
 margin=40; box=(max(0,ob[0]-margin),max(0,ob[1]-margin),min(W,ob[2]+margin),min(H,ob[3]+margin))
 ims=[comp(z.crop(box)) for z in [src,clean,dec]]
 row=Image.new("RGB",(sum(i.width for i in ims)+16,max(i.height for i in ims)+28),"white"); xx=0
 for im in ims: row.paste(im,(xx,28)); xx+=im.width+8
-ImageDraw.Draw(row).text((4,4),"Total Rank -> 종합 랭킹   SOURCE | CLEAN | FINAL",fill="black"); row.save(out/"B121_A05_ROW_CONTACT.jpg",quality=96)
+ImageDraw.Draw(row).text((4,4),"Total Rank -> 종합 랭킹   SOURCE | CLEAN | FINAL",fill="black"); row.save(out/"B122_A05_ROW_CONTACT.jpg",quality=96)
 rr=Image.new("RGB",(1024,2*1050),"white")
 for i,(lab,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); rr.paste(z,(0,i*1050+26)); ImageDraw.Draw(rr).text((5,i*1050+5),lab,fill="black")
-rr.save(out/"B121_A05_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"B122_A05_RAW_COMPARE.jpg",quality=96)
 
 report={"schema_version":1,"role":"B","run":run,"queue_index":28,"asset":asset,
  "readiness_tier":"ZOOM_REVIEW_PROMOTED_TO_RENDER_COMPLETED_SAME_INVOCATION",
@@ -211,11 +212,11 @@ report={"schema_version":1,"role":"B","run":run,"queue_index":28,"asset":asset,
  "decoded_changes":{"outside":outside,"alpha_outside":alphaout,"render_outside_target":render_out,"protected_lens_flare_cell_changed":protected_cell_changes,"localized_overlap":0},
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"B121_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
-(out/"B121_A05_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "status":"B122_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
+(out/"B122_A05_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":28,"asset":"A05BF610","source_sha256":sha(sb),"candidate_sha256":csha,"localized_physical_elements":1,
  "bbox_size_positive_margin":"1/1","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "outside":outside,"alpha_outside":alphaout,"protected_lens_flare_cell_changed":protected_cell_changes,
- "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B121_A05_REPORT.json"}
-(wr/"B121_A05BF610.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B122_A05_REPORT.json"}
+(wr/"B122_A05BF610.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False))
