@@ -158,11 +158,11 @@ rep1={
  "machine_checks":m1,"report":f"localization/graphics/role_C/{run1}/C203_59A79158_MACHINE_QA.json","runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 
-# ---------------- C204 / B151 DCC7B488 ----------------
+# ---------------- C204 / B152 DCC7B488 ----------------
 run2="20261005-C204-DCC7B488"
 out2=repo/"localization/graphics/role_C"/run2
 out2.mkdir(parents=True,exist_ok=True)
-pr2=json.loads((repo/"localization/graphics/role_B/20261005-B-PRODUCTION151-DCC7/B151_DCC7_REPORT.json").read_text(encoding="utf-8"))
+pr2=json.loads((repo/"localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_DCC7_REPORT.json").read_text(encoding="utf-8"))
 cand2=repo/pr2["candidate_path"]; sp2=pr2["source_provenance"]; asset2=pr2["asset"]
 tmp2=Path("/tmp/c204"); tmp2.mkdir(exist_ok=True); srcdds2=tmp2/"source.dds"
 folder2=asset2.split("/")[-2]; name2=asset2.split("/")[-1]
@@ -177,13 +177,13 @@ src2=raws2.transpose(Image.Transpose.FLIP_TOP_BOTTOM); fin2=rawf2.transpose(Imag
 sa2=np.asarray(src2,dtype=np.uint8); fa2=np.asarray(fin2,dtype=np.uint8)
 H2,W2=sa2.shape[:2]
 if (W2,H2)!=(2048,1024): raise RuntimeError(("C204 size",W2,H2))
-basep=repo/"localization/graphics/role_B/20261005-B-PRODUCTION151-DCC7"
-sourcepng=Image.open(basep/"B151_SOURCE_READABLE.png").convert("RGBA")
-clean=Image.open(basep/"B151_CLEAN_PLATE.png").convert("RGBA")
-finalpng=Image.open(basep/"B151_FINAL_READABLE.png").convert("RGBA")
-stm=Image.open(basep/"B151_SOURCE_TEXT_MASK.png").convert("L")
-prot=Image.open(basep/"B151_PROTECTED_MASK.png").convert("L")
-allow=Image.open(basep/"B151_ALLOWED_EFFECT_BBOX_MASK.png").convert("L")
+basep=repo/"localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7"
+sourcepng=Image.open(basep/"B152_SOURCE_READABLE.png").convert("RGBA")
+clean=Image.open(basep/"B152_CLEAN_PLATE.png").convert("RGBA")
+finalpng=Image.open(basep/"B152_FINAL_READABLE.png").convert("RGBA")
+stm=Image.open(basep/"B152_SOURCE_TEXT_MASK.png").convert("L")
+prot=Image.open(basep/"B152_PROTECTED_MASK.png").convert("L")
+allow=Image.open(basep/"B152_ALLOWED_EFFECT_BBOX_MASK.png").convert("L")
 spa=np.asarray(sourcepng,dtype=np.uint8); ca=np.asarray(clean,dtype=np.uint8); fpa=np.asarray(finalpng,dtype=np.uint8)
 st=np.asarray(stm)>0; pm=np.asarray(prot)>0; am=np.asarray(allow)>0
 if count(np.any(spa!=sa2,axis=2))!=0: raise RuntimeError("C204 producer source PNG decode mismatch")
@@ -216,7 +216,7 @@ m2={
  "clean_exact_source_residue_pixels_in_source_text_mask":count(st & np.all(ca==spa,axis=2)),
  "localized_overlap_pixels":0
 }
-# Boundary continuity: producer B151 specifically claims source-boundary blending.
+# Boundary continuity: producer B152 reconstructs from untouched four-side boundary curves.
 # The outer 1px ring of the exact effect bbox should remain source-exact where not source-text mask.
 ring=np.zeros((H2,W2),dtype=bool)
 ring[y0:y0+1,x0:x1]=True; ring[y1-1:y1,x0:x1]=True; ring[y0:y1,x0:x0+1]=True; ring[y0:y1,x1-1:x1]=True
