@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-10-05T19:41:04+09:00",
+  "updatedKst": "2026-10-05T19:53:24+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -11,7 +11,7 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "EXCLUSIVE: DX9Ex structural refactor on vr-d3d9ex-focus. DX11 Native, DXVK, localization, HUD/performance side tracks and HMD matrix work are frozen until the user explicitly reopens them.",
+    "primaryBackend": "EXCLUSIVE: DX9Ex structural refactor on vr-d3d9ex-focus. DX11 Native, DXVK, HUD/performance side tracks and HMD matrix work are frozen until the user explicitly reopens them.",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -41,8 +41,7 @@
       "frozenPrimaryWork": [
         "broad EXE-map expansion unrelated to active HUD/flare/backend work",
         "generic dependency/toolchain cleanup unrelated to active builds",
-        "PS2/FFB runtime",
-        "localization runtime"
+        "PS2/FFB runtime"
       ],
       "requiredSlots": [
         "A_CONTROL",
@@ -66,7 +65,7 @@
         "6ab45ed52f548191b94c90af792116fb"
       ],
       "productionIntegrationWip": 1,
-      "rule": "Each cycle may only continue the next bounded DX9Ex structural-refactor unit. Do not schedule DX11, DXVK, localization, HUD/performance side work, or HMD matrix work until explicitly reopened."
+      "rule": "Each cycle may only continue the next bounded DX9Ex structural-refactor unit. Do not schedule DX11, DXVK, HUD/performance side work, or HMD matrix work until explicitly reopened."
     },
     "implementationFirstEnforcement": {
       "enabled": true,
@@ -91,7 +90,6 @@
       "frozenTracks": [
         "DX11",
         "DXVK",
-        "LOCALIZATION",
         "HUD",
         "PERFORMANCE",
         "HMD_MATRIX"
