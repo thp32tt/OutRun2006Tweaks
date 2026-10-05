@@ -14,7 +14,7 @@
     "classification": "authoritative high-resolution source; DDS header 1024x256 RGBA32"
   },
   "source_sha256": "e250a41e7c59ccd5b8a68a02aace066f6578fbe0d84a365d7a0a27044b353511",
-  "candidate_sha256": "edad09a7f025f13c4c22ddd07c48dc5a86cf9cd482058f87e49fed1912901708",
+  "candidate_sha256": "fe9bb931d94a13a44a08bcf61b6325c01080b462afff84f92c97205cbe0eea65",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
   "structure": {
     "dimensions": [
@@ -72,37 +72,42 @@
         146
       ],
       "localized_bbox": [
-        242,
-        112,
-        489,
-        254
+        9,
+        123,
+        258,
+        243
       ],
-      "localized_width": 247,
-      "localized_height": 142,
-      "delta_left": 241,
-      "delta_right": 242,
-      "delta_top": 2,
-      "delta_bottom": 2,
+      "localized_width": 249,
+      "localized_height": 120,
+      "delta_left": 8,
+      "delta_right": 473,
+      "delta_top": 13,
+      "delta_bottom": 13,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
       "raw_localized_bbox": [
-        242,
-        2,
-        489,
-        144
+        9,
+        13,
+        258,
+        133
       ],
       "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
       "font_face_index": 1,
       "font_pattern": "Noto Sans CJK KR:style=Bold",
-      "font_size": 128,
+      "font_size": 104,
       "outline_px": 7,
       "body_extra_px": 3,
-      "slant_px": 13,
+      "slant_px": 10,
       "shadow_offset": [
         6,
         8
       ],
+      "layout": {
+        "alignment": "left",
+        "xscale": 1.22,
+        "target_height": 120
+      },
       "source_style": {
         "dark": [
           23,
@@ -167,24 +172,24 @@
         206
       ],
       "localized_bbox": [
-        111,
+        6,
         52,
-        268,
+        163,
         96
       ],
       "localized_width": 157,
       "localized_height": 44,
-      "delta_left": 107,
-      "delta_right": 107,
+      "delta_left": 2,
+      "delta_right": 212,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
       "raw_localized_bbox": [
-        111,
+        6,
         160,
-        268,
+        163,
         204
       ],
       "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
@@ -198,6 +203,11 @@
         0,
         0
       ],
+      "layout": {
+        "alignment": "left",
+        "xscale": 1.0,
+        "target_height": 44
+      },
       "source_style": {
         "dark": [
           60,
@@ -263,7 +273,7 @@
       1024,
       256
     ],
-    "changed_pixels": 70541,
+    "changed_pixels": 72584,
     "changed_bbox": [
       1,
       50,
