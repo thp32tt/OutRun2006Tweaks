@@ -358,9 +358,9 @@ namespace OutRunVRStereo
                 return false;
             if (Settings::VRTelemetry)
                 ++R32BatchWvpUploads;
-            const HRESULT hr = device->SetVertexShaderConstantF(
-                OutRunWvpRegister, constants, OutRunWvpRegisterCount);
-            if (FAILED(hr))
+            if (!OutRunVR::D3D9::SetVertexShaderConstantBatch(
+                    device, OutRunWvpRegister, constants,
+                    OutRunWvpRegisterCount))
             {
                 ++R32BatchWvpFailures;
                 return false;
