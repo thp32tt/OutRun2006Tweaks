@@ -1,0 +1,17 @@
+{
+  "run": "20261005-B-PRODUCTION146-8215-C196-REWORK",
+  "index": 30,
+  "asset": "8215FD25",
+  "candidate_sha256": "d8687e615007af7bdd8e4d0bf41f1830e0bf105a3ef225cc157671fc8e9fd377",
+  "localized_physical_elements": 2,
+  "bbox_size_positive_margin": "2/2",
+  "idx1_precise_effect_mask_pixels": 34362,
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "outside": 0,
+  "alpha_outside": 0,
+  "protected_regions_changed": 0,
+  "worker_status": "B146_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION146-8215-C196-REWORK/B146_8215_REPORT.json"
+}
