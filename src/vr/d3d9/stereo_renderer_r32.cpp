@@ -437,19 +437,19 @@ namespace OutRunVRStereo
             R32DirectCopyPathRejected = false;
             R32DirectCopyRejectHr = D3D_OK;
             ReleaseDirectTransportSlots();
+            if (SharedState && SharedState->magic == OutRunVR::SharedMagic)
+            {
+                InterlockedExchange(reinterpret_cast<volatile LONG*>(
+                    &SharedState->clientInteropProbeToken), 0);
+                InterlockedExchange(reinterpret_cast<volatile LONG*>(
+                    &SharedState->clientInteropProbeHandle), 0);
+            }
             ReleaseCom(DirectInteropProbeFence);
             ReleaseCom(DirectInteropProbeSurface);
             ReleaseCom(DirectInteropProbeTexture);
             DirectInteropProbeHandle = nullptr;
             DirectInteropProbeToken = 0;
             DirectInteropVerified = false;
-            if (SharedState && SharedState->magic == OutRunVR::SharedMagic)
-            {
-                InterlockedExchange(reinterpret_cast<volatile LONG*>(
-                    &SharedState->clientInteropProbeHandle), 0);
-                InterlockedExchange(reinterpret_cast<volatile LONG*>(
-                    &SharedState->clientInteropProbeToken), 0);
-            }
             R32ForgetDirectIdentity();
             ++R32DirectIdentityInvalidations;
         }
