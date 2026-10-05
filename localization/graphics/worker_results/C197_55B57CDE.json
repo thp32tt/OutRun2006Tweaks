@@ -1,0 +1,24 @@
+{
+  "run": "20261005-C197-55B57CDE",
+  "qa_id": "C197",
+  "index": 161,
+  "asset": "55B57CDE",
+  "candidate_sha256": "7569c51cf5ba82ce081bf09d486b8c8869560e7fae71292c613e4bf8a5b51ab8",
+  "machine_status": "FAIL",
+  "row_gate": "38/38 PASS",
+  "semantic_policy_pass": true,
+  "source_bbox_exact_match_all": true,
+  "candidate_bbox_exact_match_all": false,
+  "machine_checks": {
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "introduced_visible_outside_union_source_bboxes": 0,
+    "source_residue_exact_pixels_outside_localized_bboxes": 0,
+    "localized_overlap_pixels": 0,
+    "localized_1px_touch_pixels": 0,
+    "changed_dxt5_blocks": 25448,
+    "changed_dxt5_blocks_wholly_outside_allowed": 0
+  },
+  "report": "localization/graphics/role_C/20261005-C197-55B57CDE/C197_55B57CDE_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
