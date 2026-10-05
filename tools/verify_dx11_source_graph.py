@@ -10489,6 +10489,40 @@ def main() -> None:
                 missing_r267_programmable_shader_interface_semantics)
         )
 
+    r268_programmable_shader_stage_linkage_contract = [
+        ("struct ProgrammableShaderInterfaceLinkageEvidence",
+         PIPELINE_TRANSLATION_HPP, "R268 stage-linkage evidence type"),
+        ("derive_programmable_shader_interface_linkage_evidence(",
+         PIPELINE_TRANSLATION_HPP, "R268 stage-linkage derivation declaration"),
+        ("R268_D3D9_SM3_STAGE_INTERFACE_LINKAGE_V1",
+         PIPELINE_TRANSLATION_CPP, "R268 linker revision provenance"),
+        ("R268_USAGE_INDEX_COMPONENT_COVERAGE_LINKAGE_V1",
+         PIPELINE_TRANSLATION_CPP, "R268 linkage semantic-contract provenance"),
+        ("matchedSemanticCount == pixelInputSemanticCount",
+         PIPELINE_TRANSLATION_HPP, "R268 exactness requires every PS input matched"),
+        ("(match->writeMask & pixelInput.writeMask) !=",
+         PIPELINE_TRANSLATION_CPP, "R268 component coverage fail-closed gate"),
+        ("R268 derives exact VS-output to PS-input stage linkage",
+         CONSTANT_BUFFER_PROBE, "R268 positive linkage regression"),
+        ("R268 rejects unmatched pixel input semantics",
+         CONSTANT_BUFFER_PROBE, "R268 semantic mismatch regression"),
+        ("R268 rejects insufficient vertex output component coverage",
+         CONSTANT_BUFFER_PROBE, "R268 component-mask fail-closed regression"),
+        ("R268 rejects reversed VS and PS interface receipts",
+         CONSTANT_BUFFER_PROBE, "R268 stage inversion fail-closed regression"),
+    ]
+    missing_r268_programmable_shader_stage_linkage = [
+        meaning for token, source, meaning
+        in r268_programmable_shader_stage_linkage_contract
+        if token not in source
+    ]
+    if missing_r268_programmable_shader_stage_linkage:
+        raise SystemExit(
+            "DX11 R268 programmable shader stage-linkage drift: "
+            + ", ".join(
+                missing_r268_programmable_shader_stage_linkage)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
