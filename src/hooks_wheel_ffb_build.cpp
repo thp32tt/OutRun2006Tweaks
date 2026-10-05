@@ -417,7 +417,7 @@ namespace
         Settings::WheelFFBReversalReleaseRate = 0.30f;
         Settings::WheelFFBRoadTexture = 0.60f;
         Settings::WheelFFBTireSlip = 0.04f;
-        Settings::WheelFFBWallImpact = 0.55f;
+        Settings::WheelFFBWallImpact = 0.80f;
         Settings::WheelFFBGearShift = 0.60f;
         Settings::WheelFFBEngineVibration = false;
         Settings::WheelFFBEngineIdle = 0.20f;
@@ -448,7 +448,7 @@ namespace
         Settings::WheelFFBReversalReleaseRate = 0.30f;
         Settings::WheelFFBRoadTexture = 0.60f;
         Settings::WheelFFBTireSlip = 0.04f;
-        Settings::WheelFFBWallImpact = 0.55f;
+        Settings::WheelFFBWallImpact = 0.80f;
         Settings::WheelFFBGearShift = 0.60f;
         Settings::WheelFFBEngineVibration = false;
         Settings::WheelFFBEngineIdle = 0.20f;
@@ -950,7 +950,7 @@ namespace
                 Settings::WheelFFBUsePeriodicEffects = false;
                 if (modern &&
                     nearly(static_cast<float>(Settings::WheelFFBWallImpact), 0.38f))
-                    Settings::WheelFFBWallImpact = 0.55f;
+                    Settings::WheelFFBWallImpact = 0.80f;
                 Settings::WheelFFBFeelRevision = 7;
                 revision = 7;
                 changed = true;
