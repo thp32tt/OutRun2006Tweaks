@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DXVK-00399",
-  "production_id": "CONVERSION-DX11-00398",
-  "event_id": "CONVERSION-DX11-00398-E003",
-  "event_type": "retry",
+  "production_id": "CONVERSION-DXVK-00399",
+  "event_id": "CONVERSION-DXVK-00399-E002",
+  "event_type": "rollover",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
   "attempt": "1/3",
@@ -127,11 +127,14 @@
   "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
   "controller_dispatch": {
     "task_id": "CONVERSION-DXVK-00399",
-    "production_id": "CONVERSION-DX11-00398",
-    "event_id": "CONVERSION-DX11-00398-E003",
-    "event_type": "retry",
+    "production_id": "CONVERSION-DXVK-00399",
+    "event_id": "CONVERSION-DXVK-00399-E002",
+    "event_type": "rollover",
     "attempt": "1/3",
-    "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "source": "CURRENT_USER_ROLLOVER",
     "material_result_sha": "4709bd7172b91611348d612337715217f7984802",
     "validation_bearing_result_sha": "4709bd7172b91611348d612337715217f7984802",
     "runtime_validation": "UNTESTED"
@@ -140,6 +143,17 @@
   "recorded_at_kst": "2026-10-05T09:46:10+09:00",
   "current_dispatch_metadata_correction": {
     "corrected_from": {
+      "task_id": "CONVERSION-DXVK-00399",
+      "production_id": "CONVERSION-DX11-00398",
+      "event_id": "CONVERSION-DX11-00398-E003",
+      "event_type": "retry",
+      "attempt": "1/3",
+      "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH",
+      "material_result_sha": "4709bd7172b91611348d612337715217f7984802",
+      "validation_bearing_result_sha": "4709bd7172b91611348d612337715217f7984802",
+      "runtime_validation": "UNTESTED"
+    },
+    "corrected_to": {
       "task_id": "CONVERSION-DXVK-00399",
       "production_id": "CONVERSION-DXVK-00399",
       "event_id": "CONVERSION-DXVK-00399-E002",
@@ -153,20 +167,17 @@
       "validation_bearing_result_sha": "4709bd7172b91611348d612337715217f7984802",
       "runtime_validation": "UNTESTED"
     },
-    "corrected_to": {
-      "task_id": "CONVERSION-DXVK-00399",
-      "production_id": "CONVERSION-DX11-00398",
-      "event_id": "CONVERSION-DX11-00398-E003",
-      "event_type": "retry",
-      "attempt": "1/3",
-      "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH",
-      "material_result_sha": "4709bd7172b91611348d612337715217f7984802",
-      "validation_bearing_result_sha": "4709bd7172b91611348d612337715217f7984802",
-      "runtime_validation": "UNTESTED"
+    "authority": "LATEST_EXPLICIT_USER_DISPATCH",
+    "authority_order": {
+      "superseded_dispatch_observed_at": "2026-10-05T00:33:35Z",
+      "authoritative_dispatch_observed_at": "2026-10-05T00:37:35Z"
     },
-    "reason": "Current chat invocation explicitly supplies CONVERSION-DXVK-00399 with PRODUCTION_ID=CONVERSION-DX11-00398, EVENT_ID=CONVERSION-DX11-00398-E003, EVENT_TYPE=retry, ATTEMPT=1/3. This current automatic-queue dispatch overrides concurrent same-task E002 rollover bookkeeping only; material/result SHA, exact-SHA gate evidence and RUNTIME_VALIDATION=UNTESTED are unchanged.",
+    "reason": "The newer explicit user dispatch is CONVERSION-DXVK-00399-E002 / rollover / CHAT_ROLLOVER=2 at 2026-10-05T00:37:35Z. It supersedes the older CONVERSION-DX11-00398-E003 retry dispatch at 2026-10-05T00:33:35Z. Rollover is not a retry, so ATTEMPT remains 1/3. Material/result SHA, exact-SHA gate evidence and RUNTIME_VALIDATION=UNTESTED are unchanged.",
     "material_and_validation_bearing_sha_unchanged": true,
-    "reconciled_at_kst": "2026-10-05T09:49:25+09:00"
+    "reconciled_at_kst": "2026-10-05T09:51:00+09:00"
   },
-  "reconciled_at_kst": "2026-10-05T09:48:25+09:00"
+  "reconciled_at_kst": "2026-10-05T09:51:00+09:00",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt"
 }
