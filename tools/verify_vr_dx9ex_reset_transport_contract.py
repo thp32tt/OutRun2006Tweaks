@@ -80,6 +80,14 @@ host_submit = load(HOST_SUBMIT_PATH)
 # Reset must tear down every D3D9 DEFAULT-pool stereo/shared-eye/probe object
 # before ResetEx. Preserve the generation counter itself so the next recreated
 # ring cannot publish the same generation with new handles.
+retire_probe = body(r7, "void RetireDirectInteropProbePublication() noexcept")
+require_order(
+    retire_probe,
+    "D3D9 interop probe publication owner",
+    "clientInteropProbeToken),0)",
+    "clientInteropProbeHandle),0)",
+)
+
 release = body(r7, "void ReleaseStereoResources()")
 require(
     release,
@@ -90,22 +98,26 @@ require(
     "ReleaseCom(slot.leftTexture)",
     "ReleaseCom(slot.rightSurface)",
     "ReleaseCom(slot.rightTexture)",
+    "RetireDirectInteropProbePublication();",
     "ReleaseCom(DirectInteropProbeFence)",
     "ReleaseCom(DirectInteropProbeSurface)",
     "ReleaseCom(DirectInteropProbeTexture)",
     "DirectInteropProbeHandle=nullptr",
     "DirectInteropProbeToken=0",
     "DirectInteropVerified=false",
-    "clientInteropProbeToken),0)",
-    "clientInteropProbeHandle),0)",
     "DirectTransportFormat=D3DFMT_UNKNOWN",
 )
 require_order(
     release,
     "D3D9 interop probe publication retirement",
-    "clientInteropProbeToken),0)",
-    "clientInteropProbeHandle),0)",
+    "RetireDirectInteropProbePublication();",
     "ReleaseCom(DirectInteropProbeTexture)",
+)
+forbid(
+    release,
+    "reset path duplicate interop publication ownership",
+    "clientInteropProbeToken",
+    "clientInteropProbeHandle",
 )
 forbid(
     release,
@@ -178,18 +190,22 @@ require(
     "R32 host-identity interop invalidation",
     "R32ClearPendingProducerFences();",
     "ReleaseDirectTransportSlots();",
-    "clientInteropProbeToken), 0)",
-    "clientInteropProbeHandle), 0)",
+    "RetireDirectInteropProbePublication();",
     "ReleaseCom(DirectInteropProbeTexture);",
     "R32ForgetDirectIdentity();",
 )
 require_order(
     invalidate_direct_r32,
     "R32 interop probe publication retirement",
-    "clientInteropProbeToken), 0)",
-    "clientInteropProbeHandle), 0)",
+    "RetireDirectInteropProbePublication();",
     "ReleaseCom(DirectInteropProbeTexture);",
     "R32ForgetDirectIdentity();",
+)
+forbid(
+    invalidate_direct_r32,
+    "R32 duplicate interop publication ownership",
+    "clientInteropProbeToken",
+    "clientInteropProbeHandle",
 )
 
 invalidate_r32 = body(r32, "void R32InvalidateResetCaches() noexcept")
