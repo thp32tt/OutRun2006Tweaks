@@ -1790,7 +1790,7 @@ namespace
                 ImGui::EndCombo();
             }
             ImGui::TextDisabled(
-                "R9: changing FFB Model applies the complete test baseline automatically. Modern uses Reverse Force+Spring ON; Arcade/Hybrid/PS2 use both OFF.");
+                "R10: changing FFB Model applies the complete baseline. On MOZA R3, runtime also enforces Modern Reverse Force+Spring ON and Arcade/Hybrid/PS2 OFF.");
 
             const int activeFfbModel = std::clamp(int(Settings::WheelFFBModel), 0, 3);
             if (activeFfbModel == 0)
@@ -1978,11 +1978,27 @@ namespace
 
             track_ffb_change(ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr()));
             track_ffb_change(ImGui::Checkbox("Record driving telemetry (5 Hz + 1 Hz detail)", Settings::WheelFFBTelemetry.ptr()));
+
+            const std::string activeFfbDeviceName =
+                Settings::WheelFFBDeviceName.get();
+            const bool r3AutomaticPolarity =
+                activeFfbDeviceName.find("R3 Racing Wheel") != std::string::npos;
+            if (r3AutomaticPolarity)
+                ImGui::BeginDisabled();
             track_ffb_change(ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr()));
             ImGui::SameLine();
             track_ffb_change(ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()));
-            if (ImGui::IsItemHovered())
+            if (r3AutomaticPolarity)
+                ImGui::EndDisabled();
+            if (r3AutomaticPolarity)
+            {
+                ImGui::TextDisabled(
+                    "R10 R3 automatic polarity: Modern = Reverse Force/Spring ON; Arcade/Hybrid/PS2 = OFF. Runtime enforces this for every model-change path.");
+            }
+            else if (ImGui::IsItemHovered())
+            {
                 ImGui::SetTooltip("Use Reverse Spring only if the wheel pushes farther away from centre. ConstantForce direction is independent.");
+            }
 
             if (ffbDirty_)
                 ImGui::TextDisabled("Unsaved FFB changes are active now but will be lost after restart.");
