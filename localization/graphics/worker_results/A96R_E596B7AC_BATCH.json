@@ -1,0 +1,12 @@
+{
+  "run": "20261006-A-REWORK96R-E596B7AC",
+  "results": [
+    {
+      "index": 227,
+      "stem": "E596B7AC",
+      "candidate_sha256": "e60eb09818ce79c1afc005905ce0d5f7d2678c7f69a2b25f418f2679200499b2",
+      "rows": 16
+    }
+  ],
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}

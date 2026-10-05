@@ -1,0 +1,23 @@
+{
+  "run": "20261006-A-REWORK96R-E596B7AC",
+  "queue_index": 227,
+  "asset": "E596B7AC",
+  "candidate_sha256": "e60eb09818ce79c1afc005905ce0d5f7d2678c7f69a2b25f418f2679200499b2",
+  "localized_physical_rows": 16,
+  "machine_qa": {
+    "bbox_size_positive_margin": "16/16 PASS",
+    "changed_pixels": 548031,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "source_exact_residue_pixels": 0,
+    "clean_plate_residue_outside_korean_glyphs": 0,
+    "localized_overlap_pairs": [],
+    "localized_1px_touch_pairs": [],
+    "dds_roundtrip": "PASS"
+  },
+  "worker_status": "A96R_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261006-A-REWORK96R-E596B7AC/A96R_E596B7AC_REPORT.json"
+}
