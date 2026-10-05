@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C193-63C91067",
+  "qa_id": "C193",
+  "timestamp_kst": "2026-10-05T19:41:25+09:00",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION137",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "candidate_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
+  "candidate_changed_by_C": false,
+  "machine_status": "PASS_AFTER_MASK_ADJUDICATION",
+  "bbox_size_positive_margin": "2/2 PASS",
+  "controller_visual_qa": "PASS",
+  "visual_findings": [
+    "B137 removes the C184 horizontal starburst smear; center spike/glow and brown interior now transition continuously across the former title footprint.",
+    "Pink cloud clean plate is continuous with no readable title ghost or rectangular donor boundary.",
+    "C189 independent structural gates are all zero and localized bboxes are [861,1184,1157,1265] / [713,160,1009,241], both strictly inside the established C exact source bboxes.",
+    "C190 proves C189's 14 apparent residue pixels are not source text: 0 navy-title pixels, all 14 are white alpha 1-2 points sitting on the starburst top spike/glow artwork. C191's broad light-component mask is discarded as background-contaminated.",
+    "Readable overview, row detail and raw mirror_y review PASS with no source-script residue, clipping, overlap, seam or unintended artwork damage."
+  ],
+  "decision": "C193_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "machine_report": "localization/graphics/role_C/20261005-C193-63C91067/C193_63C91067_ADJUDICATED_MACHINE_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C189-63C91067/C189_ROW0_DETAIL_B64.txt",
+    "localization/graphics/role_C/20261005-C189-63C91067/C189_ROW1_DETAIL_B64.txt",
+    "localization/graphics/role_C/20261005-C189-63C91067/C189_OVERVIEW_B64.txt",
+    "localization/graphics/role_C/20261005-C189-63C91067/C189_RAW_B64.txt",
+    "localization/graphics/role_C/20261005-C190-63C91067-DIAG/C190_ROW0_RESIDUE_MARKERS_B64.txt"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
