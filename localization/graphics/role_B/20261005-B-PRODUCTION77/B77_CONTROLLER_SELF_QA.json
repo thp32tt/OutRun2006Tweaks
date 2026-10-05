@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION77",
+  "timestamp_kst": "2026-10-05T10:53:51+09:00",
+  "index": 198,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+  "source_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+  "candidate_sha256": "667b64ac0336c7ae3f7b1f4b79f36c7237225104a4c948ac7158da9805d7e1a7",
+  "semantic_binding": {
+    "0": "RANDOM -> 무작위",
+    "1": "= RANDOM PLAY = -> - 무작위 재생 -",
+    "2": "(GUITAR MIX) -> (기타 믹스)",
+    "10": "(INSTRUMENTAL) -> (연주곡)",
+    "39": "(PROTOTYPE) -> (프로토타입)",
+    "40": "INTERMEDIATE B -> 중급 B",
+    "41": "INTERMEDIATE A -> 중급 A"
+  },
+  "machine_qa": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "localized_physical_elements": 7,
+    "preserved_regions": 36,
+    "bbox_size_positive_margin": "7/7 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "source_residue": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "preserved_regions_changed": 0,
+    "card_art_changed_outside_text_bbox": 0,
+    "overlap": 0,
+    "touch_pairs": 0
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "source_style": "PASS",
+    "observations": [
+      "All seven reviewed non-song labels are rendered with a 4x nearest-neighbor pixel treatment derived from the source's low-resolution lettering family.",
+      "The RANDOM card keeps its frame, question mark, blue fill and non-text artwork exact outside the source RANDOM text bbox.",
+      "All song titles and numbered TBD labels remain unchanged, along with every non-target atlas region.",
+      "No visible English residue, clipping, overlap, seam, halo, unintended artwork change, or orientation regression is present."
+    ]
+  },
+  "decision": "B_PRODUCTION77_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
