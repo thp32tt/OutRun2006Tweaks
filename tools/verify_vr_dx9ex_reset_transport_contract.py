@@ -495,14 +495,38 @@ require_order(
     "cache.generation = generation",
 )
 
-# Host ACK ownership may observe late completions from a pre-reset generation,
-# but those completions must be forgotten rather than published into the new
-# generation's ACK ring.
-observe_generation = body(host_submit, "inline void ObserveGeneration(")
+# Host ACK ownership may observe late completions from a pre-reset generation
+# or a prior game run. Cache reuse, pending EVENT reuse and fault suppression
+# must all be scoped to the complete Frame.v2 identity, not generation alone.
+release_pending = body(host_submit, "inline void ReleasePending() noexcept")
+require(
+    release_pending,
+    "host ACK identity reset",
+    "AckFaultGeneration = 0;",
+    "AckFaultRunGeneration = 0;",
+    "AckFaultGamePid = 0;",
+    "ActiveAckGeneration = 0;",
+    "ActiveAckRunGeneration = 0;",
+    "ActiveAckGamePid = 0;",
+)
+
+observe_identity = body(host_submit, "inline void ObserveAckIdentity(")
+require(
+    observe_identity,
+    "host ACK complete run identity",
+    "RenderFrameDirectGenerationIndex",
+    "RenderFrameRunGenerationIndex",
+    "frame.clientPid",
+    "ActiveAckGeneration == generation",
+    "ActiveAckRunGeneration == runGeneration",
+    "ActiveAckGamePid == gamePid",
+)
 require_order(
-    observe_generation,
-    "host ACK generation transition",
+    observe_identity,
+    "host ACK identity transition cache reset",
     "ActiveAckGeneration = generation;",
+    "ActiveAckRunGeneration = runGeneration;",
+    "ActiveAckGamePid = gamePid;",
     "AckedFrame.fill(0);",
     "AckedGeneration.fill(0);",
 )
@@ -512,20 +536,66 @@ mismatch_start = poll_acks.find("if (ActiveAckGeneration != 0 &&")
 publish_pos = poll_acks.find("PublishCompletedFrame(", mismatch_start)
 continue_pos = poll_acks.find("continue;", mismatch_start)
 if min(mismatch_start, publish_pos, continue_pos) < 0:
-    fail("host late-generation ACK branch missing")
+    fail("host late-run ACK branch missing")
 if continue_pos > publish_pos:
-    fail("late ACK from superseded generation may publish before discard")
+    fail("late ACK from superseded generation/run may publish before discard")
 require(
     poll_acks[mismatch_start:continue_pos + len("continue;")],
-    "late-generation ACK discard",
+    "late generation/run ACK discard",
     "completedGeneration != ActiveAckGeneration",
+    "completedRunGeneration != ActiveAckRunGeneration",
+    "completedGamePid != ActiveAckGamePid",
     "pending.armed = false;",
     "pending.flushIssued = false;",
     "pending.frame = {};",
+)
+require(
+    poll_acks,
+    "host ACK query fault complete identity",
+    "AckFaultGeneration = generation;",
+    "AckFaultRunGeneration = runGeneration;",
+    "AckFaultGamePid = gamePid;",
+)
+
+arm_ack = body(host_submit, "inline bool ArmConsumptionFence(")
+require(
+    arm_ack,
+    "pending EVENT complete run identity",
+    "RenderFrameRunGenerationIndex",
+    "pending.frame.clientPid == frame.clientPid",
+)
+require_order(
+    arm_ack,
+    "pending EVENT identity before reuse",
+    "pending.frame.frameId == frame.frameId",
+    "RenderFrameDirectGenerationIndex",
+    "RenderFrameRunGenerationIndex",
+    "pending.frame.clientPid == frame.clientPid",
+    "++AckSameFramePendingReuse;",
+)
+
+can_fast = body(host_submit, "inline bool CanFastSubmit(")
+require(
+    can_fast,
+    "host ACK fault complete run identity",
+    "RenderFrameRunGenerationIndex",
+    "verified.frame.clientPid",
+    "AckFaultGeneration == generation",
+    "AckFaultRunGeneration == runGeneration",
+    "AckFaultGamePid == gamePid",
+)
+
+end_frame = body(host_submit, "inline XrResult XRAPI_CALL EndFrame(")
+require_order(
+    end_frame,
+    "observe complete ACK identity before polling",
+    "ObserveAckIdentity(observed.frame);",
+    "PollCompletedAcks();",
+    "CanFastSubmit(endInfo, verified, reject)",
 )
 
 print(
     "DX9Ex reset/transport contract PASS "
     "(resource teardown, monotonic generation, fail-close reset, "
-    "host stale-generation rejection)"
+    "host complete-run stale ACK rejection)"
 )
