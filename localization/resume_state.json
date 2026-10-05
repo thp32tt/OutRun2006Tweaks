@@ -1,5 +1,5 @@
 {
-  "schema_version": 75,
+  "schema_version": 76,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B_PRODUCTION67 completed even index 226 E3F4BA07. Authoritative HD source fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72 is 2048x512 RGBA32 BGRA/raw mirror_y. B66 canonical binding localized STAGE, GOAL/GOAL A-E and 15 STAGE CONTINUOUS while protecting OUTRUN2/OUTRUN2SP. Candidate 1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c passes 8/8 exact bbox+size+positive-margin, zero source residue/outside/alpha/protected/OutRun-mark/overlap/touch, and controller SOURCE/CLEAN/FINAL/row/raw visual self-QA. Pending independent C and in-game validation. 49BB5FE5 remains HOLD_STRICT_RECHECK. RUNTIME_VALIDATION=UNTESTED.",
     "B_PRODUCTION65 completed even index 220 D657C2EB after B63 fail-closed index 152 49BB5FE5. B63 correctly decoded DXT5 and preserved '89/'86 but decoded block splice changed 1,388 pixels outside exact source bboxes, so no candidate was persisted and index 152 is HOLD_STRICT_RECHECK. B64/B65 then bound and rendered all seven D657 physical labels, including duplicate TIME ATTACK. Candidate 6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5 preserves 2048x512 RGBA32 BGRA mip1/header/raw mirror_y, passes 7/7 bbox+size+positive margins and zero residue/outside/alpha/overlap/touch with controller visual/raw PASS. Pending C and in-game. RUNTIME_VALIDATION=UNTESTED.",
     "B_PRODUCTION60 completed even index 154 4D38BBB0. Authoritative HD source 15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf is 4096x1024 RGBA32/raw mirror_y. B59 canonical binding found 8 physical text rows and corrected the stale five-item transcription by adding SHOWROOM plus duplicate SINGLE PLAYER/MULTIPLAYER occurrences. B60 candidate c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a localizes all 8 text regions, preserves Ferrari artwork regions 0/1, passes 8/8 exact bbox+size+positive-margin and zero residue/outside/alpha/protected/artwork/overlap/touch, with controller SOURCE/CLEAN/FINAL/raw visual self-QA PASS. Pending independent C and in-game validation. RUNTIME_VALIDATION=UNTESTED.",
     "B_PRODUCTION58 completed even index 140 31C58963. Authoritative HD source ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd is 2048x1024 RGBA32/raw mirror_y. B56 readable binding corrected stale PRESS START to PRESS [Enter-key icon] KEY; B58 candidate b6d8bcc2f2cc05d45d4af3fbfab30f0a71e8fa68a89dee4c78b6f8a6aeca4cd3 localizes 누르세요 | preserved Enter-key icon | 키 plus 쇼룸/모드 선택/레이스 선택/스테이지 선택. B57 thin draft was rejected and reworked same invocation to Bold source-like weight. 6/6 exact bbox+size+positive-margin PASS; residue/outside/alpha/protected/overlap/touch=0; controller SOURCE/CLEAN/FINAL/row/raw self-QA PASS. Pending independent C and in-game. RUNTIME_VALIDATION=UNTESTED.",
@@ -199,7 +200,7 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_B/20261005-B-PRODUCTION65/B65_D657_REPORT.json",
+    "latest_hd_rework_batch": "localization/graphics/role_B/20261005-B-PRODUCTION67/B67_E3F4_REPORT.json",
     "hd_rework_candidates_ready": 16,
     "hd_rework_remaining": 0,
     "hd_partial_rework": {
@@ -3019,6 +3020,30 @@
     ],
     "machine_report": "localization/graphics/role_C/20261005-C142-D657C2EB/C142_D657_MACHINE_QA.json",
     "report": "localization/graphics/role_C/20261005-C142-D657C2EB/C142_D657_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "b_production67_e3f4ba07": {
+    "timestamp_kst": "2026-10-05T09:14:20+09:00",
+    "run": "20261005-B-PRODUCTION67",
+    "queue_index": 226,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+    "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+    "candidate_sha256": "1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+    "physical_elements": 8,
+    "bbox_size_positive_margin": "8/8",
+    "source_residue": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected": 0,
+    "protected_marks_changed": 0,
+    "overlap": 0,
+    "touch_pairs": 0,
+    "controller_visual_qa": "PASS",
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION67/B67_E3F4_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION67/B67_CONTROLLER_SELF_QA.json",
+    "c_final_qa": "PENDING",
+    "in_game_validation": "PENDING",
     "runtime_validation": "UNTESTED"
   }
 }
