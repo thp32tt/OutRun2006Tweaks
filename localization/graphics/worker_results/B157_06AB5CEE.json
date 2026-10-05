@@ -1,0 +1,13 @@
+{
+  "run": "B157",
+  "index": 36,
+  "asset": "06AB5CEE",
+  "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+  "localized_physical_elements": 3,
+  "bbox_size_positive_margin": "3/3",
+  "outside": 0,
+  "alpha_outside": 0,
+  "worker_status": "B157_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "report": "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_JENN_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}
