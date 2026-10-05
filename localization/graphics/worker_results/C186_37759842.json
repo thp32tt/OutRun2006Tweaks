@@ -1,0 +1,24 @@
+{
+  "run": "20261005-C186-37759842",
+  "qa_id": "C186",
+  "index": 95,
+  "asset": "37759842",
+  "candidate_sha256": "68e31ca94c9003cd0acd572fdcecf17d52c56b6848ee558c1359d87b6d382fcd",
+  "machine_status": "PASS",
+  "all_33_bbox_size_positive_margin_pass": true,
+  "machine_checks": {
+    "clean_changed_outside_union_source_bboxes": 0,
+    "final_changed_outside_union_source_bboxes": 0,
+    "clean_alpha_outside_union_source_bboxes": 0,
+    "final_alpha_outside_union_source_bboxes": 0,
+    "render_outside_union_source_bboxes": 0,
+    "protected_clean_changed": 0,
+    "protected_final_changed": 0,
+    "clean_source_core_unchanged": 0,
+    "source_core_residue_pixels": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_pair_1px_touch_pixels": 0
+  },
+  "report": "localization/graphics/role_C/20261005-C186-37759842/C186_37759842_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
