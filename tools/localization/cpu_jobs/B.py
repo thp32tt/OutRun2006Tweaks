@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OU
     raise SystemExit("B hosted worker only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION144-8215-C196-REWORK"
+run="20261005-B-PRODUCTION145-8215-C196-REWORK"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -28,8 +28,9 @@ urllib.request.urlretrieve(BASE+"/Original%20(PC)/Original%20(Tweaks%20dumps)/sp
 
 prior_clean_path=repo/"localization/graphics/role_B/20261005-B-PRODUCTION143-8215/B142_CLEAN_PLATE.png"
 prior_report_path=repo/"localization/graphics/role_B/20261005-B-PRODUCTION143-8215/B142_8215_REPORT.json"
-if not prior_clean_path.exists() or not prior_report_path.exists() or not candidate.exists():
-    raise RuntimeError("B143 evidence/candidate missing")
+prior_final_path=repo/"localization/graphics/role_B/20261005-B-PRODUCTION143-8215/B142_FINAL_READABLE.png"
+if not prior_clean_path.exists() or not prior_report_path.exists() or not prior_final_path.exists():
+    raise RuntimeError("B143 evidence missing")
 
 def gitblob(b): return hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
 def sha(b): return hashlib.sha256(b).hexdigest()
@@ -46,7 +47,6 @@ def save_b64_jpeg(im,jpg,b64,quality=92):
 
 sb=dds.read_bytes(); ab=atlas.read_bytes()
 if gitblob(sb)!=SOURCE_BLOB: raise RuntimeError(("source drift",gitblob(sb)))
-if sha(candidate.read_bytes())!=PRIOR_SHA: raise RuntimeError(("prior candidate drift",sha(candidate.read_bytes())))
 H=struct.unpack_from("<I",sb,12)[0]; W=struct.unpack_from("<I",sb,16)[0]; mips=struct.unpack_from("<I",sb,28)[0]
 pf=struct.unpack_from("<8I",sb,76); masks=(pf[4],pf[5],pf[6],pf[7])
 mode="RGBA" if masks[:3]==(0xff,0xff00,0xff0000) else ("BGRA" if masks[:3]==(0xff0000,0xff00,0xff) else None)
@@ -57,25 +57,24 @@ sa=np.asarray(src,dtype=np.uint8)
 regs={int(r["idx"]):r for r in json.loads(ab.decode())["regions"]}
 prior_report=json.loads(prior_report_path.read_text())
 prior_clean=Image.open(prior_clean_path).convert("RGBA")
-prior_final=Image.frombytes("RGBA",(W,H),candidate.read_bytes()[128:],"raw",mode).transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+prior_final=Image.open(prior_final_path).convert("RGBA")
 
-# Preserve C196-accepted speech-bubble (idx1) exactly from B143.
-row1=next(r for r in prior_report["rows"] if int(r["region_idx"])==1)
-row2_prev=next(r for r in prior_report["rows"] if int(r["region_idx"])==2)
+# C196 accepted the upper speech-bubble plate (atlas idx2). Preserve it exactly from B143.
+# The failed lower starburst plate is atlas idx1 and is the only reconstruction target here.
+star_row=next(r for r in prior_report["rows"] if int(r["region_idx"])==1)
+bubble_row=next(r for r in prior_report["rows"] if int(r["region_idx"])==2)
 allowed=Image.new("L",(W,H),0)
-for r in (row1,row2_prev):
+for r in (star_row,bubble_row):
     x0,y0,x1,y1=map(int,r["original_bbox"])
     ImageDraw.Draw(allowed).rectangle((x0,y0,x1-1,y1-1),fill=255)
 protected=ImageOps.invert(allowed)
 
 clean_arr=sa.copy()
-final_arr=sa.copy()
-r1box=tuple(map(int,row1["original_bbox"]))
-clean_arr[r1box[1]:r1box[3],r1box[0]:r1box[2]]=np.asarray(prior_clean)[r1box[1]:r1box[3],r1box[0]:r1box[2]]
-final_arr[r1box[1]:r1box[3],r1box[0]:r1box[2]]=np.asarray(prior_final)[r1box[1]:r1box[3],r1box[0]:r1box[2]]
+bubble_box=tuple(map(int,bubble_row["original_bbox"]))
+clean_arr[bubble_box[1]:bubble_box[3],bubble_box[0]:bubble_box[2]]=np.asarray(prior_clean)[bubble_box[1]:bubble_box[3],bubble_box[0]:bubble_box[2]]
 
-# Re-derive idx2 title core from canonical source.
-idx=2; x,y,cw,ch=map(int,regs[idx]["rect"]); roi=sa[y:y+ch,x:x+cw]
+# Re-derive idx1 starburst title core from canonical source.
+idx=1; x,y,cw,ch=map(int,regs[idx]["rect"]); roi=sa[y:y+ch,x:x+cw]
 rr=roi[:,:,0].astype(np.int16); gg=roi[:,:,1].astype(np.int16); bb=roi[:,:,2].astype(np.int16); aa=roi[:,:,3]
 white=(aa>32)&(rr>175)&(gg>175)&(bb>175)&((np.maximum.reduce([rr,gg,bb])-np.minimum.reduce([rr,gg,bb]))<72)
 band=np.zeros_like(white,dtype=bool); band[int(ch*.08):int(ch*.38),int(cw*.18):int(cw*.82)]=True
@@ -107,7 +106,7 @@ near=np.asarray(core_im.filter(ImageFilter.MaxFilter(25)))>0
 
 # Build a robust quadratic brown-field model from canonical pixels surrounding the title.
 # This deliberately excludes the old 15px edit footprint and any low-alpha/ray/background outliers.
-ob=list(map(int,row2_prev["original_bbox"]))
+ob=list(map(int,star_row["original_bbox"]))
 sx0=max(x,ob[0]-90); sy0=max(y,ob[1]-70); sx1=min(x+cw,ob[2]+90); sy1=min(y+ch,ob[3]+120)
 Y,X=np.mgrid[sy0:sy1,sx0:sx1]
 sub=sa[sy0:sy1,sx0:sx1].astype(np.float64)
@@ -186,9 +185,9 @@ tile=shear_rgba(tile,slant); abx=tile.getchannel("A").getbbox(); tile=tile.crop(
 
 cb=core_bbox; px=cb[0]+(cb[2]-cb[0]-tile.width)//2; py=cb[1]+(cb[3]-cb[1]-tile.height)//2
 final=clean.copy()
-# Restore C196-accepted idx1 final exactly.
+# Restore C196-accepted idx2 speech-bubble final exactly.
 final_arr=np.asarray(final).copy()
-final_arr[r1box[1]:r1box[3],r1box[0]:r1box[2]]=np.asarray(prior_final)[r1box[1]:r1box[3],r1box[0]:r1box[2]]
+final_arr[bubble_box[1]:bubble_box[3],bubble_box[0]:bubble_box[2]]=np.asarray(prior_final)[bubble_box[1]:bubble_box[3],bubble_box[0]:bubble_box[2]]
 final=Image.fromarray(final_arr,"RGBA")
 final.alpha_composite(tile,(px,py))
 tm=Image.new("L",(W,H),0); tm.paste(bmask(tile.getchannel("A")),(px,py)); lb=list(tm.getbbox())
@@ -216,10 +215,10 @@ if any(protected_changed.values()): raise RuntimeError(("protected changed",prot
 
 # Bbox/margin report for both physical titles.
 rows=[]
-for old in (row1,row2_prev):
+for old in (star_row,bubble_row):
     z=dict(old)
-    if int(z["region_idx"])==1:
-        z["rework_status"]="B144_C196_ACCEPTED_SPEECH_BUBBLE_PRESERVED_EXACT"
+    if int(z["region_idx"])==2:
+        z["rework_status"]="B145_C196_ACCEPTED_SPEECH_BUBBLE_PRESERVED_EXACT"
     else:
         z["source_effect_mask_pixels"]=int(np.count_nonzero(text_mask))
         z["original_bbox"]=ob
@@ -230,23 +229,23 @@ for old in (row1,row2_prev):
         z["delta_left"]=lb[0]-core_bbox[0]; z["delta_right"]=core_bbox[2]-lb[2]
         z["delta_top"]=lb[1]-core_bbox[1]; z["delta_bottom"]=core_bbox[3]-lb[3]
         z["containment"]="PASS"; z["size_ceiling"]="PASS"; z["positive_margin"]="PASS"
-        z["rework_status"]="B144_C196_PRECISE_MASK_QUADRATIC_FIELD_RECONSTRUCTION"
+        z["rework_status"]="B145_C196_STARBURST_GLYPH_HALO_QUADRATIC_FIELD_RECONSTRUCTION"
         z["precise_text_mask_bbox"]=text_bbox
     rows.append(z)
 
 source_text_mask=Image.new("L",(W,H),0)
-# Keep idx1 prior source mask in its allowed bbox for evidence; idx2 uses the new precise mask.
+# Keep C196-accepted idx2 prior source mask for evidence; idx1 uses the new starburst mask.
 prior_sm=Image.open(repo/"localization/graphics/role_B/20261005-B-PRODUCTION143-8215/B142_SOURCE_TEXT_MASK.png").convert("L")
-source_text_mask.paste(prior_sm.crop(r1box),(r1box[0],r1box[1]))
+source_text_mask.paste(prior_sm.crop(bubble_box),(bubble_box[0],bubble_box[1]))
 source_text_mask=ImageChops.lighter(source_text_mask,Image.fromarray((text_mask.astype(np.uint8)*255),"L"))
 
-source_png=out/"B144_SOURCE_READABLE.png"; clean_png=out/"B144_CLEAN_PLATE.png"; final_png=out/"B144_FINAL_READABLE.png"
-smp=out/"B144_SOURCE_TEXT_MASK.png"; ap=out/"B144_ALLOWED_EFFECT_BBOX_MASK.png"; pp=out/"B144_PROTECTED_MASK.png"
+source_png=out/"B145_SOURCE_READABLE.png"; clean_png=out/"B145_CLEAN_PLATE.png"; final_png=out/"B145_FINAL_READABLE.png"
+smp=out/"B145_SOURCE_TEXT_MASK.png"; ap=out/"B145_ALLOWED_EFFECT_BBOX_MASK.png"; pp=out/"B145_PROTECTED_MASK.png"
 src.save(source_png); clean.save(clean_png); dec.save(final_png); source_text_mask.save(smp); allowed.save(ap); protected.save(pp)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B144_CLEAN_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B144_FINAL_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B144_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"B144_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B145_CLEAN_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(ap),"--protected-mask",str(pp),"--report",str(out/"B145_FINAL_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B145_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"B145_FINAL_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS" or finalrep["status"]!="PASS": raise RuntimeError(("validator",cleanrep["status"],finalrep["status"]))
 
 # Focused controller evidence.
@@ -264,7 +263,7 @@ for r in rows:
     cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+5 for c in cards)),"white"); yy1=0
 for c in cards: sheet.paste(c,(0,yy1)); yy1+=c.height+5
-save_b64_jpeg(sheet,out/"B144_8215_CONTACTS.jpg",out/"B144_8215_CONTACTS_B64.txt",94)
+save_b64_jpeg(sheet,out/"B145_8215_CONTACTS.jpg",out/"B145_8215_CONTACTS_B64.txt",94)
 
 # Extra starburst closeup makes C196 defect directly reviewable.
 x0,y0,x1,y1=ob; p=110; box=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
@@ -273,13 +272,13 @@ scale=min(2.8,1500/max(1,ims[0].width)); ims=[z.resize((int(z.width*scale),int(z
 focus=Image.new("RGB",(sum(z.width for z in ims)+16,max(z.height for z in ims)+44),"white"); xx1=0
 for labtxt,z in zip(("SOURCE","CLEAN","FINAL"),ims):
     focus.paste(z,(xx1,44)); ImageDraw.Draw(focus).text((xx1+4,8),labtxt,fill="black"); xx1+=z.width+8
-save_b64_jpeg(focus,out/"B144_STARBURST_FOCUS.jpg",out/"B144_STARBURST_FOCUS_B64.txt",95)
+save_b64_jpeg(focus,out/"B145_STARBURST_FOCUS.jpg",out/"B145_STARBURST_FOCUS_B64.txt",95)
 
 rrim=Image.new("RGB",(1024,2*550),"white")
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
 for i,(labtxt,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im); z.thumbnail((1024,512),Image.Resampling.LANCZOS); rrim.paste(z,(0,i*550+26)); ImageDraw.Draw(rrim).text((5,i*550+5),labtxt,fill="black")
-save_b64_jpeg(rrim,out/"B144_RAW_COMPARE.jpg",out/"B144_RAW_COMPARE_B64.txt",90)
+save_b64_jpeg(rrim,out/"B145_RAW_COMPARE.jpg",out/"B145_RAW_COMPARE_B64.txt",90)
 
 report={
  "schema_version":1,"role":"B","run":run,"queue_index":30,"asset":asset,
@@ -289,12 +288,12 @@ report={
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":payload[:128]==sb[:128],"raw_orientation":"mirror_y"},
  "classification":{"localizable":"Total Rank x2","translation":"종합 랭킹","protected":["character artwork","lens flare","rank letters B/C/D/E"]},
  "clean_reconstruction":{
-   "idx1":"C196-accepted B143 speech-bubble clean/final preserved exact inside prior allowed bbox",
-   "idx2":"precise connected source-title/effect mask + robust quadratic warm-interior field reconstruction",
-   "idx2_prior_effect_mask_pixels":int(row2_prev["source_effect_mask_pixels"]),
-   "idx2_precise_effect_mask_pixels":int(np.count_nonzero(text_mask)),
-   "idx2_precise_mask_bbox":text_bbox,
-   "idx2_background_fit_samples":int(np.count_nonzero(use))
+   "idx2":"C196-accepted B143 speech-bubble clean/final preserved exact inside prior allowed bbox",
+   "idx1":"7px glyph-local source-title/effect halo + robust quadratic warm-interior field reconstruction",
+   "idx1_prior_effect_mask_pixels":int(star_row["source_effect_mask_pixels"]),
+   "idx1_precise_effect_mask_pixels":int(np.count_nonzero(text_mask)),
+   "idx1_precise_mask_bbox":text_bbox,
+   "idx1_background_fit_samples":int(np.count_nonzero(use))
  },
  "source_style":prior_report["source_style"],
  "rows":rows,
@@ -303,16 +302,16 @@ report={
  "protected_region_changed_pixels":protected_changed,
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
- "status":"B144_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"B145_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "RUNTIME_VALIDATION":"UNTESTED"
 }
-(out/"B144_8215_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(out/"B145_8215_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":30,"asset":"8215FD25","candidate_sha256":csha,
  "localized_physical_elements":2,"bbox_size_positive_margin":"2/2",
- "idx2_precise_effect_mask_pixels":int(np.count_nonzero(text_mask)),
+ "idx1_precise_effect_mask_pixels":int(np.count_nonzero(text_mask)),
  "clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "outside":outside,"alpha_outside":alphaout,"protected_regions_changed":sum(protected_changed.values()),
  "worker_status":report["status"],"runtime_validation":"UNTESTED",
- "report":f"localization/graphics/role_B/{run}/B144_8215_REPORT.json"}
-(wr/"B144_8215FD25.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "report":f"localization/graphics/role_B/{run}/B145_8215_REPORT.json"}
+(wr/"B145_8215FD25.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False),flush=True)
