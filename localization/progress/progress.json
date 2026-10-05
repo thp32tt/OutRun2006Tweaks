@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T11:50:30+09:00",
+  "updated_at_kst": "2026-10-05T11:53:26+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -548,24 +548,22 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 27,
+    "current_pending_artwork_localize_text": 26,
     "current_producer_rework_remaining": 1,
     "latest_a_production_batch": {
-      "timestamp_kst": "2026-10-05T02:45:00+09:00",
+      "timestamp_kst": "2026-10-05T11:53:26+09:00",
       "reports": [
-        "localization/graphics/role_A/20261005-A-PRODUCTION20/A_PRODUCTION20_9CE4E175_REPORT.json",
-        "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_EBEF6D20_REPORT.json"
+        "localization/graphics/role_A/20261005-A-PRODUCTION22/A_PRODUCTION22_30CF0D_REPORT.json",
+        "localization/graphics/role_A/20261005-A-PRODUCTION22/A22_CONTROLLER_SELF_QA.json"
       ],
       "assets": [
-        "9CE4E175",
-        "EBEF6D20"
+        "30CF0D"
       ],
       "candidates": {
-        "9CE4E175": "cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2",
-        "EBEF6D20": "005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2"
+        "30CF0D": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b"
       },
-      "result": "2_SELF_QA_PASS_PENDING_C_AND_INGAME",
-      "pending_artwork_localize_text": 45,
+      "result": "1_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "pending_artwork_localize_text": 26,
       "runtime_validation": "UNTESTED"
     },
     "a_production20_9ce4e175": {
@@ -827,6 +825,31 @@
       "controller_visual_qa": "PASS",
       "report": "localization/graphics/role_B/20261005-B-PRODUCTION80/B80_FEF_REPORT.json",
       "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION80/B80_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "a_production22_30cf0d": {
+      "timestamp_kst": "2026-10-05T11:53:26+09:00",
+      "index": 137,
+      "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+      "candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+      "status": "A_PRODUCTION22_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "physical_occurrences": 6,
+      "semantic_segments": 3,
+      "bbox_pass": "6/6",
+      "size_ceiling": "6/6",
+      "positive_margin": "6/6",
+      "zero_pixel_gates": {
+        "clean_source_effect_unchanged": 0,
+        "outside": 0,
+        "alpha_outside": 0,
+        "protected": 0,
+        "overlap": 0,
+        "touch": 0
+      },
+      "controller_visual_qa": "PASS",
+      "report": "localization/graphics/role_A/20261005-A-PRODUCTION22/A_PRODUCTION22_30CF0D_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION22/A22_CONTROLLER_SELF_QA.json",
       "runtime_validation": "UNTESTED"
     }
   },
