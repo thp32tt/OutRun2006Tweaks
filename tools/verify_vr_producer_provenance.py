@@ -111,8 +111,19 @@ for marker in (
         fail(f"Sumo replay Entry missing provenance field: {marker}")
 
 capture = function_body(framerate, "static void capture()")
-if "PeekSpriteNodeProducerToken(node)" not in capture:
-    fail("Sumo replay capture must non-destructively snapshot producer token")
+scope_peek = capture.find(
+    "OutRunVR::GameSemantic::PeekSpriteNodeScope(")
+producer_out = capture.find("&entry.vrProducer", scope_peek)
+if min(scope_peek, producer_out) < 0:
+    fail(
+        "Sumo replay capture must snapshot scope and producer in one "
+        "non-consuming semantic-tag lookup"
+    )
+if "PeekSpriteNodeProducerToken(node)" in capture:
+    fail(
+        "Sumo replay capture regressed to a second semantic-tag scan "
+        "for producer provenance"
+    )
 if "ConsumeSpriteNodeScope(" in capture:
     fail("Sumo replay capture must remain non-consuming")
 
