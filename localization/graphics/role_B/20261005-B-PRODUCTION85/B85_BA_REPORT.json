@@ -836,7 +836,8 @@
   },
   "candidate_sha256": "869cf1bea8b27dcc89f5b2ab68f9dd163e4bf41fa6de4b53c7b3f19b3b1c74ad",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
-  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_ROW_RAW",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B85_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B85_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_self_qa_report": "localization/graphics/role_B/20261005-B-PRODUCTION85/B85_CONTROLLER_SELF_QA.json"
 }
