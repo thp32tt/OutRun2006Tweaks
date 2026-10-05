@@ -7,7 +7,8 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("worker A only")
 
 repo=Path.cwd()
-run="20261006-A-PRODUCTION79-C05"\n# A79 rerun marker: worker compute passed; retry persistence after concurrent branch push.
+run="20261006-A-PRODUCTION79-C05"
+# A79 rerun marker: worker compute passed; retry persistence after concurrent branch push.
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
