@@ -22,6 +22,10 @@ int main() {
  require(sanitize_model(-10)==Model::ModernDD&&sanitize_model(99)==Model::PS2OriginalExperimental,"FFB model setting clamps");
  require(model_uses_modern_sat(Model::ModernDD)&&model_uses_modern_sat(Model::ArcadeHybrid),"modern SAT models");
  require(!model_uses_modern_sat(Model::ArcadeOriginal)&&!model_uses_modern_sat(Model::PS2OriginalExperimental),"original modes do not claim modern SAT");
+ require(model_default_invert_force(Model::ModernDD)&&model_default_invert_spring(Model::ModernDD),"Modern model owns reversed R3 force+spring polarity");
+ require(!model_default_invert_force(Model::ArcadeOriginal)&&!model_default_invert_spring(Model::ArcadeOriginal),"Arcade model owns normal R3 polarity");
+ require(!model_default_invert_force(Model::ArcadeHybrid)&&!model_default_invert_spring(Model::ArcadeHybrid),"Hybrid follows Arcade-side R3 polarity");
+ require(!model_default_invert_force(Model::PS2OriginalExperimental)&&!model_default_invert_spring(Model::PS2OriginalExperimental),"PS2 model owns normal R3 polarity");
  require(model_uses_arcade_events(Model::ArcadeOriginal)&&model_uses_arcade_events(Model::ArcadeHybrid),"arcade event models");
  require(std::abs(frequency_hz_from_period_ms(70.0f)-(1000.0f/70.0f))<1e-6f,"arcade road 70ms period converts to host Hz");
  require(frequency_hz_from_period_ms(0.0f)==0.0f,"invalid zero period is rejected");
@@ -136,6 +140,10 @@ int main() {
  require(proven_primary_rough_road_section(10,54)&&proven_primary_rough_road_section(10,70),"Tulip Garden primary rough-road bounds");
  require(proven_primary_rough_road_section(27,510)&&proven_primary_rough_road_section(27,533),"Floral Village primary rough-road bounds");
  require(is_proven_primary_rough_road_contact(27,520,PrimaryRoughRoadSurfaceMask),"Floral primary rough material accepted");
+ require(std::abs(SnowPrimaryRoadTextureScale-.18f)<1e-6f,"R10 snow-primary road texture remains tactile but comfort-limited");
+ require(std::abs(FloralVillageRoughPavingScale-.72f)<1e-6f,"R10 Floral rough-paving comfort retains identifiable texture");
+ require(front_slip_recovery_direction(.2f)<0&&front_slip_recovery_direction(-.2f)>0,"front-slip SAT always acts to reduce tyre slip angle");
+ require(front_slip_recovery_direction(0.0f)==0.0f,"zero front slip has no recovery direction");
 
  // R9 hardware-log regressions: Imperial Avenue primary asphalt, per-wheel
  // tactile coverage, and direction-independent collision pulse.
