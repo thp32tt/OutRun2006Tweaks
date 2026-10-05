@@ -1,0 +1,115 @@
+name: Korean Localization Test Build
+
+on:
+  push:
+    branches:
+      - korean-localization-recovery-20260928
+    paths:
+      - '.github/workflows/korean-test-build.yml'
+      - 'src/**'
+      - 'CMakeLists.txt'
+      - 'cmake.toml'
+      - 'cmkr.cmake'
+      - 'external/**'
+      - 'OutRun2006Tweaks.ini'
+      - 'OutRun2006Tweaks.lods.ini'
+      - 'localization/text/runtime_ko.tsv'
+      - 'localization/graphics/asset_queue.csv'
+      - 'localization/graphics/hd_candidates/**'
+  workflow_dispatch:
+
+jobs:
+  build-korean-test:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          submodules: recursive
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path build | Out-Null
+          Set-Location build
+          cmake -G "Visual Studio 17 2022" -A Win32 ..
+
+      - name: Add older VC2022 redist workaround to safetyhook
+        shell: pwsh
+        run: |
+          (Get-Content build/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/safetyhook-build/safetyhook.vcxproj
+          (Get-Content build/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/zydis-build/zycore/Zycore.vcxproj
+
+      - name: Disable SDL GameInput workaround
+        shell: pwsh
+        run: |
+          Set-Content -Path build/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build Win32 Release
+        run: cmake --build build --config Release
+
+      - name: Copy runtime files
+        shell: pwsh
+        run: |
+          Copy-Item OutRun2006Tweaks.ini build/bin/OutRun2006Tweaks.ini -Force
+          Copy-Item OutRun2006Tweaks.lods.ini build/bin/OutRun2006Tweaks.lods.ini -Force
+          New-Item -ItemType Directory -Force -Path build/bin/localization/text | Out-Null
+          Copy-Item localization/text/runtime_ko.tsv build/bin/localization/text/runtime_ko.tsv -Force
+          Invoke-WebRequest -Uri https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE -OutFile build/bin/OR2006C2C.exe
+
+      - name: Copy QA-passed Korean graphics
+        shell: pwsh
+        run: |
+          $rows = Import-Csv localization/graphics/asset_queue.csv
+          $selected = @()
+          foreach ($row in $rows) {
+            $status = [string]$row.artwork_status
+            if ($status -like '*pass_pending_ingame*' -and $status -notlike '*preserve_original*') {
+              $source = Join-Path 'localization/graphics/hd_candidates' $row.path
+              if (-not (Test-Path $source)) {
+                throw "Missing promoted candidate: $source"
+              }
+              $dest = Join-Path 'build/bin' $row.path
+              New-Item -ItemType Directory -Force -Path (Split-Path $dest -Parent) | Out-Null
+              Copy-Item $source $dest -Force
+              $selected += $row
+            }
+          }
+          if ($selected.Count -eq 0) {
+            throw 'No QA-passed Korean graphics selected.'
+          }
+          $selected | Export-Csv build/bin/KOREAN_TEST_GRAPHICS_MANIFEST.csv -NoTypeInformation -Encoding UTF8
+          @(
+            'OutRun 2006 Korean localization test build'
+            "Source commit: $env:GITHUB_SHA"
+            "Graphics included: $($selected.Count)"
+            'Selection: artwork_status contains pass_pending_ingame and excludes preserve_original'
+            'Runtime text: localization/text/runtime_ko.tsv'
+            'Status: TEST BUILD / IN-GAME VALIDATION REQUIRED'
+            ''
+            'Install: extract into the OutRun 2006 Coast 2 Coast game folder, where OR2006C2C.EXE is located.'
+            'Keep OutRun2006Tweaks.log and screenshots for failures.'
+          ) | Set-Content build/bin/KOREAN_TEST_BUILD_README.txt -Encoding UTF8
+          Write-Host "Selected Korean graphics: $($selected.Count)"
+
+      - name: Verify package
+        shell: pwsh
+        run: |
+          if (-not (Test-Path build/bin/dinput8.dll)) { throw 'dinput8.dll missing' }
+          if (-not (Test-Path build/bin/OR2006C2C.exe)) { throw 'OR2006C2C.exe missing' }
+          $rows = (Get-Content build/bin/localization/text/runtime_ko.tsv | Measure-Object -Line).Lines
+          if ($rows -lt 1355) { throw "runtime_ko.tsv unexpectedly short: $rows lines" }
+          $dds = (Get-ChildItem build/bin/textures/load -Recurse -Filter *.dds | Measure-Object).Count
+          if ($dds -lt 1) { throw 'No Korean DDS files copied' }
+          Write-Host "runtime rows: $rows"
+          Write-Host "Korean DDS files: $dds"
+
+      - name: Upload Korean test build
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: OutRun2-Korean-Test-${{ github.sha }}
+          path: build/bin/
+          compression-level: 9
+          retention-days: 30
