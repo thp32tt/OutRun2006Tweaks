@@ -1,0 +1,11 @@
+{
+  "run": "20261006-A-PRODUCTION71-ACF-PREFLIGHT",
+  "index": 205,
+  "asset": "ACF61D7C",
+  "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+  "atlas_region_count": 75,
+  "candidate_written": false,
+  "worker_status": "A71_PREFLIGHT_ONLY_PENDING_CONTROLLER_PHYSICAL_BINDING",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION71-ACF-PREFLIGHT/A71_ACF_PREFLIGHT.json"
+}
