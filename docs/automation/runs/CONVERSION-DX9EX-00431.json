@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00431",
+  "production_id": "CONVERSION-DX9EX-00431",
+  "event_id": "CONVERSION-DX9EX-00431-E002",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "cb02b5842dea5db9cc99573c032eec0e68729bbc",
+  "source_material_sha": "af7dbe050e4d747fd639e853bfc826eea4a040d6",
+  "material_result_sha": "57899f49f7fed02b396e0e609e4b51cff153db49",
+  "validation_bearing_result_sha": "57899f49f7fed02b396e0e609e4b51cff153db49",
+  "result_sha": "57899f49f7fed02b396e0e609e4b51cff153db49",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00431]",
+  "selected_work_item": "L3-DX9EX-001 / R32 fast-submit ACK cache complete game-run identity",
+  "summary": "Scope the R32 fast-submit ACK identity, pending EVENT reuse, stale-completion discard and generation-fault suppression to the complete Frame.v2 identity (DirectGPU transport generation + game run generation + game PID) instead of transport generation alone.",
+  "changed_paths": [
+    "vrhost/src/runtime/r32_direct_submit.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00431.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered 00430 final state and post-1100 refactor terminal owner census. Structural chain remains complete, so the next independent DirectGPU lifetime/synchronization unit was selected."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "00430 completed the shared ACK ABI identity, but R32 internal AckedFrame/AckedGeneration, ActiveAckGeneration and AckFaultGeneration state still keyed only on transport generation. A fast game restart or rare generation collision could therefore retain stale fast-submit cache/fault state across a different Frame.v2 game run."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "af7dbe050e4d747fd639e853bfc826eea4a040d6 adds active/fault run-generation and game-PID identity, clears ACK caches when any identity component changes, rejects late pending completions from another run before publication, requires complete identity for same-frame EVENT reuse, and scopes generation-fault rejection to the same run."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Intermediate 3e3c53a1b3185474892017c734b0804b5a71a7f6 failed policy only because the verifier matched an earlier RenderFrameDirectGenerationIndex occurrence; implementation was unchanged. Verifier-only repair 57899f49f7fed02b396e0e609e4b51cff153db49 passed DX9Ex Active Validation 37384420695: policy 112014053033, full-chain-compile 112014192640, host 112014192746, game 112014192767, package 112015817049 all SUCCESS. Domain Isolation Guard 37384420959 SUCCESS. Earlier source run 37384233976 on af7dbe05 was cancelled after a newer task-tagged push and is SUPERSEDED, not a repair failure."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "af7dbe050e4d747fd639e853bfc826eea4a040d6 fix(vr): scope R32 ACK cache to game run [AUTO:CONVERSION-DX9EX-00431]",
+        "3e3c53a1b3185474892017c734b0804b5a71a7f6 test(vr): guard R32 ACK run identity [AUTO:CONVERSION-DX9EX-00431]",
+        "57899f49f7fed02b396e0e609e4b51cff153db49 test(vr): narrow ACK reuse verifier branch [AUTO:CONVERSION-DX9EX-00431]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Artifact 11377715285 OutRun2-VR-DX9EX-ACTIVE-57899f49f7fed02b396e0e609e4b51cff153db49 digest sha256:e6c1883882bb403ca90df0ae9d86e5b29f7cd7a90efbc7b5073e9d61fb2d2354. CI evidence only; not HMD proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "superseded_source_run": {
+      "run_id": 37384233976,
+      "exact_sha": "af7dbe050e4d747fd639e853bfc826eea4a040d6",
+      "conclusion": "cancelled",
+      "classification": "SUPERSEDED_BY_NEWER_TASK_TAGGED_PUSH",
+      "attempt_consumed": false
+    },
+    "intermediate_false_negative": {
+      "run_id": 37384265643,
+      "exact_sha": "3e3c53a1b3185474892017c734b0804b5a71a7f6",
+      "conclusion": "failure",
+      "classification": "VERIFIER_FALSE_NEGATIVE_ORDER_ONLY"
+    },
+    "dx9ex_active": {
+      "run_id": 37384420695,
+      "conclusion": "success",
+      "exact_sha": "57899f49f7fed02b396e0e609e4b51cff153db49",
+      "jobs": {
+        "policy": 112014053033,
+        "full_chain_compile": 112014192640,
+        "host": 112014192746,
+        "game": 112014192767,
+        "package": 112015817049
+      },
+      "package_artifact_id": 11377715285,
+      "package_artifact_digest": "sha256:e6c1883882bb403ca90df0ae9d86e5b29f7cd7a90efbc7b5073e9d61fb2d2354"
+    },
+    "domain_isolation": {
+      "run_id": 37384420959,
+      "conclusion": "success",
+      "exact_sha": "57899f49f7fed02b396e0e609e4b51cff153db49"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Audit the small TOCTOU window between the first fresh-bundle identity observation and the second fresh-bundle read used by CanFastSubmit; make ArmConsumptionFence bind its cache decision to the exact frame identity it is about to protect.",
+  "completed_at_kst": "2026-10-06T07:50:25+09:00"
+}
