@@ -49,6 +49,19 @@ namespace WheelFFBMath
                model == Model::PS2OriginalExperimental;
     }
 
+    // R10: polarity is part of the model contract on the tested MOZA R3 path.
+    // Keeping it model-owned prevents profile/manual state from leaving Modern
+    // and the Original modes with each other's force direction.
+    inline bool model_invert_force(Model model)
+    {
+        return model == Model::ModernDD;
+    }
+
+    inline bool model_invert_spring(Model model)
+    {
+        return model == Model::ModernDD;
+    }
+
     // Boomslangnz/FFBArcadePlugin OutRun2Real.cpp derives a 10%-step
     // SpeedStrength from Lindbergh's speed value: 0.1..80=>10%, 80.1..130=>20%,
     // 130.1..180=>30%, 180.1..220=>40%, 220.1..270=>50%, 270.1..320=>60%,
@@ -364,6 +377,53 @@ namespace WheelFFBMath
     // water material even while every wheel is on the ordinary primary road.
     // Treat only the unambiguous all-four / collision-context-zero case as the
     // primary-asphalt false positive. Actual mixed/water contacts remain intact.
+    constexpr unsigned ImperialStoneSurfaceMask = 0x00000800u;
+
+    inline float imperial_stone_paving_coverage(
+        int uniqueStage,
+        int collisionContext,
+        const std::array<unsigned, 4>& masks)
+    {
+        if (uniqueStage != 14 || collisionContext != 0)
+            return 0.0f;
+
+        int stone = 0;
+        for (unsigned mask : masks)
+        {
+            if (mask == ImperialStoneSurfaceMask)
+                ++stone;
+            else if (mask != PrimaryAsphaltSurfaceMask)
+                return 0.0f;
+        }
+        // All-0x2 is the R9 false-water primary asphalt case; stone texture only
+        // exists when at least one wheel is on the observed 0x800 paving.
+        return stone > 0 ? static_cast<float>(stone) / 4.0f : 0.0f;
+    }
+
+    inline float imperial_stone_paving_amplitude(
+        float coverage,
+        float speedNorm,
+        float roadSetting,
+        float outputStrength)
+    {
+        if (!std::isfinite(coverage) || !std::isfinite(speedNorm) ||
+            !std::isfinite(roadSetting) || !std::isfinite(outputStrength))
+            return 0.0f;
+
+        coverage = std::clamp(coverage, 0.0f, 1.0f);
+        const float speedGate = smoothstep01(
+            (std::clamp(speedNorm, 0.0f, 1.0f) - 0.07f) / 0.23f);
+        const float roadScale = std::clamp(roadSetting / 0.60f, 0.0f, 1.67f);
+        const float gainScale = std::clamp(outputStrength / 0.70f, 0.0f, 2.0f);
+        // A full-width cobble road must remain recognizable but never return to
+        // R8's overpowering full-stage vibration. 2-wheel coverage lands around
+        // 5-6% command at the R3 baseline; full coverage stays below 9%.
+        return std::clamp(
+            (0.035f + 0.050f * coverage) * speedGate *
+                roadScale * gainScale,
+            0.0f, 0.09f);
+    }
+
     inline bool primary_asphalt_water_false_positive(
         int uniqueStage,
         int collisionContext,
@@ -483,6 +543,47 @@ namespace WheelFFBMath
         const float h01 = -2.0f * t3 + 3.0f * t2;
         const float y = h00 * Knee + h10 * span + h01;
         return sign * y;
+    }
+
+    inline float drift_caster_follow_assist(
+        float rawFrontSlip,
+        float bodySlip,
+        float speedNorm,
+        float mechanicalTrailRatio)
+    {
+        if (!std::isfinite(rawFrontSlip) || !std::isfinite(bodySlip) ||
+            !std::isfinite(speedNorm) || !std::isfinite(mechanicalTrailRatio))
+            return 0.0f;
+
+        // A real drifting front axle tends to roll into the direction its contact
+        // patches are travelling. rawFrontSlip is road-wheel angle minus that
+        // free-rolling target, so the restoring direction is always -rawFrontSlip.
+        // Activate only in substantial chassis slip; normal corner SAT is untouched.
+        const float slide = smoothstep01(
+            (std::abs(bodySlip) - 0.12f) / 0.30f);
+        const float targetError = smoothstep01(
+            (std::abs(rawFrontSlip) - 0.05f) / 0.25f);
+        const float speedGate = smoothstep01(
+            (std::clamp(speedNorm, 0.0f, 1.0f) - 0.10f) / 0.30f);
+        const float trail =
+            std::clamp(mechanicalTrailRatio, 0.0f, 0.60f) / 0.60f;
+        const float magnitude =
+            (0.12f + 0.10f * trail) * slide * targetError * speedGate;
+        if (magnitude <= 0.0f)
+            return 0.0f;
+        return rawFrontSlip > 0.0f ? -magnitude : magnitude;
+    }
+
+    inline float modern_drift_spring_scale(float bodySlip)
+    {
+        if (!std::isfinite(bodySlip))
+            return 1.0f;
+        const float slide = smoothstep01(
+            (std::abs(bodySlip) - 0.10f) / 0.28f);
+        // The artificial centre spring should almost disappear during a real
+        // oversteer slide so caster/trail can carry the wheel through centre
+        // into countersteer instead of stopping at the car's heading.
+        return 1.0f - 0.92f * slide;
     }
 
     inline float physics_return_relief(float alpha, float steerRate)
