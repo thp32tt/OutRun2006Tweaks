@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION46-PREFLIGHT",
+  "index": 133,
+  "asset": "25F697C6",
+  "readiness": "ONE_STAGE_TO_RENDER_BINDING_VISUALIZED",
+  "source": {
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "blob_sha1": "5263429e689933e1ebb5923773e5adc1a2e2b7e5",
+    "sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04"
+  },
+  "atlas": {
+    "blob_sha1": "00638ecb71316b9cf2a9d171053698c2296cf061",
+    "sha256": "7f4fa4543810bc2f1f665f26ba8270573fa0bd7badb0643f3c014398483990fa",
+    "regions": 24
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "orientation": "mirror_y"
+  },
+  "required_semantics": [
+    "ALPINE",
+    "ANCIENT RUINS",
+    "BLU MIRABEAU",
+    "ARGENTO NURBURGRING",
+    "BIANCO AVUS",
+    "NERO",
+    "ROSSO SCUDERIA",
+    "GRIGIO ALLOY",
+    "GIALLO MODENA"
+  ],
+  "protected": "Ferrari/model names and non-target artwork",
+  "runtime_validation": "UNTESTED",
+  "status": "A46_BINDING_CONTACT_READY_CONTINUE_SAME_INVOCATION"
+}
