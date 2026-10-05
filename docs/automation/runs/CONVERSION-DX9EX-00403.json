@@ -1,0 +1,136 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00403",
+  "production_id": "CONVERSION-DX9EX-00403",
+  "event_id": "CONVERSION-DX9EX-00403-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "queue_controller_contract": {
+    "path": "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "status": "APPLIED"
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "8fa7a10f3f9a13d2bc5ccce29a2cbbd82cddb520",
+  "source_material_sha": "4811ab9d53b5c7ee7a60b8789916b0a6abe74c69",
+  "result_sha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+  "material_result_sha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+  "validation_bearing_result_sha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+  "state_commit_sha": "5e67987d1cf007bf45f6669915b4fa975104aa29",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00403]",
+  "selected_work_item": "VR-REFACTOR-POST1100-R31-R32-RETIREMENT-PRECONDITION-GUARD-0012",
+  "summary": "Added a bounded fail-closed proof gate before any physical R31/R32 hook-layer retirement. The verifier freezes the currently required install fallback, Reset/Present/DirectGPU chain, StateBlock coverage/fallback and final lower-R29 ownership so a later flattening cannot silently remove behavior-bearing layers. The task changes verification/workflow/state only; no runtime rendering path, hook target, draw math, resource lifetime, copy/wait/lock or OpenXR behavior was changed. Physical retirement remains explicitly DEFERRED.",
+  "changed_paths": [
+    "tools/verify_vr_r31_r32_retirement_guard.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00403.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read latest vr-d3d9ex-focus HEAD, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, VR_REFACTOR_STATE, VR_AUTODEV_STATE, VR_PROBLEM_HISTORY, VR_REGRESSION_KNOWLEDGE and Issue #14. 00402 was recovered as COMPLETE at 8fa7a10f3f9a13d2bc5ccce29a2cbbd82cddb520; 00403 had no prior run record or task commit."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Full physical R31/R32 retirement is not yet a mechanical equivalence change. R31 still owns R30-successor draw hooks plus fallback StateBlock hooks; R32 still owns R22 Reset post-processing, R13 Present/DirectGPU interception and R31 draw interception; R33 still targets R32 physical entry points while its final fallback passes through R32LowerFailClosed and R30-owned lower-R29 calls."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "4811ab9d53b5c7ee7a60b8789916b0a6abe74c69 added tools/verify_vr_r31_r32_retirement_guard.py. The guard pins the four required retirement precondition families and intentionally requires canonical DX9Ex Active workflow ownership. 8b1bd6b3b6d726bec3e478ac2862bde80916a254 added the verifier to workflow path filters and the architecture verification step."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "TDD RED at 4811ab9d53b5c7ee7a60b8789916b0a6abe74c69 exited 1 only because DX9Ex Active did not yet list/invoke the new verifier. N100 exact 8b1bd6b3b6d726bec3e478ac2862bde80916a254 then passed py_compile, retirement guard, architecture, R51 runtime contract, R32-R34 compatibility/Present, hook graph, refactor contract, Sumo replay semantic contract, near-plane gate and workflow YAML. GitHub exact-SHA DX9Ex Active 37268342455 policy/host/game/full-chain-compile/package SUCCESS; Domain Isolation Guard 37268342567 SUCCESS."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "source_material_sha": "4811ab9d53b5c7ee7a60b8789916b0a6abe74c69",
+      "result_sha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+      "validation_bearing_result_sha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+      "task_tagged_commits": [
+        "4811ab9d53b5c7ee7a60b8789916b0a6abe74c69 test(vr): pin R31 R32 retirement preconditions [AUTO:CONVERSION-DX9EX-00403]",
+        "8b1bd6b3b6d726bec3e478ac2862bde80916a254 ci(vr): gate R31 R32 retirement preconditions [AUTO:CONVERSION-DX9EX-00403]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Artifact 11326909994 OutRun2-VR-DX9EX-ACTIVE-8b1bd6b3b6d726bec3e478ac2862bde80916a254 digest sha256:b81eb674a40841b5408f09e6e70576662a3b8b171c83b11f1237049847ebd36b size 2730691 bytes. Build artifact is not runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "state_commit_sha": "5e67987d1cf007bf45f6669915b4fa975104aa29",
+      "issue14_update": "RECORDED",
+      "issue14_comment_id": 5988809644,
+      "issue13_update": "NOT_REQUIRED_NO_RUNTIME_BEHAVIOR_CHANGE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "evidence": {
+    "red": {
+      "sha": "4811ab9d53b5c7ee7a60b8789916b0a6abe74c69",
+      "n100": "FAIL_EXPECTED_WORKFLOW_OWNERSHIP_MISSING"
+    },
+    "dx9ex_active": {
+      "run_id": 37268342455,
+      "conclusion": "success",
+      "exact_sha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+      "jobs": {
+        "policy": 111629818012,
+        "host": 111629975614,
+        "game": 111629975647,
+        "full_chain_compile": 111629975679,
+        "package": 111631323827
+      },
+      "artifact_id": 11326909994,
+      "artifact_digest": "sha256:b81eb674a40841b5408f09e6e70576662a3b8b171c83b11f1237049847ebd36b"
+    },
+    "domain_isolation": {
+      "run_id": 37268342567,
+      "conclusion": "success",
+      "exact_sha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254"
+    },
+    "n100_local": {
+      "conclusion": "AUXILIARY_EXACT_SHA_STATIC_PASS",
+      "exact_sha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+      "checks": [
+        "py_compile retirement verifier",
+        "R31/R32 retirement precondition guard",
+        "architecture",
+        "R51 runtime contract",
+        "R32-R34 compatibility/Present",
+        "hook graph",
+        "refactor contract",
+        "Sumo replay semantic contract",
+        "near-plane active gate",
+        "DX9Ex Active workflow YAML"
+      ]
+    }
+  },
+  "next_action": "Do not physically remove or retarget R31/R32 hooks unless a future bounded task provides an atomic replacement and updates the retirement guard with fail-before/pass-after evidence proving preservation of install fallback, Reset/Present/DirectGPU, StateBlock coverage and lower-R29 fallback. With no such mechanical replacement proven in 00403, retirement remains DEFERRED; return to explicit DX9Ex maintenance/regression work until new source evidence supports the next structural step.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00403",
+    "production_id": "CONVERSION-DX9EX-00403",
+    "event_id": "CONVERSION-DX9EX-00403-E001",
+    "event_type": "dispatch",
+    "lane": "DX9EX",
+    "target_branch": "vr-d3d9ex-focus",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+    "validation_bearing_result_sha": "8b1bd6b3b6d726bec3e478ac2862bde80916a254",
+    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
+    "runtime_validation": "UNTESTED"
+  },
+  "validated_at_kst": "2026-10-05T14:41:00+09:00",
+  "completed_at_kst": "2026-10-05T14:42:22+09:00"
+}
