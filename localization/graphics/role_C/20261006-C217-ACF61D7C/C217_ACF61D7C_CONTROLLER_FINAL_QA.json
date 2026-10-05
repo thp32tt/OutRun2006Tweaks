@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-06T00:46:00+09:00",
+  "role": "C",
+  "run": "20261006-C217-ACF61D7C",
+  "qa_id": "C217",
+  "queue_index": 205,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+  "producer_run": "20261006-A-PRODUCTION76-ACF",
+  "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+  "candidate_sha256": "2bbb9d19a833fb6c9ade243eb70132ef5ce46150d1fa1cb9423ff4e5101b770c",
+  "supersedes": [
+    "C214 machine QA on A72: invalid product-token/edge-strip binding; A73 corrected geometry",
+    "C216 worker revalidation on A75: superseded before reconciliation by A76 source-scale refinement"
+  ],
+  "structure": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "machine_status": "PASS",
+  "physical_rows": 23,
+  "bbox_gate": "23/23 localized bbox exact-match, containment/size ceiling/positive margin PASS",
+  "machine_checks": {
+    "decoded_changed_outside_union_producer_rows": 0,
+    "alpha_changed_outside_union_producer_rows": 0,
+    "introduced_visible_outside_union_producer_rows": 0,
+    "protected_full_region_changed_pixels": 0,
+    "protected_inline_token_changed_pixels": 0,
+    "token_relation_failures": 0,
+    "localized_bbox_clean_to_final_mismatches": 0,
+    "source_exact_residue_outside_localized_bboxes": 0
+  },
+  "independent_product_token_geometry": {
+    "OutRun idx8": "pixel-exact; Korean descriptor remains after token",
+    "OutRun idx12": "pixel-exact middle token; Korean pieces remain on intended sides",
+    "OutRun2SP idx10": {
+      "independent_phrase_bbox": [
+        1807,
+        909,
+        2696,
+        975
+      ],
+      "token_bbox": [
+        2356,
+        909,
+        2696,
+        964
+      ],
+      "localized_bbox": [
+        2032,
+        914,
+        2348,
+        970
+      ],
+      "token_changed_pixels": 0,
+      "localized_inside_true_phrase_bbox": true,
+      "localized_before_token": true,
+      "detached_edge_strip_excluded": "[3599,986,3600,1044] alpha artifact is outside phrase geometry"
+    }
+  },
+  "protected_policy": "PASS_PIXEL_EXACT",
+  "protected_examples": [
+    "OutRun2SP logo",
+    "PSP purchase/system message",
+    "Radiation",
+    "Night Bird",
+    "Magical Sound Shower",
+    "Passing Breeze",
+    "Life Was A Bore",
+    "Splash Wave",
+    "Shiny World",
+    "Night Flight",
+    "Risky Ride",
+    "START",
+    "This Item Costs",
+    "VOICE: ON",
+    "NORMAL",
+    "TUNED/NORMAL MT/AT",
+    "NATIONALITY",
+    "OR artwork"
+  ],
+  "controller_visual_qa": "PASS",
+  "controller_visual_findings": [
+    "A76 resolves the A72/A73 product-token geometry defect and A75 source-scale weakness. Dark main rows now use a source-height family at 56/66px (~0.85) with natural 0px tracking and no horizontal glyph distortion.",
+    "CONGRATULATIONS is independently restored to 72/82px height (~0.88); OPTIONS/RANKINGS retain the large red heading family at ~0.92-0.94 source height, with the serif treatment matching the source hierarchy more closely.",
+    "Exchange line 1 is restored to 48/57px height (~0.84) while preserving the original OutRun token. YES/NO intentionally share one Korean family; NO is width-constrained at 68/76px, so the common 32/53px height is accepted rather than distorting the three-syllable Korean word.",
+    "SOURCE/CLEAN/FINAL risk contacts and region10 review show no source-script ghost, seam, clipping, overlap, alpha halo, token damage or detached-edge misuse. Raw mirror_y evidence preserves canonical orientation and all protected artwork."
+  ],
+  "decision": "C217_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED",
+  "machine_report": "localization/graphics/role_C/20261006-C217-ACF61D7C/C217_ACF61D7C_MACHINE_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261006-C217-ACF61D7C/C217_ACF_RISK_CONTACTS.jpg",
+    "localization/graphics/role_C/20261006-C217-ACF61D7C/C217_ACF_REGION10.jpg",
+    "localization/graphics/role_C/20261006-C217-ACF61D7C/C217_ACF_RAW_COMPARE.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION76-ACF/A76_ACF_TARGET_CONTACTS.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION76-ACF/A76_ACF_SOURCE_CLEAN_FINAL.jpg"
+  ],
+  "exclusions": "Completed prior PASS assets were not reopened. Index95 37759842 had no newer candidate and was not repeated. VR/FFB/DX11/DXVK untouched."
+}
