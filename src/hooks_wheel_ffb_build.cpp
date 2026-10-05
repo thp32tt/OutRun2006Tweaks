@@ -59,7 +59,7 @@ namespace Settings
     Setting<int> WheelFFBFeelRevision{
         "WheelFFB", "FeelRevision", 0,
         "Internal one-shot migration version for wheel FFB feel defaults.",
-        Range<int>{ 0, 7 }
+        Range<int>{ 0, 8 }
     };
 }
 
@@ -196,10 +196,11 @@ namespace
 
     // Direct Stage.zip/COLI0200 analysis proves material 0x14 / mask
     // 0x100000 is PRIMARY road in these exact forward-stage ranges.
-    // Keep them out of generic curb/shoulder classification. Floral Village
-    // retains the tested 0.60 comfort attenuation; Deep Lake/Tulip keep normal
-    // Road Detail until hardware A/B justifies any stage-specific attenuation.
-    constexpr float FloralVillageRoughPavingScale = 0.60f;
+    // Keep them out of generic curb/shoulder classification. R10 relaxes the
+    // Floral Village comfort attenuation from 0.60 to 0.72 so the long stone
+    // paving remains identifiable without returning to the overpowering level.
+    constexpr float FloralVillageRoughPavingScale =
+        WheelFFBMath::FloralVillageRoughPavingScale;
 
     bool is_proven_primary_rough_road(
         const StageSurfaceContext& stage,
@@ -625,7 +626,9 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                     sawSnowDisqualifier = true;
             }
             const bool snowPrimaryRoad = sawSnowPrimary && !sawSnowDisqualifier;
-            const float coreStageScale = snowPrimaryRoad ? 0.04f : 1.0f;
+            const float coreStageScale = snowPrimaryRoad
+                ? WheelFFBMath::SnowPrimaryRoadTextureScale
+                : 1.0f;
 
             desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
             const float envelope =
@@ -954,6 +957,21 @@ namespace
                 changed = true;
             }
 
+            if (revision < 8)
+            {
+                // R10 persists the same model-owned polarity that the runtime
+                // now self-heals on every actual model transition.
+                const auto model = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                Settings::WheelFFBInvertForce =
+                    WheelFFBMath::model_default_invert_force(model);
+                Settings::WheelFFBInvertSpring =
+                    WheelFFBMath::model_default_invert_spring(model);
+                Settings::WheelFFBFeelRevision = 8;
+                revision = 8;
+                changed = true;
+            }
+
             if (!changed)
                 return true;
 
@@ -965,6 +983,11 @@ namespace
                 spdlog::warn(
                     "WheelFFBFeelRetune: applied revision {} for this session but could not persist user.ini",
                     revision);
+            }
+            else if (revision >= 8)
+            {
+                spdlog::info(
+                    "WheelFFBFeelRetune: applied revision 8 (R10 model-owned polarity persistence and tactile snow/rough-road retune)");
             }
             else if (revision >= 5)
             {
@@ -1085,7 +1108,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_physics_preset();
-                    Settings::WheelFFBFeelRevision = 7;
+                    Settings::WheelFFBFeelRevision = 8;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
@@ -1101,7 +1124,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_natural_preset();
-                    Settings::WheelFFBFeelRevision = 7;
+                    Settings::WheelFFBFeelRevision = 8;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
