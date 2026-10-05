@@ -558,11 +558,33 @@ require(
 )
 
 arm_ack = body(host_submit, "inline bool ArmConsumptionFence(")
+arm_identity_prefix = """const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        const std::uint32_t gamePid = frame.clientPid;
+        if (slot >= Pending.size() || !generation || !runGeneration || !gamePid)
+            return false;"""
 require(
     arm_ack,
-    "pending EVENT complete run identity",
-    "RenderFrameRunGenerationIndex",
+    "ArmConsumptionFence complete frame identity",
+    arm_identity_prefix,
+    "ObserveAckIdentity(frame);",
+    "ActiveAckGeneration != generation",
+    "ActiveAckRunGeneration != runGeneration",
+    "ActiveAckGamePid != gamePid",
     "pending.frame.clientPid == frame.clientPid",
+)
+require_order(
+    arm_ack[arm_ack.find(arm_identity_prefix):],
+    "ArmConsumptionFence exact-frame identity before ACK cache read",
+    arm_identity_prefix,
+    "ObserveAckIdentity(frame);",
+    "ActiveAckGeneration != generation",
+    "ActiveAckRunGeneration != runGeneration",
+    "ActiveAckGamePid != gamePid",
+    "!EnsureFence(slot)",
+    "AckedGeneration[slot] == generation",
 )
 pending_reuse = """if (pending.armed &&
             pending.frame.frameId == frame.frameId &&

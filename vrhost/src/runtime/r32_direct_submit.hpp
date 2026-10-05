@@ -260,7 +260,23 @@ namespace OutRunVrR32DirectSubmit
             frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
         const std::uint32_t generation =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        if (slot >= Pending.size() || !generation || !EnsureFence(slot))
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        const std::uint32_t gamePid = frame.clientPid;
+        if (slot >= Pending.size() || !generation || !runGeneration || !gamePid)
+            return false;
+
+        // EndFrame reads the verified bundle twice: once to classify pending
+        // completions, then again for the actual projection submission. A game
+        // restart can publish a new run between those reads while reusing the
+        // same slot/frame/transport-generation values. Rebind the ACK cache to
+        // the exact frame we are about to protect before consulting any cached
+        // completion or pending-EVENT state.
+        ObserveAckIdentity(frame);
+        if (ActiveAckGeneration != generation ||
+            ActiveAckRunGeneration != runGeneration ||
+            ActiveAckGamePid != gamePid ||
+            !EnsureFence(slot))
             return false;
 
         if (AckedGeneration[slot] == generation &&
@@ -471,8 +487,9 @@ namespace OutRunVrR32DirectSubmit
     inline XrResult XRAPI_CALL EndFrame(
         XrSession session, const XrFrameEndInfo* endInfo) noexcept
     {
-        // Learn the newest committed DirectGPU generation before polling older
-        // EVENT queries. This closes the reset/recreation ACK rollback window.
+        // Learn the newest committed DirectGPU run identity before polling
+        // older EVENT queries. ArmConsumptionFence rebinds once more to the
+        // exact submission snapshot to close the double-ReadFresh TOCTOU window.
         OutRunVrR23VerifiedBundle::Snapshot observed{};
         if (OutRunVrR23VerifiedBundle::ReadFresh(observed) &&
             observed.kind ==
