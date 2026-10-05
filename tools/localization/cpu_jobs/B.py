@@ -17,7 +17,7 @@ candidate=repo/"localization/graphics/hd_candidates"/asset
 candidate.parent.mkdir(parents=True,exist_ok=True)
 
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
-SOURCE_SHA="e02db9b4e04747e2a74295e8f5a01e07f0ed88d31832f4169b1e5996bc30f1eb"
+SOURCE_SHA="cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a"
 BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
 tmp=Path("/tmp/outrun_B156"); tmp.mkdir(parents=True,exist_ok=True)
 dds=tmp/"JENN_HD.dds"; atlas=tmp/"JENN_HD_atlas.json"
@@ -176,7 +176,7 @@ save_b64(rr,out/"B156_JENN_RAW_COMPARE.jpg",out/"B156_JENN_RAW_COMPARE_B64.txt",
 
 report={
  "schema_version":1,"role":"B","run":run,"queue_index":36,"asset":asset,
- "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"upstream_release_filename":"6AB5CEE_1024x1024.dds","queue_hd_alias":"06AB5CEE_1024x1024.dds","source_sha256":SOURCE_SHA},
+ "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"upstream_release_filename":"6AB5CEE_1024x1024.dds","queue_hd_alias":"06AB5CEE_1024x1024.dds","inventory_archive_sha256":"e02db9b4e04747e2a74295e8f5a01e07f0ed88d31832f4169b1e5996bc30f1eb","source_sha256":SOURCE_SHA},
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"header_128_exact":payload[:128]==sb[:128],"raw_orientation":"mirror_y"},
  "classification":{"prior_action":"zoom_review","localizable":"Total Rank","translation":"종합 랭킹","protected":["Jennifer character artwork","lens flare","rank letters A/B/C/D/E","heart/cross UI"]},
  "template_provenance":{"producer":"B148","final_qa":"C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME","template_asset":"8215FD25","source_cell":src_cell,"target_cell":dst_cell,"shift":[dx,dy],
