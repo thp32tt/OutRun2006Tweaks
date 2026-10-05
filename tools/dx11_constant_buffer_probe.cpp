@@ -306,6 +306,69 @@ int main()
 
     DevicePair d3d = create_warp_device();
 
+    const DWORD r264VsTokens[] = {
+        D3DVS_VERSION(3, 0),
+        0x0000FFFFu,
+    };
+    const DWORD r264PsTokens[] = {
+        D3DPS_VERSION(3, 0),
+        0x0000FFFFu,
+    };
+    const auto r264VsEvidence =
+        outrun::vr::dx11::
+            capture_programmable_shader_function_source_evidence(
+                r264VsTokens, sizeof(r264VsTokens), true);
+    const auto r264PsEvidence =
+        outrun::vr::dx11::
+            capture_programmable_shader_function_source_evidence(
+                r264PsTokens, sizeof(r264PsTokens), false);
+    const ProgrammableShaderFunctionIdentity r264VsIdentity{
+        true,
+        true,
+        r264VsEvidence.byteSize,
+        r264VsEvidence.versionToken,
+        r264VsEvidence.bytecodeHash,
+    };
+    const ProgrammableShaderFunctionIdentity r264PsIdentity{
+        true,
+        true,
+        r264PsEvidence.byteSize,
+        r264PsEvidence.versionToken,
+        r264PsEvidence.bytecodeHash,
+    };
+    require(
+        r264VsEvidence.exact() &&
+        r264PsEvidence.exact() &&
+        r264VsEvidence.tokens.size() == 2u &&
+        r264PsEvidence.tokens.size() == 2u &&
+        outrun::vr::dx11::
+            validate_programmable_shader_function_source_evidence(
+                r264VsEvidence, r264VsIdentity, true) &&
+        outrun::vr::dx11::
+            validate_programmable_shader_function_source_evidence(
+                r264PsEvidence, r264PsIdentity, false),
+        "R264 captures exact programmable shader source bytecode evidence");
+
+    auto r264DriftedVsIdentity = r264VsIdentity;
+    r264DriftedVsIdentity.bytecodeHash ^= 1ull;
+    const auto r264WrongStageEvidence =
+        outrun::vr::dx11::
+            capture_programmable_shader_function_source_evidence(
+                r264VsTokens, sizeof(r264VsTokens), false);
+    const auto r264MisalignedEvidence =
+        outrun::vr::dx11::
+            capture_programmable_shader_function_source_evidence(
+                r264VsTokens,
+                static_cast<UINT>(sizeof(r264VsTokens) - 1u),
+                true);
+    require(
+        !outrun::vr::dx11::
+            validate_programmable_shader_function_source_evidence(
+                r264VsEvidence, r264DriftedVsIdentity, true) &&
+        !r264WrongStageEvidence.exact() &&
+        !r264MisalignedEvidence.exact(),
+        "R264 rejects source identity drift, wrong-stage bytecode, and misaligned payloads");
+
     const ProgrammableShaderFunctionIdentity programmableVs{
         true,
         true,
