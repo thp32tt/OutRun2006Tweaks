@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C157-8C259C68",
+  "timestamp_kst": "2026-10-05T12:28:52+09:00",
+  "queue_index": 188,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+  "scope": "new B_PRODUCTION81/B82 corrective candidate only; completed prior PASS assets not repeated",
+  "producer_run": "20261005-B-PRODUCTION81",
+  "source_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+  "candidate_sha256": "03f52892acd091496c53c19a0a48c2f9c2d1acf9b05d9f96801ff4032e756b03",
+  "candidate_changed_by_C": false,
+  "independent_machine_qa": {
+    "report": "localization/graphics/role_C/20261005-C157-8C259C68/C157_8C_MACHINE_QA.json",
+    "status": "PASS",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "canonical_source_and_atlas_redownloaded": true,
+    "producer_masks_consumed": false,
+    "clean_changed_outside_source_mask": 0,
+    "clean_unchanged_inside_source_mask": 0,
+    "clean_protected_changed": 0,
+    "clean_alpha_changed_outside_source_mask": 0,
+    "bbox_size_positive_margin": "6/6 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "target_protected_overlap": 0,
+    "target_protected_1px_near": 0,
+    "overlap": 0,
+    "touch_pairs": [],
+    "source_fill_median_rgb": [
+      63,
+      71,
+      74
+    ],
+    "localized_fill_median_rgb": [
+      63,
+      71,
+      74
+    ],
+    "fill_median_abs_delta": [
+      0,
+      0,
+      0
+    ]
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "semantic_binding": "PASS_CORRECT_READABLE_ROW_ORDER",
+    "source_style": "PASS_SHARED_DARK_GRAY_BOLD_HELP_COPY_FAMILY",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "residue": "NONE_VISIBLE",
+    "seam_or_halo": "NONE_VISIBLE",
+    "orientation_regression": "NONE_VISIBLE"
+  },
+  "decision": "C157_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "producer_rework_remaining": [
+    "C598919A"
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94",
+    "49BB5FE5",
+    "75C3586A"
+  ],
+  "pending_production_localize_text": 25,
+  "in_game_validation": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
