@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION89",
+  "timestamp_kst": "2026-10-05T13:20:00+09:00",
+  "index": 222,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+  "source_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+  "superseded_attempts": [
+    {
+      "run": "B87",
+      "decision": "WORKER_FAIL_GATE_BUG",
+      "reason": "visible_out counted preserved source rows even though decoded RGBA diff outside target bboxes was 0"
+    },
+    {
+      "run": "B88",
+      "candidate_sha256": "c23b2494e3c621399b19790fbcc3f07c7dc46d9ff22e53d71a6195a53ad733a3",
+      "decision": "CONTROLLER_VISUAL_REWORK",
+      "reason": "Hangul source-family scale was too small; 32px render replaced by B89 36px while retaining positive margins"
+    }
+  ],
+  "candidate_sha256": "e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea",
+  "machine_qa": {
+    "dimensions": [
+      1024,
+      2048
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_exact": true,
+    "raw_orientation": "mirror_y",
+    "localized_elements": 3,
+    "bbox_size_positive_margin": "3/3 PASS",
+    "clean_validator": "PASS",
+    "final_validator": "PASS",
+    "source_residue": 0,
+    "decoded_changed_outside_exact_bboxes": 0,
+    "alpha_outside": 0,
+    "introduced_visible_outside": 0,
+    "protected_rows_3_24_changed_pixels": 0,
+    "changed_blocks_outside_patch": 0
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "semantic_binding": "PASS",
+    "source_style": "PASS",
+    "song_title_policy": "PASS",
+    "observations": [
+      "Only the three functional mode rows are localized: OutRun Mode / 15 C., OutRun 1986, Journey Mode / Random.",
+      "Known song titles Who Are You?, Splash Wave, Shiny World, Shake The Street, Rush A Difficulty, Risky Ride and Passing Breeze remain original English pixel-exact.",
+      "Ferrari model-name rows remain pixel-exact. B89 36px shared Black Hangul better matches the source family scale than B88 while staying inside every exact source bbox with positive margins.",
+      "No visible English residue, clipping, overlap, seam, halo, protected-row change or raw mirror_y regression."
+    ]
+  },
+  "decision": "B89_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
