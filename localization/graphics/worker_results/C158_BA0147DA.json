@@ -1,0 +1,134 @@
+{
+  "run": "20261005-C158-BA0147DA",
+  "asset": "BA0147DA",
+  "index": 212,
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "candidate_sha256": "869cf1bea8b27dcc89f5b2ab68f9dd163e4bf41fa6de4b53c7b3f19b3b1c74ad",
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "12/12",
+  "source_alignment_anchor": "12/12",
+  "clean_outside": 0,
+  "clean_unchanged_inside": 0,
+  "clean_protected": 0,
+  "outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "render_outside_target": 0,
+  "source_residue": 0,
+  "target_protected_overlap": 0,
+  "target_protected_1px_near": 0,
+  "overlap": 0,
+  "touch_pairs": 0,
+  "style_checks": {
+    "dark_done_large": {
+      "source_fill_median_rgb": [
+        60,
+        71,
+        74
+      ],
+      "localized_fill_median_rgb": [
+        60,
+        71,
+        74
+      ],
+      "fill_median_abs_delta": [
+        0,
+        0,
+        0
+      ],
+      "status": "PASS"
+    },
+    "dark_done_small": {
+      "source_fill_median_rgb": [
+        60,
+        71,
+        74
+      ],
+      "localized_fill_median_rgb": [
+        60,
+        71,
+        74
+      ],
+      "fill_median_abs_delta": [
+        0,
+        0,
+        0
+      ],
+      "status": "PASS"
+    },
+    "dark_menu": {
+      "source_fill_median_rgb": [
+        63,
+        71,
+        74
+      ],
+      "localized_fill_median_rgb": [
+        63,
+        71,
+        74
+      ],
+      "fill_median_abs_delta": [
+        0,
+        0,
+        0
+      ],
+      "status": "PASS"
+    },
+    "orange_prof": {
+      "source_fill_median_rgb": [
+        241,
+        147,
+        49
+      ],
+      "localized_fill_median_rgb": [
+        241,
+        147,
+        49
+      ],
+      "fill_median_abs_delta": [
+        0,
+        0,
+        0
+      ],
+      "status": "PASS"
+    },
+    "red_big": {
+      "source_fill_median_rgb": [
+        186,
+        0,
+        0
+      ],
+      "localized_fill_median_rgb": [
+        186,
+        0,
+        0
+      ],
+      "fill_median_abs_delta": [
+        0,
+        0,
+        0
+      ],
+      "status": "PASS"
+    },
+    "red_small": {
+      "source_fill_median_rgb": [
+        186,
+        0,
+        0
+      ],
+      "localized_fill_median_rgb": [
+        186,
+        0,
+        0
+      ],
+      "fill_median_abs_delta": [
+        0,
+        0,
+        0
+      ],
+      "status": "PASS"
+    }
+  },
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_C/20261005-C158-BA0147DA/C158_BA_MACHINE_QA.json"
+}
