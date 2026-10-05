@@ -42,11 +42,10 @@ The main steering model contains:
 
 ### Selectable force models
 
-The standalone branch now exposes four models through the same DirectInput safety/output layer:
+The standalone branch now exposes three models through the same DirectInput safety/output layer:
 
 - **Modern DD Physics** — current front-slip/yaw SAT and DD-oriented transient model;
 - **Arcade Original (Lindbergh-derived)** — full-speed condition/spring servo-style backbone (OutRun2Real reference 0.50, damper reference OFF) plus directional wall, surface-transition and rough-surface behavior reconstructed from the public Lindbergh drive-board interception;
-- **Arcade + Modern Hybrid** — Modern DD SAT with the arcade event/surface semantics;
 - **PS2 Original topology (Experimental)** — verified PS2 Condition/Constant/Periodic effect topology without claiming still-unknown payload fields as original values. A separate PS2 Host Gain keeps 1.00x as the retail-reference translation while the F11 shortcut uses 2.00x DD compensation.
 
 Xbox controller vibration is not exposed as a wheel model. See `docs/reverse/FFB_MODEL_MODES.md` for evidence boundaries and mapping details.
@@ -168,11 +167,10 @@ v0.1은 주로 **MOZA R3**를 기준으로 개발했으며 기본 검증 경로�
 
 ### 선택 가능한 FFB 모델
 
-독립 FFB 브랜치는 동일한 DirectInput 안전/출력 계층 위에서 네 가지 모델을 선택할 수 있습니다.
+독립 FFB 브랜치는 동일한 DirectInput 안전/출력 계층 위에서 세 가지 모델을 선택할 수 있습니다.
 
 - **Modern DD Physics** — 현재의 front-slip/yaw SAT 및 현대 DD용 transient 모델
 - **Arcade Original (Lindbergh-derived)** — 공개 Lindbergh drive-board interception에서 재구성한 condition/spring, 방향성 벽 충돌, 노면 전환, 거친 노면 효과
-- **Arcade + Modern Hybrid** — Modern DD SAT + 아케이드 이벤트/노면 의미
 - **PS2 Original topology (Experimental)** — PS2에서 검증된 Condition/Constant/Periodic 구조를 사용하되 아직 해독되지 않은 payload 수치를 원본값이라고 주장하지 않는 실험 모드
 
 Xbox의 원본 경로는 휠 FFB가 아니라 컨트롤러 진동이므로 선택 가능한 휠 모델에는 넣지 않았습니다. 근거와 매핑 범위는 `docs/reverse/FFB_MODEL_MODES.md`에 정리했습니다.
