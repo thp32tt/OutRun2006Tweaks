@@ -2,6 +2,41 @@
 
 // OutRun vehicle-dynamics estimator for steering FFB.
 //
+// R10 coordinate bridge:
+// - reconstructed local lateral velocity / beta / yaw use a right-positive body
+//   convention;
+// - the captured game steering input uses the opposite sign.
+// A tyre slip angle must compare both quantities in one coordinate convention.
+// Keep this conversion explicit so deep-drift beta cannot silently reverse SAT.
+inline float WheelFFB_front_alignment_target_in_steering_coords(
+    float bodySlipRightPositive,
+    float yawRateRightPositive,
+    float yawLeadSeconds)
+{
+    if (!std::isfinite(bodySlipRightPositive) ||
+        !std::isfinite(yawRateRightPositive) ||
+        !std::isfinite(yawLeadSeconds))
+        return 0.0f;
+
+    return std::clamp(
+        -(bodySlipRightPositive + yawRateRightPositive * yawLeadSeconds),
+        -0.70f, 0.70f);
+}
+
+inline float WheelFFB_front_slip_in_steering_coords(
+    float roadWheelAngle,
+    float bodySlipRightPositive,
+    float yawRateRightPositive,
+    float yawLeadSeconds)
+{
+    if (!std::isfinite(roadWheelAngle))
+        return 0.0f;
+    const float alignmentTarget =
+        WheelFFB_front_alignment_target_in_steering_coords(
+            bodySlipRightPositive, yawRateRightPositive, yawLeadSeconds);
+    return std::clamp(roadWheelAngle - alignmentTarget, -0.70f, 0.70f);
+}
+//
 // This class deliberately owns no DirectInput effects and computes no FFB
 // torque. Its only job is to estimate reusable vehicle state from the game:
 // body slip (beta), yaw rate, front-slip proxy and local motion. WheelFFBEngine
@@ -37,6 +72,7 @@ public:
         rawBodySlip_ = 0.0f;
         rawYawRate_ = 0.0f;
         rawFrontSlip_ = 0.0f;
+        frontAlignmentTarget_ = 0.0f;
         bodySlipBlend_ = 0.18f;
         yawRateBlend_ = 0.20f;
         frontSlipBlend_ = 0.24f;
@@ -289,7 +325,18 @@ public:
         steerRate_ += (rawSteerRate - steerRate_) * 0.55f;
 
         // Bicycle-model-inspired front-slip proxy:
-        // alpha_f ~= road-wheel-angle - beta - a*r/v.
+        //   alpha_f ~= delta - atan((v_y + a*r) / v_x)
+        //
+        // The reconstructed motion basis above is right-positive, while captured
+        // OutRun steering is opposite-signed. R9 subtracted right-positive beta
+        // and yaw directly from the steering-domain road-wheel angle. Normal
+        // corners often hid that mismatch because delta dominated, but large
+        // drift beta could reverse the desired aligning direction and make the
+        // wheel pull toward the vehicle nose instead of the velocity vector.
+        //
+        // Convert the front-axle velocity direction into steering coordinates
+        // first, then form tyre slip. SAT therefore drives this slip toward zero:
+        // in a drift the free wheel naturally moves into counter-steer.
         constexpr float RoadWheelLockRad = 0.52f;
         const float steeringLeadSeconds = 0.018f + 0.012f * transientT;
         const float steeringLead = std::clamp(
@@ -297,9 +344,11 @@ public:
         const float roadWheelAngle = std::clamp(
             steer + steeringLead, -1.0f, 1.0f) * RoadWheelLockRad;
         const float yawLeadSeconds = 0.10f - 0.045f * speedNorm;
-        const float baseFrontSlip =
-            roadWheelAngle - bodySlip_ - yawRate_ * yawLeadSeconds;
-        rawFrontSlip_ = std::clamp(baseFrontSlip, -0.70f, 0.70f);
+        frontAlignmentTarget_ =
+            WheelFFB_front_alignment_target_in_steering_coords(
+                bodySlip_, yawRate_, yawLeadSeconds);
+        rawFrontSlip_ = WheelFFB_front_slip_in_steering_coords(
+            roadWheelAngle, bodySlip_, yawRate_, yawLeadSeconds);
 
         // When the desired tyre torque changes side, do not let the old filtered
         // slip linger for several extra physics ticks. The normal speed-adaptive
@@ -341,6 +390,7 @@ public:
     float rawBodySlip() const { return rawBodySlip_; }
     float rawYawRate() const { return rawYawRate_; }
     float rawFrontSlip() const { return rawFrontSlip_; }
+    float frontAlignmentTarget() const { return frontAlignmentTarget_; }
     float steerRate() const { return steerRate_; }
     float bodySlipBlend() const { return bodySlipBlend_; }
     float yawRateBlend() const { return yawRateBlend_; }
@@ -367,6 +417,7 @@ private:
         rawBodySlip_ = 0.0f;
         rawYawRate_ = 0.0f;
         rawFrontSlip_ = 0.0f;
+        frontAlignmentTarget_ = 0.0f;
         bodySlipBlend_ = 0.18f;
         yawRateBlend_ = 0.20f;
         frontSlipBlend_ = 0.24f;
@@ -393,6 +444,7 @@ private:
         rawBodySlip_ *= 0.55f;
         rawYawRate_ *= 0.55f;
         rawFrontSlip_ *= 0.55f;
+        frontAlignmentTarget_ *= 0.55f;
         activationBlend_ *= 0.85f;
 
         // Once telemetry has been invalid for several ticks, clear all dynamic
@@ -427,6 +479,7 @@ private:
     float rawBodySlip_ = 0.0f;
     float rawYawRate_ = 0.0f;
     float rawFrontSlip_ = 0.0f;
+    float frontAlignmentTarget_ = 0.0f;
     float bodySlipBlend_ = 0.18f;
     float yawRateBlend_ = 0.20f;
     float frontSlipBlend_ = 0.24f;

@@ -581,6 +581,26 @@ namespace
             // an Original model. F11/profile transitions already do this too;
             // this runtime guard covers every other live settings path.
             const int runtimeModelValue = static_cast<int>(ffbModel);
+
+            // R10: make polarity model-owned at runtime, not merely a UI preset
+            // side effect. This closes profile/manual paths that could leave
+            // Modern with Original polarity or vice versa while the model ID
+            // itself had already changed.
+            const bool modelEventReversePolarity =
+                WheelFFBMath::model_uses_r3_reverse_polarity(ffbModel);
+            const bool modelSpringReversePolarity =
+                WheelFFBMath::model_uses_r3_spring_reverse_polarity(ffbModel);
+            if (bool(Settings::WheelFFBInvertForce) != modelEventReversePolarity ||
+                bool(Settings::WheelFFBInvertSpring) != modelSpringReversePolarity)
+            {
+                Settings::WheelFFBInvertForce = modelEventReversePolarity;
+                Settings::WheelFFBInvertSpring = modelSpringReversePolarity;
+                spdlog::info(
+                    "WheelFFB: R10 model-owned polarity enforced for {}: invertCF={} invertSpring={}",
+                    WheelFFBMath::model_name(ffbModel),
+                    modelEventReversePolarity, modelSpringReversePolarity);
+            }
+
             if (activeRuntimeModel_ != runtimeModelValue)
             {
                 const int previousModel = activeRuntimeModel_;
@@ -837,8 +857,17 @@ namespace
                 WheelFFBMath::common_contact_tactile_amplitude(
                     contactTactileEnvelope, speedNorm, configuredRoadDetail,
                     modelOutputStrength) * materialRoadTextureScale;
-            float roadAmp = commonContactTactile;
-            float roadFreq = 25.0f + 12.0f * speedNorm;
+            const bool imperialStonePaving =
+                WheelFFBMath::imperial_avenue_stone_paving_pattern(
+                    uniqueStage, collisionContext, surfaceMasks);
+            const float imperialStoneFloor = imperialStonePaving
+                ? WheelFFBMath::imperial_avenue_stone_tactile_amplitude(
+                    speedNorm, configuredRoadDetail, modelOutputStrength)
+                : 0.0f;
+            float roadAmp = std::max(commonContactTactile, imperialStoneFloor);
+            float roadFreq = imperialStonePaving
+                ? (8.0f + 4.0f * speedNorm)
+                : (25.0f + 12.0f * speedNorm);
             float ps2SurfaceEnvelope = 0.0f;
             int ps2RoadRaw = 0;
             if (arcadeEffects)
@@ -968,7 +997,8 @@ namespace
             // stronger, but the common DD contact layer fills silent curb/contact
             // gaps.  In particular, PS2 raw magnitudes below its recovered retail
             // Type-4 threshold still get a modest PC tactile cue instead of silence.
-            roadAmp = std::max(roadAmp, commonContactTactile);
+            roadAmp = std::max(
+                roadAmp, std::max(commonContactTactile, imperialStoneFloor));
 
             if (!arcadeEffects && !ps2Original &&
                 waterFlag && roughness > 0.7f && speedNorm > 0.70f && splashTimer_ <= 0)
@@ -1049,6 +1079,10 @@ namespace
             const float springSpeed = originalConditionBackbone
                 ? 1.0f
                 : (1.0f - 0.88f * springFade);
+            const float driftSpringScale = modernStructural
+                ? WheelFFBMath::drift_center_spring_scale(
+                    vehicleDynamics_.bodySlip())
+                : 1.0f;
             const float configuredSpringStrength = std::clamp(
                 static_cast<float>(Settings::WheelFFBSpringStrength), 0.0f, 1.5f);
             const float ps2SpringUserScale =
@@ -1058,7 +1092,8 @@ namespace
                     WheelFFBPS2::spring_coefficient_norm() * ps2SpringUserScale,
                     0.0f, 1.0f)
                 : std::clamp(
-                    configuredSpringStrength * springSpeed, 0.0f, 1.0f);
+                    configuredSpringStrength * springSpeed * driftSpringScale,
+                    0.0f, 1.0f);
             const float configuredSpringSaturation = std::clamp(
                 static_cast<float>(Settings::WheelFFBSpringSaturation),
                 0.1f, 1.0f);
@@ -1287,6 +1322,12 @@ namespace
                     (frontSlip > 0.0f ? -1.0f : 1.0f) *
                     physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
+
+                // Front-slip already compares steering angle with the front-axle
+                // velocity direction in one coordinate convention. Its ordinary
+                // SAT is therefore the physical counter-steer mechanism; do not
+                // layer an extra synthetic drift auto-steer force on top.
+
                 if (!std::isfinite(physicsSatTorque))
                     physicsSatTorque = 0.0f;
             }
@@ -1365,10 +1406,20 @@ namespace
             // Keep SAT/spring/damper on the DD-safe slew path while allowing a
             // crash or gear thunk to arrive promptly without releasing that
             // slew limiter for the whole steering signal.
-            const float forceDirection = Settings::WheelFFBInvertForce ? -1.0f : 1.0f;
+            // Hybrid mixes Modern structural SAT with Arcade event semantics.
+            // They have opposite R3 transport polarity, so do not force both
+            // through one global sign. The UI/persisted InvertForce represents
+            // event polarity; structural polarity is derived from the model.
+            const float structuralForceDirection =
+                WheelFFBMath::model_uses_r3_structural_reverse_polarity(ffbModel)
+                    ? -1.0f : 1.0f;
+            const float eventForceDirection =
+                Settings::WheelFFBInvertForce ? -1.0f : 1.0f;
             const float outputRamp = warmupScale * recreateScale;
-            float total = structural * modelOutputStrength * forceDirection * outputRamp;
-            float eventOutput = events * outputStrength * forceDirection * outputRamp;
+            float total =
+                structural * modelOutputStrength * structuralForceDirection * outputRamp;
+            float eventOutput =
+                events * outputStrength * eventForceDirection * outputRamp;
             if (!std::isfinite(total))
                 total = 0.0f;
             if (!std::isfinite(eventOutput))
@@ -1588,13 +1639,15 @@ namespace
                 {
                     lastTelemetryDetailTick_ = telemetryNow;
                     spdlog::info(
-                    "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} diPreResponse={} diCorrected={} responseCorrection={}",
+                    "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} frontAlignTarget={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} driftSpringScale={} stonePaving={} stoneFloor={} diPreResponse={} diCorrected={} responseCorrection={}",
                     telemetryNow,
                     vehicleDynamics_.rawBodySlip(), vehicleDynamics_.bodySlip(), vehicleDynamics_.bodySlipBlend(),
                     vehicleDynamics_.rawYawRate(), vehicleDynamics_.yawRate(), vehicleDynamics_.yawRateBlend(),
+                    vehicleDynamics_.frontAlignmentTarget(),
                     vehicleDynamics_.rawFrontSlip(), vehicleDynamics_.frontSlip(), vehicleDynamics_.frontSlipBlend(),
                     trailResponseSlip, trailResponseLead, lateralForceShape, pneumaticTrail,
                     pneumaticSatShape, mechanicalTrailMix, mechanicalContribution, physicsShape,
+                    driftSpringScale, imperialStonePaving, imperialStoneFloor,
                     levelBeforeResponse, level, bool(Settings::WheelFFBResponseCorrection));
                 // Raw horizontal bases allow row/column x X/Z candidates to be
                 // compared offline without changing the active steering model.

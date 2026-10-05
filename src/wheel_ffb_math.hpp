@@ -33,6 +33,29 @@ namespace WheelFFBMath
         }
     }
 
+    // R10 MOZA-R3 test contract: polarity belongs to the force source/model,
+    // not to stale global checkboxes.
+    //
+    // Modern DD's inferred SAT/centering convention needs R3 reversal. Arcade
+    // and PS2 source-model effects use the opposite convention. Hybrid contains
+    // both, so its Modern structural SAT is reversed while its Arcade events are
+    // not. Spring follows the structural convention.
+    inline bool model_uses_r3_reverse_polarity(Model model)
+    {
+        // Primary ConstantForce/event polarity shown in the UI.
+        return model == Model::ModernDD;
+    }
+
+    inline bool model_uses_r3_structural_reverse_polarity(Model model)
+    {
+        return model == Model::ModernDD || model == Model::ArcadeHybrid;
+    }
+
+    inline bool model_uses_r3_spring_reverse_polarity(Model model)
+    {
+        return model == Model::ModernDD || model == Model::ArcadeHybrid;
+    }
+
     inline bool model_uses_modern_sat(Model model)
     {
         return model == Model::ModernDD || model == Model::ArcadeHybrid;
@@ -382,6 +405,53 @@ namespace WheelFFBMath
         return true;
     }
 
+    constexpr unsigned ImperialAvenueCompanionPavingMask = 0x00000800u;
+
+    // R10 hardware log: Imperial Avenue repeatedly alternates primary mask 0x2
+    // with 0x800 while the car is on the visual stone-paved roadway. R9 removed
+    // the erroneous water buzz but made this surface too quiet. Recognize only
+    // this exact stage/context/mask family and add a low-amplitude texture floor.
+    inline bool imperial_avenue_stone_paving_pattern(
+        int uniqueStage,
+        int collisionContext,
+        const std::array<unsigned, 4>& masks)
+    {
+        if (uniqueStage != 14 || collisionContext != 0)
+            return false;
+        bool sawCompanionPaving = false;
+        for (unsigned mask : masks)
+        {
+            if (mask == ImperialAvenueCompanionPavingMask)
+                sawCompanionPaving = true;
+            else if (mask != PrimaryAsphaltSurfaceMask)
+                return false;
+        }
+        // All-0x2 is the ordinary primary-road case that R9 deliberately made
+        // quiet. Require at least one observed 0x800 paving contact so this
+        // subtle texture cannot leak across the whole stage.
+        return sawCompanionPaving;
+    }
+
+    inline float imperial_avenue_stone_tactile_amplitude(
+        float speedNorm,
+        float roadSetting,
+        float outputStrength)
+    {
+        if (!std::isfinite(speedNorm) || !std::isfinite(roadSetting) ||
+            !std::isfinite(outputStrength))
+            return 0.0f;
+        const float speedGate = smoothstep01(
+            (std::clamp(speedNorm, 0.0f, 1.0f) - 0.05f) / 0.30f);
+        const float roadScale = std::clamp(roadSetting / 0.60f, 0.0f, 1.67f);
+        const float gainScale = std::clamp(outputStrength / 0.70f, 0.0f, 2.0f);
+        // Roughly one quarter of the old 0.28 full-road buzz: clearly
+        // perceptible as paving, but well below curb/grass impact texture.
+        return std::clamp(
+            (0.045f + 0.030f * speedGate) * roadScale * gainScale,
+            0.0f, 0.09f);
+    }
+
+
     // Common PC/DD contact layer used only to make the physically obvious
     // 0/1/2/3/4-wheel contact states distinguishable.  It does not replace the
     // Lindbergh or PS2 source-model effects; those remain the primary model
@@ -484,6 +554,24 @@ namespace WheelFFBMath
         const float y = h00 * Knee + h10 * span + h01;
         return sign * y;
     }
+
+    // A real rack/caster geometry aligns the front wheels with the direction
+    // of travel, not with the vehicle body's zero-steer heading. The synthetic
+    // DirectInput centre spring is useful at low slip but becomes unphysical in
+    // a drift, so fade it almost completely as chassis sideslip grows.
+    inline float drift_center_spring_scale(float bodySlip)
+    {
+        if (!std::isfinite(bodySlip))
+            return 1.0f;
+        const float t = smoothstep01(
+            (std::abs(bodySlip) - 0.10f) / 0.24f);
+        return 1.0f - 0.95f * t;
+    }
+
+    // Drift steering direction is now solved in the front-slip estimator by
+    // converting the right-positive vehicle kinematics into OutRun's steering
+    // coordinate convention. Do not add a second synthetic auto-steer torque
+    // here: SAT itself should reduce physical front-tyre slip toward zero.
 
     inline float physics_return_relief(float alpha, float steerRate)
     {
