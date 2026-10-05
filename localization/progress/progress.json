@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T21:27:02+09:00",
+  "updated_at_kst": "2026-10-05T21:53:30+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -54,7 +54,7 @@
       "transcription_percent": 100,
       "draft_artwork_percent": 100,
       "final_artwork_percent": 0,
-      "transcribed_assets": 79,
+      "transcribed_assets": 80,
       "full_draft_candidates": 79,
       "total_artwork_targets": 79,
       "source_faithful_reviewed": 32,
@@ -103,9 +103,9 @@
     "graphics_transcription": {
       "status": "done",
       "percent": 100,
-      "transcribed_assets": 79,
-      "localize_text_targets": 79,
-      "transcribed_segments": 723,
+      "transcribed_assets": 80,
+      "localize_text_targets": 80,
+      "transcribed_segments": 721,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
@@ -130,12 +130,12 @@
     "graphics_artwork_planning": {
       "status": "done",
       "percent": 100,
-      "planned_assets": 79,
-      "translated_segments": 723,
+      "planned_assets": 82,
+      "translated_segments": 721,
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C201/C202 consumed only current A56/B148 results and both pass independent final C QA. 55B57CDE A56 candidate 78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812: canonical DXT5+atlas revalidation gives source/localized bbox exact 38/38, containment/size/positive margins 38/38, semantic binding PASS, outside/alpha/introduced-visible/source-residue/overlap/touch/out-of-allowed DXT5 blocks all 0; controller contacts/raw PASS. 8215FD25 B148 candidate cb023fa5533b4a058c437c1a879b2952a7268308e47202f7dced32c6a563e141: 2/2 exact localized bbox PASS, outside/alpha/render/overlap/touch=0, and the starburst clean patch is pixel-exact to C193-approved B137 same-family clean template after +1088 x shift; controller visual PASS. pending-C=0; pending_artwork localize_text=12; producer REWORK=1 (37759842). RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "B152 index32 DCC7B488 promoted from zoom_review after B149 positive classification. Candidate 958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14: canonical 2048x1024 RGBA32/raw mirror_y, Total Rank -> 종합 랭킹, 1/1 exact bbox+size+positive-margin PASS, CLEAN/FINAL validators PASS, decoded/alpha/render outside=0, controller SOURCE/CLEAN/FINAL and raw visual PASS. B150 source-ghost and B151 rectangular-luminance intermediates rejected/superseded. pending-C=1 (DCC7B488); pending_artwork localize_text=12; producer REWORK=1 (37759842). RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -155,17 +155,17 @@
   "graphics": {
     "total_dds": 243,
     "visually_reviewed": 243,
-    "localize_text": 82,
+    "localize_text": 83,
     "preserve_brand_song_credit": 33,
     "font_pipeline": 9,
     "hangul_name_entry": 1,
-    "zoom_review": 44,
+    "zoom_review": 43,
     "no_localization": 74,
     "work_queue_total": 137,
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
-    "transcribed_assets": 79,
-    "transcribed_segments": 723,
+    "transcribed_assets": 80,
+    "transcribed_segments": 721,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -181,8 +181,8 @@
     },
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
-    "artwork_plan_assets": 80,
-    "artwork_plan_segments": 723,
+    "artwork_plan_assets": 82,
+    "artwork_plan_segments": 721,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -270,8 +270,10 @@
         "37759842"
       ],
       "remaining": 1,
-      "note": "Only 37759842 remains producer REWORK: manual/template source-faithful selector clean-plate reconstruction required. C201 approved 55B57CDE A56 and C202 approved 8215FD25 B148 pending isolated in-game validation. pending_artwork localize_text=12; pending-C=0; RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": []
+      "note": "B152 DCC7B488 self-QA PASS pending independent C. pending_artwork localize_text=12; pending-C=1 (DCC7B488); producer REWORK=1 (37759842). RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": [
+        "DCC7B488"
+      ]
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -1674,23 +1676,23 @@
     ]
   },
   "latest_b_first_qa": {
-    "run": "B_PRODUCTION128",
-    "worker_output_commit": "fe9a5106e50137d4507fb3d3b991d1aac50e0655",
-    "result": "A05BF610_C176_REWORK_RESOLVED_SELF_QA_PASS_PENDING_C_INGAME",
+    "run": "B_PRODUCTION152",
+    "worker_output_commit": "612d7034f2e88356465acc0e52d44032c344a77f",
+    "result": "DCC7B488_ZOOM_REVIEW_PROMOTED_SELF_QA_PASS_PENDING_C_INGAME",
     "assets": {
-      "A05BF610": {
-        "queue_index": 28,
-        "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
-        "candidate_sha256": "bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8",
-        "status": "B128_SELF_QA_PASS_PENDING_C_AND_INGAME",
-        "report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_A05_REPORT.json",
-        "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_CONTROLLER_SELF_QA.json",
+      "DCC7B488": {
+        "queue_index": 32,
+        "source_sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+        "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+        "status": "B152_SELF_QA_PASS_PENDING_C_AND_INGAME",
+        "report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_DCC7_REPORT.json",
+        "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_CONTROLLER_SELF_QA.json",
         "physical_elements": 1,
         "bbox_size_positive_margin": "1/1",
         "outside_pixels": 0,
         "alpha_outside_pixels": 0,
-        "protected_lens_flare_cell_changed": 0,
-        "c176_return_resolved": true
+        "render_outside_pixels": 0,
+        "b150_b151_rejected_visual": true
       }
     },
     "runtime_validation": "UNTESTED"
