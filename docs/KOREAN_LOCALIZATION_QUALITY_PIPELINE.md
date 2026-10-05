@@ -63,6 +63,26 @@ Use `tools/localization/validate_clean_plate.py` where decoded RGBA source/candi
 
 `tools/localization/render_artwork.py` is proof-only. Its transparent lettering output is never a deployable localized DDS by itself.
 
+## Production visual QA gate
+
+The following visual gates apply to **every newly produced or materially reworked Korean graphics asset**, not only to items already reported by an in-game screenshot.
+
+A producer self-QA PASS requires all of the following:
+- **Native-resolution source only:** never upscale a previous Korean bitmap or low-resolution localized font to create the final candidate. Mixed low-resolution/high-resolution Korean lettering in one UI family is FAIL.
+- **No broken glyphs:** jagged, garbled, clipped, malformed, inconsistent-antialias or visibly damaged Hangul is FAIL.
+- **No source residue or double drawing:** any visible English/source-script remnant behind or beside Korean, duplicate English/Korean layer, ghost silhouette, or source-shaped effect residue is FAIL.
+- **No foreign-image intrusion:** Korean text/effects may not overwrite, cover, borrow from, or visually intrude into icons, cards, portraits, photos, logos, decorative foreground, neighboring atlas content or other UI images.
+- **No layer collision:** text-to-text, text-to-icon, text-to-frame, text-to-number or text-to-image collision/touch is FAIL unless the exact source intentionally overlaps the same elements.
+- **Source transform fidelity:** slant/italic angle, perspective/shear, baseline, alignment, relative scale, line spacing and rotation must follow the corresponding source. A visibly wrong tilt or perspective is FAIL even when bbox containment passes.
+- **Source style fidelity:** font weight/proportion, fill/gradient, outline, shadow/glow, edge softness and antialiasing must remain source-family consistent. A Korean label that visibly looks pasted-on or belongs to a different resolution/style family is FAIL.
+- **Clean-plate integrity first:** lettering must never be used to hide a bad clean plate. Patch rectangles, donor boundaries, seams, smears, luminance blocks, halos and damaged background/artwork are FAIL.
+- **Family consistency:** labels that share one source UI family must use consistent Korean rendering rules unless the source itself intentionally differs. One low-resolution or differently weighted member in an otherwise high-resolution family is FAIL.
+- **Readable-orientation visual review is mandatory:** inspect SOURCE/CLEAN/FINAL at normal readable orientation and high zoom in addition to machine masks/bboxes. Numeric PASS alone is insufficient.
+- **Raw/orientation review is mandatory:** verify the actual DDS raw/game orientation so mirrored/rotated atlas content is not accidentally approved.
+- **Runtime presentation remains a separate gate:** when a produced asset has not yet been seen in-game, record `RUNTIME_VALIDATION=UNTESTED` or `*_PASS_PENDING_INGAME_RETEST`; never infer in-game correctness from static QA.
+
+If any item above fails, the producer must keep the item as `REWORK_REQUIRED` (or `MANUAL_RECONSTRUCTION_REQUIRED` where appropriate) and repair it before handing it to C. A/B must not mark a candidate producer-PASS merely because pixel containment/protected-mask checks are zero.
+
 ## In-game regression QA
 
 Actual in-game screenshots are a higher-level visual gate than static mask/bbox checks. If a user screenshot shows a concrete defect, reopen the affected asset/runtime path even when earlier static QA passed.
