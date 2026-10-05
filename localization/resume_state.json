@@ -1,5 +1,5 @@
 {
-  "schema_version": 90,
+  "schema_version": 91,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_PRODUCTION56 supersedes C197/A54 for odd index161 55B57CDE. Candidate 78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812 uses exact source-bbox rectangular clean scope and explicit BC3 alpha normalization. Hosted worker PASS: 38/38 decoded bbox exact-match to intended Hangul; 38/38 bbox/size/positive-margin; decoded alpha extra/missing=0/0; source-bbox residue=0; outside/alpha/introduced-visible=0; changed blocks outside patch=0. Controller SOURCE/CLEAN/FINAL + raw mirror_y visual QA PASS. Pending independent C and in-game. A55 failed closed at one remaining alpha pixel and was not promoted. RUNTIME_VALIDATION=UNTESTED.",
     "C200 supersedes C199/C198 for index30 8215FD25. Latest completed B146 candidate d8687e615007af7bdd8e4d0bf41f1830e0bf105a3ef225cc157671fc8e9fd377 fixes the speech bubble and removes the large starburst source ghost, but C visual still finds broad non-source haze/blur, pale gray/white smears and isolated artifacts in the starburst title-removal zone, visible around 종합 랭킹 in FINAL. REWORK_REQUIRED. RUNTIME_VALIDATION=UNTESTED.",
     "C199 supersedes C198 for index30 8215FD25. Latest completed B145 candidate e9d999eaa5a416c05c8ecf527c220645bf9097d3177611c5da1c40f2bff7b793 fixes the speech-bubble ghost, but C visual shows a large translucent Total Rank-shaped ghost across the starburst CLEAN and behind/around 종합 랭킹 in FINAL. Keep speech bubble; rebuild only starburst. B Laplace-repair worker c5a7a62109f2 is compute-pending, not candidate-complete. RUNTIME_VALIDATION=UNTESTED.",
     "C197 returned A54 index161 55B57CDE candidate 7569c51cf5ba82ce081bf09d486b8c8869560e7fae71292c613e4bf8a5b51ab8. Independent canonical DXT5 source+atlas audit reproduces 38/38 source bboxes and all 38 containment/size/positive-margin gates, with zero outside/overlap/out-of-allowed-block changes. But decoded candidate alpha bbox matches A54 declaration only 10/38; 28/38 labels carry extra low-alpha/source-shaped fringe, visible as speckle/fringe in C contacts. REWORK_REQUIRED; derive QA bbox from decoded alpha and re-encode cleanly. RUNTIME_VALIDATION=UNTESTED.",
@@ -3936,11 +3937,10 @@
     "runtime_validation": "UNTESTED"
   },
   "current_pending_artwork_localize_text": 12,
-  "current_producer_rework_remaining": 3,
+  "current_producer_rework_remaining": 2,
   "current_producer_rework_assets": [
     "37759842",
-    "8215FD25",
-    "55B57CDE"
+    "8215FD25"
   ],
   "latest_b_production": {
     "run": "B_PRODUCTION137",
@@ -4052,7 +4052,9 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [],
+  "current_pending_c": [
+    "55B57CDE"
+  ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -4286,6 +4288,45 @@
     "decision": "C200_REWORK_REQUIRED_STARBURST_TEXTURE_DISCONTINUITY_AND_SMEAR",
     "supersedes": "C199/B145 and C198/B144",
     "report": "localization/graphics/role_C/20261005-C200-8215FD25/C200_8215FD25_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "a_production56_55b57cde": {
+    "timestamp_kst": "2026-10-05T21:10:15+09:00",
+    "run": "20261005-A-PRODUCTION56-DXT5",
+    "queue_index": 161,
+    "asset": "55B57CDE",
+    "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+    "candidate_sha256": "78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812",
+    "status": "A56_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "supersedes": "C197/A54 candidate 7569c51cf5ba82ce081bf09d486b8c8869560e7fae71292c613e4bf8a5b51ab8",
+    "prior_retry": {
+      "run": "A55",
+      "status": "FAIL_CLOSED_ONE_EXTRA_DECODED_ALPHA_PIXEL_NO_PROMOTION"
+    },
+    "machine_qa": {
+      "bbox_size_positive_margin": "38/38 PASS",
+      "decoded_bbox_exact_match": "38/38 PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0,
+      "source_bbox_residue_pixels": 0,
+      "decoded_changed_outside": 0,
+      "alpha_outside": 0,
+      "introduced_visible_outside": 0,
+      "changed_blocks_outside_patch": 0
+    },
+    "dxt5_solver": {
+      "clean_scope": "EXACT_SOURCE_BBOX_RECTANGLES",
+      "target_reencoded_blocks": 10068,
+      "source_only_full_alpha_blocks": 19021,
+      "boundary_alpha_index_only_blocks": 4744,
+      "target_and_full_source_blocks_alpha_mode": "BC3_ALPHA_255_0_EXACT_ZERO_NON_TARGET",
+      "boundary_endpoints_and_color_bytes_preserved": true
+    },
+    "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_AND_RAW_MIRROR_Y_NO_SOURCE_SHAPED_FRINGE",
+    "pending_independent_c_final_qa": true,
+    "raw_orientation": "mirror_y",
+    "report": "localization/graphics/role_A/20261005-A-PRODUCTION56-DXT5/A56_55B57CDE_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION56-DXT5/A56_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
