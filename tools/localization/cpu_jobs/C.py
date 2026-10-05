@@ -7,7 +7,7 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
-repo=Path.cwd(); run="20261005-C187-25F697C6"
+repo=Path.cwd(); run="20261005-C188-25F697C6"
 out=repo/"localization/graphics/role_C"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 pd=repo/"localization/graphics/role_A/20261005-A-PRODUCTION47"
@@ -49,16 +49,13 @@ allowed=np.zeros((H,W),bool)
 for r in rows:
     x0,y0,x1,y1=map(int,r["source_effect_bbox"]); allowed[y0:y1,x0:x1]=True
 
-# Independently determine the flat background RGBA from pixels outside all target bboxes.
-# This asset is a flat selector text atlas. Use the modal RGBA among all non-target pixels,
-# which is robust against preserved Ferrari/model labels occupying a minority of the canvas.
-outside=sa[~allowed]
-vals,cnts=np.unique(outside.reshape(-1,4),axis=0,return_counts=True)
-bg=vals[int(np.argmax(cnts))]
-bg_tuple=[int(x) for x in bg]
+# Canonical atlas stores these text sprites on transparent background. Invisible RGB under alpha=0
+# is not visible residue, so all residue/render decisions are based on alpha-visible pixels.
+bg=np.array([0,0,0,0],dtype=np.uint8)
+bg_tuple=[0,0,0,0]
 expected=sa.copy()
 for r in rows:
-    x0,y0,x1,y1=map(int,r["source_effect_bbox"]); expected[y0:y1,x0:x1]=bg
+    x0,y0,x1,y1=map(int,r["source_effect_bbox"]); expected[y0:y1,x0:x1]=0
 expected_clean=Image.fromarray(expected,"RGBA")
 
 # Protected source must be byte/pixel exact outside source bboxes.
@@ -72,19 +69,19 @@ render_union=np.zeros((H,W),bool)
 for r in rows:
     ob=list(map(int,r["source_effect_bbox"])); declared=list(map(int,r["localized_bbox"]))
     x0,y0,x1,y1=ob
-    # Any candidate pixel different from the exact reconstructed flat background is localized content.
-    diff=np.any(fa[y0:y1,x0:x1]!=bg,axis=2)
+    # Visible candidate alpha defines localized content; alpha=0 RGB is intentionally ignored.
+    diff=fa[y0:y1,x0:x1,3]>0
     actual=bbox(diff)
     if actual is not None:
         actual=[actual[0]+x0,actual[1]+y0,actual[2]+x0,actual[3]+y0]
-        ax0,ay0,ax1,ay1=actual; render_union[ay0:ay1,ax0:ax1] |= np.any(fa[ay0:ay1,ax0:ax1]!=bg,axis=2)
+        ax0,ay0,ax1,ay1=actual; render_union[ay0:ay1,ax0:ax1] |= fa[ay0:ay1,ax0:ax1,3]>0
     else:
         actual=None
     # Exact clean-residue gate: outside the declared localized bbox, every target-bbox pixel must be flat background.
     lx0,ly0,lx1,ly1=declared
     local_box=np.zeros((H,W),bool); local_box[ly0:ly1,lx0:lx1]=True
     target=np.zeros((H,W),bool); target[y0:y1,x0:x1]=True
-    residue_mask=target & ~local_box & np.any(fa!=bg,axis=2)
+    residue_mask=target & ~local_box & (fa[:,:,3]>0)
     dl=declared[0]-x0; dr=x1-declared[2]; dt=declared[1]-y0; db=y1-declared[3]
     rowchecks.append({
       "idx":r["idx"],"source":r["source"],"korean":r["korean"],
@@ -100,7 +97,7 @@ for r in rows:
 masks=[]
 for rc in rowchecks:
     lx0,ly0,lx1,ly1=rc["declared_localized_bbox"]
-    m=np.zeros((H,W),bool); m[ly0:ly1,lx0:lx1]=np.any(fa[ly0:ly1,lx0:lx1]!=bg,axis=2); masks.append(m)
+    m=np.zeros((H,W),bool); m[ly0:ly1,lx0:lx1]=fa[ly0:ly1,lx0:lx1,3]>0; masks.append(m)
 overlap=touch=0
 from PIL import ImageFilter
 for i,mi in enumerate(masks):
@@ -115,7 +112,7 @@ rowpass=all(x["containment"]=="PASS" and x["size_ceiling"]=="PASS" and x["positi
 status="PASS" if rowpass and all(machine[k]==0 for k in ["final_changed_outside_union_source_bboxes","final_alpha_changed_outside_union_source_bboxes","localized_pair_overlap_pixels","localized_pair_1px_touch_pixels","flat_background_residue_pixels_total"]) else "FAIL"
 
 # Persist exact independent clean plate PNG as C evidence.
-expected_clean.save(out/"C187_INDEPENDENT_EXACT_CLEAN_PLATE.png")
+expected_clean.save(out/"C188_INDEPENDENT_EXACT_CLEAN_PLATE.png")
 
 font=ImageFont.load_default(); cards=[]
 for rc in rowchecks:
@@ -132,25 +129,25 @@ sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+
 yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+6
 if sheet.width>1800: sheet=sheet.resize((1800,round(sheet.height*1800/sheet.width)),Image.Resampling.LANCZOS)
-saveb64(sheet,out/"C187_CONTACTS_B64.txt",95)
+saveb64(sheet,out/"C188_CONTACTS_B64.txt",95)
 rawcard=Image.new("RGB",(1024,2070),"white")
 for i,(lab,z) in enumerate((("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_final))):
     zz=comp(z).resize((1024,1024),Image.Resampling.LANCZOS); rawcard.paste(zz,(0,i*1035+22)); ImageDraw.Draw(rawcard).text((5,i*1035+4),lab,fill="black")
-saveb64(rawcard,out/"C187_RAW_B64.txt",92)
+saveb64(rawcard,out/"C188_RAW_B64.txt",92)
 
 report={
- "schema_version":1,"role":"C","run":run,"qa_id":"C187","queue_index":pr["index"],"asset":asset,
+ "schema_version":1,"role":"C","run":run,"qa_id":"C188","queue_index":pr["index"],"asset":asset,
  "producer_run":pr["run"],"source_sha256":sp["sha256"],"candidate_sha256":pr["candidate_sha256"],
  "structure":{"dimensions":dims,"format":"RGBA32","raw_mode":mode,"mipmaps":mips,"raw_orientation":"mirror_y","header_exact":cb[:128]==sb[:128]},
- "independent_flat_background_rgba":bg_tuple,
- "independent_clean_plate":"localization/graphics/role_C/20261005-C187-25F697C6/C187_INDEPENDENT_EXACT_CLEAN_PLATE.png",
+ "independent_visible_background":"transparent_alpha0",
+ "independent_clean_plate":"localization/graphics/role_C/20261005-C188-25F697C6/C188_INDEPENDENT_EXACT_CLEAN_PLATE.png",
  "row_checks":rowchecks,"all_9_bbox_size_positive_margin_and_residue_pass":rowpass,
  "machine_checks":machine,"machine_status":status,
  "policy_checks":{"stage_names":{"ANCIENT RUINS":"에인션트 루인스","ALPINE":"알파인"},"protected_ferrari_model_labels":"outside target bboxes exact by pixel gate"},
- "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","decision":"PENDING_CONTROLLER_VISUAL_QA" if status=="PASS" else "C187_REWORK_REQUIRED_MACHINE_GATE",
+ "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","decision":"PENDING_CONTROLLER_VISUAL_QA" if status=="PASS" else "C188_REWORK_REQUIRED_MACHINE_GATE",
  "runtime_validation":"UNTESTED",
- "preview_b64_files":["localization/graphics/role_C/20261005-C187-25F697C6/C187_CONTACTS_B64.txt","localization/graphics/role_C/20261005-C187-25F697C6/C187_RAW_B64.txt"]
+ "preview_b64_files":["localization/graphics/role_C/20261005-C188-25F697C6/C188_CONTACTS_B64.txt","localization/graphics/role_C/20261005-C188-25F697C6/C188_RAW_B64.txt"]
 }
-(out/"C187_25F697C6_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-(wr/"C187_25F697C6.json").write_text(json.dumps({"run":run,"qa_id":"C187","index":pr["index"],"asset":"25F697C6","candidate_sha256":pr["candidate_sha256"],"machine_status":status,"machine_checks":machine,"report":f"localization/graphics/role_C/{run}/C187_25F697C6_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"qa_id":"C187","machine_status":status,"background_rgba":bg_tuple,"machine_checks":machine},ensure_ascii=False))
+(out/"C188_25F697C6_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(wr/"C188_25F697C6.json").write_text(json.dumps({"run":run,"qa_id":"C188","index":pr["index"],"asset":"25F697C6","candidate_sha256":pr["candidate_sha256"],"machine_status":status,"machine_checks":machine,"report":f"localization/graphics/role_C/{run}/C188_25F697C6_MACHINE_QA.json","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"qa_id":"C188","machine_status":status,"background_rgba":bg_tuple,"machine_checks":machine},ensure_ascii=False))
