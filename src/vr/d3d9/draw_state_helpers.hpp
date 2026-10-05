@@ -5,6 +5,32 @@
 
 namespace OutRunVR::D3D9
 {
+    struct LiveEffectRenderStateSnapshot
+    {
+        DWORD alphaBlend = FALSE;
+        DWORD alphaTest = FALSE;
+        DWORD zWrite = TRUE;
+        DWORD zEnable = D3DZB_TRUE;
+        DWORD cullMode = D3DCULL_CCW;
+    };
+
+    inline bool ReadLiveEffectRenderStateSnapshot(
+        IDirect3DDevice9* device,
+        LiveEffectRenderStateSnapshot& out) noexcept
+    {
+        return device &&
+            SUCCEEDED(device->GetRenderState(
+                D3DRS_ALPHABLENDENABLE, &out.alphaBlend)) &&
+            SUCCEEDED(device->GetRenderState(
+                D3DRS_ALPHATESTENABLE, &out.alphaTest)) &&
+            SUCCEEDED(device->GetRenderState(
+                D3DRS_ZWRITEENABLE, &out.zWrite)) &&
+            SUCCEEDED(device->GetRenderState(
+                D3DRS_ZENABLE, &out.zEnable)) &&
+            SUCCEEDED(device->GetRenderState(
+                D3DRS_CULLMODE, &out.cullMode));
+    }
+
     inline bool SetVertexShaderConstantBatch(
         IDirect3DDevice9* device,
         UINT startRegister,
