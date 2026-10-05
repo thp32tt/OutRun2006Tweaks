@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C166-63C91067",
+  "qa_id": "C166",
+  "timestamp_kst": "2026-10-05T15:03:00+09:00",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION105",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "candidate_sha256": "4eda98aa3749618530f702fb614db54b7cec7a9f4ba427875495d0d1d379e38c",
+  "candidate_changed_by_C": false,
+  "producer_machine_status": "PASS_REPORTED",
+  "producer_bbox_size_positive_margin": "2/2 PASS",
+  "controller_visual_qa": "FAIL_CLEAN_PLATE_GRADIENT_SEAM",
+  "visual_note": "Mandatory C review of B105 SOURCE/CLEAN/FINAL evidence finds a visible horizontal interpolation/gradient discontinuity across the upper portion of the lower starburst plate after Total Rank removal. Machine zero-residue/outside counters do not detect this texture-continuity defect.",
+  "decision": "C166_REWORK_REQUIRED_CLEAN_PLATE_GRADIENT_SEAM",
+  "required_rework": "Reconstruct the lower Total Rank clean plate without horizontal band/seam artifacts, preserve the canonical starburst gradient/edge glow continuously, then rerun exact-pixel, residue and visual gates.",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION105/B105_63C_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION105/B105_63C_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION105/B105_63C_ROW_CONTACT.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION105/B105_63C_RAW_COMPARE.jpg"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
