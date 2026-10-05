@@ -9,6 +9,7 @@ R13_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r13.cpp"
 R22_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r22.cpp"
 R32_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r32.cpp"
 HOST_CACHE_PATH = ROOT / "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp"
+HOST_PASSTHROUGH_PATH = ROOT / "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp"
 HOST_SUBMIT_PATH = ROOT / "vrhost/src/runtime/r32_direct_submit.hpp"
 
 
@@ -75,6 +76,7 @@ r13 = load(R13_PATH)
 r22 = load(R22_PATH)
 r32 = load(R32_PATH)
 host_cache = load(HOST_CACHE_PATH)
+host_passthrough = load(HOST_PASSTHROUGH_PATH)
 host_submit = load(HOST_SUBMIT_PATH)
 
 # Reset must tear down every D3D9 DEFAULT-pool stereo/shared-eye/probe object
@@ -360,6 +362,36 @@ require(
     "R32 failed-reset cleanup",
     "R32InvalidateResetCaches();",
     "++R32ResetFailures;",
+)
+
+# Production R23 completion must update both ACK contracts. R13/R32 use the
+# generation-scoped per-slot mapping, while the lower R7 fallback still consumes
+# SharedPose.hostDirectConsumedFrameId. Keep the legacy bridge monotonic so late
+# async completions cannot move the global ACK backwards.
+ensure_pose_host = body(host_passthrough, "inline bool EnsurePoseState() noexcept")
+require(
+    ensure_pose_host,
+    "host writable legacy ACK mapping",
+    "FILE_MAP_ALL_ACCESS",
+    "OutRunVR::SharedMemoryName",
+)
+legacy_ack = body(host_passthrough, "inline void PublishLegacyConsumedFrame(")
+require(
+    legacy_ack,
+    "host legacy global ACK bridge",
+    "hostDirectConsumedFrameId",
+    "GetCurrentProcessId()",
+    "LegacyFrameAtOrAfter",
+    "InterlockedCompareExchange",
+)
+publish_completed = body(host_passthrough, "inline bool PublishCompletedFrame(")
+require_order(
+    publish_completed,
+    "host dual ACK publication",
+    "DirectAckState->completedFrameId[slot] = frame.frameId;",
+    "EndAckWrite();",
+    "PublishLegacyConsumedFrame(frame.frameId);",
+    "return true;",
 )
 
 # Host shared-resource caches must key on the new producer generation and both

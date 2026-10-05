@@ -46,7 +46,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
     inline bool FirstDeclaredFormatMismatchLogged = false;
 
     inline HANDLE PoseMapping = nullptr;
-    inline const OutRunVR::SharedPoseState* PoseState = nullptr;
+    inline OutRunVR::SharedPoseState* PoseState = nullptr;
     inline HANDLE FrameMapping = nullptr;
     inline const OutRunVR::SharedRenderFrameRing* FrameRing = nullptr;
     inline HANDLE DirectAckMapping = nullptr;
@@ -167,11 +167,11 @@ namespace OutRunVrD3D9ExDirectPassthrough
             PoseMapping = nullptr;
         }
 
-        PoseMapping = OpenFileMappingW(FILE_MAP_READ, FALSE, OutRunVR::SharedMemoryName);
+        PoseMapping = OpenFileMappingW(FILE_MAP_ALL_ACCESS, FALSE, OutRunVR::SharedMemoryName);
         if (!PoseMapping)
             return false;
-        PoseState = static_cast<const OutRunVR::SharedPoseState*>(MapViewOfFile(
-            PoseMapping, FILE_MAP_READ, 0, 0, sizeof(OutRunVR::SharedPoseState)));
+        PoseState = static_cast<OutRunVR::SharedPoseState*>(MapViewOfFile(
+            PoseMapping, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(OutRunVR::SharedPoseState)));
         if (!PoseState)
         {
             CloseHandle(PoseMapping);
@@ -495,6 +495,36 @@ namespace OutRunVrD3D9ExDirectPassthrough
         return true;
     }
 
+    inline bool LegacyFrameAtOrAfter(
+        std::uint32_t candidate, std::uint32_t reference) noexcept
+    {
+        return static_cast<std::int32_t>(candidate - reference) >= 0;
+    }
+
+    inline void PublishLegacyConsumedFrame(std::uint32_t frameId) noexcept
+    {
+        if (!frameId || !EnsurePoseState() ||
+            PoseState->hostPid != GetCurrentProcessId())
+            return;
+
+        auto* ack = reinterpret_cast<volatile LONG*>(
+            &PoseState->hostDirectConsumedFrameId);
+        LONG current = *ack;
+        for (;;)
+        {
+            const auto currentFrame = static_cast<std::uint32_t>(current);
+            if (currentFrame != 0 &&
+                !LegacyFrameAtOrAfter(frameId, currentFrame))
+                return;
+
+            const LONG observed = InterlockedCompareExchange(
+                ack, static_cast<LONG>(frameId), current);
+            if (observed == current)
+                return;
+            current = observed;
+        }
+    }
+
     inline bool PublishCompletedFrame(
         const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
@@ -518,6 +548,12 @@ namespace OutRunVrD3D9ExDirectPassthrough
         DirectAckState->hostPid = GetCurrentProcessId();
         DirectAckState->completedFrameId[slot] = frame.frameId;
         EndAckWrite();
+
+        // Keep the legacy R7 fallback alive as well. Production R23 no longer
+        // calls the old SharedWriter::AckDirectFrame path, so without this
+        // bridge a lower-chain fallback could fill all four producer slots and
+        // never observe consumption despite the primary per-slot ACK succeeding.
+        PublishLegacyConsumedFrame(frame.frameId);
         return true;
     }
 
