@@ -625,7 +625,9 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                     sawSnowDisqualifier = true;
             }
             const bool snowPrimaryRoad = sawSnowPrimary && !sawSnowDisqualifier;
-            const float coreStageScale = snowPrimaryRoad ? 0.04f : 1.0f;
+            const float coreStageScale = snowPrimaryRoad
+                ? WheelFFBMath::SnowIceComfortTextureScale
+                : 1.0f;
 
             desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
             const float envelope =
