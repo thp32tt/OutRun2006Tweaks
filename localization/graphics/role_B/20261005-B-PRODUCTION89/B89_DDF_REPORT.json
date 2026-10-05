@@ -322,7 +322,21 @@
   },
   "candidate_sha256": "e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
-  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_ROW_RAW_STYLE_POLICY",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B89_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B89_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_self_qa_report": "localization/graphics/role_B/20261005-B-PRODUCTION89/B89_CONTROLLER_SELF_QA.json",
+  "superseded_attempts": [
+    {
+      "run": "B87",
+      "result": "WORKER_FAIL_FALSE_PROTECTED_VISIBILITY_GATE",
+      "note": "decoded pixel diff outside exact target bboxes was already 0; visible_out gate incorrectly counted intentionally preserved source rows"
+    },
+    {
+      "run": "B88",
+      "candidate_sha256": "c23b2494e3c621399b19790fbcc3f07c7dc46d9ff22e53d71a6195a53ad733a3",
+      "result": "CONTROLLER_VISUAL_REWORK",
+      "note": "machine PASS but Korean height was visibly too small relative to the shared source text family"
+    }
+  ]
 }
