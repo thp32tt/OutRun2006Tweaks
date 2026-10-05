@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C192-39BCA907",
+  "qa_id": "C192",
+  "timestamp_kst": "2026-10-05T19:41:25+09:00",
+  "queue_index": 147,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+  "producer_run": "20261005-A-PRODUCTION49",
+  "source_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+  "candidate_sha256": "6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b",
+  "candidate_changed_by_C": false,
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "15/15 PASS",
+  "semantic_policy_pass": true,
+  "controller_visual_qa": "PASS",
+  "visual_findings": [
+    "A48's wrong physical semantic binding was caught before C approval and superseded by A49. C192 evaluates only A49.",
+    "Independent canonical-source decode/header/raw mirror_y check PASS; every independently measured localized bbox exactly matches A49's declared bbox.",
+    "15/15 containment, source-size ceiling and positive margins PASS; outside/alpha/protected/residue/overlap/1px-touch counters are all 0.",
+    "All 15 source stage names map to the canonical phonetic Hangul policy and SOURCE/CLEAN/FINAL plus readable/raw visual review shows no residue, clipping, overlap or orientation regression."
+  ],
+  "decision": "C192_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "machine_report": "localization/graphics/role_C/20261005-C192-39BCA907/C192_39BCA907_MACHINE_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C192-39BCA907/C192_INDEPENDENT_CLEAN_PLATE.png",
+    "localization/graphics/role_C/20261005-C192-39BCA907/C192_CONTACTS_B64.txt",
+    "localization/graphics/role_C/20261005-C192-39BCA907/C192_READABLE_OVERVIEW_B64.txt",
+    "localization/graphics/role_C/20261005-C192-39BCA907/C192_RAW_B64.txt"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
