@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C156-30CF0D",
+  "queue_index": 137,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "producer_run": "20261005-A-PRODUCTION22",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "a17e3caff8610356d70ddc52e89a7533aa99b98c",
+    "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc"
+  },
+  "candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
+  "candidate_changed_by_C": false,
+  "independent_method": "canonical source/candidate hashes and DDS structure independently verified; producer source/allowed/protected masks are treated as geometry evidence because canonical texture carries transparent-RGB/effect pixels not reducible to alpha alone; C independently recomputes mask/source-clean/final/protected/bbox/overlap gates from those evidence masks and performs separate controller visual review",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "key": "manual_large",
+      "region_idx": 2,
+      "source": "MANUAL",
+      "korean": "수동",
+      "cell": [
+        0,
+        220,
+        888,
+        96
+      ],
+      "original_bbox": [
+        1,
+        235,
+        397,
+        315
+      ],
+      "localized_bbox": [
+        130,
+        237,
+        268,
+        313
+      ],
+      "source_size": [
+        396,
+        80
+      ],
+      "localized_size": [
+        138,
+        76
+      ],
+      "delta_left": 129,
+      "delta_right": 129,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "automatic_large",
+      "region_idx": 3,
+      "source": "AUTOMATIC",
+      "korean": "자동",
+      "cell": [
+        888,
+        220,
+        888,
+        96
+      ],
+      "original_bbox": [
+        889,
+        233,
+        1775,
+        315
+      ],
+      "localized_bbox": [
+        1263,
+        235,
+        1401,
+        313
+      ],
+      "source_size": [
+        886,
+        82
+      ],
+      "localized_size": [
+        138,
+        78
+      ],
+      "delta_left": 374,
+      "delta_right": 374,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "manual_small",
+      "region_idx": 4,
+      "source": "MANUAL",
+      "korean": "수동",
+      "cell": [
+        0,
+        136,
+        808,
+        84
+      ],
+      "original_bbox": [
+        14,
+        148,
+        339,
+        210
+      ],
+      "localized_bbox": [
+        124,
+        150,
+        229,
+        208
+      ],
+      "source_size": [
+        325,
+        62
+      ],
+      "localized_size": [
+        105,
+        58
+      ],
+      "delta_left": 110,
+      "delta_right": 110,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "automatic_small",
+      "region_idx": 5,
+      "source": "AUTOMATIC",
+      "korean": "자동",
+      "cell": [
+        808,
+        136,
+        808,
+        84
+      ],
+      "original_bbox": [
+        822,
+        147,
+        1376,
+        216
+      ],
+      "localized_bbox": [
+        1041,
+        149,
+        1157,
+        214
+      ],
+      "source_size": [
+        554,
+        69
+      ],
+      "localized_size": [
+        116,
+        65
+      ],
+      "delta_left": 219,
+      "delta_right": 219,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "select_transmission",
+      "region_idx": 6,
+      "source": "SELECT TRANSMISSION",
+      "korean": "변속 방식 선택",
+      "cell": [
+        0,
+        56,
+        1276,
+        80
+      ],
+      "original_bbox": [
+        5,
+        67,
+        868,
+        130
+      ],
+      "localized_bbox": [
+        272,
+        69,
+        601,
+        128
+      ],
+      "source_size": [
+        863,
+        63
+      ],
+      "localized_size": [
+        329,
+        59
+      ],
+      "delta_left": 267,
+      "delta_right": 267,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "transmission_small",
+      "region_idx": 7,
+      "source": "TRANSMISSION",
+      "korean": "변속 방식",
+      "cell": [
+        1276,
+        88,
+        508,
+        48
+      ],
+      "original_bbox": [
+        1288,
+        96,
+        1569,
+        128
+      ],
+      "localized_bbox": [
+        1379,
+        98,
+        1478,
+        126
+      ],
+      "source_size": [
+        281,
+        32
+      ],
+      "localized_size": [
+        99,
+        28
+      ],
+      "delta_left": 91,
+      "delta_right": 91,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "clean_changed_outside_source_mask": 0,
+    "clean_unchanged_inside_source_mask": 0,
+    "clean_protected_changed": 0,
+    "clean_alpha_changed_outside_source_mask": 0,
+    "bbox_size_positive_margin": "6/6 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "target_protected_overlap": 0,
+    "target_protected_1px_near": 0,
+    "overlap": 0,
+    "touch_pairs": []
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
