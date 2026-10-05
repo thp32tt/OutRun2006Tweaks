@@ -1,0 +1,22 @@
+{
+  "run": "20261005-C162-7CE1CFC5",
+  "asset": "7CE1CFC5",
+  "index": 59,
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "candidate_sha256": "b75102588dc30ec828fdec765658d2e25cbcee9d972832bb70b527b372008542",
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "4/4",
+  "decoded_changed_outside": 0,
+  "alpha_outside": 0,
+  "introduced_visible_outside": 0,
+  "source_residue": 0,
+  "overlap": 0,
+  "touch_pairs": 0,
+  "target_protected_overlap": 0,
+  "target_protected_1px_near": 0,
+  "protected_source_changed": 0,
+  "changed_bc3_blocks": 19293,
+  "changed_bc3_blocks_wholly_outside_allowed": 0,
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_C/20261005-C162-7CE1CFC5/C162_7CE_MACHINE_QA.json"
+}
