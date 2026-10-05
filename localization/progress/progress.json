@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T16:06:00+09:00",
+  "updated_at_kst": "2026-10-05T16:35:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -557,8 +557,8 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 18,
-    "current_producer_rework_remaining": 2,
+    "current_pending_artwork_localize_text": 17,
+    "current_producer_rework_remaining": 4,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T14:52:10+09:00",
       "assets": [
@@ -1129,7 +1129,9 @@
     },
     "current_producer_rework_assets": [
       "63C91067",
-      "C598919A"
+      "C598919A",
+      "A05BF610",
+      "37759842"
     ],
     "a_production26_2ea557b4": {
       "index": 55,
@@ -1243,7 +1245,7 @@
       "report": "localization/graphics/role_C/20261005-C170-754F0599/C170_754F_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C171-C172-BATCH/C171_C172_BATCH_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C173-C174-BATCH/C173_C174_BATCH_FINAL_QA.json",
     "c171_controller_final_qa": {
       "timestamp_kst": "2026-10-05T16:06:00+09:00",
       "run": "20261005-C171-754F0599",
@@ -1266,6 +1268,31 @@
       "decision": "C172_REWORK_REQUIRED_CLEAN_PLATE_GHOSTING_AND_ARTWORK_DAMAGE",
       "supersedes": "C169_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE",
       "report": "localization/graphics/role_C/20261005-C172-63C91067/C172_63C_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c173_controller_final_qa": {
+      "timestamp_kst": "2026-10-05T16:35:00+09:00",
+      "run": "20261005-C173-A05BF610",
+      "queue_index": 28,
+      "candidate_sha256": "d124775363f3e989a312d13fa0ee17436a28cd927837933b0ea9c8a98a89e6a2",
+      "machine_status": "REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+      "controller_visual_qa": "FAIL_SOURCE_TEXT_RESIDUE_AND_GHOST_CLEAN_PLATE",
+      "decision": "C173_REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+      "machine_report": "localization/graphics/role_C/20261005-C173-A05BF610/C173_A05_MACHINE_QA.json",
+      "report": "localization/graphics/role_C/20261005-C173-A05BF610/C173_A05_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c174_controller_final_qa": {
+      "timestamp_kst": "2026-10-05T16:35:00+09:00",
+      "run": "20261005-C174-37759842",
+      "queue_index": 95,
+      "candidate_sha256": "d43a8476c72552486dd2352740e21cf87a0767765ef6440111d1be02e37ba825",
+      "producer_bbox_size_positive_margin": "33/33 PASS",
+      "producer_source_core_residue_pixels": 2573,
+      "producer_clean_source_core_unchanged": 2774,
+      "controller_visual_qa": "FAIL_CANNOT_ADVANCE_MACHINE_ZERO_OVERLAP_VIOLATION",
+      "decision": "C174_REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
+      "report": "localization/graphics/role_C/20261005-C174-37759842/C174_37759842_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     }
   },
