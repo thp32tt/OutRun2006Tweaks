@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C172-63C91067",
+  "qa_id": "C172",
+  "timestamp_kst": "2026-10-05T16:02:00+09:00",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION111",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "candidate_sha256": "08c1325ef5404f74045aa28d744ad38d66729cba7f701228e8147daeb03398a2",
+  "candidate_changed_by_C": false,
+  "producer_machine_status": "PASS_REPORTED",
+  "producer_bbox_size_positive_margin": "2/2 PASS",
+  "producer_zero_pixel_gates": {
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "decoded_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "source_effect_residue": 0,
+    "render_outside_target": 0,
+    "localized_overlap": 0
+  },
+  "controller_visual_qa": "FAIL_CLEAN_PLATE_GHOSTING_AND_ARTWORK_DAMAGE",
+  "visual_failures": [
+    "Pink cloud CLEAN contains multiple rectangular/letter-shaped tonal ghosts across the removed-title area; the background is no longer a smooth source-faithful gradient.",
+    "Lower starburst CLEAN still contains non-source orange/brown blobs and broken/clipped inner-glow geometry around the top-center title-removal region.",
+    "Both defects remain visible behind/adjacent to the Korean title in FINAL."
+  ],
+  "reasoning": "B111 symmetry reconstruction changed only permitted pixels and passes numeric residue/outside gates, but the contract explicitly rejects seams, residue-like ghosts, texture/gradient discontinuity and unintended artwork changes. Mandatory visual QA therefore fails.",
+  "decision": "C172_REWORK_REQUIRED_CLEAN_PLATE_GHOSTING_AND_ARTWORK_DAMAGE",
+  "required_rework": "Reconstruct the two patterned plates from source-faithful neighboring/symmetric content without letter-shaped ghosts, block boundaries, blobs or clipped glow geometry; verify the CLEAN plate visually before Korean lettering, then rerun exact-pixel and controller visual QA.",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION111/B111_63C_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION111/B111_63C_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION111/B111_63C_ROW_CONTACT.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION111/B111_63C_RAW_COMPARE.jpg"
+  ],
+  "supersedes_controller_decision": "C169_REWORK_REQUIRED_CLEAN_PLATE_ARTWORK_DAMAGE",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
