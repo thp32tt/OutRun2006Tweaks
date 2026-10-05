@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T16:35:00+09:00",
+  "updated_at_kst": "2026-10-05T17:05:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1245,7 +1245,7 @@
       "report": "localization/graphics/role_C/20261005-C170-754F0599/C170_754F_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C173-C174-BATCH/C173_C174_BATCH_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C175-C176-BATCH/C175_C176_BATCH_FINAL_QA.json",
     "c171_controller_final_qa": {
       "timestamp_kst": "2026-10-05T16:06:00+09:00",
       "run": "20261005-C171-754F0599",
@@ -1293,6 +1293,33 @@
       "controller_visual_qa": "FAIL_CANNOT_ADVANCE_MACHINE_ZERO_OVERLAP_VIOLATION",
       "decision": "C174_REWORK_REQUIRED_SOURCE_TEXT_RESIDUE",
       "report": "localization/graphics/role_C/20261005-C174-37759842/C174_37759842_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c175_controller_final_qa": {
+      "timestamp_kst": "2026-10-05T17:05:00+09:00",
+      "run": "20261005-C175-A05BF610",
+      "queue_index": 28,
+      "candidate_sha256": "60bceae994a26e21cba719908340cd1eade7902b66077fda2b982d99ab22f6c2",
+      "machine_status": "PASS",
+      "controller_visual_qa": "FAIL_CLEAN_PLATE_RECTANGLE_AND_BORDER_DAMAGE",
+      "decision": "C175_REWORK_REQUIRED_CLEAN_PLATE_RECTANGLE_AND_BORDER_DAMAGE",
+      "corrective_rework_by_C": true,
+      "superseded_by": "C176",
+      "machine_report": "localization/graphics/role_C/20261005-C175-A05BF610/C175_A05_MACHINE_REWORK_QA.json",
+      "report": "localization/graphics/role_C/20261005-C175-A05BF610/C175_A05_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c176_controller_final_qa": {
+      "timestamp_kst": "2026-10-05T17:05:00+09:00",
+      "run": "20261005-C176-A05BF610",
+      "queue_index": 28,
+      "candidate_sha256": "205d756d9f163dfd6abee9facb6a92588f7654981a5e3c284a37574da5310b4c",
+      "producer_run": "20261005-B-PRODUCTION124",
+      "producer_machine_status": "PASS_REPORTED",
+      "producer_bbox_size_positive_margin": "1/1 PASS",
+      "controller_visual_qa": "FAIL_CLEAN_PLATE_RESIDUE_AND_BORDER_TOUCH",
+      "decision": "C176_REWORK_REQUIRED_CLEAN_PLATE_RESIDUE_BORDER_TOUCH_AND_SPACING",
+      "report": "localization/graphics/role_C/20261005-C176-A05BF610/C176_A05_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     }
   },
