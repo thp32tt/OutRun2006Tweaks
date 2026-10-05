@@ -1,5 +1,5 @@
 {
-  "schema_version": 92,
+  "schema_version": 93,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_PRODUCTION60 completed odd index163 59A79158 candidate 1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583. A58 source contact proved physical order idx0..23 = Waterfalls..Castle Wall (reverse artwork-plan list). A59 was machine-safe but rejected as visually undersized; A60 restored source-family shared vertical scale. 24/24 bbox/size/positive-margin, CLEAN/FINAL PASS, outside/alpha/protected/residue/render/overlap/touch=0, readable/raw mirror_y self-QA PASS. C203 machine QA independently matches 24/24 source/localized bboxes but C controller remains pending. Index143 stale pending state reconciled to preserve-original song-title policy. RUNTIME_VALIDATION=UNTESTED.",
     "C201 finalized A56 index161 55B57CDE candidate 78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812. Independent canonical DXT5+atlas revalidation: source/localized bbox exact 38/38, containment/size/positive margins 38/38, semantic mapping PASS, outside/alpha/introduced-visible/source-residue/overlap/touch/out-of-allowed DXT5 blocks all 0; controller contacts/raw mirror_y PASS. C201_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "C202 finalized B148 index30 8215FD25 candidate cb023fa5533b4a058c437c1a879b2952a7268308e47202f7dced32c6a563e141. Independent C machine QA: 2/2 exact localized bbox containment/size/positive margins, decoded/alpha/render outside=0, overlap/touch=0; starburst clean patch is pixel-exact to C193-approved B137 same-family clean template after +1088 x shift (diff=0/max channel delta=0). Controller SOURCE/CLEAN/FINAL/raw visual PASS; speech bubble remains seamless. Supersedes C196/C198/C199/C200. C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED.",
     "A_PRODUCTION56 supersedes C197/A54 for odd index161 55B57CDE. Candidate 78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812 uses exact source-bbox rectangular clean scope and explicit BC3 alpha normalization. Hosted worker PASS: 38/38 decoded bbox exact-match to intended Hangul; 38/38 bbox/size/positive-margin; decoded alpha extra/missing=0/0; source-bbox residue=0; outside/alpha/introduced-visible=0; changed blocks outside patch=0. Controller SOURCE/CLEAN/FINAL + raw mirror_y visual QA PASS. Pending independent C and in-game. A55 failed closed at one remaining alpha pixel and was not promoted. RUNTIME_VALIDATION=UNTESTED.",
@@ -3938,7 +3939,7 @@
     "c176_return_resolved": true,
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_artwork_localize_text": 12,
+  "current_pending_artwork_localize_text": 10,
   "current_producer_rework_remaining": 1,
   "current_producer_rework_assets": [
     "37759842"
@@ -4054,7 +4055,8 @@
     "runtime_validation": "UNTESTED"
   },
   "current_pending_c": [
-    "DCC7B488"
+    "DCC7B488",
+    "59A79158"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -4387,5 +4389,61 @@
     "report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_DCC7_REPORT.json",
     "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
+  },
+  "a_production60_59a79158": {
+    "timestamp_kst": "2026-10-05T22:00:20+09:00",
+    "run": "20261005-A-PRODUCTION60",
+    "queue_index": 163,
+    "asset": "59A79158",
+    "source_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+    "candidate_sha256": "1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583",
+    "status": "A60_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "prior_attempts": {
+      "a57": "FAIL_CLOSED_WRONG_PHYSICAL_BINDING_NO_CANDIDATE",
+      "a58": "PREFLIGHT_SOURCE_CONTACT",
+      "a59": "REWORK_REQUIRED_SOURCE_SCALE"
+    },
+    "machine_qa": {
+      "bbox_size_positive_margin": "24/24 PASS",
+      "clean_plate_validator": "PASS",
+      "final_mask_validator": "PASS",
+      "changed_outside": 0,
+      "alpha_outside": 0,
+      "protected_changed": 0,
+      "source_residue": 0,
+      "render_outside_target": 0,
+      "overlap": 0,
+      "touch": 0
+    },
+    "source_style": {
+      "family": "shared dark-gray bold condensed stage-list labels",
+      "shared_lowres_font_size": 9,
+      "pixel_scale": 4,
+      "alignment": "left",
+      "skyscrapers_horizontal_scale": 0.9899
+    },
+    "structure": {
+      "dimensions": [
+        1024,
+        2048
+      ],
+      "format": "RGBA32",
+      "raw_mode": "BGRA",
+      "mipmaps": 1,
+      "raw_orientation": "mirror_y"
+    },
+    "controller_visual_qa": "PASS",
+    "pending_independent_c_final_qa": true,
+    "c203_machine_observation": "PASS_MACHINE_ONLY_CONTROLLER_C_PENDING",
+    "report": "localization/graphics/role_A/20261005-A-PRODUCTION60/A60_59A79158_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION60/A60_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "index143_preserve_original_reconciliation": {
+    "timestamp_kst": "2026-10-05T22:00:20+09:00",
+    "index": 143,
+    "asset": "34923C8A",
+    "status": "PRESERVE_ORIGINAL_POLICY_NO_CANDIDATE_REQUIRED",
+    "reason": "song-title artwork per TRANSLATION_NAMING_POLICY"
   }
 }
