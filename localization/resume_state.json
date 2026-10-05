@@ -962,7 +962,7 @@
       "status": "PENDING_B_C_D_STRICT_QA"
     },
     "latest_d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json",
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C164-C166-BATCH/C164_C166_BATCH_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261005-C167-63C91067/C167_63C_CONTROLLER_FINAL_QA.json",
     "c77_fa7bbb13": {
       "timestamp_kst": "2026-09-27T14:05:02+09:00",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
@@ -3782,6 +3782,18 @@
     "controller_visual_qa": "FAIL_CLEAN_PLATE_GRADIENT_SEAM",
     "decision": "C166_REWORK_REQUIRED_CLEAN_PLATE_GRADIENT_SEAM",
     "report": "localization/graphics/role_C/20261005-C166-63C91067/C166_63C_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c167_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T15:10:00+09:00",
+    "run": "20261005-C167-63C91067",
+    "queue_index": 26,
+    "candidate_sha256": "40d7a005c7978151e01099e72317df48d44629e71661626222981745d5acb963",
+    "producer_machine_status": "PASS_REPORTED",
+    "controller_visual_qa": "FAIL_CLEAN_PLATE_VISIBLE_RECONSTRUCTION_ARTIFACTS",
+    "decision": "C167_REWORK_REQUIRED_CLEAN_PLATE_VISIBLE_RECONSTRUCTION_ARTIFACTS",
+    "supersedes": "C166_REWORK_REQUIRED_CLEAN_PLATE_GRADIENT_SEAM",
+    "report": "localization/graphics/role_C/20261005-C167-63C91067/C167_63C_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
