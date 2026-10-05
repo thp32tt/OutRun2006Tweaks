@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00417",
+  "production_id": "CONVERSION-DX9EX-00417",
+  "event_id": "CONVERSION-DX9EX-00417-E003",
+  "event_type": "rollover",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "7d30041f4a68ddec79c53a680d5002a1e838ba6f",
+  "source_material_sha": "527d258c4f4c96ceade1ccc35a2c19e53b9fd14b",
+  "material_result_sha": "51cf08fdf36adbd31ca85c4fb376f179229e33a2",
+  "validation_bearing_result_sha": "51cf08fdf36adbd31ca85c4fb376f179229e33a2",
+  "result_sha": "51cf08fdf36adbd31ca85c4fb376f179229e33a2",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00417]",
+  "selected_work_item": "L3-DX9EX-001",
+  "summary": "Closed a reset-time D3D9Ex/D3D11 interop probe lifetime race by retiring the shared probe token then shared handle before releasing the D3D9 COM resources, and extended the canonical reset/transport verifier to pin that publication-before-release ordering.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00417.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered branch HEAD 7d30041f... from completed 00416 reset/transport contract; no 00417 record or task-tagged commit existed, so rollover was classified as pre-generation/no-result rather than retry."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Reviewed ReleaseStereoResources and host ServiceInteropProbe. Found shared clientInteropProbeHandle/token were cleared after COM release, leaving a bounded stale-handle observation window during ResetEx."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "527d258c retires clientInteropProbeToken then clientInteropProbeHandle before releasing DirectInteropProbe COM resources; 51cf08fd adds deterministic require_order coverage."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 51cf08fdf36adbd31ca85c4fb376f179229e33a2: DX9Ex Active Validation 37357303580 SUCCESS (policy 111922976188, full-chain-compile 111923134581, game 111923134620, host 111923134673, package 111925364035); Domain Isolation Guard 37357303115 SUCCESS."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "527d258c4f4c96ceade1ccc35a2c19e53b9fd14b fix(vr): retire interop probe publication before reset release [AUTO:CONVERSION-DX9EX-00417]",
+        "51cf08fdf36adbd31ca85c4fb376f179229e33a2 test(vr): gate interop probe retirement ordering [AUTO:CONVERSION-DX9EX-00417]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "OutRun2-VR-DX9EX-ACTIVE-51cf08fdf36adbd31ca85c4fb376f179229e33a2 artifact 11365302382 digest sha256:e84c55b18d2232002922efcd43f419acaf72ef189282129f8aefb29fd0d40c41. CI evidence only, not HMD proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37357303580,
+      "conclusion": "success",
+      "exact_sha": "51cf08fdf36adbd31ca85c4fb376f179229e33a2",
+      "jobs": {
+        "policy": 111922976188,
+        "full_chain_compile": 111923134581,
+        "game": 111923134620,
+        "host": 111923134673,
+        "package": 111925364035
+      },
+      "package_artifact_id": 11365302382,
+      "package_artifact_digest": "sha256:e84c55b18d2232002922efcd43f419acaf72ef189282129f8aefb29fd0d40c41"
+    },
+    "domain_isolation": {
+      "run_id": 37357303115,
+      "conclusion": "success",
+      "exact_sha": "51cf08fdf36adbd31ca85c4fb376f179229e33a2"
+    }
+  },
+  "next_action": "Treat interop probe publication retirement ordering as statically guarded. Runtime remains UNTESTED; continue the next executable DX9Ex quality/stability item without repeating 00416/00417 reset lifecycle work.",
+  "completed_at_kst": "2026-10-06T03:43:24+09:00"
+}
