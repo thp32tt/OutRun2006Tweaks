@@ -14,7 +14,9 @@
   "visible_outside": 0,
   "protected_rows_changed": 0,
   "changed_blocks_outside_patch": 0,
-  "worker_status": "B89_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "worker_status": "B89_SELF_QA_PASS_PENDING_C_AND_INGAME",
   "runtime_validation": "UNTESTED",
-  "report": "localization/graphics/role_B/20261005-B-PRODUCTION89/B89_DDF_REPORT.json"
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION89/B89_DDF_REPORT.json",
+  "controller_visual_qa": "PASS",
+  "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION89/B89_CONTROLLER_SELF_QA.json"
 }
