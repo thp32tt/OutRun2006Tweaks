@@ -1186,3 +1186,14 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Queue index 230 advanced to `b73_self_qa_pass_pending_c`; pending_artwork localize_text=31. Independent C final QA and isolated in-game validation remain pending.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION73/B73_E95_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION73/B73_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261005-B-PRODUCTION73/B73_FINAL_VALIDATION.json`.
+
+## 2026-10-05 10:36:18 KST — C149 E95DA5 B73 final PASS
+- Reviewed only the new B_PRODUCTION73 index 230 `E95DA5_512x256.dds`; completed C144-and-earlier PASS assets were not repeated.
+- GitHub-hosted C output remained unavailable after C145/C146/C147 dispatch attempts, so the contract-authorized N100 fallback executed the independent heavy Python QA against the pinned canonical source/atlas. C149 uses the corrected exact residue basis: source-to-independent-clean changed pixels, not every pixel included by the strengthened pill diagnostic mask.
+- B73 CLEAN matches C149's independent reconstruction by 0 pixels. Candidate `d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b` preserves exact 2048x1024 RGBA32 header/raw `mirror_y`; 11/11 bbox containment, source-size ceilings and positive margins PASS; outside=0, alpha-outside=0, protected/preserved changes=0, render-outside-target=0, source residue=0, overlap=0, touch=0, target-to-preserved overlap=0 and 1px-near=0.
+- A preliminary raw strengthened-mask diagnostic counted 1,806 equal-source pixels in the pill bboxes (UNAVAILABLE 1,359; SOLD 447), but source-to-clean reconstruction proves those pixels are plate/background pixels unchanged by cleaning, not English residue. The corrected exact residue gate is 0.
+- Controller SOURCE/CLEAN/FINAL, per-row contacts and raw mirror_y review PASS. NotoSansCJK-Black weight is consistent with the source block family; `이용 불가`/`판매 완료` are centered on the red pills without visible seam/residue; song titles, Alberto's Antics names, explanatory English lines and non-text artwork remain unchanged.
+- Decision: `C149_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. Candidate unchanged by C. Producer REWORK=0; pending_artwork localize_text=31.
+- `4F68708E`, `F6811E94`, and `49BB5FE5` remain strict DXT5 no-candidate HOLD; existing `1A43E9D9` remains HIGH_RISK pending mandatory in-game validation.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C149-E95DA5/C149_E95_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C149-E95DA5/C149_E95_MACHINE_QA.json`.
