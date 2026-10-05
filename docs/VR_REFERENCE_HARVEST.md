@@ -28,6 +28,11 @@ No behavior is accepted merely because another mod used it.
 | openRBRVR / `dxvk-openRBRVR` | a DXVK-based D3D9 VR path is viable, but it makes the graphics translation layer part of the mod | DXVK remains an isolated measured experiment |
 | ReShade / D3D wrappers | robust device/reset/present lifecycle interception patterns | compared against D3D9 hook lifecycle |
 | iZ3D / historical stereo wrappers | final-draw duplication, stereo projection and zero-disparity UI concepts | historical reference only; no incompatible source imported |
+| GameOrDie007/Star-Wars-Episode-I-Racer-PCVR | 32-bit OpenXR port: asymmetric per-eye projection, world-locked 2D panel, HMD-aware culling and exact world/screen overlay separation | design reference only; AGPL source is not copied |
+| JayBiggsGMG/BFVR-Battlefield-1942-VR-Mod | x86 legacy renderer + x64 D3D11/OpenXR presenter, shared-texture transport and per-stage OpenXR timing | timing granularity adopted in the x64 host; MIT project remains a reference |
+| letsgosportsteam/mirrors-edge-vr-mod | 32-bit D3D9 proxy, exact shader/material identity for stereo effects and lens-flare suppression, production-code regression harnesses | retain exact-identity/fail-closed rule; no OutRun flare is suppressed until its own identity is captured |
+| RyanCraighead/lego-racers-vr and LoizouS/MKart64-VR | racing ports that separate race stereo from non-race/menu presentation and compose head motion onto the authoritative race camera | confirms current projection/theater mode split and simulation-once/render-per-eye policy |
+| VR-Stereo-Hub/bioshock-trilogy-vr | Present-hook OpenXR pacing experiments document pair-pacing shear and D3D11 immediate-context threading hazards | reinforces same-frame pose/FOV ownership and single-context discipline; no stale-frame shortcut adopted |
 
 ## Important conclusion: D3D9Ex is a backend, not an assumption
 
@@ -151,3 +156,22 @@ The policy differs by branch:
 - Full GPLv3 terms are stored in `COPYING.GPL3`.
 
 Further GPL/LGPL imports must be added to this ledger before release.
+
+
+## 2026-10-06 current VR-mod sweep
+
+The October 2026 sweep compared current code-bearing projects rather than release screenshots or profile-only mods. The most transferable findings were deliberately limited to patterns that preserve OutRun's already-verified renderer invariants.
+
+Adopted now on `vr-dx11-native-r71`:
+
+- host timing now separates `xrWaitFrame`, `xrBeginFrame`, pose/view location, source capture, render/composition and `xrEndFrame`;
+- compositor timing separately records swapchain acquire, image wait, release, ordinary projection/theater blit enqueue and menu-plane blit enqueue;
+- timing uses rolling p95/p99 windows and does not add GPU synchronization, so diagnostics do not intentionally change frame pacing.
+
+Retained as a rule but not force-applied:
+
+- lens flare/effect suppression must use exact OutRun-owned shader/material/producer evidence. A foreign mod's hash or material identity is never portable evidence;
+- race stereo and non-race/menu presentation stay separate unless runtime evidence proves a specific screen element needs a different owner;
+- a presented eye pair must keep the pose/FOV associated with the image that was actually rendered. Reusing a stale image under a new pose is not an accepted performance optimization.
+
+No source code from the external projects above is copied by this sweep.
