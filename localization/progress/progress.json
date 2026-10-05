@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T08:00:19+09:00",
+  "updated_at_kst": "2026-10-06T08:05:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1781,7 +1781,7 @@
       "material_fix": {
         "row": "Stage -> 스테이지",
         "historical_horizontal_scale": 0.7028,
-        "new_horizontal_scale": 1.0,
+        "new_horizontal_scale": 1,
         "font": "Noto Sans CJK KR Bold",
         "font_size": 60,
         "shear": 0.16,
@@ -1845,7 +1845,7 @@
       "material_fix": {
         "row": "Stage -> 스테이지",
         "historical_horizontal_scale": 0.7028,
-        "new_horizontal_scale": 1.0,
+        "new_horizontal_scale": 1,
         "font": "Noto Sans CJK KR Bold",
         "font_size": 60,
         "shear": 0.16,
@@ -1865,7 +1865,38 @@
       "runtime_validation": "PENDING_NEW_INGAME_RETEST",
       "report": "localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_IGR010_REPORT.json",
       "controller_report": "localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_CONTROLLER_SELF_QA.json"
-    }
+    },
+    "a98_zoom_review_4afc1bed": {
+      "run": "A98",
+      "queue_index": 25,
+      "asset": "4AFC1BED",
+      "action": "zoom_review",
+      "source_sha256": "542025bee37f371b236d77854b4b7f95574ae051b91bc31a205af03dfd1adb7f",
+      "source_structure": "2048x2048 RGBA32 mip1 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "localizable_segments": 0,
+      "candidate_required": false,
+      "controller_visual_qa": "PASS_READABLE_AND_RAW",
+      "evidence": "localization/graphics/role_A/20261006-A-PROBE98-4AFC1BED/A98_CONTROLLER_CLASSIFICATION.json",
+      "status": "A98_ZOOM_REVIEW_COMPLETE_PRESERVE_ORIGINAL",
+      "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION"
+    },
+    "latest_a_zoom_review": {
+      "run": "A98",
+      "queue_index": 25,
+      "asset": "4AFC1BED",
+      "action": "zoom_review",
+      "source_sha256": "542025bee37f371b236d77854b4b7f95574ae051b91bc31a205af03dfd1adb7f",
+      "source_structure": "2048x2048 RGBA32 mip1 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "localizable_segments": 0,
+      "candidate_required": false,
+      "controller_visual_qa": "PASS_READABLE_AND_RAW",
+      "evidence": "localization/graphics/role_A/20261006-A-PROBE98-4AFC1BED/A98_CONTROLLER_CLASSIFICATION.json",
+      "status": "A98_ZOOM_REVIEW_COMPLETE_PRESERVE_ORIGINAL",
+      "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION"
+    },
+    "current_blocked_zoom_review": 40
   },
   "data_build": {
     "draft_bin_entries": 1356,
