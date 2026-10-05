@@ -2,12 +2,12 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX9EX-00409",
   "production_id": "CONVERSION-DX9EX-00409",
-  "event_id": "CONVERSION-DX9EX-00409-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX9EX-00409-E002",
+  "event_type": "retry",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "attempt": "1/3",
-  "status": "COMPLETE",
+  "attempt": "2/3",
+  "status": "IN_PROGRESS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
@@ -31,21 +31,21 @@
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered VR_REFACTOR_STATE at cycle 1100. The declared next bounded successor was dead draw-executor cleanup after R31/R32 physical draw-hook retirement."
+      "evidence": "E002 recovered the missing-run failure as a result-identity bug: 3060adb27c8444deb4c6094b1a15cb42fbee414f changes only docs/VR_WORK_QUEUE.json, while 117d6b7980dd41c8504558b6bafc38dda01e184b owns the successful canonical Gate. The run record lacked the contract-required result_sha field."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
-      "evidence": "R31TryFastWorld/R31TryHud and R32TryFastWorld/R32TryHud had no live callers after R33 direct-to-R30 hook retirement. R31BuildFastWorldConstants, R31TelemetryNoteFastWorld/Hud, R32EffectIsFragileLive, R32SetWvpBatch, R32GetSavedViewport, R32RestoreRightPassState and R32ObserveFrameWorkload remain live through R33 and were preserved."
+      "evidence": "Queue Controller Contract requires result_sha and forbids later bookkeeping/checkpoint commits from silently replacing validation_bearing_result_sha. Current fail-closed workflow also exposed stale verifier literals after the verifier runner changed to an explicit $verifiers loop."
     },
     "C2_IMPLEMENT": {
-      "status": "COMPLETE",
-      "evidence": "cabc25a removed dead R31 executors and R31-only first-log flags; 45995627 removed dead R32 executors; 117d6b79 added fail-closed reintroduction guards."
+      "status": "IN_PROGRESS",
+      "evidence": "Staged explicit result_sha/bookkeeping roles; verifier repair material commit pending."
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE",
-      "automation_validation": "PASS",
+      "status": "PENDING",
+      "automation_validation": "PENDING",
       "runtime_validation": "UNTESTED",
-      "evidence": "Exact SHA 117d6b7980dd41c8504558b6bafc38dda01e184b: DX9Ex Active Validation 37297954231 SUCCESS (policy 111723598839, host 111723726505, full-chain-compile 111723726549, game 111723726635, package 111725245114). Domain Isolation Guard 37297954242 SUCCESS. No Quest3/VDXR runtime test performed."
+      "evidence": "New exact-SHA Gate pending for E002 repair."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
@@ -67,7 +67,7 @@
       "runtime_validation": "UNTESTED"
     }
   },
-  "automation_validation": "PASS",
+  "automation_validation": "PENDING",
   "evidence": {
     "dx9ex_active": {
       "run_id": 37297954231,
@@ -99,5 +99,41 @@
     }
   },
   "next_action": "Keep all non-DX9Ex tracks frozen. Next bounded structural unit: census the remaining R33-consumed fast-path helpers still defined in R31/R32 and extract one neutral shared owner only where lifecycle ownership is not implied.",
-  "completed_at_kst": "2026-10-05T19:45:19+09:00"
+  "completed_at_kst": null,
+  "result_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+  "failure_context": {
+    "supplied": "No authoritative DX9Ex Active Validation run was created for result SHA 3060adb27c8444deb4c6094b1a15cb42fbee414f after 697s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
+    "classification": "BOOKKEEPING_SHA_MISIDENTIFIED_AS_RESULT_DUE_MISSING_RESULT_SHA",
+    "misidentified_sha": "3060adb27c8444deb4c6094b1a15cb42fbee414f",
+    "misidentified_sha_role": "QUEUE_BOOKKEEPING_ONLY",
+    "actual_prior_validation_bearing_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+    "actions_failure": false,
+    "repairable": true
+  },
+  "result_identity": {
+    "source_material_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+    "result_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+    "validation_bearing_result_sha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
+    "queue_commit_sha": "3060adb27c8444deb4c6094b1a15cb42fbee414f",
+    "queue_commit_role": "BOOKKEEPING_ONLY",
+    "state_commit_sha": "793d68c97febe970a99d26f36aa64f04e34bfa03",
+    "state_commit_role": "BOOKKEEPING_ONLY"
+  },
+  "retry_repair": {
+    "event_id": "CONVERSION-DX9EX-00409-E002",
+    "attempt": "2/3",
+    "repaired_stage": "C3_VALIDATE/C6_RESULT_IDENTITY",
+    "reason": "Required result_sha was absent even though validation_bearing_result_sha was present; controller selected queue_commit_sha 3060adb... and waited for a Gate that the bookkeeping-only commit was never meant to own.",
+    "repair_plan": [
+      "Persist explicit result_sha and bookkeeping roles.",
+      "Update fail-closed verifiers so the current DX9Ex workflow layout is recognized.",
+      "Add deterministic 00409 result-identity guard.",
+      "Promote the new exact-SHA verifier repair commit only after canonical DX9Ex Active Validation and Domain Isolation pass."
+    ],
+    "prior_dx9ex_active_run_id": 37297954231,
+    "prior_dx9ex_active_conclusion": "success",
+    "prior_domain_isolation_run_id": 37297954242,
+    "prior_domain_isolation_conclusion": "success",
+    "runtime_validation": "UNTESTED"
+  }
 }
