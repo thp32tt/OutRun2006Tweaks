@@ -3927,19 +3927,18 @@
     "runtime_validation": "UNTESTED"
   },
   "current_pending_artwork_localize_text": 15,
-  "current_producer_rework_remaining": 3,
+  "current_producer_rework_remaining": 2,
   "current_producer_rework_assets": [
-    "63C91067",
     "C598919A",
     "37759842"
   ],
   "latest_b_production": {
-    "run": "B_PRODUCTION128",
-    "asset": "A05BF610",
-    "queue_index": 28,
-    "candidate_sha256": "bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8",
-    "report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_A05_REPORT.json",
-    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_CONTROLLER_SELF_QA.json",
+    "run": "B_PRODUCTION137",
+    "asset": "63C91067",
+    "queue_index": 26,
+    "candidate_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_63C_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_CONTROLLER_SELF_QA.json",
     "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
     "runtime_validation": "UNTESTED"
   },
@@ -4043,7 +4042,9 @@
     "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION47/A47_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": [],
+  "current_pending_c": [
+    "63C91067"
+  ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
     "run": "20261005-C180-560FA536",
@@ -4094,6 +4095,21 @@
     "decision": "C188_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
     "machine_report": "localization/graphics/role_C/20261005-C188-25F697C6/C188_25F697C6_MACHINE_QA.json",
     "report": "localization/graphics/role_C/20261005-C188-25F697C6/C188_25F697C6_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "b_production137_63c91067": {
+    "timestamp_kst": "2026-10-05T19:18:00+09:00",
+    "run": "20261005-B-PRODUCTION137",
+    "queue_index": 26,
+    "asset": "63C91067",
+    "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+    "candidate_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
+    "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "machine_qa": "2/2 bbox/size/positive-margin PASS; outside/alpha/residue/render-outside/overlap=0",
+    "controller_visual_qa": "PASS",
+    "c184_return_resolved": true,
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_63C_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }
