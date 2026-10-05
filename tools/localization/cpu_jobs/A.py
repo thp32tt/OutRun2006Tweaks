@@ -8,7 +8,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
 
 repo=Path.cwd()
-run="20261006-A-INGAME89-IGR003-SHOWROOM"
+run="20261006-A-INGAME89R-IGR003-SHOWROOM"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -31,25 +31,11 @@ assets={
        "fill":[46,53,57,255],"stroke":0,"align":"left","margin":2}
    ]
  },
- "A9":{
-   "queue_index":201,
-   "rel":"textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
-   "old_sha":"59b21fa3aadf86e892dbd6adee4b178b2dad09048fd314fd731135f363d6a6fe",
-   "source_sha":"6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
-   "source_url":"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
-   "clean":"localization/graphics/role_A/20261005-A-PRODUCTION69/A69_CLEAN_PLATE.png",
-   "protected":"localization/graphics/role_A/20261005-A-PRODUCTION69/A69_PROTECTED_VISIBLE_MASK.png",
-   "targets":[
-      {"key":"stages","source":"STAGES","korean":"스테이지",
-       "bb":[1173,1986,1379,2037],"font_style":"Black","font_start":58,
-       "fill":[46,54,57,255],"stroke":0,"align":"left","margin":2},
-      {"key":"goals","source":"GOALS","korean":"골",
-       "bb":[1079,1734,1255,1785],"font_style":"Black","font_start":58,
-       "fill":[46,54,57,255],"stroke":0,"align":"left","margin":2}
-   ]
- }
+
 }
 preserved={
+ "A9ABD877":{"queue_index":201,"sha":"a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+   "rel":"textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds","role":"current B168 native STAGES/GOALS + stage family"},
  "754F0599":{"queue_index":175,"sha":"884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
    "rel":"textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds","role":"metallic top SHOWROOM header"},
  "E95DA5":{"queue_index":230,"sha":"d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
@@ -223,24 +209,24 @@ report={
    "visible_bindings":[
      {"asset":"754F0599","queue_index":175,"screen":"metallic top SHOWROOM header","action":"PRESERVED_C171_NATIVE"},
      {"asset":"97E863AD","queue_index":193,"screen":"WELCOME TO THE / OUTRUN SHOWROOM body","action":"REWORKED_NATIVE_VISIBLE_ROWS"},
-     {"asset":"A9ABD877","queue_index":201,"screen":"STAGES / GOALS main-list rows","action":"REWORKED_NATIVE_VISIBLE_ROWS"},
+     {"asset":"A9ABD877","queue_index":201,"screen":"STAGES / GOALS main-list rows","action":"PRESERVED_CURRENT_B168_NATIVE"},
      {"asset":"E95DA5","queue_index":230,"screen":"FERRARI CARS / BGM / CAR COLORS main-list rows","action":"PRESERVED_C149_NATIVE"}
    ],
    "runtime_text_required":False,
-   "note":"Actual screenshot(145) shows one menu composed from four baked graphics families. User-visible mixed-resolution defect is isolated to legacy lowres*4 rows in 97E/A9; E95 and 754F visible rows are already native source-style and are preserved."
+   "note":"Actual screenshot(145) shows one menu composed from four baked graphics families. A89 retry consumes newer concurrent B168 A9ABD877 rather than overwriting it: its STAGES/GOALS and stage family are native-HD and preserved. Remaining user-visible mixed-resolution work is isolated to 97E863AD WELCOME/SHOWROOM rows; E95 and 754F are also preserved."
  },
  "assets":reports,"preserved_assets":preserved,
- "method":"Re-render only screenshot-visible legacy lowres*4 Korean rows directly at canonical HD resolution with Noto Sans CJK KR Black, exact source median fill and left alignment. Preserve already-native C149/C171 rows and all unrelated atlas content.",
+ "method":"Re-render only screenshot-visible 97E863AD legacy lowres*4 Korean rows directly at canonical HD resolution with Noto Sans CJK KR Black, exact source median fill and left alignment. Preserve newer B168 A9ABD877, C149 E95DA5, C171 754F0599 and all unrelated atlas content.",
  "visual_qa":"PENDING_CONTROLLER_SELF_QA","runtime_validation":"PENDING_NEW_INGAME_RETEST",
- "status":"A89_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"A89R_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
 (out/"A89_IGR003_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 (wr/"A89_IGR003.json").write_text(json.dumps({
  "run":run,"regression":"IGR-003","mapping":"EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
  "assets":{k:{"queue_index":v["queue_index"],"candidate_sha256":v["candidate_sha256"],
  "bbox_size_positive_margin":f"{len(v['rows'])}/{len(v['rows'])} PASS",**v["scope_qa"]} for k,v in reports.items()},
- "preserved":{"754F0599":preserved["754F0599"]["sha"],"E95DA5":preserved["E95DA5"]["sha"]},
+ "preserved":{"A9ABD877":preserved["A9ABD877"]["sha"],"754F0599":preserved["754F0599"]["sha"],"E95DA5":preserved["E95DA5"]["sha"]},
  "runtime_validation":"PENDING_NEW_INGAME_RETEST",
- "worker_status":report["status"],"report":str((out/"A89_IGR003_REPORT.json").relative_to(repo))
+ "retry_of_failed_workflow_run":37367610075,"worker_status":report["status"],"report":str((out/"A89_IGR003_REPORT.json").relative_to(repo))
 },ensure_ascii=False,indent=2)+"\n")
 print("A89_DONE",json.dumps({k:v["candidate_sha256"] for k,v in reports.items()}))
