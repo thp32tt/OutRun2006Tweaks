@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C180-C188-BATCH",
+  "timestamp_kst": "2026-10-05T19:02:14+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "candidate_changed_by_C": false,
+  "assets_checked": [
+    {
+      "qa_id": "C180",
+      "asset": "560FA536",
+      "decision": "C180_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    },
+    {
+      "qa_id": "C184",
+      "asset": "63C91067",
+      "decision": "C184_REWORK_REQUIRED_STARBURST_CLEAN_PLATE_RECONSTRUCTION_ARTIFACTS"
+    },
+    {
+      "qa_id": "C186",
+      "asset": "37759842",
+      "decision": "C186_REWORK_REQUIRED_MANUAL_TEMPLATE_CLEAN_PLATE_RECONSTRUCTION"
+    },
+    {
+      "qa_id": "C188",
+      "asset": "25F697C6",
+      "decision": "C188_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    }
+  ],
+  "result": "2_PIXEL_VISUAL_PASS_2_REWORK_REQUIRED",
+  "pixel_visual_pass_assets": [
+    "560FA536",
+    "25F697C6"
+  ],
+  "rework_required_assets": [
+    "63C91067",
+    "37759842"
+  ],
+  "global_producer_rework_remaining": [
+    "63C91067",
+    "C598919A",
+    "37759842"
+  ],
+  "pending_c_localize_text": 0,
+  "pending_artwork_localize_text": 15,
+  "superseded_or_retry_notes": [
+    "C183 B134 is superseded by latest B135/C184 and is not separately scored.",
+    "C185 A42 is superseded by latest A45/C186 and is not separately scored.",
+    "Initial C187 used an invalid alpha=0 RGB residue metric and its worker push lost a concurrent-update race; it is not a QA decision. Correct visible-alpha retry is C188."
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94",
+    "49BB5FE5",
+    "75C3586A"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
