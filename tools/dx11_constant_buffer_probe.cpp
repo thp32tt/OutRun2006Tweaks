@@ -4231,6 +4231,50 @@ int main()
         r258IndexedSourceRevalidation.snapshotToken != 0,
         "R258 indexed final dormant handoff revalidates current R255 source state");
 
+    NativeManagedTextureRegistry r261TextureRegistry;
+    int r261TextureKey = 0;
+    require(
+        r261TextureRegistry.register_texture(
+            &r261TextureKey, D3DFMT_A8R8G8B8, 4, 4, 1, 0,
+            D3DPOOL_MANAGED),
+        "R261 texture registry accepts exact managed stage resource");
+    std::array<unsigned char, 64> r261TexturePixels{};
+    for (std::size_t i = 0; i < r261TexturePixels.size(); ++i)
+        r261TexturePixels[i] = static_cast<unsigned char>(0x40u + (i & 0x1fu));
+    D3DLOCKED_RECT r261TextureLock{};
+    r261TextureLock.Pitch = 16;
+    r261TextureLock.pBits = r261TexturePixels.data();
+    require(
+        r261TextureRegistry.begin_source_lock(
+            &r261TextureKey, 0, nullptr, 0, r261TextureLock) &&
+        r261TextureRegistry.stage_source_unlock(&r261TextureKey, 0) &&
+        r261TextureRegistry.finish_source_unlock(
+            &r261TextureKey, 0, S_OK) &&
+        r261TextureRegistry.recreate_and_upload_mirror_for_observation(
+            &r261TextureKey, d3d.device),
+        "R261 texture stage builds current managed shadow and mirror");
+    const std::array<const void*, 1> r261TextureKeys{&r261TextureKey};
+    const auto r261TextureStages =
+        r261TextureRegistry.mirror_readiness_for_stages(
+            r261TextureKeys.data(), r261TextureKeys.size(),
+            0x1u, d3d.device);
+    require(
+        r261TextureStages.inputValid &&
+        r261TextureStages.allRequiredReady &&
+        r261TextureStages.registeredMask == 0x1u &&
+        r261TextureStages.shadowValidMask == 0x1u &&
+        r261TextureStages.resourcesOwnedMask == 0x1u &&
+        r261TextureStages.lifetimeCurrentMask == 0x1u &&
+        r261TextureStages.deviceMatchesMask == 0x1u &&
+        r261TextureStages.descriptorExactMask == 0x1u &&
+        r261TextureStages.readyMask == 0x1u &&
+        r261TextureStages.pendingMask == 0 &&
+        r261TextureStages.snapshotToken != 0 &&
+        r261TextureRegistry.validate_mirror_readiness_snapshot_for_stages(
+            r261TextureKeys.data(), r261TextureKeys.size(),
+            0x1u, d3d.device, r261TextureStages.snapshotToken),
+        "R261 texture stage prerequisite seals current managed texture behavior");
+
     const auto r260IndexedResourceBehavior =
         outrun::vr::dx11::compose_programmable_resource_behavior_readiness(
             r258IndexedSourceRevalidation,
@@ -4291,12 +4335,96 @@ int main()
         r260IndexedStaleVertex.reviewSnapshotToken == 0,
         "R260 indexed resource behavior rejects stale vertex mirror identity");
 
+    const auto r261IndexedTextureResourceBehavior =
+        outrun::vr::dx11::
+            compose_programmable_texture_resource_behavior_readiness(
+                r260IndexedResourceBehavior,
+                r260IndexedResourceBehavior.reviewSnapshotToken,
+                r261TextureRegistry,
+                r261TextureKeys.data(), r261TextureKeys.size(),
+                d3d.device,
+                r261TextureStages,
+                r261TextureStages.snapshotToken);
+    require(
+        r261IndexedTextureResourceBehavior.inputValid &&
+        r261IndexedTextureResourceBehavior.geometryReviewReady &&
+        r261IndexedTextureResourceBehavior.geometrySnapshotMatches &&
+        r261IndexedTextureResourceBehavior.requiredTextureScopePresent &&
+        r261IndexedTextureResourceBehavior.textureStagesInputValid &&
+        r261IndexedTextureResourceBehavior.textureStageSnapshotMatches &&
+        r261IndexedTextureResourceBehavior.geometryResourceBehaviorExact &&
+        r261IndexedTextureResourceBehavior.textureResourceBehaviorExact &&
+        !r261IndexedTextureResourceBehavior.outputResourceBehaviorProofPresent &&
+        !r261IndexedTextureResourceBehavior.fullResourceBehaviorProofPresent &&
+        r261IndexedTextureResourceBehavior.requiredTextureMask == 0x1u &&
+        r261IndexedTextureResourceBehavior.readyTextureMask == 0x1u &&
+        r261IndexedTextureResourceBehavior.pendingTextureMask == 0 &&
+        r261IndexedTextureResourceBehavior.missingResourceScopeMask == 0x4u &&
+        r261IndexedTextureResourceBehavior.boundaryPreserved &&
+        r261IndexedTextureResourceBehavior.reviewReady &&
+        r261IndexedTextureResourceBehavior.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_texture_resource_behavior_readiness_snapshot(
+                r260IndexedResourceBehavior,
+                r260IndexedResourceBehavior.reviewSnapshotToken,
+                r261TextureRegistry,
+                r261TextureKeys.data(), r261TextureKeys.size(),
+                d3d.device,
+                r261TextureStages,
+                r261TextureStages.snapshotToken,
+                r261IndexedTextureResourceBehavior.reviewSnapshotToken),
+        "R261 indexed texture resource behavior closes supplied texture scope while output F18 remains fail-closed");
+
+    const auto staleR261TextureStageToken =
+        r261TextureStages.snapshotToken == 1ull
+            ? 2ull
+            : (r261TextureStages.snapshotToken ^ 1ull);
+    const auto r261IndexedStaleTexture =
+        outrun::vr::dx11::
+            compose_programmable_texture_resource_behavior_readiness(
+                r260IndexedResourceBehavior,
+                r260IndexedResourceBehavior.reviewSnapshotToken,
+                r261TextureRegistry,
+                r261TextureKeys.data(), r261TextureKeys.size(),
+                d3d.device,
+                r261TextureStages,
+                staleR261TextureStageToken);
+    require(
+        r261IndexedStaleTexture.geometrySnapshotMatches &&
+        !r261IndexedStaleTexture.textureStageSnapshotMatches &&
+        !r261IndexedStaleTexture.textureResourceBehaviorExact &&
+        !r261IndexedStaleTexture.reviewReady &&
+        r261IndexedStaleTexture.reviewSnapshotToken == 0,
+        "R261 rejects stale managed texture-stage identity");
+
+    const auto staleR260IndexedTextureGeometryToken =
+        r260IndexedResourceBehavior.reviewSnapshotToken == 1ull
+            ? 2ull
+            : (r260IndexedResourceBehavior.reviewSnapshotToken ^ 1ull);
+    const auto r261IndexedStaleGeometry =
+        outrun::vr::dx11::
+            compose_programmable_texture_resource_behavior_readiness(
+                r260IndexedResourceBehavior,
+                staleR260IndexedTextureGeometryToken,
+                r261TextureRegistry,
+                r261TextureKeys.data(), r261TextureKeys.size(),
+                d3d.device,
+                r261TextureStages,
+                r261TextureStages.snapshotToken);
+    require(
+        r261IndexedStaleGeometry.geometryReviewReady &&
+        !r261IndexedStaleGeometry.geometrySnapshotMatches &&
+        !r261IndexedStaleGeometry.geometryResourceBehaviorExact &&
+        !r261IndexedStaleGeometry.reviewReady &&
+        r261IndexedStaleGeometry.reviewSnapshotToken == 0,
+        "R261 rejects stale R260 geometry resource-behavior identity");
+
     const auto r259IndexedPrerequisiteHandoff =
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258IndexedSourceRevalidation,
             r258IndexedSourceRevalidation.snapshotToken,
-            r260IndexedResourceBehavior,
-            r260IndexedResourceBehavior.reviewSnapshotToken,
+            r261IndexedTextureResourceBehavior,
+            r261IndexedTextureResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
             r243InputLayoutReady.snapshotToken);
     require(
@@ -4306,6 +4434,7 @@ int main()
         r259IndexedPrerequisiteHandoff.resourceBehaviorReviewReady &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorSnapshotMatches &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorGeometryProofPresent &&
+        r259IndexedPrerequisiteHandoff.resourceBehaviorTextureProofPresent &&
         !r259IndexedPrerequisiteHandoff.resourceBehaviorCoverageComplete &&
         r259IndexedPrerequisiteHandoff.inputLayoutOwnershipReady &&
         r259IndexedPrerequisiteHandoff.inputLayoutSnapshotMatches &&
@@ -4328,8 +4457,8 @@ int main()
             validate_programmable_activation_prerequisite_handoff_snapshot(
                 r258IndexedSourceRevalidation,
                 r258IndexedSourceRevalidation.snapshotToken,
-                r260IndexedResourceBehavior,
-                r260IndexedResourceBehavior.reviewSnapshotToken,
+                r261IndexedTextureResourceBehavior,
+                r261IndexedTextureResourceBehavior.reviewSnapshotToken,
                 r243InputLayoutReady,
                 r243InputLayoutReady.snapshotToken,
                 r259IndexedPrerequisiteHandoff.reviewSnapshotToken),
@@ -4343,8 +4472,8 @@ int main()
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258IndexedSourceRevalidation,
             staleR258IndexedReviewToken,
-            r260IndexedResourceBehavior,
-            r260IndexedResourceBehavior.reviewSnapshotToken,
+            r261IndexedTextureResourceBehavior,
+            r261IndexedTextureResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
             r243InputLayoutReady.snapshotToken);
     require(
@@ -4355,16 +4484,16 @@ int main()
         r259IndexedStaleSource.activationSnapshotToken == 0,
         "R259 rejects stale R258 source-revalidation identity");
 
-    const auto staleR260IndexedReviewToken =
-        r260IndexedResourceBehavior.reviewSnapshotToken == 1ull
+    const auto staleR261IndexedReviewToken =
+        r261IndexedTextureResourceBehavior.reviewSnapshotToken == 1ull
             ? 2ull
-            : (r260IndexedResourceBehavior.reviewSnapshotToken ^ 1ull);
+            : (r261IndexedTextureResourceBehavior.reviewSnapshotToken ^ 1ull);
     const auto r259IndexedStaleResourceBehavior =
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258IndexedSourceRevalidation,
             r258IndexedSourceRevalidation.snapshotToken,
-            r260IndexedResourceBehavior,
-            staleR260IndexedReviewToken,
+            r261IndexedTextureResourceBehavior,
+            staleR261IndexedReviewToken,
             r243InputLayoutReady,
             r243InputLayoutReady.snapshotToken);
     require(
@@ -4374,7 +4503,7 @@ int main()
         !r259IndexedStaleResourceBehavior.reviewReady &&
         r259IndexedStaleResourceBehavior.reviewSnapshotToken == 0 &&
         r259IndexedStaleResourceBehavior.activationSnapshotToken == 0,
-        "R259 rejects stale R260 resource-behavior identity");
+        "R259 rejects stale R261 resource-behavior identity");
 
     const auto staleR243ReviewToken =
         r243InputLayoutReady.snapshotToken == 1ull
@@ -4384,8 +4513,8 @@ int main()
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258IndexedSourceRevalidation,
             r258IndexedSourceRevalidation.snapshotToken,
-            r260IndexedResourceBehavior,
-            r260IndexedResourceBehavior.reviewSnapshotToken,
+            r261IndexedTextureResourceBehavior,
+            r261IndexedTextureResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
             staleR243ReviewToken);
     require(
@@ -5261,12 +5390,45 @@ int main()
                 r260NonIndexedResourceBehavior.reviewSnapshotToken),
         "R260 non-indexed geometry resource behavior is exact without inventing index coverage");
 
+    const auto r261NonIndexedTextureResourceBehavior =
+        outrun::vr::dx11::
+            compose_programmable_texture_resource_behavior_readiness(
+                r260NonIndexedResourceBehavior,
+                r260NonIndexedResourceBehavior.reviewSnapshotToken,
+                r261TextureRegistry,
+                r261TextureKeys.data(), r261TextureKeys.size(),
+                d3d.device,
+                r261TextureStages,
+                r261TextureStages.snapshotToken);
+    require(
+        r261NonIndexedTextureResourceBehavior.geometryReviewReady &&
+        r261NonIndexedTextureResourceBehavior.geometrySnapshotMatches &&
+        r261NonIndexedTextureResourceBehavior.textureStageSnapshotMatches &&
+        r261NonIndexedTextureResourceBehavior.geometryResourceBehaviorExact &&
+        r261NonIndexedTextureResourceBehavior.textureResourceBehaviorExact &&
+        !r261NonIndexedTextureResourceBehavior.outputResourceBehaviorProofPresent &&
+        !r261NonIndexedTextureResourceBehavior.fullResourceBehaviorProofPresent &&
+        r261NonIndexedTextureResourceBehavior.missingResourceScopeMask == 0x4u &&
+        r261NonIndexedTextureResourceBehavior.reviewReady &&
+        r261NonIndexedTextureResourceBehavior.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_texture_resource_behavior_readiness_snapshot(
+                r260NonIndexedResourceBehavior,
+                r260NonIndexedResourceBehavior.reviewSnapshotToken,
+                r261TextureRegistry,
+                r261TextureKeys.data(), r261TextureKeys.size(),
+                d3d.device,
+                r261TextureStages,
+                r261TextureStages.snapshotToken,
+                r261NonIndexedTextureResourceBehavior.reviewSnapshotToken),
+        "R261 non-indexed texture resource behavior reuses exact current texture stage without widening F18");
+
     const auto r259NonIndexedPrerequisiteHandoff =
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258NonIndexedSourceRevalidation,
             r258NonIndexedSourceRevalidation.snapshotToken,
-            r260NonIndexedResourceBehavior,
-            r260NonIndexedResourceBehavior.reviewSnapshotToken,
+            r261NonIndexedTextureResourceBehavior,
+            r261NonIndexedTextureResourceBehavior.reviewSnapshotToken,
             r243InputLayoutReady,
             r243InputLayoutReady.snapshotToken);
     require(
@@ -5275,6 +5437,7 @@ int main()
         r259NonIndexedPrerequisiteHandoff.resourceBehaviorReviewReady &&
         r259NonIndexedPrerequisiteHandoff.resourceBehaviorSnapshotMatches &&
         r259NonIndexedPrerequisiteHandoff.resourceBehaviorGeometryProofPresent &&
+        r259NonIndexedPrerequisiteHandoff.resourceBehaviorTextureProofPresent &&
         !r259NonIndexedPrerequisiteHandoff.resourceBehaviorCoverageComplete &&
         r259NonIndexedPrerequisiteHandoff.inputLayoutProofPresent &&
         !r259NonIndexedPrerequisiteHandoff.resourceBehaviorProofPresent &&
@@ -5292,8 +5455,8 @@ int main()
             validate_programmable_activation_prerequisite_handoff_snapshot(
                 r258NonIndexedSourceRevalidation,
                 r258NonIndexedSourceRevalidation.snapshotToken,
-                r260NonIndexedResourceBehavior,
-                r260NonIndexedResourceBehavior.reviewSnapshotToken,
+                r261NonIndexedTextureResourceBehavior,
+                r261NonIndexedTextureResourceBehavior.reviewSnapshotToken,
                 r243InputLayoutReady,
                 r243InputLayoutReady.snapshotToken,
                 r259NonIndexedPrerequisiteHandoff.reviewSnapshotToken),
