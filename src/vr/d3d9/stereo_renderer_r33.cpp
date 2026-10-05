@@ -308,10 +308,8 @@ namespace OutRunVRStereo
         void R33InvalidateRightForLeftWrite(
             bool mayWriteDepth, bool mayWriteStencil) noexcept
         {
-            if (mayWriteDepth)
-                RightDepthSynchronized = false;
-            if (mayWriteStencil)
-                RightStencilSynchronized = false;
+            R9InvalidateRightDepthStencilSync(
+                mayWriteDepth, mayWriteStencil);
         }
 
         HRESULT __stdcall SetRenderStateDestR33(IDirect3DDevice9* device,
@@ -1096,7 +1094,6 @@ namespace OutRunVRStereo
     inline void FailClosedDepthStencilState() noexcept
     {
         R33InvalidateDepthStencilCache();
-        RightDepthSynchronized = false;
-        RightStencilSynchronized = false;
+        R9InvalidateRightDepthStencilSync(true, true);
     }
 }
