@@ -112,6 +112,14 @@ When a RENDER_READY or ONE_STAGE_TO_RENDER item exists, do not open unrelated pr
 - A zero-candidate producer run is acceptable only when current evidence shows that no RENDER_READY or ONE_STAGE_TO_RENDER item can safely advance. In that case, perform at most one new preflight-only batch before the next candidate-completion attempt.
 - This methodology is a Git workflow rule only. It MUST NOT add Production/Event IDs, task queues, rollover state machines, C0-C6 orchestration, Actions-gate bookkeeping or controller-side work-state engines.
 
+### Mandatory production self-QA visual gate
+- The global production visual gates in `docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md` apply to every new or materially reworked A/B candidate, not only screenshot-returned regressions.
+- Before A/B records producer PASS, it MUST perform readable-orientation SOURCE/CLEAN/FINAL visual review plus raw/game-orientation review in addition to numeric checks.
+- Mixed low-resolution Korean, broken glyphs, source residue/double drawing, other-image intrusion, unintended layer collision, wrong slant/perspective/baseline/alignment, or source-style/family mismatch are producer FAIL conditions.
+- Numeric zero-overlap/bbox/protected-mask PASS cannot override a visible defect. When visual QA and machine QA disagree, fail closed, record the numeric false negative and rework.
+- Do not hand a visibly questionable candidate to C as PASS. Use `REWORK_REQUIRED` or `MANUAL_RECONSTRUCTION_REQUIRED` and continue repair in the same invocation when safe.
+- Static producer PASS without actual game evidence remains runtime-unvalidated and must retain `RUNTIME_VALIDATION=UNTESTED` or pending-in-game state.
+
 ## Throughput rule
 - Continue producing multiple assets in one run while tool/runtime budget allows; do not stop after a single DDS when additional independent queue items are actionable.
 - Persist each completed batch and machine-readable QA evidence to Git so the next invocation can resume from repository state alone.
