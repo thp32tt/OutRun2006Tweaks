@@ -1,0 +1,17 @@
+{
+  "mapping": "IGR-004_EXACT_GRAPHICS_A9ABD877_B168_WEIGHT_RETRY",
+  "candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+  "bbox_size_positive_margin": "17/17 PASS",
+  "native_resolution_rows": 17,
+  "glyph_upscale_rows": 0,
+  "horizontal_scaled_rows": 0,
+  "tracking_rows": 0,
+  "changed_pixels": 233538,
+  "changed_outside_target_bboxes": 0,
+  "alpha_changed_outside_target_bboxes": 0,
+  "protected_changed_pixels": 0,
+  "render_outside_target_bboxes": 0,
+  "render_protected_overlap_pixels": 0,
+  "localized_overlap_pixels": 0,
+  "status": "PASS"
+}
