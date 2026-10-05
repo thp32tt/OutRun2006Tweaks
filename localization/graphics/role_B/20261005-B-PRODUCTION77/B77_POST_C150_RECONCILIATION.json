@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION77",
+  "timestamp_kst": "2026-10-05T10:58:30+09:00",
+  "queue_index": 198,
+  "original_b77_candidate_sha256": "667b64ac0336c7ae3f7b1f4b79f36c7237225104a4c948ac7158da9805d7e1a7",
+  "current_candidate_sha256": "34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c",
+  "superseded_by": "20261005-C150-9FC88069",
+  "reason": "C150 restored three protected song-title/variant qualifiers that B77 incorrectly localized.",
+  "restored_regions": {
+    "2": "(GUITAR MIX)",
+    "10": "(INSTRUMENTAL)",
+    "39": "(PROTOTYPE)"
+  },
+  "retained_localized_regions": {
+    "0": "RANDOM -> 무작위",
+    "1": "= RANDOM PLAY = -> - 무작위 재생 -",
+    "40": "INTERMEDIATE B -> 중급 B",
+    "41": "INTERMEDIATE A -> 중급 A"
+  },
+  "c150_machine_qa": {
+    "bbox_size_positive_margin": "4/4 PASS",
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "overlap": 0,
+    "touch_pairs": 0,
+    "preserved_regions_changed": 0
+  },
+  "b_action": "NO_DUPLICATE_REGENERATION_AFTER_C_CORRECTION",
+  "state": "C150_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
