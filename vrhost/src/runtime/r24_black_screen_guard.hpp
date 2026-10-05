@@ -272,19 +272,7 @@ namespace OutRunVrR24BlackScreenGuard
                 state, snapshot.frame))
             return false;
 
-        const std::uint32_t generation = snapshot.frame.reserved[
-            OutRunVR::RenderFrameDirectGenerationIndex];
-        const std::uint32_t runGeneration = snapshot.frame.reserved[
-            OutRunVR::RenderFrameRunGenerationIndex];
-        const std::uint32_t gamePid = snapshot.frame.clientPid;
-        const bool safeAlreadyOwned =
-            snapshot.frameId != 0 && generation != 0 &&
-            runGeneration != 0 && gamePid != 0 &&
-            SafeFrameId == snapshot.frameId &&
-            SafeTransportGeneration == generation &&
-            SafeRunGeneration == runGeneration &&
-            SafeGamePid == gamePid &&
-            SafeEyeSrv[0] && SafeEyeSrv[1];
+        const bool safeAlreadyOwned = SafeEyesOwnFrame(snapshot.frame);
         if (!safeAlreadyOwned && !EnsureSafeFrame(snapshot.frameId))
             return false;
         if (!OutRunVrR23RuntimeHardening::DirectSafeEyeMatchesCommittedFrame(

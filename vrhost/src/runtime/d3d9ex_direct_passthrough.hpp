@@ -115,6 +115,23 @@ namespace OutRunVrD3D9ExDirectPassthrough
         SafeGamePid = 0;
     }
 
+    inline bool SafeEyesOwnFrame(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        const std::uint32_t gamePid = frame.clientPid;
+        return frame.frameId != 0 && generation != 0 &&
+            runGeneration != 0 && gamePid != 0 &&
+            SafeFrameId == frame.frameId &&
+            SafeTransportGeneration == generation &&
+            SafeRunGeneration == runGeneration &&
+            SafeGamePid == gamePid &&
+            SafeEyeSrv[0] && SafeEyeSrv[1];
+    }
+
     inline void CloseDirectAckMapping() noexcept
     {
         if (DirectAckState)
@@ -693,17 +710,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
         OutRunVR::SharedRenderFrameState frame{};
         if (!ReadFrameById(frameId, frame))
             return false;
-        const std::uint32_t generation =
-            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        const std::uint32_t runGeneration =
-            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
-        const std::uint32_t gamePid = frame.clientPid;
-        if (frameId && generation && runGeneration && gamePid &&
-            SafeFrameId == frameId &&
-            SafeTransportGeneration == generation &&
-            SafeRunGeneration == runGeneration &&
-            SafeGamePid == gamePid &&
-            SafeEyeSrv[0] && SafeEyeSrv[1])
+        if (SafeEyesOwnFrame(frame))
             return true;
         return CopySharedFrameToSafeEyes(frame);
     }

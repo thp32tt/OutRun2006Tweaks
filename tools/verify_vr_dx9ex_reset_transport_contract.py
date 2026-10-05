@@ -478,9 +478,8 @@ require_order(
 )
 
 # Host-owned SafeEye fallback cache must also be scoped to the complete
-# Frame.v2 game-run identity. A fast game restart may reuse frameId and even a
-# transport-generation value; cached eyes from that prior run must never be
-# treated as the current frame.
+# Frame.v2 game-run identity. Keep one owner predicate for cache identity so
+# legacy/R32 ensure paths and R23/R24 direct consumers cannot drift apart.
 reset_safe_eyes = body(host_passthrough, "inline void ResetSafeEyes() noexcept")
 require(
     reset_safe_eyes,
@@ -489,6 +488,24 @@ require(
     "SafeTransportGeneration = 0;",
     "SafeRunGeneration = 0;",
     "SafeGamePid = 0;",
+)
+
+safe_eye_owner = body(host_passthrough, "inline bool SafeEyesOwnFrame(")
+require(
+    safe_eye_owner,
+    "SafeEye owner complete run identity",
+    "RenderFrameDirectGenerationIndex",
+    "RenderFrameRunGenerationIndex",
+    "const std::uint32_t gamePid = frame.clientPid;",
+    "frame.frameId != 0",
+    "generation != 0",
+    "runGeneration != 0",
+    "gamePid != 0",
+    "SafeFrameId == frame.frameId",
+    "SafeTransportGeneration == generation",
+    "SafeRunGeneration == runGeneration",
+    "SafeGamePid == gamePid",
+    "SafeEyeSrv[0] && SafeEyeSrv[1]",
 )
 
 copy_safe = body(host_passthrough, "inline bool CopySharedFrameToSafeEyes(")
@@ -506,84 +523,50 @@ require_order(
 ensure_safe = body(host_passthrough, "inline bool EnsureSafeFrame(")
 require(
     ensure_safe,
-    "SafeEye complete run cache key",
-    "RenderFrameDirectGenerationIndex",
-    "RenderFrameRunGenerationIndex",
-    "const std::uint32_t gamePid = frame.clientPid;",
-    "SafeFrameId == frameId",
-    "SafeTransportGeneration == generation",
-    "SafeRunGeneration == runGeneration",
-    "SafeGamePid == gamePid",
-)
-require_order(
-    ensure_safe,
-    "SafeEye cache identity before reuse",
-    "const std::uint32_t generation",
-    "const std::uint32_t runGeneration",
-    "const std::uint32_t gamePid",
-    "SafeFrameId == frameId",
-    "SafeTransportGeneration == generation",
-    "SafeRunGeneration == runGeneration",
-    "SafeGamePid == gamePid",
+    "legacy SafeEye owner delegation",
+    "if (SafeEyesOwnFrame(frame))",
     "return true;",
     "CopySharedFrameToSafeEyes(frame)",
 )
+forbid(
+    ensure_safe,
+    "legacy SafeEye identity duplication",
+    "SafeFrameId ==",
+    "SafeTransportGeneration ==",
+    "SafeRunGeneration ==",
+    "SafeGamePid ==",
+)
 
-# R23/R24 may reuse an already-owned SafeEye without calling EnsureSafeFrame.
-# Those bypasses must carry the same complete game-run identity as the cache
-# itself so a fast restart cannot revive prior-run eye content.
 r23_direct = body(host_r23_runtime, "inline XrResult RenderCommittedDirect(")
 require(
     r23_direct,
-    "R23 SafeEye owned-cache complete run identity",
-    "const std::uint32_t generation",
-    "RenderFrameDirectGenerationIndex",
-    "const std::uint32_t runGeneration",
-    "RenderFrameRunGenerationIndex",
-    "const std::uint32_t gamePid = frame.clientPid;",
-    "SafeFrameId == frame.frameId",
-    "SafeTransportGeneration == generation",
-    "SafeRunGeneration == runGeneration",
-    "SafeGamePid == gamePid",
-)
-require_order(
-    r23_direct,
-    "R23 SafeEye complete identity before owned-cache reuse",
-    "const std::uint32_t generation",
-    "const std::uint32_t runGeneration",
-    "const std::uint32_t gamePid",
-    "SafeFrameId == frame.frameId",
-    "SafeTransportGeneration == generation",
-    "SafeRunGeneration == runGeneration",
-    "SafeGamePid == gamePid",
+    "R23 SafeEye owner delegation",
+    "const bool safeAlreadyOwned = SafeEyesOwnFrame(frame);",
     "if (!safeAlreadyOwned && !EnsureSafeFrame(frame.frameId))",
+)
+forbid(
+    r23_direct,
+    "R23 SafeEye identity duplication",
+    "SafeFrameId ==",
+    "SafeTransportGeneration ==",
+    "SafeRunGeneration ==",
+    "SafeGamePid ==",
 )
 
 r24_direct = body(host_r24, "inline bool TryBuildDirectSafeProjection(")
 require(
     r24_direct,
-    "R24 SafeEye owned-cache complete run identity",
-    "const std::uint32_t generation",
-    "RenderFrameDirectGenerationIndex",
-    "const std::uint32_t runGeneration",
-    "RenderFrameRunGenerationIndex",
-    "const std::uint32_t gamePid = snapshot.frame.clientPid;",
-    "SafeFrameId == snapshot.frameId",
-    "SafeTransportGeneration == generation",
-    "SafeRunGeneration == runGeneration",
-    "SafeGamePid == gamePid",
-)
-require_order(
-    r24_direct,
-    "R24 SafeEye complete identity before owned-cache reuse",
-    "const std::uint32_t generation",
-    "const std::uint32_t runGeneration",
-    "const std::uint32_t gamePid",
-    "SafeFrameId == snapshot.frameId",
-    "SafeTransportGeneration == generation",
-    "SafeRunGeneration == runGeneration",
-    "SafeGamePid == gamePid",
+    "R24 SafeEye owner delegation",
+    "const bool safeAlreadyOwned = SafeEyesOwnFrame(snapshot.frame);",
     "if (!safeAlreadyOwned && !EnsureSafeFrame(snapshot.frameId))",
+)
+forbid(
+    r24_direct,
+    "R24 SafeEye identity duplication",
+    "SafeFrameId ==",
+    "SafeTransportGeneration ==",
+    "SafeRunGeneration ==",
+    "SafeGamePid ==",
 )
 
 # Host opened-shared-resource caches must be scoped to the complete Frame.v2
@@ -639,27 +622,18 @@ require_order(
 ensure_safe_r32 = body(host_cache, "inline bool EnsureSafeFrameR32(")
 require(
     ensure_safe_r32,
-    "R32 SafeEye complete run cache key",
-    "RenderFrameDirectGenerationIndex",
-    "RenderFrameRunGenerationIndex",
-    "const std::uint32_t gamePid = frame.clientPid;",
-    "SafeFrameId == frameId",
-    "SafeTransportGeneration == generation",
-    "SafeRunGeneration == runGeneration",
-    "SafeGamePid == gamePid",
-)
-require_order(
-    ensure_safe_r32,
-    "R32 SafeEye identity before reuse",
-    "const std::uint32_t generation",
-    "const std::uint32_t runGeneration",
-    "const std::uint32_t gamePid",
-    "SafeFrameId == frameId",
-    "SafeTransportGeneration == generation",
-    "SafeRunGeneration == runGeneration",
-    "SafeGamePid == gamePid",
+    "R32 SafeEye owner delegation",
+    "if (SafeEyesOwnFrame(frame))",
     "return true;",
     "CopySharedFrameToSafeEyesR32(frame)",
+)
+forbid(
+    ensure_safe_r32,
+    "R32 SafeEye identity duplication",
+    "SafeFrameId ==",
+    "SafeTransportGeneration ==",
+    "SafeRunGeneration ==",
+    "SafeGamePid ==",
 )
 
 # Host ACK ownership may observe late completions from a pre-reset generation
