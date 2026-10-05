@@ -46,7 +46,7 @@ for r in a["regions"]:
     d.text((x+4,y+4),f'idx{r["idx"]}',fill=(255,255,255,255))
 scale=min(1.0,1800/max(W,H))
 disp=ov.resize((max(1,int(W*scale)),max(1,int(H*scale))),Image.Resampling.LANCZOS)
-disp.save(out/"B153_SOURCE_ATLAS.jpg",quality=92,optimize=True)
+disp.convert("RGB").save(out/"B153_SOURCE_ATLAS.jpg",quality=92,optimize=True)
 (out/"B153_SOURCE_ATLAS_B64.txt").write_text(base64.b64encode((out/"B153_SOURCE_ATLAS.jpg").read_bytes()).decode())
 
 # Per-region contact strip preserving readable orientation.
