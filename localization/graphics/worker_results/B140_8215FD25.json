@@ -1,0 +1,11 @@
+{
+  "run": "20261005-B-PRODUCTION140-8215-PREFLIGHT",
+  "index": 30,
+  "asset": "8215FD25",
+  "source_sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e",
+  "regions": 8,
+  "decision": "PREFLIGHT_EVIDENCE_READY",
+  "candidate_persisted": false,
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION140-8215-PREFLIGHT/B140_8215_PREFLIGHT.json"
+}

@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION140-8215-PREFLIGHT",
+  "queue_index": 30,
+  "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+  "queue_action": "zoom_review",
+  "prior_status": "blocked_review",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "64a92104d3158614283d0d63baee7ec29ca45316",
+    "source_sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e"
+  },
+  "structure": {
+    "width": 4096,
+    "height": 2048,
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "regions": [
+    {
+      "idx": 0,
+      "name": "sprite_8",
+      "cell": [
+        0,
+        456,
+        1088,
+        1592
+      ],
+      "alpha_bbox": [
+        4,
+        576,
+        1088,
+        2048
+      ],
+      "alpha_pixels": 1127344,
+      "opaque_alpha_pixels": 947984
+    },
+    {
+      "idx": 1,
+      "name": "sprite_9",
+      "cell": [
+        1088,
+        1032,
+        2048,
+        1016
+      ],
+      "alpha_bbox": [
+        1133,
+        1032,
+        3087,
+        2034
+      ],
+      "alpha_pixels": 1104169,
+      "opaque_alpha_pixels": 192208
+    },
+    {
+      "idx": 2,
+      "name": "sprite_10",
+      "cell": [
+        1088,
+        16,
+        1720,
+        1016
+      ],
+      "alpha_bbox": [
+        1115,
+        42,
+        2778,
+        1014
+      ],
+      "alpha_pixels": 1153646,
+      "opaque_alpha_pixels": 112125
+    },
+    {
+      "idx": 3,
+      "name": "sprite_11",
+      "cell": [
+        2808,
+        16,
+        1016,
+        1016
+      ],
+      "alpha_bbox": [
+        2808,
+        16,
+        3824,
+        1032
+      ],
+      "alpha_pixels": 1032256,
+      "opaque_alpha_pixels": 1016064
+    },
+    {
+      "idx": 4,
+      "name": "sprite_12",
+      "cell": [
+        3136,
+        1672,
+        504,
+        376
+      ],
+      "alpha_bbox": [
+        3221,
+        1700,
+        3555,
+        2020
+      ],
+      "alpha_pixels": 75800,
+      "opaque_alpha_pixels": 54402
+    },
+    {
+      "idx": 5,
+      "name": "sprite_13",
+      "cell": [
+        0,
+        80,
+        504,
+        376
+      ],
+      "alpha_bbox": [
+        81,
+        107,
+        423,
+        429
+      ],
+      "alpha_pixels": 80756,
+      "opaque_alpha_pixels": 58126
+    },
+    {
+      "idx": 6,
+      "name": "sprite_14",
+      "cell": [
+        504,
+        80,
+        504,
+        376
+      ],
+      "alpha_bbox": [
+        594,
+        101,
+        918,
+        435
+      ],
+      "alpha_pixels": 67256,
+      "opaque_alpha_pixels": 47557
+    },
+    {
+      "idx": 7,
+      "name": "sprite_15",
+      "cell": [
+        3136,
+        1296,
+        504,
+        376
+      ],
+      "alpha_bbox": [
+        3225,
+        1323,
+        3551,
+        1644
+      ],
+      "alpha_pixels": 78744,
+      "opaque_alpha_pixels": 59196
+    }
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER_CLASSIFICATION",
+  "candidate_persisted": false,
+  "decision": "PREFLIGHT_EVIDENCE_READY",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
