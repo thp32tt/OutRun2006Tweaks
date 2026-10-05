@@ -1437,3 +1437,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Stage names use the mandatory phonetic policy. Static QA PASS: 15/15 exact source-effect bbox containment, source-size ceiling and positive margins; changed/alpha outside=0, protected idx0/16 changes=0, clean source unchanged=0, final source residue=0, localized overlap/touch=0. Controller readable SOURCE/CLEAN/FINAL and raw mirror_y visual QA PASS.
 - Queue index 147 -> `a49_self_qa_pass_pending_c`. pending_artwork localize_text=14; pending-C gains `39BCA907`; producer REWORK remains `C598919A`+`37759842`. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_A/20261005-A-PRODUCTION49/A49_39BCA907_REPORT.json`, `localization/graphics/role_A/20261005-A-PRODUCTION49/A49_CONTROLLER_SELF_QA.json`, `localization/graphics/role_A/20261005-A-PRODUCTION49/A49_39BCA907_SOURCE_CLEAN_FINAL.jpg`, `localization/graphics/role_A/20261005-A-PRODUCTION49/A49_39BCA907_FINAL_RAW_MIRROR_Y.jpg`.
+
+## 2026-10-05 19:41 KST — C192/C193: 2 PASS
+- C193 63C91067: B137 resolves C184 starburst smear. 2/2 exact bbox/size/margin PASS; structural zero-pixel gates PASS. C190 proves C189's 14 flagged white alpha 1–2 pixels are protected starburst glow, not source title; visual/raw PASS -> `C193_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`.
+- C192 39BCA907: A48 semantic-row misbinding caught and superseded by A49. Independent 15/15 bbox/size/margin + semantic policy + outside/alpha/protected/residue/overlap/touch PASS; readable/raw visual PASS -> `C192_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`.
+- Producer REWORK=2 (`C598919A`, `37759842`); pending-C=0; pending_artwork localize_text=14. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
