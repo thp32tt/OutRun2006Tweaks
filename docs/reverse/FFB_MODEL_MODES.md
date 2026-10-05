@@ -1,6 +1,6 @@
 # Selectable Wheel FFB Models
 
-The standalone FFB branch exposes several force models through one DirectInput COM output owner. Device selection, focus-loss safety, actuator shutdown, response correction, slew limiting, soft saturation, reconnect handling and the hard DirectInput cap are shared by every model. Hardware periodic transport remains a live model/user choice: Arcade Original/Hybrid can request Sine, PS2 Original can request Triangle, and the core falls back to ConstantForce when a required periodic effect is unavailable. The shared compatibility wrapper does not overwrite that choice.
+The standalone FFB branch exposes several force models through one DirectInput COM output owner. Device selection, focus-loss safety, actuator shutdown, response correction, slew limiting, soft saturation, reconnect handling and the hard DirectInput cap are shared by every model. Hardware periodic transport remains a live model/user choice: Arcade Original can request Sine, PS2 Original can request Triangle, and the core falls back to ConstantForce when a required periodic effect is unavailable. The shared compatibility wrapper does not overwrite that choice.
 
 ## Model 0 — Modern DD Physics
 
@@ -40,26 +40,19 @@ C2C does not expose the Lindbergh drive-board packet stream, so this branch reco
 - a dedicated C2C course-collision witness: the course solver reloads EVWORK_CAR field_283 to 30 and field_coli_281/field_282 carry side/intensity-related state. A rising high timer edge now owns wall/course impacts; the broader field_8 bit 0x1000 remains available for vehicle/other impacts, with severe speed-drop only as emergency fallback;
 - C2C gear changes.
 
-Modern inferred Physics SAT and inferred tire-slip chatter are disabled in this mode. The centering backbone is the shared DirectInput condition/spring path. Road Detail and Collision are explicit PC host scalers around the reconstructed `SpeedStrength` source; both Arcade shortcuts set them to 1.00 for one-to-one source amplitude before common Overall Strength. The **Use Arcade Original** shortcut restores the public OutRun2Real profile baseline: `SpringStrength=50` maps to a 0.50 condition coefficient with 1.00 saturation, while `EnableDamper=0` maps to zero Dynamic Damping. F11 can still override those values explicitly after loading the shortcut; Arcade Hybrid does not inherit this Original-only condition baseline.
+Modern inferred Physics SAT and inferred tire-slip chatter are disabled in this mode. The centering backbone is the shared DirectInput condition/spring path. Road Detail and Collision are explicit PC host scalers around the reconstructed `SpeedStrength` source; both Arcade shortcuts set them to 1.00 for one-to-one source amplitude before common Overall Strength. The **Use Arcade Original** shortcut restores the public OutRun2Real profile baseline: `SpringStrength=50` maps to a 0.50 condition coefficient with 1.00 saturation, while `EnableDamper=0` maps to zero Dynamic Damping. F11 can still override those values explicitly after loading the shortcut.
 
-OutRun2Real creates its infinite Spring and ConstantForce in separate SDL haptic effect slots. A 0x7B wall/rail/surface event therefore does not implicitly cancel the already-running Spring. Arcade Original now mirrors that coexistence: the servo-style condition backbone remains active through the ~80 ms directional event instead of being blanked for five C2C ticks. Hybrid still briefly unloads its inferred Modern structural layer during the directional event so the reconstructed arcade transient remains readable.
+OutRun2Real creates its infinite Spring and ConstantForce in separate SDL haptic effect slots. A 0x7B wall/rail/surface event therefore does not implicitly cancel the already-running Spring. Arcade Original mirrors that coexistence: the servo-style condition backbone remains active through the ~80 ms directional event instead of being blanked for five C2C ticks.
 
 The Lindbergh plugin's speed-strength staircase is retained as a comparative shape. Its thresholds were defined in a different speed scale, so C2C uses the same ten-step structure after scaling `speedRaw / 2`; this is a porting approximation, not a claim that the raw speed units are identical. Modern DD still clamps its own `speedNorm` to 0..1, while Arcade preserves 0..1.25 headroom so the reference final >500 / 100% strength band remains reachable. Captured C2C telemetry reaches `speedRaw ~= 2.239`, i.e. Arcade normalized speed ~=1.12.
 
-## Model 2 — Arcade + Modern Hybrid (Retired)
+## Legacy Model 2 migration
 
-**R11 retirement note:** this model is no longer selectable. Legacy `Model=2`
-state is folded into the complete Modern DD baseline, and saved Hybrid profiles
-are loaded as clean Modern profiles. The historical notes below are retained
-only to document the earlier experiment.
-
-R3 model changes still apply the tested polarity default, but both Reverse controls remain manually editable until the next model change.
-
-Keeps the Modern DD structural steering model but swaps surface/wall/gear event behavior to the Lindbergh-derived arcade reconstruction.
-
-This is intended for modern DD hardware when the user wants current SAT quality with arcade-style transient timing. Collision debounce remains shared, but Hybrid only unloads its Modern structural torque during the active Arcade directional event window (~80 ms); the rest of the debounce interval no longer leaves SAT artificially blank.
-
-The **Use Arcade Hybrid** shortcut is a complete reference preset rather than a delta from the previously selected model. It explicitly restores the Modern DD spring/damper, mechanical/caster, tire-slip, slew and reversal-release baseline before enabling the arcade event layer. This prevents Arcade Original's 0.50/no-damper condition profile or PS2 condition settings from leaking into Hybrid during live F11 switching. All Original/Hybrid/PS2 reference shortcuts also restore both ConstantForce and Spring reversal to OFF so stale direction settings cannot contaminate model comparisons.
+Model value `2` is reserved only for backward compatibility. It is rewritten to
+Model 0 (Modern DD) at load/runtime and is not selectable, named, or assigned its
+own force/event behavior. MOZA R3 model changes still apply the tested polarity
+default, while both Reverse controls remain manually editable until the next
+model change.
 
 ## Model 3 — PS2 Original topology (Experimental)
 
@@ -96,8 +89,7 @@ The reconstructed Xbox `CalcVibrationValues()` path is controller-rumble logic r
 
 1. Modern DD Physics
 2. Arcade Original (Lindbergh-derived)
-3. Arcade + Modern Hybrid
-4. PS2 Original topology (Experimental)
+3. PS2 Original topology (Experimental)
 
 Named FFB profiles include the selected model. Device identity, wheel response correction and diagnostics remain global/wheel-specific as before.
 
