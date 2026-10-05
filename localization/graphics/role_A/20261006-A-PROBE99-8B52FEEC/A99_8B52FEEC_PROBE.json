@@ -1,0 +1,54 @@
+{
+  "run": "20261006-A-PROBE99-8B52FEEC",
+  "queue_index": 27,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/8B52FEEC_1024x512.dds",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_CLAR_RANK_Exst/8B52FEEC_1024x512.dds",
+  "source": {
+    "width": 1024,
+    "height": 512,
+    "mips": 1,
+    "fourcc": "\u0000\u0000\u0000\u0000",
+    "bpp": 32,
+    "masks": [
+      "0xff0000",
+      "0xff00",
+      "0xff",
+      "0xff000000"
+    ],
+    "pitch_or_linear": 4096,
+    "sha256": "a11b32753655d25dbf95baf808af90a3cc3f65fb1083db0bb1db8fad80cdcf47",
+    "bytes": 2097280,
+    "pil_mode": "RGBA"
+  },
+  "component_count": 3,
+  "components": [
+    {
+      "bbox": [
+        1,
+        228,
+        255,
+        512
+      ],
+      "area": 45561
+    },
+    {
+      "bbox": [
+        553,
+        198,
+        746,
+        512
+      ],
+      "area": 43682
+    },
+    {
+      "bbox": [
+        284,
+        198,
+        490,
+        512
+      ],
+      "area": 43672
+    }
+  ],
+  "status": "A99_SOURCE_PROBE_COMPLETE_CONTROLLER_CLASSIFICATION_REQUIRED"
+}

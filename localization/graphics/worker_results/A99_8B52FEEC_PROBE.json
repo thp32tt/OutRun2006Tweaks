@@ -1,0 +1,24 @@
+{
+  "run": "20261006-A-PROBE99-8B52FEEC",
+  "queue_index": 27,
+  "source_sha256": "a11b32753655d25dbf95baf808af90a3cc3f65fb1083db0bb1db8fad80cdcf47",
+  "source_meta": {
+    "width": 1024,
+    "height": 512,
+    "mips": 1,
+    "fourcc": "\u0000\u0000\u0000\u0000",
+    "bpp": 32,
+    "masks": [
+      "0xff0000",
+      "0xff00",
+      "0xff",
+      "0xff000000"
+    ],
+    "pitch_or_linear": 4096,
+    "sha256": "a11b32753655d25dbf95baf808af90a3cc3f65fb1083db0bb1db8fad80cdcf47",
+    "bytes": 2097280,
+    "pil_mode": "RGBA"
+  },
+  "report": "localization/graphics/role_A/20261006-A-PROBE99-8B52FEEC/A99_8B52FEEC_PROBE.json",
+  "status": "A99_SOURCE_PROBE_COMPLETE_CONTROLLER_CLASSIFICATION_REQUIRED"
+}
