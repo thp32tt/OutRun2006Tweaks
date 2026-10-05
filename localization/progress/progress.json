@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T12:51:00+09:00",
+  "updated_at_kst": "2026-10-05T12:53:53+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B85 completed even index 212 BA0147DA after same-invocation B83 semantic preflight and B84 visual alignment correction. Candidate 869cf1bea8b27dcc89f5b2ab68f9dd163e4bf41fa6de4b53c7b3f19b3b1c74ad from canonical f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61: 12 physical target occurrences for 10 semantic strings, 12/12 bbox+size+positive margins, clean/final PASS, zero residue/outside/alpha/protected/render-outside/overlap/touch, controller SOURCE/CLEAN/FINAL/row/raw mirror_y PASS. Character names, VERDE MUGELLO, zodiac and logos/icons preserved. pending_artwork localize_text=24; producer REWORK=1 (C598919A constrained DXT5 solver). RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C158 independently finalized B85 index 212 BA0147DA candidate 869cf1bea8b27dcc89f5b2ab68f9dd163e4bf41fa6de4b53c7b3f19b3b1c74ad: pinned canonical DDS+atlas were re-downloaded and C rebuilt 12 source masks/exact bboxes/clean plate/protected artwork without producer masks. 12/12 bbox+size+positive margins and alignment anchors PASS; all clean/final/protected/residue/overlap/touch gates zero; controller source/clean/final, row-contact and raw mirror_y visuals PASS. pending_artwork localize_text=24; producer REWORK=1 (C598919A constrained DXT5 solver). RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -270,7 +270,7 @@
         "C598919A"
       ],
       "remaining": 1,
-      "note": "B85 added BA0147DA candidate 869cf1bea8b27dcc89f5b2ab68f9dd163e4bf41fa6de4b53c7b3f19b3b1c74ad with controller self-QA PASS. C598919A remains the sole producer REWORK_REQUIRED item requiring endpoint/index-constrained exact decoded-pixel DXT5 solver. Strict HOLD no-candidate remains 4F68708E/F6811E94/49BB5FE5/75C3586A. pending_artwork localize_text=24. RUNTIME_VALIDATION=UNTESTED.",
+      "note": "C158 cross-lane final QA approved corrected B85 BA0147DA static candidate. C598919A remains the sole producer REWORK_REQUIRED item and requires an endpoint/index-constrained exact decoded-pixel DXT5 solver. Strict HOLD no-candidate remains 4F68708E/F6811E94/49BB5FE5/75C3586A. RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": []
     },
     "latest_d_final_qa": {
@@ -295,14 +295,14 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C157",
-      "report": "localization/graphics/role_C/20261005-C157-8C259C68/C157_8C_CONTROLLER_FINAL_QA.json",
+      "run": "C158",
+      "report": "localization/graphics/role_C/20261005-C158-BA0147DA/C158_BA_CONTROLLER_FINAL_QA.json",
       "result": "1_PIXEL_VISUAL_PASS_1_PRODUCER_REWORK_REMAINS",
       "candidate_changed_by_C": false,
       "assets_checked": 1,
-      "physical_elements_checked": 6,
+      "physical_elements_checked": 12,
       "pixel_visual_pass_assets": [
-        "8C259C68"
+        "BA0147DA"
       ],
       "rework_required_assets": [
         "C598919A"
@@ -320,12 +320,12 @@
         "1A43E9D9"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 25,
+      "pending_production_localize_text": 24,
       "machine_evidence": {
-        "8C259C68": "localization/graphics/role_C/20261005-C157-8C259C68/C157_8C_MACHINE_QA.json"
+        "BA0147DA": "localization/graphics/role_C/20261005-C158-BA0147DA/C158_BA_MACHINE_QA.json"
       },
       "controller_visual": {
-        "8C259C68": "PASS"
+        "BA0147DA": "PASS"
       },
       "in_game_validation": "PENDING; RUNTIME_VALIDATION=UNTESTED"
     },
@@ -342,7 +342,9 @@
           "status": "B85_SELF_QA_PASS_PENDING_C_AND_INGAME",
           "report": "localization/graphics/role_B/20261005-B-PRODUCTION85/B85_BA_REPORT.json",
           "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION85/B85_CONTROLLER_SELF_QA.json",
-          "physical_elements": 12
+          "physical_elements": 12,
+          "c_final_qa": "C158_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+          "c_report": "localization/graphics/role_C/20261005-C158-BA0147DA/C158_BA_CONTROLLER_FINAL_QA.json"
         }
       },
       "runtime_validation": "UNTESTED"
@@ -945,6 +947,38 @@
       "controller_visual_qa": "PASS",
       "report": "localization/graphics/role_B/20261005-B-PRODUCTION85/B85_BA_REPORT.json",
       "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION85/B85_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "c158_controller_final_qa": {
+      "timestamp_kst": "2026-10-05T12:53:53+09:00",
+      "run": "20261005-C158-BA0147DA",
+      "queue_index": 212,
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+      "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "candidate_sha256": "869cf1bea8b27dcc89f5b2ab68f9dd163e4bf41fa6de4b53c7b3f19b3b1c74ad",
+      "candidate_changed_by_C": false,
+      "machine_status": "PASS",
+      "bbox_size_positive_margin": "12/12 PASS",
+      "source_alignment_anchor": "12/12 PASS",
+      "zero_pixel_gates": {
+        "clean_changed_outside_source_mask": 0,
+        "clean_unchanged_inside_source_mask": 0,
+        "clean_protected_changed": 0,
+        "clean_alpha_changed_outside_source_mask": 0,
+        "outside": 0,
+        "alpha_outside": 0,
+        "protected_changed": 0,
+        "render_outside_target": 0,
+        "source_residue": 0,
+        "target_protected_overlap": 0,
+        "target_protected_1px_near": 0,
+        "overlap": 0,
+        "touch_pairs": 0
+      },
+      "controller_visual_qa": "PASS",
+      "decision": "C158_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "machine_report": "localization/graphics/role_C/20261005-C158-BA0147DA/C158_BA_MACHINE_QA.json",
+      "report": "localization/graphics/role_C/20261005-C158-BA0147DA/C158_BA_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     }
   },
