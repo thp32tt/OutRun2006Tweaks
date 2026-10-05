@@ -7,12 +7,12 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
-repo=Path.cwd(); run="20261005-A-PRODUCTION55-DXT5"
+repo=Path.cwd(); run="20261005-A-PRODUCTION56-DXT5"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset_rel="textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset_rel; candidate.parent.mkdir(parents=True,exist_ok=True)
-tmp=Path("/tmp/outrun_A55"); tmp.mkdir(parents=True,exist_ok=True)
+tmp=Path("/tmp/outrun_A56"); tmp.mkdir(parents=True,exist_ok=True)
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"; BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
 source=tmp/"55B57CDE_HD.dds"; atlasp=tmp/"55B57CDE_atlas.json"
 urllib.request.urlretrieve(BASE+"/Release/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",source)
@@ -65,7 +65,7 @@ for idx,(english,korean) in TARGETS.items():
     elements.append({"idx":idx,"source":english,"korean":korean,"cell":[x,y,cw,ch],"source_mask":gm,"original_bbox":eb,
                      "source_mask_pixels":int(np.count_nonzero(gm)),"source_rgba_median":list(color)})
 
-clean_arr=sa.copy(); clean_arr[source_union,3]=0; clean=Image.fromarray(clean_arr,"RGBA")
+clean_arr=sa.copy(); clean_arr[allowed,3]=0; clean=Image.fromarray(clean_arr,"RGBA")
 final=clean.copy(); target_union=np.zeros((H,W),bool); layers=[]
 
 def text_alpha(text,maxw,maxh):
@@ -115,7 +115,7 @@ tb=enc.read_bytes(); dds_meta(tb)
 allowed_raw=np.flipud(allowed); source_raw=np.flipud(source_union); target_raw=np.flipud(target_union); source_alpha_raw=np.flipud(sa[:,:,3])
 raw_final_arr=np.asarray(raw_final,dtype=np.uint8)
 desired_alpha_raw=source_alpha_raw.copy()
-desired_alpha_raw[source_raw]=0
+desired_alpha_raw[allowed_raw]=0
 desired_alpha_raw[target_raw]=raw_final_arr[:,:,3][target_raw]
 bw=W//4; bh=H//4; outb=bytearray(sb); target_blocks=set(); source_full=set(); source_partial=set()
 
@@ -143,7 +143,7 @@ for by in range(bh):
     if not np.any(allowed_raw[y:y+4]): continue
     for bx in range(bw):
         x=bx*4; am=allowed_raw[y:y+4,x:x+4]; sm=source_raw[y:y+4,x:x+4]; tm=target_raw[y:y+4,x:x+4]
-        if not np.any(sm) and not np.any(tm): continue
+        if not np.any(am) and not np.any(tm): continue
         off=128+(by*bw+bx)*16
         if np.any(tm):
             if not np.all(am): raise RuntimeError(("target block crosses bbox",bx,by))
@@ -162,7 +162,7 @@ for by in range(bh):
         zi=z[0]
         for yy in range(4):
             for xx in range(4):
-                if sm[yy,xx]: idxs[yy*4+xx]=zi
+                if am[yy,xx]: idxs[yy*4+xx]=zi
         nb=set_alpha_indices(ob,idxs)
         if nb[:2]!=ob[:2] or nb[8:]!=ob[8:]: raise RuntimeError(("endpoint/color drift",bx,by))
         outb[off:off+16]=nb; source_partial.add((bx,by))
@@ -171,8 +171,8 @@ candidate.write_bytes(outb); dec_raw=Image.open(candidate).convert("RGBA"); dec=
 diff=np.any(sa!=da,axis=2); diff_out=int(np.count_nonzero(diff & ~allowed)); alpha_out=int(np.count_nonzero((sa[:,:,3]!=da[:,:,3]) & ~allowed))
 intro=int(np.count_nonzero((sa[:,:,3]<=1)&(da[:,:,3]>1)&~allowed))
 if any((diff_out,alpha_out,intro)): raise RuntimeError(("outside drift",diff_out,alpha_out,intro))
-residue=int(np.count_nonzero(source_union & (da[:,:,3]>0) & ~target_union))
-if residue: raise RuntimeError(("source residue decoded alpha",residue))
+residue=int(np.count_nonzero(allowed & (da[:,:,3]>0) & ~target_union))
+if residue: raise RuntimeError(("decoded alpha remains inside source bbox outside intended Hangul",residue))
 
 bbox_exact=0; extra_total=0; missing_total=0
 for e,layer in zip(elements,layers):
@@ -221,8 +221,8 @@ for e in elements:
     cards.append(c)
 cw=max(c.width for c in cards); sh=sum(c.height+2 for c in cards); sheet=Image.new("RGB",(cw,sh),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+2
-sheet.save(out/"A55_55B57CDE_SOURCE_CLEAN_FINAL.jpg",quality=94)
-comp(dec_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A55_55B57CDE_FINAL_RAW_MIRROR_Y.jpg",quality=93)
+sheet.save(out/"A56_55B57CDE_SOURCE_CLEAN_FINAL.jpg",quality=94)
+comp(dec_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A56_55B57CDE_FINAL_RAW_MIRROR_Y.jpg",quality=93)
 
 report={"schema_version":1,"role":"A","run":run,"index":161,"asset":asset_rel,
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"blob_sha1":gitblob(sb),"sha256":sha(sb)},
@@ -234,15 +234,15 @@ report={"schema_version":1,"role":"A","run":run,"index":161,"asset":asset_rel,
  "decoded_alpha_missing_pixels":missing_total,"decoded_bbox_exact_match":f"{bbox_exact}/38 PASS","localized_overlap_pairs":0,"localized_1px_touch_pairs":0},
  "compressed_patch":{"target_reencoded_blocks":len(target_blocks),"source_only_full_alpha_blocks":len(source_full),
  "boundary_alpha_index_only_blocks":len(source_partial),"changed_blocks":changed_blocks,"changed_blocks_outside_patch":changed_outside,
- "target_and_full_source_blocks_alpha_mode":"BC3_ALPHA_255_0_EXACT_ZERO_NON_TARGET",
+ "target_and_full_source_blocks_alpha_mode":"BC3_ALPHA_255_0_EXACT_ZERO_NON_TARGET","clean_scope":"EXACT_SOURCE_BBOX_RECTANGLES",
  "boundary_endpoints_and_color_bytes_preserved":True},
  "candidate_sha256":sha(bytes(outb)),"candidate_path":str(candidate.relative_to(repo)),
- "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","status":"A55_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA","runtime_validation":"UNTESTED"}
-(out/"A55_55B57CDE_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","status":"A56_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA","runtime_validation":"UNTESTED"}
+(out/"A56_55B57CDE_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":161,"asset":"55B57CDE","candidate_sha256":report["candidate_sha256"],"bbox_size_positive_margin":"38/38 PASS","decoded_bbox_exact_match":f"{bbox_exact}/38 PASS",
  "decoded_changed_outside":diff_out,"alpha_outside":alpha_out,"introduced_visible_outside":intro,"source_residue":residue,
  "decoded_alpha_extra_pixels":extra_total,"decoded_alpha_missing_pixels":missing_total,
  "boundary_alpha_index_only_blocks":len(source_partial),"worker_status":report["status"],"runtime_validation":"UNTESTED",
- "report":"localization/graphics/role_A/20261005-A-PRODUCTION55-DXT5/A55_55B57CDE_REPORT.json"}
-(wr/"A55_55B57CDE.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "report":"localization/graphics/role_A/20261005-A-PRODUCTION56-DXT5/A56_55B57CDE_REPORT.json"}
+(wr/"A56_55B57CDE.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False,indent=2))
