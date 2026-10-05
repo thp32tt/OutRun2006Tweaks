@@ -73,7 +73,7 @@ for y,on in enumerate(proj+[False]):
         seed.append([s,y]); s=None
 merged=[]
 for b in seed:
-    if merged and b[0]-merged[-1][1]<=3:
+    if merged and b[0]-merged[-1][1]<=12:
         merged[-1][1]=b[1]
     else:
         merged.append(b)
