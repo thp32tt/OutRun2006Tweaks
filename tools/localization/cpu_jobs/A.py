@@ -8,7 +8,7 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter,ImageOps
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
 
-repo=Path.cwd(); run="20261005-A-PRODUCTION24"
+repo=Path.cwd(); run="20261005-A-PRODUCTION25"
 out=repo/"localization/graphics/role_A"/run; wr=repo/"localization/graphics/worker_results"
 out.mkdir(parents=True,exist_ok=True); wr.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds"
@@ -103,29 +103,38 @@ def text_mask(text,fs,stroke):
     b=m.getbbox(); return m.crop(b) if b else None
 
 def make_small(text,fs):
-    inner=max(3,round(fs*.055)); outer=max(inner+4,round(fs*.13))
+    # Small mission labels use a solid white outer ring, navy inner outline,
+    # then warm-yellow fill. Keep the source family shared across all 3 rows.
+    navy_sw=max(4,round(fs*.085)); white_sw=max(navy_sw+3,round(fs*.15))
     f=ImageFont.truetype(fp,fs,index=fi)
-    d=ImageDraw.Draw(Image.new("L",(4,4),0)); bb=d.textbbox((0,0),text,font=f,stroke_width=outer)
-    pad=outer+8; size=(bb[2]-bb[0]+2*pad,bb[3]-bb[1]+2*pad); pos=(pad-bb[0],pad-bb[1])
-    om=Image.new("L",size,0); nm=Image.new("L",size,0); fm=Image.new("L",size,0)
-    ImageDraw.Draw(om).text(pos,text,font=f,fill=255,stroke_width=outer,stroke_fill=255)
-    ImageDraw.Draw(nm).text(pos,text,font=f,fill=255,stroke_width=inner,stroke_fill=255)
+    d=ImageDraw.Draw(Image.new("L",(4,4),0)); bb=d.textbbox((0,0),text,font=f,stroke_width=white_sw)
+    pad=white_sw+8; size=(bb[2]-bb[0]+2*pad,bb[3]-bb[1]+2*pad); pos=(pad-bb[0],pad-bb[1])
+    wm=Image.new("L",size,0); nm=Image.new("L",size,0); fm=Image.new("L",size,0)
+    ImageDraw.Draw(wm).text(pos,text,font=f,fill=255,stroke_width=white_sw,stroke_fill=255)
+    ImageDraw.Draw(nm).text(pos,text,font=f,fill=255,stroke_width=navy_sw,stroke_fill=255)
     ImageDraw.Draw(fm).text(pos,text,font=f,fill=255)
-    # Source has a soft white halo outside the navy outline.
-    halo=om.filter(ImageFilter.GaussianBlur(max(1.2,fs*.018)))
-    tile=Image.new("RGBA",size,(0,0,0,0)); tile.paste(white,(0,0),halo); tile.paste(navy,(0,0),om); tile.paste(yellow,(0,0),fm)
-    b=tile.getchannel("A").getbbox(); return tile.crop(b) if b else None,{"inner":inner,"outer":outer}
+    # Source white ring has a very soft fringe outside a solid core.
+    halo=wm.filter(ImageFilter.GaussianBlur(max(0.8,fs*.012)))
+    tile=Image.new("RGBA",size,(0,0,0,0))
+    tile.paste(white,(0,0),halo)
+    tile.paste(white,(0,0),wm)
+    tile.paste(navy,(0,0),nm)
+    tile.paste(yellow,(0,0),fm)
+    b=tile.getchannel("A").getbbox()
+    return (tile.crop(b) if b else None),{"navy_stroke":navy_sw,"white_stroke":white_sw}
 
-def big_gradient(size):
-    w,h=size; im=Image.new("RGBA",size); p=im.load()
+def big_gradient(size,fill_bbox):
+    w,h=size; fy0,fy1=fill_bbox[1],fill_bbox[3]
+    im=Image.new("RGBA",size,(255,255,255,255)); p=im.load()
     for yy in range(h):
-        t=yy/max(1,h-1)
-        if t<.38:
-            u=t/.38; c=(255,int(round(158+(246-158)*u)),int(round(5+(220-5)*u)),255)
-        elif t<.62:
-            u=(t-.38)/.24; c=(255,int(round(246+(248-246)*u)),int(round(220+(232-220)*u)),255)
+        t=(yy-fy0)/max(1,fy1-fy0-1)
+        t=max(0.0,min(1.0,t))
+        if t<.34:
+            u=t/.34; c=(255,int(round(146+(245-146)*u)),int(round(0+(220-0)*u)),255)
+        elif t<.60:
+            u=(t-.34)/.26; c=(255,int(round(245+(252-245)*u)),int(round(220+(238-220)*u)),255)
         else:
-            u=(t-.62)/.38; c=(255,int(round(248+(181-248)*u)),int(round(232+(16-232)*u)),255)
+            u=(t-.60)/.40; c=(255,int(round(252+(170-252)*u)),int(round(238+(0-238)*u)),255)
         for xx in range(w): p[xx,yy]=c
     return im
 
@@ -142,9 +151,12 @@ def make_big(text,fs):
     sm=Image.new("L",tile.size,0); sm.paste(om,(shadow,shadow)); tile.paste((7,15,57,220),(0,0,tile.width,tile.height),sm)
     z=Image.new("L",tile.size,0); z.paste(om,(0,0)); tile.paste(navy,(0,0),z)
     z=Image.new("L",tile.size,0); z.paste(wm,(0,0)); tile.paste(white,(0,0),z)
-    z=Image.new("L",tile.size,0); z.paste(fm,(0,0)); tile.paste(big_gradient(tile.size),(0,0),z)
+    z=Image.new("L",tile.size,0); z.paste(fm,(0,0))
+    fb=z.getbbox()
+    tile.paste(big_gradient(tile.size,fb),(0,0),z)
     tile=shear_rgba(tile,.20)
-    b=tile.getchannel("A").getbbox(); return tile.crop(b) if b else None,{"outer":outer,"inner":inner,"shadow":shadow,"slant":.20}
+    b=tile.getchannel("A").getbbox()
+    return (tile.crop(b) if b else None),{"outer":outer,"inner":inner,"shadow":shadow,"slant":.20}
 
 # Fit big independently; small labels share one size/style family.
 bigrow=rows[0]; bx0,by0,bx1,by1=bigrow["original_bbox"]
@@ -261,15 +273,15 @@ src.save(source_png); clean.save(clean_png); dec.save(final_png)
 smimg=Image.fromarray((source_mask.astype(np.uint8)*255),"L"); alimg=Image.fromarray((allowed.astype(np.uint8)*255),"L"); protimg=ImageOps.invert(alimg)
 smimg.save(out/"7CE_SOURCE_TEXT_MASK.png"); alimg.save(out/"7CE_ALLOWED_BBOX_MASK.png"); protimg.save(out/"7CE_PROTECTED_MASK.png")
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(out/"7CE_SOURCE_TEXT_MASK.png"),"--report",str(out/"A24_CLEAN_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(out/"7CE_ALLOWED_BBOX_MASK.png"),"--protected-mask",str(out/"7CE_PROTECTED_MASK.png"),"--report",str(out/"A24_FINAL_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A24_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"A24_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(out/"7CE_SOURCE_TEXT_MASK.png"),"--report",str(out/"A25_CLEAN_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(out/"7CE_ALLOWED_BBOX_MASK.png"),"--protected-mask",str(out/"7CE_PROTECTED_MASK.png"),"--report",str(out/"A25_FINAL_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"A25_CLEAN_VALIDATION.json").read_text()); finalrep=json.loads((out/"A25_FINAL_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS" or finalrep["status"]!="PASS": raise RuntimeError(("validator",cleanrep["status"],finalrep["status"]))
 
 stack=Image.new("RGB",(1024,3*282),"white")
 for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,256),Image.Resampling.LANCZOS); stack.paste(z,(0,i*282+24)); ImageDraw.Draw(stack).text((5,i*282+5),label,fill="black")
-stack.save(out/"A24_7CE_SOURCE_CLEAN_FINAL.jpg",quality=97)
+stack.save(out/"A25_7CE_SOURCE_CLEAN_FINAL.jpg",quality=97)
 cards=[]
 for row in outrows:
     x0,y0,x1,y1=row["original_bbox"]; p=16; cr=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
@@ -280,11 +292,11 @@ for row in outrows:
     ImageDraw.Draw(c).text((5,5),f'{row["region_idx"]} {row["source"]} -> {row["korean"]}',fill="black"); cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+4 for c in cards)),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.save(out/"A24_7CE_ROW_CONTACT.jpg",quality=97)
+sheet.save(out/"A25_7CE_ROW_CONTACT.jpg",quality=97)
 rr=Image.new("RGB",(1024,2*282),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im).resize((1024,256),Image.Resampling.LANCZOS); rr.paste(z,(0,i*282+24)); ImageDraw.Draw(rr).text((5,i*282+5),label,fill="black")
-rr.save(out/"A24_7CE_RAW_COMPARE.jpg",quality=97)
+rr.save(out/"A25_7CE_RAW_COMPARE.jpg",quality=97)
 
 report={"schema_version":1,"role":"A","run":run,"queue_index":59,"asset":asset,"readiness_tier":"ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":commit,"source_git_blob_sha1":blob(sb),"atlas_git_blob_sha1":blob(ab),"source_sha256":sha(srcp)},
@@ -295,11 +307,11 @@ report={"schema_version":1,"role":"A","run":run,"queue_index":59,"asset":asset,"
  "decoded_changes":{"changed_pixels_outside_exact_source_bboxes":outside,"alpha_outside":alphaout,"introduced_visible_outside":visout,"source_residue":residue,"protected_top_art_changed":protected_top_changed,"localized_overlap":overlap,"localized_touch":touch},
  "compressed_patch":{"target_reencoded_blocks":len(target_blocks),"source_only_full_alpha_blocks":len(source_full),"partial_alpha_only_blocks":len(partial),"changed_blocks":changed_blocks,"changed_blocks_outside_patch":outside_patch,"partial_endpoints_and_color_bytes_preserved":True},
  "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),"controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"A24_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
-(out/"A24_7CE_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "status":"A25_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
+(out/"A25_7CE_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":59,"asset":"7CE1CFC5","source_sha256":sha(srcp),"candidate_sha256":cand_sha,"localized_physical_elements":4,
  "bbox_size_positive_margin":"4/4","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],"source_residue":residue,
  "decoded_changed_outside":outside,"alpha_outside":alphaout,"protected_top_art_changed":protected_top_changed,"overlap":overlap,"touch":touch,
- "changed_blocks_outside_patch":outside_patch,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":str((out/"A24_7CE_REPORT.json").relative_to(repo))}
-(wr/"A24_7CE1CFC5.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "changed_blocks_outside_patch":outside_patch,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":str((out/"A25_7CE_REPORT.json").relative_to(repo))}
+(wr/"A25_7CE1CFC5.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False))
