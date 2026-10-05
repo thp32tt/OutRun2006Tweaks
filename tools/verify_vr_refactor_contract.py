@@ -182,6 +182,27 @@ if r33.count("R9InvalidateRightDepthStencilSync(") < 2:
     errors.append(
         "R33 missing R9 right-depth sync owner API at left-write and fail-close boundaries")
 
+# Post-1000 successor: R33 may consult right depth/stencil synchronization
+# readiness only through R9 owner queries. Direct reads split ownership just as
+# direct writes do and make later final-dispatch flattening harder to reason about.
+for marker in (
+    "inline bool R9IsRightDepthInSync() noexcept",
+    "inline bool R9IsRightStencilInSync() noexcept",
+):
+    if marker not in r9:
+        errors.append(f"R9 missing right depth/stencil sync owner query: {marker}")
+for raw in ("RightDepthSynchronized", "RightStencilSynchronized"):
+    if re.search(rf"\b{raw}\b", r33):
+        errors.append(f"R33 retained direct R9 right-depth sync read: {raw}")
+if r33.count("R9IsRightDepthInSync()") < 4:
+    errors.append("R33 missing R9 depth-sync owner query at both world/HUD readiness gates")
+if r33.count("R9IsRightStencilInSync()") < 4:
+    errors.append("R33 missing R9 stencil-sync owner query at both world/HUD readiness gates")
+if "return RightDepthSynchronized;" not in r9:
+    errors.append("R9 depth-sync owner query no longer preserves tracked-state read")
+if "return RightStencilSynchronized;" not in r9:
+    errors.append("R9 stencil-sync owner query no longer preserves tracked-state read")
+
 if "R9DrawCalls" in r20:
     errors.append("R20 retained direct R9 draw-count dependency")
 if "R9DrawCallCount()" not in r20:
