@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T21:10:15+09:00",
+  "role": "A",
+  "run": "20261005-A-PRODUCTION56-DXT5",
+  "queue_index": 161,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+  "candidate_sha256": "78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812",
+  "supersedes": {
+    "producer_run": "20261005-A-PRODUCTION54-DXT5",
+    "candidate_sha256": "7569c51cf5ba82ce081bf09d486b8c8869560e7fae71292c613e4bf8a5b51ab8",
+    "c_decision": "C197_REWORK_REQUIRED_DXT5_VISIBLE_FRINGE_AND_UNDECLARED_ALPHA_EXTENTS"
+  },
+  "retry_history": {
+    "a55": "FAIL_CLOSED_AT_IDX2_ONE_EXTRA_DECODED_ALPHA_PIXEL_NO_PROMOTION",
+    "a56": "PASS"
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "38/38 PASS",
+    "decoded_bbox_exact_match": "38/38 PASS",
+    "decoded_alpha_extra_pixels": 0,
+    "decoded_alpha_missing_pixels": 0,
+    "source_bbox_residue_pixels": 0,
+    "decoded_changed_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "introduced_visible_outside_exact_source_bboxes": 0,
+    "localized_overlap_pairs": 0,
+    "localized_1px_touch_pairs": 0,
+    "changed_blocks_outside_patch": 0,
+    "header_128_exact": true,
+    "format": "DXT5",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "dxt5_rework": {
+    "clean_scope": "EXACT_SOURCE_BBOX_RECTANGLES",
+    "target_and_full_source_blocks_alpha_mode": "BC3_ALPHA_255_0_EXACT_ZERO_NON_TARGET",
+    "target_reencoded_blocks": 10068,
+    "source_only_full_alpha_blocks": 19021,
+    "boundary_alpha_index_only_blocks": 4744,
+    "boundary_endpoints_and_color_bytes_preserved": true
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "clean_plate": "PASS_NO_VISIBLE_SOURCE_SHAPED_TEXT_FRINGE_OR_GHOST",
+    "final": "PASS_NO_C197_STYLE_LOW_ALPHA_PERIPHERAL_REMNANTS",
+    "semantic_binding": "PASS_38_OF_38_A52_MAPPING",
+    "raw_mirror_y": "PASS",
+    "source_style": "PASS_DARK_TEAL_PLAIN_FAMILY"
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261005-A-PRODUCTION56-DXT5/A56_55B57CDE_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION56-DXT5/A56_55B57CDE_FINAL_RAW_MIRROR_Y.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION56-DXT5/A56_55B57CDE_REPORT.json"
+  ],
+  "decision": "A56_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "runtime_validation": "UNTESTED"
+}
