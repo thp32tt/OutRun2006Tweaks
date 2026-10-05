@@ -1417,3 +1417,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - A41–A45 retried odd index 95 `37759842`. All numeric gates passed, but controller visual QA still shows source-shaped CLEAN artifacts; latest A45 `68e31ca94c9003cd0acd572fdcecf17d52c56b6848ee558c1359d87b6d382fcd` rejected. Status `a45_rework_required_visual_clean_plate_ghosts`.
 - A46 bound index 133 `25F697C6` targets idx15–23 and protected Ferrari/model idx0–14. A47 candidate `08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013`: 9/9 bbox/size/positive-margin PASS; outside/alpha/protected/source-residue/overlap/touch all 0; controller SOURCE/CLEAN/FINAL visual PASS. Status `a47_self_qa_pass_pending_c`.
 - Snapshot: producer REWORK=3 (`63C91067`, `C598919A`, `37759842`); pending-C=2 (`560FA536`, `25F697C6`); pending_artwork localize_text=15. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-05 19:02 KST — C180/C184/C186/C188: 2 PASS / 2 REWORK
+- C180 560FA536: corrected warning bbox/mask independently verified; 13/13 machine + controller visual PASS -> `C180_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`.
+- C184 63C91067: numeric PASS, visual FAIL — lower starburst clean plate still has interpolation/smear and glow/texture reconstruction artifacts -> `REWORK_REQUIRED`.
+- C186 37759842: 33/33 numeric PASS, visual FAIL — source-shaped YES/NO/mode/RANDOM ghosts and donor boundaries remain in CLEAN/FINAL -> manual/template reconstruction required.
+- C188 25F697C6: independent visible-alpha 9/9 exact bbox/size/margin, zero residue/outside/overlap and SOURCE/CLEAN/FINAL/raw visual PASS -> `C188_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`.
+- Producer REWORK=3 (`63C91067`, `C598919A`, `37759842`); pending-C=0; pending_artwork localize_text=15. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
