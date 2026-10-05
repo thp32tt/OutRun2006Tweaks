@@ -1771,3 +1771,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - A later B atlas-target script attempt after B144 failed before producing a newer candidate, so B144 remains the newest reviewable 8215FD25 DDS in this C cycle.
 - Queue remains 137 rows = 82 localize_text + 44 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit. pending_artwork localize_text=12; producer REWORK=3 (`37759842`, `8215FD25`, `55B57CDE`); pending-C=0. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_C/20261005-C197-C198-BATCH/C197_C198_BATCH_FINAL_QA.json`, C197 machine/controller contacts and C198 controller report/B144 visual evidence.
+
+## 2026-10-05 20:59 KST — C199 supersedes C198 for latest 8215FD25
+- B145 landed after the C198/B144 reconciliation, so C refreshed the branch and reviewed the newer candidate instead of leaving a stale decision as current.
+- **C199 / index 30 `8215FD25`** candidate `e9d999eaa5a416c05c8ecf527c220645bf9097d3177611c5da1c40f2bff7b793`: producer numeric gates remain 2/2 bbox/size/positive-margin PASS with zero outside/alpha/protected/overlap counters.
+- B145 fixes the speech-bubble ghost seen in B144/C198; the speech-bubble CLEAN/FINAL is now visually acceptable.
+- Mandatory C visual QA still FAILS the starburst: CLEAN contains a large translucent `Total Rank`-shaped source ghost across the title footprint and it remains behind/around `종합 랭킹` in FINAL. Decision `C199_REWORK_REQUIRED_STARBURST_SOURCE_GHOST`.
+- Preserve the corrected speech bubble. Rebuild only the starburst title footprint to the source warm brown gradient/glow with no source-shaped silhouette.
+- C197 for `55B57CDE` remains unchanged REWORK_REQUIRED. Current producer REWORK remains `37759842`, `8215FD25`, `55B57CDE`; pending-C=0; pending_artwork localize_text=12.
+- A still newer B Laplace-repair script at `c5a7a62109f2` was GitHub-hosted compute-pending at this checkpoint and therefore is not candidate-complete and was not approved. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Current batch evidence: `localization/graphics/role_C/20261005-C197-C199-BATCH/C197_C199_BATCH_FINAL_QA.json`.
