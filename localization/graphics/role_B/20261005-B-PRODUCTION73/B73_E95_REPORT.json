@@ -27,6 +27,7 @@
       "25": "SOLD"
     },
     "preserved": {
+      "0": "decorative panel",
       "1": "Night Flight (song title)",
       "2": "Magical Sound Shower (song title)",
       "3": "Life Was A Bore (song title)",
@@ -41,8 +42,7 @@
       "21": "You already own this item",
       "22": "yellow bar artwork",
       "23": "gray bar artwork",
-      "26": "separator artwork",
-      "0": "decorative panel"
+      "26": "separator artwork"
     }
   },
   "translations": {
@@ -641,6 +641,7 @@
     }
   ],
   "preserved_regions_changed_pixels": {
+    "0": 0,
     "1": 0,
     "2": 0,
     "3": 0,
@@ -655,8 +656,7 @@
     "21": 0,
     "22": 0,
     "23": 0,
-    "26": 0,
-    "0": 0
+    "26": 0
   },
   "clean_plate_validator": {
     "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION73/E95_SOURCE_READABLE.png",
@@ -708,7 +708,8 @@
   },
   "candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
-  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_ROW_RAW",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_PRODUCTION73_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B_PRODUCTION73_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_self_qa_report": "localization/graphics/role_B/20261005-B-PRODUCTION73/B73_CONTROLLER_SELF_QA.json"
 }
