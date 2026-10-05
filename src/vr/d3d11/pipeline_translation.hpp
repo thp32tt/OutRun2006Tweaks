@@ -499,6 +499,42 @@ namespace outrun::vr::dx11
         const ProgrammableShaderInstructionDecode& decode,
         const ProgrammableShaderRegisterSemantics& registerSemantics) noexcept;
 
+    // R268 consumes two exact R267 shader-model-3 interface receipts and
+    // proves only the inter-stage VS-output -> PS-input contract. Every pixel
+    // input semantic must have one same-usage/index vertex output whose
+    // declared component mask covers the pixel declaration. Extra VS outputs
+    // are permitted. Missing/mismatched semantics, insufficient masks, stage
+    // inversion, or inconsistent R267 counts fail closed. This remains
+    // diagnostic evidence only and does not authorize native Draw* dispatch.
+    struct ProgrammableShaderInterfaceLinkageEvidence
+    {
+        bool vertexInterfaceExact = false;
+        bool pixelInterfaceExact = false;
+        bool complete = false;
+        UINT vertexOutputSemanticCount = 0;
+        UINT pixelInputSemanticCount = 0;
+        UINT matchedSemanticCount = 0;
+        std::uint64_t interfaceLinkHash = 0;
+        std::uint64_t linkerRevisionHash = 0;
+        std::uint64_t semanticContractHash = 0;
+
+        [[nodiscard]] bool exact() const noexcept
+        {
+            return vertexInterfaceExact &&
+                   pixelInterfaceExact &&
+                   complete &&
+                   matchedSemanticCount == pixelInputSemanticCount &&
+                   interfaceLinkHash != 0 &&
+                   linkerRevisionHash != 0 &&
+                   semanticContractHash != 0;
+        }
+    };
+
+    [[nodiscard]] ProgrammableShaderInterfaceLinkageEvidence
+    derive_programmable_shader_interface_linkage_evidence(
+        const ProgrammableShaderInterfaceSemantics& vertexSemantics,
+        const ProgrammableShaderInterfaceSemantics& pixelSemantics) noexcept;
+
     [[nodiscard]] ProgrammableShaderPairCacheIdentity
     seal_programmable_shader_pair_cache_identity(
         bool observationComplete,
