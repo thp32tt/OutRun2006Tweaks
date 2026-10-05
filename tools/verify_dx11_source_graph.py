@@ -10417,6 +10417,56 @@ def main() -> None:
             + ", ".join(missing_r265_programmable_shader_instruction_decoder)
         )
 
+    r266_programmable_shader_register_semantics_contract = [
+        ("operandClassificationComplete",
+         PIPELINE_TRANSLATION_HPP, "R266 R265-stream operand-classification receipt"),
+        ("R266_D3D9_SM2_SM3_OPCODE_REGISTER_OPERAND_CLASSIFIER_V1",
+         PIPELINE_TRANSLATION_CPP, "R266 opcode/register classifier provenance"),
+        ("struct ProgrammableShaderOperandSemanticDecode",
+         PIPELINE_TRANSLATION_HPP, "R266 bounded operand-semantic receipt type"),
+        ("classify_programmable_shader_operands(",
+         PIPELINE_TRANSLATION_HPP, "R266 operand-semantic classifier declaration"),
+        ("R266_D3D9_SM2_SM3_OPERAND_SEMANTIC_CLASSIFIER_V1",
+         PIPELINE_TRANSLATION_CPP, "R266 semantic-classifier revision provenance"),
+        ("R266_REGISTER_ROLE_TYPE_INDEX_MODIFIER_ADDRESSING_CONSTANT_SAMPLER_PROVENANCE_V1",
+         PIPELINE_TRANSLATION_CPP, "R266 semantic-classifier contract provenance"),
+        ("struct ProgrammableShaderRegisterSemantics",
+         PIPELINE_TRANSLATION_HPP, "R266 register/constant/sampler evidence type"),
+        ("decode_programmable_shader_register_semantics(",
+         PIPELINE_TRANSLATION_HPP, "R266 register-semantics decoder declaration"),
+        ("R266_D3D9_SM2_SM3_REGISTER_SEMANTICS_DECODER_V1",
+         PIPELINE_TRANSLATION_CPP, "R266 register decoder revision provenance"),
+        ("R266_OPCODE_ROLE_REGISTER_MODIFIER_ADDRESS_CONSTANT_SAMPLER_PROVENANCE_V1",
+         PIPELINE_TRANSLATION_CPP, "R266 register decoder contract provenance"),
+        ("registerSemanticsExact",
+         RUNTIME_CENSUS, "R266 production census records semantic exactness"),
+        ("decode_programmable_shader_register_semantics(decode)",
+         RUNTIME_CENSUS, "R266 production R265 evidence feeds register semantics"),
+        ("registerSemanticsHash",
+         RUNTIME_CENSUS, "R266 production source identity retains semantic hash"),
+        ("R266 decodes destination/source register semantics, relative addressing, and normalized constant provenance",
+         CONSTANT_BUFFER_PROBE, "R266 constant-bank and relative-address regression"),
+        ("R266 derives exact TEX sampler provenance",
+         CONSTANT_BUFFER_PROBE, "R266 sampler provenance regression"),
+        ("R266 preserves R265 structure but fails closed on model-dependent register-role layouts",
+         CONSTANT_BUFFER_PROBE, "R266 unsupported-layout fail-closed regression"),
+        ("R266 classifies register roles, modifiers, addressing, constants and samplers",
+         CONSTANT_BUFFER_PROBE, "R266 semantic classifier positive regression"),
+        ("R266 fails closed on invalid source modifiers and opcode arity drift",
+         CONSTANT_BUFFER_PROBE, "R266 semantic classifier fail-closed regression"),
+    ]
+    missing_r266_programmable_shader_register_semantics = [
+        meaning for token, source, meaning
+        in r266_programmable_shader_register_semantics_contract
+        if token not in source
+    ]
+    if missing_r266_programmable_shader_register_semantics:
+        raise SystemExit(
+            "DX11 R266 programmable shader register-semantics drift: "
+            + ", ".join(
+                missing_r266_programmable_shader_register_semantics)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
