@@ -2188,6 +2188,109 @@ namespace outrun::vr::dx11
         return out;
     }
 
+    ProgrammableShaderInterfaceLinkageEvidence
+    derive_programmable_shader_interface_linkage_evidence(
+        const ProgrammableShaderInterfaceSemantics& vertexSemantics,
+        const ProgrammableShaderInterfaceSemantics& pixelSemantics) noexcept
+    {
+        ProgrammableShaderInterfaceLinkageEvidence out{};
+        out.vertexInterfaceExact =
+            vertexSemantics.exact() && vertexSemantics.vertexStage;
+        out.pixelInterfaceExact =
+            pixelSemantics.exact() && !pixelSemantics.vertexStage;
+        if (!out.vertexInterfaceExact || !out.pixelInterfaceExact)
+            return out;
+
+        UINT actualVertexOutputs = 0;
+        for (const auto& semantic : vertexSemantics.semantics)
+        {
+            if (semantic.input == semantic.output)
+                return out;
+            if (semantic.output)
+                ++actualVertexOutputs;
+        }
+
+        UINT actualPixelInputs = 0;
+        for (const auto& semantic : pixelSemantics.semantics)
+        {
+            if (!semantic.input || semantic.output)
+                return out;
+            ++actualPixelInputs;
+        }
+
+        if (vertexSemantics.semanticDeclarationCount !=
+                vertexSemantics.semantics.size() ||
+            pixelSemantics.semanticDeclarationCount !=
+                pixelSemantics.semantics.size() ||
+            vertexSemantics.outputSemanticCount != actualVertexOutputs ||
+            pixelSemantics.inputSemanticCount != actualPixelInputs)
+            return out;
+
+        out.vertexOutputSemanticCount = actualVertexOutputs;
+        out.pixelInputSemanticCount = actualPixelInputs;
+
+        static constexpr char kLinkerRevision[] =
+            "R268_D3D9_SM3_STAGE_INTERFACE_LINKAGE_V1";
+        static constexpr char kSemanticContract[] =
+            "R268_USAGE_INDEX_COMPONENT_COVERAGE_LINKAGE_V1";
+        out.linkerRevisionHash =
+            hash_bytes(kLinkerRevision, sizeof(kLinkerRevision) - 1u);
+        out.semanticContractHash =
+            hash_bytes(kSemanticContract, sizeof(kSemanticContract) - 1u);
+
+        std::uint64_t linkHash = 1469598103934665603ull;
+        const auto mix = [&linkHash](std::uint64_t value) noexcept
+        {
+            for (unsigned shift = 0; shift < 64u; shift += 8u)
+            {
+                linkHash ^=
+                    static_cast<std::uint8_t>((value >> shift) & 0xFFu);
+                linkHash *= 1099511628211ull;
+            }
+        };
+        mix(vertexSemantics.interfaceSemanticsHash);
+        mix(pixelSemantics.interfaceSemanticsHash);
+        mix(out.linkerRevisionHash);
+        mix(out.semanticContractHash);
+        mix(actualVertexOutputs);
+        mix(actualPixelInputs);
+
+        for (const auto& pixelInput : pixelSemantics.semantics)
+        {
+            const ProgrammableShaderInterfaceSemantic* match = nullptr;
+            for (const auto& vertexOutput : vertexSemantics.semantics)
+            {
+                if (!vertexOutput.output)
+                    continue;
+                if (vertexOutput.usage != pixelInput.usage ||
+                    vertexOutput.usageIndex != pixelInput.usageIndex)
+                    continue;
+                if (match != nullptr)
+                    return out;
+                match = &vertexOutput;
+            }
+
+            if (match == nullptr ||
+                (match->writeMask & pixelInput.writeMask) !=
+                    pixelInput.writeMask)
+                return out;
+
+            ++out.matchedSemanticCount;
+            mix(static_cast<DWORD>(pixelInput.usage));
+            mix(pixelInput.usageIndex);
+            mix(static_cast<DWORD>(match->registerType));
+            mix(match->registerIndex);
+            mix(match->writeMask);
+            mix(static_cast<DWORD>(pixelInput.registerType));
+            mix(pixelInput.registerIndex);
+            mix(pixelInput.writeMask);
+        }
+
+        out.complete = true;
+        out.interfaceLinkHash = linkHash;
+        return out;
+    }
+
     ProgrammableShaderPairCacheIdentity
     seal_programmable_shader_pair_cache_identity(
         bool observationComplete,
