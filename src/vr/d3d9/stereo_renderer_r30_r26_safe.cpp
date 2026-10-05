@@ -1437,10 +1437,14 @@ namespace OutRunVRStereo
             const void* c64Node = nullptr;
             OutRunVR::GameSemantic::ProducerToken c64Producer =
                 OutRunVR::GameSemantic::ProducerToken::None;
-            const bool c64Provenance =
-                OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
-                    c64Scope, c64NodeEpoch, c64Node, c64Producer);
-            if (c64Provenance &&
+            bool c64Provenance = false;
+            if (semanticHud || Settings::VRTelemetry)
+            {
+                c64Provenance =
+                    OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                        c64Scope, c64NodeEpoch, c64Node, c64Producer);
+            }
+            if (Settings::VRTelemetry && c64Provenance &&
                 c64Producer != OutRunVR::GameSemantic::ProducerToken::None)
             {
                 ++R51ProducerFingerprintDraws;
@@ -1459,26 +1463,23 @@ namespace OutRunVRStereo
                 if (c64Scope != semanticScope)
                     ++R51ProducerFingerprintScopeMismatch;
 
-                if (Settings::VRTelemetry)
+                const auto producerIndex =
+                    static_cast<unsigned>(c64Producer);
+                if (producerIndex < 32)
                 {
-                    const auto producerIndex =
-                        static_cast<unsigned>(c64Producer);
-                    if (producerIndex < 32)
+                    const std::uint32_t producerBit =
+                        1u << producerIndex;
+                    if ((R51ProducerFingerprintLoggedMask &
+                            producerBit) == 0)
                     {
-                        const std::uint32_t producerBit =
-                            1u << producerIndex;
-                        if ((R51ProducerFingerprintLoggedMask &
-                                producerBit) == 0)
-                        {
-                            R51ProducerFingerprintLoggedMask |= producerBit;
-                            spdlog::info(
-                                "VR R51 DRAW FINGERPRINT: producer={} c64Scope={} drawScope={} nodeRelation={}",
-                                OutRunVR::GameSemantic::Name(c64Producer),
-                                OutRunVR::GameSemantic::Name(c64Scope),
-                                OutRunVR::GameSemantic::Name(semanticScope),
-                                sameNode ? "SAME" :
-                                    (c64Node ? "OTHER" : "NONE"));
-                        }
+                        R51ProducerFingerprintLoggedMask |= producerBit;
+                        spdlog::info(
+                            "VR R51 DRAW FINGERPRINT: producer={} c64Scope={} drawScope={} nodeRelation={}",
+                            OutRunVR::GameSemantic::Name(c64Producer),
+                            OutRunVR::GameSemantic::Name(c64Scope),
+                            OutRunVR::GameSemantic::Name(semanticScope),
+                            sameNode ? "SAME" :
+                                (c64Node ? "OTHER" : "NONE"));
                     }
                 }
             }
