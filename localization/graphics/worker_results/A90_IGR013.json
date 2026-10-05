@@ -1,0 +1,50 @@
+{
+  "run": "20261006-A-INGAME90-IGR013-BRACKET-STAGE",
+  "regression": "IGR-013",
+  "queue_index": 173,
+  "asset": "6DC89C6E",
+  "candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
+  "superseded_candidate_sha256": "b406580d029118f5a3aa7de689389699dcb2cd0e4824c4f8d8c9075f0d9e4c26",
+  "physical_rows_reworked": 21,
+  "bbox_size_positive_margin": "21/21 PASS",
+  "scope_qa": {
+    "bbox_size_positive_margin": "21/21 PASS",
+    "changed_pixels": 286224,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "clean_plate_residue_outside_korean_glyphs": 0,
+    "localized_overlap_pairs": [],
+    "localized_1px_touch_pairs": [],
+    "dds_roundtrip": "PASS"
+  },
+  "mapping": {
+    "status": "EXACT_MIXED_SPLIT_GRAPHICS_PLUS_RUNTIME_REFERENCE",
+    "domain": "MIXED",
+    "graphics": {
+      "E7F6E9B7": {
+        "queue_index": 228,
+        "visible": "top COAST 2 COAST metallic header",
+        "action": "PRESERVE_C144_NATIVE",
+        "candidate_sha256": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607"
+      },
+      "6DC89C6E": {
+        "queue_index": 173,
+        "visible": "bottom stage location label (screenshot shows SUNNY BEACH / 서니 비치)",
+        "action": "REWORK_ALL_21_SHARED_STAGE_ROWS_NATIVE_HD"
+      }
+    },
+    "runtime_text": {
+      "id": 1123,
+      "korean": "스테이지 주행",
+      "visible": "center bracket detail box",
+      "action": "MAPPED_REFERENCE_NO_SOURCE_CHANGE",
+      "reason": "string is semantically correct and screenshot defect targeted the raster stage-name lowres family; retain for new in-game retest"
+    },
+    "protected_screen_art": "character portrait, bracket tree/lines/circles, rank badge/icon and other UI artwork are outside the edited 6DC text atlas"
+  },
+  "worker_status": "A90_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "report": "localization/graphics/role_A/20261006-A-INGAME90-IGR013-BRACKET-STAGE/A90_IGR013_6DC89C6E_REPORT.json"
+}
