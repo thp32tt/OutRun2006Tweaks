@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00406",
+  "production_id": "CONVERSION-DX11-00406",
+  "event_id": "CONVERSION-DX11-00406-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R268_PROGRAMMABLE_SHADER_STAGE_INTERFACE_LINKAGE",
+  "base_sha": "6278e9cddb6645239cceb2442e5df3be1403af4b",
+  "result_sha": null,
+  "source_implementation_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "automation_validation_detail": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "C3_VALIDATE",
+  "summary": "R268 consumes exact R267 SM3 VS-output and PS-input interface semantics to derive fail-closed usage/index/component-coverage stage-linkage evidence toward the dormant R263 F21 semantic-translation receipt. NativeDrawPath, Draw and DrawIndexed remain unauthorized.",
+  "evidence": [
+    "pipeline_translation.hpp defines ProgrammableShaderInterfaceLinkageEvidence with exact matched-input semantics.",
+    "pipeline_translation.cpp derives linkage only from exact correctly staged R267 receipts and rejects missing semantics or insufficient component coverage.",
+    "dx11_constant_buffer_probe covers positive linkage, semantic mismatch, component-mask mismatch and stage inversion.",
+    "verify_dx11_source_graph.py seals the R268 source/test contract."
+  ],
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub HEAD 6278e9cddb6645239cceb2442e5df3be1403af4b; read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, conversion state, prior 00405 record, regression history and Issue #14."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected 00405 exact_next_action: R268 stage-linkage compatibility evidence from R267 VS-output/PS-input semantics."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added pair-level R268 linkage evidence plus positive/fail-closed regressions and source-graph guard without enabling native draw dispatch."
+    },
+    "C3_VALIDATE": {
+      "status": "IN_PROGRESS",
+      "evidence": "Await exact-SHA Backend Conversion Gate for the validation-bearing R268 guard commit."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material source/test/static-guard commits on vr-dx11-native-r71 contain [AUTO:CONVERSION-DX11-00406]."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static/source semantic-linkage evidence only; no runtime candidate or binary payload is authorized."
+    },
+    "C6_STATE": {
+      "status": "IN_PROGRESS",
+      "evidence": "Persist exact validation-bearing SHA and PASS evidence after the exact-SHA Gate completes."
+    }
+  },
+  "exact_next_action": "Consume the exact-SHA Backend Conversion Gate for the R268 validation-bearing guard commit, then persist C3/C6 PASS state with RUNTIME_VALIDATION=UNTESTED. A later independent task may route R268 linkage provenance into production census/R263, but must not enable NativeDrawPath, Draw or DrawIndexed."
+}
