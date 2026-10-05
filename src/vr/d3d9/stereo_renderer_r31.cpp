@@ -34,10 +34,6 @@ namespace OutRunVRStereo
         constexpr std::size_t StateBlockApplyVtableIndex = 5;
         constexpr std::uint64_t LiveWvpValidationInterval = 16;
 
-        SafetyHookInline R31DrawPrimitiveR30Hook{};
-        SafetyHookInline R31DrawIndexedPrimitiveR30Hook{};
-        SafetyHookInline R31DrawPrimitiveUPR30Hook{};
-        SafetyHookInline R31DrawIndexedPrimitiveUPR30Hook{};
         SafetyHookInline R31CreateStateBlockHook{};
         SafetyHookInline R31BeginStateBlockHook{};
         SafetyHookInline R31EndStateBlockHook{};
@@ -687,107 +683,7 @@ namespace OutRunVRStereo
             return result;
         }
 
-        template <typename ActualDraw, typename R29Draw>
-        HRESULT R31Dispatch(IDirect3DDevice9* device, ActualDraw&& actualDraw,
-            R29Draw&& r29Draw, const char* site)
-        {
-            R31ObserveDraw(device);
-            R31DiscardUnreliableDrawCaches();
-
-            if (OutRunVR::State::StateBlockTracker::Recording())
-            {
-                R31TelemetryNoteFallback();
-                return actualDraw();
-            }
-
-            if (R30ClassifyScreenSpacePass(device) == R30ScreenSpaceKind::Hud2D)
-            {
-                const auto hud = R31TryHud(device,
-                    std::forward<ActualDraw>(actualDraw), site);
-                if (hud.handled)
-                    return hud.hr;
-            }
-            else
-            {
-                const auto fast = R31TryFastWorld(device,
-                    std::forward<ActualDraw>(actualDraw), site);
-                if (fast.handled)
-                    return fast.hr;
-            }
-
-            R31TelemetryNoteFallback();
-            return r29Draw();
-        }
-
-        HRESULT __stdcall DrawPrimitiveDestR31(IDirect3DDevice9* device,
-            D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
-        {
-            auto actual = [&]() {
-                return DrawPrimitiveHook.stdcall<HRESULT>(
-                    device, type, startVertex, primitiveCount);
-            };
-            auto r29 = [&]() {
-                return R30CallLowerDrawPrimitive(
-                    device, type, startVertex, primitiveCount);
-            };
-            return R31Dispatch(device, actual, r29, "R31/DrawPrimitive");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveDestR31(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
-            UINT startIndex, UINT primitiveCount)
-        {
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
-                    baseVertexIndex, minVertexIndex, numVertices, startIndex,
-                    primitiveCount);
-            };
-            auto r29 = [&]() {
-                return R30CallLowerDrawIndexedPrimitive(device, type,
-                    baseVertexIndex, minVertexIndex, numVertices, startIndex,
-                    primitiveCount);
-            };
-            return R31Dispatch(device, actual, r29,
-                "R31/DrawIndexedPrimitive");
-        }
-
-        HRESULT __stdcall DrawPrimitiveUPDestR31(IDirect3DDevice9* device,
-            D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
-            UINT stride)
-        {
-            auto actual = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
-                    device, type, primitiveCount, data, stride);
-            };
-            auto r29 = [&]() {
-                return R30CallLowerDrawPrimitiveUP(
-                    device, type, primitiveCount, data, stride);
-            };
-            return R31Dispatch(device, actual, r29, "R31/DrawPrimitiveUP");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveUPDestR31(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
-            const void* indexData, D3DFORMAT indexFormat,
-            const void* vertexData, UINT stride)
-        {
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
-                    minVertexIndex, numVertices, primitiveCount, indexData,
-                    indexFormat, vertexData, stride);
-            };
-            auto r29 = [&]() {
-                return R30CallLowerDrawIndexedPrimitiveUP(device,
-                    type, minVertexIndex, numVertices, primitiveCount,
-                    indexData, indexFormat, vertexData, stride);
-            };
-            return R31Dispatch(device, actual, r29,
-                "R31/DrawIndexedPrimitiveUP");
-        }
-
-        void R31BlockCurrentVerifiedGeneration() noexcept
+                                        void R31BlockCurrentVerifiedGeneration() noexcept
         {
             float ignored[16]{};
             std::uint32_t generation = 0, pose = 0;
@@ -970,29 +866,7 @@ namespace OutRunVRStereo
             return hr;
         }
 
-        void R31RollbackDrawHooks() noexcept
-        {
-            R31DrawIndexedPrimitiveUPR30Hook = {};
-            R31DrawPrimitiveUPR30Hook = {};
-            R31DrawIndexedPrimitiveR30Hook = {};
-            R31DrawPrimitiveR30Hook = {};
-        }
-
-        bool R31EnableDrawHooks() noexcept
-        {
-            SafetyHookInline* hooks[]{
-                &R31DrawPrimitiveR30Hook,
-                &R31DrawIndexedPrimitiveR30Hook,
-                &R31DrawPrimitiveUPR30Hook,
-                &R31DrawIndexedPrimitiveUPR30Hook
-            };
-            for (auto* hook : hooks)
-                if (!*hook || !hook->enable().has_value())
-                    return false;
-            return true;
-        }
-
-        DWORD WINAPI R31InstallThread(void*)
+                        DWORD WINAPI R31InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
             R31InstallState.store(State::Pending, std::memory_order_release);
@@ -1013,19 +887,6 @@ namespace OutRunVRStereo
                 if (r30 == State::Ready && renderer == State::Ready)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
-                    R31DrawPrimitiveR30Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveDestR30),
-                        DrawPrimitiveDestR31, disabled);
-                    R31DrawIndexedPrimitiveR30Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR30),
-                        DrawIndexedPrimitiveDestR31, disabled);
-                    R31DrawPrimitiveUPR30Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveUPDestR30),
-                        DrawPrimitiveUPDestR31, disabled);
-                    R31DrawIndexedPrimitiveUPR30Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30),
-                        DrawIndexedPrimitiveUPDestR31, disabled);
-
                     bool fallbackEndArmed = false;
                     bool fallbackBeginArmed = false;
                     bool fallbackCreateArmed = false;
@@ -1047,7 +908,6 @@ namespace OutRunVRStereo
                             R31EndStateBlockHook = {};
                             fallbackEndArmed = false;
                         }
-                        R31RollbackDrawHooks();
                         OutRunVR::State::StateBlockEvents::Clear();
                         OutRunVR::State::StateBlockRecovery::Clear();
                         OutRunVR::State::StateBlockTracker::MarkCoverageLost();
@@ -1069,12 +929,6 @@ namespace OutRunVRStereo
                         failInstall("StateBlock event callbacks unavailable");
                         return 0;
                     }
-                    if (!R31EnableDrawHooks())
-                    {
-                        failInstall("draw hooks unavailable");
-                        return 0;
-                    }
-
                     if (OutRunVR::State::StateBlockTracker::LifecycleHooksReady())
                     {
                         spdlog::info(
@@ -1140,7 +994,7 @@ namespace OutRunVRStereo
                     R31InstallState.store(State::Ready, std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR31Perf", true);
                     spdlog::info(
-                        "VR R31 PERF: cached world stereo + draw-route telemetry READY; R30 HUD sentinel path superseded");
+                        "VR R31 STATE: StateBlock cache/recovery ownership READY; R30 remains the draw owner until R33 final dispatch");
                     return 0;
                 }
                 Sleep(25);

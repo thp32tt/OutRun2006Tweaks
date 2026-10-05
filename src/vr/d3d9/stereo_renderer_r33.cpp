@@ -1,7 +1,8 @@
 // R33 final dispatch + post-review hot-path hardening.
 //
-// R32 owns reset/direct-transport review-2 safety. R33 is the final physical
-// game-side callback boundary and owns depth/stencil write-state caching,
+// R32 owns reset/direct-transport review-2 safety. R33 is the sole physical
+// draw dispatcher directly over R30 while Reset/Present still chain through R32.
+// R33 owns depth/stencil write-state caching,
 // exact single-count draw dispatch, final raster replay preservation, and the
 // ResetEx replay-health guard previously implemented by a separate R34 hook
 // layer. R33 now also owns initial replay-health synchronization and terminal
@@ -33,10 +34,10 @@ namespace OutRunVRStereo
         SafetyHookInline R33ResetR32Hook{};
         SafetyHookInline R33PresentR32Hook{};
         SafetyHookInline R33SetRenderStateR29Hook{};
-        SafetyHookInline R33DrawPrimitiveR32Hook{};
-        SafetyHookInline R33DrawIndexedPrimitiveR32Hook{};
-        SafetyHookInline R33DrawPrimitiveUPR32Hook{};
-        SafetyHookInline R33DrawIndexedPrimitiveUPR32Hook{};
+        SafetyHookInline R33DrawPrimitiveR30Hook{};
+        SafetyHookInline R33DrawIndexedPrimitiveR30Hook{};
+        SafetyHookInline R33DrawPrimitiveUPR30Hook{};
+        SafetyHookInline R33DrawIndexedPrimitiveUPR30Hook{};
 
         struct R33DepthStencilWriteState
         {
@@ -749,6 +750,7 @@ namespace OutRunVRStereo
         HRESULT __stdcall DrawPrimitiveDestR33(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
+            R32ObserveFrameWorkload(device, type, primitiveCount, false, false);
             auto call = [&]() {
                 const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                     device, type, startVertex, primitiveCount);
@@ -774,6 +776,7 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
+            R32ObserveFrameWorkload(device, type, primitiveCount, true, false);
             auto call = [&]() {
                 const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                     device, type, baseVertexIndex, minVertexIndex,
@@ -802,6 +805,7 @@ namespace OutRunVRStereo
             D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
             UINT stride)
         {
+            R32ObserveFrameWorkload(device, type, primitiveCount, false, true);
             auto call = [&]() {
                 const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                     device, type, primitiveCount, data, stride);
@@ -828,6 +832,7 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
+            R32ObserveFrameWorkload(device, type, primitiveCount, true, true);
             auto call = [&]() {
                 const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                     device, type, minVertexIndex, numVertices, primitiveCount,
@@ -963,10 +968,10 @@ namespace OutRunVRStereo
 
         void R33RollbackHooks() noexcept
         {
-            R33DrawIndexedPrimitiveUPR32Hook = {};
-            R33DrawPrimitiveUPR32Hook = {};
-            R33DrawIndexedPrimitiveR32Hook = {};
-            R33DrawPrimitiveR32Hook = {};
+            R33DrawIndexedPrimitiveUPR30Hook = {};
+            R33DrawPrimitiveUPR30Hook = {};
+            R33DrawIndexedPrimitiveR30Hook = {};
+            R33DrawPrimitiveR30Hook = {};
             R33SetRenderStateR29Hook = {};
             R33PresentR32Hook = {};
             R33ResetR32Hook = {};
@@ -978,10 +983,10 @@ namespace OutRunVRStereo
                 &R33ResetR32Hook,
                 &R33PresentR32Hook,
                 &R33SetRenderStateR29Hook,
-                &R33DrawPrimitiveR32Hook,
-                &R33DrawIndexedPrimitiveR32Hook,
-                &R33DrawPrimitiveUPR32Hook,
-                &R33DrawIndexedPrimitiveUPR32Hook
+                &R33DrawPrimitiveR30Hook,
+                &R33DrawIndexedPrimitiveR30Hook,
+                &R33DrawPrimitiveUPR30Hook,
+                &R33DrawIndexedPrimitiveUPR30Hook
             };
             for (auto* hook : hooks)
                 if (!*hook || !hook->enable().has_value())
@@ -1012,17 +1017,17 @@ namespace OutRunVRStereo
                     R33SetRenderStateR29Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&SetRenderStateDestR29),
                         SetRenderStateDestR33, disabled);
-                    R33DrawPrimitiveR32Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveDestR32),
+                    R33DrawPrimitiveR30Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&DrawPrimitiveDestR30),
                         DrawPrimitiveDestR33, disabled);
-                    R33DrawIndexedPrimitiveR32Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR32),
+                    R33DrawIndexedPrimitiveR30Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR30),
                         DrawIndexedPrimitiveDestR33, disabled);
-                    R33DrawPrimitiveUPR32Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveUPDestR32),
+                    R33DrawPrimitiveUPR30Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&DrawPrimitiveUPDestR30),
                         DrawPrimitiveUPDestR33, disabled);
-                    R33DrawIndexedPrimitiveUPR32Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR32),
+                    R33DrawIndexedPrimitiveUPR30Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30),
                         DrawIndexedPrimitiveUPDestR33, disabled);
 
                     if (!R33EnableHooks())
@@ -1030,7 +1035,7 @@ namespace OutRunVRStereo
                         R33RollbackHooks();
                         R33ReportInstallResult(false);
                         spdlog::error(
-                            "VR R33: final reset/state/draw hook transaction was partial; corrected R32 remains authoritative");
+                            "VR R33: final hook transaction was partial; R30 draw path and R32 lifecycle remain authoritative");
                         return 0;
                     }
 

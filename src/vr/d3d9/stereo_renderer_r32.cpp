@@ -14,10 +14,6 @@ namespace OutRunVRStereo
         SafetyHookInline R32ResetR22Hook{};
         SafetyHookInline R32ResolveDirectR13Hook{};
         SafetyHookInline R32PresentR13Hook{};
-        SafetyHookInline R32DrawPrimitiveR31Hook{};
-        SafetyHookInline R32DrawIndexedPrimitiveR31Hook{};
-        SafetyHookInline R32DrawPrimitiveUPR31Hook{};
-        SafetyHookInline R32DrawIndexedPrimitiveUPR31Hook{};
 
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R32InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
@@ -730,109 +726,7 @@ namespace OutRunVRStereo
             return hr;
         }
 
-        template <typename ActualDraw, typename LowerDraw>
-        HRESULT R32Dispatch(IDirect3DDevice9* device,
-            ActualDraw&& actualDraw, LowerDraw&& lowerDraw,
-            const char* site) noexcept
-        {
-            R31ObserveDraw(device);
-
-            if (!OutRunVR::State::StateBlockTracker::Recording())
-            {
-                if (R30ClassifyScreenSpacePass(device) != R30ScreenSpaceKind::None)
-                {
-                    const auto hud = R32TryHud(device,
-                        std::forward<ActualDraw>(actualDraw), site);
-                    if (hud.handled)
-                        return hud.hr;
-                }
-                else
-                {
-                    const auto fast = R32TryFastWorld(device,
-                        std::forward<ActualDraw>(actualDraw), site);
-                    if (fast.handled)
-                        return fast.hr;
-                }
-            }
-
-            R31TelemetryNoteFallback();
-            return R32LowerFailClosed(device,
-                std::forward<LowerDraw>(lowerDraw));
-        }
-
-        HRESULT __stdcall DrawPrimitiveDestR32(IDirect3DDevice9* device,
-            D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
-        {
-            R32ObserveFrameWorkload(device, type, primitiveCount, false, false);
-            auto actual = [&]() {
-                return DrawPrimitiveHook.stdcall<HRESULT>(
-                    device, type, startVertex, primitiveCount);
-            };
-            auto lower = [&]() {
-                return R32DrawPrimitiveR31Hook.stdcall<HRESULT>(
-                    device, type, startVertex, primitiveCount);
-            };
-            return R32Dispatch(device, actual, lower, "R32/DrawPrimitive");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveDestR32(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
-            UINT startIndex, UINT primitiveCount)
-        {
-            R32ObserveFrameWorkload(device, type, primitiveCount, true, false);
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
-                    baseVertexIndex, minVertexIndex, numVertices, startIndex,
-                    primitiveCount);
-            };
-            auto lower = [&]() {
-                return R32DrawIndexedPrimitiveR31Hook.stdcall<HRESULT>(device,
-                    type, baseVertexIndex, minVertexIndex, numVertices,
-                    startIndex, primitiveCount);
-            };
-            return R32Dispatch(device, actual, lower,
-                "R32/DrawIndexedPrimitive");
-        }
-
-        HRESULT __stdcall DrawPrimitiveUPDestR32(IDirect3DDevice9* device,
-            D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
-            UINT stride)
-        {
-            R32ObserveFrameWorkload(device, type, primitiveCount, false, true);
-            auto actual = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
-                    device, type, primitiveCount, data, stride);
-            };
-            auto lower = [&]() {
-                return R32DrawPrimitiveUPR31Hook.stdcall<HRESULT>(
-                    device, type, primitiveCount, data, stride);
-            };
-            return R32Dispatch(device, actual, lower, "R32/DrawPrimitiveUP");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveUPDestR32(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
-            const void* indexData, D3DFORMAT indexFormat,
-            const void* vertexData, UINT stride)
-        {
-            R32ObserveFrameWorkload(device, type, primitiveCount, true, true);
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
-                    minVertexIndex, numVertices, primitiveCount, indexData,
-                    indexFormat, vertexData, stride);
-            };
-            auto lower = [&]() {
-                return R32DrawIndexedPrimitiveUPR31Hook.stdcall<HRESULT>(device,
-                    type, minVertexIndex, numVertices, primitiveCount,
-                    indexData, indexFormat, vertexData, stride);
-            };
-            return R32Dispatch(device, actual, lower,
-                "R32/DrawIndexedPrimitiveUP");
-        }
-
-        void R32ForgetDirectIdentity() noexcept
+                                        void R32ForgetDirectIdentity() noexcept
         {
             R32DirectHostPid = 0;
             R32DirectHostLuidLow = 0;
@@ -1343,10 +1237,6 @@ namespace OutRunVRStereo
 
         void R32RollbackHooks() noexcept
         {
-            R32DrawIndexedPrimitiveUPR31Hook = {};
-            R32DrawPrimitiveUPR31Hook = {};
-            R32DrawIndexedPrimitiveR31Hook = {};
-            R32DrawPrimitiveR31Hook = {};
             R32PresentR13Hook = {};
             R32ResolveDirectR13Hook = {};
             R32ResetR22Hook = {};
@@ -1357,11 +1247,7 @@ namespace OutRunVRStereo
             SafetyHookInline* hooks[]{
                 &R32ResetR22Hook,
                 &R32ResolveDirectR13Hook,
-                &R32PresentR13Hook,
-                &R32DrawPrimitiveR31Hook,
-                &R32DrawIndexedPrimitiveR31Hook,
-                &R32DrawPrimitiveUPR31Hook,
-                &R32DrawIndexedPrimitiveUPR31Hook
+                &R32PresentR13Hook
             };
             for (auto* hook : hooks)
                 if (!*hook || !hook->enable().has_value())
@@ -1396,19 +1282,6 @@ namespace OutRunVRStereo
                         ResolveDirectTransportR32, disabled);
                     R32PresentR13Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&PresentDestR13), PresentDestR32, disabled);
-                    R32DrawPrimitiveR31Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveDestR31),
-                        DrawPrimitiveDestR32, disabled);
-                    R32DrawIndexedPrimitiveR31Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR31),
-                        DrawIndexedPrimitiveDestR32, disabled);
-                    R32DrawPrimitiveUPR31Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveUPDestR31),
-                        DrawPrimitiveUPDestR32, disabled);
-                    R32DrawIndexedPrimitiveUPR31Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR31),
-                        DrawIndexedPrimitiveUPDestR32, disabled);
-
                     if (!R32EnableHooks())
                     {
                         R32RollbackHooks();
@@ -1417,14 +1290,14 @@ namespace OutRunVRStereo
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR32Review", false);
                         spdlog::error(
-                            "VR R32: review/optimization hook transaction was partial; R31/R22 remain authoritative");
+                            "VR R32: lifecycle/DirectGPU hook transaction was partial; R30 draw + R31 StateBlock/R22 lifecycle remain authoritative");
                         return 0;
                     }
 
                     R32InstallState.store(State::Ready, std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", true);
                     spdlog::info(
-                        "VR R32 REVIEW2: R22-owned Reset lifecycle + fail-closed state reads + batched WVP + cached D3D9Ex interop + pending-fence-safe producer ring + delta telemetry READY");
+                        "VR R32 REVIEW2: Reset/Present/DirectGPU lifecycle + fail-closed helpers + cached D3D9Ex interop + pending-fence-safe producer ring READY; R33 owns draw dispatch");
                     return 0;
                 }
                 Sleep(25);
