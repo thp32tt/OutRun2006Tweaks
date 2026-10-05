@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-05T21:02:36+09:00",
+  "role": "C",
+  "run": "20261005-C197-C200-BATCH",
+  "assets_checked": 2,
+  "physical_elements_checked": 40,
+  "results": [
+    {
+      "qa_id": "C197",
+      "index": 161,
+      "asset": "55B57CDE",
+      "candidate_sha256": "7569c51cf5ba82ce081bf09d486b8c8869560e7fae71292c613e4bf8a5b51ab8",
+      "machine_status": "FAIL",
+      "decision": "C197_REWORK_REQUIRED_DXT5_VISIBLE_FRINGE_AND_UNDECLARED_ALPHA_EXTENTS",
+      "report": "localization/graphics/role_C/20261005-C197-55B57CDE/C197_55B57CDE_CONTROLLER_FINAL_QA.json"
+    },
+    {
+      "qa_id": "C200",
+      "index": 30,
+      "asset": "8215FD25",
+      "candidate_sha256": "d8687e615007af7bdd8e4d0bf41f1830e0bf105a3ef225cc157671fc8e9fd377",
+      "producer_static_qa": "PASS_REPORTED",
+      "controller_visual_qa": "FAIL_STARBURST_TEXTURE_DISCONTINUITY_AND_SMEAR",
+      "decision": "C200_REWORK_REQUIRED_STARBURST_TEXTURE_DISCONTINUITY_AND_SMEAR",
+      "report": "localization/graphics/role_C/20261005-C200-8215FD25/C200_8215FD25_CONTROLLER_FINAL_QA.json",
+      "supersedes": "C199/B145 and C198/B144"
+    }
+  ],
+  "rework_required_assets": [
+    "55B57CDE",
+    "8215FD25"
+  ],
+  "global_rework_remaining": [
+    "37759842",
+    "8215FD25",
+    "55B57CDE"
+  ],
+  "pending_artwork_localize_text": 12,
+  "pending_c": [],
+  "queue_action_counts": {
+    "localize_text": 82,
+    "zoom_review": 44,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_brand_song_credit": 1
+  },
+  "runtime_validation": "UNTESTED",
+  "exclusions": "Completed prior PASS assets were not repeated. VR/FFB/DX11/DXVK untouched."
+}
