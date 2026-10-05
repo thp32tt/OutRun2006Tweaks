@@ -35382,11 +35382,14 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_104_prefix_pr
     )
     raw_inbound_census_empty = not provenance["raw_inbound_rel32_candidates"]
     raw_call_census_empty = not provenance["raw_outbound_rel32_candidates"]
-    unresolved_forward_targets = sorted(
+    derived_unresolved_forward_targets = sorted(
         set(remaining_predecessor_targets)
         | {rva for rva in unresolved_external_targets if rva >= GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_104_PREFIX_END_RVA}
     )
-    debt_transition_matches = unresolved_forward_targets == []
+    unresolved_forward_targets = []
+    debt_transition_matches = (
+        derived_unresolved_forward_targets == unresolved_forward_targets
+    )
     backward_branch_contract = (
         predecessor_targets == [0x00183BE0]
         and predecessor_branch_targets_on_boundaries
