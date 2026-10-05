@@ -7,7 +7,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("worker A only")
 
 repo=Path.cwd()
-run="20261006-A-PRODUCTION72-ACF"
+run="20261006-A-PRODUCTION73-ACF"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -116,6 +116,9 @@ def word_groups(mask,expected_words):
         if x==p+1: p=x
         else: runs.append((s,p+1)); s=p=x
     runs.append((s,p+1))
+    # Atlas cells can contain a detached 1-4 px edge strip that is not part of the text.
+    # Exclude only such cell-edge strips before word-gap grouping; all interior glyph runs remain eligible.
+    runs=[r for r in runs if not ((r[1]-r[0])<=4 and (r[0]<=1 or r[1]>=mask.width-1))]
     if len(runs)<expected_words: raise RuntimeError(("too few runs",expected_words,runs))
     gaps=[(runs[i+1][0]-runs[i][1],i) for i in range(len(runs)-1)]
     cuts=sorted(i for _,i in sorted(gaps,reverse=True)[:expected_words-1])
@@ -219,15 +222,15 @@ if len(rows)!=23: raise RuntimeError(("physical row count",len(rows)))
 # Clean plate is exact transparent removal of approved source glyph pixels only.
 clean=src.copy()
 ca=clean.getchannel("A"); ca.paste(0,(0,0,W,H),source_mask); clean.putalpha(ca)
-sp=out/"A72_ACF_SOURCE_READABLE.png"; cp=out/"A72_ACF_CLEAN_PLATE.png"
-smp=out/"A72_ACF_SOURCE_TEXT_MASK.png"; ap=out/"A72_ACF_ALLOWED_BBOX_MASK.png"
+sp=out/"A73_ACF_SOURCE_READABLE.png"; cp=out/"A73_ACF_CLEAN_PLATE.png"
+smp=out/"A73_ACF_SOURCE_TEXT_MASK.png"; ap=out/"A73_ACF_ALLOWED_BBOX_MASK.png"
 src.save(sp); clean.save(cp); source_mask.save(smp); allowed.save(ap)
 source_visible=bmask(src.getchannel("A"))
 protected=ImageChops.multiply(source_visible,ImageOps.invert(source_mask))
 protected=ImageChops.lighter(protected,inline_global)
-pp=out/"A72_ACF_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"A72_ACF_CLEAN_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A72_ACF_CLEAN_VALIDATION.json").read_text())
+pp=out/"A73_ACF_PROTECTED_VISIBLE_MASK.png"; protected.save(pp)
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(smp),"--protected-mask",str(pp),"--report",str(out/"A73_ACF_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"A73_ACF_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
@@ -358,10 +361,10 @@ candidate.write_bytes(payload)
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
 dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip")
-fp=out/"A72_ACF_FINAL_DECODED_READABLE.png"; dec.save(fp)
-target_union.save(out/"A72_ACF_TARGET_TEXT_MASK.png")
-subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A72_ACF_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"A72_ACF_FINAL_VALIDATION.json").read_text())
+fp=out/"A73_ACF_FINAL_DECODED_READABLE.png"; dec.save(fp)
+target_union.save(out/"A73_ACF_TARGET_TEXT_MASK.png")
+subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A73_ACF_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"A73_ACF_FINAL_VALIDATION.json").read_text())
 
 diff=dmask(src,dec)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
@@ -402,24 +405,24 @@ sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+
 yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
 sheet.thumbnail((1900,16000),Image.Resampling.LANCZOS)
-sheet.save(out/"A72_ACF_TARGET_CONTACTS.jpg",quality=97)
+sheet.save(out/"A73_ACF_TARGET_CONTACTS.jpg",quality=97)
 
 full=Image.new("RGB",(1024,3*280),"white")
 for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,512),Image.Resampling.NEAREST)
     z=z.resize((1024,256),Image.Resampling.LANCZOS)
     full.paste(z,(0,i*280+24)); ImageDraw.Draw(full).text((4,i*280+4),label,fill="black")
-full.save(out/"A72_ACF_SOURCE_CLEAN_FINAL.jpg",quality=96)
+full.save(out/"A73_ACF_SOURCE_CLEAN_FINAL.jpg",quality=96)
 
 rr=Image.new("RGB",(1024,2*280),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im).resize((1024,256),Image.Resampling.LANCZOS)
     rr.paste(z,(0,i*280+24)); ImageDraw.Draw(rr).text((4,i*280+4),label,fill="black")
-rr.save(out/"A72_ACF_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"A73_ACF_RAW_COMPARE.jpg",quality=96)
 
 report={
  "schema_version":1,"role":"A","run":run,"index":205,"asset":asset,
- "readiness_tier":"A71_PREFLIGHT_RESOLVED_TO_RENDER_READY_COMPLETED_SAME_INVOCATION",
+ "readiness_tier":"A71_PREFLIGHT_RESOLVED_TO_RENDER_READY_COMPLETED_SAME_INVOCATION_A73_TOKEN_EDGE_FIX",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":commit,"git_blob_sha1":blob(sb),"atlas_git_blob_sha1":blob(ab),"source_sha256":sha(sb)},
  "semantic_binding":{"transcription_segments":len(semantic_segments),"localized_physical_rows":len(outrows),
    "protected_policy_regions":protected_policy,
@@ -437,16 +440,16 @@ report={
  "preserved_product_tokens":tokens,
  "candidate_sha256":sha(payload),"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","runtime_validation":"UNTESTED",
- "status":"A72_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"A73_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(out/"A72_ACF61D7C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A72_ACF61D7C.json").write_text(json.dumps({
+(out/"A73_ACF61D7C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"A73_ACF61D7C.json").write_text(json.dumps({
  "run":run,"index":205,"asset":"ACF61D7C","source_sha256":sha(sb),"candidate_sha256":sha(payload),
  "semantic_segments":len(semantic_segments),"localized_physical_rows":len(outrows),
  "bbox_size_positive_margin":f"{len(outrows)}/{len(outrows)} PASS","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"render_outside_target":render_outside,
  "candidate_vs_clean_outside_target":candidate_vs_clean_outside_target,"overlap":overlap,"touch_pairs":len(touch),
  "target_protected_overlap":target_protected_overlap,"target_protected_1px_near":target_protected_near,
- "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_A/{run}/A72_ACF61D7C_REPORT.json"
+ "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_A/{run}/A73_ACF61D7C_REPORT.json"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps({"run":run,"index":205,"asset":"ACF61D7C","candidate_sha256":sha(payload),"semantic":len(semantic_segments),"physical":len(outrows),"status":report["status"]},ensure_ascii=False))
