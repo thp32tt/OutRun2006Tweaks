@@ -70,15 +70,15 @@ expected={
 if len(regs)!=5 or any(regs[i]["rect"]!=expected[i] for i in expected):
     raise RuntimeError(("atlas drift",regs))
 
-# Stock visual + raw atlas order establish semantics. Atlas y is raw DDS; convert each
-# raw cell to readable/game orientation. Xbox Live is a service/brand mark and is
-# preserved pixel-exact under the brand rule, even though the historical draft listed it.
+# Stock visual is top-to-bottom stage select/showroom/single player/system link/xbox live.
+# The atlas indices are bottom-to-top (idx4..idx0) in the canonical readable HD source.
+# Xbox Live is a service/brand mark and is preserved pixel-exact.
 semantics={
- 0:("stage select","스테이지 선택"),
- 1:("showroom","쇼룸"),
+ 0:("xbox live",None),
+ 1:("system link","시스템 링크"),
  2:("single player","싱글 플레이"),
- 3:("system link","시스템 링크"),
- 4:("xbox live",None),
+ 3:("showroom","쇼룸"),
+ 4:("stage select","스테이지 선택"),
 }
 rows=[]
 source_text_mask=Image.new("L",(W,H),0)
@@ -86,7 +86,7 @@ allowed=Image.new("L",(W,H),0)
 style_data={}
 for idx in range(5):
     rx,ry,cw,ch=regs[idx]["rect"]
-    y=H-(ry+ch)
+    y=ry
     cell_rect=[rx,y,rx+cw,y+ch]
     cell=src.crop(tuple(cell_rect))
     am=bmask(cell.getchannel("A"))
@@ -292,7 +292,7 @@ diff=dmask(src,decoded)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
 alpha_out=count(ImageChops.multiply(bmask(ImageChops.difference(src.getchannel("A"),decoded.getchannel("A"))),ImageOps.invert(allowed)))
 prot=count(ImageChops.multiply(diff,protected))
-preserve=row4=next(r for r in rows if r["region_idx"]==4)
+preserve=next(r for r in rows if r["region_idx"]==0)
 px,py,pw,ph=preserve["readable_cell"]
 preserve_changes=count(dmask(src.crop((px,py,px+pw,py+ph)),decoded.crop((px,py,px+pw,py+ph))))
 guard=Image.new("L",(W,H),0)
@@ -335,7 +335,7 @@ report={
  "source_sha256":SOURCE_SHA,"candidate_sha256":CANDIDATE_SHA,"candidate_path":str(candidate.relative_to(repo)),
  "structure":{"dimensions":[W,H],"format":"RGBA32","pixel_raw_mode":RAWMODE,"pitch":pitch,"depth":depth,"mipmaps":mips,
   "bytes":len(sb),"header_128_exact":True,"raw_orientation":"mirror_y"},
- "semantic_binding":{"stock_visual_order":["stage select","showroom","single player","system link","xbox live"],
+ "semantic_binding":{"stock_visual_order":["stage select","showroom","single player","system link","xbox live"],"atlas_index_order_readable":[4,3,2,1,0],
   "localized":["stage select -> 스테이지 선택","showroom -> 쇼룸","single player -> 싱글 플레이","system link -> 시스템 링크"],
   "preserved":["xbox live"],"preserve_reason":"Xbox Live is brand/service artwork; preserve original pixels"},
  "rows":rows,
