@@ -1,0 +1,44 @@
+{
+  "run": "20261006-A-INGAME88-IGR001-C2C",
+  "regression": "IGR-001",
+  "mapping": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+  "assets": {
+    "BA": {
+      "queue_index": 212,
+      "candidate_sha256": "61ae0c45568e023cc258379173f8d80f43cc5257f2d8facefbcf3c87759179e1",
+      "bbox_size_positive_margin": "1/1 PASS",
+      "changed_pixels": 57388,
+      "changed_outside_target_bboxes": 0,
+      "alpha_changed_outside_target_bboxes": 0,
+      "protected_changed_pixels": 0,
+      "render_protected_overlap_pixels": 0,
+      "status": "PASS"
+    },
+    "8C": {
+      "queue_index": 188,
+      "candidate_sha256": "00e16af1e3d468667fe13ed5291ec55bbfd06f18e6895a6be7e79f413ade94bd",
+      "bbox_size_positive_margin": "1/1 PASS",
+      "changed_pixels": 51564,
+      "changed_outside_target_bboxes": 0,
+      "alpha_changed_outside_target_bboxes": 0,
+      "protected_changed_pixels": 0,
+      "render_protected_overlap_pixels": 0,
+      "status": "PASS"
+    },
+    "D657": {
+      "queue_index": 220,
+      "candidate_sha256": "1a57c385e6c3ea2cc368888041e7106aab79bc4ab364daf0b51edd4465fcc935",
+      "bbox_size_positive_margin": "1/1 PASS",
+      "changed_pixels": 12770,
+      "changed_outside_target_bboxes": 0,
+      "alpha_changed_outside_target_bboxes": 0,
+      "protected_changed_pixels": 0,
+      "render_protected_overlap_pixels": 0,
+      "status": "PASS"
+    }
+  },
+  "preserved_754F_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "worker_status": "A88_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "report": "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_IGR001_REPORT.json"
+}

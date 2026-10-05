@@ -1,0 +1,299 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-INGAME88-IGR001-C2C",
+  "base_head": "dda45a754960fe4879d6f0a7b92c6e333486bed4",
+  "user_ingame_regression": [
+    "IGR-001",
+    "스크린샷(143).png"
+  ],
+  "owner_lane": "A",
+  "mapping": {
+    "status": "EXACT_GRAPHICS_MULTI_ASSET_NO_RUNTIME_TEXT",
+    "domain": "GRAPHICS",
+    "visible_bindings": [
+      {
+        "screen": "large red 코스트 2 코스트 title",
+        "asset": "BA0147DA",
+        "queue_index": 212,
+        "source": "COAST 2 COAST",
+        "action": "REWORKED_NATIVE"
+      },
+      {
+        "screen": "레이스와 하트 어택... help line",
+        "asset": "8C259C68",
+        "queue_index": 188,
+        "source": "Complete Race and Heart Attack missions to win OR Miles!",
+        "action": "REWORKED_NATIVE"
+      },
+      {
+        "screen": "bottom 코스트 2 코스트 selector",
+        "asset": "D657C2EB",
+        "queue_index": 220,
+        "source": "COAST 2 COAST",
+        "action": "REWORKED_NATIVE"
+      },
+      {
+        "screen": "top 싱글 플레이 mode header",
+        "asset": "754F0599",
+        "queue_index": 175,
+        "source": "single player",
+        "action": "PRESERVED_C171_NATIVE_SOURCE_STYLE"
+      }
+    ],
+    "runtime_text_required": false,
+    "note": "IGR-001 exact mapping resolved entirely to baked graphics. The three backlog-named title/subtitle/bottom-selector defects were materially re-rendered; the shared top SINGLE PLAYER header is independently mapped to 754F0599 and preserved because C171 already established native-HD source-style geometry."
+  },
+  "assets": {
+    "BA": {
+      "queue_index": 212,
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+      "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "superseded_candidate_sha256": "f5838261bd2015ade657d51f45175f1ef1c0351252c6505dc5eaf985be54d5a1",
+      "candidate_sha256": "61ae0c45568e023cc258379173f8d80f43cc5257f2d8facefbcf3c87759179e1",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+      "structure": {
+        "width": 2048,
+        "height": 2048,
+        "pitch": 8192,
+        "mips": 1,
+        "pf_flags": 65,
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "raw_mode": "RGBA",
+        "header_128_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "rows": [
+        {
+          "key": "coast2coast_title",
+          "source": "COAST 2 COAST",
+          "korean": "코스트 2 코스트",
+          "original_bbox": [
+            0,
+            964,
+            1760,
+            1124
+          ],
+          "localized_bbox": [
+            4,
+            982,
+            1033,
+            1105
+          ],
+          "source_size": [
+            1760,
+            160
+          ],
+          "localized_size": [
+            1029,
+            123
+          ],
+          "delta_left": 4,
+          "delta_right": 727,
+          "delta_top": 18,
+          "delta_bottom": 19,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "positive_margin": "PASS",
+          "font": "Noto Sans CJK KR Black",
+          "font_size": 160,
+          "fill_rgba": [
+            186,
+            0,
+            0,
+            255
+          ],
+          "stroke": 0,
+          "slant": 0.0,
+          "alignment": "left",
+          "native_resolution_render": true,
+          "upscaled_old_korean_reused": false
+        }
+      ],
+      "scope_qa": {
+        "changed_pixels": 57388,
+        "changed_outside_target_bboxes": 0,
+        "alpha_changed_outside_target_bboxes": 0,
+        "protected_changed_pixels": 0,
+        "render_protected_overlap_pixels": 0,
+        "status": "PASS"
+      }
+    },
+    "8C": {
+      "queue_index": 188,
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+      "source_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+      "superseded_candidate_sha256": "8da8dbf1d5f577605e2268841667fdd64636f4358f27e17103587ee032c2575c",
+      "candidate_sha256": "00e16af1e3d468667fe13ed5291ec55bbfd06f18e6895a6be7e79f413ade94bd",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+      "structure": {
+        "width": 2048,
+        "height": 2048,
+        "pitch": 8192,
+        "mips": 1,
+        "pf_flags": 65,
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "raw_mode": "RGBA",
+        "header_128_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "rows": [
+        {
+          "key": "coast2coast_help",
+          "source": "Complete Race and Heart Attack missions to win OR Miles!",
+          "korean": "레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!",
+          "original_bbox": [
+            6,
+            1259,
+            1727,
+            1325
+          ],
+          "localized_bbox": [
+            9,
+            1262,
+            1468,
+            1322
+          ],
+          "source_size": [
+            1721,
+            66
+          ],
+          "localized_size": [
+            1459,
+            60
+          ],
+          "delta_left": 3,
+          "delta_right": 259,
+          "delta_top": 3,
+          "delta_bottom": 3,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "positive_margin": "PASS",
+          "font": "Noto Sans CJK KR Bold",
+          "font_size": 62,
+          "fill_rgba": [
+            63,
+            71,
+            74,
+            255
+          ],
+          "stroke": 0,
+          "slant": 0.0,
+          "alignment": "left",
+          "native_resolution_render": true,
+          "upscaled_old_korean_reused": false
+        }
+      ],
+      "scope_qa": {
+        "changed_pixels": 51564,
+        "changed_outside_target_bboxes": 0,
+        "alpha_changed_outside_target_bboxes": 0,
+        "protected_changed_pixels": 0,
+        "render_protected_overlap_pixels": 0,
+        "status": "PASS"
+      }
+    },
+    "D657": {
+      "queue_index": 220,
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+      "source_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "superseded_candidate_sha256": "6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5",
+      "candidate_sha256": "1a57c385e6c3ea2cc368888041e7106aab79bc4ab364daf0b51edd4465fcc935",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+      "structure": {
+        "width": 2048,
+        "height": 512,
+        "pitch": 8192,
+        "mips": 1,
+        "pf_flags": 65,
+        "bpp": 32,
+        "masks": [
+          "0xff0000",
+          "0xff00",
+          "0xff",
+          "0xff000000"
+        ],
+        "raw_mode": "BGRA",
+        "header_128_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "rows": [
+        {
+          "key": "coast2coast_selector",
+          "source": "COAST 2 COAST",
+          "korean": "코스트 2 코스트",
+          "original_bbox": [
+            20,
+            266,
+            626,
+            330
+          ],
+          "localized_bbox": [
+            22,
+            270,
+            442,
+            325
+          ],
+          "source_size": [
+            606,
+            64
+          ],
+          "localized_size": [
+            420,
+            55
+          ],
+          "delta_left": 2,
+          "delta_right": 184,
+          "delta_top": 4,
+          "delta_bottom": 5,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "positive_margin": "PASS",
+          "font": "Noto Sans CJK KR Bold",
+          "font_size": 64,
+          "fill_rgba": [
+            78,
+            96,
+            100,
+            255
+          ],
+          "stroke": 2,
+          "slant": 0.0,
+          "alignment": "left",
+          "native_resolution_render": true,
+          "upscaled_old_korean_reused": false
+        }
+      ],
+      "scope_qa": {
+        "changed_pixels": 12770,
+        "changed_outside_target_bboxes": 0,
+        "alpha_changed_outside_target_bboxes": 0,
+        "protected_changed_pixels": 0,
+        "render_protected_overlap_pixels": 0,
+        "status": "PASS"
+      }
+    }
+  },
+  "preserved_header": {
+    "queue_index": 175,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+    "candidate_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+    "reason": "C171 pixel/visual PASS already uses native-HD metallic source-family geometry for single player; do not repeat completed bytes without a row-specific new failure."
+  },
+  "method": "Newer user in-game evidence overrides prior static PASS for the IGR-001-specific C2C rows. Re-render only those exact source bboxes directly at canonical HD resolution; preserve B166 Heart Attack corrections and all unrelated rows byte-for-pixel.",
+  "visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "A88_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
