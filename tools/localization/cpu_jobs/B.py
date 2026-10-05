@@ -7,7 +7,7 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageFilter,ImageOps
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("worker B only")
 repo=Path.cwd()
-run="20261005-B-PRODUCTION93"
+run="20261005-B-PRODUCTION94"
 out=repo/"localization/graphics/role_B"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds"
@@ -95,32 +95,29 @@ for row in rows:
 pix=sa[source_core]
 white_sel=(pix[:,0]>165)&(pix[:,1]>165)&(pix[:,2]>165)
 navy_sel=(pix[:,2].astype(int)>pix[:,0].astype(int)+10)&(pix[:,2].astype(int)>pix[:,1].astype(int)+5)&(pix[:,0]<100)&(pix[:,1]<100)
-white_rgb=tuple(int(round(statistics.median(pix[white_sel,k]))) for k in range(3))
-navy_rgb=tuple(int(round(statistics.median(pix[navy_sel,k]))) for k in range(3))
+white_rgb=tuple(int(round(float(np.median(pix[white_sel,k].astype(np.float32))))) for k in range(3))
+navy_rgb=tuple(int(round(float(np.median(pix[navy_sel,k].astype(np.float32))))) for k in range(3))
 white=white_rgb+(255,); navy=navy_rgb+(255,)
 
-# Smooth local vertical reconstruction, pasted only into the glyph/effect mask.
-clean_arr=sa.copy()
+# Patterned/gradient plate reconstruction: OpenCV Telea inpaint RGB inside the
+# glyph/effect mask only. Preserve source alpha byte-for-byte.
+subprocess.run(["python3","-m","pip","install","--disable-pip-version-check","opencv-python-headless"],check=True,stdout=subprocess.DEVNULL)
+import cv2
 sm=np.asarray(source_mask)>0
-for row in rows:
-    x0,y0,x1,y1=row["original_bbox"]; pad=10
-    xx0=max(0,x0-pad); xx1=min(W,x1+pad)
-    top0=max(0,y0-12); top1=max(0,y0-4); bot0=min(H,y1+4); bot1=min(H,y1+12)
-    if top1<=top0 or bot1<=bot0: raise RuntimeError(("reconstruction samples",row))
-    top=np.median(sa[top0:top1,xx0:xx1].astype(np.float32),axis=0)
-    bot=np.median(sa[bot0:bot1,xx0:xx1].astype(np.float32),axis=0)
-    for yy in range(y0,y1):
-        t=(yy-y0+0.5)/max(1,(y1-y0))
-        line=np.clip(np.rint(top*(1-t)+bot*t),0,255).astype(np.uint8)
-        sel=sm[yy,xx0:xx1]
-        clean_arr[yy,xx0:xx1][sel]=line[sel]
+bgr=cv2.cvtColor(sa[:,:,:3],cv2.COLOR_RGB2BGR)
+mask8=(sm.astype(np.uint8)*255)
+inp=cv2.inpaint(bgr,mask8,7,cv2.INPAINT_TELEA)
+rgb=cv2.cvtColor(inp,cv2.COLOR_BGR2RGB)
+clean_arr=sa.copy()
+clean_arr[sm,:3]=rgb[sm]
+clean_arr[:,:,3]=sa[:,:,3]
 clean=Image.fromarray(clean_arr,"RGBA")
 source_png=out/"63C_SOURCE_READABLE.png"; clean_png=out/"63C_CLEAN_PLATE.png"; smp=out/"63C_SOURCE_TEXT_MASK.png"; allowedp=out/"63C_ALLOWED_BBOX_MASK.png"
 src.save(source_png); clean.save(clean_png); source_mask.save(smp); allowed.save(allowedp)
 protected=ImageOps.invert(allowed); pp=out/"63C_PROTECTED_MASK.png"; protected.save(pp)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(smp),"--protected-mask",str(pp),"--report",str(out/"B93_CLEAN_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"B93_CLEAN_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(smp),"--protected-mask",str(pp),"--report",str(out/"B94_CLEAN_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"B94_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
@@ -176,7 +173,7 @@ for row in rows:
       "delta_left":lb[0]-x0,"delta_right":x1-lb[2],"delta_top":lb[1]-y0,"delta_bottom":y1-lb[3],
       "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","font_file":Path(fp).name,"font_style":fstyle,
       "font_size":shared_fs,"stroke_width":shared_sw,"slant":.22,"fill_rgba":white,"outline_rgba":navy,"alignment":"center",
-      "rework_status":"B93_NEW_EXACT_HD_CANDIDATE"})
+      "rework_status":"B94_NEW_EXACT_HD_CANDIDATE"})
 
 if ImageChops.multiply(targets[0],targets[1]).getbbox(): raise RuntimeError("target overlap")
 target=ImageChops.lighter(targets[0],targets[1]); target.save(out/"63C_TARGET_TEXT_MASK.png")
@@ -189,8 +186,8 @@ raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
 dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("RGBA roundtrip mismatch")
 final_png=out/"63C_FINAL_DECODED_READABLE.png"; dec.save(final_png)
-subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(allowedp),"--protected-mask",str(pp),"--report",str(out/"B93_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"B93_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(source_png),str(final_png),str(allowedp),"--protected-mask",str(pp),"--report",str(out/"B94_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"B94_FINAL_VALIDATION.json").read_text())
 if finalrep["status"]!="PASS": raise RuntimeError(("final validator",finalrep))
 
 diff=diffmask(src,dec)
@@ -211,7 +208,7 @@ if outside or alphaout or render_out or prot or residue:
 stack=Image.new("RGB",(1024,3*1050),"white")
 for i,(label,im) in enumerate([("SOURCE",src),("CLEAN",clean),("FINAL",dec)]):
     z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); stack.paste(z,(0,i*1050+26)); ImageDraw.Draw(stack).text((5,i*1050+5),label,fill="black")
-stack.save(out/"B93_63C_SOURCE_CLEAN_FINAL.jpg",quality=96)
+stack.save(out/"B94_63C_SOURCE_CLEAN_FINAL.jpg",quality=96)
 cards=[]
 for row in outrows:
     x0,y0,x1,y1=row["original_bbox"]; p=20; cr=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
@@ -223,11 +220,11 @@ for row in outrows:
     ImageDraw.Draw(c).text((5,5),f'{row["region_idx"]} Total Rank -> 종합 랭킹',fill="black"); cards.append(c)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height+4 for c in cards)),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.save(out/"B93_63C_ROW_CONTACT.jpg",quality=96)
+sheet.save(out/"B94_63C_ROW_CONTACT.jpg",quality=96)
 rr=Image.new("RGB",(1024,2*1050),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec)]):
     z=comp(im).resize((1024,1024),Image.Resampling.NEAREST); rr.paste(z,(0,i*1050+26)); ImageDraw.Draw(rr).text((5,i*1050+5),label,fill="black")
-rr.save(out/"B93_63C_RAW_COMPARE.jpg",quality=96)
+rr.save(out/"B94_63C_RAW_COMPARE.jpg",quality=96)
 
 report={"schema_version":1,"role":"B","run":run,"queue_index":26,"asset":asset,
  "readiness_tier":"PREFLIGHT_PROMOTED_TO_RENDER_COMPLETED_SAME_INVOCATION",
@@ -239,11 +236,11 @@ report={"schema_version":1,"role":"B","run":run,"queue_index":26,"asset":asset,
  "decoded_changes":{"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"source_effect_residue":residue,"render_outside_target":render_out,"localized_overlap":0},
  "candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"B93_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
-(out/"B93_63C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+ "status":"B94_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
+(out/"B94_63C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 summary={"run":run,"index":26,"asset":"63C91067","source_sha256":sha(sb),"candidate_sha256":csha,"localized_physical_elements":2,
  "bbox_size_positive_margin":"2/2","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "source_residue":residue,"outside":outside,"alpha_outside":alphaout,"protected_changed":prot,"render_outside_target":render_out,"overlap":0,
- "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B93_63C_REPORT.json"}
-(wr/"B93_63C91067.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+ "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{run}/B94_63C_REPORT.json"}
+(wr/"B94_63C91067.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
 print(json.dumps(summary,ensure_ascii=False))
