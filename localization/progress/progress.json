@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T23:56:00+09:00",
+  "updated_at_kst": "2026-10-06T00:26:18+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C212/C213 consumed only the new A70/B155 results. C212 independently revalidated A70 index193 97E863AD candidate b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d: canonical 2048x1024 RGBA32/header/raw mirror_y, 13/13 exact source/localized bbox+size+positive margins, outside/alpha/introduced-visible/source-residue/overlap/touch/protected all 0. C210 detached-syllable defect is resolved with 0px artificial tracking/natural font advance and no horizontal glyph scaling while retaining Black/source-height family (~0.84-0.91 height ratio), anchors and exact product/model tokens. Visual PASS -> C212_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. C213 independently confirms B155 index152 49BB5FE5 preserve-original policy: PRO./INS./G.M./E.R. are music-version/mix qualifiers and '89/'86 badges; no Korean candidate is permitted or required, closing B63 HOLD by semantic scope correction rather than relaxing pixel gates. Current producer REWORK=1 (37759842); pending-C=0; pending_artwork localize_text=7. Queue counts remain 84 localize_text + 42 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit. RUNTIME_VALIDATION=UNTESTED for 97E863AD; 49BB5FE5 runtime N/A.",
+  "next_checkpoint": "B157 completed the oldest B-even zoom_review index36 06AB5CEE without reopening prior PASS assets. Canonical 4096x4096 RGBA32/raw mirror_y JENN rank source contains three physical Total Rank labels: warm starburst, pink speech bubble and green speech bubble. B157 reused only title-removal/render pixels from already-C-approved C202/C206 same-family templates while preserving every Jennifer-specific pixel outside exact edit masks. Candidate 0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5 passes 3/3 exact bbox+size+positive margins, CLEAN/FINAL validators, outside/alpha/source-residue/overlap/touch=0 and controller SOURCE/CLEAN/FINAL + raw mirror_y visual self-QA. Queue index36 zoom_review -> localize_text; pending-C=06AB5CEE; producer REWORK remains only 37759842; pending_artwork localize_text=7. Queue counts now 85 localize_text + 41 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve_brand_song_credit. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -155,17 +155,17 @@
   "graphics": {
     "total_dds": 243,
     "visually_reviewed": 243,
-    "localize_text": 84,
+    "localize_text": 85,
     "preserve_brand_song_credit": 33,
     "font_pipeline": 9,
     "hangul_name_entry": 1,
-    "zoom_review": 42,
+    "zoom_review": 41,
     "no_localization": 74,
     "work_queue_total": 137,
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
-    "transcribed_assets": 81,
-    "transcribed_segments": 722,
+    "transcribed_assets": 82,
+    "transcribed_segments": 723,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -181,8 +181,8 @@
     },
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
-    "artwork_plan_assets": 83,
-    "artwork_plan_segments": 722,
+    "artwork_plan_assets": 84,
+    "artwork_plan_segments": 723,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -270,8 +270,10 @@
         "37759842"
       ],
       "remaining": 1,
-      "note": "C212 approved A70 97E863AD spacing repair; C213 closed 49BB5FE5 as preserve-original policy/no candidate. Only 37759842 remains producer REWORK. pending_artwork localize_text=7; pending-C=0; RUNTIME_VALIDATION=UNTESTED for localized candidates.",
-      "pending_c": []
+      "note": "B157 promoted index36 06AB5CEE from zoom_review and produced a 3-label Korean candidate pending independent C. C212/C213 remain final for prior A70/B155 results. Only 37759842 remains producer REWORK; pending_artwork localize_text=7; pending-C=06AB5CEE; RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": [
+        "06AB5CEE"
+      ]
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -332,20 +334,19 @@
       "in_game_validation": "97E863AD UNTESTED; 49BB5FE5 NOT_APPLICABLE_FOR_LOCALIZATION; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
-      "run": "B_PRODUCTION154",
-      "worker_output_commit": "bebcf3b09e3d0c592177023bfe7adfb1382b4dd9",
-      "result": "B7E25BAD_ZOOM_REVIEW_PROMOTED_SELF_QA_PASS_C209_FINAL_STATIC_PASS_PENDING_INGAME",
+      "run": "B_PRODUCTION157",
+      "worker_output_commit": "daa16fc7761153c02d3a72daa4b405a2bf5bffc5",
+      "result": "06AB5CEE_ZOOM_REVIEW_PROMOTED_SELF_QA_PASS_PENDING_C_AND_INGAME",
       "assets": {
-        "B7E25BAD": {
-          "queue_index": 34,
-          "source_sha256": "3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
-          "candidate_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
-          "status": "C209_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
-          "report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_HOLL_REPORT.json",
-          "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_CONTROLLER_SELF_QA.json",
-          "c_final_report": "localization/graphics/role_C/20261005-C209-B7E25BAD/C209_B7E25BAD_CONTROLLER_FINAL_QA.json",
-          "physical_elements": 1,
-          "bbox_size_positive_margin": "1/1",
+        "06AB5CEE": {
+          "queue_index": 36,
+          "source_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+          "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+          "status": "B157_SELF_QA_PASS_PENDING_C_AND_INGAME",
+          "report": "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_JENN_REPORT.json",
+          "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_CONTROLLER_SELF_QA.json",
+          "physical_elements": 3,
+          "bbox_size_positive_margin": "3/3",
           "outside_pixels": 0,
           "alpha_outside_pixels": 0,
           "source_title_residue": 0,
