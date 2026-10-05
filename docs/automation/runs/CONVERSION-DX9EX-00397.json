@@ -1,0 +1,147 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00397",
+  "production_id": "CONVERSION-DXVK-00396",
+  "event_id": "CONVERSION-DXVK-00396-E009",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "queue_controller_contract": {
+    "path": "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "status": "APPLIED",
+    "evidence": "Read at C0 from authoritative vr-d3d9ex-focus before implementation. Exact-SHA validation-bearing result is preserved separately from later bookkeeping commits."
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_STRUCTURAL",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "d6b8b44015935a8dc626f231c512a52f08765d48",
+  "source_material_sha": "41b0f5ee29438f81d35d29db32b550959cd6435e",
+  "result_sha": "583c17035766c0594a52720047b2c00c6e07655c",
+  "material_result_sha": "583c17035766c0594a52720047b2c00c6e07655c",
+  "validation_bearing_result_sha": "583c17035766c0594a52720047b2c00c6e07655c",
+  "state_commit_sha": "52d5d821187942b025878c8773e65cf175848a8b",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00397]",
+  "selected_work_item": "VR-REFACTOR-POST1000-R33-R9-DEPTH-METADATA-OWNER-0008",
+  "summary": "Continued the active post-1000 R34-to-R33 structural cleanup by removing R33 direct ownership leakage into R9 main-depth metadata. R9 now exposes inline R9TrackedMainDepthHasStencil() with the exact prior predicate; R33 consumes that owner API instead of reading R9MainDepthKnown, R9MainDepthIdentity, and R9MainDepthDesc directly. No projection, HUD/SkyGlow/lens-flare behavior, Present ordering, D3D getter, allocation, wait, lock, or new hot-path synchronization was introduced.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_r32_review.py",
+    "tools/verify_vr_refactor_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00397.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read current branch HEAD d6b8b44015935a8dc626f231c512a52f08765d48, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, VR_REFACTOR_STATE.json, VR_AUTODEV_STATE.json, VR_RUN_STATE.md, VR_REVIEW_FINDINGS.md, VR_REGRESSION_KNOWLEDGE.json, VR_PROBLEM_HISTORY.md, and Issues #13/#14. Confirmed cycles 0..1000 and post-1000 items 0001..0007 complete; runtime visual freeze remains active during structural cleanup."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R33 still directly read the R9-private main-depth metadata tuple R9MainDepthKnown/R9MainDepthIdentity/R9MainDepthDesc only to reproduce a stable stencil predicate. This was a bounded ownership leak with an exact behavior-preserving owner-query extraction available."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Source material 41b0f5ee29438f81d35d29db32b550959cd6435e adds inline R9TrackedMainDepthHasStencil(), removes R33TrackedDepthHasStencil(), routes both R33 stencil decisions through the R9 owner API, and adds verifier guards against direct R9 metadata reintroduction. Validation-bearing 583c17035766c0594a52720047b2c00c6e07655c only restores EOF newlines unintentionally removed during connector transfer."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_STRUCTURAL",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 583c17035766c0594a52720047b2c00c6e07655c: DX9Ex Active Validation 37245601542 SUCCESS with policy 111562788183, host 111562843370, game 111562843319, full-chain-compile 111562843339 and package 111563733228; Domain Isolation Guard 37245601527 SUCCESS; HUD Inspector 37245601510 SUCCESS. N100 detached exact-SHA py_compile, architecture, R51 runtime contract, R32 review, hook graph, refactor contract, near-plane gate, workflow YAML parse and git diff --check all PASS. No HMD/game runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "source_material_sha": "41b0f5ee29438f81d35d29db32b550959cd6435e",
+      "result_sha": "583c17035766c0594a52720047b2c00c6e07655c",
+      "validation_bearing_result_sha": "583c17035766c0594a52720047b2c00c6e07655c",
+      "messages": [
+        "refactor(vr): encapsulate R9 depth stencil metadata [AUTO:CONVERSION-DX9EX-00397]",
+        "fix(vr): preserve 00397 source newlines [AUTO:CONVERSION-DX9EX-00397]"
+      ],
+      "ci_skip_on_validation_bearing_result": false,
+      "superseded_validation": {
+        "sha": "41b0f5ee29438f81d35d29db32b550959cd6435e",
+        "dx9ex_active_run_id": 37245544417,
+        "conclusion": "cancelled",
+        "classification": "SUPERSEDED_BY_583c1703_NEWLINE_CORRECTION",
+        "consumes_attempt": false
+      }
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "DX9Ex Active package artifact 11318917608, name OutRun2-VR-DX9EX-ACTIVE-583c17035766c0594a52720047b2c00c6e07655c, digest sha256:0320c25b0173ea514a352ce58442a233f540e084728c354d3c8b4afa9e4ee1a6, size 2730626 bytes. Artifact is automation/build evidence only, not Quest3/VDXR runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "state_commit_sha": "52d5d821187942b025878c8773e65cf175848a8b",
+      "issue14_validation_comment_id": 5985850851,
+      "issue13_update": "NOT_REQUIRED_NO_RUNTIME_PROBLEM_STATUS_CHANGE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37245601542,
+      "conclusion": "success",
+      "exact_sha": "583c17035766c0594a52720047b2c00c6e07655c",
+      "jobs": {
+        "policy": 111562788183,
+        "host": 111562843370,
+        "game": 111562843319,
+        "full_chain_compile": 111562843339,
+        "package": 111563733228
+      },
+      "artifact_id": 11318917608,
+      "artifact_digest": "sha256:0320c25b0173ea514a352ce58442a233f540e084728c354d3c8b4afa9e4ee1a6"
+    },
+    "domain_isolation": {
+      "run_id": 37245601527,
+      "conclusion": "success",
+      "exact_sha": "583c17035766c0594a52720047b2c00c6e07655c"
+    },
+    "hud_inspector": {
+      "run_id": 37245601510,
+      "conclusion": "success",
+      "exact_sha": "583c17035766c0594a52720047b2c00c6e07655c",
+      "artifact_id": 11319091970,
+      "artifact_digest": "sha256:80653600a2045db560dea8e5e5dfbe04fcc8d33ad90dcd7d1da5231f5a463a89"
+    },
+    "n100_local": {
+      "conclusion": "success",
+      "exact_sha": "583c17035766c0594a52720047b2c00c6e07655c",
+      "checks": [
+        "python3 -m py_compile relevant VR verifiers",
+        "verify_vr_architecture.py",
+        "verify_vr_r51_runtime_contract.py",
+        "verify_vr_r32_review.py",
+        "verify_vr_hook_graph.py",
+        "verify_vr_refactor_contract.py",
+        "verify_vr_nearplane_active_gate.py",
+        "workflow YAML parse",
+        "git diff --check"
+      ],
+      "transport_note": "N100 HTTPS remote lacked push credentials, so validated local content was published through the connected GitHub write API as a single source commit; this did not consume an implementation repair attempt."
+    }
+  },
+  "next_action": "Do not repeat CONVERSION-DX9EX-00397 or restore direct R33 reads of R9MainDepthKnown/R9MainDepthIdentity/R9MainDepthDesc. Preserve R9TrackedMainDepthHasStencil() as the owner boundary. Under a new DX9Ex task, continue only the next bounded post-1000 structural successor supported by current source/static evidence; if no such unit is safe, return to explicit runtime/general maintenance. Runtime visual claims remain gated on Quest3/VDXR evidence.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00397",
+    "production_id": "CONVERSION-DXVK-00396",
+    "event_id": "CONVERSION-DXVK-00396-E009",
+    "event_type": "retry",
+    "lane": "DX9EX",
+    "target_branch": "vr-d3d9ex-focus",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "583c17035766c0594a52720047b2c00c6e07655c",
+    "validation_bearing_result_sha": "583c17035766c0594a52720047b2c00c6e07655c",
+    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_STRUCTURAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "validated_at_kst": "2026-10-05T09:04:30+09:00"
+}
