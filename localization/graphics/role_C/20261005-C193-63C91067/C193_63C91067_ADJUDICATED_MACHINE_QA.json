@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C193-63C91067",
+  "qa_id": "C193",
+  "timestamp_kst": "2026-10-05T19:41:25+09:00",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "producer_run": "20261005-B-PRODUCTION137",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "candidate_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "raw_orientation": "mirror_y",
+    "header_exact": true
+  },
+  "row_gate": "2/2 containment/source-size/positive-margin PASS",
+  "structural_machine_checks": {
+    "clean_changed_outside_c_exact_bboxes": 0,
+    "final_changed_outside_c_exact_bboxes": 0,
+    "clean_alpha_changed_outside_c_exact_bboxes": 0,
+    "final_alpha_changed_outside_c_exact_bboxes": 0,
+    "render_outside_c_exact_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_pair_1px_touch_pixels": 0
+  },
+  "source_residue_adjudication": {
+    "c189_initial_flagged_pixels": 14,
+    "c190_diagnostic_navy_title_pixels": 0,
+    "c190_diagnostic_white_pixels": 14,
+    "rgba": "all flagged pixels are white with alpha 1-2",
+    "location": "starburst top spike/glow artwork, shown by C190 residue-marker evidence",
+    "classification": "PROTECTED_BACKGROUND_GLOW_NOT_SOURCE_TEXT",
+    "adjudicated_source_text_residue_pixels": 0,
+    "c191_note": "discarded diagnostic mask: broad connected light-component method absorbed legitimate cloud/starburst background and is not a valid source-title mask"
+  },
+  "machine_status": "PASS_AFTER_MASK_ADJUDICATION",
+  "source_reports": [
+    "localization/graphics/role_C/20261005-C189-63C91067/C189_63C91067_MACHINE_QA.json",
+    "localization/graphics/role_C/20261005-C190-63C91067-DIAG/C190_63C91067_MACHINE_QA.json",
+    "localization/graphics/role_C/20261005-C191-63C91067/C191_63C91067_MACHINE_QA.json"
+  ],
+  "runtime_validation": "UNTESTED"
+}
