@@ -56,11 +56,27 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('stale pre-independent-conversion active_by_lane state', SOURCE)
         self.assertIn('for lane_key in ("C", "A", "B")', SOURCE)
 
+    def test_priority_policy_defers_dxvk(self):
+        self.assertIn('high_priority = ("C", "A")', SOURCE)
+        self.assertIn('CONVERSION_DXVK_DEFERRED', SOURCE)
+        self.assertIn('high_active == 0', SOURCE)
+        self.assertIn('Priority C(DX9Ex refactor) > A(DX11) > B(DXVK deferred)', SOURCE)
+
+    def test_rollover_throttle_policy(self):
+        self.assertIn('CONVERSATION_ROLLOVER_MIN_SECONDS', SOURCE)
+        self.assertIn('conversation_rollover_cooldown', SOURCE)
+        self.assertIn('hard_length_limit', SOURCE)
+
     def test_vr_compose_pins_v2_and_three_slots(self):
         compose = (ROOT / 'docker-compose.portainer-vr.yml').read_text()
         self.assertIn('dockerfile: Dockerfile.portainer-vr', compose)
         self.assertIn('CHAT_SLOTS: "3"', compose)
         self.assertIn('CONVERSION_PARALLEL: "true"', compose)
+        self.assertIn('CONVERSION_ACTIVE_LIMIT: "2"', compose)
+        self.assertIn('CONVERSION_DXVK_DEFERRED: "true"', compose)
+        self.assertIn('QUEUE_RESULT_GRACE_SECONDS: "600"', compose)
+        self.assertIn('CONVERSATION_ROLLOVER_MIN_SECONDS: "900"', compose)
+        self.assertIn('MAX_CHAT_ROLLOVERS_PER_TASK: "3"', compose)
         self.assertIn('TASK_EVENT_MODEL: "v2"', compose)
         self.assertIn('PRODUCTION_COUNTER_MODE: "lane"', compose)
         dockerfile = (ROOT / 'Dockerfile.portainer-vr').read_text()
