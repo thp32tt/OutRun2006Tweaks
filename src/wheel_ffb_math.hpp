@@ -33,12 +33,27 @@ namespace WheelFFBMath
         }
     }
 
-    // R10 MOZA-R3 test contract: polarity belongs to the force model, not to a
-    // stale global checkbox. Modern DD needs the R3 reversal while the
-    // Lindbergh/PS2-derived models use the opposite transport polarity.
+    // R10 MOZA-R3 test contract: polarity belongs to the force source/model,
+    // not to stale global checkboxes.
+    //
+    // Modern DD's inferred SAT/centering convention needs R3 reversal. Arcade
+    // and PS2 source-model effects use the opposite convention. Hybrid contains
+    // both, so its Modern structural SAT is reversed while its Arcade events are
+    // not. Spring follows the structural convention.
     inline bool model_uses_r3_reverse_polarity(Model model)
     {
+        // Primary ConstantForce/event polarity shown in the UI.
         return model == Model::ModernDD;
+    }
+
+    inline bool model_uses_r3_structural_reverse_polarity(Model model)
+    {
+        return model == Model::ModernDD || model == Model::ArcadeHybrid;
+    }
+
+    inline bool model_uses_r3_spring_reverse_polarity(Model model)
+    {
+        return model == Model::ModernDD || model == Model::ArcadeHybrid;
     }
 
     inline bool model_uses_modern_sat(Model model)
