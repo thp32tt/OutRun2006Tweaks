@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T19:02:14+09:00",
+  "updated_at_kst": "2026-10-05T19:18:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C180/C184/C186/C188 consumed all current pending-C/latest changed approval candidates. PASS pending in-game: 560FA536 (C180), 25F697C6 (C188). REWORK_REQUIRED: 63C91067 (C184 starburst clean-plate interpolation/glow artifacts), 37759842 (C186 persistent source-shaped selector ghosts/donor boundaries). C598919A remains producer DXT5 constrained-solver REWORK. pending-C=0; pending_artwork localize_text=15; producer REWORK=3 (63C91067,C598919A,37759842). RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "B137 producer-side C184 repair self-QA PASS for 63C91067; independent C final QA pending. Producer REWORK now 2 (C598919A,37759842); pending-C=1 (63C91067); pending_artwork localize_text=15. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -267,13 +267,14 @@
     "next_hd_rework": {
       "status": "REWORK_REQUIRED",
       "assets": [
-        "63C91067",
         "C598919A",
         "37759842"
       ],
-      "remaining": 3,
-      "note": "C180 clears 560FA536; C188 clears 25F697C6. C184 returns 63C91067 for visible starburst clean-plate interpolation/glow artifacts despite numeric PASS. C186 confirms latest A45 37759842 still requires manual/template reconstruction because source-shaped selector ghosts/donor boundaries remain despite 33/33 numeric PASS. pending_artwork localize_text=15; RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": []
+      "remaining": 2,
+      "note": "B137 63C91067 self-QA PASS pending independent C; remaining producer REWORK is C598919A exact-DXT5 solver and 37759842 manual/template clean-plate reconstruction. pending_artwork localize_text=15; RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": [
+        "63C91067"
+      ]
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -342,23 +343,23 @@
       "in_game_validation": "560FA536/25F697C6 PENDING; 63C91067/37759842 NOT_ELIGIBLE; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
-      "run": "B_PRODUCTION128",
-      "worker_output_commit": "fe9a5106e50137d4507fb3d3b991d1aac50e0655",
-      "result": "A05BF610_C176_REWORK_RESOLVED_SELF_QA_PASS_PENDING_C_INGAME",
+      "run": "B_PRODUCTION137",
+      "worker_output_commit": "79bb468e1e911dc4da3b4b2bfa745e5bccfb1871",
+      "result": "63C91067_C184_REWORK_RESOLVED_SELF_QA_PASS_PENDING_C_INGAME",
       "assets": {
-        "A05BF610": {
-          "queue_index": 28,
-          "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
-          "candidate_sha256": "bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8",
-          "status": "B128_SELF_QA_PASS_PENDING_C_AND_INGAME",
-          "report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_A05_REPORT.json",
-          "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION128/B128_CONTROLLER_SELF_QA.json",
-          "physical_elements": 1,
-          "bbox_size_positive_margin": "1/1",
+        "63C91067": {
+          "queue_index": 26,
+          "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+          "candidate_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
+          "status": "B137_SELF_QA_PASS_PENDING_C_AND_INGAME",
+          "report": "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_63C_REPORT.json",
+          "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION137/B137_CONTROLLER_SELF_QA.json",
+          "physical_elements": 2,
+          "bbox_size_positive_margin": "2/2",
           "outside_pixels": 0,
           "alpha_outside_pixels": 0,
-          "protected_lens_flare_cell_changed": 0,
-          "c176_return_resolved": true
+          "source_effect_residue": 0,
+          "c184_return_resolved": true
         }
       },
       "runtime_validation": "UNTESTED"
