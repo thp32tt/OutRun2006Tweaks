@@ -254,6 +254,102 @@ if observed_owner_calls != expected_owner_calls:
         f"missing={missing}, added={added}"
     )
 
+# Completion contract: every allow-listed cross-layer call must carry explicit
+# owner evidence. This closes the neutral-helper extraction chain: future work
+# cannot add a new R31/R32 dependency by editing only the allow-list, and an
+# existing helper cannot silently lose the state/telemetry/lifecycle reason that
+# keeps it in its current owner.
+owner_evidence = {
+    "R31BuildFastWorldConstants": (
+        r31, "bool R31BuildFastWorldConstants(",
+        ("GetLastVerifiedWvp(", "R31BlockedVerifiedGeneration",
+         "StateBlockTracker::Reliable()", "R31PrepareEyeTailCache("),
+    ),
+    "R31DiscardUnreliableDrawCaches": (
+        r31, "void R31DiscardUnreliableDrawCaches(",
+        ("StateBlockTracker::Reliable()", "InvalidateEffectStateCache()",
+         "InvalidateTrackedRasterShadow()", "InvalidateLiveStateSample()"),
+    ),
+    "R31ObserveDraw": (
+        r31, "void R31ObserveDraw(",
+        ("R31Frame.epoch", "++R31Frame.draws", "TargetIsBackBuffer()"),
+    ),
+    "R31TelemetryNoteFallback": (
+        r31, "inline void R31TelemetryNoteFallback(",
+        ("++R31Frame.fallback",),
+    ),
+    "R31TelemetryNoteFastWorld": (
+        r31, "inline void R31TelemetryNoteFastWorld(",
+        ("++R31FastWorldDraws", "++R31Frame.fastWorld"),
+    ),
+    "R31TelemetryNoteFragile": (
+        r31, "inline void R31TelemetryNoteFragile(",
+        ("++R31Frame.fragile",),
+    ),
+    "R31TelemetryNoteHud": (
+        r31, "inline void R31TelemetryNoteHud(",
+        ("++R31HudDraws", "++R31Frame.hud"),
+    ),
+    "R31TelemetryNoteUnstable": (
+        r31, "inline void R31TelemetryNoteUnstable(",
+        ("++R31Frame.unstable",),
+    ),
+    "R32EffectIsFragileLive": (
+        r32, "bool R32EffectIsFragileLive(",
+        ("R32ReadEffectSnapshot(device, state)",
+         "PassPolicy::ClassifyEffectStereo(",
+         "PassPolicy::AllowsEffectWorldStereo(policy)"),
+    ),
+    "R32GetSavedViewport": (
+        r32, "bool R32GetSavedViewport(",
+        ("StateBlockTracker::Reliable()",
+         "R31GetSavedViewport(device, viewport)",
+         "OutRunVR::D3D9::ReadViewport(device, viewport)"),
+    ),
+    "R32InstallStatus": (
+        r32, "R32InstallStatus() noexcept",
+        ("R32InstallState.load(std::memory_order_acquire)",),
+    ),
+    "R32LowerFailClosed": (
+        r32, "HRESULT R32LowerFailClosed(",
+        ("R32ReadEffectSnapshot(device, snapshot)",
+         "CurrentVertexShaderIdentity.exchange(0",
+         "R32FailClosedZeroDisparityDraws"),
+    ),
+    "R32ObserveFrameWorkload": (
+        r32, "void R32ObserveFrameWorkload(",
+        ("Settings::VRTelemetry", "R32FrameWorkloadCounters",
+         "frame.primitives += primitiveCount",
+         "TryGetEffectTelemetrySnapshot(effect)"),
+    ),
+    "R32RestoreRightPassState": (
+        r32, "bool R32RestoreRightPassState(",
+        ("SetRenderTargetHook.stdcall<HRESULT>",
+         "SetDepthStencilSurfaceHook",
+         "device->SetViewport(&savedViewport)",
+         "R32SetWvpBatch(device, originalConstants)"),
+    ),
+    "R32SetWvpBatch": (
+        r32, "bool R32SetWvpBatch(",
+        ("R32BatchWvpUploads",
+         "OutRunVR::D3D9::SetVertexShaderConstantBatch(",
+         "R32BatchWvpFailures"),
+    ),
+}
+if set(owner_evidence) != expected_owner_calls:
+    missing = sorted(expected_owner_calls - set(owner_evidence))
+    added = sorted(set(owner_evidence) - expected_owner_calls)
+    fail(
+        "terminal owner-evidence map drifted from census: "
+        f"missing={missing}, added={added}"
+    )
+for call, (source, marker, evidence) in owner_evidence.items():
+    require(
+        function_body(source, marker),
+        f"terminal owner evidence for {call}",
+        *evidence,
+    )
+
 require(
     function_body(r31, "bool R31BuildFastWorldConstants("),
     "R31 fast-world cache/pose owner",
