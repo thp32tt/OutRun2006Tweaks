@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C180-560FA536",
+  "qa_id": "C180",
+  "timestamp_kst": "2026-10-05T19:02:14+09:00",
+  "queue_index": 101,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+  "source_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+  "candidate_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+  "candidate_changed_by_C": false,
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "13/13 PASS",
+  "controller_visual_qa": "PASS",
+  "visual_findings": [
+    "C179 warning-row defect is corrected: canonical source-effect bbox is [3006,25,3932,168], localized bbox [3027,36,3911,156], with positive margins on all sides.",
+    "Extended SOURCE/CLEAN/FINAL warning audit shows the former left-edge source-script fragment is removed while the warning icon and adjacent numeric sprites remain intact.",
+    "All 13 SOURCE/CLEAN/FINAL contacts and raw mirror_y overview show no visible source residue, protected-artwork damage, clipping or orientation regression."
+  ],
+  "decision": "C180_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "machine_report": "localization/graphics/role_C/20261005-C180-560FA536/C180_560FA536_MACHINE_QA.json",
+  "evidence": [
+    "localization/graphics/role_C/20261005-C180-560FA536/C180_ALL_CONTACTS_B64.txt",
+    "localization/graphics/role_C/20261005-C180-560FA536/C180_WARNING_EXTENDED_B64.txt",
+    "localization/graphics/role_C/20261005-C180-560FA536/C180_A36_A38_WARNING_COMPARE_B64.txt",
+    "localization/graphics/role_C/20261005-C180-560FA536/C180_RAW_B64.txt"
+  ],
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
