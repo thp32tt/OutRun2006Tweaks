@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00477",
+  "production_id": "CONVERSION-DX9EX-00477",
+  "event_id": "CONVERSION-DX9EX-00477-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "571e96d244111e7579b891427a82f496f6fa85dd",
+  "material_result_sha": "4c1f7d3a6b2ccd38a9c556d9e5d61112352e5578",
+  "validation_bearing_result_sha": "4c1f7d3a6b2ccd38a9c556d9e5d61112352e5578",
+  "result_sha": "4c1f7d3a6b2ccd38a9c556d9e5d61112352e5578",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00477]",
+  "selected_work_item": "VR-DX9EX-R32-DESTROY-TRANSACTION-0060",
+  "summary": "R32 now delegates session destruction through R26 and performs pending-ACK/direct-cache cleanup only after downstream XR_SUCCESS.",
+  "checkpoints": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered and finalized 00476 canonical PASS before starting 00477."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Re-censused every vrhost/src/runtime DestroySession wrapper. R32 was the remaining mutating wrapper that cleaned pending ACK/direct caches before parent result and bypassed R26 by delegating directly to R24."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "R32 now calls OutRunVrR26RecenterHardening::DestroySession first; ReleasePending and R32ResetDirectCaches execute only on XR_SUCCESS. Deterministic verifier pins ordering and forbids direct R24 bypass."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA passed DX9Ex Active 37432343027 and Domain Isolation 37432343075."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "4c1f7d3a6b2ccd38a9c556d9e5d61112352e5578",
+      "validation_bearing_result_sha": "4c1f7d3a6b2ccd38a9c556d9e5d61112352e5578",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE",
+      "artifact_id": 11397303588,
+      "digest": "sha256:4e3491bb631b22bb572821e76d948f9f72790c395ae4e7f350ac00f91c5efe6f"
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "changed_paths": [
+      "vrhost/src/runtime/r32_direct_submit.hpp",
+      "tools/verify_vr_dx9ex_reset_transport_contract.py",
+      "docs/VR_REFACTOR_STATE.json",
+      "docs/automation/runs/CONVERSION-DX9EX-00477.json"
+    ],
+    "preserved_on_failure": [
+      "Pending ACK query objects and frame identity",
+      "R32 direct cache state",
+      "R26 accepted/pending recenter ownership through restored owner-chain delegation"
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "validation": {
+      "dx9ex_active_run_id": 37432343027,
+      "policy_job_id": 112165902466,
+      "full_chain_compile_job_id": 112166030106,
+      "game_job_id": 112166030152,
+      "host_job_id": 112166030182,
+      "package_job_id": 112167696787,
+      "domain_isolation_run_id": 37432343075,
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11397303588,
+      "digest": "sha256:4e3491bb631b22bb572821e76d948f9f72790c395ae4e7f350ac00f91c5efe6f"
+    },
+    "issue14_comment_id": 6011963024,
+    "destroy_session_census": "All currently discovered mutating vrhost/src/runtime DestroySession wrappers are result-ordered; R21/R22 remain forwarding-only."
+  },
+  "next_action": "At the next DX9Ex task, re-read VR_REFACTOR_STATE and resume the next structural successor after the completed DestroySession transactional chain; do not repeat the completed census.",
+  "started_at_kst": "2026-10-06T16:49:00+09:00",
+  "completed_at_kst": "2026-10-06T16:58:00+09:00"
+}
