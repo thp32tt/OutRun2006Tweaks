@@ -71,18 +71,20 @@ for marker in (
     if marker not in tag:
         fail(f"SpriteNode tag lost projected/provenance field: {marker}")
 
-register = function_body(semantics, "inline void RegisterSpriteNodeScope(")
 for marker in (
-    "ProducerToken producer = ProducerToken::None",
-    "const ProjectedMarkerInfo* projectedMarker = nullptr",
-    "projectedMarker ? *projectedMarker : ProjectedMarkerInfo{}",
+    "ProducerToken producer = ProducerToken::None,",
+    "const ProjectedMarkerInfo* projectedMarker = nullptr) noexcept",
 ):
-    if marker not in register:
-        fail(f"registration does not preserve projected marker: {marker}")
+    if marker not in semantics:
+        fail(f"registration signature does not preserve projected marker: {marker}")
+register = function_body(semantics, "inline void RegisterSpriteNodeScope(")
+if "projectedMarker ? *projectedMarker : ProjectedMarkerInfo{}" not in register:
+    fail("registration body does not persist projected marker payload")
 
+if "ProjectedMarkerInfo* projectedMarker = nullptr) noexcept" not in semantics:
+    fail("non-consuming lookup signature lost projected marker output")
 peek = function_body(semantics, "inline RenderScope PeekSpriteNodeScope(")
 for marker in (
-    "ProjectedMarkerInfo* projectedMarker = nullptr",
     "*projectedMarker = {};",
     "*projectedMarker = SpriteNodeSemanticTags[i].projectedMarker;",
 ):
