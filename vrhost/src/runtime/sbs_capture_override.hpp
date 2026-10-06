@@ -278,6 +278,12 @@ float4 PSMain(VSOut input) : SV_Target
                 }
                 else
                 {
+                    // The event-query fence proved all application GPU commands
+                    // that reference this swapchain are complete. Preserve that
+                    // proof even if xrDestroySwapchain itself fails transiently,
+                    // so a live destroy retry does not repeat the same bounded
+                    // CPU/GPU drain before any new graphics work can be submitted.
+                    gpuWorkSubmitted = false;
                     const XrResult result = ::xrDestroySwapchain(handle);
                     if (XR_FAILED(result) && !parentSessionDestroying)
                         return false;

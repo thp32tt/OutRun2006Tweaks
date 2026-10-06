@@ -1166,7 +1166,16 @@ require_order(
     "if (!gpuDrained)",
     "if (!parentSessionDestroying)",
     "return false;",
+    "gpuWorkSubmitted = false;",
     "const XrResult result = ::xrDestroySwapchain(handle);",
+)
+require_order(
+    sbs_swapchain_destroy,
+    "R19 successful drain proof survives transient live destroy failure",
+    "gpuWorkSubmitted = false;",
+    "const XrResult result = ::xrDestroySwapchain(handle);",
+    "if (XR_FAILED(result) && !parentSessionDestroying)",
+    "return false;",
 )
 require_order(
     sbs_swapchain_destroy,
