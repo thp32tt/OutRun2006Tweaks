@@ -18,7 +18,7 @@ RUN mkdir -p /opt/outrun/app /opt/outrun/prompts /tmp/controller-parts && touch 
 COPY src-vr-v2/controller.py.part* /tmp/controller-parts/
 RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.py && python -m py_compile /opt/outrun/app/controller.py && rm -rf /tmp/controller-parts
 
-COPY entrypoint.direct.sh /opt/outrun/entrypoint.sh
+COPY entrypoint.vr.sh /opt/outrun/entrypoint.sh
 COPY bootstrap_review.override.md /opt/outrun/prompts/bootstrap_review.md
 COPY continue_review.override.md /opt/outrun/prompts/continue_review.md
 COPY watchdog_resume.override.md /opt/outrun/prompts/watchdog_resume.md
