@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T16:01:59+09:00",
+  "updated_at_kst": "2026-10-06T16:10:39+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -115,7 +115,12 @@
         21,
         22,
         23
-      ]
+      ],
+      "name_entry_status": "hold_strict_recheck_runtime_input_storage_mapping",
+      "name_entry_preflight_report": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_NAME_ENTRY_PREFLIGHT.json",
+      "name_entry_controller_review": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_CONTROLLER_PREFLIGHT_REVIEW.json",
+      "name_entry_symbol_count": 49,
+      "name_entry_candidate_written": false
     },
     "packaging": {
       "status": "not_started",
@@ -162,7 +167,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A134 work-stole the remaining even font_pipeline rows 16/18/20/22 after refreshing HEAD and confirming B was working index176 instead. K4 Korean runtime text uses the ImGui UTF-8 overlay with an installed Windows Korean-capable font; all nine stock spr_font_xst DDS rows 15-23 are now correctly preserve-original/no-candidate. Index24 Hangul name-entry remains a separate unresolved input path. B index176 candidate/evidence was not touched. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "A135 consumed the remaining index24 Hangul-name-entry preflight after all stock font rows were resolved. Hosted evidence proves 66743AA8 is a 49-choice name-entry input alphabet/UI (A-Z + 0-9 + 12 symbols + END), not a generic Hangul font page. Art-only replacement is unsafe until selected-cell character mapping, Hangul composition, persisted player-name encoding, committed-name rendering and replay/leaderboard/network serialization are traced. Status HOLD_STRICT_RECHECK_RUNTIME_NAME_ENTRY_MAPPING; no candidate persisted. B index176 output was not reviewed or altered by A.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,

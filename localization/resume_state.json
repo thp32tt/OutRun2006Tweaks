@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A135 index24 66743AA8 name-entry preflight: 49 cells are the complete name-entry choice alphabet/control set (A-Z, 0-9, 12 punctuation/symbols, END). This is not the K4 display font. Do not create a Hangul DDS by relabeling cells: runtime selected-character mapping, Jamo/syllable composition, saved-name encoding, committed-name rendering, and replay/leaderboard/network serialization are unproven. HOLD_STRICT_RECHECK_RUNTIME_NAME_ENTRY_MAPPING; no candidate. Evidence A135 preflight + controller review. RUNTIME_VALIDATION=UNTESTED.",
     "A134 work-stole B font_pipeline rows 16/18/20/22 after A primary-shard exhaustion. The same K4 architecture proof as A133 applies: stock font DDS are not the Korean renderer; Korean UTF-8 is redrawn via ImGui with Windows Korean system fonts. All nine stock font rows 15-23 are now preserve-original/no candidate. Index24 name-entry remains separate/unresolved; B index176 was not duplicated. RUNTIME_VALIDATION=UNTESTED.",
     "A133 reconciled A-owned font_pipeline rows 15/17/19/21/23: current K4 Korean text does not consume replacement stock font DDS. hooks_localization suppresses stock English output and redraws UTF-8 via ImGui; Overlay::rebuild_fonts loads Windows Korean-capable system fonts. Preserve original DDS, no Korean candidate required. Legacy 505-glyph/two-page atlas remains K3 research only; index24 name-entry is separate. B-owned font rows 16/18/20/22 remain. B index176 is active and was not work-stolen. RUNTIME_VALIDATION=UNTESTED.",
     "B195 resolved all 10 remaining blocked zoom_review rows 166/174/178/180/194/196/202/206/210/238 from existing exact-HD B181/B192/B193 evidence. All are PRESERVE_ORIGINAL / NO_LOCALIZABLE_TEXT: protected song/game-title/model/brand/logo artwork, stage/course imagery, or incidental environmental signage only. Readable + raw mirror_y controller QA PASS 10/10; no candidate needed. Global blocked zoom_review=0. A132 concurrently completed index62, so do not repeat it. Remaining B direct-image hold is index176 75C3586A HOLD_STRICT_RECHECK; canonical source lacks the transcribed source glyph/effect evidence and is not render-ready.",
@@ -6191,6 +6192,28 @@
     "name_entry_index_24_untouched": true,
     "active_b_index_176_untouched": true,
     "report": "localization/graphics/role_A/20261006-A-FONT134-WORKSTEAL-EVEN/A134_RUNTIME_FONT_WORKSTEAL.json",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "a135_name_entry_preflight": {
+    "timestamp_kst": "2026-10-06T16:10:39+09:00",
+    "role": "A",
+    "work_stolen_from_lane": "B",
+    "queue_index": 24,
+    "asset": "66743AA8",
+    "classification": "NAME_ENTRY_INPUT_ALPHABET_AND_CONTROL_UI",
+    "source_sha256": "8e18676ac303b07a56d81d1d21c5e025e0baf46da49b16ae9d2e411960181f73",
+    "atlas_regions": 49,
+    "symbol_breakdown": {
+      "uppercase_latin": 26,
+      "digits": 10,
+      "punctuation_symbols": 12,
+      "end_control": 1
+    },
+    "status": "HOLD_STRICT_RECHECK_RUNTIME_NAME_ENTRY_MAPPING",
+    "candidate_written": false,
+    "preflight_report": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_NAME_ENTRY_PREFLIGHT.json",
+    "controller_review": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_CONTROLLER_PREFLIGHT_REVIEW.json",
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
   }

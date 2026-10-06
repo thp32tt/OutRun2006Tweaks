@@ -1852,3 +1852,11 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - 4/4 rows changed from `blocked_runtime_font` to `k4_overlay_preserve_original_no_candidate_required`. Together with A133, all nine stock font rows 15-23 are now resolved without producing incorrect Korean DDS replacements.
 - Index24 name-entry is intentionally left unresolved because it is a separate input/runtime path. No DDS or runtime source bytes changed; `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261006-A-FONT134-WORKSTEAL-EVEN/A134_RUNTIME_FONT_WORKSTEAL.json`.
+
+## 2026-10-06 16:10 KST — A135 index24 name-entry preflight / strict HOLD
+- After A134 resolved all nine stock font rows, the only remaining font-domain queue item is index24 `66743AA8` (`hangul_name_entry`). A work-stole this independent B-shard item; B's index176 candidate/output was not reviewed or modified.
+- GitHub-hosted worker run 37427704475 succeeded and expanded all 49 atlas cells. Controller visual review identifies the complete set as **A-Z 26 + 0-9 10 + 12 punctuation/symbols + END = 49**.
+- This is a name-entry **input alphabet/control UI**, not a generic display font atlas. Replacing these pictures with Hangul/Jamo alone would relabel the visible keys while leaving selected-character mapping/storage undefined.
+- Fail-closed state: `A135_HOLD_STRICT_RECHECK_RUNTIME_NAME_ENTRY_MAPPING`. Required proof is selected cell -> code mapping, Hangul/Jamo composition, player-name save/load encoding, committed-name rendering, and replay/leaderboard/network serialization compatibility. No DDS candidate was persisted.
+- `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_NAME_ENTRY_PREFLIGHT.json`; `localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_CONTROLLER_PREFLIGHT_REVIEW.json`.

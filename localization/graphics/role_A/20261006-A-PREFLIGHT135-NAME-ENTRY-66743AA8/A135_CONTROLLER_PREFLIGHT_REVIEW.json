@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8-CONTROLLER",
+  "timestamp_kst": "2026-10-06T16:10:39+09:00",
+  "queue_index": 24,
+  "asset": "textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "work_stolen_from_lane": "B",
+  "source_sha256": "8e18676ac303b07a56d81d1d21c5e025e0baf46da49b16ae9d2e411960181f73",
+  "source_provenance": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
+  },
+  "controller_visual_review": {
+    "evidence": [
+      "A135_NAME_ENTRY_49_CELL_CONTACT.jpg",
+      "A135_NAME_ENTRY_PUBLISHED_READABLE.jpg",
+      "A135_NAME_ENTRY_DDS_DECODE.jpg",
+      "A135_NAME_ENTRY_DDS_MIRROR_Y.jpg"
+    ],
+    "atlas_regions": 49,
+    "all_regions_nonempty": true,
+    "readable_symbol_set": {
+      "uppercase_latin": 26,
+      "digits": 10,
+      "punctuation_symbols": 12,
+      "end_control": 1,
+      "total": 49,
+      "sprite_44_to_92_order": "END, *, ¥, @, ?, =, /, ., -, +, &, %, !, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, Z, Y, X, W, V, U, T, S, R, Q, P, O, N, M, L, K, J, I, H, G, F, E, D, C, B, A"
+    },
+    "orientation": "Published PNG/readable atlas visually matches DDS mirror-Y presentation; compressed DDS decode is vertically inverted in the raw proof. Byte/pixel equality was not asserted because the published PNG is not the DDS decoded byte surface.",
+    "visual_decision": "PASS_FOR_SEMANTIC_CLASSIFICATION"
+  },
+  "semantic_classification": "NAME_ENTRY_INPUT_ALPHABET_AND_CONTROL_UI",
+  "candidate_safety": {
+    "render_ready": false,
+    "one_stage_to_render": false,
+    "tier": "PREFLIGHT_ONLY",
+    "reason": "The repository has no proven mapping from selecting one of these sprite choices to Hangul codepoint/Jamo composition, persisted player-name encoding, or downstream name rendering/network serialization.",
+    "unsafe_shortcut": "Replacing Latin/punctuation artwork with Hangul/Jamo would relabel ASCII-backed choices without proving the stored value or committed-name renderer, producing misleading or corrupt input."
+  },
+  "required_next_proof": [
+    "trace name-entry selected-cell -> character/code assignment",
+    "trace player-name buffer encoding and save/load persistence",
+    "verify committed-name renderer accepts the intended Korean representation",
+    "verify replay/leaderboard/network name serialization compatibility",
+    "only then design Hangul/Jamo composition and atlas/UI changes"
+  ],
+  "decision": "HOLD_STRICT_RECHECK_RUNTIME_NAME_ENTRY_MAPPING",
+  "candidate_written": false,
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

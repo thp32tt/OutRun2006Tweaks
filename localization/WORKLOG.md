@@ -2262,3 +2262,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Index24 66743AA8 name-entry is not conflated with text display; it remains a separate unresolved input-path item. B index176 worker output was not consumed or reviewed by A.
 - Static architecture reconciliation PASS. Runtime/in-game confirmation remains `UNTESTED`. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261006-A-FONT134-WORKSTEAL-EVEN/A134_RUNTIME_FONT_WORKSTEAL.json`.
+
+## 2026-10-06 16:10 KST — A135 66743AA8 name-entry semantic/runtime preflight
+
+- With A primary work exhausted and all stock font DDS rows 15-23 reconciled, A selected the remaining independent index24 `hangul_name_entry` row under the work-steal rule. It did not touch B's active index176 work.
+- Hosted A135 downloaded the pinned Sonic-TV original `66743AA8_1024x1024.dds`, published PNG and atlas metadata at commit `3ce344e7...`; source DDS SHA-256 is `8e18676ac303b07a56d81d1d21c5e025e0baf46da49b16ae9d2e411960181f73`. The atlas has 49/49 nonempty 96x96 regions, `sprite_44..sprite_92`.
+- Controller contact review maps the 49 choices to END, 12 punctuation/symbols, digits 9..0 and letters Z..A in atlas order; in readable screen order the page is A-Z, 0-9, punctuation, END. Raw DDS decode is vertically inverted relative to the readable presentation; mirror-Y proof visually restores it.
+- Critical semantic result: this texture is the selectable player-name alphabet/control artwork. An art-only Korean/Jamo redraw cannot prove what byte/code is appended to the player-name buffer and cannot prove Hangul composition or downstream name display/storage. It would therefore be a misleading candidate even if every pixel gate passed.
+- Queue index24 is moved from generic `blocked_runtime_name_entry` to explicit `a135_hold_strict_recheck_runtime_name_entry_mapping`. No candidate was generated. Next safe work requires runtime tracing of selection-code assignment, player-name persistence/rendering, and replay/leaderboard/network serialization before any Hangul input design.
+- Hosted worker run `37427704475` PASS. Runtime validation remains `UNTESTED`; VR/FFB/DX11/DXVK untouched.
