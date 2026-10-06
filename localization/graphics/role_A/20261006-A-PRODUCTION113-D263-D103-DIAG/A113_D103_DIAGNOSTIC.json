@@ -1,0 +1,521 @@
+{
+  "queue_index": 217,
+  "asset": "D1039D6F",
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "candidate_components": [
+    {
+      "label": 525,
+      "area": 5845,
+      "bbox": [
+        581,
+        962,
+        724,
+        1023
+      ],
+      "w": 143,
+      "h": 61,
+      "aspect": 2.344,
+      "rectangularity": 0.67,
+      "bright": 123,
+      "center": [
+        652.5,
+        992.5
+      ]
+    },
+    {
+      "label": 454,
+      "area": 2027,
+      "bbox": [
+        485,
+        893,
+        647,
+        935
+      ],
+      "w": 162,
+      "h": 42,
+      "aspect": 3.857,
+      "rectangularity": 0.298,
+      "bright": 748,
+      "center": [
+        566.0,
+        914.0
+      ]
+    },
+    {
+      "label": 557,
+      "area": 1813,
+      "bbox": [
+        457,
+        1037,
+        504,
+        1133
+      ],
+      "w": 47,
+      "h": 96,
+      "aspect": 0.49,
+      "rectangularity": 0.402,
+      "bright": 504,
+      "center": [
+        480.5,
+        1085.0
+      ]
+    },
+    {
+      "label": 560,
+      "area": 1813,
+      "bbox": [
+        1205,
+        1037,
+        1252,
+        1133
+      ],
+      "w": 47,
+      "h": 96,
+      "aspect": 0.49,
+      "rectangularity": 0.402,
+      "bright": 731,
+      "center": [
+        1228.5,
+        1085.0
+      ]
+    },
+    {
+      "label": 622,
+      "area": 1813,
+      "bbox": [
+        1205,
+        1925,
+        1252,
+        2021
+      ],
+      "w": 47,
+      "h": 96,
+      "aspect": 0.49,
+      "rectangularity": 0.402,
+      "bright": 501,
+      "center": [
+        1228.5,
+        1973.0
+      ]
+    },
+    {
+      "label": 620,
+      "area": 1809,
+      "bbox": [
+        455,
+        1924,
+        502,
+        2021
+      ],
+      "w": 47,
+      "h": 97,
+      "aspect": 0.485,
+      "rectangularity": 0.397,
+      "bright": 557,
+      "center": [
+        478.5,
+        1972.5
+      ]
+    },
+    {
+      "label": 567,
+      "area": 1284,
+      "bbox": [
+        28,
+        1047,
+        73,
+        1132
+      ],
+      "w": 45,
+      "h": 85,
+      "aspect": 0.529,
+      "rectangularity": 0.336,
+      "bright": 668,
+      "center": [
+        50.5,
+        1089.5
+      ]
+    },
+    {
+      "label": 568,
+      "area": 1284,
+      "bbox": [
+        776,
+        1047,
+        821,
+        1132
+      ],
+      "w": 45,
+      "h": 85,
+      "aspect": 0.529,
+      "rectangularity": 0.336,
+      "bright": 668,
+      "center": [
+        798.5,
+        1089.5
+      ]
+    },
+    {
+      "label": 627,
+      "area": 1284,
+      "bbox": [
+        776,
+        1935,
+        821,
+        2020
+      ],
+      "w": 45,
+      "h": 85,
+      "aspect": 0.529,
+      "rectangularity": 0.336,
+      "bright": 668,
+      "center": [
+        798.5,
+        1977.5
+      ]
+    },
+    {
+      "label": 332,
+      "area": 1184,
+      "bbox": [
+        1338,
+        769,
+        1429,
+        797
+      ],
+      "w": 91,
+      "h": 28,
+      "aspect": 3.25,
+      "rectangularity": 0.465,
+      "bright": 1244,
+      "center": [
+        1383.5,
+        783.0
+      ]
+    },
+    {
+      "label": 626,
+      "area": 1172,
+      "bbox": [
+        265,
+        1935,
+        310,
+        2018
+      ],
+      "w": 45,
+      "h": 83,
+      "aspect": 0.542,
+      "rectangularity": 0.314,
+      "bright": 657,
+      "center": [
+        287.5,
+        1976.5
+      ]
+    },
+    {
+      "label": 47,
+      "area": 1171,
+      "bbox": [
+        800,
+        507,
+        890,
+        534
+      ],
+      "w": 90,
+      "h": 27,
+      "aspect": 3.333,
+      "rectangularity": 0.482,
+      "bright": 1234,
+      "center": [
+        845.0,
+        520.5
+      ]
+    },
+    {
+      "label": 587,
+      "area": 1166,
+      "bbox": [
+        88,
+        1061,
+        133,
+        1130
+      ],
+      "w": 45,
+      "h": 69,
+      "aspect": 0.652,
+      "rectangularity": 0.376,
+      "bright": 501,
+      "center": [
+        110.5,
+        1095.5
+      ]
+    },
+    {
+      "label": 589,
+      "area": 1166,
+      "bbox": [
+        836,
+        1061,
+        881,
+        1130
+      ],
+      "w": 45,
+      "h": 69,
+      "aspect": 0.652,
+      "rectangularity": 0.376,
+      "bright": 501,
+      "center": [
+        858.5,
+        1095.5
+      ]
+    },
+    {
+      "label": 645,
+      "area": 1166,
+      "bbox": [
+        836,
+        1949,
+        881,
+        2018
+      ],
+      "w": 45,
+      "h": 69,
+      "aspect": 0.652,
+      "rectangularity": 0.376,
+      "bright": 501,
+      "center": [
+        858.5,
+        1983.5
+      ]
+    },
+    {
+      "label": 649,
+      "area": 1135,
+      "bbox": [
+        27,
+        1965,
+        71,
+        2020
+      ],
+      "w": 44,
+      "h": 55,
+      "aspect": 0.8,
+      "rectangularity": 0.469,
+      "bright": 392,
+      "center": [
+        49.0,
+        1992.5
+      ]
+    },
+    {
+      "label": 644,
+      "area": 1131,
+      "bbox": [
+        87,
+        1949,
+        131,
+        2018
+      ],
+      "w": 44,
+      "h": 69,
+      "aspect": 0.638,
+      "rectangularity": 0.373,
+      "bright": 577,
+      "center": [
+        109.0,
+        1983.5
+      ]
+    },
+    {
+      "label": 598,
+      "area": 1104,
+      "bbox": [
+        267,
+        1077,
+        312,
+        1130
+      ],
+      "w": 45,
+      "h": 53,
+      "aspect": 0.849,
+      "rectangularity": 0.463,
+      "bright": 397,
+      "center": [
+        289.5,
+        1103.5
+      ]
+    },
+    {
+      "label": 600,
+      "area": 1104,
+      "bbox": [
+        1015,
+        1077,
+        1060,
+        1130
+      ],
+      "w": 45,
+      "h": 53,
+      "aspect": 0.849,
+      "rectangularity": 0.463,
+      "bright": 397,
+      "center": [
+        1037.5,
+        1103.5
+      ]
+    },
+    {
+      "label": 652,
+      "area": 1104,
+      "bbox": [
+        1015,
+        1965,
+        1060,
+        2018
+      ],
+      "w": 45,
+      "h": 53,
+      "aspect": 0.849,
+      "rectangularity": 0.463,
+      "bright": 397,
+      "center": [
+        1037.5,
+        1991.5
+      ]
+    },
+    {
+      "label": 407,
+      "area": 939,
+      "bbox": [
+        16,
+        856,
+        93,
+        894
+      ],
+      "w": 77,
+      "h": 38,
+      "aspect": 2.026,
+      "rectangularity": 0.321,
+      "bright": 498,
+      "center": [
+        54.5,
+        875.0
+      ]
+    },
+    {
+      "label": 643,
+      "area": 684,
+      "bbox": [
+        378,
+        1948,
+        436,
+        2019
+      ],
+      "w": 58,
+      "h": 71,
+      "aspect": 0.817,
+      "rectangularity": 0.166,
+      "bright": 2461,
+      "center": [
+        407.0,
+        1983.5
+      ]
+    },
+    {
+      "label": 591,
+      "area": 601,
+      "bbox": [
+        380,
+        1062,
+        437,
+        1131
+      ],
+      "w": 57,
+      "h": 69,
+      "aspect": 0.826,
+      "rectangularity": 0.153,
+      "bright": 2384,
+      "center": [
+        408.5,
+        1096.5
+      ]
+    },
+    {
+      "label": 594,
+      "area": 601,
+      "bbox": [
+        1128,
+        1062,
+        1185,
+        1131
+      ],
+      "w": 57,
+      "h": 69,
+      "aspect": 0.826,
+      "rectangularity": 0.153,
+      "bright": 2384,
+      "center": [
+        1156.5,
+        1096.5
+      ]
+    },
+    {
+      "label": 647,
+      "area": 601,
+      "bbox": [
+        1128,
+        1950,
+        1185,
+        2019
+      ],
+      "w": 57,
+      "h": 69,
+      "aspect": 0.826,
+      "rectangularity": 0.153,
+      "bright": 2384,
+      "center": [
+        1156.5,
+        1984.5
+      ]
+    },
+    {
+      "label": 92,
+      "area": 396,
+      "bbox": [
+        1288,
+        599,
+        1325,
+        636
+      ],
+      "w": 37,
+      "h": 37,
+      "aspect": 1.0,
+      "rectangularity": 0.289,
+      "bright": 455,
+      "center": [
+        1306.5,
+        617.5
+      ]
+    },
+    {
+      "label": 416,
+      "area": 372,
+      "bbox": [
+        117,
+        866,
+        182,
+        887
+      ],
+      "w": 65,
+      "h": 21,
+      "aspect": 3.095,
+      "rectangularity": 0.273,
+      "bright": 73,
+      "center": [
+        149.5,
+        876.5
+      ]
+    }
+  ],
+  "status": "ONE_STAGE_TO_RENDER_COMPONENT_MAPPING_READY_FOR_CONTROLLER"
+}
