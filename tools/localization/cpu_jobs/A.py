@@ -7,7 +7,7 @@ from PIL import Image,ImageChops,ImageDraw,ImageFont,ImageOps
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
 
-repo=Path.cwd(); run="20261006-A-PRODUCTION106-590A4724"
+repo=Path.cwd(); run="20261006-A-PRODUCTION107-590A4724"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds"
@@ -86,13 +86,22 @@ if len(core)<50: core=pix
 fill=tuple(int(x) for x in np.median(core,axis=0))
 fill=(fill[0],fill[1],fill[2],255)
 
-FONT=subprocess.check_output(["fc-match","-f","%{file}|%{index}","Noto Sans CJK KR:style=Black"],text=True).strip()
-font_path,font_index=FONT.rsplit("|",1); font_index=int(font_index or 0)
+subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
+FONT=subprocess.check_output(["fc-match","-f","%{file}","Noto Sans CJK KR:style=Black"],text=True).strip()
+if not FONT or not Path(FONT).exists(): raise RuntimeError(("font missing",FONT))
+font_path=FONT
+# Hard fail if the resolved font cannot render actual Hangul (prevents tofu numeric false-positive).
+probe_font=ImageFont.truetype(font_path,48)
+probe_a=probe_font.getmask("일반 밸런스").getbbox()
+probe_b=probe_font.getmask("□□□□□").getbbox()
+if probe_a is None or probe_font.getlength("일반 밸런스")<=0:
+    raise RuntimeError(("hangul font coverage missing",font_path))
 text="일반 밸런스"; shear=0.26
 ow,oh=ob[2]-ob[0],ob[3]-ob[1]
 best=None
 for fs in range(min(78,oh+18),24,-1):
-    font=ImageFont.truetype(font_path,fs,index=font_index)
+    font=ImageFont.truetype(font_path,fs)
     bb=font.getbbox(text,stroke_width=0)
     tw,th=bb[2]-bb[0],bb[3]-bb[1]
     pad=18
@@ -128,13 +137,13 @@ payload=tb[:128]+raw_final.tobytes("raw",mode); candidate.write_bytes(payload); 
 dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode).transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("DDS roundtrip mismatch")
 
-srcp=out/"A106_SOURCE_READABLE.png"; clnp=out/"A106_CLEAN_PLATE.png"; finp=out/"A106_FINAL_READABLE.png"
-src.save(srcp); clean.save(clnp); dec.save(finp); source_mask.save(out/"A106_SOURCE_TEXT_MASK.png"); render_mask.save(out/"A106_RENDER_MASK.png")
-allowedp=out/"A106_ALLOWED_BBOX_MASK.png"; protectedp=out/"A106_PROTECTED_MASK.png"; allowed.save(allowedp); protected.save(protectedp)
+srcp=out/"A107_SOURCE_READABLE.png"; clnp=out/"A107_CLEAN_PLATE.png"; finp=out/"A107_FINAL_READABLE.png"
+src.save(srcp); clean.save(clnp); dec.save(finp); source_mask.save(out/"A107_SOURCE_TEXT_MASK.png"); render_mask.save(out/"A107_RENDER_MASK.png")
+allowedp=out/"A107_ALLOWED_BBOX_MASK.png"; protectedp=out/"A107_PROTECTED_MASK.png"; allowed.save(allowedp); protected.save(protectedp)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(srcp),str(clnp),str(allowedp),"--protected-mask",str(protectedp),"--report",str(out/"A106_CLEAN_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(srcp),str(finp),str(allowedp),"--protected-mask",str(protectedp),"--report",str(out/"A106_FINAL_VALIDATION.json")],check=True)
-cr=json.loads((out/"A106_CLEAN_VALIDATION.json").read_text()); fr=json.loads((out/"A106_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(srcp),str(clnp),str(allowedp),"--protected-mask",str(protectedp),"--report",str(out/"A107_CLEAN_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(srcp),str(finp),str(allowedp),"--protected-mask",str(protectedp),"--report",str(out/"A107_FINAL_VALIDATION.json")],check=True)
+cr=json.loads((out/"A107_CLEAN_VALIDATION.json").read_text()); fr=json.loads((out/"A107_FINAL_VALIDATION.json").read_text())
 if cr["status"]!="PASS" or fr["status"]!="PASS": raise RuntimeError(("validator",cr["status"],fr["status"]))
 
 # Readable high-zoom SOURCE/CLEAN/FINAL + raw full view.
@@ -144,12 +153,23 @@ ims=[z.resize((z.width*3,z.height*3),Image.Resampling.NEAREST) for z in ims]
 sheet=Image.new("RGB",(sum(z.width for z in ims)+16,max(z.height for z in ims)+42),"white"); xx=0
 d=ImageDraw.Draw(sheet); d.text((5,5),"SOURCE | CLEAN | FINAL    Normal Balance -> 일반 밸런스",fill="black")
 for z in ims: sheet.paste(z,(xx,42)); xx+=z.width+8
-save_b64(sheet,out/"A106_590A_CONTACTS.jpg",out/"A106_590A_CONTACTS_B64.txt",97)
+save_b64(sheet,out/"A107_590A_CONTACTS.jpg",out/"A107_590A_CONTACTS_B64.txt",97)
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode)
 rr=Image.new("RGB",(1100,1080),"white")
 for i,(lab,z0) in enumerate((("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec))):
     z=comp(z0); z.thumbnail((1100,500),Image.Resampling.LANCZOS); rr.paste(z,(0,i*535+27)); ImageDraw.Draw(rr).text((5,i*535+5),lab,fill="black")
-save_b64(rr,out/"A106_590A_RAW_COMPARE.jpg",out/"A106_590A_RAW_COMPARE_B64.txt",93)
+save_b64(rr,out/"A107_590A_RAW_COMPARE.jpg",out/"A107_590A_RAW_COMPARE_B64.txt",93)
+
+# Carry forward transport-safe readable/raw proofs for the two no-text members of the same A103 preflight batch.
+for stem in ("4668C688","4C972A19"):
+    rp=repo/"localization/graphics/role_A/20261006-A-PROBE103-ZOOM103151153"/f"A103_{stem}_READABLE.png"
+    wp=repo/"localization/graphics/role_A/20261006-A-PROBE103-ZOOM103151153"/f"A103_{stem}_RAW.png"
+    panels=[]
+    for lab,p in (("READABLE",rp),("RAW_MIRROR_Y",wp)):
+        z=comp(Image.open(p).convert("RGBA")); z.thumbnail((850,850),Image.Resampling.LANCZOS)
+        canvas=Image.new("RGB",(850,z.height+26),"white"); ImageDraw.Draw(canvas).text((4,4),lab,fill="black"); canvas.paste(z,(0,26)); panels.append(canvas)
+    sheet2=Image.new("RGB",(1708,max(x.height for x in panels)),"white"); sheet2.paste(panels[0],(0,0)); sheet2.paste(panels[1],(858,0))
+    sheet2.save(out/f"A107_{stem}_READABLE_RAW_PROOF.jpg",quality=82,optimize=True)
 
 report={
  "schema_version":1,"role":"A","run":run,"queue_index":103,"asset":asset,
@@ -162,8 +182,8 @@ report={
  "zero_pixel_gates":{"clean_changed_outside_source_bbox":clean_out,"final_changed_outside_source_bbox":final_out,"alpha_changed_outside_source_bbox":alpha_out,"localized_overlap":0},
  "clean_plate_validator":cr,"final_mask_validator":fr,
  "candidate_path":str(candidate.relative_to(repo)),"worker_static_qa":"PASS","controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
- "status":"A106_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C","runtime_validation":"UNTESTED"
+ "status":"A107_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C","runtime_validation":"UNTESTED"
 }
-(out/"A106_590A4724_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-(wr/"A106_590A4724.json").write_text(json.dumps({"run":run,"index":103,"asset":"590A4724","candidate_sha256":csha,"bbox_size_positive_margin":"1/1 PASS","clean_outside":clean_out,"final_outside":final_out,"alpha_outside":alpha_out,"status":report["status"],"report":f"localization/graphics/role_A/{run}/A106_590A4724_REPORT.json"},ensure_ascii=False,indent=2)+"\n")
+(out/"A107_590A4724_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(wr/"A107_590A4724.json").write_text(json.dumps({"run":run,"index":103,"asset":"590A4724","candidate_sha256":csha,"bbox_size_positive_margin":"1/1 PASS","clean_outside":clean_out,"final_outside":final_out,"alpha_outside":alpha_out,"status":report["status"],"report":f"localization/graphics/role_A/{run}/A107_590A4724_REPORT.json"},ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"run":run,"candidate_sha256":csha,"original_bbox":ob,"localized_bbox":lb,"margins":margins,"font_size":fs,"fill":fill,"clean_out":clean_out,"final_out":final_out,"alpha_out":alpha_out},ensure_ascii=False),flush=True)
