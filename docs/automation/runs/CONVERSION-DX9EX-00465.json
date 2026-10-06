@@ -2,17 +2,17 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX9EX-00465",
   "production_id": "CONVERSION-DX9EX-00465",
-  "event_id": "CONVERSION-DX9EX-00465-E002",
+  "event_id": "CONVERSION-DX9EX-00465-E003",
   "event_type": "retry",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "attempt": "2/3",
+  "attempt": "3/3",
   "status": "VALIDATING",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "c0f95a32e722e1b162c93be75323212938cbe407",
-  "material_result_sha": "PENDING_SELF",
+  "material_result_sha": "53d4247599a1ae217393b370328dd97ac03704c5",
   "validation_bearing_result_sha": "PENDING_SELF",
   "result_sha": "PENDING_SELF",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00465]",
@@ -39,14 +39,14 @@
       "evidence": "Release now requires explicit contentComplete provenance. Successful release commits generation only for complete content; cleanup releases pass false; hard release failure clears committedGeneration before setting releaseFaulted. R24 projection/flat/emergency paths use the same explicit contract."
     },
     "C3_VALIDATE": {
-      "status": "RETRYING",
+      "status": "RETRYING_FINAL",
       "automation_validation": "PENDING",
       "runtime_validation": "UNTESTED",
-      "evidence": "Initial material SHA e92c9d6a0b066fe6672904c7d0e742b1fb474f12: DX9Ex Active 37419678304 policy FAIL on missing success-path Release(..., ok); Domain Isolation 37419678336 PASS."
+      "evidence": "Attempt 1: DX9Ex Active 37419678304 FAIL_IMPLEMENTATION_GUARD, Domain Isolation 37419678336 PASS. Attempt 2: source repair SHA 53d4247599a1ae217393b370328dd97ac03704c5; DX9Ex Active 37419860688 FAIL_VERIFIER_MARKER_ONLY. Final repair changes verifier marker to RenderSafeProjectionChecked."
     },
     "C4_COMMIT": {
       "status": "PENDING",
-      "source_material_sha": "e92c9d6a0b066fe6672904c7d0e742b1fb474f12",
+      "source_material_sha": "53d4247599a1ae217393b370328dd97ac03704c5",
       "ci_skip_on_validation_bearing_result": false
     },
     "C5_PACKAGE": {
@@ -74,10 +74,18 @@
       "dx9ex_active_result": "FAIL_IMPLEMENTATION_GUARD",
       "domain_isolation_run_id": 37419678336,
       "domain_isolation_result": "PASS"
+    },
+    "second_validation": {
+      "dx9ex_active_run_id": 37419860688,
+      "policy_job_id": 112126578849,
+      "dx9ex_active_result": "FAIL_VERIFIER_MARKER_ONLY",
+      "source_repair_sha": "53d4247599a1ae217393b370328dd97ac03704c5",
+      "domain_isolation_run_id": 37419860533,
+      "domain_isolation_result": "SUCCESS"
     }
   },
-  "next_action": "Validate the repaired exact SHA with canonical DX9Ex Active Validation and Domain Isolation; if both pass, finalize C3-C6 while keeping RUNTIME_VALIDATION=UNTESTED.",
+  "next_action": "Validate the final verifier-repair exact SHA with canonical DX9Ex Active Validation and Domain Isolation; if PASS, finalize C3-C6 with source_material_sha=53d42475... and RUNTIME_VALIDATION=UNTESTED. If it fails again, mark BLOCKED per bounded repair rule.",
   "started_at_kst": "2026-10-06T14:43:00+09:00",
-  "source_material_sha": "e92c9d6a0b066fe6672904c7d0e742b1fb474f12",
-  "failure_context": "DX9Ex Active Validation exact run 37419678304 failed at policy job 112126013222 because the initial implementation accidentally left successful projection/theater Release calls as contentComplete=false. Domain Isolation exact run 37419678336 passed. This retry changes only the successful render release calls to pass ok; invalid-index/error cleanup remains false."
+  "source_material_sha": "53d4247599a1ae217393b370328dd97ac03704c5",
+  "failure_context": "Attempt 1 exact run 37419678304 caught successful Release calls incorrectly passing contentComplete=false. Attempt 2 exact run 37419860688 confirmed source repair but failed policy because verifier looked for nonexistent R24 marker RenderDirectSafeProjection; actual content owner is RenderSafeProjectionChecked. Attempt 3 fixes only the verifier marker without weakening required release-provenance assertions."
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T14:47:00+09:00",
+  "updatedKst": "2026-10-06T14:50:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -996,9 +996,9 @@
   "post1000Maintenance00465": {
     "taskId": "CONVERSION-DX9EX-00465",
     "productionId": "CONVERSION-DX9EX-00465",
-    "eventId": "CONVERSION-DX9EX-00465-E002",
+    "eventId": "CONVERSION-DX9EX-00465-E003",
     "eventType": "retry",
-    "attempt": "2/3",
+    "attempt": "3/3",
     "item": "VR-DX9EX-RELEASE-COMMIT-PROVENANCE-0048",
     "baseSha": "c0f95a32e722e1b162c93be75323212938cbe407",
     "materialResultSha": "PENDING_SELF",
@@ -1006,7 +1006,7 @@
     "automationValidation": "PENDING",
     "runtimeValidation": "UNTESTED",
     "summary": "Separate swapchain release success from cached-visible content commitment so incomplete/invalid releases cannot inherit same-generation commit proof.",
-    "sourceMaterialSha": "e92c9d6a0b066fe6672904c7d0e742b1fb474f12",
-    "failureContext": "DX9Ex Active Validation 37419678304 policy job 112126013222 correctly caught that successful projection/theater render paths still passed contentComplete=false after the initial refactor. Domain Isolation 37419678336 passed. Retry repairs only those success-path release calls; cleanup/error paths remain false."
+    "sourceMaterialSha": "53d4247599a1ae217393b370328dd97ac03704c5",
+    "failureContext": "Attempt 1 e92c9d6a... failed policy because successful release calls still used contentComplete=false. Attempt 2 53d42475... repaired those source calls; policy then failed only because the new verifier referenced nonexistent RenderDirectSafeProjection instead of the real R24 owner RenderSafeProjectionChecked. Final attempt changes only that verifier marker."
   }
 }

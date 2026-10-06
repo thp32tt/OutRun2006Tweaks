@@ -1062,7 +1062,7 @@ require(
     "const bool released = Release(Theater, ok);",
 )
 
-r24_direct_projection = body(host_r24, "inline bool RenderDirectSafeProjection(")
+r24_direct_projection = body(host_r24, "inline bool RenderSafeProjectionChecked(")
 r24_direct_flat = body(host_r24, "inline bool RenderDirectFlatFallback(")
 r24_emergency = body(host_r24, "inline bool BuildEmergencyVisibleQuad(")
 require(
