@@ -65,7 +65,8 @@ jobs:
             )
             'src/vr/d3d9/stereo_renderer_r21.cpp' = @(
               'R21InstallState',
-              'IsFailed(R20InstallState)',
+              'R20InstallStatus()',
+              'R21InstallStatus()',
               'StartDisabled'
             )
             'src/vr/d3d9/stereo_renderer_r22.cpp' = @(
@@ -78,7 +79,7 @@ jobs:
             )
             'src/vr/d3d9/stereo_renderer_r23.cpp' = @(
               'R23InstallState',
-              'IsFailed(R22InstallState)',
+              'R22InstallStatus()',
               'R23CaptureActualGameState',
               'R23GameDrawSerial',
               'passive original Clear only',
