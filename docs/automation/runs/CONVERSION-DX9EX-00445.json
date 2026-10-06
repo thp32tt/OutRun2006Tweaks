@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "status": "VALIDATION_PENDING",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "0d5b903f5aa2852c454da1abbf0e4f810ff5c3c3",
-  "material_result_sha": "PENDING_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_COMMIT_SHA",
-  "result_sha": "PENDING_COMMIT_SHA",
+  "material_result_sha": "6dc36719fb7b6079c51c870a93fadb7b0361a73f",
+  "validation_bearing_result_sha": "5faeeea1d642254d5187f5d5bff37ad876810e93",
+  "result_sha": "5faeeea1d642254d5187f5d5bff37ad876810e93",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00445]",
   "selected_work_item": "VR-DX9EX-R26-ACCEPTED-REQUEST-OWNERSHIP-0028",
   "summary": "Retain and revalidate the accepted F10 requester PID through LOCAL application and visible-submit completion, preserving independent focus-recenter ownership.",
@@ -38,25 +38,31 @@
       "evidence": "Added accepted requester PID retention, independent game/focus pending-recenter source bits, stale accepted-request cleanup, application-time owner revalidation, and completion-time owner revalidation. Unknown process enumeration defers game-only LOCAL mutation rather than assuming ownership."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
-      "automation_validation": "PENDING",
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
       "runtime_validation": "UNTESTED",
-      "evidence": "Awaiting exact-SHA GitHub Actions gates."
+      "evidence": "Initial material SHA 6dc36719fb7b6079c51c870a93fadb7b0361a73f failed only the recenter verifier due to a stale pre-owner-guard literal in DX9Ex Active 37397067101. Verifier repair SHA b2ef91df8e427b5d86d89a4b64a1178ccf1513f3 then exposed a real host compile error (stale return cleared) in job 112055988462. Final exact SHA 5faeeea1d642254d5187f5d5bff37ad876810e93 passed DX9Ex Active Validation 37397417136: policy 112056720845, host 112056827999, game 112056828083, full-chain-compile 112056828094, package 112058233912. Domain Isolation Guard 37397417094 / 112056585099 SUCCESS."
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA",
-      "task_tagged_commits": [],
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "6dc36719fb7b6079c51c870a93fadb7b0361a73f fix(vr): retain recenter request process ownership [AUTO:CONVERSION-DX9EX-00445]",
+        "b2ef91df8e427b5d86d89a4b64a1178ccf1513f3 test(vr): align recenter owner gate verifier [AUTO:CONVERSION-DX9EX-00445]",
+        "5faeeea1d642254d5187f5d5bff37ad876810e93 fix(vr): return recenter completion status [AUTO:CONVERSION-DX9EX-00445]"
+      ],
       "ci_skip_on_validation_bearing_result": false
     },
     "C5_PACKAGE": {
-      "status": "PENDING_AUTOMATION_ARTIFACT"
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Package artifact 11384416094 digest sha256:fbdcbb1cfdf29ec28df253967c10c086716eeb58f5e70859d869c4801cb01e0b; CI evidence only."
     },
     "C6_STATE": {
-      "status": "PENDING_VALIDATION_EVIDENCE",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 6007248298
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "red_probe": {
       "base_sha": "0d5b903f5aa2852c454da1abbf0e4f810ff5c3c3",
@@ -66,8 +72,49 @@
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "validation_attempts": [
+      {
+        "exact_sha": "6dc36719fb7b6079c51c870a93fadb7b0361a73f",
+        "dx9ex_run_id": 37397067101,
+        "result": "FAIL",
+        "reason": "Stale deterministic verifier literal after owner guard was inserted; implementation contract itself had not yet reached compile jobs."
+      },
+      {
+        "exact_sha": "b2ef91df8e427b5d86d89a4b64a1178ccf1513f3",
+        "dx9ex_run_id": 37397202878,
+        "result": "FAIL",
+        "reason": "Host compile exposed stale return cleared after completion CAS refactor; policy had passed."
+      },
+      {
+        "exact_sha": "5faeeea1d642254d5187f5d5bff37ad876810e93",
+        "dx9ex_run_id": 37397417136,
+        "result": "PASS",
+        "reason": "All required DX9Ex jobs succeeded."
+      }
+    ],
+    "dx9ex_active": {
+      "run_id": 37397417136,
+      "conclusion": "success",
+      "exact_sha": "5faeeea1d642254d5187f5d5bff37ad876810e93",
+      "jobs": {
+        "policy": 112056720845,
+        "host": 112056827999,
+        "game": 112056828083,
+        "full_chain_compile": 112056828094,
+        "package": 112058233912
+      },
+      "package_artifact_id": 11384416094,
+      "package_artifact_digest": "sha256:fbdcbb1cfdf29ec28df253967c10c086716eeb58f5e70859d869c4801cb01e0b"
+    },
+    "domain_isolation": {
+      "run_id": 37397417094,
+      "job_id": 112056585099,
+      "conclusion": "success",
+      "exact_sha": "5faeeea1d642254d5187f5d5bff37ad876810e93"
     }
   },
-  "next_action": "Validate exact material SHA with DX9Ex Active Validation and Domain Isolation Guard, then finalize the durable run record and Issue #14 ledger.",
-  "started_at_kst": "2026-10-06T09:59:47+09:00"
+  "next_action": "Continue from the latest bookkeeping HEAD with the next independent DX9Ex stability/quality unit; structural extraction remains terminal unless new ownership evidence appears.",
+  "started_at_kst": "2026-10-06T09:59:47+09:00",
+  "completed_at_kst": "2026-10-06T10:12:25+09:00"
 }
