@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T10:45:00+09:00",
+  "updatedKst": "2026-10-06T11:00:43+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -93,9 +93,11 @@
     "VR-DX9EX-R26-ACCEPTED-REQUEST-OWNERSHIP-0028",
     "VR-DX9EX-R26-SESSION-REQUEUE-0029",
     "VR-DX9EX-RECENTER-IPC-PUBLISH-COHERENCY-0030",
-    "VR-DX9EX-RECENTER-IPC-STABLE-SNAPSHOT-0031"
+    "VR-DX9EX-RECENTER-IPC-STABLE-SNAPSHOT-0031",
+    "VR-DX9EX-RECENTER-LOCAL-OWNERSHIP-BEFORE-ACK-0032",
+    "VR-DX9EX-RECENTER-POST-ACK-OWNERSHIP-RECOVERY-0033"
   ],
-  "next": "Structural extraction remains terminal. Continue with accepted-request ordering after CONVERSION-DX9EX-00448 so shared receivedId is never advanced before host-local pending ownership exists; then leave the recenter IPC race chain if no further executable gap remains.",
+  "next": "Structural extraction remains terminal. CONVERSION-DX9EX-00449 moved host-local accepted-request ownership before the shared ACK; CONVERSION-DX9EX-00450 adds post-ACK recovery if session teardown cleared that ownership in the remaining race window. After exact-SHA validation, leave the recenter IPC race chain unless new evidence exposes another executable gap.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",

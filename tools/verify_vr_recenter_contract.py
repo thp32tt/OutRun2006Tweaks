@@ -180,6 +180,17 @@ require_order(
     "FirstStaleGameRequestLogged = true;",
 )
 
+post_ack_recovery = body(
+    r26, "inline bool RecoverLostGameRequestOwnershipAfterAck(")
+require_order(
+    post_ack_recovery,
+    "post-ACK accepted request ownership recovery",
+    "PendingGameRequestId.load(std::memory_order_acquire) == requestId",
+    "channel.RequeueReceived(requestId)",
+    "++PostAckOwnershipLosses;",
+    "return true;",
+)
+
 poll = body(r26, "inline XrResult XRAPI_CALL PollEvent(")
 require_order(
     poll,
@@ -201,6 +212,9 @@ require_order(
     "QueueApplicationRecenter(ApplicationRecenterSourceGame);",
     "WriteSyntheticLocalChange(eventData, XR_NULL_HANDLE);",
     "channel.MarkReceived(requestId);",
+    "RecoverLostGameRequestOwnershipAfterAck(",
+    "return XR_EVENT_UNAVAILABLE;",
+    "++GameRequestsReceived;",
 )
 focus_start = poll.find("if (PendingFocusRecenter && eventData)")
 focus_end = poll.find("const XrResult result = ::xrPollEvent", focus_start)

@@ -50,12 +50,14 @@ namespace OutRunVrR26RecenterHardening
     inline std::uint64_t StaleGameRequestsDropped = 0;
     inline std::uint64_t StaleAcceptedGameRequestsDropped = 0;
     inline std::uint64_t SessionGameRequestsRequeued = 0;
+    inline std::uint64_t PostAckOwnershipLosses = 0;
     inline std::uint64_t AnchoredStartupFallbacks = 0;
     inline bool FirstReferenceChangeLogged = false;
     inline bool FirstFocusRecenterLogged = false;
     inline bool FirstStaleGameRequestLogged = false;
     inline bool FirstStaleAcceptedGameRequestLogged = false;
     inline bool FirstSessionGameRequestRequeuedLogged = false;
+    inline bool FirstPostAckOwnershipLossLogged = false;
     inline bool FirstAnchoredFallbackLogged = false;
 
     inline XrVector3f RotateVector(const XrQuaternionf& q,
@@ -388,6 +390,32 @@ namespace OutRunVrR26RecenterHardening
         }
     }
 
+    inline bool RecoverLostGameRequestOwnershipAfterAck(
+        OutRunVR::RecenterIpc::Channel& channel, LONG requestId) noexcept
+    {
+        if (requestId == 0 ||
+            PendingGameRequestId.load(std::memory_order_acquire) == requestId)
+            return false;
+
+        // Session teardown can race the accept path after host-local ownership
+        // is published but before the shared ACK. If teardown clears the local
+        // record first, the late ACK would otherwise suppress the request even
+        // though no session owns it. Requeue only when this request is still the
+        // latest shared sequence; a newer publication safely supersedes it.
+        const bool requeued = channel.RequeueReceived(requestId);
+        ++PostAckOwnershipLosses;
+        if (!FirstPostAckOwnershipLossLogged)
+        {
+            FirstPostAckOwnershipLossLogged = true;
+            std::cerr
+                << "[R50 recenter] host-local ownership disappeared after shared ACK requestId="
+                << requestId << " recovery="
+                << (requeued ? "requeued" : "already-requeued-or-superseded")
+                << "\n";
+        }
+        return true;
+    }
+
     inline XrResult XRAPI_CALL PollEvent(XrInstance instance,
         XrEventDataBuffer* eventData) noexcept
     {
@@ -432,6 +460,9 @@ namespace OutRunVrR26RecenterHardening
                     QueueApplicationRecenter(ApplicationRecenterSourceGame);
                     WriteSyntheticLocalChange(eventData, XR_NULL_HANDLE);
                     channel.MarkReceived(requestId);
+                    if (RecoverLostGameRequestOwnershipAfterAck(
+                            channel, requestId))
+                        return XR_EVENT_UNAVAILABLE;
                     ++GameRequestsReceived;
                     std::cerr
                         << "[R28 recenter] F10 request received requestId="
