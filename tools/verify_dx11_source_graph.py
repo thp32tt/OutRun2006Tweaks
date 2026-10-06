@@ -10587,6 +10587,40 @@ def main() -> None:
                 missing_r270_programmable_register_semantics_source_provenance)
         )
 
+    r271_programmable_pair_source_semantic_receipt_contract = [
+        ("struct ProgrammableShaderPairSourceSemanticEvidence",
+         PIPELINE_TRANSLATION_HPP, "R271 pair source-semantic evidence type"),
+        ("derive_programmable_shader_pair_source_semantic_evidence(",
+         PIPELINE_TRANSLATION_HPP, "R271 pair receipt derivation declaration"),
+        ("R271_D3D9_PROGRAMMABLE_PAIR_SOURCE_SEMANTIC_RECEIPT_V1",
+         PIPELINE_TRANSLATION_CPP, "R271 receipt revision provenance"),
+        ("R271_R239_R270_R266_R268_EXACT_PAIR_PROVENANCE_V1",
+         PIPELINE_TRANSLATION_CPP, "R271 semantic contract provenance"),
+        ("sourceSemanticPair =",
+         RUNTIME_CENSUS, "R271 production census derives pair receipt"),
+        ("shaderSourceSemanticPairExact",
+         RUNTIME_CENSUS, "R271 production census seals receipt exactness"),
+        ("VR DX11 R271 sourceSemanticPair:",
+         RUNTIME_CENSUS, "R271 production census exposes diagnostic receipt"),
+        ("R271 composes exact R239 R266 R268 pair source-semantic receipt",
+         CONSTANT_BUFFER_PROBE, "R271 positive pair-receipt regression"),
+        ("R271 rejects detached pixel register semantics from another source stream",
+         CONSTANT_BUFFER_PROBE, "R271 stale source fail-closed regression"),
+        ("sig.shaderTranslationExact = false;",
+         RUNTIME_CENSUS, "R271 must not widen programmable translation readiness"),
+    ]
+    missing_r271_programmable_pair_source_semantic_receipt = [
+        meaning for token, source, meaning
+        in r271_programmable_pair_source_semantic_receipt_contract
+        if token not in source
+    ]
+    if missing_r271_programmable_pair_source_semantic_receipt:
+        raise SystemExit(
+            "DX11 R271 programmable pair source-semantic receipt drift: "
+            + ", ".join(
+                missing_r271_programmable_pair_source_semantic_receipt)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
