@@ -2170,3 +2170,10 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - Red widths 1111/808/679/820/640 -> 1514/1096/991/1143/878px; gray 267/104/252 -> 411/210/364px, all below exact source ceilings and source-left aligned.
 - 8/8 bbox/size/positive-margin; outside/alpha/protected/Ferrari/overlap=0; exact RGBA32 header/raw mirror_y and clean/final validators PASS. Controller readable/row-contact/RAW visual QA PASS.
 - Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+
+## 2026-10-07 07:14 KST — A150 q139 hierarchy producer PASS
+- PRE_INGAME #016 reopened q139 313DB8CB C116 for visibly undersized TUNED/NORMAL Korean labels.
+- A150 candidate `50ee1f3b43dc...`: 튜닝 55px -> 튜닝 사양 121px, 일반 58px -> 일반 사양 120px while staying inside 139/174px source bboxes.
+- 2/2 bbox/size/positive-margin PASS; final validator PASS; outside/alpha/protected=0; exact RGBA32 header/raw mirror_y; SOURCE/C116/A150 readable+row+RAW controller QA PASS.
+- Fresh C + refreshed English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
