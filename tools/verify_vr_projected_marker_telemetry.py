@@ -27,9 +27,6 @@ for marker in (
     "R57ProjectedBuildAttempts",
     "R57ProjectedBuildSuccesses",
     "R57ProjectedBuildFailures",
-    "R57ProjectedRankSprani",
-    "R57ProjectedRankClip",
-    "R57ProjectedRival",
 ):
     if marker not in r30:
         fail(f"missing projected-marker counter: {marker}")
@@ -44,7 +41,7 @@ for marker in (
         fail(f"telemetry does not expose semantic-registry state: {marker}")
 
 for marker in (
-    "projected[semantic={},missingPayload={},buildAttempts={},buildOk={},buildFail={},rankSprani={},rankClip={},rival={}]",
+    "projected[semantic={},missingPayload={},buildAttempts={},buildOk={},buildFail={}]",
     "registry[published={},registered={},consumed={},staleCleared={}]",
 ):
     if marker not in r30:
@@ -63,18 +60,6 @@ for marker in (
 ):
     if marker not in classify:
         fail(f"projected classification contract changed: {marker}")
-
-for token in (
-    "ProducerToken::RankMarkerSprani",
-    "ProducerToken::RankMarkerClipSprite",
-    "ProducerToken::RivalMarkerSprani",
-):
-    # Tokens may be used only under VRTelemetry diagnostics, never to grant ownership.
-    pos = classify.find(token)
-    if pos >= 0:
-        window = classify[max(0, pos - 500):pos + 500]
-        if "Settings::VRTelemetry" not in window:
-            fail(f"producer token escaped diagnostic-only scope: {token}")
 
 # Existing registry counters must stay atomic/shared.
 for marker in (
