@@ -2264,6 +2264,156 @@ def watchdog_rearm_queue_state(now: datetime) -> Optional[str]:
     return None
 
 
+def _cdp_alive() -> bool:
+    try:
+        with urllib.request.urlopen("http://127.0.0.1:9222/json/version", timeout=1.0) as response:
+            return 200 <= int(getattr(response, "status", 200)) < 500
+    except Exception:
+        return False
+
+
+def fatal_browser_disconnect(exc: BaseException) -> bool:
+    """Return True only for errors that imply the shared Chrome/CDP session is gone."""
+    message = str(exc or "").lower()
+    fatal_markers = (
+        "browser has been closed",
+        "browser closed",
+        "connection closed while reading from the driver",
+        "playwright connection closed",
+        "websocket is closed",
+        "websocket closed",
+        "browsercontext has been closed",
+    )
+    if any(marker in message for marker in fatal_markers):
+        return True
+    if "target page, context or browser has been closed" in message:
+        return not _cdp_alive()
+    return False
+
+
+def container_memory_percent() -> Optional[float]:
+    """Read Docker/cgroup memory usage without adding psutil."""
+    candidates = (
+        (Path("/sys/fs/cgroup/memory.current"), Path("/sys/fs/cgroup/memory.max")),
+        (Path("/sys/fs/cgroup/memory/memory.usage_in_bytes"), Path("/sys/fs/cgroup/memory/memory.limit_in_bytes")),
+    )
+    for current_path, limit_path in candidates:
+        try:
+            current_raw = current_path.read_text(encoding="utf-8").strip()
+            limit_raw = limit_path.read_text(encoding="utf-8").strip()
+            if not current_raw or not limit_raw or limit_raw == "max":
+                continue
+            current = int(current_raw)
+            limit = int(limit_raw)
+            if current < 0 or limit <= 0 or limit >= (1 << 60):
+                continue
+            return max(0.0, (current / limit) * 100.0)
+        except Exception:
+            continue
+    return None
+
+
+def _seconds_until_next_schedule(now: datetime) -> Optional[float]:
+    waits = []
+    for minute in SCHEDULE_MINUTES:
+        candidate = now.replace(minute=minute, second=0, microsecond=0)
+        if candidate <= now:
+            candidate += timedelta(hours=1)
+        waits.append((candidate - now).total_seconds())
+    return min(waits) if waits else None
+
+
+def _seconds_until_next_queue_slot(now: datetime) -> Optional[float]:
+    try:
+        q = load_queue_state()
+    except Exception:
+        q = {}
+    waits = []
+    not_before = _parse_iso(q.get("next_task_not_before"))
+    if not_before and not_before > now:
+        waits.append((not_before - now).total_seconds())
+    scheduled = _seconds_until_next_schedule(now)
+    if scheduled is not None:
+        waits.append(scheduled)
+    return min(waits) if waits else None
+
+
+async def recycle_block_reason(pages: dict[str, Page], now: datetime) -> Optional[str]:
+    for slot_name, page in pages.items():
+        try:
+            if page.is_closed():
+                continue
+            if await first_visible(page, BUSY_SELECTORS) is not None:
+                return f"{slot_name}:response_generating"
+        except Exception as exc:
+            if fatal_browser_disconnect(exc):
+                raise
+            log.debug("recycle busy check failed slot=%s: %s", slot_name, exc)
+
+    reg = load_registry(now)
+    send_times = []
+    for raw in [reg.last_global_send_at] + [slot.last_sent_at for slot in reg.slots]:
+        parsed = _parse_iso(raw)
+        if parsed:
+            send_times.append(parsed)
+    if send_times:
+        last_send = max(send_times)
+        idle_seconds = max(0.0, (now - last_send).total_seconds())
+        if idle_seconds < RECYCLE_MIN_IDLE_SECONDS:
+            return f"recent_send:{int(idle_seconds)}s<{RECYCLE_MIN_IDLE_SECONDS}s"
+
+    next_slot_seconds = _seconds_until_next_queue_slot(now)
+    if (
+        next_slot_seconds is not None
+        and 0 <= next_slot_seconds < RECYCLE_MIN_NEXT_SLOT_SECONDS
+    ):
+        return f"next_slot:{int(next_slot_seconds)}s<{RECYCLE_MIN_NEXT_SLOT_SECONDS}s"
+    return None
+
+
+async def maybe_request_controller_recycle(
+    pages: dict[str, Page],
+    now: datetime,
+    started_monotonic: float,
+) -> None:
+    if not RECYCLE_ENABLED:
+        return
+
+    uptime_seconds = max(0.0, time.monotonic() - started_monotonic)
+    memory_percent = container_memory_percent()
+    due_reasons = []
+    if uptime_seconds >= RECYCLE_INTERVAL_MINUTES * 60:
+        due_reasons.append(f"interval:{int(uptime_seconds // 60)}m")
+    if memory_percent is not None and memory_percent >= RECYCLE_MEMORY_PERCENT:
+        due_reasons.append(f"memory:{memory_percent:.1f}%")
+
+    write_runtime(
+        last_recycle_check_at=now.isoformat(),
+        recycle_uptime_seconds=int(uptime_seconds),
+        container_memory_percent=round(memory_percent, 1) if memory_percent is not None else None,
+    )
+    if not due_reasons:
+        return
+
+    reason = "+".join(due_reasons)
+    blocked = await recycle_block_reason(pages, now)
+    if blocked:
+        write_runtime(
+            recycle_due_reason=reason,
+            recycle_deferred_reason=blocked,
+        )
+        return
+
+    write_runtime(
+        status="recycle_requested",
+        last_action=f"Safe preventive recycle requested ({reason}); Docker restart will restore Chrome/Playwright state",
+        recycle_due_reason=reason,
+        recycle_deferred_reason=None,
+        recycle_requested_at=now.isoformat(),
+    )
+    raise SystemExit(75)
+
+
 async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: bool):
     if QUEUE_MODE:
         startup_reconcile_queue_state()
@@ -2282,6 +2432,8 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
     last_watchdog_check = 0.0
     last_queue_check = 0.0
     last_heartbeat = 0.0
+    last_recycle_check = 0.0
+    recycle_started_monotonic = time.monotonic()
     write_runtime(status="idle", tab_mode="fresh_per_run" if FRESH_CHAT_EACH_RUN else "dedicated_per_slot", tab_count=len(pages))
     while True:
         now = datetime.now(TZ)
@@ -2291,6 +2443,10 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
         if mono - last_heartbeat >= HEARTBEAT_SECONDS:
             last_heartbeat = mono
             write_runtime(queue_loop_heartbeat_at=now.isoformat(), last_tick=now.isoformat())
+
+        if RECYCLE_ENABLED and mono - last_recycle_check >= RECYCLE_CHECK_SECONDS:
+            last_recycle_check = mono
+            await maybe_request_controller_recycle(pages, now, recycle_started_monotonic)
 
         if AUTO_SEND and QUEUE_MODE and mono - last_queue_check >= QUEUE_CHECK_SECONDS:
             last_queue_check = mono
@@ -2303,6 +2459,13 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
                 else:
                     await queue_cycle(context, pages)
             except Exception as e:
+                if fatal_browser_disconnect(e):
+                    write_runtime(
+                        status="browser_fatal_disconnect",
+                        last_action=f"Fatal Chrome/Playwright disconnect during queue cycle: {type(e).__name__}: {e}",
+                        last_error=repr(e),
+                    )
+                    raise
                 log.exception("queue cycle failed")
                 write_runtime(
                     status="queue_error",
@@ -2318,6 +2481,13 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
                 try:
                     await run_cycle(context, pages)
                 except Exception as e:
+                    if fatal_browser_disconnect(e):
+                        write_runtime(
+                            status="browser_fatal_disconnect",
+                            last_action=f"Fatal Chrome/Playwright disconnect during scheduled cycle: {type(e).__name__}: {e}",
+                            last_error=repr(e),
+                        )
+                        raise
                     log.exception("scheduled cycle failed")
                     write_runtime(status="error", last_error=repr(e))
         elif not AUTO_SEND:
@@ -2329,6 +2499,13 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
             try:
                 await watchdog_cycle(context, pages)
             except Exception as e:
+                if fatal_browser_disconnect(e):
+                    write_runtime(
+                        status="browser_fatal_disconnect",
+                        last_action=f"Fatal Chrome/Playwright disconnect during watchdog: {type(e).__name__}: {e}",
+                        last_error=repr(e),
+                    )
+                    raise
                 log.exception("watchdog cycle failed")
                 write_runtime(status="watchdog_error", last_error=repr(e))
         await asyncio.sleep(5)
