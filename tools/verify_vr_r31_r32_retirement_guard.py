@@ -353,11 +353,11 @@ owner_evidence = {
         ("R13OverlayReadyForTransport()",
          "return lowerResolve();",
          "R32EnsureDirectResources(device)",
-         "R32DrainPendingProducerFence(slotIndex)",
-         "R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted)",
+         "R32DrainPendingProducerFence(index)",
+         "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
          "R32WaitProducerFence(slot.fence)",
          "slot.producerPending = true;",
-         "ActiveDirectTransportSlot = slotIndex;"),
+         "ActiveDirectTransportSlot = selected;"),
     ),
     "R32SetWvpBatch": (
         r32, "bool R32SetWvpBatch(",
@@ -618,11 +618,11 @@ require(
     "R13OverlayReadyForTransport()",
     "return lowerResolve();",
     "R32EnsureDirectResources(device)",
-    "R32DrainPendingProducerFence(slotIndex)",
-    "R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted)",
+    "R32DrainPendingProducerFence(index)",
+    "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
     "R32WaitProducerFence(slot.fence)",
     "slot.producerPending = true;",
-    "ActiveDirectTransportSlot = slotIndex;",
+    "ActiveDirectTransportSlot = selected;",
 )
 lower_fail_closed = function_body(r32, "HRESULT R32LowerFailClosed(")
 require(
