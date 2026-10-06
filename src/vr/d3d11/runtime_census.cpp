@@ -1223,7 +1223,9 @@ namespace outrun::vr::dx11
 
             const auto registerSemantics =
                 decode_programmable_shader_register_semantics(decode);
-            out.registerSemanticsExact = registerSemantics.exact();
+            out.registerSemanticsExact =
+                validate_programmable_shader_register_semantics(
+                    registerSemantics, decode);
             out.registerSemanticInstructionCount =
                 registerSemantics.semanticInstructionCount;
             out.destinationOperandCount =
