@@ -144,8 +144,9 @@
     "alpha_outside": 0,
     "protected_changed": 0
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_A151_REJECTED_A153_READABLE_ROW_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A153_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "status": "A153_C227R_TYPOGRAPHY_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_qa": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_CONTROLLER_SELF_QA.json"
 }
