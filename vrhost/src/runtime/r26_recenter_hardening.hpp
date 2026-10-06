@@ -33,8 +33,12 @@ namespace OutRunVrR26RecenterHardening
 {
     inline bool PendingFocusRecenter = false;
     inline XrSession PendingFocusSession = XR_NULL_HANDLE;
+    inline constexpr std::uint32_t ApplicationRecenterSourceGame = 1u << 0;
+    inline constexpr std::uint32_t ApplicationRecenterSourceFocus = 1u << 1;
     inline std::atomic<LONG> PendingGameRequestId{ 0 };
+    inline std::atomic<DWORD> PendingGameRequesterPid{ 0 };
     inline std::atomic<bool> PendingApplicationRecenter{ false };
+    inline std::atomic<std::uint32_t> PendingApplicationRecenterSources{ 0 };
     inline std::atomic<std::uint64_t> ApplicationSpaceGeneration{ 0 };
     inline std::atomic<std::uint64_t> PendingGameTargetGeneration{ 0 };
     inline bool FallbackAnchorValid = false;
@@ -44,10 +48,12 @@ namespace OutRunVrR26RecenterHardening
     inline std::uint64_t GameRequestsReceived = 0;
     inline std::uint64_t GameRequestsApplied = 0;
     inline std::uint64_t StaleGameRequestsDropped = 0;
+    inline std::uint64_t StaleAcceptedGameRequestsDropped = 0;
     inline std::uint64_t AnchoredStartupFallbacks = 0;
     inline bool FirstReferenceChangeLogged = false;
     inline bool FirstFocusRecenterLogged = false;
     inline bool FirstStaleGameRequestLogged = false;
+    inline bool FirstStaleAcceptedGameRequestLogged = false;
     inline bool FirstAnchoredFallbackLogged = false;
 
     inline XrVector3f RotateVector(const XrQuaternionf& q,
@@ -77,16 +83,89 @@ namespace OutRunVrR26RecenterHardening
         PendingFocusRecenter = false;
         PendingFocusSession = XR_NULL_HANDLE;
         PendingGameRequestId.store(0, std::memory_order_release);
+        PendingGameRequesterPid.store(0, std::memory_order_release);
         PendingApplicationRecenter.store(false, std::memory_order_release);
+        PendingApplicationRecenterSources.store(0, std::memory_order_release);
         ApplicationSpaceGeneration.store(0, std::memory_order_release);
         PendingGameTargetGeneration.store(0, std::memory_order_release);
         InvalidateFallbackAnchor();
     }
 
-    inline void QueueApplicationRecenter() noexcept
+    inline void QueueApplicationRecenter(std::uint32_t source) noexcept
     {
+        PendingApplicationRecenterSources.fetch_or(
+            source, std::memory_order_acq_rel);
         PendingApplicationRecenter.store(true, std::memory_order_release);
         InvalidateFallbackAnchor();
+    }
+
+    inline bool RequesterMatchesCurrentGameProcess(
+        DWORD requesterPid, DWORD& currentGamePid) noexcept
+    {
+        currentGamePid = OutRunVrSbsCaptureOverride::FindGamePid();
+        return requesterPid != 0 && currentGamePid != 0 &&
+            requesterPid == currentGamePid;
+    }
+
+    inline bool ClearPendingGameRequest(LONG requestId) noexcept
+    {
+        LONG expected = requestId;
+        if (requestId == 0 ||
+            !PendingGameRequestId.compare_exchange_strong(
+                expected, 0, std::memory_order_acq_rel,
+                std::memory_order_acquire))
+            return false;
+        PendingGameRequesterPid.store(0, std::memory_order_release);
+        PendingGameTargetGeneration.store(0, std::memory_order_release);
+        return true;
+    }
+
+    inline void DropAcceptedGameRequest(
+        LONG requestId, DWORD requesterPid, DWORD currentGamePid) noexcept
+    {
+        if (!ClearPendingGameRequest(requestId))
+            return;
+        const std::uint32_t previousSources =
+            PendingApplicationRecenterSources.fetch_and(
+                ~ApplicationRecenterSourceGame, std::memory_order_acq_rel);
+        const std::uint32_t remainingSources =
+            previousSources & ~ApplicationRecenterSourceGame;
+        if (remainingSources == 0)
+            PendingApplicationRecenter.store(false, std::memory_order_release);
+
+        ++StaleAcceptedGameRequestsDropped;
+        if (!FirstStaleAcceptedGameRequestLogged)
+        {
+            FirstStaleAcceptedGameRequestLogged = true;
+            std::cerr
+                << "[R28 recenter] accepted F10 request lost process ownership requestId="
+                << requestId << " requesterPid=" << requesterPid
+                << " currentGamePid=" << currentGamePid
+                << "; pending game recenter ownership dropped\n";
+        }
+    }
+
+    inline bool PendingGameRequestOwnedByCurrentProcess(
+        LONG requestId) noexcept
+    {
+        if (requestId == 0 ||
+            PendingGameRequestId.load(std::memory_order_acquire) != requestId)
+            return false;
+
+        const DWORD requesterPid =
+            PendingGameRequesterPid.load(std::memory_order_acquire);
+        DWORD currentGamePid = 0;
+        if (RequesterMatchesCurrentGameProcess(
+                requesterPid, currentGamePid))
+            return true;
+
+        // Process enumeration can momentarily miss a still-starting game.
+        // Defer while no live game is visible, but fail closed once a
+        // replacement PID is known (or requester metadata is malformed).
+        if (!requesterPid || currentGamePid != 0)
+            DropAcceptedGameRequest(
+                requestId, requesterPid, currentGamePid);
+        return false;
     }
 
     inline bool ApplicationRecenterAppliedForPendingGameRequest() noexcept
@@ -106,6 +185,37 @@ namespace OutRunVrR26RecenterHardening
     {
         if (!PendingApplicationRecenter.load(std::memory_order_acquire))
             return true;
+
+        const std::uint32_t pendingSources =
+            PendingApplicationRecenterSources.load(std::memory_order_acquire);
+        if ((pendingSources & ApplicationRecenterSourceGame) != 0)
+        {
+            const LONG requestId =
+                PendingGameRequestId.load(std::memory_order_acquire);
+            const DWORD requesterPid =
+                PendingGameRequesterPid.load(std::memory_order_acquire);
+            DWORD currentGamePid = 0;
+            if (!RequesterMatchesCurrentGameProcess(
+                    requesterPid, currentGamePid))
+            {
+                if (!requesterPid || currentGamePid != 0)
+                {
+                    DropAcceptedGameRequest(
+                        requestId, requesterPid, currentGamePid);
+                    if (!PendingApplicationRecenter.load(
+                            std::memory_order_acquire))
+                        return true;
+                }
+                else if ((pendingSources & ApplicationRecenterSourceFocus) == 0)
+                {
+                    // Do not move LOCAL on behalf of a game request whose
+                    // process ownership is temporarily unverifiable. A focus
+                    // recenter may still proceed independently.
+                    return false;
+                }
+            }
+        }
+
         const XrSpace base = OutRunVrFinalTest::BaseLocalSpace != XR_NULL_HANDLE
             ? OutRunVrFinalTest::BaseLocalSpace : localSpace;
         if (session == XR_NULL_HANDLE || viewSpace == XR_NULL_HANDLE ||
@@ -138,6 +248,7 @@ namespace OutRunVrR26RecenterHardening
             generation =
                 ApplicationSpaceGeneration.fetch_add(1, std::memory_order_acq_rel) + 1;
         PendingApplicationRecenter.store(false, std::memory_order_release);
+        PendingApplicationRecenterSources.store(0, std::memory_order_release);
         InvalidateFallbackAnchor();
 
         // Never destroy the immutable runtime LOCAL. Old application-created
@@ -234,14 +345,6 @@ namespace OutRunVrR26RecenterHardening
         std::memcpy(eventData, &synthetic, sizeof(synthetic));
     }
 
-    inline bool RequesterMatchesCurrentGameProcess(
-        DWORD requesterPid, DWORD& currentGamePid) noexcept
-    {
-        currentGamePid = OutRunVrSbsCaptureOverride::FindGamePid();
-        return requesterPid != 0 && currentGamePid != 0 &&
-            requesterPid == currentGamePid;
-    }
-
     inline void DiscardStaleGameRequest(
         OutRunVR::RecenterIpc::Channel& channel,
         LONG requestId, DWORD requesterPid, DWORD currentGamePid) noexcept
@@ -288,9 +391,11 @@ namespace OutRunVrR26RecenterHardening
                     // LOCAL anchor invalidation/rebuild cycle.
                     const std::uint64_t targetGeneration =
                         ApplicationSpaceGeneration.load(std::memory_order_acquire) + 1;
+                    PendingGameRequesterPid.store(
+                        requesterPid, std::memory_order_release);
                     PendingGameTargetGeneration.store(
                         targetGeneration, std::memory_order_release);
-                    QueueApplicationRecenter();
+                    QueueApplicationRecenter(ApplicationRecenterSourceGame);
                     WriteSyntheticLocalChange(eventData, XR_NULL_HANDLE);
                     channel.MarkReceived(requestId);
                     PendingGameRequestId.store(requestId, std::memory_order_release);
@@ -306,7 +411,7 @@ namespace OutRunVrR26RecenterHardening
 
         if (PendingFocusRecenter && eventData)
         {
-            QueueApplicationRecenter();
+            QueueApplicationRecenter(ApplicationRecenterSourceFocus);
             WriteSyntheticLocalChange(eventData, PendingFocusSession);
             PendingFocusRecenter = false;
             PendingFocusSession = XR_NULL_HANDLE;
@@ -376,19 +481,15 @@ namespace OutRunVrR26RecenterHardening
         const LONG pending =
             PendingGameRequestId.load(std::memory_order_acquire);
         if (pending == 0 ||
+            !PendingGameRequestOwnedByCurrentProcess(pending) ||
             !ApplicationRecenterAppliedForPendingGameRequest())
             return false;
 
-        auto& channel = OutRunVR::RecenterIpc::SharedChannel();
-        channel.MarkApplied(pending);
-        LONG expected = pending;
-        const bool cleared = PendingGameRequestId.compare_exchange_strong(
-            expected, 0, std::memory_order_acq_rel,
-            std::memory_order_acquire);
-        if (cleared)
+        if (ClearPendingGameRequest(pending))
         {
+            auto& channel = OutRunVR::RecenterIpc::SharedChannel();
+            channel.MarkApplied(pending);
             ++GameRequestsApplied;
-            PendingGameTargetGeneration.store(0, std::memory_order_release);
             InvalidateFallbackAnchor();
             std::cerr
                 << "[R45 recenter] requestId=" << pending
@@ -426,18 +527,17 @@ namespace OutRunVrR26RecenterHardening
              OutRunVrR24BlackScreenGuard::CachedLayerFallbacks != cachedBefore ||
              OutRunVrR24BlackScreenGuard::EmergencyLayerFallbacks != emergencyBefore);
 
-        if (pending != 0 && ApplicationRecenterAppliedForPendingGameRequest() &&
+        if (pending != 0 &&
+            PendingGameRequestOwnedByCurrentProcess(pending) &&
+            ApplicationRecenterAppliedForPendingGameRequest() &&
             XR_SUCCEEDED(result) && !r24ViewFallback &&
             (anchoredStartup || (endInfo && endInfo->layerCount > 0)))
         {
+            if (!ClearPendingGameRequest(pending))
+                return result;
             auto& channel = OutRunVR::RecenterIpc::SharedChannel();
             channel.MarkApplied(pending);
-            LONG expected = pending;
-            PendingGameRequestId.compare_exchange_strong(
-                expected, 0, std::memory_order_acq_rel,
-                std::memory_order_acquire);
             ++GameRequestsApplied;
-            PendingGameTargetGeneration.store(0, std::memory_order_release);
             std::cerr
                 << "[R28 recenter] requestId=" << pending
                 << " path=" << (anchoredStartup ?

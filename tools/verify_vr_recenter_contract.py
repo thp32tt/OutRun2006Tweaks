@@ -69,15 +69,27 @@ main = load(MAIN_PATH)
 r32 = load(R32_PATH)
 api = load(API_PATH)
 
-queue = body(r26, "inline void QueueApplicationRecenter() noexcept")
+queue = body(r26, "inline void QueueApplicationRecenter(std::uint32_t source) noexcept")
 require_order(
     queue,
-    "queue recenter fail-close",
+    "queue recenter source ownership",
+    "PendingApplicationRecenterSources.fetch_or(",
+    "source, std::memory_order_acq_rel",
     "PendingApplicationRecenter.store(true, std::memory_order_release)",
     "InvalidateFallbackAnchor();",
 )
 
 apply = body(r26, "inline bool ApplyPendingApplicationRecenter(")
+require_order(
+    apply,
+    "accepted game request revalidation before LOCAL mutation",
+    "PendingApplicationRecenterSources.load(std::memory_order_acquire)",
+    "ApplicationRecenterSourceGame",
+    "PendingGameRequesterPid.load(std::memory_order_acquire)",
+    "RequesterMatchesCurrentGameProcess(",
+    "DropAcceptedGameRequest(",
+    "const XrSpace base =",
+)
 require(
     apply,
     "application LOCAL recenter",
@@ -91,6 +103,7 @@ require(
     "OutRunVrFinalTest::LocalSpace = recentered",
     "ApplicationSpaceGeneration.fetch_add(1, std::memory_order_acq_rel)",
     "PendingApplicationRecenter.store(false, std::memory_order_release)",
+    "PendingApplicationRecenterSources.store(0, std::memory_order_release)",
     "if (previous != XR_NULL_HANDLE && previous != base)",
     "::xrDestroySpace(previous)",
 )
@@ -139,8 +152,9 @@ require_order(
 require_order(
     poll,
     "game recenter receive",
+    "PendingGameRequesterPid.store(",
     "PendingGameTargetGeneration.store(",
-    "QueueApplicationRecenter();",
+    "QueueApplicationRecenter(ApplicationRecenterSourceGame);",
     "WriteSyntheticLocalChange(eventData, XR_NULL_HANDLE);",
     "channel.MarkReceived(requestId);",
     "PendingGameRequestId.store(requestId, std::memory_order_release);",
@@ -154,7 +168,7 @@ require_order(
     focus_block,
     "focus recenter synthesis",
     "if (PendingFocusRecenter && eventData)",
-    "QueueApplicationRecenter();",
+    "QueueApplicationRecenter(ApplicationRecenterSourceFocus);",
     "WriteSyntheticLocalChange(eventData, PendingFocusSession);",
     "PendingFocusRecenter = false;",
     "PendingFocusSession = XR_NULL_HANDLE;",
@@ -174,21 +188,42 @@ require(
     "PendingFocusSession = state->session",
 )
 
+accepted_owner = body(
+    r26, "inline bool PendingGameRequestOwnedByCurrentProcess(")
+require_order(
+    accepted_owner,
+    "accepted request current-process ownership",
+    "PendingGameRequesterPid.load(std::memory_order_acquire)",
+    "RequesterMatchesCurrentGameProcess(",
+    "if (!requesterPid || currentGamePid != 0)",
+    "DropAcceptedGameRequest(",
+)
+drop_accepted = body(r26, "inline void DropAcceptedGameRequest(")
+require_order(
+    drop_accepted,
+    "accepted stale request cleanup",
+    "ClearPendingGameRequest(requestId)",
+    "PendingApplicationRecenterSources.fetch_and(",
+    "~ApplicationRecenterSourceGame",
+    "PendingApplicationRecenter.store(false, std::memory_order_release)",
+)
+
 complete = body(
     r26, "inline bool CompletePendingGameRequestAfterVisibleProjection() noexcept")
 require_order(
     complete,
     "fresh projection completion",
+    "PendingGameRequestOwnedByCurrentProcess(pending)",
     "!ApplicationRecenterAppliedForPendingGameRequest()",
+    "ClearPendingGameRequest(pending)",
     "channel.MarkApplied(pending);",
-    "PendingGameRequestId.compare_exchange_strong(",
-    "PendingGameTargetGeneration.store(0, std::memory_order_release);",
 )
 
 end_frame = body(r26, "inline XrResult XRAPI_CALL EndFrame(")
 require(
     end_frame,
     "fallback completion gate",
+    "PendingGameRequestOwnedByCurrentProcess(pending)",
     "ApplicationRecenterAppliedForPendingGameRequest()",
     "XR_SUCCEEDED(result)",
     "!r24ViewFallback",
@@ -214,7 +249,9 @@ require_order(
     "PendingFocusRecenter = false;",
     "PendingFocusSession = XR_NULL_HANDLE;",
     "PendingGameRequestId.store(0, std::memory_order_release)",
+    "PendingGameRequesterPid.store(0, std::memory_order_release)",
     "PendingApplicationRecenter.store(false, std::memory_order_release)",
+    "PendingApplicationRecenterSources.store(0, std::memory_order_release)",
     "ApplicationSpaceGeneration.store(0, std::memory_order_release)",
     "PendingGameTargetGeneration.store(0, std::memory_order_release)",
     "InvalidateFallbackAnchor();",
