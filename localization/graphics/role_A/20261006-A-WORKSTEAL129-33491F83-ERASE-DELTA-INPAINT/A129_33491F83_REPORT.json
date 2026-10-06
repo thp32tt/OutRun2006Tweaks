@@ -1,0 +1,654 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-WORKSTEAL129-33491F83-ERASE-DELTA-INPAINT",
+  "queue_index": 62,
+  "asset": "textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+  "work_stolen_from_lane": "B",
+  "work_steal_reason": "A odd shard exhausted; index62 was the oldest actionable manual reconstruction while B continued later even zoom-review production.",
+  "source_provenance": {
+    "dds_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+    "dds_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+    "psd_repo": "Sonic-TV/OR2006Sprites",
+    "psd_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "psd_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_loading_cvt_Exst/33491F83_512x256.psd",
+    "psd_bytes": 8669875,
+    "psd_canvas": [
+      2048,
+      1024
+    ]
+  },
+  "translation": {
+    "Diverge": "분기",
+    "Left": "좌측",
+    "Right": "우측",
+    "EASY": "쉬움",
+    "HARD": "어려움",
+    "physical_elements": 9
+  },
+  "construction": {
+    "source_text_mask": "exact alpha masks from nine visible PSD rasterized English label layers",
+    "clean_plate": "EASY/HARD authoring erase-footprint derived from Basic Fix vs Layer 43 delta then Telea r9; Diverge/Left/Right PSD erase component; detached labels transparent; extended repair remains inside exact source bboxes",
+    "render": "native 2048x1024 Noto Sans CJK KR Black; family colors sampled from source; shared Korean font size within Left/Right, main EASY/HARD, regular EASY/HARD and oblique EASY/HARD pairs",
+    "oblique_transform": "27-degree source PSD shear reproduced as tan(27deg)"
+  },
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "key": "diverge_main",
+      "source": "Diverge",
+      "korean": "분기",
+      "psd_layer_path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Diverge/Diverge [Rasterized]",
+      "source_bbox": [
+        456,
+        14,
+        755,
+        113
+      ],
+      "source_mask_pixels": 22346,
+      "source_centroid": [
+        599.4017721292402,
+        62.14217309585608
+      ],
+      "family": "yellow",
+      "style_group": "diverge",
+      "shear": 0.0,
+      "cell": "main",
+      "fill_rgba": [
+        230,
+        230,
+        0,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        10,
+        57,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "font_size": 84,
+      "outer_stroke_px": 8,
+      "navy_stroke_px": 5,
+      "localized_bbox": [
+        519,
+        15,
+        680,
+        112
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "anchor": [
+        519,
+        15
+      ],
+      "source_width": 299,
+      "source_height": 99,
+      "localized_width": 161,
+      "localized_height": 97,
+      "delta_left": 63,
+      "delta_right": 75,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "left_main",
+      "source": "Left",
+      "korean": "좌측",
+      "psd_layer_path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Left-Easy/Left [Rasterized]",
+      "source_bbox": [
+        322,
+        161,
+        478,
+        245
+      ],
+      "source_mask_pixels": 11335,
+      "source_centroid": [
+        398.3817379797089,
+        205.5745037494486
+      ],
+      "family": "green",
+      "style_group": "main_lr",
+      "shear": 0.0,
+      "cell": "main",
+      "fill_rgba": [
+        0,
+        179,
+        96,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        10,
+        57,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "font_size": 71,
+      "outer_stroke_px": 7,
+      "navy_stroke_px": 5,
+      "localized_bbox": [
+        328,
+        162,
+        469,
+        244
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "anchor": [
+        328,
+        162
+      ],
+      "source_width": 156,
+      "source_height": 84,
+      "localized_width": 141,
+      "localized_height": 82,
+      "delta_left": 6,
+      "delta_right": 9,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "right_main",
+      "source": "Right",
+      "korean": "우측",
+      "psd_layer_path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Right-Hard/Right [Rasterized]",
+      "source_bbox": [
+        682,
+        163,
+        885,
+        257
+      ],
+      "source_mask_pixels": 15844,
+      "source_centroid": [
+        780.3319237566271,
+        206.34385256248422
+      ],
+      "family": "red",
+      "style_group": "main_lr",
+      "shear": 0.0,
+      "cell": "main",
+      "fill_rgba": [
+        199,
+        50,
+        50,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        10,
+        57,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "font_size": 71,
+      "outer_stroke_px": 7,
+      "navy_stroke_px": 5,
+      "localized_bbox": [
+        710,
+        165,
+        850,
+        247
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "anchor": [
+        710,
+        165
+      ],
+      "source_width": 203,
+      "source_height": 94,
+      "localized_width": 140,
+      "localized_height": 82,
+      "delta_left": 28,
+      "delta_right": 35,
+      "delta_top": 2,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "easy_main",
+      "source": "EASY",
+      "korean": "쉬움",
+      "psd_layer_path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Left-Easy/EASY [Rasterized]",
+      "source_bbox": [
+        142,
+        285,
+        385,
+        375
+      ],
+      "source_mask_pixels": 19550,
+      "source_centroid": [
+        257.9976982097187,
+        328.7962659846547
+      ],
+      "family": "green",
+      "style_group": "main_diff",
+      "shear": 0.0,
+      "cell": "main",
+      "fill_rgba": [
+        0,
+        179,
+        96,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        10,
+        57,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "font_size": 73,
+      "outer_stroke_px": 7,
+      "navy_stroke_px": 5,
+      "localized_bbox": [
+        186,
+        287,
+        329,
+        371
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "anchor": [
+        186,
+        287
+      ],
+      "source_width": 243,
+      "source_height": 90,
+      "localized_width": 143,
+      "localized_height": 84,
+      "delta_left": 44,
+      "delta_right": 56,
+      "delta_top": 2,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "hard_main",
+      "source": "HARD",
+      "korean": "어려움",
+      "psd_layer_path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Right-Hard/HARD [Rasterized]",
+      "source_bbox": [
+        808,
+        287,
+        1068,
+        373
+      ],
+      "source_mask_pixels": 21302,
+      "source_centroid": [
+        934.1881044033424,
+        329.67524176133696
+      ],
+      "family": "red",
+      "style_group": "main_diff",
+      "shear": 0.0,
+      "cell": "main",
+      "fill_rgba": [
+        199,
+        50,
+        50,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        10,
+        57,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "font_size": 73,
+      "outer_stroke_px": 7,
+      "navy_stroke_px": 5,
+      "localized_bbox": [
+        829,
+        288,
+        1039,
+        372
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "anchor": [
+        829,
+        288
+      ],
+      "source_width": 260,
+      "source_height": 86,
+      "localized_width": 210,
+      "localized_height": 84,
+      "delta_left": 21,
+      "delta_right": 29,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "hard_arrow",
+      "source": "HARD",
+      "korean": "어려움",
+      "psd_layer_path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Oblique - 27 degrees shear/Down-HARD/HARD [Rasterized]",
+      "source_bbox": [
+        1367,
+        19,
+        1645,
+        105
+      ],
+      "source_mask_pixels": 21484,
+      "source_centroid": [
+        1506.6614224539192,
+        61.87441817166263
+      ],
+      "family": "red",
+      "style_group": "oblique_diff",
+      "shear": 0.5095254494944288,
+      "cell": "detached",
+      "fill_rgba": [
+        199,
+        50,
+        50,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        10,
+        57,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "font_size": 73,
+      "outer_stroke_px": 7,
+      "navy_stroke_px": 5,
+      "localized_bbox": [
+        1407,
+        20,
+        1607,
+        104
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "anchor": [
+        1407,
+        20
+      ],
+      "source_width": 278,
+      "source_height": 86,
+      "localized_width": 200,
+      "localized_height": 84,
+      "delta_left": 40,
+      "delta_right": 38,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "easy_arrow",
+      "source": "EASY",
+      "korean": "쉬움",
+      "psd_layer_path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Oblique - 27 degrees shear/Up-EASY/EASY [Rasterized]",
+      "source_bbox": [
+        1364,
+        145,
+        1635,
+        235
+      ],
+      "source_mask_pixels": 19896,
+      "source_centroid": [
+        1494.7794028950543,
+        188.79644149577805
+      ],
+      "family": "green",
+      "style_group": "oblique_diff",
+      "shear": 0.5095254494944288,
+      "cell": "detached",
+      "fill_rgba": [
+        0,
+        179,
+        96,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        10,
+        57,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "font_size": 73,
+      "outer_stroke_px": 7,
+      "navy_stroke_px": 5,
+      "localized_bbox": [
+        1428,
+        147,
+        1561,
+        231
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "anchor": [
+        1428,
+        147
+      ],
+      "source_width": 271,
+      "source_height": 90,
+      "localized_width": 133,
+      "localized_height": 84,
+      "delta_left": 64,
+      "delta_right": 74,
+      "delta_top": 2,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "hard_alone",
+      "source": "HARD",
+      "korean": "어려움",
+      "psd_layer_path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Regular/HARD [Rasterized]",
+      "source_bbox": [
+        1748,
+        19,
+        2008,
+        105
+      ],
+      "source_mask_pixels": 21302,
+      "source_centroid": [
+        1874.1881044033423,
+        61.67524176133696
+      ],
+      "family": "red",
+      "style_group": "regular_diff",
+      "shear": 0.0,
+      "cell": "detached",
+      "fill_rgba": [
+        199,
+        50,
+        50,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        10,
+        57,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "font_size": 73,
+      "outer_stroke_px": 7,
+      "navy_stroke_px": 5,
+      "localized_bbox": [
+        1769,
+        20,
+        1979,
+        104
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "anchor": [
+        1769,
+        20
+      ],
+      "source_width": 260,
+      "source_height": 86,
+      "localized_width": 210,
+      "localized_height": 84,
+      "delta_left": 21,
+      "delta_right": 29,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "easy_alone",
+      "source": "EASY",
+      "korean": "쉬움",
+      "psd_layer_path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Regular/EASY [Rasterized]",
+      "source_bbox": [
+        1754,
+        145,
+        1997,
+        235
+      ],
+      "source_mask_pixels": 19550,
+      "source_centroid": [
+        1869.9976982097187,
+        188.79626598465472
+      ],
+      "family": "green",
+      "style_group": "regular_diff",
+      "shear": 0.0,
+      "cell": "detached",
+      "fill_rgba": [
+        0,
+        179,
+        96,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        10,
+        57,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "font_size": 73,
+      "outer_stroke_px": 7,
+      "navy_stroke_px": 5,
+      "localized_bbox": [
+        1798,
+        147,
+        1941,
+        231
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "anchor": [
+        1798,
+        147
+      ],
+      "source_width": 243,
+      "source_height": 90,
+      "localized_width": 143,
+      "localized_height": 84,
+      "delta_left": 44,
+      "delta_right": 56,
+      "delta_top": 2,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "static_qa": {
+    "elements_total": 9,
+    "bbox_size_positive_margin": "9/9 PASS",
+    "clean_changed_outside_repair_scope": 0,
+    "repair_extra_pixels": 2427,
+    "repair_extra_outside_source_bboxes": 0,
+    "manual_clean_missing_alpha_by_main_label": {
+      "diverge_main": 0,
+      "left_main": 0,
+      "right_main": 0,
+      "easy_main": 0,
+      "hard_main": 0
+    },
+    "clean_component_by_key": {
+      "diverge_main": "Erase Left and Right and Diverge",
+      "left_main": "Erase Left and Right and Diverge",
+      "right_main": "Erase Left and Right and Diverge",
+      "easy_main": "BasicFix-vs-Layer43 erase-delta + Telea r9",
+      "hard_main": "BasicFix-vs-Layer43 erase-delta + Telea r9"
+    },
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "localized_pixels_outside_exact_source_bboxes": 0,
+    "localized_overlap_pixels": 0,
+    "dds_roundtrip": "PASS",
+    "status": "PASS"
+  },
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+  "candidate_sha256": "f429d9201100f1cbd2570f4dc5d1e1a8f8f64e33a6b0cf8d83e5dff82f9fe703",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "A129_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

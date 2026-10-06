@@ -1,0 +1,17 @@
+{
+  "role": "A",
+  "run": "20261006-A-WORKSTEAL129-33491F83-ERASE-DELTA-INPAINT",
+  "queue_index": 62,
+  "asset": "33491F83",
+  "work_stolen_from_lane": "B",
+  "source_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+  "candidate_sha256": "f429d9201100f1cbd2570f4dc5d1e1a8f8f64e33a6b0cf8d83e5dff82f9fe703",
+  "psd_layered_source": true,
+  "elements": 9,
+  "bbox_size_positive_margin": "9/9 PASS",
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "report": "localization/graphics/role_A/20261006-A-WORKSTEAL129-33491F83-ERASE-DELTA-INPAINT/A129_33491F83_REPORT.json",
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED"
+}
