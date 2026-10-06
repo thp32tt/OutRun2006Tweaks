@@ -698,6 +698,19 @@ require(
     "LastClassicAdvanceMs = 0;",
 )
 
+direct_host_destroy = body(
+    host_passthrough, "inline XrResult XRAPI_CALL DestroySession("
+)
+require_order(
+    direct_host_destroy,
+    "D3D9Ex direct-host transactional session teardown",
+    "const XrResult result =",
+    "OutRunVrSbsCaptureOverride::DestroySession(session);",
+    "if (XR_SUCCEEDED(result))",
+    "ResetR13HostState();",
+    "return result;",
+)
+
 # R24 flat recovery may reuse an older SafeEye frame, but only inside the
 # currently live DirectGPU transport/game run. This preserves same-run visual
 # recovery without reviving prior-process or pre-reset eye content.

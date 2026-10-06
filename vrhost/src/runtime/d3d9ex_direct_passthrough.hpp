@@ -873,8 +873,11 @@ namespace OutRunVrD3D9ExDirectPassthrough
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session)
     {
-        ResetR13HostState();
-        return OutRunVrSbsCaptureOverride::DestroySession(session);
+        const XrResult result =
+            OutRunVrSbsCaptureOverride::DestroySession(session);
+        if (XR_SUCCEEDED(result))
+            ResetR13HostState();
+        return result;
     }
 }
 
