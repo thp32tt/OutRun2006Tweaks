@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "B222R",
+  "queue_index": 94,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+  "candidate_sha256": "c36da00d6fa421180f6017fd188e9de783a35eb57a6dcc4927039c663aeee905",
+  "report": "localization/graphics/role_B/20261007-B-MANUALQA222R-2DA43E41/B222R_2DA43E41_REPORT.json",
+  "status": "B222R_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "runtime_validation": "UNTESTED"
+}

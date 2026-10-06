@@ -1,0 +1,880 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B222R",
+  "queue_index": 94,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+  "trigger": "B222_CONTROLLER_VISUAL_QA_RETRY_SOURCE_RESIDUE_FIX",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/007_q094_2DA43E41.jpg",
+  "prior_c_status": "C_USERPOLICY02_PASS_PENDING_INGAME",
+  "defects": [
+    "MULTIROW_TEXT_HIERARCHY_UNDERSIZED",
+    "VIEW_CHANGE_RIGHT_SLANT_STYLE_MISMATCH",
+    "EXPERT_RIGHT_SLANT_AND_WIDTH_MISMATCH",
+    "SPECIAL_COURSE_RIGHT_SLANT_AND_WIDTH_MISMATCH"
+  ],
+  "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+  "c90_before_sha256": "dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae",
+  "retry_before_sha256": "dbe9ddebf1d4114d764169cd41495ff08a3aaab80190af4cdc0be526ace62af0",
+  "candidate_sha256": "c36da00d6fa421180f6017fd188e9de783a35eb57a6dcc4927039c663aeee905",
+  "method": "exact pinned 4096x4096 RGBA32 source; B222 controller visual-QA retry clears all alpha in each of 7 independently measured source text/effect bboxes before fresh Korean composition, eliminating historical partial-clean residue; fresh native Noto Sans CJK KR Black at final atlas resolution; source-derived palettes; fresh-raster horizontal family shaping; explicit readable right shear only on source-italic rows; preserved 4 acceptable localized rows pixel-exact outside selected bboxes",
+  "reworked_keys": [
+    "course_or2",
+    "course_sp",
+    "max_speed",
+    "handling",
+    "view_change",
+    "expert",
+    "special_course"
+  ],
+  "preserved_keys": [
+    "wait_other",
+    "wait_now",
+    "acceleration",
+    "single_play"
+  ],
+  "rows": [
+    {
+      "key": "course_or2",
+      "source": "OutRun2 · 15 Continuous Course has been selected.",
+      "korean": [
+        "OutRun2 · 15코스 연속이",
+        "선택되었습니다."
+      ],
+      "source_bbox": [
+        115,
+        192,
+        2056,
+        448
+      ],
+      "source_size": [
+        1941,
+        256
+      ],
+      "prior_localized_bbox": [
+        569,
+        207,
+        1645,
+        429
+      ],
+      "prior_size": [
+        1076,
+        222
+      ],
+      "localized_bbox": [
+        289,
+        208,
+        1881,
+        431
+      ],
+      "localized_size": [
+        1592,
+        223
+      ],
+      "margins": [
+        174,
+        175,
+        16,
+        17
+      ],
+      "localized_width_source_ratio": 0.8202,
+      "localized_height_source_ratio": 0.8711,
+      "style": {
+        "font_size": 112,
+        "stroke": 5,
+        "palette": {
+          "light": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "dark": [
+            0,
+            10,
+            57,
+            255
+          ],
+          "orange": [
+            247,
+            186,
+            24,
+            255
+          ],
+          "red": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "blue": [
+            48,
+            56,
+            94,
+            255
+          ],
+          "yellow": [
+            247,
+            186,
+            24,
+            255
+          ],
+          "cyan": [
+            138,
+            143,
+            164,
+            255
+          ]
+        },
+        "target_width_ratio": 0.82,
+        "second_width_ratio": 0.48,
+        "slant": 0.0
+      },
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_target_bbox": [
+        301,
+        208,
+        1881,
+        429
+      ],
+      "decoded_containment": "PASS"
+    },
+    {
+      "key": "course_sp",
+      "source": "OutRun2: SP · 15 Continuous Course has been selected.",
+      "korean": [
+        "OutRun2: SP · 15코스 연속이",
+        "선택되었습니다."
+      ],
+      "source_bbox": [
+        132,
+        488,
+        2078,
+        717
+      ],
+      "source_size": [
+        1946,
+        229
+      ],
+      "prior_localized_bbox": [
+        456,
+        496,
+        1754,
+        709
+      ],
+      "prior_size": [
+        1298,
+        213
+      ],
+      "localized_bbox": [
+        307,
+        492,
+        1903,
+        713
+      ],
+      "localized_size": [
+        1596,
+        221
+      ],
+      "margins": [
+        175,
+        175,
+        4,
+        4
+      ],
+      "localized_width_source_ratio": 0.8201,
+      "localized_height_source_ratio": 0.9651,
+      "style": {
+        "font_size": 111,
+        "stroke": 5,
+        "palette": {
+          "light": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "dark": [
+            0,
+            10,
+            57,
+            255
+          ],
+          "orange": [
+            247,
+            186,
+            24,
+            255
+          ],
+          "red": [
+            150,
+            25,
+            35,
+            255
+          ],
+          "blue": [
+            48,
+            56,
+            94,
+            255
+          ],
+          "yellow": [
+            247,
+            186,
+            24,
+            255
+          ],
+          "cyan": [
+            138,
+            143,
+            164,
+            255
+          ]
+        },
+        "target_width_ratio": 0.82,
+        "second_width_ratio": 0.48,
+        "slant": 0.0
+      },
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_target_bbox": [
+        307,
+        492,
+        1903,
+        713
+      ],
+      "decoded_containment": "PASS"
+    },
+    {
+      "key": "max_speed",
+      "source": "最高速:",
+      "korean": "최고 속도:",
+      "source_bbox": [
+        3827,
+        319,
+        4018,
+        410
+      ],
+      "source_size": [
+        191,
+        91
+      ],
+      "prior_localized_bbox": [
+        3829,
+        340,
+        4015,
+        388
+      ],
+      "prior_size": [
+        186,
+        48
+      ],
+      "localized_bbox": [
+        3829,
+        326,
+        4016,
+        402
+      ],
+      "localized_size": [
+        187,
+        76
+      ],
+      "margins": [
+        2,
+        2,
+        7,
+        8
+      ],
+      "localized_width_source_ratio": 0.9791,
+      "localized_height_source_ratio": 0.8352,
+      "style": {
+        "font_size": 77,
+        "outer_stroke": 1,
+        "inner_stroke": 0,
+        "fill": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "inner_color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outer_color": [
+          255,
+          0,
+          0,
+          255
+        ],
+        "palette": {
+          "light": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "dark": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "orange": [
+            255,
+            136,
+            136,
+            255
+          ],
+          "red": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "blue": [
+            28,
+            45,
+            155,
+            255
+          ],
+          "yellow": [
+            255,
+            136,
+            136,
+            255
+          ],
+          "cyan": [
+            45,
+            190,
+            235,
+            255
+          ]
+        },
+        "target_width_ratio": 0.96,
+        "slant": 0.0
+      },
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_target_bbox": [
+        3829,
+        326,
+        4016,
+        402
+      ],
+      "decoded_containment": "PASS"
+    },
+    {
+      "key": "handling",
+      "source": "ハンドリング:",
+      "korean": "핸들링:",
+      "source_bbox": [
+        1677,
+        896,
+        2112,
+        1050
+      ],
+      "source_size": [
+        435,
+        154
+      ],
+      "prior_localized_bbox": [
+        1731,
+        920,
+        2066,
+        1026
+      ],
+      "prior_size": [
+        335,
+        106
+      ],
+      "localized_bbox": [
+        1688,
+        907,
+        2100,
+        1039
+      ],
+      "localized_size": [
+        412,
+        132
+      ],
+      "margins": [
+        11,
+        12,
+        11,
+        11
+      ],
+      "localized_width_source_ratio": 0.9471,
+      "localized_height_source_ratio": 0.8571,
+      "style": {
+        "font_size": 135,
+        "outer_stroke": 2,
+        "inner_stroke": 0,
+        "fill": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "inner_color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outer_color": [
+          16,
+          16,
+          16,
+          255
+        ],
+        "palette": {
+          "light": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "dark": [
+            16,
+            16,
+            16,
+            255
+          ],
+          "orange": [
+            245,
+            165,
+            25,
+            255
+          ],
+          "red": [
+            150,
+            25,
+            35,
+            255
+          ],
+          "blue": [
+            28,
+            45,
+            155,
+            255
+          ],
+          "yellow": [
+            244,
+            213,
+            92,
+            255
+          ],
+          "cyan": [
+            45,
+            190,
+            235,
+            255
+          ]
+        },
+        "target_width_ratio": 0.88,
+        "slant": 0.0
+      },
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_target_bbox": [
+        1688,
+        907,
+        2100,
+        1039
+      ],
+      "decoded_containment": "PASS"
+    },
+    {
+      "key": "view_change",
+      "source": "View Change Button :",
+      "korean": "시점 변경 버튼:",
+      "source_bbox": [
+        3430,
+        998,
+        3896,
+        1102
+      ],
+      "source_size": [
+        466,
+        104
+      ],
+      "prior_localized_bbox": [
+        3434,
+        1023,
+        3890,
+        1098
+      ],
+      "prior_size": [
+        456,
+        75
+      ],
+      "localized_bbox": [
+        3432,
+        1007,
+        3894,
+        1092
+      ],
+      "localized_size": [
+        462,
+        85
+      ],
+      "margins": [
+        2,
+        2,
+        9,
+        10
+      ],
+      "localized_width_source_ratio": 0.9914,
+      "localized_height_source_ratio": 0.8173,
+      "style": {
+        "font_size": 80,
+        "outer_stroke": 4,
+        "inner_stroke": 1,
+        "fill": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "inner_color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outer_color": [
+          13,
+          17,
+          24,
+          255
+        ],
+        "palette": {
+          "light": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "dark": [
+            13,
+            17,
+            24,
+            255
+          ],
+          "orange": [
+            238,
+            126,
+            126,
+            255
+          ],
+          "red": [
+            222,
+            0,
+            0,
+            255
+          ],
+          "blue": [
+            51,
+            140,
+            178,
+            255
+          ],
+          "yellow": [
+            231,
+            231,
+            0,
+            255
+          ],
+          "cyan": [
+            119,
+            178,
+            204,
+            255
+          ]
+        },
+        "target_width_ratio": 0.9,
+        "slant": 0.26
+      },
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_target_bbox": [
+        3432,
+        1007,
+        3894,
+        1092
+      ],
+      "decoded_containment": "PASS"
+    },
+    {
+      "key": "expert",
+      "source": "For Expert Drivers",
+      "korean": "상급자용",
+      "source_bbox": [
+        2842,
+        1124,
+        3479,
+        1229
+      ],
+      "source_size": [
+        637,
+        105
+      ],
+      "prior_localized_bbox": [
+        2984,
+        1125,
+        3337,
+        1228
+      ],
+      "prior_size": [
+        353,
+        103
+      ],
+      "localized_bbox": [
+        2886,
+        1133,
+        3434,
+        1219
+      ],
+      "localized_size": [
+        548,
+        86
+      ],
+      "margins": [
+        44,
+        45,
+        9,
+        10
+      ],
+      "localized_width_source_ratio": 0.8603,
+      "localized_height_source_ratio": 0.819,
+      "style": {
+        "font_size": 77,
+        "outer_stroke": 6,
+        "inner_stroke": 3,
+        "fill": [
+          44,
+          52,
+          91,
+          255
+        ],
+        "inner_color": [
+          199,
+          50,
+          50,
+          255
+        ],
+        "outer_color": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "palette": {
+          "light": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "dark": [
+            0,
+            10,
+            57,
+            255
+          ],
+          "orange": [
+            245,
+            165,
+            25,
+            255
+          ],
+          "red": [
+            199,
+            50,
+            50,
+            255
+          ],
+          "blue": [
+            44,
+            52,
+            91,
+            255
+          ],
+          "yellow": [
+            244,
+            213,
+            92,
+            255
+          ],
+          "cyan": [
+            136,
+            141,
+            163,
+            255
+          ]
+        },
+        "target_width_ratio": 0.86,
+        "slant": 0.25
+      },
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_target_bbox": [
+        2886,
+        1133,
+        3434,
+        1219
+      ],
+      "decoded_containment": "PASS"
+    },
+    {
+      "key": "special_course",
+      "source": "Special Course",
+      "korean": "스페셜 코스",
+      "source_bbox": [
+        3137,
+        1279,
+        3879,
+        1403
+      ],
+      "source_size": [
+        742,
+        124
+      ],
+      "prior_localized_bbox": [
+        3227,
+        1280,
+        3781,
+        1402
+      ],
+      "prior_size": [
+        554,
+        122
+      ],
+      "localized_bbox": [
+        3189,
+        1290,
+        3827,
+        1392
+      ],
+      "localized_size": [
+        638,
+        102
+      ],
+      "margins": [
+        52,
+        52,
+        11,
+        11
+      ],
+      "localized_width_source_ratio": 0.8598,
+      "localized_height_source_ratio": 0.8226,
+      "style": {
+        "font_size": 93,
+        "outer_stroke": 6,
+        "inner_stroke": 3,
+        "fill": [
+          253,
+          203,
+          67,
+          255
+        ],
+        "inner_color": [
+          0,
+          10,
+          57,
+          255
+        ],
+        "outer_color": [
+          255,
+          244,
+          215,
+          255
+        ],
+        "palette": {
+          "light": [
+            255,
+            244,
+            215,
+            255
+          ],
+          "dark": [
+            0,
+            10,
+            57,
+            255
+          ],
+          "orange": [
+            253,
+            199,
+            55,
+            255
+          ],
+          "red": [
+            150,
+            25,
+            35,
+            255
+          ],
+          "blue": [
+            44,
+            52,
+            91,
+            255
+          ],
+          "yellow": [
+            253,
+            203,
+            67,
+            255
+          ],
+          "cyan": [
+            146,
+            150,
+            170,
+            255
+          ]
+        },
+        "target_width_ratio": 0.86,
+        "slant": 0.25
+      },
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_target_bbox": [
+        3189,
+        1290,
+        3827,
+        1392
+      ],
+      "decoded_containment": "PASS"
+    }
+  ],
+  "machine_qa": {
+    "bbox_size_positive_margin": "7/7 PASS",
+    "strict_clean_visible_alpha_inside_selected_bboxes": 0,
+    "strict_clean_changes_outside_selected_source_bboxes": 0,
+    "candidate_changes_outside_selected_source_bboxes": 0,
+    "alpha_changes_outside_selected_source_bboxes": 0,
+    "reworked_row_overlap_pixels": 0,
+    "header_128_exact": true,
+    "raw_mode": "RGBA",
+    "raw_orientation": "mirror_y",
+    "roundtrip": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_B222R_STRICT_SELECTED_BBOX_CLEAN_ZERO_VISIBLE_ALPHA",
+    "2_slant_direction": "PASS_SOURCE_UPRIGHT_OR_EXPLICIT_RIGHT_SHEAR_BY_ROW",
+    "3_no_unnecessary_undersizing": "PASS_SEVEN_FALSE_NEGATIVE_ROWS_HIERARCHY_RESTORED",
+    "4_source_weight_outline_shadow": "PASS_SOURCE_DERIVED_PALETTE_NATIVE_BLACK",
+    "5_no_clipping": "PASS_7_OF_7_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_CANDIDATE_CHANGE_OUTSIDE_SELECTED_EXACT_SOURCE_BBOXES",
+    "7_flip_y_raw": "PASS_RAW_EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER_RETRY_REVIEW"
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "B222R_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
