@@ -1,0 +1,176 @@
+{
+  "run": "20261006-A-USERJPG144-CLEANUP",
+  "qa": "A144_ORDERED_GATE_RAW_FLIPY_SUPPLEMENT",
+  "status": "RAW_AND_FLIPY_EVIDENCE_READY_PENDING_CONTROLLER_VISUAL_DECISION",
+  "asset_count": 16,
+  "assets": [
+    {
+      "number": 1,
+      "queue_index": 12,
+      "asset": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+      "sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
+      "width": 1024,
+      "height": 256,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 2,
+      "queue_index": 26,
+      "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+      "sha256": "0281b7b46b5c53598bab2bf4a01f65f391b166345710460c51791da8cf70d530",
+      "width": 2048,
+      "height": 2048,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 3,
+      "queue_index": 28,
+      "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+      "sha256": "aa0692a2918326a494c1b04837603313faac7bdd9b7f043d4b679a8e8b1493f9",
+      "width": 2048,
+      "height": 2048,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 4,
+      "queue_index": 30,
+      "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+      "sha256": "e2eccea39c4241477c5c9743e23ffb69d1cfe785f5186dbd992a865a917d6edc",
+      "width": 4096,
+      "height": 2048,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 5,
+      "queue_index": 32,
+      "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+      "sha256": "9e0b5dcd66b1aaeb031f60090d3c8f919cc59f7c6f8860602bcbc9990eb87867",
+      "width": 2048,
+      "height": 1024,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 6,
+      "queue_index": 34,
+      "asset": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+      "sha256": "590f868ac4b99addf1bf41a87de29498584b770e54649809f8398bb699aad467",
+      "width": 4096,
+      "height": 2048,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 7,
+      "queue_index": 36,
+      "asset": "textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+      "sha256": "e3854f79be83cdd5fac7e9af91ab8f2beb9707000a7c6abbc564c2ca443fa553",
+      "width": 4096,
+      "height": 4096,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 8,
+      "queue_index": 38,
+      "asset": "textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+      "sha256": "e3854f79be83cdd5fac7e9af91ab8f2beb9707000a7c6abbc564c2ca443fa553",
+      "width": 4096,
+      "height": 4096,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 9,
+      "queue_index": 43,
+      "asset": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+      "sha256": "a2b0db36e0283244037dccae5b65558a70d5b8547da245d92c840e0da3b3327c",
+      "width": 2048,
+      "height": 2048,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 10,
+      "queue_index": 44,
+      "asset": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "sha256": "8c6a390cbadae23beff263bb0eea4ca935643d591b45bac9ca474fa108e5a913",
+      "width": 2048,
+      "height": 2048,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 14,
+      "queue_index": 51,
+      "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+      "sha256": "3a046a8b695ee6b0a766fca223455616a45a9480b72e28b0c39ddf42821d0b6d",
+      "width": 4096,
+      "height": 2048,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 18,
+      "queue_index": 57,
+      "asset": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+      "sha256": "3dae27fdeb7d2cde6d440b45f1e94ddafe35a97fe749447fdf0f3974d5e90c16",
+      "width": 4096,
+      "height": 4096,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 19,
+      "queue_index": 59,
+      "asset": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+      "sha256": "cc8745c36a40422f747fd5ceb66f42f36d165292750765a506a8b1fcba7cb217",
+      "width": 2048,
+      "height": 512,
+      "format": "DXT5",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 20,
+      "queue_index": 61,
+      "asset": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+      "sha256": "fe1e7e7d264694c39f2bdbf50bb0a94ba15b88aea5b52873df4ceae749a8f95e",
+      "width": 4096,
+      "height": 4096,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 21,
+      "queue_index": 65,
+      "asset": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+      "sha256": "2b39cf005e79149890f0cfee605d29144d7d257e9cc9179b6c1f583ce393fce5",
+      "width": 2048,
+      "height": 2048,
+      "format": "\u0000\u0000\u0000\u0000",
+      "raw_flip_y_identity": "PASS"
+    },
+    {
+      "number": 22,
+      "queue_index": 86,
+      "asset": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+      "sha256": "e3631a376fbe9f35d5926c3668033f3f971298e686c5eb14b8a7321feeb7c513",
+      "width": 4096,
+      "height": 4096,
+      "format": "DXT5",
+      "raw_flip_y_identity": "PASS"
+    }
+  ],
+  "sheets": [
+    "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_RAW_FLIPY_SHEET_1.jpg",
+    "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_RAW_FLIPY_SHEET_2.jpg",
+    "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_RAW_FLIPY_SHEET_3.jpg",
+    "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_RAW_FLIPY_SHEET_4.jpg"
+  ],
+  "pjr001_orientation_proof": "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_PJR001_SOURCE_CANDIDATE_RAW_FLIPY.jpg",
+  "runtime_validation": "UNTESTED"
+}
