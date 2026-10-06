@@ -2647,3 +2647,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Machine QA PASS: 8/8 bbox+source-size+positive-margin; candidate/alpha changes outside selected exact source bboxes=0; protected-visible/Ferrari artwork changes=0; localized overlap=0; exact RGBA32 header/raw mirror_y roundtrip; C141 clean/full final validators PASS.
 - Controller SOURCE/C141/B225 full readable, 2x row-contact and SOURCE/B225 RAW review PASS: materially stronger menu hierarchy/readability without source residue, over-stretch, broken Hangul, clipping, overlap, protected-art damage, Ferrari damage, seam/halo or orientation regression.
 - Decision B225_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched. Evidence: localization/graphics/role_B/20261007-B-MANUALQA225-4D38BBB0/B225_CONTROLLER_FINAL_QA.json.
+
+
+## 2026-10-07 07:14 KST — A150 q139 313DB8CB PRE_INGAME hierarchy rework
+- Refreshed contract/queue/backlog/live HEAD and skipped all completed or fresh-C-pending A work. With no active A-owned P0/P1 material-production or C-returned REWORK, current PRE_INGAME English-original comparisons were reviewed.
+- Card #016 q139 313DB8CB exposed a C116 visual false negative: source TUNED 139x36 / NORMAL 174x36 versus Korean 튜닝 55x32 / 일반 58x32. Containment passed, but source-relative width hierarchy was visibly too weak under the newer ordered generation gate.
+- GitHub-hosted A150 worker run 37538999863 reused the exact A_PRODUCTION19 validated clean plate/source masks and native 2048x1024 RGBA32 geometry. Korean labels were rerendered as 튜닝 사양 / 일반 사양 with native Noto Sans CJK KR Black, heavy plain-white upright/centered source family. Candidate 50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7; final widths 121/120px, gains +66/+62px.
+- Machine QA: 2/2 bbox+source-size+positive-margin PASS; final mask validator PASS; changed/alpha outside=0; protected=0; exact header/raw mirror_y preserved.
+- Controller SOURCE/C116/A150 row/full/RAW visual review PASS: hierarchy materially improved, with no source residue, clipping, overlap, protected intrusion or orientation regression. Ordered generation gate 1-8 producer PASS.
+- Prior C116 is superseded for q139 because candidate bytes changed. Fresh independent C + regenerated PRE_INGAME English comparison/user review + actual-game validation remain required. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_A/20261007-A-MANUALQA150-313DB8CB/A150_CONTROLLER_SELF_QA.json`, `localization/graphics/role_A/20261007-A-MANUALQA150-313DB8CB/A150_313DB8CB_REPORT.json`.
