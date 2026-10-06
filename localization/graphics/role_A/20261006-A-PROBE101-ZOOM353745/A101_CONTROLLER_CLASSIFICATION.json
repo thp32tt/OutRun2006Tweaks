@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PROBE101-ZOOM353745",
+  "timestamp_kst": "2026-10-06T09:43:28+09:00",
+  "decision": "MIXED_BATCH_INDEX35_LOCALIZE_INDEX37_45_PRESERVE_ORIGINAL",
+  "source_commit": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "assets": {
+    "E989E3B7": {
+      "queue_index": 35,
+      "path": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+      "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+      "structure": "4096x4096 RGBA32 mip1 raw mirror_y",
+      "classification": "LOCALIZABLE_TEXT",
+      "segments": [
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭킹",
+          "occurrences": 2
+        }
+      ],
+      "candidate_required": true,
+      "producer_run": "20261006-A-PRODUCTION102-E989E3B7"
+    },
+    "515DCBB2": {
+      "queue_index": 37,
+      "path": "textures/load/spr_sprani_JENN_RANK_Exst/515DCBB2_1024x1024.dds",
+      "source_sha256": "71479df90571cc1546fd6b274888e123f73c960f2f4a0381f20cf667d4ea511b",
+      "structure": "1024x1024 DXT5 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "Jennifer character pose sprites only",
+        "no language-bearing text"
+      ],
+      "candidate_required": false
+    },
+    "1F77CB88": {
+      "queue_index": 45,
+      "path": "textures/load/spr_sprani_etc_cvt_Exst/1F77CB88_128x128.dds",
+      "source_sha256": "e57f4d36c34fc2f07881494438b4233ab60f7608d77431117873bafc04d64ed1",
+      "structure": "512x512 RGBA32 mip1 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "keyboard/function keycap legends F1/F2/Esc/Tab/Enter and directional arrows only",
+        "technical control legends preserved original"
+      ],
+      "candidate_required": false
+    }
+  },
+  "controller_visual_qa": {
+    "readable_orientation": "PASS_3_OF_3",
+    "raw_mirror_y_orientation": "PASS_3_OF_3",
+    "preserve_original_indices": [
+      37,
+      45
+    ]
+  },
+  "evidence": [
+    "A101_E989E3B7_READABLE_PROOF.jpg",
+    "A101_515DCBB2_READABLE_PROOF.jpg",
+    "A101_1F77CB88_READABLE_PROOF.jpg"
+  ],
+  "status": "A101_CLASSIFICATION_COMPLETE_A102_PRODUCTION_COMPLETE_FOR_INDEX35",
+  "runtime_validation": "INDEX35_UNTESTED_INDEX37_45_NOT_REQUIRED_FOR_LOCALIZATION",
+  "vr_ffb_dx11_dxvk_touched": false
+}
