@@ -1,6 +1,7 @@
 // R33 final dispatch + post-review hot-path hardening.
 //
-// R32 owns hook-free direct-transport review-2 safety plus Reset/Present helpers.
+// R32 owns hook-free direct-transport review-2 safety plus Reset/Present helpers
+// and no longer has an async install/status shim.
 // R33 is the sole upper physical Reset/Present/DirectGPU/draw dispatcher:
 // Reset hooks R22, Present/DirectGPU hook R13, and draws hook R30 while lower
 // owner semantics stay intact.
@@ -1019,13 +1020,17 @@ namespace OutRunVRStereo
             using State = OutRunVR::RuntimeEligibility::InstallState;
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const auto r32 = R32InstallStatus();
-                if (r32 == State::Failed)
+                const auto r31 = R31InstallStatus();
+                const auto r22 = R22InstallStatus();
+                const auto r13 = R13InstallStatus();
+                if (r31 == State::Failed || r22 == State::Failed ||
+                    r13 == R13InstallStatusValue::Failed)
                 {
                     R33ReportInstallResult(false);
                     return 0;
                 }
-                if (r32 == State::Ready)
+                if (r31 == State::Ready && r22 == State::Ready &&
+                    r13 == R13InstallStatusValue::Ready)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
                     R33ResetR22Hook = safetyhook::create_inline(
@@ -1069,7 +1074,7 @@ namespace OutRunVRStereo
 
                     R33ReportInstallResult(true);
                     spdlog::info(
-                        "VR R33 DISPATCH: final Reset/Present/DirectGPU/draw physical ownership READY; R32 is hook-free functional owner; top-level telemetry counted once when enabled; direct R22 Reset + direct R13 Present/DirectGPU + R30 draw dispatch ACTIVE");
+                        "VR R33 DISPATCH: final Reset/Present/DirectGPU/draw physical ownership READY; R32 is hook-free functional owner with no async install shim; top-level telemetry counted once when enabled; direct R31/R22/R13 prerequisite ownership + R22 Reset + R13 Present/DirectGPU + R30 draw dispatch ACTIVE");
                     return 0;
                 }
                 Sleep(25);
