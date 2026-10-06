@@ -92,9 +92,11 @@ for sp in specs:
     # Isolate the complete source glyph/effect footprint as every non-sign-red
     # pixel inside the red sign interior. This captures pale fill, orange shadow,
     # AA fringe and source-shaped effect pixels without swallowing the white rim.
-    sign_red=(r>125) & (r>g+45) & (r>b+30) & (g<105) & (b<120)
+    sign_red=(r>140) & (r>g+65) & (r>b+35) & (g<72) & (b<120)
     interior=ndimage.binary_erosion(banner,iterations=1,border_value=0)
-    effect=interior & ~sign_red
+    bright=interior & (r>150) & (g>90) & (b>55)
+    near=ndimage.binary_dilation(bright,iterations=4)
+    effect=interior & ~sign_red & near
     effect=ndimage.binary_dilation(effect,iterations=1) & interior
 
     elab,en=ndimage.label(effect)
@@ -144,7 +146,7 @@ for row,sm in zip(rows,source_masks):
 clean_arr=sa.copy()
 rr0=sa[:,:,0].astype(np.int16); gg0=sa[:,:,1].astype(np.int16); bb0=sa[:,:,2].astype(np.int16)
 for row,sm,bm in zip(rows,source_masks,banner_masks):
-    red_donor=bm & ~sm & (rr0>125) & (rr0>gg0+45) & (rr0>bb0+30) & (gg0<105) & (bb0<120)
+    red_donor=bm & ~sm & (rr0>140) & (rr0>gg0+65) & (rr0>bb0+35) & (gg0<72) & (bb0<120)
     if int(red_donor.sum())<80:
         raise RuntimeError(("red donor too small",row["key"],int(red_donor.sum())))
     _,inds=ndimage.distance_transform_edt(~red_donor,return_indices=True)
