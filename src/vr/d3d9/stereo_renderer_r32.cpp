@@ -11,7 +11,6 @@ namespace OutRunVRStereo
 {
     namespace
     {
-        SafetyHookInline R32ResetR22Hook{};
         SafetyHookInline R32ResolveDirectR13Hook{};
 
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R32InstallState{
@@ -739,14 +738,15 @@ namespace OutRunVRStereo
             }
         }
 
-        HRESULT __stdcall ResetDestR32(IDirect3DDevice9* device,
-            D3DPRESENT_PARAMETERS* params)
+        template <typename LowerReset>
+        HRESULT R32WithResetLifecycle(IDirect3DDevice9* device,
+            LowerReset&& lowerReset) noexcept
         {
             const bool gameDevice = IsGameDevice(device);
             if (gameDevice)
                 R32ClearPendingProducerFences();
 
-            const HRESULT hr = R32ResetR22Hook.stdcall<HRESULT>(device, params);
+            const HRESULT hr = lowerReset();
             if (gameDevice)
             {
                 if (SUCCEEDED(hr))
@@ -907,13 +907,11 @@ namespace OutRunVRStereo
         void R32RollbackHooks() noexcept
         {
             R32ResolveDirectR13Hook = {};
-            R32ResetR22Hook = {};
         }
 
         bool R32EnableHooks() noexcept
         {
             SafetyHookInline* hooks[]{
-                &R32ResetR22Hook,
                 &R32ResolveDirectR13Hook
             };
             for (auto* hook : hooks)
@@ -942,8 +940,6 @@ namespace OutRunVRStereo
                     r13 == R13InstallStatusValue::Ready)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
-                    R32ResetR22Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&ResetDestR22), ResetDestR32, disabled);
                     R32ResolveDirectR13Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&ResolveDirectTransportR13),
                         ResolveDirectTransportR32, disabled);
@@ -955,14 +951,14 @@ namespace OutRunVRStereo
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR32Review", false);
                         spdlog::error(
-                            "VR R32: Reset/DirectGPU hook transaction was partial; R30 draw + R31 StateBlock/R22 lifecycle remain authoritative");
+                            "VR R32: DirectGPU hook transaction was partial; R30 draw + R31 StateBlock/R22 lifecycle remain authoritative");
                         return 0;
                     }
 
                     R32InstallState.store(State::Ready, std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", true);
                     spdlog::info(
-                        "VR R32 REVIEW2: Reset/DirectGPU physical hooks + Present telemetry owner helper + fail-closed helpers + cached D3D9Ex interop + pending-fence-safe producer ring READY; R33 owns Present/draw dispatch");
+                        "VR R32 REVIEW2: DirectGPU physical hook + Reset/Present owner helpers + fail-closed helpers + cached D3D9Ex interop + pending-fence-safe producer ring READY; R33 owns Reset/Present/draw dispatch");
                     return 0;
                 }
                 Sleep(25);
