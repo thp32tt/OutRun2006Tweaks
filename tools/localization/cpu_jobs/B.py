@@ -37,19 +37,29 @@ def load_dds(p):
     b=Path(p).read_bytes()
     if b[:4]!=b"DDS ": raise RuntimeError("not DDS")
     h=struct.unpack_from("<I",b,12)[0]; w=struct.unpack_from("<I",b,16)[0]
-    pitch=struct.unpack_from("<I",b,20)[0]; mips=struct.unpack_from("<I",b,28)[0]
-    fourcc=b[84:88]; bpp=struct.unpack_from("<I",b,88)[0]; masks=struct.unpack_from("<IIII",b,92)
-    if not (w==1024 and h==1024 and pitch==4096 and mips==1 and fourcc==b"\0\0\0\0" and bpp==32 and len(b)==128+w*h*4):
-        raise RuntimeError(("dds structure",w,h,pitch,mips,fourcc,bpp,len(b),masks))
-    if masks==(0xff,0xff00,0xff0000,0xff000000): mode="RGBA"
-    elif masks==(0xff0000,0xff00,0xff,0xff000000): mode="BGRA"
-    else: raise RuntimeError(("unsupported masks",masks))
-    raw=Image.frombytes("RGBA",(w,h),b[128:],"raw",mode)
+    linear=struct.unpack_from("<I",b,20)[0]; mips=struct.unpack_from("<I",b,28)[0]
+    fourcc=b[84:88]
+    if not (w==1024 and h==1024 and fourcc==b"DXT3" and len(b)==128+w*h):
+        raise RuntimeError(("dds structure",w,h,linear,mips,fourcc,len(b)))
+    raw=Image.open(p).convert("RGBA")
     readable=raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-    return b[:128],readable,{"width":w,"height":h,"pitch":pitch,"mips":mips,"bpp":bpp,"masks":[hex(x) for x in masks],"raw_mode":mode}
+    return b[:128],readable,{
+      "width":w,"height":h,"linear_size":linear,"mips":mips,
+      "fourcc":"DXT3","compression":"BC2/DXT3","raw_mode":"DXT3"
+    }
 
 def write_dds(header,readable,p,mode):
-    payload=header+readable.transpose(Image.Transpose.FLIP_TOP_BOTTOM).tobytes("raw",mode)
+    if mode!="DXT3": raise RuntimeError(("unexpected mode",mode))
+    raw=readable.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+    temp=Path("/tmp/B209_encode_dxt3.dds")
+    raw.save(temp,format="DDS",pixel_format="DXT3")
+    encoded=temp.read_bytes()
+    if encoded[:4]!=b"DDS " or encoded[84:88]!=b"DXT3":
+        raise RuntimeError(("Pillow did not emit DXT3",encoded[84:88]))
+    expected=readable.width*readable.height
+    if len(encoded)!=128+expected:
+        raise RuntimeError(("encoded DXT3 size drift",len(encoded),128+expected))
+    payload=header+encoded[128:]
     Path(p).write_bytes(payload)
     return hashlib.sha256(payload).hexdigest()
 
