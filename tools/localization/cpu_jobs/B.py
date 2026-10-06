@@ -8,13 +8,13 @@ from scipy import ndimage
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("GitHub-hosted localization CPU worker / role B only")
 
-repo=Path.cwd(); run="20261006-B-PRODUCTION178-33491F83"
+repo=Path.cwd(); run="20261006-B-PRODUCTION179-33491F83-MASKS"
 out=repo/"localization/graphics/role_B"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset; candidate.parent.mkdir(parents=True,exist_ok=True)
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds"
-srcp=Path("/tmp/B178_33491F83.dds"); urllib.request.urlretrieve(url,srcp)
+srcp=Path("/tmp/B179_33491F83.dds"); urllib.request.urlretrieve(url,srcp)
 SOURCE_SHA="796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551"
 
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -35,11 +35,11 @@ atlas_cells=[
 ]
 # Coarse text-only controller windows. Main diagram windows exclude arrows/cones/road where possible.
 specs=[
- {"key":"diverge_main","source":"Diverge","ko":"분기","window":[450,5,850,120],"family":"yellow","white_outer":False},
- {"key":"left_main","source":"Left","ko":"좌측","window":[330,100,560,230],"family":"green","white_outer":True},
- {"key":"right_main","source":"Right","ko":"우측","window":[720,100,970,230],"family":"red","white_outer":True},
- {"key":"easy_main","source":"EASY","ko":"쉬움","window":[120,225,455,365],"family":"green","white_outer":True},
- {"key":"hard_main","source":"HARD","ko":"어려움","window":[835,225,1145,365],"family":"red","white_outer":True},
+ {"key":"diverge_main","source":"Diverge","ko":"분기","window":[450,5,850,105],"family":"yellow","white_outer":False},
+ {"key":"left_main","source":"Left","ko":"좌측","window":[330,115,560,220],"family":"green","white_outer":True},
+ {"key":"right_main","source":"Right","ko":"우측","window":[720,115,970,220],"family":"red","white_outer":True},
+ {"key":"easy_main","source":"EASY","ko":"쉬움","window":[120,240,455,365],"family":"green","white_outer":True},
+ {"key":"hard_main","source":"HARD","ko":"어려움","window":[835,240,1145,365],"family":"red","white_outer":True},
  {"key":"hard_arrow","source":"HARD","ko":"어려움","window":[1360,5,1660,120],"family":"red","white_outer":True},
  {"key":"easy_arrow","source":"EASY","ko":"쉬움","window":[1360,135,1660,248],"family":"green","white_outer":True},
  {"key":"hard_alone","source":"HARD","ko":"어려움","window":[1730,5,2025,120],"family":"red","white_outer":True},
@@ -77,12 +77,12 @@ for sp in specs:
     for area,c in comps: seed|=c
     # Grow from fill through nearby visible pixels to capture navy/white outline + AA,
     # but cap growth to 14px so unrelated road/arrow art cannot bridge in.
-    grow=ndimage.binary_dilation(seed,iterations=14)
+    grow=ndimage.binary_dilation(seed,iterations=11)
     mlocal=grow & (sub[:,:,3]>8)
     # Require every kept pixel to be close to seed; this rejects a background component
     # that merely enters the window away from the lettering.
     dist=ndimage.distance_transform_edt(~seed)
-    mlocal &= (dist<=14.5)
+    mlocal &= (dist<=11.5)
     m=np.zeros((H,W),bool); m[y0:y1,x0:x1]=mlocal
     bb=bbox(m)
     if bb is None: raise RuntimeError(("empty mask",sp["key"]))
@@ -181,10 +181,10 @@ if outside or alpha_out or protected_changed or introduced or residue:
     raise RuntimeError(("static gate",outside,alpha_out,protected_changed,introduced,residue))
 
 # Evidence.
-src.save(out/"B178_SOURCE_READABLE.png"); clean.save(out/"B178_CLEAN_PLATE.png"); dec.save(out/"B178_FINAL_READABLE.png")
-Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"B178_SOURCE_TEXT_MASK.png")
-Image.fromarray((protected_visible.astype(np.uint8)*255),"L").save(out/"B178_PROTECTED_MASK.png")
-Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"B178_TARGET_MASK.png")
+src.save(out/"B179_SOURCE_READABLE.png"); clean.save(out/"B179_CLEAN_PLATE.png"); dec.save(out/"B179_FINAL_READABLE.png")
+Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"B179_SOURCE_TEXT_MASK.png")
+Image.fromarray((protected_visible.astype(np.uint8)*255),"L").save(out/"B179_PROTECTED_MASK.png")
+Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"B179_TARGET_MASK.png")
 
 def comp(im,bg=(235,235,235,255)):
     z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
@@ -198,18 +198,18 @@ cards=[card("SOURCE",src,crop,1),card("CLEAN",clean,crop,1),card("FINAL",dec,cro
 mw=max(c.width for c in cards); mh=sum(c.height for c in cards)+8*2
 sheet=Image.new("RGB",(mw,mh),"white"); yy=0
 for c in cards:sheet.paste(c,(0,yy));yy+=c.height+8
-sheet.thumbnail((2200,1600),Image.Resampling.LANCZOS); sheet.save(out/"B178_SOURCE_CLEAN_FINAL_TOP_CONTACT.jpg",quality=97)
+sheet.thumbnail((2200,1600),Image.Resampling.LANCZOS); sheet.save(out/"B179_SOURCE_CLEAN_FINAL_TOP_CONTACT.jpg",quality=97)
 
 full=Image.new("RGB",(2048,comp(src).height*3+68),"white")
 yy=0
 for label,im in [("SOURCE",src),("CLEAN",clean),("FINAL",dec)]:
     c=card(label,im,(0,0,W,H),1); c.thumbnail((2048,700),Image.Resampling.LANCZOS); full.paste(c,(0,yy)); yy+=c.height+4
-full=full.crop((0,0,2048,yy)); full.save(out/"B178_FULL_SOURCE_CLEAN_FINAL.jpg",quality=95)
+full=full.crop((0,0,2048,yy)); full.save(out/"B179_FULL_SOURCE_CLEAN_FINAL.jpg",quality=95)
 rawsrc=Image.open(srcp).convert("RGBA"); rawfin=Image.open(candidate).convert("RGBA")
 rs=Image.new("RGB",(2048,0+2*(H+30)+8),"white"); yy=0
 for label,im in [("SOURCE_RAW",rawsrc),("FINAL_RAW",rawfin)]:
     c=card(label,im,(0,0,W,H),1); rs.paste(c,(0,yy)); yy+=c.height+8
-rs.thumbnail((2200,1500),Image.Resampling.LANCZOS); rs.save(out/"B178_RAW_CONTACT.jpg",quality=95)
+rs.thumbnail((2200,1500),Image.Resampling.LANCZOS); rs.save(out/"B179_RAW_CONTACT.jpg",quality=95)
 
 report={
  "schema_version":1,"role":"B","run":run,
@@ -229,12 +229,13 @@ report={
    "source_residue_pixels":residue,"localized_overlap":0,"status":"PASS"},
  "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","runtime_validation":"UNTESTED",
- "status":"B178_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"B179_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "superseded_attempt":{"run":"B178","workflow_run_id":37394363639,"result":"FAIL_CLOSED_SOURCE_TEXT_MASK_OVERLAP_NO_CANDIDATE","repair":"non-overlapping main text windows plus tighter 11px source-effect growth"},
  "no_vr_ffb_dx11_dxvk_work":True
 }
-(out/"B178_33491F83_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"B178_33491F83.json").write_text(json.dumps({
+(out/"B179_33491F83_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"B179_33491F83.json").write_text(json.dumps({
  "role":"B","run":run,"queue_index":62,"asset":"33491F83","source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,
- "report":str((out/"B178_33491F83_REPORT.json").relative_to(repo)),
+ "report":str((out/"B179_33491F83_REPORT.json").relative_to(repo)),
  "status":"WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("B178_DONE",cand_sha,[(r["key"],r["source_bbox"],r["localized_bbox"]) for r in rows])
+print("B179_DONE",cand_sha,[(r["key"],r["source_bbox"],r["localized_bbox"]) for r in rows])
