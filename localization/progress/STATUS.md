@@ -1992,4 +1992,14 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - The sequence now applies during construction, not only after rendering. Any failed step forces regeneration before producer PASS; numeric bbox/mask PASS cannot override a visual failure.
 - Contract and quality pipeline were updated so A/B generation and C return-to-REWORK behavior inherit the rule on subsequent runs.
 - Policy-only change: no DDS candidate bytes or runtime code changed; `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+## 2026-10-06 22:31 KST — A144 user-JPG rework producer pass after visual-gate retry
+
+- Consumed the existing A144 hosted-worker output for the 16 A-owned PJR rows (#001-010, #014, #018-022) instead of repeating already completed A143/runtime work.
+- Controller visual QA rejected the first A144 material-output commit because the worker's font probe silently accepted a DejaVu fallback and rendered Korean as tofu boxes. Numeric/material-output status did not override the visible failure.
+- Fixed the worker to require the actual Noto Sans CJK KR TTC face and reran on GitHub-hosted compute. Corrected candidate commit: 57485abbf79cb1ff03325aa312fe85e1103b5f20.
+- Added hosted decoded RAW + FLIP-Y evidence for all 16 candidates; worker commit 5d5a1d1fffe8275e40e2572a32e37f5c491da028. Controller reviewed all four sheets plus the dedicated PJR-001 English-source/candidate orientation proof.
+- Ordered REWORK construction gate 1-8: PASS at producer level. PJR-001 source RAW and Korean RAW are both storage-inverted while both FLIP-Y views are readable, confirming orientation alignment. Total Rank family, navigation labels, NEXT MISSION, girlfriend line, C4A/392/C598 families are readable in the corrected evidence with no tofu regression.
+- Shared queue/backlog now advances these 16 rows only to producer-static-pass pending fresh independent C, renewed English-original/user JPG review, and NEW actual-game retest. No row is closed and no C approval is claimed.
+- RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_CONTROLLER_FINAL_QA.json.
 

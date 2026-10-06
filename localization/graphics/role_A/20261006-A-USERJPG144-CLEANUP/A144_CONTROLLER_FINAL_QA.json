@@ -1,0 +1,113 @@
+{
+  "run": "20261006-A-USERJPG144-CLEANUP",
+  "completed_at_kst": "2026-10-06 22:31 KST",
+  "producer_status": "A_REWORK_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C",
+  "queue_indices": [
+    12,
+    26,
+    28,
+    30,
+    32,
+    34,
+    36,
+    38,
+    43,
+    44,
+    51,
+    57,
+    59,
+    61,
+    65,
+    86
+  ],
+  "user_jpg_numbers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    14,
+    18,
+    19,
+    20,
+    21,
+    22
+  ],
+  "assets": [
+    "D6DC1380",
+    "63C91067",
+    "A05BF610",
+    "8215FD25",
+    "DCC7B488",
+    "B7E25BAD",
+    "06AB5CEE",
+    "6AB5CEE",
+    "455717B2",
+    "19CEDB9",
+    "FF2462BB",
+    "39229D64",
+    "7CE1CFC5",
+    "C4A2937B",
+    "EBEF6D20",
+    "C598919A"
+  ],
+  "candidate_sha256": {
+    "D6DC1380": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
+    "63C91067": "0281b7b46b5c53598bab2bf4a01f65f391b166345710460c51791da8cf70d530",
+    "A05BF610": "aa0692a2918326a494c1b04837603313faac7bdd9b7f043d4b679a8e8b1493f9",
+    "8215FD25": "e2eccea39c4241477c5c9743e23ffb69d1cfe785f5186dbd992a865a917d6edc",
+    "DCC7B488": "9e0b5dcd66b1aaeb031f60090d3c8f919cc59f7c6f8860602bcbc9990eb87867",
+    "B7E25BAD": "590f868ac4b99addf1bf41a87de29498584b770e54649809f8398bb699aad467",
+    "06AB5CEE": "e3854f79be83cdd5fac7e9af91ab8f2beb9707000a7c6abbc564c2ca443fa553",
+    "6AB5CEE": "e3854f79be83cdd5fac7e9af91ab8f2beb9707000a7c6abbc564c2ca443fa553",
+    "455717B2": "a2b0db36e0283244037dccae5b65558a70d5b8547da245d92c840e0da3b3327c",
+    "19CEDB9": "8c6a390cbadae23beff263bb0eea4ca935643d591b45bac9ca474fa108e5a913",
+    "FF2462BB": "3a046a8b695ee6b0a766fca223455616a45a9480b72e28b0c39ddf42821d0b6d",
+    "39229D64": "3dae27fdeb7d2cde6d440b45f1e94ddafe35a97fe749447fdf0f3974d5e90c16",
+    "7CE1CFC5": "cc8745c36a40422f747fd5ceb66f42f36d165292750765a506a8b1fcba7cb217",
+    "C4A2937B": "fe1e7e7d264694c39f2bdbf50bb0a94ba15b88aea5b52873df4ceae749a8f95e",
+    "EBEF6D20": "2b39cf005e79149890f0cfee605d29144d7d257e9cc9179b6c1f583ce393fce5",
+    "C598919A": "e3631a376fbe9f35d5926c3668033f3f971298e686c5eb14b8a7321feeb7c513"
+  },
+  "font": {
+    "family": "Noto Sans CJK KR",
+    "ttc_index": 1,
+    "fallback_forbidden": true
+  },
+  "first_worker_visual_failure": {
+    "commit": "5bd0324d1acb9ce8f9465bb4de282a28a7334e06",
+    "failure": "fc-match silently fell back to DejaVu and produced tofu boxes; machine/material-output status was rejected by controller visual QA"
+  },
+  "corrected_material_worker_commit": "57485abbf79cb1ff03325aa312fe85e1103b5f20",
+  "raw_flip_worker_commit": "5d5a1d1fffe8275e40e2572a32e37f5c491da028",
+  "ordered_generation_gate": {
+    "1_source_text_removed_and_plate_restored": "PASS",
+    "2_slant_direction_matches_source": "PASS",
+    "3_text_not_unnecessarily_undersized_and_within_source_bbox": "PASS",
+    "4_source_faithful_weight_outline_shadow": "PASS",
+    "5_no_clipped_pixels": "PASS",
+    "6_protected_graphics_vehicle_name_box_clearance": "PASS",
+    "7_raw_and_flip_y_visual_review": "PASS",
+    "8_immediate_readability_vs_english": "PASS"
+  },
+  "evidence": {
+    "material_report": "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A_USERJPG144_REWORK_REPORT.json",
+    "raw_flip_report": "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_RAW_FLIPY_QA.json",
+    "raw_flip_sheets": [
+      "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_RAW_FLIPY_SHEET_1.jpg",
+      "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_RAW_FLIPY_SHEET_2.jpg",
+      "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_RAW_FLIPY_SHEET_3.jpg",
+      "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_RAW_FLIPY_SHEET_4.jpg"
+    ],
+    "pjr001_orientation": "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_PJR001_SOURCE_CANDIDATE_RAW_FLIPY.jpg"
+  },
+  "independent_c": "PENDING",
+  "pre_ingame_user_jpg_review": "PENDING_AFTER_FRESH_C",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
