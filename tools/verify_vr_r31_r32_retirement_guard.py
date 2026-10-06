@@ -245,6 +245,7 @@ expected_owner_calls = {
     "R32RestoreRightPassState",
     "R32WithPresentTelemetry",
     "R32WithResetLifecycle",
+    "R32ResolveDirectTransport",
     "R32SetWvpBatch",
 }
 observed_owner_calls = set(re.findall(r"\b(R3[12]\w+)\s*\(", r33))
@@ -346,6 +347,17 @@ owner_evidence = {
          "R32ResetAfterGameReset();",
          "R32InvalidateResetCaches();",
          "++R32ResetFailures"),
+    ),
+    "R32ResolveDirectTransport": (
+        r32, "bool R32ResolveDirectTransport(",
+        ("R13OverlayReadyForTransport()",
+         "return lowerResolve();",
+         "R32EnsureDirectResources(device)",
+         "R32DrainPendingProducerFence(slotIndex)",
+         "R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted)",
+         "R32WaitProducerFence(slot.fence)",
+         "slot.producerPending = true;",
+         "ActiveDirectTransportSlot = slotIndex;"),
     ),
     "R32SetWvpBatch": (
         r32, "bool R32SetWvpBatch(",
@@ -530,9 +542,9 @@ require(
     "static bool LifecycleHooksReady() noexcept",
 )
 
-# 2) R32 retains only physical DirectGPU ownership plus Reset/Present owner
-# helpers and fail-close helpers. Its former physical Reset/Present/draw
-# overlays must be gone.
+# 2) R32 is now a hook-free functional owner for DirectGPU, Reset/Present,
+# fail-close and state helpers. All former physical Reset/Present/DirectGPU/draw
+# overlays must be gone; R33 is the sole upper physical dispatcher.
 forbid(
     r32,
     "R32",
@@ -551,14 +563,17 @@ forbid(
     "HRESULT __stdcall PresentDestR32(",
     "SafetyHookInline R32ResetR22Hook{};",
     "HRESULT __stdcall ResetDestR32(",
+    "SafetyHookInline R32ResolveDirectR13Hook{};",
+    "ResolveDirectTransportR32(",
+    "safetyhook::create_inline(",
 )
 require(
     r32,
     "R32 lifecycle owner",
-    "SafetyHookInline R32ResolveDirectR13Hook{};",
     "void R32ObserveFrameWorkload(",
     "HRESULT R32WithPresentTelemetry(",
     "HRESULT R32WithResetLifecycle(",
+    "bool R32ResolveDirectTransport(",
     "HRESULT R32LowerFailClosed(",
     "R32InstallStatus() noexcept",
     "R32EffectIsFragileLive(",
@@ -575,8 +590,8 @@ require(
     "const auto r13 = R13InstallStatus();",
     "r31 == State::Failed || r22 == State::Failed",
     "r31 == State::Ready && r22 == State::Ready",
-    "reinterpret_cast<void*>(&ResolveDirectTransportR13)",
-    "ResolveDirectTransportR32, disabled",
+    "R32InstallState.store(State::Ready",
+    "HookManager::ReportAsyncResult(\"OpenXRVRStereoR32Review\", true)",
 )
 forbid(
     r32_install,
@@ -591,6 +606,9 @@ forbid(
     "ResetDestR22",
     "ResetDestR32",
     "R32ResetR22Hook",
+    "ResolveDirectTransportR13",
+    "R32ResolveDirectR13Hook",
+    "safetyhook::create_inline(",
 )
 reset_lifecycle = function_body(r32, "HRESULT R32WithResetLifecycle(")
 require(
@@ -619,8 +637,19 @@ require(
     "R32FinalizeFramePerf(",
     "R32LogPerfWindow()",
 )
-resolve32 = function_body(r32, "bool ResolveDirectTransportR32(")
-require(resolve32, "R32 DirectGPU", "R32ResolveDirectR13Hook.call<bool>")
+resolve32 = function_body(r32, "bool R32ResolveDirectTransport(")
+require(
+    resolve32,
+    "R32 DirectGPU owner helper",
+    "R13OverlayReadyForTransport()",
+    "return lowerResolve();",
+    "R32EnsureDirectResources(device)",
+    "R32DrainPendingProducerFence(slotIndex)",
+    "R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted)",
+    "R32WaitProducerFence(slot.fence)",
+    "slot.producerPending = true;",
+    "ActiveDirectTransportSlot = slotIndex;",
+)
 lower_fail_closed = function_body(r32, "HRESULT R32LowerFailClosed(")
 require(
     lower_fail_closed,
