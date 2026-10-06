@@ -2680,3 +2680,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Current manifest contains 27 rows (26 localized candidates + 1 policy-preserved original). q139 313DB8CB is review #013 at localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/013_q139_313DB8CB.jpg.
 - #013 pins English source SHA 4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786 at native 2048x1024/display scale 1 and current A150 candidate SHA 50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7. Controller reopened the generated FLIP-Y/RAW card and verified the intended source/current pair.
 - q139 remains C226 static PASS pending user JPG review and actual in-game validation. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 08:34 KST — C227R q175 754F0599
+
+- Fresh C on A151 candidate `f21970a3d6d8ae69954d0159524856b5019cd1445daa65c55d85213f73e431f5`. GitHub-hosted corrected verifier run 37547071812 SUCCESS; C227's overlapping row windows were superseded by C227R without changing candidate bytes.
+- Machine PASS: exact canonical source bboxes restored; 3/3 bbox/size/positive-margin, outside/alpha/overlap/touch=0, exact BGRA header/raw mirror_y.
+- Controller SOURCE/CLEAN/FINAL + high-zoom + RAW visual FAIL: A151 fixed scale, slant and metallic effects, but the Korean glyph skeleton remains generic Noto block Hangul and does not match the source extended rounded techno family. Numeric PASS cannot override source-style-family mismatch.
+- Decision `C227R_REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH`. Preserve current geometry/scale/right-lean/effects and reconstruct source-like Korean letterform proportions/stroke character. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
