@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A101 resolved odd zoom-review indices 35/37/45: E989E3B7 contains Total Rank x2 and A102 produced native-HD candidate c0e76661... with 2/2 exact bbox/size/positive-margin and zero outside/alpha/residue/overlap/touch, controller visual PASS pending independent C+in-game; 515DCBB2 is character-only PRESERVE_ORIGINAL; 1F77CB88 is technical keyboard/control legends PRESERVE_ORIGINAL. Do not revisit these rows. Current next normal A blocked odd row is index103 590A4724 unless a higher-priority in-game/C-returned row appears.",
     "B177/B179 index62 33491F83: route labels are localizable (분기/좌측/우측/쉬움/어려움) but integrated with route artwork. B178/B179 both failed closed before candidate; manual artwork-aware clean reconstruction is required and protected gates must not be relaxed. Indices136/144 are positively classified preserve-original/no-localization. Latest completed B material remains B176 A8CE339F pending C.",
     "B176 index52 A8CE339F: zoom_review -> localize_text, native-HD DXT5 candidate d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8. B175 numeric PASS was controller-rejected for visible English fragments; B176 residue repair passes controller SOURCE/CLEAN/FINAL + raw. Pending independent C; do not repeat. Next B normal target even index62 33491F83 unless higher priority appears.",
     "A100 positively classified odd indices 29 F043316B, 31 A82266FC, and 33 FBCAB18D as NO_LOCALIZABLE_TEXT/PRESERVE_ORIGINAL from exact HD readable+raw evidence. Do not revisit them. Next normal A queue item is odd index35 E989E3B7 zoom_review unless a higher-priority in-game/C-returned row appears.",
@@ -5551,7 +5552,7 @@
     "report": "localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_IGR010_REPORT.json",
     "controller_report": "localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_CONTROLLER_SELF_QA.json"
   },
-  "current_blocked_zoom_review": 35,
+  "current_blocked_zoom_review": 28,
   "a98_zoom_review_4afc1bed": {
     "timestamp_kst": "2026-10-06T08:05:00+09:00",
     "queue_index": 25,
@@ -5678,5 +5679,28 @@
     "required_next": "Build an artwork-aware clean plate for the integrated route diagram before Korean lettering; do not clear a rectangular source bbox or relax protected-art gates.",
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "a101_zoom_review_353745": {
+    "timestamp_kst": "2026-10-06T09:43:28+09:00",
+    "indices": [
+      35,
+      37,
+      45
+    ],
+    "assets": {
+      "E989E3B7": "LOCALIZABLE_TOTAL_RANK_X2",
+      "515DCBB2": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "1F77CB88": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL"
+    },
+    "report": "localization/graphics/role_A/20261006-A-PROBE101-ZOOM353745/A101_CONTROLLER_CLASSIFICATION.json",
+    "status": "A101_CLASSIFICATION_COMPLETE"
+  },
+  "a102_e989e3b7": {
+    "timestamp_kst": "2026-10-06T09:43:28+09:00",
+    "queue_index": 35,
+    "candidate_sha256": "c0e76661ed974cb7c477f172e93fd67645391f1da3e81dcb867d86af3a595622",
+    "report": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_E989E3B7_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_CONTROLLER_SELF_QA.json",
+    "status": "A102_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME"
   }
 }
