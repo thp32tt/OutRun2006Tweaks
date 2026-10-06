@@ -108,7 +108,13 @@ def render(text,fs,fill):
     return tile
 
 MARGIN=2
-final=clean.copy(); target=np.zeros((H,W),bool); reports=[]
+final=src.copy()
+# Apply only the C135-validated clean pixels inside the four exact source
+# heading bboxes so every unrelated/explanatory source pixel remains exact.
+for _r in rows:
+    _x0,_y0,_x1,_y1=_r["bbox"]
+    final.paste(clean.crop((_x0,_y0,_x1,_y1)),(_x0,_y0))
+target=np.zeros((H,W),bool); reports=[]
 for r in rows:
     b=r["bbox"]; aw=b[2]-b[0]; ah=b[3]-b[1]; fill=sample_fill(r["old_bbox"])
     best=None
