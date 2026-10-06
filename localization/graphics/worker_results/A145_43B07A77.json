@@ -1,0 +1,10 @@
+{
+  "role": "A",
+  "run": "A145",
+  "queue_index": 89,
+  "asset": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+  "candidate_sha256": "741a05cb632e85a4fea783e51bb2f98678c0510f8b34fc7a73cc39c898c0749c",
+  "report": "localization/graphics/role_A/20261006-A-MANUALQA145-43B07A77/A145_43B07A77_REPORT.json",
+  "status": "A145_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "runtime_validation": "UNTESTED"
+}
