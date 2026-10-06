@@ -1,8 +1,8 @@
 // R33 final dispatch + post-review hot-path hardening.
 //
-// R32 owns reset/direct-transport review-2 safety plus Present telemetry.
-// R33 is the sole physical Present/draw dispatcher: Present hooks R13 directly
-// while Reset still chains through R32 and draws hook R30 directly.
+// R32 owns direct-transport review-2 safety plus Reset/Present owner helpers.
+// R33 is the sole upper physical Reset/Present/draw dispatcher: Reset hooks R22,
+// Present hooks R13, and draws hook R30 while lower owner semantics stay intact.
 // R33 owns depth/stencil write-state caching,
 // exact single-count draw dispatch, final raster replay preservation, and the
 // ResetEx replay-health guard previously implemented by a separate R34 hook
@@ -32,7 +32,7 @@ namespace OutRunVRStereo
 
     namespace
     {
-        SafetyHookInline R33ResetR32Hook{};
+        SafetyHookInline R33ResetR22Hook{};
         SafetyHookInline R33PresentR13Hook{};
         SafetyHookInline R33SetRenderStateR29Hook{};
         SafetyHookInline R33DrawPrimitiveR30Hook{};
@@ -862,7 +862,10 @@ namespace OutRunVRStereo
             D3DPRESENT_PARAMETERS* params)
         {
             const bool gameDevice = IsGameDevice(device);
-            const HRESULT hr = R33ResetR32Hook.stdcall<HRESULT>(device, params);
+            const HRESULT hr = R32WithResetLifecycle(
+                device, [&]() noexcept {
+                    return R33ResetR22Hook.stdcall<HRESULT>(device, params);
+                });
 
             if (gameDevice)
             {
@@ -876,7 +879,7 @@ namespace OutRunVRStereo
                 {
                     R33FirstResetLifecycleLogged = true;
                     spdlog::info(
-                        "VR R33 RESET: chained R33 -> R32 -> R22; R22 owns fail-close/baseline and R32 rearms caches only after successful Reset");
+                        "VR R33 RESET: R33 hooks R22 directly and preserves R32 reset lifecycle through its owner helper; R22 owns fail-close/baseline and R32 rearms caches only after successful Reset");
                 }
 
                 const bool healthy = SUCCEEDED(hr) &&
@@ -978,13 +981,13 @@ namespace OutRunVRStereo
             R33DrawPrimitiveR30Hook = {};
             R33SetRenderStateR29Hook = {};
             R33PresentR13Hook = {};
-            R33ResetR32Hook = {};
+            R33ResetR22Hook = {};
         }
 
         bool R33EnableHooks() noexcept
         {
             SafetyHookInline* hooks[]{
-                &R33ResetR32Hook,
+                &R33ResetR22Hook,
                 &R33PresentR13Hook,
                 &R33SetRenderStateR29Hook,
                 &R33DrawPrimitiveR30Hook,
@@ -1012,8 +1015,8 @@ namespace OutRunVRStereo
                 if (r32 == State::Ready)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
-                    R33ResetR32Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&ResetDestR32),
+                    R33ResetR22Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&ResetDestR22),
                         ResetDestR33, disabled);
                     R33PresentR13Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&PresentDestR13),
@@ -1039,7 +1042,7 @@ namespace OutRunVRStereo
                         R33RollbackHooks();
                         R33ReportInstallResult(false);
                         spdlog::error(
-                            "VR R33: final hook transaction was partial; R30 draw path and R32 Reset/DirectGPU remain authoritative");
+                            "VR R33: final hook transaction was partial; R30 draw path and R32 DirectGPU/R22 Reset lifecycle remain authoritative");
                         return 0;
                     }
 
@@ -1050,7 +1053,7 @@ namespace OutRunVRStereo
 
                     R33ReportInstallResult(true);
                     spdlog::info(
-                        "VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY; top-level telemetry counted once when enabled; corrected R32->R22 Reset lifecycle + depth/stencil cache ACTIVE");
+                        "VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY; top-level telemetry counted once when enabled; direct R22 Reset owner with preserved R32 reset lifecycle + depth/stencil cache ACTIVE");
                     return 0;
                 }
                 Sleep(25);
