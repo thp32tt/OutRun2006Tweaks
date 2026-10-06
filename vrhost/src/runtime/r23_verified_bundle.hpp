@@ -110,9 +110,29 @@ namespace OutRunVrR23VerifiedBundle
             nowMs - s.publishedAtMs <= MaxPresentationAgeMs;
     }
 
+    inline bool BelongsToCurrentProducerRun(const Snapshot& snapshot) noexcept
+    {
+        const std::uint32_t snapshotRunGeneration =
+            snapshot.frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        const std::uint32_t snapshotGamePid = snapshot.frame.clientPid;
+        if (!snapshotRunGeneration || !snapshotGamePid)
+            return false;
+
+        OutRunVR::SharedRenderFrameState latest{};
+        std::uint32_t publish = 0;
+        if (!OutRunVrFinalTest::ReadLatestFrame(latest, publish))
+            return false;
+
+        const std::uint32_t latestRunGeneration =
+            latest.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        return latestRunGeneration != 0 && latest.clientPid != 0 &&
+            snapshotRunGeneration == latestRunGeneration &&
+            snapshotGamePid == latest.clientPid;
+    }
+
     inline bool ReadFresh(Snapshot& out) noexcept
     {
-        return Read(out) && IsFresh(out);
+        return Read(out) && IsFresh(out) && BelongsToCurrentProducerRun(out);
     }
 
     inline bool Matches(const OutRunVR::SharedRenderFrameState& frame,

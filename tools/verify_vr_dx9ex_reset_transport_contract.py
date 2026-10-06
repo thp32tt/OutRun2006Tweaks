@@ -8,6 +8,7 @@ R7_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r7.inc"
 R13_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r13.cpp"
 R22_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r22.cpp"
 R32_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r32.cpp"
+HOST_BUNDLE_PATH = ROOT / "vrhost/src/runtime/r23_verified_bundle.hpp"
 HOST_CACHE_PATH = ROOT / "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp"
 HOST_PASSTHROUGH_PATH = ROOT / "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp"
 HOST_R23_RUNTIME_PATH = ROOT / "vrhost/src/runtime/r23_runtime_hardening.hpp"
@@ -79,6 +80,7 @@ r7 = load(R7_PATH)
 r13 = load(R13_PATH)
 r22 = load(R22_PATH)
 r32 = load(R32_PATH)
+host_bundle = load(HOST_BUNDLE_PATH)
 host_cache = load(HOST_CACHE_PATH)
 host_passthrough = load(HOST_PASSTHROUGH_PATH)
 host_r23_runtime = load(HOST_R23_RUNTIME_PATH)
@@ -713,6 +715,29 @@ require_order(
     "LatestCompleteDirectFrame(latest)",
     "SafeEyesBelongToTransportRun(latest)",
     "SourceSrv = SafeEyeSrv[0];",
+)
+
+# A committed R23 presentation bundle may outlive newer frames from the same
+# producer run, but it must never survive a game-process/run restart. Freshness
+# therefore combines age/internal consistency with current producer identity.
+bundle_run = body(host_bundle, "inline bool BelongsToCurrentProducerRun(")
+require(
+    bundle_run,
+    "R23 verified bundle current producer-run identity",
+    "RenderFrameRunGenerationIndex",
+    "snapshot.frame.clientPid",
+    "OutRunVrFinalTest::ReadLatestFrame(latest, publish)",
+    "latest.reserved[OutRunVR::RenderFrameRunGenerationIndex]",
+    "snapshotRunGeneration == latestRunGeneration",
+    "snapshotGamePid == latest.clientPid",
+)
+bundle_fresh = body(host_bundle, "inline bool ReadFresh(")
+require_order(
+    bundle_fresh,
+    "R23 verified bundle freshness includes producer-run ownership",
+    "Read(out)",
+    "IsFresh(out)",
+    "BelongsToCurrentProducerRun(out)",
 )
 
 # R19's short-lived stereo fallback cache must be scoped to the producer run.
