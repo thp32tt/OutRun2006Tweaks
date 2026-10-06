@@ -956,15 +956,29 @@ for marker in (
 ):
     if marker not in r22:
         errors.append(f"R22 StateBlock owner missing neutral event dispatch: {marker}")
-    if marker not in r31:
-        errors.append(f"R31 fallback StateBlock hook missing neutral event dispatch: {marker}")
+    if marker in r31:
+        errors.append(f"R31 regained physical StateBlock event dispatch: {marker}")
 
 if "StateBlockTracker::LifecycleHooksReady()" not in r31:
-    errors.append("R31 missing conditional R22 StateBlock ownership gate")
-if "R22 lifecycle hooks are authoritative" not in r31:
+    errors.append("R31 missing R22 StateBlock lifecycle-coverage gate")
+if "R22 lifecycle hooks are authoritative; R31 is event-consumer only" not in r31:
     errors.append("R31 missing authoritative R22 lifecycle-owner path")
-if "R31 fallback StateBlock hooks armed" not in r31:
-    errors.append("R31 missing fallback physical StateBlock hook path")
+if "R31 physical StateBlock fallback retired; fast-path trust remains disabled" not in r31:
+    errors.append("R31 missing fail-closed no-fallback lifecycle path")
+for banned in (
+    "R31CreateStateBlockHook",
+    "R31BeginStateBlockHook",
+    "R31EndStateBlockHook",
+    "R31StateBlockApplyHook",
+    "R31StateBlockApplyTarget",
+    "StateBlockApplyDestR31(",
+    "R31EnsureStateBlockApplyHook(",
+    "CreateStateBlockDestR31(",
+    "BeginStateBlockDestR31(",
+    "EndStateBlockDestR31(",
+):
+    if banned in r31:
+        errors.append(f"R31 retained retired physical StateBlock ownership: {banned}")
 if "StateBlockTracker::SetEventConsumerReady(" not in r31 or \
         "StateBlockEvents::Configured()" not in r31:
     errors.append("R31 missing neutral event-consumer readiness publication")
@@ -976,24 +990,25 @@ else:
     install_body = r31[install_start:install_end]
     recovery_configure_pos = install_body.find("StateBlockRecovery::Configure(")
     configure_pos = install_body.find("StateBlockEvents::Configure(")
-    lifecycle_owner_pos = install_body.find("StateBlockTracker::LifecycleHooksReady()")
-    fallback_end_pos = install_body.find("fallbackEndArmed = R31EndStateBlockHook.enable().has_value()")
-    fallback_begin_pos = install_body.find("fallbackBeginArmed = R31BeginStateBlockHook.enable().has_value()")
-    fallback_create_pos = install_body.find("fallbackCreateArmed = R31CreateStateBlockHook.enable().has_value()")
+    lifecycle_owner_pos = install_body.find("const bool lifecycleReady =")
+    degraded_log_pos = install_body.find(
+        "R31 physical StateBlock fallback retired; fast-path trust remains disabled")
+    coverage_degrade_pos = install_body.rfind(
+        "StateBlockTracker::MarkCoverageLost()", 0, degraded_log_pos)
     consumer_ready_pos = install_body.find("StateBlockTracker::SetEventConsumerReady(true)")
     ready_pos = install_body.find("R31InstallState.store(State::Ready", consumer_ready_pos)
     if min(recovery_configure_pos, configure_pos, lifecycle_owner_pos,
-            fallback_end_pos, fallback_begin_pos, fallback_create_pos,
+            coverage_degrade_pos, degraded_log_pos,
             consumer_ready_pos, ready_pos) < 0 or not (
             recovery_configure_pos < configure_pos < lifecycle_owner_pos <
-            fallback_end_pos < fallback_begin_pos < fallback_create_pos <
+            coverage_degrade_pos < degraded_log_pos <
             consumer_ready_pos < ready_pos):
         errors.append(
-            "R31 must establish StateBlock lifecycle/fallback ownership before publishing readiness")
+            "R31 must configure StateBlock consumers, fail closed without R22 "
+            "lifecycle coverage, then publish readiness")
 
-    if "R31EndStateBlockHook.enable().has_value() &&" in install_body or \
-            "R31BeginStateBlockHook.enable().has_value() &&" in install_body:
-        errors.append("R31 fallback hooks regained short-circuit partial-install enable")
+    if "safetyhook::create_inline(" in install_body:
+        errors.append("R31 install regained physical hook creation after retirement")
 
     fail_start = install_body.find("const auto failInstall =")
     fail_end = install_body.find(
@@ -1005,9 +1020,6 @@ else:
         fail_body = install_body[fail_start:fail_end]
         order = [
             fail_body.find("StateBlockTracker::SetEventConsumerReady(false)"),
-            fail_body.find("R31CreateStateBlockHook = {}"),
-            fail_body.find("R31BeginStateBlockHook = {}"),
-            fail_body.find("R31EndStateBlockHook = {}"),
             fail_body.find("StateBlockEvents::Clear()"),
             fail_body.find("StateBlockRecovery::Clear()"),
             fail_body.find("StateBlockTracker::MarkCoverageLost()"),
@@ -1015,10 +1027,10 @@ else:
         ]
         if min(order) < 0 or order != sorted(order):
             errors.append(
-                "R31 rollback must withdraw readiness, fallback hooks in reverse "
-                "order, event/recovery callbacks, then fail closed")
+                "R31 rollback must withdraw readiness, event/recovery callbacks, "
+                "mark coverage lost, then fail closed")
 if "StateBlockEvents::Clear()" not in r31:
-    errors.append("R31 draw-hook failure path missing StateBlock event rollback")
+    errors.append("R31 failure path missing StateBlock event rollback")
 
 dirty_match = re.search(
     r"void R31MarkStateBlockCachesDirty\(\) noexcept\s*\{(?P<body>.*?)\n        \}",
