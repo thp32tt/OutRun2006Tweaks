@@ -727,7 +727,7 @@ require_order(
 # The game may only accept a dedicated ACK that belongs to its current Frame.v2
 # game run as well as the current DirectGPU resource generation. This closes the
 # remaining race where an old host completion lands after a fast game restart.
-read_gpu_ack = body(r13, "bool R13ReadGpuCompletedFrame(")
+read_gpu_ack = body(r13, "bool R13ReadGpuCompletionSnapshot(")
 require(
     read_gpu_ack,
     "game dedicated ACK complete run-identity validation",
@@ -746,6 +746,16 @@ require_order(
     "DirectGpuAckRunGenerationIndex",
     "DirectGpuAckGamePidIndex",
     "GetCurrentProcessId()",
+    "completed.completedFrameId,",
+    "snapshot.completedFrameId,",
+)
+read_gpu_ack_slot = body(r13, "bool R13ReadGpuCompletedFrame(")
+require_order(
+    read_gpu_ack_slot,
+    "game dedicated ACK per-slot wrapper",
+    "if (slotIndex >= OutRunVR::RenderFrameRingSize)",
+    "R13GpuCompletionSnapshot snapshot{};",
+    "R13ReadGpuCompletionSnapshot(snapshot)",
     "completedFrame = snapshot.completedFrameId[slotIndex];",
 )
 
