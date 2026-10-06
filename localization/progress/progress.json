@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 07:30 KST",
+  "updated_at_kst": "2026-10-07 08:40 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -3549,6 +3549,26 @@
     "controller_visual_qa": "FAIL_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH",
     "decision": "C227R_REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH",
     "report": "localization/graphics/role_C/20261007-C227R-754F0599-A151/C227R_754F0599_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "a152r_9ce4e175": {
+    "run": "A152R",
+    "queue_index": 195,
+    "asset": "9CE4E175",
+    "candidate_sha256": "b4b8655e9805b897ab17249112db6c5536bab34f03d445b7722bc5222476c72c",
+    "rework": "NOT AVAILABLE -> 사용할 수 없음; native Hangul aspect, no horizontal stretch; 220x37 inside source 395x41",
+    "qa": "1/1 bbox/size/positive-margin; outside/alpha/protected=0; BGRA raw mirror_y; controller visual PASS",
+    "status": "PENDING_FRESH_C_USER_JPG_INGAME",
+    "runtime_validation": "UNTESTED"
+  },
+  "a153_754f0599": {
+    "run": "A153",
+    "queue_index": 175,
+    "asset": "754F0599",
+    "candidate_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
+    "rework": "C227R typography-family return; replace generic Noto skeleton with fresh NanumGothic Bold low-profile extended techno family while preserving A151 hierarchy/right lean/metallic effects",
+    "qa": "3/3 bbox/size/positive-margin; outside/alpha/protected=0; BGRA raw mirror_y; controller visual PASS",
+    "status": "PENDING_FRESH_C_USER_JPG_INGAME",
     "runtime_validation": "UNTESTED"
   }
 }
