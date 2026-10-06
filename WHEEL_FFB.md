@@ -52,7 +52,7 @@ Xbox controller vibration is not exposed as a wheel model. See `docs/reverse/FFB
 
 ### Force Feedback UI
 
-The F11 **Force Feedback** page owns output-device selection, **FFB Model** selection and game-side tuning. `Load MOZA R3 Physics SAT` and `Load MOZA R3 Natural SAT` provide starting profiles, while **Save Force Feedback** persists live edits.
+The F11 **Force Feedback** page owns output-device selection, **FFB Model** selection and game-side tuning. `Load Universal Physics SAT` and `Load Universal Natural SAT` provide starting profiles, while **Save Force Feedback** persists live edits.
 
 The **Advanced FFB tuning** section exposes supported lower-level values such as Spring Saturation, Weight Transfer, Force Build Slew Rate, Countersteer Release Rate, Pneumatic Trail Response Lead and optional wheel-response correction. These remain live tuning controls; wheel-specific response data is stored with the wheel profile rather than a generic named feel profile.
 
