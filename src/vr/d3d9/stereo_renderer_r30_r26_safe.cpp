@@ -110,6 +110,18 @@ namespace OutRunVRStereo
         std::uint64_t R30Hud2DDraws = 0;
         std::uint64_t R30PerspectiveHudDraws = 0;
         std::uint64_t R30WorldBillboardDraws = 0;
+        // Diagnostic-only projected-marker observability. These counters never
+        // participate in ownership/classification decisions; they exist so one
+        // HMD session can distinguish semantic lifetime, payload transport and
+        // per-eye reprojection failures.
+        std::uint64_t R57ProjectedSemanticObserved = 0;
+        std::uint64_t R57ProjectedPayloadMissing = 0;
+        std::uint64_t R57ProjectedBuildAttempts = 0;
+        std::uint64_t R57ProjectedBuildSuccesses = 0;
+        std::uint64_t R57ProjectedBuildFailures = 0;
+        std::uint64_t R57ProjectedRankSprani = 0;
+        std::uint64_t R57ProjectedRankClip = 0;
+        std::uint64_t R57ProjectedRival = 0;
         std::uint64_t R44OverlayOwnedWvpHits = 0;
         std::uint64_t R44OverlayOwnedWvpGroupHits = 0;
         std::uint64_t R44SpatialBillboardClassifications = 0;
@@ -1133,7 +1145,7 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] fingerprint[draws={},sameNode={},otherNode={},noNode={},scopeMismatch={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] fingerprint[draws={},sameNode={},otherNode={},noNode={},scopeMismatch={}] projected[semantic={},missingPayload={},buildAttempts={},buildOk={},buildFail={},rankSprani={},rankClip={},rival={}] registry[published={},registered={},consumed={},staleCleared={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
@@ -1160,6 +1172,22 @@ namespace OutRunVRStereo
                 R51ProducerFingerprintOtherNode,
                 R51ProducerFingerprintNoNode,
                 R51ProducerFingerprintScopeMismatch,
+                R57ProjectedSemanticObserved,
+                R57ProjectedPayloadMissing,
+                R57ProjectedBuildAttempts,
+                R57ProjectedBuildSuccesses,
+                R57ProjectedBuildFailures,
+                R57ProjectedRankSprani,
+                R57ProjectedRankClip,
+                R57ProjectedRival,
+                OutRunVR::GameSemantic::SpriteNodeSemanticPublishedCount.load(
+                    std::memory_order_relaxed),
+                OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
+                    std::memory_order_relaxed),
+                OutRunVR::GameSemantic::SpriteNodeSemanticConsumed.load(
+                    std::memory_order_relaxed),
+                OutRunVR::GameSemantic::SpriteNodeSemanticStaleCleared.load(
+                    std::memory_order_relaxed),
                 R44OverlayOwnedWvpHits, R44OverlayOwnedWvpGroupHits,
                 R44SpatialBillboardClassifications,
                 R44FlatOverlayClassifications,
@@ -1612,6 +1640,30 @@ namespace OutRunVRStereo
             {
                 const auto* marker =
                     OutRunVR::GameSemantic::CurrentProjectedMarker();
+                if (Settings::VRTelemetry)
+                {
+                    ++R57ProjectedSemanticObserved;
+                    if (!marker || !marker->valid)
+                        ++R57ProjectedPayloadMissing;
+
+                    // ProducerToken is diagnostic-only. It is intentionally
+                    // counted after RenderScope has already granted projected
+                    // semantic ownership and never affects the return value.
+                    switch (OutRunVR::GameSemantic::CurrentQueueProducerToken())
+                    {
+                    case OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani:
+                        ++R57ProjectedRankSprani;
+                        break;
+                    case OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite:
+                        ++R57ProjectedRankClip;
+                        break;
+                    case OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani:
+                        ++R57ProjectedRival;
+                        break;
+                    default:
+                        break;
+                    }
+                }
                 return marker && marker->valid
                     ? R30ScreenSpaceKind::ProjectedWorldMarker2D
                     : R30ScreenSpaceKind::None;
@@ -3354,6 +3406,9 @@ namespace OutRunVRStereo
             if (screenKind ==
                 R30ScreenSpaceKind::ProjectedWorldMarker2D)
             {
+                if (Settings::VRTelemetry)
+                    ++R57ProjectedBuildAttempts;
+
                 float deltaX[2]{};
                 float deltaY[2]{};
                 float baseAnchorX = 0.0f;
@@ -3361,7 +3416,11 @@ namespace OutRunVRStereo
                 if (!R57BuildProjectedMarkerDelta(
                         stereo, baseProjection, deltaX, deltaY,
                         &baseAnchorX, &baseAnchorY))
+                {
+                    if (Settings::VRTelemetry)
+                        ++R57ProjectedBuildFailures;
                     return false;
+                }
 
                 const float markerScale = R30HudScaleValue();
                 for (int eye = 0; eye < 2; ++eye)
@@ -3378,12 +3437,18 @@ namespace OutRunVRStereo
                     const D3DMATRIX corrected =
                         MultiplyMatrix(stockWvp, clipShift);
                     if (!MatrixFinite(corrected))
+                    {
+                        if (Settings::VRTelemetry)
+                            ++R57ProjectedBuildFailures;
                         return false;
+                    }
                     const D3DMATRIX correctedT =
                         TransposeMatrix(corrected);
                     std::memcpy(eyeConstants[eye], &correctedT,
                         sizeof(correctedT));
                 }
+                if (Settings::VRTelemetry)
+                    ++R57ProjectedBuildSuccesses;
                 return true;
             }
 
