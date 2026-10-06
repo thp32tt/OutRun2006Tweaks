@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T09:16:00+09:00",
+  "updatedKst": "2026-10-06T09:24:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -86,7 +86,8 @@
     "VR-REFACTOR-POST1100-CLASSIC-FRESHNESS-RUN-IDENTITY-0021",
     "VR-DX9EX-R24-RELEASED-IMAGE-RUN-PROVENANCE-0022",
     "VR-DX9EX-R19-STEREO-CACHE-RUN-IDENTITY-0023",
-    "VR-DX9EX-R23-BUNDLE-CURRENT-RUN-IDENTITY-0024"
+    "VR-DX9EX-R23-BUNDLE-CURRENT-RUN-IDENTITY-0024",
+    "VR-DX9EX-R24-DISPLAY-GRACE-CURRENT-RUN-0025"
   ],
   "next": "Post-1100 R31/R32 neutral-helper extraction chain COMPLETE. Preserve the terminal 15-call owner census and owner-evidence map. Subsequent DX9Ex work may return to the highest executable general quality/performance/stability item; do not reopen structural extraction unless the census/verifier or new source evidence shows a real ownership regression.",
   "runtimeValidation": "UNTESTED",
@@ -198,7 +199,8 @@
     "CONVERSION-DX9EX-00438 / VR-REFACTOR-POST1100-CLASSIC-FRESHNESS-RUN-IDENTITY-0021 scopes classic fallback freshness progression to Frame.v2 frameId + runGeneration + clientPid. A fast game restart that reuses a low frameId now refreshes LastClassicAdvanceMs for the new producer run instead of inheriting an expired prior-run timer; zero run identity fails closed. DestroySession resets the added identity fields. Runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00439 / VR-DX9EX-R24-RELEASED-IMAGE-RUN-PROVENANCE-0022 binds R24's released DirectGPU projection cache and DirectFlat theater cache to transport generation + producer run generation + game PID. A cached image released in an older game process/run can no longer outrank current fallback content merely because its OpenXR swapchain generation is still committed. Live desktop-theater and emergency theater commits explicitly clear DirectGPU provenance. Runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00440 / VR-DX9EX-R19-STEREO-CACHE-RUN-IDENTITY-0023 scopes R19's LastStereoFrame fallback cache to Frame.v2 producer run generation + game PID. If the host survives a fast game-process restart, observing any new-run Frame.v2 (even before it becomes stereo-complete) immediately invalidates the prior run's cached gameplay frame instead of allowing the old frame to remain gameplay-authoritative for the 500ms grace window. Zero/invalid run identity fails closed. Runtime remains UNTESTED pending Quest3/VDXR.",
-    "CONVERSION-DX9EX-00441 / VR-DX9EX-R23-BUNDLE-CURRENT-RUN-IDENTITY-0024 binds R23 verified-bundle freshness to the currently published Frame.v2 producer run (run generation + game PID). Newer frames from the same run remain valid under the existing 1000ms presentation grace, but once any new game run publishes Frame.v2 the prior run's committed classic/direct bundle fails fresh-read immediately instead of remaining reusable by R23/R24/R32. Runtime remains UNTESTED pending Quest3/VDXR."
+    "CONVERSION-DX9EX-00441 / VR-DX9EX-R23-BUNDLE-CURRENT-RUN-IDENTITY-0024 binds R23 verified-bundle freshness to the currently published Frame.v2 producer run (run generation + game PID). Newer frames from the same run remain valid under the existing 1000ms presentation grace, but once any new game run publishes Frame.v2 the prior run's committed classic/direct bundle fails fresh-read immediately instead of remaining reusable by R23/R24/R32. Runtime remains UNTESTED pending Quest3/VDXR.",
+    "CONVERSION-DX9EX-00442 / VR-DX9EX-R24-DISPLAY-GRACE-CURRENT-RUN-0025 closes the R24 soft-grace bypass around R23 ReadFresh current-run ownership. ReadDisplayGraceSnapshot still preserves the existing display-only age/internal-consistency checks but now also requires BelongsToCurrentProducerRun(out), so a prior game run's committed classic/direct bundle cannot be revived through the raw Read() grace path after a fast producer restart. Runtime remains UNTESTED pending Quest3/VDXR."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "117d6b7980dd41c8504558b6bafc38dda01e184b",

@@ -779,6 +779,27 @@ require(
     "InvalidateStereoFrameCache();",
 )
 
+# R24's display-only soft grace intentionally reads the committed snapshot
+# without R23's normal fresh-read path, but it must retain the same current
+# producer-run ownership. Otherwise a prior-run bundle could be revived after
+# a fast game restart through this raw Read() bypass.
+display_grace = body(host_r24, "inline bool ReadDisplayGraceSnapshot(")
+require(
+    display_grace,
+    "R24 display grace current producer-run guard",
+    "Read(out)",
+    "FrameComplete(out.frame)",
+    "BelongsToCurrentProducerRun(out)",
+)
+require_order(
+    display_grace,
+    "R24 display grace validates bundle before current run",
+    "Read(out)",
+    "FrameComplete(out.frame)",
+    "BelongsToCurrentProducerRun(out)",
+    "GetTickCount64()",
+)
+
 # R24's released-image cache must not outlive the DirectGPU producer run that
 # populated it. Swapchain generation proves release ownership only inside that
 # swapchain creation; it does not distinguish a restarted game process/run.

@@ -160,7 +160,8 @@ namespace OutRunVrR24BlackScreenGuard
             out.frame.sourcePoseSequence != out.poseSequence ||
             out.frame.presentQpc != out.presentQpc ||
             !OutRunVrSbsCaptureOverride::FrameComplete(out.frame) ||
-            !out.publishedAtMs)
+            !out.publishedAtMs ||
+            !BelongsToCurrentProducerRun(out))
             return false;
         const ULONGLONG now = GetTickCount64();
         return now >= out.publishedAtMs &&
