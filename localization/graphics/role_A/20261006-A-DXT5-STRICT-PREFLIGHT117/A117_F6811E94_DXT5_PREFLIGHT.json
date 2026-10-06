@@ -1,0 +1,646 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-DXT5-STRICT-PREFLIGHT117",
+  "queue_index": 119,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "structure": {
+    "width": 2048,
+    "height": 256,
+    "mipmaps": 1,
+    "fourcc": "DXT5",
+    "raw_orientation": "mirror_y"
+  },
+  "translation": {
+    "source": "Time Attack Mode",
+    "korean": "타임 어택 모드"
+  },
+  "prior_strict_bboxes": [
+    [
+      390,
+      54,
+      1632,
+      200
+    ]
+  ],
+  "rows": [
+    {
+      "bbox": [
+        390,
+        54,
+        1632,
+        200
+      ],
+      "actual_nonzero_bbox_within_bbox": [
+        390,
+        54,
+        1632,
+        200
+      ],
+      "nonzero_pixels": 152215,
+      "alpha_hist_top": [
+        [
+          104087,
+          255
+        ],
+        [
+          1665,
+          1
+        ],
+        [
+          1035,
+          2
+        ],
+        [
+          898,
+          4
+        ],
+        [
+          862,
+          3
+        ],
+        [
+          651,
+          12
+        ],
+        [
+          545,
+          8
+        ],
+        [
+          523,
+          5
+        ],
+        [
+          481,
+          243
+        ],
+        [
+          426,
+          231
+        ],
+        [
+          424,
+          7
+        ],
+        [
+          422,
+          6
+        ]
+      ],
+      "coarse_rgb_top": [
+        {
+          "rgb": [
+            224,
+            128,
+            0
+          ],
+          "count": 48010
+        },
+        {
+          "rgb": [
+            240,
+            240,
+            240
+          ],
+          "count": 47369
+        },
+        {
+          "rgb": [
+            0,
+            0,
+            32
+          ],
+          "count": 43485
+        },
+        {
+          "rgb": [
+            224,
+            112,
+            0
+          ],
+          "count": 4773
+        },
+        {
+          "rgb": [
+            144,
+            80,
+            16
+          ],
+          "count": 771
+        },
+        {
+          "rgb": [
+            160,
+            160,
+            176
+          ],
+          "count": 641
+        },
+        {
+          "rgb": [
+            208,
+            112,
+            0
+          ],
+          "count": 624
+        },
+        {
+          "rgb": [
+            80,
+            48,
+            16
+          ],
+          "count": 544
+        },
+        {
+          "rgb": [
+            64,
+            32,
+            16
+          ],
+          "count": 529
+        },
+        {
+          "rgb": [
+            144,
+            80,
+            0
+          ],
+          "count": 445
+        },
+        {
+          "rgb": [
+            80,
+            80,
+            112
+          ],
+          "count": 443
+        },
+        {
+          "rgb": [
+            0,
+            16,
+            32
+          ],
+          "count": 374
+        }
+      ],
+      "block_counts": {
+        "full": 11160,
+        "partial": 347,
+        "partial_with_zero_alpha_palette": 347,
+        "partial_with_all_outside_alpha_zero": 347
+      },
+      "partial_block_samples": [
+        {
+          "readable_block": [
+            388,
+            52,
+            392,
+            56
+          ],
+          "inside_pixels": 4,
+          "alpha_palette": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            255
+          ],
+          "color_palette": [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "outside_alpha_values": [
+            0
+          ]
+        },
+        {
+          "readable_block": [
+            392,
+            52,
+            396,
+            56
+          ],
+          "inside_pixels": 8,
+          "alpha_palette": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            255
+          ],
+          "color_palette": [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "outside_alpha_values": [
+            0
+          ]
+        },
+        {
+          "readable_block": [
+            396,
+            52,
+            400,
+            56
+          ],
+          "inside_pixels": 8,
+          "alpha_palette": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            255
+          ],
+          "color_palette": [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "outside_alpha_values": [
+            0
+          ]
+        },
+        {
+          "readable_block": [
+            400,
+            52,
+            404,
+            56
+          ],
+          "inside_pixels": 8,
+          "alpha_palette": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            255
+          ],
+          "color_palette": [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "outside_alpha_values": [
+            0
+          ]
+        },
+        {
+          "readable_block": [
+            404,
+            52,
+            408,
+            56
+          ],
+          "inside_pixels": 8,
+          "alpha_palette": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            255
+          ],
+          "color_palette": [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "outside_alpha_values": [
+            0
+          ]
+        },
+        {
+          "readable_block": [
+            408,
+            52,
+            412,
+            56
+          ],
+          "inside_pixels": 8,
+          "alpha_palette": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            255
+          ],
+          "color_palette": [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "outside_alpha_values": [
+            0
+          ]
+        },
+        {
+          "readable_block": [
+            412,
+            52,
+            416,
+            56
+          ],
+          "inside_pixels": 8,
+          "alpha_palette": [
+            2,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0
+          ],
+          "color_palette": [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "outside_alpha_values": [
+            0
+          ]
+        },
+        {
+          "readable_block": [
+            416,
+            52,
+            420,
+            56
+          ],
+          "inside_pixels": 8,
+          "alpha_palette": [
+            4,
+            0,
+            3,
+            2,
+            2,
+            1,
+            1,
+            0
+          ],
+          "color_palette": [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "outside_alpha_values": [
+            0
+          ]
+        },
+        {
+          "readable_block": [
+            420,
+            52,
+            424,
+            56
+          ],
+          "inside_pixels": 8,
+          "alpha_palette": [
+            7,
+            0,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          "color_palette": [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "outside_alpha_values": [
+            0
+          ]
+        },
+        {
+          "readable_block": [
+            424,
+            52,
+            428,
+            56
+          ],
+          "inside_pixels": 8,
+          "alpha_palette": [
+            8,
+            0,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          "color_palette": [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "outside_alpha_values": [
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "nonzero_alpha_outside_prior_bboxes": 0,
+  "unique_partial_blocks": 347,
+  "partial_block_zero_alpha_palette_count": 347,
+  "feasibility_rule": "partial DXT5 blocks can preserve every outside decoded pixel exactly by keeping original endpoints and outside indices; inside indices may be reassigned only to the original block palettes. Full-inside blocks may be normally reconstructed. This preflight measures whether source boundary blocks provide transparent/background palette support before candidate construction.",
+  "status": "A117_DXT5_CONSTRAINED_PREFLIGHT_COMPLETE_PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED"
+}

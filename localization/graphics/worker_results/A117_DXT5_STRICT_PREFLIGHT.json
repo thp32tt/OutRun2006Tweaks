@@ -1,0 +1,23 @@
+{
+  "run": "20261006-A-DXT5-STRICT-PREFLIGHT117",
+  "role": "A",
+  "assets": [
+    {
+      "index": 99,
+      "id": "4F68708E",
+      "partial_blocks": 834,
+      "partial_zero_alpha_palette": 772,
+      "report": "localization/graphics/role_A/20261006-A-DXT5-STRICT-PREFLIGHT117/A117_4F68708E_DXT5_PREFLIGHT.json"
+    },
+    {
+      "index": 119,
+      "id": "F6811E94",
+      "partial_blocks": 347,
+      "partial_zero_alpha_palette": 347,
+      "report": "localization/graphics/role_A/20261006-A-DXT5-STRICT-PREFLIGHT117/A117_F6811E94_DXT5_PREFLIGHT.json"
+    }
+  ],
+  "candidate_written": false,
+  "status": "A117_STRICT_DXT5_PREFLIGHT_COMPLETE",
+  "runtime_validation": "UNTESTED"
+}
