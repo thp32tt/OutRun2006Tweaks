@@ -2673,3 +2673,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - GitHub-hosted C worker run 37540359421 independently decoded the pinned RGBA32 source and current candidate, re-derived both source/candidate alpha bboxes directly inside canonical cells, and did not consume producer masks. Machine PASS: 2/2 bbox/source-size/positive-margin; changed/alpha outside exact source bboxes=0; localized overlap/touch=0; exact header/raw mirror_y parity PASS.
 - Controller SOURCE/CLEAN/FINAL, high-zoom rows and RAW review PASS. A150 materially repairs the C116 hierarchy false-negative: prior 튜닝/일반 widths 55/58px become 튜닝 사양/일반 사양 121/120px while remaining inside 139/174px source bboxes, preserving heavy plain-white upright centered source-family weight and native-HD Hangul. No residue, clipping, overlap, protected-art damage or orientation regression.
 - Decision C226_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export refresh required before C synchronization completes; actual game validation remains UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 07:43 KST — C226 PRE_INGAME export synchronization
+
+- GitHub-hosted C exporter run 37541482848 completed SUCCESS and worker commit 5991153ef31aecb06828f9814a44684f069d2e0c rebuilt the current C-pass English-original comparison set.
+- Current manifest contains 27 rows (26 localized candidates + 1 policy-preserved original). q139 313DB8CB is review #013 at localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/013_q139_313DB8CB.jpg.
+- #013 pins English source SHA 4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786 at native 2048x1024/display scale 1 and current A150 candidate SHA 50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7. Controller reopened the generated FLIP-Y/RAW card and verified the intended source/current pair.
+- q139 remains C226 static PASS pending user JPG review and actual in-game validation. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

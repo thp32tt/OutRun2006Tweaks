@@ -2188,3 +2188,8 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - A150 50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7 fresh C machine QA PASS: 2/2 bbox/size/positive-margin, outside/alpha/overlap/touch gates zero, exact RGBA32 header/raw mirror_y PASS.
 - Controller visual PASS: source-relative TUNED/NORMAL hierarchy materially restored by 튜닝 사양/일반 사양 while preserving heavy plain-white upright source family; no residue/breakage/clipping/intrusion.
 - Decision C226_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export/user review + actual game validation pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-07 07:43 KST — C226 PRE_INGAME export refreshed
+- Exporter 37541482848 SUCCESS; worker 5991153ef31aecb06828f9814a44684f069d2e0c; current C-pass set 27 rows.
+- q139 313DB8CB is #013 with source 4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786 and A150 candidate 50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7; FLIP-Y and RAW card rechecked.
+- User JPG review and in-game validation pending. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
