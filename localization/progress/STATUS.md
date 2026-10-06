@@ -1842,3 +1842,6 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Legacy 505-glyph/two-page Hangul atlas remains K3 research only. B-owned font rows 16/18/20/22 and separate name-entry index24 were untouched.
 - Static reconciliation PASS; no DDS/runtime source changed. `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261006-A-FONT133-ODD-RUNTIME-FONT/A133_RUNTIME_FONT_RECONCILE.json`.
+
+### A133 verifier note
+- `verify_state.py`: **FAIL (pre-existing state drift)** — transcription/artwork-plan/progress and legacy visual-review action-count mismatches. A133 changed only font-row status/notes and shared status metadata; queue action counts were not changed. This is recorded, not masked.

@@ -123,5 +123,20 @@
   },
   "decision": "A133_FONT_PIPELINE_STATIC_PASS_PRESERVE_ORIGINAL_NO_CANDIDATES",
   "runtime_validation": "UNTESTED",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "state_verification": {
+    "command": "python tools/localization/verify_state.py",
+    "execution_host": "N100 MCP short metadata verification",
+    "result": "FAIL_PREEXISTING_STATE_DRIFT_NOT_INTRODUCED_BY_A133",
+    "failures": [
+      "graphics transcription count 123 != 82",
+      "graphics transcription segments 746 != 724",
+      "artwork-plan indices do not match transcription indices",
+      "artwork-plan count 125 != localize_text target 94",
+      "visual_review action counts differ from current progress/queue action counts"
+    ],
+    "a133_action_count_change": false,
+    "a133_queue_action_values_unchanged": true,
+    "decision": "record fail closed; do not broaden A133 into unrelated historical state migration"
+  }
 }

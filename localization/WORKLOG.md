@@ -2249,3 +2249,7 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Queue rows 15/17/19/21/23 are therefore closed as preserve-original/no-Korean-DDS-candidate-required. The original DDS bytes were not touched. The 505-syllable/two-page atlas is retained only as K3 research evidence, not packaged as a replacement. B-owned font rows 16/18/20/22 and name-entry index24 remain separate.
 - Corrected stale `resume_state.current_blocked_zoom_review` from 12 to 0 to match the current queue/B195 result. No runtime source or graphics binary changed, so no new build was required. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261006-A-FONT133-ODD-RUNTIME-FONT/A133_RUNTIME_FONT_RECONCILE.json`.
+
+### A133 post-commit state verifier
+- Ran `tools/localization/verify_state.py` after the A133 commit. It returns the existing recovery-branch state drift: transcriptions 123 vs progress 82, segments 746 vs 724, artwork-plan/index mismatch, artwork-plan 125 vs localize_text 94, and legacy `visual_review.csv` action counts differing from the current queue/progress action counts.
+- A133 did not change any queue `action` value, transcription row, artwork-plan row, or visual-review row, so these failures predate and are outside the five font-row reconciliation. Recorded as `FAIL_PREEXISTING_STATE_DRIFT_NOT_INTRODUCED_BY_A133`; no unrelated migration was attempted.
