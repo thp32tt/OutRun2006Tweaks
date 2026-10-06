@@ -10,7 +10,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role B only")
 
 repo=Path.cwd()
-run="20261006-B-PRODUCTION190-6C9B3611-START-GOAL"
+run="20261006-B-PRODUCTION191-6C9B3611-START-GOAL"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -21,7 +21,7 @@ candidate=repo/"localization/graphics/hd_candidates"/asset
 candidate.parent.mkdir(parents=True,exist_ok=True)
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
 SOURCE_SHA="d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8"
-srcp=Path("/tmp/B190_6C9B3611.dds")
+srcp=Path("/tmp/B191_6C9B3611.dds")
 urllib.request.urlretrieve(url,srcp)
 
 def sha256(p):
@@ -164,14 +164,17 @@ if np.count_nonzero(source_masks[0]&source_masks[1]):
 
 # Same-family A85 precedent: reconstruct the complete inset red body, not a
 # glyph-shaped patch. B182-B189 showed that component/hand polygon masks can
-# either leave English-effect strips or touch the white rim. B190 derives the
+# either leave English-effect strips or touch the white rim. B191 derives the
 # red-body polygon from the convex hull of strongly saturated source-red pixels
 # inside each tight sign ROI; this fills lettering holes without crossing into
 # the white rim. Exact measured source-effect pixels are unioned as a fail-safe.
 clean_masks=[]
 clean_region=np.zeros((H,W),bool)
 for row,sm,bm in zip(rows,source_masks,banner_masks):
-    x0,y0,x1,y1=row["roi"]
+    # Seed only inside the already-measured sign bounding box. The broader
+    # diagnostic ROI also contains unrelated red route/map artwork; B190's hull
+    # therefore expanded catastrophically into protected art.
+    x0,y0,x1,y1=row["banner_bbox"]
     sub=sa[y0:y1,x0:x1,:]
     r=sub[:,:,0].astype(np.int16); g=sub[:,:,1].astype(np.int16); b=sub[:,:,2].astype(np.int16)
     aa=sub[:,:,3]>8
@@ -333,14 +336,14 @@ if residue_final:
 
 
 # Evidence.
-src.save(out/"B190_SOURCE_READABLE.png")
-clean.save(out/"B190_CLEAN_PLATE.png")
-dec.save(out/"B190_FINAL_READABLE.png")
-src_raw.save(out/"B190_SOURCE_RAW.png")
-dec_raw.save(out/"B190_FINAL_RAW.png")
-Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"B190_SOURCE_TEXT_MASK.png")
-Image.fromarray((clean_region.astype(np.uint8)*255),"L").save(out/"B190_CLEAN_REGION_MASK.png")
-Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"B190_TARGET_MASK.png")
+src.save(out/"B191_SOURCE_READABLE.png")
+clean.save(out/"B191_CLEAN_PLATE.png")
+dec.save(out/"B191_FINAL_READABLE.png")
+src_raw.save(out/"B191_SOURCE_RAW.png")
+dec_raw.save(out/"B191_FINAL_RAW.png")
+Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"B191_SOURCE_TEXT_MASK.png")
+Image.fromarray((clean_region.astype(np.uint8)*255),"L").save(out/"B191_CLEAN_REGION_MASK.png")
+Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"B191_TARGET_MASK.png")
 
 def on_white(im):
     z=Image.new("RGBA",im.size,(255,255,255,255)); z.alpha_composite(im); return z.convert("RGB")
@@ -365,7 +368,7 @@ y=0
 for c in cards:
     sheet.paste(c,(0,y)); y+=c.height+8
 sheet.thumbnail((1800,2800),Image.Resampling.LANCZOS)
-sheet.save(out/"B190_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
+sheet.save(out/"B191_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
 
 raw_sheet=Image.new("RGB",(1024,2*1024+70),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW",src_raw),("FINAL_RAW",dec_raw)]):
@@ -375,7 +378,7 @@ for i,(label,im) in enumerate([("SOURCE_RAW",src_raw),("FINAL_RAW",dec_raw)]):
     raw_sheet.paste(vis,(0,y+30)); ImageDraw.Draw(raw_sheet).text((6,y+7),label,fill="black")
 raw_sheet=raw_sheet.crop((0,0,1024,2*1024+70))
 raw_sheet.thumbnail((1400,1800),Image.Resampling.LANCZOS)
-raw_sheet.save(out/"B190_RAW_CONTACT.jpg",quality=95)
+raw_sheet.save(out/"B191_RAW_CONTACT.jpg",quality=95)
 
 report={
  "schema_version":1,"role":"B","run":run,
@@ -388,7 +391,7 @@ report={
  "source_provenance":{"url":url,"sha256":SOURCE_SHA},
  "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":MIPS,
    "header_128_exact":payload[:128]==raw[:128],"raw_orientation":"mirror_y"},
- "construction":"B190 derives each sign interior from the convex hull of strongly saturated source-red pixels in the tight START/GOAL ROI, erodes one pixel from that hull, and unions only exact measured source-effect pixels. This supersedes B182-B189 masks that either left English-effect strips or over-cleaned the rim; route map, thumbnails and OutRun2SP artwork remain protected and fresh native Korean stays inside the exact source-effect bbox.",
+ "construction":"B191 fixes B190's protected-art hull overreach by deriving the red-body convex hull only inside each previously measured sign banner_bbox, then eroding one pixel and unioning exact measured source-effect pixels. The broad diagnostic ROI is never used as a hull seed; route map, thumbnails and OutRun2SP artwork remain protected and fresh native Korean stays inside the exact source-effect bbox.",
  "same_family_reference":"localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_CONTROLLER_SELF_QA.json",
  "rows":rows,
  "static_qa":{
@@ -408,15 +411,15 @@ report={
  "candidate_sha256":cand_sha,
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "runtime_validation":"UNTESTED",
- "status":"B190_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"B191_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"B190_6C9B3611_REPORT.json"
+rp=out/"B191_6C9B3611_REPORT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"B190_6C9B3611.json").write_text(json.dumps({
+(wr/"B191_6C9B3611.json").write_text(json.dumps({
  "role":"B","run":run,"queue_index":172,"asset":"6C9B3611",
  "source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,
  "report":str(rp.relative_to(repo)),
  "status":"WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("B190_DONE",cand_sha,[(r["key"],r["source_bbox"],r["localized_bbox"],r["font_size"]) for r in rows])
+print("B191_DONE",cand_sha,[(r["key"],r["source_bbox"],r["localized_bbox"],r["font_size"]) for r in rows])
