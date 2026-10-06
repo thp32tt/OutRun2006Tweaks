@@ -12,7 +12,7 @@ from psd_tools import PSDImage
 import cv2
 
 repo=Path.cwd()
-run="20261006-A-WORKSTEAL129-33491F83-ERASE-DELTA-INPAINT"
+run="20261006-A-WORKSTEAL130-33491F83-PAINTOVER-DIAGNOSTIC"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -28,8 +28,8 @@ psd_commit="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 psd_rel="PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_loading_cvt_Exst/33491F83_512x256.psd"
 psd_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+psd_commit+"/"+urllib.parse.quote(psd_rel,safe="/")
 
-srcp=Path("/tmp/A129_33491F83.dds")
-psdp=Path("/tmp/A129_33491F83.psd")
+srcp=Path("/tmp/A130_33491F83.dds")
+psdp=Path("/tmp/A130_33491F83.psd")
 urllib.request.urlretrieve(src_url,srcp)
 urllib.request.urlretrieve(psd_url,psdp)
 
@@ -169,6 +169,35 @@ erase_canvas.alpha_composite(erase_im.convert("RGBA"),(int(erase.left),int(erase
 l43a=np.asarray(layer43_canvas,dtype=np.uint8)
 era=np.asarray(erase_canvas,dtype=np.uint8)
 
+# Controller diagnostic: render the authoring paintover subgroups that intersect
+# EASY/HARD so visual QA can select real road geometry instead of synthetic inpaint.
+paint_paths=[
+"objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5",
+"objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7",
+"objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8",
+"objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10",
+"objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy",
+"objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15",
+]
+paint_cards=[]
+for pp in paint_paths:
+    pl=by_path.get(pp)
+    if pl is None: continue
+    pim=pl.composite(force=True,apply_icc=False) if pl.is_group() else pl.topil()
+    if pim is None: continue
+    canv=Image.new("RGBA",(W,H),(0,0,0,0))
+    canv.alpha_composite(pim.convert("RGBA"),(int(pl.left),int(pl.top)))
+    crop=canv.crop((60,220,1140,500))
+    bg=Image.new("RGBA",crop.size,(235,235,235,255)); bg.alpha_composite(crop)
+    card=Image.new("RGB",(1080,315),"white")
+    card.paste(bg.convert("RGB"),(0,35))
+    ImageDraw.Draw(card).text((8,8),pp.split("/Paintover/")[-1],fill="black")
+    paint_cards.append(card)
+if paint_cards:
+    diag=Image.new("RGB",(1080,315*len(paint_cards)),"white")
+    for i,c in enumerate(paint_cards): diag.paste(c,(0,315*i))
+    diag.save(out/"A130_PAINTOVER_COMPONENT_CONTACT.jpg",quality=94)
+
 clean_arr=sa.copy()
 manual_missing={}
 clean_component_by_key={}
@@ -237,7 +266,7 @@ for row in rows:
     x0,y0,x1,y1=row["source_bbox"]; bbox_scope[y0:y1,x0:x1]=True
 repair_extra_outside_bbox=int(np.count_nonzero(repair_extra & ~bbox_scope))
 if repair_extra_outside_bbox: raise RuntimeError(("repair scope outside source bboxes",repair_extra_outside_bbox))
-manual_clean.save(out/"A129_MANUAL_PSD_CLEAN_COMPONENT.png")
+manual_clean.save(out/"A130_MANUAL_PSD_CLEAN_COMPONENT.png")
 
 # Source-family colors sampled from the authoritative release inside each exact PSD mask.
 def sample_style(row):
@@ -370,15 +399,15 @@ for row in rows:
     row.pop("_mask",None); row.pop("_glyph",None)
 
 # Evidence.
-src.save(out/"A129_SOURCE_READABLE.png")
-clean.save(out/"A129_CLEAN_PLATE.png")
-dec.save(out/"A129_FINAL_READABLE.png")
-src_raw.save(out/"A129_SOURCE_RAW.png")
-dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"A129_FINAL_RAW.png")
-Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"A129_SOURCE_TEXT_MASK.png")
-Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"A129_TARGET_MASK.png")
-Image.fromarray((repair_scope.astype(np.uint8)*255),"L").save(out/"A129_REPAIR_SCOPE.png")
-manual_clean.save(out/"A129_MANUAL_PSD_CLEAN_COMPOSITE.png")
+src.save(out/"A130_SOURCE_READABLE.png")
+clean.save(out/"A130_CLEAN_PLATE.png")
+dec.save(out/"A130_FINAL_READABLE.png")
+src_raw.save(out/"A130_SOURCE_RAW.png")
+dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"A130_FINAL_RAW.png")
+Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"A130_SOURCE_TEXT_MASK.png")
+Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"A130_TARGET_MASK.png")
+Image.fromarray((repair_scope.astype(np.uint8)*255),"L").save(out/"A130_REPAIR_SCOPE.png")
+manual_clean.save(out/"A130_MANUAL_PSD_CLEAN_COMPOSITE.png")
 
 def white(im):
     z=Image.new("RGBA",im.size,(235,235,235,255));z.alpha_composite(im);return z.convert("RGB")
@@ -394,16 +423,16 @@ def contact(cards,path,maxsize=None):
     s.save(path,quality=97)
 
 contact([card("SOURCE",src,(0,0,1200,820)),card("CLEAN PSD-LAYER",clean,(0,0,1200,820)),card("FINAL",dec,(0,0,1200,820))],
-        out/"A129_MAIN_SOURCE_CLEAN_FINAL.jpg",(1800,2400))
+        out/"A130_MAIN_SOURCE_CLEAN_FINAL.jpg",(1800,2400))
 contact([card("SOURCE RIGHT",src,(1260,0,2048,270)),card("CLEAN RIGHT",clean,(1260,0,2048,270)),card("FINAL RIGHT",dec,(1260,0,2048,270))],
-        out/"A129_RIGHT_SOURCE_CLEAN_FINAL.jpg",(1800,1400))
+        out/"A130_RIGHT_SOURCE_CLEAN_FINAL.jpg",(1800,1400))
 contact([card("SOURCE RAW mirror_y",src_raw,(0,0,W,H)),card("FINAL RAW mirror_y",dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM),(0,0,W,H))],
-        out/"A129_RAW_COMPARE.jpg",(1300,1200))
+        out/"A130_RAW_COMPARE.jpg",(1300,1200))
 zoomcards=[]
 for row in rows:
     x0,y0,x1,y1=row["source_bbox"];p=8;crop=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
     zoomcards += [card(row["key"]+" SOURCE",src,crop,2),card(row["key"]+" CLEAN",clean,crop,2),card(row["key"]+" FINAL",dec,crop,2)]
-contact(zoomcards,out/"A129_LABEL_ZOOM_CONTACT.jpg",(2800,6000))
+contact(zoomcards,out/"A130_LABEL_ZOOM_CONTACT.jpg",(2800,6000))
 
 report={
  "schema_version":1,"role":"A","run":run,"queue_index":queue_index,"asset":asset,
@@ -429,12 +458,12 @@ report={
    "localized_overlap_pixels":0,"dds_roundtrip":"PASS","status":"PASS"},
  "candidate_path":str(candidate.relative_to(repo)),"candidate_sha256":cand_sha,
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","runtime_validation":"UNTESTED",
- "status":"A129_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"A130_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"A129_33491F83_REPORT.json"
+rp=out/"A130_33491F83_REPORT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A129_33491F83.json").write_text(json.dumps({
+(wr/"A130_33491F83.json").write_text(json.dumps({
  "role":"A","run":run,"queue_index":queue_index,"asset":"33491F83","work_stolen_from_lane":"B",
  "source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,"psd_layered_source":True,
  "elements":9,"bbox_size_positive_margin":"9/9 PASS","changed_outside":outside,"alpha_outside":alpha_out,
@@ -446,5 +475,5 @@ print(json.dumps({
  "rows":[{"key":r["key"],"source_bbox":r["source_bbox"],"localized_bbox":r["localized_bbox"],
           "font_size":r["font_size"],"shear":r["shear"],
           "margins":[r["delta_left"],r["delta_right"],r["delta_top"],r["delta_bottom"]]} for r in rows],
- "status":"A129_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"A130_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 },ensure_ascii=False),flush=True)
