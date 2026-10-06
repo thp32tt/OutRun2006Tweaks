@@ -1771,3 +1771,10 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - No Korean candidate required; protected OutRun2/OutRun2SP logos and scene/environment artwork remain untouched.
 - index62 remains MANUAL_RECONSTRUCTION_REQUIRED. Next normal B zoom_review: index166 unless higher-priority work appears.
 - VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-06 11:15 KST — A108/A109/A110 zoom results
+- **index103 590A4724:** `Normal Balance -> 일반 밸런스`; accepted A108 native-HD candidate `bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178` restored byte-exact after a superseded A107 overwrite. A108 self-QA: bbox/size/positive-margin PASS; clean/final/alpha outside=0; overlap=0; controller readable/raw PASS. Pending independent C + in-game, `RUNTIME_VALIDATION=UNTESTED`.
+- **indices151/153/155/157/165/169/171:** course/photo/rank-card + protected OutRun2/OutRun2SP artwork only -> **PRESERVE_ORIGINAL / NO_LOCALIZABLE_TEXT**.
+- **index177:** OUTRUN2 cover plus song titles Shiny World / Splash Wave / Night Flight -> **PRESERVE_ORIGINAL_POLICY**.
+- Blocked `zoom_review`: **25 -> 16**. Next A odd rows: **189, 191, 217, 219** unless higher-priority work appears.
+- VR/FFB/DX11/DXVK untouched.
