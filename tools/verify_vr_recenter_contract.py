@@ -196,10 +196,11 @@ require_order(
     "game recenter receive",
     "PendingGameRequesterPid.store(",
     "PendingGameTargetGeneration.store(",
+    "PendingGameRequestId.store(",
+    "requestId, std::memory_order_release);",
     "QueueApplicationRecenter(ApplicationRecenterSourceGame);",
     "WriteSyntheticLocalChange(eventData, XR_NULL_HANDLE);",
     "channel.MarkReceived(requestId);",
-    "PendingGameRequestId.store(requestId, std::memory_order_release);",
 )
 focus_start = poll.find("if (PendingFocusRecenter && eventData)")
 focus_end = poll.find("const XrResult result = ::xrPollEvent", focus_start)

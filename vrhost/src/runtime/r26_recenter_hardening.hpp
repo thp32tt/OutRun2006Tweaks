@@ -421,10 +421,17 @@ namespace OutRunVrR26RecenterHardening
                         requesterPid, std::memory_order_release);
                     PendingGameTargetGeneration.store(
                         targetGeneration, std::memory_order_release);
+
+                    // Publish host-local ownership before acknowledging the
+                    // shared request. If session teardown occurs after the ACK,
+                    // ResetSessionState can now always see this requestId and
+                    // requeue it. If teardown/crash happens before the ACK, the
+                    // shared request was never suppressed and remains pending.
+                    PendingGameRequestId.store(
+                        requestId, std::memory_order_release);
                     QueueApplicationRecenter(ApplicationRecenterSourceGame);
                     WriteSyntheticLocalChange(eventData, XR_NULL_HANDLE);
                     channel.MarkReceived(requestId);
-                    PendingGameRequestId.store(requestId, std::memory_order_release);
                     ++GameRequestsReceived;
                     std::cerr
                         << "[R28 recenter] F10 request received requestId="
