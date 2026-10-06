@@ -1,0 +1,18 @@
+{
+  "role": "A",
+  "run": "20261006-A-WORKSTEAL120R3-33491F83",
+  "work_stolen_from_lane": "B",
+  "queue_index": 62,
+  "asset": "33491F83",
+  "source_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+  "candidate_sha256": "417dc8c7a48d0ab2a39deec303e2ce96a9a75d1547a5101e57153d3cf5825c2d",
+  "elements": 9,
+  "reconstructed_art_pixels": 98285,
+  "changed_outside_exact_bboxes": 0,
+  "protected_changed": 0,
+  "target_outside_exact_bboxes": 0,
+  "source_mask_unreconstructed": 0,
+  "report": "localization/graphics/role_A/20261006-A-WORKSTEAL120R3-33491F83/A120R3_33491F83_REPORT.json",
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_HIGH_ZOOM_RESIDUE_QA_AND_C",
+  "runtime_validation": "UNTESTED"
+}
