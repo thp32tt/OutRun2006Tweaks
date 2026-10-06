@@ -1,0 +1,707 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B218",
+  "queue_index": 228,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+  "trigger": "MANUAL_PRE_INGAME_ENGLISH_ORIGINAL_VISUAL_FALSE_NEGATIVE_AFTER_NEW_8_STEP_GATE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/058_q228_E7F6E9B7.jpg",
+  "prior_c_status": "C144_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "defects": [
+    "UNNECESSARY_UNDERSIZING_ON_TALL_ROWS",
+    "SOURCE_TECHNO_PROPORTION_WEIGHT_MISMATCH"
+  ],
+  "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+  "before_sha256": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607",
+  "candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+  "method": "pinned exact source + C144/B68 validated clean plate; fresh native Noto CJK Medium; per-row maximum safe height with 4px positive margin; 1.18x source-wide geometry; preserved silver gradient/dark outline-shadow/rightward techno lean; exact canonical DDS header/BGRA/raw mirror_y",
+  "rows": [
+    {
+      "source": "coast 2 coast",
+      "korean": "코스트 2 코스트",
+      "source_bbox": [
+        5,
+        26,
+        1456,
+        145
+      ],
+      "source_size": [
+        1451,
+        119
+      ],
+      "prior_localized_bbox": [
+        9,
+        38,
+        681,
+        133
+      ],
+      "prior_localized_size": [
+        672,
+        95
+      ],
+      "localized_bbox": [
+        9,
+        30,
+        1048,
+        141
+      ],
+      "localized_size": [
+        1039,
+        111
+      ],
+      "margins": [
+        4,
+        408,
+        4,
+        4
+      ],
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size": 136,
+      "horizontal_stretch": 1.18,
+      "shear": 0.12,
+      "width_gain_px": 367,
+      "height_gain_px": 16,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "source": "car select",
+      "korean": "차량 선택",
+      "source_bbox": [
+        5,
+        182,
+        1124,
+        301
+      ],
+      "source_size": [
+        1119,
+        119
+      ],
+      "prior_localized_bbox": [
+        9,
+        186,
+        415,
+        297
+      ],
+      "prior_localized_size": [
+        406,
+        111
+      ],
+      "localized_bbox": [
+        9,
+        186,
+        522,
+        297
+      ],
+      "localized_size": [
+        513,
+        111
+      ],
+      "margins": [
+        4,
+        602,
+        4,
+        4
+      ],
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size": 114,
+      "horizontal_stretch": 1.18,
+      "shear": 0.12,
+      "width_gain_px": 107,
+      "height_gain_px": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "source": "license select",
+      "korean": "라이선스 선택",
+      "source_bbox": [
+        6,
+        338,
+        1500,
+        457
+      ],
+      "source_size": [
+        1494,
+        119
+      ],
+      "prior_localized_bbox": [
+        10,
+        342,
+        601,
+        453
+      ],
+      "prior_localized_size": [
+        591,
+        111
+      ],
+      "localized_bbox": [
+        10,
+        342,
+        756,
+        452
+      ],
+      "localized_size": [
+        746,
+        110
+      ],
+      "margins": [
+        4,
+        744,
+        4,
+        5
+      ],
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size": 113,
+      "horizontal_stretch": 1.18,
+      "shear": 0.12,
+      "width_gain_px": 155,
+      "height_gain_px": -1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "source": "game lobby",
+      "korean": "게임 로비",
+      "source_bbox": [
+        7,
+        494,
+        1132,
+        644
+      ],
+      "source_size": [
+        1125,
+        150
+      ],
+      "prior_localized_bbox": [
+        11,
+        513,
+        413,
+        624
+      ],
+      "prior_localized_size": [
+        402,
+        111
+      ],
+      "localized_bbox": [
+        11,
+        498,
+        666,
+        640
+      ],
+      "localized_size": [
+        655,
+        142
+      ],
+      "margins": [
+        4,
+        466,
+        4,
+        4
+      ],
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size": 147,
+      "horizontal_stretch": 1.18,
+      "shear": 0.12,
+      "width_gain_px": 253,
+      "height_gain_px": 31,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "source": "main menu",
+      "korean": "메인 메뉴",
+      "source_bbox": [
+        6,
+        644,
+        1107,
+        769
+      ],
+      "source_size": [
+        1101,
+        125
+      ],
+      "prior_localized_bbox": [
+        10,
+        651,
+        417,
+        762
+      ],
+      "prior_localized_size": [
+        407,
+        111
+      ],
+      "localized_bbox": [
+        10,
+        648,
+        550,
+        765
+      ],
+      "localized_size": [
+        540,
+        117
+      ],
+      "margins": [
+        4,
+        557,
+        4,
+        4
+      ],
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size": 121,
+      "horizontal_stretch": 1.18,
+      "shear": 0.12,
+      "width_gain_px": 133,
+      "height_gain_px": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "source": "multiplayer",
+      "korean": "멀티플레이",
+      "source_bbox": [
+        6,
+        806,
+        1195,
+        956
+      ],
+      "source_size": [
+        1189,
+        150
+      ],
+      "prior_localized_bbox": [
+        10,
+        825,
+        483,
+        936
+      ],
+      "prior_localized_size": [
+        473,
+        111
+      ],
+      "localized_bbox": [
+        10,
+        810,
+        778,
+        952
+      ],
+      "localized_size": [
+        768,
+        142
+      ],
+      "margins": [
+        4,
+        417,
+        4,
+        4
+      ],
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size": 147,
+      "horizontal_stretch": 1.18,
+      "shear": 0.12,
+      "width_gain_px": 295,
+      "height_gain_px": 31,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "source": "music select",
+      "korean": "음악 선택",
+      "source_bbox": [
+        6,
+        956,
+        1276,
+        1077
+      ],
+      "source_size": [
+        1270,
+        121
+      ],
+      "prior_localized_bbox": [
+        10,
+        961,
+        414,
+        1072
+      ],
+      "prior_localized_size": [
+        404,
+        111
+      ],
+      "localized_bbox": [
+        10,
+        960,
+        529,
+        1073
+      ],
+      "localized_size": [
+        519,
+        113
+      ],
+      "margins": [
+        4,
+        747,
+        4,
+        4
+      ],
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size": 116,
+      "horizontal_stretch": 1.18,
+      "shear": 0.12,
+      "width_gain_px": 115,
+      "height_gain_px": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "source": "options",
+      "korean": "옵션",
+      "source_bbox": [
+        6,
+        1114,
+        748,
+        1265
+      ],
+      "source_size": [
+        742,
+        151
+      ],
+      "prior_localized_bbox": [
+        10,
+        1135,
+        205,
+        1244
+      ],
+      "prior_localized_size": [
+        195,
+        109
+      ],
+      "localized_bbox": [
+        10,
+        1118,
+        318,
+        1261
+      ],
+      "localized_size": [
+        308,
+        143
+      ],
+      "margins": [
+        4,
+        430,
+        4,
+        4
+      ],
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size": 151,
+      "horizontal_stretch": 1.18,
+      "shear": 0.12,
+      "width_gain_px": 113,
+      "height_gain_px": 34,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "source": "network",
+      "korean": "네트워크",
+      "source_bbox": [
+        6,
+        1274,
+        816,
+        1424
+      ],
+      "source_size": [
+        810,
+        150
+      ],
+      "prior_localized_bbox": [
+        10,
+        1293,
+        395,
+        1404
+      ],
+      "prior_localized_size": [
+        385,
+        111
+      ],
+      "localized_bbox": [
+        10,
+        1278,
+        633,
+        1420
+      ],
+      "localized_size": [
+        623,
+        142
+      ],
+      "margins": [
+        4,
+        183,
+        4,
+        4
+      ],
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size": 148,
+      "horizontal_stretch": 1.18,
+      "shear": 0.12,
+      "width_gain_px": 238,
+      "height_gain_px": 31,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "source": "rankings",
+      "korean": "랭킹",
+      "source_bbox": [
+        6,
+        1424,
+        792,
+        1580
+      ],
+      "source_size": [
+        786,
+        156
+      ],
+      "prior_localized_bbox": [
+        10,
+        1446,
+        202,
+        1557
+      ],
+      "prior_localized_size": [
+        192,
+        111
+      ],
+      "localized_bbox": [
+        10,
+        1428,
+        313,
+        1576
+      ],
+      "localized_size": [
+        303,
+        148
+      ],
+      "margins": [
+        4,
+        479,
+        4,
+        4
+      ],
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size": 155,
+      "horizontal_stretch": 1.18,
+      "shear": 0.12,
+      "width_gain_px": 111,
+      "height_gain_px": 37,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "source": "game select",
+      "korean": "게임 선택",
+      "source_bbox": [
+        3,
+        1580,
+        1236,
+        1736
+      ],
+      "source_size": [
+        1233,
+        156
+      ],
+      "prior_localized_bbox": [
+        7,
+        1602,
+        411,
+        1713
+      ],
+      "prior_localized_size": [
+        404,
+        111
+      ],
+      "localized_bbox": [
+        7,
+        1584,
+        701,
+        1732
+      ],
+      "localized_size": [
+        694,
+        148
+      ],
+      "margins": [
+        4,
+        535,
+        4,
+        4
+      ],
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size": 155,
+      "horizontal_stretch": 1.18,
+      "shear": 0.12,
+      "width_gain_px": 290,
+      "height_gain_px": 37,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "source": "mode select",
+      "korean": "모드 선택",
+      "source_bbox": [
+        2,
+        1736,
+        1252,
+        1861
+      ],
+      "source_size": [
+        1250,
+        125
+      ],
+      "prior_localized_bbox": [
+        6,
+        1743,
+        406,
+        1854
+      ],
+      "prior_localized_size": [
+        400,
+        111
+      ],
+      "localized_bbox": [
+        6,
+        1740,
+        549,
+        1857
+      ],
+      "localized_size": [
+        543,
+        117
+      ],
+      "margins": [
+        4,
+        703,
+        4,
+        4
+      ],
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size": 121,
+      "horizontal_stretch": 1.18,
+      "shear": 0.12,
+      "width_gain_px": 143,
+      "height_gain_px": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "source": "race select",
+      "korean": "레이스 선택",
+      "source_bbox": [
+        6,
+        1898,
+        1244,
+        2017
+      ],
+      "source_size": [
+        1238,
+        119
+      ],
+      "prior_localized_bbox": [
+        10,
+        1902,
+        509,
+        2013
+      ],
+      "prior_localized_size": [
+        499,
+        111
+      ],
+      "localized_bbox": [
+        10,
+        1902,
+        641,
+        2013
+      ],
+      "localized_size": [
+        631,
+        111
+      ],
+      "margins": [
+        4,
+        603,
+        4,
+        4
+      ],
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size": 114,
+      "horizontal_stretch": 1.18,
+      "shear": 0.12,
+      "width_gain_px": 132,
+      "height_gain_px": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_qa": {
+    "bbox_size_positive_margin": "13/13 PASS",
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "clean_changed_outside_source_bboxes": 0,
+    "height_improved_rows": 10,
+    "height_material_gain_ge12_rows": 7,
+    "header_128_exact": true,
+    "raw_mode": "BGRA",
+    "raw_orientation": "mirror_y"
+  },
+  "ordered_generation_gate": {
+    "1_source_text_removed_and_plate_restored": "PASS_INHERITED_C144_VALIDATED_B68_CLEAN_PLATE",
+    "2_source_matching_slant_direction": "PASS_RIGHTWARD_TECHNO_SHEAR",
+    "3_no_unnecessary_undersizing": "PASS_MAX_SAFE_PER_ROW_HEIGHT_WITH_4PX_MARGIN",
+    "4_source_faithful_weight_outline_shadow": "PASS_MEDIUM_CJK_PLUS_SILVER_GRADIENT_DARK_OUTLINE_SHADOW",
+    "5_no_clipped_pixels": "PASS_13_OF_13_POSITIVE_MARGIN",
+    "6_protected_art_clearance": "PASS_ZERO_CHANGES_OUTSIDE_EXACT_SOURCE_BBOXES",
+    "7_raw_and_flip_y": "PASS_EVIDENCE_WRITTEN",
+    "8_immediate_readability_vs_english": "PENDING_CONTROLLER_VISUAL"
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "B218_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
