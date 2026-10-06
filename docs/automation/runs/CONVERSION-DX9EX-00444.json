@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "status": "VALIDATION_PENDING",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "d90b24a3a4dfdbd5e0e4b68925b0d3b8444e4589",
-  "material_result_sha": "PENDING_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_COMMIT_SHA",
-  "result_sha": "PENDING_COMMIT_SHA",
+  "material_result_sha": "5ac8c4184e39482dee9977779ac993e6514fa51d",
+  "validation_bearing_result_sha": "5ac8c4184e39482dee9977779ac993e6514fa51d",
+  "result_sha": "5ac8c4184e39482dee9977779ac993e6514fa51d",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00444]",
   "selected_work_item": "VR-DX9EX-R26-RECENTER-REQUESTER-PID-GUARD-0027",
   "summary": "Reject stale or malformed F10 recenter IPC requests before R26 accepts ownership by matching requesterPid to the live OR2006C2C process.",
@@ -38,25 +38,29 @@
       "evidence": "Added live-game PID ownership predicate and stale-request discard path. Temporary inability to enumerate the game leaves the request pending; zero/mismatched requester PID is consumed without queueing a recenter."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
-      "automation_validation": "PENDING",
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
       "runtime_validation": "UNTESTED",
-      "evidence": "Awaiting exact-SHA GitHub Actions gates."
+      "evidence": "Exact SHA 5ac8c4184e39482dee9977779ac993e6514fa51d: DX9Ex Active Validation 37396013645 SUCCESS; policy 112052016133, host 112052121117, game 112052121126, full-chain-compile 112052121079, package 112053252072 all SUCCESS. Domain Isolation Guard 37396013737 / 112052016667 SUCCESS."
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA",
-      "task_tagged_commits": [],
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "5ac8c4184e39482dee9977779ac993e6514fa51d fix(vr): reject stale recenter requester PID [AUTO:CONVERSION-DX9EX-00444]"
+      ],
       "ci_skip_on_validation_bearing_result": false
     },
     "C5_PACKAGE": {
-      "status": "PENDING_AUTOMATION_ARTIFACT"
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Package artifact 11382919261 digest sha256:ac7fd5d8eb8be9ae86f95afc8ed5af1d69f64a98d9c4ce6d753f59f32d15ea23; CI evidence only."
     },
     "C6_STATE": {
-      "status": "PENDING_VALIDATION_EVIDENCE",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 6006986385
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "red_probe": {
       "base_sha": "d90b24a3a4dfdbd5e0e4b68925b0d3b8444e4589",
@@ -66,8 +70,29 @@
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "dx9ex_active": {
+      "run_id": 37396013645,
+      "conclusion": "success",
+      "exact_sha": "5ac8c4184e39482dee9977779ac993e6514fa51d",
+      "jobs": {
+        "policy": 112052016133,
+        "host": 112052121117,
+        "game": 112052121126,
+        "full_chain_compile": 112052121079,
+        "package": 112053252072
+      },
+      "package_artifact_id": 11382919261,
+      "package_artifact_digest": "sha256:ac7fd5d8eb8be9ae86f95afc8ed5af1d69f64a98d9c4ce6d753f59f32d15ea23"
+    },
+    "domain_isolation": {
+      "run_id": 37396013737,
+      "job_id": 112052016667,
+      "conclusion": "success",
+      "exact_sha": "5ac8c4184e39482dee9977779ac993e6514fa51d"
     }
   },
-  "next_action": "Validate the exact material SHA with DX9Ex Active Validation and Domain Isolation Guard, then finalize the run record and Issue #14 ledger.",
-  "started_at_kst": "2026-10-06T09:48:26+09:00"
+  "next_action": "Continue from latest exact HEAD with accepted-request lifecycle ownership so an already accepted F10 request cannot survive replacement of its originating game process.",
+  "started_at_kst": "2026-10-06T09:48:26+09:00",
+  "completed_at_kst": "2026-10-06T09:55:00+09:00"
 }
