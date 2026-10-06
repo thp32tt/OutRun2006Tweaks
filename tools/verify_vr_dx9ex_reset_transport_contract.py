@@ -470,6 +470,7 @@ require_order(
     reset_r32,
     "R32 reset lifecycle owner helper",
     "const HRESULT hr = lowerReset();",
+    "const bool gameDevice = IsGameDevice(device);",
     "if (gameDevice)",
     "if (SUCCEEDED(hr))",
     "R32ResetAfterGameReset();",
