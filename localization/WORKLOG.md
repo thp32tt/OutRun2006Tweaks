@@ -2590,3 +2590,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - GitHub-hosted C225R run 37515103393 SUCCESS. Machine PASS: 4/4 bbox/source-size/positive-margin; changed/alpha outside exact source bboxes=0; C135 independently validated clean source-alpha remaining=0; localized overlap/touch=0; exact header/raw mirror_y PASS.
 - Controller SOURCE/CLEAN/FINAL, high-zoom row contacts and RAW review PASS. B219 materially fixes C135 centered headings: all four are source-left anchored, large red family rises to 141px inside 145px source height, small family remains compact, explanatory English copy stays preserved. No source-heading residue, broken glyph, clipping, overlap, protected intrusion or orientation regression.
 - Decision C225R_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export refresh required; actual game validation remains UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 04:07 KST — C225R PRE_INGAME export synchronization
+
+- GitHub-hosted C exporter run 37515655448 completed SUCCESS; worker commit ecd457bd863f19ccd00fb81235ec73132be56eba rebuilt the current English-original C-pass comparison set.
+- Current manifest contains 34 rows (33 localized candidates + 1 policy-preserved original). q232 EBFC709F is review #033 at localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/033_q232_EBFC709F.jpg.
+- #033 pins English source SHA ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0 at native 2048x1024/display scale 1 and current B219 candidate SHA 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221. Controller reopened the generated FLIP-Y/RAW card and verified the intended source/current pair.
+- q232 remains C225R static PASS pending user JPG review and actual in-game validation. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

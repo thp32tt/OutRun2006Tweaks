@@ -2126,3 +2126,8 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - B219 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221 fresh C machine QA PASS: 4/4 bbox/size/positive-margin, outside/alpha/clean-alpha/overlap/touch gates zero, exact header/raw mirror_y PASS.
 - Controller visual PASS: source-left heading family and large-row hierarchy restored; no residue/breakage/clipping/intrusion. C225 first retry was verifier-only false failure; C225R corrected the alpha-bbox method without changing candidate bytes.
 - Decision C225R_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export/user review + actual game validation pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-07 04:07 KST — C225R PRE_INGAME export refreshed
+- GitHub-hosted exporter run 37515655448 SUCCESS, worker output ecd457bd863f19ccd00fb81235ec73132be56eba. Current C-pass set = 34 rows.
+- q232 EBFC709F is #033 with exact English source ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0 and B219 candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221; generated FLIP-Y + RAW card manually rechecked.
+- User JPG review + actual in-game validation remain pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.

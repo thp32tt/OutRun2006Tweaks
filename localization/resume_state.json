@@ -7288,19 +7288,19 @@
     "controller": "localization/graphics/role_B/20261007-B-MANUALQA219-EBFC709F/B219_CONTROLLER_FINAL_QA.json"
   },
   "latest_c_pre_ingame_export": {
-    "timestamp_kst": "2026-10-07T03:38:37+09:00",
-    "worker_run_id": 37511503225,
-    "worker_output_commit": "5fe3b1d369c0f7bc125936a793a0ee17bf145a9d",
+    "timestamp_kst": "2026-10-07T04:07:12+09:00",
+    "worker_run_id": 37515655448,
+    "worker_output_commit": "ecd457bd863f19ccd00fb81235ec73132be56eba",
     "manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
-    "count": 35,
-    "localized_candidate_count": 34,
+    "count": 34,
+    "localized_candidate_count": 33,
     "policy_pass_no_candidate_count": 1,
-    "q55": {
-      "number": 5,
-      "asset": "2EA557B4",
-      "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
-      "candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
-      "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/005_q055_2EA557B4.jpg"
+    "q232": {
+      "number": 33,
+      "asset": "EBFC709F",
+      "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+      "candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
+      "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/033_q232_EBFC709F.jpg"
     },
     "runtime_validation": "UNTESTED"
   },
@@ -7423,9 +7423,12 @@
   "b219_q232_manual_visual_rework": {
     "status": "C225R_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
     "fresh_independent_c": "C225R_PASS",
-    "pre_ingame_comparison_refresh": "PENDING_C225R_EXPORT",
+    "pre_ingame_comparison_refresh": "REFRESHED_C225R_EXPORT_033",
     "c_pass_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_CONTROLLER_FINAL_QA.json",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "pre_ingame_review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/033_q232_EBFC709F.jpg",
+    "pre_ingame_manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
+    "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "c225r_controller_final_qa": {
     "timestamp_kst": "2026-10-07T03:58:25+09:00",
@@ -7441,8 +7444,11 @@
     "decision": "C225R_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
     "machine_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_MACHINE_QA.json",
     "controller_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_CONTROLLER_FINAL_QA.json",
-    "pre_ingame_comparison_refresh": "PENDING_C225R_EXPORT",
+    "pre_ingame_comparison_refresh": "REFRESHED_C225R_EXPORT_033",
     "runtime_validation": "UNTESTED",
-    "forbidden_domains_touched": []
+    "forbidden_domains_touched": [],
+    "pre_ingame_review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/033_q232_EBFC709F.jpg",
+    "pre_ingame_manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
+    "pre_ingame_user_review": "PENDING_USER_REVIEW"
   }
 }
