@@ -495,6 +495,12 @@ int main()
                 r266VsDecode);
     require(
         r266VsSemantics.exact() &&
+        r266VsSemantics.versionToken == r266VsDecode.versionToken &&
+        r266VsSemantics.sourceBytecodeHash ==
+            r266VsDecode.sourceBytecodeHash &&
+        outrun::vr::dx11::
+            validate_programmable_shader_register_semantics(
+                r266VsSemantics, r266VsDecode) &&
         r266VsSemantics.vertexStage &&
         r266VsSemantics.semanticInstructionCount == 1u &&
         r266VsSemantics.destinationOperandCount == 1u &&
@@ -523,6 +529,18 @@ int main()
         r266VsSemantics.semanticContractHash != 0,
         "R266 decodes destination/source register semantics, relative addressing, and normalized constant provenance");
 
+    auto r270StaleVsSemantics = r266VsSemantics;
+    r270StaleVsSemantics.sourceBytecodeHash =
+        r266VsSemantics.sourceBytecodeHash == 1ull
+            ? 2ull
+            : (r266VsSemantics.sourceBytecodeHash ^ 1ull);
+    require(
+        r270StaleVsSemantics.exact() &&
+        !outrun::vr::dx11::
+            validate_programmable_shader_register_semantics(
+                r270StaleVsSemantics, r266VsDecode),
+        "R270 rejects detached R266 register semantics with stale R265 source provenance");
+
     const DWORD r266PsTokens[] = {
         D3DPS_VERSION(3, 0),
         static_cast<DWORD>(D3DSIO_TEX) | (3u << 24u),
@@ -538,14 +556,19 @@ int main()
         outrun::vr::dx11::
             capture_programmable_shader_function_source_evidence(
                 r266PsTokens, sizeof(r266PsTokens), false);
+    const auto r266PsDecode =
+        outrun::vr::dx11::
+            decode_programmable_shader_instruction_stream(
+                r266PsEvidence);
     const auto r266PsSemantics =
         outrun::vr::dx11::
             decode_programmable_shader_register_semantics(
-                outrun::vr::dx11::
-                    decode_programmable_shader_instruction_stream(
-                        r266PsEvidence));
+                r266PsDecode);
     require(
         r266PsSemantics.exact() &&
+        outrun::vr::dx11::
+            validate_programmable_shader_register_semantics(
+                r266PsSemantics, r266PsDecode) &&
         !r266PsSemantics.vertexStage &&
         r266PsSemantics.destinationOperandCount == 1u &&
         r266PsSemantics.sourceOperandCount == 2u &&
