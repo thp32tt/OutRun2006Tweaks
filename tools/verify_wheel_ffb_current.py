@@ -801,8 +801,8 @@ ui_natural = wheel_ui[ui_natural_start:ui_presets_end]
 
 def setting_assignments(text):
     return {
-        match.group(1): re.sub(r'\\s+', '', match.group(2))
-        for match in re.finditer(r'Settings::([A-Za-z0-9_]+)\\s*=\\s*([^;]+);', text)
+        match.group(1): re.sub(r'\s+', '', match.group(2))
+        for match in re.finditer(r'Settings::([A-Za-z0-9_]+)\s*=\s*([^;]+);', text)
     }
 
 for label, helper, fallback in (
