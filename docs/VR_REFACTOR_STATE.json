@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T16:06:00+09:00",
+  "updatedKst": "2026-10-06T16:10:01+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -116,7 +116,7 @@
     "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051",
     "VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052"
   ],
-  "next": "CONVERSION-DX9EX-00472 / VR-DX9EX-R13-DESTROY-TRANSACTION-0055 material candidate pending canonical validation. D3D9ExDirectPassthrough now preserves SafeEye/CopyFence/direct-ACK/read mappings and capture freshness state until downstream R19/R20 session destruction succeeds.",
+  "next": "CONVERSION-DX9EX-00473: continue transactional propagation through remaining outer DestroySession wrappers. Next runnable successor is R26 recenter teardown: ResetSessionState currently mutates/requeues accepted recenter ownership before the downstream DestroySession result, so a failed parent destroy can discard live-session recenter state.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -261,7 +261,8 @@
     "CONVERSION-DX9EX-00470 / VR-DX9EX-SESSION-DESTROY-TRANSACTION-0053: R19 parent-session teardown now preserves swapchain/local host ownership until the lower xrDestroySession succeeds. Source material f385ab8e9ae689f5905ecb2059683c9a3654f618; final verifier-scope/validation-bearing SHA 4dcbc04bd99627700f3a6297986856f12a3c0054. DX9Ex Active 37425658979 policy/game/R33-full-chain/host/package SUCCESS; Domain Isolation 37425658964 SUCCESS. Package artifact 11395123099 digest sha256:c2ba146129db987a7ec0cbdf922f40b9eac28aedc8230b2b34d857e7b6297845. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00471 / VR-DX9EX-INNER-SESSION-TEARDOWN-TRANSACTION-0054: pending exact-SHA validation. The inner OpenXR compatibility DestroySession now calls the runtime first and only clears frame mapping, LOCAL/session identity and graphics binding on XR_SUCCESS. This preserves the D3D11 completion-fence prerequisites needed by outer R19 teardown retry after a transient parent-destroy failure. RUNTIME_VALIDATION=UNTESTED.",
     "CONVERSION-DX9EX-00471 / VR-DX9EX-INNER-SESSION-TEARDOWN-TRANSACTION-0054 exact SHA 1e7cf32eb551503428a16b9ec6bd7637654bfbc3 passed DX9Ex Active 37426540525 policy/game/R33-full-chain/host/package, Domain Isolation 37426540662 and Autodev Coordination 37426540615. Package artifact 11394384385 digest sha256:912afd2338bbd7baa9e730f8c531cc297b8cdb66bacaae643b99a8530b0efc10. Runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00472 / VR-DX9EX-R13-DESTROY-TRANSACTION-0055: D3D9ExDirectPassthrough::DestroySession now forwards to R19 first and calls ResetR13HostState only on XR_SUCCESS. Failed downstream parent destruction therefore retains SafeEyes, CopyFence, DirectAck mapping, read mappings and capture-freshness state for retry. RUNTIME_VALIDATION=UNTESTED."
+    "CONVERSION-DX9EX-00472 / VR-DX9EX-R13-DESTROY-TRANSACTION-0055: D3D9ExDirectPassthrough::DestroySession now forwards to R19 first and calls ResetR13HostState only on XR_SUCCESS. Failed downstream parent destruction therefore retains SafeEyes, CopyFence, DirectAck mapping, read mappings and capture-freshness state for retry. RUNTIME_VALIDATION=UNTESTED.",
+    "CONVERSION-DX9EX-00472 / VR-DX9EX-R13-DESTROY-TRANSACTION-0055 exact SHA 7642b5c227df689e67bbb95509ce0e762bd8f0b7 passed DX9Ex Active 37427445400 policy/full-chain-compile/game/host/package, Domain Isolation 37427445392 and Autodev Coordination 37427445426. Package artifact 11396195967 digest sha256:15483268be2c59ba90cb13b0f465a55ce6f0f257187d6d50294eeede6317c12a. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
@@ -1104,7 +1105,8 @@
   },
   "completedWork": [
     "VR-DX9EX-SESSION-DESTROY-TRANSACTION-0053",
-    "VR-DX9EX-INNER-SESSION-TEARDOWN-TRANSACTION-0054"
+    "VR-DX9EX-INNER-SESSION-TEARDOWN-TRANSACTION-0054",
+    "VR-DX9EX-R13-DESTROY-TRANSACTION-0055"
   ],
   "post1000Maintenance00470": {
     "taskId": "CONVERSION-DX9EX-00470",
@@ -1175,12 +1177,26 @@
     "attempt": "1/3",
     "item": "VR-DX9EX-R13-DESTROY-TRANSACTION-0055",
     "baseSha": "46b307b0af372cb5557d17248e59ba9ce0e6c546",
-    "materialResultSha": "PENDING_SELF",
-    "validationBearingResultSha": "PENDING_SELF",
-    "automationValidation": "PENDING",
+    "materialResultSha": "7642b5c227df689e67bbb95509ce0e762bd8f0b7",
+    "validationBearingResultSha": "7642b5c227df689e67bbb95509ce0e762bd8f0b7",
+    "automationValidation": "PASS",
     "runtimeValidation": "UNTESTED",
     "runtimeBehaviorChanged": true,
     "summary": "Make the D3D9Ex direct-host DestroySession wrapper transactional so R13 host resources/state survive a failed downstream session destruction and remain retryable.",
-    "status": "VALIDATING"
+    "status": "COMPLETE",
+    "validation": {
+      "dx9exActiveRunId": 37427445400,
+      "jobs": {
+        "policy": 112150217808,
+        "fullChainCompile": 112150311846,
+        "game": 112150311877,
+        "host": 112150311896,
+        "package": 112151737021
+      },
+      "domainIsolationRunId": 37427445392,
+      "autodevCoordinationRunId": 37427445426,
+      "packageArtifactId": 11396195967,
+      "packageArtifactDigest": "sha256:15483268be2c59ba90cb13b0f465a55ce6f0f257187d6d50294eeede6317c12a"
+    }
   }
 }
