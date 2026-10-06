@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261007-C222-FEF70E85",
+  "qa_id": "C222",
+  "timestamp_kst": "2026-10-07T02:27:10+09:00",
+  "queue_index": 236,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "producer_run": "20261007-B-MANUALQA217-FEF70E85",
+  "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "candidate_sha256": "5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245",
+  "prior_c_status_invalidated": "C153_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "candidate_changed_by_C": false,
+  "producer_machine_status": "PASS_REPORTED",
+  "producer_machine_summary": {
+    "bbox_size_positive_margin": "14/14 PASS",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_pixels_outside_exact_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "source_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "protected_REVERSED_changed_pixels": 0,
+    "header_128_exact_canonical": true,
+    "raw_mode": "BGRA",
+    "raw_orientation": "mirror_y"
+  },
+  "independent_c_machine_reexecution": "NOT_REQUIRED_AFTER_DEFINITE_CONTROLLER_VISUAL_FAIL",
+  "controller_visual_qa": "FAIL_SOURCE_STYLE_PROPORTION_WEIGHT",
+  "visual_failures": [
+    "Canonical English stage labels use a strongly condensed, narrow-stem uppercase family; B217 uses broad square Noto Sans CJK KR Black glyphs and then widens them up to about 1.18x, producing the opposite width/proportion character.",
+    "The Korean strokes read materially heavier and blockier than the source family. The source-vs-B217 14-row contact sheet makes the family mismatch visible even though every localized bbox is contained.",
+    "B217 fixes the prior low-resolution/undersized C153 false negative, but the replacement does not satisfy the current source-font/style fidelity gate because condensed proportion, stroke character and visual weight are not source-faithful."
+  ],
+  "ordered_visual_gate": {
+    "1_slant_perspective_direction": "PASS_UPRIGHT_SOURCE_AND_CANDIDATE",
+    "2_clean_plate_source_removal": "PASS_C153_VALIDATED_CLEAN_PLATE_NO_VISIBLE_SOURCE_RESIDUE",
+    "3_original_font_style_fidelity": "FAIL_CONDENSED_PROPORTION_AND_WEIGHT_MISMATCH",
+    "4_scale_and_readability": "PASS_IMMEDIATELY_READABLE_AND_WITHIN_SOURCE_BBOX",
+    "5_glyph_integrity": "PASS_NATIVE_HD_NO_BROKEN_OR_NEAREST_UPSCALED_HANGUL",
+    "6_protected_art_separation": "PASS_ZERO_OUTSIDE_AND_REVERSED_EXACT",
+    "7_source_faithful_placement": "PASS_RIGHT_ANCHORED_WITH_POSITIVE_MARGINS",
+    "8_flip_y_and_raw_consistency": "PASS_READABLE_AND_RAW_MIRROR_Y_EVIDENCE"
+  },
+  "reasoning": "Visual source-style fidelity is a fail-closed C gate. Numeric containment, residue, overlap, header and orientation PASS cannot override a definite typography-family mismatch.",
+  "decision": "C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
+  "required_rework": "Keep the validated clean plate, canonical stage spellings, right anchors, positive margins and RAW mirror-Y structure. Re-render all 14 Korean stage labels with a materially more condensed/narrow source-family treatment and lighter source-faithful stroke character; do not apply the current 1.18x width expansion. Preserve practical readable height while staying inside each exact source glyph/effect bbox.",
+  "producer_report": "localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_FEF70E85_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_FEF_SOURCE_OLD_CLEAN_NEW_READABLE.jpg",
+    "localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_FEF_ROW_CONTACT.jpg",
+    "localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_FEF_SOURCE_OLD_NEW_RAW.jpg"
+  ],
+  "pre_ingame_comparison_refresh": "BLOCKED_UNTIL_MATERIAL_B_REWORK_AND_NEW_C_PASS",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}

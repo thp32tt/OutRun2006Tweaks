@@ -2503,3 +2503,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Prior C153 pass is superseded for changed bytes. Fresh independent C + regenerated English-original comparison JPG + user review + actual-game validation remain mandatory. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_CONTROLLER_SELF_QA.json.
 
+
+## 2026-10-07 02:27 KST — C222 q236 FEF70E85 fresh independent visual QA
+
+- Selected fresh-C-pending B217 q236 FEF70E85 rather than repeating an already approved candidate. Current candidate SHA 5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245; canonical source SHA a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518.
+- Producer numeric/static evidence remains strong: 14/14 bbox/size/positive-margin PASS, outside/alpha/protected/source-residue/overlap/touch = 0, protected REVERSED exact, canonical header/BGRA raw mirror_y preserved. B217 also fixes the prior C153 low-resolution/undersized false negative.
+- Independent C source/C153-old/clean/B217 readable sheet, 14-row contact sheet and RAW sheet were reviewed. FAIL_SOURCE_STYLE_PROPORTION_WEIGHT: the English family is strongly condensed/narrow, while B217 uses broad square Noto Sans CJK KR Black glyphs and widens them up to about 1.18x. The new text is readable and clean but is visibly the wrong family proportion/stroke weight relative to source.
+- Decision C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT. Preserve the validated clean plate, canonical stage spellings, right anchors, readable height, positive margins and raw orientation; rerender all 14 rows with a materially more condensed/narrow, lighter source-faithful Korean treatment, then require a new independent C pass.
+- Pre-in-game consolidated PASS export remains blocked for q236 until material B rework + newer C PASS. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.

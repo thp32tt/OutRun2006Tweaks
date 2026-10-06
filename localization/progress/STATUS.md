@@ -2064,3 +2064,8 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - 14/14 bbox/size/positive-margin; clean/outside/alpha/protected/residue/overlap/touch=0; REVERSED exact; RAW mirror_y and controller readable/row/RAW QA PASS.
 - Fresh C/comparison JPG/user review/in-game required; RUNTIME_VALIDATION=UNTESTED.
 
+
+## 2026-10-07 02:27 KST — C222 q236 FEF70E85
+- B217 FEF70E85 5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245: producer 14/14 containment/positive-margin and zero-pixel gates remain PASS; native-HD/readability and RAW mirror-Y are clean.
+- Fresh independent C visual QA FAIL_SOURCE_STYLE_PROPORTION_WEIGHT: source stage typography is strongly condensed/narrow, but B217 Korean is broad/blocky Noto Sans CJK KR Black with up to ~1.18x width expansion. Numeric containment cannot override current source-font/style fidelity policy.
+- Decision C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT; q236 returned to B for material typography rework and must receive a newer C PASS before PRE_INGAME/in-game testing. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.

@@ -2666,6 +2666,21 @@
       "status": "B_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
       "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_CONTROLLER_SELF_QA.json",
       "runtime_validation": "UNTESTED"
+    },
+    "c222_fef70e85": {
+      "timestamp_kst": "2026-10-07T02:27:10+09:00",
+      "queue_index": 236,
+      "asset": "FEF70E85",
+      "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+      "candidate_sha256": "5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245",
+      "producer_run": "B217",
+      "producer_machine_status": "PASS_REPORTED",
+      "producer_bbox_size_positive_margin": "14/14 PASS",
+      "producer_zero_pixel_gates": "outside/alpha/protected/source_residue/overlap/touch=0; REVERSED exact; header/raw mirror_y preserved",
+      "controller_visual_qa": "FAIL_SOURCE_STYLE_PROPORTION_WEIGHT",
+      "decision": "C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
+      "report": "localization/graphics/role_C/20261007-C222-FEF70E85/C222_FEF70E85_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
@@ -2893,7 +2908,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "A144/A145/A146 and B210/B211/B212/B214/B215/B216 plus B217 q236 FEF70E85 are pending fresh independent C. Prior C153 pass for q236 is superseded by native-HD candidate bytes; C must regenerate the English-original comparison before in-game testing. RUNTIME_VALIDATION=UNTESTED.",
+  "current_pending_c": "A144/A145/A146 and B210/B211/B212/B214/B215/B216 remain pending fresh independent C. B217 q236 FEF70E85 was independently rejected by C222 for source-style condensed proportion/weight mismatch and returned to B REWORK_REQUIRED. RUNTIME_VALIDATION=UNTESTED.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -3155,5 +3170,20 @@
     "pre_ingame_comparison_refresh": "PENDING_C",
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "c222_fef70e85": {
+    "timestamp_kst": "2026-10-07T02:27:10+09:00",
+    "queue_index": 236,
+    "asset": "FEF70E85",
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "candidate_sha256": "5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245",
+    "producer_run": "B217",
+    "producer_machine_status": "PASS_REPORTED",
+    "producer_bbox_size_positive_margin": "14/14 PASS",
+    "producer_zero_pixel_gates": "outside/alpha/protected/source_residue/overlap/touch=0; REVERSED exact; header/raw mirror_y preserved",
+    "controller_visual_qa": "FAIL_SOURCE_STYLE_PROPORTION_WEIGHT",
+    "decision": "C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
+    "report": "localization/graphics/role_C/20261007-C222-FEF70E85/C222_FEF70E85_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
   }
 }

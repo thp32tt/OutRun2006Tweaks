@@ -4217,8 +4217,7 @@
     "E3FD08BE",
     "12519155",
     "1762489B",
-    "1F5FE6E9",
-    "FEF70E85"
+    "1F5FE6E9"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -7146,9 +7145,26 @@
     "worker_output_commit": "dee9990",
     "github_worker_run_id": 37498324346,
     "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_CONTROLLER_SELF_QA.json",
-    "status": "B_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
-    "fresh_independent_c": "PENDING",
-    "pre_ingame_comparison_refresh": "PENDING_C",
+    "status": "C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
+    "fresh_independent_c": "C222_FAIL_RETURNED_TO_B_REWORK",
+    "pre_ingame_comparison_refresh": "BLOCKED_UNTIL_MATERIAL_REWORK_AND_NEW_C_PASS",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": [],
+    "c_return_report": "localization/graphics/role_C/20261007-C222-FEF70E85/C222_FEF70E85_CONTROLLER_FINAL_QA.json"
+  },
+  "c222_controller_final_qa": {
+    "timestamp_kst": "2026-10-07T02:27:10+09:00",
+    "run": "20261007-C222-FEF70E85",
+    "queue_index": 236,
+    "asset": "FEF70E85",
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "candidate_sha256": "5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245",
+    "producer_run": "B217",
+    "producer_machine_status": "PASS_REPORTED_14_OF_14_CONTAINMENT_ZERO_PIXEL_GATES",
+    "controller_visual_qa": "FAIL_SOURCE_STYLE_PROPORTION_WEIGHT",
+    "decision": "C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
+    "required_rework": "Condensed/narrow, lighter source-faithful Korean stage family; keep validated clean plate/right anchors/positive margins/raw mirror_y.",
+    "report": "localization/graphics/role_C/20261007-C222-FEF70E85/C222_FEF70E85_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
