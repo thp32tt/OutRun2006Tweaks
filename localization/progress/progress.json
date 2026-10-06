@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06 17:34",
+  "updated_at_kst": "2026-10-06T18:19:28+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -116,7 +116,7 @@
         22,
         23
       ],
-      "name_entry_status": "b206_hold_compat_alias_sidecar_and_name_render_hooks_required",
+      "name_entry_status": "a141_hold_sidecar_alias_foundation_build_pass_input_render_hooks_required",
       "name_entry_preflight_report": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_NAME_ENTRY_PREFLIGHT.json",
       "name_entry_controller_review": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_CONTROLLER_PREFLIGHT_REVIEW.json",
       "name_entry_symbol_count": 49,
@@ -135,7 +135,17 @@
       "name_entry_direct_utf8_native_field": "REJECTED_FIXED_BYTE_CONSUMERS",
       "name_entry_fixed_byte_evidence": "4-byte bounded copies/termination at 0x4B2A43/0x4B2BBE/0x4B2C60/0x4B2D0C; raw 0x11 writer at 0x4308B0; raw 0x17 propagation via 0x4675F0",
       "name_entry_k4_current_coverage": "text-ID translations only; arbitrary player name not covered",
-      "name_entry_compatibility_direction": "ASCII native alias + mod-owned UTF-8 sidecar + explicit local name-render hooks; online/remote alias until separate transport proof"
+      "name_entry_compatibility_direction": "ASCII native alias + mod-owned UTF-8 sidecar + explicit local name-render hooks; online/remote alias until separate transport proof",
+      "name_entry_a141_sidecar_report": "localization/graphics/role_A/20261006-A-PREFLIGHT141-NAME-SIDECAR/A141_NAME_SIDECAR_FOUNDATION.json",
+      "name_entry_sidecar_path": "SaveGame/KoreanPlayerNames.tsv",
+      "name_entry_native_alias_format": "K + 13 Base32(A-Z2-7) chars = 14 bytes",
+      "name_entry_native_alias_payload_ceiling": "14 <= proven 15-byte payload ceiling",
+      "name_entry_sidecar_key": "native compatibility alias itself",
+      "name_entry_sidecar_atomic_write": "temporary file + MoveFileExW replace/write-through",
+      "name_entry_a141_win32_release_run": 37441155668,
+      "name_entry_a141_win32_release_artifact": 11401148429,
+      "name_entry_a141_korean_test_run": 37441155760,
+      "name_entry_a141_korean_test_artifact": 11401263208
     },
     "packaging": {
       "status": "not_started",
@@ -182,7 +192,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B206 classified concrete consumers of the proven 16-byte player-name field and rejected direct UTF-8 storage: at least one path truncates/copies the name in 4-byte units, while other paths propagate raw 17/23-byte records, and Edit License feeds the native field directly to stock text-object setup. Current K4 overlay resolves only remembered Text/*.bin text IDs, not arbitrary player-name strings. Index24 remains fail-closed, now narrowed to compatibility-alias + UTF-8-sidecar/local-render-hook design; no DDS/runtime source changed. Existing C/ingame-pending assets were not repeated.",
+  "next_checkpoint": "A141 completed B206's two deterministic implementation prerequisites for index24: a <=15-byte ASCII compatibility alias policy and a mod-owned UTF-8 sidecar lifecycle. src/hooks_localization.cpp now provides K+13 Base32 deterministic aliases, collision handling, UTF-8 validation and atomic SaveGame/KoreanPlayerNames.tsv persistence keyed by the alias itself. Win32 Release run 37441155668 and Korean Test Build run 37441155760 both PASS. No native player-name bytes, DDS, input, render, ranking, network or replay behavior changed. Index24 remains HOLD for Hangul composition/name-entry and explicit local player-name rendering hooks; online/ranking/replay keep the legacy alias.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,

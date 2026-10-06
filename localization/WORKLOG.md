@@ -2331,3 +2331,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Existing B202 `788CE557`, B203 `B1696633`, and B204 Stage repairs were not duplicated. A139 explicitly consumes/preserves the B204 Stage-fixed A064 candidate.
 - Affected in-game rows remain open. Independent C and a NEW actual in-game retest are mandatory before closure. VR/FFB/DX11/DXVK untouched.
 
+
+
+## 2026-10-06 18:19 KST — A141 name-entry sidecar implementation foundation
+
+- A primary-shard production was exhausted and no user/C rework was actionable, so A refreshed state and work-stole index24 from B's unresolved B206 HOLD. Completed A136-A139/C-pending graphics were not regenerated or re-QA'd.
+- B205/B206 already proved why native UTF-8 is unsafe. A141 therefore implemented the compatibility layer rather than changing the 49-cell keyboard art: a 14-byte ASCII alias that fits the proven 15-byte payload ceiling and a canonical UTF-8 name sidecar at `SaveGame/KoreanPlayerNames.tsv`.
+- Sidecar rows are `alias<TAB>UTF-8-name`; loader rejects malformed alias/UTF-8/control characters and inconsistent duplicate mappings. New aliases use FNV-1a 64-bit plus deterministic salt collision resolution, and writes are sorted + atomic via `MoveFileExW`.
+- The alias is itself the stable key, so save-slot/file-name discovery is not required for this layer. The game can continue persisting/serializing a legacy-safe byte string while the mod retains the local Korean name independently.
+- No native player-name field write, Hangul composition, input interception, stock name renderer substitution or remote protocol change is enabled by this batch. Those remain the next implementation boundary.
+- Win32 Release run `37441155668` and Korean Test Build run `37441155760` both succeeded; artifacts `11401148429` and `11401263208`.
+- `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.

@@ -41,9 +41,24 @@
   ],
   "build": {
     "required": true,
-    "status": "PENDING_WIN32_RELEASE"
+    "status": "PASS",
+    "win32_release": {
+      "run_id": 37441155668,
+      "conclusion": "SUCCESS",
+      "artifact_id": 11401148429,
+      "digest": "sha256:418137344ed0ccb442c960da1b548ee5ca133aff29b36b513069da756bea334f"
+    },
+    "korean_test": {
+      "run_id": 37441155760,
+      "conclusion": "SUCCESS",
+      "artifact_id": 11401263208,
+      "digest": "sha256:784d51dbbb29352fda1c4b389b06ccec03f51e5302843545781033136ea77dd5"
+    }
   },
   "runtime_validation": "UNTESTED",
   "forbidden_domains_touched": [],
-  "status": "A141_SOURCE_IMPLEMENTED_BUILD_PENDING"
+  "status": "A141_SIDECAR_ALIAS_FOUNDATION_BUILD_PASS_INPUT_RENDER_HOOKS_REQUIRED",
+  "runtime_source_changed": true,
+  "runtime_behavior_changed": false,
+  "reconciled_at_kst": "2026-10-06T18:19:28+09:00"
 }

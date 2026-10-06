@@ -1909,3 +1909,14 @@ User review of the generated before/after JPGs overrode prior static PASS where 
 
 Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static candidates. **Not runtime closed**: IGR-008/011/012/014/015/016/018 require independent C and a new actual in-game retest.
 
+
+
+## 2026-10-06 18:19 KST — A141 index24 compatibility alias + UTF-8 sidecar foundation
+- Refreshed HEAD/queue/backlog after A136-A139. No A-owned active P0/P1, C-returned REWORK, RENDER_READY or ONE_STAGE_TO_RENDER item remained; all new visual reworks are producer-static-pass pending C/new in-game and were not repeated. A therefore work-stole the sole unresolved index24 B206 HOLD.
+- Continued strictly after B206: direct UTF-8 in the native 16-byte player-name field remains rejected. Implemented only the proven-safe prerequisites in `src/hooks_localization.cpp`: deterministic **14-byte ASCII alias** (`K` + 13 Base32 A-Z2-7 chars), deterministic collision salt/reuse, strict UTF-8/control validation, bidirectional alias/name mapping, and atomic `SaveGame/KoreanPlayerNames.tsv` persistence.
+- The sidecar key is the native alias itself. This avoids guessing LicenseXX slot numbering/path while allowing the alias already carried by the game's player-name field to identify the canonical Korean UTF-8 name.
+- Fail-closed behavior is preserved: A141 does **not** write `0x7C23E0`, does not redraw/relabel `66743AA8`, and does not yet hook Hangul input, local rendering, ranking, network or replay serialization.
+- Current build validation: Win32 Release run `37441155668` **SUCCESS**, artifact `11401148429` digest `sha256:418137344ed0ccb442c960da1b548ee5ca133aff29b36b513069da756bea334f`; Korean Test Build run `37441155760` **SUCCESS**, artifact `11401263208` digest `sha256:784d51dbbb29352fda1c4b389b06ccec03f51e5302843545781033136ea77dd5`.
+- Queue state: `a141_hold_sidecar_alias_foundation_build_pass_input_render_hooks_required`. Next safe implementation is Hangul composition/name-entry behavior plus explicit local player-name render substitution; Edit License `0x4DE48A -> 0x48F280` is the only exact local display callsite currently proven. Online/ranking/replay remain native-alias fallback until separately mapped/tested.
+- `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_A/20261006-A-PREFLIGHT141-NAME-SIDECAR/A141_NAME_SIDECAR_FOUNDATION.json`.
