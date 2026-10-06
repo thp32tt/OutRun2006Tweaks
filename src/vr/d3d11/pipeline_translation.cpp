@@ -1593,6 +1593,8 @@ namespace outrun::vr::dx11
         ProgrammableShaderRegisterSemantics out{};
         out.vertexStage = decode.vertexStage;
         out.instructionDecodeExact = decode.exact();
+        out.versionToken = decode.versionToken;
+        out.sourceBytecodeHash = decode.sourceBytecodeHash;
         out.instructionCount = decode.instructionCount;
         if (!out.instructionDecodeExact)
             return out;
@@ -1993,6 +1995,18 @@ namespace outrun::vr::dx11
             out.semanticInstructionCount == out.instructionCount;
         out.registerSemanticsHash = semanticHash;
         return out;
+    }
+
+    bool validate_programmable_shader_register_semantics(
+        const ProgrammableShaderRegisterSemantics& semantics,
+        const ProgrammableShaderInstructionDecode& decode) noexcept
+    {
+        return semantics.exact() &&
+               decode.exact() &&
+               semantics.vertexStage == decode.vertexStage &&
+               semantics.versionToken == decode.versionToken &&
+               semantics.sourceBytecodeHash == decode.sourceBytecodeHash &&
+               semantics.instructionCount == decode.instructionCount;
     }
 
     ProgrammableShaderInterfaceSemantics
