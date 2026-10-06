@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T19:15:59.068+09:00",
+  "updated_at_kst": "2026-10-06T19:34:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -116,7 +116,7 @@
         22,
         23
       ],
-      "name_entry_status": "a142_local_player_name_render_build_pass_jamo_artwork_input_wiring_required",
+      "name_entry_status": "b209_jamo_artwork_static_pass_hold_input_wiring_required",
       "name_entry_preflight_report": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_NAME_ENTRY_PREFLIGHT.json",
       "name_entry_controller_review": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_CONTROLLER_PREFLIGHT_REVIEW.json",
       "name_entry_symbol_count": 49,
@@ -192,7 +192,16 @@
       "name_entry_a142_win32_release_run": 37447477302,
       "name_entry_a142_win32_release_artifact": 11403418681,
       "name_entry_a142_korean_test_run": 37447477392,
-      "name_entry_a142_korean_test_artifact": 11404063316
+      "name_entry_a142_korean_test_artifact": 11404063316,
+      "name_entry_candidate": "localization/graphics/hd_candidates/textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+      "name_entry_candidate_sha256": "c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e",
+      "name_entry_b209_report": "localization/graphics/role_B/20261006-B-PRODUCTION209-NAMEENTRY-JAMO-KEYCAPS/B209_JAMO_KEYCAP_REPORT.json",
+      "name_entry_b209_controller_qa": "localization/graphics/role_B/20261006-B-PRODUCTION209-NAMEENTRY-JAMO-KEYCAPS/B209_CONTROLLER_SELF_QA.json",
+      "name_entry_b209_mapping": "B207 a..z selections + A135 A..Z sprite identity -> 26 standard two-beolsik base Jamo keycaps",
+      "name_entry_b209_format": "DXT3/BC2 preserved; canonical 128-byte header preserved",
+      "name_entry_b209_decoded_qa": "26/26 containment+size PASS; visible outside=0; alpha outside=0; protected visible changed=0",
+      "name_entry_b209_visual_qa": "PASS readable full + raw mirror_y; no visible Latin residue/broken glyph/clipping/overlap/intrusion/wrong orientation",
+      "name_entry_b209_package_selected": false
     },
     "packaging": {
       "status": "not_started",
@@ -239,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A142 consumes B208 without repeating its composer and completes the explicit local alias->UTF-8 player-name render prerequisite. Exact stock text-object drawing at VA 0x48F455 uses Sumo_Printf(\"%s\", object+0x4E); the existing Sumo_Printf hook now substitutes only sidecar-backed aliases at exact return site module+0x8F45A, preserving the native alias bytes and all save/ranking/network/replay transport. Source dbbfdca6... passed Win32 Release 37447477302 and Korean Test Build 37447477392. Runtime/in-game validation is still untested. Remaining index24 work is source-faithful Jamo key artwork, then wiring B208 composition into B207's character path and committing the A141 alias on END.",
+  "next_checkpoint": "B209 produced the first actual Korean name-entry artwork candidate for index24: 26 A-Z keycaps are replaced by their standard two-beolsik base Jamo using the B207 runtime a..z mapping and A135 A..Z sprite identity. Candidate c6daaf2e... preserves DXT3/BC2, canonical header and every non-target BC2 block; decoded 26/26 bbox/size plus outside/protected gates PASS and controller readable/raw visual QA PASS. A142 local alias->UTF8 rendering remains BUILD PASS. The overall feature stays HOLD because B208 composition is not yet wired to stock character events and END does not yet commit the A141 alias; candidate is intentionally excluded from the Korean test package until that runtime wiring is build-validated.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
