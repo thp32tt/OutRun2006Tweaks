@@ -468,6 +468,20 @@ forbid(
     "WaitForSingleObject(",
 )
 
+present_r7 = body(r7, "HRESULT __stdcall PresentDest(")
+require_order(
+    present_r7,
+    "DirectGPU post-Present publication ordering",
+    "const HRESULT hr=PresentHook.stdcall<HRESULT>",
+    "if(directTransport)",
+    "if(SUCCEEDED(hr)&&DirectTransportFrameReadyAfterPresent(pendingFrameId))",
+    "if(composedStereo&&SUCCEEDED(hr)&&!FrameStereoIncomplete)",
+    "PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,pendingFrameId);",
+    "PublishRenderFrame(OutRunVR::StereoSbsActive,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,&FrameStereoMetadata,false,directTransport);",
+)
+if present_r7.count("DirectTransportFrameReadyAfterPresent(pendingFrameId)") != 1:
+    fail("DirectGPU Present path must authorize publication through exactly one post-Present readiness gate")
+
 forbid(
     resolve_direct_r32,
     "R32 final owner fixed-slot regression",
