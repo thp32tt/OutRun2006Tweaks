@@ -817,6 +817,50 @@ require_order(
     "ReleaseCom(completion);",
 )
 
+create_shaders = body(host_sbs, "inline bool CreateShaders()")
+require_order(
+    create_shaders,
+    "R19 shader resource bundle is published transactionally",
+    "ReleaseCom(ConstantBuffer);",
+    "ReleaseCom(Sampler);",
+    "ReleaseCom(Ps);",
+    "ReleaseCom(Vs);",
+    "ID3D11VertexShader* pendingVs = nullptr;",
+    "ID3D11PixelShader* pendingPs = nullptr;",
+    "ID3D11SamplerState* pendingSampler = nullptr;",
+    "ID3D11Buffer* pendingConstantBuffer = nullptr;",
+    "CreateVertexShader(vsCode->GetBufferPointer(),",
+    "&pendingVs);",
+    "CreatePixelShader(psCode->GetBufferPointer(),",
+    "&pendingPs);",
+    "CreateSamplerState(&sd, &pendingSampler)",
+    "CreateBuffer(",
+    "&bd, nullptr, &pendingConstantBuffer)",
+    "Vs = pendingVs;",
+    "Ps = pendingPs;",
+    "Sampler = pendingSampler;",
+    "ConstantBuffer = pendingConstantBuffer;",
+    "return true;",
+)
+require(
+    create_shaders,
+    "R19 shader partial-creation rollback",
+    "const auto rollbackPending = [&]() noexcept",
+    "ReleaseCom(pendingConstantBuffer);",
+    "ReleaseCom(pendingSampler);",
+    "ReleaseCom(pendingPs);",
+    "ReleaseCom(pendingVs);",
+    "rollbackPending();",
+)
+forbid(
+    create_shaders,
+    "R19 shader creation must not publish directly into globals",
+    "nullptr, &Vs);",
+    "nullptr, &Ps);",
+    "CreateSamplerState(&sd, &Sampler)",
+    "&bd, nullptr, &ConstantBuffer)",
+)
+
 sbs_acquire = body(host_sbs, "inline bool Acquire(Swapchain& swapchain")
 require(
     host_sbs,

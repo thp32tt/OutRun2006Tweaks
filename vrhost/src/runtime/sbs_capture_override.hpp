@@ -512,6 +512,14 @@ float4 PSMain(VSOut input) : SV_Target
         if (!OutRunVrFinalTest::Device)
             return false;
 
+        // A previous partial creation attempt must not survive into a retry.
+        // Keep the published shader bundle all-or-nothing so failed retries
+        // cannot overwrite live COM pointers and leak the objects they owned.
+        ReleaseCom(ConstantBuffer);
+        ReleaseCom(Sampler);
+        ReleaseCom(Ps);
+        ReleaseCom(Vs);
+
         ID3DBlob* vsCode = nullptr;
         ID3DBlob* psCode = nullptr;
         ID3DBlob* errors = nullptr;
@@ -533,29 +541,58 @@ float4 PSMain(VSOut input) : SV_Target
             return false;
         }
 
+        ID3D11VertexShader* pendingVs = nullptr;
+        ID3D11PixelShader* pendingPs = nullptr;
+        ID3D11SamplerState* pendingSampler = nullptr;
+        ID3D11Buffer* pendingConstantBuffer = nullptr;
+        const auto rollbackPending = [&]() noexcept
+        {
+            ReleaseCom(pendingConstantBuffer);
+            ReleaseCom(pendingSampler);
+            ReleaseCom(pendingPs);
+            ReleaseCom(pendingVs);
+        };
+
         hr = OutRunVrFinalTest::Device->CreateVertexShader(vsCode->GetBufferPointer(),
-            vsCode->GetBufferSize(), nullptr, &Vs);
+            vsCode->GetBufferSize(), nullptr, &pendingVs);
         if (SUCCEEDED(hr))
             hr = OutRunVrFinalTest::Device->CreatePixelShader(psCode->GetBufferPointer(),
-                psCode->GetBufferSize(), nullptr, &Ps);
+                psCode->GetBufferSize(), nullptr, &pendingPs);
         ReleaseCom(vsCode);
         ReleaseCom(psCode);
-        if (FAILED(hr) || !Vs || !Ps)
+        if (FAILED(hr) || !pendingVs || !pendingPs)
+        {
+            rollbackPending();
             return false;
+        }
 
         D3D11_SAMPLER_DESC sd{};
         sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
         sd.AddressU = sd.AddressV = sd.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-        if (FAILED(OutRunVrFinalTest::Device->CreateSamplerState(&sd, &Sampler)))
+        if (FAILED(OutRunVrFinalTest::Device->CreateSamplerState(&sd, &pendingSampler)) ||
+            !pendingSampler)
+        {
+            rollbackPending();
             return false;
+        }
 
         D3D11_BUFFER_DESC bd{};
         bd.ByteWidth = sizeof(BlitParams);
         bd.Usage = D3D11_USAGE_DYNAMIC;
         bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
         bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-        return SUCCEEDED(OutRunVrFinalTest::Device->CreateBuffer(&bd, nullptr, &ConstantBuffer)) &&
-            ConstantBuffer;
+        if (FAILED(OutRunVrFinalTest::Device->CreateBuffer(
+                &bd, nullptr, &pendingConstantBuffer)) || !pendingConstantBuffer)
+        {
+            rollbackPending();
+            return false;
+        }
+
+        Vs = pendingVs;
+        Ps = pendingPs;
+        Sampler = pendingSampler;
+        ConstantBuffer = pendingConstantBuffer;
+        return true;
     }
 
     inline bool GetGameUv(UvRect& uv)

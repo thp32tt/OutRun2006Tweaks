@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T13:47:00+09:00",
+  "updatedKst": "2026-10-06T14:11:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -107,9 +107,10 @@
     "VR-DX9EX-SWAPCHAIN-IMAGE-WAIT-BOUNDED-0042",
     "VR-DX9EX-SWAPCHAIN-WAIT-HARD-ERROR-FAIL-CLOSED-0043",
     "VR-DX9EX-SWAPCHAIN-IMAGE-RELEASE-FAIL-CLOSED-0044",
-    "VR-DX9EX-SWAPCHAIN-IMAGE-ACQUIRE-FAIL-CLOSED-0045"
+    "VR-DX9EX-SWAPCHAIN-IMAGE-ACQUIRE-FAIL-CLOSED-0045",
+    "VR-DX9EX-SHADER-RESOURCE-TRANSACTION-0046"
   ],
-  "next": "Structural extraction remains terminal and ARCH-V3-GATE-001 remains HMD-gated. R19 now fails closed across all three swapchain image-flow hard-error stages: acquire, non-timeout wait, and release each mark a distinct fault that blocks unchanged-handle reuse and forces transactional Destroy/recreate; XR_TIMEOUT_EXPIRED remains the only same-image wait retry path. Continue only with another independently provable DX9Ex stability/resource-lifetime unit until the Quest3/VDXR architecture-v3 entry gate opens.",
+  "next": "Structural extraction remains terminal and ARCH-V3-GATE-001 remains HMD-gated. R19 swapchain image-flow hard errors now fail closed, and CreateShaders now stages VS/PS/sampler/constant-buffer resources locally with rollback before publishing a complete bundle. Validate the exact 00463 material SHA, then continue only with another independently provable DX9Ex stability/resource-lifetime unit until the Quest3/VDXR architecture-v3 entry gate opens.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -237,7 +238,8 @@
     "VR-DX9EX-SWAPCHAIN-IMAGE-WAIT-BOUNDED-0042 replaces XR_INFINITE_DURATION with a 5 ms wait budget. XR_TIMEOUT_EXPIRED preserves acquired=true/waited=false and the acquired image index so the next frame retries the same oldest acquired image as required by OpenXR 1.1.63, preventing the R19 host frame loop from intentionally blocking indefinitely.",
     "CONVERSION-DX9EX-00460 / VR-DX9EX-SWAPCHAIN-WAIT-HARD-ERROR-FAIL-CLOSED-0043 keeps XR_TIMEOUT_EXPIRED as the only same-image retry path. A non-timeout xrWaitSwapchainImage failure now marks the R19 swapchain waitFaulted, Acquire fails closed, and EnsureSwapchain refuses the unchanged-handle fast path so transactional Destroy/recreate can recover without hammering a failed wait every host frame. Runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00461 / VR-DX9EX-SWAPCHAIN-IMAGE-RELEASE-FAIL-CLOSED-0044 marks a swapchain releaseFaulted when xrReleaseSwapchainImage returns a hard failure. The next frame cannot reuse or rerender that waited image: Acquire fails closed and EnsureSwapchain bypasses unchanged-handle reuse so the existing transactional Destroy/recreate path resolves ownership. XR_SUCCESS and XR_SESSION_LOSS_PENDING remain success via XR_SUCCEEDED. Runtime remains UNTESTED pending Quest3/VDXR.",
-    "CONVERSION-DX9EX-00462 / VR-DX9EX-SWAPCHAIN-IMAGE-ACQUIRE-FAIL-CLOSED-0045 marks acquireFaulted on hard xrAcquireSwapchainImage failure, without claiming acquired/waited ownership. Later Acquire calls fail closed and EnsureSwapchain bypasses unchanged-handle reuse so transactional Destroy/recreate resolves the broken image-flow path. XR_SUCCESS and XR_SESSION_LOSS_PENDING remain success via XR_FAILED semantics. Runtime remains UNTESTED pending Quest3/VDXR."
+    "CONVERSION-DX9EX-00462 / VR-DX9EX-SWAPCHAIN-IMAGE-ACQUIRE-FAIL-CLOSED-0045 marks acquireFaulted on hard xrAcquireSwapchainImage failure, without claiming acquired/waited ownership. Later Acquire calls fail closed and EnsureSwapchain bypasses unchanged-handle reuse so transactional Destroy/recreate resolves the broken image-flow path. XR_SUCCESS and XR_SESSION_LOSS_PENDING remain success via XR_FAILED semantics. Runtime remains UNTESTED pending Quest3/VDXR.",
+    "CONVERSION-DX9EX-00463 / VR-DX9EX-SHADER-RESOURCE-TRANSACTION-0046 makes R19 CreateShaders all-or-nothing: any stale partial global bundle is released before retry, VS/PS/sampler/constant-buffer objects are created into pending locals, every failure rolls them back, and globals are published only after the full bundle exists. Runtime remains UNTESTED pending Quest3/VDXR."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
@@ -901,5 +903,41 @@
       "packageArtifactId": 11386998671,
       "packageArtifactDigest": "sha256:ff35bc0cc243abae4304414f0f825d7a89fa12848d00a046b1e0cb0598c41f96"
     }
+  },
+  "post1000Maintenance00462": {
+    "taskId": "CONVERSION-DX9EX-00462",
+    "eventId": "CONVERSION-DX9EX-00462-E001",
+    "eventType": "dispatch",
+    "attempt": "1/3",
+    "item": "VR-DX9EX-SWAPCHAIN-IMAGE-ACQUIRE-FAIL-CLOSED-0045",
+    "baseSha": "9a6e954ed52474a7b02cfc6b9d0bc5281519e51f",
+    "materialResultSha": "20ee3894807b8879638d711dfc5721bcab78599f",
+    "validationBearingResultSha": "20ee3894807b8879638d711dfc5721bcab78599f",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "validation": {
+      "dx9exActiveRunId": 37415352721,
+      "domainIsolationRunId": 37415352672,
+      "packageArtifactId": 11390709534,
+      "packageArtifactDigest": "sha256:4e6dacbdaf2087677966f67238fcf680376501034b8dfd545bd993d7c5acbb21"
+    },
+    "issue14CommentId": 6009822972
+  },
+  "post1000Maintenance00463": {
+    "taskId": "CONVERSION-DX9EX-00463",
+    "productionId": "CONVERSION-DX9EX-00463",
+    "eventId": "CONVERSION-DX9EX-00463-E003",
+    "eventType": "rollover",
+    "attempt": "1/3",
+    "chatRollover": 2,
+    "rolloverIsRetry": false,
+    "resumeReason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+    "item": "VR-DX9EX-SHADER-RESOURCE-TRANSACTION-0046",
+    "baseSha": "20ee3894807b8879638d711dfc5721bcab78599f",
+    "materialResultSha": "PENDING_SELF",
+    "validationBearingResultSha": "PENDING_SELF",
+    "automationValidation": "PENDING",
+    "runtimeValidation": "UNTESTED",
+    "summary": "Make R19 shader resource creation transactional so partial VS/PS/sampler/constant-buffer failures cannot leak prior COM objects or publish an incomplete global bundle."
   }
 }

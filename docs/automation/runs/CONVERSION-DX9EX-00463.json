@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00463",
+  "production_id": "CONVERSION-DX9EX-00463",
+  "event_id": "CONVERSION-DX9EX-00463-E003",
+  "event_type": "rollover",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+  "status": "VALIDATING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "20ee3894807b8879638d711dfc5721bcab78599f",
+  "material_result_sha": "PENDING_SELF",
+  "validation_bearing_result_sha": "PENDING_SELF",
+  "result_sha": "PENDING_SELF",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00463]",
+  "selected_work_item": "VR-DX9EX-SHADER-RESOURCE-TRANSACTION-0046",
+  "summary": "Make R19 shader resource creation transactional so partial VS/PS/sampler/constant-buffer failures cannot leak prior COM objects or publish an incomplete global bundle.",
+  "changed_paths": [
+    "vrhost/src/runtime/sbs_capture_override.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00462.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00463.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub HEAD 20ee3894807b8879638d711dfc5721bcab78599f. CONVERSION-DX9EX-00462 source work was not repeated: its exact SHA already passed DX9Ex Active 37415352721 and Domain Isolation 37415352672, so only stale C3-C6 bookkeeping and Issue #14 were finalized."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "CreateShaders wrote newly created VS/PS/sampler/constant-buffer COM objects directly into globals. If a later creation step failed, earlier globals survived and a retry could overwrite those pointers without Release, leaking resources and exposing a partial bundle."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Normalize any prior partial global bundle before retry; create VS/PS/sampler/constant-buffer into pending local COM pointers; rollback all pending objects on every creation failure; publish globals only after the full bundle succeeds."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING"
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "code_review": [
+      "Previous CreatePixelShader failure left Vs published; sampler/buffer failures left larger partial global bundles.",
+      "Retry creation previously reused the same global output pointers, so earlier COM ownership could be lost without Release.",
+      "New pending locals and rollback make publication atomic at function scope."
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Validate this exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize C3-C6 bookkeeping and Issue #14 while preserving RUNTIME_VALIDATION=UNTESTED.",
+  "started_at_kst": "2026-10-06T14:11:00+09:00"
+}
