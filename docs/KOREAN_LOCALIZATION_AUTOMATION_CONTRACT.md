@@ -120,6 +120,11 @@ When a RENDER_READY or ONE_STAGE_TO_RENDER item exists, do not open unrelated pr
 - Do not hand a visibly questionable candidate to C as PASS. Use `REWORK_REQUIRED` or `MANUAL_RECONSTRUCTION_REQUIRED` and continue repair in the same invocation when safe.
 - Static producer PASS without actual game evidence remains runtime-unvalidated and must retain `RUNTIME_VALIDATION=UNTESTED` or pending-in-game state.
 
+### Ordered rework construction gate
+- Every new or materially reworked graphics candidate MUST execute the eight-step ordered generation gate in `docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md` before producer PASS: (1) English/source removal and complete plate/background restoration, (2) source-matching readable slant direction, (3) no unnecessarily undersized Korean lettering while still obeying the exact source-bbox ceiling, (4) source-faithful weight/outline/shadow without excessive effects, (5) no clipped glyph/effect pixels, (6) no intrusion into protected graphics/vehicle/name/box content, (7) clean/correct FLIP-Y and RAW views, and (8) immediate readability versus the English source.
+- This is a **generation loop**, not a final-review-only checklist. A/B must correct the failed construction stage and regenerate before recording producer PASS; C must return any missed violation as `REWORK_REQUIRED`.
+- Machine bbox/mask success cannot override any failed ordered step.
+
 ## Throughput rule
 - Continue producing multiple assets in one run while tool/runtime budget allows; do not stop after a single DDS when additional independent queue items are actionable.
 - Persist each completed batch and machine-readable QA evidence to Git so the next invocation can resume from repository state alone.
