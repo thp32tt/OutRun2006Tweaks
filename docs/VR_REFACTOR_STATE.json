@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T17:18:00+09:00",
+  "updatedKst": "2026-10-06T17:39:06+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -116,7 +116,7 @@
     "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051",
     "VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052"
   ],
-  "next": "From the latest exact HEAD, re-census the retained R32 Reset/Present/ResolveDirect physical hooks and R33 lifecycle chaining for the next equivalence-safe structural owner fold. Do not recreate the retired R31 physical StateBlock fallback hooks; if no safe physical-owner fold exists, continue neutral ownership/helper extraction instead of forcing a hook rewrite.",
+  "next": "Re-read the latest exact HEAD and re-census the two remaining R32 physical hooks: ResetDestR22 and ResolveDirectTransportR13. Prefer one equivalence-safe owner fold per task, with Reset vs DirectGPU ordering reviewed independently. Do not recreate R31 StateBlock or R32 Present physical hooks.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -270,9 +270,10 @@
     "CONVERSION-DX9EX-00475 / VR-DX9EX-R23-DESTROY-TRANSACTION-0058 exact SHA f0b7534421afa8447802baf7892f21c999356b3a passed DX9Ex Active 37430595722 policy/full-chain-compile/game/host/package and Domain Isolation 37430595687. Package artifact 11397166992 digest sha256:e54e4d1e76c5ab694c16edd879264758505e26570f5fff4fb186d11cb72b1bbc. R23 now invalidates the verified bundle and resets final-submission state only after downstream DestroySession succeeds; failed destruction preserves retry state. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00476 / VR-DX9EX-R15-DESTROY-TRANSACTION-0059 exact SHA 680b45584897397e30d9baec26f27c8d349dfa08 passed DX9Ex Active 37431533894 policy/full-chain-compile/game/host/package and Domain Isolation 37431533890. Package artifact 11397810639 digest sha256:ba087d736c43088428623a2ebdea17612c19d0e89c84f5ec370e3be7737b036e. R15 now clears classic fallback frame/run/PID freshness only after downstream DestroySession succeeds; failed destruction preserves retry state. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00477 / VR-DX9EX-R32-DESTROY-TRANSACTION-0060 exact SHA 4c1f7d3a6b2ccd38a9c556d9e5d61112352e5578 passed DX9Ex Active 37432343027 policy/full-chain-compile/game/host/package and Domain Isolation 37432343075. Package artifact 11397303588 digest sha256:4e3491bb631b22bb572821e76d948f9f72790c395ae4e7f350ac00f91c5efe6f. R32 now delegates DestroySession through R26 and releases pending ACK/direct caches only after XR_SUCCESS. Current vrhost/src/runtime DestroySession census has no remaining pre-destroy mutating wrapper. Runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00478 / VR-REFACTOR-POST1100-R31-STATEBLOCK-PHYSICAL-HOOK-RETIREMENT-0061: retired R31's remaining four conditional physical StateBlock fallback hooks, leaving R22 as the sole physical StateBlock lifecycle owner and R31 as the neutral event-consumer/cache owner. Missing R22 lifecycle coverage now marks StateBlock coverage lost so fast-path trust remains fail-closed and live validation stays authoritative. Source material b96ba8f53b74d5def6c44323db741a28653b9e31; initial DX9Ex Active 37434242877 exposed only a stale architecture-verifier expectation. Final validation-bearing SHA 505b37ea40ee6de35ceabf391421608971bbb43d passed DX9Ex Active 37434380922 policy/host/game/full-chain-compile/package and Domain Isolation 37434380874. Package artifact 11398845190 digest sha256:6e8b57f488d6c3ca9f919050e3fa9f4884456fa5c7e1a7b365ccab072634a38d. RUNTIME_VALIDATION=UNTESTED."
+    "CONVERSION-DX9EX-00478 / VR-REFACTOR-POST1100-R31-STATEBLOCK-PHYSICAL-HOOK-RETIREMENT-0061: retired R31's remaining four conditional physical StateBlock fallback hooks, leaving R22 as the sole physical StateBlock lifecycle owner and R31 as the neutral event-consumer/cache owner. Missing R22 lifecycle coverage now marks StateBlock coverage lost so fast-path trust remains fail-closed and live validation stays authoritative. Source material b96ba8f53b74d5def6c44323db741a28653b9e31; initial DX9Ex Active 37434242877 exposed only a stale architecture-verifier expectation. Final validation-bearing SHA 505b37ea40ee6de35ceabf391421608971bbb43d passed DX9Ex Active 37434380922 policy/host/game/full-chain-compile/package and Domain Isolation 37434380874. Package artifact 11398845190 digest sha256:6e8b57f488d6c3ca9f919050e3fa9f4884456fa5c7e1a7b365ccab072634a38d. RUNTIME_VALIDATION=UNTESTED.",
+    "CONVERSION-DX9EX-00479 / VR-REFACTOR-POST1100-R32-PRESENT-PHYSICAL-HOOK-RETIREMENT-0062: retired R32's physical Present hook while preserving its workload/QPC telemetry as R32WithPresentTelemetry. R33 now hooks PresentDestR13 directly and is the sole physical Present owner; device-lost raw Present bypass semantics remain unchanged. R32 physical hook count is 2 (Reset + ResolveDirect). Exact validation-bearing SHA effaa7c4b9fabc968e950c7284738f9bbfd7c35c passed DX9Ex Active 37436859380 policy/host/game/full-chain-compile/package, Domain Isolation 37436859565 and HUD Inspector 37436859620. Package artifact 11398803792 digest sha256:2d583569162952fe15d7507e9d25051bf513f89447da9f440e5ff3189427ba2a. OpenXR VR architecture 37436859535 remains red on a separate pre-existing stale hardening guard after verify_vr_r32_review itself passed. Runtime remains UNTESTED."
   ],
-  "batchStatus": "VR-REFACTOR-POST1100-R31-STATEBLOCK-PHYSICAL-HOOK-RETIREMENT-0061-BUILD_VERIFIED",
+  "batchStatus": "VR-REFACTOR-POST1100-R32-PRESENT-PHYSICAL-HOOK-RETIREMENT-0062-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
   "validationRunId": 37409670128,
   "validationResult": "PASS",
@@ -1120,7 +1121,8 @@
     "VR-DX9EX-R23-DESTROY-TRANSACTION-0058",
     "VR-DX9EX-R15-DESTROY-TRANSACTION-0059",
     "VR-DX9EX-R32-DESTROY-TRANSACTION-0060",
-    "VR-REFACTOR-POST1100-R31-STATEBLOCK-PHYSICAL-HOOK-RETIREMENT-0061"
+    "VR-REFACTOR-POST1100-R31-STATEBLOCK-PHYSICAL-HOOK-RETIREMENT-0061",
+    "VR-REFACTOR-POST1100-R32-PRESENT-PHYSICAL-HOOK-RETIREMENT-0062"
   ],
   "post1000Maintenance00470": {
     "taskId": "CONVERSION-DX9EX-00470",
@@ -1410,5 +1412,48 @@
       }
     },
     "issue14CommentId": 6012251623
+  },
+  "post1000Maintenance00479": {
+    "taskId": "CONVERSION-DX9EX-00479",
+    "productionId": "CONVERSION-DX9EX-00479",
+    "eventId": "CONVERSION-DX9EX-00479-E001",
+    "eventType": "dispatch",
+    "attempt": "1/3",
+    "item": "VR-REFACTOR-POST1100-R32-PRESENT-PHYSICAL-HOOK-RETIREMENT-0062",
+    "baseSha": "2086d2377b4bd2251aee129c6a018fc2749e438c",
+    "materialResultSha": "effaa7c4b9fabc968e950c7284738f9bbfd7c35c",
+    "validationBearingResultSha": "effaa7c4b9fabc968e950c7284738f9bbfd7c35c",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "runtimeBehaviorChanged": true,
+    "summary": "Retire the R32 physical Present hook. R33 directly owns PresentDestR13 while R32 retains workload/QPC telemetry through an owner helper; Reset and ResolveDirect remain physical R32 hooks.",
+    "status": "COMPLETE",
+    "hookCount": {
+      "r32Before": 3,
+      "r32After": 2,
+      "r33Unchanged": 7
+    },
+    "validation": {
+      "dx9exActiveRunId": 37436859380,
+      "jobs": {
+        "policy": 112180690958,
+        "fullChainCompile": 112180810260,
+        "game": 112180810342,
+        "host": 112180810348,
+        "package": 112182646270
+      },
+      "domainIsolationRunId": 37436859565,
+      "hudInspectorRunId": 37436859620,
+      "packageArtifactId": 11398803792,
+      "packageArtifactDigest": "sha256:2d583569162952fe15d7507e9d25051bf513f89447da9f440e5ff3189427ba2a",
+      "noncanonicalArchitectureRun": {
+        "runId": 37436859535,
+        "result": "FAIL_STALE_GENERIC_GUARD",
+        "r32ReviewPassed": true,
+        "missingHistoricalMarker": "src/vr/d3d9/stereo_renderer_r21.cpp :: IsFailed(R20InstallState)"
+      }
+    },
+    "issue14CommentId": 6012585918,
+    "validationPr": 102
   }
 }
