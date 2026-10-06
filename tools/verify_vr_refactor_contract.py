@@ -782,12 +782,26 @@ for marker in (
     "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
     "R32DrainPendingProducerFence(index)",
     "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
-    "R32WaitProducerFence(slot.fence)",
+    "DirectTransportFrameReadyAfterPresent() is",
     "slot.producerPending = true;",
     "ActiveDirectTransportSlot = selected;",
 ):
     if marker not in r32:
         errors.append(f"R32 missing hook-free DirectGPU owner contract: {marker}")
+resolve_r32_start = r32.find("bool R32ResolveDirectTransport(")
+resolve_r32_end = r32.find("void R32InvalidateResetCaches() noexcept", resolve_r32_start)
+if min(resolve_r32_start, resolve_r32_end) < 0:
+    errors.append("R32 DirectGPU owner helper boundaries unavailable")
+else:
+    resolve_r32 = r32[resolve_r32_start:resolve_r32_end]
+    for banned in (
+        "R32WaitProducerFence(slot.fence)",
+        "R32ProducerFencePending[selected] = true;",
+        "R32ProducerPendingFrame[selected] = frameId;",
+    ):
+        if banned in resolve_r32:
+            errors.append(f"R32 retained redundant pre-Present fence wait state: {banned}")
+
 for marker in (
     "SafetyHookInline R33ResolveDirectR13Hook{};",
     "reinterpret_cast<void*>(&ResolveDirectTransportR13)",

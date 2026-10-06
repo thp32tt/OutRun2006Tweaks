@@ -111,7 +111,9 @@ for required in (
         "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
         "R32DrainPendingProducerFence(index)",
         "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
-        "R32WaitProducerFence(slot.fence)"):
+        "DirectTransportFrameReadyAfterPresent() is",
+        "slot.producerPending = true;",
+        "ActiveDirectTransportSlot = selected;"):
     if required not in r32:
         raise SystemExit(f"R32 DirectGPU owner helper contract missing: {required}")
 resolve_start = r32.find("bool R32ResolveDirectTransport(")
@@ -120,6 +122,16 @@ copy_reject = r32.find("if (R32DirectCopyPathRejected)", resolve_start)
 if min(resolve_start, ensure_direct, copy_reject) < 0 or ensure_direct > copy_reject:
     raise SystemExit(
         "R32 DirectGPU copy rejection must be checked only after host identity/interop revalidation")
+resolve_end = r32.find("void R32InvalidateResetCaches() noexcept", resolve_start)
+if resolve_end < 0:
+    raise SystemExit("could not isolate R32 DirectGPU owner helper")
+resolve_body = r32[resolve_start:resolve_end]
+for banned in (
+        "R32WaitProducerFence(slot.fence)",
+        "R32ProducerFencePending[selected] = true;",
+        "R32ProducerPendingFrame[selected] = frameId;"):
+    if banned in resolve_body:
+        raise SystemExit(f"R32 DirectGPU owner regained redundant pre-Present fence wait state: {banned}")
 
 drain_start = r32.find("bool R32DrainPendingProducerFence")
 drain_error = r32.find("A query error does not prove GPU completion", drain_start)

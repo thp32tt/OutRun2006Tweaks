@@ -355,7 +355,7 @@ owner_evidence = {
          "R32EnsureDirectResources(device)",
          "R32DrainPendingProducerFence(index)",
          "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
-         "R32WaitProducerFence(slot.fence)",
+         "DirectTransportFrameReadyAfterPresent() is",
          "slot.producerPending = true;",
          "ActiveDirectTransportSlot = selected;"),
     ),
@@ -620,9 +620,16 @@ require(
     "R32EnsureDirectResources(device)",
     "R32DrainPendingProducerFence(index)",
     "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
-    "R32WaitProducerFence(slot.fence)",
+    "DirectTransportFrameReadyAfterPresent() is",
     "slot.producerPending = true;",
     "ActiveDirectTransportSlot = selected;",
+)
+forbid(
+    resolve32,
+    "R32 DirectGPU pre-Present fence wait retirement",
+    "R32WaitProducerFence(slot.fence)",
+    "R32ProducerFencePending[selected] = true;",
+    "R32ProducerPendingFrame[selected] = frameId;",
 )
 lower_fail_closed = function_body(r32, "HRESULT R32LowerFailClosed(")
 require(

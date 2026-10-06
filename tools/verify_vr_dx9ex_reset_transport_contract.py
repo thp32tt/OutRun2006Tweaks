@@ -422,7 +422,9 @@ require_order(
     "if (selected >= OutRunVR::RenderFrameRingSize)",
     "++DirectTransportRingBackpressure;",
     "auto& slot = DirectTransportSlots[selected];",
-    "R32ProducerFencePending[selected] = true;",
+    "slot.fence->Issue(D3DISSUE_END)",
+    "DirectTransportFrameReadyAfterPresent() is",
+    "slot.producerPending = true;",
     "ActiveDirectTransportSlot = selected;",
 )
 ack_retire_marker = "The host completed this exact published frame. Retire the"
@@ -445,6 +447,13 @@ forbid(
     "R32 final owner fixed-slot regression",
     "R32DrainPendingProducerFence(slotIndex)",
     "R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted)",
+)
+forbid(
+    resolve_direct_r32,
+    "R32 redundant pre-Present producer fence wait",
+    "R32WaitProducerFence(slot.fence)",
+    "R32ProducerFencePending[selected] = true;",
+    "R32ProducerPendingFrame[selected] = frameId;",
 )
 
 invalidate_r32 = body(r32, "void R32InvalidateResetCaches() noexcept")

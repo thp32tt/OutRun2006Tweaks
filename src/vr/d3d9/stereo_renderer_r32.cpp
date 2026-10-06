@@ -746,18 +746,13 @@ namespace OutRunVRStereo
                 }
             }
 
-            R32ProducerFencePending[selected] = true;
-            R32ProducerPendingFrame[selected] = frameId;
-            if (!R32WaitProducerFence(slot.fence))
-                return false;
-
-            R32ProducerFencePending[selected] = false;
-            R32ProducerPendingFrame[selected] = 0;
-
-            // Bridge the R32-private producer fence into the base R7/R13
-            // post-Present publication contract. DirectTransportFrameReadyAfterPresent()
-            // is still the sole owner that marks the slot published after Present;
-            // it requires this exact frame identity plus producerPending.
+            // Do not spin on the producer EVENT before Present. Present is the
+            // flush boundary, and DirectTransportFrameReadyAfterPresent() is
+            // already the sole publication gate: it waits a bounded 1 ms after
+            // Present, publishes only on completion, and leaves S_FALSE slots
+            // quarantined for the next ring scan. Avoiding the redundant
+            // pre-Present 2 ms wait removes a frame-pacing stall without
+            // weakening shared-eye immutability or host ACK ownership.
             slot.producerPending = true;
             slot.pendingFrameId = frameId;
             slot.frameId = frameId;
