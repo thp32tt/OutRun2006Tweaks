@@ -11,7 +11,6 @@ namespace OutRunVRStereo
 {
     namespace
     {
-        SafetyHookInline R32ResolveDirectR13Hook{};
 
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R32InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
@@ -618,11 +617,12 @@ namespace OutRunVRStereo
             return false;
         }
 
-        bool ResolveDirectTransportR32(IDirect3DDevice9* device,
-            std::uint32_t frameId) noexcept
+        template <typename LowerResolve>
+        bool R32ResolveDirectTransport(IDirect3DDevice9* device,
+            std::uint32_t frameId, LowerResolve&& lowerResolve) noexcept
         {
             if (!R13OverlayReadyForTransport())
-                return R32ResolveDirectR13Hook.call<bool>(device, frameId);
+                return lowerResolve();
             if (!frameId || !R32EnsureDirectResources(device) ||
                 !BackBuffer || !RightEyeSurface)
                 return false;
@@ -904,22 +904,6 @@ namespace OutRunVRStereo
             return hr;
         }
 
-        void R32RollbackHooks() noexcept
-        {
-            R32ResolveDirectR13Hook = {};
-        }
-
-        bool R32EnableHooks() noexcept
-        {
-            SafetyHookInline* hooks[]{
-                &R32ResolveDirectR13Hook
-            };
-            for (auto* hook : hooks)
-                if (!*hook || !hook->enable().has_value())
-                    return false;
-            return true;
-        }
-
         DWORD WINAPI R32InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
@@ -939,26 +923,10 @@ namespace OutRunVRStereo
                 if (r31 == State::Ready && r22 == State::Ready &&
                     r13 == R13InstallStatusValue::Ready)
                 {
-                    const auto disabled = safetyhook::InlineHook::StartDisabled;
-                    R32ResolveDirectR13Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&ResolveDirectTransportR13),
-                        ResolveDirectTransportR32, disabled);
-                    if (!R32EnableHooks())
-                    {
-                        R32RollbackHooks();
-                        R32InstallState.store(State::Failed,
-                            std::memory_order_release);
-                        HookManager::ReportAsyncResult(
-                            "OpenXRVRStereoR32Review", false);
-                        spdlog::error(
-                            "VR R32: DirectGPU hook transaction was partial; R30 draw + R31 StateBlock/R22 lifecycle remain authoritative");
-                        return 0;
-                    }
-
                     R32InstallState.store(State::Ready, std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", true);
                     spdlog::info(
-                        "VR R32 REVIEW2: DirectGPU physical hook + Reset/Present owner helpers + fail-closed helpers + cached D3D9Ex interop + pending-fence-safe producer ring READY; R33 owns Reset/Present/draw dispatch");
+                        "VR R32 REVIEW2: hook-free functional owner READY; DirectGPU + Reset/Present helpers + fail-closed helpers + cached D3D9Ex interop + pending-fence-safe producer ring are consumed by R33 final dispatcher");
                     return 0;
                 }
                 Sleep(25);
