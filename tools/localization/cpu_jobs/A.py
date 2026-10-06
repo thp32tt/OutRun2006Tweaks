@@ -3,10 +3,12 @@ import hashlib,json,math,os,struct,subprocess,urllib.parse,urllib.request
 from pathlib import Path
 import numpy as np
 from PIL import Image,ImageDraw,ImageFont,ImageChops
-from psd_tools import PSDImage
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
+
+subprocess.run(["python","-m","pip","install","--disable-pip-version-check","-q","psd-tools==1.10.8"],check=True)
+from psd_tools import PSDImage
 
 repo=Path.cwd()
 run="20261006-A-WORKSTEAL122-33491F83-PSD-CLEAN"
