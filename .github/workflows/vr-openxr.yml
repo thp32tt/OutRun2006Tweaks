@@ -165,7 +165,8 @@ jobs:
             'vrhost/src/runtime/r23_runtime_hardening.hpp' = @(
               'ExpectedDirectDxgiFormat',
               'DirectSafeEyeMatchesCommittedFrame',
-              'SafeTransportGeneration'
+              'SafeEyesOwnFrame(frame)',
+              'EnsureSafeFrame(frame.frameId)'
             )
             'vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp' = @(
               'R32SharedSlotCache',
