@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A resolved all remaining odd blocked zoom-review indices 189/191/217/219. 189 8C9E91F8 and 191 94BB6271 are PRESERVE_ORIGINAL/no-localization. 217 D1039D6F START/GOAL -> 출발/골 candidate 68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39 (A116) and 219 D263B3F1 COURSE SELECT -> 코스 선택 candidate f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24 (A113) pass producer machine+controller visual QA pending independent C/in-game. Do not repeat. A odd blocked zoom-review shard is exhausted; remaining 12 blocked zoom rows are even/B shard unless a higher-priority A-owned in-game/C-returned REWORK appears.",
     "A resolved odd zoom-review indices 103/151/153/155/157/165/169/171/177. Index103 590A4724 = Normal Balance -> 일반 밸런스, exact A108 candidate bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178 restored after superseded A107 overwrite; A108 producer self-QA PASS pending independent C/in-game. Indices151/153/155/157/165/169/171 are photo/logo/rank-art only and index177 is protected game/song-title artwork; all PRESERVE_ORIGINAL/no candidate. Do not revisit. Next normal A odd blocked rows: 189,191,217,219 unless higher-priority in-game/C-returned work appears.",
     "B180 closed even zoom_review indices 146/148/150 as PRESERVE_ORIGINAL_NO_LOCALIZATION from exact-HD readable/raw evidence; no candidate required and do not repeat. Index62 33491F83 remains MANUAL_RECONSTRUCTION_REQUIRED with protected route artwork; next normal B zoom target is index166 5EBD7FE8 unless higher priority appears.",
     "A101 resolved odd zoom-review indices 35/37/45: E989E3B7 contains Total Rank x2 and A102 produced native-HD candidate c0e76661... with 2/2 exact bbox/size/positive-margin and zero outside/alpha/residue/overlap/touch, controller visual PASS pending independent C+in-game; 515DCBB2 is character-only PRESERVE_ORIGINAL; 1F77CB88 is technical keyboard/control legends PRESERVE_ORIGINAL. Do not revisit these rows. Current next normal A blocked odd row is index103 590A4724 unless a higher-priority in-game/C-returned row appears.",
@@ -5554,7 +5555,7 @@
     "report": "localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_IGR010_REPORT.json",
     "controller_report": "localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_CONTROLLER_SELF_QA.json"
   },
-  "current_blocked_zoom_review": 16,
+  "current_blocked_zoom_review": 12,
   "a98_zoom_review_4afc1bed": {
     "timestamp_kst": "2026-10-06T08:05:00+09:00",
     "queue_index": 25,
@@ -5745,6 +5746,37 @@
       "localization/graphics/role_A/20261006-A-PROBE103-ZOOM103151153/A103_CONTROLLER_CLASSIFICATION.json",
       "localization/graphics/role_A/20261006-A-PROBE109-ZOOM155157165/A109_CONTROLLER_CLASSIFICATION.json",
       "localization/graphics/role_A/20261006-A-PROBE110-ZOOM169171177/A110_CONTROLLER_CLASSIFICATION.json"
+    ]
+  },
+  "a111_a113_a116_zoom_review": {
+    "timestamp_kst": "2026-10-06T11:58:00+09:00",
+    "resolved_indices": [
+      189,
+      191,
+      217,
+      219
+    ],
+    "preserve_original_indices": [
+      189,
+      191
+    ],
+    "candidates": {
+      "D1039D6F": {
+        "index": 217,
+        "candidate_sha256": "68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39",
+        "status": "A116_SELF_QA_PASS_PENDING_C_AND_INGAME"
+      },
+      "D263B3F1": {
+        "index": 219,
+        "candidate_sha256": "f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24",
+        "status": "A113_SELF_QA_PASS_PENDING_C_AND_INGAME"
+      }
+    },
+    "odd_blocked_remaining": 0,
+    "reports": [
+      "localization/graphics/role_A/20261006-A-PROBE111-ZOOM189191217219/A111_CONTROLLER_CLASSIFICATION.json",
+      "localization/graphics/role_A/20261006-A-PRODUCTION113-D263-D103-DIAG/A113_D263_CONTROLLER_SELF_QA.json",
+      "localization/graphics/role_A/20261006-A-PRODUCTION116-D1039D6F/A116_CONTROLLER_SELF_QA.json"
     ]
   }
 }
