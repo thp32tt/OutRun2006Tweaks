@@ -18,11 +18,22 @@ namespace OutRunVR::GameSemantic
         SkyGlow,
         WorldParticle,
         WorldBillboard,
+        // Exact vehicle-relative world anchor that the game already projected
+        // into its 640x480 sprite coordinate system before queueing.
+        ProjectedWorldMarker2D,
         ReflectionCube,
         // Generic canonical 2D queue content. It needs only per-eye
         // asymmetric-FOV alignment, never head/IPD/world-plane placement.
         ScreenOverlay2D,
         ScreenHud,
+    };
+
+    struct ProjectedMarkerInfo
+    {
+        bool valid = false;
+        float viewX = 0.0f;
+        float viewY = 0.0f;
+        float viewZ = 0.0f;
     };
 
     // Bounded diagnostic identity for exact producer families recovered from
@@ -51,6 +62,7 @@ namespace OutRunVR::GameSemantic
         case RenderScope::SkyGlow: return "SKY_GLOW";
         case RenderScope::WorldParticle: return "WORLD_PARTICLE";
         case RenderScope::WorldBillboard: return "WORLD_BILLBOARD";
+        case RenderScope::ProjectedWorldMarker2D: return "PROJECTED_WORLD_MARKER_2D";
         case RenderScope::ReflectionCube: return "REFLECTION_CUBE";
         case RenderScope::ScreenOverlay2D: return "SCREEN_OVERLAY_2D";
         case RenderScope::ScreenHud: return "SCREEN_HUD";
@@ -140,6 +152,11 @@ namespace OutRunVR::GameSemantic
             scope == RenderScope::WorldBillboard;
     }
 
+    inline bool CorroboratesProjectedWorldMarker(RenderScope scope) noexcept
+    {
+        return scope == RenderScope::ProjectedWorldMarker2D;
+    }
+
     inline bool CorroboratesScreenOverlay2D(RenderScope scope) noexcept
     {
         return scope == RenderScope::ScreenOverlay2D;
@@ -167,6 +184,7 @@ namespace OutRunVR::GameSemantic
         RenderScope scope = RenderScope::None;
         ProducerToken producer = ProducerToken::None;
         std::uint64_t serial = 0;
+        ProjectedMarkerInfo projectedMarker{};
     };
 
     inline constexpr std::size_t SpriteNodeSemanticCapacity = 0x230;
@@ -196,6 +214,7 @@ namespace OutRunVR::GameSemantic
     inline thread_local std::uint64_t SpriteQueueNodeEpoch = 0;
     inline thread_local ProducerToken CurrentSpriteQueueProducer =
         ProducerToken::None;
+    inline thread_local ProjectedMarkerInfo CurrentQueueProjectedMarker{};
 
     inline const void* CurrentQueueNode() noexcept
     {
@@ -212,6 +231,12 @@ namespace OutRunVR::GameSemantic
         return CurrentSpriteQueueProducer;
     }
 
+    inline const ProjectedMarkerInfo* CurrentProjectedMarker() noexcept
+    {
+        return CurrentQueueProjectedMarker.valid
+            ? &CurrentQueueProjectedMarker : nullptr;
+    }
+
     inline bool QueueRenderActive() noexcept
     {
         return SpriteQueueDepth != 0;
@@ -219,7 +244,8 @@ namespace OutRunVR::GameSemantic
 
     inline void RegisterSpriteNodeScope(
         const void* node, RenderScope scope,
-        ProducerToken producer = ProducerToken::None) noexcept
+        ProducerToken producer = ProducerToken::None,
+        const ProjectedMarkerInfo* projectedMarker = nullptr) noexcept
     {
         if (!node || scope == RenderScope::None)
             return;
@@ -235,6 +261,8 @@ namespace OutRunVR::GameSemantic
                 SpriteNodeSemanticTags[i].scope = scope;
                 SpriteNodeSemanticTags[i].producer = producer;
                 SpriteNodeSemanticTags[i].serial = serial;
+                SpriteNodeSemanticTags[i].projectedMarker =
+                    projectedMarker ? *projectedMarker : ProjectedMarkerInfo{};
                 SpriteNodeSemanticPublishedCount.store(
                     SpriteNodeSemanticCount, std::memory_order_release);
                 SpriteNodeSemanticRegistered.fetch_add(
@@ -246,7 +274,8 @@ namespace OutRunVR::GameSemantic
         if (SpriteNodeSemanticCount < SpriteNodeSemanticTags.size())
         {
             SpriteNodeSemanticTags[SpriteNodeSemanticCount++] =
-                { node, scope, producer, serial };
+                { node, scope, producer, serial,
+                  projectedMarker ? *projectedMarker : ProjectedMarkerInfo{} };
             SpriteNodeSemanticPublishedCount.store(
                 SpriteNodeSemanticCount, std::memory_order_release);
             SpriteNodeSemanticRegistered.fetch_add(
@@ -265,7 +294,8 @@ namespace OutRunVR::GameSemantic
                 oldest = i;
         }
         SpriteNodeSemanticTags[oldest] =
-            { node, scope, producer, serial };
+            { node, scope, producer, serial,
+              projectedMarker ? *projectedMarker : ProjectedMarkerInfo{} };
         SpriteNodeSemanticRegistered.fetch_add(
             1, std::memory_order_relaxed);
         SpriteNodeSemanticStaleCleared.fetch_add(
@@ -275,10 +305,13 @@ namespace OutRunVR::GameSemantic
     inline RenderScope PeekSpriteNodeScope(
         const void* node,
         RenderScope fallback = RenderScope::None,
-        ProducerToken* producer = nullptr) noexcept
+        ProducerToken* producer = nullptr,
+        ProjectedMarkerInfo* projectedMarker = nullptr) noexcept
     {
         if (producer)
             *producer = ProducerToken::None;
+        if (projectedMarker)
+            *projectedMarker = {};
         if (!node ||
             SpriteNodeSemanticPublishedCount.load(
                 std::memory_order_acquire) == 0)
@@ -291,6 +324,8 @@ namespace OutRunVR::GameSemantic
                 continue;
             if (producer)
                 *producer = SpriteNodeSemanticTags[i].producer;
+            if (projectedMarker)
+                *projectedMarker = SpriteNodeSemanticTags[i].projectedMarker;
             return SpriteNodeSemanticTags[i].scope;
         }
         return fallback;
@@ -318,6 +353,7 @@ namespace OutRunVR::GameSemantic
             return fallback;
 
         std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
+        CurrentQueueProjectedMarker = {};
         for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
         {
             if (SpriteNodeSemanticTags[i].node != node)
@@ -325,6 +361,8 @@ namespace OutRunVR::GameSemantic
             const RenderScope scope = SpriteNodeSemanticTags[i].scope;
             if (producer)
                 *producer = SpriteNodeSemanticTags[i].producer;
+            CurrentQueueProjectedMarker =
+                SpriteNodeSemanticTags[i].projectedMarker;
             SpriteNodeSemanticTags[i] =
                 SpriteNodeSemanticTags[--SpriteNodeSemanticCount];
             SpriteNodeSemanticTags[SpriteNodeSemanticCount] = {};
@@ -371,6 +409,7 @@ namespace OutRunVR::GameSemantic
             SpriteQueueSemanticCutoff = next > 0 ? next - 1 : 0;
         }
         CurrentSpriteQueueNode = node;
+        CurrentQueueProjectedMarker = {};
         if (++SpriteQueueNodeEpoch == 0)
             ++SpriteQueueNodeEpoch;
         CurrentSpriteQueueProducer = ProducerToken::None;
@@ -389,6 +428,7 @@ namespace OutRunVR::GameSemantic
             SpriteQueuePreviousScope = RenderScope::None;
             CurrentSpriteQueueNode = nullptr;
             CurrentSpriteQueueProducer = ProducerToken::None;
+            CurrentQueueProjectedMarker = {};
 
             // Remove only tags that existed when this queue walk began. A
             // producer thread may already be preparing the next frame while
