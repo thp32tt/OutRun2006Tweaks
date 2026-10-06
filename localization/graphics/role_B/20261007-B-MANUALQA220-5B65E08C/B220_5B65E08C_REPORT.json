@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B220",
+  "queue_index": 164,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+  "trigger": "MANUAL_PRE_INGAME_8_STEP_VISUAL_FALSE_NEGATIVE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/024_q164_5B65E08C.jpg",
+  "prior_c_status": "C108_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "defects": [
+    "TEXT_WIDTH_HIERARCHY_UNDERSIZED",
+    "SOURCE_LEFT_ALIGNMENT_MISMATCH"
+  ],
+  "source_sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+  "before_sha256": "33da77625f6b6af22cab72db30394b6b8c0bdd78e9f9a6166f273d6fab4da609",
+  "candidate_sha256": "65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f",
+  "method": "exact pinned native-HD source + previously C-validated clean plate; fresh native Noto Sans CJK KR Black; 0.80 source-width target from native glyph raster; source-left 2px anchor; plain white source family",
+  "row": {
+    "source": "SELECT LICENSE",
+    "korean": "라이선스 선택",
+    "source_bbox": [
+      590,
+      565,
+      1493,
+      659
+    ],
+    "source_size": [
+      903,
+      94
+    ],
+    "prior_localized_bbox": [
+      794,
+      567,
+      1288,
+      657
+    ],
+    "prior_localized_size": [
+      494,
+      90
+    ],
+    "localized_bbox": [
+      592,
+      567,
+      1314,
+      657
+    ],
+    "localized_size": [
+      722,
+      90
+    ],
+    "margins": [
+      2,
+      179,
+      2,
+      2
+    ],
+    "font_file": "NotoSansCJK-Black.ttc",
+    "font_face_index": 1,
+    "font_style": "Black,Regular",
+    "font_size": 93,
+    "horizontal_source_width_ratio": 0.7996,
+    "alignment": "source_left"
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "1/1 PASS",
+    "changed_outside_exact_source_bbox": 0,
+    "alpha_changed_outside_exact_source_bbox": 0,
+    "header_128_exact": true,
+    "raw_mode": "RGBA",
+    "raw_orientation": "mirror_y"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_INHERITED_C106_C108_VALIDATED_CLEAN",
+    "2_slant_direction": "PASS_SOURCE_UPRIGHT",
+    "3_no_unnecessary_undersizing": "PASS_WIDTH_HIERARCHY_MATERIALLY_INCREASED",
+    "4_source_weight_effect": "PASS_NATIVE_BLACK_PLAIN_WHITE",
+    "5_no_clipping": "PASS_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_FINAL_CHANGE_OUTSIDE_EXACT_SOURCE_BBOX",
+    "7_flip_y_raw": "PASS_EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "B220_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
