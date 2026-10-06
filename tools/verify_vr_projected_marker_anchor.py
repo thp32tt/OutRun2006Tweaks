@@ -144,7 +144,9 @@ if "&RivalMarkerProjectedInfo" not in rival:
 # Sumo no-tick replay allocates fresh nodes, so projected anchor metadata must
 # survive together with the already-preserved RenderScope and ProducerToken.
 entry_start = framerate.find("struct Entry")
-entry_end = framerate.find("};", entry_start)
+entry_end = framerate.find("static Entry Captured", entry_start)
+if entry_start < 0 or entry_end <= entry_start:
+    fail("Sumo replay Entry block is missing")
 entry = framerate[entry_start:entry_end]
 if "ProjectedMarkerInfo vrProjectedMarker{};" not in entry:
     fail("Sumo replay Entry does not preserve projected marker payload")
