@@ -286,6 +286,38 @@ require_order(
     "RenderFrameRingClaimed = true;",
 )
 
+# R13 owns the dedicated DirectGPU ACK mapping lifetime. The mapping must have
+# one physical teardown owner, and ResetEx must drop the previous transport-run
+# view/handle before lower D3D9 shared resources are released/recreated.
+release_ack = body(r13, "void R13ReleaseAckState() noexcept")
+require_order(
+    release_ack,
+    "R13 dedicated ACK mapping teardown owner",
+    "UnmapViewOfFile(R13AckState);",
+    "R13AckState = nullptr;",
+    "CloseHandle(R13AckMapping);",
+    "R13AckMapping = nullptr;",
+)
+if r13.count("UnmapViewOfFile(R13AckState);") != 1:
+    fail("R13 dedicated ACK view teardown must have one physical owner")
+if r13.count("CloseHandle(R13AckMapping);") != 1:
+    fail("R13 dedicated ACK handle teardown must have one physical owner")
+
+ensure_ack = body(r13, "bool R13EnsureAckState() noexcept")
+require(
+    ensure_ack,
+    "R13 ACK mapping recovery routing",
+    "R13ReleaseAckState();",
+    "OpenFileMappingW(",
+    "MapViewOfFile(",
+)
+for marker in (
+    "UnmapViewOfFile(R13AckState);",
+    "CloseHandle(R13AckMapping);",
+):
+    if marker in ensure_ack:
+        fail(f"R13 ACK ensure path regained duplicate teardown: {marker}")
+
 # R13 is the lower reset/resource owner. It releases shared resources and
 # publishes a disabled frame before ResetEx; recreation occurs only on success.
 reset_pre = body(r13, "void R13ResetCommonPre(IDirect3DDevice9*)")
@@ -293,6 +325,7 @@ require_order(
     reset_pre,
     "R13 reset preamble",
     "OutRunVRRenderer::NotifyGameReset();",
+    "R13ReleaseAckState();",
     "ReleaseStereoResources();",
     "PublishStereoState(OutRunVR::StereoDisabled",
     "PublishRenderFrame(OutRunVR::StereoDisabled",
@@ -1611,6 +1644,6 @@ require_order(
 
 print(
     "DX9Ex reset/transport contract PASS "
-    "(resource teardown, monotonic generation, fail-close reset, "
+    "(resource/ACK teardown, monotonic generation, fail-close reset, "
     "host complete-run stale ACK rejection)"
 )

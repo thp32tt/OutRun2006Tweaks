@@ -74,14 +74,8 @@ namespace OutRunVRStereo
         HANDLE R13AckMapping = nullptr;
         const OutRunVR::R13::DirectGpuAckState* R13AckState = nullptr;
 
-        bool R13EnsureAckState() noexcept
+        void R13ReleaseAckState() noexcept
         {
-            if (R13AckState &&
-                R13AckState->magic == OutRunVR::R13::DirectGpuAckMagic &&
-                R13AckState->version == OutRunVR::R13::DirectGpuAckVersion &&
-                R13AckState->structSize == sizeof(OutRunVR::R13::DirectGpuAckState))
-                return true;
-
             if (R13AckState)
             {
                 UnmapViewOfFile(R13AckState);
@@ -92,6 +86,17 @@ namespace OutRunVRStereo
                 CloseHandle(R13AckMapping);
                 R13AckMapping = nullptr;
             }
+        }
+
+        bool R13EnsureAckState() noexcept
+        {
+            if (R13AckState &&
+                R13AckState->magic == OutRunVR::R13::DirectGpuAckMagic &&
+                R13AckState->version == OutRunVR::R13::DirectGpuAckVersion &&
+                R13AckState->structSize == sizeof(OutRunVR::R13::DirectGpuAckState))
+                return true;
+
+            R13ReleaseAckState();
 
             R13AckMapping = OpenFileMappingW(
                 FILE_MAP_READ, FALSE, OutRunVR::R13::DirectGpuAckName);
@@ -103,8 +108,7 @@ namespace OutRunVRStereo
                 sizeof(OutRunVR::R13::DirectGpuAckState)));
             if (!R13AckState)
             {
-                CloseHandle(R13AckMapping);
-                R13AckMapping = nullptr;
+                R13ReleaseAckState();
                 return false;
             }
 
@@ -112,10 +116,7 @@ namespace OutRunVRStereo
                 R13AckState->version != OutRunVR::R13::DirectGpuAckVersion ||
                 R13AckState->structSize != sizeof(OutRunVR::R13::DirectGpuAckState))
             {
-                UnmapViewOfFile(R13AckState);
-                R13AckState = nullptr;
-                CloseHandle(R13AckMapping);
-                R13AckMapping = nullptr;
+                R13ReleaseAckState();
                 return false;
             }
 
@@ -286,6 +287,11 @@ namespace OutRunVRStereo
             R9FirstFailureEpoch = 0;
 
             OutRunVRRenderer::NotifyGameReset();
+            // The dedicated host ACK mapping is transport-run state, not a
+            // process-lifetime cache. Drop our view/handle at ResetEx so a
+            // recreated host/generation is observed through a fresh named
+            // mapping instead of keeping the previous mapping object alive.
+            R13ReleaseAckState();
             ReleaseStereoResources();
             AuxRenderTargetActive = {};
             ActiveOcclusionQueries.store(0, std::memory_order_release);
