@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION108-590A4724",
+  "queue_index": 103,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+  "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+  "candidate_sha256": "bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "classification": {
+    "prior_action": "zoom_review",
+    "source": "Normal Balance",
+    "korean": "일반 밸런스",
+    "occurrences": 1
+  },
+  "construction": {
+    "source_mask": "C111-approved same-phrase Normal Balance selected-state geometry + target AA fringe",
+    "clean": "target-own pale plate quadratic reconstruction inside source mask only",
+    "korean_geometry": "C111-approved 일반 밸런스 geometry",
+    "text_tone": "target unselected source core tone",
+    "template_approval": "C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "target_fg_rgb": [
+      143.0,
+      137.0,
+      84.0
+    ],
+    "clean_method": "same-row local interpolation under exact source glyph mask",
+    "source_slant_shear": 0.2
+  },
+  "row": {
+    "original_bbox": [
+      1411,
+      1968,
+      1801,
+      2040
+    ],
+    "localized_bbox": [
+      1508,
+      1986,
+      1704,
+      2026
+    ],
+    "delta_left": 97,
+    "delta_right": 97,
+    "delta_top": 18,
+    "delta_bottom": 14,
+    "source_width": 390,
+    "source_height": 72,
+    "localized_width": 196,
+    "localized_height": 40,
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS"
+  },
+  "zero_pixel_gates": {
+    "clean_outside": 0,
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "localized_overlap": 0
+  },
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 7439,
+    "changed_bbox": [
+      1432,
+      1980,
+      1786,
+      2025
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_FINAL_READABLE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 9342,
+    "changed_bbox": [
+      1432,
+      1980,
+      1786,
+      2026
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+  "worker_static_qa": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "status": "A108_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED"
+}
