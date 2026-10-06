@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# A147: work-steal C222-returned q236 FEF70E85 source-typography repair.
+# A147R: same-invocation controller retry for C222-returned q236 source typography.
 # B217 fixed native-resolution rendering but C222 rejected the current bytes because
 # Noto Sans CJK KR Black + <=1.18x widening is too broad/blocky versus the strongly
 # condensed, lighter English source family. This job preserves B80's C153-validated
@@ -15,7 +15,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageChops
 
 repo=Path.cwd()
-run="20261007-A-PRODUCTION147-Q236-SOURCE-TYPOGRAPHY"
+run="20261007-A-PRODUCTION147R-Q236-SOURCE-TYPOGRAPHY"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -23,7 +23,7 @@ wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=T
 asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset
 clean_path=repo/"localization/graphics/role_B/20261005-B-PRODUCTION80/FEF_CLEAN_PLATE.png"
-EXPECTED_BEFORE="5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245"
+EXPECTED_BEFORE="8a587e0c4d90583be696dd35443cc6fc51384118bf4df85704b75dd6a0345e53"
 SOURCE_SHA="a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518"
 commit="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 base="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+commit
@@ -49,7 +49,7 @@ specs=[
  (13,"IMPERIAL AVENUE","임페리얼 애비뉴"),
 ]
 protected_ids=[14]
-CONDENSE=0.82
+CONDENSE=0.90
 MARGIN=2
 
 def sha_bytes(b): return hashlib.sha256(b).hexdigest()
@@ -113,10 +113,10 @@ fill=(fill_rgb[0],fill_rgb[1],fill_rgb[2],255)
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
 subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
-font_line=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{style}","Noto Sans CJK KR:style=Medium"],text=True).strip()
+font_line=subprocess.check_output(["fc-match","-f","%{file}|%{index}|%{style}","Noto Sans CJK KR:style=Bold"],text=True).strip()
 FONT,FI,FSTYLE=font_line.rsplit("|",2); FI=int(FI or 0)
-if not Path(FONT).exists() or "NotoSansCJK" not in Path(FONT).name or "Medium" not in FSTYLE:
-    raise RuntimeError(("Noto CJK Medium unavailable",font_line))
+if not Path(FONT).exists() or "NotoSansCJK" not in Path(FONT).name or "Bold" not in FSTYLE:
+    raise RuntimeError(("Noto CJK Bold unavailable",font_line))
 
 def render_native(text,fs):
     f=ImageFont.truetype(FONT,fs,index=FI)
@@ -131,7 +131,7 @@ def render_native(text,fs):
     tile=Image.new("RGBA",a.size,fill); tile.putalpha(a)
     return tile
 
-# Preserve B217's native-height readability: choose the largest shared Medium
+# Preserve B217's native-height readability: choose the largest shared Bold
 # size that fits every exact source height before the horizontal source-family transform.
 shared_fs=None
 for fs in range(120,40,-1):
@@ -143,7 +143,7 @@ for fs in range(120,40,-1):
             ok=False; break
     if ok:
         shared_fs=fs; break
-if shared_fs is None: raise RuntimeError("shared Medium native height fit failed")
+if shared_fs is None: raise RuntimeError("shared Bold native height fit failed")
 
 final=clean.copy(); target=np.zeros((H,W),bool); row_reports=[]
 for r in rows:
@@ -177,15 +177,19 @@ for r in rows:
     oldb=r["prior_localized_bbox"]
     if not oldb: raise RuntimeError(("missing B217 bbox",r["region_idx"]))
     oldw,oldh=oldb[2]-oldb[0],oldb[3]-oldb[1]
-    if lw > int(round(oldw*0.92)):
-        raise RuntimeError(("not materially more condensed",r["region_idx"],oldw,lw))
+    b217_widths={0:951,1:368,2:391,3:386,4:479,5:797,6:291,7:481,8:379,9:552,10:477,11:273,12:182,13:670}
+    b217w=b217_widths[r["region_idx"]]
+    if lw > int(round(b217w*0.90)):
+        raise RuntimeError(("not condensed enough vs C222-rejected B217",r["region_idx"],b217w,lw))
+    old_alpha=int(np.count_nonzero((oa[:,:,3]>0)&rect_bool((H,W),ob)))
+    new_alpha=int(np.count_nonzero(lm))
+    if new_alpha < int(old_alpha*1.12):
+        raise RuntimeError(("controller retry still too light",r["region_idx"],old_alpha,new_alpha))
     if lh < oldh-2:
         raise RuntimeError(("height/readability regression",r["region_idx"],oldh,lh))
 
     final.alpha_composite(layer); target|=lm
     source_area=max(1,aw*ah)
-    old_alpha=int(np.count_nonzero((oa[:,:,3]>0)&rect_bool((H,W),ob)))
-    new_alpha=int(np.count_nonzero(lm))
     row_reports.append({
       **r,"localized_bbox":lb,"source_size":[aw,ah],"prior_localized_size":[oldw,oldh],
       "localized_size":[lw,lh],"delta_left":margins[0],"delta_right":margins[1],
@@ -194,11 +198,11 @@ for r in rows:
       "font_file":Path(FONT).name,"font_face_index":FI,"font_style":FSTYLE,
       "font_size_native":shared_fs,"native_unscaled_size":native_size,
       "horizontal_source_family_scale":CONDENSE,"fill_rgba":list(fill),"alignment":"right",
-      "prior_width_px":oldw,"new_width_px":lw,"width_ratio_vs_B217":round(lw/oldw,4),
-      "prior_height_px":oldh,"new_height_px":lh,
-      "prior_alpha_coverage_of_source_bbox":round(old_alpha/source_area,5),
+      "first_attempt_width_px":oldw,"b217_rejected_width_px":b217w,"new_width_px":lw,"width_ratio_vs_B217":round(lw/b217w,4),
+      "first_attempt_height_px":oldh,"new_height_px":lh,
+      "first_attempt_alpha_coverage_of_source_bbox":round(old_alpha/source_area,5),
       "new_alpha_coverage_of_source_bbox":round(new_alpha/source_area,5),
-      "fresh_native_hd_render":True,"rework_status":"A147_SOURCE_TYPOGRAPHY_REBUILD"
+      "fresh_native_hd_render":True,"rework_status":"A147R_CONTROLLER_RETRY_SOURCE_TYPOGRAPHY"
     })
 
 row_masks=[target & rect_bool((H,W),r["original_bbox"]) for r in row_reports]
@@ -235,8 +239,8 @@ for idx in protected_ids:
     preserved[str(idx)]=int(np.count_nonzero(np.any(sa[y:y+ch,x:x+cw]!=na[y:y+ch,x:x+cw],axis=2)))
 if any(preserved.values()): raise RuntimeError(("protected changed",preserved))
 
-condensed_rows=sum(1 for r in row_reports if r["width_ratio_vs_B217"]<=0.92)
-height_preserved_rows=sum(1 for r in row_reports if r["new_height_px"]>=r["prior_height_px"]-2)
+condensed_rows=sum(1 for r in row_reports if r["width_ratio_vs_B217"]<=0.90)
+height_preserved_rows=sum(1 for r in row_reports if r["new_height_px"]>=r["first_attempt_height_px"]-2)
 if condensed_rows!=14 or height_preserved_rows!=14:
     raise RuntimeError(("source typography materiality",condensed_rows,height_preserved_rows))
 
@@ -246,17 +250,17 @@ def card(label,im):
     v=comp(im).resize((1024,1024),Image.Resampling.LANCZOS)
     c=Image.new("RGB",(1024,1050),(28,28,28)); c.paste(v,(0,26)); ImageDraw.Draw(c).text((5,5),label,fill="white"); return c
 
-cards=[card("SOURCE_READABLE",src),card("B217_REJECTED",old),card("B80_CLEAN",clean),card("A147_MEDIUM_CONDENSED",new)]
+cards=[card("SOURCE_READABLE",src),card("A147_MEDIUM_TOO_LIGHT",old),card("B80_CLEAN",clean),card("A147R_BOLD_CONDENSED",new)]
 sheet=Image.new("RGB",(2048,2100),(24,24,24))
 sheet.paste(cards[0],(0,0)); sheet.paste(cards[1],(1024,0)); sheet.paste(cards[2],(0,1050)); sheet.paste(cards[3],(1024,1050))
 sheet.thumbnail((1800,1850),Image.Resampling.LANCZOS)
-sheet.save(out/"A147_FEF_SOURCE_B217_CLEAN_NEW_READABLE.jpg","JPEG",quality=96,subsampling=0)
+sheet.save(out/"A147R_FEF_SOURCE_A147_CLEAN_NEW_READABLE.jpg","JPEG",quality=96,subsampling=0)
 
-rawcards=[card("SOURCE_RAW_MIRROR_Y",src_raw),card("B217_RAW_REJECTED",old_raw),card("A147_RAW_MIRROR_Y",new_raw)]
+rawcards=[card("SOURCE_RAW_MIRROR_Y",src_raw),card("A147_RAW_TOO_LIGHT",old_raw),card("A147R_RAW_MIRROR_Y",new_raw)]
 rawsheet=Image.new("RGB",(3072,1050),(24,24,24))
 for i,c in enumerate(rawcards): rawsheet.paste(c,(1024*i,0))
 rawsheet.thumbnail((2100,760),Image.Resampling.LANCZOS)
-rawsheet.save(out/"A147_FEF_SOURCE_B217_NEW_RAW.jpg","JPEG",quality=96,subsampling=0)
+rawsheet.save(out/"A147R_FEF_SOURCE_A147_NEW_RAW.jpg","JPEG",quality=96,subsampling=0)
 
 src_rgb=comp(src); old_rgb=comp(old); new_rgb=comp(new)
 contacts=[]
@@ -271,21 +275,22 @@ for rr in row_reports:
         ims.append(z)
     cw=sum(z.width for z in ims)+12; ch=max(z.height for z in ims)+28
     c=Image.new("RGB",(cw,ch),(28,28,28)); d=ImageDraw.Draw(c); xx=0
-    for lab,z in zip(("SOURCE","B217_REJECTED","A147"),ims):
+    for lab,z in zip(("SOURCE","A147_TOO_LIGHT","A147R"),ims):
         d.text((xx+4,4),lab,fill="white"); c.paste(z,(xx,26)); xx+=z.width+6
     contacts.append(c)
 rowsheet=Image.new("RGB",(max(c.width for c in contacts),sum(c.height for c in contacts)+6*(len(contacts)-1)),(24,24,24))
 yy=0
 for c in contacts: rowsheet.paste(c,(0,yy)); yy+=c.height+6
 rowsheet.thumbnail((2200,12000),Image.Resampling.LANCZOS)
-rowsheet.save(out/"A147_FEF_ROW_CONTACT.jpg","JPEG",quality=96,subsampling=0)
+rowsheet.save(out/"A147R_FEF_ROW_CONTACT.jpg","JPEG",quality=96,subsampling=0)
 
 report={
- "schema_version":1,"role":"A","run":"A147","queue_index":236,"asset":asset,
+ "schema_version":1,"role":"A","run":"A147R","queue_index":236,"asset":asset,
  "work_stolen_from_lane":"B","trigger":"C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
- "prior_candidate_sha256":EXPECTED_BEFORE,"source_sha256":SOURCE_SHA,"candidate_sha256":after,
+ "first_attempt_candidate_sha256":EXPECTED_BEFORE,
+ "c222_rejected_b217_sha256":"5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245","source_sha256":SOURCE_SHA,"candidate_sha256":after,
  "c222_defect":"B217 Noto Sans CJK KR Black is broad/blocky and widened <=1.18x versus strongly condensed/narrow English source",
- "method":"preserve C153/B80 validated clean plate + source right anchors + B217 native-height readability; rerender every row at native 2048x2048 using shared Noto Sans CJK KR Medium, then apply one consistent 0.82x native-resolution horizontal source-family transform; no nearest-neighbor enlargement; exact source bbox/RAW mirror-Y/header retained",
+ "method":"controller rejected first A147 Medium/0.82 as too light/narrow; preserve validated clean plate/right anchors/native height and rerender all 14 at native 2048x2048 using Noto Sans CJK KR Bold + shared 0.90x condensed source-family transform; still materially narrower than C222-rejected B217; no nearest-neighbor enlargement",
  "shared_style":{"font_file":Path(FONT).name,"font_face_index":FI,"font_style":FSTYLE,
                  "font_size_native":shared_fs,"horizontal_source_family_scale":CONDENSE,
                  "fill_rgba":list(fill),"alignment":"right"},
@@ -314,16 +319,16 @@ report={
    }
  },
  "runtime_validation":"UNTESTED",
- "status":"A147_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+ "status":"A147R_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"A147_FEF70E85_REPORT.json"
+rp=out/"A147R_FEF70E85_REPORT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A147_FEF70E85.json").write_text(json.dumps({
- "role":"A","run":"A147","queue_index":236,"asset":asset,"candidate_sha256":after,
+(wr/"A147R_FEF70E85.json").write_text(json.dumps({
+ "role":"A","run":"A147R","queue_index":236,"asset":asset,"candidate_sha256":after,
  "report":str(rp.relative_to(repo)),"status":report["status"],"runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print(json.dumps({"run":"A147","before":EXPECTED_BEFORE,"after":after,
+print(json.dumps({"run":"A147R","before":EXPECTED_BEFORE,"after":after,
  "font_style":FSTYLE,"font_size_native":shared_fs,"condense":CONDENSE,
  "materially_more_condensed_rows":condensed_rows,"height_preserved_rows":height_preserved_rows,
  "status":report["status"]},ensure_ascii=False))
