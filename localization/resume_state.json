@@ -1,5 +1,5 @@
 {
-  "schema_version": 113,
+  "schema_version": 114,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B208 index24 HangulNameComposer BUILD PASS: standard 2-beolsik Jamo semantics are now implemented as an inactive deterministic composer behind the B207-proven character/control boundary. It supports initial/medial/final composition, double initials, compound vowels/finals, final splitting, stepwise BACKSPACE, digits/space, UTF-8 output, and the proven 15-codepoint ceiling. Final source 0f696621... passed Win32 Release 37445766665 and Korean Test Build 37445766663. Do not wire input yet: source-faithful 66743AA8 Jamo artwork and explicit local alias-to-UTF8 player-name rendering remain required; stock controls/native transport/network/ranking/replay stay unchanged.",
     "B207 index24 control mapping completes the stock name-entry event boundary after the already-built A141 sidecar foundation. Character selections are 0x00..0x25 (0x25 aliases slot 0x24); controls are 0x26 BACKSPACE, 0x27 page1/page2 symbols, 0x28 page1/page3 one-shot uppercase, 0x29 page1/page4 persistent uppercase, 0x2A page1/page5 legacy extended page, and 0x2B END/confirm. Preserve controls 0x26..0x2B and intercept only the character/composition path before legacy byte append; exact 66743AA8 visual binding/Jamo layout and explicit local Korean-name rendering remain HOLD.",
     "A141 index24 implementation foundation BUILD PASS: after A primary work was exhausted, A work-stole the B206 HOLD and implemented the two safe deterministic prerequisites rather than repeating consumer mapping. Native player-name storage remains legacy-compatible; canonical Korean UTF-8 is mapped by a deterministic 14-byte ASCII alias (K + 13 Base32 chars) to SaveGame/KoreanPlayerNames.tsv with UTF-8 validation, collision handling and atomic persistence. Win32 Release 37441155668 and Korean Test Build 37441155760 both SUCCESS. No write to 0x7C23E0 and no DDS/input/render/network/ranking/replay behavior yet. Next safe work: Hangul composition/name-entry hook plus explicit local player-name render substitution, beginning from proven Edit License 0x4DE48A->0x48F280; keep remote/ranking/replay on alias.",
     "C: independently revalidate A136/A137/A138/A139 user-JPG visual rework (BF3EE5C6, 37759842, FD90AA9, A064FDFC, 48DEBE77). Do not close IGR-008/011/012/014/015/016/018 until a NEW actual in-game screenshot confirms the reported broken/slant/residue defects are gone.",
@@ -6495,5 +6496,57 @@
     "candidate_written": false,
     "runtime_source_changed": false,
     "runtime_validation": "UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT"
+  },
+  "b208_hangul_name_composer": {
+    "timestamp_kst": "2026-10-06T18:58:30+09:00",
+    "role": "B",
+    "queue_index": 24,
+    "prior": "B207_HOLD_SIDECAR_BUILD_PASS_CONTROLS_MAPPED_HANGUL_COMPOSITION_RENDER_REQUIRED",
+    "status": "B208_HOLD_COMPOSER_BUILD_PASS_JAMO_ARTWORK_RENDER_HOOK_REQUIRED",
+    "report": "localization/graphics/role_B/20261006-B-PRODUCTION208-HANGUL-NAME-COMPOSER/B208_HANGUL_NAME_COMPOSER.json",
+    "final_source_commit": "0f696621d80a192f69d1f4195715870a0dfcf046",
+    "source_file": "src/hooks_localization.cpp",
+    "implementation": {
+      "class": "KoreanRuntime::HangulNameComposer",
+      "stock_character_boundary": "0x00..0x25; 10..35 map a..z",
+      "base_mapping": "standard 2-beolsik physical-key Jamo semantics",
+      "shifted_keys": "Q/W/E/R/T tense consonants, O/P shifted vowels",
+      "features": [
+        "initial/medial/final composition",
+        "double initials",
+        "compound vowels",
+        "compound finals",
+        "final split before following vowel",
+        "stepwise backspace",
+        "digits",
+        "space",
+        "UTF-8 output"
+      ],
+      "max_visible_codepoints": 15,
+      "wired_to_game_input": false,
+      "writes_native_field": false,
+      "local_render_hook": false
+    },
+    "build_validation": {
+      "win32_release": {
+        "run_id": 37445766665,
+        "conclusion": "SUCCESS",
+        "artifact_id": 11404040505,
+        "digest": "sha256:c659267dde0f328d427ed0349f70ccf828ab2c652ba10f435a382ce529a49009"
+      },
+      "korean_test": {
+        "run_id": 37445766663,
+        "conclusion": "SUCCESS",
+        "artifact_id": 11403511226,
+        "digest": "sha256:b036cb8a95981121423a25490e941cdf0423bdc2965f2eb54c0eba81826ef175"
+      }
+    },
+    "runtime_behavior_changed": false,
+    "runtime_validation": "UNTESTED",
+    "next_safe_work": [
+      "author/verify source-faithful Jamo key artwork for 66743AA8",
+      "implement explicit local alias-to-UTF8 player-name renderer",
+      "only then wire composer at B207 boundary and alias commit on confirm"
+    ]
   }
 }
