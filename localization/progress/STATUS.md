@@ -2031,3 +2031,10 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_A/20261006-A-MANUALQA146-E1639D2E/A146_E1639D2E_REPORT.json and A146_CONTROLLER_FINAL_QA.json.
 
+
+
+### B212 selector-mode slant manual visual rework — 2026-10-06 23:57 KST
+- q102 571E78F3: `c4f33f3d... -> 442babea...`; Time Attack/15-course selector rows corrected to source-direction right lean; machine/controller QA PASS, **HIGH_RISK edge-touch**, fresh C required.
+- q104 62BEBF33: `687ecaad... -> c84a2703...`; OutRun Mode family slant corrected; 4px vertical margins, static QA PASS, fresh C required.
+- q116 E3FD08BE: `3fbf7b03... -> 7e42aaa0...`; Heart Attack Mode family slant corrected; 3px vertical margins, static QA PASS, fresh C required.
+- All three retain canonical DXT5/header/raw mirror-Y and zero visible/alpha changes outside exact source bboxes. Current PRE_INGAME comparison cards are stale until C refreshes them. `RUNTIME_VALIDATION=UNTESTED`.

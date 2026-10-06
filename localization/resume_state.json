@@ -1,5 +1,5 @@
 {
-  "schema_version": 119,
+  "schema_version": 120,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4211,7 +4211,10 @@
     "EBEF6D20",
     "C598919A",
     "43B07A77",
-    "E1639D2E"
+    "E1639D2E",
+    "571E78F3",
+    "62BEBF33",
+    "E3FD08BE"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6703,7 +6706,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-06 23:41 KST",
+  "updated_at_kst": "2026-10-06 23:57 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7004,5 +7007,65 @@
     "pre_ingame_comparison_refresh": "PENDING_C",
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "b212_selector_family_manual_visual_rework": {
+    "run": "B212",
+    "timestamp_kst": "2026-10-06 23:57 KST",
+    "role": "B",
+    "selection_reason": "primary B shard had no active regression/C-returned REWORK/render-ready candidate; manual PRE_INGAME English-original review found a shared selector-family slant false-negative",
+    "worker_output_commit": "aac7cb4f88931db60af5fed84473ac374e298b8d",
+    "items": [
+      {
+        "queue_index": 102,
+        "asset_key": "571E78F3",
+        "asset": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+        "prior_c_status": "C91_PIXEL_VISUAL_PASS_PENDING_INGAME_HIGH_RISK_EDGE_TOUCH",
+        "before_sha256": "c4f33f3d98b6d5873d8bb6438d5e649fdaa12c114ed8d34d22a7405d448fc186",
+        "candidate_sha256": "442babea9c5dea9a944dff3d4a6a577f007dad2ae63a9699d380baf0ce7fc05d",
+        "defects": [
+          "WRONG_OR_WEAK_SLANT_DIRECTION",
+          "SOURCE_TRANSFORM_FIDELITY_MISMATCH"
+        ],
+        "high_risk_edge_touch": true,
+        "worker_report": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_571E78F3_REPORT.json",
+        "status": "B_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME"
+      },
+      {
+        "queue_index": 104,
+        "asset_key": "62BEBF33",
+        "asset": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+        "prior_c_status": "C91_PIXEL_VISUAL_PASS_PENDING_INGAME",
+        "before_sha256": "687ecaad8db7478f4964b11d082f86b21091507bef564cfde3adfb4a1a625e7d",
+        "candidate_sha256": "c84a2703d0a22b36384e07ce72d4e761e651a1a23219cd78153b4a0aff022505",
+        "defects": [
+          "WRONG_OR_WEAK_SLANT_DIRECTION",
+          "SOURCE_TRANSFORM_FIDELITY_MISMATCH"
+        ],
+        "high_risk_edge_touch": false,
+        "worker_report": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_62BEBF33_REPORT.json",
+        "status": "B_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME"
+      },
+      {
+        "queue_index": 116,
+        "asset_key": "E3FD08BE",
+        "asset": "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+        "prior_c_status": "C91_PIXEL_VISUAL_PASS_PENDING_INGAME",
+        "before_sha256": "3fbf7b03834549de10277947043ca8dd15d05fd729cd8441174b74581b532c9f",
+        "candidate_sha256": "7e42aaa0f8aec535008bb816ec3660e075ce87c56a4ae44170c3340d1a32a6dc",
+        "defects": [
+          "WRONG_OR_WEAK_SLANT_DIRECTION",
+          "SOURCE_TRANSFORM_FIDELITY_MISMATCH"
+        ],
+        "high_risk_edge_touch": false,
+        "worker_report": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_E3FD08BE_REPORT.json",
+        "status": "B_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME"
+      }
+    ],
+    "controller_qa": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_CONTROLLER_SELF_QA.json",
+    "controller_visual_qa": "PASS_READABLE_AND_RAW_3_OF_3",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_C",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

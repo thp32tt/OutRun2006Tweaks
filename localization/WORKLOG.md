@@ -2455,3 +2455,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_A/20261006-A-MANUALQA146-E1639D2E/A146_E1639D2E_REPORT.json and A146_CONTROLLER_FINAL_QA.json.
 
+
+
+## B212 selector-mode slant manual visual rework — 2026-10-06 23:57 KST
+- Refreshed the live branch and confirmed B had no active P0/P1 in-game regression, C-returned REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER candidate. Following the user-authorized manual-QA fallback, current PRE_INGAME English-original comparisons were inspected instead of repeating pending-C work.
+- q102 `571E78F3`, q104 `62BEBF33`, q116 `E3FD08BE` shared a visible false-negative: prior C91 Korean selector-mode lettering was materially too upright/weakly slanted versus the strongly right-italic English family.
+- GitHub-hosted B212 materially rebuilt the existing native-HD Korean effect rasters on C91-validated clean plates with readable right-lean correction. New SHAs: `571E78F3=442babea9c5d...`, `62BEBF33=c84a2703d0a2...`, `E3FD08BE=7e42aaa0f8ae...`. No low-resolution Korean bitmap was upscaled.
+- Worker QA: **4/4 bbox + source-size ceiling PASS**, visible/alpha outside exact source bboxes=0, changed BC3 blocks outside patch=0, canonical DXT5 headers preserved, raw mirror-Y orientation retained.
+- Controller SOURCE/OLD/B212 readable + RAW review: **PASS 3/3**. Right-lean fidelity is improved with orange/navy/white-glow family retained; no broken glyph, English residue, foreign-art intrusion or orientation inversion observed. q102 retains exact source-bbox edge touch and remains **HIGH_RISK** pending fresh C/high-zoom and actual-game validation.
+- Prior C91 pass is superseded for these changed bytes. Fresh independent C + regenerated English-original comparison JPG + user review + actual-game validation are mandatory. `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_CONTROLLER_SELF_QA.json`.

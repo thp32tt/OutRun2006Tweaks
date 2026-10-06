@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B212",
+  "timestamp_kst": "2026-10-06T23:57:24+09:00",
+  "trigger": "manual PRE_INGAME English-original comparison inspection after primary B queue had no active P0/P1/C-returned REWORK/RENDER_READY work",
+  "worker_output_commit": "aac7cb4f88931db60af5fed84473ac374e298b8d",
+  "defects": [
+    "WRONG_OR_WEAK_SLANT_DIRECTION",
+    "SOURCE_TRANSFORM_FIDELITY_MISMATCH"
+  ],
+  "assets": [
+    {
+      "queue_index": 102,
+      "asset_key": "571E78F3",
+      "asset": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+      "prior_c_status_invalidated": "C91_PIXEL_VISUAL_PASS_PENDING_INGAME_HIGH_RISK_EDGE_TOUCH",
+      "before_sha256": "c4f33f3d98b6d5873d8bb6438d5e649fdaa12c114ed8d34d22a7405d448fc186",
+      "candidate_sha256": "442babea9c5dea9a944dff3d4a6a577f007dad2ae63a9699d380baf0ce7fc05d",
+      "worker_report": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_571E78F3_REPORT.json",
+      "readable_evidence": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_571E78F3_SOURCE_OLD_NEW_READABLE.jpg",
+      "raw_evidence": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_571E78F3_SOURCE_OLD_NEW_RAW.jpg",
+      "controller_visual_review": "PASS_WITH_HIGH_RISK_EDGE_TOUCH: SOURCE/OLD/B212 readable comparison shows materially stronger source-direction right lean for both selector rows while retaining orange/navy/white-glow family. RAW mirror-Y comparison remains consistent. No broken Hangul, source-script residue, foreign-art intrusion or newly visible transform inversion observed. Exact source-bbox edge touch remains a mandatory fresh-C/in-game high-risk hold.",
+      "high_risk_edge_touch": true,
+      "fresh_independent_c": "PENDING",
+      "pre_ingame_comparison_refresh": "PENDING_C",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "queue_index": 104,
+      "asset_key": "62BEBF33",
+      "asset": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+      "prior_c_status_invalidated": "C91_PIXEL_VISUAL_PASS_PENDING_INGAME",
+      "before_sha256": "687ecaad8db7478f4964b11d082f86b21091507bef564cfde3adfb4a1a625e7d",
+      "candidate_sha256": "c84a2703d0a22b36384e07ce72d4e761e651a1a23219cd78153b4a0aff022505",
+      "worker_report": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_62BEBF33_REPORT.json",
+      "readable_evidence": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_62BEBF33_SOURCE_OLD_NEW_READABLE.jpg",
+      "raw_evidence": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_62BEBF33_SOURCE_OLD_NEW_RAW.jpg",
+      "controller_visual_review": "PASS: SOURCE/OLD/B212 readable comparison shows the prior near-upright 아웃런 모드 corrected toward the source right-italic transform while preserving the orange/navy/white-glow family and 4px vertical margins. RAW mirror-Y comparison is transform-consistent; no clipping, broken Hangul, residue or protected-art intrusion observed.",
+      "high_risk_edge_touch": false,
+      "fresh_independent_c": "PENDING",
+      "pre_ingame_comparison_refresh": "PENDING_C",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "queue_index": 116,
+      "asset_key": "E3FD08BE",
+      "asset": "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+      "prior_c_status_invalidated": "C91_PIXEL_VISUAL_PASS_PENDING_INGAME",
+      "before_sha256": "3fbf7b03834549de10277947043ca8dd15d05fd729cd8441174b74581b532c9f",
+      "candidate_sha256": "7e42aaa0f8aec535008bb816ec3660e075ce87c56a4ae44170c3340d1a32a6dc",
+      "worker_report": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_E3FD08BE_REPORT.json",
+      "readable_evidence": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_E3FD08BE_SOURCE_OLD_NEW_READABLE.jpg",
+      "raw_evidence": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_E3FD08BE_SOURCE_OLD_NEW_RAW.jpg",
+      "controller_visual_review": "PASS: SOURCE/OLD/B212 readable comparison shows 하트 어택 모드 corrected to a stronger source-direction right lean while preserving source-family orange/navy/white-glow effects and positive margins. RAW mirror-Y review shows no orientation regression, clipping, broken glyphs, residue or foreign-art intrusion.",
+      "high_risk_edge_touch": false,
+      "fresh_independent_c": "PENDING",
+      "pre_ingame_comparison_refresh": "PENDING_C",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "machine_qa": {
+    "assets": 3,
+    "physical_rows": 4,
+    "bbox_and_source_size_ceiling": "4/4 PASS",
+    "visible_changed_pixels_outside_source_bboxes": 0,
+    "alpha_changed_pixels_outside_source_bboxes": 0,
+    "changed_blocks_outside_patch_set": 0,
+    "canonical_header_preserved": "3/3 PASS"
+  },
+  "controller_visual_qa": "PASS_READABLE_AND_RAW_3_OF_3",
+  "ordered_generation_gate": {
+    "1_source_removal_plate_restoration": "PASS_INHERITED_C91_VALIDATED_CLEAN_PLATES",
+    "2_source_matching_readable_slant_direction": "PASS_B212_RIGHT_LEAN_VISUAL",
+    "3_no_unnecessary_undersizing": "PASS_EXISTING_NATIVE_HEIGHT_PRESERVED_WITHIN_SOURCE_BBOX",
+    "4_source_faithful_weight_outline_shadow": "PASS_PRIOR_NATIVE_HD_EFFECT_FAMILY_PRESERVED",
+    "5_no_clipped_pixels": "PASS_VISUAL_AND_MACHINE_CONTAINMENT; Q102_REMAINS_EDGE_TOUCH_HIGH_RISK",
+    "6_protected_art_clearance": "PASS_ZERO_OUTSIDE_SOURCE_BBOX",
+    "7_flip_y_and_raw": "PASS_BOTH_REVIEWED",
+    "8_immediate_readability_vs_english": "PASS"
+  },
+  "decision": "B212_PRODUCER_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_REFRESHED_ENGLISH_COMPARISON_USER_REVIEW_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
