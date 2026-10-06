@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T12:17:10+09:00",
+  "updated_at_kst": "2026-10-06T12:41:22+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B191 promoted index172 6C9B3611 from zoom_review to localize_text and produced candidate 963445a44888... with producer static/controller visual PASS. Pending independent C; runtime untested. B-owned in-game backlog rows remain pending C/new in-game retest and must not be repeated. Index62 33491F83 remains MANUAL_RECONSTRUCTION_REQUIRED. Next normal even zoom_review is index166 5EBD7FE8.",
+  "next_checkpoint": "A119R resolved the final A strict DXT5 HOLD index99 4F68708E. Complete decoded source effect bbox [514,37,1614,217] supersedes under-covered threshold boxes (606 source pixels omitted). A119 numeric PASS bd7185f454ab... was controller-rejected for cross-line style mismatch; A119R candidate 70970da7653b... uses one shared 61px white/navy/glow/shear family. Machine zero-pixel gates + SOURCE/CLEAN/FINAL/raw controller visual PASS; pending independent C/in-game. A primary odd unfinished production HOLD is now exhausted unless C/new in-game evidence returns REWORK.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1352,31 +1352,24 @@
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     },
     "latest_a_production": {
-      "run": "A97",
-      "decision": "FINAL_PENDING_ARTWORK_BATCH_NATIVE_HD",
+      "run": "A119R",
+      "decision": "STRICT_DXT5_HOLD_RESOLVED_NATIVE_HD",
       "indices": [
-        225,
-        227,
-        231,
-        237
+        99
       ],
       "candidate_sha256": {
-        "E3C455FA": "37b8236f06fcec8c8c64c1076f9bf0f3c8c56ea3638b8a4582a513a40bbcb18d",
-        "E596B7AC": "e60eb09818ce79c1afc005905ce0d5f7d2678c7f69a2b25f418f2679200499b2",
-        "EBE401C8": "dc08f74a20c7070763413a831ace96b6ef677e52328de5e3a1a87cd440937499",
-        "FF514CEB": "acbf42d5f8f45ee6227bb0f81a770687bba680916c828f773095b64dbc63e5a3"
+        "4F68708E": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612"
       },
-      "result": "A97_STATIC_PASS_PENDING_C",
-      "conceptual_segments": 35,
-      "localized_physical_rows": 38,
-      "machine_qa": "4/4 assets PASS; 38/38 physical rows bbox/size/positive-margin; zero outside/alpha/protected/source-residue/overlap/touch; DDS roundtrip PASS",
-      "controller_visual_qa": "4/4 PASS",
+      "result": "A119R_STATIC_PASS_PENDING_C",
+      "conceptual_segments": 1,
+      "localized_physical_rows": 2,
+      "machine_qa": "hard multiline + 2/2 line-core bbox/size/positive-margin PASS; changed/alpha outside=0; source residue=0; row overlap=0; shared line style PASS",
+      "controller_visual_qa": "PASS after rejecting A119 numeric false-negative style mismatch",
       "corrections": [
-        "E3C455FA A95 leading Latin residue false-negative fixed in A95R",
-        "E596B7AC CAPE WAY -> 케이프 웨이; CONIFEROUS FOREST -> 코니퍼러스 포레스트; BAY AREA recovered",
-        "EBE401C8 two omitted explanatory help lines recovered"
+        "A117/A119 threshold-bbox undercoverage 606px reconciled to complete source effect bbox",
+        "A119 54px/57px cross-line style mismatch rejected and rebuilt with shared 61px style"
       ],
-      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION97-PENDING4-FINALIZE/A97_CONTROLLER_SELF_QA.json",
+      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_CONTROLLER_SELF_QA.json",
       "runtime_validation": "UNTESTED",
       "pending_independent_c_static_qa": true
     },
@@ -1498,6 +1491,7 @@
       "runtime_validation": "UNTESTED"
     },
     "current_pending_c": [
+      "4F68708E",
       "788CE557",
       "B1696633",
       "30CF0D",
@@ -2195,7 +2189,8 @@
       "index99": {
         "partial_blocks": 834,
         "partial_with_alpha_zero": 772,
-        "status": "HOLD_STRICT_RECHECK_CONSTRAINED_METHOD_STILL_REQUIRED"
+        "status": "RESOLVED_BY_A119R_COMPLETE_SOURCE_FOOTPRINT",
+        "resolution_candidate_sha256": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612"
       },
       "index119": {
         "partial_blocks": 347,
@@ -2216,6 +2211,61 @@
       "status": "STATIC_PASS_PENDING_C",
       "runtime_validation": "UNTESTED",
       "next_even_zoom_review_index": 166
+    },
+    "a119r_4f68708e": {
+      "timestamp_kst": "2026-10-06T12:41:22+09:00",
+      "queue_index": 99,
+      "asset": "4F68708E",
+      "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+      "candidate_sha256": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612",
+      "superseded_a119_candidate_sha256": "bd7185f454abfd326e7609eb4826c1a22388617824cd25e00c211e73b648f889",
+      "translation_lines": [
+        "Drive against the Ghost Car -> 고스트 카와 달리며",
+        "and challenge for the course record!! -> 코스 기록에 도전하세요!"
+      ],
+      "complete_source_bbox": [
+        514,
+        37,
+        1614,
+        217
+      ],
+      "localized_bbox": [
+        523,
+        43,
+        1135,
+        210
+      ],
+      "hard_positive_margins": {
+        "left": 9,
+        "right": 479,
+        "top": 6,
+        "bottom": 7
+      },
+      "per_line_core_qa": [
+        "row1 [543,43,1023,124] in [537,41,1350,126] margins 6/327/2/2 PASS",
+        "row2 [523,129,1135,210] in [517,126,1610,213] margins 6/475/3/3 PASS"
+      ],
+      "shared_style": {
+        "font": "Noto Sans CJK KR Bold",
+        "font_size": 61,
+        "stroke_px": 4,
+        "outer_glow_stroke_px": 7,
+        "shear": 0.24
+      },
+      "machine_qa": {
+        "prior_core_undercoverage_pixels": 606,
+        "changed_outside": 0,
+        "alpha_outside": 0,
+        "source_residue": 0,
+        "row_overlap": 0,
+        "vertical_gap": 5,
+        "shared_line_style": "PASS"
+      },
+      "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_AND_RAW_MIRROR_Y_SHARED_STYLE",
+      "status": "A119R_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME",
+      "report": "localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_4F68708E_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
@@ -2462,6 +2512,7 @@
     "runtime_validation": "PENDING_NEW_INGAME_RETEST"
   },
   "current_pending_c": [
+    "4F68708E",
     "BA0147DA",
     "8C259C68",
     "D657C2EB",
