@@ -840,14 +840,29 @@ forbid(
 )
 require_order(
     sbs_acquire,
-    "R19 timeout preserves acquired image for later retry",
+    "R19 bounded wait call ordering",
     "image = swapchain.acquiredImage;",
     "wait.timeout = SwapchainImageWaitBudgetNs;",
     "::xrWaitSwapchainImage(swapchain.handle, &wait);",
     "if (result == XR_TIMEOUT_EXPIRED)",
-    "return false;",
     "if (XR_FAILED(result))",
     "swapchain.waited = true;",
+)
+timeout_start = sbs_acquire.find("if (result == XR_TIMEOUT_EXPIRED)")
+failed_start = sbs_acquire.find("if (XR_FAILED(result))", timeout_start)
+timeout_path = sbs_acquire[timeout_start:failed_start]
+require(
+    timeout_path,
+    "R19 timeout yields frame while preserving acquired image",
+    "return false;",
+)
+forbid(
+    timeout_path,
+    "R19 timeout must retain acquired image ownership",
+    "swapchain.acquired = false;",
+    "swapchain.acquiredImage = 0;",
+    "swapchain.waited = true;",
+    "::xrReleaseSwapchainImage",
 )
 
 sbs_swapchain_destroy = body(host_sbs, "bool Destroy(bool parentSessionDestroying = false)")
