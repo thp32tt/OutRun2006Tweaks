@@ -333,15 +333,16 @@ require_order(
 if read_ack.count("R13ReleaseAckState();") != 1:
     fail("R13 ACK snapshot path must retire a stale host mapping exactly once")
 
-read_ack_slot = body(r13, "bool R13ReadGpuCompletedFrame(")
+read_ack_rebind = body(r13, "bool R13ReadGpuCompletionSnapshotWithRebind(")
 require_order(
-    read_ack_slot,
-    "R13 per-slot ACK compatibility wrapper",
-    "if (slotIndex >= OutRunVR::RenderFrameRingSize)",
-    "R13GpuCompletionSnapshot snapshot{};",
-    "R13ReadGpuCompletionSnapshot(snapshot)",
-    "completedFrame = snapshot.completedFrameId[slotIndex];",
+    read_ack_rebind,
+    "R13 bounded ACK stale-mapping rebind owner",
+    "if (R13ReadGpuCompletionSnapshot(completed))",
+    "return true;",
+    "return R13ReadGpuCompletionSnapshot(completed);",
 )
+if read_ack_rebind.count("R13ReadGpuCompletionSnapshot(completed)") != 2:
+    fail("R13 ACK rebind owner must perform initial + one bounded recovery snapshot")
 
 # R13 is the lower reset/resource owner. It releases shared resources and
 # publishes a disabled frame before ResetEx; recreation occurs only on success.
@@ -488,13 +489,32 @@ require(
     "const bool ackValid = ackSnapshotValid;",
     "ackSnapshot.completedFrameId[index]",
 )
-if resolve_direct_r32.count("R13TryGetGpuCompletionSnapshot(ackSnapshot)") != 2:
-    fail("R32 DirectGPU ring scan must use at most initial + bounded rebind ACK snapshots per resolve")
+if resolve_direct_r32.count("R13TryGetGpuCompletionSnapshot(ackSnapshot)") != 1:
+    fail("R32 DirectGPU ring scan must delegate bounded ACK rebind policy to one R13 snapshot call")
 forbid(
     resolve_direct_r32,
     "R32 repeated per-slot ACK snapshot regression",
     "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
 )
+
+resolve_direct_r13 = body(r13, "bool ResolveDirectTransportR13(")
+require_order(
+    resolve_direct_r13,
+    "R13 base DirectGPU whole-ring ACK scan",
+    "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
+    "R13GpuCompletionSnapshot ackSnapshot{};",
+    "bool ackSnapshotRead = false;",
+    "bool ackSnapshotValid = false;",
+    "for (std::uint32_t offset = 0;",
+    "if (slot.published && slot.frameId)",
+    "R13ReadGpuCompletionSnapshotWithRebind(ackSnapshot)",
+    "ackSnapshotRead = true;",
+    "ackSnapshot.completedFrameId[index]",
+    "slot.frameId = 0;",
+    "slot.published = false;",
+)
+if resolve_direct_r13.count("R13ReadGpuCompletionSnapshotWithRebind(ackSnapshot)") != 1:
+    fail("R13 base DirectGPU ring scan must read one owner-managed ACK snapshot per resolve")
 
 post_present_r7 = body(r7, "bool DirectTransportFrameReadyAfterPresent(")
 require_order(
@@ -757,14 +777,11 @@ require_order(
     "completed.completedFrameId,",
     "snapshot.completedFrameId,",
 )
-read_gpu_ack_slot = body(r13, "bool R13ReadGpuCompletedFrame(")
-require_order(
-    read_gpu_ack_slot,
-    "game dedicated ACK per-slot wrapper",
-    "if (slotIndex >= OutRunVR::RenderFrameRingSize)",
-    "R13GpuCompletionSnapshot snapshot{};",
-    "R13ReadGpuCompletionSnapshot(snapshot)",
-    "completedFrame = snapshot.completedFrameId[slotIndex];",
+forbid(
+    r13,
+    "retired per-slot ACK compatibility surface",
+    "R13ReadGpuCompletedFrame(",
+    "R13TryGetGpuCompletedFrame(",
 )
 
 # Host-owned SafeEye fallback cache must also be scoped to the complete

@@ -496,22 +496,14 @@ namespace OutRunVRStereo
 
                 if (candidate.published && candidate.frameId)
                 {
-                    // The ACK mapping is one seqlock-protected snapshot for the
-                    // whole 4-slot ring. Read it at most twice per resolve scan:
-                    // the second read is a bounded recovery attempt that can
-                    // reopen a stale host mapping released by the first read.
-                    // If both snapshots are unavailable, keep every published
-                    // slot immutable until the next resolve instead of repeating
-                    // the same mapping/seqlock work once per candidate slot.
+                    // R13 owns ACK mapping/rebind policy. Its snapshot API
+                    // performs at most one bounded stale-mapping reopen/retry,
+                    // so this final owner samples that whole-ring state exactly
+                    // once per resolve scan and reuses it for every candidate.
                     if (!ackSnapshotRead)
                     {
                         ackSnapshotValid =
                             R13TryGetGpuCompletionSnapshot(ackSnapshot);
-                        if (!ackSnapshotValid)
-                        {
-                            ackSnapshotValid =
-                                R13TryGetGpuCompletionSnapshot(ackSnapshot);
-                        }
                         ackSnapshotRead = true;
                     }
 

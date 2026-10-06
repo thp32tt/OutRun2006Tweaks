@@ -556,10 +556,16 @@ for marker in (
         errors.append(f"R13 missing DirectGPU owner API: {marker}")
     if marker not in r32:
         errors.append(f"R32 missing R13 DirectGPU owner API use: {marker}")
-if "R13TryGetGpuCompletedFrame(" not in r13:
-    errors.append("R13 missing legacy per-slot ACK compatibility API")
-if "R13TryGetGpuCompletedFrame(" in r32:
-    errors.append("R32 regained repeated per-slot ACK snapshot fallback")
+for retired in (
+    "R13ReadGpuCompletedFrame(",
+    "R13TryGetGpuCompletedFrame(",
+):
+    if retired in r13:
+        errors.append(f"R13 retained retired per-slot ACK compatibility surface: {retired}")
+    if retired in r32:
+        errors.append(f"R32 regained retired per-slot ACK compatibility surface: {retired}")
+if "R13ReadGpuCompletionSnapshotWithRebind(" not in r13:
+    errors.append("R13 missing bounded ACK snapshot rebind owner")
 
 for rel, source in (("R32", r32), ("R33", r33)):
     for banned in (

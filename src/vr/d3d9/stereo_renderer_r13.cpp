@@ -194,19 +194,16 @@ namespace OutRunVRStereo
             return false;
         }
 
-        bool R13ReadGpuCompletedFrame(std::uint32_t slotIndex,
-            std::uint32_t& completedFrame) noexcept
+        bool R13ReadGpuCompletionSnapshotWithRebind(
+            R13GpuCompletionSnapshot& completed) noexcept
         {
-            completedFrame = 0;
-            if (slotIndex >= OutRunVR::RenderFrameRingSize)
-                return false;
+            if (R13ReadGpuCompletionSnapshot(completed))
+                return true;
 
-            R13GpuCompletionSnapshot snapshot{};
-            if (!R13ReadGpuCompletionSnapshot(snapshot))
-                return false;
-
-            completedFrame = snapshot.completedFrameId[slotIndex];
-            return true;
+            // A stable snapshot from the wrong host releases the stale mapping.
+            // Give the ACK owner one bounded reopen/retry so upper layers do not
+            // need to repeat mapping/seqlock policy per ring slot.
+            return R13ReadGpuCompletionSnapshot(completed);
         }
 
         bool ResolveDirectTransportR13(IDirect3DDevice9* device, std::uint32_t frameId)
@@ -222,6 +219,9 @@ namespace OutRunVRStereo
                 (frameId - 1u) % OutRunVR::RenderFrameRingSize;
             std::uint32_t selected = OutRunVR::RenderFrameRingSize;
             bool ackBlocked = false;
+            R13GpuCompletionSnapshot ackSnapshot{};
+            bool ackSnapshotRead = false;
+            bool ackSnapshotValid = false;
 
             // R38: the base producer can choose any free slot, so the safety
             // gate must validate the actual candidate slot rather than the old
@@ -263,9 +263,16 @@ namespace OutRunVRStereo
 
                 if (slot.published && slot.frameId)
                 {
-                    std::uint32_t gpuCompleted = 0;
-                    const bool ackValid =
-                        R13ReadGpuCompletedFrame(index, gpuCompleted);
+                    if (!ackSnapshotRead)
+                    {
+                        ackSnapshotValid =
+                            R13ReadGpuCompletionSnapshotWithRebind(ackSnapshot);
+                        ackSnapshotRead = true;
+                    }
+
+                    const bool ackValid = ackSnapshotValid;
+                    const std::uint32_t gpuCompleted = ackValid
+                        ? ackSnapshot.completedFrameId[index] : 0;
                     if (!ackValid ||
                         !FrameIdAtOrAfter(gpuCompleted, slot.frameId))
                     {
@@ -805,13 +812,7 @@ namespace OutRunVRStereo
     inline bool R13TryGetGpuCompletionSnapshot(
         R13GpuCompletionSnapshot& completed) noexcept
     {
-        return R13ReadGpuCompletionSnapshot(completed);
-    }
-
-    inline bool R13TryGetGpuCompletedFrame(
-        std::uint32_t slotIndex, std::uint32_t& completedFrame) noexcept
-    {
-        return R13ReadGpuCompletedFrame(slotIndex, completedFrame);
+        return R13ReadGpuCompletionSnapshotWithRebind(completed);
     }
 
     inline void R13NoteSafeAckBackpressure() noexcept
