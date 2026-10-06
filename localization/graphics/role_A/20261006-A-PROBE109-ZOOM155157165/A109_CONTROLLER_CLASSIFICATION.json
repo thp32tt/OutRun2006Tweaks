@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PROBE109-ZOOM155157165",
+  "timestamp_kst": "2026-10-06T11:10:00+09:00",
+  "decision": "ALL_THREE_NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+  "source_commit": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "assets": {
+    "4D49CA85": {
+      "queue_index": 155,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D49CA85_512x256.dds",
+      "source_sha256": "3d76affb538d9232e8e9ff70349ed7207dbf54013db36e7a5228fb7bba2a1248",
+      "structure": "2048x1024 RGBA32 mip1 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "two course preview photographs",
+        "OutRun2SP logo artwork only"
+      ],
+      "protected_original": [
+        "OutRun2SP logo artwork",
+        "course preview photography"
+      ],
+      "candidate_required": false
+    },
+    "4DF4D7CD": {
+      "queue_index": 157,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4DF4D7CD_512x512.dds",
+      "source_sha256": "0d8ebbaf8e99b776f16324af2fdfdf43720b62062a330507578a313683d24c6b",
+      "structure": "2048x2048 RGBA32 mip1 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "four course preview photographs",
+        "OutRun2 logo artwork only"
+      ],
+      "protected_original": [
+        "OutRun2 logo artwork",
+        "course preview photography"
+      ],
+      "candidate_required": false
+    },
+    "5C98F2": {
+      "queue_index": 165,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5C98F2_512x512.dds",
+      "source_sha256": "bc6cdc7990b79ef91ec05ee2e53f84b187649d009c4108bdeacc7a7f57be3c54",
+      "structure": "2048x2048 RGBA32 mip1 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "three course preview photographs",
+        "OutRun2SP logo artwork only"
+      ],
+      "protected_original": [
+        "OutRun2SP logo artwork",
+        "course preview photography"
+      ],
+      "candidate_required": false
+    }
+  },
+  "controller_visual_qa": {
+    "readable_orientation": "PASS_3_OF_3",
+    "raw_mirror_y_orientation": "PASS_3_OF_3",
+    "notes": "A109 readable proofs plus A110 prior raw proofs confirm photo/logo-only atlases; no language-bearing localization text."
+  },
+  "status": "A109_CLASSIFICATION_COMPLETE_PRESERVE_ORIGINAL_3_OF_3",
+  "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION",
+  "vr_ffb_dx11_dxvk_touched": false
+}
