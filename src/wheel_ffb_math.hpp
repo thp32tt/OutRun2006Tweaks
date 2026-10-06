@@ -298,14 +298,14 @@ namespace WheelFFBMath
     }
 
     // During a real drift the front-wheel slip sign can cross the body-slip
-    // sign as the rack countersteers.  At that point blindly following frontSlip
-    // can pull the wheel back toward the car heading instead of letting caster/
-    // trail align the front wheels with the velocity vector.  Blend toward a
-    // body-slip recovery direction only for a developed oversteer state and only
-    // while front/body slip signs oppose; ordinary cornering/understeer is untouched.
+    // sign as the rack countersteers. Front slip remains the sole torque-direction
+    // owner: body slip is only a confidence gate that increases the existing
+    // aligning torque after a developed oversteer state is established. This avoids
+    // the R13 failure mode where an opposite-sign body-slip cue merely unloaded the
+    // wheel instead of accelerating it into countersteer.
     constexpr float DriftCountersteerStartRad = 0.16f;
     constexpr float DriftCountersteerFullRad = 0.42f;
-    constexpr float DriftCountersteerMaxBlend = 0.20f;
+    constexpr float DriftCountersteerMaxBlend = 0.35f;
 
     inline float drift_countersteer_blend(
         float bodySlip, float frontSlip, float bodySlide)
@@ -476,12 +476,13 @@ namespace WheelFFBMath
             (std::clamp(speedNorm, 0.0f, 1.0f) - 0.04f) / 0.30f);
         const float roadScale = std::clamp(roadSetting / 0.60f, 0.0f, 1.67f);
         const float gainScale = std::clamp(outputStrength / 0.70f, 0.0f, 2.0f);
-        // R12 hardware follow-up: Imperial Avenue still felt too smooth on R3.
-        // Raise only this evidence-scoped stage/mask family; generic rough roads
-        // retain their existing comfort scaling.
+        // R13 hardware-log follow-up: Imperial Avenue still felt almost smooth
+        // even though the 0x2/0x800 brick/stone pattern was detected. Raise only
+        // this evidence-scoped floor; ordinary all-0x2 asphalt and generic rough
+        // roads keep their existing comfort scaling.
         return std::clamp(
-            (0.100f + 0.080f * speedGate) * roadScale * gainScale,
-            0.0f, 0.20f);
+            (0.160f + 0.140f * speedGate) * roadScale * gainScale,
+            0.0f, 0.32f);
     }
 
 
