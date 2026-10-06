@@ -45,6 +45,7 @@ on:
       - 'tools/verify_vr_hud_cadence_restore.py'
       - 'tools/verify_vr_producer_provenance.py'
       - 'tools/verify_vr_cross_thread_semantic_registry.py'
+      - 'tools/verify_vr_projected_marker_anchor.py'
       - 'tools/verify_vr_r31_r32_retirement_guard.py'
       - 'tools/verify_vr_recenter_contract.py'
       - 'tools/verify_vr_dx9ex_reset_transport_contract.py'
@@ -96,6 +97,7 @@ jobs:
             'tools/verify_vr_hud_cadence_restore.py',
             'tools/verify_vr_producer_provenance.py',
             'tools/verify_vr_cross_thread_semantic_registry.py',
+            'tools/verify_vr_projected_marker_anchor.py',
             'tools/verify_vr_r31_r32_retirement_guard.py',
             'tools/verify_vr_recenter_contract.py',
             'tools/verify_vr_dx9ex_reset_transport_contract.py',
