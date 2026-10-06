@@ -153,10 +153,24 @@ namespace OutRunVRStereo
 
                 if (snapshot.magic != OutRunVR::R13::DirectGpuAckMagic ||
                     snapshot.version != OutRunVR::R13::DirectGpuAckVersion ||
-                    snapshot.structSize != sizeof(snapshot) ||
-                    !snapshot.hostPid || !SharedState ||
-                    snapshot.hostPid != SharedState->hostPid ||
-                    snapshot.transportGeneration != DirectTransportGeneration ||
+                    snapshot.structSize != sizeof(snapshot))
+                    return false;
+
+                const std::uint32_t expectedHostPid =
+                    SharedState ? SharedState->hostPid : 0;
+                if (!snapshot.hostPid || !expectedHostPid)
+                    return false;
+                if (snapshot.hostPid != expectedHostPid)
+                {
+                    // The snapshot is stable but belongs to a different host
+                    // process. Retire our read-only mapping so the next ACK
+                    // read can rebind to the current host mapping even when
+                    // the R32 transport-ready identity path was not active.
+                    R13ReleaseAckState();
+                    return false;
+                }
+
+                if (snapshot.transportGeneration != DirectTransportGeneration ||
                     !RenderFrameRunGeneration ||
                     snapshot.reserved[
                         OutRunVR::R13::DirectGpuAckRunGenerationIndex] !=

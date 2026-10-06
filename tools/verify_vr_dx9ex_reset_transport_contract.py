@@ -318,6 +318,19 @@ for marker in (
     if marker in ensure_ack:
         fail(f"R13 ACK ensure path regained duplicate teardown: {marker}")
 
+read_ack = body(r13, "bool R13ReadGpuCompletedFrame(")
+require_order(
+    read_ack,
+    "R13 stale-host ACK mapping retirement",
+    "const std::uint32_t expectedHostPid =",
+    "if (!snapshot.hostPid || !expectedHostPid)",
+    "if (snapshot.hostPid != expectedHostPid)",
+    "R13ReleaseAckState();",
+    "snapshot.transportGeneration != DirectTransportGeneration",
+)
+if read_ack.count("R13ReleaseAckState();") != 1:
+    fail("R13 ACK read path must retire a stale host mapping exactly once")
+
 # R13 is the lower reset/resource owner. It releases shared resources and
 # publishes a disabled frame before ResetEx; recreation occurs only on success.
 reset_pre = body(r13, "void R13ResetCommonPre(IDirect3DDevice9*)")
