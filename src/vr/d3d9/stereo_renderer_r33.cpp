@@ -1,7 +1,8 @@
 // R33 final dispatch + post-review hot-path hardening.
 //
-// R32 owns reset/direct-transport review-2 safety. R33 is the sole physical
-// draw dispatcher directly over R30 while Reset/Present still chain through R32.
+// R32 owns reset/direct-transport review-2 safety plus Present telemetry.
+// R33 is the sole physical Present/draw dispatcher: Present hooks R13 directly
+// while Reset still chains through R32 and draws hook R30 directly.
 // R33 owns depth/stencil write-state caching,
 // exact single-count draw dispatch, final raster replay preservation, and the
 // ResetEx replay-health guard previously implemented by a separate R34 hook
@@ -32,7 +33,7 @@ namespace OutRunVRStereo
     namespace
     {
         SafetyHookInline R33ResetR32Hook{};
-        SafetyHookInline R33PresentR32Hook{};
+        SafetyHookInline R33PresentR13Hook{};
         SafetyHookInline R33SetRenderStateR29Hook{};
         SafetyHookInline R33DrawPrimitiveR30Hook{};
         SafetyHookInline R33DrawIndexedPrimitiveR30Hook{};
@@ -956,8 +957,11 @@ namespace OutRunVRStereo
             if (blocked)
                 R33ForceResetReplayFailClosed(device, "Present/pre");
 
-            const HRESULT hr = R33PresentR32Hook.stdcall<HRESULT>(device,
-                sourceRect, destRect, destWindowOverride, dirtyRegion);
+            const HRESULT hr = R32WithPresentTelemetry(
+                device, [&]() noexcept {
+                    return R33PresentR13Hook.stdcall<HRESULT>(device,
+                        sourceRect, destRect, destWindowOverride, dirtyRegion);
+                });
             if (IsGameDevice(device))
                 R33LogPerfWindow();
 
@@ -973,7 +977,7 @@ namespace OutRunVRStereo
             R33DrawIndexedPrimitiveR30Hook = {};
             R33DrawPrimitiveR30Hook = {};
             R33SetRenderStateR29Hook = {};
-            R33PresentR32Hook = {};
+            R33PresentR13Hook = {};
             R33ResetR32Hook = {};
         }
 
@@ -981,7 +985,7 @@ namespace OutRunVRStereo
         {
             SafetyHookInline* hooks[]{
                 &R33ResetR32Hook,
-                &R33PresentR32Hook,
+                &R33PresentR13Hook,
                 &R33SetRenderStateR29Hook,
                 &R33DrawPrimitiveR30Hook,
                 &R33DrawIndexedPrimitiveR30Hook,
@@ -1011,8 +1015,8 @@ namespace OutRunVRStereo
                     R33ResetR32Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&ResetDestR32),
                         ResetDestR33, disabled);
-                    R33PresentR32Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&PresentDestR32),
+                    R33PresentR13Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&PresentDestR13),
                         PresentDestR33, disabled);
                     R33SetRenderStateR29Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&SetRenderStateDestR29),
@@ -1035,7 +1039,7 @@ namespace OutRunVRStereo
                         R33RollbackHooks();
                         R33ReportInstallResult(false);
                         spdlog::error(
-                            "VR R33: final hook transaction was partial; R30 draw path and R32 lifecycle remain authoritative");
+                            "VR R33: final hook transaction was partial; R30 draw path and R32 Reset/DirectGPU remain authoritative");
                         return 0;
                     }
 
