@@ -837,6 +837,21 @@ require_order(
     "return false;",
     "const XrResult result = ::xrDestroySwapchain(handle);",
 )
+require_order(
+    sbs_swapchain_destroy,
+    "R19 live destroy preserves local resources until ownership resolves",
+    "WaitForSwapchainGpuIdleBeforeDestroy();",
+    "if (!gpuDrained)",
+    "if (!parentSessionDestroying)",
+    "return false;",
+    "const XrResult result = ::xrDestroySwapchain(handle);",
+    "if (XR_FAILED(result) && !parentSessionDestroying)",
+    "return false;",
+    "for (auto& pair : rtvs)",
+    "rtvs.clear();",
+    "images.clear();",
+    "generation = 0;",
+)
 destroy_unproven = sbs_swapchain_destroy[
     sbs_swapchain_destroy.find("if (!gpuDrained)"):
     sbs_swapchain_destroy.find("else", sbs_swapchain_destroy.find("if (!gpuDrained)"))

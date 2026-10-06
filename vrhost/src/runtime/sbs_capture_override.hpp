@@ -246,13 +246,6 @@ float4 PSMain(VSOut input) : SV_Target
 
         bool Destroy(bool parentSessionDestroying = false)
         {
-            for (auto& pair : rtvs)
-            {
-                ReleaseCom(pair[0]);
-                ReleaseCom(pair[1]);
-            }
-            rtvs.clear();
-            images.clear();
             if (handle != XR_NULL_HANDLE)
             {
                 const bool gpuDrained = WaitForSwapchainGpuIdleBeforeDestroy();
@@ -280,6 +273,18 @@ float4 PSMain(VSOut input) : SV_Target
                     handle = XR_NULL_HANDLE;
                 }
             }
+
+            // Live destroy is transactional: keep the existing image/RTV set and
+            // dimensions intact until GPU completion and handle destruction both
+            // succeed. A failed resize/recreate can then retry without discarding
+            // the still-owned swapchain resources.
+            for (auto& pair : rtvs)
+            {
+                ReleaseCom(pair[0]);
+                ReleaseCom(pair[1]);
+            }
+            rtvs.clear();
+            images.clear();
             generation = 0;
             committedGeneration = 0;
             width = height = 0;
