@@ -72,6 +72,12 @@ CONVERSION_DXVK_DEFERRED = os.getenv("CONVERSION_DXVK_DEFERRED", "true").lower()
 PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECONDS", "15")))
 PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS", "15")))
 HEARTBEAT_SECONDS = max(5, int(os.getenv("HEARTBEAT_SECONDS", "15")))
+RECYCLE_ENABLED = os.getenv("RECYCLE_ENABLED", "true").lower() == "true"
+RECYCLE_INTERVAL_MINUTES = max(15, int(os.getenv("RECYCLE_INTERVAL_MINUTES", "180")))
+RECYCLE_MEMORY_PERCENT = max(1.0, min(100.0, float(os.getenv("RECYCLE_MEMORY_PERCENT", "70"))))
+RECYCLE_CHECK_SECONDS = max(10, int(os.getenv("RECYCLE_CHECK_SECONDS", "30")))
+RECYCLE_MIN_IDLE_SECONDS = max(0, int(os.getenv("RECYCLE_MIN_IDLE_SECONDS", "300")))
+RECYCLE_MIN_NEXT_SLOT_SECONDS = max(0, int(os.getenv("RECYCLE_MIN_NEXT_SLOT_SECONDS", "120")))
 LOCALIZATION_QA_BATCH_SIZE = max(1, int(os.getenv("LOCALIZATION_QA_BATCH_SIZE", "4")))
 LOCALIZATION_QA_COALESCE_SECONDS = max(0, int(os.getenv("LOCALIZATION_QA_COALESCE_SECONDS", "30")))
 LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS", "15")))
@@ -276,6 +282,12 @@ runtime = {
     "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
     "parallel_distinct_slot_send_gap_seconds": PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS,
     "heartbeat_seconds": HEARTBEAT_SECONDS,
+    "recycle_enabled": RECYCLE_ENABLED,
+    "recycle_interval_minutes": RECYCLE_INTERVAL_MINUTES,
+    "recycle_memory_percent": RECYCLE_MEMORY_PERCENT,
+    "recycle_check_seconds": RECYCLE_CHECK_SECONDS,
+    "recycle_min_idle_seconds": RECYCLE_MIN_IDLE_SECONDS,
+    "recycle_min_next_slot_seconds": RECYCLE_MIN_NEXT_SLOT_SECONDS,
     "localization_qa_batch_size": LOCALIZATION_QA_BATCH_SIZE,
     "localization_qa_coalesce_seconds": LOCALIZATION_QA_COALESCE_SECONDS,
     "localization_same_slot_send_gap_seconds": LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS,
