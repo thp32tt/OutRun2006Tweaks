@@ -4224,7 +4224,8 @@
     "EBFC709F",
     "5B65E08C",
     "1A43E9D9",
-    "313DB8CB"
+    "313DB8CB",
+    "754F0599"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6716,7 +6717,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 07:14 KST",
+  "updated_at_kst": "2026-10-07 07:30 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7484,6 +7485,36 @@
     "controller_visual_qa": "PASS_SOURCE_C116_A150_READABLE_ROW_RAW",
     "controller_qa": "localization/graphics/role_A/20261007-A-MANUALQA150-313DB8CB/A150_CONTROLLER_SELF_QA.json",
     "status": "A150_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "a151_754f0599_manual_visual_rework": {
+    "run": "A151",
+    "timestamp_kst": "2026-10-07 07:30 KST",
+    "role": "A",
+    "queue_index": 175,
+    "asset_key": "754F0599",
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+    "trigger": "PRE_INGAME_025_SOURCE_RELATIVE_SCALE_HIERARCHY_FALSE_NEGATIVE",
+    "prior_c_status": "C171_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+    "candidate_sha256": "f21970a3d6d8ae69954d0159524856b5019cd1445daa65c55d85213f73e431f5",
+    "github_worker_run": 37540721560,
+    "worker_output_commit": "0acf3ce5b9d3e1672b2a74c856b8fbe9f500eca5",
+    "machine_qa": {
+      "bbox_size_positive_margin": "3/3 PASS",
+      "final_validator": "PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "protected": 0,
+      "format": "RGBA32/BGRA raw",
+      "raw_orientation": "mirror_y"
+    },
+    "controller_visual_qa": "PASS_SOURCE_C171_A151_READABLE_ROW_RAW",
+    "controller_qa": "localization/graphics/role_A/20261007-A-MANUALQA151-754F0599/A151_CONTROLLER_SELF_QA.json",
+    "status": "A151_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
     "fresh_independent_c": "PENDING",
     "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
     "runtime_validation": "UNTESTED",
