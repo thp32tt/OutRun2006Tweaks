@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T11:46:49+09:00",
+  "updatedKst": "2026-10-06T11:49:15+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -101,7 +101,7 @@
     "VR-DX9EX-SWAPCHAIN-DESTROY-FLUSH-0036",
     "VR-DX9EX-SWAPCHAIN-DESTROY-GPU-DRAIN-0037"
   ],
-  "next": "Structural extraction remains terminal. R19 swapchain teardown now uses a D3D11 event-query completion fence after Flush so normal-path GPU execution is drained before xrDestroySwapchain. Continue with the next independently provable DX9Ex stability/resource-lifetime unit; HMD-visible behavior remains runtime-evidence gated.",
+  "next": "Structural extraction remains terminal. CONVERSION-DX9EX-00454 runtime GPU-drain change is implemented; first Gate exposed only a verifier false-negative caused by the failure-path fallback Flush. Retry scopes the verifier to the normal End->Flush->GetData path, then exact-SHA validation resumes.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",

@@ -791,10 +791,12 @@ require(
     "while (status == S_FALSE)",
     "ReleaseCom(completion);",
 )
+gpu_drain_completion = sbs_gpu_drain[
+    sbs_gpu_drain.find("OutRunVrFinalTest::Context->End(completion);"):
+]
 require_order(
-    sbs_gpu_drain,
+    gpu_drain_completion,
     "R19 swapchain GPU completion ordering",
-    "CreateQuery(",
     "OutRunVrFinalTest::Context->End(completion);",
     "OutRunVrFinalTest::Context->Flush();",
     "while (status == S_FALSE)",

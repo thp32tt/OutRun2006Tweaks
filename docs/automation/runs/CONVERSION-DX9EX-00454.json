@@ -2,17 +2,17 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX9EX-00454",
   "production_id": "CONVERSION-DX9EX-00454",
-  "event_id": "CONVERSION-DX9EX-00454-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX9EX-00454-E002",
+  "event_type": "retry",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "status": "VALIDATING",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "6d33850a66a396d37c2f5cec53ab037ace59464c",
-  "material_result_sha": "PENDING_SELF",
+  "material_result_sha": "a6de7e6d155b8977fa60c545dafc075d038c5eb5",
   "validation_bearing_result_sha": "PENDING_SELF",
   "result_sha": "PENDING_SELF",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00454]",
@@ -38,9 +38,10 @@
       "evidence": "Added a D3D11 event query, End->Flush->GetData(S_FALSE loop) completion fence before xrDestroySwapchain, with best-effort Flush fallback if query creation is unavailable, plus deterministic reset/transport verifier coverage."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
+      "status": "RETRYING",
       "automation_validation": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "evidence": "DX9Ex Active 37405887502 failed only because the verifier's first Flush match came from the CreateQuery-failure fallback before the normal End->Flush sequence. Domain Isolation 37405887504 succeeded."
     },
     "C4_COMMIT": {
       "status": "PENDING",
@@ -68,8 +69,28 @@
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "initial_failed_gate": {
+      "run_id": 37405887502,
+      "head_sha": "a6de7e6d155b8977fa60c545dafc075d038c5eb5",
+      "policy_job_id": 112083249183,
+      "result": "FAIL",
+      "classification": "VERIFIER_FALSE_NEGATIVE",
+      "reason": "require_order searched the entire helper and matched the failure-path best-effort Flush before the normal-path End(completion), so the correct runtime implementation was rejected."
+    },
+    "initial_domain_isolation": {
+      "run_id": 37405887504,
+      "head_sha": "a6de7e6d155b8977fa60c545dafc075d038c5eb5",
+      "result": "SUCCESS"
+    },
+    "retry_repair": {
+      "event_id": "CONVERSION-DX9EX-00454-E002",
+      "attempt": "2/3",
+      "source_runtime_change": false,
+      "verifier_change": "Scope normal-path ordering checks from End(completion) onward so failure-path fallback Flush cannot shadow the intended completion-fence sequence."
     }
   },
-  "next_action": "Validate the exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize bookkeeping while preserving validation_bearing_result_sha.",
-  "started_at_kst": "2026-10-06T11:46:49+09:00"
+  "next_action": "Validate the verifier-repair SHA with canonical DX9Ex Active Validation and Domain Isolation. Preserve a6de7e6d155b8977fa60c545dafc075d038c5eb5 as the runtime-source material SHA and promote the repair SHA as validation-bearing only if its exact gates pass.",
+  "started_at_kst": "2026-10-06T11:46:49+09:00",
+  "retry_started_at_kst": "2026-10-06T11:49:15+09:00"
 }
