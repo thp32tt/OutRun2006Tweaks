@@ -1,0 +1,25 @@
+{
+  "run": "20261007-A-MANUALQA152R-9CE4E175",
+  "asset": "9CE4E175",
+  "queue_index": 195,
+  "c125_candidate_sha256": "cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2",
+  "a152_rejected_candidate_sha256": "5801e241ba3c288c8245c48123e55aa1f538fb6ca26eb32e182c7f3ec1779b09",
+  "candidate_sha256": "b4b8655e9805b897ab17249112db6c5536bab34f03d445b7722bc5222476c72c",
+  "translation": "사용할 수 없음",
+  "new_size": [
+    220,
+    37
+  ],
+  "source_size": [
+    395,
+    41
+  ],
+  "bbox_size_positive_margin": "1/1 PASS",
+  "native_aspect": "PASS_NO_HORIZONTAL_STRETCH",
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "worker_status": "A152R_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261007-A-MANUALQA152R-9CE4E175/A152R_9CE4E175_REPORT.json"
+}

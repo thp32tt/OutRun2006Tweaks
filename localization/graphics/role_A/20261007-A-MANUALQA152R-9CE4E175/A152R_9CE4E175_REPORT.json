@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261007-A-MANUALQA152R-9CE4E175",
+  "worker": "github-actions",
+  "base_head": "bcdb816c3412ed213dfefe3d34c28718cd61693d",
+  "queue_index": 195,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+  "trigger": "A152_CONTROLLER_REJECTED_STRETCHED_GLYPH_PROPORTIONS_RETRY",
+  "source_sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
+  "c125_candidate_sha256": "cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2",
+  "a152_rejected_candidate_sha256": "5801e241ba3c288c8245c48123e55aa1f538fb6ca26eb32e182c7f3ec1779b09",
+  "candidate_sha256": "b4b8655e9805b897ab17249112db6c5536bab34f03d445b7722bc5222476c72c",
+  "translation_reword": {
+    "from": "이용 불가",
+    "to": "사용할 수 없음",
+    "reason": "Direct semantic equivalent of NOT AVAILABLE chosen to restore source hierarchy with natural native Hangul proportions instead of horizontal glyph stretching."
+  },
+  "reason": "A152 numeric PASS was controller-rejected because 이용 불가 required obvious horizontal stretching. A152R uses a longer direct Korean equivalent and native glyph aspect, preserving the source heavy-white centered family.",
+  "structure": {
+    "dimensions": [
+      1024,
+      128
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "pitch": 4096,
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "prior_clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION20/9CE4E175_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION20/9CE4E175_HD_CLEAN_PLATE.png",
+    "size": [
+      1024,
+      128
+    ],
+    "changed_pixels": 8042,
+    "changed_bbox": [
+      95,
+      80,
+      490,
+      121
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION20/9CE4E175_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261007-A-MANUALQA152R-9CE4E175/9CE4E175_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      1024,
+      128
+    ],
+    "changed_pixels": 10396,
+    "changed_bbox": [
+      95,
+      80,
+      490,
+      121
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_outside_source_bbox": 0,
+    "alpha_changed_pixels_outside_source_bbox": 0,
+    "protected_visible_pixels_changed": 0
+  },
+  "row": {
+    "source": "NOT AVAILABLE",
+    "prior_korean": "이용 불가",
+    "korean": "사용할 수 없음",
+    "original_bbox": [
+      95,
+      80,
+      490,
+      121
+    ],
+    "localized_bbox": [
+      182,
+      82,
+      402,
+      119
+    ],
+    "source_width": 395,
+    "source_height": 41,
+    "localized_width": 220,
+    "localized_height": 37,
+    "width_ratio": 0.557,
+    "height_ratio": 0.9024,
+    "delta_left": 87,
+    "delta_right": 88,
+    "delta_top": 2,
+    "delta_bottom": 2,
+    "a152_intermediate_size": [
+      252,
+      37
+    ],
+    "c125_size": [
+      142,
+      37
+    ],
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "native_aspect": "PASS_NO_HORIZONTAL_STRETCH",
+    "style": "native Noto Sans CJK KR Black, heavy white sans, centered, upright"
+  },
+  "ordered_generation_gate": {
+    "1_source_text_removed_and_plate_restored": "PASS_REUSE_PRIOR_EXACT_VALIDATED_CLEAN_PLATE",
+    "2_slant_direction_matches_source": "PASS_SOURCE_UPRIGHT",
+    "3_text_not_unnecessarily_undersized_and_within_source_bbox": "PASS_NATIVE_PHRASE_WIDTH_AND_SOURCE_CEILING",
+    "4_source_faithful_weight_outline_shadow": "PASS_NATIVE_BLACK_HEAVY_WHITE_NO_INVENTED_EFFECT",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGINS",
+    "6_protected_graphics_clearance": "PASS_ZERO_PROTECTED_CHANGE",
+    "7_raw_and_flip_y_visual_review": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "8_immediate_readability_vs_english": "PENDING_CONTROLLER"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A152R_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
