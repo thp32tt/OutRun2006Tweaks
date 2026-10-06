@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "status": "VALIDATION_PENDING",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "92d542a5e56e7590432e45b4bf1a1e29ae180e35",
-  "material_result_sha": "PENDING_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_COMMIT_SHA",
-  "result_sha": "PENDING_COMMIT_SHA",
+  "material_result_sha": "e85edc9fa75a5ca52c61227ac00b112a2e3dc466",
+  "validation_bearing_result_sha": "e85edc9fa75a5ca52c61227ac00b112a2e3dc466",
+  "result_sha": "e85edc9fa75a5ca52c61227ac00b112a2e3dc466",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00443]",
   "selected_work_item": "VR-DX9EX-R26-SESSION-STATE-RESET-0026",
   "summary": "Reset R26 recenter pending state and generation/anchor ownership at OpenXR session destruction before forwarding to R24 teardown.",
@@ -38,25 +38,29 @@
       "evidence": "Added ResetSessionState plus an R26 xrDestroySession wrapper that clears session-scoped recenter state before forwarding to R24 teardown; deterministic verifier coverage added."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
-      "automation_validation": "PENDING",
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
       "runtime_validation": "UNTESTED",
-      "evidence": "Awaiting exact-SHA GitHub Actions gates for the material commit."
+      "evidence": "Exact SHA e85edc9fa75a5ca52c61227ac00b112a2e3dc466: DX9Ex Active Validation 37395009660 SUCCESS; policy 112048777653, host 112048871391, game 112048871288, full-chain-compile 112048871258, package 112050154748 all SUCCESS. Domain Isolation Guard 37395009656 / 112048777391 SUCCESS."
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA",
-      "task_tagged_commits": [],
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "e85edc9fa75a5ca52c61227ac00b112a2e3dc466 fix(vr): reset recenter state on session teardown [AUTO:CONVERSION-DX9EX-00443]"
+      ],
       "ci_skip_on_validation_bearing_result": false
     },
     "C5_PACKAGE": {
-      "status": "PENDING_AUTOMATION_ARTIFACT"
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Package artifact 11383022381 digest sha256:b7136f301702771ff0f7541d5ac1660de2be09357a1999178176f399e497a423; CI evidence only."
     },
     "C6_STATE": {
-      "status": "PENDING_VALIDATION_EVIDENCE",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 6006779669
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "red_probe": {
       "base_sha": "92d542a5e56e7590432e45b4bf1a1e29ae180e35",
@@ -66,8 +70,29 @@
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "dx9ex_active": {
+      "run_id": 37395009660,
+      "conclusion": "success",
+      "exact_sha": "e85edc9fa75a5ca52c61227ac00b112a2e3dc466",
+      "jobs": {
+        "policy": 112048777653,
+        "host": 112048871391,
+        "game": 112048871288,
+        "full_chain_compile": 112048871258,
+        "package": 112050154748
+      },
+      "package_artifact_id": 11383022381,
+      "package_artifact_digest": "sha256:b7136f301702771ff0f7541d5ac1660de2be09357a1999178176f399e497a423"
+    },
+    "domain_isolation": {
+      "run_id": 37395009656,
+      "job_id": 112048777391,
+      "conclusion": "success",
+      "exact_sha": "e85edc9fa75a5ca52c61227ac00b112a2e3dc466"
     }
   },
-  "next_action": "Validate the exact material SHA with DX9Ex Active Validation and Domain Isolation Guard, then finalize the durable run record and Issue #14 ledger.",
-  "started_at_kst": "2026-10-06T09:31:00+09:00"
+  "next_action": "Continue from latest exact HEAD with the next independently executable DX9Ex quality/stability unit; structural extraction remains terminal unless new owner-census evidence appears.",
+  "started_at_kst": "2026-10-06T09:31:00+09:00",
+  "completed_at_kst": "2026-10-06T09:44:00+09:00"
 }
