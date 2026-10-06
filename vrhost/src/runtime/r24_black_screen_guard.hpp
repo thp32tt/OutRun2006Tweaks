@@ -707,20 +707,29 @@ namespace OutRunVrR24BlackScreenGuard
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session) noexcept
     {
-        ExactProjectionSubmits = 0;
-        SoftGraceProjectionSubmits = 0;
-        DirectSafeProjectionSubmits = 0;
-        LiveTheaterFallbacks = 0;
-        DirectFlatFallbacks = 0;
-        CachedLayerFallbacks = 0;
-        EmergencyLayerFallbacks = 0;
-        EmptyFrameFallbacks = 0;
-        MixedValidatedSubmits = 0;
-        ProjectionCommittedGeneration = 0;
-        TheaterCommittedGeneration = 0;
-        ProjectionCommittedRun = {};
-        TheaterCommittedDirectRun = {};
-        return OutRunVrR23RuntimeHardening::DestroySession(session);
+        // Keep the current-session fallback/provenance state intact until the
+        // downstream parent teardown actually succeeds. If xrDestroySession
+        // fails, R26 and the outer wrappers must be able to retry against the
+        // same live session without R24 having forgotten committed ownership.
+        const XrResult result =
+            OutRunVrR23RuntimeHardening::DestroySession(session);
+        if (XR_SUCCEEDED(result))
+        {
+            ExactProjectionSubmits = 0;
+            SoftGraceProjectionSubmits = 0;
+            DirectSafeProjectionSubmits = 0;
+            LiveTheaterFallbacks = 0;
+            DirectFlatFallbacks = 0;
+            CachedLayerFallbacks = 0;
+            EmergencyLayerFallbacks = 0;
+            EmptyFrameFallbacks = 0;
+            MixedValidatedSubmits = 0;
+            ProjectionCommittedGeneration = 0;
+            TheaterCommittedGeneration = 0;
+            ProjectionCommittedRun = {};
+            TheaterCommittedDirectRun = {};
+        }
+        return result;
     }
 }
 

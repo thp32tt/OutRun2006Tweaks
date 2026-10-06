@@ -1415,11 +1415,17 @@ require(
 )
 
 r24_destroy = body(host_r24, "inline XrResult XRAPI_CALL DestroySession(")
-require(
+require_order(
     r24_destroy,
-    "R24 released-image provenance reset",
+    "R24 transactional session teardown",
+    "const XrResult result =",
+    "OutRunVrR23RuntimeHardening::DestroySession(session);",
+    "if (XR_SUCCEEDED(result))",
+    "ProjectionCommittedGeneration = 0;",
+    "TheaterCommittedGeneration = 0;",
     "ProjectionCommittedRun = {};",
     "TheaterCommittedDirectRun = {};",
+    "return result;",
 )
 
 # Host ACK ownership may observe late completions from a pre-reset generation
