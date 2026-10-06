@@ -9107,6 +9107,113 @@ bool validate_programmable_output_resource_behavior_readiness_snapshot(
         current.missingResourceScopeMask == 0;
 }
 
+NativeProgrammableShaderSourceMappingHandoff
+compose_programmable_shader_source_mapping_handoff(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const ProgrammableShaderPairSourceSemanticEvidence& sourceReceipt,
+    const ProgrammableShaderRegisterMappingPlanEvidence& mappingPlan) noexcept {
+    NativeProgrammableShaderSourceMappingHandoff out{};
+
+    out.cacheKey = mappingPlan.cacheKey;
+    out.pairSemanticHash = mappingPlan.pairSemanticHash;
+    out.vertexRegisterSemanticsHash =
+        mappingPlan.vertexRegisterSemanticsHash;
+    out.pixelRegisterSemanticsHash =
+        mappingPlan.pixelRegisterSemanticsHash;
+    out.constantMappingHash = mappingPlan.constantMappingHash;
+    out.samplerMappingHash = mappingPlan.samplerMappingHash;
+    out.mappingPlanRevisionHash = mappingPlan.planRevisionHash;
+    out.mappingSemanticContractHash = mappingPlan.semanticContractHash;
+
+    out.inputValid =
+        sourceReceipt.exact() &&
+        mappingPlan.exact();
+    out.sourceIdentityExact =
+        sourceIdentity.exact_identity() &&
+        !sourceIdentity.translationImplemented;
+    out.sourceSemanticReceiptExact = sourceReceipt.exact();
+    out.mappingPlanExact = mappingPlan.exact();
+
+    out.sourceReceiptIdentityMatches =
+        out.sourceIdentityExact &&
+        sourceReceipt.cacheKey == sourceIdentity.cacheKey &&
+        sourceReceipt.vertexVersionToken ==
+            sourceIdentity.vertexShader.versionToken &&
+        sourceReceipt.pixelVersionToken ==
+            sourceIdentity.pixelShader.versionToken &&
+        sourceReceipt.vertexSourceBytecodeHash ==
+            sourceIdentity.vertexShader.bytecodeHash &&
+        sourceReceipt.pixelSourceBytecodeHash ==
+            sourceIdentity.pixelShader.bytecodeHash;
+
+    out.mappingPlanIdentityMatches =
+        out.sourceSemanticReceiptExact &&
+        out.mappingPlanExact &&
+        mappingPlan.cacheKey == sourceReceipt.cacheKey &&
+        mappingPlan.pairSemanticHash == sourceReceipt.pairSemanticHash &&
+        mappingPlan.vertexRegisterSemanticsHash ==
+            sourceReceipt.vertexRegisterSemanticsHash &&
+        mappingPlan.pixelRegisterSemanticsHash ==
+            sourceReceipt.pixelRegisterSemanticsHash;
+
+    out.constantRegisterMappingExact =
+        out.mappingPlanIdentityMatches &&
+        mappingPlan.constantRegisterMappingExact &&
+        mappingPlan.constantMappingHash != 0;
+    out.samplerMappingExact =
+        out.mappingPlanIdentityMatches &&
+        mappingPlan.samplerMappingExact &&
+        mappingPlan.samplerMappingHash != 0;
+
+    out.diagnosticOnly = true;
+    out.boundaryPreserved =
+        out.sourceReceiptIdentityMatches &&
+        out.mappingPlanIdentityMatches &&
+        out.constantRegisterMappingExact &&
+        out.samplerMappingExact &&
+        out.diagnosticOnly;
+    out.reviewReady =
+        out.inputValid &&
+        out.boundaryPreserved;
+
+    if (out.reviewReady) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
+        token = mix_readiness_snapshot_token(token, out.pairSemanticHash);
+        token = mix_readiness_snapshot_token(
+            token, out.vertexRegisterSemanticsHash);
+        token = mix_readiness_snapshot_token(
+            token, out.pixelRegisterSemanticsHash);
+        token = mix_readiness_snapshot_token(token, out.constantMappingHash);
+        token = mix_readiness_snapshot_token(token, out.samplerMappingHash);
+        token = mix_readiness_snapshot_token(
+            token, out.mappingPlanRevisionHash);
+        token = mix_readiness_snapshot_token(
+            token, out.mappingSemanticContractHash);
+        token = mix_readiness_snapshot_token(token, 0x273u);
+        out.reviewSnapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_programmable_shader_source_mapping_handoff_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const ProgrammableShaderPairSourceSemanticEvidence& sourceReceipt,
+    const ProgrammableShaderRegisterMappingPlanEvidence& mappingPlan,
+    std::uint64_t reviewSnapshotToken) noexcept {
+    if (reviewSnapshotToken == 0)
+        return false;
+    const auto current =
+        compose_programmable_shader_source_mapping_handoff(
+            sourceIdentity, sourceReceipt, mappingPlan);
+    return current.reviewReady &&
+        current.reviewSnapshotToken == reviewSnapshotToken &&
+        current.sourceReceiptIdentityMatches &&
+        current.mappingPlanIdentityMatches &&
+        current.constantRegisterMappingExact &&
+        current.samplerMappingExact;
+}
+
 NativeProgrammableShaderSemanticTranslationReadiness
 compose_programmable_shader_semantic_translation_readiness(
     const ProgrammableShaderPairCacheIdentity& sourceIdentity,

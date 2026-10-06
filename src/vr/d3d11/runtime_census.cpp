@@ -321,6 +321,10 @@ namespace outrun::vr::dx11
             std::uint64_t shaderSamplerMappingHash{};
             std::uint64_t shaderRegisterMappingPlanRevisionHash{};
             std::uint64_t shaderRegisterMappingSemanticContractHash{};
+            // R273 binds the R272 mapping plan to the exact R239/R271 source
+            // identity as a production diagnostic handoff for later R263 use.
+            bool shaderSourceMappingHandoffExact{};
+            std::uint64_t shaderSourceMappingHandoffSnapshotToken{};
             bool shaderTranslationExact{};
             // R220: keep the shader activation-readiness boundary distinct
             // from translation implementation state. Programmable D3D9 shader
@@ -756,6 +760,10 @@ namespace outrun::vr::dx11
                 hash, sig.shaderRegisterMappingPlanRevisionHash);
             hash = hash_mix(
                 hash, sig.shaderRegisterMappingSemanticContractHash);
+            hash = hash_mix(
+                hash, sig.shaderSourceMappingHandoffExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderSourceMappingHandoffSnapshotToken);
             hash = hash_mix(hash, sig.shaderIntrospectionComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderMixedPair ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderTranslationExact ? 1u : 0u);
@@ -1431,6 +1439,15 @@ namespace outrun::vr::dx11
                 registerMappingPlan.planRevisionHash;
             sig.shaderRegisterMappingSemanticContractHash =
                 registerMappingPlan.semanticContractHash;
+            const auto sourceMappingHandoff =
+                compose_programmable_shader_source_mapping_handoff(
+                    programmablePairIdentity,
+                    sourceSemanticPair,
+                    registerMappingPlan);
+            sig.shaderSourceMappingHandoffExact =
+                sourceMappingHandoff.reviewReady;
+            sig.shaderSourceMappingHandoffSnapshotToken =
+                sourceMappingHandoff.reviewSnapshotToken;
 
             // R80 starts fail-closed. R215 may promote only the later
             // fixed-function branch after its resource-dependent pixel
@@ -1966,6 +1983,10 @@ namespace outrun::vr::dx11
                         sig.shaderSamplerMappingHash,
                         sig.shaderRegisterMappingPlanRevisionHash,
                         sig.shaderRegisterMappingSemanticContractHash);
+                    spdlog::info(
+                        "VR DX11 R273 sourceMappingHandoff: exact={} snapshot=0x{:016X}",
+                        sig.shaderSourceMappingHandoffExact ? 1 : 0,
+                        sig.shaderSourceMappingHandoffSnapshotToken);
                 }
                 spdlog::info(
                     "VR DX11 R85 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] shader[introspection={},mixed={},exact={},vsPresent={},vsBytes={},vsVersion=0x{:08X},vsHash=0x{:016X},psPresent={},psBytes={},psVersion=0x{:08X},psHash=0x{:016X}] ffpCoverage[exact={}] ffpReadiness[ready={},mask=0x{:08X},activeStages={}] texMask[present=0x{:02X},exact=0x{:02X}] managedTexShadow[required=0x{:02X},ready=0x{:02X}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",

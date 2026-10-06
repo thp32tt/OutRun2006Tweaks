@@ -29,6 +29,8 @@ struct FixedFunctionStageState;
 struct PipelineTranslation;
 struct ProgrammableShaderPairCacheIdentity;
 struct ProgrammableShaderInterfaceLinkageEvidence;
+struct ProgrammableShaderPairSourceSemanticEvidence;
+struct ProgrammableShaderRegisterMappingPlanEvidence;
 
 struct NativeBackendConfig {
     std::uint32_t width = 0;
@@ -1939,6 +1941,46 @@ validate_programmable_output_resource_behavior_readiness_snapshot(
     const NativeSurfaceMirror& colorSurface,
     const NativeSurfaceMirror& depthSurface,
     std::uint64_t surfaceBindingSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
+// R273 seals the source-derived R272 constant/sampler mapping plan to the
+// same exact R239/R271 programmable pair identity that a later R263
+// semantic-translation review will consume. This is a diagnostic handoff only;
+// it does not create/bind D3D11 shaders or authorize NativeDrawPath/Draw*.
+struct NativeProgrammableShaderSourceMappingHandoff {
+    bool inputValid{};
+    bool sourceIdentityExact{};
+    bool sourceSemanticReceiptExact{};
+    bool mappingPlanExact{};
+    bool sourceReceiptIdentityMatches{};
+    bool mappingPlanIdentityMatches{};
+    bool constantRegisterMappingExact{};
+    bool samplerMappingExact{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    std::uint64_t cacheKey{};
+    std::uint64_t pairSemanticHash{};
+    std::uint64_t vertexRegisterSemanticsHash{};
+    std::uint64_t pixelRegisterSemanticsHash{};
+    std::uint64_t constantMappingHash{};
+    std::uint64_t samplerMappingHash{};
+    std::uint64_t mappingPlanRevisionHash{};
+    std::uint64_t mappingSemanticContractHash{};
+    std::uint64_t reviewSnapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderSourceMappingHandoff
+compose_programmable_shader_source_mapping_handoff(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const ProgrammableShaderPairSourceSemanticEvidence& sourceReceipt,
+    const ProgrammableShaderRegisterMappingPlanEvidence& mappingPlan) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_shader_source_mapping_handoff_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const ProgrammableShaderPairSourceSemanticEvidence& sourceReceipt,
+    const ProgrammableShaderRegisterMappingPlanEvidence& mappingPlan,
     std::uint64_t reviewSnapshotToken) noexcept;
 
 // R263 seals one exact F21 programmable-shader semantic-translation proof.

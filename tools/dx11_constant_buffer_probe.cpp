@@ -1125,6 +1125,57 @@ int main()
         !r272RelativePlan.exact(),
         "R272 rejects relative-address constant mapping plans fail closed");
 
+    const auto r273SourceMappingHandoff =
+        outrun::vr::dx11::
+            compose_programmable_shader_source_mapping_handoff(
+                r272Pair, r272SourceReceipt, r272MappingPlan);
+    require(
+        r273SourceMappingHandoff.inputValid &&
+        r273SourceMappingHandoff.sourceIdentityExact &&
+        r273SourceMappingHandoff.sourceSemanticReceiptExact &&
+        r273SourceMappingHandoff.mappingPlanExact &&
+        r273SourceMappingHandoff.sourceReceiptIdentityMatches &&
+        r273SourceMappingHandoff.mappingPlanIdentityMatches &&
+        r273SourceMappingHandoff.constantRegisterMappingExact &&
+        r273SourceMappingHandoff.samplerMappingExact &&
+        r273SourceMappingHandoff.diagnosticOnly &&
+        r273SourceMappingHandoff.boundaryPreserved &&
+        r273SourceMappingHandoff.reviewReady &&
+        r273SourceMappingHandoff.cacheKey == r272Pair.cacheKey &&
+        r273SourceMappingHandoff.pairSemanticHash ==
+            r272SourceReceipt.pairSemanticHash &&
+        r273SourceMappingHandoff.constantMappingHash ==
+            r272MappingPlan.constantMappingHash &&
+        r273SourceMappingHandoff.samplerMappingHash ==
+            r272MappingPlan.samplerMappingHash &&
+        r273SourceMappingHandoff.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_shader_source_mapping_handoff_snapshot(
+                r272Pair,
+                r272SourceReceipt,
+                r272MappingPlan,
+                r273SourceMappingHandoff.reviewSnapshotToken),
+        "R273 binds exact R272 mapping plan to R239 R271 source identity");
+
+    auto r273StaleMappingPlan = r272MappingPlan;
+    r273StaleMappingPlan.cacheKey =
+        r272MappingPlan.cacheKey == 1ull
+            ? 2ull
+            : (r272MappingPlan.cacheKey ^ 1ull);
+    const auto r273StaleMappingHandoff =
+        outrun::vr::dx11::
+            compose_programmable_shader_source_mapping_handoff(
+                r272Pair, r272SourceReceipt, r273StaleMappingPlan);
+    require(
+        r273StaleMappingPlan.exact() &&
+        r273StaleMappingHandoff.sourceReceiptIdentityMatches &&
+        !r273StaleMappingHandoff.mappingPlanIdentityMatches &&
+        !r273StaleMappingHandoff.constantRegisterMappingExact &&
+        !r273StaleMappingHandoff.samplerMappingExact &&
+        !r273StaleMappingHandoff.reviewReady &&
+        r273StaleMappingHandoff.reviewSnapshotToken == 0,
+        "R273 rejects detached R272 mapping-plan identity fail closed");
+
     NativeProgrammableShaderPairCache programmableCache;
     require(
         !programmableCache.ready() &&

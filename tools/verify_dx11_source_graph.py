@@ -10655,6 +10655,44 @@ def main() -> None:
                 missing_r272_programmable_register_mapping_plan)
         )
 
+    r273_programmable_source_mapping_handoff_contract = [
+        ("struct NativeProgrammableShaderSourceMappingHandoff",
+         NATIVE_BACKEND_HPP, "R273 source mapping handoff type"),
+        ("compose_programmable_shader_source_mapping_handoff(",
+         NATIVE_BACKEND_HPP, "R273 handoff composition declaration"),
+        ("validate_programmable_shader_source_mapping_handoff_snapshot(",
+         NATIVE_BACKEND_HPP, "R273 handoff snapshot validator"),
+        ("out.sourceReceiptIdentityMatches =",
+         NATIVE_BACKEND_CPP, "R273 R239/R271 source identity binding"),
+        ("out.mappingPlanIdentityMatches =",
+         NATIVE_BACKEND_CPP, "R273 R272 mapping-plan identity binding"),
+        ("token, 0x273u",
+         NATIVE_BACKEND_CPP, "R273 independent handoff snapshot-domain tag"),
+        ("sourceMappingHandoff =",
+         RUNTIME_CENSUS, "R273 production census composes source mapping handoff"),
+        ("shaderSourceMappingHandoffExact",
+         RUNTIME_CENSUS, "R273 production census seals handoff exactness"),
+        ("VR DX11 R273 sourceMappingHandoff:",
+         RUNTIME_CENSUS, "R273 production census logs handoff snapshot"),
+        ("R273 binds exact R272 mapping plan to R239 R271 source identity",
+         CONSTANT_BUFFER_PROBE, "R273 positive source/mapping handoff regression"),
+        ("R273 rejects detached R272 mapping-plan identity fail closed",
+         CONSTANT_BUFFER_PROBE, "R273 stale mapping-plan fail-closed regression"),
+        ("sig.shaderTranslationExact = false;",
+         RUNTIME_CENSUS, "R273 keeps programmable translation fail closed"),
+    ]
+    missing_r273_programmable_source_mapping_handoff = [
+        meaning for token, source, meaning
+        in r273_programmable_source_mapping_handoff_contract
+        if token not in source
+    ]
+    if missing_r273_programmable_source_mapping_handoff:
+        raise SystemExit(
+            "DX11 R273 programmable source-mapping handoff drift: "
+            + ", ".join(
+                missing_r273_programmable_source_mapping_handoff)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
