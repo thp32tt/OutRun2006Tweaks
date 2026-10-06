@@ -181,6 +181,40 @@ float4 PSMain(VSOut input) : SV_Target
 
     inline std::uint64_t NextSwapchainGeneration = 0;
 
+    inline bool FirstSwapchainGpuDrainFailureLogged = false;
+
+    inline bool WaitForSwapchainGpuIdleBeforeDestroy() noexcept
+    {
+        if (!OutRunVrFinalTest::Device || !OutRunVrFinalTest::Context)
+            return false;
+
+        D3D11_QUERY_DESC queryDesc{};
+        queryDesc.Query = D3D11_QUERY_EVENT;
+        ID3D11Query* completion = nullptr;
+        if (FAILED(OutRunVrFinalTest::Device->CreateQuery(
+                &queryDesc, &completion)) || !completion)
+        {
+            OutRunVrFinalTest::Context->Flush();
+            return false;
+        }
+
+        // D3D11 Flush only submits queued work; an event query + GetData is the
+        // completion fence that proves all earlier immediate-context commands
+        // have finished before OpenXR swapchain destruction.
+        OutRunVrFinalTest::Context->End(completion);
+        OutRunVrFinalTest::Context->Flush();
+        HRESULT status = S_FALSE;
+        while (status == S_FALSE)
+        {
+            status = OutRunVrFinalTest::Context->GetData(
+                completion, nullptr, 0, 0);
+            if (status == S_FALSE)
+                SwitchToThread();
+        }
+        ReleaseCom(completion);
+        return status == S_OK;
+    }
+
     struct Swapchain
     {
         XrSwapchain handle = XR_NULL_HANDLE;
@@ -207,12 +241,13 @@ float4 PSMain(VSOut input) : SV_Target
             images.clear();
             if (handle != XR_NULL_HANDLE)
             {
-                // OpenXR requires submitted graphics commands that reference a
-                // swapchain to be completed before destruction. Flush the D3D11
-                // immediate context at this teardown/recreate boundary so queued
-                // RTV work is submitted before xrDestroySwapchain observes it.
-                if (OutRunVrFinalTest::Context)
-                    OutRunVrFinalTest::Context->Flush();
+                const bool gpuDrained = WaitForSwapchainGpuIdleBeforeDestroy();
+                if (!gpuDrained && !FirstSwapchainGpuDrainFailureLogged)
+                {
+                    FirstSwapchainGpuDrainFailureLogged = true;
+                    std::cerr
+                        << "[R19] swapchain GPU completion fence unavailable/failed before destroy; continuing teardown after best-effort Flush\\n";
+                }
                 ::xrDestroySwapchain(handle);
                 handle = XR_NULL_HANDLE;
             }

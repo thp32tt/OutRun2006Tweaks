@@ -779,18 +779,34 @@ require(
     "InvalidateStereoFrameCache();",
 )
 
-sbs_swapchain_destroy = body(host_sbs, "void Destroy()")
+sbs_gpu_drain = body(host_sbs, "inline bool WaitForSwapchainGpuIdleBeforeDestroy() noexcept")
 require(
-    sbs_swapchain_destroy,
-    "R19 OpenXR swapchain destroy D3D11 submission fence",
-    "if (OutRunVrFinalTest::Context)",
+    sbs_gpu_drain,
+    "R19 OpenXR swapchain destroy GPU completion fence",
+    "D3D11_QUERY_EVENT",
+    "CreateQuery(",
+    "OutRunVrFinalTest::Context->End(completion);",
     "OutRunVrFinalTest::Context->Flush();",
-    "::xrDestroySwapchain(handle);",
+    "OutRunVrFinalTest::Context->GetData(",
+    "while (status == S_FALSE)",
+    "ReleaseCom(completion);",
 )
 require_order(
-    sbs_swapchain_destroy,
-    "R19 swapchain destroy flush-before-destroy ordering",
+    sbs_gpu_drain,
+    "R19 swapchain GPU completion ordering",
+    "CreateQuery(",
+    "OutRunVrFinalTest::Context->End(completion);",
     "OutRunVrFinalTest::Context->Flush();",
+    "while (status == S_FALSE)",
+    "OutRunVrFinalTest::Context->GetData(",
+    "ReleaseCom(completion);",
+)
+
+sbs_swapchain_destroy = body(host_sbs, "void Destroy()")
+require_order(
+    sbs_swapchain_destroy,
+    "R19 swapchain completion-before-destroy ordering",
+    "WaitForSwapchainGpuIdleBeforeDestroy();",
     "::xrDestroySwapchain(handle);",
 )
 
