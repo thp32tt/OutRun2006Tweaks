@@ -1,5 +1,5 @@
 {
-  "schema_version": 109,
+  "schema_version": 110,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B205 index24 canonical-EXE static trace resolves A136's exact field/encoding blocker: player name is the 16-byte runtime field 0x7C23E0..0x7C23EF, name-entry is configured min=1/max=16 and stores at most 15 payload bytes + NUL, and selector-to-name append is a legacy one-byte code table rather than UTF-8/UTF-16. Do not redraw 66743AA8 yet. Next safe work is consumer classification plus a compatible Korean name storage/render/serialization policy before any runtime behavior change. No candidate; RUNTIME_VALIDATION=UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT.",
     "A136 index24 runtime mapping advanced A135 HOLD: Edit License uses SELECTION_PLAYERNAME=0 with EXE+0xDDC50 / selection-change EXE+0xDD990; player save data begins at VA 0x7C23E0 (module+0x3C23E0), and repo INI confirms name/model are recoverable from the first 0xB0 bytes of License.dat/LicenseXX.dat. Exact name-field offset/encoding, Hangul composition, committed-name renderer and replay/ranking/network serialization are still unproven. Do not relabel 66743AA8 or repeat A135; next proof is controlled LicenseXX.dat binary diff or live OR2006C2C.EXE trace. SumoNet_OnlineUserName EXE+0x430C20 is separate online identity evidence only. No candidate; RUNTIME_VALIDATION=UNTESTED.",
     "B202-B204 reconciled pending user-slant worker output: index106/IGR-017 a9c10f00..., index48/IGR-009 259153b9..., index60/IGR-010 a8ffc1f0... all pass machine scope plus readable high-zoom source/final slant-direction and raw mirror_y gates. Independent C + NEW actual game retest still required; do not repeat unless returned REWORK. B201 index176 remains pending C; A135 index24 remains HOLD.",
     "B201 completed index176 75C3586A after mandatory controller visual QA rejected B200's numeric PASS for wrong semantic atlas binding. Correct binding: idx35 JENNIFER->제니퍼, idx36 CLARISSA->클라리사, idx37 HOLLY->홀리, idx39 FLAGMAN 4->플래그맨 4; idx38 ??? and idx40 route artwork preserved exact. Final 494d42c09c58... passes 4/4 exact source-alpha bbox/size/positive margins, zero outside/alpha/introduced-visible/source-residue/overlap/preserved-overlap/near1, DDS roundtrip, readable SOURCE/CLEAN/FINAL and raw mirror_y visual QA. Pending independent C; RUNTIME_VALIDATION=UNTESTED. Do not repeat B74/B196-B200 rejected/diagnostic attempts. A135 index24 runtime-name-entry HOLD remains separate.",
@@ -6321,5 +6322,30 @@
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_A/20261006-A-PREFLIGHT136-NAME-ENTRY-RUNTIME-MAPPING/A136_NAME_ENTRY_RUNTIME_MAPPING.json",
     "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "b205_name_entry_exe_mapping": {
+    "timestamp_kst": "2026-10-06T17:22:30+09:00",
+    "role": "B",
+    "queue_index": 24,
+    "asset": "66743AA8",
+    "prior": "A136_HOLD_RUNTIME_NAME_FIELD_OFFSET_ENCODING_REQUIRED",
+    "status": "B205_HOLD_KOREAN_NAME_ENCODING_CONSUMER_HOOKS_REQUIRED",
+    "report": "localization/graphics/role_B/20261006-B-PREFLIGHT205-NAME-ENTRY-EXE-MAPPING/B205_NAME_ENTRY_EXE_MAPPING.json",
+    "executable_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "executable_source": "GitHub Actions artifact 11373183170 / run 37379204466",
+    "player_name_runtime_va": "0x7C23E0",
+    "player_name_module_offset": "0x3C23E0",
+    "field_bytes": 16,
+    "max_payload_bytes": 15,
+    "terminator": "NUL",
+    "native_encoding": "legacy single-byte selector table; not UTF-8/UTF-16",
+    "selector_table": "0x64C81B + page*0x25 + selection",
+    "selector_function_va": "0x468D40",
+    "commit_copy_va": "0x4DDBE5..0x4DDC02",
+    "load_copy_va": "0x4DD855..0x4DD872",
+    "candidate_written": false,
+    "runtime_behavior_changed": false,
+    "runtime_validation": "UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT",
+    "next_safe_work": "classify player-name consumers and choose compatible Korean storage/render/serialization policy"
   }
 }
