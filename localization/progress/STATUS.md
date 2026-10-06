@@ -1930,3 +1930,15 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - Fail-closed remainder: exact `66743AA8` visual sprite/cell -> logical selection binding, Korean Jamo/syllable layout, and explicit local alias->UTF-8 player-name rendering remain unproven. No Korean keyboard DDS or runtime input hook was promoted.
 - State: `b207_hold_sidecar_build_pass_controls_mapped_hangul_composition_render_required`. B207 changes no runtime source/DDS, so no additional build is required. A141 Win32 Release run `37441155668` and Korean Test Build run `37441155760` remain the inherited build-pass prerequisite. `RUNTIME_VALIDATION=UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261006-B-PREFLIGHT207-NAMEENTRY-CONTROLS/B207_NAMEENTRY_CONTROL_MAP.json`; `B207_DISASSEMBLY_EVIDENCE.txt`.
+
+## 2026-10-06 18:58 KST — B208 index24 Hangul name composer foundation
+
+- Refreshed current B state before selection: no OPEN user in-game backlog, no C-returned REWORK, no B render-ready/one-stage DDS, and index24 remained the only unresolved B primary item. B207/A141 completed evidence was consumed as prerequisite and not repeated.
+- Implemented an **inactive** `KoreanRuntime::HangulNameComposer` in `src/hooks_localization.cpp`. B207 already proved stock selections 10..35 are `a..z`; B208 maps those physical keys to standard 2-beolsik Jamo semantics and supports shifted Q/W/E/R/T plus O/P.
+- Composition covers initial/medial/final state, double initials, compound vowels, compound finals, final split when a vowel follows, stepwise BACKSPACE, digits/space, UTF-8 output, and a maximum of 15 visible codepoints matching the proven native payload ceiling. Hangul source constants use universal Unicode escapes for MSVC source-codepage safety.
+- During self-QA, chained compound-vowel BACKSPACE handling was tightened before validation; final source commit is `0f696621d80a192f69d1f4195715870a0dfcf046`.
+- Current Win32 Release run `37445766665` SUCCESS, artifact `11404040505`, digest `sha256:c659267dde0f328d427ed0349f70ccf828ab2c652ba10f435a382ce529a49009`. Korean Test Build run `37445766663` SUCCESS, artifact `11403511226`, digest `sha256:b036cb8a95981121423a25490e941cdf0423bdc2965f2eb54c0eba81826ef175`.
+- Fail-closed boundary remains intentional: the composer is not connected to stock input, does not write the 16-byte native player-name field, does not promote a `66743AA8` DDS, does not render alias->Korean player names, and does not alter network/ranking/replay behavior.
+- State: `b208_hold_composer_build_pass_jamo_artwork_render_hook_required`. Next safe work is source-faithful Jamo key artwork and explicit local alias-to-UTF8 player-name rendering; only then should B207's character path be intercepted and the A141 alias committed on END.
+- `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_B/20261006-B-PRODUCTION208-HANGUL-NAME-COMPOSER/B208_HANGUL_NAME_COMPOSER.json`.
