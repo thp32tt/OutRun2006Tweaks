@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B222R",
+  "timestamp_kst": "2026-10-07 05:29 KST",
+  "queue_index": 94,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+  "trigger": "NEWER_8_STEP_PRE_INGAME_VISUAL_FALSE_NEGATIVE",
+  "prior_c_pass": "C_USERPOLICY02_PASS_PENDING_INGAME (C90 bytes)",
+  "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+  "prior_candidate_sha256": "dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae",
+  "rejected_intermediate_sha256": "dbe9ddebf1d4114d764169cd41495ff08a3aaab80190af4cdc0be526ace62af0",
+  "candidate_sha256": "c36da00d6fa421180f6017fd188e9de783a35eb57a6dcc4927039c663aeee905",
+  "worker_runs": {
+    "B222": {
+      "workflow_run_id": 37525658897,
+      "worker_commit": "8ca56b7df850886542229b3a806c5c6803a8fb7c",
+      "result": "REJECTED_BY_CONTROLLER_SOURCE_RESIDUE_IN_HISTORICALLY_PRESERVED_ROWS"
+    },
+    "B222R": {
+      "workflow_run_id": 37526243550,
+      "worker_commit": "6a9499ee084c247e84880a2d1d9c3e2fc7cc8ad9",
+      "result": "SUCCESS"
+    }
+  },
+  "evidence": {
+    "readable": "localization/graphics/role_B/20261007-B-MANUALQA222R-2DA43E41/B222R_2DA_SOURCE_C90_NEW_READABLE.jpg",
+    "row_contact": "localization/graphics/role_B/20261007-B-MANUALQA222R-2DA43E41/B222R_2DA_ROW_CONTACT_2X.jpg",
+    "raw": "localization/graphics/role_B/20261007-B-MANUALQA222R-2DA43E41/B222R_2DA_SOURCE_NEW_RAW.jpg",
+    "clean_validation": "localization/graphics/role_B/20261007-B-MANUALQA222R-2DA43E41/B222R_CLEAN_PLATE_VALIDATION.json"
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "7/7 PASS",
+    "strict_clean_visible_alpha_inside_selected_bboxes": 0,
+    "strict_clean_changes_outside_selected_source_bboxes": 0,
+    "candidate_changes_outside_selected_source_bboxes": 0,
+    "alpha_changes_outside_selected_source_bboxes": 0,
+    "reworked_row_overlap_pixels": 0,
+    "header_128_exact": true,
+    "raw_mode": "RGBA",
+    "raw_orientation": "mirror_y",
+    "roundtrip": "PASS"
+  },
+  "reworked_rows": [
+    {
+      "key": "course_or2",
+      "source_size": [
+        1941,
+        256
+      ],
+      "prior_size": [
+        1076,
+        222
+      ],
+      "final_size": [
+        1592,
+        223
+      ],
+      "margins": [
+        174,
+        175,
+        16,
+        17
+      ],
+      "width_source_ratio": 0.8202,
+      "height_source_ratio": 0.8711,
+      "slant": 0.0
+    },
+    {
+      "key": "course_sp",
+      "source_size": [
+        1946,
+        229
+      ],
+      "prior_size": [
+        1298,
+        213
+      ],
+      "final_size": [
+        1596,
+        221
+      ],
+      "margins": [
+        175,
+        175,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.8201,
+      "height_source_ratio": 0.9651,
+      "slant": 0.0
+    },
+    {
+      "key": "max_speed",
+      "source_size": [
+        191,
+        91
+      ],
+      "prior_size": [
+        186,
+        48
+      ],
+      "final_size": [
+        187,
+        76
+      ],
+      "margins": [
+        2,
+        2,
+        7,
+        8
+      ],
+      "width_source_ratio": 0.9791,
+      "height_source_ratio": 0.8352,
+      "slant": 0.0
+    },
+    {
+      "key": "handling",
+      "source_size": [
+        435,
+        154
+      ],
+      "prior_size": [
+        335,
+        106
+      ],
+      "final_size": [
+        412,
+        132
+      ],
+      "margins": [
+        11,
+        12,
+        11,
+        11
+      ],
+      "width_source_ratio": 0.9471,
+      "height_source_ratio": 0.8571,
+      "slant": 0.0
+    },
+    {
+      "key": "view_change",
+      "source_size": [
+        466,
+        104
+      ],
+      "prior_size": [
+        456,
+        75
+      ],
+      "final_size": [
+        462,
+        85
+      ],
+      "margins": [
+        2,
+        2,
+        9,
+        10
+      ],
+      "width_source_ratio": 0.9914,
+      "height_source_ratio": 0.8173,
+      "slant": 0.26
+    },
+    {
+      "key": "expert",
+      "source_size": [
+        637,
+        105
+      ],
+      "prior_size": [
+        353,
+        103
+      ],
+      "final_size": [
+        548,
+        86
+      ],
+      "margins": [
+        44,
+        45,
+        9,
+        10
+      ],
+      "width_source_ratio": 0.8603,
+      "height_source_ratio": 0.819,
+      "slant": 0.25
+    },
+    {
+      "key": "special_course",
+      "source_size": [
+        742,
+        124
+      ],
+      "prior_size": [
+        554,
+        122
+      ],
+      "final_size": [
+        638,
+        102
+      ],
+      "margins": [
+        52,
+        52,
+        11,
+        11
+      ],
+      "width_source_ratio": 0.8598,
+      "height_source_ratio": 0.8226,
+      "slant": 0.25
+    }
+  ],
+  "controller_visual_qa": {
+    "result": "PASS",
+    "observations": [
+      "C90 numerical PASS was a strict visual false negative: course title rows, maximum-speed/handling hierarchy, and Expert/Special display rows were materially undersized; View Change/Expert/Special did not preserve the source right-lean family strongly enough.",
+      "The first hosted B222 material attempt was rejected in the same invocation because course_or2 retained English source pixels from a historical partial clean plate; those bytes were not promoted to queue/state.",
+      "B222R reconstructs all seven selected exact source-text bboxes from pinned source with zero visible alpha before Korean composition. The final readable evidence shows no English residue or plate/background contamination.",
+      "Course rows now occupy about 82% of source width; 최고 속도/핸들링 restore vertical hierarchy; View Change/Expert/Special use readable source-direction right slant and source-derived effect palettes.",
+      "SOURCE/current/final and RAW mirror-Y evidence show no broken Hangul, clipping, overlap, protected-art intrusion, opposite slant, or orientation regression."
+    ]
+  },
+  "ordered_generation_gate": {
+    "english_removal_plate_restoration": "PASS",
+    "source_matching_slant_direction": "PASS",
+    "no_unnecessary_undersizing": "PASS",
+    "source_faithful_weight_outline_shadow": "PASS",
+    "no_clipped_pixels": "PASS",
+    "protected_graphics_clearance": "PASS",
+    "flip_y_and_raw": "PASS",
+    "immediate_readability_vs_english": "PASS"
+  },
+  "decision": "B222R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

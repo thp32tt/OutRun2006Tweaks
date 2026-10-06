@@ -2145,3 +2145,10 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - B221 restores source-left block-safe anchors and ~0.78x source-width hierarchy while retaining native Hangul, orange/navy/white effect family and readable right slant. Final decoded sizes 725x110 and 835x110 with positive margins; prior edge touch removed.
 - 2/2 bbox/source-size PASS; visible/alpha outside=0; source residue=0; overlap=0; changed BC3 blocks outside patch=0; source-only/partial color bytes preserved; DXT5 raw mirror_y verified. Controller readable/high-zoom/RAW visual QA PASS.
 - Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+### B222R q94 selector-atlas strict visual rework — 2026-10-07 05:29 KST
+- q94 2DA43E41: C90/USERPOLICY02 dce31f89fa30... -> B222 rejected dbe9ddebf1d4... -> B222R c36da00d6fa4....
+- Seven strict-audit-failing rows rebuilt from exact pinned source cells: course titles regain ~82% source width, max-speed/handling regain vertical hierarchy, and View Change/Expert/Special restore source-direction right lean/effect family.
+- Same-invocation B222 intermediate was rejected for English residue from a historical partial clean plate; B222R clears each selected source-text bbox before composition and controller evidence is clean.
+- 7/7 bbox/size/positive-margin; strict clean/candidate outside=0; alpha outside=0; overlap=0; RGBA32 header/raw mirror_y PASS. Controller readable/RAW visual QA PASS.
+- Fresh independent C + regenerated English-original PRE_INGAME comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
