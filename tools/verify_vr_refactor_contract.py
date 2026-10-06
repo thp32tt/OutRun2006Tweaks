@@ -1207,6 +1207,8 @@ for marker in ("StateBlockTracker::Recording()", "StateBlockTracker::Reliable()"
 # describe the current final-dispatch/teardown contracts, not historical
 # physical-hook/status symbols retired by the completed flattening chain.
 for retired in (
+    "IsFailed(R20InstallState)",
+    "IsFailed(R22InstallState)",
     "R31StateBlockTrackingReliable",
     "R31 fast left-eye c64 rollback",
     "R32ResetR22Hook",
@@ -1223,6 +1225,9 @@ for retired in (
             f"generic OpenXR hardening workflow retained retired marker: {retired}")
 
 for marker in (
+    "R20InstallStatus()",
+    "R21InstallStatus()",
+    "R22InstallStatus()",
     "StateBlockTracker::LifecycleHooksReady()",
     "StateBlockTracker::SetEventConsumerReady(true)",
     "R31 physical StateBlock fallback retired; fast-path trust remains disabled",
