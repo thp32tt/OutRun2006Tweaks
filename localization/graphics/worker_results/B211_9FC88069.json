@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "B211",
+  "queue_index": 198,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+  "candidate_sha256": "2160e7eef9dd27b028b5adc3df770a508c62891fd21676677365a0f55bee5885",
+  "report": "localization/graphics/role_B/20261006-B-MANUALQA211-9FC88069/B211_9FC88069_REPORT.json",
+  "status": "B211_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "runtime_validation": "UNTESTED"
+}

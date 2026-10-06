@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B211",
+  "queue_index": 198,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+  "trigger": "B_MANUAL_PRE_INGAME_JPG_REVIEW_053_VISUAL_FALSE_NEGATIVE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/053_q198_9FC88069.jpg",
+  "prior_c_status": "C150_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "defects": [
+    "TEXT_SCALE_TOO_SMALL_VS_SOURCE",
+    "SOURCE_STYLE_HIERARCHY_MISMATCH"
+  ],
+  "source_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+  "before_sha256": "34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c",
+  "candidate_sha256": "2160e7eef9dd27b028b5adc3df770a508c62891fd21676677365a0f55bee5885",
+  "rows": [
+    {
+      "key": "random_card",
+      "korean": "무작위",
+      "source_bbox": [
+        116,
+        1922,
+        434,
+        1984
+      ],
+      "prior_localized_bbox": [
+        215,
+        1931,
+        335,
+        1979
+      ],
+      "localized_bbox": [
+        206,
+        1925,
+        343,
+        1980
+      ],
+      "source_size": [
+        318,
+        62
+      ],
+      "localized_size": [
+        137,
+        55
+      ],
+      "scale_from_prior": 1.14,
+      "delta_left": 90,
+      "delta_right": 91,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "random_play",
+      "korean": "- 무작위 재생 -",
+      "source_bbox": [
+        548,
+        1984,
+        1128,
+        2036
+      ],
+      "prior_localized_bbox": [
+        552,
+        1988,
+        748,
+        2032
+      ],
+      "localized_bbox": [
+        735,
+        1987,
+        940,
+        2033
+      ],
+      "source_size": [
+        580,
+        52
+      ],
+      "localized_size": [
+        205,
+        46
+      ],
+      "scale_from_prior": 1.0454545454545454,
+      "delta_left": 187,
+      "delta_right": 188,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "intermediate_b",
+      "korean": "중급 B",
+      "source_bbox": [
+        1561,
+        43,
+        1984,
+        84
+      ],
+      "prior_localized_bbox": [
+        1565,
+        47,
+        1645,
+        79
+      ],
+      "localized_bbox": [
+        1728,
+        46,
+        1816,
+        81
+      ],
+      "source_size": [
+        423,
+        41
+      ],
+      "localized_size": [
+        88,
+        35
+      ],
+      "scale_from_prior": 1.09375,
+      "delta_left": 167,
+      "delta_right": 168,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "intermediate_a",
+      "korean": "중급 A",
+      "source_bbox": [
+        2198,
+        43,
+        2624,
+        84
+      ],
+      "prior_localized_bbox": [
+        2202,
+        47,
+        2282,
+        79
+      ],
+      "localized_bbox": [
+        2367,
+        46,
+        2455,
+        81
+      ],
+      "source_size": [
+        426,
+        41
+      ],
+      "localized_size": [
+        88,
+        35
+      ],
+      "scale_from_prior": 1.09375,
+      "delta_left": 169,
+      "delta_right": 169,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "preservation": {
+    "song_titles_music_credits_and_parenthetical_variants": "PIXEL_EXACT_UNTOUCHED_OUTSIDE_4_FUNCTIONAL_BBOXES",
+    "other_card_art": "PIXEL_EXACT_UNTOUCHED_OUTSIDE_4_FUNCTIONAL_BBOXES"
+  },
+  "qa": {
+    "changed_pixels_outside_four_source_bboxes": 0,
+    "alpha_changed_outside_four_source_bboxes": 0,
+    "dds_header_128_exact": true,
+    "rgba32_roundtrip_exact": true,
+    "readable_source_old_new_visual_review": "PENDING_CONTROLLER",
+    "raw_source_old_new_visual_review": "PENDING_CONTROLLER"
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "B211_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
