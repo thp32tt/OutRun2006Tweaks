@@ -2060,7 +2060,6 @@ namespace
             {
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBModel = 0;
-                Settings::WheelFFBFeelRevision = 8;
                 Settings::WheelFFBPhysicsSat = true;
                 Settings::WheelFFBGlobalStrength = 0.70f;
                 Settings::WheelFFBSpringStrength = 0.22f;
@@ -2106,7 +2105,6 @@ namespace
             if (ImGui::Button("Load MOZA R3 Natural SAT"))
             {
                 Settings::WheelFFBModel = 0;
-                Settings::WheelFFBFeelRevision = 8;
                 Settings::WheelFFBPhysicsSat = false;
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBGlobalStrength = 0.70f;
