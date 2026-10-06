@@ -103,18 +103,33 @@ for key,en,ko,comp in specs:
     # sign-tight ROI. B191 proved this avoids swallowing the bright white rim,
     # which a convex hull can include even when its seed pixels are all red.
     lab2,n2=ndimage.label(red2)
-    seed=np.zeros_like(red2)
-    pts=[]
-    comp_meta=[]
+    raw_comps=[]
     for j in range(1,n2+1):
         cm=lab2==j; ar=int(cm.sum())
         if ar<15: continue
         yy,xx=np.nonzero(cm)
-        comp_meta.append([ar,[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]])
+        cb2=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
+        raw_comps.append((ar,cm,cb2))
+    if not raw_comps:
+        raise RuntimeError(("no red body components",key))
+    raw_comps.sort(key=lambda z:z[0],reverse=True)
+    main_bbox=raw_comps[0][2]
+    seed=np.zeros_like(red2)
+    pts=[]
+    comp_meta=[]
+    for ar,cm,cb2 in raw_comps:
+        cx=(cb2[0]+cb2[2])/2; cy=(cb2[1]+cb2[3])/2
+        # Keep the main sign plate and small red islands enclosed by that plate.
+        # Reject nearby scene reds (the START traffic-light lamp was the visual-QA
+        # false inclusion that produced a horizontal red bar into protected art).
+        if not (main_bbox[0] <= cx <= main_bbox[2] and main_bbox[1] <= cy <= main_bbox[3]):
+            continue
+        yy,xx=np.nonzero(cm)
+        comp_meta.append([ar,cb2])
         seed |= cm
         pts.extend((int(x),int(y)) for x,y in zip(xx,yy))
     if len(pts)<30:
-        raise RuntimeError(("insufficient red body seed",key,len(pts),comp_meta))
+        raise RuntimeError(("insufficient red body seed",key,len(pts),comp_meta,main_bbox))
     row_bounds={}
     for yy in range(seed.shape[0]):
         xx=np.nonzero(seed[yy])[0]
