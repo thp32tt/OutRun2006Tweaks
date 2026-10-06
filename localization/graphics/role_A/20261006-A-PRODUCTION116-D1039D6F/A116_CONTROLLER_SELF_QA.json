@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION116-D1039D6F",
+  "timestamp_kst": "2026-10-06T11:56:00+09:00",
+  "queue_index": 217,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "candidate_sha256": "68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39",
+  "classification": "zoom_review -> localize_text; START -> 출발, GOAL -> 골",
+  "machine_status": "PASS",
+  "mapping_provenance": "A113 exact readable/component mapping identifies the two D103 route-map signs. A116 independently applies the B190/B191 convex-red-hull reconstruction technique on D103 source pixels; A85 is the accepted same-family in-game-regression precedent.",
+  "bbox_gate": {
+    "elements": "2/2 PASS",
+    "start": {
+      "original_bbox": [
+        803,
+        509,
+        884,
+        532
+      ],
+      "localized_bbox": [
+        827,
+        511,
+        860,
+        530
+      ],
+      "margins": [
+        24,
+        24,
+        2,
+        2
+      ]
+    },
+    "goal": {
+      "original_bbox": [
+        1343,
+        771,
+        1420,
+        795
+      ],
+      "localized_bbox": [
+        1372,
+        773,
+        1391,
+        793
+      ],
+      "margins": [
+        29,
+        29,
+        2,
+        2
+      ]
+    },
+    "size_ceiling": "2/2 PASS",
+    "positive_margin": "2/2 PASS"
+  },
+  "zero_pixel_gates": {
+    "clean_source_residue": 0,
+    "clean_non_red": 0,
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "final_source_residue_color": 0,
+    "localized_overlap": 0,
+    "dds_roundtrip": "PASS"
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_reason": "High-zoom SOURCE/CLEAN/FINAL shows complete English removal, continuous red badge bodies with source horizontal highlight retained as design, sharp native Hangul, preserved white rims/map/art and no seam/halo/collision. Raw mirror_y comparison preserves all four course/card images and logos; only the mapped route labels change.",
+  "rejected_prior_attempts": [
+    "A112 failed closed because the broad red-component search selected a non-label component.",
+    "A114 failed closed on a non-pixel-identical GOAL family transfer assumption.",
+    "A115 failed closed because the hand polygon under-covered source effect pixels.",
+    "A116 uses D103-local convex-red-hull reconstruction and passes both machine and mandatory controller visual gates."
+  ],
+  "decision": "A116_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION116-D1039D6F/A116_D1039D6F_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_A/20261006-A-PRODUCTION116-D1039D6F/A116_D103_SOURCE_CLEAN_FINAL_CONTACT.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION116-D1039D6F/A116_D103_RAW_COMPARE.jpg"
+  ],
+  "vr_ffb_dx11_dxvk_touched": false
+}
