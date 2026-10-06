@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A151",
+  "timestamp_kst": "2026-10-07 07:30 KST",
+  "queue_index": 175,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "prior_c_status": "C171_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "prior_candidate_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+  "candidate_sha256": "f21970a3d6d8ae69954d0159524856b5019cd1445daa65c55d85213f73e431f5",
+  "defect": "Source-relative menu hierarchy was too small: localized heights 103/95/109 versus source 143/132/151.",
+  "rework": "Fresh native Korean rerender from the validated clean plate; source-left alignment, readable right lean, metallic grayscale family, brighter keyline and lower dark extrusion retained.",
+  "machine_qa": {
+    "bbox_size_positive_margin": "3/3 PASS",
+    "final_mask_validator": "PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "raw_orientation": "mirror_y"
+  },
+  "size_changes": [
+    {
+      "key": "stage_select",
+      "before": [
+        1011,
+        103
+      ],
+      "after": [
+        1188,
+        124
+      ],
+      "source": [
+        1366,
+        143
+      ]
+    },
+    {
+      "key": "showroom",
+      "before": [
+        551,
+        95
+      ],
+      "after": [
+        700,
+        114
+      ],
+      "source": [
+        950,
+        132
+      ]
+    },
+    {
+      "key": "single_player",
+      "before": [
+        1024,
+        109
+      ],
+      "after": [
+        1208,
+        130
+      ],
+      "source": [
+        1384,
+        151
+      ]
+    }
+  ],
+  "controller_visual_qa": "PASS_SOURCE_C171_A151_READABLE_ROW_RAW",
+  "github_worker_run": 37540721560,
+  "worker_output_commit": "0acf3ce5b9d3e1672b2a74c856b8fbe9f500eca5",
+  "prior_worker_attempt": {
+    "run": 37540519413,
+    "result": "HEADER_CHECK_ERROR_BEFORE_RENDER_NO_CANDIDATE_CHANGE"
+  },
+  "producer_status": "A151_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
