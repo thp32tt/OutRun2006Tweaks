@@ -8,13 +8,13 @@ from scipy import ndimage
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
 
-repo=Path.cwd(); run="20261006-A-PROBE100-ZOOM293133"
+repo=Path.cwd(); run="20261006-A-PROBE101-ZOOM353745"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 items=[
- (29,"spr_sprani_CLAR_RANK_Exst","F043316B_1024x512.dds"),
- (31,"spr_sprani_FLAG_RANK_Exst","A82266FC_1024x512.dds"),
- (33,"spr_sprani_FLAG_RANK_Exst","FBCAB18D_1024x512.dds"),
+ (35,"spr_sprani_HOLL_RANK_Exst","E989E3B7_1024x1024.dds"),
+ (37,"spr_sprani_JENN_RANK_Exst","515DCBB2_1024x1024.dds"),
+ (45,"spr_sprani_etc_cvt_Exst","1F77CB88_128x128.dds"),
 ]
 base="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/"
 results=[]
@@ -30,35 +30,34 @@ for idx,folder,asset in items:
     if im.size!=(w,h): raise RuntimeError(("PIL size mismatch",asset,im.size,(w,h)))
     readable=im.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
     stem=asset.split("_")[0]
-    readable.save(out/f"A100_{stem}_READABLE.png")
-    im.save(out/f"A100_{stem}_RAW.png")
+    readable.save(out/f"A101_{stem}_READABLE.png")
+    im.save(out/f"A101_{stem}_RAW.png")
     alpha=np.asarray(readable.getchannel("A")); visible=alpha>8
     lab,n=ndimage.label(visible); objs=ndimage.find_objects(lab); comps=[]
     for i,sl in enumerate(objs,1):
         if sl is None: continue
         y,x=sl; area=int((lab[sl]==i).sum())
-        if area<16: continue
+        if area<8: continue
         comps.append({"bbox":[int(x.start),int(y.start),int(x.stop),int(y.stop)],"area":area})
     comps=sorted(comps,key=lambda z:z["area"],reverse=True)
     ov=readable.copy(); d=ImageDraw.Draw(ov)
-    for c in comps[:400]:
+    for c in comps[:500]:
         x0,y0,x1,y1=c["bbox"]; d.rectangle((x0,y0,x1-1,y1-1),outline=(255,0,255,255),width=max(1,w//2048))
-    ov.save(out/f"A100_{stem}_COMPONENTS.png")
-    # compact controller proof on light checker-like solid backing, preserving readable orientation.
+    ov.save(out/f"A101_{stem}_COMPONENTS.png")
     proof=Image.new("RGBA",readable.size,(235,235,235,255)); proof.alpha_composite(readable)
     proof=proof.convert("RGB")
     proof.thumbnail((2200,1600),Image.Resampling.LANCZOS)
-    proof.save(out/f"A100_{stem}_READABLE_PROOF.jpg",quality=96)
+    proof.save(out/f"A101_{stem}_READABLE_PROOF.jpg",quality=96)
     meta={"queue_index":idx,"folder":folder,"asset":asset,"source_url":url,
           "width":w,"height":h,"mips":mips,"fourcc":fourcc.decode("latin1"),
           "bpp":bpp,"masks":[hex(x) for x in masks],"pitch_or_linear":pitch_or_linear,
           "sha256":hashlib.sha256(raw).hexdigest(),"bytes":len(raw),
-          "component_count":len(comps),"components":comps[:800]}
+          "component_count":len(comps),"components":comps[:1000]}
     results.append(meta)
-report={"run":run,"items":results,"status":"A100_SOURCE_PROBE_BATCH_COMPLETE_CONTROLLER_CLASSIFICATION_REQUIRED"}
-(out/"A100_ZOOM293133_PROBE.json").write_text(json.dumps(report,indent=2)+"\n")
-(wr/"A100_ZOOM293133_PROBE.json").write_text(json.dumps({
- "run":run,"indices":[29,31,33],"items":[{"queue_index":x["queue_index"],"asset":x["asset"],"sha256":x["sha256"],"width":x["width"],"height":x["height"]} for x in results],
- "report":str((out/"A100_ZOOM293133_PROBE.json").relative_to(repo)),
+report={"run":run,"items":results,"status":"A101_SOURCE_PROBE_BATCH_COMPLETE_CONTROLLER_CLASSIFICATION_REQUIRED"}
+(out/"A101_ZOOM353745_PROBE.json").write_text(json.dumps(report,indent=2)+"\n")
+(wr/"A101_ZOOM353745_PROBE.json").write_text(json.dumps({
+ "run":run,"indices":[35,37,45],"items":[{"queue_index":x["queue_index"],"asset":x["asset"],"sha256":x["sha256"],"width":x["width"],"height":x["height"]} for x in results],
+ "report":str((out/"A101_ZOOM353745_PROBE.json").relative_to(repo)),
  "status":report["status"]},indent=2)+"\n")
-print("A100_PROBE",[(x["queue_index"],x["asset"],x["width"],x["height"],x["mips"],x["fourcc"],x["sha256"],x["component_count"]) for x in results])
+print("A101_PROBE",[(x["queue_index"],x["asset"],x["width"],x["height"],x["mips"],x["fourcc"],x["sha256"],x["component_count"]) for x in results])
