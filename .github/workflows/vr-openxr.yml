@@ -85,31 +85,36 @@ jobs:
               'authoritative first seed'
             )
             'src/vr/d3d9/stereo_renderer_r31.cpp' = @(
-              'R31StateBlockTrackingReliable',
+              'StateBlockTracker::LifecycleHooksReady()',
+              'StateBlockTracker::SetEventConsumerReady(true)',
               'GetR28VerifiedProjection',
-              'R31 fast left-eye c64 rollback'
+              'R31 physical StateBlock fallback retired; fast-path trust remains disabled'
             )
             'src/vr/d3d9/stereo_renderer_r32.cpp' = @(
-              'R32ResetR22Hook',
-              'ResetDestR22',
+              'R32WithResetLifecycle',
+              'R32WithPresentTelemetry',
+              'R32ResolveDirectTransport',
               'R32ResetAfterGameReset',
               'R32SetWvpBatch',
               'R32WaitProducerFence',
               'R32DrainPendingProducerFence',
               'R32ProducerFencePending',
               'draw is forced to stock-WVP zero disparity',
-              'VR R32 REVIEW2'
+              'R32 is a hook-free functional owner'
             )
             'src/vr/d3d9/stereo_renderer_r33.cpp' = @(
               'R31OwnedResult R33TryFastWorld',
               'R31OwnedResult R33TryHud',
               'R32LowerFailClosed',
-              'R30DrawPrimitiveR29Hook',
-              'R33ResetR32Hook.stdcall<HRESULT>',
+              'R33DrawPrimitiveR30Hook',
+              'R33ResetR22Hook.stdcall<HRESULT>',
+              'R33PresentR13Hook.stdcall<HRESULT>',
+              'R33ResolveDirectR13Hook.call<bool>',
               'R33ResetReplayBlocked',
               'LastResetStateReplaySucceeded',
               'stereo remains fail-closed',
-              'top-level telemetry counted once'
+              'top-level telemetry counted once',
+              'direct R31/R22/R13 prerequisite ownership'
             )
             'src/vr/d3d9/ex_device_upgrade_r14.cpp' = @(
               'std::unordered_map<IDirect3DTexture9*, R14EntryPtr>',
@@ -176,10 +181,14 @@ jobs:
               'presentation-authoritative while its exact producer slot stays protected'
             )
             'vrhost/src/runtime/sbs_capture_override.hpp' = @(
-              'Preserve acquiredImage',
               'bool acquired = false',
-              'Release(Projection);',
-              'Release(Theater);'
+              'PrepareForParentSessionDestroy()',
+              'ForgetAfterParentSessionDestroy()',
+              'Projection.PrepareForParentSessionDestroy();',
+              'Theater.PrepareForParentSessionDestroy();',
+              'Projection.ForgetAfterParentSessionDestroy();',
+              'Theater.ForgetAfterParentSessionDestroy();',
+              'xrDestroySession destroys child swapchains/spaces'
             )
             'vrhost/src/main_r23.cpp' = @(
               'R23RefreshTheaterFallbackCapture',
