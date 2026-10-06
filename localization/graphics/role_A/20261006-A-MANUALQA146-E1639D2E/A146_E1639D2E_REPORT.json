@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-MANUALQA146-E1639D2E",
+  "index": 241,
+  "asset": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+  "worker": "github-actions",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "1a119356bf20b0116d408ffe510e62ec90fc0c53",
+    "sha256": "e250a41e7c59ccd5b8a68a02aace066f6578fbe0d84a365d7a0a27044b353511",
+    "path": "Release/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+    "classification": "authoritative high-resolution source; DDS header 1024x256 RGBA32"
+  },
+  "source_sha256": "e250a41e7c59ccd5b8a68a02aace066f6578fbe0d84a365d7a0a27044b353511",
+  "candidate_sha256": "b94f215b889231a7942299d6a2179540425d11538df21feb25565cac13bab037",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+  "structure": {
+    "dimensions": [
+      1024,
+      256
+    ],
+    "format": "RGBA32",
+    "pixel_raw_mode": "BGRA",
+    "pitch": 4096,
+    "depth": 0,
+    "mipmaps": 1,
+    "bytes": 1048704,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "translation": {
+    "physical_occurrences": 2,
+    "rows": [
+      {
+        "source": "Loading",
+        "korean": "로딩",
+        "region_idx": 0
+      },
+      {
+        "source": "PLEASE WAIT",
+        "korean": "잠시만요",
+        "region_idx": 1
+      }
+    ]
+  },
+  "rows": [
+    {
+      "idx": 0,
+      "source": "Loading",
+      "korean": "로딩",
+      "family": "large_metallic",
+      "cell": [
+        0,
+        104,
+        904,
+        152
+      ],
+      "original_bbox": [
+        1,
+        110,
+        731,
+        256
+      ],
+      "source_width": 730,
+      "source_height": 146,
+      "raw_original_bbox": [
+        1,
+        0,
+        731,
+        146
+      ],
+      "localized_bbox": [
+        9,
+        116,
+        413,
+        250
+      ],
+      "localized_width": 404,
+      "localized_height": 134,
+      "delta_left": 8,
+      "delta_right": 318,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_localized_bbox": [
+        9,
+        6,
+        413,
+        140
+      ],
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Bold",
+      "font_size": 119,
+      "outline_px": 7,
+      "body_extra_px": 3,
+      "slant_px": 12,
+      "shadow_offset": [
+        6,
+        8
+      ],
+      "layout": {
+        "alignment": "left",
+        "xscale": 1.75,
+        "target_height": 134
+      },
+      "source_style": {
+        "dark": [
+          23,
+          23,
+          23,
+          255
+        ],
+        "bright": [
+          244,
+          244,
+          244,
+          255
+        ],
+        "margins": {
+          "left": 2,
+          "top": 2,
+          "right": 8,
+          "bottom": 13
+        },
+        "profile_samples": [
+          [
+            245,
+            245,
+            245
+          ],
+          [
+            110,
+            110,
+            110
+          ],
+          [
+            49,
+            49,
+            49
+          ]
+        ]
+      }
+    },
+    {
+      "idx": 1,
+      "source": "PLEASE WAIT",
+      "korean": "잠시만요",
+      "family": "small_wait",
+      "cell": [
+        0,
+        44,
+        512,
+        60
+      ],
+      "original_bbox": [
+        4,
+        50,
+        375,
+        98
+      ],
+      "source_width": 371,
+      "source_height": 48,
+      "raw_original_bbox": [
+        4,
+        158,
+        375,
+        206
+      ],
+      "localized_bbox": [
+        6,
+        52,
+        163,
+        96
+      ],
+      "localized_width": 157,
+      "localized_height": 44,
+      "delta_left": 2,
+      "delta_right": 212,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_localized_bbox": [
+        6,
+        160,
+        163,
+        204
+      ],
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Bold",
+      "font_size": 42,
+      "outline_px": 2,
+      "body_extra_px": 1,
+      "slant_px": 1,
+      "shadow_offset": [
+        0,
+        0
+      ],
+      "layout": {
+        "alignment": "left",
+        "xscale": 1.35,
+        "target_height": 44
+      },
+      "source_style": {
+        "dark": [
+          60,
+          66,
+          68,
+          255
+        ],
+        "bright": [
+          60,
+          66,
+          68,
+          255
+        ],
+        "margins": {
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "profile_samples": [
+          [
+            60,
+            66,
+            68
+          ],
+          [
+            60,
+            66,
+            68
+          ],
+          [
+            60,
+            66,
+            68
+          ]
+        ]
+      }
+    }
+  ],
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-MANUALQA146-E1639D2E/E1639D2E_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-MANUALQA146-E1639D2E/E1639D2E_HD_CLEAN_PLATE.png",
+    "size": [
+      1024,
+      256
+    ],
+    "changed_pixels": 60330,
+    "changed_bbox": [
+      1,
+      50,
+      731,
+      256
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-MANUALQA146-E1639D2E/E1639D2E_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-MANUALQA146-E1639D2E/E1639D2E_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      1024,
+      256
+    ],
+    "changed_pixels": 80736,
+    "changed_bbox": [
+      1,
+      50,
+      731,
+      256
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "machine_checks": {
+    "source_mask_pixels_unchanged_in_clean": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pixels": 0,
+    "changed_pixels_outside_source_bboxes": 0,
+    "alpha_changed_pixels_outside_source_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "source_residue_visible_pixels": 0
+  },
+  "all_2_bbox_pass": true,
+  "all_2_size_ceiling_pass": true,
+  "all_2_positive_margin": true,
+  "trigger": "MANUAL_PRE_INGAME_JPG_REVIEW_062_VISUAL_FALSE_NEGATIVE",
+  "prior_c_status": "C165_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "defects": [
+    "TEXT_SCALE_TOO_SMALL_VS_SOURCE",
+    "SOURCE_HIERARCHY_MISMATCH"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A146_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
