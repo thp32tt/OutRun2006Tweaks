@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     init: true
     shm_size: "768m"
-    mem_limit: 3g
+    mem_limit: 4g
     mem_reservation: 1g
     cpus: 1.5
     environment:
