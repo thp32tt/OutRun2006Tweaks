@@ -533,7 +533,7 @@ require(
 require_order(
     read_gpu_ack,
     "game dedicated ACK identity validation",
-    "snapshot.hostPid != SharedState->hostPid",
+    "snapshot.hostPid != expectedHostPid",
     "snapshot.transportGeneration != DirectTransportGeneration",
     "!RenderFrameRunGeneration",
     "DirectGpuAckRunGenerationIndex",
