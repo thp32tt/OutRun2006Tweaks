@@ -1,0 +1,42 @@
+A143 exact name-entry input wiring evidence
+Timestamp KST: 2026-10-06T19:52:30+09:00
+Branch: korean-localization-recovery-20260928
+Canonical OR2006C2C.exe SHA-256: 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
+
+Static dispatch proof
+- VA 0x4692B1: A1 20 94 7F 00        mov eax, ds:0x7F9420
+- VA 0x4692B6: 83 F8 26              cmp eax, 0x26
+- VA 0x4692B9: 7D 68                 jge 0x469323
+- VA 0x4692BB: reads WORD object+0x6FA maximum
+- VA 0x4692C2: reads WORD object+0x6F6 current length
+- VA 0x4692CE..0x4692D6: stock character selection -> 0x468D40 -> one-byte append to object+0x5F4
+- VA 0x469323: exact 0x26 BACKSPACE branch
+- VA 0x469361..0x469376: dispatches 0x27..0x2B controls
+- VA 0x4694AC: END begins by strlen(object+0x5F4); compares against WORD object+0x6F8; then executes stock finalizer.
+
+A143 hook boundary
+- Hook address: module+0x692B6 / VA 0x4692B6.
+- Expected signature: 83 F8 26 7D 68 0F BF 8E FA 06 00 00.
+- At callback entry EAX is the selection loaded by 0x4692B1 and ESI is the name-entry object.
+- Handled character/BACKSPACE paths substitute EAX=0x2C, which follows the stock invalid-control no-op exit rather than the one-byte append.
+- 0x27..0x2A are not rewritten by A143 and therefore execute the canonical stock page-control code.
+- 0x2B END is left unchanged after a successful sidecar alias commit, preserving the stock minimum-length/finalize/parent-copy path.
+
+Storage/render compatibility
+- Native name field remains the B205-proven 16-byte field with <=15 payload bytes + NUL.
+- Persistent alias remains A141 K+13 Base32 characters (14 bytes).
+- Transient preview token KAAAAAAAAAAAAA is reserved from sidecar load/generation and never persisted.
+- A142 local text-object renderer resolves transient/persistent aliases to UTF-8 only for the exact local Sumo_Printf("%s") callsite.
+- No UTF-8 bytes are written to native player-name storage.
+- No ranking/network/replay serialization format is changed.
+
+Build validation for exact source 224e3c8fce6cfebfc0b780683a168b53ccd4e87d
+- Win32 Release run 37451825543: SUCCESS; artifact 11407089218; sha256:0a08b0b4d57c8decdac4a76558cc0879b570f4a1e19b8fc19862a1749e3fddd9
+- Korean Test Build run 37451825561: SUCCESS; artifact 11407390504; sha256:dd70d0b39c09595b2b370a239a7610e3ccfb9f75be571b6848b02a568f8c524b
+- Korean Test package at this source SHA intentionally excludes B209 66743AA8 because independent C QA is still pending.
+
+B209 candidate consumed, not regenerated
+- SHA-256: c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e
+- Producer static/controller QA: PASS
+- Independent C QA: PENDING
+- Runtime/in-game validation: UNTESTED
