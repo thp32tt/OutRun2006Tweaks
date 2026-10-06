@@ -1,37 +1,70 @@
 #!/usr/bin/env python3
-import hashlib,json,os,subprocess
+import hashlib,json,os,struct,urllib.request
 from pathlib import Path
+from PIL import Image,ImageDraw
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
 
 repo=Path.cwd()
-source_commit="5f5f87c41ce43ccdf205e9936a645d44690f01b2"
-asset="localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds"
-expected="bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178"
-out=repo/"localization/graphics/role_A/20261006-A-RESTORE108-590A4724"; out.mkdir(parents=True,exist_ok=True)
-wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
-
-# Restore the already completed A108 bytes exactly; do not rerender or modify the approved candidate.
-data=subprocess.check_output(["git","show",f"{source_commit}:{asset}"],cwd=repo)
-sha=hashlib.sha256(data).hexdigest()
-if sha!=expected:
-    raise RuntimeError(("historical A108 candidate drift",sha,expected))
-dst=repo/asset
-before=hashlib.sha256(dst.read_bytes()).hexdigest() if dst.exists() else None
-dst.write_bytes(data)
-after=hashlib.sha256(dst.read_bytes()).hexdigest()
-if after!=expected:
-    raise RuntimeError(("restore write mismatch",after))
+run="20261006-A-PROBE111-ZOOM189191217219"
+out=repo/"localization/graphics/role_A"/run
+out.mkdir(parents=True,exist_ok=True)
+wr=repo/"localization/graphics/worker_results"
+wr.mkdir(parents=True,exist_ok=True)
+base="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst"
+items=[
+ (189,"8C9E91F8_512x512.dds"),
+ (191,"94BB6271_512x256.dds"),
+ (217,"D1039D6F_512x512.dds"),
+ (219,"D263B3F1_512x512.dds"),
+]
+tmp=Path("/tmp/a111"); tmp.mkdir(exist_ok=True)
+rows=[]
+for idx,name in items:
+    p=tmp/name
+    urllib.request.urlretrieve(f"{base}/{name}",p)
+    raw=p.read_bytes()
+    if raw[:4]!=b"DDS ": raise RuntimeError(("not dds",name))
+    h=struct.unpack_from("<I",raw,12)[0]
+    w=struct.unpack_from("<I",raw,16)[0]
+    mips=struct.unpack_from("<I",raw,28)[0]
+    fourcc=raw[84:88].decode("latin1")
+    bpp=struct.unpack_from("<I",raw,88)[0]
+    masks=[hex(x) for x in struct.unpack_from("<IIII",raw,92)]
+    imraw=Image.open(p).convert("RGBA")
+    if imraw.size!=(w,h): raise RuntimeError(("decode size",name,imraw.size,(w,h)))
+    readable=imraw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+    stem=name.split("_")[0]
+    imraw.save(out/f"A111_{stem}_RAW.png")
+    readable.save(out/f"A111_{stem}_READABLE.png")
+    for lab,im in (("READABLE",readable),("RAW_MIRROR_Y",imraw)):
+        bg=Image.new("RGBA",im.size,(235,235,235,255)); bg.alpha_composite(im)
+        proof=bg.convert("RGB")
+        proof.thumbnail((1800,1800),Image.Resampling.LANCZOS)
+        canvas=Image.new("RGB",(proof.width,proof.height+28),"white")
+        ImageDraw.Draw(canvas).text((5,5),f"{stem} {lab}",fill="black")
+        canvas.paste(proof,(0,28))
+        canvas.save(out/f"A111_{stem}_{lab}_PROOF.jpg",quality=92,optimize=True)
+    rows.append({
+      "queue_index":idx,
+      "asset":name,
+      "source_url":f"{base}/{name}",
+      "sha256":hashlib.sha256(raw).hexdigest(),
+      "bytes":len(raw),
+      "width":w,"height":h,"mipmaps":mips,"fourcc":fourcc,"bpp":bpp,"masks":masks
+    })
 report={
- "schema_version":1,"role":"A","run":"A108_EXACT_RESTORE",
- "asset":"textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
- "historical_commit":source_commit,"before_sha256":before,"restored_sha256":after,
- "reason":"A108 was already controller-self-QA PASS. A later superseded A107 worker output overwrote the candidate path without updating A108 state; restore exact A108 bytes instead of repeating production.",
- "a108_report":"localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_590A4724_REPORT.json",
- "a108_controller":"localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_CONTROLLER_SELF_QA.json",
- "status":"A108_EXACT_BYTES_RESTORED_NO_REPRODUCTION","runtime_validation":"UNTESTED","vr_ffb_dx11_dxvk_touched":False
+ "schema_version":1,"role":"A","run":run,
+ "items":rows,
+ "status":"A111_SOURCE_PROBE_BATCH_COMPLETE_CONTROLLER_CLASSIFICATION_REQUIRED"
 }
-(out/"A108_EXACT_RESTORE_REPORT.json").write_text(json.dumps(report,indent=2)+"\n")
-(wr/"A108_EXACT_RESTORE.json").write_text(json.dumps({"asset":"590A4724","restored_sha256":after,"status":report["status"]},indent=2)+"\n")
+(out/"A111_ZOOM189191217219_PROBE.json").write_text(json.dumps(report,indent=2)+"\n")
+(wr/"A111_ZOOM189191217219_PROBE.json").write_text(json.dumps({
+ "run":run,
+ "indices":[x[0] for x in items],
+ "items":[{"queue_index":r["queue_index"],"asset":r["asset"],"sha256":r["sha256"],"width":r["width"],"height":r["height"],"fourcc":r["fourcc"],"mipmaps":r["mipmaps"]} for r in rows],
+ "report":f"localization/graphics/role_A/{run}/A111_ZOOM189191217219_PROBE.json",
+ "status":report["status"]
+},indent=2)+"\n")
 print(json.dumps(report),flush=True)
