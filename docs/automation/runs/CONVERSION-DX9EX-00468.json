@@ -6,7 +6,7 @@
   "event_type": "dispatch",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "status": "VALIDATING",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
@@ -38,12 +38,14 @@
       "evidence": "Clear gpuWorkSubmitted immediately after successful drain and before xrDestroySwapchain. The normal success path is unchanged; failed live destroy retains the handle/resources but also retains the completed-drain proof. Deterministic verifier pins drain -> proof clear -> xrDestroySwapchain -> failure return ordering."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
+      "status": "RETRYING",
       "automation_validation": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "evidence": "Attempt 1 exact SHA f8ff8b6f42c9c90042a1fe66544a1a2373f64feb: VR Autodev Coordination validate SUCCESS; DX9Ex Active 37422577091 policy failed only in verify_vr_dx9ex_reset_transport_contract.py because the old 'skip drain only for never-submitted swapchains' assertion expected gpuWorkSubmitted=false after xrDestroySwapchain. Host/game/full-chain/package were skipped by policy dependency."
     },
     "C4_COMMIT": {
       "status": "PENDING",
+      "source_material_sha": "f8ff8b6f42c9c90042a1fe66544a1a2373f64feb",
       "ci_skip_on_validation_bearing_result": false
     },
     "C5_PACKAGE": {
@@ -65,8 +67,16 @@
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "attempt1": {
+      "dx9ex_active_run_id": 37422577091,
+      "policy_job_id": 112134994065,
+      "policy_result": "FAIL_STALE_VERIFIER_ORDER",
+      "autodev_run_id": 37422577119,
+      "autodev_result": "SUCCESS"
     }
   },
-  "next_action": "Validate this exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; if PASS, finalize C3-C6 while preserving RUNTIME_VALIDATION=UNTESTED.",
-  "started_at_kst": "2026-10-06T15:13:00+09:00"
+  "next_action": "Validate the verifier-repair exact SHA with canonical DX9Ex Active Validation and Domain Isolation; if PASS, finalize C3-C6. Do not alter runtime source unless a new gate failure identifies a source defect.",
+  "started_at_kst": "2026-10-06T15:13:00+09:00",
+  "failure_context": "Attempt 1 is a verifier-order false negative. Source behavior remains: successful event-query drain clears gpuWorkSubmitted before xrDestroySwapchain so a transient destroy failure preserves the completed-drain proof. Attempt 2 updates only the stale deterministic assertion."
 }

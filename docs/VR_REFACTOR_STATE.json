@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T15:13:00+09:00",
+  "updatedKst": "2026-10-06T15:16:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -114,7 +114,7 @@
     "VR-DX9EX-RELEASE-CALLSITE-COMPAT-0049",
     "VR-DX9EX-EMERGENCY-CLEAR-GPU-PROVENANCE-0050"
   ],
-  "next": "Structural extraction remains terminal and ARCH-V3-GATE-001 remains HMD-gated. CONVERSION-DX9EX-00468 preserves successful swapchain GPU-drain proof across a transient live xrDestroySwapchain failure so the retry does not repeat the same bounded completion fence without intervening graphics work. Validate the exact 00468 material SHA before any further independent unit.",
+  "next": "CONVERSION-DX9EX-00468 attempt 1 source semantics are retained. DX9Ex Active 37422577091 failed only because a stale verifier still expected gpuWorkSubmitted=false after xrDestroySwapchain; attempt 2 updates that deterministic ordering assertion to the intended successful-drain proof order. Validate the exact repair SHA before continuing.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -250,7 +250,8 @@
     "CONVERSION-DX9EX-00466 / VR-DX9EX-RELEASE-CALLSITE-COMPAT-0049 exact SHA b6b478f79042f840ec1a7bdb9f019433b84c24a3 passed DX9Ex Active 37420399545 (policy/host/game/full-chain-compile/package), Domain Isolation 37420399537, and validate 37420399520. Package artifact 11393006524 digest sha256:dba29d2769d29a22ede2fe4ee41ef55a5479dd2acd80e7b38e18b9d706933cfe. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00467 / VR-DX9EX-EMERGENCY-CLEAR-GPU-PROVENANCE-0050: R24 BuildEmergencyVisibleQuad submits ClearRenderTargetView directly against Theater swapchain RTVs. Before this unit only RenderTo/Draw set gpuWorkSubmitted, so a later live Destroy could incorrectly classify an emergency-cleared swapchain as never submitted and bypass WaitForSwapchainGpuIdleBeforeDestroy. The fix records owner GPU-work provenance immediately after Clear and before Flush; runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00467 / VR-DX9EX-EMERGENCY-CLEAR-GPU-PROVENANCE-0050 exact SHA b290361d2abd2b2ac03b94cca9b89c62b89e51f1 passed DX9Ex Active 37421595884, Domain Isolation 37421595899, and Autodev validate 37421595883; package artifact 11392964691 digest sha256:8bb39b1b4da864759fe740c14a0c091375c6752d7493083a28202430ec207448. Runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00468 / VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051: after WaitForSwapchainGpuIdleBeforeDestroy succeeds, Swapchain::Destroy now clears gpuWorkSubmitted before xrDestroySwapchain. If the live destroy call itself fails, the retained swapchain no longer repeats an already-proven event-query drain on the next retry unless new graphics work is submitted. OpenXR's completion-before-destroy invariant remains intact; runtime remains UNTESTED pending Quest3/VDXR."
+    "CONVERSION-DX9EX-00468 / VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051: after WaitForSwapchainGpuIdleBeforeDestroy succeeds, Swapchain::Destroy now clears gpuWorkSubmitted before xrDestroySwapchain. If the live destroy call itself fails, the retained swapchain no longer repeats an already-proven event-query drain on the next retry unless new graphics work is submitted. OpenXR's completion-before-destroy invariant remains intact; runtime remains UNTESTED pending Quest3/VDXR.",
+    "CONVERSION-DX9EX-00468 attempt 1 DX9Ex Active 37422577091 reached all architecture verifiers; only verify_vr_dx9ex_reset_transport_contract.py failed because an older order assertion contradicted the new drain-proof placement. Attempt 2 changes that verifier ordering only; runtime source semantics remain unchanged."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
@@ -1059,13 +1060,14 @@
     "productionId": "CONVERSION-DX9EX-00468",
     "eventId": "CONVERSION-DX9EX-00468-E001",
     "eventType": "dispatch",
-    "attempt": "1/3",
+    "attempt": "2/3",
     "item": "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051",
     "baseSha": "8f7199bd5fcc027e1312cfd639f2f20de01abcd4",
     "materialResultSha": "PENDING_SELF",
     "validationBearingResultSha": "PENDING_SELF",
-    "automationValidation": "PENDING",
+    "automationValidation": "RETRYING",
     "runtimeValidation": "UNTESTED",
-    "summary": "Preserve successful R19 swapchain GPU-drain proof across transient live xrDestroySwapchain failure so retries do not repeat the same bounded completion fence."
+    "summary": "Preserve successful R19 swapchain GPU-drain proof across transient live xrDestroySwapchain failure so retries do not repeat the same bounded completion fence.",
+    "failureContext": "Attempt 1 exact SHA f8ff8b6f42c9c90042a1fe66544a1a2373f64feb: policy step verify_vr_dx9ex_reset_transport_contract.py failed only on stale 'R19 skip drain only for never-submitted swapchains' ordering, which still expected xrDestroySwapchain before gpuWorkSubmitted=false. The new source intentionally preserves successful drain proof before the destroy call."
   }
 }

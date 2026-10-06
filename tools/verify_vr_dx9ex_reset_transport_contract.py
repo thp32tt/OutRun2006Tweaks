@@ -1117,8 +1117,8 @@ require_order(
     "const bool gpuDrained =",
     "!gpuWorkSubmitted || WaitForSwapchainGpuIdleBeforeDestroy();",
     "if (!gpuDrained)",
-    "const XrResult result = ::xrDestroySwapchain(handle);",
     "gpuWorkSubmitted = false;",
+    "const XrResult result = ::xrDestroySwapchain(handle);",
 )
 
 render_to = body(host_sbs, "inline bool RenderTo(ID3D11RenderTargetView* rtv")
