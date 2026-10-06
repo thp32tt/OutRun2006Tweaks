@@ -110,6 +110,20 @@ namespace OutRunVR::RecenterIpc
                 InterlockedExchange(&state_->receivedId, requestId);
         }
 
+        bool RequeueReceived(LONG requestId) noexcept
+        {
+            if (requestId == 0 || !Ensure())
+                return false;
+
+            const LONG requested = InterlockedCompareExchange(
+                &state_->requestId, 0, 0);
+            if (requested != requestId)
+                return false;
+
+            return InterlockedCompareExchange(
+                &state_->receivedId, 0, requestId) == requestId;
+        }
+
         void MarkApplied(LONG requestId) noexcept
         {
             if (requestId != 0 && Ensure())

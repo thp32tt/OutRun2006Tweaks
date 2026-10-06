@@ -49,11 +49,13 @@ namespace OutRunVrR26RecenterHardening
     inline std::uint64_t GameRequestsApplied = 0;
     inline std::uint64_t StaleGameRequestsDropped = 0;
     inline std::uint64_t StaleAcceptedGameRequestsDropped = 0;
+    inline std::uint64_t SessionGameRequestsRequeued = 0;
     inline std::uint64_t AnchoredStartupFallbacks = 0;
     inline bool FirstReferenceChangeLogged = false;
     inline bool FirstFocusRecenterLogged = false;
     inline bool FirstStaleGameRequestLogged = false;
     inline bool FirstStaleAcceptedGameRequestLogged = false;
+    inline bool FirstSessionGameRequestRequeuedLogged = false;
     inline bool FirstAnchoredFallbackLogged = false;
 
     inline XrVector3f RotateVector(const XrQuaternionf& q,
@@ -80,6 +82,30 @@ namespace OutRunVrR26RecenterHardening
 
     inline void ResetSessionState() noexcept
     {
+        // If this session dies after the host accepted an F10 request but before
+        // a visible post-recenter submission, return that request to the shared
+        // channel. Otherwise receivedId would keep suppressing it forever even
+        // though appliedId never advanced. The next session will revalidate the
+        // requester PID before accepting it again.
+        const LONG pending =
+            PendingGameRequestId.load(std::memory_order_acquire);
+        if (pending != 0)
+        {
+            auto& channel = OutRunVR::RecenterIpc::SharedChannel();
+            if (channel.RequeueReceived(pending))
+            {
+                ++SessionGameRequestsRequeued;
+                if (!FirstSessionGameRequestRequeuedLogged)
+                {
+                    FirstSessionGameRequestRequeuedLogged = true;
+                    std::cerr
+                        << "[R46 recenter] session teardown requeued accepted F10 requestId="
+                        << pending
+                        << " because no visible applied completion was published\n";
+                }
+            }
+        }
+
         PendingFocusRecenter = false;
         PendingFocusSession = XR_NULL_HANDLE;
         PendingGameRequestId.store(0, std::memory_order_release);

@@ -5,6 +5,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 
 R26_PATH = ROOT / "vrhost/src/runtime/r26_recenter_hardening.hpp"
+IPC_PATH = ROOT / "src/vr/ipc/recenter_request.hpp"
 MAIN_PATH = ROOT / "vrhost/src/main_r23.cpp"
 R32_PATH = ROOT / "vrhost/src/runtime/r32_direct_submit.hpp"
 API_PATH = ROOT / "vrhost/src/runtime/openxr_api_compat.hpp"
@@ -65,9 +66,21 @@ def require_order(source: str, label: str, *markers: str) -> None:
 
 
 r26 = load(R26_PATH)
+ipc = load(IPC_PATH)
 main = load(MAIN_PATH)
 r32 = load(R32_PATH)
 api = load(API_PATH)
+
+requeue_received = body(ipc, "bool RequeueReceived(LONG requestId) noexcept")
+require_order(
+    requeue_received,
+    "accepted recenter IPC requeue",
+    "if (requestId == 0 || !Ensure())",
+    "InterlockedCompareExchange(",
+    "&state_->requestId, 0, 0",
+    "if (requested != requestId)",
+    "&state_->receivedId, 0, requestId",
+)
 
 queue = body(r26, "inline void QueueApplicationRecenter(std::uint32_t source) noexcept")
 require_order(
@@ -245,6 +258,14 @@ require_order(
 # pending game/focus recenter, target generation or LOCAL fallback anchor into
 # the next session created by the long-lived host process.
 reset_session = body(r26, "inline void ResetSessionState() noexcept")
+require_order(
+    reset_session,
+    "accepted request requeue before session-state reset",
+    "PendingGameRequestId.load(std::memory_order_acquire)",
+    "channel.RequeueReceived(pending)",
+    "++SessionGameRequestsRequeued;",
+    "PendingFocusRecenter = false;",
+)
 require_order(
     reset_session,
     "recenter session-state reset",
