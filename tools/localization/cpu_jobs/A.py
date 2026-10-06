@@ -154,11 +154,12 @@ if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip mis
 srcp=out/"A102_SOURCE_READABLE.png"; clnp=out/"A102_CLEAN_PLATE.png"; finp=out/"A102_FINAL_READABLE.png"
 src.save(srcp); clean.save(clnp); dec.save(finp)
 source_mask.save(out/"A102_SOURCE_TEXT_MASK.png"); render_mask_global.save(out/"A102_RENDER_MASK.png")
-allowed.save(out/"A102_ALLOWED_EFFECT_BBOX_MASK.png"); protected.save(out/"A102_PROTECTED_MASK.png")
+allowedp=out/"A102_ALLOWED_EFFECT_BBOX_MASK.png"; protectedp=out/"A102_PROTECTED_MASK.png"
+allowed.save(allowedp); protected.save(protectedp)
 validator=repo/"tools/localization/validate_clean_plate.py"
 import subprocess
-subprocess.run(["python3",str(validator),str(srcp),str(clnp),str(allowed),"--protected-mask",str(protected),"--report",str(out/"A102_CLEAN_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(srcp),str(finp),str(allowed),"--protected-mask",str(protected),"--report",str(out/"A102_FINAL_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(srcp),str(clnp),str(allowedp),"--protected-mask",str(protectedp),"--report",str(out/"A102_CLEAN_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(srcp),str(finp),str(allowedp),"--protected-mask",str(protectedp),"--report",str(out/"A102_FINAL_VALIDATION.json")],check=True)
 cr=json.loads((out/"A102_CLEAN_VALIDATION.json").read_text()); fr=json.loads((out/"A102_FINAL_VALIDATION.json").read_text())
 if cr["status"]!="PASS" or fr["status"]!="PASS": raise RuntimeError(("validator",cr["status"],fr["status"]))
 
