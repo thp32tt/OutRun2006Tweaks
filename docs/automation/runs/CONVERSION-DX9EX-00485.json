@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00485",
+  "production_id": "CONVERSION-DX9EX-00485",
+  "event_id": "CONVERSION-DX9EX-00485-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "d858b4052b49dfc9369a5b48e6feacb4014049fc",
+  "red_guard_sha": "52e3202c1fe640f62e695e2712a10f12562a1104",
+  "material_result_sha": "3edab9f54806b2ef4141546b3537cfa75c280af6",
+  "validation_bearing_result_sha": "3edab9f54806b2ef4141546b3537cfa75c280af6",
+  "result_sha": "3edab9f54806b2ef4141546b3537cfa75c280af6",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00485]",
+  "selected_work_item": "DX9EX-CORRECTNESS-CROSS-THREAD-SEMANTIC-REGISTRY-0068",
+  "summary": "Restored the HMD-proven shared synchronized SpriteNode semantic registry while retaining current ProducerToken diagnostics and current R31/R32/R33 ownership. Exact ScreenHud/WorldBillboard tags can now cross producer/render thread boundaries; queue serial cutoff cleanup preserves concurrently produced next-frame tags. Projected rank/rival anchor payload is intentionally deferred.",
+  "checkpoints": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read target HEAD d858b405, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, VR_REFACTOR_STATE, 00484 run record, VR problem/regression records and current AI scoreboard. Structure-refactor chain remained COMPLETE."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Latest user runtime analysis on ff947254/session 20261006T151027454Z-8f9b3197 showed 3858 semantic trace rows all UNKNOWN, worldBillboard=0 and producer draws=0. Issue #13 root-cause refinement compared current source with HMD-proven 902a89ea and identified thread_local SpriteNode semantic registry as a bounded cross-thread lifetime regression."
+    },
+    "C2_RED": {
+      "status": "COMPLETE",
+      "sha": "52e3202c1fe640f62e695e2712a10f12562a1104",
+      "evidence": "Added and wired tools/verify_vr_cross_thread_semantic_registry.py before implementation. DX9Ex Active 37498045406 policy job 112387556159 failed the new architecture contract as expected on the thread_local registry."
+    },
+    "C3_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Changed SpriteNode tag storage to a shared mutex-protected bounded table with acquire/release PublishedCount fast gate, monotonic registration serials, queue-start cutoff, and queue-end stale cleanup that preserves concurrently produced next-frame tags. ProducerToken remains diagnostic metadata; queue cursor/CurrentScope remain thread_local. Generic fallback stays ScreenOverlay2D."
+    },
+    "C4_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 3edab9f54806b2ef4141546b3537cfa75c280af6 passed DX9Ex Active 37498273170 policy/host/game/full-chain/package and HUD Inspector 37498273068 build/static."
+    },
+    "C5_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "3edab9f54806b2ef4141546b3537cfa75c280af6",
+      "validation_bearing_result_sha": "3edab9f54806b2ef4141546b3537cfa75c280af6",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C6_PACKAGE": {
+      "status": "COMPLETE",
+      "artifact_id": 11428802385,
+      "digest": "sha256:a74ab32fe6faff05bd76889f487d0835fd4e859c65e3fa2bb0582f6548e5020f"
+    },
+    "C7_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "changed_paths": [
+      ".github/workflows/vr-dx9ex-active.yml",
+      "src/vr/game/render_semantics.hpp",
+      "tools/verify_vr_cross_thread_semantic_registry.py"
+    ],
+    "regression_keys": [
+      "VR-REGRESSION-DIVERGED-HUD-CADENCE-20261005",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001",
+      "VR-R51-VEHICLE-RANK-ANCHOR-001"
+    ],
+    "red_validation": {
+      "sha": "52e3202c1fe640f62e695e2712a10f12562a1104",
+      "dx9ex_active_run_id": 37498045406,
+      "policy_job_id": 112387556159,
+      "result": "EXPECTED_FAILURE"
+    },
+    "green_validation": {
+      "sha": "3edab9f54806b2ef4141546b3537cfa75c280af6",
+      "dx9ex_active_run_id": 37498273170,
+      "policy_job_id": 112388323867,
+      "host_job_id": 112388544823,
+      "game_job_id": 112388544744,
+      "full_chain_compile_job_id": 112388544808,
+      "package_job_id": 112390845153,
+      "hud_inspector_run_id": 37498273068,
+      "hud_build_job_id": 112388321916,
+      "hud_static_job_id": 112388322401,
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11428802385,
+      "digest": "sha256:a74ab32fe6faff05bd76889f487d0835fd4e859c65e3fa2bb0582f6548e5020f"
+    },
+    "scope_boundary": "Semantic lifetime only. ProjectedMarkerInfo/Calc3D2D rank-rival anchor payload remains a separate unimplemented root-cause unit; no runtime visual success is claimed.",
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR session was executed for the 00485 exact build."
+    },
+    "issue14_comment_id": 6021152212,
+    "issue13_comment_id": 6021157673
+  },
+  "next_action": "Quest3/VDXR CORRECTNESS should verify exact ScreenHud/WorldBillboard/ProducerToken observations return. If semantic lifetime passes but rank/rival markers remain detached, restore the proven ProjectedMarkerInfo/Calc3D2D view-space anchor payload as the next separate bounded task. Keep cadence/fence authority unchanged until the visual path is restored and retested.",
+  "started_at_kst": "2026-10-07T01:41:00+09:00",
+  "completed_at_kst": "2026-10-07T01:52:31+09:00"
+}
