@@ -6715,7 +6715,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 05:47 KST",
+  "updated_at_kst": "2026-10-07 06:16 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7261,33 +7261,34 @@
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "latest_b_manual_visual_rework": {
-    "timestamp_kst": "2026-10-07 05:47 KST",
-    "run": "B223",
-    "queue_index": 112,
-    "asset": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+    "timestamp_kst": "2026-10-07 06:16 KST",
+    "run": "B224",
+    "queue_index": 140,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
     "trigger": "NEWER_8_STEP_PRE_INGAME_VISUAL_FALSE_NEGATIVE",
-    "prior_c_pass": "C127_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
-    "source_sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
-    "before_sha256": "0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80",
-    "candidate_sha256": "7714bd71b38bd38852ce6497695d872d7ba6b669fd2c6efdb43ba87dd1f3734d",
+    "prior_c_pass": "C140_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "source_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+    "before_sha256": "ecc7efdde172f410c85207ecdc5bbfd5bac95c753341763ad6afb9a6a7f1b3f2",
+    "candidate_sha256": "588eb51d554c8adeef850bd53d665ed9f4a4d1c3389b9e67dcdd4be9f4dd635c",
     "defects": [
-      "MULTI_LINE_TEXT_HIERARCHY_UNDERSIZED",
-      "SOURCE_RELATIVE_WIDTH_TOO_WEAK"
+      "FOUR_WHITE_HEADINGS_VISIBLY_UNDERSIZED",
+      "KEY_WORD_VISIBLY_UNDERSIZED",
+      "SOURCE_RELATIVE_HIERARCHY_TOO_WEAK"
     ],
     "machine_qa": {
-      "bbox_size": "2/2 PASS",
-      "decoded_row_gap": 14,
+      "bbox_size": "5/5 PASS",
       "candidate_outside": 0,
       "alpha_outside": 0,
-      "source_residue": 0,
+      "protected_visible_changed": 0,
+      "enter_icon_changed": 0,
       "localized_overlap": 0,
       "raw_orientation": "mirror_y"
     },
-    "controller_visual_qa": "PASS_SOURCE_C127_B223_READABLE_AND_RAW",
-    "status": "B223_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+    "controller_visual_qa": "PASS_SOURCE_C140_B224_READABLE_AND_RAW",
+    "status": "B224_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_B/20261007-B-MANUALQA223-D41D0B1/B223_D41D0B1_REPORT.json",
-    "controller": "localization/graphics/role_B/20261007-B-MANUALQA223-D41D0B1/B223_CONTROLLER_FINAL_QA.json"
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA224-31C58963/B224_31C58963_REPORT.json",
+    "controller": "localization/graphics/role_B/20261007-B-MANUALQA224-31C58963/B224_CONTROLLER_FINAL_QA.json"
   },
   "latest_c_pre_ingame_export": {
     "timestamp_kst": "2026-10-07T04:07:12+09:00",

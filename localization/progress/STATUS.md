@@ -2158,3 +2158,9 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - Prior Korean 572/580px widths were materially undersized against 911/858px English source lines. B223 restores both to ~80% source width with the shared 83px Black white/navy/right-slanted family.
 - Decoded 729x96 / 685x96, positive margins, row gap 14px; 2/2 bbox+size PASS; outside/alpha/residue/overlap=0; DXT5 header/raw mirror_y PASS. Controller readable/RAW visual QA PASS.
 - Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+### B224 q140 31C58963 hierarchy rework — 2026-10-07 06:16 KST
+- q140 31C58963: C140 ecc7efdde172... -> B224 588eb51d554c....
+- White heading widths 539/448/364/172px -> 630/560/499/279px; KEY 49px -> 82px. Source sizes remain hard ceilings and source-left/compound family geometry is preserved.
+- 5/5 bbox/size/positive-margin; outside/alpha/protected/Enter-icon/overlap=0; exact RGBA32 header/raw mirror_y PASS; clean/final validators PASS. Controller readable/RAW visual QA PASS.
+- Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

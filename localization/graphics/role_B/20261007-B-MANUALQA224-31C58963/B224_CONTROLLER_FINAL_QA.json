@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B224",
+  "timestamp_kst": "2026-10-07 06:16 KST",
+  "queue_index": 140,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+  "trigger": "NEWER_8_STEP_PRE_INGAME_VISUAL_FALSE_NEGATIVE",
+  "prior_c_pass": "C140_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "source_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+  "prior_candidate_sha256": "ecc7efdde172f410c85207ecdc5bbfd5bac95c753341763ad6afb9a6a7f1b3f2",
+  "candidate_sha256": "588eb51d554c8adeef850bd53d665ed9f4a4d1c3389b9e67dcdd4be9f4dd635c",
+  "worker_run": {
+    "workflow_run_id": 37532335400,
+    "worker_commit": "c34260186192f722aa2402f93dd176f13b7532b9",
+    "result": "SUCCESS"
+  },
+  "evidence": {
+    "readable": "localization/graphics/role_B/20261007-B-MANUALQA224-31C58963/B224_31C_SOURCE_C140_NEW_READABLE.jpg",
+    "row_contact": "localization/graphics/role_B/20261007-B-MANUALQA224-31C58963/B224_31C_ROW_CONTACT_2X.jpg",
+    "raw": "localization/graphics/role_B/20261007-B-MANUALQA224-31C58963/B224_31C_SOURCE_NEW_RAW.jpg",
+    "clean_validation": "localization/graphics/role_B/20261007-B-MANUALQA224-31C58963/B224_CLEAN_PLATE_VALIDATION.json",
+    "final_validation": "localization/graphics/role_B/20261007-B-MANUALQA224-31C58963/B224_FINAL_MASK_VALIDATION.json"
+  },
+  "machine_qa": {
+    "bbox_source_size_positive_margin": "5/5 PASS",
+    "candidate_changes_outside_selected_source_bboxes": 0,
+    "alpha_changes_outside_selected_source_bboxes": 0,
+    "protected_visible_changed": 0,
+    "enter_icon_changed": 0,
+    "localized_overlap_pixels": 0,
+    "header_128_exact": true,
+    "raw_mode": "RGBA",
+    "raw_orientation": "mirror_y",
+    "roundtrip": "PASS"
+  },
+  "rows": [
+    {
+      "key": "select_stage",
+      "source": "SELECT STAGE",
+      "korean": "스테이지 선택",
+      "source_size": [
+        833,
+        98
+      ],
+      "prior_size": [
+        539,
+        94
+      ],
+      "final_size": [
+        630,
+        94
+      ],
+      "margins": [
+        2,
+        201,
+        2,
+        2
+      ],
+      "width_source_ratio": 0.7563
+    },
+    {
+      "key": "select_race",
+      "source": "SELECT RACE",
+      "korean": "레이스 선택",
+      "source_size": [
+        780,
+        98
+      ],
+      "prior_size": [
+        448,
+        94
+      ],
+      "final_size": [
+        560,
+        94
+      ],
+      "margins": [
+        2,
+        218,
+        2,
+        2
+      ],
+      "width_source_ratio": 0.7179
+    },
+    {
+      "key": "select_mode",
+      "source": "SELECT MODE",
+      "korean": "모드 선택",
+      "source_size": [
+        808,
+        98
+      ],
+      "prior_size": [
+        364,
+        94
+      ],
+      "final_size": [
+        499,
+        94
+      ],
+      "margins": [
+        3,
+        306,
+        2,
+        2
+      ],
+      "width_source_ratio": 0.6188
+    },
+    {
+      "key": "showroom",
+      "source": "SHOWROOM",
+      "korean": "쇼룸",
+      "source_size": [
+        645,
+        95
+      ],
+      "prior_size": [
+        172,
+        91
+      ],
+      "final_size": [
+        279,
+        91
+      ],
+      "margins": [
+        3,
+        363,
+        2,
+        2
+      ],
+      "width_source_ratio": 0.4341
+    },
+    {
+      "key": "key_word",
+      "source": "KEY",
+      "korean": "키",
+      "source_size": [
+        126,
+        62
+      ],
+      "prior_size": [
+        49,
+        58
+      ],
+      "final_size": [
+        82,
+        58
+      ],
+      "margins": [
+        22,
+        22,
+        2,
+        2
+      ],
+      "width_source_ratio": 0.6508
+    }
+  ],
+  "controller_visual_qa": {
+    "result": "PASS",
+    "observations": [
+      "PRE_INGAME #017 showed a numeric false negative: C140 kept near-source text height but the four white Korean headings and yellow KEY word read materially weaker/smaller in the source family because their horizontal hierarchy collapsed.",
+      "B224 restores the four white headings from 539/448/364/172px to 630/560/499/279px and KEY from 49px to 82px, while preserving source-left heading anchors, source height, white heavy family and yellow/black compound family.",
+      "The wider forms remain readable without obvious over-stretching at practical scale; SHOWROOM remains the shortest Korean label by semantics but is materially larger than C140 rather than a caption-like remnant.",
+      "SOURCE/C140/B224 readable and SOURCE/B224 RAW mirror-Y evidence show no source residue, clipping, broken Hangul, overlap, protected-art change, Enter-icon damage, seam/halo or orientation regression."
+    ]
+  },
+  "ordered_generation_gate": {
+    "english_removal_plate_restoration": "PASS",
+    "source_matching_slant_direction": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "no_unnecessary_undersizing": "PASS",
+    "source_faithful_weight_outline_shadow": "PASS",
+    "no_clipped_pixels": "PASS",
+    "protected_graphics_clearance": "PASS",
+    "flip_y_and_raw": "PASS",
+    "immediate_readability_vs_english": "PASS"
+  },
+  "decision": "B224_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
