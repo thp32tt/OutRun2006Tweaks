@@ -143,6 +143,19 @@ SIGNATURE_SHADER_RE = re.compile(
     r"psVersion=0x(?P<psVersion>[0-9A-Fa-f]+),"
     r"psHash=0x(?P<psHash>[0-9A-Fa-f]+)\]"
 )
+R276_SEMANTIC_PLAN_RE = re.compile(
+    r"VR DX11 R276 semanticTranslationPlan signature#(?P<signature>\d+): "
+    r"exact=(?P<exact>[01]) snapshot=0x(?P<snapshot>[0-9A-Fa-f]+) "
+    r"targetVS=0x(?P<targetVS>[0-9A-Fa-f]+) "
+    r"targetPS=0x(?P<targetPS>[0-9A-Fa-f]+) "
+    r"revision=0x(?P<revision>[0-9A-Fa-f]+) "
+    r"contract=0x(?P<contract>[0-9A-Fa-f]+)"
+)
+R275_SEMANTIC_RECEIPT_RE = re.compile(
+    r"VR DX11 R275 translatedSemanticReceipt signature#(?P<signature>\d+): "
+    r"exact=(?P<exact>[01]) objectReady=(?P<objectReady>[01]) "
+    r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
+)
 DECL_RE = re.compile(
     r"VR DX11 R72 decl signature#(?P<signature>\d+) elem#(?P<element>\d+): "
     r"stream=(?P<stream>\d+) offset=(?P<offset>\d+) type=(?P<type>\d+) "
@@ -421,6 +434,12 @@ def summarize_programmable_shader_inventory(
     pair_map: dict[tuple[int, int, int, int, int, int], dict] = {}
     identity_missing: list[dict] = []
     identity_blocking: list[dict] = []
+    semantic_plan_missing: list[dict] = []
+    semantic_receipt_missing: list[dict] = []
+    semantic_plan_inexact: list[dict] = []
+    r242_object_ownership_missing: list[dict] = []
+    semantic_plan_exact_signatures = 0
+    semantic_receipt_exact_signatures = 0
     records_with_identity = 0
     programmable_signatures = 0
 
@@ -474,7 +493,43 @@ def summarize_programmable_shader_inventory(
                 "TranslationImplemented": False,
             },
         )
+        plan = signature.get("semantic_translation_plan")
+        receipt = signature.get("translated_semantic_receipt")
+        missing_prerequisite = None
+        if plan is None:
+            semantic_plan_missing.append(ref)
+            missing_prerequisite = "R276_SEMANTIC_PLAN_EVIDENCE"
+        elif not plan["exact"]:
+            semantic_plan_inexact.append(ref)
+            missing_prerequisite = "R276_SEMANTIC_PLAN_EXACTNESS"
+        else:
+            semantic_plan_exact_signatures += 1
+
+        if receipt is None:
+            semantic_receipt_missing.append(ref)
+            if missing_prerequisite is None:
+                missing_prerequisite = "R275_TRANSLATED_SEMANTIC_RECEIPT"
+        else:
+            if receipt["exact"]:
+                semantic_receipt_exact_signatures += 1
+            elif not receipt["object_ready"] and plan is not None and plan["exact"]:
+                r242_object_ownership_missing.append(ref)
+                if missing_prerequisite is None:
+                    missing_prerequisite = "R242_TRANSLATED_OBJECT_OWNERSHIP"
+            elif missing_prerequisite is None:
+                missing_prerequisite = "R275_TRANSLATED_SEMANTIC_RECEIPT_EXACTNESS"
+
         pair["SignatureRefs"].append(ref)
+        pair.setdefault("SemanticTranslationEvidence", []).append(
+            {
+                "SignatureRef": ref,
+                "Plan": plan,
+                "Receipt": receipt,
+                "MissingPrerequisite": missing_prerequisite,
+                "DiagnosticOnly": True,
+                "ActivationProof": False,
+            }
+        )
 
     pairs = [pair_map[key] for key in sorted(pair_map)]
     evidence_coverage_complete = bool(
@@ -483,6 +538,12 @@ def summarize_programmable_shader_inventory(
         and not identity_missing
         and not identity_blocking
     )
+    semantic_evidence_coverage_complete = bool(
+        evidence_coverage_complete
+        and programmable_signatures > 0
+        and not semantic_plan_missing
+        and not semantic_receipt_missing
+    )
     return {
         "CurrentSignatureRecords": len(signatures),
         "CurrentSignatureRecordsWithShaderIdentity": records_with_identity,
@@ -490,6 +551,13 @@ def summarize_programmable_shader_inventory(
         "CurrentUniqueShaderPairs": len(pairs),
         "ShaderIdentityMissingSignatures": identity_missing,
         "ShaderIdentityBlockingSignatures": identity_blocking,
+        "SemanticPlanEvidenceMissingSignatures": semantic_plan_missing,
+        "SemanticPlanInexactSignatures": semantic_plan_inexact,
+        "SemanticReceiptEvidenceMissingSignatures": semantic_receipt_missing,
+        "R242ObjectOwnershipMissingSignatures": r242_object_ownership_missing,
+        "SemanticPlanExactSignatures": semantic_plan_exact_signatures,
+        "SemanticReceiptExactSignatures": semantic_receipt_exact_signatures,
+        "SemanticEvidenceCoverageComplete": semantic_evidence_coverage_complete,
         "EvidenceLimitedBySignatureDetailCap": detail_cap_saturated,
         "EvidenceCoverageComplete": evidence_coverage_complete,
         "TranslationImplemented": False,
@@ -519,6 +587,8 @@ def main() -> int:
     # startup epoch so separate files and accumulated process restarts cannot
     # overwrite an unrelated signature#N record.
     signatures: dict[SignatureKey, dict] = {}
+    semantic_translation_plans: dict[SignatureKey, dict] = {}
+    translated_semantic_receipts: dict[SignatureKey, dict] = {}
     declarations: dict[SignatureKey, list[dict]] = {}
     fixed_function: dict[SignatureKey, list[dict]] = {}
     fixed_function_texture_factors: dict[SignatureKey, dict] = {}
@@ -606,6 +676,39 @@ def main() -> int:
                 summary["source_log"] = source_log
                 summaries.append(summary)
                 latest_summary_line_by_log[source_log] = line_number
+                continue
+
+            match = R276_SEMANTIC_PLAN_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                signature_key = (source_log, startup_epoch, signature_id)
+                semantic_translation_plans[signature_key] = {
+                    "exact": bool(int(data["exact"])),
+                    "snapshot": int(data["snapshot"], 16),
+                    "snapshot_hex": "0x" + data["snapshot"].upper(),
+                    "target_vertex_semantic_hash": int(data["targetVS"], 16),
+                    "target_vertex_semantic_hash_hex": "0x" + data["targetVS"].upper(),
+                    "target_pixel_semantic_hash": int(data["targetPS"], 16),
+                    "target_pixel_semantic_hash_hex": "0x" + data["targetPS"].upper(),
+                    "translator_revision_hash": int(data["revision"], 16),
+                    "translator_revision_hash_hex": "0x" + data["revision"].upper(),
+                    "semantic_contract_hash": int(data["contract"], 16),
+                    "semantic_contract_hash_hex": "0x" + data["contract"].upper(),
+                }
+                continue
+
+            match = R275_SEMANTIC_RECEIPT_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                signature_key = (source_log, startup_epoch, signature_id)
+                translated_semantic_receipts[signature_key] = {
+                    "exact": bool(int(data["exact"])),
+                    "object_ready": bool(int(data["objectReady"])),
+                    "snapshot": int(data["snapshot"], 16),
+                    "snapshot_hex": "0x" + data["snapshot"].upper(),
+                }
                 continue
 
             match = SIGNATURE_RE.search(line)
@@ -740,6 +843,12 @@ def main() -> int:
                 fixed_function.setdefault(signature_key, []).append(parsed)
 
     for signature_key, signature in signatures.items():
+        signature["semantic_translation_plan"] = (
+            semantic_translation_plans.get(signature_key)
+        )
+        signature["translated_semantic_receipt"] = (
+            translated_semantic_receipts.get(signature_key)
+        )
         signature["declaration"] = sorted(
             declarations.get(signature_key, []), key=lambda item: item["element"]
         )

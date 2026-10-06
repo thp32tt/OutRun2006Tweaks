@@ -2076,7 +2076,8 @@ namespace outrun::vr::dx11
                         sig.shaderSourceMappingHandoffExact ? 1 : 0,
                         sig.shaderSourceMappingHandoffSnapshotToken);
                     spdlog::info(
-                        "VR DX11 R276 semanticTranslationPlan: exact={} snapshot=0x{:016X} targetVS=0x{:016X} targetPS=0x{:016X} revision=0x{:016X} contract=0x{:016X}",
+                        "VR DX11 R276 semanticTranslationPlan signature#{}: exact={} snapshot=0x{:016X} targetVS=0x{:016X} targetPS=0x{:016X} revision=0x{:016X} contract=0x{:016X}",
+                        unique,
                         sig.shaderSemanticTranslationPlanExact ? 1 : 0,
                         sig.shaderSemanticTranslationPlanSnapshotToken,
                         sig.shaderTranslatedVertexSemanticHash,
@@ -2084,7 +2085,8 @@ namespace outrun::vr::dx11
                         sig.shaderTranslatorRevisionHash,
                         sig.shaderTranslationSemanticContractHash);
                     spdlog::info(
-                        "VR DX11 R275 translatedSemanticReceipt: exact={} objectReady={} snapshot=0x{:016X}",
+                        "VR DX11 R275 translatedSemanticReceipt signature#{}: exact={} objectReady={} snapshot=0x{:016X}",
+                        unique,
                         sig.shaderTranslatedSemanticReceiptExact ? 1 : 0,
                         sig.shaderTranslatedSemanticReceiptObjectReady ? 1 : 0,
                         sig.shaderTranslatedSemanticReceiptSnapshotToken);

@@ -10878,6 +10878,37 @@ def main() -> None:
             + ", ".join(missing_r277_programmable_semantic_census)
         )
 
+    r278_programmable_semantic_correlation_contract = [
+        ("VR DX11 R276 semanticTranslationPlan signature#{}:",
+         RUNTIME_CENSUS, "R278 R276 evidence is signature-attributable"),
+        ("VR DX11 R275 translatedSemanticReceipt signature#{}:",
+         RUNTIME_CENSUS, "R278 R275 evidence is signature-attributable"),
+        ("R276_SEMANTIC_PLAN_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R278 analyzer parses R276 plan identity"),
+        ("R275_SEMANTIC_RECEIPT_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R278 analyzer parses R275 receipt identity"),
+        ("R242ObjectOwnershipMissingSignatures",
+         DX11_CENSUS_ANALYZER, "R278 analyzer classifies exact R242 ownership gap"),
+        ("SemanticTranslationEvidence",
+         DX11_CENSUS_ANALYZER, "R278 programmable inventory carries per-signature evidence"),
+        ("R242_TRANSLATED_OBJECT_OWNERSHIP",
+         DX11_CENSUS_ANALYZER, "R278 explicit remaining prerequisite classification"),
+        ("r278_programmable_semantic",
+         DX11_CENSUS_ANALYZER_TEST, "R278 per-signature correlation regression"),
+        ("NativeDrawPathActivationAllowed",
+         DX11_CENSUS_ANALYZER_TEST, "R278 regression keeps activation disabled"),
+    ]
+    missing_r278_programmable_semantic_correlation = [
+        meaning for token, source, meaning
+        in r278_programmable_semantic_correlation_contract
+        if token not in source
+    ]
+    if missing_r278_programmable_semantic_correlation:
+        raise SystemExit(
+            "DX11 R278 programmable semantic correlation drift: "
+            + ", ".join(missing_r278_programmable_semantic_correlation)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),

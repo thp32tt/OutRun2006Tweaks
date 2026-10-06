@@ -1833,6 +1833,56 @@ def main() -> int:
     assert r211_raster_semantics["UnsupportedTotalLatest"] == 2
     assert r211_raster_semantics["NativeDrawPathActivationAllowed"] is False
 
+    r278_programmable_semantic = run_case(
+        "VR DX11 R276 semanticTranslationPlan signature#1: exact=1 "
+        "snapshot=0x1111111111111111 targetVS=0x2222222222222222 "
+        "targetPS=0x3333333333333333 revision=0x4444444444444444 "
+        "contract=0x5555555555555555\n"
+        "VR DX11 R275 translatedSemanticReceipt signature#1: exact=0 "
+        "objectReady=0 snapshot=0x0000000000000000\n"
+        "VR DX11 R85 signature#1: primitive=4 fixedFn=0 fvf=0x00000000 "
+        "decl=0 declHash=0x0000000000000000 declElems=0 "
+        "inputLayout[exact=0,elements=0,fvfExact=0,fvfPending=0] "
+        "shader[introspection=1,mixed=0,exact=0,vsPresent=1,vsBytes=16,"
+        "vsVersion=0xFFFE0300,vsHash=0xAAAAAAAAAAAAAAAA,psPresent=1,"
+        "psBytes=16,psVersion=0xFFFF0300,psHash=0xBBBBBBBBBBBBBBBB] "
+        "ffpCoverage[exact=0]\n"
+        "VR DX11 R120 census: samples=1 exact=0 fixedFn=0 programmable=1 "
+        "topologyUnsupported=0 signatures=1 declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,depthUnsupported=0] "
+        "shaderReadiness[introspectionFailure=0,mixedPair=0,translationExact=0,"
+        "fixedFunctionPending=0,programmablePending=1] "
+        "programmableSemantic[planExact=1,planPending=0,receiptExact=0,receiptPending=1] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,stencil=0,"
+        "fog=0,lighting=0,srgb=0,fill=0,blend=0,depthCmp=0,cull=0]\n"
+    )
+    r278_inventory = r278_programmable_semantic["ActivationEvidence"][
+        "ProgrammableShaderInventory"
+    ]
+    assert r278_inventory["CurrentProgrammableSignatures"] == 1
+    assert r278_inventory["CurrentUniqueShaderPairs"] == 1
+    assert r278_inventory["SemanticPlanExactSignatures"] == 1
+    assert r278_inventory["SemanticReceiptExactSignatures"] == 0
+    assert r278_inventory["SemanticEvidenceCoverageComplete"] is True
+    assert r278_inventory["R242ObjectOwnershipMissingSignatures"] == [
+        {"source_log": "runtime.log", "startup_epoch": 0, "id": 1}
+    ]
+    r278_pair_evidence = r278_inventory["Pairs"][0]["SemanticTranslationEvidence"][0]
+    assert r278_pair_evidence["Plan"]["exact"] is True
+    assert (
+        r278_pair_evidence["Plan"]["target_vertex_semantic_hash"]
+        == 0x2222222222222222
+    )
+    assert (
+        r278_pair_evidence["Plan"]["target_pixel_semantic_hash"]
+        == 0x3333333333333333
+    )
+    assert r278_pair_evidence["Receipt"]["exact"] is False
+    assert r278_pair_evidence["Receipt"]["object_ready"] is False
+    assert r278_pair_evidence["MissingPrerequisite"] == "R242_TRANSLATED_OBJECT_OWNERSHIP"
+    assert r278_pair_evidence["ActivationProof"] is False
+    assert r278_programmable_semantic["NativeDrawPathActivationAllowed"] is False
+
     r277_programmable_semantic = run_case(
         "VR DX11 R120 census: samples=6 exact=0 fixedFn=0 programmable=6 "
         "topologyUnsupported=0 signatures=2 declSamples=0 indexedSamples=0 texturedSamples=0 "
