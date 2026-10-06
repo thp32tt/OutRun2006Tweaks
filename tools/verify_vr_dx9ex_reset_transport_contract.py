@@ -1244,12 +1244,48 @@ require_order(
     "::xrCreateSwapchain(session, &create, &swapchain.handle)",
 )
 
+sbs_parent_prepare = body(host_sbs, "bool PrepareForParentSessionDestroy() noexcept")
+require_order(
+    sbs_parent_prepare,
+    "R19 parent-session GPU completion proof",
+    "if (handle == XR_NULL_HANDLE || !gpuWorkSubmitted)",
+    "return true;",
+    "if (!WaitForSwapchainGpuIdleBeforeDestroy())",
+    "return false;",
+    "gpuWorkSubmitted = false;",
+    "return true;",
+)
+
+sbs_parent_forget = body(host_sbs, "void ForgetAfterParentSessionDestroy() noexcept")
+require(
+    sbs_parent_forget,
+    "R19 parent-success local ownership release",
+    "handle = XR_NULL_HANDLE;",
+    "rtvs.clear();",
+    "images.clear();",
+    "generation = 0;",
+    "committedGeneration = 0;",
+    "gpuWorkSubmitted = false;",
+)
+
 sbs_destroy_session = body(host_sbs, "inline XrResult XRAPI_CALL DestroySession(XrSession session)")
+forbid(
+    sbs_destroy_session,
+    "R19 parent destroy must not discard local state before parent result",
+    "ResetAll(true);",
+)
 require_order(
     sbs_destroy_session,
-    "R19 parent-session child cleanup fallback",
-    "ResetAll(true);",
-    "OutRunVrFinalTest::DestroySession(session)",
+    "R19 transactional parent-session teardown",
+    "Projection.PrepareForParentSessionDestroy();",
+    "Theater.PrepareForParentSessionDestroy();",
+    "const XrResult result = OutRunVrFinalTest::DestroySession(session);",
+    "if (XR_SUCCEEDED(result))",
+    "Projection.ForgetAfterParentSessionDestroy();",
+    "Theater.ForgetAfterParentSessionDestroy();",
+    "ViewSpace = XR_NULL_HANDLE;",
+    "ResetCapture();",
+    "return result;",
 )
 
 # R24's display-only soft grace intentionally reads the committed snapshot
