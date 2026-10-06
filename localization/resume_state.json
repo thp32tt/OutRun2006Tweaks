@@ -1,5 +1,5 @@
 {
-  "schema_version": 104,
+  "schema_version": 105,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B194 completed index214 BF229CF4 START/GOAL as exact-HD DXT5 candidate 3d292729007c... . First numeric-PASS worker draft 869b5fef... was controller-rejected because the START sign mask absorbed nearby traffic-light scene red and visibly intruded into protected art. Final scene-red exclusion passes 2/2 bbox/size/margins, zero decoded outside/alpha/introduced-visible, clean residue=0, final source-residue color=0, and SOURCE/CLEAN/FINAL + raw mirror_y visual QA. Pending independent C/in-game; do not repeat rejected B194 drafts. Next normal B zoom_review is index166 5EBD7FE8; do not duplicate index62 while A/manual reconstruction work owns it.",
     "A119R resolved index99 4F68708E strict DXT5 HOLD. A117/A119 showed the old threshold boxes omitted 606 low-alpha source-effect pixels; exact complete multiline bbox [514,37,1614,217] enables constrained boundary-safe BC3. A119 numeric PASS bd7185f454abfd326e7609eb4826c1a22388617824cd25e00c211e73b648f889 was controller-rejected for shared-line style mismatch (54px vs 57px). A119R candidate 70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612: both lines share 61px Bold/4px navy stroke/7px glow/0.24 shear; hard bbox and 2/2 line-core bbox/size/positive margins PASS, changed/alpha outside=0, source residue=0, overlap=0, 5px row gap; SOURCE/CLEAN/FINAL + raw mirror_y visual PASS. Pending independent C + in-game; do not repeat unless returned REWORK.",
     "B191 completed index172 6C9B3611 START/GOAL as a native exact-HD Korean candidate 963445a44888...; producer machine + controller visual QA PASS, pending independent C and in-game. Do not repeat B182-B190 superseded attempts. Next normal B zoom_review is index166 5EBD7FE8; index62 remains manual reconstruction required.",
     "A118 resolved index119 F6811E94 strict DXT5 hold: Time Attack Mode -> 타임 어택 모드, candidate af938e04d2555e14bc646d22be0f2ef0e5112e899c3a2b646931659ab680a6b7; 1/1 bbox/size/positive-margin PASS, decoded changed/alpha/protected outside=0, source residue=0, controller SOURCE/CLEAN/FINAL + raw mirror_y PASS. Pending independent C + in-game; do not repeat unless returned REWORK. Index99 was subsequently resolved by A119R; see the newer A119R action.",
@@ -5870,5 +5871,20 @@
     "report": "localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_4F68708E_REPORT.json",
     "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
+  },
+  "b194_production": {
+    "timestamp_kst": "2026-10-06T14:58:00+09:00",
+    "run": "B194",
+    "queue_index": 214,
+    "asset": "BF229CF4",
+    "classification": "ZOOM_REVIEW_TO_LOCALIZE_TEXT",
+    "candidate_sha256": "3d292729007cacb909782ad6c38fe463ba1ff4705772c69f930d4a30f14a839b",
+    "worker_report": "localization/graphics/role_B/20261006-B-PRODUCTION194-BF229CF4-START-GOAL/B194_BF229CF4_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION194-BF229CF4-START-GOAL/B194_CONTROLLER_SELF_QA.json",
+    "first_visual_fail_sha256": "869b5fefc452578228402c48203f5302a61c1119ea2b22336e952c4ccf95c381",
+    "final_controller_visual_qa": "PASS_AFTER_SCENE_RED_INTRUSION_REWORK",
+    "status": "STATIC_PASS_PENDING_C",
+    "runtime_validation": "UNTESTED",
+    "next_even_zoom_review_index": 166
   }
 }

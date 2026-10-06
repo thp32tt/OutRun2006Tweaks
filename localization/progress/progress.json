@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T12:41:22+09:00",
+  "updated_at_kst": "2026-10-06T14:58:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A119R resolved the final A strict DXT5 HOLD index99 4F68708E. Complete decoded source effect bbox [514,37,1614,217] supersedes under-covered threshold boxes (606 source pixels omitted). A119 numeric PASS bd7185f454ab... was controller-rejected for cross-line style mismatch; A119R candidate 70970da7653b... uses one shared 61px white/navy/glow/shear family. Machine zero-pixel gates + SOURCE/CLEAN/FINAL/raw controller visual PASS; pending independent C/in-game. A primary odd unfinished production HOLD is now exhausted unless C/new in-game evidence returns REWORK.",
+  "next_checkpoint": "B194 promoted index214 BF229CF4 from zoom_review to localize_text and produced exact-HD DXT5 candidate 3d292729007c... after controller visual QA rejected the first numeric-PASS scene-red intrusion draft. Final 2/2 bbox/size/positive margins PASS; decoded outside/alpha/introduced-visible=0, clean residue=0, final source-residue color=0, controller SOURCE/CLEAN/FINAL+raw PASS. Pending independent C; runtime untested. Next normal even zoom_review is index166 5EBD7FE8; index62 is concurrently owned by A/manual reconstruction work and is not duplicated.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -155,11 +155,11 @@
   "graphics": {
     "total_dds": 243,
     "visually_reviewed": 243,
-    "localize_text": 93,
+    "localize_text": 94,
     "preserve_brand_song_credit": 1,
     "font_pipeline": 9,
     "hangul_name_entry": 1,
-    "zoom_review": 33,
+    "zoom_review": 32,
     "no_localization": 74,
     "work_queue_total": 137,
     "work_queue_file": "localization/graphics/asset_queue.csv",
@@ -181,7 +181,7 @@
     },
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
-    "artwork_plan_assets": 114,
+    "artwork_plan_assets": 115,
     "artwork_plan_segments": 723,
     "artwork_proof_candidates": 7,
     "simple6_package": {
@@ -1916,7 +1916,7 @@
       "status": "A_PRIMARY_ODD_ZOOM_REVIEW_SHARD_EXHAUSTED_2_NEW_CANDIDATES_PENDING_C",
       "next_normal_a_blocked_odd": []
     },
-    "current_blocked_zoom_review": 12,
+    "current_blocked_zoom_review": 10,
     "b173_6ab5cee_alias": {
       "timestamp_kst": "2026-10-06T08:17:29+09:00",
       "run": "20261006-B-PRODUCTION173-JENN-ALIAS",
@@ -2266,6 +2266,31 @@
       "report": "localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_4F68708E_REPORT.json",
       "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_CONTROLLER_SELF_QA.json",
       "runtime_validation": "UNTESTED"
+    },
+    "b194_production": {
+      "timestamp_kst": "2026-10-06T14:58:00+09:00",
+      "run": "B194",
+      "queue_index": 214,
+      "asset": "BF229CF4",
+      "classification": "ZOOM_REVIEW_TO_LOCALIZE_TEXT",
+      "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+      "candidate_sha256": "3d292729007cacb909782ad6c38fe463ba1ff4705772c69f930d4a30f14a839b",
+      "worker_report": "localization/graphics/role_B/20261006-B-PRODUCTION194-BF229CF4-START-GOAL/B194_BF229CF4_REPORT.json",
+      "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION194-BF229CF4-START-GOAL/B194_CONTROLLER_SELF_QA.json",
+      "machine_qa": {
+        "bbox_size_positive_margin": "2/2 PASS",
+        "clean_source_residue": 0,
+        "changed_outside_allowed_blocks": 0,
+        "alpha_changed_outside_allowed_blocks": 0,
+        "introduced_visible_outside_allowed_blocks": 0,
+        "final_source_residue_color": 0,
+        "localized_overlap": 0
+      },
+      "controller_visual_qa": "PASS_AFTER_SCENE_RED_INTRUSION_REWORK",
+      "rejected_intermediate": "fd34a6ad worker output candidate 869b5fef... numeric PASS but controller visual FAIL: START red-body mask included nearby traffic-light red and painted a red bar into protected art.",
+      "status": "B194_STATIC_PASS_PENDING_C",
+      "runtime_validation": "UNTESTED",
+      "next_even_zoom_review_index": 166
     }
   },
   "data_build": {

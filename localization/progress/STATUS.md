@@ -1812,3 +1812,9 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Mandatory controller SOURCE/CLEAN/FINAL, per-row high zoom and raw mirror_y review: PASS. No mixed low-resolution text, broken Hangul, English residue, double drawing, clipping, layer collision, foreign-image intrusion or source-family mismatch.
 - State: `A119R_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME`; runtime validation UNTESTED. A's former index99 strict HOLD is resolved; do not repeat unless C/new in-game evidence returns REWORK. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_4F68708E_REPORT.json`; `localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_CONTROLLER_SELF_QA.json`.
+
+## 2026-10-06T14:58:00+09:00 — B194 index214 BF229CF4
+- BF229CF4: START -> 출발, GOAL -> 골; exact-HD 2048x2048 DXT5 candidate `3d292729007cacb909782ad6c38fe463ba1ff4705772c69f930d4a30f14a839b`.
+- First worker candidate `869b5fef...` passed numeric gates but controller visual QA rejected a red bar into the traffic-light/protected scene. B194 final excludes scene-red components from the sign body; no weak draft was promoted.
+- Final producer machine QA: 2/2 bbox/size/positive margins PASS; changed/alpha/introduced-visible outside allowed blocks=0; clean source residue=0; final source-residue color=0; overlap=0. Controller SOURCE/CLEAN/FINAL + raw mirror_y visual QA PASS.
+- Status: B194_STATIC_PASS_PENDING_C; RUNTIME_VALIDATION=UNTESTED. Queue now 94 localize_text / 32 zoom_review; blocked zoom_review=10. Next normal B zoom-review: index166. VR/FFB/DX11/DXVK untouched.

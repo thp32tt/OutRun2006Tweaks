@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PRODUCTION194-BF229CF4-START-GOAL",
+  "timestamp_kst": "2026-10-06T14:58:00+09:00",
+  "queue_index": 214,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "classification": {
+    "from": "zoom_review",
+    "to": "localize_text",
+    "segments": [
+      {
+        "source": "START",
+        "korean": "출발"
+      },
+      {
+        "source": "GOAL",
+        "korean": "골"
+      }
+    ],
+    "physical_text_elements": 2
+  },
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+  "candidate_sha256": "3d292729007cacb909782ad6c38fe463ba1ff4705772c69f930d4a30f14a839b",
+  "worker_report": "localization/graphics/role_B/20261006-B-PRODUCTION194-BF229CF4-START-GOAL/B194_BF229CF4_REPORT.json",
+  "machine_qa": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "clean_source_residue": 0,
+    "changed_outside_allowed_blocks": 0,
+    "alpha_changed_outside_allowed_blocks": 0,
+    "introduced_visible_outside_allowed_blocks": 0,
+    "final_source_residue_exact_under_guard": 11,
+    "final_source_residue_color": 0,
+    "localized_overlap": 0,
+    "changed_bc3_blocks": 237,
+    "changed_bc3_blocks_outside_allowed": 0,
+    "full_reencoded_blocks": 231,
+    "partial_constrained_blocks": 6,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rejected_intermediate": {
+    "candidate_sha256": "869b5fefc452578228402c48203f5302a61c1119ea2b22336e952c4ccf95c381",
+    "reason": "CONTROLLER_VISUAL_FAIL_PROTECTED_SCENE_RED_INTRUSION",
+    "observation": "START clean/final showed a horizontal red bar into the adjacent traffic-light scene because a small scene-red component was included in the sign body envelope.",
+    "promoted": false
+  },
+  "controller_visual_observations": [
+    "Readable SOURCE/CLEAN/FINAL re-review after scene-red exclusion: START/GOAL English faces are removed, badge red-body reconstruction stays inside the badges, and no traffic-light/map/photo intrusion remains.",
+    "Localized 출발/골 fit inside measured source-effect bboxes with positive margins and match the previously accepted B191 pale-face/orange-shadow/right-shear badge family.",
+    "White badge rims remain continuous; course-map/road artwork, stage photos and OutRun2SP logos remain visually unchanged outside the badge interiors.",
+    "Full raw mirror_y contact shows no orientation regression, foreign-image intrusion, clipping, overlap, broken Hangul or mixed low-resolution fallback."
+  ],
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_AND_RAW_AFTER_INTRUSION_REWORK",
+  "status": "B194_STATIC_PASS_PENDING_C",
+  "pending_independent_c_static_qa": true,
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
