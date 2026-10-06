@@ -2108,3 +2108,9 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - GitHub-hosted exporter run 37511503225 SUCCESS, worker output 5fe3b1d369c0f7bc125936a793a0ee17bf145a9d. Current C-pass set = 35 rows.
 - q55 2EA557B4 is #005 with exact English source b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685 and A148R candidate ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c; FLIP-Y + RAW exported card manually rechecked.
 - User JPG review + actual in-game validation remain pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-07 03:40 KST — A149 q135 source-family weight producer PASS
+- PRE_INGAME #016 reopened q135 2B0863D6 C109 for weak/thin Korean gray-label weight versus the English source family.
+- A149 candidate `8657a59f966b...`: nine gray labels rebuilt with native Noto CJK Black, exact source gray core, small 1-2px weight reinforcement and 1.14x width strengthening; CLASS badge unchanged.
+- 10/10 bbox/size/positive-margin, clean/final validators PASS; outside/alpha/protected/residue=0; exact RGBA32 header/raw mirror_y; SOURCE/C109/A149 readable+row+RAW controller QA PASS.
+- Fresh C + refreshed English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
