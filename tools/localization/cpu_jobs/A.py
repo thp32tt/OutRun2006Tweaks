@@ -2,6 +2,7 @@
 import hashlib,json,math,os,struct,subprocess,urllib.parse,urllib.request
 from pathlib import Path
 import numpy as np
+from scipy import ndimage
 from PIL import Image,ImageDraw,ImageFont,ImageChops
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
@@ -11,7 +12,7 @@ subprocess.run(["python","-m","pip","install","--disable-pip-version-check","-q"
 from psd_tools import PSDImage
 
 repo=Path.cwd()
-run="20261006-A-WORKSTEAL126-33491F83-CLEAN-PLATE-FIX"
+run="20261006-A-WORKSTEAL127-33491F83-MASK-INPAINT"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -27,8 +28,8 @@ psd_commit="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 psd_rel="PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_loading_cvt_Exst/33491F83_512x256.psd"
 psd_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+psd_commit+"/"+urllib.parse.quote(psd_rel,safe="/")
 
-srcp=Path("/tmp/A126_33491F83.dds")
-psdp=Path("/tmp/A126_33491F83.psd")
+srcp=Path("/tmp/A127_33491F83.dds")
+psdp=Path("/tmp/A127_33491F83.psd")
 urllib.request.urlretrieve(src_url,srcp)
 urllib.request.urlretrieve(psd_url,psdp)
 
@@ -170,8 +171,25 @@ for row in rows:
     m=row["_mask"]
     if row["cell"]=="main":
         if row["key"] in {"easy_main","hard_main"}:
-            component=l43a
-            clean_component_by_key[row["key"]]="Layer 43"
+            # The PSD's Layer 43 visually removes EASY/HARD with a broad white
+            # patch, which is not a source-faithful clean plate. Reconstruct
+            # only the exact English effect pixels from nearest non-text
+            # neighbours in the authoritative release. This keeps road/white/
+            # green geometry continuous without touching any pixel outside the
+            # declared source mask.
+            y0=max(0,row["source_bbox"][1]-24); y1=min(H,row["source_bbox"][3]+24)
+            x0=max(0,row["source_bbox"][0]-24); x1=min(W,row["source_bbox"][2]+24)
+            cm=m[y0:y1,x0:x1]
+            ca=sa[y0:y1,x0:x1]
+            if not cm.any() or np.all(cm):
+                raise RuntimeError(("invalid inpaint mask",row["key"]))
+            _,inds=ndimage.distance_transform_edt(cm,return_indices=True)
+            patch=clean_arr[y0:y1,x0:x1].copy()
+            patch[cm]=ca[inds[0][cm],inds[1][cm]]
+            clean_arr[y0:y1,x0:x1]=patch
+            clean_component_by_key[row["key"]]="nearest-unmasked source inpaint"
+            manual_missing[row["key"]]=0
+            continue
         else:
             component=era
             clean_component_by_key[row["key"]]="Erase Left and Right and Diverge"
@@ -184,17 +202,18 @@ for row in rows:
         clean_arr[m]=0
 clean=Image.fromarray(clean_arr,"RGBA")
 
-# Deterministic regression guards for the A125 visual false-negative:
-# EASY/HARD clean pixels must be byte-identical to Layer 43, never the broad erase layer.
+# Deterministic regression guards for the A125/A126 visual false-negatives:
+# inpaint may change ONLY exact source-text pixels and must not reproduce the
+# Layer-43 broad white erasure plate byte-for-byte.
 for row in rows:
     if row["key"] in {"easy_main","hard_main"}:
         m=row["_mask"]
-        if np.any(clean_arr[m] != l43a[m]):
-            raise RuntimeError(("easy/hard clean component drift",row["key"]))
+        if np.array_equal(clean_arr[m],l43a[m]):
+            raise RuntimeError(("easy/hard fell back to Layer 43 patch",row["key"]))
 clean_changed=np.any(clean_arr!=sa,axis=2)
 clean_outside=int(np.count_nonzero(clean_changed & ~source_mask))
 if clean_outside: raise RuntimeError(("clean outside source mask",clean_outside))
-manual_clean.save(out/"A126_MANUAL_PSD_CLEAN_COMPONENT.png")
+manual_clean.save(out/"A127_MANUAL_PSD_CLEAN_COMPONENT.png")
 
 # Source-family colors sampled from the authoritative release inside each exact PSD mask.
 def sample_style(row):
@@ -327,14 +346,14 @@ for row in rows:
     row.pop("_mask",None); row.pop("_glyph",None)
 
 # Evidence.
-src.save(out/"A126_SOURCE_READABLE.png")
-clean.save(out/"A126_CLEAN_PLATE.png")
-dec.save(out/"A126_FINAL_READABLE.png")
-src_raw.save(out/"A126_SOURCE_RAW.png")
-dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"A126_FINAL_RAW.png")
-Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"A126_SOURCE_TEXT_MASK.png")
-Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"A126_TARGET_MASK.png")
-manual_clean.save(out/"A126_MANUAL_PSD_CLEAN_COMPOSITE.png")
+src.save(out/"A127_SOURCE_READABLE.png")
+clean.save(out/"A127_CLEAN_PLATE.png")
+dec.save(out/"A127_FINAL_READABLE.png")
+src_raw.save(out/"A127_SOURCE_RAW.png")
+dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"A127_FINAL_RAW.png")
+Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"A127_SOURCE_TEXT_MASK.png")
+Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"A127_TARGET_MASK.png")
+manual_clean.save(out/"A127_MANUAL_PSD_CLEAN_COMPOSITE.png")
 
 def white(im):
     z=Image.new("RGBA",im.size,(235,235,235,255));z.alpha_composite(im);return z.convert("RGB")
@@ -350,16 +369,16 @@ def contact(cards,path,maxsize=None):
     s.save(path,quality=97)
 
 contact([card("SOURCE",src,(0,0,1200,820)),card("CLEAN PSD-LAYER",clean,(0,0,1200,820)),card("FINAL",dec,(0,0,1200,820))],
-        out/"A126_MAIN_SOURCE_CLEAN_FINAL.jpg",(1800,2400))
+        out/"A127_MAIN_SOURCE_CLEAN_FINAL.jpg",(1800,2400))
 contact([card("SOURCE RIGHT",src,(1260,0,2048,270)),card("CLEAN RIGHT",clean,(1260,0,2048,270)),card("FINAL RIGHT",dec,(1260,0,2048,270))],
-        out/"A126_RIGHT_SOURCE_CLEAN_FINAL.jpg",(1800,1400))
+        out/"A127_RIGHT_SOURCE_CLEAN_FINAL.jpg",(1800,1400))
 contact([card("SOURCE RAW mirror_y",src_raw,(0,0,W,H)),card("FINAL RAW mirror_y",dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM),(0,0,W,H))],
-        out/"A126_RAW_COMPARE.jpg",(1300,1200))
+        out/"A127_RAW_COMPARE.jpg",(1300,1200))
 zoomcards=[]
 for row in rows:
     x0,y0,x1,y1=row["source_bbox"];p=8;crop=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
     zoomcards += [card(row["key"]+" SOURCE",src,crop,2),card(row["key"]+" CLEAN",clean,crop,2),card(row["key"]+" FINAL",dec,crop,2)]
-contact(zoomcards,out/"A126_LABEL_ZOOM_CONTACT.jpg",(2800,6000))
+contact(zoomcards,out/"A127_LABEL_ZOOM_CONTACT.jpg",(2800,6000))
 
 report={
  "schema_version":1,"role":"A","run":run,"queue_index":queue_index,"asset":asset,
@@ -371,7 +390,7 @@ report={
  "translation":{"Diverge":"분기","Left":"좌측","Right":"우측","EASY":"쉬움","HARD":"어려움","physical_elements":9},
  "construction":{
    "source_text_mask":"exact alpha masks from nine visible PSD rasterized English label layers",
-   "clean_plate":"component-specific PSD reconstruction: Layer 43 for EASY/HARD, Erase Left and Right and Diverge only for Diverge/Left/Right; detached labels transparent; exact source masks only",
+   "clean_plate":"exact-mask reconstruction: EASY/HARD nearest-unmasked authoritative source inpaint, Diverge/Left/Right PSD erase component, detached labels transparent; no pixel outside exact source masks changes",
    "render":"native 2048x1024 Noto Sans CJK KR Black; family colors sampled from source; shared Korean font size within Left/Right, main EASY/HARD, regular EASY/HARD and oblique EASY/HARD pairs",
    "oblique_transform":"27-degree source PSD shear reproduced as tan(27deg)"
  },
@@ -385,12 +404,12 @@ report={
    "localized_overlap_pixels":0,"dds_roundtrip":"PASS","status":"PASS"},
  "candidate_path":str(candidate.relative_to(repo)),"candidate_sha256":cand_sha,
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","runtime_validation":"UNTESTED",
- "status":"A126_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"A127_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"A126_33491F83_REPORT.json"
+rp=out/"A127_33491F83_REPORT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A126_33491F83.json").write_text(json.dumps({
+(wr/"A127_33491F83.json").write_text(json.dumps({
  "role":"A","run":run,"queue_index":queue_index,"asset":"33491F83","work_stolen_from_lane":"B",
  "source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,"psd_layered_source":True,
  "elements":9,"bbox_size_positive_margin":"9/9 PASS","changed_outside":outside,"alpha_outside":alpha_out,
@@ -402,5 +421,5 @@ print(json.dumps({
  "rows":[{"key":r["key"],"source_bbox":r["source_bbox"],"localized_bbox":r["localized_bbox"],
           "font_size":r["font_size"],"shear":r["shear"],
           "margins":[r["delta_left"],r["delta_right"],r["delta_top"],r["delta_bottom"]]} for r in rows],
- "status":"A126_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"A127_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 },ensure_ascii=False),flush=True)
