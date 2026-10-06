@@ -2558,3 +2558,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - GitHub-hosted C worker run 37510968187 independently re-derived source/current geometry. Machine PASS: source [1,105,1090,248], final [9,113,890,240], 1/1 bbox/size/positive-margin; visible outside=0; clean visible alpha=0; changed DXT5 blocks wholly outside allowed=0; 24 partial boundary blocks preserve alpha endpoints/color data; header exact; RAW mirror_y PASS.
 - Controller SOURCE/CLEAN/FINAL, high-zoom detail and RAW review PASS: current 881x127 Korean restores the C164 undersized 533x127 hierarchy and source-left anchor, preserves readable right lean, filled cyan/white/blue gradient, white/navy edging and depth, with no residue, broken glyph, clipping or intrusion.
 - Decision C224_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME comparison set refresh required before synchronization completion; actual game validation remains UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 03:38 KST — C224 PRE_INGAME export synchronization
+
+- GitHub-hosted C exporter run 37511503225 completed SUCCESS and worker commit 5fe3b1d369c0f7bc125936a793a0ee17bf145a9d rebuilt the current C-pass English-original comparison set.
+- Current manifest contains 35 rows (34 localized candidates + 1 policy-preserved original). q55 2EA557B4 is review #005 at localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/005_q055_2EA557B4.jpg.
+- #005 pins English source SHA b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685 at native 2048x256 with display scale 1 and current A148R candidate SHA ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c. Controller reopened the exported card and verified the FLIP-Y and RAW source/current pair.
+- q55 remains C224 static PASS pending user JPG review and actual in-game validation; RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

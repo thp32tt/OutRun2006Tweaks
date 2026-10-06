@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Fresh independent C should continue with the newest materially reworked producer candidates, including B218 q228 E7F6E9B7 and remaining pending-fresh-C items. q55 2EA557B4 passed C224 and now needs PRE_INGAME English-original comparison refresh/user review plus actual in-game validation. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "Fresh independent C should continue with newest materially reworked producer candidates, especially B218 q228 E7F6E9B7 and other pending-fresh-C rows. q55 2EA557B4 passed C224; English-original PRE_INGAME comparison is refreshed as #005 and now awaits user JPG review plus actual in-game validation. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -2688,8 +2688,11 @@
       "decision": "C224_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
       "machine_report": "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA557B4_MACHINE_QA.json",
       "controller_report": "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA557B4_CONTROLLER_FINAL_QA.json",
-      "pre_ingame_comparison_refresh": "PENDING_C224_EXPORT",
-      "runtime_validation": "UNTESTED"
+      "pre_ingame_comparison_refresh": "REFRESHED_C224_EXPORT_005",
+      "runtime_validation": "UNTESTED",
+      "pre_ingame_review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/005_q055_2EA557B4.jpg",
+      "pre_ingame_manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
+      "pre_ingame_user_review": "PENDING_USER_REVIEW"
     }
   },
   "data_build": {
@@ -3245,16 +3248,16 @@
     "controller": "localization/graphics/role_B/20261007-B-MANUALQA218-E7F6E9B7/B218_CONTROLLER_FINAL_QA.json"
   },
   "latest_c_pre_ingame_export": {
-    "timestamp_kst": "2026-10-07T03:14:41+09:00",
-    "worker_run_id": 37507895220,
-    "worker_output_commit": "cf9f188fb0debbf1630062ea7a195d0be3395a60",
-    "count": 36,
-    "localized_candidate_count": 35,
+    "timestamp_kst": "2026-10-07T03:38:37+09:00",
+    "worker_run_id": 37511503225,
+    "worker_output_commit": "5fe3b1d369c0f7bc125936a793a0ee17bf145a9d",
+    "count": 35,
+    "localized_candidate_count": 34,
     "policy_pass_no_candidate_count": 1,
     "manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
-    "q236_number": 36,
-    "q236_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/036_q236_FEF70E85.jpg",
-    "q236_candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "q55_number": 5,
+    "q55_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/005_q055_2EA557B4.jpg",
+    "q55_candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
     "runtime_validation": "UNTESTED"
   },
   "a148r_2ea557b4": {
@@ -3289,7 +3292,10 @@
     "decision": "C224_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
     "machine_report": "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA557B4_MACHINE_QA.json",
     "controller_report": "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA557B4_CONTROLLER_FINAL_QA.json",
-    "pre_ingame_comparison_refresh": "PENDING_C224_EXPORT",
-    "runtime_validation": "UNTESTED"
+    "pre_ingame_comparison_refresh": "REFRESHED_C224_EXPORT_005",
+    "runtime_validation": "UNTESTED",
+    "pre_ingame_review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/005_q055_2EA557B4.jpg",
+    "pre_ingame_manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
+    "pre_ingame_user_review": "PENDING_USER_REVIEW"
   }
 }

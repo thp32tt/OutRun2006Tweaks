@@ -2103,3 +2103,8 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - A148R ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c fresh independent C machine QA PASS: 1/1 bbox/size/positive-margin, DXT5 boundary/header/orientation gates PASS.
 - Controller visual PASS: source-left hierarchy restored, 881px width vs old C164 533px, source-direction right lean and filled gradient/edge/depth retained; no residue/breakage/clipping/intrusion.
 - Decision C224_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export refresh + user review + actual game validation pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-07 03:38 KST — C224 PRE_INGAME export refreshed
+- GitHub-hosted exporter run 37511503225 SUCCESS, worker output 5fe3b1d369c0f7bc125936a793a0ee17bf145a9d. Current C-pass set = 35 rows.
+- q55 2EA557B4 is #005 with exact English source b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685 and A148R candidate ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c; FLIP-Y + RAW exported card manually rechecked.
+- User JPG review + actual in-game validation remain pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
