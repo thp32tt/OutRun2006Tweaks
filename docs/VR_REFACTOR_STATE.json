@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T14:31:00+09:00",
+  "updatedKst": "2026-10-06T14:36:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -971,10 +971,24 @@
     "attempt": "1/3",
     "item": "VR-DX9EX-CAPTURE-SOURCE-TRANSACTION-0047",
     "baseSha": "5912dee3955138baba3172cc7eb18f52f18c2f86",
-    "materialResultSha": "PENDING_SELF",
-    "validationBearingResultSha": "PENDING_SELF",
-    "automationValidation": "PENDING",
+    "materialResultSha": "a1eca64d5d1e4e0c01e2c822dd6d1db5dbb103f0",
+    "validationBearingResultSha": "a1eca64d5d1e4e0c01e2c822dd6d1db5dbb103f0",
+    "automationValidation": "PASS",
     "runtimeValidation": "UNTESTED",
-    "summary": "Make R19 production capture source replacement transactional so transient texture/SRV creation failures preserve the last complete published source bundle."
+    "summary": "Make R19 production capture source replacement transactional so transient texture/SRV creation failures preserve the last complete published source bundle.",
+    "validation": {
+      "dx9exActiveRunId": 37418853388,
+      "jobs": {
+        "policy": 112123468765,
+        "fullChainCompile": 112123568347,
+        "game": 112123568387,
+        "host": 112123568420,
+        "package": 112124827998
+      },
+      "domainIsolationRunId": 37418853347,
+      "packageArtifactId": 11392805130,
+      "packageArtifactDigest": "sha256:63dd5b7c6a5ef60d7853ae1752ce59e8d99f52e3d76c8b5fec24a57c5471b47b"
+    },
+    "issue14CommentId": 6010094436
   }
 }
