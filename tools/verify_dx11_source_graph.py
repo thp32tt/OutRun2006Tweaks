@@ -10300,6 +10300,35 @@ def main() -> None:
             + ", ".join(missing_r262_programmable_output_resource_behavior)
         )
 
+    r275_translated_semantic_receipt_contract = [
+        ("struct NativeProgrammableShaderTranslatedSemanticReceipt",
+         NATIVE_BACKEND_HPP, "R275 translated-semantic receipt type"),
+        ("compose_programmable_shader_translated_semantic_receipt(",
+         NATIVE_BACKEND_HPP, "R275 receipt composer declaration"),
+        ("validate_programmable_shader_translated_semantic_receipt_snapshot(",
+         NATIVE_BACKEND_HPP, "R275 receipt snapshot validator declaration"),
+        ("out.sourceMappingHandoffSnapshotMatches =",
+         NATIVE_BACKEND_CPP, "R275 exact R273 receipt binding"),
+        ("out.cacheIdentityMatches =",
+         NATIVE_BACKEND_CPP, "R275 R239/R242/R273 identity convergence"),
+        ("token, 0x275u",
+         NATIVE_BACKEND_CPP, "R275 receipt snapshot-domain tag"),
+        ("R275 seals translated semantic scalars to R242 and R273 ownership",
+         CONSTANT_BUFFER_PROBE, "R275 positive receipt regression"),
+        ("R275 rejects stale R273 mapping handoff before semantic receipt sealing",
+         CONSTANT_BUFFER_PROBE, "R275 stale R273 fail-closed regression"),
+    ]
+    missing_r275_translated_semantic_receipt = [
+        meaning for token, source, meaning
+        in r275_translated_semantic_receipt_contract
+        if token not in source
+    ]
+    if missing_r275_translated_semantic_receipt:
+        raise SystemExit(
+            "DX11 R275 translated semantic receipt drift: "
+            + ", ".join(missing_r275_translated_semantic_receipt)
+        )
+
     r263_programmable_shader_semantic_translation_contract = [
         ("struct NativeProgrammableShaderSemanticTranslationReadiness",
          NATIVE_BACKEND_HPP, "R263 exact F21 semantic-translation readiness type"),
@@ -10307,46 +10336,36 @@ def main() -> None:
          NATIVE_BACKEND_HPP, "R263 semantic-translation composition declaration"),
         ("validate_programmable_shader_semantic_translation_readiness_snapshot(",
          NATIVE_BACKEND_HPP, "R263 semantic-translation snapshot validator"),
-        ("out.cacheIdentityMatches =",
-         NATIVE_BACKEND_CPP, "R263 source/object/layout cache identity binding"),
-        ("out.sourceMappingHandoffReady =",
-         NATIVE_BACKEND_CPP, "R274 R263 requires reviewed R273 mapping handoff"),
-        ("out.sourceMappingHandoffSnapshotMatches =",
-         NATIVE_BACKEND_CPP, "R274 R263 binds exact R273 snapshot"),
+        ("const NativeProgrammableShaderTranslatedSemanticReceipt&",
+         NATIVE_BACKEND_HPP, "R263 consumes R275 typed receipt"),
+        ("out.translatedSemanticReceiptReady =",
+         NATIVE_BACKEND_CPP, "R263 validates R275 receipt integrity"),
+        ("out.translatedSemanticReceiptSnapshotMatches =",
+         NATIVE_BACKEND_CPP, "R263 binds exact R275 snapshot"),
+        ("out.translatedSemanticIdentityMatches =",
+         NATIVE_BACKEND_CPP, "R263 binds R275 receipt to current pair/object"),
         ("out.sourceMappingIdentityMatches =",
-         NATIVE_BACKEND_CPP, "R274 R263 binds R273 cache identity to R239"),
+         NATIVE_BACKEND_CPP, "R263 retains R273 provenance through R275"),
         ("out.vertexSemanticExact =",
-         NATIVE_BACKEND_CPP, "R263 vertex semantic exactness gate"),
+         NATIVE_BACKEND_CPP, "R263 vertex semantic exactness comes from R275"),
         ("out.pixelSemanticExact =",
-         NATIVE_BACKEND_CPP, "R263 pixel semantic exactness gate"),
+         NATIVE_BACKEND_CPP, "R263 pixel semantic exactness comes from R275"),
         ("out.constantRegisterMappingExact =",
-         NATIVE_BACKEND_CPP, "R274 constant mapping derives from R273 handoff"),
+         NATIVE_BACKEND_CPP, "R263 constant mapping proof comes through R275"),
         ("out.samplerMappingExact =",
-         NATIVE_BACKEND_CPP, "R274 sampler mapping derives from R273 handoff"),
+         NATIVE_BACKEND_CPP, "R263 sampler mapping proof comes through R275"),
         ("out.interfaceSourceIdentityMatches =",
          NATIVE_BACKEND_CPP, "R269 source/linkage identity match gate"),
         ("out.interfaceLinkExact =",
          NATIVE_BACKEND_CPP, "R263 stage-interface semantic exactness gate"),
-        ("out.translatorRevisionHash =",
-         NATIVE_BACKEND_CPP, "R263 translator revision provenance"),
-        ("out.semanticContractHash =",
-         NATIVE_BACKEND_CPP, "R263 semantic-contract provenance"),
-        ("out.sourcePairSemanticHash =",
-         NATIVE_BACKEND_CPP, "R274 R271 pair semantic identity retained"),
-        ("out.sourceConstantMappingHash =",
-         NATIVE_BACKEND_CPP, "R274 exact constant-map identity retained"),
-        ("out.sourceSamplerMappingHash =",
-         NATIVE_BACKEND_CPP, "R274 exact sampler-map identity retained"),
-        ("out.sourceMappingHandoffSnapshotToken =",
-         NATIVE_BACKEND_CPP, "R274 R273 receipt token retained"),
         ("out.semanticProofPresent =",
          NATIVE_BACKEND_CPP, "R263 complete F21 semantic proof gate"),
-        ("token, 0x274u",
-         NATIVE_BACKEND_CPP, "R274 strengthened semantic review snapshot-domain tag"),
-        ("R274 R263 consumes exact R273 source mapping handoff",
-         CONSTANT_BUFFER_PROBE, "R274 exact source-mapping consumption regression"),
-        ("R274 rejects stale R273 source-mapping snapshot in R263",
-         CONSTANT_BUFFER_PROBE, "R274 stale mapping receipt fail-closed regression"),
+        ("token, 0x263275u",
+         NATIVE_BACKEND_CPP, "R263/R275 combined semantic review snapshot-domain tag"),
+        ("R275 R263 consumes snapshot-sealed translated semantic receipt",
+         CONSTANT_BUFFER_PROBE, "R263 consumes R275 positive regression"),
+        ("R263 rejects stale R275 translated semantic receipt",
+         CONSTANT_BUFFER_PROBE, "R263 stale R275 fail-closed regression"),
         ("R269 rejects R268 linkage provenance that does not match R263 source pair identity",
          CONSTANT_BUFFER_PROBE, "R269 source-linked interface fail-closed regression"),
         ("R263 rejects incomplete programmable constant-register semantic proof",
@@ -10364,13 +10383,14 @@ def main() -> None:
             "DX11 R263 programmable shader semantic-translation drift: "
             + ", ".join(missing_r263_programmable_shader_semantic_translation)
         )
-    stale_r263_mapping_fixture_signature = (
-        "bool constantRegisterMappingExact,\n"
-        "    bool samplerMappingExact"
+    stale_r263_loose_semantic_signature = (
+        "std::uint64_t translatedVertexSemanticHash,\n"
+        "    std::uint64_t translatedPixelSemanticHash,\n"
+        "    const ProgrammableShaderInterfaceLinkageEvidence& sourceInterfaceLinkage"
     )
-    if stale_r263_mapping_fixture_signature in NATIVE_BACKEND_HPP:
+    if stale_r263_loose_semantic_signature in NATIVE_BACKEND_HPP:
         raise SystemExit(
-            "DX11 R274 stale fixture mapping booleans remain in R263 API"
+            "DX11 R275 stale loose semantic scalars remain in R263 API"
         )
 
     r264_programmable_shader_source_evidence_contract = [
@@ -10744,6 +10764,29 @@ def main() -> None:
         raise SystemExit(
             "DX11 R274 R263 source-mapping consumption drift: "
             + ", ".join(missing_r274_r263_source_mapping_consumption)
+        )
+
+    r275_r263_receipt_consumption_contract = [
+        ("translatedSemanticReceipt.reviewSnapshotToken ==",
+         NATIVE_BACKEND_CPP, "R275 receipt carries its sealed snapshot"),
+        ("validate_programmable_shader_translated_semantic_receipt_snapshot(",
+         NATIVE_BACKEND_CPP, "R263 validates R275 receipt integrity"),
+        ("translatedSemanticReceipt.translationObjectSnapshotToken ==",
+         NATIVE_BACKEND_CPP, "R263 binds R275 to current R242 object receipt"),
+        ("r275SemanticReceipt =",
+         CONSTANT_BUFFER_PROBE, "R275 receipt test fixture is explicit"),
+        ("sig.shaderTranslationExact = false;",
+         RUNTIME_CENSUS, "R275 keeps programmable production gate fail-closed"),
+    ]
+    missing_r275_r263_receipt_consumption = [
+        meaning for token, source, meaning
+        in r275_r263_receipt_consumption_contract
+        if token not in source
+    ]
+    if missing_r275_r263_receipt_consumption:
+        raise SystemExit(
+            "DX11 R275 R263 receipt-consumption drift: "
+            + ", ".join(missing_r275_r263_receipt_consumption)
         )
 
     r259_programmable_activation_prerequisite_contract = [

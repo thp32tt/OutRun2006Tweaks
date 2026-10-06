@@ -1983,12 +1983,69 @@ validate_programmable_shader_source_mapping_handoff_snapshot(
     const ProgrammableShaderRegisterMappingPlanEvidence& mappingPlan,
     std::uint64_t reviewSnapshotToken) noexcept;
 
+// R275 seals one dormant translated-semantic observation into a
+// tamper-evident receipt bound to the exact R239 pair, R242 translated-object
+// ownership and R273 source-mapping handoff. The translated semantic hashes and
+// translator contract are still diagnostic evidence supplied by a translator
+// or probe; this receipt does not create/bind shaders or authorize Draw*.
+struct NativeProgrammableShaderTranslatedSemanticReceipt {
+    bool inputValid{};
+    bool sourceIdentityExact{};
+    bool translationObjectReady{};
+    bool translationObjectSnapshotMatches{};
+    bool sourceMappingHandoffReady{};
+    bool sourceMappingHandoffSnapshotMatches{};
+    bool cacheIdentityMatches{};
+    bool vertexSemanticExact{};
+    bool pixelSemanticExact{};
+    bool constantRegisterMappingExact{};
+    bool samplerMappingExact{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    std::uint64_t cacheKey{};
+    DWORD vertexVersionToken{};
+    DWORD pixelVersionToken{};
+    std::uint64_t vertexBytecodeHash{};
+    std::uint64_t pixelBytecodeHash{};
+    std::uint64_t translatedVertexSemanticHash{};
+    std::uint64_t translatedPixelSemanticHash{};
+    std::uint64_t translatorRevisionHash{};
+    std::uint64_t semanticContractHash{};
+    std::uint64_t sourcePairSemanticHash{};
+    std::uint64_t sourceConstantMappingHash{};
+    std::uint64_t sourceSamplerMappingHash{};
+    std::uint64_t sourceMappingPlanRevisionHash{};
+    std::uint64_t sourceMappingSemanticContractHash{};
+    std::uint64_t translationObjectSnapshotToken{};
+    std::uint64_t sourceMappingHandoffSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderTranslatedSemanticReceipt
+compose_programmable_shader_translated_semantic_receipt(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectReadiness& translationObject,
+    std::uint64_t translationObjectSnapshotToken,
+    const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff,
+    std::uint64_t sourceMappingHandoffSnapshotToken,
+    std::uint64_t translatedVertexSemanticHash,
+    std::uint64_t translatedPixelSemanticHash,
+    std::uint64_t translatorRevisionHash,
+    std::uint64_t semanticContractHash,
+    bool vertexSemanticExact,
+    bool pixelSemanticExact) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_shader_translated_semantic_receipt_snapshot(
+    const NativeProgrammableShaderTranslatedSemanticReceipt& receipt,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
 // R263 seals one exact F21 programmable-shader semantic-translation proof.
-// R274 strengthens that boundary by requiring the source-derived R273 mapping
-// handoff and its exact snapshot instead of caller-supplied mapping booleans.
-// The proof remains bound to the R239 source identity, R242 translated object,
-// R243 input-layout receipt and R268 stage linkage. This review path never
-// routes Draw* or activates NativeDrawPath.
+// R275 now carries the translated-semantic scalar bundle as one snapshot-sealed
+// receipt. R263 consumes that receipt plus exact R243 input-layout and R268
+// linkage evidence. This review path never routes Draw* or activates
+// NativeDrawPath.
 struct NativeProgrammableShaderSemanticTranslationReadiness {
     bool inputValid{};
     bool sourceIdentityExact{};
@@ -1997,6 +2054,9 @@ struct NativeProgrammableShaderSemanticTranslationReadiness {
     bool inputLayoutReady{};
     bool inputLayoutSnapshotMatches{};
     bool cacheIdentityMatches{};
+    bool translatedSemanticReceiptReady{};
+    bool translatedSemanticReceiptSnapshotMatches{};
+    bool translatedSemanticIdentityMatches{};
     bool sourceMappingHandoffReady{};
     bool sourceMappingHandoffSnapshotMatches{};
     bool sourceMappingIdentityMatches{};
@@ -2027,6 +2087,7 @@ struct NativeProgrammableShaderSemanticTranslationReadiness {
     bool samplerMappingExact{};
     std::uint64_t translationObjectSnapshotToken{};
     std::uint64_t inputLayoutSnapshotToken{};
+    std::uint64_t translatedSemanticReceiptSnapshotToken{};
     std::uint64_t sourceMappingHandoffSnapshotToken{};
     std::uint64_t reviewSnapshotToken{};
 };
@@ -2038,15 +2099,10 @@ compose_programmable_shader_semantic_translation_readiness(
     std::uint64_t translationObjectSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken,
-    std::uint64_t translatedVertexSemanticHash,
-    std::uint64_t translatedPixelSemanticHash,
-    const ProgrammableShaderInterfaceLinkageEvidence& sourceInterfaceLinkage,
-    const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff,
-    std::uint64_t sourceMappingHandoffSnapshotToken,
-    std::uint64_t translatorRevisionHash,
-    std::uint64_t semanticContractHash,
-    bool vertexSemanticExact,
-    bool pixelSemanticExact) noexcept;
+    const NativeProgrammableShaderTranslatedSemanticReceipt&
+        translatedSemanticReceipt,
+    std::uint64_t translatedSemanticReceiptSnapshotToken,
+    const ProgrammableShaderInterfaceLinkageEvidence& sourceInterfaceLinkage) noexcept;
 
 [[nodiscard]] bool
 validate_programmable_shader_semantic_translation_readiness_snapshot(
@@ -2055,15 +2111,10 @@ validate_programmable_shader_semantic_translation_readiness_snapshot(
     std::uint64_t translationObjectSnapshotToken,
     const NativeProgrammableShaderInputLayoutReadiness& inputLayout,
     std::uint64_t inputLayoutSnapshotToken,
-    std::uint64_t translatedVertexSemanticHash,
-    std::uint64_t translatedPixelSemanticHash,
+    const NativeProgrammableShaderTranslatedSemanticReceipt&
+        translatedSemanticReceipt,
+    std::uint64_t translatedSemanticReceiptSnapshotToken,
     const ProgrammableShaderInterfaceLinkageEvidence& sourceInterfaceLinkage,
-    const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff,
-    std::uint64_t sourceMappingHandoffSnapshotToken,
-    std::uint64_t translatorRevisionHash,
-    std::uint64_t semanticContractHash,
-    bool vertexSemanticExact,
-    bool pixelSemanticExact,
     std::uint64_t reviewSnapshotToken) noexcept;
 
 // R259 consumes the current R258 source receipt, R262 full F18 resource-behavior
