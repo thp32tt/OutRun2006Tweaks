@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T16:10:39+09:00",
+  "updated_at_kst": "2026-10-06T16:18:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -167,7 +167,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A135 consumed the remaining index24 Hangul-name-entry preflight after all stock font rows were resolved. Hosted evidence proves 66743AA8 is a 49-choice name-entry input alphabet/UI (A-Z + 0-9 + 12 symbols + END), not a generic Hangul font page. Art-only replacement is unsafe until selected-cell character mapping, Hangul composition, persisted player-name encoding, committed-name rendering and replay/leaderboard/network serialization are traced. Status HOLD_STRICT_RECHECK_RUNTIME_NAME_ENTRY_MAPPING; no candidate persisted. B index176 output was not reviewed or altered by A.",
+  "next_checkpoint": "B201 consumed the pending B200 worker result for index176 75C3586A and rejected B200 as a visual/numeric false negative: wrong semantic atlas binding localized HOLLY as CLARISSA, preserved ??? as JENNIFER, route artwork as HOLLY, and left true JENNIFER/CLARISSA English sprites untouched. Corrected B201 candidate 494d42c09c58... binds idx35 JENNIFER, idx36 CLARISSA, idx37 HOLLY, idx39 FLAGMAN 4; idx38 ??? and idx40 route art remain exact. 4/4 exact source-alpha bbox/size/margins + zero outside/residue/overlap/near1 PASS; SOURCE/CLEAN/FINAL + readable/raw mirror_y controller PASS. Pending independent C; runtime untested. A135 index24 name-entry HOLD remains untouched.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -2369,6 +2369,46 @@
       "candidate_written": false,
       "status": "B_PRIMARY_EVEN_BLOCKED_ZOOM_REVIEW_SHARD_EXHAUSTED",
       "runtime_validation": "NOT_REQUIRED_FOR_NO_LOCALIZATION_CLASSIFICATIONS"
+    },
+    "b201_75c_names": {
+      "timestamp_kst": "2026-10-06T16:18:00+09:00",
+      "run": "B201",
+      "queue_index": 176,
+      "asset": "75C3586A",
+      "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+      "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+      "corrected_binding": {
+        "35": "JENNIFER -> 제니퍼",
+        "36": "CLARISSA -> 클라리사",
+        "37": "HOLLY -> 홀리",
+        "38": "PRESERVE ???",
+        "39": "FLAGMAN 4 -> 플래그맨 4",
+        "40": "PRESERVE route artwork"
+      },
+      "rejected_b200": {
+        "candidate_sha256": "74bc2973f1dd198acf810e1cae541c6fe143ae11936f647bbb5802c4d279a72c",
+        "reason": "CONTROLLER_VISUAL_FAIL_WRONG_SEMANTIC_ATLAS_BINDING",
+        "promoted": false
+      },
+      "machine_qa": {
+        "bbox_size_positive_margin": "4/4 PASS",
+        "clean_source_alpha_residue": 0,
+        "changed_outside_source_bboxes": 0,
+        "alpha_changed_outside_source_bboxes": 0,
+        "introduced_visible_outside_source_bboxes": 0,
+        "final_source_alpha_residue_outside_targets": 0,
+        "localized_overlap": 0,
+        "localized_to_preserved_overlap": 0,
+        "localized_to_preserved_near1": 0,
+        "preserved_idx38_question_mark_exact": true,
+        "preserved_idx40_route_exact": true,
+        "dds_roundtrip": "PASS"
+      },
+      "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_FULL_READABLE_AND_RAW_AFTER_BINDING_REWORK",
+      "worker_report": "localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_75C3586A_REPORT.json",
+      "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_CONTROLLER_SELF_QA.json",
+      "status": "B201_STATIC_PASS_PENDING_C",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {

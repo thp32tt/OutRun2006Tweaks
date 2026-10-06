@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX",
+  "timestamp_kst": "2026-10-06T16:18:00+09:00",
+  "queue_index": 176,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "worker_report": "localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_75C3586A_REPORT.json",
+  "rejected_intermediate": {
+    "run": "B200",
+    "candidate_sha256": "74bc2973f1dd198acf810e1cae541c6fe143ae11936f647bbb5802c4d279a72c",
+    "reason": "NUMERIC_PASS_VISUAL_FAIL_WRONG_SEMANTIC_ATLAS_BINDING",
+    "observation": "Full readable atlas showed B200 mapped idx37 HOLLY as CLARISSA, idx38 preserved ??? as JENNIFER, idx40 route artwork as HOLLY, while true idx35/idx36 JENNIFER/CLARISSA remained English. B200 was not promoted."
+  },
+  "corrected_binding": [
+    {
+      "atlas_idx": 35,
+      "source": "JENNIFER",
+      "korean": "제니퍼"
+    },
+    {
+      "atlas_idx": 36,
+      "source": "CLARISSA",
+      "korean": "클라리사"
+    },
+    {
+      "atlas_idx": 37,
+      "source": "HOLLY",
+      "korean": "홀리"
+    },
+    {
+      "atlas_idx": 39,
+      "source": "FLAGMAN 4",
+      "korean": "플래그맨 4"
+    },
+    {
+      "atlas_idx": 38,
+      "preserve": "???"
+    },
+    {
+      "atlas_idx": 40,
+      "preserve": "route artwork"
+    }
+  ],
+  "machine_qa": {
+    "bbox_size_positive_margin": "4/4 PASS",
+    "clean_source_alpha_residue": 0,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "introduced_visible_outside_source_bboxes": 0,
+    "final_source_alpha_residue_outside_targets": 0,
+    "localized_overlap": 0,
+    "localized_to_preserved_overlap": 0,
+    "localized_to_preserved_near1": 0,
+    "preserved_idx38_question_mark_exact": true,
+    "preserved_idx40_route_exact": true,
+    "dds_roundtrip": "PASS"
+  },
+  "controller_visual_observations": [
+    "SOURCE/CLEAN/FINAL high-zoom review: all four intended English labels are removed exactly; transparent clean plates contain no source residue; Korean labels are intact and readable.",
+    "Full readable atlas review: 플래그맨 4, 홀리, 제니퍼, 클라리사 occupy the correct source-label positions; ??? remains original and the neighboring route line is unchanged.",
+    "No broken Hangul, source double drawing, portrait/card intrusion, route/map damage, clipping, overlap or mixed low-resolution rendering is visible.",
+    "Raw mirror_y review confirms orientation is preserved and the corrected labels remain in the corresponding mirrored atlas cells."
+  ],
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_FULL_READABLE_AND_RAW_AFTER_BINDING_REWORK",
+  "status": "B201_STATIC_PASS_PENDING_C",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

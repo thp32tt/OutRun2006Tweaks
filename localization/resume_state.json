@@ -1,5 +1,5 @@
 {
-  "schema_version": 106,
+  "schema_version": 107,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B201 completed index176 75C3586A after mandatory controller visual QA rejected B200's numeric PASS for wrong semantic atlas binding. Correct binding: idx35 JENNIFER->제니퍼, idx36 CLARISSA->클라리사, idx37 HOLLY->홀리, idx39 FLAGMAN 4->플래그맨 4; idx38 ??? and idx40 route artwork preserved exact. Final 494d42c09c58... passes 4/4 exact source-alpha bbox/size/positive margins, zero outside/alpha/introduced-visible/source-residue/overlap/preserved-overlap/near1, DDS roundtrip, readable SOURCE/CLEAN/FINAL and raw mirror_y visual QA. Pending independent C; RUNTIME_VALIDATION=UNTESTED. Do not repeat B74/B196-B200 rejected/diagnostic attempts. A135 index24 runtime-name-entry HOLD remains separate.",
     "A135 index24 66743AA8 name-entry preflight: 49 cells are the complete name-entry choice alphabet/control set (A-Z, 0-9, 12 punctuation/symbols, END). This is not the K4 display font. Do not create a Hangul DDS by relabeling cells: runtime selected-character mapping, Jamo/syllable composition, saved-name encoding, committed-name rendering, and replay/leaderboard/network serialization are unproven. HOLD_STRICT_RECHECK_RUNTIME_NAME_ENTRY_MAPPING; no candidate. Evidence A135 preflight + controller review. RUNTIME_VALIDATION=UNTESTED.",
     "A134 work-stole B font_pipeline rows 16/18/20/22 after A primary-shard exhaustion. The same K4 architecture proof as A133 applies: stock font DDS are not the Korean renderer; Korean UTF-8 is redrawn via ImGui with Windows Korean system fonts. All nine stock font rows 15-23 are now preserve-original/no candidate. Index24 name-entry remains separate/unresolved; B index176 was not duplicated. RUNTIME_VALIDATION=UNTESTED.",
     "A133 reconciled A-owned font_pipeline rows 15/17/19/21/23: current K4 Korean text does not consume replacement stock font DDS. hooks_localization suppresses stock English output and redraws UTF-8 via ImGui; Overlay::rebuild_fonts loads Windows Korean-capable system fonts. Preserve original DDS, no Korean candidate required. Legacy 505-glyph/two-page atlas remains K3 research only; index24 name-entry is separate. B-owned font rows 16/18/20/22 remain. B index176 is active and was not work-stolen. RUNTIME_VALIDATION=UNTESTED.",
@@ -6216,5 +6217,45 @@
     "controller_review": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_CONTROLLER_PREFLIGHT_REVIEW.json",
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "b201_75c_names": {
+    "timestamp_kst": "2026-10-06T16:18:00+09:00",
+    "run": "B201",
+    "queue_index": 176,
+    "asset": "75C3586A",
+    "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+    "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+    "corrected_binding": {
+      "35": "JENNIFER -> 제니퍼",
+      "36": "CLARISSA -> 클라리사",
+      "37": "HOLLY -> 홀리",
+      "38": "PRESERVE ???",
+      "39": "FLAGMAN 4 -> 플래그맨 4",
+      "40": "PRESERVE route artwork"
+    },
+    "rejected_b200": {
+      "candidate_sha256": "74bc2973f1dd198acf810e1cae541c6fe143ae11936f647bbb5802c4d279a72c",
+      "reason": "CONTROLLER_VISUAL_FAIL_WRONG_SEMANTIC_ATLAS_BINDING",
+      "promoted": false
+    },
+    "machine_qa": {
+      "bbox_size_positive_margin": "4/4 PASS",
+      "clean_source_alpha_residue": 0,
+      "changed_outside_source_bboxes": 0,
+      "alpha_changed_outside_source_bboxes": 0,
+      "introduced_visible_outside_source_bboxes": 0,
+      "final_source_alpha_residue_outside_targets": 0,
+      "localized_overlap": 0,
+      "localized_to_preserved_overlap": 0,
+      "localized_to_preserved_near1": 0,
+      "preserved_idx38_question_mark_exact": true,
+      "preserved_idx40_route_exact": true,
+      "dds_roundtrip": "PASS"
+    },
+    "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_FULL_READABLE_AND_RAW_AFTER_BINDING_REWORK",
+    "worker_report": "localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_75C3586A_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_CONTROLLER_SELF_QA.json",
+    "status": "B201_STATIC_PASS_PENDING_C",
+    "runtime_validation": "UNTESTED"
   }
 }
