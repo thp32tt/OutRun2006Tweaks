@@ -39,6 +39,7 @@ state_block_tracker = text("src/vr/state/state_block_tracker.hpp")
 state_block_recovery = text("src/vr/state/state_block_recovery.hpp")
 state_block_events = text("src/vr/state/state_block_events.hpp")
 vr_openxr_workflow = text(".github/workflows/vr-openxr.yml")
+r23_runtime_hardening = text("vrhost/src/runtime/r23_runtime_hardening.hpp")
 sbs_capture_override = text("vrhost/src/runtime/sbs_capture_override.hpp")
 overlay_hooks = text("src/overlay/hooks_overlay.cpp")
 render_semantics = text("src/vr/game/render_semantics.hpp")
@@ -1250,6 +1251,37 @@ for marker in (
     if marker not in vr_openxr_workflow:
         errors.append(
             f"generic OpenXR hardening workflow missing terminal marker: {marker}")
+
+r23_guard_start = vr_openxr_workflow.find(
+    "'vrhost/src/runtime/r23_runtime_hardening.hpp' = @(")
+r23_guard_end = vr_openxr_workflow.find(
+    "'vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp' = @(",
+    r23_guard_start)
+if r23_guard_start < 0 or r23_guard_end <= r23_guard_start:
+    errors.append("generic OpenXR R23 host hardening marker block missing")
+else:
+    r23_guard_block = vr_openxr_workflow[r23_guard_start:r23_guard_end]
+    if "'SafeTransportGeneration'" in r23_guard_block:
+        errors.append(
+            "generic OpenXR R23 host hardening retained obsolete transport-generation marker")
+    for marker in (
+        "ExpectedDirectDxgiFormat",
+        "DirectSafeEyeMatchesCommittedFrame",
+        "SafeEyesOwnFrame(frame)",
+        "EnsureSafeFrame(frame.frameId)",
+    ):
+        if marker not in r23_guard_block:
+            errors.append(
+                f"generic OpenXR R23 host hardening missing current marker: {marker}")
+
+for marker in (
+    "ExpectedDirectDxgiFormat",
+    "DirectSafeEyeMatchesCommittedFrame",
+    "SafeEyesOwnFrame(frame)",
+    "EnsureSafeFrame(frame.frameId)",
+):
+    if marker not in r23_runtime_hardening:
+        errors.append(f"R23 runtime hardening missing current safe-eye marker: {marker}")
 
 for marker in (
     "bool PrepareForParentSessionDestroy() noexcept",
