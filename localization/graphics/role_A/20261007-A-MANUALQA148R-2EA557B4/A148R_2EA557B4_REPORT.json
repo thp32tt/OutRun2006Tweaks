@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261007-A-MANUALQA148R-2EA557B4",
+  "index": 55,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "worker": "github-actions",
+  "trigger": "CONTROLLER_RETRY_SOURCE_ALIGNMENT_AFTER_A148_SCALE_REWORK",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/017_q055_2EA557B4.jpg",
+  "prior_c_status": "C164_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "c164_candidate_sha256": "b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc",
+  "first_attempt_a148_sha256": "13cf23b401ecf65fa3b2f70af50a5be5e1f07c086d982d634c08d7b8094b477b",
+  "first_attempt_a148_status": "CONTROLLER_REJECTED_SOURCE_ALIGNMENT_NOT_PROMOTED",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "bbf53949c7d9f1dc4949e661caeeaf19fe667d79",
+    "sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+    "path": "Release/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+    "classification": "authoritative HD source; stale filename suffix, DDS header 2048x256 DXT5"
+  },
+  "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+  "candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "structure": {
+    "dimensions": [
+      2048,
+      256
+    ],
+    "compression": "DXT5",
+    "bytes": 524416,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "exact_source_bbox_block_aligned": false
+  },
+  "translation": {
+    "source": "NEXT ROUND",
+    "korean": "다음 라운드"
+  },
+  "method": "constrained DXT5: full interior blocks from source-faithful target encode; partial boundary blocks keep exact source endpoints/color/index data and rewrite only in-bbox alpha indices to an existing source zero-alpha index",
+  "original_bbox": [
+    1,
+    105,
+    1090,
+    248
+  ],
+  "localized_bbox": [
+    9,
+    113,
+    890,
+    240
+  ],
+  "raw_original_bbox": [
+    1,
+    8,
+    1090,
+    151
+  ],
+  "raw_localized_bbox": [
+    9,
+    16,
+    890,
+    143
+  ],
+  "delta_left": 8,
+  "delta_right": 200,
+  "delta_top": 8,
+  "delta_bottom": 8,
+  "source_size": [
+    1089,
+    143
+  ],
+  "localized_size": [
+    881,
+    127
+  ],
+  "containment": "PASS",
+  "raw_containment": "PASS",
+  "size_ceiling": "PASS",
+  "positive_margin": "PASS",
+  "font": "Noto Sans CJK KR Bold",
+  "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+  "font_face_index": 1,
+  "font_pattern": "Noto Sans CJK KR:style=Bold",
+  "font_size": 108,
+  "horizontal_source_hierarchy_scale": 1.65,
+  "prior_localized_bbox": [
+    105,
+    113,
+    986,
+    240
+  ],
+  "prior_localized_size": [
+    881,
+    127
+  ],
+  "width_gain_px": 0,
+  "width_ratio_vs_c164": 1.0,
+  "style_geometry": {
+    "outer_navy_stroke": 9,
+    "white_mid_stroke": 5,
+    "gradient_body_extra": 3,
+    "slant_px": 22,
+    "shadow_offset": [
+      5,
+      6
+    ],
+    "source_profile_samples": [
+      [
+        57,
+        81,
+        115
+      ],
+      [
+        148,
+        197,
+        216
+      ],
+      [
+        255,
+        239,
+        231
+      ],
+      [
+        132,
+        190,
+        214
+      ],
+      [
+        87,
+        106,
+        139
+      ]
+    ],
+    "source_navy": [
+      16,
+      24,
+      74,
+      255
+    ],
+    "source_white": [
+      247,
+      239,
+      231,
+      255
+    ]
+  },
+  "dxt5": {
+    "full_replaced_blocks": 9485,
+    "partial_boundary_blocks": 343,
+    "boundary_in_bbox_alpha_samples_cleared": 3967
+  },
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261007-A-MANUALQA148R-2EA557B4/2EA557B4_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261007-A-MANUALQA148R-2EA557B4/2EA557B4_HD_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      256
+    ],
+    "changed_pixels": 116439,
+    "changed_bbox": [
+      1,
+      105,
+      1090,
+      248
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261007-A-MANUALQA148R-2EA557B4/2EA557B4_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261007-A-MANUALQA148R-2EA557B4/2EA557B4_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      256
+    ],
+    "changed_pixels": 130768,
+    "changed_bbox": [
+      1,
+      105,
+      1090,
+      248
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_total": 130768,
+    "changed_pixels_outside_original_bbox": 0,
+    "alpha_changed_pixels_outside_original_bbox": 0,
+    "protected_visible_pixels_changed": 0,
+    "source_residue_visible_pixels_outside_korean_guard": 0
+  },
+  "ordered_generation_gate": {
+    "plate_restoration": "PASS_EXACT_SOURCE_MASK",
+    "source_matching_slant_direction": "PASS_RIGHT_LEAN_AND_SOURCE_LEFT_ALIGNMENT_RESTORED",
+    "no_unnecessary_undersizing": "PASS_1_65X_WIDTH_RESTORED",
+    "source_faithful_weight_outline_shadow": "PASS_SOURCE_DERIVED",
+    "clipping": "PASS_POSITIVE_MARGIN",
+    "protected_art_clearance": "PASS_ZERO_OUTSIDE",
+    "flip_y_and_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "immediate_readability": "PENDING_CONTROLLER"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A148R_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
