@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION102-E989E3B7",
+  "queue_index": 35,
+  "asset": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583"
+  },
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "classification": {
+    "prior_action": "zoom_review",
+    "localizable": "Total Rank x2",
+    "translation": "종합 랭킹",
+    "protected": [
+      "Holly character artwork",
+      "speech-bubble borders/glow",
+      "all non-title UI artwork"
+    ]
+  },
+  "approved_template_reuse": {
+    "producer": "B157",
+    "final_qa": "C215_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "method": "exact duplicate sprite transfer; only C215-approved source-removal and Korean-render pixels copied",
+    "rows": [
+      {
+        "template_region_idx": 2,
+        "target_region_idx": 6,
+        "kind": "pink speech bubble",
+        "approval": "C202_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+        "shift": [
+          0,
+          -1280
+        ],
+        "target_cell": [
+          0,
+          208,
+          1720,
+          1016
+        ],
+        "original_bbox": [
+          594,
+          342,
+          1128,
+          444
+        ],
+        "source_core_bbox": [
+          609,
+          357,
+          1113,
+          429
+        ],
+        "localized_bbox": [
+          745,
+          361,
+          977,
+          425
+        ],
+        "source_width": 504,
+        "source_height": 72,
+        "localized_width": 232,
+        "localized_height": 64,
+        "margins": [
+          136,
+          136,
+          4,
+          4
+        ],
+        "source_removal_pixels": 40072,
+        "render_pixels": 11667,
+        "target_vs_template_source_diff_pixels": 0
+      },
+      {
+        "template_region_idx": 3,
+        "target_region_idx": 7,
+        "kind": "green speech bubble",
+        "approval": "C206_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+        "shift": [
+          0,
+          -1280
+        ],
+        "target_cell": [
+          1720,
+          208,
+          1640,
+          1016
+        ],
+        "original_bbox": [
+          2266,
+          363,
+          2785,
+          448
+        ],
+        "source_core_bbox": [
+          2273,
+          370,
+          2778,
+          442
+        ],
+        "localized_bbox": [
+          2412,
+          375,
+          2639,
+          437
+        ],
+        "source_width": 505,
+        "source_height": 72,
+        "localized_width": 227,
+        "localized_height": 62,
+        "margins": [
+          139,
+          139,
+          5,
+          5
+        ],
+        "source_removal_pixels": 42697,
+        "render_pixels": 11309,
+        "target_vs_template_source_diff_pixels": 0
+      }
+    ]
+  },
+  "bbox_gate": {
+    "containment": "2/2 PASS",
+    "size_ceiling": "2/2 PASS",
+    "positive_margin": "2/2 PASS"
+  },
+  "zero_pixel_gates": {
+    "clean_changed_outside_source_mask": 0,
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "localized_overlap": 0,
+    "localized_1px_touch": 0,
+    "source_script_residue": "0 by exact C215 final-patch identity"
+  },
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_CLEAN_PLATE.png",
+    "size": [
+      4096,
+      4096
+    ],
+    "changed_pixels": 82769,
+    "changed_bbox": [
+      600,
+      342,
+      2785,
+      448
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_FINAL_READABLE.png",
+    "size": [
+      4096,
+      4096
+    ],
+    "changed_pixels": 76810,
+    "changed_bbox": [
+      600,
+      342,
+      2785,
+      448
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "candidate_sha256": "c0e76661ed974cb7c477f172e93fd67645391f1da3e81dcb867d86af3a595622",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+  "worker_static_qa": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "status": "A102_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED"
+}
