@@ -238,11 +238,16 @@ namespace OutRunVrReviewHardening
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session)
     {
-        LastClassicFrameId = 0;
-        LastClassicRunGeneration = 0;
-        LastClassicGamePid = 0;
-        LastClassicAdvanceMs = 0;
-        return OutRunVrD3D9ExDirectPassthrough::DestroySession(session);
+        const XrResult result =
+            OutRunVrD3D9ExDirectPassthrough::DestroySession(session);
+        if (XR_SUCCEEDED(result))
+        {
+            LastClassicFrameId = 0;
+            LastClassicRunGeneration = 0;
+            LastClassicGamePid = 0;
+            LastClassicAdvanceMs = 0;
+        }
+        return result;
     }
 }
 

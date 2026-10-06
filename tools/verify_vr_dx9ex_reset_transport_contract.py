@@ -1414,6 +1414,20 @@ require(
     "TheaterCommittedDirectRun = {};",
 )
 
+review_destroy = body(host_review, "inline XrResult XRAPI_CALL DestroySession(")
+require_order(
+    review_destroy,
+    "R15 transactional session teardown",
+    "const XrResult result =",
+    "OutRunVrD3D9ExDirectPassthrough::DestroySession(session);",
+    "if (XR_SUCCEEDED(result))",
+    "LastClassicFrameId = 0;",
+    "LastClassicRunGeneration = 0;",
+    "LastClassicGamePid = 0;",
+    "LastClassicAdvanceMs = 0;",
+    "return result;",
+)
+
 r23_destroy = body(host_r23_runtime, "inline XrResult XRAPI_CALL DestroySession(")
 require_order(
     r23_destroy,
