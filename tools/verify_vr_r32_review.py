@@ -68,8 +68,17 @@ r32 = require(
     "DirectGPU copy path is disabled until Reset/interop revalidation",
     "R32EnsureDirectResources must run before this cached rejection",
     "VR R32 PERF 5s",
-    "VR R32 REVIEW2",
+    "R32 is a hook-free functional owner",
 )
+for retired in (
+        "R32InstallState",
+        "R32InstallThread",
+        "VRStereoR32ReviewHook",
+        "R32InstallStatus()",
+        "OpenXRVRStereoR32Review"):
+    if retired in r32:
+        raise SystemExit(f"R32 retained retired async install/status shim: {retired}")
+
 for banned in (
         "R32ResetR13Hook",
         "R32ResetR22Hook",
@@ -148,6 +157,13 @@ r33 = require(
     "R32ResolveDirectTransport(",
     "R33ResolveDirectR13Hook.call<bool>",
     "top-level telemetry counted once",
+    "const auto r31 = R31InstallStatus();",
+    "const auto r22 = R22InstallStatus();",
+    "const auto r13 = R13InstallStatus();",
+    "r31 == State::Failed || r22 == State::Failed",
+    "r13 == R13InstallStatusValue::Failed",
+    "r31 == State::Ready && r22 == State::Ready",
+    "r13 == R13InstallStatusValue::Ready",
 )
 for banned in ("R33ResetR32Hook", "reinterpret_cast<void*>(&ResetDestR32)"):
     if banned in r33:
@@ -166,6 +182,10 @@ direct_lower = r33.find("R33ResolveDirectR13Hook.call<bool>", direct_helper)
 if min(direct33_start, direct_helper, direct_lower) < 0 or not (
         direct33_start < direct_helper < direct_lower):
     raise SystemExit("R33 direct DirectGPU owner must preserve R32 helper around the lower R13 trampoline")
+
+for banned in ("R32InstallStatus()", "R32InstallState"):
+    if banned in r33:
+        raise SystemExit(f"R33 retained retired R32 install relay: {banned}")
 
 ex = require(
     "src/vr/d3d9/ex_device_upgrade.cpp",
