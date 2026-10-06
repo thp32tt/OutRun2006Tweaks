@@ -124,33 +124,31 @@ for m in source_masks:
     source_mask |= m
 if np.count_nonzero(source_masks[0]&source_masks[1]): raise RuntimeError("source masks overlap")
 
-# Clean plate by diffusing local red sign pixels through only the old source-letter footprint.
-clean_arr=sa.astype(np.float32).copy()
+# Clean plate: replace only the source-letter footprint with row-local sign-red samples.
+# This avoids pulling pale source glyph colours back into the repair while preserving the banner gradient.
+clean_arr=sa.copy()
 for row,sm,bm in zip(rows,source_masks,banner_masks):
-    donor=bm & ~sm
-    # Prefer saturated sign-red pixels as initial donors.
     rr=sa[:,:,0].astype(np.int16); gg=sa[:,:,1].astype(np.int16); bb=sa[:,:,2].astype(np.int16)
-    red_donor=donor & (rr>135) & (rr>gg+55) & (rr>bb+35) & (gg<110)
-    if int(red_donor.sum())<100: raise RuntimeError(("red donor too small",row["key"],int(red_donor.sum())))
-    dist,inds=ndimage.distance_transform_edt(~red_donor,return_indices=True)
-    yy,xx=inds
-    for ch in range(4):
-        clean_arr[:,:,ch][sm]=sa[:,:,ch][yy[sm],xx[sm]]
-    # Laplace-style local smoothing across removed letters while preserving every non-text pixel.
-    for _ in range(48):
-        for ch in range(3):
-            v=clean_arr[:,:,ch]
-            avg=(np.roll(v,1,0)+np.roll(v,-1,0)+np.roll(v,1,1)+np.roll(v,-1,1))*0.25
-            v[sm]=avg[sm]
-    clean_arr[:,:,3][sm]=255.0
+    red_donor=bm & ~sm & (rr>135) & (rr>gg+55) & (rr>bb+35) & (gg<95)
+    if int(red_donor.sum())<100:
+        raise RuntimeError(("red donor too small",row["key"],int(red_donor.sum())))
+    global_med=np.median(sa[red_donor],axis=0)
+    ys=np.unique(np.nonzero(sm)[0])
+    for y in ys:
+        xs=np.nonzero(sm[y])[0]
+        row_donor=np.nonzero(red_donor[y])[0]
+        if len(row_donor)>=4:
+            med=np.median(sa[y,row_donor],axis=0)
+        else:
+            med=global_med
+        clean_arr[y,xs]=np.clip(np.rint(med),0,255).astype(np.uint8)
+    clean_arr[:,:,3][sm]=255
 
-clean_arr=np.clip(np.rint(clean_arr),0,255).astype(np.uint8)
 clean=Image.fromarray(clean_arr,"RGBA")
 # Clean-plate source-script residue: old pale/orange source-letter class must be eliminated.
 residue_clean=0
 for row,sm in zip(rows,source_masks):
-    ca=clean_arr
-    rr=ca[:,:,0].astype(np.int16); gg=ca[:,:,1].astype(np.int16); bb=ca[:,:,2].astype(np.int16)
+    rr=clean_arr[:,:,0].astype(np.int16); gg=clean_arr[:,:,1].astype(np.int16); bb=clean_arr[:,:,2].astype(np.int16)
     old_class=sm & (rr>150) & (gg>58) & (bb>35) & ((gg-bb)>10)
     residue_clean += int(np.count_nonzero(old_class))
 if residue_clean:
@@ -309,7 +307,7 @@ report={
  "source_provenance":{"url":url,"sha256":SOURCE_SHA},
  "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":MIPS,
    "header_128_exact":payload[:128]==raw[:128],"raw_orientation":"mirror_y"},
- "construction":"red-banner source letters isolated as enclosed pale/orange islands; clean plate diffuses neighboring sign-red only through source-letter footprint; native Hangul uses natural advance + 0.17 source-family shear + sampled pale face/orange shadow.",
+ "construction":"red-banner source letters isolated as enclosed pale/orange islands; clean plate replaces only the old letters with row-local sign-red samples; native Hangul uses natural advance + 0.17 source-family shear + sampled pale face/orange shadow.",
  "rows":rows,
  "static_qa":{
    "elements_total":2,"bbox_size_positive_margin":"2/2 PASS",
