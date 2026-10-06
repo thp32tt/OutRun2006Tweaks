@@ -1,0 +1,733 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-WORKSTEAL120-33491F83",
+  "work_stolen_from_lane": "B",
+  "work_steal_reason": "A odd shard had no actionable production rows after A119R; B current cycle was processing later even zoom_review items 166+ while oldest untouched actionable even row 62 remained MANUAL_RECONSTRUCTION_REQUIRED.",
+  "queue_index": 62,
+  "asset": "textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+  "source_provenance": {
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+    "sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551"
+  },
+  "prior_failures": [
+    {
+      "run": "B178",
+      "failure": "SOURCE_TEXT_MASK_OVERLAP",
+      "result": "FAIL_CLOSED_NO_CANDIDATE"
+    },
+    {
+      "run": "B179",
+      "failure": "NO_SAFE_RENDER_FIT_LEFT_MAIN_CENTER_ONLY",
+      "result": "FAIL_CLOSED_NO_CANDIDATE"
+    }
+  ],
+  "translation": {
+    "semantic_segments": [
+      {
+        "source": "Diverge",
+        "korean": "분기"
+      },
+      {
+        "source": "Left",
+        "korean": "좌측"
+      },
+      {
+        "source": "Right",
+        "korean": "우측"
+      },
+      {
+        "source": "EASY",
+        "korean": "쉬움"
+      },
+      {
+        "source": "HARD",
+        "korean": "어려움"
+      }
+    ],
+    "physical_elements": 9
+  },
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "construction": {
+    "source_mask": "B179 disjoint color-core + <=11.5px source-effect masks",
+    "clean_plate": "artwork-aware nearest-boundary class reconstruction inside main-route source text masks; text-only arrow/standalone cells cleared transparent; all non-text source pixels immutable",
+    "placement": "exhaustive x/y collision-free search inside each exact source text bbox at descending native font size; 1px separation from immutable original pixels outside source-text masks; reconstructed clean-plate background inside the original text footprint remains paintable; source-centroid-nearest valid placement selected",
+    "source_transform_policy": {
+      "main_and_standalone_shear": 0.0,
+      "arrow_label_shear": 0.18
+    }
+  },
+  "reconstruction_stats": {
+    "source_text_mask_pixels": 144117,
+    "reconstructed_art_pixels": 56693,
+    "cleared_transparent_pixels": 87424,
+    "clean_changed_outside_source_text_mask": 0
+  },
+  "rows": [
+    {
+      "key": "diverge_main",
+      "source": "Diverge",
+      "ko": "분기",
+      "window": [
+        450,
+        5,
+        850,
+        105
+      ],
+      "family": "yellow",
+      "white_outer": false,
+      "shear": 0.0,
+      "cell": "transparent_label",
+      "source_bbox": [
+        461,
+        19,
+        750,
+        105
+      ],
+      "source_mask_pixels": 18506,
+      "source_mask_centroid": [
+        599.0857019345077,
+        61.929104074354264
+      ],
+      "fill_rgba": [
+        230,
+        230,
+        0,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        10,
+        57,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "localized_bbox": [
+        592,
+        35,
+        683,
+        91
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 47,
+      "outer_stroke_px": 5,
+      "navy_stroke_px": 3,
+      "anchor": [
+        592,
+        35
+      ],
+      "placement_score_from_source_centroid": 1476.8051139480492,
+      "source_width": 289,
+      "source_height": 86,
+      "localized_width": 91,
+      "localized_height": 56,
+      "delta_left": 131,
+      "delta_right": 67,
+      "delta_top": 16,
+      "delta_bottom": 14,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "protected_separation_1px": "PASS"
+    },
+    {
+      "key": "left_main",
+      "source": "Left",
+      "ko": "좌측",
+      "window": [
+        330,
+        115,
+        560,
+        220
+      ],
+      "family": "green",
+      "white_outer": true,
+      "shear": 0.0,
+      "cell": "main",
+      "source_bbox": [
+        330,
+        115,
+        517,
+        220
+      ],
+      "source_mask_pixels": 10030,
+      "source_mask_centroid": [
+        404.67347956131607,
+        182.7678963110668
+      ],
+      "fill_rgba": [
+        0,
+        179,
+        96,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        104,
+        57,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "localized_bbox": [
+        403,
+        182,
+        466,
+        219
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 31,
+      "outer_stroke_px": 3,
+      "navy_stroke_px": 2,
+      "anchor": [
+        403,
+        182
+      ],
+      "placement_score_from_source_centroid": 1204.0488227143082,
+      "source_width": 187,
+      "source_height": 105,
+      "localized_width": 63,
+      "localized_height": 37,
+      "delta_left": 73,
+      "delta_right": 51,
+      "delta_top": 67,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "protected_separation_1px": "PASS"
+    },
+    {
+      "key": "right_main",
+      "source": "Right",
+      "ko": "우측",
+      "window": [
+        720,
+        115,
+        970,
+        220
+      ],
+      "family": "red",
+      "white_outer": true,
+      "shear": 0.0,
+      "cell": "main",
+      "source_bbox": [
+        720,
+        140,
+        970,
+        220
+      ],
+      "source_mask_pixels": 10830,
+      "source_mask_centroid": [
+        842.7665743305632,
+        188.17128347183748
+      ],
+      "fill_rgba": [
+        199,
+        50,
+        50,
+        255
+      ],
+      "navy_rgba": [
+        118,
+        36,
+        54,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "localized_bbox": [
+        902,
+        155,
+        967,
+        193
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 33,
+      "outer_stroke_px": 3,
+      "navy_stroke_px": 2,
+      "anchor": [
+        902,
+        155
+      ],
+      "placement_score_from_source_centroid": 8615.846660289255,
+      "source_width": 250,
+      "source_height": 80,
+      "localized_width": 65,
+      "localized_height": 38,
+      "delta_left": 182,
+      "delta_right": 3,
+      "delta_top": 15,
+      "delta_bottom": 27,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "protected_separation_1px": "PASS"
+    },
+    {
+      "key": "easy_main",
+      "source": "EASY",
+      "ko": "쉬움",
+      "window": [
+        120,
+        240,
+        455,
+        365
+      ],
+      "family": "green",
+      "white_outer": true,
+      "shear": 0.0,
+      "cell": "main",
+      "source_bbox": [
+        120,
+        240,
+        380,
+        365
+      ],
+      "source_mask_pixels": 20007,
+      "source_mask_centroid": [
+        248.94681861348528,
+        314.5604538411556
+      ],
+      "fill_rgba": [
+        0,
+        179,
+        96,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        102,
+        57,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "localized_bbox": [
+        160,
+        298,
+        259,
+        357
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 50,
+      "outer_stroke_px": 5,
+      "navy_stroke_px": 3,
+      "anchor": [
+        160,
+        298
+      ],
+      "placement_score_from_source_centroid": 1723.4833535220732,
+      "source_width": 260,
+      "source_height": 125,
+      "localized_width": 99,
+      "localized_height": 59,
+      "delta_left": 40,
+      "delta_right": 121,
+      "delta_top": 58,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "protected_separation_1px": "PASS"
+    },
+    {
+      "key": "hard_main",
+      "source": "HARD",
+      "ko": "어려움",
+      "window": [
+        835,
+        240,
+        1145,
+        365
+      ],
+      "family": "red",
+      "white_outer": true,
+      "shear": 0.0,
+      "cell": "main",
+      "source_bbox": [
+        835,
+        292,
+        1063,
+        365
+      ],
+      "source_mask_pixels": 15826,
+      "source_mask_centroid": [
+        945.8065841021105,
+        328.6306710476431
+      ],
+      "fill_rgba": [
+        199,
+        50,
+        50,
+        255
+      ],
+      "navy_rgba": [
+        120,
+        41,
+        54,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "localized_bbox": [
+        903,
+        302,
+        1053,
+        363
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 52,
+      "outer_stroke_px": 5,
+      "navy_stroke_px": 3,
+      "anchor": [
+        903,
+        302
+      ],
+      "placement_score_from_source_centroid": 1051.3877337160325,
+      "source_width": 228,
+      "source_height": 73,
+      "localized_width": 150,
+      "localized_height": 61,
+      "delta_left": 68,
+      "delta_right": 10,
+      "delta_top": 10,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "protected_separation_1px": "PASS"
+    },
+    {
+      "key": "hard_arrow",
+      "source": "HARD",
+      "ko": "어려움",
+      "window": [
+        1360,
+        5,
+        1660,
+        120
+      ],
+      "family": "red",
+      "white_outer": true,
+      "shear": 0.18,
+      "cell": "arrow",
+      "source_bbox": [
+        1373,
+        24,
+        1639,
+        100
+      ],
+      "source_mask_pixels": 18110,
+      "source_mask_centroid": [
+        1507.1548868028713,
+        61.910160132523465
+      ],
+      "fill_rgba": [
+        199,
+        50,
+        50,
+        255
+      ],
+      "navy_rgba": [
+        108,
+        32,
+        54,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "localized_bbox": [
+        1445,
+        35,
+        1596,
+        98
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 54,
+      "outer_stroke_px": 5,
+      "navy_stroke_px": 4,
+      "anchor": [
+        1445,
+        35
+      ],
+      "placement_score_from_source_centroid": 199.15867625325666,
+      "source_width": 266,
+      "source_height": 76,
+      "localized_width": 151,
+      "localized_height": 63,
+      "delta_left": 72,
+      "delta_right": 43,
+      "delta_top": 11,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "protected_separation_1px": "PASS"
+    },
+    {
+      "key": "easy_arrow",
+      "source": "EASY",
+      "ko": "쉬움",
+      "window": [
+        1360,
+        135,
+        1660,
+        248
+      ],
+      "family": "green",
+      "white_outer": true,
+      "shear": 0.18,
+      "cell": "arrow",
+      "source_bbox": [
+        1370,
+        151,
+        1629,
+        229
+      ],
+      "source_mask_pixels": 16567,
+      "source_mask_centroid": [
+        1494.395726444136,
+        188.85265890022333
+      ],
+      "fill_rgba": [
+        0,
+        179,
+        96,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        50,
+        66,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "localized_bbox": [
+        1416,
+        155,
+        1514,
+        216
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 52,
+      "outer_stroke_px": 5,
+      "navy_stroke_px": 3,
+      "anchor": [
+        1416,
+        155
+      ],
+      "placement_score_from_source_centroid": 875.3490548797241,
+      "source_width": 259,
+      "source_height": 78,
+      "localized_width": 98,
+      "localized_height": 61,
+      "delta_left": 46,
+      "delta_right": 115,
+      "delta_top": 4,
+      "delta_bottom": 13,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "protected_separation_1px": "PASS"
+    },
+    {
+      "key": "hard_alone",
+      "source": "HARD",
+      "ko": "어려움",
+      "window": [
+        1730,
+        5,
+        2025,
+        120
+      ],
+      "family": "red",
+      "white_outer": true,
+      "shear": 0.0,
+      "cell": "standalone",
+      "source_bbox": [
+        1753,
+        24,
+        2003,
+        100
+      ],
+      "source_mask_pixels": 17967,
+      "source_mask_centroid": [
+        1874.6477987421383,
+        61.794790449156785
+      ],
+      "fill_rgba": [
+        199,
+        50,
+        50,
+        255
+      ],
+      "navy_rgba": [
+        120,
+        41,
+        54,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "localized_bbox": [
+        1843,
+        34,
+        1993,
+        95
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 52,
+      "outer_stroke_px": 5,
+      "navy_stroke_px": 3,
+      "anchor": [
+        1843,
+        34
+      ],
+      "placement_score_from_source_centroid": 1886.7315126161172,
+      "source_width": 250,
+      "source_height": 76,
+      "localized_width": 150,
+      "localized_height": 61,
+      "delta_left": 90,
+      "delta_right": 10,
+      "delta_top": 10,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "protected_separation_1px": "PASS"
+    },
+    {
+      "key": "easy_alone",
+      "source": "EASY",
+      "ko": "쉬움",
+      "window": [
+        1730,
+        135,
+        2025,
+        248
+      ],
+      "family": "green",
+      "white_outer": true,
+      "shear": 0.0,
+      "cell": "standalone",
+      "source_bbox": [
+        1759,
+        151,
+        1992,
+        229
+      ],
+      "source_mask_pixels": 16274,
+      "source_mask_centroid": [
+        1869.4436524517635,
+        188.85350866412682
+      ],
+      "fill_rgba": [
+        0,
+        179,
+        96,
+        255
+      ],
+      "navy_rgba": [
+        0,
+        74,
+        77,
+        255
+      ],
+      "white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "localized_bbox": [
+        1772,
+        158,
+        1871,
+        217
+      ],
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 50,
+      "outer_stroke_px": 5,
+      "navy_stroke_px": 3,
+      "anchor": [
+        1772,
+        158
+      ],
+      "placement_score_from_source_centroid": 2300.4257961193503,
+      "source_width": 233,
+      "source_height": 78,
+      "localized_width": 99,
+      "localized_height": 59,
+      "delta_left": 13,
+      "delta_right": 121,
+      "delta_top": 7,
+      "delta_bottom": 12,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "protected_separation_1px": "PASS"
+    }
+  ],
+  "static_qa": {
+    "elements_total": 9,
+    "bbox_size_positive_margin": "9/9 PASS",
+    "changed_pixels_outside_source_text_mask": 0,
+    "alpha_changed_outside_source_text_mask": 0,
+    "protected_immutable_pixels_changed": 0,
+    "localized_overlap_pixels": 0,
+    "localized_vs_immutable_protected_1px_overlap": 0,
+    "source_mask_unreconstructed_pixels": 0,
+    "source_visual_residue_check": "PENDING_CONTROLLER_HIGH_ZOOM",
+    "dds_roundtrip": "PASS",
+    "status": "PASS"
+  },
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+  "candidate_sha256": "f051a3350dff1f7101a61d21c0c24a5ffb17a7bca7602af46ac35f264ebbd92c",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "A120_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
