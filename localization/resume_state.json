@@ -1,5 +1,5 @@
 {
-  "schema_version": 117,
+  "schema_version": 118,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -6702,7 +6702,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-06 23:14 KST",
+  "updated_at_kst": "2026-10-06T23:21:31+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -6877,6 +6877,45 @@
     "controller_visual_qa": "PASS_SOURCE_OLD_NEW_READABLE_AND_RAW",
     "fresh_independent_c": "PENDING",
     "pre_ingame_comparison_refresh": "PENDING_C",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "b210_b211_manual_preingame_rework": {
+    "timestamp_kst": "2026-10-06T23:21:31+09:00",
+    "role": "B",
+    "trigger": "B manual review of current PRE_INGAME English-original comparison set after primary B production queue exhaustion",
+    "items": [
+      {
+        "run": "B210",
+        "queue_index": 50,
+        "asset": "textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+        "prior_c_status": "C104_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+        "before_sha256": "ecc4cbb6cdc064d2c7ccccfc378569f1dc7fc8339c46330ec68ec81c8f899df1",
+        "candidate_sha256": "af6a189de92ccade79687c92a46cd2304a5f631f73e96a24a9d6a74844de5c33",
+        "defects": [
+          "WRONG_SLANT_DIRECTION",
+          "SOURCE_STYLE_HIERARCHY_MISMATCH"
+        ],
+        "controller_qa": "localization/graphics/role_B/20261006-B-MANUALQA210-CBF8ECBF/B210_CONTROLLER_SELF_QA.json",
+        "status": "B_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME"
+      },
+      {
+        "run": "B211",
+        "queue_index": 198,
+        "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+        "prior_c_status": "C150_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+        "before_sha256": "34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c",
+        "candidate_sha256": "2160e7eef9dd27b028b5adc3df770a508c62891fd21676677365a0f55bee5885",
+        "defects": [
+          "TEXT_SCALE_TOO_SMALL_VS_SOURCE",
+          "SOURCE_STYLE_HIERARCHY_MISMATCH"
+        ],
+        "controller_qa": "localization/graphics/role_B/20261006-B-MANUALQA211-9FC88069/B211_CONTROLLER_SELF_QA.json",
+        "status": "B_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME"
+      }
+    ],
+    "controller_visual_qa": "PASS_READABLE_AND_RAW_2_OF_2",
+    "c_pre_ingame_export_refresh_required": true,
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
   }

@@ -2013,3 +2013,9 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_A/20261006-A-MANUALQA145-43B07A77/A145_43B07A77_REPORT.json and A145_CONTROLLER_FINAL_QA.json.
 
+
+
+### B210/B211 manual PRE_INGAME visual rework — 2026-10-06 23:21 KST
+- q050 CBF8ECBF: B210 candidate `af6a189de...`; source-matching readable slant + hierarchy rework; producer machine/controller visual QA PASS; fresh C required.
+- q198 9FC88069: B211 candidate `2160e7ee...`; RANDOM/RANDOM PLAY/INTERMEDIATE hierarchy rework; protected song/variant artwork retained; producer machine/controller visual QA PASS; fresh C required.
+- Current PRE_INGAME export is stale for these two rows until C refreshes it. `RUNTIME_VALIDATION=UNTESTED`.

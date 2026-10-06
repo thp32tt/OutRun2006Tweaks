@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06 23:14 KST",
+  "updated_at_kst": "2026-10-06T23:21:31+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A145 corrected q089 43B07A77 Game Over hierarchy/slant and passed producer controller QA. Do not repeat A145 or A144 bytes. Fresh independent C must validate the new q089 candidate and refresh PRE_INGAME_JPG_REVIEW; other producer outputs remain pending C/new in-game evidence.",
+  "next_checkpoint": "Fresh independent C should validate A144/A145 plus B210 q050 and B211 q198, refresh PRE_INGAME_JPG_REVIEW for the new candidate bytes, then route any C returns back to the owning producer lane. Do not repeat the completed B210/B211 material rework. Runtime validation remains UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -2555,6 +2555,26 @@
       "package_selected": false,
       "runtime_validation": "UNTESTED",
       "report": "localization/graphics/role_A/20261006-A-RUNTIME143-NAME-ENTRY-INPUT-WIRING/A143_NAME_ENTRY_INPUT_WIRING.json"
+    },
+    "b210_b211_manual_preingame_rework": {
+      "timestamp_kst": "2026-10-06T23:21:31+09:00",
+      "queue_indices": [
+        50,
+        198
+      ],
+      "assets": {
+        "CBF8ECBF": "af6a189de92ccade79687c92a46cd2304a5f631f73e96a24a9d6a74844de5c33",
+        "9FC88069": "2160e7eef9dd27b028b5adc3df770a508c62891fd21676677365a0f55bee5885"
+      },
+      "prior_c_passes_invalidated": [
+        "C104 CBF8ECBF",
+        "C150 9FC88069"
+      ],
+      "machine_qa": "PASS: q50 3/3 and q198 4/4 exact bbox/size/positive-margin; changes/alpha outside target bboxes=0; exact DDS header/roundtrip per worker reports",
+      "controller_visual_qa": "PASS: SOURCE/OLD/NEW readable + RAW; q50 slant/hierarchy corrected; q198 scale/hierarchy corrected",
+      "status": "B_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+      "c_pre_ingame_export_refresh_required": true,
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
@@ -2809,7 +2829,7 @@
     },
     "runtime_validation": "PENDING_NEW_INGAME_RETEST"
   },
-  "current_pending_c": "A144 user-JPG rework and A145 q089 43B07A77 are pending fresh independent C. q089 prior C104 pass is superseded by new candidate bytes; C must refresh the English-original comparison set before in-game testing. RUNTIME_VALIDATION=UNTESTED.",
+  "current_pending_c": "A144 user-JPG rework, A145 q089 43B07A77, B210 q050 CBF8ECBF and B211 q198 9FC88069 are pending fresh independent C. Prior C104/C150 passes for these materially changed candidates are superseded; C must refresh the English-original comparison set before in-game testing. RUNTIME_VALIDATION=UNTESTED.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",

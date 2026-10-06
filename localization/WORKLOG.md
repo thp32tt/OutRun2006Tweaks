@@ -2435,3 +2435,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_A/20261006-A-MANUALQA145-43B07A77/A145_43B07A77_REPORT.json and A145_CONTROLLER_FINAL_QA.json.
 
+
+
+## B210/B211 manual PRE_INGAME visual rework reconciliation — 2026-10-06 23:21 KST
+- B primary production queue had no OPEN_USER_INGAME_FAIL / current REWORK_REQUIRED / render-ready item, so the user-authorized manual visual review path was used against the current English-original PRE_INGAME comparison set.
+- **B210 / q050 CBF8ECBF**: prior C104 visual PASS was a false negative for readable slant/source hierarchy. Candidate `af6a189de92ccade79687c92a46cd2304a5f631f73e96a24a9d6a74844de5c33` materially reworks TIME OVER / GAME OVER / GOAL; 3/3 bbox-size-positive-margin PASS; changed/alpha pixels outside source bboxes = 0; controller SOURCE/OLD/NEW readable + RAW review PASS.
+- **B211 / q198 9FC88069**: prior C150 visual PASS was a false negative for undersized RANDOM / RANDOM PLAY / INTERMEDIATE B/A. Candidate `2160e7eef9dd27b028b5adc3df770a508c62891fd21676677365a0f55bee5885` increases source-relative hierarchy while preserving song-title/variant artwork; 4/4 bbox-size-positive-margin PASS; changed/alpha pixels outside source bboxes = 0; controller SOURCE/OLD/NEW readable + RAW review PASS.
+- Both items now require **fresh independent C QA + refreshed English-original comparison JPG + user review + actual in-game validation**. Prior C PASS does not survive the material byte changes.
+- `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.

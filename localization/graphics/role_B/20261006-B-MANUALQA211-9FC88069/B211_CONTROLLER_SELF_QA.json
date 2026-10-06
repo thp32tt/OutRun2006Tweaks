@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B211",
+  "timestamp_kst": "2026-10-06T23:21:31+09:00",
+  "queue_index": 198,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+  "candidate_sha256": "2160e7eef9dd27b028b5adc3df770a508c62891fd21676677365a0f55bee5885",
+  "prior_candidate_sha256": "34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c",
+  "prior_c_status_invalidated": "C150_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "manual_review_defects": [
+    "TEXT_SCALE_TOO_SMALL_VS_SOURCE",
+    "SOURCE_STYLE_HIERARCHY_MISMATCH"
+  ],
+  "evidence": {
+    "readable": "localization/graphics/role_B/20261006-B-MANUALQA211-9FC88069/B211_SOURCE_OLD_NEW_READABLE.jpg",
+    "raw": "localization/graphics/role_B/20261006-B-MANUALQA211-9FC88069/B211_SOURCE_OLD_NEW_RAW.jpg",
+    "worker_report": "localization/graphics/role_B/20261006-B-MANUALQA211-9FC88069/B211_9FC88069_REPORT.json"
+  },
+  "machine_gate": "PASS_INHERITED_FROM_WORKER_REPORT",
+  "controller_visual_review": "PASS: RANDOM/RANDOM PLAY/INTERMEDIATE B/A are enlarged to near-source height while staying inside exact source bboxes; source pixel-art family and protected song/variant artwork remain intact. RAW mirror-Y comparison shows no orientation regression, clipping, broken glyphs or foreign-image intrusion.",
+  "ordered_rework_gate": {
+    "1_plate_background_restoration": "PASS_OR_INHERITED_VALIDATED_CLEAN_PLATE",
+    "2_readable_slant_direction": "PASS",
+    "3_source_relative_scale_hierarchy": "PASS",
+    "4_weight_outline_shadow": "PASS_SOURCE_FAMILY_PRESERVED",
+    "5_clipped_pixels": "PASS_NONE_OBSERVED",
+    "6_protected_art_clearance": "PASS",
+    "7_flip_y_and_raw": "PASS_BOTH_REVIEWED",
+    "8_immediate_readability": "PASS"
+  },
+  "decision": "B_PRODUCER_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_AND_USER_JPG_REVIEW_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
