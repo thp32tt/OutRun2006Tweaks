@@ -1,0 +1,13 @@
+{
+  "role": "A",
+  "run": "20261006-A-WORKSTEAL121-33491F83-PSD",
+  "queue_index": 62,
+  "report": "localization/graphics/role_A/20261006-A-WORKSTEAL121-33491F83-PSD/A121_33491F83_PSD_LAYERS.json",
+  "psd_canvas": [
+    2048,
+    1024
+  ],
+  "layer_count": 227,
+  "text_layer_count": 9,
+  "status": "PSD_LAYER_INVENTORY_READY"
+}

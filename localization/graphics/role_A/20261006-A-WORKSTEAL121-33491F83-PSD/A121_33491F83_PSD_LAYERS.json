@@ -1,0 +1,5000 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-WORKSTEAL121-33491F83-PSD",
+  "queue_index": 62,
+  "asset": "textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+  "work_stolen_from_lane": "B",
+  "psd_source": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_loading_cvt_Exst/33491F83_512x256.psd",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/PSDs%2C%20XCFs%2C%20SVGs%2C%20and%20other%20Working%20Source%20Assets/OutRun2SP%20Mode%20UI/spr_sprani_loading_cvt_Exst/33491F83_512x256.psd",
+    "bytes": 8669875
+  },
+  "psd_canvas": [
+    2048,
+    1024
+  ],
+  "layers": [
+    {
+      "depth": 0,
+      "index": 0,
+      "name": "Background",
+      "path": "Background",
+      "kind": "solidcolorfill",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        2048,
+        1024
+      ],
+      "size": [
+        2048,
+        1024
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 0,
+      "index": 1,
+      "name": "objects",
+      "path": "objects",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        2048,
+        1024
+      ],
+      "size": [
+        2048,
+        1024
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 1,
+      "index": 0,
+      "name": "**Put background art inside this folder**",
+      "path": "objects/**Put background art inside this folder**",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        2048,
+        1024
+      ],
+      "size": [
+        2048,
+        1024
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 2,
+      "index": 0,
+      "name": "Texture-Area-2048x1024",
+      "path": "objects/**Put background art inside this folder**/Texture-Area-2048x1024",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        2048,
+        1024
+      ],
+      "size": [
+        2048,
+        1024
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 2,
+      "index": 1,
+      "name": "Sprites-Area",
+      "path": "objects/**Put background art inside this folder**/Sprites-Area",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        4,
+        4,
+        2036,
+        812
+      ],
+      "size": [
+        2032,
+        808
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 2,
+      "index": 2,
+      "name": "original-4x-Nearest-Neighbor",
+      "path": "objects/**Put background art inside this folder**/original-4x-Nearest-Neighbor",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        2048,
+        1024
+      ],
+      "size": [
+        2048,
+        1024
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 3,
+      "index": 0,
+      "name": "33491F83_512x256 - iguanaclerk",
+      "path": "objects/**Put background art inside this folder**/original-4x-Nearest-Neighbor/33491F83_512x256 - iguanaclerk",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        2048,
+        1024
+      ],
+      "size": [
+        2048,
+        1024
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 4,
+      "index": 0,
+      "name": "33491F83_512x256",
+      "path": "objects/**Put background art inside this folder**/original-4x-Nearest-Neighbor/33491F83_512x256 - iguanaclerk/33491F83_512x256",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        2048,
+        1024
+      ],
+      "size": [
+        2048,
+        1024
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 3,
+      "index": 1,
+      "name": "BG Flat Colors",
+      "path": "objects/**Put background art inside this folder**/original-4x-Nearest-Neighbor/BG Flat Colors",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        2048,
+        1024
+      ],
+      "size": [
+        2048,
+        1024
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 4,
+      "index": 0,
+      "name": "Flat Colors 0",
+      "path": "objects/**Put background art inside this folder**/original-4x-Nearest-Neighbor/BG Flat Colors/Flat Colors 0",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        2048,
+        1024
+      ],
+      "size": [
+        2048,
+        1024
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 4,
+      "index": 1,
+      "name": "Flat Colors 1",
+      "path": "objects/**Put background art inside this folder**/original-4x-Nearest-Neighbor/BG Flat Colors/Flat Colors 1",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        2040,
+        816
+      ],
+      "size": [
+        2040,
+        816
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 2,
+      "index": 3,
+      "name": "Mixed Technique",
+      "path": "objects/**Put background art inside this folder**/Mixed Technique",
+      "kind": "group",
+      "visible": false,
+      "bbox": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0,
+        0
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 3,
+      "index": 0,
+      "name": "33491F83_512x256 [commit #016d1c4]",
+      "path": "objects/**Put background art inside this folder**/Mixed Technique/33491F83_512x256 [commit #016d1c4]",
+      "kind": "group",
+      "visible": false,
+      "bbox": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0,
+        0
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 4,
+      "index": 0,
+      "name": "Recover Opaque Fill from Transparent Objects - 4xHDcube3+DonelBueno",
+      "path": "objects/**Put background art inside this folder**/Mixed Technique/33491F83_512x256 [commit #016d1c4]/Recover Opaque Fill from Transparent Objects - 4xHDcube3+DonelBueno",
+      "kind": "pixel",
+      "visible": false,
+      "bbox": [
+        18,
+        6,
+        2003,
+        805
+      ],
+      "size": [
+        1985,
+        799
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 4,
+      "index": 1,
+      "name": "33491F83_512x256 - 4xHDcube3+DonelBueno",
+      "path": "objects/**Put background art inside this folder**/Mixed Technique/33491F83_512x256 [commit #016d1c4]/33491F83_512x256 - 4xHDcube3+DonelBueno",
+      "kind": "pixel",
+      "visible": false,
+      "bbox": [
+        0,
+        0,
+        2048,
+        1024
+      ],
+      "size": [
+        2048,
+        1024
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 1,
+      "index": 1,
+      "name": "**Put any graphic and text art inside this folder**",
+      "path": "objects/**Put any graphic and text art inside this folder**",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        4,
+        4,
+        2008,
+        812
+      ],
+      "size": [
+        2004,
+        808
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 2,
+      "index": 0,
+      "name": "Manual Work",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        4,
+        4,
+        2008,
+        812
+      ],
+      "size": [
+        2004,
+        808
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 3,
+      "index": 0,
+      "name": "Bunki - Remastered",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        4,
+        4,
+        1196,
+        812
+      ],
+      "size": [
+        1192,
+        808
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 4,
+      "index": 0,
+      "name": "Sprites-Area",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Sprites-Area",
+      "kind": "pixel",
+      "visible": false,
+      "bbox": [
+        4,
+        4,
+        1196,
+        812
+      ],
+      "size": [
+        1192,
+        808
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 4,
+      "index": 1,
+      "name": "Bunki graphic",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        4,
+        4,
+        1196,
+        812
+      ],
+      "size": [
+        1192,
+        808
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 5,
+      "index": 0,
+      "name": "Bunki - Basic Fix",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Bunki - Basic Fix",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        4,
+        4,
+        1196,
+        812
+      ],
+      "size": [
+        1192,
+        808
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 5,
+      "index": 1,
+      "name": "Erase AI Typography",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Erase AI Typography",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        4,
+        4,
+        1196,
+        812
+      ],
+      "size": [
+        1192,
+        808
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 6,
+      "index": 0,
+      "name": "4xHDcube3",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Erase AI Typography/4xHDcube3",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        4,
+        4,
+        1196,
+        812
+      ],
+      "size": [
+        1192,
+        808
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Layer 43",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Erase AI Typography/4xHDcube3/Layer 43",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        4,
+        4,
+        1196,
+        812
+      ],
+      "size": [
+        1192,
+        808
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 1,
+      "name": "Levels 1",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Erase AI Typography/4xHDcube3/Levels 1",
+      "kind": "levels",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0,
+        0
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 1,
+      "name": "Erase Left and Right and Diverge",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Erase AI Typography/Erase Left and Right and Diverge",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        119,
+        20,
+        1060,
+        399
+      ],
+      "size": [
+        941,
+        379
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 5,
+      "index": 2,
+      "name": "Paintover",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        82,
+        66,
+        1120,
+        769
+      ],
+      "size": [
+        1038,
+        703
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 6,
+      "index": 0,
+      "name": "Group 3",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 3",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        108,
+        125,
+        319,
+        214
+      ],
+      "size": [
+        211,
+        89
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Layer 1",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 3/Layer 1",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        108,
+        135,
+        310,
+        206
+      ],
+      "size": [
+        202,
+        71
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 1,
+      "name": "Layer 3",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 3/Layer 3",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        163,
+        125,
+        319,
+        214
+      ],
+      "size": [
+        156,
+        89
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 2,
+      "name": "Layer 2",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 3/Layer 2",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        110,
+        145,
+        308,
+        204
+      ],
+      "size": [
+        198,
+        59
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 3,
+      "name": "Layer 4",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 3/Layer 4",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        162,
+        189,
+        178,
+        208
+      ],
+      "size": [
+        16,
+        19
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 1,
+      "name": "Group 1",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 1",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        881,
+        121,
+        1092,
+        214
+      ],
+      "size": [
+        211,
+        93
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Layer 1 copy",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 1/Layer 1 copy",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        890,
+        135,
+        1092,
+        206
+      ],
+      "size": [
+        202,
+        71
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 1,
+      "name": "Layer 3 copy",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 1/Layer 3 copy",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        881,
+        121,
+        1040,
+        214
+      ],
+      "size": [
+        159,
+        93
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 2,
+      "name": "Layer 2 copy 2",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 1/Layer 2 copy 2",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        892,
+        145,
+        1090,
+        204
+      ],
+      "size": [
+        198,
+        59
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 3,
+      "name": "Layer 4 copy",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 1/Layer 4 copy",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        1022,
+        189,
+        1038,
+        208
+      ],
+      "size": [
+        16,
+        19
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 2,
+      "name": "Group 4",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 4",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        238,
+        454,
+        962,
+        504
+      ],
+      "size": [
+        724,
+        50
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Layer 5",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 4/Layer 5",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        479,
+        484,
+        719,
+        504
+      ],
+      "size": [
+        240,
+        20
+      ],
+      "opacity": 102,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 1,
+      "name": "Layer 5 copy",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 4/Layer 5 copy",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        238,
+        454,
+        962,
+        465
+      ],
+      "size": [
+        724,
+        11
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 3,
+      "name": "Group 5",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        101,
+        66,
+        1094,
+        676
+      ],
+      "size": [
+        993,
+        610
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Layer 6",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Layer 6",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        150,
+        81,
+        1052,
+        270
+      ],
+      "size": [
+        902,
+        189
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 1,
+      "name": "Layer 7",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Layer 7",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        151,
+        66,
+        1055,
+        266
+      ],
+      "size": [
+        904,
+        200
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 2,
+      "name": "Layer 8",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Layer 8",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        572,
+        267,
+        640,
+        273
+      ],
+      "size": [
+        68,
+        6
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 3,
+      "name": "Group 2",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 2",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        101,
+        122,
+        1094,
+        289
+      ],
+      "size": [
+        993,
+        167
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 8,
+      "index": 0,
+      "name": "Shape 2",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 2/Shape 2",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        106,
+        216,
+        303,
+        289
+      ],
+      "size": [
+        197,
+        73
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 1,
+      "name": "Layer 10",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 2/Layer 10",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        101,
+        217,
+        273,
+        275
+      ],
+      "size": [
+        172,
+        58
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 2,
+      "name": "Shape 1",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 2/Shape 1",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        907,
+        215,
+        1094,
+        281
+      ],
+      "size": [
+        187,
+        66
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 3,
+      "name": "Shape 3",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 2/Shape 3",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        252,
+        122,
+        408,
+        176
+      ],
+      "size": [
+        156,
+        54
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 4,
+      "name": "Group 7",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        211,
+        125,
+        911,
+        484
+      ],
+      "size": [
+        700,
+        359
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 8,
+      "index": 0,
+      "name": "Shape 4",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7/Shape 4",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        211,
+        125,
+        334,
+        154
+      ],
+      "size": [
+        123,
+        29
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 1,
+      "name": "Shape 6",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7/Shape 6",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        479,
+        222,
+        558,
+        356
+      ],
+      "size": [
+        79,
+        134
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 2,
+      "name": "Shape 5",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7/Shape 5",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        477,
+        221,
+        514,
+        257
+      ],
+      "size": [
+        37,
+        36
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 3,
+      "name": "Shape 7",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7/Shape 7",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        476,
+        228,
+        559,
+        371
+      ],
+      "size": [
+        83,
+        143
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 4,
+      "name": "Shape 8",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7/Shape 8",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        547,
+        341,
+        558,
+        450
+      ],
+      "size": [
+        11,
+        109
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 5,
+      "name": "Shape 10",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7/Shape 10",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        650,
+        276,
+        684,
+        354
+      ],
+      "size": [
+        34,
+        78
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 6,
+      "name": "Shape 9",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7/Shape 9",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        643,
+        228,
+        720,
+        370
+      ],
+      "size": [
+        77,
+        142
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 7,
+      "name": "Layer 11",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7/Layer 11",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        303,
+        225,
+        911,
+        456
+      ],
+      "size": [
+        608,
+        231
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 8,
+      "name": "Shape 14",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7/Shape 14",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        829,
+        361,
+        850,
+        484
+      ],
+      "size": [
+        21,
+        123
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 9,
+      "name": "Layer 12",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7/Layer 12",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        352,
+        374,
+        376,
+        455
+      ],
+      "size": [
+        24,
+        81
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 10,
+      "name": "Shape 15",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7/Shape 15",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        351,
+        358,
+        374,
+        455
+      ],
+      "size": [
+        23,
+        97
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 5,
+      "name": "Shape 16",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Shape 16",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        336,
+        631,
+        546,
+        640
+      ],
+      "size": [
+        210,
+        9
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 6,
+      "name": "Shape 17",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Shape 17",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        531,
+        628,
+        866,
+        640
+      ],
+      "size": [
+        335,
+        12
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 7,
+      "name": "Shape 19",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Shape 19",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        690,
+        666,
+        870,
+        676
+      ],
+      "size": [
+        180,
+        10
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 8,
+      "name": "Shape 18",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Shape 18",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        330,
+        666,
+        515,
+        676
+      ],
+      "size": [
+        185,
+        10
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 4,
+      "name": "Group 6",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 6",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        415,
+        96,
+        1019,
+        340
+      ],
+      "size": [
+        604,
+        244
+      ],
+      "opacity": 168,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Shape 11",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 6/Shape 11",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        640,
+        96,
+        1019,
+        318
+      ],
+      "size": [
+        379,
+        222
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 1,
+      "name": "Shape 12",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 6/Shape 12",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        415,
+        156,
+        570,
+        331
+      ],
+      "size": [
+        155,
+        175
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 2,
+      "name": "Shape 13",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 6/Shape 13",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        639,
+        245,
+        682,
+        340
+      ],
+      "size": [
+        43,
+        95
+      ],
+      "opacity": 217,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 5,
+      "name": "Group 8",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        82,
+        82,
+        1119,
+        768
+      ],
+      "size": [
+        1037,
+        686
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Layer 15",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 15",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        642,
+        277,
+        662,
+        327
+      ],
+      "size": [
+        20,
+        50
+      ],
+      "opacity": 194,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 1,
+      "name": "Layer 16",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 16",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        540,
+        278,
+        558,
+        320
+      ],
+      "size": [
+        18,
+        42
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 2,
+      "name": "Layer 17",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 17",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        644,
+        244,
+        700,
+        336
+      ],
+      "size": [
+        56,
+        92
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 3,
+      "name": "Layer 18",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 18",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        643,
+        312,
+        656,
+        350
+      ],
+      "size": [
+        13,
+        38
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 4,
+      "name": "Layer 19",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 19",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        642,
+        313,
+        650,
+        334
+      ],
+      "size": [
+        8,
+        21
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 5,
+      "name": "Layer 20",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 20",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        849,
+        549,
+        897,
+        767
+      ],
+      "size": [
+        48,
+        218
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 6,
+      "name": "Layer 21",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 21",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        305,
+        549,
+        352,
+        768
+      ],
+      "size": [
+        47,
+        219
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 7,
+      "name": "Layer 26",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 26",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        869,
+        549,
+        912,
+        765
+      ],
+      "size": [
+        43,
+        216
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 8,
+      "name": "Layer 22",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 22",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        845,
+        377,
+        908,
+        764
+      ],
+      "size": [
+        63,
+        387
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 9,
+      "name": "Layer 24",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 24",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        290,
+        550,
+        334,
+        764
+      ],
+      "size": [
+        44,
+        214
+      ],
+      "opacity": 212,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 10,
+      "name": "Layer 25",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 25",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0,
+        0
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 11,
+      "name": "Layer 23",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 23",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        294,
+        549,
+        338,
+        764
+      ],
+      "size": [
+        44,
+        215
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 12,
+      "name": "Layer 28 copy",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 28 copy",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        268,
+        540,
+        935,
+        550
+      ],
+      "size": [
+        667,
+        10
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 13,
+      "name": "Layer 30",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 30",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        823,
+        117,
+        1051,
+        165
+      ],
+      "size": [
+        228,
+        48
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 14,
+      "name": "Layer 29",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 29",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        825,
+        119,
+        1056,
+        167
+      ],
+      "size": [
+        231,
+        48
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 15,
+      "name": "Group 9",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Group 9",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        145,
+        118,
+        502,
+        249
+      ],
+      "size": [
+        357,
+        131
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 8,
+      "index": 0,
+      "name": "Shape 21",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Group 9/Shape 21",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        146,
+        118,
+        486,
+        235
+      ],
+      "size": [
+        340,
+        117
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 1,
+      "name": "Shape 20",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Group 9/Shape 20",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        145,
+        118,
+        502,
+        249
+      ],
+      "size": [
+        357,
+        131
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 16,
+      "name": "Layer 27",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 27",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        822,
+        130,
+        933,
+        164
+      ],
+      "size": [
+        111,
+        34
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 17,
+      "name": "Shape 23",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Shape 23",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        82,
+        236,
+        128,
+        245
+      ],
+      "size": [
+        46,
+        9
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 18,
+      "name": "Shape 22",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Shape 22",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        158,
+        237,
+        267,
+        297
+      ],
+      "size": [
+        109,
+        60
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 19,
+      "name": "Layer 31",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 31",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        82,
+        218,
+        110,
+        239
+      ],
+      "size": [
+        28,
+        21
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 20,
+      "name": "Layer 32",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 32",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        755,
+        158,
+        779,
+        167
+      ],
+      "size": [
+        24,
+        9
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 21,
+      "name": "Layer 33",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 33",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        793,
+        129,
+        848,
+        155
+      ],
+      "size": [
+        55,
+        26
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 22,
+      "name": "Shape 24",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Shape 24",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        764,
+        129,
+        842,
+        168
+      ],
+      "size": [
+        78,
+        39
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 23,
+      "name": "Shape 25",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Shape 25",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        973,
+        82,
+        1057,
+        101
+      ],
+      "size": [
+        84,
+        19
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 24,
+      "name": "Layer 34",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Layer 34",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        974,
+        92,
+        1037,
+        101
+      ],
+      "size": [
+        63,
+        9
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 25,
+      "name": "Shape 27",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Shape 27",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        1085,
+        216,
+        1119,
+        239
+      ],
+      "size": [
+        34,
+        23
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 26,
+      "name": "Shape 26",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8/Shape 26",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        943,
+        232,
+        1119,
+        289
+      ],
+      "size": [
+        176,
+        57
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 6,
+      "name": "Group 10",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        274,
+        305,
+        928,
+        769
+      ],
+      "size": [
+        654,
+        464
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Shape 28",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10/Shape 28",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        639,
+        316,
+        649,
+        448
+      ],
+      "size": [
+        10,
+        132
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 1,
+      "name": "Shape 29",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10/Shape 29",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        546,
+        305,
+        564,
+        440
+      ],
+      "size": [
+        18,
+        135
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 2,
+      "name": "Layer 35",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10/Layer 35",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        554,
+        317,
+        646,
+        334
+      ],
+      "size": [
+        92,
+        17
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 3,
+      "name": "Shape 30",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10/Shape 30",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        551,
+        342,
+        562,
+        454
+      ],
+      "size": [
+        11,
+        112
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 4,
+      "name": "Layer 36",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10/Layer 36",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        554,
+        339,
+        562,
+        364
+      ],
+      "size": [
+        8,
+        25
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 5,
+      "name": "Shape 35",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10/Shape 35",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        539,
+        386,
+        663,
+        769
+      ],
+      "size": [
+        124,
+        383
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 6,
+      "name": "Shape 33",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10/Shape 33",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        549,
+        410,
+        562,
+        485
+      ],
+      "size": [
+        13,
+        75
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 7,
+      "name": "Shape 31",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10/Shape 31",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        640,
+        338,
+        649,
+        451
+      ],
+      "size": [
+        9,
+        113
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 8,
+      "name": "Shape 32",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10/Shape 32",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        647,
+        339,
+        667,
+        465
+      ],
+      "size": [
+        20,
+        126
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 9,
+      "name": "Layer 50",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10/Layer 50",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        320,
+        639,
+        883,
+        652
+      ],
+      "size": [
+        563,
+        13
+      ],
+      "opacity": 64,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 10,
+      "name": "Layer 51 copy",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10/Layer 51 copy",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        274,
+        623,
+        928,
+        642
+      ],
+      "size": [
+        654,
+        19
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 7,
+      "name": "Group 11",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        557,
+        266,
+        645,
+        435
+      ],
+      "size": [
+        88,
+        169
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Shape 36",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/Shape 36",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        558,
+        325,
+        570,
+        434
+      ],
+      "size": [
+        12,
+        109
+      ],
+      "opacity": 230,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 1,
+      "name": "Shape 37",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/Shape 37",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        634,
+        325,
+        643,
+        434
+      ],
+      "size": [
+        9,
+        109
+      ],
+      "opacity": 230,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 2,
+      "name": "Shape 38",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/Shape 38",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        558,
+        266,
+        644,
+        321
+      ],
+      "size": [
+        86,
+        55
+      ],
+      "opacity": 214,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 3,
+      "name": "Shape 39",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/Shape 39",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        558,
+        319,
+        644,
+        327
+      ],
+      "size": [
+        86,
+        8
+      ],
+      "opacity": 201,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 4,
+      "name": "lights",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/lights",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        562,
+        327,
+        640,
+        434
+      ],
+      "size": [
+        78,
+        107
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 8,
+      "index": 0,
+      "name": "base",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/lights/base",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        562,
+        327,
+        640,
+        434
+      ],
+      "size": [
+        78,
+        107
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 9,
+      "index": 0,
+      "name": "Shape 51",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/lights/base/Shape 51",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        562,
+        327,
+        640,
+        434
+      ],
+      "size": [
+        78,
+        107
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 9,
+      "index": 1,
+      "name": "Shape 52",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/lights/base/Shape 52",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        572,
+        335,
+        630,
+        433
+      ],
+      "size": [
+        58,
+        98
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 1,
+      "name": "light1",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/lights/light1",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        572,
+        331,
+        630,
+        385
+      ],
+      "size": [
+        58,
+        54
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 9,
+      "index": 0,
+      "name": "Rectangle 2",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/lights/light1/Rectangle 2",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        572,
+        331,
+        630,
+        376
+      ],
+      "size": [
+        58,
+        45
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 9,
+      "index": 1,
+      "name": "circle",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/lights/light1/circle",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        572,
+        340,
+        630,
+        385
+      ],
+      "size": [
+        58,
+        45
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 2,
+      "name": "light2",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/lights/light2",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        572,
+        384,
+        629,
+        431
+      ],
+      "size": [
+        57,
+        47
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 9,
+      "index": 0,
+      "name": "Rectangle 1",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/lights/light2/Rectangle 1",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        572,
+        384,
+        629,
+        424
+      ],
+      "size": [
+        57,
+        40
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 9,
+      "index": 1,
+      "name": "circle2",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/lights/light2/circle2",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        572,
+        391,
+        629,
+        431
+      ],
+      "size": [
+        57,
+        40
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 5,
+      "name": "Shape 40",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/Shape 40",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        557,
+        266,
+        645,
+        435
+      ],
+      "size": [
+        88,
+        169
+      ],
+      "opacity": 150,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 6,
+      "name": "Layer 49",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 11/Layer 49",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        575,
+        267,
+        628,
+        268
+      ],
+      "size": [
+        53,
+        1
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 8,
+      "name": "Group 13",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 13",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        209,
+        122,
+        992,
+        182
+      ],
+      "size": [
+        783,
+        60
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Group 12",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 13/Group 12",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        209,
+        129,
+        326,
+        182
+      ],
+      "size": [
+        117,
+        53
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 8,
+      "index": 0,
+      "name": "Layer 37",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 13/Group 12/Layer 37",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        302,
+        151,
+        322,
+        164
+      ],
+      "size": [
+        20,
+        13
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 1,
+      "name": "Layer 38",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 13/Group 12/Layer 38",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        305,
+        163,
+        320,
+        182
+      ],
+      "size": [
+        15,
+        19
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 2,
+      "name": "Shape 41",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 13/Group 12/Shape 41",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        209,
+        129,
+        326,
+        182
+      ],
+      "size": [
+        117,
+        53
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 3,
+      "name": "Layer 42",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 13/Group 12/Layer 42",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        315,
+        165,
+        319,
+        174
+      ],
+      "size": [
+        4,
+        9
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 1,
+      "name": "Group 12 copy",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 13/Group 12 copy",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        873,
+        122,
+        992,
+        182
+      ],
+      "size": [
+        119,
+        60
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 8,
+      "index": 0,
+      "name": "Layer 39",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 13/Group 12 copy/Layer 39",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        877,
+        151,
+        897,
+        164
+      ],
+      "size": [
+        20,
+        13
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 1,
+      "name": "Layer 40",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 13/Group 12 copy/Layer 40",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        879,
+        163,
+        894,
+        182
+      ],
+      "size": [
+        15,
+        19
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 2,
+      "name": "Shape 41",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 13/Group 12 copy/Shape 41",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        873,
+        129,
+        990,
+        182
+      ],
+      "size": [
+        117,
+        53
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 3,
+      "name": "Layer 41",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 13/Group 12 copy/Layer 41",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        880,
+        122,
+        992,
+        174
+      ],
+      "size": [
+        112,
+        52
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 9,
+      "name": "Group 14",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 14",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        252,
+        433,
+        950,
+        768
+      ],
+      "size": [
+        698,
+        335
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Shape 45",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 14/Shape 45",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        902,
+        752,
+        950,
+        768
+      ],
+      "size": [
+        48,
+        16
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 1,
+      "name": "Shape 46",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 14/Shape 46",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        901,
+        752,
+        912,
+        768
+      ],
+      "size": [
+        11,
+        16
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 2,
+      "name": "Shape 43",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 14/Shape 43",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        290,
+        753,
+        301,
+        768
+      ],
+      "size": [
+        11,
+        15
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 3,
+      "name": "Shape 44",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 14/Shape 44",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        298,
+        755,
+        308,
+        768
+      ],
+      "size": [
+        10,
+        13
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 4,
+      "name": "Shape 42",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 14/Shape 42",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        252,
+        753,
+        299,
+        768
+      ],
+      "size": [
+        47,
+        15
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 5,
+      "name": "Shape 47",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 14/Shape 47",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        889,
+        716,
+        905,
+        768
+      ],
+      "size": [
+        16,
+        52
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 6,
+      "name": "Shape 50",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 14/Shape 50",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        635,
+        433,
+        642,
+        466
+      ],
+      "size": [
+        7,
+        33
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 7,
+      "name": "Shape 48",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 14/Shape 48",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        563,
+        461,
+        641,
+        479
+      ],
+      "size": [
+        78,
+        18
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 8,
+      "name": "Shape 49",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 14/Shape 49",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        560,
+        433,
+        568,
+        466
+      ],
+      "size": [
+        8,
+        33
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 10,
+      "name": "Group 16",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        83,
+        81,
+        1118,
+        457
+      ],
+      "size": [
+        1035,
+        376
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Group 15",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        806,
+        239,
+        1118,
+        456
+      ],
+      "size": [
+        312,
+        217
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 8,
+      "index": 0,
+      "name": "Layer 44",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15/Layer 44",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        850,
+        388,
+        866,
+        454
+      ],
+      "size": [
+        16,
+        66
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 1,
+      "name": "Shape 53",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15/Shape 53",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        806,
+        273,
+        836,
+        304
+      ],
+      "size": [
+        30,
+        31
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 2,
+      "name": "Shape 55",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15/Shape 55",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        832,
+        263,
+        937,
+        383
+      ],
+      "size": [
+        105,
+        120
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 3,
+      "name": "Shape 57",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15/Shape 57",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        845,
+        340,
+        866,
+        406
+      ],
+      "size": [
+        21,
+        66
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 4,
+      "name": "Shape 54",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15/Shape 54",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        833,
+        279,
+        922,
+        385
+      ],
+      "size": [
+        89,
+        106
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 5,
+      "name": "Shape 56",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15/Shape 56",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        849,
+        272,
+        925,
+        398
+      ],
+      "size": [
+        76,
+        126
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 6,
+      "name": "Shape 58",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15/Shape 58",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        843,
+        371,
+        857,
+        456
+      ],
+      "size": [
+        14,
+        85
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 7,
+      "name": "Layer 47",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15/Layer 47",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        931,
+        284,
+        988,
+        320
+      ],
+      "size": [
+        57,
+        36
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 8,
+      "name": "Shape 63",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15/Shape 63",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        893,
+        266,
+        982,
+        360
+      ],
+      "size": [
+        89,
+        94
+      ],
+      "opacity": 217,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 9,
+      "name": "Shape 62",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15/Shape 62",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        882,
+        239,
+        1118,
+        400
+      ],
+      "size": [
+        236,
+        161
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 10,
+      "name": "Shape 65",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15/Shape 65",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        836,
+        357,
+        853,
+        409
+      ],
+      "size": [
+        17,
+        52
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 1,
+      "name": "Group 15 copy",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        83,
+        81,
+        560,
+        457
+      ],
+      "size": [
+        477,
+        376
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 8,
+      "index": 0,
+      "name": "Layer 45",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Layer 45",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        338,
+        377,
+        357,
+        455
+      ],
+      "size": [
+        19,
+        78
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 1,
+      "name": "Shape 55",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Shape 55",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        267,
+        263,
+        372,
+        384
+      ],
+      "size": [
+        105,
+        121
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 2,
+      "name": "Shape 57",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Shape 57",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        338,
+        340,
+        359,
+        406
+      ],
+      "size": [
+        21,
+        66
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 3,
+      "name": "Shape 54",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Shape 54",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        280,
+        279,
+        369,
+        386
+      ],
+      "size": [
+        89,
+        107
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 4,
+      "name": "Shape 56",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Shape 56",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        279,
+        272,
+        355,
+        398
+      ],
+      "size": [
+        76,
+        126
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 5,
+      "name": "Shape 58",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Shape 58",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        347,
+        371,
+        361,
+        457
+      ],
+      "size": [
+        14,
+        86
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 6,
+      "name": "Layer 46",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Layer 46",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        336,
+        375,
+        353,
+        455
+      ],
+      "size": [
+        17,
+        80
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 7,
+      "name": "Layer 48",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Layer 48",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        220,
+        285,
+        271,
+        321
+      ],
+      "size": [
+        51,
+        36
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 8,
+      "name": "Shape 64",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Shape 64",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        356,
+        359,
+        374,
+        429
+      ],
+      "size": [
+        18,
+        70
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 9,
+      "name": "Shape 61",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Shape 61",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        237,
+        274,
+        305,
+        349
+      ],
+      "size": [
+        68,
+        75
+      ],
+      "opacity": 191,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 10,
+      "name": "Shape 69",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Shape 69",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        518,
+        252,
+        560,
+        332
+      ],
+      "size": [
+        42,
+        80
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 11,
+      "name": "Shape 60",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Shape 60",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        83,
+        236,
+        312,
+        388
+      ],
+      "size": [
+        229,
+        152
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 12,
+      "name": "Shape 68",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Shape 68",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        209,
+        119,
+        407,
+        176
+      ],
+      "size": [
+        198,
+        57
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 13,
+      "name": "Shape 67",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Shape 67",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        144,
+        99,
+        418,
+        175
+      ],
+      "size": [
+        274,
+        76
+      ],
+      "opacity": 173,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 14,
+      "name": "Shape 59",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Shape 59",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        85,
+        254,
+        318,
+        414
+      ],
+      "size": [
+        233,
+        160
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 8,
+      "index": 15,
+      "name": "Shape 66",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy/Shape 66",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        145,
+        81,
+        451,
+        162
+      ],
+      "size": [
+        306,
+        81
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 11,
+      "name": "Erase-Curved-Arrows",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Erase-Curved-Arrows",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        86,
+        107,
+        1103,
+        238
+      ],
+      "size": [
+        1017,
+        131
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "remove-right-red",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Erase-Curved-Arrows/remove-right-red",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        872,
+        108,
+        1103,
+        232
+      ],
+      "size": [
+        231,
+        124
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 7,
+      "index": 1,
+      "name": "remove-left-green",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Erase-Curved-Arrows/remove-left-green",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        86,
+        107,
+        327,
+        238
+      ],
+      "size": [
+        241,
+        131
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 12,
+      "name": "Group 17",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 17",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        197,
+        144,
+        898,
+        197
+      ],
+      "size": [
+        701,
+        53
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Layer 52",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 17/Layer 52",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        197,
+        144,
+        898,
+        197
+      ],
+      "size": [
+        701,
+        53
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 13,
+      "name": "outline",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/outline",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        82,
+        80,
+        1120,
+        769
+      ],
+      "size": [
+        1038,
+        689
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": true
+    },
+    {
+      "depth": 7,
+      "index": 0,
+      "name": "Shape 70",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/outline/Shape 70",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        82,
+        80,
+        1120,
+        769
+      ],
+      "size": [
+        1038,
+        689
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 4,
+      "index": 2,
+      "name": "Frame",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Frame",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        20,
+        8,
+        1180,
+        804
+      ],
+      "size": [
+        1160,
+        796
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 5,
+      "index": 0,
+      "name": "Frame-Frame",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Frame/Frame-Frame",
+      "kind": "shape",
+      "visible": false,
+      "bbox": [
+        19,
+        55,
+        1181,
+        805
+      ],
+      "size": [
+        1162,
+        750
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 5,
+      "index": 1,
+      "name": "Frame-Shape-Down",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Frame/Frame-Shape-Down",
+      "kind": "shape",
+      "visible": false,
+      "bbox": [
+        370,
+        59,
+        829,
+        113
+      ],
+      "size": [
+        459,
+        54
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 5,
+      "index": 2,
+      "name": "Frame-Shape-Up",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Frame/Frame-Shape-Up",
+      "kind": "shape",
+      "visible": false,
+      "bbox": [
+        371,
+        7,
+        829,
+        61
+      ],
+      "size": [
+        458,
+        54
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 5,
+      "index": 3,
+      "name": "Frame [Rasterized]",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Frame/Frame [Rasterized]",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        20,
+        8,
+        1180,
+        804
+      ],
+      "size": [
+        1160,
+        796
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 4,
+      "index": 3,
+      "name": "Text",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        121,
+        14,
+        1079,
+        375
+      ],
+      "size": [
+        958,
+        361
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 5,
+      "index": 0,
+      "name": "misc",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/misc",
+      "kind": "group",
+      "visible": false,
+      "bbox": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0,
+        0
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 6,
+      "index": 0,
+      "name": "l-selection-drop-shadow",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/misc/l-selection-drop-shadow",
+      "kind": "pixel",
+      "visible": false,
+      "bbox": [
+        77,
+        107,
+        150,
+        202
+      ],
+      "size": [
+        73,
+        95
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 1,
+      "name": "r-selection-drop-shadow",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/misc/r-selection-drop-shadow",
+      "kind": "pixel",
+      "visible": false,
+      "bbox": [
+        1050,
+        107,
+        1123,
+        202
+      ],
+      "size": [
+        73,
+        95
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 5,
+      "index": 1,
+      "name": "Left-Easy",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Left-Easy",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        121,
+        129,
+        478,
+        375
+      ],
+      "size": [
+        357,
+        246
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 6,
+      "index": 0,
+      "name": "EASY",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Left-Easy/EASY",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        158,
+        301,
+        369,
+        359
+      ],
+      "size": [
+        211,
+        58
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "EASY"
+    },
+    {
+      "depth": 6,
+      "index": 1,
+      "name": "EASY [Rasterized]",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Left-Easy/EASY [Rasterized]",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        142,
+        285,
+        385,
+        375
+      ],
+      "size": [
+        243,
+        90
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 2,
+      "name": "Left",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Left-Easy/Left",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        338,
+        177,
+        462,
+        229
+      ],
+      "size": [
+        124,
+        52
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "Left"
+    },
+    {
+      "depth": 6,
+      "index": 3,
+      "name": "Left [Rasterized]",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Left-Easy/Left [Rasterized]",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        322,
+        161,
+        478,
+        245
+      ],
+      "size": [
+        156,
+        84
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 4,
+      "name": "Left-Easy-Green-Curved-Arrow",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Left-Easy/Left-Easy-Green-Curved-Arrow",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        121,
+        129,
+        297,
+        196
+      ],
+      "size": [
+        176,
+        67
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 5,
+      "index": 2,
+      "name": "Right-Hard",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Right-Hard",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        682,
+        129,
+        1079,
+        373
+      ],
+      "size": [
+        397,
+        244
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 6,
+      "index": 0,
+      "name": "HARD",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Right-Hard/HARD",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        824,
+        303,
+        1052,
+        357
+      ],
+      "size": [
+        228,
+        54
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "HARD"
+    },
+    {
+      "depth": 6,
+      "index": 1,
+      "name": "HARD [Rasterized]",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Right-Hard/HARD [Rasterized]",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        808,
+        287,
+        1068,
+        373
+      ],
+      "size": [
+        260,
+        86
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 2,
+      "name": "Right",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Right-Hard/Right",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        698,
+        179,
+        869,
+        241
+      ],
+      "size": [
+        171,
+        62
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "Right"
+    },
+    {
+      "depth": 6,
+      "index": 3,
+      "name": "Right [Rasterized]",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Right-Hard/Right [Rasterized]",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        682,
+        163,
+        885,
+        257
+      ],
+      "size": [
+        203,
+        94
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 4,
+      "name": "Right-Hard-Red-Curved-Arrow",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Right-Hard/Right-Hard-Red-Curved-Arrow",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        903,
+        129,
+        1079,
+        196
+      ],
+      "size": [
+        176,
+        67
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 5,
+      "index": 3,
+      "name": "Diverge",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Diverge",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        456,
+        14,
+        755,
+        113
+      ],
+      "size": [
+        299,
+        99
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 6,
+      "index": 0,
+      "name": "Diverge",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Diverge/Diverge",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        472,
+        30,
+        739,
+        97
+      ],
+      "size": [
+        267,
+        67
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "Diverge"
+    },
+    {
+      "depth": 6,
+      "index": 1,
+      "name": "Diverge [Rasterized]",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Diverge/Diverge [Rasterized]",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        456,
+        14,
+        755,
+        113
+      ],
+      "size": [
+        299,
+        99
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 3,
+      "index": 1,
+      "name": "Text",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        1289,
+        19,
+        2008,
+        235
+      ],
+      "size": [
+        719,
+        216
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 4,
+      "index": 0,
+      "name": "Regular",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Regular",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        1748,
+        19,
+        2008,
+        235
+      ],
+      "size": [
+        260,
+        216
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 5,
+      "index": 0,
+      "name": "EASY",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Regular/EASY",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        1770,
+        161,
+        1981,
+        219
+      ],
+      "size": [
+        211,
+        58
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "EASY"
+    },
+    {
+      "depth": 5,
+      "index": 1,
+      "name": "EASY [Rasterized]",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Regular/EASY [Rasterized]",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        1754,
+        145,
+        1997,
+        235
+      ],
+      "size": [
+        243,
+        90
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 5,
+      "index": 2,
+      "name": "HARD",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Regular/HARD",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        1764,
+        35,
+        1992,
+        89
+      ],
+      "size": [
+        228,
+        54
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "HARD"
+    },
+    {
+      "depth": 5,
+      "index": 3,
+      "name": "HARD [Rasterized]",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Regular/HARD [Rasterized]",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        1748,
+        19,
+        2008,
+        105
+      ],
+      "size": [
+        260,
+        86
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 4,
+      "index": 1,
+      "name": "Oblique - 27 degrees shear",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Oblique - 27 degrees shear",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        1289,
+        19,
+        1645,
+        235
+      ],
+      "size": [
+        356,
+        216
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 5,
+      "index": 0,
+      "name": "Up-EASY",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Oblique - 27 degrees shear/Up-EASY",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        1294,
+        145,
+        1635,
+        235
+      ],
+      "size": [
+        341,
+        90
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 6,
+      "index": 0,
+      "name": "EASY",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Oblique - 27 degrees shear/Up-EASY/EASY",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        1380,
+        161,
+        1619,
+        219
+      ],
+      "size": [
+        239,
+        58
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "EASY"
+    },
+    {
+      "depth": 6,
+      "index": 1,
+      "name": "EASY [Rasterized]",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Oblique - 27 degrees shear/Up-EASY/EASY [Rasterized]",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        1364,
+        145,
+        1635,
+        235
+      ],
+      "size": [
+        271,
+        90
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 2,
+      "name": "arrow-up",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Oblique - 27 degrees shear/Up-EASY/arrow-up",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        1294,
+        155,
+        1351,
+        221
+      ],
+      "size": [
+        57,
+        66
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 5,
+      "index": 1,
+      "name": "Down-HARD",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Oblique - 27 degrees shear/Down-HARD",
+      "kind": "group",
+      "visible": true,
+      "bbox": [
+        1289,
+        19,
+        1645,
+        105
+      ],
+      "size": [
+        356,
+        86
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 6,
+      "index": 0,
+      "name": "HARD",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Oblique - 27 degrees shear/Down-HARD/HARD",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        1383,
+        35,
+        1629,
+        89
+      ],
+      "size": [
+        246,
+        54
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "HARD"
+    },
+    {
+      "depth": 6,
+      "index": 1,
+      "name": "HARD [Rasterized]",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Oblique - 27 degrees shear/Down-HARD/HARD [Rasterized]",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        1367,
+        19,
+        1645,
+        105
+      ],
+      "size": [
+        278,
+        86
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 6,
+      "index": 2,
+      "name": "arrow-down",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Oblique - 27 degrees shear/Down-HARD/arrow-down",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        1289,
+        26,
+        1347,
+        93
+      ],
+      "size": [
+        58,
+        67
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    },
+    {
+      "depth": 0,
+      "index": 2,
+      "name": "atlas-grid",
+      "path": "atlas-grid",
+      "kind": "group",
+      "visible": false,
+      "bbox": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0,
+        0
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.PASS_THROUGH",
+      "is_group": true
+    },
+    {
+      "depth": 1,
+      "index": 0,
+      "name": "atlas",
+      "path": "atlas-grid/atlas",
+      "kind": "pixel",
+      "visible": false,
+      "bbox": [
+        4,
+        4,
+        2036,
+        812
+      ],
+      "size": [
+        2032,
+        808
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false
+    }
+  ],
+  "text_layers": [
+    {
+      "depth": 6,
+      "index": 0,
+      "name": "EASY",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Left-Easy/EASY",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        158,
+        301,
+        369,
+        359
+      ],
+      "size": [
+        211,
+        58
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "EASY"
+    },
+    {
+      "depth": 6,
+      "index": 2,
+      "name": "Left",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Left-Easy/Left",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        338,
+        177,
+        462,
+        229
+      ],
+      "size": [
+        124,
+        52
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "Left"
+    },
+    {
+      "depth": 6,
+      "index": 0,
+      "name": "HARD",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Right-Hard/HARD",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        824,
+        303,
+        1052,
+        357
+      ],
+      "size": [
+        228,
+        54
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "HARD"
+    },
+    {
+      "depth": 6,
+      "index": 2,
+      "name": "Right",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Right-Hard/Right",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        698,
+        179,
+        869,
+        241
+      ],
+      "size": [
+        171,
+        62
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "Right"
+    },
+    {
+      "depth": 6,
+      "index": 0,
+      "name": "Diverge",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Text/Diverge/Diverge",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        472,
+        30,
+        739,
+        97
+      ],
+      "size": [
+        267,
+        67
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "Diverge"
+    },
+    {
+      "depth": 5,
+      "index": 0,
+      "name": "EASY",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Regular/EASY",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        1770,
+        161,
+        1981,
+        219
+      ],
+      "size": [
+        211,
+        58
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "EASY"
+    },
+    {
+      "depth": 5,
+      "index": 2,
+      "name": "HARD",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Regular/HARD",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        1764,
+        35,
+        1992,
+        89
+      ],
+      "size": [
+        228,
+        54
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "HARD"
+    },
+    {
+      "depth": 6,
+      "index": 0,
+      "name": "EASY",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Oblique - 27 degrees shear/Up-EASY/EASY",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        1380,
+        161,
+        1619,
+        219
+      ],
+      "size": [
+        239,
+        58
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "EASY"
+    },
+    {
+      "depth": 6,
+      "index": 0,
+      "name": "HARD",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Text/Oblique - 27 degrees shear/Down-HARD/HARD",
+      "kind": "type",
+      "visible": false,
+      "bbox": [
+        1383,
+        35,
+        1629,
+        89
+      ],
+      "size": [
+        246,
+        54
+      ],
+      "opacity": 255,
+      "blend_mode": "BlendMode.NORMAL",
+      "is_group": false,
+      "text": "HARD"
+    }
+  ],
+  "status": "A121_PSD_LAYER_INVENTORY_READY",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
