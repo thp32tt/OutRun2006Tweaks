@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PROBE103-ZOOM103151153",
+  "timestamp_kst": "2026-10-06T10:26:33+09:00",
+  "decision": "MIXED_BATCH_INDEX103_LOCALIZE_INDEX151_153_PRESERVE_ORIGINAL",
+  "source_commit": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "assets": {
+    "590A4724": {
+      "queue_index": 103,
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+      "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+      "structure": "2048x2048 RGBA32 mip1 raw mirror_y",
+      "classification": "LOCALIZABLE_TEXT",
+      "segments": [
+        {
+          "source": "Normal Balance",
+          "korean": "일반 밸런스",
+          "occurrences": 1
+        }
+      ],
+      "candidate_required": true,
+      "producer_run": "20261006-A-PRODUCTION108-590A4724"
+    },
+    "4668C688": {
+      "queue_index": 151,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4668C688_512x512.dds",
+      "source_sha256": "9adbd53a111d2feb05eebf020327ec54d8f627cc9ec3348060e1d83e807d991b",
+      "structure": "2048x2048 RGBA32 mip1 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "eight course-image thumbnails",
+        "OutRun2 logo artwork only",
+        "no language-bearing localization text"
+      ],
+      "protected_original": [
+        "OutRun2 logo",
+        "course image artwork"
+      ],
+      "candidate_required": false
+    },
+    "4C972A19": {
+      "queue_index": 153,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4C972A19_512x512.dds",
+      "source_sha256": "2f3de90d8fff616d9d65c4df1be544749be834b77d3eac8a1be9d08c220c54fc",
+      "structure": "2048x2048 RGBA32 mip1 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "course-image artwork",
+        "OutRun2 logos",
+        "ordinal/rank tokens 1st/2nd/3rd/th and numeric digits",
+        "route-marker dot artwork"
+      ],
+      "protected_original": [
+        "OutRun2 logo",
+        "ordinal/rank/numeric tokens",
+        "route-marker dot artwork"
+      ],
+      "candidate_required": false
+    }
+  },
+  "controller_visual_qa": {
+    "readable_orientation": "PASS_3_OF_3",
+    "raw_mirror_y_orientation": "PASS_3_OF_3",
+    "preserve_original_indices": [
+      151,
+      153
+    ]
+  },
+  "evidence": [
+    "A103_590A4724_READABLE_PROOF.jpg",
+    "A103_4668C688_READABLE_PROOF.jpg",
+    "A103_4C972A19_READABLE_PROOF.jpg"
+  ],
+  "status": "A103_CLASSIFICATION_COMPLETE_A108_PRODUCTION_COMPLETE_FOR_INDEX103",
+  "runtime_validation": "INDEX103_UNTESTED_INDEX151_153_NOT_REQUIRED_FOR_LOCALIZATION",
+  "vr_ffb_dx11_dxvk_touched": false
+}
