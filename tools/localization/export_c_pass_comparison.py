@@ -13,6 +13,15 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 SOURCE_REPO = "Sonic-TV/OR2006Sprites"
 SOURCE_COMMIT = "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 OUTPUT_REL = Path("localization/graphics/role_C/PRE_INGAME_JPG_REVIEW")
+VISUAL_REVIEW_CHECKLIST = [
+    "plate_restoration_no_haze_or_source_residue",
+    "readable_slant_direction_matches_source",
+    "text_scale_and_hierarchy_not_visibly_undersized",
+    "weight_outline_shadow_shading_remain_readable",
+    "no_fill_outline_shadow_or_italic_end_clipping",
+    "no_vehicle_name_icon_plate_or_neighbor_intrusion",
+    "no_untranslated_visible_localizable_labels",
+]
 STOCK_ZIP_REL = Path("localization/validation/binary_compare/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip")
 ALIAS_SOURCE_BASENAME = {"06AB5CEE_1024x1024.dds": "6AB5CEE_1024x1024.dds"}
 EXPECTED_SOURCE_SHA = {
@@ -293,6 +302,7 @@ def main():
         "policy_pass_no_candidate_count": sum(x["source_kind"] == "policy_pass_no_candidate" for x in manifest),
         "layout": "top row English original vs current Korean in FLIP-Y review; bottom row English original vs current Korean in RAW DDS",
         "display_scaling_policy": "Only a proven lower-resolution English source may be integer-nearest-neighbor scaled for review display; source native size and SHA stay recorded and unmodified.",
+        "visual_review_checklist": VISUAL_REVIEW_CHECKLIST,
         "items": manifest,
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
@@ -307,6 +317,7 @@ def main():
         "- Lower-resolution English originals may be nearest-neighbor scaled only for human display; the English source bytes are never modified or treated as pixel-QA equivalents.\n"
         "- If no proven English source can be aligned to the candidate, export fails closed.\n"
         "- User visual rejection overrides prior C static PASS and reopens the asset for A/B rework before in-game testing.\n"
+        "- C visual checklist: clean plate/source-footprint restoration; source-direction slant; source-relative scale/hierarchy; readable weight/effects; zero clipping; zero protected-art intrusion; no untranslated visible localizable labels.\n"
         "- Report defects by the leading JPG number.\n",
         encoding="utf-8",
     )

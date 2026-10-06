@@ -169,4 +169,7 @@ Before any graphics asset that has reached independent C static PASS is treated 
 - The comparison must use an opaque neutral background so wrong orientation, reversed slant, source residue, overlap, broken glyphs, alpha halos, other-image intrusion, source-style drift, baseline/alignment mismatch and protected-art damage can be judged directly against the English original.
 - A C policy PASS that intentionally has no localized candidate remains in the numbered set; its comparison shows the English source on both sides and clearly marks the current result as original-preserved/no-localized-pixels.
 - User rejection from this JPG review overrides prior static/C PASS exactly like in-game screenshot evidence: reopen the affected asset for A/B rework and require a newer C pass before it returns to this export.
+- C pre-in-game visual review MUST enforce plate restoration, readable slant direction, source-relative text hierarchy/scale, readable effect weight, zero clipping, protected-art isolation and completeness of visible translated labels. Any user-visible failure in these categories overrides an earlier C numeric/static PASS and reopens the row.
+- A/B rework after such a rejection MUST materially change the candidate or exact rendering evidence; merely changing status/notes or re-running the old bytes is not completion.
+
 - This JPG review is a pre-in-game human gate only. It does not replace actual in-game validation and must not close RUNTIME_VALIDATION.
