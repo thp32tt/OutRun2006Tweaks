@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A149",
+  "timestamp_kst": "2026-10-07 03:40 KST",
+  "queue_index": 135,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+  "selection": {
+    "reason": "A primary production queue had no active P0/P1, C-returned REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER row after refresh; manual PRE_INGAME English-original review selected current card #016.",
+    "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/016_q135_2B0863D6.jpg",
+    "prior_c_status": "C109_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "2f3e99f468367e056ee3c6edfdb412b1fe5f10f27387a463472b07aeaa335fbb"
+  },
+  "defect": {
+    "tags": [
+      "SOURCE_FAMILY_WEIGHT_LEGIBILITY_TOO_WEAK",
+      "KOREAN_LABELS_VISUALLY_THINNER_THAN_SOURCE"
+    ],
+    "note": "The gray Korean labels were numerically contained and nearly source-height, but the current card showed noticeably weaker/thinner readable weight than the condensed English family. The red CLASS badge itself was retained as already clean."
+  },
+  "material_rework": {
+    "method": "Rebuild from canonical 2048x256 RGBA32 source and exact source masks/clean plate. Use native Noto Sans CJK KR Black, source-core gray RGB 101/108/110, modest native 1.14x horizontal reinforcement and 1-2px source-family weight stroke. CLASS badge stays unchanged.",
+    "prior_candidate_sha256": "2f3e99f468367e056ee3c6edfdb412b1fe5f10f27387a463472b07aeaa335fbb",
+    "candidate_sha256": "8657a59f966bb4be994a00ead41d6939a5145efba320deab83cd3ef8af92b0c1",
+    "gray_rows_reworked": 9,
+    "class_badge_changed": false,
+    "width_gains_px": [
+      14,
+      13,
+      17,
+      17,
+      18,
+      22,
+      5,
+      5,
+      11
+    ]
+  },
+  "machine_qa": {
+    "target_occurrences": 10,
+    "bbox_readable_raw": "10/10 PASS",
+    "size_ceiling": "10/10 PASS",
+    "positive_margin": "10/10 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "clean_plate_source_text_residue_pixels": 0,
+    "structure": "2048x256 RGBA32 mip1 header exact",
+    "raw_orientation": "mirror_y"
+  },
+  "ordered_generation_gate": {
+    "1_source_text_removed_plate_restored": "PASS_CANONICAL_SOURCE_MASK_CLEAN_PLATE",
+    "2_source_transform_direction": "PASS_UPRIGHT_SOURCE_FAMILY_RAW_MIRROR_Y_PRESERVED",
+    "3_no_unnecessary_undersizing": "PASS_SOURCE_HEIGHT_NEAR_MAX_AND_1_14X_WIDTH_REINFORCEMENT",
+    "4_weight_outline_shadow": "PASS_NATIVE_BLACK_PLUS_SOURCE_CORE_GRAY_AND_SMALL_WEIGHT_STROKE",
+    "5_no_clipped_pixels": "PASS_10_OF_10_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_PROTECTED_CHANGE",
+    "7_flip_y_and_raw": "PASS_CONTROLLER_VISUAL_BOTH",
+    "8_immediate_readability_vs_source": "PASS_CONTROLLER_VISUAL_IMPROVED_WEIGHT"
+  },
+  "evidence": {
+    "worker_report": "localization/graphics/role_A/20261007-A-MANUALQA149-2B0863D6/A149_2B0863D6_REPORT.json",
+    "source_prior_clean_final": "localization/graphics/role_A/20261007-A-MANUALQA149-2B0863D6/A149_SOURCE_C109_CLEAN_FINAL_GRAY.jpg",
+    "row_contact": "localization/graphics/role_A/20261007-A-MANUALQA149-2B0863D6/A149_ROW_CONTACT.jpg",
+    "raw_compare": "localization/graphics/role_A/20261007-A-MANUALQA149-2B0863D6/A149_SOURCE_C109_FINAL_RAW.jpg",
+    "github_worker_run": 37512216342,
+    "worker_output_commit": "4b80fa429147385074790d9f8c21eee994af19a9"
+  },
+  "controller_visual_qa": "PASS_SOURCE_C109_A149_READABLE_ROW_RAW",
+  "producer_status": "A149_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
