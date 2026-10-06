@@ -6,17 +6,18 @@ from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
 
-repo=Path.cwd(); run="20261007-A-MANUALQA148-2EA557B4"
+repo=Path.cwd(); run="20261007-A-MANUALQA148R-2EA557B4"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset_rel="textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset_rel; candidate.parent.mkdir(parents=True,exist_ok=True)
 validator=repo/"tools/localization/validate_clean_plate.py"
-work=Path("/tmp/outrun_A148_q055"); work.mkdir(parents=True,exist_ok=True)
+work=Path("/tmp/outrun_A148R_q055"); work.mkdir(parents=True,exist_ok=True)
 source=work/"2EA557B4_HD.dds"; atlas=work/"4x_2EA557B4_512x64_atlas.json"
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 SOURCE_SHA="b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685"
-EXPECTED_BEFORE="b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc"
+EXPECTED_BEFORE="13cf23b401ecf65fa3b2f70af50a5be5e1f07c086d982d634c08d7b8094b477b"
+C164_CANDIDATE="b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc"
 SOURCE_WIDTH_RESTORE=1.65
 BLOB="bbf53949c7d9f1dc4949e661caeeaf19fe667d79"
 urllib.request.urlretrieve("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT+"/Release/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",source)
@@ -31,7 +32,7 @@ def dmask(a,b):
     return m.point(lambda v:255 if v else 0)
 
 if sha(source)!=SOURCE_SHA: raise RuntimeError(("source SHA",sha(source),SOURCE_SHA))
-if not candidate.exists() or sha(candidate)!=EXPECTED_BEFORE: raise RuntimeError(("candidate drift before A148",sha(candidate) if candidate.exists() else None,EXPECTED_BEFORE))
+if not candidate.exists() or sha(candidate)!=EXPECTED_BEFORE: raise RuntimeError(("candidate drift before A148R",sha(candidate) if candidate.exists() else None,EXPECTED_BEFORE))
 old_raw=Image.open(candidate).convert("RGBA"); old_readable=old_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 sb=source.read_bytes()
 if sb[:4]!=b"DDS " or sb[84:88]!=b"DXT5": raise RuntimeError("not DXT5")
@@ -56,8 +57,8 @@ sp=out/"2EA557B4_HD_SOURCE_READABLE.png"; cp=out/"2EA557B4_HD_CLEAN_PLATE.png"
 spm=out/"2EA557B4_HD_SOURCE_TEXT_MASK.png"; ap=out/"2EA557B4_HD_ALLOWED_TEXT_REGION_MASK.png"
 pp=out/"2EA557B4_HD_PROTECTED_VISIBLE_MASK.png"; cpp=out/"2EA557B4_HD_CLEAN_PROTECTED_VISIBLE_MASK.png"
 readable.save(sp); clean.save(cp); srcmask.save(spm); allowed.save(ap); protected.save(pp); clean_protected.save(cpp)
-subprocess.run(["python3",str(validator),str(sp),str(cp),str(spm),"--protected-mask",str(cpp),"--report",str(out/"A148_CLEAN_PLATE_VALIDATION.json")],check=True)
-cleanrep=json.loads((out/"A148_CLEAN_PLATE_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(cp),str(spm),"--protected-mask",str(cpp),"--report",str(out/"A148R_CLEAN_PLATE_VALIDATION.json")],check=True)
+cleanrep=json.loads((out/"A148R_CLEAN_PLATE_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean fail",cleanrep))
 
 def fontpath():
@@ -190,14 +191,14 @@ def render(text):
             rb=layer.getchannel("A").getbbox()
             if rb: layer=layer.crop(rb)
         if layer.width<=aw-16 and layer.height<=ah-16:
-            tx=ob[0]+(aw-layer.width)//2; ty=ob[1]+(ah-layer.height)//2
+            tx=ob[0]+8; ty=ob[1]+(ah-layer.height)//2
             if tx>=ob[0]+4 and ty>=ob[1]+4 and tx+layer.width<=ob[2]-4 and ty+layer.height<=ob[3]-4:
                 return layer,(tx,ty),fs,outer,white_stroke,body_extra
     raise RuntimeError("filled-gradient fit failed")
 
 layer,(tx,ty),fs,OUTER_STROKE,WHITE_STROKE,BODY_EXTRA=render("다음 라운드")
 
-layer.save(out/"A148_KOREAN_LAYER_FILLED_GRADIENT.png")
+layer.save(out/"A148R_KOREAN_LAYER_FILLED_GRADIENT.png")
 lm=layer.getchannel("A").point(lambda v:255 if v else 0)
 final=clean.copy(); final.paste(layer,(tx,ty),lm)
 ideal_loc=[tx,ty,tx+layer.width,ty+layer.height]
@@ -265,8 +266,8 @@ if candidate.read_bytes()[:128]!=sb[:128]: raise RuntimeError("header")
 dr=Image.open(candidate).convert("RGBA"); dec=dr.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 dp=out/"2EA557B4_HD_FINAL_DECODED_READABLE.png"; dec.save(dp)
 
-subprocess.run(["python3",str(validator),str(sp),str(dp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A148_FINAL_MASK_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"A148_FINAL_MASK_VALIDATION.json").read_text())
+subprocess.run(["python3",str(validator),str(sp),str(dp),str(ap),"--protected-mask",str(pp),"--report",str(out/"A148R_FINAL_MASK_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"A148R_FINAL_MASK_VALIDATION.json").read_text())
 diff=dmask(readable,dec)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
 alpha_out=count(ImageChops.multiply(ImageChops.difference(readable.getchannel("A"),dec.getchannel("A")).point(lambda v:255 if v else 0),ImageOps.invert(allowed)))
@@ -297,8 +298,9 @@ if not old_db: raise RuntimeError("prior C164 candidate empty")
 old_loc=[cell[0]+old_db[0],cell[1]+old_db[1],cell[0]+old_db[2],cell[1]+old_db[3]]
 old_w=old_loc[2]-old_loc[0]; old_h=old_loc[3]-old_loc[1]
 new_w=loc[2]-loc[0]; new_h=loc[3]-loc[1]
-if new_w < int(round(old_w*1.50)): raise RuntimeError(("insufficient width restoration",old_w,new_w))
+if new_w < 850: raise RuntimeError(("insufficient source hierarchy width",new_w))
 if new_h < old_h-2: raise RuntimeError(("height regression",old_h,new_h))
+if not (0 < loc[0]-ob[0] <= 12): raise RuntimeError(("source-left alignment not restored",ob,loc))
 
 def gray(im):
     bg=Image.new("RGBA",im.size,(90,90,90,255)); bg.alpha_composite(im); return bg.convert("RGB")
@@ -306,20 +308,20 @@ sheet=Image.new("RGB",(W*2,H*2),(60,60,60))
 sheet.paste(gray(readable),(0,0)); sheet.paste(gray(old_readable),(W,0))
 sheet.paste(gray(clean),(0,H)); sheet.paste(gray(dec),(W,H))
 sheet.thumbnail((1800,500),Image.Resampling.LANCZOS)
-sheet.save(out/"A148_SOURCE_C164_CLEAN_NEW_READABLE.jpg",quality=96)
+sheet.save(out/"A148R_SOURCE_C164_CLEAN_NEW_READABLE.jpg",quality=96)
 rawsheet=Image.new("RGB",(W*3,H),(60,60,60))
 rawsheet.paste(gray(raw),(0,0)); rawsheet.paste(gray(old_raw),(W,0)); rawsheet.paste(gray(dr),(W*2,0))
 rawsheet.thumbnail((2100,320),Image.Resampling.LANCZOS)
-rawsheet.save(out/"A148_SOURCE_C164_NEW_RAW.jpg",quality=96)
+rawsheet.save(out/"A148R_SOURCE_C164_NEW_RAW.jpg",quality=96)
 crop=(0,80,1200,256)
 cs=Image.new("RGB",(1200,(256-80)*3),(60,60,60))
 for i,im in enumerate([readable,old_readable,dec]): cs.paste(gray(im.crop(crop)),(0,i*(256-80)))
-cs.save(out/"A148_NEXT_ROUND_SOURCE_C164_NEW_DETAIL.jpg",quality=96)
+cs.save(out/"A148R_NEXT_ROUND_SOURCE_C164_NEW_DETAIL.jpg",quality=96)
 
 status=(cleanrep["status"]=="PASS" and finalrep["status"]=="PASS" and outside==0 and alpha_out==0 and prot==0 and residue==0 and contain and size_ok and positive and raw_contain)
 report={
  "schema_version":1,"role":"A","run":run,"index":55,"asset":asset_rel,"worker":os.environ.get("OUTRUN_CPU_WORKER"),
- "trigger":"MANUAL_PRE_INGAME_TEXT_SCALE_HIERARCHY_FALSE_NEGATIVE","review_jpg":"localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/017_q055_2EA557B4.jpg","prior_c_status":"C164_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME","prior_candidate_sha256":EXPECTED_BEFORE,
+ "trigger":"CONTROLLER_RETRY_SOURCE_ALIGNMENT_AFTER_A148_SCALE_REWORK","review_jpg":"localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/017_q055_2EA557B4.jpg","prior_c_status":"C164_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME","c164_candidate_sha256":C164_CANDIDATE,"first_attempt_a148_sha256":EXPECTED_BEFORE,"first_attempt_a148_status":"CONTROLLER_REJECTED_SOURCE_ALIGNMENT_NOT_PROMOTED",
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":BLOB,"sha256":SOURCE_SHA,"path":"Release/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds","classification":"authoritative HD source; stale filename suffix, DDS header 2048x256 DXT5"},
  "source_sha256":SOURCE_SHA,"candidate_sha256":csha,"candidate_path":str(candidate.relative_to(repo)),
  "structure":{"dimensions":[W,H],"compression":"DXT5","bytes":len(sb),"header_128_exact":True,"raw_orientation":"mirror_y","exact_source_bbox_block_aligned":False},
@@ -333,10 +335,10 @@ report={
  "dxt5":{"full_replaced_blocks":full_blocks,"partial_boundary_blocks":partial_blocks,"boundary_in_bbox_alpha_samples_cleared":boundary_pixels_cleared},
  "clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
  "decoded_changes":{"changed_pixels_total":count(diff),"changed_pixels_outside_original_bbox":outside_exact_pixels,"alpha_changed_pixels_outside_original_bbox":alpha_out,"protected_visible_pixels_changed":prot,"source_residue_visible_pixels_outside_korean_guard":residue},
- "ordered_generation_gate":{"plate_restoration":"PASS_EXACT_SOURCE_MASK","source_matching_slant_direction":"PASS_RIGHT_LEAN_PRESERVED","no_unnecessary_undersizing":"REWORKED_1_65X_WIDTH_PENDING_CONTROLLER","source_faithful_weight_outline_shadow":"PASS_SOURCE_DERIVED","clipping":"PASS_POSITIVE_MARGIN","protected_art_clearance":"PASS_ZERO_OUTSIDE","flip_y_and_raw":"EVIDENCE_WRITTEN_PENDING_CONTROLLER","immediate_readability":"PENDING_CONTROLLER"},"controller_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"UNTESTED","status":"A148_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A148_WORKER_REWORK_REQUIRED","no_vr_ffb_dx11_dxvk_work":True
+ "ordered_generation_gate":{"plate_restoration":"PASS_EXACT_SOURCE_MASK","source_matching_slant_direction":"PASS_RIGHT_LEAN_AND_SOURCE_LEFT_ALIGNMENT_RESTORED","no_unnecessary_undersizing":"PASS_1_65X_WIDTH_RESTORED","source_faithful_weight_outline_shadow":"PASS_SOURCE_DERIVED","clipping":"PASS_POSITIVE_MARGIN","protected_art_clearance":"PASS_ZERO_OUTSIDE","flip_y_and_raw":"EVIDENCE_WRITTEN_PENDING_CONTROLLER","immediate_readability":"PENDING_CONTROLLER"},"controller_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"UNTESTED","status":"A148R_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A148R_WORKER_REWORK_REQUIRED","no_vr_ffb_dx11_dxvk_work":True
 }
-(out/"A148_2EA557B4_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-summary={"run":run,"asset":"2EA557B4","index":55,"trigger":"MANUAL_PRE_INGAME_TEXT_SCALE_HIERARCHY_FALSE_NEGATIVE","prior_candidate_sha256":EXPECTED_BEFORE,"source_sha256":SOURCE_SHA,"candidate_sha256":csha,"source_dimensions":[W,H],"compression":"DXT5","bbox_pass":"1/1" if contain and raw_contain else "FAIL","size_ceiling":"1/1" if size_ok else "FAIL","positive_margin":"1/1" if positive else "FAIL","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],"changed_pixels_outside_original_bbox":outside,"alpha_changed_pixels_outside_original_bbox":alpha_out,"protected_visible_pixels_changed":prot,"source_residue_visible_pixels_outside_korean_guard":residue,"partial_boundary_blocks":partial_blocks,"prior_width":old_w,"new_width":new_w,"width_gain_px":new_w-old_w,"width_ratio_vs_c164":round(new_w/old_w,4),"worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_A/20261005-A-PRODUCTION26/A148_2EA557B4_REPORT.json"}
-(wr/"A148_2EA557B4.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"A148R_2EA557B4_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+summary={"run":run,"asset":"2EA557B4","index":55,"trigger":"CONTROLLER_RETRY_SOURCE_ALIGNMENT_AFTER_A148","c164_candidate_sha256":C164_CANDIDATE,"first_attempt_a148_sha256":EXPECTED_BEFORE,"source_sha256":SOURCE_SHA,"candidate_sha256":csha,"source_dimensions":[W,H],"compression":"DXT5","bbox_pass":"1/1" if contain and raw_contain else "FAIL","size_ceiling":"1/1" if size_ok else "FAIL","positive_margin":"1/1" if positive else "FAIL","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],"changed_pixels_outside_original_bbox":outside,"alpha_changed_pixels_outside_original_bbox":alpha_out,"protected_visible_pixels_changed":prot,"source_residue_visible_pixels_outside_korean_guard":residue,"partial_boundary_blocks":partial_blocks,"prior_width":old_w,"new_width":new_w,"width_gain_px":new_w-old_w,"width_ratio_vs_c164":round(new_w/old_w,4),"worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_A/20261005-A-PRODUCTION26/A148R_2EA557B4_REPORT.json"}
+(wr/"A148R_2EA557B4.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False,indent=2))
 if not status: raise SystemExit(2)
