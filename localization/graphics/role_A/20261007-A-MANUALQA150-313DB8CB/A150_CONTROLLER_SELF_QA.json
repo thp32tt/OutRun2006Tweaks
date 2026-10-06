@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A150",
+  "timestamp_kst": "2026-10-07 07:14 KST",
+  "queue_index": 139,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+  "selection": {
+    "reason": "No active A-owned P0/P1 material-production row or C-returned REWORK remained after refresh; manual review of the current PRE_INGAME English-original C-pass set reopened q139.",
+    "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/016_q139_313DB8CB.jpg",
+    "prior_c_status": "C116_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "c44a9ccd62e2b78fb17ec10f7a50a6de32dc1a0f84a44f2595b3e7ffaa0cc0ea"
+  },
+  "defect": {
+    "tags": [
+      "SOURCE_RELATIVE_WIDTH_HIERARCHY_TOO_WEAK",
+      "KOREAN_LABELS_VISUALLY_UNDERSIZED"
+    ],
+    "note": "Prior C116 passed containment but TUNED 139x36 -> 튜닝 55x32 and NORMAL 174x36 -> 일반 58x32, leaving the Korean labels visibly tiny versus the English source."
+  },
+  "material_rework": {
+    "method": "Reuse the exact prior validated clean plate/source masks and native 2048x1024 RGBA32 geometry. Re-render with Noto Sans CJK KR Black as 튜닝 사양 / 일반 사양, preserving source upright centered heavy-white style and positive margins.",
+    "prior_candidate_sha256": "c44a9ccd62e2b78fb17ec10f7a50a6de32dc1a0f84a44f2595b3e7ffaa0cc0ea",
+    "candidate_sha256": "50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7",
+    "translations": [
+      {
+        "source": "TUNED",
+        "prior_korean": "튜닝",
+        "korean": "튜닝 사양"
+      },
+      {
+        "source": "NORMAL",
+        "prior_korean": "일반",
+        "korean": "일반 사양"
+      }
+    ],
+    "width_change_px": [
+      {
+        "key": "tuned",
+        "before": 55,
+        "after": 121,
+        "gain": 66,
+        "source": 139
+      },
+      {
+        "key": "normal",
+        "before": 58,
+        "after": 120,
+        "gain": 62,
+        "source": 174
+      }
+    ]
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "final_mask_validator": "PASS",
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "structure": "2048x1024 RGBA32 mip1 header exact",
+    "raw_orientation": "mirror_y"
+  },
+  "ordered_generation_gate": {
+    "1_source_text_removed_plate_restored": "PASS_PRIOR_EXACT_VALIDATED_CLEAN_PLATE",
+    "2_source_transform_direction": "PASS_UPRIGHT_SOURCE_FAMILY_RAW_MIRROR_Y_PRESERVED",
+    "3_no_unnecessary_undersizing": "PASS_WIDTH_55_58_TO_121_120_WITHIN_SOURCE_BBOX",
+    "4_weight_outline_shadow": "PASS_NATIVE_BLACK_HEAVY_PLAIN_WHITE",
+    "5_no_clipped_pixels": "PASS_2_OF_2_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_PROTECTED_CHANGE",
+    "7_flip_y_and_raw": "PASS_CONTROLLER_VISUAL_BOTH",
+    "8_immediate_readability_vs_source": "PASS_CONTROLLER_VISUAL_HIERARCHY_IMPROVED"
+  },
+  "evidence": {
+    "worker_report": "localization/graphics/role_A/20261007-A-MANUALQA150-313DB8CB/A150_313DB8CB_REPORT.json",
+    "source_prior_clean_final": "localization/graphics/role_A/20261007-A-MANUALQA150-313DB8CB/A150_SOURCE_C116_CLEAN_FINAL.jpg",
+    "row_contact": "localization/graphics/role_A/20261007-A-MANUALQA150-313DB8CB/A150_ROW_CONTACT.jpg",
+    "raw_compare": "localization/graphics/role_A/20261007-A-MANUALQA150-313DB8CB/A150_SOURCE_C116_FINAL_RAW.jpg",
+    "github_worker_run": 37538999863,
+    "worker_output_commit": "368728a0407ec8f267b468f8b3e264219ae118f7"
+  },
+  "controller_visual_qa": "PASS_SOURCE_C116_A150_READABLE_ROW_RAW",
+  "producer_status": "A150_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
