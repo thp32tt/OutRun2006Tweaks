@@ -114,10 +114,12 @@ def effect(text,fs):
     h=max(core.height,outline.shape[0],shadow.shape[0]); w=max(core.width,outline.shape[1],shadow.shape[1])
     tile=Image.new("RGBA",(w,h),(0,0,0,0))
     # shadow
-    sm=Image.fromarray(shadow,"L")
+    sm0=Image.fromarray(shadow,"L")
+    sm=Image.new("L",(w,h),0); sm.paste(sm0,(0,0))
     s=Image.new("RGBA",(w,h),(2,2,2,200)); s.putalpha(sm); tile.alpha_composite(s)
     # outline centered at origin
-    om=Image.fromarray(outline,"L")
+    om0=Image.fromarray(outline,"L")
+    om=Image.new("L",(w,h),0); om.paste(om0,(0,0))
     o=Image.new("RGBA",(w,h),(2,2,2,255)); o.putalpha(om); tile.alpha_composite(o)
     # vertical silver gradient
     g=np.zeros((core.height,core.width,4),dtype=np.uint8)
