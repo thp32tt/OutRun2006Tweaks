@@ -38,6 +38,8 @@ raster = text("src/vr/state/d3d9_raster_state.hpp")
 state_block_tracker = text("src/vr/state/state_block_tracker.hpp")
 state_block_recovery = text("src/vr/state/state_block_recovery.hpp")
 state_block_events = text("src/vr/state/state_block_events.hpp")
+vr_openxr_workflow = text(".github/workflows/vr-openxr.yml")
+sbs_capture_override = text("vrhost/src/runtime/sbs_capture_override.hpp")
 overlay_hooks = text("src/overlay/hooks_overlay.cpp")
 render_semantics = text("src/vr/game/render_semantics.hpp")
 r30_safe = text("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
@@ -1200,6 +1202,61 @@ for banned in ("IsGameStateBlockRecording", "IsStateBlockTrackingReliable"):
 for marker in ("StateBlockTracker::Recording()", "StateBlockTracker::Reliable()"):
     if marker not in renderer_r29:
         errors.append(f"renderer R29 missing neutral StateBlock status access: {marker}")
+
+# Terminal post-R34/R33 closure: the generic OpenXR hardening workflow must
+# describe the current final-dispatch/teardown contracts, not historical
+# physical-hook/status symbols retired by the completed flattening chain.
+for retired in (
+    "R31StateBlockTrackingReliable",
+    "R31 fast left-eye c64 rollback",
+    "R32ResetR22Hook",
+    "'ResetDestR22'",
+    "VR R32 REVIEW2",
+    "R30DrawPrimitiveR29Hook",
+    "R33ResetR32Hook.stdcall<HRESULT>",
+    "Preserve acquiredImage",
+    "'Release(Projection);'",
+    "'Release(Theater);'",
+):
+    if retired in vr_openxr_workflow:
+        errors.append(
+            f"generic OpenXR hardening workflow retained retired marker: {retired}")
+
+for marker in (
+    "StateBlockTracker::LifecycleHooksReady()",
+    "StateBlockTracker::SetEventConsumerReady(true)",
+    "R31 physical StateBlock fallback retired; fast-path trust remains disabled",
+    "R32WithResetLifecycle",
+    "R32WithPresentTelemetry",
+    "R32ResolveDirectTransport",
+    "R32 is a hook-free functional owner",
+    "R33DrawPrimitiveR30Hook",
+    "R33ResetR22Hook.stdcall<HRESULT>",
+    "R33PresentR13Hook.stdcall<HRESULT>",
+    "R33ResolveDirectR13Hook.call<bool>",
+    "direct R31/R22/R13 prerequisite ownership",
+    "PrepareForParentSessionDestroy()",
+    "ForgetAfterParentSessionDestroy()",
+    "Projection.PrepareForParentSessionDestroy();",
+    "Theater.PrepareForParentSessionDestroy();",
+    "Projection.ForgetAfterParentSessionDestroy();",
+    "Theater.ForgetAfterParentSessionDestroy();",
+):
+    if marker not in vr_openxr_workflow:
+        errors.append(
+            f"generic OpenXR hardening workflow missing terminal marker: {marker}")
+
+for marker in (
+    "bool PrepareForParentSessionDestroy() noexcept",
+    "void ForgetAfterParentSessionDestroy() noexcept",
+    "Projection.PrepareForParentSessionDestroy();",
+    "Theater.PrepareForParentSessionDestroy();",
+    "Projection.ForgetAfterParentSessionDestroy();",
+    "Theater.ForgetAfterParentSessionDestroy();",
+    "xrDestroySession destroys child swapchains/spaces",
+):
+    if marker not in sbs_capture_override:
+        errors.append(f"SBS teardown contract missing current marker: {marker}")
 
 misplaced_tracker = ROOT / "src/vr/d3d9/state/state_block_tracker.hpp"
 if misplaced_tracker.exists():
