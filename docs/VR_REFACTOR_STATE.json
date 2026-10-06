@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T11:15:09+09:00",
+  "updatedKst": "2026-10-06T11:23:10+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -96,9 +96,10 @@
     "VR-DX9EX-RECENTER-IPC-STABLE-SNAPSHOT-0031",
     "VR-DX9EX-RECENTER-LOCAL-OWNERSHIP-BEFORE-ACK-0032",
     "VR-DX9EX-RECENTER-POST-ACK-OWNERSHIP-RECOVERY-0033",
-    "VR-DX9EX-FINAL-SUBMISSION-RESULT-ORDERING-0034"
+    "VR-DX9EX-FINAL-SUBMISSION-RESULT-ORDERING-0034",
+    "VR-DX9EX-R23-FINAL-SUBMISSION-RESULT-ORDERING-0035"
   ],
-  "next": "Structural extraction remains terminal. Final-submission telemetry/state is now required to follow the actual xrEndFrame result in R24-owned projection/fallback paths. Continue with the next independently provable DX9Ex stability/lifetime unit; HUD/rank/performance changes remain runtime-evidence gated.",
+  "next": "Structural extraction remains terminal. R23 and R24 success-capable final-submission paths now publish LastSubmittedLayer only after the actual EndFrame result. Continue with the next independently provable DX9Ex stability/resource-lifetime unit; visual/HUD/performance behavior remains runtime-evidence gated.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",

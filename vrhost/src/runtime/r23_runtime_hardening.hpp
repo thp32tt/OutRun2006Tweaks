@@ -262,8 +262,10 @@ namespace OutRunVrR23RuntimeHardening
         XrFrameEndInfo patched = *endInfo;
         patched.layerCount = 1;
         patched.layers = &layer;
-        RecordFinalSubmission(frame.frameId, kind, true);
-        return OutRunVrFinalTest::EndFrame(session, &patched);
+        const XrResult result =
+            OutRunVrFinalTest::EndFrame(session, &patched);
+        return RecordFinalSubmissionResult(
+            result, frame.frameId, kind, true);
     }
 
     inline XrResult XRAPI_CALL EndFrame(XrSession session,
@@ -285,9 +287,11 @@ namespace OutRunVrR23RuntimeHardening
         const bool hasProjection = IncomingContainsProjectionLayer(endInfo);
         if (hasNonProjection && !hasProjection)
         {
-            RecordFinalSubmission(0, SourceKind::None,
-                endInfo && endInfo->layerCount > 0);
-            return OutRunVrFinalTest::EndFrame(session, endInfo);
+            const bool intendedHasLayer = endInfo && endInfo->layerCount > 0;
+            const XrResult result =
+                OutRunVrFinalTest::EndFrame(session, endInfo);
+            return RecordFinalSubmissionResult(
+                result, 0, SourceKind::None, intendedHasLayer);
         }
         if (hasNonProjection && hasProjection)
         {
@@ -297,8 +301,10 @@ namespace OutRunVrR23RuntimeHardening
                 std::cerr
                     << "[R23] mixed projection/non-projection frame detected; dropping unverified projection while preserving non-projection layers\n";
             }
-            RecordFinalSubmission(0, SourceKind::None, true);
-            return SubmitNonProjectionOnly(session, endInfo);
+            const XrResult result =
+                SubmitNonProjectionOnly(session, endInfo);
+            return RecordFinalSubmissionResult(
+                result, 0, SourceKind::None, true);
         }
 
         if (!OutRunVrR21RuntimeHardening::HostShouldRenderReadonly())
@@ -334,8 +340,10 @@ namespace OutRunVrR23RuntimeHardening
         {
             if (IncomingPoseMatchesCommittedFrame(endInfo, verified.frame))
             {
-                RecordFinalSubmission(verified.frameId, verified.kind, true);
-                return OutRunVrFinalTest::EndFrame(session, endInfo);
+                const XrResult result =
+                    OutRunVrFinalTest::EndFrame(session, endInfo);
+                return RecordFinalSubmissionResult(
+                    result, verified.frameId, verified.kind, true);
             }
             RecordFinalSubmission(verified.frameId, verified.kind, false);
             return SubmitNoLayer(session, endInfo);
@@ -354,8 +362,10 @@ namespace OutRunVrR23RuntimeHardening
                 std::cerr
                     << "[R23] R19 classic fallback allowed for exact committed source/frame bundle only\n";
             }
-            RecordFinalSubmission(verified.frameId, verified.kind, true);
-            return OutRunVrSbsCaptureOverride::EndFrame(session, endInfo);
+            const XrResult result =
+                OutRunVrSbsCaptureOverride::EndFrame(session, endInfo);
+            return RecordFinalSubmissionResult(
+                result, verified.frameId, verified.kind, true);
         }
 
         if (!exactClassicSource && !FirstFallbackSourceMismatchLogged)

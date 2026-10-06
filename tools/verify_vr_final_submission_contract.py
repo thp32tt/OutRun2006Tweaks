@@ -116,6 +116,40 @@ require(
 if end_frame.count("RecordFinalSubmissionResult(") < 4:
     fail("R24 top-level paths are not consistently result-aware")
 
+# R23 owns several fallback/compatibility submission paths underneath R24.
+# Those paths must not publish a successful visible-layer state until the
+# underlying runtime EndFrame call has actually succeeded.
+r23_direct = body(r23, "inline XrResult RenderCommittedDirect(")
+require_order(
+    r23_direct,
+    "R23 direct projection result ordering",
+    "OutRunVrFinalTest::EndFrame(session, &patched)",
+    "RecordFinalSubmissionResult(",
+    "result, frame.frameId, kind, true",
+)
+if "RecordFinalSubmission(frame.frameId, kind, true)" in r23_direct:
+    fail("R23 direct projection still pre-records successful submission")
+
+r23_end = body(r23, "inline XrResult XRAPI_CALL EndFrame(")
+require(
+    r23_end,
+    "R23 result-aware success paths",
+    "const bool intendedHasLayer = endInfo && endInfo->layerCount > 0;",
+    "SubmitNonProjectionOnly(session, endInfo)",
+    "OutRunVrFinalTest::EndFrame(session, endInfo)",
+    "OutRunVrSbsCaptureOverride::EndFrame(session, endInfo)",
+    "RecordFinalSubmissionResult(",
+)
+if r23_end.count("RecordFinalSubmissionResult(") < 4:
+    fail("R23 success-capable paths are not consistently result-aware")
+for forbidden in (
+    "RecordFinalSubmission(0, SourceKind::None, true)",
+    "RecordFinalSubmission(verified.frameId, verified.kind, true)",
+    "RecordFinalSubmission(0, SourceKind::None,\n                endInfo && endInfo->layerCount > 0)",
+):
+    if forbidden in r23_end:
+        fail(f"R23 still pre-records a success-capable path: {forbidden!r}")
+
 # Keep the already-correct R32 fast path as the reference contract: result first,
 # success-derived submitted flag second, final-state publication third.
 r32_end = body(r32, "inline XrResult XRAPI_CALL EndFrame(")
