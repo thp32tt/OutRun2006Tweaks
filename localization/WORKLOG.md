@@ -2172,3 +2172,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Index177 `7978907D` contains OUTRUN2 cover/title artwork and song titles `Shiny World`, `Splash Wave`, `Night Flight`; per TRANSLATION_NAMING_POLICY all remain exact original English artwork.
 - Queue/transcriptions/artwork-plan/progress/resume synchronized for indices 103/151/153/155/157/165/169/171/177. Blocked zoom-review count reduced **25 -> 16**. Next normal A odd rows: 189, 191, 217, 219 unless higher-priority in-game/C-returned work appears.
 - VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-06 11:58 KST — A111/A113/A116 final odd zoom batch
+
+- Re-read the localization automation contract and all required policy/state files from the current branch. A-owned user in-game rows remain producer/C-static-pass pending newer in-game retest; none was reopened without new evidence. No direct C-returned A REWORK superseded the queue.
+- Consumed the four remaining A-primary odd blocked `zoom_review` rows: 189 `8C9E91F8`, 191 `94BB6271`, 217 `D1039D6F`, 219 `D263B3F1`.
+- A111 exact-HD readable/raw classification: index189 is OutRun2/OutRun2SP logo + vehicle/background artwork only; index191 is course-preview photos + OutRun2SP logos only. Both are **PRESERVE_ORIGINAL / NO_LOCALIZABLE_TEXT**.
+- index219 `D263B3F1`: `COURSE SELECT -> 코스 선택`. A112 correctly failed closed because the C144-approved font101 render could not retain mandatory 4px vertical margins. A113 reduced only the family font size to 100 and produced candidate `f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24`. C144-approved silver-techno family retained (NotoSansCJK-Bold face1, 0.12 shear, 5px stroke, [4,5] shadow). 1/1 bbox/size/positive-margin PASS; outside/alpha/source-residue/overlap=0; SOURCE/CLEAN/FINAL + raw mirror_y controller visual PASS.
+- index217 `D1039D6F`: A113 exact mapping isolated the route-map `START/GOAL` badges. A112 broad-component mapping, A114 exact-family GOAL assumption and A115 hand-polygon cleanup all failed closed. A116 independently rebuilt the exact D103 source using the B190/B191 convex-red-hull clean technique and produced `68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39` (`START -> 출발`, `GOAL -> 골`). 2/2 bbox/size/positive-margin PASS; clean residue/non-red/outside/alpha/final color residue/overlap=0; DDS roundtrip PASS; controller high-zoom SOURCE/CLEAN/FINAL + raw mirror_y PASS.
+- Both new DDS candidates remain **pending independent C and in-game validation**; `RUNTIME_VALIDATION=UNTESTED`. Queue/transcriptions/artwork_plan/progress/resume/STATUS synchronized.
+- Blocked `zoom_review`: **16 -> 12**. A primary odd blocked zoom shard is now **0 remaining**; all 12 remaining blocked rows are even/B shard. Work-steal was not used because B was actively producing its shard in the same cycle.
+- VR/FFB/DX11/DXVK untouched.
