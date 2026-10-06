@@ -4115,7 +4115,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C226-313DB8CB-A150/C226_313DB8CB_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C227R-754F0599-A151/C227R_754F0599_CONTROLLER_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4223,8 +4223,7 @@
     "2B0863D6",
     "EBFC709F",
     "5B65E08C",
-    "1A43E9D9",
-    "754F0599"
+    "1A43E9D9"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -7513,11 +7512,13 @@
     },
     "controller_visual_qa": "PASS_SOURCE_C171_A151_READABLE_ROW_RAW",
     "controller_qa": "localization/graphics/role_A/20261007-A-MANUALQA151-754F0599/A151_CONTROLLER_SELF_QA.json",
-    "status": "A151_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
-    "fresh_independent_c": "PENDING",
-    "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+    "status": "C227R_REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH",
+    "fresh_independent_c": "C227R_FAIL_VISUAL_STYLE",
+    "pre_ingame_comparison_refresh": "NOT_APPLICABLE_UNTIL_FRESH_C_PASS",
     "runtime_validation": "UNTESTED",
-    "forbidden_domains_touched": []
+    "forbidden_domains_touched": [],
+    "c_report": "localization/graphics/role_C/20261007-C227R-754F0599-A151/C227R_754F0599_CONTROLLER_FINAL_QA.json",
+    "required_rework": "Keep current scale/bboxes/right-lean/metallic effects; reconstruct Korean glyph geometry closer to the source extended rounded techno family."
   },
   "a150_313db8cb": {
     "producer_status": "C226_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
@@ -7549,5 +7550,19 @@
     "pre_ingame_review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/013_q139_313DB8CB.jpg",
     "pre_ingame_manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
+  },
+  "c227r_controller_final_qa": {
+    "timestamp_kst": "2026-10-07T08:34:30+09:00",
+    "queue_index": 175,
+    "asset": "754F0599",
+    "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "candidate_sha256": "f21970a3d6d8ae69954d0159524856b5019cd1445daa65c55d85213f73e431f5",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "3/3 PASS",
+    "controller_visual_qa": "FAIL_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH",
+    "decision": "C227R_REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH",
+    "report": "localization/graphics/role_C/20261007-C227R-754F0599-A151/C227R_754F0599_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
