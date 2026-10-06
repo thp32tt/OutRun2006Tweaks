@@ -485,17 +485,17 @@ namespace OutRunVrR26RecenterHardening
             !ApplicationRecenterAppliedForPendingGameRequest())
             return false;
 
-        if (ClearPendingGameRequest(pending))
-        {
-            auto& channel = OutRunVR::RecenterIpc::SharedChannel();
-            channel.MarkApplied(pending);
-            ++GameRequestsApplied;
-            InvalidateFallbackAnchor();
-            std::cerr
-                << "[R45 recenter] requestId=" << pending
-                << " completed by fresh visible DirectGPU projection; fast path remained live\n";
-        }
-        return cleared;
+        if (!ClearPendingGameRequest(pending))
+            return false;
+
+        auto& channel = OutRunVR::RecenterIpc::SharedChannel();
+        channel.MarkApplied(pending);
+        ++GameRequestsApplied;
+        InvalidateFallbackAnchor();
+        std::cerr
+            << "[R45 recenter] requestId=" << pending
+            << " completed by fresh visible DirectGPU projection; fast path remained live\n";
+        return true;
     }
 
     inline XrResult XRAPI_CALL EndFrame(XrSession session,
