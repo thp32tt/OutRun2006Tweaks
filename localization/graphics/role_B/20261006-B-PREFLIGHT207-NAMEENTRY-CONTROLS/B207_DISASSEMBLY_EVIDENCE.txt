@@ -1,0 +1,35 @@
+B207 canonical name-entry control-map evidence
+Canonical OR2006C2C.exe SHA-256: 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
+
+Character path:
+- 0x468D40 resolves selection through page state at object+0xEC and table 0x64C81B + page*0x25 + selection.
+- selection 0x25 is remapped to table slot 0x24.
+- 0x4692B1..0x4692E3 handles selections below 0x26 and appends one byte to object+0x5F4.
+- current/minimum/maximum lengths are WORD fields at object+0x6F6/+0x6F8/+0x6FA.
+
+Control path:
+- 0x26 BACKSPACE: decrements current length and clears the trailing byte.
+- 0x27 toggles page 1 / page 2.
+- 0x28 toggles page 1 / page 3; page 3 returns to page 1 after one appended character.
+- 0x29 toggles page 1 / page 4; page 4 persists.
+- 0x2A toggles page 1 / page 5.
+- 0x2B END/confirm: checks current string length against the minimum, sets completion state/result, then finalizes.
+
+Five 37-byte page mappings:
+- page1: digits 1-0, lowercase a-z, space.
+- page2: punctuation/symbol and legacy high-byte glyph codes, ending in space.
+- page3: digits 1-0, uppercase A-Z, space; one-shot behavior.
+- page4: digits 1-0, uppercase A-Z, space; persistent behavior.
+- page5: digits 1-0, legacy extended-byte glyph codes, space.
+
+Implementation boundary:
+- Preserve stock controls 0x26..0x2B exactly.
+- Future Korean composition may intercept only character selections 0x00..0x25 before the legacy-byte append.
+- A141 compatibility alias should be committed only at END/confirm after composition.
+- Exact 66743AA8 visual sprite/cell to logical-selection binding remains unproven, so no Korean DDS is promoted.
+- Local alias-to-UTF-8 player-name rendering remains a separate required implementation.
+
+A141 prerequisite status:
+- Win32 Release run 37441155668 SUCCESS, artifact 11401148429.
+- Korean Test Build run 37441155760 SUCCESS, artifact 11401263208.
+- These A141 results are inherited and not repeated by B207.
