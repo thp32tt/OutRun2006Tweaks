@@ -772,10 +772,12 @@ require_order(
     "if (!FrameComplete(frame))",
     "LastStereoFrame = frame;",
 )
-sbs_reset = body(host_sbs, "inline void ResetAll()")
+sbs_reset = body(host_sbs, "inline void ResetAll(bool parentSessionDestroying = false)")
 require(
     sbs_reset,
     "R19 stereo cache reset owner",
+    "Projection.Destroy(parentSessionDestroying);",
+    "Theater.Destroy(parentSessionDestroying);",
     "InvalidateStereoFrameCache();",
 )
 
@@ -815,12 +817,52 @@ require_order(
     "ReleaseCom(completion);",
 )
 
-sbs_swapchain_destroy = body(host_sbs, "void Destroy()")
+sbs_swapchain_destroy = body(host_sbs, "bool Destroy(bool parentSessionDestroying = false)")
+require(
+    sbs_swapchain_destroy,
+    "R19 fail-closed swapchain destruction",
+    "if (!gpuDrained)",
+    "if (!parentSessionDestroying)",
+    "return false;",
+    "handle = XR_NULL_HANDLE;",
+    "const XrResult result = ::xrDestroySwapchain(handle);",
+    "if (XR_FAILED(result) && !parentSessionDestroying)",
+)
 require_order(
     sbs_swapchain_destroy,
-    "R19 swapchain completion-before-destroy ordering",
+    "R19 live swapchain completion-before-destroy ordering",
     "WaitForSwapchainGpuIdleBeforeDestroy();",
+    "if (!gpuDrained)",
+    "if (!parentSessionDestroying)",
+    "return false;",
+    "const XrResult result = ::xrDestroySwapchain(handle);",
+)
+destroy_unproven = sbs_swapchain_destroy[
+    sbs_swapchain_destroy.find("if (!gpuDrained)"):
+    sbs_swapchain_destroy.find("else", sbs_swapchain_destroy.find("if (!gpuDrained)"))
+]
+forbid(
+    destroy_unproven,
+    "R19 unproven GPU completion path must not call xrDestroySwapchain",
     "::xrDestroySwapchain(handle);",
+)
+
+ensure_swapchain = body(host_sbs, "inline bool EnsureSwapchain(")
+require_order(
+    ensure_swapchain,
+    "R19 live recreate fail-closed destroy",
+    "if (!swapchain.Destroy())",
+    "return false;",
+    "const DXGI_FORMAT format = ChooseSwapchainFormat(session);",
+    "::xrCreateSwapchain(session, &create, &swapchain.handle)",
+)
+
+sbs_destroy_session = body(host_sbs, "inline XrResult XRAPI_CALL DestroySession(XrSession session)")
+require_order(
+    sbs_destroy_session,
+    "R19 parent-session child cleanup fallback",
+    "ResetAll(true);",
+    "OutRunVrFinalTest::DestroySession(session)",
 )
 
 # R24's display-only soft grace intentionally reads the committed snapshot

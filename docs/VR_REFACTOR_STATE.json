@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T12:06:47+09:00",
+  "updatedKst": "2026-10-06T12:09:17+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -100,9 +100,10 @@
     "VR-DX9EX-R23-FINAL-SUBMISSION-RESULT-ORDERING-0035",
     "VR-DX9EX-SWAPCHAIN-DESTROY-FLUSH-0036",
     "VR-DX9EX-SWAPCHAIN-DESTROY-GPU-DRAIN-0037",
-    "VR-DX9EX-SWAPCHAIN-GPU-DRAIN-BOUNDED-0038"
+    "VR-DX9EX-SWAPCHAIN-GPU-DRAIN-BOUNDED-0038",
+    "VR-DX9EX-SWAPCHAIN-DESTROY-FAIL-CLOSED-0039"
   ],
-  "next": "Structural extraction remains terminal. The bounded GPU-drain failure path still proceeds to xrDestroySwapchain after timeout/device removal; review fail-closed destroy ownership so an unproven GPU completion cannot violate the OpenXR destruction precondition.",
+  "next": "Structural extraction remains terminal. R19 swapchain destruction now fails closed on unproven GPU completion during live recreate and defers child cleanup to parent xrDestroySession during session teardown. Continue with the next independently provable DX9Ex stability/resource-lifetime unit; runtime behavior remains HMD-evidence gated.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",

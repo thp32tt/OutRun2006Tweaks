@@ -244,7 +244,7 @@ float4 PSMain(VSOut input) : SV_Target
         bool waited = false;
         std::uint32_t acquiredImage = 0;
 
-        void Destroy()
+        bool Destroy(bool parentSessionDestroying = false)
         {
             for (auto& pair : rtvs)
             {
@@ -256,14 +256,29 @@ float4 PSMain(VSOut input) : SV_Target
             if (handle != XR_NULL_HANDLE)
             {
                 const bool gpuDrained = WaitForSwapchainGpuIdleBeforeDestroy();
-                if (!gpuDrained && !FirstSwapchainGpuDrainFailureLogged)
+                if (!gpuDrained)
                 {
-                    FirstSwapchainGpuDrainFailureLogged = true;
-                    std::cerr
-                        << "[R19] swapchain GPU completion fence unavailable/failed before destroy; continuing teardown after best-effort Flush\\n";
+                    if (!FirstSwapchainGpuDrainFailureLogged)
+                    {
+                        FirstSwapchainGpuDrainFailureLogged = true;
+                        std::cerr
+                            << "[R19] swapchain GPU completion unproven; live destroy blocked and session teardown defers child cleanup to xrDestroySession\\n";
+                    }
+                    if (!parentSessionDestroying)
+                        return false;
+
+                    // xrDestroySession destroys child handles. On session teardown,
+                    // do not violate xrDestroySwapchain's GPU-completion precondition;
+                    // relinquish only the local handle and let the parent own cleanup.
+                    handle = XR_NULL_HANDLE;
                 }
-                ::xrDestroySwapchain(handle);
-                handle = XR_NULL_HANDLE;
+                else
+                {
+                    const XrResult result = ::xrDestroySwapchain(handle);
+                    if (XR_FAILED(result) && !parentSessionDestroying)
+                        return false;
+                    handle = XR_NULL_HANDLE;
+                }
             }
             generation = 0;
             committedGeneration = 0;
@@ -273,6 +288,7 @@ float4 PSMain(VSOut input) : SV_Target
             acquired = false;
             waited = false;
             acquiredImage = 0;
+            return true;
         }
     };
 
@@ -357,10 +373,10 @@ float4 PSMain(VSOut input) : SV_Target
         CaptureInfoLogged = false;
     }
 
-    inline void ResetAll()
+    inline void ResetAll(bool parentSessionDestroying = false)
     {
-        Projection.Destroy();
-        Theater.Destroy();
+        Projection.Destroy(parentSessionDestroying);
+        Theater.Destroy(parentSessionDestroying);
         if (ViewSpace != XR_NULL_HANDLE)
         {
             ::xrDestroySpace(ViewSpace);
@@ -597,7 +613,8 @@ float4 PSMain(VSOut input) : SV_Target
             !swapchain.images.empty())
             return true;
 
-        swapchain.Destroy();
+        if (!swapchain.Destroy())
+            return false;
         const DXGI_FORMAT format = ChooseSwapchainFormat(session);
         if (format == DXGI_FORMAT_UNKNOWN || !width || !height ||
             (arraySize != 1 && arraySize != 2))
@@ -1083,7 +1100,7 @@ float4 PSMain(VSOut input) : SV_Target
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session)
     {
-        ResetAll();
+        ResetAll(true);
         return OutRunVrFinalTest::DestroySession(session);
     }
 }
