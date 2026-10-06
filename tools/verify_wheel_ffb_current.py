@@ -183,7 +183,7 @@ req(math, 'SnowIceComfortTextureScale = 0.22f', 'R10 snow/ice comfort attenuatio
 req(math, 'imperial_avenue_stone_paving_pattern(', 'Imperial Avenue continuous 0x2/0x800 stone-road classifier exists')
 req(build, 'const bool imperialStoneRoad =', 'wrapper recognizes Imperial stone road independently of water flags')
 req(ffb, 'const bool imperialStoneRoad =', 'core recognizes Imperial stone road before splash/contact synthesis')
-req(math, '(0.140f + 0.080f * speedGate)', 'Imperial stone tactile uses the moderated R15 hardware tune')
+req(math, '(0.080f + 0.120f * speedGate)', 'Imperial stone tactile uses the softened R16 0.20 peak tune')
 req(math, 'road_motion_gate(float speedNorm)', 'road texture has a shared stationary-vehicle motion gate')
 req(ffb, 'roadAmp *= WheelFFBMath::road_motion_gate(speedNorm);', 'all road/surface tactile output is zeroed when stationary')
 req(ffb, 'imperialStoneFloor', 'runtime applies the brick/stone tactile floor')
