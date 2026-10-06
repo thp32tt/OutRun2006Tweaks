@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "run": "A143",
+  "role": "A",
+  "timestamp_kst": "2026-10-06T19:52:30+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "queue_index": 24,
+  "asset": "textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "work_stolen_from_lane": "B",
+  "selection_gate": {
+    "a_primary_actionable": 0,
+    "completed_a_or_pending_c_repeated": false,
+    "inherited_b209_candidate_consumed_not_rerendered": true
+  },
+  "inherited": [
+    "A141 deterministic 14-byte ASCII compatibility alias + UTF-8 sidecar",
+    "B207 exact stock character/control dispatch map",
+    "B208 HangulNameComposer",
+    "A142 exact local alias->UTF-8 player-name renderer",
+    "B209 two-beolsik Jamo keycap candidate"
+  ],
+  "canonical_runtime_evidence": {
+    "exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "selection_load": "VA 0x4692B1 mov eax,[0x7F9420]",
+    "hook_boundary": "VA 0x4692B6 / module+0x692B6 cmp eax,0x26; EAX=current selection, ESI=name-entry object",
+    "character_path": "0x00..0x25 before stock one-byte append at 0x4692D6",
+    "stock_controls": "0x26 BACKSPACE; 0x27..0x2A page controls; 0x2B END",
+    "end_path": "VA 0x4694AC strlen(object+0x5F4), min-length check object+0x6F8, stock finalizer",
+    "fields": "buffer +0x5F4; page +0xEC; current length +0x6F6; max +0x6FA"
+  },
+  "implementation": {
+    "source_file": "src/hooks_localization.cpp",
+    "source_commits": [
+      "2a5c4290ce9a3d73ba5454d0279ee40f968ad98a",
+      "224e3c8fce6cfebfc0b780683a168b53ccd4e87d"
+    ],
+    "dispatch_mid_hook": "module+0x692B6 with canonical byte signature guard",
+    "character_handling": "B208 composer handles base/shifted two-beolsik letter selections, digits, space and safe printable stock ASCII symbols; unsupported legacy high-byte symbol selections are suppressed once Korean editing is active",
+    "backspace": "0x26 is intercepted only for active composed/local Korean editing and updates composition without corrupting the compatibility token",
+    "controls": "0x27..0x2A return to stock code unchanged; page3 one-shot state is restored to page1 after a handled character",
+    "transient_preview": "reserved non-persistent alias KAAAAAAAAAAAAA carries current UTF-8 composition through A142 local renderer; loader/generator explicitly reserve it",
+    "end_commit": "0x2B persists canonical UTF-8 via A141 sidecar, writes only deterministic <=15-byte ASCII alias into object+0x5F4, restores current length to alias bytes, then leaves EAX=0x2B so stock min-check/finalizer/parent copy execute unchanged",
+    "native_utf8_written": false,
+    "save_ranking_network_replay_protocol_changed": false
+  },
+  "self_qa": {
+    "canonical_signature_match": true,
+    "alias_payload_bytes": 14,
+    "native_payload_ceiling": 15,
+    "reserved_preview_not_persisted": true,
+    "completed_prior_work_repeated": false,
+    "b209_candidate_rerendered": false,
+    "forbidden_domains_touched": []
+  },
+  "validation": {
+    "exact_source_commit": "224e3c8fce6cfebfc0b780683a168b53ccd4e87d",
+    "win32_release": {
+      "run_id": 37451825543,
+      "status": "SUCCESS",
+      "artifact_id": 11407089218,
+      "digest": "sha256:0a08b0b4d57c8decdac4a76558cc0879b570f4a1e19b8fc19862a1749e3fddd9"
+    },
+    "korean_test": {
+      "run_id": 37451825561,
+      "status": "SUCCESS",
+      "artifact_id": 11407390504,
+      "digest": "sha256:dd70d0b39c09595b2b370a239a7610e3ccfb9f75be571b6848b02a568f8c524b",
+      "note": "Source/input wiring is included, but index24 B209 DDS remains excluded because independent C QA has not yet promoted it to a C pass_pending_ingame status."
+    }
+  },
+  "b209_candidate": {
+    "sha256": "c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e",
+    "static_producer_qa": "PASS",
+    "independent_c_qa": "PENDING",
+    "package_selected": false
+  },
+  "status": "A143_INPUT_WIRING_BUILD_PASS_PENDING_C_AND_INGAME_RETEST",
+  "runtime_validation": "UNTESTED",
+  "next_safe_work": [
+    "C independently QA B209 66743AA8 Jamo candidate plus A143 mapping assumptions; do not self-approve.",
+    "After C pass selects the DDS into a Korean test package, perform a NEW actual-game name-entry test covering composition, BACKSPACE, page controls, END, reload/local display, and alias fallback.",
+    "Do not declare online/ranking/replay Korean transport; compatibility alias remains the only proven transport."
+  ],
+  "evidence": "localization/graphics/role_A/20261006-A-RUNTIME143-NAME-ENTRY-INPUT-WIRING/A143_NAME_ENTRY_INPUT_EVIDENCE.txt"
+}
