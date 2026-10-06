@@ -10309,14 +10309,20 @@ def main() -> None:
          NATIVE_BACKEND_HPP, "R263 semantic-translation snapshot validator"),
         ("out.cacheIdentityMatches =",
          NATIVE_BACKEND_CPP, "R263 source/object/layout cache identity binding"),
+        ("out.sourceMappingHandoffReady =",
+         NATIVE_BACKEND_CPP, "R274 R263 requires reviewed R273 mapping handoff"),
+        ("out.sourceMappingHandoffSnapshotMatches =",
+         NATIVE_BACKEND_CPP, "R274 R263 binds exact R273 snapshot"),
+        ("out.sourceMappingIdentityMatches =",
+         NATIVE_BACKEND_CPP, "R274 R263 binds R273 cache identity to R239"),
         ("out.vertexSemanticExact =",
          NATIVE_BACKEND_CPP, "R263 vertex semantic exactness gate"),
         ("out.pixelSemanticExact =",
          NATIVE_BACKEND_CPP, "R263 pixel semantic exactness gate"),
         ("out.constantRegisterMappingExact =",
-         NATIVE_BACKEND_CPP, "R263 constant-register semantic exactness gate"),
+         NATIVE_BACKEND_CPP, "R274 constant mapping derives from R273 handoff"),
         ("out.samplerMappingExact =",
-         NATIVE_BACKEND_CPP, "R263 sampler semantic exactness gate"),
+         NATIVE_BACKEND_CPP, "R274 sampler mapping derives from R273 handoff"),
         ("out.interfaceSourceIdentityMatches =",
          NATIVE_BACKEND_CPP, "R269 source/linkage identity match gate"),
         ("out.interfaceLinkExact =",
@@ -10325,12 +10331,22 @@ def main() -> None:
          NATIVE_BACKEND_CPP, "R263 translator revision provenance"),
         ("out.semanticContractHash =",
          NATIVE_BACKEND_CPP, "R263 semantic-contract provenance"),
+        ("out.sourcePairSemanticHash =",
+         NATIVE_BACKEND_CPP, "R274 R271 pair semantic identity retained"),
+        ("out.sourceConstantMappingHash =",
+         NATIVE_BACKEND_CPP, "R274 exact constant-map identity retained"),
+        ("out.sourceSamplerMappingHash =",
+         NATIVE_BACKEND_CPP, "R274 exact sampler-map identity retained"),
+        ("out.sourceMappingHandoffSnapshotToken =",
+         NATIVE_BACKEND_CPP, "R274 R273 receipt token retained"),
         ("out.semanticProofPresent =",
          NATIVE_BACKEND_CPP, "R263 complete F21 semantic proof gate"),
-        ("token, 0x263u",
-         NATIVE_BACKEND_CPP, "R263 independent semantic review snapshot-domain tag"),
-        ("R263 exact programmable shader semantic translation proof binds source identity to translated object/layout receipts",
-         CONSTANT_BUFFER_PROBE, "R263 exact F21 positive regression"),
+        ("token, 0x274u",
+         NATIVE_BACKEND_CPP, "R274 strengthened semantic review snapshot-domain tag"),
+        ("R274 R263 consumes exact R273 source mapping handoff",
+         CONSTANT_BUFFER_PROBE, "R274 exact source-mapping consumption regression"),
+        ("R274 rejects stale R273 source-mapping snapshot in R263",
+         CONSTANT_BUFFER_PROBE, "R274 stale mapping receipt fail-closed regression"),
         ("R269 rejects R268 linkage provenance that does not match R263 source pair identity",
          CONSTANT_BUFFER_PROBE, "R269 source-linked interface fail-closed regression"),
         ("R263 rejects incomplete programmable constant-register semantic proof",
@@ -10347,6 +10363,14 @@ def main() -> None:
         raise SystemExit(
             "DX11 R263 programmable shader semantic-translation drift: "
             + ", ".join(missing_r263_programmable_shader_semantic_translation)
+        )
+    stale_r263_mapping_fixture_signature = (
+        "bool constantRegisterMappingExact,\n"
+        "    bool samplerMappingExact"
+    )
+    if stale_r263_mapping_fixture_signature in NATIVE_BACKEND_HPP:
+        raise SystemExit(
+            "DX11 R274 stale fixture mapping booleans remain in R263 API"
         )
 
     r264_programmable_shader_source_evidence_contract = [
@@ -10691,6 +10715,35 @@ def main() -> None:
             "DX11 R273 programmable source-mapping handoff drift: "
             + ", ".join(
                 missing_r273_programmable_source_mapping_handoff)
+        )
+
+    r274_r263_source_mapping_consumption_contract = [
+        ("const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff",
+         NATIVE_BACKEND_HPP, "R274 R263 consumes R273 handoff by type"),
+        ("sourceMappingHandoff.reviewSnapshotToken ==",
+         NATIVE_BACKEND_CPP, "R274 exact source-mapping snapshot comparison"),
+        ("sourceMappingHandoff.cacheKey == sourceIdentity.cacheKey",
+         NATIVE_BACKEND_CPP, "R274 source mapping identity tied to R239 pair"),
+        ("sourceMappingHandoff.constantRegisterMappingExact",
+         NATIVE_BACKEND_CPP, "R274 constant mapping no longer fixture boolean"),
+        ("sourceMappingHandoff.samplerMappingExact",
+         NATIVE_BACKEND_CPP, "R274 sampler mapping no longer fixture boolean"),
+        ("r274SourceMappingPlan =",
+         CONSTANT_BUFFER_PROBE, "R274 source-derived mapping plan fixture replacement"),
+        ("r274SourceMappingHandoff =",
+         CONSTANT_BUFFER_PROBE, "R274 source-derived R273 handoff fixture replacement"),
+        ("sig.shaderTranslationExact = false;",
+         RUNTIME_CENSUS, "R274 preserves programmable production fail-closed gate"),
+    ]
+    missing_r274_r263_source_mapping_consumption = [
+        meaning for token, source, meaning
+        in r274_r263_source_mapping_consumption_contract
+        if token not in source
+    ]
+    if missing_r274_r263_source_mapping_consumption:
+        raise SystemExit(
+            "DX11 R274 R263 source-mapping consumption drift: "
+            + ", ".join(missing_r274_r263_source_mapping_consumption)
         )
 
     r259_programmable_activation_prerequisite_contract = [

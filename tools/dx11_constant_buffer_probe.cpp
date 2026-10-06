@@ -5375,6 +5375,32 @@ int main()
         r261IndexedStaleGeometry.reviewSnapshotToken == 0,
         "R261 rejects stale R260 geometry resource-behavior identity");
 
+    const auto r274SourceMappingPlan =
+        outrun::vr::dx11::derive_programmable_shader_register_mapping_plan(
+            r271SourceSemanticPair,
+            r267VsRegisterSemantics,
+            r268PsRegisterSemantics);
+    const auto r274SourceMappingHandoff =
+        outrun::vr::dx11::compose_programmable_shader_source_mapping_handoff(
+            programmablePair,
+            r271SourceSemanticPair,
+            r274SourceMappingPlan);
+    require(
+        r274SourceMappingPlan.exact() &&
+        r274SourceMappingHandoff.reviewReady &&
+        r274SourceMappingHandoff.sourceReceiptIdentityMatches &&
+        r274SourceMappingHandoff.mappingPlanIdentityMatches &&
+        r274SourceMappingHandoff.constantRegisterMappingExact &&
+        r274SourceMappingHandoff.samplerMappingExact &&
+        r274SourceMappingHandoff.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_shader_source_mapping_handoff_snapshot(
+                programmablePair,
+                r271SourceSemanticPair,
+                r274SourceMappingPlan,
+                r274SourceMappingHandoff.reviewSnapshotToken),
+        "R274 source-derived R273 mapping handoff prerequisite is exact");
+
     constexpr std::uint64_t r263VertexSemanticHash =
         0x2631000000000001ull;
     constexpr std::uint64_t r263PixelSemanticHash =
@@ -5392,9 +5418,11 @@ int main()
                 r263VertexSemanticHash,
                 r263PixelSemanticHash,
                 r268Linkage,
+                r274SourceMappingHandoff,
+                r274SourceMappingHandoff.reviewSnapshotToken,
                 r263TranslatorRevisionHash,
                 r263SemanticContractHash,
-                true, true, true, true);
+                true, true);
     require(
         r263SemanticTranslation.inputValid &&
         r263SemanticTranslation.sourceIdentityExact &&
@@ -5403,10 +5431,25 @@ int main()
         r263SemanticTranslation.inputLayoutReady &&
         r263SemanticTranslation.inputLayoutSnapshotMatches &&
         r263SemanticTranslation.cacheIdentityMatches &&
+        r263SemanticTranslation.sourceMappingHandoffReady &&
+        r263SemanticTranslation.sourceMappingHandoffSnapshotMatches &&
+        r263SemanticTranslation.sourceMappingIdentityMatches &&
         r263SemanticTranslation.vertexSemanticExact &&
         r263SemanticTranslation.pixelSemanticExact &&
         r263SemanticTranslation.constantRegisterMappingExact &&
         r263SemanticTranslation.samplerMappingExact &&
+        r263SemanticTranslation.sourcePairSemanticHash ==
+            r274SourceMappingHandoff.pairSemanticHash &&
+        r263SemanticTranslation.sourceConstantMappingHash ==
+            r274SourceMappingHandoff.constantMappingHash &&
+        r263SemanticTranslation.sourceSamplerMappingHash ==
+            r274SourceMappingHandoff.samplerMappingHash &&
+        r263SemanticTranslation.sourceMappingPlanRevisionHash ==
+            r274SourceMappingHandoff.mappingPlanRevisionHash &&
+        r263SemanticTranslation.sourceMappingSemanticContractHash ==
+            r274SourceMappingHandoff.mappingSemanticContractHash &&
+        r263SemanticTranslation.sourceMappingHandoffSnapshotToken ==
+            r274SourceMappingHandoff.reviewSnapshotToken &&
         r263SemanticTranslation.interfaceLinkExact &&
         r263SemanticTranslation.translatorRevisionHash ==
             r263TranslatorRevisionHash &&
@@ -5430,11 +5473,13 @@ int main()
                 r263VertexSemanticHash,
                 r263PixelSemanticHash,
                 r268Linkage,
+                r274SourceMappingHandoff,
+                r274SourceMappingHandoff.reviewSnapshotToken,
                 r263TranslatorRevisionHash,
                 r263SemanticContractHash,
-                true, true, true, true,
+                true, true,
                 r263SemanticTranslation.reviewSnapshotToken),
-        "R263 exact programmable shader semantic translation proof binds source identity to translated object/layout receipts");
+        "R274 R263 consumes exact R273 source mapping handoff");
 
     auto r269StaleInterfaceLinkage = r268Linkage;
     r269StaleInterfaceLinkage.vertexSourceBytecodeHash ^= 1ull;
@@ -5447,12 +5492,15 @@ int main()
                 r263VertexSemanticHash,
                 r263PixelSemanticHash,
                 r269StaleInterfaceLinkage,
+                r274SourceMappingHandoff,
+                r274SourceMappingHandoff.reviewSnapshotToken,
                 r263TranslatorRevisionHash,
                 r263SemanticContractHash,
-                true, true, true, true);
+                true, true);
     require(
         r263MissingInterfaceProof.inputValid &&
         r263MissingInterfaceProof.sourceIdentityExact &&
+        r263MissingInterfaceProof.sourceMappingIdentityMatches &&
         r263MissingInterfaceProof.translationObjectSnapshotMatches &&
         r263MissingInterfaceProof.inputLayoutSnapshotMatches &&
         !r263MissingInterfaceProof.interfaceSourceIdentityMatches &&
@@ -5462,6 +5510,37 @@ int main()
         r263MissingInterfaceProof.reviewSnapshotToken == 0,
         "R269 rejects R268 linkage provenance that does not match R263 source pair identity");
 
+    const auto staleR274MappingToken =
+        r274SourceMappingHandoff.reviewSnapshotToken == 1ull
+            ? 2ull
+            : (r274SourceMappingHandoff.reviewSnapshotToken ^ 1ull);
+    const auto r274StaleMappingSnapshot =
+        outrun::vr::dx11::
+            compose_programmable_shader_semantic_translation_readiness(
+                programmablePair,
+                r242ObjectReady, r242ObjectReady.snapshotToken,
+                r243InputLayoutReady, r243InputLayoutReady.snapshotToken,
+                r263VertexSemanticHash,
+                r263PixelSemanticHash,
+                r268Linkage,
+                r274SourceMappingHandoff,
+                staleR274MappingToken,
+                r263TranslatorRevisionHash,
+                r263SemanticContractHash,
+                true, true);
+    require(
+        r274StaleMappingSnapshot.sourceMappingHandoffReady &&
+        !r274StaleMappingSnapshot.sourceMappingHandoffSnapshotMatches &&
+        !r274StaleMappingSnapshot.sourceMappingIdentityMatches &&
+        !r274StaleMappingSnapshot.constantRegisterMappingExact &&
+        !r274StaleMappingSnapshot.samplerMappingExact &&
+        !r274StaleMappingSnapshot.semanticProofPresent &&
+        !r274StaleMappingSnapshot.reviewReady &&
+        r274StaleMappingSnapshot.reviewSnapshotToken == 0,
+        "R274 rejects stale R273 source-mapping snapshot in R263");
+
+    auto r274MissingConstantHandoff = r274SourceMappingHandoff;
+    r274MissingConstantHandoff.constantRegisterMappingExact = false;
     const auto r263MissingConstantMapping =
         outrun::vr::dx11::
             compose_programmable_shader_semantic_translation_readiness(
@@ -5471,11 +5550,14 @@ int main()
                 r263VertexSemanticHash,
                 r263PixelSemanticHash,
                 r268Linkage,
+                r274MissingConstantHandoff,
+                r274SourceMappingHandoff.reviewSnapshotToken,
                 r263TranslatorRevisionHash,
                 r263SemanticContractHash,
-                true, true, false, true);
+                true, true);
     require(
         r263MissingConstantMapping.sourceIdentityExact &&
+        r263MissingConstantMapping.sourceMappingIdentityMatches &&
         !r263MissingConstantMapping.constantRegisterMappingExact &&
         r263MissingConstantMapping.samplerMappingExact &&
         !r263MissingConstantMapping.semanticProofPresent &&
@@ -5483,6 +5565,8 @@ int main()
         r263MissingConstantMapping.reviewSnapshotToken == 0,
         "R263 rejects incomplete programmable constant-register semantic proof");
 
+    auto r274MissingSamplerHandoff = r274SourceMappingHandoff;
+    r274MissingSamplerHandoff.samplerMappingExact = false;
     const auto r263MissingSamplerMapping =
         outrun::vr::dx11::
             compose_programmable_shader_semantic_translation_readiness(
@@ -5492,11 +5576,14 @@ int main()
                 r263VertexSemanticHash,
                 r263PixelSemanticHash,
                 r268Linkage,
+                r274MissingSamplerHandoff,
+                r274SourceMappingHandoff.reviewSnapshotToken,
                 r263TranslatorRevisionHash,
                 r263SemanticContractHash,
-                true, true, true, false);
+                true, true);
     require(
         r263MissingSamplerMapping.sourceIdentityExact &&
+        r263MissingSamplerMapping.sourceMappingIdentityMatches &&
         r263MissingSamplerMapping.constantRegisterMappingExact &&
         !r263MissingSamplerMapping.samplerMappingExact &&
         !r263MissingSamplerMapping.semanticProofPresent &&

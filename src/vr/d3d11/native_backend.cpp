@@ -9224,12 +9224,12 @@ compose_programmable_shader_semantic_translation_readiness(
     std::uint64_t translatedVertexSemanticHash,
     std::uint64_t translatedPixelSemanticHash,
     const ProgrammableShaderInterfaceLinkageEvidence& sourceInterfaceLinkage,
+    const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff,
+    std::uint64_t sourceMappingHandoffSnapshotToken,
     std::uint64_t translatorRevisionHash,
     std::uint64_t semanticContractHash,
     bool vertexSemanticExact,
-    bool pixelSemanticExact,
-    bool constantRegisterMappingExact,
-    bool samplerMappingExact) noexcept {
+    bool pixelSemanticExact) noexcept {
     NativeProgrammableShaderSemanticTranslationReadiness out{};
 
     out.cacheKey = sourceIdentity.cacheKey;
@@ -9242,14 +9242,22 @@ compose_programmable_shader_semantic_translation_readiness(
     out.interfaceLinkHash = sourceInterfaceLinkage.interfaceLinkHash;
     out.translatorRevisionHash = translatorRevisionHash;
     out.semanticContractHash = semanticContractHash;
-    out.constantRegisterMappingExact = constantRegisterMappingExact;
-    out.samplerMappingExact = samplerMappingExact;
+    out.sourcePairSemanticHash = sourceMappingHandoff.pairSemanticHash;
+    out.sourceConstantMappingHash = sourceMappingHandoff.constantMappingHash;
+    out.sourceSamplerMappingHash = sourceMappingHandoff.samplerMappingHash;
+    out.sourceMappingPlanRevisionHash =
+        sourceMappingHandoff.mappingPlanRevisionHash;
+    out.sourceMappingSemanticContractHash =
+        sourceMappingHandoff.mappingSemanticContractHash;
     out.translationObjectSnapshotToken = translationObjectSnapshotToken;
     out.inputLayoutSnapshotToken = inputLayoutSnapshotToken;
+    out.sourceMappingHandoffSnapshotToken =
+        sourceMappingHandoffSnapshotToken;
 
     out.inputValid =
         translationObjectSnapshotToken != 0 &&
         inputLayoutSnapshotToken != 0 &&
+        sourceMappingHandoffSnapshotToken != 0 &&
         translatedVertexSemanticHash != 0 &&
         translatedPixelSemanticHash != 0 &&
         sourceInterfaceLinkage.exact() &&
@@ -9287,6 +9295,37 @@ compose_programmable_shader_semantic_translation_readiness(
         inputLayout.cacheKey == sourceIdentity.cacheKey &&
         inputLayout.objectSnapshotToken == translationObjectSnapshotToken;
 
+    // R274: R263 no longer accepts fixture booleans for constant/sampler
+    // mapping. It consumes the exact diagnostic R273 handoff and requires the
+    // snapshot presented by the caller to match the handoff that was reviewed.
+    out.sourceMappingHandoffReady =
+        sourceMappingHandoff.reviewReady &&
+        sourceMappingHandoff.boundaryPreserved &&
+        sourceMappingHandoff.diagnosticOnly &&
+        sourceMappingHandoff.sourceReceiptIdentityMatches &&
+        sourceMappingHandoff.mappingPlanIdentityMatches &&
+        sourceMappingHandoff.cacheKey != 0 &&
+        sourceMappingHandoff.pairSemanticHash != 0 &&
+        sourceMappingHandoff.constantMappingHash != 0 &&
+        sourceMappingHandoff.samplerMappingHash != 0 &&
+        sourceMappingHandoff.mappingPlanRevisionHash != 0 &&
+        sourceMappingHandoff.mappingSemanticContractHash != 0 &&
+        sourceMappingHandoff.reviewSnapshotToken != 0;
+    out.sourceMappingHandoffSnapshotMatches =
+        out.sourceMappingHandoffReady &&
+        sourceMappingHandoff.reviewSnapshotToken ==
+            sourceMappingHandoffSnapshotToken;
+    out.sourceMappingIdentityMatches =
+        out.sourceMappingHandoffSnapshotMatches &&
+        out.sourceIdentityExact &&
+        sourceMappingHandoff.cacheKey == sourceIdentity.cacheKey;
+    out.constantRegisterMappingExact =
+        out.sourceMappingIdentityMatches &&
+        sourceMappingHandoff.constantRegisterMappingExact;
+    out.samplerMappingExact =
+        out.sourceMappingIdentityMatches &&
+        sourceMappingHandoff.samplerMappingExact;
+
     out.vertexSemanticExact =
         vertexSemanticExact &&
         sourceIdentity.vertexShader.present &&
@@ -9321,6 +9360,7 @@ compose_programmable_shader_semantic_translation_readiness(
         out.translationObjectSnapshotMatches &&
         out.inputLayoutSnapshotMatches &&
         out.cacheIdentityMatches &&
+        out.sourceMappingIdentityMatches &&
         out.vertexSemanticExact &&
         out.pixelSemanticExact &&
         out.constantRegisterMappingExact &&
@@ -9351,6 +9391,18 @@ compose_programmable_shader_semantic_translation_readiness(
         token = mix_readiness_snapshot_token(token, out.translatorRevisionHash);
         token = mix_readiness_snapshot_token(token, out.semanticContractHash);
         token = mix_readiness_snapshot_token(
+            token, out.sourcePairSemanticHash);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceConstantMappingHash);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceSamplerMappingHash);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceMappingPlanRevisionHash);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceMappingSemanticContractHash);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceMappingHandoffSnapshotToken);
+        token = mix_readiness_snapshot_token(
             token, out.constantRegisterMappingExact ? 1u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.samplerMappingExact ? 1u : 0u);
@@ -9358,7 +9410,7 @@ compose_programmable_shader_semantic_translation_readiness(
             token, out.translationObjectSnapshotToken);
         token = mix_readiness_snapshot_token(
             token, out.inputLayoutSnapshotToken);
-        token = mix_readiness_snapshot_token(token, 0x263u);
+        token = mix_readiness_snapshot_token(token, 0x274u);
         out.reviewSnapshotToken = token == 0 ? 1 : token;
     }
     return out;
@@ -9373,12 +9425,12 @@ bool validate_programmable_shader_semantic_translation_readiness_snapshot(
     std::uint64_t translatedVertexSemanticHash,
     std::uint64_t translatedPixelSemanticHash,
     const ProgrammableShaderInterfaceLinkageEvidence& sourceInterfaceLinkage,
+    const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff,
+    std::uint64_t sourceMappingHandoffSnapshotToken,
     std::uint64_t translatorRevisionHash,
     std::uint64_t semanticContractHash,
     bool vertexSemanticExact,
     bool pixelSemanticExact,
-    bool constantRegisterMappingExact,
-    bool samplerMappingExact,
     std::uint64_t reviewSnapshotToken) noexcept {
     if (reviewSnapshotToken == 0)
         return false;
@@ -9390,15 +9442,18 @@ bool validate_programmable_shader_semantic_translation_readiness_snapshot(
             translatedVertexSemanticHash,
             translatedPixelSemanticHash,
             sourceInterfaceLinkage,
+            sourceMappingHandoff,
+            sourceMappingHandoffSnapshotToken,
             translatorRevisionHash,
             semanticContractHash,
             vertexSemanticExact,
-            pixelSemanticExact,
-            constantRegisterMappingExact,
-            samplerMappingExact);
+            pixelSemanticExact);
     return current.reviewReady &&
         current.reviewSnapshotToken == reviewSnapshotToken &&
         current.semanticProofPresent &&
+        current.sourceMappingHandoffReady &&
+        current.sourceMappingHandoffSnapshotMatches &&
+        current.sourceMappingIdentityMatches &&
         current.vertexSemanticExact &&
         current.pixelSemanticExact &&
         current.constantRegisterMappingExact &&
