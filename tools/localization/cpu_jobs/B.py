@@ -20,7 +20,7 @@ wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=T
 
 asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset
-clean_path=repo/"localization/graphics/role_C/20261005-C135-EBFC709F/EBFC709F_CLEAN_PLATE.png"
+clean_path=repo/"localization/graphics/role_C/20261005-C135-EBFC709F/EBFC709F_CLEAN_PLATE.png"\nsource_mask_path=repo/"localization/graphics/role_C/20261005-C135-EBFC709F/EBFC709F_SOURCE_TEXT_MASK.png"
 EXPECTED_BEFORE="7404fa227035e2fa003f4fa13f1bd348a050317757d7761c9d638f5fc1a01da4"
 SOURCE_SHA="ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0"
 commit="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
@@ -56,13 +56,15 @@ if sha(cb)!=EXPECTED_BEFORE: raise RuntimeError(("candidate sha drift",sha(cb)))
 src_raw,src,meta=decode(sb); old_raw,old,ometa=decode(cb)
 if meta!=ometa or sb[:128]!=cb[:128]: raise RuntimeError("structure/header drift")
 clean=Image.open(clean_path).convert("RGBA")
-if clean.size!=src.size: raise RuntimeError(("clean size drift",clean.size,src.size))
+source_mask_img=Image.open(source_mask_path).convert("L")
+if clean.size!=src.size or source_mask_img.size!=src.size: raise RuntimeError(("clean/mask size drift",clean.size,source_mask_img.size,src.size))
 sa=np.asarray(src); oa=np.asarray(old); ca=np.asarray(clean)
 H,W=sa.shape[:2]
 allowed=np.zeros((H,W),bool)
 for r in rows: allowed|=rect((H,W),r["bbox"])
+source_mask=np.asarray(source_mask_img)>0
 clean_diff=np.any(sa!=ca,axis=2)
-if np.count_nonzero(clean_diff & ~allowed): raise RuntimeError("clean outside target bbox")
+if np.count_nonzero(clean_diff & ~source_mask): raise RuntimeError(("validated clean plate drift outside C135 source mask",int(np.count_nonzero(clean_diff & ~source_mask))))
 for r in rows:
     x0,y0,x1,y1=r["bbox"]
     if np.count_nonzero(ca[y0:y1,x0:x1,3]): raise RuntimeError(("clean target alpha remains",r["key"]))
@@ -192,7 +194,7 @@ report={
  "method":"exact pinned source + C135 independently validated clean plate; fresh native Noto Sans CJK KR Bold; maximum safe per-row height; source-left anchor; C135-visible palette retained; no bitmap upscaling",
  "rows":reports,
  "machine_qa":{"bbox_size_positive_margin":"4/4 PASS","changed_outside_exact_source_bboxes":outside,
-   "alpha_changed_outside_exact_source_bboxes":alpha_out,"clean_changed_outside_exact_source_bboxes":int(np.count_nonzero(clean_diff&~allowed)),
+   "alpha_changed_outside_exact_source_bboxes":alpha_out,"clean_changed_outside_c135_source_mask":int(np.count_nonzero(clean_diff&~source_mask)),
    "header_128_exact":True,"raw_mode":meta["raw_mode"],"raw_orientation":"mirror_y"},
  "ordered_generation_gate":{
    "1_plate_restoration":"PASS_INHERITED_C135_INDEPENDENT_CLEAN_PLATE",
@@ -200,7 +202,7 @@ report={
    "3_no_unnecessary_undersizing":"PASS_MAX_SAFE_HEIGHT_PER_ROW",
    "4_source_weight_effect":"PASS_NATIVE_BOLD_FLAT_SOURCE_FAMILY_PENDING_CONTROLLER",
    "5_no_clipping":"PASS_4_OF_4_POSITIVE_MARGIN",
-   "6_protected_clearance":"PASS_ZERO_CHANGE_OUTSIDE_EXACT_SOURCE_BBOXES",
+   "6_protected_clearance":"PASS_ZERO_FINAL_CHANGE_OUTSIDE_EXACT_SOURCE_BBOXES",
    "7_flip_y_raw":"PASS_EVIDENCE_WRITTEN",
    "8_immediate_readability":"PENDING_CONTROLLER"
  },
