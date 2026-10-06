@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00480",
+  "production_id": "CONVERSION-DX9EX-00480",
+  "event_id": "CONVERSION-DX9EX-00480-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "fbf90ff3d40c8364d1c3d298d33722be7b5f3ab5",
+  "source_material_sha": "3fee8579482044e9a08f4c0493d8a38ac7575d25",
+  "initial_validation_candidate_sha": "7eab3855b49b92d0d518d22870df3fd87b26c65d",
+  "material_result_sha": "e747bc057cb12b8097a986a855b5d75ed490dc09",
+  "validation_bearing_result_sha": "e747bc057cb12b8097a986a855b5d75ed490dc09",
+  "result_sha": "e747bc057cb12b8097a986a855b5d75ed490dc09",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00480]",
+  "selected_work_item": "VR-REFACTOR-POST1100-R32-RESET-PHYSICAL-HOOK-RETIREMENT-0063",
+  "summary": "Retired the R32 physical Reset hook. R33 now hooks ResetDestR22 directly while R32WithResetLifecycle preserves the exact pending-fence/pre-reset and success/failure post-reset semantics. ResolveDirectTransportR13 is now the sole R32 physical hook.",
+  "checkpoints": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read exact target HEAD fbf90ff3, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, VR_REFACTOR_STATE, 00479 durable result and current R32/R33 Reset/ResolveDirect ownership. 00479 explicitly queued the two remaining R32 physical hooks for independent re-census."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Compared Reset and ResolveDirect. ResolveDirect owns producer ring/fence/ACK transport semantics; Reset was the smaller equivalence-safe fold because R33 already owns the final Reset boundary and R32 only wraps R22 Reset with pending-fence/cache lifecycle work."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Removed R32ResetR22Hook/ResetDestR32, extracted R32WithResetLifecycle, retargeted R33 Reset hook from ResetDestR32 to ResetDestR22, preserved pre/lower/post ordering, reduced R32 hook ceiling 2->1, and updated deterministic ownership/reset transport guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Initial candidate 7eab3855 failed policy only because reset transport verifier required retired ResetDestR32. Final exact SHA e747bc05 passed DX9Ex Active 37464285034 all jobs, Domain Isolation 37464285165 and HUD Inspector 37464285039."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "e747bc057cb12b8097a986a855b5d75ed490dc09",
+      "validation_bearing_result_sha": "e747bc057cb12b8097a986a855b5d75ed490dc09",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE",
+      "artifact_id": 11413804045,
+      "digest": "sha256:1e1ab8085f5ed055e1f5a35a1520744506a4131b9bf5dd426f3c8008ee57aefa"
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "changed_paths": [
+      "src/vr/d3d9/stereo_renderer_r32.cpp",
+      "src/vr/d3d9/stereo_renderer_r33.cpp",
+      "tools/verify_vr_hook_graph.py",
+      "tools/verify_vr_r31_r32_retirement_guard.py",
+      "tools/verify_vr_r32_review.py",
+      "tools/verify_vr_refactor_contract.py",
+      "tools/verify_vr_dx9ex_reset_transport_contract.py",
+      "docs/VR_REFACTOR_STATE.json",
+      "docs/automation/runs/CONVERSION-DX9EX-00480.json"
+    ],
+    "structural_effect": {
+      "r32_physical_hook_count_before": 2,
+      "r32_physical_hook_count_after": 1,
+      "retired_hook": "ResetDestR22 -> ResetDestR32",
+      "retained_r32_hook": "ResolveDirectTransportR13 -> ResolveDirectTransportR32",
+      "r33_reset_owner": "ResetDestR22 -> ResetDestR33",
+      "reset_ordering": [
+        "R32ClearPendingProducerFences before lower Reset",
+        "R22 Reset/fail-close/baseline/shadow lifecycle",
+        "R32 success rearm/cache reset or failure invalidate/failure count",
+        "R33 depth/stencil invalidation and reset replay health publication"
+      ]
+    },
+    "validation": {
+      "dx9ex_active_run_id": 37464285034,
+      "policy_job_id": 112271278033,
+      "host_job_id": 112271451978,
+      "full_chain_compile_job_id": 112271451997,
+      "game_job_id": 112271452013,
+      "package_job_id": 112273640401,
+      "domain_isolation_run_id": 37464285165,
+      "hud_inspector_run_id": 37464285039,
+      "result": "SUCCESS"
+    },
+    "validation_repair": {
+      "initial_candidate_sha": "7eab3855b49b92d0d518d22870df3fd87b26c65d",
+      "initial_dx9ex_active_run_id": 37464139589,
+      "failure_class": "STALE_VERIFIER_EXPECTED_RETIRED_RESETDESTR32",
+      "repaired_verifier": "tools/verify_vr_dx9ex_reset_transport_contract.py",
+      "repaired_in_sha": "e747bc057cb12b8097a986a855b5d75ed490dc09"
+    },
+    "noncanonical_observation": {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 37464285088,
+      "result": "FAIL",
+      "relevant_r32_review": "PASS",
+      "failure_reason": "Separate hardening PowerShell still expects historical R31StateBlockTrackingReliable in stereo_renderer_r31.cpp; stale generic guard, not canonical DX9Ex gate."
+    },
+    "package": {
+      "artifact_id": 11413804045,
+      "digest": "sha256:1e1ab8085f5ed055e1f5a35a1520744506a4131b9bf5dd426f3c8008ee57aefa"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "issue14_comment_id": 6016491200,
+    "validation_pr": 103
+  },
+  "next_action": "Re-read exact HEAD and re-census the sole remaining R32 physical hook ResolveDirectTransportR13, including R13 callback ownership, producer-fence/ACK ordering and host transport coupling. Fold only if an equivalence-safe single-owner boundary exists; otherwise continue neutral helper extraction.",
+  "started_at_kst": "2026-10-06T21:28:00+09:00",
+  "completed_at_kst": "2026-10-06T21:41:00+09:00"
+}
