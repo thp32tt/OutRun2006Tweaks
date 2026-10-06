@@ -288,15 +288,27 @@ for banned in (
             f"R33 retained retired R34 compatibility observer/status alias: {banned}")
 
 r31 = load("src/vr/d3d9/stereo_renderer_r31.cpp")
-end_enable = r31.find(
-    "fallbackEndArmed = R31EndStateBlockHook.enable().has_value();")
-begin_enable = r31.find(
-    "fallbackBeginArmed = R31BeginStateBlockHook.enable().has_value();")
-create_enable = r31.find(
-    "fallbackCreateArmed = R31CreateStateBlockHook.enable().has_value();")
-if min(end_enable, begin_enable, create_enable) < 0 or not (
-        end_enable < begin_enable < create_enable):
-    raise SystemExit("R31 fallback StateBlock hooks must arm End before Begin before Create")
+for banned in (
+        "R31CreateStateBlockHook",
+        "R31BeginStateBlockHook",
+        "R31EndStateBlockHook",
+        "R31StateBlockApplyHook",
+        "R31StateBlockApplyTarget",
+        "StateBlockApplyDestR31(",
+        "R31EnsureStateBlockApplyHook(",
+        "CreateStateBlockDestR31(",
+        "BeginStateBlockDestR31(",
+        "EndStateBlockDestR31(",
+        "safetyhook::create_inline("):
+    if banned in r31:
+        raise SystemExit(f"R31 retained retired physical StateBlock owner: {banned}")
+for required in (
+        "StateBlockTracker::LifecycleHooksReady()",
+        "R22 lifecycle hooks are authoritative; R31 is event-consumer only",
+        "R31 physical StateBlock fallback retired; fast-path trust remains disabled",
+        "StateBlockTracker::SetEventConsumerReady(true)"):
+    if required not in r31:
+        raise SystemExit(f"R31 event-consumer retirement contract missing: {required}")
 
 host_main = require(
     "vrhost/src/main.cpp",
