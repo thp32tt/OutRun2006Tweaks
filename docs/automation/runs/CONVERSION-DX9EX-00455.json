@@ -2,17 +2,17 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX9EX-00455",
   "production_id": "CONVERSION-DX9EX-00455",
-  "event_id": "CONVERSION-DX9EX-00455-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX9EX-00455-E002",
+  "event_type": "retry",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "status": "VALIDATING",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "c12e56ebd9395c9b8f66fc59ce52513470918b49",
-  "material_result_sha": "PENDING_SELF",
+  "material_result_sha": "60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a",
   "validation_bearing_result_sha": "PENDING_SELF",
   "result_sha": "PENDING_SELF",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00455]",
@@ -38,9 +38,10 @@
       "evidence": "Added SwapchainGpuDrainBudgetMs=250, GetDeviceRemovedReason early exit, elapsed-time cutoff, and verifier assertions while retaining normal End->Flush->GetData-until-S_OK completion ordering."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
+      "status": "RETRYING",
       "automation_validation": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "evidence": "DX9Ex Active 37406784043 failed only because verifier searched namespace-level SwapchainGpuDrainBudgetMs inside the helper body. Runtime implementation is unchanged."
     },
     "C4_COMMIT": {
       "status": "PENDING",
@@ -68,8 +69,29 @@
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "initial_failed_gate": {
+      "run_id": 37406784043,
+      "head_sha": "60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a",
+      "policy_job_id": 112086008594,
+      "result": "FAIL",
+      "classification": "VERIFIER_FALSE_NEGATIVE",
+      "reason": "Namespace-level SwapchainGpuDrainBudgetMs constant was asserted against sbs_gpu_drain function-body slice."
+    },
+    "initial_domain_isolation": {
+      "run_id": 37406784051,
+      "head_sha": "60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a",
+      "status": "completed",
+      "result": "success"
+    },
+    "retry_repair": {
+      "event_id": "CONVERSION-DX9EX-00455-E002",
+      "attempt": "2/3",
+      "source_runtime_change": false,
+      "verifier_change": "Check SwapchainGpuDrainBudgetMs on host_sbs and keep helper-local device-loss/timeout references checked on sbs_gpu_drain."
     }
   },
-  "next_action": "Validate the exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize bookkeeping while preserving validation_bearing_result_sha.",
-  "started_at_kst": "2026-10-06T11:57:38+09:00"
+  "next_action": "Validate verifier-repair exact SHA with canonical DX9Ex Active and Domain Isolation. Preserve 60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a as runtime-source material SHA.",
+  "started_at_kst": "2026-10-06T11:57:38+09:00",
+  "retry_started_at_kst": "2026-10-06T11:59:47+09:00"
 }

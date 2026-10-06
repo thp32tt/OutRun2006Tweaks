@@ -781,6 +781,11 @@ require(
 
 sbs_gpu_drain = body(host_sbs, "inline bool WaitForSwapchainGpuIdleBeforeDestroy() noexcept")
 require(
+    host_sbs,
+    "R19 swapchain GPU drain budget",
+    "SwapchainGpuDrainBudgetMs = 250",
+)
+require(
     sbs_gpu_drain,
     "R19 OpenXR swapchain destroy GPU completion fence",
     "D3D11_QUERY_EVENT",
@@ -789,7 +794,6 @@ require(
     "OutRunVrFinalTest::Context->Flush();",
     "OutRunVrFinalTest::Context->GetData(",
     "while (status == S_FALSE)",
-    "SwapchainGpuDrainBudgetMs = 250",
     "const ULONGLONG start = GetTickCount64();",
     "GetDeviceRemovedReason()",
     "GetTickCount64() - start >= SwapchainGpuDrainBudgetMs",
