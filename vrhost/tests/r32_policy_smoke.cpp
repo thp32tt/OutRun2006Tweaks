@@ -21,9 +21,6 @@ int main()
     assert(EffectSnapshotResult(false) ==
         EffectSnapshotDecision::ForceZeroDisparity);
 
-    static_assert(ProducerFenceBudgetMs <= 2,
-        "R32 producer fence must stay below the old 12 ms synchronous budget");
-
     // Frame-spike diagnostics adapt to the observed baseline instead of
     // assuming a fixed HMD refresh rate.
     assert(!IsPerfFrameSpike(14000, 12000));
@@ -33,19 +30,6 @@ int main()
     assert(UpdatePerfBaselineUs(0, 12000, false) == 12000);
     assert(UpdatePerfBaselineUs(12000, 30000, true) == 12000);
     assert(UpdatePerfBaselineUs(12000, 15200, false) == 12100);
-
-    // A timed-out D3D9 producer copy cannot make its ring slot reusable until
-    // the old EVENT query has actually completed.
-    assert(ClassifyPendingFence(false, false, false, false) ==
-        PendingFenceDecision::ReuseSlot);
-    assert(ClassifyPendingFence(true, true, true, false) ==
-        PendingFenceDecision::ReuseSlot);
-    assert(ClassifyPendingFence(true, true, false, true) ==
-        PendingFenceDecision::BlockReuse);
-    assert(ClassifyPendingFence(true, false, false, false) ==
-        PendingFenceDecision::QueryError);
-    assert(ClassifyPendingFence(true, true, false, false) ==
-        PendingFenceDecision::QueryError);
 
     return 0;
 }

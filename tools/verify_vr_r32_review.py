@@ -33,11 +33,19 @@ if min(baseline_verified, baseline_block, stereo_open) < 0 or         not (basel
     raise SystemExit(
         "external ResetEx safety block must be checked before BaselineVerified reopens stereo")
 
-policy = require(
+policy = r32_policy = require(
     "src/vr/d3d9/r32_policy.hpp",
     "RearmMonoSafetyEpoch",
     "ForceZeroDisparity",
 )
+for retired_policy in (
+        "ProducerFenceBudgetMs",
+        "PendingFenceDecision",
+        "ClassifyPendingFence",
+):
+    if retired_policy in r32_policy:
+        raise SystemExit(
+            f"R32 policy retained retired pre-Present fence side policy: {retired_policy}")
 
 r32 = require(
     "src/vr/d3d9/stereo_renderer_r32.cpp",
@@ -78,7 +86,6 @@ for banned in (
         raise SystemExit(f"R32 retained retired physical Reset ownership: {banned}")
 reset_owner = r32[r32.find("HRESULT R32WithResetLifecycle("):]
 for required in (
-        "R32ClearPendingProducerFences();",
         "const HRESULT hr = lowerReset();",
         "R32ResetAfterGameReset();",
         "R32InvalidateResetCaches();",
@@ -501,14 +508,20 @@ r33_lazy = require(
     "StateBlockRecovery::FlushPendingResync(device);",
 )
 
-require(
+r32_smoke = require(
     "vrhost/tests/r32_policy_smoke.cpp",
     "RearmMonoSafetyEpoch(1) == 3",
     "EffectSnapshotDecision::ForceZeroDisparity",
-    "ProducerFenceBudgetMs <= 2",
-    "PendingFenceDecision::BlockReuse",
-    "PendingFenceDecision::QueryError",
+    "IsPerfFrameSpike(30000, 25000)",
 )
+for retired_test in (
+        "ProducerFenceBudgetMs",
+        "PendingFenceDecision",
+        "ClassifyPendingFence",
+):
+    if retired_test in r32_smoke:
+        raise SystemExit(
+            f"R32 policy smoke retained retired pre-Present fence side policy: {retired_test}")
 
 cmake = require(
     "cmake.toml",
