@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PRODUCTION200-75C3586A-NAMES",
+  "base_head": "e317ed4bc13e953d999db8436eb2c80cb1237534",
+  "queue_index": 176,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+    "sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708"
+  },
+  "b74_hold_resolution": "B74 region contact proves atlas cells 37-40 are the four red source name-label sprites. Their apparent gray backing is only proof compositing; source pixels outside the labels are transparent. B200 therefore uses exact source alpha as the glyph/effect mask and a transparent clean plate, superseding the false SOURCE_TEXT_ABSENT hold.",
+  "segments": [
+    {
+      "source": "CLARISSA",
+      "korean": "클라리사"
+    },
+    {
+      "source": "JENNIFER",
+      "korean": "제니퍼"
+    },
+    {
+      "source": "FLAGMAN 4",
+      "korean": "플래그맨 4"
+    },
+    {
+      "source": "HOLLY",
+      "korean": "홀리"
+    }
+  ],
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "key": "clarissa",
+      "source": "CLARISSA",
+      "ko": "클라리사",
+      "cell": [
+        0,
+        204,
+        580,
+        168
+      ],
+      "atlas_idx": 37,
+      "source_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "source_width": 533,
+      "source_height": 151,
+      "source_effect_pixels": 41097,
+      "source_face_rgb": [
+        186,
+        0,
+        0
+      ],
+      "korean": "클라리사",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 143,
+      "localized_bbox": [
+        16,
+        220,
+        536,
+        357
+      ],
+      "localized_width": 520,
+      "localized_height": 137,
+      "delta_left": 7,
+      "delta_right": 6,
+      "delta_top": 7,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "jennifer",
+      "source": "JENNIFER",
+      "ko": "제니퍼",
+      "cell": [
+        580,
+        204,
+        460,
+        168
+      ],
+      "atlas_idx": 38,
+      "source_bbox": [
+        590,
+        204,
+        966,
+        365
+      ],
+      "source_width": 376,
+      "source_height": 161,
+      "source_effect_pixels": 19599,
+      "source_face_rgb": [
+        186,
+        0,
+        0
+      ],
+      "korean": "제니퍼",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 134,
+      "localized_bbox": [
+        593,
+        220,
+        951,
+        348
+      ],
+      "localized_width": 358,
+      "localized_height": 128,
+      "delta_left": 3,
+      "delta_right": 15,
+      "delta_top": 16,
+      "delta_bottom": 17,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "flagman4",
+      "source": "FLAGMAN 4",
+      "ko": "플래그맨 4",
+      "cell": [
+        0,
+        40,
+        1036,
+        164
+      ],
+      "atlas_idx": 39,
+      "source_bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "source_width": 980,
+      "source_height": 155,
+      "source_effect_pixels": 75687,
+      "source_face_rgb": [
+        186,
+        0,
+        0
+      ],
+      "korean": "플래그맨 4",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 155,
+      "localized_bbox": [
+        15,
+        53,
+        707,
+        200
+      ],
+      "localized_width": 692,
+      "localized_height": 147,
+      "delta_left": 7,
+      "delta_right": 281,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "holly",
+      "source": "HOLLY",
+      "ko": "홀리",
+      "cell": [
+        1036,
+        92,
+        276,
+        112
+      ],
+      "atlas_idx": 40,
+      "source_bbox": [
+        1036,
+        96,
+        1312,
+        204
+      ],
+      "source_width": 276,
+      "source_height": 108,
+      "source_effect_pixels": 2706,
+      "source_face_rgb": [
+        186,
+        38,
+        47
+      ],
+      "korean": "홀리",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 107,
+      "localized_bbox": [
+        1041,
+        98,
+        1225,
+        202
+      ],
+      "localized_width": 184,
+      "localized_height": 104,
+      "delta_left": 5,
+      "delta_right": 87,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "static_qa": {
+    "elements_total": 4,
+    "bbox_size_positive_margin": "4/4 PASS",
+    "clean_source_alpha_residue": 0,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "introduced_visible_outside_source_bboxes": 0,
+    "final_source_alpha_residue_outside_targets": 0,
+    "localized_overlap": 0,
+    "dds_roundtrip": "PASS",
+    "status": "PASS"
+  },
+  "candidate_sha256": "74bc2973f1dd198acf810e1cae541c6fe143ae11936f647bbb5802c4d279a72c",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "B200_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

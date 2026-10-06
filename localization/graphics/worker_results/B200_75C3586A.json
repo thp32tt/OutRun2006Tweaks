@@ -1,0 +1,9 @@
+{
+  "role": "B",
+  "run": "20261006-B-PRODUCTION200-75C3586A-NAMES",
+  "queue_index": 176,
+  "asset": "75C3586A",
+  "candidate_sha256": "74bc2973f1dd198acf810e1cae541c6fe143ae11936f647bbb5802c4d279a72c",
+  "report": "localization/graphics/role_B/20261006-B-PRODUCTION200-75C3586A-NAMES/B200_75C3586A_REPORT.json",
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
+}
