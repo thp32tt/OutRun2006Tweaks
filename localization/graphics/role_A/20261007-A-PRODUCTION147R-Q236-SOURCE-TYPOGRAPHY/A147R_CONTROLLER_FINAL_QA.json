@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A147R",
+  "timestamp_kst": "2026-10-07 02:42 KST",
+  "queue_index": 236,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "selection": {
+    "reason": "A-owned actionable P0/P1/REWORK exhausted after refresh; contract work-steal of C222-returned q236 from B lane",
+    "c_return": "C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
+    "c_rejected_candidate_sha256": "5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245"
+  },
+  "retry_history": {
+    "a147_sha256": "8a587e0c4d90583be696dd35443cc6fc51384118bf4df85704b75dd6a0345e53",
+    "a147_controller_decision": "REJECT_TOO_LIGHT_AND_TOO_NARROW_VS_SOURCE_HIERARCHY",
+    "a147r_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "retry_rule": "same-invocation correction; first attempt not promoted"
+  },
+  "final_style": {
+    "font": "Noto Sans CJK KR Bold",
+    "native_font_px": 88,
+    "horizontal_source_family_scale": 0.9,
+    "alignment": "right",
+    "fill_rgba": [
+      46,
+      53,
+      57,
+      255
+    ],
+    "native_hd": true,
+    "nearest_neighbor_upscale": false,
+    "source_family_assessment": "PASS_CONDENSED_BOLD_BALANCE_VS_CANONICAL_ENGLISH"
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "14/14 PASS",
+    "materially_more_condensed_than_c222_rejected_b217": "14/14 PASS",
+    "native_height_preserved": "14/14 PASS",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_pixels_outside_exact_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "source_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "protected_reversed_changed_pixels": 0,
+    "header_128_exact_canonical": true,
+    "raw_mode": "BGRA",
+    "raw_orientation": "mirror_y",
+    "stage_name_policy": "PASS_CANONICAL_PHONETIC_TRANSLITERATION"
+  },
+  "ordered_generation_gate": {
+    "1_source_text_removed_and_plate_restored": "PASS_INHERITED_C153_VALIDATED_B80_CLEAN_PLATE",
+    "2_slant_direction_matches_source": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "3_text_not_unnecessarily_undersized_and_within_source_bbox": "PASS_NATIVE_HEIGHT_PRESERVED_14_OF_14",
+    "4_source_faithful_weight_outline_shadow": "PASS_CONTROLLER_SOURCE_A147_A147R_VISUAL",
+    "5_no_clipped_pixels": "PASS_14_OF_14_POSITIVE_MARGIN",
+    "6_protected_graphics_vehicle_name_box_clearance": "PASS_ZERO_OUTSIDE_AND_REVERSED_EXACT",
+    "7_raw_and_flip_y_visual_review": "PASS_CONTROLLER_VISUAL_BOTH",
+    "8_immediate_readability_vs_english": "PASS_CONTROLLER_VISUAL"
+  },
+  "evidence": {
+    "worker_report": "localization/graphics/role_A/20261007-A-PRODUCTION147R-Q236-SOURCE-TYPOGRAPHY/A147R_FEF70E85_REPORT.json",
+    "readable_compare": "localization/graphics/role_A/20261007-A-PRODUCTION147R-Q236-SOURCE-TYPOGRAPHY/A147R_FEF_SOURCE_A147_CLEAN_NEW_READABLE.jpg",
+    "row_contact": "localization/graphics/role_A/20261007-A-PRODUCTION147R-Q236-SOURCE-TYPOGRAPHY/A147R_FEF_ROW_CONTACT.jpg",
+    "raw_compare": "localization/graphics/role_A/20261007-A-PRODUCTION147R-Q236-SOURCE-TYPOGRAPHY/A147R_FEF_SOURCE_A147_NEW_RAW.jpg",
+    "github_worker_runs": [
+      37504694544,
+      37505159823
+    ],
+    "final_worker_output_commit": "d9e76aec23207e1664f22a8d1278295ac2d50b10"
+  },
+  "controller_visual_qa": "PASS_SOURCE_AND_READABLE_ROW_CONTACT_AND_RAW",
+  "producer_status": "A147R_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_C",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
