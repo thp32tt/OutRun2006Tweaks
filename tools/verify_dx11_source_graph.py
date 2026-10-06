@@ -10563,6 +10563,30 @@ def main() -> None:
                 missing_r269_programmable_linkage_provenance_handoff)
         )
 
+    r270_programmable_register_semantics_source_provenance_contract = [
+        ("validate_programmable_shader_register_semantics(",
+         PIPELINE_TRANSLATION_HPP, "R270 R266-to-R265 provenance validator declaration"),
+        ("semantics.sourceBytecodeHash == decode.sourceBytecodeHash",
+         PIPELINE_TRANSLATION_CPP, "R270 exact source bytecode identity match"),
+        ("semantics.versionToken == decode.versionToken",
+         PIPELINE_TRANSLATION_CPP, "R270 exact shader version identity match"),
+        ("validate_programmable_shader_register_semantics(",
+         RUNTIME_CENSUS, "R270 production census requires source-attested register semantics"),
+        ("R270 rejects detached R266 register semantics with stale R265 source provenance",
+         CONSTANT_BUFFER_PROBE, "R270 detached receipt fail-closed regression"),
+    ]
+    missing_r270_programmable_register_semantics_source_provenance = [
+        meaning for token, source, meaning
+        in r270_programmable_register_semantics_source_provenance_contract
+        if token not in source
+    ]
+    if missing_r270_programmable_register_semantics_source_provenance:
+        raise SystemExit(
+            "DX11 R270 register-semantics source-provenance drift: "
+            + ", ".join(
+                missing_r270_programmable_register_semantics_source_provenance)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
