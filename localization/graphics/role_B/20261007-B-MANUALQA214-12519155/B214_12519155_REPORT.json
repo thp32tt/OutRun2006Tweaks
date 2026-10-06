@@ -1,0 +1,415 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B214",
+  "queue_index": 128,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
+  "trigger": "MANUAL_PRE_INGAME_ENGLISH_ORIGINAL_VISUAL_FALSE_NEGATIVE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/036_q128_12519155.jpg",
+  "prior_c_status": "C132_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "superseded_worker_candidate": "B213_b5431967219fa2e0e1c124093584584727a1be84b30de6f20d5cf29850102c7e_CONTROLLER_REJECTED",
+  "defects": [
+    "SOURCE_LEFT_ALIGNMENT_MISMATCH",
+    "STAGE_FAMILY_SIZE_INCONSISTENCY",
+    "VISIBLE_UNDERSIZING",
+    "B213_CONTROLLER_VISUAL_FALSE_SLANT_AND_UNDERWEIGHT"
+  ],
+  "source_sha256": "ad88efc25b705be8960f373f8a06ea88ce39f086857e68c851595f7c867c14c3",
+  "before_sha256": "b5431967219fa2e0e1c124093584584727a1be84b30de6f20d5cf29850102c7e",
+  "candidate_sha256": "66f1b9ea8e0d65afef09667ccfd1565e30406f9d08abde75fd3302e2c03e1f16",
+  "method": "exact 1024 source + C132 exact clean plate -> fresh native Noto Sans CJK KR Black render; shared larger stage nominal font/weight; source-family LEFT + visually upright transform; modest per-row horizontal condensation only when required by exact source width -> exact-header RGBA32 raw mirror-Y encode -> decoded strict QA",
+  "shared_stage_style": {
+    "font_family": "Noto Sans CJK KR Black",
+    "font_size": 44,
+    "stroke_width": 2,
+    "source_slant_measure": 0.0,
+    "localized_heights": [
+      46,
+      46,
+      46,
+      46,
+      46,
+      46
+    ]
+  },
+  "header_style": {
+    "font_family": "Noto Sans CJK KR Black",
+    "font_size": 42,
+    "stroke_width": 1,
+    "source_slant_measure": 0.0,
+    "horizontal_scale": 1.0
+  },
+  "rows": [
+    {
+      "n": 1,
+      "source": "Time Attack Mode / 15 C.",
+      "korean": "타임 어택 모드 / 15코스",
+      "stage_name": false,
+      "original_bbox": [
+        6,
+        508,
+        648,
+        558
+      ],
+      "localized_bbox": [
+        8,
+        510,
+        415,
+        556
+      ],
+      "source_size": [
+        642,
+        50
+      ],
+      "localized_size": [
+        407,
+        46
+      ],
+      "delta_left": 2,
+      "delta_right": 233,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "font_family": "Noto Sans CJK KR Black",
+      "font_size": 42,
+      "stroke_width": 1,
+      "shared_stage_style": "HEADER",
+      "horizontal_scale": 1.0,
+      "source_slant_measure": 0.0,
+      "alignment": "LEFT_SOURCE_FAMILY",
+      "fresh_native_render": true,
+      "edge_touch_high_risk": false,
+      "prior_localized_bbox": [
+        8,
+        510,
+        423,
+        556
+      ],
+      "prior_delta_left": 2,
+      "left_alignment_gain_px": 0
+    },
+    {
+      "n": 2,
+      "source": "Alpine",
+      "korean": "알파인",
+      "stage_name": true,
+      "original_bbox": [
+        5,
+        582,
+        165,
+        640
+      ],
+      "localized_bbox": [
+        7,
+        588,
+        127,
+        634
+      ],
+      "source_size": [
+        160,
+        58
+      ],
+      "localized_size": [
+        120,
+        46
+      ],
+      "delta_left": 2,
+      "delta_right": 38,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "font_family": "Noto Sans CJK KR Black",
+      "font_size": 44,
+      "stroke_width": 2,
+      "shared_stage_style": "STAGE_SHARED",
+      "horizontal_scale": 1.0,
+      "source_slant_measure": 0.0,
+      "alignment": "LEFT_SOURCE_FAMILY",
+      "fresh_native_render": true,
+      "edge_touch_high_risk": false,
+      "prior_localized_bbox": [
+        7,
+        590,
+        127,
+        632
+      ],
+      "prior_delta_left": 2,
+      "left_alignment_gain_px": 0
+    },
+    {
+      "n": 3,
+      "source": "Ancient Ruins",
+      "korean": "에인션트 루인스",
+      "stage_name": true,
+      "original_bbox": [
+        5,
+        660,
+        362,
+        708
+      ],
+      "localized_bbox": [
+        7,
+        661,
+        301,
+        707
+      ],
+      "source_size": [
+        357,
+        48
+      ],
+      "localized_size": [
+        294,
+        46
+      ],
+      "delta_left": 2,
+      "delta_right": 61,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "font_family": "Noto Sans CJK KR Black",
+      "font_size": 44,
+      "stroke_width": 2,
+      "shared_stage_style": "STAGE_SHARED",
+      "horizontal_scale": 1.0,
+      "source_slant_measure": 0.0,
+      "alignment": "LEFT_SOURCE_FAMILY",
+      "fresh_native_render": true,
+      "edge_touch_high_risk": false,
+      "prior_localized_bbox": [
+        7,
+        663,
+        290,
+        705
+      ],
+      "prior_delta_left": 2,
+      "left_alignment_gain_px": 0
+    },
+    {
+      "n": 4,
+      "source": "Bay Area",
+      "korean": "베이 에어리어",
+      "stage_name": true,
+      "original_bbox": [
+        6,
+        737,
+        232,
+        794
+      ],
+      "localized_bbox": [
+        7,
+        742,
+        231,
+        788
+      ],
+      "source_size": [
+        226,
+        57
+      ],
+      "localized_size": [
+        224,
+        46
+      ],
+      "delta_left": 1,
+      "delta_right": 1,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "font_family": "Noto Sans CJK KR Black",
+      "font_size": 44,
+      "stroke_width": 2,
+      "shared_stage_style": "STAGE_SHARED",
+      "horizontal_scale": 0.9032258064516129,
+      "source_slant_measure": 0.0,
+      "alignment": "LEFT_SOURCE_FAMILY",
+      "fresh_native_render": true,
+      "edge_touch_high_risk": false,
+      "prior_localized_bbox": [
+        8,
+        744,
+        230,
+        786
+      ],
+      "prior_delta_left": 2,
+      "left_alignment_gain_px": 1
+    },
+    {
+      "n": 5,
+      "source": "Big Forest",
+      "korean": "빅 포레스트",
+      "stage_name": true,
+      "original_bbox": [
+        6,
+        810,
+        256,
+        868
+      ],
+      "localized_bbox": [
+        8,
+        816,
+        219,
+        862
+      ],
+      "source_size": [
+        250,
+        58
+      ],
+      "localized_size": [
+        211,
+        46
+      ],
+      "delta_left": 2,
+      "delta_right": 37,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "font_family": "Noto Sans CJK KR Black",
+      "font_size": 44,
+      "stroke_width": 2,
+      "shared_stage_style": "STAGE_SHARED",
+      "horizontal_scale": 1.0,
+      "source_slant_measure": 0.0,
+      "alignment": "LEFT_SOURCE_FAMILY",
+      "fresh_native_render": true,
+      "edge_touch_high_risk": false,
+      "prior_localized_bbox": [
+        8,
+        818,
+        216,
+        860
+      ],
+      "prior_delta_left": 2,
+      "left_alignment_gain_px": 0
+    },
+    {
+      "n": 6,
+      "source": "Canyon",
+      "korean": "캐니언",
+      "stage_name": true,
+      "original_bbox": [
+        6,
+        886,
+        191,
+        944
+      ],
+      "localized_bbox": [
+        8,
+        892,
+        128,
+        938
+      ],
+      "source_size": [
+        185,
+        58
+      ],
+      "localized_size": [
+        120,
+        46
+      ],
+      "delta_left": 2,
+      "delta_right": 63,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "font_family": "Noto Sans CJK KR Black",
+      "font_size": 44,
+      "stroke_width": 2,
+      "shared_stage_style": "STAGE_SHARED",
+      "horizontal_scale": 1.0,
+      "source_slant_measure": 0.0,
+      "alignment": "LEFT_SOURCE_FAMILY",
+      "fresh_native_render": true,
+      "edge_touch_high_risk": false,
+      "prior_localized_bbox": [
+        8,
+        894,
+        127,
+        936
+      ],
+      "prior_delta_left": 2,
+      "left_alignment_gain_px": 0
+    },
+    {
+      "n": 7,
+      "source": "Cape Way",
+      "korean": "케이프 웨이",
+      "stage_name": true,
+      "original_bbox": [
+        6,
+        962,
+        258,
+        1020
+      ],
+      "localized_bbox": [
+        8,
+        968,
+        217,
+        1014
+      ],
+      "source_size": [
+        252,
+        58
+      ],
+      "localized_size": [
+        209,
+        46
+      ],
+      "delta_left": 2,
+      "delta_right": 41,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "font_family": "Noto Sans CJK KR Black",
+      "font_size": 44,
+      "stroke_width": 2,
+      "shared_stage_style": "STAGE_SHARED",
+      "horizontal_scale": 1.0,
+      "source_slant_measure": 0.0,
+      "alignment": "LEFT_SOURCE_FAMILY",
+      "fresh_native_render": true,
+      "edge_touch_high_risk": false,
+      "prior_localized_bbox": [
+        8,
+        970,
+        213,
+        1012
+      ],
+      "prior_delta_left": 2,
+      "left_alignment_gain_px": 0
+    }
+  ],
+  "qa": {
+    "header_128_exact_canonical": true,
+    "raw_orientation": "mirror_y",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_pixels_outside_exact_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "source_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "stage_naming_policy": "PASS",
+    "shared_stage_height_drift_px": 0,
+    "fresh_native_render": "PASS_NO_PRIOR_KOREAN_BITMAP_UPSCALE",
+    "readable_source_old_clean_new_visual_review": "PENDING_CONTROLLER",
+    "raw_source_old_new_visual_review": "PENDING_CONTROLLER",
+    "ordered_gate": {
+      "plate_restoration": "PASS_INHERITED_C132_EXACT_CLEAN",
+      "source_matching_slant_direction": "PASS_MEASURED_SOURCE_FAMILY",
+      "no_unnecessary_undersizing": "REWORKED_PENDING_CONTROLLER_VISUAL",
+      "source_faithful_weight_outline_shadow": "REWORKED_SHARED_BLACK_FAMILY_PENDING_CONTROLLER_VISUAL",
+      "clipping": "PASS_MACHINE_CONTAINMENT",
+      "protected_art_clearance": "PASS_ZERO_OUTSIDE_SOURCE_BBOX",
+      "flip_y_and_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+      "immediate_readability": "PENDING_CONTROLLER"
+    }
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "B214_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
