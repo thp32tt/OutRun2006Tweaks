@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261007-C227R-754F0599-A151",
+  "qa_id": "C227R",
+  "queue_index": 175,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "producer_run": "A151",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "candidate_sha256": "f21970a3d6d8ae69954d0159524856b5019cd1445daa65c55d85213f73e431f5",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
+  },
+  "independent_basis": "pinned canonical BGRA/RGBA32 source independently decoded; three source/candidate alpha bboxes re-derived directly from broad semantic row regions; producer masks not consumed",
+  "machine_status": "PASS",
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "pitch": 8192,
+    "depth": 0,
+    "mips": 1,
+    "raw_mode": "BGRA"
+  },
+  "rows": [
+    {
+      "key": "stage_select",
+      "source": "stage select",
+      "korean": "스테이지 선택",
+      "original_bbox": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "localized_bbox": [
+        10,
+        263,
+        1198,
+        387
+      ],
+      "source_size": [
+        1366,
+        143
+      ],
+      "localized_size": [
+        1188,
+        124
+      ],
+      "width_ratio": 0.8697,
+      "height_ratio": 0.8671,
+      "delta_left": 4,
+      "delta_right": 174,
+      "delta_top": 9,
+      "delta_bottom": 10,
+      "clean_source_alpha_remaining": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "showroom",
+      "source": "showroom",
+      "korean": "쇼룸",
+      "original_bbox": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "localized_bbox": [
+        10,
+        406,
+        710,
+        520
+      ],
+      "source_size": [
+        950,
+        132
+      ],
+      "localized_size": [
+        700,
+        114
+      ],
+      "width_ratio": 0.7368,
+      "height_ratio": 0.8636,
+      "delta_left": 4,
+      "delta_right": 246,
+      "delta_top": 9,
+      "delta_bottom": 9,
+      "clean_source_alpha_remaining": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "single_player",
+      "source": "single player",
+      "korean": "싱글 플레이",
+      "original_bbox": [
+        2,
+        566,
+        1386,
+        717
+      ],
+      "localized_bbox": [
+        6,
+        576,
+        1214,
+        706
+      ],
+      "source_size": [
+        1384,
+        151
+      ],
+      "localized_size": [
+        1208,
+        130
+      ],
+      "width_ratio": 0.8728,
+      "height_ratio": 0.8609,
+      "delta_left": 4,
+      "delta_right": 172,
+      "delta_top": 10,
+      "delta_bottom": 11,
+      "clean_source_alpha_remaining": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "summary": {
+    "bbox_size_positive_margin": "3/3 PASS",
+    "candidate_changed_outside_exact_source_bboxes": 0,
+    "candidate_alpha_changed_outside_exact_source_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "header_128_exact": true,
+    "raw_readable_parity": "PASS"
+  },
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C227R-754F0599-A151/C227R_754_SOURCE_CLEAN_FINAL_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C227R-754F0599-A151/C227R_754_ROW_CONTACT.jpg",
+    "localization/graphics/role_C/20261007-C227R-754F0599-A151/C227R_754_SOURCE_FINAL_RAW.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
