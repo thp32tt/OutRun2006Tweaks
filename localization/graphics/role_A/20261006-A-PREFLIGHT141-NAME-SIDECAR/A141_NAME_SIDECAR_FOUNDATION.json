@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "run": "A141",
+  "role": "A",
+  "timestamp_kst": "2026-10-06T18:00:15+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "parent_head": "3534946e0d6df49b8eb612c82899dd88d5e750fd",
+  "queue_index": 24,
+  "asset": "textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "work_stolen_from_lane": "B",
+  "selection_gate": {
+    "active_user_backlog": 0,
+    "c_returned_rework": 0,
+    "a_primary_render_ready": 0,
+    "a_primary_one_stage_to_render": 0,
+    "completed_work_repeated": false
+  },
+  "inherited_proof": [
+    "B205 exact 16-byte legacy field and one-byte selector encoding",
+    "B206 fixed-byte consumers reject direct UTF-8 native storage"
+  ],
+  "implementation": {
+    "source": "src/hooks_localization.cpp",
+    "sidecar_path": "SaveGame/KoreanPlayerNames.tsv",
+    "sidecar_key": "14-byte ASCII native compatibility alias itself",
+    "alias_format": "K + 13 Base32(A-Z2-7) chars",
+    "alias_payload_bytes": 14,
+    "native_payload_ceiling_bytes": 15,
+    "alias_hash": "FNV-1a 64-bit + deterministic uint32 salt on collision",
+    "utf8_validation": true,
+    "atomic_persistence": "temporary file + MoveFileExW(MOVEFILE_REPLACE_EXISTING|MOVEFILE_WRITE_THROUGH)",
+    "writes_native_player_name_field": false,
+    "hooks_input_or_render": false,
+    "changes_network_ranking_replay": false,
+    "relabels_66743AA8": false
+  },
+  "remaining_blockers": [
+    "Map/implement Hangul composition and name-entry behavior without changing legacy selector semantics blindly.",
+    "Map/implement explicit local player-name rendering substitution; Edit License 0x4DE48A->0x48F280 is the only exact local display callsite proven so far.",
+    "Keep network/ranking/replay on the native alias until separate compatibility proof."
+  ],
+  "build": {
+    "required": true,
+    "status": "PENDING_WIN32_RELEASE"
+  },
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "status": "A141_SOURCE_IMPLEMENTED_BUILD_PENDING"
+}

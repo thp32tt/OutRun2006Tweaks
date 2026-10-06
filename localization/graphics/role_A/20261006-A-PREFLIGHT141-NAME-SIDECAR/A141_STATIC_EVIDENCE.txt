@@ -1,0 +1,28 @@
+A141 player-name sidecar foundation static evidence
+Timestamp KST: 2026-10-06 18:00+
+Branch parent: 3534946e0d6df49b8eb612c82899dd88d5e750fd
+Work stolen from lane: B (A has no active P0/P1, C-returned REWORK, RENDER_READY or ONE_STAGE_TO_RENDER item)
+
+Inherited exact runtime proof (B205/B206):
+- Native field: VA 0x7C23E0..0x7C23EF, 16 bytes, <=15 payload + NUL.
+- Native selector appends one legacy byte; native storage is not UTF-8/UTF-16.
+- 0x4B2A43/0x4B2BBE/0x4B2C60/0x4B2D0C include 4-byte-bounded/truncated consumers.
+- 0x4308B0 serializes 0x11 raw bytes from 0x7C23E0.
+- 0x4678E9/0x467C6E -> 0x4675F0 propagate a raw 0x17-byte record.
+- Edit License passes the native field at 0x4DE48A -> 0x48F280.
+
+A141 implementation boundary:
+- Adds deterministic ASCII alias generation: K + 13 RFC4648-style Base32 alphabet characters = 14 bytes, within the 15-byte native payload ceiling.
+- Alias hash is FNV-1a 64-bit plus a deterministic collision salt; existing UTF-8 name mappings are reused before allocating a new alias.
+- Adds UTF-8 validation and strict TSV-safe control-character rejection.
+- Adds alias-keyed sidecar load/save at SaveGame/KoreanPlayerNames.tsv with deterministic sorted rows and atomic MoveFileExW replacement.
+- Alias itself is the stable sidecar key, so no guessed LicenseXX slot filename/index is required; the game-native alias travels with the existing License player-name field.
+- Adds reverse lookup from native alias to canonical UTF-8 Korean name.
+- Does NOT write VA 0x7C23E0, does NOT hook input/rendering, does NOT relabel 66743AA8, and does NOT change online/ranking/replay transport.
+
+Fail-closed remainder:
+- Exact Hangul composition/name-entry hook still required.
+- Exact local player-name render substitution hook(s) still required; only Edit License 0x4DE48A is proven as a direct local display callsite.
+- Online/ranking/replay remain native alias until separately proven compatible.
+- Current commit requires Win32 Release build validation before shared queue/status promotion.
+- VR/FFB/DX11/DXVK untouched.

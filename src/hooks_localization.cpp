@@ -87,6 +87,361 @@ namespace KoreanRuntime
     inline static std::mutex StateMutex{};
     inline static std::vector<DrawCommand> DrawQueue{};
 
+    // Korean player-name storage must not replace the game's 16-byte legacy
+    // field with UTF-8. Fixed-width ranking/network/save consumers proven by
+    // B205/B206 require that native field to remain byte-compatible. The
+    // sidecar below is deliberately keyed by an ASCII-safe alias which can be
+    // stored in that native field later, once the input/render hooks are proven.
+    static constexpr size_t NativePlayerNameFieldBytes = 16;
+    static constexpr size_t NativePlayerNamePayloadBytes = NativePlayerNameFieldBytes - 1;
+    static constexpr size_t KoreanPlayerNameAliasHashChars = 13;
+    static constexpr char KoreanPlayerNameAliasPrefix = 'K';
+    static constexpr char KoreanPlayerNameAliasAlphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    static constexpr char KoreanPlayerNameSidecarFilename[] = "KoreanPlayerNames.tsv";
+    static_assert(1 + KoreanPlayerNameAliasHashChars <= NativePlayerNamePayloadBytes);
+
+    inline static bool KoreanPlayerNameSidecarLoaded = false;
+    inline static std::unordered_map<std::string, std::string> AliasToKoreanPlayerName{};
+    inline static std::unordered_map<std::string, std::string> KoreanPlayerNameToAlias{};
+    inline static std::mutex KoreanPlayerNameSidecarMutex{};
+
+    static std::filesystem::path KoreanPlayerNameSidecarPath()
+    {
+        return Module::ExePath.parent_path() / "SaveGame" / KoreanPlayerNameSidecarFilename;
+    }
+
+    static bool IsValidKoreanPlayerNameUtf8(const std::string& value)
+    {
+        if (value.empty())
+            return false;
+
+        for (size_t i = 0; i < value.size();)
+        {
+            const uint8_t lead = static_cast<uint8_t>(value[i]);
+            if (lead == '\t' || lead == '\r' || lead == '\n' || lead == 0 || lead == 0x7F)
+                return false;
+
+            if (lead < 0x20)
+                return false;
+
+            if (lead < 0x80)
+            {
+                ++i;
+                continue;
+            }
+
+            size_t continuation = 0;
+            uint32_t codepoint = 0;
+            if (lead >= 0xC2 && lead <= 0xDF)
+            {
+                continuation = 1;
+                codepoint = lead & 0x1F;
+            }
+            else if (lead >= 0xE0 && lead <= 0xEF)
+            {
+                continuation = 2;
+                codepoint = lead & 0x0F;
+            }
+            else if (lead >= 0xF0 && lead <= 0xF4)
+            {
+                continuation = 3;
+                codepoint = lead & 0x07;
+            }
+            else
+            {
+                return false;
+            }
+
+            if (i + continuation >= value.size())
+                return false;
+
+            for (size_t j = 1; j <= continuation; ++j)
+            {
+                const uint8_t next = static_cast<uint8_t>(value[i + j]);
+                if ((next & 0xC0) != 0x80)
+                    return false;
+                codepoint = (codepoint << 6) | (next & 0x3F);
+            }
+
+            if ((continuation == 2 && codepoint < 0x800) ||
+                (continuation == 3 && codepoint < 0x10000) ||
+                (codepoint >= 0xD800 && codepoint <= 0xDFFF) ||
+                codepoint > 0x10FFFF)
+            {
+                return false;
+            }
+
+            i += continuation + 1;
+        }
+
+        return true;
+    }
+
+    static bool IsValidKoreanPlayerNameAlias(const std::string& alias)
+    {
+        if (alias.size() != 1 + KoreanPlayerNameAliasHashChars ||
+            alias.front() != KoreanPlayerNameAliasPrefix)
+        {
+            return false;
+        }
+
+        for (size_t i = 1; i < alias.size(); ++i)
+        {
+            if (!std::strchr(KoreanPlayerNameAliasAlphabet, alias[i]))
+                return false;
+        }
+        return true;
+    }
+
+    static uint64_t HashKoreanPlayerNameAlias(const std::string& utf8, uint32_t salt)
+    {
+        uint64_t hash = 14695981039346656037ULL;
+        constexpr uint64_t prime = 1099511628211ULL;
+
+        for (const unsigned char ch : utf8)
+        {
+            hash ^= ch;
+            hash *= prime;
+        }
+
+        // Delimit the UTF-8 payload from the collision salt so appending bytes
+        // to a name cannot alias the same hash input as a salted shorter name.
+        hash ^= 0xFF;
+        hash *= prime;
+        for (unsigned shift = 0; shift < 32; shift += 8)
+        {
+            hash ^= static_cast<uint8_t>((salt >> shift) & 0xFF);
+            hash *= prime;
+        }
+        return hash;
+    }
+
+    static std::string MakeKoreanPlayerNameAlias(const std::string& utf8, uint32_t salt)
+    {
+        uint64_t hash = HashKoreanPlayerNameAlias(utf8, salt);
+        std::string alias(1 + KoreanPlayerNameAliasHashChars, 'A');
+        alias[0] = KoreanPlayerNameAliasPrefix;
+
+        for (size_t i = 0; i < KoreanPlayerNameAliasHashChars; ++i)
+        {
+            const size_t pos = alias.size() - 1 - i;
+            alias[pos] = KoreanPlayerNameAliasAlphabet[hash & 0x1F];
+            hash >>= 5;
+        }
+        return alias;
+    }
+
+    static bool LoadKoreanPlayerNameSidecarLocked()
+    {
+        if (KoreanPlayerNameSidecarLoaded)
+            return true;
+
+        AliasToKoreanPlayerName.clear();
+        KoreanPlayerNameToAlias.clear();
+
+        const std::filesystem::path path = KoreanPlayerNameSidecarPath();
+        if (!std::filesystem::exists(path))
+        {
+            KoreanPlayerNameSidecarLoaded = true;
+            return true;
+        }
+
+        std::ifstream file(path, std::ios::binary);
+        if (!file)
+        {
+            spdlog::error(
+                "Korean player-name sidecar: failed to open '{}'",
+                path.string());
+            return false;
+        }
+
+        size_t loaded = 0;
+        size_t rejected = 0;
+        std::string line;
+        while (std::getline(file, line))
+        {
+            if (!line.empty() && line.back() == '\r')
+                line.pop_back();
+
+            const size_t tab = line.find('\t');
+            if (tab == std::string::npos)
+            {
+                ++rejected;
+                continue;
+            }
+
+            const std::string alias = line.substr(0, tab);
+            const std::string name = line.substr(tab + 1);
+            if (!IsValidKoreanPlayerNameAlias(alias) || !IsValidKoreanPlayerNameUtf8(name))
+            {
+                ++rejected;
+                continue;
+            }
+
+            const auto aliasIt = AliasToKoreanPlayerName.find(alias);
+            const auto nameIt = KoreanPlayerNameToAlias.find(name);
+            if ((aliasIt != AliasToKoreanPlayerName.end() && aliasIt->second != name) ||
+                (nameIt != KoreanPlayerNameToAlias.end() && nameIt->second != alias))
+            {
+                ++rejected;
+                continue;
+            }
+
+            AliasToKoreanPlayerName[alias] = name;
+            KoreanPlayerNameToAlias[name] = alias;
+            ++loaded;
+        }
+
+        KoreanPlayerNameSidecarLoaded = true;
+        spdlog::info(
+            "Korean player-name sidecar: loaded {} mappings ({} rejected) from '{}'",
+            loaded,
+            rejected,
+            path.string());
+        return true;
+    }
+
+    static bool SaveKoreanPlayerNameSidecarLocked()
+    {
+        const std::filesystem::path path = KoreanPlayerNameSidecarPath();
+        const std::filesystem::path temp = path.string() + ".tmp";
+
+        std::error_code ec;
+        std::filesystem::create_directories(path.parent_path(), ec);
+        if (ec)
+        {
+            spdlog::error(
+                "Korean player-name sidecar: failed to create SaveGame directory: {}",
+                ec.message());
+            return false;
+        }
+
+        std::vector<std::pair<std::string, std::string>> rows(
+            AliasToKoreanPlayerName.begin(),
+            AliasToKoreanPlayerName.end());
+        std::sort(rows.begin(), rows.end());
+
+        {
+            std::ofstream file(temp, std::ios::binary | std::ios::trunc);
+            if (!file)
+            {
+                spdlog::error(
+                    "Korean player-name sidecar: failed to create temporary file '{}'",
+                    temp.string());
+                return false;
+            }
+
+            for (const auto& [alias, name] : rows)
+                file << alias << '\t' << name << '\n';
+
+            file.flush();
+            if (!file)
+            {
+                spdlog::error(
+                    "Korean player-name sidecar: failed while writing '{}'",
+                    temp.string());
+                return false;
+            }
+        }
+
+        if (!MoveFileExW(
+                temp.c_str(),
+                path.c_str(),
+                MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+        {
+            const DWORD error = GetLastError();
+            std::filesystem::remove(temp, ec);
+            spdlog::error(
+                "Korean player-name sidecar: atomic replace failed for '{}' (Win32 error {})",
+                path.string(),
+                error);
+            return false;
+        }
+
+        return true;
+    }
+
+    // This function only creates/persists a compatibility alias. It does not
+    // write the game's native 0x7C23E0 name field and therefore does not alter
+    // ranking/network/save behavior. A later, separately validated input hook
+    // can call it once the Hangul composition path is proven.
+    static bool EnsureKoreanPlayerNameAlias(
+        const std::string& utf8,
+        std::string& alias)
+    {
+        if (!IsValidKoreanPlayerNameUtf8(utf8))
+            return false;
+
+        std::scoped_lock lock(KoreanPlayerNameSidecarMutex);
+        if (!LoadKoreanPlayerNameSidecarLocked())
+            return false;
+
+        if (const auto existing = KoreanPlayerNameToAlias.find(utf8);
+            existing != KoreanPlayerNameToAlias.end())
+        {
+            alias = existing->second;
+            return true;
+        }
+
+        for (uint32_t salt = 0; salt < 4096; ++salt)
+        {
+            const std::string candidate = MakeKoreanPlayerNameAlias(utf8, salt);
+            const auto collision = AliasToKoreanPlayerName.find(candidate);
+            if (collision != AliasToKoreanPlayerName.end())
+            {
+                if (collision->second == utf8)
+                {
+                    alias = candidate;
+                    KoreanPlayerNameToAlias[utf8] = candidate;
+                    return true;
+                }
+                continue;
+            }
+
+            AliasToKoreanPlayerName[candidate] = utf8;
+            KoreanPlayerNameToAlias[utf8] = candidate;
+            if (!SaveKoreanPlayerNameSidecarLocked())
+            {
+                AliasToKoreanPlayerName.erase(candidate);
+                KoreanPlayerNameToAlias.erase(utf8);
+                return false;
+            }
+
+            alias = candidate;
+            return true;
+        }
+
+        spdlog::error(
+            "Korean player-name sidecar: exhausted deterministic alias collision salts");
+        return false;
+    }
+
+    static bool LookupKoreanPlayerName(
+        const char* nativeAlias,
+        std::string& utf8)
+    {
+        if (!nativeAlias)
+            return false;
+
+        size_t length = 0;
+        while (length < NativePlayerNamePayloadBytes && nativeAlias[length] != '\0')
+            ++length;
+        const std::string alias(nativeAlias, length);
+        if (!IsValidKoreanPlayerNameAlias(alias))
+            return false;
+
+        std::scoped_lock lock(KoreanPlayerNameSidecarMutex);
+        if (!LoadKoreanPlayerNameSidecarLocked())
+            return false;
+
+        const auto it = AliasToKoreanPlayerName.find(alias);
+        if (it == AliasToKoreanPlayerName.end())
+            return false;
+
+        utf8 = it->second;
+        return true;
+    }
+
     static std::string UnescapeField(const std::string& input)
     {
         std::string out;
