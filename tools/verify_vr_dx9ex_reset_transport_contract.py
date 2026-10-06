@@ -817,6 +817,39 @@ require_order(
     "ReleaseCom(completion);",
 )
 
+sbs_acquire = body(host_sbs, "inline bool Acquire(Swapchain& swapchain")
+require(
+    host_sbs,
+    "R19 bounded swapchain image wait budget",
+    "SwapchainImageWaitBudgetNs = 5'000'000",
+)
+require(
+    sbs_acquire,
+    "R19 bounded swapchain image wait",
+    "wait.timeout = SwapchainImageWaitBudgetNs;",
+    "const XrResult result = ::xrWaitSwapchainImage(swapchain.handle, &wait);",
+    "if (result == XR_TIMEOUT_EXPIRED)",
+    "return false;",
+    "swapchain.waited = true;",
+)
+forbid(
+    sbs_acquire,
+    "R19 swapchain image wait must not block indefinitely",
+    "XR_INFINITE_DURATION",
+    "for (;;)",
+)
+require_order(
+    sbs_acquire,
+    "R19 timeout preserves acquired image for later retry",
+    "image = swapchain.acquiredImage;",
+    "wait.timeout = SwapchainImageWaitBudgetNs;",
+    "::xrWaitSwapchainImage(swapchain.handle, &wait);",
+    "if (result == XR_TIMEOUT_EXPIRED)",
+    "return false;",
+    "if (XR_FAILED(result))",
+    "swapchain.waited = true;",
+)
+
 sbs_swapchain_destroy = body(host_sbs, "bool Destroy(bool parentSessionDestroying = false)")
 require(
     host_sbs,

@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00459",
+  "production_id": "CONVERSION-DX9EX-00459",
+  "event_id": "CONVERSION-DX9EX-00459-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "VALIDATING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "63344a55ff230789b9334ba3e2c1f3456bdb5104",
+  "material_result_sha": "PENDING_SELF",
+  "validation_bearing_result_sha": "PENDING_SELF",
+  "result_sha": "PENDING_SELF",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00459]",
+  "selected_work_item": "VR-DX9EX-SWAPCHAIN-IMAGE-WAIT-BOUNDED-0042",
+  "summary": "Replace R19 xrWaitSwapchainImage infinite blocking with a 5 ms timeout; on XR_TIMEOUT_EXPIRED preserve the currently acquired image and retry that same image on a later host frame.",
+  "changed_paths": [
+    "vrhost/src/runtime/sbs_capture_override.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00459.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered bookkeeping HEAD 63344a55ff230789b9334ba3e2c1f3456bdb5104 after CONVERSION-DX9EX-00458 PASS. Structural extraction remains terminal."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R19 Acquire used XR_INFINITE_DURATION and an unbounded retry loop. OpenXR 1.1.63 explicitly defines XR_TIMEOUT_EXPIRED as a successful timeout outcome whose next wait targets the same acquired image, so the host can yield the frame without violating acquire/wait order."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added SwapchainImageWaitBudgetNs=5,000,000 ns, removed XR_INFINITE_DURATION and the retry loop, return false on XR_TIMEOUT_EXPIRED while keeping acquiredImage/acquired state intact, and set waited only after a successful non-timeout wait."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING"
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "red_review": {
+      "base_sha": "63344a55ff230789b9334ba3e2c1f3456bdb5104",
+      "result": "FAIL_AS_EXPECTED",
+      "missing_contract": "xrWaitSwapchainImage used XR_INFINITE_DURATION inside an unbounded loop, allowing the R19 host frame thread to block indefinitely on a stalled runtime despite OpenXR supporting finite timeout/retry semantics."
+    },
+    "standards": [
+      "OpenXR 1.1.63 xrWaitSwapchainImage: XR_TIMEOUT_EXPIRED means the next wait targets the same image index until success; the runtime must eventually relinquish ownership and must not block indefinitely.",
+      "OpenXR 1.1.63 xrReleaseSwapchainImage requires a successfully waited image, so timeout does not release or advance acquisition state."
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Validate the exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize bookkeeping while preserving validation_bearing_result_sha.",
+  "started_at_kst": "2026-10-06T12:44:30+09:00"
+}

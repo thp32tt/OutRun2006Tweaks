@@ -182,6 +182,7 @@ float4 PSMain(VSOut input) : SV_Target
     inline std::uint64_t NextSwapchainGeneration = 0;
 
     inline constexpr ULONGLONG SwapchainGpuDrainBudgetMs = 250;
+    inline constexpr XrDuration SwapchainImageWaitBudgetNs = 5'000'000;
     inline bool FirstSwapchainGpuDrainFailureLogged = false;
 
     inline bool WaitForSwapchainGpuIdleBeforeDestroy() noexcept
@@ -760,21 +761,22 @@ float4 PSMain(VSOut input) : SV_Target
             return true;
 
         XrSwapchainImageWaitInfo wait{ XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO };
-        wait.timeout = XR_INFINITE_DURATION;
-        for (;;)
+        wait.timeout = SwapchainImageWaitBudgetNs;
+        const XrResult result = ::xrWaitSwapchainImage(swapchain.handle, &wait);
+        if (result == XR_TIMEOUT_EXPIRED)
         {
-            const XrResult result = ::xrWaitSwapchainImage(swapchain.handle, &wait);
-            if (result == XR_TIMEOUT_EXPIRED)
-                continue; // The same acquired image must be waited again; it cannot be released yet.
-            if (XR_FAILED(result))
-            {
-                // Preserve acquiredImage. A later attempt must wait this oldest
-                // acquired image again instead of violating acquire/wait order.
-                return false;
-            }
-            swapchain.waited = true;
-            return true;
+            // Preserve the acquired oldest image and retry it on a later frame.
+            // OpenXR requires the next wait to target this same image after timeout.
+            return false;
         }
+        if (XR_FAILED(result))
+        {
+            // Preserve acquiredImage. A later attempt must wait this oldest
+            // acquired image again instead of violating acquire/wait order.
+            return false;
+        }
+        swapchain.waited = true;
+        return true;
     }
 
     inline bool Release(Swapchain& swapchain)
