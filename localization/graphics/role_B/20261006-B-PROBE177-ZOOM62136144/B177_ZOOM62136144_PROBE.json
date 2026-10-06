@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PROBE177-ZOOM62136144",
+  "items": [
+    {
+      "queue_index": 62,
+      "folder": "spr_sprani_loading_cvt_Exst",
+      "asset": "33491F83_512x256.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+      "width": 2048,
+      "height": 1024,
+      "mips": 1,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "bpp": 32,
+      "masks": [
+        "0xff",
+        "0xff00",
+        "0xff0000",
+        "0xff000000"
+      ],
+      "pitch_or_linear": 8192,
+      "sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+      "bytes": 8388736,
+      "component_count": 7,
+      "components": [
+        {
+          "bbox": [
+            20,
+            8,
+            1180,
+            804
+          ],
+          "area": 885108
+        },
+        {
+          "bbox": [
+            1367,
+            19,
+            1645,
+            105
+          ],
+          "area": 21469
+        },
+        {
+          "bbox": [
+            1748,
+            19,
+            2008,
+            105
+          ],
+          "area": 21289
+        },
+        {
+          "bbox": [
+            1364,
+            145,
+            1635,
+            235
+          ],
+          "area": 19882
+        },
+        {
+          "bbox": [
+            1754,
+            145,
+            1997,
+            235
+          ],
+          "area": 19539
+        },
+        {
+          "bbox": [
+            1274,
+            11,
+            1361,
+            108
+          ],
+          "area": 5345
+        },
+        {
+          "bbox": [
+            1279,
+            140,
+            1366,
+            236
+          ],
+          "area": 5302
+        }
+      ]
+    },
+    {
+      "queue_index": 136,
+      "folder": "spr_sprani_sumo_fe_cvt_Exst",
+      "asset": "2B785F6A_512x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/2B785F6A_512x512.dds",
+      "width": 2048,
+      "height": 2048,
+      "mips": 1,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "bpp": 32,
+      "masks": [
+        "0xff",
+        "0xff00",
+        "0xff0000",
+        "0xff000000"
+      ],
+      "pitch_or_linear": 8192,
+      "sha256": "01b656509584aed5428c9394dc36e38fbcf13e1ff3127187204200525d16498c",
+      "bytes": 16777344,
+      "component_count": 1,
+      "components": [
+        {
+          "bbox": [
+            0,
+            368,
+            1824,
+            2048
+          ],
+          "area": 3064320
+        }
+      ]
+    },
+    {
+      "queue_index": 144,
+      "folder": "spr_sprani_sumo_fe_cvt_Exst",
+      "asset": "35361191_512x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/35361191_512x512.dds",
+      "width": 2048,
+      "height": 2048,
+      "mips": 1,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "bpp": 32,
+      "masks": [
+        "0xff",
+        "0xff00",
+        "0xff0000",
+        "0xff000000"
+      ],
+      "pitch_or_linear": 8192,
+      "sha256": "2ba4c83ee6459ae0f428af945d4046e9fabaee650e5018f1d16d56f8dad9b1e5",
+      "bytes": 16777344,
+      "component_count": 1,
+      "components": [
+        {
+          "bbox": [
+            0,
+            268,
+            1496,
+            2048
+          ],
+          "area": 2659046
+        }
+      ]
+    }
+  ],
+  "status": "B177_SOURCE_PROBE_BATCH_COMPLETE_CONTROLLER_CLASSIFICATION_REQUIRED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
