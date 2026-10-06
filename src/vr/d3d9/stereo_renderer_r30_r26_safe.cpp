@@ -3306,7 +3306,8 @@ namespace OutRunVRStereo
                 return false;
 
             if (screenKind == R30ScreenSpaceKind::PerspectiveHud ||
-                screenKind == R30ScreenSpaceKind::WorldBillboard)
+                screenKind == R30ScreenSpaceKind::WorldBillboard ||
+                screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D)
             {
                 // R44: glyph/billboard batches commonly reuse one game c64 for
                 // several consecutive draws. Use the original game upload, not
@@ -3349,6 +3350,42 @@ namespace OutRunVRStereo
             if (!MatrixFinite(baseProjection) ||
                 !InvertMatrix(baseProjection, inverseBaseProjection))
                 return false;
+
+            if (screenKind ==
+                R30ScreenSpaceKind::ProjectedWorldMarker2D)
+            {
+                float deltaX[2]{};
+                float deltaY[2]{};
+                float baseAnchorX = 0.0f;
+                float baseAnchorY = 0.0f;
+                if (!R57BuildProjectedMarkerDelta(
+                        stereo, baseProjection, deltaX, deltaY,
+                        &baseAnchorX, &baseAnchorY))
+                    return false;
+
+                const float markerScale = R30HudScaleValue();
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    D3DMATRIX clipShift = IdentityMatrix();
+                    clipShift._11 = markerScale;
+                    clipShift._22 = markerScale;
+                    clipShift._41 =
+                        deltaX[eye] +
+                        (1.0f - markerScale) * baseAnchorX;
+                    clipShift._42 =
+                        deltaY[eye] +
+                        (1.0f - markerScale) * baseAnchorY;
+                    const D3DMATRIX corrected =
+                        MultiplyMatrix(stockWvp, clipShift);
+                    if (!MatrixFinite(corrected))
+                        return false;
+                    const D3DMATRIX correctedT =
+                        TransposeMatrix(corrected);
+                    std::memcpy(eyeConstants[eye], &correctedT,
+                        sizeof(correctedT));
+                }
+                return true;
+            }
 
             // R51: SCREEN_OVERLAY_2D continues below into the same finite,
             // recentered world-fixed plane transform as SCREEN_HUD. R49/R51
@@ -3522,6 +3559,14 @@ namespace OutRunVRStereo
                         semanticScope))
                     return E_NOTIMPL;
             }
+            else if (screenKind ==
+                R30ScreenSpaceKind::ProjectedWorldMarker2D)
+            {
+                if (!OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+                        semanticScope) ||
+                    !OutRunVR::GameSemantic::CurrentProjectedMarker())
+                    return E_NOTIMPL;
+            }
             else if (screenKind == R30ScreenSpaceKind::ScreenOverlay2D)
             {
                 if (!OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
@@ -3668,7 +3713,8 @@ namespace OutRunVRStereo
                 ++R30Hud2DDraws;
             else if (screenKind == R30ScreenSpaceKind::PerspectiveHud)
                 ++R30PerspectiveHudDraws;
-            else if (screenKind == R30ScreenSpaceKind::WorldBillboard)
+            else if (screenKind == R30ScreenSpaceKind::WorldBillboard ||
+                     screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D)
                 ++R30WorldBillboardDraws;
 
             if (!R30FirstScreenSpaceLogged)
