@@ -93,7 +93,7 @@ safe_source_blocks=set()
 for key,en,ko,comp in specs:
     cb=comp["bbox"]
     pad=12
-    x0=max(1024,cb[0]-pad); y0=max(0,cb[1]-pad); x1=min(W,cb[2]+pad); y1=min(1024,cb[3]+pad)
+    x0=max(0,cb[0]-pad); y0=max(0,cb[1]-pad); x1=min(W,cb[2]+pad); y1=min(H,cb[3]+pad)
     sub=sa[y0:y1,x0:x1,:]
     r=sub[:,:,0].astype(np.int16); g=sub[:,:,1].astype(np.int16); b=sub[:,:,2].astype(np.int16)
     a=sub[:,:,3]>8
