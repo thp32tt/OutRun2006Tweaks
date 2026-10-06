@@ -1751,3 +1751,9 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - B175 numeric PASS was rejected by controller visual QA for visible English source fragments. B176 hosted repair removes the double drawing; candidate d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8.
 - 5/5 bbox/size/margin PASS; outside/alpha/visible/source-residue=0; BC3 changes outside patch=0. SOURCE/CLEAN/FINAL + raw mirror_y visual PASS.
 - State B176_SELF_QA_PASS_PENDING_C_AND_INGAME; runtime/in-game UNTESTED. Next B normal queue index62. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-06T09:40:18+09:00 — B177/B179 zoom batch
+- index136 2B785F6A and index144 35361191: exact-HD classification PRESERVE_ORIGINAL_NO_LOCALIZATION.
+- index62 33491F83: Diverge/Left/Right/EASY/HARD to 분기/좌측/우측/쉬움/어려움, 9 physical labels; integrated route artwork protected.
+- B178/B179 both fail-closed before candidate persistence. State MANUAL_RECONSTRUCTION_REQUIRED; no gates were relaxed.
+- Latest completed B material remains B176 A8CE339F; independent C pending. VR/FFB/DX11/DXVK untouched.

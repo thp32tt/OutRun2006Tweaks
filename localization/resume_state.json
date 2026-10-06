@@ -1,5 +1,5 @@
 {
-  "schema_version": 101,
+  "schema_version": 102,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B177/B179 index62 33491F83: route labels are localizable (분기/좌측/우측/쉬움/어려움) but integrated with route artwork. B178/B179 both failed closed before candidate; manual artwork-aware clean reconstruction is required and protected gates must not be relaxed. Indices136/144 are positively classified preserve-original/no-localization. Latest completed B material remains B176 A8CE339F pending C.",
     "B176 index52 A8CE339F: zoom_review -> localize_text, native-HD DXT5 candidate d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8. B175 numeric PASS was controller-rejected for visible English fragments; B176 residue repair passes controller SOURCE/CLEAN/FINAL + raw. Pending independent C; do not repeat. Next B normal target even index62 33491F83 unless higher priority appears.",
     "A100 positively classified odd indices 29 F043316B, 31 A82266FC, and 33 FBCAB18D as NO_LOCALIZABLE_TEXT/PRESERVE_ORIGINAL from exact HD readable+raw evidence. Do not revisit them. Next normal A queue item is odd index35 E989E3B7 zoom_review unless a higher-priority in-game/C-returned row appears.",
     "A99 positively classified odd index27 8B52FEEC zoom_review as NO_LOCALIZABLE_TEXT/PRESERVE_ORIGINAL from exact HD readable+raw evidence. Do not revisit it. With no A-owned active in-game backlog, no C-returned REWORK and no pending_artwork, next A normal queue item is odd index29 F043316B zoom_review unless a higher-priority row appears.",
@@ -5633,5 +5634,49 @@
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_A8CE339F_REPORT.json",
     "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_CONTROLLER_SELF_QA.json"
+  },
+  "b177_zoom_classification": {
+    "timestamp_kst": "2026-10-06T09:40:18+09:00",
+    "run": "B177",
+    "indices": [
+      62,
+      136,
+      144
+    ],
+    "index62": "LOCALIZABLE_MANUAL_RECONSTRUCTION_REQUIRED",
+    "index136": "PRESERVE_ORIGINAL_NO_LOCALIZATION",
+    "index144": "PRESERVE_ORIGINAL_NO_LOCALIZATION",
+    "report": "localization/graphics/role_B/20261006-B-PROBE177-ZOOM62136144/B177_CONTROLLER_CLASSIFICATION.json",
+    "b179_fail_report": "localization/graphics/role_B/20261006-B-PRODUCTION179-33491F83-MASKS/B179_CONTROLLER_FAIL_CLOSED.json"
+  },
+  "b179_33491f83_fail_closed": {
+    "schema_version": 1,
+    "role": "B",
+    "timestamp_kst": "2026-10-06T09:40:18+09:00",
+    "queue_index": 62,
+    "asset": "textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+    "source_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+    "attempts": [
+      {
+        "run": "B178",
+        "workflow_run_id": 37394363639,
+        "result": "FAIL_CLOSED_NO_CANDIDATE",
+        "failure": "SOURCE_TEXT_MASK_OVERLAP",
+        "detail": "Coarse main-diagram text windows overlapped; worker stopped before persistence."
+      },
+      {
+        "run": "B179",
+        "workflow_run_id": 37394759782,
+        "result": "FAIL_CLOSED_NO_CANDIDATE",
+        "failure": "NO_SAFE_RENDER_FIT_LEFT_MAIN",
+        "detail": "After disjoint-window correction, Left/좌측 could not satisfy protected 1px separation because source text is integrated over underlying road/art pixels."
+      }
+    ],
+    "controller_decision": "MANUAL_RECONSTRUCTION_REQUIRED",
+    "numeric_false_pass_avoided": true,
+    "candidate_persisted": false,
+    "required_next": "Build an artwork-aware clean plate for the integrated route diagram before Korean lettering; do not clear a rectangular source bbox or relax protected-art gates.",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }

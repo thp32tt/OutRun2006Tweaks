@@ -2135,3 +2135,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/CLEAN/FINAL and raw mirror_y review PASS after repair: no English double drawing, broken glyph, mixed-lowres, clipping, collision or image intrusion; protected player/route/numeric/shard art preserved.
 - Queue index52 -> localize_text / b176_self_qa_pass_pending_c. Independent C remains required; RUNTIME_VALIDATION=UNTESTED. Next B normal target index62 33491F83 unless higher-priority work appears. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_A8CE339F_REPORT.json; localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_CONTROLLER_SELF_QA.json.
+
+## 2026-10-06T09:40:18+09:00 - B177/B179 even zoom classification and 33491F83 fail-closed
+- Continued after completed B176 instead of reopening any B-owned screenshot regression. Hosted B177 probe classified indices 62/136/144 from exact-HD readable/raw evidence.
+- Index136 2B785F6A: stage screenshot montage + protected OutRun2SP logo only. Index144 35361191: stage screenshot montage + protected OutRun2 logo only. Both preserve-original/no-localization; no candidate required.
+- Index62 33491F83: positive localizable route UI, 5 semantic / 9 physical labels: Diverge to 분기, Left to 좌측, Right to 우측, EASY to 쉬움, HARD to 어려움. Road/track, arrows, traffic-light/cone/barrier artwork are protected.
+- B178 hosted run 37394363639 failed closed before output because source-text masks overlapped. B179 run 37394759782 narrowed them but again failed closed before output: Left/좌측 cannot satisfy protected 1px separation with transparent-erasure because the source label is integrated over underlying route art.
+- No weak candidate was promoted. Index62 is MANUAL_RECONSTRUCTION_REQUIRED; next repair needs an artwork-aware clean plate. Runtime/in-game UNTESTED. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_B/20261006-B-PROBE177-ZOOM62136144/B177_CONTROLLER_CLASSIFICATION.json; localization/graphics/role_B/20261006-B-PRODUCTION179-33491F83-MASKS/B179_CONTROLLER_FAIL_CLOSED.json.
