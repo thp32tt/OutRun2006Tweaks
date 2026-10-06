@@ -1,0 +1,276 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PRODUCTION182-6C9B3611-START-GOAL",
+  "base_head": "40f2519d1d25f55ce37c6d3d0f52088cf7f7b86e",
+  "queue_index": 172,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "classification": {
+    "from": "zoom_review",
+    "to": "localize_text",
+    "segments": [
+      {
+        "source": "START",
+        "korean": "출발"
+      },
+      {
+        "source": "GOAL",
+        "korean": "골"
+      }
+    ],
+    "physical_text_elements": 2,
+    "protected": [
+      "OutRun2SP logo",
+      "route map",
+      "stage thumbnails",
+      "road artwork",
+      "all non-label pixels"
+    ]
+  },
+  "source_provenance": {
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+    "sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8"
+  },
+  "structure": {
+    "width": 1024,
+    "height": 1024,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "construction": "red-banner source letters isolated as enclosed pale/orange islands; clean plate replaces only the old letters with row-local sign-red samples; native Hangul uses natural advance + 0.17 source-family shear + sampled pale face/orange shadow.",
+  "rows": [
+    {
+      "key": "start",
+      "source": "START",
+      "ko": "출발",
+      "roi": [
+        40,
+        300,
+        210,
+        405
+      ],
+      "source_bbox": [
+        56,
+        374,
+        136,
+        395
+      ],
+      "banner_bbox": [
+        52,
+        371,
+        142,
+        398
+      ],
+      "source_text_pixels": 896,
+      "banner_pixels": 2021,
+      "component_meta": [
+        [
+          278,
+          [
+            16,
+            74,
+            37,
+            95
+          ]
+        ],
+        [
+          47,
+          [
+            38,
+            74,
+            54,
+            77
+          ]
+        ],
+        [
+          42,
+          [
+            55,
+            74,
+            69,
+            77
+          ]
+        ],
+        [
+          371,
+          [
+            47,
+            80,
+            84,
+            95
+          ]
+        ],
+        [
+          88,
+          [
+            84,
+            80,
+            96,
+            95
+          ]
+        ],
+        [
+          70,
+          [
+            37,
+            82,
+            46,
+            95
+          ]
+        ]
+      ],
+      "korean": "출발",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 16,
+      "shear": 0.17,
+      "shadow_offset": 1,
+      "fill_rgba": [
+        243,
+        224,
+        179,
+        255
+      ],
+      "shadow_rgba": [
+        234,
+        135,
+        98,
+        255
+      ],
+      "localized_bbox": [
+        81,
+        376,
+        110,
+        393
+      ],
+      "source_width": 80,
+      "source_height": 21,
+      "localized_width": 29,
+      "localized_height": 17,
+      "delta_left": 25,
+      "delta_right": 26,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "goal",
+      "source": "GOAL",
+      "ko": "골",
+      "roi": [
+        575,
+        625,
+        695,
+        682
+      ],
+      "source_bbox": [
+        596,
+        635,
+        671,
+        658
+      ],
+      "banner_bbox": [
+        591,
+        634,
+        681,
+        661
+      ],
+      "source_text_pixels": 1213,
+      "banner_pixels": 2181,
+      "component_meta": [
+        [
+          343,
+          [
+            21,
+            10,
+            44,
+            33
+          ]
+        ],
+        [
+          331,
+          [
+            42,
+            10,
+            63,
+            33
+          ]
+        ],
+        [
+          334,
+          [
+            60,
+            10,
+            83,
+            33
+          ]
+        ],
+        [
+          205,
+          [
+            80,
+            10,
+            96,
+            33
+          ]
+        ]
+      ],
+      "korean": "골",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 19,
+      "shear": 0.17,
+      "shadow_offset": 1,
+      "fill_rgba": [
+        255,
+        233,
+        173,
+        255
+      ],
+      "shadow_rgba": [
+        247,
+        124,
+        87,
+        255
+      ],
+      "localized_bbox": [
+        624,
+        637,
+        642,
+        656
+      ],
+      "source_width": 75,
+      "source_height": 23,
+      "localized_width": 18,
+      "localized_height": 19,
+      "delta_left": 28,
+      "delta_right": 29,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "static_qa": {
+    "elements_total": 2,
+    "bbox_size_positive_margin": "2/2 PASS",
+    "clean_source_residue": 0,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside": 0,
+    "protected_visible_changed": 0,
+    "introduced_visible_outside": 0,
+    "final_source_residue": 0,
+    "localized_overlap": 0,
+    "dds_roundtrip": "PASS",
+    "status": "PASS"
+  },
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "candidate_sha256": "c53642daa4d54718d404f21d4214019bc315b28e5b6c2c0f49d7e2c9ae9921b0",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "B182_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
