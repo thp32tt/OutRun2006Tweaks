@@ -231,18 +231,20 @@ namespace OutRunVrFinalTest
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session)
     {
-        CloseFrameMapping();
-        // main.cpp destroys the active LocalSpace before the session. If a user
-        // recenter replaced it, the immutable base LOCAL is a second handle and
-        // remains ours to release here.
-        if (BaseLocalSpace != XR_NULL_HANDLE &&
-            BaseLocalSpace != LocalSpace)
-            ::xrDestroySpace(BaseLocalSpace);
-        BaseLocalSpace = XR_NULL_HANDLE;
-        LocalSpace = XR_NULL_HANDLE;
-        Session = XR_NULL_HANDLE;
-        ReleaseGraphicsBinding();
-        return ::xrDestroySession(session);
+        // xrDestroySession owns all child handles. Keep the compatibility
+        // layer's session/LOCAL identity and D3D11 binding intact until the
+        // runtime confirms parent destruction; a failed parent destroy must
+        // remain retryable by the outer R19 transactional teardown.
+        const XrResult result = ::xrDestroySession(session);
+        if (XR_SUCCEEDED(result))
+        {
+            CloseFrameMapping();
+            BaseLocalSpace = XR_NULL_HANDLE;
+            LocalSpace = XR_NULL_HANDLE;
+            Session = XR_NULL_HANDLE;
+            ReleaseGraphicsBinding();
+        }
+        return result;
     }
 
     inline XrResult XRAPI_CALL EndFrame(XrSession session,

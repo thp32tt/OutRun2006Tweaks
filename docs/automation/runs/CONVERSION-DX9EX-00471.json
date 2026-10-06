@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00471",
+  "production_id": "CONVERSION-DX9EX-00471",
+  "event_id": "CONVERSION-DX9EX-00471-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "VALIDATING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "8e659f6d3e87d348c9fd613503e7c7095107ee5a",
+  "material_result_sha": "PENDING_SELF",
+  "validation_bearing_result_sha": "PENDING_SELF",
+  "result_sha": "PENDING_SELF",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00471]",
+  "selected_work_item": "VR-DX9EX-INNER-SESSION-TEARDOWN-TRANSACTION-0054",
+  "summary": "Move R20 compatibility-session local cleanup after the runtime xrDestroySession result so transient parent failure retains D3D11 binding and LOCAL/session ownership for outer R19 retry.",
+  "checkpoints": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered 00470 exact-SHA PASS at 4dcbc04b and finalized it at bookkeeping HEAD 8e659f6d before writing 00471."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Found inner OutRunVrFinalTest::DestroySession destroyed BaseLocalSpace and released Device/Context before calling runtime xrDestroySession, undermining 00470 retry preservation."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Runtime destroy now executes first; local frame mapping, LOCAL/session identity and graphics binding are cleared only on XR_SUCCESS. Explicit BaseLocalSpace child destroy is removed because parent session owns child handle destruction."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING"
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "spec_basis": "Current Khronos OpenXR states xrDestroySession destroys child handles; xrDestroySwapchain requires submitted graphics commands referencing the swapchain to complete before destruction. Preserve D3D11 binding until the parent result so R19 can retry its completion proof after failure.",
+    "changed_paths": [
+      "vrhost/src/runtime/openxr_api_compat.hpp",
+      "tools/verify_vr_recenter_contract.py",
+      "docs/VR_REFACTOR_STATE.json",
+      "docs/automation/runs/CONVERSION-DX9EX-00471.json"
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Validate this exact material SHA with canonical DX9Ex Active Validation and Domain Isolation. If PASS, finalize C3-C6 while preserving the material SHA as validation-bearing result.",
+  "started_at_kst": "2026-10-06T15:55:00+09:00"
+}

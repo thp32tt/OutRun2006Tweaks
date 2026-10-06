@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T15:52:00+09:00",
+  "updatedKst": "2026-10-06T15:55:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -116,7 +116,7 @@
     "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051",
     "VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052"
   ],
-  "next": "CONVERSION-DX9EX-00470 validation-bearing SHA 4dcbc04bd99627700f3a6297986856f12a3c0054 passed canonical DX9Ex Active and Domain Isolation. Continue from this bookkeeping HEAD with CONVERSION-DX9EX-00471, prioritizing the remaining inner OpenXR session teardown transaction so a failed parent destroy preserves graphics binding and LOCAL-space ownership. RUNTIME_VALIDATION remains UNTESTED.",
+  "next": "CONVERSION-DX9EX-00471 / VR-DX9EX-INNER-SESSION-TEARDOWN-TRANSACTION-0054 material candidate is pending canonical validation. R20 openxr_api_compat now keeps FrameMapping, BaseLocalSpace/LocalSpace/Session and D3D11 Device/Context until runtime xrDestroySession succeeds; explicit BaseLocalSpace child destruction before the parent call is removed.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -258,7 +258,8 @@
     "CONVERSION-DX9EX-00468 / VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051 final validation-bearing SHA fd9b2ac9c75a0ececdb7dcace46910643934f775 passed DX9Ex Active 37422950809 (policy/host/game/full-chain-compile/package), Domain Isolation 37422950914 and Autodev 37422950852. Package artifact 11394171983 digest sha256:bda59501675616b5a2036688c4d238cf2085ab6c61caa307e56697dbe7d88db8. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00469 / VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052: R24 RenderSafeProjectionChecked and RenderDirectFlatFallback rendered directly into OpenXR swapchain RTVs through RenderTo but omitted the swapchainOwner argument, so Draw did not set gpuWorkSubmitted and later live Destroy could skip WaitForSwapchainGpuIdleBeforeDestroy. Both R24 final render paths now pass their actual Projection/Theater owner; emergency clear was already covered by 00467. Runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00469 / VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052 exact SHA 133402e75327efd9159f0582577951c21578f97a passed DX9Ex Active 37423862114 (policy/host/game/full-chain-compile/package), Domain Isolation 37423862161 and Autodev 37423862147. Package artifact 11393854831 digest sha256:637bfcaff37f19c615763cda07e4dd43b24ee4cb960294a486fb732e90072dfa. Runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00470 / VR-DX9EX-SESSION-DESTROY-TRANSACTION-0053: R19 parent-session teardown now preserves swapchain/local host ownership until the lower xrDestroySession succeeds. Source material f385ab8e9ae689f5905ecb2059683c9a3654f618; final verifier-scope/validation-bearing SHA 4dcbc04bd99627700f3a6297986856f12a3c0054. DX9Ex Active 37425658979 policy/game/R33-full-chain/host/package SUCCESS; Domain Isolation 37425658964 SUCCESS. Package artifact 11395123099 digest sha256:c2ba146129db987a7ec0cbdf922f40b9eac28aedc8230b2b34d857e7b6297845. Runtime remains UNTESTED."
+    "CONVERSION-DX9EX-00470 / VR-DX9EX-SESSION-DESTROY-TRANSACTION-0053: R19 parent-session teardown now preserves swapchain/local host ownership until the lower xrDestroySession succeeds. Source material f385ab8e9ae689f5905ecb2059683c9a3654f618; final verifier-scope/validation-bearing SHA 4dcbc04bd99627700f3a6297986856f12a3c0054. DX9Ex Active 37425658979 policy/game/R33-full-chain/host/package SUCCESS; Domain Isolation 37425658964 SUCCESS. Package artifact 11395123099 digest sha256:c2ba146129db987a7ec0cbdf922f40b9eac28aedc8230b2b34d857e7b6297845. Runtime remains UNTESTED.",
+    "CONVERSION-DX9EX-00471 / VR-DX9EX-INNER-SESSION-TEARDOWN-TRANSACTION-0054: pending exact-SHA validation. The inner OpenXR compatibility DestroySession now calls the runtime first and only clears frame mapping, LOCAL/session identity and graphics binding on XR_SUCCESS. This preserves the D3D11 completion-fence prerequisites needed by outer R19 teardown retry after a transient parent-destroy failure. RUNTIME_VALIDATION=UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
@@ -1132,5 +1133,21 @@
       "packageArtifactId": 11395123099,
       "packageArtifactDigest": "sha256:c2ba146129db987a7ec0cbdf922f40b9eac28aedc8230b2b34d857e7b6297845"
     }
+  },
+  "post1000Maintenance00471": {
+    "taskId": "CONVERSION-DX9EX-00471",
+    "productionId": "CONVERSION-DX9EX-00471",
+    "eventId": "CONVERSION-DX9EX-00471-E001",
+    "eventType": "dispatch",
+    "attempt": "1/3",
+    "item": "VR-DX9EX-INNER-SESSION-TEARDOWN-TRANSACTION-0054",
+    "baseSha": "8e659f6d3e87d348c9fd613503e7c7095107ee5a",
+    "materialResultSha": "PENDING_SELF",
+    "validationBearingResultSha": "PENDING_SELF",
+    "automationValidation": "PENDING",
+    "runtimeValidation": "UNTESTED",
+    "runtimeBehaviorChanged": true,
+    "summary": "Make the inner OpenXR compatibility DestroySession transactional so failed parent destruction preserves LOCAL/session identity, frame mapping and D3D11 graphics binding for retry.",
+    "status": "VALIDATING"
   }
 }

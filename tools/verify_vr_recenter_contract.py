@@ -336,8 +336,10 @@ require(
     "#define xrDestroySession OutRunVrR26RecenterHardening::DestroySession",
 )
 
-# The immutable base LOCAL must survive repeated application-space recenters and
-# be released only during session teardown when it differs from the active LOCAL.
+# The immutable base LOCAL must survive repeated application-space recenters.
+# xrDestroySession owns child handles, so the compatibility layer must not
+# destroy the base LOCAL or release the graphics binding before the parent
+# result is known; otherwise a failed parent destroy cannot be retried safely.
 create_space = body(api, "inline XrResult XRAPI_CALL CreateReferenceSpace(")
 require_order(
     create_space,
@@ -347,14 +349,22 @@ require_order(
     "LocalSpace = *space",
 )
 destroy_session = body(api, "inline XrResult XRAPI_CALL DestroySession(")
-require(
+forbid(
     destroy_session,
-    "base LOCAL teardown",
-    "BaseLocalSpace != XR_NULL_HANDLE",
-    "BaseLocalSpace != LocalSpace",
+    "base LOCAL must remain parent-owned until session destroy succeeds",
     "::xrDestroySpace(BaseLocalSpace)",
-    "BaseLocalSpace = XR_NULL_HANDLE",
-    "LocalSpace = XR_NULL_HANDLE",
+)
+require_order(
+    destroy_session,
+    "transactional compatibility session teardown",
+    "const XrResult result = ::xrDestroySession(session);",
+    "if (XR_SUCCEEDED(result))",
+    "CloseFrameMapping();",
+    "BaseLocalSpace = XR_NULL_HANDLE;",
+    "LocalSpace = XR_NULL_HANDLE;",
+    "Session = XR_NULL_HANDLE;",
+    "ReleaseGraphicsBinding();",
+    "return result;",
 )
 
 # The host must consume the synthetic LOCAL change and invalidate all pose/layer
