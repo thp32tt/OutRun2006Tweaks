@@ -1,0 +1,1099 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A147",
+  "queue_index": 236,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "work_stolen_from_lane": "B",
+  "trigger": "C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
+  "prior_candidate_sha256": "5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245",
+  "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "candidate_sha256": "8a587e0c4d90583be696dd35443cc6fc51384118bf4df85704b75dd6a0345e53",
+  "c222_defect": "B217 Noto Sans CJK KR Black is broad/blocky and widened <=1.18x versus strongly condensed/narrow English source",
+  "method": "preserve C153/B80 validated clean plate + source right anchors + B217 native-height readability; rerender every row at native 2048x2048 using shared Noto Sans CJK KR Medium, then apply one consistent 0.82x native-resolution horizontal source-family transform; no nearest-neighbor enlargement; exact source bbox/RAW mirror-Y/header retained",
+  "shared_style": {
+    "font_file": "NotoSansCJK-Medium.ttc",
+    "font_face_index": 1,
+    "font_style": "Medium,Regular",
+    "font_size_native": 88,
+    "horizontal_source_family_scale": 0.82,
+    "fill_rgba": [
+      46,
+      53,
+      57,
+      255
+    ],
+    "alignment": "right"
+  },
+  "stage_name_policy": "PASS_CANONICAL_PHONETIC_TRANSLITERATION",
+  "rows": [
+    {
+      "region_idx": 0,
+      "source": "INDUSTRIAL COMPLEX",
+      "korean": "인더스트리얼 컴플렉스",
+      "cell": [
+        0,
+        1908,
+        1168,
+        140
+      ],
+      "original_bbox": [
+        54,
+        1937,
+        1161,
+        2024
+      ],
+      "source_mask_pixels": 50903,
+      "prior_localized_bbox": [
+        208,
+        1939,
+        1159,
+        2022
+      ],
+      "localized_bbox": [
+        487,
+        1939,
+        1159,
+        2022
+      ],
+      "source_size": [
+        1107,
+        87
+      ],
+      "prior_localized_size": [
+        951,
+        83
+      ],
+      "localized_size": [
+        672,
+        83
+      ],
+      "delta_left": 433,
+      "delta_right": 2,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        820,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 951,
+      "new_width_px": 672,
+      "width_ratio_vs_B217": 0.7066,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.41979,
+      "new_alpha_coverage_of_source_bbox": 0.22084,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    },
+    {
+      "region_idx": 1,
+      "source": "WATERFALLS",
+      "korean": "워터폴스",
+      "cell": [
+        0,
+        1796,
+        1072,
+        112
+      ],
+      "original_bbox": [
+        321,
+        1804,
+        1038,
+        1899
+      ],
+      "source_mask_pixels": 34348,
+      "prior_localized_bbox": [
+        668,
+        1810,
+        1036,
+        1893
+      ],
+      "localized_bbox": [
+        776,
+        1810,
+        1036,
+        1893
+      ],
+      "source_size": [
+        717,
+        95
+      ],
+      "prior_localized_size": [
+        368,
+        83
+      ],
+      "localized_size": [
+        260,
+        83
+      ],
+      "delta_left": 455,
+      "delta_right": 2,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        317,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 368,
+      "new_width_px": 260,
+      "width_ratio_vs_B217": 0.7065,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.24222,
+      "new_alpha_coverage_of_source_bbox": 0.12698,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    },
+    {
+      "region_idx": 2,
+      "source": "TULIP GARDEN",
+      "korean": "튤립 가든",
+      "cell": [
+        0,
+        1684,
+        1072,
+        112
+      ],
+      "original_bbox": [
+        263,
+        1694,
+        1056,
+        1788
+      ],
+      "source_mask_pixels": 38353,
+      "prior_localized_bbox": [
+        663,
+        1699,
+        1054,
+        1782
+      ],
+      "localized_bbox": [
+        778,
+        1699,
+        1054,
+        1782
+      ],
+      "source_size": [
+        793,
+        94
+      ],
+      "prior_localized_size": [
+        391,
+        83
+      ],
+      "localized_size": [
+        276,
+        83
+      ],
+      "delta_left": 515,
+      "delta_right": 2,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        336,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 391,
+      "new_width_px": 276,
+      "width_ratio_vs_B217": 0.7059,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.23485,
+      "new_alpha_coverage_of_source_bbox": 0.12451,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    },
+    {
+      "region_idx": 3,
+      "source": "SUNNY BEACH",
+      "korean": "서니 비치",
+      "cell": [
+        0,
+        1572,
+        1072,
+        112
+      ],
+      "original_bbox": [
+        283,
+        1580,
+        1063,
+        1675
+      ],
+      "source_mask_pixels": 37623,
+      "prior_localized_bbox": [
+        675,
+        1586,
+        1061,
+        1669
+      ],
+      "localized_bbox": [
+        790,
+        1586,
+        1061,
+        1669
+      ],
+      "source_size": [
+        780,
+        95
+      ],
+      "prior_localized_size": [
+        386,
+        83
+      ],
+      "localized_size": [
+        271,
+        83
+      ],
+      "delta_left": 507,
+      "delta_right": 2,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        331,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 386,
+      "new_width_px": 271,
+      "width_ratio_vs_B217": 0.7021,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.20065,
+      "new_alpha_coverage_of_source_bbox": 0.10881,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    },
+    {
+      "region_idx": 4,
+      "source": "SNOW MOUNTAIN",
+      "korean": "스노 마운틴",
+      "cell": [
+        0,
+        1460,
+        1072,
+        112
+      ],
+      "original_bbox": [
+        106,
+        1464,
+        1034,
+        1559
+      ],
+      "source_mask_pixels": 46922,
+      "prior_localized_bbox": [
+        553,
+        1470,
+        1032,
+        1553
+      ],
+      "localized_bbox": [
+        693,
+        1470,
+        1032,
+        1553
+      ],
+      "source_size": [
+        928,
+        95
+      ],
+      "prior_localized_size": [
+        479,
+        83
+      ],
+      "localized_size": [
+        339,
+        83
+      ],
+      "delta_left": 587,
+      "delta_right": 2,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        413,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 479,
+      "new_width_px": 339,
+      "width_ratio_vs_B217": 0.7077,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.20749,
+      "new_alpha_coverage_of_source_bbox": 0.10945,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    },
+    {
+      "region_idx": 5,
+      "source": "SKYSCRAPERS",
+      "korean": "스카이스크레이퍼스",
+      "cell": [
+        0,
+        1348,
+        1072,
+        112
+      ],
+      "original_bbox": [
+        255,
+        1356,
+        1056,
+        1451
+      ],
+      "source_mask_pixels": 39204,
+      "prior_localized_bbox": [
+        257,
+        1362,
+        1054,
+        1445
+      ],
+      "localized_bbox": [
+        463,
+        1362,
+        1054,
+        1445
+      ],
+      "source_size": [
+        801,
+        95
+      ],
+      "prior_localized_size": [
+        797,
+        83
+      ],
+      "localized_size": [
+        591,
+        83
+      ],
+      "delta_left": 208,
+      "delta_right": 2,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        721,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 797,
+      "new_width_px": 591,
+      "width_ratio_vs_B217": 0.7415,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.41259,
+      "new_alpha_coverage_of_source_bbox": 0.22827,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    },
+    {
+      "region_idx": 6,
+      "source": "PALM BEACH",
+      "korean": "팜 비치",
+      "cell": [
+        0,
+        1236,
+        1072,
+        112
+      ],
+      "original_bbox": [
+        351,
+        1241,
+        1057,
+        1335
+      ],
+      "source_mask_pixels": 34035,
+      "prior_localized_bbox": [
+        764,
+        1246,
+        1055,
+        1329
+      ],
+      "localized_bbox": [
+        850,
+        1246,
+        1055,
+        1329
+      ],
+      "source_size": [
+        706,
+        94
+      ],
+      "prior_localized_size": [
+        291,
+        83
+      ],
+      "localized_size": [
+        205,
+        83
+      ],
+      "delta_left": 499,
+      "delta_right": 2,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        250,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 291,
+      "new_width_px": 205,
+      "width_ratio_vs_B217": 0.7045,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.1931,
+      "new_alpha_coverage_of_source_bbox": 0.10762,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    },
+    {
+      "region_idx": 7,
+      "source": "NATIONAL PARK",
+      "korean": "내셔널 파크",
+      "cell": [
+        0,
+        1124,
+        1072,
+        112
+      ],
+      "original_bbox": [
+        191,
+        1134,
+        1056,
+        1227
+      ],
+      "source_mask_pixels": 41589,
+      "prior_localized_bbox": [
+        573,
+        1139,
+        1054,
+        1222
+      ],
+      "localized_bbox": [
+        715,
+        1139,
+        1054,
+        1222
+      ],
+      "source_size": [
+        865,
+        93
+      ],
+      "prior_localized_size": [
+        481,
+        83
+      ],
+      "localized_size": [
+        339,
+        83
+      ],
+      "delta_left": 524,
+      "delta_right": 2,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        414,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 481,
+      "new_width_px": 339,
+      "width_ratio_vs_B217": 0.7048,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.25681,
+      "new_alpha_coverage_of_source_bbox": 0.13696,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    },
+    {
+      "region_idx": 8,
+      "source": "MILKY WAY",
+      "korean": "밀키 웨이",
+      "cell": [
+        0,
+        1012,
+        1072,
+        112
+      ],
+      "original_bbox": [
+        423,
+        1023,
+        1051,
+        1112
+      ],
+      "source_mask_pixels": 28237,
+      "prior_localized_bbox": [
+        670,
+        1026,
+        1049,
+        1109
+      ],
+      "localized_bbox": [
+        782,
+        1026,
+        1049,
+        1109
+      ],
+      "source_size": [
+        628,
+        89
+      ],
+      "prior_localized_size": [
+        379,
+        83
+      ],
+      "localized_size": [
+        267,
+        83
+      ],
+      "delta_left": 359,
+      "delta_right": 2,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        326,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 379,
+      "new_width_px": 267,
+      "width_ratio_vs_B217": 0.7045,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.31518,
+      "new_alpha_coverage_of_source_bbox": 0.1707,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    },
+    {
+      "region_idx": 9,
+      "source": "METROPOLIS",
+      "korean": "메트로폴리스",
+      "cell": [
+        0,
+        900,
+        1072,
+        112
+      ],
+      "original_bbox": [
+        347,
+        908,
+        1057,
+        1003
+      ],
+      "source_mask_pixels": 35325,
+      "prior_localized_bbox": [
+        503,
+        914,
+        1055,
+        997
+      ],
+      "localized_bbox": [
+        665,
+        914,
+        1055,
+        997
+      ],
+      "source_size": [
+        710,
+        95
+      ],
+      "prior_localized_size": [
+        552,
+        83
+      ],
+      "localized_size": [
+        390,
+        83
+      ],
+      "delta_left": 318,
+      "delta_right": 2,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        476,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 552,
+      "new_width_px": 390,
+      "width_ratio_vs_B217": 0.7065,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.36563,
+      "new_alpha_coverage_of_source_bbox": 0.1938,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    },
+    {
+      "region_idx": 10,
+      "source": "LOST CITY",
+      "korean": "로스트 시티",
+      "cell": [
+        0,
+        788,
+        1072,
+        112
+      ],
+      "original_bbox": [
+        516,
+        795,
+        1050,
+        890
+      ],
+      "source_mask_pixels": 23310,
+      "prior_localized_bbox": [
+        571,
+        801,
+        1048,
+        884
+      ],
+      "localized_bbox": [
+        711,
+        801,
+        1048,
+        884
+      ],
+      "source_size": [
+        534,
+        95
+      ],
+      "prior_localized_size": [
+        477,
+        83
+      ],
+      "localized_size": [
+        337,
+        83
+      ],
+      "delta_left": 195,
+      "delta_right": 2,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        411,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 477,
+      "new_width_px": 337,
+      "width_ratio_vs_B217": 0.7065,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.34822,
+      "new_alpha_coverage_of_source_bbox": 0.1821,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    },
+    {
+      "region_idx": 11,
+      "source": "LEGEND",
+      "korean": "레전드",
+      "cell": [
+        0,
+        676,
+        1072,
+        112
+      ],
+      "original_bbox": [
+        632,
+        681,
+        1055,
+        775
+      ],
+      "source_mask_pixels": 22506,
+      "prior_localized_bbox": [
+        780,
+        686,
+        1053,
+        769
+      ],
+      "localized_bbox": [
+        862,
+        686,
+        1053,
+        769
+      ],
+      "source_size": [
+        423,
+        94
+      ],
+      "prior_localized_size": [
+        273,
+        83
+      ],
+      "localized_size": [
+        191,
+        83
+      ],
+      "delta_left": 230,
+      "delta_right": 2,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        233,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 273,
+      "new_width_px": 191,
+      "width_ratio_vs_B217": 0.6996,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.30708,
+      "new_alpha_coverage_of_source_bbox": 0.16491,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    },
+    {
+      "region_idx": 12,
+      "source": "JUNGLE",
+      "korean": "정글",
+      "cell": [
+        0,
+        564,
+        1072,
+        112
+      ],
+      "original_bbox": [
+        623,
+        573,
+        1043,
+        667
+      ],
+      "source_mask_pixels": 20811,
+      "prior_localized_bbox": [
+        859,
+        578,
+        1041,
+        661
+      ],
+      "localized_bbox": [
+        915,
+        578,
+        1041,
+        661
+      ],
+      "source_size": [
+        420,
+        94
+      ],
+      "prior_localized_size": [
+        182,
+        83
+      ],
+      "localized_size": [
+        126,
+        83
+      ],
+      "delta_left": 292,
+      "delta_right": 2,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        154,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 182,
+      "new_width_px": 126,
+      "width_ratio_vs_B217": 0.6923,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.22905,
+      "new_alpha_coverage_of_source_bbox": 0.1231,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    },
+    {
+      "region_idx": 13,
+      "source": "IMPERIAL AVENUE",
+      "korean": "임페리얼 애비뉴",
+      "cell": [
+        0,
+        452,
+        1072,
+        112
+      ],
+      "original_bbox": [
+        36,
+        467,
+        1046,
+        559
+      ],
+      "source_mask_pixels": 49460,
+      "prior_localized_bbox": [
+        374,
+        471,
+        1044,
+        554
+      ],
+      "localized_bbox": [
+        570,
+        471,
+        1044,
+        554
+      ],
+      "source_size": [
+        1010,
+        92
+      ],
+      "prior_localized_size": [
+        670,
+        83
+      ],
+      "localized_size": [
+        474,
+        83
+      ],
+      "delta_left": 534,
+      "delta_right": 2,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_file": "NotoSansCJK-Medium.ttc",
+      "font_face_index": 1,
+      "font_style": "Medium,Regular",
+      "font_size_native": 88,
+      "native_unscaled_size": [
+        578,
+        83
+      ],
+      "horizontal_source_family_scale": 0.82,
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "alignment": "right",
+      "prior_width_px": 670,
+      "new_width_px": 474,
+      "width_ratio_vs_B217": 0.7075,
+      "prior_height_px": 83,
+      "new_height_px": 83,
+      "prior_alpha_coverage_of_source_bbox": 0.33653,
+      "new_alpha_coverage_of_source_bbox": 0.1836,
+      "fresh_native_hd_render": true,
+      "rework_status": "A147_SOURCE_TYPOGRAPHY_REBUILD"
+    }
+  ],
+  "protected_regions_changed_pixels": {
+    "14": 0
+  },
+  "qa": {
+    "header_128_exact_canonical": true,
+    "raw_mode": "BGRA",
+    "raw_orientation": "mirror_y",
+    "clean_changed_pixels_outside_source_mask": 0,
+    "clean_source_alpha_remaining": 0,
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_pixels_outside_exact_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "source_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "materially_more_condensed_rows": 14,
+    "height_preserved_rows": 14,
+    "fresh_native_hd_render": "PASS_NO_LOWRES_NEAREST_UPSCALE",
+    "ordered_gate": {
+      "plate_restoration": "PASS_INHERITED_C153_VALIDATED_B80_CLEAN_PLATE",
+      "source_matching_slant_direction": "PASS_UPRIGHT_SOURCE_FAMILY",
+      "no_unnecessary_undersizing": "PASS_NATIVE_HEIGHT_PRESERVED_14_OF_14",
+      "source_faithful_weight_outline_shadow": "REWORKED_MEDIUM_CONDENSED_NO_INVENTED_EFFECTS_PENDING_CONTROLLER",
+      "clipping": "PASS_14_OF_14_POSITIVE_MARGIN",
+      "protected_art_clearance": "PASS_ZERO_OUTSIDE_SOURCE_BBOX_AND_REVERSED_EXACT",
+      "flip_y_and_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+      "immediate_readability": "PENDING_CONTROLLER"
+    }
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "A147_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

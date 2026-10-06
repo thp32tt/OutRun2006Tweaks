@@ -1,0 +1,10 @@
+{
+  "role": "A",
+  "run": "A147",
+  "queue_index": 236,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "candidate_sha256": "8a587e0c4d90583be696dd35443cc6fc51384118bf4df85704b75dd6a0345e53",
+  "report": "localization/graphics/role_A/20261007-A-PRODUCTION147-Q236-SOURCE-TYPOGRAPHY/A147_FEF70E85_REPORT.json",
+  "status": "A147_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "runtime_validation": "UNTESTED"
+}
