@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX",
+  "base_head": "d1344ef07b59f3f2ab970aeabfb085177c4d0533",
+  "queue_index": 176,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+    "sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708"
+  },
+  "b200_rework_reason": "Mandatory controller visual QA rejected B200 despite numeric PASS: semantic atlas binding was wrong. B200 localized idx37 HOLLY as CLARISSA, localized idx38 preserved ??? as JENNIFER, localized idx40 route artwork as HOLLY, and left the true idx35/idx36 JENNIFER/CLARISSA English sprites untouched. Numeric PASS was therefore a false negative.",
+  "corrected_binding": {
+    "35": "JENNIFER -> 제니퍼",
+    "36": "CLARISSA -> 클라리사",
+    "37": "HOLLY -> 홀리",
+    "39": "FLAGMAN 4 -> 플래그맨 4",
+    "38": "PRESERVE ???",
+    "40": "PRESERVE route artwork"
+  },
+  "segments": [
+    {
+      "source": "JENNIFER",
+      "korean": "제니퍼"
+    },
+    {
+      "source": "CLARISSA",
+      "korean": "클라리사"
+    },
+    {
+      "source": "HOLLY",
+      "korean": "홀리"
+    },
+    {
+      "source": "FLAGMAN 4",
+      "korean": "플래그맨 4"
+    }
+  ],
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "atlas_idx": 35,
+      "key": "jennifer",
+      "source": "JENNIFER",
+      "ko": "제니퍼",
+      "cell": [
+        0,
+        372,
+        892,
+        168
+      ],
+      "source_bbox": [
+        0,
+        374,
+        838,
+        532
+      ],
+      "source_width": 838,
+      "source_height": 158,
+      "source_effect_pixels": 72799,
+      "source_face_rgb": [
+        186,
+        0,
+        0
+      ],
+      "korean": "제니퍼",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 158,
+      "localized_bbox": [
+        3,
+        378,
+        425,
+        528
+      ],
+      "localized_width": 422,
+      "localized_height": 150,
+      "delta_left": 3,
+      "delta_right": 413,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "atlas_idx": 36,
+      "key": "clarissa",
+      "source": "CLARISSA",
+      "ko": "클라리사",
+      "cell": [
+        892,
+        372,
+        880,
+        168
+      ],
+      "source_bbox": [
+        905,
+        372,
+        1745,
+        532
+      ],
+      "source_width": 840,
+      "source_height": 160,
+      "source_effect_pixels": 68689,
+      "source_face_rgb": [
+        186,
+        0,
+        0
+      ],
+      "korean": "클라리사",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 160,
+      "localized_bbox": [
+        913,
+        376,
+        1494,
+        528
+      ],
+      "localized_width": 581,
+      "localized_height": 152,
+      "delta_left": 8,
+      "delta_right": 251,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "atlas_idx": 37,
+      "key": "holly",
+      "source": "HOLLY",
+      "ko": "홀리",
+      "cell": [
+        0,
+        204,
+        580,
+        168
+      ],
+      "source_bbox": [
+        9,
+        213,
+        542,
+        364
+      ],
+      "source_width": 533,
+      "source_height": 151,
+      "source_effect_pixels": 41097,
+      "source_face_rgb": [
+        186,
+        0,
+        0
+      ],
+      "korean": "홀리",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 151,
+      "localized_bbox": [
+        16,
+        216,
+        275,
+        361
+      ],
+      "localized_width": 259,
+      "localized_height": 145,
+      "delta_left": 7,
+      "delta_right": 267,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "atlas_idx": 39,
+      "key": "flagman4",
+      "source": "FLAGMAN 4",
+      "ko": "플래그맨 4",
+      "cell": [
+        0,
+        40,
+        1036,
+        164
+      ],
+      "source_bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "source_width": 980,
+      "source_height": 155,
+      "source_effect_pixels": 75687,
+      "source_face_rgb": [
+        186,
+        0,
+        0
+      ],
+      "korean": "플래그맨 4",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 155,
+      "localized_bbox": [
+        15,
+        53,
+        707,
+        200
+      ],
+      "localized_width": 692,
+      "localized_height": 147,
+      "delta_left": 7,
+      "delta_right": 281,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "static_qa": {
+    "elements_total": 4,
+    "bbox_size_positive_margin": "4/4 PASS",
+    "clean_source_alpha_residue": 0,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "introduced_visible_outside_source_bboxes": 0,
+    "final_source_alpha_residue_outside_targets": 0,
+    "localized_overlap": 0,
+    "localized_to_preserved_overlap": 0,
+    "localized_to_preserved_near1": 0,
+    "preserved_idx38_question_mark_exact": true,
+    "preserved_idx40_route_exact": true,
+    "dds_roundtrip": "PASS",
+    "status": "PASS"
+  },
+  "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "B201_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

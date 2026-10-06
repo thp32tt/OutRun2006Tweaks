@@ -1,0 +1,9 @@
+{
+  "role": "B",
+  "run": "20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX",
+  "queue_index": 176,
+  "asset": "75C3586A",
+  "candidate_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+  "report": "localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_75C3586A_REPORT.json",
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
+}
