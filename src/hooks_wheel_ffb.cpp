@@ -1330,25 +1330,13 @@ namespace
                     physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
 
-                // In a developed drift, frontSlip remains the primary torque
-                // direction. A small bounded body-slip cue only stabilizes the
-                // transition after the rack has already begun countersteering;
-                // it can no longer hand off most of the steering torque.
+                // In a developed drift, frontSlip remains the sole torque
+                // direction owner. Body slip only gates extra recovery authority.
+                // The previous opposite-sign cue could cancel most of deep-slip
+                // SAT, which felt like the wheel simply went light instead of
+                // rotating itself into countersteer.
                 if (driftCountersteerBlend > 0.0f)
-                {
-                    const float driftCountersteerShape =
-                        WheelFFBMath::drift_countersteer_shape(bodySlip);
-                    const float rawDriftCountersteerTorque =
-                        (bodySlip > 0.0f ? -1.0f : 1.0f) *
-                        driftCountersteerShape * satSpeed * physicsLoad *
-                        rearSlideRelief * satStrength;
-                    const float driftCountersteerTorque =
-                        WheelFFBMath::bound_drift_countersteer_torque(
-                            physicsSatTorque, rawDriftCountersteerTorque);
-                    physicsSatTorque +=
-                        (driftCountersteerTorque - physicsSatTorque) *
-                        driftCountersteerBlend;
-                }
+                    physicsSatTorque *= 1.0f + driftCountersteerBlend;
 
                 if (!std::isfinite(physicsSatTorque))
                     physicsSatTorque = 0.0f;
