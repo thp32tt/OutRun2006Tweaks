@@ -49,7 +49,7 @@ visible=sa[:,:,3]>8
 # artwork-aware reconstruction for the integrated main-route cell and then
 # performs exhaustive collision-free target placement.
 specs=[
- {"key":"diverge_main","source":"Diverge","ko":"분기","window":[450,5,850,105],"family":"yellow","white_outer":False,"shear":0.00,"cell":"main"},
+ {"key":"diverge_main","source":"Diverge","ko":"분기","window":[450,5,850,105],"family":"yellow","white_outer":False,"shear":0.00,"cell":"transparent_label"},
  {"key":"left_main","source":"Left","ko":"좌측","window":[330,115,560,220],"family":"green","white_outer":True,"shear":0.00,"cell":"main"},
  {"key":"right_main","source":"Right","ko":"우측","window":[720,115,970,220],"family":"red","white_outer":True,"shear":0.00,"cell":"main"},
  {"key":"easy_main","source":"EASY","ko":"쉬움","window":[120,240,455,365],"family":"green","white_outer":True,"shear":0.00,"cell":"main"},
