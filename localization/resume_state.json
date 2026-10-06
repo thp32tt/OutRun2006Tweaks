@@ -4115,7 +4115,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C226-313DB8CB-A150/C226_313DB8CB_CONTROLLER_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4224,7 +4224,6 @@
     "EBFC709F",
     "5B65E08C",
     "1A43E9D9",
-    "313DB8CB",
     "754F0599"
   ],
   "c180_controller_final_qa": {
@@ -7517,6 +7516,31 @@
     "status": "A151_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
     "fresh_independent_c": "PENDING",
     "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "a150_313db8cb": {
+    "producer_status": "C226_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "C226_PASS",
+    "pre_ingame_comparison_refresh": "PENDING_C226_EXPORT",
+    "c_pass_report": "localization/graphics/role_C/20261007-C226-313DB8CB-A150/C226_313DB8CB_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c226_controller_final_qa": {
+    "timestamp_kst": "2026-10-07T07:27:16+09:00",
+    "run": "20261007-C226-313DB8CB-A150",
+    "queue_index": 139,
+    "asset": "313DB8CB",
+    "source_sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
+    "candidate_sha256": "50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7",
+    "producer_run": "A150",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "2/2 PASS",
+    "controller_visual_qa": "PASS_A150_SOURCE_RELATIVE_HIERARCHY_REWORK",
+    "decision": "C226_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+    "machine_report": "localization/graphics/role_C/20261007-C226-313DB8CB-A150/C226_313DB8CB_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261007-C226-313DB8CB-A150/C226_313DB8CB_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_comparison_refresh": "PENDING_C226_EXPORT",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }

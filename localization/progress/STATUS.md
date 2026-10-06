@@ -2183,3 +2183,8 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - q175 754F0599: C171 884f333b7217... -> A151 f21970a3d6d8.... Korean heights 103/95/109 -> 124/114/130px, widths 1011/551/1024 -> 1188/700/1208px; exact source ceilings preserved.
 - 3/3 bbox/size/positive-margin, final validator, outside/alpha/protected zero gates, BGRA header/raw mirror_y and controller readable/row/RAW review PASS.
 - Fresh C, refreshed English-original comparison/user review and actual in-game validation required. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 07:27 KST — C226 q139 313DB8CB
+- A150 50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7 fresh C machine QA PASS: 2/2 bbox/size/positive-margin, outside/alpha/overlap/touch gates zero, exact RGBA32 header/raw mirror_y PASS.
+- Controller visual PASS: source-relative TUNED/NORMAL hierarchy materially restored by 튜닝 사양/일반 사양 while preserving heavy plain-white upright source family; no residue/breakage/clipping/intrusion.
+- Decision C226_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export/user review + actual game validation pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.

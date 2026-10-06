@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261007-C226-313DB8CB-A150",
+  "qa_id": "C226",
+  "timestamp_kst": "2026-10-07T07:27:16+09:00",
+  "queue_index": 139,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+  "producer_run": "A150",
+  "source_sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
+  "candidate_sha256": "50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7",
+  "candidate_changed_by_C": false,
+  "machine_report": "localization/graphics/role_C/20261007-C226-313DB8CB-A150/C226_313DB8CB_MACHINE_QA.json",
+  "machine_summary": {
+    "status": "PASS",
+    "bbox_size_positive_margin": "2/2 PASS",
+    "candidate_changed_outside_exact_source_bboxes": 0,
+    "candidate_alpha_changed_outside_exact_source_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "header_128_exact": true,
+    "raw_readable_parity": "PASS"
+  },
+  "controller_visual_qa": "PASS_A150_SOURCE_RELATIVE_HIERARCHY_REWORK",
+  "visual_observations": [
+    "A150 materially fixes the C116 false-negative: TUNED/튜닝 expands from 55px to 튜닝 사양 121px inside the 139px source bbox; NORMAL/일반 expands from 58px to 일반 사양 120px inside the 174px source bbox.",
+    "Both Korean labels keep the source's heavy plain-white upright centered family, native-HD edges and approximately 89% source height with positive margins; neither reads as the previously tiny weak replacement.",
+    "The validated clean plate remains empty across both source glyph footprints, and the current candidate changes no pixels or alpha outside the two exact source bboxes.",
+    "High-zoom row contacts show intact Hangul without clipping, residue, outline artifacts, overlap, or protected-art intrusion. Vehicle names, flags, MT/AT icons and selector bar remain untouched.",
+    "RAW mirror_y and readable FLIP-Y evidence are consistent."
+  ],
+  "ordered_visual_gate": {
+    "1_english_removal_plate_restoration": "PASS_VALIDATED_CLEAN_ZERO_VISIBLE_SOURCE",
+    "2_readable_slant_direction": "PASS_SOURCE_UPRIGHT",
+    "3_no_unnecessary_undersizing": "PASS_MATERIAL_WIDTH_GAIN_55_58_TO_121_120",
+    "4_source_faithful_weight_outline_shadow": "PASS_HEAVY_PLAIN_WHITE_NATIVE_BLACK",
+    "5_no_clipped_pixels": "PASS_2_OF_2_POSITIVE_MARGIN",
+    "6_protected_art_clearance": "PASS_ZERO_CHANGE_OUTSIDE_EXACT_SOURCE_BBOXES",
+    "7_flip_y_and_raw": "PASS",
+    "8_immediate_readability_vs_english": "PASS"
+  },
+  "decision": "C226_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+  "pre_ingame_comparison_refresh": "PENDING_C226_EXPORT",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false,
+  "evidence": [
+    "localization/graphics/role_C/20261007-C226-313DB8CB-A150/C226_313_SOURCE_CLEAN_FINAL_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C226-313DB8CB-A150/C226_313_ROW_CONTACT.jpg",
+    "localization/graphics/role_C/20261007-C226-313DB8CB-A150/C226_313_SOURCE_FINAL_RAW.jpg"
+  ]
+}

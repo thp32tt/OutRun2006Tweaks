@@ -2666,3 +2666,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - 3/3 bbox+size+positive-margin PASS; final validator PASS; outside/alpha/protected=0; exact RGBA32/BGRA header and raw mirror_y preserved. Controller SOURCE/C171/A151 readable, row and RAW review PASS.
 - Earlier hosted run 37540519413 stopped at a BGRA header-check mismatch before rendering; it changed no candidate bytes.
 - Prior C171 is superseded for q175. Fresh independent C + regenerated PRE_INGAME comparison/user review + actual-game validation remain required. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 07:27 KST — C226 q139 313DB8CB fresh independent QA
+
+- Selected newest fresh-C A150 q139 bytes 50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7 after refreshing CONTRACT/required state; completed C225R/q232 was not repeated. Canonical source 4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786.
+- GitHub-hosted C worker run 37540359421 independently decoded the pinned RGBA32 source and current candidate, re-derived both source/candidate alpha bboxes directly inside canonical cells, and did not consume producer masks. Machine PASS: 2/2 bbox/source-size/positive-margin; changed/alpha outside exact source bboxes=0; localized overlap/touch=0; exact header/raw mirror_y parity PASS.
+- Controller SOURCE/CLEAN/FINAL, high-zoom rows and RAW review PASS. A150 materially repairs the C116 hierarchy false-negative: prior 튜닝/일반 widths 55/58px become 튜닝 사양/일반 사양 121/120px while remaining inside 139/174px source bboxes, preserving heavy plain-white upright centered source-family weight and native-HD Hangul. No residue, clipping, overlap, protected-art damage or orientation regression.
+- Decision C226_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export refresh required before C synchronization completes; actual game validation remains UNTESTED. VR/FFB/DX11/DXVK untouched.
