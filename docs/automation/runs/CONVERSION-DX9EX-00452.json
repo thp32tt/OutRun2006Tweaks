@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "status": "VALIDATING",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "3dc747aa54d4a94866b2700db5ac7e300bc569fc",
-  "material_result_sha": "PENDING_SELF",
-  "validation_bearing_result_sha": "PENDING_SELF",
-  "result_sha": "PENDING_SELF",
+  "material_result_sha": "57496478aaa2fa4cc35d562511a0508cfcc7eece",
+  "validation_bearing_result_sha": "57496478aaa2fa4cc35d562511a0508cfcc7eece",
+  "result_sha": "57496478aaa2fa4cc35d562511a0508cfcc7eece",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00452]",
   "selected_work_item": "VR-DX9EX-R23-FINAL-SUBMISSION-RESULT-ORDERING-0035",
   "summary": "Extend the result-aware final-submission contract into R23-owned direct/classic/non-projection success paths so LastSubmittedLayer cannot report success before the actual EndFrame result.",
@@ -38,23 +38,27 @@
       "evidence": "Routed R23 direct projection, non-projection-only, mixed-layer preservation, exact classic projection, and exact classic fallback through RecordFinalSubmissionResult after obtaining the actual XrResult. False/fail-closed pre-records remain intentionally false."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
-      "automation_validation": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact material SHA 57496478aaa2fa4cc35d562511a0508cfcc7eece: DX9Ex Active Validation 37404146137 policy/host/game/full-chain-compile/package all SUCCESS; Domain Isolation Guard 37404146060 SUCCESS."
     },
     "C4_COMMIT": {
-      "status": "PENDING",
-      "ci_skip_on_validation_bearing_result": false
+      "status": "COMPLETE",
+      "ci_skip_on_validation_bearing_result": false,
+      "evidence": "Material/validation-bearing commit 57496478aaa2fa4cc35d562511a0508cfcc7eece includes [AUTO:CONVERSION-DX9EX-00452] and no CI-skip directive."
     },
     "C5_PACKAGE": {
-      "status": "PENDING"
+      "status": "COMPLETE",
+      "evidence": "Artifact 11386627854 OutRun2-VR-DX9EX-ACTIVE-57496478aaa2fa4cc35d562511a0508cfcc7eece digest sha256:b9f5f6ee42e61a925e80015a2f4dba769ec32a9a53c26d2c16592e80769ded97."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Durable task record finalized after exact-SHA Gate; validation-bearing result remains the material commit, separate from bookkeeping."
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "red_review": {
       "base_sha": "3dc747aa54d4a94866b2700db5ac7e300bc569fc",
@@ -64,8 +68,30 @@
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "dx9ex_active": {
+      "run_id": 37404146137,
+      "head_sha": "57496478aaa2fa4cc35d562511a0508cfcc7eece",
+      "result": "SUCCESS",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 37404146060,
+      "head_sha": "57496478aaa2fa4cc35d562511a0508cfcc7eece",
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11386627854,
+      "digest": "sha256:b9f5f6ee42e61a925e80015a2f4dba769ec32a9a53c26d2c16592e80769ded97"
     }
   },
-  "next_action": "Validate the exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize bookkeeping while preserving validation_bearing_result_sha.",
-  "started_at_kst": "2026-10-06T11:23:10+09:00"
+  "next_action": "Continue from latest branch HEAD with the next independently provable DX9Ex stability/resource-lifetime unit. Do not claim visual/HUD/performance runtime behavior without Quest3/VDXR evidence.",
+  "started_at_kst": "2026-10-06T11:23:10+09:00",
+  "completed_at_kst": "2026-10-06T11:32:30+09:00"
 }
