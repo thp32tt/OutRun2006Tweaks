@@ -1,8 +1,9 @@
 // R33 final dispatch + post-review hot-path hardening.
 //
-// R32 owns direct-transport review-2 safety plus Reset/Present owner helpers.
-// R33 is the sole upper physical Reset/Present/draw dispatcher: Reset hooks R22,
-// Present hooks R13, and draws hook R30 while lower owner semantics stay intact.
+// R32 owns hook-free direct-transport review-2 safety plus Reset/Present helpers.
+// R33 is the sole upper physical Reset/Present/DirectGPU/draw dispatcher:
+// Reset hooks R22, Present/DirectGPU hook R13, and draws hook R30 while lower
+// owner semantics stay intact.
 // R33 owns depth/stencil write-state caching,
 // exact single-count draw dispatch, final raster replay preservation, and the
 // ResetEx replay-health guard previously implemented by a separate R34 hook
@@ -34,6 +35,7 @@ namespace OutRunVRStereo
     {
         SafetyHookInline R33ResetR22Hook{};
         SafetyHookInline R33PresentR13Hook{};
+        SafetyHookInline R33ResolveDirectR13Hook{};
         SafetyHookInline R33SetRenderStateR29Hook{};
         SafetyHookInline R33DrawPrimitiveR30Hook{};
         SafetyHookInline R33DrawIndexedPrimitiveR30Hook{};
@@ -858,6 +860,15 @@ namespace OutRunVRStereo
                 device, call, "R33/DrawIndexedPrimitiveUP/raster-state");
         }
 
+        bool ResolveDirectTransportDestR33(IDirect3DDevice9* device,
+            std::uint32_t frameId) noexcept
+        {
+            return R32ResolveDirectTransport(
+                device, frameId, [&]() noexcept {
+                    return R33ResolveDirectR13Hook.call<bool>(device, frameId);
+                });
+        }
+
         HRESULT __stdcall ResetDestR33(IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
         {
@@ -980,6 +991,7 @@ namespace OutRunVRStereo
             R33DrawIndexedPrimitiveR30Hook = {};
             R33DrawPrimitiveR30Hook = {};
             R33SetRenderStateR29Hook = {};
+            R33ResolveDirectR13Hook = {};
             R33PresentR13Hook = {};
             R33ResetR22Hook = {};
         }
@@ -989,6 +1001,7 @@ namespace OutRunVRStereo
             SafetyHookInline* hooks[]{
                 &R33ResetR22Hook,
                 &R33PresentR13Hook,
+                &R33ResolveDirectR13Hook,
                 &R33SetRenderStateR29Hook,
                 &R33DrawPrimitiveR30Hook,
                 &R33DrawIndexedPrimitiveR30Hook,
@@ -1021,6 +1034,9 @@ namespace OutRunVRStereo
                     R33PresentR13Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&PresentDestR13),
                         PresentDestR33, disabled);
+                    R33ResolveDirectR13Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&ResolveDirectTransportR13),
+                        ResolveDirectTransportDestR33, disabled);
                     R33SetRenderStateR29Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&SetRenderStateDestR29),
                         SetRenderStateDestR33, disabled);
@@ -1042,7 +1058,7 @@ namespace OutRunVRStereo
                         R33RollbackHooks();
                         R33ReportInstallResult(false);
                         spdlog::error(
-                            "VR R33: final hook transaction was partial; R30 draw path and R32 DirectGPU/R22 Reset lifecycle remain authoritative");
+                            "VR R33: final hook transaction was partial; R30 draw path plus R13 DirectGPU/R22 Reset lower owners remain authoritative");
                         return 0;
                     }
 
@@ -1053,7 +1069,7 @@ namespace OutRunVRStereo
 
                     R33ReportInstallResult(true);
                     spdlog::info(
-                        "VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY; top-level telemetry counted once when enabled; direct R22 Reset owner with preserved R32 reset lifecycle + depth/stencil cache ACTIVE");
+                        "VR R33 DISPATCH: final Reset/Present/DirectGPU/draw physical ownership READY; R32 is hook-free functional owner; direct R22 Reset + direct R13 Present/DirectGPU + R30 draw dispatch ACTIVE");
                     return 0;
                 }
                 Sleep(25);
