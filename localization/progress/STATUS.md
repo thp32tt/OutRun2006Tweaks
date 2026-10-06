@@ -2177,3 +2177,9 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - A150 candidate `50ee1f3b43dc...`: 튜닝 55px -> 튜닝 사양 121px, 일반 58px -> 일반 사양 120px while staying inside 139/174px source bboxes.
 - 2/2 bbox/size/positive-margin PASS; final validator PASS; outside/alpha/protected=0; exact RGBA32 header/raw mirror_y; SOURCE/C116/A150 readable+row+RAW controller QA PASS.
 - Fresh C + refreshed English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+
+## 2026-10-07 07:30 KST — A151 q175 hierarchy producer PASS
+- q175 754F0599: C171 884f333b7217... -> A151 f21970a3d6d8.... Korean heights 103/95/109 -> 124/114/130px, widths 1011/551/1024 -> 1188/700/1208px; exact source ceilings preserved.
+- 3/3 bbox/size/positive-margin, final validator, outside/alpha/protected zero gates, BGRA header/raw mirror_y and controller readable/row/RAW review PASS.
+- Fresh C, refreshed English-original comparison/user review and actual in-game validation required. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
