@@ -20,7 +20,8 @@ wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=T
 
 asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset
-clean_path=repo/"localization/graphics/role_C/20261005-C135-EBFC709F/EBFC709F_CLEAN_PLATE.png"\nsource_mask_path=repo/"localization/graphics/role_C/20261005-C135-EBFC709F/EBFC709F_SOURCE_TEXT_MASK.png"
+clean_path=repo/"localization/graphics/role_C/20261005-C135-EBFC709F/EBFC709F_CLEAN_PLATE.png"
+source_mask_path=repo/"localization/graphics/role_C/20261005-C135-EBFC709F/EBFC709F_SOURCE_TEXT_MASK.png"
 EXPECTED_BEFORE="7404fa227035e2fa003f4fa13f1bd348a050317757d7761c9d638f5fc1a01da4"
 SOURCE_SHA="ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0"
 commit="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
