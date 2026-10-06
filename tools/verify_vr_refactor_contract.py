@@ -725,38 +725,37 @@ for marker in ("R9InstallStatus()", "R13InstallStatus()",
     if marker not in r23:
         errors.append(f"R23 missing prerequisite install owner query: {marker}")
 
-for banned in ("R13InstallState", "R13InstallReady", "R13InstallFailed"):
-    if banned in r32:
-        errors.append(
-            f"R32 retained direct R13 install-state dependency: {banned}")
-if "R13InstallStatus()" not in r13:
-    errors.append("R13 missing install-state owner query API")
-if "R13InstallStatus()" not in r32:
-    errors.append("R32 missing R13 install-state owner query")
+# R32 is hook-free and no longer owns an async install/status relay. R33 must
+# consume the real lower prerequisite owner APIs directly before installing the
+# final Reset/Present/DirectGPU/draw transaction.
+for retired in (
+    "R32InstallState",
+    "R32InstallThread",
+    "VRStereoR32ReviewHook",
+    "R32InstallStatus()",
+    "OpenXRVRStereoR32Review",
+):
+    if retired in r32:
+        errors.append(f"R32 retained retired async install/status shim: {retired}")
 
-for banned in ("R22InstallState", "R31InstallState"):
-    if banned in r32:
-        errors.append(
-            f"R32 retained direct lower-layer install-state dependency: {banned}")
 for marker, source, owner in (
+    ("R13InstallStatus()", r13, "R13"),
     ("R22InstallStatus()", r22, "R22"),
     ("R31InstallStatus()", r31, "R31"),
 ):
     if marker not in source:
         errors.append(f"{owner} missing install-state owner query API: {marker}")
-for marker in ("R22InstallStatus()", "R31InstallStatus()"):
-    if marker not in r32:
-        errors.append(f"R32 missing lower-layer install-state owner query: {marker}")
+for marker in ("R13InstallStatus()", "R22InstallStatus()", "R31InstallStatus()"):
+    if marker not in r33:
+        errors.append(f"R33 missing direct prerequisite owner query: {marker}")
 
-if "R32InstallState" in r33:
-    errors.append("R33 retained direct R32 install-state dependency")
-for marker, source, owner in (
-    ("R32InstallStatus()", r32, "R32"),
+for banned in (
+    "R13InstallState", "R13InstallReady", "R13InstallFailed",
+    "R22InstallState", "R31InstallState", "R32InstallState",
+    "R32InstallStatus()",
 ):
-    if marker not in source:
-        errors.append(f"{owner} missing install-state owner query API: {marker}")
-if "R32InstallStatus()" not in r33:
-    errors.append("R33 missing R32 install-state owner query")
+    if banned in r33:
+        errors.append(f"R33 retained direct/retired prerequisite state dependency: {banned}")
 if "R33InstallStatus()" in r33:
     errors.append("R33 retained obsolete compatibility-only install-status observer API")
 if "R33InstallState" in r33:
@@ -999,6 +998,24 @@ if install_start < 0 or install_end <= install_start:
     errors.append("R33 install transaction body missing")
 else:
     install_body = r33[install_start:install_end]
+    prerequisite_order = [
+        install_body.find("const auto r31 = R31InstallStatus();"),
+        install_body.find("const auto r22 = R22InstallStatus();"),
+        install_body.find("const auto r13 = R13InstallStatus();"),
+    ]
+    if min(prerequisite_order) < 0 or prerequisite_order != sorted(prerequisite_order):
+        errors.append("R33 must query R31/R22/R13 prerequisite owner APIs directly")
+    for retired in ("R32InstallStatus()", "R32InstallState"):
+        if retired in install_body:
+            errors.append(f"R33 install retained retired R32 readiness relay: {retired}")
+    for marker in (
+        "r31 == State::Failed || r22 == State::Failed",
+        "r13 == R13InstallStatusValue::Failed",
+        "r31 == State::Ready && r22 == State::Ready",
+        "r13 == R13InstallStatusValue::Ready",
+    ):
+        if marker not in install_body:
+            errors.append(f"R33 install missing direct prerequisite gate: {marker}")
     sync_pos = install_body.find(
         "R33SynchronizeResetReplayGuardState(installedDevice)")
     publish_pos = install_body.find(
