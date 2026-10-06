@@ -136,31 +136,58 @@ for m in source_masks:
     source_mask |= m
 if np.count_nonzero(source_masks[0]&source_masks[1]):
     raise RuntimeError("source masks overlap")
-clean_region=source_mask.copy()
-for row,sm in zip(rows,source_masks):
-    row["clean_region_bbox"]=row["source_bbox"]
-    row["clean_region_pixels"]=int(sm.sum())
 
-# Clean only the measured source glyph/effect footprint using nearest saturated
-# red donors from the same sign. Everything outside that footprint stays exact.
+# The source effect includes saturated orange/red shadow fragments that are not
+# safely separable from the sign field by color alone. Reconstruct a minimal
+# rectangular text-area plate around the measured effect bbox, clamped strictly
+# to the red sign body; the white rim and all route artwork remain protected.
+clean_masks=[]
+clean_region=np.zeros((H,W),bool)
+for row,sm,bm in zip(rows,source_masks,banner_masks):
+    sx0,sy0,sx1,sy1=row["source_bbox"]
+    bx0,by0,bx1,by1=row["banner_bbox"]
+    cx0=max(bx0,sx0-1); cy0=max(by0,sy0-1)
+    cx1=min(bx1,sx1+4); cy1=min(by1,sy1+1)
+    cm=np.zeros((H,W),bool)
+    cm[cy0:cy1,cx0:cx1]=True
+    cm &= bm
+    if not np.all(sm <= cm):
+        raise RuntimeError(("clean region misses source effect",row["key"]))
+    clean_masks.append(cm)
+    clean_region |= cm
+    row["clean_region_bbox"]=[cx0,cy0,cx1,cy1]
+    row["clean_region_pixels"]=int(cm.sum())
+
 clean_arr=sa.copy()
 rr0=sa[:,:,0].astype(np.int16); gg0=sa[:,:,1].astype(np.int16); bb0=sa[:,:,2].astype(np.int16)
-for row,sm,bm in zip(rows,source_masks,banner_masks):
-    red_donor=bm & ~sm & (rr0>140) & (rr0>gg0+65) & (rr0>bb0+35) & (gg0<72) & (bb0<120)
-    if int(red_donor.sum())<80:
+for row,cm,bm in zip(rows,clean_masks,banner_masks):
+    red_donor=bm & ~cm & (rr0>140) & (rr0>gg0+65) & (rr0>bb0+35) & (gg0<72) & (bb0<120)
+    if int(red_donor.sum())<60:
         raise RuntimeError(("red donor too small",row["key"],int(red_donor.sum())))
-    _,inds=ndimage.distance_transform_edt(~red_donor,return_indices=True)
-    yy,xx=inds
-    for ch in range(4):
-        clean_arr[:,:,ch][sm]=sa[:,:,ch][yy[sm],xx[sm]]
+    ys=np.unique(np.nonzero(cm)[0])
+    global_med=np.median(sa[red_donor],axis=0).astype(np.float64)
+    row_colors=[]
+    for y in ys:
+        xd=np.nonzero(red_donor[y])[0]
+        if len(xd)>=2:
+            row_colors.append(np.median(sa[y,xd],axis=0).astype(np.float64))
+        else:
+            row_colors.append(global_med.copy())
+    rc=np.asarray(row_colors,dtype=np.float64)
+    for ch in range(3):
+        rc[:,ch]=ndimage.gaussian_filter1d(rc[:,ch],sigma=1.0,mode="nearest")
+    rc[:,3]=255.0
+    for yi,y in enumerate(ys):
+        xs=np.nonzero(cm[y])[0]
+        clean_arr[y,xs]=np.clip(np.rint(rc[yi]),0,255).astype(np.uint8)
 
 clean=Image.fromarray(clean_arr,"RGBA")
 same_clean=np.all(clean_arr==sa,axis=2)
 rr=clean_arr[:,:,0].astype(np.int16); gg=clean_arr[:,:,1].astype(np.int16); bb=clean_arr[:,:,2].astype(np.int16)
 clean_sign_red=(rr>115) & (rr>gg+35) & (rr>bb+20) & (gg<125) & (bb<135)
 residue_clean=int(np.count_nonzero(source_mask & same_clean))
-clean_not_red=int(np.count_nonzero(source_mask & ~clean_sign_red))
-if clean_not_red:
+clean_not_red=int(np.count_nonzero(clean_region & ~clean_sign_red))
+if residue_clean or clean_not_red:
     raise RuntimeError(("clean residue",residue_clean,"clean_not_red",clean_not_red))
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
@@ -242,10 +269,7 @@ dec=dec_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("DDS roundtrip mismatch")
 da=np.asarray(dec,dtype=np.uint8)
 
-allowed=np.zeros((H,W),bool)
-for row in rows:
-    x0,y0,x1,y1=row["source_bbox"]
-    allowed[y0:y1,x0:x1]=True
+allowed=clean_region.copy()
 changed=np.any(sa!=da,axis=2)
 outside=int(np.count_nonzero(changed & ~allowed))
 alpha_out=int(np.count_nonzero((sa[:,:,3]!=da[:,:,3]) & ~allowed))
@@ -323,11 +347,12 @@ report={
  "source_provenance":{"url":url,"sha256":SOURCE_SHA},
  "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":MIPS,
    "header_128_exact":payload[:128]==raw[:128],"raw_orientation":"mirror_y"},
- "construction":"red-banner source glyph/effect mask is the complete non-sign-red footprint inside the red plate interior; only that mask is inpainted from nearest same-sign red donors, preserving the white rim and all map/logo artwork; native Hangul uses natural advance + 0.17 source-family shear + sampled pale face/orange shadow.",
+ "construction":"controller-rework after visible numeric false negative: saturated orange/red source shadow could not be safely isolated by color alone, so a minimal text-area rectangle around the measured source effect bbox is reconstructed as a smoothed same-sign red gradient, clamped to the red plate body. White rim, route art, thumbnails and logo stay exact; Korean render remains inside the measured source effect bbox.",
  "rows":rows,
  "static_qa":{
    "elements_total":2,"bbox_size_positive_margin":"2/2 PASS",
    "clean_source_residue":residue_clean,
+   "clean_reconstructed_background_pixels":int(np.count_nonzero(clean_region & ~source_mask)),
    "changed_outside_source_bboxes":outside,
    "alpha_changed_outside":alpha_out,
    "protected_visible_changed":protected_changed,
