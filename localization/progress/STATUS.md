@@ -2196,3 +2196,9 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 
 ## C227R q175 754F0599
 Machine PASS; controller visual REWORK_REQUIRED for source typography family mismatch. Runtime validation remains UNTESTED.
+
+
+## 2026-10-07 08:42 KST — A q195/A152R + q175/A153 producer PASS
+- q195 9CE4E175: C125 cdb00269... -> A152 rejected 5801e241... -> A152R b4b8655e.... Final 사용할 수 없음 220x37 inside source 395x41, native aspect/no horizontal stretch, 1/1 bbox/size/margin and zero outside/alpha/protected gates PASS.
+- q175 754F0599: C227R returned A151 f21970a3... for source typography-family mismatch. A153 5b37fdaf... uses fresh NanumGothic Bold low-profile extended techno proportions with preserved metallic/right-lean geometry; 3/3 bbox/size/margin and zero outside/alpha/protected gates PASS.
+- Both controller readable/RAW visual QA PASS and are pending fresh C + English-original JPG/user review + actual in-game validation. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
