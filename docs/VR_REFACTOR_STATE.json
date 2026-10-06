@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T16:24:00+09:00",
+  "updatedKst": "2026-10-06T16:32:05+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -116,7 +116,7 @@
     "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051",
     "VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052"
   ],
-  "next": "CONVERSION-DX9EX-00474 / VR-DX9EX-R24-DESTROY-TRANSACTION-0057 material candidate pending canonical validation. R24 now preserves submission counters and committed generation/run provenance until downstream R23+ session destruction succeeds.",
+  "next": "CONVERSION-DX9EX-00475: continue transactional propagation through the remaining outer DestroySession wrappers. Next runnable successor is R23 runtime hardening, which currently invalidates the verified bundle and final-submission record before downstream session destruction returns.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -265,7 +265,8 @@
     "CONVERSION-DX9EX-00472 / VR-DX9EX-R13-DESTROY-TRANSACTION-0055 exact SHA 7642b5c227df689e67bbb95509ce0e762bd8f0b7 passed DX9Ex Active 37427445400 policy/full-chain-compile/game/host/package, Domain Isolation 37427445392 and Autodev Coordination 37427445426. Package artifact 11396195967 digest sha256:15483268be2c59ba90cb13b0f465a55ce6f0f257187d6d50294eeede6317c12a. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00473 / VR-DX9EX-R26-DESTROY-TRANSACTION-0056: R26 DestroySession now obtains the downstream R24/R23/R22/R21/R15/R13/R19/R20 result first and calls ResetSessionState only on XR_SUCCESS. A failed parent destroy therefore keeps the live session's pending focus/game recenter ownership, requester PID, target generation, application recenter sources/generation and fallback anchor intact for retry. RUNTIME_VALIDATION=UNTESTED pending exact-SHA validation.",
     "CONVERSION-DX9EX-00473 / VR-DX9EX-R26-DESTROY-TRANSACTION-0056: source material 814bd13b307d1650f46e0011f35ada00df0442f5 moved R26 ResetSessionState after downstream DestroySession success. Attempt 1 DX9Ex Active 37428606192 failed policy only because the recenter verifier pinned the obsolete forwarding shape; Domain Isolation 37428606203 and Autodev 37428606180 passed. Retry validation-bearing SHA 06bc9a82a71dc3430246cc15c2311525e758aecd updated that verifier and passed DX9Ex Active 37428755174 policy/game/host/full-chain/package, Domain Isolation 37428755333 and Autodev Coordination 37428755231. Package artifact 11396022354 digest sha256:8d31b3f9ffdfafe38c71b5ded4f90bf4d19c95901a41973cf09b4e7bc2312918. Runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00474 / VR-DX9EX-R24-DESTROY-TRANSACTION-0057: R24 BlackScreenGuard::DestroySession now forwards to R23 first and clears projection/theater submit counters plus committed generation/run provenance only on XR_SUCCESS. A failed parent destroy therefore retains current-session fallback/provenance state for retry. RUNTIME_VALIDATION=UNTESTED pending exact-SHA validation."
+    "CONVERSION-DX9EX-00474 / VR-DX9EX-R24-DESTROY-TRANSACTION-0057: R24 BlackScreenGuard::DestroySession now forwards to R23 first and clears projection/theater submit counters plus committed generation/run provenance only on XR_SUCCESS. A failed parent destroy therefore retains current-session fallback/provenance state for retry. RUNTIME_VALIDATION=UNTESTED pending exact-SHA validation.",
+    "CONVERSION-DX9EX-00474 / VR-DX9EX-R24-DESTROY-TRANSACTION-0057 exact SHA d81a30d5828712b02b3a3fc59738810339f7d2a4 passed DX9Ex Active 37429651061 policy/host/game/full-chain-compile/package, Domain Isolation 37429651035 and Autodev Coordination 37429651079. Package artifact 11396791140 digest sha256:41d0496715802413428ed402c553c6c1519959e5de06a18bef087fea21f3351e. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
@@ -1110,7 +1111,8 @@
     "VR-DX9EX-SESSION-DESTROY-TRANSACTION-0053",
     "VR-DX9EX-INNER-SESSION-TEARDOWN-TRANSACTION-0054",
     "VR-DX9EX-R13-DESTROY-TRANSACTION-0055",
-    "VR-DX9EX-R26-DESTROY-TRANSACTION-0056"
+    "VR-DX9EX-R26-DESTROY-TRANSACTION-0056",
+    "VR-DX9EX-R24-DESTROY-TRANSACTION-0057"
   ],
   "post1000Maintenance00470": {
     "taskId": "CONVERSION-DX9EX-00470",
@@ -1247,12 +1249,26 @@
     "attempt": "1/3",
     "item": "VR-DX9EX-R24-DESTROY-TRANSACTION-0057",
     "baseSha": "fd6b54ad148dbbc2df1c62786e05a0c6e08c9ebf",
-    "materialResultSha": "PENDING_SELF",
-    "validationBearingResultSha": "PENDING_SELF",
-    "automationValidation": "PENDING",
+    "materialResultSha": "d81a30d5828712b02b3a3fc59738810339f7d2a4",
+    "validationBearingResultSha": "d81a30d5828712b02b3a3fc59738810339f7d2a4",
+    "automationValidation": "PASS",
     "runtimeValidation": "UNTESTED",
     "runtimeBehaviorChanged": true,
     "summary": "Make R24 black-screen guard session teardown transactional so failed downstream parent destruction preserves submission counters and committed run provenance for retry.",
-    "status": "VALIDATING"
+    "status": "COMPLETE",
+    "validation": {
+      "dx9exActiveRunId": 37429651061,
+      "jobs": {
+        "policy": 112157255565,
+        "host": 112157381099,
+        "game": 112157381230,
+        "fullChainCompile": 112157381253,
+        "package": 112159106927
+      },
+      "domainIsolationRunId": 37429651035,
+      "autodevCoordinationRunId": 37429651079,
+      "packageArtifactId": 11396791140,
+      "packageArtifactDigest": "sha256:41d0496715802413428ed402c553c6c1519959e5de06a18bef087fea21f3351e"
+    }
   }
 }
