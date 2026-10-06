@@ -32,6 +32,7 @@ jobs:
         run: |
           cat tools/chat-controller/v0.4/src-vr-v2/controller.py.part* > /tmp/controller-vr-v2.py
           python3 -m py_compile /tmp/controller-vr-v2.py
+          bash -n tools/chat-controller/v0.4/entrypoint.vr.sh
           python3 tools/chat-controller/v0.4/tests/test_vr_v2_dx9ex.py -v
 
       - name: Separate legacy localization implementation regression tests
