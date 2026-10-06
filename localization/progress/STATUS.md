@@ -1975,3 +1975,14 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - B209 producer static/controller QA is inherited, but **independent C QA is still pending**. The row status intentionally does not contain C `pass_pending_ingame`, so the DDS is not promoted into the test package yet. After C approval, a NEW actual-game test is required for composition, BACKSPACE, page controls, END, reload/local display and alias fallback.
 - `RUNTIME_VALIDATION=UNTESTED`. Native UTF-8/save/ranking/network/replay protocol behavior is unchanged. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261006-A-RUNTIME143-NAME-ENTRY-INPUT-WIRING/A143_NAME_ENTRY_INPUT_WIRING.json`, `A143_NAME_ENTRY_INPUT_EVIDENCE.txt`.
+
+## 2026-10-06 20:53 KST — C-pass English-original comparison review export
+
+- Rebuilt the pre-in-game C-pass human review set so every numbered card shows the English original on the left and the current Korean result on the right, with both FLIP-Y review and RAW DDS rows.
+- Current export remains 62 numbered C-pass rows: 61 localized candidates plus one preserve-original policy pass. Output directory: localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/.
+- Primary English source is Sonic-TV/OR2006Sprites pinned at 3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6. Manifest schema 3 records source origin, revision/location, SHA-256, native dimensions, candidate SHA-256, and review display scale.
+- D6DC1380 uses the exact 256x64 English source SHA 42aa10e0... and is nearest-neighbor scaled x4 only for human display against the intentionally native-HD 1024x256 Korean candidate.
+- 1F5FE6E9 uses the exact 1024x512 stock-original ZIP source SHA 3656adbd... that C139 actually validated, rather than the newer public 4096x2048 source.
+- GitHub-hosted C worker run 37457687825 SUCCESS. Policy/exporter commits 593e3be and 18e5dfc; generated comparison output commit 62fc286.
+- Contract and quality pipeline now require C to refresh the English-original comparison set whenever C-PASS membership or candidate bytes change. User visual rejection reopens the asset for A/B rework and requires a newer C pass before in-game validation.
+- RUN_KEY=OUTRUN-KOR-C-ENGLISH-COMPARE-20261006; RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
