@@ -810,12 +810,26 @@ namespace
                 roughness = std::max(roughness, wheelRoughness[i]);
             }
 
-            // Imperial Avenue and related water-capable stage tables can map
-            // ordinary all-four-wheel mask-0x2 primary road to the water branch.
-            // The hardware log showed that this produced continuous 0.76 roughness
-            // and near-full road vibration across the entire stage.  Correct only
-            // the unambiguous all-primary / all-water / collision-context-zero case.
-            if (WheelFFBMath::primary_asphalt_water_false_positive(
+            // Imperial Avenue's verified 0x2/0x800 family is one continuous
+            // stone roadway, not water. Clear the stage-table water alias before
+            // contact/splash synthesis so the 10 Hz tactile carrier cannot drop
+            // out between alternating per-wheel masks. Keep the original masks
+            // for the dedicated Imperial stone classifier below.
+            const bool imperialStoneRoad =
+                WheelFFBMath::imperial_avenue_stone_paving_pattern(
+                    uniqueStage, collisionContext, surfaceMasks);
+            if (imperialStoneRoad)
+            {
+                roughness = 0.35f;
+                waterFlag = 0;
+                waterWheelMask = 0;
+                for (int i = 0; i < 4; ++i)
+                {
+                    wheelRoughness[i] = 0.35f;
+                    wheelWater[i] = false;
+                }
+            }
+            else if (WheelFFBMath::primary_asphalt_water_false_positive(
                     uniqueStage, collisionContext, surfaceMasks, waterWheelMask))
             {
                 roughness = 0.25f;
@@ -875,9 +889,7 @@ namespace
                 WheelFFBMath::common_contact_tactile_amplitude(
                     contactTactileEnvelope, speedNorm, configuredRoadDetail,
                     modelOutputStrength) * materialRoadTextureScale;
-            const bool imperialStonePaving =
-                WheelFFBMath::imperial_avenue_stone_paving_pattern(
-                    uniqueStage, collisionContext, surfaceMasks);
+            const bool imperialStonePaving = imperialStoneRoad;
             const float imperialStoneFloor = imperialStonePaving
                 ? WheelFFBMath::imperial_avenue_stone_tactile_amplitude(
                     speedNorm, configuredRoadDetail, modelOutputStrength)
@@ -1330,13 +1342,22 @@ namespace
                     physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
 
-                // In a developed drift, frontSlip remains the sole torque
-                // direction owner. Body slip only gates extra recovery authority.
-                // The previous opposite-sign cue could cancel most of deep-slip
-                // SAT, which felt like the wheel simply went light instead of
-                // rotating itself into countersteer.
+                // In a developed drift the chassis velocity vector, not
+                // front alpha, owns the rack recovery direction. Crossfade all the
+                // way to a body-slip/caster target so the wheel actually rotates
+                // into countersteer instead of continuing toward vehicle heading.
                 if (driftCountersteerBlend > 0.0f)
-                    physicsSatTorque *= 1.0f + driftCountersteerBlend;
+                {
+                    const float driftCountersteerShape =
+                        WheelFFBMath::drift_countersteer_shape(bodySlip);
+                    const float driftCountersteerTorque =
+                        (bodySlip > 0.0f ? -1.0f : 1.0f) *
+                        driftCountersteerShape * satSpeed * physicsLoad *
+                        rearSlideRelief * satStrength;
+                    physicsSatTorque +=
+                        (driftCountersteerTorque - physicsSatTorque) *
+                        driftCountersteerBlend;
+                }
 
                 if (!std::isfinite(physicsSatTorque))
                     physicsSatTorque = 0.0f;
