@@ -1942,3 +1942,12 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - State: `b208_hold_composer_build_pass_jamo_artwork_render_hook_required`. Next safe work is source-faithful Jamo key artwork and explicit local alias-to-UTF8 player-name rendering; only then should B207's character path be intercepted and the A141 alias committed on END.
 - `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261006-B-PRODUCTION208-HANGUL-NAME-COMPOSER/B208_HANGUL_NAME_COMPOSER.json`.
+
+
+## 2026-10-06 19:15:59.068 KST — A142 index24 local sidecar-name renderer BUILD PASS
+- Refreshed after B208. A had no active owned P0/P1, C-returned REWORK, RENDER_READY or ONE_STAGE_TO_RENDER item, so it work-stole only the independent remaining index24 **local render** prerequisite. B208's Hangul composer was consumed unchanged and not repeated.
+- Canonical EXE tracing proves the exact local text-object render chain: Edit License passes native field `0x7C23E0` into `0x48F280`; the object stores the string at `+0x4E`, then VA `0x48F455` calls `Sumo_Printf("%s", object+0x4E)` after setting stock location/font/color state. Return address is module+`0x8F45A`.
+- `src/hooks_localization.cpp` now substitutes only that exact local text-object `%s` call when its string argument is a valid A141 sidecar alias. It resolves alias->UTF-8 Korean, queues the Korean name through the existing ImGui Korean overlay with the stock print state, and hides only the stock alias. Failed lookup/nonmatching callsites stay stock.
+- Native 16-byte player-name storage and save/ranking/network/replay bytes are untouched; B208 composer remains unwired. Source commit `dbbfdca6cb6695ab73960d76dae21ff44b39246e`: Win32 Release `37447477302` SUCCESS and Korean Test Build `37447477392` SUCCESS.
+- State: `a142_local_player_name_render_build_pass_jamo_artwork_input_wiring_required`. Remaining: source-faithful `66743AA8` Jamo artwork, then character-path/input wiring and alias commit on END. `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_A/20261006-A-RUNTIME142-NAME-LOCAL-RENDER/A142_LOCAL_PLAYER_NAME_RENDER.json`, `localization/graphics/role_A/20261006-A-RUNTIME142-NAME-LOCAL-RENDER/A142_LOCAL_PLAYER_NAME_RENDER_EVIDENCE.txt`.

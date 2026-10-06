@@ -1,0 +1,43 @@
+A142 exact local player-name render evidence
+Canonical OR2006C2C.exe SHA-256: 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
+
+[Edit License native field -> text object]
+0x4DE48A: push 0x7C23E0
+0x4DE48F: push 0xFFFFFFFF
+0x4DE491: push 0x9
+0x4DE493: push 0x626468
+0x4DE498: push esi
+0x4DE499: call 0x48F280
+0x626468: "%s"
+
+[0x48F280 text-object setup]
+0x48F290: lea edi,[esi+0x4E]
+0x48F293: push 0x400
+0x48F298: push edi
+0x48F299: call 0x580265
+=> supplied player-name string is formatted/copied into local text object +0x4E.
+
+[local text-object draw]
+0x48F43B: cvttss2si eax,[esi+0x38]
+0x48F440: cvttss2si ecx,[esi+0x34]
+0x48F445: push eax
+0x48F446: push ecx
+0x48F447: call 0x42CC00     ; stock locate
+0x48F44C: add esi,0x4E
+0x48F44F: push esi
+0x48F450: push 0x626468     ; "%s"
+0x48F455: call 0x42CDD0     ; Sumo_Printf
+0x48F45A: add esp,0x10      ; exact return address, module+0x8F45A
+
+[A142 hook policy]
+- Existing Sumo_Printf hook is retained.
+- New path requires exact return address module+0x8F45A, exact "%s", and a valid A141 sidecar alias in the first string argument.
+- Successful alias lookup queues the UTF-8 Korean name using the already-captured stock print state, then hides only the stock alias layout.
+- Failure to resolve the alias leaves stock rendering untouched.
+- No native player-name storage, save, ranking, network, replay or B208 composer behavior is changed.
+
+[Build validation]
+Source commit dbbfdca6cb6695ab73960d76dae21ff44b39246e
+Win32 Release run 37447477302 SUCCESS; artifact 11403418681; digest sha256:53d5bc1e6894988344dc30e6a138cc218e0ef4ea75134086a05d101af1007eac
+Korean Test Build run 37447477392 SUCCESS; artifact 11404063316; digest sha256:01e67e425b554bb00c492875aec18cf1c9109103c1e2e5030191628a4dd1b80c
+RUNTIME_VALIDATION=UNTESTED

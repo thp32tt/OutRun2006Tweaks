@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "run": "A142",
+  "role": "A",
+  "timestamp_kst": "2026-10-06T19:15:59.068+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "parent_source_commit": "dbbfdca6cb6695ab73960d76dae21ff44b39246e",
+  "queue_index": 24,
+  "asset": "textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "work_stolen_from_lane": "B",
+  "selection_gate": {
+    "a_primary_actionable": 0,
+    "active_user_rework": 0,
+    "c_returned_rework": 0,
+    "prior_b208_consumed_not_repeated": true
+  },
+  "inherited": [
+    "A141 ASCII compatibility alias + UTF-8 sidecar",
+    "B207 exact character/control boundary",
+    "B208 inactive deterministic HangulNameComposer"
+  ],
+  "exact_runtime_evidence": {
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "edit_license": "0x4DE48A push 0x7C23E0; 0x4DE499 call 0x48F280",
+    "text_object_storage": "0x48F280 formats the supplied player-name argument into object+0x4E",
+    "text_object_draw": "0x48F44C sets stock location from object+0x34/+0x38; 0x48F450 pushes object+0x4E; 0x48F450 also uses format 0x626468 == %s; 0x48F455 calls Sumo_Printf; return VA 0x48F45A == module+0x8F45A"
+  },
+  "implementation": {
+    "file": "src/hooks_localization.cpp",
+    "gate": "KoreanTextOverlayTest && Overlay.Enabled && TranslationsLoaded; exact Sumo_Printf caller return module+0x8F45A; exact %s; valid A141 alias lookup",
+    "output": "Queue sentinel DrawCommand containing sidecar UTF-8 Korean using stock x/y/cellHeight/scale/color/flags captured immediately before stock print",
+    "stock_suppression": "after successful lookup only, replace %s format with invisible spaces derived from native alias; extra variadic alias argument is then unused",
+    "fallback": "non-alias/nonmatching callsite remains byte-for-byte stock print behavior",
+    "direct_utf8_native_field": false,
+    "native_field_write": false,
+    "input_hook": false,
+    "composer_modified": false,
+    "network_ranking_replay_modified": false
+  },
+  "validation": {
+    "source_commit": "dbbfdca6cb6695ab73960d76dae21ff44b39246e",
+    "win32_release": {
+      "run_id": 37447477302,
+      "status": "SUCCESS",
+      "artifact_id": 11403418681,
+      "digest": "sha256:53d5bc1e6894988344dc30e6a138cc218e0ef4ea75134086a05d101af1007eac"
+    },
+    "korean_test": {
+      "run_id": 37447477392,
+      "status": "SUCCESS",
+      "artifact_id": 11404063316,
+      "digest": "sha256:01e67e425b554bb00c492875aec18cf1c9109103c1e2e5030191628a4dd1b80c"
+    }
+  },
+  "status": "A142_LOCAL_PLAYER_NAME_RENDER_BUILD_PASS_JAMO_ARTWORK_INPUT_WIRING_REQUIRED",
+  "runtime_behavior_changed": "conditional local presentation only when a valid sidecar alias is actually printed",
+  "runtime_validation": "UNTESTED",
+  "remaining": [
+    "source-faithful Jamo keyboard artwork for 66743AA8",
+    "B208 composer -> B207 character-path wiring",
+    "A141 alias commit on END/confirm with stock controls preserved",
+    "actual in-game validation"
+  ],
+  "evidence": "localization/graphics/role_A/20261006-A-RUNTIME142-NAME-LOCAL-RENDER/A142_LOCAL_PLAYER_NAME_RENDER_EVIDENCE.txt",
+  "forbidden_domains_touched": []
+}

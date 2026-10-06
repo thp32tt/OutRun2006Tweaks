@@ -1,5 +1,5 @@
 {
-  "schema_version": 114,
+  "schema_version": 115,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A142 index24 local-name render BUILD PASS: exact local text-object draw path VA 0x48F455 -> Sumo_Printf(\"%s\", object+0x4E) is now intercepted only at return site module+0x8F45A when the %s argument is a valid A141 sidecar alias. The stock alias is hidden, UTF-8 Korean is queued through the existing Korean overlay with the same stock position/font-state/color/alignment, and alias lookup failure leaves stock behavior untouched. Source dbbfdca6... passed Win32 Release 37447477302 and Korean Test Build 37447477392. Native field/save/ranking/network/replay are unchanged. Remaining: source-faithful 66743AA8 Jamo artwork, then wire B208 composer to B207 0x00..0x25 character path and commit A141 alias on 0x2B END; runtime validation remains UNTESTED.",
     "B208 index24 HangulNameComposer BUILD PASS: standard 2-beolsik Jamo semantics are now implemented as an inactive deterministic composer behind the B207-proven character/control boundary. It supports initial/medial/final composition, double initials, compound vowels/finals, final splitting, stepwise BACKSPACE, digits/space, UTF-8 output, and the proven 15-codepoint ceiling. Final source 0f696621... passed Win32 Release 37445766665 and Korean Test Build 37445766663. Do not wire input yet: source-faithful 66743AA8 Jamo artwork and explicit local alias-to-UTF8 player-name rendering remain required; stock controls/native transport/network/ranking/replay stay unchanged.",
     "B207 index24 control mapping completes the stock name-entry event boundary after the already-built A141 sidecar foundation. Character selections are 0x00..0x25 (0x25 aliases slot 0x24); controls are 0x26 BACKSPACE, 0x27 page1/page2 symbols, 0x28 page1/page3 one-shot uppercase, 0x29 page1/page4 persistent uppercase, 0x2A page1/page5 legacy extended page, and 0x2B END/confirm. Preserve controls 0x26..0x2B and intercept only the character/composition path before legacy byte append; exact 66743AA8 visual binding/Jamo layout and explicit local Korean-name rendering remain HOLD.",
     "A141 index24 implementation foundation BUILD PASS: after A primary work was exhausted, A work-stole the B206 HOLD and implemented the two safe deterministic prerequisites rather than repeating consumer mapping. Native player-name storage remains legacy-compatible; canonical Korean UTF-8 is mapped by a deterministic 14-byte ASCII alias (K + 13 Base32 chars) to SaveGame/KoreanPlayerNames.tsv with UTF-8 validation, collision handling and atomic persistence. Win32 Release 37441155668 and Korean Test Build 37441155760 both SUCCESS. No write to 0x7C23E0 and no DDS/input/render/network/ranking/replay behavior yet. Next safe work: Hangul composition/name-entry hook plus explicit local player-name render substitution, beginning from proven Edit License 0x4DE48A->0x48F280; keep remote/ranking/replay on alias.",
@@ -6548,5 +6549,56 @@
       "implement explicit local alias-to-UTF8 player-name renderer",
       "only then wire composer at B207 boundary and alias commit on confirm"
     ]
+  },
+  "a142_local_player_name_render": {
+    "timestamp_kst": "2026-10-06T19:15:59.068+09:00",
+    "role": "A",
+    "queue_index": 24,
+    "work_stolen_from_lane": "B",
+    "prior_status": "B208_HOLD_COMPOSER_BUILD_PASS_JAMO_ARTWORK_RENDER_HOOK_REQUIRED",
+    "status": "A142_LOCAL_PLAYER_NAME_RENDER_BUILD_PASS_JAMO_ARTWORK_INPUT_WIRING_REQUIRED",
+    "source_commit": "dbbfdca6cb6695ab73960d76dae21ff44b39246e",
+    "source_file": "src/hooks_localization.cpp",
+    "exact_path": {
+      "edit_license_create": "VA 0x4DE48A pushes native field 0x7C23E0; VA 0x4DE499 calls 0x48F280",
+      "local_text_draw": "VA 0x48F44C locates text; VA 0x48F455 calls Sumo_Printf with format 0x626468 == %s and object+0x4E string",
+      "hook_gate": "Sumo_Printf entry plus exact caller return module+0x8F45A and exact %s format",
+      "sidecar_resolution": "LookupKoreanPlayerName() requires valid A141 14-byte alias and existing sidecar mapping"
+    },
+    "behavior": {
+      "local_korean_render": "queues UTF-8 Korean via existing ImGui Korean overlay using stock print state",
+      "stock_alias_suppression": "replaces format string with invisible spaces matching the alias character count only after successful sidecar lookup",
+      "fallback": "alias lookup failure or nonmatching caller/format leaves stock Sumo_Printf behavior unchanged",
+      "native_player_name_field_modified": false,
+      "composer_input_wired": false,
+      "network_changed": false,
+      "ranking_changed": false,
+      "replay_changed": false
+    },
+    "build": {
+      "required": true,
+      "win32_release": {
+        "run_id": 37447477302,
+        "conclusion": "SUCCESS",
+        "artifact_id": 11403418681,
+        "digest": "sha256:53d5bc1e6894988344dc30e6a138cc218e0ef4ea75134086a05d101af1007eac"
+      },
+      "korean_test": {
+        "run_id": 37447477392,
+        "conclusion": "SUCCESS",
+        "artifact_id": 11404063316,
+        "digest": "sha256:01e67e425b554bb00c492875aec18cf1c9109103c1e2e5030191628a4dd1b80c"
+      }
+    },
+    "remaining": [
+      "Author and visually QA source-faithful Jamo key artwork for 66743AA8 without altering proven stock controls.",
+      "Wire B208 HangulNameComposer only to B207 character selections 0x00..0x25.",
+      "Preserve controls 0x26..0x2B and write the A141 compatibility alias to the native field only on successful END/confirm.",
+      "Run actual game validation of Korean name entry and local display before declaring runtime complete."
+    ],
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": [],
+    "completed_work_repeated": false,
+    "candidate_written": false
   }
 }

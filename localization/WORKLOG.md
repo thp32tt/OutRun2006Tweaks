@@ -2364,3 +2364,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - State: `b208_hold_composer_build_pass_jamo_artwork_render_hook_required`. Next safe work is source-faithful Jamo key artwork and explicit local alias-to-UTF8 player-name rendering; only then should B207's character path be intercepted and the A141 alias committed on END.
 - `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261006-B-PRODUCTION208-HANGUL-NAME-COMPOSER/B208_HANGUL_NAME_COMPOSER.json`.
+
+
+## 2026-10-06 19:15:59.068 KST — A142 local Korean player-name render substitution
+
+- No A-shard graphics/regression production was actionable, so A used the contract work-steal lane on the only unresolved index24 prerequisite after B208: explicit local alias-to-UTF-8 rendering. The B208 composer and prior A141/B207 work were not regenerated.
+- The exact local text object draws its stored string through `Sumo_Printf("%s", ...)` at VA `0x48F455`. A142 extends the existing Korean `Sumo_Printf` hook only for the exact module+`0x8F45A` return site and only when the argument resolves through `KoreanPlayerNames.tsv`.
+- On a match, the UTF-8 Korean name is queued with the same stock x/y/font-height/scale/color/alignment state and the ASCII alias is rendered invisibly. All unmatched strings retain normal stock behavior. This is presentation-only: native alias storage, save/ranking/network/replay transport and composer input are unchanged.
+- Build validation for exact source `dbbfdca6cb6695ab73960d76dae21ff44b39246e`: Win32 Release `37447477302` SUCCESS / artifact `11403418681`; Korean Test Build `37447477392` SUCCESS / artifact `11404063316`.
+- Runtime/in-game display has not yet been exercised, so `RUNTIME_VALIDATION=UNTESTED`. Remaining safe production is Jamo keyboard artwork, then input wiring and END/alias commit. VR/FFB/DX11/DXVK untouched.
