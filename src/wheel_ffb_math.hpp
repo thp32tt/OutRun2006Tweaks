@@ -297,23 +297,20 @@ namespace WheelFFBMath
             ? std::clamp(mechanicalTrailRatio, 0.0f, 0.60f) : 0.0f;
     }
 
-    // During a real drift the front-wheel slip sign can cross the body-slip
-    // sign as the rack countersteers. Front slip remains the sole torque-direction
-    // owner: body slip is only a confidence gate that increases the existing
-    // aligning torque after a developed oversteer state is established. This avoids
-    // the R13 failure mode where an opposite-sign body-slip cue merely unloaded the
-    // wheel instead of accelerating it into countersteer.
+    // Once the chassis is in a developed drift, front-wheel slip is no longer
+    // a reliable torque-direction owner: the rack may already be crossing through
+    // countersteer while alpha_f has the opposite sign. Use body slip as the
+    // steering-direction authority in that state and crossfade fully to it.
+    // Ordinary cornering still uses front-slip SAT because the body-slip gate is 0.
     constexpr float DriftCountersteerStartRad = 0.16f;
     constexpr float DriftCountersteerFullRad = 0.42f;
-    constexpr float DriftCountersteerMaxBlend = 0.35f;
+    constexpr float DriftCountersteerMaxBlend = 1.00f;
 
     inline float drift_countersteer_blend(
         float bodySlip, float frontSlip, float bodySlide)
     {
         if (!std::isfinite(bodySlip) || !std::isfinite(frontSlip) ||
             !std::isfinite(bodySlide))
-            return 0.0f;
-        if (bodySlip * frontSlip >= 0.0f)
             return 0.0f;
 
         const float slipT = smoothstep01(
@@ -442,10 +439,12 @@ namespace WheelFFBMath
 
     constexpr unsigned ImperialAvenueCompanionPavingMask = 0x00000800u;
 
-    // R10 hardware follow-up: Imperial Avenue alternates 0x2 and 0x800 while
-    // visually on the brick/stone roadway. R9 correctly removed the false-water
-    // full-stage buzz, but that also left the paving too quiet. Require at least
-    // one 0x800 contact so ordinary all-0x2 asphalt stays quiet.
+    // R14 hardware evidence: Imperial Avenue's normal roadway is stone/brick
+    // for the whole stage, while the game alternates the same road between 0x2
+    // and 0x800 per wheel. Requiring a live 0x800 sample made the tactile carrier
+    // drop out whenever a frame happened to be all-0x2. Treat the whole verified
+    // 0x2/0x800 family as one continuous primary stone road. collisionContext==0
+    // keeps actual collision/water contexts outside this override.
     inline bool imperial_avenue_stone_paving_pattern(
         int uniqueStage,
         int collisionContext,
@@ -453,15 +452,13 @@ namespace WheelFFBMath
     {
         if (uniqueStage != 14 || collisionContext != 0)
             return false;
-        bool sawCompanionPaving = false;
         for (unsigned mask : masks)
         {
-            if (mask == ImperialAvenueCompanionPavingMask)
-                sawCompanionPaving = true;
-            else if (mask != PrimaryAsphaltSurfaceMask)
+            if (mask != ImperialAvenueCompanionPavingMask &&
+                mask != PrimaryAsphaltSurfaceMask)
                 return false;
         }
-        return sawCompanionPaving;
+        return true;
     }
 
     inline float imperial_avenue_stone_tactile_amplitude(
