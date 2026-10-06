@@ -37,7 +37,7 @@ if prior_bytes[:4]!=b"DDS ": raise RuntimeError("not DDS")
 H,W,pitch,depth,mips=struct.unpack_from("<5I",prior_bytes,12)
 pf=struct.unpack_from("<8I",prior_bytes,76)
 if (W,H,pitch,mips)!=(2048,1024,8192,1): raise RuntimeError((W,H,pitch,depth,mips))
-if pf[1:]!=(65,0,32,0xff,0xff00,0xff0000,0xff000000): raise RuntimeError(("pixel format",pf))
+if pf[1:]!=(65,0,32,16711680,65280,255,4278190080): raise RuntimeError(("pixel format",pf))
 if len(prior_bytes)!=128+W*H*4: raise RuntimeError(("byte size",len(prior_bytes)))
 
 source=Image.open(source_png).convert("RGBA")
