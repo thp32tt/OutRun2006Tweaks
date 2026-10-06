@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION113-D263-D103-DIAG",
+  "timestamp_kst": "2026-10-06T11:56:00+09:00",
+  "queue_index": 219,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+  "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+  "candidate_sha256": "f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24",
+  "classification": "zoom_review -> localize_text; COURSE SELECT -> 코스 선택",
+  "machine_status": "PASS",
+  "style_provenance": "C144-approved B68 E7F6 silver-techno menu-name family: NotoSansCJK-Bold face1, 0.12 shear, 5px stroke, [4,5] shadow, silver vertical gradient.",
+  "bbox_gate": {
+    "original_bbox": [
+      6,
+      1011,
+      1473,
+      1129
+    ],
+    "localized_bbox": [
+      10,
+      1015,
+      406,
+      1125
+    ],
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "margins": [
+      4,
+      1067,
+      4,
+      4
+    ],
+    "source_size": [
+      1467,
+      118
+    ],
+    "localized_size": [
+      396,
+      110
+    ]
+  },
+  "zero_pixel_gates": {
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "source_residue": 0,
+    "localized_overlap": 0
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_reason": "Readable SOURCE/CLEAN/FINAL shows exact transparent removal with no residue, clipping, collision, foreign-image intrusion or seam. Korean uses the already C144-approved silver menu-name family, right slant and source-relative height. Raw mirror_y comparison preserves both OutRun2/OutRun2SP logo panels and unrelated art.",
+  "rejected_prior_attempt": "A112 used the exact C144 font size 101 but failed closed because its 111px rendered height could not retain the mandatory 4px top/bottom margin inside this 118px source bbox. A113 reduced only font size to 100 and passed all gates.",
+  "decision": "A113_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION113-D263-D103-DIAG/A113_BATCH_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_A/20261006-A-PRODUCTION113-D263-D103-DIAG/A113_D263_CONTACTS.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION113-D263-D103-DIAG/A113_D263_RAW_COMPARE.jpg"
+  ],
+  "vr_ffb_dx11_dxvk_touched": false
+}
