@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00481",
+  "production_id": "CONVERSION-DX9EX-00481",
+  "event_id": "CONVERSION-DX9EX-00481-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "e09b7b9bfcae5a357c9e3395779d76c00b43b4d3",
+  "source_material_sha": "f44b87288237acd491f3358fbd4d992149ca99e5",
+  "initial_validation_candidate_sha": "492682f940839bb05e37b644da5dd981c43ca22b",
+  "material_result_sha": "a7f50c69d460cac2b0a8eaa91529121fb84eb574",
+  "validation_bearing_result_sha": "a7f50c69d460cac2b0a8eaa91529121fb84eb574",
+  "result_sha": "a7f50c69d460cac2b0a8eaa91529121fb84eb574",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00481]",
+  "selected_work_item": "VR-REFACTOR-POST1100-R32-HOOKFREE-R33-DIRECTGPU-FOLD-0064",
+  "summary": "Retired the final R32 physical hook. R32 is now a hook-free functional owner for DirectGPU/Reset/Present/fail-close semantics; R33 physically owns ResolveDirectTransportR13 in addition to Reset/Present/draw and delegates transport semantics through R32ResolveDirectTransport.",
+  "checkpoints": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read target HEAD e09b7b9b, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, VR_REFACTOR_STATE and 00480 durable record. 00480 explicitly queued the sole remaining R32 ResolveDirectTransportR13 physical hook for re-census."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Confirmed R32 transport logic can be expressed as a lower-callable owner helper without changing identity revalidation, copy quarantine, producer EVENT/fence, dedicated ACK or pending publication semantics. R33 is already the final upper dispatcher and can own the R13 callback physically."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Removed R32ResolveDirectR13Hook plus R32 hook transaction helpers, converted DirectGPU path to R32ResolveDirectTransport(lowerResolve), published R32 ready as hook-free after R31/R22/R13 prerequisites, and added R33ResolveDirectR13Hook/ResolveDirectTransportDestR33. Hook ceilings R32 1->0 and R33 7->8."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Initial candidate 492682f9 failed policy only because the existing R32 review expected the unchanged terminal telemetry log phrase. Final exact SHA a7f50c69 passed DX9Ex Active 37467426659 all jobs, Domain Isolation 37467426716, HUD Inspector 37467426739 and Build 37467426690."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "a7f50c69d460cac2b0a8eaa91529121fb84eb574",
+      "validation_bearing_result_sha": "a7f50c69d460cac2b0a8eaa91529121fb84eb574",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE",
+      "artifact_id": 11415708175,
+      "digest": "sha256:e12dc3c2dcc65f757233e6e5a6c67fe257925074aeac8e8105b0e8d928cd672b"
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "changed_paths": [
+      "src/vr/d3d9/stereo_renderer_r32.cpp",
+      "src/vr/d3d9/stereo_renderer_r33.cpp",
+      "tools/verify_vr_hook_graph.py",
+      "tools/verify_vr_r31_r32_retirement_guard.py",
+      "tools/verify_vr_r32_review.py",
+      "tools/verify_vr_refactor_contract.py",
+      "docs/VR_REFACTOR_STATE.json",
+      "docs/automation/runs/CONVERSION-DX9EX-00481.json"
+    ],
+    "structural_effect": {
+      "r32_physical_hook_count_before": 1,
+      "r32_physical_hook_count_after": 0,
+      "r33_physical_hook_count_before": 7,
+      "r33_physical_hook_count_after": 8,
+      "retired_r32_hook": "ResolveDirectTransportR13 -> ResolveDirectTransportR32",
+      "r33_directgpu_owner": "ResolveDirectTransportR13 -> ResolveDirectTransportDestR33",
+      "r32_functional_owner": "R32ResolveDirectTransport preserves R13 overlay fallback, interop identity validation, DirectGPU rejection quarantine, pending producer EVENT drain, per-slot dedicated ACK gating, eye-copy/event issuance, bounded fence wait and pending publication metadata."
+    },
+    "validation": {
+      "dx9ex_active_run_id": 37467426659,
+      "policy_job_id": 112281888011,
+      "host_job_id": 112282067557,
+      "full_chain_compile_job_id": 112282067627,
+      "game_job_id": 112282067642,
+      "package_job_id": 112285112804,
+      "domain_isolation_run_id": 37467426716,
+      "hud_inspector_run_id": 37467426739,
+      "build_run_id": 37467426690,
+      "result": "SUCCESS"
+    },
+    "validation_repair": {
+      "initial_candidate_sha": "492682f940839bb05e37b644da5dd981c43ca22b",
+      "initial_dx9ex_active_run_id": 37467305325,
+      "failure_class": "R32_REVIEW_TERMINAL_LOG_MARKER_PRESERVATION",
+      "repaired_in_sha": "a7f50c69d460cac2b0a8eaa91529121fb84eb574"
+    },
+    "noncanonical_observation": {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 37467426527,
+      "result": "FAIL",
+      "relevant_r32_review": "PASS",
+      "failure_reason": "Separate legacy hardening PowerShell reported stale marker vrhost/src/runtime/sbs_capture_override.hpp :: Preserve acquiredImage; not canonical DX9Ex gate."
+    },
+    "package": {
+      "artifact_id": 11415708175,
+      "digest": "sha256:e12dc3c2dcc65f757233e6e5a6c67fe257925074aeac8e8105b0e8d928cd672b"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "issue14_comment_id": 6016973214,
+    "validation_pr": 104
+  },
+  "next_action": "Re-read exact HEAD and re-census the post-R34/R33 structural chain now that R31 and R32 physical hook retirement is complete. Prefer the next smallest neutral-owner/install-state dependency extraction or final-dispatch simplification; do not recreate R31/R32 physical hooks.",
+  "started_at_kst": "2026-10-06T21:52:09+09:00",
+  "completed_at_kst": "2026-10-06T22:08:48+09:00"
+}
