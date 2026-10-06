@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "run": "B209",
+  "role": "B",
+  "timestamp_kst": "2026-10-06T19:34:00+09:00",
+  "queue_index": 24,
+  "asset": "textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "candidate_sha256": "c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e",
+  "source_sha256": "8e18676ac303b07a56d81d1d21c5e025e0baf46da49b16ae9d2e411960181f73",
+  "semantic_binding": {
+    "runtime": "B207 proves stock base-page selection 10..35 == a..z",
+    "visual": "A135 proves sprite_92..sprite_67 == A..Z",
+    "production": "A-Z physical key identity -> standard 2-beolsik base Jamo; non-A-Z cells unchanged"
+  },
+  "machine_qa": {
+    "format": "DXT3/BC2 preserved",
+    "canonical_header_128_bytes_preserved": true,
+    "recompressed_blocks": 10032,
+    "non_target_compressed_blocks_preserved_exact": true,
+    "rows_total": 26,
+    "decoded_containment_pass": 26,
+    "decoded_size_ceiling_pass": 26,
+    "decoded_visible_changed_outside_original_bboxes": 0,
+    "decoded_alpha_changed_outside_original_bboxes": 0,
+    "decoded_protected_visible_changed_pixels": 0
+  },
+  "controller_visual_qa": {
+    "readable_source_final": "PASS",
+    "raw_mirror_y_source_final": "PASS",
+    "source_style_family": "PASS",
+    "wrong_slant": false,
+    "broken_glyphs": false,
+    "visible_latin_residue": false,
+    "clipping": false,
+    "other_image_intrusion": false,
+    "cell_overlap": false,
+    "protected_artwork_damage": false,
+    "notes": "The first per-cell contact proof exposed transparent RGB from DXT3-decoded pixels as black shapes because it converted RGBA directly to RGB. Full alpha-composited SOURCE/FINAL and raw evidence show those pixels are alpha-zero and not visible. B.py was corrected to alpha-composite the contact proof; this evidence-only retry does not change candidate bytes."
+  },
+  "evidence": [
+    "localization/graphics/role_B/20261006-B-PRODUCTION209-NAMEENTRY-JAMO-KEYCAPS/B209_JAMO_KEYCAP_REPORT.json",
+    "localization/graphics/role_B/20261006-B-PRODUCTION209-NAMEENTRY-JAMO-KEYCAPS/B209_SOURCE_FINAL_FULL.jpg",
+    "localization/graphics/role_B/20261006-B-PRODUCTION209-NAMEENTRY-JAMO-KEYCAPS/B209_SOURCE_FINAL_RAW.jpg",
+    "localization/graphics/role_B/20261006-B-PRODUCTION209-NAMEENTRY-JAMO-KEYCAPS/B209_AZ_TO_JAMO_CONTACT.jpg"
+  ],
+  "candidate_artwork_result": "STATIC_PASS",
+  "overall_index24_status": "HOLD_INPUT_WIRING_REQUIRED",
+  "package_selected": false,
+  "why_not_promoted": "B208 HangulNameComposer is still not wired to B207 character selections and END does not yet commit the A141 alias. Packaging the Korean keycaps before input semantics are active would be misleading.",
+  "inherited_a142": {
+    "local_alias_to_utf8_render": "BUILD_PASS",
+    "source_commit": "dbbfdca6cb6695ab73960d76dae21ff44b39246e",
+    "win32_release_run": 37447477302,
+    "korean_test_run": 37447477392
+  },
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
