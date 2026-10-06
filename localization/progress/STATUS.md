@@ -2138,3 +2138,10 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - B220 rerenders native Noto CJK Black from exact source/validated clean plate, width 722x90 (~80% of source width), source-left margin 2px; right/top/bottom margins 179/2/2px.
 - 1/1 bbox/size/positive-margin PASS; changed/alpha outside exact source bbox=0; exact header/RGBA/raw mirror_y preserved. Controller SOURCE/C108/CLEAN/B220, high-zoom row and RAW visual QA PASS.
 - Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+
+### B221 q92 OutRun Mode hierarchy rework — 2026-10-07 04:50 KST
+- q92 1A43E9D9: C125/B39 `601be9747c0c...` -> B221 `c23888347f44...`. Current PRE_INGAME #006 exposed width/alignment false-negative: B39 Korean decoded widths 488/503px versus source 931/1070px and centered placement; row1 also had HIGH_RISK top-edge touch.
+- B221 restores source-left block-safe anchors and ~0.78x source-width hierarchy while retaining native Hangul, orange/navy/white effect family and readable right slant. Final decoded sizes 725x110 and 835x110 with positive margins; prior edge touch removed.
+- 2/2 bbox/source-size PASS; visible/alpha outside=0; source residue=0; overlap=0; changed BC3 blocks outside patch=0; source-only/partial color bytes preserved; DXT5 raw mirror_y verified. Controller readable/high-zoom/RAW visual QA PASS.
+- Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

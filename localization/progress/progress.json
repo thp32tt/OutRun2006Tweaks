@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 04:15 KST",
+  "updated_at_kst": "2026-10-07 04:50 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Fresh independent C should validate B220 q164 5B65E08C 65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f and other pending fresh-C producer candidates, then regenerate the English-original PRE_INGAME comparison for approved bytes. Actual in-game validation remains UNTESTED.",
+  "next_checkpoint": "Fresh independent C should validate B221 q92 1A43E9D9 c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a and B220 q164 5B65E08C if still pending, then regenerate current English-original PRE_INGAME comparisons for approved bytes. Actual in-game validation remains UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -2940,7 +2940,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED. B218 q228 E7F6E9B7 is newly reopened from C144 under the newer 8-step visual gate and now awaits fresh independent C on candidate 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808. B219 q232 EBFC709F is reopened from C135 for source-left alignment/weight hierarchy and awaits fresh independent C on candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221. B220 q164 5B65E08C is reopened from C108 for source-width hierarchy/left alignment and awaits fresh independent C on candidate 65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f.",
+  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED. B218 q228 E7F6E9B7 is newly reopened from C144 under the newer 8-step visual gate and now awaits fresh independent C on candidate 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808. B219 q232 EBFC709F is reopened from C135 for source-left alignment/weight hierarchy and awaits fresh independent C on candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221. B220 q164 5B65E08C is reopened from C108 for source-width hierarchy/left alignment and awaits fresh independent C on candidate 65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f. B221 q92 1A43E9D9 is reopened from C125 for source-relative width/alignment and prior edge-touch risk; fresh independent C is required on candidate c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -3385,5 +3385,21 @@
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_B/20261007-B-MANUALQA220-5B65E08C/B220_5B65E08C_REPORT.json",
     "controller": "localization/graphics/role_B/20261007-B-MANUALQA220-5B65E08C/B220_CONTROLLER_FINAL_QA.json"
+  },
+  "b221_q92_manual_visual_rework": {
+    "timestamp_kst": "2026-10-07 04:50 KST",
+    "queue_index": 92,
+    "asset": "1A43E9D9",
+    "source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+    "before_sha256": "601be9747c0cf03e89740786fe0782ec1e71f0e480ceb5e3d740637d048043b3",
+    "candidate_sha256": "c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a",
+    "prior_status": "C125_STATIC_PASS_HIGH_RISK_EDGE_TOUCH_PENDING_INGAME",
+    "machine_qa": "2/2 bbox+source-size; visible/alpha outside=0; residue/overlap=0; changed BC3 blocks outside patch=0; source-only/partial color preserved; DXT5 raw mirror_y",
+    "hierarchy": "row1 width 488->725 of source931; row2 503->835 of source1070; source-left margins 3px; old top-edge touch removed",
+    "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_ROWS_RAW",
+    "status": "B221_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA221-1A43E9D9/B221_1A43_REPORT.json",
+    "controller": "localization/graphics/role_B/20261007-B-MANUALQA221-1A43E9D9/B221_CONTROLLER_FINAL_QA.json"
   }
 }
