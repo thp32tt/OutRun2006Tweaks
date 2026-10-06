@@ -4,7 +4,7 @@
   "queue_index": 214,
   "asset": "BF229CF4",
   "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
-  "candidate_sha256": "869b5fefc452578228402c48203f5302a61c1119ea2b22336e952c4ccf95c381",
+  "candidate_sha256": "3d292729007cacb909782ad6c38fe463ba1ff4705772c69f930d4a30f14a839b",
   "report": "localization/graphics/role_B/20261006-B-PRODUCTION194-BF229CF4-START-GOAL/B194_BF229CF4_REPORT.json",
   "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
 }

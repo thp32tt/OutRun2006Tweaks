@@ -2,7 +2,7 @@
   "schema_version": 1,
   "role": "B",
   "run": "20261006-B-PRODUCTION194-BF229CF4-START-GOAL",
-  "base_head": "09ec5ba9e938b8314c8b5abb529f1ada85223fa4",
+  "base_head": "c1acf20230169da93b868b5a6bca9d4c0ba161b6",
   "queue_index": 214,
   "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
   "readiness_tier": "ZOOM_REVIEW_POSITIVE_RENDER_COMPLETED_SAME_INVOCATION",
@@ -63,17 +63,17 @@
       "banner_bbox": [
         813,
         493,
-        913,
-        523
+        902,
+        520
       ],
       "source_bbox": [
         815,
         495,
-        913,
-        523
+        899,
+        517
       ],
-      "source_text_pixels": 1455,
-      "source_bc3_blocks": 144,
+      "source_text_pixels": 1308,
+      "source_bc3_blocks": 130,
       "red_component_meta": [
         [
           1546,
@@ -101,18 +101,13 @@
             79,
             25
           ]
-        ],
-        [
-          30,
-          [
-            110,
-            32,
-            114,
-            48
-          ]
         ]
       ],
       "red_hull_vertices": [
+        [
+          819,
+          500
+        ],
         [
           823,
           492
@@ -126,24 +121,12 @@
           493
         ],
         [
-          912,
-          512
+          892,
+          518
         ],
         [
-          913,
-          516
-        ],
-        [
-          913,
-          526
-        ],
-        [
-          912,
-          527
-        ],
-        [
-          911,
-          527
+          891,
+          520
         ],
         [
           813,
@@ -156,37 +139,33 @@
         [
           813,
           516
-        ],
-        [
-          819,
-          500
         ]
       ],
       "localized_bbox": [
-        844,
+        842,
         497,
-        884,
-        521
+        872,
+        515
       ],
-      "source_width": 98,
-      "source_height": 28,
-      "localized_width": 40,
-      "localized_height": 24,
-      "delta_left": 29,
-      "delta_right": 29,
+      "source_width": 84,
+      "source_height": 22,
+      "localized_width": 30,
+      "localized_height": 18,
+      "delta_left": 27,
+      "delta_right": 27,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
       "font": "Noto Sans CJK KR Black",
-      "font_size": 22,
+      "font_size": 16,
       "shear": 0.17,
       "shadow_offset": 1,
       "fill_rgba": [
         239,
-        207,
-        178,
+        203,
+        172,
         255
       ],
       "shadow_rgba": [
@@ -195,7 +174,7 @@
         82,
         255
       ],
-      "target_bc3_blocks": 69
+      "target_bc3_blocks": 40
     },
     {
       "key": "goal",
@@ -345,16 +324,16 @@
     "changed_outside_allowed_blocks": 0,
     "alpha_changed_outside_allowed_blocks": 0,
     "introduced_visible_outside_allowed_blocks": 0,
-    "final_source_residue_exact": 19,
+    "final_source_residue_exact": 11,
     "final_source_residue_color": 0,
     "localized_overlap": 0,
-    "changed_bc3_blocks": 256,
+    "changed_bc3_blocks": 237,
     "changed_bc3_blocks_outside_allowed": 0,
-    "full_reencoded_blocks": 246,
-    "partial_constrained_blocks": 19,
+    "full_reencoded_blocks": 231,
+    "partial_constrained_blocks": 6,
     "status": "PASS"
   },
-  "candidate_sha256": "869b5fefc452578228402c48203f5302a61c1119ea2b22336e952c4ccf95c381",
+  "candidate_sha256": "3d292729007cacb909782ad6c38fe463ba1ff4705772c69f930d4a30f14a839b",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
   "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
   "runtime_validation": "UNTESTED",
