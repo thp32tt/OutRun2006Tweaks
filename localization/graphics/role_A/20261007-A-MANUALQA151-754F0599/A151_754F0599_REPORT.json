@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261007-A-MANUALQA151-754F0599",
+  "worker": "github-actions",
+  "base_head": "1afdf3871bc11f5f552b9d5f7d43490d9debf49b",
+  "queue_index": 175,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "trigger": "PRE_INGAME_025_SOURCE_RELATIVE_SCALE_HIERARCHY_FALSE_NEGATIVE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/025_q175_754F0599.jpg",
+  "prior_c_status": "C171_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "prior_candidate_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "candidate_sha256": "f21970a3d6d8ae69954d0159524856b5019cd1445daa65c55d85213f73e431f5",
+  "reason": "Current C171 rows remain only 103/143, 95/132 and 109/151px high. New ordered generation gate treats this as unnecessary undersizing relative to the source family.",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32/BGRA raw",
+    "pitch": 8192,
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "prior_clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION29/754F0599_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION29/754F0599_HD_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 270693,
+    "changed_bbox": [
+      2,
+      254,
+      1386,
+      717
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION29/754F0599_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261007-A-MANUALQA151-754F0599/754F0599_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 363375,
+    "changed_bbox": [
+      2,
+      254,
+      1386,
+      717
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_visible_pixels_changed": 0
+  },
+  "rows": [
+    {
+      "key": "stage_select",
+      "source": "stage select",
+      "korean": "스테이지 선택",
+      "original_bbox": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "localized_bbox": [
+        10,
+        263,
+        1198,
+        387
+      ],
+      "source_width": 1366,
+      "source_height": 143,
+      "localized_width": 1188,
+      "localized_height": 124,
+      "width_ratio": 0.8697,
+      "height_ratio": 0.8671,
+      "delta_left": 4,
+      "delta_right": 174,
+      "delta_top": 9,
+      "delta_bottom": 10,
+      "prior_localized_bbox": [
+        10,
+        274,
+        1021,
+        377
+      ],
+      "prior_localized_width": 1011,
+      "prior_localized_height": 103,
+      "width_gain_px": 177,
+      "height_gain_px": 21,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "style": "fresh native Noto Sans CJK KR Regular; metallic grayscale gradient, bright keyline, dark extrusion, readable right lean, source-left anchor"
+    },
+    {
+      "key": "showroom",
+      "source": "showroom",
+      "korean": "쇼룸",
+      "original_bbox": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "localized_bbox": [
+        10,
+        406,
+        710,
+        520
+      ],
+      "source_width": 950,
+      "source_height": 132,
+      "localized_width": 700,
+      "localized_height": 114,
+      "width_ratio": 0.7368,
+      "height_ratio": 0.8636,
+      "delta_left": 4,
+      "delta_right": 246,
+      "delta_top": 9,
+      "delta_bottom": 9,
+      "prior_localized_bbox": [
+        10,
+        415,
+        561,
+        510
+      ],
+      "prior_localized_width": 551,
+      "prior_localized_height": 95,
+      "width_gain_px": 149,
+      "height_gain_px": 19,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "style": "fresh native Noto Sans CJK KR Regular; metallic grayscale gradient, bright keyline, dark extrusion, readable right lean, source-left anchor"
+    },
+    {
+      "key": "single_player",
+      "source": "single player",
+      "korean": "싱글 플레이",
+      "original_bbox": [
+        2,
+        566,
+        1386,
+        717
+      ],
+      "localized_bbox": [
+        6,
+        576,
+        1214,
+        706
+      ],
+      "source_width": 1384,
+      "source_height": 151,
+      "localized_width": 1208,
+      "localized_height": 130,
+      "width_ratio": 0.8728,
+      "height_ratio": 0.8609,
+      "delta_left": 4,
+      "delta_right": 172,
+      "delta_top": 10,
+      "delta_bottom": 11,
+      "prior_localized_bbox": [
+        6,
+        587,
+        1030,
+        696
+      ],
+      "prior_localized_width": 1024,
+      "prior_localized_height": 109,
+      "width_gain_px": 184,
+      "height_gain_px": 21,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "style": "fresh native Noto Sans CJK KR Regular; metallic grayscale gradient, bright keyline, dark extrusion, readable right lean, source-left anchor"
+    }
+  ],
+  "ordered_generation_gate": {
+    "1_source_text_removed_and_plate_restored": "PASS_REUSE_PRIOR_EXACT_VALIDATED_CLEAN_PLATE",
+    "2_slant_direction_matches_source": "PASS_READABLE_RIGHT_LEAN",
+    "3_text_not_unnecessarily_undersized_and_within_source_bbox": "PASS_HEIGHT_GAIN_ALL_3",
+    "4_source_faithful_weight_outline_shadow": "PASS_METALLIC_GRAYSCALE_KEYLINE_DARK_EXTRUSION",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGINS",
+    "6_protected_graphics_clearance": "PASS_ZERO_PROTECTED_CHANGE",
+    "7_raw_and_flip_y_visual_review": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "8_immediate_readability_vs_english": "PENDING_CONTROLLER"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A151_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

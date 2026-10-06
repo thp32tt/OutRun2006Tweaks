@@ -1,0 +1,29 @@
+{
+  "run": "20261007-A-MANUALQA151-754F0599",
+  "asset": "754F0599",
+  "queue_index": 175,
+  "prior_candidate_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+  "candidate_sha256": "f21970a3d6d8ae69954d0159524856b5019cd1445daa65c55d85213f73e431f5",
+  "bbox_size_positive_margin": "3/3 PASS",
+  "height_gains": [
+    21,
+    19,
+    21
+  ],
+  "height_ratios": [
+    0.8671,
+    0.8636,
+    0.8609
+  ],
+  "width_gains": [
+    177,
+    149,
+    184
+  ],
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "worker_status": "A151_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261007-A-MANUALQA151-754F0599/A151_754F0599_REPORT.json"
+}
