@@ -66,6 +66,11 @@ namespace KoreanRuntime
     static constexpr size_t TextEntryCount = 1356;
     static constexpr size_t MaxQueuedDraws = 1024;
     static constexpr size_t MaxFormattedBytes = 4096;
+    // Return site immediately after the stock local text-object Sumo_Printf("%s", text)
+    // call at VA 0x48F455. B206 proved Edit License feeds the native player-name
+    // field into this text object, so resolving only a sidecar-backed alias here
+    // changes local presentation without touching save/ranking/network bytes.
+    static constexpr uintptr_t LocalTextObjectPrintfReturnOffset = 0x8F45A;
 
     struct DrawCommand
     {
@@ -1374,6 +1379,31 @@ namespace KoreanRuntime
         const char** formatSlot = reinterpret_cast<const char**>(stack + 4);
         if (!formatSlot || !*formatSlot)
             return;
+
+        // A142: local player-name sidecar render substitution.
+        // The stock local text object prints its buffer through Sumo_Printf("%s", text)
+        // at VA 0x48F455. Restrict the new path to that exact return site and to a
+        // valid A141 sidecar alias. This deliberately leaves the native 16-byte
+        // field, ranking/network/replay consumers, and every non-sidecar string intact.
+        const uintptr_t returnAddress = *reinterpret_cast<const uintptr_t*>(stack);
+        const uintptr_t localTextObjectReturn =
+            reinterpret_cast<uintptr_t>(Module::exe_ptr(LocalTextObjectPrintfReturnOffset));
+        if (returnAddress == localTextObjectReturn && std::strcmp(*formatSlot, "%s") == 0)
+        {
+            const char* const* stringArgSlot =
+                reinterpret_cast<const char* const*>(stack + 8);
+            std::string koreanPlayerName;
+            if (stringArgSlot && *stringArgSlot &&
+                LookupKoreanPlayerName(*stringArgSlot, koreanPlayerName))
+            {
+                Queue(static_cast<uint32_t>(TextEntryCount), koreanPlayerName);
+
+                thread_local std::string hiddenPlayerNameLayout;
+                hiddenPlayerNameLayout = BuildHiddenLayout(*stringArgSlot);
+                *formatSlot = hiddenPlayerNameLayout.c_str();
+                return;
+            }
+        }
 
         uint32_t id = 0;
         if (!ResolveTextId(*formatSlot, id))
