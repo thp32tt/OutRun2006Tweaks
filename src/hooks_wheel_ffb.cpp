@@ -1338,10 +1338,13 @@ namespace
                 {
                     const float driftCountersteerShape =
                         WheelFFBMath::drift_countersteer_shape(bodySlip);
-                    const float driftCountersteerTorque =
+                    const float rawDriftCountersteerTorque =
                         (bodySlip > 0.0f ? -1.0f : 1.0f) *
                         driftCountersteerShape * satSpeed * physicsLoad *
                         rearSlideRelief * satStrength;
+                    const float driftCountersteerTorque =
+                        WheelFFBMath::bound_drift_countersteer_torque(
+                            physicsSatTorque, rawDriftCountersteerTorque);
                     physicsSatTorque +=
                         (driftCountersteerTorque - physicsSatTorque) *
                         driftCountersteerBlend;
@@ -1645,13 +1648,14 @@ namespace
                 {
                     lastTelemetryDetailTick_ = telemetryNow;
                     spdlog::info(
-                    "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} diPreResponse={} diCorrected={} responseCorrection={}",
+                    "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} driftBlend={} physicsSat={} diPreResponse={} diCorrected={} responseCorrection={}",
                     telemetryNow,
                     vehicleDynamics_.rawBodySlip(), vehicleDynamics_.bodySlip(), vehicleDynamics_.bodySlipBlend(),
                     vehicleDynamics_.rawYawRate(), vehicleDynamics_.yawRate(), vehicleDynamics_.yawRateBlend(),
                     vehicleDynamics_.rawFrontSlip(), vehicleDynamics_.frontSlip(), vehicleDynamics_.frontSlipBlend(),
                     trailResponseSlip, trailResponseLead, lateralForceShape, pneumaticTrail,
                     pneumaticSatShape, mechanicalTrailMix, mechanicalContribution, physicsShape,
+                    driftCountersteerBlend, physicsSatTorque,
                     levelBeforeResponse, level, bool(Settings::WheelFFBResponseCorrection));
                 // Raw horizontal bases allow row/column x X/Z candidates to be
                 // compared offline without changing the active steering model.
