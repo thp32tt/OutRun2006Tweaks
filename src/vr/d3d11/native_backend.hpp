@@ -28,6 +28,7 @@ struct VertexInputLayoutTranslation;
 struct FixedFunctionStageState;
 struct PipelineTranslation;
 struct ProgrammableShaderPairCacheIdentity;
+struct ProgrammableShaderInterfaceLinkageEvidence;
 
 struct NativeBackendConfig {
     std::uint32_t width = 0;
