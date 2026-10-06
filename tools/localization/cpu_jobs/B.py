@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role B only")
 
 repo=Path.cwd()
-run="20261006-B-PRODUCTION188-6C9B3611-START-GOAL"
+run="20261006-B-PRODUCTION189-6C9B3611-START-GOAL"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -20,7 +20,7 @@ candidate=repo/"localization/graphics/hd_candidates"/asset
 candidate.parent.mkdir(parents=True,exist_ok=True)
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
 SOURCE_SHA="d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8"
-srcp=Path("/tmp/B188_6C9B3611.dds")
+srcp=Path("/tmp/B189_6C9B3611.dds")
 urllib.request.urlretrieve(url,srcp)
 
 def sha256(p):
@@ -163,11 +163,11 @@ if np.count_nonzero(source_masks[0]&source_masks[1]):
 
 # Same-family A85 precedent: reconstruct the complete inset red body, not a
 # glyph-shaped patch. B182-B187 automatic red-component masks left visible
-# English-effect strips on START, so B188 uses controller-reviewed trapezoid
+# English-effect strips on START, so B189 uses controller-reviewed trapezoid
 # interiors measured from the readable source while keeping the white rim exact.
 manual_interiors={
- "start":[(63,373),(139,373),(133,396),(55,396)],
- "goal":[(602,636),(678,636),(672,659),(594,659)],
+ "start":[(55,373),(139,373),(136,396),(55,396)],
+ "goal":[(595,635),(678,635),(672,659),(594,659)],
 }
 clean_masks=[]
 clean_region=np.zeros((H,W),bool)
@@ -175,12 +175,10 @@ for row,sm,bm in zip(rows,source_masks,banner_masks):
     pim=Image.new("L",(W,H),0)
     ImageDraw.Draw(pim).polygon(manual_interiors[row["key"]],fill=255)
     cm=np.asarray(pim)>0
-    # Every measured source effect pixel must be covered by the interior clean
-    # region; otherwise fail closed rather than leaving source-script residue.
-    if np.any(sm & ~cm):
-        ys,xs=np.nonzero(sm & ~cm)
-        raise RuntimeError(("manual interior misses source effect",row["key"],len(xs),
-                            [int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]))
+    # Keep the controller-reviewed red-body polygon, but union the exact measured
+    # source-effect mask so edge AA/shadow pixels cannot survive outside it.
+    # This expands only where source lettering was actually measured.
+    cm |= sm
     clean_masks.append(cm)
     clean_region |= cm
     row["clean_region_bbox"]=bbox(cm)
@@ -327,14 +325,14 @@ if residue_final:
 
 
 # Evidence.
-src.save(out/"B188_SOURCE_READABLE.png")
-clean.save(out/"B188_CLEAN_PLATE.png")
-dec.save(out/"B188_FINAL_READABLE.png")
-src_raw.save(out/"B188_SOURCE_RAW.png")
-dec_raw.save(out/"B188_FINAL_RAW.png")
-Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"B188_SOURCE_TEXT_MASK.png")
-Image.fromarray((clean_region.astype(np.uint8)*255),"L").save(out/"B188_CLEAN_REGION_MASK.png")
-Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"B188_TARGET_MASK.png")
+src.save(out/"B189_SOURCE_READABLE.png")
+clean.save(out/"B189_CLEAN_PLATE.png")
+dec.save(out/"B189_FINAL_READABLE.png")
+src_raw.save(out/"B189_SOURCE_RAW.png")
+dec_raw.save(out/"B189_FINAL_RAW.png")
+Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"B189_SOURCE_TEXT_MASK.png")
+Image.fromarray((clean_region.astype(np.uint8)*255),"L").save(out/"B189_CLEAN_REGION_MASK.png")
+Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"B189_TARGET_MASK.png")
 
 def on_white(im):
     z=Image.new("RGBA",im.size,(255,255,255,255)); z.alpha_composite(im); return z.convert("RGB")
@@ -359,7 +357,7 @@ y=0
 for c in cards:
     sheet.paste(c,(0,y)); y+=c.height+8
 sheet.thumbnail((1800,2800),Image.Resampling.LANCZOS)
-sheet.save(out/"B188_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
+sheet.save(out/"B189_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
 
 raw_sheet=Image.new("RGB",(1024,2*1024+70),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW",src_raw),("FINAL_RAW",dec_raw)]):
@@ -369,7 +367,7 @@ for i,(label,im) in enumerate([("SOURCE_RAW",src_raw),("FINAL_RAW",dec_raw)]):
     raw_sheet.paste(vis,(0,y+30)); ImageDraw.Draw(raw_sheet).text((6,y+7),label,fill="black")
 raw_sheet=raw_sheet.crop((0,0,1024,2*1024+70))
 raw_sheet.thumbnail((1400,1800),Image.Resampling.LANCZOS)
-raw_sheet.save(out/"B188_RAW_CONTACT.jpg",quality=95)
+raw_sheet.save(out/"B189_RAW_CONTACT.jpg",quality=95)
 
 report={
  "schema_version":1,"role":"B","run":run,
@@ -382,7 +380,7 @@ report={
  "source_provenance":{"url":url,"sha256":SOURCE_SHA},
  "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":MIPS,
    "header_128_exact":payload[:128]==raw[:128],"raw_orientation":"mirror_y"},
- "construction":"B188 controller-reviewed manual trapezoid interiors rebuild the complete START/GOAL red badge bodies from source-row red donors, superseding B182-B187 automatic component masks that visibly left English-effect strips. White rim, route map, thumbnails and OutRun2SP artwork remain outside the clean scope; fresh native Korean stays inside the exact measured source effect bbox.",
+ "construction":"B189 controller-reviewed manual trapezoid interiors rebuild the complete START/GOAL red badge bodies from source-row red donors, superseding B182-B187 automatic component masks that visibly left English-effect strips. White rim, route map, thumbnails and OutRun2SP artwork remain outside the clean scope; fresh native Korean stays inside the exact measured source effect bbox.",
  "same_family_reference":"localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_CONTROLLER_SELF_QA.json",
  "rows":rows,
  "static_qa":{
@@ -402,15 +400,15 @@ report={
  "candidate_sha256":cand_sha,
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "runtime_validation":"UNTESTED",
- "status":"B188_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"B189_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"B188_6C9B3611_REPORT.json"
+rp=out/"B189_6C9B3611_REPORT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"B188_6C9B3611.json").write_text(json.dumps({
+(wr/"B189_6C9B3611.json").write_text(json.dumps({
  "role":"B","run":run,"queue_index":172,"asset":"6C9B3611",
  "source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,
  "report":str(rp.relative_to(repo)),
  "status":"WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("B188_DONE",cand_sha,[(r["key"],r["source_bbox"],r["localized_bbox"],r["font_size"]) for r in rows])
+print("B189_DONE",cand_sha,[(r["key"],r["source_bbox"],r["localized_bbox"],r["font_size"]) for r in rows])
