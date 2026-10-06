@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# B213: q128 12519155 manual PRE_INGAME visual rework.
+# B214: q128 12519155 manual PRE_INGAME visual rework.
 # Fixes source-family alignment/scale false-negative: shared stage rows must keep
 # one Korean vertical style and source-like left alignment instead of per-row
 # centered/shrunk text. Fresh native Hangul only; no old Korean bitmap upscale.
@@ -13,7 +13,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageChops
 
 repo=Path.cwd()
-run="20261007-B-MANUALQA213-12519155"
+run="20261007-B-MANUALQA214-12519155"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -22,7 +22,7 @@ asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds"
 source_zip=repo/"localization/validation/binary_compare/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip"
 candidate=repo/"localization/graphics/hd_candidates"/asset
 clean_path=repo/"localization/graphics/role_C/20261005-C132-12519155/C132_CLEAN_PLATE.png"
-EXPECTED_BEFORE="14bc44a69775206c5771023408d0752ee925542fda48359c14c4e5b2f767119d"
+EXPECTED_BEFORE="b5431967219fa2e0e1c124093584584727a1be84b30de6f20d5cf29850102c7e"
 SOURCE_SHA="ad88efc25b705be8960f373f8a06ea88ce39f086857e68c851595f7c867c14c3"
 ROWS=[
  {"n":1,"source":"Time Attack Mode / 15 C.","ko":"타임 어택 모드 / 15코스","bbox":[6,508,648,558],"stage":False},
@@ -99,8 +99,7 @@ def source_slant(b):
     slope=float(np.polyfit(np.asarray(ys),np.asarray(left),1)[0])
     return float(np.clip(-slope,-0.25,0.25))
 stage_slants=[source_slant(r["bbox"]) for r in ROWS if r["stage"]]
-shared_slant=float(np.median(stage_slants))
-if abs(shared_slant)<0.025: shared_slant=0.0
+# Controller review of SOURCE/OLD/B213 showed the source family is visually upright; the\n# signed edge-regression metric is shape-biased for mixed Latin glyphs and must not drive shear here.\nshared_slant=0.0
 
 def shear_right(im,s):
     if abs(s)<0.005: return im
@@ -134,14 +133,14 @@ def render_native(text,fs,stroke):
 stage_rows=[r for r in ROWS if r["stage"]]
 shared=None
 for fs in range(64,30,-1):
-    stroke=max(1,round(fs*0.035))
+    stroke=max(2,round(fs*0.045))
     trial=[]; ok=True
     for r in stage_rows:
         t=shear_right(render_native(r["ko"],fs,stroke),shared_slant)
-        x0,y0,x1,y1=r["bbox"]; aw=x1-x0-4; ah=y1-y0-4
+        x0,y0,x1,y1=r["bbox"]; aw=x1-x0-2; ah=y1-y0-2
         if t.height>ah: ok=False; break
         sx=min(1.0,aw/t.width)
-        if sx<0.80: ok=False; break
+        if sx<0.72: ok=False; break
         trial.append((r,t,sx))
     if ok:
         shared=(fs,stroke,trial); break
@@ -149,15 +148,15 @@ if shared is None: raise RuntimeError("no safe shared stage style")
 stage_fs,stage_stroke,stage_trial=shared
 
 # Header gets its own source-intentional smaller family but is maximized to the exact source bbox.
-header=ROWS[0]; hx0,hy0,hx1,hy1=header["bbox"]; header_slant=source_slant(header["bbox"])
+header=ROWS[0]; hx0,hy0,hx1,hy1=header["bbox"]; header_slant=0.0
 header_pick=None
 for fs in range(60,28,-1):
     stroke=max(1,round(fs*0.035))
     t=shear_right(render_native(header["ko"],fs,stroke),header_slant)
-    aw=hx1-hx0-4; ah=hy1-hy0-4
+    aw=hx1-hx0-2; ah=hy1-hy0-2
     if t.height<=ah:
         sx=min(1.0,aw/t.width)
-        if sx>=0.88:
+        if sx>=0.80:
             header_pick=(fs,stroke,t,sx); break
 if header_pick is None: raise RuntimeError("no safe header style")
 header_fs,header_stroke,header_tile,header_sx=header_pick
@@ -252,16 +251,16 @@ def comp(im,bg=(104,104,104,255)):
     z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
 def card(label,im):
     v=comp(im); c=Image.new("RGB",(v.width,v.height+28),(30,30,30)); c.paste(v,(0,28)); ImageDraw.Draw(c).text((5,5),label,fill="white"); return c
-cards=[card("SOURCE_READABLE",src),card("OLD_C132",old),card("C132_CLEAN",clean),card("B213_FINAL",new)]
+cards=[card("SOURCE_READABLE",src),card("OLD_C132",old),card("C132_CLEAN",clean),card("B214_FINAL",new)]
 sheet=Image.new("RGB",(2048,2104),(24,24,24))
 sheet.paste(cards[0],(0,0)); sheet.paste(cards[1],(1024,0)); sheet.paste(cards[2],(0,1052)); sheet.paste(cards[3],(1024,1052))
 sheet.thumbnail((1800,1800),Image.Resampling.LANCZOS)
-sheet.save(out/"B213_125_SOURCE_OLD_CLEAN_NEW_READABLE.jpg","JPEG",quality=96,subsampling=0)
-rawcards=[card("SOURCE_RAW_MIRROR_Y",src_raw),card("OLD_RAW_MIRROR_Y",old_raw),card("B213_RAW_MIRROR_Y",new_raw)]
+sheet.save(out/"B214_125_SOURCE_OLD_CLEAN_NEW_READABLE.jpg","JPEG",quality=96,subsampling=0)
+rawcards=[card("SOURCE_RAW_MIRROR_Y",src_raw),card("OLD_RAW_MIRROR_Y",old_raw),card("B214_RAW_MIRROR_Y",new_raw)]
 rawsheet=Image.new("RGB",(1024,1052*3),(24,24,24))
 for i,c in enumerate(rawcards): rawsheet.paste(c,(0,1052*i))
 rawsheet.thumbnail((1200,2200),Image.Resampling.LANCZOS)
-rawsheet.save(out/"B213_125_SOURCE_OLD_NEW_RAW.jpg","JPEG",quality=96,subsampling=0)
+rawsheet.save(out/"B214_125_SOURCE_OLD_NEW_RAW.jpg","JPEG",quality=96,subsampling=0)
 
 # Per-row SOURCE/OLD/NEW 2x contact.
 src_rgb=comp(src); old_rgb=comp(old); new_rgb=comp(new)
@@ -273,21 +272,21 @@ for rr in row_reports:
         z=im.crop(cr); z=z.resize((z.width*2,z.height*2),Image.Resampling.NEAREST); ims.append(z)
     cw=sum(z.width for z in ims)+12; ch=max(z.height for z in ims)+30
     c=Image.new("RGB",(cw,ch),(28,28,28)); d=ImageDraw.Draw(c); xx=0
-    for lab,z in zip(("SOURCE","C132","B213"),ims):
+    for lab,z in zip(("SOURCE","C132","B214"),ims):
         d.text((xx+4,5),lab,fill="white"); c.paste(z,(xx,28)); xx+=z.width+6
     contacts.append(c)
 rowsheet=Image.new("RGB",(max(c.width for c in contacts),sum(c.height for c in contacts)+6*(len(contacts)-1)),(24,24,24)); yy=0
 for c in contacts: rowsheet.paste(c,(0,yy)); yy+=c.height+6
-rowsheet.save(out/"B213_125_ROW_CONTACT_2X.jpg","JPEG",quality=96,subsampling=0)
+rowsheet.save(out/"B214_125_ROW_CONTACT_2X.jpg","JPEG",quality=96,subsampling=0)
 
 report={
- "schema_version":1,"role":"B","run":"B213","queue_index":128,"asset":asset,
+ "schema_version":1,"role":"B","run":"B214","queue_index":128,"asset":asset,
  "trigger":"MANUAL_PRE_INGAME_ENGLISH_ORIGINAL_VISUAL_FALSE_NEGATIVE",
  "review_jpg":"localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/036_q128_12519155.jpg",
- "prior_c_status":"C132_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
- "defects":["SOURCE_LEFT_ALIGNMENT_MISMATCH","STAGE_FAMILY_SIZE_INCONSISTENCY","VISIBLE_UNDERSIZING"],
+ "prior_c_status":"C132_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME","superseded_worker_candidate":"B213_b5431967219fa2e0e1c124093584584727a1be84b30de6f20d5cf29850102c7e_CONTROLLER_REJECTED",
+ "defects":["SOURCE_LEFT_ALIGNMENT_MISMATCH","STAGE_FAMILY_SIZE_INCONSISTENCY","VISIBLE_UNDERSIZING","B213_CONTROLLER_VISUAL_FALSE_SLANT_AND_UNDERWEIGHT"],
  "source_sha256":SOURCE_SHA,"before_sha256":EXPECTED_BEFORE,"candidate_sha256":after,
- "method":"exact 1024 source + C132 exact clean plate -> fresh native Noto Sans CJK KR Black render; shared stage nominal font/weight; source-family left alignment; modest per-row horizontal condensation only when required by exact source width -> exact-header RGBA32 raw mirror-Y encode -> decoded strict QA",
+ "method":"exact 1024 source + C132 exact clean plate -> fresh native Noto Sans CJK KR Black render; shared larger stage nominal font/weight; source-family LEFT + visually upright transform; modest per-row horizontal condensation only when required by exact source width -> exact-header RGBA32 raw mirror-Y encode -> decoded strict QA",
  "shared_stage_style":{"font_family":"Noto Sans CJK KR Black","font_size":stage_fs,"stroke_width":stage_stroke,
                        "source_slant_measure":shared_slant,"localized_heights":stage_heights},
  "header_style":{"font_family":"Noto Sans CJK KR Black","font_size":header_fs,"stroke_width":header_stroke,
@@ -315,12 +314,12 @@ report={
    }
  },
  "runtime_validation":"UNTESTED",
- "status":"B213_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+ "status":"B214_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"B213_12519155_REPORT.json"; rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"B213_12519155.json").write_text(json.dumps({
- "role":"B","run":"B213","queue_index":128,"asset":asset,"candidate_sha256":after,
+rp=out/"B214_12519155_REPORT.json"; rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"B214_12519155.json").write_text(json.dumps({
+ "role":"B","run":"B214","queue_index":128,"asset":asset,"candidate_sha256":after,
  "report":str(rp.relative_to(repo)),"status":report["status"],"runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print(json.dumps({"run":"B213","before":EXPECTED_BEFORE,"after":after,"stage_fs":stage_fs,"stage_heights":stage_heights,"rows":row_reports,"status":report["status"]},ensure_ascii=False))
+print(json.dumps({"run":"B214","before":EXPECTED_BEFORE,"after":after,"stage_fs":stage_fs,"stage_heights":stage_heights,"rows":row_reports,"status":report["status"]},ensure_ascii=False))
