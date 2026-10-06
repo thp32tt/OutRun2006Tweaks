@@ -88,7 +88,22 @@ for required in (
         raise SystemExit(f"R32 Reset lifecycle owner contract missing: {required}")
 if "R22ShadowState = {};" in r32[r32.find("void R32ResetAfterGameReset"):]:
     raise SystemExit("R32 successful Reset post-processing must preserve R22's freshly primed viewport/scissor shadow")
-resolve_start = r32.find("bool ResolveDirectTransportR32")
+for banned in (
+        "SafetyHookInline R32ResolveDirectR13Hook{};",
+        "ResolveDirectTransportR32(",
+        "safetyhook::create_inline("):
+    if banned in r32:
+        raise SystemExit(f"R32 retained retired physical DirectGPU ownership: {banned}")
+for required in (
+        "bool R32ResolveDirectTransport(",
+        "R13OverlayReadyForTransport()",
+        "return lowerResolve();",
+        "R32EnsureDirectResources(device)",
+        "R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted)",
+        "R32WaitProducerFence(slot.fence)"):
+    if required not in r32:
+        raise SystemExit(f"R32 DirectGPU owner helper contract missing: {required}")
+resolve_start = r32.find("bool R32ResolveDirectTransport(")
 ensure_direct = r32.find("R32EnsureDirectResources(device)", resolve_start)
 copy_reject = r32.find("if (R32DirectCopyPathRejected)", resolve_start)
 if min(resolve_start, ensure_direct, copy_reject) < 0 or ensure_direct > copy_reject:
@@ -97,7 +112,7 @@ if min(resolve_start, ensure_direct, copy_reject) < 0 or ensure_direct > copy_re
 
 drain_start = r32.find("bool R32DrainPendingProducerFence")
 drain_error = r32.find("A query error does not prove GPU completion", drain_start)
-drain_end = r32.find("bool ResolveDirectTransportR32", drain_start)
+drain_end = r32.find("bool R32ResolveDirectTransport(", drain_start)
 if min(drain_start, drain_error, drain_end) < 0:
     raise SystemExit("could not locate R32 pending-fence query-error quarantine")
 if "R32ProducerFencePending[slotIndex] = false;" in r32[drain_error:drain_end]:
@@ -127,6 +142,11 @@ r33 = require(
     "R33ResetR22Hook.stdcall<HRESULT>",
     "reinterpret_cast<void*>(&ResetDestR22)",
     "R33 hooks R22 directly and preserves R32 reset lifecycle",
+    "SafetyHookInline R33ResolveDirectR13Hook{};",
+    "reinterpret_cast<void*>(&ResolveDirectTransportR13)",
+    "ResolveDirectTransportDestR33",
+    "R32ResolveDirectTransport(",
+    "R33ResolveDirectR13Hook.call<bool>",
     "top-level telemetry counted once",
 )
 for banned in ("R33ResetR32Hook", "reinterpret_cast<void*>(&ResetDestR32)"):
@@ -139,6 +159,13 @@ reset_post = r33.find("R33InvalidateDepthStencilCache();", reset_lower)
 if min(reset33_start, reset_helper, reset_lower, reset_post) < 0 or not (
         reset33_start < reset_helper < reset_lower < reset_post):
     raise SystemExit("R33 direct Reset owner must preserve R32 wrapper around lower R22 Reset before R33 post-processing")
+
+direct33_start = r33.find("bool ResolveDirectTransportDestR33(")
+direct_helper = r33.find("R32ResolveDirectTransport(", direct33_start)
+direct_lower = r33.find("R33ResolveDirectR13Hook.call<bool>", direct_helper)
+if min(direct33_start, direct_helper, direct_lower) < 0 or not (
+        direct33_start < direct_helper < direct_lower):
+    raise SystemExit("R33 direct DirectGPU owner must preserve R32 helper around the lower R13 trampoline")
 
 ex = require(
     "src/vr/d3d9/ex_device_upgrade.cpp",
