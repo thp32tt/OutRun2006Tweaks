@@ -205,3 +205,29 @@ A RED verifier was committed first at `52e3202c1fe640f62e695e2712a10f12562a1104`
 This is not a complete vehicle-marker fix. The user-tested `ProjectedMarkerInfo` / Calc3D2D view-space anchor payload is intentionally not restored here, so rank/rival markers can still be spatially detached even if exact WorldBillboard semantics become observable again. Cadence/fence authority, DirectGPU transport, generic HUD fallback, and R31/R32/R33 physical ownership are unchanged.
 
 `RUNTIME_VALIDATION=UNTESTED`. A Quest 3 / VDXR CORRECTNESS session must confirm exact ScreenHud/WorldBillboard/producer fingerprints return before this semantic-lifetime component can be promoted to runtime PASS.
+
+## 2026-10-07 — CONVERSION-DX9EX-00486 projected rank/rival anchor restoration
+
+**Status:** BUILD_VERIFIED / NEED_HMD_TEST  
+**Validation-bearing SHA:** `371d201666f1a92dbf840c386f52dbf3d6887187`  
+**Runtime regression source:** `ff94725406535793ff7615e69480f55dd4c0ca78`, session `20261006T151027454Z-8f9b3197`
+
+After CONVERSION-DX9EX-00485 restored cross-thread semantic lifetime, one independently identified R51 root-cause unit remained: the refactor line had removed the HMD-proven `ProjectedMarkerInfo` / Calc3D2D vehicle-relative anchor payload. Bare `WorldBillboard` ownership could identify a spatial marker, but it could not recover the original car-relative view point after the game flattened that point into 640x480 sprite coordinates.
+
+CONVERSION-DX9EX-00486 restores only this exact projected-marker path:
+
+- Calc3D2D return `0xBAEE7` recovers the rank-marker view-space point;
+- Calc3D2D return `0xBB6F5` recovers the exact rival-marker view-space point;
+- rank 1st-3rd, rank 4th+, and exact rival producer `0xBB796` select `ProjectedWorldMarker2D` only when the recovered payload is valid;
+- if capture is unavailable, those producers retain the current strict `WorldBillboard` fallback;
+- the shared SpriteNode semantic registry carries both the existing diagnostic `ProducerToken` and the projected payload;
+- Sumo no-tick replay preserves the payload on the fresh replay node;
+- R30 accepts only explicit `ProjectedWorldMarker2D` plus a valid payload and recomputes the marker for each eye using the matching latched head inverse, relative eye pose, and OpenXR eye projection;
+- `ProducerToken` remains diagnostic-only and generic untagged queue content remains `ScreenOverlay2D`;
+- lens flare, cadence/fence authority, DirectGPU transport, and R31/R32/R33 ownership are unchanged.
+
+A RED guard was wired first at `f52b46cbafbdb9ff312938d87a33e954e44ccdde`; DX9Ex Active `37500712481` policy job `112396689386` failed the new projected-marker contract before implementation as expected. Intermediate candidate validation exposed only verifier parsing defects; the final exact SHA `371d201666f1a92dbf840c386f52dbf3d6887187` passed DX9Ex Active `37501890269` policy `112400708582`, host `112400877237`, game `112400876869`, R33 full-chain `112400876972`, and package `112403111409`. Package artifact `11430925881` digest is `sha256:602cf4b8e27ec735dc6a047a1a002d3ac1f3ba8de4cf6ff5c0dc8271ea30304c`.
+
+This is automated/static/build evidence only. It does not prove that the rank/rival markers are visually attached to the same cars in Quest 3 / VDXR, nor that 4th/5th digits are binocularly coherent.
+
+`RUNTIME_VALIDATION=UNTESTED`. The next matching CORRECTNESS HMD session should validate the combined 00485 semantic-lifetime + 00486 projected-anchor restoration before any further visual promotion.
