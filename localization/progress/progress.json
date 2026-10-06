@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 06:47 KST",
+  "updated_at_kst": "2026-10-07 07:14 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -3466,5 +3466,20 @@
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_B/20261007-B-MANUALQA225-4D38BBB0/B225_4D38BBB0_REPORT.json",
     "controller": "localization/graphics/role_B/20261007-B-MANUALQA225-4D38BBB0/B225_CONTROLLER_FINAL_QA.json"
+  },
+  "a150_313db8cb": {
+    "run": "A150",
+    "timestamp_kst": "2026-10-07 07:14 KST",
+    "queue_index": 139,
+    "asset": "313DB8CB",
+    "trigger": "PRE_INGAME_016_SOURCE_RELATIVE_HIERARCHY_FALSE_NEGATIVE",
+    "prior_candidate_sha256": "c44a9ccd62e2b78fb17ec10f7a50a6de32dc1a0f84a44f2595b3e7ffaa0cc0ea",
+    "candidate_sha256": "50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7",
+    "rework": "TUNED/NORMAL short Hangul labels expanded semantically to 튜닝 사양/일반 사양 with native Black source-family treatment; widths 55/58 -> 121/120px inside 139/174px source bboxes",
+    "qa": "2/2 bbox/size/positive-margin PASS; final validator PASS; outside/alpha/protected=0; exact RGBA32 header/raw mirror_y; controller readable/row/raw PASS",
+    "producer_status": "A150_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }
