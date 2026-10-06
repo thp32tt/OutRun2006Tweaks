@@ -303,6 +303,15 @@ namespace outrun::vr::dx11
             std::uint64_t shaderInterfaceLinkHash{};
             std::uint64_t shaderInterfaceLinkerRevisionHash{};
             std::uint64_t shaderInterfaceSemanticContractHash{};
+            // R271 binds both source-attested R266 stage semantics plus R268
+            // linkage to the exact R239 programmable pair identity.
+            bool shaderSourceSemanticPairExact{};
+            std::uint64_t shaderSourceSemanticPairCacheKey{};
+            std::uint64_t shaderSourceSemanticPairHash{};
+            std::uint64_t shaderSourceSemanticReceiptRevisionHash{};
+            std::uint64_t shaderSourceSemanticContractHash{};
+            std::uint64_t shaderSourceVertexRegisterHash{};
+            std::uint64_t shaderSourcePixelRegisterHash{};
             bool shaderTranslationExact{};
             // R220: keep the shader activation-readiness boundary distinct
             // from translation implementation state. Programmable D3D9 shader
@@ -710,6 +719,20 @@ namespace outrun::vr::dx11
                 hash, sig.shaderInterfaceLinkerRevisionHash);
             hash = hash_mix(
                 hash, sig.shaderInterfaceSemanticContractHash);
+            hash = hash_mix(
+                hash, sig.shaderSourceSemanticPairExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderSourceSemanticPairCacheKey);
+            hash = hash_mix(
+                hash, sig.shaderSourceSemanticPairHash);
+            hash = hash_mix(
+                hash, sig.shaderSourceSemanticReceiptRevisionHash);
+            hash = hash_mix(
+                hash, sig.shaderSourceSemanticContractHash);
+            hash = hash_mix(
+                hash, sig.shaderSourceVertexRegisterHash);
+            hash = hash_mix(
+                hash, sig.shaderSourcePixelRegisterHash);
             hash = hash_mix(hash, sig.shaderIntrospectionComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderMixedPair ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderTranslationExact ? 1u : 0u);
@@ -1177,10 +1200,14 @@ namespace outrun::vr::dx11
             TShader* shader,
             bool vertexStage,
             ProgrammableShaderInterfaceSemantics*
-                interfaceSemanticsOut = nullptr) noexcept
+                interfaceSemanticsOut = nullptr,
+            ProgrammableShaderRegisterSemantics*
+                registerSemanticsOut = nullptr) noexcept
         {
             if (interfaceSemanticsOut)
                 *interfaceSemanticsOut = {};
+            if (registerSemanticsOut)
+                *registerSemanticsOut = {};
             ShaderFunctionSignature out{};
             out.present = shader != nullptr;
             if (!shader)
@@ -1250,6 +1277,8 @@ namespace outrun::vr::dx11
                 registerSemantics.decoderRevisionHash;
             out.registerSemanticContractHash =
                 registerSemantics.semanticContractHash;
+            if (registerSemanticsOut)
+                *registerSemanticsOut = registerSemantics;
 
             const auto interfaceSemantics =
                 decode_programmable_shader_interface_semantics(
@@ -1288,12 +1317,16 @@ namespace outrun::vr::dx11
             sig.fixedFunction = fixedFunction;
             ProgrammableShaderInterfaceSemantics vertexInterfaceSemantics{};
             ProgrammableShaderInterfaceSemantics pixelInterfaceSemantics{};
+            ProgrammableShaderRegisterSemantics vertexRegisterSemantics{};
+            ProgrammableShaderRegisterSemantics pixelRegisterSemantics{};
             sig.vertexShader =
                 inspect_shader_function(
-                    vertexShader, true, &vertexInterfaceSemantics);
+                    vertexShader, true, &vertexInterfaceSemantics,
+                    &vertexRegisterSemantics);
             sig.pixelShader =
                 inspect_shader_function(
-                    pixelShader, false, &pixelInterfaceSemantics);
+                    pixelShader, false, &pixelInterfaceSemantics,
+                    &pixelRegisterSemantics);
             const auto shaderInterfaceLinkage =
                 derive_programmable_shader_interface_linkage_evidence(
                     vertexInterfaceSemantics, pixelInterfaceSemantics);
@@ -1315,6 +1348,47 @@ namespace outrun::vr::dx11
             sig.shaderMixedPair =
                 shaderQueryComplete &&
                 ((vertexShader != nullptr) != (pixelShader != nullptr));
+
+            const ProgrammableShaderFunctionIdentity vertexIdentity{
+                sig.vertexShader.present,
+                sig.vertexShader.observed,
+                sig.vertexShader.byteSize,
+                sig.vertexShader.versionToken,
+                sig.vertexShader.hash,
+            };
+            const ProgrammableShaderFunctionIdentity pixelIdentity{
+                sig.pixelShader.present,
+                sig.pixelShader.observed,
+                sig.pixelShader.byteSize,
+                sig.pixelShader.versionToken,
+                sig.pixelShader.hash,
+            };
+            const auto programmablePairIdentity =
+                seal_programmable_shader_pair_cache_identity(
+                    shaderQueryComplete,
+                    sig.shaderMixedPair,
+                    vertexIdentity,
+                    pixelIdentity);
+            const auto sourceSemanticPair =
+                derive_programmable_shader_pair_source_semantic_evidence(
+                    programmablePairIdentity,
+                    vertexRegisterSemantics,
+                    pixelRegisterSemantics,
+                    shaderInterfaceLinkage);
+            sig.shaderSourceSemanticPairExact =
+                sourceSemanticPair.exact();
+            sig.shaderSourceSemanticPairCacheKey =
+                sourceSemanticPair.cacheKey;
+            sig.shaderSourceSemanticPairHash =
+                sourceSemanticPair.pairSemanticHash;
+            sig.shaderSourceSemanticReceiptRevisionHash =
+                sourceSemanticPair.receiptRevisionHash;
+            sig.shaderSourceSemanticContractHash =
+                sourceSemanticPair.semanticContractHash;
+            sig.shaderSourceVertexRegisterHash =
+                sourceSemanticPair.vertexRegisterSemanticsHash;
+            sig.shaderSourcePixelRegisterHash =
+                sourceSemanticPair.pixelRegisterSemanticsHash;
 
             // R80 starts fail-closed. R215 may promote only the later
             // fixed-function branch after its resource-dependent pixel
@@ -1827,6 +1901,21 @@ namespace outrun::vr::dx11
 
             if (inserted && unique <= DetailedSignatureLogCap)
             {
+                if (!sig.fixedFunction &&
+                    sig.vertexShader.present &&
+                    sig.pixelShader.present)
+                {
+                    spdlog::info(
+                        "VR DX11 R271 sourceSemanticPair: exact={} cacheKey=0x{:016X} pairHash=0x{:016X} vsRegisterHash=0x{:016X} psRegisterHash=0x{:016X} linkHash=0x{:016X} receiptRevision=0x{:016X} contract=0x{:016X}",
+                        sig.shaderSourceSemanticPairExact ? 1 : 0,
+                        sig.shaderSourceSemanticPairCacheKey,
+                        sig.shaderSourceSemanticPairHash,
+                        sig.shaderSourceVertexRegisterHash,
+                        sig.shaderSourcePixelRegisterHash,
+                        sig.shaderInterfaceLinkHash,
+                        sig.shaderSourceSemanticReceiptRevisionHash,
+                        sig.shaderSourceSemanticContractHash);
+                }
                 spdlog::info(
                     "VR DX11 R85 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] shader[introspection={},mixed={},exact={},vsPresent={},vsBytes={},vsVersion=0x{:08X},vsHash=0x{:016X},psPresent={},psBytes={},psVersion=0x{:08X},psHash=0x{:016X}] ffpCoverage[exact={}] ffpReadiness[ready={},mask=0x{:08X},activeStages={}] texMask[present=0x{:02X},exact=0x{:02X}] managedTexShadow[required=0x{:02X},ready=0x{:02X}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
                     unique,
