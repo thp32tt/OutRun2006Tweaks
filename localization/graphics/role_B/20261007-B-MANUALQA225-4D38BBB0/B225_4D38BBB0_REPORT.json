@@ -1,0 +1,631 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B225",
+  "queue_index": 154,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "trigger": "STRICT_PRE_INGAME_8_STEP_VISUAL_FALSE_NEGATIVE_HIERARCHY",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/020_q154_4D38BBB0.jpg",
+  "prior_c_status": "C141_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "before_sha256": "c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a",
+  "candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "defects": [
+    "RED_FAMILY_SOURCE_RELATIVE_WIDTH_TOO_WEAK",
+    "GRAY_FAMILY_SOURCE_RELATIVE_WIDTH_TOO_WEAK",
+    "SHOWROOM_CAPTION_LIKE_UNDERSIZING"
+  ],
+  "method": "exact pinned 4096x1024 RGBA32 source + C141 independently verified exact clean plate; all eight localizable labels rebuilt from fresh native Noto Sans CJK KR Bold at existing source-family heights/colors/strokes, source-left anchored, with moderate horizontal hierarchy restoration that remains below each exact source bbox; no old Korean bitmap upscaling; Ferrari artwork and protected regions unchanged",
+  "rows": [
+    {
+      "key": "create_new_license",
+      "source": "CREATE NEW LICENSE",
+      "korean": "새 라이선스 만들기",
+      "kind": "red",
+      "source_bbox": [
+        13,
+        548,
+        1954,
+        696
+      ],
+      "source_size": [
+        1941,
+        148
+      ],
+      "prior_bbox": [
+        15,
+        552,
+        1126,
+        692
+      ],
+      "prior_size": [
+        1111,
+        140
+      ],
+      "localized_bbox": [
+        15,
+        552,
+        1529,
+        692
+      ],
+      "localized_size": [
+        1514,
+        140
+      ],
+      "margins": [
+        2,
+        425,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.78,
+      "height_source_ratio": 0.9459,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 144,
+      "stroke_width": 2,
+      "fill_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        15,
+        552,
+        1529,
+        692
+      ],
+      "decoded_size": [
+        1514,
+        140
+      ],
+      "decoded_margins": [
+        2,
+        425,
+        4,
+        4
+      ]
+    },
+    {
+      "key": "select_license",
+      "source": "SELECT LICENSE",
+      "korean": "라이선스 선택",
+      "kind": "red",
+      "source_bbox": [
+        2007,
+        541,
+        3468,
+        689
+      ],
+      "source_size": [
+        1461,
+        148
+      ],
+      "prior_bbox": [
+        2009,
+        545,
+        2817,
+        685
+      ],
+      "prior_size": [
+        808,
+        140
+      ],
+      "localized_bbox": [
+        2009,
+        545,
+        3105,
+        685
+      ],
+      "localized_size": [
+        1096,
+        140
+      ],
+      "margins": [
+        2,
+        363,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.7502,
+      "height_source_ratio": 0.9459,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 144,
+      "stroke_width": 2,
+      "fill_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        2009,
+        545,
+        3105,
+        685
+      ],
+      "decoded_size": [
+        1096,
+        140
+      ],
+      "decoded_margins": [
+        2,
+        363,
+        4,
+        4
+      ]
+    },
+    {
+      "key": "single_player_red",
+      "source": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "kind": "red",
+      "source_bbox": [
+        12,
+        374,
+        1388,
+        522
+      ],
+      "source_size": [
+        1376,
+        148
+      ],
+      "prior_bbox": [
+        14,
+        378,
+        693,
+        518
+      ],
+      "prior_size": [
+        679,
+        140
+      ],
+      "localized_bbox": [
+        14,
+        378,
+        1005,
+        518
+      ],
+      "localized_size": [
+        991,
+        140
+      ],
+      "margins": [
+        2,
+        383,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.7202,
+      "height_source_ratio": 0.9459,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 144,
+      "stroke_width": 2,
+      "fill_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        14,
+        378,
+        1005,
+        518
+      ],
+      "decoded_size": [
+        991,
+        140
+      ],
+      "decoded_margins": [
+        2,
+        383,
+        4,
+        4
+      ]
+    },
+    {
+      "key": "default_license",
+      "source": "DEFAULT LICENSE",
+      "korean": "기본 라이선스",
+      "kind": "red",
+      "source_bbox": [
+        1772,
+        374,
+        3316,
+        522
+      ],
+      "source_size": [
+        1544,
+        148
+      ],
+      "prior_bbox": [
+        1774,
+        378,
+        2594,
+        518
+      ],
+      "prior_size": [
+        820,
+        140
+      ],
+      "localized_bbox": [
+        1774,
+        378,
+        2917,
+        518
+      ],
+      "localized_size": [
+        1143,
+        140
+      ],
+      "margins": [
+        2,
+        399,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.7403,
+      "height_source_ratio": 0.9459,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 144,
+      "stroke_width": 2,
+      "fill_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        1774,
+        378,
+        2917,
+        518
+      ],
+      "decoded_size": [
+        1143,
+        140
+      ],
+      "decoded_margins": [
+        2,
+        399,
+        4,
+        4
+      ]
+    },
+    {
+      "key": "multiplayer_red",
+      "source": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "kind": "red",
+      "source_bbox": [
+        15,
+        203,
+        1235,
+        347
+      ],
+      "source_size": [
+        1220,
+        144
+      ],
+      "prior_bbox": [
+        17,
+        205,
+        657,
+        345
+      ],
+      "prior_size": [
+        640,
+        140
+      ],
+      "localized_bbox": [
+        17,
+        205,
+        895,
+        345
+      ],
+      "localized_size": [
+        878,
+        140
+      ],
+      "margins": [
+        2,
+        340,
+        2,
+        2
+      ],
+      "width_source_ratio": 0.7197,
+      "height_source_ratio": 0.9722,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 144,
+      "stroke_width": 2,
+      "fill_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        17,
+        205,
+        895,
+        345
+      ],
+      "decoded_size": [
+        878,
+        140
+      ],
+      "decoded_margins": [
+        2,
+        340,
+        2,
+        2
+      ]
+    },
+    {
+      "key": "single_player_gray",
+      "source": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "kind": "gray",
+      "source_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "source_size": [
+        587,
+        64
+      ],
+      "prior_bbox": [
+        1612,
+        289,
+        1879,
+        347
+      ],
+      "prior_size": [
+        267,
+        58
+      ],
+      "localized_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "localized_size": [
+        411,
+        58
+      ],
+      "margins": [
+        2,
+        174,
+        3,
+        3
+      ],
+      "width_source_ratio": 0.7002,
+      "height_source_ratio": 0.9062,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 56,
+      "stroke_width": 2,
+      "fill_rgba": [
+        78,
+        96,
+        100,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "decoded_size": [
+        411,
+        58
+      ],
+      "decoded_margins": [
+        2,
+        174,
+        3,
+        3
+      ]
+    },
+    {
+      "key": "showroom_gray",
+      "source": "SHOWROOM",
+      "korean": "쇼룸",
+      "kind": "gray",
+      "source_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "source_size": [
+        420,
+        62
+      ],
+      "prior_bbox": [
+        2676,
+        291,
+        2780,
+        346
+      ],
+      "prior_size": [
+        104,
+        55
+      ],
+      "localized_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "localized_size": [
+        210,
+        55
+      ],
+      "margins": [
+        2,
+        208,
+        3,
+        4
+      ],
+      "width_source_ratio": 0.5,
+      "height_source_ratio": 0.8871,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 56,
+      "stroke_width": 2,
+      "fill_rgba": [
+        78,
+        96,
+        100,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "decoded_size": [
+        210,
+        55
+      ],
+      "decoded_margins": [
+        2,
+        208,
+        3,
+        4
+      ]
+    },
+    {
+      "key": "multiplayer_gray",
+      "source": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "kind": "gray",
+      "source_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "source_size": [
+        520,
+        62
+      ],
+      "prior_bbox": [
+        2568,
+        954,
+        2820,
+        1012
+      ],
+      "prior_size": [
+        252,
+        58
+      ],
+      "localized_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "localized_size": [
+        364,
+        58
+      ],
+      "margins": [
+        2,
+        154,
+        2,
+        2
+      ],
+      "width_source_ratio": 0.7,
+      "height_source_ratio": 0.9355,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 56,
+      "stroke_width": 2,
+      "fill_rgba": [
+        78,
+        96,
+        100,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "decoded_size": [
+        364,
+        58
+      ],
+      "decoded_margins": [
+        2,
+        154,
+        2,
+        2
+      ]
+    }
+  ],
+  "machine_qa": {
+    "bbox_source_size_positive_margin": "8/8 PASS",
+    "candidate_changes_outside_selected_source_bboxes": 0,
+    "alpha_changes_outside_selected_source_bboxes": 0,
+    "protected_visible_changed": 0,
+    "artwork_changed": 0,
+    "localized_overlap_pixels": 0,
+    "header_128_exact": true,
+    "raw_mode": "RGBA",
+    "raw_orientation": "mirror_y",
+    "roundtrip": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_C141_EXACT_CLEAN_REUSED_AND_REVALIDATED",
+    "2_slant_direction": "PASS_SOURCE_UPRIGHT_FAMILY",
+    "3_no_unnecessary_undersizing": "PASS_MATERIAL_HORIZONTAL_HIERARCHY_RESTORATION",
+    "4_source_weight_outline_shadow": "PASS_SHARED_RED_AND_GRAY_SOURCE_FAMILIES",
+    "5_no_clipping": "PASS_8_OF_8_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_PROTECTED_OR_FERRARI_ARTWORK_CHANGE",
+    "7_flip_y_raw": "PASS_RAW_EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "B225_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

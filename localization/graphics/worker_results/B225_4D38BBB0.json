@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "B225",
+  "queue_index": 154,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+  "report": "localization/graphics/role_B/20261007-B-MANUALQA225-4D38BBB0/B225_4D38BBB0_REPORT.json",
+  "status": "B225_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "runtime_validation": "UNTESTED"
+}
