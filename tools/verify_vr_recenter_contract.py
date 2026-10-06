@@ -106,7 +106,36 @@ require_order(
     "::xrDestroySpace(previous)",
 )
 
+requester_owner = body(
+    r26, "inline bool RequesterMatchesCurrentGameProcess(")
+require_order(
+    requester_owner,
+    "game recenter requester process ownership",
+    "OutRunVrSbsCaptureOverride::FindGamePid()",
+    "requesterPid != 0",
+    "currentGamePid != 0",
+    "requesterPid == currentGamePid",
+)
+discard_stale = body(r26, "inline void DiscardStaleGameRequest(")
+require_order(
+    discard_stale,
+    "stale game recenter request disposal",
+    "channel.MarkReceived(requestId);",
+    "++StaleGameRequestsDropped;",
+    "FirstStaleGameRequestLogged = true;",
+)
+
 poll = body(r26, "inline XrResult XRAPI_CALL PollEvent(")
+require_order(
+    poll,
+    "game recenter requester validation before ownership",
+    "if (channel.Pending(requestId, requesterPid))",
+    "DWORD currentGamePid = 0;",
+    "if (!RequesterMatchesCurrentGameProcess(",
+    "if (!requesterPid || currentGamePid != 0)",
+    "DiscardStaleGameRequest(",
+    "const std::uint64_t targetGeneration =",
+)
 require_order(
     poll,
     "game recenter receive",

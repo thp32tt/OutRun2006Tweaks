@@ -1,0 +1,73 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00444",
+  "production_id": "CONVERSION-DX9EX-00444",
+  "event_id": "CONVERSION-DX9EX-00444-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "VALIDATION_PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "d90b24a3a4dfdbd5e0e4b68925b0d3b8444e4589",
+  "material_result_sha": "PENDING_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_COMMIT_SHA",
+  "result_sha": "PENDING_COMMIT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00444]",
+  "selected_work_item": "VR-DX9EX-R26-RECENTER-REQUESTER-PID-GUARD-0027",
+  "summary": "Reject stale or malformed F10 recenter IPC requests before R26 accepts ownership by matching requesterPid to the live OR2006C2C process.",
+  "changed_paths": [
+    "vrhost/src/runtime/r26_recenter_hardening.hpp",
+    "tools/verify_vr_recenter_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00444.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered 00443 bookkeeping HEAD d90b24a3a4dfdbd5e0e4b68925b0d3b8444e4589. VR_REFACTOR_STATE still marks the post-1100 structural extraction chain terminal; 00443 exact-SHA validation is PASS."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R26 read requesterPid from the F10 IPC channel but accepted every pending request without proving that the requester was the currently live OR2006C2C process. A host-surviving fast game restart could therefore consume a stale request from the replaced process."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added live-game PID ownership predicate and stale-request discard path. Temporary inability to enumerate the game leaves the request pending; zero/mismatched requester PID is consumed without queueing a recenter."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Awaiting exact-SHA GitHub Actions gates."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_RESULT_SHA",
+      "task_tagged_commits": [],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING_AUTOMATION_ARTIFACT"
+    },
+    "C6_STATE": {
+      "status": "PENDING_VALIDATION_EVIDENCE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "red_probe": {
+      "base_sha": "d90b24a3a4dfdbd5e0e4b68925b0d3b8444e4589",
+      "result": "FAIL_AS_EXPECTED",
+      "missing_contract": "R26 requesterPid was not validated against the currently live game process before recenter ownership."
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Validate the exact material SHA with DX9Ex Active Validation and Domain Isolation Guard, then finalize the run record and Issue #14 ledger.",
+  "started_at_kst": "2026-10-06T09:48:26+09:00"
+}

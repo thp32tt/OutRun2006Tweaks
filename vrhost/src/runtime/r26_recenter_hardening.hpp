@@ -43,9 +43,11 @@ namespace OutRunVrR26RecenterHardening
     inline std::uint64_t FocusRecentersQueued = 0;
     inline std::uint64_t GameRequestsReceived = 0;
     inline std::uint64_t GameRequestsApplied = 0;
+    inline std::uint64_t StaleGameRequestsDropped = 0;
     inline std::uint64_t AnchoredStartupFallbacks = 0;
     inline bool FirstReferenceChangeLogged = false;
     inline bool FirstFocusRecenterLogged = false;
+    inline bool FirstStaleGameRequestLogged = false;
     inline bool FirstAnchoredFallbackLogged = false;
 
     inline XrVector3f RotateVector(const XrQuaternionf& q,
@@ -232,6 +234,31 @@ namespace OutRunVrR26RecenterHardening
         std::memcpy(eventData, &synthetic, sizeof(synthetic));
     }
 
+    inline bool RequesterMatchesCurrentGameProcess(
+        DWORD requesterPid, DWORD& currentGamePid) noexcept
+    {
+        currentGamePid = OutRunVrSbsCaptureOverride::FindGamePid();
+        return requesterPid != 0 && currentGamePid != 0 &&
+            requesterPid == currentGamePid;
+    }
+
+    inline void DiscardStaleGameRequest(
+        OutRunVR::RecenterIpc::Channel& channel,
+        LONG requestId, DWORD requesterPid, DWORD currentGamePid) noexcept
+    {
+        channel.MarkReceived(requestId);
+        ++StaleGameRequestsDropped;
+        if (!FirstStaleGameRequestLogged)
+        {
+            FirstStaleGameRequestLogged = true;
+            std::cerr
+                << "[R28 recenter] stale F10 request discarded requestId="
+                << requestId << " requesterPid=" << requesterPid
+                << " currentGamePid=" << currentGamePid
+                << "; request owner is not the live OR2006C2C process\n";
+        }
+    }
+
     inline XrResult XRAPI_CALL PollEvent(XrInstance instance,
         XrEventDataBuffer* eventData) noexcept
     {
@@ -242,23 +269,38 @@ namespace OutRunVrR26RecenterHardening
             auto& channel = OutRunVR::RecenterIpc::SharedChannel();
             if (channel.Pending(requestId, requesterPid))
             {
-                // Received means only that the host accepted ownership. Applied
-                // is deliberately deferred until EndFrame succeeds after the
-                // LOCAL anchor invalidation/rebuild cycle.
-                const std::uint64_t targetGeneration =
-                    ApplicationSpaceGeneration.load(std::memory_order_acquire) + 1;
-                PendingGameTargetGeneration.store(
-                    targetGeneration, std::memory_order_release);
-                QueueApplicationRecenter();
-                WriteSyntheticLocalChange(eventData, XR_NULL_HANDLE);
-                channel.MarkReceived(requestId);
-                PendingGameRequestId.store(requestId, std::memory_order_release);
-                ++GameRequestsReceived;
-                std::cerr
-                    << "[R28 recenter] F10 request received requestId="
-                    << requestId << " pid=" << requesterPid
-                    << "; pending until visible post-reanchor submission\n";
-                return XR_SUCCESS;
+                DWORD currentGamePid = 0;
+                if (!RequesterMatchesCurrentGameProcess(
+                        requesterPid, currentGamePid))
+                {
+                    // A missing process snapshot can be transient during
+                    // startup, so leave that request pending for a later poll.
+                    // A zero requester or a different live game PID is stale
+                    // and must not recenter a replacement game process.
+                    if (!requesterPid || currentGamePid != 0)
+                        DiscardStaleGameRequest(
+                            channel, requestId, requesterPid, currentGamePid);
+                }
+                else
+                {
+                    // Received means only that the host accepted ownership. Applied
+                    // is deliberately deferred until EndFrame succeeds after the
+                    // LOCAL anchor invalidation/rebuild cycle.
+                    const std::uint64_t targetGeneration =
+                        ApplicationSpaceGeneration.load(std::memory_order_acquire) + 1;
+                    PendingGameTargetGeneration.store(
+                        targetGeneration, std::memory_order_release);
+                    QueueApplicationRecenter();
+                    WriteSyntheticLocalChange(eventData, XR_NULL_HANDLE);
+                    channel.MarkReceived(requestId);
+                    PendingGameRequestId.store(requestId, std::memory_order_release);
+                    ++GameRequestsReceived;
+                    std::cerr
+                        << "[R28 recenter] F10 request received requestId="
+                        << requestId << " pid=" << requesterPid
+                        << "; pending until visible post-reanchor submission\n";
+                    return XR_SUCCESS;
+                }
             }
         }
 

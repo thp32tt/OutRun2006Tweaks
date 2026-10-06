@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T09:31:00+09:00",
+  "updatedKst": "2026-10-06T09:48:26+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -88,7 +88,8 @@
     "VR-DX9EX-R19-STEREO-CACHE-RUN-IDENTITY-0023",
     "VR-DX9EX-R23-BUNDLE-CURRENT-RUN-IDENTITY-0024",
     "VR-DX9EX-R24-DISPLAY-GRACE-CURRENT-RUN-0025",
-    "VR-DX9EX-R26-SESSION-STATE-RESET-0026"
+    "VR-DX9EX-R26-SESSION-STATE-RESET-0026",
+    "VR-DX9EX-R26-RECENTER-REQUESTER-PID-GUARD-0027"
   ],
   "next": "Post-1100 R31/R32 neutral-helper extraction chain COMPLETE. Preserve the terminal 15-call owner census and owner-evidence map. Subsequent DX9Ex work may return to the highest executable general quality/performance/stability item; do not reopen structural extraction unless the census/verifier or new source evidence shows a real ownership regression.",
   "runtimeValidation": "UNTESTED",
@@ -202,7 +203,8 @@
     "CONVERSION-DX9EX-00440 / VR-DX9EX-R19-STEREO-CACHE-RUN-IDENTITY-0023 scopes R19's LastStereoFrame fallback cache to Frame.v2 producer run generation + game PID. If the host survives a fast game-process restart, observing any new-run Frame.v2 (even before it becomes stereo-complete) immediately invalidates the prior run's cached gameplay frame instead of allowing the old frame to remain gameplay-authoritative for the 500ms grace window. Zero/invalid run identity fails closed. Runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00441 / VR-DX9EX-R23-BUNDLE-CURRENT-RUN-IDENTITY-0024 binds R23 verified-bundle freshness to the currently published Frame.v2 producer run (run generation + game PID). Newer frames from the same run remain valid under the existing 1000ms presentation grace, but once any new game run publishes Frame.v2 the prior run's committed classic/direct bundle fails fresh-read immediately instead of remaining reusable by R23/R24/R32. Runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00442 / VR-DX9EX-R24-DISPLAY-GRACE-CURRENT-RUN-0025 closes the R24 soft-grace bypass around R23 ReadFresh current-run ownership. ReadDisplayGraceSnapshot still preserves the existing display-only age/internal-consistency checks but now also requires BelongsToCurrentProducerRun(out), so a prior game run's committed classic/direct bundle cannot be revived through the raw Read() grace path after a fast producer restart. Runtime remains UNTESTED pending Quest3/VDXR.",
-    "CONVERSION-DX9EX-00443 / VR-DX9EX-R26-SESSION-STATE-RESET-0026 makes R26 recenter ownership explicitly OpenXR-session scoped. xrDestroySession now clears pending focus/game requests, pending application recenter state, per-session application/target generations and the fallback LOCAL anchor before forwarding into R24 teardown, preventing a recreated session in the same host process from inheriting stale recenter intent. Runtime remains UNTESTED pending Quest3/VDXR."
+    "CONVERSION-DX9EX-00443 / VR-DX9EX-R26-SESSION-STATE-RESET-0026 makes R26 recenter ownership explicitly OpenXR-session scoped. xrDestroySession now clears pending focus/game requests, pending application recenter state, per-session application/target generations and the fallback LOCAL anchor before forwarding into R24 teardown, preventing a recreated session in the same host process from inheriting stale recenter intent. Runtime remains UNTESTED pending Quest3/VDXR.",
+    "CONVERSION-DX9EX-00444 / VR-DX9EX-R26-RECENTER-REQUESTER-PID-GUARD-0027 validates each pending F10 IPC requester PID against the currently live OR2006C2C process before R26 accepts ownership or queues an application-space recenter. A zero requester or a request from a replaced game process is acknowledged-and-discarded without injecting a LOCAL change; temporary process-enumeration absence leaves the request pending for a later poll. Runtime remains UNTESTED pending Quest3/VDXR."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
