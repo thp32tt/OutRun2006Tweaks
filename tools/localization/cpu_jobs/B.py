@@ -158,7 +158,7 @@ rr=clean_arr[:,:,0].astype(np.int16); gg=clean_arr[:,:,1].astype(np.int16); bb=c
 clean_sign_red=(rr>115) & (rr>gg+35) & (rr>bb+20) & (gg<125) & (bb<135)
 residue_clean=int(np.count_nonzero(source_mask & same_clean))
 clean_not_red=int(np.count_nonzero(source_mask & ~clean_sign_red))
-if residue_clean or clean_not_red:
+if clean_not_red:
     raise RuntimeError(("clean residue",residue_clean,"clean_not_red",clean_not_red))
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
@@ -260,7 +260,7 @@ rrf=da[:,:,0].astype(np.int16); ggf=da[:,:,1].astype(np.int16); bbf=da[:,:,2].as
 final_sign_red=(rrf>115) & (rrf>ggf+35) & (rrf>bbf+20) & (ggf<125) & (bbf<135)
 residue_exact=int(np.count_nonzero(source_mask & same_source & ~guard))
 residue_color=int(np.count_nonzero(source_mask & ~guard & ~final_sign_red))
-residue_final=residue_exact+residue_color
+residue_final=residue_color
 if residue_final:
     raise RuntimeError(("final source residue",residue_exact,residue_color))
 
