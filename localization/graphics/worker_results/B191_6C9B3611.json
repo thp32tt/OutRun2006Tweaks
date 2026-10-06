@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "20261006-B-PRODUCTION191-6C9B3611-START-GOAL",
+  "queue_index": 172,
+  "asset": "6C9B3611",
+  "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+  "candidate_sha256": "963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc",
+  "report": "localization/graphics/role_B/20261006-B-PRODUCTION191-6C9B3611-START-GOAL/B191_6C9B3611_REPORT.json",
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
+}
