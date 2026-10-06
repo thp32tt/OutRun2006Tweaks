@@ -1,0 +1,278 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B219",
+  "queue_index": 232,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "trigger": "MANUAL_PRE_INGAME_8_STEP_VISUAL_FALSE_NEGATIVE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/060_q232_EBFC709F.jpg",
+  "prior_c_status": "C135_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "defects": [
+    "SOURCE_LEFT_ALIGNMENT_MISMATCH",
+    "SOURCE_WEIGHT_HIERARCHY_WEAKENED"
+  ],
+  "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+  "before_sha256": "7404fa227035e2fa003f4fa13f1bd348a050317757d7761c9d638f5fc1a01da4",
+  "candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
+  "method": "exact pinned source + C135 independently validated clean plate; fresh native Noto Sans CJK KR Bold; maximum safe per-row height; source-left anchor; C135-visible palette retained; no bitmap upscaling",
+  "rows": [
+    {
+      "key": "join_small",
+      "source": "JOIN GAME",
+      "ko": "게임 참가",
+      "bbox": [
+        14,
+        287,
+        418,
+        350
+      ],
+      "old_bbox": [
+        100,
+        289,
+        331,
+        348
+      ],
+      "family": "small",
+      "source_size": [
+        404,
+        63
+      ],
+      "old_size": [
+        231,
+        59
+      ],
+      "localized_bbox": [
+        16,
+        289,
+        256,
+        348
+      ],
+      "localized_size": [
+        240,
+        59
+      ],
+      "margins": [
+        2,
+        162,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 62,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "alignment": "source_left",
+      "height_utilization": 0.9365,
+      "width_gain_px": 9,
+      "height_gain_px": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "create_small",
+      "source": "CREATE GAME",
+      "ko": "게임 만들기",
+      "bbox": [
+        898,
+        291,
+        1420,
+        354
+      ],
+      "old_bbox": [
+        1019,
+        293,
+        1298,
+        352
+      ],
+      "family": "small",
+      "source_size": [
+        522,
+        63
+      ],
+      "old_size": [
+        279,
+        59
+      ],
+      "localized_bbox": [
+        900,
+        293,
+        1192,
+        352
+      ],
+      "localized_size": [
+        292,
+        59
+      ],
+      "margins": [
+        2,
+        228,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 62,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "alignment": "source_left",
+      "height_utilization": 0.9365,
+      "width_gain_px": 13,
+      "height_gain_px": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "create_large",
+      "source": "CREATE GAME",
+      "ko": "게임 만들기",
+      "bbox": [
+        24,
+        695,
+        1245,
+        840
+      ],
+      "old_bbox": [
+        315,
+        702,
+        954,
+        833
+      ],
+      "family": "large",
+      "source_size": [
+        1221,
+        145
+      ],
+      "old_size": [
+        639,
+        131
+      ],
+      "localized_bbox": [
+        26,
+        697,
+        730,
+        838
+      ],
+      "localized_size": [
+        704,
+        141
+      ],
+      "margins": [
+        2,
+        515,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 150,
+      "fill_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "alignment": "source_left",
+      "height_utilization": 0.9724,
+      "width_gain_px": 65,
+      "height_gain_px": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "join_large",
+      "source": "JOIN GAME",
+      "ko": "게임 참가",
+      "bbox": [
+        9,
+        874,
+        979,
+        1019
+      ],
+      "old_bbox": [
+        230,
+        881,
+        757,
+        1012
+      ],
+      "family": "large",
+      "source_size": [
+        970,
+        145
+      ],
+      "old_size": [
+        527,
+        131
+      ],
+      "localized_bbox": [
+        11,
+        876,
+        590,
+        1017
+      ],
+      "localized_size": [
+        579,
+        141
+      ],
+      "margins": [
+        2,
+        389,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 150,
+      "fill_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "alignment": "source_left",
+      "height_utilization": 0.9724,
+      "width_gain_px": 52,
+      "height_gain_px": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_qa": {
+    "bbox_size_positive_margin": "4/4 PASS",
+    "changed_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "clean_plate_provenance": "C135_INDEPENDENT_VALIDATED",
+    "header_128_exact": true,
+    "raw_mode": "BGRA",
+    "raw_orientation": "mirror_y"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_INHERITED_C135_INDEPENDENT_CLEAN_PLATE",
+    "2_slant_direction": "PASS_SOURCE_UPRIGHT",
+    "3_no_unnecessary_undersizing": "PASS_MAX_SAFE_HEIGHT_PER_ROW",
+    "4_source_weight_effect": "PASS_NATIVE_BOLD_FLAT_SOURCE_FAMILY_PENDING_CONTROLLER",
+    "5_no_clipping": "PASS_4_OF_4_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_FINAL_CHANGE_OUTSIDE_EXACT_SOURCE_BBOXES",
+    "7_flip_y_raw": "PASS_EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "B219_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
