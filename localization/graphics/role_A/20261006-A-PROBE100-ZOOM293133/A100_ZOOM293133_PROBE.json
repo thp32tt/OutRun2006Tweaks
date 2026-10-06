@@ -1,0 +1,174 @@
+{
+  "run": "20261006-A-PROBE100-ZOOM293133",
+  "items": [
+    {
+      "queue_index": 29,
+      "folder": "spr_sprani_CLAR_RANK_Exst",
+      "asset": "F043316B_1024x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_CLAR_RANK_Exst/F043316B_1024x512.dds",
+      "width": 1024,
+      "height": 512,
+      "mips": 1,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "bpp": 32,
+      "masks": [
+        "0xff0000",
+        "0xff00",
+        "0xff",
+        "0xff000000"
+      ],
+      "pitch_or_linear": 4096,
+      "sha256": "5eec2b8dd7796c6dfaa19ceb58cef699c1d62a475eb827a270fcd1ee45b74b96",
+      "bytes": 2097280,
+      "component_count": 3,
+      "components": [
+        {
+          "bbox": [
+            285,
+            208,
+            600,
+            512
+          ],
+          "area": 47909
+        },
+        {
+          "bbox": [
+            615,
+            194,
+            857,
+            512
+          ],
+          "area": 46431
+        },
+        {
+          "bbox": [
+            10,
+            163,
+            265,
+            512
+          ],
+          "area": 46286
+        }
+      ]
+    },
+    {
+      "queue_index": 31,
+      "folder": "spr_sprani_FLAG_RANK_Exst",
+      "asset": "A82266FC_1024x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_FLAG_RANK_Exst/A82266FC_1024x512.dds",
+      "width": 4096,
+      "height": 2048,
+      "mips": 1,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "bpp": 32,
+      "masks": [
+        "0xff",
+        "0xff00",
+        "0xff0000",
+        "0xff000000"
+      ],
+      "pitch_or_linear": 16384,
+      "sha256": "47de72b0fbd4f36e290a29233ff84ce0324711544debabbab6ba103d09ef1487",
+      "bytes": 33554560,
+      "component_count": 5,
+      "components": [
+        {
+          "bbox": [
+            12,
+            648,
+            1072,
+            2048
+          ],
+          "area": 1057984
+        },
+        {
+          "bbox": [
+            1096,
+            648,
+            2172,
+            2048
+          ],
+          "area": 997456
+        },
+        {
+          "bbox": [
+            2256,
+            700,
+            3172,
+            2048
+          ],
+          "area": 885104
+        },
+        {
+          "bbox": [
+            3351,
+            1705,
+            3679,
+            2030
+          ],
+          "area": 73759
+        },
+        {
+          "bbox": [
+            0,
+            336,
+            120,
+            456
+          ],
+          "area": 14400
+        }
+      ]
+    },
+    {
+      "queue_index": 33,
+      "folder": "spr_sprani_FLAG_RANK_Exst",
+      "asset": "FBCAB18D_1024x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_FLAG_RANK_Exst/FBCAB18D_1024x512.dds",
+      "width": 1024,
+      "height": 512,
+      "mips": 1,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "bpp": 32,
+      "masks": [
+        "0xff",
+        "0xff00",
+        "0xff0000",
+        "0xff000000"
+      ],
+      "pitch_or_linear": 4096,
+      "sha256": "37768ef1f3af648a668bdb35c0ca3e6ee706b53cf726a98bac0f28108a1ab8b7",
+      "bytes": 2097280,
+      "component_count": 3,
+      "components": [
+        {
+          "bbox": [
+            315,
+            147,
+            593,
+            512
+          ],
+          "area": 69642
+        },
+        {
+          "bbox": [
+            614,
+            172,
+            885,
+            512
+          ],
+          "area": 61307
+        },
+        {
+          "bbox": [
+            2,
+            171,
+            310,
+            512
+          ],
+          "area": 58502
+        }
+      ]
+    }
+  ],
+  "status": "A100_SOURCE_PROBE_BATCH_COMPLETE_CONTROLLER_CLASSIFICATION_REQUIRED"
+}
