@@ -89,37 +89,41 @@ for sp in specs:
     banner &= a
     dist_in=ndimage.distance_transform_edt(banner)
 
-    # The source letters are the pale/yellow/orange islands inside the red sign body.
-    text=(banner & (dist_in>=2.0) & (r>150) & (g>58) & (b>35) & ((g-b)>10))
-    text=ndimage.binary_opening(text,iterations=1)
-    # Recover tiny AA/shadow islands immediately adjacent to the main pale letters.
-    core=ndimage.binary_dilation(text,iterations=1)
-    aa=(banner & (dist_in>=1.5) & (r>135) & (g>42) & (b>25) & ((r-g)<175))
-    text |= (aa & core)
+    # Isolate the complete source glyph/effect footprint as every non-sign-red
+    # pixel inside the red sign interior. This captures pale fill, orange shadow,
+    # AA fringe and source-shaped effect pixels without swallowing the white rim.
+    sign_red=(r>125) & (r>g+45) & (r>b+30) & (g<105) & (b<120)
+    interior=ndimage.binary_erosion(banner,iterations=1,border_value=0)
+    effect=interior & ~sign_red
+    effect=ndimage.binary_dilation(effect,iterations=1) & banner
 
-    # Reject disconnected incidental art; retain text-sized components inside the sign.
-    tlab,tn=ndimage.label(text)
-    kept=np.zeros_like(text)
+    elab,en=ndimage.label(effect)
+    kept=np.zeros_like(effect)
     comp_meta=[]
-    for i in range(1,tn+1):
-        c=(tlab==i)
+    for i in range(1,en+1):
+        c=(elab==i)
         area=int(c.sum())
-        if area<4: continue
+        if area<3: continue
         yy,xx=np.nonzero(c)
         cb=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
         comp_meta.append((area,cb))
         kept|=c
-    text=kept
-    if int(text.sum())<80: raise RuntimeError(("text mask too small",sp["key"],int(text.sum()),comp_meta))
+    effect=kept
+    if int(effect.sum())<150:
+        raise RuntimeError(("effect mask too small",sp["key"],int(effect.sum()),comp_meta))
 
-    gm=np.zeros((H,W),bool); gm[y0:y1,x0:x1]=text
+    gm=np.zeros((H,W),bool); gm[y0:y1,x0:x1]=effect
     bm=np.zeros((H,W),bool); bm[y0:y1,x0:x1]=banner
     sb=bbox(gm)
     bb=bbox(bm)
-    if sb is None or bb is None: raise RuntimeError(("empty bbox",sp["key"]))
-    # Guard against accidentally classifying the full red banner as text.
-    if (sb[2]-sb[0])>(bb[2]-bb[0])*0.92 or (sb[3]-sb[1])>(bb[3]-bb[1])*0.88:
-        raise RuntimeError(("text/banner separation unsafe",sp["key"],sb,bb))
+    if sb is None or bb is None:
+        raise RuntimeError(("empty bbox",sp["key"]))
+    bw=bb[2]-bb[0]; bh=bb[3]-bb[1]
+    sw=sb[2]-sb[0]; sh=sb[3]-sb[1]
+    if sw>bw*0.95 or sh>bh*0.92:
+        raise RuntimeError(("text/banner separation unsafe",sp["key"],sb,bb,sw/bw,sh/bh))
+    if sb[0]<=bb[0] or sb[1]<=bb[1] or sb[2]>=bb[2] or sb[3]>=bb[3]:
+        raise RuntimeError(("text touches banner edge",sp["key"],sb,bb))
     source_masks.append(gm)
     banner_masks.append(bm)
     rows.append({**sp,"source_bbox":sb,"banner_bbox":bb,"source_text_pixels":int(gm.sum()),
@@ -128,57 +132,34 @@ for sp in specs:
 source_mask=np.zeros((H,W),bool)
 for m in source_masks:
     source_mask |= m
-if np.count_nonzero(source_masks[0]&source_masks[1]): raise RuntimeError("source masks overlap")
-
-# The source lettering occupies almost the full sign interior and includes pale fill,
-# orange shadow, AA and source-shaped red effect pixels. Reconstruct the complete
-# measured source-text bbox (still strictly inside the red sign body) instead of
-# erasing only bright glyph cores; this prevents visible English ghost silhouettes.
-clean_masks=[]
-clean_region=np.zeros((H,W),bool)
-for row,bm in zip(rows,banner_masks):
-    x0,y0,x1,y1=row["source_bbox"]
-    cm=np.zeros((H,W),bool)
-    cm[y0:y1,x0:x1]=True
-    cm &= bm
-    if int(cm.sum()) < (x1-x0)*(y1-y0)*0.85:
-        raise RuntimeError(("clean region clipped by banner",row["key"],int(cm.sum()),row["source_bbox"]))
-    clean_masks.append(cm)
-    clean_region |= cm
+if np.count_nonzero(source_masks[0]&source_masks[1]):
+    raise RuntimeError("source masks overlap")
+clean_region=source_mask.copy()
+for row,sm in zip(rows,source_masks):
     row["clean_region_bbox"]=row["source_bbox"]
-    row["clean_region_pixels"]=int(cm.sum())
+    row["clean_region_pixels"]=int(sm.sum())
 
-# Rebuild that flat/gradient red sign background using row-local red donors from the
-# same sign. Every pixel outside the measured source-text bbox remains source-exact.
+# Clean only the measured source glyph/effect footprint using nearest saturated
+# red donors from the same sign. Everything outside that footprint stays exact.
 clean_arr=sa.copy()
-for row,cm,bm in zip(rows,clean_masks,banner_masks):
-    rr=sa[:,:,0].astype(np.int16); gg=sa[:,:,1].astype(np.int16); bb=sa[:,:,2].astype(np.int16)
-    red_donor=bm & ~cm & (rr>120) & (rr>gg+45) & (rr>bb+30) & (gg<115)
+rr0=sa[:,:,0].astype(np.int16); gg0=sa[:,:,1].astype(np.int16); bb0=sa[:,:,2].astype(np.int16)
+for row,sm,bm in zip(rows,source_masks,banner_masks):
+    red_donor=bm & ~sm & (rr0>125) & (rr0>gg0+45) & (rr0>bb0+30) & (gg0<105) & (bb0<120)
     if int(red_donor.sum())<80:
         raise RuntimeError(("red donor too small",row["key"],int(red_donor.sum())))
-    global_med=np.median(sa[red_donor],axis=0)
-    ys=np.unique(np.nonzero(cm)[0])
-    for y in ys:
-        xs=np.nonzero(cm[y])[0]
-        row_donor=np.nonzero(red_donor[y])[0]
-        if len(row_donor)>=2:
-            med=np.median(sa[y,row_donor],axis=0)
-        else:
-            med=global_med
-        clean_arr[y,xs]=np.clip(np.rint(med),0,255).astype(np.uint8)
-    clean_arr[:,:,3][cm]=255
+    _,inds=ndimage.distance_transform_edt(~red_donor,return_indices=True)
+    yy,xx=inds
+    for ch in range(4):
+        clean_arr[:,:,ch][sm]=sa[:,:,ch][yy[sm],xx[sm]]
 
 clean=Image.fromarray(clean_arr,"RGBA")
-# Clean-plate residue gate: the entire reconstructed text bbox must classify
-# as the sign-red background. Exact RGB equality is only diagnostic because
-# a donor red can legitimately equal a pre-existing red pixel by coincidence.
-unchanged=np.all(clean_arr==sa,axis=2)
+same_clean=np.all(clean_arr==sa,axis=2)
 rr=clean_arr[:,:,0].astype(np.int16); gg=clean_arr[:,:,1].astype(np.int16); bb=clean_arr[:,:,2].astype(np.int16)
-sign_red=(rr>95) & (rr>gg+25) & (rr>bb+15) & (gg<145)
-residue_clean=int(np.count_nonzero(clean_region & unchanged))
-clean_not_red=int(np.count_nonzero(clean_region & ~sign_red))
-if clean_not_red:
-    raise RuntimeError(("clean_not_red",clean_not_red,"unchanged_red_diagnostic",residue_clean))
+clean_sign_red=(rr>115) & (rr>gg+35) & (rr>bb+20) & (gg<125) & (bb<135)
+residue_clean=int(np.count_nonzero(source_mask & same_clean))
+clean_not_red=int(np.count_nonzero(source_mask & ~clean_sign_red))
+if residue_clean or clean_not_red:
+    raise RuntimeError(("clean residue",residue_clean,"clean_not_red",clean_not_red))
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
 subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
@@ -271,13 +252,18 @@ introduced=int(np.count_nonzero((da[:,:,3]>8)&(sa[:,:,3]<=8)&~allowed))
 if outside or alpha_out or protected_changed or introduced:
     raise RuntimeError(("static outside gate",outside,alpha_out,protected_changed,introduced))
 
-# Final residue gate: all reconstructed source-text pixels not occupied by
-# Hangul/effect must remain sign-red; any pale/source-shaped ghost is a failure.
+# Final residue gate: no source effect pixel may survive outside the new
+# Hangul/effect guard, and the exposed clean background must remain sign-red.
 guard=ndimage.binary_dilation(target,iterations=2)
+same_source=np.all(da==sa,axis=2)
 rrf=da[:,:,0].astype(np.int16); ggf=da[:,:,1].astype(np.int16); bbf=da[:,:,2].astype(np.int16)
-final_sign_red=(rrf>95) & (rrf>ggf+25) & (rrf>bbf+15) & (ggf<145)
-residue_final=int(np.count_nonzero(clean_region & ~guard & ~final_sign_red))
-if residue_final: raise RuntimeError(("final source residue",residue_final))
+final_sign_red=(rrf>115) & (rrf>ggf+35) & (rrf>bbf+20) & (ggf<125) & (bbf<135)
+residue_exact=int(np.count_nonzero(source_mask & same_source & ~guard))
+residue_color=int(np.count_nonzero(source_mask & ~guard & ~final_sign_red))
+residue_final=residue_exact+residue_color
+if residue_final:
+    raise RuntimeError(("final source residue",residue_exact,residue_color))
+
 
 # Evidence.
 src.save(out/"B182_SOURCE_READABLE.png")
@@ -335,7 +321,7 @@ report={
  "source_provenance":{"url":url,"sha256":SOURCE_SHA},
  "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":MIPS,
    "header_128_exact":payload[:128]==raw[:128],"raw_orientation":"mirror_y"},
- "construction":"red-banner source text measured from exact glyph/effect bbox; the complete measured bbox is reconstructed from row-local sign-red donors to remove all English ghost silhouettes while preserving the white banner rim and all map/logo artwork; native Hangul uses natural advance + 0.17 source-family shear + sampled pale face/orange shadow.",
+ "construction":"red-banner source glyph/effect mask is the complete non-sign-red footprint inside the red plate interior; only that mask is inpainted from nearest same-sign red donors, preserving the white rim and all map/logo artwork; native Hangul uses natural advance + 0.17 source-family shear + sampled pale face/orange shadow.",
  "rows":rows,
  "static_qa":{
    "elements_total":2,"bbox_size_positive_margin":"2/2 PASS",
