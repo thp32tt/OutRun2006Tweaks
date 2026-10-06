@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import csv, hashlib, json, os, struct, subprocess, urllib.request
+import csv, hashlib, json, os, struct, subprocess, urllib.request, urllib.parse
 from pathlib import Path
 from PIL import Image, ImageDraw
 
@@ -22,13 +22,42 @@ items=[
  (214,"textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds"),
  (238,"textures/load/spr_sprani_sumo_loading_Exst/132A1B1F_512x512.dds"),
 ]
-source_commit="a95efe01d1f136514cef94b0d9e9fd61df021754"
+source_commit_candidates=["a95efe01d1f136514cef94b0d9e9fd61df021754","3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"]
 
 with (repo/"localization/graphics/inventory.csv").open(encoding="utf-8-sig",newline="") as f:
     inventory={r["path"]:r for r in csv.DictReader(f)}
 
 def sha256(p):
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+
+def resolve_exact_source(rel, expected, dst):
+    fn=Path(rel).name
+    folder=Path(rel).parent.name
+    commits=list(source_commit_candidates)
+    api_path=urllib.parse.quote(f"Release/{folder}/{fn}", safe="/")
+    api=f"https://api.github.com/repos/Sonic-TV/OR2006Sprites/commits?path={api_path}&per_page=100"
+    req=urllib.request.Request(api,headers={"User-Agent":"OutRun-localization-B193"})
+    try:
+        with urllib.request.urlopen(req,timeout=30) as resp:
+            for ent in json.load(resp):
+                sha=ent.get("sha")
+                if sha and sha not in commits:
+                    commits.append(sha)
+    except Exception as e:
+        print("B193 history lookup warning",rel,repr(e))
+    tried=[]
+    for commit in commits:
+        url=f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{commit}/Release/{folder}/{fn}"
+        try:
+            urllib.request.urlretrieve(url,dst)
+        except Exception as e:
+            tried.append([commit,"DOWNLOAD_FAIL",repr(e)])
+            continue
+        got=sha256(dst)
+        tried.append([commit,got])
+        if got==expected:
+            return commit,url,tried
+    raise RuntimeError(("canonical source not found",rel,expected,tried))
 
 def on_white(im):
     bg=Image.new("RGBA",im.size,(255,255,255,255))
@@ -78,14 +107,10 @@ for idx,rel in items:
     if not inv:
         raise RuntimeError(("inventory missing",idx,rel))
     fn=Path(rel).name
-    folder=Path(rel).parent.name
-    url=f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{source_commit}/Release/{folder}/{fn}"
     p=Path("/tmp")/f"B193_{fn}"
-    urllib.request.urlretrieve(url,p)
-    got=sha256(p)
     expected=inv["sha256"]
-    if got!=expected:
-        raise RuntimeError(("source drift",idx,rel,got,expected))
+    resolved_commit,url,source_attempts=resolve_exact_source(rel,expected,p)
+    got=sha256(p)
     raw=p.read_bytes()
     if raw[:4]!=b"DDS ":
         raise RuntimeError((idx,"not DDS"))
@@ -117,6 +142,8 @@ for idx,rel in items:
       "queue_path":rel,
       "queue_filename":fn,
       "source_url":url,
+      "source_commit":resolved_commit,
+      "source_resolution_attempts":source_attempts,
       "inventory_sha256":expected,
       "source_sha256":got,
       "dds":{"width":w,"height":h,"mipmaps":mips,"fourcc":fourcc.decode("latin1"),"bpp":bpp},
