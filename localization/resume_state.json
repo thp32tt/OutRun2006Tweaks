@@ -4223,7 +4223,9 @@
     "2B0863D6",
     "EBFC709F",
     "5B65E08C",
-    "1A43E9D9"
+    "1A43E9D9",
+    "754F0599",
+    "9CE4E175"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6715,7 +6717,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 07:30 KST",
+  "updated_at_kst": "2026-10-07 08:40 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7564,5 +7566,23 @@
     "report": "localization/graphics/role_C/20261007-C227R-754F0599-A151/C227R_754F0599_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "a152r_9ce4e175": {
+    "run": "A152R",
+    "queue_index": 195,
+    "candidate_sha256": "b4b8655e9805b897ab17249112db6c5536bab34f03d445b7722bc5222476c72c",
+    "translation": "사용할 수 없음",
+    "status": "A152R_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "controller_visual_qa": "PASS_SOURCE_C125_A152_REJECTED_A152R_READABLE_RAW",
+    "runtime_validation": "UNTESTED"
+  },
+  "a153_754f0599": {
+    "run": "A153",
+    "queue_index": 175,
+    "candidate_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
+    "trigger": "C227R_REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH",
+    "status": "A153_C227R_TYPOGRAPHY_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "controller_visual_qa": "PASS_SOURCE_A151_REJECTED_A153_READABLE_ROW_RAW",
+    "runtime_validation": "UNTESTED"
   }
 }
