@@ -508,11 +508,22 @@ require_order(
     "R13ReadGpuCompletionSnapshotWithRebind(ackSnapshot)",
     "ackSnapshotRead = true;",
     "ackSnapshot.completedFrameId[index]",
-    "slot.frameId = 0;",
-    "slot.published = false;",
 )
 if resolve_direct_r13.count("R13ReadGpuCompletionSnapshotWithRebind(ackSnapshot)") != 1:
     fail("R13 base DirectGPU ring scan must read one owner-managed ACK snapshot per resolve")
+r13_published_marker = "if (slot.published && slot.frameId)"
+r13_published_pos = resolve_direct_r13.find(r13_published_marker)
+if r13_published_pos < 0:
+    fail("R13 base DirectGPU published-slot scope missing")
+require_order(
+    resolve_direct_r13[r13_published_pos:],
+    "R13 base DirectGPU ACK-completed publication retirement",
+    r13_published_marker,
+    "R13ReadGpuCompletionSnapshotWithRebind(ackSnapshot)",
+    "ackSnapshot.completedFrameId[index]",
+    "slot.frameId = 0;",
+    "slot.published = false;",
+)
 
 post_present_r7 = body(r7, "bool DirectTransportFrameReadyAfterPresent(")
 require_order(
