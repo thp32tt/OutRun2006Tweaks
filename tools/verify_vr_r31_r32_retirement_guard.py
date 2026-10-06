@@ -243,6 +243,7 @@ expected_owner_calls = {
     "R32LowerFailClosed",
     "R32ObserveFrameWorkload",
     "R32RestoreRightPassState",
+    "R32WithPresentTelemetry",
     "R32SetWvpBatch",
 }
 observed_owner_calls = set(re.findall(r"\b(R3[12]\w+)\s*\(", r33))
@@ -328,6 +329,14 @@ owner_evidence = {
          "SetDepthStencilSurfaceHook",
          "device->SetViewport(&savedViewport)",
          "R32SetWvpBatch(device, originalConstants)"),
+    ),
+    "R32WithPresentTelemetry": (
+        r32, "HRESULT R32WithPresentTelemetry(",
+        ("R32CaptureStereoWorkload()",
+         "QueryPerformanceCounter(&presentStart)",
+         "const HRESULT hr = lowerPresent();",
+         "R32FinalizeFramePerf(",
+         "R32LogPerfWindow()"),
     ),
     "R32SetWvpBatch": (
         r32, "bool R32SetWvpBatch(",
@@ -512,8 +521,8 @@ require(
     "static bool LifecycleHooksReady() noexcept",
 )
 
-# 2) R32 is retained only for Reset/Present/DirectGPU and fail-close helpers.
-# Its physical draw overlay over R31 must be gone.
+# 2) R32 retains physical Reset/DirectGPU ownership plus Present telemetry and
+# fail-close helpers. Its former physical Present and draw overlays must be gone.
 forbid(
     r32,
     "R32",
@@ -528,14 +537,16 @@ forbid(
     "HRESULT __stdcall DrawIndexedPrimitiveUPDestR32(",
     "R31OwnedResult R32TryFastWorld(",
     "R31OwnedResult R32TryHud(",
+    "SafetyHookInline R32PresentR13Hook{};",
+    "HRESULT __stdcall PresentDestR32(",
 )
 require(
     r32,
     "R32 lifecycle owner",
     "SafetyHookInline R32ResetR22Hook{};",
     "SafetyHookInline R32ResolveDirectR13Hook{};",
-    "SafetyHookInline R32PresentR13Hook{};",
     "void R32ObserveFrameWorkload(",
+    "HRESULT R32WithPresentTelemetry(",
     "HRESULT R32LowerFailClosed(",
     "R32InstallStatus() noexcept",
     "R32EffectIsFragileLive(",
@@ -555,7 +566,6 @@ require(
     "reinterpret_cast<void*>(&ResetDestR22), ResetDestR32, disabled",
     "reinterpret_cast<void*>(&ResolveDirectTransportR13)",
     "ResolveDirectTransportR32, disabled",
-    "reinterpret_cast<void*>(&PresentDestR13), PresentDestR32, disabled",
 )
 forbid(
     r32_install,
@@ -564,13 +574,23 @@ forbid(
     "DrawIndexedPrimitiveDestR31",
     "DrawPrimitiveUPDestR31",
     "DrawIndexedPrimitiveUPDestR31",
+    "PresentDestR13",
+    "PresentDestR32",
+    "R32PresentR13Hook",
 )
 reset32 = function_body(r32, "HRESULT __stdcall ResetDestR32(")
 if reset32.find("R32ResetR22Hook.stdcall<HRESULT>") > reset32.find(
         "R32ResetAfterGameReset();"):
     fail("R32 Reset must complete R22 before R32 rearm")
-present32 = function_body(r32, "HRESULT __stdcall PresentDestR32(")
-require(present32, "R32 Present", "R32PresentR13Hook.stdcall<HRESULT>")
+present_telemetry = function_body(r32, "HRESULT R32WithPresentTelemetry(")
+require(
+    present_telemetry,
+    "R32 Present telemetry owner",
+    "R32CaptureStereoWorkload()",
+    "const HRESULT hr = lowerPresent();",
+    "R32FinalizeFramePerf(",
+    "R32LogPerfWindow()",
+)
 resolve32 = function_body(r32, "bool ResolveDirectTransportR32(")
 require(resolve32, "R32 DirectGPU", "R32ResolveDirectR13Hook.call<bool>")
 lower_fail_closed = function_body(r32, "HRESULT R32LowerFailClosed(")
@@ -583,8 +603,9 @@ require(
     "R32FailClosedZeroDisparityDraws",
 )
 
-# 3) R33 is the only physical draw dispatcher. Reset/Present intentionally
-# remain chained through R32, while all four draw families hook R30 directly.
+# 3) R33 is the sole physical Present/draw dispatcher. Reset intentionally
+# remains chained through R32; Present hooks R13 directly and keeps R32-owned
+# telemetry through one owner helper; all four draw families hook R30 directly.
 forbid(
     r33,
     "R33",
@@ -609,8 +630,24 @@ require(
     "reinterpret_cast<void*>(&DrawPrimitiveUPDestR30)",
     "reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30)",
     "R33ResetR32Hook.stdcall<HRESULT>",
-    "R33PresentR32Hook.stdcall<HRESULT>",
+    "SafetyHookInline R33PresentR13Hook{};",
+    "reinterpret_cast<void*>(&PresentDestR13)",
+    "R32WithPresentTelemetry(",
+    "R33PresentR13Hook.stdcall<HRESULT>",
 )
+
+present33 = function_body(r33, "HRESULT __stdcall PresentDestR33(")
+require(
+    present33,
+    "R33 direct Present owner",
+    "R32WithPresentTelemetry(",
+    "R33PresentR13Hook.stdcall<HRESULT>",
+)
+if present33.find("Present/pre") > present33.find("R32WithPresentTelemetry("):
+    fail("R33 must reassert Reset replay fail-close before R32 Present telemetry/lower Present")
+if present33.find("R32WithPresentTelemetry(") > present33.find(
+        "R33PresentR13Hook.stdcall<HRESULT>"):
+    fail("R32 Present telemetry wrapper must own the direct R13 Present call")
 
 # R32 workload telemetry used to live at its draw entry. Once R33 hooks R30
 # directly, R33 must preserve the same one-call-per-top-level-draw accounting.
@@ -669,6 +706,6 @@ require(
 
 print(
     "VR R31/R32 draw-retirement guard PASS "
-    "(R31=StateBlock owner, R32=Reset/Present/DirectGPU owner, "
+    "(R31=StateBlock owner, R32=Reset/DirectGPU + Present telemetry owner, "
     "R33=sole physical draw dispatcher over R30, neutral-helper census=terminal, remaining R31/R32 calls=owner-specific)"
 )
