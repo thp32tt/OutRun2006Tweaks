@@ -1,0 +1,396 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B224",
+  "queue_index": 140,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+  "trigger": "STRICT_PRE_INGAME_8_STEP_VISUAL_FALSE_NEGATIVE_HIERARCHY",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/017_q140_31C58963.jpg",
+  "prior_c_status": "C140_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "source_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+  "before_sha256": "ecc7efdde172f410c85207ecdc5bbfd5bac95c753341763ad6afb9a6a7f1b3f2",
+  "candidate_sha256": "588eb51d554c8adeef850bd53d665ed9f4a4d1c3389b9e67dcdd4be9f4dd635c",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+  "defects": [
+    "FOUR_WHITE_HEADINGS_VISIBLY_UNDERSIZED",
+    "KEY_WORD_VISIBLY_UNDERSIZED",
+    "SOURCE_RELATIVE_HIERARCHY_TOO_WEAK"
+  ],
+  "preserved": {
+    "press_word": "누르세요",
+    "enter_icon": "original Enter-key icon"
+  },
+  "method": "exact pinned 2048x1024 RGBA32 source + C140 independent exact clean plate; rerender four white headings with native Noto Sans CJK KR Bold 95px + 2px same-color weight and source-left 2px anchor; moderate source-relative horizontal restoration from fresh native raster (630/560/500/280px) to avoid the prior caption-like hierarchy; rerender KEY from native 48px yellow/black family to 82px width while preserving PRESS and Enter icon exactly; only five exact source bboxes changed",
+  "rows": [
+    {
+      "key": "select_stage",
+      "source": "SELECT STAGE",
+      "korean": "스테이지 선택",
+      "source_bbox": [
+        7,
+        905,
+        840,
+        1003
+      ],
+      "source_size": [
+        833,
+        98
+      ],
+      "prior_localized_bbox": [
+        9,
+        907,
+        548,
+        1001
+      ],
+      "prior_size": [
+        539,
+        94
+      ],
+      "localized_bbox": [
+        9,
+        907,
+        639,
+        1001
+      ],
+      "localized_size": [
+        630,
+        94
+      ],
+      "margins": [
+        2,
+        201,
+        2,
+        2
+      ],
+      "width_source_ratio": 0.7563,
+      "height_source_ratio": 0.9592,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 95,
+      "stroke_width": 2,
+      "kind": "white",
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_localized_bbox": [
+        9,
+        907,
+        639,
+        1001
+      ],
+      "decoded_localized_size": [
+        630,
+        94
+      ],
+      "decoded_margins": [
+        2,
+        201,
+        2,
+        2
+      ],
+      "decoded_containment": "PASS",
+      "decoded_size_ceiling": "PASS"
+    },
+    {
+      "key": "select_race",
+      "source": "SELECT RACE",
+      "korean": "레이스 선택",
+      "source_bbox": [
+        13,
+        749,
+        793,
+        847
+      ],
+      "source_size": [
+        780,
+        98
+      ],
+      "prior_localized_bbox": [
+        15,
+        751,
+        463,
+        845
+      ],
+      "prior_size": [
+        448,
+        94
+      ],
+      "localized_bbox": [
+        15,
+        751,
+        575,
+        845
+      ],
+      "localized_size": [
+        560,
+        94
+      ],
+      "margins": [
+        2,
+        218,
+        2,
+        2
+      ],
+      "width_source_ratio": 0.7179,
+      "height_source_ratio": 0.9592,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 95,
+      "stroke_width": 2,
+      "kind": "white",
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_localized_bbox": [
+        15,
+        751,
+        575,
+        845
+      ],
+      "decoded_localized_size": [
+        560,
+        94
+      ],
+      "decoded_margins": [
+        2,
+        218,
+        2,
+        2
+      ],
+      "decoded_containment": "PASS",
+      "decoded_size_ceiling": "PASS"
+    },
+    {
+      "key": "select_mode",
+      "source": "SELECT MODE",
+      "korean": "모드 선택",
+      "source_bbox": [
+        7,
+        589,
+        815,
+        687
+      ],
+      "source_size": [
+        808,
+        98
+      ],
+      "prior_localized_bbox": [
+        9,
+        591,
+        373,
+        685
+      ],
+      "prior_size": [
+        364,
+        94
+      ],
+      "localized_bbox": [
+        9,
+        591,
+        509,
+        685
+      ],
+      "localized_size": [
+        500,
+        94
+      ],
+      "margins": [
+        2,
+        306,
+        2,
+        2
+      ],
+      "width_source_ratio": 0.6188,
+      "height_source_ratio": 0.9592,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 95,
+      "stroke_width": 2,
+      "kind": "white",
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_localized_bbox": [
+        10,
+        591,
+        509,
+        685
+      ],
+      "decoded_localized_size": [
+        499,
+        94
+      ],
+      "decoded_margins": [
+        3,
+        306,
+        2,
+        2
+      ],
+      "decoded_containment": "PASS",
+      "decoded_size_ceiling": "PASS"
+    },
+    {
+      "key": "showroom",
+      "source": "SHOWROOM",
+      "korean": "쇼룸",
+      "source_bbox": [
+        7,
+        432,
+        652,
+        527
+      ],
+      "source_size": [
+        645,
+        95
+      ],
+      "prior_localized_bbox": [
+        9,
+        434,
+        181,
+        525
+      ],
+      "prior_size": [
+        172,
+        91
+      ],
+      "localized_bbox": [
+        9,
+        434,
+        289,
+        525
+      ],
+      "localized_size": [
+        280,
+        91
+      ],
+      "margins": [
+        2,
+        363,
+        2,
+        2
+      ],
+      "width_source_ratio": 0.4341,
+      "height_source_ratio": 0.9579,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 95,
+      "stroke_width": 2,
+      "kind": "white",
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_localized_bbox": [
+        10,
+        434,
+        289,
+        525
+      ],
+      "decoded_localized_size": [
+        279,
+        91
+      ],
+      "decoded_margins": [
+        3,
+        363,
+        2,
+        2
+      ],
+      "decoded_containment": "PASS",
+      "decoded_size_ceiling": "PASS"
+    },
+    {
+      "key": "key_word",
+      "source": "KEY",
+      "korean": "키",
+      "source_bbox": [
+        457,
+        319,
+        583,
+        381
+      ],
+      "source_size": [
+        126,
+        62
+      ],
+      "prior_localized_bbox": [
+        498,
+        321,
+        547,
+        379
+      ],
+      "prior_size": [
+        49,
+        58
+      ],
+      "localized_bbox": [
+        479,
+        321,
+        561,
+        379
+      ],
+      "localized_size": [
+        82,
+        58
+      ],
+      "margins": [
+        22,
+        22,
+        2,
+        2
+      ],
+      "width_source_ratio": 0.6508,
+      "height_source_ratio": 0.9355,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 48,
+      "stroke_width": 6,
+      "kind": "yellow",
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_localized_bbox": [
+        479,
+        321,
+        561,
+        379
+      ],
+      "decoded_localized_size": [
+        82,
+        58
+      ],
+      "decoded_margins": [
+        22,
+        22,
+        2,
+        2
+      ],
+      "decoded_containment": "PASS",
+      "decoded_size_ceiling": "PASS"
+    }
+  ],
+  "machine_qa": {
+    "bbox_source_size_positive_margin": "5/5 PASS",
+    "candidate_changes_outside_selected_source_bboxes": 0,
+    "alpha_changes_outside_selected_source_bboxes": 0,
+    "protected_visible_changed": 0,
+    "enter_icon_changed": 0,
+    "localized_overlap_pixels": 0,
+    "header_128_exact": true,
+    "raw_mode": "RGBA",
+    "raw_orientation": "mirror_y",
+    "roundtrip": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_C140_EXACT_CLEAN_REUSED_AND_REVALIDATED",
+    "2_slant_direction": "PASS_SOURCE_UPRIGHT_FAMILY",
+    "3_no_unnecessary_undersizing": "PASS_MATERIAL_HIERARCHY_RESTORATION",
+    "4_source_weight_outline_shadow": "PASS_SHARED_BOLD_WHITE_AND_YELLOW_BLACK_SOURCE_FAMILIES",
+    "5_no_clipping": "PASS_5_OF_5_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_OUTSIDE_PROTECTED_AND_ENTER_ICON_CHANGE",
+    "7_flip_y_raw": "PASS_RAW_EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "B224_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
