@@ -2116,3 +2116,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Evidence: `localization/graphics/role_A/20261006-A-PROBE99-8B52FEEC/A99_8B52FEEC_PROBE.json`, `A99_SOURCE_READABLE.png`, `A99_SOURCE_RAW.png`, `A99_SOURCE_COMPONENTS.png`, and `A99_CONTROLLER_CLASSIFICATION.json`.
 - Current blocked `zoom_review` count at checkpoint: 38 (includes concurrent non-A progress). Next normal A row is odd index29 `F043316B` unless a higher-priority in-game/C-returned row appears. No VR/FFB/DX11/DXVK work.
 
+## 2026-10-06 09:04 KST — A100 odd zoom-review batch 29/31/33
+
+- Refreshed the branch after A99 and concurrent lane activity. A has no owned active in-game P0/P1 row and no C-returned `REWORK_REQUIRED`; no render-ready/pending-artwork candidate outranked the next odd-shard zoom-review rows.
+- Per the one-preflight-batch rule, inspected exact pinned HD sources for indices 29 `F043316B`, 31 `A82266FC`, and 33 `FBCAB18D` with the GitHub-hosted A worker, then performed readable and raw mirror_y controller review.
+- index29 F043316B: exact SHA-256 `5eec2b8dd7796c6dfaa19ceb58cef699c1d62a475eb827a270fcd1ee45b74b96`, 1024x512 RGBA32/mip1. Three Clarissa pose sprites only; no language-bearing text.
+- index31 A82266FC: exact SHA-256 `47de72b0fbd4f36e290a29233ff84ce0324711544debabbab6ba103d09ef1487`, actual 4096x2048 RGBA32/mip1 despite the nominal 1024x512 filename. Three Flagman pose sprites, grade-A artwork, sparkle, and small clothing/hat logo artwork only. Grade/logo material is protected artwork and not localization text.
+- index33 FBCAB18D: exact SHA-256 `37768ef1f3af648a668bdb35c0ca3e6ee706b53cf726a98bac0f28108a1ab8b7`, 1024x512 RGBA32/mip1. Three Flagman pose sprites plus protected clothing/hat logo artwork only; no language-bearing text.
+- Result for all three: `NO_LOCALIZABLE_TEXT / PRESERVE_ORIGINAL`, localizable segments=0, no Korean DDS candidate required. Queue/transcription/artwork-plan state is closed so these rows are not repeated.
+- Evidence: `localization/graphics/role_A/20261006-A-PROBE100-ZOOM293133/A100_ZOOM293133_PROBE.json` and `A100_CONTROLLER_CLASSIFICATION.json` plus per-asset readable/raw/component proofs.
+- Blocked zoom-review count after this batch: 35. Next A normal row: odd index35 `E989E3B7` unless a higher-priority in-game/C-returned row appears. VR/FFB/DX11/DXVK untouched.
+
