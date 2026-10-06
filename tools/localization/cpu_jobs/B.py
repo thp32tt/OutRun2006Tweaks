@@ -99,7 +99,9 @@ def source_slant(b):
     slope=float(np.polyfit(np.asarray(ys),np.asarray(left),1)[0])
     return float(np.clip(-slope,-0.25,0.25))
 stage_slants=[source_slant(r["bbox"]) for r in ROWS if r["stage"]]
-# Controller review of SOURCE/OLD/B213 showed the source family is visually upright; the\n# signed edge-regression metric is shape-biased for mixed Latin glyphs and must not drive shear here.\nshared_slant=0.0
+# Controller review of SOURCE/OLD/B213 showed the source family is visually upright; the
+# signed edge-regression metric is shape-biased for mixed Latin glyphs and must not drive shear here.
+shared_slant=0.0
 
 def shear_right(im,s):
     if abs(s)<0.005: return im
