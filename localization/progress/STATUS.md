@@ -1896,3 +1896,16 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Design is narrowed fail-closed to an ASCII-safe native compatibility alias (<=15 bytes) plus mod-owned UTF-8 Korean sidecar and explicit local player-name rendering hooks. Online/remote transport must continue to use the alias until a distinct compatible transport is proven; `SumoNet_OnlineUserName` is not conflated with the license-name field.
 - Queue status: `b206_hold_compat_alias_sidecar_and_name_render_hooks_required`. No DDS candidate or runtime source was changed, so no build is required and runtime validation remains `UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT`. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261006-B-PREFLIGHT206-NAME-CONSUMERS/B206_NAME_CONSUMER_MAPPING.json`; `localization/graphics/role_B/20261006-B-PREFLIGHT206-NAME-CONSUMERS/B206_DISASSEMBLY_EVIDENCE.txt`.
+
+### 2026-10-06 17:34 KST — user JPG visual rework A136-A139
+
+User review of the generated before/after JPGs overrode prior static PASS where visible evidence still showed reversed/weak slant direction or source/background residue. Rework now present on branch:
+
+- `BF3EE5C6` A136 `a7eb06e2441956f4418f4cc95da52313696bc13d7864f7c7f76c8efdf909f85d`: 11-row source-direction slant rebuild; 13/13 bbox/size/margin; zero outside/protected/residue.
+- `37759842` A137 `ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b`: 16 selector rows corrected to readable right lean; 16/16 bbox, zero outside/overlap.
+- `FD90AA9` A138 `03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433`: 3 shared headers rebuilt at 108px with corrected right lean; zero outside/alpha/residue/overlap/touch.
+- `48DEBE77` A139 `f92629621d421e924a3f1b9d77252c551832824110e755325bcf0bf4a1af2ad0`: START/GOAL full inset clean reconstruction; source-face residue 0.
+- `A064FDFC` A139+B204 `2d3d7fd7b612cee048067813f150d323be30483042010786168a90fa983386b6`: OUTRUN MILES x2 corrected without regressing B204 Stage.
+
+Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static candidates. **Not runtime closed**: IGR-008/011/012/014/015/016/018 require independent C and a new actual in-game retest.
+
