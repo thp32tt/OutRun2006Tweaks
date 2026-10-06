@@ -1086,10 +1086,20 @@ require(
     "const bool released = Release(Projection, ok);",
 )
 require(
+    r24_direct_projection,
+    "R24 projection render carries swapchain GPU-work owner",
+    "UvRect{ 0.f, 0.f, 1.f, 1.f }, &Projection",
+)
+require(
     r24_direct_flat,
     "R24 theater content-complete release ownership",
     "Release(Theater, false);",
     "const bool released = Release(Theater, ok);",
+)
+require(
+    r24_direct_flat,
+    "R24 direct-flat render carries swapchain GPU-work owner",
+    "UvRect{ 0.f, 0.f, 1.f, 1.f }, &Theater",
 )
 require(
     r24_emergency,

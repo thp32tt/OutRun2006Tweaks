@@ -268,7 +268,7 @@ namespace OutRunVrR24BlackScreenGuard
             SourceSrv = SafeEyeSrv[eye];
             SourceFormat = SafeEyeFormat;
             ok = RenderTo(Projection.rtvs[image][eye], Projection.width,
-                Projection.height, UvRect{ 0.f, 0.f, 1.f, 1.f }) && ok;
+                Projection.height, UvRect{ 0.f, 0.f, 1.f, 1.f }, &Projection) && ok;
         }
         SourceSrv = savedSrv;
         SourceFormat = savedFormat;
@@ -392,7 +392,7 @@ namespace OutRunVrR24BlackScreenGuard
         SourceSrv = SafeEyeSrv[0];
         SourceFormat = SafeEyeFormat;
         const bool ok = RenderTo(Theater.rtvs[image][0], Theater.width,
-            Theater.height, UvRect{ 0.f, 0.f, 1.f, 1.f });
+            Theater.height, UvRect{ 0.f, 0.f, 1.f, 1.f }, &Theater);
         SourceSrv = savedSrv;
         SourceFormat = savedFormat;
         if (OutRunVrFinalTest::Context)
