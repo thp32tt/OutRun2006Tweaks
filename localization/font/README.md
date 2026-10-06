@@ -28,3 +28,7 @@ The active K4 Korean text path does **not** replace the game's stock font DDS at
 The 505-syllable/two-page atlas described below is retained as K3 research evidence only. It must not be packaged as a stock-font replacement unless the runtime architecture is intentionally changed and separately validated in-game. Name-entry input (`spr_name_entry_xst`) is a separate path and is **not** resolved by this policy.
 
 A133 statically reconciled A-owned font-pipeline queue rows 15/17/19/21/23 to preserve-original/no-candidate. Runtime/in-game validation of the K4 overlay remains pending.
+
+### A134 remaining stock-font reconciliation
+
+After refreshing the branch, A's primary shard had no actionable production rows while B was actively producing index176. A therefore work-stole the remaining even `font_pipeline` rows 16/18/20/22 and applied the same K4 architecture decision as A133. All nine stock `spr_font_xst` queue rows 15-23 are now preserve-original/no-Korean-DDS-candidate for K4. The name-entry atlas at index24 remains a separate input-path problem and is not covered by the overlay-font decision.

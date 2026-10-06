@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-FONT134-WORKSTEAL-EVEN",
+  "timestamp_kst": "2026-10-06T16:01:59+09:00",
+  "work_stolen_from_lane": "B",
+  "selection": {
+    "a_open_ingame_fail": 0,
+    "a_direct_c_rework": 0,
+    "a_primary_actionable_rows": 0,
+    "work_steal_targets": [
+      16,
+      18,
+      20,
+      22
+    ],
+    "skipped_active_b_asset": 176,
+    "next_separate_unresolved": 24
+  },
+  "architecture_evidence": {
+    "runtime_text_source": "src/hooks_localization.cpp",
+    "runtime_text_source_sha": "8469bf87379649f29505bef915cce57176c4c549",
+    "behavior": "matched stock English glyph output is hidden and Korean UTF-8 is redrawn through D3D9 ImGui",
+    "overlay_source": "src/overlay/overlay.cpp",
+    "overlay_source_sha": "80090d71a2c1ffb53bf9796748bdfbf397825409",
+    "font_loader": "Overlay::rebuild_fonts",
+    "windows_font_preference": [
+      "malgun.ttf",
+      "malgunsl.ttf",
+      "gulim.ttc",
+      "batang.ttc",
+      "segoeui.ttf"
+    ],
+    "stock_font_map_sha": "cf028d506c360fa912b178077f11aced032ebf5d",
+    "k4_doc_sha": "db5af48e31bb8bd67f23d5a7a48a9c0fc2a69458"
+  },
+  "rows": [
+    {
+      "queue_index": 16,
+      "asset": "textures/load/spr_font_xst/23DDB6EC_512x512.dds",
+      "stock_descriptor_index": 2,
+      "stock_resource_handle": 3,
+      "stock_cell": [
+        30,
+        30
+      ],
+      "stock_format": "DXT3",
+      "prior_status": "blocked_runtime_font",
+      "decision": "PRESERVE_ORIGINAL_NO_KOREAN_DDS_CANDIDATE_REQUIRED_K4_OVERLAY",
+      "candidate_written": false
+    },
+    {
+      "queue_index": 18,
+      "asset": "textures/load/spr_font_xst/7B65A191_256x128.dds",
+      "stock_descriptor_index": 0,
+      "stock_resource_handle": 0,
+      "stock_cell": [
+        12,
+        12
+      ],
+      "stock_format": "DXT3",
+      "prior_status": "blocked_runtime_font",
+      "decision": "PRESERVE_ORIGINAL_NO_KOREAN_DDS_CANDIDATE_REQUIRED_K4_OVERLAY",
+      "candidate_written": false
+    },
+    {
+      "queue_index": 20,
+      "asset": "textures/load/spr_font_xst/B7EEB2D9_256x128.dds",
+      "stock_descriptor_index": 5,
+      "stock_resource_handle": 6,
+      "stock_cell": [
+        15,
+        20
+      ],
+      "stock_format": "DXT3",
+      "prior_status": "blocked_runtime_font",
+      "decision": "PRESERVE_ORIGINAL_NO_KOREAN_DDS_CANDIDATE_REQUIRED_K4_OVERLAY",
+      "candidate_written": false
+    },
+    {
+      "queue_index": 22,
+      "asset": "textures/load/spr_font_xst/E86D77E8_256x128.dds",
+      "stock_descriptor_index": 8,
+      "stock_resource_handle": 7,
+      "stock_cell": [
+        16,
+        20
+      ],
+      "stock_format": "DXT3",
+      "prior_status": "blocked_runtime_font",
+      "decision": "PRESERVE_ORIGINAL_NO_KOREAN_DDS_CANDIDATE_REQUIRED_K4_OVERLAY",
+      "candidate_written": false
+    }
+  ],
+  "qa": {
+    "queue_rows_reconciled": "4/4",
+    "all_stock_font_rows_15_to_23_resolved": true,
+    "stock_dds_modified": false,
+    "runtime_source_modified": false,
+    "active_b_index_176_modified": false,
+    "name_entry_index_24_modified": false,
+    "status": "STATIC_ARCHITECTURE_RECONCILIATION_PASS"
+  },
+  "decision": "A134_FONT_PIPELINE_WORKSTEAL_STATIC_PASS_PRESERVE_ORIGINAL_NO_CANDIDATES",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

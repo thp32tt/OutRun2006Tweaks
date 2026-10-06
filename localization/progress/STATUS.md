@@ -1845,3 +1845,10 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 
 ### A133 verifier note
 - `verify_state.py`: **FAIL (pre-existing state drift)** — transcription/artwork-plan/progress and legacy visual-review action-count mismatches. A133 changed only font-row status/notes and shared status metadata; queue action counts were not changed. This is recorded, not masked.
+
+## 2026-10-06 16:01 KST — A134 remaining even stock-font rows work-stolen and resolved
+- Refreshed HEAD after A133. A had no active owned in-game fail, C-returned REWORK, or unfinished primary-shard direct-image work. B was actively producing index176, so A did not touch that asset.
+- Per work-steal rule, A consumed the oldest independent remaining even font rows **16/18/20/22**. Current K4 path redraws Korean UTF-8 through the D3D9 ImGui overlay and loads a Korean-capable Windows font; these stock `spr_font_xst` DDS files are not Korean rendering assets.
+- 4/4 rows changed from `blocked_runtime_font` to `k4_overlay_preserve_original_no_candidate_required`. Together with A133, all nine stock font rows 15-23 are now resolved without producing incorrect Korean DDS replacements.
+- Index24 name-entry is intentionally left unresolved because it is a separate input/runtime path. No DDS or runtime source bytes changed; `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_A/20261006-A-FONT134-WORKSTEAL-EVEN/A134_RUNTIME_FONT_WORKSTEAL.json`.

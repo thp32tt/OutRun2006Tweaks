@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A134 work-stole B font_pipeline rows 16/18/20/22 after A primary-shard exhaustion. The same K4 architecture proof as A133 applies: stock font DDS are not the Korean renderer; Korean UTF-8 is redrawn via ImGui with Windows Korean system fonts. All nine stock font rows 15-23 are now preserve-original/no candidate. Index24 name-entry remains separate/unresolved; B index176 was not duplicated. RUNTIME_VALIDATION=UNTESTED.",
     "A133 reconciled A-owned font_pipeline rows 15/17/19/21/23: current K4 Korean text does not consume replacement stock font DDS. hooks_localization suppresses stock English output and redraws UTF-8 via ImGui; Overlay::rebuild_fonts loads Windows Korean-capable system fonts. Preserve original DDS, no Korean candidate required. Legacy 505-glyph/two-page atlas remains K3 research only; index24 name-entry is separate. B-owned font rows 16/18/20/22 remain. B index176 is active and was not work-stolen. RUNTIME_VALIDATION=UNTESTED.",
     "B195 resolved all 10 remaining blocked zoom_review rows 166/174/178/180/194/196/202/206/210/238 from existing exact-HD B181/B192/B193 evidence. All are PRESERVE_ORIGINAL / NO_LOCALIZABLE_TEXT: protected song/game-title/model/brand/logo artwork, stage/course imagery, or incidental environmental signage only. Readable + raw mirror_y controller QA PASS 10/10; no candidate needed. Global blocked zoom_review=0. A132 concurrently completed index62, so do not repeat it. Remaining B direct-image hold is index176 75C3586A HOLD_STRICT_RECHECK; canonical source lacks the transcribed source glyph/effect evidence and is not render-ready.",
     "A132 resolved work-stolen index62 33491F83 manual reconstruction. Candidate 58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2: source-authored Layer43+Group16 restores EASY/HARD road/green-edge background; verified PSD erase component restores Diverge/Left/Right. 9/9 bbox/size/positive margins and all exact-bbox outside/alpha/overlap gates PASS; controller readable/high-zoom/raw mirror_y visual PASS. Pending independent C + in-game; do not repeat A125-A131 rejected intermediates unless C/new game evidence returns REWORK.",
@@ -6085,6 +6086,111 @@
     "name_entry_index_24_untouched": true,
     "active_b_index_176_untouched": true,
     "report": "localization/graphics/role_A/20261006-A-FONT133-ODD-RUNTIME-FONT/A133_RUNTIME_FONT_RECONCILE.json",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "a134_runtime_font_worksteal": {
+    "timestamp_kst": "2026-10-06T16:01:59+09:00",
+    "role": "A",
+    "work_stolen_from_lane": "B",
+    "queue_indices": [
+      16,
+      18,
+      20,
+      22
+    ],
+    "assets": [
+      "23DDB6EC",
+      "7B65A191",
+      "B7EEB2D9",
+      "E86D77E8"
+    ],
+    "reason": "A primary shard exhausted; refreshed current cycle and B was actively producing index176, not these font rows.",
+    "decision": "K4_OVERLAY_PRESERVE_ORIGINAL_NO_KOREAN_DDS_CANDIDATE_REQUIRED",
+    "architecture": {
+      "runtime_text_renderer": "D3D9 ImGui UTF-8 overlay",
+      "runtime_source": "src/hooks_localization.cpp",
+      "overlay_font_source": "Windows system font via Overlay::rebuild_fonts",
+      "windows_font_preference": [
+        "malgun.ttf",
+        "malgunsl.ttf",
+        "gulim.ttc",
+        "batang.ttc",
+        "segoeui.ttf"
+      ],
+      "stock_font_dds_used_for_korean_overlay": false,
+      "legacy_two_page_atlas": "K3 research only"
+    },
+    "source_shas": {
+      "hooks_localization": "8469bf87379649f29505bef915cce57176c4c549",
+      "overlay": "80090d71a2c1ffb53bf9796748bdfbf397825409",
+      "stock_font_map": "cf028d506c360fa912b178077f11aced032ebf5d",
+      "k4_doc": "db5af48e31bb8bd67f23d5a7a48a9c0fc2a69458"
+    },
+    "rows": [
+      {
+        "index": 16,
+        "asset": "textures/load/spr_font_xst/23DDB6EC_512x512.dds",
+        "descriptor_index": 2,
+        "resource_handle": 3,
+        "cell": [
+          30,
+          30
+        ],
+        "format": "DXT3",
+        "status": "PRESERVE_ORIGINAL_NO_CANDIDATE_REQUIRED"
+      },
+      {
+        "index": 18,
+        "asset": "textures/load/spr_font_xst/7B65A191_256x128.dds",
+        "descriptor_index": 0,
+        "resource_handle": 0,
+        "cell": [
+          12,
+          12
+        ],
+        "format": "DXT3",
+        "status": "PRESERVE_ORIGINAL_NO_CANDIDATE_REQUIRED"
+      },
+      {
+        "index": 20,
+        "asset": "textures/load/spr_font_xst/B7EEB2D9_256x128.dds",
+        "descriptor_index": 5,
+        "resource_handle": 6,
+        "cell": [
+          15,
+          20
+        ],
+        "format": "DXT3",
+        "status": "PRESERVE_ORIGINAL_NO_CANDIDATE_REQUIRED"
+      },
+      {
+        "index": 22,
+        "asset": "textures/load/spr_font_xst/E86D77E8_256x128.dds",
+        "descriptor_index": 8,
+        "resource_handle": 7,
+        "cell": [
+          16,
+          20
+        ],
+        "format": "DXT3",
+        "status": "PRESERVE_ORIGINAL_NO_CANDIDATE_REQUIRED"
+      }
+    ],
+    "all_stock_font_rows_resolved": [
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "name_entry_index_24_untouched": true,
+    "active_b_index_176_untouched": true,
+    "report": "localization/graphics/role_A/20261006-A-FONT134-WORKSTEAL-EVEN/A134_RUNTIME_FONT_WORKSTEAL.json",
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
   }

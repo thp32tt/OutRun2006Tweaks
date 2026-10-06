@@ -2253,3 +2253,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 ### A133 post-commit state verifier
 - Ran `tools/localization/verify_state.py` after the A133 commit. It returns the existing recovery-branch state drift: transcriptions 123 vs progress 82, segments 746 vs 724, artwork-plan/index mismatch, artwork-plan 125 vs localize_text 94, and legacy `visual_review.csv` action counts differing from the current queue/progress action counts.
 - A133 did not change any queue `action` value, transcription row, artwork-plan row, or visual-review row, so these failures predate and are outside the five font-row reconciliation. Recorded as `FAIL_PREEXISTING_STATE_DRIFT_NOT_INTRODUCED_BY_A133`; no unrelated migration was attempted.
+
+## 2026-10-06 16:01 KST — A134 K4 stock-font work-steal completion
+
+- Refreshed the branch after A133/B worker output. There were no A-owned open in-game regressions, no direct C-returned A REWORK, and no remaining odd direct-image production item. The four oldest independent unfinished rows were B-shard font_pipeline indices 16/18/20/22; B was concurrently focused on index176, so A recorded a safe work-steal instead of duplicating B's graphics candidate.
+- Source evidence is unchanged from A133: `src/hooks_localization.cpp` hides matching stock English draws and queues Korean UTF-8 to the ImGui overlay; `Overlay::rebuild_fonts()` reads a Korean-capable Windows font (Malgun first, then Gulim/Batang/Segoe fallbacks). `stock_font_map.json` identifies 23DDB6EC, 7B65A191, B7EEB2D9 and E86D77E8 as stock font descriptors/resources, not K4 Hangul overlay pages.
+- Rows 16/18/20/22 were therefore closed as preserve-original/no candidate. No DDS candidate was generated and no source code was changed. All stock font rows 15-23 are now reconciled to the active K4 architecture. The two-page 505-Hangul atlas remains K3 research only.
+- Index24 66743AA8 name-entry is not conflated with text display; it remains a separate unresolved input-path item. B index176 worker output was not consumed or reviewed by A.
+- Static architecture reconciliation PASS. Runtime/in-game confirmation remains `UNTESTED`. VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_A/20261006-A-FONT134-WORKSTEAL-EVEN/A134_RUNTIME_FONT_WORKSTEAL.json`.
