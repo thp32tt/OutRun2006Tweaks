@@ -119,17 +119,19 @@ int main() {
  require(pneumatic_sat_shape(.12f)>.90f,"pneumatic SAT strong in normal loaded corner");
  require(pneumatic_sat_shape(.16f)>.98f,"pneumatic SAT peaks near prior 0.16rad region");
  require(pneumatic_sat_shape(.32f)<.50f,"pneumatic trail falls in deep understeer");
+ require(pneumatic_trail_factor(.60f)<.03f,"R13 pneumatic trail collapses to near zero in full sliding");
  require(combined_sat_shape(.16f,.25f)<=1.000001f,"combined SAT bounded");
  require(mechanical_sat_shape(.12f,.25f)>0.10f,"mechanical trail acts in normal loaded corner");
  require(std::abs(deep_slip_mechanical_trail_ratio(.12f,.25f)-.25f)<1e-6f,"normal-corner caster ratio is unchanged");
- require(deep_slip_mechanical_trail_ratio(.32f,.25f)>.4249f&&deep_slip_mechanical_trail_ratio(.32f,.25f)<.4251f,"deep-slip caster ratio gains 70 percent");
+ require(std::abs(deep_slip_mechanical_trail_ratio(.32f,.25f)-.25f)<1e-6f,"R13 mechanical trail remains geometric in deep slip");
  require(std::abs(deep_slip_mechanical_trail_ratio(-.32f,.25f)-deep_slip_mechanical_trail_ratio(.32f,.25f))<1e-6f,"deep-slip caster boost is symmetric");
- require(deep_slip_mechanical_trail_ratio(.32f,.60f)<=.600001f,"deep-slip caster boost respects mechanical cap");
+ require(std::abs(deep_slip_mechanical_trail_ratio(.32f,.60f)-.60f)<1e-6f,"R13 mechanical trail keeps configured geometry at cap");
  require(mechanical_sat_shape(.32f,.25f)>mechanical_sat_shape(.12f,.25f),"mechanical term follows front lateral force");
  require(combined_sat_shape(.32f,.25f)>pneumatic_sat_shape(.32f),"total trail preserves deep-slip torque");
- require(combined_sat_shape(.32f,0.0f)==pneumatic_sat_shape(.32f),"mechanical trail zero is pure pneumatic");
+ require(combined_sat_shape(.60f,0.0f)>pneumatic_sat_shape(.60f),"R13 residual Mz remains separate after pneumatic trail collapse");
+ require(combined_sat_shape(.60f,0.0f)<.12f,"R13 residual Mz stays a small cue rather than a hidden spring");
  require(std::abs(combined_sat_shape(.32f,.25f)-combined_sat_shape(-.32f,.25f))<1e-6f,"SAT shape symmetry");
- require(combined_sat_shape_with_deep_slip_boost(.32f,.32f,.25f)>combined_sat_shape(.32f,.32f,.25f)*1.15f,"deep-slip boost survives final normalization");
+ require(std::abs(combined_sat_shape_with_deep_slip_boost(.32f,.32f,.25f)-combined_sat_shape(.32f,.32f,.25f))<1e-6f,"R13 compatibility helper no longer invents deep-slip mechanical boost");
  require(std::abs(combined_sat_shape_with_deep_slip_boost(.12f,.12f,.25f)-combined_sat_shape(.12f,.12f,.25f))<1e-5f,"deep-slip boost leaves normal corner unchanged");
  require(impact_direction_from_lateral(0.0f)==0.0f,"head-on impact is neutral");
  require(impact_direction_from_lateral(.20f)<0.0f&&impact_direction_from_lateral(-.20f)>0.0f,"lateral impact direction remains symmetric");
@@ -180,7 +182,7 @@ int main() {
  require(model_uses_reversed_r3_polarity(Model::ModernDD),"R3 Modern polarity is reversed");
  require(!model_uses_reversed_r3_polarity(Model::ArcadeOriginal)&&!model_uses_reversed_r3_polarity(Model::PS2OriginalExperimental),"R3 Original/PS2 polarity uses native sign");
  require(std::abs(SnowIceComfortTextureScale-.22f)<1e-6f,"snow/ice comfort texture remains perceptible");
- require(drift_countersteer_blend(.70f,-.35f,1.0f)>.80f,"deep opposed-slip drift strongly hands off to body-slip countersteer");
+ require(drift_countersteer_blend(.70f,-.35f,1.0f)>.15f&&drift_countersteer_blend(.70f,-.35f,1.0f)<=.20f,"R13 body-slip drift cue is bounded to a small assist");
  require(drift_countersteer_blend(.30f,.20f,1.0f)==0.0f,"same-sign front/body slip keeps normal SAT direction");
  require(drift_countersteer_blend(.10f,-.20f,1.0f)==0.0f,"small body slip does not trigger drift handoff");
  require(drift_countersteer_shape(.70f)>.89f&&drift_countersteer_shape(.05f)==0.0f,"drift recovery magnitude is bounded to developed oversteer");
@@ -207,6 +209,8 @@ int main() {
  WheelVehicleDynamics low; EVWORK_CAR lowCar; low.reset(); for(int i=0;i<80;++i)step(low,lowCar,0,0,0,.15f); step(low,lowCar,.01f,0,.2f,.15f);
  WheelVehicleDynamics high; EVWORK_CAR highCar; high.reset(); for(int i=0;i<80;++i)step(high,highCar,0,0,0,.90f); step(high,highCar,.01f,0,.2f,.90f);
  require(high.frontSlipBlend()>low.frontSlipBlend(),"front-slip transient speeds up with vehicle speed");
+ require(low.frontSlipBlend()>=.16f&&low.frontSlipBlend()<.23f,"R13 low-speed front-slip relaxation remains compliant");
+ require(high.frontSlipBlend()>.65f&&high.frontSlipBlend()<=.78f,"R13 high-speed front-slip relaxation follows distance-based response");
 
  // v0.2: a rapid steering reversal must change the Physics SAT tyre proxy on
  // the first valid tick instead of carrying stale opposite torque for several
