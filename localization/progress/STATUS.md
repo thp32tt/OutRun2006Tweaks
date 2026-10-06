@@ -1757,3 +1757,11 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - index62 33491F83: Diverge/Left/Right/EASY/HARD to 분기/좌측/우측/쉬움/어려움, 9 physical labels; integrated route artwork protected.
 - B178/B179 both fail-closed before candidate persistence. State MANUAL_RECONSTRUCTION_REQUIRED; no gates were relaxed.
 - Latest completed B material remains B176 A8CE339F; independent C pending. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-06 09:43 KST — A101/A102 zoom reviews 35/37/45
+- index35 `E989E3B7`: `Total Rank` x2 positively classified and localized to `종합 랭킹`; A102 native-HD candidate `c0e76661ed974cb7c477f172e93fd67645391f1da3e81dcb867d86af3a595622`.
+- A102 reuses exact C215-approved duplicate pink/green speech-bubble pixels only. 2/2 bbox/size/positive-margin PASS; outside/alpha/source-residue/overlap/touch all 0; controller SOURCE/CLEAN/FINAL + raw mirror_y visual PASS. Pending independent C + in-game.
+- index37 `515DCBB2`: Jennifer pose art only → **NO_LOCALIZABLE_TEXT / PRESERVE_ORIGINAL**.
+- index45 `1F77CB88`: F1/F2/Esc/Tab/Enter/directional keycap legends only → **NO_LOCALIZABLE_TEXT / PRESERVE_ORIGINAL** under technical-control preservation.
+- Blocked zoom-review count: **28**. Next normal A odd row: index103 `590A4724`, unless higher-priority backlog/C-return appears.
+- VR/FFB/DX11/DXVK untouched.
