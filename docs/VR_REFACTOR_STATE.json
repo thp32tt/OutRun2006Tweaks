@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T23:40:38+09:00",
+  "updatedKst": "2026-10-07T01:52:31+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -116,7 +116,7 @@
     "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051",
     "VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052"
   ],
-  "next": "Structure-refactor chain remains COMPLETE. Continue the general DX9Ex maintenance/correctness priority list from the latest exact HEAD. Prefer low-risk synchronization/resource-lifetime work while the prepared Quest3/VDXR baseline test remains pending; do not alter producer-fence or cadence authority without matching telemetry. Revalidate VR-R50-FRAME-STABILITY-PRESERVE-001 on the next HMD session.",
+  "next": "Structure-refactor chain remains COMPLETE. Continue general DX9Ex correctness from latest HEAD. The cross-thread SpriteNode semantic lifetime component is BUILD_VERIFIED at 3edab9f5 but RUNTIME_VALIDATION=UNTESTED. Next bounded source/static unit is the HMD-proven ProjectedMarkerInfo/Calc3D2D rank-rival view-space anchor payload restoration; keep generic ScreenOverlay2D fallback, R31/R32/R33 ownership, and cadence/fence authority unchanged. A Quest3/VDXR CORRECTNESS run should revalidate exact ScreenHud/WorldBillboard/ProducerToken observations and final marker anchoring.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -276,9 +276,10 @@
     "CONVERSION-DX9EX-00481 / VR-REFACTOR-POST1100-R32-HOOKFREE-R33-DIRECTGPU-FOLD-0064: retired the final R32 physical hook. R32 is now hook-free and retains DirectGPU producer-fence/ACK/quarantine plus Reset/Present/fail-close semantics as owner helpers; R33 physically hooks ResolveDirectTransportR13 and delegates through R32ResolveDirectTransport, making R33 the final Reset/Present/DirectGPU/draw dispatcher. Hook count R32 1->0, R33 7->8. Initial candidate 492682f940839bb05e37b644da5dd981c43ca22b failed policy only because verify_vr_r32_review.py required the unchanged terminal telemetry log phrase. Final exact SHA a7f50c69d460cac2b0a8eaa91529121fb84eb574 passed DX9Ex Active 37467426659 policy/host/game/full-chain/package, Domain Isolation 37467426716, HUD Inspector 37467426739 and Build 37467426690. Package artifact 11415708175 digest sha256:e12dc3c2dcc65f757233e6e5a6c67fe257925074aeac8e8105b0e8d928cd672b. OpenXR VR architecture 37467426527 remains red on a separate stale generic hardening guard after the task's R32 review verifier passed. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00482 / VR-REFACTOR-POST1100-R32-INSTALL-SHIM-RETIREMENT-0065: removed the redundant R32InstallState/R32InstallThread/VRStereoR32ReviewHook/R32InstallStatus relay after 00481 made R32 fully hook-free. R33 now directly gates its final disabled-first Reset/Present/DirectGPU/draw hook transaction on R31InstallStatus, R22InstallStatus and R13InstallStatus with the same fail/ready semantics. R31 remains a real StateBlock consumer/recovery initializer and is intentionally retained. Exact validation-bearing SHA b205046d37a336b9942666caedee8b5292888197 passed DX9Ex Active 37471397113 policy/host/game/full-chain/package, Domain Isolation 37471397155, HUD Inspector 37471396975 and Build 37471397172. Package artifact 11417631143 digest sha256:8b3eb99180bdf6c7cc847668cda7b35f9aaefe052b0bed91c4723822c907d1af. OpenXR VR architecture 37471396951 remains red on a separate stale generic hardening guard after verify_vr_r32_review passed. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00483 / VR-REFACTOR-POST1100-TERMINAL-HARDENING-GUARD-0066: terminal census found no further equivalence-safe runtime owner flattening after R31/R32 retirement and R33 final-dispatch consolidation. Reconciled generic OpenXR hardening markers with current R21/R23 owner-query APIs, R31 StateBlock consumer ownership, hook-free R32 helpers, R33 final R30/R22/R13 hooks, current SBS parent-session teardown, and R23 host SafeEyesOwnFrame/EnsureSafeFrame ownership. Initial 567e9adb exposed stale R23 IsFailed(R22InstallState); repair 0448ec6f exposed stale host SafeTransportGeneration; final dceb12ce3b8925aa31bc5c5e92aa1df202e57b11 passed DX9Ex Active 37476535871, OpenXR VR architecture 37476536036, Domain Isolation 37476535870 and Build 37476536131. Package artifact 11419747152 digest sha256:3f30f749a787a3a2d12ec8a7a295f1f686ad4a4d2c42f727c2d392814a1bc398. Runtime source behavior unchanged; RUNTIME_VALIDATION=UNTESTED. Post-R34/R33 structure-refactor chain is now COMPLETE.",
-    "CONVERSION-DX9EX-00484 / DX9EX-PERF-CADENCE-PROCESS-HANDLE-CACHE-0067: after the structure-refactor chain was explicitly closed, selected a bounded general frame-pacing maintenance unit. WaitForNextCadenceRequest previously opened and closed a SYNCHRONIZE process handle for host.hostPid on every cadence-gated rendered frame. The game now caches one process handle while the host PID is stable, releases/reacquires it on PID change or host exit/unusable handle, drops it for invalid host state, and releases it on game Reset. Cadence token identity, xrWaitFrame authority, timeout budget, simulation cadence and producer-fence policy are unchanged. verify_vr_hud_cadence_restore.py prevents per-frame OpenProcess/CloseHandle regression. Exact validation-bearing SHA ff94725406535793ff7615e69480f55dd4c0ca78 passed DX9Ex Active 37479990940 policy/host/game/full-chain/package. Package artifact 11420524136 digest sha256:fe293358e9d541b1c697bd7b42c8448f85d39102bab80e250b95ef9fcea14e11. RUNTIME_VALIDATION=UNTESTED."
+    "CONVERSION-DX9EX-00484 / DX9EX-PERF-CADENCE-PROCESS-HANDLE-CACHE-0067: after the structure-refactor chain was explicitly closed, selected a bounded general frame-pacing maintenance unit. WaitForNextCadenceRequest previously opened and closed a SYNCHRONIZE process handle for host.hostPid on every cadence-gated rendered frame. The game now caches one process handle while the host PID is stable, releases/reacquires it on PID change or host exit/unusable handle, drops it for invalid host state, and releases it on game Reset. Cadence token identity, xrWaitFrame authority, timeout budget, simulation cadence and producer-fence policy are unchanged. verify_vr_hud_cadence_restore.py prevents per-frame OpenProcess/CloseHandle regression. Exact validation-bearing SHA ff94725406535793ff7615e69480f55dd4c0ca78 passed DX9Ex Active 37479990940 policy/host/game/full-chain/package. Package artifact 11420524136 digest sha256:fe293358e9d541b1c697bd7b42c8448f85d39102bab80e250b95ef9fcea14e11. RUNTIME_VALIDATION=UNTESTED.",
+    "CONVERSION-DX9EX-00485 / DX9EX-CORRECTNESS-CROSS-THREAD-SEMANTIC-REGISTRY-0068: runtime regression evidence from ff947254/session 20261006T151027454Z-8f9b3197 showed 3858 semantic rows all UNKNOWN, worldBillboard=0 and producer draws=0. Compared with HMD-proven 902a89ea and restored only the shared synchronized SpriteNode semantic registry on current R31/R32/R33 architecture, retaining ProducerToken diagnostics and ScreenOverlay2D generic fallback. RED SHA 52e3202c... failed the new guard as expected; exact validation-bearing SHA 3edab9f54806b2ef4141546b3537cfa75c280af6 passed DX9Ex Active 37498273170 policy/host/game/full-chain/package and HUD Inspector 37498273068. Artifact 11428802385 digest sha256:a74ab32fe6faff05bd76889f487d0835fd4e859c65e3fa2bb0582f6548e5020f. ProjectedMarkerInfo/Calc3D2D anchor payload intentionally remains for the next bounded correctness unit. RUNTIME_VALIDATION=UNTESTED."
   ],
-  "batchStatus": "DX9EX-GENERAL-PERF-CADENCE-PROCESS-HANDLE-CACHE-0067-BUILD_VERIFIED",
+  "batchStatus": "DX9EX-CORRECTNESS-CROSS-THREAD-SEMANTIC-REGISTRY-0068-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
   "validationRunId": 37409670128,
   "validationResult": "PASS",
@@ -1132,7 +1133,8 @@
     "VR-REFACTOR-POST1100-R32-HOOKFREE-R33-DIRECTGPU-FOLD-0064",
     "VR-REFACTOR-POST1100-R32-INSTALL-SHIM-RETIREMENT-0065",
     "VR-REFACTOR-POST1100-TERMINAL-HARDENING-GUARD-0066",
-    "DX9EX-PERF-CADENCE-PROCESS-HANDLE-CACHE-0067"
+    "DX9EX-PERF-CADENCE-PROCESS-HANDLE-CACHE-0067",
+    "DX9EX-CORRECTNESS-CROSS-THREAD-SEMANTIC-REGISTRY-0068"
   ],
   "post1000Maintenance00470": {
     "taskId": "CONVERSION-DX9EX-00470",
@@ -1687,5 +1689,46 @@
     },
     "issue14CommentId": 6018702833,
     "validationPr": 107
+  },
+  "correctnessRecovery00485": {
+    "taskId": "CONVERSION-DX9EX-00485",
+    "productionId": "CONVERSION-DX9EX-00485",
+    "eventId": "CONVERSION-DX9EX-00485-E001",
+    "eventType": "dispatch",
+    "attempt": "1/3",
+    "item": "DX9EX-CORRECTNESS-CROSS-THREAD-SEMANTIC-REGISTRY-0068",
+    "category": "GENERAL_CORRECTNESS_HUD_SEMANTIC_LIFETIME",
+    "baseSha": "d858b4052b49dfc9369a5b48e6feacb4014049fc",
+    "redGuardSha": "52e3202c1fe640f62e695e2712a10f12562a1104",
+    "materialResultSha": "3edab9f54806b2ef4141546b3537cfa75c280af6",
+    "validationBearingResultSha": "3edab9f54806b2ef4141546b3537cfa75c280af6",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "status": "COMPLETE_BUILD_VERIFIED",
+    "summary": "Restored cross-thread publication/consumption of exact SpriteNode ScreenHud/WorldBillboard semantics and ProducerToken metadata using the proven shared synchronized bounded registry with serial-cutoff stale cleanup.",
+    "scopeBoundary": "ProjectedMarkerInfo/Calc3D2D rank-rival anchor payload is not part of 00485 and remains open. No HMD visual PASS is claimed.",
+    "validation": {
+      "red": {
+        "sha": "52e3202c1fe640f62e695e2712a10f12562a1104",
+        "dx9exActiveRunId": 37498045406,
+        "policyJobId": 112387556159,
+        "result": "EXPECTED_FAILURE"
+      },
+      "green": {
+        "dx9exActiveRunId": 37498273170,
+        "jobs": {
+          "policy": 112388323867,
+          "host": 112388544823,
+          "game": 112388544744,
+          "fullChainCompile": 112388544808,
+          "package": 112390845153
+        },
+        "hudInspectorRunId": 37498273068,
+        "packageArtifactId": 11428802385,
+        "packageArtifactDigest": "sha256:a74ab32fe6faff05bd76889f487d0835fd4e859c65e3fa2bb0582f6548e5020f"
+      }
+    },
+    "issue14CommentId": 6021152212,
+    "issue13CommentId": 6021157673
   }
 }
