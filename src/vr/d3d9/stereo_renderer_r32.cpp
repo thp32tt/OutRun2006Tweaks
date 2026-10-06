@@ -428,6 +428,10 @@ namespace OutRunVRStereo
         void R32InvalidateDirectInteropOnly() noexcept
         {
             R32ClearPendingProducerFences();
+            // Host PID/LUID changed. The dedicated ACK mapping belongs to the
+            // previous host process object too, so drop that view/handle before
+            // rebuilding the shared-eye transport against the new identity.
+            R13ReleaseAckState();
             R32DirectCopyPathRejected = false;
             R32DirectCopyRejectHr = D3D_OK;
             ReleaseDirectTransportSlots();

@@ -360,13 +360,17 @@ require(
     invalidate_direct_r32,
     "R32 host-identity interop invalidation",
     "R32ClearPendingProducerFences();",
+    "R13ReleaseAckState();",
     "ReleaseDirectTransportSlots();",
     "ReleaseDirectInteropProbe();",
     "R32ForgetDirectIdentity();",
 )
 require_order(
     invalidate_direct_r32,
-    "R32 interop probe teardown routing",
+    "R32 host-identity ACK/transport teardown routing",
+    "R32ClearPendingProducerFences();",
+    "R13ReleaseAckState();",
+    "ReleaseDirectTransportSlots();",
     "ReleaseDirectInteropProbe();",
     "R32ForgetDirectIdentity();",
 )
