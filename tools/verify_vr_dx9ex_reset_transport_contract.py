@@ -449,12 +449,22 @@ forbid(
     "R32 final owner fixed-slot regression",
     "R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted)",
 )
+require(
+    resolve_direct_r32,
+    "R32 non-blocking producer EVENT poll",
+    "candidate.fence",
+    "candidate.fence->GetData(nullptr, 0, 0)",
+)
 forbid(
     resolve_direct_r32,
     "R32 redundant pre-Present producer fence wait",
     "R32WaitProducerFence(slot.fence)",
     "R32ProducerFencePending[selected] = true;",
     "R32ProducerPendingFrame[selected] = frameId;",
+    "D3DGETDATA_FLUSH",
+    "SwitchToThread(",
+    "Sleep(",
+    "WaitForSingleObject(",
 )
 
 invalidate_r32 = body(r32, "void R32InvalidateResetCaches() noexcept")
