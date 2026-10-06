@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00466",
+  "production_id": "CONVERSION-DX9EX-00466",
+  "event_id": "CONVERSION-DX9EX-00466-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "VALIDATING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "010b05a4bbf2d79d1c48871a95712c92f3a3b073",
+  "material_result_sha": "PENDING_SELF",
+  "validation_bearing_result_sha": "PENDING_SELF",
+  "result_sha": "PENDING_SELF",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00466]",
+  "selected_work_item": "VR-DX9EX-RELEASE-CALLSITE-COMPAT-0049",
+  "summary": "Propagate explicit R19 release-content provenance through the older R23 direct-safe projection caller so the host compiles and incomplete images still revoke cache proof.",
+  "changed_paths": [
+    "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00465.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00466.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered HEAD 010b05a4bbf2d79d1c48871a95712c92f3a3b073 and attempt-3 evidence. 00465 is BLOCKED at 3/3; exact host compile exposed two omitted one-argument Release(Projection) calls in R23 direct-safe projection while policy and Domain Isolation passed."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "RenderSafeProjection in d3d9ex_direct_passthrough.hpp has two Release call sites: invalid image-index cleanup and post-render release. The former must revoke commit provenance (false); the latter must pass render completeness (ok) and reject failed release."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Migrated invalid-index cleanup to Release(Projection, false), successful render path to Release(Projection, ok), and made failed release fail the render path. Added deterministic verifier coverage forbidding legacy one-argument Release in that owner."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING"
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "predecessor_blocked_task": "CONVERSION-DX9EX-00465",
+    "predecessor_host_job_id": 112127068320,
+    "compile_signature": "C2660: OutRunVrSbsCaptureOverride::Release function does not take 1 arguments",
+    "code_review": [
+      "Invalid RTV index still releases acquired/waited image but cannot mark it content-complete.",
+      "Post-render release carries ok provenance and is now part of the success condition.",
+      "Verifier binds directly to RenderSafeProjection and forbids Release(Projection); legacy form."
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Validate this exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; if PASS, finalize C3-C6 and Issue #14 while preserving RUNTIME_VALIDATION=UNTESTED.",
+  "started_at_kst": "2026-10-06T14:55:00+09:00"
+}

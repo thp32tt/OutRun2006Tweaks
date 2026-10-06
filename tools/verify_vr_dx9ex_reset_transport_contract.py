@@ -1062,6 +1062,20 @@ require(
     "const bool released = Release(Theater, ok);",
 )
 
+direct_safe_projection = body(host_passthrough, "inline bool RenderSafeProjection(")
+require(
+    direct_safe_projection,
+    "R23 direct projection explicit release content provenance",
+    "Release(Projection, false);",
+    "const bool released = Release(Projection, ok);",
+    "if (!ok || !released)",
+)
+forbid(
+    direct_safe_projection,
+    "R23 direct projection must not use legacy one-argument Release",
+    "Release(Projection);",
+)
+
 r24_direct_projection = body(host_r24, "inline bool RenderSafeProjectionChecked(")
 r24_direct_flat = body(host_r24, "inline bool RenderDirectFlatFallback(")
 r24_emergency = body(host_r24, "inline bool BuildEmergencyVisibleQuad(")

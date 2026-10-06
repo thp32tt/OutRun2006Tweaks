@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "3/3",
-  "status": "VALIDATING",
+  "status": "BLOCKED",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "c0f95a32e722e1b162c93be75323212938cbe407",
   "material_result_sha": "53d4247599a1ae217393b370328dd97ac03704c5",
-  "validation_bearing_result_sha": "PENDING_SELF",
-  "result_sha": "PENDING_SELF",
+  "validation_bearing_result_sha": "010b05a4bbf2d79d1c48871a95712c92f3a3b073",
+  "result_sha": "010b05a4bbf2d79d1c48871a95712c92f3a3b073",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00465]",
   "selected_work_item": "VR-DX9EX-RELEASE-COMMIT-PROVENANCE-0048",
   "summary": "Separate swapchain release success from cached-visible content commitment so incomplete/invalid releases cannot inherit same-generation commit proof.",
@@ -39,25 +39,26 @@
       "evidence": "Release now requires explicit contentComplete provenance. Successful release commits generation only for complete content; cleanup releases pass false; hard release failure clears committedGeneration before setting releaseFaulted. R24 projection/flat/emergency paths use the same explicit contract."
     },
     "C3_VALIDATE": {
-      "status": "RETRYING_FINAL",
-      "automation_validation": "PENDING",
+      "status": "BLOCKED",
+      "automation_validation": "FAIL",
       "runtime_validation": "UNTESTED",
-      "evidence": "Attempt 1: DX9Ex Active 37419678304 FAIL_IMPLEMENTATION_GUARD, Domain Isolation 37419678336 PASS. Attempt 2: source repair SHA 53d4247599a1ae217393b370328dd97ac03704c5; DX9Ex Active 37419860688 FAIL_VERIFIER_MARKER_ONLY. Final repair changes verifier marker to RenderSafeProjectionChecked."
+      "evidence": "Attempt 3 exact SHA 010b05a4bbf2d79d1c48871a95712c92f3a3b073 passed policy job 112126970221 and Domain Isolation 37419986786, but host job 112127068320 failed compile C2660 at d3d9ex_direct_passthrough.hpp lines 750/768 because legacy one-argument Release(Projection) callers remained."
     },
     "C4_COMMIT": {
-      "status": "PENDING",
+      "status": "BLOCKED",
       "source_material_sha": "53d4247599a1ae217393b370328dd97ac03704c5",
+      "validation_bearing_result_sha": "010b05a4bbf2d79d1c48871a95712c92f3a3b073",
       "ci_skip_on_validation_bearing_result": false
     },
     "C5_PACKAGE": {
-      "status": "PENDING"
+      "status": "NOT_PRODUCED_DUE_TO_FAILED_GATE"
     },
     "C6_STATE": {
-      "status": "PENDING",
+      "status": "COMPLETE_BLOCKED",
       "runtime_validation": "UNTESTED"
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "FAIL",
   "evidence": {
     "code_review": [
       "Release success previously conflated OpenXR ownership transfer with content-valid cache commitment.",
@@ -82,10 +83,21 @@
       "source_repair_sha": "53d4247599a1ae217393b370328dd97ac03704c5",
       "domain_isolation_run_id": 37419860533,
       "domain_isolation_result": "SUCCESS"
+    },
+    "third_validation": {
+      "dx9ex_active_run_id": 37419986787,
+      "policy_job_id": 112126970221,
+      "policy_result": "PASS",
+      "host_job_id": 112127068320,
+      "host_result": "FAIL_COMPILE_C2660_LEGACY_RELEASE_CALLERS",
+      "domain_isolation_run_id": 37419986786,
+      "domain_isolation_result": "PASS"
     }
   },
-  "next_action": "Validate the final verifier-repair exact SHA with canonical DX9Ex Active Validation and Domain Isolation; if PASS, finalize C3-C6 with source_material_sha=53d42475... and RUNTIME_VALIDATION=UNTESTED. If it fails again, mark BLOCKED per bounded repair rule.",
+  "next_action": "Do not retry 00465. Use 00466 to address the newly evidenced legacy Release call sites and validate independently.",
   "started_at_kst": "2026-10-06T14:43:00+09:00",
   "source_material_sha": "53d4247599a1ae217393b370328dd97ac03704c5",
-  "failure_context": "Attempt 1 exact run 37419678304 caught successful Release calls incorrectly passing contentComplete=false. Attempt 2 exact run 37419860688 confirmed source repair but failed policy because verifier looked for nonexistent R24 marker RenderDirectSafeProjection; actual content owner is RenderSafeProjectionChecked. Attempt 3 fixes only the verifier marker without weakening required release-provenance assertions."
+  "failure_context": "Attempt 1 exact run 37419678304 caught successful Release calls incorrectly passing contentComplete=false. Attempt 2 exact run 37419860688 confirmed source repair but failed policy because verifier looked for nonexistent R24 marker RenderDirectSafeProjection; actual content owner is RenderSafeProjectionChecked. Attempt 3 fixes only the verifier marker without weakening required release-provenance assertions.",
+  "blocker": "Automatic repair budget exhausted at ATTEMPT=3/3. New compile evidence identifies omitted R23 direct-safe projection Release caller migration; follow-up moved to independent TASK_ID CONVERSION-DX9EX-00466.",
+  "completed_at_kst": "2026-10-06T14:55:00+09:00"
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T14:50:00+09:00",
+  "updatedKst": "2026-10-06T14:55:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -112,7 +112,7 @@
     "VR-DX9EX-CAPTURE-SOURCE-TRANSACTION-0047",
     "VR-DX9EX-RELEASE-COMMIT-PROVENANCE-0048"
   ],
-  "next": "Structural extraction remains terminal and ARCH-V3-GATE-001 remains HMD-gated. R19 release ownership now separates successful OpenXR release from cached-visible content commitment: only a fully rendered image may carry committedGeneration, while invalid-index, partial-render, or hard-release failure revokes same-generation cache proof. Validate the exact 00465 material SHA, then continue only with another independently provable DX9Ex stability/resource-lifetime unit until the Quest3/VDXR architecture-v3 entry gate opens.",
+  "next": "Structural extraction remains terminal and ARCH-V3-GATE-001 remains HMD-gated. CONVERSION-DX9EX-00465 is task-BLOCKED after exhausting 3/3, but its final host compile log provided new evidence: the older R23 direct-safe projection caller was not migrated to Release(Swapchain&, bool). CONVERSION-DX9EX-00466 propagates false for invalid-index cleanup and ok for the completed render path, with deterministic caller coverage. Validate the exact 00466 SHA before any further independent unit.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -243,7 +243,8 @@
     "CONVERSION-DX9EX-00462 / VR-DX9EX-SWAPCHAIN-IMAGE-ACQUIRE-FAIL-CLOSED-0045 marks acquireFaulted on hard xrAcquireSwapchainImage failure, without claiming acquired/waited ownership. Later Acquire calls fail closed and EnsureSwapchain bypasses unchanged-handle reuse so transactional Destroy/recreate resolves the broken image-flow path. XR_SUCCESS and XR_SESSION_LOSS_PENDING remain success via XR_FAILED semantics. Runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00463 / VR-DX9EX-SHADER-RESOURCE-TRANSACTION-0046 makes R19 CreateShaders all-or-nothing: any stale partial global bundle is released before retry, VS/PS/sampler/constant-buffer objects are created into pending locals, every failure rolls them back, and globals are published only after the full bundle exists. Runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00464 / VR-DX9EX-CAPTURE-SOURCE-TRANSACTION-0047 stages a replacement R19 production capture texture and SRV in local COM pointers, releases pending resources on failure, and swaps the published Source/SourceSrv only after both objects are complete. The prior bundle and its unchanged freshness timestamp remain intact on transient creation failure. Runtime remains UNTESTED pending Quest3/VDXR.",
-    "CONVERSION-DX9EX-00465 / VR-DX9EX-RELEASE-COMMIT-PROVENANCE-0048 changes R19 Release to require explicit contentComplete provenance. Successful releases commit the current generation only when rendering completed; invalid-index and partial-render cleanup release with contentComplete=false, and hard release failure clears committedGeneration before faulting. R24 direct projection/flat/emergency callers use the same explicit contract. Runtime remains UNTESTED pending Quest3/VDXR."
+    "CONVERSION-DX9EX-00465 / VR-DX9EX-RELEASE-COMMIT-PROVENANCE-0048 changes R19 Release to require explicit contentComplete provenance. Successful releases commit the current generation only when rendering completed; invalid-index and partial-render cleanup release with contentComplete=false, and hard release failure clears committedGeneration before faulting. R24 direct projection/flat/emergency callers use the same explicit contract. Runtime remains UNTESTED pending Quest3/VDXR.",
+    "CONVERSION-DX9EX-00465 exhausted ATTEMPT=3/3 and is BLOCKED as a task after validation-bearing 010b05a4bbf2d79d1c48871a95712c92f3a3b073 passed policy/domain isolation but host compile failed: d3d9ex_direct_passthrough.hpp still called the new two-argument R19 Release API with one argument at two R23 direct-safe projection call sites. The third-attempt compile log is new evidence and reopens the specific caller-propagation defect as CONVERSION-DX9EX-00466 rather than retrying 00465."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
@@ -1001,12 +1002,28 @@
     "attempt": "3/3",
     "item": "VR-DX9EX-RELEASE-COMMIT-PROVENANCE-0048",
     "baseSha": "c0f95a32e722e1b162c93be75323212938cbe407",
+    "materialResultSha": "53d4247599a1ae217393b370328dd97ac03704c5",
+    "validationBearingResultSha": "010b05a4bbf2d79d1c48871a95712c92f3a3b073",
+    "automationValidation": "FAIL",
+    "runtimeValidation": "UNTESTED",
+    "summary": "Separate swapchain release success from cached-visible content commitment so incomplete/invalid releases cannot inherit same-generation commit proof.",
+    "sourceMaterialSha": "53d4247599a1ae217393b370328dd97ac03704c5",
+    "failureContext": "Attempt 1 e92c9d6a... failed policy because successful release calls still used contentComplete=false. Attempt 2 53d42475... repaired those source calls; policy then failed only because the new verifier referenced nonexistent RenderDirectSafeProjection instead of the real R24 owner RenderSafeProjectionChecked. Final attempt changes only that verifier marker.",
+    "status": "BLOCKED",
+    "blocker": "ATTEMPT=3/3 exact SHA 010b05a4bbf2d79d1c48871a95712c92f3a3b073: policy PASS and Domain Isolation 37419986786 PASS, but host job 112127068320 failed C2660 because d3d9ex_direct_passthrough.hpp retained two legacy one-argument Release(Projection) calls after the R19 API changed to Release(Swapchain&, bool)."
+  },
+  "post1000Maintenance00466": {
+    "taskId": "CONVERSION-DX9EX-00466",
+    "productionId": "CONVERSION-DX9EX-00466",
+    "eventId": "CONVERSION-DX9EX-00466-E001",
+    "eventType": "dispatch",
+    "attempt": "1/3",
+    "item": "VR-DX9EX-RELEASE-CALLSITE-COMPAT-0049",
+    "baseSha": "010b05a4bbf2d79d1c48871a95712c92f3a3b073",
     "materialResultSha": "PENDING_SELF",
     "validationBearingResultSha": "PENDING_SELF",
     "automationValidation": "PENDING",
     "runtimeValidation": "UNTESTED",
-    "summary": "Separate swapchain release success from cached-visible content commitment so incomplete/invalid releases cannot inherit same-generation commit proof.",
-    "sourceMaterialSha": "53d4247599a1ae217393b370328dd97ac03704c5",
-    "failureContext": "Attempt 1 e92c9d6a... failed policy because successful release calls still used contentComplete=false. Attempt 2 53d42475... repaired those source calls; policy then failed only because the new verifier referenced nonexistent RenderDirectSafeProjection instead of the real R24 owner RenderSafeProjectionChecked. Final attempt changes only that verifier marker."
+    "summary": "Propagate explicit R19 release-content provenance through the older R23 direct-safe projection caller so the host compiles and incomplete images still revoke cache proof."
   }
 }

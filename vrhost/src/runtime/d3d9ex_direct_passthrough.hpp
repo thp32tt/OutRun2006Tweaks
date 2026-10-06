@@ -747,7 +747,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
             return false;
         if (image >= Projection.rtvs.size())
         {
-            Release(Projection);
+            Release(Projection, false);
             return false;
         }
 
@@ -765,8 +765,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         SourceFormat = savedFormat;
         if (OutRunVrFinalTest::Context)
             OutRunVrFinalTest::Context->Flush();
-        Release(Projection);
-        if (!ok)
+        const bool released = Release(Projection, ok);
+        if (!ok || !released)
             return false;
 
         projection = *incoming;
