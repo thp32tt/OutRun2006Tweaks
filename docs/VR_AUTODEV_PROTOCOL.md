@@ -2,6 +2,22 @@
 
 This repository-side protocol matches the four Work scheduled roles. The schedule is external; this file defines durable coordination and ownership.
 
+## Architecture v3 phase-transition override — 2026-10-06
+
+This section supplements the 2026-09-30 DX9Ex-first direction and is the newest authority for what happens after the stable DX9Ex runtime baseline is accepted.
+
+- Current phase remains **DX9Ex stabilization**. Do not interrupt an active immutable DX9Ex task to start architecture migration.
+- The existing `IGameAdapter`, `IStereoBackend`, `IFrameProducer`, `IFrameConsumer`, `IVrRuntime`, IPC v3, and v3 shadow-bridge scaffolding must be reused; do not recreate parallel abstractions.
+- The durable migration sequence is `docs/VR_ARCH_V3_MIGRATION_PLAN.md` and queue keys `ARCH-V3-GATE-001`, `ARCH-V3-001..008`.
+- `ARCH-V3-GATE-001` is an HMD/runtime gate. CI or static evidence alone cannot open it.
+- While the gate is closed, v2 remains the live authority and v3 is limited to test/shadow/equivalence work that does not alter rendered behavior.
+- If all executable DX9Ex stabilization work becomes HMD-gated, report the exact runtime gate instead of manufacturing filler refactors.
+- When matching Quest 3 / VDXR evidence opens `ARCH-V3-GATE-001`, D must automatically promote `ARCH-V3-001` to READY and execute `ARCH-V3-001..008` in dependency order, one bounded change at a time.
+- Live cutover is staged. Never switch HostState, ClientState, FrameRing and AckState authority in one atomic change; preserve rollback to v2 until v3-primary runtime acceptance.
+- Do not delete IPC v2 or semantic compatibility paths until `ARCH-V3-007` has matching USER_RUNTIME_VERIFIED evidence.
+- DX11 Native and DXVK remain downstream ports while the v3-primary DX9Ex runtime is unaccepted. After `ARCH-V3-008`, they may be reopened against the common v3 architecture contract instead of copying old R-series coupling.
+- DX12/D3D9On12 remains reference-only unless explicitly reopened.
+
 ## User direction override — 2026-09-30
 
 This section supersedes the 2026-09-29 backend-allocation override.
