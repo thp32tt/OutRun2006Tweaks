@@ -243,6 +243,7 @@ float4 PSMain(VSOut input) : SV_Target
         std::vector<std::array<ID3D11RenderTargetView*, 2>> rtvs;
         bool acquired = false;
         bool waited = false;
+        bool waitFaulted = false;
         bool gpuWorkSubmitted = false;
         std::uint32_t acquiredImage = 0;
 
@@ -295,6 +296,7 @@ float4 PSMain(VSOut input) : SV_Target
             format = DXGI_FORMAT_UNKNOWN;
             acquired = false;
             waited = false;
+            waitFaulted = false;
             gpuWorkSubmitted = false;
             acquiredImage = 0;
             return true;
@@ -619,7 +621,7 @@ float4 PSMain(VSOut input) : SV_Target
     {
         if (swapchain.handle != XR_NULL_HANDLE && swapchain.width == width &&
             swapchain.height == height && swapchain.arraySize == arraySize &&
-            !swapchain.images.empty())
+            !swapchain.images.empty() && !swapchain.waitFaulted)
             return true;
 
         if (!swapchain.Destroy())
@@ -747,6 +749,9 @@ float4 PSMain(VSOut input) : SV_Target
 
     inline bool Acquire(Swapchain& swapchain, std::uint32_t& image)
     {
+        if (swapchain.waitFaulted)
+            return false;
+
         if (!swapchain.acquired)
         {
             XrSwapchainImageAcquireInfo acquire{ XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
@@ -771,8 +776,11 @@ float4 PSMain(VSOut input) : SV_Target
         }
         if (XR_FAILED(result))
         {
-            // Preserve acquiredImage. A later attempt must wait this oldest
-            // acquired image again instead of violating acquire/wait order.
+            // Only XR_TIMEOUT_EXPIRED has an explicit same-image retry contract.
+            // Keep local ownership intact, but fail this swapchain closed so the
+            // next EnsureSwapchain call tears it down/recreates it instead of
+            // repeatedly issuing a failed wait every host frame.
+            swapchain.waitFaulted = true;
             return false;
         }
         swapchain.waited = true;

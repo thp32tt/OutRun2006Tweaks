@@ -862,10 +862,43 @@ forbid(
     "swapchain.acquired = false;",
     "swapchain.acquiredImage = 0;",
     "swapchain.waited = true;",
+    "swapchain.waitFaulted = true;",
     "::xrReleaseSwapchainImage",
+)
+require(
+    host_sbs,
+    "R19 swapchain wait hard-fault state",
+    "bool waitFaulted = false;",
+)
+require_order(
+    sbs_acquire,
+    "R19 prior hard wait fault fails closed before acquire",
+    "if (swapchain.waitFaulted)",
+    "return false;",
+    "if (!swapchain.acquired)",
+)
+hard_wait_start = sbs_acquire.find("if (XR_FAILED(result))")
+wait_success_start = sbs_acquire.find("swapchain.waited = true;", hard_wait_start)
+hard_wait_path = sbs_acquire[hard_wait_start:wait_success_start]
+require(
+    hard_wait_path,
+    "R19 hard wait failure marks swapchain faulted",
+    "swapchain.waitFaulted = true;",
+    "return false;",
+)
+require_order(
+    hard_wait_path,
+    "R19 hard wait fault before frame yield",
+    "swapchain.waitFaulted = true;",
+    "return false;",
 )
 
 sbs_swapchain_destroy = body(host_sbs, "bool Destroy(bool parentSessionDestroying = false)")
+require(
+    sbs_swapchain_destroy,
+    "R19 swapchain wait hard-fault reset",
+    "waitFaulted = false;",
+)
 require(
     host_sbs,
     "R19 swapchain GPU-work provenance",
@@ -958,6 +991,12 @@ forbid(
 )
 
 ensure_swapchain = body(host_sbs, "inline bool EnsureSwapchain(")
+require(
+    ensure_swapchain,
+    "R19 hard wait fault bypasses swapchain reuse",
+    "!swapchain.waitFaulted",
+    "if (!swapchain.Destroy())",
+)
 require_order(
     ensure_swapchain,
     "R19 live recreate fail-closed destroy",

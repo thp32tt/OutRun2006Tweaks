@@ -1,0 +1,73 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00460",
+  "production_id": "CONVERSION-DX9EX-00460",
+  "event_id": "CONVERSION-DX9EX-00460-E003",
+  "event_type": "rollover",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+  "status": "VALIDATING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "85e77072e3b026e00eed5b0597ada289ebf35f94",
+  "material_result_sha": "PENDING_SELF",
+  "validation_bearing_result_sha": "PENDING_SELF",
+  "result_sha": "PENDING_SELF",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00460]",
+  "selected_work_item": "VR-DX9EX-SWAPCHAIN-WAIT-HARD-ERROR-FAIL-CLOSED-0043",
+  "summary": "Fail closed after non-timeout xrWaitSwapchainImage errors: mark the swapchain faulted, block repeated Acquire retries, and force EnsureSwapchain through transactional teardown/recreation while preserving XR_TIMEOUT_EXPIRED same-image retry semantics.",
+  "changed_paths": [
+    "vrhost/src/runtime/sbs_capture_override.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00460.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub HEAD 85e77072e3b026e00eed5b0597ada289ebf35f94. CONVERSION-DX9EX-00459 exact HEAD validation already passed DX9Ex Active 37410522395 and Domain Isolation 37410522350, so its material work was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "OpenXR explicitly defines same-image retry after XR_TIMEOUT_EXPIRED. The current R19 path also retried non-timeout wait failures indefinitely each host frame, despite those errors lacking the timeout retry guarantee."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added per-swapchain waitFaulted state. Hard xrWaitSwapchainImage failures set it; Acquire then fails closed and EnsureSwapchain bypasses same-handle reuse to transactional Destroy/recreate. Timeout behavior is unchanged and does not set the fault."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING"
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "standards": [
+      "OpenXR 1.1 current registry: XR_TIMEOUT_EXPIRED is the explicitly specified case where the next xrWaitSwapchainImage waits on the same image index again.",
+      "Non-timeout xrWaitSwapchainImage failures include runtime/handle/instance/session/call-order errors; this change fails closed rather than repeatedly resubmitting the failed wait."
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Validate this exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize C3-C6 bookkeeping and Issue #14 while preserving RUNTIME_VALIDATION=UNTESTED.",
+  "started_at_kst": "2026-10-06T13:14:00+09:00"
+}

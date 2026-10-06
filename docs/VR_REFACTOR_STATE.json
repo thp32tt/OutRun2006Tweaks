@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T12:44:30+09:00",
+  "updatedKst": "2026-10-06T13:14:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -104,9 +104,10 @@
     "VR-DX9EX-SWAPCHAIN-DESTROY-FAIL-CLOSED-0039",
     "VR-DX9EX-SWAPCHAIN-LIVE-DESTROY-RESOURCE-RETENTION-0040",
     "VR-DX9EX-SWAPCHAIN-GPU-WORK-PROVENANCE-0041",
-    "VR-DX9EX-SWAPCHAIN-IMAGE-WAIT-BOUNDED-0042"
+    "VR-DX9EX-SWAPCHAIN-IMAGE-WAIT-BOUNDED-0042",
+    "VR-DX9EX-SWAPCHAIN-WAIT-HARD-ERROR-FAIL-CLOSED-0043"
   ],
-  "next": "Structural extraction remains terminal. R19 swapchain image wait is now finite: xrWaitSwapchainImage uses a 5 ms timeout and returns control to the host frame loop on XR_TIMEOUT_EXPIRED while retaining the same acquired image for a later retry. Continue with the next independently provable DX9Ex stability/frame-pacing unit; runtime behavior remains HMD-evidence gated.",
+  "next": "Structural extraction remains terminal. R19 now distinguishes the retryable XR_TIMEOUT_EXPIRED path from hard xrWaitSwapchainImage failures: timeout retains same-image retry state, while a hard failure marks the swapchain faulted so later reuse is blocked and EnsureSwapchain attempts transactional teardown/recreation. Continue with the next independently provable DX9Ex stability/frame-pacing unit; runtime behavior remains HMD-evidence gated.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -231,7 +232,8 @@
     "CONVERSION-DX9EX-00457 / VR-DX9EX-SWAPCHAIN-LIVE-DESTROY-RESOURCE-RETENTION-0040 makes live R19 swapchain destruction transactional. Runtime source SHA b788db90113ea34b208427a6b9fdd314c9d24377; verifier repair/validation-bearing SHA b855fd32389aa330b8f04598fbcd76853c6d8f99 passed DX9Ex Active 37408680043 and Domain Isolation 37408680053 after initial verifier-only failure 37408556548. Package artifact 11389036142 digest sha256:7f9c7931d2b664c054f5ad3aaf7a1f2337d2a14b5ed57df1116ce86b31b72eb0. Runtime remains UNTESTED.",
     "VR-DX9EX-SWAPCHAIN-GPU-WORK-PROVENANCE-0041 adds per-swapchain gpuWorkSubmitted ownership set immediately after Draw. Fresh or partially initialized swapchains with no submitted graphics work can destroy without a completion query; rendered swapchains still require the bounded D3D11 event-query drain.",
     "CONVERSION-DX9EX-00458 / VR-DX9EX-SWAPCHAIN-GPU-WORK-PROVENANCE-0041 tracks whether an R19 swapchain actually submitted Draw work. Initial source SHA 2e37d30581f40d7de6210ab5fe946346d0698ee3 exposed incompatible RenderTo signature consumers and failed host compile; compatibility repair/validation-bearing SHA 4df0dab3a947ace0b938a8216b934786e79a06b5 passed DX9Ex Active 37409670128 and Domain Isolation 37409670208. Package artifact 11387984834 digest sha256:9008297ac9eb2a72eb8288d79ce2d8b431ce0abc3458498243965ad8b65f3627. Runtime remains UNTESTED.",
-    "VR-DX9EX-SWAPCHAIN-IMAGE-WAIT-BOUNDED-0042 replaces XR_INFINITE_DURATION with a 5 ms wait budget. XR_TIMEOUT_EXPIRED preserves acquired=true/waited=false and the acquired image index so the next frame retries the same oldest acquired image as required by OpenXR 1.1.63, preventing the R19 host frame loop from intentionally blocking indefinitely."
+    "VR-DX9EX-SWAPCHAIN-IMAGE-WAIT-BOUNDED-0042 replaces XR_INFINITE_DURATION with a 5 ms wait budget. XR_TIMEOUT_EXPIRED preserves acquired=true/waited=false and the acquired image index so the next frame retries the same oldest acquired image as required by OpenXR 1.1.63, preventing the R19 host frame loop from intentionally blocking indefinitely.",
+    "CONVERSION-DX9EX-00460 / VR-DX9EX-SWAPCHAIN-WAIT-HARD-ERROR-FAIL-CLOSED-0043 keeps XR_TIMEOUT_EXPIRED as the only same-image retry path. A non-timeout xrWaitSwapchainImage failure now marks the R19 swapchain waitFaulted, Acquire fails closed, and EnsureSwapchain refuses the unchanged-handle fast path so transactional Destroy/recreate can recover without hammering a failed wait every host frame. Runtime remains UNTESTED pending Quest3/VDXR."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
