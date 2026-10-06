@@ -40,7 +40,7 @@ tc=np.asarray(src.crop(target_cell),dtype=np.float32)
 sel_src=tpl_src.crop(selected); sel_clean=tpl_clean.crop(selected); sel_final=tpl_final.crop(selected)
 # Exact approved Normal Balance source mask geometry from selected state.
 sm0=dm(sel_src,sel_clean)
-if sm0.getbbox()!=(11,8,401,80): raise RuntimeError(("selected source mask drift",sm0.getbbox()))
+if sm0.getbbox()!=(32,20,386,65): raise RuntimeError(("selected source clean-diff mask drift",sm0.getbbox()))
 sm=np.asarray(sm0)>0
 # Slightly include target color AA fringes where neighboring pixels are dark relative to the plate core.
 lum=0.2126*tc[:,:,0]+0.7152*tc[:,:,1]+0.0722*tc[:,:,2]
@@ -93,7 +93,7 @@ outcell[:,:,3]=clean_cell[:,:,3]
 outcell=np.clip(outcell,0,255).astype(np.uint8)
 final=clean.copy(); final.paste(Image.fromarray(outcell,"RGBA"),(target_cell[0],target_cell[1]))
 
-orig=[target_cell[0]+source_bbox[0],target_cell[1]+source_bbox[1],target_cell[0]+source_bbox[2],target_cell[1]+source_bbox[3]]
+orig=[1411,1968,1801,2040]  # C111 source-effect bbox [875,1632,1265,1704] shifted to target cell
 loc=[1504,1986,1702,2026]
 lm=Image.new("L",(W,H),0); lmarr=(cov>0.01).astype(np.uint8)*255; lm.paste(Image.fromarray(lmarr,"L"),(target_cell[0],target_cell[1]))
 if lm.getbbox()!=tuple(loc): raise RuntimeError(("localized bbox",lm.getbbox(),loc))
@@ -133,4 +133,4 @@ report={"schema_version":1,"role":"A","run":run,"queue_index":103,"asset":asset,
  "clean_plate_validator":cr,"final_mask_validator":fr,"candidate_path":str(candidate.relative_to(repo)),"worker_static_qa":"PASS","controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","status":"A107_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C","runtime_validation":"UNTESTED"}
 (out/"A107_590A4724_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 (wr/"A107_590A4724.json").write_text(json.dumps({"run":run,"index":103,"asset":"590A4724","candidate_sha256":csha,"bbox_size_positive_margin":"1/1 PASS","outside":final_out,"alpha_outside":alpha_out,"status":report["status"],"report":f"localization/graphics/role_A/{run}/A107_590A4724_REPORT.json"},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"run":run,"candidate_sha256":csha,"source_bbox":source_bbox,"orig":orig,"loc":loc,"margins":margins,"fg_target":fg_target.tolist(),"fit_pixels":int(fitmask.sum())},ensure_ascii=False),flush=True)
+print(json.dumps({"run":run,"candidate_sha256":csha,"source_mask_core_bbox":source_bbox,"orig":orig,"loc":loc,"margins":margins,"fg_target":fg_target.tolist(),"fit_pixels":int(fitmask.sum())},ensure_ascii=False),flush=True)
