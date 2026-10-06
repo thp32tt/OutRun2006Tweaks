@@ -75,6 +75,10 @@ SUMMARY_RE = re.compile(
     r"(?:translationExact=(?P<shaderTranslationExact>\d+),)?"
     r"fixedFunctionPending=(?P<shaderFixedFunctionPending>\d+),"
     r"programmablePending=(?P<shaderProgrammablePending>\d+)\] )?"
+    r"(?:programmableSemantic\[planExact=(?P<shaderSemanticPlanExact>\d+),"
+    r"planPending=(?P<shaderSemanticPlanPending>\d+),"
+    r"receiptExact=(?P<shaderSemanticReceiptExact>\d+),"
+    r"receiptPending=(?P<shaderSemanticReceiptPending>\d+)\] )?"
     r"(?:ffpCoverage\[exact=(?P<fixedFunctionCoverageExact>\d+),"
     r"queryFailure=(?P<fixedFunctionQueryFailure>\d+)\] )?"
     r"(?:ffpReadiness\[ready=(?P<fixedFunctionReadinessReady>\d+),"
@@ -1247,6 +1251,16 @@ def main() -> int:
         == managed_texture_shadow_evidence["RequiredSamples"]
     )
 
+    programmable_semantic_evidence = {
+        "PlanExactSamples": sum_latest("shaderSemanticPlanExact"),
+        "PlanPendingSamples": sum_latest("shaderSemanticPlanPending"),
+        "ReceiptExactSamples": sum_latest("shaderSemanticReceiptExact"),
+        "ReceiptPendingSamples": sum_latest("shaderSemanticReceiptPending"),
+        "TranslationImplemented": False,
+        "DiagnosticOnly": True,
+        "ActivationProof": False,
+    }
+
     dual_source_blend_evidence = {
         "AnySamples": sum_latest("dualSourceBlendAny"),
         "RgbSourceSamples": sum_latest("dualSourceBlendRgbSrc"),
@@ -1297,6 +1311,7 @@ def main() -> int:
             "ProgrammableShaderInventory": programmable_shader_inventory,
             "StartupBootstrapCoverage": startup_bootstrap_coverage,
             "ManagedTextureShadow": managed_texture_shadow_evidence,
+            "ProgrammableSemanticTranslation": programmable_semantic_evidence,
             "DualSourceBlend": dual_source_blend_evidence,
             "FixedFunctionDetailedStageDemand": fixed_function_detailed_stage_demand,
         },

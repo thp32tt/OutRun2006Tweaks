@@ -1833,6 +1833,32 @@ def main() -> int:
     assert r211_raster_semantics["UnsupportedTotalLatest"] == 2
     assert r211_raster_semantics["NativeDrawPathActivationAllowed"] is False
 
+    r277_programmable_semantic = run_case(
+        "VR DX11 R120 census: samples=6 exact=0 fixedFn=0 programmable=6 "
+        "topologyUnsupported=0 signatures=2 declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,depthUnsupported=0] "
+        "shaderReadiness[introspectionFailure=0,mixedPair=0,translationExact=0,"
+        "fixedFunctionPending=0,programmablePending=6] "
+        "programmableSemantic[planExact=5,planPending=1,receiptExact=0,receiptPending=6] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,stencil=0,"
+        "fog=0,lighting=0,srgb=0,fill=0,blend=0,depthCmp=0,cull=0]\n"
+    )
+    assert r277_programmable_semantic["LatestSummary"]["shaderSemanticPlanExact"] == 5
+    assert r277_programmable_semantic["LatestSummary"]["shaderSemanticPlanPending"] == 1
+    assert r277_programmable_semantic["LatestSummary"]["shaderSemanticReceiptExact"] == 0
+    assert r277_programmable_semantic["LatestSummary"]["shaderSemanticReceiptPending"] == 6
+    r277_evidence = r277_programmable_semantic["ActivationEvidence"][
+        "ProgrammableSemanticTranslation"
+    ]
+    assert r277_evidence["PlanExactSamples"] == 5
+    assert r277_evidence["PlanPendingSamples"] == 1
+    assert r277_evidence["ReceiptExactSamples"] == 0
+    assert r277_evidence["ReceiptPendingSamples"] == 6
+    assert r277_evidence["TranslationImplemented"] is False
+    assert r277_evidence["DiagnosticOnly"] is True
+    assert r277_evidence["ActivationProof"] is False
+    assert r277_programmable_semantic["NativeDrawPathActivationAllowed"] is False
+
     return 0
 
 

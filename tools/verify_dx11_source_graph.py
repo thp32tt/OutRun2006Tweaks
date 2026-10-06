@@ -10841,6 +10841,43 @@ def main() -> None:
             + ", ".join(missing_r275_r263_receipt_consumption)
         )
 
+    r277_programmable_semantic_census_contract = [
+        ("shaderSemanticTranslationPlanExact",
+         RUNTIME_CENSUS, "R277 census carries R276 plan readiness"),
+        ("derive_programmable_shader_semantic_translation_plan(",
+         RUNTIME_CENSUS, "R277 census derives R276 plan from live source evidence"),
+        ("shaderSemanticTranslationPlanSnapshotToken",
+         RUNTIME_CENSUS, "R277 census seals R276 plan snapshot identity"),
+        ("shaderTranslatedSemanticReceiptExact",
+         RUNTIME_CENSUS, "R277 census carries R275 receipt readiness"),
+        ("NativeProgrammableShaderTranslationObjectReadiness",
+         RUNTIME_CENSUS, "R277 census explicitly models unavailable R242 ownership"),
+        ("compose_programmable_shader_translated_semantic_receipt(",
+         RUNTIME_CENSUS, "R277 census composes typed R275 receipt"),
+        ("VR DX11 R276 semanticTranslationPlan:",
+         RUNTIME_CENSUS, "R277 detailed R276 plan log"),
+        ("VR DX11 R275 translatedSemanticReceipt:",
+         RUNTIME_CENSUS, "R277 detailed R275 receipt log"),
+        ("programmableSemantic[planExact={},planPending={},receiptExact={},receiptPending={}]",
+         RUNTIME_CENSUS, "R277 periodic readiness counters"),
+        ("ProgrammableSemanticTranslation",
+         DX11_CENSUS_ANALYZER, "R277 analyzer exposes programmable semantic evidence"),
+        ("r277_programmable_semantic",
+         DX11_CENSUS_ANALYZER_TEST, "R277 analyzer regression fixture"),
+        ("sig.shaderTranslationExact = false;",
+         RUNTIME_CENSUS, "R277 does not promote programmable translation"),
+    ]
+    missing_r277_programmable_semantic_census = [
+        meaning for token, source, meaning
+        in r277_programmable_semantic_census_contract
+        if token not in source
+    ]
+    if missing_r277_programmable_semantic_census:
+        raise SystemExit(
+            "DX11 R277 programmable semantic census drift: "
+            + ", ".join(missing_r277_programmable_semantic_census)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),

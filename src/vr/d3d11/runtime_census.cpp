@@ -114,6 +114,12 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> ShaderTranslationExactSamples{0};
         std::atomic<std::uint64_t> ShaderFixedFunctionPendingSamples{0};
         std::atomic<std::uint64_t> ShaderProgrammablePendingSamples{0};
+        // R277 observes the R276->R275 programmable semantic evidence chain
+        // without promoting translation or draw authority.
+        std::atomic<std::uint64_t> ShaderSemanticPlanExactSamples{0};
+        std::atomic<std::uint64_t> ShaderSemanticPlanPendingSamples{0};
+        std::atomic<std::uint64_t> ShaderSemanticReceiptExactSamples{0};
+        std::atomic<std::uint64_t> ShaderSemanticReceiptPendingSamples{0};
         std::atomic<std::uint64_t> FixedFunctionStateCoverageExactSamples{0};
         std::atomic<std::uint64_t> FixedFunctionStateCoverageFailureSamples{0};
         std::atomic<std::uint64_t> FixedFunctionTranslationReadySamples{0};
@@ -325,6 +331,17 @@ namespace outrun::vr::dx11
             // identity as a production diagnostic handoff for later R263 use.
             bool shaderSourceMappingHandoffExact{};
             std::uint64_t shaderSourceMappingHandoffSnapshotToken{};
+            // R277 seals source-derived R276 plan identity into the sampled
+            // programmable signature and observes the R275 receipt boundary.
+            bool shaderSemanticTranslationPlanExact{};
+            std::uint64_t shaderSemanticTranslationPlanSnapshotToken{};
+            std::uint64_t shaderTranslatedVertexSemanticHash{};
+            std::uint64_t shaderTranslatedPixelSemanticHash{};
+            std::uint64_t shaderTranslatorRevisionHash{};
+            std::uint64_t shaderTranslationSemanticContractHash{};
+            bool shaderTranslatedSemanticReceiptExact{};
+            bool shaderTranslatedSemanticReceiptObjectReady{};
+            std::uint64_t shaderTranslatedSemanticReceiptSnapshotToken{};
             bool shaderTranslationExact{};
             // R220: keep the shader activation-readiness boundary distinct
             // from translation implementation state. Programmable D3D9 shader
@@ -764,6 +781,23 @@ namespace outrun::vr::dx11
                 hash, sig.shaderSourceMappingHandoffExact ? 1u : 0u);
             hash = hash_mix(
                 hash, sig.shaderSourceMappingHandoffSnapshotToken);
+            hash = hash_mix(
+                hash, sig.shaderSemanticTranslationPlanExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderSemanticTranslationPlanSnapshotToken);
+            hash = hash_mix(
+                hash, sig.shaderTranslatedVertexSemanticHash);
+            hash = hash_mix(
+                hash, sig.shaderTranslatedPixelSemanticHash);
+            hash = hash_mix(hash, sig.shaderTranslatorRevisionHash);
+            hash = hash_mix(
+                hash, sig.shaderTranslationSemanticContractHash);
+            hash = hash_mix(
+                hash, sig.shaderTranslatedSemanticReceiptExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTranslatedSemanticReceiptObjectReady ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTranslatedSemanticReceiptSnapshotToken);
             hash = hash_mix(hash, sig.shaderIntrospectionComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderMixedPair ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderTranslationExact ? 1u : 0u);
@@ -1449,6 +1483,46 @@ namespace outrun::vr::dx11
             sig.shaderSourceMappingHandoffSnapshotToken =
                 sourceMappingHandoff.reviewSnapshotToken;
 
+            const auto semanticTranslationPlan =
+                derive_programmable_shader_semantic_translation_plan(
+                    sourceSemanticPair,
+                    shaderInterfaceLinkage,
+                    sourceMappingHandoff,
+                    sourceMappingHandoff.reviewSnapshotToken);
+            sig.shaderSemanticTranslationPlanExact =
+                semanticTranslationPlan.reviewReady;
+            sig.shaderSemanticTranslationPlanSnapshotToken =
+                semanticTranslationPlan.reviewSnapshotToken;
+            sig.shaderTranslatedVertexSemanticHash =
+                semanticTranslationPlan.targetVertexSemanticHash;
+            sig.shaderTranslatedPixelSemanticHash =
+                semanticTranslationPlan.targetPixelSemanticHash;
+            sig.shaderTranslatorRevisionHash =
+                semanticTranslationPlan.translatorRevisionHash;
+            sig.shaderTranslationSemanticContractHash =
+                semanticTranslationPlan.semanticContractHash;
+
+            // R277 deliberately supplies no R242 translated-object ownership.
+            // The R275 receipt therefore exposes the exact remaining boundary
+            // while retaining the deterministic R276 plan identity.
+            const NativeProgrammableShaderTranslationObjectReadiness
+                unavailableTranslationObject{};
+            const auto translatedSemanticReceipt =
+                compose_programmable_shader_translated_semantic_receipt(
+                    programmablePairIdentity,
+                    unavailableTranslationObject,
+                    0,
+                    sourceMappingHandoff,
+                    sourceMappingHandoff.reviewSnapshotToken,
+                    semanticTranslationPlan,
+                    semanticTranslationPlan.reviewSnapshotToken);
+            sig.shaderTranslatedSemanticReceiptExact =
+                translatedSemanticReceipt.reviewReady;
+            sig.shaderTranslatedSemanticReceiptObjectReady =
+                translatedSemanticReceipt.translationObjectReady;
+            sig.shaderTranslatedSemanticReceiptSnapshotToken =
+                translatedSemanticReceipt.reviewSnapshotToken;
+
             // R80 starts fail-closed. R215 may promote only the later
             // fixed-function branch after its resource-dependent pixel
             // prototype, vertex prototype and WVP transform are all exact.
@@ -1904,6 +1978,20 @@ namespace outrun::vr::dx11
                 ShaderProgrammablePendingSamples.fetch_add(
                     1, std::memory_order_relaxed);
 
+            if (!sig.fixedFunction &&
+                sig.vertexShader.present &&
+                sig.pixelShader.present)
+            {
+                (sig.shaderSemanticTranslationPlanExact
+                    ? ShaderSemanticPlanExactSamples
+                    : ShaderSemanticPlanPendingSamples).fetch_add(
+                        1, std::memory_order_relaxed);
+                (sig.shaderTranslatedSemanticReceiptExact
+                    ? ShaderSemanticReceiptExactSamples
+                    : ShaderSemanticReceiptPendingSamples).fetch_add(
+                        1, std::memory_order_relaxed);
+            }
+
             if (sig.fixedFunction)
             {
                 (sig.fixedFunctionStateCoverageExact
@@ -1987,6 +2075,19 @@ namespace outrun::vr::dx11
                         "VR DX11 R273 sourceMappingHandoff: exact={} snapshot=0x{:016X}",
                         sig.shaderSourceMappingHandoffExact ? 1 : 0,
                         sig.shaderSourceMappingHandoffSnapshotToken);
+                    spdlog::info(
+                        "VR DX11 R276 semanticTranslationPlan: exact={} snapshot=0x{:016X} targetVS=0x{:016X} targetPS=0x{:016X} revision=0x{:016X} contract=0x{:016X}",
+                        sig.shaderSemanticTranslationPlanExact ? 1 : 0,
+                        sig.shaderSemanticTranslationPlanSnapshotToken,
+                        sig.shaderTranslatedVertexSemanticHash,
+                        sig.shaderTranslatedPixelSemanticHash,
+                        sig.shaderTranslatorRevisionHash,
+                        sig.shaderTranslationSemanticContractHash);
+                    spdlog::info(
+                        "VR DX11 R275 translatedSemanticReceipt: exact={} objectReady={} snapshot=0x{:016X}",
+                        sig.shaderTranslatedSemanticReceiptExact ? 1 : 0,
+                        sig.shaderTranslatedSemanticReceiptObjectReady ? 1 : 0,
+                        sig.shaderTranslatedSemanticReceiptSnapshotToken);
                 }
                 spdlog::info(
                     "VR DX11 R85 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] shader[introspection={},mixed={},exact={},vsPresent={},vsBytes={},vsVersion=0x{:08X},vsHash=0x{:016X},psPresent={},psBytes={},psVersion=0x{:08X},psHash=0x{:016X}] ffpCoverage[exact={}] ffpReadiness[ready={},mask=0x{:08X},activeStages={}] texMask[present=0x{:02X},exact=0x{:02X}] managedTexShadow[required=0x{:02X},ready=0x{:02X}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
@@ -2395,7 +2496,7 @@ namespace outrun::vr::dx11
             const auto sampleStride = census_sample_stride();
             const auto samplingScheme = census_sampling_scheme();
             spdlog::info(
-                "VR DX11 R120 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} rasterSemantics[pointUnsupported={},lineUnsupported={}] signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={},auxRenderTargetUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},translationExact={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpPipelineShader[exact={},pending={},alphaTestOwned={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] dualSourceBlend[any={},rgbSrc={},rgbDst={},alphaSrc={},alphaDst={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={},dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={},texCoordWrap={},mrtColorWrite={},specular={}]",
+                "VR DX11 R120 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} rasterSemantics[pointUnsupported={},lineUnsupported={}] signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={},auxRenderTargetUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},translationExact={},fixedFunctionPending={},programmablePending={}] programmableSemantic[planExact={},planPending={},receiptExact={},receiptPending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpPipelineShader[exact={},pending={},alphaTestOwned={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] dualSourceBlend[any={},rgbSrc={},rgbDst={},alphaSrc={},alphaDst={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={},dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={},texCoordWrap={},mrtColorWrite={},specular={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -2468,6 +2569,10 @@ namespace outrun::vr::dx11
                 ShaderTranslationExactSamples.load(std::memory_order_relaxed),
                 ShaderFixedFunctionPendingSamples.load(std::memory_order_relaxed),
                 ShaderProgrammablePendingSamples.load(std::memory_order_relaxed),
+                ShaderSemanticPlanExactSamples.load(std::memory_order_relaxed),
+                ShaderSemanticPlanPendingSamples.load(std::memory_order_relaxed),
+                ShaderSemanticReceiptExactSamples.load(std::memory_order_relaxed),
+                ShaderSemanticReceiptPendingSamples.load(std::memory_order_relaxed),
                 FixedFunctionStateCoverageExactSamples.load(
                     std::memory_order_relaxed),
                 FixedFunctionStateCoverageFailureSamples.load(
