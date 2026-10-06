@@ -57,10 +57,12 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('for lane_key in ("A", "B", "C")', SOURCE)
 
     def test_priority_policy_defers_dxvk(self):
-        self.assertIn('high_priority = ("C", "A")', SOURCE)
+        self.assertIn('("A", CONVERSION_DX11_ENABLED)', SOURCE)
+        self.assertIn('("C", CONVERSION_DX9EX_ENABLED)', SOURCE)
+        self.assertIn('if high_active >= CONVERSION_ACTIVE_LIMIT', SOURCE)
         self.assertIn('CONVERSION_DXVK_DEFERRED', SOURCE)
         self.assertIn('high_active == 0', SOURCE)
-        self.assertIn('Priority C(DX9Ex refactor) > A(DX11) > B(DXVK deferred)', SOURCE)
+        self.assertIn('Co-primary A(DX11) + C(DX9Ex); B(DXVK deferred)', SOURCE)
 
     def test_single_lane_policy_freezes_non_dx9ex(self):
         self.assertIn('CONVERSION_ONLY_SLOT', SOURCE)
@@ -85,6 +87,8 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('CHAT_SLOTS: "3"', compose)
         self.assertIn('CONVERSION_PARALLEL: "true"', compose)
         self.assertIn('CONVERSION_ACTIVE_LIMIT: "2"', compose)
+        self.assertIn('CONVERSION_DX11_ENABLED: "true"', compose)
+        self.assertIn('CONVERSION_DX9EX_ENABLED: "true"', compose)
         self.assertIn('CONVERSION_ONLY_SLOT: ""', compose)
         self.assertIn('CONVERSION_DXVK_DEFERRED: "true"', compose)
         self.assertIn('QUEUE_RESULT_GRACE_SECONDS: "600"', compose)
