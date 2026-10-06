@@ -197,9 +197,11 @@ namespace
     // Direct Stage.zip/COLI0200 analysis proves material 0x14 / mask
     // 0x100000 is PRIMARY road in these exact forward-stage ranges.
     // Keep them out of generic curb/shoulder classification. Floral Village
-    // retains the tested 0.60 comfort attenuation; Deep Lake/Tulip keep normal
-    // Road Detail until hardware A/B justifies any stage-specific attenuation.
-    constexpr float FloralVillageRoughPavingScale = 0.60f;
+    // R13 hardware-log follow-up: the tested 0.60 attenuation made the
+    // sustained Floral Village stone paving almost disappear on the R3.
+    // Keep a modest stage-scoped comfort reduction while restoring a clearly
+    // tactile road surface; Deep Lake/Tulip keep normal Road Detail.
+    constexpr float FloralVillageRoughPavingScale = 0.85f;
 
     bool is_proven_primary_rough_road(
         const StageSurfaceContext& stage,
