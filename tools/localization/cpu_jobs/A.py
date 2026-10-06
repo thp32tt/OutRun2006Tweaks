@@ -1,509 +1,166 @@
 #!/usr/bin/env python3
-import hashlib,json,math,os,struct,subprocess,urllib.parse,urllib.request
+import hashlib, json, os, urllib.request
 from pathlib import Path
-import numpy as np
-from PIL import Image,ImageDraw,ImageFont,ImageChops
+from PIL import Image, ImageDraw, ImageOps
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
 
-subprocess.run(["python","-m","pip","install","--disable-pip-version-check","-q","psd-tools==1.10.8","opencv-python-headless==4.10.0.84"],check=True)
-from psd_tools import PSDImage
-import cv2
-
 repo=Path.cwd()
-run="20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN"
+run="20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
-wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
+wr=repo/"localization/graphics/worker_results"
+wr.mkdir(parents=True,exist_ok=True)
 
-queue_index=62
-asset="textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds"
-candidate=repo/"localization/graphics/hd_candidates"/asset
-candidate.parent.mkdir(parents=True,exist_ok=True)
+base="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_name_entry_xst"
+dds_url=base+"/66743AA8_1024x1024.dds"
+png_url=base+"/66743AA8_1024x1024.png"
+atlas_url=base+"/66743AA8_1024x1024_atlas.json"
 
-src_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds"
-SOURCE_SHA="796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551"
-psd_commit="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
-psd_rel="PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_loading_cvt_Exst/33491F83_512x256.psd"
-psd_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+psd_commit+"/"+urllib.parse.quote(psd_rel,safe="/")
+dds=Path("/tmp/A135_66743AA8.dds")
+png=Path("/tmp/A135_66743AA8.png")
+atlasp=Path("/tmp/A135_66743AA8_atlas.json")
+urllib.request.urlretrieve(dds_url,dds)
+urllib.request.urlretrieve(png_url,png)
+urllib.request.urlretrieve(atlas_url,atlasp)
 
-srcp=Path("/tmp/A132_33491F83.dds")
-psdp=Path("/tmp/A132_33491F83.psd")
-urllib.request.urlretrieve(src_url,srcp)
-urllib.request.urlretrieve(psd_url,psdp)
+raw=dds.read_bytes()
+sha=hashlib.sha256(raw).hexdigest()
+src=Image.open(dds).convert("RGBA")
+published=Image.open(png).convert("RGBA")
+atlas=json.loads(atlasp.read_text(encoding="utf-8"))
+if src.size!=(1024,1024) or published.size!=(1024,1024):
+    raise RuntimeError(("unexpected source size",src.size,published.size))
+# Published PNG and PIL DDS decode should identify the correct raw orientation.
+same=ImageOps.invert(Image.new("L",(1,1),0)).getbbox() is not None
+same_rgba=list(src.getdata())==list(published.getdata())
+flip=src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+same_flip=list(flip.getdata())==list(published.getdata())
+if not (same_rgba or same_flip):
+    # Do not guess orientation: still emit evidence and hold.
+    orientation="UNRESOLVED"
+    readable=published
+elif same_rgba:
+    orientation="DDS_DECODE_MATCHES_PUBLISHED_PNG"
+    readable=src
+else:
+    orientation="DDS_DECODE_REQUIRES_MIRROR_Y"
+    readable=flip
 
-def sha_bytes(b): return hashlib.sha256(b).hexdigest()
-raw=srcp.read_bytes()
-if sha_bytes(raw)!=SOURCE_SHA: raise RuntimeError(("source drift",sha_bytes(raw)))
-if raw[:4]!=b"DDS ": raise RuntimeError("not DDS")
-H=struct.unpack_from("<I",raw,12)[0]
-W=struct.unpack_from("<I",raw,16)[0]
-MIPS=struct.unpack_from("<I",raw,28)[0]
-FOURCC=raw[84:88]
-BPP=struct.unpack_from("<I",raw,88)[0]
-MASKS=struct.unpack_from("<IIII",raw,92)
-if (W,H,MIPS,FOURCC,BPP)!=(2048,1024,1,b"\0\0\0\0",32):
-    raise RuntimeError(("source structure",W,H,MIPS,FOURCC,BPP))
-if MASKS!=(0xff,0xff00,0xff0000,0xff000000):
-    raise RuntimeError(("source masks",MASKS))
+regions=atlas.get("regions",[])
+if len(regions)!=49:
+    raise RuntimeError(("region count",len(regions)))
 
-src_raw=Image.open(srcp).convert("RGBA")
-src=src_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-sa=np.asarray(src,dtype=np.uint8)
-
-# Parse layered authoring source and locate the nine visible rasterized English labels.
-psd=PSDImage.open(psdp)
-if (psd.width,psd.height)!=(W,H): raise RuntimeError(("PSD canvas",psd.width,psd.height))
-
-layers=[]
-def walk(group,parent=""):
-    for layer in group:
-        path=(parent+"/"+layer.name).strip("/")
-        layers.append((path,layer))
-        if layer.is_group(): walk(layer,path)
-walk(psd)
-
-label_layers=[]
-for path,layer in layers:
-    if "/Text/" in path and layer.name.endswith("[Rasterized]") and getattr(layer,"kind",None)=="pixel":
-        label_layers.append((path,layer))
-if len(label_layers)!=9:
-    raise RuntimeError(("expected 9 rasterized text layers",len(label_layers),[p for p,_ in label_layers]))
-
-# Stable path -> translation/style binding.
-bindings={}
-for path,layer in label_layers:
-    if "Bunki - Remastered/Text/Diverge/" in path:
-        key="diverge_main"; ko="분기"; family="yellow"; style_group="diverge"; shear=0.0; cell="main"
-    elif "Bunki - Remastered/Text/Left-Easy/EASY" in path:
-        key="easy_main"; ko="쉬움"; family="green"; style_group="main_diff"; shear=0.0; cell="main"
-    elif "Bunki - Remastered/Text/Left-Easy/Left" in path:
-        key="left_main"; ko="좌측"; family="green"; style_group="main_lr"; shear=0.0; cell="main"
-    elif "Bunki - Remastered/Text/Right-Hard/HARD" in path:
-        key="hard_main"; ko="어려움"; family="red"; style_group="main_diff"; shear=0.0; cell="main"
-    elif "Bunki - Remastered/Text/Right-Hard/Right" in path:
-        key="right_main"; ko="우측"; family="red"; style_group="main_lr"; shear=0.0; cell="main"
-    elif "Manual Work/Text/Regular/EASY" in path:
-        key="easy_alone"; ko="쉬움"; family="green"; style_group="regular_diff"; shear=0.0; cell="detached"
-    elif "Manual Work/Text/Regular/HARD" in path:
-        key="hard_alone"; ko="어려움"; family="red"; style_group="regular_diff"; shear=0.0; cell="detached"
-    elif "Oblique - 27 degrees shear/Up-EASY/EASY" in path:
-        key="easy_arrow"; ko="쉬움"; family="green"; style_group="oblique_diff"; shear=math.tan(math.radians(27)); cell="detached"
-    elif "Oblique - 27 degrees shear/Down-HARD/HARD" in path:
-        key="hard_arrow"; ko="어려움"; family="red"; style_group="oblique_diff"; shear=math.tan(math.radians(27)); cell="detached"
+# Atlas records are sprite_44..sprite_92 in a 7x7 logical set.
+records=[]
+cards=[]
+for reg in regions:
+    idx=int(reg["idx"])
+    name=reg["name"]
+    x,y,w,h=[int(v) for v in reg["rect"]]
+    crop=published.crop((x,y,x+w,y+h))
+    alpha=crop.getchannel("A")
+    ab=alpha.getbbox()
+    nonzero=sum(1 for v in alpha.getdata() if v)
+    if ab:
+        glyph_bbox=[x+ab[0],y+ab[1],x+ab[2],y+ab[3]]
     else:
-        raise RuntimeError(("unbound PSD text layer",path))
-    bindings[key]={"key":key,"path":path,"layer":layer,"ko":ko,"family":family,
-                   "style_group":style_group,"shear":shear,"cell":cell}
-
-if set(bindings)!=set(["diverge_main","left_main","right_main","easy_main","hard_main",
-                       "hard_arrow","easy_arrow","hard_alone","easy_alone"]):
-    raise RuntimeError(("binding keys",sorted(bindings)))
-
-# Exact source-text/effect masks come from the authoring PSD's visible rasterized
-# label layers, not OCR/threshold rectangles. This solves the prior under/over-mask problem.
-source_mask=np.zeros((H,W),bool)
-rows=[]
-exclude_keys=set()
-for key in ["diverge_main","left_main","right_main","easy_main","hard_main",
-            "hard_arrow","easy_arrow","hard_alone","easy_alone"]:
-    b=bindings[key]; layer=b["layer"]
-    exclude_keys.add((layer.name,int(layer.left),int(layer.top),int(layer.right),int(layer.bottom)))
-    im=layer.topil()
-    if im is None: raise RuntimeError(("no pixel image",key))
-    im=im.convert("RGBA")
-    if im.size!=(layer.width,layer.height):
-        raise RuntimeError(("layer image size",key,im.size,(layer.width,layer.height)))
-    a=np.asarray(im)[:,:,3]>0
-    if not a.any(): raise RuntimeError(("empty rasterized alpha",key))
-    ys,xs=np.nonzero(a)
-    x0=int(layer.left+xs.min()); y0=int(layer.top+ys.min())
-    x1=int(layer.left+xs.max()+1); y1=int(layer.top+ys.max()+1)
-    m=np.zeros((H,W),bool)
-    m[int(layer.top):int(layer.bottom),int(layer.left):int(layer.right)]=a
-    if np.any(source_mask&m): raise RuntimeError(("text masks overlap",key))
-    source_mask|=m
-    yy,xx=np.nonzero(m)
-    rows.append({
-      "key":key,"source":layer.name.replace(" [Rasterized]",""),"korean":b["ko"],
-      "psd_layer_path":b["path"],"source_bbox":[x0,y0,x1,y1],
-      "source_mask_pixels":int(m.sum()),"source_centroid":[float(xx.mean()),float(yy.mean())],
-      "family":b["family"],"style_group":b["style_group"],"shear":b["shear"],"cell":b["cell"],
-      "_mask":m
+        glyph_bbox=None
+    records.append({
+        "atlas_idx":idx,
+        "sprite_name":name,
+        "rect":[x,y,w,h],
+        "alpha_bbox_global":glyph_bbox,
+        "nonzero_alpha_pixels":nonzero
     })
+    # Normalize each cell to 160x160 without changing the source pixels; nearest scaling for inspection.
+    tile=Image.new("RGBA",(192,192),(238,238,238,255))
+    sc=max(1,min(4,160//max(1,max(w,h))))
+    shown=crop.resize((w*sc,h*sc),Image.Resampling.NEAREST)
+    px=(192-shown.width)//2; py=(192-shown.height)//2
+    tile.alpha_composite(shown,(px,py))
+    card=Image.new("RGB",(192,220),"white")
+    card.paste(tile.convert("RGB"),(0,28))
+    ImageDraw.Draw(card).text((5,6),f"{idx:02d} {name}",fill="black")
+    cards.append(card)
 
-# Build exact manual clean artwork from the authoring PSD components that were
-# created specifically to erase the AI/upscaled typography:
-#   Layer 43: full main-route art with EASY/HARD already removed.
-#   Erase Left and Right and Diverge: clean patches for the remaining 3 labels.
-# Composite those authoring layers, then splice ONLY through exact label alpha masks.
-basic_path="objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Bunki - Basic Fix"
-layer43_path="objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Erase AI Typography/4xHDcube3/Layer 43"
-erase_path="objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Erase AI Typography/Erase Left and Right and Diverge"
-by_path={p:l for p,l in layers}
-if basic_path not in by_path or layer43_path not in by_path or erase_path not in by_path:
-    raise RuntimeError("manual clean PSD layers missing")
-basic=by_path[basic_path]; layer43=by_path[layer43_path]; erase=by_path[erase_path]
-basic_im=basic.topil()
-base_im=layer43.topil()
-erase_im=erase.topil()
-if basic_im is None or base_im is None or erase_im is None:
-    raise RuntimeError("manual clean PSD pixel image missing")
-basic_canvas=Image.new("RGBA",(W,H),(0,0,0,0))
-basic_canvas.alpha_composite(basic_im.convert("RGBA"),(int(basic.left),int(basic.top)))
-basica=np.asarray(basic_canvas,dtype=np.uint8)
-manual_clean=Image.new("RGBA",(W,H),(0,0,0,0))
-manual_clean.alpha_composite(base_im.convert("RGBA"),(int(layer43.left),int(layer43.top)))
-manual_clean.alpha_composite(erase_im.convert("RGBA"),(int(erase.left),int(erase.top)))
-mca=np.asarray(manual_clean,dtype=np.uint8)
+cols=7; rowsn=7
+sheet=Image.new("RGB",(cols*192,rowsn*220),"white")
+for i,c in enumerate(cards):
+    sheet.paste(c,((i%cols)*192,(i//cols)*220))
+sheet.save(out/"A135_NAME_ENTRY_49_CELL_CONTACT.jpg",quality=97)
 
-# Build authoritative clean plate with component-specific authoring layers.
-# Layer 43 is the verified clean source for EASY/HARD. The erase patch layer is
-# ONLY valid for Diverge/Left/Right; applying it globally creates the white
-# patch-box defect caught by controller visual QA in A125.
-layer43_canvas=Image.new("RGBA",(W,H),(0,0,0,0))
-layer43_canvas.alpha_composite(base_im.convert("RGBA"),(int(layer43.left),int(layer43.top)))
-erase_canvas=layer43_canvas.copy()
-erase_canvas.alpha_composite(erase_im.convert("RGBA"),(int(erase.left),int(erase.top)))
-l43a=np.asarray(layer43_canvas,dtype=np.uint8)
-era=np.asarray(erase_canvas,dtype=np.uint8)
+# Full atlas + mirror-Y proof.
+def on_white(im):
+    z=Image.new("RGBA",im.size,(238,238,238,255))
+    z.alpha_composite(im)
+    return z.convert("RGB")
+full=on_white(published)
+full.thumbnail((1200,1200),Image.Resampling.LANCZOS)
+full.save(out/"A135_NAME_ENTRY_PUBLISHED_READABLE.jpg",quality=97)
+rawproof=on_white(src)
+rawproof.thumbnail((1200,1200),Image.Resampling.LANCZOS)
+rawproof.save(out/"A135_NAME_ENTRY_DDS_DECODE.jpg",quality=97)
+flipproof=on_white(flip)
+flipproof.thumbnail((1200,1200),Image.Resampling.LANCZOS)
+flipproof.save(out/"A135_NAME_ENTRY_DDS_MIRROR_Y.jpg",quality=97)
 
-# Controller diagnostic: render the authoring paintover subgroups that intersect
-# EASY/HARD so visual QA can select real road geometry instead of synthetic inpaint.
-paint_paths=[
-"objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5",
-"objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 5/Group 7",
-"objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 8",
-"objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 10",
-"objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15 copy",
-"objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover/Group 16/Group 15",
-]
-paint_cards=[]
-for pp in paint_paths:
-    pl=by_path.get(pp)
-    if pl is None: continue
-    pim=pl.composite(force=True,apply_icc=False) if pl.is_group() else pl.topil()
-    if pim is None: continue
-    canv=Image.new("RGBA",(W,H),(0,0,0,0))
-    canv.alpha_composite(pim.convert("RGBA"),(int(pl.left),int(pl.top)))
-    crop=canv.crop((60,220,1140,500))
-    bg=Image.new("RGBA",crop.size,(235,235,235,255)); bg.alpha_composite(crop)
-    card=Image.new("RGB",(1080,315),"white")
-    card.paste(bg.convert("RGB"),(0,35))
-    ImageDraw.Draw(card).text((8,8),pp.split("/Paintover/")[-1],fill="black")
-    paint_cards.append(card)
-if paint_cards:
-    diag=Image.new("RGB",(1080,315*len(paint_cards)),"white")
-    for i,c in enumerate(paint_cards): diag.paste(c,(0,315*i))
-    diag.save(out/"A132_PAINTOVER_COMPONENT_CONTACT.jpg",quality=94)
-
-# Compare complete authoring-stack reconstructions.  This is diagnostic-only:
-# no stack is accepted until controller visual QA confirms the road geometry.
-paint_path="objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover"
-pgroup=by_path.get(paint_path)
-if pgroup is None: raise RuntimeError("Paintover group missing")
-pim=pgroup.composite(force=True,apply_icc=False)
-if pim is None: raise RuntimeError("Paintover composite failed")
-pcanvas=Image.new("RGBA",(W,H),(0,0,0,0))
-pcanvas.alpha_composite(pim.convert("RGBA"),(int(pgroup.left),int(pgroup.top)))
-
-group16_path=paint_path+"/Group 16"
-g16=by_path.get(group16_path)
-if g16 is None: raise RuntimeError("Group 16 missing")
-g16im=g16.composite(force=True,apply_icc=False)
-g16canvas=Image.new("RGBA",(W,H),(0,0,0,0))
-g16canvas.alpha_composite(g16im.convert("RGBA"),(int(g16.left),int(g16.top)))
-
-def overlay(base,ov):
-    z=base.copy(); z.alpha_composite(ov); return z
-stack_variants=[
-    ("Layer43",layer43_canvas),
-    ("Layer43+Paintover",overlay(layer43_canvas,pcanvas)),
-    ("Basic+Paintover",overlay(basic_canvas,pcanvas)),
-    ("Layer43+Group16",overlay(layer43_canvas,g16canvas)),
-    ("Basic+Erase+Paintover",overlay(overlay(basic_canvas,erase_canvas),pcanvas)),
-]
-stack_cards=[]
-for nm,im in stack_variants:
-    crop=im.crop((60,220,1140,430))
-    bg=Image.new("RGBA",crop.size,(235,235,235,255)); bg.alpha_composite(crop)
-    c=Image.new("RGB",(1080,245),"white"); c.paste(bg.convert("RGB"),(0,35))
-    ImageDraw.Draw(c).text((8,8),nm,fill="black")
-    stack_cards.append(c)
-diag2=Image.new("RGB",(1080,245*len(stack_cards)),"white")
-for i,c in enumerate(stack_cards): diag2.paste(c,(0,245*i))
-diag2.save(out/"A132_PSD_STACK_CONTACT.jpg",quality=95)
-
-clean_arr=sa.copy()
-manual_missing={}
-clean_component_by_key={}
-repair_scope=source_mask.copy()
-repair_extra=np.zeros((H,W),bool)
-for row in rows:
-    m=row["_mask"]
-    if row["cell"]=="main":
-        if row["key"] in {"easy_main","hard_main"}:
-            # A131 controller visual QA identified Layer43+Group16 as the
-            # source-authored stack that restores the road/green edge through
-            # EASY/HARD without the white erase plate or synthetic inpaint
-            # smear.  Copy only the authoring erase footprint inside the exact
-            # source effect bbox; everything else remains authoritative source.
-            bx0,by0,bx1,by1=row["source_bbox"]
-            delta=np.any(l43a!=basica,axis=2)
-            clip=np.zeros((H,W),bool); clip[by0:by1,bx0:bx1]=True
-            rm=(delta & clip) | m
-            rm=cv2.morphologyEx(rm.astype(np.uint8),cv2.MORPH_CLOSE,np.ones((5,5),np.uint8)).astype(bool)
-            rm &= clip
-            if not rm.any():
-                raise RuntimeError(("empty erase-delta repair mask",row["key"]))
-            authored=overlay(layer43_canvas,g16canvas)
-            aa=np.asarray(authored,dtype=np.uint8)
-            missing=int(np.count_nonzero(rm & (aa[:,:,3]==0)))
-            manual_missing[row["key"]]=missing
-            if missing:
-                raise RuntimeError(("Group16 authored clean alpha missing",row["key"],missing))
-            clean_arr[rm]=aa[rm]
-            repair_scope |= rm
-            repair_extra |= (rm & ~source_mask)
-            clean_component_by_key[row["key"]]="Layer43+Group16 authored road clean"
-            continue
-        else:
-            component=era
-            clean_component_by_key[row["key"]]="Erase Left and Right and Diverge"
-        missing=int(np.count_nonzero(m & (component[:,:,3]==0)))
-        manual_missing[row["key"]]=missing
-        if missing:
-            raise RuntimeError(("manual clean alpha missing",row["key"],missing))
-        clean_arr[m]=component[m]
-    else:
-        clean_arr[m]=0
-clean=Image.fromarray(clean_arr,"RGBA")
-
-# Deterministic regression guard: repaired EASY/HARD must not reproduce
-# Layer 43's broad white erasure plate byte-for-byte.
-for row in rows:
-    if row["key"] in {"easy_main","hard_main"}:
-        m=row["_mask"]
-        if np.array_equal(clean_arr[m],l43a[m]):
-            raise RuntimeError(("easy/hard fell back to Layer 43 patch",row["key"]))
-clean_changed=np.any(clean_arr!=sa,axis=2)
-clean_outside=int(np.count_nonzero(clean_changed & ~repair_scope))
-if clean_outside: raise RuntimeError(("clean outside repair scope",clean_outside))
-# Any extended repair scope is still constrained to exact source bboxes.
-bbox_scope=np.zeros((H,W),bool)
-for row in rows:
-    x0,y0,x1,y1=row["source_bbox"]; bbox_scope[y0:y1,x0:x1]=True
-repair_extra_outside_bbox=int(np.count_nonzero(repair_extra & ~bbox_scope))
-if repair_extra_outside_bbox: raise RuntimeError(("repair scope outside source bboxes",repair_extra_outside_bbox))
-manual_clean.save(out/"A132_MANUAL_PSD_CLEAN_COMPONENT.png")
-
-# Source-family colors sampled from the authoritative release inside each exact PSD mask.
-def sample_style(row):
-    m=row["_mask"]; px=sa[m]
-    rgb=px[:,:3].astype(np.int16)
-    r,g,b=rgb[:,0],rgb[:,1],rgb[:,2]
-    if row["family"]=="green":
-        sel=(g>110)&(g>r+35)&(g>b+20)
-    elif row["family"]=="red":
-        sel=(r>125)&(r>g+45)&(r>b+25)
-    else:
-        sel=(r>155)&(g>145)&(b<125)&(r>g-50)
-    fill=tuple(int(v) for v in np.median(rgb[sel],axis=0))+(255,) if sel.any() else {
-      "green":(0,179,96,255),"red":(199,50,50,255),"yellow":(230,230,0,255)}[row["family"]]
-    nsel=(r<95)&(g<105)&(b<145)&(b>r+18)&(b>g+8)
-    navy=tuple(int(v) for v in np.median(rgb[nsel],axis=0))+(255,) if nsel.any() else (0,10,57,255)
-    wsel=(r>240)&(g>240)&(b>240)
-    white=tuple(int(v) for v in np.median(rgb[wsel],axis=0))+(255,) if wsel.any() else (255,255,255,255)
-    row["fill_rgba"]=fill; row["navy_rgba"]=navy; row["white_rgba"]=white
-for row in rows: sample_style(row)
-
-subprocess.run(["sudo","apt-get","update","-qq"],check=True)
-subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
-FONT=subprocess.check_output(["fc-match","-f","%{file}","Noto Sans CJK KR:style=Black"],text=True).strip()
-if not FONT or not Path(FONT).exists(): raise RuntimeError(("font",FONT))
-
-def shear_image(im,k):
-    if abs(k)<1e-6:return im
-    add=max(1,int(math.ceil(abs(k)*im.height)))
-    # Right-lean: x' = x + k*(h-y), matching source oblique label direction.
-    return im.transform((im.width+add,im.height),Image.Transform.AFFINE,
-                        (1,-k,add,0,1,0),resample=Image.Resampling.BICUBIC)
-
-def make_glyph(row,fs):
-    outer=max(3,round(fs*0.10)); inner=max(2,round(fs*0.065))
-    font=ImageFont.truetype(FONT,fs)
-    probe=Image.new("RGBA",(1200,360),(0,0,0,0))
-    d=ImageDraw.Draw(probe)
-    tb=d.textbbox((0,0),row["korean"],font=font,stroke_width=outer)
-    xy=(40-tb[0],40-tb[1])
-    if row["key"]=="diverge_main":
-        d.text(xy,row["korean"],font=font,fill=row["fill_rgba"],stroke_width=outer,stroke_fill=row["navy_rgba"])
-    else:
-        d.text(xy,row["korean"],font=font,fill=row["fill_rgba"],stroke_width=outer,stroke_fill=row["white_rgba"])
-        d.text(xy,row["korean"],font=font,fill=row["fill_rgba"],stroke_width=inner,stroke_fill=row["navy_rgba"])
-    gb=probe.getchannel("A").getbbox()
-    if not gb:return None
-    g=probe.crop(gb)
-    g=shear_image(g,row["shear"])
-    gb=g.getchannel("A").getbbox()
-    if gb:g=g.crop(gb)
-    return g,outer,inner
-
-# Shared source family => shared Korean point size within each corresponding label family.
-groups={}
-for row in rows: groups.setdefault(row["style_group"],[]).append(row)
-for group,grows in groups.items():
-    chosen=None
-    for fs in range(110,15,-1):
-        built=[]
-        good=True
-        for row in grows:
-            got=make_glyph(row,fs)
-            if got is None: good=False;break
-            glyph,outer,inner=got
-            x0,y0,x1,y1=row["source_bbox"]
-            if glyph.width>(x1-x0)-2 or glyph.height>(y1-y0)-2:
-                good=False;break
-            built.append((row,glyph,outer,inner))
-        if good:
-            chosen=(fs,built);break
-    if chosen is None: raise RuntimeError(("no shared-style fit",group))
-    fs,built=chosen
-    for row,glyph,outer,inner in built:
-        row["_glyph"]=glyph; row["font_size"]=fs; row["outer_stroke_px"]=outer; row["navy_stroke_px"]=inner
-
-# Place each glyph nearest the source-label centroid, with mandatory 1px positive bbox margin.
-final=clean.copy()
-target=np.zeros((H,W),bool)
-for row in rows:
-    g=row["_glyph"]; x0,y0,x1,y1=row["source_bbox"]
-    cx,cy=row["source_centroid"]
-    px=int(round(cx-g.width/2)); py=int(round(cy-g.height/2))
-    px=max(x0+1,min(px,x1-g.width-1))
-    py=max(y0+1,min(py,y1-g.height-1))
-    layer=Image.new("RGBA",(W,H),(0,0,0,0)); layer.alpha_composite(g,(px,py))
-    lm=np.asarray(layer.getchannel("A"))>0
-    ys,xs=np.nonzero(lm)
-    lb=[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
-    if not(lb[0]>x0 and lb[1]>y0 and lb[2]<x1 and lb[3]<y1):
-        raise RuntimeError(("target containment",row["key"],row["source_bbox"],lb))
-    if np.any(target&lm): raise RuntimeError(("localized overlap",row["key"]))
-    final.alpha_composite(layer); target|=lm
-    row["localized_bbox"]=lb
-    row["font"]="Noto Sans CJK KR Black"
-    row["anchor"]=[px,py]
-    row["source_width"]=x1-x0; row["source_height"]=y1-y0
-    row["localized_width"]=lb[2]-lb[0]; row["localized_height"]=lb[3]-lb[1]
-    row["delta_left"]=lb[0]-x0; row["delta_right"]=x1-lb[2]
-    row["delta_top"]=lb[1]-y0; row["delta_bottom"]=y1-lb[3]
-    row["containment"]="PASS";row["size_ceiling"]="PASS";row["positive_margin"]="PASS"
-
-# Hard allowed region is union of exact source-effect bboxes.
-allowed=np.zeros((H,W),bool)
-for row in rows:
-    x0,y0,x1,y1=row["source_bbox"];allowed[y0:y1,x0:x1]=True
-if int(np.count_nonzero(target&~allowed)): raise RuntimeError("target outside source bboxes")
-
-# Encode exact RGBA32 preserving original header and raw mirror-Y.
-raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-payload=raw[:128]+raw_final.tobytes("raw","RGBA")
-if payload[:128]!=raw[:128] or len(payload)!=len(raw): raise RuntimeError("DDS structure drift")
-candidate.write_bytes(payload)
-cand_sha=sha_bytes(payload)
-dec=Image.open(candidate).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("DDS roundtrip mismatch")
-da=np.asarray(dec,dtype=np.uint8)
-
-changed=np.any(da!=sa,axis=2)
-outside=int(np.count_nonzero(changed&~allowed))
-alpha_out=int(np.count_nonzero((da[:,:,3]!=sa[:,:,3])&~allowed))
-target_out=int(np.count_nonzero(target&~allowed))
-if outside or alpha_out or target_out:
-    raise RuntimeError(("zero-pixel gate",outside,alpha_out,target_out))
-rows_pass=sum(1 for r in rows if min(r["delta_left"],r["delta_right"],r["delta_top"],r["delta_bottom"])>0)
-if rows_pass!=9: raise RuntimeError(("row gate",rows_pass))
-
-# Strip private helper objects from report.
-for row in rows:
-    row.pop("_mask",None); row.pop("_glyph",None)
-
-# Evidence.
-src.save(out/"A132_SOURCE_READABLE.png")
-clean.save(out/"A132_CLEAN_PLATE.png")
-dec.save(out/"A132_FINAL_READABLE.png")
-src_raw.save(out/"A132_SOURCE_RAW.png")
-dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"A132_FINAL_RAW.png")
-Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"A132_SOURCE_TEXT_MASK.png")
-Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"A132_TARGET_MASK.png")
-Image.fromarray((repair_scope.astype(np.uint8)*255),"L").save(out/"A132_REPAIR_SCOPE.png")
-manual_clean.save(out/"A132_MANUAL_PSD_CLEAN_COMPOSITE.png")
-
-def white(im):
-    z=Image.new("RGBA",im.size,(235,235,235,255));z.alpha_composite(im);return z.convert("RGB")
-def card(label,im,crop,scale=1):
-    v=white(im).crop(crop)
-    if scale!=1:v=v.resize((v.width*scale,v.height*scale),Image.Resampling.NEAREST)
-    c=Image.new("RGB",(v.width,v.height+30),"white");c.paste(v,(0,30));ImageDraw.Draw(c).text((6,7),label,fill="black");return c
-def contact(cards,path,maxsize=None):
-    mw=max(c.width for c in cards);mh=sum(c.height+8 for c in cards)
-    s=Image.new("RGB",(mw,mh),"white");y=0
-    for c in cards:s.paste(c,(0,y));y+=c.height+8
-    if maxsize:s.thumbnail(maxsize,Image.Resampling.LANCZOS)
-    s.save(path,quality=97)
-
-contact([card("SOURCE",src,(0,0,1200,820)),card("CLEAN PSD-LAYER",clean,(0,0,1200,820)),card("FINAL",dec,(0,0,1200,820))],
-        out/"A132_MAIN_SOURCE_CLEAN_FINAL.jpg",(1800,2400))
-contact([card("SOURCE RIGHT",src,(1260,0,2048,270)),card("CLEAN RIGHT",clean,(1260,0,2048,270)),card("FINAL RIGHT",dec,(1260,0,2048,270))],
-        out/"A132_RIGHT_SOURCE_CLEAN_FINAL.jpg",(1800,1400))
-contact([card("SOURCE RAW mirror_y",src_raw,(0,0,W,H)),card("FINAL RAW mirror_y",dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM),(0,0,W,H))],
-        out/"A132_RAW_COMPARE.jpg",(1300,1200))
-zoomcards=[]
-for row in rows:
-    x0,y0,x1,y1=row["source_bbox"];p=8;crop=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
-    zoomcards += [card(row["key"]+" SOURCE",src,crop,2),card(row["key"]+" CLEAN",clean,crop,2),card(row["key"]+" FINAL",dec,crop,2)]
-contact(zoomcards,out/"A132_LABEL_ZOOM_CONTACT.jpg",(2800,6000))
+# Cell geometry sanity.
+widths=sorted(set(r["rect"][2] for r in records))
+heights=sorted(set(r["rect"][3] for r in records))
+nonempty=sum(1 for r in records if r["alpha_bbox_global"] is not None)
 
 report={
- "schema_version":1,"role":"A","run":run,"queue_index":queue_index,"asset":asset,
- "work_stolen_from_lane":"B",
- "work_steal_reason":"A odd shard exhausted; index62 was the oldest actionable manual reconstruction while B continued later even zoom-review production.",
- "source_provenance":{"dds_url":src_url,"dds_sha256":SOURCE_SHA,
-   "psd_repo":"Sonic-TV/OR2006Sprites","psd_commit":psd_commit,"psd_path":psd_rel,
-   "psd_bytes":psdp.stat().st_size,"psd_canvas":[psd.width,psd.height]},
- "translation":{"Diverge":"분기","Left":"좌측","Right":"우측","EASY":"쉬움","HARD":"어려움","physical_elements":9},
- "construction":{
-   "source_text_mask":"exact alpha masks from nine visible PSD rasterized English label layers",
-   "clean_plate":"EASY/HARD authored Layer43+Group16 road reconstruction over the BasicFix-vs-Layer43 erase footprint; Diverge/Left/Right PSD erase component; detached labels transparent; extended repair remains inside exact source bboxes",
-   "render":"native 2048x1024 Noto Sans CJK KR Black; family colors sampled from source; shared Korean font size within Left/Right, main EASY/HARD, regular EASY/HARD and oblique EASY/HARD pairs",
-   "oblique_transform":"27-degree source PSD shear reproduced as tan(27deg)"
- },
- "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":MIPS,"header_128_exact":True,"raw_orientation":"mirror_y"},
- "rows":rows,
- "static_qa":{"elements_total":9,"bbox_size_positive_margin":"9/9 PASS",
-   "clean_changed_outside_repair_scope":clean_outside,"repair_extra_pixels":int(repair_extra.sum()),"repair_extra_outside_source_bboxes":repair_extra_outside_bbox,"manual_clean_missing_alpha_by_main_label":manual_missing,"clean_component_by_key":clean_component_by_key,
-   "changed_pixels_outside_exact_source_bboxes":outside,
-   "alpha_changed_outside_exact_source_bboxes":alpha_out,
-   "localized_pixels_outside_exact_source_bboxes":target_out,
-   "localized_overlap_pixels":0,"dds_roundtrip":"PASS","status":"PASS"},
- "candidate_path":str(candidate.relative_to(repo)),"candidate_sha256":cand_sha,
- "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","runtime_validation":"UNTESTED",
- "status":"A132_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
- "no_vr_ffb_dx11_dxvk_work":True
+  "schema_version":1,
+  "role":"A",
+  "run":run,
+  "queue_index":24,
+  "asset":"textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "work_stolen_from_lane":"B",
+  "source":{
+    "repo":"Sonic-TV/OR2006Sprites",
+    "commit":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "dds_url":dds_url,
+    "png_url":png_url,
+    "atlas_url":atlas_url,
+    "dds_sha256":sha,
+    "dds_bytes":len(raw),
+    "canvas":[1024,1024]
+  },
+  "atlas":{
+    "regions_count":len(records),
+    "sprite_range":["sprite_44","sprite_92"],
+    "logical_grid":"49 regions / 7x7 inspection contact",
+    "region_widths":widths,
+    "region_heights":heights,
+    "nonempty_alpha_regions":nonempty,
+    "records":records
+  },
+  "orientation":{
+    "dds_decode_equals_published_png":same_rgba,
+    "dds_mirror_y_equals_published_png":same_flip,
+    "decision":orientation
+  },
+  "evidence":[
+    "A135_NAME_ENTRY_49_CELL_CONTACT.jpg",
+    "A135_NAME_ENTRY_PUBLISHED_READABLE.jpg",
+    "A135_NAME_ENTRY_DDS_DECODE.jpg",
+    "A135_NAME_ENTRY_DDS_MIRROR_Y.jpg"
+  ],
+  "decision":"PREFLIGHT_READY_FOR_CONTROLLER_SEMANTIC_REVIEW",
+  "candidate_written":False,
+  "blocker":"Do not repurpose the 49 name-entry sprite slots until controller visual review identifies the stock symbol set and runtime input/storage mapping; atlas capacity alone does not prove Hangul-safe input.",
+  "runtime_validation":"UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"A132_33491F83_REPORT.json"
+rp=out/"A135_NAME_ENTRY_PREFLIGHT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A132_33491F83.json").write_text(json.dumps({
- "role":"A","run":run,"queue_index":queue_index,"asset":"33491F83","work_stolen_from_lane":"B",
- "source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,"psd_layered_source":True,
- "elements":9,"bbox_size_positive_margin":"9/9 PASS","changed_outside":outside,"alpha_outside":alpha_out,
- "report":str(rp.relative_to(repo)),"status":"WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
- "runtime_validation":"UNTESTED"
+(wr/"A135_NAME_ENTRY_66743AA8.json").write_text(json.dumps({
+  "role":"A","run":run,"queue_index":24,"asset":"66743AA8",
+  "source_sha256":sha,"regions":len(records),"orientation":orientation,
+  "report":str(rp.relative_to(repo)),
+  "status":"PREFLIGHT_READY_FOR_CONTROLLER_SEMANTIC_REVIEW",
+  "runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print(json.dumps({
- "run":run,"candidate_sha256":cand_sha,
- "rows":[{"key":r["key"],"source_bbox":r["source_bbox"],"localized_bbox":r["localized_bbox"],
-          "font_size":r["font_size"],"shear":r["shear"],
-          "margins":[r["delta_left"],r["delta_right"],r["delta_top"],r["delta_bottom"]]} for r in rows],
- "status":"A132_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
-},ensure_ascii=False),flush=True)
+print(json.dumps({"run":run,"source_sha256":sha,"regions":len(records),"nonempty":nonempty,"orientation":orientation,"status":"PREFLIGHT_READY_FOR_CONTROLLER_SEMANTIC_REVIEW"},ensure_ascii=False),flush=True)
