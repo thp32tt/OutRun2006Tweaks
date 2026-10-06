@@ -4115,7 +4115,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA557B4_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_CONTROLLER_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -7417,6 +7417,31 @@
     "status": "A149_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
     "fresh_independent_c": "PENDING",
     "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "b219_q232_manual_visual_rework": {
+    "status": "C225R_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "C225R_PASS",
+    "pre_ingame_comparison_refresh": "PENDING_C225R_EXPORT",
+    "c_pass_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "c225r_controller_final_qa": {
+    "timestamp_kst": "2026-10-07T03:58:25+09:00",
+    "run": "20261007-C225R-EBFC709F-B219",
+    "queue_index": 232,
+    "asset": "EBFC709F",
+    "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+    "candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
+    "producer_run": "B219",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "4/4 PASS",
+    "controller_visual_qa": "PASS_B219_SOURCE_ALIGNMENT_HIERARCHY_REWORK",
+    "decision": "C225R_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+    "machine_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_comparison_refresh": "PENDING_C225R_EXPORT",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }

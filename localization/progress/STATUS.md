@@ -2121,3 +2121,8 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - B219 uses native Noto CJK Bold on the independently validated C135 clean plate, restores 2px source-left anchors, preserves 59px small-row height, and grows the large rows 131->141px inside the exact 145px source ceiling.
 - 4/4 bbox/size/positive-margin PASS; changed/alpha outside exact source bboxes=0; exact header/BGRA/raw mirror_y preserved. Controller SOURCE/C135/CLEAN/B219, row-contact and RAW visual QA PASS.
 - Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 03:58 KST — C225R q232 EBFC709F
+- B219 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221 fresh C machine QA PASS: 4/4 bbox/size/positive-margin, outside/alpha/clean-alpha/overlap/touch gates zero, exact header/raw mirror_y PASS.
+- Controller visual PASS: source-left heading family and large-row hierarchy restored; no residue/breakage/clipping/intrusion. C225 first retry was verifier-only false failure; C225R corrected the alpha-bbox method without changing candidate bytes.
+- Decision C225R_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export/user review + actual game validation pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.

@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Fresh independent C should validate B219 q232 EBFC709F 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221 and B218 q228 E7F6E9B7, then regenerate the English-original PRE_INGAME comparison for any newly approved bytes. Actual in-game validation remains separate and UNTESTED.",
+  "next_checkpoint": "Fresh independent C should continue with newest pending producer candidates, especially A149 q135 2B0863D6 and B218 q228 E7F6E9B7. q232 EBFC709F passed C225R and now needs PRE_INGAME English-original comparison refresh/user review plus actual in-game validation. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -414,14 +414,14 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C224",
-      "report": "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA557B4_CONTROLLER_FINAL_QA.json",
-      "result": "C224_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+      "run": "C225R",
+      "report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_CONTROLLER_FINAL_QA.json",
+      "result": "C225R_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
       "candidate_changed_by_C": false,
       "assets_checked": 1,
-      "physical_elements_checked": 1,
+      "physical_elements_checked": 4,
       "pixel_visual_pass_assets": [
-        "2EA557B4"
+        "EBFC709F"
       ],
       "rework_required_assets": [],
       "in_game_validation": "UNTESTED; PRE_INGAME user JPG review and actual-game validation pending."
@@ -2693,6 +2693,23 @@
       "pre_ingame_review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/005_q055_2EA557B4.jpg",
       "pre_ingame_manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
       "pre_ingame_user_review": "PENDING_USER_REVIEW"
+    },
+    "c225r_ebfc709f": {
+      "timestamp_kst": "2026-10-07T03:58:25+09:00",
+      "queue_index": 232,
+      "asset": "EBFC709F",
+      "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+      "candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
+      "producer_run": "B219",
+      "machine_status": "PASS",
+      "bbox_size_positive_margin": "4/4 PASS",
+      "zero_pixel_gates": "changed/alpha outside exact source bboxes=0; clean source alpha=0; overlap/touch=0; raw mirror_y",
+      "controller_visual_qa": "PASS_B219_SOURCE_ALIGNMENT_HIERARCHY_REWORK",
+      "decision": "C225R_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+      "machine_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_MACHINE_QA.json",
+      "controller_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_CONTROLLER_FINAL_QA.json",
+      "pre_ingame_comparison_refresh": "PENDING_C225R_EXPORT",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
@@ -3323,9 +3340,29 @@
     "prior_status": "C135_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
     "machine_qa": "4/4 bbox+size+positive-margin; outside/alpha=0; small height 59px; large height 141px; 2px source-left margins; BGRA/raw mirror_y",
     "controller_visual_qa": "PASS_SOURCE_C135_CLEAN_B219_ROW_RAW",
-    "status": "B219_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "status": "C225R_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_B/20261007-B-MANUALQA219-EBFC709F/B219_EBFC709F_REPORT.json",
-    "controller": "localization/graphics/role_B/20261007-B-MANUALQA219-EBFC709F/B219_CONTROLLER_FINAL_QA.json"
+    "controller": "localization/graphics/role_B/20261007-B-MANUALQA219-EBFC709F/B219_CONTROLLER_FINAL_QA.json",
+    "fresh_independent_c": "C225R_PASS",
+    "pre_ingame_comparison_refresh": "PENDING_C225R_EXPORT",
+    "c_pass_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_CONTROLLER_FINAL_QA.json"
+  },
+  "c225r_ebfc709f": {
+    "timestamp_kst": "2026-10-07T03:58:25+09:00",
+    "queue_index": 232,
+    "asset": "EBFC709F",
+    "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+    "candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
+    "producer_run": "B219",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "4/4 PASS",
+    "zero_pixel_gates": "changed/alpha outside exact source bboxes=0; clean source alpha=0; overlap/touch=0; raw mirror_y",
+    "controller_visual_qa": "PASS_B219_SOURCE_ALIGNMENT_HIERARCHY_REWORK",
+    "decision": "C225R_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+    "machine_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_comparison_refresh": "PENDING_C225R_EXPORT",
+    "runtime_validation": "UNTESTED"
   }
 }

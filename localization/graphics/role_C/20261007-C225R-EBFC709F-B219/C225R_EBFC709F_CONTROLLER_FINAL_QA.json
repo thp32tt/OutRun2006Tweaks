@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261007-C225R-EBFC709F-B219",
+  "qa_id": "C225R",
+  "timestamp_kst": "2026-10-07T03:58:25+09:00",
+  "queue_index": 232,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "producer_run": "B219",
+  "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+  "candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
+  "candidate_changed_by_C": false,
+  "machine_report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_MACHINE_QA.json",
+  "machine_summary": {
+    "status": "PASS",
+    "bbox_size_positive_margin": "4/4 PASS",
+    "candidate_changed_outside_exact_source_bboxes": 0,
+    "candidate_alpha_changed_outside_exact_source_bboxes": 0,
+    "clean_source_alpha_remaining": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "verifier_retry_note": "The first C225 hosted attempt failed only because it incorrectly derived an effect bbox from source-vs-clean RGB values on a transparent clean plate. C225R corrected the independent method to derive exact source alpha bboxes directly from the canonical source. Candidate bytes never changed between attempts.",
+  "controller_visual_qa": "PASS_B219_SOURCE_ALIGNMENT_HIERARCHY_REWORK",
+  "visual_observations": [
+    "All four current Korean headings are source-left anchored with positive 2px margins; the prior C135 centered-placement false negative is materially corrected.",
+    "Large red 게임 만들기 / 게임 참가 rows preserve the source upright display hierarchy at 141px decoded height inside the 145px source height, while small gray headings retain the compact family.",
+    "Explanatory English sentences are pixel-preserved outside the four exact heading bboxes. The C135 independently validated clean plate has zero remaining source alpha inside all four source heading masks.",
+    "High-zoom row contacts show no broken Hangul, clipping, source-heading residue, overlap, touch, foreign-image intrusion, or style-family discontinuity.",
+    "RAW mirror_y evidence is consistent with readable FLIP-Y orientation."
+  ],
+  "ordered_visual_gate": {
+    "1_english_removal_plate_restoration": "PASS_C135_VALIDATED_CLEAN_ZERO_SOURCE_ALPHA",
+    "2_readable_slant_direction": "PASS_SOURCE_UPRIGHT",
+    "3_no_unnecessary_undersizing": "PASS_MAX_SAFE_HEIGHT_59PX_SMALL_141PX_LARGE",
+    "4_source_faithful_weight_effects": "PASS_BOLD_FLAT_SOURCE_FAMILY",
+    "5_no_clipping": "PASS_4_OF_4_POSITIVE_2PX_MIN_MARGIN",
+    "6_protected_art_clearance": "PASS_ZERO_CHANGE_OUTSIDE_EXACT_SOURCE_BBOXES",
+    "7_flip_y_and_raw": "PASS",
+    "8_immediate_readability": "PASS"
+  },
+  "decision": "C225R_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+  "pre_ingame_comparison_refresh": "PENDING_C225R_EXPORT",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false,
+  "evidence": [
+    "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC_SOURCE_CLEAN_FINAL_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC_ROW_CONTACT.jpg",
+    "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC_SOURCE_FINAL_RAW.jpg"
+  ]
+}
