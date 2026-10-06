@@ -417,6 +417,7 @@ require_order(
     "R32DrainPendingProducerFence(index)",
     "if (candidate.producerPending)",
     "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
+    "The host completed this exact published frame. Retire the",
     "candidate.frameId = 0;",
     "candidate.published = false;",
     "selected = index;",
