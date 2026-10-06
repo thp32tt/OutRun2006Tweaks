@@ -1,5 +1,5 @@
 {
-  "schema_version": 112,
+  "schema_version": 113,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B207 index24 control mapping completes the stock name-entry event boundary after the already-built A141 sidecar foundation. Character selections are 0x00..0x25 (0x25 aliases slot 0x24); controls are 0x26 BACKSPACE, 0x27 page1/page2 symbols, 0x28 page1/page3 one-shot uppercase, 0x29 page1/page4 persistent uppercase, 0x2A page1/page5 legacy extended page, and 0x2B END/confirm. Preserve controls 0x26..0x2B and intercept only the character/composition path before legacy byte append; exact 66743AA8 visual binding/Jamo layout and explicit local Korean-name rendering remain HOLD.",
     "A141 index24 implementation foundation BUILD PASS: after A primary work was exhausted, A work-stole the B206 HOLD and implemented the two safe deterministic prerequisites rather than repeating consumer mapping. Native player-name storage remains legacy-compatible; canonical Korean UTF-8 is mapped by a deterministic 14-byte ASCII alias (K + 13 Base32 chars) to SaveGame/KoreanPlayerNames.tsv with UTF-8 validation, collision handling and atomic persistence. Win32 Release 37441155668 and Korean Test Build 37441155760 both SUCCESS. No write to 0x7C23E0 and no DDS/input/render/network/ranking/replay behavior yet. Next safe work: Hangul composition/name-entry hook plus explicit local player-name render substitution, beginning from proven Edit License 0x4DE48A->0x48F280; keep remote/ranking/replay on alias.",
     "C: independently revalidate A136/A137/A138/A139 user-JPG visual rework (BF3EE5C6, 37759842, FD90AA9, A064FDFC, 48DEBE77). Do not close IGR-008/011/012/014/015/016/018 until a NEW actual in-game screenshot confirms the reported broken/slant/residue defects are gone.",
     "B205 index24 canonical-EXE static trace resolves A136's exact field/encoding blocker: player name is the 16-byte runtime field 0x7C23E0..0x7C23EF, name-entry is configured min=1/max=16 and stores at most 15 payload bytes + NUL, and selector-to-name append is a legacy one-byte code table rather than UTF-8/UTF-16. Do not redraw 66743AA8 yet. Next safe work is consumer classification plus a compatible Korean name storage/render/serialization policy before any runtime behavior change. No candidate; RUNTIME_VALIDATION=UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT.",
@@ -6449,5 +6450,50 @@
       "explicit local player-name render substitution at proven callsites",
       "keep online/ranking/replay native alias until separate proof"
     ]
+  },
+  "b207_nameentry_control_map": {
+    "timestamp_kst": "2026-10-06T18:23:36+09:00",
+    "role": "B",
+    "queue_index": 24,
+    "prior": "A141_SIDECAR_ALIAS_FOUNDATION_BUILD_PASS_INPUT_RENDER_HOOKS_REQUIRED",
+    "status": "B207_HOLD_SIDECAR_BUILD_PASS_CONTROLS_MAPPED_HANGUL_COMPOSITION_RENDER_REQUIRED",
+    "report": "localization/graphics/role_B/20261006-B-PREFLIGHT207-NAMEENTRY-CONTROLS/B207_NAMEENTRY_CONTROL_MAP.json",
+    "evidence": "localization/graphics/role_B/20261006-B-PREFLIGHT207-NAMEENTRY-CONTROLS/B207_DISASSEMBLY_EVIDENCE.txt",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "inherited_a141_build": {
+      "source_commit": "aa7dc1f15826b96e3061077d636da65c08730105",
+      "win32_release_run": 37441155668,
+      "win32_release_artifact": 11401148429,
+      "korean_test_run": 37441155760,
+      "korean_test_artifact": 11401263208,
+      "result": "SUCCESS_INHERITED_NOT_REPEATED"
+    },
+    "selection": {
+      "global": "0x7F9420",
+      "lookup_function": "0x468D40",
+      "character_range": "0x00..0x25",
+      "selection_0x25": "remaps to table slot 0x24",
+      "unique_slots_per_page": 37
+    },
+    "controls": {
+      "backspace": "0x26",
+      "symbols_toggle": "0x27 page1/page2",
+      "one_shot_uppercase": "0x28 page1/page3; page3 auto-resets after append",
+      "persistent_uppercase": "0x29 page1/page4",
+      "extended_page": "0x2A page1/page5",
+      "confirm": "0x2B END after minimum-length check"
+    },
+    "object_offsets": {
+      "buffer": "0x5F4",
+      "length": "0x6F6",
+      "minimum": "0x6F8",
+      "maximum": "0x6FA",
+      "page": "0xEC",
+      "result": "0x700"
+    },
+    "safe_future_boundary": "preserve control selections 0x26..0x2B; intercept only character selections 0x00..0x25 before one-byte append; commit A141 alias on confirm after Korean composition",
+    "candidate_written": false,
+    "runtime_source_changed": false,
+    "runtime_validation": "UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT"
   }
 }
