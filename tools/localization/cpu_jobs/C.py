@@ -9,7 +9,7 @@ import numpy as np
 from PIL import Image,ImageDraw,ImageChops
 
 repo=Path.cwd()
-run="20261007-C227-754F0599-A151"
+run="20261007-C227R-754F0599-A151"
 out=repo/"localization/graphics/role_C"/run
 out.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
@@ -19,8 +19,8 @@ EXPECTED="f21970a3d6d8ae69954d0159524856b5019cd1445daa65c55d85213f73e431f5"
 SOURCE_SHA="9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5"
 SOURCE_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds"
 regions=[
- ("stage_select","stage select","스테이지 선택",[0,240,1500,405]),
- ("showroom","showroom","쇼룸",[0,390,1100,540]),
+ ("stage_select","stage select","스테이지 선택",[0,240,1500,397]),
+ ("showroom","showroom","쇼룸",[0,397,1100,550]),
  ("single_player","single player","싱글 플레이",[0,550,1500,735]),
 ]
 def h(b): return hashlib.sha256(b).hexdigest()
@@ -104,7 +104,7 @@ def card(label,im):
 cards=[card("SOURCE_READABLE",s),card("A151_CLEAN",clean),card("A151_FINAL",f)]
 w=max(x.width for x in cards); hh=sum(x.height for x in cards); sheet=Image.new("RGB",(w,hh),(25,25,25)); y=0
 for x in cards: sheet.paste(x,(0,y)); y+=x.height
-sheet.save(out/"C227_754_SOURCE_CLEAN_FINAL_READABLE.jpg","JPEG",quality=96,subsampling=0)
+sheet.save(out/"C227R_754_SOURCE_CLEAN_FINAL_READABLE.jpg","JPEG",quality=96,subsampling=0)
 
 sf=flat(s); ff=flat(f); contacts=[]
 for row in rows:
@@ -117,14 +117,14 @@ for row in rows:
 cw=max(x.width for x in contacts); ch=sum(x.height for x in contacts)+6*(len(contacts)-1)
 cs=Image.new("RGB",(cw,ch),(25,25,25)); y=0
 for x in contacts: cs.paste(x,(0,y)); y+=x.height+6
-cs.save(out/"C227_754_ROW_CONTACT.jpg","JPEG",quality=96,subsampling=0)
+cs.save(out/"C227R_754_ROW_CONTACT.jpg","JPEG",quality=96,subsampling=0)
 
 rawcards=[card("SOURCE_RAW_MIRROR_Y",sr),card("A151_RAW_MIRROR_Y",fr)]
 rw=max(x.width for x in rawcards); rh=sum(x.height for x in rawcards); rs=Image.new("RGB",(rw,rh),(25,25,25)); y=0
 for x in rawcards: rs.paste(x,(0,y)); y+=x.height
-rs.save(out/"C227_754_SOURCE_FINAL_RAW.jpg","JPEG",quality=96,subsampling=0)
+rs.save(out/"C227R_754_SOURCE_FINAL_RAW.jpg","JPEG",quality=96,subsampling=0)
 
-report={"schema_version":1,"role":"C","run":run,"qa_id":"C227","queue_index":175,"asset":asset,
+report={"schema_version":1,"role":"C","run":run,"qa_id":"C227R","queue_index":175,"asset":asset,
  "producer_run":"A151","source_sha256":SOURCE_SHA,"candidate_sha256":EXPECTED,
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6","url":SOURCE_URL},
  "independent_basis":"pinned canonical BGRA/RGBA32 source independently decoded; three source/candidate alpha bboxes re-derived directly from broad semantic row regions; producer masks not consumed",
@@ -132,13 +132,13 @@ report={"schema_version":1,"role":"C","run":run,"qa_id":"C227","queue_index":175
  "summary":{"bbox_size_positive_margin":"3/3 PASS","candidate_changed_outside_exact_source_bboxes":outside,
   "candidate_alpha_changed_outside_exact_source_bboxes":alpha_out,"localized_pair_overlap_pixels":overlap,
   "localized_touch_pairs":touch,"header_128_exact":True,"raw_readable_parity":"PASS"},
- "visual_evidence":[str((out/"C227_754_SOURCE_CLEAN_FINAL_READABLE.jpg").relative_to(repo)),
-  str((out/"C227_754_ROW_CONTACT.jpg").relative_to(repo)),str((out/"C227_754_SOURCE_FINAL_RAW.jpg").relative_to(repo))],
+ "visual_evidence":[str((out/"C227R_754_SOURCE_CLEAN_FINAL_READABLE.jpg").relative_to(repo)),
+  str((out/"C227R_754_ROW_CONTACT.jpg").relative_to(repo)),str((out/"C227R_754_SOURCE_FINAL_RAW.jpg").relative_to(repo))],
  "controller_visual_qa":"PENDING_CONTROLLER","decision":"PENDING_CONTROLLER","runtime_validation":"UNTESTED",
  "vr_ffb_dx11_dxvk_changes":False}
-(out/"C227_754F0599_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"C227R_754F0599_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
-(wr/"C227_754F0599.json").write_text(json.dumps({"role":"C","run":"C227","queue_index":175,"asset":asset,
- "candidate_sha256":EXPECTED,"machine_status":"PASS","report":str((out/"C227_754F0599_MACHINE_QA.json").relative_to(repo)),
+(wr/"C227R_754F0599.json").write_text(json.dumps({"role":"C","run":"C227","queue_index":175,"asset":asset,
+ "candidate_sha256":EXPECTED,"machine_status":"PASS","report":str((out/"C227R_754F0599_MACHINE_QA.json").relative_to(repo)),
  "runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps({"run":"C227","status":"PASS","rows":rows,"summary":report["summary"]},ensure_ascii=False))
