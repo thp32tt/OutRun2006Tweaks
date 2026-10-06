@@ -2193,3 +2193,6 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - Exporter 37541482848 SUCCESS; worker 5991153ef31aecb06828f9814a44684f069d2e0c; current C-pass set 27 rows.
 - q139 313DB8CB is #013 with source 4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786 and A150 candidate 50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7; FLIP-Y and RAW card rechecked.
 - User JPG review and in-game validation pending. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+## C227R q175 754F0599
+Machine PASS; controller visual REWORK_REQUIRED for source typography family mismatch. Runtime validation remains UNTESTED.
