@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
 
 repo=Path.cwd()
-run="20261006-A-WORKSTEAL120R3-33491F83"
+run="20261006-A-WORKSTEAL120R4-33491F83"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -22,7 +22,7 @@ candidate.parent.mkdir(parents=True,exist_ok=True)
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds"
 SOURCE_SHA="796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551"
 
-srcp=Path("/tmp/A120R3_33491F83.dds")
+srcp=Path("/tmp/A120R4_33491F83.dds")
 urllib.request.urlretrieve(url,srcp)
 raw=srcp.read_bytes()
 def sha_bytes(x): return hashlib.sha256(x).hexdigest()
@@ -76,7 +76,7 @@ def fill_seed(arr,family):
 
 def keep_fill_component(key,area,gx0,gy0,gx1,gy1,cx,cy):
     if key=="diverge_main": return area>=100
-    if key=="left_main": return area>=300 and cy>=175 and cx<530
+    if key=="left_main": return area>=300 and cy>=175 and cx<470
     if key=="right_main": return area>=100 and cy>=175 and cx<900
     if key=="easy_main": return area>=500 and cy>=300
     if key=="hard_main": return area>=500 and cy>=290
@@ -175,36 +175,49 @@ for row,m in zip(rows,masks):
     x0,y0,x1,y1=row["source_bbox"]
     allowed_region[y0:y1,x0:x1]=True
 
-# ARTWORK-AWARE CLEAN PLATE — A120R3
-# Controller visual review rejected A120/A120R2 because partial effect masks left
-# English fragments and nearest-mask reconstruction copied those fragments into the
-# plate. Reconstruct the COMPLETE exact source text bboxes instead. The bbox is the
-# contract's hard mutation ceiling; all pixels outside are immutable.
-#
-# Main diagram text lies over background route art. Fill all five text bboxes from
-# the nearest source pixel outside the UNION of main text bboxes, preventing any
-# source label from being used as reconstruction material. Detached right-cell labels
-# live on transparency and are cleared to transparent.
-clean_arr=sa.copy()
-main_region=np.zeros((H,W),bool)
-detached_region=np.zeros((H,W),bool)
-for row in rows:
-    x0,y0,x1,y1=row["source_bbox"]
-    if row["cell"] in ("main","transparent_label"):
-        main_region[y0:y1,x0:x1]=True
-    else:
-        detached_region[y0:y1,x0:x1]=True
+# ARTWORK-AWARE CLEAN PLATE — A120R4
+# R3 was controller-rejected: full-bbox nearest-neighbor fill created broken route
+# geometry and stripe artifacts. R4 returns to the measured source-text/effect masks,
+# expands them only 3 px inside each exact source bbox to catch antialias/shadow
+# residue, and uses edge-aware Telea inpainting for the opaque main diagram.
+# Detached right-cell labels are transparent and are cleared exactly.
+subprocess.run(
+    ["python","-m","pip","install","--disable-pip-version-check","-q",
+     "opencv-python-headless==4.10.0.84"],
+    check=True
+)
+import cv2
 
-# All source text bboxes are excluded as donors.
-all_text_region=main_region|detached_region
-donor_ok=~all_text_region
-if not donor_ok.any(): raise RuntimeError("no clean donors")
-# EDT returns nearest zero; use all_text_region so every inside pixel maps to an
-# outside donor and never to another source label.
-_,inds=ndimage.distance_transform_edt(all_text_region,return_indices=True)
-yy,xx=np.nonzero(main_region)
-clean_arr[yy,xx,:]=sa[inds[0,yy,xx],inds[1,yy,xx],:]
-clean_arr[detached_region]=0
+clean_arr=sa.copy()
+main_mask=np.zeros((H,W),bool)
+detached_mask=np.zeros((H,W),bool)
+effective_masks=[]
+for row,m in zip(rows,masks):
+    x0,y0,x1,y1=row["source_bbox"]
+    bboxmask=np.zeros((H,W),bool); bboxmask[y0:y1,x0:x1]=True
+    # 3px antialias/effect safety halo cannot escape the measured source bbox.
+    eff=ndimage.binary_dilation(m,iterations=3)&bboxmask
+    effective_masks.append(eff)
+    if row["cell"] in ("main","transparent_label"):
+        main_mask|=eff
+    else:
+        detached_mask|=eff
+
+if np.any(main_mask&detached_mask):
+    raise RuntimeError("main/detached clean masks overlap")
+
+# Telea works on the readable-orientation full RGBA source. Inpaint RGB only;
+# alpha is retained for the opaque main diagram. A 7px radius is deliberately
+# small relative to the label cells so route/rail/lane edges propagate across
+# letter-shaped holes without rectangular plate replacement.
+rgb=sa[:,:,:3].copy()
+inpaint_u8=(main_mask.astype(np.uint8)*255)
+rgb_clean=cv2.inpaint(rgb,inpaint_u8,7.0,cv2.INPAINT_TELEA)
+clean_arr[main_mask,:3]=rgb_clean[main_mask,:3]
+# The main diagram's source alpha is preserved byte-for-byte.
+clean_arr[main_mask,3]=sa[main_mask,3]
+# Detached right-cell text has transparent background.
+clean_arr[detached_mask]=0
 
 clean=Image.fromarray(clean_arr,"RGBA")
 clean_visible=clean_arr[:,:,3]>8
@@ -212,8 +225,17 @@ clean_changed=np.any(sa!=clean_arr,axis=2)
 clean_outside=int(np.count_nonzero(clean_changed & ~allowed_region))
 if clean_outside:
     raise RuntimeError(("clean changed outside exact source bboxes",clean_outside))
-reconstructed_art=main_region.copy()
-cleared_transparent=detached_region.copy()
+
+# Stronger source-residue proxy: none of the original measured text/effect pixels
+# may remain byte-identical after cleaning. This is safe here because Telea replaces
+# the main masks and detached masks are zeroed.
+same=np.all(clean_arr==sa,axis=2)
+same_source_text=int(np.count_nonzero(same & source_mask))
+if same_source_text:
+    raise RuntimeError(("clean retained exact source text/effect pixels",same_source_text))
+
+reconstructed_art=main_mask.copy()
+cleared_transparent=detached_mask.copy()
 unreconstructed=0
 
 # Install Hangul font.
@@ -346,15 +368,15 @@ if rows_pass!=len(rows):
     raise RuntimeError(("row gate",rows_pass,len(rows)))
 
 # Evidence.
-src.save(out/"A120R3_SOURCE_READABLE.png")
-src_raw.save(out/"A120R3_SOURCE_RAW.png")
-clean.save(out/"A120R3_CLEAN_PLATE.png")
-dec.save(out/"A120R3_FINAL_READABLE.png")
-dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"A120R3_FINAL_RAW.png")
-Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"A120R3_SOURCE_TEXT_MASK.png")
-Image.fromarray((reconstructed_art.astype(np.uint8)*255),"L").save(out/"A120R3_RECONSTRUCTED_ART_MASK.png")
-Image.fromarray((clean_visible.astype(np.uint8)*255),"L").save(out/"A120R3_CLEAN_VISIBLE_MASK.png")
-Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"A120R3_TARGET_MASK.png")
+src.save(out/"A120R4_SOURCE_READABLE.png")
+src_raw.save(out/"A120R4_SOURCE_RAW.png")
+clean.save(out/"A120R4_CLEAN_PLATE.png")
+dec.save(out/"A120R4_FINAL_READABLE.png")
+dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"A120R4_FINAL_RAW.png")
+Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"A120R4_SOURCE_TEXT_MASK.png")
+Image.fromarray((reconstructed_art.astype(np.uint8)*255),"L").save(out/"A120R4_RECONSTRUCTED_ART_MASK.png")
+Image.fromarray((clean_visible.astype(np.uint8)*255),"L").save(out/"A120R4_CLEAN_VISIBLE_MASK.png")
+Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"A120R4_TARGET_MASK.png")
 
 def comp(im,bg=(235,235,235,255)):
     z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
@@ -373,7 +395,7 @@ sheet=Image.new("RGB",(mw,mh),"white"); yy=0
 for c in cards:
     sheet.paste(c,(0,yy)); yy+=c.height+8
 sheet.thumbnail((1800,2400),Image.Resampling.LANCZOS)
-sheet.save(out/"A120R3_MAIN_SOURCE_CLEAN_FINAL.jpg",quality=97)
+sheet.save(out/"A120R4_MAIN_SOURCE_CLEAN_FINAL.jpg",quality=97)
 
 right_crop=(1190,0,2048,270)
 cards=[card("SOURCE RIGHT CELLS",src,right_crop),card("CLEAN RIGHT CELLS",clean,right_crop),card("FINAL RIGHT CELLS",dec,right_crop)]
@@ -381,7 +403,7 @@ mw=max(c.width for c in cards); mh=sum(c.height+8 for c in cards)
 sheet=Image.new("RGB",(mw,mh),"white"); yy=0
 for c in cards:
     sheet.paste(c,(0,yy)); yy+=c.height+8
-sheet.save(out/"A120R3_RIGHT_SOURCE_CLEAN_FINAL.jpg",quality=97)
+sheet.save(out/"A120R4_RIGHT_SOURCE_CLEAN_FINAL.jpg",quality=97)
 
 full=Image.new("RGB",(2048,0),"white")
 fullcards=[card("SOURCE",src,(0,0,W,H)),card("CLEAN",clean,(0,0,W,H)),card("FINAL",dec,(0,0,W,H))]
@@ -390,13 +412,13 @@ mw=max(c.width for c in fullcards); mh=sum(c.height+8 for c in fullcards)
 full=Image.new("RGB",(mw,mh),"white"); yy=0
 for c in fullcards:
     full.paste(c,(0,yy)); yy+=c.height+8
-full.save(out/"A120R3_FULL_SOURCE_CLEAN_FINAL.jpg",quality=95)
+full.save(out/"A120R4_FULL_SOURCE_CLEAN_FINAL.jpg",quality=95)
 
 rawsheet=Image.new("RGB",(1100,700),"white")
 for i,(label,im) in enumerate([("SOURCE RAW mirror_y",src_raw),("FINAL RAW mirror_y",dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM))]):
     v=comp(im); v.thumbnail((1050,280),Image.Resampling.LANCZOS)
     y=i*335+30; rawsheet.paste(v,(20,y)); ImageDraw.Draw(rawsheet).text((20,y-22),label,fill="black")
-rawsheet.save(out/"A120R3_RAW_COMPARE.jpg",quality=95)
+rawsheet.save(out/"A120R4_RAW_COMPARE.jpg",quality=95)
 
 report={
  "schema_version":1,
@@ -412,6 +434,7 @@ report={
    {"run":"B179","failure":"NO_SAFE_RENDER_FIT_LEFT_MAIN_CENTER_ONLY","result":"FAIL_CLOSED_NO_CANDIDATE"},
    {"run":"A120-v1","failure":"CONTROLLER_VISUAL_REJECT_SOURCE_RESIDUE_AND_WHITE_PATCH_BLOBS","result":"REJECTED_CANDIDATE_f051a335"},
    {"run":"A120R2","failure":"CONTROLLER_VISUAL_REJECT_ENGLISH_RESIDUE_AND_SPIKED_NEAREST_MASK_RECONSTRUCTION","result":"REJECTED_CANDIDATE_b5a1172f"},
+   {"run":"A120R3","failure":"CONTROLLER_VISUAL_REJECT_BROKEN_ROUTE_GEOMETRY_AND_STRIPE_ARTIFACTS","result":"REJECTED_CANDIDATE_417dc8c7"},
    {"run":"A120-v2/v3","failure":"FAIL_CLOSED_DIAGNOSTIC_GATES_BEFORE_CANDIDATE","result":"NO_CANDIDATE"}
  ],
  "translation":{"semantic_segments":[
@@ -421,7 +444,7 @@ report={
  "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":MIPS,"header_128_exact":payload[:128]==raw[:128],"raw_orientation":"mirror_y"},
  "construction":{
    "source_mask":"A120D component-selected text-face seeds; detached labels use exact visible connected components touched by text seed; integrated route labels use selected face + source-effect palette connectivity within 19.5px, excluding road/arrow fill components",
-   "clean_plate":"controller-revised full exact-bbox reconstruction: main-route/Diverge bboxes filled from nearest source donors outside the union of all text bboxes, so no source label can be copied back; detached right-cell text bboxes cleared transparent; every pixel outside exact bbox union immutable",
+   "clean_plate":"R4 controller-rework: measured source text/effect masks expanded by 3px inside exact source bboxes; opaque main diagram RGB reconstructed with pinned OpenCV Telea radius 7 while preserving source alpha; detached right-cell labels cleared transparent; no pixel outside exact bbox union may change",
    "placement":"exhaustive x/y fit inside each exact source glyph/effect bbox at descending native font size; reconstructed route/background pixels inside that hard bbox are paintable, while every pixel outside bbox union is immutable; source-centroid-nearest valid placement selected",
    "source_transform_policy":{"main_and_standalone_shear":0.0,"arrow_label_shear":0.18}
  },
@@ -430,7 +453,8 @@ report={
    "allowed_exact_bbox_pixels":int(allowed_region.sum()),
    "reconstructed_art_pixels":int(reconstructed_art.sum()),
    "cleared_transparent_pixels":int(cleared_transparent.sum()),
-   "clean_changed_outside_exact_source_bboxes":clean_outside
+   "clean_changed_outside_exact_source_bboxes":clean_outside,
+   "clean_exact_source_text_pixels_retained":same_source_text
  },
  "rows":rows,
  "static_qa":{
@@ -450,12 +474,12 @@ report={
  "candidate_sha256":cand_sha,
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "runtime_validation":"UNTESTED",
- "status":"A120R3_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"A120R4_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"A120R3_33491F83_REPORT.json"
+rp=out/"A120R4_33491F83_REPORT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A120R3_33491F83.json").write_text(json.dumps({
+(wr/"A120R4_33491F83.json").write_text(json.dumps({
  "role":"A","run":run,"work_stolen_from_lane":"B","queue_index":62,"asset":"33491F83",
  "source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,
  "elements":len(rows),"reconstructed_art_pixels":int(reconstructed_art.sum()),
@@ -471,5 +495,5 @@ print(json.dumps({
    for r in rows],
  "reconstructed_art_pixels":int(reconstructed_art.sum()),
  "cleared_transparent_pixels":int(cleared_transparent.sum()),
- "status":"A120R3_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"A120R4_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 },ensure_ascii=False),flush=True)
