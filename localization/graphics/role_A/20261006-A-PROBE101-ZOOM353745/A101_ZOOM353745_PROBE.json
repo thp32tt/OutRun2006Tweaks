@@ -1,0 +1,291 @@
+{
+  "run": "20261006-A-PROBE101-ZOOM353745",
+  "items": [
+    {
+      "queue_index": 35,
+      "folder": "spr_sprani_HOLL_RANK_Exst",
+      "asset": "E989E3B7_1024x1024.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+      "width": 4096,
+      "height": 4096,
+      "mips": 1,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "bpp": 32,
+      "masks": [
+        "0xff",
+        "0xff00",
+        "0xff0000",
+        "0xff000000"
+      ],
+      "pitch_or_linear": 16384,
+      "sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+      "bytes": 67108992,
+      "component_count": 8,
+      "components": [
+        {
+          "bbox": [
+            32,
+            239,
+            1685,
+            1200
+          ],
+          "area": 1123619
+        },
+        {
+          "bbox": [
+            1782,
+            267,
+            3298,
+            1161
+          ],
+          "area": 937692
+        },
+        {
+          "bbox": [
+            1268,
+            2816,
+            2552,
+            4096
+          ],
+          "area": 815040
+        },
+        {
+          "bbox": [
+            2708,
+            1224,
+            3688,
+            2504
+          ],
+          "area": 795824
+        },
+        {
+          "bbox": [
+            1296,
+            1232,
+            2512,
+            2504
+          ],
+          "area": 766848
+        },
+        {
+          "bbox": [
+            20,
+            2840,
+            1252,
+            4096
+          ],
+          "area": 755744
+        },
+        {
+          "bbox": [
+            196,
+            1228,
+            1016,
+            2504
+          ],
+          "area": 737856
+        },
+        {
+          "bbox": [
+            2884,
+            2816,
+            3632,
+            4096
+          ],
+          "area": 658304
+        }
+      ]
+    },
+    {
+      "queue_index": 37,
+      "folder": "spr_sprani_JENN_RANK_Exst",
+      "asset": "515DCBB2_1024x1024.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_JENN_RANK_Exst/515DCBB2_1024x1024.dds",
+      "width": 1024,
+      "height": 1024,
+      "mips": 0,
+      "fourcc": "DXT5",
+      "bpp": 0,
+      "masks": [
+        "0x0",
+        "0x0",
+        "0x0",
+        "0x0"
+      ],
+      "pitch_or_linear": 0,
+      "sha256": "71479df90571cc1546fd6b274888e123f73c960f2f4a0381f20cf667d4ea511b",
+      "bytes": 1048704,
+      "component_count": 7,
+      "components": [
+        {
+          "bbox": [
+            6,
+            656,
+            277,
+            1024
+          ],
+          "area": 56258
+        },
+        {
+          "bbox": [
+            544,
+            274,
+            813,
+            626
+          ],
+          "area": 55674
+        },
+        {
+          "bbox": [
+            283,
+            656,
+            540,
+            1024
+          ],
+          "area": 54350
+        },
+        {
+          "bbox": [
+            273,
+            237,
+            537,
+            626
+          ],
+          "area": 50342
+        },
+        {
+          "bbox": [
+            585,
+            646,
+            772,
+            1024
+          ],
+          "area": 48342
+        },
+        {
+          "bbox": [
+            15,
+            276,
+            267,
+            626
+          ],
+          "area": 46071
+        },
+        {
+          "bbox": [
+            811,
+            228,
+            816,
+            244
+          ],
+          "area": 62
+        }
+      ]
+    },
+    {
+      "queue_index": 45,
+      "folder": "spr_sprani_etc_cvt_Exst",
+      "asset": "1F77CB88_128x128.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_etc_cvt_Exst/1F77CB88_128x128.dds",
+      "width": 512,
+      "height": 512,
+      "mips": 1,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "bpp": 32,
+      "masks": [
+        "0xff",
+        "0xff00",
+        "0xff0000",
+        "0xff000000"
+      ],
+      "pitch_or_linear": 2048,
+      "sha256": "e57f4d36c34fc2f07881494438b4233ab60f7608d77431117873bafc04d64ed1",
+      "bytes": 1048704,
+      "component_count": 9,
+      "components": [
+        {
+          "bbox": [
+            6,
+            183,
+            106,
+            281
+          ],
+          "area": 9712
+        },
+        {
+          "bbox": [
+            230,
+            295,
+            330,
+            393
+          ],
+          "area": 9712
+        },
+        {
+          "bbox": [
+            286,
+            407,
+            386,
+            505
+          ],
+          "area": 9712
+        },
+        {
+          "bbox": [
+            398,
+            407,
+            498,
+            505
+          ],
+          "area": 9712
+        },
+        {
+          "bbox": [
+            173,
+            407,
+            274,
+            505
+          ],
+          "area": 9682
+        },
+        {
+          "bbox": [
+            341,
+            295,
+            442,
+            393
+          ],
+          "area": 8357
+        },
+        {
+          "bbox": [
+            28,
+            420,
+            140,
+            492
+          ],
+          "area": 7920
+        },
+        {
+          "bbox": [
+            6,
+            308,
+            106,
+            380
+          ],
+          "area": 7128
+        },
+        {
+          "bbox": [
+            118,
+            308,
+            218,
+            380
+          ],
+          "area": 7128
+        }
+      ]
+    }
+  ],
+  "status": "A101_SOURCE_PROBE_BATCH_COMPLETE_CONTROLLER_CLASSIFICATION_REQUIRED"
+}

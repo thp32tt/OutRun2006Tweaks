@@ -1,0 +1,33 @@
+{
+  "run": "20261006-A-PROBE101-ZOOM353745",
+  "indices": [
+    35,
+    37,
+    45
+  ],
+  "items": [
+    {
+      "queue_index": 35,
+      "asset": "E989E3B7_1024x1024.dds",
+      "sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+      "width": 4096,
+      "height": 4096
+    },
+    {
+      "queue_index": 37,
+      "asset": "515DCBB2_1024x1024.dds",
+      "sha256": "71479df90571cc1546fd6b274888e123f73c960f2f4a0381f20cf667d4ea511b",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "queue_index": 45,
+      "asset": "1F77CB88_128x128.dds",
+      "sha256": "e57f4d36c34fc2f07881494438b4233ab60f7608d77431117873bafc04d64ed1",
+      "width": 512,
+      "height": 512
+    }
+  ],
+  "report": "localization/graphics/role_A/20261006-A-PROBE101-ZOOM353745/A101_ZOOM353745_PROBE.json",
+  "status": "A101_SOURCE_PROBE_BATCH_COMPLETE_CONTROLLER_CLASSIFICATION_REQUIRED"
+}
