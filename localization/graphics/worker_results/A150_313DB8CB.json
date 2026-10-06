@@ -1,0 +1,22 @@
+{
+  "run": "20261007-A-MANUALQA150-313DB8CB",
+  "asset": "313DB8CB",
+  "queue_index": 139,
+  "prior_candidate_sha256": "c44a9ccd62e2b78fb17ec10f7a50a6de32dc1a0f84a44f2595b3e7ffaa0cc0ea",
+  "candidate_sha256": "50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7",
+  "bbox_size_positive_margin": "2/2 PASS",
+  "width_gains": [
+    66,
+    62
+  ],
+  "width_ratios": [
+    0.8705,
+    0.6897
+  ],
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "worker_status": "A150_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261007-A-MANUALQA150-313DB8CB/A150_313DB8CB_REPORT.json"
+}
