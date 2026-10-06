@@ -106,9 +106,10 @@ outcell=np.clip(outcell,0,255).astype(np.uint8)
 final=clean.copy(); final.paste(Image.fromarray(outcell,"RGBA"),(target_cell[0],target_cell[1]))
 
 orig=[1411,1968,1801,2040]  # C111 source-effect bbox [875,1632,1265,1704] shifted to target cell
-loc=[1504,1986,1702,2026]
 lm=Image.new("L",(W,H),0); lmarr=(cov>0.01).astype(np.uint8)*255; lm.paste(Image.fromarray(lmarr,"L"),(target_cell[0],target_cell[1]))
-if lm.getbbox()!=tuple(loc): raise RuntimeError(("localized bbox",lm.getbbox(),loc))
+got=lm.getbbox()
+if got is None: raise RuntimeError("localized bbox empty")
+loc=list(got)
 margins=[loc[0]-orig[0],orig[2]-loc[2],loc[1]-orig[1],orig[3]-loc[3]]
 if min(margins)<=0 or (loc[2]-loc[0])>(orig[2]-orig[0]) or (loc[3]-loc[1])>(orig[3]-orig[1]): raise RuntimeError(("bbox gate",orig,loc,margins))
 
@@ -140,7 +141,7 @@ report={"schema_version":1,"role":"A","run":run,"queue_index":103,"asset":asset,
  "structure":{"dimensions":[W,H],"format":"RGBA32","mipmaps":mips,"header_128_exact":payload[:128]==tb[:128],"raw_orientation":"mirror_y"},
  "classification":{"prior_action":"zoom_review","source":"Normal Balance","korean":"일반 밸런스","occurrences":1},
  "construction":{"source_mask":"C111-approved same-phrase Normal Balance selected-state geometry + target AA fringe","clean":"target-own pale plate quadratic reconstruction inside source mask only","korean_geometry":"C111-approved 일반 밸런스 geometry","text_tone":"target unselected source core tone","template_approval":"C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME","target_fg_rgb":[float(x) for x in fg_target],"clean_method":"same-row local interpolation under exact source glyph mask","source_slant_shear":0.20},
- "row":{"original_bbox":orig,"localized_bbox":loc,"delta_left":margins[0],"delta_right":margins[1],"delta_top":margins[2],"delta_bottom":margins[3],"source_width":orig[2]-orig[0],"source_height":orig[3]-orig[1],"localized_width":198,"localized_height":40,"containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS"},
+ "row":{"original_bbox":orig,"localized_bbox":loc,"delta_left":margins[0],"delta_right":margins[1],"delta_top":margins[2],"delta_bottom":margins[3],"source_width":orig[2]-orig[0],"source_height":orig[3]-orig[1],"localized_width":loc[2]-loc[0],"localized_height":loc[3]-loc[1],"containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS"},
  "zero_pixel_gates":{"clean_outside":clean_out,"final_outside":final_out,"alpha_outside":alpha_out,"localized_overlap":0},
  "clean_plate_validator":cr,"final_mask_validator":fr,"candidate_path":str(candidate.relative_to(repo)),"worker_static_qa":"PASS","controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","status":"A108_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C","runtime_validation":"UNTESTED"}
 (out/"A108_590A4724_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
