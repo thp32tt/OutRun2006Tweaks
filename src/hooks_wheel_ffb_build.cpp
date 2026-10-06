@@ -1102,10 +1102,10 @@ namespace
                 return false;
             }
 
-            // The old UI implementation names these presets after R3 and writes
-            // obsolete v0.1 values. Draw universal labels here and apply the
-            // device-independent v0.2 preset directly; returning false prevents
-            // the old caller block from overwriting the new values afterwards.
+            // The source UI retains the historical R3 labels for hook matching,
+            // but its fallback bodies are kept synchronized with these helpers.
+            // Draw universal labels here, apply the canonical preset once, and
+            // return false so the caller does not execute the mirrored body twice.
             if (label && std::strcmp(label, "Load MOZA R3 Physics SAT") == 0)
             {
                 const bool clicked = ButtonHook.ccall<bool>(
@@ -1113,7 +1113,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_physics_preset();
-                    Settings::WheelFFBFeelRevision = 7;
+                    Settings::WheelFFBFeelRevision = 8;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
@@ -1129,7 +1129,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_natural_preset();
-                    Settings::WheelFFBFeelRevision = 7;
+                    Settings::WheelFFBFeelRevision = 8;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
