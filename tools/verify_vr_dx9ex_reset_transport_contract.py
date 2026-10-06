@@ -318,7 +318,7 @@ for marker in (
     if marker in ensure_ack:
         fail(f"R13 ACK ensure path regained duplicate teardown: {marker}")
 
-read_ack = body(r13, "bool R13ReadGpuCompletedFrame(")
+read_ack = body(r13, "bool R13ReadGpuCompletionSnapshot(")
 require_order(
     read_ack,
     "R13 stale-host ACK mapping retirement",
@@ -327,9 +327,21 @@ require_order(
     "if (snapshot.hostPid != expectedHostPid)",
     "R13ReleaseAckState();",
     "snapshot.transportGeneration != DirectTransportGeneration",
+    "completed.completedFrameId,",
+    "snapshot.completedFrameId,",
 )
 if read_ack.count("R13ReleaseAckState();") != 1:
-    fail("R13 ACK read path must retire a stale host mapping exactly once")
+    fail("R13 ACK snapshot path must retire a stale host mapping exactly once")
+
+read_ack_slot = body(r13, "bool R13ReadGpuCompletedFrame(")
+require_order(
+    read_ack_slot,
+    "R13 per-slot ACK compatibility wrapper",
+    "if (slotIndex >= OutRunVR::RenderFrameRingSize)",
+    "R13GpuCompletionSnapshot snapshot{};",
+    "R13ReadGpuCompletionSnapshot(snapshot)",
+    "completedFrame = snapshot.completedFrameId[slotIndex];",
+)
 
 # R13 is the lower reset/resource owner. It releases shared resources and
 # publishes a disabled frame before ResetEx; recreation occurs only on success.
