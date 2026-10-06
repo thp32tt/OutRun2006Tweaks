@@ -200,6 +200,20 @@ for row,sm,banner,safe_banner in zip(rows,source_masks,banner_masks,safe_banner_
             keep=safe_banner[y,bx*4:bx*4+4]
             if np.any(keep):
                 clean_arr[y,xs[keep]]=np.clip(np.rint(col),0,255).astype(np.uint8)
+
+    # A median red-body fill can coincidentally reproduce a small number of source
+    # effect pixels byte-for-byte. That is not acceptable for the strict source-residue
+    # gate. Replace only those stubborn source-effect pixels with the nearest genuine
+    # donor pixel from this same sign body; protected/outside pixels remain untouched.
+    same_row=np.all(clean_arr==sa,axis=2)
+    stubborn=sm & same_row
+    if np.any(stubborn):
+        _, nearest=ndimage.distance_transform_edt(~donor,return_indices=True)
+        sy,sx=np.nonzero(stubborn)
+        clean_arr[sy,sx]=sa[nearest[0,sy,sx],nearest[1,sy,sx]]
+        stubborn2=sm & np.all(clean_arr==sa,axis=2)
+        if np.any(stubborn2):
+            raise RuntimeError(("nearest donor failed to remove source residue",row["key"],int(stubborn2.sum())))
 clean=Image.fromarray(clean_arr,"RGBA")
 
 # Source effect must be fully changed away in clean plate.
