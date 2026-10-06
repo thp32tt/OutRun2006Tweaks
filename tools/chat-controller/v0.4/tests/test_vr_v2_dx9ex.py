@@ -70,6 +70,18 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('conversion_single_lane_running', SOURCE)
         self.assertIn('await conversion_send_lane_task(context, pages, q, CONVERSION_ONLY_SLOT)', SOURCE)
 
+    def test_preventive_recycle_policy(self):
+        self.assertIn('RECYCLE_ENABLED', SOURCE)
+        self.assertIn('RECYCLE_INTERVAL_MINUTES', SOURCE)
+        self.assertIn('RECYCLE_MEMORY_PERCENT', SOURCE)
+        self.assertIn('RECYCLE_MIN_IDLE_SECONDS', SOURCE)
+        self.assertIn('RECYCLE_MIN_NEXT_SLOT_SECONDS', SOURCE)
+        self.assertIn('async def maybe_request_controller_recycle', SOURCE)
+        self.assertIn('async def recycle_block_reason', SOURCE)
+        self.assertIn('def fatal_browser_disconnect', SOURCE)
+        self.assertIn('raise SystemExit(75)', SOURCE)
+        self.assertIn('browser_fatal_disconnect', SOURCE)
+
     def test_rollover_throttle_policy(self):
         self.assertIn('CONVERSATION_ROLLOVER_MIN_SECONDS', SOURCE)
         self.assertIn('conversation_rollover_cooldown', SOURCE)
@@ -85,6 +97,14 @@ class VRV2DX9ExTests(unittest.TestCase):
         compose = (ROOT / 'docker-compose.portainer-vr.yml').read_text()
         self.assertIn('dockerfile: Dockerfile.portainer-vr', compose)
         self.assertIn('CHAT_SLOTS: "3"', compose)
+        self.assertIn('RECYCLE_ENABLED: "true"', compose)
+        self.assertIn('RECYCLE_INTERVAL_MINUTES: "180"', compose)
+        self.assertIn('RECYCLE_MEMORY_PERCENT: "70"', compose)
+        self.assertIn('RECYCLE_CHECK_SECONDS: "30"', compose)
+        self.assertIn('RECYCLE_MIN_IDLE_SECONDS: "300"', compose)
+        self.assertIn('RECYCLE_MIN_NEXT_SLOT_SECONDS: "120"', compose)
+        self.assertIn('PROFILE_CACHE_PRUNE_ON_START: "true"', compose)
+        self.assertIn('mem_limit: 4g', compose)
         self.assertIn('CONVERSION_PARALLEL: "true"', compose)
         self.assertIn('CONVERSION_ACTIVE_LIMIT: "2"', compose)
         self.assertIn('CONVERSION_DX11_ENABLED: "true"', compose)
@@ -100,7 +120,15 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('PRODUCTION_COUNTER_MODE: "lane"', compose)
         dockerfile = (ROOT / 'Dockerfile.portainer-vr').read_text()
         self.assertIn('COPY src-vr-v2/controller.py.part*', dockerfile)
+        self.assertIn('COPY entrypoint.vr.sh /opt/outrun/entrypoint.sh', dockerfile)
         self.assertIn('COPY conversion_dx9ex.md', dockerfile)
+        entrypoint = (ROOT / 'entrypoint.vr.sh').read_text()
+        self.assertIn('PROFILE_CACHE_PRUNE_ON_START', entrypoint)
+        self.assertIn('Chrome DevTools lost after controller attach; recycling container', entrypoint)
+        self.assertIn('Default/Service Worker/CacheStorage', entrypoint)
+        self.assertNotIn('Default/Cookies', entrypoint)
+        self.assertNotIn('Default/Local Storage', entrypoint)
+        self.assertNotIn('Default/IndexedDB', entrypoint)
 
 
 if __name__ == '__main__':
