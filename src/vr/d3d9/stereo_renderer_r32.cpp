@@ -497,25 +497,27 @@ namespace OutRunVRStereo
                 if (candidate.published && candidate.frameId)
                 {
                     // The ACK mapping is one seqlock-protected snapshot for the
-                    // whole 4-slot ring. Read it once per resolve scan instead
-                    // of memcpy/barrier-validating the same mapping again for
-                    // every published candidate. If the batch read is unstable
-                    // or stale, retain the proven per-slot read as a slow-path
-                    // fallback so host-rebind behavior is unchanged.
+                    // whole 4-slot ring. Read it at most twice per resolve scan:
+                    // the second read is a bounded recovery attempt that can
+                    // reopen a stale host mapping released by the first read.
+                    // If both snapshots are unavailable, keep every published
+                    // slot immutable until the next resolve instead of repeating
+                    // the same mapping/seqlock work once per candidate slot.
                     if (!ackSnapshotRead)
                     {
                         ackSnapshotValid =
                             R13TryGetGpuCompletionSnapshot(ackSnapshot);
+                        if (!ackSnapshotValid)
+                        {
+                            ackSnapshotValid =
+                                R13TryGetGpuCompletionSnapshot(ackSnapshot);
+                        }
                         ackSnapshotRead = true;
                     }
 
-                    std::uint32_t gpuCompleted = 0;
-                    bool ackValid = ackSnapshotValid;
-                    if (ackValid)
-                        gpuCompleted = ackSnapshot.completedFrameId[index];
-                    else
-                        ackValid =
-                            R13TryGetGpuCompletedFrame(index, gpuCompleted);
+                    const bool ackValid = ackSnapshotValid;
+                    const std::uint32_t gpuCompleted = ackValid
+                        ? ackSnapshot.completedFrameId[index] : 0;
 
                     if (!ackValid ||
                         !FrameIdAtOrAfter(gpuCompleted, candidate.frameId))

@@ -435,7 +435,8 @@ require_order(
     "if (candidate.producerPending)",
     "if (!ackSnapshotRead)",
     "R13TryGetGpuCompletionSnapshot(ackSnapshot)",
-    "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
+    "if (!ackSnapshotValid)",
+    "ackSnapshotRead = true;",
     "The host completed this exact published frame. Retire the",
     "selected = index;",
     "if (selected >= OutRunVR::RenderFrameRingSize)",
@@ -482,11 +483,18 @@ require(
     "bool ackSnapshotValid = false;",
     "if (!ackSnapshotRead)",
     "R13TryGetGpuCompletionSnapshot(ackSnapshot)",
-    "gpuCompleted = ackSnapshot.completedFrameId[index];",
+    "if (!ackSnapshotValid)",
+    "ackSnapshotRead = true;",
+    "const bool ackValid = ackSnapshotValid;",
+    "ackSnapshot.completedFrameId[index]",
+)
+if resolve_direct_r32.count("R13TryGetGpuCompletionSnapshot(ackSnapshot)") != 2:
+    fail("R32 DirectGPU ring scan must use at most initial + bounded rebind ACK snapshots per resolve")
+forbid(
+    resolve_direct_r32,
+    "R32 repeated per-slot ACK snapshot regression",
     "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
 )
-if resolve_direct_r32.count("R13TryGetGpuCompletionSnapshot(ackSnapshot)") != 1:
-    fail("R32 DirectGPU ring scan must read at most one batched ACK snapshot per resolve")
 
 post_present_r7 = body(r7, "bool DirectTransportFrameReadyAfterPresent(")
 require_order(
