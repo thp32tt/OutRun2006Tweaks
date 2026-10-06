@@ -2080,3 +2080,10 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - A147R e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8: independent hosted C machine QA 14/14 bbox/size/positive-margin PASS; clean/outside/alpha/protected gates 0; RAW mirror_y and canonical stage naming PASS.
 - Controller visual PASS: C222 source-typography mismatch is materially corrected by native-HD Bold 88px + 0.90x condensed family; native height/right anchors/readability preserved with no residue, breakage, clipping or intrusion.
 - Decision C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export refresh + user review + actual game validation pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+
+### B218 q228 silver-techno hierarchy rework — 2026-10-07 03:01 KST
+- q228 E7F6E9B7: C144 6e880cb76145... -> B218 28e814599105.... New 8-step PRE_INGAME review reopened the prior static PASS for unnecessary undersizing/source-techno proportion.
+- Fresh native Medium CJK + 1.18x source-wide geometry; tall rows now use maximum safe per-row height with 4px margins. Height improved 10/13; >=12px gain 7/13.
+- 13/13 bbox/size/positive-margin; outside/alpha/clean-outside=0; BGRA/header/raw mirror_y preserved. Controller SOURCE/C144/B218, row-contact and RAW visual QA PASS.
+- Fresh C + regenerated English-original comparison/user review + actual in-game validation required; RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 02:44 KST",
+  "updated_at_kst": "2026-10-07 03:01 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Continue fresh independent C on remaining producer candidates. q236 FEF70E85 passed C223 and now requires PRE_INGAME English-original comparison refresh/user review plus actual in-game validation; do not repeat unchanged A147R bytes. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "Fresh independent C must validate B218 q228 E7F6E9B7 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808 and regenerate its PRE_INGAME English-original comparison before user/in-game review. q236 C223 also awaits refreshed comparison/user review and actual in-game validation. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -2897,7 +2897,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED.",
+  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED. B218 q228 E7F6E9B7 is newly reopened from C144 under the newer 8-step visual gate and now awaits fresh independent C on candidate 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -3206,5 +3206,19 @@
     "controller_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_CONTROLLER_FINAL_QA.json",
     "pre_ingame_comparison_refresh": "PENDING_C223_EXPORT",
     "runtime_validation": "UNTESTED"
+  },
+  "b218_q228_manual_visual_rework": {
+    "timestamp_kst": "2026-10-07 03:01 KST",
+    "queue_index": 228,
+    "asset": "E7F6E9B7",
+    "before_sha256": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607",
+    "candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+    "prior_status": "C144_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "machine_qa": "13/13 bbox+size+positive-margin; outside/alpha/clean-outside=0; height improved 10/13; >=12px gain 7/13; raw mirror_y",
+    "controller_visual_qa": "PASS_SOURCE_C144_B218_ROW_RAW",
+    "status": "B218_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA218-E7F6E9B7/B218_E7F6E9B7_REPORT.json",
+    "controller": "localization/graphics/role_B/20261007-B-MANUALQA218-E7F6E9B7/B218_CONTROLLER_FINAL_QA.json"
   }
 }

@@ -4217,7 +4217,8 @@
     "E3FD08BE",
     "12519155",
     "1762489B",
-    "1F5FE6E9"
+    "1F5FE6E9",
+    "E7F6E9B7"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6709,7 +6710,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 02:44 KST",
+  "updated_at_kst": "2026-10-07 03:01 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7247,5 +7248,33 @@
     "pre_ingame_comparison_refresh": "PENDING_C223_EXPORT",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "latest_b_manual_visual_rework": {
+    "timestamp_kst": "2026-10-07 03:01 KST",
+    "run": "B218",
+    "queue_index": 228,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+    "trigger": "NEW_8_STEP_GATE_PRE_INGAME_VISUAL_FALSE_NEGATIVE",
+    "prior_c_pass": "C144_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "before_sha256": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607",
+    "candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+    "defects": [
+      "UNNECESSARY_UNDERSIZING_ON_TALL_ROWS",
+      "SOURCE_TECHNO_PROPORTION_WEIGHT_MISMATCH"
+    ],
+    "machine_qa": {
+      "bbox_size_positive_margin": "13/13 PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "clean_outside": 0,
+      "height_improved_rows": "10/13",
+      "height_gain_ge12_rows": "7/13",
+      "raw_orientation": "mirror_y"
+    },
+    "controller_visual_qa": "PASS_SOURCE_C144_B218_ROW_RAW",
+    "status": "B218_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA218-E7F6E9B7/B218_E7F6E9B7_REPORT.json",
+    "controller": "localization/graphics/role_B/20261007-B-MANUALQA218-E7F6E9B7/B218_CONTROLLER_FINAL_QA.json"
   }
 }

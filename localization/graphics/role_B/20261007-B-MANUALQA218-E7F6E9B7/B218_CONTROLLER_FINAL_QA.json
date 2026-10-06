@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B218",
+  "timestamp_kst": "2026-10-07 03:01 KST",
+  "queue_index": 228,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+  "trigger": "NEWER_8_STEP_VISUAL_GATE_REOPENED_C144_FALSE_NEGATIVE",
+  "prior_candidate_sha256": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607",
+  "candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+  "prior_status": "C144_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "evidence": {
+    "readable": "localization/graphics/role_B/20261007-B-MANUALQA218-E7F6E9B7/B218_E7F6_SOURCE_OLD_CLEAN_NEW_READABLE.jpg",
+    "row_contact": "localization/graphics/role_B/20261007-B-MANUALQA218-E7F6E9B7/B218_E7F6_ROW_CONTACT.jpg",
+    "raw": "localization/graphics/role_B/20261007-B-MANUALQA218-E7F6E9B7/B218_E7F6_SOURCE_OLD_NEW_RAW.jpg",
+    "worker_report": "localization/graphics/role_B/20261007-B-MANUALQA218-E7F6E9B7/B218_E7F6E9B7_REPORT.json"
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "13/13 PASS",
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "clean_changed_outside_source_bboxes": 0,
+    "height_improved_rows": 10,
+    "height_material_gain_ge12_rows": 7,
+    "raw_mode": "BGRA",
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": {
+    "source_vs_c144_vs_b218": "PASS",
+    "row_contact_13": "PASS",
+    "raw_mirror_y": "PASS",
+    "observations": [
+      "C144/B68 had visibly compressed hierarchy on the tall 150-156px source rows; B218 raises those rows near their maximum safe source height while retaining 4px positive margins.",
+      "Noto CJK Medium plus 1.18x horizontal source-wide geometry is less blocky and closer to the broad silver-techno source family than the prior Bold treatment.",
+      "Silver vertical gradient, dark outline/shadow and rightward lean remain coherent across the 13-row family.",
+      "No visible English residue, broken Hangul, clipping, overlap, row collision or RAW orientation regression was observed."
+    ]
+  },
+  "ordered_generation_gate": {
+    "plate_background_restoration": "PASS",
+    "slant_direction": "PASS",
+    "no_unnecessary_undersizing": "PASS",
+    "source_faithful_weight_outline_shadow": "PASS",
+    "clipping": "PASS",
+    "protected_clearance": "PASS",
+    "flip_y_raw": "PASS",
+    "immediate_readability": "PASS"
+  },
+  "decision": "B218_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
