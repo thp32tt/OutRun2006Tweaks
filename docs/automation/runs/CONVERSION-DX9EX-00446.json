@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00446",
+  "production_id": "CONVERSION-DX9EX-00446",
+  "event_id": "CONVERSION-DX9EX-00446-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "fb568a3cde273081d7b8d1e72300f8d07783e36f",
+  "material_result_sha": "f9018c61891823c797d2a5e63b41ec4c453f8f8a",
+  "validation_bearing_result_sha": "f9018c61891823c797d2a5e63b41ec4c453f8f8a",
+  "result_sha": "f9018c61891823c797d2a5e63b41ec4c453f8f8a",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00446]",
+  "selected_work_item": "VR-DX9EX-R26-SESSION-REQUEUE-0029",
+  "summary": "Requeue an accepted-but-not-applied F10 recenter request at OpenXR session teardown so the next session can revalidate requester ownership instead of permanently suppressing the request.",
+  "changed_paths": [
+    "src/vr/ipc/recenter_request.hpp",
+    "vrhost/src/runtime/r26_recenter_hardening.hpp",
+    "tools/verify_vr_recenter_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00446.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered 00445 bookkeeping HEAD fb568a3cde273081d7b8d1e72300f8d07783e36f; structural extraction explicitly terminal."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Found accepted F10 session-teardown loss: receivedId remained equal to requestId after host-local pending state reset, preventing rediscovery after session recreation."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added Channel::RequeueReceived CAS guard and invoked it before R26 session-local state reset for accepted pending requests only."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact material SHA passed recenter verifier in policy, host/game/full-chain builds, package, and Domain Isolation."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "f9018c61891823c797d2a5e63b41ec4c453f8f8a fix(vr): requeue accepted recenter on session teardown [AUTO:CONVERSION-DX9EX-00446]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Package artifact 11383847514 digest sha256:dc596b78235548e65feb1fbec2b531d14d73c9c51edf9e515535ec0f2465e430; CI evidence only."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 6007415099
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37398523213,
+      "conclusion": "success",
+      "exact_sha": "f9018c61891823c797d2a5e63b41ec4c453f8f8a",
+      "jobs": {
+        "policy": 112060147994,
+        "game": 112060258491,
+        "full_chain_compile": 112060258510,
+        "host": 112060258582,
+        "package": 112061632221
+      },
+      "package_artifact_id": 11383847514,
+      "package_artifact_digest": "sha256:dc596b78235548e65feb1fbec2b531d14d73c9c51edf9e515535ec0f2465e430"
+    },
+    "domain_isolation": {
+      "run_id": 37398522991,
+      "conclusion": "success",
+      "exact_sha": "f9018c61891823c797d2a5e63b41ec4c453f8f8a"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Continue with next independent DX9Ex quality/stability unit; structural extraction remains terminal unless new ownership evidence appears.",
+  "started_at_kst": "2026-10-06T10:12:00+09:00",
+  "completed_at_kst": "2026-10-06T10:25:00+09:00"
+}
