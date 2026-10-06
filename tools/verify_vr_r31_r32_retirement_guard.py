@@ -660,9 +660,9 @@ require(
     "R32FailClosedZeroDisparityDraws",
 )
 
-# 3) R33 is the sole upper physical Reset/Present/draw dispatcher. Reset hooks
-# R22 directly while preserving R32 lifecycle semantics through one owner helper;
-# Present hooks R13 directly with R32 telemetry; draws hook R30 directly.
+# 3) R33 is the sole upper physical Reset/Present/DirectGPU/draw dispatcher.
+# Reset hooks R22; Present and DirectGPU hook R13; draws hook R30. R32 semantics
+# are preserved through owner helpers without retaining any physical hook.
 forbid(
     r33,
     "R33",
@@ -694,7 +694,23 @@ require(
     "reinterpret_cast<void*>(&PresentDestR13)",
     "R32WithPresentTelemetry(",
     "R33PresentR13Hook.stdcall<HRESULT>",
+    "SafetyHookInline R33ResolveDirectR13Hook{};",
+    "reinterpret_cast<void*>(&ResolveDirectTransportR13)",
+    "ResolveDirectTransportDestR33",
+    "R32ResolveDirectTransport(",
+    "R33ResolveDirectR13Hook.call<bool>",
 )
+
+direct33 = function_body(r33, "bool ResolveDirectTransportDestR33(")
+require(
+    direct33,
+    "R33 direct DirectGPU owner",
+    "R32ResolveDirectTransport(",
+    "R33ResolveDirectR13Hook.call<bool>",
+)
+if direct33.find("R32ResolveDirectTransport(") > direct33.find(
+        "R33ResolveDirectR13Hook.call<bool>"):
+    fail("R32 DirectGPU helper must own the direct R13 trampoline call")
 
 reset33 = function_body(r33, "HRESULT __stdcall ResetDestR33(")
 require(
@@ -782,6 +798,6 @@ require(
 
 print(
     "VR R31/R32 draw-retirement guard PASS "
-    "(R31=StateBlock owner, R32=DirectGPU + Reset/Present helper owner, "
+    "(R31=StateBlock owner, R32=hook-free DirectGPU + Reset/Present helper owner, "
     "R33=sole physical draw dispatcher over R30, neutral-helper census=terminal, remaining R31/R32 calls=owner-specific)"
 )
