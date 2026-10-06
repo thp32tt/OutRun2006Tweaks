@@ -2052,25 +2052,33 @@ namespace
                 WheelFFB_RequestDirectionTest(0);
             ImGui::TextDisabled("Direction tests are hard-capped at 20% and only run during active gameplay.");
 
+            // Runtime relabels this legacy source button to the Universal preset
+            // and intercepts the click in hooks_wheel_ffb_build.cpp. Keep this
+            // fallback body value-for-value synchronized in case that hook is
+            // unavailable during future UI refactoring.
             if (ImGui::Button("Load MOZA R3 Physics SAT"))
             {
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBModel = 0;
+                Settings::WheelFFBFeelRevision = 8;
                 Settings::WheelFFBPhysicsSat = true;
                 Settings::WheelFFBGlobalStrength = 0.70f;
-                Settings::WheelFFBSpringStrength = 0.65f;
-                Settings::WheelFFBSpringSaturation = 0.95f;
+                Settings::WheelFFBSpringStrength = 0.22f;
+                Settings::WheelFFBSpringSaturation = 0.55f;
                 Settings::WheelFFBDamperStrength = 0.28f;
-                Settings::WheelFFBSteeringWeight = 1.45f;
-                Settings::WheelFFBMechanicalTrail = 0.25f;
-                Settings::WheelFFBTrailResponseLead = 0.25f;
+                Settings::WheelFFBSteeringWeight = 1.60f;
+                Settings::WheelFFBMechanicalTrail = 0.30f;
+                Settings::WheelFFBTrailResponseLead = 0.40f;
                 Settings::WheelFFBGripLoss = 0.65f;
                 Settings::WheelFFBWeightTransfer = 0.15f;
-                Settings::WheelFFBSlewRate = 0.040f;
-                Settings::WheelFFBReversalReleaseRate = 0.12f;
-                Settings::WheelFFBRoadTexture = 0.30f;
-                Settings::WheelFFBTireSlip = 0.20f;
-                Settings::WheelFFBWallImpact = 0.55f;
+                Settings::WheelFFBSlewRate = 0.12f;
+                Settings::WheelFFBReversalReleaseRate = 0.30f;
+                Settings::WheelFFBRoadTexture = 0.60f;
+                Settings::WheelFFBTireSlip = 0.04f;
+                Settings::WheelFFBWallImpact = 0.80f;
+                Settings::WheelFFBGearShift = 0.60f;
+                Settings::WheelFFBEngineVibration = false;
+                Settings::WheelFFBEngineIdle = 0.20f;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
                 // R3 compatibility default: prefer ConstantForce road/slip
@@ -2098,22 +2106,26 @@ namespace
             if (ImGui::Button("Load MOZA R3 Natural SAT"))
             {
                 Settings::WheelFFBModel = 0;
+                Settings::WheelFFBFeelRevision = 8;
                 Settings::WheelFFBPhysicsSat = false;
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBGlobalStrength = 0.70f;
-                Settings::WheelFFBSpringStrength = 0.65f;
-                Settings::WheelFFBSpringSaturation = 0.95f;
+                Settings::WheelFFBSpringStrength = 0.22f;
+                Settings::WheelFFBSpringSaturation = 0.55f;
                 Settings::WheelFFBDamperStrength = 0.30f;
                 Settings::WheelFFBSteeringWeight = 1.75f;
-                Settings::WheelFFBMechanicalTrail = 0.25f;
-                Settings::WheelFFBTrailResponseLead = 0.25f;
+                Settings::WheelFFBMechanicalTrail = 0.30f;
+                Settings::WheelFFBTrailResponseLead = 0.40f;
                 Settings::WheelFFBGripLoss = 0.65f;
                 Settings::WheelFFBWeightTransfer = 0.20f;
-                Settings::WheelFFBSlewRate = 0.045f;
-                Settings::WheelFFBReversalReleaseRate = 0.12f;
-                Settings::WheelFFBRoadTexture = 0.30f;
-                Settings::WheelFFBTireSlip = 0.20f;
-                Settings::WheelFFBWallImpact = 0.55f;
+                Settings::WheelFFBSlewRate = 0.12f;
+                Settings::WheelFFBReversalReleaseRate = 0.30f;
+                Settings::WheelFFBRoadTexture = 0.60f;
+                Settings::WheelFFBTireSlip = 0.04f;
+                Settings::WheelFFBWallImpact = 0.80f;
+                Settings::WheelFFBGearShift = 0.60f;
+                Settings::WheelFFBEngineVibration = false;
+                Settings::WheelFFBEngineIdle = 0.20f;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
                 // R3 compatibility default: prefer ConstantForce road/slip
@@ -2121,6 +2133,7 @@ namespace
                 Settings::WheelFFBUsePeriodicEffects = false;
                 Settings::WheelFFBInvertForce = true;
                 Settings::WheelFFBInvertSpring = true;
+                Settings::WheelFFBDebugLog = true;
                 Settings::VibrationMode = 0;
                 WheelFFB_RequestSettingsTransition();
                 if (Settings::write(Module::UserIniPath))
