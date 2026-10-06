@@ -1,0 +1,34 @@
+{
+  "role": "A",
+  "run": "20261006-A-WORKSTEAL123-33491F83-PSD-BUNKI",
+  "queue_index": 62,
+  "report": "localization/graphics/role_A/20261006-A-WORKSTEAL123-33491F83-PSD-BUNKI/A123_33491F83_BUNKI_LAYER_REPORT.json",
+  "coverage": {
+    "diverge": {
+      "pixels": 29601,
+      "opaque_or_visible": 29601,
+      "coverage": 1.0
+    },
+    "left": {
+      "pixels": 13104,
+      "opaque_or_visible": 13104,
+      "coverage": 1.0
+    },
+    "right": {
+      "pixels": 19082,
+      "opaque_or_visible": 19082,
+      "coverage": 1.0
+    },
+    "easy": {
+      "pixels": 21870,
+      "opaque_or_visible": 21870,
+      "coverage": 1.0
+    },
+    "hard": {
+      "pixels": 22360,
+      "opaque_or_visible": 22360,
+      "coverage": 1.0
+    }
+  },
+  "status": "BUNKI_CLEAN_LAYER_PROBE_COMPLETE"
+}

@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-WORKSTEAL123-33491F83-PSD-BUNKI",
+  "queue_index": 62,
+  "psd_group_path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic",
+  "group_bbox": [
+    4,
+    4,
+    1196,
+    812
+  ],
+  "main_label_bbox_alpha_coverage": {
+    "diverge": {
+      "pixels": 29601,
+      "opaque_or_visible": 29601,
+      "coverage": 1.0
+    },
+    "left": {
+      "pixels": 13104,
+      "opaque_or_visible": 13104,
+      "coverage": 1.0
+    },
+    "right": {
+      "pixels": 19082,
+      "opaque_or_visible": 19082,
+      "coverage": 1.0
+    },
+    "easy": {
+      "pixels": 21870,
+      "opaque_or_visible": 21870,
+      "coverage": 1.0
+    },
+    "hard": {
+      "pixels": 22360,
+      "opaque_or_visible": 22360,
+      "coverage": 1.0
+    }
+  },
+  "status": "A123_BUNKI_CLEAN_LAYER_PROBE_COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
