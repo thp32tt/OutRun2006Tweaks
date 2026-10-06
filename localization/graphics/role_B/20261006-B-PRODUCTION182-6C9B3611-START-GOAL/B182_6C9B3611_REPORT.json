@@ -2,7 +2,7 @@
   "schema_version": 1,
   "role": "B",
   "run": "20261006-B-PRODUCTION182-6C9B3611-START-GOAL",
-  "base_head": "3440524aff979b4475f84f2e529bc348de2730a0",
+  "base_head": "b8315dd38e42e314dac215565788ab00cd4dbbea",
   "queue_index": 172,
   "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
   "classification": {
@@ -39,7 +39,7 @@
     "header_128_exact": true,
     "raw_orientation": "mirror_y"
   },
-  "construction": "red-banner source text measured from exact glyph/effect bbox; the complete measured bbox is reconstructed from row-local sign-red donors to remove all English ghost silhouettes while preserving the white banner rim and all map/logo artwork; native Hangul uses natural advance + 0.17 source-family shear + sampled pale face/orange shadow.",
+  "construction": "red-banner source glyph/effect mask is the complete non-sign-red footprint inside the red plate interior; only that mask is inpainted from nearest same-sign red donors, preserving the white rim and all map/logo artwork; native Hangul uses natural advance + 0.17 source-family shear + sampled pale face/orange shadow.",
   "rows": [
     {
       "key": "start",
@@ -52,8 +52,8 @@
         405
       ],
       "source_bbox": [
-        56,
-        374,
+        55,
+        373,
         136,
         395
       ],
@@ -63,100 +63,91 @@
         142,
         398
       ],
-      "source_text_pixels": 896,
+      "source_text_pixels": 1111,
       "banner_pixels": 2021,
       "component_meta": [
         [
-          278,
+          450,
           [
-            16,
-            74,
-            37,
+            15,
+            73,
+            70,
             95
           ]
         ],
         [
-          47,
+          28,
           [
-            38,
-            74,
-            54,
-            77
+            70,
+            73,
+            85,
+            75
           ]
         ],
         [
-          42,
+          104,
           [
-            55,
-            74,
-            69,
-            77
+            36,
+            80,
+            48,
+            95
           ]
         ],
         [
-          371,
+          426,
           [
             47,
             80,
-            84,
+            85,
             95
           ]
         ],
         [
-          88,
+          103,
           [
             84,
             80,
             96,
             95
           ]
-        ],
-        [
-          70,
-          [
-            37,
-            82,
-            46,
-            95
-          ]
         ]
       ],
       "clean_region_bbox": [
-        56,
-        374,
+        55,
+        373,
         136,
         395
       ],
-      "clean_region_pixels": 1505,
+      "clean_region_pixels": 1111,
       "korean": "출발",
       "font": "Noto Sans CJK KR Black",
-      "font_size": 16,
+      "font_size": 17,
       "shear": 0.17,
       "shadow_offset": 1,
       "fill_rgba": [
-        243,
-        224,
-        179,
+        244,
+        225,
+        180,
         255
       ],
       "shadow_rgba": [
         234,
-        135,
-        98,
+        131,
+        95,
         255
       ],
       "localized_bbox": [
-        81,
-        376,
-        110,
+        80,
+        375,
+        111,
         393
       ],
-      "source_width": 80,
-      "source_height": 21,
-      "localized_width": 29,
-      "localized_height": 17,
+      "source_width": 81,
+      "source_height": 22,
+      "localized_width": 31,
+      "localized_height": 18,
       "delta_left": 25,
-      "delta_right": 26,
+      "delta_right": 25,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -176,7 +167,7 @@
       "source_bbox": [
         596,
         635,
-        671,
+        672,
         658
       ],
       "banner_bbox": [
@@ -185,11 +176,11 @@
         681,
         661
       ],
-      "source_text_pixels": 1213,
+      "source_text_pixels": 1375,
       "banner_pixels": 2181,
       "component_meta": [
         [
-          343,
+          383,
           [
             21,
             10,
@@ -198,29 +189,20 @@
           ]
         ],
         [
-          331,
+          760,
           [
-            42,
+            41,
             10,
-            63,
+            84,
             33
           ]
         ],
         [
-          334,
-          [
-            60,
-            10,
-            83,
-            33
-          ]
-        ],
-        [
-          205,
+          232,
           [
             80,
             10,
-            96,
+            97,
             33
           ]
         ]
@@ -228,10 +210,10 @@
       "clean_region_bbox": [
         596,
         635,
-        671,
+        672,
         658
       ],
-      "clean_region_pixels": 1702,
+      "clean_region_pixels": 1375,
       "korean": "골",
       "font": "Noto Sans CJK KR Black",
       "font_size": 19,
@@ -245,21 +227,21 @@
       ],
       "shadow_rgba": [
         247,
-        124,
-        87,
+        118,
+        84,
         255
       ],
       "localized_bbox": [
-        624,
+        625,
         637,
-        642,
+        643,
         656
       ],
-      "source_width": 75,
+      "source_width": 76,
       "source_height": 23,
       "localized_width": 18,
       "localized_height": 19,
-      "delta_left": 28,
+      "delta_left": 29,
       "delta_right": 29,
       "delta_top": 2,
       "delta_bottom": 2,
@@ -271,7 +253,7 @@
   "static_qa": {
     "elements_total": 2,
     "bbox_size_positive_margin": "2/2 PASS",
-    "clean_source_residue": 7,
+    "clean_source_residue": 115,
     "changed_outside_source_bboxes": 0,
     "alpha_changed_outside": 0,
     "protected_visible_changed": 0,
@@ -282,7 +264,7 @@
     "status": "PASS"
   },
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
-  "candidate_sha256": "183389440261f137fa2a4a159105728caa8f9e6cab0a10a96f1afaa8ebad14ff",
+  "candidate_sha256": "93adbfe8815ad5f5df33345822e0e9939c082a38273609252554fdb88f27a9df",
   "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
   "runtime_validation": "UNTESTED",
   "status": "B182_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
