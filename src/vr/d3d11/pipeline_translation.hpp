@@ -416,6 +416,11 @@ namespace outrun::vr::dx11
         bool vertexStage = false;
         bool instructionDecodeExact = false;
         bool complete = false;
+        // R270 binds register/constant/sampler semantics back to the exact
+        // R265 source stream so later F21 evidence cannot accept a detached
+        // but otherwise well-formed semantic receipt.
+        DWORD versionToken = 0;
+        std::uint64_t sourceBytecodeHash = 0;
         UINT instructionCount = 0;
         UINT semanticInstructionCount = 0;
         UINT destinationOperandCount = 0;
@@ -437,6 +442,8 @@ namespace outrun::vr::dx11
         {
             return instructionDecodeExact &&
                    complete &&
+                   versionToken != 0 &&
+                   sourceBytecodeHash != 0 &&
                    semanticInstructionCount == instructionCount &&
                    registerSemanticsHash != 0 &&
                    decoderRevisionHash != 0 &&
@@ -446,6 +453,13 @@ namespace outrun::vr::dx11
 
     [[nodiscard]] ProgrammableShaderRegisterSemantics
     decode_programmable_shader_register_semantics(
+        const ProgrammableShaderInstructionDecode& decode) noexcept;
+
+    // R270 validates that one exact R266 semantic receipt still belongs to
+    // the exact R265 instruction stream from which it was derived.
+    [[nodiscard]] bool
+    validate_programmable_shader_register_semantics(
+        const ProgrammableShaderRegisterSemantics& semantics,
         const ProgrammableShaderInstructionDecode& decode) noexcept;
 
     // R267 derives explicit shader-model-3 interface declaration semantics
