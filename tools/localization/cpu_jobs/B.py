@@ -54,14 +54,31 @@ def write_dds(header,readable,p,mode):
     temp=Path("/tmp/B209_encode_dxt3.dds")
     raw.save(temp,format="DDS",pixel_format="DXT3")
     encoded=temp.read_bytes()
+    original=source.read_bytes()
     if encoded[:4]!=b"DDS " or encoded[84:88]!=b"DXT3":
         raise RuntimeError(("Pillow did not emit DXT3",encoded[84:88]))
     expected=readable.width*readable.height
-    if len(encoded)!=128+expected:
-        raise RuntimeError(("encoded DXT3 size drift",len(encoded),128+expected))
-    payload=header+encoded[128:]
+    if len(encoded)!=128+expected or len(original)!=128+expected:
+        raise RuntimeError(("DXT3 size drift",len(encoded),len(original),128+expected))
+    # DXT3/BC2 = one 16-byte block per 4x4 pixels. Recompress only blocks that
+    # intersect an allowed A-Z source bbox; preserve every other canonical block
+    # byte-for-byte. Raw DDS Y is inverse of readable Y for this asset.
+    src_payload=bytearray(original[128:])
+    enc_payload=encoded[128:]
+    blocks_x=readable.width//4
+    replaced=0
+    for by_raw in range(readable.height//4):
+        y_read=readable.height-(by_raw+1)*4
+        for bx in range(blocks_x):
+            x=bx*4
+            if not allowed[y_read:y_read+4,x:x+4].any():
+                continue
+            off=(by_raw*blocks_x+bx)*16
+            src_payload[off:off+16]=enc_payload[off:off+16]
+            replaced+=1
+    payload=header+bytes(src_payload)
     Path(p).write_bytes(payload)
-    return hashlib.sha256(payload).hexdigest()
+    return hashlib.sha256(payload).hexdigest(),replaced
 
 header,src,meta=load_dds(source)
 sa=np.asarray(src,dtype=np.uint8)
@@ -226,10 +243,32 @@ protected_changed=int(np.logical_and(changed,protected_source).sum())
 if outside or alpha_out or protected_changed:
     raise RuntimeError(("global scope",outside,alpha_out,protected_changed))
 
-candidate_sha=write_dds(header,final,candidate,meta["raw_mode"])
+candidate_sha,replaced_blocks=write_dds(header,final,candidate,meta["raw_mode"])
 dh,decoded,dmeta=load_dds(candidate)
-if dh!=header or dmeta!=meta or ImageChops.difference(decoded,final).getbbox() is not None:
-    raise RuntimeError("DDS header/roundtrip mismatch")
+if dh!=header or dmeta!=meta:
+    raise RuntimeError(("DDS header/meta mismatch",dh==header,dmeta,meta))
+# BC2 is lossy in RGB, so final QA is performed on the decoded candidate,
+# not by requiring equality with the pre-compression RGBA render.
+da=np.asarray(decoded,dtype=np.uint8)
+decoded_changed=np.any(da!=sa,axis=2)
+decoded_visible=np.logical_or(da[:,:,3]>0,sa[:,:,3]>0)
+decoded_visible_outside=int(np.logical_and.reduce((decoded_changed,~allowed,decoded_visible)).sum())
+decoded_alpha_outside=int(np.logical_and(da[:,:,3]!=sa[:,:,3],~allowed).sum())
+decoded_protected_visible_changed=int(np.logical_and.reduce((decoded_changed,protected_source,decoded_visible)).sum())
+if decoded_visible_outside or decoded_alpha_outside or decoded_protected_visible_changed:
+    raise RuntimeError(("decoded compressed scope",decoded_visible_outside,decoded_alpha_outside,decoded_protected_visible_changed))
+# Re-measure each localized non-transparent bbox from decoded BC2 pixels.
+for row in rows:
+    x0,y0,x1,y1=row["original_bbox"]
+    sub=da[y0:y1,x0:x1,3]>0
+    ys,xs=np.nonzero(sub)
+    if not len(xs): raise RuntimeError(("decoded empty jamo",row["letter"]))
+    db=[x0+int(xs.min()),y0+int(ys.min()),x0+int(xs.max()+1),y0+int(ys.max()+1)]
+    row["decoded_localized_bbox"]=db
+    row["decoded_containment"]="PASS" if (x0<=db[0] and y0<=db[1] and db[2]<=x1 and db[3]<=y1) else "FAIL"
+    row["decoded_size_ceiling"]="PASS" if (db[2]-db[0]<=x1-x0 and db[3]-db[1]<=y1-y0) else "FAIL"
+    if row["decoded_containment"]!="PASS" or row["decoded_size_ceiling"]!="PASS":
+        raise RuntimeError(("decoded bbox fail",row))
 
 # Evidence.
 Image.fromarray((source_text*255).astype(np.uint8),"L").save(out/"B209_SOURCE_AZ_MASK.png")
@@ -283,7 +322,7 @@ report={
  "mapping":[{"letter":a,"jamo":b,"sprite":c,"cell_rect":list(d)} for a,b,c,d in mapping],
  "palette_rgba":palette,"font":"Noto Sans CJK KR Black","shear_readable":0.18,
  "candidate_sha256":candidate_sha,"dds_meta":meta,
- "qa":{"rows":rows,"changed_pixels":int(changed.sum()),"changed_pixels_outside_original_bboxes":outside,"alpha_changed_outside_original_bboxes":alpha_out,"protected_changed_pixels":protected_changed,"clean_source_residue_pixels":0,"dds_header_128_exact":True,"dds_roundtrip":"PASS","raw_orientation":"mirror_y","visual_controller_review":"PENDING","runtime_validation":"UNTESTED"},
+ "qa":{"rows":rows,"precompression_changed_pixels":int(changed.sum()),"precompression_changed_pixels_outside_original_bboxes":outside,"precompression_alpha_changed_outside_original_bboxes":alpha_out,"precompression_protected_changed_pixels":protected_changed,"clean_source_residue_pixels":0,"dds_header_128_exact":True,"compression":"DXT3/BC2","recompressed_blocks":replaced_blocks,"non_target_compressed_blocks_preserved_exact":True,"decoded_visible_changed_outside_original_bboxes":decoded_visible_outside,"decoded_alpha_changed_outside_original_bboxes":decoded_alpha_outside,"decoded_protected_visible_changed_pixels":decoded_protected_visible_changed,"decoded_containment":"PASS","raw_orientation":"mirror_y","visual_controller_review":"PENDING","runtime_validation":"UNTESTED"},
  "promotion":{"status":"HOLD_INPUT_WIRING_REQUIRED","test_build_selected":False,"reason":"Do not package/promote until B208 composer is wired to the B207 character path and END commits the A141 alias."},
  "no_vr_ffb_dx11_dxvk_work":True
 }
