@@ -473,12 +473,12 @@ namespace WheelFFBMath
             (std::clamp(speedNorm, 0.0f, 1.0f) - 0.04f) / 0.30f);
         const float roadScale = std::clamp(roadSetting / 0.60f, 0.0f, 1.67f);
         const float gainScale = std::clamp(outputStrength / 0.70f, 0.0f, 2.0f);
-        // R14/R15 hardware follow-up: 0.30 was too strong on the R3.
-        // Keep the continuous Imperial stone road clearly tactile but center it
-        // between the old weak ~0.18 tune and the over-strong ~0.30 tune.
+        // R16 hardware follow-up: 0.30/0.24 was still too strong on the R3.
+        // Keep only a light stone-road texture. The final road_motion_gate()
+        // removes the channel entirely at standstill and fades it in with speed.
         return std::clamp(
-            (0.140f + 0.080f * speedGate) * roadScale * gainScale,
-            0.0f, 0.24f);
+            (0.080f + 0.120f * speedGate) * roadScale * gainScale,
+            0.0f, 0.20f);
     }
 
     // Road texture is contact texture, so it must disappear when the car is
