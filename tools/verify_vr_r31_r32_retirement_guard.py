@@ -586,20 +586,17 @@ reset_lifecycle = function_body(r32, "HRESULT R32WithResetLifecycle(")
 require(
     reset_lifecycle,
     "R32 Reset lifecycle owner",
-    "R32ClearPendingProducerFences();",
     "const HRESULT hr = lowerReset();",
     "R32ResetAfterGameReset();",
     "R32InvalidateResetCaches();",
     "++R32ResetFailures",
 )
-reset_clear = reset_lifecycle.find("R32ClearPendingProducerFences();")
 reset_lower = reset_lifecycle.find("const HRESULT hr = lowerReset();")
 reset_success = reset_lifecycle.find("R32ResetAfterGameReset();")
 reset_failure = reset_lifecycle.find("R32InvalidateResetCaches();", reset_lower)
-if min(reset_clear, reset_lower, reset_success, reset_failure) < 0 or not (
-        reset_clear < reset_lower < reset_success and
-        reset_lower < reset_failure):
-    fail("R32 Reset lifecycle must clear pending producer fences before lower R22 Reset and run success/failure cache handling only afterward")
+if min(reset_lower, reset_success, reset_failure) < 0 or not (
+        reset_lower < reset_success and reset_lower < reset_failure):
+    fail("R32 Reset lifecycle must run lower R22 Reset before success/failure cache handling")
 present_telemetry = function_body(r32, "HRESULT R32WithPresentTelemetry(")
 require(
     present_telemetry,

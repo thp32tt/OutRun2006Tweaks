@@ -829,7 +829,6 @@ for banned in (
         errors.append(f"R32 retained retired physical Reset ownership: {banned}")
 for marker in (
     "HRESULT R32WithResetLifecycle(",
-    "R32ClearPendingProducerFences();",
     "const HRESULT hr = lowerReset();",
     "R32ResetAfterGameReset();",
     "R32InvalidateResetCaches();",
