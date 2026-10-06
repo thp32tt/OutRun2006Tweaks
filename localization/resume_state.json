@@ -1,5 +1,5 @@
 {
-  "schema_version": 115,
+  "schema_version": 116,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B209 index24 Jamo artwork STATIC PASS/HOLD: canonical DXT3 66743AA8 now has an actual source-faithful 26-key two-beolsik base-Jamo candidate c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e. B207 a..z selection semantics + A135 A..Z sprite identity provide the artwork binding. DXT3/BC2 and exact header are preserved; non-target compressed blocks remain byte-exact; decoded 26/26 containment/size and outside/protected gates pass; controller readable/raw visual QA passes. Do not package yet: B208 composer still needs wiring at the B207 character path and END must persist/write the A141 alias. A142 local Korean renderer is already BUILD PASS. RUNTIME_VALIDATION=UNTESTED.",
     "A142 index24 local-name render BUILD PASS: exact local text-object draw path VA 0x48F455 -> Sumo_Printf(\"%s\", object+0x4E) is now intercepted only at return site module+0x8F45A when the %s argument is a valid A141 sidecar alias. The stock alias is hidden, UTF-8 Korean is queued through the existing Korean overlay with the same stock position/font-state/color/alignment, and alias lookup failure leaves stock behavior untouched. Source dbbfdca6... passed Win32 Release 37447477302 and Korean Test Build 37447477392. Native field/save/ranking/network/replay are unchanged. Remaining: source-faithful 66743AA8 Jamo artwork, then wire B208 composer to B207 0x00..0x25 character path and commit A141 alias on 0x2B END; runtime validation remains UNTESTED.",
     "B208 index24 HangulNameComposer BUILD PASS: standard 2-beolsik Jamo semantics are now implemented as an inactive deterministic composer behind the B207-proven character/control boundary. It supports initial/medial/final composition, double initials, compound vowels/finals, final splitting, stepwise BACKSPACE, digits/space, UTF-8 output, and the proven 15-codepoint ceiling. Final source 0f696621... passed Win32 Release 37445766665 and Korean Test Build 37445766663. Do not wire input yet: source-faithful 66743AA8 Jamo artwork and explicit local alias-to-UTF8 player-name rendering remain required; stock controls/native transport/network/ranking/replay stay unchanged.",
     "B207 index24 control mapping completes the stock name-entry event boundary after the already-built A141 sidecar foundation. Character selections are 0x00..0x25 (0x25 aliases slot 0x24); controls are 0x26 BACKSPACE, 0x27 page1/page2 symbols, 0x28 page1/page3 one-shot uppercase, 0x29 page1/page4 persistent uppercase, 0x2A page1/page5 legacy extended page, and 0x2B END/confirm. Preserve controls 0x26..0x2B and intercept only the character/composition path before legacy byte append; exact 66743AA8 visual binding/Jamo layout and explicit local Korean-name rendering remain HOLD.",
@@ -6600,5 +6601,34 @@
     "forbidden_domains_touched": [],
     "completed_work_repeated": false,
     "candidate_written": false
+  },
+  "b209_jamo_keycap_candidate": {
+    "timestamp_kst": "2026-10-06T19:34:00+09:00",
+    "role": "B",
+    "queue_index": 24,
+    "prior": "A142_LOCAL_PLAYER_NAME_RENDER_BUILD_PASS_JAMO_ARTWORK_INPUT_WIRING_REQUIRED",
+    "status": "B209_JAMO_ARTWORK_STATIC_PASS_HOLD_INPUT_WIRING_REQUIRED",
+    "candidate": "localization/graphics/hd_candidates/textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+    "candidate_sha256": "c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e",
+    "source_sha256": "8e18676ac303b07a56d81d1d21c5e025e0baf46da49b16ae9d2e411960181f73",
+    "worker_report": "localization/graphics/role_B/20261006-B-PRODUCTION209-NAMEENTRY-JAMO-KEYCAPS/B209_JAMO_KEYCAP_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261006-B-PRODUCTION209-NAMEENTRY-JAMO-KEYCAPS/B209_CONTROLLER_SELF_QA.json",
+    "mapping": "B207 selection 10..35 a..z + A135 sprite_92..67 A..Z -> standard 2-beolsik base Jamo",
+    "target_keys": 26,
+    "preserved_cells": "digits, punctuation/symbols, END and all non-A-Z cells",
+    "compression": "DXT3/BC2",
+    "canonical_header_preserved": true,
+    "non_target_bc2_blocks_preserved_exact": true,
+    "recompressed_target_blocks": 10032,
+    "decoded_containment_pass": "26/26",
+    "decoded_visible_outside": 0,
+    "decoded_alpha_outside": 0,
+    "decoded_protected_visible_changed": 0,
+    "controller_visual_qa": "PASS_READABLE_AND_RAW_MIRROR_Y",
+    "package_selected": false,
+    "inherited_a142_local_renderer": "BUILD_PASS",
+    "input_wiring": false,
+    "runtime_validation": "UNTESTED",
+    "next_safe_work": "wire B208 HangulNameComposer to B207 character selections, preserve controls, and persist/write A141 alias only on successful END; then build/package and actual-game validate"
   }
 }
