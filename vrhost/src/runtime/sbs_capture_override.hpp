@@ -244,6 +244,7 @@ float4 PSMain(VSOut input) : SV_Target
         bool acquired = false;
         bool waited = false;
         bool waitFaulted = false;
+        bool releaseFaulted = false;
         bool gpuWorkSubmitted = false;
         std::uint32_t acquiredImage = 0;
 
@@ -297,6 +298,7 @@ float4 PSMain(VSOut input) : SV_Target
             acquired = false;
             waited = false;
             waitFaulted = false;
+            releaseFaulted = false;
             gpuWorkSubmitted = false;
             acquiredImage = 0;
             return true;
@@ -621,7 +623,8 @@ float4 PSMain(VSOut input) : SV_Target
     {
         if (swapchain.handle != XR_NULL_HANDLE && swapchain.width == width &&
             swapchain.height == height && swapchain.arraySize == arraySize &&
-            !swapchain.images.empty() && !swapchain.waitFaulted)
+            !swapchain.images.empty() && !swapchain.waitFaulted &&
+            !swapchain.releaseFaulted)
             return true;
 
         if (!swapchain.Destroy())
@@ -749,7 +752,7 @@ float4 PSMain(VSOut input) : SV_Target
 
     inline bool Acquire(Swapchain& swapchain, std::uint32_t& image)
     {
-        if (swapchain.waitFaulted)
+        if (swapchain.waitFaulted || swapchain.releaseFaulted)
             return false;
 
         if (!swapchain.acquired)
@@ -803,6 +806,11 @@ float4 PSMain(VSOut input) : SV_Target
             swapchain.committedGeneration = swapchain.generation;
             return true;
         }
+
+        // Do not render into/release the same waited image again after a hard
+        // release failure. Preserve local ownership for transactional teardown,
+        // then force the next EnsureSwapchain call through Destroy/recreate.
+        swapchain.releaseFaulted = true;
         return false;
     }
 

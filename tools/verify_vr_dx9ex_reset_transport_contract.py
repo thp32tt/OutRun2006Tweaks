@@ -867,13 +867,14 @@ forbid(
 )
 require(
     host_sbs,
-    "R19 swapchain wait hard-fault state",
+    "R19 swapchain image-flow hard-fault state",
     "bool waitFaulted = false;",
+    "bool releaseFaulted = false;",
 )
 require_order(
     sbs_acquire,
-    "R19 prior hard wait fault fails closed before acquire",
-    "if (swapchain.waitFaulted)",
+    "R19 prior image-flow hard fault fails closed before acquire",
+    "if (swapchain.waitFaulted || swapchain.releaseFaulted)",
     "return false;",
     "if (!swapchain.acquired)",
 )
@@ -893,11 +894,40 @@ require_order(
     "return false;",
 )
 
+sbs_release = body(host_sbs, "inline bool Release(Swapchain& swapchain)")
+require(
+    sbs_release,
+    "R19 hard release failure marks swapchain faulted",
+    "const XrResult result = ::xrReleaseSwapchainImage(swapchain.handle, &release);",
+    "if (XR_SUCCEEDED(result))",
+    "swapchain.releaseFaulted = true;",
+    "return false;",
+)
+release_fail_start = sbs_release.find("swapchain.releaseFaulted = true;")
+if release_fail_start < 0:
+    fail("R19 hard release fault marker missing")
+release_fail_path = sbs_release[release_fail_start:]
+forbid(
+    release_fail_path,
+    "R19 hard release failure must retain local image ownership for teardown",
+    "swapchain.acquired = false;",
+    "swapchain.waited = false;",
+    "swapchain.acquiredImage = 0;",
+    "swapchain.committedGeneration = swapchain.generation;",
+)
+require_order(
+    release_fail_path,
+    "R19 hard release fault before frame yield",
+    "swapchain.releaseFaulted = true;",
+    "return false;",
+)
+
 sbs_swapchain_destroy = body(host_sbs, "bool Destroy(bool parentSessionDestroying = false)")
 require(
     sbs_swapchain_destroy,
-    "R19 swapchain wait hard-fault reset",
+    "R19 swapchain image-flow hard-fault reset",
     "waitFaulted = false;",
+    "releaseFaulted = false;",
 )
 require(
     host_sbs,
@@ -993,8 +1023,9 @@ forbid(
 ensure_swapchain = body(host_sbs, "inline bool EnsureSwapchain(")
 require(
     ensure_swapchain,
-    "R19 hard wait fault bypasses swapchain reuse",
+    "R19 image-flow hard fault bypasses swapchain reuse",
     "!swapchain.waitFaulted",
+    "!swapchain.releaseFaulted",
     "if (!swapchain.Destroy())",
 )
 require_order(
