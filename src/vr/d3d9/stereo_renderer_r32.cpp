@@ -12,9 +12,6 @@ namespace OutRunVRStereo
     namespace
     {
 
-        std::atomic<OutRunVR::RuntimeEligibility::InstallState> R32InstallState{
-            OutRunVR::RuntimeEligibility::InstallState::Pending };
-
         std::uint64_t R32BatchWvpUploads = 0;
         std::uint64_t R32BatchWvpFailures = 0;
         std::uint64_t R32StateSnapshotFailures = 0;
@@ -904,71 +901,7 @@ namespace OutRunVRStereo
             return hr;
         }
 
-        DWORD WINAPI R32InstallThread(void*)
-        {
-            using State = OutRunVR::RuntimeEligibility::InstallState;
-            R32InstallState.store(State::Pending, std::memory_order_release);
-            for (int attempt = 0; attempt < 4800; ++attempt)
-            {
-                const auto r31 = R31InstallStatus();
-                const auto r22 = R22InstallStatus();
-                const auto r13 = R13InstallStatus();
-                if (r31 == State::Failed || r22 == State::Failed ||
-                    r13 == R13InstallStatusValue::Failed)
-                {
-                    R32InstallState.store(State::Failed, std::memory_order_release);
-                    HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", false);
-                    return 0;
-                }
-                if (r31 == State::Ready && r22 == State::Ready &&
-                    r13 == R13InstallStatusValue::Ready)
-                {
-                    R32InstallState.store(State::Ready, std::memory_order_release);
-                    HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", true);
-                    spdlog::info(
-                        "VR R32 REVIEW2: hook-free functional owner READY; DirectGPU + Reset/Present helpers + fail-closed helpers + cached D3D9Ex interop + pending-fence-safe producer ring are consumed by R33 final dispatcher");
-                    return 0;
-                }
-                Sleep(25);
-            }
+        // R32 is a hook-free functional owner. Its helpers are consumed by
+        // the R33 final dispatcher after R33 verifies R31/R22/R13 readiness.
 
-            R32InstallState.store(State::Failed, std::memory_order_release);
-            HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", false);
-            spdlog::error("VR R32: timed out waiting for R31/R22/R13 prerequisites");
-            return 0;
-        }
-
-        class VRStereoR32ReviewHook final : public Hook
-        {
-        public:
-            std::string_view description() override
-            {
-                return "OpenXRVRStereoR32Review";
-            }
-            bool validate() override { return true; }
-            bool apply() override
-            {
-                HANDLE thread = CreateThread(
-                    nullptr, 0, R32InstallThread, nullptr, 0, nullptr);
-                if (!thread)
-                {
-                    R32InstallState.store(
-                        OutRunVR::RuntimeEligibility::InstallState::Failed,
-                        std::memory_order_release);
-                    return false;
-                }
-                CloseHandle(thread);
-                return true;
-            }
-            static VRStereoR32ReviewHook instance;
-        };
-
-        VRStereoR32ReviewHook VRStereoR32ReviewHook::instance;
-    }
-
-    inline OutRunVR::RuntimeEligibility::InstallState
-    R32InstallStatus() noexcept
-    {
-        return R32InstallState.load(std::memory_order_acquire);
-    }
 }
