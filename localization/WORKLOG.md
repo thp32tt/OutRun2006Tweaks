@@ -2240,3 +2240,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller readable + raw mirror_y review PASS 10/10. Localizable segments=0 for all; no Korean DDS candidate is required and no raster bytes were modified.
 - Queue state now has blocked zoom_review=0 globally. A132 concurrently completed index62 33491F83, so B did not duplicate it. Remaining B direct-image hold: index176 75C3586A HOLD_STRICT_RECHECK, not render-ready because canonical source-text glyph/effect evidence is absent.
 - VR/FFB/DX11/DXVK untouched. Evidence: localization/graphics/role_B/20261006-B-CLASSIFY195-EVEN-ZOOM-CLOSEOUT/B195_CONTROLLER_CLASSIFICATION.json.
+
+## 2026-10-06 15:34 KST — A133 A-owned blocked runtime-font queue cleanup
+
+- Contract/state refresh found zero A-owned open user regressions, zero direct C-returned A REWORK, no unfinished odd direct-image rows, and B actively working index176. Completed A132 and all C/ingame-pending assets were not repeated.
+- The five odd `font_pipeline` rows 15 `20389D70`, 17 `6B8ED9DA`, 19 `B3ED3652`, 21 `D7CE8BC3`, 23 `FDC6BAD7` were still marked `blocked_runtime_font`, but that state belonged to the older stock-font/K3 research path.
+- Current recovery-branch K4 architecture is explicit in source: the localization hook preserves layout while hiding matching stock English glyph output, then redraws Korean UTF-8 via ImGui. The overlay font rebuild loads an installed Korean-capable Windows font, preferring Malgun Gothic, with Gulim/Batang/Segoe fallbacks. `stock_font_map.json` confirms the five assets are stock font atlas resources; they are not the K4 Korean overlay font source.
+- Queue rows 15/17/19/21/23 are therefore closed as preserve-original/no-Korean-DDS-candidate-required. The original DDS bytes were not touched. The 505-syllable/two-page atlas is retained only as K3 research evidence, not packaged as a replacement. B-owned font rows 16/18/20/22 and name-entry index24 remain separate.
+- Corrected stale `resume_state.current_blocked_zoom_review` from 12 to 0 to match the current queue/B195 result. No runtime source or graphics binary changed, so no new build was required. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_A/20261006-A-FONT133-ODD-RUNTIME-FONT/A133_RUNTIME_FONT_RECONCILE.json`.

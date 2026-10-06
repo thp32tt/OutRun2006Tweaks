@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A133 reconciled A-owned font_pipeline rows 15/17/19/21/23: current K4 Korean text does not consume replacement stock font DDS. hooks_localization suppresses stock English output and redraws UTF-8 via ImGui; Overlay::rebuild_fonts loads Windows Korean-capable system fonts. Preserve original DDS, no Korean candidate required. Legacy 505-glyph/two-page atlas remains K3 research only; index24 name-entry is separate. B-owned font rows 16/18/20/22 remain. B index176 is active and was not work-stolen. RUNTIME_VALIDATION=UNTESTED.",
     "B195 resolved all 10 remaining blocked zoom_review rows 166/174/178/180/194/196/202/206/210/238 from existing exact-HD B181/B192/B193 evidence. All are PRESERVE_ORIGINAL / NO_LOCALIZABLE_TEXT: protected song/game-title/model/brand/logo artwork, stage/course imagery, or incidental environmental signage only. Readable + raw mirror_y controller QA PASS 10/10; no candidate needed. Global blocked zoom_review=0. A132 concurrently completed index62, so do not repeat it. Remaining B direct-image hold is index176 75C3586A HOLD_STRICT_RECHECK; canonical source lacks the transcribed source glyph/effect evidence and is not render-ready.",
     "A132 resolved work-stolen index62 33491F83 manual reconstruction. Candidate 58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2: source-authored Layer43+Group16 restores EASY/HARD road/green-edge background; verified PSD erase component restores Diverge/Left/Right. 9/9 bbox/size/positive margins and all exact-bbox outside/alpha/overlap gates PASS; controller readable/high-zoom/raw mirror_y visual PASS. Pending independent C + in-game; do not repeat A125-A131 rejected intermediates unless C/new game evidence returns REWORK.",
     "B194 completed index214 BF229CF4 START/GOAL as exact-HD DXT5 candidate 3d292729007c... . First numeric-PASS worker draft 869b5fef... was controller-rejected because the START sign mask absorbed nearby traffic-light scene red and visibly intruded into protected art. Final scene-red exclusion passes 2/2 bbox/size/margins, zero decoded outside/alpha/introduced-visible, clean residue=0, final source-residue color=0, and SOURCE/CLEAN/FINAL + raw mirror_y visual QA. Pending independent C/in-game; do not repeat rejected B194 drafts. Next normal B zoom_review is index166 5EBD7FE8; do not duplicate index62 while A/manual reconstruction work owns it.",
@@ -5562,7 +5563,7 @@
     "report": "localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_IGR010_REPORT.json",
     "controller_report": "localization/graphics/role_B/20261006-B-INGAME172-IGR010-STAGE-HEART-TALLY/B172_CONTROLLER_SELF_QA.json"
   },
-  "current_blocked_zoom_review": 12,
+  "current_blocked_zoom_review": 0,
   "a98_zoom_review_4afc1bed": {
     "timestamp_kst": "2026-10-06T08:05:00+09:00",
     "queue_index": 25,
@@ -5974,5 +5975,117 @@
     "candidate_written": false,
     "status": "B_PRIMARY_EVEN_BLOCKED_ZOOM_REVIEW_SHARD_EXHAUSTED",
     "runtime_validation": "NOT_REQUIRED_FOR_NO_LOCALIZATION_CLASSIFICATIONS"
+  },
+  "a133_runtime_font_reconcile": {
+    "timestamp_kst": "2026-10-06T15:34:50+09:00",
+    "role": "A",
+    "queue_indices": [
+      15,
+      17,
+      19,
+      21,
+      23
+    ],
+    "assets": [
+      "20389D70",
+      "6B8ED9DA",
+      "B3ED3652",
+      "D7CE8BC3",
+      "FDC6BAD7"
+    ],
+    "decision": "K4_OVERLAY_PRESERVE_ORIGINAL_NO_KOREAN_DDS_CANDIDATE_REQUIRED",
+    "architecture": {
+      "runtime_text_renderer": "D3D9 ImGui UTF-8 overlay",
+      "runtime_source": "src/hooks_localization.cpp",
+      "overlay_font_source": "Windows system font loaded by Overlay::rebuild_fonts",
+      "windows_font_preference": [
+        "malgun.ttf",
+        "malgunsl.ttf",
+        "gulim.ttc",
+        "batang.ttc",
+        "segoeui.ttf"
+      ],
+      "stock_font_dds_used_for_korean_overlay": false,
+      "legacy_two_page_atlas": "K3 research only"
+    },
+    "source_shas": {
+      "hooks_localization": "8469bf87379649f29505bef915cce57176c4c549",
+      "overlay": "80090d71a2c1ffb53bf9796748bdfbf397825409",
+      "stock_font_map": "cf028d506c360fa912b178077f11aced032ebf5d",
+      "k4_doc": "db5af48e31bb8bd67f23d5a7a48a9c0fc2a69458"
+    },
+    "rows": [
+      {
+        "index": 15,
+        "asset": "textures/load/spr_font_xst/20389D70_512x256.dds",
+        "descriptor_index": 9,
+        "resource_handle": 9,
+        "cell": [
+          17,
+          17
+        ],
+        "format": "DXT5",
+        "status": "PRESERVE_ORIGINAL_NO_CANDIDATE_REQUIRED"
+      },
+      {
+        "index": 17,
+        "asset": "textures/load/spr_font_xst/6B8ED9DA_256x128.dds",
+        "descriptor_index": 6,
+        "resource_handle": 8,
+        "cell": [
+          16,
+          12
+        ],
+        "format": "DXT3",
+        "status": "PRESERVE_ORIGINAL_NO_CANDIDATE_REQUIRED"
+      },
+      {
+        "index": 19,
+        "asset": "textures/load/spr_font_xst/B3ED3652_512x256.dds",
+        "descriptor_index": 3,
+        "resource_handle": 4,
+        "cell": [
+          26,
+          26
+        ],
+        "format": "DXT3",
+        "status": "PRESERVE_ORIGINAL_NO_CANDIDATE_REQUIRED"
+      },
+      {
+        "index": 21,
+        "asset": "textures/load/spr_font_xst/D7CE8BC3_512x256.dds",
+        "descriptor_index": 7,
+        "resource_handle": 2,
+        "cell": [
+          22,
+          26
+        ],
+        "format": "DXT3",
+        "status": "PRESERVE_ORIGINAL_NO_CANDIDATE_REQUIRED"
+      },
+      {
+        "index": 23,
+        "asset": "textures/load/spr_font_xst/FDC6BAD7_512x128.dds",
+        "descriptor_index": 4,
+        "resource_handle": 5,
+        "cell": [
+          20,
+          20
+        ],
+        "format": "DXT3",
+        "status": "PRESERVE_ORIGINAL_NO_CANDIDATE_REQUIRED"
+      }
+    ],
+    "b_owned_font_rows_untouched": [
+      16,
+      18,
+      20,
+      22
+    ],
+    "name_entry_index_24_untouched": true,
+    "active_b_index_176_untouched": true,
+    "report": "localization/graphics/role_A/20261006-A-FONT133-ODD-RUNTIME-FONT/A133_RUNTIME_FONT_RECONCILE.json",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }

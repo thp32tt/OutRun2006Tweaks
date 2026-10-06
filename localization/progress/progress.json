@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T15:18:00+09:00",
+  "updated_at_kst": "2026-10-06T15:34:50+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -83,12 +83,27 @@
       }
     },
     "hangul_font": {
-      "status": "two_page_atlas_proof_generated",
+      "status": "k4_system_font_overlay_static_path_confirmed_pending_ingame",
       "percent": 45,
       "required_unique_hangul_syllables": 505,
       "atlas_pages": 2,
       "page_capacity": 256,
-      "manifest": "localization/font/hangul_glyph_manifest.json"
+      "manifest": "localization/font/hangul_glyph_manifest.json",
+      "stock_font_dds_policy": "preserve_original_no_candidate_required_for_k4",
+      "a_shard_font_rows_resolved": [
+        15,
+        17,
+        19,
+        21,
+        23
+      ],
+      "b_shard_font_rows_remaining": [
+        16,
+        18,
+        20,
+        22
+      ],
+      "name_entry_index_24_separate": true
     },
     "packaging": {
       "status": "not_started",
@@ -135,7 +150,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B195 consumed all remaining even blocked zoom_review evidence and positively closed indices 166/174/178/180/194/196/202/206/210/238 as PRESERVE_ORIGINAL / NO_LOCALIZABLE_TEXT. Exact-HD readable + raw mirror_y controller review found only protected song/game-title/model/brand/logo artwork, stage/course imagery, or incidental environmental signage. No weak candidate was generated. blocked zoom_review is now 0 globally. A132 concurrently resolved index62; B must not repeat it. Remaining B direct-image hold is index176 75C3586A HOLD_STRICT_RECHECK (canonical source lacks the transcribed source glyph/effect evidence), so it is not render-ready.",
+  "next_checkpoint": "A133 resolved A-owned blocked_runtime_font rows 15/17/19/21/23 by reconciling them with the current K4 renderer architecture: Korean runtime text is redrawn through the D3D9 ImGui overlay using a Korean-capable Windows system font, so the stock spr_font_xst DDS atlases must remain original and require no Korean DDS candidate. Legacy two-page Hangul atlas remains K3 research only; index24 name-entry is a separate path. B-owned font rows 16/18/20/22 remain for B. B is actively working index176 75C3586A and A did not duplicate it. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,

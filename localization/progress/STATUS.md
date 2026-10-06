@@ -1834,3 +1834,11 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Controller readable + raw mirror_y review PASS 10/10. Localizable segments=0 for all; no Korean DDS candidate is required and no raster bytes were modified.
 - Queue state now has blocked zoom_review=0 globally. A132 concurrently completed index62 33491F83, so B did not duplicate it. Remaining B direct-image hold: index176 75C3586A HOLD_STRICT_RECHECK, not render-ready because canonical source-text glyph/effect evidence is absent.
 - VR/FFB/DX11/DXVK untouched. Evidence: localization/graphics/role_B/20261006-B-CLASSIFY195-EVEN-ZOOM-CLOSEOUT/B195_CONTROLLER_CLASSIFICATION.json.
+
+## 2026-10-06 15:34 KST — A133 odd stock-font pipeline reconciliation
+- No A-owned `OPEN_USER_INGAME_FAIL`, direct C-returned A REWORK, or unfinished odd direct-image candidate remained. B index176 `75C3586A` is actively owned by B and was not duplicated.
+- Reconciled A-owned queue indices **15/17/19/21/23** from `blocked_runtime_font` to `k4_overlay_preserve_original_no_candidate_required`.
+- Current K4 path suppresses matched stock English output in `src/hooks_localization.cpp` and redraws Korean UTF-8 through the D3D9 ImGui overlay. `Overlay::rebuild_fonts()` loads Korean-capable Windows system fonts (Malgun/Gulim/Batang/Segoe fallback chain), so these stock `spr_font_xst` DDS atlases must remain byte-original; generating Korean DDS replacements would be the wrong architecture.
+- Legacy 505-glyph/two-page Hangul atlas remains K3 research only. B-owned font rows 16/18/20/22 and separate name-entry index24 were untouched.
+- Static reconciliation PASS; no DDS/runtime source changed. `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_A/20261006-A-FONT133-ODD-RUNTIME-FONT/A133_RUNTIME_FONT_RECONCILE.json`.

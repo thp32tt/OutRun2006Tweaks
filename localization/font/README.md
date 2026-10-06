@@ -20,3 +20,11 @@ Default output:
 Current corpus uses 505 Hangul syllables, so two pages are sufficient.
 
 The raster pages are development candidates until K3 in-game rendering verifies baseline, size, spacing, outline and scaling.
+
+## Current recovery-branch production policy
+
+The active K4 Korean text path does **not** replace the game's stock font DDS atlases. `src/hooks_localization.cpp` suppresses matched stock English glyph output and redraws the Korean UTF-8 string through the existing D3D9 ImGui overlay. `Overlay::rebuild_fonts()` loads a Korean-capable Windows system font (Malgun Gothic first, then other Windows fallbacks). Therefore stock `spr_font_xst` DDS files remain original and do not require Korean bitmap candidates for K4.
+
+The 505-syllable/two-page atlas described below is retained as K3 research evidence only. It must not be packaged as a stock-font replacement unless the runtime architecture is intentionally changed and separately validated in-game. Name-entry input (`spr_name_entry_xst`) is a separate path and is **not** resolved by this policy.
+
+A133 statically reconciled A-owned font-pipeline queue rows 15/17/19/21/23 to preserve-original/no-candidate. Runtime/in-game validation of the K4 overlay remains pending.
