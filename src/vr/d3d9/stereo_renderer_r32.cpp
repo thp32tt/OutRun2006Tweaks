@@ -599,7 +599,6 @@ namespace OutRunVRStereo
             if (ready == S_FALSE)
             {
                 if (Settings::VRTelemetry) ++R32PendingFenceBlocks;
-                ++DirectTransportRingBackpressure;
                 if (!R32FirstPendingFenceLogged)
                 {
                     R32FirstPendingFenceLogged = true;
@@ -633,25 +632,84 @@ namespace OutRunVRStereo
             if (R32DirectCopyPathRejected)
                 return false;
 
-            const std::uint32_t slotIndex =
+            const std::uint32_t preferred =
                 (frameId - 1u) % OutRunVR::RenderFrameRingSize;
-            if (!R32DrainPendingProducerFence(slotIndex))
-                return false;
+            std::uint32_t selected = OutRunVR::RenderFrameRingSize;
+            bool ackBlocked = false;
 
-            auto& slot = DirectTransportSlots[slotIndex];
-            if (slot.frameId)
+            // Preserve the R38 free-slot contract at the final R33/R32 owner.
+            // A slow producer fence or host ACK on the preferred modulo slot
+            // must not force DirectGPU fallback while another ring slot is free.
+            for (std::uint32_t offset = 0;
+                 offset < OutRunVR::RenderFrameRingSize; ++offset)
             {
-                std::uint32_t gpuCompleted = 0;
-                const bool ackValid =
-                    R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted);
-                if (!ackValid || !FrameIdAtOrAfter(gpuCompleted, slot.frameId))
+                const std::uint32_t index =
+                    (preferred + offset) % OutRunVR::RenderFrameRingSize;
+                if (!R32DrainPendingProducerFence(index))
+                    continue;
+
+                auto& candidate = DirectTransportSlots[index];
+
+                // DirectTransportFrameReadyAfterPresent() may leave an
+                // unpublished slot quarantined on S_FALSE. Reclaim it only
+                // after the same EVENT proves completion; a query error keeps
+                // the whole DirectGPU path fail-closed.
+                if (candidate.producerPending)
                 {
-                    R13NoteSafeAckBackpressure();
-                    ++DirectTransportRingBackpressure;
-                    return false;
+                    const HRESULT ready = candidate.fence
+                        ? candidate.fence->GetData(nullptr, 0, 0) : E_FAIL;
+                    if (ready == S_OK)
+                    {
+                        candidate.producerPending = false;
+                        candidate.pendingFrameId = 0;
+                        if (!candidate.published)
+                            candidate.frameId = 0;
+                    }
+                    else if (ready == S_FALSE)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        R32DirectCopyPathRejected = true;
+                        R32DirectCopyRejectHr = ready;
+                        if (Settings::VRTelemetry) ++R32PendingFenceErrors;
+                        return false;
+                    }
                 }
+
+                if (candidate.published && candidate.frameId)
+                {
+                    std::uint32_t gpuCompleted = 0;
+                    const bool ackValid =
+                        R13TryGetGpuCompletedFrame(index, gpuCompleted);
+                    if (!ackValid ||
+                        !FrameIdAtOrAfter(gpuCompleted, candidate.frameId))
+                    {
+                        ackBlocked = true;
+                        continue;
+                    }
+
+                    // The host completed this exact published frame. Retire the
+                    // old publication before writing new eye pixels into the
+                    // shared textures.
+                    candidate.frameId = 0;
+                    candidate.published = false;
+                }
+
+                selected = index;
+                break;
             }
 
+            if (selected >= OutRunVR::RenderFrameRingSize)
+            {
+                if (ackBlocked)
+                    R13NoteSafeAckBackpressure();
+                ++DirectTransportRingBackpressure;
+                return false;
+            }
+
+            auto& slot = DirectTransportSlots[selected];
             {
                 InternalPassScope guard;
                 const HRESULT leftCopy = device->StretchRect(BackBuffer, nullptr,
@@ -688,13 +746,13 @@ namespace OutRunVRStereo
                 }
             }
 
-            R32ProducerFencePending[slotIndex] = true;
-            R32ProducerPendingFrame[slotIndex] = frameId;
+            R32ProducerFencePending[selected] = true;
+            R32ProducerPendingFrame[selected] = frameId;
             if (!R32WaitProducerFence(slot.fence))
                 return false;
 
-            R32ProducerFencePending[slotIndex] = false;
-            R32ProducerPendingFrame[slotIndex] = 0;
+            R32ProducerFencePending[selected] = false;
+            R32ProducerPendingFrame[selected] = 0;
 
             // Bridge the R32-private producer fence into the base R7/R13
             // post-Present publication contract. DirectTransportFrameReadyAfterPresent()
@@ -704,7 +762,7 @@ namespace OutRunVRStereo
             slot.pendingFrameId = frameId;
             slot.frameId = frameId;
             slot.published = false;
-            ActiveDirectTransportSlot = slotIndex;
+            ActiveDirectTransportSlot = selected;
             return true;
         }
 

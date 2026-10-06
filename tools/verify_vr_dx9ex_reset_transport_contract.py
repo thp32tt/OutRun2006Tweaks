@@ -400,6 +400,41 @@ forbid(
     "DirectInteropVerified = false;",
 )
 
+drain_pending_r32 = body(r32, "bool R32DrainPendingProducerFence(")
+forbid(
+    drain_pending_r32,
+    "R32 per-slot fence polling must not count whole-ring backpressure",
+    "++DirectTransportRingBackpressure;",
+)
+
+resolve_direct_r32 = body(r32, "bool R32ResolveDirectTransport(")
+require_order(
+    resolve_direct_r32,
+    "R32 final-owner free-slot scan",
+    "const std::uint32_t preferred =",
+    "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
+    "for (std::uint32_t offset = 0;",
+    "R32DrainPendingProducerFence(index)",
+    "if (candidate.producerPending)",
+    "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
+    "candidate.frameId = 0;",
+    "candidate.published = false;",
+    "selected = index;",
+    "if (selected >= OutRunVR::RenderFrameRingSize)",
+    "++DirectTransportRingBackpressure;",
+    "auto& slot = DirectTransportSlots[selected];",
+    "R32ProducerFencePending[selected] = true;",
+    "ActiveDirectTransportSlot = selected;",
+)
+if resolve_direct_r32.count("++DirectTransportRingBackpressure;") != 1:
+    fail("R32 DirectGPU free-slot scan must count whole-ring backpressure once")
+forbid(
+    resolve_direct_r32,
+    "R32 final owner fixed-slot regression",
+    "R32DrainPendingProducerFence(slotIndex)",
+    "R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted)",
+)
+
 invalidate_r32 = body(r32, "void R32InvalidateResetCaches() noexcept")
 require(
     invalidate_r32,
