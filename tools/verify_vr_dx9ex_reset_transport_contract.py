@@ -400,6 +400,18 @@ forbid(
     "DirectInteropVerified = false;",
 )
 
+# 00493: after the pre-Present wait was retired, the parallel R32-only
+# producer-pending side table and its drain helper must disappear entirely.
+# The canonical DirectTransportSlot::producerPending EVENT remains authoritative.
+forbid(
+    r32,
+    "retired R32 duplicate producer-pending side state",
+    "R32ProducerFencePending",
+    "R32ProducerPendingFrame",
+    "R32WaitProducerFence(",
+    "R32DrainPendingProducerFence(",
+)
+
 drain_pending_r32 = body(r32, "bool R32DrainPendingProducerFence(")
 forbid(
     drain_pending_r32,
