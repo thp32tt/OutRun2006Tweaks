@@ -1,0 +1,13 @@
+{
+  "role": "B",
+  "run": "B221",
+  "queue_index": 92,
+  "asset": "1A43E9D9",
+  "candidate_sha256": "c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a",
+  "source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+  "evidence": "localization/graphics/role_B/20261007-B-MANUALQA221-1A43E9D9/B221_1A43_SOURCE_NEW_RAW.jpg",
+  "raw_orientation": "mirror_y_as_stored",
+  "candidate_bytes_changed": false,
+  "status": "B221_RAW_EVIDENCE_WRITTEN_PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED"
+}
