@@ -2384,3 +2384,16 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Overall feature stays fail-closed: `b209_jamo_artwork_static_pass_hold_input_wiring_required`. The DDS is **not** selected for the Korean test package yet because B208's composer is still not wired to B207 character events and END does not yet persist/write the A141 compatibility alias. A142 local rendering is inherited BUILD PASS.
 - `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261006-B-PRODUCTION209-NAMEENTRY-JAMO-KEYCAPS/B209_JAMO_KEYCAP_REPORT.json`; `B209_CONTROLLER_SELF_QA.json`.
+
+## 2026-10-06 19:52 KST — A143 name-entry input/END wiring BUILD PASS
+
+- Refreshed the current branch and did not repeat A-owned P0/P1 items already waiting on C/new in-game evidence. With index24 still the only unresolved implementation path, A work-stole only the remaining B209 -> runtime-wiring boundary.
+- Reused B209 candidate `c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e` unchanged. No artwork rerender was performed.
+- Canonical EXE proof fixes the safe hook at VA `0x4692B6` / module+`0x692B6`: EAX already holds the selected cell and ESI the name-entry object, immediately before stock character/control dispatch.
+- Implemented guarded mid-hook wiring in `src/hooks_localization.cpp`. Character selections feed B208 composition; BACKSPACE edits the composition; stock page controls `0x27..0x2A` remain on the original path. Unsupported legacy high-byte symbols are fail-closed once Korean editing is active.
+- A reserved non-persistent 14-byte preview token (`KAAAAAAAAAAAAA`) lets A142 render the current UTF-8 composition without ever writing UTF-8 to the game's native field. The token is explicitly excluded from persistent sidecar load/generation.
+- On successful `0x2B` END, A143 calls A141 persistence, writes only the deterministic 14-byte ASCII compatibility alias to object+`0x5F4`, restores byte length, then leaves END unchanged so the stock minimum check/finalizer/parent 16-byte copy execute normally.
+- Exact source `224e3c8fce6cfebfc0b780683a168b53ccd4e87d` passed Win32 Release run `37451825543` (artifact `11407089218`) and Korean Test Build run `37451825561` (artifact `11407390504`).
+- B209 producer static/controller QA is inherited, but **independent C QA is still pending**. The row status intentionally does not contain C `pass_pending_ingame`, so the DDS is not promoted into the test package yet. After C approval, a NEW actual-game test is required for composition, BACKSPACE, page controls, END, reload/local display and alias fallback.
+- `RUNTIME_VALIDATION=UNTESTED`. Native UTF-8/save/ranking/network/replay protocol behavior is unchanged. VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_A/20261006-A-RUNTIME143-NAME-ENTRY-INPUT-WIRING/A143_NAME_ENTRY_INPUT_WIRING.json`, `A143_NAME_ENTRY_INPUT_EVIDENCE.txt`.
