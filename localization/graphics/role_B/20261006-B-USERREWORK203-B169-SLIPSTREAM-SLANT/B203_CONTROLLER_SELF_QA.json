@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B203",
+  "timestamp_kst": "2026-10-06T16:45:32+09:00",
+  "queue_index": 48,
+  "candidate_sha256": "259153b91e330479a4d975037013c77d339ffe3a2781461ebe118bfc04e28824",
+  "machine_qa": {
+    "bbox_size_positive_margin": "1/1 PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "other_8_rows_changed": 0
+  },
+  "visual": [
+    "SOURCE/OLD/CLEAN/FINAL and 2x: final visibly matches source Slipstream readable right lean better than superseded candidate.",
+    "White/navy/cobalt glow and horizontal streak field remain source-family consistent; no residue/clipping/broken Hangul.",
+    "Raw mirror_y PASS."
+  ],
+  "status": "B203_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

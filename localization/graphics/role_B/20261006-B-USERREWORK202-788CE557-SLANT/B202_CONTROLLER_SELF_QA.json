@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B202",
+  "timestamp_kst": "2026-10-06T16:45:32+09:00",
+  "queue_index": 106,
+  "candidate_sha256": "a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482",
+  "machine_qa": {
+    "bbox_size_positive_margin": "5/5 PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "source_residue": 0,
+    "protected_overlap": 0,
+    "guard_conflicts": 0
+  },
+  "visual": [
+    "SOURCE/CLEAN/FINAL high-zoom: no English residue, patch seam, broken glyph or foreign-art intrusion.",
+    "Readable italic source rows and Korean finals have the same right-lean direction by visible top-vs-bottom displacement.",
+    "OutRun2SP and unrelated selector artwork intact; raw mirror_y PASS."
+  ],
+  "status": "B202_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

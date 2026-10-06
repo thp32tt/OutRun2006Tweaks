@@ -2279,3 +2279,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/CLEAN/FINAL high-zoom, full readable atlas and raw mirror_y visual QA PASS. No English residue, broken glyph, portrait/card/route intrusion, clipping, overlap or orientation regression.
 - State: `B201_STATIC_PASS_PENDING_C`; RUNTIME_VALIDATION=UNTESTED. A135 index24 runtime name-entry HOLD is untouched. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_75C3586A_REPORT.json`, `localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_CONTROLLER_SELF_QA.json`; hosted worker run 37428411125.
+
+## 2026-10-06T16:45:32+09:00 — B202-B204 user visual slant rework reconciliation
+- Consumed pending hosted B worker output `c3b3ca49418f017a29340457f96c03ad55ff29b2`; no completed candidate was regenerated.
+- B202 / index106 / IGR-017 P0: `a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482`; 5/5 bbox/size/margins, residue/outside/alpha/protected/overlap/guard=0, OutRun2SP exact. SOURCE/CLEAN/FINAL high-zoom visually confirms source-matching readable right lean; raw mirror_y PASS.
+- B203 / index48 / IGR-009 P1: `259153b91e330479a4d975037013c77d339ffe3a2781461ebe118bfc04e28824`; Slipstream only, 1/1 bbox/size/margin, outside/alpha/protected=0, other eight localized rows exact. SOURCE/OLD/CLEAN/FINAL 2x + raw confirms corrected source-direction lean and glow/streak family.
+- B204 / index60 / IGR-010 P1: `a8ffc1f0b14c8c1e3ef5680ea1ae90db3354330404be8ca02e0e336d362331a8`; Stage only, transparent clean reconstruction, native source-family render; non-Stage/A85/heart-tally pixels exact. 4x source/final visually confirms same-direction right lean; family/raw PASS.
+- Slant judgment used visible top-vs-bottom displacement, not affine parameter sign. All three remain STATIC_PASS_PENDING_C_AND_INGAME_RETEST; no backlog row closed. B201/index176 and A135/index24 untouched. VR/FFB/DX11/DXVK untouched.

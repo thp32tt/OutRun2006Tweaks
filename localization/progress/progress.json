@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T16:18:00+09:00",
+  "updated_at_kst": "2026-10-06T16:45:32+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -167,7 +167,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B201 consumed the pending B200 worker result for index176 75C3586A and rejected B200 as a visual/numeric false negative: wrong semantic atlas binding localized HOLLY as CLARISSA, preserved ??? as JENNIFER, route artwork as HOLLY, and left true JENNIFER/CLARISSA English sprites untouched. Corrected B201 candidate 494d42c09c58... binds idx35 JENNIFER, idx36 CLARISSA, idx37 HOLLY, idx39 FLAGMAN 4; idx38 ??? and idx40 route art remain exact. 4/4 exact source-alpha bbox/size/margins + zero outside/residue/overlap/near1 PASS; SOURCE/CLEAN/FINAL + readable/raw mirror_y controller PASS. Pending independent C; runtime untested. A135 index24 name-entry HOLD remains untouched.",
+  "next_checkpoint": "B202-B204 consumed pending B slant-rework worker output c3b3ca49. B202 index106/IGR-017, B203 index48/IGR-009 and B204 index60/IGR-010 pass machine scope plus explicit readable slant-direction/source-residue visual gates and raw mirror_y review. Candidate hashes a9c10f00..., 259153b9..., a8ffc1f0.... All remain pending independent C and NEW actual in-game retest; no row closed. B201/index176 and A135/index24 were not repeated.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -2409,6 +2409,32 @@
       "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION201-75C3586A-NAMES-MAPFIX/B201_CONTROLLER_SELF_QA.json",
       "status": "B201_STATIC_PASS_PENDING_C",
       "runtime_validation": "UNTESTED"
+    },
+    "b202_b204_user_slant_rework": {
+      "timestamp_kst": "2026-10-06T16:45:32+09:00",
+      "worker_commit": "c3b3ca49418f017a29340457f96c03ad55ff29b2",
+      "items": [
+        {
+          "run": "B202",
+          "queue_index": 106,
+          "backlog": "IGR-017",
+          "candidate_sha256": "a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482"
+        },
+        {
+          "run": "B203",
+          "queue_index": 48,
+          "backlog": "IGR-009",
+          "candidate_sha256": "259153b91e330479a4d975037013c77d339ffe3a2781461ebe118bfc04e28824"
+        },
+        {
+          "run": "B204",
+          "queue_index": 60,
+          "backlog": "IGR-010",
+          "candidate_sha256": "a8ffc1f0b14c8c1e3ef5680ea1ae90db3354330404be8ca02e0e336d362331a8"
+        }
+      ],
+      "controller_visual_qa": "PASS_EXPLICIT_READABLE_SLANT_DIRECTION_AND_RAW_3_OF_3",
+      "runtime_validation": "PENDING_NEW_INGAME_RETEST"
     }
   },
   "data_build": {

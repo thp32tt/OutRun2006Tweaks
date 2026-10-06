@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B204",
+  "timestamp_kst": "2026-10-06T16:45:32+09:00",
+  "queue_index": 60,
+  "candidate_sha256": "a8ffc1f0b14c8c1e3ef5680ea1ae90db3354330404be8ca02e0e336d362331a8",
+  "machine_qa": {
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "non_stage_exact": true
+  },
+  "visual": [
+    "4x SOURCE/OLD/CLEAN/FINAL: source Stage and final 스테이지 share the readable right-lean direction by visible displacement.",
+    "Transparent clean has no historical white residue/seam; source yellow/navy/pale hierarchy retained.",
+    "Family and raw mirror_y review preserves OUTRUN MILES and heart-tally/numeric art."
+  ],
+  "status": "B204_STATIC_PASS_PENDING_C_AND_INGAME_RETEST",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
