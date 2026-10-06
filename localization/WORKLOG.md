@@ -2408,3 +2408,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - GitHub-hosted C worker run 37457687825 SUCCESS. Policy/exporter commits 593e3be and 18e5dfc; generated comparison output commit 62fc286.
 - Contract and quality pipeline now require C to refresh the English-original comparison set whenever C-PASS membership or candidate bytes change. User visual rejection reopens the asset for A/B rework and requires a newer C pass before in-game validation.
 - RUN_KEY=OUTRUN-KOR-C-ENGLISH-COMPARE-20261006; RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+## 2026-10-06 21:31 KST — Ordered REWORK generation gate policy
+
+- Added a mandatory eight-step generation loop for every new/materially reworked graphics asset: complete English/source removal and plate/background reconstruction; source-matching slant direction; no unnecessarily undersized Korean lettering while respecting the exact source-bbox ceiling; source-faithful weight/outline/shadow; zero clipped pixels; zero intrusion into protected graphics/vehicle/name/box regions; clean FLIP-Y and RAW views; and immediate readability versus the English original.
+- The sequence now applies during construction, not only after rendering. Any failed step forces regeneration before producer PASS; numeric bbox/mask PASS cannot override a visual failure.
+- Contract and quality pipeline were updated so A/B generation and C return-to-REWORK behavior inherit the rule on subsequent runs.
+- Policy-only change: no DDS candidate bytes or runtime code changed; `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
