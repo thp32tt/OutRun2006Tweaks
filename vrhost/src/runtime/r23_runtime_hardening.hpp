@@ -67,6 +67,16 @@ namespace OutRunVrR23RuntimeHardening
         }
     }
 
+    inline XrResult RecordFinalSubmissionResult(
+        XrResult result, std::uint32_t frameId,
+        OutRunVrR23VerifiedBundle::SourceKind kind,
+        bool intendedHasLayer) noexcept
+    {
+        RecordFinalSubmission(frameId, kind,
+            XR_SUCCEEDED(result) && intendedHasLayer);
+        return result;
+    }
+
     inline XrResult SubmitNoLayer(XrSession session,
         const XrFrameEndInfo* endInfo) noexcept
     {

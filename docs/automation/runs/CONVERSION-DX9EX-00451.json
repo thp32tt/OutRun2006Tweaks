@@ -1,0 +1,73 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00451",
+  "production_id": "CONVERSION-DX9EX-00451",
+  "event_id": "CONVERSION-DX9EX-00451-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "VALIDATING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "15680a2f44bcf111979095443595a7d887235c67",
+  "material_result_sha": "PENDING_SELF",
+  "validation_bearing_result_sha": "PENDING_SELF",
+  "result_sha": "PENDING_SELF",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00451]",
+  "selected_work_item": "VR-DX9EX-FINAL-SUBMISSION-RESULT-ORDERING-0034",
+  "summary": "Make R24-owned final-submission bookkeeping follow the actual xrEndFrame result instead of pre-recording successful layer submission before the runtime call.",
+  "changed_paths": [
+    "vrhost/src/runtime/r23_runtime_hardening.hpp",
+    "vrhost/src/runtime/r24_black_screen_guard.hpp",
+    "tools/verify_vr_final_submission_contract.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00451.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered latest branch HEAD 15680a2f44bcf111979095443595a7d887235c67 after CONVERSION-DX9EX-00450 bookkeeping. Structural extraction is terminal; open HUD/rank/performance work remains HMD-evidence gated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R32 fast-submit already records final submission after xrEndFrame and derives submitted from XR_SUCCEEDED(result), while R24 projection/fallback paths wrote LastSubmittedLayer=true before calling xrEndFrame. An xrEndFrame failure could therefore be reported as a successful visible submission."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R23-owned RecordFinalSubmissionResult and routed all direct R24 final-submission writes through it after the actual EndFrame result. Added deterministic verifier and canonical policy-gate wiring."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING"
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "red_review": {
+      "base_sha": "15680a2f44bcf111979095443595a7d887235c67",
+      "result": "FAIL_AS_EXPECTED",
+      "missing_contract": "R24 directly recorded successful final submission before the underlying xrEndFrame call on classic, DirectSafeEye, mixed/mono, and visible-fallback paths."
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Validate the exact material SHA with the canonical DX9Ex Active Validation and Domain Isolation gates; only then finalize bookkeeping while preserving validation_bearing_result_sha.",
+  "started_at_kst": "2026-10-06T11:08:32+09:00"
+}

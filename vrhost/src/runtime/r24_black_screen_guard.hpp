@@ -173,8 +173,6 @@ namespace OutRunVrR24BlackScreenGuard
         const OutRunVrR23VerifiedBundle::Snapshot& snapshot,
         bool softGrace = false) noexcept
     {
-        OutRunVrR23RuntimeHardening::RecordFinalSubmission(
-            snapshot.frameId, snapshot.kind, true);
         if (softGrace)
         {
             ++SoftGraceProjectionSubmits;
@@ -197,7 +195,9 @@ namespace OutRunVrR24BlackScreenGuard
                     << BuildId << "\n";
             }
         }
-        return OutRunVrFinalTest::EndFrame(session, endInfo);
+        const XrResult result = OutRunVrFinalTest::EndFrame(session, endInfo);
+        return OutRunVrR23RuntimeHardening::RecordFinalSubmissionResult(
+            result, snapshot.frameId, snapshot.kind, true);
     }
 
     inline void BuildViewQuad(XrSwapchain handle, std::uint32_t width,
@@ -346,8 +346,6 @@ namespace OutRunVrR24BlackScreenGuard
         XrFrameEndInfo patched = *endInfo;
         patched.layerCount = 1;
         patched.layers = &layer;
-        OutRunVrR23RuntimeHardening::RecordFinalSubmission(
-            snapshot.frameId, snapshot.kind, true);
         ++DirectSafeProjectionSubmits;
         if (!FirstDirectSafeLogged)
         {
@@ -357,6 +355,8 @@ namespace OutRunVrR24BlackScreenGuard
                 << BuildId << "\n";
         }
         result = OutRunVrFinalTest::EndFrame(session, &patched);
+        OutRunVrR23RuntimeHardening::RecordFinalSubmissionResult(
+            result, snapshot.frameId, snapshot.kind, true);
         return true;
     }
 
@@ -511,9 +511,10 @@ namespace OutRunVrR24BlackScreenGuard
                     << "[R24] every visible fallback failed; submitting no layer reason="
                     << reason << " build=" << BuildId << "\n";
             }
-            OutRunVrR23RuntimeHardening::RecordFinalSubmission(
-                0, OutRunVrR23VerifiedBundle::SourceKind::None, false);
-            return OutRunVrR23RuntimeHardening::SubmitNoLayer(session, endInfo);
+            const XrResult result =
+                OutRunVrR23RuntimeHardening::SubmitNoLayer(session, endInfo);
+            return OutRunVrR23RuntimeHardening::RecordFinalSubmissionResult(
+                result, 0, OutRunVrR23VerifiedBundle::SourceKind::None, false);
         }
 
         const XrCompositionLayerBaseHeader* layer =
@@ -521,9 +522,6 @@ namespace OutRunVrR24BlackScreenGuard
         XrFrameEndInfo patched = *endInfo;
         patched.layerCount = 1;
         patched.layers = &layer;
-        OutRunVrR23RuntimeHardening::RecordFinalSubmission(
-            0, OutRunVrR23VerifiedBundle::SourceKind::None, true);
-
         if (cached)
         {
             ++CachedLayerFallbacks;
@@ -569,7 +567,10 @@ namespace OutRunVrR24BlackScreenGuard
                     << reason << " build=" << BuildId << "\n";
             }
         }
-        return OutRunVrFinalTest::EndFrame(session, &patched);
+        const XrResult result =
+            OutRunVrFinalTest::EndFrame(session, &patched);
+        return OutRunVrR23RuntimeHardening::RecordFinalSubmissionResult(
+            result, 0, OutRunVrR23VerifiedBundle::SourceKind::None, true);
     }
 
     inline XrResult XRAPI_CALL EndFrame(
@@ -591,17 +592,19 @@ namespace OutRunVrR24BlackScreenGuard
             projection.count == 1 && !hasNonProjection)
         {
             ++IntentionalMonoProjectionSubmits;
-            OutRunVrR23RuntimeHardening::RecordFinalSubmission(
-                0, SourceKind::None, true);
-            return OutRunVrFinalTest::EndFrame(session, endInfo);
+            const XrResult result =
+                OutRunVrFinalTest::EndFrame(session, endInfo);
+            return OutRunVrR23RuntimeHardening::RecordFinalSubmissionResult(
+                result, 0, SourceKind::None, true);
         }
 
         // Theater/menu is already visible and deliberate; do not replace it.
         if (hasNonProjection && projection.count == 0)
         {
-            OutRunVrR23RuntimeHardening::RecordFinalSubmission(
-                0, SourceKind::None, endInfo->layerCount > 0);
-            return OutRunVrFinalTest::EndFrame(session, endInfo);
+            const XrResult result =
+                OutRunVrFinalTest::EndFrame(session, endInfo);
+            return OutRunVrR23RuntimeHardening::RecordFinalSubmissionResult(
+                result, 0, SourceKind::None, endInfo->layerCount > 0);
         }
 
         OutRunVrR23VerifiedBundle::Snapshot verified{};
@@ -623,9 +626,10 @@ namespace OutRunVrR24BlackScreenGuard
                     << "[R24] mixed classic frame preserved after independent projection bundle validation build="
                     << BuildId << "\n";
             }
-            OutRunVrR23RuntimeHardening::RecordFinalSubmission(
-                verified.frameId, verified.kind, true);
-            return OutRunVrFinalTest::EndFrame(session, endInfo);
+            const XrResult result =
+                OutRunVrFinalTest::EndFrame(session, endInfo);
+            return OutRunVrR23RuntimeHardening::RecordFinalSubmissionResult(
+                result, verified.frameId, verified.kind, true);
         }
         if (hasNonProjection)
             return OutRunVrR23RuntimeHardening::SubmitNonProjectionOnly(
@@ -656,9 +660,10 @@ namespace OutRunVrR24BlackScreenGuard
                 OutRunVrReviewHardening::FreshClassicFallbackAvailable())
             {
                 OutRunVrR21RuntimeHardening::BindLegacyBlitConstantBufferToVs();
-                OutRunVrR23RuntimeHardening::RecordFinalSubmission(
-                    verified.frameId, verified.kind, true);
-                return OutRunVrSbsCaptureOverride::EndFrame(session, endInfo);
+                const XrResult result =
+                    OutRunVrSbsCaptureOverride::EndFrame(session, endInfo);
+                return OutRunVrR23RuntimeHardening::RecordFinalSubmissionResult(
+                    result, verified.frameId, verified.kind, true);
             }
 
             return SubmitVisibleFallback(
