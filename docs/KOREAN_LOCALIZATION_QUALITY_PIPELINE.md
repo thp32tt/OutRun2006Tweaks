@@ -167,3 +167,34 @@ The following checks are mandatory in producer self-QA and independent C readabl
 
 A user rejection in PRE_INGAME_JPG_REVIEW immediately changes the affected row to REWORK_REQUIRED, invalidates the prior C visual PASS, removes it from the current C-pass export, and requires material A/B rework plus a newer independent C pass before in-game testing.
 
+
+
+## Third-stage C strict visual audit (C3_STRICT_AUDIT)
+
+This gate applies to candidates whose current bytes have already passed independent C static QA. It is an additional human/controller visual false-negative hunt used when higher-priority production/fresh-C work is exhausted; it does not replace producer QA, normal C QA, or in-game validation.
+
+### Required comparison views
+For the same candidate SHA, inspect:
+- canonical English source vs verified CLEAN_PLATE vs Korean FINAL at matched decoded dimensions;
+- FLIP-Y/readable orientation and RAW DDS orientation;
+- practical display scale plus high-zoom detail;
+- line/region crops where multiple typography families, protected artwork, or tight plate boundaries exist.
+
+### Fail-closed emphasis order
+1. **Readable slant/perspective direction:** visually match the English source direction and approximate magnitude. Opposite-direction shear, accidental upright rendering, excessive shear, or inconsistent line directions FAIL.
+2. **Clean plate integrity:** before judging Korean lettering, verify the English/source lettering was actually removed and the underlying plate/background was naturally reconstructed. Residue, ghosting, blur, smeared texture, patch rectangles, seams, damaged graphics, wrong donor texture or alpha discontinuity FAIL.
+3. **Source typography similarity:** compare family impression, condensed/wide proportion, weight, stroke shape, round/square character, relative cap-height equivalent, alignment, baseline, per-line hierarchy, spacing, gradient/fill, outline, shadow/glow and depth. A visibly different generic font treatment FAIL even if every pixel is contained.
+4. **Non-undersized readable scale:** the Korean result must be immediately readable and visually proportionate to the English source without exceeding the exact original glyph/effect bbox. Excessively small or weak lettering FAIL.
+5. **Glyph quality:** broken Hangul, missing/clipped strokes, jagged nearest-neighbor enlargement, mixed-resolution text, malformed syllables, clipped outline/shadow/glow or damaged antialias fringes FAIL.
+6. **Protected-art and neighbor clearance:** enforce the existing zero-overlap rule at pixel level. Any localized/effect pixel touching prohibited vehicle/character/name/icon/box/frame/neighbor/preserved-art content is FAIL.
+7. **Placement and hierarchy:** source-faithful horizontal/vertical anchor, baseline, line spacing, line-size hierarchy and relationship to the plate are mandatory. A contained but visibly displaced composition FAILS.
+8. **FLIP-Y + RAW parity:** both inspection orientations must remain clean, correctly transformed and semantically consistent.
+
+### Result semantics
+- Existing machine QA remains mandatory, but a visible failure in this C3 gate overrides numeric PASS.
+- `C3_STRICT_PASS`: all existing machine gates and every ordered visual item above pass for the same current candidate bytes.
+- `REWORK_REQUIRED`: any definite visual or numeric defect. The prior C PASS for those bytes is superseded and A/B must repair before a fresh independent C approval.
+- `HOLD_STRICT_RECHECK`: exact-source/clean evidence is missing or ambiguous, or decoded evidence is insufficient for a safe decision.
+- A previous C3 pass is invalidated when candidate bytes, source/clean provenance, user/JPG/in-game evidence, or this quality policy materially changes.
+- C3 does not imply runtime/in-game validation. Keep runtime state unchanged unless the game was actually tested.
+- Record candidate/source hashes, comparison evidence, the eight ordered findings, and final C3 result in role_C evidence/WORKLOG so unchanged assets are rotated rather than repeatedly rechecked.
