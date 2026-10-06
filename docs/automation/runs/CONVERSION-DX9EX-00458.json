@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00458",
+  "production_id": "CONVERSION-DX9EX-00458",
+  "event_id": "CONVERSION-DX9EX-00458-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "VALIDATING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "eff1a91a5416bd5b7c828395b879316dbee88d92",
+  "material_result_sha": "PENDING_SELF",
+  "validation_bearing_result_sha": "PENDING_SELF",
+  "result_sha": "PENDING_SELF",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00458]",
+  "selected_work_item": "VR-DX9EX-SWAPCHAIN-GPU-WORK-PROVENANCE-0041",
+  "summary": "Track whether an R19 swapchain has actually submitted Draw work, skip the D3D11 completion fence only for never-submitted fresh/partially initialized swapchains, and preserve the existing bounded fail-closed drain for every rendered swapchain.",
+  "changed_paths": [
+    "vrhost/src/runtime/sbs_capture_override.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00458.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered bookkeeping HEAD eff1a91a5416bd5b7c828395b879316dbee88d92 after CONVERSION-DX9EX-00457 PASS. Structural extraction remains terminal."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R19 Destroy always created/polled a D3D11 completion query when handle != null, including fresh swapchains that failed during image/RTV initialization before any Draw. OpenXR 1.1.63 requires completion only for submitted graphics commands referring to the swapchain, so the never-submitted path can safely avoid the drain and its 250ms/device-loss failure surface."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added per-swapchain gpuWorkSubmitted, set it immediately after Draw in RenderTo, route Projection/Theater through the owner-aware RenderTo signature, bypass the drain only while false, and reset the flag only after destruction ownership resolves."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING"
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "red_review": {
+      "base_sha": "eff1a91a5416bd5b7c828395b879316dbee88d92",
+      "result": "FAIL_AS_EXPECTED",
+      "missing_contract": "Destroy unconditionally required a D3D11 event-query drain for every non-null swapchain handle, even when initialization failed before any Draw command ever referenced a swapchain RTV."
+    },
+    "standards": [
+      "OpenXR 1.1.63 xrDestroySwapchain requires all submitted graphics API commands referring to the swapchain to have completed before destroy; with no submitted commands there is no completion dependency to prove."
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Validate the exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize bookkeeping while preserving validation_bearing_result_sha.",
+  "started_at_kst": "2026-10-06T12:30:00+09:00"
+}

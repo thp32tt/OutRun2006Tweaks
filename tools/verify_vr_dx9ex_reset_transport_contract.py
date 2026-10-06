@@ -819,6 +819,36 @@ require_order(
 
 sbs_swapchain_destroy = body(host_sbs, "bool Destroy(bool parentSessionDestroying = false)")
 require(
+    host_sbs,
+    "R19 swapchain GPU-work provenance",
+    "bool gpuWorkSubmitted = false;",
+)
+require_order(
+    sbs_swapchain_destroy,
+    "R19 skip drain only for never-submitted swapchains",
+    "const bool gpuDrained =",
+    "!gpuWorkSubmitted || WaitForSwapchainGpuIdleBeforeDestroy();",
+    "if (!gpuDrained)",
+    "const XrResult result = ::xrDestroySwapchain(handle);",
+    "gpuWorkSubmitted = false;",
+)
+
+render_to = body(host_sbs, "inline bool RenderTo(Swapchain& swapchain")
+require_order(
+    render_to,
+    "R19 marks submitted GPU work after draw",
+    "OutRunVrFinalTest::Context->Draw(3, 0);",
+    "swapchain.gpuWorkSubmitted = true;",
+    "OutRunVrFinalTest::Context->OMSetRenderTargets(1, &nullRtv, nullptr);",
+)
+require(
+    host_sbs,
+    "R19 render paths pass swapchain provenance owner",
+    "RenderTo(Projection, Projection.rtvs",
+    "RenderTo(Theater, Theater.rtvs",
+)
+
+require(
     sbs_swapchain_destroy,
     "R19 fail-closed swapchain destruction",
     "if (!gpuDrained)",

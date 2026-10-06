@@ -242,13 +242,15 @@ float4 PSMain(VSOut input) : SV_Target
         std::vector<std::array<ID3D11RenderTargetView*, 2>> rtvs;
         bool acquired = false;
         bool waited = false;
+        bool gpuWorkSubmitted = false;
         std::uint32_t acquiredImage = 0;
 
         bool Destroy(bool parentSessionDestroying = false)
         {
             if (handle != XR_NULL_HANDLE)
             {
-                const bool gpuDrained = WaitForSwapchainGpuIdleBeforeDestroy();
+                const bool gpuDrained =
+                    !gpuWorkSubmitted || WaitForSwapchainGpuIdleBeforeDestroy();
                 if (!gpuDrained)
                 {
                     if (!FirstSwapchainGpuDrainFailureLogged)
@@ -292,6 +294,7 @@ float4 PSMain(VSOut input) : SV_Target
             format = DXGI_FORMAT_UNKNOWN;
             acquired = false;
             waited = false;
+            gpuWorkSubmitted = false;
             acquiredImage = 0;
             return true;
         }
@@ -695,8 +698,8 @@ float4 PSMain(VSOut input) : SV_Target
         return true;
     }
 
-    inline bool RenderTo(ID3D11RenderTargetView* rtv, std::uint32_t width,
-        std::uint32_t height, const UvRect& uv)
+    inline bool RenderTo(Swapchain& swapchain, ID3D11RenderTargetView* rtv,
+        std::uint32_t width, std::uint32_t height, const UvRect& uv)
     {
         if (!rtv || !SourceSrv || !ConstantBuffer || !CreateShaders() ||
             !OutRunVrFinalTest::Context)
@@ -729,6 +732,10 @@ float4 PSMain(VSOut input) : SV_Target
         OutRunVrFinalTest::Context->PSSetSamplers(0, 1, &Sampler);
         OutRunVrFinalTest::Context->PSSetConstantBuffers(0, 1, &ConstantBuffer);
         OutRunVrFinalTest::Context->Draw(3, 0);
+        // Once Draw references an RTV from this swapchain, destruction must
+        // prove GPU completion. Fresh/partially initialized swapchains that
+        // never reach Draw have no submitted graphics work to drain.
+        swapchain.gpuWorkSubmitted = true;
         ID3D11ShaderResourceView* nullSrv = nullptr;
         OutRunVrFinalTest::Context->PSSetShaderResources(0, 1, &nullSrv);
         ID3D11RenderTargetView* nullRtv = nullptr;
@@ -896,9 +903,9 @@ float4 PSMain(VSOut input) : SV_Target
             Release(Projection);
             return false;
         }
-        bool ok = RenderTo(Projection.rtvs[image][0], Projection.width,
+        bool ok = RenderTo(Projection, Projection.rtvs[image][0], Projection.width,
             Projection.height, eyeUv[0]);
-        ok = RenderTo(Projection.rtvs[image][1], Projection.width,
+        ok = RenderTo(Projection, Projection.rtvs[image][1], Projection.width,
             Projection.height, eyeUv[1]) && ok;
         const bool released = Release(Projection);
         if (!ok || !released)
@@ -1001,7 +1008,7 @@ float4 PSMain(VSOut input) : SV_Target
             Release(Theater);
             return false;
         }
-        const bool ok = RenderTo(Theater.rtvs[image][0], Theater.width,
+        const bool ok = RenderTo(Theater, Theater.rtvs[image][0], Theater.width,
             Theater.height, theaterUv);
         const bool released = Release(Theater);
         if (!ok || !released)
