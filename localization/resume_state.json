@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C: independently revalidate A136/A137/A138/A139 user-JPG visual rework (BF3EE5C6, 37759842, FD90AA9, A064FDFC, 48DEBE77). Do not close IGR-008/011/012/014/015/016/018 until a NEW actual in-game screenshot confirms the reported broken/slant/residue defects are gone.",
     "B206 index24 consumer mapping rejects direct UTF-8/native-field Hangul. The 16-byte field is consumed by fixed-byte paths including a 4-byte bounded copy/termination path, plus raw 17-byte writer and 23-byte propagation paths; Edit License also sends the field directly into a stock text object. Current K4 overlay only translates remembered Text/*.bin text IDs, so arbitrary player-name bytes are not covered. Next safe implementation prerequisite is an ASCII-compatible native alias plus mod-owned UTF-8 sidecar and explicit local name-render hooks; online/remote names stay alias until a separately proven transport exists. No DDS/runtime behavior changed.",
     "B205 index24 canonical-EXE static trace resolves A136's exact field/encoding blocker: player name is the 16-byte runtime field 0x7C23E0..0x7C23EF, name-entry is configured min=1/max=16 and stores at most 15 payload bytes + NUL, and selector-to-name append is a legacy one-byte code table rather than UTF-8/UTF-16. Do not redraw 66743AA8 yet. Next safe work is consumer classification plus a compatible Korean name storage/render/serialization policy before any runtime behavior change. No candidate; RUNTIME_VALIDATION=UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT.",
     "A136 index24 runtime mapping advanced A135 HOLD: Edit License uses SELECTION_PLAYERNAME=0 with EXE+0xDDC50 / selection-change EXE+0xDD990; player save data begins at VA 0x7C23E0 (module+0x3C23E0), and repo INI confirms name/model are recoverable from the first 0xB0 bytes of License.dat/LicenseXX.dat. Exact name-field offset/encoding, Hangul composition, committed-name renderer and replay/ranking/network serialization are still unproven. Do not relabel 66743AA8 or repeat A135; next proof is controlled LicenseXX.dat binary diff or live OR2006C2C.EXE trace. SumoNet_OnlineUserName EXE+0x430C20 is separate online identity evidence only. No candidate; RUNTIME_VALIDATION=UNTESTED.",
@@ -6381,5 +6382,34 @@
     "runtime_behavior_changed": false,
     "runtime_validation": "UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT",
     "next_safe_work": "map exact local name-render callsites/save lifecycle needed for sidecar alias implementation before behavior change"
+  },
+  "a136_a139_user_jpg_visual_rework": {
+    "date_kst": "2026-10-06 17:34",
+    "status": "STATIC_PASS_PENDING_C_AND_NEW_INGAME_RETEST",
+    "reopened": [
+      "IGR-008",
+      "IGR-011",
+      "IGR-012",
+      "IGR-014",
+      "IGR-015",
+      "IGR-016",
+      "IGR-018"
+    ],
+    "candidate_sha256": {
+      "37759842": "ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b",
+      "BF3EE5C6": "a7eb06e2441956f4418f4cc95da52313696bc13d7864f7c7f76c8efdf909f85d",
+      "FD90AA9": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+      "A064FDFC": "2d3d7fd7b612cee048067813f150d323be30483042010786168a90fa983386b6",
+      "48DEBE77": "f92629621d421e924a3f1b9d77252c551832824110e755325bcf0bf4a1af2ad0"
+    },
+    "evidence": [
+      "localization/graphics/role_A/20261006-A-USERREWORK136-BF3-SLANT/A136_USER_REWORK_BF3_ROW_CONTACT_SOURCE_OLD_NEW.jpg",
+      "localization/graphics/role_A/20261006-A-USERREWORK137-37759842-SLANT/A137_37759842_SOURCE_OLD_NEW_RIGHT_LEAN.jpg",
+      "localization/graphics/role_A/20261006-A-USERREWORK138-FD90-SLANT/A138_USER_REWORK_FD90_IGR018_HEADER_FAMILY_CONTACT.jpg",
+      "localization/graphics/role_A/20261006-A-USERREWORK139-IGR012-SLANT/A139_USER_REWORK_IGR012_48DEBE77_BADGE_CONTACTS.jpg",
+      "localization/graphics/role_A/20261006-A-USERREWORK139-IGR012-SLANT/A139_USER_REWORK_IGR012_A064_OUTRUN_MILES_CONTACTS.jpg"
+    ],
+    "controller_visual_qa": "PASS_READABLE_RIGHT_LEAN_AND_RESIDUE_REWORK",
+    "runtime_validation": "PENDING_NEW_INGAME_RETEST"
   }
 }
