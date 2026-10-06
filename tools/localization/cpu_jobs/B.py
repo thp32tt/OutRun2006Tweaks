@@ -88,6 +88,7 @@ specs=[("start","START","출발",start_comp),("goal","GOAL","골",goal_comp)]
 rows=[]
 source_masks=[]
 banner_masks=[]
+safe_banner_masks=[]
 safe_source_blocks=set()
 
 for key,en,ko,comp in specs:
@@ -115,8 +116,9 @@ for key,en,ko,comp in specs:
     poly=[(x0+int(pts_arr[i,0]),y0+int(pts_arr[i,1])) for i in hull.vertices]
     pm=Image.new("L",(W,H),0)
     ImageDraw.Draw(pm).polygon(poly,fill=255)
-    banner=np.asarray(pm)>0
-    banner=ndimage.binary_erosion(banner,iterations=1,border_value=0)
+    banner_full=np.asarray(pm)>0
+    banner_full &= alpha
+    banner=ndimage.binary_erosion(banner_full,iterations=1,border_value=0)
     # Keep only source-visible sign pixels; this strips any accidental hull excursion into transparency.
     banner &= alpha
 
@@ -164,10 +166,10 @@ for key,en,ko,comp in specs:
         blocks.add((xx//4,yy//4))
     for bx,by in blocks:
         block=np.zeros((H,W),bool); block[by*4:by*4+4,bx*4:bx*4+4]=True
-        if not np.all(banner[by*4:by*4+4,bx*4:bx*4+4]):
+        if not np.all(banner_full[by*4:by*4+4,bx*4:bx*4+4]):
             raise RuntimeError(("source effect touches unsafe partial sign block",key,[bx,by],sbx,bbanner))
     safe_source_blocks |= blocks
-    source_masks.append(effect); banner_masks.append(banner)
+    source_masks.append(effect); banner_masks.append(banner); safe_banner_masks.append(banner_full)
     rows.append({
       "key":key,"source":en,"korean":ko,"probe_roi":[x0,y0,x1,y1],
       "red_component_bbox":cb,"banner_bbox":bbanner,"source_bbox":sbx,
@@ -231,7 +233,7 @@ final=clean.copy()
 target=np.zeros((H,W),bool)
 safe_target_blocks=set()
 
-for row,sm,banner in zip(rows,source_masks,banner_masks):
+for row,sm,banner,safe_banner in zip(rows,source_masks,banner_masks,safe_banner_masks):
     x0,y0,x1,y1=row["source_bbox"]; sw=x1-x0; sh=y1-y0
     fill,shadow=source_colors(sm)
     chosen=None
@@ -258,7 +260,7 @@ for row,sm,banner in zip(rows,source_masks,banner_masks):
         if not(lb[0]>=x0+2 and lb[1]>=y0+2 and lb[2]<=x1-2 and lb[3]<=y1-2):
             continue
         blocks={(xx//4,yy//4) for yy,xx in zip(*np.nonzero(lm))}
-        if any(not np.all(banner[by*4:by*4+4,bx*4:bx*4+4]) for bx,by in blocks):
+        if any(not np.all(safe_banner[by*4:by*4+4,bx*4:bx*4+4]) for bx,by in blocks):
             continue
         chosen=(glyph,px,py,lm,lb,blocks,fs,off,fill,shadow)
         break
