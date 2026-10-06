@@ -1,0 +1,307 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PRODUCTION190-6C9B3611-START-GOAL",
+  "base_head": "673dcfa0587eaf2bdbec27dd0c7164056cb7adaf",
+  "queue_index": 172,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "classification": {
+    "from": "zoom_review",
+    "to": "localize_text",
+    "segments": [
+      {
+        "source": "START",
+        "korean": "출발"
+      },
+      {
+        "source": "GOAL",
+        "korean": "골"
+      }
+    ],
+    "physical_text_elements": 2,
+    "protected": [
+      "OutRun2SP logo",
+      "route map",
+      "stage thumbnails",
+      "road artwork",
+      "all non-label pixels"
+    ]
+  },
+  "source_provenance": {
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+    "sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8"
+  },
+  "structure": {
+    "width": 1024,
+    "height": 1024,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "construction": "B190 derives each sign interior from the convex hull of strongly saturated source-red pixels in the tight START/GOAL ROI, erodes one pixel from that hull, and unions only exact measured source-effect pixels. This supersedes B182-B189 masks that either left English-effect strips or over-cleaned the rim; route map, thumbnails and OutRun2SP artwork remain protected and fresh native Korean stays inside the exact source-effect bbox.",
+  "same_family_reference": "localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_CONTROLLER_SELF_QA.json",
+  "rows": [
+    {
+      "key": "start",
+      "source": "START",
+      "ko": "출발",
+      "roi": [
+        40,
+        300,
+        210,
+        405
+      ],
+      "source_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "banner_bbox": [
+        52,
+        371,
+        142,
+        398
+      ],
+      "source_text_pixels": 1215,
+      "banner_pixels": 2021,
+      "component_meta": [
+        [
+          518,
+          [
+            15,
+            73,
+            86,
+            96
+          ]
+        ],
+        [
+          117,
+          [
+            36,
+            80,
+            48,
+            96
+          ]
+        ],
+        [
+          464,
+          [
+            46,
+            80,
+            85,
+            96
+          ]
+        ],
+        [
+          116,
+          [
+            84,
+            80,
+            96,
+            96
+          ]
+        ]
+      ],
+      "clean_region_bbox": [
+        53,
+        347,
+        172,
+        404
+      ],
+      "clean_region_pixels": 4245,
+      "red_hull_vertices": [
+        [
+          152,
+          404
+        ],
+        [
+          52,
+          397
+        ],
+        [
+          55,
+          389
+        ],
+        [
+          60,
+          376
+        ],
+        [
+          62,
+          372
+        ],
+        [
+          63,
+          371
+        ],
+        [
+          172,
+          345
+        ],
+        [
+          172,
+          360
+        ],
+        [
+          154,
+          402
+        ]
+      ],
+      "korean": "출발",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 17,
+      "shear": 0.17,
+      "shadow_offset": 1,
+      "fill_rgba": [
+        244,
+        225,
+        180,
+        255
+      ],
+      "shadow_rgba": [
+        234,
+        131,
+        95,
+        255
+      ],
+      "localized_bbox": [
+        79,
+        375,
+        112,
+        394
+      ],
+      "source_width": 81,
+      "source_height": 23,
+      "localized_width": 33,
+      "localized_height": 19,
+      "delta_left": 24,
+      "delta_right": 24,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "goal",
+      "source": "GOAL",
+      "ko": "골",
+      "roi": [
+        575,
+        625,
+        695,
+        682
+      ],
+      "source_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "banner_bbox": [
+        591,
+        634,
+        681,
+        661
+      ],
+      "source_text_pixels": 1510,
+      "banner_pixels": 2181,
+      "component_meta": [
+        [
+          1510,
+          [
+            20,
+            10,
+            97,
+            34
+          ]
+        ]
+      ],
+      "clean_region_bbox": [
+        580,
+        634,
+        680,
+        660
+      ],
+      "clean_region_pixels": 2335,
+      "red_hull_vertices": [
+        [
+          578,
+          632
+        ],
+        [
+          680,
+          634
+        ],
+        [
+          680,
+          646
+        ],
+        [
+          670,
+          660
+        ],
+        [
+          591,
+          660
+        ]
+      ],
+      "korean": "골",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 19,
+      "shear": 0.17,
+      "shadow_offset": 1,
+      "fill_rgba": [
+        255,
+        233,
+        173,
+        255
+      ],
+      "shadow_rgba": [
+        247,
+        118,
+        84,
+        255
+      ],
+      "localized_bbox": [
+        624,
+        637,
+        643,
+        657
+      ],
+      "source_width": 77,
+      "source_height": 24,
+      "localized_width": 19,
+      "localized_height": 20,
+      "delta_left": 29,
+      "delta_right": 29,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "static_qa": {
+    "elements_total": 2,
+    "bbox_size_positive_margin": "2/2 PASS",
+    "clean_source_residue": 0,
+    "clean_reconstructed_background_pixels": 3855,
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside": 0,
+    "protected_visible_changed": 0,
+    "introduced_visible_outside": 0,
+    "final_source_residue": 0,
+    "localized_overlap": 0,
+    "dds_roundtrip": "PASS",
+    "status": "PASS"
+  },
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "candidate_sha256": "9c2c0aae8e450bd0a09ebeec8b4759e9a5befe4684f2d494389fd37954a40cc4",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "B190_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
