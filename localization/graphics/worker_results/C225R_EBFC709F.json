@@ -1,0 +1,10 @@
+{
+  "role": "C",
+  "run": "C225R",
+  "queue_index": 232,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
+  "machine_status": "PASS",
+  "report": "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC709F_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}

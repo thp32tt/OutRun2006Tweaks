@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261007-C225R-EBFC709F-B219",
+  "qa_id": "C225R",
+  "queue_index": 232,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "producer_run": "B219",
+  "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+  "candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds"
+  },
+  "independent_basis": "pinned canonical source independently decoded; source text alpha bboxes re-derived directly inside previously mapped semantic regions; candidate alpha bboxes re-derived directly; producer masks not consumed",
+  "machine_status": "PASS",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "key": "join_small",
+      "source": "JOIN GAME",
+      "korean": "게임 참가",
+      "original_bbox": [
+        14,
+        287,
+        418,
+        350
+      ],
+      "localized_bbox": [
+        16,
+        289,
+        256,
+        348
+      ],
+      "source_size": [
+        404,
+        63
+      ],
+      "localized_size": [
+        240,
+        59
+      ],
+      "delta_left": 2,
+      "delta_right": 162,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "clean_source_alpha_remaining": 0
+    },
+    {
+      "key": "create_small",
+      "source": "CREATE GAME",
+      "korean": "게임 만들기",
+      "original_bbox": [
+        898,
+        291,
+        1420,
+        354
+      ],
+      "localized_bbox": [
+        900,
+        293,
+        1192,
+        352
+      ],
+      "source_size": [
+        522,
+        63
+      ],
+      "localized_size": [
+        292,
+        59
+      ],
+      "delta_left": 2,
+      "delta_right": 228,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "clean_source_alpha_remaining": 0
+    },
+    {
+      "key": "create_large",
+      "source": "CREATE GAME",
+      "korean": "게임 만들기",
+      "original_bbox": [
+        24,
+        695,
+        1245,
+        840
+      ],
+      "localized_bbox": [
+        26,
+        697,
+        730,
+        838
+      ],
+      "source_size": [
+        1221,
+        145
+      ],
+      "localized_size": [
+        704,
+        141
+      ],
+      "delta_left": 2,
+      "delta_right": 515,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "clean_source_alpha_remaining": 0
+    },
+    {
+      "key": "join_large",
+      "source": "JOIN GAME",
+      "korean": "게임 참가",
+      "original_bbox": [
+        9,
+        874,
+        979,
+        1019
+      ],
+      "localized_bbox": [
+        11,
+        876,
+        590,
+        1017
+      ],
+      "source_size": [
+        970,
+        145
+      ],
+      "localized_size": [
+        579,
+        141
+      ],
+      "delta_left": 2,
+      "delta_right": 389,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "clean_source_alpha_remaining": 0
+    }
+  ],
+  "summary": {
+    "bbox_size_positive_margin": "4/4 PASS",
+    "candidate_changed_outside_exact_source_bboxes": 0,
+    "candidate_alpha_changed_outside_exact_source_bboxes": 0,
+    "clean_source_alpha_remaining": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "raw_readable_parity": "PASS"
+  },
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC_SOURCE_CLEAN_FINAL_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC_ROW_CONTACT.jpg",
+    "localization/graphics/role_C/20261007-C225R-EBFC709F-B219/C225R_EBFC_SOURCE_FINAL_RAW.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
