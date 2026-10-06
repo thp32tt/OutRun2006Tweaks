@@ -2069,3 +2069,9 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - B217 FEF70E85 5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245: producer 14/14 containment/positive-margin and zero-pixel gates remain PASS; native-HD/readability and RAW mirror-Y are clean.
 - Fresh independent C visual QA FAIL_SOURCE_STYLE_PROPORTION_WEIGHT: source stage typography is strongly condensed/narrow, but B217 Korean is broad/blocky Noto Sans CJK KR Black with up to ~1.18x width expansion. Numeric containment cannot override current source-font/style fidelity policy.
 - Decision C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT; q236 returned to B for material typography rework and must receive a newer C PASS before PRE_INGAME/in-game testing. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-07 02:44 KST — A147R q236 source typography producer PASS
+- q236 FEF70E85: C222-rejected B217 `5c92d09a7b4d...` -> controller-rejected first A147 `8a587e0c4d90...` -> **A147R `e0a01c50df1a...`**.
+- Final treatment is native 88px Noto Sans CJK KR Bold with a shared 0.90x condensed transform, preserving validated clean plate, right anchors, source-dark colour and canonical phonetic stage names.
+- 14/14 bbox/size/positive-margin and 14/14 native-height/condensed checks PASS; outside/alpha/protected/residue/overlap/touch=0; REVERSED exact; BGRA/header/raw mirror_y and controller readable/RAW visual QA PASS.
+- Fresh independent C + regenerated English-original comparison/user review + actual in-game validation remain required. `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
