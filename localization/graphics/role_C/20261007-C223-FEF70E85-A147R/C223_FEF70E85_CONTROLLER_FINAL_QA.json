@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261007-C223-FEF70E85-A147R",
+  "qa_id": "C223",
+  "timestamp_kst": "2026-10-07T02:57:10+09:00",
+  "queue_index": 236,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "producer_run": "A147R",
+  "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+  "candidate_changed_by_C": false,
+  "machine_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_MACHINE_QA.json",
+  "machine_summary": {
+    "status": "PASS",
+    "bbox_size_positive_margin": "14/14 PASS",
+    "clean_changed_outside_source_mask": 0,
+    "clean_source_alpha_remaining": 0,
+    "candidate_changed_outside_source_bboxes": 0,
+    "candidate_alpha_changed_outside_source_bboxes": 0,
+    "protected_REVERSED_changed_pixels": 0,
+    "stage_name_policy": "PASS_CANONICAL_PHONETIC_TRANSLITERATION",
+    "raw_readable_parity": "PASS"
+  },
+  "controller_visual_qa": "PASS_C222_SOURCE_TYPOGRAPHY_REWORK",
+  "visual_observations": [
+    "C222's broad/blocky B217 typography defect is materially corrected: A147R uses Noto Sans CJK KR Bold with a shared 0.90x horizontal source-family condensation instead of Black plus width expansion.",
+    "Canonical SOURCE/CLEAN/FINAL and all 14 row contacts show source-like tall condensed hierarchy with native 83px Korean row height, right anchors, positive margins and immediate readability; shorter Korean line widths follow the canonical phonetic spellings rather than undersizing.",
+    "The C153-validated clean plate remains visually uniform with no English/source residue, haze, patch boundary, damaged artwork or alpha discontinuity.",
+    "No broken Hangul, clipping, overlap, protected-art intrusion, foreign-image intrusion or mixed-resolution glyphs are visible at high zoom.",
+    "Readable FLIP-Y and RAW mirror_y evidence are mutually consistent and preserve the atlas orientation."
+  ],
+  "ordered_visual_gate": {
+    "1_slant_perspective_direction": "PASS_UPRIGHT_SOURCE_AND_CANDIDATE",
+    "2_clean_plate_source_removal": "PASS_C153_VALIDATED_CLEAN_PLATE_AND_C223_VISUAL_REVIEW",
+    "3_original_font_style_fidelity": "PASS_C222_DEFECT_MATERIALLY_CORRECTED_CONDENSED_BOLD_BALANCE",
+    "4_scale_and_readability": "PASS_NATIVE_83PX_HEIGHT_IMMEDIATE_READABILITY_WITHIN_SOURCE_BBOX",
+    "5_glyph_integrity": "PASS_NATIVE_HD_NO_BROKEN_OR_CLIPPED_HANGUL",
+    "6_protected_art_separation": "PASS_ZERO_OUTSIDE_AND_REVERSED_EXACT",
+    "7_source_faithful_placement": "PASS_RIGHT_ANCHORED_POSITIVE_MARGIN_14_OF_14",
+    "8_flip_y_and_raw_consistency": "PASS"
+  },
+  "decision": "C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+  "pre_ingame_comparison_refresh": "PENDING_C223_EXPORT",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false,
+  "evidence": [
+    "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF_SOURCE_CLEAN_FINAL_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF_ROW_CONTACT.jpg",
+    "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF_SOURCE_FINAL_RAW.jpg"
+  ]
+}

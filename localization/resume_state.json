@@ -4115,7 +4115,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261006-C221-BATCH/C221_BATCH_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_CONTROLLER_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4217,8 +4217,7 @@
     "E3FD08BE",
     "12519155",
     "1762489B",
-    "1F5FE6E9",
-    "FEF70E85"
+    "1F5FE6E9"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -7224,9 +7223,28 @@
     "controller_visual_qa": "PASS_SOURCE_A147_A147R_READABLE_ROW_CONTACT_AND_RAW",
     "controller_qa": "localization/graphics/role_A/20261007-A-PRODUCTION147R-Q236-SOURCE-TYPOGRAPHY/A147R_CONTROLLER_FINAL_QA.json",
     "worker_report": "localization/graphics/role_A/20261007-A-PRODUCTION147R-Q236-SOURCE-TYPOGRAPHY/A147R_FEF70E85_REPORT.json",
-    "status": "A147R_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
-    "fresh_independent_c": "PENDING",
-    "pre_ingame_comparison_refresh": "PENDING_C",
+    "status": "C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "C223_PASS",
+    "pre_ingame_comparison_refresh": "PENDING_C223_EXPORT",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": [],
+    "c_pass_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_CONTROLLER_FINAL_QA.json"
+  },
+  "c223_controller_final_qa": {
+    "timestamp_kst": "2026-10-07T02:57:10+09:00",
+    "run": "20261007-C223-FEF70E85-A147R",
+    "queue_index": 236,
+    "asset": "FEF70E85",
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "producer_run": "A147R",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "14/14 PASS",
+    "controller_visual_qa": "PASS_C222_SOURCE_TYPOGRAPHY_REWORK",
+    "decision": "C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+    "machine_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_comparison_refresh": "PENDING_C223_EXPORT",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }

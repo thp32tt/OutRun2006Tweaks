@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Fresh independent C should validate materially changed pending producer candidates including B217 q236 FEF70E85, refresh PRE_INGAME_JPG_REVIEW for changed candidates, and return any visual failure to the owning producer lane. Do not repeat B217 bytes. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "Continue fresh independent C on remaining producer candidates. q236 FEF70E85 passed C223 and now requires PRE_INGAME English-original comparison refresh/user review plus actual in-game validation; do not repeat unchanged A147R bytes. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -414,45 +414,17 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C221",
-      "report": "localization/graphics/role_C/20261006-C221-BATCH/C221_BATCH_FINAL_QA.json",
-      "result": "C221_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME_RETEST",
+      "run": "C223",
+      "report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_CONTROLLER_FINAL_QA.json",
+      "result": "C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
       "candidate_changed_by_C": false,
       "assets_checked": 1,
-      "physical_elements_checked": 16,
+      "physical_elements_checked": 14,
       "pixel_visual_pass_assets": [
-        "37759842"
+        "FEF70E85"
       ],
       "rework_required_assets": [],
-      "global_rework_remaining": [
-        "B1696633",
-        "788CE557"
-      ],
-      "active_user_ingame_graphics_rework_queue_indices": [
-        48,
-        95,
-        106
-      ],
-      "active_user_ingame_fail_rows_closed": 0,
-      "static_pass_pending_new_ingame_retest": [
-        "37759842"
-      ],
-      "pending_c_localize_text": 0,
-      "pending_production_localize_text": 4,
-      "machine_evidence": {
-        "37759842": "localization/graphics/role_C/20261006-C221-37759842-A83/C221_37759842_MACHINE_QA.json"
-      },
-      "controller_visual": {
-        "37759842": "PASS_SOURCE_LEFT_ALIGNMENT_SLANT_LINE_CADENCE"
-      },
-      "not_consumed": {
-        "BF3EE5C6": "A82 worker candidate 3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37 remains worker static PASS pending producer controller/shared-state finalization; C did not pre-approve.",
-        "788CE557": "B162 worker candidate 86fb9246aac7e4a0d0e1a84b113d194439cc96bc236213d5a7faeab1ea451119 remains producer controller/shared-state incomplete; C did not pre-approve."
-      },
-      "superseded_unpersisted": {
-        "C220": "Hosted small-corrective compute produced ephemeral f5aa13d257d3d6bfdc79a03395a6a380183942fcd65fdf256916c07b9a47e92d with zero machine gates, but its worker commit correctly failed rebase on concurrent A83 candidate bytes and was never pushed/persisted. C221 validates the current A83 bytes instead."
-      },
-      "in_game_validation": "37759842 PENDING_NEW_INGAME_RETEST; IGR-014/015/016 not CLOSED."
+      "in_game_validation": "UNTESTED; PRE_INGAME user JPG review and actual-game validation pending."
     },
     "latest_b_first_qa": {
       "run": "B_INGAME168",
@@ -2681,6 +2653,23 @@
       "decision": "C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
       "report": "localization/graphics/role_C/20261007-C222-FEF70E85/C222_FEF70E85_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
+    },
+    "c223_fef70e85": {
+      "timestamp_kst": "2026-10-07T02:57:10+09:00",
+      "queue_index": 236,
+      "asset": "FEF70E85",
+      "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+      "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+      "producer_run": "A147R",
+      "machine_status": "PASS",
+      "bbox_size_positive_margin": "14/14 PASS",
+      "zero_pixel_gates": "clean outside/source alpha=0; candidate outside/alpha-outside=0; protected REVERSED exact",
+      "controller_visual_qa": "PASS_C222_SOURCE_TYPOGRAPHY_REWORK",
+      "decision": "C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+      "machine_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_MACHINE_QA.json",
+      "controller_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_CONTROLLER_FINAL_QA.json",
+      "pre_ingame_comparison_refresh": "PENDING_C223_EXPORT",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
@@ -3200,5 +3189,22 @@
     "fresh_independent_c": "PENDING",
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "c223_fef70e85": {
+    "timestamp_kst": "2026-10-07T02:57:10+09:00",
+    "queue_index": 236,
+    "asset": "FEF70E85",
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "producer_run": "A147R",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "14/14 PASS",
+    "zero_pixel_gates": "clean outside/source alpha=0; candidate outside/alpha-outside=0; protected REVERSED exact",
+    "controller_visual_qa": "PASS_C222_SOURCE_TYPOGRAPHY_REWORK",
+    "decision": "C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+    "machine_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_comparison_refresh": "PENDING_C223_EXPORT",
+    "runtime_validation": "UNTESTED"
   }
 }

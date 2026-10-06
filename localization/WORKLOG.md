@@ -2520,3 +2520,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller inspected SOURCE / A147 / A147R readable full sheet, all 14 row contacts, and RAW mirror-Y evidence: A147R restores source-family weight while retaining condensed proportions, readable hierarchy, intact Hangul, and no clipping/residue/protected-art intrusion. Ordered generation gate 1-8 producer PASS.
 - State: `A147R_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME`. Fresh independent C and regenerated English-original comparison/user review are required before actual-game validation. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261007-A-PRODUCTION147R-Q236-SOURCE-TYPOGRAPHY/A147R_CONTROLLER_FINAL_QA.json` and `localization/graphics/role_A/20261007-A-PRODUCTION147R-Q236-SOURCE-TYPOGRAPHY/A147R_FEF70E85_REPORT.json`.
+
+## 2026-10-07 02:57 KST — C223 q236 FEF70E85 fresh independent QA
+
+- Selected the materially reworked A147R q236 bytes returned from C222 rather than repeating B217/C222. Candidate e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8; canonical source a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518.
+- GitHub-hosted C worker run 37507185018 independently re-derived the 14 source bboxes and current clean-to-final localized diffs. Machine QA PASS: 14/14 bbox/source-size/positive-margin; clean outside/source-alpha=0; candidate outside/alpha-outside=0; protected REVERSED exact; canonical stage naming and RAW mirror_y parity PASS.
+- Controller SOURCE/CLEAN/FINAL, 14-row high-zoom and RAW review PASS. C222 broad/blocky Black+width-expansion mismatch is materially corrected by native-HD Bold 88px + shared 0.90x condensation while retaining 83px row height, right anchoring and readability. Clean plate remains residue/seam free; no broken Hangul, clipping, overlap or protected intrusion.
+- Decision C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME comparison set must now be refreshed before user review; actual game validation remains UNTESTED. VR/FFB/DX11/DXVK untouched.

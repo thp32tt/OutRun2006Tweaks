@@ -2075,3 +2075,8 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - Final treatment is native 88px Noto Sans CJK KR Bold with a shared 0.90x condensed transform, preserving validated clean plate, right anchors, source-dark colour and canonical phonetic stage names.
 - 14/14 bbox/size/positive-margin and 14/14 native-height/condensed checks PASS; outside/alpha/protected/residue/overlap/touch=0; REVERSED exact; BGRA/header/raw mirror_y and controller readable/RAW visual QA PASS.
 - Fresh independent C + regenerated English-original comparison/user review + actual in-game validation remain required. `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 02:57 KST — C223 q236 FEF70E85
+- A147R e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8: independent hosted C machine QA 14/14 bbox/size/positive-margin PASS; clean/outside/alpha/protected gates 0; RAW mirror_y and canonical stage naming PASS.
+- Controller visual PASS: C222 source-typography mismatch is materially corrected by native-HD Bold 88px + 0.90x condensed family; native height/right anchors/readability preserved with no residue, breakage, clipping or intrusion.
+- Decision C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export refresh + user review + actual game validation pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
