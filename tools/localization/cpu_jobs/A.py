@@ -6,7 +6,7 @@ from PIL import Image,ImageChops,ImageDraw,ImageOps,ImageFilter
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
-repo=Path.cwd(); run="20261006-A-PRODUCTION107-590A4724"
+repo=Path.cwd(); run="20261006-A-PRODUCTION108-590A4724"
 out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds"; candidate=repo/"localization/graphics/hd_candidates"/asset; candidate.parent.mkdir(parents=True,exist_ok=True)
@@ -51,23 +51,20 @@ ys,xs=np.where(source_mask); source_bbox=(int(xs.min()),int(ys.min()),int(xs.max
 if not (source_bbox[0]>=8 and source_bbox[1]>=6 and source_bbox[2]<=404 and source_bbox[3]<=82):
  raise RuntimeError(("target source mask escaped expected text region",source_bbox))
 
-# Fit target's own pale plate as a smooth 2D quadratic over bright, unmasked interior pixels.
+# Reconstruct target's own plate locally: interpolate each glyph run from immediate same-row background.
+# This preserves the target pale gradient/bevel instead of importing a differently-colored template plate.
 Y,X=np.mgrid[0:88,0:424]
 rgb=tc[:,:,:3]; alpha=tc[:,:,3]
-brightness=rgb.mean(axis=2)
-fitmask=(~source_mask)&(alpha>200)&(X>=12)&(X<=401)&(Y>=9)&(Y<=78)&(brightness>185)
-# polynomial 1,x,y,x^2,xy,y^2
-A=np.stack([np.ones_like(X),X,Y,X*X,X*Y,Y*Y],axis=2).astype(np.float64)
-Af=A[fitmask]
-if Af.shape[0]<5000: raise RuntimeError(("too few plate fit pixels",Af.shape[0]))
-coef=[]
-for c in range(3):
- coef.append(np.linalg.lstsq(Af,rgb[:,:,c][fitmask].astype(np.float64),rcond=None)[0])
-pred=np.zeros_like(rgb,dtype=np.float64)
-for c in range(3): pred[:,:,c]=(A@coef[c])
-pred=np.clip(pred,0,255)
 clean_cell=tc.copy()
-for c in range(3): clean_cell[:,:,c][source_mask]=np.round(pred[:,:,c][source_mask])
+for yy in range(88):
+    mr=source_mask[yy]
+    if not np.any(mr): continue
+    # same-row valid pixels; source mask is confined to text and never reaches cell edges
+    good=(~mr)&(alpha[yy]>0)
+    gx=np.where(good)[0]; mx=np.where(mr)[0]
+    if gx.size<20: raise RuntimeError(("row interpolation support",yy,gx.size))
+    for c in range(3):
+        clean_cell[yy,mx,c]=np.round(np.interp(mx,gx,tc[yy,gx,c]))
 # alpha preserved exactly
 clean=src.copy(); clean.paste(Image.fromarray(clean_cell.astype(np.uint8),"RGBA"),(target_cell[0],target_cell[1]))
 
@@ -82,6 +79,21 @@ thr=np.quantile(fl[rm],0.10); core=rm&(fl<=thr); fg_sel=np.median(sf[core,:3],ax
 den=sc[:,:,:3]-fg_sel.reshape(1,1,3); num=sc[:,:,:3]-sf[:,:,:3]; valid=np.abs(den)>15
 rat=np.full_like(num,np.nan); rat[valid]=num[valid]/den[valid]
 cov=np.nanmedian(rat,axis=2); cov=np.nan_to_num(cov,nan=0,posinf=0,neginf=0); cov=np.clip(cov,0,1); cov[~rm]=0
+# Apply source-faithful right slant to the accepted Korean coverage before recoloring.
+# Source Normal Balance is a visibly italic selector label; 0.20 shear matches this family.
+base=cov.copy()
+ys0,xs0=np.where(base>0)
+crop=base[ys0.min():ys0.max()+1,xs0.min():xs0.max()+1]
+hh,ww=crop.shape; shear=0.20; sh=int(round(shear*(hh-1)))
+sheared=np.zeros((hh,ww+sh),dtype=np.float32)
+for yy in range(hh):
+    dx=int(round(shear*(hh-1-yy)))
+    sheared[yy,dx:dx+ww]=np.maximum(sheared[yy,dx:dx+ww],crop[yy])
+cov=np.zeros_like(base)
+# Center within the exact source-effect bbox [11,8,401,80], preserve prior vertical baseline.
+px=11+(390-sheared.shape[1])//2; py=26
+cov[py:py+hh,px:px+sheared.shape[1]]=sheared
+
 # Target unselected source core tone from exact Normal Balance mask.
 tl=0.2126*tc[:,:,0]+0.7152*tc[:,:,1]+0.0722*tc[:,:,2]
 vals=tl[source_mask]; tthr=np.quantile(vals,0.20); tcore=source_mask&(tl<=tthr)
@@ -107,30 +119,30 @@ if clean_out or final_out or alpha_out: raise RuntimeError(("outside",clean_out,
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM); payload=tb[:128]+raw_final.tobytes("raw",mode); candidate.write_bytes(payload); csha=sha(payload)
 dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode).transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox(): raise RuntimeError("roundtrip")
-srcp=out/"A107_SOURCE_READABLE.png"; clnp=out/"A107_CLEAN_PLATE.png"; finp=out/"A107_FINAL_READABLE.png"; src.save(srcp); clean.save(clnp); dec.save(finp)
-sg=Image.new("L",(W,H),0); sg.paste(Image.fromarray((source_mask.astype(np.uint8)*255),"L"),(target_cell[0],target_cell[1])); sg.save(out/"A107_SOURCE_TEXT_MASK.png"); lm.save(out/"A107_RENDER_MASK.png")
-allowedp=out/"A107_ALLOWED_BBOX_MASK.png"; protectedp=out/"A107_PROTECTED_MASK.png"; allowed.save(allowedp); protected.save(protectedp)
+srcp=out/"A108_SOURCE_READABLE.png"; clnp=out/"A108_CLEAN_PLATE.png"; finp=out/"A108_FINAL_READABLE.png"; src.save(srcp); clean.save(clnp); dec.save(finp)
+sg=Image.new("L",(W,H),0); sg.paste(Image.fromarray((source_mask.astype(np.uint8)*255),"L"),(target_cell[0],target_cell[1])); sg.save(out/"A108_SOURCE_TEXT_MASK.png"); lm.save(out/"A108_RENDER_MASK.png")
+allowedp=out/"A108_ALLOWED_BBOX_MASK.png"; protectedp=out/"A108_PROTECTED_MASK.png"; allowed.save(allowedp); protected.save(protectedp)
 val=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(val),str(srcp),str(clnp),str(allowedp),"--protected-mask",str(protectedp),"--report",str(out/"A107_CLEAN_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(val),str(srcp),str(finp),str(allowedp),"--protected-mask",str(protectedp),"--report",str(out/"A107_FINAL_VALIDATION.json")],check=True)
-cr=json.loads((out/"A107_CLEAN_VALIDATION.json").read_text()); fr=json.loads((out/"A107_FINAL_VALIDATION.json").read_text())
+subprocess.run(["python3",str(val),str(srcp),str(clnp),str(allowedp),"--protected-mask",str(protectedp),"--report",str(out/"A108_CLEAN_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(val),str(srcp),str(finp),str(allowedp),"--protected-mask",str(protectedp),"--report",str(out/"A108_FINAL_VALIDATION.json")],check=True)
+cr=json.loads((out/"A108_CLEAN_VALIDATION.json").read_text()); fr=json.loads((out/"A108_FINAL_VALIDATION.json").read_text())
 if cr["status"]!="PASS" or fr["status"]!="PASS": raise RuntimeError(("validator",cr["status"],fr["status"]))
 
 box=(1380,1935,1844,2048); ims=[comp(z.crop(box)).resize((928,226),Image.Resampling.NEAREST) for z in (src,clean,dec)]
 sheet=Image.new("RGB",(2800,260),"white"); ImageDraw.Draw(sheet).text((5,5),"SOURCE | CLEAN | FINAL",fill="black"); x=0
 for z in ims: sheet.paste(z,(x,34)); x+=936
-save_b64(sheet,out/"A107_590A_CONTACTS.jpg",out/"A107_590A_CONTACTS_B64.txt",97)
+save_b64(sheet,out/"A108_590A_CONTACTS.jpg",out/"A108_590A_CONTACTS_B64.txt",97)
 raw_dec=Image.frombytes("RGBA",(W,H),payload[128:],"raw",mode); rr=Image.new("RGB",(1000,1040),"white")
 for i,(lab,z0) in enumerate((("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",raw_dec))):
  z=comp(z0); z.thumbnail((1000,480),Image.Resampling.LANCZOS); rr.paste(z,(0,i*515+25)); ImageDraw.Draw(rr).text((5,i*515+5),lab,fill="black")
-save_b64(rr,out/"A107_590A_RAW_COMPARE.jpg",out/"A107_590A_RAW_COMPARE_B64.txt",92)
+save_b64(rr,out/"A108_590A_RAW_COMPARE.jpg",out/"A108_590A_RAW_COMPARE_B64.txt",92)
 report={"schema_version":1,"role":"A","run":run,"queue_index":103,"asset":asset,"source_sha256":TARGET_SHA,"candidate_sha256":csha,
  "structure":{"dimensions":[W,H],"format":"RGBA32","mipmaps":mips,"header_128_exact":payload[:128]==tb[:128],"raw_orientation":"mirror_y"},
  "classification":{"prior_action":"zoom_review","source":"Normal Balance","korean":"일반 밸런스","occurrences":1},
- "construction":{"source_mask":"C111-approved same-phrase Normal Balance selected-state geometry + target AA fringe","clean":"target-own pale plate quadratic reconstruction inside source mask only","korean_geometry":"C111-approved 일반 밸런스 geometry","text_tone":"target unselected source core tone","template_approval":"C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME","target_fg_rgb":[float(x) for x in fg_target],"plate_fit_pixels":int(fitmask.sum())},
+ "construction":{"source_mask":"C111-approved same-phrase Normal Balance selected-state geometry + target AA fringe","clean":"target-own pale plate quadratic reconstruction inside source mask only","korean_geometry":"C111-approved 일반 밸런스 geometry","text_tone":"target unselected source core tone","template_approval":"C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME","target_fg_rgb":[float(x) for x in fg_target],"clean_method":"same-row local interpolation under exact source glyph mask","source_slant_shear":0.20},
  "row":{"original_bbox":orig,"localized_bbox":loc,"delta_left":margins[0],"delta_right":margins[1],"delta_top":margins[2],"delta_bottom":margins[3],"source_width":orig[2]-orig[0],"source_height":orig[3]-orig[1],"localized_width":198,"localized_height":40,"containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS"},
  "zero_pixel_gates":{"clean_outside":clean_out,"final_outside":final_out,"alpha_outside":alpha_out,"localized_overlap":0},
- "clean_plate_validator":cr,"final_mask_validator":fr,"candidate_path":str(candidate.relative_to(repo)),"worker_static_qa":"PASS","controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","status":"A107_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C","runtime_validation":"UNTESTED"}
-(out/"A107_590A4724_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-(wr/"A107_590A4724.json").write_text(json.dumps({"run":run,"index":103,"asset":"590A4724","candidate_sha256":csha,"bbox_size_positive_margin":"1/1 PASS","outside":final_out,"alpha_outside":alpha_out,"status":report["status"],"report":f"localization/graphics/role_A/{run}/A107_590A4724_REPORT.json"},ensure_ascii=False,indent=2)+"\n")
-print(json.dumps({"run":run,"candidate_sha256":csha,"source_mask_core_bbox":source_bbox,"orig":orig,"loc":loc,"margins":margins,"fg_target":fg_target.tolist(),"fit_pixels":int(fitmask.sum())},ensure_ascii=False),flush=True)
+ "clean_plate_validator":cr,"final_mask_validator":fr,"candidate_path":str(candidate.relative_to(repo)),"worker_static_qa":"PASS","controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","status":"A108_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C","runtime_validation":"UNTESTED"}
+(out/"A108_590A4724_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(wr/"A108_590A4724.json").write_text(json.dumps({"run":run,"index":103,"asset":"590A4724","candidate_sha256":csha,"bbox_size_positive_margin":"1/1 PASS","outside":final_out,"alpha_outside":alpha_out,"status":report["status"],"report":f"localization/graphics/role_A/{run}/A108_590A4724_REPORT.json"},ensure_ascii=False,indent=2)+"\n")
+print(json.dumps({"run":run,"candidate_sha256":csha,"source_mask_core_bbox":source_bbox,"orig":orig,"loc":loc,"margins":margins,"fg_target":fg_target.tolist(),"clean_method":"row_interpolation","source_slant_shear":0.20},ensure_ascii=False),flush=True)
