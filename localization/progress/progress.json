@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 01:49 KST",
+  "updated_at_kst": "2026-10-07 02:44 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -2908,7 +2908,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "A144/A145/A146 and B210/B211/B212/B214/B215/B216 remain pending fresh independent C. B217 q236 FEF70E85 was independently rejected by C222 for source-style condensed proportion/weight mismatch and returned to B REWORK_REQUIRED. RUNTIME_VALIDATION=UNTESTED.",
+  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -3185,5 +3185,20 @@
     "decision": "C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
     "report": "localization/graphics/role_C/20261007-C222-FEF70E85/C222_FEF70E85_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
+  },
+  "a147r_fef70e85": {
+    "run": "A147R",
+    "timestamp_kst": "2026-10-07 02:44 KST",
+    "queue_index": 236,
+    "asset": "FEF70E85",
+    "trigger": "C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
+    "first_attempt": "A147 Medium/0.82 rejected by controller as too light/narrow",
+    "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "final_style": "Noto Sans CJK KR Bold 88px + 0.90x condensed native-HD",
+    "qa": "14/14 bbox/size/positive-margin; 14/14 condensed vs B217 with height preserved; outside/alpha/protected/residue/overlap/touch=0; REVERSED exact; BGRA/raw mirror_y/controller visual PASS",
+    "producer_status": "A147R_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }
