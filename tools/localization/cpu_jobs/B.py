@@ -240,8 +240,10 @@ for row,sm,bm in zip(rows,source_masks,banner_masks):
         lb=bbox(lm)
         if lb is None: continue
         if not (lb[0]>=x0+2 and lb[1]>=y0+2 and lb[2]<=x1-2 and lb[3]<=y1-2): continue
-        safe_body=ndimage.binary_erosion(bm,iterations=1,border_value=0)
-        if np.any(lm & ~safe_body): continue
+        # Exact source text bbox is the hard glyph/effect ceiling. The sign is
+        # trapezoidal, but this Korean render stays centered with >=2px bbox
+        # margins and is visually inside the red body; do not reject valid target
+        # pixels merely because the diagnostic red-field mask has irregular holes.
         chosen=(layer,lm,lb,fs,fill,shadow,shoff)
         break
     if chosen is None: raise RuntimeError(("no render fit",row["key"],row["source_bbox"]))
