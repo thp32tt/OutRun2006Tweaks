@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-07T02:19:51+09:00",
+  "updatedKst": "2026-10-07T02:47:22+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -116,7 +116,7 @@
     "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051",
     "VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052"
   ],
-  "next": "Structure-refactor chain remains COMPLETE. The two runtime-identified HUD/marker root-cause units are now build-verified: 00485 restores cross-thread exact semantic lifetime and 00486 restores the HMD-proven Calc3D2D ProjectedMarkerInfo rank/rival anchor with exact per-eye reprojection. Next priority is one Quest3/VDXR CORRECTNESS runtime session on the 00486 package before further HUD/marker source changes. Verify exact ScreenHud/WorldBillboard/ProjectedWorldMarker2D observations, vehicle-relative rank/rival anchoring, 4th/5th binocular coherence, preserved world stereo and frame stability. Keep cadence/fence tuning separate until that visual baseline is re-established.",
+  "next": "Structure-refactor chain remains COMPLETE. 00485 semantic lifetime and 00486 projected rank/rival anchor are build-verified; 00487 adds decisive telemetry without changing rendering. Highest priority is now one Quest3/VDXR CORRECTNESS session on exact 00487 package with VRTelemetry enabled. Inspect projected[semantic,missingPayload,buildAttempts,buildOk,buildFail] and registry[published,registered,consumed,staleCleared] together with HUD trace and visible marker anchoring before any further HUD/marker source change.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -278,9 +278,10 @@
     "CONVERSION-DX9EX-00483 / VR-REFACTOR-POST1100-TERMINAL-HARDENING-GUARD-0066: terminal census found no further equivalence-safe runtime owner flattening after R31/R32 retirement and R33 final-dispatch consolidation. Reconciled generic OpenXR hardening markers with current R21/R23 owner-query APIs, R31 StateBlock consumer ownership, hook-free R32 helpers, R33 final R30/R22/R13 hooks, current SBS parent-session teardown, and R23 host SafeEyesOwnFrame/EnsureSafeFrame ownership. Initial 567e9adb exposed stale R23 IsFailed(R22InstallState); repair 0448ec6f exposed stale host SafeTransportGeneration; final dceb12ce3b8925aa31bc5c5e92aa1df202e57b11 passed DX9Ex Active 37476535871, OpenXR VR architecture 37476536036, Domain Isolation 37476535870 and Build 37476536131. Package artifact 11419747152 digest sha256:3f30f749a787a3a2d12ec8a7a295f1f686ad4a4d2c42f727c2d392814a1bc398. Runtime source behavior unchanged; RUNTIME_VALIDATION=UNTESTED. Post-R34/R33 structure-refactor chain is now COMPLETE.",
     "CONVERSION-DX9EX-00484 / DX9EX-PERF-CADENCE-PROCESS-HANDLE-CACHE-0067: after the structure-refactor chain was explicitly closed, selected a bounded general frame-pacing maintenance unit. WaitForNextCadenceRequest previously opened and closed a SYNCHRONIZE process handle for host.hostPid on every cadence-gated rendered frame. The game now caches one process handle while the host PID is stable, releases/reacquires it on PID change or host exit/unusable handle, drops it for invalid host state, and releases it on game Reset. Cadence token identity, xrWaitFrame authority, timeout budget, simulation cadence and producer-fence policy are unchanged. verify_vr_hud_cadence_restore.py prevents per-frame OpenProcess/CloseHandle regression. Exact validation-bearing SHA ff94725406535793ff7615e69480f55dd4c0ca78 passed DX9Ex Active 37479990940 policy/host/game/full-chain/package. Package artifact 11420524136 digest sha256:fe293358e9d541b1c697bd7b42c8448f85d39102bab80e250b95ef9fcea14e11. RUNTIME_VALIDATION=UNTESTED.",
     "CONVERSION-DX9EX-00485 / DX9EX-CORRECTNESS-CROSS-THREAD-SEMANTIC-REGISTRY-0068: runtime regression evidence from ff947254/session 20261006T151027454Z-8f9b3197 showed 3858 semantic rows all UNKNOWN, worldBillboard=0 and producer draws=0. Compared with HMD-proven 902a89ea and restored only the shared synchronized SpriteNode semantic registry on current R31/R32/R33 architecture, retaining ProducerToken diagnostics and ScreenOverlay2D generic fallback. RED SHA 52e3202c... failed the new guard as expected; exact validation-bearing SHA 3edab9f54806b2ef4141546b3537cfa75c280af6 passed DX9Ex Active 37498273170 policy/host/game/full-chain/package and HUD Inspector 37498273068. Artifact 11428802385 digest sha256:a74ab32fe6faff05bd76889f487d0835fd4e859c65e3fa2bb0582f6548e5020f. ProjectedMarkerInfo/Calc3D2D anchor payload intentionally remains for the next bounded correctness unit. RUNTIME_VALIDATION=UNTESTED.",
-    "CONVERSION-DX9EX-00486 / DX9EX-CORRECTNESS-PROJECTED-MARKER-ANCHOR-0069: after 00485 restored cross-thread semantic lifetime, restored the second runtime-identified root cause from the HMD-proven 902a89ea lineage. Exact Calc3D2D returns 0xBAEE7(rank) and 0xBB6F5(rival) recover game-view anchors; current shared semantic tags carry ProjectedMarkerInfo beside ProducerToken; Sumo replay preserves the payload; exact rank/rival producers use ProjectedWorldMarker2D when valid with WorldBillboard fail-soft fallback; R30 reprojects the recovered point through the matching latched head inverse, relative eye pose and OpenXR eye FOV. Generic ScreenOverlay2D, cadence/fence authority, DirectGPU transport and R31/R32/R33 ownership unchanged. RED f52b46cb... failed the new guard as expected. Final validation-bearing SHA 371d201666f1a92dbf840c386f52dbf3d6887187 passed DX9Ex Active 37501890269 policy/host/game/full-chain/package. Artifact 11430925881 digest sha256:602cf4b8e27ec735dc6a047a1a002d3ac1f3ba8de4cf6ff5c0dc8271ea30304c. RUNTIME_VALIDATION=UNTESTED; next action is one Quest3/VDXR CORRECTNESS retest."
+    "CONVERSION-DX9EX-00486 / DX9EX-CORRECTNESS-PROJECTED-MARKER-ANCHOR-0069: after 00485 restored cross-thread semantic lifetime, restored the second runtime-identified root cause from the HMD-proven 902a89ea lineage. Exact Calc3D2D returns 0xBAEE7(rank) and 0xBB6F5(rival) recover game-view anchors; current shared semantic tags carry ProjectedMarkerInfo beside ProducerToken; Sumo replay preserves the payload; exact rank/rival producers use ProjectedWorldMarker2D when valid with WorldBillboard fail-soft fallback; R30 reprojects the recovered point through the matching latched head inverse, relative eye pose and OpenXR eye FOV. Generic ScreenOverlay2D, cadence/fence authority, DirectGPU transport and R31/R32/R33 ownership unchanged. RED f52b46cb... failed the new guard as expected. Final validation-bearing SHA 371d201666f1a92dbf840c386f52dbf3d6887187 passed DX9Ex Active 37501890269 policy/host/game/full-chain/package. Artifact 11430925881 digest sha256:602cf4b8e27ec735dc6a047a1a002d3ac1f3ba8de4cf6ff5c0dc8271ea30304c. RUNTIME_VALIDATION=UNTESTED; next action is one Quest3/VDXR CORRECTNESS retest.",
+    "CONVERSION-DX9EX-00487 / DX9EX-DIAG-PROJECTED-MARKER-TELEMETRY-0070: 00486 was already fully completed when 00487 dispatched, so no projected-anchor code was repeated. Added telemetry-only R57 projected semantic/payload/build counters plus shared semantic-registry publication/consumption/stale cleanup values to the existing 5s VRTelemetry line. RED 4b1b7584/37504824223 failed as expected on missing telemetry. First implementation ba1b7fc0/37505015232 was rejected by the existing producer-provenance guard because exact ProducerToken family strings appeared in R30; final telemetry was intentionally made producer-agnostic. Exact validation-bearing SHA 19c922516f77e738b24adf8d9ae99610ebf0e54c passed DX9Ex Active 37505190533 policy/host/game/full-chain/package. Package artifact 11431648019 digest sha256:17127dfea8ef3656fd64ed8c5ce69842d6273e35fe9a7417d52267cd57f01114. Rendering/classification/projection/cadence/fence/owner behavior is unchanged. RUNTIME_VALIDATION=UNTESTED."
   ],
-  "batchStatus": "DX9EX-CORRECTNESS-PROJECTED-MARKER-ANCHOR-0069-BUILD_VERIFIED",
+  "batchStatus": "DX9EX-DIAG-PROJECTED-MARKER-TELEMETRY-0070-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
   "validationRunId": 37409670128,
   "validationResult": "PASS",
@@ -1136,7 +1137,8 @@
     "VR-REFACTOR-POST1100-TERMINAL-HARDENING-GUARD-0066",
     "DX9EX-PERF-CADENCE-PROCESS-HANDLE-CACHE-0067",
     "DX9EX-CORRECTNESS-CROSS-THREAD-SEMANTIC-REGISTRY-0068",
-    "DX9EX-CORRECTNESS-PROJECTED-MARKER-ANCHOR-0069"
+    "DX9EX-CORRECTNESS-PROJECTED-MARKER-ANCHOR-0069",
+    "DX9EX-DIAG-PROJECTED-MARKER-TELEMETRY-0070"
   ],
   "post1000Maintenance00470": {
     "taskId": "CONVERSION-DX9EX-00470",
@@ -1779,5 +1781,53 @@
     },
     "issue14CommentId": 6021623282,
     "issue13CommentId": 6021624141
+  },
+  "diagnostics00487": {
+    "taskId": "CONVERSION-DX9EX-00487",
+    "productionId": "CONVERSION-DX9EX-00487",
+    "eventId": "CONVERSION-DX9EX-00487-E001",
+    "eventType": "dispatch",
+    "attempt": "1/3",
+    "item": "DX9EX-DIAG-PROJECTED-MARKER-TELEMETRY-0070",
+    "category": "GENERAL_CORRECTNESS_RUNTIME_OBSERVABILITY",
+    "baseSha": "62c3adabe3e18e6cd6f152c9bc651b6f38aa1c78",
+    "redGuardSha": "4b1b75849838eb4279b535d5706e0f84130c8c0b",
+    "firstImplementationSha": "ba1b7fc0b32a7f9657c178d4d2db4871a3113c05",
+    "materialResultSha": "19c922516f77e738b24adf8d9ae99610ebf0e54c",
+    "validationBearingResultSha": "19c922516f77e738b24adf8d9ae99610ebf0e54c",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "runtimeBehaviorChanged": false,
+    "telemetryBehaviorChanged": true,
+    "status": "COMPLETE_BUILD_VERIFIED",
+    "summary": "Expose projected semantic/payload/per-eye-build and shared semantic-registry counters so the next HMD session can localize any remaining 00485/00486 failure without another renderer change.",
+    "validation": {
+      "red": {
+        "sha": "4b1b75849838eb4279b535d5706e0f84130c8c0b",
+        "dx9exActiveRunId": 37504824223,
+        "policyJobId": 112410672963,
+        "result": "EXPECTED_FAILURE"
+      },
+      "repair": {
+        "sha": "ba1b7fc0b32a7f9657c178d4d2db4871a3113c05",
+        "dx9exActiveRunId": 37505015232,
+        "policyJobId": 112411337324,
+        "result": "EXPECTED_CONTRACT_CONFLICT_PRODUCER_TOKEN_IN_R30"
+      },
+      "green": {
+        "dx9exActiveRunId": 37505190533,
+        "jobs": {
+          "policy": 112412028465,
+          "host": 112412188342,
+          "game": 112412188305,
+          "fullChainCompile": 112412188169,
+          "package": 112414683947
+        },
+        "packageArtifactId": 11431648019,
+        "packageArtifactDigest": "sha256:17127dfea8ef3656fd64ed8c5ce69842d6273e35fe9a7417d52267cd57f01114"
+      }
+    },
+    "issue14CommentId": 6022070361,
+    "issue13CommentId": 6022077298
   }
 }
