@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PROBE100-ZOOM293133",
+  "timestamp_kst": "2026-10-06T09:03:00+09:00",
+  "decision": "BATCH_NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+  "source_commit": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "assets": {
+    "F043316B": {
+      "queue_index": 29,
+      "path": "textures/load/spr_sprani_CLAR_RANK_Exst/F043316B_1024x512.dds",
+      "source_sha256": "5eec2b8dd7796c6dfaa19ceb58cef699c1d62a475eb827a270fcd1ee45b74b96",
+      "structure": "1024x512 RGBA32 mip1 raw mirror_y",
+      "localizable_segments": 0,
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "three Clarissa character pose sprites only",
+        "no language-bearing text"
+      ],
+      "candidate_required": false
+    },
+    "A82266FC": {
+      "queue_index": 31,
+      "path": "textures/load/spr_sprani_FLAG_RANK_Exst/A82266FC_1024x512.dds",
+      "source_sha256": "47de72b0fbd4f36e290a29233ff84ce0324711544debabbab6ba103d09ef1487",
+      "structure": "4096x2048 RGBA32 mip1 raw mirror_y",
+      "localizable_segments": 0,
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "three Flagman character pose sprites",
+        "rank-grade A artwork and sparkle",
+        "small clothing/hat logo artwork is protected brand/logo-style artwork, not localization text"
+      ],
+      "candidate_required": false
+    },
+    "FBCAB18D": {
+      "queue_index": 33,
+      "path": "textures/load/spr_sprani_FLAG_RANK_Exst/FBCAB18D_1024x512.dds",
+      "source_sha256": "37768ef1f3af648a668bdb35c0ca3e6ee706b53cf726a98bac0f28108a1ab8b7",
+      "structure": "1024x512 RGBA32 mip1 raw mirror_y",
+      "localizable_segments": 0,
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "three Flagman character pose sprites",
+        "small clothing/hat logo artwork only; protected as artwork/brand marking",
+        "no language-bearing localization text"
+      ],
+      "candidate_required": false
+    }
+  },
+  "controller_visual_qa": {
+    "readable_orientation": "PASS_3_OF_3",
+    "raw_mirror_y_orientation": "PASS_3_OF_3",
+    "no_unintended_translation": true,
+    "preserve_original_entire_dds": true
+  },
+  "evidence": [
+    "A100_F043316B_READABLE_PROOF.jpg",
+    "A100_F043316B_RAW.png",
+    "A100_A82266FC_READABLE_PROOF.jpg",
+    "A100_A82266FC_RAW.png",
+    "A100_FBCAB18D_READABLE_PROOF.jpg",
+    "A100_FBCAB18D_RAW.png"
+  ],
+  "status": "A100_ZOOM_REVIEW_BATCH_COMPLETE_PRESERVE_ORIGINAL",
+  "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION",
+  "vr_ffb_dx11_dxvk_touched": false
+}
