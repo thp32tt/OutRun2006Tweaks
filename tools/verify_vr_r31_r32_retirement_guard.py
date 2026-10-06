@@ -239,7 +239,6 @@ expected_owner_calls = {
     "R31TelemetryNoteUnstable",
     "R32EffectIsFragileLive",
     "R32GetSavedViewport",
-    "R32InstallStatus",
     "R32LowerFailClosed",
     "R32ObserveFrameWorkload",
     "R32RestoreRightPassState",
@@ -308,10 +307,6 @@ owner_evidence = {
         ("StateBlockTracker::Reliable()",
          "R31GetSavedViewport(device, viewport)",
          "OutRunVR::D3D9::ReadViewport(device, viewport)"),
-    ),
-    "R32InstallStatus": (
-        r32, "R32InstallStatus() noexcept",
-        ("R32InstallState.load(std::memory_order_acquire)",),
     ),
     "R32LowerFailClosed": (
         r32, "HRESULT R32LowerFailClosed(",
@@ -432,12 +427,6 @@ require(
     "device->SetViewport(&savedViewport)",
     "R32SetWvpBatch(device, originalConstants)",
 )
-require(
-    function_body(r32, "R32InstallStatus() noexcept"),
-    "R32 install-state owner",
-    "R32InstallState.load(std::memory_order_acquire)",
-)
-
 # 1) R31 is retained only as the neutral StateBlock event-consumer/state-cache
 # owner. R22 owns the physical StateBlock lifecycle hooks; when that optional
 # coverage is unavailable, reliability stays fail-closed instead of installing
@@ -575,41 +564,21 @@ require(
     "HRESULT R32WithResetLifecycle(",
     "bool R32ResolveDirectTransport(",
     "HRESULT R32LowerFailClosed(",
-    "R32InstallStatus() noexcept",
     "R32EffectIsFragileLive(",
     "R32SetWvpBatch(",
     "R32GetSavedViewport(",
     "R32RestoreRightPassState(",
 )
-r32_install = function_body(r32, "DWORD WINAPI R32InstallThread(void*)")
-require(
-    r32_install,
-    "R32 install",
-    "const auto r31 = R31InstallStatus();",
-    "const auto r22 = R22InstallStatus();",
-    "const auto r13 = R13InstallStatus();",
-    "r31 == State::Failed || r22 == State::Failed",
-    "r31 == State::Ready && r22 == State::Ready",
-    "R32InstallState.store(State::Ready",
-    "HookManager::ReportAsyncResult(\"OpenXRVRStereoR32Review\", true)",
-)
-forbid(
-    r32_install,
-    "R32 install",
-    "DrawPrimitiveDestR31",
-    "DrawIndexedPrimitiveDestR31",
-    "DrawPrimitiveUPDestR31",
-    "DrawIndexedPrimitiveUPDestR31",
-    "PresentDestR13",
-    "PresentDestR32",
-    "R32PresentR13Hook",
-    "ResetDestR22",
-    "ResetDestR32",
-    "R32ResetR22Hook",
-    "ResolveDirectTransportR13",
-    "R32ResolveDirectR13Hook",
-    "safetyhook::create_inline(",
-)
+for retired in (
+    "R32InstallState",
+    "R32InstallThread",
+    "VRStereoR32ReviewHook",
+    "R32InstallStatus()",
+    "OpenXRVRStereoR32Review",
+):
+    if retired in r32:
+        fail(f"R32 retained retired async install/status shim: {retired}")
+
 reset_lifecycle = function_body(r32, "HRESULT R32WithResetLifecycle(")
 require(
     reset_lifecycle,
@@ -699,6 +668,27 @@ require(
     "ResolveDirectTransportDestR33",
     "R32ResolveDirectTransport(",
     "R33ResolveDirectR13Hook.call<bool>",
+)
+
+r33_install = function_body(r33, "DWORD WINAPI R33InstallThread(void*)")
+require(
+    r33_install,
+    "R33 direct prerequisite ownership",
+    "const auto r31 = R31InstallStatus();",
+    "const auto r22 = R22InstallStatus();",
+    "const auto r13 = R13InstallStatus();",
+    "r31 == State::Failed || r22 == State::Failed",
+    "r13 == R13InstallStatusValue::Failed",
+    "r31 == State::Ready && r22 == State::Ready",
+    "r13 == R13InstallStatusValue::Ready",
+    "R33ReportInstallResult(false);",
+    "R33ReportInstallResult(true);",
+)
+forbid(
+    r33_install,
+    "R33 direct prerequisite ownership",
+    "R32InstallStatus()",
+    "R32InstallState",
 )
 
 direct33 = function_body(r33, "bool ResolveDirectTransportDestR33(")
