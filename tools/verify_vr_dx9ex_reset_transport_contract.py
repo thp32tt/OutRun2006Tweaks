@@ -1008,7 +1008,7 @@ require_order(
     "return false;",
 )
 
-sbs_release = body(host_sbs, "inline bool Release(Swapchain& swapchain)")
+sbs_release = body(host_sbs, "inline bool Release(Swapchain& swapchain, bool contentComplete)")
 require(
     sbs_release,
     "R19 hard release failure marks swapchain faulted",
@@ -1017,9 +1017,19 @@ require(
     "swapchain.releaseFaulted = true;",
     "return false;",
 )
-release_fail_start = sbs_release.find("swapchain.releaseFaulted = true;")
+require_order(
+    sbs_release,
+    "R19 release commit proof requires complete content",
+    "swapchain.acquired = false;",
+    "swapchain.waited = false;",
+    "swapchain.acquiredImage = 0;",
+    "swapchain.committedGeneration =",
+    "contentComplete ? swapchain.generation : 0;",
+    "return true;",
+)
+release_fail_start = sbs_release.find("swapchain.committedGeneration = 0;", sbs_release.find("if (XR_SUCCEEDED(result))"))
 if release_fail_start < 0:
-    fail("R19 hard release fault marker missing")
+    fail("R19 hard release must invalidate committed generation")
 release_fail_path = sbs_release[release_fail_start:]
 forbid(
     release_fail_path,
@@ -1031,9 +1041,47 @@ forbid(
 )
 require_order(
     release_fail_path,
-    "R19 hard release fault before frame yield",
+    "R19 hard release invalidates cache proof before fault",
+    "swapchain.committedGeneration = 0;",
     "swapchain.releaseFaulted = true;",
     "return false;",
+)
+
+projection_override = body(host_sbs, "inline bool RenderProjectionOverride(")
+theater_override = body(host_sbs, "inline bool RenderTheaterOverride(")
+require(
+    projection_override,
+    "R19 projection release commit ownership",
+    "Release(Projection, false);",
+    "const bool released = Release(Projection, ok);",
+)
+require(
+    theater_override,
+    "R19 theater release commit ownership",
+    "Release(Theater, false);",
+    "const bool released = Release(Theater, ok);",
+)
+
+r24_direct_projection = body(host_r24, "inline bool RenderDirectSafeProjection(")
+r24_direct_flat = body(host_r24, "inline bool RenderDirectFlatFallback(")
+r24_emergency = body(host_r24, "inline bool BuildEmergencyVisibleQuad(")
+require(
+    r24_direct_projection,
+    "R24 projection content-complete release ownership",
+    "Release(Projection, false);",
+    "const bool released = Release(Projection, ok);",
+)
+require(
+    r24_direct_flat,
+    "R24 theater content-complete release ownership",
+    "Release(Theater, false);",
+    "const bool released = Release(Theater, ok);",
+)
+require(
+    r24_emergency,
+    "R24 emergency clear release ownership",
+    "Release(Theater, false);",
+    "Release(Theater, true)",
 )
 
 sbs_swapchain_destroy = body(host_sbs, "bool Destroy(bool parentSessionDestroying = false)")

@@ -855,7 +855,7 @@ float4 PSMain(VSOut input) : SV_Target
         return true;
     }
 
-    inline bool Release(Swapchain& swapchain)
+    inline bool Release(Swapchain& swapchain, bool contentComplete)
     {
         if (!swapchain.acquired || !swapchain.waited)
             return false;
@@ -866,12 +866,18 @@ float4 PSMain(VSOut input) : SV_Target
             swapchain.acquired = false;
             swapchain.waited = false;
             swapchain.acquiredImage = 0;
-            // A released image is valid only for the exact swapchain creation
-            // that produced it. Recreated handles never inherit this evidence.
-            swapchain.committedGeneration = swapchain.generation;
+            // A generation is reusable as cached-visible evidence only when
+            // the image content completed before the successful release.
+            // Releasing an invalid/partially rendered image must revoke any
+            // earlier proof from the same swapchain generation.
+            swapchain.committedGeneration =
+                contentComplete ? swapchain.generation : 0;
             return true;
         }
 
+        // A hard release failure also invalidates cached-visible proof for this
+        // generation: the runtime did not accept the current image transition.
+        swapchain.committedGeneration = 0;
         // Do not render into/release the same waited image again after a hard
         // release failure. Preserve local ownership for transactional teardown,
         // then force the next EnsureSwapchain call through Destroy/recreate.
@@ -984,14 +990,14 @@ float4 PSMain(VSOut input) : SV_Target
             return false;
         if (image >= Projection.rtvs.size())
         {
-            Release(Projection);
+            Release(Projection, false);
             return false;
         }
         bool ok = RenderTo(Projection.rtvs[image][0], Projection.width,
             Projection.height, eyeUv[0], &Projection);
         ok = RenderTo(Projection.rtvs[image][1], Projection.width,
             Projection.height, eyeUv[1], &Projection) && ok;
-        const bool released = Release(Projection);
+        const bool released = Release(Projection, false);
         if (!ok || !released)
             return false;
 
@@ -1089,12 +1095,12 @@ float4 PSMain(VSOut input) : SV_Target
             return false;
         if (image >= Theater.rtvs.size())
         {
-            Release(Theater);
+            Release(Theater, false);
             return false;
         }
         const bool ok = RenderTo(Theater.rtvs[image][0], Theater.width,
             Theater.height, theaterUv, &Theater);
-        const bool released = Release(Theater);
+        const bool released = Release(Theater, false);
         if (!ok || !released)
             return false;
 

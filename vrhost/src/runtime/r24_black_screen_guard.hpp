@@ -256,7 +256,7 @@ namespace OutRunVrR24BlackScreenGuard
             return false;
         if (image >= Projection.rtvs.size())
         {
-            Release(Projection);
+            Release(Projection, false);
             return false;
         }
 
@@ -275,7 +275,7 @@ namespace OutRunVrR24BlackScreenGuard
         if (OutRunVrFinalTest::Context)
             OutRunVrFinalTest::Context->Flush();
 
-        const bool released = Release(Projection);
+        const bool released = Release(Projection, false);
         if (!ok || !released)
             return false;
 
@@ -383,7 +383,7 @@ namespace OutRunVrR24BlackScreenGuard
             return false;
         if (image >= Theater.rtvs.size())
         {
-            Release(Theater);
+            Release(Theater, false);
             return false;
         }
 
@@ -397,7 +397,7 @@ namespace OutRunVrR24BlackScreenGuard
         SourceFormat = savedFormat;
         if (OutRunVrFinalTest::Context)
             OutRunVrFinalTest::Context->Flush();
-        const bool released = Release(Theater);
+        const bool released = Release(Theater, false);
         if (!ok || !released)
             return false;
 
@@ -458,7 +458,7 @@ namespace OutRunVrR24BlackScreenGuard
             return false;
         if (image >= Theater.rtvs.size())
         {
-            Release(Theater);
+            Release(Theater, false);
             return false;
         }
 
@@ -466,7 +466,7 @@ namespace OutRunVrR24BlackScreenGuard
         OutRunVrFinalTest::Context->ClearRenderTargetView(
             Theater.rtvs[image][0], visibleError);
         OutRunVrFinalTest::Context->Flush();
-        if (!Release(Theater))
+        if (!Release(Theater, true))
             return false;
 
         TheaterCommittedGeneration = OutRunVrSbsCaptureOverride::Theater.generation;
