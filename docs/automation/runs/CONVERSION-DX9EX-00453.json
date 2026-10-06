@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00453",
+  "production_id": "CONVERSION-DX9EX-00453",
+  "event_id": "CONVERSION-DX9EX-00453-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "VALIDATING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "b78092313b8f0dcdc8d21f65988fdb8926e81baf",
+  "material_result_sha": "PENDING_SELF",
+  "validation_bearing_result_sha": "PENDING_SELF",
+  "result_sha": "PENDING_SELF",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00453]",
+  "selected_work_item": "VR-DX9EX-SWAPCHAIN-DESTROY-FLUSH-0036",
+  "summary": "Flush the D3D11 immediate context before destroying R19 OpenXR swapchains so teardown/recreation does not call xrDestroySwapchain while prior RTV commands remain only queued in the immediate context.",
+  "changed_paths": [
+    "vrhost/src/runtime/sbs_capture_override.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00453.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered branch HEAD b78092313b8f0dcdc8d21f65988fdb8926e81baf. CONVERSION-DX9EX-00452 validation-bearing SHA 57496478aaa2fa4cc35d562511a0508cfcc7eece has successful DX9Ex Active and Domain Isolation gates; structural extraction is terminal."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R19 Swapchain::Destroy released app-side RTV/image containers and called xrDestroySwapchain without first flushing the D3D11 immediate context. OpenXR 1.1 requires submitted graphics commands referring to the swapchain to be complete before destruction and notes CPU synchronization or queue flush may be required."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added an OutRunVrFinalTest::Context guarded Flush immediately before xrDestroySwapchain and extended the existing canonical DX9Ex reset/transport verifier with a flush-before-destroy ordering contract."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING"
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "red_review": {
+      "base_sha": "b78092313b8f0dcdc8d21f65988fdb8926e81baf",
+      "result": "FAIL_AS_EXPECTED",
+      "missing_contract": "Swapchain::Destroy had no D3D11 immediate-context flush before xrDestroySwapchain."
+    },
+    "standards": [
+      "Khronos OpenXR 1.1 xrDestroySwapchain: all submitted graphics API commands referring to the swapchain must have completed before destroy; a CPU wait or queue flush may be required.",
+      "Khronos OpenXR 1.1 xrReleaseSwapchainImage: release is valid only after a successful wait; this change does not alter acquire/wait/release call order."
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Validate this exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize bookkeeping while preserving validation_bearing_result_sha.",
+  "started_at_kst": "2026-10-06T11:36:54+09:00"
+}

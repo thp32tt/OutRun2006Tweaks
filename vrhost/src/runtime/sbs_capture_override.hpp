@@ -207,6 +207,12 @@ float4 PSMain(VSOut input) : SV_Target
             images.clear();
             if (handle != XR_NULL_HANDLE)
             {
+                // OpenXR requires submitted graphics commands that reference a
+                // swapchain to be completed before destruction. Flush the D3D11
+                // immediate context at this teardown/recreate boundary so queued
+                // RTV work is submitted before xrDestroySwapchain observes it.
+                if (OutRunVrFinalTest::Context)
+                    OutRunVrFinalTest::Context->Flush();
                 ::xrDestroySwapchain(handle);
                 handle = XR_NULL_HANDLE;
             }

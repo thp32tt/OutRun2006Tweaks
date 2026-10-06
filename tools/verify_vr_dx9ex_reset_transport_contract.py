@@ -779,6 +779,21 @@ require(
     "InvalidateStereoFrameCache();",
 )
 
+sbs_swapchain_destroy = body(host_sbs, "void Destroy()")
+require(
+    sbs_swapchain_destroy,
+    "R19 OpenXR swapchain destroy D3D11 submission fence",
+    "if (OutRunVrFinalTest::Context)",
+    "OutRunVrFinalTest::Context->Flush();",
+    "::xrDestroySwapchain(handle);",
+)
+require_order(
+    sbs_swapchain_destroy,
+    "R19 swapchain destroy flush-before-destroy ordering",
+    "OutRunVrFinalTest::Context->Flush();",
+    "::xrDestroySwapchain(handle);",
+)
+
 # R24's display-only soft grace intentionally reads the committed snapshot
 # without R23's normal fresh-read path, but it must retain the same current
 # producer-run ownership. Otherwise a prior-run bundle could be revived after
