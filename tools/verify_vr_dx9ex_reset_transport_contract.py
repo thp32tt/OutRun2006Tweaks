@@ -1247,9 +1247,17 @@ require_order(
 sbs_parent_prepare = body(host_sbs, "bool PrepareForParentSessionDestroy() noexcept")
 require_order(
     sbs_parent_prepare,
-    "R19 parent-session GPU completion proof",
+    "R19 parent-session no-work fast path",
     "if (handle == XR_NULL_HANDLE || !gpuWorkSubmitted)",
     "return true;",
+    "if (!WaitForSwapchainGpuIdleBeforeDestroy())",
+)
+parent_prepare_drain = sbs_parent_prepare[
+    sbs_parent_prepare.find("if (!WaitForSwapchainGpuIdleBeforeDestroy())"):
+]
+require_order(
+    parent_prepare_drain,
+    "R19 parent-session GPU completion proof",
     "if (!WaitForSwapchainGpuIdleBeforeDestroy())",
     "return false;",
     "gpuWorkSubmitted = false;",
