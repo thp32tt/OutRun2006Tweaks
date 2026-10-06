@@ -762,6 +762,39 @@ if "R33InstallStatus()" in r33:
 if "R33InstallState" in r33:
     errors.append("R33 retained write-only final install state after observer retirement")
 
+# Post-1100 Present-owner flattening: R32 keeps telemetry semantics but no
+# longer owns a physical Present hook. R33 hooks R13 Present directly and wraps
+# that lower call with the R32 telemetry owner helper.
+for banned in (
+    "SafetyHookInline R32PresentR13Hook{};",
+    "HRESULT __stdcall PresentDestR32(",
+    "reinterpret_cast<void*>(&PresentDestR13), PresentDestR32",
+):
+    if banned in r32:
+        errors.append(f"R32 retained retired physical Present ownership: {banned}")
+for marker in (
+    "HRESULT R32WithPresentTelemetry(",
+    "const HRESULT hr = lowerPresent();",
+    "R32FinalizeFramePerf(",
+    "R32LogPerfWindow()",
+):
+    if marker not in r32:
+        errors.append(f"R32 missing Present telemetry owner contract: {marker}")
+for marker in (
+    "SafetyHookInline R33PresentR13Hook{};",
+    "reinterpret_cast<void*>(&PresentDestR13)",
+    "R32WithPresentTelemetry(",
+    "R33PresentR13Hook.stdcall<HRESULT>",
+):
+    if marker not in r33:
+        errors.append(f"R33 missing direct Present owner contract: {marker}")
+for banned in (
+    "R33PresentR32Hook",
+    "reinterpret_cast<void*>(&PresentDestR32)",
+):
+    if banned in r33:
+        errors.append(f"R33 retained retired R32 Present chain: {banned}")
+
 # Post-1000 hook-chain flattening: all former R34 runtime responsibilities are
 # owned by R33. The source shim and historical R34 compatibility Hook/status
 # alias are both retired and must stay absent.
