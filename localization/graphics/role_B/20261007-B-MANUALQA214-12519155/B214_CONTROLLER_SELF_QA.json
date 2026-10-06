@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B214",
+  "timestamp_kst": "2026-10-07T00:33:26+09:00",
+  "queue_index": 128,
+  "asset_key": "12519155",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
+  "trigger": "manual PRE_INGAME English-original comparison after B shard completion; C132 visual false-negative reopened",
+  "prior_c_status_invalidated": "C132_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "prior_c_candidate_sha256": "14bc44a69775206c5771023408d0752ee925542fda48359c14c4e5b2f767119d",
+  "b213_intermediate_candidate": {
+    "sha256": "b5431967219fa2e0e1c124093584584727a1be84b30de6f20d5cf29850102c7e",
+    "decision": "CONTROLLER_REJECTED_NOT_PROMOTED",
+    "reasons": [
+      "false signed slant inferred from Latin shape edge regression",
+      "underweight/undersized source-family appearance"
+    ]
+  },
+  "worker_output_commit": "319828cfe4060500d99cbedc8225a607c7074045",
+  "candidate_sha256": "66f1b9ea8e0d65afef09667ccfd1565e30406f9d08abde75fd3302e2c03e1f16",
+  "defects_fixed": [
+    "SOURCE_LEFT_ALIGNMENT_MISMATCH",
+    "STAGE_FAMILY_SIZE_INCONSISTENCY",
+    "VISIBLE_UNDERSIZING",
+    "B213_FALSE_SLANT_AND_UNDERWEIGHT"
+  ],
+  "machine_qa": {
+    "bbox_and_source_size_ceiling": "7/7 PASS",
+    "positive_margin": "7/7 PASS",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_pixels_outside_exact_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "source_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "stage_naming_policy": "PASS",
+    "shared_stage_height_drift_px": 0,
+    "fresh_native_render": "PASS_NO_PRIOR_KOREAN_BITMAP_UPSCALE",
+    "header_128_exact_canonical": true,
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_note": "SOURCE/C132/B214 readable comparison and SOURCE/OLD/B214 RAW review PASS. B214 restores source-family left alignment, visually upright transform, consistent shared stage-row weight/height and stronger source-like hierarchy. Korean rows remain immediately readable without the C132 ragged centering or B213 false lean. No broken glyph, clipping, English residue, foreign-art intrusion, plate seam, overlap, or RAW orientation regression observed.",
+  "visual_evidence": [
+    "localization/graphics/role_B/20261007-B-MANUALQA214-12519155/B214_125_SOURCE_OLD_CLEAN_NEW_READABLE.jpg",
+    "localization/graphics/role_B/20261007-B-MANUALQA214-12519155/B214_125_SOURCE_OLD_NEW_RAW.jpg",
+    "localization/graphics/role_B/20261007-B-MANUALQA214-12519155/B214_125_ROW_CONTACT_2X.jpg"
+  ],
+  "ordered_generation_gate": {
+    "1_source_removal_plate_restoration": "PASS_INHERITED_C132_EXACT_CLEAN_PLATE",
+    "2_source_matching_readable_slant_direction": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "3_no_unnecessarily_undersized_korean": "PASS_B214_SHARED_46PX_STAGE_HEIGHT_AND_LEFT_HIERARCHY",
+    "4_source_faithful_weight_outline_shadow": "PASS_SHARED_BLACK_PLUS_2PX_SAME_COLOR_STAGE_FAMILY",
+    "5_no_clipped_pixels": "PASS",
+    "6_protected_art_clearance": "PASS",
+    "7_flip_y_and_raw": "PASS",
+    "8_immediate_readability_vs_english": "PASS"
+  },
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_C",
+  "runtime_validation": "UNTESTED",
+  "decision": "B214_PRODUCER_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

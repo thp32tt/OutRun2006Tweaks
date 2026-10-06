@@ -2465,3 +2465,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/OLD/B212 readable + RAW review: **PASS 3/3**. Right-lean fidelity is improved with orange/navy/white-glow family retained; no broken glyph, English residue, foreign-art intrusion or orientation inversion observed. q102 retains exact source-bbox edge touch and remains **HIGH_RISK** pending fresh C/high-zoom and actual-game validation.
 - Prior C91 pass is superseded for these changed bytes. Fresh independent C + regenerated English-original comparison JPG + user review + actual-game validation are mandatory. `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_CONTROLLER_SELF_QA.json`.
+
+
+## B214 q128 source-family alignment/scale rework — 2026-10-07 00:33 KST
+- B shard refresh found no active P0/P1, C-returned REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER item. Manual PRE_INGAME English-original comparison #036 therefore reopened q128 `12519155`: C132 had centered each Korean label independently and used visibly inconsistent/undersized stage-row typography against a left-aligned shared English stage family.
+- First material attempt B213 (`b5431967219f...`) was **controller-rejected before promotion** because signed edge regression introduced a false lean and the result remained underweight. The same invocation continued through B214 rather than handing a questionable candidate to C.
+- Final B214 (`66f1b9ea8e0d65afef09667ccfd1565e30406f9d08abde75fd3302e2c03e1f16`) freshly renders native Noto Sans CJK KR Black from the exact source/C132 clean plate: source-family left alignment, visually upright transform, one shared 44px nominal/46px decoded stage family across all six stage rows, source-intentional header family, and only modest horizontal condensation where exact source width requires it. No previous Korean bitmap was upscaled.
+- Machine QA: **7/7 bbox + source-size + positive-margin PASS**; outside/alpha/protected/source-residue/overlap/touch all 0; stage naming PASS; canonical RGBA32 header/raw mirror_y preserved.
+- Controller SOURCE/C132/B214 readable + RAW + per-row review: **PASS**. No broken glyphs, clipping, English residue, overlap, foreign-art intrusion, plate artifact or orientation regression observed.
+- Prior C132 pass is superseded for changed bytes. Fresh independent C + regenerated English-original comparison JPG + user review + actual-game validation remain mandatory. `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_B/20261007-B-MANUALQA214-12519155/B214_CONTROLLER_SELF_QA.json`.

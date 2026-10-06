@@ -1,5 +1,5 @@
 {
-  "schema_version": 120,
+  "schema_version": 121,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4214,7 +4214,8 @@
     "E1639D2E",
     "571E78F3",
     "62BEBF33",
-    "E3FD08BE"
+    "E3FD08BE",
+    "12519155"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6706,7 +6707,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-06 23:57 KST",
+  "updated_at_kst": "2026-10-07 00:33 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7063,6 +7064,27 @@
     ],
     "controller_qa": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_CONTROLLER_SELF_QA.json",
     "controller_visual_qa": "PASS_READABLE_AND_RAW_3_OF_3",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_C",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "b214_12519155_manual_visual_rework": {
+    "run": "B214",
+    "timestamp_kst": "2026-10-07 00:33 KST",
+    "role": "B",
+    "queue_index": 128,
+    "asset_key": "12519155",
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
+    "selection_reason": "B primary shard had no active P0/P1/C-returned REWORK/RENDER_READY item; manual C-pass JPG review found q128 source-family alignment/scale false-negative",
+    "prior_c_status": "C132_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_c_candidate_sha256": "14bc44a69775206c5771023408d0752ee925542fda48359c14c4e5b2f767119d",
+    "b213_intermediate_sha256": "b5431967219fa2e0e1c124093584584727a1be84b30de6f20d5cf29850102c7e",
+    "b213_status": "CONTROLLER_REJECTED_NOT_PROMOTED",
+    "candidate_sha256": "66f1b9ea8e0d65afef09667ccfd1565e30406f9d08abde75fd3302e2c03e1f16",
+    "worker_output_commit": "319828cfe4060500d99cbedc8225a607c7074045",
+    "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA214-12519155/B214_CONTROLLER_SELF_QA.json",
+    "status": "B_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
     "fresh_independent_c": "PENDING",
     "pre_ingame_comparison_refresh": "PENDING_C",
     "runtime_validation": "UNTESTED",

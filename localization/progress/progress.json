@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06 23:57 KST",
+  "updated_at_kst": "2026-10-07 00:33 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Fresh independent C should validate A144/A145/A146, B210/B211 and new B212 q102/q104/q116 bytes, refresh PRE_INGAME_JPG_REVIEW for all materially changed candidates, then return any visual failures to the owning producer lane. Do not repeat B212 bytes. q102 remains HIGH_RISK edge-touch pending C/high-zoom/in-game. Runtime validation remains UNTESTED.",
+  "next_checkpoint": "Fresh independent C should validate A144/A145/A146, B210/B211/B212 and new B214 q128 12519155 bytes, refresh PRE_INGAME_JPG_REVIEW for every materially changed candidate, then route any visual failure back to the owning producer lane. Do not repeat B214 bytes. Runtime validation remains UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -2602,6 +2602,23 @@
       "status": "B_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
       "controller_qa": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_CONTROLLER_SELF_QA.json",
       "runtime_validation": "UNTESTED"
+    },
+    "b214_12519155_manual_visual_rework": {
+      "run": "B214",
+      "timestamp_kst": "2026-10-07 00:33 KST",
+      "queue_index": 128,
+      "asset_key": "12519155",
+      "prior_c_status_invalidated": "C132_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "prior_c_candidate_sha256": "14bc44a69775206c5771023408d0752ee925542fda48359c14c4e5b2f767119d",
+      "b213_intermediate_sha256": "b5431967219fa2e0e1c124093584584727a1be84b30de6f20d5cf29850102c7e",
+      "b213_status": "CONTROLLER_REJECTED",
+      "candidate_sha256": "66f1b9ea8e0d65afef09667ccfd1565e30406f9d08abde75fd3302e2c03e1f16",
+      "worker_output_commit": "319828cfe4060500d99cbedc8225a607c7074045",
+      "machine_qa": "PASS: 7/7 bbox+size+positive margin; outside/alpha/protected/residue/overlap/touch=0; shared stage height drift=0; exact header/raw mirror_y",
+      "controller_visual_qa": "PASS: source-left alignment, upright transform, shared stage weight/height, readable hierarchy; SOURCE/C132/B214 + RAW reviewed",
+      "status": "B_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+      "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA214-12519155/B214_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
@@ -2816,35 +2833,20 @@
     ]
   },
   "latest_b_first_qa": {
-    "run": "B212",
-    "result": "SELECTOR_FAMILY_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_AND_INGAME",
-    "worker_output_commit": "aac7cb4f88931db60af5fed84473ac374e298b8d",
+    "run": "B214",
+    "result": "Q128_SOURCE_FAMILY_ALIGNMENT_SCALE_REWORK_SELF_QA_PASS_PENDING_FRESH_C_AND_INGAME",
+    "worker_output_commit": "319828cfe4060500d99cbedc8225a607c7074045",
     "assets": {
-      "571E78F3": {
-        "queue_index": 102,
-        "candidate_sha256": "442babea9c5dea9a944dff3d4a6a577f007dad2ae63a9699d380baf0ce7fc05d",
-        "status": "B212_STATIC_PASS_PENDING_FRESH_C_AND_INGAME",
-        "high_risk_edge_touch": true,
-        "report": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_571E78F3_REPORT.json"
-      },
-      "62BEBF33": {
-        "queue_index": 104,
-        "candidate_sha256": "c84a2703d0a22b36384e07ce72d4e761e651a1a23219cd78153b4a0aff022505",
-        "status": "B212_STATIC_PASS_PENDING_FRESH_C_AND_INGAME",
-        "high_risk_edge_touch": false,
-        "report": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_62BEBF33_REPORT.json"
-      },
-      "E3FD08BE": {
-        "queue_index": 116,
-        "candidate_sha256": "7e42aaa0f8aec535008bb816ec3660e075ce87c56a4ae44170c3340d1a32a6dc",
-        "status": "B212_STATIC_PASS_PENDING_FRESH_C_AND_INGAME",
-        "high_risk_edge_touch": false,
-        "report": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_E3FD08BE_REPORT.json"
+      "12519155": {
+        "queue_index": 128,
+        "candidate_sha256": "66f1b9ea8e0d65afef09667ccfd1565e30406f9d08abde75fd3302e2c03e1f16",
+        "status": "B214_STATIC_PASS_PENDING_FRESH_C_AND_INGAME",
+        "report": "localization/graphics/role_B/20261007-B-MANUALQA214-12519155/B214_12519155_REPORT.json"
       }
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "A144 user-JPG rework, A145 q089, A146 q241, B210 q050, B211 q198 and B212 q102/q104/q116 selector-family slant rework are pending fresh independent C. Prior C91/C104/C150/C165 passes for materially changed candidates are superseded; C must regenerate English-original comparisons before in-game testing. q102 remains HIGH_RISK edge-touch. RUNTIME_VALIDATION=UNTESTED.",
+  "current_pending_c": "A144 user-JPG rework, A145 q089 43B07A77, A146 q241 E1639D2E, B210 q050 CBF8ECBF, B211 q198 9FC88069, B212 q102 571E78F3 / q104 62BEBF33 / q116 E3FD08BE, and B214 q128 12519155 are pending fresh independent C. Prior C91/C104/C132/C150/C165 passes for materially changed candidates are superseded; C must regenerate English-original comparisons before in-game testing. RUNTIME_VALIDATION=UNTESTED.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",

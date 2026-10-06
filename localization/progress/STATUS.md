@@ -2038,3 +2038,10 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - q104 62BEBF33: `687ecaad... -> c84a2703...`; OutRun Mode family slant corrected; 4px vertical margins, static QA PASS, fresh C required.
 - q116 E3FD08BE: `3fbf7b03... -> 7e42aaa0...`; Heart Attack Mode family slant corrected; 3px vertical margins, static QA PASS, fresh C required.
 - All three retain canonical DXT5/header/raw mirror-Y and zero visible/alpha changes outside exact source bboxes. Current PRE_INGAME comparison cards are stale until C refreshes them. `RUNTIME_VALIDATION=UNTESTED`.
+
+
+### B214 q128 source-family alignment/scale rework — 2026-10-07 00:33 KST
+- q128 `12519155`: C132 `14bc44a69775...` -> B213 rejected `b5431967219f...` -> **B214 `66f1b9ea8e0d...`**.
+- Fixed per-row centering/ragged left edge, shared-family size inconsistency and visible undersizing; B214 uses fresh native Black Hangul with source-left alignment and uniform 46px decoded stage-row height.
+- 7/7 bbox/size/positive-margin, zero outside/alpha/protected/residue/overlap/touch, naming policy and RAW mirror_y PASS. Controller readable/RAW PASS.
+- Fresh C/comparison JPG/user review/in-game required; `RUNTIME_VALIDATION=UNTESTED`.
