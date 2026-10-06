@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T15:27:00+09:00",
+  "updatedKst": "2026-10-06T15:33:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -113,9 +113,10 @@
     "VR-DX9EX-RELEASE-COMMIT-PROVENANCE-0048",
     "VR-DX9EX-RELEASE-CALLSITE-COMPAT-0049",
     "VR-DX9EX-EMERGENCY-CLEAR-GPU-PROVENANCE-0050",
-    "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051"
+    "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051",
+    "VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052"
   ],
-  "next": "Structural extraction remains terminal and ARCH-V3-GATE-001 remains HMD-gated. CONVERSION-DX9EX-00469 closes the remaining R24 final-path swapchain GPU-work provenance gap by passing Projection/Theater owners into RenderTo. Validate the exact 00469 material SHA before any further independent unit.",
+  "next": "Structural extraction remains terminal and ARCH-V3-GATE-001 remains HMD-gated. CONVERSION-DX9EX-00469 validation-bearing SHA 133402e75327efd9159f0582577951c21578f97a passed canonical DX9Ex Active, Domain Isolation and coordination gates. Continue with another independent DX9Ex stability/resource-lifetime/frame-pacing unit; RUNTIME_VALIDATION remains UNTESTED.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -255,7 +256,8 @@
     "CONVERSION-DX9EX-00468 attempt 1 DX9Ex Active 37422577091 reached all architecture verifiers; only verify_vr_dx9ex_reset_transport_contract.py failed because an older order assertion contradicted the new drain-proof placement. Attempt 2 changes that verifier ordering only; runtime source semantics remain unchanged.",
     "CONVERSION-DX9EX-00468 attempt 2 exact SHA 6a87578417a89448de46946eb8b5406a3d42ed42: Domain Isolation 37422733650 PASS and Autodev Coordination 37422733664 PASS; DX9Ex Active 37422733687 failed only because the new transient-destroy verifier used function-global first-occurrence ordering and captured the earlier !gpuDrained return false. Final 3/3 repair scopes that assertion to the successful-drain branch.",
     "CONVERSION-DX9EX-00468 / VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051 final validation-bearing SHA fd9b2ac9c75a0ececdb7dcace46910643934f775 passed DX9Ex Active 37422950809 (policy/host/game/full-chain-compile/package), Domain Isolation 37422950914 and Autodev 37422950852. Package artifact 11394171983 digest sha256:bda59501675616b5a2036688c4d238cf2085ab6c61caa307e56697dbe7d88db8. Runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00469 / VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052: R24 RenderSafeProjectionChecked and RenderDirectFlatFallback rendered directly into OpenXR swapchain RTVs through RenderTo but omitted the swapchainOwner argument, so Draw did not set gpuWorkSubmitted and later live Destroy could skip WaitForSwapchainGpuIdleBeforeDestroy. Both R24 final render paths now pass their actual Projection/Theater owner; emergency clear was already covered by 00467. Runtime remains UNTESTED pending Quest3/VDXR."
+    "CONVERSION-DX9EX-00469 / VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052: R24 RenderSafeProjectionChecked and RenderDirectFlatFallback rendered directly into OpenXR swapchain RTVs through RenderTo but omitted the swapchainOwner argument, so Draw did not set gpuWorkSubmitted and later live Destroy could skip WaitForSwapchainGpuIdleBeforeDestroy. Both R24 final render paths now pass their actual Projection/Theater owner; emergency clear was already covered by 00467. Runtime remains UNTESTED pending Quest3/VDXR.",
+    "CONVERSION-DX9EX-00469 / VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052 exact SHA 133402e75327efd9159f0582577951c21578f97a passed DX9Ex Active 37423862114 (policy/host/game/full-chain-compile/package), Domain Isolation 37423862161 and Autodev 37423862147. Package artifact 11393854831 digest sha256:637bfcaff37f19c615763cda07e4dd43b24ee4cb960294a486fb732e90072dfa. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
@@ -1086,10 +1088,14 @@
     "attempt": "1/3",
     "item": "VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052",
     "baseSha": "9984491d78dc8dc11504c94fbb84e3cf10e965a2",
-    "materialResultSha": "PENDING_SELF",
-    "validationBearingResultSha": "PENDING_SELF",
-    "automationValidation": "PENDING",
+    "materialResultSha": "133402e75327efd9159f0582577951c21578f97a",
+    "validationBearingResultSha": "133402e75327efd9159f0582577951c21578f97a",
+    "automationValidation": "PASS",
     "runtimeValidation": "UNTESTED",
-    "summary": "Pass the actual R19 swapchain owner through R24 projection/direct-flat RenderTo calls so Draw records GPU work and live Destroy cannot skip the completion fence."
+    "summary": "Pass the actual R19 swapchain owner through R24 projection/direct-flat RenderTo calls so Draw records GPU work and live Destroy cannot skip the completion fence.",
+    "status": "COMPLETE",
+    "dx9exActiveRunId": 37423862114,
+    "domainIsolationRunId": 37423862161,
+    "packageArtifactId": 11393854831
   }
 }

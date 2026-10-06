@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "status": "VALIDATING",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "9984491d78dc8dc11504c94fbb84e3cf10e965a2",
-  "material_result_sha": "PENDING_SELF",
-  "validation_bearing_result_sha": "PENDING_SELF",
-  "result_sha": "PENDING_SELF",
+  "material_result_sha": "133402e75327efd9159f0582577951c21578f97a",
+  "validation_bearing_result_sha": "133402e75327efd9159f0582577951c21578f97a",
+  "result_sha": "133402e75327efd9159f0582577951c21578f97a",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00469]",
   "selected_work_item": "VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052",
   "summary": "Pass the actual R19 swapchain owner through R24 projection/direct-flat RenderTo calls so Draw records GPU work and live Destroy cannot skip the completion fence.",
@@ -38,23 +38,29 @@
       "evidence": "Added &Projection to R24 per-eye direct projection RenderTo and &Theater to direct-flat RenderTo. Added deterministic verifier coverage requiring both owner arguments while retaining explicit release-content provenance."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
-      "automation_validation": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 133402e75327efd9159f0582577951c21578f97a: DX9Ex Active 37423862114 policy/host/game/full-chain-compile/package SUCCESS; Domain Isolation 37423862161 SUCCESS; VR Autodev Coordination 37423862147 validate SUCCESS."
     },
     "C4_COMMIT": {
-      "status": "PENDING",
+      "status": "COMPLETE",
+      "source_material_sha": "133402e75327efd9159f0582577951c21578f97a",
+      "validation_bearing_result_sha": "133402e75327efd9159f0582577951c21578f97a",
       "ci_skip_on_validation_bearing_result": false
     },
     "C5_PACKAGE": {
-      "status": "PENDING"
+      "status": "COMPLETE",
+      "artifact_id": 11393854831,
+      "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-133402e75327efd9159f0582577951c21578f97a",
+      "digest": "sha256:637bfcaff37f19c615763cda07e4dd43b24ee4cb960294a486fb732e90072dfa"
     },
     "C6_STATE": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "runtime_validation": "UNTESTED"
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "spec_basis": "OpenXR 1.1.63 requires submitted graphics commands that refer to a swapchain to complete before xrDestroySwapchain. R19's bounded event-query drain is gated by per-swapchain gpuWorkSubmitted provenance.",
     "code_review": [
@@ -65,8 +71,21 @@
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
-    }
+    },
+    "validation": {
+      "dx9ex_active_run_id": 37423862114,
+      "policy_job_id": 112139000134,
+      "host_job_id": 112139091357,
+      "game_job_id": 112139091295,
+      "full_chain_compile_job_id": 112139091370,
+      "package_job_id": 112140472272,
+      "domain_isolation_run_id": 37423862161,
+      "autodev_run_id": 37423862147,
+      "result": "SUCCESS"
+    },
+    "final_ledger_issue_14_comment_id": 6010782954
   },
-  "next_action": "Validate this exact material SHA with canonical DX9Ex Active Validation, Domain Isolation and coordination; if PASS, finalize C3-C6 while preserving RUNTIME_VALIDATION=UNTESTED.",
-  "started_at_kst": "2026-10-06T15:27:00+09:00"
+  "next_action": "COMPLETE. Preserve 133402e75327efd9159f0582577951c21578f97a as validation_bearing_result_sha; continue only with another independently provable DX9Ex unit while ARCH-V3-GATE-001 remains HMD-gated.",
+  "started_at_kst": "2026-10-06T15:27:00+09:00",
+  "completed_at_kst": "2026-10-06T15:33:00+09:00"
 }
