@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-WORKSTEAL124-33491F83-PSD-LAYERS",
+  "queue_index": 62,
+  "layers": [
+    {
+      "key": "basic",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Bunki - Basic Fix",
+      "kind": "pixel",
+      "bbox": [
+        4,
+        4,
+        1196,
+        812
+      ],
+      "image_size": [
+        1192,
+        808
+      ]
+    },
+    {
+      "key": "layer43",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Erase AI Typography/4xHDcube3/Layer 43",
+      "kind": "pixel",
+      "bbox": [
+        4,
+        4,
+        1196,
+        812
+      ],
+      "image_size": [
+        1192,
+        808
+      ]
+    },
+    {
+      "key": "erase",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Erase AI Typography/Erase Left and Right and Diverge",
+      "kind": "pixel",
+      "bbox": [
+        119,
+        20,
+        1060,
+        399
+      ],
+      "image_size": [
+        941,
+        379
+      ]
+    },
+    {
+      "key": "paint",
+      "path": "objects/**Put any graphic and text art inside this folder**/Manual Work/Bunki - Remastered/Bunki graphic/Paintover",
+      "kind": "group",
+      "bbox": [
+        82,
+        66,
+        1120,
+        769
+      ],
+      "image_size": [
+        1038,
+        703
+      ]
+    }
+  ],
+  "status": "A124_PSD_CLEAN_COMPONENTS_READY",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
