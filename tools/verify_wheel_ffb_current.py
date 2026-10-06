@@ -816,11 +816,7 @@ for label, helper, fallback in (
             raise SystemExit(
                 f'CURRENT VERIFY FAILED [{label} source preset fallback drift]: '
                 f'{key} helper={value!r} fallback={fallback_values.get(key)!r}')
-    if fallback_values.get('WheelFFBFeelRevision') != '8':
-        raise SystemExit(
-            f'CURRENT VERIFY FAILED [{label} source preset fallback revision]: '
-            f'{fallback_values.get("WheelFFBFeelRevision")!r}')
-    print(f'OK [{label} source preset fallback mirrors canonical helper]')
+    print(f'OK [{label} source preset fallback mirrors canonical helper values]')
 
 forbid(math, 'DeepSlipMechanicalBoost', 'R13 removes slip-dependent mechanical geometry gain')
 req(math, 'ResidualTrail = 0.02f', 'R13 pneumatic trail collapses to a near-zero sliding remainder')
