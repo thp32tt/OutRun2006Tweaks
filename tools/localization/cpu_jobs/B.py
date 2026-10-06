@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageChops
 
 repo=Path.cwd()
-run="20261007-B-MANUALQA222-2DA43E41"
+run="20261007-B-MANUALQA222R-2DA43E41"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -19,7 +19,8 @@ asset="textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset
 clean_path=repo/"localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_CLEAN_PLATE_CANONICAL.png"
 source_mask_path=repo/"localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_SOURCE_TEXT_MASK_CANONICAL.png"
-EXPECTED_BEFORE="dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae"
+EXPECTED_BEFORE="dbe9ddebf1d4114d764169cd41495ff08a3aaab80190af4cdc0be526ace62af0"
+C90_BEFORE="dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae"
 SOURCE_SHA="3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099"
 commit="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+commit+"/Release/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds"
@@ -190,14 +191,23 @@ def fit_course(key,cfg):
     lb=list(layer.getchannel("A").getbbox())
     return layer,lb,{"font_size":fs,"stroke":st,"palette":pal,"target_width_ratio":cfg["width_ratio"],"second_width_ratio":0.48,"slant":0.0}
 
+# B222 controller review found source-English residue in rows that had been preserved by
+# the historical partial clean plate. For this retry, each selected exact source-text bbox
+# is rebuilt from pinned source and made fully transparent before fresh Korean composition.
+# These original bboxes are the independently measured source glyph/effect cells; the
+# C90 contact sheet confirms they contain no protected artwork.
+strict_arr=np.asarray(src).copy()
+for cfg in ROWS.values():
+    x0,y0,x1,y1=cfg["bbox"]
+    strict_arr[y0:y1,x0:x1,3]=0
+strict_clean=Image.fromarray(strict_arr,"RGBA")
 final=old.copy()
 layers={}
 row_reports=[]
 allowed=np.zeros((meta["h"],meta["w"]),bool)
 for key,cfg in ROWS.items():
     x0,y0,x1,y1=cfg["bbox"]; sw=x1-x0; sh=y1-y0
-    # Step 1: restore the already C90-validated clean plate only inside this exact source bbox.
-    final.paste(clean.crop((x0,y0,x1,y1)),(x0,y0))
+    final.paste(strict_clean.crop((x0,y0,x1,y1)),(x0,y0))
     if cfg["kind"]=="course": layer,lb,style=fit_course(key,cfg)
     else: layer,lb,style=fit_single(key,cfg)
     final.alpha_composite(layer); layers[key]=layer
@@ -239,11 +249,20 @@ for rr in row_reports:
     rr["decoded_containment"]="PASS" if db and db[0]>=x0 and db[1]>=y0 and db[2]<=x1 and db[3]<=y1 else "FAIL"
     if rr["decoded_containment"]!="PASS": raise RuntimeError(("decoded_bbox",rr["key"],db))
 
-# Validate the inherited clean plate against its canonical full source mask again.
+# Validate retry clean construction: selected source-text bboxes are fully cleared,
+# and source bytes outside those exact cells are untouched.
 validator=repo/"tools/localization/validate_clean_plate.py"
-src_png=tmp/"source_readable.png"; new_png=tmp/"new_readable.png"
-src.save(src_png); new.save(new_png)
-subprocess.run(["python3",str(validator),str(src_png),str(clean_path),str(source_mask_path),"--report",str(out/"B222_CLEAN_PLATE_VALIDATION.json")],check=True)
+src_png=tmp/"source_readable.png"; new_png=tmp/"new_readable.png"; strict_png=tmp/"strict_clean.png"
+src.save(src_png); new.save(new_png); strict_clean.save(strict_png)
+selected_mask=Image.fromarray((allowed.astype(np.uint8)*255),"L")
+selected_mask_path=out/"B222R_SELECTED_CLEAN_MASK.png"; selected_mask.save(selected_mask_path)
+strict_alpha=np.asarray(strict_clean)[:,:,3]
+strict_visible_inside=int(np.count_nonzero((strict_alpha>0)&allowed))
+if strict_visible_inside: raise RuntimeError(("strict_clean_not_empty",strict_visible_inside))
+strict_diff=np.any(np.asarray(src)!=np.asarray(strict_clean),axis=2)
+strict_outside=int(np.count_nonzero(strict_diff&~allowed))
+if strict_outside: raise RuntimeError(("strict_clean_changed_outside",strict_outside))
+subprocess.run(["python3",str(validator),str(src_png),str(strict_png),str(selected_mask_path),"--report",str(out/"B222R_CLEAN_PLATE_VALIDATION.json")],check=True)
 
 # Visual evidence: whole relevant upper atlas + per-row contact + RAW orientation.
 def comp(im):
@@ -257,7 +276,7 @@ cards=[crop_card("SOURCE",src,fullcrop),crop_card("C90",old,fullcrop),crop_card(
 for c in cards: c.thumbnail((1400,540),Image.Resampling.LANCZOS)
 sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+8),(20,20,20)); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+4
-sheet.save(out/"B222_2DA_SOURCE_C90_NEW_READABLE.jpg","JPEG",quality=96,subsampling=0)
+sheet.save(out/"B222R_2DA_SOURCE_C90_NEW_READABLE.jpg","JPEG",quality=96,subsampling=0)
 
 contacts=[]
 for rr in row_reports:
@@ -269,40 +288,40 @@ for rr in row_reports:
     contacts.append(c)
 cs=Image.new("RGB",(max(c.width for c in contacts),sum(c.height for c in contacts)+4),(20,20,20)); yy=0
 for c in contacts: cs.paste(c,(0,yy)); yy+=c.height+4
-cs.save(out/"B222_2DA_ROW_CONTACT_2X.jpg","JPEG",quality=96,subsampling=0)
+cs.save(out/"B222R_2DA_ROW_CONTACT_2X.jpg","JPEG",quality=96,subsampling=0)
 
 raw_cards=[crop_card("SOURCE RAW",src_raw,(0,meta["h"]-1500,4096,4096)),crop_card("B222 RAW",new_raw,(0,meta["h"]-1500,4096,4096))]
 for c in raw_cards: c.thumbnail((1400,540),Image.Resampling.LANCZOS)
 rs=Image.new("RGB",(max(c.width for c in raw_cards),sum(c.height for c in raw_cards)+4),(20,20,20)); yy=0
 for c in raw_cards: rs.paste(c,(0,yy)); yy+=c.height+4
-rs.save(out/"B222_2DA_SOURCE_NEW_RAW.jpg","JPEG",quality=96,subsampling=0)
+rs.save(out/"B222R_2DA_SOURCE_NEW_RAW.jpg","JPEG",quality=96,subsampling=0)
 
 report={
- "schema_version":1,"role":"B","run":"B222","queue_index":94,"asset":asset,
- "trigger":"STRICT_PRE_INGAME_8_STEP_VISUAL_FALSE_NEGATIVE",
+ "schema_version":1,"role":"B","run":"B222R","queue_index":94,"asset":asset,
+ "trigger":"B222_CONTROLLER_VISUAL_QA_RETRY_SOURCE_RESIDUE_FIX",
  "review_jpg":"localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/007_q094_2DA43E41.jpg",
  "prior_c_status":"C_USERPOLICY02_PASS_PENDING_INGAME",
  "defects":["MULTIROW_TEXT_HIERARCHY_UNDERSIZED","VIEW_CHANGE_RIGHT_SLANT_STYLE_MISMATCH","EXPERT_RIGHT_SLANT_AND_WIDTH_MISMATCH","SPECIAL_COURSE_RIGHT_SLANT_AND_WIDTH_MISMATCH"],
- "source_sha256":SOURCE_SHA,"before_sha256":EXPECTED_BEFORE,"candidate_sha256":AFTER,
- "method":"exact pinned 4096x4096 RGBA32 source + C90/B_RECOVERY05 independently validated canonical clean plate; only 7 strict-audit-failing source bboxes restored; fresh native Noto Sans CJK KR Black at final atlas resolution; source-derived palettes; fresh-raster horizontal family shaping for source hierarchy; explicit readable right shear only on source-italic rows; preserved 4 acceptable localized rows byte/pixel exact outside selected bboxes",
+ "source_sha256":SOURCE_SHA,"c90_before_sha256":C90_BEFORE,"retry_before_sha256":EXPECTED_BEFORE,"candidate_sha256":AFTER,
+ "method":"exact pinned 4096x4096 RGBA32 source; B222 controller visual-QA retry clears all alpha in each of 7 independently measured source text/effect bboxes before fresh Korean composition, eliminating historical partial-clean residue; fresh native Noto Sans CJK KR Black at final atlas resolution; source-derived palettes; fresh-raster horizontal family shaping; explicit readable right shear only on source-italic rows; preserved 4 acceptable localized rows pixel-exact outside selected bboxes",
  "reworked_keys":list(ROWS),"preserved_keys":PRESERVED,"rows":row_reports,
- "machine_qa":{"bbox_size_positive_margin":"7/7 PASS","candidate_changes_outside_selected_source_bboxes":outside,
+ "machine_qa":{"bbox_size_positive_margin":"7/7 PASS","strict_clean_visible_alpha_inside_selected_bboxes":strict_visible_inside,"strict_clean_changes_outside_selected_source_bboxes":strict_outside,"candidate_changes_outside_selected_source_bboxes":outside,
    "alpha_changes_outside_selected_source_bboxes":alpha_out,"reworked_row_overlap_pixels":0,
    "header_128_exact":True,"raw_mode":meta["raw_mode"],"raw_orientation":"mirror_y","roundtrip":"PASS"},
  "ordered_generation_gate":{
-   "1_plate_restoration":"PASS_C90_VALIDATED_CLEAN_REUSED_AND_REVALIDATED",
+   "1_plate_restoration":"PASS_B222R_STRICT_SELECTED_BBOX_CLEAN_ZERO_VISIBLE_ALPHA",
    "2_slant_direction":"PASS_SOURCE_UPRIGHT_OR_EXPLICIT_RIGHT_SHEAR_BY_ROW",
    "3_no_unnecessary_undersizing":"PASS_SEVEN_FALSE_NEGATIVE_ROWS_HIERARCHY_RESTORED",
    "4_source_weight_outline_shadow":"PASS_SOURCE_DERIVED_PALETTE_NATIVE_BLACK",
    "5_no_clipping":"PASS_7_OF_7_POSITIVE_MARGIN",
    "6_protected_clearance":"PASS_ZERO_CANDIDATE_CHANGE_OUTSIDE_SELECTED_EXACT_SOURCE_BBOXES",
    "7_flip_y_raw":"PASS_RAW_EVIDENCE_WRITTEN",
-   "8_immediate_readability":"PENDING_CONTROLLER"
+   "8_immediate_readability":"PENDING_CONTROLLER_RETRY_REVIEW"
  },
- "runtime_validation":"UNTESTED","status":"B222_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+ "runtime_validation":"UNTESTED","status":"B222R_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"B222_2DA43E41_REPORT.json"; rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"B222_2DA43E41.json").write_text(json.dumps({"role":"B","run":"B222","queue_index":94,"asset":asset,
+rp=out/"B222R_2DA43E41_REPORT.json"; rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"B222R_2DA43E41.json").write_text(json.dumps({"role":"B","run":"B222R","queue_index":94,"asset":asset,
  "candidate_sha256":AFTER,"report":str(rp.relative_to(repo)),"status":report["status"],"runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print(json.dumps({"run":"B222","before":EXPECTED_BEFORE,"after":AFTER,"rows":{r["key"]:{"old":r["prior_size"],"new":r["localized_size"],"ratios":[r["localized_width_source_ratio"],r["localized_height_source_ratio"]]} for r in row_reports},"status":report["status"]},ensure_ascii=False))
+print(json.dumps({"run":"B222R","before":EXPECTED_BEFORE,"after":AFTER,"rows":{r["key"]:{"old":r["prior_size"],"new":r["localized_size"],"ratios":[r["localized_width_source_ratio"],r["localized_height_source_ratio"]]} for r in row_reports},"status":report["status"]},ensure_ascii=False))
