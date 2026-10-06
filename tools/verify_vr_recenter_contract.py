@@ -77,7 +77,6 @@ require_order(
     "recenter IPC coherent publication",
     "InterlockedExchange(&state_->requesterPid, 0)",
     "const LONG requestId = InterlockedIncrement(&state_->requestId)",
-    "InterlockedExchange(&state_->requesterPid,",
     "static_cast<LONG>(GetCurrentProcessId())",
     "return requestId;",
 )
