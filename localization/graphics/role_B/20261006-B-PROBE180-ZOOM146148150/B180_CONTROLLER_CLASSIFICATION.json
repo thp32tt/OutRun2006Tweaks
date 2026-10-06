@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PROBE180-ZOOM146148150",
+  "timestamp_kst": "2026-10-06T09:49:15+09:00",
+  "worker_report": "localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_ZOOM146148150_REPORT.json",
+  "items": [
+    {
+      "index": 146,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39018963_512x256.dds",
+      "asset": "39018963",
+      "sha": "a71fb9ee0537bf9658f4822d9c543afe325232fa9843b405101cf443065424f3",
+      "reason": "Exact-HD readable/raw review shows two stage screenshots plus protected OutRun2 logo artwork only; no localizable UI text.",
+      "classification": "NO_LOCALIZABLE_TEXT",
+      "decision": "PRESERVE_ORIGINAL_NO_LOCALIZATION",
+      "readable_orientation": "PASS",
+      "raw_mirror_y_orientation": "PASS",
+      "candidate_required": false
+    },
+    {
+      "index": 148,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/3AE1BB60_256x256.dds",
+      "asset": "3AE1BB60",
+      "sha": "5f97816ab3b671b5638b1405f6967d621113b4d684a984fb6f1f1bd4af7636ec",
+      "reason": "Exact-HD readable/raw review shows stage screenshots, protected OutRun2SP logo, and incidental environmental signage/scene artwork; no localizable UI text.",
+      "classification": "NO_LOCALIZABLE_TEXT",
+      "decision": "PRESERVE_ORIGINAL_NO_LOCALIZATION",
+      "readable_orientation": "PASS",
+      "raw_mirror_y_orientation": "PASS",
+      "candidate_required": false
+    },
+    {
+      "index": 150,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/40A4D914_256x128.dds",
+      "asset": "40A4D914",
+      "sha": "53550412ab3565e24a64cc8840cbe2ec866f6dbd76204b34c9dab238bf273a64",
+      "reason": "Exact-HD readable/raw review shows stage-photo montage, question-mark artwork and protected OutRun2SP logo only; no localizable UI text.",
+      "classification": "NO_LOCALIZABLE_TEXT",
+      "decision": "PRESERVE_ORIGINAL_NO_LOCALIZATION",
+      "readable_orientation": "PASS",
+      "raw_mirror_y_orientation": "PASS",
+      "candidate_required": false
+    }
+  ],
+  "controller_visual_qa": "PASS_READABLE_AND_RAW_ORIENTATION",
+  "candidate_written": false,
+  "runtime_validation": "NOT_APPLICABLE_FOR_CLASSIFICATION",
+  "status": "B180_CLASSIFIED_PRESERVE_ORIGINAL_NO_LOCALIZATION",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

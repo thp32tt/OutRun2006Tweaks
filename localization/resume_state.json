@@ -1,5 +1,5 @@
 {
-  "schema_version": 102,
+  "schema_version": 103,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B180 closed even zoom_review indices 146/148/150 as PRESERVE_ORIGINAL_NO_LOCALIZATION from exact-HD readable/raw evidence; no candidate required and do not repeat. Index62 33491F83 remains MANUAL_RECONSTRUCTION_REQUIRED with protected route artwork; next normal B zoom target is index166 5EBD7FE8 unless higher priority appears.",
     "A101 resolved odd zoom-review indices 35/37/45: E989E3B7 contains Total Rank x2 and A102 produced native-HD candidate c0e76661... with 2/2 exact bbox/size/positive-margin and zero outside/alpha/residue/overlap/touch, controller visual PASS pending independent C+in-game; 515DCBB2 is character-only PRESERVE_ORIGINAL; 1F77CB88 is technical keyboard/control legends PRESERVE_ORIGINAL. Do not revisit these rows. Current next normal A blocked odd row is index103 590A4724 unless a higher-priority in-game/C-returned row appears.",
     "B177/B179 index62 33491F83: route labels are localizable (분기/좌측/우측/쉬움/어려움) but integrated with route artwork. B178/B179 both failed closed before candidate; manual artwork-aware clean reconstruction is required and protected gates must not be relaxed. Indices136/144 are positively classified preserve-original/no-localization. Latest completed B material remains B176 A8CE339F pending C.",
     "B176 index52 A8CE339F: zoom_review -> localize_text, native-HD DXT5 candidate d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8. B175 numeric PASS was controller-rejected for visible English fragments; B176 residue repair passes controller SOURCE/CLEAN/FINAL + raw. Pending independent C; do not repeat. Next B normal target even index62 33491F83 unless higher priority appears.",
@@ -5702,5 +5703,19 @@
     "report": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_E989E3B7_REPORT.json",
     "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_CONTROLLER_SELF_QA.json",
     "status": "A102_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME"
+  },
+  "b180_zoom_classification": {
+    "timestamp_kst": "2026-10-06T09:49:15+09:00",
+    "run": "B180",
+    "indices": [
+      146,
+      148,
+      150
+    ],
+    "result": "PRESERVE_ORIGINAL_NO_LOCALIZATION_3_OF_3",
+    "worker_report": "localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_ZOOM146148150_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_CONTROLLER_CLASSIFICATION.json",
+    "candidate_written": false,
+    "next_even_zoom_review_index": 166
   }
 }

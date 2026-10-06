@@ -2152,3 +2152,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - A102 static gates: 2/2 containment, source-size ceiling, positive margin PASS; clean changed outside source mask=0; decoded outside=0; alpha outside=0; source-script residue=0; localized overlap/touch=0. Controller SOURCE/CLEAN/FINAL and raw mirror_y visual review PASS with no patch seam, border/glow damage, clipping, halo, or Holly artwork change.
 - Queue/transcription/artwork-plan/progress/resume synchronized. Current blocked zoom-review count: 28. Next normal A blocked odd row: index103 `590A4724`, unless a higher-priority in-game/C-returned row appears.
 - Index35 remains pending independent C and in-game validation; indices37/45 require no localization runtime test. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-06T09:49:15+09:00 — B180 even zoom-review batch 146/148/150
+- Continued after B177/B179 without repeating index62 or the already-closed 136/144 classifications. Hosted CPU probe run 37395563755 completed successfully and produced exact-HD readable/raw evidence only.
+- index146 39018963: two stage screenshots plus protected OutRun2 logo; no localizable UI text.
+- index148 3AE1BB60: stage screenshots, protected OutRun2SP logo, and incidental environmental signage/scene artwork; no localizable UI text.
+- index150 40A4D914: stage-photo montage, question-mark artwork and protected OutRun2SP logo; no localizable UI text.
+- Controller readable + raw mirror_y review PASS for all three. All are PRESERVE_ORIGINAL_NO_LOCALIZATION; no DDS candidate was generated because none is required.
+- Index62 33491F83 remains MANUAL_RECONSTRUCTION_REQUIRED rather than weakening protected-art gates. Runtime validation is not applicable to this classification-only batch. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_ZOOM146148150_REPORT.json; localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_CONTROLLER_CLASSIFICATION.json.

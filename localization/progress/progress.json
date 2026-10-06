@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T09:43:28+09:00",
+  "updated_at_kst": "2026-10-06T09:49:15+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B176 remains latest completed B material candidate: A8CE339F d9e590a8... pending C. B177 classified even zoom rows 62/136/144: 136 and 144 preserve original; 62 33491F83 is localizable route UI but B178/B179 both fail-closed before candidate because text is integrated over route artwork. Index62 is MANUAL_RECONSTRUCTION_REQUIRED with exact translations recorded; do not relax protected-art gates.",
+  "next_checkpoint": "B180 positively classified even zoom_review indices 146/148/150 as preserve-original/no-localization from exact-HD readable/raw evidence. No Korean DDS is required for those three and they must not be reselected. Index62 33491F83 remains MANUAL_RECONSTRUCTION_REQUIRED; next normal B zoom_review is even index166 5EBD7FE8 unless a higher-priority in-game/C-returned task appears.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -155,11 +155,11 @@
   "graphics": {
     "total_dds": 243,
     "visually_reviewed": 243,
-    "localize_text": 88,
+    "localize_text": 89,
     "preserve_brand_song_credit": 1,
     "font_pipeline": 9,
     "hangul_name_entry": 1,
-    "zoom_review": 38,
+    "zoom_review": 37,
     "no_localization": 74,
     "work_queue_total": 137,
     "work_queue_file": "localization/graphics/asset_queue.csv",
@@ -181,7 +181,7 @@
     },
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
-    "artwork_plan_assets": 94,
+    "artwork_plan_assets": 100,
     "artwork_plan_segments": 723,
     "artwork_proof_candidates": 7,
     "simple6_package": {
@@ -2073,6 +2073,20 @@
       "controller_visual_qa": "PASS",
       "status": "A102_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME",
       "report": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_E989E3B7_REPORT.json"
+    },
+    "b180_zoom_classification": {
+      "timestamp_kst": "2026-10-06T09:49:15+09:00",
+      "run": "B180",
+      "indices": [
+        146,
+        148,
+        150
+      ],
+      "result": "PRESERVE_ORIGINAL_NO_LOCALIZATION_3_OF_3",
+      "worker_report": "localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_ZOOM146148150_REPORT.json",
+      "controller_report": "localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_CONTROLLER_CLASSIFICATION.json",
+      "candidate_written": false,
+      "next_even_zoom_review_index": 166
     }
   },
   "data_build": {

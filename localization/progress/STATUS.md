@@ -1765,3 +1765,9 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - index45 `1F77CB88`: F1/F2/Esc/Tab/Enter/directional keycap legends only → **NO_LOCALIZABLE_TEXT / PRESERVE_ORIGINAL** under technical-control preservation.
 - Blocked zoom-review count: **28**. Next normal A odd row: index103 `590A4724`, unless higher-priority backlog/C-return appears.
 - VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-06T09:49:15+09:00 — B180 zoom classification
+- even indices 146/148/150: exact-HD readable/raw PASS, 3/3 PRESERVE_ORIGINAL_NO_LOCALIZATION.
+- No Korean candidate required; protected OutRun2/OutRun2SP logos and scene/environment artwork remain untouched.
+- index62 remains MANUAL_RECONSTRUCTION_REQUIRED. Next normal B zoom_review: index166 unless higher-priority work appears.
+- VR/FFB/DX11/DXVK untouched.
