@@ -658,7 +658,7 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                 : 1.0f;
 
             desiredRoadAmp = imperialStoneRoad
-                ? 0.22f
+                ? 0.20f
                 : (strongTactile ? 0.30f : 0.22f);
             const float envelope =
                 textureRoughness * roadSpeedGate * outputStrength * coreStageScale;
