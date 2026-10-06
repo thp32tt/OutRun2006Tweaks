@@ -201,7 +201,7 @@ namespace
     // sustained Floral Village stone paving almost disappear on the R3.
     // Keep a modest stage-scoped comfort reduction while restoring a clearly
     // tactile road surface; Deep Lake/Tulip keep normal Road Detail.
-    constexpr float FloralVillageRoughPavingScale = 0.85f;
+    constexpr float FloralVillageRoughPavingScale = 0.75f;
 
     bool is_proven_primary_rough_road(
         const StageSurfaceContext& stage,
@@ -559,6 +559,31 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                     surface.wheelRoughness[i] = 0.25f;
             }
         }
+        const std::array<unsigned, 4> currentMasks = {
+            surface.surfaceMask[0], surface.surfaceMask[1],
+            surface.surfaceMask[2], surface.surfaceMask[3]
+        };
+        const bool imperialStoneRoad =
+            WheelFFBMath::imperial_avenue_stone_paving_pattern(
+                stage.uniqueStage, surface.collisionContext, currentMasks);
+        if (imperialStoneRoad)
+        {
+            // The game's stage table marks 0x2 members of this same stone road
+            // as water. Normalize only the local compatibility profile so the
+            // stage is a continuous tactile road instead of a sequence of
+            // one-frame water/stone dropouts.
+            surface.minimum = 0.35f;
+            surface.maximum = 0.35f;
+            surface.spread = 0.0f;
+            surface.nonWaterMinimum = 0.35f;
+            surface.nonWaterMaximum = 0.35f;
+            surface.waterWheelMask = 0;
+            surface.validSamples = 4;
+            surface.nonWaterSamples = 4;
+            for (int i = 0; i < 4; ++i)
+                surface.wheelRoughness[i] = 0.35f;
+        }
+
         const bool rawMixedSurface =
             surface.validSamples >= 2 && surface.spread >= 0.08f;
 
@@ -588,7 +613,8 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
         const bool strongTactile =
             !primaryRoughRoad &&
             (mixedSurface || fullyRough || snowCurbHeld);
-        const bool tactileSurface = nonWaterRough || snowCurbHeld;
+        const bool tactileSurface =
+            imperialStoneRoad || nonWaterRough || snowCurbHeld;
 
         float desiredRoadAmp = 0.0f;
         float steeringScale = 1.0f;
@@ -631,11 +657,18 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                 ? WheelFFBMath::SnowIceComfortTextureScale
                 : 1.0f;
 
-            desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
+            desiredRoadAmp = imperialStoneRoad
+                ? 0.30f
+                : (strongTactile ? 0.30f : 0.22f);
             const float envelope =
                 textureRoughness * roadSpeedGate * outputStrength * coreStageScale;
 
-            if (primaryRoughRoad)
+            if (imperialStoneRoad)
+            {
+                // Dedicated core stone floor owns amplitude. Do not unload SAT,
+                // damping, or inflate the user RoadTexture setting here.
+            }
+            else if (primaryRoughRoad)
             {
                 const bool floralComfort = stage.uniqueStage == 27;
                 Settings::WheelFFBRoadTexture = std::clamp(
@@ -663,7 +696,7 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
             // Keep exactly the same SAT/damper relief for genuine tactile
             // transitions.  The Floral Village primary-road rough paving is a
             // sustained road surface, not a curb: only its Road Detail is scaled.
-            if (!primaryRoughRoad)
+            if (!primaryRoughRoad && !imperialStoneRoad)
             {
                 steeringScale = strongTactile ? 0.72f : 0.80f;
                 damperScale = strongTactile ? 0.55f : 0.70f;
