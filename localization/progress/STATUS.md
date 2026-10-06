@@ -2114,3 +2114,10 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - A149 candidate `8657a59f966b...`: nine gray labels rebuilt with native Noto CJK Black, exact source gray core, small 1-2px weight reinforcement and 1.14x width strengthening; CLASS badge unchanged.
 - 10/10 bbox/size/positive-margin, clean/final validators PASS; outside/alpha/protected/residue=0; exact RGBA32 header/raw mirror_y; SOURCE/C109/A149 readable+row+RAW controller QA PASS.
 - Fresh C + refreshed English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+
+### B219 q232 source-left heading hierarchy rework — 2026-10-07 03:47 KST
+- q232 EBFC709F: C135 `7404fa227035...` -> B219 `54ed1e64dde7...`. New 8-step PRE_INGAME review reopened the prior C PASS because all four English JOIN/CREATE headings are left-anchored while C135 centered the Korean replacements and weakened the large display hierarchy.
+- B219 uses native Noto CJK Bold on the independently validated C135 clean plate, restores 2px source-left anchors, preserves 59px small-row height, and grows the large rows 131->141px inside the exact 145px source ceiling.
+- 4/4 bbox/size/positive-margin PASS; changed/alpha outside exact source bboxes=0; exact header/BGRA/raw mirror_y preserved. Controller SOURCE/C135/CLEAN/B219, row-contact and RAW visual QA PASS.
+- Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

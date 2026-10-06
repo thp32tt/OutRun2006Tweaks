@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B219",
+  "timestamp_kst": "2026-10-07 03:47 KST",
+  "queue_index": 232,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "trigger": "NEWER_8_STEP_PRE_INGAME_VISUAL_FALSE_NEGATIVE",
+  "prior_c_pass": "C135_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+  "prior_candidate_sha256": "7404fa227035e2fa003f4fa13f1bd348a050317757d7761c9d638f5fc1a01da4",
+  "candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
+  "defect": {
+    "source_alignment": "English JOIN GAME / CREATE GAME headings are left anchored in all four occurrences; C135 centered Korean replacements inside each exact source bbox.",
+    "hierarchy": "C135 Regular family weakens the large red heading hierarchy versus the source bold display family."
+  },
+  "worker_run": {
+    "workflow_run_id": 37513748726,
+    "status": "SUCCESS",
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA219-EBFC709F/B219_EBFC709F_REPORT.json"
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "4/4 PASS",
+    "changed_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "header_128_exact": true,
+    "raw_mode": "BGRA",
+    "raw_orientation": "mirror_y",
+    "rows": {
+      "join_small": {
+        "old_size": [
+          231,
+          59
+        ],
+        "new_size": [
+          240,
+          59
+        ],
+        "margins": [
+          2,
+          162,
+          2,
+          2
+        ]
+      },
+      "create_small": {
+        "old_size": [
+          279,
+          59
+        ],
+        "new_size": [
+          292,
+          59
+        ],
+        "margins": [
+          2,
+          228,
+          2,
+          2
+        ]
+      },
+      "create_large": {
+        "old_size": [
+          639,
+          131
+        ],
+        "new_size": [
+          704,
+          141
+        ],
+        "margins": [
+          2,
+          515,
+          2,
+          2
+        ]
+      },
+      "join_large": {
+        "old_size": [
+          527,
+          131
+        ],
+        "new_size": [
+          579,
+          141
+        ],
+        "margins": [
+          2,
+          389,
+          2,
+          2
+        ]
+      }
+    }
+  },
+  "evidence": {
+    "readable": "localization/graphics/role_B/20261007-B-MANUALQA219-EBFC709F/B219_EBFC_SOURCE_C135_CLEAN_NEW_READABLE.jpg",
+    "row_contact": "localization/graphics/role_B/20261007-B-MANUALQA219-EBFC709F/B219_EBFC_ROW_CONTACT.jpg",
+    "raw": "localization/graphics/role_B/20261007-B-MANUALQA219-EBFC709F/B219_EBFC_SOURCE_NEW_RAW.jpg"
+  },
+  "controller_visual_qa": {
+    "result": "PASS",
+    "observations": [
+      "All four Korean headings now begin at the same source-left edge family instead of floating centered inside the English heading bboxes.",
+      "Large 게임 만들기 / 게임 참가 regain display hierarchy with 141px decoded height while remaining 2px inside the exact 145px source-height ceiling.",
+      "Small headings keep the compact source hierarchy and explanatory English sentences remain pixel-preserved outside the four exact heading bboxes.",
+      "No visible English heading residue, broken Hangul, clipping, row overlap, protected-content intrusion, clean-plate seam, or RAW mirror-Y regression is visible."
+    ]
+  },
+  "ordered_generation_gate": {
+    "english_removal_plate_restoration": "PASS_C135_INDEPENDENT_VALIDATED_CLEAN",
+    "readable_slant_direction": "PASS_SOURCE_UPRIGHT",
+    "no_unnecessary_undersizing": "PASS",
+    "source_faithful_weight_outline_shadow": "PASS",
+    "no_clipped_pixels": "PASS",
+    "protected_graphics_clearance": "PASS",
+    "flip_y_and_raw": "PASS",
+    "immediate_readability_vs_english": "PASS"
+  },
+  "decision": "B219_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
