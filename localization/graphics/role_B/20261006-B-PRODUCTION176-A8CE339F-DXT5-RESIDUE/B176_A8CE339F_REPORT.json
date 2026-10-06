@@ -1,0 +1,424 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE",
+  "base_head": "a184afd8184e1a79e61e0be69fe9ad03e3d88f05",
+  "queue_index": 52,
+  "asset": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+  "readiness_tier": "ZOOM_REVIEW_POSITIVE_RENDER_COMPLETED_SAME_INVOCATION",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+    "sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b"
+  },
+  "classification": {
+    "localizable": [
+      "Extra Time",
+      "Start x2",
+      "Goal x2"
+    ],
+    "translations": {
+      "Extra Time": "추가 시간",
+      "Start": "출발",
+      "Goal": "골"
+    },
+    "protected": [
+      "6P/5P/4P/3P/2P/1P player markers",
+      "route/timeline bars and ticks",
+      "all numeric countdown glyphs",
+      "white decorative shards"
+    ]
+  },
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "key": "extra_time",
+      "source": "Extra Time",
+      "korean": "추가 시간",
+      "kind": "extra",
+      "original_bbox": [
+        16,
+        213,
+        485,
+        284
+      ],
+      "source_mask_pixels": 23587,
+      "localized_bbox": [
+        143,
+        218,
+        356,
+        281
+      ],
+      "source_width": 469,
+      "source_height": 71,
+      "localized_width": 213,
+      "localized_height": 63,
+      "delta_left": 127,
+      "delta_right": 129,
+      "delta_top": 5,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 54,
+      "block_safe_bbox": [
+        16,
+        216,
+        484,
+        284
+      ],
+      "style": {
+        "fill": [
+          255,
+          238,
+          188,
+          255
+        ],
+        "outer": [
+          0,
+          10,
+          65,
+          255
+        ],
+        "inner": [
+          215,
+          160,
+          50,
+          255
+        ],
+        "outer_stroke": 5,
+        "inner_stroke": 2,
+        "shear": 0.2
+      },
+      "rework_status": "B176_NEW_EXACT_HD_DXT5_CANDIDATE",
+      "decoded_localized_bbox": [
+        143,
+        218,
+        355,
+        281
+      ],
+      "decoded_localized_width": 212,
+      "decoded_localized_height": 63,
+      "decoded_containment": "PASS",
+      "decoded_size_ceiling": "PASS"
+    },
+    {
+      "key": "start_left",
+      "source": "Start",
+      "korean": "출발",
+      "kind": "small",
+      "original_bbox": [
+        24,
+        308,
+        131,
+        349
+      ],
+      "source_mask_pixels": 3530,
+      "localized_bbox": [
+        46,
+        310,
+        106,
+        346
+      ],
+      "source_width": 107,
+      "source_height": 41,
+      "localized_width": 60,
+      "localized_height": 36,
+      "delta_left": 22,
+      "delta_right": 25,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 30,
+      "block_safe_bbox": [
+        24,
+        308,
+        128,
+        348
+      ],
+      "style": {
+        "fill": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outer": [
+          0,
+          10,
+          65,
+          255
+        ],
+        "inner": null,
+        "outer_stroke": 3,
+        "inner_stroke": 0,
+        "shear": 0.0
+      },
+      "rework_status": "B176_NEW_EXACT_HD_DXT5_CANDIDATE",
+      "decoded_localized_bbox": [
+        46,
+        310,
+        106,
+        346
+      ],
+      "decoded_localized_width": 60,
+      "decoded_localized_height": 36,
+      "decoded_containment": "PASS",
+      "decoded_size_ceiling": "PASS"
+    },
+    {
+      "key": "goal_left",
+      "source": "Goal",
+      "korean": "골",
+      "kind": "small",
+      "original_bbox": [
+        649,
+        308,
+        744,
+        349
+      ],
+      "source_mask_pixels": 3225,
+      "localized_bbox": [
+        681,
+        310,
+        715,
+        345
+      ],
+      "source_width": 95,
+      "source_height": 41,
+      "localized_width": 34,
+      "localized_height": 35,
+      "delta_left": 32,
+      "delta_right": 29,
+      "delta_top": 2,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 32,
+      "block_safe_bbox": [
+        652,
+        308,
+        744,
+        348
+      ],
+      "style": {
+        "fill": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outer": [
+          0,
+          10,
+          65,
+          255
+        ],
+        "inner": null,
+        "outer_stroke": 3,
+        "inner_stroke": 0,
+        "shear": 0.0
+      },
+      "rework_status": "B176_NEW_EXACT_HD_DXT5_CANDIDATE",
+      "decoded_localized_bbox": [
+        681,
+        310,
+        715,
+        345
+      ],
+      "decoded_localized_width": 34,
+      "decoded_localized_height": 35,
+      "decoded_containment": "PASS",
+      "decoded_size_ceiling": "PASS"
+    },
+    {
+      "key": "start_right",
+      "source": "Start",
+      "korean": "출발",
+      "kind": "small",
+      "original_bbox": [
+        801,
+        309,
+        908,
+        350
+      ],
+      "source_mask_pixels": 3528,
+      "localized_bbox": [
+        829,
+        314,
+        882,
+        345
+      ],
+      "source_width": 107,
+      "source_height": 41,
+      "localized_width": 53,
+      "localized_height": 31,
+      "delta_left": 28,
+      "delta_right": 26,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 27,
+      "block_safe_bbox": [
+        804,
+        312,
+        908,
+        348
+      ],
+      "style": {
+        "fill": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outer": [
+          0,
+          10,
+          65,
+          255
+        ],
+        "inner": null,
+        "outer_stroke": 2,
+        "inner_stroke": 0,
+        "shear": 0.0
+      },
+      "rework_status": "B176_NEW_EXACT_HD_DXT5_CANDIDATE",
+      "decoded_localized_bbox": [
+        829,
+        314,
+        882,
+        345
+      ],
+      "decoded_localized_width": 53,
+      "decoded_localized_height": 31,
+      "decoded_containment": "PASS",
+      "decoded_size_ceiling": "PASS"
+    },
+    {
+      "key": "goal_right",
+      "source": "Goal",
+      "korean": "골",
+      "kind": "small",
+      "original_bbox": [
+        1426,
+        308,
+        1521,
+        349
+      ],
+      "source_mask_pixels": 3226,
+      "localized_bbox": [
+        1457,
+        310,
+        1491,
+        345
+      ],
+      "source_width": 95,
+      "source_height": 41,
+      "localized_width": 34,
+      "localized_height": 35,
+      "delta_left": 31,
+      "delta_right": 30,
+      "delta_top": 2,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR Black",
+      "font_size": 32,
+      "block_safe_bbox": [
+        1428,
+        308,
+        1520,
+        348
+      ],
+      "style": {
+        "fill": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outer": [
+          0,
+          10,
+          65,
+          255
+        ],
+        "inner": null,
+        "outer_stroke": 3,
+        "inner_stroke": 0,
+        "shear": 0.0
+      },
+      "rework_status": "B176_NEW_EXACT_HD_DXT5_CANDIDATE",
+      "decoded_localized_bbox": [
+        1457,
+        310,
+        1491,
+        345
+      ],
+      "decoded_localized_width": 34,
+      "decoded_localized_height": 35,
+      "decoded_containment": "PASS",
+      "decoded_size_ceiling": "PASS"
+    }
+  ],
+  "containment": {
+    "elements_total": 5,
+    "elements_pass": 5,
+    "decoded_changed_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "visible_pixels_outside_exact_source_bboxes": 0,
+    "source_residue_pixels": 0,
+    "status": "PASS"
+  },
+  "clean_plate": {
+    "source_mask_visible_pixels_after_rgba_zero": 0,
+    "status": "PASS"
+  },
+  "compressed_patch": {
+    "target_reencoded_blocks": 1119,
+    "source_only_full_reencoded_blocks": 1524,
+    "partial_alpha_only_blocks": 147,
+    "changed_blocks": 2788,
+    "changed_blocks_outside_patch": 0,
+    "partial_endpoints_and_color_bytes_preserved": true,
+    "status": "PASS"
+  },
+  "candidate_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "B176_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "superseded_attempts": [
+    {
+      "run": "B174 first render dispatch",
+      "result": "FAIL_CLOSED_DXT5_DETECTED_BEFORE_OUTPUT",
+      "note": "Initial render code assumed RGBA32; hosted worker detected canonical DXT5 and stopped before candidate persistence."
+    },
+    {
+      "run": "B175",
+      "candidate_sha256": "d23a6cd866fef15d44b86094e22fe6055efd183183039a260af8c1a6f7d7b582",
+      "result": "REJECTED_CONTROLLER_VISUAL_QA_SOURCE_SCRIPT_DOUBLE_DRAW",
+      "note": "Numeric gates falsely passed because the source-only DXT5 splice retained source colour blocks; readable FINAL visibly showed Ex...me / S...rt / G...al around Korean. B176 replaces full source-only blocks and explicitly zeros RGBA before compression."
+    }
+  ],
+  "no_vr_ffb_dx11_dxvk_work": true
+}

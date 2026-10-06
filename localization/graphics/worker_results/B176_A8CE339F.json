@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE",
+  "queue_index": 52,
+  "asset": "A8CE339F",
+  "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+  "candidate_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
+  "report": "localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_A8CE339F_REPORT.json",
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
+}
