@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "status": "VALIDATING",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "15680a2f44bcf111979095443595a7d887235c67",
-  "material_result_sha": "PENDING_SELF",
-  "validation_bearing_result_sha": "PENDING_SELF",
-  "result_sha": "PENDING_SELF",
+  "material_result_sha": "29e9f717bdc6a8acee6febec63363f1447af2055",
+  "validation_bearing_result_sha": "29e9f717bdc6a8acee6febec63363f1447af2055",
+  "result_sha": "29e9f717bdc6a8acee6febec63363f1447af2055",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00451]",
   "selected_work_item": "VR-DX9EX-FINAL-SUBMISSION-RESULT-ORDERING-0034",
   "summary": "Make R24-owned final-submission bookkeeping follow the actual xrEndFrame result instead of pre-recording successful layer submission before the runtime call.",
@@ -40,23 +40,27 @@
       "evidence": "Added R23-owned RecordFinalSubmissionResult and routed all direct R24 final-submission writes through it after the actual EndFrame result. Added deterministic verifier and canonical policy-gate wiring."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
-      "automation_validation": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact material SHA 29e9f717bdc6a8acee6febec63363f1447af2055: DX9Ex Active Validation 37403344410 policy/host/game/full-chain-compile/package all SUCCESS; Domain Isolation Guard 37403344452 SUCCESS."
     },
     "C4_COMMIT": {
-      "status": "PENDING",
-      "ci_skip_on_validation_bearing_result": false
+      "status": "COMPLETE",
+      "ci_skip_on_validation_bearing_result": false,
+      "evidence": "Material/validation-bearing commit 29e9f717bdc6a8acee6febec63363f1447af2055 includes [AUTO:CONVERSION-DX9EX-00451] and no CI-skip directive."
     },
     "C5_PACKAGE": {
-      "status": "PENDING"
+      "status": "COMPLETE",
+      "evidence": "Artifact 11386526807 OutRun2-VR-DX9EX-ACTIVE-29e9f717bdc6a8acee6febec63363f1447af2055 digest sha256:72094ba8c94ee424492292f353689a6ed402c237c1d066d8124340ae2951a01f."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Durable task record finalized after exact-SHA Gate; validation-bearing result remains the material commit, separate from bookkeeping."
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "red_review": {
       "base_sha": "15680a2f44bcf111979095443595a7d887235c67",
@@ -66,8 +70,30 @@
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "dx9ex_active": {
+      "run_id": 37403344410,
+      "head_sha": "29e9f717bdc6a8acee6febec63363f1447af2055",
+      "result": "SUCCESS",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 37403344452,
+      "head_sha": "29e9f717bdc6a8acee6febec63363f1447af2055",
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11386526807,
+      "digest": "sha256:72094ba8c94ee424492292f353689a6ed402c237c1d066d8124340ae2951a01f"
     }
   },
-  "next_action": "Validate the exact material SHA with the canonical DX9Ex Active Validation and Domain Isolation gates; only then finalize bookkeeping while preserving validation_bearing_result_sha.",
-  "started_at_kst": "2026-10-06T11:08:32+09:00"
+  "next_action": "Continue from latest branch HEAD with the next independently provable DX9Ex stability/lifetime unit. Do not promote HUD/rank/performance runtime behavior without Quest3/VDXR evidence.",
+  "started_at_kst": "2026-10-06T11:08:32+09:00",
+  "completed_at_kst": "2026-10-06T11:22:39+09:00"
 }
