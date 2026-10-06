@@ -280,8 +280,11 @@ decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"B209_FINAL_RAW_MIRR
 
 def card(label,im,cell,scale=2):
     x0,y0,x1,y1=cell
-    v=im.crop((x0,y0,x1,y1)).resize(((x1-x0)*scale,(y1-y0)*scale),Image.Resampling.NEAREST)
-    c=Image.new("RGB",(v.width,v.height+28),"white"); c.paste(v.convert("RGB"),(0,28))
+    rgba=im.crop((x0,y0,x1,y1))
+    bg=Image.new("RGBA",rgba.size,(28,38,72,255))
+    bg.alpha_composite(rgba)
+    v=bg.convert("RGB").resize(((x1-x0)*scale,(y1-y0)*scale),Image.Resampling.NEAREST)
+    c=Image.new("RGB",(v.width,v.height+28),"white"); c.paste(v,(0,28))
     ImageDraw.Draw(c).text((5,6),label,fill="black")
     return c
 cards=[]
