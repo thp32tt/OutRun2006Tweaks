@@ -1783,12 +1783,19 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
         )
         return
 
-    # Priority policy:
-    #   1) C = DX9Ex structural refactor
-    #   2) A = DX11 conversion
-    #   3) B = DXVK fallback only when both higher-priority lanes are unavailable
-    # Existing DXVK work may finish, but no new DXVK task is issued while C/A are active.
-    high_priority = ("C", "A")
+    # Co-primary policy:
+    #   A = DX11 conversion (dispatch first so it resumes immediately)
+    #   C = DX9Ex structural refactor
+    #   B = DXVK fallback only when both co-primary lanes are unavailable.
+    # Fill all available high-priority capacity in one scheduler cycle instead
+    # of dispatching only one new lane and waiting for the next poll.
+    high_priority = tuple(
+        key for key, enabled in (
+            ("A", CONVERSION_DX11_ENABLED),
+            ("C", CONVERSION_DX9EX_ENABLED),
+        )
+        if enabled
+    )
     high_active = sum(
         1 for key in high_priority
         if key in active_by_lane and active_by_lane[key].get("phase") != "DONE"
@@ -1796,11 +1803,12 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
 
     if high_active < CONVERSION_ACTIVE_LIMIT:
         for lane_key in high_priority:
+            if high_active >= CONVERSION_ACTIVE_LIMIT:
+                break
             if lane_key in active_by_lane:
                 continue
             if await conversion_send_lane_task(context, pages, q, lane_key):
                 high_active += 1
-                break
 
     if (
         CONVERSION_DXVK_DEFERRED
@@ -1818,7 +1826,7 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
     write_runtime(
         status="conversion_parallel_running",
         last_action=(
-            "Priority C(DX9Ex refactor) > A(DX11) > B(DXVK deferred); active: "
+            "Co-primary A(DX11) + C(DX9Ex); B(DXVK deferred); active: "
             + ", ".join(
                 f"{key}={value.get('task_id')}:{value.get('phase')}"
                 for key, value in sorted(q.get("active_by_lane", {}).items())
