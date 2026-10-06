@@ -1102,7 +1102,25 @@ namespace KoreanRuntime
     static void BeginKoreanNameEntry(uintptr_t object)
     {
         if (KoreanNameEntryActiveObject == object)
-            return;
+        {
+            const char* currentBuffer = KoreanNameEntryBuffer(object);
+            const std::string currentUtf8 = KoreanNameEntryComposer.Utf8();
+            const bool bufferMatchesComposer =
+                (currentUtf8.empty() && currentBuffer[0] == '\0') ||
+                (!currentUtf8.empty() &&
+                 std::strncmp(
+                     currentBuffer,
+                     KoreanPlayerNamePreviewAlias,
+                     sizeof(KoreanPlayerNamePreviewAlias) - 1) == 0 &&
+                 currentBuffer[sizeof(KoreanPlayerNamePreviewAlias) - 1] == '\0');
+            if (bufferMatchesComposer)
+                return;
+
+            // The stock parent can recycle this object after a cancel/re-entry.
+            // If its buffer no longer carries our preview token, discard stale
+            // transient composition and seed from the newly loaded native name.
+            KoreanNameEntryActiveObject = 0;
+        }
 
         KoreanNameEntryComposer.Reset();
         ClearKoreanPlayerNamePreview();
@@ -1157,8 +1175,11 @@ namespace KoreanRuntime
     {
         const uint32_t page = KoreanNameEntryPage(object);
 
-        if (selection <= 9)
+        if (selection <= 9 &&
+            (page == 1 || page == 3 || page == 4 || page == 5))
+        {
             return KoreanNameEntryComposer.PushDigitSelection(selection);
+        }
 
         if (selection >= 10 && selection <= 35)
         {
