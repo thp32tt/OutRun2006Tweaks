@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B223",
+  "timestamp_kst": "2026-10-07 05:47 KST",
+  "queue_index": 112,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+  "trigger": "NEWER_8_STEP_PRE_INGAME_VISUAL_FALSE_NEGATIVE",
+  "prior_c_pass": "C127_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "source_sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+  "prior_candidate_sha256": "0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80",
+  "candidate_sha256": "7714bd71b38bd38852ce6497695d872d7ba6b669fd2c6efdb43ba87dd1f3734d",
+  "worker_run": {
+    "workflow_run_id": 37528750634,
+    "worker_commit": "a85adc9fc255818358c9a2e7f949c251f293220e",
+    "result": "SUCCESS"
+  },
+  "evidence": {
+    "readable": "localization/graphics/role_B/20261007-B-MANUALQA223-D41D0B1/B223_D41_SOURCE_C127_NEW_READABLE.jpg",
+    "row_contact": "localization/graphics/role_B/20261007-B-MANUALQA223-D41D0B1/B223_D41_ROW_CONTACT_2X.jpg",
+    "raw": "localization/graphics/role_B/20261007-B-MANUALQA223-D41D0B1/B223_D41_SOURCE_NEW_RAW.jpg",
+    "clean_validation": "localization/graphics/role_B/20261007-B-MANUALQA223-D41D0B1/B223_CLEAN_PLATE_VALIDATION.json",
+    "final_validation": "localization/graphics/role_B/20261007-B-MANUALQA223-D41D0B1/B223_FINAL_MASK_VALIDATION.json"
+  },
+  "machine_qa": {
+    "bbox_source_size_positive_margin": "2/2 PASS",
+    "decoded_row_gap": 14,
+    "candidate_changes_outside_two_exact_source_bboxes": 0,
+    "alpha_changes_outside_two_exact_source_bboxes": 0,
+    "source_residue_pixels_alpha_gt16_outside_2px_target_guard": 0,
+    "localized_overlap_pixels": 0,
+    "changed_full_bc3_blocks": 9048,
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "n": 1,
+      "source": "Try to reach the goal",
+      "korean": "여자친구와 함께",
+      "source_size": [
+        911,
+        103
+      ],
+      "prior_size": [
+        572,
+        94
+      ],
+      "final_size": [
+        729,
+        96
+      ],
+      "margins": [
+        91,
+        91,
+        3,
+        4
+      ],
+      "width_source_ratio": 0.8002,
+      "height_source_ratio": 0.932
+    },
+    {
+      "n": 2,
+      "source": "with your girlfriend.",
+      "korean": "골에 도착하세요.",
+      "source_size": [
+        858,
+        116
+      ],
+      "prior_size": [
+        580,
+        96
+      ],
+      "final_size": [
+        685,
+        96
+      ],
+      "margins": [
+        86,
+        87,
+        10,
+        10
+      ],
+      "width_source_ratio": 0.7995,
+      "height_source_ratio": 0.8276
+    }
+  ],
+  "controller_visual_qa": {
+    "result": "PASS",
+    "observations": [
+      "The C127 Korean rows were visibly undersized against the English source despite numeric containment: row widths were 572/580px versus source widths 911/858px.",
+      "B223 materially restores the shared two-line hierarchy to about 80% of the exact corresponding source widths while preserving the same 83px Black family, white fill, navy outline and readable right slant.",
+      "The final readable comparison shows both Korean lines larger and immediately readable without exceeding the source line bboxes; positive margins and a 14px decoded inter-line gap remain.",
+      "SOURCE/C127/B223 readable evidence and SOURCE/B223 RAW mirror-Y evidence show no English residue, broken Hangul, clipping, overlap, protected-art intrusion, opposite slant, seam/halo or orientation regression."
+    ]
+  },
+  "ordered_generation_gate": {
+    "english_removal_plate_restoration": "PASS",
+    "source_matching_slant_direction": "PASS",
+    "no_unnecessary_undersizing": "PASS",
+    "source_faithful_weight_outline_shadow": "PASS",
+    "no_clipped_pixels": "PASS",
+    "protected_graphics_clearance": "PASS",
+    "flip_y_and_raw": "PASS",
+    "immediate_readability_vs_english": "PASS"
+  },
+  "decision": "B223_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

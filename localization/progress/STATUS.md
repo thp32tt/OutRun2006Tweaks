@@ -2152,3 +2152,9 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - Same-invocation B222 intermediate was rejected for English residue from a historical partial clean plate; B222R clears each selected source-text bbox before composition and controller evidence is clean.
 - 7/7 bbox/size/positive-margin; strict clean/candidate outside=0; alpha outside=0; overlap=0; RGBA32 header/raw mirror_y PASS. Controller readable/RAW visual QA PASS.
 - Fresh independent C + regenerated English-original PRE_INGAME comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+### B223 q112 D41D0B1 hierarchy rework — 2026-10-07 05:47 KST
+- q112 D41D0B1: C127/B43 0ac0b2d32691... -> B223 7714bd71b38b....
+- Prior Korean 572/580px widths were materially undersized against 911/858px English source lines. B223 restores both to ~80% source width with the shared 83px Black white/navy/right-slanted family.
+- Decoded 729x96 / 685x96, positive margins, row gap 14px; 2/2 bbox+size PASS; outside/alpha/residue/overlap=0; DXT5 header/raw mirror_y PASS. Controller readable/RAW visual QA PASS.
+- Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

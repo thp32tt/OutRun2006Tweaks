@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 05:29 KST",
+  "updated_at_kst": "2026-10-07 05:47 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Fresh independent C should validate B222R q94 2DA43E41 c36da00d6fa421180f6017fd188e9de783a35eb57a6dcc4927039c663aeee905 (and older B221/B220 producer outputs if still pending), then regenerate current English-original PRE_INGAME comparisons for approved bytes. Actual in-game validation remains UNTESTED.",
+  "next_checkpoint": "Fresh independent C should validate B223 q112 D41D0B1 7714bd71b38bd38852ce6497695d872d7ba6b669fd2c6efdb43ba87dd1f3734d, B222R q94 and other producer outputs still pending fresh C, then regenerate English-original PRE_INGAME comparisons for approved bytes. Actual in-game validation remains UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -3418,5 +3418,21 @@
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_B/20261007-B-MANUALQA222R-2DA43E41/B222R_2DA43E41_REPORT.json",
     "controller": "localization/graphics/role_B/20261007-B-MANUALQA222R-2DA43E41/B222R_CONTROLLER_FINAL_QA.json"
+  },
+  "b223_q112_manual_visual_rework": {
+    "timestamp_kst": "2026-10-07 05:47 KST",
+    "queue_index": 112,
+    "asset": "D41D0B1",
+    "source_sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+    "before_sha256": "0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80",
+    "candidate_sha256": "7714bd71b38bd38852ce6497695d872d7ba6b669fd2c6efdb43ba87dd1f3734d",
+    "prior_status": "C127_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "hierarchy": "row1 572x94 -> 729x96 of source 911x103; row2 580x96 -> 685x96 of source 858x116; decoded gap 14px",
+    "machine_qa": "2/2 bbox+source-size+positive-margin; outside=0; alpha outside=0; residue=0; overlap=0; DXT5 raw mirror_y",
+    "controller_visual_qa": "PASS_SOURCE_C127_B223_READABLE_AND_RAW",
+    "status": "B223_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA223-D41D0B1/B223_D41D0B1_REPORT.json",
+    "controller": "localization/graphics/role_B/20261007-B-MANUALQA223-D41D0B1/B223_CONTROLLER_FINAL_QA.json"
   }
 }
