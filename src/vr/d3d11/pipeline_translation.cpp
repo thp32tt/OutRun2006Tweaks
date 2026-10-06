@@ -2316,6 +2316,111 @@ namespace outrun::vr::dx11
         return out;
     }
 
+    ProgrammableShaderPairSourceSemanticEvidence
+    derive_programmable_shader_pair_source_semantic_evidence(
+        const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+        const ProgrammableShaderRegisterSemantics& vertexSemantics,
+        const ProgrammableShaderRegisterSemantics& pixelSemantics,
+        const ProgrammableShaderInterfaceLinkageEvidence& interfaceLinkage) noexcept
+    {
+        ProgrammableShaderPairSourceSemanticEvidence out{};
+        out.cacheKey = sourceIdentity.cacheKey;
+        out.vertexVersionToken = sourceIdentity.vertexShader.versionToken;
+        out.pixelVersionToken = sourceIdentity.pixelShader.versionToken;
+        out.vertexSourceBytecodeHash = sourceIdentity.vertexShader.bytecodeHash;
+        out.pixelSourceBytecodeHash = sourceIdentity.pixelShader.bytecodeHash;
+        out.vertexRegisterSemanticsHash =
+            vertexSemantics.registerSemanticsHash;
+        out.pixelRegisterSemanticsHash =
+            pixelSemantics.registerSemanticsHash;
+        out.interfaceLinkHash = interfaceLinkage.interfaceLinkHash;
+
+        out.sourceIdentityExact =
+            sourceIdentity.exact_identity() &&
+            !sourceIdentity.translationImplemented;
+        out.vertexRegisterSemanticsExact =
+            vertexSemantics.exact() &&
+            vertexSemantics.vertexStage &&
+            vertexSemantics.versionToken ==
+                sourceIdentity.vertexShader.versionToken &&
+            vertexSemantics.sourceBytecodeHash ==
+                sourceIdentity.vertexShader.bytecodeHash;
+        out.pixelRegisterSemanticsExact =
+            pixelSemantics.exact() &&
+            !pixelSemantics.vertexStage &&
+            pixelSemantics.versionToken ==
+                sourceIdentity.pixelShader.versionToken &&
+            pixelSemantics.sourceBytecodeHash ==
+                sourceIdentity.pixelShader.bytecodeHash;
+        out.interfaceLinkageExact =
+            interfaceLinkage.exact() &&
+            interfaceLinkage.vertexVersionToken ==
+                sourceIdentity.vertexShader.versionToken &&
+            interfaceLinkage.pixelVersionToken ==
+                sourceIdentity.pixelShader.versionToken &&
+            interfaceLinkage.vertexSourceBytecodeHash ==
+                sourceIdentity.vertexShader.bytecodeHash &&
+            interfaceLinkage.pixelSourceBytecodeHash ==
+                sourceIdentity.pixelShader.bytecodeHash;
+
+        if (!out.sourceIdentityExact ||
+            !out.vertexRegisterSemanticsExact ||
+            !out.pixelRegisterSemanticsExact ||
+            !out.interfaceLinkageExact)
+            return out;
+
+        out.vertexConstantReferenceCount =
+            vertexSemantics.floatConstantReferenceCount +
+            vertexSemantics.intConstantReferenceCount +
+            vertexSemantics.boolConstantReferenceCount;
+        out.pixelConstantReferenceCount =
+            pixelSemantics.floatConstantReferenceCount +
+            pixelSemantics.intConstantReferenceCount +
+            pixelSemantics.boolConstantReferenceCount;
+        out.vertexSamplerReferenceCount =
+            vertexSemantics.samplerReferenceCount;
+        out.pixelSamplerReferenceCount =
+            pixelSemantics.samplerReferenceCount;
+
+        static constexpr char kReceiptRevision[] =
+            "R271_D3D9_PROGRAMMABLE_PAIR_SOURCE_SEMANTIC_RECEIPT_V1";
+        static constexpr char kSemanticContract[] =
+            "R271_R239_R270_R266_R268_EXACT_PAIR_PROVENANCE_V1";
+        out.receiptRevisionHash =
+            hash_bytes(kReceiptRevision, sizeof(kReceiptRevision) - 1u);
+        out.semanticContractHash =
+            hash_bytes(kSemanticContract, sizeof(kSemanticContract) - 1u);
+
+        std::uint64_t pairHash = 1469598103934665603ull;
+        const auto mix = [&pairHash](std::uint64_t value) noexcept
+        {
+            for (unsigned shift = 0; shift < 64u; shift += 8u)
+            {
+                pairHash ^=
+                    static_cast<std::uint8_t>((value >> shift) & 0xFFu);
+                pairHash *= 1099511628211ull;
+            }
+        };
+        mix(out.cacheKey);
+        mix(out.vertexVersionToken);
+        mix(out.pixelVersionToken);
+        mix(out.vertexSourceBytecodeHash);
+        mix(out.pixelSourceBytecodeHash);
+        mix(out.vertexRegisterSemanticsHash);
+        mix(out.pixelRegisterSemanticsHash);
+        mix(out.interfaceLinkHash);
+        mix(out.vertexConstantReferenceCount);
+        mix(out.pixelConstantReferenceCount);
+        mix(out.vertexSamplerReferenceCount);
+        mix(out.pixelSamplerReferenceCount);
+        mix(out.receiptRevisionHash);
+        mix(out.semanticContractHash);
+
+        out.complete = true;
+        out.pairSemanticHash = pairHash;
+        return out;
+    }
+
     ProgrammableShaderPairCacheIdentity
     seal_programmable_shader_pair_cache_identity(
         bool observationComplete,
