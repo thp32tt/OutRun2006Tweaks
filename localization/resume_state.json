@@ -1,5 +1,5 @@
 {
-  "schema_version": 116,
+  "schema_version": 117,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A143 index24 input wiring BUILD PASS: exact source 224e3c8fce6c hooks canonical EXE+0x692B6 after selection load, uses B208 two-beolsik composition with transient A142 preview alias, preserves stock page controls, and commits only the A141 14-byte compatibility alias on 0x2B END. Win32 Release 37451825543 + Korean Test Build 37451825561 SUCCESS. B209 DDS c6daaf2e7aa0 was consumed unchanged but independent C QA is PENDING and package_selected=false. Next: C, then NEW actual-game composition/BACKSPACE/page/END/reload/local-display test; RUNTIME_VALIDATION=UNTESTED.",
     "B209 index24 Jamo artwork STATIC PASS/HOLD: canonical DXT3 66743AA8 now has an actual source-faithful 26-key two-beolsik base-Jamo candidate c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e. B207 a..z selection semantics + A135 A..Z sprite identity provide the artwork binding. DXT3/BC2 and exact header are preserved; non-target compressed blocks remain byte-exact; decoded 26/26 containment/size and outside/protected gates pass; controller readable/raw visual QA passes. Do not package yet: B208 composer still needs wiring at the B207 character path and END must persist/write the A141 alias. A142 local Korean renderer is already BUILD PASS. RUNTIME_VALIDATION=UNTESTED.",
     "A142 index24 local-name render BUILD PASS: exact local text-object draw path VA 0x48F455 -> Sumo_Printf(\"%s\", object+0x4E) is now intercepted only at return site module+0x8F45A when the %s argument is a valid A141 sidecar alias. The stock alias is hidden, UTF-8 Korean is queued through the existing Korean overlay with the same stock position/font-state/color/alignment, and alias lookup failure leaves stock behavior untouched. Source dbbfdca6... passed Win32 Release 37447477302 and Korean Test Build 37447477392. Native field/save/ranking/network/replay are unchanged. Remaining: source-faithful 66743AA8 Jamo artwork, then wire B208 composer to B207 0x00..0x25 character path and commit A141 alias on 0x2B END; runtime validation remains UNTESTED.",
     "B208 index24 HangulNameComposer BUILD PASS: standard 2-beolsik Jamo semantics are now implemented as an inactive deterministic composer behind the B207-proven character/control boundary. It supports initial/medial/final composition, double initials, compound vowels/finals, final splitting, stepwise BACKSPACE, digits/space, UTF-8 output, and the proven 15-codepoint ceiling. Final source 0f696621... passed Win32 Release 37445766665 and Korean Test Build 37445766663. Do not wire input yet: source-faithful 66743AA8 Jamo artwork and explicit local alias-to-UTF8 player-name rendering remain required; stock controls/native transport/network/ranking/replay stay unchanged.",
@@ -4176,6 +4177,7 @@
     "runtime_validation": "UNTESTED"
   },
   "current_pending_c": [
+    "66743AA8",
     "33491F83",
     "BF3EE5C6",
     "A064FDFC",
@@ -6630,5 +6632,57 @@
     "input_wiring": false,
     "runtime_validation": "UNTESTED",
     "next_safe_work": "wire B208 HangulNameComposer to B207 character selections, preserve controls, and persist/write A141 alias only on successful END; then build/package and actual-game validate"
+  },
+  "a143_nameentry_input_wiring": {
+    "timestamp_kst": "2026-10-06T19:52:30+09:00",
+    "role": "A",
+    "queue_index": 24,
+    "work_stolen_from_lane": "B",
+    "prior": "B209_JAMO_ARTWORK_STATIC_PASS_HOLD_INPUT_WIRING_REQUIRED",
+    "status": "A143_INPUT_WIRING_BUILD_PASS_PENDING_C_AND_INGAME_RETEST",
+    "source_commit": "224e3c8fce6cfebfc0b780683a168b53ccd4e87d",
+    "source_commits": [
+      "2a5c4290ce9a3d73ba5454d0279ee40f968ad98a",
+      "224e3c8fce6cfebfc0b780683a168b53ccd4e87d"
+    ],
+    "hook": {
+      "offset": "0x692B6",
+      "exact_signature": "83 F8 26 7D 68 0F BF 8E FA 06 00 00",
+      "object_register": "ESI",
+      "selection_register": "EAX",
+      "suppress_selection": "0x2C"
+    },
+    "behavior": {
+      "composer_wired": true,
+      "backspace_wired": true,
+      "stock_page_controls_preserved": true,
+      "end_alias_commit": true,
+      "transient_preview_alias": "KAAAAAAAAAAAAA",
+      "native_utf8_written": false,
+      "network_ranking_replay_changed": false
+    },
+    "b209": {
+      "candidate_sha256": "c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e",
+      "rerendered": false,
+      "independent_c_qa": "PENDING",
+      "package_selected": false
+    },
+    "build": {
+      "win32_release": {
+        "run_id": 37451825543,
+        "conclusion": "SUCCESS",
+        "artifact_id": 11407089218,
+        "digest": "sha256:0a08b0b4d57c8decdac4a76558cc0879b570f4a1e19b8fc19862a1749e3fddd9"
+      },
+      "korean_test": {
+        "run_id": 37451825561,
+        "conclusion": "SUCCESS",
+        "artifact_id": 11407390504,
+        "digest": "sha256:dd70d0b39c09595b2b370a239a7610e3ccfb9f75be571b6848b02a568f8c524b"
+      }
+    },
+    "runtime_validation": "UNTESTED",
+    "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
+    "forbidden_domains_touched": []
   }
 }
