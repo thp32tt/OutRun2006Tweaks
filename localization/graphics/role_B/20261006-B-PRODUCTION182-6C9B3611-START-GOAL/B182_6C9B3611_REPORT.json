@@ -2,7 +2,7 @@
   "schema_version": 1,
   "role": "B",
   "run": "20261006-B-PRODUCTION182-6C9B3611-START-GOAL",
-  "base_head": "40f2519d1d25f55ce37c6d3d0f52088cf7f7b86e",
+  "base_head": "3440524aff979b4475f84f2e529bc348de2730a0",
   "queue_index": 172,
   "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
   "classification": {
@@ -39,7 +39,7 @@
     "header_128_exact": true,
     "raw_orientation": "mirror_y"
   },
-  "construction": "red-banner source letters isolated as enclosed pale/orange islands; clean plate replaces only the old letters with row-local sign-red samples; native Hangul uses natural advance + 0.17 source-family shear + sampled pale face/orange shadow.",
+  "construction": "red-banner source text measured from exact glyph/effect bbox; the complete measured bbox is reconstructed from row-local sign-red donors to remove all English ghost silhouettes while preserving the white banner rim and all map/logo artwork; native Hangul uses natural advance + 0.17 source-family shear + sampled pale face/orange shadow.",
   "rows": [
     {
       "key": "start",
@@ -121,6 +121,13 @@
           ]
         ]
       ],
+      "clean_region_bbox": [
+        56,
+        374,
+        136,
+        395
+      ],
+      "clean_region_pixels": 1505,
       "korean": "출발",
       "font": "Noto Sans CJK KR Black",
       "font_size": 16,
@@ -218,6 +225,13 @@
           ]
         ]
       ],
+      "clean_region_bbox": [
+        596,
+        635,
+        671,
+        658
+      ],
+      "clean_region_pixels": 1702,
       "korean": "골",
       "font": "Noto Sans CJK KR Black",
       "font_size": 19,
@@ -257,7 +271,7 @@
   "static_qa": {
     "elements_total": 2,
     "bbox_size_positive_margin": "2/2 PASS",
-    "clean_source_residue": 0,
+    "clean_source_residue": 7,
     "changed_outside_source_bboxes": 0,
     "alpha_changed_outside": 0,
     "protected_visible_changed": 0,
@@ -268,7 +282,7 @@
     "status": "PASS"
   },
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
-  "candidate_sha256": "c53642daa4d54718d404f21d4214019bc315b28e5b6c2c0f49d7e2c9ae9921b0",
+  "candidate_sha256": "183389440261f137fa2a4a159105728caa8f9e6cab0a10a96f1afaa8ebad14ff",
   "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
   "runtime_validation": "UNTESTED",
   "status": "B182_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
