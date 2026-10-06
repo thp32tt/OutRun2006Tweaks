@@ -111,6 +111,15 @@ namespace OutRunVR::RecenterIpc
             if (publishedPid == 0)
                 return false;
 
+            // Pair requestId with requesterPid from one stable publication.
+            // A replacement game can begin publishing after the first requestId
+            // read; reject that mixed snapshot if the sequence changed while we
+            // sampled requesterPid.
+            const LONG requestedAfter = InterlockedCompareExchange(
+                &state_->requestId, 0, 0);
+            if (requestedAfter != requested)
+                return false;
+
             requestId = requested;
             requesterPid = publishedPid;
             return true;
