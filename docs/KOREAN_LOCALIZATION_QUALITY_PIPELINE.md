@@ -38,6 +38,21 @@ Measure source style per line: fill/gradient, weight, outline, shadow/glow, slan
 
 If a source-faithful result cannot be produced safely, stop as `MANUAL_RECONSTRUCTION_REQUIRED` rather than generating a weak candidate.
 
+### Ordered rework generation gate
+
+For every REWORK asset, enforce the following checks **in this order while regenerating the asset**, not only as post-hoc QA. A failed step sends the asset back to the corresponding construction step before a producer PASS can be recorded.
+
+1. **English removal / plate restoration:** after removing the English/source lettering and its effects, the plate/background must be fully reconstructed before any Korean lettering is drawn. Source-shaped residue, blur, patch boxes, seams, donor boundaries, damaged artwork or alpha discontinuities are FAIL.
+2. **Source-matching slant direction:** at readable orientation, the Korean lettering must lean in the same visual direction as the English source. Preserve the source raw-DDS transform separately; do not infer visual lean from a shear-sign variable.
+3. **No undersized lettering:** within the hard source-bbox size ceiling, use a source-faithful scale that remains immediately readable and is not unnecessarily smaller than the English source. A materially undersized Korean result is FAIL even when containment passes. Never enlarge beyond the exact source glyph/effect bbox to solve readability.
+4. **Source-faithful weight/effects:** stroke weight, outline, shadow/glow and related effects must match the source family and must not be excessive. Heavy outline/shadow that harms legibility or changes the source style is FAIL.
+5. **No clipped pixels:** no Hangul stroke, outline, shadow, glow, antialias fringe or transformed glyph pixel may be cut off or truncated.
+6. **Protected-art clearance:** Korean glyph/effect pixels must not intrude into protected graphics, vehicles, vehicle/model names, icons, frames, boxes, numbers, portraits, neighboring atlas content or other preserved artwork.
+7. **Both FLIP-Y and RAW must be clean:** inspect the FLIP-Y/readable review and the actual RAW DDS view. Both must have correct orientation/transform and be free of clipping, residue, overlap, intrusion and other visible anomalies.
+8. **Immediate readability against the source:** compare the final Korean result directly against the English original at the same practical display scale. If the Korean text is not immediately readable, or is materially harder to read because of scale, weight, effects, damage or contrast, it is FAIL and must be regenerated.
+
+Numeric containment/protected-mask PASS never overrides a failure in this ordered gate.
+
 ## QA
 
 Run two independent gates:
