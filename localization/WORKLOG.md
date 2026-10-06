@@ -2127,3 +2127,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Evidence: `localization/graphics/role_A/20261006-A-PROBE100-ZOOM293133/A100_ZOOM293133_PROBE.json` and `A100_CONTROLLER_CLASSIFICATION.json` plus per-asset readable/raw/component proofs.
 - Blocked zoom-review count after this batch: 35. Next A normal row: odd index35 `E989E3B7` unless a higher-priority in-game/C-returned row appears. VR/FFB/DX11/DXVK untouched.
 
+## 2026-10-06T09:19:51+09:00 - B176 index52 A8CE339F zoom-review promotion + DXT5 rework
+- Consumed existing B174/B175 worker evidence instead of repeating completed B172/B173 work. Index52 positively maps to five physical text rows: Extra Time -> 추가 시간, Start x2 -> 출발, Goal x2 -> 골. Player markers, route/timeline art, countdown numbers and decorative shards are protected.
+- Mandatory visual QA rejected B175 candidate d23a6cd866fef15d44b86094e22fe6055efd183183039a260af8c1a6f7d7b582 despite numeric PASS: readable FINAL visibly retained source fragments Ex...me / S...rt / G...al. Recorded as a numeric false negative; not promoted.
+- B176 GitHub-hosted worker 37393124139 zeros the complete source RGBA footprint and replaces full source-only DXT5 blocks from the clean/final encode while preserving boundary colour bytes. Final candidate d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8.
+- Machine QA: 5/5 exact bbox+size+positive margins; decoded changed/alpha/introduced-visible outside=0; source residue=0; 2,788 changed BC3 blocks with zero outside the declared patch.
+- Controller SOURCE/CLEAN/FINAL and raw mirror_y review PASS after repair: no English double drawing, broken glyph, mixed-lowres, clipping, collision or image intrusion; protected player/route/numeric/shard art preserved.
+- Queue index52 -> localize_text / b176_self_qa_pass_pending_c. Independent C remains required; RUNTIME_VALIDATION=UNTESTED. Next B normal target index62 33491F83 unless higher-priority work appears. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_A8CE339F_REPORT.json; localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_CONTROLLER_SELF_QA.json.

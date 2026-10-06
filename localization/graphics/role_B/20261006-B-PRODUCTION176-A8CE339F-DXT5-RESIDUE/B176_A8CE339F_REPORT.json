@@ -404,9 +404,9 @@
   },
   "candidate_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
-  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_AND_RAW_MIRROR_Y_AFTER_B175_RESIDUE_REJECT",
   "runtime_validation": "UNTESTED",
-  "status": "B176_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "status": "B176_SELF_QA_PASS_PENDING_C_AND_INGAME",
   "superseded_attempts": [
     {
       "run": "B174 first render dispatch",
@@ -420,5 +420,7 @@
       "note": "Numeric gates falsely passed because the source-only DXT5 splice retained source colour blocks; readable FINAL visibly showed Ex...me / S...rt / G...al around Korean. B176 replaces full source-only blocks and explicitly zeros RGBA before compression."
     }
   ],
-  "no_vr_ffb_dx11_dxvk_work": true
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_visual_qa_notes": "Mandatory controller review explicitly rejected B175 d23a6cd8... because FINAL visibly retained English fragments (Ex...me, S...rt, G...al) around Korean despite numeric PASS. B176 rebuilt the DXT5 source-only blocks from the clean/final encode and zeroed the complete source RGBA footprint before compression. B176 SOURCE/CLEAN/FINAL contact now shows clean removal with no source double drawing, and raw mirror_y contact preserves route bars, player markers, numbers and decorative shards.",
+  "timestamp_finalized_kst": "2026-10-06T09:19:51+09:00"
 }

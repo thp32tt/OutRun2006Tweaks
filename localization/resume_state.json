@@ -1,5 +1,5 @@
 {
-  "schema_version": 100,
+  "schema_version": 101,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B176 index52 A8CE339F: zoom_review -> localize_text, native-HD DXT5 candidate d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8. B175 numeric PASS was controller-rejected for visible English fragments; B176 residue repair passes controller SOURCE/CLEAN/FINAL + raw. Pending independent C; do not repeat. Next B normal target even index62 33491F83 unless higher priority appears.",
     "A100 positively classified odd indices 29 F043316B, 31 A82266FC, and 33 FBCAB18D as NO_LOCALIZABLE_TEXT/PRESERVE_ORIGINAL from exact HD readable+raw evidence. Do not revisit them. Next normal A queue item is odd index35 E989E3B7 zoom_review unless a higher-priority in-game/C-returned row appears.",
     "A99 positively classified odd index27 8B52FEEC zoom_review as NO_LOCALIZABLE_TEXT/PRESERVE_ORIGINAL from exact HD readable+raw evidence. Do not revisit it. With no A-owned active in-game backlog, no C-returned REWORK and no pending_artwork, next A normal queue item is odd index29 F043316B zoom_review unless a higher-priority row appears.",
     "B173 resolved even index38 6AB5CEE zoom_review: exact numeric-hash/canonical-HD alias of C215-approved index36 06AB5CEE. Candidate 0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5 persisted under the unpadded path byte-exact; Total Rank x3 -> 종합 랭킹; no low-res upscale. Do not repeat. Next B normal queue target: even index52 A8CE339F zoom_review unless higher priority appears.",
@@ -4023,21 +4024,32 @@
   "current_producer_rework_remaining": 0,
   "current_producer_rework_assets": [],
   "latest_b_production": {
-    "timestamp_kst": "2026-10-06T08:17:29+09:00",
-    "run": "20261006-B-PRODUCTION173-JENN-ALIAS",
-    "queue_index": 38,
-    "asset": "textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
-    "classification": "LOCALIZABLE_EXACT_ALIAS",
-    "source": "Total Rank x3",
-    "korean": "종합 랭킹",
-    "canonical_source_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
-    "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
-    "exact_alias_of_index": 36,
-    "c215_visual_policy": "PASS_BY_EXACT_SOURCE_AND_CANDIDATE_SHA",
-    "status": "B173_EXACT_ALIAS_OF_C215_PASS_PENDING_INGAME",
+    "timestamp_kst": "2026-10-06T09:19:51+09:00",
+    "run": "20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE",
+    "queue_index": 52,
+    "asset": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+    "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+    "candidate_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
+    "classification": "ZOOM_REVIEW_TO_LOCALIZE_TEXT",
+    "segments": {
+      "Extra Time": "추가 시간",
+      "Start x2": "출발",
+      "Goal x2": "골"
+    },
+    "b175_rejected_numeric_false_negative": true,
+    "machine_qa": {
+      "bbox_size_positive_margin": "5/5 PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "visible_outside": 0,
+      "source_residue": 0,
+      "compressed_outside_patch": 0
+    },
+    "controller_visual_qa": "PASS_AFTER_SOURCE_RESIDUE_REPAIR",
+    "status": "B176_SELF_QA_PASS_PENDING_C_AND_INGAME",
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_B/20261006-B-PRODUCTION173-JENN-ALIAS/B173_6AB5CEE_ALIAS_REPORT.json",
-    "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION173-JENN-ALIAS/B173_CONTROLLER_SELF_QA.json"
+    "report": "localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_A8CE339F_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_CONTROLLER_SELF_QA.json"
   },
   "c177_controller_final_qa": {
     "timestamp_kst": "2026-10-05T17:56:29+09:00",
@@ -5593,5 +5605,33 @@
     "candidate_required": false,
     "report": "localization/graphics/role_A/20261006-A-PROBE100-ZOOM293133/A100_CONTROLLER_CLASSIFICATION.json",
     "status": "A100_ZOOM_REVIEW_BATCH_COMPLETE_PRESERVE_ORIGINAL"
+  },
+  "b176_a8ce339f": {
+    "timestamp_kst": "2026-10-06T09:19:51+09:00",
+    "run": "20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE",
+    "queue_index": 52,
+    "asset": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+    "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+    "candidate_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
+    "classification": "ZOOM_REVIEW_TO_LOCALIZE_TEXT",
+    "segments": {
+      "Extra Time": "추가 시간",
+      "Start x2": "출발",
+      "Goal x2": "골"
+    },
+    "b175_rejected_numeric_false_negative": true,
+    "machine_qa": {
+      "bbox_size_positive_margin": "5/5 PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "visible_outside": 0,
+      "source_residue": 0,
+      "compressed_outside_patch": 0
+    },
+    "controller_visual_qa": "PASS_AFTER_SOURCE_RESIDUE_REPAIR",
+    "status": "B176_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_A8CE339F_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_CONTROLLER_SELF_QA.json"
   }
 }

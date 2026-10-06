@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE",
+  "timestamp_kst": "2026-10-06T09:19:51+09:00",
+  "queue_index": 52,
+  "asset": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+  "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+  "candidate_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
+  "classification": {
+    "prior_action": "zoom_review",
+    "result": "localize_text",
+    "segments": [
+      {
+        "source": "Extra Time",
+        "korean": "추가 시간",
+        "physical": 1
+      },
+      {
+        "source": "Start",
+        "korean": "출발",
+        "physical": 2
+      },
+      {
+        "source": "Goal",
+        "korean": "골",
+        "physical": 2
+      }
+    ],
+    "protected": [
+      "6P/5P/4P/3P/2P/1P",
+      "route/timeline bars/ticks",
+      "numeric countdown glyphs",
+      "white decorative shards"
+    ]
+  },
+  "b175_numeric_false_negative": {
+    "candidate_sha256": "d23a6cd866fef15d44b86094e22fe6055efd183183039a260af8c1a6f7d7b582",
+    "machine_status": "PASS",
+    "controller_visual_status": "FAIL_SOURCE_SCRIPT_DOUBLE_DRAW",
+    "visible_defect": "English fragments remained around Korean: Ex...me / S...rt / G...al",
+    "promotion": "REJECTED_NOT_SHARED_STATE"
+  },
+  "b176_repair": {
+    "method": "zero complete RGBA source-text footprint; replace full source-only DXT5 blocks from clean/final encode; preserve partial-boundary colour bytes while forcing removed source alpha to zero",
+    "clean_source_mask_visible_pixels": 0,
+    "changed_blocks_outside_patch": 0
+  },
+  "machine_qa": {
+    "elements": "5/5 PASS",
+    "bbox_size_positive_margin": "5/5 PASS",
+    "decoded_changed_outside": 0,
+    "alpha_changed_outside": 0,
+    "visible_outside": 0,
+    "source_residue": 0,
+    "target_reencoded_blocks": 1119,
+    "source_only_full_reencoded_blocks": 1524,
+    "partial_alpha_blocks": 147,
+    "changed_blocks": 2788,
+    "changed_blocks_outside_patch": 0
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS_NO_SOURCE_RESIDUE_OR_DOUBLE_DRAW",
+    "raw_mirror_y": "PASS",
+    "mixed_low_resolution": "PASS_NONE",
+    "broken_glyph": "PASS_NONE",
+    "foreign_image_intrusion": "PASS_NONE",
+    "layer_collision": "PASS_NONE",
+    "slant_baseline_alignment": "PASS",
+    "style_family": "PASS",
+    "protected_artwork": "PASS"
+  },
+  "decision": "B176_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "pending_independent_c": true,
+  "no_vr_ffb_dx11_dxvk_work": true
+}

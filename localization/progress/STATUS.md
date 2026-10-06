@@ -1746,3 +1746,8 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Blocked zoom reviews after batch: **35**. Next normal A item: index35 `E989E3B7`, unless a higher-priority backlog/C-return appears.
 - VR/FFB/DX11/DXVK untouched.
 
+## 2026-10-06T09:19:51+09:00 — B176 A8CE339F index52
+- Promoted zoom_review -> localize_text: Extra Time/Start x2/Goal x2 -> 추가 시간/출발/골.
+- B175 numeric PASS was rejected by controller visual QA for visible English source fragments. B176 hosted repair removes the double drawing; candidate d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8.
+- 5/5 bbox/size/margin PASS; outside/alpha/visible/source-residue=0; BC3 changes outside patch=0. SOURCE/CLEAN/FINAL + raw mirror_y visual PASS.
+- State B176_SELF_QA_PASS_PENDING_C_AND_INGAME; runtime/in-game UNTESTED. Next B normal queue index62. VR/FFB/DX11/DXVK untouched.
