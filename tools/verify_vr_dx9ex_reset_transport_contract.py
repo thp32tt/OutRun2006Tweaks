@@ -789,6 +789,10 @@ require(
     "OutRunVrFinalTest::Context->Flush();",
     "OutRunVrFinalTest::Context->GetData(",
     "while (status == S_FALSE)",
+    "SwapchainGpuDrainBudgetMs = 250",
+    "const ULONGLONG start = GetTickCount64();",
+    "GetDeviceRemovedReason()",
+    "GetTickCount64() - start >= SwapchainGpuDrainBudgetMs",
     "ReleaseCom(completion);",
 )
 gpu_drain_completion = sbs_gpu_drain[
@@ -799,8 +803,11 @@ require_order(
     "R19 swapchain GPU completion ordering",
     "OutRunVrFinalTest::Context->End(completion);",
     "OutRunVrFinalTest::Context->Flush();",
+    "const ULONGLONG start = GetTickCount64();",
     "while (status == S_FALSE)",
     "OutRunVrFinalTest::Context->GetData(",
+    "GetDeviceRemovedReason()",
+    "GetTickCount64() - start >= SwapchainGpuDrainBudgetMs",
     "ReleaseCom(completion);",
 )
 

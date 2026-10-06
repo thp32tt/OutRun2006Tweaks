@@ -181,6 +181,7 @@ float4 PSMain(VSOut input) : SV_Target
 
     inline std::uint64_t NextSwapchainGeneration = 0;
 
+    inline constexpr ULONGLONG SwapchainGpuDrainBudgetMs = 250;
     inline bool FirstSwapchainGpuDrainFailureLogged = false;
 
     inline bool WaitForSwapchainGpuIdleBeforeDestroy() noexcept
@@ -200,16 +201,29 @@ float4 PSMain(VSOut input) : SV_Target
 
         // D3D11 Flush only submits queued work; an event query + GetData is the
         // completion fence that proves all earlier immediate-context commands
-        // have finished before OpenXR swapchain destruction.
+        // have finished before OpenXR swapchain destruction. Bound only the
+        // abnormal stall/device-loss path so teardown cannot hang forever.
         OutRunVrFinalTest::Context->End(completion);
         OutRunVrFinalTest::Context->Flush();
+        const ULONGLONG start = GetTickCount64();
         HRESULT status = S_FALSE;
         while (status == S_FALSE)
         {
             status = OutRunVrFinalTest::Context->GetData(
                 completion, nullptr, 0, 0);
-            if (status == S_FALSE)
-                SwitchToThread();
+            if (status != S_FALSE)
+                break;
+
+            const HRESULT removed =
+                OutRunVrFinalTest::Device->GetDeviceRemovedReason();
+            if (FAILED(removed))
+            {
+                status = removed;
+                break;
+            }
+            if (GetTickCount64() - start >= SwapchainGpuDrainBudgetMs)
+                break;
+            SwitchToThread();
         }
         ReleaseCom(completion);
         return status == S_OK;

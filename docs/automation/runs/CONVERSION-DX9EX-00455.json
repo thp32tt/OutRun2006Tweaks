@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00455",
+  "production_id": "CONVERSION-DX9EX-00455",
+  "event_id": "CONVERSION-DX9EX-00455-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "VALIDATING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "c12e56ebd9395c9b8f66fc59ce52513470918b49",
+  "material_result_sha": "PENDING_SELF",
+  "validation_bearing_result_sha": "PENDING_SELF",
+  "result_sha": "PENDING_SELF",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00455]",
+  "selected_work_item": "VR-DX9EX-SWAPCHAIN-GPU-DRAIN-BOUNDED-0038",
+  "summary": "Bound the R19 D3D11 event-query GPU completion wait to 250 ms and exit early on device removal so swapchain teardown cannot hang indefinitely on a stalled/lost GPU while preserving the normal completion-fence path.",
+  "changed_paths": [
+    "vrhost/src/runtime/sbs_capture_override.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00455.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered bookkeeping HEAD c12e56ebd9395c9b8f66fc59ce52513470918b49 after CONVERSION-DX9EX-00454 PASS. Structural extraction remains terminal; 00454 introduced the event-query completion fence and explicitly queued bounded device-loss/stall handling next."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "WaitForSwapchainGpuIdleBeforeDestroy looped while GetData returned S_FALSE with no time or device-loss exit. On a stalled/removed GPU this could block session/reset teardown indefinitely. Existing bounded OpenXR wait policy already uses a 250 ms recovery budget."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added SwapchainGpuDrainBudgetMs=250, GetDeviceRemovedReason early exit, elapsed-time cutoff, and verifier assertions while retaining normal End->Flush->GetData-until-S_OK completion ordering."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING"
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "red_review": {
+      "base_sha": "c12e56ebd9395c9b8f66fc59ce52513470918b49",
+      "result": "FAIL_AS_EXPECTED",
+      "missing_contract": "00454 event-query wait had no bounded exit for persistent S_FALSE and no explicit D3D11 device-removal escape."
+    },
+    "references": [
+      "Microsoft ID3D11DeviceContext::GetData returns S_FALSE while query data is unavailable and must be polled until available on the normal path.",
+      "Microsoft ID3D11DeviceContext::Flush is asynchronous; the event query remains the normal completion proof."
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Validate the exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize bookkeeping while preserving validation_bearing_result_sha.",
+  "started_at_kst": "2026-10-06T11:57:38+09:00"
+}

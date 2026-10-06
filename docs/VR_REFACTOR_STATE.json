@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T11:56:06+09:00",
+  "updatedKst": "2026-10-06T11:57:38+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -99,9 +99,10 @@
     "VR-DX9EX-FINAL-SUBMISSION-RESULT-ORDERING-0034",
     "VR-DX9EX-R23-FINAL-SUBMISSION-RESULT-ORDERING-0035",
     "VR-DX9EX-SWAPCHAIN-DESTROY-FLUSH-0036",
-    "VR-DX9EX-SWAPCHAIN-DESTROY-GPU-DRAIN-0037"
+    "VR-DX9EX-SWAPCHAIN-DESTROY-GPU-DRAIN-0037",
+    "VR-DX9EX-SWAPCHAIN-GPU-DRAIN-BOUNDED-0038"
   ],
-  "next": "Structural extraction remains terminal. Swapchain teardown now proves normal-path GPU completion with a D3D11 event query before xrDestroySwapchain. Next inspect the completion wait for bounded device-loss/driver-stall behavior without weakening the normal completion guarantee.",
+  "next": "Structural extraction remains terminal. R19 swapchain GPU-drain completion wait is now bounded to 250 ms and exits early on D3D11 device removal, while preserving the normal End->Flush->GetData(S_OK) completion fence. Continue with the next independent DX9Ex stability/resource-lifetime unit; runtime behavior remains HMD-evidence gated.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
