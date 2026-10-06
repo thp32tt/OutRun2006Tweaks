@@ -2494,3 +2494,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Prior C139 pass is superseded for changed bytes. Fresh independent C + regenerated English-original comparison JPG + user review + actual-game validation remain mandatory. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_B/20261007-B-MANUALQA216-1F5FE6E9/B216_CONTROLLER_SELF_QA.json.
 
+## B217 q236 native-HD stage-list visual rework — 2026-10-07 01:49 KST
+- Refreshed B state and skipped completed/pending-C B210/B211/B212/B214/B215/B216 work. No active B P0/P1, C-returned REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER item remained, so the contract manual PRE_INGAME comparison path was used.
+- English-original comparison #061 reopened q236 FEF70E85. The historical B80/C153 candidate was explicitly built from quarter-size Hangul and nearest-neighbor enlarged x4, which conflicts with the current low-resolution hard-fail policy and is visibly smaller/weaker than the English stage-list family.
+- GitHub-hosted B217 worker run 37498324346 produced 5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245 from exact pinned source a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518 plus the C153-validated B80 clean plate. All 14 canonical phonetic stage names were freshly rendered at native 2048 resolution with Noto Sans CJK KR Black 86px, dark source fill, right alignment and mild <=1.18x width restoration; no prior Korean bitmap was reused/upscaled.
+- Machine QA: 14/14 bbox + source-size + positive-margin PASS; clean/outside/alpha/protected/source-residue/overlap/touch all 0; width and height improved 14/14; REVERSED protected cell exact; canonical stage naming PASS; exact BGRA header/raw mirror_y preserved.
+- Controller SOURCE/C153-B80/CLEAN/B217 readable + 14-row contact + RAW review: PASS. Native-HD edges are smooth and stronger while the source family/alignment remain intact; no broken glyph, clipping, residue, overlap, seam, halo, protected-art damage or orientation regression observed.
+- Prior C153 pass is superseded for changed bytes. Fresh independent C + regenerated English-original comparison JPG + user review + actual-game validation remain mandatory. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_CONTROLLER_SELF_QA.json.
+

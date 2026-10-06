@@ -1,5 +1,5 @@
 {
-  "schema_version": 123,
+  "schema_version": 124,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4217,7 +4217,8 @@
     "E3FD08BE",
     "12519155",
     "1762489B",
-    "1F5FE6E9"
+    "1F5FE6E9",
+    "FEF70E85"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6709,7 +6710,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 01:22 KST",
+  "updated_at_kst": "2026-10-07 01:49 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7125,6 +7126,26 @@
     "worker_output_commit": "b39388c",
     "github_worker_run_id": 37494130140,
     "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA216-1F5FE6E9/B216_CONTROLLER_SELF_QA.json",
+    "status": "B_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_C",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "b217_fef70e85_native_hd_manual_visual_rework": {
+    "run": "B217",
+    "timestamp_kst": "2026-10-07 01:49 KST",
+    "role": "B",
+    "queue_index": 236,
+    "asset_key": "FEF70E85",
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+    "selection_reason": "No active B P0/P1/C-returned REWORK/render-ready item; manual C-pass JPG #061 exposed low-resolution nearest-neighbor stage-list false-negative",
+    "prior_c_status": "C153_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_c_candidate_sha256": "e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086",
+    "candidate_sha256": "5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245",
+    "worker_output_commit": "dee9990",
+    "github_worker_run_id": 37498324346,
+    "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_CONTROLLER_SELF_QA.json",
     "status": "B_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
     "fresh_independent_c": "PENDING",
     "pre_ingame_comparison_refresh": "PENDING_C",

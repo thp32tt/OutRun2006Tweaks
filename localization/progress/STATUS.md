@@ -2058,3 +2058,9 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - 4/4 bbox/size/positive-margin; outside/alpha/protected/residue/overlap/touch=0; RAW mirror_y and controller readable/row/RAW QA PASS.
 - Fresh C/comparison JPG/user review/in-game required; RUNTIME_VALIDATION=UNTESTED.
 
+### B217 q236 native-HD stage-list visual rework — 2026-10-07 01:49 KST
+- q236 FEF70E85: C153 e6d12ebf9b48... -> B217 5c92d09a7b4d....
+- Replaced historical quarter-scale + nearest-neighbor x4 Hangul with fresh native-HD 86px Black stage labels; 14/14 rows gained width and height while preserving right alignment and canonical phonetic names.
+- 14/14 bbox/size/positive-margin; clean/outside/alpha/protected/residue/overlap/touch=0; REVERSED exact; RAW mirror_y and controller readable/row/RAW QA PASS.
+- Fresh C/comparison JPG/user review/in-game required; RUNTIME_VALIDATION=UNTESTED.
+

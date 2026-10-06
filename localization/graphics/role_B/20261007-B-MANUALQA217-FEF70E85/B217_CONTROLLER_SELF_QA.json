@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B217",
+  "timestamp_kst": "2026-10-07T01:49:47+09:00",
+  "queue_index": 236,
+  "asset_key": "FEF70E85",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+  "trigger": "B primary production queue had no active P0/P1, C-returned REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER item; manual PRE_INGAME English-original comparison #061 reopened C153 visual false-negative",
+  "prior_c_status_invalidated": "C153_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "prior_c_candidate_sha256": "e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086",
+  "worker_output_commit": "dee9990",
+  "github_worker_run_id": 37498324346,
+  "candidate_sha256": "5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245",
+  "defects_fixed": [
+    "LOW_RES_NEAREST_UPSCALED_HANGUL",
+    "TEXT_SCALE_AND_WEIGHT_UNDERSIZED_VS_SOURCE"
+  ],
+  "machine_qa": {
+    "bbox_and_source_size_ceiling": "14/14 PASS",
+    "positive_margin": "14/14 PASS",
+    "clean_changed_pixels_outside_source_mask": 0,
+    "clean_source_alpha_remaining": 0,
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_pixels_outside_exact_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "source_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "width_improved_rows": 14,
+    "height_improved_rows": 14,
+    "fresh_native_hd_render": "PASS_NO_LOWRES_NEAREST_UPSCALE",
+    "header_128_exact_canonical": true,
+    "raw_mode": "BGRA",
+    "raw_orientation": "mirror_y",
+    "protected_REVERSED_changed_pixels": 0,
+    "stage_name_policy": "PASS_CANONICAL_PHONETIC_TRANSLITERATION"
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_note": "SOURCE/C153-B80/CLEAN/B217 readable comparison, 14-row contact sheet and SOURCE/C153/B217 RAW review PASS. The former quarter-resolution nearest-neighbor Korean stage list is visibly replaced by smooth native-HD Hangul with stronger source-relative scale and weight while preserving the dark condensed upright family, right alignment, canonical stage-name spellings and protected REVERSED artwork. No broken glyphs, source residue, clipping, overlap, seam, halo, foreign-art intrusion or orientation regression observed.",
+  "visual_evidence": [
+    "localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_FEF_SOURCE_OLD_CLEAN_NEW_READABLE.jpg",
+    "localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_FEF_ROW_CONTACT.jpg",
+    "localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_FEF_SOURCE_OLD_NEW_RAW.jpg"
+  ],
+  "ordered_generation_gate": {
+    "1_source_removal_plate_restoration": "PASS_INHERITED_C153_VALIDATED_B80_CLEAN_PLATE",
+    "2_source_matching_readable_slant_direction": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "3_no_unnecessarily_undersized_korean": "PASS_14_OF_14_NATIVE_HD_SCALE_IMPROVED_WITH_SOURCE_BBOX_CEILING",
+    "4_source_faithful_weight_outline_shadow": "PASS_NATIVE_BLACK_DARK_SOURCE_FILL_NO_INVENTED_EFFECTS",
+    "5_no_clipped_pixels": "PASS_14_OF_14_POSITIVE_MARGIN",
+    "6_protected_art_clearance": "PASS_ZERO_OUTSIDE_SOURCE_BBOX_AND_REVERSED_EXACT",
+    "7_flip_y_and_raw": "PASS_CONTROLLER_VISUAL",
+    "8_immediate_readability_vs_english": "PASS_CONTROLLER_VISUAL"
+  },
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_C",
+  "runtime_validation": "UNTESTED",
+  "decision": "B217_PRODUCER_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

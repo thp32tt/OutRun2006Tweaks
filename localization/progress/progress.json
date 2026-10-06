@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 01:22 KST",
+  "updated_at_kst": "2026-10-07 01:49 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Fresh independent C should validate materially changed pending producer candidates including B216 q132 1F5FE6E9, refresh PRE_INGAME_JPG_REVIEW for changed candidates, and route any visual failure back to the owning producer lane. Do not repeat B216 bytes. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "Fresh independent C should validate materially changed pending producer candidates including B217 q236 FEF70E85, refresh PRE_INGAME_JPG_REVIEW for changed candidates, and return any visual failure to the owning producer lane. Do not repeat B217 bytes. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -2650,6 +2650,22 @@
       "status": "B_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
       "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA216-1F5FE6E9/B216_CONTROLLER_SELF_QA.json",
       "runtime_validation": "UNTESTED"
+    },
+    "b217_fef70e85_native_hd_manual_visual_rework": {
+      "run": "B217",
+      "timestamp_kst": "2026-10-07 01:49 KST",
+      "queue_index": 236,
+      "asset_key": "FEF70E85",
+      "prior_c_status_invalidated": "C153_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "prior_c_candidate_sha256": "e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086",
+      "candidate_sha256": "5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245",
+      "worker_output_commit": "dee9990",
+      "github_worker_run_id": 37498324346,
+      "machine_qa": "PASS: 14/14 bbox+size+positive margin; clean/outside/alpha/protected/residue/overlap/touch=0; width+height improved 14/14; protected REVERSED exact; exact BGRA header/raw mirror_y",
+      "controller_visual_qa": "PASS: low-resolution 4x-nearest stage list replaced by smooth native-HD source-family render; SOURCE/C153/CLEAN/B217, 14-row contact and RAW reviewed",
+      "status": "B_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+      "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
@@ -2864,20 +2880,20 @@
     ]
   },
   "latest_b_first_qa": {
-    "run": "B216",
-    "result": "Q132_REQUEST_FAMILY_SCALE_WEIGHT_REWORK_SELF_QA_PASS_PENDING_FRESH_C_AND_INGAME",
-    "worker_output_commit": "b39388c",
+    "run": "B217",
+    "result": "Q236_NATIVE_HD_STAGE_LIST_REWORK_SELF_QA_PASS_PENDING_FRESH_C_AND_INGAME",
+    "worker_output_commit": "dee9990",
     "assets": {
-      "1F5FE6E9": {
-        "queue_index": 132,
-        "candidate_sha256": "615281ac66733323221916c506cda2fb9eb2f139866e98f1a9985e56ba7dde90",
-        "status": "B216_STATIC_PASS_PENDING_FRESH_C_AND_INGAME",
-        "report": "localization/graphics/role_B/20261007-B-MANUALQA216-1F5FE6E9/B216_1F5FE6E9_REPORT.json"
+      "FEF70E85": {
+        "queue_index": 236,
+        "candidate_sha256": "5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245",
+        "status": "B217_STATIC_PASS_PENDING_FRESH_C_AND_INGAME",
+        "report": "localization/graphics/role_B/20261007-B-MANUALQA217-FEF70E85/B217_FEF70E85_REPORT.json"
       }
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "A144/A145/A146 and B210/B211/B212/B214/B215 plus B216 q132 1F5FE6E9 are pending fresh independent C. Prior C139 pass for q132 is superseded by changed candidate bytes; C must regenerate the English-original comparison before in-game testing. RUNTIME_VALIDATION=UNTESTED.",
+  "current_pending_c": "A144/A145/A146 and B210/B211/B212/B214/B215/B216 plus B217 q236 FEF70E85 are pending fresh independent C. Prior C153 pass for q236 is superseded by native-HD candidate bytes; C must regenerate the English-original comparison before in-game testing. RUNTIME_VALIDATION=UNTESTED.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
