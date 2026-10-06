@@ -254,6 +254,47 @@ float4 PSMain(VSOut input) : SV_Target
             gpuWorkSubmitted = true;
         }
 
+        bool PrepareForParentSessionDestroy() noexcept
+        {
+            if (handle == XR_NULL_HANDLE || !gpuWorkSubmitted)
+                return true;
+            if (!WaitForSwapchainGpuIdleBeforeDestroy())
+                return false;
+
+            // Preserve the completion proof across a transient parent-session
+            // destroy failure. No new swapchain GPU work can be submitted while
+            // teardown is in progress, so a retry need not repeat this drain.
+            gpuWorkSubmitted = false;
+            return true;
+        }
+
+        void ForgetAfterParentSessionDestroy() noexcept
+        {
+            // A successful xrDestroySession owns destruction of all child
+            // OpenXR handles. Drop only our local handle identity here and
+            // release the D3D11 views/cache that can no longer be referenced.
+            handle = XR_NULL_HANDLE;
+            for (auto& pair : rtvs)
+            {
+                ReleaseCom(pair[0]);
+                ReleaseCom(pair[1]);
+            }
+            rtvs.clear();
+            images.clear();
+            generation = 0;
+            committedGeneration = 0;
+            width = height = 0;
+            arraySize = 1;
+            format = DXGI_FORMAT_UNKNOWN;
+            acquired = false;
+            waited = false;
+            acquireFaulted = false;
+            waitFaulted = false;
+            releaseFaulted = false;
+            gpuWorkSubmitted = false;
+            acquiredImage = 0;
+        }
+
         bool Destroy(bool parentSessionDestroying = false)
         {
             if (handle != XR_NULL_HANDLE)
@@ -1213,8 +1254,35 @@ float4 PSMain(VSOut input) : SV_Target
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session)
     {
-        ResetAll(true);
-        return OutRunVrFinalTest::DestroySession(session);
+        const bool projectionGpuReady =
+            Projection.PrepareForParentSessionDestroy();
+        const bool theaterGpuReady =
+            Theater.PrepareForParentSessionDestroy();
+        if ((!projectionGpuReady || !theaterGpuReady) &&
+            !FirstSwapchainGpuDrainFailureLogged)
+        {
+            FirstSwapchainGpuDrainFailureLogged = true;
+            std::cerr
+                << "[R19] parent-session teardown proceeding with child GPU completion unproven; local ownership retained unless xrDestroySession succeeds\n";
+        }
+
+        const XrResult result = OutRunVrFinalTest::DestroySession(session);
+        if (XR_SUCCEEDED(result))
+        {
+            // xrDestroySession destroys child swapchains/spaces. Only after the
+            // parent succeeds may local ownership be forgotten; on failure the
+            // complete state remains available for a later retry.
+            Projection.ForgetAfterParentSessionDestroy();
+            Theater.ForgetAfterParentSessionDestroy();
+            ViewSpace = XR_NULL_HANDLE;
+            ResetCapture();
+            ReleaseCom(ConstantBuffer);
+            ReleaseCom(Sampler);
+            ReleaseCom(Ps);
+            ReleaseCom(Vs);
+            InvalidateStereoFrameCache();
+        }
+        return result;
     }
 }
 
