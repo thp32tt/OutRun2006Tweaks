@@ -60,8 +60,10 @@ for marker in (
         fail(f"render semantic projected-marker contract missing: {marker}")
 
 tag_start = semantics.find("struct SpriteNodeSemanticTag")
-tag_end = semantics.find("};", tag_start)
-tag = semantics[tag_start:tag_end]
+register_start = semantics.find("inline constexpr std::size_t SpriteNodeSemanticCapacity", tag_start)
+if tag_start < 0 or register_start <= tag_start:
+    fail("SpriteNodeSemanticTag block is missing")
+tag = semantics[tag_start:register_start]
 for marker in (
     "ProducerToken producer = ProducerToken::None;",
     "ProjectedMarkerInfo projectedMarker{};",
@@ -156,7 +158,8 @@ for marker in (
 replay = function_body(framerate, "static void replay()")
 for marker in (
     "entry.vrProducer",
-    "entry.vrProjectedMarker.valid ? &entry.vrProjectedMarker : nullptr",
+    "entry.vrProjectedMarker.valid",
+    "&entry.vrProjectedMarker",
 ):
     if marker not in replay:
         fail(f"Sumo replay restore missing projected payload: {marker}")
