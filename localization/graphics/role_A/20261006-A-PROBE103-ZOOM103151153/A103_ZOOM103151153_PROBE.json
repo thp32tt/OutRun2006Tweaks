@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PROBE103-ZOOM103151153",
+  "items": [
+    {
+      "queue_index": 103,
+      "folder": "spr_sprani_selector_cvt_Exst",
+      "asset": "590A4724_512x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+      "sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+      "bytes": 16777344,
+      "width": 2048,
+      "height": 2048,
+      "mipmaps": 1,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "bpp": 32,
+      "masks": [
+        "0xff",
+        "0xff00",
+        "0xff0000",
+        "0xff000000"
+      ],
+      "component_count": 3,
+      "components": [
+        {
+          "bbox": [
+            37,
+            200,
+            1400,
+            1096
+          ],
+          "area": 949734
+        },
+        {
+          "bbox": [
+            37,
+            1152,
+            1400,
+            2048
+          ],
+          "area": 949709
+        },
+        {
+          "bbox": [
+            1405,
+            1968,
+            1820,
+            2040
+          ],
+          "area": 28008
+        }
+      ]
+    },
+    {
+      "queue_index": 151,
+      "folder": "spr_sprani_sumo_fe_cvt_Exst",
+      "asset": "4668C688_512x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/4668C688_512x512.dds",
+      "sha256": "9adbd53a111d2feb05eebf020327ec54d8f627cc9ec3348060e1d83e807d991b",
+      "bytes": 16777344,
+      "width": 2048,
+      "height": 2048,
+      "mipmaps": 1,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "bpp": 32,
+      "masks": [
+        "0xff",
+        "0xff00",
+        "0xff0000",
+        "0xff000000"
+      ],
+      "component_count": 1,
+      "components": [
+        {
+          "bbox": [
+            0,
+            368,
+            1824,
+            2048
+          ],
+          "area": 3064320
+        }
+      ]
+    },
+    {
+      "queue_index": 153,
+      "folder": "spr_sprani_sumo_fe_cvt_Exst",
+      "asset": "4C972A19_512x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/4C972A19_512x512.dds",
+      "sha256": "2f3de90d8fff616d9d65c4df1be544749be834b77d3eac8a1be9d08c220c54fc",
+      "bytes": 16777344,
+      "width": 2048,
+      "height": 2048,
+      "mipmaps": 1,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "bpp": 32,
+      "masks": [
+        "0xff",
+        "0xff00",
+        "0xff0000",
+        "0xff000000"
+      ],
+      "component_count": 15,
+      "components": [
+        {
+          "bbox": [
+            0,
+            65,
+            1940,
+            2048
+          ],
+          "area": 2299104
+        },
+        {
+          "bbox": [
+            1788,
+            184,
+            1987,
+            272
+          ],
+          "area": 12388
+        },
+        {
+          "bbox": [
+            755,
+            1034,
+            873,
+            1145
+          ],
+          "area": 8995
+        },
+        {
+          "bbox": [
+            1333,
+            185,
+            1390,
+            270
+          ],
+          "area": 3540
+        },
+        {
+          "bbox": [
+            897,
+            182,
+            952,
+            264
+          ],
+          "area": 3311
+        },
+        {
+          "bbox": [
+            981,
+            178,
+            1035,
+            259
+          ],
+          "area": 3284
+        },
+        {
+          "bbox": [
+            1157,
+            180,
+            1212,
+            261
+          ],
+          "area": 3266
+        },
+        {
+          "bbox": [
+            1070,
+            182,
+            1122,
+            259
+          ],
+          "area": 3094
+        },
+        {
+          "bbox": [
+            1577,
+            181,
+            1631,
+            262
+          ],
+          "area": 3047
+        },
+        {
+          "bbox": [
+            1250,
+            182,
+            1304,
+            265
+          ],
+          "area": 3032
+        },
+        {
+          "bbox": [
+            1478,
+            185,
+            1535,
+            262
+          ],
+          "area": 2750
+        },
+        {
+          "bbox": [
+            1654,
+            185,
+            1705,
+            262
+          ],
+          "area": 2183
+        },
+        {
+          "bbox": [
+            1740,
+            189,
+            1774,
+            267
+          ],
+          "area": 1748
+        },
+        {
+          "bbox": [
+            1428,
+            229,
+            1454,
+            271
+          ],
+          "area": 898
+        },
+        {
+          "bbox": [
+            1406,
+            230,
+            1427,
+            271
+          ],
+          "area": 619
+        }
+      ]
+    }
+  ],
+  "status": "A103_SOURCE_PROBE_BATCH_COMPLETE_CONTROLLER_CLASSIFICATION_REQUIRED"
+}
