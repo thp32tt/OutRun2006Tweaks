@@ -4218,7 +4218,8 @@
     "12519155",
     "1762489B",
     "1F5FE6E9",
-    "E7F6E9B7"
+    "E7F6E9B7",
+    "2EA557B4"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6710,7 +6711,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 03:01 KST",
+  "updated_at_kst": "2026-10-07 03:19 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7299,5 +7300,64 @@
       "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/036_q236_FEF70E85.jpg"
     },
     "runtime_validation": "UNTESTED"
+  },
+  "a148r_2ea557b4_manual_visual_rework": {
+    "run": "A148R",
+    "timestamp_kst": "2026-10-07 03:19 KST",
+    "role": "A",
+    "queue_index": 55,
+    "asset_key": "2EA557B4",
+    "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+    "selection_reason": "manual PRE_INGAME English-original review after A production queue exhaustion",
+    "prior_c_status": "C164_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc",
+    "defects": [
+      "TEXT_SCALE_MATERIALLY_UNDERSIZED_VS_SOURCE",
+      "SOURCE_ALIGNMENT_HIERARCHY_MISMATCH"
+    ],
+    "first_attempt_sha256": "13cf23b401ecf65fa3b2f70af50a5be5e1f07c086d982d634c08d7b8094b477b",
+    "first_attempt_status": "CONTROLLER_REJECTED_NOT_PROMOTED_SOURCE_ALIGNMENT",
+    "candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
+    "worker_output_commit": "bd869b7f0e36acb1efec484d9d70311aa04dd668",
+    "github_worker_runs": [
+      37508566228,
+      37510039137
+    ],
+    "source_size": [
+      1089,
+      143
+    ],
+    "prior_localized_size": [
+      533,
+      127
+    ],
+    "localized_size": [
+      881,
+      127
+    ],
+    "localized_bbox": [
+      9,
+      113,
+      890,
+      240
+    ],
+    "machine_qa": {
+      "bbox_size_positive_margin": "1/1 PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "protected": 0,
+      "residue": 0,
+      "clean_validator": "PASS",
+      "final_validator": "PASS",
+      "format": "DXT5",
+      "raw_orientation": "mirror_y"
+    },
+    "controller_visual_qa": "PASS_SOURCE_C164_A148R_READABLE_DETAIL_AND_RAW",
+    "controller_qa": "localization/graphics/role_A/20261007-A-MANUALQA148R-2EA557B4/A148R_CONTROLLER_SELF_QA.json",
+    "status": "A148R_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
