@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-CLASSIFY192-ZOOM166174178180",
+  "base_head": "adbe2d5febe1431e238fbe98d4e13076ae7826d2",
+  "source_worker_report": "localization/graphics/role_B/20261006-B-PROBE181-ZOOM166172174178180/B181_ZOOM166172174178180_REPORT.json",
+  "items": [
+    {
+      "queue_index": 166,
+      "asset": "5EBD7FE8",
+      "raw_source": "localization/graphics/role_B/20261006-B-PROBE181-ZOOM166172174178180/B181_5EBD7FE8_RAW.png",
+      "raw_proof": "localization/graphics/role_B/20261006-B-CLASSIFY192-ZOOM166174178180/B192_5EBD7FE8_RAW_PROOF.jpg"
+    },
+    {
+      "queue_index": 174,
+      "asset": "73F852A4",
+      "raw_source": "localization/graphics/role_B/20261006-B-PROBE181-ZOOM166172174178180/B181_73F852A4_RAW.png",
+      "raw_proof": "localization/graphics/role_B/20261006-B-CLASSIFY192-ZOOM166174178180/B192_73F852A4_RAW_PROOF.jpg"
+    },
+    {
+      "queue_index": 178,
+      "asset": "798A1E",
+      "raw_source": "localization/graphics/role_B/20261006-B-PROBE181-ZOOM166172174178180/B181_798A1E_RAW.png",
+      "raw_proof": "localization/graphics/role_B/20261006-B-CLASSIFY192-ZOOM166174178180/B192_798A1E_RAW_PROOF.jpg"
+    },
+    {
+      "queue_index": 180,
+      "asset": "7ABD5110",
+      "raw_source": "localization/graphics/role_B/20261006-B-PROBE181-ZOOM166172174178180/B181_7ABD5110_RAW.png",
+      "raw_proof": "localization/graphics/role_B/20261006-B-CLASSIFY192-ZOOM166174178180/B192_7ABD5110_RAW_PROOF.jpg"
+    }
+  ],
+  "purpose": "Compact raw-orientation proofs for pending controller classification only; no candidate/render/state mutation.",
+  "status": "RAW_PROOFS_READY_FOR_CONTROLLER_REVIEW",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

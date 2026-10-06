@@ -1,0 +1,15 @@
+{
+  "role": "B",
+  "run": "20261006-B-PROBE193-ZOOM194196202206210214238",
+  "indices": [
+    194,
+    196,
+    202,
+    206,
+    210,
+    214,
+    238
+  ],
+  "report": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_ZOOM194196202206210214238_REPORT.json",
+  "status": "WORKER_PROBE_READY_FOR_CONTROLLER_CLASSIFICATION"
+}

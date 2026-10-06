@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PROBE193-ZOOM194196202206210214238",
+  "base_head": "adbe2d5febe1431e238fbe98d4e13076ae7826d2",
+  "purpose": "One allowed new preflight batch after consuming existing B181 evidence; exact-HD readable+raw classification evidence for all remaining even blocked zoom_review rows.",
+  "items": [
+    {
+      "queue_index": 194,
+      "asset": "9AC75730",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9AC75730_512x512.dds",
+      "queue_filename": "9AC75730_512x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/9AC75730_512x512.dds",
+      "source_commit": "3da79726739ac631d8e2703a65330dbb0c310770",
+      "source_resolution_attempts": [
+        [
+          "a95efe01d1f136514cef94b0d9e9fd61df021754",
+          "7487d50ae24dc3a6951d6e4d297bdc112cf981a36168f88feac69782b8a9b79a"
+        ],
+        [
+          "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+          "7487d50ae24dc3a6951d6e4d297bdc112cf981a36168f88feac69782b8a9b79a"
+        ],
+        [
+          "dd0c8022792899c6895d903705659f378947388b",
+          "7487d50ae24dc3a6951d6e4d297bdc112cf981a36168f88feac69782b8a9b79a"
+        ],
+        [
+          "3da79726739ac631d8e2703a65330dbb0c310770",
+          "a40c30d68742961c4c75b397d05b341e01cbfc22b60d40caa88649e34c5719b0"
+        ]
+      ],
+      "inventory_sha256": "a40c30d68742961c4c75b397d05b341e01cbfc22b60d40caa88649e34c5719b0",
+      "source_sha256": "a40c30d68742961c4c75b397d05b341e01cbfc22b60d40caa88649e34c5719b0",
+      "dds": {
+        "width": 2048,
+        "height": 2048,
+        "mipmaps": 1,
+        "fourcc": "DXT5",
+        "bpp": 0
+      },
+      "raw_orientation": "mirror_y",
+      "readable_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_9AC75730_READABLE.png",
+      "raw_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_9AC75730_RAW.png",
+      "readable_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_9AC75730_READABLE_PROOF.jpg",
+      "raw_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_9AC75730_RAW_PROOF.jpg",
+      "controller_classification": "PENDING_CONTROLLER_VISUAL_REVIEW"
+    },
+    {
+      "queue_index": 196,
+      "asset": "9EF903AF",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9EF903AF_512x512.dds",
+      "queue_filename": "9EF903AF_512x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/9EF903AF_512x512.dds",
+      "source_commit": "3da79726739ac631d8e2703a65330dbb0c310770",
+      "source_resolution_attempts": [
+        [
+          "a95efe01d1f136514cef94b0d9e9fd61df021754",
+          "aff7978bf243322d38b834577d8bbc7792c040ffb647b37300657025e17dc647"
+        ],
+        [
+          "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+          "aff7978bf243322d38b834577d8bbc7792c040ffb647b37300657025e17dc647"
+        ],
+        [
+          "dd0c8022792899c6895d903705659f378947388b",
+          "aff7978bf243322d38b834577d8bbc7792c040ffb647b37300657025e17dc647"
+        ],
+        [
+          "3da79726739ac631d8e2703a65330dbb0c310770",
+          "4dc7f00c7057064bea082735717eb66867b85c1fd3efafb49a56534100bedac5"
+        ]
+      ],
+      "inventory_sha256": "4dc7f00c7057064bea082735717eb66867b85c1fd3efafb49a56534100bedac5",
+      "source_sha256": "4dc7f00c7057064bea082735717eb66867b85c1fd3efafb49a56534100bedac5",
+      "dds": {
+        "width": 2048,
+        "height": 2048,
+        "mipmaps": 1,
+        "fourcc": "DXT5",
+        "bpp": 0
+      },
+      "raw_orientation": "mirror_y",
+      "readable_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_9EF903AF_READABLE.png",
+      "raw_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_9EF903AF_RAW.png",
+      "readable_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_9EF903AF_READABLE_PROOF.jpg",
+      "raw_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_9EF903AF_RAW_PROOF.jpg",
+      "controller_classification": "PENDING_CONTROLLER_VISUAL_REVIEW"
+    },
+    {
+      "queue_index": 202,
+      "asset": "AB56F682",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/AB56F682_512x512.dds",
+      "queue_filename": "AB56F682_512x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/AB56F682_512x512.dds",
+      "source_commit": "3da79726739ac631d8e2703a65330dbb0c310770",
+      "source_resolution_attempts": [
+        [
+          "a95efe01d1f136514cef94b0d9e9fd61df021754",
+          "c8cf69f180e3b9e9aab5363ac421b460854dda8e0b3b1e4560a7e5702d20fb78"
+        ],
+        [
+          "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+          "c8cf69f180e3b9e9aab5363ac421b460854dda8e0b3b1e4560a7e5702d20fb78"
+        ],
+        [
+          "dd0c8022792899c6895d903705659f378947388b",
+          "c8cf69f180e3b9e9aab5363ac421b460854dda8e0b3b1e4560a7e5702d20fb78"
+        ],
+        [
+          "3da79726739ac631d8e2703a65330dbb0c310770",
+          "847088dd71a29a50ccd33c2d52b07dd365f24c3345e7b4cf0531e13e25776655"
+        ]
+      ],
+      "inventory_sha256": "847088dd71a29a50ccd33c2d52b07dd365f24c3345e7b4cf0531e13e25776655",
+      "source_sha256": "847088dd71a29a50ccd33c2d52b07dd365f24c3345e7b4cf0531e13e25776655",
+      "dds": {
+        "width": 2048,
+        "height": 2048,
+        "mipmaps": 1,
+        "fourcc": "DXT5",
+        "bpp": 0
+      },
+      "raw_orientation": "mirror_y",
+      "readable_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_AB56F682_READABLE.png",
+      "raw_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_AB56F682_RAW.png",
+      "readable_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_AB56F682_READABLE_PROOF.jpg",
+      "raw_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_AB56F682_RAW_PROOF.jpg",
+      "controller_classification": "PENDING_CONTROLLER_VISUAL_REVIEW"
+    },
+    {
+      "queue_index": 206,
+      "asset": "AEA507A4",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/AEA507A4_512x256.dds",
+      "queue_filename": "AEA507A4_512x256.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_sumo_fe_cvt_Exst/AEA507A4_512x256.dds",
+      "source_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+      "source_resolution_attempts": [
+        [
+          "a95efe01d1f136514cef94b0d9e9fd61df021754",
+          "c0655ff7c6aee5d2cf60792f20a2d5e3455f52840b8ca69e69fc341060514dcc"
+        ]
+      ],
+      "inventory_sha256": "c0655ff7c6aee5d2cf60792f20a2d5e3455f52840b8ca69e69fc341060514dcc",
+      "source_sha256": "c0655ff7c6aee5d2cf60792f20a2d5e3455f52840b8ca69e69fc341060514dcc",
+      "dds": {
+        "width": 2048,
+        "height": 1024,
+        "mipmaps": 12,
+        "fourcc": "DXT5",
+        "bpp": 0
+      },
+      "raw_orientation": "mirror_y",
+      "readable_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_AEA507A4_READABLE.png",
+      "raw_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_AEA507A4_RAW.png",
+      "readable_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_AEA507A4_READABLE_PROOF.jpg",
+      "raw_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_AEA507A4_RAW_PROOF.jpg",
+      "controller_classification": "PENDING_CONTROLLER_VISUAL_REVIEW"
+    },
+    {
+      "queue_index": 210,
+      "asset": "B5BB7AB0",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/B5BB7AB0_512x512.dds",
+      "queue_filename": "B5BB7AB0_512x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/B5BB7AB0_512x512.dds",
+      "source_commit": "3da79726739ac631d8e2703a65330dbb0c310770",
+      "source_resolution_attempts": [
+        [
+          "a95efe01d1f136514cef94b0d9e9fd61df021754",
+          "c1d01a601f5c2f73402639f8804f15935db373d29acd8182929cce2b9134eeb5"
+        ],
+        [
+          "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+          "c1d01a601f5c2f73402639f8804f15935db373d29acd8182929cce2b9134eeb5"
+        ],
+        [
+          "dd0c8022792899c6895d903705659f378947388b",
+          "c1d01a601f5c2f73402639f8804f15935db373d29acd8182929cce2b9134eeb5"
+        ],
+        [
+          "3da79726739ac631d8e2703a65330dbb0c310770",
+          "a14927afd29972f383fcecf4e32a7c60534a030b37b99183390503f24d6f8ff0"
+        ]
+      ],
+      "inventory_sha256": "a14927afd29972f383fcecf4e32a7c60534a030b37b99183390503f24d6f8ff0",
+      "source_sha256": "a14927afd29972f383fcecf4e32a7c60534a030b37b99183390503f24d6f8ff0",
+      "dds": {
+        "width": 2048,
+        "height": 2048,
+        "mipmaps": 1,
+        "fourcc": "DXT5",
+        "bpp": 0
+      },
+      "raw_orientation": "mirror_y",
+      "readable_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_B5BB7AB0_READABLE.png",
+      "raw_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_B5BB7AB0_RAW.png",
+      "readable_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_B5BB7AB0_READABLE_PROOF.jpg",
+      "raw_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_B5BB7AB0_RAW_PROOF.jpg",
+      "controller_classification": "PENDING_CONTROLLER_VISUAL_REVIEW"
+    },
+    {
+      "queue_index": 214,
+      "asset": "BF229CF4",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+      "queue_filename": "BF229CF4_512x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3da79726739ac631d8e2703a65330dbb0c310770/Release/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+      "source_commit": "3da79726739ac631d8e2703a65330dbb0c310770",
+      "source_resolution_attempts": [
+        [
+          "a95efe01d1f136514cef94b0d9e9fd61df021754",
+          "225afde209bf8439884d59eba001f7cb6615b030fcd61c6f5d666a26eb319071"
+        ],
+        [
+          "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+          "225afde209bf8439884d59eba001f7cb6615b030fcd61c6f5d666a26eb319071"
+        ],
+        [
+          "dd0c8022792899c6895d903705659f378947388b",
+          "225afde209bf8439884d59eba001f7cb6615b030fcd61c6f5d666a26eb319071"
+        ],
+        [
+          "3da79726739ac631d8e2703a65330dbb0c310770",
+          "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b"
+        ]
+      ],
+      "inventory_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+      "source_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+      "dds": {
+        "width": 2048,
+        "height": 2048,
+        "mipmaps": 1,
+        "fourcc": "DXT5",
+        "bpp": 0
+      },
+      "raw_orientation": "mirror_y",
+      "readable_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_BF229CF4_READABLE.png",
+      "raw_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_BF229CF4_RAW.png",
+      "readable_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_BF229CF4_READABLE_PROOF.jpg",
+      "raw_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_BF229CF4_RAW_PROOF.jpg",
+      "controller_classification": "PENDING_CONTROLLER_VISUAL_REVIEW"
+    },
+    {
+      "queue_index": 238,
+      "asset": "132A1B1F",
+      "queue_path": "textures/load/spr_sprani_sumo_loading_Exst/132A1B1F_512x512.dds",
+      "queue_filename": "132A1B1F_512x512.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/63907f83d2f878c1a02a79288bf36163bb83b847/Release/spr_sprani_sumo_loading_Exst/132A1B1F_512x512.dds",
+      "source_commit": "63907f83d2f878c1a02a79288bf36163bb83b847",
+      "source_resolution_attempts": [
+        [
+          "a95efe01d1f136514cef94b0d9e9fd61df021754",
+          "24d47ec2bc5244f199a36a2a3d0fbdf3c0d6ded930ffedb27c2377db39c09cfe"
+        ],
+        [
+          "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+          "24d47ec2bc5244f199a36a2a3d0fbdf3c0d6ded930ffedb27c2377db39c09cfe"
+        ],
+        [
+          "07edd1462bc44952793a6c378c5c86163cd1c979",
+          "24d47ec2bc5244f199a36a2a3d0fbdf3c0d6ded930ffedb27c2377db39c09cfe"
+        ],
+        [
+          "5e1471ca934e0417d646bb8aaab0ed46e85a73f2",
+          "2eb33c0aae7a6f6004a6b435b83531367668fb2fb0be4649b7a27ad395078a61"
+        ],
+        [
+          "35c23d3f2ce33f14ac94a15b57510150d0b3296f",
+          "b8ad3f0889c7f78ff8c85f58568ee4d70a4b1ef3112ab9424e35d420080e6da5"
+        ],
+        [
+          "191bb8319269b5af1cbcf0423071a663fa6d8eff",
+          "53506c3a9c69fbc28d0dfaed81e28bdd0ec6102da133fe0a55981e62815ddd54"
+        ],
+        [
+          "8ac29d57be6d2b96e04bd09bac6fa80f5a2c9d07",
+          "b8ad3f0889c7f78ff8c85f58568ee4d70a4b1ef3112ab9424e35d420080e6da5"
+        ],
+        [
+          "46e76401d83e1f0b289fc31d192ea98b20855d2f",
+          "53506c3a9c69fbc28d0dfaed81e28bdd0ec6102da133fe0a55981e62815ddd54"
+        ],
+        [
+          "63907f83d2f878c1a02a79288bf36163bb83b847",
+          "48d567d50fe59fd1718c0a7468c2c47fd374e46e008da350d40c5d12e5dec333"
+        ]
+      ],
+      "inventory_sha256": "48d567d50fe59fd1718c0a7468c2c47fd374e46e008da350d40c5d12e5dec333",
+      "source_sha256": "48d567d50fe59fd1718c0a7468c2c47fd374e46e008da350d40c5d12e5dec333",
+      "dds": {
+        "width": 512,
+        "height": 512,
+        "mipmaps": 1,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "bpp": 32
+      },
+      "raw_orientation": "mirror_y",
+      "readable_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_132A1B1F_READABLE.png",
+      "raw_evidence": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_132A1B1F_RAW.png",
+      "readable_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_132A1B1F_READABLE_PROOF.jpg",
+      "raw_proof": "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_132A1B1F_RAW_PROOF.jpg",
+      "controller_classification": "PENDING_CONTROLLER_VISUAL_REVIEW"
+    }
+  ],
+  "controller_visual_qa": "PENDING",
+  "candidate_written": false,
+  "runtime_validation": "UNTESTED",
+  "status": "B193_WORKER_PROBE_READY_FOR_CONTROLLER_CLASSIFICATION",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
