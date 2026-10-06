@@ -2,19 +2,19 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX9EX-00468",
   "production_id": "CONVERSION-DX9EX-00468",
-  "event_id": "CONVERSION-DX9EX-00468-E002",
+  "event_id": "CONVERSION-DX9EX-00468-E003",
   "event_type": "retry",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "3/3",
-  "status": "VALIDATING",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "8f7199bd5fcc027e1312cfd639f2f20de01abcd4",
-  "material_result_sha": "PENDING_SELF",
-  "validation_bearing_result_sha": "PENDING_SELF",
-  "result_sha": "PENDING_SELF",
+  "material_result_sha": "f8ff8b6f42c9c90042a1fe66544a1a2373f64feb",
+  "validation_bearing_result_sha": "fd9b2ac9c75a0ececdb7dcace46910643934f775",
+  "result_sha": "fd9b2ac9c75a0ececdb7dcace46910643934f775",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00468]",
   "selected_work_item": "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051",
   "summary": "Preserve successful R19 swapchain GPU-drain proof across transient live xrDestroySwapchain failure so retries do not repeat the same bounded completion fence.",
@@ -38,25 +38,29 @@
       "evidence": "Clear gpuWorkSubmitted immediately after successful drain and before xrDestroySwapchain. The normal success path is unchanged; failed live destroy retains the handle/resources but also retains the completed-drain proof. Deterministic verifier pins drain -> proof clear -> xrDestroySwapchain -> failure return ordering."
     },
     "C3_VALIDATE": {
-      "status": "RETRYING_FINAL",
-      "automation_validation": "PENDING",
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
       "runtime_validation": "UNTESTED",
-      "evidence": "Attempt 1 f8ff8b6f... failed stale verifier ordering. Attempt 2 exact SHA 6a87578417a89448de46946eb8b5406a3d42ed42: Domain Isolation 37422733650 SUCCESS and VR Autodev Coordination 37422733664 SUCCESS; DX9Ex Active 37422733687 policy failed only because the new transient-destroy require_order searched the entire Destroy body and matched the earlier !gpuDrained return false. Host/game/full-chain/package were skipped by policy dependency."
+      "evidence": "Final attempt exact SHA fd9b2ac9c75a0ececdb7dcace46910643934f775: DX9Ex Active 37422950809 policy/host/game/full-chain-compile/package SUCCESS; Domain Isolation 37422950914 SUCCESS; VR Autodev Coordination 37422950852 validate SUCCESS."
     },
     "C4_COMMIT": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "source_material_sha": "f8ff8b6f42c9c90042a1fe66544a1a2373f64feb",
+      "validation_bearing_result_sha": "fd9b2ac9c75a0ececdb7dcace46910643934f775",
       "ci_skip_on_validation_bearing_result": false
     },
     "C5_PACKAGE": {
-      "status": "PENDING"
+      "status": "COMPLETE",
+      "artifact_id": 11394171983,
+      "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-fd9b2ac9c75a0ececdb7dcace46910643934f775",
+      "digest": "sha256:bda59501675616b5a2036688c4d238cf2085ab6c61caa307e56697dbe7d88db8"
     },
     "C6_STATE": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "runtime_validation": "UNTESTED"
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "spec_basis": "OpenXR 1.1.63 requires all submitted graphics commands referring to a swapchain to complete before xrDestroySwapchain. The existing D3D11 event-query fence supplies that proof; once it succeeds, repeating the same fence without intervening GPU work is unnecessary.",
     "code_review": [
@@ -84,9 +88,23 @@
       "domain_isolation_result": "SUCCESS",
       "autodev_run_id": 37422733664,
       "autodev_result": "SUCCESS"
-    }
+    },
+    "attempt3": {
+      "validation_bearing_result_sha": "fd9b2ac9c75a0ececdb7dcace46910643934f775",
+      "dx9ex_active_run_id": 37422950809,
+      "policy_job_id": 112136165489,
+      "host_job_id": 112136271140,
+      "game_job_id": 112136271134,
+      "full_chain_compile_job_id": 112136271238,
+      "package_job_id": 112137696968,
+      "domain_isolation_run_id": 37422950914,
+      "autodev_run_id": 37422950852,
+      "result": "SUCCESS"
+    },
+    "final_ledger_issue_14_comment_id": 6010667088
   },
-  "next_action": "Validate the final verifier-scope repair exact SHA with canonical DX9Ex Active Validation and Domain Isolation. If any required Gate fails again, mark CONVERSION-DX9EX-00468 BLOCKED because ATTEMPT=3/3 is exhausted.",
+  "next_action": "COMPLETE. Preserve fd9b2ac9c75a0ececdb7dcace46910643934f775 as validation_bearing_result_sha; continue from bookkeeping HEAD with the next independent DX9Ex unit.",
   "started_at_kst": "2026-10-06T15:13:00+09:00",
-  "failure_context": "Final automatic repair 3/3 is verifier-only. Scope the transient destroy-failure order check to the successful-drain branch so its return false cannot alias the earlier !gpuDrained fail-closed return. Runtime source semantics from f8ff8b6f remain unchanged."
+  "failure_context": "Final automatic repair 3/3 is verifier-only. Scope the transient destroy-failure order check to the successful-drain branch so its return false cannot alias the earlier !gpuDrained fail-closed return. Runtime source semantics from f8ff8b6f remain unchanged.",
+  "completed_at_kst": "2026-10-06T15:24:00+09:00"
 }

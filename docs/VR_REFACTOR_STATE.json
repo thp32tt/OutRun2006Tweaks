@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T15:20:00+09:00",
+  "updatedKst": "2026-10-06T15:24:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -112,9 +112,10 @@
     "VR-DX9EX-CAPTURE-SOURCE-TRANSACTION-0047",
     "VR-DX9EX-RELEASE-COMMIT-PROVENANCE-0048",
     "VR-DX9EX-RELEASE-CALLSITE-COMPAT-0049",
-    "VR-DX9EX-EMERGENCY-CLEAR-GPU-PROVENANCE-0050"
+    "VR-DX9EX-EMERGENCY-CLEAR-GPU-PROVENANCE-0050",
+    "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051"
   ],
-  "next": "CONVERSION-DX9EX-00468 final 3/3 verifier repair scopes the transient destroy-failure ordering assertion to the successful-drain branch. Runtime source remains the original 00468 material change. Validate this exact SHA; if it fails again, mark the task BLOCKED per bounded repair policy.",
+  "next": "Structural extraction remains terminal and ARCH-V3-GATE-001 remains HMD-gated. CONVERSION-DX9EX-00468 validation-bearing SHA fd9b2ac9c75a0ececdb7dcace46910643934f775 passed canonical DX9Ex Active, Domain Isolation and coordination gates. Continue with the next independently provable DX9Ex stability/resource-lifetime or frame-pacing unit.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -252,7 +253,8 @@
     "CONVERSION-DX9EX-00467 / VR-DX9EX-EMERGENCY-CLEAR-GPU-PROVENANCE-0050 exact SHA b290361d2abd2b2ac03b94cca9b89c62b89e51f1 passed DX9Ex Active 37421595884, Domain Isolation 37421595899, and Autodev validate 37421595883; package artifact 11392964691 digest sha256:8bb39b1b4da864759fe740c14a0c091375c6752d7493083a28202430ec207448. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00468 / VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051: after WaitForSwapchainGpuIdleBeforeDestroy succeeds, Swapchain::Destroy now clears gpuWorkSubmitted before xrDestroySwapchain. If the live destroy call itself fails, the retained swapchain no longer repeats an already-proven event-query drain on the next retry unless new graphics work is submitted. OpenXR's completion-before-destroy invariant remains intact; runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00468 attempt 1 DX9Ex Active 37422577091 reached all architecture verifiers; only verify_vr_dx9ex_reset_transport_contract.py failed because an older order assertion contradicted the new drain-proof placement. Attempt 2 changes that verifier ordering only; runtime source semantics remain unchanged.",
-    "CONVERSION-DX9EX-00468 attempt 2 exact SHA 6a87578417a89448de46946eb8b5406a3d42ed42: Domain Isolation 37422733650 PASS and Autodev Coordination 37422733664 PASS; DX9Ex Active 37422733687 failed only because the new transient-destroy verifier used function-global first-occurrence ordering and captured the earlier !gpuDrained return false. Final 3/3 repair scopes that assertion to the successful-drain branch."
+    "CONVERSION-DX9EX-00468 attempt 2 exact SHA 6a87578417a89448de46946eb8b5406a3d42ed42: Domain Isolation 37422733650 PASS and Autodev Coordination 37422733664 PASS; DX9Ex Active 37422733687 failed only because the new transient-destroy verifier used function-global first-occurrence ordering and captured the earlier !gpuDrained return false. Final 3/3 repair scopes that assertion to the successful-drain branch.",
+    "CONVERSION-DX9EX-00468 / VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051 final validation-bearing SHA fd9b2ac9c75a0ececdb7dcace46910643934f775 passed DX9Ex Active 37422950809 (policy/host/game/full-chain-compile/package), Domain Isolation 37422950914 and Autodev 37422950852. Package artifact 11394171983 digest sha256:bda59501675616b5a2036688c4d238cf2085ab6c61caa307e56697dbe7d88db8. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
@@ -1059,16 +1061,20 @@
   "post1000Maintenance00468": {
     "taskId": "CONVERSION-DX9EX-00468",
     "productionId": "CONVERSION-DX9EX-00468",
-    "eventId": "CONVERSION-DX9EX-00468-E002",
+    "eventId": "CONVERSION-DX9EX-00468-E003",
     "eventType": "retry",
     "attempt": "3/3",
     "item": "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051",
     "baseSha": "8f7199bd5fcc027e1312cfd639f2f20de01abcd4",
-    "materialResultSha": "PENDING_SELF",
-    "validationBearingResultSha": "PENDING_SELF",
-    "automationValidation": "PENDING",
+    "materialResultSha": "f8ff8b6f42c9c90042a1fe66544a1a2373f64feb",
+    "validationBearingResultSha": "fd9b2ac9c75a0ececdb7dcace46910643934f775",
+    "automationValidation": "PASS",
     "runtimeValidation": "UNTESTED",
     "summary": "Preserve successful R19 swapchain GPU-drain proof across transient live xrDestroySwapchain failure so retries do not repeat the same bounded completion fence.",
-    "failureContext": "Attempt 1 f8ff8b6f... failed stale verifier ordering. Attempt 2 6a875784... fixed that assertion but a second verifier assertion still searched the entire Destroy body and matched the earlier !gpuDrained return false instead of the transient xrDestroySwapchain failure return. Attempt 3 scopes only that assertion to the successful-drain branch; runtime source is unchanged."
+    "failureContext": "Attempts 1-2 exposed deterministic verifier false-negatives only; attempt 3 fd9b2ac9... scoped the ordering assertion to the successful-drain branch and all canonical gates passed. Runtime source material originated at f8ff8b6f....",
+    "status": "COMPLETE",
+    "dx9exActiveRunId": 37422950809,
+    "domainIsolationRunId": 37422950914,
+    "packageArtifactId": 11394171983
   }
 }
