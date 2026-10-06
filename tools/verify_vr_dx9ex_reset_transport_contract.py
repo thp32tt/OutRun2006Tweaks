@@ -444,6 +444,30 @@ require_order(
 
 if resolve_direct_r32.count("++DirectTransportRingBackpressure;") != 1:
     fail("R32 DirectGPU free-slot scan must count whole-ring backpressure once")
+
+post_present_r7 = body(r7, "bool DirectTransportFrameReadyAfterPresent(")
+require_order(
+    post_present_r7,
+    "DirectGPU bounded post-Present publication",
+    "if(WaitForEventQuery(slot.fence,1))",
+    "slot.producerPending=false;",
+    "slot.pendingFrameId=0;",
+    "slot.published=true;",
+    "++DirectTransportFenceTimeouts;",
+    "const HRESULT status=slot.fence->GetData(nullptr,0,0);",
+    "if(status!=S_FALSE)",
+)
+if post_present_r7.count("WaitForEventQuery(") != 1:
+    fail("DirectGPU post-Present publication must keep exactly one bounded EVENT wait")
+forbid(
+    post_present_r7,
+    "DirectGPU post-Present publication wait",
+    "D3DGETDATA_FLUSH",
+    "Sleep(",
+    "SwitchToThread(",
+    "WaitForSingleObject(",
+)
+
 forbid(
     resolve_direct_r32,
     "R32 final owner fixed-slot regression",
