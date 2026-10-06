@@ -1,0 +1,887 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8",
+  "queue_index": 24,
+  "asset": "textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "work_stolen_from_lane": "B",
+  "source": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "dds_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_name_entry_xst/66743AA8_1024x1024.dds",
+    "png_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_name_entry_xst/66743AA8_1024x1024.png",
+    "atlas_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_name_entry_xst/66743AA8_1024x1024_atlas.json",
+    "dds_sha256": "8e18676ac303b07a56d81d1d21c5e025e0baf46da49b16ae9d2e411960181f73",
+    "dds_bytes": 1048704,
+    "canvas": [
+      1024,
+      1024
+    ]
+  },
+  "atlas": {
+    "regions_count": 49,
+    "sprite_range": [
+      "sprite_44",
+      "sprite_92"
+    ],
+    "logical_grid": "49 regions / 7x7 inspection contact",
+    "region_widths": [
+      96
+    ],
+    "region_heights": [
+      96
+    ],
+    "nonempty_alpha_regions": 49,
+    "records": [
+      {
+        "atlas_idx": 0,
+        "sprite_name": "sprite_44",
+        "rect": [
+          928,
+          386,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          931,
+          410,
+          1019,
+          455
+        ],
+        "nonzero_alpha_pixels": 3295
+      },
+      {
+        "atlas_idx": 1,
+        "sprite_name": "sprite_45",
+        "rect": [
+          701,
+          384,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          717,
+          400,
+          776,
+          468
+        ],
+        "nonzero_alpha_pixels": 2585
+      },
+      {
+        "atlas_idx": 2,
+        "sprite_name": "sprite_46",
+        "rect": [
+          601,
+          384,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          611,
+          392,
+          681,
+          474
+        ],
+        "nonzero_alpha_pixels": 2982
+      },
+      {
+        "atlas_idx": 3,
+        "sprite_name": "sprite_47",
+        "rect": [
+          503,
+          384,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          515,
+          388,
+          585,
+          476
+        ],
+        "nonzero_alpha_pixels": 4292
+      },
+      {
+        "atlas_idx": 4,
+        "sprite_name": "sprite_48",
+        "rect": [
+          405,
+          384,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          425,
+          388,
+          478,
+          473
+        ],
+        "nonzero_alpha_pixels": 2164
+      },
+      {
+        "atlas_idx": 5,
+        "sprite_name": "sprite_49",
+        "rect": [
+          306,
+          384,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          318,
+          408,
+          393,
+          452
+        ],
+        "nonzero_alpha_pixels": 2369
+      },
+      {
+        "atlas_idx": 6,
+        "sprite_name": "sprite_50",
+        "rect": [
+          207,
+          384,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          233,
+          388,
+          296,
+          476
+        ],
+        "nonzero_alpha_pixels": 1521
+      },
+      {
+        "atlas_idx": 7,
+        "sprite_name": "sprite_51",
+        "rect": [
+          104,
+          384,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          138,
+          445,
+          169,
+          469
+        ],
+        "nonzero_alpha_pixels": 585
+      },
+      {
+        "atlas_idx": 8,
+        "sprite_name": "sprite_52",
+        "rect": [
+          0,
+          384,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          21,
+          422,
+          72,
+          444
+        ],
+        "nonzero_alpha_pixels": 993
+      },
+      {
+        "atlas_idx": 9,
+        "sprite_name": "sprite_53",
+        "rect": [
+          887,
+          289,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          911,
+          306,
+          961,
+          366
+        ],
+        "nonzero_alpha_pixels": 1625
+      },
+      {
+        "atlas_idx": 10,
+        "sprite_name": "sprite_54",
+        "rect": [
+          786,
+          288,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          803,
+          293,
+          861,
+          381
+        ],
+        "nonzero_alpha_pixels": 3305
+      },
+      {
+        "atlas_idx": 11,
+        "sprite_name": "sprite_55",
+        "rect": [
+          687,
+          288,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          693,
+          293,
+          772,
+          381
+        ],
+        "nonzero_alpha_pixels": 3967
+      },
+      {
+        "atlas_idx": 12,
+        "sprite_name": "sprite_56",
+        "rect": [
+          587,
+          288,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          612,
+          296,
+          659,
+          378
+        ],
+        "nonzero_alpha_pixels": 1458
+      },
+      {
+        "atlas_idx": 13,
+        "sprite_name": "sprite_57",
+        "rect": [
+          490,
+          288,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          505,
+          293,
+          567,
+          381
+        ],
+        "nonzero_alpha_pixels": 3180
+      },
+      {
+        "atlas_idx": 14,
+        "sprite_name": "sprite_58",
+        "rect": [
+          391,
+          288,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          403,
+          293,
+          465,
+          381
+        ],
+        "nonzero_alpha_pixels": 3245
+      },
+      {
+        "atlas_idx": 15,
+        "sprite_name": "sprite_59",
+        "rect": [
+          293,
+          288,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          306,
+          296,
+          371,
+          378
+        ],
+        "nonzero_alpha_pixels": 2135
+      },
+      {
+        "atlas_idx": 16,
+        "sprite_name": "sprite_60",
+        "rect": [
+          196,
+          288,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          215,
+          293,
+          277,
+          381
+        ],
+        "nonzero_alpha_pixels": 3163
+      },
+      {
+        "atlas_idx": 17,
+        "sprite_name": "sprite_61",
+        "rect": [
+          97,
+          288,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          112,
+          295,
+          177,
+          380
+        ],
+        "nonzero_alpha_pixels": 3028
+      },
+      {
+        "atlas_idx": 18,
+        "sprite_name": "sprite_62",
+        "rect": [
+          0,
+          288,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          17,
+          295,
+          80,
+          377
+        ],
+        "nonzero_alpha_pixels": 2676
+      },
+      {
+        "atlas_idx": 19,
+        "sprite_name": "sprite_63",
+        "rect": [
+          890,
+          192,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          907,
+          196,
+          969,
+          284
+        ],
+        "nonzero_alpha_pixels": 2824
+      },
+      {
+        "atlas_idx": 20,
+        "sprite_name": "sprite_64",
+        "rect": [
+          791,
+          192,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          807,
+          196,
+          873,
+          281
+        ],
+        "nonzero_alpha_pixels": 2875
+      },
+      {
+        "atlas_idx": 21,
+        "sprite_name": "sprite_65",
+        "rect": [
+          693,
+          192,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          720,
+          199,
+          767,
+          281
+        ],
+        "nonzero_alpha_pixels": 1833
+      },
+      {
+        "atlas_idx": 22,
+        "sprite_name": "sprite_66",
+        "rect": [
+          594,
+          192,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          608,
+          196,
+          667,
+          284
+        ],
+        "nonzero_alpha_pixels": 3120
+      },
+      {
+        "atlas_idx": 23,
+        "sprite_name": "sprite_67",
+        "rect": [
+          493,
+          192,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          502,
+          199,
+          575,
+          281
+        ],
+        "nonzero_alpha_pixels": 2728
+      },
+      {
+        "atlas_idx": 24,
+        "sprite_name": "sprite_68",
+        "rect": [
+          394,
+          192,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          416,
+          199,
+          479,
+          281
+        ],
+        "nonzero_alpha_pixels": 2325
+      },
+      {
+        "atlas_idx": 25,
+        "sprite_name": "sprite_69",
+        "rect": [
+          295,
+          192,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          300,
+          199,
+          377,
+          281
+        ],
+        "nonzero_alpha_pixels": 2875
+      },
+      {
+        "atlas_idx": 26,
+        "sprite_name": "sprite_70",
+        "rect": [
+          194,
+          192,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          197,
+          199,
+          282,
+          281
+        ],
+        "nonzero_alpha_pixels": 4453
+      },
+      {
+        "atlas_idx": 27,
+        "sprite_name": "sprite_71",
+        "rect": [
+          96,
+          192,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          108,
+          199,
+          174,
+          281
+        ],
+        "nonzero_alpha_pixels": 2855
+      },
+      {
+        "atlas_idx": 28,
+        "sprite_name": "sprite_72",
+        "rect": [
+          0,
+          192,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          13,
+          199,
+          83,
+          284
+        ],
+        "nonzero_alpha_pixels": 3168
+      },
+      {
+        "atlas_idx": 29,
+        "sprite_name": "sprite_73",
+        "rect": [
+          883,
+          96,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          907,
+          103,
+          967,
+          185
+        ],
+        "nonzero_alpha_pixels": 2145
+      },
+      {
+        "atlas_idx": 30,
+        "sprite_name": "sprite_74",
+        "rect": [
+          785,
+          96,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          802,
+          100,
+          864,
+          188
+        ],
+        "nonzero_alpha_pixels": 2938
+      },
+      {
+        "atlas_idx": 31,
+        "sprite_name": "sprite_75",
+        "rect": [
+          689,
+          96,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          704,
+          103,
+          771,
+          185
+        ],
+        "nonzero_alpha_pixels": 3290
+      },
+      {
+        "atlas_idx": 32,
+        "sprite_name": "sprite_76",
+        "rect": [
+          589,
+          96,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          606,
+          100,
+          667,
+          188
+        ],
+        "nonzero_alpha_pixels": 3073
+      },
+      {
+        "atlas_idx": 33,
+        "sprite_name": "sprite_77",
+        "rect": [
+          491,
+          96,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          505,
+          103,
+          571,
+          185
+        ],
+        "nonzero_alpha_pixels": 2774
+      },
+      {
+        "atlas_idx": 34,
+        "sprite_name": "sprite_78",
+        "rect": [
+          392,
+          96,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          407,
+          100,
+          471,
+          188
+        ],
+        "nonzero_alpha_pixels": 3341
+      },
+      {
+        "atlas_idx": 35,
+        "sprite_name": "sprite_79",
+        "rect": [
+          294,
+          96,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          303,
+          103,
+          379,
+          185
+        ],
+        "nonzero_alpha_pixels": 3708
+      },
+      {
+        "atlas_idx": 36,
+        "sprite_name": "sprite_80",
+        "rect": [
+          197,
+          96,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          201,
+          103,
+          286,
+          185
+        ],
+        "nonzero_alpha_pixels": 4539
+      },
+      {
+        "atlas_idx": 37,
+        "sprite_name": "sprite_81",
+        "rect": [
+          97,
+          96,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          117,
+          103,
+          163,
+          185
+        ],
+        "nonzero_alpha_pixels": 2048
+      },
+      {
+        "atlas_idx": 38,
+        "sprite_name": "sprite_82",
+        "rect": [
+          0,
+          96,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          13,
+          103,
+          89,
+          185
+        ],
+        "nonzero_alpha_pixels": 3139
+      },
+      {
+        "atlas_idx": 39,
+        "sprite_name": "sprite_83",
+        "rect": [
+          871,
+          0,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          887,
+          7,
+          947,
+          92
+        ],
+        "nonzero_alpha_pixels": 1840
+      },
+      {
+        "atlas_idx": 40,
+        "sprite_name": "sprite_84",
+        "rect": [
+          774,
+          0,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          797,
+          7,
+          844,
+          89
+        ],
+        "nonzero_alpha_pixels": 1594
+      },
+      {
+        "atlas_idx": 41,
+        "sprite_name": "sprite_85",
+        "rect": [
+          677,
+          0,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          688,
+          7,
+          764,
+          89
+        ],
+        "nonzero_alpha_pixels": 3374
+      },
+      {
+        "atlas_idx": 42,
+        "sprite_name": "sprite_86",
+        "rect": [
+          581,
+          0,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          598,
+          4,
+          663,
+          92
+        ],
+        "nonzero_alpha_pixels": 3396
+      },
+      {
+        "atlas_idx": 43,
+        "sprite_name": "sprite_87",
+        "rect": [
+          485,
+          0,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          502,
+          7,
+          571,
+          89
+        ],
+        "nonzero_alpha_pixels": 2433
+      },
+      {
+        "atlas_idx": 44,
+        "sprite_name": "sprite_88",
+        "rect": [
+          387,
+          0,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          402,
+          7,
+          472,
+          89
+        ],
+        "nonzero_alpha_pixels": 2947
+      },
+      {
+        "atlas_idx": 45,
+        "sprite_name": "sprite_89",
+        "rect": [
+          289,
+          0,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          299,
+          7,
+          368,
+          89
+        ],
+        "nonzero_alpha_pixels": 3361
+      },
+      {
+        "atlas_idx": 46,
+        "sprite_name": "sprite_90",
+        "rect": [
+          193,
+          0,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          212,
+          4,
+          277,
+          92
+        ],
+        "nonzero_alpha_pixels": 2742
+      },
+      {
+        "atlas_idx": 47,
+        "sprite_name": "sprite_91",
+        "rect": [
+          96,
+          0,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          111,
+          7,
+          177,
+          89
+        ],
+        "nonzero_alpha_pixels": 3397
+      },
+      {
+        "atlas_idx": 48,
+        "sprite_name": "sprite_92",
+        "rect": [
+          0,
+          0,
+          96,
+          96
+        ],
+        "alpha_bbox_global": [
+          11,
+          7,
+          78,
+          89
+        ],
+        "nonzero_alpha_pixels": 2991
+      }
+    ]
+  },
+  "orientation": {
+    "dds_decode_equals_published_png": false,
+    "dds_mirror_y_equals_published_png": false,
+    "decision": "UNRESOLVED"
+  },
+  "evidence": [
+    "A135_NAME_ENTRY_49_CELL_CONTACT.jpg",
+    "A135_NAME_ENTRY_PUBLISHED_READABLE.jpg",
+    "A135_NAME_ENTRY_DDS_DECODE.jpg",
+    "A135_NAME_ENTRY_DDS_MIRROR_Y.jpg"
+  ],
+  "decision": "PREFLIGHT_READY_FOR_CONTROLLER_SEMANTIC_REVIEW",
+  "candidate_written": false,
+  "blocker": "Do not repurpose the 49 name-entry sprite slots until controller visual review identifies the stock symbol set and runtime input/storage mapping; atlas capacity alone does not prove Hangul-safe input.",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

@@ -1,0 +1,12 @@
+{
+  "role": "A",
+  "run": "20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8",
+  "queue_index": 24,
+  "asset": "66743AA8",
+  "source_sha256": "8e18676ac303b07a56d81d1d21c5e025e0baf46da49b16ae9d2e411960181f73",
+  "regions": 49,
+  "orientation": "UNRESOLVED",
+  "report": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_NAME_ENTRY_PREFLIGHT.json",
+  "status": "PREFLIGHT_READY_FOR_CONTROLLER_SEMANTIC_REVIEW",
+  "runtime_validation": "UNTESTED"
+}
