@@ -169,18 +169,16 @@ for row,cm,bm in zip(rows,clean_masks,banner_masks):
     clean_arr[:,:,3][cm]=255
 
 clean=Image.fromarray(clean_arr,"RGBA")
-# Clean-plate residue gate: the entire reconstructed text bbox must be sign-red and
-# no exact source pixel from that region may survive.
-residue_clean=0
-clean_not_red=0
+# Clean-plate residue gate: the entire reconstructed text bbox must classify
+# as the sign-red background. Exact RGB equality is only diagnostic because
+# a donor red can legitimately equal a pre-existing red pixel by coincidence.
 unchanged=np.all(clean_arr==sa,axis=2)
 rr=clean_arr[:,:,0].astype(np.int16); gg=clean_arr[:,:,1].astype(np.int16); bb=clean_arr[:,:,2].astype(np.int16)
 sign_red=(rr>95) & (rr>gg+25) & (rr>bb+15) & (gg<145)
-for row,cm in zip(rows,clean_masks):
-    clean_not_red += int(np.count_nonzero(cm & ~sign_red))
-    residue_clean += int(np.count_nonzero(cm & unchanged))
-if residue_clean or clean_not_red:
-    raise RuntimeError(("clean residue",residue_clean,"clean_not_red",clean_not_red))
+residue_clean=int(np.count_nonzero(clean_region & unchanged))
+clean_not_red=int(np.count_nonzero(clean_region & ~sign_red))
+if clean_not_red:
+    raise RuntimeError(("clean_not_red",clean_not_red,"unchanged_red_diagnostic",residue_clean))
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
 subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
@@ -273,11 +271,12 @@ introduced=int(np.count_nonzero((da[:,:,3]>8)&(sa[:,:,3]<=8)&~allowed))
 if outside or alpha_out or protected_changed or introduced:
     raise RuntimeError(("static outside gate",outside,alpha_out,protected_changed,introduced))
 
-# Final residue gate: no exact old pixel from the reconstructed source-text region
-# may survive outside the new Hangul/effect guard.
+# Final residue gate: all reconstructed source-text pixels not occupied by
+# Hangul/effect must remain sign-red; any pale/source-shaped ghost is a failure.
 guard=ndimage.binary_dilation(target,iterations=2)
-same_source=np.all(da==sa,axis=2)
-residue_final=int(np.count_nonzero(clean_region & same_source & ~guard))
+rrf=da[:,:,0].astype(np.int16); ggf=da[:,:,1].astype(np.int16); bbf=da[:,:,2].astype(np.int16)
+final_sign_red=(rrf>95) & (rrf>ggf+25) & (rrf>bbf+15) & (ggf<145)
+residue_final=int(np.count_nonzero(clean_region & ~guard & ~final_sign_red))
 if residue_final: raise RuntimeError(("final source residue",residue_final))
 
 # Evidence.
