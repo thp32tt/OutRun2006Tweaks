@@ -762,6 +762,41 @@ if "R33InstallStatus()" in r33:
 if "R33InstallState" in r33:
     errors.append("R33 retained write-only final install state after observer retirement")
 
+# Post-1100 Reset-owner flattening: R32 keeps the corrected reset lifecycle
+# semantics but no longer owns a physical Reset hook. R33 hooks R22 Reset
+# directly and wraps that lower call with the R32 lifecycle owner helper.
+for banned in (
+    "SafetyHookInline R32ResetR22Hook{};",
+    "HRESULT __stdcall ResetDestR32(",
+    "reinterpret_cast<void*>(&ResetDestR22), ResetDestR32",
+):
+    if banned in r32:
+        errors.append(f"R32 retained retired physical Reset ownership: {banned}")
+for marker in (
+    "HRESULT R32WithResetLifecycle(",
+    "R32ClearPendingProducerFences();",
+    "const HRESULT hr = lowerReset();",
+    "R32ResetAfterGameReset();",
+    "R32InvalidateResetCaches();",
+    "++R32ResetFailures",
+):
+    if marker not in r32:
+        errors.append(f"R32 missing Reset lifecycle owner contract: {marker}")
+for marker in (
+    "SafetyHookInline R33ResetR22Hook{};",
+    "reinterpret_cast<void*>(&ResetDestR22)",
+    "R32WithResetLifecycle(",
+    "R33ResetR22Hook.stdcall<HRESULT>",
+):
+    if marker not in r33:
+        errors.append(f"R33 missing direct Reset owner contract: {marker}")
+for banned in (
+    "R33ResetR32Hook",
+    "reinterpret_cast<void*>(&ResetDestR32)",
+):
+    if banned in r33:
+        errors.append(f"R33 retained retired R32 Reset chain: {banned}")
+
 # Post-1100 Present-owner flattening: R32 keeps telemetry semantics but no
 # longer owns a physical Present hook. R33 hooks R13 Present directly and wraps
 # that lower call with the R32 telemetry owner helper.
