@@ -3,6 +3,12 @@
   "role": "A",
   "run": "20261006-A-USERJPG144-CLEANUP",
   "trigger": "USER_PRE_INGAME_JPG_REVIEW_20261006",
+  "korean_font": {
+    "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "ttc_index": 1,
+    "family": "Noto Sans CJK KR",
+    "fallback_forbidden": true
+  },
   "numbers": [
     1,
     2,
@@ -26,19 +32,19 @@
       "number": 1,
       "queue_index": 12,
       "asset": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
-      "before_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+      "before_sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
       "after_sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
       "fixes": [
         "orientation_up_down_reversed"
       ],
-      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+      "status": "A_REWORK_ORIENTATION_BYTES_PRESERVED_PENDING_C_VISUAL_CONFIRM"
     },
     {
       "number": 2,
       "queue_index": 26,
       "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
-      "before_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
-      "after_sha256": "2afae053f48811b79ca3cbcf706e6edf4013e65d012010cb48b681169621f675",
+      "before_sha256": "2afae053f48811b79ca3cbcf706e6edf4013e65d012010cb48b681169621f675",
+      "after_sha256": "0281b7b46b5c53598bab2bf4a01f65f391b166345710460c51791da8cf70d530",
       "fixes": [
         "total_rank_text_scale",
         "plate_source_footprint_restoration",
@@ -54,12 +60,12 @@
             1275
           ],
           "localized_bbox": [
-            871,
+            834,
             1179,
-            1146,
+            1184,
             1270
           ],
-          "font_size": 96,
+          "font_size": 89,
           "stroke": 3,
           "slant": 0.16
         },
@@ -71,13 +77,13 @@
             246
           ],
           "localized_bbox": [
-            741,
+            705,
             161,
-            982,
+            1017,
             241
           ],
-          "font_size": 84,
-          "stroke": 3,
+          "font_size": 80,
+          "stroke": 2,
           "slant": 0.16
         }
       ],
@@ -87,8 +93,8 @@
       "number": 3,
       "queue_index": 28,
       "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
-      "before_sha256": "bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8",
-      "after_sha256": "bf232cda0af9e364ffd94ae30ba6092dd86280184d25936286d39583cfa7bfa7",
+      "before_sha256": "bf232cda0af9e364ffd94ae30ba6092dd86280184d25936286d39583cfa7bfa7",
+      "after_sha256": "aa0692a2918326a494c1b04837603313faac7bdd9b7f043d4b679a8e8b1493f9",
       "fixes": [
         "total_rank_text_scale",
         "plate_source_footprint_restoration",
@@ -104,13 +110,13 @@
             1275
           ],
           "localized_bbox": [
-            685,
+            649,
             1190,
-            926,
+            961,
             1270
           ],
-          "font_size": 84,
-          "stroke": 3,
+          "font_size": 80,
+          "stroke": 2,
           "slant": 0.16
         }
       ],
@@ -120,8 +126,8 @@
       "number": 4,
       "queue_index": 30,
       "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
-      "before_sha256": "cb023fa5533b4a058c437c1a879b2952a7268308e47202f7dced32c6a563e141",
-      "after_sha256": "41f83927c102db60dfe69aa7c499076a646c2e5cd53675672a575e7958403c51",
+      "before_sha256": "41f83927c102db60dfe69aa7c499076a646c2e5cd53675672a575e7958403c51",
+      "after_sha256": "e2eccea39c4241477c5c9743e23ffb69d1cfe785f5186dbd992a865a917d6edc",
       "fixes": [
         "total_rank_text_scale",
         "plate_source_footprint_restoration",
@@ -137,10 +143,10 @@
             1281
           ],
           "localized_bbox": [
-            1988,
-            1194,
-            2205,
-            1265
+            1948,
+            1192,
+            2245,
+            1268
           ],
           "font_size": 76,
           "stroke": 2,
@@ -154,10 +160,10 @@
             252
           ],
           "localized_bbox": [
-            1840,
-            165,
-            2057,
-            236
+            1800,
+            163,
+            2097,
+            239
           ],
           "font_size": 76,
           "stroke": 2,
@@ -170,8 +176,8 @@
       "number": 5,
       "queue_index": 32,
       "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
-      "before_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
-      "after_sha256": "2bdcc07401bb0543821173e266535f6153705bde28d53d2f1a12a40be2a4f2b0",
+      "before_sha256": "2bdcc07401bb0543821173e266535f6153705bde28d53d2f1a12a40be2a4f2b0",
+      "after_sha256": "9e0b5dcd66b1aaeb031f60090d3c8f919cc59f7c6f8860602bcbc9990eb87867",
       "fixes": [
         "total_rank_text_scale",
         "plate_source_footprint_restoration",
@@ -187,10 +193,10 @@
             248
           ],
           "localized_bbox": [
-            698,
-            170,
-            913,
-            240
+            658,
+            168,
+            952,
+            243
           ],
           "font_size": 75,
           "stroke": 2,
@@ -203,8 +209,8 @@
       "number": 6,
       "queue_index": 34,
       "asset": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
-      "before_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
-      "after_sha256": "405bfa8118ec156e8bc3167797fbc3d93850aae793080f6829b1b818335d0f4f",
+      "before_sha256": "405bfa8118ec156e8bc3167797fbc3d93850aae793080f6829b1b818335d0f4f",
+      "after_sha256": "590f868ac4b99addf1bf41a87de29498584b770e54649809f8398bb699aad467",
       "fixes": [
         "total_rank_text_scale",
         "plate_source_footprint_restoration",
@@ -220,10 +226,10 @@
             1281
           ],
           "localized_bbox": [
-            2180,
-            1194,
-            2397,
-            1265
+            2140,
+            1192,
+            2437,
+            1268
           ],
           "font_size": 76,
           "stroke": 2,
@@ -236,8 +242,8 @@
       "number": 7,
       "queue_index": 36,
       "asset": "textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
-      "before_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
-      "after_sha256": "4db4c974fbaef5779723fe15fed6d58281bd570fa5012631bcd39ba3f1e51839",
+      "before_sha256": "4db4c974fbaef5779723fe15fed6d58281bd570fa5012631bcd39ba3f1e51839",
+      "after_sha256": "e3854f79be83cdd5fac7e9af91ab8f2beb9707000a7c6abbc564c2ca443fa553",
       "fixes": [
         "total_rank_text_scale",
         "plate_source_footprint_restoration",
@@ -253,10 +259,10 @@
             3329
           ],
           "localized_bbox": [
-            1988,
-            3242,
-            2205,
-            3313
+            1948,
+            3240,
+            2245,
+            3316
           ],
           "font_size": 76,
           "stroke": 2,
@@ -270,10 +276,10 @@
             1724
           ],
           "localized_bbox": [
-            752,
-            1637,
-            969,
-            1708
+            712,
+            1635,
+            1009,
+            1711
           ],
           "font_size": 76,
           "stroke": 2,
@@ -287,10 +293,10 @@
             1728
           ],
           "localized_bbox": [
-            2418,
-            1650,
-            2633,
-            1720
+            2378,
+            1648,
+            2672,
+            1723
           ],
           "font_size": 75,
           "stroke": 2,
@@ -303,8 +309,8 @@
       "number": 8,
       "queue_index": 38,
       "asset": "textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
-      "before_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
-      "after_sha256": "4db4c974fbaef5779723fe15fed6d58281bd570fa5012631bcd39ba3f1e51839",
+      "before_sha256": "4db4c974fbaef5779723fe15fed6d58281bd570fa5012631bcd39ba3f1e51839",
+      "after_sha256": "e3854f79be83cdd5fac7e9af91ab8f2beb9707000a7c6abbc564c2ca443fa553",
       "fixes": [
         "exact_alias_of_007_rework"
       ],
@@ -314,8 +320,8 @@
       "number": 9,
       "queue_index": 43,
       "asset": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
-      "before_sha256": "50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f",
-      "after_sha256": "c158430f8a4f3730fa3c7067b0d20db97af8fddf6c830ddeb80e2d16820368ae",
+      "before_sha256": "c158430f8a4f3730fa3c7067b0d20db97af8fddf6c830ddeb80e2d16820368ae",
+      "after_sha256": "a2b0db36e0283244037dccae5b65558a70d5b8547da245d92c840e0da3b3327c",
       "fixes": [
         "text_scale_hierarchy",
         "right_lean",
@@ -331,13 +337,13 @@
             351
           ],
           "localized_bbox": [
-            168,
+            122,
             261,
-            393,
+            439,
             346
           ],
-          "font_size": 90,
-          "stroke": 3
+          "font_size": 86,
+          "stroke": 2
         },
         {
           "key": "perfect",
@@ -348,13 +354,13 @@
             560
           ],
           "localized_bbox": [
-            542,
+            495,
             359,
-            873,
+            920,
             552
           ],
-          "font_size": 200,
-          "stroke": 6
+          "font_size": 195,
+          "stroke": 5
         },
         {
           "key": "congratulations",
@@ -365,12 +371,12 @@
             788
           ],
           "localized_bbox": [
-            635,
+            493,
             568,
-            1395,
-            780
+            1537,
+            779
           ],
-          "font_size": 221,
+          "font_size": 211,
           "stroke": 6
         },
         {
@@ -382,12 +388,12 @@
             1026
           ],
           "localized_bbox": [
-            622,
+            567,
             796,
-            1001,
+            1056,
             1017
           ],
-          "font_size": 231,
+          "font_size": 224,
           "stroke": 6
         }
       ],
@@ -397,8 +403,8 @@
       "number": 10,
       "queue_index": 44,
       "asset": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
-      "before_sha256": "3090f2664bab3065502b10a98f93d17e92a64a3725dc1b7a4bb790648a5da6e7",
-      "after_sha256": "4b55fb306cb5096a9ecf98085687cee01e8debd50fe5a5e2d128a008d1016bea",
+      "before_sha256": "4b55fb306cb5096a9ecf98085687cee01e8debd50fe5a5e2d128a008d1016bea",
+      "after_sha256": "8c6a390cbadae23beff263bb0eea4ca935643d591b45bac9ca474fa108e5a913",
       "fixes": [
         "text_scale_hierarchy",
         "source_direction_slant",
@@ -414,12 +420,12 @@
             160
           ],
           "localized_bbox": [
-            37,
+            30,
             103,
-            161,
+            168,
             157
           ],
-          "font_size": 54,
+          "font_size": 52,
           "stroke": 2,
           "slant": 0.12
         },
@@ -432,12 +438,12 @@
             160
           ],
           "localized_bbox": [
-            234,
+            228,
             103,
-            358,
+            364,
             157
           ],
-          "font_size": 55,
+          "font_size": 52,
           "stroke": 2,
           "slant": 0.12
         },
@@ -450,12 +456,12 @@
             151
           ],
           "localized_bbox": [
-            437,
+            429,
             113,
-            481,
+            489,
             148
           ],
-          "font_size": 37,
+          "font_size": 34,
           "stroke": 1,
           "slant": 0.0
         },
@@ -468,12 +474,12 @@
             152
           ],
           "localized_bbox": [
-            558,
+            549,
             112,
-            604,
+            614,
             149
           ],
-          "font_size": 40,
+          "font_size": 36,
           "stroke": 1,
           "slant": 0.0
         },
@@ -486,12 +492,12 @@
             249
           ],
           "localized_bbox": [
-            97,
+            82,
             183,
-            182,
+            196,
             246
           ],
-          "font_size": 67,
+          "font_size": 62,
           "stroke": 2,
           "slant": 0.12
         },
@@ -504,12 +510,12 @@
             259
           ],
           "localized_bbox": [
-            372,
+            356,
             183,
-            471,
+            487,
             256
           ],
-          "font_size": 78,
+          "font_size": 73,
           "stroke": 2,
           "slant": 0.12
         },
@@ -522,12 +528,12 @@
             259
           ],
           "localized_bbox": [
-            588,
-            189,
-            747,
-            249
+            575,
+            192,
+            761,
+            245
           ],
-          "font_size": 64,
+          "font_size": 50,
           "stroke": 2,
           "slant": 0.12
         },
@@ -540,12 +546,12 @@
             249
           ],
           "localized_bbox": [
-            802,
+            796,
             183,
-            949,
+            956,
             246
           ],
-          "font_size": 66,
+          "font_size": 62,
           "stroke": 2,
           "slant": 0.12
         },
@@ -558,12 +564,12 @@
             260
           ],
           "localized_bbox": [
-            1806,
+            1799,
             196,
-            1850,
+            1856,
             257
           ],
-          "font_size": 65,
+          "font_size": 60,
           "stroke": 2,
           "slant": 0.12
         },
@@ -576,12 +582,12 @@
             381
           ],
           "localized_bbox": [
-            1871,
+            1856,
             315,
-            1956,
+            1972,
             378
           ],
-          "font_size": 67,
+          "font_size": 62,
           "stroke": 2,
           "slant": 0.12
         },
@@ -594,12 +600,12 @@
             1240
           ],
           "localized_bbox": [
-            1860,
+            1853,
             1183,
-            1984,
+            1991,
             1237
           ],
-          "font_size": 54,
+          "font_size": 52,
           "stroke": 2,
           "slant": 0.12
         },
@@ -612,12 +618,12 @@
             1486
           ],
           "localized_bbox": [
-            532,
+            510,
             1415,
-            670,
+            693,
             1483
           ],
-          "font_size": 73,
+          "font_size": 67,
           "stroke": 2,
           "slant": 0.12
         }
@@ -628,8 +634,8 @@
       "number": 14,
       "queue_index": 51,
       "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
-      "before_sha256": "9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08",
-      "after_sha256": "4fff8c59a44a1b7d03cee192124915f87eb73b3988c7673feb3228785ce67726",
+      "before_sha256": "4fff8c59a44a1b7d03cee192124915f87eb73b3988c7673feb3228785ce67726",
+      "after_sha256": "3a046a8b695ee6b0a766fca223455616a45a9480b72e28b0c39ddf42821d0b6d",
       "fixes": [
         "bottom_outline_clipping",
         "two_line_effect_margin",
@@ -645,12 +651,12 @@
             562
           ],
           "localized_bbox": [
-            3156,
+            3117,
             491,
-            3357,
+            3397,
             553
           ],
-          "font_size": 66,
+          "font_size": 61,
           "stroke": 2
         },
         {
@@ -662,12 +668,12 @@
             643
           ],
           "localized_bbox": [
-            3113,
+            3068,
             571,
-            3401,
+            3445,
             634
           ],
-          "font_size": 66,
+          "font_size": 62,
           "stroke": 2
         }
       ],
@@ -677,8 +683,8 @@
       "number": 18,
       "queue_index": 57,
       "asset": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
-      "before_sha256": "dbd97d30d1e14df102d5c90c5ef5e339a93a934c4b10b71e2b30fbf76db2b8f8",
-      "after_sha256": "7b8afadca8d1a5adf3490b157c3f328255c7e308f25d29a3d4ead28d5629f116",
+      "before_sha256": "7b8afadca8d1a5adf3490b157c3f328255c7e308f25d29a3d4ead28d5629f116",
+      "after_sha256": "3dae27fdeb7d2cde6d440b45f1e94ddafe35a97fe749447fdf0f3974d5e90c16",
       "fixes": [
         "right_lean",
         "total_rank_plate_restoration",
@@ -697,12 +703,12 @@
             102
           ],
           "localized_bbox": [
-            1823,
+            1803,
             10,
-            1940,
-            96
+            1959,
+            97
           ],
-          "font_size": 93,
+          "font_size": 88,
           "stroke": 2,
           "slant": 0.11
         },
@@ -715,12 +721,12 @@
             259
           ],
           "localized_bbox": [
-            2596,
-            86,
-            3406,
-            249
+            2435,
+            83,
+            3567,
+            252
           ],
-          "font_size": 176,
+          "font_size": 171,
           "stroke": 4,
           "slant": 0.11
         },
@@ -734,11 +740,11 @@
           ],
           "localized_bbox": [
             134,
-            305,
-            1581,
-            737
+            352,
+            1580,
+            690
           ],
-          "font_size": 459,
+          "font_size": 344,
           "stroke": 8,
           "slant": 0.11
         },
@@ -751,12 +757,12 @@
             1075
           ],
           "localized_bbox": [
-            565,
-            905,
-            1047,
-            1065
+            518,
+            911,
+            1095,
+            1060
           ],
-          "font_size": 172,
+          "font_size": 149,
           "stroke": 4,
           "slant": 0.11
         },
@@ -769,12 +775,12 @@
             998
           ],
           "localized_bbox": [
-            1853,
+            1758,
             864,
-            2774,
+            2868,
             987
           ],
-          "font_size": 133,
+          "font_size": 124,
           "stroke": 3,
           "slant": 0.11
         },
@@ -787,12 +793,12 @@
             1267
           ],
           "localized_bbox": [
-            1881,
-            1121,
-            2386,
-            1260
+            1790,
+            1119,
+            2477,
+            1261
           ],
-          "font_size": 148,
+          "font_size": 142,
           "stroke": 4,
           "slant": 0.11
         },
@@ -805,12 +811,12 @@
             640
           ],
           "localized_bbox": [
-            2678,
+            2660,
             563,
-            2771,
+            2789,
             632
           ],
-          "font_size": 74,
+          "font_size": 71,
           "stroke": 2,
           "slant": 0.11
         },
@@ -823,13 +829,13 @@
             1085
           ],
           "localized_bbox": [
-            2535,
+            2519,
             1021,
-            2614,
-            1080
+            2629,
+            1079
           ],
-          "font_size": 62,
-          "stroke": 2,
+          "font_size": 59,
+          "stroke": 1,
           "slant": 0.11
         },
         {
@@ -841,12 +847,12 @@
             1085
           ],
           "localized_bbox": [
-            3032,
+            3024,
             1021,
-            3074,
+            3081,
             1080
           ],
-          "font_size": 62,
+          "font_size": 61,
           "stroke": 2,
           "slant": 0.11
         },
@@ -859,13 +865,13 @@
             1106
           ],
           "localized_bbox": [
-            3170,
-            1022,
-            3626,
-            1100
+            3168,
+            1032,
+            3628,
+            1090
           ],
-          "font_size": 82,
-          "stroke": 2,
+          "font_size": 58,
+          "stroke": 1,
           "slant": 0.11
         },
         {
@@ -877,10 +883,10 @@
             1281
           ],
           "localized_bbox": [
-            3205,
-            1150,
-            3372,
-            1273
+            3169,
+            1149,
+            3408,
+            1275
           ],
           "font_size": 133,
           "stroke": 3,
@@ -895,12 +901,12 @@
             1267
           ],
           "localized_bbox": [
-            3539,
+            3474,
             1177,
-            3928,
-            1261
+            3993,
+            1262
           ],
-          "font_size": 89,
+          "font_size": 86,
           "stroke": 2,
           "slant": 0.11
         },
@@ -913,13 +919,13 @@
             1792
           ],
           "localized_bbox": [
-            1989,
-            1357,
-            3181,
-            1714
+            1990,
+            1397,
+            3180,
+            1675
           ],
-          "font_size": 377,
-          "stroke": 8,
+          "font_size": 283,
+          "stroke": 7,
           "slant": 0.11
         },
         {
@@ -931,12 +937,12 @@
             2099
           ],
           "localized_bbox": [
-            768,
-            1924,
-            1266,
-            2089
+            723,
+            1931,
+            1311,
+            2083
           ],
-          "font_size": 178,
+          "font_size": 152,
           "stroke": 4,
           "slant": 0.11
         },
@@ -949,13 +955,13 @@
             2099
           ],
           "localized_bbox": [
-            2647,
-            1909,
-            3189,
-            2089
+            2603,
+            1918,
+            3233,
+            2080
           ],
-          "font_size": 193,
-          "stroke": 5,
+          "font_size": 163,
+          "stroke": 4,
           "slant": 0.11
         },
         {
@@ -967,12 +973,12 @@
             514
           ],
           "localized_bbox": [
-            2522,
-            368,
-            3027,
-            507
+            2431,
+            366,
+            3118,
+            508
           ],
-          "font_size": 148,
+          "font_size": 142,
           "stroke": 4,
           "slant": 0.11
         }
@@ -983,8 +989,8 @@
       "number": 19,
       "queue_index": 59,
       "asset": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
-      "before_sha256": "b75102588dc30ec828fdec765658d2e25cbcee9d972832bb70b527b372008542",
-      "after_sha256": "8cd6ff315cb66121d1656e634f8bc8cd897d5fca9084aa8cde6fc23679c09c91",
+      "before_sha256": "8cd6ff315cb66121d1656e634f8bc8cd897d5fca9084aa8cde6fc23679c09c91",
+      "after_sha256": "cc8745c36a40422f747fd5ceb66f42f36d165292750765a506a8b1fcba7cb217",
       "fixes": [
         "next_mission_internal_shading_reduced",
         "readability",
@@ -1000,13 +1006,13 @@
             500
           ],
           "localized_bbox": [
-            454,
+            396,
             361,
-            847,
+            904,
             492
           ],
-          "font_size": 140,
-          "stroke": 4,
+          "font_size": 132,
+          "stroke": 3,
           "slant": 0.1,
           "effect": "solid_fill_thin_outline_no_internal_gradient"
         },
@@ -1019,12 +1025,12 @@
             304
           ],
           "localized_bbox": [
-            166,
+            102,
             227,
-            533,
-            298
+            597,
+            299
           ],
-          "font_size": 74,
+          "font_size": 71,
           "stroke": 2,
           "slant": 0.08,
           "effect": "solid_fill_thin_outline_no_internal_gradient"
@@ -1038,13 +1044,13 @@
             137
           ],
           "localized_bbox": [
-            145,
-            59,
-            582,
-            130
+            128,
+            66,
+            599,
+            123
           ],
-          "font_size": 74,
-          "stroke": 2,
+          "font_size": 58,
+          "stroke": 1,
           "slant": 0.08,
           "effect": "solid_fill_thin_outline_no_internal_gradient"
         },
@@ -1057,10 +1063,10 @@
             320
           ],
           "localized_bbox": [
-            822,
-            237,
-            1303,
-            308
+            727,
+            235,
+            1398,
+            310
           ],
           "font_size": 74,
           "stroke": 2,
@@ -1074,8 +1080,8 @@
       "number": 20,
       "queue_index": 61,
       "asset": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
-      "before_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
-      "after_sha256": "bd9861961f8ff6183d1d0a52e1791df895cb8c8eff847d42a204c7c0321a9eab",
+      "before_sha256": "bd9861961f8ff6183d1d0a52e1791df895cb8c8eff847d42a204c7c0321a9eab",
+      "after_sha256": "fe1e7e7d264694c39f2bdbf50bb0a94ba15b88aea5b52873df4ceae749a8f95e",
       "fixes": [
         "source_text_residue",
         "plate_cleanliness",
@@ -1093,12 +1099,12 @@
           ],
           "localized_bbox": [
             2072,
-            1016,
-            2542,
-            1088
+            1025,
+            2541,
+            1078
           ],
-          "font_size": 76,
-          "stroke": 2,
+          "font_size": 53,
+          "stroke": 1,
           "slant": 0.1
         },
         {
@@ -1110,13 +1116,13 @@
             1106
           ],
           "localized_bbox": [
-            2601,
-            1011,
-            3023,
-            1092
+            2603,
+            1022,
+            3021,
+            1081
           ],
-          "font_size": 85,
-          "stroke": 2,
+          "font_size": 60,
+          "stroke": 1,
           "slant": 0.1
         },
         {
@@ -1129,12 +1135,12 @@
           ],
           "localized_bbox": [
             3072,
-            1031,
-            3563,
-            1097
+            1039,
+            3562,
+            1089
           ],
-          "font_size": 69,
-          "stroke": 2,
+          "font_size": 49,
+          "stroke": 1,
           "slant": 0.1
         },
         {
@@ -1146,12 +1152,12 @@
             1106
           ],
           "localized_bbox": [
-            3656,
+            3617,
             1030,
-            3982,
+            4021,
             1101
           ],
-          "font_size": 73,
+          "font_size": 70,
           "stroke": 2,
           "slant": 0.1
         },
@@ -1164,13 +1170,13 @@
             1568
           ],
           "localized_bbox": [
-            1049,
-            1491,
-            1500,
-            1563
+            1045,
+            1499,
+            1503,
+            1555
           ],
-          "font_size": 76,
-          "stroke": 2,
+          "font_size": 56,
+          "stroke": 1,
           "slant": 0.1
         },
         {
@@ -1182,13 +1188,13 @@
             1567
           ],
           "localized_bbox": [
-            1596,
-            1492,
-            1959,
-            1562
+            1572,
+            1498,
+            1984,
+            1556
           ],
-          "font_size": 73,
-          "stroke": 2,
+          "font_size": 59,
+          "stroke": 1,
           "slant": 0.1
         },
         {
@@ -1200,12 +1206,12 @@
             1568
           ],
           "localized_bbox": [
-            2095,
-            1491,
-            2474,
-            1563
+            2059,
+            1494,
+            2510,
+            1559
           ],
-          "font_size": 76,
+          "font_size": 64,
           "stroke": 2,
           "slant": 0.1
         },
@@ -1219,12 +1225,12 @@
           ],
           "localized_bbox": [
             1036,
-            1610,
+            1621,
             1547,
-            1689
+            1678
           ],
-          "font_size": 83,
-          "stroke": 2,
+          "font_size": 58,
+          "stroke": 1,
           "slant": 0.1
         },
         {
@@ -1237,12 +1243,12 @@
           ],
           "localized_bbox": [
             1560,
-            1611,
+            1622,
             2047,
-            1687
+            1677
           ],
-          "font_size": 79,
-          "stroke": 2,
+          "font_size": 55,
+          "stroke": 1,
           "slant": 0.1
         },
         {
@@ -1254,13 +1260,13 @@
             1695
           ],
           "localized_bbox": [
-            2060,
-            1614,
-            2566,
-            1683
+            2058,
+            1623,
+            2568,
+            1674
           ],
-          "font_size": 71,
-          "stroke": 2,
+          "font_size": 51,
+          "stroke": 1,
           "slant": 0.1
         },
         {
@@ -1272,12 +1278,12 @@
             1688
           ],
           "localized_bbox": [
-            2621,
+            2563,
             1611,
-            3000,
+            3058,
             1683
           ],
-          "font_size": 76,
+          "font_size": 71,
           "stroke": 2,
           "slant": 0.1
         },
@@ -1290,12 +1296,12 @@
             1687
           ],
           "localized_bbox": [
-            3095,
-            1612,
-            3484,
-            1682
+            3061,
+            1615,
+            3519,
+            1679
           ],
-          "font_size": 73,
+          "font_size": 63,
           "stroke": 2,
           "slant": 0.1
         },
@@ -1308,12 +1314,12 @@
             1584
           ],
           "localized_bbox": [
-            3192,
+            3158,
             1452,
-            3361,
+            3394,
             1578
           ],
-          "font_size": 136,
+          "font_size": 128,
           "stroke": 3,
           "slant": 0.1
         },
@@ -1326,12 +1332,12 @@
             1582
           ],
           "localized_bbox": [
-            3654,
+            3620,
             1452,
-            3820,
+            3855,
             1576
           ],
-          "font_size": 134,
+          "font_size": 125,
           "stroke": 3,
           "slant": 0.1
         },
@@ -1344,12 +1350,12 @@
             1688
           ],
           "localized_bbox": [
-            3712,
-            1620,
-            3876,
-            1674
+            3713,
+            1627,
+            3875,
+            1668
           ],
-          "font_size": 58,
+          "font_size": 40,
           "stroke": 1,
           "slant": 0.1
         },
@@ -1362,12 +1368,12 @@
             1894
           ],
           "localized_bbox": [
-            3820,
-            1824,
-            4070,
-            1868
+            3821,
+            1827,
+            4069,
+            1865
           ],
-          "font_size": 47,
+          "font_size": 34,
           "stroke": 1,
           "slant": 0.1
         },
@@ -1380,12 +1386,12 @@
             2034
           ],
           "localized_bbox": [
-            3624,
-            1901,
-            3899,
+            3600,
+            1900,
+            3924,
             2027
           ],
-          "font_size": 133,
+          "font_size": 128,
           "stroke": 3,
           "slant": 0.1
         },
@@ -1398,12 +1404,12 @@
             2140
           ],
           "localized_bbox": [
-            3559,
-            2065,
-            3948,
-            2135
+            3525,
+            2068,
+            3983,
+            2132
           ],
-          "font_size": 73,
+          "font_size": 63,
           "stroke": 2,
           "slant": 0.1
         },
@@ -1416,12 +1422,12 @@
             2272
           ],
           "localized_bbox": [
-            2606,
-            2184,
-            2965,
-            2267
+            2563,
+            2186,
+            3008,
+            2265
           ],
-          "font_size": 90,
+          "font_size": 78,
           "stroke": 2,
           "slant": 0.1
         },
@@ -1434,13 +1440,13 @@
             2266
           ],
           "localized_bbox": [
-            3087,
-            2190,
-            3365,
-            2261
+            3058,
+            2195,
+            3394,
+            2255
           ],
-          "font_size": 76,
-          "stroke": 2,
+          "font_size": 61,
+          "stroke": 1,
           "slant": 0.1
         },
         {
@@ -1452,13 +1458,13 @@
             2829
           ],
           "localized_bbox": [
-            1493,
+            1469,
             2725,
-            1626,
+            1651,
             2824
           ],
-          "font_size": 106,
-          "stroke": 3,
+          "font_size": 101,
+          "stroke": 2,
           "slant": 0.1
         }
       ],
@@ -1468,8 +1474,8 @@
       "number": 21,
       "queue_index": 65,
       "asset": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
-      "before_sha256": "005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2",
-      "after_sha256": "074cf03b504cb715e6b1328ecb33cec46a7b12fe6df74f8261eccfc77242cacc",
+      "before_sha256": "074cf03b504cb715e6b1328ecb33cec46a7b12fe6df74f8261eccfc77242cacc",
+      "after_sha256": "2b39cf005e79149890f0cfee605d29144d7d257e9cc9179b6c1f583ce393fce5",
       "fixes": [
         "untranslated_course",
         "untranslated_left",
@@ -1489,12 +1495,12 @@
             543
           ],
           "localized_bbox": [
-            407,
+            384,
             447,
-            520,
+            544,
             537
           ],
-          "font_size": 98,
+          "font_size": 91,
           "stroke": 2
         },
         {
@@ -1508,12 +1514,12 @@
             543
           ],
           "localized_bbox": [
-            1327,
+            1304,
             447,
-            1440,
+            1464,
             537
           ],
-          "font_size": 98,
+          "font_size": 91,
           "stroke": 2
         },
         {
@@ -1527,12 +1533,12 @@
             1340
           ],
           "localized_bbox": [
-            554,
-            1261,
-            649,
-            1335
+            527,
+            1264,
+            676,
+            1331
           ],
-          "font_size": 79,
+          "font_size": 81,
           "stroke": 2
         },
         {
@@ -1546,12 +1552,12 @@
             1470
           ],
           "localized_bbox": [
-            321,
+            290,
             1348,
-            468,
+            500,
             1462
           ],
-          "font_size": 123,
+          "font_size": 115,
           "stroke": 3
         },
         {
@@ -1565,12 +1571,12 @@
             1470
           ],
           "localized_bbox": [
-            726,
+            701,
             1410,
-            832,
-            1464
+            858,
+            1465
           ],
-          "font_size": 59,
+          "font_size": 57,
           "stroke": 1
         },
         {
@@ -1584,13 +1590,13 @@
             1620
           ],
           "localized_bbox": [
-            181,
+            145,
             1479,
-            350,
+            387,
             1611
           ],
-          "font_size": 141,
-          "stroke": 4
+          "font_size": 134,
+          "stroke": 3
         },
         {
           "key": "hard",
@@ -1603,12 +1609,12 @@
             1618
           ],
           "localized_bbox": [
-            764,
-            1479,
-            1013,
-            1608
+            725,
+            1484,
+            1052,
+            1603
           ],
-          "font_size": 139,
+          "font_size": 120,
           "stroke": 3
         }
       ],
@@ -1618,8 +1624,8 @@
       "number": 22,
       "queue_index": 86,
       "asset": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
-      "before_sha256": "e3c3f78975b3dd582690a7f169c1aa364dd05e3846827340aae38631885b92bf",
-      "after_sha256": "ddc24a0fab998eef0088b0b3d3b85768af7fd48b765e769e6c4ec338133579ba",
+      "before_sha256": "ddc24a0fab998eef0088b0b3d3b85768af7fd48b765e769e6c4ec338133579ba",
+      "after_sha256": "e3631a376fbe9f35d5926c3668033f3f971298e686c5eb14b8a7321feeb7c513",
       "fixes": [
         "text_clipping",
         "wrong_slant_direction",
@@ -1639,12 +1645,12 @@
             1412
           ],
           "localized_bbox": [
-            1922,
-            1319,
-            2237,
-            1405
+            1879,
+            1320,
+            2280,
+            1403
           ],
-          "font_size": 93,
+          "font_size": 84,
           "stroke": 2,
           "slant": 0.08
         },
@@ -1660,12 +1666,12 @@
             1236
           ],
           "localized_bbox": [
-            370,
+            299,
             1132,
-            918,
+            988,
             1228
           ],
-          "font_size": 104,
+          "font_size": 97,
           "stroke": 2,
           "slant": 0.08
         },
@@ -1681,12 +1687,12 @@
             1241
           ],
           "localized_bbox": [
-            2925,
+            2880,
             1164,
-            3261,
+            3306,
             1235
           ],
-          "font_size": 78,
+          "font_size": 72,
           "stroke": 1,
           "slant": 0.08
         },
@@ -1702,13 +1708,13 @@
             1088
           ],
           "localized_bbox": [
-            569,
-            999,
-            870,
+            522,
+            1000,
+            917,
             1081
           ],
-          "font_size": 89,
-          "stroke": 2,
+          "font_size": 83,
+          "stroke": 1,
           "slant": 0.08
         },
         {
@@ -1723,13 +1729,13 @@
             1088
           ],
           "localized_bbox": [
-            1668,
-            999,
-            2053,
+            1616,
+            1000,
+            2105,
             1081
           ],
-          "font_size": 89,
-          "stroke": 2,
+          "font_size": 83,
+          "stroke": 1,
           "slant": 0.08
         },
         {
@@ -1744,12 +1750,12 @@
             1088
           ],
           "localized_bbox": [
-            2841,
+            2806,
             998,
-            3196,
+            3231,
             1081
           ],
-          "font_size": 87,
+          "font_size": 84,
           "stroke": 2,
           "slant": 0.08
         },
@@ -1765,12 +1771,12 @@
             1091
           ],
           "localized_bbox": [
-            3755,
+            3736,
             999,
-            3868,
+            3887,
             1084
           ],
-          "font_size": 92,
+          "font_size": 86,
           "stroke": 2,
           "slant": 0.08
         },
@@ -1786,12 +1792,12 @@
             1242
           ],
           "localized_bbox": [
-            3847,
+            3828,
             1169,
-            3934,
+            3952,
             1236
           ],
-          "font_size": 74,
+          "font_size": 69,
           "stroke": 1,
           "slant": 0.045
         },
@@ -1807,12 +1813,12 @@
             2795
           ],
           "localized_bbox": [
-            3698,
+            3674,
             2695,
-            3817,
+            3840,
             2787
           ],
-          "font_size": 100,
+          "font_size": 93,
           "stroke": 2,
           "slant": 0.045
         },
@@ -1828,12 +1834,12 @@
             960
           ],
           "localized_bbox": [
-            758,
+            744,
             902,
-            828,
+            843,
             955
           ],
-          "font_size": 58,
+          "font_size": 54,
           "stroke": 1,
           "slant": 0.045
         },
@@ -1849,12 +1855,12 @@
             949
           ],
           "localized_bbox": [
-            1338,
+            1328,
             902,
-            1394,
+            1403,
             945
           ],
-          "font_size": 47,
+          "font_size": 42,
           "stroke": 1,
           "slant": 0.045
         },
@@ -1870,12 +1876,12 @@
             1836
           ],
           "localized_bbox": [
-            1522,
+            1513,
             1706,
-            1724,
+            1733,
             1826
           ],
-          "font_size": 128,
+          "font_size": 129,
           "stroke": 2,
           "slant": 0.045
         },
@@ -1891,12 +1897,12 @@
             1834
           ],
           "localized_bbox": [
-            2115,
+            2110,
             1704,
-            2338,
+            2343,
             1824
           ],
-          "font_size": 128,
+          "font_size": 129,
           "stroke": 2,
           "slant": 0.045
         },
@@ -1912,12 +1918,12 @@
             1836
           ],
           "localized_bbox": [
-            2723,
+            2712,
             1706,
-            2930,
+            2941,
             1826
           ],
-          "font_size": 126,
+          "font_size": 129,
           "stroke": 2,
           "slant": 0.045
         },
@@ -1933,12 +1939,12 @@
             1834
           ],
           "localized_bbox": [
-            3322,
+            3313,
             1704,
-            3533,
+            3542,
             1824
           ],
-          "font_size": 128,
+          "font_size": 129,
           "stroke": 2,
           "slant": 0.045
         },
@@ -1954,12 +1960,12 @@
             2284
           ],
           "localized_bbox": [
-            3378,
+            3373,
             2154,
-            3597,
+            3602,
             2274
           ],
-          "font_size": 128,
+          "font_size": 129,
           "stroke": 2,
           "slant": 0.045
         },
@@ -1975,12 +1981,12 @@
             1633
           ],
           "localized_bbox": [
-            282,
+            273,
             1503,
-            484,
+            493,
             1623
           ],
-          "font_size": 128,
+          "font_size": 129,
           "stroke": 2,
           "slant": 0.045
         },
@@ -1996,12 +2002,12 @@
             1635
           ],
           "localized_bbox": [
-            876,
+            871,
             1505,
-            1099,
+            1104,
             1625
           ],
-          "font_size": 128,
+          "font_size": 129,
           "stroke": 2,
           "slant": 0.045
         },
@@ -2017,12 +2023,12 @@
             1635
           ],
           "localized_bbox": [
-            1483,
+            1472,
             1505,
-            1690,
+            1701,
             1625
           ],
-          "font_size": 126,
+          "font_size": 129,
           "stroke": 2,
           "slant": 0.045
         },
@@ -2038,12 +2044,12 @@
             1633
           ],
           "localized_bbox": [
-            2082,
+            2073,
             1503,
-            2293,
+            2302,
             1623
           ],
-          "font_size": 128,
+          "font_size": 129,
           "stroke": 2,
           "slant": 0.045
         },
@@ -2059,12 +2065,12 @@
             1635
           ],
           "localized_bbox": [
-            2682,
+            2677,
             1505,
-            2901,
+            2906,
             1625
           ],
-          "font_size": 128,
+          "font_size": 129,
           "stroke": 2,
           "slant": 0.045
         },
@@ -2080,12 +2086,12 @@
             2032
           ],
           "localized_bbox": [
-            3285,
+            3237,
             1905,
-            3795,
+            3842,
             2022
           ],
-          "font_size": 125,
+          "font_size": 120,
           "stroke": 2,
           "slant": 0.08
         },
@@ -2101,12 +2107,12 @@
             1832
           ],
           "localized_bbox": [
-            580,
+            533,
             1705,
-            1090,
+            1138,
             1822
           ],
-          "font_size": 125,
+          "font_size": 120,
           "stroke": 2,
           "slant": 0.08
         },
@@ -2122,13 +2128,13 @@
             1584
           ],
           "localized_bbox": [
-            3101,
-            1494,
-            3491,
-            1577
+            3080,
+            1500,
+            3511,
+            1572
           ],
-          "font_size": 90,
-          "stroke": 2,
+          "font_size": 73,
+          "stroke": 1,
           "slant": 0.08
         },
         {
@@ -2143,12 +2149,12 @@
             1640
           ],
           "localized_bbox": [
-            3238,
+            3228,
             1588,
-            3302,
+            3312,
             1636
           ],
-          "font_size": 52,
+          "font_size": 47,
           "stroke": 1,
           "slant": 0.08
         },
@@ -2164,13 +2170,13 @@
             1384
           ],
           "localized_bbox": [
-            101,
-            1294,
-            491,
-            1377
+            80,
+            1300,
+            511,
+            1372
           ],
-          "font_size": 90,
-          "stroke": 2,
+          "font_size": 73,
+          "stroke": 1,
           "slant": 0.08
         },
         {
@@ -2185,12 +2191,12 @@
             1440
           ],
           "localized_bbox": [
-            240,
+            230,
             1388,
-            304,
+            314,
             1436
           ],
-          "font_size": 52,
+          "font_size": 47,
           "stroke": 1,
           "slant": 0.08
         },
@@ -2206,13 +2212,13 @@
             1384
           ],
           "localized_bbox": [
-            701,
-            1294,
-            1091,
-            1377
+            680,
+            1300,
+            1111,
+            1372
           ],
-          "font_size": 90,
-          "stroke": 2,
+          "font_size": 73,
+          "stroke": 1,
           "slant": 0.08
         },
         {
@@ -2227,12 +2233,12 @@
             1440
           ],
           "localized_bbox": [
-            834,
+            822,
             1388,
-            898,
+            909,
             1436
           ],
-          "font_size": 52,
+          "font_size": 48,
           "stroke": 1,
           "slant": 0.08
         },
@@ -2248,13 +2254,13 @@
             1392
           ],
           "localized_bbox": [
-            1288,
-            1295,
-            1703,
-            1384
+            1280,
+            1304,
+            1711,
+            1376
           ],
-          "font_size": 96,
-          "stroke": 2,
+          "font_size": 73,
+          "stroke": 1,
           "slant": 0.08
         },
         {
@@ -2269,12 +2275,12 @@
             1440
           ],
           "localized_bbox": [
-            1440,
+            1430,
             1395,
-            1495,
+            1506,
             1436
           ],
-          "font_size": 44,
+          "font_size": 41,
           "stroke": 1,
           "slant": 0.08
         },
@@ -2290,12 +2296,12 @@
             753
           ],
           "localized_bbox": [
-            1627,
-            707,
-            1780,
+            1607,
+            708,
+            1800,
             749
           ],
-          "font_size": 45,
+          "font_size": 40,
           "stroke": 1,
           "slant": 0.08
         },
@@ -2311,12 +2317,12 @@
             753
           ],
           "localized_bbox": [
-            1961,
+            1929,
             708,
-            2164,
+            2195,
             749
           ],
-          "font_size": 44,
+          "font_size": 40,
           "stroke": 1,
           "slant": 0.08
         },
@@ -2332,12 +2338,12 @@
             746
           ],
           "localized_bbox": [
-            2337,
+            2313,
             708,
-            2508,
+            2533,
             743
           ],
-          "font_size": 37,
+          "font_size": 33,
           "stroke": 1,
           "slant": 0.08
         },
@@ -2353,12 +2359,12 @@
             753
           ],
           "localized_bbox": [
-            2702,
-            708,
-            2863,
+            2676,
+            709,
+            2890,
             749
           ],
-          "font_size": 44,
+          "font_size": 39,
           "stroke": 1,
           "slant": 0.08
         },
@@ -2374,12 +2380,12 @@
             753
           ],
           "localized_bbox": [
-            3083,
+            3066,
             707,
-            3209,
+            3226,
             749
           ],
-          "font_size": 45,
+          "font_size": 41,
           "stroke": 1,
           "slant": 0.08
         },
@@ -2395,12 +2401,12 @@
             753
           ],
           "localized_bbox": [
-            3380,
-            707,
-            3625,
-            749
+            3382,
+            713,
+            3623,
+            744
           ],
-          "font_size": 45,
+          "font_size": 29,
           "stroke": 1,
           "slant": 0.08
         },
@@ -2416,12 +2422,12 @@
             753
           ],
           "localized_bbox": [
-            3800,
+            3786,
             708,
-            3924,
+            3939,
             749
           ],
-          "font_size": 44,
+          "font_size": 40,
           "stroke": 1,
           "slant": 0.08
         },
@@ -2437,12 +2443,12 @@
             840
           ],
           "localized_bbox": [
-            3681,
+            3655,
             795,
-            3857,
+            3884,
             836
           ],
-          "font_size": 44,
+          "font_size": 40,
           "stroke": 1,
           "slant": 0.08
         },
@@ -2458,12 +2464,12 @@
             960
           ],
           "localized_bbox": [
-            3781,
+            3767,
             914,
-            3864,
+            3879,
             956
           ],
-          "font_size": 45,
+          "font_size": 41,
           "stroke": 1,
           "slant": 0.08
         },
@@ -2479,12 +2485,12 @@
             657
           ],
           "localized_bbox": [
-            69,
+            41,
             618,
-            272,
+            300,
             654
           ],
-          "font_size": 39,
+          "font_size": 34,
           "stroke": 1,
           "slant": 0.08
         }
