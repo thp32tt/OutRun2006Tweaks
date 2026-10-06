@@ -1,0 +1,24 @@
+{
+  "run": "20261006-A-USERREWORK139-IGR012-SLANT",
+  "regression": "IGR-012",
+  "assets": [
+    "A064FDFC",
+    "48DEBE77"
+  ],
+  "candidate_sha256": {
+    "A064FDFC": "2d3d7fd7b612cee048067813f150d323be30483042010786168a90fa983386b6",
+    "48DEBE77": "f92629621d421e924a3f1b9d77252c551832824110e755325bcf0bf4a1af2ad0"
+  },
+  "bbox_size_margin": {
+    "A064FDFC": "2/2 PASS",
+    "48DEBE77": "3/3 PASS"
+  },
+  "outside": {
+    "A064FDFC": 0,
+    "48DEBE77": 0
+  },
+  "source_face_residue_48_clean_plate": 0,
+  "worker_status": "A139_USER_REWORK_IGR012_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "report": "localization/graphics/role_A/20261006-A-USERREWORK139-IGR012-SLANT/A139_USER_REWORK_IGR012_IGR012_REPORT.json"
+}

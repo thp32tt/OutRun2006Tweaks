@@ -1,0 +1,8 @@
+{
+  "run": "20261006-A-USERREWORK137-37759842-SLANT",
+  "candidate_sha256": "ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b",
+  "bbox": "16/16 PASS",
+  "outside": 0,
+  "overlap_count": 0,
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER"
+}

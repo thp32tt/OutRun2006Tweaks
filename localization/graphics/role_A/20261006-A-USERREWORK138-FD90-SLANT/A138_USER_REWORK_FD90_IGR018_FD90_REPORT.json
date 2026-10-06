@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-USERREWORK138-FD90-SLANT",
+  "queue_index": 121,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "user_regression": {
+    "id": "IGR-018",
+    "screenshot": "스크린샷(141).png",
+    "screen": "CAR_SELECT_BLUE",
+    "defect_tags": [
+      "SOURCE_RESIDUE",
+      "LOW_RES_FONT",
+      "HEADER_GHOST",
+      "STYLE_INCONSISTENCY"
+    ]
+  },
+  "mapping": {
+    "status": "EXACT_HIGH_CONFIDENCE_GRAPHICS",
+    "basis": "FD90AA9 uniquely contains the contiguous Select Game Mode / Select your car / Select Course source header stack visible in the car-select family."
+  },
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "input_candidate_sha256": "3d000de4c8c88645f4f50deb388e2538a00154783a1db4b848f15f7e7bf86894",
+  "candidate_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "pitch": 16384,
+    "mips": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "reworked_elements": [
+    {
+      "key": "select_game_mode",
+      "source": "Select Game Mode",
+      "korean": "게임 모드 선택",
+      "original_bbox": [
+        166,
+        819,
+        1166,
+        973
+      ],
+      "localized_bbox": [
+        341,
+        846,
+        990,
+        945
+      ],
+      "source_size": [
+        1000,
+        154
+      ],
+      "localized_size": [
+        649,
+        99
+      ],
+      "delta_left": 175,
+      "delta_right": 176,
+      "delta_top": 27,
+      "delta_bottom": 28,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR:style=Black",
+      "native_font_size_px": 108,
+      "shear": 0.28,
+      "alignment": "source-centered-shared-header-family"
+    },
+    {
+      "key": "select_car",
+      "source": "Select your car",
+      "korean": "차량 선택",
+      "original_bbox": [
+        243,
+        947,
+        1156,
+        1111
+      ],
+      "localized_bbox": [
+        485,
+        979,
+        913,
+        1078
+      ],
+      "source_size": [
+        913,
+        164
+      ],
+      "localized_size": [
+        428,
+        99
+      ],
+      "delta_left": 242,
+      "delta_right": 243,
+      "delta_top": 32,
+      "delta_bottom": 33,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR:style=Black",
+      "native_font_size_px": 108,
+      "shear": 0.28,
+      "alignment": "source-centered-shared-header-family"
+    },
+    {
+      "key": "select_course",
+      "source": "Select Course",
+      "korean": "코스 선택",
+      "original_bbox": [
+        302,
+        1062,
+        1085,
+        1213
+      ],
+      "localized_bbox": [
+        478,
+        1088,
+        908,
+        1187
+      ],
+      "source_size": [
+        783,
+        151
+      ],
+      "localized_size": [
+        430,
+        99
+      ],
+      "delta_left": 176,
+      "delta_right": 177,
+      "delta_top": 26,
+      "delta_bottom": 26,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR:style=Black",
+      "native_font_size_px": 108,
+      "shear": 0.28,
+      "alignment": "source-centered-shared-header-family"
+    }
+  ],
+  "family_style": {
+    "shared_native_font": "Noto Sans CJK KR Black",
+    "font_size_px": 108,
+    "shear": 0.28,
+    "alignment": "source-centered",
+    "fill": "neutral white",
+    "outline": "light edge + dark gray keyline",
+    "shadow": "source-like offset dark depth",
+    "old_korean_bitmap_reused": false
+  },
+  "preservation": {
+    "all_pixels_outside_three_header_bboxes_vs_A86": "PIXEL_EXACT",
+    "other_26_localized_rows": "PRESERVED_BYTES"
+  },
+  "machine_checks": {
+    "changed_pixels_outside_header_union": 0,
+    "alpha_changed_outside_header_union": 0,
+    "clean_source_effect_unchanged_pixels": 0,
+    "localized_pair_overlap": [],
+    "localized_pair_touch": []
+  },
+  "a86_fail_close_reason": "A86 changed only Select your car; controller family review would leave source-shared header lines in inconsistent Korean styles, so A86 is superseded before producer promotion.",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "A138_USER_REWORK_FD90_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}

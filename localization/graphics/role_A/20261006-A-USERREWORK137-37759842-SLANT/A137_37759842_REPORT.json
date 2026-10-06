@@ -1,0 +1,1053 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-USERREWORK137-37759842-SLANT",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "candidate_sha256": "ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b",
+  "input_candidate_sha256": "2dac8ee099120f2978eaf8ba992ffff11ecad7c11912a98aca9269a1a78f6988",
+  "root_cause": "PIL Image.Transform.AFFINE maps output coordinates to input coordinates; prior (1,-k,k*h,0,1,0) produced the opposite readable slant direction despite being labeled right shear.",
+  "method": "reconstruct the same 16 selector transform rows from A81 exact clean plate; reuse the previously accepted A83 line slots/anchors/font sizes; rerender native Noto CJK with corrected affine sign (1,+0.24,0,0,1,0) and no low-resolution bitmap reuse.",
+  "rows": [
+    {
+      "idx": 4,
+      "kind": "continuous",
+      "source_effect_bbox": [
+        642,
+        3272,
+        1027,
+        3576
+      ],
+      "localized_bbox": [
+        646,
+        3280,
+        884,
+        3567
+      ],
+      "style": "white_dark",
+      "lines": [
+        {
+          "line": "타임 어택",
+          "slot": [
+            3276,
+            3350
+          ],
+          "localized_bbox": [
+            646,
+            3280,
+            884,
+            3346
+          ],
+          "font_size": 59,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            3350,
+            3424
+          ],
+          "localized_bbox": [
+            646,
+            3360,
+            763,
+            3413
+          ],
+          "font_size": 59,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "15코스",
+          "slot": [
+            3424,
+            3498
+          ],
+          "localized_bbox": [
+            646,
+            3432,
+            825,
+            3489
+          ],
+          "font_size": 59,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "연속",
+          "slot": [
+            3498,
+            3572
+          ],
+          "localized_bbox": [
+            646,
+            3502,
+            756,
+            3567
+          ],
+          "font_size": 59,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 5,
+      "kind": "continuous",
+      "source_effect_bbox": [
+        1226,
+        3272,
+        1611,
+        3576
+      ],
+      "localized_bbox": [
+        1230,
+        3280,
+        1409,
+        3567
+      ],
+      "style": "white_dark",
+      "lines": [
+        {
+          "line": "아웃런",
+          "slot": [
+            3276,
+            3350
+          ],
+          "localized_bbox": [
+            1230,
+            3280,
+            1399,
+            3346
+          ],
+          "font_size": 59,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            3350,
+            3424
+          ],
+          "localized_bbox": [
+            1230,
+            3360,
+            1347,
+            3413
+          ],
+          "font_size": 59,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "15코스",
+          "slot": [
+            3424,
+            3498
+          ],
+          "localized_bbox": [
+            1230,
+            3432,
+            1409,
+            3489
+          ],
+          "font_size": 59,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "연속",
+          "slot": [
+            3498,
+            3572
+          ],
+          "localized_bbox": [
+            1230,
+            3502,
+            1340,
+            3567
+          ],
+          "font_size": 59,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 6,
+      "kind": "mode",
+      "source_effect_bbox": [
+        1856,
+        3288,
+        2112,
+        3492
+      ],
+      "localized_bbox": [
+        1860,
+        3308,
+        2103,
+        3467
+      ],
+      "style": "orange_blue",
+      "lines": [
+        {
+          "line": "타임 어택",
+          "slot": [
+            3292,
+            3390
+          ],
+          "localized_bbox": [
+            1860,
+            3308,
+            2103,
+            3374
+          ],
+          "font_size": 60,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            3390,
+            3488
+          ],
+          "localized_bbox": [
+            1860,
+            3410,
+            1984,
+            3467
+          ],
+          "font_size": 63,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 7,
+      "kind": "mode",
+      "source_effect_bbox": [
+        2440,
+        3288,
+        2696,
+        3492
+      ],
+      "localized_bbox": [
+        2444,
+        3307,
+        2684,
+        3467
+      ],
+      "style": "orange_blue",
+      "lines": [
+        {
+          "line": "하트 어택",
+          "slot": [
+            3292,
+            3390
+          ],
+          "localized_bbox": [
+            2444,
+            3307,
+            2684,
+            3374
+          ],
+          "font_size": 60,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            3390,
+            3488
+          ],
+          "localized_bbox": [
+            2444,
+            3410,
+            2568,
+            3467
+          ],
+          "font_size": 63,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 8,
+      "kind": "mode",
+      "source_effect_bbox": [
+        714,
+        3726,
+        1006,
+        3862
+      ],
+      "localized_bbox": [
+        718,
+        3733,
+        865,
+        3850
+      ],
+      "style": "orange_blue",
+      "lines": [
+        {
+          "line": "아웃런",
+          "slot": [
+            3730,
+            3794
+          ],
+          "localized_bbox": [
+            718,
+            3733,
+            865,
+            3791
+          ],
+          "font_size": 51,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            3794,
+            3858
+          ],
+          "localized_bbox": [
+            718,
+            3801,
+            824,
+            3850
+          ],
+          "font_size": 53,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 9,
+      "kind": "mode",
+      "source_effect_bbox": [
+        1272,
+        3728,
+        1528,
+        3932
+      ],
+      "localized_bbox": [
+        1276,
+        3748,
+        1519,
+        3907
+      ],
+      "style": "orange_blue",
+      "lines": [
+        {
+          "line": "타임 어택",
+          "slot": [
+            3732,
+            3830
+          ],
+          "localized_bbox": [
+            1276,
+            3748,
+            1519,
+            3814
+          ],
+          "font_size": 60,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            3830,
+            3928
+          ],
+          "localized_bbox": [
+            1276,
+            3850,
+            1400,
+            3907
+          ],
+          "font_size": 63,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 10,
+      "kind": "mode",
+      "source_effect_bbox": [
+        1856,
+        3728,
+        2112,
+        3932
+      ],
+      "localized_bbox": [
+        1860,
+        3747,
+        2100,
+        3907
+      ],
+      "style": "orange_blue",
+      "lines": [
+        {
+          "line": "하트 어택",
+          "slot": [
+            3732,
+            3830
+          ],
+          "localized_bbox": [
+            1860,
+            3747,
+            2100,
+            3814
+          ],
+          "font_size": 60,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            3830,
+            3928
+          ],
+          "localized_bbox": [
+            1860,
+            3850,
+            1984,
+            3907
+          ],
+          "font_size": 63,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 11,
+      "kind": "mode",
+      "source_effect_bbox": [
+        2466,
+        3726,
+        2758,
+        3862
+      ],
+      "localized_bbox": [
+        2470,
+        3733,
+        2617,
+        3850
+      ],
+      "style": "orange_blue",
+      "lines": [
+        {
+          "line": "아웃런",
+          "slot": [
+            3730,
+            3794
+          ],
+          "localized_bbox": [
+            2470,
+            3733,
+            2617,
+            3791
+          ],
+          "font_size": 51,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            3794,
+            3858
+          ],
+          "localized_bbox": [
+            2470,
+            3801,
+            2576,
+            3850
+          ],
+          "font_size": 53,
+          "stroke_px": 3,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 45,
+      "kind": "continuous_small",
+      "source_effect_bbox": [
+        3474,
+        1676,
+        3745,
+        1894
+      ],
+      "localized_bbox": [
+        3478,
+        1683,
+        3641,
+        1887
+      ],
+      "style": "white_dark",
+      "lines": [
+        {
+          "line": "타임 어택",
+          "slot": [
+            1680,
+            1732
+          ],
+          "localized_bbox": [
+            3478,
+            1683,
+            3641,
+            1729
+          ],
+          "font_size": 40,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            1732,
+            1785
+          ],
+          "localized_bbox": [
+            3478,
+            1739,
+            3563,
+            1778
+          ],
+          "font_size": 42,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "15코스",
+          "slot": [
+            1785,
+            1838
+          ],
+          "localized_bbox": [
+            3478,
+            1790,
+            3607,
+            1832
+          ],
+          "font_size": 42,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "연속",
+          "slot": [
+            1838,
+            1890
+          ],
+          "localized_bbox": [
+            3478,
+            1841,
+            3554,
+            1887
+          ],
+          "font_size": 40,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 46,
+      "kind": "continuous_small",
+      "source_effect_bbox": [
+        3666,
+        2100,
+        3937,
+        2318
+      ],
+      "localized_bbox": [
+        3670,
+        2107,
+        3799,
+        2311
+      ],
+      "style": "white_dark",
+      "lines": [
+        {
+          "line": "아웃런",
+          "slot": [
+            2104,
+            2156
+          ],
+          "localized_bbox": [
+            3670,
+            2107,
+            3785,
+            2153
+          ],
+          "font_size": 40,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            2156,
+            2209
+          ],
+          "localized_bbox": [
+            3670,
+            2163,
+            3755,
+            2202
+          ],
+          "font_size": 42,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "15코스",
+          "slot": [
+            2209,
+            2262
+          ],
+          "localized_bbox": [
+            3670,
+            2214,
+            3799,
+            2256
+          ],
+          "font_size": 42,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "연속",
+          "slot": [
+            2262,
+            2314
+          ],
+          "localized_bbox": [
+            3670,
+            2265,
+            3746,
+            2311
+          ],
+          "font_size": 40,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 47,
+      "kind": "mode_small",
+      "source_effect_bbox": [
+        3699,
+        2527,
+        3885,
+        2675
+      ],
+      "localized_bbox": [
+        3703,
+        2541,
+        3877,
+        2657
+      ],
+      "style": "orange_blue",
+      "lines": [
+        {
+          "line": "타임 어택",
+          "slot": [
+            2531,
+            2601
+          ],
+          "localized_bbox": [
+            3703,
+            2541,
+            3877,
+            2590
+          ],
+          "font_size": 43,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            2601,
+            2671
+          ],
+          "localized_bbox": [
+            3703,
+            2615,
+            3792,
+            2657
+          ],
+          "font_size": 45,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 48,
+      "kind": "mode_small",
+      "source_effect_bbox": [
+        59,
+        1254,
+        245,
+        1403
+      ],
+      "localized_bbox": [
+        63,
+        1268,
+        235,
+        1384
+      ],
+      "style": "orange_blue",
+      "lines": [
+        {
+          "line": "하트 어택",
+          "slot": [
+            1258,
+            1328
+          ],
+          "localized_bbox": [
+            63,
+            1268,
+            235,
+            1317
+          ],
+          "font_size": 43,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            1328,
+            1399
+          ],
+          "localized_bbox": [
+            63,
+            1342,
+            152,
+            1384
+          ],
+          "font_size": 45,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 49,
+      "kind": "mode_small",
+      "source_effect_bbox": [
+        470,
+        1253,
+        682,
+        1352
+      ],
+      "localized_bbox": [
+        474,
+        1260,
+        568,
+        1343
+      ],
+      "style": "orange_blue",
+      "lines": [
+        {
+          "line": "아웃런",
+          "slot": [
+            1257,
+            1302
+          ],
+          "localized_bbox": [
+            474,
+            1260,
+            568,
+            1299
+          ],
+          "font_size": 32,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            1302,
+            1348
+          ],
+          "localized_bbox": [
+            474,
+            1307,
+            550,
+            1343
+          ],
+          "font_size": 38,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 50,
+      "kind": "mode_small",
+      "source_effect_bbox": [
+        843,
+        1254,
+        1029,
+        1403
+      ],
+      "localized_bbox": [
+        847,
+        1268,
+        1021,
+        1384
+      ],
+      "style": "orange_blue",
+      "lines": [
+        {
+          "line": "타임 어택",
+          "slot": [
+            1258,
+            1328
+          ],
+          "localized_bbox": [
+            847,
+            1268,
+            1021,
+            1317
+          ],
+          "font_size": 43,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            1328,
+            1399
+          ],
+          "localized_bbox": [
+            847,
+            1342,
+            936,
+            1384
+          ],
+          "font_size": 45,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 51,
+      "kind": "mode_small",
+      "source_effect_bbox": [
+        1235,
+        1254,
+        1421,
+        1403
+      ],
+      "localized_bbox": [
+        1239,
+        1268,
+        1411,
+        1384
+      ],
+      "style": "orange_blue",
+      "lines": [
+        {
+          "line": "하트 어택",
+          "slot": [
+            1258,
+            1328
+          ],
+          "localized_bbox": [
+            1239,
+            1268,
+            1411,
+            1317
+          ],
+          "font_size": 43,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            1328,
+            1399
+          ],
+          "localized_bbox": [
+            1239,
+            1342,
+            1328,
+            1384
+          ],
+          "font_size": 45,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "idx": 52,
+      "kind": "mode_small",
+      "source_effect_bbox": [
+        1646,
+        1253,
+        1858,
+        1352
+      ],
+      "localized_bbox": [
+        1650,
+        1260,
+        1744,
+        1343
+      ],
+      "style": "orange_blue",
+      "lines": [
+        {
+          "line": "아웃런",
+          "slot": [
+            1257,
+            1302
+          ],
+          "localized_bbox": [
+            1650,
+            1260,
+            1744,
+            1299
+          ],
+          "font_size": 32,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        },
+        {
+          "line": "모드",
+          "slot": [
+            1302,
+            1348
+          ],
+          "localized_bbox": [
+            1650,
+            1307,
+            1726,
+            1343
+          ],
+          "font_size": 38,
+          "stroke_px": 2,
+          "shear": 0.24,
+          "direction": "readable_right_lean"
+        }
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "changed_outside_target_rows": 0,
+    "alpha_changed_outside_target_rows": 0,
+    "pair_overlap_pixels": 0,
+    "dds_roundtrip": "PASS"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER"
+}

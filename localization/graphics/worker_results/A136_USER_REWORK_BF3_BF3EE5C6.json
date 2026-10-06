@@ -1,0 +1,26 @@
+{
+  "run": "20261006-A-USERREWORK136-BF3-SLANT",
+  "asset": "BF3EE5C6",
+  "index": 49,
+  "input_candidate_sha256": "3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37",
+  "candidate_sha256": "a7eb06e2441956f4418f4cc95da52313696bc13d7864f7c7f76c8efdf909f85d",
+  "reworked_rows": 11,
+  "preserved_rows": 2,
+  "bbox_pass": "13/13",
+  "size_ceiling": "13/13",
+  "positive_margin": "13/13",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "changed_pixels_outside_original_bboxes": 0,
+  "alpha_changed_pixels_outside_original_bboxes": 0,
+  "protected_visible_pixels_changed": 0,
+  "source_residue_pixels": 0,
+  "changes_vs_input_outside_11_failed_bboxes": 0,
+  "preserved_input_pixel_diffs": {
+    "top_ghost": 0,
+    "goal": 0
+  },
+  "worker_status": "A136_USER_REWORK_BF3_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261006-A-USERREWORK136-BF3-SLANT/A136_USER_REWORK_BF3_BF3EE5C6_REPORT.json"
+}

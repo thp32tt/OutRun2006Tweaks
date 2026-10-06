@@ -1,0 +1,755 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-USERREWORK136-BF3-SLANT",
+  "index": 49,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+  "worker": "github-actions",
+  "source_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+  "input_candidate_sha256": "3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37",
+  "candidate_sha256": "a7eb06e2441956f4418f4cc95da52313696bc13d7864f7c7f76c8efdf909f85d",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "d6cde0c83a157e66e089867ccd616c289eb29c6e",
+    "sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887"
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "pitch": 8192,
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "c109_return_reason": "source style slant/italic mismatch on 11 rows",
+  "reworked_keys": [
+    "double",
+    "go",
+    "normal",
+    "rank",
+    "rank_stage",
+    "shift_up",
+    "spare",
+    "strike",
+    "tuned_a",
+    "tuned_b",
+    "turkey"
+  ],
+  "preserved_c109_style_accepted_keys": [
+    "goal",
+    "top_ghost"
+  ],
+  "preserved_input_pixel_diffs": {
+    "top_ghost": 0,
+    "goal": 0
+  },
+  "method": "reconstruct canonical clean plate; preserve C109-style-accepted top_ghost/goal exact; rerender only 11 returned rows with materially stronger source-family right shear 0.32-0.36 while retaining A14 fill/outline/shadow families",
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-USERREWORK136-BF3-SLANT/BF3EE5C6_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-USERREWORK136-BF3-SLANT/BF3EE5C6_HD_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 661577,
+    "changed_bbox": [
+      0,
+      163,
+      2012,
+      1517
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-USERREWORK136-BF3-SLANT/BF3EE5C6_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-USERREWORK136-BF3-SLANT/BF3EE5C6_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 750837,
+    "changed_bbox": [
+      0,
+      163,
+      2012,
+      1517
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "rows": [
+    {
+      "key": "rank_stage",
+      "source": "Rank for this stage",
+      "korean": "이 스테이지 랭크",
+      "style": "yellow_navy",
+      "original_bbox": [
+        12,
+        163,
+        615,
+        245
+      ],
+      "localized_bbox": [
+        78,
+        166,
+        548,
+        242
+      ],
+      "delta_left": 66,
+      "delta_right": 67,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        603,
+        82
+      ],
+      "localized_size": [
+        470,
+        76
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        12,
+        1803,
+        615,
+        1885
+      ],
+      "raw_localized_bbox": [
+        78,
+        1806,
+        548,
+        1882
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 67,
+      "shear": 0.34,
+      "rework_status": "A136_USER_REWORK_BF3_SLANT_RERENDER"
+    },
+    {
+      "key": "normal",
+      "source": "NORMAL",
+      "korean": "일반",
+      "style": "green_navy",
+      "original_bbox": [
+        729,
+        192,
+        1012,
+        251
+      ],
+      "localized_bbox": [
+        822,
+        195,
+        919,
+        248
+      ],
+      "delta_left": 93,
+      "delta_right": 93,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        283,
+        59
+      ],
+      "localized_size": [
+        97,
+        53
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        729,
+        1797,
+        1012,
+        1856
+      ],
+      "raw_localized_bbox": [
+        822,
+        1800,
+        919,
+        1853
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 46,
+      "shear": 0.36,
+      "rework_status": "A136_USER_REWORK_BF3_SLANT_RERENDER"
+    },
+    {
+      "key": "tuned_a",
+      "source": "TUNED",
+      "korean": "튜닝",
+      "style": "red_navy",
+      "original_bbox": [
+        1116,
+        193,
+        1342,
+        251
+      ],
+      "localized_bbox": [
+        1181,
+        196,
+        1276,
+        248
+      ],
+      "delta_left": 65,
+      "delta_right": 66,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        226,
+        58
+      ],
+      "localized_size": [
+        95,
+        52
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1116,
+        1797,
+        1342,
+        1855
+      ],
+      "raw_localized_bbox": [
+        1181,
+        1800,
+        1276,
+        1852
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 44,
+      "shear": 0.36,
+      "rework_status": "A136_USER_REWORK_BF3_SLANT_RERENDER"
+    },
+    {
+      "key": "tuned_b",
+      "source": "TUNED",
+      "korean": "튜닝",
+      "style": "red_navy",
+      "original_bbox": [
+        1476,
+        193,
+        1702,
+        251
+      ],
+      "localized_bbox": [
+        1541,
+        196,
+        1636,
+        248
+      ],
+      "delta_left": 65,
+      "delta_right": 66,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        226,
+        58
+      ],
+      "localized_size": [
+        95,
+        52
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1476,
+        1797,
+        1702,
+        1855
+      ],
+      "raw_localized_bbox": [
+        1541,
+        1800,
+        1636,
+        1852
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 44,
+      "shear": 0.36,
+      "rework_status": "A136_USER_REWORK_BF3_SLANT_RERENDER"
+    },
+    {
+      "key": "top_ghost",
+      "source": "TOP Ghost Car!!",
+      "korean": "최고 고스트 카!!",
+      "style": "white_red_glow",
+      "original_bbox": [
+        572,
+        272,
+        1374,
+        392
+      ],
+      "localized_bbox": [
+        682,
+        274,
+        1263,
+        390
+      ],
+      "delta_left": 110,
+      "delta_right": 111,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        802,
+        120
+      ],
+      "localized_size": [
+        581,
+        116
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        572,
+        1656,
+        1374,
+        1776
+      ],
+      "raw_localized_bbox": [
+        682,
+        1658,
+        1263,
+        1774
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 83,
+      "shear": "PRESERVED_A14",
+      "rework_status": "A14_PRESERVED_EXACT_C109_STYLE_ACCEPTED"
+    },
+    {
+      "key": "double",
+      "source": "Double!",
+      "korean": "더블!",
+      "style": "gold_navy",
+      "original_bbox": [
+        0,
+        400,
+        500,
+        528
+      ],
+      "localized_bbox": [
+        120,
+        403,
+        380,
+        525
+      ],
+      "delta_left": 120,
+      "delta_right": 120,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        500,
+        128
+      ],
+      "localized_size": [
+        260,
+        122
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        0,
+        1520,
+        500,
+        1648
+      ],
+      "raw_localized_bbox": [
+        120,
+        1523,
+        380,
+        1645
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 108,
+      "shear": 0.36,
+      "rework_status": "A136_USER_REWORK_BF3_SLANT_RERENDER"
+    },
+    {
+      "key": "strike",
+      "source": "Strike!",
+      "korean": "스트라이크!",
+      "style": "gold_navy",
+      "original_bbox": [
+        548,
+        392,
+        1000,
+        528
+      ],
+      "localized_bbox": [
+        554,
+        413,
+        993,
+        507
+      ],
+      "delta_left": 6,
+      "delta_right": 7,
+      "delta_top": 21,
+      "delta_bottom": 21,
+      "source_size": [
+        452,
+        136
+      ],
+      "localized_size": [
+        439,
+        94
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        548,
+        1520,
+        1000,
+        1656
+      ],
+      "raw_localized_bbox": [
+        554,
+        1541,
+        993,
+        1635
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 84,
+      "shear": 0.36,
+      "rework_status": "A136_USER_REWORK_BF3_SLANT_RERENDER"
+    },
+    {
+      "key": "goal",
+      "source": "GOAL!",
+      "korean": "골!",
+      "style": "goal_multicolor",
+      "original_bbox": [
+        600,
+        552,
+        1016,
+        680
+      ],
+      "localized_bbox": [
+        728,
+        554,
+        887,
+        678
+      ],
+      "delta_left": 128,
+      "delta_right": 129,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        416,
+        128
+      ],
+      "localized_size": [
+        159,
+        124
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        600,
+        1368,
+        1016,
+        1496
+      ],
+      "raw_localized_bbox": [
+        728,
+        1370,
+        887,
+        1494
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 114,
+      "shear": "PRESERVED_A14",
+      "rework_status": "A14_PRESERVED_EXACT_C109_STYLE_ACCEPTED"
+    },
+    {
+      "key": "spare",
+      "source": "Spare!",
+      "korean": "스페어!",
+      "style": "gold_navy",
+      "original_bbox": [
+        1104,
+        544,
+        1520,
+        688
+      ],
+      "localized_bbox": [
+        1108,
+        548,
+        1515,
+        683
+      ],
+      "delta_left": 4,
+      "delta_right": 5,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "source_size": [
+        416,
+        144
+      ],
+      "localized_size": [
+        407,
+        135
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1104,
+        1360,
+        1520,
+        1504
+      ],
+      "raw_localized_bbox": [
+        1108,
+        1365,
+        1515,
+        1500
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 120,
+      "shear": 0.36,
+      "rework_status": "A136_USER_REWORK_BF3_SLANT_RERENDER"
+    },
+    {
+      "key": "shift_up",
+      "source": "Shift up!!",
+      "korean": "시프트 업!!",
+      "style": "yellow_white_navy",
+      "original_bbox": [
+        158,
+        710,
+        900,
+        878
+      ],
+      "localized_bbox": [
+        174,
+        713,
+        883,
+        875
+      ],
+      "delta_left": 16,
+      "delta_right": 17,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        742,
+        168
+      ],
+      "localized_size": [
+        709,
+        162
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        158,
+        1170,
+        900,
+        1338
+      ],
+      "raw_localized_bbox": [
+        174,
+        1173,
+        883,
+        1335
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 148,
+      "shear": 0.34,
+      "rework_status": "A136_USER_REWORK_BF3_SLANT_RERENDER"
+    },
+    {
+      "key": "rank",
+      "source": "Rank",
+      "korean": "랭크",
+      "style": "white_lavender",
+      "original_bbox": [
+        1068,
+        756,
+        1413,
+        882
+      ],
+      "localized_bbox": [
+        1134,
+        759,
+        1346,
+        879
+      ],
+      "delta_left": 66,
+      "delta_right": 67,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        345,
+        126
+      ],
+      "localized_size": [
+        212,
+        120
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1068,
+        1166,
+        1413,
+        1292
+      ],
+      "raw_localized_bbox": [
+        1134,
+        1169,
+        1346,
+        1289
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 106,
+      "shear": 0.36,
+      "rework_status": "A136_USER_REWORK_BF3_SLANT_RERENDER"
+    },
+    {
+      "key": "turkey",
+      "source": "Turkey!",
+      "korean": "터키!",
+      "style": "gold_navy",
+      "original_bbox": [
+        1572,
+        992,
+        2012,
+        1140
+      ],
+      "localized_bbox": [
+        1640,
+        995,
+        1944,
+        1137
+      ],
+      "delta_left": 68,
+      "delta_right": 68,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        440,
+        148
+      ],
+      "localized_size": [
+        304,
+        142
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1572,
+        908,
+        2012,
+        1056
+      ],
+      "raw_localized_bbox": [
+        1640,
+        911,
+        1944,
+        1053
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 127,
+      "shear": 0.36,
+      "rework_status": "A136_USER_REWORK_BF3_SLANT_RERENDER"
+    },
+    {
+      "key": "go",
+      "source": "Go!",
+      "korean": "출발!",
+      "style": "go_peach",
+      "original_bbox": [
+        25,
+        1161,
+        805,
+        1517
+      ],
+      "localized_bbox": [
+        39,
+        1164,
+        790,
+        1514
+      ],
+      "delta_left": 14,
+      "delta_right": 15,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        780,
+        356
+      ],
+      "localized_size": [
+        751,
+        350
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        25,
+        531,
+        805,
+        887
+      ],
+      "raw_localized_bbox": [
+        39,
+        534,
+        790,
+        884
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 317,
+      "shear": 0.32,
+      "rework_status": "A136_USER_REWORK_BF3_SLANT_RERENDER"
+    }
+  ],
+  "all_13_readable_and_raw_bbox_pass": true,
+  "all_13_size_ceiling_pass": true,
+  "all_13_positive_margin": true,
+  "decoded_changes": {
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "clean_plate_source_text_residue_pixels": 0,
+    "changes_vs_input_outside_11_failed_bboxes": 0
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A136_USER_REWORK_BF3_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
