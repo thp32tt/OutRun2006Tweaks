@@ -1738,3 +1738,11 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Current blocked zoom-review count at checkpoint: **38**. Next normal A item: index29 `F043316B`, unless a higher-priority backlog/C-return appears.
 - VR/FFB/DX11/DXVK untouched.
 
+## 2026-10-06 09:04 KST — A100 zoom reviews 29/31/33
+- `F043316B`, `A82266FC`, `FBCAB18D`: exact-HD readable/raw mirror_y inspection complete.
+- Positive classification: **NO_LOCALIZABLE_TEXT / PRESERVE_ORIGINAL** for all three. Visible content is character pose art, rank-grade/sparkle art, and protected logo markings only.
+- index31 exact source is **4096x2048 RGBA32** despite its nominal `1024x512` filename.
+- No Korean DDS candidates generated because none are required. Queue/transcription/artwork-plan state closed all three stale blocked reviews.
+- Blocked zoom reviews after batch: **35**. Next normal A item: index35 `E989E3B7`, unless a higher-priority backlog/C-return appears.
+- VR/FFB/DX11/DXVK untouched.
+
