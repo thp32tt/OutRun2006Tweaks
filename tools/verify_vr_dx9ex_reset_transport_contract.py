@@ -1414,6 +1414,18 @@ require(
     "TheaterCommittedDirectRun = {};",
 )
 
+r23_destroy = body(host_r23_runtime, "inline XrResult XRAPI_CALL DestroySession(")
+require_order(
+    r23_destroy,
+    "R23 transactional session teardown",
+    "const XrResult result =",
+    "OutRunVrR22RuntimeHardening::DestroySession(session);",
+    "if (XR_SUCCEEDED(result))",
+    "OutRunVrR23VerifiedBundle::Invalidate();",
+    "RecordFinalSubmission(",
+    "return result;",
+)
+
 r24_destroy = body(host_r24, "inline XrResult XRAPI_CALL DestroySession(")
 require_order(
     r24_destroy,

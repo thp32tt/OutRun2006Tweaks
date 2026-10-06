@@ -380,9 +380,15 @@ namespace OutRunVrR23RuntimeHardening
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session)
     {
-        OutRunVrR23VerifiedBundle::Invalidate();
-        RecordFinalSubmission(0, OutRunVrR23VerifiedBundle::SourceKind::None, false);
-        return OutRunVrR22RuntimeHardening::DestroySession(session);
+        const XrResult result =
+            OutRunVrR22RuntimeHardening::DestroySession(session);
+        if (XR_SUCCEEDED(result))
+        {
+            OutRunVrR23VerifiedBundle::Invalidate();
+            RecordFinalSubmission(
+                0, OutRunVrR23VerifiedBundle::SourceKind::None, false);
+        }
+        return result;
     }
 }
 
