@@ -549,13 +549,17 @@ for banned in (
             f"R32 retained direct R13 DirectGPU owner-state dependency: {banned}")
 for marker in (
     "R13OverlayReadyForTransport()",
-    "R13TryGetGpuCompletedFrame(",
+    "R13TryGetGpuCompletionSnapshot(",
     "R13NoteSafeAckBackpressure()",
 ):
     if marker not in r13:
         errors.append(f"R13 missing DirectGPU owner API: {marker}")
     if marker not in r32:
         errors.append(f"R32 missing R13 DirectGPU owner API use: {marker}")
+if "R13TryGetGpuCompletedFrame(" not in r13:
+    errors.append("R13 missing legacy per-slot ACK compatibility API")
+if "R13TryGetGpuCompletedFrame(" in r32:
+    errors.append("R32 regained repeated per-slot ACK snapshot fallback")
 
 for rel, source in (("R32", r32), ("R33", r33)):
     for banned in (
