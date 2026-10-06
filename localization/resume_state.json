@@ -4217,7 +4217,8 @@
     "E3FD08BE",
     "12519155",
     "1762489B",
-    "1F5FE6E9"
+    "1F5FE6E9",
+    "FEF70E85"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6709,7 +6710,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 01:49 KST",
+  "updated_at_kst": "2026-10-07 02:44 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7165,6 +7166,67 @@
     "decision": "C222_REWORK_REQUIRED_SOURCE_STYLE_PROPORTION_WEIGHT",
     "required_rework": "Condensed/narrow, lighter source-faithful Korean stage family; keep validated clean plate/right anchors/positive margins/raw mirror_y.",
     "report": "localization/graphics/role_C/20261007-C222-FEF70E85/C222_FEF70E85_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "a147r_fef70e85_source_typography_rework": {
+    "run": "A147R",
+    "timestamp_kst": "2026-10-07 02:44 KST",
+    "role": "A",
+    "queue_index": 236,
+    "work_stolen_from_lane": "B",
+    "selection_reason": "No A-owned active P0/P1/C-returned REWORK/render-ready item after refresh; consumed the only C222-returned material REWORK under contract work-steal.",
+    "asset_key": "FEF70E85",
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+    "c222_rejected_candidate_sha256": "5c92d09a7b4df56655c34f8ca95dbe5c63b15a3670365eafe7ff3c22696ae245",
+    "first_attempt_sha256": "8a587e0c4d90583be696dd35443cc6fc51384118bf4df85704b75dd6a0345e53",
+    "first_attempt_status": "CONTROLLER_REJECTED_TOO_LIGHT_AND_TOO_NARROW_NOT_PROMOTED",
+    "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+    "github_worker_runs": [
+      37504694544,
+      37505159823
+    ],
+    "worker_output_commits": [
+      "22dcf2f20eeb6ed7cc61d31288bafb50b9a8bb70",
+      "d9e76aec23207e1664f22a8d1278295ac2d50b10"
+    ],
+    "final_style": {
+      "font": "Noto Sans CJK KR Bold",
+      "native_font_px": 88,
+      "horizontal_source_family_scale": 0.9,
+      "alignment": "right"
+    },
+    "machine_qa": {
+      "bbox_size_positive_margin": "14/14 PASS",
+      "materially_more_condensed_rows": "14/14 PASS",
+      "native_height_preserved_rows": "14/14 PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "protected": 0,
+      "source_residue": 0,
+      "overlap": 0,
+      "touch_pairs": 0,
+      "protected_reversed_changed_pixels": 0,
+      "header_128_exact": true,
+      "raw_mode": "BGRA",
+      "raw_orientation": "mirror_y"
+    },
+    "ordered_generation_gate": {
+      "1_source_text_removed_and_plate_restored": "PASS",
+      "2_slant_direction_matches_source": "PASS",
+      "3_text_not_unnecessarily_undersized_and_within_source_bbox": "PASS",
+      "4_source_faithful_weight_outline_shadow": "PASS",
+      "5_no_clipped_pixels": "PASS",
+      "6_protected_graphics_vehicle_name_box_clearance": "PASS",
+      "7_raw_and_flip_y_visual_review": "PASS",
+      "8_immediate_readability_vs_english": "PASS"
+    },
+    "controller_visual_qa": "PASS_SOURCE_A147_A147R_READABLE_ROW_CONTACT_AND_RAW",
+    "controller_qa": "localization/graphics/role_A/20261007-A-PRODUCTION147R-Q236-SOURCE-TYPOGRAPHY/A147R_CONTROLLER_FINAL_QA.json",
+    "worker_report": "localization/graphics/role_A/20261007-A-PRODUCTION147R-Q236-SOURCE-TYPOGRAPHY/A147R_FEF70E85_REPORT.json",
+    "status": "A147R_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_C",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
