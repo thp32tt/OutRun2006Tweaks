@@ -245,7 +245,7 @@ namespace WheelFFBMath
     {
         if (!std::isfinite(alpha)) return 0.0f;
         constexpr float FullTrailUntil = 0.08f;
-        constexpr float TrailFallComplete = 0.42f;
+        constexpr float TrailFallComplete = 0.425f;
         constexpr float ResidualTrail = 0.02f;
         const float t = smoothstep01(
             (std::abs(alpha) - FullTrailUntil) /
