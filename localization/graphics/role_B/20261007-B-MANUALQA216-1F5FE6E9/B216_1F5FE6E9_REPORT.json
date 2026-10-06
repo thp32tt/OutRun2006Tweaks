@@ -1,0 +1,279 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B216",
+  "queue_index": 132,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+  "trigger": "MANUAL_PRE_INGAME_ENGLISH_ORIGINAL_VISUAL_FALSE_NEGATIVE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/038_q132_1F5FE6E9.jpg",
+  "prior_c_status": "C139_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "defects": [
+    "TEXT_SCALE_TOO_SMALL_VS_SOURCE",
+    "SOURCE_WEIGHT_HIERARCHY_TOO_WEAK"
+  ],
+  "source_sha256": "3656adbd699b7852cb5fcf4bb01fc4f1f65bbd9d7d39e12e7a1c2ac5a49fef1d",
+  "before_sha256": "e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be",
+  "candidate_sha256": "615281ac66733323221916c506cda2fb9eb2f139866e98f1a9985e56ba7dde90",
+  "method": "exact canonical 1024x512 RGBA32 source + prior B55/C139 validated clean plate -> one shared fresh native Noto Sans CJK KR Black family -> maximum shared positive-margin vertical fit + modest 1.25x horizontal source-family fit -> exact-header raw mirror-Y encode -> decoded strict QA",
+  "shared_style": {
+    "font_family": "Noto Sans CJK KR Black",
+    "font_size": 18,
+    "horizontal_scale": 1.25,
+    "fill_rgba": [
+      101,
+      97,
+      79,
+      255
+    ]
+  },
+  "rows": [
+    {
+      "n": 1,
+      "source": "REQUEST",
+      "korean": "요청",
+      "original_bbox": [
+        641,
+        140,
+        744,
+        160
+      ],
+      "localized_bbox": [
+        642,
+        141,
+        682,
+        159
+      ],
+      "source_size": [
+        103,
+        20
+      ],
+      "localized_size": [
+        40,
+        18
+      ],
+      "delta_left": 1,
+      "delta_right": 62,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_family": "Noto Sans CJK KR Black",
+      "font_size": 18,
+      "horizontal_scale": 1.25,
+      "fill_rgba": [
+        101,
+        97,
+        79,
+        255
+      ],
+      "alignment": "LEFT_SOURCE_FAMILY",
+      "fresh_native_render": true,
+      "prior_localized_bbox": [
+        642,
+        141,
+        672,
+        158
+      ],
+      "prior_localized_size": [
+        30,
+        17
+      ],
+      "width_gain_px": 10,
+      "height_gain_px": 1
+    },
+    {
+      "n": 2,
+      "source": "SPECIAL REQUEST 1",
+      "korean": "스페셜 요청 1",
+      "original_bbox": [
+        641,
+        164,
+        861,
+        184
+      ],
+      "localized_bbox": [
+        642,
+        165,
+        767,
+        183
+      ],
+      "source_size": [
+        220,
+        20
+      ],
+      "localized_size": [
+        125,
+        18
+      ],
+      "delta_left": 1,
+      "delta_right": 94,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_family": "Noto Sans CJK KR Black",
+      "font_size": 18,
+      "horizontal_scale": 1.25,
+      "fill_rgba": [
+        101,
+        97,
+        79,
+        255
+      ],
+      "alignment": "LEFT_SOURCE_FAMILY",
+      "fresh_native_render": true,
+      "prior_localized_bbox": [
+        642,
+        165,
+        737,
+        182
+      ],
+      "prior_localized_size": [
+        95,
+        17
+      ],
+      "width_gain_px": 30,
+      "height_gain_px": 1
+    },
+    {
+      "n": 3,
+      "source": "SPECIAL REQUEST 2",
+      "korean": "스페셜 요청 2",
+      "original_bbox": [
+        641,
+        188,
+        865,
+        208
+      ],
+      "localized_bbox": [
+        642,
+        189,
+        768,
+        207
+      ],
+      "source_size": [
+        224,
+        20
+      ],
+      "localized_size": [
+        126,
+        18
+      ],
+      "delta_left": 1,
+      "delta_right": 97,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_family": "Noto Sans CJK KR Black",
+      "font_size": 18,
+      "horizontal_scale": 1.25,
+      "fill_rgba": [
+        101,
+        97,
+        79,
+        255
+      ],
+      "alignment": "LEFT_SOURCE_FAMILY",
+      "fresh_native_render": true,
+      "prior_localized_bbox": [
+        642,
+        189,
+        738,
+        206
+      ],
+      "prior_localized_size": [
+        96,
+        17
+      ],
+      "width_gain_px": 30,
+      "height_gain_px": 1
+    },
+    {
+      "n": 4,
+      "source": "SPECIAL REQUEST 3",
+      "korean": "스페셜 요청 3",
+      "original_bbox": [
+        641,
+        211,
+        865,
+        232
+      ],
+      "localized_bbox": [
+        642,
+        212,
+        767,
+        230
+      ],
+      "source_size": [
+        224,
+        21
+      ],
+      "localized_size": [
+        125,
+        18
+      ],
+      "delta_left": 1,
+      "delta_right": 98,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_family": "Noto Sans CJK KR Black",
+      "font_size": 18,
+      "horizontal_scale": 1.25,
+      "fill_rgba": [
+        101,
+        97,
+        79,
+        255
+      ],
+      "alignment": "LEFT_SOURCE_FAMILY",
+      "fresh_native_render": true,
+      "prior_localized_bbox": [
+        642,
+        213,
+        738,
+        230
+      ],
+      "prior_localized_size": [
+        96,
+        17
+      ],
+      "width_gain_px": 29,
+      "height_gain_px": 1
+    }
+  ],
+  "qa": {
+    "header_128_exact_canonical": true,
+    "raw_orientation": "mirror_y",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_pixels_outside_exact_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "source_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "width_improved_rows": 4,
+    "height_not_smaller_rows": 4,
+    "fresh_native_render": "PASS_NO_PRIOR_KOREAN_BITMAP_UPSCALE",
+    "readable_source_old_clean_new_visual_review": "PENDING_CONTROLLER",
+    "raw_source_old_new_visual_review": "PENDING_CONTROLLER",
+    "ordered_gate": {
+      "plate_restoration": "PASS_INHERITED_B55_C139_VALIDATED_CLEAN_PLATE",
+      "source_matching_slant_direction": "PASS_SHARED_UPRIGHT_SOURCE_FAMILY",
+      "no_unnecessary_undersizing": "REWORKED_PENDING_CONTROLLER_VISUAL",
+      "source_faithful_weight_outline_shadow": "REWORKED_BLACK_NO_INVENTED_OUTLINE_PENDING_CONTROLLER",
+      "clipping": "PASS_MACHINE_POSITIVE_MARGIN",
+      "protected_art_clearance": "PASS_ZERO_OUTSIDE_SOURCE_BBOX",
+      "flip_y_and_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+      "immediate_readability": "PENDING_CONTROLLER"
+    }
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "B216_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
