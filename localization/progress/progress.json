@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T17:22:30+09:00",
+  "updated_at_kst": "2026-10-06T17:50:03+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -116,12 +116,12 @@
         22,
         23
       ],
-      "name_entry_status": "b205_hold_korean_name_encoding_consumer_hooks_required",
+      "name_entry_status": "b206_hold_compat_alias_sidecar_and_name_render_hooks_required",
       "name_entry_preflight_report": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_NAME_ENTRY_PREFLIGHT.json",
       "name_entry_controller_review": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_CONTROLLER_PREFLIGHT_REVIEW.json",
       "name_entry_symbol_count": 49,
       "name_entry_candidate_written": false,
-      "name_entry_runtime_mapping_report": "localization/graphics/role_B/20261006-B-PREFLIGHT205-NAME-ENTRY-EXE-MAPPING/B205_NAME_ENTRY_EXE_MAPPING.json",
+      "name_entry_runtime_mapping_report": "localization/graphics/role_B/20261006-B-PREFLIGHT206-NAME-CONSUMERS/B206_NAME_CONSUMER_MAPPING.json",
       "name_entry_persistence_container": "Player-save runtime field proven at first 16 bytes of player-save memory; repo INI separately documents name/model recovery in first 0xB0 bytes of License.dat/LicenseXX.dat.",
       "name_entry_player_save_memory": "VA 0x7C23E0 / module+0x3C23E0",
       "name_entry_runtime_mapping_report_prior": "localization/graphics/role_A/20261006-A-PREFLIGHT136-NAME-ENTRY-RUNTIME-MAPPING/A136_NAME_ENTRY_RUNTIME_MAPPING.json",
@@ -130,7 +130,12 @@
       "name_entry_max_payload_bytes": 15,
       "name_entry_terminator": "NUL",
       "name_entry_native_encoding": "legacy one-byte selector code table; not UTF-8/UTF-16",
-      "name_entry_selector_table": "0x64C81B + page*0x25 + selection"
+      "name_entry_selector_table": "0x64C81B + page*0x25 + selection",
+      "name_entry_b206_consumer_report": "localization/graphics/role_B/20261006-B-PREFLIGHT206-NAME-CONSUMERS/B206_NAME_CONSUMER_MAPPING.json",
+      "name_entry_direct_utf8_native_field": "REJECTED_FIXED_BYTE_CONSUMERS",
+      "name_entry_fixed_byte_evidence": "4-byte bounded copies/termination at 0x4B2A43/0x4B2BBE/0x4B2C60/0x4B2D0C; raw 0x11 writer at 0x4308B0; raw 0x17 propagation via 0x4675F0",
+      "name_entry_k4_current_coverage": "text-ID translations only; arbitrary player name not covered",
+      "name_entry_compatibility_direction": "ASCII native alias + mod-owned UTF-8 sidecar + explicit local name-render hooks; online/remote alias until separate transport proof"
     },
     "packaging": {
       "status": "not_started",
@@ -177,7 +182,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B205 resolved A136's exact player-name field/encoding blocker from the branch's own Korean Test Build executable: Edit License commits exactly 16 bytes to 0x7C23E0..0x7C23EF, input is capped to 15 payload bytes + NUL, and selector mapping appends one legacy byte per character. Native name entry is therefore not Unicode. No misleading Hangul DDS/runtime patch was produced; index24 remains a narrowed HOLD until downstream name consumers and a compatible Korean storage/render/serialization policy are mapped. Existing B202-B204 and B201 outputs remain pending C/new in-game and were not repeated.",
+  "next_checkpoint": "B206 classified concrete consumers of the proven 16-byte player-name field and rejected direct UTF-8 storage: at least one path truncates/copies the name in 4-byte units, while other paths propagate raw 17/23-byte records, and Edit License feeds the native field directly to stock text-object setup. Current K4 overlay resolves only remembered Text/*.bin text IDs, not arbitrary player-name strings. Index24 remains fail-closed, now narrowed to compatibility-alias + UTF-8-sidecar/local-render-hook design; no DDS/runtime source changed. Existing C/ingame-pending assets were not repeated.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,

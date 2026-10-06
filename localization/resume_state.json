@@ -1,5 +1,5 @@
 {
-  "schema_version": 110,
+  "schema_version": 111,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B206 index24 consumer mapping rejects direct UTF-8/native-field Hangul. The 16-byte field is consumed by fixed-byte paths including a 4-byte bounded copy/termination path, plus raw 17-byte writer and 23-byte propagation paths; Edit License also sends the field directly into a stock text object. Current K4 overlay only translates remembered Text/*.bin text IDs, so arbitrary player-name bytes are not covered. Next safe implementation prerequisite is an ASCII-compatible native alias plus mod-owned UTF-8 sidecar and explicit local name-render hooks; online/remote names stay alias until a separately proven transport exists. No DDS/runtime behavior changed.",
     "B205 index24 canonical-EXE static trace resolves A136's exact field/encoding blocker: player name is the 16-byte runtime field 0x7C23E0..0x7C23EF, name-entry is configured min=1/max=16 and stores at most 15 payload bytes + NUL, and selector-to-name append is a legacy one-byte code table rather than UTF-8/UTF-16. Do not redraw 66743AA8 yet. Next safe work is consumer classification plus a compatible Korean name storage/render/serialization policy before any runtime behavior change. No candidate; RUNTIME_VALIDATION=UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT.",
     "A136 index24 runtime mapping advanced A135 HOLD: Edit License uses SELECTION_PLAYERNAME=0 with EXE+0xDDC50 / selection-change EXE+0xDD990; player save data begins at VA 0x7C23E0 (module+0x3C23E0), and repo INI confirms name/model are recoverable from the first 0xB0 bytes of License.dat/LicenseXX.dat. Exact name-field offset/encoding, Hangul composition, committed-name renderer and replay/ranking/network serialization are still unproven. Do not relabel 66743AA8 or repeat A135; next proof is controlled LicenseXX.dat binary diff or live OR2006C2C.EXE trace. SumoNet_OnlineUserName EXE+0x430C20 is separate online identity evidence only. No candidate; RUNTIME_VALIDATION=UNTESTED.",
     "B202-B204 reconciled pending user-slant worker output: index106/IGR-017 a9c10f00..., index48/IGR-009 259153b9..., index60/IGR-010 a8ffc1f0... all pass machine scope plus readable high-zoom source/final slant-direction and raw mirror_y gates. Independent C + NEW actual game retest still required; do not repeat unless returned REWORK. B201 index176 remains pending C; A135 index24 remains HOLD.",
@@ -6347,5 +6348,38 @@
     "runtime_behavior_changed": false,
     "runtime_validation": "UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT",
     "next_safe_work": "classify player-name consumers and choose compatible Korean storage/render/serialization policy"
+  },
+  "b206_name_consumer_mapping": {
+    "timestamp_kst": "2026-10-06T17:50:03+09:00",
+    "role": "B",
+    "queue_index": 24,
+    "asset": "66743AA8",
+    "prior": "B205_HOLD_KOREAN_NAME_ENCODING_CONSUMER_HOOKS_REQUIRED",
+    "status": "B206_HOLD_COMPAT_ALIAS_SIDECAR_AND_NAME_RENDER_HOOKS_REQUIRED",
+    "executable_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "report": "localization/graphics/role_B/20261006-B-PREFLIGHT206-NAME-CONSUMERS/B206_NAME_CONSUMER_MAPPING.json",
+    "evidence": "localization/graphics/role_B/20261006-B-PREFLIGHT206-NAME-CONSUMERS/B206_DISASSEMBLY_EVIDENCE.txt",
+    "consumers": {
+      "edit_license_display": "0x4DE48A -> 0x48F280 with source 0x7C23E0",
+      "fixed_four_byte_record": [
+        "0x4B2A43..0x4B2A61",
+        "0x4B2BBE",
+        "0x4B2C60",
+        "0x4B2D0C"
+      ],
+      "raw_writer": "0x4308B0 -> 0x491900 count 0x11",
+      "raw_record_propagation": "0x4678E9/0x467C6E -> 0x4675F0 -> 0x449A60 count 0x17"
+    },
+    "current_k4_coverage": "Text-ID translation only through ResolveTextId/InterceptPrint; arbitrary player-name strings are not a generic UTF-8 path.",
+    "rejected_designs": [
+      "raw UTF-8 in native 16-byte field",
+      "assume stock high-bit single-byte codes can render Hangul",
+      "reuse SumoNet_OnlineUserName as proven license-name storage"
+    ],
+    "recommended_compatibility_direction": "native ASCII alias <=15 bytes + mod-owned UTF-8 Korean sidecar + explicit local player-name render hooks; keep online/remote transport on alias until separately proven",
+    "candidate_written": false,
+    "runtime_behavior_changed": false,
+    "runtime_validation": "UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT",
+    "next_safe_work": "map exact local name-render callsites/save lifecycle needed for sidecar alias implementation before behavior change"
   }
 }

@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "run": "B206",
+  "role": "B",
+  "timestamp_kst": "2026-10-06T17:50:03+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "parent_head": "90d6dad8a81e2e2be868f980840b07f545a41cbd",
+  "queue_index": 24,
+  "asset": "textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "scope": "single_preflight_batch_no_render_ready_or_rework_available",
+  "source_executable": {
+    "source": "Korean Test Build Actions artifact 11373183170 / run 37379204466",
+    "sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "image_base": "0x00400000"
+  },
+  "inherited_proof_from_b205": {
+    "player_name_field": "0x7C23E0..0x7C23EF",
+    "field_bytes": 16,
+    "max_payload_bytes": 15,
+    "terminator": "NUL",
+    "native_input": "legacy one-byte selector table; not UTF-8/UTF-16"
+  },
+  "consumer_classification": [
+    {
+      "class": "EDIT_LICENSE_TEXT_OBJECT",
+      "evidence": [
+        "0x4DE48A pushes 0x7C23E0",
+        "0x4DE499 calls 0x48F280"
+      ],
+      "consequence": "The committed native field is handed directly to stock text-object construction; Korean display needs an explicit player-name render path rather than assuming the Text-ID overlay will see it."
+    },
+    {
+      "class": "FIXED_4_BYTE_NAME_RECORD",
+      "evidence": [
+        "0x4B2A43 copies 6 bytes from 0x7C23E0 through memcpy-like 0x449A60, then 0x4B2A61 forces NUL at destination+4.",
+        "0x4B2BBE, 0x4B2C60 and 0x4B2D0C pass 0x7C23E0 to NUL-aware bounded copy 0x581780 with count=4."
+      ],
+      "consequence": "UTF-8 can be truncated on byte boundaries and can split a Hangul code point; direct native-field UTF-8 is unsafe."
+    },
+    {
+      "class": "RAW_BINARY_WRITER",
+      "evidence": [
+        "0x4308B0 pushes count 0x11 and source 0x7C23E0",
+        "0x4308BB calls 0x491900",
+        "0x491900 copies exactly the requested bytes into its writer buffer"
+      ],
+      "consequence": "The native representation is serialized as raw bytes with no Unicode transcoding."
+    },
+    {
+      "class": "RAW_23_BYTE_RECORD_PROPAGATION",
+      "evidence": [
+        "0x4678E9 and 0x467C6E call 0x4675F0 with source 0x7C23E0.",
+        "0x467641 pushes count 0x17 and 0x46764B calls memcpy-like 0x449A60 into a global/session record."
+      ],
+      "consequence": "At least one wider record embeds the player-save prefix byte-for-byte; changing the native field affects non-render consumers."
+    },
+    {
+      "class": "CURRENT_K4_OVERLAY_BOUNDARY",
+      "evidence": [
+        "src/hooks_localization.cpp RememberText records only valid translated text IDs.",
+        "ResolveTextId succeeds only for remembered pointer/content mappings.",
+        "InterceptPrint exits when ResolveTextId fails and only hooks stock printf paths."
+      ],
+      "consequence": "The existing K4 UTF-8 overlay is not a generic arbitrary-player-name codec/render path."
+    },
+    {
+      "class": "ONLINE_IDENTITY_SEPARATE",
+      "evidence": [
+        "SumoNet_OnlineUserName remains a distinct buffer at EXE+0x430C20 / VA 0x830C20.",
+        "B205 found no proven data-flow link making it identical to the license-name field."
+      ],
+      "consequence": "Do not claim Korean license-name transport works online merely because the chat/lobby identity buffer is narrow-char."
+    }
+  ],
+  "policy_decision": {
+    "direct_utf8_native_field": "REJECT",
+    "cp949_or_high_bit_native_field": "NOT_PROVEN_SAFE; stock one-byte/high-bit rendering and fixed-byte consumers remain blockers",
+    "compatible_direction": "Keep native 16-byte field as an ASCII-safe <=15-byte compatibility alias; store canonical Korean UTF-8 in mod-owned sidecar state; add explicit local player-name render hooks. Keep online/remote transport on the compatibility alias until a separate protocol/transport path is proven.",
+    "why_no_runtime_patch_this_run": "Consumer mapping proves what must not be done, but exact sidecar lifecycle and all local display callsites are not yet sufficiently mapped for a fail-safe behavior change."
+  },
+  "qa": {
+    "completed_work_repeated": false,
+    "active_user_backlog_at_selection": 0,
+    "c_returned_rework_at_selection": 0,
+    "b_render_ready_at_selection": 0,
+    "preflight_batches_this_run": 1,
+    "candidate_written": false,
+    "runtime_source_changed": false,
+    "build_required": false,
+    "runtime_validation": "UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT",
+    "forbidden_domains_touched": []
+  },
+  "next_safe_work": [
+    "Map the exact name render/use callsites that must substitute sidecar Korean text locally.",
+    "Choose a stable sidecar key and save/load lifecycle for License.dat/LicenseXX.dat slots.",
+    "Define a deterministic ASCII compatibility alias/token policy within 15 bytes.",
+    "Only after those are proven, implement runtime name-entry/render behavior and run Win32 Release validation.",
+    "Treat online/remote Korean-name transport as a separate future proof; alias fallback is mandatory until then."
+  ],
+  "status": "B206_HOLD_COMPAT_ALIAS_SIDECAR_AND_NAME_RENDER_HOOKS_REQUIRED"
+}

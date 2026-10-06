@@ -1,0 +1,42 @@
+B206 canonical OR2006C2C.exe consumer evidence
+EXE SHA-256: 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
+
+[Edit License direct native-name display]
+0x4DE48A: push 0x7C23E0
+0x4DE48F: push 0xFFFFFFFF
+0x4DE491: push 0x9
+0x4DE499: call 0x48F280
+
+[Fixed byte-count consumer]
+0x4B2A43: push 0x6
+0x4B2A4F: push 0x7C23E0
+0x4B2A55: call 0x449A60   ; memcpy-like exact byte copy
+0x4B2A61: mov byte [esi+0x18],0 ; destination is esi+0x14, so visible string forced NUL after 4 bytes
+
+0x4B2BB8: push 0x4
+0x4B2BBE: push 0x7C23E0
+0x4B2BC8: call 0x581780   ; bounded NUL-aware copy
+0x4B2C53: push 0x4 / 0x4B2C60: push 0x7C23E0 / 0x4B2C6A: call 0x581780
+0x4B2CFF: push 0x4 / 0x4B2D0C: push 0x7C23E0 / 0x4B2D16: call 0x581780
+
+[Raw binary writer]
+0x4308B0: push 0x11
+0x4308B2: push 0x7C23E0
+0x4308BB: call 0x491900
+0x491910..0x491924: byte loop copies exactly requested count to writer buffer
+
+[Raw 23-byte propagation]
+0x4678E9: push 0x7C23E0 / 0x4678EE: call 0x4675F0
+0x467C6E: push 0x7C23E0 / 0x467C73: call 0x4675F0
+0x467641: push 0x17
+0x467643: push source argument
+0x46764B: call 0x449A60
+
+[K4 boundary from branch source]
+src/hooks_localization.cpp RememberText(): ignores text without a valid translated TextEntry id.
+ResolveTextId(): resolves only remembered pointer/content mappings.
+InterceptPrint(): returns immediately if ResolveTextId() fails.
+Therefore existing K4 overlay cannot be treated as a generic UTF-8 player-name renderer.
+
+Decision: direct UTF-8 in native 16-byte player-name storage is rejected.
+Safe direction: ASCII compatibility alias in native field + mod-owned UTF-8 sidecar + explicit local name-render hooks; online/remote stays alias until separately proven.
