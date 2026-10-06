@@ -469,8 +469,8 @@ reset_r32 = body(r32, "HRESULT R32WithResetLifecycle(")
 require_order(
     reset_r32,
     "R32 reset lifecycle owner helper",
-    "if (gameDevice)",
     "const HRESULT hr = lowerReset();",
+    "if (gameDevice)",
     "if (SUCCEEDED(hr))",
     "R32ResetAfterGameReset();",
 )
