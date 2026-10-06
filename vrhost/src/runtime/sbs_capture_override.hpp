@@ -413,8 +413,6 @@ float4 PSMain(VSOut input) : SV_Target
             SourceHeight == desc.Height && SourceFormat == desc.Format)
             return true;
 
-        ReleaseCom(SourceSrv);
-        ReleaseCom(Source);
         D3D11_TEXTURE2D_DESC d{};
         d.Width = desc.Width;
         d.Height = desc.Height;
@@ -424,18 +422,38 @@ float4 PSMain(VSOut input) : SV_Target
         d.SampleDesc.Count = 1;
         d.Usage = D3D11_USAGE_DEFAULT;
         d.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-        if (FAILED(OutRunVrFinalTest::Device->CreateTexture2D(&d, nullptr, &Source)) || !Source)
+
+        // Build the replacement source off to the side. A transient allocation
+        // or SRV failure must not discard the last complete capture bundle;
+        // its timestamp stays unchanged, so normal freshness rules still bound
+        // how long that prior frame can be used.
+        ID3D11Texture2D* pendingSource = nullptr;
+        HRESULT hr = OutRunVrFinalTest::Device->CreateTexture2D(
+            &d, nullptr, &pendingSource);
+        if (FAILED(hr) || !pendingSource)
+        {
+            ReleaseCom(pendingSource);
             return false;
+        }
 
         D3D11_SHADER_RESOURCE_VIEW_DESC vd{};
         vd.Format = d.Format;
         vd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
         vd.Texture2D.MipLevels = 1;
-        if (FAILED(OutRunVrFinalTest::Device->CreateShaderResourceView(Source, &vd, &SourceSrv)) || !SourceSrv)
+        ID3D11ShaderResourceView* pendingSourceSrv = nullptr;
+        hr = OutRunVrFinalTest::Device->CreateShaderResourceView(
+            pendingSource, &vd, &pendingSourceSrv);
+        if (FAILED(hr) || !pendingSourceSrv)
         {
-            ReleaseCom(Source);
+            ReleaseCom(pendingSourceSrv);
+            ReleaseCom(pendingSource);
             return false;
         }
+
+        ReleaseCom(SourceSrv);
+        ReleaseCom(Source);
+        Source = pendingSource;
+        SourceSrv = pendingSourceSrv;
         SourceWidth = d.Width;
         SourceHeight = d.Height;
         SourceFormat = d.Format;

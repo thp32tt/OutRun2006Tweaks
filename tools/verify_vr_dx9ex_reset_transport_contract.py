@@ -817,6 +817,37 @@ require_order(
     "ReleaseCom(completion);",
 )
 
+ensure_source = body(host_sbs, "inline bool EnsureSource(")
+require_order(
+    ensure_source,
+    "R19 capture source replacement is transactional",
+    "ID3D11Texture2D* pendingSource = nullptr;",
+    "CreateTexture2D(",
+    "&d, nullptr, &pendingSource)",
+    "ID3D11ShaderResourceView* pendingSourceSrv = nullptr;",
+    "CreateShaderResourceView(",
+    "pendingSource, &vd, &pendingSourceSrv)",
+    "ReleaseCom(SourceSrv);",
+    "ReleaseCom(Source);",
+    "Source = pendingSource;",
+    "SourceSrv = pendingSourceSrv;",
+    "SourceWidth = d.Width;",
+    "SourceHeight = d.Height;",
+    "SourceFormat = d.Format;",
+)
+require(
+    ensure_source,
+    "R19 failed replacement releases only pending capture resources",
+    "ReleaseCom(pendingSourceSrv);",
+    "ReleaseCom(pendingSource);",
+)
+forbid(
+    ensure_source,
+    "R19 capture resource creation must not target published globals directly",
+    "CreateTexture2D(&d, nullptr, &Source)",
+    "CreateShaderResourceView(Source, &vd, &SourceSrv)",
+)
+
 create_shaders = body(host_sbs, "inline bool CreateShaders()")
 require_order(
     create_shaders,

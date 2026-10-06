@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T14:27:00+09:00",
+  "updatedKst": "2026-10-06T14:31:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -108,9 +108,10 @@
     "VR-DX9EX-SWAPCHAIN-WAIT-HARD-ERROR-FAIL-CLOSED-0043",
     "VR-DX9EX-SWAPCHAIN-IMAGE-RELEASE-FAIL-CLOSED-0044",
     "VR-DX9EX-SWAPCHAIN-IMAGE-ACQUIRE-FAIL-CLOSED-0045",
-    "VR-DX9EX-SHADER-RESOURCE-TRANSACTION-0046"
+    "VR-DX9EX-SHADER-RESOURCE-TRANSACTION-0046",
+    "VR-DX9EX-CAPTURE-SOURCE-TRANSACTION-0047"
   ],
-  "next": "Structural extraction remains terminal and ARCH-V3-GATE-001 remains HMD-gated. R19 swapchain image-flow hard errors now fail closed, and CreateShaders now stages VS/PS/sampler/constant-buffer resources locally with rollback before publishing a complete bundle. Validate the exact 00463 material SHA, then continue only with another independently provable DX9Ex stability/resource-lifetime unit until the Quest3/VDXR architecture-v3 entry gate opens.",
+  "next": "Structural extraction remains terminal and ARCH-V3-GATE-001 remains HMD-gated. R19 CreateShaders and production capture source replacement now use transactional resource publication: transient creation failure cannot leak partial shader resources or discard the last complete capture texture/SRV bundle. Validate the exact 00464 material SHA, then continue only with another independently provable DX9Ex stability/resource-lifetime unit until the Quest3/VDXR architecture-v3 entry gate opens.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -239,7 +240,8 @@
     "CONVERSION-DX9EX-00460 / VR-DX9EX-SWAPCHAIN-WAIT-HARD-ERROR-FAIL-CLOSED-0043 keeps XR_TIMEOUT_EXPIRED as the only same-image retry path. A non-timeout xrWaitSwapchainImage failure now marks the R19 swapchain waitFaulted, Acquire fails closed, and EnsureSwapchain refuses the unchanged-handle fast path so transactional Destroy/recreate can recover without hammering a failed wait every host frame. Runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00461 / VR-DX9EX-SWAPCHAIN-IMAGE-RELEASE-FAIL-CLOSED-0044 marks a swapchain releaseFaulted when xrReleaseSwapchainImage returns a hard failure. The next frame cannot reuse or rerender that waited image: Acquire fails closed and EnsureSwapchain bypasses unchanged-handle reuse so the existing transactional Destroy/recreate path resolves ownership. XR_SUCCESS and XR_SESSION_LOSS_PENDING remain success via XR_SUCCEEDED. Runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00462 / VR-DX9EX-SWAPCHAIN-IMAGE-ACQUIRE-FAIL-CLOSED-0045 marks acquireFaulted on hard xrAcquireSwapchainImage failure, without claiming acquired/waited ownership. Later Acquire calls fail closed and EnsureSwapchain bypasses unchanged-handle reuse so transactional Destroy/recreate resolves the broken image-flow path. XR_SUCCESS and XR_SESSION_LOSS_PENDING remain success via XR_FAILED semantics. Runtime remains UNTESTED pending Quest3/VDXR.",
-    "CONVERSION-DX9EX-00463 / VR-DX9EX-SHADER-RESOURCE-TRANSACTION-0046 makes R19 CreateShaders all-or-nothing: any stale partial global bundle is released before retry, VS/PS/sampler/constant-buffer objects are created into pending locals, every failure rolls them back, and globals are published only after the full bundle exists. Runtime remains UNTESTED pending Quest3/VDXR."
+    "CONVERSION-DX9EX-00463 / VR-DX9EX-SHADER-RESOURCE-TRANSACTION-0046 makes R19 CreateShaders all-or-nothing: any stale partial global bundle is released before retry, VS/PS/sampler/constant-buffer objects are created into pending locals, every failure rolls them back, and globals are published only after the full bundle exists. Runtime remains UNTESTED pending Quest3/VDXR.",
+    "CONVERSION-DX9EX-00464 / VR-DX9EX-CAPTURE-SOURCE-TRANSACTION-0047 stages a replacement R19 production capture texture and SRV in local COM pointers, releases pending resources on failure, and swaps the published Source/SourceSrv only after both objects are complete. The prior bundle and its unchanged freshness timestamp remain intact on transient creation failure. Runtime remains UNTESTED pending Quest3/VDXR."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
@@ -960,5 +962,19 @@
       "packageArtifactDigest": "sha256:d10012b3422121f928ca614c11234430832b7798b6b075b97e9f062ececf350e"
     },
     "issue14CommentId": 6010000643
+  },
+  "post1000Maintenance00464": {
+    "taskId": "CONVERSION-DX9EX-00464",
+    "productionId": "CONVERSION-DX9EX-00464",
+    "eventId": "CONVERSION-DX9EX-00464-E001",
+    "eventType": "dispatch",
+    "attempt": "1/3",
+    "item": "VR-DX9EX-CAPTURE-SOURCE-TRANSACTION-0047",
+    "baseSha": "5912dee3955138baba3172cc7eb18f52f18c2f86",
+    "materialResultSha": "PENDING_SELF",
+    "validationBearingResultSha": "PENDING_SELF",
+    "automationValidation": "PENDING",
+    "runtimeValidation": "UNTESTED",
+    "summary": "Make R19 production capture source replacement transactional so transient texture/SRV creation failures preserve the last complete published source bundle."
   }
 }
