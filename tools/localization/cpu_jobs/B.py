@@ -78,9 +78,15 @@ for sp in specs:
     if not comps: raise RuntimeError(("no red banner",sp["key"]))
     comps.sort(key=lambda x:x[0],reverse=True)
     banner_seed=comps[0][1]
-    banner=ndimage.binary_fill_holes(ndimage.binary_closing(banner_seed,iterations=1))
-    # Keep only the connected sign body grown one pixel to include AA-red interior, but not the white outer rim.
-    banner=ndimage.binary_dilation(banner,iterations=1) & a
+    # The pale letters cut through the red field, so binary hole filling only captures
+    # enclosed glyph counters. Reconstruct the actual red sign interior from the
+    # left/right envelope of the largest connected red field on each scanline.
+    banner=np.zeros_like(banner_seed)
+    for yy in range(banner_seed.shape[0]):
+        xs=np.nonzero(banner_seed[yy])[0]
+        if len(xs)>=2:
+            banner[yy,int(xs.min()):int(xs.max())+1]=True
+    banner &= a
     dist_in=ndimage.distance_transform_edt(banner)
 
     # The source letters are the pale/yellow/orange islands inside the red sign body.
