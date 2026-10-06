@@ -2,24 +2,24 @@
   "schema_version": 1,
   "task_id": "CONVERSION-DX9EX-00499",
   "production_id": "CONVERSION-DX9EX-00499",
-  "event_id": "CONVERSION-DX9EX-00499-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX9EX-00499-E002",
+  "event_type": "retry",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "attempt": "1/3",
-  "status": "BLOCKED_VALIDATION_REPAIR_LIMIT",
+  "attempt": "2/3",
+  "status": "COMPLETE",
   "base_sha": "bd6740196815b51e6388129e589a828010906073",
   "source_material_sha": "88ebd4b8cbf7051b24662e0041aa140a981c0abf",
-  "validation_bearing_result_sha": "5d0a005d7dc67bd6a15e3204bd1785db21dc9626",
-  "result_sha": "5d0a005d7dc67bd6a15e3204bd1785db21dc9626",
+  "validation_bearing_result_sha": "2db80d661f0d7d572f09eca77119bbf3f3e13e76",
+  "result_sha": "2db80d661f0d7d572f09eca77119bbf3f3e13e76",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00499]",
   "selected_work_item": "DX9EX-PERF-DIRECTGPU-ACK-RING-SNAPSHOT-0081",
-  "summary": "Batch the steady-state DirectGPU host ACK read into one seqlock-protected whole-ring snapshot per R32 resolve scan, while retaining the proven per-slot ACK reader as the invalid/stale snapshot slow-path fallback.",
-  "automation_validation": "FAIL",
+  "summary": "Batched steady-state DirectGPU host ACK reads into one seqlock-protected whole-ring snapshot per R32 resolve scan, retaining the proven per-slot ACK reader as the invalid/stale snapshot slow-path fallback; retry 2/3 reconciled the canonical run-identity verifier with the new snapshot owner.",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
-  "repair_attempts_used": 3,
+  "repair_attempts_used": 1,
   "evidence": {
     "changed_paths": [
       "src/vr/d3d9/stereo_renderer_r13.cpp",
@@ -58,8 +58,24 @@
       "run_id": 37541650793,
       "result": "SUCCESS"
     },
-    "host_game_full_chain_package": "SKIPPED_AFTER_POLICY_FAILURE"
+    "host_game_full_chain_package": "SKIPPED_AFTER_POLICY_FAILURE",
+    "retry_2": {
+      "failure_context_reconciled": "Controller reported missing run for 5d0a005d..., but exact-SHA DX9Ex Active run 37541650820 existed and failed policy; retry resumed from the real failure instead of treating it as missing.",
+      "repair_sha": "2db80d661f0d7d572f09eca77119bbf3f3e13e76",
+      "dx9ex_active_run_id": 37542820962,
+      "domain_isolation_run_id": 37542821020,
+      "jobs": {
+        "policy": 112539632572,
+        "host": 112539840666,
+        "game": 112539840712,
+        "full_chain_compile": 112539840749,
+        "package": 112540997762
+      },
+      "package_artifact_id": 11449691693,
+      "package_artifact_digest": "sha256:1ef99f74a046e9d334bed6c0798b9919f98f97038ae4c666f7357a7b43579d6a",
+      "result": "SUCCESS"
+    }
   },
-  "blocker": "Three automatic verifier-repair attempts were consumed. Queue contract requires stopping this unchanged work item; do not claim PASS until a later retry reconciles the remaining ACK identity verifier with the new whole-ring snapshot owner.",
-  "next_action": "A later retry of the same task/work item should start from the remaining DirectGpuAckRunGenerationIndex verifier expectation, inspect all ACK identity guards together, and either reconcile them atomically or revert the experiment. No runtime/HMD claim is permitted."
+  "blocker": null,
+  "next_action": "No further work is required for TASK_ID CONVERSION-DX9EX-00499. Runtime/HMD behavior remains UNTESTED; do not infer visual or pacing proof from CI."
 }
