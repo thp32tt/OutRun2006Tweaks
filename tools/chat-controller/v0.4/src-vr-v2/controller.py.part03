@@ -54,6 +54,98 @@ def start_status_server():
 
 
 
+
+def _production_number(production_id: str) -> Optional[int]:
+    match = re.search(r"-(\d+)$", str(production_id or ""))
+    return int(match.group(1)) if match else None
+
+
+def github_stale_event_guard(active: dict, trigger: str) -> bool:
+    """Drop stale retry/rollover work before it can reopen an older production task."""
+    if CONTROLLER_MODE != "conversion":
+        return False
+    branch = str(active.get("branch") or "").strip()
+    production_id = str(active.get("production_id") or active.get("task_id") or "").strip()
+    if not branch or not production_id:
+        return False
+    try:
+        # Recovery decisions must bypass the normal short commit-list cache.
+        _github_commit_list_cache.pop(branch, None)
+        head = github_branch_head(branch)
+        task_commit = github_find_task_commit(branch, production_id)
+        record = github_task_record(head, production_id) if head else None
+
+        status = str((record or {}).get("status", (record or {}).get("result", ""))).upper()
+        result_sha = str(
+            (record or {}).get("validation_bearing_result_sha")
+            or (record or {}).get("material_result_sha")
+            or (record or {}).get("result_sha")
+            or ""
+        )
+        complete = status in {"COMPLETE", "PASS", "SUCCESS", "DONE"}
+
+        if complete:
+            if re.fullmatch(r"[0-9a-fA-F]{40}", result_sha):
+                active["result_sha"] = result_sha.lower()
+            elif task_commit and task_commit.get("sha"):
+                active["result_sha"] = task_commit["sha"]
+            active["automation_validation"] = str((record or {}).get("automation_validation") or "PASS")
+            active["runtime_validation"] = str((record or {}).get("runtime_validation") or "UNTESTED")
+            active["terminal"] = "PASS"
+            active["phase"] = "DONE"
+            active["stale_event_drop"] = trigger
+            write_runtime(
+                status="stale_event_drop",
+                last_action=f"{production_id} {trigger} dropped: GitHub run record is already {status or 'COMPLETE'}",
+                queue=active,
+            )
+            return True
+
+        if task_commit and task_commit.get("sha"):
+            active["result_sha"] = task_commit["sha"]
+            active["result_message"] = task_commit.get("message", "")
+            active["phase"] = "WAIT_ACTIONS"
+            active["wait_actions_started_at"] = datetime.now(TZ).isoformat()
+            active["last_gate_poll_at"] = None
+            active["stale_event_drop"] = trigger
+            write_runtime(
+                status="stale_event_drop",
+                last_action=f"{production_id} {trigger} dropped: durable material commit already exists",
+                queue=active,
+            )
+            return True
+
+        current_number = _production_number(production_id)
+        prefix = production_id.rsplit("-", 1)[0] + "-"
+        cached = _github_commit_list_cache.get(branch)
+        commits = cached[1] if cached else []
+        latest_id = production_id
+        latest_number = current_number
+        marker_re = re.compile(r"\[AUTO:(" + re.escape(prefix) + r"(\d+))\]")
+        for item in commits if isinstance(commits, list) else []:
+            message = item.get("commit", {}).get("message", "")
+            for match in marker_re.finditer(message):
+                number = int(match.group(2))
+                if latest_number is None or number > latest_number:
+                    latest_number = number
+                    latest_id = match.group(1)
+        if current_number is not None and latest_number is not None and latest_number > current_number:
+            active["terminal"] = "STALE_DROPPED"
+            active["phase"] = "DONE"
+            active["stale_event_drop"] = trigger
+            active["superseded_by"] = latest_id
+            write_runtime(
+                status="stale_event_drop",
+                last_action=f"{production_id} {trigger} dropped: same lane already advanced to {latest_id}",
+                queue=active,
+            )
+            return True
+    except Exception as exc:
+        log.warning("stale-event guard failed task=%s trigger=%s error=%r", production_id, trigger, exc)
+        write_runtime(last_github_error=f"stale-event-guard:{production_id}:{exc!r}")
+    return False
+
+
 def queue_rollover_prompt(active: dict) -> str:
     rollover = int(active.get("chat_rollovers", 0)) + 1
     lane = str(active.get("lane", ""))
@@ -97,6 +189,8 @@ def queue_rollover_prompt(active: dict) -> str:
 async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
     """Move one active task to a fresh chat without consuming a repair attempt."""
     if not CONVERSATION_ROLLOVER_ENABLED:
+        return False
+    if github_stale_event_guard(active, f"rollover:{reason}"):
         return False
     count = int(active.get("chat_rollovers", 0))
     hard_length_limit = "length limit" in reason.lower() or "reached its length" in reason.lower()
@@ -194,6 +288,7 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     if new_url:
         slot.url = new_url
         active["active_chat_url"] = new_url
+    slot.completed_tasks_in_chat = 0
 
     active["retry_recovery_attempted"] = False
     active["retry_rollover_pending"] = False
@@ -222,6 +317,9 @@ async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, acti
     retry = await first_visible(page, RETRY_SELECTORS, total_wait_ms=500)
     if retry is None and not active.get("retry_rollover_pending"):
         return False
+    if github_stale_event_guard(active, "retry-surface"):
+        save_queue_state(q)
+        return True
 
     now = datetime.now(TZ)
     retry_text = await retry_surface_text(page)
@@ -308,6 +406,8 @@ async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, acti
 
 
 async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
+    if github_stale_event_guard(active, f"retry-send:{reason}"):
+        return False
     now = datetime.now(TZ)
     reg = load_registry(now)
     slot = next((s for s in reg.slots if s.name == active["slot"]), None)
@@ -875,6 +975,9 @@ async def localization_process_lane(
                 active["completed_at"] = now.isoformat()
                 active["terminal"] = "PASS"
                 active["phase"] = "DONE"
+                slot.completed_tasks_in_chat = int(slot.completed_tasks_in_chat) + 1
+                slot.last_result = f"conversion_task_complete:{active['task_id']}"
+                save_registry(reg)
                 q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
                 save_queue_state(q)
                 return
@@ -1247,11 +1350,21 @@ async def conversion_send_lane_task(
         )
         return False
 
+    if CHAT_ROTATE_COMPLETED_TASKS and slot.completed_tasks_in_chat >= CHAT_ROTATE_COMPLETED_TASKS:
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+        slot.completed_tasks_in_chat = 0
+        slot.last_result = "completed_task_chat_rotation"
+        save_registry(reg)
+
     if slot.url and await detect_conversation_limit(page):
         page = await replace_with_fresh_slot_page(context, pages, slot)
+        slot.completed_tasks_in_chat = 0
+        save_registry(reg)
 
     if await first_visible(page, RETRY_SELECTORS, total_wait_ms=500) is not None:
         page = await replace_with_fresh_slot_page(context, pages, slot)
+        slot.completed_tasks_in_chat = 0
+        save_registry(reg)
 
     if not await ensure_logged_in(page):
         write_runtime(status="login_required", last_action=f"Conversion lane {slot_name}: login required", queue=q)
