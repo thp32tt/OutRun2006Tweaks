@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN-CONTROLLER",
+  "timestamp_kst": "2026-10-06T15:12:29+09:00",
+  "queue_index": 62,
+  "asset": "textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+  "work_stolen_from_lane": "B",
+  "source_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+  "candidate_sha256": "58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2",
+  "translation": {
+    "semantic": {
+      "Diverge": "분기",
+      "Left": "좌측",
+      "Right": "우측",
+      "EASY": "쉬움",
+      "HARD": "어려움"
+    },
+    "physical_elements": 9
+  },
+  "rejected_intermediates": {
+    "range": "A125-A131",
+    "status": "SUPERSEDED_NOT_PROMOTED",
+    "reasons": [
+      "broad white erase plate / patch",
+      "nearest-neighbour jagged road edge",
+      "synthetic inpaint smear / road-boundary discontinuity",
+      "diagnostic-only stacks pending controller selection"
+    ],
+    "numeric_false_negative_recorded": true
+  },
+  "clean_plate": {
+    "diverge_left_right": "verified PSD Erase Left and Right and Diverge component",
+    "easy_hard": "source-authored Layer43+Group16 road clean",
+    "synthetic_inpaint_used": false,
+    "repair_extra_pixels": 2427,
+    "repair_extra_outside_source_bboxes": 0
+  },
+  "machine_qa": {
+    "elements_total": 9,
+    "bbox_size_positive_margin": "9/9 PASS",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "localized_pixels_outside_exact_source_bboxes": 0,
+    "localized_overlap_pixels": 0,
+    "dds_roundtrip": "PASS"
+  },
+  "reviewed_evidence": [
+    "A132_MAIN_SOURCE_CLEAN_FINAL.jpg",
+    "A132_LABEL_ZOOM_CONTACT.jpg",
+    "A132_RAW_COMPARE.jpg",
+    "A132_33491F83_REPORT.json"
+  ],
+  "visual_qa": {
+    "authored_road_and_green_edge_continuity": "PASS",
+    "clean_plate_source_residue": "PASS",
+    "white_patch_or_smear": "PASS_NONE_VISIBLE",
+    "source_style_family": "PASS",
+    "hangul_glyph_integrity": "PASS",
+    "clipping_overlap_foreign_image_intrusion": "PASS",
+    "protected_route_art": "PASS",
+    "readable_orientation": "PASS",
+    "raw_mirror_y_orientation": "PASS"
+  },
+  "decision": "A132_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_touched": false
+}

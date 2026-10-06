@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A132 resolved work-stolen index62 33491F83 manual reconstruction. Candidate 58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2: source-authored Layer43+Group16 restores EASY/HARD road/green-edge background; verified PSD erase component restores Diverge/Left/Right. 9/9 bbox/size/positive margins and all exact-bbox outside/alpha/overlap gates PASS; controller readable/high-zoom/raw mirror_y visual PASS. Pending independent C + in-game; do not repeat A125-A131 rejected intermediates unless C/new game evidence returns REWORK.",
     "B194 completed index214 BF229CF4 START/GOAL as exact-HD DXT5 candidate 3d292729007c... . First numeric-PASS worker draft 869b5fef... was controller-rejected because the START sign mask absorbed nearby traffic-light scene red and visibly intruded into protected art. Final scene-red exclusion passes 2/2 bbox/size/margins, zero decoded outside/alpha/introduced-visible, clean residue=0, final source-residue color=0, and SOURCE/CLEAN/FINAL + raw mirror_y visual QA. Pending independent C/in-game; do not repeat rejected B194 drafts. Next normal B zoom_review is index166 5EBD7FE8; do not duplicate index62 while A/manual reconstruction work owns it.",
     "A119R resolved index99 4F68708E strict DXT5 HOLD. A117/A119 showed the old threshold boxes omitted 606 low-alpha source-effect pixels; exact complete multiline bbox [514,37,1614,217] enables constrained boundary-safe BC3. A119 numeric PASS bd7185f454abfd326e7609eb4826c1a22388617824cd25e00c211e73b648f889 was controller-rejected for shared-line style mismatch (54px vs 57px). A119R candidate 70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612: both lines share 61px Bold/4px navy stroke/7px glow/0.24 shear; hard bbox and 2/2 line-core bbox/size/positive margins PASS, changed/alpha outside=0, source residue=0, overlap=0, 5px row gap; SOURCE/CLEAN/FINAL + raw mirror_y visual PASS. Pending independent C + in-game; do not repeat unless returned REWORK.",
     "B191 completed index172 6C9B3611 START/GOAL as a native exact-HD Korean candidate 963445a44888...; producer machine + controller visual QA PASS, pending independent C and in-game. Do not repeat B182-B190 superseded attempts. Next normal B zoom_review is index166 5EBD7FE8; index62 remains manual reconstruction required.",
@@ -4161,6 +4162,7 @@
     "runtime_validation": "UNTESTED"
   },
   "current_pending_c": [
+    "33491F83",
     "BF3EE5C6",
     "A064FDFC",
     "48DEBE77",
@@ -5886,5 +5888,36 @@
     "status": "STATIC_PASS_PENDING_C",
     "runtime_validation": "UNTESTED",
     "next_even_zoom_review_index": 166
+  },
+  "a132_33491f83": {
+    "timestamp_kst": "2026-10-06T15:12:29+09:00",
+    "run": "20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN",
+    "queue_index": 62,
+    "asset": "33491F83",
+    "path": "textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+    "work_stolen_from_lane": "B",
+    "classification": "MANUAL_RECONSTRUCTION_RESOLVED_BY_AUTHORED_PSD_STACK",
+    "source_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+    "candidate_sha256": "58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2",
+    "clean_components": {
+      "diverge_left_right": "Erase Left and Right and Diverge",
+      "easy_hard": "Layer43+Group16 authored road clean"
+    },
+    "machine_qa": {
+      "bbox_size_positive_margin": "9/9 PASS",
+      "changed_pixels_outside_exact_source_bboxes": 0,
+      "alpha_changed_outside_exact_source_bboxes": 0,
+      "localized_pixels_outside_exact_source_bboxes": 0,
+      "localized_overlap_pixels": 0,
+      "repair_extra_outside_source_bboxes": 0,
+      "dds_roundtrip": "PASS"
+    },
+    "controller_visual_qa": "PASS",
+    "rejected_intermediates": "A125-A131 numeric/visual false-positive or diagnostic attempts superseded",
+    "status": "A132_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "report": "localization/graphics/role_A/20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN/A132_33491F83_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN/A132_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T14:58:00+09:00",
+  "updated_at_kst": "2026-10-06T15:12:29+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B194 promoted index214 BF229CF4 from zoom_review to localize_text and produced exact-HD DXT5 candidate 3d292729007c... after controller visual QA rejected the first numeric-PASS scene-red intrusion draft. Final 2/2 bbox/size/positive margins PASS; decoded outside/alpha/introduced-visible=0, clean residue=0, final source-residue color=0, controller SOURCE/CLEAN/FINAL+raw PASS. Pending independent C; runtime untested. Next normal even zoom_review is index166 5EBD7FE8; index62 is concurrently owned by A/manual reconstruction work and is not duplicated.",
+  "next_checkpoint": "A132 work-steal resolved index62 33491F83 manual reconstruction with source-authored PSD Layer43+Group16 road clean for EASY/HARD and verified erase components for Diverge/Left/Right. Candidate 58fe9ed97494...: 9/9 bbox/size/positive margins, changed/alpha/localized outside exact source bboxes=0, overlap=0, DDS roundtrip PASS; controller readable/high-zoom/raw mirror_y PASS. Pending independent C and in-game; do not repeat A125-A131 rejected intermediates.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1352,26 +1352,18 @@
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     },
     "latest_a_production": {
-      "run": "A119R",
-      "decision": "STRICT_DXT5_HOLD_RESOLVED_NATIVE_HD",
-      "indices": [
-        99
-      ],
-      "candidate_sha256": {
-        "4F68708E": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612"
-      },
-      "result": "A119R_STATIC_PASS_PENDING_C",
-      "conceptual_segments": 1,
-      "localized_physical_rows": 2,
-      "machine_qa": "hard multiline + 2/2 line-core bbox/size/positive-margin PASS; changed/alpha outside=0; source residue=0; row overlap=0; shared line style PASS",
-      "controller_visual_qa": "PASS after rejecting A119 numeric false-negative style mismatch",
-      "corrections": [
-        "A117/A119 threshold-bbox undercoverage 606px reconciled to complete source effect bbox",
-        "A119 54px/57px cross-line style mismatch rejected and rebuilt with shared 61px style"
-      ],
-      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION119R-4F68708E/A119R_CONTROLLER_SELF_QA.json",
-      "runtime_validation": "UNTESTED",
-      "pending_independent_c_static_qa": true
+      "timestamp_kst": "2026-10-06T15:12:29+09:00",
+      "run": "A132",
+      "queue_index": 62,
+      "asset": "33491F83",
+      "classification": "MANUAL_RECONSTRUCTION_RESOLVED_BY_AUTHORED_PSD_STACK",
+      "candidate_sha256": "58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2",
+      "machine_qa": "9/9 bbox+size+positive-margin PASS; changed/alpha/localized outside exact source bboxes=0; overlap=0; DDS roundtrip PASS",
+      "controller_visual_qa": "PASS",
+      "status": "A132_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "report": "localization/graphics/role_A/20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN/A132_33491F83_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN/A132_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "UNTESTED"
     },
     "latest_a_rework": {
       "run": "A45",
@@ -2537,6 +2529,7 @@
     "runtime_validation": "PENDING_NEW_INGAME_RETEST"
   },
   "current_pending_c": [
+    "33491F83",
     "4F68708E",
     "BA0147DA",
     "8C259C68",

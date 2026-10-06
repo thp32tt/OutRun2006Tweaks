@@ -1818,3 +1818,11 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - First worker candidate `869b5fef...` passed numeric gates but controller visual QA rejected a red bar into the traffic-light/protected scene. B194 final excludes scene-red components from the sign body; no weak draft was promoted.
 - Final producer machine QA: 2/2 bbox/size/positive margins PASS; changed/alpha/introduced-visible outside allowed blocks=0; clean source residue=0; final source-residue color=0; overlap=0. Controller SOURCE/CLEAN/FINAL + raw mirror_y visual QA PASS.
 - Status: B194_STATIC_PASS_PENDING_C; RUNTIME_VALIDATION=UNTESTED. Queue now 94 localize_text / 32 zoom_review; blocked zoom_review=10. Next normal B zoom-review: index166. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-06 15:12 KST — A132 index62 33491F83 manual reconstruction resolved
+- A odd actionable production shard was exhausted, so after refresh A work-stole the oldest safe manual-reconstruction row, index62 `33491F83`; completed A in-game/static-pass rows were not repeated.
+- Rejected A125-A131 numeric/visual intermediates were not promoted. A132 uses the layered Sonic-TV PSD authoring source: Diverge/Left/Right from the verified erase component and EASY/HARD from `Layer43+Group16`, preserving road/green-edge geometry without white patch or synthetic-inpaint smear.
+- Candidate `58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2`: 5 semantic / 9 physical labels, 9/9 exact bbox + source-size ceiling + positive-margin PASS; changed/alpha/localized pixels outside exact source bboxes=0; localized overlap=0; repair-extra outside source bboxes=0; DDS roundtrip PASS.
+- Controller readable/high-zoom SOURCE/CLEAN/FINAL and raw mirror_y review: PASS. No source residue, patch seam, smear, broken Hangul, clipping, collision, foreign-image intrusion or orientation regression observed.
+- State: `A132_SELF_QA_PASS_PENDING_C_AND_INGAME`; RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_A/20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN/A132_33491F83_REPORT.json`; `localization/graphics/role_A/20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN/A132_CONTROLLER_SELF_QA.json`.
