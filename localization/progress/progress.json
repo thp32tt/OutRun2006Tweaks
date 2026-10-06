@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T12:12:00+09:00",
+  "updated_at_kst": "2026-10-06T12:17:10+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A118 resolved odd-shard strict DXT5 HOLD index119 F6811E94: Time Attack Mode -> 타임 어택 모드, candidate af938e04d2555e14bc646d22be0f2ef0e5112e899c3a2b646931659ab680a6b7, machine zero-pixel gates and controller SOURCE/CLEAN/FINAL + raw mirror_y PASS, pending independent C/in-game. Index99 4F68708E remains HOLD_STRICT_RECHECK because A117 found 62 unique partial boundary blocks without an alpha-zero palette entry; do not relax the boundary gate. A odd blocked zoom-review remains exhausted; B is active on its even shard.",
+  "next_checkpoint": "B191 promoted index172 6C9B3611 from zoom_review to localize_text and produced candidate 963445a44888... with producer static/controller visual PASS. Pending independent C; runtime untested. B-owned in-game backlog rows remain pending C/new in-game retest and must not be repeated. Index62 33491F83 remains MANUAL_RECONSTRUCTION_REQUIRED. Next normal even zoom_review is index166 5EBD7FE8.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -155,11 +155,11 @@
   "graphics": {
     "total_dds": 243,
     "visually_reviewed": 243,
-    "localize_text": 92,
+    "localize_text": 93,
     "preserve_brand_song_credit": 1,
     "font_pipeline": 9,
     "hangul_name_entry": 1,
-    "zoom_review": 34,
+    "zoom_review": 33,
     "no_localization": 74,
     "work_queue_total": 137,
     "work_queue_file": "localization/graphics/asset_queue.csv",
@@ -181,7 +181,7 @@
     },
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
-    "artwork_plan_assets": 100,
+    "artwork_plan_assets": 114,
     "artwork_plan_segments": 723,
     "artwork_proof_candidates": 7,
     "simple6_package": {
@@ -2203,6 +2203,19 @@
         "status": "FEASIBLE_RESOLVED_BY_A118"
       },
       "report": "localization/graphics/worker_results/A117_DXT5_STRICT_PREFLIGHT.json"
+    },
+    "b191_production": {
+      "timestamp_kst": "2026-10-06T12:17:10+09:00",
+      "run": "B191",
+      "queue_index": 172,
+      "asset": "6C9B3611",
+      "classification": "ZOOM_REVIEW_TO_LOCALIZE_TEXT",
+      "candidate_sha256": "963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc",
+      "worker_report": "localization/graphics/role_B/20261006-B-PRODUCTION191-6C9B3611-START-GOAL/B191_6C9B3611_REPORT.json",
+      "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION191-6C9B3611-START-GOAL/B191_CONTROLLER_SELF_QA.json",
+      "status": "STATIC_PASS_PENDING_C",
+      "runtime_validation": "UNTESTED",
+      "next_even_zoom_review_index": 166
     }
   },
   "data_build": {

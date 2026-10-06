@@ -2193,3 +2193,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Machine QA PASS: changed/alpha/protected pixels outside original bbox=0, source residue=0, bbox/size/positive-margin=1/1 PASS, DDS size/header/orientation preserved. Controller SOURCE/CLEAN/FINAL and raw mirror_y visual review PASS: no mixed low-resolution text, broken Hangul, clipping, overlap, residual English, foreign-image intrusion or orientation error.
 - State: `A118_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME`; runtime validation UNTESTED. Index99 remains fail-closed; boundary gates were not weakened. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261006-A-PRODUCTION118-F6811E94/A118_F6811E94_REPORT.json`; `localization/graphics/role_A/20261006-A-PRODUCTION118-F6811E94/A118_CONTROLLER_SELF_QA.json`; `localization/graphics/worker_results/A117_DXT5_STRICT_PREFLIGHT.json`.
+
+## 2026-10-06T12:17:10+09:00 — B191 index172 6C9B3611 START/GOAL production
+- Resumed the unfinished B181 positive zoom classification rather than repeating completed B176-B180 or owned in-game rows already pending C/retest.
+- B182-B190 drafts were fail-closed during producer visual QA: early masks left visible English-effect strips; B190 convex hull accidentally included protected red map artwork. None of those rejected bytes were accepted as producer PASS.
+- B191 constrains convex red-body reconstruction to each measured sign banner box, preserves the white rim and all route/map/stage-thumbnail/OutRun2SP artwork, and renders only START -> 출발 / GOAL -> 골 at native 1024x1024 RGBA32.
+- Candidate 963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc: 2/2 exact source-effect bbox + source-size ceiling + positive margins PASS; changed/alpha/protected/introduced-visible outside allowed scope=0; clean/final source residue=0; localized overlap=0; DDS roundtrip/header/raw mirror_y PASS.
+- Controller SOURCE/CLEAN/FINAL and full raw mirror_y visual review PASS: no source-script residue, border break, clipping, overlap, foreign-image intrusion or orientation regression. Pending independent C; RUNTIME_VALIDATION=UNTESTED.
+- Queue promoted index172 from zoom_review to localize_text. Index62 remains MANUAL_RECONSTRUCTION_REQUIRED; next normal even zoom-review is index166. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_B/20261006-B-PRODUCTION191-6C9B3611-START-GOAL/B191_6C9B3611_REPORT.json; localization/graphics/role_B/20261006-B-PRODUCTION191-6C9B3611-START-GOAL/B191_CONTROLLER_SELF_QA.json.

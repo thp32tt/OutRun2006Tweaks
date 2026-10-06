@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PRODUCTION191-6C9B3611-START-GOAL",
+  "timestamp_kst": "2026-10-06T12:17:10+09:00",
+  "queue_index": 172,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "classification": {
+    "from": "zoom_review",
+    "to": "localize_text",
+    "segments": [
+      {
+        "source": "START",
+        "korean": "출발"
+      },
+      {
+        "source": "GOAL",
+        "korean": "골"
+      }
+    ],
+    "physical_text_elements": 2
+  },
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "candidate_sha256": "963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc",
+  "worker_report": "localization/graphics/role_B/20261006-B-PRODUCTION191-6C9B3611-START-GOAL/B191_6C9B3611_REPORT.json",
+  "machine_qa": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "changed_outside_allowed": 0,
+    "alpha_changed_outside": 0,
+    "protected_visible_changed": 0,
+    "introduced_visible_outside": 0,
+    "clean_source_residue": 0,
+    "final_source_residue": 0,
+    "localized_overlap": 0,
+    "dds_roundtrip": "PASS",
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_observations": [
+    "Readable SOURCE/CLEAN/FINAL review: START and GOAL English face/outline/shadow are removed with no visible source-script residue; red badge interiors are continuous and the white rim remains intact.",
+    "Localized 출발/골 remain inside the exact measured source-effect bboxes with positive margins and retain the pale face/orange shadow family plus rightward shear.",
+    "Full readable/raw review shows route map, stage thumbnails, road artwork and OutRun2SP logo unchanged outside the two badge interiors; no clipping, overlap, foreign-image intrusion or orientation regression is visible.",
+    "B190 protected-art hull overreach is superseded; B191 constrains hull construction to the measured sign banner boxes."
+  ],
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_AND_RAW",
+  "status": "B191_STATIC_PASS_PENDING_C",
+  "pending_independent_c_static_qa": true,
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

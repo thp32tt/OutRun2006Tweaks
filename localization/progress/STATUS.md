@@ -1795,3 +1795,9 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - Machine QA PASS: changed/alpha/protected pixels outside original bbox=0, source residue=0, bbox/size/positive-margin=1/1 PASS, DDS size/header/orientation preserved. Controller SOURCE/CLEAN/FINAL and raw mirror_y visual review PASS: no mixed low-resolution text, broken Hangul, clipping, overlap, residual English, foreign-image intrusion or orientation error.
 - State: `A118_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME`; runtime validation UNTESTED. Index99 remains fail-closed; boundary gates were not weakened. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261006-A-PRODUCTION118-F6811E94/A118_F6811E94_REPORT.json`; `localization/graphics/role_A/20261006-A-PRODUCTION118-F6811E94/A118_CONTROLLER_SELF_QA.json`; `localization/graphics/worker_results/A117_DXT5_STRICT_PREFLIGHT.json`.
+
+## 2026-10-06T12:17:10+09:00 — B191 index172
+- 6C9B3611: START -> 출발, GOAL -> 골; candidate 963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc.
+- Producer machine QA 2/2 PASS and controller readable/raw visual QA PASS. B182-B190 rejected attempts are superseded and must not be reused.
+- Status: B191_STATIC_PASS_PENDING_C; RUNTIME_VALIDATION=UNTESTED.
+- Queue now 93 localize_text / 33 zoom_review. Next normal B zoom-review: index166. VR/FFB/DX11/DXVK untouched.
