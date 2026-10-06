@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "status": "VALIDATING",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "949889d6a89a0f5420ec1452624cdf81e5565314",
-  "material_result_sha": "PENDING_SELF",
-  "validation_bearing_result_sha": "PENDING_SELF",
-  "result_sha": "PENDING_SELF",
+  "material_result_sha": "7aab628c5ab121d0b12ae65236c3f3d4e1710a1b",
+  "validation_bearing_result_sha": "7aab628c5ab121d0b12ae65236c3f3d4e1710a1b",
+  "result_sha": "7aab628c5ab121d0b12ae65236c3f3d4e1710a1b",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00450]",
   "selected_work_item": "VR-DX9EX-RECENTER-POST-ACK-OWNERSHIP-RECOVERY-0033",
   "summary": "Recover a recenter request when session teardown clears host-local ownership after it was published but before PollEvent's shared receivedId ACK completes.",
@@ -27,45 +27,71 @@
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered exact branch HEAD 949889d6a89a0f5420ec1452624cdf81e5565314. CONVERSION-DX9EX-00449 exact-SHA DX9Ex Active 37401065824 and Domain Isolation 37401065749 are SUCCESS; structural extraction remains terminal."
+      "evidence": "Recovered exact branch HEAD 949889d6a89a0f5420ec1452624cdf81e5565314. CONVERSION-DX9EX-00449 exact-SHA DX9Ex Active 37401065824 and Domain Isolation 37401065749 were SUCCESS; structural extraction remained terminal."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
-      "evidence": "Found a remaining cross-thread teardown window: ResetSessionState can clear PendingGameRequestId after 00449 publishes local ownership but before PollEvent executes MarkReceived. A late ACK would then suppress the shared request with no session-local owner available to requeue it."
+      "evidence": "Found a remaining cross-thread teardown window: ResetSessionState could clear PendingGameRequestId after 00449 published local ownership but before PollEvent executed MarkReceived, allowing a late shared ACK to suppress a request with no session-local owner."
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
-      "evidence": "Added post-ACK local-ownership recheck. If ownership disappeared, the host attempts requestId-exact RequeueReceived and returns XR_EVENT_UNAVAILABLE so the aborted synthetic accept is not exposed as a successful event. Newer requestIds are never rolled back."
+      "evidence": "Added post-ACK local-ownership recheck. If ownership disappeared, the host attempts requestId-exact RequeueReceived and returns XR_EVENT_UNAVAILABLE so the aborted synthetic accept is not exposed as successful. Newer requestIds are not rolled back."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
-      "automation_validation": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact material SHA 7aab628c5ab121d0b12ae65236c3f3d4e1710a1b: DX9Ex Active Validation 37402158890 policy/full-chain-compile/host/game/package all SUCCESS; Domain Isolation Guard 37402158898 SUCCESS."
     },
     "C4_COMMIT": {
-      "status": "PENDING",
-      "ci_skip_on_validation_bearing_result": false
+      "status": "COMPLETE",
+      "ci_skip_on_validation_bearing_result": false,
+      "evidence": "Material/validation-bearing commit 7aab628c5ab121d0b12ae65236c3f3d4e1710a1b includes [AUTO:CONVERSION-DX9EX-00450] and no CI-skip directive."
     },
     "C5_PACKAGE": {
-      "status": "PENDING"
+      "status": "COMPLETE",
+      "evidence": "Artifact 11386205696 OutRun2-VR-DX9EX-ACTIVE-7aab628c5ab121d0b12ae65236c3f3d4e1710a1b digest sha256:70072134eea21b7c23f42357baa7e25e8af81e38a51f9e01b32fc57907d104ba."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Durable run record finalized; validation-bearing result identity preserved separately from this bookkeeping commit."
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "red_review": {
       "base_sha": "949889d6a89a0f5420ec1452624cdf81e5565314",
       "result": "FAIL_AS_EXPECTED",
       "missing_contract": "No post-MarkReceived check repaired the shared ACK if ResetSessionState had already cleared host-local accepted-request ownership."
     },
+    "dx9ex_active": {
+      "run_id": 37402158890,
+      "head_sha": "7aab628c5ab121d0b12ae65236c3f3d4e1710a1b",
+      "result": "SUCCESS",
+      "jobs": [
+        "policy",
+        "full-chain-compile",
+        "host",
+        "game",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 37402158898,
+      "head_sha": "7aab628c5ab121d0b12ae65236c3f3d4e1710a1b",
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11386205696,
+      "digest": "sha256:70072134eea21b7c23f42357baa7e25e8af81e38a51f9e01b32fc57907d104ba"
+    },
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
     }
   },
-  "next_action": "Validate the exact material SHA with DX9Ex Active Validation and Domain Isolation, then write bookkeeping without replacing validation_bearing_result_sha.",
-  "started_at_kst": "2026-10-06T10:57:07+09:00"
+  "next_action": "Start the next controller task from the latest branch HEAD. The recenter IPC race chain can be left unless fresh source/static evidence exposes another executable gap.",
+  "started_at_kst": "2026-10-06T10:57:07+09:00",
+  "completed_at_kst": "2026-10-06T11:08:32+09:00"
 }
