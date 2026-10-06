@@ -779,11 +779,12 @@ for marker in (
     "R13OverlayReadyForTransport()",
     "return lowerResolve();",
     "R32EnsureDirectResources(device)",
-    "R32DrainPendingProducerFence(slotIndex)",
-    "R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted)",
+    "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
+    "R32DrainPendingProducerFence(index)",
+    "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
     "R32WaitProducerFence(slot.fence)",
     "slot.producerPending = true;",
-    "ActiveDirectTransportSlot = slotIndex;",
+    "ActiveDirectTransportSlot = selected;",
 ):
     if marker not in r32:
         errors.append(f"R32 missing hook-free DirectGPU owner contract: {marker}")
