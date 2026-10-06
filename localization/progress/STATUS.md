@@ -2019,3 +2019,15 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - q050 CBF8ECBF: B210 candidate `af6a189de...`; source-matching readable slant + hierarchy rework; producer machine/controller visual QA PASS; fresh C required.
 - q198 9FC88069: B211 candidate `2160e7ee...`; RANDOM/RANDOM PLAY/INTERMEDIATE hierarchy rework; protected song/variant artwork retained; producer machine/controller visual QA PASS; fresh C required.
 - Current PRE_INGAME export is stale for these two rows until C refreshes it. `RUNTIME_VALIDATION=UNTESTED`.
+## 2026-10-06 23:41 KST — A146 q241 Loading hierarchy manual visual rework
+
+- Refreshed current Git after B210/B211 reconciliation; no OPEN in-game backlog or C-returned REWORK existed and completed A144/A145 work was not repeated.
+- Manual review of current English-original comparison card 062_q241_E1639D2E.jpg found a visual false negative in prior C165: the large Loading→로딩 label was materially undersized versus the source hierarchy. PLEASE WAIT→잠시만요 already matched source height and was left unchanged.
+- GitHub-hosted A worker rerendered from canonical source/validated clean plate. Candidate fe9bb931d94a13a44a08bcf61b6325c01080b462afff84f92c97205cbe0eea65 -> b94f215b889231a7942299d6a2179540425d11538df21feb25565cac13bab037.
+- Large source bbox is 730x146; prior Korean 249x120; A146 Korean 404x134 with positive margins. Exactly 43,102 prior-candidate pixels changed, all inside the large Loading source bbox; the small 잠시만요 row changed 0 pixels.
+- Machine QA: 2/2 bbox/size/positive-margin PASS; clean/final validators PASS; outside/alpha/protected/residue/overlap/touch all 0; DDS header exact and BGRA roundtrip exact.
+- Controller inspected SOURCE/CLEAN/FINAL readable orientation and RAW mirror-Y output: enlarged 로딩 retains the source-derived metallic vertical profile, dark edge/depth, slight right lean, intact Hangul, and no clipping, residue or protected-art intrusion. Ordered rework gate 1-8 producer PASS.
+- Prior C165 pass is superseded for q241 because candidate bytes changed. Fresh independent C plus regenerated English-original comparison JPG is required before in-game testing.
+- RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_A/20261006-A-MANUALQA146-E1639D2E/A146_E1639D2E_REPORT.json and A146_CONTROLLER_FINAL_QA.json.
+

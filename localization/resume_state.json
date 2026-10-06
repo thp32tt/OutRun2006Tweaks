@@ -1,5 +1,5 @@
 {
-  "schema_version": 118,
+  "schema_version": 119,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4210,7 +4210,8 @@
     "C4A2937B",
     "EBEF6D20",
     "C598919A",
-    "43B07A77"
+    "43B07A77",
+    "E1639D2E"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6702,7 +6703,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-06T23:21:31+09:00",
+  "updated_at_kst": "2026-10-06 23:41 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -6916,6 +6917,91 @@
     ],
     "controller_visual_qa": "PASS_READABLE_AND_RAW_2_OF_2",
     "c_pre_ingame_export_refresh_required": true,
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "a146_e1639d2e_manual_visual_rework": {
+    "run": "A146",
+    "timestamp_kst": "2026-10-06 23:41 KST",
+    "role": "A",
+    "queue_index": 241,
+    "asset": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+    "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/062_q241_E1639D2E.jpg",
+    "trigger": "MANUAL_PRE_INGAME_JPG_REVIEW_062_VISUAL_FALSE_NEGATIVE",
+    "prior_c_status": "C165_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "fe9bb931d94a13a44a08bcf61b6325c01080b462afff84f92c97205cbe0eea65",
+    "candidate_sha256": "b94f215b889231a7942299d6a2179540425d11538df21feb25565cac13bab037",
+    "worker_output_commit": "29b2706111c7690deb0204427e4938a9f1a7c1d3",
+    "reworked_row": {
+      "source": "Loading",
+      "korean": "로딩",
+      "source_bbox": [
+        1,
+        110,
+        731,
+        256
+      ],
+      "source_size": [
+        730,
+        146
+      ],
+      "prior_localized_bbox": [
+        9,
+        123,
+        258,
+        243
+      ],
+      "prior_localized_size": [
+        249,
+        120
+      ],
+      "localized_bbox": [
+        9,
+        116,
+        413,
+        250
+      ],
+      "localized_size": [
+        404,
+        134
+      ],
+      "changed_pixels_vs_prior": 43102
+    },
+    "preserved_row": {
+      "source": "PLEASE WAIT",
+      "korean": "잠시만요",
+      "pixel_exact_vs_prior_candidate": true,
+      "changed_pixels_vs_prior": 0
+    },
+    "machine_qa": {
+      "bbox_pass": "2/2",
+      "size_ceiling": "2/2",
+      "positive_margin": "2/2",
+      "clean_plate_validator": "PASS",
+      "final_mask_validator": "PASS",
+      "source_mask_pixels_unchanged_in_clean": 0,
+      "localized_overlap_pixels": 0,
+      "localized_touch_pixels": 0,
+      "changed_pixels_outside_source_bboxes": 0,
+      "alpha_changed_pixels_outside_source_bboxes": 0,
+      "protected_visible_pixels_changed": 0,
+      "source_residue_visible_pixels": 0,
+      "dds_header_128_exact": true,
+      "rgba32_bgra_roundtrip_exact": true
+    },
+    "ordered_generation_gate": {
+      "1_source_text_removed_and_plate_restored": "PASS_VALIDATED_CLEAN_PLATE",
+      "2_source_matching_slant_direction": "PASS_CONTROLLER_VISUAL_READABLE",
+      "3_no_unnecessary_undersizing": "PASS_LARGE_LOADING_HIERARCHY_MATERIALLY_INCREASED",
+      "4_source_faithful_weight_outline_shadow": "PASS_SOURCE_DERIVED_METALLIC_PROFILE",
+      "5_no_clipped_pixels": "PASS_POSITIVE_MARGIN",
+      "6_protected_art_clearance": "PASS_ZERO_OUTSIDE_PROTECTED_CHANGE",
+      "7_raw_and_flip_y": "PASS_CONTROLLER_VISUAL_BOTH",
+      "8_immediate_readability_vs_english": "PASS_CONTROLLER_VISUAL"
+    },
+    "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_AND_RAW",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_C",
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
   }
