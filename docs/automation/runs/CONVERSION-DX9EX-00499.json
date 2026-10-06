@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00499",
+  "production_id": "CONVERSION-DX9EX-00499",
+  "event_id": "CONVERSION-DX9EX-00499-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "BLOCKED_VALIDATION_REPAIR_LIMIT",
+  "base_sha": "bd6740196815b51e6388129e589a828010906073",
+  "source_material_sha": "88ebd4b8cbf7051b24662e0041aa140a981c0abf",
+  "validation_bearing_result_sha": "5d0a005d7dc67bd6a15e3204bd1785db21dc9626",
+  "result_sha": "5d0a005d7dc67bd6a15e3204bd1785db21dc9626",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00499]",
+  "selected_work_item": "DX9EX-PERF-DIRECTGPU-ACK-RING-SNAPSHOT-0081",
+  "summary": "Batch the steady-state DirectGPU host ACK read into one seqlock-protected whole-ring snapshot per R32 resolve scan, while retaining the proven per-slot ACK reader as the invalid/stale snapshot slow-path fallback.",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "repair_attempts_used": 3,
+  "evidence": {
+    "changed_paths": [
+      "src/vr/d3d9/stereo_renderer_r13.cpp",
+      "src/vr/d3d9/stereo_renderer_r32.cpp",
+      "tools/verify_vr_dx9ex_reset_transport_contract.py"
+    ],
+    "initial_candidate": {
+      "sha": "88ebd4b8cbf7051b24662e0041aa140a981c0abf",
+      "run_id": 37541419224,
+      "policy_job_id": 112535072110,
+      "result": "FAIL_STALE_VERIFIER_OWNER_LOCATION",
+      "signature": "R13 stale-host ACK mapping retirement missing ordered markers"
+    },
+    "repair_1": {
+      "sha": "3adce88b7ecc39f706d5b63178e9539732aa9172",
+      "run_id": 37541504581,
+      "policy_job_id": 112535348754,
+      "result": "FAIL_VERIFIER_ORDER_ASSUMPTION",
+      "signature": "R32 final-owner free-slot scan order changed"
+    },
+    "repair_2": {
+      "sha": "fc719396037117ee10b859cecafd3d9088e1c191",
+      "run_id": 37541572026,
+      "policy_job_id": 112535570427,
+      "result": "FAIL_VERIFIER_AMBIGUOUS_MEMCPY_MARKER",
+      "signature": "R13 whole-ring ACK stable snapshot order changed"
+    },
+    "repair_3": {
+      "sha": "5d0a005d7dc67bd6a15e3204bd1785db21dc9626",
+      "run_id": 37541650820,
+      "policy_job_id": 112535826263,
+      "result": "FAIL_REMAINING_ACK_IDENTITY_VERIFIER_EXPECTATION",
+      "signature": "game dedicated ACK complete run-identity validation missing: DirectGpuAckRunGenerationIndex"
+    },
+    "domain_isolation": {
+      "run_id": 37541650793,
+      "result": "SUCCESS"
+    },
+    "host_game_full_chain_package": "SKIPPED_AFTER_POLICY_FAILURE"
+  },
+  "blocker": "Three automatic verifier-repair attempts were consumed. Queue contract requires stopping this unchanged work item; do not claim PASS until a later retry reconciles the remaining ACK identity verifier with the new whole-ring snapshot owner.",
+  "next_action": "A later retry of the same task/work item should start from the remaining DirectGpuAckRunGenerationIndex verifier expectation, inspect all ACK identity guards together, and either reconcile them atomically or revert the experiment. No runtime/HMD claim is permitted."
+}
