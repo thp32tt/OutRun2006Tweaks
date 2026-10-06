@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T18:23:36+09:00",
+  "updated_at_kst": "2026-10-06T18:58:30+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -116,7 +116,7 @@
         22,
         23
       ],
-      "name_entry_status": "b207_hold_sidecar_build_pass_controls_mapped_hangul_composition_render_required",
+      "name_entry_status": "b208_hold_composer_build_pass_jamo_artwork_render_hook_required",
       "name_entry_preflight_report": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_NAME_ENTRY_PREFLIGHT.json",
       "name_entry_controller_review": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_CONTROLLER_PREFLIGHT_REVIEW.json",
       "name_entry_symbol_count": 49,
@@ -165,7 +165,25 @@
         "page": "0xEC",
         "result": "0x700"
       },
-      "name_entry_safe_input_boundary": "preserve 0x26..0x2B controls; intercept only 0x00..0x25 character path before legacy byte append; commit A141 alias on confirm after composition"
+      "name_entry_safe_input_boundary": "preserve 0x26..0x2B controls; intercept only 0x00..0x25 character path before legacy byte append; commit A141 alias on confirm after composition",
+      "name_entry_b208_composer_report": "localization/graphics/role_B/20261006-B-PRODUCTION208-HANGUL-NAME-COMPOSER/B208_HANGUL_NAME_COMPOSER.json",
+      "name_entry_b208_final_source_commit": "0f696621d80a192f69d1f4195715870a0dfcf046",
+      "name_entry_composer": "inactive standard 2-beolsik HangulNameComposer, 15 visible codepoints max",
+      "name_entry_composer_features": [
+        "initial/medial/final",
+        "double initial",
+        "compound medial",
+        "compound final",
+        "final split",
+        "stepwise backspace",
+        "digits/space",
+        "UTF-8"
+      ],
+      "name_entry_composer_wired_to_input": false,
+      "name_entry_b208_win32_release_run": 37445766665,
+      "name_entry_b208_win32_release_artifact": 11404040505,
+      "name_entry_b208_korean_test_run": 37445766663,
+      "name_entry_b208_korean_test_artifact": 11403511226
     },
     "packaging": {
       "status": "not_started",
@@ -212,7 +230,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B207 consumed the already-validated A141 sidecar foundation and mapped the stock name-entry control state machine. Character selections 0x00..0x25 feed the legacy one-byte table, while 0x26 is backspace, 0x27..0x2A are page controls, and 0x2B confirms after the minimum-length check. The future Korean composition hook can therefore preserve all stock controls and replace only the character path before byte append, committing the A141 compatibility alias at confirmation. Exact 66743AA8 visual-cell/Jamo binding and explicit local alias-to-UTF8 name rendering remain fail-closed; no DDS/runtime source changed in B207.",
+  "next_checkpoint": "B208 implemented and build-validated an inactive standard 2-beolsik HangulNameComposer on the B207-proven character/control boundary. Final source 0f696621... passes Win32 Release run 37445766665 and Korean Test Build 37445766663. Composition handles initial/medial/final state, double initials, compound vowels/finals, final splitting, stepwise BACKSPACE, digits/space and UTF-8 within a 15-codepoint ceiling. No stock input interception, native-field write, DDS promotion, local Korean-name renderer, or network/ranking/replay change is enabled. Remaining safe work is source-faithful Jamo artwork plus explicit local alias-to-UTF8 name rendering before wiring the composer.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
