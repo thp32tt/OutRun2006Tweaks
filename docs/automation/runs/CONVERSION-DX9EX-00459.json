@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "status": "VALIDATING",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "63344a55ff230789b9334ba3e2c1f3456bdb5104",
-  "material_result_sha": "PENDING_SELF",
-  "validation_bearing_result_sha": "PENDING_SELF",
-  "result_sha": "PENDING_SELF",
+  "material_result_sha": "e9b7660fad3a419df3887a87ea3a06d1f092953d",
+  "validation_bearing_result_sha": "85e77072e3b026e00eed5b0597ada289ebf35f94",
+  "result_sha": "85e77072e3b026e00eed5b0597ada289ebf35f94",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00459]",
   "selected_work_item": "VR-DX9EX-SWAPCHAIN-IMAGE-WAIT-BOUNDED-0042",
   "summary": "Replace R19 xrWaitSwapchainImage infinite blocking with a 5 ms timeout; on XR_TIMEOUT_EXPIRED preserve the currently acquired image and retry that same image on a later host frame.",
@@ -38,23 +38,28 @@
       "evidence": "Added SwapchainImageWaitBudgetNs=5,000,000 ns, removed XR_INFINITE_DURATION and the retry loop, return false on XR_TIMEOUT_EXPIRED while keeping acquiredImage/acquired state intact, and set waited only after a successful non-timeout wait."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
-      "automation_validation": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact validation-bearing SHA 85e77072e3b026e00eed5b0597ada289ebf35f94 passed DX9Ex Active Validation 37410522395 (policy/game/host/full-chain-compile/package SUCCESS) and Domain Isolation Guard 37410522350 SUCCESS."
     },
     "C4_COMMIT": {
-      "status": "PENDING",
+      "status": "COMPLETE",
+      "material_result_sha": "e9b7660fad3a419df3887a87ea3a06d1f092953d",
+      "validation_bearing_result_sha": "85e77072e3b026e00eed5b0597ada289ebf35f94",
       "ci_skip_on_validation_bearing_result": false
     },
     "C5_PACKAGE": {
-      "status": "PENDING"
+      "status": "COMPLETE",
+      "artifact_id": 11389059554,
+      "digest": "sha256:0ffbd568e881b032de3f9137cebbf63faac6ebb7cda333ba22a73807f4f7ed83"
     },
     "C6_STATE": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "runtime_validation": "UNTESTED"
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "red_review": {
       "base_sha": "63344a55ff230789b9334ba3e2c1f3456bdb5104",
@@ -68,8 +73,15 @@
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "validation": {
+      "dx9ex_active_run_id": 37410522395,
+      "domain_isolation_run_id": 37410522350,
+      "package_artifact_id": 11389059554,
+      "package_artifact_digest": "sha256:0ffbd568e881b032de3f9137cebbf63faac6ebb7cda333ba22a73807f4f7ed83"
     }
   },
-  "next_action": "Validate the exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize bookkeeping while preserving validation_bearing_result_sha.",
-  "started_at_kst": "2026-10-06T12:44:30+09:00"
+  "next_action": "Continue from current branch HEAD with the next independently provable DX9Ex stability/resource-lifetime unit; runtime behavior remains Quest3/VDXR-gated.",
+  "started_at_kst": "2026-10-06T12:44:30+09:00",
+  "completed_at_kst": "2026-10-06T13:44:30+09:00"
 }
