@@ -45,8 +45,7 @@ policy = require(
 r32 = require(
     "src/vr/d3d9/stereo_renderer_r32.cpp",
     '#include "stereo_renderer_r31.cpp"',
-    "R32ResetR22Hook",
-    "reinterpret_cast<void*>(&ResetDestR22)",
+    "R32WithResetLifecycle",
     "R32ResetAfterGameReset",
     "R32InvalidateResetCaches",
     "SetStereoRecoverySafetyThroughEpoch(",
@@ -71,8 +70,22 @@ r32 = require(
     "VR R32 PERF 5s",
     "VR R32 REVIEW2",
 )
-if "R32ResetR13Hook" in r32:
-    raise SystemExit("R32 must no longer install a competing ResetDestR13 hook")
+for banned in (
+        "R32ResetR13Hook",
+        "R32ResetR22Hook",
+        "HRESULT __stdcall ResetDestR32(",
+        "reinterpret_cast<void*>(&ResetDestR22), ResetDestR32"):
+    if banned in r32:
+        raise SystemExit(f"R32 retained retired physical Reset ownership: {banned}")
+reset_owner = r32[r32.find("HRESULT R32WithResetLifecycle("):]
+for required in (
+        "R32ClearPendingProducerFences();",
+        "const HRESULT hr = lowerReset();",
+        "R32ResetAfterGameReset();",
+        "R32InvalidateResetCaches();",
+        "++R32ResetFailures"):
+    if required not in reset_owner:
+        raise SystemExit(f"R32 Reset lifecycle owner contract missing: {required}")
 if "R22ShadowState = {};" in r32[r32.find("void R32ResetAfterGameReset"):]:
     raise SystemExit("R32 successful Reset post-processing must preserve R22's freshly primed viewport/scissor shadow")
 resolve_start = r32.find("bool ResolveDirectTransportR32")
@@ -110,12 +123,22 @@ r33 = require(
     "R30CallLowerDrawIndexedPrimitive(",
     "R30CallLowerDrawPrimitiveUP(",
     "R30CallLowerDrawIndexedPrimitiveUP(",
-    "R33ResetR32Hook.stdcall<HRESULT>",
-    "R33 -> R32 -> R22",
+    "R32WithResetLifecycle(",
+    "R33ResetR22Hook.stdcall<HRESULT>",
+    "reinterpret_cast<void*>(&ResetDestR22)",
+    "R33 hooks R22 directly and preserves R32 reset lifecycle",
     "top-level telemetry counted once",
 )
-if "const HRESULT hr = ResetDestR22" in r33:
-    raise SystemExit("R33 must not bypass the corrected R32 Reset lifecycle")
+for banned in ("R33ResetR32Hook", "reinterpret_cast<void*>(&ResetDestR32)"):
+    if banned in r33:
+        raise SystemExit(f"R33 retained retired R32 Reset chain: {banned}")
+reset33_start = r33.find("HRESULT __stdcall ResetDestR33(")
+reset_helper = r33.find("R32WithResetLifecycle(", reset33_start)
+reset_lower = r33.find("R33ResetR22Hook.stdcall<HRESULT>", reset_helper)
+reset_post = r33.find("R33InvalidateDepthStencilCache();", reset_lower)
+if min(reset33_start, reset_helper, reset_lower, reset_post) < 0 or not (
+        reset33_start < reset_helper < reset_lower < reset_post):
+    raise SystemExit("R33 direct Reset owner must preserve R32 wrapper around lower R22 Reset before R33 post-processing")
 
 ex = require(
     "src/vr/d3d9/ex_device_upgrade.cpp",
