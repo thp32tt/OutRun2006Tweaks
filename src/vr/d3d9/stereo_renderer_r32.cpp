@@ -903,5 +903,5 @@ namespace OutRunVRStereo
 
         // R32 is a hook-free functional owner. Its helpers are consumed by
         // the R33 final dispatcher after R33 verifies R31/R22/R13 readiness.
-
+    }
 }
