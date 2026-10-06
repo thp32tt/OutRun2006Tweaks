@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-DIAG105-590A",
+  "target": "590A4724",
+  "target_cell": [
+    1400,
+    1960,
+    424,
+    88
+  ],
+  "c075_template_stats": [
+    {
+      "template_cell": 50,
+      "diff_pixels": 37312,
+      "mean_abs_rgba": 62.23060945540309
+    },
+    {
+      "template_cell": 51,
+      "diff_pixels": 9428,
+      "mean_abs_rgba": 14.17347636149228
+    },
+    {
+      "template_cell": 52,
+      "diff_pixels": 37312,
+      "mean_abs_rgba": 67.16034385720411
+    }
+  ],
+  "status": "DIAGNOSTIC_COMPLETE"
+}
