@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION108-590A4724",
+  "timestamp_kst": "2026-10-06T10:26:33+09:00",
+  "queue_index": 103,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+  "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+  "candidate_sha256": "bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178",
+  "machine_status": "PASS",
+  "classification": "zoom_review -> localize_text; Normal Balance -> 일반 밸런스",
+  "source_policy": "Preserve target pale/unselected plate; reuse only C111-approved Korean phrase geometry and source-family text treatment, then reconstruct target plate from target pixels.",
+  "bbox_gate": {
+    "original_bbox": [
+      1411,
+      1968,
+      1801,
+      2040
+    ],
+    "localized_bbox": [
+      1508,
+      1986,
+      1704,
+      2026
+    ],
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "margins": [
+      97,
+      97,
+      18,
+      14
+    ],
+    "source_size": [
+      390,
+      72
+    ],
+    "localized_size": [
+      196,
+      40
+    ]
+  },
+  "zero_pixel_gates": {
+    "clean_outside": 0,
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "localized_overlap": 0
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_reason": "A108 supersedes A107. SOURCE/CLEAN/FINAL review shows the target pale selector plate is continuous with no visible English residue, patch rectangle, halo, clipped bevel, or borrowed orange-state pixels. Korean 일반 밸런스 uses the target's dark olive source tone and a right-slanted selector-family transform. Raw mirror_y review preserves both course images and all unrelated pixels/orientation.",
+  "rejected_prior_attempts": [
+    "A104 failed closed because selected orange template cell was not pixel-identical to target pale plate.",
+    "A106 failed closed because pale More BGM clean template was not pixel-identical to target plate.",
+    "A107 machine PASS was controller-rejected for visible mottled clean-plate residue and insufficient source slant; A108 reconstructs from target-own pixels and applies source-family shear."
+  ],
+  "decision": "A108_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_590A4724_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_590A_CONTACTS.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_590A_RAW_COMPARE.jpg"
+  ],
+  "vr_ffb_dx11_dxvk_touched": false
+}
