@@ -2098,3 +2098,8 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - A148 scale-only intermediate `13cf23b401ec...` was controller-rejected/not promoted for remaining alignment mismatch. Final A148R `ee11a2521e3c...` is 881x127 at source-left bbox [9,113,890,240], retaining source gradient/edges/depth/right lean.
 - Clean/final validators, bbox/size/positive-margin PASS; outside/alpha/protected/residue=0; constrained DXT5/header/raw mirror_y and controller readable/detail/RAW visual QA PASS.
 - Fresh C + refreshed English-original comparison/user review + actual in-game validation required. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 03:26 KST — C224 q055 2EA557B4
+- A148R ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c fresh independent C machine QA PASS: 1/1 bbox/size/positive-margin, DXT5 boundary/header/orientation gates PASS.
+- Controller visual PASS: source-left hierarchy restored, 881px width vs old C164 533px, source-direction right lean and filled gradient/edge/depth retained; no residue/breakage/clipping/intrusion.
+- Decision C224_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export refresh + user review + actual game validation pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.

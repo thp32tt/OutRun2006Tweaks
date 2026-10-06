@@ -2551,3 +2551,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller inspected SOURCE/C164/CLEAN/A148R readable evidence, large detail comparison and RAW mirror-Y: hierarchy, left alignment, fill/effects, slant and Hangul integrity now PASS with no clipping/residue/foreign-art intrusion. Ordered generation gate 1-8 producer PASS.
 - Prior C164 pass is superseded for q055 because bytes changed. Fresh independent C + regenerated PRE_INGAME English comparison/user review + actual game validation remain required. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261007-A-MANUALQA148R-2EA557B4/A148R_CONTROLLER_SELF_QA.json`, `localization/graphics/role_A/20261007-A-MANUALQA148R-2EA557B4/A148R_2EA557B4_REPORT.json`.
+
+## 2026-10-07 03:26 KST — C224 q055 2EA557B4 fresh independent QA
+
+- Selected A148R q055 current bytes ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c, not the superseded C164/A148 candidates. Canonical source b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685.
+- GitHub-hosted C worker run 37510968187 independently re-derived source/current geometry. Machine PASS: source [1,105,1090,248], final [9,113,890,240], 1/1 bbox/size/positive-margin; visible outside=0; clean visible alpha=0; changed DXT5 blocks wholly outside allowed=0; 24 partial boundary blocks preserve alpha endpoints/color data; header exact; RAW mirror_y PASS.
+- Controller SOURCE/CLEAN/FINAL, high-zoom detail and RAW review PASS: current 881x127 Korean restores the C164 undersized 533x127 hierarchy and source-left anchor, preserves readable right lean, filled cyan/white/blue gradient, white/navy edging and depth, with no residue, broken glyph, clipping or intrusion.
+- Decision C224_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME comparison set refresh required before synchronization completion; actual game validation remains UNTESTED. VR/FFB/DX11/DXVK untouched.

@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261007-C224-2EA557B4-A148R",
+  "qa_id": "C224",
+  "timestamp_kst": "2026-10-07T03:26:01+09:00",
+  "queue_index": 55,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "producer_run": "A148R",
+  "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+  "candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
+  "candidate_changed_by_C": false,
+  "machine_report": "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA557B4_MACHINE_QA.json",
+  "machine_summary": {
+    "status": "PASS",
+    "dimensions": [
+      2048,
+      256
+    ],
+    "format": "DXT5",
+    "header_128_exact": true,
+    "bbox_size_positive_margin": "1/1 PASS",
+    "original_bbox": [
+      1,
+      105,
+      1090,
+      248
+    ],
+    "localized_bbox": [
+      9,
+      113,
+      890,
+      240
+    ],
+    "source_size": [
+      1089,
+      143
+    ],
+    "localized_size": [
+      881,
+      127
+    ],
+    "localized_visible_pixels_outside_source_bbox": 0,
+    "clean_visible_alpha_pixels": 0,
+    "changed_dxt5_blocks_wholly_outside_allowed": 0,
+    "partial_boundary_changed_blocks": 24,
+    "partial_boundary_endpoint_or_color_drift": 0,
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": "PASS_A148R_SCALE_ALIGNMENT_STYLE_REWORK",
+  "visual_observations": [
+    "Canonical NEXT ROUND and A148R 다음 라운드 use the same readable right-lean direction; A148R restores source-left anchoring with an 8px positive left margin instead of the rejected centered placement.",
+    "The current Korean title occupies 881x127 versus the source 1089x143, materially restoring the C164 undersized 533px width while remaining inside the exact source bbox.",
+    "Filled cyan/white/blue gradient, white/navy edging and lower-right depth remain source-family consistent; Hangul interiors are filled and immediately readable rather than hollow or outline-dominant.",
+    "The independently checked clean plate is fully transparent for this text-only sprite, and readable/high-zoom evidence shows no source residue, patch artifact, broken Hangul, clipping, overlap or foreign-image intrusion.",
+    "RAW mirror_y evidence matches the readable FLIP-Y result and preserves the asset orientation."
+  ],
+  "ordered_visual_gate": {
+    "1_source_text_removed_and_plate_restored": "PASS_TEXT_ONLY_SPRITE_CLEAN_ALPHA_ZERO",
+    "2_slant_direction_matches_source": "PASS_READABLE_RIGHT_LEAN",
+    "3_text_not_unnecessarily_undersized": "PASS_C164_533PX_TO_A148R_881PX_SOURCE_1089PX",
+    "4_source_faithful_weight_outline_shadow": "PASS_FILLED_GRADIENT_WHITE_NAVY_EDGE_DEPTH",
+    "5_no_clipped_pixels": "PASS_8PX_TOP_BOTTOM_LEFT_POSITIVE_MARGIN",
+    "6_protected_art_clearance": "PASS_NO_VISIBLE_PIXELS_OUTSIDE_SOURCE_BBOX",
+    "7_raw_and_flip_y": "PASS",
+    "8_immediate_readability_vs_english": "PASS"
+  },
+  "decision": "C224_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+  "pre_ingame_comparison_refresh": "PENDING_C224_EXPORT",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false,
+  "evidence": [
+    "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA_SOURCE_CLEAN_FINAL_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA_SOURCE_FINAL_DETAIL.jpg",
+    "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA_SOURCE_FINAL_RAW.jpg"
+  ]
+}
