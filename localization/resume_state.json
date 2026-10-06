@@ -1,5 +1,5 @@
 {
-  "schema_version": 122,
+  "schema_version": 123,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4216,7 +4216,8 @@
     "62BEBF33",
     "E3FD08BE",
     "12519155",
-    "1762489B"
+    "1762489B",
+    "1F5FE6E9"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6708,7 +6709,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 00:56 KST",
+  "updated_at_kst": "2026-10-07 01:22 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7104,6 +7105,26 @@
     "candidate_sha256": "2569b0a2ea319e02d13d04d5cb3ed38bf676d35b3972aa42cab573068238d48a",
     "worker_output_commit": "a2c1dfc56b81a99ffc3b2be8df10473cb035cfb8",
     "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA215-1762489B/B215_CONTROLLER_SELF_QA.json",
+    "status": "B_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_C",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "b216_1f5fe6e9_manual_visual_rework": {
+    "run": "B216",
+    "timestamp_kst": "2026-10-07 01:22 KST",
+    "role": "B",
+    "queue_index": 132,
+    "asset_key": "1F5FE6E9",
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+    "selection_reason": "No active B P0/P1/C-returned REWORK/render-ready item; manual C-pass JPG #038 found request-family scale/weight false-negative",
+    "prior_c_status": "C139_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_c_candidate_sha256": "e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be",
+    "candidate_sha256": "615281ac66733323221916c506cda2fb9eb2f139866e98f1a9985e56ba7dde90",
+    "worker_output_commit": "b39388c",
+    "github_worker_run_id": 37494130140,
+    "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA216-1F5FE6E9/B216_CONTROLLER_SELF_QA.json",
     "status": "B_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
     "fresh_independent_c": "PENDING",
     "pre_ingame_comparison_refresh": "PENDING_C",

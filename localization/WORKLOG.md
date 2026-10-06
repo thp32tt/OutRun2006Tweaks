@@ -2485,3 +2485,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Prior C133 pass is superseded for changed bytes. Fresh independent C + regenerated English-original comparison JPG + user review + actual-game validation remain mandatory. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_B/20261007-B-MANUALQA215-1762489B/B215_CONTROLLER_SELF_QA.json.
 
+## B216 q132 request-family scale/weight rework — 2026-10-07 01:22 KST
+- Refreshed B state and skipped B210/B211/B212/B214/B215 outputs already waiting on fresh C. No active B-owned P0/P1, C-returned REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER item remained, so the contract manual PRE_INGAME comparison path was used.
+- English-original comparison #038 reopened q132 1F5FE6E9: prior C139/B55 요청 / 스페셜 요청 1-3 passed containment but remained visibly undersized/light against the shared English REQUEST family.
+- GitHub-hosted B216 worker run 37494130140 produced 615281ac66733323221916c506cda2fb9eb2f139866e98f1a9985e56ba7dde90 from exact source 3656adbd699b7852cb5fcf4bb01fc4f1f65bbd9d7d39e12e7a1c2ac5a49fef1d plus the prior validated B55 clean plate. All four rows use one fresh native Noto Sans CJK KR Black 18px family with modest 1.25x width fit; width gains are +10/+30/+30/+29px and each row gains 1px height while retaining positive margins.
+- Machine QA: 4/4 bbox + source-size + positive-margin PASS; outside/alpha/protected/source-residue/overlap/touch all 0; canonical RGBA32 header/raw mirror_y preserved.
+- Controller SOURCE/C139/B55-clean/B216 readable + per-row 4x + RAW review: PASS. No broken glyphs, clipping, English residue, panel damage, foreign-art intrusion, overlap, seam, halo or orientation regression observed.
+- Prior C139 pass is superseded for changed bytes. Fresh independent C + regenerated English-original comparison JPG + user review + actual-game validation remain mandatory. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_B/20261007-B-MANUALQA216-1F5FE6E9/B216_CONTROLLER_SELF_QA.json.
+

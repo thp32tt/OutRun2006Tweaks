@@ -2052,3 +2052,9 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - 5/5 bbox/size/positive-margin; clean/outside/alpha/protected/residue/overlap/touch=0; RAW mirror_y and controller readable/RAW QA PASS.
 - Fresh C/comparison JPG/user review/in-game required; RUNTIME_VALIDATION=UNTESTED.
 
+### B216 q132 request-family scale/weight rework — 2026-10-07 01:22 KST
+- q132 1F5FE6E9: C139 e503bb29d875... -> B216 615281ac6673....
+- Fixed visually undersized/light 요청 / 스페셜 요청 1-3 family using one native 18px Black style; all four rows gained width and height while retaining positive source-bbox margins.
+- 4/4 bbox/size/positive-margin; outside/alpha/protected/residue/overlap/touch=0; RAW mirror_y and controller readable/row/RAW QA PASS.
+- Fresh C/comparison JPG/user review/in-game required; RUNTIME_VALIDATION=UNTESTED.
+

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B216",
+  "timestamp_kst": "2026-10-07T01:22:15+09:00",
+  "queue_index": 132,
+  "asset_key": "1F5FE6E9",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+  "trigger": "B primary production queue had no active P0/P1, C-returned REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER item; manual PRE_INGAME English-original comparison #038 reopened C139 visual false-negative",
+  "prior_c_status_invalidated": "C139_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "prior_c_candidate_sha256": "e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be",
+  "worker_output_commit": "b39388c",
+  "github_worker_run_id": 37494130140,
+  "candidate_sha256": "615281ac66733323221916c506cda2fb9eb2f139866e98f1a9985e56ba7dde90",
+  "defects_fixed": [
+    "TEXT_SCALE_TOO_SMALL_VS_SOURCE",
+    "SOURCE_WEIGHT_HIERARCHY_TOO_WEAK"
+  ],
+  "machine_qa": {
+    "bbox_and_source_size_ceiling": "4/4 PASS",
+    "positive_margin": "4/4 PASS",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_pixels_outside_exact_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "source_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "width_improved_rows": 4,
+    "height_not_smaller_rows": 4,
+    "fresh_native_render": "PASS_NO_PRIOR_KOREAN_BITMAP_UPSCALE",
+    "header_128_exact_canonical": true,
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_note": "SOURCE/C139/B55-clean/B216 readable comparison, per-row 4x contact and SOURCE/C139/B216 RAW review PASS. B216 restores stronger source-family scale/weight without exceeding any exact source bbox: all four Korean rows use a shared 18px Black family, remain upright like the source, preserve left alignment and gain width while keeping positive margins. No broken Hangul, clipping, source residue, panel damage, overlap, foreign-art intrusion, seam, halo or raw-orientation regression is visible.",
+  "visual_evidence": [
+    "localization/graphics/role_B/20261007-B-MANUALQA216-1F5FE6E9/B216_1F5_SOURCE_OLD_CLEAN_NEW_READABLE.jpg",
+    "localization/graphics/role_B/20261007-B-MANUALQA216-1F5FE6E9/B216_1F5_ROW_CONTACT_4X.jpg",
+    "localization/graphics/role_B/20261007-B-MANUALQA216-1F5FE6E9/B216_1F5_SOURCE_OLD_NEW_RAW.jpg"
+  ],
+  "ordered_generation_gate": {
+    "1_source_removal_plate_restoration": "PASS_INHERITED_B55_C139_VALIDATED_CLEAN_PLATE",
+    "2_source_matching_readable_slant_direction": "PASS_SHARED_UPRIGHT_SOURCE_FAMILY",
+    "3_no_unnecessarily_undersized_korean": "PASS_4_OF_4_SCALE_IMPROVED_WITH_SOURCE_BBOX_CEILING",
+    "4_source_faithful_weight_outline_shadow": "PASS_BLACK_SHARED_FAMILY_NO_INVENTED_OUTLINE",
+    "5_no_clipped_pixels": "PASS_4_OF_4_POSITIVE_MARGIN",
+    "6_protected_art_clearance": "PASS_ZERO_OUTSIDE_SOURCE_BBOX",
+    "7_flip_y_and_raw": "PASS_CONTROLLER_VISUAL",
+    "8_immediate_readability_vs_english": "PASS_CONTROLLER_VISUAL"
+  },
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_C",
+  "runtime_validation": "UNTESTED",
+  "decision": "B216_PRODUCER_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
