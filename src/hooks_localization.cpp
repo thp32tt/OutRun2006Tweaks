@@ -442,6 +442,518 @@ namespace KoreanRuntime
         return true;
     }
 
+
+    // B208: deterministic Korean-name composition foundation.
+    //
+    // The stock name-entry selector exposes digits + latin a-z on its base
+    // character page. B207 proved that selections 10..35 map exactly to a..z,
+    // which lets a future input hook reuse those 26 physical choices as a
+    // standard 2-beolsik keyboard without guessing sprite ordering. This
+    // composer is intentionally not wired into the game yet: the stock
+    // controls, native field, sidecar alias, and rendering paths stay unchanged
+    // until the visual Jamo atlas and local-name renderer are validated.
+    static constexpr size_t KoreanPlayerNameMaxCodepoints = NativePlayerNamePayloadBytes;
+
+    static constexpr char32_t ComposeHangulCodepoint(int choseong, int jungseong, int jongseong)
+    {
+        return static_cast<char32_t>(
+            0xAC00 + ((choseong * 21 + jungseong) * 28) + jongseong);
+    }
+
+    static constexpr char32_t BaseJamoForLatinSelection(uint32_t selection)
+    {
+        // selection 10..35 == latin a..z on the stock page-1 byte table.
+        constexpr char32_t map[26] = {
+            U'ㅁ', U'ㅠ', U'ㅊ', U'ㅇ', U'ㄷ', U'ㄹ', U'ㅎ',
+            U'ㅗ', U'ㅑ', U'ㅓ', U'ㅏ', U'ㅣ', U'ㅡ', U'ㅜ',
+            U'ㅐ', U'ㅔ', U'ㅂ', U'ㄱ', U'ㄴ', U'ㅅ', U'ㅕ',
+            U'ㅍ', U'ㅈ', U'ㅌ', U'ㅛ', U'ㅋ'
+        };
+        return selection >= 10 && selection <= 35 ? map[selection - 10] : U'\0';
+    }
+
+    static constexpr char32_t ShiftedJamoForLatinSelection(uint32_t selection)
+    {
+        const char32_t base = BaseJamoForLatinSelection(selection);
+        switch (selection)
+        {
+        case 14: return U'ㄸ'; // e
+        case 24: return U'ㅒ'; // o
+        case 25: return U'ㅖ'; // p
+        case 26: return U'ㅃ'; // q
+        case 27: return U'ㄲ'; // r
+        case 29: return U'ㅆ'; // t
+        case 32: return U'ㅉ'; // w
+        default: return base;
+        }
+    }
+
+    static_assert(BaseJamoForLatinSelection(10) == U'ㅁ'); // A key
+    static_assert(BaseJamoForLatinSelection(26) == U'ㅂ'); // Q key
+    static_assert(BaseJamoForLatinSelection(35) == U'ㅋ'); // Z key
+    static_assert(ShiftedJamoForLatinSelection(26) == U'ㅃ');
+    static_assert(ShiftedJamoForLatinSelection(27) == U'ㄲ');
+    static_assert(ComposeHangulCodepoint(0, 0, 0) == U'가');
+    static_assert(ComposeHangulCodepoint(18, 0, 4) == U'한');
+    static_assert(ComposeHangulCodepoint(0, 18, 8) == U'글');
+
+    class HangulNameComposer
+    {
+    public:
+        void Reset()
+        {
+            committed_.clear();
+            ClearCurrent();
+        }
+
+        bool Empty() const
+        {
+            return committed_.empty() && choseong_ < 0;
+        }
+
+        size_t VisibleCodepoints() const
+        {
+            return committed_.size() + (choseong_ >= 0 ? 1u : 0u);
+        }
+
+        bool PushLatinSelection(uint32_t selection, bool shifted)
+        {
+            const char32_t jamo = shifted
+                ? ShiftedJamoForLatinSelection(selection)
+                : BaseJamoForLatinSelection(selection);
+            return jamo != U'\0' && PushJamo(jamo);
+        }
+
+        bool PushDigitSelection(uint32_t selection)
+        {
+            constexpr char32_t digits[10] = {
+                U'1', U'2', U'3', U'4', U'5',
+                U'6', U'7', U'8', U'9', U'0'
+            };
+            if (selection >= 10)
+                return false;
+            return PushLiteral(digits[selection]);
+        }
+
+        bool PushSpace()
+        {
+            return PushLiteral(U' ');
+        }
+
+        bool Backspace()
+        {
+            if (jongseong_ != 0)
+            {
+                if (previousJongseong_ != 0)
+                {
+                    jongseong_ = previousJongseong_;
+                    previousJongseong_ = 0;
+                }
+                else
+                {
+                    jongseong_ = 0;
+                }
+                return true;
+            }
+
+            if (jungseong_ >= 0)
+            {
+                if (previousJungseong_ >= 0)
+                {
+                    jungseong_ = previousJungseong_;
+                    previousJungseong_ = -1;
+                }
+                else
+                {
+                    jungseong_ = -1;
+                }
+                return true;
+            }
+
+            if (choseong_ >= 0)
+            {
+                if (previousChoseong_ >= 0)
+                {
+                    choseong_ = previousChoseong_;
+                    previousChoseong_ = -1;
+                }
+                else
+                {
+                    choseong_ = -1;
+                }
+                return true;
+            }
+
+            if (!committed_.empty())
+            {
+                committed_.pop_back();
+                return true;
+            }
+
+            return false;
+        }
+
+        std::string Utf8() const
+        {
+            std::string out;
+            out.reserve((committed_.size() + 1) * 3);
+            for (const char32_t cp : committed_)
+                AppendUtf8Codepoint(out, cp);
+            if (choseong_ >= 0)
+                AppendUtf8Codepoint(out, CurrentCodepoint());
+            return out;
+        }
+
+    private:
+        std::u32string committed_{};
+        int choseong_ = -1;
+        int jungseong_ = -1;
+        int jongseong_ = 0;
+        int previousChoseong_ = -1;
+        int previousJungseong_ = -1;
+        int previousJongseong_ = 0;
+
+        static int InitialIndex(char32_t jamo)
+        {
+            switch (jamo)
+            {
+            case U'ㄱ': return 0;  case U'ㄲ': return 1;  case U'ㄴ': return 2;
+            case U'ㄷ': return 3;  case U'ㄸ': return 4;  case U'ㄹ': return 5;
+            case U'ㅁ': return 6;  case U'ㅂ': return 7;  case U'ㅃ': return 8;
+            case U'ㅅ': return 9;  case U'ㅆ': return 10; case U'ㅇ': return 11;
+            case U'ㅈ': return 12; case U'ㅉ': return 13; case U'ㅊ': return 14;
+            case U'ㅋ': return 15; case U'ㅌ': return 16; case U'ㅍ': return 17;
+            case U'ㅎ': return 18; default: return -1;
+            }
+        }
+
+        static int MedialIndex(char32_t jamo)
+        {
+            switch (jamo)
+            {
+            case U'ㅏ': return 0;  case U'ㅐ': return 1;  case U'ㅑ': return 2;
+            case U'ㅒ': return 3;  case U'ㅓ': return 4;  case U'ㅔ': return 5;
+            case U'ㅕ': return 6;  case U'ㅖ': return 7;  case U'ㅗ': return 8;
+            case U'ㅘ': return 9;  case U'ㅙ': return 10; case U'ㅚ': return 11;
+            case U'ㅛ': return 12; case U'ㅜ': return 13; case U'ㅝ': return 14;
+            case U'ㅞ': return 15; case U'ㅟ': return 16; case U'ㅠ': return 17;
+            case U'ㅡ': return 18; case U'ㅢ': return 19; case U'ㅣ': return 20;
+            default: return -1;
+            }
+        }
+
+        static int FinalIndex(char32_t jamo)
+        {
+            switch (jamo)
+            {
+            case U'ㄱ': return 1;  case U'ㄲ': return 2;  case U'ㄳ': return 3;
+            case U'ㄴ': return 4;  case U'ㄵ': return 5;  case U'ㄶ': return 6;
+            case U'ㄷ': return 7;  case U'ㄹ': return 8;  case U'ㄺ': return 9;
+            case U'ㄻ': return 10; case U'ㄼ': return 11; case U'ㄽ': return 12;
+            case U'ㄾ': return 13; case U'ㄿ': return 14; case U'ㅀ': return 15;
+            case U'ㅁ': return 16; case U'ㅂ': return 17; case U'ㅄ': return 18;
+            case U'ㅅ': return 19; case U'ㅆ': return 20; case U'ㅇ': return 21;
+            case U'ㅈ': return 22; case U'ㅊ': return 23; case U'ㅋ': return 24;
+            case U'ㅌ': return 25; case U'ㅍ': return 26; case U'ㅎ': return 27;
+            default: return 0;
+            }
+        }
+
+        static char32_t InitialCompatibilityJamo(int choseong)
+        {
+            constexpr char32_t map[19] = {
+                U'ㄱ', U'ㄲ', U'ㄴ', U'ㄷ', U'ㄸ', U'ㄹ', U'ㅁ',
+                U'ㅂ', U'ㅃ', U'ㅅ', U'ㅆ', U'ㅇ', U'ㅈ', U'ㅉ',
+                U'ㅊ', U'ㅋ', U'ㅌ', U'ㅍ', U'ㅎ'
+            };
+            return choseong >= 0 && choseong < 19 ? map[choseong] : U'\0';
+        }
+
+        static int DoubleInitial(int left, int right)
+        {
+            if (left == 0 && right == 0) return 1;
+            if (left == 3 && right == 3) return 4;
+            if (left == 7 && right == 7) return 8;
+            if (left == 9 && right == 9) return 10;
+            if (left == 12 && right == 12) return 13;
+            return -1;
+        }
+
+        static int CombineMedial(int left, int right)
+        {
+            if (left == 8 && right == 0) return 9;   // ㅗ+ㅏ=ㅘ
+            if (left == 8 && right == 1) return 10;  // ㅗ+ㅐ=ㅙ
+            if (left == 8 && right == 20) return 11; // ㅗ+ㅣ=ㅚ
+            if (left == 9 && right == 20) return 10; // ㅘ+ㅣ=ㅙ
+            if (left == 13 && right == 4) return 14; // ㅜ+ㅓ=ㅝ
+            if (left == 13 && right == 5) return 15; // ㅜ+ㅔ=ㅞ
+            if (left == 13 && right == 20) return 16;// ㅜ+ㅣ=ㅟ
+            if (left == 14 && right == 20) return 15;// ㅝ+ㅣ=ㅞ
+            if (left == 18 && right == 20) return 19;// ㅡ+ㅣ=ㅢ
+            return -1;
+        }
+
+        static int CombineFinal(int left, int right)
+        {
+            if (left == 1 && right == 19) return 3;   // ㄱ+ㅅ=ㄳ
+            if (left == 4 && right == 22) return 5;   // ㄴ+ㅈ=ㄵ
+            if (left == 4 && right == 27) return 6;   // ㄴ+ㅎ=ㄶ
+            if (left == 8 && right == 1) return 9;    // ㄹ+ㄱ=ㄺ
+            if (left == 8 && right == 16) return 10;  // ㄹ+ㅁ=ㄻ
+            if (left == 8 && right == 17) return 11;  // ㄹ+ㅂ=ㄼ
+            if (left == 8 && right == 19) return 12;  // ㄹ+ㅅ=ㄽ
+            if (left == 8 && right == 25) return 13;  // ㄹ+ㅌ=ㄾ
+            if (left == 8 && right == 26) return 14;  // ㄹ+ㅍ=ㄿ
+            if (left == 8 && right == 27) return 15;  // ㄹ+ㅎ=ㅀ
+            if (left == 17 && right == 19) return 18; // ㅂ+ㅅ=ㅄ
+            return -1;
+        }
+
+        static bool SplitFinal(int combined, int& first, int& second)
+        {
+            switch (combined)
+            {
+            case 3: first = 1; second = 19; return true;
+            case 5: first = 4; second = 22; return true;
+            case 6: first = 4; second = 27; return true;
+            case 9: first = 8; second = 1; return true;
+            case 10: first = 8; second = 16; return true;
+            case 11: first = 8; second = 17; return true;
+            case 12: first = 8; second = 19; return true;
+            case 13: first = 8; second = 25; return true;
+            case 14: first = 8; second = 26; return true;
+            case 15: first = 8; second = 27; return true;
+            case 18: first = 17; second = 19; return true;
+            default: return false;
+            }
+        }
+
+        static int FinalToInitial(int jongseong)
+        {
+            switch (jongseong)
+            {
+            case 1: return 0;  case 2: return 1;  case 4: return 2;
+            case 7: return 3;  case 8: return 5;  case 16: return 6;
+            case 17: return 7; case 19: return 9; case 20: return 10;
+            case 21: return 11; case 22: return 12; case 23: return 14;
+            case 24: return 15; case 25: return 16; case 26: return 17;
+            case 27: return 18; default: return -1;
+            }
+        }
+
+        static void AppendUtf8Codepoint(std::string& out, char32_t cp)
+        {
+            if (cp <= 0x7F)
+            {
+                out.push_back(static_cast<char>(cp));
+            }
+            else if (cp <= 0x7FF)
+            {
+                out.push_back(static_cast<char>(0xC0 | (cp >> 6)));
+                out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+            }
+            else if (cp <= 0xFFFF)
+            {
+                out.push_back(static_cast<char>(0xE0 | (cp >> 12)));
+                out.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
+                out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+            }
+            else
+            {
+                out.push_back(static_cast<char>(0xF0 | (cp >> 18)));
+                out.push_back(static_cast<char>(0x80 | ((cp >> 12) & 0x3F)));
+                out.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
+                out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+            }
+        }
+
+        char32_t CurrentCodepoint() const
+        {
+            if (choseong_ < 0)
+                return U'\0';
+            if (jungseong_ < 0)
+                return InitialCompatibilityJamo(choseong_);
+            return ComposeHangulCodepoint(choseong_, jungseong_, jongseong_);
+        }
+
+        bool CanAddVisibleCodepoint() const
+        {
+            return VisibleCodepoints() < KoreanPlayerNameMaxCodepoints;
+        }
+
+        void ClearCurrent()
+        {
+            choseong_ = -1;
+            jungseong_ = -1;
+            jongseong_ = 0;
+            previousChoseong_ = -1;
+            previousJungseong_ = -1;
+            previousJongseong_ = 0;
+        }
+
+        void StartInitial(int choseong)
+        {
+            ClearCurrent();
+            choseong_ = choseong;
+        }
+
+        void StartVowel(int jungseong)
+        {
+            ClearCurrent();
+            choseong_ = 11; // implicit ㅇ
+            jungseong_ = jungseong;
+        }
+
+        void FlushCurrent()
+        {
+            if (choseong_ >= 0)
+                committed_.push_back(CurrentCodepoint());
+            ClearCurrent();
+        }
+
+        bool PushLiteral(char32_t cp)
+        {
+            if (choseong_ >= 0)
+            {
+                if (!CanAddVisibleCodepoint())
+                    return false;
+                FlushCurrent();
+            }
+            else if (committed_.size() >= KoreanPlayerNameMaxCodepoints)
+            {
+                return false;
+            }
+
+            committed_.push_back(cp);
+            return true;
+        }
+
+        bool PushJamo(char32_t jamo)
+        {
+            const int consonant = InitialIndex(jamo);
+            const int vowel = MedialIndex(jamo);
+
+            if (consonant >= 0)
+            {
+                const int final = FinalIndex(jamo);
+                if (choseong_ < 0)
+                {
+                    if (committed_.size() >= KoreanPlayerNameMaxCodepoints)
+                        return false;
+                    StartInitial(consonant);
+                    return true;
+                }
+
+                if (jungseong_ < 0)
+                {
+                    const int doubled = DoubleInitial(choseong_, consonant);
+                    if (doubled >= 0)
+                    {
+                        previousChoseong_ = choseong_;
+                        choseong_ = doubled;
+                        return true;
+                    }
+
+                    if (!CanAddVisibleCodepoint())
+                        return false;
+                    FlushCurrent();
+                    StartInitial(consonant);
+                    return true;
+                }
+
+                if (jongseong_ == 0 && final != 0)
+                {
+                    jongseong_ = final;
+                    previousJongseong_ = 0;
+                    return true;
+                }
+
+                if (jongseong_ != 0 && final != 0)
+                {
+                    const int combined = CombineFinal(jongseong_, final);
+                    if (combined >= 0)
+                    {
+                        previousJongseong_ = jongseong_;
+                        jongseong_ = combined;
+                        return true;
+                    }
+                }
+
+                if (!CanAddVisibleCodepoint())
+                    return false;
+                FlushCurrent();
+                StartInitial(consonant);
+                return true;
+            }
+
+            if (vowel >= 0)
+            {
+                if (choseong_ < 0)
+                {
+                    if (committed_.size() >= KoreanPlayerNameMaxCodepoints)
+                        return false;
+                    StartVowel(vowel);
+                    return true;
+                }
+
+                if (jungseong_ < 0)
+                {
+                    jungseong_ = vowel;
+                    previousJungseong_ = -1;
+                    return true;
+                }
+
+                if (jongseong_ == 0)
+                {
+                    const int combined = CombineMedial(jungseong_, vowel);
+                    if (combined >= 0)
+                    {
+                        previousJungseong_ = jungseong_;
+                        jungseong_ = combined;
+                        return true;
+                    }
+
+                    if (!CanAddVisibleCodepoint())
+                        return false;
+                    FlushCurrent();
+                    StartVowel(vowel);
+                    return true;
+                }
+
+                if (!CanAddVisibleCodepoint())
+                    return false;
+
+                int firstFinal = 0;
+                int secondFinal = 0;
+                const int priorFinal = jongseong_;
+                if (SplitFinal(priorFinal, firstFinal, secondFinal))
+                {
+                    jongseong_ = firstFinal;
+                    previousJongseong_ = 0;
+                    const int nextInitial = FinalToInitial(secondFinal);
+                    FlushCurrent();
+                    if (nextInitial < 0)
+                        return false;
+                    StartInitial(nextInitial);
+                    jungseong_ = vowel;
+                    return true;
+                }
+
+                const int nextInitial = FinalToInitial(priorFinal);
+                if (nextInitial < 0)
+                    return false;
+                jongseong_ = 0;
+                previousJongseong_ = 0;
+                FlushCurrent();
+                StartInitial(nextInitial);
+                jungseong_ = vowel;
+                return true;
+            }
+
+            return false;
+        }
+    };
+
     static std::string UnescapeField(const std::string& input)
     {
         std::string out;
