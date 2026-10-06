@@ -1,5 +1,5 @@
 {
-  "schema_version": 108,
+  "schema_version": 109,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A136 index24 runtime mapping advanced A135 HOLD: Edit License uses SELECTION_PLAYERNAME=0 with EXE+0xDDC50 / selection-change EXE+0xDD990; player save data begins at VA 0x7C23E0 (module+0x3C23E0), and repo INI confirms name/model are recoverable from the first 0xB0 bytes of License.dat/LicenseXX.dat. Exact name-field offset/encoding, Hangul composition, committed-name renderer and replay/ranking/network serialization are still unproven. Do not relabel 66743AA8 or repeat A135; next proof is controlled LicenseXX.dat binary diff or live OR2006C2C.EXE trace. SumoNet_OnlineUserName EXE+0x430C20 is separate online identity evidence only. No candidate; RUNTIME_VALIDATION=UNTESTED.",
     "B202-B204 reconciled pending user-slant worker output: index106/IGR-017 a9c10f00..., index48/IGR-009 259153b9..., index60/IGR-010 a8ffc1f0... all pass machine scope plus readable high-zoom source/final slant-direction and raw mirror_y gates. Independent C + NEW actual game retest still required; do not repeat unless returned REWORK. B201 index176 remains pending C; A135 index24 remains HOLD.",
     "B201 completed index176 75C3586A after mandatory controller visual QA rejected B200's numeric PASS for wrong semantic atlas binding. Correct binding: idx35 JENNIFER->제니퍼, idx36 CLARISSA->클라리사, idx37 HOLLY->홀리, idx39 FLAGMAN 4->플래그맨 4; idx38 ??? and idx40 route artwork preserved exact. Final 494d42c09c58... passes 4/4 exact source-alpha bbox/size/positive margins, zero outside/alpha/introduced-visible/source-residue/overlap/preserved-overlap/near1, DDS roundtrip, readable SOURCE/CLEAN/FINAL and raw mirror_y visual QA. Pending independent C; RUNTIME_VALIDATION=UNTESTED. Do not repeat B74/B196-B200 rejected/diagnostic attempts. A135 index24 runtime-name-entry HOLD remains separate.",
     "A135 index24 66743AA8 name-entry preflight: 49 cells are the complete name-entry choice alphabet/control set (A-Z, 0-9, 12 punctuation/symbols, END). This is not the K4 display font. Do not create a Hangul DDS by relabeling cells: runtime selected-character mapping, Jamo/syllable composition, saved-name encoding, committed-name rendering, and replay/leaderboard/network serialization are unproven. HOLD_STRICT_RECHECK_RUNTIME_NAME_ENTRY_MAPPING; no candidate. Evidence A135 preflight + controller review. RUNTIME_VALIDATION=UNTESTED.",
@@ -6284,5 +6285,41 @@
     ],
     "controller_visual_qa": "PASS_EXPLICIT_READABLE_SLANT_DIRECTION_AND_RAW_3_OF_3",
     "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+  },
+  "a136_name_entry_runtime_mapping": {
+    "timestamp_kst": "2026-10-06T17:11:19.697+09:00",
+    "role": "A",
+    "queue_index": 24,
+    "asset": "66743AA8",
+    "prior": "A135_HOLD_STRICT_RECHECK_RUNTIME_NAME_ENTRY_MAPPING",
+    "status": "A136_HOLD_RUNTIME_NAME_FIELD_OFFSET_ENCODING_REQUIRED",
+    "evidence": {
+      "game_state": "STATE_G_NAMEENTRY=0x1F",
+      "game_event": "EVENT_G_NAMEENTRY=0x18B",
+      "edit_license_player_name_selection": "SELECTION_PLAYERNAME=0",
+      "license_button_handler": "EXE+0xDDC50",
+      "license_selection_change": "EXE+0xDD990",
+      "player_save_memory": "VA 0x7C23E0 / module+0x3C23E0",
+      "persisted_profile": "License.dat / LicenseXX.dat",
+      "persisted_name_model_region": "first 0xB0 bytes contain recoverable name/model; exact name-field suboffset/encoding unproven",
+      "online_identity": "SumoNet_OnlineUserName EXE+0x430C20 is const char*; server notification compares up to 16 bytes and chat JSON serializes it; not proven identical to license player name"
+    },
+    "environment_probe": {
+      "n100_mcp_connected": true,
+      "or2006c2c_exe_found": false,
+      "license_dat_found": false,
+      "conclusion": "No local game binary/profile sample was available for a controlled save diff or disassembly in this run."
+    },
+    "remaining_proof": [
+      "Create two controlled LicenseXX.dat saves differing only in player name; binary-diff first 0xB0 to locate field width/terminator/checksum behavior.",
+      "Trace name-entry selected-cell write from STATE_G_NAMEENTRY/EVENT_G_NAMEENTRY into the identified player save block.",
+      "Prove an encoding/composition design that can represent Hangul without corrupting save/load.",
+      "Trace committed-name display renderer and ranking/replay serialization.",
+      "Treat online network username separately until an explicit data-flow link to license player name is proven."
+    ],
+    "candidate_written": false,
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_A/20261006-A-PREFLIGHT136-NAME-ENTRY-RUNTIME-MAPPING/A136_NAME_ENTRY_RUNTIME_MAPPING.json",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }

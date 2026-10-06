@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-06T17:11:19.697+09:00",
+  "run": "A136",
+  "role": "A",
+  "branch": "korean-localization-recovery-20260928",
+  "parent_sha": "0c53c9cb39c6c3b1efdde937f7ef7427f2f442b0",
+  "queue_index": 24,
+  "asset_path": "textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "source_asset_sha256": "8e18676ac303b07a56d81d1d21c5e025e0baf46da49b16ae9d2e411960181f73",
+  "prior_preflight": "A135",
+  "purpose": "Advance the only unresolved name-entry HOLD by tracing runtime selection and persistence anchors without relabeling atlas cells.",
+  "findings": {
+    "atlas_semantics": "49 selectable A-Z / 0-9 / symbols / END cells; input UI, not display font",
+    "name_entry_state": "STATE_G_NAMEENTRY = 0x1F",
+    "name_entry_event": "EVENT_G_NAMEENTRY = 0x18B",
+    "edit_license": {
+      "selection_player_name": 0,
+      "button_handler_module_offset": "0xDDC50",
+      "change_selection_module_offset": "0xDD990"
+    },
+    "persistence": {
+      "player_save_memory_va": "0x7C23E0",
+      "player_save_module_offset": "0x3C23E0",
+      "file_family": "License.dat / LicenseXX.dat",
+      "repo_ini_evidence": "OutRun2006Tweaks.ini says name/model corruption can be repaired by replacing first 0xB0 bytes of License.dat.",
+      "proven_scope": "name/model are contained in the first 0xB0 profile bytes",
+      "unproven_scope": "exact player-name suboffset, width, terminator, checksum and character encoding"
+    },
+    "online_identity_separate_clue": {
+      "pointer_module_offset": "0x430C20",
+      "cpp_type": "const char*",
+      "lobby_compare_limit_bytes": 16,
+      "chat_transport": "serialized as JSON UserName",
+      "caution": "No explicit source data-flow proves this online identity buffer is the LicenseXX.dat player-name field."
+    }
+  },
+  "environment": {
+    "n100_mcp": "CONNECTED_AND_QUERIED",
+    "game_executable_in_allowed_workspace": false,
+    "license_profile_sample_in_allowed_workspace": false,
+    "probe_script": "work/a136_locate_nameentry_runtime.py"
+  },
+  "qa": {
+    "duplicate_completed_work": false,
+    "renderable_candidate_available": false,
+    "c_returned_rework_available": false,
+    "artwork_candidate_generated": false,
+    "misleading_art_only_hangul_keyboard_blocked": true,
+    "fail_closed": true
+  },
+  "status": "A136_HOLD_RUNTIME_NAME_FIELD_OFFSET_ENCODING_REQUIRED",
+  "remaining_proof": [
+    "Controlled LicenseXX.dat diff between two names differing by one ASCII character, then by length, to locate field and termination/checksum behavior.",
+    "Live trace or disassembly from the name-entry cell selection handler into player save memory.",
+    "Define and prove Hangul/Jamo composition and persisted representation.",
+    "Prove committed-name renderer handles that representation.",
+    "Prove ranking/replay serialization; separately prove or isolate network/online identity."
+  ],
+  "candidate_written": false,
+  "runtime_validation": "UNTESTED",
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}

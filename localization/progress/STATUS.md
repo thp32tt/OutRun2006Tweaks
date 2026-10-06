@@ -1875,3 +1875,13 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - B203 / index48 / IGR-009 P1: `259153b91e330479a4d975037013c77d339ffe3a2781461ebe118bfc04e28824`; Slipstream only, 1/1 bbox/size/margin, outside/alpha/protected=0, other eight localized rows exact. SOURCE/OLD/CLEAN/FINAL 2x + raw confirms corrected source-direction lean and glow/streak family.
 - B204 / index60 / IGR-010 P1: `a8ffc1f0b14c8c1e3ef5680ea1ae90db3354330404be8ca02e0e336d362331a8`; Stage only, transparent clean reconstruction, native source-family render; non-Stage/A85/heart-tally pixels exact. 4x source/final visually confirms same-direction right lean; family/raw PASS.
 - Slant judgment used visible top-vs-bottom displacement, not affine parameter sign. All three remain STATIC_PASS_PENDING_C_AND_INGAME_RETEST; no backlog row closed. B201/index176 and A135/index24 untouched. VR/FFB/DX11/DXVK untouched.
+
+
+## 2026-10-06 17:11:19.697 KST — A136 index24 runtime name-entry mapping narrowed
+- Did not repeat A135 atlas work and did not generate a DDS candidate. The only unresolved queue item remains index24 `66743AA8`.
+- Exact branch source anchors the player-name edit route: `STATE_G_NAMEENTRY=0x1F`, `EVENT_G_NAMEENTRY=0x18B`; Edit License uses `SELECTION_PLAYERNAME=0`, button handler `EXE+0xDDC50`, selection-change function `EXE+0xDD990`.
+- Save persistence is narrowed from generic Common.dat speculation to the license profile: player save memory starts at VA `0x7C23E0` (module+`0x3C23E0`), while the shipped INI explicitly says corrupted name/model can be restored by replacing the first `0xB0` bytes of `License.dat` / `LicenseXX.dat`.
+- Network identity was checked separately: `SumoNet_OnlineUserName` at EXE+`0x430C20` is a narrow `const char*`, compared up to 16 bytes for lobby identity and serialized to chat JSON. There is no proven data-flow link making it the same field as the license player name, so it is not used as an encoding proof.
+- N100 MCP was connected and searched, but no `OR2006C2C.EXE` or `LicenseXX.dat` sample exists in its allowed workspace. Exact name subfield offset/encoding, Hangul composition, committed-name rendering and replay/ranking/network serialization therefore remain fail-closed.
+- State: `A136_HOLD_RUNTIME_NAME_FIELD_OFFSET_ENCODING_REQUIRED`; next safe proof is a controlled two-save `LicenseXX.dat` diff or live EXE trace. `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_A/20261006-A-PREFLIGHT136-NAME-ENTRY-RUNTIME-MAPPING/A136_NAME_ENTRY_RUNTIME_MAPPING.json`.

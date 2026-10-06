@@ -2286,3 +2286,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - B203 / index48 / IGR-009 P1: `259153b91e330479a4d975037013c77d339ffe3a2781461ebe118bfc04e28824`; Slipstream only, 1/1 bbox/size/margin, outside/alpha/protected=0, other eight localized rows exact. SOURCE/OLD/CLEAN/FINAL 2x + raw confirms corrected source-direction lean and glow/streak family.
 - B204 / index60 / IGR-010 P1: `a8ffc1f0b14c8c1e3ef5680ea1ae90db3354330404be8ca02e0e336d362331a8`; Stage only, transparent clean reconstruction, native source-family render; non-Stage/A85/heart-tally pixels exact. 4x source/final visually confirms same-direction right lean; family/raw PASS.
 - Slant judgment used visible top-vs-bottom displacement, not affine parameter sign. All three remain STATIC_PASS_PENDING_C_AND_INGAME_RETEST; no backlog row closed. B201/index176 and A135/index24 untouched. VR/FFB/DX11/DXVK untouched.
+
+
+## 2026-10-06 17:11:19.697 KST — A136 name-entry runtime/storage mapping preflight
+
+- Refreshed current branch state first: no A-owned renderable/C-returned REWORK remained, and repeating pending-C assets would violate the contract. A therefore advanced only the existing index24 PREFLIGHT/HOLD.
+- New concrete mapping: Edit License player-name selection is `SELECTION_PLAYERNAME=0`; related known code anchors are EXE+`0xDDC50` and EXE+`0xDD990`. Name-entry state/event are `0x1F` / `0x18B`.
+- Persistence container is now narrowed to the license profile. Player save data begins at VA `0x7C23E0` (module+`0x3C23E0`), and the repository INI documents name/model recovery from the first `0xB0` bytes of `License.dat`/`LicenseXX.dat`.
+- The online identity pointer at EXE+`0x430C20` is separately a narrow-char path and is consumed with a 16-byte compare in lobby detection; this does not prove the license name uses the same storage or serialization.
+- N100 MCP connectivity was verified; a scoped filesystem probe found no game EXE or license-save sample to perform the remaining controlled binary diff/disassembly. This is an environment-evidence gap, not a claim that the connector is unavailable.
+- Queue status advanced to `a136_hold_runtime_name_field_offset_encoding_required`. No artwork/runtime code candidate was written, so no false Hangul keyboard is promoted. VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_A/20261006-A-PREFLIGHT136-NAME-ENTRY-RUNTIME-MAPPING/A136_NAME_ENTRY_RUNTIME_MAPPING.json`.

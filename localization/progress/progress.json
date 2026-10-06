@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T16:45:32+09:00",
+  "updated_at_kst": "2026-10-06T17:11:19.697+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -116,11 +116,14 @@
         22,
         23
       ],
-      "name_entry_status": "hold_strict_recheck_runtime_input_storage_mapping",
+      "name_entry_status": "a136_hold_runtime_name_field_offset_encoding_required",
       "name_entry_preflight_report": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_NAME_ENTRY_PREFLIGHT.json",
       "name_entry_controller_review": "localization/graphics/role_A/20261006-A-PREFLIGHT135-NAME-ENTRY-66743AA8/A135_CONTROLLER_PREFLIGHT_REVIEW.json",
       "name_entry_symbol_count": 49,
-      "name_entry_candidate_written": false
+      "name_entry_candidate_written": false,
+      "name_entry_runtime_mapping_report": "localization/graphics/role_A/20261006-A-PREFLIGHT136-NAME-ENTRY-RUNTIME-MAPPING/A136_NAME_ENTRY_RUNTIME_MAPPING.json",
+      "name_entry_persistence_container": "LicenseXX.dat first 0xB0 contains name/model (exact name field offset/encoding unproven)",
+      "name_entry_player_save_memory": "VA 0x7C23E0 / module+0x3C23E0"
     },
     "packaging": {
       "status": "not_started",
@@ -167,7 +170,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B202-B204 consumed pending B slant-rework worker output c3b3ca49. B202 index106/IGR-017, B203 index48/IGR-009 and B204 index60/IGR-010 pass machine scope plus explicit readable slant-direction/source-residue visual gates and raw mirror_y review. Candidate hashes a9c10f00..., 259153b9..., a8ffc1f0.... All remain pending independent C and NEW actual in-game retest; no row closed. B201/index176 and A135/index24 were not repeated.",
+  "next_checkpoint": "A136 advanced the only unresolved index24 name-entry HOLD without repeating A135 artwork. Runtime/source tracing now anchors Edit License player-name selection at EXE+0xDDC50 (selection change EXE+0xDD990), player save memory at VA 0x7C23E0/module+0x3C23E0, and name/model persistence to the first 0xB0 bytes of License.dat/LicenseXX.dat. Exact player-name field offset/encoding and Hangul composition/render/serialization remain unproven, so no DDS candidate was produced. Online username EXE+0x430C20 is explicitly treated as a separate 16-byte/narrow-char network identity clue, not proof of the license-name format. Next safe proof is controlled LicenseXX.dat binary diff or live EXE trace.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
