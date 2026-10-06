@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION119-4F68708E",
+  "queue_index": 99,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+  "source_provenance": {
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2"
+  },
+  "translation": {
+    "semantic_source": "Drive against the Ghost Car and challenge for the course record!!",
+    "semantic_korean": "고스트 카와 달리며 코스 기록에 도전하세요!",
+    "physical_lines": [
+      {
+        "source": "Drive against the Ghost Car",
+        "korean": "고스트 카와 달리며"
+      },
+      {
+        "source": "and challenge for the course record!!",
+        "korean": "코스 기록에 도전하세요!"
+      }
+    ]
+  },
+  "structure": {
+    "width": 2048,
+    "height": 256,
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "a117_reconciliation": {
+    "prior_threshold_bboxes": [
+      [
+        537,
+        41,
+        1350,
+        126
+      ],
+      [
+        517,
+        126,
+        1610,
+        213
+      ]
+    ],
+    "prior_nonzero_source_pixels_outside_bboxes": 606,
+    "complete_source_bboxes": [
+      [
+        534,
+        37,
+        1600,
+        126
+      ],
+      [
+        514,
+        126,
+        1614,
+        217
+      ]
+    ],
+    "nonzero_source_pixels_outside_complete_bboxes": 0,
+    "decision": "A117 HOLD was caused by under-covered threshold bboxes. A119 expands each physical source line to the complete decoded non-zero alpha footprint before DXT5 boundary construction."
+  },
+  "construction": {
+    "clean_plate": "all complete source-line rectangles cleared to transparent; atlas has zero protected non-text visible pixels outside them",
+    "render": "native 2048x256 Noto Sans CJK KR Bold, source-sampled white fill/navy outline, soft blue/navy outer glow, 0.24 right shear, two physical Korean lines",
+    "dxt5_boundary": "full-inside blocks use fresh desired DXT5 encode; partial blocks preserve original endpoints/color bytes/outside indices and only clear inside alpha via an existing exact-zero palette entry; target lettering is prohibited from partial boundary blocks; outside blocks remain byte-identical",
+    "block_counts": {
+      "full_inside": 11880,
+      "partial_boundary": 618,
+      "outside_unchanged": 20270,
+      "partial_target_blocks": 0
+    }
+  },
+  "style": {
+    "font": "Noto Sans CJK KR Bold",
+    "fill_rgba": [
+      255,
+      255,
+      255,
+      255
+    ],
+    "stroke_rgba": [
+      5,
+      14,
+      60,
+      255
+    ],
+    "glow_rgb": [
+      5,
+      26,
+      88
+    ],
+    "shear": 0.24
+  },
+  "elements": [
+    {
+      "source": "Drive against the Ghost Car",
+      "korean": "고스트 카와 달리며",
+      "original_bbox": [
+        534,
+        37,
+        1600,
+        126
+      ],
+      "localized_preencode_bbox": [
+        542,
+        43,
+        965,
+        120
+      ],
+      "font": "Noto Sans CJK KR Bold",
+      "font_size": 54,
+      "stroke_px": 4,
+      "outer_glow_stroke_px": 7,
+      "shear": 0.24,
+      "localized_bbox": [
+        542,
+        43,
+        965,
+        119
+      ],
+      "source_width": 1066,
+      "source_height": 89,
+      "localized_width": 423,
+      "localized_height": 76,
+      "delta_left": 8,
+      "delta_right": 635,
+      "delta_top": 6,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "source": "and challenge for the course record!!",
+      "korean": "코스 기록에 도전하세요!",
+      "original_bbox": [
+        514,
+        126,
+        1614,
+        217
+      ],
+      "localized_preencode_bbox": [
+        522,
+        132,
+        1092,
+        211
+      ],
+      "font": "Noto Sans CJK KR Bold",
+      "font_size": 57,
+      "stroke_px": 4,
+      "outer_glow_stroke_px": 7,
+      "shear": 0.24,
+      "localized_bbox": [
+        522,
+        132,
+        1092,
+        211
+      ],
+      "source_width": 1100,
+      "source_height": 91,
+      "localized_width": 570,
+      "localized_height": 79,
+      "delta_left": 8,
+      "delta_right": 522,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "static_qa": {
+    "prior_bbox_undercoverage_pixels": 606,
+    "complete_source_visible_outside_rects": 0,
+    "changed_pixels_outside_complete_source_rects": 0,
+    "alpha_changed_outside_complete_source_rects": 0,
+    "source_residue_outside_korean_guard": 0,
+    "unexpected_visible_pixels_outside_korean_guard": 0,
+    "localized_row_bbox_overlap": 0,
+    "header_128_exact": true,
+    "dds_size_preserved": true,
+    "status": "PASS"
+  },
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+  "candidate_sha256": "bd7185f454abfd326e7609eb4826c1a22388617824cd25e00c211e73b648f889",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "A119_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
