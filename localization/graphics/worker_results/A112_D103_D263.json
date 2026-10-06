@@ -1,0 +1,10 @@
+{
+  "run": "20261006-A-PRODUCTION112-D103-D263",
+  "candidates": {},
+  "failures": {
+    "D263B3F1": "RuntimeError(('D263 C144 style does not fit', [6, 1011, 1473, 1129], (400, 111)))",
+    "D1039D6F": "RuntimeError(('D103 text core', 'START', 17, {'label': 525, 'area': 5845, 'bbox': [581, 962, 724, 1023], 'rectangularity': 0.670067637280752, 'bright': 57}))"
+  },
+  "status": "A112_FAIL_CLOSED_NO_CANDIDATES",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION112-D103-D263/A112_BATCH_REPORT.json"
+}
