@@ -149,3 +149,16 @@ Git synchronization is mandatory at the end of each role when that role changed 
 - Do not invalidate every historical approved candidate merely because this quality layer was imported. Apply it to new/reworked assets and to existing assets only when QA evidence flags a concrete defect.
 - Static QA and runtime/in-game validation are separate. If runtime validation was not actually performed, record `RUNTIME_VALIDATION=UNTESTED`.
 - These quality requirements MUST NOT introduce new scheduler schemas, Production/Event IDs, rollover state machines, C0-C6 orchestration, or other controller bookkeeping.
+
+## C-pass pre-in-game human JPG review gate
+
+Before any graphics asset that has reached independent C static PASS is treated as ready for actual in-game testing, C MUST maintain a consolidated human-review JPG export under `localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/`.
+
+- Rebuild the export from current `asset_queue.csv` state; never carry stale images for assets reopened by later user/JPG/in-game regression.
+- Include every current `localize_text` graphics row whose latest valid state is independent C PASS, plus exact byte-identical aliases of a C-approved candidate.
+- Exclude A/B/user-rework states that are still pending a newer C pass.
+- Number files in queue-index order as `NNN_qIII_ASSETKEY.jpg` and retain `manifest.csv` / `manifest.json` so the user can report corrections by number.
+- Each localized-candidate JPG must expose both RAW DDS view and FLIP-Y review view on an opaque neutral background so wrong orientation, slant, residue, overlap, broken glyphs, alpha halos and other-image intrusion are visible before runtime testing.
+- A C policy PASS that intentionally has no localized candidate remains in the numbered manifest and receives a numbered no-candidate review card so numbering stays complete.
+- User rejection from this JPG review overrides prior static/C PASS exactly like in-game screenshot evidence: reopen the affected asset for A/B rework and require a newer C pass before it returns to this export.
+- This JPG review is a pre-in-game human gate only. It does not replace actual in-game validation and must not close `RUNTIME_VALIDATION`.
