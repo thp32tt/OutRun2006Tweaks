@@ -2045,3 +2045,10 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - Fixed per-row centering/ragged left edge, shared-family size inconsistency and visible undersizing; B214 uses fresh native Black Hangul with source-left alignment and uniform 46px decoded stage-row height.
 - 7/7 bbox/size/positive-margin, zero outside/alpha/protected/residue/overlap/touch, naming policy and RAW mirror_y PASS. Controller readable/RAW PASS.
 - Fresh C/comparison JPG/user review/in-game required; `RUNTIME_VALIDATION=UNTESTED`.
+
+### B215 q130 source-family alignment/width rework — 2026-10-07 00:56 KST
+- q130 1762489B: C133 324f677c4afc... -> B215 2569b0a2ea31....
+- Fixed centered layout and excessive width shrink: all 5 rows left-anchored with positive margins and visibly stronger source hierarchy.
+- 5/5 bbox/size/positive-margin; clean/outside/alpha/protected/residue/overlap/touch=0; RAW mirror_y and controller readable/RAW QA PASS.
+- Fresh C/comparison JPG/user review/in-game required; RUNTIME_VALIDATION=UNTESTED.
+

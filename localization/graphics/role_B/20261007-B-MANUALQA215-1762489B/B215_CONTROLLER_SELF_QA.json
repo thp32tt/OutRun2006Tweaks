@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B215",
+  "timestamp_kst": "2026-10-07T00:56:07+09:00",
+  "queue_index": 130,
+  "asset_key": "1762489B",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+  "trigger": "B primary production queue exhausted; manual PRE_INGAME English-original comparison #037 reopened a C133 visual false-negative",
+  "prior_c_status_invalidated": "C133_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "prior_c_candidate_sha256": "324f677c4afc482ef3dbcf0cd226514a68847ee872d1eeda75b9311a9cb7a871",
+  "worker_output_commit": "a2c1dfc56b81a99ffc3b2be8df10473cb035cfb8",
+  "candidate_sha256": "2569b0a2ea319e02d13d04d5cb3ed38bf676d35b3972aa42cab573068238d48a",
+  "defects_fixed": [
+    "SOURCE_LEFT_ALIGNMENT_MISMATCH",
+    "TEXT_WIDTH_HIERARCHY_TOO_NARROW",
+    "CENTERED_LAYOUT_FALSE_NEGATIVE"
+  ],
+  "machine_qa": {
+    "bbox_and_source_size_ceiling": "5/5 PASS",
+    "positive_margin": "5/5 PASS",
+    "clean_changed_pixels_outside_source_text_mask": 0,
+    "clean_source_alpha_remaining": 0,
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_pixels_outside_exact_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "source_residue_pixels": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "left_alignment_improved_rows": 5,
+    "width_improved_rows": 5,
+    "fresh_native_render": "PASS_NO_PRIOR_KOREAN_BITMAP_UPSCALE",
+    "header_128_exact_canonical": true,
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_note": "SOURCE/C133/B215 readable comparison and SOURCE/C133/B215 RAW review PASS. B215 restores the English source family's left anchor and materially stronger width hierarchy for all five labels while preserving the upright transform, source-relative vertical size, protected numeric rank marker, and raw mirror-Y orientation. No broken glyph, clipping, English residue, foreign-art intrusion, overlap, seam, or orientation regression observed.",
+  "visual_evidence": [
+    "localization/graphics/role_B/20261007-B-MANUALQA215-1762489B/B215_176_SOURCE_OLD_NEW_READABLE.jpg",
+    "localization/graphics/role_B/20261007-B-MANUALQA215-1762489B/B215_176_SOURCE_OLD_NEW_RAW.jpg",
+    "localization/graphics/role_B/20261007-B-MANUALQA215-1762489B/B215_176_ROW_CONTACT_2X.jpg"
+  ],
+  "ordered_generation_gate": {
+    "1_source_removal_plate_restoration": "PASS_EXACT_ALPHA_ONLY_SOURCE_TEXT_MASK",
+    "2_source_matching_readable_slant_direction": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "3_no_unnecessarily_undersized_korean": "PASS_ALL_5_ROWS_WIDTH_HIERARCHY_INCREASED_WITH_SOURCE_BBOX_CEILING",
+    "4_source_faithful_weight_outline_shadow": "PASS_NATIVE_NOTO_BLACK_SOURCE_COLOR_FAMILY",
+    "5_no_clipped_pixels": "PASS_5_OF_5_POSITIVE_MARGIN",
+    "6_protected_art_clearance": "PASS_ZERO_OUTSIDE_SOURCE_BBOX",
+    "7_flip_y_and_raw": "PASS_CONTROLLER_VISUAL",
+    "8_immediate_readability_vs_english": "PASS_CONTROLLER_VISUAL"
+  },
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_C",
+  "runtime_validation": "UNTESTED",
+  "decision": "B215_PRODUCER_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

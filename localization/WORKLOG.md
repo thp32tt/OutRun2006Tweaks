@@ -2475,3 +2475,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/C132/B214 readable + RAW + per-row review: **PASS**. No broken glyphs, clipping, English residue, overlap, foreign-art intrusion, plate artifact or orientation regression observed.
 - Prior C132 pass is superseded for changed bytes. Fresh independent C + regenerated English-original comparison JPG + user review + actual-game validation remain mandatory. `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261007-B-MANUALQA214-12519155/B214_CONTROLLER_SELF_QA.json`.
+
+## B215 q130 source-family alignment/width rework — 2026-10-07 00:56 KST
+- Refreshed B state and skipped completed B210/B211/B212/B214 outputs already waiting on fresh C. No active B-owned P0/P1, C-returned REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER item remained, so the contract manual PRE_INGAME comparison path was used.
+- English-original comparison #037 reopened q130 1762489B: prior C133 centered all five Korean labels and left them materially narrower than the left-aligned English source family.
+- GitHub-hosted B215 produced 2569b0a2ea319e02d13d04d5cb3ed38bf676d35b3972aa42cab573068238d48a from exact source c64baefa65663bc247c33f2f7a72c4ea49990e2a0edb409f186b090dfd3460ac using an exact alpha-only clean plate and fresh native Noto Sans CJK KR Black. All five rows now use a 2px source-left anchor; visible width gains versus C133 are +121/+119/+195/+177/+102px while every localized bbox stays below the exact source width/height ceiling.
+- Machine QA: 5/5 bbox + source-size + positive-margin PASS; clean/outside/alpha/protected/source-residue/overlap/touch all 0; all 5 left-align and width-hierarchy improvement checks PASS; canonical RGBA32 header/raw mirror_y preserved.
+- Controller SOURCE/C133/B215 readable + RAW + row-contact review: PASS. No broken glyphs, clipping, English residue, foreign-art intrusion, overlap, seam or orientation regression observed.
+- Prior C133 pass is superseded for changed bytes. Fresh independent C + regenerated English-original comparison JPG + user review + actual-game validation remain mandatory. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_B/20261007-B-MANUALQA215-1762489B/B215_CONTROLLER_SELF_QA.json.
+
