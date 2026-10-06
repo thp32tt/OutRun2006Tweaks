@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION102-E989E3B7",
+  "timestamp_kst": "2026-10-06T09:43:28+09:00",
+  "queue_index": 35,
+  "asset": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+  "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+  "candidate_sha256": "c0e76661ed974cb7c477f172e93fd67645391f1da3e81dcb867d86af3a595622",
+  "machine_status": "PASS",
+  "classification": "zoom_review -> localize_text; Total Rank x2 -> 종합 랭킹",
+  "template_provenance": "Exact duplicate pink/green speech-bubble source patches from C215-approved B157 candidate; source-patch diff=0 for both rows.",
+  "bbox_gate": {
+    "containment": "2/2 PASS",
+    "size_ceiling": "2/2 PASS",
+    "positive_margin": "2/2 PASS",
+    "pink_margins": [
+      136,
+      136,
+      4,
+      4
+    ],
+    "green_margins": [
+      139,
+      139,
+      5,
+      5
+    ]
+  },
+  "zero_pixel_gates": {
+    "clean_changed_outside_source_mask": 0,
+    "decoded_changed_outside_union_source_bboxes": 0,
+    "alpha_changed_outside_union_source_bboxes": 0,
+    "localized_overlap": 0,
+    "localized_1px_touch": 0,
+    "source_script_residue": 0
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_reason": "SOURCE/CLEAN/FINAL contacts show seamless English removal on both pink and green bubbles, no patch boundary, border/glow damage, clipping, alpha halo or overlap. Korean white fill/navy outline/right slant matches the C215-approved family. Raw mirror_y view preserves Holly character artwork and all unrelated pixels.",
+  "decision": "A102_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_E989E3B7_REPORT.json",
+  "evidence": [
+    "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_E989_CONTACTS.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_E989_RAW_COMPARE.jpg"
+  ],
+  "vr_ffb_dx11_dxvk_touched": false
+}
