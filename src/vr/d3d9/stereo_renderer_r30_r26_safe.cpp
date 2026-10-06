@@ -119,9 +119,6 @@ namespace OutRunVRStereo
         std::uint64_t R57ProjectedBuildAttempts = 0;
         std::uint64_t R57ProjectedBuildSuccesses = 0;
         std::uint64_t R57ProjectedBuildFailures = 0;
-        std::uint64_t R57ProjectedRankSprani = 0;
-        std::uint64_t R57ProjectedRankClip = 0;
-        std::uint64_t R57ProjectedRival = 0;
         std::uint64_t R44OverlayOwnedWvpHits = 0;
         std::uint64_t R44OverlayOwnedWvpGroupHits = 0;
         std::uint64_t R44SpatialBillboardClassifications = 0;
@@ -1145,7 +1142,7 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] fingerprint[draws={},sameNode={},otherNode={},noNode={},scopeMismatch={}] projected[semantic={},missingPayload={},buildAttempts={},buildOk={},buildFail={},rankSprani={},rankClip={},rival={}] registry[published={},registered={},consumed={},staleCleared={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] fingerprint[draws={},sameNode={},otherNode={},noNode={},scopeMismatch={}] projected[semantic={},missingPayload={},buildAttempts={},buildOk={},buildFail={}] registry[published={},registered={},consumed={},staleCleared={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
@@ -1177,9 +1174,6 @@ namespace OutRunVRStereo
                 R57ProjectedBuildAttempts,
                 R57ProjectedBuildSuccesses,
                 R57ProjectedBuildFailures,
-                R57ProjectedRankSprani,
-                R57ProjectedRankClip,
-                R57ProjectedRival,
                 OutRunVR::GameSemantic::SpriteNodeSemanticPublishedCount.load(
                     std::memory_order_relaxed),
                 OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
@@ -1646,23 +1640,6 @@ namespace OutRunVRStereo
                     if (!marker || !marker->valid)
                         ++R57ProjectedPayloadMissing;
 
-                    // ProducerToken is diagnostic-only. It is intentionally
-                    // counted after RenderScope has already granted projected
-                    // semantic ownership and never affects the return value.
-                    switch (OutRunVR::GameSemantic::CurrentQueueProducerToken())
-                    {
-                    case OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani:
-                        ++R57ProjectedRankSprani;
-                        break;
-                    case OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite:
-                        ++R57ProjectedRankClip;
-                        break;
-                    case OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani:
-                        ++R57ProjectedRival;
-                        break;
-                    default:
-                        break;
-                    }
                 }
                 return marker && marker->valid
                     ? R30ScreenSpaceKind::ProjectedWorldMarker2D
