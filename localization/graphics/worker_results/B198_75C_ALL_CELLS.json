@@ -1,0 +1,19 @@
+{
+  "role": "B",
+  "run": "20261006-B-PROBE198-75C-ALL-CELLS",
+  "report": "localization/graphics/role_B/20261006-B-PROBE198-75C-ALL-CELLS/B198_ALL_CELL_REPORT.json",
+  "textlike_indices": [
+    2,
+    7,
+    27,
+    8,
+    16,
+    9,
+    28,
+    15,
+    12,
+    13,
+    18
+  ],
+  "status": "ALL_CELL_TEXTLIKE_DIAGNOSTIC_READY"
+}

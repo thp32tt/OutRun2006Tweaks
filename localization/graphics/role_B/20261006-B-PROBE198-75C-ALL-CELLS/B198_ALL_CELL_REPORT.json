@@ -1,0 +1,2642 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PROBE198-75C-ALL-CELLS",
+  "base_head": "6a297fc1663696482691a700cb2cd2c61823d426",
+  "queue_index": 176,
+  "asset": "75C3586A",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "records": [
+    {
+      "idx": 2,
+      "name": "sprite_934",
+      "roi_readable": [
+        0,
+        368,
+        860,
+        676
+      ],
+      "size": [
+        860,
+        308
+      ],
+      "red_pixels": 92913,
+      "red_fraction": 0.3507739353669586,
+      "red_bbox_local": [
+        14,
+        16,
+        838,
+        308
+      ],
+      "red_component_count": 18,
+      "red_components": [
+        [
+          6238,
+          [
+            14,
+            16,
+            93,
+            164
+          ]
+        ],
+        [
+          9685,
+          [
+            110,
+            16,
+            211,
+            160
+          ]
+        ],
+        [
+          10760,
+          [
+            218,
+            16,
+            322,
+            160
+          ]
+        ],
+        [
+          10760,
+          [
+            334,
+            16,
+            438,
+            160
+          ]
+        ],
+        [
+          5696,
+          [
+            452,
+            16,
+            505,
+            160
+          ]
+        ],
+        [
+          7726,
+          [
+            518,
+            16,
+            613,
+            160
+          ]
+        ],
+        [
+          9685,
+          [
+            624,
+            16,
+            725,
+            160
+          ]
+        ],
+        [
+          10649,
+          [
+            732,
+            16,
+            838,
+            160
+          ]
+        ],
+        [
+          17693,
+          [
+            216,
+            184,
+            396,
+            308
+          ]
+        ],
+        [
+          13,
+          [
+            313,
+            184,
+            318,
+            187
+          ]
+        ],
+        [
+          8,
+          [
+            316,
+            188,
+            320,
+            190
+          ]
+        ],
+        [
+          1946,
+          [
+            612,
+            196,
+            794,
+            308
+          ]
+        ],
+        [
+          1470,
+          [
+            420,
+            200,
+            455,
+            308
+          ]
+        ],
+        [
+          13,
+          [
+            351,
+            232,
+            356,
+            235
+          ]
+        ],
+        [
+          22,
+          [
+            367,
+            240,
+            372,
+            248
+          ]
+        ],
+        [
+          53,
+          [
+            265,
+            243,
+            273,
+            252
+          ]
+        ],
+        [
+          182,
+          [
+            384,
+            284,
+            396,
+            308
+          ]
+        ],
+        [
+          314,
+          [
+            458,
+            288,
+            480,
+            308
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.2203752642706131,
+      "textlike": true
+    },
+    {
+      "idx": 7,
+      "name": "sprite_939",
+      "roi_readable": [
+        0,
+        676,
+        844,
+        892
+      ],
+      "size": [
+        844,
+        216
+      ],
+      "red_pixels": 57572,
+      "red_fraction": 0.3158021765841671,
+      "red_bbox_local": [
+        12,
+        0,
+        844,
+        216
+      ],
+      "red_component_count": 13,
+      "red_components": [
+        [
+          7939,
+          [
+            216,
+            0,
+            396,
+            56
+          ]
+        ],
+        [
+          2367,
+          [
+            420,
+            0,
+            496,
+            54
+          ]
+        ],
+        [
+          726,
+          [
+            782,
+            0,
+            844,
+            61
+          ]
+        ],
+        [
+          5566,
+          [
+            12,
+            80,
+            89,
+            216
+          ]
+        ],
+        [
+          21711,
+          [
+            216,
+            80,
+            396,
+            216
+          ]
+        ],
+        [
+          5198,
+          [
+            420,
+            80,
+            476,
+            216
+          ]
+        ],
+        [
+          239,
+          [
+            653,
+            80,
+            668,
+            106
+          ]
+        ],
+        [
+          12813,
+          [
+            646,
+            118,
+            804,
+            216
+          ]
+        ],
+        [
+          8,
+          [
+            802,
+            120,
+            804,
+            124
+          ]
+        ],
+        [
+          27,
+          [
+            361,
+            121,
+            368,
+            127
+          ]
+        ],
+        [
+          14,
+          [
+            798,
+            144,
+            801,
+            149
+          ]
+        ],
+        [
+          894,
+          [
+            573,
+            161,
+            600,
+            216
+          ]
+        ],
+        [
+          70,
+          [
+            190,
+            181,
+            192,
+            216
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.5336690363349131,
+      "textlike": true
+    },
+    {
+      "idx": 27,
+      "name": "sprite_959",
+      "roi_readable": [
+        1428,
+        1100,
+        1632,
+        1304
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 3735,
+      "red_fraction": 0.08974913494809689,
+      "red_bbox_local": [
+        0,
+        0,
+        204,
+        44
+      ],
+      "red_component_count": 5,
+      "red_components": [
+        [
+          577,
+          [
+            0,
+            0,
+            22,
+            44
+          ]
+        ],
+        [
+          1514,
+          [
+            39,
+            0,
+            126,
+            27
+          ]
+        ],
+        [
+          1504,
+          [
+            168,
+            0,
+            204,
+            44
+          ]
+        ],
+        [
+          124,
+          [
+            112,
+            32,
+            139,
+            44
+          ]
+        ],
+        [
+          16,
+          [
+            46,
+            40,
+            51,
+            44
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.2584342560553633,
+      "textlike": true
+    },
+    {
+      "idx": 8,
+      "name": "sprite_940",
+      "roi_readable": [
+        844,
+        676,
+        1688,
+        892
+      ],
+      "size": [
+        844,
+        216
+      ],
+      "red_pixels": 24922,
+      "red_fraction": 0.1367057223099877,
+      "red_bbox_local": [
+        0,
+        50,
+        776,
+        216
+      ],
+      "red_component_count": 4,
+      "red_components": [
+        [
+          1652,
+          [
+            0,
+            50,
+            204,
+            64
+          ]
+        ],
+        [
+          211,
+          [
+            302,
+            80,
+            319,
+            112
+          ]
+        ],
+        [
+          12518,
+          [
+            188,
+            111,
+            329,
+            216
+          ]
+        ],
+        [
+          10541,
+          [
+            635,
+            112,
+            776,
+            216
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.4868790591539407,
+      "textlike": true
+    },
+    {
+      "idx": 16,
+      "name": "sprite_948",
+      "roi_readable": [
+        760,
+        892,
+        1380,
+        1096
+      ],
+      "size": [
+        620,
+        204
+      ],
+      "red_pixels": 4648,
+      "red_fraction": 0.03674889310562935,
+      "red_bbox_local": [
+        0,
+        0,
+        428,
+        44
+      ],
+      "red_component_count": 4,
+      "red_components": [
+        [
+          1011,
+          [
+            0,
+            0,
+            44,
+            44
+          ]
+        ],
+        [
+          3605,
+          [
+            272,
+            0,
+            428,
+            44
+          ]
+        ],
+        [
+          8,
+          [
+            360,
+            16,
+            363,
+            19
+          ]
+        ],
+        [
+          24,
+          [
+            341,
+            24,
+            349,
+            28
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.21807400379506642,
+      "textlike": true
+    },
+    {
+      "idx": 9,
+      "name": "sprite_941",
+      "roi_readable": [
+        1688,
+        676,
+        1932,
+        884
+      ],
+      "size": [
+        244,
+        208
+      ],
+      "red_pixels": 4301,
+      "red_fraction": 0.0847454287515763,
+      "red_bbox_local": [
+        178,
+        84,
+        244,
+        208
+      ],
+      "red_component_count": 4,
+      "red_components": [
+        [
+          8,
+          [
+            194,
+            84,
+            196,
+            88
+          ]
+        ],
+        [
+          9,
+          [
+            191,
+            88,
+            194,
+            92
+          ]
+        ],
+        [
+          744,
+          [
+            178,
+            93,
+            199,
+            148
+          ]
+        ],
+        [
+          3540,
+          [
+            181,
+            133,
+            244,
+            208
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.5348557692307693,
+      "textlike": true
+    },
+    {
+      "idx": 28,
+      "name": "sprite_960",
+      "roi_readable": [
+        1632,
+        1100,
+        1836,
+        1304
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 3618,
+      "red_fraction": 0.08693771626297578,
+      "red_bbox_local": [
+        0,
+        0,
+        204,
+        204
+      ],
+      "red_component_count": 4,
+      "red_components": [
+        [
+          579,
+          [
+            0,
+            0,
+            22,
+            44
+          ]
+        ],
+        [
+          1060,
+          [
+            168,
+            0,
+            204,
+            31
+          ]
+        ],
+        [
+          71,
+          [
+            196,
+            33,
+            204,
+            44
+          ]
+        ],
+        [
+          1908,
+          [
+            60,
+            68,
+            204,
+            204
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.26379277201076506,
+      "textlike": true
+    },
+    {
+      "idx": 15,
+      "name": "sprite_947",
+      "roi_readable": [
+        608,
+        892,
+        760,
+        1100
+      ],
+      "size": [
+        152,
+        208
+      ],
+      "red_pixels": 2032,
+      "red_fraction": 0.06427125506072874,
+      "red_bbox_local": [
+        51,
+        0,
+        152,
+        44
+      ],
+      "red_component_count": 4,
+      "red_components": [
+        [
+          1366,
+          [
+            51,
+            0,
+            113,
+            44
+          ]
+        ],
+        [
+          644,
+          [
+            100,
+            0,
+            152,
+            29
+          ]
+        ],
+        [
+          13,
+          [
+            96,
+            26,
+            100,
+            30
+          ]
+        ],
+        [
+          9,
+          [
+            116,
+            36,
+            119,
+            39
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.2583502024291498,
+      "textlike": true
+    },
+    {
+      "idx": 12,
+      "name": "sprite_944",
+      "roi_readable": [
+        152,
+        892,
+        304,
+        1100
+      ],
+      "size": [
+        152,
+        208
+      ],
+      "red_pixels": 10244,
+      "red_fraction": 0.32401315789473684,
+      "red_bbox_local": [
+        8,
+        0,
+        152,
+        208
+      ],
+      "red_component_count": 3,
+      "red_components": [
+        [
+          52,
+          [
+            38,
+            0,
+            40,
+            28
+          ]
+        ],
+        [
+          3539,
+          [
+            64,
+            0,
+            152,
+            44
+          ]
+        ],
+        [
+          6653,
+          [
+            8,
+            64,
+            144,
+            208
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.25,
+      "textlike": true
+    },
+    {
+      "idx": 13,
+      "name": "sprite_945",
+      "roi_readable": [
+        304,
+        892,
+        456,
+        1100
+      ],
+      "size": [
+        152,
+        208
+      ],
+      "red_pixels": 4076,
+      "red_fraction": 0.12892206477732793,
+      "red_bbox_local": [
+        0,
+        0,
+        152,
+        44
+      ],
+      "red_component_count": 3,
+      "red_components": [
+        [
+          253,
+          [
+            0,
+            0,
+            32,
+            10
+          ]
+        ],
+        [
+          3355,
+          [
+            0,
+            0,
+            92,
+            44
+          ]
+        ],
+        [
+          468,
+          [
+            116,
+            0,
+            152,
+            15
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.8475455465587044,
+      "textlike": true
+    },
+    {
+      "idx": 18,
+      "name": "sprite_950",
+      "roi_readable": [
+        1584,
+        892,
+        1788,
+        1096
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 3709,
+      "red_fraction": 0.0891243752402922,
+      "red_bbox_local": [
+        0,
+        0,
+        64,
+        204
+      ],
+      "red_component_count": 3,
+      "red_components": [
+        [
+          1378,
+          [
+            0,
+            0,
+            36,
+            44
+          ]
+        ],
+        [
+          2278,
+          [
+            12,
+            72,
+            45,
+            204
+          ]
+        ],
+        [
+          53,
+          [
+            45,
+            200,
+            64,
+            204
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.8677912341407151,
+      "textlike": true
+    },
+    {
+      "idx": 0,
+      "name": "sprite_932",
+      "roi_readable": [
+        0,
+        0,
+        688,
+        368
+      ],
+      "size": [
+        688,
+        368
+      ],
+      "red_pixels": 101590,
+      "red_fraction": 0.4012496840242669,
+      "red_bbox_local": [
+        8,
+        49,
+        688,
+        364
+      ],
+      "red_component_count": 13,
+      "red_components": [
+        [
+          10014,
+          [
+            336,
+            49,
+            434,
+            199
+          ]
+        ],
+        [
+          7492,
+          [
+            8,
+            53,
+            102,
+            196
+          ]
+        ],
+        [
+          6455,
+          [
+            112,
+            53,
+            207,
+            196
+          ]
+        ],
+        [
+          9006,
+          [
+            210,
+            53,
+            330,
+            196
+          ]
+        ],
+        [
+          13899,
+          [
+            450,
+            53,
+            586,
+            196
+          ]
+        ],
+        [
+          7230,
+          [
+            600,
+            53,
+            688,
+            196
+          ]
+        ],
+        [
+          10291,
+          [
+            128,
+            213,
+            227,
+            364
+          ]
+        ],
+        [
+          5459,
+          [
+            590,
+            215,
+            688,
+            324
+          ]
+        ],
+        [
+          10549,
+          [
+            9,
+            216,
+            115,
+            360
+          ]
+        ],
+        [
+          6516,
+          [
+            243,
+            216,
+            339,
+            360
+          ]
+        ],
+        [
+          6516,
+          [
+            346,
+            216,
+            442,
+            360
+          ]
+        ],
+        [
+          7205,
+          [
+            422,
+            216,
+            542,
+            360
+          ]
+        ],
+        [
+          958,
+          [
+            625,
+            334,
+            657,
+            364
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.0,
+      "textlike": false
+    },
+    {
+      "idx": 17,
+      "name": "sprite_949",
+      "roi_readable": [
+        1380,
+        892,
+        1584,
+        1096
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 19183,
+      "red_fraction": 0.46095251826220685,
+      "red_bbox_local": [
+        12,
+        0,
+        204,
+        204
+      ],
+      "red_component_count": 11,
+      "red_components": [
+        [
+          3061,
+          [
+            99,
+            0,
+            204,
+            44
+          ]
+        ],
+        [
+          34,
+          [
+            60,
+            5,
+            64,
+            18
+          ]
+        ],
+        [
+          16,
+          [
+            141,
+            27,
+            147,
+            32
+          ]
+        ],
+        [
+          2482,
+          [
+            12,
+            72,
+            44,
+            204
+          ]
+        ],
+        [
+          13409,
+          [
+            48,
+            72,
+            192,
+            204
+          ]
+        ],
+        [
+          9,
+          [
+            174,
+            76,
+            177,
+            80
+          ]
+        ],
+        [
+          10,
+          [
+            172,
+            81,
+            176,
+            84
+          ]
+        ],
+        [
+          16,
+          [
+            68,
+            83,
+            74,
+            88
+          ]
+        ],
+        [
+          8,
+          [
+            169,
+            96,
+            171,
+            100
+          ]
+        ],
+        [
+          12,
+          [
+            65,
+            165,
+            68,
+            170
+          ]
+        ],
+        [
+          126,
+          [
+            44,
+            190,
+            64,
+            204
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.2924115724721261,
+      "textlike": false
+    },
+    {
+      "idx": 1,
+      "name": "sprite_933",
+      "roi_readable": [
+        688,
+        0,
+        1376,
+        368
+      ],
+      "size": [
+        688,
+        368
+      ],
+      "red_pixels": 37039,
+      "red_fraction": 0.14629281471183014,
+      "red_bbox_local": [
+        0,
+        53,
+        624,
+        364
+      ],
+      "red_component_count": 9,
+      "red_components": [
+        [
+          10717,
+          [
+            39,
+            53,
+            143,
+            196
+          ]
+        ],
+        [
+          8903,
+          [
+            190,
+            54,
+            300,
+            196
+          ]
+        ],
+        [
+          1772,
+          [
+            0,
+            87,
+            32,
+            196
+          ]
+        ],
+        [
+          2704,
+          [
+            348,
+            96,
+            624,
+            204
+          ]
+        ],
+        [
+          5493,
+          [
+            7,
+            215,
+            107,
+            324
+          ]
+        ],
+        [
+          5496,
+          [
+            112,
+            215,
+            212,
+            324
+          ]
+        ],
+        [
+          37,
+          [
+            0,
+            243,
+            2,
+            267
+          ]
+        ],
+        [
+          959,
+          [
+            42,
+            334,
+            74,
+            364
+          ]
+        ],
+        [
+          958,
+          [
+            147,
+            334,
+            179,
+            364
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.009957185288169869,
+      "textlike": false
+    },
+    {
+      "idx": 3,
+      "name": "sprite_935",
+      "roi_readable": [
+        860,
+        368,
+        1720,
+        676
+      ],
+      "size": [
+        860,
+        308
+      ],
+      "red_pixels": 66399,
+      "red_fraction": 0.2506757777106614,
+      "red_bbox_local": [
+        45,
+        12,
+        860,
+        164
+      ],
+      "red_component_count": 8,
+      "red_components": [
+        [
+          8864,
+          [
+            549,
+            12,
+            651,
+            164
+          ]
+        ],
+        [
+          8859,
+          [
+            658,
+            12,
+            760,
+            164
+          ]
+        ],
+        [
+          8698,
+          [
+            45,
+            13,
+            143,
+            164
+          ]
+        ],
+        [
+          6488,
+          [
+            150,
+            16,
+            245,
+            160
+          ]
+        ],
+        [
+          9152,
+          [
+            249,
+            16,
+            370,
+            160
+          ]
+        ],
+        [
+          10648,
+          [
+            376,
+            16,
+            481,
+            160
+          ]
+        ],
+        [
+          5696,
+          [
+            489,
+            16,
+            542,
+            160
+          ]
+        ],
+        [
+          7994,
+          [
+            765,
+            16,
+            860,
+            160
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.0,
+      "textlike": false
+    },
+    {
+      "idx": 19,
+      "name": "sprite_951",
+      "roi_readable": [
+        1788,
+        892,
+        1992,
+        1096
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 23812,
+      "red_fraction": 0.5721837754709727,
+      "red_bbox_local": [
+        12,
+        0,
+        192,
+        204
+      ],
+      "red_component_count": 6,
+      "red_components": [
+        [
+          2659,
+          [
+            94,
+            0,
+            180,
+            44
+          ]
+        ],
+        [
+          11,
+          [
+            172,
+            0,
+            183,
+            1
+          ]
+        ],
+        [
+          8,
+          [
+            188,
+            27,
+            191,
+            30
+          ]
+        ],
+        [
+          21111,
+          [
+            12,
+            72,
+            192,
+            204
+          ]
+        ],
+        [
+          8,
+          [
+            124,
+            108,
+            128,
+            110
+          ]
+        ],
+        [
+          15,
+          [
+            144,
+            112,
+            148,
+            116
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.30735774702037677,
+      "textlike": false
+    },
+    {
+      "idx": 37,
+      "name": "sprite_969",
+      "roi_readable": [
+        0,
+        1676,
+        580,
+        1844
+      ],
+      "size": [
+        580,
+        168
+      ],
+      "red_pixels": 5283,
+      "red_fraction": 0.0542179802955665,
+      "red_bbox_local": [
+        18,
+        0,
+        580,
+        168
+      ],
+      "red_component_count": 5,
+      "red_components": [
+        [
+          9,
+          [
+            18,
+            0,
+            27,
+            1
+          ]
+        ],
+        [
+          9,
+          [
+            137,
+            0,
+            146,
+            1
+          ]
+        ],
+        [
+          9,
+          [
+            273,
+            0,
+            282,
+            1
+          ]
+        ],
+        [
+          9,
+          [
+            425,
+            0,
+            434,
+            1
+          ]
+        ],
+        [
+          5247,
+          [
+            176,
+            77,
+            580,
+            168
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.012479474548440065,
+      "textlike": false
+    },
+    {
+      "idx": 29,
+      "name": "sprite_961",
+      "roi_readable": [
+        1836,
+        1100,
+        2040,
+        1304
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 5910,
+      "red_fraction": 0.14201268742791234,
+      "red_bbox_local": [
+        0,
+        0,
+        144,
+        76
+      ],
+      "red_component_count": 3,
+      "red_components": [
+        [
+          5122,
+          [
+            0,
+            0,
+            144,
+            44
+          ]
+        ],
+        [
+          20,
+          [
+            136,
+            32,
+            142,
+            36
+          ]
+        ],
+        [
+          768,
+          [
+            0,
+            68,
+            96,
+            76
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.05670895809304114,
+      "textlike": false
+    },
+    {
+      "idx": 39,
+      "name": "sprite_971",
+      "roi_readable": [
+        0,
+        1844,
+        1036,
+        2008
+      ],
+      "size": [
+        1036,
+        164
+      ],
+      "red_pixels": 12320,
+      "red_fraction": 0.07251153592617007,
+      "red_bbox_local": [
+        2,
+        0,
+        687,
+        164
+      ],
+      "red_component_count": 2,
+      "red_components": [
+        [
+          12230,
+          [
+            2,
+            0,
+            687,
+            164
+          ]
+        ],
+        [
+          90,
+          [
+            437,
+            159,
+            463,
+            164
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.0660196346171956,
+      "textlike": false
+    },
+    {
+      "idx": 11,
+      "name": "sprite_943",
+      "roi_readable": [
+        0,
+        892,
+        152,
+        1100
+      ],
+      "size": [
+        152,
+        208
+      ],
+      "red_pixels": 8965,
+      "red_fraction": 0.2835589574898785,
+      "red_bbox_local": [
+        8,
+        0,
+        144,
+        208
+      ],
+      "red_component_count": 2,
+      "red_components": [
+        [
+          2312,
+          [
+            12,
+            0,
+            91,
+            34
+          ]
+        ],
+        [
+          6653,
+          [
+            8,
+            64,
+            144,
+            208
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.3008286943319838,
+      "textlike": false
+    },
+    {
+      "idx": 20,
+      "name": "sprite_952",
+      "roi_readable": [
+        0,
+        1100,
+        204,
+        1304
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 8550,
+      "red_fraction": 0.2054498269896194,
+      "red_bbox_local": [
+        8,
+        0,
+        204,
+        48
+      ],
+      "red_component_count": 2,
+      "red_components": [
+        [
+          6470,
+          [
+            8,
+            0,
+            144,
+            48
+          ]
+        ],
+        [
+          2080,
+          [
+            160,
+            0,
+            204,
+            48
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.09299307958477508,
+      "textlike": false
+    },
+    {
+      "idx": 31,
+      "name": "sprite_963",
+      "roi_readable": [
+        204,
+        1304,
+        408,
+        1508
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 3706,
+      "red_fraction": 0.08905228758169935,
+      "red_bbox_local": [
+        0,
+        72,
+        204,
+        204
+      ],
+      "red_component_count": 2,
+      "red_components": [
+        [
+          3497,
+          [
+            0,
+            72,
+            204,
+            177
+          ]
+        ],
+        [
+          209,
+          [
+            56,
+            196,
+            91,
+            204
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.043733179546328334,
+      "textlike": false
+    },
+    {
+      "idx": 14,
+      "name": "sprite_946",
+      "roi_readable": [
+        456,
+        892,
+        608,
+        1100
+      ],
+      "size": [
+        152,
+        208
+      ],
+      "red_pixels": 1114,
+      "red_fraction": 0.03523532388663968,
+      "red_bbox_local": [
+        0,
+        0,
+        144,
+        42
+      ],
+      "red_component_count": 2,
+      "red_components": [
+        [
+          118,
+          [
+            0,
+            0,
+            15,
+            12
+          ]
+        ],
+        [
+          996,
+          [
+            116,
+            0,
+            144,
+            42
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.3406186740890688,
+      "textlike": false
+    },
+    {
+      "idx": 35,
+      "name": "sprite_967",
+      "roi_readable": [
+        0,
+        1508,
+        892,
+        1676
+      ],
+      "size": [
+        892,
+        168
+      ],
+      "red_pixels": 18035,
+      "red_fraction": 0.12034886824685032,
+      "red_bbox_local": [
+        0,
+        0,
+        729,
+        168
+      ],
+      "red_component_count": 1,
+      "red_components": [
+        [
+          18035,
+          [
+            0,
+            0,
+            729,
+            168
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.04473628016228913,
+      "textlike": false
+    },
+    {
+      "idx": 21,
+      "name": "sprite_953",
+      "roi_readable": [
+        204,
+        1100,
+        408,
+        1304
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 4384,
+      "red_fraction": 0.1053440984236832,
+      "red_bbox_local": [
+        0,
+        0,
+        92,
+        48
+      ],
+      "red_component_count": 1,
+      "red_components": [
+        [
+          4384,
+          [
+            0,
+            0,
+            92,
+            48
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.19499711649365628,
+      "textlike": false
+    },
+    {
+      "idx": 32,
+      "name": "sprite_964",
+      "roi_readable": [
+        408,
+        1304,
+        612,
+        1508
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 3567,
+      "red_fraction": 0.08571222606689735,
+      "red_bbox_local": [
+        0,
+        72,
+        204,
+        204
+      ],
+      "red_component_count": 1,
+      "red_components": [
+        [
+          3567,
+          [
+            0,
+            72,
+            204,
+            204
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.029171472510572855,
+      "textlike": false
+    },
+    {
+      "idx": 33,
+      "name": "sprite_965",
+      "roi_readable": [
+        612,
+        1304,
+        1048,
+        1488
+      ],
+      "size": [
+        436,
+        184
+      ],
+      "red_pixels": 3399,
+      "red_fraction": 0.04236886717191863,
+      "red_bbox_local": [
+        75,
+        96,
+        248,
+        184
+      ],
+      "red_component_count": 1,
+      "red_components": [
+        [
+          3399,
+          [
+            75,
+            96,
+            248,
+            184
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.0219635021938572,
+      "textlike": false
+    },
+    {
+      "idx": 38,
+      "name": "sprite_970",
+      "roi_readable": [
+        580,
+        1676,
+        1040,
+        1844
+      ],
+      "size": [
+        460,
+        168
+      ],
+      "red_pixels": 3124,
+      "red_fraction": 0.04042443064182195,
+      "red_bbox_local": [
+        0,
+        3,
+        107,
+        168
+      ],
+      "red_component_count": 1,
+      "red_components": [
+        [
+          3124,
+          [
+            0,
+            3,
+            107,
+            168
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.054956004140786746,
+      "textlike": false
+    },
+    {
+      "idx": 47,
+      "name": "sprite_979",
+      "roi_readable": [
+        1720,
+        1844,
+        1788,
+        1940
+      ],
+      "size": [
+        68,
+        96
+      ],
+      "red_pixels": 1549,
+      "red_fraction": 0.23728553921568626,
+      "red_bbox_local": [
+        19,
+        0,
+        40,
+        96
+      ],
+      "red_component_count": 1,
+      "red_components": [
+        [
+          1549,
+          [
+            19,
+            0,
+            40,
+            96
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.40640318627450983,
+      "textlike": false
+    },
+    {
+      "idx": 44,
+      "name": "sprite_976",
+      "roi_readable": [
+        1516,
+        1844,
+        1584,
+        1940
+      ],
+      "size": [
+        68,
+        96
+      ],
+      "red_pixels": 1536,
+      "red_fraction": 0.23529411764705882,
+      "red_bbox_local": [
+        4,
+        0,
+        20,
+        96
+      ],
+      "red_component_count": 1,
+      "red_components": [
+        [
+          1536,
+          [
+            4,
+            0,
+            20,
+            96
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.3307291666666667,
+      "textlike": false
+    },
+    {
+      "idx": 26,
+      "name": "sprite_958",
+      "roi_readable": [
+        1224,
+        1100,
+        1428,
+        1304
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 1504,
+      "red_fraction": 0.03613994617454825,
+      "red_bbox_local": [
+        168,
+        0,
+        204,
+        44
+      ],
+      "red_component_count": 1,
+      "red_components": [
+        [
+          1504,
+          [
+            168,
+            0,
+            204,
+            44
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.094939446366782,
+      "textlike": false
+    },
+    {
+      "idx": 4,
+      "name": "sprite_936",
+      "roi_readable": [
+        1720,
+        368,
+        2008,
+        632
+      ],
+      "size": [
+        288,
+        264
+      ],
+      "red_pixels": 1136,
+      "red_fraction": 0.01494107744107744,
+      "red_bbox_local": [
+        0,
+        73,
+        25,
+        160
+      ],
+      "red_component_count": 1,
+      "red_components": [
+        [
+          1136,
+          [
+            0,
+            73,
+            25,
+            160
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.0,
+      "textlike": false
+    },
+    {
+      "idx": 30,
+      "name": "sprite_962",
+      "roi_readable": [
+        0,
+        1304,
+        204,
+        1508
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 800,
+      "red_fraction": 0.019223375624759707,
+      "red_bbox_local": [
+        137,
+        150,
+        204,
+        204
+      ],
+      "red_component_count": 1,
+      "red_components": [
+        [
+          800,
+          [
+            137,
+            150,
+            204,
+            204
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.0,
+      "textlike": false
+    },
+    {
+      "idx": 34,
+      "name": "sprite_966",
+      "roi_readable": [
+        1048,
+        1304,
+        1840,
+        1476
+      ],
+      "size": [
+        792,
+        172
+      ],
+      "red_pixels": 512,
+      "red_fraction": 0.0037585153864223633,
+      "red_bbox_local": [
+        644,
+        0,
+        652,
+        64
+      ],
+      "red_component_count": 1,
+      "red_components": [
+        [
+          512,
+          [
+            644,
+            0,
+            652,
+            64
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.13272991543340382,
+      "textlike": false
+    },
+    {
+      "idx": 42,
+      "name": "sprite_974",
+      "roi_readable": [
+        1380,
+        1844,
+        1448,
+        1940
+      ],
+      "size": [
+        68,
+        96
+      ],
+      "red_pixels": 312,
+      "red_fraction": 0.04779411764705882,
+      "red_bbox_local": [
+        0,
+        67,
+        12,
+        96
+      ],
+      "red_component_count": 1,
+      "red_components": [
+        [
+          312,
+          [
+            0,
+            67,
+            12,
+            96
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.16207107843137256,
+      "textlike": false
+    },
+    {
+      "idx": 41,
+      "name": "sprite_973",
+      "roi_readable": [
+        1312,
+        1844,
+        1380,
+        1940
+      ],
+      "size": [
+        68,
+        96
+      ],
+      "red_pixels": 86,
+      "red_fraction": 0.013174019607843137,
+      "red_bbox_local": [
+        64,
+        74,
+        68,
+        96
+      ],
+      "red_component_count": 1,
+      "red_components": [
+        [
+          86,
+          [
+            64,
+            74,
+            68,
+            96
+          ]
+        ]
+      ],
+      "neutral_fraction": 0.36243872549019607,
+      "textlike": false
+    },
+    {
+      "idx": 5,
+      "name": "sprite_937",
+      "roi_readable": [
+        1376,
+        0,
+        1552,
+        236
+      ],
+      "size": [
+        176,
+        236
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.14310477657935286,
+      "textlike": false
+    },
+    {
+      "idx": 6,
+      "name": "sprite_938",
+      "roi_readable": [
+        1552,
+        0,
+        1772,
+        224
+      ],
+      "size": [
+        220,
+        224
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.1567775974025974,
+      "textlike": false
+    },
+    {
+      "idx": 10,
+      "name": "sprite_942",
+      "roi_readable": [
+        1772,
+        0,
+        1924,
+        208
+      ],
+      "size": [
+        152,
+        208
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.11946482793522267,
+      "textlike": false
+    },
+    {
+      "idx": 22,
+      "name": "sprite_954",
+      "roi_readable": [
+        408,
+        1100,
+        612,
+        1304
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.12773933102652826,
+      "textlike": false
+    },
+    {
+      "idx": 23,
+      "name": "sprite_955",
+      "roi_readable": [
+        612,
+        1100,
+        816,
+        1304
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.07420222991157248,
+      "textlike": false
+    },
+    {
+      "idx": 24,
+      "name": "sprite_956",
+      "roi_readable": [
+        816,
+        1100,
+        1020,
+        1304
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.09801518646674356,
+      "textlike": false
+    },
+    {
+      "idx": 25,
+      "name": "sprite_957",
+      "roi_readable": [
+        1020,
+        1100,
+        1224,
+        1304
+      ],
+      "size": [
+        204,
+        204
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.1404988465974625,
+      "textlike": false
+    },
+    {
+      "idx": 36,
+      "name": "sprite_968",
+      "roi_readable": [
+        892,
+        1508,
+        1772,
+        1676
+      ],
+      "size": [
+        880,
+        168
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.15073728354978355,
+      "textlike": false
+    },
+    {
+      "idx": 40,
+      "name": "sprite_972",
+      "roi_readable": [
+        1036,
+        1844,
+        1312,
+        1956
+      ],
+      "size": [
+        276,
+        112
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.11639492753623189,
+      "textlike": false
+    },
+    {
+      "idx": 43,
+      "name": "sprite_975",
+      "roi_readable": [
+        1448,
+        1844,
+        1516,
+        1940
+      ],
+      "size": [
+        68,
+        96
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.0,
+      "textlike": false
+    },
+    {
+      "idx": 45,
+      "name": "sprite_977",
+      "roi_readable": [
+        1584,
+        1844,
+        1652,
+        1940
+      ],
+      "size": [
+        68,
+        96
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.08363970588235294,
+      "textlike": false
+    },
+    {
+      "idx": 46,
+      "name": "sprite_978",
+      "roi_readable": [
+        1652,
+        1844,
+        1720,
+        1940
+      ],
+      "size": [
+        68,
+        96
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.08333333333333333,
+      "textlike": false
+    },
+    {
+      "idx": 48,
+      "name": "sprite_980",
+      "roi_readable": [
+        1788,
+        1844,
+        1856,
+        1940
+      ],
+      "size": [
+        68,
+        96
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.125,
+      "textlike": false
+    },
+    {
+      "idx": 49,
+      "name": "sprite_981",
+      "roi_readable": [
+        1856,
+        1844,
+        1924,
+        1940
+      ],
+      "size": [
+        68,
+        96
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.33088235294117646,
+      "textlike": false
+    },
+    {
+      "idx": 50,
+      "name": "sprite_982",
+      "roi_readable": [
+        1924,
+        1844,
+        1992,
+        1940
+      ],
+      "size": [
+        68,
+        96
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.0,
+      "textlike": false
+    },
+    {
+      "idx": 51,
+      "name": "sprite_983",
+      "roi_readable": [
+        1040,
+        1676,
+        1240,
+        1748
+      ],
+      "size": [
+        200,
+        72
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.000625,
+      "textlike": false
+    },
+    {
+      "idx": 52,
+      "name": "sprite_984",
+      "roi_readable": [
+        1992,
+        1844,
+        2016,
+        1868
+      ],
+      "size": [
+        24,
+        24
+      ],
+      "red_pixels": 0,
+      "red_fraction": 0.0,
+      "red_bbox_local": null,
+      "red_component_count": 0,
+      "red_components": [],
+      "neutral_fraction": 0.0,
+      "textlike": false
+    }
+  ],
+  "textlike_indices": [
+    2,
+    7,
+    27,
+    8,
+    16,
+    9,
+    28,
+    15,
+    12,
+    13,
+    18
+  ],
+  "status": "ALL_CELL_TEXTLIKE_DIAGNOSTIC_READY",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
