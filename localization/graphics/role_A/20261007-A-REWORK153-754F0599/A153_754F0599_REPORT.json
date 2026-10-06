@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261007-A-REWORK153-754F0599",
+  "worker": "github-actions",
+  "queue_index": 175,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "trigger": "C227R_REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH",
+  "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+  "prior_candidate_sha256": "f21970a3d6d8ae69954d0159524856b5019cd1445daa65c55d85213f73e431f5",
+  "candidate_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
+  "rework": "Replace generic Noto skeleton with fresh NanumGothic Bold skeleton, then apply low-profile extended techno proportions while preserving A151 width hierarchy, right lean and metallic effects.",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "raw_mode": "BGRA",
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "key": "stage_select",
+      "source": "stage select",
+      "korean": "스테이지 선택",
+      "original_bbox": [
+        6,
+        254,
+        1372,
+        397
+      ],
+      "localized_bbox": [
+        10,
+        279,
+        1180,
+        371
+      ],
+      "source_size": [
+        1366,
+        143
+      ],
+      "localized_size": [
+        1170,
+        92
+      ],
+      "delta_left": 4,
+      "delta_right": 192,
+      "delta_top": 25,
+      "delta_bottom": 26,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "style": "NanumGothic Bold fresh glyph skeleton; extended low-profile techno transform; metallic grayscale; right lean; dark lower extrusion"
+    },
+    {
+      "key": "showroom",
+      "source": "showroom",
+      "korean": "쇼룸",
+      "original_bbox": [
+        6,
+        397,
+        956,
+        529
+      ],
+      "localized_bbox": [
+        10,
+        421,
+        691,
+        504
+      ],
+      "source_size": [
+        950,
+        132
+      ],
+      "localized_size": [
+        681,
+        83
+      ],
+      "delta_left": 4,
+      "delta_right": 265,
+      "delta_top": 24,
+      "delta_bottom": 25,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "style": "NanumGothic Bold fresh glyph skeleton; extended low-profile techno transform; metallic grayscale; right lean; dark lower extrusion"
+    },
+    {
+      "key": "single_player",
+      "source": "single player",
+      "korean": "싱글 플레이",
+      "original_bbox": [
+        2,
+        566,
+        1386,
+        717
+      ],
+      "localized_bbox": [
+        6,
+        592,
+        1198,
+        690
+      ],
+      "source_size": [
+        1384,
+        151
+      ],
+      "localized_size": [
+        1192,
+        98
+      ],
+      "delta_left": 4,
+      "delta_right": 188,
+      "delta_top": 26,
+      "delta_bottom": 27,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "style": "NanumGothic Bold fresh glyph skeleton; extended low-profile techno transform; metallic grayscale; right lean; dark lower extrusion"
+    }
+  ],
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION29/754F0599_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261007-A-REWORK153-754F0599/754F0599_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 322717,
+    "changed_bbox": [
+      2,
+      254,
+      1386,
+      717
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "machine": {
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A153_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

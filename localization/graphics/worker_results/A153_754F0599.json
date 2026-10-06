@@ -1,0 +1,14 @@
+{
+  "run": "20261007-A-REWORK153-754F0599",
+  "asset": "754F0599",
+  "queue_index": 175,
+  "prior_candidate_sha256": "f21970a3d6d8ae69954d0159524856b5019cd1445daa65c55d85213f73e431f5",
+  "candidate_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
+  "bbox_size_positive_margin": "3/3 PASS",
+  "outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "worker_status": "A153_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261007-A-REWORK153-754F0599/A153_754F0599_REPORT.json"
+}
