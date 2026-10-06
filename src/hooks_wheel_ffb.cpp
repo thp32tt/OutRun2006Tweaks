@@ -1312,7 +1312,7 @@ namespace
                 WheelFFBMath::mechanical_sat_shape(
                     frontSlip, effectiveMechanicalTrail);
             const float physicsShape =
-                WheelFFBMath::combined_sat_shape_with_deep_slip_boost(
+                WheelFFBMath::combined_sat_shape(
                     frontSlip, trailResponseSlip, mechanicalTrailMix);
             const float trailShape = pneumaticSatShape; // legacy telemetry field name
             const float physicsLoad = 0.62f + 0.48f * lateralLoadSmooth;
@@ -1330,10 +1330,10 @@ namespace
                     physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
 
-                // In a developed drift, frontSlip may reverse sign because the
-                // front wheels have already started countersteering. Do not let
-                // that sign reversal command the rack back toward the car nose.
-                // Blend toward the body-slip/caster recovery direction instead.
+                // In a developed drift, frontSlip remains the primary torque
+                // direction. A small bounded body-slip cue only stabilizes the
+                // transition after the rack has already begun countersteering;
+                // it can no longer hand off most of the steering torque.
                 if (driftCountersteerBlend > 0.0f)
                 {
                     const float driftCountersteerShape =

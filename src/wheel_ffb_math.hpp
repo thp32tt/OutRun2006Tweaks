@@ -237,16 +237,16 @@ namespace WheelFFBMath
         return std::sin(x * HalfPi);
     }
 
-    // Pneumatic trail remains near full in the linear tyre region, then falls
-    // as slip grows. Keep a small residual rather than forcing the pneumatic
-    // lever arm mathematically to zero because this is an arcade-state proxy,
-    // not a fitted tyre dataset.
+    // Brush-model-inspired pneumatic trail: keep the lever arm near full in the
+    // linear tyre region, then let it collapse almost completely once the front
+    // contact patch is fully sliding. Any useful high-slip remainder is modelled
+    // separately as residual aligning moment instead of hiding it in trail.
     inline float pneumatic_trail_factor(float alpha)
     {
         if (!std::isfinite(alpha)) return 0.0f;
         constexpr float FullTrailUntil = 0.08f;
         constexpr float TrailFallComplete = 0.42f;
-        constexpr float ResidualTrail = 0.15f;
+        constexpr float ResidualTrail = 0.02f;
         const float t = smoothstep01(
             (std::abs(alpha) - FullTrailUntil) /
             (TrailFallComplete - FullTrailUntil));
@@ -287,31 +287,14 @@ namespace WheelFFBMath
             : 0.0f;
     }
 
-    // Keep normal-corner feel unchanged, then add only the missing
-    // mechanical/caster self-steer in a large drift. Pneumatic trail and the
-    // existing re-grip/return suppression are deliberately untouched.
-    // R9 hardware A/B: the R3 log showed plenty of computed deep-slip SAT, but
-    // the wheel did not self-countersteer strongly enough.  Raise only the
-    // mechanical/caster component in deep slip; normal-corner SAT is unchanged.
-    constexpr float DeepSlipMechanicalBoost = 1.70f;
-    constexpr float DeepSlipMechanicalStartRad = 0.18f;
-    constexpr float DeepSlipMechanicalFullRad = 0.32f;
-
+    // R13 keeps mechanical/caster trail geometric. Deep slip changes the tyre
+    // force, not the steering geometry, so do not invent extra trail as a drift
+    // assist. Keep the legacy helper name for profile/test compatibility.
     inline float deep_slip_mechanical_trail_ratio(float forceAlpha, float mechanicalTrailRatio)
     {
-        const float ratio = std::isfinite(mechanicalTrailRatio)
+        (void)forceAlpha;
+        return std::isfinite(mechanicalTrailRatio)
             ? std::clamp(mechanicalTrailRatio, 0.0f, 0.60f) : 0.0f;
-        if (!std::isfinite(forceAlpha))
-            return ratio;
-
-        const float t = std::clamp(
-            (std::abs(forceAlpha) - DeepSlipMechanicalStartRad) /
-                (DeepSlipMechanicalFullRad - DeepSlipMechanicalStartRad),
-            0.0f, 1.0f);
-        const float smooth = t * t * (3.0f - 2.0f * t);
-        return std::clamp(
-            ratio * (1.0f + (DeepSlipMechanicalBoost - 1.0f) * smooth),
-            0.0f, 0.60f);
     }
 
     // During a real drift the front-wheel slip sign can cross the body-slip
@@ -322,7 +305,7 @@ namespace WheelFFBMath
     // while front/body slip signs oppose; ordinary cornering/understeer is untouched.
     constexpr float DriftCountersteerStartRad = 0.16f;
     constexpr float DriftCountersteerFullRad = 0.42f;
-    constexpr float DriftCountersteerMaxBlend = 0.85f;
+    constexpr float DriftCountersteerMaxBlend = 0.20f;
 
     inline float drift_countersteer_blend(
         float bodySlip, float frontSlip, float bodySlide)
@@ -361,8 +344,17 @@ namespace WheelFFBMath
         const float denominator = PneumaticReferencePeak + ratio;
         if (denominator <= 0.0f)
             return 0.0f;
-        const float raw = lateral_force_shape(forceAlpha) *
-            (pneumatic_trail_factor(trailAlpha) + ratio);
+        const float fyShape = lateral_force_shape(forceAlpha);
+        // Residual Mz is a small high-slip aligning cue, kept separate from
+        // pneumatic trail so a fully sliding contact patch does not pretend to
+        // retain a large pneumatic lever arm.
+        constexpr float ResidualMzRatio = 0.05f;
+        const float residualT = smoothstep01(
+            (std::abs(forceAlpha) - 0.18f) / 0.24f);
+        const float residualMz = fyShape * ResidualMzRatio * residualT;
+        const float raw =
+            fyShape * (pneumatic_trail_factor(trailAlpha) + ratio) +
+            residualMz;
         return std::clamp(raw / denominator, 0.0f, 1.0f);
     }
 
@@ -374,17 +366,10 @@ namespace WheelFFBMath
     inline float combined_sat_shape_with_deep_slip_boost(
         float forceAlpha, float trailAlpha, float baseMechanicalTrailRatio)
     {
-        if (!std::isfinite(forceAlpha) || !std::isfinite(trailAlpha))
-            return 0.0f;
-        const float baseRatio = std::clamp(baseMechanicalTrailRatio, 0.0f, 0.60f);
-        const float effectiveRatio =
-            deep_slip_mechanical_trail_ratio(forceAlpha, baseRatio);
-        const float denominator = PneumaticReferencePeak + baseRatio;
-        if (denominator <= 0.0f)
-            return 0.0f;
-        const float raw = lateral_force_shape(forceAlpha) *
-            (pneumatic_trail_factor(trailAlpha) + effectiveRatio);
-        return std::clamp(raw / denominator, 0.0f, 1.0f);
+        // Legacy API name retained for existing callers/tests. R13 deliberately
+        // removes slip-dependent mechanical boost and uses the geometric model.
+        return combined_sat_shape(
+            forceAlpha, trailAlpha, baseMechanicalTrailRatio);
     }
 
     inline float impact_direction_from_lateral(float lateral, float deadband = 0.04f)

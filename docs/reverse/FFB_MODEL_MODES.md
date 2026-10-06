@@ -7,7 +7,7 @@ The standalone FFB branch exposes several force models through one DirectInput C
 The existing DD-oriented model:
 
 - front-slip/yaw Physics SAT with Natural SAT fallback;
-- pneumatic + mechanical/caster trail, with a smooth deep-slip-only mechanical/caster reinforcement that is zero in normal corners and reaches +25% by about 0.32 rad front slip;
+- brush-like pneumatic trail collapse plus geometric mechanical/caster trail and a small separate residual aligning moment at high slip;
 - dynamic damping and grip-loss release;
 - stage-aware four-wheel road texture;
 - modern collision, gear and optional engine haptics.
@@ -105,7 +105,7 @@ For Arcade Original, the target remains the motorized drive-board feel represent
 
 R7 applies confirmed/actionable findings from review cycles C0049-C0148 while leaving research-gated assumptions unchanged. Current MOZA R3 presets are no longer reclassified by an every-physics-tick legacy signature matcher. Named FFB profiles now load from a canonical baseline before stored values are overlaid, so a partial/older profile cannot inherit model-owned values from whichever profile was active before it.
 
-Modern Physics SAT uses a 1.50x deep-slip mechanical/caster ratio and normalizes the boosted numerator against the unboosted base ratio, so the requested reinforcement survives the final SAT normalization. Counter-torque still crosses zero before changing direction, but a bounded four-tick build assist reduces the long reversal tail. Authoritative course/vehicle collision edges may retrigger after the real output window instead of waiting for the old 90-frame heuristic debounce; Arcade collision strength is latched at impact, and near-neutral/head-on impacts do not invent a steering side.
+R13 removes the old slip-dependent mechanical/caster multiplier: steering geometry now stays geometric while front-tire force, pneumatic-trail collapse and a small residual aligning moment shape high-slip torque. Front-slip filtering uses a normalized distance-based relaxation law at the fixed 60 Hz physics rate, and the body-slip recovery cue is capped at 20% so front-slip SAT remains the primary countersteer direction. Counter-torque still crosses zero before changing direction, while the bounded four-tick build assist reduces the long reversal tail. Authoritative course/vehicle collision edges may retrigger after the real output window instead of waiting for the old 90-frame heuristic debounce; Arcade collision strength is latched at impact, and near-neutral/head-on impacts do not invent a steering side.
 
 Surface classification separates proven primary material-0x14 road sections from curb/off-road roughness: Deep Lake 419..458, Tulip Garden 54..70 and Floral Village 510..533. Floral retains its tested 0.60 Road Detail comfort scale; the other two keep normal Road Detail but do not receive curb SAT/damper unloading or fixed-strength curb promotion. Snow attenuation is keyed to the proven 0x800000 primary material rather than the entire stage, and a 0x800000 <-> 0x2 primary-road transition cannot arm the snow-curb latch. Arcade rough-event reconstruction also excludes these proven primary rough-road contacts instead of treating every roughness >=0.60 sample as grass/sand.
 

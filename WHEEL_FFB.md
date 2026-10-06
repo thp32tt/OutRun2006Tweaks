@@ -34,7 +34,7 @@ The main steering model contains:
 
 1. **Physics SAT** — estimates front slip from vehicle motion, steering and yaw, then derives aligning torque from lateral force and total trail.
 2. **Natural SAT fallback** — progressive steering-angle-based restoring torque when the physics sample is unavailable or Physics SAT is disabled.
-3. **Mechanical / caster trail** — remains active with front lateral load instead of acting as an artificial center spring; in large drift slip only, the mechanical/caster component smoothly gains up to 25% while the existing re-grip/return suppression remains unchanged.
+3. **Pneumatic + mechanical trail** — pneumatic trail collapses toward zero at large front slip, while mechanical/caster trail remains geometric and a small separate residual aligning moment preserves a readable high-slip cue.
 4. **Low-speed spring** — only a stabilizer near low speed; deliberately reduced on the tested R3 feel.
 5. **Dynamic damping** — steering-velocity resistance that releases as the front end scrubs or the car slides.
 6. **Grip-loss unloading** — reduces steering load as usable front grip falls away.
@@ -159,7 +159,7 @@ v0.1은 주로 **MOZA R3**를 기준으로 개발했으며 기본 검증 경로�
 
 1. **Physics SAT** — 차량 움직임, 조향각, yaw에서 전륜 슬립을 추정하고 횡력과 총 trail을 이용해 self-aligning torque를 계산합니다.
 2. **Natural SAT fallback** — 물리 샘플을 사용할 수 없거나 Physics SAT를 끈 경우 조향각에 비례해 점진적으로 중앙 복원 토크를 생성합니다.
-3. **Mechanical / caster trail** — 인위적인 센터 스프링 대신 전륜 횡하중과 함께 유지되는 기계적/캐스터 트레일 성분입니다.
+3. **Pneumatic + mechanical trail** — 큰 전륜 슬립에서는 pneumatic trail이 거의 0까지 감소하고, mechanical/caster trail은 기하학적 값으로 유지하며 작은 residual aligning moment만 별도로 남깁니다.
 4. **Low-speed spring** — 저속에서만 안정화용으로 사용하며 테스트한 R3에서는 의도적으로 약하게 설정합니다.
 5. **Dynamic damping** — 조향 속도에 대한 저항이며 전륜이 밀리거나 차량이 슬라이드할 때 완화됩니다.
 6. **Grip-loss unloading** — 사용 가능한 전륜 그립이 줄어들수록 조향 하중을 줄입니다.
