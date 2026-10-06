@@ -1,0 +1,2506 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-USERJPG144-CLEANUP",
+  "trigger": "USER_PRE_INGAME_JPG_REVIEW_20261006",
+  "numbers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    14,
+    18,
+    19,
+    20,
+    21,
+    22
+  ],
+  "assets": [
+    {
+      "number": 1,
+      "queue_index": 12,
+      "asset": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+      "before_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+      "after_sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
+      "fixes": [
+        "orientation_up_down_reversed"
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 2,
+      "queue_index": 26,
+      "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+      "before_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
+      "after_sha256": "2afae053f48811b79ca3cbcf706e6edf4013e65d012010cb48b681169621f675",
+      "fixes": [
+        "total_rank_text_scale",
+        "plate_source_footprint_restoration",
+        "right_lean",
+        "readability"
+      ],
+      "details": [
+        {
+          "bbox": [
+            747,
+            1174,
+            1271,
+            1275
+          ],
+          "localized_bbox": [
+            871,
+            1179,
+            1146,
+            1270
+          ],
+          "font_size": 96,
+          "stroke": 3,
+          "slant": 0.16
+        },
+        {
+          "bbox": [
+            599,
+            156,
+            1124,
+            246
+          ],
+          "localized_bbox": [
+            741,
+            161,
+            982,
+            241
+          ],
+          "font_size": 84,
+          "stroke": 3,
+          "slant": 0.16
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 3,
+      "queue_index": 28,
+      "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+      "before_sha256": "bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8",
+      "after_sha256": "bf232cda0af9e364ffd94ae30ba6092dd86280184d25936286d39583cfa7bfa7",
+      "fixes": [
+        "total_rank_text_scale",
+        "plate_source_footprint_restoration",
+        "right_lean",
+        "readability"
+      ],
+      "details": [
+        {
+          "bbox": [
+            543,
+            1185,
+            1068,
+            1275
+          ],
+          "localized_bbox": [
+            685,
+            1190,
+            926,
+            1270
+          ],
+          "font_size": 84,
+          "stroke": 3,
+          "slant": 0.16
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 4,
+      "queue_index": 30,
+      "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+      "before_sha256": "cb023fa5533b4a058c437c1a879b2952a7268308e47202f7dced32c6a563e141",
+      "after_sha256": "41f83927c102db60dfe69aa7c499076a646c2e5cd53675672a575e7958403c51",
+      "fixes": [
+        "total_rank_text_scale",
+        "plate_source_footprint_restoration",
+        "right_lean",
+        "readability"
+      ],
+      "details": [
+        {
+          "bbox": [
+            1829,
+            1179,
+            2364,
+            1281
+          ],
+          "localized_bbox": [
+            1988,
+            1194,
+            2205,
+            1265
+          ],
+          "font_size": 76,
+          "stroke": 2,
+          "slant": 0.16
+        },
+        {
+          "bbox": [
+            1682,
+            150,
+            2216,
+            252
+          ],
+          "localized_bbox": [
+            1840,
+            165,
+            2057,
+            236
+          ],
+          "font_size": 76,
+          "stroke": 2,
+          "slant": 0.16
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 5,
+      "queue_index": 32,
+      "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+      "before_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+      "after_sha256": "2bdcc07401bb0543821173e266535f6153705bde28d53d2f1a12a40be2a4f2b0",
+      "fixes": [
+        "total_rank_text_scale",
+        "plate_source_footprint_restoration",
+        "right_lean",
+        "readability"
+      ],
+      "details": [
+        {
+          "bbox": [
+            546,
+            163,
+            1065,
+            248
+          ],
+          "localized_bbox": [
+            698,
+            170,
+            913,
+            240
+          ],
+          "font_size": 75,
+          "stroke": 2,
+          "slant": 0.16
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 6,
+      "queue_index": 34,
+      "asset": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+      "before_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
+      "after_sha256": "405bfa8118ec156e8bc3167797fbc3d93850aae793080f6829b1b818335d0f4f",
+      "fixes": [
+        "total_rank_text_scale",
+        "plate_source_footprint_restoration",
+        "right_lean",
+        "readability"
+      ],
+      "details": [
+        {
+          "bbox": [
+            2021,
+            1179,
+            2556,
+            1281
+          ],
+          "localized_bbox": [
+            2180,
+            1194,
+            2397,
+            1265
+          ],
+          "font_size": 76,
+          "stroke": 2,
+          "slant": 0.16
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 7,
+      "queue_index": 36,
+      "asset": "textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+      "before_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+      "after_sha256": "4db4c974fbaef5779723fe15fed6d58281bd570fa5012631bcd39ba3f1e51839",
+      "fixes": [
+        "total_rank_text_scale",
+        "plate_source_footprint_restoration",
+        "right_lean",
+        "readability"
+      ],
+      "details": [
+        {
+          "bbox": [
+            1829,
+            3227,
+            2364,
+            3329
+          ],
+          "localized_bbox": [
+            1988,
+            3242,
+            2205,
+            3313
+          ],
+          "font_size": 76,
+          "stroke": 2,
+          "slant": 0.16
+        },
+        {
+          "bbox": [
+            594,
+            1622,
+            1128,
+            1724
+          ],
+          "localized_bbox": [
+            752,
+            1637,
+            969,
+            1708
+          ],
+          "font_size": 76,
+          "stroke": 2,
+          "slant": 0.16
+        },
+        {
+          "bbox": [
+            2266,
+            1643,
+            2785,
+            1728
+          ],
+          "localized_bbox": [
+            2418,
+            1650,
+            2633,
+            1720
+          ],
+          "font_size": 75,
+          "stroke": 2,
+          "slant": 0.16
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 8,
+      "queue_index": 38,
+      "asset": "textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+      "before_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+      "after_sha256": "4db4c974fbaef5779723fe15fed6d58281bd570fa5012631bcd39ba3f1e51839",
+      "fixes": [
+        "exact_alias_of_007_rework"
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 9,
+      "queue_index": 43,
+      "asset": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+      "before_sha256": "50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f",
+      "after_sha256": "c158430f8a4f3730fa3c7067b0d20db97af8fddf6c830ddeb80e2d16820368ae",
+      "fixes": [
+        "text_scale_hierarchy",
+        "right_lean",
+        "effect_weight_reduced"
+      ],
+      "details": [
+        {
+          "key": "continue",
+          "bbox": [
+            4,
+            256,
+            558,
+            351
+          ],
+          "localized_bbox": [
+            168,
+            261,
+            393,
+            346
+          ],
+          "font_size": 90,
+          "stroke": 3
+        },
+        {
+          "key": "perfect",
+          "bbox": [
+            113,
+            352,
+            1302,
+            560
+          ],
+          "localized_bbox": [
+            542,
+            359,
+            873,
+            552
+          ],
+          "font_size": 200,
+          "stroke": 6
+        },
+        {
+          "key": "congratulations",
+          "bbox": [
+            6,
+            560,
+            2024,
+            788
+          ],
+          "localized_bbox": [
+            635,
+            568,
+            1395,
+            780
+          ],
+          "font_size": 221,
+          "stroke": 6
+        },
+        {
+          "key": "passed",
+          "bbox": [
+            44,
+            788,
+            1579,
+            1026
+          ],
+          "localized_bbox": [
+            622,
+            796,
+            1001,
+            1017
+          ],
+          "font_size": 231,
+          "stroke": 6
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 10,
+      "queue_index": 44,
+      "asset": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "before_sha256": "3090f2664bab3065502b10a98f93d17e92a64a3725dc1b7a4bb790648a5da6e7",
+      "after_sha256": "4b55fb306cb5096a9ecf98085687cee01e8debd50fe5a5e2d128a008d1016bea",
+      "fixes": [
+        "text_scale_hierarchy",
+        "source_direction_slant",
+        "readability"
+      ],
+      "details": [
+        {
+          "key": "sector2",
+          "bbox": [
+            8,
+            100,
+            190,
+            160
+          ],
+          "localized_bbox": [
+            37,
+            103,
+            161,
+            157
+          ],
+          "font_size": 54,
+          "stroke": 2,
+          "slant": 0.12
+        },
+        {
+          "key": "sector1",
+          "bbox": [
+            208,
+            100,
+            385,
+            160
+          ],
+          "localized_bbox": [
+            234,
+            103,
+            358,
+            157
+          ],
+          "font_size": 55,
+          "stroke": 2,
+          "slant": 0.12
+        },
+        {
+          "key": "win",
+          "bbox": [
+            418,
+            110,
+            500,
+            151
+          ],
+          "localized_bbox": [
+            437,
+            113,
+            481,
+            148
+          ],
+          "font_size": 37,
+          "stroke": 1,
+          "slant": 0.0
+        },
+        {
+          "key": "lose",
+          "bbox": [
+            528,
+            109,
+            635,
+            152
+          ],
+          "localized_bbox": [
+            558,
+            112,
+            604,
+            149
+          ],
+          "font_size": 40,
+          "stroke": 1,
+          "slant": 0.0
+        },
+        {
+          "key": "result",
+          "bbox": [
+            32,
+            180,
+            247,
+            249
+          ],
+          "localized_bbox": [
+            97,
+            183,
+            182,
+            246
+          ],
+          "font_size": 67,
+          "stroke": 2,
+          "slant": 0.12
+        },
+        {
+          "key": "ranking",
+          "bbox": [
+            289,
+            180,
+            555,
+            259
+          ],
+          "localized_bbox": [
+            372,
+            183,
+            471,
+            256
+          ],
+          "font_size": 78,
+          "stroke": 2,
+          "slant": 0.12
+        },
+        {
+          "key": "stage",
+          "bbox": [
+            571,
+            179,
+            765,
+            259
+          ],
+          "localized_bbox": [
+            588,
+            189,
+            747,
+            249
+          ],
+          "font_size": 64,
+          "stroke": 2,
+          "slant": 0.12
+        },
+        {
+          "key": "rank",
+          "bbox": [
+            788,
+            180,
+            964,
+            249
+          ],
+          "localized_bbox": [
+            802,
+            183,
+            949,
+            246
+          ],
+          "font_size": 66,
+          "stroke": 2,
+          "slant": 0.12
+        },
+        {
+          "key": "you",
+          "bbox": [
+            1759,
+            193,
+            1897,
+            260
+          ],
+          "localized_bbox": [
+            1806,
+            196,
+            1850,
+            257
+          ],
+          "font_size": 65,
+          "stroke": 2,
+          "slant": 0.12
+        },
+        {
+          "key": "diff",
+          "bbox": [
+            1853,
+            312,
+            1975,
+            381
+          ],
+          "localized_bbox": [
+            1871,
+            315,
+            1956,
+            378
+          ],
+          "font_size": 67,
+          "stroke": 2,
+          "slant": 0.12
+        },
+        {
+          "key": "sector3",
+          "bbox": [
+            1832,
+            1180,
+            2013,
+            1240
+          ],
+          "localized_bbox": [
+            1860,
+            1183,
+            1984,
+            1237
+          ],
+          "font_size": 54,
+          "stroke": 2,
+          "slant": 0.12
+        },
+        {
+          "key": "rival",
+          "bbox": [
+            498,
+            1412,
+            705,
+            1486
+          ],
+          "localized_bbox": [
+            532,
+            1415,
+            670,
+            1483
+          ],
+          "font_size": 73,
+          "stroke": 2,
+          "slant": 0.12
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 14,
+      "queue_index": 51,
+      "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+      "before_sha256": "9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08",
+      "after_sha256": "4fff8c59a44a1b7d03cee192124915f87eb73b3988c7673feb3228785ce67726",
+      "fixes": [
+        "bottom_outline_clipping",
+        "two_line_effect_margin",
+        "readability"
+      ],
+      "details": [
+        {
+          "text": "여자친구를",
+          "bbox": [
+            3002,
+            482,
+            3512,
+            562
+          ],
+          "localized_bbox": [
+            3156,
+            491,
+            3357,
+            553
+          ],
+          "font_size": 66,
+          "stroke": 2
+        },
+        {
+          "text": "놓치지 마세요!",
+          "bbox": [
+            3002,
+            562,
+            3512,
+            643
+          ],
+          "localized_bbox": [
+            3113,
+            571,
+            3401,
+            634
+          ],
+          "font_size": 66,
+          "stroke": 2
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 18,
+      "queue_index": 57,
+      "asset": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+      "before_sha256": "dbd97d30d1e14df102d5c90c5ef5e339a93a934c4b10b71e2b30fbf76db2b8f8",
+      "after_sha256": "7b8afadca8d1a5adf3490b157c3f328255c7e308f25d29a3d4ead28d5629f116",
+      "fixes": [
+        "right_lean",
+        "total_rank_plate_restoration",
+        "text_box_intrusion",
+        "target_vehicle_guard",
+        "alberto_bottom_guard",
+        "effect_weight_reduced"
+      ],
+      "details": [
+        {
+          "key": "hearts",
+          "bbox": [
+            1715,
+            5,
+            2048,
+            102
+          ],
+          "localized_bbox": [
+            1823,
+            10,
+            1940,
+            96
+          ],
+          "font_size": 93,
+          "stroke": 2,
+          "slant": 0.11
+        },
+        {
+          "key": "technical_bonus",
+          "bbox": [
+            2393,
+            77,
+            3610,
+            259
+          ],
+          "localized_bbox": [
+            2596,
+            86,
+            3406,
+            249
+          ],
+          "font_size": 176,
+          "stroke": 4,
+          "slant": 0.11
+        },
+        {
+          "key": "mission_cleared",
+          "bbox": [
+            128,
+            256,
+            1587,
+            787
+          ],
+          "localized_bbox": [
+            134,
+            305,
+            1581,
+            737
+          ],
+          "font_size": 459,
+          "stroke": 8,
+          "slant": 0.11
+        },
+        {
+          "key": "total_rank_green",
+          "bbox": [
+            512,
+            896,
+            1101,
+            1075
+          ],
+          "localized_bbox": [
+            565,
+            905,
+            1047,
+            1065
+          ],
+          "font_size": 172,
+          "stroke": 4,
+          "slant": 0.11
+        },
+        {
+          "key": "storing",
+          "bbox": [
+            1652,
+            858,
+            2975,
+            998
+          ],
+          "localized_bbox": [
+            1853,
+            864,
+            2774,
+            987
+          ],
+          "font_size": 133,
+          "stroke": 3,
+          "slant": 0.11
+        },
+        {
+          "key": "special_request",
+          "bbox": [
+            1644,
+            1114,
+            2624,
+            1267
+          ],
+          "localized_bbox": [
+            1881,
+            1121,
+            2386,
+            1260
+          ],
+          "font_size": 148,
+          "stroke": 4,
+          "slant": 0.11
+        },
+        {
+          "key": "target",
+          "bbox": [
+            2625,
+            555,
+            2825,
+            640
+          ],
+          "localized_bbox": [
+            2678,
+            563,
+            2771,
+            632
+          ],
+          "font_size": 74,
+          "stroke": 2,
+          "slant": 0.11
+        },
+        {
+          "key": "start",
+          "bbox": [
+            2487,
+            1016,
+            2662,
+            1085
+          ],
+          "localized_bbox": [
+            2535,
+            1021,
+            2614,
+            1080
+          ],
+          "font_size": 62,
+          "stroke": 2,
+          "slant": 0.11
+        },
+        {
+          "key": "goal",
+          "bbox": [
+            2975,
+            1016,
+            3131,
+            1085
+          ],
+          "localized_bbox": [
+            3032,
+            1021,
+            3074,
+            1080
+          ],
+          "font_size": 62,
+          "stroke": 2,
+          "slant": 0.11
+        },
+        {
+          "key": "hit_ghost",
+          "bbox": [
+            3163,
+            1017,
+            3633,
+            1106
+          ],
+          "localized_bbox": [
+            3170,
+            1022,
+            3626,
+            1100
+          ],
+          "font_size": 82,
+          "stroke": 2,
+          "slant": 0.11
+        },
+        {
+          "key": "exit",
+          "bbox": [
+            3083,
+            1143,
+            3494,
+            1281
+          ],
+          "localized_bbox": [
+            3205,
+            1150,
+            3372,
+            1273
+          ],
+          "font_size": 133,
+          "stroke": 3,
+          "slant": 0.11
+        },
+        {
+          "key": "collect_stars",
+          "bbox": [
+            3469,
+            1172,
+            3998,
+            1267
+          ],
+          "localized_bbox": [
+            3539,
+            1177,
+            3928,
+            1261
+          ],
+          "font_size": 89,
+          "stroke": 2,
+          "slant": 0.11
+        },
+        {
+          "key": "mission_failed",
+          "bbox": [
+            1984,
+            1280,
+            3187,
+            1792
+          ],
+          "localized_bbox": [
+            1989,
+            1357,
+            3181,
+            1714
+          ],
+          "font_size": 377,
+          "stroke": 8,
+          "slant": 0.11
+        },
+        {
+          "key": "total_rank_brown",
+          "bbox": [
+            717,
+            1915,
+            1318,
+            2099
+          ],
+          "localized_bbox": [
+            768,
+            1924,
+            1266,
+            2089
+          ],
+          "font_size": 178,
+          "stroke": 4,
+          "slant": 0.11
+        },
+        {
+          "key": "total_rank_pink",
+          "bbox": [
+            2598,
+            1900,
+            3238,
+            2099
+          ],
+          "localized_bbox": [
+            2647,
+            1909,
+            3189,
+            2089
+          ],
+          "font_size": 193,
+          "stroke": 5,
+          "slant": 0.11
+        },
+        {
+          "key": "special_request_alt",
+          "bbox": [
+            2280,
+            361,
+            3269,
+            514
+          ],
+          "localized_bbox": [
+            2522,
+            368,
+            3027,
+            507
+          ],
+          "font_size": 148,
+          "stroke": 4,
+          "slant": 0.11
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 19,
+      "queue_index": 59,
+      "asset": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+      "before_sha256": "b75102588dc30ec828fdec765658d2e25cbcee9d972832bb70b527b372008542",
+      "after_sha256": "8cd6ff315cb66121d1656e634f8bc8cd897d5fca9084aa8cde6fc23679c09c91",
+      "fixes": [
+        "next_mission_internal_shading_reduced",
+        "readability",
+        "thin_outline"
+      ],
+      "details": [
+        {
+          "region_idx": 0,
+          "bbox": [
+            8,
+            353,
+            1293,
+            500
+          ],
+          "localized_bbox": [
+            454,
+            361,
+            847,
+            492
+          ],
+          "font_size": 140,
+          "stroke": 4,
+          "slant": 0.1,
+          "effect": "solid_fill_thin_outline_no_internal_gradient"
+        },
+        {
+          "region_idx": 1,
+          "bbox": [
+            75,
+            222,
+            625,
+            304
+          ],
+          "localized_bbox": [
+            166,
+            227,
+            533,
+            298
+          ],
+          "font_size": 74,
+          "stroke": 2,
+          "slant": 0.08,
+          "effect": "solid_fill_thin_outline_no_internal_gradient"
+        },
+        {
+          "region_idx": 2,
+          "bbox": [
+            119,
+            53,
+            609,
+            137
+          ],
+          "localized_bbox": [
+            145,
+            59,
+            582,
+            130
+          ],
+          "font_size": 74,
+          "stroke": 2,
+          "slant": 0.08,
+          "effect": "solid_fill_thin_outline_no_internal_gradient"
+        },
+        {
+          "region_idx": 8,
+          "bbox": [
+            717,
+            225,
+            1408,
+            320
+          ],
+          "localized_bbox": [
+            822,
+            237,
+            1303,
+            308
+          ],
+          "font_size": 74,
+          "stroke": 2,
+          "slant": 0.08,
+          "effect": "solid_fill_thin_outline_no_internal_gradient"
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 20,
+      "queue_index": 61,
+      "asset": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+      "before_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+      "after_sha256": "bd9861961f8ff6183d1d0a52e1791df895cb8c8eff847d42a204c7c0321a9eab",
+      "fixes": [
+        "source_text_residue",
+        "plate_cleanliness",
+        "right_lean",
+        "effect_weight_reduced"
+      ],
+      "details": [
+        {
+          "key": "go_gate",
+          "bbox": [
+            2066,
+            998,
+            2548,
+            1106
+          ],
+          "localized_bbox": [
+            2072,
+            1016,
+            2542,
+            1088
+          ],
+          "font_size": 76,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "cut_line",
+          "bbox": [
+            2595,
+            998,
+            3029,
+            1106
+          ],
+          "localized_bbox": [
+            2601,
+            1011,
+            3023,
+            1092
+          ],
+          "font_size": 85,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "keep_passing",
+          "bbox": [
+            3067,
+            1022,
+            3568,
+            1106
+          ],
+          "localized_bbox": [
+            3072,
+            1031,
+            3563,
+            1097
+          ],
+          "font_size": 69,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "double_speed",
+          "bbox": [
+            3607,
+            1025,
+            4032,
+            1106
+          ],
+          "localized_bbox": [
+            3656,
+            1030,
+            3982,
+            1101
+          ],
+          "font_size": 73,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "hit_blue_cone",
+          "bbox": [
+            1038,
+            1486,
+            1511,
+            1568
+          ],
+          "localized_bbox": [
+            1049,
+            1491,
+            1500,
+            1563
+          ],
+          "font_size": 76,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "dont_crash",
+          "bbox": [
+            1566,
+            1487,
+            1990,
+            1567
+          ],
+          "localized_bbox": [
+            1596,
+            1492,
+            1959,
+            1562
+          ],
+          "font_size": 73,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "collect_coins",
+          "bbox": [
+            2053,
+            1486,
+            2517,
+            1568
+          ],
+          "localized_bbox": [
+            2095,
+            1491,
+            2474,
+            1563
+          ],
+          "font_size": 76,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "run_red",
+          "bbox": [
+            1030,
+            1603,
+            1554,
+            1696
+          ],
+          "localized_bbox": [
+            1036,
+            1610,
+            1547,
+            1689
+          ],
+          "font_size": 83,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "run_blue",
+          "bbox": [
+            1554,
+            1603,
+            2053,
+            1696
+          ],
+          "localized_bbox": [
+            1560,
+            1611,
+            2047,
+            1687
+          ],
+          "font_size": 79,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "pass_convoy",
+          "bbox": [
+            2053,
+            1603,
+            2573,
+            1695
+          ],
+          "localized_bbox": [
+            2060,
+            1614,
+            2566,
+            1683
+          ],
+          "font_size": 71,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "catch_heart",
+          "bbox": [
+            2555,
+            1606,
+            3067,
+            1688
+          ],
+          "localized_bbox": [
+            2621,
+            1611,
+            3000,
+            1683
+          ],
+          "font_size": 76,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "beat_car_1",
+          "bbox": [
+            3054,
+            1607,
+            3526,
+            1687
+          ],
+          "localized_bbox": [
+            3095,
+            1612,
+            3484,
+            1682
+          ],
+          "font_size": 73,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "red",
+          "bbox": [
+            3110,
+            1446,
+            3443,
+            1584
+          ],
+          "localized_bbox": [
+            3192,
+            1452,
+            3361,
+            1578
+          ],
+          "font_size": 136,
+          "stroke": 3,
+          "slant": 0.1
+        },
+        {
+          "key": "blue",
+          "bbox": [
+            3571,
+            1446,
+            3904,
+            1582
+          ],
+          "localized_bbox": [
+            3654,
+            1452,
+            3820,
+            1576
+          ],
+          "font_size": 134,
+          "stroke": 3,
+          "slant": 0.1
+        },
+        {
+          "key": "drift",
+          "bbox": [
+            3707,
+            1607,
+            3881,
+            1688
+          ],
+          "localized_bbox": [
+            3712,
+            1620,
+            3876,
+            1674
+          ],
+          "font_size": 58,
+          "stroke": 1,
+          "slant": 0.1
+        },
+        {
+          "key": "stage_bonus",
+          "bbox": [
+            3814,
+            1798,
+            4076,
+            1894
+          ],
+          "localized_bbox": [
+            3820,
+            1824,
+            4070,
+            1868
+          ],
+          "font_size": 47,
+          "stroke": 1,
+          "slant": 0.1
+        },
+        {
+          "key": "get",
+          "bbox": [
+            3594,
+            1894,
+            3930,
+            2034
+          ],
+          "localized_bbox": [
+            3624,
+            1901,
+            3899,
+            2027
+          ],
+          "font_size": 133,
+          "stroke": 3,
+          "slant": 0.1
+        },
+        {
+          "key": "beat_car_2",
+          "bbox": [
+            3518,
+            2060,
+            3990,
+            2140
+          ],
+          "localized_bbox": [
+            3559,
+            2065,
+            3948,
+            2135
+          ],
+          "font_size": 73,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "next_stage",
+          "bbox": [
+            2557,
+            2179,
+            3015,
+            2272
+          ],
+          "localized_bbox": [
+            2606,
+            2184,
+            2965,
+            2267
+          ],
+          "font_size": 90,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "drift_and",
+          "bbox": [
+            3052,
+            2185,
+            3400,
+            2266
+          ],
+          "localized_bbox": [
+            3087,
+            2190,
+            3365,
+            2261
+          ],
+          "font_size": 76,
+          "stroke": 2,
+          "slant": 0.1
+        },
+        {
+          "key": "position",
+          "bbox": [
+            1394,
+            2720,
+            1726,
+            2829
+          ],
+          "localized_bbox": [
+            1493,
+            2725,
+            1626,
+            2824
+          ],
+          "font_size": 106,
+          "stroke": 3,
+          "slant": 0.1
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 21,
+      "queue_index": 65,
+      "asset": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+      "before_sha256": "005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2",
+      "after_sha256": "074cf03b504cb715e6b1328ecb33cec46a7b12fe6df74f8261eccfc77242cacc",
+      "fixes": [
+        "untranslated_course",
+        "untranslated_left",
+        "untranslated_right",
+        "untranslated_easy",
+        "untranslated_hard"
+      ],
+      "details": [
+        {
+          "key": "loading_left",
+          "source": "Loading",
+          "korean": "로딩",
+          "bbox": [
+            256,
+            441,
+            672,
+            543
+          ],
+          "localized_bbox": [
+            407,
+            447,
+            520,
+            537
+          ],
+          "font_size": 98,
+          "stroke": 2
+        },
+        {
+          "key": "loading_right",
+          "source": "Loading",
+          "korean": "로딩",
+          "bbox": [
+            1176,
+            441,
+            1592,
+            543
+          ],
+          "localized_bbox": [
+            1327,
+            447,
+            1440,
+            537
+          ],
+          "font_size": 98,
+          "stroke": 2
+        },
+        {
+          "key": "course",
+          "source": "Diverge",
+          "korean": "코스",
+          "bbox": [
+            458,
+            1256,
+            745,
+            1340
+          ],
+          "localized_bbox": [
+            554,
+            1261,
+            649,
+            1335
+          ],
+          "font_size": 79,
+          "stroke": 2
+        },
+        {
+          "key": "left",
+          "source": "Left",
+          "korean": "왼쪽",
+          "bbox": [
+            270,
+            1340,
+            520,
+            1470
+          ],
+          "localized_bbox": [
+            321,
+            1348,
+            468,
+            1462
+          ],
+          "font_size": 123,
+          "stroke": 3
+        },
+        {
+          "key": "right",
+          "source": "Right",
+          "korean": "오른쪽",
+          "bbox": [
+            685,
+            1405,
+            874,
+            1470
+          ],
+          "localized_bbox": [
+            726,
+            1410,
+            832,
+            1464
+          ],
+          "font_size": 59,
+          "stroke": 1
+        },
+        {
+          "key": "easy",
+          "source": "EASY",
+          "korean": "쉬움",
+          "bbox": [
+            102,
+            1470,
+            430,
+            1620
+          ],
+          "localized_bbox": [
+            181,
+            1479,
+            350,
+            1611
+          ],
+          "font_size": 141,
+          "stroke": 4
+        },
+        {
+          "key": "hard",
+          "source": "HARD",
+          "korean": "어려움",
+          "bbox": [
+            720,
+            1470,
+            1058,
+            1618
+          ],
+          "localized_bbox": [
+            764,
+            1479,
+            1013,
+            1608
+          ],
+          "font_size": 139,
+          "stroke": 3
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    },
+    {
+      "number": 22,
+      "queue_index": 86,
+      "asset": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+      "before_sha256": "e3c3f78975b3dd582690a7f169c1aa364dd05e3846827340aae38631885b92bf",
+      "after_sha256": "ddc24a0fab998eef0088b0b3d3b85768af7fd48b765e769e6c4ec338133579ba",
+      "fixes": [
+        "text_clipping",
+        "wrong_slant_direction",
+        "style_overdone",
+        "readability_degraded"
+      ],
+      "details": [
+        {
+          "region_idx": 30,
+          "source": "OutRun MODE",
+          "korean": "아웃런 모드",
+          "kind": "mode",
+          "bbox": [
+            1872,
+            1312,
+            2288,
+            1412
+          ],
+          "localized_bbox": [
+            1922,
+            1319,
+            2237,
+            1405
+          ],
+          "font_size": 93,
+          "stroke": 2,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 40,
+          "source": "Top Runners of Each Goal",
+          "korean": "각 골별 최고 기록",
+          "kind": "header",
+          "bbox": [
+            16,
+            1124,
+            1272,
+            1236
+          ],
+          "localized_bbox": [
+            370,
+            1132,
+            918,
+            1228
+          ],
+          "font_size": 104,
+          "stroke": 2,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 43,
+          "source": "Heart Attack MODE",
+          "korean": "하트 어택 모드",
+          "kind": "mode",
+          "bbox": [
+            2613,
+            1158,
+            3574,
+            1241
+          ],
+          "localized_bbox": [
+            2925,
+            1164,
+            3261,
+            1235
+          ],
+          "font_size": 78,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 44,
+          "source": "OutRun MODE",
+          "korean": "아웃런 모드",
+          "kind": "mode",
+          "bbox": [
+            362,
+            993,
+            1078,
+            1088
+          ],
+          "localized_bbox": [
+            569,
+            999,
+            870,
+            1081
+          ],
+          "font_size": 89,
+          "stroke": 2,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 45,
+          "source": "Time Attack MODE",
+          "korean": "타임 어택 모드",
+          "kind": "mode",
+          "bbox": [
+            1405,
+            993,
+            2317,
+            1088
+          ],
+          "localized_bbox": [
+            1668,
+            999,
+            2053,
+            1081
+          ],
+          "font_size": 89,
+          "stroke": 2,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 46,
+          "source": "15 Continuous Course",
+          "korean": "15코스 연속",
+          "kind": "mode",
+          "bbox": [
+            2480,
+            992,
+            3557,
+            1088
+          ],
+          "localized_bbox": [
+            2841,
+            998,
+            3196,
+            1081
+          ],
+          "font_size": 87,
+          "stroke": 2,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 47,
+          "source": "Ranking",
+          "korean": "랭킹",
+          "kind": "mode",
+          "bbox": [
+            3601,
+            992,
+            4022,
+            1091
+          ],
+          "localized_bbox": [
+            3755,
+            999,
+            3868,
+            1084
+          ],
+          "font_size": 92,
+          "stroke": 2,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 48,
+          "source": "NORMAL",
+          "korean": "일반",
+          "kind": "badge",
+          "bbox": [
+            3759,
+            1164,
+            4022,
+            1242
+          ],
+          "localized_bbox": [
+            3847,
+            1169,
+            3934,
+            1236
+          ],
+          "font_size": 74,
+          "stroke": 1,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 49,
+          "source": "TUNED",
+          "korean": "튜닝",
+          "kind": "badge",
+          "bbox": [
+            3624,
+            2688,
+            3891,
+            2795
+          ],
+          "localized_bbox": [
+            3698,
+            2695,
+            3817,
+            2787
+          ],
+          "font_size": 100,
+          "stroke": 2,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 64,
+          "source": "NORMAL",
+          "korean": "일반",
+          "kind": "small",
+          "bbox": [
+            663,
+            898,
+            924,
+            960
+          ],
+          "localized_bbox": [
+            758,
+            902,
+            828,
+            955
+          ],
+          "font_size": 58,
+          "stroke": 1,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 65,
+          "source": "TUNED",
+          "korean": "튜닝",
+          "kind": "small",
+          "bbox": [
+            1263,
+            899,
+            1469,
+            949
+          ],
+          "localized_bbox": [
+            1338,
+            902,
+            1394,
+            945
+          ],
+          "font_size": 47,
+          "stroke": 1,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 16,
+          "source": "GOAL E",
+          "korean": "골 E",
+          "kind": "goal",
+          "bbox": [
+            1456,
+            1696,
+            1790,
+            1836
+          ],
+          "localized_bbox": [
+            1522,
+            1706,
+            1724,
+            1826
+          ],
+          "font_size": 128,
+          "stroke": 2,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 17,
+          "source": "GOAL D",
+          "korean": "골 D",
+          "kind": "goal",
+          "bbox": [
+            2056,
+            1694,
+            2397,
+            1834
+          ],
+          "localized_bbox": [
+            2115,
+            1704,
+            2338,
+            1824
+          ],
+          "font_size": 128,
+          "stroke": 2,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 18,
+          "source": "GOAL C",
+          "korean": "골 C",
+          "kind": "goal",
+          "bbox": [
+            2656,
+            1696,
+            2997,
+            1836
+          ],
+          "localized_bbox": [
+            2723,
+            1706,
+            2930,
+            1826
+          ],
+          "font_size": 126,
+          "stroke": 2,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 19,
+          "source": "GOAL B",
+          "korean": "골 B",
+          "kind": "goal",
+          "bbox": [
+            3256,
+            1694,
+            3599,
+            1834
+          ],
+          "localized_bbox": [
+            3322,
+            1704,
+            3533,
+            1824
+          ],
+          "font_size": 128,
+          "stroke": 2,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 20,
+          "source": "GOAL A",
+          "korean": "골 A",
+          "kind": "goal",
+          "bbox": [
+            3312,
+            2144,
+            3664,
+            2284
+          ],
+          "localized_bbox": [
+            3378,
+            2154,
+            3597,
+            2274
+          ],
+          "font_size": 128,
+          "stroke": 2,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 21,
+          "source": "GOAL E",
+          "korean": "골 E",
+          "kind": "goal",
+          "bbox": [
+            216,
+            1493,
+            550,
+            1633
+          ],
+          "localized_bbox": [
+            282,
+            1503,
+            484,
+            1623
+          ],
+          "font_size": 128,
+          "stroke": 2,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 22,
+          "source": "GOAL D",
+          "korean": "골 D",
+          "kind": "goal",
+          "bbox": [
+            816,
+            1495,
+            1159,
+            1635
+          ],
+          "localized_bbox": [
+            876,
+            1505,
+            1099,
+            1625
+          ],
+          "font_size": 128,
+          "stroke": 2,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 23,
+          "source": "GOAL C",
+          "korean": "골 C",
+          "kind": "goal",
+          "bbox": [
+            1416,
+            1495,
+            1757,
+            1635
+          ],
+          "localized_bbox": [
+            1483,
+            1505,
+            1690,
+            1625
+          ],
+          "font_size": 126,
+          "stroke": 2,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 24,
+          "source": "GOAL B",
+          "korean": "골 B",
+          "kind": "goal",
+          "bbox": [
+            2016,
+            1493,
+            2359,
+            1633
+          ],
+          "localized_bbox": [
+            2082,
+            1503,
+            2293,
+            1623
+          ],
+          "font_size": 128,
+          "stroke": 2,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 25,
+          "source": "GOAL A",
+          "korean": "골 A",
+          "kind": "goal",
+          "bbox": [
+            2616,
+            1495,
+            2968,
+            1635
+          ],
+          "localized_bbox": [
+            2682,
+            1505,
+            2901,
+            1625
+          ],
+          "font_size": 128,
+          "stroke": 2,
+          "slant": 0.045
+        },
+        {
+          "region_idx": 14,
+          "source": "OutRun2 15 Continuous Course descriptor",
+          "korean": "15코스 연속",
+          "kind": "product_descriptor",
+          "bbox": [
+            3122,
+            1896,
+            3958,
+            2032
+          ],
+          "localized_bbox": [
+            3285,
+            1905,
+            3795,
+            2022
+          ],
+          "font_size": 125,
+          "stroke": 2,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 15,
+          "source": "OutRun2SP 15 Continuous Course descriptor",
+          "korean": "15코스 연속",
+          "kind": "product_descriptor",
+          "bbox": [
+            439,
+            1696,
+            1232,
+            1832
+          ],
+          "localized_bbox": [
+            580,
+            1705,
+            1090,
+            1822
+          ],
+          "font_size": 125,
+          "stroke": 2,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 26,
+          "source": "Time Attack MODE",
+          "korean": "타임 어택 모드",
+          "kind": "time_mode_line",
+          "bbox": [
+            3072,
+            1488,
+            3520,
+            1584
+          ],
+          "localized_bbox": [
+            3101,
+            1494,
+            3491,
+            1577
+          ],
+          "font_size": 90,
+          "stroke": 2,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 26,
+          "source": "TUNED",
+          "korean": "튜닝",
+          "kind": "time_variant_line",
+          "bbox": [
+            3080,
+            1584,
+            3460,
+            1640
+          ],
+          "localized_bbox": [
+            3238,
+            1588,
+            3302,
+            1636
+          ],
+          "font_size": 52,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 27,
+          "source": "Time Attack MODE",
+          "korean": "타임 어택 모드",
+          "kind": "time_mode_line",
+          "bbox": [
+            72,
+            1288,
+            520,
+            1384
+          ],
+          "localized_bbox": [
+            101,
+            1294,
+            491,
+            1377
+          ],
+          "font_size": 90,
+          "stroke": 2,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 27,
+          "source": "TUNED",
+          "korean": "튜닝",
+          "kind": "time_variant_line",
+          "bbox": [
+            80,
+            1384,
+            464,
+            1440
+          ],
+          "localized_bbox": [
+            240,
+            1388,
+            304,
+            1436
+          ],
+          "font_size": 52,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 28,
+          "source": "Time Attack MODE",
+          "korean": "타임 어택 모드",
+          "kind": "time_mode_line",
+          "bbox": [
+            672,
+            1288,
+            1120,
+            1384
+          ],
+          "localized_bbox": [
+            701,
+            1294,
+            1091,
+            1377
+          ],
+          "font_size": 90,
+          "stroke": 2,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 28,
+          "source": "NORMAL",
+          "korean": "일반",
+          "kind": "time_variant_line",
+          "bbox": [
+            672,
+            1384,
+            1060,
+            1440
+          ],
+          "localized_bbox": [
+            834,
+            1388,
+            898,
+            1436
+          ],
+          "font_size": 52,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 29,
+          "source": "Time Attack MODE",
+          "korean": "타임 어택 모드",
+          "kind": "time_mode_line",
+          "bbox": [
+            1272,
+            1288,
+            1720,
+            1392
+          ],
+          "localized_bbox": [
+            1288,
+            1295,
+            1703,
+            1384
+          ],
+          "font_size": 96,
+          "stroke": 2,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 29,
+          "source": "NORMAL",
+          "korean": "일반",
+          "kind": "time_variant_line",
+          "bbox": [
+            1272,
+            1392,
+            1664,
+            1440
+          ],
+          "localized_bbox": [
+            1440,
+            1395,
+            1495,
+            1436
+          ],
+          "font_size": 44,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 79,
+          "source": "Cape Way",
+          "korean": "케이프 웨이",
+          "kind": "stage",
+          "bbox": [
+            1603,
+            704,
+            1805,
+            753
+          ],
+          "localized_bbox": [
+            1627,
+            707,
+            1780,
+            749
+          ],
+          "font_size": 45,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 80,
+          "source": "Imperial Avenue",
+          "korean": "임페리얼 애비뉴",
+          "kind": "stage",
+          "bbox": [
+            1897,
+            705,
+            2228,
+            753
+          ],
+          "localized_bbox": [
+            1961,
+            708,
+            2164,
+            749
+          ],
+          "font_size": 44,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 81,
+          "source": "Ancient Ruins",
+          "korean": "에인션트 루인스",
+          "kind": "stage",
+          "bbox": [
+            2277,
+            705,
+            2569,
+            746
+          ],
+          "localized_bbox": [
+            2337,
+            708,
+            2508,
+            743
+          ],
+          "font_size": 37,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 82,
+          "source": "Metropolis",
+          "korean": "메트로폴리스",
+          "kind": "stage",
+          "bbox": [
+            2672,
+            705,
+            2894,
+            753
+          ],
+          "localized_bbox": [
+            2702,
+            708,
+            2863,
+            749
+          ],
+          "font_size": 44,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 83,
+          "source": "Tulip Garden",
+          "korean": "튤립 가든",
+          "kind": "stage",
+          "bbox": [
+            3016,
+            704,
+            3277,
+            753
+          ],
+          "localized_bbox": [
+            3083,
+            707,
+            3209,
+            749
+          ],
+          "font_size": 45,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 84,
+          "source": "Skyscrapers",
+          "korean": "스카이스크레이퍼스",
+          "kind": "stage",
+          "bbox": [
+            3377,
+            704,
+            3629,
+            753
+          ],
+          "localized_bbox": [
+            3380,
+            707,
+            3625,
+            749
+          ],
+          "font_size": 45,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 85,
+          "source": "Milky Way",
+          "korean": "밀키 웨이",
+          "kind": "stage",
+          "bbox": [
+            3757,
+            705,
+            3968,
+            753
+          ],
+          "localized_bbox": [
+            3800,
+            708,
+            3924,
+            749
+          ],
+          "font_size": 44,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 86,
+          "source": "Floral Village",
+          "korean": "플로럴 빌리지",
+          "kind": "stage",
+          "bbox": [
+            3632,
+            792,
+            3907,
+            840
+          ],
+          "localized_bbox": [
+            3681,
+            795,
+            3857,
+            836
+          ],
+          "font_size": 44,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 87,
+          "source": "Legend",
+          "korean": "레전드",
+          "kind": "stage",
+          "bbox": [
+            3745,
+            911,
+            3901,
+            960
+          ],
+          "localized_bbox": [
+            3781,
+            914,
+            3864,
+            956
+          ],
+          "font_size": 45,
+          "stroke": 1,
+          "slant": 0.08
+        },
+        {
+          "region_idx": 88,
+          "source": "Giant Statues",
+          "korean": "자이언트 스태추스",
+          "kind": "stage",
+          "bbox": [
+            31,
+            615,
+            311,
+            657
+          ],
+          "localized_bbox": [
+            69,
+            618,
+            272,
+            654
+          ],
+          "font_size": 39,
+          "stroke": 1,
+          "slant": 0.08
+        }
+      ],
+      "status": "A_REWORK_SELF_QA_PASS_PENDING_C"
+    }
+  ],
+  "hard_visual_gates": [
+    "plate_restoration_no_haze_or_source_residue",
+    "readable_slant_direction_matches_source",
+    "text_scale_and_hierarchy_not_visibly_undersized",
+    "weight_outline_shadow_shading_remain_readable",
+    "no_fill_outline_shadow_or_italic_end_clipping",
+    "no_vehicle_name_icon_plate_or_neighbor_intrusion",
+    "no_untranslated_visible_localizable_labels"
+  ],
+  "runtime_validation": "UNTESTED",
+  "status": "A_USER_JPG_REWORK_MATERIAL_OUTPUT_PENDING_INDEPENDENT_C"
+}
