@@ -9116,14 +9116,13 @@ compose_programmable_shader_semantic_translation_readiness(
     std::uint64_t inputLayoutSnapshotToken,
     std::uint64_t translatedVertexSemanticHash,
     std::uint64_t translatedPixelSemanticHash,
-    std::uint64_t interfaceLinkHash,
+    const ProgrammableShaderInterfaceLinkageEvidence& sourceInterfaceLinkage,
     std::uint64_t translatorRevisionHash,
     std::uint64_t semanticContractHash,
     bool vertexSemanticExact,
     bool pixelSemanticExact,
     bool constantRegisterMappingExact,
-    bool samplerMappingExact,
-    bool interfaceLinkExact) noexcept {
+    bool samplerMappingExact) noexcept {
     NativeProgrammableShaderSemanticTranslationReadiness out{};
 
     out.cacheKey = sourceIdentity.cacheKey;
@@ -9133,7 +9132,7 @@ compose_programmable_shader_semantic_translation_readiness(
     out.pixelBytecodeHash = sourceIdentity.pixelShader.bytecodeHash;
     out.translatedVertexSemanticHash = translatedVertexSemanticHash;
     out.translatedPixelSemanticHash = translatedPixelSemanticHash;
-    out.interfaceLinkHash = interfaceLinkHash;
+    out.interfaceLinkHash = sourceInterfaceLinkage.interfaceLinkHash;
     out.translatorRevisionHash = translatorRevisionHash;
     out.semanticContractHash = semanticContractHash;
     out.constantRegisterMappingExact = constantRegisterMappingExact;
@@ -9146,7 +9145,7 @@ compose_programmable_shader_semantic_translation_readiness(
         inputLayoutSnapshotToken != 0 &&
         translatedVertexSemanticHash != 0 &&
         translatedPixelSemanticHash != 0 &&
-        interfaceLinkHash != 0 &&
+        sourceInterfaceLinkage.exact() &&
         translatorRevisionHash != 0 &&
         semanticContractHash != 0;
     out.sourceIdentityExact =
@@ -9195,9 +9194,19 @@ compose_programmable_shader_semantic_translation_readiness(
         sourceIdentity.pixelShader.versionToken != 0 &&
         sourceIdentity.pixelShader.bytecodeHash != 0 &&
         translatedPixelSemanticHash != 0;
+    out.interfaceSourceIdentityMatches =
+        sourceInterfaceLinkage.exact() &&
+        sourceInterfaceLinkage.vertexVersionToken ==
+            sourceIdentity.vertexShader.versionToken &&
+        sourceInterfaceLinkage.pixelVersionToken ==
+            sourceIdentity.pixelShader.versionToken &&
+        sourceInterfaceLinkage.vertexSourceBytecodeHash ==
+            sourceIdentity.vertexShader.bytecodeHash &&
+        sourceInterfaceLinkage.pixelSourceBytecodeHash ==
+            sourceIdentity.pixelShader.bytecodeHash;
     out.interfaceLinkExact =
-        interfaceLinkExact &&
-        interfaceLinkHash != 0 &&
+        out.interfaceSourceIdentityMatches &&
+        sourceInterfaceLinkage.interfaceLinkHash != 0 &&
         inputLayout.inputLayoutIdentity != 0;
 
     out.semanticProofPresent =
@@ -9256,14 +9265,13 @@ bool validate_programmable_shader_semantic_translation_readiness_snapshot(
     std::uint64_t inputLayoutSnapshotToken,
     std::uint64_t translatedVertexSemanticHash,
     std::uint64_t translatedPixelSemanticHash,
-    std::uint64_t interfaceLinkHash,
+    const ProgrammableShaderInterfaceLinkageEvidence& sourceInterfaceLinkage,
     std::uint64_t translatorRevisionHash,
     std::uint64_t semanticContractHash,
     bool vertexSemanticExact,
     bool pixelSemanticExact,
     bool constantRegisterMappingExact,
     bool samplerMappingExact,
-    bool interfaceLinkExact,
     std::uint64_t reviewSnapshotToken) noexcept {
     if (reviewSnapshotToken == 0)
         return false;
@@ -9274,14 +9282,13 @@ bool validate_programmable_shader_semantic_translation_readiness_snapshot(
             inputLayout, inputLayoutSnapshotToken,
             translatedVertexSemanticHash,
             translatedPixelSemanticHash,
-            interfaceLinkHash,
+            sourceInterfaceLinkage,
             translatorRevisionHash,
             semanticContractHash,
             vertexSemanticExact,
             pixelSemanticExact,
             constantRegisterMappingExact,
-            samplerMappingExact,
-            interfaceLinkExact);
+            samplerMappingExact);
     return current.reviewReady &&
         current.reviewSnapshotToken == reviewSnapshotToken &&
         current.semanticProofPresent &&

@@ -10523,6 +10523,44 @@ def main() -> None:
                 missing_r268_programmable_shader_stage_linkage)
         )
 
+    r269_programmable_linkage_provenance_handoff_contract = [
+        ("std::uint64_t sourceBytecodeHash = 0;",
+         PIPELINE_TRANSLATION_HPP, "R269 R267 source bytecode provenance"),
+        ("std::uint64_t vertexSourceBytecodeHash = 0;",
+         PIPELINE_TRANSLATION_HPP, "R269 R268 vertex source identity"),
+        ("std::uint64_t pixelSourceBytecodeHash = 0;",
+         PIPELINE_TRANSLATION_HPP, "R269 R268 pixel source identity"),
+        ("out.vertexSourceBytecodeHash = vertexSemantics.sourceBytecodeHash;",
+         PIPELINE_TRANSLATION_CPP, "R269 linkage carries VS source identity"),
+        ("out.pixelSourceBytecodeHash = pixelSemantics.sourceBytecodeHash;",
+         PIPELINE_TRANSLATION_CPP, "R269 linkage carries PS source identity"),
+        ("const ProgrammableShaderInterfaceLinkageEvidence& sourceInterfaceLinkage",
+         NATIVE_BACKEND_HPP, "R269 R263 consumes exact R268 receipt"),
+        ("sourceInterfaceLinkage.vertexSourceBytecodeHash ==",
+         NATIVE_BACKEND_CPP, "R269 R263 matches VS source identity"),
+        ("sourceInterfaceLinkage.pixelSourceBytecodeHash ==",
+         NATIVE_BACKEND_CPP, "R269 R263 matches PS source identity"),
+        ("bool shaderInterfaceLinkExact{};",
+         RUNTIME_CENSUS, "R269 production census pair linkage exactness"),
+        ("const auto shaderInterfaceLinkage =",
+         RUNTIME_CENSUS, "R269 production census derives R268 linkage"),
+        ("hash, sig.shaderInterfaceLinkHash",
+         RUNTIME_CENSUS, "R269 census identity seals pair linkage hash"),
+        ("R269 rejects R268 linkage provenance that does not match R263 source pair identity",
+         CONSTANT_BUFFER_PROBE, "R269 stale source-linkage negative regression"),
+    ]
+    missing_r269_programmable_linkage_provenance_handoff = [
+        meaning for token, source, meaning
+        in r269_programmable_linkage_provenance_handoff_contract
+        if token not in source
+    ]
+    if missing_r269_programmable_linkage_provenance_handoff:
+        raise SystemExit(
+            "DX11 R269 programmable linkage-provenance handoff drift: "
+            + ", ".join(
+                missing_r269_programmable_linkage_provenance_handoff)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),

@@ -2002,6 +2002,8 @@ namespace outrun::vr::dx11
     {
         ProgrammableShaderInterfaceSemantics out{};
         out.vertexStage = decode.vertexStage;
+        out.versionToken = decode.versionToken;
+        out.sourceBytecodeHash = decode.sourceBytecodeHash;
         out.instructionDecodeExact = decode.exact();
         out.registerSemanticsExact =
             registerSemantics.exact() &&
@@ -2201,6 +2203,11 @@ namespace outrun::vr::dx11
         if (!out.vertexInterfaceExact || !out.pixelInterfaceExact)
             return out;
 
+        out.vertexVersionToken = vertexSemantics.versionToken;
+        out.pixelVersionToken = pixelSemantics.versionToken;
+        out.vertexSourceBytecodeHash = vertexSemantics.sourceBytecodeHash;
+        out.pixelSourceBytecodeHash = pixelSemantics.sourceBytecodeHash;
+
         UINT actualVertexOutputs = 0;
         for (const auto& semantic : vertexSemantics.semantics)
         {
@@ -2248,6 +2255,10 @@ namespace outrun::vr::dx11
                 linkHash *= 1099511628211ull;
             }
         };
+        mix(out.vertexVersionToken);
+        mix(out.pixelVersionToken);
+        mix(out.vertexSourceBytecodeHash);
+        mix(out.pixelSourceBytecodeHash);
         mix(vertexSemantics.interfaceSemanticsHash);
         mix(pixelSemantics.interfaceSemanticsHash);
         mix(out.linkerRevisionHash);

@@ -296,6 +296,13 @@ namespace outrun::vr::dx11
             ShaderFunctionSignature pixelShader{};
             bool shaderIntrospectionComplete{};
             bool shaderMixedPair{};
+            // R269 seals pair-level R268 linkage into production census
+            // identity without widening programmable translation readiness.
+            bool shaderInterfaceLinkExact{};
+            UINT shaderInterfaceMatchedSemanticCount{};
+            std::uint64_t shaderInterfaceLinkHash{};
+            std::uint64_t shaderInterfaceLinkerRevisionHash{};
+            std::uint64_t shaderInterfaceSemanticContractHash{};
             bool shaderTranslationExact{};
             // R220: keep the shader activation-readiness boundary distinct
             // from translation implementation state. Programmable D3D9 shader
@@ -694,6 +701,15 @@ namespace outrun::vr::dx11
                 hash, sig.pixelShader.interfaceDecoderRevisionHash);
             hash = hash_mix(
                 hash, sig.pixelShader.interfaceSemanticContractHash);
+            hash = hash_mix(
+                hash, sig.shaderInterfaceLinkExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderInterfaceMatchedSemanticCount);
+            hash = hash_mix(hash, sig.shaderInterfaceLinkHash);
+            hash = hash_mix(
+                hash, sig.shaderInterfaceLinkerRevisionHash);
+            hash = hash_mix(
+                hash, sig.shaderInterfaceSemanticContractHash);
             hash = hash_mix(hash, sig.shaderIntrospectionComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderMixedPair ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderTranslationExact ? 1u : 0u);
@@ -1159,8 +1175,12 @@ namespace outrun::vr::dx11
         template <typename TShader>
         ShaderFunctionSignature inspect_shader_function(
             TShader* shader,
-            bool vertexStage) noexcept
+            bool vertexStage,
+            ProgrammableShaderInterfaceSemantics*
+                interfaceSemanticsOut = nullptr) noexcept
         {
+            if (interfaceSemanticsOut)
+                *interfaceSemanticsOut = {};
             ShaderFunctionSignature out{};
             out.present = shader != nullptr;
             if (!shader)
@@ -1249,6 +1269,8 @@ namespace outrun::vr::dx11
                 interfaceSemantics.decoderRevisionHash;
             out.interfaceSemanticContractHash =
                 interfaceSemantics.semanticContractHash;
+            if (interfaceSemanticsOut)
+                *interfaceSemanticsOut = interfaceSemantics;
             return out;
         }
 
@@ -1262,10 +1284,26 @@ namespace outrun::vr::dx11
         {
             SourceSignature sig{};
             sig.fixedFunction = fixedFunction;
+            ProgrammableShaderInterfaceSemantics vertexInterfaceSemantics{};
+            ProgrammableShaderInterfaceSemantics pixelInterfaceSemantics{};
             sig.vertexShader =
-                inspect_shader_function(vertexShader, true);
+                inspect_shader_function(
+                    vertexShader, true, &vertexInterfaceSemantics);
             sig.pixelShader =
-                inspect_shader_function(pixelShader, false);
+                inspect_shader_function(
+                    pixelShader, false, &pixelInterfaceSemantics);
+            const auto shaderInterfaceLinkage =
+                derive_programmable_shader_interface_linkage_evidence(
+                    vertexInterfaceSemantics, pixelInterfaceSemantics);
+            sig.shaderInterfaceLinkExact = shaderInterfaceLinkage.exact();
+            sig.shaderInterfaceMatchedSemanticCount =
+                shaderInterfaceLinkage.matchedSemanticCount;
+            sig.shaderInterfaceLinkHash =
+                shaderInterfaceLinkage.interfaceLinkHash;
+            sig.shaderInterfaceLinkerRevisionHash =
+                shaderInterfaceLinkage.linkerRevisionHash;
+            sig.shaderInterfaceSemanticContractHash =
+                shaderInterfaceLinkage.semanticContractHash;
             sig.shaderIntrospectionComplete =
                 shaderQueryComplete &&
                 sig.vertexShader.observed &&

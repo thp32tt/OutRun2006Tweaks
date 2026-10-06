@@ -1957,6 +1957,7 @@ struct NativeProgrammableShaderSemanticTranslationReadiness {
     bool cacheIdentityMatches{};
     bool vertexSemanticExact{};
     bool pixelSemanticExact{};
+    bool interfaceSourceIdentityMatches{};
     bool interfaceLinkExact{};
     bool semanticProofPresent{};
     bool diagnosticOnly{};
@@ -1988,14 +1989,13 @@ compose_programmable_shader_semantic_translation_readiness(
     std::uint64_t inputLayoutSnapshotToken,
     std::uint64_t translatedVertexSemanticHash,
     std::uint64_t translatedPixelSemanticHash,
-    std::uint64_t interfaceLinkHash,
+    const ProgrammableShaderInterfaceLinkageEvidence& sourceInterfaceLinkage,
     std::uint64_t translatorRevisionHash,
     std::uint64_t semanticContractHash,
     bool vertexSemanticExact,
     bool pixelSemanticExact,
     bool constantRegisterMappingExact,
-    bool samplerMappingExact,
-    bool interfaceLinkExact) noexcept;
+    bool samplerMappingExact) noexcept;
 
 [[nodiscard]] bool
 validate_programmable_shader_semantic_translation_readiness_snapshot(
@@ -2006,14 +2006,13 @@ validate_programmable_shader_semantic_translation_readiness_snapshot(
     std::uint64_t inputLayoutSnapshotToken,
     std::uint64_t translatedVertexSemanticHash,
     std::uint64_t translatedPixelSemanticHash,
-    std::uint64_t interfaceLinkHash,
+    const ProgrammableShaderInterfaceLinkageEvidence& sourceInterfaceLinkage,
     std::uint64_t translatorRevisionHash,
     std::uint64_t semanticContractHash,
     bool vertexSemanticExact,
     bool pixelSemanticExact,
     bool constantRegisterMappingExact,
     bool samplerMappingExact,
-    bool interfaceLinkExact,
     std::uint64_t reviewSnapshotToken) noexcept;
 
 // R259 consumes the current R258 source receipt, R262 full F18 resource-behavior

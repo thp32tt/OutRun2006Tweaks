@@ -637,6 +637,10 @@ int main()
         r267VsRegisterSemantics.exact() &&
         r267VsInterfaceSemantics.exact() &&
         r267VsInterfaceSemantics.vertexStage &&
+        r267VsInterfaceSemantics.versionToken ==
+            r267VsEvidence.versionToken &&
+        r267VsInterfaceSemantics.sourceBytecodeHash ==
+            r267VsEvidence.bytecodeHash &&
         r267VsInterfaceSemantics.shaderModel3 &&
         r267VsInterfaceSemantics.declarationInstructionCount == 3u &&
         r267VsInterfaceSemantics.semanticDeclarationCount == 2u &&
@@ -842,6 +846,12 @@ int main()
         r268PsInterfaceSemantics.exact() &&
         !r268PsInterfaceSemantics.vertexStage &&
         r268Linkage.exact() &&
+        r268Linkage.vertexVersionToken == r267VsEvidence.versionToken &&
+        r268Linkage.pixelVersionToken == r268PsDecode.versionToken &&
+        r268Linkage.vertexSourceBytecodeHash ==
+            r267VsEvidence.bytecodeHash &&
+        r268Linkage.pixelSourceBytecodeHash ==
+            r268PsDecode.sourceBytecodeHash &&
         r268Linkage.vertexOutputSemanticCount == 1u &&
         r268Linkage.pixelInputSemanticCount == 1u &&
         r268Linkage.matchedSemanticCount == 1u &&
@@ -891,16 +901,16 @@ int main()
     const ProgrammableShaderFunctionIdentity programmableVs{
         true,
         true,
-        128u,
-        D3DVS_VERSION(3, 0),
-        0x1111111111111111ull,
+        static_cast<UINT>(sizeof(r267VsTokens)),
+        r267VsEvidence.versionToken,
+        r267VsEvidence.bytecodeHash,
     };
     const ProgrammableShaderFunctionIdentity programmablePs{
         true,
         true,
-        96u,
-        D3DPS_VERSION(3, 0),
-        0x2222222222222222ull,
+        static_cast<UINT>(sizeof(r268PsTokens)),
+        r268PsDecode.versionToken,
+        r268PsDecode.sourceBytecodeHash,
     };
     const auto programmablePair =
         seal_programmable_shader_pair_cache_identity(
@@ -5113,8 +5123,6 @@ int main()
         0x2631000000000001ull;
     constexpr std::uint64_t r263PixelSemanticHash =
         0x2632000000000002ull;
-    constexpr std::uint64_t r263InterfaceLinkHash =
-        0x2633000000000003ull;
     constexpr std::uint64_t r263TranslatorRevisionHash =
         0x2634000000000004ull;
     constexpr std::uint64_t r263SemanticContractHash =
@@ -5127,10 +5135,10 @@ int main()
                 r243InputLayoutReady, r243InputLayoutReady.snapshotToken,
                 r263VertexSemanticHash,
                 r263PixelSemanticHash,
-                r263InterfaceLinkHash,
+                r268Linkage,
                 r263TranslatorRevisionHash,
                 r263SemanticContractHash,
-                true, true, true, true, true);
+                true, true, true, true);
     require(
         r263SemanticTranslation.inputValid &&
         r263SemanticTranslation.sourceIdentityExact &&
@@ -5165,13 +5173,15 @@ int main()
                 r243InputLayoutReady, r243InputLayoutReady.snapshotToken,
                 r263VertexSemanticHash,
                 r263PixelSemanticHash,
-                r263InterfaceLinkHash,
+                r268Linkage,
                 r263TranslatorRevisionHash,
                 r263SemanticContractHash,
-                true, true, true, true, true,
+                true, true, true, true,
                 r263SemanticTranslation.reviewSnapshotToken),
         "R263 exact programmable shader semantic translation proof binds source identity to translated object/layout receipts");
 
+    auto r269StaleInterfaceLinkage = r268Linkage;
+    r269StaleInterfaceLinkage.vertexSourceBytecodeHash ^= 1ull;
     const auto r263MissingInterfaceProof =
         outrun::vr::dx11::
             compose_programmable_shader_semantic_translation_readiness(
@@ -5180,19 +5190,21 @@ int main()
                 r243InputLayoutReady, r243InputLayoutReady.snapshotToken,
                 r263VertexSemanticHash,
                 r263PixelSemanticHash,
-                r263InterfaceLinkHash,
+                r269StaleInterfaceLinkage,
                 r263TranslatorRevisionHash,
                 r263SemanticContractHash,
-                true, true, true, true, false);
+                true, true, true, true);
     require(
+        r263MissingInterfaceProof.inputValid &&
         r263MissingInterfaceProof.sourceIdentityExact &&
         r263MissingInterfaceProof.translationObjectSnapshotMatches &&
         r263MissingInterfaceProof.inputLayoutSnapshotMatches &&
+        !r263MissingInterfaceProof.interfaceSourceIdentityMatches &&
         !r263MissingInterfaceProof.interfaceLinkExact &&
         !r263MissingInterfaceProof.semanticProofPresent &&
         !r263MissingInterfaceProof.reviewReady &&
         r263MissingInterfaceProof.reviewSnapshotToken == 0,
-        "R263 rejects incomplete programmable shader interface semantic proof");
+        "R269 rejects R268 linkage provenance that does not match R263 source pair identity");
 
     const auto r263MissingConstantMapping =
         outrun::vr::dx11::
@@ -5202,10 +5214,10 @@ int main()
                 r243InputLayoutReady, r243InputLayoutReady.snapshotToken,
                 r263VertexSemanticHash,
                 r263PixelSemanticHash,
-                r263InterfaceLinkHash,
+                r268Linkage,
                 r263TranslatorRevisionHash,
                 r263SemanticContractHash,
-                true, true, false, true, true);
+                true, true, false, true);
     require(
         r263MissingConstantMapping.sourceIdentityExact &&
         !r263MissingConstantMapping.constantRegisterMappingExact &&
@@ -5223,10 +5235,10 @@ int main()
                 r243InputLayoutReady, r243InputLayoutReady.snapshotToken,
                 r263VertexSemanticHash,
                 r263PixelSemanticHash,
-                r263InterfaceLinkHash,
+                r268Linkage,
                 r263TranslatorRevisionHash,
                 r263SemanticContractHash,
-                true, true, true, false, true);
+                true, true, true, false);
     require(
         r263MissingSamplerMapping.sourceIdentityExact &&
         r263MissingSamplerMapping.constantRegisterMappingExact &&

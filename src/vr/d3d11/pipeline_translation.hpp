@@ -472,6 +472,11 @@ namespace outrun::vr::dx11
         bool registerSemanticsExact = false;
         bool shaderModel3 = false;
         bool complete = false;
+        // R269: carry the exact R264/R265 source identity through R267 so
+        // pair-level R268 linkage can be checked against the census-sealed
+        // shader pair instead of accepting a detached semantic hash.
+        DWORD versionToken = 0;
+        std::uint64_t sourceBytecodeHash = 0;
         UINT declarationInstructionCount = 0;
         UINT semanticDeclarationCount = 0;
         UINT inputSemanticCount = 0;
@@ -488,6 +493,8 @@ namespace outrun::vr::dx11
                    registerSemanticsExact &&
                    shaderModel3 &&
                    complete &&
+                   versionToken != 0 &&
+                   sourceBytecodeHash != 0 &&
                    interfaceSemanticsHash != 0 &&
                    decoderRevisionHash != 0 &&
                    semanticContractHash != 0;
@@ -511,6 +518,12 @@ namespace outrun::vr::dx11
         bool vertexInterfaceExact = false;
         bool pixelInterfaceExact = false;
         bool complete = false;
+        // R269: retain source identities for the pair-level receipt consumed
+        // by R263 semantic-translation readiness.
+        DWORD vertexVersionToken = 0;
+        DWORD pixelVersionToken = 0;
+        std::uint64_t vertexSourceBytecodeHash = 0;
+        std::uint64_t pixelSourceBytecodeHash = 0;
         UINT vertexOutputSemanticCount = 0;
         UINT pixelInputSemanticCount = 0;
         UINT matchedSemanticCount = 0;
@@ -523,6 +536,10 @@ namespace outrun::vr::dx11
             return vertexInterfaceExact &&
                    pixelInterfaceExact &&
                    complete &&
+                   vertexVersionToken != 0 &&
+                   pixelVersionToken != 0 &&
+                   vertexSourceBytecodeHash != 0 &&
+                   pixelSourceBytecodeHash != 0 &&
                    matchedSemanticCount == pixelInputSemanticCount &&
                    interfaceLinkHash != 0 &&
                    linkerRevisionHash != 0 &&
