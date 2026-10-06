@@ -201,7 +201,7 @@ namespace
     // sustained Floral Village stone paving almost disappear on the R3.
     // Keep a modest stage-scoped comfort reduction while restoring a clearly
     // tactile road surface; Deep Lake/Tulip keep normal Road Detail.
-    constexpr float FloralVillageRoughPavingScale = 0.75f;
+    constexpr float FloralVillageRoughPavingScale = 0.55f;
 
     bool is_proven_primary_rough_road(
         const StageSurfaceContext& stage,
