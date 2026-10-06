@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T12:17:00+09:00",
+  "updatedKst": "2026-10-06T12:28:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -225,11 +225,12 @@
     "CONVERSION-DX9EX-00453 / VR-DX9EX-SWAPCHAIN-DESTROY-FLUSH-0036 flushes the D3D11 immediate context before R19 xrDestroySwapchain at swapchain teardown/recreate boundaries. Exact material/validation-bearing SHA 75066b77b9f95ca644791d4c821a1c77fffcfe1f passed DX9Ex Active Validation 37405053984 and Domain Isolation 37405053923; runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00454 / VR-DX9EX-SWAPCHAIN-DESTROY-GPU-DRAIN-0037 adds a D3D11 event-query completion fence before R19 xrDestroySwapchain. Runtime source SHA a6de7e6d155b8977fa60c545dafc075d038c5eb5; verifier repair/validation-bearing SHA b4ade25a787f18f52693219f571dfbb3f4754add passed DX9Ex Active 37406042110 and Domain Isolation 37406042061 after initial verifier-only failure 37405887502. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00455 / VR-DX9EX-SWAPCHAIN-GPU-DRAIN-BOUNDED-0038 bounds the R19 event-query wait to 250 ms and exits early on device removal while preserving normal completion fencing. Runtime source SHA 60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a; verifier repair/validation-bearing SHA ac32589324fbc76b4d2fcd4321f31415f0ef5a39 passed DX9Ex Active 37406897470 and Domain Isolation 37406897447 after initial verifier-only failure 37406784043. Runtime remains UNTESTED.",
-    "VR-DX9EX-SWAPCHAIN-LIVE-DESTROY-RESOURCE-RETENTION-0040 moves RTV/image release and metadata reset after the live fail-closed returns so a transient drain/destroy failure cannot discard the still-owned swapchain resources before a later retry."
+    "VR-DX9EX-SWAPCHAIN-LIVE-DESTROY-RESOURCE-RETENTION-0040 moves RTV/image release and metadata reset after the live fail-closed returns so a transient drain/destroy failure cannot discard the still-owned swapchain resources before a later retry.",
+    "CONVERSION-DX9EX-00457 / VR-DX9EX-SWAPCHAIN-LIVE-DESTROY-RESOURCE-RETENTION-0040 makes live R19 swapchain destruction transactional. Runtime source SHA b788db90113ea34b208427a6b9fdd314c9d24377; verifier repair/validation-bearing SHA b855fd32389aa330b8f04598fbcd76853c6d8f99 passed DX9Ex Active 37408680043 and Domain Isolation 37408680053 after initial verifier-only failure 37408556548. Package artifact 11389036142 digest sha256:7f9c7931d2b664c054f5ad3aaf7a1f2337d2a14b5ed57df1116ce86b31b72eb0. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
-  "validatedSourceSha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
-  "validationRunId": 37406897470,
+  "validatedSourceSha": "b855fd32389aa330b8f04598fbcd76853c6d8f99",
+  "validationRunId": 37408680043,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
