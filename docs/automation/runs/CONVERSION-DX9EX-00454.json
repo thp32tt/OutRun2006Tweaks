@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "2/3",
-  "status": "VALIDATING",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "6d33850a66a396d37c2f5cec53ab037ace59464c",
-  "material_result_sha": "a6de7e6d155b8977fa60c545dafc075d038c5eb5",
-  "validation_bearing_result_sha": "PENDING_SELF",
-  "result_sha": "PENDING_SELF",
+  "material_result_sha": "b4ade25a787f18f52693219f571dfbb3f4754add",
+  "validation_bearing_result_sha": "b4ade25a787f18f52693219f571dfbb3f4754add",
+  "result_sha": "b4ade25a787f18f52693219f571dfbb3f4754add",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00454]",
   "selected_work_item": "VR-DX9EX-SWAPCHAIN-DESTROY-GPU-DRAIN-0037",
   "summary": "Upgrade R19 OpenXR swapchain teardown from submission-only Flush to a D3D11 event-query completion fence so normal-path GPU work is actually complete before xrDestroySwapchain.",
@@ -38,24 +38,28 @@
       "evidence": "Added a D3D11 event query, End->Flush->GetData(S_FALSE loop) completion fence before xrDestroySwapchain, with best-effort Flush fallback if query creation is unavailable, plus deterministic reset/transport verifier coverage."
     },
     "C3_VALIDATE": {
-      "status": "RETRYING",
-      "automation_validation": "PENDING",
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
       "runtime_validation": "UNTESTED",
-      "evidence": "DX9Ex Active 37405887502 failed only because the verifier's first Flush match came from the CreateQuery-failure fallback before the normal End->Flush sequence. Domain Isolation 37405887504 succeeded."
+      "evidence": "Retry validation-bearing SHA passed canonical DX9Ex Active Validation and Domain Isolation. Initial failure was verifier-only."
     },
     "C4_COMMIT": {
-      "status": "PENDING",
-      "ci_skip_on_validation_bearing_result": false
+      "status": "COMPLETE",
+      "ci_skip_on_validation_bearing_result": false,
+      "result_sha": "b4ade25a787f18f52693219f571dfbb3f4754add",
+      "source_runtime_sha": "a6de7e6d155b8977fa60c545dafc075d038c5eb5"
     },
     "C5_PACKAGE": {
-      "status": "PENDING"
+      "status": "COMPLETE",
+      "artifact_id": 11387287754,
+      "digest": "sha256:c4b577e1fb40cec0bb36ed19de3f030c9a60bfa5d0518ed2965f4d5e83c9dd85"
     },
     "C6_STATE": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "runtime_validation": "UNTESTED"
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "red_review": {
       "base_sha": "6d33850a66a396d37c2f5cec53ab037ace59464c",
@@ -88,9 +92,33 @@
       "attempt": "2/3",
       "source_runtime_change": false,
       "verifier_change": "Scope normal-path ordering checks from End(completion) onward so failure-path fallback Flush cannot shadow the intended completion-fence sequence."
+    },
+    "dx9ex_active": {
+      "run_id": 37406042110,
+      "head_sha": "b4ade25a787f18f52693219f571dfbb3f4754add",
+      "result": "SUCCESS",
+      "jobs": {
+        "policy": 112083728414,
+        "game": 112083849012,
+        "host": 112083849019,
+        "full_chain_compile": 112083849023,
+        "package": 112084766621
+      }
+    },
+    "domain_isolation": {
+      "run_id": 37406042061,
+      "job_id": 112083727824,
+      "head_sha": "b4ade25a787f18f52693219f571dfbb3f4754add",
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11387287754,
+      "digest": "sha256:c4b577e1fb40cec0bb36ed19de3f030c9a60bfa5d0518ed2965f4d5e83c9dd85"
     }
   },
-  "next_action": "Validate the verifier-repair SHA with canonical DX9Ex Active Validation and Domain Isolation. Preserve a6de7e6d155b8977fa60c545dafc075d038c5eb5 as the runtime-source material SHA and promote the repair SHA as validation-bearing only if its exact gates pass.",
+  "next_action": "Continue from the latest bookkeeping HEAD with the bounded device-loss/driver-stall behavior of the swapchain GPU completion wait; preserve b4ade25a787f18f52693219f571dfbb3f4754add as CONVERSION-DX9EX-00454 validation-bearing result.",
   "started_at_kst": "2026-10-06T11:46:49+09:00",
-  "retry_started_at_kst": "2026-10-06T11:49:15+09:00"
+  "retry_started_at_kst": "2026-10-06T11:49:15+09:00",
+  "source_material_sha": "a6de7e6d155b8977fa60c545dafc075d038c5eb5",
+  "completed_at_kst": "2026-10-06T11:56:06+09:00"
 }
