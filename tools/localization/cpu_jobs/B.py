@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role B only")
 
 repo=Path.cwd()
-run="20261006-B-PRODUCTION185-6C9B3611-START-GOAL"
+run="20261006-B-PRODUCTION186-6C9B3611-START-GOAL"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -20,7 +20,7 @@ candidate=repo/"localization/graphics/hd_candidates"/asset
 candidate.parent.mkdir(parents=True,exist_ok=True)
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds"
 SOURCE_SHA="d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8"
-srcp=Path("/tmp/B185_6C9B3611.dds")
+srcp=Path("/tmp/B186_6C9B3611.dds")
 urllib.request.urlretrieve(url,srcp)
 
 def sha256(p):
@@ -77,10 +77,15 @@ for sp in specs:
         comps.append((area,c,[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]))
     if not comps: raise RuntimeError(("no red banner",sp["key"]))
     comps.sort(key=lambda x:x[0],reverse=True)
-    banner_seed=comps[0][1]
-    # The pale letters cut through the red field, so binary hole filling only captures
-    # enclosed glyph counters. Reconstruct the actual red sign interior from the
-    # left/right envelope of the largest connected red field on each scanline.
+    # The English face splits the red plate into several disconnected red islands.
+    # Using only the largest island (B182-B185) under-covered the START plate and
+    # left visible pale/orange strips. This ROI is sign-tight, so use the union of
+    # all meaningful saturated-red components to recover the complete plate envelope.
+    banner_seed=np.zeros_like(red)
+    for area,c,cb in comps:
+        banner_seed |= c
+    # Reconstruct the actual red sign interior from the left/right envelope of all
+    # sign-red components on each scanline.
     banner=np.zeros_like(banner_seed)
     for yy in range(banner_seed.shape[0]):
         xs=np.nonzero(banner_seed[yy])[0]
@@ -297,14 +302,14 @@ if residue_final:
 
 
 # Evidence.
-src.save(out/"B185_SOURCE_READABLE.png")
-clean.save(out/"B185_CLEAN_PLATE.png")
-dec.save(out/"B185_FINAL_READABLE.png")
-src_raw.save(out/"B185_SOURCE_RAW.png")
-dec_raw.save(out/"B185_FINAL_RAW.png")
-Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"B185_SOURCE_TEXT_MASK.png")
-Image.fromarray((clean_region.astype(np.uint8)*255),"L").save(out/"B185_CLEAN_REGION_MASK.png")
-Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"B185_TARGET_MASK.png")
+src.save(out/"B186_SOURCE_READABLE.png")
+clean.save(out/"B186_CLEAN_PLATE.png")
+dec.save(out/"B186_FINAL_READABLE.png")
+src_raw.save(out/"B186_SOURCE_RAW.png")
+dec_raw.save(out/"B186_FINAL_RAW.png")
+Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"B186_SOURCE_TEXT_MASK.png")
+Image.fromarray((clean_region.astype(np.uint8)*255),"L").save(out/"B186_CLEAN_REGION_MASK.png")
+Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"B186_TARGET_MASK.png")
 
 def on_white(im):
     z=Image.new("RGBA",im.size,(255,255,255,255)); z.alpha_composite(im); return z.convert("RGB")
@@ -329,7 +334,7 @@ y=0
 for c in cards:
     sheet.paste(c,(0,y)); y+=c.height+8
 sheet.thumbnail((1800,2800),Image.Resampling.LANCZOS)
-sheet.save(out/"B185_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
+sheet.save(out/"B186_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
 
 raw_sheet=Image.new("RGB",(1024,2*1024+70),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW",src_raw),("FINAL_RAW",dec_raw)]):
@@ -339,7 +344,7 @@ for i,(label,im) in enumerate([("SOURCE_RAW",src_raw),("FINAL_RAW",dec_raw)]):
     raw_sheet.paste(vis,(0,y+30)); ImageDraw.Draw(raw_sheet).text((6,y+7),label,fill="black")
 raw_sheet=raw_sheet.crop((0,0,1024,2*1024+70))
 raw_sheet.thumbnail((1400,1800),Image.Resampling.LANCZOS)
-raw_sheet.save(out/"B185_RAW_CONTACT.jpg",quality=95)
+raw_sheet.save(out/"B186_RAW_CONTACT.jpg",quality=95)
 
 report={
  "schema_version":1,"role":"B","run":run,
@@ -352,7 +357,7 @@ report={
  "source_provenance":{"url":url,"sha256":SOURCE_SHA},
  "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":MIPS,
    "header_128_exact":payload[:128]==raw[:128],"raw_orientation":"mirror_y"},
- "construction":"A85 same-family full-inset badge-interior reconstruction precedent: rebuild the complete red sign body inside the white rim from strict saturated-red source-row donors only, preventing pale/orange English-effect contamination while preserving rim/map/thumbnails/logo; fresh native Korean uses sampled pale face + orange outline/shadow + 0.17 shear inside the exact source effect bbox.",
+ "construction":"A85 same-family full-inset badge-interior reconstruction precedent: recover the complete sign envelope from the union of all meaningful saturated-red components, then rebuild the full red body inside the white rim from strict red row donors. This fixes the B182-B185 largest-component under-coverage that left visible English-effect strips; rim/map/thumbnails/logo stay protected and fresh native Korean remains inside the exact source effect bbox.",
  "same_family_reference":"localization/graphics/role_A/20261006-A-PRODUCTION85-IGR012-CLEAN/A85_CONTROLLER_SELF_QA.json",
  "rows":rows,
  "static_qa":{
@@ -372,15 +377,15 @@ report={
  "candidate_sha256":cand_sha,
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "runtime_validation":"UNTESTED",
- "status":"B185_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"B186_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"B185_6C9B3611_REPORT.json"
+rp=out/"B186_6C9B3611_REPORT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"B185_6C9B3611.json").write_text(json.dumps({
+(wr/"B186_6C9B3611.json").write_text(json.dumps({
  "role":"B","run":run,"queue_index":172,"asset":"6C9B3611",
  "source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,
  "report":str(rp.relative_to(repo)),
  "status":"WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("B185_DONE",cand_sha,[(r["key"],r["source_bbox"],r["localized_bbox"],r["font_size"]) for r in rows])
+print("B186_DONE",cand_sha,[(r["key"],r["source_bbox"],r["localized_bbox"],r["font_size"]) for r in rows])
