@@ -4223,7 +4223,8 @@
     "2B0863D6",
     "EBFC709F",
     "5B65E08C",
-    "1A43E9D9"
+    "1A43E9D9",
+    "313DB8CB"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6715,7 +6716,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 06:47 KST",
+  "updated_at_kst": "2026-10-07 07:14 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7453,5 +7454,39 @@
     "pre_ingame_review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/033_q232_EBFC709F.jpg",
     "pre_ingame_manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
+  },
+  "a150_313db8cb_manual_visual_rework": {
+    "run": "A150",
+    "timestamp_kst": "2026-10-07 07:14 KST",
+    "role": "A",
+    "queue_index": 139,
+    "asset_key": "313DB8CB",
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+    "trigger": "PRE_INGAME_016_SOURCE_RELATIVE_HIERARCHY_FALSE_NEGATIVE",
+    "prior_c_status": "C116_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "c44a9ccd62e2b78fb17ec10f7a50a6de32dc1a0f84a44f2595b3e7ffaa0cc0ea",
+    "candidate_sha256": "50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7",
+    "github_worker_run": 37538999863,
+    "worker_output_commit": "368728a0407ec8f267b468f8b3e264219ae118f7",
+    "translation_rework": [
+      "TUNED -> 튜닝 사양",
+      "NORMAL -> 일반 사양"
+    ],
+    "machine_qa": {
+      "bbox_size_positive_margin": "2/2 PASS",
+      "final_validator": "PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "protected": 0,
+      "format": "RGBA32",
+      "raw_orientation": "mirror_y"
+    },
+    "controller_visual_qa": "PASS_SOURCE_C116_A150_READABLE_ROW_RAW",
+    "controller_qa": "localization/graphics/role_A/20261007-A-MANUALQA150-313DB8CB/A150_CONTROLLER_SELF_QA.json",
+    "status": "A150_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
