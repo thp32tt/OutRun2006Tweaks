@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A118 resolved index119 F6811E94 strict DXT5 hold: Time Attack Mode -> 타임 어택 모드, candidate af938e04d2555e14bc646d22be0f2ef0e5112e899c3a2b646931659ab680a6b7; 1/1 bbox/size/positive-margin PASS, decoded changed/alpha/protected outside=0, source residue=0, controller SOURCE/CLEAN/FINAL + raw mirror_y PASS. Pending independent C + in-game; do not repeat unless returned REWORK. Index99 4F68708E remains fail-closed: A117 found 834 partial boundary blocks and 62 without alpha-zero palette support, so exact-safe constrained reconstruction is still required.",
     "A resolved all remaining odd blocked zoom-review indices 189/191/217/219. 189 8C9E91F8 and 191 94BB6271 are PRESERVE_ORIGINAL/no-localization. 217 D1039D6F START/GOAL -> 출발/골 candidate 68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39 (A116) and 219 D263B3F1 COURSE SELECT -> 코스 선택 candidate f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24 (A113) pass producer machine+controller visual QA pending independent C/in-game. Do not repeat. A odd blocked zoom-review shard is exhausted; remaining 12 blocked zoom rows are even/B shard unless a higher-priority A-owned in-game/C-returned REWORK appears.",
     "A resolved odd zoom-review indices 103/151/153/155/157/165/169/171/177. Index103 590A4724 = Normal Balance -> 일반 밸런스, exact A108 candidate bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178 restored after superseded A107 overwrite; A108 producer self-QA PASS pending independent C/in-game. Indices151/153/155/157/165/169/171 are photo/logo/rank-art only and index177 is protected game/song-title artwork; all PRESERVE_ORIGINAL/no candidate. Do not revisit. Next normal A odd blocked rows: 189,191,217,219 unless higher-priority in-game/C-returned work appears.",
     "B180 closed even zoom_review indices 146/148/150 as PRESERVE_ORIGINAL_NO_LOCALIZATION from exact-HD readable/raw evidence; no candidate required and do not repeat. Index62 33491F83 remains MANUAL_RECONSTRUCTION_REQUIRED with protected route artwork; next normal B zoom target is index166 5EBD7FE8 unless higher priority appears.",
@@ -5778,5 +5779,49 @@
       "localization/graphics/role_A/20261006-A-PRODUCTION113-D263-D103-DIAG/A113_D263_CONTROLLER_SELF_QA.json",
       "localization/graphics/role_A/20261006-A-PRODUCTION116-D1039D6F/A116_CONTROLLER_SELF_QA.json"
     ]
+  },
+  "a117_dxt5_strict_preflight": {
+    "timestamp_kst": "2026-10-06T12:06:36+09:00",
+    "index99": {
+      "asset": "4F68708E",
+      "partial_blocks": 834,
+      "partial_with_alpha_zero": 772,
+      "status": "HOLD_STRICT_RECHECK"
+    },
+    "index119": {
+      "asset": "F6811E94",
+      "partial_blocks": 347,
+      "partial_with_alpha_zero": 347,
+      "status": "FEASIBLE_RESOLVED_BY_A118"
+    },
+    "report": "localization/graphics/worker_results/A117_DXT5_STRICT_PREFLIGHT.json"
+  },
+  "a118_f6811e94": {
+    "timestamp_kst": "2026-10-06T12:12:00+09:00",
+    "queue_index": 119,
+    "candidate_sha256": "af938e04d2555e14bc646d22be0f2ef0e5112e899c3a2b646931659ab680a6b7",
+    "source_bbox": [
+      390,
+      54,
+      1632,
+      200
+    ],
+    "localized_bbox": [
+      664,
+      62,
+      1357,
+      192
+    ],
+    "bbox_size_positive_margin": "1/1 PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "source_residue": 0,
+    "dxt5_partial_boundary_blocks": 347,
+    "controller_visual_qa": "PASS",
+    "status": "A118_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "report": "localization/graphics/role_A/20261006-A-PRODUCTION118-F6811E94/A118_F6811E94_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION118-F6811E94/A118_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
   }
 }

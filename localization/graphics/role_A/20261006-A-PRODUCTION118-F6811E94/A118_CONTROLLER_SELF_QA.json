@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION118-F6811E94-CONTROLLER",
+  "timestamp_kst": "2026-10-06T12:12:00+09:00",
+  "queue_index": 119,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "candidate_sha256": "af938e04d2555e14bc646d22be0f2ef0e5112e899c3a2b646931659ab680a6b7",
+  "translation": {
+    "source": "Time Attack Mode",
+    "korean": "타임 어택 모드"
+  },
+  "reviewed_evidence": [
+    "A118_SOURCE_CLEAN_FINAL_CONTACT.jpg",
+    "A118_RAW_COMPARE.jpg",
+    "A118_F6811E94_REPORT.json"
+  ],
+  "visual_qa": {
+    "source_family_orange_fill_navy_outline": "PASS",
+    "native_hd_legibility": "PASS",
+    "hangul_glyph_integrity": "PASS",
+    "slant_and_weight_consistency": "PASS",
+    "clean_plate_no_source_residue": "PASS",
+    "no_clipping_overlap_or_foreign_image_intrusion": "PASS",
+    "readable_orientation": "PASS",
+    "raw_mirror_y_orientation": "PASS"
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "1/1 PASS",
+    "source_bbox": [
+      390,
+      54,
+      1632,
+      200
+    ],
+    "localized_bbox": [
+      664,
+      62,
+      1357,
+      192
+    ],
+    "changed_pixels_outside": 0,
+    "alpha_changed_outside": 0,
+    "protected_pixels_changed": 0,
+    "source_residue": 0,
+    "dxt5_full_inside_blocks": 11160,
+    "dxt5_partial_boundary_blocks": 347,
+    "dxt5_outside_unchanged_blocks": 21261
+  },
+  "decision": "A118_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_touched": false
+}

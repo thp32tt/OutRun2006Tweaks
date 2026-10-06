@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T11:58:00+09:00",
+  "updated_at_kst": "2026-10-06T12:12:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A resolved all remaining odd-shard blocked zoom_review rows 189/191/217/219. 189/191 are preserve-original/no-localization. 217 D1039D6F START/GOAL -> 출발/골 candidate 68bd2219... and 219 D263B3F1 COURSE SELECT -> 코스 선택 candidate f6303ee1... pass producer machine+controller visual QA pending independent C/in-game. No odd blocked zoom_review rows remain; 12 blocked rows are even/B shard. Do not repeat A111/A113/A116 unless C or new in-game evidence returns REWORK.",
+  "next_checkpoint": "A118 resolved odd-shard strict DXT5 HOLD index119 F6811E94: Time Attack Mode -> 타임 어택 모드, candidate af938e04d2555e14bc646d22be0f2ef0e5112e899c3a2b646931659ab680a6b7, machine zero-pixel gates and controller SOURCE/CLEAN/FINAL + raw mirror_y PASS, pending independent C/in-game. Index99 4F68708E remains HOLD_STRICT_RECHECK because A117 found 62 unique partial boundary blocks without an alpha-zero palette entry; do not relax the boundary gate. A odd blocked zoom-review remains exhausted; B is active on its even shard.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -580,7 +580,7 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 4,
+    "current_pending_artwork_localize_text": 0,
     "current_producer_rework_remaining": 0,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T20:39:22+09:00",
@@ -2142,6 +2142,67 @@
       "controller_visual_qa": "PASS",
       "status": "A116_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME",
       "report": "localization/graphics/role_A/20261006-A-PRODUCTION116-D1039D6F/A116_D1039D6F_REPORT.json"
+    },
+    "a118_f6811e94": {
+      "timestamp_kst": "2026-10-06T12:12:00+09:00",
+      "queue_index": 119,
+      "asset": "F6811E94",
+      "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+      "candidate_sha256": "af938e04d2555e14bc646d22be0f2ef0e5112e899c3a2b646931659ab680a6b7",
+      "translation": "Time Attack Mode -> 타임 어택 모드",
+      "source_bbox": [
+        390,
+        54,
+        1632,
+        200
+      ],
+      "localized_bbox": [
+        664,
+        62,
+        1357,
+        192
+      ],
+      "positive_margins": {
+        "left": 274,
+        "right": 275,
+        "top": 8,
+        "bottom": 8
+      },
+      "dxt5_blocks": {
+        "full_inside": 11160,
+        "partial_boundary": 347,
+        "outside_unchanged": 21261
+      },
+      "machine_qa": {
+        "bbox_size_positive_margin": "1/1 PASS",
+        "changed_outside": 0,
+        "alpha_outside": 0,
+        "protected_changed": 0,
+        "source_residue": 0
+      },
+      "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_AND_RAW_MIRROR_Y",
+      "status": "A118_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME",
+      "report": "localization/graphics/role_A/20261006-A-PRODUCTION118-F6811E94/A118_F6811E94_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION118-F6811E94/A118_CONTROLLER_SELF_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "a117_dxt5_strict_preflight": {
+      "timestamp_kst": "2026-10-06T12:06:36+09:00",
+      "indices": [
+        99,
+        119
+      ],
+      "index99": {
+        "partial_blocks": 834,
+        "partial_with_alpha_zero": 772,
+        "status": "HOLD_STRICT_RECHECK_CONSTRAINED_METHOD_STILL_REQUIRED"
+      },
+      "index119": {
+        "partial_blocks": 347,
+        "partial_with_alpha_zero": 347,
+        "status": "FEASIBLE_RESOLVED_BY_A118"
+      },
+      "report": "localization/graphics/worker_results/A117_DXT5_STRICT_PREFLIGHT.json"
     }
   },
   "data_build": {
