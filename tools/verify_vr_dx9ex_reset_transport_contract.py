@@ -359,13 +359,13 @@ require(
     "R32DirectCopyPathRejected = false;",
     "R32DirectCopyRejectHr = D3D_OK;",
 )
-reset_r32 = body(r32, "HRESULT __stdcall ResetDestR32(")
+reset_r32 = body(r32, "HRESULT R32WithResetLifecycle(")
 require_order(
     reset_r32,
-    "R32 reset lifecycle",
+    "R32 reset lifecycle owner helper",
     "if (gameDevice)",
     "R32ClearPendingProducerFences();",
-    "R32ResetR22Hook.stdcall<HRESULT>",
+    "const HRESULT hr = lowerReset();",
     "if (SUCCEEDED(hr))",
     "R32ResetAfterGameReset();",
 )
@@ -374,6 +374,13 @@ require(
     "R32 failed-reset cleanup",
     "R32InvalidateResetCaches();",
     "++R32ResetFailures;",
+)
+forbid(
+    r32,
+    "retired R32 physical Reset ownership",
+    "SafetyHookInline R32ResetR22Hook{};",
+    "HRESULT __stdcall ResetDestR32(",
+    "reinterpret_cast<void*>(&ResetDestR22), ResetDestR32",
 )
 
 # Production R23 completion must update both ACK contracts. R13/R32 use the
