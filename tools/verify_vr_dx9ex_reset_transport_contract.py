@@ -469,17 +469,22 @@ forbid(
 )
 
 present_r7 = body(r7, "HRESULT __stdcall PresentDest(")
+lower_present_marker = "const HRESULT hr=PresentHook.stdcall<HRESULT>"
+lower_present_pos = present_r7.find(lower_present_marker)
+if lower_present_pos < 0:
+    fail("DirectGPU Present path lost lower Present boundary")
+post_lower_present_r7 = present_r7[lower_present_pos:]
 require_order(
-    present_r7,
+    post_lower_present_r7,
     "DirectGPU post-Present publication ordering",
-    "const HRESULT hr=PresentHook.stdcall<HRESULT>",
+    lower_present_marker,
     "if(directTransport)",
     "if(SUCCEEDED(hr)&&DirectTransportFrameReadyAfterPresent(pendingFrameId))",
     "if(composedStereo&&SUCCEEDED(hr)&&!FrameStereoIncomplete)",
     "PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,pendingFrameId);",
     "PublishRenderFrame(OutRunVR::StereoSbsActive,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,&FrameStereoMetadata,false,directTransport);",
 )
-if present_r7.count("DirectTransportFrameReadyAfterPresent(pendingFrameId)") != 1:
+if post_lower_present_r7.count("DirectTransportFrameReadyAfterPresent(pendingFrameId)") != 1:
     fail("DirectGPU Present path must authorize publication through exactly one post-Present readiness gate")
 
 forbid(
