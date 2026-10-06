@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A148R",
+  "timestamp_kst": "2026-10-07 03:19 KST",
+  "queue_index": 55,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "selection": {
+    "reason": "No active A-owned P0/P1/C-returned REWORK/render-ready production remained after refresh; manual review of current PRE_INGAME English-original card #017 found a hard text-scale/alignment false negative in C164.",
+    "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/017_q055_2EA557B4.jpg",
+    "prior_c_status": "C164_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc"
+  },
+  "defect": {
+    "tags": [
+      "TEXT_SCALE_MATERIALLY_UNDERSIZED_VS_SOURCE",
+      "SOURCE_ALIGNMENT_HIERARCHY_MISMATCH"
+    ],
+    "source_bbox": [
+      1,
+      105,
+      1090,
+      248
+    ],
+    "source_size": [
+      1089,
+      143
+    ],
+    "c164_bbox": [
+      278,
+      113,
+      811,
+      240
+    ],
+    "c164_size": [
+      533,
+      127
+    ],
+    "visual_note": "C164 Korean occupied only about half the English title width and was centered deep inside a source title that begins at the left edge."
+  },
+  "retry_history": {
+    "a148_candidate_sha256": "13cf23b401ecf65fa3b2f70af50a5be5e1f07c086d982d634c08d7b8094b477b",
+    "a148_bbox": [
+      105,
+      113,
+      986,
+      240
+    ],
+    "a148_size": [
+      881,
+      127
+    ],
+    "a148_decision": "CONTROLLER_REJECTED_NOT_PROMOTED_SOURCE_ALIGNMENT_STILL_CENTERED",
+    "a148r_candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c"
+  },
+  "final_geometry": {
+    "source_bbox": [
+      1,
+      105,
+      1090,
+      248
+    ],
+    "localized_bbox": [
+      9,
+      113,
+      890,
+      240
+    ],
+    "source_size": [
+      1089,
+      143
+    ],
+    "localized_size": [
+      881,
+      127
+    ],
+    "delta_left": 8,
+    "delta_right": 200,
+    "delta_top": 8,
+    "delta_bottom": 8,
+    "width_gain_vs_c164_px": 348,
+    "width_ratio_vs_c164": 1.6529,
+    "source_relative_width": 0.809,
+    "alignment": "SOURCE_LEFT_WITH_POSITIVE_MARGIN"
+  },
+  "machine_qa": {
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "containment": "PASS",
+    "raw_containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "changed_pixels_outside_original_bbox": 0,
+    "alpha_changed_pixels_outside_original_bbox": 0,
+    "protected_visible_pixels_changed": 0,
+    "source_residue_visible_pixels_outside_korean_guard": 0,
+    "format": "DXT5",
+    "dimensions": [
+      2048,
+      256
+    ],
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "constrained_dxt5_partial_boundary_method": true
+  },
+  "ordered_generation_gate": {
+    "1_source_text_removed_and_plate_restored": "PASS_EXACT_SOURCE_MASK_CLEAN_PLATE",
+    "2_slant_direction_matches_source": "PASS_RIGHT_LEAN_AND_LEFT_ALIGNMENT_CONTROLLER_VISUAL",
+    "3_text_not_unnecessarily_undersized_and_within_source_bbox": "PASS_533_TO_881_WIDTH_RESTORATION",
+    "4_source_faithful_weight_outline_shadow": "PASS_SOURCE_DERIVED_GRADIENT_NAVY_WHITE_DEPTH",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGINS",
+    "6_protected_graphics_vehicle_name_box_clearance": "PASS_ZERO_PROTECTED_CHANGE",
+    "7_raw_and_flip_y_visual_review": "PASS_CONTROLLER_VISUAL_BOTH",
+    "8_immediate_readability_vs_english": "PASS_CONTROLLER_VISUAL"
+  },
+  "evidence": {
+    "worker_report": "localization/graphics/role_A/20261007-A-MANUALQA148R-2EA557B4/A148R_2EA557B4_REPORT.json",
+    "readable_compare": "localization/graphics/role_A/20261007-A-MANUALQA148R-2EA557B4/A148R_SOURCE_C164_CLEAN_NEW_READABLE.jpg",
+    "detail_compare": "localization/graphics/role_A/20261007-A-MANUALQA148R-2EA557B4/A148R_NEXT_ROUND_SOURCE_C164_NEW_DETAIL.jpg",
+    "raw_compare": "localization/graphics/role_A/20261007-A-MANUALQA148R-2EA557B4/A148R_SOURCE_C164_NEW_RAW.jpg",
+    "github_worker_runs": [
+      37508566228,
+      37510039137
+    ],
+    "final_worker_output_commit": "bd869b7f0e36acb1efec484d9d70311aa04dd668"
+  },
+  "controller_visual_qa": "PASS_SOURCE_C164_A148R_READABLE_DETAIL_AND_RAW",
+  "producer_status": "A148R_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
