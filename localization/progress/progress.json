@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T08:34:00+09:00",
+  "updated_at_kst": "2026-10-06T09:04:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1864,21 +1864,41 @@
       "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION"
     },
     "latest_a_zoom_review": {
-      "run": "A99",
-      "queue_index": 27,
-      "asset": "8B52FEEC",
-      "action": "zoom_review",
-      "source_sha256": "a11b32753655d25dbf95baf808af90a3cc3f65fb1083db0bb1db8fad80cdcf47",
-      "source_structure": "1024x512 RGBA32 mip1 raw mirror_y",
-      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "run": "A100",
+      "indices": [
+        29,
+        31,
+        33
+      ],
+      "assets": {
+        "F043316B": {
+          "queue_index": 29,
+          "source_sha256": "5eec2b8dd7796c6dfaa19ceb58cef699c1d62a475eb827a270fcd1ee45b74b96",
+          "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+          "candidate_required": false
+        },
+        "A82266FC": {
+          "queue_index": 31,
+          "source_sha256": "47de72b0fbd4f36e290a29233ff84ce0324711544debabbab6ba103d09ef1487",
+          "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+          "candidate_required": false,
+          "source_structure": "4096x2048 RGBA32 mip1 despite nominal filename"
+        },
+        "FBCAB18D": {
+          "queue_index": 33,
+          "source_sha256": "37768ef1f3af648a668bdb35c0ca3e6ee706b53cf726a98bac0f28108a1ab8b7",
+          "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+          "candidate_required": false
+        }
+      },
       "localizable_segments": 0,
-      "candidate_required": false,
-      "controller_visual_qa": "PASS_READABLE_AND_RAW",
-      "evidence": "localization/graphics/role_A/20261006-A-PROBE99-8B52FEEC/A99_CONTROLLER_CLASSIFICATION.json",
-      "status": "A99_ZOOM_REVIEW_COMPLETE_PRESERVE_ORIGINAL",
+      "controller_visual_qa": "PASS_READABLE_AND_RAW_3_OF_3",
+      "protected_artwork": "rank-grade symbols, sparkle, clothing/hat logo artwork preserved",
+      "evidence": "localization/graphics/role_A/20261006-A-PROBE100-ZOOM293133/A100_CONTROLLER_CLASSIFICATION.json",
+      "status": "A100_ZOOM_REVIEW_BATCH_COMPLETE_PRESERVE_ORIGINAL",
       "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION"
     },
-    "current_blocked_zoom_review": 38,
+    "current_blocked_zoom_review": 35,
     "b173_6ab5cee_alias": {
       "timestamp_kst": "2026-10-06T08:17:29+09:00",
       "run": "20261006-B-PRODUCTION173-JENN-ALIAS",
@@ -1909,6 +1929,41 @@
       "controller_visual_qa": "PASS_READABLE_AND_RAW",
       "evidence": "localization/graphics/role_A/20261006-A-PROBE99-8B52FEEC/A99_CONTROLLER_CLASSIFICATION.json",
       "status": "A99_ZOOM_REVIEW_COMPLETE_PRESERVE_ORIGINAL",
+      "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION"
+    },
+    "a100_zoom_review_293133": {
+      "run": "A100",
+      "indices": [
+        29,
+        31,
+        33
+      ],
+      "assets": {
+        "F043316B": {
+          "queue_index": 29,
+          "source_sha256": "5eec2b8dd7796c6dfaa19ceb58cef699c1d62a475eb827a270fcd1ee45b74b96",
+          "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+          "candidate_required": false
+        },
+        "A82266FC": {
+          "queue_index": 31,
+          "source_sha256": "47de72b0fbd4f36e290a29233ff84ce0324711544debabbab6ba103d09ef1487",
+          "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+          "candidate_required": false,
+          "source_structure": "4096x2048 RGBA32 mip1 despite nominal filename"
+        },
+        "FBCAB18D": {
+          "queue_index": 33,
+          "source_sha256": "37768ef1f3af648a668bdb35c0ca3e6ee706b53cf726a98bac0f28108a1ab8b7",
+          "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+          "candidate_required": false
+        }
+      },
+      "localizable_segments": 0,
+      "controller_visual_qa": "PASS_READABLE_AND_RAW_3_OF_3",
+      "protected_artwork": "rank-grade symbols, sparkle, clothing/hat logo artwork preserved",
+      "evidence": "localization/graphics/role_A/20261006-A-PROBE100-ZOOM293133/A100_CONTROLLER_CLASSIFICATION.json",
+      "status": "A100_ZOOM_REVIEW_BATCH_COMPLETE_PRESERVE_ORIGINAL",
       "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION"
     }
   },
