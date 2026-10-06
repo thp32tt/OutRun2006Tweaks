@@ -99,8 +99,11 @@ for key,en,ko,comp in specs:
     r=sub[:,:,0].astype(np.int16); g=sub[:,:,1].astype(np.int16); b=sub[:,:,2].astype(np.int16)
     a=sub[:,:,3]>8
     red2=a & (r>135) & (r>g+42) & (r>b+24) & (g<160) & (b<175)
-    # Union all meaningful red islands inside this tight sign ROI, then convex-hull them.
+    # Reconstruct the sign's red-body envelope scanline-by-scanline inside this
+    # sign-tight ROI. B191 proved this avoids swallowing the bright white rim,
+    # which a convex hull can include even when its seed pixels are all red.
     lab2,n2=ndimage.label(red2)
+    seed=np.zeros_like(red2)
     pts=[]
     comp_meta=[]
     for j in range(1,n2+1):
@@ -108,22 +111,42 @@ for key,en,ko,comp in specs:
         if ar<15: continue
         yy,xx=np.nonzero(cm)
         comp_meta.append([ar,[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]])
+        seed |= cm
         pts.extend((int(x),int(y)) for x,y in zip(xx,yy))
     if len(pts)<30:
-        raise RuntimeError(("insufficient red hull seed",key,len(pts),comp_meta))
+        raise RuntimeError(("insufficient red body seed",key,len(pts),comp_meta))
+    row_bounds={}
+    for yy in range(seed.shape[0]):
+        xx=np.nonzero(seed[yy])[0]
+        if len(xx)>=2:
+            row_bounds[int(yy)]=(int(xx.min()),int(xx.max()))
+    known=sorted(row_bounds)
+    if len(known)<2:
+        raise RuntimeError(("insufficient red body rows",key,known,comp_meta))
+    body=np.zeros_like(seed)
+    for yy in range(known[0],known[-1]+1):
+        if yy in row_bounds:
+            lx,rx=row_bounds[yy]
+        else:
+            lo=max(z for z in known if z<yy); hi=min(z for z in known if z>yy)
+            t=(yy-lo)/(hi-lo)
+            lx=round(row_bounds[lo][0]*(1-t)+row_bounds[hi][0]*t)
+            rx=round(row_bounds[lo][1]*(1-t)+row_bounds[hi][1]*t)
+        body[yy,lx:rx+1]=True
+    body &= a
+    banner_full=np.zeros((H,W),bool)
+    banner_full[y0:y1,x0:x1]=body
+    banner=ndimage.binary_erosion(banner_full,iterations=1,border_value=0) & alpha
+
+    # Keep the hull only as audit metadata; it no longer defines editable pixels.
     pts_arr=np.asarray(pts,dtype=np.int32)
     hull=ConvexHull(pts_arr)
     poly=[(x0+int(pts_arr[i,0]),y0+int(pts_arr[i,1])) for i in hull.vertices]
-    pm=Image.new("L",(W,H),0)
-    ImageDraw.Draw(pm).polygon(poly,fill=255)
-    banner_full=np.asarray(pm)>0
-    banner_full &= alpha
-    banner=ndimage.binary_erosion(banner_full,iterations=1,border_value=0)
-    # Keep only source-visible sign pixels; this strips any accidental hull excursion into transparency.
-    banner &= alpha
 
-    # Source glyph/effect footprint: non-sign-red bright pixels near bright text within sign interior.
-    sign_red=(rr>125)&(rr>gg+35)&(rr>bb+18)&(gg<175)&(bb<185)&alpha
+    # Source glyph/effect footprint: every pale/orange non-body pixel near the
+    # lettering inside the reconstructed red interior. Use B191's stricter
+    # sign-red family so orange English shadows cannot be mistaken for background.
+    sign_red=(rr>140)&(rr>gg+60)&(rr>bb+35)&(gg<110)&(bb<140)&alpha
     bright=banner & (rr>145) & (gg>85) & (bb>45)
     near=ndimage.binary_dilation(bright,iterations=4)
     effect=banner & ~sign_red & near
