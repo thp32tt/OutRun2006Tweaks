@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PROBE110-ZOOM169171177",
+  "timestamp_kst": "2026-10-06T11:10:00+09:00",
+  "decision": "ALL_THREE_NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+  "source_commit": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "assets": {
+    "638F38C0": {
+      "queue_index": 169,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/638F38C0_512x256.dds",
+      "source_sha256": "512a48b544d93bf4d09f90240036cae32c9af174681a382a6439916ce3db1b01",
+      "structure": "2048x1024 RGBA32 mip1 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "OutRun2 and OutRun2SP logos",
+        "course-card collage artwork",
+        "question-mark decorative/card artwork"
+      ],
+      "protected_original": [
+        "OutRun2/OutRun2SP logos",
+        "course-card artwork",
+        "question-mark artwork"
+      ],
+      "candidate_required": false
+    },
+    "67CE2848": {
+      "queue_index": 171,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/67CE2848_512x256.dds",
+      "source_sha256": "c254721290a3db1af229a11f62f5d58c0f54e9fe699a9b7b6a6dc2fb7d065168",
+      "structure": "2048x1024 RGBA32 mip1 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "two course preview photographs",
+        "OutRun2 and OutRun2SP logos only"
+      ],
+      "protected_original": [
+        "OutRun2/OutRun2SP logos",
+        "course preview photography"
+      ],
+      "candidate_required": false
+    },
+    "7978907D": {
+      "queue_index": 177,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/7978907D_512x128.dds",
+      "source_sha256": "128bd80947bd93fbce970d227b8ecb8a018abfa70e34f3888c8d56b3916edb84",
+      "structure": "2048x512 compressed DDS mip12 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL_POLICY",
+      "visual_findings": [
+        "OUTRUN2 cover/card title artwork",
+        "song titles Shiny World, Splash Wave, Night Flight"
+      ],
+      "protected_original": [
+        "game title/logo artwork",
+        "song title artwork per TRANSLATION_NAMING_POLICY"
+      ],
+      "candidate_required": false
+    }
+  },
+  "controller_visual_qa": {
+    "readable_orientation": "PASS_3_OF_3",
+    "raw_mirror_y_orientation": "PASS_3_OF_3",
+    "song_title_policy": "PASS_7978907D"
+  },
+  "status": "A110_CLASSIFICATION_COMPLETE_PRESERVE_ORIGINAL_3_OF_3",
+  "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION",
+  "vr_ffb_dx11_dxvk_touched": false
+}
