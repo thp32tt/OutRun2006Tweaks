@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PROBE111-ZOOM189191217219",
+  "timestamp_kst": "2026-10-06T11:56:00+09:00",
+  "decision": "INDEX189_191_PRESERVE_ORIGINAL_INDEX217_219_LOCALIZED",
+  "source_commit": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "assets": {
+    "8C9E91F8": {
+      "queue_index": 189,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C9E91F8_512x512.dds",
+      "source_sha256": "f191007320f170078adad09918622fd037bcd2e4352259d1197134fed47ee6f0",
+      "structure": "2048x2048 RGBA32 mip1 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "OutRun2/OutRun2SP logo artwork",
+        "vehicle/background/menu artwork only",
+        "no language-bearing menu/help/title text"
+      ],
+      "protected_original": [
+        "OutRun2/OutRun2SP logos",
+        "vehicle/background artwork"
+      ],
+      "candidate_required": false
+    },
+    "94BB6271": {
+      "queue_index": 191,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/94BB6271_512x256.dds",
+      "source_sha256": "1a6de01568dbe1b161eb2b734f2c056fb74d20290d59cdac463dca3a72784c99",
+      "structure": "2048x1024 RGBA32 mip1 raw mirror_y",
+      "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "visual_findings": [
+        "four course-preview photographs",
+        "OutRun2SP logo artwork only"
+      ],
+      "protected_original": [
+        "OutRun2SP logo artwork",
+        "course-preview photography"
+      ],
+      "candidate_required": false
+    },
+    "D1039D6F": {
+      "queue_index": 217,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+      "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+      "structure": "2048x2048 RGBA32 mip1 raw mirror_y",
+      "classification": "LOCALIZABLE_TEXT",
+      "segments": [
+        {
+          "source": "START",
+          "korean": "출발",
+          "occurrences": 1
+        },
+        {
+          "source": "GOAL",
+          "korean": "골",
+          "occurrences": 1
+        }
+      ],
+      "protected_original": [
+        "OutRun2SP logos",
+        "course thumbnails",
+        "route map/road artwork"
+      ],
+      "candidate_required": true,
+      "producer_run": "20261006-A-PRODUCTION116-D1039D6F"
+    },
+    "D263B3F1": {
+      "queue_index": 219,
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+      "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+      "structure": "2048x2048 RGBA32 mip1 raw mirror_y",
+      "classification": "LOCALIZABLE_TEXT",
+      "segments": [
+        {
+          "source": "COURSE SELECT",
+          "korean": "코스 선택",
+          "occurrences": 1
+        }
+      ],
+      "protected_original": [
+        "OutRun2/OutRun2SP logo artwork",
+        "button/background artwork"
+      ],
+      "candidate_required": true,
+      "producer_run": "20261006-A-PRODUCTION113-D263-D103-DIAG"
+    }
+  },
+  "controller_visual_qa": {
+    "readable_orientation": "PASS_4_OF_4",
+    "raw_mirror_y_orientation": "PASS_4_OF_4",
+    "preserve_original_indices": [
+      189,
+      191
+    ],
+    "localized_indices": [
+      217,
+      219
+    ]
+  },
+  "evidence": [
+    "A111_8C9E91F8_READABLE_PROOF.jpg",
+    "A111_8C9E91F8_RAW_MIRROR_Y_PROOF.jpg",
+    "A111_94BB6271_READABLE_PROOF.jpg",
+    "A111_94BB6271_RAW_MIRROR_Y_PROOF.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION116-D1039D6F/A116_D103_SOURCE_CLEAN_FINAL_CONTACT.jpg",
+    "localization/graphics/role_A/20261006-A-PRODUCTION113-D263-D103-DIAG/A113_D263_CONTACTS.jpg"
+  ],
+  "status": "A111_CLASSIFICATION_COMPLETE_A113_A116_PRODUCTION_COMPLETE_FOR_TEXT_ASSETS",
+  "runtime_validation": "INDEX217_219_UNTESTED_INDEX189_191_NOT_REQUIRED_FOR_LOCALIZATION",
+  "vr_ffb_dx11_dxvk_touched": false
+}
