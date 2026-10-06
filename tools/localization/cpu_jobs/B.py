@@ -22,7 +22,7 @@ items=[
  (214,"textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds"),
  (238,"textures/load/spr_sprani_sumo_loading_Exst/132A1B1F_512x512.dds"),
 ]
-source_commit="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
+source_commit="a95efe01d1f136514cef94b0d9e9fd61df021754"
 
 with (repo/"localization/graphics/inventory.csv").open(encoding="utf-8-sig",newline="") as f:
     inventory={r["path"]:r for r in csv.DictReader(f)}
