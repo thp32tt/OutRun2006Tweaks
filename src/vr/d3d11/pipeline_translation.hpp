@@ -621,6 +621,83 @@ namespace outrun::vr::dx11
         const ProgrammableShaderRegisterSemantics& pixelSemantics,
         const ProgrammableShaderInterfaceLinkageEvidence& interfaceLinkage) noexcept;
 
+    // R272 turns the exact R271 pair receipt plus R266 operand provenance into
+    // a deterministic, fail-closed logical constant/sampler mapping plan.
+    // The target indices are translation-plan identities only: no D3D11
+    // constant buffer, sampler object or shader is created/bound here.
+    enum class ProgrammableShaderConstantRegisterClass : std::uint8_t
+    {
+        Float = 0,
+        Int = 1,
+        Bool = 2,
+    };
+
+    struct ProgrammableShaderConstantRegisterMapping
+    {
+        bool vertexStage = false;
+        ProgrammableShaderConstantRegisterClass registerClass =
+            ProgrammableShaderConstantRegisterClass::Float;
+        D3DSHADER_PARAM_REGISTER_TYPE sourceRegisterType = D3DSPR_FORCE_DWORD;
+        UINT sourceRegisterIndex = 0;
+        UINT normalizedConstantIndex = 0;
+        UINT logicalTargetIndex = 0;
+    };
+
+    struct ProgrammableShaderSamplerRegisterMapping
+    {
+        bool vertexStage = false;
+        UINT sourceRegisterIndex = 0;
+        UINT targetSamplerSlot = 0;
+    };
+
+    struct ProgrammableShaderRegisterMappingPlanEvidence
+    {
+        bool sourceSemanticReceiptExact = false;
+        bool vertexRegisterSemanticsExact = false;
+        bool pixelRegisterSemanticsExact = false;
+        bool constantRegisterMappingExact = false;
+        bool samplerMappingExact = false;
+        bool complete = false;
+        std::uint64_t cacheKey = 0;
+        std::uint64_t pairSemanticHash = 0;
+        std::uint64_t vertexRegisterSemanticsHash = 0;
+        std::uint64_t pixelRegisterSemanticsHash = 0;
+        UINT constantMappingCount = 0;
+        UINT samplerMappingCount = 0;
+        std::uint64_t constantMappingHash = 0;
+        std::uint64_t samplerMappingHash = 0;
+        std::uint64_t planRevisionHash = 0;
+        std::uint64_t semanticContractHash = 0;
+        std::vector<ProgrammableShaderConstantRegisterMapping> constantMappings;
+        std::vector<ProgrammableShaderSamplerRegisterMapping> samplerMappings;
+
+        [[nodiscard]] bool exact() const noexcept
+        {
+            return sourceSemanticReceiptExact &&
+                   vertexRegisterSemanticsExact &&
+                   pixelRegisterSemanticsExact &&
+                   constantRegisterMappingExact &&
+                   samplerMappingExact &&
+                   complete &&
+                   cacheKey != 0 &&
+                   pairSemanticHash != 0 &&
+                   vertexRegisterSemanticsHash != 0 &&
+                   pixelRegisterSemanticsHash != 0 &&
+                   constantMappingCount == constantMappings.size() &&
+                   samplerMappingCount == samplerMappings.size() &&
+                   constantMappingHash != 0 &&
+                   samplerMappingHash != 0 &&
+                   planRevisionHash != 0 &&
+                   semanticContractHash != 0;
+        }
+    };
+
+    [[nodiscard]] ProgrammableShaderRegisterMappingPlanEvidence
+    derive_programmable_shader_register_mapping_plan(
+        const ProgrammableShaderPairSourceSemanticEvidence& sourceReceipt,
+        const ProgrammableShaderRegisterSemantics& vertexSemantics,
+        const ProgrammableShaderRegisterSemantics& pixelSemantics) noexcept;
+
     [[nodiscard]] ProgrammableShaderPairCacheIdentity
     seal_programmable_shader_pair_cache_identity(
         bool observationComplete,

@@ -2421,6 +2421,256 @@ namespace outrun::vr::dx11
         return out;
     }
 
+    ProgrammableShaderRegisterMappingPlanEvidence
+    derive_programmable_shader_register_mapping_plan(
+        const ProgrammableShaderPairSourceSemanticEvidence& sourceReceipt,
+        const ProgrammableShaderRegisterSemantics& vertexSemantics,
+        const ProgrammableShaderRegisterSemantics& pixelSemantics) noexcept
+    {
+        ProgrammableShaderRegisterMappingPlanEvidence out{};
+        out.cacheKey = sourceReceipt.cacheKey;
+        out.pairSemanticHash = sourceReceipt.pairSemanticHash;
+        out.vertexRegisterSemanticsHash =
+            sourceReceipt.vertexRegisterSemanticsHash;
+        out.pixelRegisterSemanticsHash =
+            sourceReceipt.pixelRegisterSemanticsHash;
+
+        static constexpr char kPlanRevision[] =
+            "R272_D3D9_PROGRAMMABLE_REGISTER_MAPPING_PLAN_V1";
+        static constexpr char kSemanticContract[] =
+            "R272_R271_R266_EXACT_CONSTANT_SAMPLER_MAPPING_V1";
+        out.planRevisionHash =
+            hash_bytes(kPlanRevision, sizeof(kPlanRevision) - 1u);
+        out.semanticContractHash =
+            hash_bytes(kSemanticContract, sizeof(kSemanticContract) - 1u);
+
+        out.sourceSemanticReceiptExact = sourceReceipt.exact();
+        out.vertexRegisterSemanticsExact =
+            vertexSemantics.exact() &&
+            vertexSemantics.vertexStage &&
+            vertexSemantics.versionToken == sourceReceipt.vertexVersionToken &&
+            vertexSemantics.sourceBytecodeHash ==
+                sourceReceipt.vertexSourceBytecodeHash &&
+            vertexSemantics.registerSemanticsHash ==
+                sourceReceipt.vertexRegisterSemanticsHash;
+        out.pixelRegisterSemanticsExact =
+            pixelSemantics.exact() &&
+            !pixelSemantics.vertexStage &&
+            pixelSemantics.versionToken == sourceReceipt.pixelVersionToken &&
+            pixelSemantics.sourceBytecodeHash ==
+                sourceReceipt.pixelSourceBytecodeHash &&
+            pixelSemantics.registerSemanticsHash ==
+                sourceReceipt.pixelRegisterSemanticsHash;
+
+        if (!out.sourceSemanticReceiptExact ||
+            !out.vertexRegisterSemanticsExact ||
+            !out.pixelRegisterSemanticsExact)
+            return out;
+
+        UINT observedConstantReferences = 0;
+        UINT observedSamplerReferences = 0;
+        const auto append_stage =
+            [&](const ProgrammableShaderRegisterSemantics& semantics,
+                bool vertexStage) -> bool
+        {
+            for (const auto& operand : semantics.operands)
+            {
+                if (operand.constantReference && operand.samplerReference)
+                    return false;
+
+                if (operand.constantReference)
+                {
+                    ++observedConstantReferences;
+                    if (operand.role !=
+                            ProgrammableShaderRegisterOperandRole::Source ||
+                        operand.relativeAddressing)
+                        return false;
+
+                    ProgrammableShaderConstantRegisterMapping mapping{};
+                    mapping.vertexStage = vertexStage;
+                    mapping.sourceRegisterType = operand.registerType;
+                    mapping.sourceRegisterIndex = operand.registerIndex;
+                    mapping.normalizedConstantIndex =
+                        operand.normalizedConstantIndex;
+
+                    switch (operand.registerType)
+                    {
+                    case D3DSPR_CONST:
+                        mapping.registerClass =
+                            ProgrammableShaderConstantRegisterClass::Float;
+                        if (mapping.normalizedConstantIndex !=
+                            mapping.sourceRegisterIndex)
+                            return false;
+                        break;
+                    case D3DSPR_CONST2:
+                        mapping.registerClass =
+                            ProgrammableShaderConstantRegisterClass::Float;
+                        if (mapping.normalizedConstantIndex !=
+                            2048u + mapping.sourceRegisterIndex)
+                            return false;
+                        break;
+                    case D3DSPR_CONST3:
+                        mapping.registerClass =
+                            ProgrammableShaderConstantRegisterClass::Float;
+                        if (mapping.normalizedConstantIndex !=
+                            4096u + mapping.sourceRegisterIndex)
+                            return false;
+                        break;
+                    case D3DSPR_CONST4:
+                        mapping.registerClass =
+                            ProgrammableShaderConstantRegisterClass::Float;
+                        if (mapping.normalizedConstantIndex !=
+                            6144u + mapping.sourceRegisterIndex)
+                            return false;
+                        break;
+                    case D3DSPR_CONSTINT:
+                        mapping.registerClass =
+                            ProgrammableShaderConstantRegisterClass::Int;
+                        if (mapping.normalizedConstantIndex !=
+                            mapping.sourceRegisterIndex)
+                            return false;
+                        break;
+                    case D3DSPR_CONSTBOOL:
+                        mapping.registerClass =
+                            ProgrammableShaderConstantRegisterClass::Bool;
+                        if (mapping.normalizedConstantIndex !=
+                            mapping.sourceRegisterIndex)
+                            return false;
+                        break;
+                    default:
+                        return false;
+                    }
+                    mapping.logicalTargetIndex =
+                        mapping.normalizedConstantIndex;
+
+                    bool duplicate = false;
+                    for (const auto& existing : out.constantMappings)
+                    {
+                        if (existing.vertexStage == mapping.vertexStage &&
+                            existing.registerClass == mapping.registerClass &&
+                            existing.normalizedConstantIndex ==
+                                mapping.normalizedConstantIndex)
+                        {
+                            if (existing.sourceRegisterType !=
+                                    mapping.sourceRegisterType ||
+                                existing.sourceRegisterIndex !=
+                                    mapping.sourceRegisterIndex ||
+                                existing.logicalTargetIndex !=
+                                    mapping.logicalTargetIndex)
+                                return false;
+                            duplicate = true;
+                            break;
+                        }
+                    }
+                    if (!duplicate)
+                        out.constantMappings.push_back(mapping);
+                }
+
+                if (operand.samplerReference)
+                {
+                    ++observedSamplerReferences;
+                    if (operand.role !=
+                            ProgrammableShaderRegisterOperandRole::Source ||
+                        operand.registerType != D3DSPR_SAMPLER ||
+                        operand.relativeAddressing)
+                        return false;
+
+                    ProgrammableShaderSamplerRegisterMapping mapping{};
+                    mapping.vertexStage = vertexStage;
+                    mapping.sourceRegisterIndex = operand.registerIndex;
+                    mapping.targetSamplerSlot = operand.registerIndex;
+
+                    bool duplicate = false;
+                    for (const auto& existing : out.samplerMappings)
+                    {
+                        if (existing.vertexStage == mapping.vertexStage &&
+                            existing.sourceRegisterIndex ==
+                                mapping.sourceRegisterIndex)
+                        {
+                            if (existing.targetSamplerSlot !=
+                                mapping.targetSamplerSlot)
+                                return false;
+                            duplicate = true;
+                            break;
+                        }
+                    }
+                    if (!duplicate)
+                        out.samplerMappings.push_back(mapping);
+                }
+            }
+            return true;
+        };
+
+        if (!append_stage(vertexSemantics, true) ||
+            !append_stage(pixelSemantics, false))
+            return out;
+
+        const UINT expectedConstantReferences =
+            sourceReceipt.vertexConstantReferenceCount +
+            sourceReceipt.pixelConstantReferenceCount;
+        const UINT expectedSamplerReferences =
+            sourceReceipt.vertexSamplerReferenceCount +
+            sourceReceipt.pixelSamplerReferenceCount;
+        if (observedConstantReferences != expectedConstantReferences ||
+            observedSamplerReferences != expectedSamplerReferences)
+            return out;
+
+        std::uint64_t constantHash = 1469598103934665603ull;
+        std::uint64_t samplerHash = 1469598103934665603ull;
+        const auto mix =
+            [](std::uint64_t& hash, std::uint64_t value) noexcept
+        {
+            for (unsigned shift = 0; shift < 64u; shift += 8u)
+            {
+                hash ^= static_cast<std::uint8_t>(
+                    (value >> shift) & 0xFFu);
+                hash *= 1099511628211ull;
+            }
+        };
+
+        mix(constantHash, out.cacheKey);
+        mix(constantHash, out.pairSemanticHash);
+        mix(constantHash, out.vertexRegisterSemanticsHash);
+        mix(constantHash, out.pixelRegisterSemanticsHash);
+        mix(constantHash, out.planRevisionHash);
+        mix(constantHash, out.semanticContractHash);
+        for (const auto& mapping : out.constantMappings)
+        {
+            mix(constantHash, mapping.vertexStage ? 1u : 0u);
+            mix(constantHash,
+                static_cast<std::uint64_t>(mapping.registerClass));
+            mix(constantHash,
+                static_cast<DWORD>(mapping.sourceRegisterType));
+            mix(constantHash, mapping.sourceRegisterIndex);
+            mix(constantHash, mapping.normalizedConstantIndex);
+            mix(constantHash, mapping.logicalTargetIndex);
+        }
+
+        mix(samplerHash, out.cacheKey);
+        mix(samplerHash, out.pairSemanticHash);
+        mix(samplerHash, out.vertexRegisterSemanticsHash);
+        mix(samplerHash, out.pixelRegisterSemanticsHash);
+        mix(samplerHash, out.planRevisionHash);
+        mix(samplerHash, out.semanticContractHash);
+        for (const auto& mapping : out.samplerMappings)
+        {
+            mix(samplerHash, mapping.vertexStage ? 1u : 0u);
+            mix(samplerHash, mapping.sourceRegisterIndex);
+            mix(samplerHash, mapping.targetSamplerSlot);
+        }
+
+        out.constantMappingCount =
+            static_cast<UINT>(out.constantMappings.size());
+        out.samplerMappingCount =
+            static_cast<UINT>(out.samplerMappings.size());
+        out.constantMappingHash = constantHash == 0 ? 1 : constantHash;
+        out.samplerMappingHash = samplerHash == 0 ? 1 : samplerHash;
+        out.constantRegisterMappingExact = true;
+        out.samplerMappingExact = true;
+        out.complete = true;
+        return out;
+    }
+
     ProgrammableShaderPairCacheIdentity
     seal_programmable_shader_pair_cache_identity(
         bool observationComplete,

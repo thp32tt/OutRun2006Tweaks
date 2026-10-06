@@ -993,6 +993,130 @@ int main()
         !r271StalePair.exact(),
         "R271 rejects detached pixel register semantics from another source stream");
 
+    const DWORD r272VsTokens[] = {
+        D3DVS_VERSION(3, 0),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        r267DclSemanticToken(D3DDECLUSAGE_POSITION, 0u),
+        r266ParameterToken(
+            D3DSPR_INPUT, 0u, D3DSP_WRITEMASK_ALL),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        r267DclSemanticToken(D3DDECLUSAGE_TEXCOORD, 1u),
+        r266ParameterToken(
+            D3DSPR_OUTPUT, 2u, D3DSP_WRITEMASK_ALL),
+        static_cast<DWORD>(D3DSIO_MOV) | (2u << 24u),
+        r266ParameterToken(
+            D3DSPR_OUTPUT, 2u, D3DSP_WRITEMASK_ALL),
+        r266ParameterToken(
+            D3DSPR_CONST, 5u, D3DSP_NOSWIZZLE),
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const DWORD r272PsTokens[] = {
+        D3DPS_VERSION(3, 0),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        r267DclSemanticToken(D3DDECLUSAGE_TEXCOORD, 1u),
+        r266ParameterToken(
+            D3DSPR_INPUT, 0u,
+            D3DSP_WRITEMASK_0 | D3DSP_WRITEMASK_1),
+        static_cast<DWORD>(D3DSIO_TEX) | (3u << 24u),
+        r266ParameterToken(
+            D3DSPR_TEMP, 0u, D3DSP_WRITEMASK_ALL),
+        r266ParameterToken(
+            D3DSPR_INPUT, 0u, D3DSP_NOSWIZZLE),
+        r266ParameterToken(
+            D3DSPR_SAMPLER, 3u, D3DSP_NOSWIZZLE),
+        static_cast<DWORD>(D3DSIO_END),
+    };
+    const auto r272VsEvidence =
+        capture_programmable_shader_function_source_evidence(
+            r272VsTokens, sizeof(r272VsTokens), true);
+    const auto r272PsEvidence =
+        capture_programmable_shader_function_source_evidence(
+            r272PsTokens, sizeof(r272PsTokens), false);
+    const auto r272VsDecode =
+        decode_programmable_shader_instruction_stream(r272VsEvidence);
+    const auto r272PsDecode =
+        decode_programmable_shader_instruction_stream(r272PsEvidence);
+    const auto r272VsRegisterSemantics =
+        decode_programmable_shader_register_semantics(r272VsDecode);
+    const auto r272PsRegisterSemantics =
+        decode_programmable_shader_register_semantics(r272PsDecode);
+    const auto r272VsInterfaceSemantics =
+        decode_programmable_shader_interface_semantics(
+            r272VsDecode, r272VsRegisterSemantics);
+    const auto r272PsInterfaceSemantics =
+        decode_programmable_shader_interface_semantics(
+            r272PsDecode, r272PsRegisterSemantics);
+    const auto r272Linkage =
+        derive_programmable_shader_interface_linkage_evidence(
+            r272VsInterfaceSemantics, r272PsInterfaceSemantics);
+    const ProgrammableShaderFunctionIdentity r272VsIdentity{
+        true, true, static_cast<UINT>(sizeof(r272VsTokens)),
+        r272VsEvidence.versionToken, r272VsEvidence.bytecodeHash,
+    };
+    const ProgrammableShaderFunctionIdentity r272PsIdentity{
+        true, true, static_cast<UINT>(sizeof(r272PsTokens)),
+        r272PsEvidence.versionToken, r272PsEvidence.bytecodeHash,
+    };
+    const auto r272Pair =
+        seal_programmable_shader_pair_cache_identity(
+            true, false, r272VsIdentity, r272PsIdentity);
+    const auto r272SourceReceipt =
+        derive_programmable_shader_pair_source_semantic_evidence(
+            r272Pair, r272VsRegisterSemantics,
+            r272PsRegisterSemantics, r272Linkage);
+    const auto r272MappingPlan =
+        derive_programmable_shader_register_mapping_plan(
+            r272SourceReceipt,
+            r272VsRegisterSemantics,
+            r272PsRegisterSemantics);
+    require(
+        r272SourceReceipt.exact() &&
+        r272MappingPlan.exact() &&
+        r272MappingPlan.sourceSemanticReceiptExact &&
+        r272MappingPlan.vertexRegisterSemanticsExact &&
+        r272MappingPlan.pixelRegisterSemanticsExact &&
+        r272MappingPlan.constantRegisterMappingExact &&
+        r272MappingPlan.samplerMappingExact &&
+        r272MappingPlan.constantMappingCount == 1u &&
+        r272MappingPlan.samplerMappingCount == 1u &&
+        r272MappingPlan.constantMappings.size() == 1u &&
+        r272MappingPlan.constantMappings[0].vertexStage &&
+        r272MappingPlan.constantMappings[0].registerClass ==
+            ProgrammableShaderConstantRegisterClass::Float &&
+        r272MappingPlan.constantMappings[0].sourceRegisterType ==
+            D3DSPR_CONST &&
+        r272MappingPlan.constantMappings[0].sourceRegisterIndex == 5u &&
+        r272MappingPlan.constantMappings[0].normalizedConstantIndex == 5u &&
+        r272MappingPlan.constantMappings[0].logicalTargetIndex == 5u &&
+        r272MappingPlan.samplerMappings.size() == 1u &&
+        !r272MappingPlan.samplerMappings[0].vertexStage &&
+        r272MappingPlan.samplerMappings[0].sourceRegisterIndex == 3u &&
+        r272MappingPlan.samplerMappings[0].targetSamplerSlot == 3u &&
+        r272MappingPlan.constantMappingHash != 0 &&
+        r272MappingPlan.samplerMappingHash != 0 &&
+        r272MappingPlan.planRevisionHash != 0 &&
+        r272MappingPlan.semanticContractHash != 0,
+        "R272 derives exact deterministic constant-register and sampler mapping plan");
+
+    auto r272RelativeVs = r272VsRegisterSemantics;
+    for (auto& operand : r272RelativeVs.operands)
+    {
+        if (operand.constantReference)
+        {
+            operand.relativeAddressing = true;
+            break;
+        }
+    }
+    const auto r272RelativePlan =
+        derive_programmable_shader_register_mapping_plan(
+            r272SourceReceipt, r272RelativeVs, r272PsRegisterSemantics);
+    require(
+        !r272RelativePlan.constantRegisterMappingExact &&
+        !r272RelativePlan.samplerMappingExact &&
+        !r272RelativePlan.complete &&
+        !r272RelativePlan.exact(),
+        "R272 rejects relative-address constant mapping plans fail closed");
+
     NativeProgrammableShaderPairCache programmableCache;
     require(
         !programmableCache.ready() &&

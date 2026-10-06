@@ -10621,6 +10621,40 @@ def main() -> None:
                 missing_r271_programmable_pair_source_semantic_receipt)
         )
 
+    r272_programmable_register_mapping_plan_contract = [
+        ("struct ProgrammableShaderRegisterMappingPlanEvidence",
+         PIPELINE_TRANSLATION_HPP, "R272 mapping-plan evidence type"),
+        ("derive_programmable_shader_register_mapping_plan(",
+         PIPELINE_TRANSLATION_HPP, "R272 mapping-plan derivation declaration"),
+        ("R272_D3D9_PROGRAMMABLE_REGISTER_MAPPING_PLAN_V1",
+         PIPELINE_TRANSLATION_CPP, "R272 mapping-plan revision provenance"),
+        ("R272_R271_R266_EXACT_CONSTANT_SAMPLER_MAPPING_V1",
+         PIPELINE_TRANSLATION_CPP, "R272 mapping semantic contract provenance"),
+        ("operand.relativeAddressing)",
+         PIPELINE_TRANSLATION_CPP, "R272 relative-address mapping stays fail closed"),
+        ("shaderRegisterMappingPlanExact",
+         RUNTIME_CENSUS, "R272 production census seals mapping-plan exactness"),
+        ("VR DX11 R272 registerMappingPlan:",
+         RUNTIME_CENSUS, "R272 production census exposes mapping-plan hashes"),
+        ("R272 derives exact deterministic constant-register and sampler mapping plan",
+         CONSTANT_BUFFER_PROBE, "R272 positive register/sampler mapping regression"),
+        ("R272 rejects relative-address constant mapping plans fail closed",
+         CONSTANT_BUFFER_PROBE, "R272 relative-address fail-closed regression"),
+        ("sig.shaderTranslationExact = false;",
+         RUNTIME_CENSUS, "R272 must not widen programmable translation readiness"),
+    ]
+    missing_r272_programmable_register_mapping_plan = [
+        meaning for token, source, meaning
+        in r272_programmable_register_mapping_plan_contract
+        if token not in source
+    ]
+    if missing_r272_programmable_register_mapping_plan:
+        raise SystemExit(
+            "DX11 R272 programmable register-mapping plan drift: "
+            + ", ".join(
+                missing_r272_programmable_register_mapping_plan)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),

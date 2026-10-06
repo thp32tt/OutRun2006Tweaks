@@ -312,6 +312,15 @@ namespace outrun::vr::dx11
             std::uint64_t shaderSourceSemanticContractHash{};
             std::uint64_t shaderSourceVertexRegisterHash{};
             std::uint64_t shaderSourcePixelRegisterHash{};
+            // R272 materializes a deterministic logical register/sampler map
+            // from the exact R271/R266 source receipts without activating it.
+            bool shaderRegisterMappingPlanExact{};
+            UINT shaderConstantRegisterMappingCount{};
+            UINT shaderSamplerMappingCount{};
+            std::uint64_t shaderConstantRegisterMappingHash{};
+            std::uint64_t shaderSamplerMappingHash{};
+            std::uint64_t shaderRegisterMappingPlanRevisionHash{};
+            std::uint64_t shaderRegisterMappingSemanticContractHash{};
             bool shaderTranslationExact{};
             // R220: keep the shader activation-readiness boundary distinct
             // from translation implementation state. Programmable D3D9 shader
@@ -733,6 +742,20 @@ namespace outrun::vr::dx11
                 hash, sig.shaderSourceVertexRegisterHash);
             hash = hash_mix(
                 hash, sig.shaderSourcePixelRegisterHash);
+            hash = hash_mix(
+                hash, sig.shaderRegisterMappingPlanExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderConstantRegisterMappingCount);
+            hash = hash_mix(
+                hash, sig.shaderSamplerMappingCount);
+            hash = hash_mix(
+                hash, sig.shaderConstantRegisterMappingHash);
+            hash = hash_mix(
+                hash, sig.shaderSamplerMappingHash);
+            hash = hash_mix(
+                hash, sig.shaderRegisterMappingPlanRevisionHash);
+            hash = hash_mix(
+                hash, sig.shaderRegisterMappingSemanticContractHash);
             hash = hash_mix(hash, sig.shaderIntrospectionComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderMixedPair ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderTranslationExact ? 1u : 0u);
@@ -1389,6 +1412,25 @@ namespace outrun::vr::dx11
                 sourceSemanticPair.vertexRegisterSemanticsHash;
             sig.shaderSourcePixelRegisterHash =
                 sourceSemanticPair.pixelRegisterSemanticsHash;
+            const auto registerMappingPlan =
+                derive_programmable_shader_register_mapping_plan(
+                    sourceSemanticPair,
+                    vertexRegisterSemantics,
+                    pixelRegisterSemantics);
+            sig.shaderRegisterMappingPlanExact =
+                registerMappingPlan.exact();
+            sig.shaderConstantRegisterMappingCount =
+                registerMappingPlan.constantMappingCount;
+            sig.shaderSamplerMappingCount =
+                registerMappingPlan.samplerMappingCount;
+            sig.shaderConstantRegisterMappingHash =
+                registerMappingPlan.constantMappingHash;
+            sig.shaderSamplerMappingHash =
+                registerMappingPlan.samplerMappingHash;
+            sig.shaderRegisterMappingPlanRevisionHash =
+                registerMappingPlan.planRevisionHash;
+            sig.shaderRegisterMappingSemanticContractHash =
+                registerMappingPlan.semanticContractHash;
 
             // R80 starts fail-closed. R215 may promote only the later
             // fixed-function branch after its resource-dependent pixel
@@ -1915,6 +1957,15 @@ namespace outrun::vr::dx11
                         sig.shaderInterfaceLinkHash,
                         sig.shaderSourceSemanticReceiptRevisionHash,
                         sig.shaderSourceSemanticContractHash);
+                    spdlog::info(
+                        "VR DX11 R272 registerMappingPlan: exact={} constants={} samplers={} constantHash=0x{:016X} samplerHash=0x{:016X} planRevision=0x{:016X} contract=0x{:016X}",
+                        sig.shaderRegisterMappingPlanExact ? 1 : 0,
+                        sig.shaderConstantRegisterMappingCount,
+                        sig.shaderSamplerMappingCount,
+                        sig.shaderConstantRegisterMappingHash,
+                        sig.shaderSamplerMappingHash,
+                        sig.shaderRegisterMappingPlanRevisionHash,
+                        sig.shaderRegisterMappingSemanticContractHash);
                 }
                 spdlog::info(
                     "VR DX11 R85 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] shader[introspection={},mixed={},exact={},vsPresent={},vsBytes={},vsVersion=0x{:08X},vsHash=0x{:016X},psPresent={},psBytes={},psVersion=0x{:08X},psHash=0x{:016X}] ffpCoverage[exact={}] ffpReadiness[ready={},mask=0x{:08X},activeStages={}] texMask[present=0x{:02X},exact=0x{:02X}] managedTexShadow[required=0x{:02X},ready=0x{:02X}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
