@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 07:14 KST",
+  "updated_at_kst": "2026-10-07 07:30 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -3478,6 +3478,21 @@
     "rework": "TUNED/NORMAL short Hangul labels expanded semantically to 튜닝 사양/일반 사양 with native Black source-family treatment; widths 55/58 -> 121/120px inside 139/174px source bboxes",
     "qa": "2/2 bbox/size/positive-margin PASS; final validator PASS; outside/alpha/protected=0; exact RGBA32 header/raw mirror_y; controller readable/row/raw PASS",
     "producer_status": "A150_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "a151_754f0599": {
+    "run": "A151",
+    "timestamp_kst": "2026-10-07 07:30 KST",
+    "queue_index": 175,
+    "asset": "754F0599",
+    "trigger": "PRE_INGAME_025_SOURCE_RELATIVE_SCALE_HIERARCHY_FALSE_NEGATIVE",
+    "prior_candidate_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+    "candidate_sha256": "f21970a3d6d8ae69954d0159524856b5019cd1445daa65c55d85213f73e431f5",
+    "rework": "stage select/showroom/single player fresh native rerender; heights 103/95/109 -> 124/114/130px within source 143/132/151; source-left metallic right-lean family",
+    "qa": "3/3 bbox/size/positive-margin PASS; final validator PASS; outside/alpha/protected=0; exact BGRA header/raw mirror_y; controller readable/row/raw PASS",
+    "producer_status": "A151_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
     "fresh_independent_c": "PENDING",
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
