@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "2/3",
-  "status": "VALIDATING",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "a5b22f29c7771bb0b2c59a5f3280dd41c67cd8eb",
-  "material_result_sha": "PENDING_SELF",
-  "validation_bearing_result_sha": "PENDING_SELF",
-  "result_sha": "PENDING_SELF",
+  "material_result_sha": "06bc9a82a71dc3430246cc15c2311525e758aecd",
+  "validation_bearing_result_sha": "06bc9a82a71dc3430246cc15c2311525e758aecd",
+  "result_sha": "06bc9a82a71dc3430246cc15c2311525e758aecd",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00473]",
   "selected_work_item": "VR-DX9EX-R26-DESTROY-TRANSACTION-0056",
   "summary": "Move R26 ResetSessionState after the downstream DestroySession result so failure preserves accepted/pending recenter ownership and remains retryable.",
@@ -32,24 +32,29 @@
       "evidence": "R26 now forwards to R24 first and calls ResetSessionState only on XR_SUCCESS; deterministic verifier pins ordering."
     },
     "C3_VALIDATE": {
-      "status": "RETRYING",
-      "automation_validation": "PENDING",
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
       "runtime_validation": "UNTESTED",
-      "evidence": "Initial policy failure was verifier-only; production R26 source remains unchanged."
+      "evidence": "Retry exact SHA passed DX9Ex Active 37428755174, Domain Isolation 37428755333 and Autodev Coordination 37428755231. Attempt 1 failure was verifier-only."
     },
     "C4_COMMIT": {
-      "status": "PENDING",
+      "status": "COMPLETE",
+      "result_sha": "06bc9a82a71dc3430246cc15c2311525e758aecd",
+      "source_material_sha": "814bd13b307d1650f46e0011f35ada00df0442f5",
+      "validation_bearing_result_sha": "06bc9a82a71dc3430246cc15c2311525e758aecd",
       "ci_skip_on_validation_bearing_result": false
     },
     "C5_PACKAGE": {
-      "status": "PENDING"
+      "status": "COMPLETE",
+      "artifact_id": 11396022354,
+      "digest": "sha256:8d31b3f9ffdfafe38c71b5ded4f90bf4d19c95901a41973cf09b4e7bc2312918"
     },
     "C6_STATE": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "runtime_validation": "UNTESTED"
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "changed_paths": [
       "vrhost/src/runtime/r26_recenter_hardening.hpp",
@@ -67,10 +72,30 @@
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "validation": {
+      "initial_dx9ex_active_run_id": 37428606192,
+      "initial_policy_job_id": 112153903276,
+      "initial_domain_isolation_run_id": 37428606203,
+      "initial_autodev_coordination_run_id": 37428606180,
+      "dx9ex_active_run_id": 37428755174,
+      "policy_job_id": 112154382266,
+      "game_job_id": 112154492467,
+      "host_job_id": 112154492474,
+      "full_chain_compile_job_id": 112154492630,
+      "package_job_id": 112156111193,
+      "domain_isolation_run_id": 37428755333,
+      "autodev_coordination_run_id": 37428755231,
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11396022354,
+      "digest": "sha256:8d31b3f9ffdfafe38c71b5ded4f90bf4d19c95901a41973cf09b4e7bc2312918"
     }
   },
-  "next_action": "Run canonical exact-SHA validation for retry 2. Treat source semantics as unchanged from 814bd13b; on PASS, retain retry SHA as validation-bearing result and record 814bd13b as source_material_sha.",
+  "next_action": "CONVERSION-DX9EX-00474: make R24 black-screen-guard DestroySession transactional so a failed downstream parent destroy preserves current submission counters and committed-run provenance for retry.",
   "started_at_kst": "2026-10-06T16:12:00+09:00",
   "source_material_sha": "814bd13b307d1650f46e0011f35ada00df0442f5",
-  "failure_context": "Attempt 1 exact SHA 814bd13b307d1650f46e0011f35ada00df0442f5: Domain Isolation 37428606203 SUCCESS and Autodev Coordination 37428606180 SUCCESS; DX9Ex Active 37428606192 policy failed only because verify_vr_recenter_contract.py pinned the obsolete pre-transactional DestroySession forwarding markers."
+  "failure_context": "Attempt 1 exact SHA 814bd13b307d1650f46e0011f35ada00df0442f5: Domain Isolation 37428606203 SUCCESS and Autodev Coordination 37428606180 SUCCESS; DX9Ex Active 37428606192 policy failed only because verify_vr_recenter_contract.py pinned the obsolete pre-transactional DestroySession forwarding markers.",
+  "completed_at_kst": "2026-10-06T16:23:13+09:00"
 }

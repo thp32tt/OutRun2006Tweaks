@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T16:18:00+09:00",
+  "updatedKst": "2026-10-06T16:23:13+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -116,7 +116,7 @@
     "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051",
     "VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052"
   ],
-  "next": "CONVERSION-DX9EX-00473 retry 2/3: source material 814bd13b307d1650f46e0011f35ada00df0442f5 is unchanged; initial DX9Ex Active run 37428606192 failed only because verify_vr_recenter_contract.py still required the pre-transactional forwarding shape. Retry updates that deterministic verifier and revalidates the same R26 source semantics.",
+  "next": "CONVERSION-DX9EX-00474: continue transactional propagation through remaining outer DestroySession wrappers. Next runnable successor is R24 black-screen guard teardown, which currently clears submission counters and committed-run provenance before downstream session destruction returns.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -263,7 +263,8 @@
     "CONVERSION-DX9EX-00471 / VR-DX9EX-INNER-SESSION-TEARDOWN-TRANSACTION-0054 exact SHA 1e7cf32eb551503428a16b9ec6bd7637654bfbc3 passed DX9Ex Active 37426540525 policy/game/R33-full-chain/host/package, Domain Isolation 37426540662 and Autodev Coordination 37426540615. Package artifact 11394384385 digest sha256:912afd2338bbd7baa9e730f8c531cc297b8cdb66bacaae643b99a8530b0efc10. Runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00472 / VR-DX9EX-R13-DESTROY-TRANSACTION-0055: D3D9ExDirectPassthrough::DestroySession now forwards to R19 first and calls ResetR13HostState only on XR_SUCCESS. Failed downstream parent destruction therefore retains SafeEyes, CopyFence, DirectAck mapping, read mappings and capture-freshness state for retry. RUNTIME_VALIDATION=UNTESTED.",
     "CONVERSION-DX9EX-00472 / VR-DX9EX-R13-DESTROY-TRANSACTION-0055 exact SHA 7642b5c227df689e67bbb95509ce0e762bd8f0b7 passed DX9Ex Active 37427445400 policy/full-chain-compile/game/host/package, Domain Isolation 37427445392 and Autodev Coordination 37427445426. Package artifact 11396195967 digest sha256:15483268be2c59ba90cb13b0f465a55ce6f0f257187d6d50294eeede6317c12a. Runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00473 / VR-DX9EX-R26-DESTROY-TRANSACTION-0056: R26 DestroySession now obtains the downstream R24/R23/R22/R21/R15/R13/R19/R20 result first and calls ResetSessionState only on XR_SUCCESS. A failed parent destroy therefore keeps the live session's pending focus/game recenter ownership, requester PID, target generation, application recenter sources/generation and fallback anchor intact for retry. RUNTIME_VALIDATION=UNTESTED pending exact-SHA validation."
+    "CONVERSION-DX9EX-00473 / VR-DX9EX-R26-DESTROY-TRANSACTION-0056: R26 DestroySession now obtains the downstream R24/R23/R22/R21/R15/R13/R19/R20 result first and calls ResetSessionState only on XR_SUCCESS. A failed parent destroy therefore keeps the live session's pending focus/game recenter ownership, requester PID, target generation, application recenter sources/generation and fallback anchor intact for retry. RUNTIME_VALIDATION=UNTESTED pending exact-SHA validation.",
+    "CONVERSION-DX9EX-00473 / VR-DX9EX-R26-DESTROY-TRANSACTION-0056: source material 814bd13b307d1650f46e0011f35ada00df0442f5 moved R26 ResetSessionState after downstream DestroySession success. Attempt 1 DX9Ex Active 37428606192 failed policy only because the recenter verifier pinned the obsolete forwarding shape; Domain Isolation 37428606203 and Autodev 37428606180 passed. Retry validation-bearing SHA 06bc9a82a71dc3430246cc15c2311525e758aecd updated that verifier and passed DX9Ex Active 37428755174 policy/game/host/full-chain/package, Domain Isolation 37428755333 and Autodev Coordination 37428755231. Package artifact 11396022354 digest sha256:8d31b3f9ffdfafe38c71b5ded4f90bf4d19c95901a41973cf09b4e7bc2312918. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
@@ -1107,7 +1108,8 @@
   "completedWork": [
     "VR-DX9EX-SESSION-DESTROY-TRANSACTION-0053",
     "VR-DX9EX-INNER-SESSION-TEARDOWN-TRANSACTION-0054",
-    "VR-DX9EX-R13-DESTROY-TRANSACTION-0055"
+    "VR-DX9EX-R13-DESTROY-TRANSACTION-0055",
+    "VR-DX9EX-R26-DESTROY-TRANSACTION-0056"
   ],
   "post1000Maintenance00470": {
     "taskId": "CONVERSION-DX9EX-00470",
@@ -1208,14 +1210,32 @@
     "attempt": "2/3",
     "item": "VR-DX9EX-R26-DESTROY-TRANSACTION-0056",
     "baseSha": "a5b22f29c7771bb0b2c59a5f3280dd41c67cd8eb",
-    "materialResultSha": "PENDING_SELF",
-    "validationBearingResultSha": "PENDING_SELF",
-    "automationValidation": "PENDING",
+    "sourceMaterialSha": "814bd13b307d1650f46e0011f35ada00df0442f5",
+    "materialResultSha": "06bc9a82a71dc3430246cc15c2311525e758aecd",
+    "validationBearingResultSha": "06bc9a82a71dc3430246cc15c2311525e758aecd",
+    "automationValidation": "PASS",
     "runtimeValidation": "UNTESTED",
     "runtimeBehaviorChanged": true,
-    "summary": "Make R26 recenter session teardown transactional so failed downstream parent destruction preserves live-session recenter ownership/state for retry.",
-    "status": "VALIDATING",
-    "sourceMaterialSha": "814bd13b307d1650f46e0011f35ada00df0442f5",
-    "failureContext": "Attempt 1 exact SHA 814bd13b...: Domain Isolation 37428606203 and Autodev Coordination 37428606180 passed; DX9Ex Active 37428606192 failed policy only because tools/verify_vr_recenter_contract.py still required ResetSessionState before direct forwarding. Runtime source semantics were not reverted."
+    "summary": "Make R26 recenter session teardown transactional so failed downstream parent destruction preserves live-session recenter ownership/state for retry; retry only updates the stale deterministic verifier.",
+    "failureContext": "Attempt 1 exact SHA 814bd13b... failed DX9Ex Active policy only because tools/verify_vr_recenter_contract.py required the obsolete pre-transactional forwarding shape. Domain Isolation and Autodev passed; retry changed verifier/state only.",
+    "status": "COMPLETE",
+    "validation": {
+      "initialDx9exActiveRunId": 37428606192,
+      "initialPolicyJobId": 112153903276,
+      "initialDomainIsolationRunId": 37428606203,
+      "initialAutodevCoordinationRunId": 37428606180,
+      "dx9exActiveRunId": 37428755174,
+      "jobs": {
+        "policy": 112154382266,
+        "game": 112154492467,
+        "host": 112154492474,
+        "fullChainCompile": 112154492630,
+        "package": 112156111193
+      },
+      "domainIsolationRunId": 37428755333,
+      "autodevCoordinationRunId": 37428755231,
+      "packageArtifactId": 11396022354,
+      "packageArtifactDigest": "sha256:8d31b3f9ffdfafe38c71b5ded4f90bf4d19c95901a41973cf09b4e7bc2312918"
+    }
   }
 }
