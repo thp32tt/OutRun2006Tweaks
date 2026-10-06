@@ -2535,3 +2535,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Machine QA PASS: 13/13 bbox+size+positive-margin; changed outside exact source bboxes=0; alpha outside=0; validated clean outside=0; 10/13 rows gained height, 7/13 gained >=12px; canonical header/BGRA/raw mirror_y retained.
 - Controller inspected SOURCE/C144/B218 full sheet, 13-row contact and RAW evidence. PASS: source hierarchy/style materially improved with no visible English residue, broken Hangul, clipping, overlap/collision or orientation regression.
 - Decision B218_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched. Evidence: localization/graphics/role_B/20261007-B-MANUALQA218-E7F6E9B7/B218_CONTROLLER_FINAL_QA.json.
+
+## 2026-10-07 03:14 KST — C223 PRE_INGAME export synchronization
+
+- Hosted C exporter run 37507895220 completed SUCCESS and worker commit cf9f188fb0debbf1630062ea7a195d0be3395a60 rebuilt the current C-pass English-original comparison set.
+- Manifest now contains 36 current C-pass rows (35 localized candidates + 1 policy-preserved original). q236 FEF70E85 is review #036 at localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/036_q236_FEF70E85.jpg.
+- #036 pins English source SHA a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518 at native 2048x2048 with display scale 1 and current A147R candidate SHA e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8. Controller re-opened the exported card and verified both FLIP-Y and RAW panels are the intended current bytes/source pair.
+- q236 remains C223 static PASS pending user JPG review and actual in-game validation; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.

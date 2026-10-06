@@ -2087,3 +2087,8 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - Fresh native Medium CJK + 1.18x source-wide geometry; tall rows now use maximum safe per-row height with 4px margins. Height improved 10/13; >=12px gain 7/13.
 - 13/13 bbox/size/positive-margin; outside/alpha/clean-outside=0; BGRA/header/raw mirror_y preserved. Controller SOURCE/C144/B218, row-contact and RAW visual QA PASS.
 - Fresh C + regenerated English-original comparison/user review + actual in-game validation required; RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 03:14 KST — C223 PRE_INGAME export refreshed
+- GitHub-hosted exporter run 37507895220 SUCCESS, worker output cf9f188fb0debbf1630062ea7a195d0be3395a60. Current C-pass set = 36 rows.
+- q236 FEF70E85 is #036 with exact English source a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518 and A147R candidate e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8; FLIP-Y + RAW exported card manually rechecked.
+- User JPG review + actual in-game validation remain pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.

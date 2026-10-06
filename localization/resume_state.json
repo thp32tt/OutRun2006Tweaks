@@ -7226,10 +7226,13 @@
     "worker_report": "localization/graphics/role_A/20261007-A-PRODUCTION147R-Q236-SOURCE-TYPOGRAPHY/A147R_FEF70E85_REPORT.json",
     "status": "C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
     "fresh_independent_c": "C223_PASS",
-    "pre_ingame_comparison_refresh": "PENDING_C223_EXPORT",
+    "pre_ingame_comparison_refresh": "REFRESHED_C223_EXPORT_036",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": [],
-    "c_pass_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_CONTROLLER_FINAL_QA.json"
+    "c_pass_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/036_q236_FEF70E85.jpg",
+    "pre_ingame_manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
+    "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "c223_controller_final_qa": {
     "timestamp_kst": "2026-10-07T02:57:10+09:00",
@@ -7245,9 +7248,12 @@
     "decision": "C223_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
     "machine_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_MACHINE_QA.json",
     "controller_report": "localization/graphics/role_C/20261007-C223-FEF70E85-A147R/C223_FEF70E85_CONTROLLER_FINAL_QA.json",
-    "pre_ingame_comparison_refresh": "PENDING_C223_EXPORT",
+    "pre_ingame_comparison_refresh": "REFRESHED_C223_EXPORT_036",
     "runtime_validation": "UNTESTED",
-    "forbidden_domains_touched": []
+    "forbidden_domains_touched": [],
+    "pre_ingame_review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/036_q236_FEF70E85.jpg",
+    "pre_ingame_manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
+    "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "latest_b_manual_visual_rework": {
     "timestamp_kst": "2026-10-07 03:01 KST",
@@ -7276,5 +7282,22 @@
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_B/20261007-B-MANUALQA218-E7F6E9B7/B218_E7F6E9B7_REPORT.json",
     "controller": "localization/graphics/role_B/20261007-B-MANUALQA218-E7F6E9B7/B218_CONTROLLER_FINAL_QA.json"
+  },
+  "latest_c_pre_ingame_export": {
+    "timestamp_kst": "2026-10-07T03:14:41+09:00",
+    "worker_run_id": 37507895220,
+    "worker_output_commit": "cf9f188fb0debbf1630062ea7a195d0be3395a60",
+    "manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
+    "count": 36,
+    "localized_candidate_count": 35,
+    "policy_pass_no_candidate_count": 1,
+    "q236": {
+      "number": 36,
+      "asset": "FEF70E85",
+      "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+      "candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
+      "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/036_q236_FEF70E85.jpg"
+    },
+    "runtime_validation": "UNTESTED"
   }
 }
