@@ -2657,3 +2657,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/C116/A150 row/full/RAW visual review PASS: hierarchy materially improved, with no source residue, clipping, overlap, protected intrusion or orientation regression. Ordered generation gate 1-8 producer PASS.
 - Prior C116 is superseded for q139 because candidate bytes changed. Fresh independent C + regenerated PRE_INGAME English comparison/user review + actual-game validation remain required. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261007-A-MANUALQA150-313DB8CB/A150_CONTROLLER_SELF_QA.json`, `localization/graphics/role_A/20261007-A-MANUALQA150-313DB8CB/A150_313DB8CB_REPORT.json`.
+
+
+## 2026-10-07 07:30 KST — A151 q175 754F0599 hierarchy rework
+- Refreshed contract/state/backlog/queue/HEAD and skipped completed or fresh-C-pending A work. PRE_INGAME #025 q175 was selected as the next odd-lane visual rework.
+- Prior C171 candidate 884f333b7217... used Korean heights 103/95/109px against source 143/132/151px for stage select/showroom/single player. A151 rerendered all three from the exact validated clean plate with fresh native Korean, source-left alignment, readable right lean and metallic grayscale effects.
+- Successful hosted run 37540721560 / worker 0acf3ce5b9d3... produced f21970a3d6d8.... Final sizes are 1188x124 / 700x114 / 1208x130; all remain below exact source ceilings.
+- 3/3 bbox+size+positive-margin PASS; final validator PASS; outside/alpha/protected=0; exact RGBA32/BGRA header and raw mirror_y preserved. Controller SOURCE/C171/A151 readable, row and RAW review PASS.
+- Earlier hosted run 37540519413 stopped at a BGRA header-check mismatch before rendering; it changed no candidate bytes.
+- Prior C171 is superseded for q175. Fresh independent C + regenerated PRE_INGAME comparison/user review + actual-game validation remain required. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
