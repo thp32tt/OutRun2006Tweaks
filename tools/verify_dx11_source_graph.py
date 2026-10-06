@@ -10300,23 +10300,62 @@ def main() -> None:
             + ", ".join(missing_r262_programmable_output_resource_behavior)
         )
 
+    r276_programmable_semantic_translation_plan_contract = [
+        ("struct NativeProgrammableShaderSemanticTranslationPlanEvidence",
+         NATIVE_BACKEND_HPP, "R276 source-derived semantic translation plan type"),
+        ("derive_programmable_shader_semantic_translation_plan(",
+         NATIVE_BACKEND_HPP, "R276 plan producer declaration"),
+        ("validate_programmable_shader_semantic_translation_plan_snapshot(",
+         NATIVE_BACKEND_HPP, "R276 plan snapshot validator declaration"),
+        ("out.provenanceMatches =",
+         NATIVE_BACKEND_CPP, "R276 R271/R268/R273 provenance convergence"),
+        ("R276_D3D9_SOURCE_DERIVED_SEMANTIC_TRANSLATION_PLAN_V1",
+         NATIVE_BACKEND_CPP, "R276 deterministic translator revision"),
+        ("R276_R271_R268_R273_TARGET_SEMANTIC_IDENTITY_V1",
+         NATIVE_BACKEND_CPP, "R276 deterministic semantic contract"),
+        ("token, 0x276u",
+         NATIVE_BACKEND_CPP, "R276 independent snapshot-domain tag"),
+        ("R276 derives target semantic identities from R271 R268 R273 provenance",
+         CONSTANT_BUFFER_PROBE, "R276 positive source-derived translation-plan regression"),
+        ("R276 rejects stale R273 mapping snapshot before target semantic derivation",
+         CONSTANT_BUFFER_PROBE, "R276 stale R273 fail-closed regression"),
+        ("sig.shaderTranslationExact = false;",
+         RUNTIME_CENSUS, "R276 keeps programmable production translation fail closed"),
+    ]
+    missing_r276_programmable_semantic_translation_plan = [
+        meaning for token, source, meaning
+        in r276_programmable_semantic_translation_plan_contract
+        if token not in source
+    ]
+    if missing_r276_programmable_semantic_translation_plan:
+        raise SystemExit(
+            "DX11 R276 semantic translation plan drift: "
+            + ", ".join(missing_r276_programmable_semantic_translation_plan)
+        )
+
     r275_translated_semantic_receipt_contract = [
         ("struct NativeProgrammableShaderTranslatedSemanticReceipt",
          NATIVE_BACKEND_HPP, "R275 translated-semantic receipt type"),
         ("compose_programmable_shader_translated_semantic_receipt(",
          NATIVE_BACKEND_HPP, "R275 receipt composer declaration"),
+        ("const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan",
+         NATIVE_BACKEND_HPP, "R275 typed R276 plan consumption"),
         ("validate_programmable_shader_translated_semantic_receipt_snapshot(",
          NATIVE_BACKEND_HPP, "R275 receipt snapshot validator declaration"),
         ("out.sourceMappingHandoffSnapshotMatches =",
          NATIVE_BACKEND_CPP, "R275 exact R273 receipt binding"),
+        ("out.translationPlanReady =",
+         NATIVE_BACKEND_CPP, "R275 validates R276 plan readiness"),
+        ("out.translationPlanSnapshotMatches =",
+         NATIVE_BACKEND_CPP, "R275 binds exact R276 plan snapshot"),
         ("out.cacheIdentityMatches =",
-         NATIVE_BACKEND_CPP, "R275 R239/R242/R273 identity convergence"),
-        ("token, 0x275u",
-         NATIVE_BACKEND_CPP, "R275 receipt snapshot-domain tag"),
-        ("R275 seals translated semantic scalars to R242 and R273 ownership",
-         CONSTANT_BUFFER_PROBE, "R275 positive receipt regression"),
-        ("R275 rejects stale R273 mapping handoff before semantic receipt sealing",
-         CONSTANT_BUFFER_PROBE, "R275 stale R273 fail-closed regression"),
+         NATIVE_BACKEND_CPP, "R275 R239/R242/R273/R276 identity convergence"),
+        ("token, 0x275276u",
+         NATIVE_BACKEND_CPP, "R275/R276 receipt snapshot-domain tag"),
+        ("R275 seals R276 source-derived semantic translation plan",
+         CONSTANT_BUFFER_PROBE, "R275 positive typed-plan regression"),
+        ("R275 rejects stale R276 semantic translation plan snapshot",
+         CONSTANT_BUFFER_PROBE, "R275 stale R276 plan fail-closed regression"),
     ]
     missing_r275_translated_semantic_receipt = [
         meaning for token, source, meaning
@@ -10327,6 +10366,15 @@ def main() -> None:
         raise SystemExit(
             "DX11 R275 translated semantic receipt drift: "
             + ", ".join(missing_r275_translated_semantic_receipt)
+        )
+    stale_r275_loose_semantic_plan_signature = (
+        "std::uint64_t translatedVertexSemanticHash,\n"
+        "    std::uint64_t translatedPixelSemanticHash,\n"
+        "    std::uint64_t translatorRevisionHash"
+    )
+    if stale_r275_loose_semantic_plan_signature in NATIVE_BACKEND_HPP:
+        raise SystemExit(
+            "DX11 R276 stale probe-supplied semantic scalars remain in R275 API"
         )
 
     r263_programmable_shader_semantic_translation_contract = [
@@ -10773,10 +10821,14 @@ def main() -> None:
          NATIVE_BACKEND_CPP, "R263 validates R275 receipt integrity"),
         ("translatedSemanticReceipt.translationObjectSnapshotToken ==",
          NATIVE_BACKEND_CPP, "R263 binds R275 to current R242 object receipt"),
+        ("translationPlan.reviewSnapshotToken ==",
+         NATIVE_BACKEND_CPP, "R275 requires exact R276 plan snapshot"),
+        ("r276TranslationPlan =",
+         CONSTANT_BUFFER_PROBE, "R276 source-derived plan fixture is explicit"),
         ("r275SemanticReceipt =",
-         CONSTANT_BUFFER_PROBE, "R275 receipt test fixture is explicit"),
+         CONSTANT_BUFFER_PROBE, "R275 receipt consumes typed R276 plan"),
         ("sig.shaderTranslationExact = false;",
-         RUNTIME_CENSUS, "R275 keeps programmable production gate fail-closed"),
+         RUNTIME_CENSUS, "R275/R276 keep programmable production gate fail-closed"),
     ]
     missing_r275_r263_receipt_consumption = [
         meaning for token, source, meaning
