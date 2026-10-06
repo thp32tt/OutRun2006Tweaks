@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A152R",
+  "timestamp_kst": "2026-10-07 08:40 KST",
+  "queue_index": 195,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+  "prior_c_status": "C125_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "c125_candidate_sha256": "cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2",
+  "rejected_a152_sha256": "5801e241ba3c288c8245c48123e55aa1f538fb6ca26eb32e182c7f3ec1779b09",
+  "candidate_sha256": "b4b8655e9805b897ab17249112db6c5536bab34f03d445b7722bc5222476c72c",
+  "defect": "C125 numeric PASS left 이용 불가 only 142x37 inside 395x41 NOT AVAILABLE source footprint; first A152 enlarged by horizontal stretching and was controller-rejected.",
+  "rework": "Use direct semantic equivalent 사용할 수 없음 with native Noto CJK Black aspect, heavy-white centered source family; no horizontal glyph stretch.",
+  "machine_qa": {
+    "bbox_size_positive_margin": "1/1 PASS",
+    "source_size": [
+      395,
+      41
+    ],
+    "final_size": [
+      220,
+      37
+    ],
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": "PASS_SOURCE_C125_A152_REJECTED_A152R_READABLE_RAW",
+  "producer_status": "A152R_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "github_worker_run": 37547231014,
+  "worker_output_commit": "cb3def67ba1a1d4d49b095c6d2e8838944591e7e",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
