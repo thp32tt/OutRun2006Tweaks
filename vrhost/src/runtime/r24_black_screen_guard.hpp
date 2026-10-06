@@ -465,6 +465,7 @@ namespace OutRunVrR24BlackScreenGuard
         const float visibleError[4]{ 0.12f, 0.025f, 0.025f, 1.0f };
         OutRunVrFinalTest::Context->ClearRenderTargetView(
             Theater.rtvs[image][0], visibleError);
+        Theater.NoteGpuWorkSubmitted();
         OutRunVrFinalTest::Context->Flush();
         if (!Release(Theater, true))
             return false;

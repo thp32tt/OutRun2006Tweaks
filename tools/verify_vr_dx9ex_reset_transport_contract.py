@@ -1127,12 +1127,18 @@ require(
     "R19 tracked render preserves four-argument compatibility",
     "Swapchain* swapchainOwner = nullptr",
 )
+require(
+    host_sbs,
+    "R19 swapchain owner exposes GPU-work provenance mutation",
+    "void NoteGpuWorkSubmitted() noexcept",
+    "gpuWorkSubmitted = true;",
+)
 require_order(
     render_to,
     "R19 marks submitted GPU work after draw",
     "OutRunVrFinalTest::Context->Draw(3, 0);",
     "if (swapchainOwner)",
-    "swapchainOwner->gpuWorkSubmitted = true;",
+    "swapchainOwner->NoteGpuWorkSubmitted();",
     "OutRunVrFinalTest::Context->OMSetRenderTargets(1, &nullRtv, nullptr);",
 )
 require(
@@ -1291,6 +1297,14 @@ require_order(
 )
 
 emergency_quad = body(host_r24, "inline bool BuildEmergencyVisibleQuad(")
+require_order(
+    emergency_quad,
+    "R24 emergency clear records swapchain GPU work before flush",
+    "OutRunVrFinalTest::Context->ClearRenderTargetView(",
+    "Theater.NoteGpuWorkSubmitted();",
+    "OutRunVrFinalTest::Context->Flush();",
+    "Release(Theater, true)",
+)
 require_order(
     emergency_quad,
     "R24 emergency theater clears direct provenance",

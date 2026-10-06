@@ -249,6 +249,11 @@ float4 PSMain(VSOut input) : SV_Target
         bool gpuWorkSubmitted = false;
         std::uint32_t acquiredImage = 0;
 
+        void NoteGpuWorkSubmitted() noexcept
+        {
+            gpuWorkSubmitted = true;
+        }
+
         bool Destroy(bool parentSessionDestroying = false)
         {
             if (handle != XR_NULL_HANDLE)
@@ -797,9 +802,9 @@ float4 PSMain(VSOut input) : SV_Target
         OutRunVrFinalTest::Context->Draw(3, 0);
         // Once Draw references an RTV from this swapchain, destruction must
         // prove GPU completion. Fresh/partially initialized swapchains that
-        // never reach Draw have no submitted graphics work to drain.
+        // never reach graphics work have no submitted work to drain.
         if (swapchainOwner)
-            swapchainOwner->gpuWorkSubmitted = true;
+            swapchainOwner->NoteGpuWorkSubmitted();
         ID3D11ShaderResourceView* nullSrv = nullptr;
         OutRunVrFinalTest::Context->PSSetShaderResources(0, 1, &nullSrv);
         ID3D11RenderTargetView* nullRtv = nullptr;
