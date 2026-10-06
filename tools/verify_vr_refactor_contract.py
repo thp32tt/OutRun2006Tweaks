@@ -780,7 +780,6 @@ for marker in (
     "return lowerResolve();",
     "R32EnsureDirectResources(device)",
     "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
-    "R32DrainPendingProducerFence(index)",
     "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
     "DirectTransportFrameReadyAfterPresent() is",
     "slot.producerPending = true;",

@@ -372,7 +372,6 @@ invalidate_direct_r32 = body(
 require(
     invalidate_direct_r32,
     "R32 host-identity interop invalidation",
-    "R32ClearPendingProducerFences();",
     "R13ReleaseAckState();",
     "ReleaseDirectTransportSlots();",
     "ReleaseDirectInteropProbe();",
@@ -381,7 +380,6 @@ require(
 require_order(
     invalidate_direct_r32,
     "R32 host-identity ACK/transport teardown routing",
-    "R32ClearPendingProducerFences();",
     "R13ReleaseAckState();",
     "ReleaseDirectTransportSlots();",
     "ReleaseDirectInteropProbe();",
@@ -412,13 +410,6 @@ forbid(
     "R32DrainPendingProducerFence(",
 )
 
-drain_pending_r32 = body(r32, "bool R32DrainPendingProducerFence(")
-forbid(
-    drain_pending_r32,
-    "R32 per-slot fence polling must not count whole-ring backpressure",
-    "++DirectTransportRingBackpressure;",
-)
-
 resolve_direct_r32 = body(r32, "bool R32ResolveDirectTransport(")
 require_order(
     resolve_direct_r32,
@@ -426,7 +417,6 @@ require_order(
     "const std::uint32_t preferred =",
     "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
     "for (std::uint32_t offset = 0;",
-    "R32DrainPendingProducerFence(index)",
     "if (candidate.producerPending)",
     "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
     "The host completed this exact published frame. Retire the",
@@ -457,7 +447,6 @@ if resolve_direct_r32.count("++DirectTransportRingBackpressure;") != 1:
 forbid(
     resolve_direct_r32,
     "R32 final owner fixed-slot regression",
-    "R32DrainPendingProducerFence(slotIndex)",
     "R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted)",
 )
 forbid(
@@ -473,7 +462,6 @@ require(
     invalidate_r32,
     "R32 reset identity invalidation",
     "R32ForgetDirectIdentity();",
-    "R32ClearPendingProducerFences();",
     "R32DirectCopyPathRejected = false;",
     "R32DirectCopyRejectHr = D3D_OK;",
 )
@@ -482,7 +470,6 @@ require_order(
     reset_r32,
     "R32 reset lifecycle owner helper",
     "if (gameDevice)",
-    "R32ClearPendingProducerFences();",
     "const HRESULT hr = lowerReset();",
     "if (SUCCEEDED(hr))",
     "R32ResetAfterGameReset();",

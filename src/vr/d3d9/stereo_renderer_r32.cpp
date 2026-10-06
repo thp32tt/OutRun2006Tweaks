@@ -19,21 +19,11 @@ namespace OutRunVRStereo
         std::uint64_t R32ResetEpochRearms = 0;
         std::uint64_t R32ResetFailures = 0;
         std::uint64_t R32DirectProbeCacheHits = 0;
-        std::uint64_t R32DirectFenceSuccess = 0;
-        std::uint64_t R32DirectFenceBudgetFallbacks = 0;
-        std::uint64_t R32DirectFenceWaitSamples = 0;
-        std::uint64_t R32DirectFencePolls = 0;
-        std::uint64_t R32DirectFenceWaitUsTotal = 0;
-        std::uint64_t R32DirectFenceWaitUsMax = 0;
         std::uint64_t R32DirectIdentityInvalidations = 0;
-        std::uint64_t R32PendingFenceDrains = 0;
-        std::uint64_t R32PendingFenceBlocks = 0;
         std::uint64_t R32PendingFenceErrors = 0;
         bool R32FirstStateSnapshotFailureLogged = false;
         bool R32FirstBatchWvpLogged = false;
-        bool R32FirstFenceBudgetLogged = false;
         bool R32FirstResetRearmLogged = false;
-        bool R32FirstPendingFenceLogged = false;
         bool R32FirstDirectCopyRejectLogged = false;
         bool R32DirectCopyPathRejected = false;
         HRESULT R32DirectCopyRejectHr = D3D_OK;
@@ -41,8 +31,6 @@ namespace OutRunVRStereo
         std::uint32_t R32DirectHostPid = 0;
         std::uint32_t R32DirectHostLuidLow = 0;
         std::uint32_t R32DirectHostLuidHigh = 0;
-        std::array<bool, OutRunVR::RenderFrameRingSize> R32ProducerFencePending{};
-        std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> R32ProducerPendingFrame{};
 
         struct R32CounterSnapshot
         {
@@ -56,14 +44,7 @@ namespace OutRunVRStereo
             std::uint64_t stateFail = 0;
             std::uint64_t zeroFallback = 0;
             std::uint64_t directCache = 0;
-            std::uint64_t directFenceOk = 0;
-            std::uint64_t directFenceFallback = 0;
-            std::uint64_t directFenceWaitSamples = 0;
-            std::uint64_t directFencePolls = 0;
-            std::uint64_t directFenceWaitUs = 0;
             std::uint64_t directBackpressure = 0;
-            std::uint64_t pendingDrain = 0;
-            std::uint64_t pendingBlock = 0;
             std::uint64_t pendingError = 0;
             std::uint64_t resetRearm = 0;
             std::uint64_t resetFail = 0;
@@ -84,8 +65,6 @@ namespace OutRunVRStereo
             std::uint64_t particleLikeDraws = 0;
             std::uint64_t particleLikePrimitives = 0;
             std::uint64_t effectUnknownDraws = 0;
-            std::uint64_t fenceWaitUs = 0;
-            std::uint64_t fencePolls = 0;
         };
         thread_local R32FrameWorkload R32FrameWorkloadCounters{};
 
@@ -279,7 +258,7 @@ namespace OutRunVRStereo
             R32LastSpikeLogMs = nowMs;
 
             spdlog::warn(
-                "VR R32 FRAME SPIKE: frameUs={} baselineUs={} presentUs={} workload[draws={},primitives={},triangles={},indexed={},up={},alphaBlend={},alphaBlendPrimitives={},alphaTest={},particleLikeDraws={},particleLikePrimitives={},effectUnknown={}] stereo[main={},offscreen={},aux={},fastWorld={},hud={},fallback={},fragile={},unstable={}] direct[fenceWaitUs={},fencePolls={}]",
+                "VR R32 FRAME SPIKE: frameUs={} baselineUs={} presentUs={} workload[draws={},primitives={},triangles={},indexed={},up={},alphaBlend={},alphaBlendPrimitives={},alphaTest={},particleLikeDraws={},particleLikePrimitives={},effectUnknown={}] stereo[main={},offscreen={},aux={},fastWorld={},hud={},fallback={},fragile={},unstable={}]",
                 frameUs, baselineBefore, presentUs,
                 frame.draws, frame.primitives, frame.triangles,
                 frame.indexedDraws, frame.upDraws,
@@ -288,8 +267,7 @@ namespace OutRunVRStereo
                 frame.particleLikePrimitives, frame.effectUnknownDraws,
                 stereo.main, stereo.offscreen, stereo.aux,
                 stereo.fastWorld, stereo.hud, stereo.fallback,
-                stereo.fragile, stereo.unstable,
-                frame.fenceWaitUs, frame.fencePolls);
+                stereo.fragile, stereo.unstable);
         }
 
         bool R32ReadEffectSnapshot(IDirect3DDevice9* device,
@@ -410,12 +388,6 @@ namespace OutRunVRStereo
             R32DirectHostLuidHigh = 0;
         }
 
-        void R32ClearPendingProducerFences() noexcept
-        {
-            R32ProducerFencePending.fill(false);
-            R32ProducerPendingFrame.fill(0);
-        }
-
         bool R32DirectIdentityMatches() noexcept
         {
             return SharedState && DirectInteropVerified &&
@@ -427,7 +399,6 @@ namespace OutRunVRStereo
 
         void R32InvalidateDirectInteropOnly() noexcept
         {
-            R32ClearPendingProducerFences();
             // Host PID/LUID changed. The dedicated ACK mapping belongs to the
             // previous host process object too, so drop that view/handle before
             // rebuilding the shared-eye transport against the new identity.
@@ -451,8 +422,6 @@ namespace OutRunVRStereo
             if (DirectTransportResourcesReady && !R32DirectIdentityMatches())
                 R32InvalidateDirectInteropOnly();
 
-            if (!DirectTransportResourcesReady)
-                R32ClearPendingProducerFences();
             if (!EnsureDirectTransportResources(device))
                 return false;
             if (!SharedState || !DirectInteropVerified)
@@ -462,159 +431,6 @@ namespace OutRunVRStereo
             R32DirectHostLuidLow = SharedState->hostAdapterLuidLow;
             R32DirectHostLuidHigh = SharedState->hostAdapterLuidHigh;
             return true;
-        }
-
-        bool R32WaitProducerFence(IDirect3DQuery9* query) noexcept
-        {
-            if (!query)
-                return false;
-
-            static const LONGLONG qpcFrequency = []() noexcept {
-                LARGE_INTEGER value{};
-                return QueryPerformanceFrequency(&value) != FALSE
-                    ? value.QuadPart : 0;
-            }();
-            LARGE_INTEGER start{};
-            const bool highResolutionClock = qpcFrequency > 0 &&
-                QueryPerformanceCounter(&start) != FALSE;
-            const ULONGLONG fallbackStartMs = highResolutionClock ? 0 :
-                GetTickCount64();
-            const ULONGLONG fallbackDeadline = highResolutionClock ? 0 :
-                fallbackStartMs + OutRunVR::R32::ProducerFenceBudgetMs;
-            std::uint64_t pollCount = 0;
-            auto recordFenceWait = [&]() noexcept {
-                if (!Settings::VRTelemetry)
-                    return;
-                std::uint64_t elapsedUs = 0;
-                if (highResolutionClock)
-                {
-                    LARGE_INTEGER now{};
-                    if (QueryPerformanceCounter(&now) != FALSE &&
-                        now.QuadPart >= start.QuadPart)
-                    {
-                        elapsedUs = static_cast<std::uint64_t>(
-                            ((now.QuadPart - start.QuadPart) * 1000000LL) /
-                            qpcFrequency);
-                    }
-                }
-                else
-                {
-                    const ULONGLONG nowMs = GetTickCount64();
-                    elapsedUs = nowMs >= fallbackStartMs
-                        ? (nowMs - fallbackStartMs) * 1000ULL : 0ULL;
-                }
-                ++R32DirectFenceWaitSamples;
-                R32DirectFencePolls += pollCount;
-                R32DirectFenceWaitUsTotal += elapsedUs;
-                R32DirectFenceWaitUsMax =
-                    (std::max)(R32DirectFenceWaitUsMax, elapsedUs);
-                R32FrameWorkloadCounters.fenceWaitUs += elapsedUs;
-                R32FrameWorkloadCounters.fencePolls += pollCount;
-            };
-            const LONGLONG budgetTicks = highResolutionClock
-                ? (qpcFrequency *
-                    static_cast<LONGLONG>(OutRunVR::R32::ProducerFenceBudgetMs) +
-                    999) / 1000
-                : 0;
-
-            // Budget starts before the FLUSH request so a slow first GetData is
-            // accounted for instead of being hidden outside the 2 ms window.
-            HRESULT ready = query->GetData(nullptr, 0, D3DGETDATA_FLUSH);
-            if (ready == S_OK)
-            {
-                if (Settings::VRTelemetry) ++R32DirectFenceSuccess;
-                recordFenceWait();
-                return true;
-            }
-            if (ready != S_FALSE)
-            {
-                recordFenceWait();
-                return false;
-            }
-
-            for (;;)
-            {
-                ++pollCount;
-                ready = query->GetData(nullptr, 0, 0);
-                if (ready == S_OK)
-                {
-                    if (Settings::VRTelemetry) ++R32DirectFenceSuccess;
-                    recordFenceWait();
-                    return true;
-                }
-
-                bool expired = ready != S_FALSE;
-                if (!expired && highResolutionClock)
-                {
-                    LARGE_INTEGER now{};
-                    expired = QueryPerformanceCounter(&now) == FALSE ||
-                        now.QuadPart - start.QuadPart >= budgetTicks;
-                }
-                else if (!expired)
-                {
-                    expired = GetTickCount64() >= fallbackDeadline;
-                }
-
-                if (expired)
-                {
-                    if (Settings::VRTelemetry) ++R32DirectFenceBudgetFallbacks;
-                    ++DirectTransportFenceTimeouts;
-                    if (!R32FirstFenceBudgetLogged)
-                    {
-                        R32FirstFenceBudgetLogged = true;
-                        spdlog::warn(
-                            "VR R32 D3D9Ex: producer copy fence exceeded {}ms; falling back to SBS instead of stalling up to 12ms",
-                            OutRunVR::R32::ProducerFenceBudgetMs);
-                    }
-                    recordFenceWait();
-                    return false;
-                }
-                SwitchToThread();
-            }
-        }
-
-        bool R32DrainPendingProducerFence(std::uint32_t slotIndex) noexcept
-        {
-            if (slotIndex >= R32ProducerFencePending.size() ||
-                !R32ProducerFencePending[slotIndex])
-                return true;
-
-            auto& slot = DirectTransportSlots[slotIndex];
-            if (!slot.fence)
-            {
-                R32DirectCopyPathRejected = true;
-                R32DirectCopyRejectHr = E_FAIL;
-                if (Settings::VRTelemetry) ++R32PendingFenceErrors;
-                return false;
-            }
-
-            const HRESULT ready = slot.fence->GetData(nullptr, 0, 0);
-            if (ready == S_OK)
-            {
-                R32ProducerFencePending[slotIndex] = false;
-                R32ProducerPendingFrame[slotIndex] = 0;
-                if (Settings::VRTelemetry) ++R32PendingFenceDrains;
-                return true;
-            }
-            if (ready == S_FALSE)
-            {
-                if (Settings::VRTelemetry) ++R32PendingFenceBlocks;
-                if (!R32FirstPendingFenceLogged)
-                {
-                    R32FirstPendingFenceLogged = true;
-                    spdlog::info(
-                        "VR R32 D3D9Ex: timed-out producer EVENT remains pending; the ring slot is blocked from reuse until the GPU reports completion");
-                }
-                return false;
-            }
-
-            // A query error does not prove GPU completion. Keep the pending
-            // marker intact and quarantine DirectGPU until Reset or interop
-            // identity regeneration recreates the ring.
-            R32DirectCopyPathRejected = true;
-            R32DirectCopyRejectHr = ready;
-            if (Settings::VRTelemetry) ++R32PendingFenceErrors;
-            return false;
         }
 
         template <typename LowerResolve>
@@ -645,9 +461,6 @@ namespace OutRunVRStereo
             {
                 const std::uint32_t index =
                     (preferred + offset) % OutRunVR::RenderFrameRingSize;
-                if (!R32DrainPendingProducerFence(index))
-                    continue;
-
                 auto& candidate = DirectTransportSlots[index];
 
                 // DirectTransportFrameReadyAfterPresent() may leave an
@@ -768,7 +581,6 @@ namespace OutRunVRStereo
             InvalidateLiveStateSample();
             OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
             R32ForgetDirectIdentity();
-            R32ClearPendingProducerFences();
             R32DirectCopyPathRejected = false;
             R32DirectCopyRejectHr = D3D_OK;
             R32FrameWorkloadCounters = {};
@@ -797,9 +609,6 @@ namespace OutRunVRStereo
             LowerReset&& lowerReset) noexcept
         {
             const bool gameDevice = IsGameDevice(device);
-            if (gameDevice)
-                R32ClearPendingProducerFences();
-
             const HRESULT hr = lowerReset();
             if (gameDevice)
             {
@@ -831,14 +640,7 @@ namespace OutRunVRStereo
                 R32Counters.stateFail = R32StateSnapshotFailures;
                 R32Counters.zeroFallback = R32FailClosedZeroDisparityDraws;
                 R32Counters.directCache = R32DirectProbeCacheHits;
-                R32Counters.directFenceOk = R32DirectFenceSuccess;
-                R32Counters.directFenceFallback = R32DirectFenceBudgetFallbacks;
-                R32Counters.directFenceWaitSamples = R32DirectFenceWaitSamples;
-                R32Counters.directFencePolls = R32DirectFencePolls;
-                R32Counters.directFenceWaitUs = R32DirectFenceWaitUsTotal;
                 R32Counters.directBackpressure = DirectTransportRingBackpressure;
-                R32Counters.pendingDrain = R32PendingFenceDrains;
-                R32Counters.pendingBlock = R32PendingFenceBlocks;
                 R32Counters.pendingError = R32PendingFenceErrors;
                 R32Counters.resetRearm = R32ResetEpochRearms;
                 R32Counters.resetFail = R32ResetFailures;
@@ -847,14 +649,6 @@ namespace OutRunVRStereo
             if (now - R32Counters.lastLogMs < 5000)
                 return;
 
-            const std::uint64_t fenceSamples =
-                R32DirectFenceWaitSamples - R32Counters.directFenceWaitSamples;
-            const std::uint64_t fencePolls =
-                R32DirectFencePolls - R32Counters.directFencePolls;
-            const std::uint64_t fenceWaitUs =
-                R32DirectFenceWaitUsTotal - R32Counters.directFenceWaitUs;
-            const std::uint64_t fenceAvgUs =
-                fenceSamples ? fenceWaitUs / fenceSamples : 0;
             const std::uint64_t frameAvgUs = R32PerfWindowCounters.frames
                 ? R32PerfWindowCounters.frameUsTotal /
                     R32PerfWindowCounters.frames : 0;
@@ -869,7 +663,7 @@ namespace OutRunVRStereo
                     R32PerfWindowCounters.frames : 0;
 
             spdlog::info(
-                "VR R32 PERF 5s: frame[frames={},spikes={},avgUs={},maxUs={},presentAvgUs={},presentMaxUs={}] workload[drawAvg={},drawMax={},primitiveAvg={},primitiveMax={},triangleMax={},upMax={},alphaBlendMax={},particleLikeDrawMax={},particleLikePrimitiveMax={}] liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},fenceSamples={},fencePolls={},fenceAvgUs={},fenceMaxUs={},backpressure={},pendingDrain={},pendingBlock={},pendingError={}] reset[rearm={},fail={}]",
+                "VR R32 PERF 5s: frame[frames={},spikes={},avgUs={},maxUs={},presentAvgUs={},presentMaxUs={}] workload[drawAvg={},drawMax={},primitiveAvg={},primitiveMax={},triangleMax={},upMax={},alphaBlendMax={},particleLikeDrawMax={},particleLikePrimitiveMax={}] liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},backpressure={},pendingError={}] reset[rearm={},fail={}]",
                 R32PerfWindowCounters.frames,
                 R32PerfWindowCounters.spikes,
                 frameAvgUs,
@@ -894,15 +688,7 @@ namespace OutRunVRStereo
                 R32StateSnapshotFailures - R32Counters.stateFail,
                 R32FailClosedZeroDisparityDraws - R32Counters.zeroFallback,
                 R32DirectProbeCacheHits - R32Counters.directCache,
-                R32DirectFenceSuccess - R32Counters.directFenceOk,
-                R32DirectFenceBudgetFallbacks - R32Counters.directFenceFallback,
-                fenceSamples,
-                fencePolls,
-                fenceAvgUs,
-                R32DirectFenceWaitUsMax,
                 DirectTransportRingBackpressure - R32Counters.directBackpressure,
-                R32PendingFenceDrains - R32Counters.pendingDrain,
-                R32PendingFenceBlocks - R32Counters.pendingBlock,
                 R32PendingFenceErrors - R32Counters.pendingError,
                 R32ResetEpochRearms - R32Counters.resetRearm,
                 R32ResetFailures - R32Counters.resetFail);
@@ -917,18 +703,10 @@ namespace OutRunVRStereo
             R32Counters.stateFail = R32StateSnapshotFailures;
             R32Counters.zeroFallback = R32FailClosedZeroDisparityDraws;
             R32Counters.directCache = R32DirectProbeCacheHits;
-            R32Counters.directFenceOk = R32DirectFenceSuccess;
-            R32Counters.directFenceFallback = R32DirectFenceBudgetFallbacks;
-            R32Counters.directFenceWaitSamples = R32DirectFenceWaitSamples;
-            R32Counters.directFencePolls = R32DirectFencePolls;
-            R32Counters.directFenceWaitUs = R32DirectFenceWaitUsTotal;
             R32Counters.directBackpressure = DirectTransportRingBackpressure;
-            R32Counters.pendingDrain = R32PendingFenceDrains;
-            R32Counters.pendingBlock = R32PendingFenceBlocks;
             R32Counters.pendingError = R32PendingFenceErrors;
             R32Counters.resetRearm = R32ResetEpochRearms;
             R32Counters.resetFail = R32ResetFailures;
-            R32DirectFenceWaitUsMax = 0;
             R32PerfWindowCounters = {};
         }
 

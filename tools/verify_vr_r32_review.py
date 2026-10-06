@@ -37,9 +37,6 @@ policy = require(
     "src/vr/d3d9/r32_policy.hpp",
     "RearmMonoSafetyEpoch",
     "ForceZeroDisparity",
-    "ProducerFenceBudgetMs = 2",
-    "PendingFenceDecision",
-    "ClassifyPendingFence",
 )
 
 r32 = require(
@@ -54,16 +51,9 @@ r32 = require(
     "draw is forced to stock-WVP zero disparity",
     "R32SetWvpBatch",
     "OutRunWvpRegisterCount",
-    "R32WaitProducerFence",
     "QueryPerformanceCounter",
-    "static const LONGLONG qpcFrequency",
-    "Budget starts before the FLUSH request",
-    "R32ProducerFencePending",
-    "R32DrainPendingProducerFence",
-    "timed-out producer EVENT remains pending",
     "R32DirectIdentityMatches",
     "R32DirectCopyPathRejected",
-    "A query error does not prove GPU completion",
     "StretchRect commands are already queued",
     "DirectGPU copy path is disabled until Reset/interop revalidation",
     "R32EnsureDirectResources must run before this cached rejection",
@@ -109,7 +99,6 @@ for required in (
         "return lowerResolve();",
         "R32EnsureDirectResources(device)",
         "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
-        "R32DrainPendingProducerFence(index)",
         "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
         "DirectTransportFrameReadyAfterPresent() is",
         "slot.producerPending = true;",
@@ -132,15 +121,6 @@ for banned in (
         "R32ProducerPendingFrame[selected] = frameId;"):
     if banned in resolve_body:
         raise SystemExit(f"R32 DirectGPU owner regained redundant pre-Present fence wait state: {banned}")
-
-drain_start = r32.find("bool R32DrainPendingProducerFence")
-drain_error = r32.find("A query error does not prove GPU completion", drain_start)
-drain_end = r32.find("bool R32ResolveDirectTransport(", drain_start)
-if min(drain_start, drain_error, drain_end) < 0:
-    raise SystemExit("could not locate R32 pending-fence query-error quarantine")
-if "R32ProducerFencePending[slotIndex] = false;" in r32[drain_error:drain_end]:
-    raise SystemExit(
-        "R32 query-error path must not mark a producer EVENT complete/reusable")
 
 issue_marker = r32.find("StretchRect commands are already queued", resolve_start)
 issue_reject = r32.find("R32DirectCopyPathRejected = true;", issue_marker)
