@@ -9,6 +9,7 @@ UISCALE = ROOT / "src/hooks_uiscaling.cpp"
 SEMANTICS = ROOT / "src/vr/game/render_semantics.hpp"
 PROFILES = ROOT / "tools/OutRunVR-TestProfiles.ps1"
 POLICY = ROOT / "tools/Test-OutRunVRTestPolicy.ps1"
+OUTRUN_RENDERER = ROOT / "src/vr/game/outrun_renderer.cpp"
 WORKFLOW = ROOT / ".github/workflows/vr-dx9ex-active.yml"
 
 
@@ -58,6 +59,7 @@ uiscale = require_text(UISCALE)
 semantics = require_text(SEMANTICS)
 profiles = require_text(PROFILES)
 policy = require_text(POLICY)
+outrun_renderer = require_text(OUTRUN_RENDERER)
 workflow = require_text(WORKFLOW)
 
 exact_int_array(
@@ -176,6 +178,55 @@ for forbidden in (
 ):
     if forbidden in correctness:
         fail(f"CORRECTNESS regressed to stale cadence: {forbidden}")
+
+# The XR cadence Present path runs at headset refresh. Process liveness must
+# reuse one SYNCHRONIZE handle per host PID instead of OpenProcess/CloseHandle
+# on every rendered frame; PID changes, host exit, and game Reset release it.
+cadence_wait = function_body(
+    outrun_renderer, "        void WaitForNextCadenceRequest() noexcept")
+cadence_alive = function_body(
+    outrun_renderer, "        bool CadenceHostProcessAlive(DWORD hostPid) noexcept")
+cadence_close = function_body(
+    outrun_renderer, "        void CloseCadenceHostProcess() noexcept")
+reset_notify = function_body(
+    outrun_renderer, "\tvoid NotifyGameReset()")
+
+for marker in (
+    "HANDLE CadenceHostProcess = nullptr;",
+    "DWORD CadenceHostProcessPid = 0;",
+):
+    if marker not in outrun_renderer:
+        fail(f"cadence host-process cache state missing: {marker}")
+
+if "OpenProcess(" in cadence_wait or "CloseHandle(" in cadence_wait:
+    fail("cadence wait path regressed to per-frame process-handle churn")
+for marker in (
+    "CadenceHostProcessAlive(host.hostPid)",
+    "CloseCadenceHostProcess();",
+):
+    if marker not in cadence_wait:
+        fail(f"cadence wait path missing cached host-process contract: {marker}")
+
+for marker in (
+    "CadenceHostProcess = OpenProcess(SYNCHRONIZE, FALSE, hostPid);",
+    "CadenceHostProcessPid != hostPid",
+    "WaitForSingleObject(CadenceHostProcess, 0)",
+    "wait == WAIT_TIMEOUT",
+    "CloseCadenceHostProcess();",
+):
+    if marker not in cadence_alive:
+        fail(f"cadence host-process cache helper missing: {marker}")
+
+for marker in (
+    "CloseHandle(CadenceHostProcess);",
+    "CadenceHostProcess = nullptr;",
+    "CadenceHostProcessPid = 0;",
+):
+    if marker not in cadence_close:
+        fail(f"cadence host-process release helper missing: {marker}")
+
+if "CloseCadenceHostProcess();" not in reset_notify:
+    fail("game Reset must release the cached cadence host process handle")
 
 for marker in (
     "Has-Argument $correctness '-FramerateLimit=0'",
