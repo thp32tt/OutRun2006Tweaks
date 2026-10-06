@@ -808,11 +808,12 @@
     "source_weight_effects": "REWORKED_SOURCE_DERIVED_CORE_RGB_PLUS_NATIVE_BLACK_STROKE_PENDING_CONTROLLER",
     "clipping": "PASS_POSITIVE_MARGINS",
     "protected_clearance": "PASS_ZERO_PROTECTED_CHANGE",
-    "flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
-    "immediate_readability": "PENDING_CONTROLLER"
+    "flip_y_raw": "PASS_CONTROLLER_VISUAL_BOTH",
+    "immediate_readability": "PASS_CONTROLLER_VISUAL_IMPROVED_WEIGHT"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_C109_A149_READABLE_ROW_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A149_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "status": "A149_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_qa": "localization/graphics/role_A/20261007-A-MANUALQA149-2B0863D6/A149_CONTROLLER_SELF_QA.json"
 }
