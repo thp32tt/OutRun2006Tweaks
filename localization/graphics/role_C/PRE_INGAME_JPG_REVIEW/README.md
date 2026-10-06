@@ -1,9 +1,12 @@
-# C QA PASS - pre-in-game human JPG review
+# C QA PASS - English original vs Korean pre-in-game review
 
-Total numbered C-pass rows: 62
-
-Localized candidate JPGs: 61
-
-Preserve-original/no-candidate policy cards: 1
-
-Ordering: queue index ascending. Each candidate JPG shows RAW DDS above and FLIP-Y below. User visual rejection reopens that asset for A/B rework before in-game testing. Report corrections using the leading JPG number.
+- Numbered C-pass rows: 62
+- Primary English source: Sonic-TV/OR2006Sprites pinned at 3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6
+- Exact stock-original fallback: localization/validation/binary_compare/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip
+- Every JPG contains the English original and current Korean candidate side-by-side.
+- Top: FLIP-Y review comparison. Bottom: RAW DDS comparison.
+- English source SHA-256, native dimensions, origin, and any review-only display scale are recorded in the manifests.
+- Lower-resolution English originals may be nearest-neighbor scaled only for human display; the English source bytes are never modified or treated as pixel-QA equivalents.
+- If no proven English source can be aligned to the candidate, export fails closed.
+- User visual rejection overrides prior C static PASS and reopens the asset for A/B rework before in-game testing.
+- Report defects by the leading JPG number.
