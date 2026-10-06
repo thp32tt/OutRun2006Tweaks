@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T10:36:00+09:00",
+  "updatedKst": "2026-10-06T10:45:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -92,9 +92,10 @@
     "VR-DX9EX-R26-RECENTER-REQUESTER-PID-GUARD-0027",
     "VR-DX9EX-R26-ACCEPTED-REQUEST-OWNERSHIP-0028",
     "VR-DX9EX-R26-SESSION-REQUEUE-0029",
-    "VR-DX9EX-RECENTER-IPC-PUBLISH-COHERENCY-0030"
+    "VR-DX9EX-RECENTER-IPC-PUBLISH-COHERENCY-0030",
+    "VR-DX9EX-RECENTER-IPC-STABLE-SNAPSHOT-0031"
   ],
-  "next": "Structural extraction remains terminal. Continue with the next independent DX9Ex quality/stability item after CONVERSION-DX9EX-00447; recenter IPC publication now has a sentinel but snapshot stability across concurrent publication should be reviewed before leaving this chain.",
+  "next": "Structural extraction remains terminal. Continue with accepted-request ordering after CONVERSION-DX9EX-00448 so shared receivedId is never advanced before host-local pending ownership exists; then leave the recenter IPC race chain if no further executable gap remains.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -210,7 +211,8 @@
     "CONVERSION-DX9EX-00444 / VR-DX9EX-R26-RECENTER-REQUESTER-PID-GUARD-0027 validates each pending F10 IPC requester PID against the currently live OR2006C2C process before R26 accepts ownership or queues an application-space recenter. A zero requester or a request from a replaced game process is acknowledged-and-discarded without injecting a LOCAL change; temporary process-enumeration absence leaves the request pending for a later poll. Runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00445 / VR-DX9EX-R26-ACCEPTED-REQUEST-OWNERSHIP-0028 retains the accepted F10 requester PID through the pending LOCAL recenter lifecycle and revalidates it before application and before visible-submit completion. Game/focus recenter sources are tracked independently so dropping a stale accepted game request cannot cancel a concurrent focus recenter; transient process-enumeration absence defers game-only LOCAL mutation instead of guessing ownership. Runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00446 / VR-DX9EX-R26-SESSION-REQUEUE-0029 requeues an accepted-but-not-applied F10 request during OpenXR session teardown by atomically rolling receivedId back only when the shared requestId still matches. Exact material/validation-bearing SHA f9018c61891823c797d2a5e63b41ec4c453f8f8a passed DX9Ex Active Validation 37398523213 and Domain Isolation 37398522991; runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00447 / VR-DX9EX-RECENTER-IPC-PUBLISH-COHERENCY-0030 adds requesterPid=0 publication sentinel ordering for F10 recenter IPC. Final exact validation-bearing SHA 212311d5a341d116627bd3dfe2886cab0305a1a4 passed DX9Ex Active 37399517000 and Domain Isolation 37399516939 after two verifier-only false-negative repairs; runtime remains UNTESTED."
+    "CONVERSION-DX9EX-00447 / VR-DX9EX-RECENTER-IPC-PUBLISH-COHERENCY-0030 adds requesterPid=0 publication sentinel ordering for F10 recenter IPC. Final exact validation-bearing SHA 212311d5a341d116627bd3dfe2886cab0305a1a4 passed DX9Ex Active 37399517000 and Domain Isolation 37399516939 after two verifier-only false-negative repairs; runtime remains UNTESTED.",
+    "CONVERSION-DX9EX-00448 / VR-DX9EX-RECENTER-IPC-STABLE-SNAPSHOT-0031 rereads requestId after requesterPid in Pending() and rejects sequence changes, closing the remaining mixed publication snapshot window. Exact material/validation-bearing SHA 2843acf416dbccaceddda24d15b9549d2f604440 passed DX9Ex Active 37400259544 and Domain Isolation 37400259567; runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
   "validatedSourceSha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
@@ -758,5 +760,31 @@
       "packageArtifactDigest": "sha256:e205de279ccaaa1e844c9b0f2b3ae095368c3b25da548655a62cec6e6c6a68b3"
     },
     "issue14CommentId": 6007543673
+  },
+  "post1000Maintenance00448": {
+    "taskId": "CONVERSION-DX9EX-00448",
+    "eventId": "CONVERSION-DX9EX-00448-E001",
+    "attempt": "1/3",
+    "item": "VR-DX9EX-RECENTER-IPC-STABLE-SNAPSHOT-0031",
+    "baseSha": "c1a191c4d91bab7b4f6004d342d98614edcc1ec4",
+    "materialResultSha": "2843acf416dbccaceddda24d15b9549d2f604440",
+    "validationBearingResultSha": "2843acf416dbccaceddda24d15b9549d2f604440",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "validation": {
+      "dx9exActiveRunId": 37400259544,
+      "jobs": {
+        "policy": 112065633802,
+        "fullChainCompile": 112065726490,
+        "game": 112065726493,
+        "host": 112065726509,
+        "package": 112067079864
+      },
+      "domainIsolationRunId": 37400259567,
+      "domainIsolationJobId": 112065633694,
+      "packageArtifactId": 11385365978,
+      "packageArtifactDigest": "sha256:f8d8d8114c22f7aef59e678deb9c296328905d5b727d557f0f25459f99ea253c"
+    },
+    "issue14CommentId": 6007644239
   }
 }
