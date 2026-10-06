@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261006-A-PRODUCTION106-590A4724",
+  "queue_index": 103,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+  "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+  "candidate_sha256": "9883c645d9d0994d18db0273b1e423ff92fa64bb6f01618229f57863b83d007a",
+  "classification": {
+    "prior_action": "zoom_review",
+    "source": "Normal Balance",
+    "korean": "일반 밸런스",
+    "occurrences": 1
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "clean_plate_provenance": {
+    "donor_asset": "C075FB49",
+    "donor_cell": [
+      1288,
+      1712,
+      1712,
+      1800
+    ],
+    "donor_approval": "C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "target_cell": [
+      1400,
+      1960,
+      1824,
+      2048
+    ],
+    "target_vs_donor_source_diff_pixels": 9428,
+    "border_diff_outside_measured_source_text_bbox": 0,
+    "method": "same pale-yellow selector plate family; whole-cell donor clean accepted only because all target-vs-donor source differences are confined to measured text bbox"
+  },
+  "render": {
+    "font": "Noto Sans CJK KR Black",
+    "font_size": 75,
+    "shear": 0.26,
+    "fill_rgba": [
+      139,
+      128,
+      77,
+      255
+    ]
+  },
+  "row": {
+    "original_bbox": [
+      1404,
+      1968,
+      1820,
+      2040
+    ],
+    "localized_bbox": [
+      1482,
+      1971,
+      1742,
+      2037
+    ],
+    "delta_left": 78,
+    "delta_right": 78,
+    "delta_top": 3,
+    "delta_bottom": 3,
+    "source_width": 416,
+    "source_height": 72,
+    "localized_width": 260,
+    "localized_height": 66,
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS"
+  },
+  "zero_pixel_gates": {
+    "clean_changed_outside_source_bbox": 0,
+    "final_changed_outside_source_bbox": 0,
+    "alpha_changed_outside_source_bbox": 0,
+    "localized_overlap": 0
+  },
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-PRODUCTION106-590A4724/A106_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-PRODUCTION106-590A4724/A106_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 9987,
+    "changed_bbox": [
+      1404,
+      1968,
+      1820,
+      2040
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-PRODUCTION106-590A4724/A106_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-PRODUCTION106-590A4724/A106_FINAL_READABLE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 13225,
+    "changed_bbox": [
+      1404,
+      1968,
+      1820,
+      2040
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+  "worker_static_qa": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "status": "A106_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED"
+}

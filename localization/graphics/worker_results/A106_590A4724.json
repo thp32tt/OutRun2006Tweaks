@@ -1,0 +1,12 @@
+{
+  "run": "20261006-A-PRODUCTION106-590A4724",
+  "index": 103,
+  "asset": "590A4724",
+  "candidate_sha256": "9883c645d9d0994d18db0273b1e423ff92fa64bb6f01618229f57863b83d007a",
+  "bbox_size_positive_margin": "1/1 PASS",
+  "clean_outside": 0,
+  "final_outside": 0,
+  "alpha_outside": 0,
+  "status": "A106_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION106-590A4724/A106_590A4724_REPORT.json"
+}
