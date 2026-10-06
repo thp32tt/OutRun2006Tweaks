@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00487",
+  "production_id": "CONVERSION-DX9EX-00487",
+  "event_id": "CONVERSION-DX9EX-00487-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "runtime_behavior_changed": false,
+  "telemetry_behavior_changed": true,
+  "base_sha": "62c3adabe3e18e6cd6f152c9bc651b6f38aa1c78",
+  "red_guard_sha": "4b1b75849838eb4279b535d5706e0f84130c8c0b",
+  "first_implementation_sha": "ba1b7fc0b32a7f9657c178d4d2db4871a3113c05",
+  "producer_agnostic_source_repair_sha": "930f0667ee243e043099f45345963e8fd1749cd3",
+  "material_result_sha": "19c922516f77e738b24adf8d9ae99610ebf0e54c",
+  "validation_bearing_result_sha": "19c922516f77e738b24adf8d9ae99610ebf0e54c",
+  "result_sha": "19c922516f77e738b24adf8d9ae99610ebf0e54c",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00487]",
+  "selected_work_item": "DX9EX-DIAG-PROJECTED-MARKER-TELEMETRY-0070",
+  "summary": "Added telemetry-only observability for the build-verified 00485 cross-thread semantic registry and 00486 projected rank/rival anchor path. Existing R30 5s VRTelemetry now reports projected semantic observations, missing payloads, per-eye projected build attempts/success/failure, and shared semantic-registry publication/consumption/stale-cleanup counters. Rendering classification, projected math and owner graph are unchanged.",
+  "checkpoints": {
+    "recover": {
+      "status": "COMPLETE",
+      "evidence": "Read exact target HEAD 62c3adab, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, VR_REFACTOR_STATE and durable 00485/00486 results. Confirmed 00486 already completed and target state explicitly prioritized one Quest3/VDXR CORRECTNESS session before more HUD/marker renderer changes."
+    },
+    "review": {
+      "status": "COMPLETE",
+      "evidence": "00485/00486 had exact source/static fixes but R30 telemetry could not distinguish semantic arrival, payload loss and per-eye projected delta failure in one HMD run. Chose observability-only hardening rather than another visual change."
+    },
+    "red": {
+      "status": "COMPLETE",
+      "sha": "4b1b75849838eb4279b535d5706e0f84130c8c0b",
+      "evidence": "Added/wired verify_vr_projected_marker_telemetry.py before implementation. DX9Ex Active 37504824223 policy 112410672963 failed exactly with missing R57ProjectedSemanticObserved."
+    },
+    "implement": {
+      "status": "COMPLETE",
+      "evidence": "Added R57 projected semantic/payload/build counters gated by VRTelemetry, exposed existing shared semantic registry published/registered/consumed/stale-cleared atomics in the 5s R30 log, and left RenderScope/ProjectedMarkerInfo authority unchanged."
+    },
+    "repair": {
+      "status": "COMPLETE",
+      "evidence": "First implementation ba1b7fc0 failed DX9Ex Active 37505015232 policy 112411337324 because existing producer provenance guard forbids exact ProducerToken family strings anywhere in R30. Removed producer-specific telemetry, keeping the final diagnostics token-agnostic."
+    },
+    "validate": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 19c922516f77e738b24adf8d9ae99610ebf0e54c passed DX9Ex Active 37505190533 policy/host/game/full-chain/package."
+    },
+    "commit": {
+      "status": "COMPLETE",
+      "result_sha": "19c922516f77e738b24adf8d9ae99610ebf0e54c",
+      "validation_bearing_result_sha": "19c922516f77e738b24adf8d9ae99610ebf0e54c",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "package": {
+      "status": "COMPLETE",
+      "artifact_id": 11431648019,
+      "digest": "sha256:17127dfea8ef3656fd64ed8c5ce69842d6273e35fe9a7417d52267cd57f01114"
+    },
+    "state": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "changed_paths": [
+      ".github/workflows/vr-dx9ex-active.yml",
+      "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+      "tools/verify_vr_projected_marker_telemetry.py"
+    ],
+    "telemetry_fields": {
+      "projected": [
+        "semantic",
+        "missingPayload",
+        "buildAttempts",
+        "buildOk",
+        "buildFail"
+      ],
+      "registry": [
+        "published",
+        "registered",
+        "consumed",
+        "staleCleared"
+      ]
+    },
+    "authority_invariants": [
+      "RenderScope remains rendering semantic authority",
+      "ProjectedMarkerInfo remains projected-anchor payload authority",
+      "ProducerToken remains diagnostic-only and no exact producer token family is used in R30",
+      "generic ScreenOverlay2D and WorldBillboard fallback unchanged",
+      "cadence/fence/DirectGPU and R31/R32/R33 owner graph unchanged"
+    ],
+    "red_validation": {
+      "sha": "4b1b75849838eb4279b535d5706e0f84130c8c0b",
+      "dx9ex_active_run_id": 37504824223,
+      "policy_job_id": 112410672963,
+      "result": "EXPECTED_FAILURE"
+    },
+    "validation_repair": {
+      "sha": "ba1b7fc0b32a7f9657c178d4d2db4871a3113c05",
+      "dx9ex_active_run_id": 37505015232,
+      "policy_job_id": 112411337324,
+      "result": "EXPECTED_CONTRACT_CONFLICT",
+      "reason": "verify_vr_producer_provenance.py correctly rejected exact producer-token family strings in R30 even though they were inside diagnostics; final telemetry was made producer-agnostic."
+    },
+    "green_validation": {
+      "sha": "19c922516f77e738b24adf8d9ae99610ebf0e54c",
+      "dx9ex_active_run_id": 37505190533,
+      "policy_job_id": 112412028465,
+      "host_job_id": 112412188342,
+      "game_job_id": 112412188305,
+      "full_chain_compile_job_id": 112412188169,
+      "package_job_id": 112414683947,
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11431648019,
+      "digest": "sha256:17127dfea8ef3656fd64ed8c5ce69842d6273e35fe9a7417d52267cd57f01114"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR session was executed for the 00487 exact build. Telemetry is intended to make the next CORRECTNESS session decisive."
+    },
+    "issue14_comment_id": 6022070361,
+    "issue13_comment_id": 6022077298
+  },
+  "next_action": "Run one Quest3/VDXR CORRECTNESS session on exact 00487 package with VRTelemetry enabled. Correlate projected[semantic,missingPayload,buildAttempts,buildOk,buildFail] with registry[published,registered,consumed,staleCleared], HUD trace exact scopes and visible rank/rival anchoring. Do not make another HUD/marker rendering change until that runtime evidence identifies the remaining stage.",
+  "started_at_kst": "2026-10-07T02:33:04+09:00",
+  "completed_at_kst": "2026-10-07T02:47:22+09:00"
+}
