@@ -175,6 +175,34 @@ require_order(
     "InvalidateFallbackAnchor();",
 )
 
+# R26 state is session-scoped. A destroyed OpenXR session must not leak a
+# pending game/focus recenter, target generation or LOCAL fallback anchor into
+# the next session created by the long-lived host process.
+reset_session = body(r26, "inline void ResetSessionState() noexcept")
+require_order(
+    reset_session,
+    "recenter session-state reset",
+    "PendingFocusRecenter = false;",
+    "PendingFocusSession = XR_NULL_HANDLE;",
+    "PendingGameRequestId.store(0, std::memory_order_release)",
+    "PendingApplicationRecenter.store(false, std::memory_order_release)",
+    "ApplicationSpaceGeneration.store(0, std::memory_order_release)",
+    "PendingGameTargetGeneration.store(0, std::memory_order_release)",
+    "InvalidateFallbackAnchor();",
+)
+destroy_r26 = body(r26, "inline XrResult XRAPI_CALL DestroySession(")
+require_order(
+    destroy_r26,
+    "recenter destroy forwarding",
+    "ResetSessionState();",
+    "return OutRunVrR24BlackScreenGuard::DestroySession(session);",
+)
+require(
+    r26,
+    "recenter destroy hook",
+    "#define xrDestroySession OutRunVrR26RecenterHardening::DestroySession",
+)
+
 # The immutable base LOCAL must survive repeated application-space recenters and
 # be released only during session teardown when it differs from the active LOCAL.
 create_space = body(api, "inline XrResult XRAPI_CALL CreateReferenceSpace(")

@@ -25,6 +25,9 @@
 #ifdef xrEndFrame
 #undef xrEndFrame
 #endif
+#ifdef xrDestroySession
+#undef xrDestroySession
+#endif
 
 namespace OutRunVrR26RecenterHardening
 {
@@ -65,6 +68,17 @@ namespace OutRunVrR26RecenterHardening
     {
         FallbackAnchorValid = false;
         FallbackAnchor = {};
+    }
+
+    inline void ResetSessionState() noexcept
+    {
+        PendingFocusRecenter = false;
+        PendingFocusSession = XR_NULL_HANDLE;
+        PendingGameRequestId.store(0, std::memory_order_release);
+        PendingApplicationRecenter.store(false, std::memory_order_release);
+        ApplicationSpaceGeneration.store(0, std::memory_order_release);
+        PendingGameTargetGeneration.store(0, std::memory_order_release);
+        InvalidateFallbackAnchor();
     }
 
     inline void QueueApplicationRecenter() noexcept
@@ -399,7 +413,14 @@ namespace OutRunVrR26RecenterHardening
 
         return result;
     }
+
+    inline XrResult XRAPI_CALL DestroySession(XrSession session) noexcept
+    {
+        ResetSessionState();
+        return OutRunVrR24BlackScreenGuard::DestroySession(session);
+    }
 }
 
 #define xrPollEvent OutRunVrR26RecenterHardening::PollEvent
 #define xrEndFrame OutRunVrR26RecenterHardening::EndFrame
+#define xrDestroySession OutRunVrR26RecenterHardening::DestroySession

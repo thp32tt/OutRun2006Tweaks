@@ -1,0 +1,73 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00443",
+  "production_id": "CONVERSION-DX9EX-00443",
+  "event_id": "CONVERSION-DX9EX-00443-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "VALIDATION_PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "92d542a5e56e7590432e45b4bf1a1e29ae180e35",
+  "material_result_sha": "PENDING_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_COMMIT_SHA",
+  "result_sha": "PENDING_COMMIT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00443]",
+  "selected_work_item": "VR-DX9EX-R26-SESSION-STATE-RESET-0026",
+  "summary": "Reset R26 recenter pending state and generation/anchor ownership at OpenXR session destruction before forwarding to R24 teardown.",
+  "changed_paths": [
+    "vrhost/src/runtime/r26_recenter_hardening.hpp",
+    "tools/verify_vr_recenter_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00443.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered exact branch HEAD 92d542a5e56e7590432e45b4bf1a1e29ae180e35; post-1100 R31/R32 structural chain is explicitly complete and 00442 exact-SHA validation is green."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R26 keeps pending game/focus recenter state, application/target generations and fallback anchor across frames but had no xrDestroySession hook, allowing stale session-local intent to survive host-side OpenXR session recreation."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added ResetSessionState plus an R26 xrDestroySession wrapper that clears session-scoped recenter state before forwarding to R24 teardown; deterministic verifier coverage added."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Awaiting exact-SHA GitHub Actions gates for the material commit."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_RESULT_SHA",
+      "task_tagged_commits": [],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING_AUTOMATION_ARTIFACT"
+    },
+    "C6_STATE": {
+      "status": "PENDING_VALIDATION_EVIDENCE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "red_probe": {
+      "base_sha": "92d542a5e56e7590432e45b4bf1a1e29ae180e35",
+      "result": "FAIL_AS_EXPECTED",
+      "missing_contract": "R26 session teardown/reset hook absent before implementation"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Validate the exact material SHA with DX9Ex Active Validation and Domain Isolation Guard, then finalize the durable run record and Issue #14 ledger.",
+  "started_at_kst": "2026-10-06T09:31:00+09:00"
+}
