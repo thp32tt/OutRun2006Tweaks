@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-USERREWORK204-A064-STAGE-SLANT",
+  "base_head": "b0bf0e7e5e19497e2a8ec398d995104be96e1edc",
+  "user_ingame_regression": [
+    "IGR-010",
+    "스크린샷(153).png"
+  ],
+  "screen": "STAGE_HEART_TALLY_OVERLAY",
+  "owner_lane": "B",
+  "priority": "P1",
+  "mapping": {
+    "status": "EXACT_GRAPHICS_A064_STAGE_PLUS_PROTECTED_TALLY_ART",
+    "domain": "GRAPHICS",
+    "queue_index": 60,
+    "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+    "localized_binding": {
+      "source": "Stage",
+      "korean": "스테이지",
+      "source_effect_bbox": [
+        455,
+        245,
+        690,
+        350
+      ]
+    },
+    "protected_screen_components": [
+      "stage numeral/player marker sprites",
+      "heart icon",
+      "x /8 tally glyphs/numerals"
+    ],
+    "runtime_text_required": false,
+    "runtime_table_evidence": "runtime_ko.tsv contains only unrelated stage phrases (IDs 195/381 전체 스테이지, 1123 스테이지 주행, 1133 unlock guidance); no Stage <number> / heart-tally localized runtime row exists.",
+    "provenance": "A064 B84 readable atlas visibly contains Ranking/Stage/Rank together with the heart x /8 tally HUD art. The user screenshot regression is therefore the baked Stage sprite plus protected numeric/icon art, not a Korean runtime-overlay string."
+  },
+  "regression_cause": {
+    "producer_origin": "B84",
+    "historical_stage_font_size": 80,
+    "historical_horizontal_scale": 0.7028,
+    "historical_localized_bbox": [
+      461,
+      249,
+      685,
+      345
+    ],
+    "later_preservation": "B_RECOVERY02 preserved the row byte-exact; B_RECOVERY09 re-applied it pixel-exact after clean-plate correction; A85 modified OUTRUN MILES only and kept Stage unchanged.",
+    "numeric_false_negative": "Prior bbox/overlap static PASS did not catch the in-game compressed/hierarchy/readability defect.",
+    "user_screenshot_override": true
+  },
+  "material_fix": {
+    "input_candidate_sha256": "77171503a7c1d089f09abcf458ee79b5aa3b52281ce8bed5f5dc234ce7dcfb9b",
+    "superseded_first_b172_sha256": "9457c16db67978ee383550f9094a8862c5030fdea105deba217a4b416467fa37",
+    "candidate_sha256": "a8ffc1f0b14c8c1e3ef5680ea1ae90db3354330404be8ca02e0e336d362331a8",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "source_file": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+    "clean_plate": "B204 exact Stage source-effect bbox transparent reconstruction; historical B_RECOVERY02 clean crop rejected by controller for sparse white residue",
+    "changed_row": "Stage -> 스테이지",
+    "method": "replace only exact Stage source-effect bbox with transparent source-class clean plate after controller rejected the historical clean crop for sparse white residue; fresh native-resolution Noto Sans CJK KR Bold render at natural horizontal advance, source-derived yellow/navy/pale family, 0.16 right shear; preserve all other candidate pixels exact",
+    "font": "Noto Sans CJK KR Bold",
+    "font_size": 57,
+    "horizontal_scale": 1.0,
+    "shear": 0.16,
+    "palette_rgba": {
+      "face": [
+        245,
+        204,
+        12,
+        255
+      ],
+      "inner": [
+        0,
+        10,
+        65,
+        255
+      ],
+      "outer": [
+        255,
+        255,
+        255,
+        255
+      ]
+    },
+    "old_localized_bbox": [
+      461,
+      249,
+      685,
+      345
+    ],
+    "new_localized_bbox": [
+      462,
+      265,
+      682,
+      330
+    ],
+    "source_size": [
+      235,
+      105
+    ],
+    "new_localized_size": [
+      220,
+      65
+    ],
+    "delta_left": 7,
+    "delta_right": 8,
+    "delta_top": 20,
+    "delta_bottom": 20
+  },
+  "controller_retry_reason": "First B204 worker candidate was NOT promoted: mandatory readable visual QA found sparse white source-fragment residue in the reused historical clean crop. Retry reconstructs the reopened Stage cell transparently before lettering.",
+  "static_qa": {
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "changed_pixels": 10638,
+    "changed_pixels_outside_stage_bbox": 0,
+    "alpha_changed_outside_stage_bbox": 0,
+    "legacy_protected_pixels_inside_reopened_stage_bbox": 3724,
+    "protected_changed_pixels": 0,
+    "render_protected_overlap_pixels": 0,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "all_non_stage_candidate_pixels_preserved_exact": true,
+    "clean_plate_source_residue_visual": "NONE_AFTER_TRANSPARENT_RECONSTRUCTION",
+    "a85_outrun_miles_rows_preserved_exact": true,
+    "heart_tally_art_preserved_exact": true,
+    "status": "PASS"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "B204_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

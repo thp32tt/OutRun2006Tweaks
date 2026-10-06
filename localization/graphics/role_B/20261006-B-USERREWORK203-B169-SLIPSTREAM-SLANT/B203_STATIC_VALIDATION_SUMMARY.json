@@ -1,0 +1,34 @@
+{
+  "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+  "superseded_candidate_sha256": "31a73348657620a4e7c7adc66a65e07f95a35a6b61266b48f9409e835b7f12be",
+  "candidate_sha256": "259153b91e330479a4d975037013c77d339ffe3a2781461ebe118bfc04e28824",
+  "localized_bbox": [
+    954,
+    1722,
+    1323,
+    1821
+  ],
+  "original_bbox": [
+    889,
+    1718,
+    1388,
+    1825
+  ],
+  "bbox_size_positive_margin": "1/1 PASS",
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "other_8_localized_row_changed_pixels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "header_128_exact": true,
+  "raw_orientation": "mirror_y",
+  "status": "PASS"
+}

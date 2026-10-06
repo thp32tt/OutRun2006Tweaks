@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-USERREWORK203-B169-SLIPSTREAM-SLANT",
+  "base_head": "b0bf0e7e5e19497e2a8ec398d995104be96e1edc",
+  "queue_index": 48,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+  "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+  "superseded_candidate_sha256": "31a73348657620a4e7c7adc66a65e07f95a35a6b61266b48f9409e835b7f12be",
+  "candidate_sha256": "259153b91e330479a4d975037013c77d339ffe3a2781461ebe118bfc04e28824",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+  "readiness_tier": "P1_USER_INGAME_FAIL_REWORK_COMPLETED_SAME_INVOCATION",
+  "user_ingame_regression": [
+    "IGR-009",
+    "스크린샷(152).png"
+  ],
+  "method": "Reopen only Slipstream on prior C104-approved B169 atlas; restore C104-approved native clean plate under exact source effect bbox; rerender native Noto CJK Black with natural advance, 0.26 right shear, white face + navy/cobalt outline/glow; preserve source streak field and all other localized/non-text pixels exactly; exact-header RGBA32 DDS.",
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "pf_flags": 65,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "slipstream": {
+    "source": "Slipstream",
+    "korean": "슬립스트림",
+    "original_bbox": [
+      889,
+      1718,
+      1388,
+      1825
+    ],
+    "prior_localized_bbox": [
+      892,
+      1719,
+      1385,
+      1823
+    ],
+    "localized_bbox": [
+      954,
+      1722,
+      1323,
+      1821
+    ],
+    "source_size": [
+      499,
+      107
+    ],
+    "localized_size": [
+      369,
+      99
+    ],
+    "delta_left": 65,
+    "delta_right": 65,
+    "delta_top": 4,
+    "delta_bottom": 4,
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "native_font": "Noto Sans CJK KR Black",
+    "native_font_size": 74,
+    "outer_stroke": 6,
+    "inner_stroke": 3,
+    "glow_radius": 3,
+    "slant": 0.26,
+    "artificial_tracking_px": 0,
+    "native_raster_resampled": false,
+    "effect_preservation": "SOURCE_STREAK_FIELD_FROM_PRIOR_VALIDATED_CLEAN_PLATE"
+  },
+  "scope_qa": {
+    "changed_pixels": 23645,
+    "changed_outside_exact_source_bbox": 0,
+    "alpha_changed_outside_exact_source_bbox": 0,
+    "protected_changed_pixels": 0,
+    "other_8_localized_row_changed_pixels": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "localized_to_protected_overlap_pixels": 0,
+    "status": "PASS"
+  },
+  "visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "status": "B203_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}

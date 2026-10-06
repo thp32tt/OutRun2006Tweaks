@@ -1,0 +1,437 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-USERREWORK202-788CE557-SLANT",
+  "base_head": "b0bf0e7e5e19497e2a8ec398d995104be96e1edc",
+  "queue_index": 106,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+  "source_sha256": "4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b",
+  "candidate_sha256": "a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+  "readiness_tier": "P0_USER_INGAME_FAIL_REWORK_COMPLETED_SAME_INVOCATION",
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "pitch": 8192,
+    "mips": 1,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "method": "P0 IGR-017 visual rework of B162: same exact-HD semantic masks, stronger source-family 0.30 selector slant, source-left Transmission alignment, native-resolution smooth affine Hangul; preserve OutRun2SP/product and selector artwork; exact-header DDS",
+  "mask_discovery": {
+    "for_experts": {
+      "window": [
+        0,
+        60,
+        900,
+        210
+      ],
+      "seed_kind": "red",
+      "seed_pixels": 9017,
+      "seed_bbox": [
+        21,
+        111,
+        560,
+        177
+      ],
+      "assignment": "nearest_fill_seed_vs_protected_OutRun2SP_within_26px"
+    },
+    "outrun2sp_protected": {
+      "window": [
+        0,
+        60,
+        900,
+        210
+      ],
+      "seed_kind": "orange",
+      "seed_pixels": 7181,
+      "seed_bbox": [
+        458,
+        123,
+        826,
+        173
+      ],
+      "policy": "PRESERVE_PRODUCT_ARTWORK",
+      "method": "exclusive_orange_fill_plus_biased_nearest_effect_family",
+      "protected_pixels": 31338,
+      "red_mask_pixels_excluded_for_product_protection": 0,
+      "candidate_must_preserve_product_mask_exact": true
+    },
+    "transmission_black": {
+      "window": [
+        0,
+        196,
+        620,
+        320
+      ],
+      "seed_kind": "black",
+      "seed_pixels": 17868,
+      "component_count": 14,
+      "selected_components": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "seed_bbox": [
+        22,
+        220,
+        542,
+        320
+      ]
+    },
+    "transmission_white": {
+      "window": [
+        520,
+        196,
+        1120,
+        320
+      ],
+      "seed_kind": "white",
+      "seed_pixels": 17858,
+      "component_count": 13,
+      "selected_components": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "seed_bbox": [
+        591,
+        220,
+        1111,
+        283
+      ]
+    },
+    "music_change": {
+      "window": [
+        900,
+        45,
+        1500,
+        176
+      ],
+      "seed_kind": "white",
+      "seed_pixels": 5148,
+      "component_count": 6,
+      "selected_components": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "seed_bbox": [
+        962,
+        127,
+        1278,
+        176
+      ]
+    },
+    "time_remaining": {
+      "window": [
+        1120,
+        176,
+        1960,
+        310
+      ],
+      "seed_kind": "white",
+      "seed_pixels": 16628,
+      "component_count": 5,
+      "selected_components": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "seed_bbox": [
+        1155,
+        176,
+        1811,
+        297
+      ]
+    }
+  },
+  "rows": [
+    {
+      "key": "for_experts",
+      "source": "For Experts",
+      "korean": "상급자용",
+      "original_bbox": [
+        3,
+        92,
+        560,
+        196
+      ],
+      "localized_bbox": [
+        116,
+        98,
+        438,
+        189
+      ],
+      "source_size": [
+        557,
+        104
+      ],
+      "localized_size": [
+        322,
+        91
+      ],
+      "delta_left": 113,
+      "delta_right": 122,
+      "delta_top": 6,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "zero_overlap": "PASS",
+      "positive_separation_px": 2,
+      "native_font": "Noto Sans CJK KR Black",
+      "native_font_size": 86,
+      "outer_stroke": 6,
+      "inner_stroke": 3,
+      "slant": 0.3,
+      "style": "red_white_navy",
+      "native_raster_resampled": false,
+      "rework_status": "P0_INGAME_REWORK_NEW_CANDIDATE"
+    },
+    {
+      "key": "transmission_black",
+      "source": "Transmission",
+      "korean": "변속기",
+      "original_bbox": [
+        22,
+        220,
+        542,
+        320
+      ],
+      "localized_bbox": [
+        24,
+        225,
+        281,
+        314
+      ],
+      "source_size": [
+        520,
+        100
+      ],
+      "localized_size": [
+        257,
+        89
+      ],
+      "delta_left": 2,
+      "delta_right": 261,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "zero_overlap": "PASS",
+      "positive_separation_px": 2,
+      "native_font": "Noto Sans CJK KR Black",
+      "native_font_size": 94,
+      "outer_stroke": 7,
+      "inner_stroke": 3,
+      "slant": 0.3,
+      "style": "black_transmission",
+      "native_raster_resampled": false,
+      "rework_status": "P0_INGAME_REWORK_NEW_CANDIDATE"
+    },
+    {
+      "key": "transmission_white",
+      "source": "Transmission",
+      "korean": "변속기",
+      "original_bbox": [
+        591,
+        220,
+        1111,
+        283
+      ],
+      "localized_bbox": [
+        593,
+        223,
+        756,
+        280
+      ],
+      "source_size": [
+        520,
+        63
+      ],
+      "localized_size": [
+        163,
+        57
+      ],
+      "delta_left": 2,
+      "delta_right": 355,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "zero_overlap": "PASS",
+      "positive_separation_px": 2,
+      "native_font": "Noto Sans CJK KR Black",
+      "native_font_size": 59,
+      "outer_stroke": 4,
+      "inner_stroke": 2,
+      "slant": 0.3,
+      "style": "white_transmission",
+      "native_raster_resampled": false,
+      "rework_status": "P0_INGAME_REWORK_NEW_CANDIDATE"
+    },
+    {
+      "key": "music_change",
+      "source": "Music Change",
+      "korean": "음악 변경",
+      "original_bbox": [
+        962,
+        126,
+        1281,
+        176
+      ],
+      "localized_bbox": [
+        1037,
+        128,
+        1206,
+        174
+      ],
+      "source_size": [
+        319,
+        50
+      ],
+      "localized_size": [
+        169,
+        46
+      ],
+      "delta_left": 75,
+      "delta_right": 75,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "zero_overlap": "PASS",
+      "positive_separation_px": 2,
+      "native_font": "Noto Sans CJK KR Black",
+      "native_font_size": 42,
+      "outer_stroke": 3,
+      "inner_stroke": 2,
+      "slant": 0.2,
+      "style": "white_shadow",
+      "native_raster_resampled": false,
+      "rework_status": "P0_INGAME_REWORK_NEW_CANDIDATE"
+    },
+    {
+      "key": "time_remaining",
+      "source": "Time remaining :",
+      "korean": "남은 시간:",
+      "original_bbox": [
+        1147,
+        176,
+        1819,
+        304
+      ],
+      "localized_bbox": [
+        1235,
+        178,
+        1730,
+        302
+      ],
+      "source_size": [
+        672,
+        128
+      ],
+      "localized_size": [
+        495,
+        124
+      ],
+      "delta_left": 88,
+      "delta_right": 89,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "zero_overlap": "PASS",
+      "positive_separation_px": 2,
+      "native_font": "Noto Sans CJK KR Black",
+      "native_font_size": 118,
+      "outer_stroke": 8,
+      "inner_stroke": 4,
+      "slant": 0.2,
+      "style": "white_navy",
+      "native_raster_resampled": false,
+      "rework_status": "P0_INGAME_REWORK_NEW_CANDIDATE"
+    }
+  ],
+  "clean_plate": {
+    "source_text_residue_pixels": 0,
+    "leftover_target_fill_pixels": {
+      "for_experts": 0,
+      "transmission_black": 0,
+      "transmission_white": 0,
+      "music_change": 0,
+      "time_remaining": 0
+    },
+    "preserved_source_changed_pixels": 0,
+    "status": "PASS"
+  },
+  "containment": {
+    "elements_total": 5,
+    "elements_pass": 5,
+    "elements_fail": 0,
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "status": "PASS"
+  },
+  "zero_overlap": {
+    "new_vs_preserved_source_alpha_pixels": 0,
+    "two_px_guard_vs_preserved_conflicts": 0,
+    "new_pair_overlap_or_2px_guard_conflicts": [],
+    "status": "PASS"
+  },
+  "product_protection": {
+    "OutRun2SP_mask_changed_pixels": 0,
+    "status": "PASS"
+  },
+  "protected_preserved": [
+    "OutRun2SP product artwork",
+    "selector arrows",
+    "warning icon",
+    "vehicle silhouettes",
+    "steering wheels",
+    "numeric row",
+    "all unrelated atlas alpha"
+  ],
+  "user_ingame_backlog": [
+    "IGR-017",
+    "IGR-005_LINKED_MAPPING_STILL_OPEN"
+  ],
+  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B202_USER_REWORK_788_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}

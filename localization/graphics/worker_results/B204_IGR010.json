@@ -1,0 +1,11 @@
+{
+  "role": "B",
+  "run": "20261006-B-USERREWORK204-A064-STAGE-SLANT",
+  "regression": "IGR-010",
+  "queue_index": 60,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "input_sha256": "77171503a7c1d089f09abcf458ee79b5aa3b52281ce8bed5f5dc234ce7dcfb9b",
+  "candidate_sha256": "a8ffc1f0b14c8c1e3ef5680ea1ae90db3354330404be8ca02e0e336d362331a8",
+  "report": "localization/graphics/role_B/20261006-B-USERREWORK204-A064-STAGE-SLANT/B204_IGR010_REPORT.json",
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
+}
