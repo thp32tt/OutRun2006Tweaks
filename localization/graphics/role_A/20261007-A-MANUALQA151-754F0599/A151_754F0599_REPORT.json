@@ -199,11 +199,17 @@
     "4_source_faithful_weight_outline_shadow": "PASS_METALLIC_GRAYSCALE_KEYLINE_DARK_EXTRUSION",
     "5_no_clipped_pixels": "PASS_POSITIVE_MARGINS",
     "6_protected_graphics_clearance": "PASS_ZERO_PROTECTED_CHANGE",
-    "7_raw_and_flip_y_visual_review": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
-    "8_immediate_readability_vs_english": "PENDING_CONTROLLER"
+    "7_raw_and_flip_y_visual_review": "PASS_CONTROLLER_VISUAL_BOTH",
+    "8_immediate_readability_vs_english": "PASS_CONTROLLER_VISUAL_HIERARCHY_IMPROVED"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_C171_A151_READABLE_ROW_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A151_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "status": "A151_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_qa": "localization/graphics/role_A/20261007-A-MANUALQA151-754F0599/A151_CONTROLLER_SELF_QA.json",
+  "retry_context": {
+    "first_worker_run": 37540519413,
+    "first_result": "HEADER_CHECK_ERROR_BEFORE_RENDER_NO_CANDIDATE_CHANGE",
+    "successful_worker_run": 37540721560
+  }
 }
