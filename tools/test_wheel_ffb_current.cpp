@@ -165,7 +165,7 @@ int main() {
  require(imperial_avenue_stone_paving_pattern(14,0,imperialAsphalt),"Imperial all-0x2 frame remains the same continuous stone road");
  require(!imperial_avenue_stone_paving_pattern(13,0,imperialAsphalt),"continuous-stone override stays scoped to Imperial Avenue");
  const float stoneAmp=imperial_avenue_stone_tactile_amplitude(.70f,.60f,.70f);
- require(stoneAmp>.20f&&stoneAmp<=.24f,"Imperial stone tactile is moderated between the prior weak and over-strong tunes");
+ require(stoneAmp>=.195f&&stoneAmp<=.201f,"Imperial stone tactile peaks near the softened 0.20 target");
  require(road_motion_gate(0.0f)==0.0f,"stationary car has zero road-texture gate");
  require(road_motion_gate(.08f)>.999f,"road texture reaches full motion authority once clearly moving");
  require(imperial_avenue_stone_tactile_amplitude(0.0f,.60f,.70f)*road_motion_gate(0.0f)==0.0f,"Imperial stone cannot vibrate while parked");
