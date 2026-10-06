@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261007-C226-313DB8CB-A150",
+  "qa_id": "C226",
+  "queue_index": 139,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+  "producer_run": "A150",
+  "source_sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
+  "candidate_sha256": "50ee1f3b43dc0bdbe6c9b198e9e382239e7b624088e0ef9d45bbb2e978ec4fd7",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds"
+  },
+  "independent_basis": "pinned canonical RGBA32 source independently decoded; source and candidate alpha bboxes re-derived directly inside canonical sprite cells; producer masks not consumed",
+  "machine_status": "PASS",
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "pitch": 8192,
+    "depth": 1,
+    "mips": 1,
+    "raw_mode": "RGBA"
+  },
+  "rows": [
+    {
+      "key": "tuned",
+      "source": "TUNED",
+      "korean": "튜닝 사양",
+      "cell": [
+        1404,
+        968,
+        1724,
+        1024
+      ],
+      "original_bbox": [
+        1405,
+        982,
+        1544,
+        1018
+      ],
+      "localized_bbox": [
+        1414,
+        984,
+        1535,
+        1016
+      ],
+      "source_size": [
+        139,
+        36
+      ],
+      "localized_size": [
+        121,
+        32
+      ],
+      "delta_left": 9,
+      "delta_right": 9,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "width_ratio": 0.8705,
+      "height_ratio": 0.8889,
+      "clean_source_alpha_remaining": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "normal",
+      "source": "NORMAL",
+      "korean": "일반 사양",
+      "cell": [
+        1724,
+        968,
+        2044,
+        1024
+      ],
+      "original_bbox": [
+        1730,
+        981,
+        1904,
+        1017
+      ],
+      "localized_bbox": [
+        1757,
+        983,
+        1877,
+        1015
+      ],
+      "source_size": [
+        174,
+        36
+      ],
+      "localized_size": [
+        120,
+        32
+      ],
+      "delta_left": 27,
+      "delta_right": 27,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "width_ratio": 0.6897,
+      "height_ratio": 0.8889,
+      "clean_source_alpha_remaining": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "summary": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "candidate_changed_outside_exact_source_bboxes": 0,
+    "candidate_alpha_changed_outside_exact_source_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "header_128_exact": true,
+    "raw_readable_parity": "PASS"
+  },
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C226-313DB8CB-A150/C226_313_SOURCE_CLEAN_FINAL_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C226-313DB8CB-A150/C226_313_ROW_CONTACT.jpg",
+    "localization/graphics/role_C/20261007-C226-313DB8CB-A150/C226_313_SOURCE_FINAL_RAW.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
