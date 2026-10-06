@@ -820,7 +820,7 @@ require_order(
 create_shaders = body(host_sbs, "inline bool CreateShaders()")
 require_order(
     create_shaders,
-    "R19 shader resource bundle is published transactionally",
+    "R19 shader resource staging precedes global publication",
     "ReleaseCom(ConstantBuffer);",
     "ReleaseCom(Sampler);",
     "ReleaseCom(Ps);",
@@ -836,6 +836,18 @@ require_order(
     "CreateSamplerState(&sd, &pendingSampler)",
     "CreateBuffer(",
     "&bd, nullptr, &pendingConstantBuffer)",
+    "Vs = pendingVs;",
+    "Ps = pendingPs;",
+    "Sampler = pendingSampler;",
+    "ConstantBuffer = pendingConstantBuffer;",
+)
+publish_start = create_shaders.find("Vs = pendingVs;")
+if publish_start < 0:
+    fail("R19 shader publication start missing")
+publish_path = create_shaders[publish_start:]
+require_order(
+    publish_path,
+    "R19 complete shader bundle publishes before success",
     "Vs = pendingVs;",
     "Ps = pendingPs;",
     "Sampler = pendingSampler;",

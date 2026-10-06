@@ -2,11 +2,11 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX9EX-00463",
   "production_id": "CONVERSION-DX9EX-00463",
-  "event_id": "CONVERSION-DX9EX-00463-E003",
-  "event_type": "rollover",
+  "event_id": "CONVERSION-DX9EX-00463-E004",
+  "event_type": "retry",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "chat_rollover": 2,
   "rollover_is_retry": false,
   "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
@@ -15,7 +15,7 @@
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "20ee3894807b8879638d711dfc5721bcab78599f",
-  "material_result_sha": "PENDING_SELF",
+  "material_result_sha": "954c264dc0c76afe85a8784ec057df452b4d33cf",
   "validation_bearing_result_sha": "PENDING_SELF",
   "result_sha": "PENDING_SELF",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00463]",
@@ -42,12 +42,14 @@
       "evidence": "Normalize any prior partial global bundle before retry; create VS/PS/sampler/constant-buffer into pending local COM pointers; rollback all pending objects on every creation failure; publish globals only after the full bundle succeeds."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
+      "status": "RETRYING",
       "automation_validation": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "evidence": "Initial validation-bearing source SHA 954c264dc0c76afe85a8784ec057df452b4d33cf: DX9Ex Active 37417855306 policy failed verifier-only; Domain Isolation 37417855282 PASS. Retry scopes final return ordering to the global-publication suffix."
     },
     "C4_COMMIT": {
       "status": "PENDING",
+      "source_material_sha": "954c264dc0c76afe85a8784ec057df452b4d33cf",
       "ci_skip_on_validation_bearing_result": false
     },
     "C5_PACKAGE": {
@@ -68,8 +70,17 @@
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "initial_validation": {
+      "dx9ex_active_run_id": 37417855306,
+      "policy_job_id": 112120371426,
+      "dx9ex_active_result": "FAIL_VERIFIER_ONLY",
+      "domain_isolation_run_id": 37417855282,
+      "domain_isolation_result": "PASS"
     }
   },
-  "next_action": "Validate this exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize C3-C6 bookkeeping and Issue #14 while preserving RUNTIME_VALIDATION=UNTESTED.",
-  "started_at_kst": "2026-10-06T14:11:00+09:00"
+  "next_action": "Validate the verifier-repair exact SHA with canonical DX9Ex Active Validation and Domain Isolation; if both pass, finalize C3-C6 while keeping source_material_sha=954c264d... and RUNTIME_VALIDATION=UNTESTED.",
+  "started_at_kst": "2026-10-06T14:11:00+09:00",
+  "source_material_sha": "954c264dc0c76afe85a8784ec057df452b4d33cf",
+  "failure_context": "DX9Ex Active Validation exact run 37417855306 failed at policy job 112120371426 because the new verifier's whole-function require_order bound 'return true;' to CreateShaders' early already-complete fast path. Domain Isolation exact run 37417855282 succeeded. This is a verifier-only false-negative; implementation source was not changed in retry."
 }
