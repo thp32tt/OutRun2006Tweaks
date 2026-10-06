@@ -234,7 +234,9 @@ require_order(
     end_frame,
     "head-locked fallback rejection",
     "const bool r24ViewFallback",
-    "if (pending != 0 && ApplicationRecenterAppliedForPendingGameRequest()",
+    "if (pending != 0 &&",
+    "PendingGameRequestOwnedByCurrentProcess(pending)",
+    "ApplicationRecenterAppliedForPendingGameRequest()",
     "else if (pending != 0 && r24ViewFallback)",
     "InvalidateFallbackAnchor();",
 )
