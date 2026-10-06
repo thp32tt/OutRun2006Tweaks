@@ -13,6 +13,7 @@ HOST_CACHE_PATH = ROOT / "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp"
 HOST_PASSTHROUGH_PATH = ROOT / "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp"
 HOST_R23_RUNTIME_PATH = ROOT / "vrhost/src/runtime/r23_runtime_hardening.hpp"
 HOST_R24_PATH = ROOT / "vrhost/src/runtime/r24_black_screen_guard.hpp"
+HOST_R26_PATH = ROOT / "vrhost/src/runtime/r26_recenter_hardening.hpp"
 HOST_REVIEW_PATH = ROOT / "vrhost/src/runtime/review_hardening.hpp"
 HOST_SBS_PATH = ROOT / "vrhost/src/runtime/sbs_capture_override.hpp"
 HOST_SUBMIT_PATH = ROOT / "vrhost/src/runtime/r32_direct_submit.hpp"
@@ -85,6 +86,7 @@ host_cache = load(HOST_CACHE_PATH)
 host_passthrough = load(HOST_PASSTHROUGH_PATH)
 host_r23_runtime = load(HOST_R23_RUNTIME_PATH)
 host_r24 = load(HOST_R24_PATH)
+host_r26 = load(HOST_R26_PATH)
 host_review = load(HOST_REVIEW_PATH)
 host_sbs = load(HOST_SBS_PATH)
 host_submit = load(HOST_SUBMIT_PATH)
@@ -708,6 +710,17 @@ require_order(
     "OutRunVrSbsCaptureOverride::DestroySession(session);",
     "if (XR_SUCCEEDED(result))",
     "ResetR13HostState();",
+    "return result;",
+)
+
+r26_destroy = body(host_r26, "inline XrResult XRAPI_CALL DestroySession(")
+require_order(
+    r26_destroy,
+    "R26 recenter transactional session teardown",
+    "const XrResult result =",
+    "OutRunVrR24BlackScreenGuard::DestroySession(session);",
+    "if (XR_SUCCEEDED(result))",
+    "ResetSessionState();",
     "return result;",
 )
 

@@ -622,8 +622,14 @@ namespace OutRunVrR26RecenterHardening
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session) noexcept
     {
-        ResetSessionState();
-        return OutRunVrR24BlackScreenGuard::DestroySession(session);
+        // Preserve accepted/pending recenter ownership while the parent
+        // session is still live. A failed downstream destroy is retryable and
+        // must not requeue/clear the current session's recenter state.
+        const XrResult result =
+            OutRunVrR24BlackScreenGuard::DestroySession(session);
+        if (XR_SUCCEEDED(result))
+            ResetSessionState();
+        return result;
     }
 }
 
