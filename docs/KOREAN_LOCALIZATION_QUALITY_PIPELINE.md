@@ -129,8 +129,10 @@ Static QA and in-game validation are distinct. Never infer runtime success from 
 
 Quality rules live here and in graphics QA tooling. They must not be copied into controller scheduling/state code. Do not add Production/Event ID layers, queue schemas, rollover state machines or C0-C6 orchestration merely to enforce this document.
 
-## Pre-in-game consolidated JPG review
+## Pre-in-game consolidated English-original comparison JPG review
 
-After independent C static QA passes a graphics candidate, but before actual game testing, export the current C-pass set to `localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/`.
+After independent C static QA passes a graphics candidate, but before actual game testing, export the current C-pass set to localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/.
 
-The export is a human visual gate: numbered JPGs, queue-index ordering, a machine-readable manifest, and both RAW/FLIP-Y views for every localized candidate. User-observed visual defects in this set are hard failures even when C numeric/static checks passed; the asset must return to A/B rework and receive a newer C pass before in-game validation. Reopened/pending-C assets must disappear from the current export. Preserve-original policy passes with no candidate remain as numbered manifest cards only.
+The export is a human visual gate: numbered JPGs, queue-index ordering, a machine-readable manifest, and English original vs current Korean candidate shown side-by-side. Each localized candidate must include both FLIP-Y review and RAW DDS comparisons using the same decoded dimensions. The manifest must pin and hash the canonical English source; missing/ambiguous source or a source/candidate size mismatch is FAIL/HOLD, not a review pass.
+
+C must refresh this comparison set whenever C-PASS membership or candidate bytes change. tools/localization/export_c_pass_comparison.py is the persistent exporter and the C hosted-worker path must invoke it when a refresh is required. User-observed visual defects in this set are hard failures even when C numeric/static checks passed; the asset must return to A/B rework and receive a newer C pass before in-game validation. Reopened/pending-C assets must disappear from the current export. Preserve-original policy passes with no candidate remain numbered comparisons whose right side explicitly states that the original is intentionally preserved.

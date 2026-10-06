@@ -152,13 +152,16 @@ Git synchronization is mandatory at the end of each role when that role changed 
 
 ## C-pass pre-in-game human JPG review gate
 
-Before any graphics asset that has reached independent C static PASS is treated as ready for actual in-game testing, C MUST maintain a consolidated human-review JPG export under `localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/`.
+Before any graphics asset that has reached independent C static PASS is treated as ready for actual in-game testing, C MUST maintain a consolidated English-original-vs-current-Korean human-review JPG export under localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/.
 
-- Rebuild the export from current `asset_queue.csv` state; never carry stale images for assets reopened by later user/JPG/in-game regression.
-- Include every current `localize_text` graphics row whose latest valid state is independent C PASS, plus exact byte-identical aliases of a C-approved candidate.
+- Rebuild the export from current asset_queue.csv state; never carry stale images for assets reopened by later user/JPG/in-game regression.
+- Include every current localize_text graphics row whose latest valid state is independent C PASS, plus exact byte-identical aliases of a C-approved candidate.
 - Exclude A/B/user-rework states that are still pending a newer C pass.
-- Number files in queue-index order as `NNN_qIII_ASSETKEY.jpg` and retain `manifest.csv` / `manifest.json` so the user can report corrections by number.
-- Each localized-candidate JPG must expose both RAW DDS view and FLIP-Y review view on an opaque neutral background so wrong orientation, slant, residue, overlap, broken glyphs, alpha halos and other-image intrusion are visible before runtime testing.
-- A C policy PASS that intentionally has no localized candidate remains in the numbered manifest and receives a numbered no-candidate review card so numbering stays complete.
+- Number files in queue-index order as NNN_qIII_ASSETKEY.jpg and retain manifest.csv / manifest.json so the user can report corrections by number.
+- The English original is mandatory. Each numbered localized-candidate JPG must place the canonical unmodified English source and the current Korean candidate side-by-side at the same decoded dimensions. The top comparison is FLIP-Y review orientation; the bottom comparison is RAW DDS orientation.
+- Fetch the English source from a pinned canonical source revision, record the exact source URL/revision and SHA-256 in the manifest, and fail closed if the source is unavailable, ambiguous, or decodes to a different size than the current candidate. Do not substitute an older Korean bitmap, clean plate, or already-localized candidate for the English original.
+- The persistent exporter is tools/localization/export_c_pass_comparison.py. Whenever C changes the current C-PASS membership or candidate bytes, the C hosted-worker job MUST invoke this exporter before C synchronization is considered complete. A later C QA script may replace tools/localization/cpu_jobs/C.py, but it must still invoke the persistent exporter when the C-pass review set needs refresh.
+- The comparison must use an opaque neutral background so wrong orientation, reversed slant, source residue, overlap, broken glyphs, alpha halos, other-image intrusion, source-style drift, baseline/alignment mismatch and protected-art damage can be judged directly against the English original.
+- A C policy PASS that intentionally has no localized candidate remains in the numbered set; its comparison shows the English source on both sides and clearly marks the current result as original-preserved/no-localized-pixels.
 - User rejection from this JPG review overrides prior static/C PASS exactly like in-game screenshot evidence: reopen the affected asset for A/B rework and require a newer C pass before it returns to this export.
-- This JPG review is a pre-in-game human gate only. It does not replace actual in-game validation and must not close `RUNTIME_VALIDATION`.
+- This JPG review is a pre-in-game human gate only. It does not replace actual in-game validation and must not close RUNTIME_VALIDATION.
