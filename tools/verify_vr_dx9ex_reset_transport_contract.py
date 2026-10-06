@@ -833,19 +833,26 @@ require_order(
     "gpuWorkSubmitted = false;",
 )
 
-render_to = body(host_sbs, "inline bool RenderTo(Swapchain& swapchain")
+render_to = body(host_sbs, "inline bool RenderTo(ID3D11RenderTargetView* rtv")
+require(
+    render_to,
+    "R19 tracked render preserves four-argument compatibility",
+    "Swapchain* swapchainOwner = nullptr",
+)
 require_order(
     render_to,
     "R19 marks submitted GPU work after draw",
     "OutRunVrFinalTest::Context->Draw(3, 0);",
-    "swapchain.gpuWorkSubmitted = true;",
+    "if (swapchainOwner)",
+    "swapchainOwner->gpuWorkSubmitted = true;",
     "OutRunVrFinalTest::Context->OMSetRenderTargets(1, &nullRtv, nullptr);",
 )
 require(
     host_sbs,
     "R19 render paths pass swapchain provenance owner",
-    "RenderTo(Projection, Projection.rtvs",
-    "RenderTo(Theater, Theater.rtvs",
+    "eyeUv[0], &Projection",
+    "eyeUv[1], &Projection",
+    "theaterUv, &Theater",
 )
 
 require(

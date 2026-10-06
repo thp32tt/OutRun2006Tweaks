@@ -698,8 +698,8 @@ float4 PSMain(VSOut input) : SV_Target
         return true;
     }
 
-    inline bool RenderTo(Swapchain& swapchain, ID3D11RenderTargetView* rtv,
-        std::uint32_t width, std::uint32_t height, const UvRect& uv)
+    inline bool RenderTo(ID3D11RenderTargetView* rtv, std::uint32_t width,
+        std::uint32_t height, const UvRect& uv, Swapchain* swapchainOwner = nullptr)
     {
         if (!rtv || !SourceSrv || !ConstantBuffer || !CreateShaders() ||
             !OutRunVrFinalTest::Context)
@@ -735,7 +735,8 @@ float4 PSMain(VSOut input) : SV_Target
         // Once Draw references an RTV from this swapchain, destruction must
         // prove GPU completion. Fresh/partially initialized swapchains that
         // never reach Draw have no submitted graphics work to drain.
-        swapchain.gpuWorkSubmitted = true;
+        if (swapchainOwner)
+            swapchainOwner->gpuWorkSubmitted = true;
         ID3D11ShaderResourceView* nullSrv = nullptr;
         OutRunVrFinalTest::Context->PSSetShaderResources(0, 1, &nullSrv);
         ID3D11RenderTargetView* nullRtv = nullptr;
@@ -903,10 +904,10 @@ float4 PSMain(VSOut input) : SV_Target
             Release(Projection);
             return false;
         }
-        bool ok = RenderTo(Projection, Projection.rtvs[image][0], Projection.width,
-            Projection.height, eyeUv[0]);
-        ok = RenderTo(Projection, Projection.rtvs[image][1], Projection.width,
-            Projection.height, eyeUv[1]) && ok;
+        bool ok = RenderTo(Projection.rtvs[image][0], Projection.width,
+            Projection.height, eyeUv[0], &Projection);
+        ok = RenderTo(Projection.rtvs[image][1], Projection.width,
+            Projection.height, eyeUv[1], &Projection) && ok;
         const bool released = Release(Projection);
         if (!ok || !released)
             return false;
@@ -1008,8 +1009,8 @@ float4 PSMain(VSOut input) : SV_Target
             Release(Theater);
             return false;
         }
-        const bool ok = RenderTo(Theater, Theater.rtvs[image][0], Theater.width,
-            Theater.height, theaterUv);
+        const bool ok = RenderTo(Theater.rtvs[image][0], Theater.width,
+            Theater.height, theaterUv, &Theater);
         const bool released = Release(Theater);
         if (!ok || !released)
             return false;
