@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261007-A-MANUALQA152-9CE4E175",
+  "worker": "github-actions",
+  "base_head": "c53ac2e0d860a88d720fae2480923fe44d217ae7",
+  "queue_index": 195,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+  "trigger": "PRE_INGAME_019_SOURCE_RELATIVE_WIDTH_HIERARCHY_FALSE_NEGATIVE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/019_q195_9CE4E175.jpg",
+  "prior_c_status": "C125_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "prior_candidate_sha256": "cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2",
+  "source_sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
+  "candidate_sha256": "5801e241ba3c288c8245c48123e55aa1f538fb6ca26eb32e182c7f3ec1779b09",
+  "reason": "PRE_INGAME #019 shows 이용 불가 only 142px wide inside the exact 395px NOT AVAILABLE source effect bbox. Latest ordered generation gate treats the resulting weak plate hierarchy as a visual false negative despite numeric containment PASS.",
+  "structure": {
+    "dimensions": [
+      1024,
+      128
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "pitch": 4096,
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "prior_clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION20/9CE4E175_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION20/9CE4E175_HD_CLEAN_PLATE.png",
+    "size": [
+      1024,
+      128
+    ],
+    "changed_pixels": 8042,
+    "changed_bbox": [
+      95,
+      80,
+      490,
+      121
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION20/9CE4E175_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261007-A-MANUALQA152-9CE4E175/9CE4E175_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      1024,
+      128
+    ],
+    "changed_pixels": 10194,
+    "changed_bbox": [
+      95,
+      80,
+      490,
+      121
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_outside_source_bbox": 0,
+    "alpha_changed_pixels_outside_source_bbox": 0,
+    "protected_visible_pixels_changed": 0,
+    "diagnostic_source_residue": 0
+  },
+  "row": {
+    "source": "NOT AVAILABLE",
+    "korean": "이용 불가",
+    "original_bbox": [
+      95,
+      80,
+      490,
+      121
+    ],
+    "localized_bbox": [
+      166,
+      82,
+      418,
+      119
+    ],
+    "source_width": 395,
+    "source_height": 41,
+    "localized_width": 252,
+    "localized_height": 37,
+    "width_ratio": 0.638,
+    "height_ratio": 0.9024,
+    "delta_left": 71,
+    "delta_right": 72,
+    "delta_top": 2,
+    "delta_bottom": 2,
+    "prior_localized_bbox": [
+      221,
+      82,
+      363,
+      119
+    ],
+    "prior_localized_width": 142,
+    "prior_localized_height": 37,
+    "width_gain_px": 110,
+    "height_gain_px": 0,
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "style": "fresh native Noto Sans CJK KR Black; heavy white sans, centered; no invented outline/slant"
+  },
+  "ordered_generation_gate": {
+    "1_source_text_removed_and_plate_restored": "PASS_REUSE_PRIOR_EXACT_VALIDATED_CLEAN_PLATE",
+    "2_slant_direction_matches_source": "PASS_SOURCE_UPRIGHT",
+    "3_text_not_unnecessarily_undersized_and_within_source_bbox": "PASS_WIDTH_142_TO_252_WITHIN_395",
+    "4_source_faithful_weight_outline_shadow": "PASS_HEAVY_WHITE_SANS_NO_INVENTED_EFFECT",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGINS",
+    "6_protected_graphics_clearance": "PASS_ZERO_PROTECTED_CHANGE",
+    "7_raw_and_flip_y_visual_review": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "8_immediate_readability_vs_english": "PENDING_CONTROLLER"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A152_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
