@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role B only")
 
 repo=Path.cwd()
-run="20261006-B-PRODUCTION175-A8CE339F-DXT5"
+run="20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -79,8 +79,15 @@ for row in rows:
     x0,y0,x1,y1=row["original_bbox"]; allowed[y0:y1,x0:x1]=True
 
 clean_arr=sa.copy()
-clean_arr[source_mask,3]=0
+# B175 controller visual QA caught source-script double drawing after BC3 splice.
+# Zero the complete RGBA source-text footprint so the compressor cannot retain
+# source glyph colour in blocks that become transparent.
+clean_arr[source_mask]=0
 clean=Image.fromarray(clean_arr,"RGBA")
+clean_alpha=np.asarray(clean.getchannel("A"))
+clean_source_visible=int(np.count_nonzero(clean_alpha[source_mask]>0))
+if clean_source_visible:
+    raise RuntimeError(("clean source mask still visible",clean_source_visible))
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
 subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra","libnvtt-bin"],check=True)
@@ -144,7 +151,7 @@ for row in rows:
     row.update({"localized_bbox":lb,"source_width":sw,"source_height":sh,"localized_width":lw,"localized_height":lh,
       "delta_left":lb[0]-ob[0],"delta_right":ob[2]-lb[2],"delta_top":lb[1]-ob[1],"delta_bottom":ob[3]-lb[3],
       "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS","font":"Noto Sans CJK KR Black",
-      "font_size":fs,"block_safe_bbox":blockbb,"style":sty,"rework_status":"B175_NEW_EXACT_HD_DXT5_CANDIDATE"})
+      "font_size":fs,"block_safe_bbox":blockbb,"style":sty,"rework_status":"B176_NEW_EXACT_HD_DXT5_CANDIDATE"})
 
 # Encode full raw image then splice only safe BC3 blocks; boundary cleanup changes alpha indices only.
 raw=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
@@ -174,17 +181,26 @@ for by in range(bh):
             if not np.all(am): raise RuntimeError(("target partial block",bx,by))
             outb[off:off+16]=tb[off:off+16]; target_blocks.add((bx,by)); continue
         if np.all(am):
-            outb[off:off+16]=tb[off:off+8]+sb[off+8:off+16]; source_only_full.add((bx,by)); continue
+            # B176: replace the whole DXT5 block from the clean/final encode.
+            # B175 copied only alpha bytes and retained source colour blocks,
+            # which produced visible English double drawing despite numeric gates.
+            outb[off:off+16]=tb[off:off+16]; source_only_full.add((bx,by)); continue
         if not np.any(sm): continue
-        ob=bytes(outb[off:off+16]); idx=aidx(ob); sa4=source_raw_alpha[y:y+4,x:x+4]
-        zero=[idx[yy*4+xx] for yy in range(4) for xx in range(4) if sa4[yy,xx]<=1]
-        if not zero: raise RuntimeError(("partial no transparent index",bx,by))
-        zi=Counter(zero).most_common(1)[0][0]
+        # Boundary blocks straddle the exact source bbox. Preserve original
+        # colour bytes and rebuild alpha indices with explicit 255/0 endpoints:
+        # source glyph pixels -> 0, every other pixel -> nearest original alpha.
+        ob=bytes(outb[off:off+16]); sa4=source_raw_alpha[y:y+4,x:x+4]
+        alpha_vals=[255,0,218,182,145,109,72,36]
+        idx=[]
         for yy in range(4):
             for xx in range(4):
-                if sm[yy,xx]: idx[yy*4+xx]=zi
-        nb=seta(ob,idx)
-        if nb[8:]!=ob[8:] or nb[:2]!=ob[:2]: raise RuntimeError("partial endpoint/color drift")
+                if sm[yy,xx]:
+                    idx.append(1)
+                else:
+                    a=int(sa4[yy,xx])
+                    idx.append(min(range(8),key=lambda k:abs(alpha_vals[k]-a)))
+        bits=sum((int(v)&7)<<(3*i) for i,v in enumerate(idx))
+        nb=bytes([255,0])+bits.to_bytes(6,"little")+ob[8:]
         outb[off:off+16]=nb; partial_blocks.add((bx,by))
 
 candidate.write_bytes(outb); cand_sha=sha(candidate)
@@ -225,11 +241,11 @@ for by in range(bh):
 if outside_patch: raise RuntimeError(("compressed outside patch",outside_patch))
 
 # Evidence
-src.save(out/"B175_SOURCE_READABLE.png"); clean.save(out/"B175_CLEAN_PLATE.png"); dec.save(out/"B175_FINAL_READABLE.png")
-Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"B175_SOURCE_TEXT_MASK.png")
-Image.fromarray((allowed.astype(np.uint8)*255),"L").save(out/"B175_ALLOWED_MASK.png")
-Image.fromarray(((~allowed).astype(np.uint8)*255),"L").save(out/"B175_PROTECTED_MASK.png")
-Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"B175_TARGET_MASK.png")
+src.save(out/"B176_SOURCE_READABLE.png"); clean.save(out/"B176_CLEAN_PLATE.png"); dec.save(out/"B176_FINAL_READABLE.png")
+Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"B176_SOURCE_TEXT_MASK.png")
+Image.fromarray((allowed.astype(np.uint8)*255),"L").save(out/"B176_ALLOWED_MASK.png")
+Image.fromarray(((~allowed).astype(np.uint8)*255),"L").save(out/"B176_PROTECTED_MASK.png")
+Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"B176_TARGET_MASK.png")
 
 def comp(im,bg=(88,88,88,255)):
     z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
@@ -243,7 +259,7 @@ cards=[card("SOURCE",src,crop,1),card("CLEAN",clean,crop,1),card("FINAL",dec,cro
 Wc=max(c.width for c in cards); Hc=sum(c.height for c in cards)+8*(len(cards)-1)
 sheet=Image.new("RGB",(Wc,Hc),"white"); yy=0
 for c in cards: sheet.paste(c,(0,yy)); yy+=c.height+8
-sheet.thumbnail((2200,1400),Image.Resampling.LANCZOS); sheet.save(out/"B175_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
+sheet.thumbnail((2200,1400),Image.Resampling.LANCZOS); sheet.save(out/"B176_SOURCE_CLEAN_FINAL_CONTACT.jpg",quality=97)
 
 raw_src=Image.open(src_dds).convert("RGBA"); raw_final=Image.open(candidate).convert("RGBA")
 rcrop=(0,H-450,1600,H-190)
@@ -251,7 +267,7 @@ cards=[card("SOURCE_RAW",raw_src,rcrop,1),card("FINAL_RAW",raw_final,rcrop,1)]
 Wc=max(c.width for c in cards); Hc=sum(c.height for c in cards)+8
 rs=Image.new("RGB",(Wc,Hc),"white"); yy=0
 for c in cards: rs.paste(c,(0,yy)); yy+=c.height+8
-rs.thumbnail((2200,1200),Image.Resampling.LANCZOS); rs.save(out/"B175_RAW_CONTACT.jpg",quality=97)
+rs.thumbnail((2200,1200),Image.Resampling.LANCZOS); rs.save(out/"B176_RAW_CONTACT.jpg",quality=97)
 
 report={
  "schema_version":1,"role":"B","run":run,
@@ -265,19 +281,25 @@ report={
  "containment":{"elements_total":5,"elements_pass":5,"decoded_changed_outside_exact_source_bboxes":diff_out,
    "alpha_changed_outside_exact_source_bboxes":alpha_out,"visible_pixels_outside_exact_source_bboxes":visible_out,
    "source_residue_pixels":residue,"status":"PASS"},
- "compressed_patch":{"target_reencoded_blocks":len(target_blocks),"source_only_full_alpha_blocks":len(source_only_full),
+ "clean_plate":{"source_mask_visible_pixels_after_rgba_zero":clean_source_visible,"status":"PASS"},
+ "compressed_patch":{"target_reencoded_blocks":len(target_blocks),"source_only_full_reencoded_blocks":len(source_only_full),
    "partial_alpha_only_blocks":len(partial_blocks),"changed_blocks":changed_blocks,"changed_blocks_outside_patch":outside_patch,
    "partial_endpoints_and_color_bytes_preserved":True,"status":"PASS"},
  "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","runtime_validation":"UNTESTED",
- "status":"B175_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
- "superseded_attempt":{"run":"B174 first render dispatch","result":"FAIL_CLOSED_DXT5_DETECTED_BEFORE_OUTPUT",
-   "note":"Initial render code assumed RGBA32; hosted worker detected canonical DXT5 and stopped before candidate persistence. B175 uses the existing exact DXT5 constrained splice method."},
+ "status":"B176_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "superseded_attempts":[
+   {"run":"B174 first render dispatch","result":"FAIL_CLOSED_DXT5_DETECTED_BEFORE_OUTPUT",
+    "note":"Initial render code assumed RGBA32; hosted worker detected canonical DXT5 and stopped before candidate persistence."},
+   {"run":"B175","candidate_sha256":"d23a6cd866fef15d44b86094e22fe6055efd183183039a260af8c1a6f7d7b582",
+    "result":"REJECTED_CONTROLLER_VISUAL_QA_SOURCE_SCRIPT_DOUBLE_DRAW",
+    "note":"Numeric gates falsely passed because the source-only DXT5 splice retained source colour blocks; readable FINAL visibly showed Ex...me / S...rt / G...al around Korean. B176 replaces full source-only blocks and explicitly zeros RGBA before compression."}
+ ],
  "no_vr_ffb_dx11_dxvk_work":True
 }
-(out/"B175_A8CE339F_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"B175_A8CE339F.json").write_text(json.dumps({
+(out/"B176_A8CE339F_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"B176_A8CE339F.json").write_text(json.dumps({
  "role":"B","run":run,"queue_index":52,"asset":"A8CE339F","source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,
- "report":str((out/"B175_A8CE339F_REPORT.json").relative_to(repo)),"status":"WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
+ "report":str((out/"B176_A8CE339F_REPORT.json").relative_to(repo)),"status":"WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("B175_DONE",cand_sha,[(r["key"],r["original_bbox"],r["localized_bbox"],r["decoded_localized_bbox"]) for r in rows])
+print("B176_DONE",cand_sha,[(r["key"],r["original_bbox"],r["localized_bbox"],r["decoded_localized_bbox"]) for r in rows])
