@@ -506,7 +506,7 @@ req(build, 'result.surfaceMask[i] = car->water_flag_24C[i];', 'historical water_
 req(build, 'DWORD wheelWaterFlag = 0;', 'water classification is captured independently for each wheel')
 req(build, 'result.waterWheelMask |= (1u << i);', 'stage-specific water wheels are retained in the road profile')
 req(build, 'const bool mixedSurface = rawMixedSurface && nonWaterRough;', 'ordinary route forks and water do not trigger curb tactile boost')
-req(build, 'const bool tactileSurface = nonWaterRough || snowCurbHeld;', 'curb compatibility path requires non-water roughness or an active snow latch')
+req(build, 'imperialStoneRoad || nonWaterRough || snowCurbHeld;', 'tactile compatibility path includes the verified continuous Imperial stone road without admitting generic water')
 req(build, 'surface.nonWaterMaximum - 0.30f', 'curb compatibility amplitude is based on non-water roughness')
 req(build, 'waterOnlyRough', 'stage water is explicitly separated from curb compatibility')
 req(build, '"WheelFFB STAGE:', 'stage identity is emitted into FFB diagnostics')
