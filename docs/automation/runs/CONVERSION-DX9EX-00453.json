@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "status": "VALIDATING",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "b78092313b8f0dcdc8d21f65988fdb8926e81baf",
-  "material_result_sha": "PENDING_SELF",
-  "validation_bearing_result_sha": "PENDING_SELF",
-  "result_sha": "PENDING_SELF",
+  "material_result_sha": "75066b77b9f95ca644791d4c821a1c77fffcfe1f",
+  "validation_bearing_result_sha": "75066b77b9f95ca644791d4c821a1c77fffcfe1f",
+  "result_sha": "75066b77b9f95ca644791d4c821a1c77fffcfe1f",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00453]",
   "selected_work_item": "VR-DX9EX-SWAPCHAIN-DESTROY-FLUSH-0036",
   "summary": "Flush the D3D11 immediate context before destroying R19 OpenXR swapchains so teardown/recreation does not call xrDestroySwapchain while prior RTV commands remain only queued in the immediate context.",
@@ -38,23 +38,27 @@
       "evidence": "Added an OutRunVrFinalTest::Context guarded Flush immediately before xrDestroySwapchain and extended the existing canonical DX9Ex reset/transport verifier with a flush-before-destroy ordering contract."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
-      "automation_validation": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact material SHA passed canonical DX9Ex Active Validation and Domain Isolation."
     },
     "C4_COMMIT": {
-      "status": "PENDING",
-      "ci_skip_on_validation_bearing_result": false
+      "status": "COMPLETE",
+      "ci_skip_on_validation_bearing_result": false,
+      "result_sha": "75066b77b9f95ca644791d4c821a1c77fffcfe1f"
     },
     "C5_PACKAGE": {
-      "status": "PENDING"
+      "status": "COMPLETE",
+      "artifact_id": 11387530836,
+      "digest": "sha256:a0874a8a911b75db74561347cec74f41503ede75e04a34124b9d6e2aec8f5740"
     },
     "C6_STATE": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "runtime_validation": "UNTESTED"
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "red_review": {
       "base_sha": "b78092313b8f0dcdc8d21f65988fdb8926e81baf",
@@ -68,8 +72,31 @@
     "runtime": {
       "status": "UNTESTED",
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "dx9ex_active": {
+      "run_id": 37405053984,
+      "head_sha": "75066b77b9f95ca644791d4c821a1c77fffcfe1f",
+      "result": "SUCCESS",
+      "jobs": {
+        "policy": 112080641434,
+        "host": 112080717031,
+        "game": 112080717219,
+        "full_chain_compile": 112080716961,
+        "package": 112081892700
+      }
+    },
+    "domain_isolation": {
+      "run_id": 37405053923,
+      "job_id": 112080640937,
+      "head_sha": "75066b77b9f95ca644791d4c821a1c77fffcfe1f",
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11387530836,
+      "digest": "sha256:a0874a8a911b75db74561347cec74f41503ede75e04a34124b9d6e2aec8f5740"
     }
   },
-  "next_action": "Validate this exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize bookkeeping while preserving validation_bearing_result_sha.",
-  "started_at_kst": "2026-10-06T11:36:54+09:00"
+  "next_action": "Continue from the latest bookkeeping HEAD with the next independently provable DX9Ex stability/resource-lifetime unit; preserve 75066b77b9f95ca644791d4c821a1c77fffcfe1f as CONVERSION-DX9EX-00453 validation-bearing result.",
+  "started_at_kst": "2026-10-06T11:36:54+09:00",
+  "completed_at_kst": "2026-10-06T11:43:44+09:00"
 }

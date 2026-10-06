@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T11:36:54+09:00",
+  "updatedKst": "2026-10-06T11:43:44+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -217,11 +217,12 @@
     "CONVERSION-DX9EX-00445 / VR-DX9EX-R26-ACCEPTED-REQUEST-OWNERSHIP-0028 retains the accepted F10 requester PID through the pending LOCAL recenter lifecycle and revalidates it before application and before visible-submit completion. Game/focus recenter sources are tracked independently so dropping a stale accepted game request cannot cancel a concurrent focus recenter; transient process-enumeration absence defers game-only LOCAL mutation instead of guessing ownership. Runtime remains UNTESTED pending Quest3/VDXR.",
     "CONVERSION-DX9EX-00446 / VR-DX9EX-R26-SESSION-REQUEUE-0029 requeues an accepted-but-not-applied F10 request during OpenXR session teardown by atomically rolling receivedId back only when the shared requestId still matches. Exact material/validation-bearing SHA f9018c61891823c797d2a5e63b41ec4c453f8f8a passed DX9Ex Active Validation 37398523213 and Domain Isolation 37398522991; runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00447 / VR-DX9EX-RECENTER-IPC-PUBLISH-COHERENCY-0030 adds requesterPid=0 publication sentinel ordering for F10 recenter IPC. Final exact validation-bearing SHA 212311d5a341d116627bd3dfe2886cab0305a1a4 passed DX9Ex Active 37399517000 and Domain Isolation 37399516939 after two verifier-only false-negative repairs; runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00448 / VR-DX9EX-RECENTER-IPC-STABLE-SNAPSHOT-0031 rereads requestId after requesterPid in Pending() and rejects sequence changes, closing the remaining mixed publication snapshot window. Exact material/validation-bearing SHA 2843acf416dbccaceddda24d15b9549d2f604440 passed DX9Ex Active 37400259544 and Domain Isolation 37400259567; runtime remains UNTESTED."
+    "CONVERSION-DX9EX-00448 / VR-DX9EX-RECENTER-IPC-STABLE-SNAPSHOT-0031 rereads requestId after requesterPid in Pending() and rejects sequence changes, closing the remaining mixed publication snapshot window. Exact material/validation-bearing SHA 2843acf416dbccaceddda24d15b9549d2f604440 passed DX9Ex Active 37400259544 and Domain Isolation 37400259567; runtime remains UNTESTED.",
+    "CONVERSION-DX9EX-00453 / VR-DX9EX-SWAPCHAIN-DESTROY-FLUSH-0036 flushes the D3D11 immediate context before R19 xrDestroySwapchain at swapchain teardown/recreate boundaries. Exact material/validation-bearing SHA 75066b77b9f95ca644791d4c821a1c77fffcfe1f passed DX9Ex Active Validation 37405053984 and Domain Isolation 37405053923; runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
-  "validatedSourceSha": "117d6b7980dd41c8504558b6bafc38dda01e184b",
-  "validationRunId": 37297954231,
+  "validatedSourceSha": "75066b77b9f95ca644791d4c821a1c77fffcfe1f",
+  "validationRunId": 37405053984,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -791,5 +792,33 @@
       "packageArtifactDigest": "sha256:f8d8d8114c22f7aef59e678deb9c296328905d5b727d557f0f25459f99ea253c"
     },
     "issue14CommentId": 6007644239
+  },
+  "post1000Maintenance00453": {
+    "taskId": "CONVERSION-DX9EX-00453",
+    "eventId": "CONVERSION-DX9EX-00453-E001",
+    "eventType": "dispatch",
+    "attempt": "1/3",
+    "item": "VR-DX9EX-SWAPCHAIN-DESTROY-FLUSH-0036",
+    "baseSha": "b78092313b8f0dcdc8d21f65988fdb8926e81baf",
+    "materialResultSha": "75066b77b9f95ca644791d4c821a1c77fffcfe1f",
+    "validationBearingResultSha": "75066b77b9f95ca644791d4c821a1c77fffcfe1f",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "runtimeBehaviorChanged": true,
+    "summary": "Flush D3D11 immediate-context work immediately before R19 xrDestroySwapchain so submitted RTV commands are issued before swapchain teardown/recreation.",
+    "validation": {
+      "dx9exActiveRunId": 37405053984,
+      "jobs": {
+        "policy": 112080641434,
+        "host": 112080717031,
+        "game": 112080717219,
+        "fullChainCompile": 112080716961,
+        "package": 112081892700
+      },
+      "domainIsolationRunId": 37405053923,
+      "domainIsolationJobId": 112080640937,
+      "packageArtifactId": 11387530836,
+      "packageArtifactDigest": "sha256:a0874a8a911b75db74561347cec74f41503ede75e04a34124b9d6e2aec8f5740"
+    }
   }
 }
