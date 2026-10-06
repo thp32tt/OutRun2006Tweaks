@@ -2687,3 +2687,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Machine PASS: exact canonical source bboxes restored; 3/3 bbox/size/positive-margin, outside/alpha/overlap/touch=0, exact BGRA header/raw mirror_y.
 - Controller SOURCE/CLEAN/FINAL + high-zoom + RAW visual FAIL: A151 fixed scale, slant and metallic effects, but the Korean glyph skeleton remains generic Noto block Hangul and does not match the source extended rounded techno family. Numeric PASS cannot override source-style-family mismatch.
 - Decision `C227R_REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH`. Preserve current geometry/scale/right-lean/effects and reconstruct source-like Korean letterform proportions/stroke character. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+
+## 2026-10-07 08:42 KST — A152R q195 + A153 q175
+- Refreshed CONTRACT/required policy/state/backlog/queue/live HEAD. No active user in-game backlog existed at selection time. PRE_INGAME #019 q195 was reopened from C125 because 이용 불가 142x37 was visibly weak inside the 395x41 NOT AVAILABLE source footprint.
+- A152 hosted run 37546852392 produced a numeric-PASS 252x37 이용 불가 candidate but controller rejected it for obvious horizontal glyph stretching. A152R run 37547231014 SUCCESS produced b4b8655e9805... using the direct equivalent 사용할 수 없음 at native Hangul aspect 220x37. 1/1 bbox/size/positive-margin, outside/alpha/protected=0, raw mirror_y and SOURCE/C125/A152/A152R visual PASS.
+- During the same invocation C227R returned q175 A151 as REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH. This became the producer priority immediately. A153 hosted run 37547611829 SUCCESS produced 5b37fdaf3563... using fresh NanumGothic Bold skeletons transformed into lower/wider techno proportions while preserving A151 scale hierarchy, source-left anchors, right lean and metallic effects.
+- A153 machine QA: 3/3 bbox/size/positive-margin; outside/alpha/protected=0; exact BGRA header/raw mirror_y. Controller SOURCE/A151/A153 row/full/RAW visual PASS; generic Noto family mismatch is materially reduced.
+- q195 transcription/artwork-plan wording was synchronized to 사용할 수 없음; q175/q195 queue/resume/progress/artwork plan were moved to fresh-C pending. Both remain RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
