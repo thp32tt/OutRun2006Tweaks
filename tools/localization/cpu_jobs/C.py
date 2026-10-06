@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# C pre-in-game comparison exporter v2: English original vs current Korean.
 import runpy
 from pathlib import Path
 
