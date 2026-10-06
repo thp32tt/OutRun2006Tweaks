@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00479",
+  "production_id": "CONVERSION-DX9EX-00479",
+  "event_id": "CONVERSION-DX9EX-00479-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "2086d2377b4bd2251aee129c6a018fc2749e438c",
+  "material_result_sha": "effaa7c4b9fabc968e950c7284738f9bbfd7c35c",
+  "validation_bearing_result_sha": "effaa7c4b9fabc968e950c7284738f9bbfd7c35c",
+  "result_sha": "effaa7c4b9fabc968e950c7284738f9bbfd7c35c",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00479]",
+  "selected_work_item": "VR-REFACTOR-POST1100-R32-PRESENT-PHYSICAL-HOOK-RETIREMENT-0062",
+  "summary": "R32 no longer owns a physical Present hook. R33 hooks PresentDestR13 directly and wraps that exact lower Present call with the R32-owned workload/QPC telemetry helper; R32 Reset and ResolveDirect hooks remain unchanged.",
+  "checkpoints": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read target HEAD 2086d237, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, VR_REFACTOR_STATE and recent structural/verifier state. 00478 had retired R31 physical StateBlock hooks and explicitly queued R32/R33 lifecycle re-census."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Compared R32 Reset/Present/ResolveDirect with R33 Reset/Present. PresentDestR32 had no rendering/lifetime mutation beyond R32 workload/QPC telemetry around R13 Present, making it the smallest equivalence-safe physical-owner fold."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Removed R32PresentR13Hook and PresentDestR32; added R32WithPresentTelemetry owner helper; R33PresentR13Hook now hooks PresentDestR13 directly and invokes the telemetry helper around its trampoline. R32 hook ceiling reduced 3->2. Reset/ResolveDirect unchanged."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA effaa7c4b9fabc968e950c7284738f9bbfd7c35c passed DX9Ex Active Validation 37436859380 policy/host/game/full-chain-compile/package and Domain Isolation 37436859565. HUD Inspector 37436859620 also passed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "effaa7c4b9fabc968e950c7284738f9bbfd7c35c",
+      "validation_bearing_result_sha": "effaa7c4b9fabc968e950c7284738f9bbfd7c35c",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE",
+      "artifact_id": 11398803792,
+      "digest": "sha256:2d583569162952fe15d7507e9d25051bf513f89447da9f440e5ff3189427ba2a"
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "changed_paths": [
+      "src/vr/d3d9/stereo_renderer_r32.cpp",
+      "src/vr/d3d9/stereo_renderer_r33.cpp",
+      "tools/verify_vr_hook_graph.py",
+      "tools/verify_vr_r31_r32_retirement_guard.py",
+      "tools/verify_vr_r32_review.py",
+      "tools/verify_vr_refactor_contract.py",
+      "docs/VR_REFACTOR_STATE.json",
+      "docs/automation/runs/CONVERSION-DX9EX-00479.json"
+    ],
+    "structural_effect": {
+      "r32_physical_hook_count_before": 3,
+      "r32_physical_hook_count_after": 2,
+      "retired_hook": "PresentDestR13 -> PresentDestR32",
+      "retained_r32_hooks": [
+        "ResetDestR22 -> ResetDestR32",
+        "ResolveDirectTransportR13 -> ResolveDirectTransportR32"
+      ],
+      "r33_present_owner": "PresentDestR13 -> PresentDestR33",
+      "telemetry_preservation": "R32WithPresentTelemetry captures R32 workload/QPC before the direct R13 Present trampoline and finalizes/logs after it; R33 device-lost raw-Present bypass remains outside telemetry as before."
+    },
+    "validation": {
+      "dx9ex_active_run_id": 37436859380,
+      "policy_job_id": 112180690958,
+      "full_chain_compile_job_id": 112180810260,
+      "game_job_id": 112180810342,
+      "host_job_id": 112180810348,
+      "package_job_id": 112182646270,
+      "domain_isolation_run_id": 37436859565,
+      "hud_inspector_run_id": 37436859620,
+      "result": "SUCCESS"
+    },
+    "noncanonical_observation": {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 37436859535,
+      "result": "FAIL",
+      "relevant_verifier": "tools/verify_vr_r32_review.py passed",
+      "failure_reason": "Separate hardening PowerShell still expects historical src/vr/d3d9/stereo_renderer_r21.cpp marker IsFailed(R20InstallState); pre-existing stale generic guard, not canonical DX9Ex gate."
+    },
+    "package": {
+      "artifact_id": 11398803792,
+      "digest": "sha256:2d583569162952fe15d7507e9d25051bf513f89447da9f440e5ff3189427ba2a"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "issue14_comment_id": 6012585918,
+    "validation_pr": 102
+  },
+  "next_action": "Re-read exact HEAD and re-census the two remaining R32 physical hooks, ResetDestR22 and ResolveDirectTransportR13. Prefer one equivalence-safe owner fold per task; do not recreate the retired R32 Present hook.",
+  "started_at_kst": "2026-10-06T17:20:51+09:00",
+  "completed_at_kst": "2026-10-06T17:39:06+09:00"
+}
