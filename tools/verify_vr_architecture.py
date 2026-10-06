@@ -212,10 +212,12 @@ require(
     "src/vr/d3d9/stereo_renderer_r31.cpp",
     "GetR28VerifiedProjection",
     "projectionGeneration != generation",
-    "BeginStateBlockDestR31",
-    "StateBlockEvents::NotifyBegin(device)",
+    "R31OnStateBlockBegin",
+    "StateBlockTracker::SetRecording(true)",
+    "StateBlockEvents::Configure(",
+    "StateBlockTracker::LifecycleHooksReady()",
+    "R31 physical StateBlock fallback retired; fast-path trust remains disabled",
     "StateBlockTracker::Reliable()",
-    "per-draw live WVP/shader/render-state validation",
 )
 require(
     "src/vr/d3d9/stereo_renderer_r33.cpp",
