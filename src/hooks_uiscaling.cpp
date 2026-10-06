@@ -4,6 +4,7 @@
 #include "vr/game/render_semantics.hpp"
 
 #include <array>
+#include <cmath>
 
 namespace Settings
 {
@@ -72,6 +73,11 @@ class UIScaling : public Hook
 	};
 	static constexpr int RivalMarker_SpraniCall = 0xBB796;
 	static constexpr int TextGlyph_PutSpriteCalls[] = { 0x2C808, 0x2C9DB };
+
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo RankMarkerProjectedInfo{};
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo RivalMarkerProjectedInfo{};
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
 	static inline SafetyHookInline D3DXMatrixTransformation2D = {};
@@ -216,6 +222,32 @@ class UIScaling : public Hook
 	{
 		Calc3D2D_hk.call(a1, a2, in, out);
 
+		// Exact rank/rival producers flatten a real game-view point into the
+		// 640x480 sprite space before queueing. Recover that view-space point at
+		// only the two proven Calc3D2D callsites so R30 can reproject it per eye.
+		const void* returnAddress = _ReturnAddress();
+		auto recoverViewPoint =
+			[&](OutRunVR::GameSemantic::ProjectedMarkerInfo& info)
+		{
+			info = {};
+			if (!out || !std::isfinite(out->x) ||
+				!std::isfinite(out->y) || !std::isfinite(out->z) ||
+				!std::isfinite(a1) || !std::isfinite(a2) ||
+				std::fabs(a1) <= 1.0e-6f ||
+				std::fabs(a2) <= 1.0e-6f ||
+				std::fabs(out->z) <= 1.0e-6f)
+				return;
+			info.valid = true;
+			info.viewZ = out->z;
+			info.viewX = out->x * (-out->z) / a1;
+			info.viewY = out->y * (-out->z) / a2;
+		};
+
+		if (returnAddress == Module::exe_ptr(0xBAEE7))
+			recoverViewPoint(RankMarkerProjectedInfo);
+		else if (returnAddress == Module::exe_ptr(0xBB6F5))
+			recoverViewPoint(RivalMarkerProjectedInfo);
+
 		// TODO: OnlineArcade mode needs to add position here
 
 		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
@@ -256,17 +288,24 @@ class UIScaling : public Hook
 		const int result = Game::sprani_play_ae_auth_alpha(
 			spriteId, x + RankMarkerFracX, y + RankMarkerFracY, a4, a5, alpha);
 
-		// These four call sites are explicitly identified by the original mod as
-		// rival-car rank markers. Preserve that ownership on the queued node so
-		// the VR sprite renderer does not flatten the marker into the fixed HUD.
+		const bool projected = RankMarkerProjectedInfo.valid;
+		const auto scope = projected
+			? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+			: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+		const auto* marker = projected ? &RankMarkerProjectedInfo : nullptr;
+
+		// These four exact producer callsites own the vehicle-relative rank
+		// markers. Prefer the recovered Calc3D2D anchor; retain the current
+		// strict WorldBillboard path as a fail-soft fallback if capture is absent.
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			SpriteNode* node = root ? root->tail_4 : nullptr;
 			if (node && node != tailsBefore[prio])
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, OutRunVR::GameSemantic::RenderScope::WorldBillboard,
-					OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani);
+					node, scope,
+					OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani,
+					marker);
 		}
 		return result;
 	}
@@ -293,9 +332,14 @@ class UIScaling : public Hook
 		{
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
+			const bool projected = RankMarkerProjectedInfo.valid;
+			const auto scope = projected
+				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
 			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-				node, OutRunVR::GameSemantic::RenderScope::WorldBillboard,
-				OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite);
+				node, scope,
+				OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite,
+				projected ? &RankMarkerProjectedInfo : nullptr);
 		}
 
 		return result;
@@ -306,7 +350,9 @@ class UIScaling : public Hook
 		const std::array<SpriteNode*, Game::SpritePriorityCount>& before,
 		OutRunVR::GameSemantic::RenderScope scope,
 		OutRunVR::GameSemantic::ProducerToken producer =
-			OutRunVR::GameSemantic::ProducerToken::None)
+			OutRunVR::GameSemantic::ProducerToken::None,
+		const OutRunVR::GameSemantic::ProjectedMarkerInfo* projectedMarker =
+			nullptr)
 	{
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
@@ -320,7 +366,7 @@ class UIScaling : public Hook
 			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, scope, producer);
+					node, scope, producer, projectedMarker);
 				if (node == tailAfter)
 					break;
 				node = node->next_0;
@@ -363,12 +409,16 @@ class UIScaling : public Hook
 		const int result = Game::sprani_play_ae_auth_alpha(
 			spriteId, x, y, a4, a5, alpha);
 		// R71 HMD evidence binds this exact 0xBB796 producer to the
-		// vehicle-relative rival marker. The refactor semantic model no longer
-		// carries the old projected-marker payload, so preserve its spatial
-		// ownership as WORLD_BILLBOARD and let R30's strict world gates decide.
+		// vehicle-relative rival marker. Reuse its proven Calc3D2D anchor when
+		// available; fail softly to the current strict WorldBillboard route.
+		const bool projected = RivalMarkerProjectedInfo.valid;
 		TagAppendedNodes(
-			before, OutRunVR::GameSemantic::RenderScope::WorldBillboard,
-			OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani);
+			before,
+			projected
+				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				: OutRunVR::GameSemantic::RenderScope::WorldBillboard,
+			OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
+			projected ? &RivalMarkerProjectedInfo : nullptr);
 		return result;
 	}
 
@@ -759,7 +809,7 @@ public:
 				Memory::HookType::Call);
 
 		spdlog::info(
-			"VR HUD RESTORE: exact option arrows/result clips/text glyphs -> SCREEN_HUD; 0xBB796 rival marker -> WORLD_BILLBOARD");
+			"VR HUD RESTORE: exact option arrows/result clips/text glyphs -> SCREEN_HUD; rank/rival markers -> PROJECTED_WORLD_MARKER_2D when Calc3D2D anchor is valid, WORLD_BILLBOARD fallback otherwise");
 
 		NaviPub_Disp_SpriteSpacingEnable_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleEnable_Addr), SpriteSpacingEnable);
 		NaviPub_Disp_SpriteSpacingEnable2_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleEnable2_Addr), SpriteSpacingEnable);
