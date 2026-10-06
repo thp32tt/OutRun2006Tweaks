@@ -265,10 +265,29 @@ r33_guard = require(
     "R33ReportInstallResult(",
     "R9TrackedMainDepthHasStencil()",
     "Present/pre",
-    "R33PresentR32Hook.stdcall<HRESULT>",
+    "R32WithPresentTelemetry(",
+    "R33PresentR13Hook.stdcall<HRESULT>",
+    "reinterpret_cast<void*>(&PresentDestR13)",
 )
-if r33_guard.find("Present/pre") > r33_guard.find("R33PresentR32Hook.stdcall<HRESULT>"):
-    raise SystemExit("R33 must reassert Reset replay fail-close before lower Present work")
+if r33_guard.find("Present/pre") > r33_guard.find("R32WithPresentTelemetry("):
+    raise SystemExit("R33 must reassert Reset replay fail-close before R32 Present telemetry/lower Present")
+if r33_guard.find("R32WithPresentTelemetry(") > r33_guard.find("R33PresentR13Hook.stdcall<HRESULT>"):
+    raise SystemExit("R32 Present telemetry wrapper must own the direct R13 Present call")
+r32_source = load("src/vr/d3d9/stereo_renderer_r32.cpp")
+for banned in (
+        "SafetyHookInline R32PresentR13Hook{};",
+        "HRESULT __stdcall PresentDestR32(",
+        "reinterpret_cast<void*>(&PresentDestR13), PresentDestR32"):
+    if banned in r32_source:
+        raise SystemExit(f"R32 retained retired physical Present ownership: {banned}")
+for required in (
+        "HRESULT R32WithPresentTelemetry(",
+        "const HRESULT hr = lowerPresent();",
+        "R32FinalizeFramePerf(",
+        "R32LogPerfWindow()"):
+    if required not in r32_source:
+        raise SystemExit(f"R32 Present telemetry owner contract missing: {required}")
+
 r34_path = ROOT / "src/vr/d3d9/stereo_renderer_r34.cpp"
 if r34_path.exists():
     raise SystemExit("retired R34 source shim reappeared")
