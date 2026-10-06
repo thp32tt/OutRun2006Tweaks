@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 06:16 KST",
+  "updated_at_kst": "2026-10-07 06:47 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Fresh independent C should validate B224 q140 31C58963 588eb51d554c8adeef850bd53d665ed9f4a4d1c3389b9e67dcdd4be9f4dd635c, B223 q112, B222R q94 and other producer outputs still pending fresh C, then regenerate English-original PRE_INGAME comparisons for approved bytes. Actual in-game validation remains UNTESTED.",
+  "next_checkpoint": "Fresh independent C should validate B225 q154 4D38BBB0 815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288, B224 q140, B223 q112, B222R q94 and other producer outputs still pending fresh C, then regenerate English-original PRE_INGAME comparisons for approved bytes. Actual in-game validation remains UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -3450,5 +3450,21 @@
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_B/20261007-B-MANUALQA224-31C58963/B224_31C58963_REPORT.json",
     "controller": "localization/graphics/role_B/20261007-B-MANUALQA224-31C58963/B224_CONTROLLER_FINAL_QA.json"
+  },
+  "b225_q154_manual_visual_rework": {
+    "timestamp_kst": "2026-10-07 06:47 KST",
+    "queue_index": 154,
+    "asset": "4D38BBB0",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "before_sha256": "c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a",
+    "candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+    "prior_status": "C141_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "hierarchy": "red 1111/808/679/820/640 -> 1514/1096/991/1143/878; gray 267/104/252 -> 411/210/364",
+    "machine_qa": "8/8 bbox+source-size+positive-margin; outside=0; alpha outside=0; protected=0; Ferrari artwork=0; overlap=0; exact RGBA32 raw mirror_y",
+    "controller_visual_qa": "PASS_SOURCE_C141_B225_READABLE_ROW_CONTACT_RAW",
+    "status": "B225_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA225-4D38BBB0/B225_4D38BBB0_REPORT.json",
+    "controller": "localization/graphics/role_B/20261007-B-MANUALQA225-4D38BBB0/B225_CONTROLLER_FINAL_QA.json"
   }
 }

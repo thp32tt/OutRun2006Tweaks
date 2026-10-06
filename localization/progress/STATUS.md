@@ -2164,3 +2164,9 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - White heading widths 539/448/364/172px -> 630/560/499/279px; KEY 49px -> 82px. Source sizes remain hard ceilings and source-left/compound family geometry is preserved.
 - 5/5 bbox/size/positive-margin; outside/alpha/protected/Enter-icon/overlap=0; exact RGBA32 header/raw mirror_y PASS; clean/final validators PASS. Controller readable/RAW visual QA PASS.
 - Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+### B225 q154 4D38BBB0 hierarchy rework — 2026-10-07 06:47 KST
+- q154: C141 c92e095672a6... -> B225 815f0112c772....
+- Red widths 1111/808/679/820/640 -> 1514/1096/991/1143/878px; gray 267/104/252 -> 411/210/364px, all below exact source ceilings and source-left aligned.
+- 8/8 bbox/size/positive-margin; outside/alpha/protected/Ferrari/overlap=0; exact RGBA32 header/raw mirror_y and clean/final validators PASS. Controller readable/row-contact/RAW visual QA PASS.
+- Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
