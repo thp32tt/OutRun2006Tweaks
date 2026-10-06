@@ -1,0 +1,11 @@
+{
+  "run": "20261006-A-PRODUCTION116-D1039D6F",
+  "index": 217,
+  "candidate_sha256": "68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39",
+  "bbox_size_positive_margin": "2/2 PASS",
+  "outside": 0,
+  "alpha_outside": 0,
+  "residue": 0,
+  "status": "A116_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "report": "localization/graphics/role_A/20261006-A-PRODUCTION116-D1039D6F/A116_D1039D6F_REPORT.json"
+}
