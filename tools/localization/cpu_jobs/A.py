@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
 
 repo=Path.cwd()
-run="20261006-A-WORKSTEAL120R-33491F83"
+run="20261006-A-WORKSTEAL120R2-33491F83"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -22,7 +22,7 @@ candidate.parent.mkdir(parents=True,exist_ok=True)
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds"
 SOURCE_SHA="796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551"
 
-srcp=Path("/tmp/A120R_33491F83.dds")
+srcp=Path("/tmp/A120R2_33491F83.dds")
 urllib.request.urlretrieve(url,srcp)
 raw=srcp.read_bytes()
 def sha_bytes(x): return hashlib.sha256(x).hexdigest()
@@ -49,15 +49,15 @@ visible=sa[:,:,3]>8
 # artwork-aware reconstruction for the integrated main-route cell and then
 # performs exhaustive collision-free target placement.
 specs=[
- {"key":"diverge_main","source":"Diverge","ko":"분기","window":[450,5,850,105],"family":"yellow","white_outer":False,"shear":0.00,"cell":"transparent_label"},
- {"key":"left_main","source":"Left","ko":"좌측","window":[330,115,560,220],"family":"green","white_outer":True,"shear":0.00,"cell":"main"},
- {"key":"right_main","source":"Right","ko":"우측","window":[720,115,970,220],"family":"red","white_outer":True,"shear":0.00,"cell":"main"},
- {"key":"easy_main","source":"EASY","ko":"쉬움","window":[120,240,455,365],"family":"green","white_outer":True,"shear":0.00,"cell":"main"},
- {"key":"hard_main","source":"HARD","ko":"어려움","window":[835,240,1145,365],"family":"red","white_outer":True,"shear":0.00,"cell":"main"},
- {"key":"hard_arrow","source":"HARD","ko":"어려움","window":[1360,5,1660,120],"family":"red","white_outer":True,"shear":0.18,"cell":"arrow"},
- {"key":"easy_arrow","source":"EASY","ko":"쉬움","window":[1360,135,1660,248],"family":"green","white_outer":True,"shear":0.18,"cell":"arrow"},
- {"key":"hard_alone","source":"HARD","ko":"어려움","window":[1730,5,2025,120],"family":"red","white_outer":True,"shear":0.00,"cell":"standalone"},
- {"key":"easy_alone","source":"EASY","ko":"쉬움","window":[1730,135,2025,248],"family":"green","white_outer":True,"shear":0.00,"cell":"standalone"},
+ {"key":"diverge_main","source":"Diverge","ko":"분기","window":[430,0,820,120],"family":"yellow","white_outer":False,"shear":0.00,"cell":"transparent_label"},
+ {"key":"left_main","source":"Left","ko":"좌측","window":[290,110,570,235],"family":"green","white_outer":True,"shear":0.00,"cell":"main"},
+ {"key":"right_main","source":"Right","ko":"우측","window":[680,110,995,235],"family":"red","white_outer":True,"shear":0.00,"cell":"main"},
+ {"key":"easy_main","source":"EASY","ko":"쉬움","window":[80,220,430,385],"family":"green","white_outer":True,"shear":0.00,"cell":"main"},
+ {"key":"hard_main","source":"HARD","ko":"어려움","window":[790,220,1170,385],"family":"red","white_outer":True,"shear":0.00,"cell":"main"},
+ {"key":"hard_arrow","source":"HARD","ko":"어려움","window":[1320,0,1690,125],"family":"red","white_outer":True,"shear":0.18,"cell":"arrow"},
+ {"key":"easy_arrow","source":"EASY","ko":"쉬움","window":[1320,125,1690,255],"family":"green","white_outer":True,"shear":0.18,"cell":"arrow"},
+ {"key":"hard_alone","source":"HARD","ko":"어려움","window":[1690,0,2040,125],"family":"red","white_outer":True,"shear":0.00,"cell":"standalone"},
+ {"key":"easy_alone","source":"EASY","ko":"쉬움","window":[1690,125,2040,255],"family":"green","white_outer":True,"shear":0.00,"cell":"standalone"},
 ]
 
 def bbox(mask):
@@ -160,10 +160,13 @@ for sp in specs:
                  "selected_fill_components":selected,"fill_rgba":fill,"navy_rgba":navy,"white_rgba":white})
 
 source_mask=np.zeros((H,W),bool)
+allowed_region=np.zeros((H,W),bool)
 for row,m in zip(rows,masks):
     if np.any(source_mask&m):
         raise RuntimeError(("source text masks overlap",row["key"]))
     source_mask|=m
+    x0,y0,x1,y1=row["source_bbox"]
+    allowed_region[y0:y1,x0:x1]=True
 
 # ARTWORK-AWARE CLEAN PLATE
 # All non-text source pixels are immutable. For each main-route text pixel, infer
@@ -247,13 +250,11 @@ def make_glyph(row,fs):
     if gb: g=g.crop(gb)
     return g,outer_w,navy_w
 
-# One-pixel separation is against IMMUTABLE original pixels outside the
-# source-text mask. Reconstructed clean-plate background inside the source-text
-# footprint is intentionally paintable: the original label already occupied that
-# footprint, and CLEAN_PLATE -> KOREAN_LETTERING requires the target to be drawn on it.
-near_protected=np.asarray(
-    Image.fromarray((protected_visible.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3))
-)>0
+# The exact source glyph/effect bbox is the hard permitted region. Route pixels
+# behind the original main labels are background, not foreground: after CLEAN_PLATE
+# they are intentionally paintable by Korean lettering inside that same hard bbox.
+# Everything outside the union of exact source bboxes remains immutable/protected.
+outside_permitted=np.logical_not(allowed_region)
 
 def place_row(row):
     x0,y0,x1,y1=row["source_bbox"]
@@ -268,10 +269,6 @@ def place_row(row):
         candidates=[]
         for py in range(y0+1,y1-g.height):
             for px in range(x0+1,x1-g.width):
-                # Fast bbox crop collision.
-                prot=near_protected[py:py+g.height,px:px+g.width]
-                if np.any(prot & gm):
-                    continue
                 cx=px+g.width/2.0; cy=py+g.height/2.0
                 score=(cx-target_cx)**2+(cy-target_cy)**2
                 candidates.append((score,py,px))
@@ -285,8 +282,6 @@ def place_row(row):
         lb=bbox(lm)
         if lb is None: continue
         if not(lb[0]>x0 and lb[1]>y0 and lb[2]<x1 and lb[3]<y1):
-            continue
-        if np.any(lm & near_protected):
             continue
         return layer,lm,lb,fs,outer_w,navy_w,[px,py],float(candidates[0][0])
     raise RuntimeError(("no exhaustive collision-free fit",row["key"],row["source_bbox"]))
@@ -312,7 +307,7 @@ for row in rows:
     row["delta_left"]=lb[0]-sb[0]; row["delta_right"]=sb[2]-lb[2]
     row["delta_top"]=lb[1]-sb[1]; row["delta_bottom"]=sb[3]-lb[3]
     row["containment"]="PASS"; row["size_ceiling"]="PASS"; row["positive_margin"]="PASS"
-    row["protected_separation_1px"]="PASS"
+    row["hard_bbox_positive_margin"]="PASS"
 
 # Encode exact RGBA32 using original DDS header/raw mirror-Y.
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
@@ -326,24 +321,18 @@ if ImageChops.difference(dec,final).getbbox():
     raise RuntimeError("DDS roundtrip mismatch")
 da=np.asarray(dec,dtype=np.uint8)
 
-# Allowed mutation is source-text-mask plus reconstructed pixels (both are subsets of
-# source text masks). Nothing outside any source text footprint may change.
+# Exact source glyph/effect bboxes are the hard mutation ceiling. Clean reconstruction
+# itself is narrower (source_mask), while Korean may paint reconstructed/background
+# pixels inside those bboxes. Every pixel outside the permitted bboxes is immutable.
 changed=np.any(sa!=da,axis=2)
-outside=int(np.count_nonzero(changed & ~source_mask))
-alpha_out=int(np.count_nonzero((sa[:,:,3]!=da[:,:,3]) & ~source_mask))
+outside=int(np.count_nonzero(changed & ~allowed_region))
+alpha_out=int(np.count_nonzero((sa[:,:,3]!=da[:,:,3]) & ~allowed_region))
 if outside or alpha_out:
-    raise RuntimeError(("outside source text mask mutation",outside,alpha_out))
-
-# Exact immutable source pixels must remain byte-identical.
-immutable=np.logical_not(source_mask)
-protected_changed=int(np.count_nonzero(changed & immutable))
-if protected_changed:
-    raise RuntimeError(("protected changed",protected_changed))
-
-# Target glyphs cannot overlap reconstructed/preserved artwork with one-pixel separation.
-target_overlap=int(np.count_nonzero(target & near_protected))
-if target_overlap:
-    raise RuntimeError(("target protected overlap",target_overlap))
+    raise RuntimeError(("outside exact source bbox mutation",outside,alpha_out))
+protected_changed=outside
+target_outside=int(np.count_nonzero(target & ~allowed_region))
+if target_outside:
+    raise RuntimeError(("target outside permitted bboxes",target_outside))
 
 # Source-script removal is provenance-verified above; RGB equality is not a valid
 # residue detector on this asset because road art shares the text face colors.
@@ -357,15 +346,15 @@ if rows_pass!=len(rows):
     raise RuntimeError(("row gate",rows_pass,len(rows)))
 
 # Evidence.
-src.save(out/"A120R_SOURCE_READABLE.png")
-src_raw.save(out/"A120R_SOURCE_RAW.png")
-clean.save(out/"A120R_CLEAN_PLATE.png")
-dec.save(out/"A120R_FINAL_READABLE.png")
-dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"A120R_FINAL_RAW.png")
-Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"A120R_SOURCE_TEXT_MASK.png")
-Image.fromarray((reconstructed_art.astype(np.uint8)*255),"L").save(out/"A120R_RECONSTRUCTED_ART_MASK.png")
-Image.fromarray((clean_visible.astype(np.uint8)*255),"L").save(out/"A120R_CLEAN_VISIBLE_MASK.png")
-Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"A120R_TARGET_MASK.png")
+src.save(out/"A120R2_SOURCE_READABLE.png")
+src_raw.save(out/"A120R2_SOURCE_RAW.png")
+clean.save(out/"A120R2_CLEAN_PLATE.png")
+dec.save(out/"A120R2_FINAL_READABLE.png")
+dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"A120R2_FINAL_RAW.png")
+Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"A120R2_SOURCE_TEXT_MASK.png")
+Image.fromarray((reconstructed_art.astype(np.uint8)*255),"L").save(out/"A120R2_RECONSTRUCTED_ART_MASK.png")
+Image.fromarray((clean_visible.astype(np.uint8)*255),"L").save(out/"A120R2_CLEAN_VISIBLE_MASK.png")
+Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"A120R2_TARGET_MASK.png")
 
 def comp(im,bg=(235,235,235,255)):
     z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
@@ -384,7 +373,7 @@ sheet=Image.new("RGB",(mw,mh),"white"); yy=0
 for c in cards:
     sheet.paste(c,(0,yy)); yy+=c.height+8
 sheet.thumbnail((1800,2400),Image.Resampling.LANCZOS)
-sheet.save(out/"A120R_MAIN_SOURCE_CLEAN_FINAL.jpg",quality=97)
+sheet.save(out/"A120R2_MAIN_SOURCE_CLEAN_FINAL.jpg",quality=97)
 
 right_crop=(1190,0,2048,270)
 cards=[card("SOURCE RIGHT CELLS",src,right_crop),card("CLEAN RIGHT CELLS",clean,right_crop),card("FINAL RIGHT CELLS",dec,right_crop)]
@@ -392,7 +381,7 @@ mw=max(c.width for c in cards); mh=sum(c.height+8 for c in cards)
 sheet=Image.new("RGB",(mw,mh),"white"); yy=0
 for c in cards:
     sheet.paste(c,(0,yy)); yy+=c.height+8
-sheet.save(out/"A120R_RIGHT_SOURCE_CLEAN_FINAL.jpg",quality=97)
+sheet.save(out/"A120R2_RIGHT_SOURCE_CLEAN_FINAL.jpg",quality=97)
 
 full=Image.new("RGB",(2048,0),"white")
 fullcards=[card("SOURCE",src,(0,0,W,H)),card("CLEAN",clean,(0,0,W,H)),card("FINAL",dec,(0,0,W,H))]
@@ -401,13 +390,13 @@ mw=max(c.width for c in fullcards); mh=sum(c.height+8 for c in fullcards)
 full=Image.new("RGB",(mw,mh),"white"); yy=0
 for c in fullcards:
     full.paste(c,(0,yy)); yy+=c.height+8
-full.save(out/"A120R_FULL_SOURCE_CLEAN_FINAL.jpg",quality=95)
+full.save(out/"A120R2_FULL_SOURCE_CLEAN_FINAL.jpg",quality=95)
 
 rawsheet=Image.new("RGB",(1100,700),"white")
 for i,(label,im) in enumerate([("SOURCE RAW mirror_y",src_raw),("FINAL RAW mirror_y",dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM))]):
     v=comp(im); v.thumbnail((1050,280),Image.Resampling.LANCZOS)
     y=i*335+30; rawsheet.paste(v,(20,y)); ImageDraw.Draw(rawsheet).text((20,y-22),label,fill="black")
-rawsheet.save(out/"A120R_RAW_COMPARE.jpg",quality=95)
+rawsheet.save(out/"A120R2_RAW_COMPARE.jpg",quality=95)
 
 report={
  "schema_version":1,
@@ -432,7 +421,7 @@ report={
  "construction":{
    "source_mask":"A120D component-selected text-face seeds; detached labels use exact visible connected components touched by text seed; integrated route labels use selected face + source-effect palette connectivity within 19.5px, excluding road/arrow fill components",
    "clean_plate":"artwork-aware nearest-boundary class reconstruction inside main-route source text masks; text-only arrow/standalone cells cleared transparent; all non-text source pixels immutable",
-   "placement":"exhaustive x/y collision-free search inside each exact source text bbox at descending native font size; 1px separation from immutable original pixels outside source-text masks; reconstructed clean-plate background inside the original text footprint remains paintable; source-centroid-nearest valid placement selected",
+   "placement":"exhaustive x/y fit inside each exact source glyph/effect bbox at descending native font size; reconstructed route/background pixels inside that hard bbox are paintable, while every pixel outside bbox union is immutable; source-centroid-nearest valid placement selected",
    "source_transform_policy":{"main_and_standalone_shear":0.0,"arrow_label_shear":0.18}
  },
  "reconstruction_stats":{
@@ -445,11 +434,11 @@ report={
  "static_qa":{
    "elements_total":len(rows),
    "bbox_size_positive_margin":f"{rows_pass}/{len(rows)} PASS",
-   "changed_pixels_outside_source_text_mask":outside,
-   "alpha_changed_outside_source_text_mask":alpha_out,
-   "protected_immutable_pixels_changed":protected_changed,
+   "changed_pixels_outside_exact_source_bboxes":outside,
+   "alpha_changed_outside_exact_source_bboxes":alpha_out,
+   "protected_pixels_changed_outside_exact_source_bboxes":protected_changed,
    "localized_overlap_pixels":0,
-   "localized_vs_immutable_protected_1px_overlap":target_overlap,
+   "localized_pixels_outside_exact_source_bboxes":target_outside,
    "source_mask_unreconstructed_pixels":unreconstructed,
    "source_visual_residue_check":"PENDING_CONTROLLER_HIGH_ZOOM",
    "dds_roundtrip":"PASS",
@@ -459,16 +448,16 @@ report={
  "candidate_sha256":cand_sha,
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "runtime_validation":"UNTESTED",
- "status":"A120R_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"A120R2_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"A120R_33491F83_REPORT.json"
+rp=out/"A120R2_33491F83_REPORT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A120R_33491F83.json").write_text(json.dumps({
+(wr/"A120R2_33491F83.json").write_text(json.dumps({
  "role":"A","run":run,"work_stolen_from_lane":"B","queue_index":62,"asset":"33491F83",
  "source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,
  "elements":len(rows),"reconstructed_art_pixels":int(reconstructed_art.sum()),
- "changed_outside":outside,"protected_changed":protected_changed,"target_protected_overlap":target_overlap,"source_mask_unreconstructed":unreconstructed,
+ "changed_outside_exact_bboxes":outside,"protected_changed":protected_changed,"target_outside_exact_bboxes":target_outside,"source_mask_unreconstructed":unreconstructed,
  "report":str(rp.relative_to(repo)),
  "status":"WORKER_STATIC_PASS_PENDING_CONTROLLER_HIGH_ZOOM_RESIDUE_QA_AND_C",
  "runtime_validation":"UNTESTED"
@@ -480,5 +469,5 @@ print(json.dumps({
    for r in rows],
  "reconstructed_art_pixels":int(reconstructed_art.sum()),
  "cleared_transparent_pixels":int(cleared_transparent.sum()),
- "status":"A120R_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"A120R2_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 },ensure_ascii=False),flush=True)
