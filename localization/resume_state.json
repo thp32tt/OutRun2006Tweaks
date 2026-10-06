@@ -4221,7 +4221,8 @@
     "E7F6E9B7",
     "2EA557B4",
     "2B0863D6",
-    "EBFC709F"
+    "EBFC709F",
+    "5B65E08C"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6713,7 +6714,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 03:47 KST",
+  "updated_at_kst": "2026-10-07 04:15 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7259,33 +7260,34 @@
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "latest_b_manual_visual_rework": {
-    "timestamp_kst": "2026-10-07 03:47 KST",
-    "run": "B219",
-    "queue_index": 232,
-    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+    "timestamp_kst": "2026-10-07 04:15 KST",
+    "run": "B220",
+    "queue_index": 164,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
     "trigger": "NEWER_8_STEP_PRE_INGAME_VISUAL_FALSE_NEGATIVE",
-    "prior_c_pass": "C135_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
-    "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
-    "before_sha256": "7404fa227035e2fa003f4fa13f1bd348a050317757d7761c9d638f5fc1a01da4",
-    "candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
+    "prior_c_pass": "C108_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "source_sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+    "before_sha256": "33da77625f6b6af22cab72db30394b6b8c0bdd78e9f9a6166f273d6fab4da609",
+    "candidate_sha256": "65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f",
     "defects": [
-      "SOURCE_LEFT_ALIGNMENT_MISMATCH",
-      "SOURCE_WEIGHT_HIERARCHY_WEAKENED"
+      "TEXT_WIDTH_HIERARCHY_UNDERSIZED",
+      "SOURCE_LEFT_ALIGNMENT_MISMATCH"
     ],
     "machine_qa": {
-      "bbox_size_positive_margin": "4/4 PASS",
+      "bbox_size_positive_margin": "1/1 PASS",
       "outside": 0,
       "alpha_outside": 0,
-      "small_height": "59px preserved",
-      "large_height": "131->141px",
-      "source_left_margin": "2px",
+      "source_size": "903x94",
+      "prior_size": "494x90",
+      "new_size": "722x90",
+      "margins": "L2/R179/T2/B2",
       "raw_orientation": "mirror_y"
     },
-    "controller_visual_qa": "PASS_SOURCE_C135_CLEAN_B219_ROW_RAW",
-    "status": "B219_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "controller_visual_qa": "PASS_SOURCE_C108_CLEAN_B220_ROW_RAW",
+    "status": "B220_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_B/20261007-B-MANUALQA219-EBFC709F/B219_EBFC709F_REPORT.json",
-    "controller": "localization/graphics/role_B/20261007-B-MANUALQA219-EBFC709F/B219_CONTROLLER_FINAL_QA.json"
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA220-5B65E08C/B220_5B65E08C_REPORT.json",
+    "controller": "localization/graphics/role_B/20261007-B-MANUALQA220-5B65E08C/B220_CONTROLLER_FINAL_QA.json"
   },
   "latest_c_pre_ingame_export": {
     "timestamp_kst": "2026-10-07T04:07:12+09:00",

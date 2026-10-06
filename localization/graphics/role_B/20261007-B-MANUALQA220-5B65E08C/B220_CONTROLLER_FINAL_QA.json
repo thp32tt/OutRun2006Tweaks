@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B220",
+  "timestamp_kst": "2026-10-07 04:15 KST",
+  "queue_index": 164,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+  "trigger": "NEWER_8_STEP_PRE_INGAME_VISUAL_FALSE_NEGATIVE",
+  "prior_c_pass": "C108_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "source_sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+  "prior_candidate_sha256": "33da77625f6b6af22cab72db30394b6b8c0bdd78e9f9a6166f273d6fab4da609",
+  "candidate_sha256": "65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f",
+  "defect": {
+    "hierarchy": "C108 Korean width 494px versus 903px source made the localized title materially weaker/narrower at practical display scale despite 90px vs 94px height.",
+    "alignment": "C108 centered the Korean title with 204/205px side margins while the source title is left anchored at the source bbox edge."
+  },
+  "worker_run": {
+    "workflow_run_id": 37517244917,
+    "status": "SUCCESS",
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA220-5B65E08C/B220_5B65E08C_REPORT.json"
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "1/1 PASS",
+    "source_bbox": [
+      590,
+      565,
+      1493,
+      659
+    ],
+    "source_size": [
+      903,
+      94
+    ],
+    "prior_localized_bbox": [
+      794,
+      567,
+      1288,
+      657
+    ],
+    "prior_size": [
+      494,
+      90
+    ],
+    "localized_bbox": [
+      592,
+      567,
+      1314,
+      657
+    ],
+    "localized_size": [
+      722,
+      90
+    ],
+    "margins": [
+      2,
+      179,
+      2,
+      2
+    ],
+    "changed_outside_exact_source_bbox": 0,
+    "alpha_changed_outside_exact_source_bbox": 0,
+    "header_128_exact": true,
+    "raw_mode": "RGBA",
+    "raw_orientation": "mirror_y"
+  },
+  "evidence": {
+    "readable": "localization/graphics/role_B/20261007-B-MANUALQA220-5B65E08C/B220_5B65_SOURCE_C108_CLEAN_NEW_READABLE.jpg",
+    "row_contact": "localization/graphics/role_B/20261007-B-MANUALQA220-5B65E08C/B220_5B65_ROW_CONTACT.jpg",
+    "raw": "localization/graphics/role_B/20261007-B-MANUALQA220-5B65E08C/B220_5B65_SOURCE_NEW_RAW.jpg"
+  },
+  "controller_visual_qa": {
+    "result": "PASS",
+    "observations": [
+      "B220 restores a source-left title relationship instead of the visibly floating centered C108 placement.",
+      "The localized title now occupies about 80% of the exact English source width while preserving the source-like 90px height, making the hierarchy immediately closer to SELECT LICENSE without exceeding the 903x94 source ceiling.",
+      "Plain white heavy source family remains coherent; no invented shadow, glow, or slant is present.",
+      "No visible source residue, broken Hangul, clipping, overlap, red-panel damage, clean-plate seam, or RAW mirror-Y regression is visible."
+    ]
+  },
+  "ordered_generation_gate": {
+    "english_removal_plate_restoration": "PASS_C106_C108_VALIDATED_CLEAN",
+    "readable_slant_direction": "PASS_SOURCE_UPRIGHT",
+    "no_unnecessary_undersizing": "PASS",
+    "source_faithful_weight_outline_shadow": "PASS",
+    "no_clipped_pixels": "PASS",
+    "protected_graphics_clearance": "PASS",
+    "flip_y_and_raw": "PASS",
+    "immediate_readability_vs_english": "PASS"
+  },
+  "decision": "B220_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

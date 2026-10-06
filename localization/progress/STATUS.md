@@ -2131,3 +2131,10 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - GitHub-hosted exporter run 37515655448 SUCCESS, worker output ecd457bd863f19ccd00fb81235ec73132be56eba. Current C-pass set = 34 rows.
 - q232 EBFC709F is #033 with exact English source ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0 and B219 candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221; generated FLIP-Y + RAW card manually rechecked.
 - User JPG review + actual in-game validation remain pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+
+### B220 q164 license-title hierarchy rework — 2026-10-07 04:15 KST
+- q164 5B65E08C: C108 `33da77625f6b...` -> B220 `65bad7ee4e2f...`. PRE_INGAME #024 exposed a visual false-negative: source SELECT LICENSE is 903x94 and left anchored, but C108 Korean was 494x90 and centered.
+- B220 rerenders native Noto CJK Black from exact source/validated clean plate, width 722x90 (~80% of source width), source-left margin 2px; right/top/bottom margins 179/2/2px.
+- 1/1 bbox/size/positive-margin PASS; changed/alpha outside exact source bbox=0; exact header/RGBA/raw mirror_y preserved. Controller SOURCE/C108/CLEAN/B220, high-zoom row and RAW visual QA PASS.
+- Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

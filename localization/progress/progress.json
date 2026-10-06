@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 03:47 KST",
+  "updated_at_kst": "2026-10-07 04:15 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Fresh independent C should continue with newest pending producer candidates, especially A149 q135 2B0863D6 and B218 q228 E7F6E9B7. q232 EBFC709F passed C225R; English-original PRE_INGAME comparison is refreshed as #033 and now awaits user JPG review plus actual in-game validation. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "Fresh independent C should validate B220 q164 5B65E08C 65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f and other pending fresh-C producer candidates, then regenerate the English-original PRE_INGAME comparison for approved bytes. Actual in-game validation remains UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -2940,7 +2940,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED. B218 q228 E7F6E9B7 is newly reopened from C144 under the newer 8-step visual gate and now awaits fresh independent C on candidate 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808. B219 q232 EBFC709F is reopened from C135 for source-left alignment/weight hierarchy and awaits fresh independent C on candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221.",
+  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED. B218 q228 E7F6E9B7 is newly reopened from C144 under the newer 8-step visual gate and now awaits fresh independent C on candidate 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808. B219 q232 EBFC709F is reopened from C135 for source-left alignment/weight hierarchy and awaits fresh independent C on candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221. B220 q164 5B65E08C is reopened from C108 for source-width hierarchy/left alignment and awaits fresh independent C on candidate 65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -3370,5 +3370,20 @@
     "pre_ingame_review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/033_q232_EBFC709F.jpg",
     "pre_ingame_manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
+  },
+  "b220_q164_manual_visual_rework": {
+    "timestamp_kst": "2026-10-07 04:15 KST",
+    "queue_index": 164,
+    "asset": "5B65E08C",
+    "source_sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+    "before_sha256": "33da77625f6b6af22cab72db30394b6b8c0bdd78e9f9a6166f273d6fab4da609",
+    "candidate_sha256": "65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f",
+    "prior_status": "C108_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "machine_qa": "1/1 bbox+size+positive-margin; outside/alpha=0; source 903x94; C108 494x90 centered; B220 722x90 source-left; margins L2/R179/T2/B2; RGBA/raw mirror_y",
+    "controller_visual_qa": "PASS_SOURCE_C108_CLEAN_B220_ROW_RAW",
+    "status": "B220_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA220-5B65E08C/B220_5B65E08C_REPORT.json",
+    "controller": "localization/graphics/role_B/20261007-B-MANUALQA220-5B65E08C/B220_CONTROLLER_FINAL_QA.json"
   }
 }
