@@ -197,9 +197,12 @@ def make_glyph(row,fs):
     if gb: g=g.crop(gb)
     return g,outer_w,navy_w
 
-# One-pixel protected-art separation against reconstructed clean artwork.
+# One-pixel separation is against IMMUTABLE original pixels outside the
+# source-text mask. Reconstructed clean-plate background inside the source-text
+# footprint is intentionally paintable: the original label already occupied that
+# footprint, and CLEAN_PLATE -> KOREAN_LETTERING requires the target to be drawn on it.
 near_protected=np.asarray(
-    Image.fromarray((clean_visible.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3))
+    Image.fromarray((protected_visible.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3))
 )>0
 
 def place_row(row):
@@ -377,7 +380,7 @@ report={
  "construction":{
    "source_mask":"B179 disjoint color-core + <=11.5px source-effect masks",
    "clean_plate":"artwork-aware nearest-boundary class reconstruction inside main-route source text masks; text-only arrow/standalone cells cleared transparent; all non-text source pixels immutable",
-   "placement":"exhaustive x/y collision-free search inside each exact source text bbox at descending native font size; 1px separation from reconstructed/preserved visible artwork; source-centroid-nearest valid placement selected",
+   "placement":"exhaustive x/y collision-free search inside each exact source text bbox at descending native font size; 1px separation from immutable original pixels outside source-text masks; reconstructed clean-plate background inside the original text footprint remains paintable; source-centroid-nearest valid placement selected",
    "source_transform_policy":{"main_and_standalone_shear":0.0,"arrow_label_shear":0.18}
  },
  "reconstruction_stats":{
@@ -394,7 +397,7 @@ report={
    "alpha_changed_outside_source_text_mask":alpha_out,
    "protected_immutable_pixels_changed":protected_changed,
    "localized_overlap_pixels":0,
-   "localized_vs_protected_1px_overlap":target_overlap,
+   "localized_vs_immutable_protected_1px_overlap":target_overlap,
    "source_mask_unreconstructed_pixels":unreconstructed,
    "source_visual_residue_check":"PENDING_CONTROLLER_HIGH_ZOOM",
    "dds_roundtrip":"PASS",
