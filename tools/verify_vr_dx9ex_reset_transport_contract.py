@@ -418,6 +418,9 @@ require_order(
     "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
     "for (std::uint32_t offset = 0;",
     "if (candidate.producerPending)",
+    "R13GpuCompletionSnapshot ackSnapshot{};",
+    "if (!ackSnapshotRead)",
+    "R13TryGetGpuCompletionSnapshot(ackSnapshot)",
     "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
     "The host completed this exact published frame. Retire the",
     "selected = index;",
@@ -444,6 +447,33 @@ require_order(
 
 if resolve_direct_r32.count("++DirectTransportRingBackpressure;") != 1:
     fail("R32 DirectGPU free-slot scan must count whole-ring backpressure once")
+
+ack_snapshot_r13 = body(r13, "bool R13ReadGpuCompletionSnapshot(")
+require_order(
+    ack_snapshot_r13,
+    "R13 whole-ring ACK stable snapshot",
+    "const std::uint32_t before = R13AckState->sequence;",
+    "std::memcpy(&snapshot, R13AckState, sizeof(snapshot));",
+    "const std::uint32_t after = R13AckState->sequence;",
+    "if (before != after || (after & 1u))",
+    "snapshot.transportGeneration != DirectTransportGeneration",
+    "std::memcpy(",
+    "completed.completedFrameId,",
+    "snapshot.completedFrameId,",
+)
+require(
+    resolve_direct_r32,
+    "R32 one-snapshot-per-resolve ACK fast path",
+    "R13GpuCompletionSnapshot ackSnapshot{};",
+    "bool ackSnapshotRead = false;",
+    "bool ackSnapshotValid = false;",
+    "if (!ackSnapshotRead)",
+    "R13TryGetGpuCompletionSnapshot(ackSnapshot)",
+    "gpuCompleted = ackSnapshot.completedFrameId[index];",
+    "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
+)
+if resolve_direct_r32.count("R13TryGetGpuCompletionSnapshot(ackSnapshot)") != 1:
+    fail("R32 DirectGPU ring scan must read at most one batched ACK snapshot per resolve")
 
 post_present_r7 = body(r7, "bool DirectTransportFrameReadyAfterPresent(")
 require_order(

@@ -12,6 +12,11 @@
 
 namespace OutRunVRStereo
 {
+    struct R13GpuCompletionSnapshot
+    {
+        std::uint32_t completedFrameId[OutRunVR::RenderFrameRingSize]{};
+    };
+
     namespace
     {
         SafetyHookInline R13ResetR9Hook{};
@@ -129,11 +134,11 @@ namespace OutRunVRStereo
             return true;
         }
 
-        bool R13ReadGpuCompletedFrame(std::uint32_t slotIndex,
-            std::uint32_t& completedFrame) noexcept
+        bool R13ReadGpuCompletionSnapshot(
+            R13GpuCompletionSnapshot& completed) noexcept
         {
-            completedFrame = 0;
-            if (slotIndex >= OutRunVR::RenderFrameRingSize || !R13EnsureAckState())
+            completed = {};
+            if (!R13EnsureAckState())
                 return false;
 
             for (int attempt = 0; attempt < 4; ++attempt)
@@ -180,10 +185,28 @@ namespace OutRunVRStereo
                         GetCurrentProcessId())
                     return false;
 
-                completedFrame = snapshot.completedFrameId[slotIndex];
+                std::memcpy(
+                    completed.completedFrameId,
+                    snapshot.completedFrameId,
+                    sizeof(completed.completedFrameId));
                 return true;
             }
             return false;
+        }
+
+        bool R13ReadGpuCompletedFrame(std::uint32_t slotIndex,
+            std::uint32_t& completedFrame) noexcept
+        {
+            completedFrame = 0;
+            if (slotIndex >= OutRunVR::RenderFrameRingSize)
+                return false;
+
+            R13GpuCompletionSnapshot snapshot{};
+            if (!R13ReadGpuCompletionSnapshot(snapshot))
+                return false;
+
+            completedFrame = snapshot.completedFrameId[slotIndex];
+            return true;
         }
 
         bool ResolveDirectTransportR13(IDirect3DDevice9* device, std::uint32_t frameId)
@@ -777,6 +800,12 @@ namespace OutRunVRStereo
     inline bool R13OverlayReadyForTransport() noexcept
     {
         return R13OverlayReady.load(std::memory_order_acquire);
+    }
+
+    inline bool R13TryGetGpuCompletionSnapshot(
+        R13GpuCompletionSnapshot& completed) noexcept
+    {
+        return R13ReadGpuCompletionSnapshot(completed);
     }
 
     inline bool R13TryGetGpuCompletedFrame(

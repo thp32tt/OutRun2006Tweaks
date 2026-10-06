@@ -452,6 +452,9 @@ namespace OutRunVRStereo
                 (frameId - 1u) % OutRunVR::RenderFrameRingSize;
             std::uint32_t selected = OutRunVR::RenderFrameRingSize;
             bool ackBlocked = false;
+            R13GpuCompletionSnapshot ackSnapshot{};
+            bool ackSnapshotRead = false;
+            bool ackSnapshotValid = false;
 
             // Preserve the R38 free-slot contract at the final R33/R32 owner.
             // A slow producer fence or host ACK on the preferred modulo slot
@@ -493,9 +496,27 @@ namespace OutRunVRStereo
 
                 if (candidate.published && candidate.frameId)
                 {
+                    // The ACK mapping is one seqlock-protected snapshot for the
+                    // whole 4-slot ring. Read it once per resolve scan instead
+                    // of memcpy/barrier-validating the same mapping again for
+                    // every published candidate. If the batch read is unstable
+                    // or stale, retain the proven per-slot read as a slow-path
+                    // fallback so host-rebind behavior is unchanged.
+                    if (!ackSnapshotRead)
+                    {
+                        ackSnapshotValid =
+                            R13TryGetGpuCompletionSnapshot(ackSnapshot);
+                        ackSnapshotRead = true;
+                    }
+
                     std::uint32_t gpuCompleted = 0;
-                    const bool ackValid =
-                        R13TryGetGpuCompletedFrame(index, gpuCompleted);
+                    bool ackValid = ackSnapshotValid;
+                    if (ackValid)
+                        gpuCompleted = ackSnapshot.completedFrameId[index];
+                    else
+                        ackValid =
+                            R13TryGetGpuCompletedFrame(index, gpuCompleted);
+
                     if (!ackValid ||
                         !FrameIdAtOrAfter(gpuCompleted, candidate.frameId))
                     {
