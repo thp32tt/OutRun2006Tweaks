@@ -943,6 +943,56 @@ int main()
         !programmablePair.translationImplemented,
         "R240 programmable pair identity prerequisite");
 
+    const auto r271SourceSemanticPair =
+        derive_programmable_shader_pair_source_semantic_evidence(
+            programmablePair,
+            r267VsRegisterSemantics,
+            r268PsRegisterSemantics,
+            r268Linkage);
+    require(
+        validate_programmable_shader_register_semantics(
+            r267VsRegisterSemantics, r267VsDecode) &&
+        validate_programmable_shader_register_semantics(
+            r268PsRegisterSemantics, r268PsDecode) &&
+        r271SourceSemanticPair.exact() &&
+        r271SourceSemanticPair.sourceIdentityExact &&
+        r271SourceSemanticPair.vertexRegisterSemanticsExact &&
+        r271SourceSemanticPair.pixelRegisterSemanticsExact &&
+        r271SourceSemanticPair.interfaceLinkageExact &&
+        r271SourceSemanticPair.cacheKey == programmablePair.cacheKey &&
+        r271SourceSemanticPair.vertexSourceBytecodeHash ==
+            programmablePair.vertexShader.bytecodeHash &&
+        r271SourceSemanticPair.pixelSourceBytecodeHash ==
+            programmablePair.pixelShader.bytecodeHash &&
+        r271SourceSemanticPair.vertexRegisterSemanticsHash ==
+            r267VsRegisterSemantics.registerSemanticsHash &&
+        r271SourceSemanticPair.pixelRegisterSemanticsHash ==
+            r268PsRegisterSemantics.registerSemanticsHash &&
+        r271SourceSemanticPair.interfaceLinkHash ==
+            r268Linkage.interfaceLinkHash &&
+        r271SourceSemanticPair.pairSemanticHash != 0 &&
+        r271SourceSemanticPair.receiptRevisionHash != 0 &&
+        r271SourceSemanticPair.semanticContractHash != 0,
+        "R271 composes exact R239 R266 R268 pair source-semantic receipt");
+
+    auto r271StalePixelSemantics = r268PsRegisterSemantics;
+    r271StalePixelSemantics.sourceBytecodeHash =
+        r268PsRegisterSemantics.sourceBytecodeHash == 1ull
+            ? 2ull
+            : (r268PsRegisterSemantics.sourceBytecodeHash ^ 1ull);
+    const auto r271StalePair =
+        derive_programmable_shader_pair_source_semantic_evidence(
+            programmablePair,
+            r267VsRegisterSemantics,
+            r271StalePixelSemantics,
+            r268Linkage);
+    require(
+        r271StalePixelSemantics.exact() &&
+        !r271StalePair.pixelRegisterSemanticsExact &&
+        !r271StalePair.complete &&
+        !r271StalePair.exact(),
+        "R271 rejects detached pixel register semantics from another source stream");
+
     NativeProgrammableShaderPairCache programmableCache;
     require(
         !programmableCache.ready() &&
