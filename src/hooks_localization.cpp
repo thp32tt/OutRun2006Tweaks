@@ -103,11 +103,19 @@ namespace KoreanRuntime
     static constexpr char KoreanPlayerNameAliasPrefix = 'K';
     static constexpr char KoreanPlayerNameAliasAlphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
     static constexpr char KoreanPlayerNameSidecarFilename[] = "KoreanPlayerNames.tsv";
+    // Reserved transient token used only while the stock name-entry object is
+    // being edited. It is never persisted and can therefore carry the composed
+    // UTF-8 preview through the already-proven A142 local text-object renderer.
+    static constexpr char KoreanPlayerNamePreviewAlias[] = "KAAAAAAAAAAAAA";
     static_assert(1 + KoreanPlayerNameAliasHashChars <= NativePlayerNamePayloadBytes);
+    static_assert(
+        sizeof(KoreanPlayerNamePreviewAlias) - 1 ==
+        1 + KoreanPlayerNameAliasHashChars);
 
     inline static bool KoreanPlayerNameSidecarLoaded = false;
     inline static std::unordered_map<std::string, std::string> AliasToKoreanPlayerName{};
     inline static std::unordered_map<std::string, std::string> KoreanPlayerNameToAlias{};
+    inline static std::string KoreanPlayerNamePreviewUtf8{};
     inline static std::mutex KoreanPlayerNameSidecarMutex{};
 
     static std::filesystem::path KoreanPlayerNameSidecarPath()
@@ -277,7 +285,9 @@ namespace KoreanRuntime
 
             const std::string alias = line.substr(0, tab);
             const std::string name = line.substr(tab + 1);
-            if (!IsValidKoreanPlayerNameAlias(alias) || !IsValidKoreanPlayerNameUtf8(name))
+            if (!IsValidKoreanPlayerNameAlias(alias) ||
+                alias == KoreanPlayerNamePreviewAlias ||
+                !IsValidKoreanPlayerNameUtf8(name))
             {
                 ++rejected;
                 continue;
@@ -391,6 +401,9 @@ namespace KoreanRuntime
         for (uint32_t salt = 0; salt < 4096; ++salt)
         {
             const std::string candidate = MakeKoreanPlayerNameAlias(utf8, salt);
+            if (candidate == KoreanPlayerNamePreviewAlias)
+                continue;
+
             const auto collision = AliasToKoreanPlayerName.find(candidate);
             if (collision != AliasToKoreanPlayerName.end())
             {
@@ -436,6 +449,14 @@ namespace KoreanRuntime
             return false;
 
         std::scoped_lock lock(KoreanPlayerNameSidecarMutex);
+        if (alias == KoreanPlayerNamePreviewAlias)
+        {
+            if (KoreanPlayerNamePreviewUtf8.empty())
+                return false;
+            utf8 = KoreanPlayerNamePreviewUtf8;
+            return true;
+        }
+
         if (!LoadKoreanPlayerNameSidecarLocked())
             return false;
 
@@ -607,6 +628,65 @@ namespace KoreanRuntime
             if (choseong_ >= 0)
                 AppendUtf8Codepoint(out, CurrentCodepoint());
             return out;
+        }
+
+        // Seed the editor from an existing stock ASCII name or a previously
+        // persisted Korean sidecar name. Existing codepoints stay committed;
+        // newly selected Jamo compose after them, and BACKSPACE removes one
+        // visible codepoint at a time until fresh composition begins.
+        bool LoadUtf8Literal(const std::string& utf8)
+        {
+            if (!IsValidKoreanPlayerNameUtf8(utf8))
+                return false;
+
+            std::u32string decoded;
+            decoded.reserve(KoreanPlayerNameMaxCodepoints);
+
+            for (size_t i = 0; i < utf8.size();)
+            {
+                const uint8_t lead = static_cast<uint8_t>(utf8[i]);
+                uint32_t cp = 0;
+                size_t continuation = 0;
+                if (lead < 0x80)
+                {
+                    cp = lead;
+                }
+                else if (lead <= 0xDF)
+                {
+                    cp = lead & 0x1F;
+                    continuation = 1;
+                }
+                else if (lead <= 0xEF)
+                {
+                    cp = lead & 0x0F;
+                    continuation = 2;
+                }
+                else
+                {
+                    cp = lead & 0x07;
+                    continuation = 3;
+                }
+
+                for (size_t j = 1; j <= continuation; ++j)
+                    cp = (cp << 6) | (static_cast<uint8_t>(utf8[i + j]) & 0x3F);
+
+                if (decoded.size() >= KoreanPlayerNameMaxCodepoints)
+                    return false;
+                decoded.push_back(static_cast<char32_t>(cp));
+                i += continuation + 1;
+            }
+
+            Reset();
+            committed_ = std::move(decoded);
+            return true;
+        }
+
+        bool PushPrintableAscii(char ch)
+        {
+            const unsigned char value = static_cast<unsigned char>(ch);
+            if (value < 0x20 || value > 0x7E)
+                return false;
+            return PushLiteral(static_cast<char32_t>(value));
         }
 
     private:
@@ -975,6 +1055,231 @@ namespace KoreanRuntime
             return false;
         }
     };
+
+    // A143: connect the B208 composer to the exact B207 name-entry dispatch
+    // boundary. The hook runs after the stock code loads the current selection
+    // into EAX and before it decides between character/control paths.
+    static constexpr uintptr_t NameEntryDispatchOffset = 0x692B6;
+    static constexpr size_t NameEntryBufferOffset = 0x5F4;
+    static constexpr size_t NameEntryPageOffset = 0xEC;
+    static constexpr size_t NameEntryCurrentLengthOffset = 0x6F6;
+    static constexpr uint32_t NameEntryBackspaceSelection = 0x26;
+    static constexpr uint32_t NameEntryEndSelection = 0x2B;
+    static constexpr uint32_t NameEntrySuppressedSelection = 0x2C;
+    static constexpr uintptr_t NameEntryByteTableOffset = 0x24C81B;
+
+    inline static HangulNameComposer KoreanNameEntryComposer{};
+    inline static uintptr_t KoreanNameEntryActiveObject = 0;
+    inline static bool KoreanNameEntryUnsupportedSymbolLogged = false;
+
+    static char* KoreanNameEntryBuffer(uintptr_t object)
+    {
+        return reinterpret_cast<char*>(object + NameEntryBufferOffset);
+    }
+
+    static int16_t* KoreanNameEntryCurrentLength(uintptr_t object)
+    {
+        return reinterpret_cast<int16_t*>(object + NameEntryCurrentLengthOffset);
+    }
+
+    static uint32_t KoreanNameEntryPage(uintptr_t object)
+    {
+        return *reinterpret_cast<uint32_t*>(object + NameEntryPageOffset);
+    }
+
+    static void SetKoreanPlayerNamePreview(const std::string& utf8)
+    {
+        std::scoped_lock lock(KoreanPlayerNameSidecarMutex);
+        KoreanPlayerNamePreviewUtf8 = utf8;
+    }
+
+    static void ClearKoreanPlayerNamePreview()
+    {
+        std::scoped_lock lock(KoreanPlayerNameSidecarMutex);
+        KoreanPlayerNamePreviewUtf8.clear();
+    }
+
+    static void BeginKoreanNameEntry(uintptr_t object)
+    {
+        if (KoreanNameEntryActiveObject == object)
+            return;
+
+        KoreanNameEntryComposer.Reset();
+        ClearKoreanPlayerNamePreview();
+
+        const char* buffer = KoreanNameEntryBuffer(object);
+        size_t length = 0;
+        while (length < NativePlayerNamePayloadBytes && buffer[length] != '\0')
+            ++length;
+
+        if (length != 0)
+        {
+            const std::string native(buffer, length);
+            std::string resolved;
+            if (LookupKoreanPlayerName(native.c_str(), resolved))
+            {
+                KoreanNameEntryComposer.LoadUtf8Literal(resolved);
+            }
+            else if (!IsValidKoreanPlayerNameAlias(native) &&
+                     IsValidKoreanPlayerNameUtf8(native))
+            {
+                KoreanNameEntryComposer.LoadUtf8Literal(native);
+            }
+        }
+
+        KoreanNameEntryActiveObject = object;
+    }
+
+    static void SyncKoreanNameEntryPreview(uintptr_t object)
+    {
+        const std::string utf8 = KoreanNameEntryComposer.Utf8();
+        char* buffer = KoreanNameEntryBuffer(object);
+
+        if (utf8.empty())
+        {
+            std::memset(buffer, 0, NativePlayerNameFieldBytes);
+            *KoreanNameEntryCurrentLength(object) = 0;
+            ClearKoreanPlayerNamePreview();
+            return;
+        }
+
+        constexpr size_t previewAliasLength = sizeof(KoreanPlayerNamePreviewAlias) - 1;
+        std::memset(buffer, 0, NativePlayerNameFieldBytes);
+        std::memcpy(buffer, KoreanPlayerNamePreviewAlias, previewAliasLength);
+        *KoreanNameEntryCurrentLength(object) =
+            static_cast<int16_t>(KoreanNameEntryComposer.VisibleCodepoints());
+        SetKoreanPlayerNamePreview(utf8);
+    }
+
+    static bool PushKoreanNameEntrySelection(
+        uintptr_t object,
+        uint32_t selection)
+    {
+        const uint32_t page = KoreanNameEntryPage(object);
+
+        if (selection <= 9)
+            return KoreanNameEntryComposer.PushDigitSelection(selection);
+
+        if (selection >= 10 && selection <= 35)
+        {
+            if (page == 1 || page == 3 || page == 4)
+            {
+                const bool shifted = page == 3 || page == 4;
+                const bool pushed =
+                    KoreanNameEntryComposer.PushLatinSelection(selection, shifted);
+                if (pushed && page == 3)
+                    *reinterpret_cast<uint32_t*>(object + NameEntryPageOffset) = 1;
+                return pushed;
+            }
+        }
+
+        // Selection 0x25 is an intentional duplicate of table slot 0x24.
+        const uint32_t tableSelection = selection == 0x25 ? 0x24 : selection;
+        if (tableSelection <= 0x24 && page >= 1 && page <= 5)
+        {
+            const uint8_t* table = Module::exe_ptr<uint8_t>(
+                NameEntryByteTableOffset + page * 0x25 + tableSelection);
+            if (table && *table >= 0x20 && *table <= 0x7E)
+                return KoreanNameEntryComposer.PushPrintableAscii(
+                    static_cast<char>(*table));
+        }
+
+        if (!KoreanNameEntryUnsupportedSymbolLogged)
+        {
+            KoreanNameEntryUnsupportedSymbolLogged = true;
+            spdlog::warn(
+                "Korean name entry: unsupported legacy symbol selection {} on page {}; "
+                "selection ignored to protect UTF-8/alias integrity",
+                selection,
+                page);
+        }
+        return false;
+    }
+
+    static void InterceptKoreanNameEntry(SafetyHookContext& ctx)
+    {
+        if (!Settings::KoreanTextOverlayTest ||
+            !Settings::OverlayEnabled ||
+            !TranslationsLoaded)
+        {
+            return;
+        }
+
+        const uintptr_t object = static_cast<uintptr_t>(ctx.esi);
+        if (!object)
+            return;
+
+        const uint32_t selection = static_cast<uint32_t>(ctx.eax);
+        if (selection < NameEntryBackspaceSelection)
+        {
+            BeginKoreanNameEntry(object);
+            if (PushKoreanNameEntrySelection(object, selection))
+            {
+                SyncKoreanNameEntryPreview(object);
+                ctx.eax = NameEntrySuppressedSelection;
+            }
+            else if (KoreanNameEntryActiveObject == object)
+            {
+                // Once Korean editing is active, never let an unsupported
+                // legacy/high-byte glyph contaminate the transient alias.
+                ctx.eax = NameEntrySuppressedSelection;
+            }
+            return;
+        }
+
+        if (selection == NameEntryBackspaceSelection)
+        {
+            BeginKoreanNameEntry(object);
+            if (KoreanNameEntryComposer.Backspace())
+                SyncKoreanNameEntryPreview(object);
+            else
+                SyncKoreanNameEntryPreview(object);
+            ctx.eax = NameEntrySuppressedSelection;
+            return;
+        }
+
+        // Keep page/control behavior 0x27..0x2A byte-for-byte stock.
+        if (selection != NameEntryEndSelection ||
+            KoreanNameEntryActiveObject != object)
+        {
+            return;
+        }
+
+        const std::string utf8 = KoreanNameEntryComposer.Utf8();
+        if (utf8.empty())
+        {
+            // Let stock END enforce its minimum-length rule on an empty buffer.
+            ClearKoreanPlayerNamePreview();
+            return;
+        }
+
+        std::string persistentAlias;
+        if (!EnsureKoreanPlayerNameAlias(utf8, persistentAlias))
+        {
+            spdlog::error(
+                "Korean name entry: failed to persist compatibility alias; "
+                "blocking END to avoid losing the composed UTF-8 name");
+            ctx.eax = NameEntrySuppressedSelection;
+            return;
+        }
+
+        char* buffer = KoreanNameEntryBuffer(object);
+        std::memset(buffer, 0, NativePlayerNameFieldBytes);
+        std::memcpy(
+            buffer,
+            persistentAlias.data(),
+            (std::min)(persistentAlias.size(), NativePlayerNamePayloadBytes));
+        *KoreanNameEntryCurrentLength(object) =
+            static_cast<int16_t>(persistentAlias.size());
+
+        ClearKoreanPlayerNamePreview();
+        KoreanNameEntryActiveObject = 0;
+        KoreanNameEntryComposer.Reset();
+
+        // EAX remains 0x2B. Stock minimum-length checking, result state,
+        // finalizer, parent 16-byte copy to 0x7C23E0, and all legacy
+        // save/ranking/network/replay consumers continue unchanged.
+    }
 
     static std::string UnescapeField(const std::string& input)
     {
@@ -1796,6 +2101,74 @@ public:
 };
 
 KoreanTextOverlayPrintHook KoreanTextOverlayPrintHook::instance;
+
+
+class KoreanNameEntryHook : public Hook
+{
+    static constexpr uintptr_t DispatchOffset = 0x692B6;
+    static constexpr uint8_t ExpectedDispatchBytes[] = {
+        0x83, 0xF8, 0x26, 0x7D, 0x68,
+        0x0F, 0xBF, 0x8E, 0xFA, 0x06, 0x00, 0x00
+    };
+
+    inline static SafetyHookMid DispatchHook{};
+
+    static void DispatchDest(SafetyHookContext& ctx)
+    {
+        KoreanRuntime::InterceptKoreanNameEntry(ctx);
+    }
+
+public:
+    std::string_view description() override
+    {
+        return "KoreanNameEntry";
+    }
+
+    void declare_settings() override
+    {
+        Settings::KoreanTextOverlayTest.needs_restart();
+    }
+
+    bool validate() override
+    {
+        if (!Settings::KoreanTextOverlayTest)
+            return false;
+
+        if (!Settings::OverlayEnabled || !KoreanRuntime::LoadTranslations())
+            return false;
+
+        const uint8_t* dispatch = Module::exe_ptr(DispatchOffset);
+        if (!dispatch ||
+            std::memcmp(
+                dispatch,
+                ExpectedDispatchBytes,
+                sizeof(ExpectedDispatchBytes)) != 0)
+        {
+            spdlog::error(
+                "Korean name entry: dispatch signature mismatch at EXE+0x{:X}; "
+                "leaving stock input untouched",
+                DispatchOffset);
+            return false;
+        }
+
+        return true;
+    }
+
+    bool apply() override
+    {
+        DispatchHook = safetyhook::create_mid(
+            Module::exe_ptr(DispatchOffset),
+            DispatchDest);
+        spdlog::info(
+            "Korean name entry: installed B207 character/END bridge at EXE+0x{:X}",
+            DispatchOffset);
+        return !!DispatchHook;
+    }
+
+    static KoreanNameEntryHook instance;
+};
+
+KoreanNameEntryHook KoreanNameEntryHook::instance;
 
 
 class KoreanK3TraceHook : public Hook
