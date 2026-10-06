@@ -608,8 +608,8 @@ namespace OutRunVRStereo
         HRESULT R32WithResetLifecycle(IDirect3DDevice9* device,
             LowerReset&& lowerReset) noexcept
         {
-            const bool gameDevice = IsGameDevice(device);
             const HRESULT hr = lowerReset();
+            const bool gameDevice = IsGameDevice(device);
             if (gameDevice)
             {
                 if (SUCCEEDED(hr))
