@@ -519,7 +519,7 @@ req(math, 'PrimaryRoughRoadSurfaceMask = 0x00100000u', 'primary rough-road mater
 req(math, 'uniqueStage == 1 && roadSection >= 419 && roadSection <= 458', 'Deep Lake primary rough-road range is evidence-pinned')
 req(math, 'uniqueStage == 10 && roadSection >= 54 && roadSection <= 70', 'Tulip Garden primary rough-road range is evidence-pinned')
 req(math, 'uniqueStage == 27 && roadSection >= 510 && roadSection <= 533', 'Floral Village primary rough-road range is evidence-pinned')
-req(build, 'FloralVillageRoughPavingScale = 0.75f', 'Floral Village R14 comfort scale slightly softens the already-perceptible stone road')
+req(build, 'FloralVillageRoughPavingScale = 0.55f', 'Floral Village R14 comfort scale is slightly below the pre-R13 0.60 baseline')
 req(build, 'is_proven_primary_rough_road(', 'wrapper classifies proven primary rough road separately from curb/off-road')
 req(build, '!primaryRoughRoad &&', 'proven primary rough road bypasses generic curb boost')
 req(build, 'if (!primaryRoughRoad && !imperialStoneRoad)', 'primary rough road and Imperial continuous stone road do not unload SAT/damper')
