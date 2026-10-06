@@ -18,19 +18,47 @@ def sha_bytes(b): return hashlib.sha256(b).hexdigest()
 def sha_file(p): return sha_bytes(Path(p).read_bytes())
 
 def font_path():
-    for pat in ["Noto Sans CJK KR:style=Bold","Noto Sans CJK KR:style=Medium","Noto Sans CJK KR"]:
-        try:
-            p=subprocess.check_output(["fc-match","-f","%{file}",pat],text=True).strip()
-        except Exception:
-            p=""
-        if p and Path(p).exists():
-            return p
-    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
-    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
-    p=subprocess.check_output(["fc-match","-f","%{file}","Noto Sans CJK KR:style=Bold"],text=True).strip()
-    if not p or not Path(p).exists(): raise RuntimeError("Noto CJK font unavailable")
+    # fc-match can silently fall back to DejaVu when Noto CJK is absent.
+    # That produced visible tofu boxes in the first A144 worker output, so
+    # require the actual Noto CJK collection before any Korean rasterization.
+    def find_actual_noto():
+        for pat in ["Noto Sans CJK KR:style=Bold","Noto Sans CJK KR:style=Medium","Noto Sans CJK KR"]:
+            try:
+                raw=subprocess.check_output(["fc-match","-f","%{file}|%{family}",pat],text=True).strip()
+            except Exception:
+                raw=""
+            if "|" not in raw:
+                continue
+            p,fam=raw.split("|",1)
+            if p and Path(p).exists() and "NotoSansCJK" in Path(p).name and "Noto Sans CJK" in fam:
+                return p
+        return ""
+    p=find_actual_noto()
+    if not p:
+        subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+        subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
+        p=find_actual_noto()
+    if not p:
+        raise RuntimeError("actual Noto CJK font unavailable; refusing fallback/tofu render")
     return p
+
 FONT=font_path()
+def font_index(path):
+    # Ubuntu's Noto CJK TTC normally stores JP/KR/SC/TC/HK faces.
+    # Resolve the KR face by its reported family name instead of assuming index 0.
+    if Path(path).suffix.lower()!=".ttc":
+        return 0
+    for idx in range(10):
+        try:
+            fam=ImageFont.truetype(path,24,index=idx).getname()[0]
+        except Exception:
+            break
+        if "CJK KR" in fam or fam.endswith(" KR"):
+            return idx
+    raise RuntimeError(("Noto CJK KR TTC face unavailable",path))
+FONT_INDEX=font_index(FONT)
+def load_ko_font(size):
+    return ImageFont.truetype(FONT,size,index=FONT_INDEX)
 
 def dds_info(path):
     b=Path(path).read_bytes()
@@ -106,7 +134,7 @@ def fit_tile(text,bbox,fill=(255,255,255,255),outline=(20,28,70,255),slant=.12,
     x1,y1,x2,y2=bbox; aw=x2-x1; ah=y2-y1
     start=int(ah*1.25) if font_hint is None else max(int(font_hint*1.35),int(ah*.75))
     for fs in range(max(12,start),9,-1):
-        font=ImageFont.truetype(FONT,fs)
+        font=load_ko_font(fs)
         sw=max(1,min(8,round(fs*max_stroke_ratio)))
         d=ImageDraw.Draw(Image.new("L",(8,8),0))
         bb=d.textbbox((0,0),text,font=font,stroke_width=sw)
@@ -173,7 +201,7 @@ def compare_jpg(source,old,new,path,title):
         ims.append(x)
     w=max(i.width for i in ims); h=max(i.height for i in ims)
     canvas=Image.new("RGB",(w*3,h+70),(32,32,32)); d=ImageDraw.Draw(canvas)
-    try: f=ImageFont.truetype(FONT,28)
+    try: f=load_ko_font(28)
     except: f=ImageFont.load_default()
     for i,(lab,im) in enumerate(zip(["ENGLISH SOURCE","OLD KOREAN","REWORK"],ims)):
         bg=Image.new("RGB",im.size,(96,96,96)); bg.paste(im.convert("RGB"),mask=im.getchannel("A"))
@@ -189,8 +217,10 @@ rel="textures/load/spr_etc_xst/D6DC1380_256x64.dds"
 cand=repo/"localization/graphics/hd_candidates"/rel
 old,info=load_readable(cand,mirror_y=False)
 before=sha_file(cand)
-new=old.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-after=write_rgba(cand,new,info,mirror_y=False)
+# Do not toggle the orientation again on a retry. PJR-001 remains a separate
+# orientation review item; this retry targets the confirmed Korean tofu failure.
+new=old.copy()
+after=before
 srcp=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"/rel
 src,_=load_readable(srcp,mirror_y=False)
 src=src.resize(new.size,Image.Resampling.NEAREST)
@@ -521,14 +551,17 @@ results.append({"number":22,"queue_index":86,"asset":rel,"before_sha256":before,
 
 # Hard self-QA: every selected asset must materially change, except alias equality is itself the intended material update.
 for r in results:
-    if r["before_sha256"]==r["after_sha256"]:
+    if r["before_sha256"]==r["after_sha256"] and r["number"]!=1:
         raise RuntimeError(("no material byte change",r["number"],r["asset"]))
+    if r["number"]==1:
+        r["status"]="A_REWORK_ORIENTATION_BYTES_PRESERVED_PENDING_C_VISUAL_CONFIRM"
 
 summary={
  "schema_version":1,
  "role":"A",
  "run":run,
  "trigger":"USER_PRE_INGAME_JPG_REVIEW_20261006",
+ "korean_font":{"path":FONT,"ttc_index":FONT_INDEX,"family":load_ko_font(24).getname()[0],"fallback_forbidden":True},
  "numbers":[r["number"] for r in results],
  "assets":results,
  "hard_visual_gates":[
