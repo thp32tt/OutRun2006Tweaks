@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T14:20:00+09:00",
+  "updatedKst": "2026-10-06T14:27:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -934,12 +934,31 @@
     "resumeReason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
     "item": "VR-DX9EX-SHADER-RESOURCE-TRANSACTION-0046",
     "baseSha": "20ee3894807b8879638d711dfc5721bcab78599f",
-    "materialResultSha": "PENDING_SELF",
-    "validationBearingResultSha": "PENDING_SELF",
-    "automationValidation": "PENDING",
+    "materialResultSha": "a574252a4038d26015d5f600302890f161c47de7",
+    "validationBearingResultSha": "a574252a4038d26015d5f600302890f161c47de7",
+    "automationValidation": "PASS",
     "runtimeValidation": "UNTESTED",
     "summary": "Make R19 shader resource creation transactional so partial VS/PS/sampler/constant-buffer failures cannot leak prior COM objects or publish an incomplete global bundle.",
     "sourceMaterialSha": "954c264dc0c76afe85a8784ec057df452b4d33cf",
-    "failureContext": "DX9Ex Active Validation run 37417855306 failed only in the new deterministic verifier: require_order matched CreateShaders' early already-complete return true before the final publish return. Domain Isolation 37417855282 passed. Retry narrows final-success ordering to the publication suffix without weakening the resource-lifetime checks."
+    "failureContext": "DX9Ex Active Validation run 37417855306 failed only in the new deterministic verifier: require_order matched CreateShaders' early already-complete return true before the final publish return. Domain Isolation 37417855282 passed. Retry narrows final-success ordering to the publication suffix without weakening the resource-lifetime checks.",
+    "validation": {
+      "initialDx9exActiveRunId": 37417855306,
+      "initialPolicyJobId": 112120371426,
+      "initialResult": "FAIL_VERIFIER_ONLY",
+      "initialDomainIsolationRunId": 37417855282,
+      "initialDomainIsolationResult": "PASS",
+      "dx9exActiveRunId": 37418042343,
+      "jobs": {
+        "policy": 112120953175,
+        "fullChainCompile": 112121042924,
+        "game": 112121042932,
+        "host": 112121042965,
+        "package": 112122351557
+      },
+      "domainIsolationRunId": 37418042272,
+      "packageArtifactId": 11391353219,
+      "packageArtifactDigest": "sha256:d10012b3422121f928ca614c11234430832b7798b6b075b97e9f062ececf350e"
+    },
+    "issue14CommentId": 6010000643
   }
 }
