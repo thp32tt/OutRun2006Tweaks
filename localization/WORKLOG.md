@@ -2143,3 +2143,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - B178 hosted run 37394363639 failed closed before output because source-text masks overlapped. B179 run 37394759782 narrowed them but again failed closed before output: Left/좌측 cannot satisfy protected 1px separation with transparent-erasure because the source label is integrated over underlying route art.
 - No weak candidate was promoted. Index62 is MANUAL_RECONSTRUCTION_REQUIRED; next repair needs an artwork-aware clean plate. Runtime/in-game UNTESTED. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_B/20261006-B-PROBE177-ZOOM62136144/B177_CONTROLLER_CLASSIFICATION.json; localization/graphics/role_B/20261006-B-PRODUCTION179-33491F83-MASKS/B179_CONTROLLER_FAIL_CLOSED.json.
+
+## 2026-10-06 09:43 KST — A101/A102 odd zoom reviews 35/37/45
+
+- Refreshed branch/queue and confirmed A-owned user in-game P0/P1 items are already statically repaired and awaiting C/new in-game revalidation; completed rows were not repeated.
+- A101 GitHub-hosted exact-HD probe classified index35 `E989E3B7` as localizable (`Total Rank` x2 → `종합 랭킹`), index37 `515DCBB2` as character-only preserve-original, and index45 `1F77CB88` as technical keyboard/control-key legends preserve-original.
+- A102 produced native 4096x4096 RGBA32 candidate `c0e76661ed974cb7c477f172e93fd67645391f1da3e81dcb867d86af3a595622` for index35. Both target speech-bubble source patches are byte/pixel-identical to the C215-approved B157 pink/green templates after y=-1280 shift, so only the already-approved source-removal/render pixels were transferred.
+- A102 static gates: 2/2 containment, source-size ceiling, positive margin PASS; clean changed outside source mask=0; decoded outside=0; alpha outside=0; source-script residue=0; localized overlap/touch=0. Controller SOURCE/CLEAN/FINAL and raw mirror_y visual review PASS with no patch seam, border/glow damage, clipping, halo, or Holly artwork change.
+- Queue/transcription/artwork-plan/progress/resume synchronized. Current blocked zoom-review count: 28. Next normal A blocked odd row: index103 `590A4724`, unless a higher-priority in-game/C-returned row appears.
+- Index35 remains pending independent C and in-game validation; indices37/45 require no localization runtime test. VR/FFB/DX11/DXVK untouched.
