@@ -333,6 +333,20 @@ namespace WheelFFBMath
         return t > 0.0f ? 0.45f + 0.45f * t : 0.0f;
     }
 
+    // Body-slip is only a bounded recovery cue. Its absolute torque must not
+    // exceed the front-slip SAT that owns steering direction; otherwise a small
+    // blend factor can still reverse the result when deep-slip SAT is weak.
+    inline float bound_drift_countersteer_torque(
+        float primaryFrontSlipTorque, float bodySlipCueTorque)
+    {
+        if (!std::isfinite(primaryFrontSlipTorque))
+            return 0.0f;
+        if (!std::isfinite(bodySlipCueTorque))
+            return primaryFrontSlipTorque;
+        const float limit = std::abs(primaryFrontSlipTorque);
+        return std::clamp(bodySlipCueTorque, -limit, limit);
+    }
+
     // Total aligning moment follows Fy * (pneumatic trail + mechanical trail).
     // Normalize the total pseudo-trail so enabling mechanical trail reshapes
     // the SAT curve without silently turning SteeringWeight into a second gain.
