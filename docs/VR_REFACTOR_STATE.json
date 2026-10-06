@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T12:30:00+09:00",
+  "updatedKst": "2026-10-06T12:42:30+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -228,11 +228,12 @@
     "CONVERSION-DX9EX-00455 / VR-DX9EX-SWAPCHAIN-GPU-DRAIN-BOUNDED-0038 bounds the R19 event-query wait to 250 ms and exits early on device removal while preserving normal completion fencing. Runtime source SHA 60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a; verifier repair/validation-bearing SHA ac32589324fbc76b4d2fcd4321f31415f0ef5a39 passed DX9Ex Active 37406897470 and Domain Isolation 37406897447 after initial verifier-only failure 37406784043. Runtime remains UNTESTED.",
     "VR-DX9EX-SWAPCHAIN-LIVE-DESTROY-RESOURCE-RETENTION-0040 moves RTV/image release and metadata reset after the live fail-closed returns so a transient drain/destroy failure cannot discard the still-owned swapchain resources before a later retry.",
     "CONVERSION-DX9EX-00457 / VR-DX9EX-SWAPCHAIN-LIVE-DESTROY-RESOURCE-RETENTION-0040 makes live R19 swapchain destruction transactional. Runtime source SHA b788db90113ea34b208427a6b9fdd314c9d24377; verifier repair/validation-bearing SHA b855fd32389aa330b8f04598fbcd76853c6d8f99 passed DX9Ex Active 37408680043 and Domain Isolation 37408680053 after initial verifier-only failure 37408556548. Package artifact 11389036142 digest sha256:7f9c7931d2b664c054f5ad3aaf7a1f2337d2a14b5ed57df1116ce86b31b72eb0. Runtime remains UNTESTED.",
-    "VR-DX9EX-SWAPCHAIN-GPU-WORK-PROVENANCE-0041 adds per-swapchain gpuWorkSubmitted ownership set immediately after Draw. Fresh or partially initialized swapchains with no submitted graphics work can destroy without a completion query; rendered swapchains still require the bounded D3D11 event-query drain."
+    "VR-DX9EX-SWAPCHAIN-GPU-WORK-PROVENANCE-0041 adds per-swapchain gpuWorkSubmitted ownership set immediately after Draw. Fresh or partially initialized swapchains with no submitted graphics work can destroy without a completion query; rendered swapchains still require the bounded D3D11 event-query drain.",
+    "CONVERSION-DX9EX-00458 / VR-DX9EX-SWAPCHAIN-GPU-WORK-PROVENANCE-0041 tracks whether an R19 swapchain actually submitted Draw work. Initial source SHA 2e37d30581f40d7de6210ab5fe946346d0698ee3 exposed incompatible RenderTo signature consumers and failed host compile; compatibility repair/validation-bearing SHA 4df0dab3a947ace0b938a8216b934786e79a06b5 passed DX9Ex Active 37409670128 and Domain Isolation 37409670208. Package artifact 11387984834 digest sha256:9008297ac9eb2a72eb8288d79ce2d8b431ce0abc3458498243965ad8b65f3627. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
-  "validatedSourceSha": "b855fd32389aa330b8f04598fbcd76853c6d8f99",
-  "validationRunId": 37408680043,
+  "validatedSourceSha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
+  "validationRunId": 37409670128,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
