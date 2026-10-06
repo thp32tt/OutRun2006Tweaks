@@ -275,7 +275,7 @@ namespace OutRunVrR24BlackScreenGuard
         if (OutRunVrFinalTest::Context)
             OutRunVrFinalTest::Context->Flush();
 
-        const bool released = Release(Projection, false);
+        const bool released = Release(Projection, ok);
         if (!ok || !released)
             return false;
 
@@ -397,7 +397,7 @@ namespace OutRunVrR24BlackScreenGuard
         SourceFormat = savedFormat;
         if (OutRunVrFinalTest::Context)
             OutRunVrFinalTest::Context->Flush();
-        const bool released = Release(Theater, false);
+        const bool released = Release(Theater, ok);
         if (!ok || !released)
             return false;
 

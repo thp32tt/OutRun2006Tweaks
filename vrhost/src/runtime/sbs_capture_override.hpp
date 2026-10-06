@@ -997,7 +997,7 @@ float4 PSMain(VSOut input) : SV_Target
             Projection.height, eyeUv[0], &Projection);
         ok = RenderTo(Projection.rtvs[image][1], Projection.width,
             Projection.height, eyeUv[1], &Projection) && ok;
-        const bool released = Release(Projection, false);
+        const bool released = Release(Projection, ok);
         if (!ok || !released)
             return false;
 
@@ -1100,7 +1100,7 @@ float4 PSMain(VSOut input) : SV_Target
         }
         const bool ok = RenderTo(Theater.rtvs[image][0], Theater.width,
             Theater.height, theaterUv, &Theater);
-        const bool released = Release(Theater, false);
+        const bool released = Release(Theater, ok);
         if (!ok || !released)
             return false;
 
