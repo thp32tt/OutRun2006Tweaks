@@ -246,6 +246,30 @@ float4 PSMain(VSOut input) : SV_Target
     inline bool LastStereoFrameValid = false;
     inline ULONGLONG LastStereoFrameMs = 0;
 
+    inline bool FrameRunIdentityValid(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        return frame.reserved[OutRunVR::RenderFrameRunGenerationIndex] != 0 &&
+            frame.clientPid != 0;
+    }
+
+    inline bool SameProducerRun(
+        const OutRunVR::SharedRenderFrameState& a,
+        const OutRunVR::SharedRenderFrameState& b) noexcept
+    {
+        return FrameRunIdentityValid(a) && FrameRunIdentityValid(b) &&
+            a.reserved[OutRunVR::RenderFrameRunGenerationIndex] ==
+                b.reserved[OutRunVR::RenderFrameRunGenerationIndex] &&
+            a.clientPid == b.clientPid;
+    }
+
+    inline void InvalidateStereoFrameCache() noexcept
+    {
+        LastStereoFrame = {};
+        LastStereoFrameValid = false;
+        LastStereoFrameMs = 0;
+    }
+
     inline std::uint64_t EndFrames = 0;
     inline std::uint64_t CaptureFresh = 0;
     inline std::uint64_t CaptureTimeout = 0;
@@ -292,9 +316,7 @@ float4 PSMain(VSOut input) : SV_Target
         ReleaseCom(Sampler);
         ReleaseCom(Ps);
         ReleaseCom(Vs);
-        LastStereoFrame = {};
-        LastStereoFrameValid = false;
-        LastStereoFrameMs = 0;
+        InvalidateStereoFrameCache();
     }
 
     inline bool EnsureSource(const D3D11_TEXTURE2D_DESC& desc)
@@ -704,14 +726,29 @@ float4 PSMain(VSOut input) : SV_Target
     {
         OutRunVR::SharedRenderFrameState frame{};
         std::uint32_t publish = 0;
-        if (OutRunVrFinalTest::ReadLatestFrame(frame, publish) && FrameComplete(frame))
+        if (!OutRunVrFinalTest::ReadLatestFrame(frame, publish))
+            return;
+
+        // A host OpenXR session may survive a fast game-process restart. As soon
+        // as the new producer publishes any Frame.v2 identity, stop treating the
+        // prior run's last complete stereo frame as current gameplay, even when
+        // the new frame is not complete yet.
+        if (!FrameRunIdentityValid(frame))
         {
-            if (!LastStereoFrameValid || frame.frameId != LastStereoFrame.frameId ||
-                frame.presentQpc != LastStereoFrame.presentQpc)
-                LastStereoFrameMs = GetTickCount64();
-            LastStereoFrame = frame;
-            LastStereoFrameValid = true;
+            InvalidateStereoFrameCache();
+            return;
         }
+        if (LastStereoFrameValid && !SameProducerRun(frame, LastStereoFrame))
+            InvalidateStereoFrameCache();
+
+        if (!FrameComplete(frame))
+            return;
+
+        if (!LastStereoFrameValid || frame.frameId != LastStereoFrame.frameId ||
+            frame.presentQpc != LastStereoFrame.presentQpc)
+            LastStereoFrameMs = GetTickCount64();
+        LastStereoFrame = frame;
+        LastStereoFrameValid = true;
     }
 
     inline bool PublishedSourceMatches(const OutRunVR::SharedRenderFrameState& frame)

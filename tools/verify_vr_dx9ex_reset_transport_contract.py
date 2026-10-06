@@ -13,6 +13,7 @@ HOST_PASSTHROUGH_PATH = ROOT / "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp
 HOST_R23_RUNTIME_PATH = ROOT / "vrhost/src/runtime/r23_runtime_hardening.hpp"
 HOST_R24_PATH = ROOT / "vrhost/src/runtime/r24_black_screen_guard.hpp"
 HOST_REVIEW_PATH = ROOT / "vrhost/src/runtime/review_hardening.hpp"
+HOST_SBS_PATH = ROOT / "vrhost/src/runtime/sbs_capture_override.hpp"
 HOST_SUBMIT_PATH = ROOT / "vrhost/src/runtime/r32_direct_submit.hpp"
 
 
@@ -83,6 +84,7 @@ host_passthrough = load(HOST_PASSTHROUGH_PATH)
 host_r23_runtime = load(HOST_R23_RUNTIME_PATH)
 host_r24 = load(HOST_R24_PATH)
 host_review = load(HOST_REVIEW_PATH)
+host_sbs = load(HOST_SBS_PATH)
 host_submit = load(HOST_SUBMIT_PATH)
 
 # Reset must tear down every D3D9 DEFAULT-pool stereo/shared-eye/probe object
@@ -711,6 +713,45 @@ require_order(
     "LatestCompleteDirectFrame(latest)",
     "SafeEyesBelongToTransportRun(latest)",
     "SourceSrv = SafeEyeSrv[0];",
+)
+
+# R19's short-lived stereo fallback cache must be scoped to the producer run.
+# The OpenXR host can survive a fast game restart, so observing any Frame.v2
+# from a new run must invalidate the prior run's complete stereo frame before
+# the new frame becomes stereo-complete.
+stereo_cache = body(host_sbs, "inline void UpdateStereoFrameCache()")
+require(
+    host_sbs,
+    "R19 stereo cache run identity helpers",
+    "inline bool FrameRunIdentityValid(",
+    "RenderFrameRunGenerationIndex",
+    "inline bool SameProducerRun(",
+    "inline void InvalidateStereoFrameCache() noexcept",
+)
+require(
+    stereo_cache,
+    "R19 stereo cache fail-closed run transition",
+    "if (!OutRunVrFinalTest::ReadLatestFrame(frame, publish))",
+    "if (!FrameRunIdentityValid(frame))",
+    "InvalidateStereoFrameCache();",
+    "if (LastStereoFrameValid && !SameProducerRun(frame, LastStereoFrame))",
+    "if (!FrameComplete(frame))",
+    "LastStereoFrame = frame;",
+    "LastStereoFrameValid = true;",
+)
+require_order(
+    stereo_cache,
+    "R19 new-run invalidation before complete-frame reuse",
+    "if (!FrameRunIdentityValid(frame))",
+    "if (LastStereoFrameValid && !SameProducerRun(frame, LastStereoFrame))",
+    "if (!FrameComplete(frame))",
+    "LastStereoFrame = frame;",
+)
+sbs_reset = body(host_sbs, "inline void ResetAll()")
+require(
+    sbs_reset,
+    "R19 stereo cache reset owner",
+    "InvalidateStereoFrameCache();",
 )
 
 # R24's released-image cache must not outlive the DirectGPU producer run that
