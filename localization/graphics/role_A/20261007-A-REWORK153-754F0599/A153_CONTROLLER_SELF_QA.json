@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A153",
+  "timestamp_kst": "2026-10-07 08:40 KST",
+  "queue_index": 175,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "trigger": "C227R_REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH",
+  "prior_candidate_sha256": "f21970a3d6d8ae69954d0159524856b5019cd1445daa65c55d85213f73e431f5",
+  "candidate_sha256": "5b37fdaf3563380bf44cae7fbb41c932efee8876de52b026347a1c49f9b17585",
+  "defect": "C227R machine PASS but controller rejected generic Noto skeleton versus extended rounded techno source family.",
+  "rework": "Fresh NanumGothic Bold skeleton with low-profile extended techno proportions, preserving A151 width hierarchy, source-left anchors, right lean and metallic grayscale/dark extrusion.",
+  "machine_qa": {
+    "bbox_size_positive_margin": "3/3 PASS",
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": "PASS_SOURCE_A151_REJECTED_A153_READABLE_ROW_RAW",
+  "producer_status": "A153_C227R_TYPOGRAPHY_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "github_worker_run": 37547611829,
+  "worker_output_commit": "715c391788d63d8037070d07eece0a9a54956293",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
