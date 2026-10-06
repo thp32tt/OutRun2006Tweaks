@@ -785,15 +785,49 @@ if build.count('if (migrationModel == WheelFFBMath::Model::ModernDD)') < 3:
     raise SystemExit('CURRENT VERIFY FAILED [Modern-only feel migrations are not consistently model-gated]')
 print('OK [revision 1/2/4 feel retunes are gated to Modern DD]')
 req(build, 'migrationModel == WheelFFBMath::Model::ModernDD\n                        ? normalize_legacy_preset(false)\n                        : false;', 'legacy numeric preset normalization cannot rewrite Arcade/PS2 state')
-req(build, 'Settings::WheelFFBFeelRevision = 7;\n                    WheelFFB_ResetHeadroomStats();', 'current Universal preset stamps the R9 feel revision')
+req(build, 'Settings::WheelFFBFeelRevision = 8;\n                    WheelFFB_ResetHeadroomStats();', 'current Universal preset stamps the current feel revision')
 req(build, 'void apply_universal_physics_preset()\n    {\n        Settings::WheelFFBEnable = true;\n        // These helpers replace the original F11 button blocks', 'Universal Physics preset helper is the intercepted F11 owner')
 physics_helper = build[build.find('void apply_universal_physics_preset()'):build.find('void apply_universal_natural_preset()')]
 natural_helper = build[build.find('void apply_universal_natural_preset()'):build.find('bool normalize_legacy_preset(')]
 req(physics_helper, 'Settings::WheelFFBModel = 0;', 'Universal Physics preset restores Modern DD model ID')
 req(natural_helper, 'Settings::WheelFFBModel = 0;', 'Universal Natural preset restores Modern DD model ID')
+ui_physics_start = wheel_ui.find('if (ImGui::Button("Load MOZA R3 Physics SAT"))')
+ui_natural_start = wheel_ui.find('if (ImGui::Button("Load MOZA R3 Natural SAT"))')
+ui_presets_end = wheel_ui.find('ImGui::TextDisabled(', ui_natural_start)
+if min(ui_physics_start, ui_natural_start, ui_presets_end) < 0:
+    raise SystemExit('CURRENT VERIFY FAILED [legacy source preset fallback blocks are missing]')
+ui_physics = wheel_ui[ui_physics_start:ui_natural_start]
+ui_natural = wheel_ui[ui_natural_start:ui_presets_end]
+
+def setting_assignments(text):
+    return {
+        match.group(1): re.sub(r'\\s+', '', match.group(2))
+        for match in re.finditer(r'Settings::([A-Za-z0-9_]+)\\s*=\\s*([^;]+);', text)
+    }
+
+for label, helper, fallback in (
+    ('Physics', physics_helper, ui_physics),
+    ('Natural', natural_helper, ui_natural),
+):
+    helper_values = setting_assignments(helper)
+    fallback_values = setting_assignments(fallback)
+    for key, value in helper_values.items():
+        if fallback_values.get(key) != value:
+            raise SystemExit(
+                f'CURRENT VERIFY FAILED [{label} source preset fallback drift]: '
+                f'{key} helper={value!r} fallback={fallback_values.get(key)!r}')
+    if fallback_values.get('WheelFFBFeelRevision') != '8':
+        raise SystemExit(
+            f'CURRENT VERIFY FAILED [{label} source preset fallback revision]: '
+            f'{fallback_values.get("WheelFFBFeelRevision")!r}')
+    print(f'OK [{label} source preset fallback mirrors canonical helper]')
+
 forbid(math, 'DeepSlipMechanicalBoost', 'R13 removes slip-dependent mechanical geometry gain')
 req(math, 'ResidualTrail = 0.02f', 'R13 pneumatic trail collapses to a near-zero sliding remainder')
 req(math, 'ResidualMzRatio = 0.05f', 'R13 keeps high-slip residual Mz separate from pneumatic trail')
+req(math, 'bound_drift_countersteer_torque(', 'R13 body-slip cue magnitude is bounded by primary front-slip SAT')
+req(ffb, 'WheelFFBMath::bound_drift_countersteer_torque(', 'runtime cannot let body-slip assist overpower front-slip SAT')
+req(ffb, 'driftBlend={} physicsSat={}', 'hardware telemetry exposes R13 drift blend and final Physics SAT')
 req(math, 'combined_sat_shape_with_deep_slip_boost(', 'legacy deep-slip API remains compatibility-safe')
 req(ffb, 'WheelFFBMath::combined_sat_shape(', 'runtime consumes the geometric combined SAT path')
 forbid(ffb, 'WheelFFBMath::combined_sat_shape_with_deep_slip_boost(', 'runtime no longer consumes artificial deep-slip mechanical boost')
