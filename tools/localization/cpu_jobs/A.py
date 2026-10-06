@@ -12,7 +12,7 @@ from psd_tools import PSDImage
 import cv2
 
 repo=Path.cwd()
-run="20261006-A-WORKSTEAL131-33491F83-PSD-STACK-DIAGNOSTIC"
+run="20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -28,8 +28,8 @@ psd_commit="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 psd_rel="PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_loading_cvt_Exst/33491F83_512x256.psd"
 psd_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+psd_commit+"/"+urllib.parse.quote(psd_rel,safe="/")
 
-srcp=Path("/tmp/A131_33491F83.dds")
-psdp=Path("/tmp/A131_33491F83.psd")
+srcp=Path("/tmp/A132_33491F83.dds")
+psdp=Path("/tmp/A132_33491F83.psd")
 urllib.request.urlretrieve(src_url,srcp)
 urllib.request.urlretrieve(psd_url,psdp)
 
@@ -196,7 +196,7 @@ for pp in paint_paths:
 if paint_cards:
     diag=Image.new("RGB",(1080,315*len(paint_cards)),"white")
     for i,c in enumerate(paint_cards): diag.paste(c,(0,315*i))
-    diag.save(out/"A131_PAINTOVER_COMPONENT_CONTACT.jpg",quality=94)
+    diag.save(out/"A132_PAINTOVER_COMPONENT_CONTACT.jpg",quality=94)
 
 # Compare complete authoring-stack reconstructions.  This is diagnostic-only:
 # no stack is accepted until controller visual QA confirms the road geometry.
@@ -233,7 +233,7 @@ for nm,im in stack_variants:
     stack_cards.append(c)
 diag2=Image.new("RGB",(1080,245*len(stack_cards)),"white")
 for i,c in enumerate(stack_cards): diag2.paste(c,(0,245*i))
-diag2.save(out/"A131_PSD_STACK_CONTACT.jpg",quality=95)
+diag2.save(out/"A132_PSD_STACK_CONTACT.jpg",quality=95)
 
 clean_arr=sa.copy()
 manual_missing={}
@@ -244,36 +244,29 @@ for row in rows:
     m=row["_mask"]
     if row["cell"]=="main":
         if row["key"] in {"easy_main","hard_main"}:
-            # Derive the authoring erase footprint from the delta between
-            # Bunki - Basic Fix (before EASY/HARD erasure) and Layer 43 (after).
-            # This captures the whole white erase plate, including residue
-            # outside the rasterized English alpha mask.
+            # A131 controller visual QA identified Layer43+Group16 as the
+            # source-authored stack that restores the road/green edge through
+            # EASY/HARD without the white erase plate or synthetic inpaint
+            # smear.  Copy only the authoring erase footprint inside the exact
+            # source effect bbox; everything else remains authoritative source.
             bx0,by0,bx1,by1=row["source_bbox"]
             delta=np.any(l43a!=basica,axis=2)
             clip=np.zeros((H,W),bool); clip[by0:by1,bx0:bx1]=True
             rm=(delta & clip) | m
-            # Close tiny gaps between antialiased erase fragments but remain
-            # strictly inside the source effect bbox.
             rm=cv2.morphologyEx(rm.astype(np.uint8),cv2.MORPH_CLOSE,np.ones((5,5),np.uint8)).astype(bool)
             rm &= clip
             if not rm.any():
                 raise RuntimeError(("empty erase-delta repair mask",row["key"]))
-            y0=max(0,by0-64); y1=min(H,by1+64)
-            x0=max(0,bx0-64); x1=min(W,bx1+64)
-            cm=rm[y0:y1,x0:x1]
-            ca=sa[y0:y1,x0:x1]
-            bgr=cv2.cvtColor(ca[:,:,:3],cv2.COLOR_RGB2BGR)
-            mask8=(cm.astype(np.uint8)*255)
-            inp=cv2.inpaint(bgr,mask8,9.0,cv2.INPAINT_TELEA)
-            rgb=cv2.cvtColor(inp,cv2.COLOR_BGR2RGB)
-            patch=clean_arr[y0:y1,x0:x1].copy()
-            patch[cm,:3]=rgb[cm]
-            patch[cm,3]=ca[cm,3]
-            clean_arr[y0:y1,x0:x1]=patch
+            authored=overlay(layer43_canvas,g16canvas)
+            aa=np.asarray(authored,dtype=np.uint8)
+            missing=int(np.count_nonzero(rm & (aa[:,:,3]==0)))
+            manual_missing[row["key"]]=missing
+            if missing:
+                raise RuntimeError(("Group16 authored clean alpha missing",row["key"],missing))
+            clean_arr[rm]=aa[rm]
             repair_scope |= rm
             repair_extra |= (rm & ~source_mask)
-            clean_component_by_key[row["key"]]="BasicFix-vs-Layer43 erase-delta + Telea r9"
-            manual_missing[row["key"]]=0
+            clean_component_by_key[row["key"]]="Layer43+Group16 authored road clean"
             continue
         else:
             component=era
@@ -303,7 +296,7 @@ for row in rows:
     x0,y0,x1,y1=row["source_bbox"]; bbox_scope[y0:y1,x0:x1]=True
 repair_extra_outside_bbox=int(np.count_nonzero(repair_extra & ~bbox_scope))
 if repair_extra_outside_bbox: raise RuntimeError(("repair scope outside source bboxes",repair_extra_outside_bbox))
-manual_clean.save(out/"A131_MANUAL_PSD_CLEAN_COMPONENT.png")
+manual_clean.save(out/"A132_MANUAL_PSD_CLEAN_COMPONENT.png")
 
 # Source-family colors sampled from the authoritative release inside each exact PSD mask.
 def sample_style(row):
@@ -436,15 +429,15 @@ for row in rows:
     row.pop("_mask",None); row.pop("_glyph",None)
 
 # Evidence.
-src.save(out/"A131_SOURCE_READABLE.png")
-clean.save(out/"A131_CLEAN_PLATE.png")
-dec.save(out/"A131_FINAL_READABLE.png")
-src_raw.save(out/"A131_SOURCE_RAW.png")
-dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"A131_FINAL_RAW.png")
-Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"A131_SOURCE_TEXT_MASK.png")
-Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"A131_TARGET_MASK.png")
-Image.fromarray((repair_scope.astype(np.uint8)*255),"L").save(out/"A131_REPAIR_SCOPE.png")
-manual_clean.save(out/"A131_MANUAL_PSD_CLEAN_COMPOSITE.png")
+src.save(out/"A132_SOURCE_READABLE.png")
+clean.save(out/"A132_CLEAN_PLATE.png")
+dec.save(out/"A132_FINAL_READABLE.png")
+src_raw.save(out/"A132_SOURCE_RAW.png")
+dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"A132_FINAL_RAW.png")
+Image.fromarray((source_mask.astype(np.uint8)*255),"L").save(out/"A132_SOURCE_TEXT_MASK.png")
+Image.fromarray((target.astype(np.uint8)*255),"L").save(out/"A132_TARGET_MASK.png")
+Image.fromarray((repair_scope.astype(np.uint8)*255),"L").save(out/"A132_REPAIR_SCOPE.png")
+manual_clean.save(out/"A132_MANUAL_PSD_CLEAN_COMPOSITE.png")
 
 def white(im):
     z=Image.new("RGBA",im.size,(235,235,235,255));z.alpha_composite(im);return z.convert("RGB")
@@ -460,16 +453,16 @@ def contact(cards,path,maxsize=None):
     s.save(path,quality=97)
 
 contact([card("SOURCE",src,(0,0,1200,820)),card("CLEAN PSD-LAYER",clean,(0,0,1200,820)),card("FINAL",dec,(0,0,1200,820))],
-        out/"A131_MAIN_SOURCE_CLEAN_FINAL.jpg",(1800,2400))
+        out/"A132_MAIN_SOURCE_CLEAN_FINAL.jpg",(1800,2400))
 contact([card("SOURCE RIGHT",src,(1260,0,2048,270)),card("CLEAN RIGHT",clean,(1260,0,2048,270)),card("FINAL RIGHT",dec,(1260,0,2048,270))],
-        out/"A131_RIGHT_SOURCE_CLEAN_FINAL.jpg",(1800,1400))
+        out/"A132_RIGHT_SOURCE_CLEAN_FINAL.jpg",(1800,1400))
 contact([card("SOURCE RAW mirror_y",src_raw,(0,0,W,H)),card("FINAL RAW mirror_y",dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM),(0,0,W,H))],
-        out/"A131_RAW_COMPARE.jpg",(1300,1200))
+        out/"A132_RAW_COMPARE.jpg",(1300,1200))
 zoomcards=[]
 for row in rows:
     x0,y0,x1,y1=row["source_bbox"];p=8;crop=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p))
     zoomcards += [card(row["key"]+" SOURCE",src,crop,2),card(row["key"]+" CLEAN",clean,crop,2),card(row["key"]+" FINAL",dec,crop,2)]
-contact(zoomcards,out/"A131_LABEL_ZOOM_CONTACT.jpg",(2800,6000))
+contact(zoomcards,out/"A132_LABEL_ZOOM_CONTACT.jpg",(2800,6000))
 
 report={
  "schema_version":1,"role":"A","run":run,"queue_index":queue_index,"asset":asset,
@@ -481,7 +474,7 @@ report={
  "translation":{"Diverge":"분기","Left":"좌측","Right":"우측","EASY":"쉬움","HARD":"어려움","physical_elements":9},
  "construction":{
    "source_text_mask":"exact alpha masks from nine visible PSD rasterized English label layers",
-   "clean_plate":"EASY/HARD authoring erase-footprint derived from Basic Fix vs Layer 43 delta then Telea r9; Diverge/Left/Right PSD erase component; detached labels transparent; extended repair remains inside exact source bboxes",
+   "clean_plate":"EASY/HARD authored Layer43+Group16 road reconstruction over the BasicFix-vs-Layer43 erase footprint; Diverge/Left/Right PSD erase component; detached labels transparent; extended repair remains inside exact source bboxes",
    "render":"native 2048x1024 Noto Sans CJK KR Black; family colors sampled from source; shared Korean font size within Left/Right, main EASY/HARD, regular EASY/HARD and oblique EASY/HARD pairs",
    "oblique_transform":"27-degree source PSD shear reproduced as tan(27deg)"
  },
@@ -495,12 +488,12 @@ report={
    "localized_overlap_pixels":0,"dds_roundtrip":"PASS","status":"PASS"},
  "candidate_path":str(candidate.relative_to(repo)),"candidate_sha256":cand_sha,
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA","runtime_validation":"UNTESTED",
- "status":"A131_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+ "status":"A132_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
  "no_vr_ffb_dx11_dxvk_work":True
 }
-rp=out/"A131_33491F83_REPORT.json"
+rp=out/"A132_33491F83_REPORT.json"
 rp.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A131_33491F83.json").write_text(json.dumps({
+(wr/"A132_33491F83.json").write_text(json.dumps({
  "role":"A","run":run,"queue_index":queue_index,"asset":"33491F83","work_stolen_from_lane":"B",
  "source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,"psd_layered_source":True,
  "elements":9,"bbox_size_positive_margin":"9/9 PASS","changed_outside":outside,"alpha_outside":alpha_out,
@@ -512,5 +505,5 @@ print(json.dumps({
  "rows":[{"key":r["key"],"source_bbox":r["source_bbox"],"localized_bbox":r["localized_bbox"],
           "font_size":r["font_size"],"shear":r["shear"],
           "margins":[r["delta_left"],r["delta_right"],r["delta_top"],r["delta_bottom"]]} for r in rows],
- "status":"A131_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"A132_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 },ensure_ascii=False),flush=True)
