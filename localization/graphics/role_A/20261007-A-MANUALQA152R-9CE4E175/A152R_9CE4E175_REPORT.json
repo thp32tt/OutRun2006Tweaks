@@ -119,11 +119,12 @@
     "4_source_faithful_weight_outline_shadow": "PASS_NATIVE_BLACK_HEAVY_WHITE_NO_INVENTED_EFFECT",
     "5_no_clipped_pixels": "PASS_POSITIVE_MARGINS",
     "6_protected_graphics_clearance": "PASS_ZERO_PROTECTED_CHANGE",
-    "7_raw_and_flip_y_visual_review": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
-    "8_immediate_readability_vs_english": "PENDING_CONTROLLER"
+    "7_raw_and_flip_y_visual_review": "PASS_CONTROLLER_VISUAL_BOTH",
+    "8_immediate_readability_vs_english": "PASS_CONTROLLER_VISUAL"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_C125_A152_REJECTED_A152R_READABLE_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A152R_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "status": "A152R_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_qa": "localization/graphics/role_A/20261007-A-MANUALQA152R-9CE4E175/A152R_CONTROLLER_SELF_QA.json"
 }
