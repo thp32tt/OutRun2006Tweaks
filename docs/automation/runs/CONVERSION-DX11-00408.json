@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00408",
+  "production_id": "CONVERSION-DX11-00408",
+  "event_id": "CONVERSION-DX11-00408-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R270_PROGRAMMABLE_REGISTER_SEMANTICS_SOURCE_PROVENANCE",
+  "base_sha": "591bd9f2a41556e95cf53c908cff190fbccb7c74",
+  "result_sha": "dd8524e3b3fc60178790f5c7007cd227a634ad2b",
+  "source_implementation_sha": "55b6378da360a634b90bafdee46252b706f10307",
+  "material_result_sha": "dd8524e3b3fc60178790f5c7007cd227a634ad2b",
+  "validation_bearing_result_sha": "dd8524e3b3fc60178790f5c7007cd227a634ad2b",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "summary": "R270 binds exact R266 programmable register/constant/sampler semantic receipts to their exact R265 source stream via shader version token and source bytecode hash, adds a reusable fail-closed validator, and requires production DX11 census to consume only source-attested R266 semantics. NativeDrawPath, Draw and DrawIndexed remain unauthorized.",
+  "evidence": [
+    "pipeline_translation.hpp carries R265 versionToken/sourceBytecodeHash in R266 semantics and declares validate_programmable_shader_register_semantics.",
+    "pipeline_translation.cpp populates provenance and validates stage/version/source-hash/instruction-count identity against the exact R265 decode.",
+    "runtime_census.cpp records registerSemanticsExact only when the R270 provenance validator passes.",
+    "dx11_constant_buffer_probe covers positive source-attested VS/PS semantics and rejects a stale detached R266 receipt.",
+    "verify_dx11_source_graph.py seals the R270 source/test/census contract.",
+    "Backend Conversion Gate 37433475875 succeeded on exact SHA dd8524e3b3fc60178790f5c7007cd227a634ad2b; validate job 112169945666 and DX11 readiness smoke job 112171196783 both succeeded.",
+    "Artifact 11397513758 digest sha256:42c32a19bd1a0ba14b9a5503eee6da6830d4899f35e311e8def20c810584994f."
+  ],
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT at 591bd9f2a41556e95cf53c908cff190fbccb7c74; read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, prior run state, regression knowledge/history and Issue #14. N100 Remote Desktop was connected but monthly calls were exhausted, so no local workspace was used."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R269 already sealed R268 stage-linkage provenance into R263/census. The next smallest independent fail-closed gap was that R266 constant/sampler/register semantics lacked an explicit reusable R265 source-identity validator."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R270 source provenance fields/validator, production census enforcement, positive/stale regressions and source-graph guard; no translation activation or Draw routing changed."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA Backend Conversion Gate 37433475875 completed SUCCESS. validate job 112169945666 passed source graph, dormant activation, census, Win32 configure/build and binary verification. DX11 readiness smoke job 112171196783 passed including the constant-buffer probe carrying R270 regressions. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material lineage 0810d6ea8faab1e1d1a35f2c3ec84dc06a22f63c -> 55b6378da360a634b90bafdee46252b706f10307 -> 115766b972dfad3335ad7c1107e19d815ca1edbb -> 0f6f12482f93f9af2a5c58cfbc98ef18f92f284c -> dd8524e3b3fc60178790f5c7007cd227a634ad2b; every material commit contains [AUTO:CONVERSION-DX11-00408]."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static/source programmable semantic evidence only; no runtime candidate or binary payload is authorized."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "Durable run record and conversion-lane state persist exact validation-bearing SHA, Gate receipts, UNTESTED runtime status and exact next action."
+    }
+  },
+  "exact_next_action": "Under CONVERSION-DX11-00409, compose a fail-closed pair-level programmable source-semantic receipt that binds exact source-attested R266 VS/PS register semantics to the exact R268 interface-linkage receipt and R239 pair identity, exposing production census evidence for later R263 consumption without setting shaderTranslationExact or enabling NativeDrawPath/Draw/DrawIndexed.",
+  "status": "COMPLETE",
+  "implementation_commits": [
+    "0810d6ea8faab1e1d1a35f2c3ec84dc06a22f63c",
+    "55b6378da360a634b90bafdee46252b706f10307",
+    "115766b972dfad3335ad7c1107e19d815ca1edbb",
+    "0f6f12482f93f9af2a5c58cfbc98ef18f92f284c",
+    "dd8524e3b3fc60178790f5c7007cd227a634ad2b"
+  ],
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "validation": {
+    "exact_sha": "dd8524e3b3fc60178790f5c7007cd227a634ad2b",
+    "backend_conversion_gate": {
+      "run_id": 37433475875,
+      "conclusion": "success",
+      "validate_job_id": 112169945666,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112171196783,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11397513758,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-dd8524e3b3fc60178790f5c7007cd227a634ad2b",
+      "artifact_digest": "sha256:42c32a19bd1a0ba14b9a5503eee6da6830d4899f35e311e8def20c810584994f"
+    }
+  }
+}
