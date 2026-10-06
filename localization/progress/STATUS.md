@@ -2002,4 +2002,14 @@ Controller readable SOURCE/OLD/CLEAN/FINAL review: PASS for these new static can
 - Shared queue/backlog now advances these 16 rows only to producer-static-pass pending fresh independent C, renewed English-original/user JPG review, and NEW actual-game retest. No row is closed and no C approval is claimed.
 - RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_CONTROLLER_FINAL_QA.json.
+## 2026-10-06 23:14 KST — A145 q089 Game Over manual visual rework
+
+- Refreshed the live branch after concurrent B worker output and skipped all A144/PJR assets already waiting on fresh C.
+- Current C-pass comparison card 023_q089_43B07A77.jpg exposed an ordered-gate visual false negative: Korean 게임 오버 was materially undersized versus English Game Over and readable italic/slant was too weak/upright.
+- Reopened only q089. GitHub-hosted A worker reused the validated native-HD clean plate and native-HD Korean effect raster, restored source-relative hierarchy and readable right lean, and wrote exact-header RGBA32 DDS bytes. Candidate d2311d4c20327363bacf8b336e925e527ef8c5c8f13a385b0a2fb2e25a946cbc -> 741a05cb632e85a4fea783e51bb2f98678c0510f8b34fc7a73cc39c898c0749c.
+- Source bbox [1,13,1494,251] (1493x238); old localized bbox [337,21,1157,243]; A145 bbox [122,19,1372,245] (1250x226), positive margins. Changed pixels outside source bbox=0; alpha changes outside=0; DDS header and RGBA roundtrip exact.
+- Controller inspected SOURCE / OLD / A145 in both readable FLIP-Y and RAW orientation: source-direction right lean and hierarchy are restored, Hangul/effects remain intact, and no clipping/residue/protected-art intrusion is visible.
+- Ordered rework gate 1-8: producer PASS. Prior C104 PASS is superseded for q089 because candidate bytes changed; fresh independent C and regenerated English-original comparison are required before in-game testing.
+- RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_A/20261006-A-MANUALQA145-43B07A77/A145_43B07A77_REPORT.json and A145_CONTROLLER_FINAL_QA.json.
 

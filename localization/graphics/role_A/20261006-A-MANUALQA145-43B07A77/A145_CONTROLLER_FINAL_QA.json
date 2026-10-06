@@ -1,0 +1,64 @@
+{
+  "run": "A145",
+  "timestamp_kst": "2026-10-06 23:14 KST",
+  "role": "A",
+  "queue_index": 89,
+  "asset": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/023_q089_43B07A77.jpg",
+  "prior_c_status": "C104_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "prior_candidate_sha256": "d2311d4c20327363bacf8b336e925e527ef8c5c8f13a385b0a2fb2e25a946cbc",
+  "candidate_sha256": "741a05cb632e85a4fea783e51bb2f98678c0510f8b34fc7a73cc39c898c0749c",
+  "worker_output_commit": "112c657b257f25013d60981a9a272d6faf2e4c87",
+  "defects": [
+    "TEXT_SCALE_TOO_SMALL_VS_SOURCE",
+    "WRONG_OR_WEAK_SLANT_DIRECTION",
+    "SOURCE_HIERARCHY_MISMATCH"
+  ],
+  "source_bbox": [
+    1,
+    13,
+    1494,
+    251
+  ],
+  "prior_localized_bbox": [
+    337,
+    21,
+    1157,
+    243
+  ],
+  "localized_bbox": [
+    122,
+    19,
+    1372,
+    245
+  ],
+  "source_size": [
+    1493,
+    238
+  ],
+  "localized_size": [
+    1250,
+    226
+  ],
+  "ordered_generation_gate": {
+    "1_source_text_removed_and_plate_restored": "PASS_INHERITED_VALIDATED_CLEAN_PLATE",
+    "2_source_matching_slant_direction": "PASS_CONTROLLER_VISUAL",
+    "3_no_unnecessary_undersizing": "PASS_SOURCE_RELATIVE_HIERARCHY_RESTORED",
+    "4_source_faithful_weight_outline_shadow": "PASS_PRESERVED_NATIVE_HD_EFFECT_RASTER",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGIN",
+    "6_protected_art_clearance": "PASS_CHANGED_PIXELS_OUTSIDE_SOURCE_BBOX_0",
+    "7_raw_and_flip_y": "PASS_CONTROLLER_VISUAL_BOTH",
+    "8_immediate_readability_vs_english": "PASS_CONTROLLER_VISUAL"
+  },
+  "machine_qa": {
+    "changed_pixels_outside_source_bbox": 0,
+    "alpha_changed_outside_source_bbox": 0,
+    "dds_header_128_exact": true,
+    "rgba32_roundtrip_exact": true
+  },
+  "controller_visual_qa": "PASS_SOURCE_OLD_NEW_READABLE_AND_RAW",
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_C",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
