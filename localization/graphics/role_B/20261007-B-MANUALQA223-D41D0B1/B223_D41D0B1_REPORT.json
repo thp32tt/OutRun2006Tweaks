@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B223",
+  "queue_index": 112,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+  "trigger": "STRICT_PRE_INGAME_8_STEP_VISUAL_FALSE_NEGATIVE_UNDERSIZED_MULTI_LINE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/014_q112_D41D0B1.jpg",
+  "prior_c_status": "C127_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "source_sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+  "before_sha256": "0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80",
+  "candidate_sha256": "7714bd71b38bd38852ce6497695d872d7ba6b669fd2c6efdb43ba87dd1f3734d",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+  "defects": [
+    "MULTI_LINE_TEXT_HIERARCHY_UNDERSIZED",
+    "SOURCE_RELATIVE_WIDTH_TOO_WEAK"
+  ],
+  "method": "exact pinned 2048x256 DXT5 source + B43/C127 validated clean plate; fresh native Noto Sans CJK KR Black 83px, source white/navy family and readable right slant; each Korean line widened from fresh native raster to 0.80x exact corresponding source width while preserving independent line centers and source height ceiling; only fully allowed BC3 blocks replaced, partial boundary blocks preserved from C127",
+  "structure": {
+    "width": 2048,
+    "height": 256,
+    "format": "DXT5",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_128_exact": true
+  },
+  "rows": [
+    {
+      "n": 1,
+      "source": "Try to reach the goal",
+      "korean": "여자친구와 함께",
+      "original_bbox": [
+        435,
+        19,
+        1346,
+        122
+      ],
+      "source_size": [
+        911,
+        103
+      ],
+      "prior_localized_bbox": [
+        604,
+        23,
+        1176,
+        117
+      ],
+      "prior_localized_size": [
+        572,
+        94
+      ],
+      "localized_bbox": [
+        526,
+        22,
+        1255,
+        118
+      ],
+      "localized_size": [
+        729,
+        96
+      ],
+      "margins": [
+        91,
+        91,
+        3,
+        4
+      ],
+      "width_source_ratio": 0.8002,
+      "height_source_ratio": 0.932,
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 83,
+      "stroke_width": 8,
+      "slant": 0.31,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_localized_bbox": [
+        526,
+        22,
+        1255,
+        118
+      ],
+      "decoded_localized_size": [
+        729,
+        96
+      ],
+      "decoded_margins": [
+        91,
+        91,
+        3,
+        4
+      ],
+      "decoded_containment": "PASS",
+      "decoded_size_ceiling": "PASS"
+    },
+    {
+      "n": 2,
+      "source": "with your girlfriend.",
+      "korean": "골에 도착하세요.",
+      "original_bbox": [
+        499,
+        122,
+        1357,
+        238
+      ],
+      "source_size": [
+        858,
+        116
+      ],
+      "prior_localized_bbox": [
+        638,
+        132,
+        1218,
+        228
+      ],
+      "prior_localized_size": [
+        580,
+        96
+      ],
+      "localized_bbox": [
+        585,
+        132,
+        1271,
+        228
+      ],
+      "localized_size": [
+        686,
+        96
+      ],
+      "margins": [
+        86,
+        86,
+        10,
+        10
+      ],
+      "width_source_ratio": 0.7995,
+      "height_source_ratio": 0.8276,
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_face_index": 1,
+      "font_style": "Black,Regular",
+      "font_size": 83,
+      "stroke_width": 8,
+      "slant": 0.31,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_localized_bbox": [
+        585,
+        132,
+        1270,
+        228
+      ],
+      "decoded_localized_size": [
+        685,
+        96
+      ],
+      "decoded_margins": [
+        86,
+        87,
+        10,
+        10
+      ],
+      "decoded_containment": "PASS",
+      "decoded_size_ceiling": "PASS"
+    }
+  ],
+  "machine_qa": {
+    "bbox_source_size_positive_margin": "2/2 PASS",
+    "decoded_row_gap": 14,
+    "candidate_changes_outside_two_exact_source_bboxes": 0,
+    "alpha_changes_outside_two_exact_source_bboxes": 0,
+    "source_residue_pixels_alpha_gt16_outside_2px_target_guard": 0,
+    "localized_overlap_pixels": 0,
+    "changed_full_bc3_blocks": 9048,
+    "header_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_INHERITED_B43_C127_VALIDATED_CLEAN_REVALIDATED",
+    "2_slant_direction": "PASS_SOURCE_RIGHT_LEAN_0_31_READABLE",
+    "3_no_unnecessary_undersizing": "PASS_WIDTH_HIERARCHY_RESTORED_TO_0_80_SOURCE",
+    "4_source_weight_outline_shadow": "PASS_SHARED_WHITE_NAVY_83PX_8PX",
+    "5_no_clipping": "PASS_2_OF_2_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_CHANGE_OUTSIDE_EXACT_SOURCE_BBOXES",
+    "7_flip_y_raw": "PASS_EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "B223_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

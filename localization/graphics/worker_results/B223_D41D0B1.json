@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "B223",
+  "queue_index": 112,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+  "candidate_sha256": "7714bd71b38bd38852ce6497695d872d7ba6b669fd2c6efdb43ba87dd1f3734d",
+  "report": "localization/graphics/role_B/20261007-B-MANUALQA223-D41D0B1/B223_D41D0B1_REPORT.json",
+  "status": "B223_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "runtime_validation": "UNTESTED"
+}
