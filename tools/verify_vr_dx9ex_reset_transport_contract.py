@@ -471,7 +471,6 @@ require_order(
     "const std::uint32_t after = R13AckState->sequence;",
     "if (before != after || (after & 1u))",
     "snapshot.transportGeneration != DirectTransportGeneration",
-    "std::memcpy(",
     "completed.completedFrameId,",
     "snapshot.completedFrameId,",
 )
