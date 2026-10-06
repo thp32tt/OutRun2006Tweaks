@@ -2,9 +2,10 @@
   "run": "20261006-A-PRODUCTION107-590A4724",
   "index": 103,
   "asset": "590A4724",
-  "candidate_sha256": "17a9a26a6200308ce5cc4a77b8a2b39cacc39e8d743359de5cf5be6de0a1a229",
+  "candidate_sha256": "86cd432ae929deed545f39fa9c91210057a81ee5456eb7202342932e351e7a06",
   "bbox_size_positive_margin": "1/1 PASS",
-  "outside": 0,
+  "clean_outside": 0,
+  "final_outside": 0,
   "alpha_outside": 0,
   "status": "A107_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
   "report": "localization/graphics/role_A/20261006-A-PRODUCTION107-590A4724/A107_590A4724_REPORT.json"
