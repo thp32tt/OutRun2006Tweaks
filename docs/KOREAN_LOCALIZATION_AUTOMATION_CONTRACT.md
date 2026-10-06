@@ -173,3 +173,34 @@ Before any graphics asset that has reached independent C static PASS is treated 
 - A/B rework after such a rejection MUST materially change the candidate or exact rendering evidence; merely changing status/notes or re-running the old bytes is not completion.
 
 - This JPG review is a pre-in-game human gate only. It does not replace actual in-game validation and must not close RUNTIME_VALIDATION.
+
+
+## C third-stage strict QA fallback
+
+When normal actionable work is exhausted, C MUST not idle or declare the graphics stream complete merely because current candidates already have an independent C static PASS. Instead, C enters **C3_STRICT_AUDIT**, a third-stage fail-closed QA pass over previously C-approved graphics.
+
+### Trigger and target set
+- Trigger only after the current C invocation has refreshed Git and confirmed there is no higher-priority fresh A/B candidate, user in-game regression, C-returned rework, or pending independent C review that it can safely process first.
+- The target set is graphics whose **current bytes** have a valid independent C static PASS. Superseded/reopened candidates, A/B-only PASS, and candidates awaiting fresh C are not eligible until they receive a new C PASS.
+- Audit the least-recently third-stage-reviewed eligible C-pass asset first so the whole C-pass set is eventually covered. Do not repeatedly audit the same unchanged bytes while other eligible C-pass assets remain unaudited.
+- A changed candidate SHA, changed canonical English source/clean-plate evidence, new user/JPG/in-game defect, or changed quality policy invalidates any earlier third-stage result for the affected asset and makes it eligible again.
+- This is QA evidence, not a new scheduler or production queue. Existing asset_queue.csv remains authoritative for work state.
+
+### Mandatory C3_STRICT_AUDIT visual priorities
+C3 MUST compare the canonical English source, verified clean plate, and current Korean candidate at matched decoded dimensions. Review readable/FLIP-Y orientation, RAW DDS orientation, practical game scale, and high zoom. Give extra scrutiny to:
+1. **Slant / perspective direction** — Korean text must lean in the same readable visual direction and with a source-faithful amount of slant/perspective. Opposite lean, accidental upright text, excessive lean, or per-line inconsistency is FAIL.
+2. **Clean plate / source removal** — the pre-render plate must look naturally reconstructed with no English/source-script residue, blur/smear, ghosting, patch rectangle, donor seam, wrong texture, damaged graphic, or alpha discontinuity. A merely hidden/blurred original is FAIL.
+3. **Original-font/style fidelity** — compare font-family impression, condensed/wide proportion, weight, stroke character, corner/roundness character, capitalization-equivalent hierarchy, line hierarchy, spacing, alignment, baseline, gradient/fill, outline, shadow/glow and depth. The exact same font is not required when unavailable, but an obviously different family or visual weight is FAIL.
+4. **Scale and readability** — Korean must not be needlessly undersized or weak compared with the English source. It must remain immediately readable while still obeying the exact source glyph/effect bbox ceiling and all protected-art limits.
+5. **Glyph integrity** — no broken Hangul strokes, missing pixels, clipped antialias fringe, malformed syllables, jagged low-resolution upscaling, mixed-resolution font appearance, or partially erased glyph/effect pixels.
+6. **Protected-art separation** — zero overlap with vehicle/character graphics, names, icons, boxes, frames, neighboring labels, preserved English/song/brand artwork, or unrelated atlas content. Even a 1-pixel prohibited intrusion is FAIL.
+7. **Source-faithful placement** — preserve intended horizontal/vertical anchoring, baseline, line spacing, per-line scale hierarchy and plate relationship. Numeric bbox containment alone does not make visibly misplaced text acceptable.
+8. **FLIP-Y and RAW consistency** — both views must be clean and semantically correct. A candidate that looks correct only in one orientation is FAIL.
+
+### Third-stage decision rules
+- **Visual evidence outranks machine PASS.** Zero-overlap, bbox, mask, header, roundtrip or other numeric success can never override a visible defect found in C3.
+- If any mandatory C3 item fails, immediately supersede the prior C PASS for the current bytes and return the asset as `REWORK_REQUIRED` with the exact visual defect and source-vs-candidate evidence. A/B must then rework it before it can regain C approval.
+- If evidence is ambiguous, the source is not exact, or BC/DXT decoded-pixel proof is insufficient, use `HOLD_STRICT_RECHECK`, never PASS.
+- Use `C3_STRICT_PASS` only when all ordered visual checks and the existing numeric/containment gates pass for the same candidate SHA.
+- C3_STRICT_PASS is **not** runtime validation and does not close any user in-game backlog. Keep `RUNTIME_VALIDATION=UNTESTED` or the existing pending-in-game state until an actual game retest exists.
+- Record candidate SHA, canonical source SHA/provenance, clean-plate evidence, prior C-pass provenance, FLIP-Y+RAW review evidence, C3 result and failure reason in the C role report/WORKLOG. Third-stage PASS is QA hardening, not a new production completion and must not be counted as a newly produced DDS.
