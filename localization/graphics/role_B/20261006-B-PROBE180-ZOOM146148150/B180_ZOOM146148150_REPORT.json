@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PROBE180-ZOOM146148150",
+  "base_head": "c0f74cb4362fae3f546853e87d28013a23a21426",
+  "purpose": "Next even zoom_review batch after B177/B179 fail-closed index62 and preserve classifications 136/144.",
+  "items": [
+    {
+      "queue_index": 146,
+      "asset": "39018963",
+      "queue_filename": "39018963_512x256.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/39018963_512x256.dds",
+      "source_sha256": "a71fb9ee0537bf9658f4822d9c543afe325232fa9843b405101cf443065424f3",
+      "dds": {
+        "width": 2048,
+        "height": 1024,
+        "mipmaps": 1,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "bpp": 32
+      },
+      "raw_orientation": "mirror_y",
+      "readable_evidence": "localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_39018963_READABLE.png",
+      "raw_evidence": "localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_39018963_RAW.png",
+      "controller_classification": "PENDING_CONTROLLER_VISUAL_REVIEW"
+    },
+    {
+      "queue_index": 148,
+      "asset": "3AE1BB60",
+      "queue_filename": "3AE1BB60_256x256.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/3AE1BB60_256x256.dds",
+      "source_sha256": "5f97816ab3b671b5638b1405f6967d621113b4d684a984fb6f1f1bd4af7636ec",
+      "dds": {
+        "width": 1024,
+        "height": 1024,
+        "mipmaps": 1,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "bpp": 32
+      },
+      "raw_orientation": "mirror_y",
+      "readable_evidence": "localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_3AE1BB60_READABLE.png",
+      "raw_evidence": "localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_3AE1BB60_RAW.png",
+      "controller_classification": "PENDING_CONTROLLER_VISUAL_REVIEW"
+    },
+    {
+      "queue_index": 150,
+      "asset": "40A4D914",
+      "queue_filename": "40A4D914_256x128.dds",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/40A4D914_256x128.dds",
+      "source_sha256": "53550412ab3565e24a64cc8840cbe2ec866f6dbd76204b34c9dab238bf273a64",
+      "dds": {
+        "width": 1024,
+        "height": 512,
+        "mipmaps": 1,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "bpp": 32
+      },
+      "raw_orientation": "mirror_y",
+      "readable_evidence": "localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_40A4D914_READABLE.png",
+      "raw_evidence": "localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_40A4D914_RAW.png",
+      "controller_classification": "PENDING_CONTROLLER_VISUAL_REVIEW"
+    }
+  ],
+  "controller_visual_qa": "PENDING",
+  "candidate_written": false,
+  "runtime_validation": "UNTESTED",
+  "status": "B180_WORKER_PROBE_READY_FOR_CONTROLLER_CLASSIFICATION",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
