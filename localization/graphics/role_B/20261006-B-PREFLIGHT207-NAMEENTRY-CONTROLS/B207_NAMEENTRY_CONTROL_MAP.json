@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "run": "B207",
+  "role": "B",
+  "timestamp_kst": "2026-10-06T18:23:36+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "queue_index": 24,
+  "asset": "textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "inherited_a141": {
+    "source_commit": "aa7dc1f15826b96e3061077d636da65c08730105",
+    "win32_release_run": 37441155668,
+    "win32_release_artifact": 11401148429,
+    "korean_test_run": 37441155760,
+    "korean_test_artifact": 11401263208,
+    "result": "SUCCESS_INHERITED_NOT_REPEATED"
+  },
+  "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+  "findings": {
+    "character_selection_range": "0x00..0x25",
+    "selection_0x25_behavior": "remapped to table slot 0x24",
+    "unique_character_slots_per_page": 37,
+    "lookup_function_va": "0x468D40",
+    "page_state_offset": "object+0xEC",
+    "table_formula": "0x64C81B + page*0x25 + selection",
+    "edit_buffer_offset": "object+0x5F4",
+    "current_length_offset": "object+0x6F6",
+    "minimum_length_offset": "object+0x6F8",
+    "maximum_length_offset": "object+0x6FA",
+    "controls": {
+      "0x26": "BACKSPACE",
+      "0x27": "toggle base page1 / symbol page2",
+      "0x28": "toggle page1 / one-shot uppercase page3; page3 returns to page1 after one character",
+      "0x29": "toggle page1 / persistent uppercase page4",
+      "0x2A": "toggle page1 / legacy extended-byte page5",
+      "0x2B": "END/confirm after minimum-length check"
+    }
+  },
+  "decision": {
+    "safe_future_boundary": "Preserve control selections 0x26..0x2B; Korean composition may replace only the 0x00..0x25 character path before the legacy one-byte append, then use the A141 ASCII compatibility alias at confirmation.",
+    "dds_candidate": "NONE",
+    "why_hold": "The exact 66743AA8 visual sprite/cell to logical selection binding and the Korean Jamo/syllable layout are not yet proven; explicit local alias-to-Korean-name rendering is also still required."
+  },
+  "qa": {
+    "completed_work_repeated": false,
+    "candidate_written": false,
+    "runtime_source_changed": false,
+    "build_required": false,
+    "runtime_validation": "UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT",
+    "forbidden_domains_touched": []
+  },
+  "status": "B207_HOLD_SIDECAR_BUILD_PASS_CONTROLS_MAPPED_HANGUL_COMPOSITION_RENDER_REQUIRED"
+}
