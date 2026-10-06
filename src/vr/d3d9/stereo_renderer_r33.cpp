@@ -1069,7 +1069,7 @@ namespace OutRunVRStereo
 
                     R33ReportInstallResult(true);
                     spdlog::info(
-                        "VR R33 DISPATCH: final Reset/Present/DirectGPU/draw physical ownership READY; R32 is hook-free functional owner; direct R22 Reset + direct R13 Present/DirectGPU + R30 draw dispatch ACTIVE");
+                        "VR R33 DISPATCH: final Reset/Present/DirectGPU/draw physical ownership READY; R32 is hook-free functional owner; top-level telemetry counted once when enabled; direct R22 Reset + direct R13 Present/DirectGPU + R30 draw dispatch ACTIVE");
                     return 0;
                 }
                 Sleep(25);
