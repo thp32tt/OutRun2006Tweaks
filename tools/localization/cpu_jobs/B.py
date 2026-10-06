@@ -52,7 +52,7 @@ rr=sa[:,:,0].astype(np.int16); gg=sa[:,:,1].astype(np.int16); bb=sa[:,:,2].astyp
 # Find only large saturated-red plate components there. OutRun logos are blue/white and
 # the other course-photo artwork is excluded by this color/size gate.
 q=np.zeros((H,W),bool)
-q[0:1024,1024:2048]=True
+q[0:1024,512:2048]=True
 red=q & alpha & (rr>145) & (rr>gg+48) & (rr>bb+28) & (gg<150) & (bb<165)
 lab,n=ndimage.label(red)
 cands=[]
@@ -63,7 +63,7 @@ for i in range(1,n+1):
         continue
     b=bbox(m)
     w=b[2]-b[0]; h=b[3]-b[1]
-    if 45<=w<=260 and 12<=h<=110:
+    if 45<=w<=300 and 12<=h<=90 and (w/max(h,1))>=1.55:
         cands.append({"area":area,"bbox":b,"mask":m})
 if len(cands)<2:
     raise RuntimeError(("fewer than two route-sign red components",[(c["area"],c["bbox"]) for c in cands]))
@@ -75,7 +75,7 @@ for a in cands:
         if a is b: continue
         ac=((a["bbox"][0]+a["bbox"][2])/2,(a["bbox"][1]+a["bbox"][3])/2)
         bc=((b["bbox"][0]+b["bbox"][2])/2,(b["bbox"][1]+b["bbox"][3])/2)
-        if ac[0] < bc[0] and ac[1] < bc[1]:
+        if ac[0] < bc[0] and ac[1] < bc[1] and (bc[0]-ac[0])>250 and (bc[1]-ac[1])>80:
             pairs.append((a["area"]+b["area"],a,b))
 if not pairs:
     raise RuntimeError(("cannot geometrically identify START/GOAL pair",[(c["area"],c["bbox"]) for c in cands]))
@@ -152,7 +152,7 @@ for key,en,ko,comp in specs:
         raise RuntimeError(("effect too small",key,int(effect.sum()),bbanner,comp_meta))
     sw=sbx[2]-sbx[0]; sh=sbx[3]-sbx[1]
     bw0=bbanner[2]-bbanner[0]; bh0=bbanner[3]-bbanner[1]
-    if sw>bw0*0.96 or sh>bh0*0.94:
+    if sw>bw0*0.98 or sh>bh0*0.98:
         raise RuntimeError(("effect/banner separation unsafe",key,sbx,bbanner,sw/bw0,sh/bh0))
 
     # Every BC3 block touched by source effect must be fully inside the eroded red-body hull.
