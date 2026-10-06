@@ -464,10 +464,10 @@ namespace KoreanRuntime
     {
         // selection 10..35 == latin a..z on the stock page-1 byte table.
         constexpr char32_t map[26] = {
-            U'ㅁ', U'ㅠ', U'ㅊ', U'ㅇ', U'ㄷ', U'ㄹ', U'ㅎ',
-            U'ㅗ', U'ㅑ', U'ㅓ', U'ㅏ', U'ㅣ', U'ㅡ', U'ㅜ',
-            U'ㅐ', U'ㅔ', U'ㅂ', U'ㄱ', U'ㄴ', U'ㅅ', U'ㅕ',
-            U'ㅍ', U'ㅈ', U'ㅌ', U'ㅛ', U'ㅋ'
+            U'\u3141', U'\u3160', U'\u314A', U'\u3147', U'\u3137', U'\u3139', U'\u314E',
+            U'\u3157', U'\u3151', U'\u3153', U'\u314F', U'\u3163', U'\u3161', U'\u315C',
+            U'\u3150', U'\u3154', U'\u3142', U'\u3131', U'\u3134', U'\u3145', U'\u3155',
+            U'\u314D', U'\u3148', U'\u314C', U'\u315B', U'\u314B'
         };
         return selection >= 10 && selection <= 35 ? map[selection - 10] : U'\0';
     }
@@ -477,25 +477,25 @@ namespace KoreanRuntime
         const char32_t base = BaseJamoForLatinSelection(selection);
         switch (selection)
         {
-        case 14: return U'ㄸ'; // e
-        case 24: return U'ㅒ'; // o
-        case 25: return U'ㅖ'; // p
-        case 26: return U'ㅃ'; // q
-        case 27: return U'ㄲ'; // r
-        case 29: return U'ㅆ'; // t
-        case 32: return U'ㅉ'; // w
+        case 14: return U'\u3138'; // e
+        case 24: return U'\u3152'; // o
+        case 25: return U'\u3156'; // p
+        case 26: return U'\u3143'; // q
+        case 27: return U'\u3132'; // r
+        case 29: return U'\u3146'; // t
+        case 32: return U'\u3149'; // w
         default: return base;
         }
     }
 
-    static_assert(BaseJamoForLatinSelection(10) == U'ㅁ'); // A key
-    static_assert(BaseJamoForLatinSelection(26) == U'ㅂ'); // Q key
-    static_assert(BaseJamoForLatinSelection(35) == U'ㅋ'); // Z key
-    static_assert(ShiftedJamoForLatinSelection(26) == U'ㅃ');
-    static_assert(ShiftedJamoForLatinSelection(27) == U'ㄲ');
-    static_assert(ComposeHangulCodepoint(0, 0, 0) == U'가');
-    static_assert(ComposeHangulCodepoint(18, 0, 4) == U'한');
-    static_assert(ComposeHangulCodepoint(0, 18, 8) == U'글');
+    static_assert(BaseJamoForLatinSelection(10) == U'\u3141'); // A key
+    static_assert(BaseJamoForLatinSelection(26) == U'\u3142'); // Q key
+    static_assert(BaseJamoForLatinSelection(35) == U'\u314B'); // Z key
+    static_assert(ShiftedJamoForLatinSelection(26) == U'\u3143');
+    static_assert(ShiftedJamoForLatinSelection(27) == U'\u3132');
+    static_assert(ComposeHangulCodepoint(0, 0, 0) == U'\uAC00');
+    static_assert(ComposeHangulCodepoint(18, 0, 4) == U'\uD55C');
+    static_assert(ComposeHangulCodepoint(0, 18, 8) == U'\uAE00');
 
     class HangulNameComposer
     {
@@ -561,7 +561,7 @@ namespace KoreanRuntime
                 if (previousJungseong_ >= 0)
                 {
                     jungseong_ = previousJungseong_;
-                    previousJungseong_ = -1;
+                    previousJungseong_ = PreviousMedialState(jungseong_);
                 }
                 else
                 {
@@ -617,13 +617,13 @@ namespace KoreanRuntime
         {
             switch (jamo)
             {
-            case U'ㄱ': return 0;  case U'ㄲ': return 1;  case U'ㄴ': return 2;
-            case U'ㄷ': return 3;  case U'ㄸ': return 4;  case U'ㄹ': return 5;
-            case U'ㅁ': return 6;  case U'ㅂ': return 7;  case U'ㅃ': return 8;
-            case U'ㅅ': return 9;  case U'ㅆ': return 10; case U'ㅇ': return 11;
-            case U'ㅈ': return 12; case U'ㅉ': return 13; case U'ㅊ': return 14;
-            case U'ㅋ': return 15; case U'ㅌ': return 16; case U'ㅍ': return 17;
-            case U'ㅎ': return 18; default: return -1;
+            case U'\u3131': return 0;  case U'\u3132': return 1;  case U'\u3134': return 2;
+            case U'\u3137': return 3;  case U'\u3138': return 4;  case U'\u3139': return 5;
+            case U'\u3141': return 6;  case U'\u3142': return 7;  case U'\u3143': return 8;
+            case U'\u3145': return 9;  case U'\u3146': return 10; case U'\u3147': return 11;
+            case U'\u3148': return 12; case U'\u3149': return 13; case U'\u314A': return 14;
+            case U'\u314B': return 15; case U'\u314C': return 16; case U'\u314D': return 17;
+            case U'\u314E': return 18; default: return -1;
             }
         }
 
@@ -631,13 +631,13 @@ namespace KoreanRuntime
         {
             switch (jamo)
             {
-            case U'ㅏ': return 0;  case U'ㅐ': return 1;  case U'ㅑ': return 2;
-            case U'ㅒ': return 3;  case U'ㅓ': return 4;  case U'ㅔ': return 5;
-            case U'ㅕ': return 6;  case U'ㅖ': return 7;  case U'ㅗ': return 8;
-            case U'ㅘ': return 9;  case U'ㅙ': return 10; case U'ㅚ': return 11;
-            case U'ㅛ': return 12; case U'ㅜ': return 13; case U'ㅝ': return 14;
-            case U'ㅞ': return 15; case U'ㅟ': return 16; case U'ㅠ': return 17;
-            case U'ㅡ': return 18; case U'ㅢ': return 19; case U'ㅣ': return 20;
+            case U'\u314F': return 0;  case U'\u3150': return 1;  case U'\u3151': return 2;
+            case U'\u3152': return 3;  case U'\u3153': return 4;  case U'\u3154': return 5;
+            case U'\u3155': return 6;  case U'\u3156': return 7;  case U'\u3157': return 8;
+            case U'\u3158': return 9;  case U'\u3159': return 10; case U'\u315A': return 11;
+            case U'\u315B': return 12; case U'\u315C': return 13; case U'\u315D': return 14;
+            case U'\u315E': return 15; case U'\u315F': return 16; case U'\u3160': return 17;
+            case U'\u3161': return 18; case U'\u3162': return 19; case U'\u3163': return 20;
             default: return -1;
             }
         }
@@ -646,15 +646,15 @@ namespace KoreanRuntime
         {
             switch (jamo)
             {
-            case U'ㄱ': return 1;  case U'ㄲ': return 2;  case U'ㄳ': return 3;
-            case U'ㄴ': return 4;  case U'ㄵ': return 5;  case U'ㄶ': return 6;
-            case U'ㄷ': return 7;  case U'ㄹ': return 8;  case U'ㄺ': return 9;
-            case U'ㄻ': return 10; case U'ㄼ': return 11; case U'ㄽ': return 12;
-            case U'ㄾ': return 13; case U'ㄿ': return 14; case U'ㅀ': return 15;
-            case U'ㅁ': return 16; case U'ㅂ': return 17; case U'ㅄ': return 18;
-            case U'ㅅ': return 19; case U'ㅆ': return 20; case U'ㅇ': return 21;
-            case U'ㅈ': return 22; case U'ㅊ': return 23; case U'ㅋ': return 24;
-            case U'ㅌ': return 25; case U'ㅍ': return 26; case U'ㅎ': return 27;
+            case U'\u3131': return 1;  case U'\u3132': return 2;  case U'\u3133': return 3;
+            case U'\u3134': return 4;  case U'\u3135': return 5;  case U'\u3136': return 6;
+            case U'\u3137': return 7;  case U'\u3139': return 8;  case U'\u313A': return 9;
+            case U'\u313B': return 10; case U'\u313C': return 11; case U'\u313D': return 12;
+            case U'\u313E': return 13; case U'\u313F': return 14; case U'\u3140': return 15;
+            case U'\u3141': return 16; case U'\u3142': return 17; case U'\u3144': return 18;
+            case U'\u3145': return 19; case U'\u3146': return 20; case U'\u3147': return 21;
+            case U'\u3148': return 22; case U'\u314A': return 23; case U'\u314B': return 24;
+            case U'\u314C': return 25; case U'\u314D': return 26; case U'\u314E': return 27;
             default: return 0;
             }
         }
@@ -662,9 +662,9 @@ namespace KoreanRuntime
         static char32_t InitialCompatibilityJamo(int choseong)
         {
             constexpr char32_t map[19] = {
-                U'ㄱ', U'ㄲ', U'ㄴ', U'ㄷ', U'ㄸ', U'ㄹ', U'ㅁ',
-                U'ㅂ', U'ㅃ', U'ㅅ', U'ㅆ', U'ㅇ', U'ㅈ', U'ㅉ',
-                U'ㅊ', U'ㅋ', U'ㅌ', U'ㅍ', U'ㅎ'
+                U'\u3131', U'\u3132', U'\u3134', U'\u3137', U'\u3138', U'\u3139', U'\u3141',
+                U'\u3142', U'\u3143', U'\u3145', U'\u3146', U'\u3147', U'\u3148', U'\u3149',
+                U'\u314A', U'\u314B', U'\u314C', U'\u314D', U'\u314E'
             };
             return choseong >= 0 && choseong < 19 ? map[choseong] : U'\0';
         }
@@ -691,6 +691,23 @@ namespace KoreanRuntime
             if (left == 14 && right == 20) return 15;// ㅝ+ㅣ=ㅞ
             if (left == 18 && right == 20) return 19;// ㅡ+ㅣ=ㅢ
             return -1;
+        }
+
+        static int PreviousMedialState(int medial)
+        {
+            // Enables stepwise BACKSPACE for chained compound vowels:
+            // ㅙ -> ㅘ -> ㅗ, ㅞ -> ㅝ -> ㅜ, etc.
+            switch (medial)
+            {
+            case 9:  return 8;  // ㅘ -> ㅗ
+            case 10: return 8;  // direct ㅙ -> ㅗ (when prior history was not ㅘ)
+            case 11: return 8;  // ㅚ -> ㅗ
+            case 14: return 13; // ㅝ -> ㅜ
+            case 15: return 13; // direct ㅞ -> ㅜ (when prior history was not ㅝ)
+            case 16: return 13; // ㅟ -> ㅜ
+            case 19: return 18; // ㅢ -> ㅡ
+            default: return -1;
+            }
         }
 
         static int CombineFinal(int left, int right)
