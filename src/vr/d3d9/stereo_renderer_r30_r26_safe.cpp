@@ -1539,6 +1539,9 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticWorld =
                 OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+            const bool semanticProjectedWorld =
+                OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+                    semanticScope);
             const bool semanticOverlay2D =
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
@@ -1600,6 +1603,18 @@ namespace OutRunVRStereo
                                 (c64Node ? "OTHER" : "NONE"));
                     }
                 }
+            }
+
+            // The exact projected route requires both explicit semantic
+            // ownership and the recovered Calc3D2D payload on this queue node.
+            // ProducerToken remains diagnostic-only and never grants ownership.
+            if (semanticProjectedWorld)
+            {
+                const auto* marker =
+                    OutRunVR::GameSemantic::CurrentProjectedMarker();
+                return marker && marker->valid
+                    ? R30ScreenSpaceKind::ProjectedWorldMarker2D
+                    : R30ScreenSpaceKind::None;
             }
 
             // R50: canonical queue membership proves generic 2D ownership but
