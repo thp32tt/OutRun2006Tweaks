@@ -1,0 +1,626 @@
+{
+  "schema_version": 1,
+  "count": 62,
+  "items": [
+    {
+      "number": 1,
+      "queue_index": 12,
+      "asset_key": "D6DC1380",
+      "asset_path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+      "artwork_status": "c85_pixel_visual_pass_pending_ingame",
+      "jpg": "001_q012_D6DC1380.jpg",
+      "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 2,
+      "queue_index": 26,
+      "asset_key": "63C91067",
+      "asset_path": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+      "artwork_status": "c193_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "002_q026_63C91067.jpg",
+      "candidate_sha256": "4b3dfe4986302c47f1332ebb27315b7cebfdf746e681e1655195963408289ab4",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 3,
+      "queue_index": 28,
+      "asset_key": "A05BF610",
+      "asset_path": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+      "artwork_status": "c178_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "003_q028_A05BF610.jpg",
+      "candidate_sha256": "bb2510327952114bcca67c004748240aa1f3c8f526a866e3ef31affe51bdbbc8",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 4,
+      "queue_index": 30,
+      "asset_key": "8215FD25",
+      "asset_path": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+      "artwork_status": "c202_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "004_q030_8215FD25.jpg",
+      "candidate_sha256": "cb023fa5533b4a058c437c1a879b2952a7268308e47202f7dced32c6a563e141",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 5,
+      "queue_index": 32,
+      "asset_key": "DCC7B488",
+      "asset_path": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+      "artwork_status": "c206_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "005_q032_DCC7B488.jpg",
+      "candidate_sha256": "958a69de83c05be292336735fb30b002a19a4fc788ce371138a3454651cf4d14",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 6,
+      "queue_index": 34,
+      "asset_key": "B7E25BAD",
+      "asset_path": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+      "artwork_status": "c209_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "006_q034_B7E25BAD.jpg",
+      "candidate_sha256": "7aea9077a236d6897e0944d71e795cbd5f6aba3852aa95853151eee3f6012800",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 7,
+      "queue_index": 36,
+      "asset_key": "06AB5CEE",
+      "asset_path": "textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+      "artwork_status": "c215_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "007_q036_06AB5CEE.jpg",
+      "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 8,
+      "queue_index": 38,
+      "asset_key": "6AB5CEE",
+      "asset_path": "textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+      "artwork_status": "b173_exact_alias_of_c215_pass_pending_ingame",
+      "jpg": "008_q038_6AB5CEE.jpg",
+      "candidate_sha256": "0b430a505c28b496fa2294326ac9dbc41821e5ddac5b830d348e11d1b67c39e5",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 9,
+      "queue_index": 43,
+      "asset_key": "455717B2",
+      "asset_path": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+      "artwork_status": "c104_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "009_q043_455717B2.jpg",
+      "candidate_sha256": "50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 10,
+      "queue_index": 44,
+      "asset_key": "19CEDB9",
+      "asset_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "artwork_status": "c90_pixel_visual_pass_pending_ingame",
+      "jpg": "010_q044_19CEDB9.jpg",
+      "candidate_sha256": "3090f2664bab3065502b10a98f93d17e92a64a3725dc1b7a4bb790648a5da6e7",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 11,
+      "queue_index": 46,
+      "asset_key": "AA04D779",
+      "asset_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+      "artwork_status": "c_userpolicy02_pass_pending_ingame",
+      "jpg": "011_q046_AA04D779.jpg",
+      "candidate_sha256": "93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 12,
+      "queue_index": 47,
+      "asset_key": "AD720950",
+      "asset_path": "textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+      "artwork_status": "c109_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "012_q047_AD720950.jpg",
+      "candidate_sha256": "6dad37489e7027b8f546c38b3729167697965fc8e33fcabff46f09aba1677955",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 13,
+      "queue_index": 50,
+      "asset_key": "CBF8ECBF",
+      "asset_path": "textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+      "artwork_status": "c104_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "013_q050_CBF8ECBF.jpg",
+      "candidate_sha256": "ecc4cbb6cdc064d2c7ccccfc378569f1dc7fc8339c46330ec68ec81c8f899df1",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 14,
+      "queue_index": 51,
+      "asset_key": "FF2462BB",
+      "asset_path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+      "artwork_status": "c_userpolicy02_pass_pending_ingame",
+      "jpg": "014_q051_FF2462BB.jpg",
+      "candidate_sha256": "9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 15,
+      "queue_index": 53,
+      "asset_key": "568D3696",
+      "asset_path": "textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+      "artwork_status": "c_userpolicy02_pass_pending_ingame",
+      "jpg": "015_q053_568D3696.jpg",
+      "candidate_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 16,
+      "queue_index": 54,
+      "asset_key": "FA7BBB13",
+      "asset_path": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+      "artwork_status": "c_userpolicy02_pass_pending_ingame",
+      "jpg": "016_q054_FA7BBB13.jpg",
+      "candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 17,
+      "queue_index": 55,
+      "asset_key": "2EA557B4",
+      "asset_path": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+      "artwork_status": "c164_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "017_q055_2EA557B4.jpg",
+      "candidate_sha256": "b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 18,
+      "queue_index": 57,
+      "asset_key": "39229D64",
+      "asset_path": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+      "artwork_status": "c108_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "018_q057_39229D64.jpg",
+      "candidate_sha256": "dbd97d30d1e14df102d5c90c5ef5e339a93a934c4b10b71e2b30fbf76db2b8f8",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 19,
+      "queue_index": 59,
+      "asset_key": "7CE1CFC5",
+      "asset_path": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+      "artwork_status": "c162_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "019_q059_7CE1CFC5.jpg",
+      "candidate_sha256": "b75102588dc30ec828fdec765658d2e25cbcee9d972832bb70b527b372008542",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 20,
+      "queue_index": 61,
+      "asset_key": "C4A2937B",
+      "asset_path": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+      "artwork_status": "c85_pixel_visual_pass_pending_ingame",
+      "jpg": "020_q061_C4A2937B.jpg",
+      "candidate_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 21,
+      "queue_index": 65,
+      "asset_key": "EBEF6D20",
+      "asset_path": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+      "artwork_status": "c125_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "021_q065_EBEF6D20.jpg",
+      "candidate_sha256": "005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 22,
+      "queue_index": 86,
+      "asset_key": "C598919A",
+      "asset_path": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+      "artwork_status": "c194_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "022_q086_C598919A.jpg",
+      "candidate_sha256": "e3c3f78975b3dd582690a7f169c1aa364dd05e3846827340aae38631885b92bf",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 23,
+      "queue_index": 89,
+      "asset_key": "43B07A77",
+      "asset_path": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+      "artwork_status": "c104_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "023_q089_43B07A77.jpg",
+      "candidate_sha256": "d2311d4c20327363bacf8b336e925e527ef8c5c8f13a385b0a2fb2e25a946cbc",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 24,
+      "queue_index": 92,
+      "asset_key": "1A43E9D9",
+      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+      "artwork_status": "c125_static_pass_high_risk_edge_touch_pending_ingame",
+      "jpg": "024_q092_1A43E9D9.jpg",
+      "candidate_sha256": "601be9747c0cf03e89740786fe0782ec1e71f0e480ceb5e3d740637d048043b3",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 25,
+      "queue_index": 94,
+      "asset_key": "2DA43E41",
+      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+      "artwork_status": "c_userpolicy02_pass_pending_ingame",
+      "jpg": "025_q094_2DA43E41.jpg",
+      "candidate_sha256": "dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 26,
+      "queue_index": 97,
+      "asset_key": "411827E",
+      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+      "artwork_status": "c87_pixel_visual_pass_pending_ingame",
+      "jpg": "026_q097_411827E.jpg",
+      "candidate_sha256": "c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 27,
+      "queue_index": 98,
+      "asset_key": "42E618FD",
+      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+      "artwork_status": "c126_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "027_q098_42E618FD.jpg",
+      "candidate_sha256": "86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 28,
+      "queue_index": 100,
+      "asset_key": "53CE39D5",
+      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+      "artwork_status": "c117_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "028_q100_53CE39D5.jpg",
+      "candidate_sha256": "08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 29,
+      "queue_index": 101,
+      "asset_key": "560FA536",
+      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+      "artwork_status": "c180_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "029_q101_560FA536.jpg",
+      "candidate_sha256": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 30,
+      "queue_index": 102,
+      "asset_key": "571E78F3",
+      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+      "artwork_status": "c91_pixel_visual_pass_pending_ingame_high_risk_edge_touch",
+      "jpg": "030_q102_571E78F3.jpg",
+      "candidate_sha256": "c4f33f3d98b6d5873d8bb6438d5e649fdaa12c114ed8d34d22a7405d448fc186",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 31,
+      "queue_index": 104,
+      "asset_key": "62BEBF33",
+      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+      "artwork_status": "c91_pixel_visual_pass_pending_ingame",
+      "jpg": "031_q104_62BEBF33.jpg",
+      "candidate_sha256": "687ecaad8db7478f4964b11d082f86b21091507bef564cfde3adfb4a1a625e7d",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 32,
+      "queue_index": 107,
+      "asset_key": "841E796B",
+      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+      "artwork_status": "c103_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "032_q107_841E796B.jpg",
+      "candidate_sha256": "6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 33,
+      "queue_index": 111,
+      "asset_key": "C075FB49",
+      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+      "artwork_status": "c111_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "033_q111_C075FB49.jpg",
+      "candidate_sha256": "d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 34,
+      "queue_index": 112,
+      "asset_key": "D41D0B1",
+      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+      "artwork_status": "c127_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "034_q112_D41D0B1.jpg",
+      "candidate_sha256": "0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 35,
+      "queue_index": 116,
+      "asset_key": "E3FD08BE",
+      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+      "artwork_status": "c91_pixel_visual_pass_pending_ingame",
+      "jpg": "035_q116_E3FD08BE.jpg",
+      "candidate_sha256": "3fbf7b03834549de10277947043ca8dd15d05fd729cd8441174b74581b532c9f",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 36,
+      "queue_index": 128,
+      "asset_key": "12519155",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
+      "artwork_status": "c132_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "036_q128_12519155.jpg",
+      "candidate_sha256": "14bc44a69775206c5771023408d0752ee925542fda48359c14c4e5b2f767119d",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 37,
+      "queue_index": 130,
+      "asset_key": "1762489B",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+      "artwork_status": "c133_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "037_q130_1762489B.jpg",
+      "candidate_sha256": "324f677c4afc482ef3dbcf0cd226514a68847ee872d1eeda75b9311a9cb7a871",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 38,
+      "queue_index": 132,
+      "asset_key": "1F5FE6E9",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+      "artwork_status": "c139_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "038_q132_1F5FE6E9.jpg",
+      "candidate_sha256": "e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 39,
+      "queue_index": 133,
+      "asset_key": "25F697C6",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+      "artwork_status": "c188_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "039_q133_25F697C6.jpg",
+      "candidate_sha256": "08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 40,
+      "queue_index": 135,
+      "asset_key": "2B0863D6",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+      "artwork_status": "c109_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "040_q135_2B0863D6.jpg",
+      "candidate_sha256": "2f3e99f468367e056ee3c6edfdb412b1fe5f10f27387a463472b07aeaa335fbb",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 41,
+      "queue_index": 139,
+      "asset_key": "313DB8CB",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+      "artwork_status": "c116_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "041_q139_313DB8CB.jpg",
+      "candidate_sha256": "c44a9ccd62e2b78fb17ec10f7a50a6de32dc1a0f84a44f2595b3e7ffaa0cc0ea",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 42,
+      "queue_index": 140,
+      "asset_key": "31C58963",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+      "artwork_status": "c140_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "042_q140_31C58963.jpg",
+      "candidate_sha256": "ecc7efdde172f410c85207ecdc5bbfd5bac95c753341763ad6afb9a6a7f1b3f2",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 43,
+      "queue_index": 147,
+      "asset_key": "39BCA907",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "artwork_status": "c192_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "043_q147_39BCA907.jpg",
+      "candidate_sha256": "6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 44,
+      "queue_index": 152,
+      "asset_key": "49BB5FE5",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+      "artwork_status": "c213_preserve_original_policy_pass_no_candidate_required",
+      "jpg": "044_q152_49BB5FE5.jpg",
+      "candidate_sha256": "",
+      "source_kind": "policy_pass_no_candidate"
+    },
+    {
+      "number": 45,
+      "queue_index": 154,
+      "asset_key": "4D38BBB0",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+      "artwork_status": "c141_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "045_q154_4D38BBB0.jpg",
+      "candidate_sha256": "c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 46,
+      "queue_index": 159,
+      "asset_key": "4EDA9DE3",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+      "artwork_status": "c195_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "046_q159_4EDA9DE3.jpg",
+      "candidate_sha256": "8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 47,
+      "queue_index": 161,
+      "asset_key": "55B57CDE",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+      "artwork_status": "c201_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "047_q161_55B57CDE.jpg",
+      "candidate_sha256": "78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 48,
+      "queue_index": 163,
+      "asset_key": "59A79158",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+      "artwork_status": "c203_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "048_q163_59A79158.jpg",
+      "candidate_sha256": "1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 49,
+      "queue_index": 164,
+      "asset_key": "5B65E08C",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+      "artwork_status": "c108_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "049_q164_5B65E08C.jpg",
+      "candidate_sha256": "33da77625f6b6af22cab72db30394b6b8c0bdd78e9f9a6166f273d6fab4da609",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 50,
+      "queue_index": 175,
+      "asset_key": "754F0599",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+      "artwork_status": "c171_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "050_q175_754F0599.jpg",
+      "candidate_sha256": "884f333b7217fd975aec1c1fc81c98bfd4287e52dc60255eb6b06803430b2250",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 51,
+      "queue_index": 195,
+      "asset_key": "9CE4E175",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+      "artwork_status": "c125_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "051_q195_9CE4E175.jpg",
+      "candidate_sha256": "cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 52,
+      "queue_index": 197,
+      "asset_key": "9F060EC1",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+      "artwork_status": "c85_pixel_visual_pass_pending_ingame",
+      "jpg": "052_q197_9F060EC1.jpg",
+      "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 53,
+      "queue_index": 198,
+      "asset_key": "9FC88069",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+      "artwork_status": "c150_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "053_q198_9FC88069.jpg",
+      "candidate_sha256": "34e7a924b46c98b0b714d6bebd40f7e94d352a26de269816e421db5242ad819c",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 54,
+      "queue_index": 205,
+      "asset_key": "ACF61D7C",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+      "artwork_status": "c217_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "054_q205_ACF61D7C.jpg",
+      "candidate_sha256": "2bbb9d19a833fb6c9ade243eb70132ef5ce46150d1fa1cb9423ff4e5101b770c",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 55,
+      "queue_index": 215,
+      "asset_key": "C05E67EF",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+      "artwork_status": "c218_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "055_q215_C05E67EF.jpg",
+      "candidate_sha256": "0a0c8c9006dc7d45a10de8fd2927b56ba1fb1af77315db213f4acabe5c3cd05b",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 56,
+      "queue_index": 222,
+      "asset_key": "DDF0392A",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+      "artwork_status": "c159_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "056_q222_DDF0392A.jpg",
+      "candidate_sha256": "e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 57,
+      "queue_index": 226,
+      "asset_key": "E3F4BA07",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+      "artwork_status": "c143_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "057_q226_E3F4BA07.jpg",
+      "candidate_sha256": "1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 58,
+      "queue_index": 228,
+      "asset_key": "E7F6E9B7",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+      "artwork_status": "c144_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "058_q228_E7F6E9B7.jpg",
+      "candidate_sha256": "6e880cb7614531a95b5dcc8cda311423b8a6cbeaf6b7f6c2d0fc5befcca6d607",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 59,
+      "queue_index": 230,
+      "asset_key": "E95DA5",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+      "artwork_status": "c149_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "059_q230_E95DA5.jpg",
+      "candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 60,
+      "queue_index": 232,
+      "asset_key": "EBFC709F",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+      "artwork_status": "c135_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "060_q232_EBFC709F.jpg",
+      "candidate_sha256": "7404fa227035e2fa003f4fa13f1bd348a050317757d7761c9d638f5fc1a01da4",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 61,
+      "queue_index": 236,
+      "asset_key": "FEF70E85",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+      "artwork_status": "c153_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "061_q236_FEF70E85.jpg",
+      "candidate_sha256": "e6d12ebf9b48192067c3f31bad0ffcb81f5f77c7370f7d43dfd9a4d04df5d086",
+      "source_kind": "localized_candidate"
+    },
+    {
+      "number": 62,
+      "queue_index": 241,
+      "asset_key": "E1639D2E",
+      "asset_path": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+      "artwork_status": "c165_pixel_visual_policy_pass_pending_ingame",
+      "jpg": "062_q241_E1639D2E.jpg",
+      "candidate_sha256": "fe9bb931d94a13a44a08bcf61b6325c01080b462afff84f92c97205cbe0eea65",
+      "source_kind": "localized_candidate"
+    }
+  ]
+}
