@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-28T04:24:10Z",
+  "updatedUtc": "2026-10-06T04:22:54Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
-  "phase": "DX9Ex stabilization / dense-scene performance telemetry / downstream DX11-DXVK deferred",
+  "phase": "DX9Ex stabilization -> HMD baseline gate -> Architecture v3 migration -> downstream DX11/DXVK",
   "checkpoint": "C6_STATE",
   "policy": {
     "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host; vr-d3d9ex-focus is the active stabilization source of truth",
@@ -13,7 +13,7 @@
       "DXVK_DOWNSTREAM_PORT",
       "DX12_D3D9ON12_REFERENCE_ONLY"
     ],
-    "blockedBackendAction": "Keep this project on DX9Ex correctness, stability, and performance until the stable DX9Ex reference is accepted. Port proven fixes to DX11 Native and DXVK afterward. DX12/D3D9On12 remains reference-only unless explicitly reopened.",
+    "blockedBackendAction": "Keep DX11 Native and DXVK frozen during DX9Ex stabilization and the Architecture v3 live migration. After ARCH-V3-007 USER_RUNTIME_VERIFIED and ARCH-V3-008 handoff, port the proven common contract downstream. DX12/D3D9On12 remains reference-only unless explicitly reopened.",
     "genericBuildDisabled": true,
     "dedicatedWorkflow": ".github/workflows/vr-dx9ex-active.yml",
     "runtimeTesting": "Quest 3/VDXR DX9Ex gate: prioritize CORRECTNESS and D_PERF, including dense-building and sand/smoke/spray scenes. DX11/DXVK runtime validation is deferred until the DX9Ex reference is stable.",
@@ -83,7 +83,7 @@
       ],
       "productionIntegrationWip": 1,
       "maxParallelHmdExperimentSlots": 6,
-      "nonBlockingRule": "DX9Ex HUD/visual/performance/stability lanes may proceed independently, but downstream DX11/DXVK/DX12 work must not displace DX9Ex stabilization."
+      "nonBlockingRule": "DX9Ex HUD/visual/performance/stability lanes may proceed independently before the HMD baseline gate. Architecture v3 becomes the next active phase only through ARCH-V3-GATE-001. Downstream DX11/DXVK/DX12 work must not displace either phase."
     },
     "pcFastBuild": {
       "defaultMode": "INCREMENTAL",
@@ -116,6 +116,25 @@
       "rule": "READY is an instruction to act, not a parking state. Implement/validate/fix blockers in-run whenever HMD is not required.",
       "noIdleGate": true,
       "continueIndependentLaneWhileWaiting": true
+    },
+    "architectureV3Transition": {
+      "enabled": true,
+      "plan": "docs/VR_ARCH_V3_MIGRATION_PLAN.md",
+      "queueGate": "ARCH-V3-GATE-001",
+      "sequence": [
+        "ARCH-V3-001",
+        "ARCH-V3-002",
+        "ARCH-V3-003",
+        "ARCH-V3-004",
+        "ARCH-V3-005",
+        "ARCH-V3-006",
+        "ARCH-V3-007",
+        "ARCH-V3-008"
+      ],
+      "currentStatus": "HMD_GATED",
+      "currentAuthority": "IPC v2 live; IPC v3 test/shadow only until gate opens",
+      "autoTransitionRule": "After an exact Quest3/VDXR DX9Ex baseline is accepted and blocking P0 lifecycle/resource/reset/recenter/direct-transport regressions are cleared, promote ARCH-V3-001 to READY and execute the sequence in order. Do not manufacture filler if only HMD-gated work remains.",
+      "downstreamRule": "Keep DX11 Native and DXVK frozen until ARCH-V3-007 is USER_RUNTIME_VERIFIED and ARCH-V3-008 records the common-contract handoff."
     }
   },
   "runtimeEvidence": {
@@ -139,7 +158,7 @@
     "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
     "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
   ],
-  "nextAction": "Quest3/VDXR test the integrated DX9Ex build with VRTelemetry enabled through one dense-building section and one sand/smoke/spray section, upload the generated analysis ZIP, then use PERFORMANCE_SPIKES.csv plus frame/draw/primitive/particleLike/fenceWait evidence to choose the first optimization.",
+  "nextAction": "Continue the current bounded DX9Ex stability/frame-pacing/resource-lifetime queue until the exact Quest3/VDXR baseline gate is satisfied. Then follow docs/VR_ARCH_V3_MIGRATION_PLAN.md and ARCH-V3-001..008; do not start live v3 authority or downstream DX11/DXVK porting before the gate.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
