@@ -2161,3 +2161,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller readable + raw mirror_y review PASS for all three. All are PRESERVE_ORIGINAL_NO_LOCALIZATION; no DDS candidate was generated because none is required.
 - Index62 33491F83 remains MANUAL_RECONSTRUCTION_REQUIRED rather than weakening protected-art gates. Runtime validation is not applicable to this classification-only batch. VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_ZOOM146148150_REPORT.json; localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_CONTROLLER_CLASSIFICATION.json.
+
+## 2026-10-06 11:15 KST — A108/A109/A110 zoom-review reconcile
+
+- Re-read the automation contract and required state. No A-owned user in-game OPEN/REWORK row or C-returned directly repairable row superseded the current unfinished zoom-review chain, so completed A regression bytes were not repeated.
+- Consumed the existing A103/A109/A110 hosted probe evidence instead of opening duplicate preflight. Index103 `590A4724` contains `Normal Balance` and had already reached A108 producer self-QA PASS as `일반 밸런스`, candidate `bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178`.
+- A106/A107 were numeric-PASS but controller-visible failures/intermediates; A108 is the accepted result. This invocation detected that a later superseded A107 worker run had overwritten the shared candidate path, so it restored the exact A108 bytes from historical commit `5f5f87c41ce43ccdf205e9936a645d44690f01b2` without rerendering. Restore report proves prior SHA `86cd432a...` -> restored SHA `bfb50ebd...`.
+- A108 static result retained: 2048x2048 RGBA32, raw mirror_y, 1/1 bbox/source-size/positive-margin PASS, clean/final/alpha outside=0, localized overlap=0, controller SOURCE/CLEAN/FINAL + raw visual PASS. Independent C and in-game validation remain pending; runtime validation is UNTESTED.
+- Positively closed additional odd zoom rows as no-localization/preserve-original from readable + raw evidence: 151 `4668C688`, 153 `4C972A19`, 155 `4D49CA85`, 157 `4DF4D7CD`, 165 `5C98F2`, 169 `638F38C0`, 171 `67CE2848`. These contain course/photo/rank-card artwork and protected OutRun2/OutRun2SP logos but no language-bearing text.
+- Index177 `7978907D` contains OUTRUN2 cover/title artwork and song titles `Shiny World`, `Splash Wave`, `Night Flight`; per TRANSLATION_NAMING_POLICY all remain exact original English artwork.
+- Queue/transcriptions/artwork-plan/progress/resume synchronized for indices 103/151/153/155/157/165/169/171/177. Blocked zoom-review count reduced **25 -> 16**. Next normal A odd rows: 189, 191, 217, 219 unless higher-priority in-game/C-returned work appears.
+- VR/FFB/DX11/DXVK untouched.
