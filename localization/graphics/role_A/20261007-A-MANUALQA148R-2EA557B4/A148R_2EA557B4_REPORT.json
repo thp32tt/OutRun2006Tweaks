@@ -95,7 +95,7 @@
     127
   ],
   "width_gain_px": 0,
-  "width_ratio_vs_c164": 1.0,
+  "width_ratio_vs_c164": 1,
   "style_geometry": {
     "outer_navy_stroke": 9,
     "white_mid_stroke": 5,
@@ -202,11 +202,12 @@
     "source_faithful_weight_outline_shadow": "PASS_SOURCE_DERIVED",
     "clipping": "PASS_POSITIVE_MARGIN",
     "protected_art_clearance": "PASS_ZERO_OUTSIDE",
-    "flip_y_and_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
-    "immediate_readability": "PENDING_CONTROLLER"
+    "flip_y_and_raw": "PASS_CONTROLLER_VISUAL_BOTH",
+    "immediate_readability": "PASS_CONTROLLER_VISUAL"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_C164_A148R_READABLE_DETAIL_AND_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A148R_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "status": "A148R_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_qa": "localization/graphics/role_A/20261007-A-MANUALQA148R-2EA557B4/A148R_CONTROLLER_SELF_QA.json"
 }
