@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T17:50:03+09:00",
+  "updated_at_kst": "2026-10-06 17:34",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -2450,6 +2450,28 @@
       ],
       "controller_visual_qa": "PASS_EXPLICIT_READABLE_SLANT_DIRECTION_AND_RAW_3_OF_3",
       "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+    },
+    "a136_a139_user_jpg_visual_rework": {
+      "status": "STATIC_PASS_PENDING_C_AND_NEW_INGAME_RETEST",
+      "trigger": "User direct review of generated before/after JPG: broken glyph fragments, mostly reversed readable slant, and residual source/background traces remained.",
+      "visual_false_negatives_reopened": [
+        "IGR-008",
+        "IGR-011",
+        "IGR-012",
+        "IGR-014",
+        "IGR-015",
+        "IGR-016",
+        "IGR-018"
+      ],
+      "candidates": {
+        "37759842": "ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b",
+        "BF3EE5C6": "a7eb06e2441956f4418f4cc95da52313696bc13d7864f7c7f76c8efdf909f85d",
+        "FD90AA9": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+        "A064FDFC": "2d3d7fd7b612cee048067813f150d323be30483042010786168a90fa983386b6",
+        "48DEBE77": "f92629621d421e924a3f1b9d77252c551832824110e755325bcf0bf4a1af2ad0"
+      },
+      "qa": "Controller re-opened comparison JPGs and inspected new SOURCE/OLD/CLEAN/FINAL evidence at readable orientation. Corrected readable right lean; A139 removes START/GOAL source face/outline/shadow residue. Numeric gates: BF3 13/13, 3775 16/16, FD90 3/3, A064 2/2, 48DE 3/3; outside/protected/residue/overlap gates zero as applicable.",
+      "note": "B202/B203/B204 already-fixed 788CE557/B1696633/A064 Stage were not duplicated; A139 consumes/preserves B204 Stage. Runtime validation remains pending."
     }
   },
   "data_build": {
@@ -2695,18 +2717,5 @@
     },
     "runtime_validation": "PENDING_NEW_INGAME_RETEST"
   },
-  "current_pending_c": [
-    "33491F83",
-    "4F68708E",
-    "BA0147DA",
-    "8C259C68",
-    "D657C2EB",
-    "A9ABD877",
-    "97E863AD",
-    "6DC89C6E",
-    "E3C455FA",
-    "E596B7AC",
-    "EBE401C8",
-    "FF514CEB"
-  ]
+  "current_pending_c": "A136/A137/A138/A139 user-JPG visual rework batch plus existing producer candidates; C must independently revalidate. All affected in-game backlog rows remain open until a NEW actual game retest."
 }
