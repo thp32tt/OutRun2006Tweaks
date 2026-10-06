@@ -473,13 +473,23 @@ namespace WheelFFBMath
             (std::clamp(speedNorm, 0.0f, 1.0f) - 0.04f) / 0.30f);
         const float roadScale = std::clamp(roadSetting / 0.60f, 0.0f, 1.67f);
         const float gainScale = std::clamp(outputStrength / 0.70f, 0.0f, 2.0f);
-        // R13 hardware-log follow-up: Imperial Avenue still felt almost smooth
-        // even though the 0x2/0x800 brick/stone pattern was detected. Raise only
-        // this evidence-scoped floor; ordinary all-0x2 asphalt and generic rough
-        // roads keep their existing comfort scaling.
+        // R14/R15 hardware follow-up: 0.30 was too strong on the R3.
+        // Keep the continuous Imperial stone road clearly tactile but center it
+        // between the old weak ~0.18 tune and the over-strong ~0.30 tune.
         return std::clamp(
-            (0.160f + 0.140f * speedGate) * roadScale * gainScale,
-            0.0f, 0.32f);
+            (0.140f + 0.080f * speedGate) * roadScale * gainScale,
+            0.0f, 0.24f);
+    }
+
+    // Road texture is contact texture, so it must disappear when the car is
+    // stationary.  Apply this at the final road channel for every model rather
+    // than baking special stop logic into individual stage/material classifiers.
+    inline float road_motion_gate(float speedNorm)
+    {
+        if (!std::isfinite(speedNorm))
+            return 0.0f;
+        return smoothstep01(
+            (std::clamp(speedNorm, 0.0f, 1.0f) - 0.005f) / 0.075f);
     }
 
 
