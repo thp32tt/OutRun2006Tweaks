@@ -28,17 +28,8 @@ namespace OutRunVRStereo
 {
     namespace
     {
-        constexpr std::size_t CreateStateBlockVtableIndex = 59;
-        constexpr std::size_t BeginStateBlockVtableIndex = 60;
-        constexpr std::size_t EndStateBlockVtableIndex = 61;
-        constexpr std::size_t StateBlockApplyVtableIndex = 5;
         constexpr std::uint64_t LiveWvpValidationInterval = 16;
 
-        SafetyHookInline R31CreateStateBlockHook{};
-        SafetyHookInline R31BeginStateBlockHook{};
-        SafetyHookInline R31EndStateBlockHook{};
-        SafetyHookInline R31StateBlockApplyHook{};
-        void* R31StateBlockApplyTarget = nullptr;
 
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R31InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
@@ -50,7 +41,6 @@ namespace OutRunVRStereo
         std::uint64_t R31FastWorldValidationRejects = 0;
         std::uint64_t R31HudDraws = 0;
         bool R31FirstStateBlockLogged = false;
-        bool R31FirstAlternateStateBlockLogged = false;
 
         struct R31EyeTailCache
         {
@@ -432,113 +422,7 @@ namespace OutRunVRStereo
             }
         }
 
-        HRESULT __stdcall StateBlockApplyDestR31(IDirect3DStateBlock9* block)
-        {
-            const HRESULT hr = R31StateBlockApplyHook.stdcall<HRESULT>(block);
-            if (!block)
-                return hr;
-            IDirect3DDevice9* device = nullptr;
-            if (SUCCEEDED(block->GetDevice(&device)) && device)
-            {
-                if (IsGameDevice(device))
-                    OutRunVR::State::StateBlockEvents::NotifyApply(device, hr);
-                device->Release();
-            }
-            else
-            {
-                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-            }
-            return hr;
-        }
-
-        bool R31EnsureStateBlockApplyHook(IDirect3DStateBlock9* block) noexcept
-        {
-            if (!block)
-            {
-                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-                return false;
-            }
-            void** vtable = *reinterpret_cast<void***>(block);
-            if (!vtable)
-            {
-                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-                return false;
-            }
-
-            if (R31StateBlockApplyHook)
-            {
-                const bool reliable = R31CreateStateBlockHook &&
-                    R31BeginStateBlockHook && R31EndStateBlockHook &&
-                    !OutRunVR::State::StateBlockTracker::CoverageLost() &&
-                    R31StateBlockApplyTarget ==
-                        vtable[StateBlockApplyVtableIndex];
-                if (!reliable && R31StateBlockApplyTarget !=
-                        vtable[StateBlockApplyVtableIndex])
-                {
-                    OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-                    if (!R31FirstAlternateStateBlockLogged)
-                    {
-                        R31FirstAlternateStateBlockLogged = true;
-                        spdlog::warn(
-                            "VR R31 STATE: alternate StateBlock::Apply implementation observed; fast-path cache trust is disabled for the process");
-                    }
-                }
-                return reliable;
-            }
-            R31StateBlockApplyHook = safetyhook::create_inline(
-                vtable[StateBlockApplyVtableIndex], StateBlockApplyDestR31,
-                safetyhook::InlineHook::StartDisabled);
-            if (!R31StateBlockApplyHook ||
-                !R31StateBlockApplyHook.enable().has_value())
-            {
-                R31StateBlockApplyHook = {};
-                R31StateBlockApplyTarget = nullptr;
-                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-                spdlog::warn(
-                    "VR R31 STATE: could not hook StateBlock::Apply; per-draw live WVP/shader/render-state validation remains active");
-                return false;
-            }
-            R31StateBlockApplyTarget =
-                vtable[StateBlockApplyVtableIndex];
-            const bool reliable = R31CreateStateBlockHook &&
-                R31BeginStateBlockHook && R31EndStateBlockHook &&
-                !OutRunVR::State::StateBlockTracker::CoverageLost();
-            return reliable;
-        }
-
-        HRESULT __stdcall CreateStateBlockDestR31(IDirect3DDevice9* device,
-            D3DSTATEBLOCKTYPE type, IDirect3DStateBlock9** block)
-        {
-            const HRESULT hr = R31CreateStateBlockHook.stdcall<HRESULT>(
-                device, type, block);
-            if (SUCCEEDED(hr) && IsGameDevice(device) && block && *block)
-                R31EnsureStateBlockApplyHook(*block);
-            return hr;
-        }
-
-        HRESULT __stdcall BeginStateBlockDestR31(IDirect3DDevice9* device)
-        {
-            const HRESULT hr = R31BeginStateBlockHook.stdcall<HRESULT>(device);
-            if (SUCCEEDED(hr) && IsGameDevice(device) && !InternalStereoPass)
-                OutRunVR::State::StateBlockEvents::NotifyBegin(device);
-            return hr;
-        }
-
-        HRESULT __stdcall EndStateBlockDestR31(IDirect3DDevice9* device,
-            IDirect3DStateBlock9** block)
-        {
-            const HRESULT hr = R31EndStateBlockHook.stdcall<HRESULT>(device, block);
-            if (IsGameDevice(device) &&
-                (!InternalStereoPass || OutRunVR::State::StateBlockTracker::Recording()))
-            {
-                OutRunVR::State::StateBlockEvents::NotifyEnd(device, hr);
-                if (SUCCEEDED(hr) && block && *block)
-                    R31EnsureStateBlockApplyHook(*block);
-            }
-            return hr;
-        }
-
-                        DWORD WINAPI R31InstallThread(void*)
+        DWORD WINAPI R31InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
             R31InstallState.store(State::Pending, std::memory_order_release);
@@ -558,28 +442,9 @@ namespace OutRunVRStereo
 
                 if (r30 == State::Ready && renderer == State::Ready)
                 {
-                    const auto disabled = safetyhook::InlineHook::StartDisabled;
-                    bool fallbackEndArmed = false;
-                    bool fallbackBeginArmed = false;
-                    bool fallbackCreateArmed = false;
                     const auto failInstall = [&](const char* reason) noexcept
                     {
                         OutRunVR::State::StateBlockTracker::SetEventConsumerReady(false);
-                        if (fallbackCreateArmed)
-                        {
-                            R31CreateStateBlockHook = {};
-                            fallbackCreateArmed = false;
-                        }
-                        if (fallbackBeginArmed)
-                        {
-                            R31BeginStateBlockHook = {};
-                            fallbackBeginArmed = false;
-                        }
-                        if (fallbackEndArmed)
-                        {
-                            R31EndStateBlockHook = {};
-                            fallbackEndArmed = false;
-                        }
                         OutRunVR::State::StateBlockEvents::Clear();
                         OutRunVR::State::StateBlockRecovery::Clear();
                         OutRunVR::State::StateBlockTracker::MarkCoverageLost();
@@ -601,65 +466,18 @@ namespace OutRunVRStereo
                         failInstall("StateBlock event callbacks unavailable");
                         return 0;
                     }
-                    if (OutRunVR::State::StateBlockTracker::LifecycleHooksReady())
+                    const bool lifecycleReady =
+                        OutRunVR::State::StateBlockTracker::LifecycleHooksReady();
+                    if (lifecycleReady)
                     {
                         spdlog::info(
-                            "VR R31 STATE: R22 lifecycle hooks are authoritative; R31 physical StateBlock hooks are not installed");
+                            "VR R31 STATE: R22 lifecycle hooks are authoritative; R31 is event-consumer only");
                     }
                     else
                     {
-                        IDirect3DDevice9* const device =
-                            StereoInstalledDevice.load(std::memory_order_acquire);
-                        if (!device)
-                        {
-                            failInstall("fallback StateBlock owner has no installed device");
-                            return 0;
-                        }
-                        void** vtable = *reinterpret_cast<void***>(device);
-                        if (!vtable)
-                        {
-                            failInstall("fallback StateBlock owner has no device vtable");
-                            return 0;
-                        }
-
-                        R31CreateStateBlockHook = safetyhook::create_inline(
-                            vtable[CreateStateBlockVtableIndex],
-                            CreateStateBlockDestR31, disabled);
-                        R31BeginStateBlockHook = safetyhook::create_inline(
-                            vtable[BeginStateBlockVtableIndex],
-                            BeginStateBlockDestR31, disabled);
-                        R31EndStateBlockHook = safetyhook::create_inline(
-                            vtable[EndStateBlockVtableIndex],
-                            EndStateBlockDestR31, disabled);
-                        if (!R31CreateStateBlockHook ||
-                            !R31BeginStateBlockHook ||
-                            !R31EndStateBlockHook)
-                        {
-                            failInstall("fallback StateBlock hooks could not be created");
-                            return 0;
-                        }
-
-                        fallbackEndArmed = R31EndStateBlockHook.enable().has_value();
-                        if (!fallbackEndArmed)
-                        {
-                            failInstall("fallback EndStateBlock hook failed");
-                            return 0;
-                        }
-                        fallbackBeginArmed = R31BeginStateBlockHook.enable().has_value();
-                        if (!fallbackBeginArmed)
-                        {
-                            failInstall("fallback BeginStateBlock hook failed");
-                            return 0;
-                        }
-                        fallbackCreateArmed = R31CreateStateBlockHook.enable().has_value();
-                        if (!fallbackCreateArmed)
-                        {
-                            failInstall("fallback CreateStateBlock hook failed");
-                            return 0;
-                        }
-
-                        spdlog::info(
-                            "VR R31 STATE: R22 lifecycle coverage unavailable; R31 fallback StateBlock hooks armed");
+                        OutRunVR::State::StateBlockTracker::MarkCoverageLost();
+                        spdlog::warn(
+                            "VR R31 STATE: R22 lifecycle coverage unavailable; R31 physical StateBlock fallback retired; fast-path trust remains disabled");
                     }
 
                     OutRunVR::State::StateBlockTracker::SetEventConsumerReady(true);
