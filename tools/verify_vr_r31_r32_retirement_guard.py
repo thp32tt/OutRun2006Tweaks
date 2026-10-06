@@ -244,6 +244,7 @@ expected_owner_calls = {
     "R32ObserveFrameWorkload",
     "R32RestoreRightPassState",
     "R32WithPresentTelemetry",
+    "R32WithResetLifecycle",
     "R32SetWvpBatch",
 }
 observed_owner_calls = set(re.findall(r"\b(R3[12]\w+)\s*\(", r33))
@@ -337,6 +338,14 @@ owner_evidence = {
          "const HRESULT hr = lowerPresent();",
          "R32FinalizeFramePerf(",
          "R32LogPerfWindow()"),
+    ),
+    "R32WithResetLifecycle": (
+        r32, "HRESULT R32WithResetLifecycle(",
+        ("R32ClearPendingProducerFences();",
+         "const HRESULT hr = lowerReset();",
+         "R32ResetAfterGameReset();",
+         "R32InvalidateResetCaches();",
+         "++R32ResetFailures"),
     ),
     "R32SetWvpBatch": (
         r32, "bool R32SetWvpBatch(",
@@ -521,8 +530,9 @@ require(
     "static bool LifecycleHooksReady() noexcept",
 )
 
-# 2) R32 retains physical Reset/DirectGPU ownership plus Present telemetry and
-# fail-close helpers. Its former physical Present and draw overlays must be gone.
+# 2) R32 retains only physical DirectGPU ownership plus Reset/Present owner
+# helpers and fail-close helpers. Its former physical Reset/Present/draw
+# overlays must be gone.
 forbid(
     r32,
     "R32",
@@ -539,14 +549,16 @@ forbid(
     "R31OwnedResult R32TryHud(",
     "SafetyHookInline R32PresentR13Hook{};",
     "HRESULT __stdcall PresentDestR32(",
+    "SafetyHookInline R32ResetR22Hook{};",
+    "HRESULT __stdcall ResetDestR32(",
 )
 require(
     r32,
     "R32 lifecycle owner",
-    "SafetyHookInline R32ResetR22Hook{};",
     "SafetyHookInline R32ResolveDirectR13Hook{};",
     "void R32ObserveFrameWorkload(",
     "HRESULT R32WithPresentTelemetry(",
+    "HRESULT R32WithResetLifecycle(",
     "HRESULT R32LowerFailClosed(",
     "R32InstallStatus() noexcept",
     "R32EffectIsFragileLive(",
@@ -563,7 +575,6 @@ require(
     "const auto r13 = R13InstallStatus();",
     "r31 == State::Failed || r22 == State::Failed",
     "r31 == State::Ready && r22 == State::Ready",
-    "reinterpret_cast<void*>(&ResetDestR22), ResetDestR32, disabled",
     "reinterpret_cast<void*>(&ResolveDirectTransportR13)",
     "ResolveDirectTransportR32, disabled",
 )
@@ -577,11 +588,28 @@ forbid(
     "PresentDestR13",
     "PresentDestR32",
     "R32PresentR13Hook",
+    "ResetDestR22",
+    "ResetDestR32",
+    "R32ResetR22Hook",
 )
-reset32 = function_body(r32, "HRESULT __stdcall ResetDestR32(")
-if reset32.find("R32ResetR22Hook.stdcall<HRESULT>") > reset32.find(
-        "R32ResetAfterGameReset();"):
-    fail("R32 Reset must complete R22 before R32 rearm")
+reset_lifecycle = function_body(r32, "HRESULT R32WithResetLifecycle(")
+require(
+    reset_lifecycle,
+    "R32 Reset lifecycle owner",
+    "R32ClearPendingProducerFences();",
+    "const HRESULT hr = lowerReset();",
+    "R32ResetAfterGameReset();",
+    "R32InvalidateResetCaches();",
+    "++R32ResetFailures",
+)
+reset_clear = reset_lifecycle.find("R32ClearPendingProducerFences();")
+reset_lower = reset_lifecycle.find("const HRESULT hr = lowerReset();")
+reset_success = reset_lifecycle.find("R32ResetAfterGameReset();")
+reset_failure = reset_lifecycle.find("R32InvalidateResetCaches();", reset_lower)
+if min(reset_clear, reset_lower, reset_success, reset_failure) < 0 or not (
+        reset_clear < reset_lower < reset_success and
+        reset_lower < reset_failure):
+    fail("R32 Reset lifecycle must clear pending producer fences before lower R22 Reset and run success/failure cache handling only afterward")
 present_telemetry = function_body(r32, "HRESULT R32WithPresentTelemetry(")
 require(
     present_telemetry,
@@ -603,9 +631,9 @@ require(
     "R32FailClosedZeroDisparityDraws",
 )
 
-# 3) R33 is the sole physical Present/draw dispatcher. Reset intentionally
-# remains chained through R32; Present hooks R13 directly and keeps R32-owned
-# telemetry through one owner helper; all four draw families hook R30 directly.
+# 3) R33 is the sole upper physical Reset/Present/draw dispatcher. Reset hooks
+# R22 directly while preserving R32 lifecycle semantics through one owner helper;
+# Present hooks R13 directly with R32 telemetry; draws hook R30 directly.
 forbid(
     r33,
     "R33",
@@ -629,12 +657,31 @@ require(
     "reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR30)",
     "reinterpret_cast<void*>(&DrawPrimitiveUPDestR30)",
     "reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30)",
-    "R33ResetR32Hook.stdcall<HRESULT>",
+    "SafetyHookInline R33ResetR22Hook{};",
+    "reinterpret_cast<void*>(&ResetDestR22)",
+    "R32WithResetLifecycle(",
+    "R33ResetR22Hook.stdcall<HRESULT>",
     "SafetyHookInline R33PresentR13Hook{};",
     "reinterpret_cast<void*>(&PresentDestR13)",
     "R32WithPresentTelemetry(",
     "R33PresentR13Hook.stdcall<HRESULT>",
 )
+
+reset33 = function_body(r33, "HRESULT __stdcall ResetDestR33(")
+require(
+    reset33,
+    "R33 direct Reset owner",
+    "R32WithResetLifecycle(",
+    "R33ResetR22Hook.stdcall<HRESULT>",
+    "R33InvalidateDepthStencilCache();",
+    "R33SetResetReplayGuardState(",
+)
+if reset33.find("R32WithResetLifecycle(") > reset33.find(
+        "R33ResetR22Hook.stdcall<HRESULT>"):
+    fail("R32 Reset lifecycle helper must own the direct R22 Reset call")
+if reset33.find("R33ResetR22Hook.stdcall<HRESULT>") > reset33.find(
+        "R33InvalidateDepthStencilCache();"):
+    fail("R33 depth/replay post-processing must remain after the wrapped R22 Reset")
 
 present33 = function_body(r33, "HRESULT __stdcall PresentDestR33(")
 require(
@@ -706,6 +753,6 @@ require(
 
 print(
     "VR R31/R32 draw-retirement guard PASS "
-    "(R31=StateBlock owner, R32=Reset/DirectGPU + Present telemetry owner, "
+    "(R31=StateBlock owner, R32=DirectGPU + Reset/Present helper owner, "
     "R33=sole physical draw dispatcher over R30, neutral-helper census=terminal, remaining R31/R32 calls=owner-specific)"
 )
