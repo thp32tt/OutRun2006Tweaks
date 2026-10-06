@@ -566,6 +566,61 @@ namespace outrun::vr::dx11
         const ProgrammableShaderInterfaceSemantics& vertexSemantics,
         const ProgrammableShaderInterfaceSemantics& pixelSemantics) noexcept;
 
+    // R271 composes one pair-level source-semantic receipt from the exact R239
+    // programmable pair identity, source-attested R266 VS/PS register semantics
+    // and the exact R268 stage-linkage receipt. This is production census
+    // evidence only; it does not claim translation or authorize native Draw*.
+    struct ProgrammableShaderPairSourceSemanticEvidence
+    {
+        bool sourceIdentityExact = false;
+        bool vertexRegisterSemanticsExact = false;
+        bool pixelRegisterSemanticsExact = false;
+        bool interfaceLinkageExact = false;
+        bool complete = false;
+        std::uint64_t cacheKey = 0;
+        DWORD vertexVersionToken = 0;
+        DWORD pixelVersionToken = 0;
+        std::uint64_t vertexSourceBytecodeHash = 0;
+        std::uint64_t pixelSourceBytecodeHash = 0;
+        std::uint64_t vertexRegisterSemanticsHash = 0;
+        std::uint64_t pixelRegisterSemanticsHash = 0;
+        std::uint64_t interfaceLinkHash = 0;
+        UINT vertexConstantReferenceCount = 0;
+        UINT pixelConstantReferenceCount = 0;
+        UINT vertexSamplerReferenceCount = 0;
+        UINT pixelSamplerReferenceCount = 0;
+        std::uint64_t pairSemanticHash = 0;
+        std::uint64_t receiptRevisionHash = 0;
+        std::uint64_t semanticContractHash = 0;
+
+        [[nodiscard]] bool exact() const noexcept
+        {
+            return sourceIdentityExact &&
+                   vertexRegisterSemanticsExact &&
+                   pixelRegisterSemanticsExact &&
+                   interfaceLinkageExact &&
+                   complete &&
+                   cacheKey != 0 &&
+                   vertexVersionToken != 0 &&
+                   pixelVersionToken != 0 &&
+                   vertexSourceBytecodeHash != 0 &&
+                   pixelSourceBytecodeHash != 0 &&
+                   vertexRegisterSemanticsHash != 0 &&
+                   pixelRegisterSemanticsHash != 0 &&
+                   interfaceLinkHash != 0 &&
+                   pairSemanticHash != 0 &&
+                   receiptRevisionHash != 0 &&
+                   semanticContractHash != 0;
+        }
+    };
+
+    [[nodiscard]] ProgrammableShaderPairSourceSemanticEvidence
+    derive_programmable_shader_pair_source_semantic_evidence(
+        const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+        const ProgrammableShaderRegisterSemantics& vertexSemantics,
+        const ProgrammableShaderRegisterSemantics& pixelSemantics,
+        const ProgrammableShaderInterfaceLinkageEvidence& interfaceLinkage) noexcept;
+
     [[nodiscard]] ProgrammableShaderPairCacheIdentity
     seal_programmable_shader_pair_cache_identity(
         bool observationComplete,
