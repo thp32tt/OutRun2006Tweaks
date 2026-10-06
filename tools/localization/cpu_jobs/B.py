@@ -95,7 +95,7 @@ for sp in specs:
     sign_red=(r>125) & (r>g+45) & (r>b+30) & (g<105) & (b<120)
     interior=ndimage.binary_erosion(banner,iterations=1,border_value=0)
     effect=interior & ~sign_red
-    effect=ndimage.binary_dilation(effect,iterations=1) & banner
+    effect=ndimage.binary_dilation(effect,iterations=1) & interior
 
     elab,en=ndimage.label(effect)
     kept=np.zeros_like(effect)
