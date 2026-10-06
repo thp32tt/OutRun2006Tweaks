@@ -165,7 +165,10 @@ int main() {
  require(imperial_avenue_stone_paving_pattern(14,0,imperialAsphalt),"Imperial all-0x2 frame remains the same continuous stone road");
  require(!imperial_avenue_stone_paving_pattern(13,0,imperialAsphalt),"continuous-stone override stays scoped to Imperial Avenue");
  const float stoneAmp=imperial_avenue_stone_tactile_amplitude(.70f,.60f,.70f);
- require(stoneAmp>.28f&&stoneAmp<=.32f,"Imperial brick/stone tactile floor is strong enough for R3 but remains stage-scoped and capped");
+ require(stoneAmp>.20f&&stoneAmp<=.24f,"Imperial stone tactile is moderated between the prior weak and over-strong tunes");
+ require(road_motion_gate(0.0f)==0.0f,"stationary car has zero road-texture gate");
+ require(road_motion_gate(.08f)>.999f,"road texture reaches full motion authority once clearly moving");
+ require(imperial_avenue_stone_tactile_amplitude(0.0f,.60f,.70f)*road_motion_gate(0.0f)==0.0f,"Imperial stone cannot vibrate while parked");
  require(!is_proven_primary_rough_road_contact(27,520,PrimaryAsphaltSurfaceMask),"ordinary asphalt is not rough-road material");
  require(std::abs(software_road_tactile_frequency(35.0f)-10.0f)<1e-6f,"software road carrier smoother than old 15Hz fallback");
  require(std::abs(software_slip_tactile_frequency(35.0f)-12.0f)<1e-6f,"software slip carrier remains distinct from road carrier");
