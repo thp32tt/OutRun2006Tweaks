@@ -533,10 +533,10 @@
       "dependencies": [],
       "attempts": 0,
       "runtimeCandidate": true,
-      "implementationProgress": "00488 centralized R13 DirectGPU ACK mapping teardown and drops the mapping during ResetEx preamble before stereo/shared-resource teardown; exact-SHA automatic validation passed.",
-      "lastResultSha": "cedb2cc9a63ea99a217303bf3165da82cb59d91a",
-      "lastValidation": "DX9Ex Active 37508745089 + Domain Isolation 37508745083 SUCCESS; runtime UNTESTED.",
-      "nextAction": "Continue bounded D3D9Ex reset/shared-resource/direct-transport robustness from latest HEAD. Prefer stale host/transport identity or handle lifetime hardening that can be proven statically without changing fence authority."
+      "implementationProgress": "00491 completed: final R33/R32 DirectGPU owner now scans the full 4-slot ring from preferred frame modulo, skips still-pending producer fences or host-ACK-blocked publications, safely reclaims unpublished post-Present slots only after EVENT completion, and retires ACK-completed publication metadata before shared-eye overwrite. Exact-SHA automatic validation passed.",
+      "lastResultSha": "c8e4434bd44dd9696105a8dfefbb9ab581971bf5",
+      "lastValidation": "DX9Ex Active 37523000254 SUCCESS (policy/host/game/full-chain/package) + Domain Isolation 37523000130 SUCCESS at c8e4434bd44dd9696105a8dfefbb9ab581971bf5; runtime UNTESTED.",
+      "nextAction": "Continue one bounded DX9Ex DirectGPU/resource-lifetime/frame-pacing improvement from latest HEAD without changing fence/ACK authority. Prefer a statically provable hot-path or stale-state invariant."
     },
     {
       "id": "L4-RELEASE-001",
