@@ -408,8 +408,10 @@ require(
     "R32InstallState.load(std::memory_order_acquire)",
 )
 
-# 1) R31 is retained only for StateBlock/state-cache ownership. Its physical
-# draw overlay over R30 must be gone.
+# 1) R31 is retained only as the neutral StateBlock event-consumer/state-cache
+# owner. R22 owns the physical StateBlock lifecycle hooks; when that optional
+# coverage is unavailable, reliability stays fail-closed instead of installing
+# a second physical fallback layer.
 forbid(
     r31,
     "R31",
@@ -426,16 +428,26 @@ forbid(
     "R31EnableDrawHooks()",
     "R31OwnedResult R31TryFastWorld(",
     "R31OwnedResult R31TryHud(",
-)
-require(
-    r31,
-    "R31 StateBlock owner",
     "SafetyHookInline R31CreateStateBlockHook{};",
     "SafetyHookInline R31BeginStateBlockHook{};",
     "SafetyHookInline R31EndStateBlockHook{};",
     "SafetyHookInline R31StateBlockApplyHook{};",
+    "R31StateBlockApplyTarget",
+    "StateBlockApplyDestR31(",
+    "R31EnsureStateBlockApplyHook(",
+    "CreateStateBlockDestR31(",
+    "BeginStateBlockDestR31(",
+    "EndStateBlockDestR31(",
+    "safetyhook::create_inline(",
+)
+require(
+    r31,
+    "R31 StateBlock event consumer",
     "StateBlockRecovery::Configure(",
     "StateBlockEvents::Configure(",
+    "StateBlockTracker::LifecycleHooksReady()",
+    "StateBlockTracker::MarkCoverageLost()",
+    "R31 physical StateBlock fallback retired; fast-path trust remains disabled",
     "StateBlockTracker::SetEventConsumerReady(true)",
     "R31InstallStatus() noexcept",
     "R31OwnedResult",
@@ -449,12 +461,10 @@ require(
     "R31 install",
     "const auto r30 = R30InstallStatus();",
     "const auto renderer = OutRunVRRenderer::R29RendererState();",
-    "StateBlockTracker::LifecycleHooksReady()",
-    "R22 lifecycle hooks are authoritative; R31 physical StateBlock hooks are not installed",
-    "R31 fallback StateBlock hooks armed",
-    "fallbackEndArmed = R31EndStateBlockHook.enable().has_value();",
-    "fallbackBeginArmed = R31BeginStateBlockHook.enable().has_value();",
-    "fallbackCreateArmed = R31CreateStateBlockHook.enable().has_value();",
+    "const bool lifecycleReady =",
+    "StateBlockTracker::LifecycleHooksReady();",
+    "R22 lifecycle hooks are authoritative; R31 is event-consumer only",
+    "R31 physical StateBlock fallback retired; fast-path trust remains disabled",
     "StateBlockEvents::Clear();",
     "StateBlockRecovery::Clear();",
     "StateBlockTracker::MarkCoverageLost();",
@@ -466,22 +476,31 @@ forbid(
     "DrawIndexedPrimitiveDestR30",
     "DrawPrimitiveUPDestR30",
     "DrawIndexedPrimitiveUPDestR30",
-    "draw hooks unavailable",
+    "fallbackEndArmed",
+    "fallbackBeginArmed",
+    "fallbackCreateArmed",
+    "R31CreateStateBlockHook",
+    "R31BeginStateBlockHook",
+    "R31EndStateBlockHook",
+    "R31StateBlockApplyHook",
+    "safetyhook::create_inline(",
 )
-fallback_end = r31_install.find(
-    "fallbackEndArmed = R31EndStateBlockHook.enable().has_value();")
-fallback_begin = r31_install.find(
-    "fallbackBeginArmed = R31BeginStateBlockHook.enable().has_value();")
-fallback_create = r31_install.find(
-    "fallbackCreateArmed = R31CreateStateBlockHook.enable().has_value();")
-ready_publish = r31_install.find(
-    "StateBlockTracker::SetEventConsumerReady(true)")
-if min(fallback_end, fallback_begin, fallback_create, ready_publish) < 0 or not (
-    fallback_end < fallback_begin < fallback_create < ready_publish
-):
+recovery_configure = r31_install.find("StateBlockRecovery::Configure(")
+configure_pos = r31_install.find("StateBlockEvents::Configure(")
+lifecycle_owner_pos = r31_install.find("const bool lifecycleReady =")
+degraded_log_pos = r31_install.find(
+    "R31 physical StateBlock fallback retired; fast-path trust remains disabled")
+coverage_degrade_pos = r31_install.rfind(
+    "StateBlockTracker::MarkCoverageLost()", 0, degraded_log_pos)
+consumer_ready_pos = r31_install.find("StateBlockTracker::SetEventConsumerReady(true)")
+ready_pos = r31_install.find("R31InstallState.store(State::Ready", consumer_ready_pos)
+if min(recovery_configure, configure_pos, lifecycle_owner_pos,
+       coverage_degrade_pos, degraded_log_pos, consumer_ready_pos, ready_pos) < 0 or not (
+       recovery_configure < configure_pos < lifecycle_owner_pos <
+       coverage_degrade_pos < degraded_log_pos < consumer_ready_pos < ready_pos):
     fail(
-        "R31 fallback StateBlock transaction must arm End -> Begin -> Create "
-        "before publishing EventConsumerReady"
+        "R31 must configure neutral StateBlock consumers, fail closed when "
+        "R22 lifecycle coverage is absent, then publish readiness"
     )
 
 require(
