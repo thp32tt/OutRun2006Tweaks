@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "run": "B208",
+  "role": "B",
+  "timestamp_kst": "2026-10-06T18:58:30+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "queue_index": 24,
+  "asset": "textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "selection_gate": {
+    "active_user_backlog": 0,
+    "c_returned_rework": 0,
+    "b_render_ready": 0,
+    "b_one_stage_to_render": 0,
+    "only_unresolved_b_primary_index": 24,
+    "completed_work_repeated": false
+  },
+  "source_changes": {
+    "file": "src/hooks_localization.cpp",
+    "foundation_commit": "71aac999050adb565aa2d0a9b333264b2ba7996e",
+    "final_source_commit": "0f696621d80a192f69d1f4195715870a0dfcf046",
+    "implementation": "inactive deterministic HangulNameComposer foundation; not wired to stock name-entry input",
+    "runtime_behavior_changed": false
+  },
+  "inherited_runtime_mapping": {
+    "from_b207": "stock character selections 0x00..0x25; controls 0x26..0x2B preserved",
+    "stock_base_letter_range": "selection 10..35 maps a..z",
+    "native_field": "16 bytes / <=15 payload + NUL",
+    "compatibility_storage": "A141 ASCII alias + UTF-8 sidecar"
+  },
+  "two_beolsik_mapping": {
+    "basis": "stock a..z identity from B207 mapped to standard Korean 2-beolsik physical key semantics",
+    "base_a_to_z": [
+      "ㅁ",
+      "ㅠ",
+      "ㅊ",
+      "ㅇ",
+      "ㄷ",
+      "ㄹ",
+      "ㅎ",
+      "ㅗ",
+      "ㅑ",
+      "ㅓ",
+      "ㅏ",
+      "ㅣ",
+      "ㅡ",
+      "ㅜ",
+      "ㅐ",
+      "ㅔ",
+      "ㅂ",
+      "ㄱ",
+      "ㄴ",
+      "ㅅ",
+      "ㅕ",
+      "ㅍ",
+      "ㅈ",
+      "ㅌ",
+      "ㅛ",
+      "ㅋ"
+    ],
+    "shifted": {
+      "e": "ㄸ",
+      "o": "ㅒ",
+      "p": "ㅖ",
+      "q": "ㅃ",
+      "r": "ㄲ",
+      "t": "ㅆ",
+      "w": "ㅉ"
+    },
+    "source_code_uses_universal_unicode_escapes": true
+  },
+  "composer_features": [
+    "Unicode Hangul syllable composition formula",
+    "initial/medial/final consonant state",
+    "double initial consonants",
+    "compound vowels",
+    "compound final consonants",
+    "final-consonant split when a following vowel starts the next syllable",
+    "stepwise BACKSPACE for compound vowel/final/initial states",
+    "digits and space",
+    "UTF-8 output",
+    "15 visible-codepoint ceiling matching the proven native payload ceiling"
+  ],
+  "deterministic_checks": {
+    "compile_time": [
+      "selection 10 -> ㅁ",
+      "selection 26 -> ㅂ",
+      "selection 35 -> ㅋ",
+      "shift selection 26 -> ㅃ",
+      "shift selection 27 -> ㄲ",
+      "syllable formula: 가, 한, 글"
+    ],
+    "prototype_vectors": [
+      [
+        "rk",
+        "가"
+      ],
+      [
+        "gksrmf",
+        "한글"
+      ],
+      [
+        "tlwkd",
+        "시장"
+      ],
+      [
+        "dkssud",
+        "안녕"
+      ],
+      [
+        "tjdnf",
+        "서울"
+      ],
+      [
+        "rkr",
+        "각"
+      ],
+      [
+        "rkrk",
+        "가가"
+      ],
+      [
+        "qksrkq",
+        "반갑"
+      ]
+    ]
+  },
+  "build_validation": {
+    "win32_release": {
+      "run_id": 37445766665,
+      "conclusion": "SUCCESS",
+      "artifact_id": 11404040505,
+      "digest": "sha256:c659267dde0f328d427ed0349f70ccf828ab2c652ba10f435a382ce529a49009",
+      "head_sha": "0f696621d80a192f69d1f4195715870a0dfcf046"
+    },
+    "korean_test": {
+      "run_id": 37445766663,
+      "conclusion": "SUCCESS",
+      "artifact_id": 11403511226,
+      "digest": "sha256:b036cb8a95981121423a25490e941cdf0423bdc2965f2eb54c0eba81826ef175",
+      "head_sha": "0f696621d80a192f69d1f4195715870a0dfcf046"
+    }
+  },
+  "fail_closed_boundary": {
+    "input_hook_enabled": false,
+    "native_player_name_written": false,
+    "dds_candidate_written": false,
+    "local_player_name_render_hook_enabled": false,
+    "network_ranking_replay_changed": false,
+    "remaining": [
+      "prove/author source-faithful visual Jamo key artwork for 66743AA8 without misleading stock controls",
+      "implement explicit local alias-to-UTF-8 player-name rendering",
+      "only then wire HangulNameComposer to the B207 character-selection boundary and commit A141 alias on confirm"
+    ]
+  },
+  "qa": {
+    "source_code_changed": true,
+    "build_required": true,
+    "win32_release_pass": true,
+    "korean_test_build_pass": true,
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": [],
+    "completed_work_repeated": false
+  },
+  "status": "B208_HOLD_COMPOSER_BUILD_PASS_JAMO_ARTWORK_RENDER_HOOK_REQUIRED"
+}
