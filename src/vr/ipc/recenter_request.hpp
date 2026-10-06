@@ -80,10 +80,18 @@ namespace OutRunVR::RecenterIpc
         {
             if (!Ensure())
                 return 0;
+
+            // requesterPid=0 is a publication sentinel. It closes the window
+            // where a restarting game could expose the previous requestId with
+            // the replacement process PID, causing the host to accept a mixed
+            // request identity and then process the new F10 a second time.
+            InterlockedExchange(&state_->requesterPid, 0);
+            MemoryBarrier();
+            const LONG requestId = InterlockedIncrement(&state_->requestId);
+            MemoryBarrier();
             InterlockedExchange(&state_->requesterPid,
                 static_cast<LONG>(GetCurrentProcessId()));
-            MemoryBarrier();
-            return InterlockedIncrement(&state_->requestId);
+            return requestId;
         }
 
         bool Pending(LONG& requestId, DWORD& requesterPid) noexcept
@@ -98,9 +106,13 @@ namespace OutRunVR::RecenterIpc
                 &state_->receivedId, 0, 0);
             if (requested == 0 || requested == received)
                 return false;
+            const DWORD publishedPid = static_cast<DWORD>(
+                InterlockedCompareExchange(&state_->requesterPid, 0, 0));
+            if (publishedPid == 0)
+                return false;
+
             requestId = requested;
-            requesterPid = static_cast<DWORD>(InterlockedCompareExchange(
-                &state_->requesterPid, 0, 0));
+            requesterPid = publishedPid;
             return true;
         }
 

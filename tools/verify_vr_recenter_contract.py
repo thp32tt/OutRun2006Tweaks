@@ -71,6 +71,28 @@ main = load(MAIN_PATH)
 r32 = load(R32_PATH)
 api = load(API_PATH)
 
+publish = body(ipc, "LONG Publish() noexcept")
+require_order(
+    publish,
+    "recenter IPC coherent publication",
+    "InterlockedExchange(&state_->requesterPid, 0)",
+    "const LONG requestId = InterlockedIncrement(&state_->requestId)",
+    "InterlockedExchange(&state_->requesterPid,",
+    "static_cast<LONG>(GetCurrentProcessId())",
+    "return requestId;",
+)
+pending_ipc = body(ipc, "bool Pending(LONG& requestId, DWORD& requesterPid) noexcept")
+require_order(
+    pending_ipc,
+    "recenter IPC publication sentinel",
+    "const DWORD publishedPid = static_cast<DWORD>(",
+    "InterlockedCompareExchange(&state_->requesterPid, 0, 0)",
+    "if (publishedPid == 0)",
+    "return false;",
+    "requestId = requested;",
+    "requesterPid = publishedPid;",
+)
+
 requeue_received = body(ipc, "bool RequeueReceived(LONG requestId) noexcept")
 require_order(
     requeue_received,
