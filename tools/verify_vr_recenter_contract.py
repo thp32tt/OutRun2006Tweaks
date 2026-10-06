@@ -81,8 +81,13 @@ require_order(
     "return requestId;",
 )
 pending_ipc = body(ipc, "bool Pending(LONG& requestId, DWORD& requesterPid) noexcept")
+published_pid_start = pending_ipc.find(
+    "const DWORD publishedPid = static_cast<DWORD>(")
+if published_pid_start < 0:
+    fail("recenter IPC publication sentinel missing")
+published_pid_block = pending_ipc[published_pid_start:]
 require_order(
-    pending_ipc,
+    published_pid_block,
     "recenter IPC publication sentinel",
     "const DWORD publishedPid = static_cast<DWORD>(",
     "InterlockedCompareExchange(&state_->requesterPid, 0, 0)",
@@ -90,6 +95,7 @@ require_order(
     "return false;",
     "requestId = requested;",
     "requesterPid = publishedPid;",
+    "return true;",
 )
 
 requeue_received = body(ipc, "bool RequeueReceived(LONG requestId) noexcept")
