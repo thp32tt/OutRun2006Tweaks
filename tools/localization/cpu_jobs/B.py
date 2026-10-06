@@ -65,6 +65,7 @@ for i in range(1,n+1):
     w=b[2]-b[0]; h=b[3]-b[1]
     if 45<=w<=300 and 12<=h<=90 and (w/max(h,1))>=1.55:
         cands.append({"area":area,"bbox":b,"mask":m})
+print("B194_RED_CANDIDATES",[(z["area"],z["bbox"],round((z["bbox"][2]-z["bbox"][0])/max(1,z["bbox"][3]-z["bbox"][1]),2)) for z in cands],flush=True)
 if len(cands)<2:
     raise RuntimeError(("fewer than two route-sign red components",[(c["area"],c["bbox"]) for c in cands]))
 # START is the upper-left sign, GOAL the lower-right sign. Keep the pair maximizing
@@ -81,6 +82,7 @@ if not pairs:
     raise RuntimeError(("cannot geometrically identify START/GOAL pair",[(c["area"],c["bbox"]) for c in cands]))
 pairs.sort(key=lambda z:z[0],reverse=True)
 _,start_comp,goal_comp=pairs[0]
+print("B194_SELECTED",start_comp["area"],start_comp["bbox"],goal_comp["area"],goal_comp["bbox"],flush=True)
 
 specs=[("start","START","출발",start_comp),("goal","GOAL","골",goal_comp)]
 rows=[]
