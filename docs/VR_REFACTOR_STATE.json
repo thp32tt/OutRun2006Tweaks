@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T11:59:47+09:00",
+  "updatedKst": "2026-10-06T12:06:47+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -102,7 +102,7 @@
     "VR-DX9EX-SWAPCHAIN-DESTROY-GPU-DRAIN-0037",
     "VR-DX9EX-SWAPCHAIN-GPU-DRAIN-BOUNDED-0038"
   ],
-  "next": "Structural extraction remains terminal. CONVERSION-DX9EX-00455 bounded GPU-drain runtime change is implemented; first Gate exposed only a verifier scope false-negative for the namespace-level budget constant. Retry fixes verifier scope and resumes exact-SHA validation.",
+  "next": "Structural extraction remains terminal. The bounded GPU-drain failure path still proceeds to xrDestroySwapchain after timeout/device removal; review fail-closed destroy ownership so an unproven GPU completion cannot violate the OpenXR destruction precondition.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -221,11 +221,12 @@
     "CONVERSION-DX9EX-00447 / VR-DX9EX-RECENTER-IPC-PUBLISH-COHERENCY-0030 adds requesterPid=0 publication sentinel ordering for F10 recenter IPC. Final exact validation-bearing SHA 212311d5a341d116627bd3dfe2886cab0305a1a4 passed DX9Ex Active 37399517000 and Domain Isolation 37399516939 after two verifier-only false-negative repairs; runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00448 / VR-DX9EX-RECENTER-IPC-STABLE-SNAPSHOT-0031 rereads requestId after requesterPid in Pending() and rejects sequence changes, closing the remaining mixed publication snapshot window. Exact material/validation-bearing SHA 2843acf416dbccaceddda24d15b9549d2f604440 passed DX9Ex Active 37400259544 and Domain Isolation 37400259567; runtime remains UNTESTED.",
     "CONVERSION-DX9EX-00453 / VR-DX9EX-SWAPCHAIN-DESTROY-FLUSH-0036 flushes the D3D11 immediate context before R19 xrDestroySwapchain at swapchain teardown/recreate boundaries. Exact material/validation-bearing SHA 75066b77b9f95ca644791d4c821a1c77fffcfe1f passed DX9Ex Active Validation 37405053984 and Domain Isolation 37405053923; runtime remains UNTESTED.",
-    "CONVERSION-DX9EX-00454 / VR-DX9EX-SWAPCHAIN-DESTROY-GPU-DRAIN-0037 adds a D3D11 event-query completion fence before R19 xrDestroySwapchain. Runtime source SHA a6de7e6d155b8977fa60c545dafc075d038c5eb5; verifier repair/validation-bearing SHA b4ade25a787f18f52693219f571dfbb3f4754add passed DX9Ex Active 37406042110 and Domain Isolation 37406042061 after initial verifier-only failure 37405887502. Runtime remains UNTESTED."
+    "CONVERSION-DX9EX-00454 / VR-DX9EX-SWAPCHAIN-DESTROY-GPU-DRAIN-0037 adds a D3D11 event-query completion fence before R19 xrDestroySwapchain. Runtime source SHA a6de7e6d155b8977fa60c545dafc075d038c5eb5; verifier repair/validation-bearing SHA b4ade25a787f18f52693219f571dfbb3f4754add passed DX9Ex Active 37406042110 and Domain Isolation 37406042061 after initial verifier-only failure 37405887502. Runtime remains UNTESTED.",
+    "CONVERSION-DX9EX-00455 / VR-DX9EX-SWAPCHAIN-GPU-DRAIN-BOUNDED-0038 bounds the R19 event-query wait to 250 ms and exits early on device removal while preserving normal completion fencing. Runtime source SHA 60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a; verifier repair/validation-bearing SHA ac32589324fbc76b4d2fcd4321f31415f0ef5a39 passed DX9Ex Active 37406897470 and Domain Isolation 37406897447 after initial verifier-only failure 37406784043. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-POST1100-R31-R32-DEAD-DRAW-EXECUTOR-CLEANUP-BUILD_VERIFIED",
-  "validatedSourceSha": "b4ade25a787f18f52693219f571dfbb3f4754add",
-  "validationRunId": 37406042110,
+  "validatedSourceSha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+  "validationRunId": 37406897470,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -853,6 +854,37 @@
       "domainIsolationJobId": 112083727824,
       "packageArtifactId": 11387287754,
       "packageArtifactDigest": "sha256:c4b577e1fb40cec0bb36ed19de3f030c9a60bfa5d0518ed2965f4d5e83c9dd85"
+    }
+  },
+  "post1000Maintenance00455": {
+    "taskId": "CONVERSION-DX9EX-00455",
+    "eventId": "CONVERSION-DX9EX-00455-E002",
+    "eventType": "retry",
+    "attempt": "2/3",
+    "item": "VR-DX9EX-SWAPCHAIN-GPU-DRAIN-BOUNDED-0038",
+    "baseSha": "c12e56ebd9395c9b8f66fc59ce52513470918b49",
+    "sourceMaterialSha": "60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a",
+    "materialResultSha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+    "validationBearingResultSha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "runtimeBehaviorChanged": true,
+    "summary": "Bound R19 D3D11 event-query swapchain GPU drain to 250 ms with device-removal escape while preserving the normal completion-fence path. Initial failure was verifier-scope only.",
+    "validation": {
+      "initialFailedRunId": 37406784043,
+      "initialDomainIsolationRunId": 37406784051,
+      "dx9exActiveRunId": 37406897470,
+      "jobs": {
+        "policy": 112086348806,
+        "host": 112086478448,
+        "game": 112086478350,
+        "fullChainCompile": 112086478304,
+        "package": 112087716734
+      },
+      "domainIsolationRunId": 37406897447,
+      "domainIsolationJobId": 112086348549,
+      "packageArtifactId": 11386998671,
+      "packageArtifactDigest": "sha256:ff35bc0cc243abae4304414f0f825d7a89fa12848d00a046b1e0cb0598c41f96"
     }
   }
 }

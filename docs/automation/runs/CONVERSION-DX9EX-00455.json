@@ -7,14 +7,14 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "2/3",
-  "status": "VALIDATING",
+  "status": "COMPLETE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "c12e56ebd9395c9b8f66fc59ce52513470918b49",
-  "material_result_sha": "60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a",
-  "validation_bearing_result_sha": "PENDING_SELF",
-  "result_sha": "PENDING_SELF",
+  "material_result_sha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+  "validation_bearing_result_sha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+  "result_sha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00455]",
   "selected_work_item": "VR-DX9EX-SWAPCHAIN-GPU-DRAIN-BOUNDED-0038",
   "summary": "Bound the R19 D3D11 event-query GPU completion wait to 250 ms and exit early on device removal so swapchain teardown cannot hang indefinitely on a stalled/lost GPU while preserving the normal completion-fence path.",
@@ -38,24 +38,28 @@
       "evidence": "Added SwapchainGpuDrainBudgetMs=250, GetDeviceRemovedReason early exit, elapsed-time cutoff, and verifier assertions while retaining normal End->Flush->GetData-until-S_OK completion ordering."
     },
     "C3_VALIDATE": {
-      "status": "RETRYING",
-      "automation_validation": "PENDING",
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
       "runtime_validation": "UNTESTED",
-      "evidence": "DX9Ex Active 37406784043 failed only because verifier searched namespace-level SwapchainGpuDrainBudgetMs inside the helper body. Runtime implementation is unchanged."
+      "evidence": "Retry exact SHA passed DX9Ex Active and Domain Isolation; initial policy failure was verifier-only."
     },
     "C4_COMMIT": {
-      "status": "PENDING",
-      "ci_skip_on_validation_bearing_result": false
+      "status": "COMPLETE",
+      "ci_skip_on_validation_bearing_result": false,
+      "result_sha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+      "source_runtime_sha": "60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a"
     },
     "C5_PACKAGE": {
-      "status": "PENDING"
+      "status": "COMPLETE",
+      "artifact_id": 11386998671,
+      "digest": "sha256:ff35bc0cc243abae4304414f0f825d7a89fa12848d00a046b1e0cb0598c41f96"
     },
     "C6_STATE": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "runtime_validation": "UNTESTED"
     }
   },
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "evidence": {
     "red_review": {
       "base_sha": "c12e56ebd9395c9b8f66fc59ce52513470918b49",
@@ -89,9 +93,33 @@
       "attempt": "2/3",
       "source_runtime_change": false,
       "verifier_change": "Check SwapchainGpuDrainBudgetMs on host_sbs and keep helper-local device-loss/timeout references checked on sbs_gpu_drain."
+    },
+    "dx9ex_active": {
+      "run_id": 37406897470,
+      "head_sha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+      "result": "SUCCESS",
+      "jobs": {
+        "policy": 112086348806,
+        "host": 112086478448,
+        "game": 112086478350,
+        "full_chain_compile": 112086478304,
+        "package": 112087716734
+      }
+    },
+    "domain_isolation": {
+      "run_id": 37406897447,
+      "job_id": 112086348549,
+      "head_sha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11386998671,
+      "digest": "sha256:ff35bc0cc243abae4304414f0f825d7a89fa12848d00a046b1e0cb0598c41f96"
     }
   },
-  "next_action": "Validate verifier-repair exact SHA with canonical DX9Ex Active and Domain Isolation. Preserve 60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a as runtime-source material SHA.",
+  "next_action": "Review fail-closed swapchain destruction when GPU completion cannot be proven; preserve ac32589324fbc76b4d2fcd4321f31415f0ef5a39 as CONVERSION-DX9EX-00455 validation-bearing result.",
   "started_at_kst": "2026-10-06T11:57:38+09:00",
-  "retry_started_at_kst": "2026-10-06T11:59:47+09:00"
+  "retry_started_at_kst": "2026-10-06T11:59:47+09:00",
+  "source_material_sha": "60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a",
+  "completed_at_kst": "2026-10-06T12:06:47+09:00"
 }
