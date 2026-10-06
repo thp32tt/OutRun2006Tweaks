@@ -108,7 +108,9 @@ for required in (
         "R13OverlayReadyForTransport()",
         "return lowerResolve();",
         "R32EnsureDirectResources(device)",
-        "R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted)",
+        "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
+        "R32DrainPendingProducerFence(index)",
+        "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
         "R32WaitProducerFence(slot.fence)"):
     if required not in r32:
         raise SystemExit(f"R32 DirectGPU owner helper contract missing: {required}")
