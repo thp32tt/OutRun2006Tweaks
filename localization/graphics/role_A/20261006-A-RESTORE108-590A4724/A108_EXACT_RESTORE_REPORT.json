@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A108_EXACT_RESTORE",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+  "historical_commit": "5f5f87c41ce43ccdf205e9936a645d44690f01b2",
+  "before_sha256": "86cd432ae929deed545f39fa9c91210057a81ee5456eb7202342932e351e7a06",
+  "restored_sha256": "bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178",
+  "reason": "A108 was already controller-self-QA PASS. A later superseded A107 worker output overwrote the candidate path without updating A108 state; restore exact A108 bytes instead of repeating production.",
+  "a108_report": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_590A4724_REPORT.json",
+  "a108_controller": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_CONTROLLER_SELF_QA.json",
+  "status": "A108_EXACT_BYTES_RESTORED_NO_REPRODUCTION",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_touched": false
+}
