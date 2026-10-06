@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00491",
+  "production_id": "CONVERSION-DX9EX-00491",
+  "event_id": "CONVERSION-DX9EX-00491-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "BLOCKED_REPAIR_LIMIT",
+  "base_sha": "70fa755b6d46cd68e4052e1a2d72dade9c771c99",
+  "material_result_sha": "ec32c89d022890d792d2541b2070ea0e3f0543b9",
+  "validation_bearing_result_sha": "78e61b66f673188304c85f85bf4a6ce939db50bf",
+  "result_sha": "78e61b66f673188304c85f85bf4a6ce939db50bf",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00491]",
+  "selected_work_item": "DX9EX-L3-R32-DIRECTGPU-FREE-SLOT-REUSE-0074",
+  "summary": "Restore the proven R38 free-slot scan at the final R33/R32 DirectGPU owner so a busy modulo slot cannot force fallback while another ring slot is reusable; also reclaim post-Present unpublished S_FALSE slots only after EVENT completion and retire ACK-completed publication metadata before overwriting shared eyes.",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "repair_attempts_used": 3,
+  "evidence": {
+    "changed_paths": [
+      "src/vr/d3d9/stereo_renderer_r32.cpp",
+      "tools/verify_vr_dx9ex_reset_transport_contract.py",
+      "tools/verify_vr_r32_review.py",
+      "tools/verify_vr_refactor_contract.py",
+      "tools/verify_vr_r31_r32_retirement_guard.py"
+    ],
+    "source_material_sha": "ec32c89d022890d792d2541b2070ea0e3f0543b9",
+    "gates": [
+      {
+        "sha": "ec32c89d022890d792d2541b2070ea0e3f0543b9",
+        "run_id": 37522121910,
+        "policy_job_id": 112469904425,
+        "result": "FAIL_STALE_R32_REVIEW_FIXED_SLOT_EXPECTATION"
+      },
+      {
+        "sha": "f553e94396b56511ef0737e4a9ef7f62c62a8f19",
+        "run_id": 37522226784,
+        "policy_job_id": 112470255579,
+        "result": "FAIL_STALE_REFACTOR_FIXED_SLOT_EXPECTATION"
+      },
+      {
+        "sha": "0cf7aed93bc99db9beec259bedcd27997b017fda",
+        "run_id": 37522317123,
+        "policy_job_id": 112470574808,
+        "result": "FAIL_STALE_RETIREMENT_GUARD_FIXED_SLOT_EXPECTATION"
+      },
+      {
+        "sha": "78e61b66f673188304c85f85bf4a6ce939db50bf",
+        "run_id": 37522424598,
+        "policy_job_id": 112470929260,
+        "result": "FAIL_NEW_RESET_TRANSPORT_VERIFIER_ORDER_MATCH"
+      }
+    ],
+    "domain_isolation": {
+      "run_id": 37522424503,
+      "job_id": 112470928690,
+      "result": "SUCCESS"
+    },
+    "final_failure": "verify_vr_dx9ex_reset_transport_contract.py require_order matched the earlier post-Present reclaim candidate.frameId = 0 before the later ACK-retirement occurrence; host/game/full-chain/package were skipped.",
+    "source_compile_status": "NOT_REACHED",
+    "package_status": "NOT_PRODUCED"
+  },
+  "blocker": "Automatic repair limit reached after three verifier-alignment repairs. The remaining failure is a deterministic verifier-order bug, not observed source/build failure.",
+  "next_action": "On controller retry, modify only the reset/transport verifier to scope ACK-retirement ordering inside the candidate.published && candidate.frameId block (or otherwise disambiguate the later frameId/published clear), then rerun exact-SHA DX9Ex Active + Domain Isolation. Do not change the R32 source unless a subsequent build/runtime failure proves it necessary."
+}
