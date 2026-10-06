@@ -1169,8 +1169,12 @@ require_order(
     "gpuWorkSubmitted = false;",
     "const XrResult result = ::xrDestroySwapchain(handle);",
 )
+successful_drain_destroy = sbs_swapchain_destroy[
+    sbs_swapchain_destroy.find("// The event-query fence proved"):
+    sbs_swapchain_destroy.find("for (auto& pair : rtvs)")
+]
 require_order(
-    sbs_swapchain_destroy,
+    successful_drain_destroy,
     "R19 successful drain proof survives transient live destroy failure",
     "gpuWorkSubmitted = false;",
     "const XrResult result = ::xrDestroySwapchain(handle);",

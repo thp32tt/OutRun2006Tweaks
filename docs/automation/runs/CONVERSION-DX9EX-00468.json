@@ -2,11 +2,11 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX9EX-00468",
   "production_id": "CONVERSION-DX9EX-00468",
-  "event_id": "CONVERSION-DX9EX-00468-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX9EX-00468-E002",
+  "event_type": "retry",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "attempt": "2/3",
+  "attempt": "3/3",
   "status": "VALIDATING",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
@@ -38,10 +38,10 @@
       "evidence": "Clear gpuWorkSubmitted immediately after successful drain and before xrDestroySwapchain. The normal success path is unchanged; failed live destroy retains the handle/resources but also retains the completed-drain proof. Deterministic verifier pins drain -> proof clear -> xrDestroySwapchain -> failure return ordering."
     },
     "C3_VALIDATE": {
-      "status": "RETRYING",
+      "status": "RETRYING_FINAL",
       "automation_validation": "PENDING",
       "runtime_validation": "UNTESTED",
-      "evidence": "Attempt 1 exact SHA f8ff8b6f42c9c90042a1fe66544a1a2373f64feb: VR Autodev Coordination validate SUCCESS; DX9Ex Active 37422577091 policy failed only in verify_vr_dx9ex_reset_transport_contract.py because the old 'skip drain only for never-submitted swapchains' assertion expected gpuWorkSubmitted=false after xrDestroySwapchain. Host/game/full-chain/package were skipped by policy dependency."
+      "evidence": "Attempt 1 f8ff8b6f... failed stale verifier ordering. Attempt 2 exact SHA 6a87578417a89448de46946eb8b5406a3d42ed42: Domain Isolation 37422733650 SUCCESS and VR Autodev Coordination 37422733664 SUCCESS; DX9Ex Active 37422733687 policy failed only because the new transient-destroy require_order searched the entire Destroy body and matched the earlier !gpuDrained return false. Host/game/full-chain/package were skipped by policy dependency."
     },
     "C4_COMMIT": {
       "status": "PENDING",
@@ -74,9 +74,19 @@
       "policy_result": "FAIL_STALE_VERIFIER_ORDER",
       "autodev_run_id": 37422577119,
       "autodev_result": "SUCCESS"
+    },
+    "attempt2": {
+      "validation_bearing_candidate": "6a87578417a89448de46946eb8b5406a3d42ed42",
+      "dx9ex_active_run_id": 37422733687,
+      "policy_job_id": 112135481875,
+      "policy_result": "FAIL_VERIFIER_SCOPE_FIRST_RETURN",
+      "domain_isolation_run_id": 37422733650,
+      "domain_isolation_result": "SUCCESS",
+      "autodev_run_id": 37422733664,
+      "autodev_result": "SUCCESS"
     }
   },
-  "next_action": "Validate the verifier-repair exact SHA with canonical DX9Ex Active Validation and Domain Isolation; if PASS, finalize C3-C6. Do not alter runtime source unless a new gate failure identifies a source defect.",
+  "next_action": "Validate the final verifier-scope repair exact SHA with canonical DX9Ex Active Validation and Domain Isolation. If any required Gate fails again, mark CONVERSION-DX9EX-00468 BLOCKED because ATTEMPT=3/3 is exhausted.",
   "started_at_kst": "2026-10-06T15:13:00+09:00",
-  "failure_context": "Attempt 1 is a verifier-order false negative. Source behavior remains: successful event-query drain clears gpuWorkSubmitted before xrDestroySwapchain so a transient destroy failure preserves the completed-drain proof. Attempt 2 updates only the stale deterministic assertion."
+  "failure_context": "Final automatic repair 3/3 is verifier-only. Scope the transient destroy-failure order check to the successful-drain branch so its return false cannot alias the earlier !gpuDrained fail-closed return. Runtime source semantics from f8ff8b6f remain unchanged."
 }
