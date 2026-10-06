@@ -1414,6 +1414,23 @@ require(
     "TheaterCommittedDirectRun = {};",
 )
 
+r32_destroy = body(host_submit, "inline XrResult XRAPI_CALL DestroySession(")
+require_order(
+    r32_destroy,
+    "R32 transactional session teardown",
+    "const XrResult result =",
+    "OutRunVrR26RecenterHardening::DestroySession(session);",
+    "if (XR_SUCCEEDED(result))",
+    "ReleasePending();",
+    "OutRunVrD3D9ExDirectPassthrough::R32ResetDirectCaches();",
+    "return result;",
+)
+forbid(
+    r32_destroy,
+    "R32 destroy must not bypass R26 recenter owner",
+    "OutRunVrR24BlackScreenGuard::DestroySession(session)",
+)
+
 review_destroy = body(host_review, "inline XrResult XRAPI_CALL DestroySession(")
 require_order(
     review_destroy,

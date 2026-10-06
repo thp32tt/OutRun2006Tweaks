@@ -545,9 +545,14 @@ namespace OutRunVrR32DirectSubmit
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session) noexcept
     {
-        ReleasePending();
-        OutRunVrD3D9ExDirectPassthrough::R32ResetDirectCaches();
-        return OutRunVrR24BlackScreenGuard::DestroySession(session);
+        const XrResult result =
+            OutRunVrR26RecenterHardening::DestroySession(session);
+        if (XR_SUCCEEDED(result))
+        {
+            ReleasePending();
+            OutRunVrD3D9ExDirectPassthrough::R32ResetDirectCaches();
+        }
+        return result;
     }
 }
 
