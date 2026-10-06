@@ -1206,6 +1206,120 @@ namespace OutRunVRStereo
             return std::clamp(Settings::VRHudScale.get(), 0.30f, 1.20f);
         }
 
+        bool R57ProjectViewPoint(
+            const OutRunVR::GameSemantic::ProjectedMarkerInfo& marker,
+            const D3DMATRIX& transform,
+            float& ndcX, float& ndcY) noexcept
+        {
+            if (!marker.valid ||
+                !std::isfinite(marker.viewX) ||
+                !std::isfinite(marker.viewY) ||
+                !std::isfinite(marker.viewZ) ||
+                !MatrixFinite(transform))
+                return false;
+
+            const float clipX =
+                marker.viewX * transform._11 +
+                marker.viewY * transform._21 +
+                marker.viewZ * transform._31 +
+                transform._41;
+            const float clipY =
+                marker.viewX * transform._12 +
+                marker.viewY * transform._22 +
+                marker.viewZ * transform._32 +
+                transform._42;
+            const float clipW =
+                marker.viewX * transform._14 +
+                marker.viewY * transform._24 +
+                marker.viewZ * transform._34 +
+                transform._44;
+            if (!std::isfinite(clipX) || !std::isfinite(clipY) ||
+                !std::isfinite(clipW) || std::fabs(clipW) <= 1.0e-6f)
+                return false;
+
+            ndcX = clipX / clipW;
+            ndcY = clipY / clipW;
+            return std::isfinite(ndcX) && std::isfinite(ndcY);
+        }
+
+        bool R57BuildProjectedMarkerDelta(
+            const OutRunVRRenderer::LatchedStereoFrame& stereo,
+            const D3DMATRIX& baseProjection,
+            float deltaX[2], float deltaY[2],
+            float* baseXOut = nullptr,
+            float* baseYOut = nullptr) noexcept
+        {
+            const auto* marker =
+                OutRunVR::GameSemantic::CurrentProjectedMarker();
+            if (!marker || !marker->valid || !MatrixFinite(baseProjection))
+                return false;
+
+            float baseX = 0.0f;
+            float baseY = 0.0f;
+            if (!R57ProjectViewPoint(
+                    *marker, baseProjection, baseX, baseY))
+                return false;
+            if (baseXOut)
+                *baseXOut = baseX;
+            if (baseYOut)
+                *baseYOut = baseY;
+
+            float headRaw[16]{};
+            std::uint32_t headPoseSequence = 0;
+            D3DMATRIX headInverse{};
+            if (!OutRunVRRenderer::GetLatchedHeadInverse(
+                    headRaw, headPoseSequence) ||
+                headPoseSequence != stereo.poseSequence)
+                return false;
+            std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+            if (!MatrixFinite(headInverse))
+                return false;
+
+            const float centerEye[3]{
+                0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
+                0.5f * (stereo.eyeOffset[0][1] + stereo.eyeOffset[1][1]),
+                0.5f * (stereo.eyeOffset[0][2] + stereo.eyeOffset[1][2])
+            };
+            const float identityOrientation[4]{
+                0.0f, 0.0f, 0.0f, 1.0f
+            };
+
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                const float relativeEye[3]{
+                    stereo.eyeOffset[eye][0] - centerEye[0],
+                    stereo.eyeOffset[eye][1] - centerEye[1],
+                    stereo.eyeOffset[eye][2] - centerEye[2]
+                };
+                const D3DMATRIX eyePose =
+                    MatrixFromQuaternionTranslation(
+                        identityOrientation, relativeEye,
+                        Settings::VRWorldScale * Settings::VRStereoDepth);
+                const D3DMATRIX eyeInverse = InverseRigid(eyePose);
+                const D3DMATRIX eyeProjection =
+                    ProjectionFromFov(
+                        baseProjection, stereo.eyeFov[eye]);
+                const D3DMATRIX eyeTransform =
+                    MultiplyMatrix(
+                        MultiplyMatrix(headInverse, eyeInverse),
+                        eyeProjection);
+
+                float eyeX = 0.0f;
+                float eyeY = 0.0f;
+                if (!R57ProjectViewPoint(
+                        *marker, eyeTransform, eyeX, eyeY))
+                    return false;
+                deltaX[eye] = eyeX - baseX;
+                deltaY[eye] = eyeY - baseY;
+                if (!std::isfinite(deltaX[eye]) ||
+                    !std::isfinite(deltaY[eye]) ||
+                    std::fabs(deltaX[eye]) > 2.0f ||
+                    std::fabs(deltaY[eye]) > 2.0f)
+                    return false;
+            }
+            return true;
+        }
+
         float R30HudAspectCompensation(
             const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
         {
@@ -1310,7 +1424,8 @@ namespace OutRunVRStereo
             Hud2D,
             PerspectiveHud,
             ScreenOverlay2D,
-            WorldBillboard
+            WorldBillboard,
+            ProjectedWorldMarker2D
         };
 
         constexpr std::uint64_t R44OverlayWvpDrawWindow = 12u;
