@@ -120,6 +120,8 @@ namespace OutRunVRRenderer
 		OutRunVR::CadenceV1::ClientState* CadenceClientState = nullptr;
 		HANDLE CadenceRequestEvent = nullptr;
 		HANDLE CadencePresentedEvent = nullptr;
+		HANDLE CadenceHostProcess = nullptr;
+		DWORD CadenceHostProcessPid = 0;
 		std::atomic<std::uint32_t> ActiveCadenceRequestId{0};
 		std::atomic<bool> CadencePacingActive{false};
 		std::uint32_t CadenceAcceptedRequestId = 0;
@@ -962,6 +964,45 @@ namespace OutRunVRRenderer
             SetEvent(CadencePresentedEvent);
         }
 
+        void CloseCadenceHostProcess() noexcept
+        {
+            if (CadenceHostProcess)
+                CloseHandle(CadenceHostProcess);
+            CadenceHostProcess = nullptr;
+            CadenceHostProcessPid = 0;
+        }
+
+        bool CadenceHostProcessAlive(DWORD hostPid) noexcept
+        {
+            if (!hostPid)
+            {
+                CloseCadenceHostProcess();
+                return false;
+            }
+
+            if (CadenceHostProcess && CadenceHostProcessPid != hostPid)
+                CloseCadenceHostProcess();
+
+            if (!CadenceHostProcess)
+            {
+                CadenceHostProcess = OpenProcess(SYNCHRONIZE, FALSE, hostPid);
+                if (!CadenceHostProcess)
+                    return false;
+                CadenceHostProcessPid = hostPid;
+            }
+
+            const DWORD wait = WaitForSingleObject(CadenceHostProcess, 0);
+            if (wait == WAIT_TIMEOUT)
+                return true;
+
+            // The host exited or the cached process handle became unusable.
+            // Release it here so a later host generation/PID can be acquired
+            // once, rather than opening and closing a process handle every
+            // rendered frame on the cadence-critical Present thread.
+            CloseCadenceHostProcess();
+            return false;
+        }
+
         void WaitForNextCadenceRequest() noexcept
         {
             if (Settings::VRFrameCadenceMode <= 0 || !GameRendererIsActive())
@@ -982,13 +1023,11 @@ namespace OutRunVRRenderer
             if ((host.flags & required) != required || !host.hostPid)
             {
                 CadencePacingActive.store(false, std::memory_order_release);
+                CloseCadenceHostProcess();
                 return;
             }
 
-            HANDLE hostProcess = OpenProcess(SYNCHRONIZE, FALSE, host.hostPid);
-            const bool hostAlive = hostProcess &&
-                WaitForSingleObject(hostProcess, 0) == WAIT_TIMEOUT;
-            if (hostProcess) CloseHandle(hostProcess);
+            const bool hostAlive = CadenceHostProcessAlive(host.hostPid);
 
             LARGE_INTEGER cadenceNow{}, cadenceFreq{};
             QueryPerformanceCounter(&cadenceNow);
@@ -1834,6 +1873,7 @@ namespace OutRunVRRenderer
 		CadenceAcceptedRequestId = 0;
 		CadencePresentedRequestId = 0;
 		CadenceTimedOutRequestId = 0;
+		CloseCadenceHostProcess();
 		PresentPoseLocked = false;
 		InvalidateGameWvpWrite();
 		RestoreCullingCamera();
