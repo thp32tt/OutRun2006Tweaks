@@ -1,0 +1,451 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-PROBE197-75C-TEXT-CELLS",
+  "base_head": "511f5ca79434a12f088935bbb79c92e27ea7d59e",
+  "queue_index": 176,
+  "asset": "75C3586A",
+  "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+  "cells": [
+    {
+      "cell": "idx35",
+      "roi_readable": [
+        0,
+        1508,
+        892,
+        1676
+      ],
+      "red_masks": {
+        "red65": {
+          "pixels": 18028,
+          "bbox_local": [
+            0,
+            0,
+            729,
+            168
+          ],
+          "components": [
+            [
+              18028,
+              [
+                0,
+                0,
+                729,
+                168
+              ]
+            ]
+          ]
+        },
+        "red40": {
+          "pixels": 18041,
+          "bbox_local": [
+            0,
+            0,
+            729,
+            168
+          ],
+          "components": [
+            [
+              18041,
+              [
+                0,
+                0,
+                729,
+                168
+              ]
+            ]
+          ]
+        },
+        "bright_red": {
+          "pixels": 17571,
+          "bbox_local": [
+            0,
+            0,
+            729,
+            168
+          ],
+          "components": [
+            [
+              17571,
+              [
+                0,
+                0,
+                729,
+                168
+              ]
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "cell": "idx36",
+      "roi_readable": [
+        892,
+        1508,
+        1772,
+        1676
+      ],
+      "red_masks": {
+        "red65": {
+          "pixels": 0,
+          "bbox_local": null,
+          "components": []
+        },
+        "red40": {
+          "pixels": 0,
+          "bbox_local": null,
+          "components": []
+        },
+        "bright_red": {
+          "pixels": 0,
+          "bbox_local": null,
+          "components": []
+        }
+      }
+    },
+    {
+      "cell": "idx37",
+      "roi_readable": [
+        0,
+        1676,
+        580,
+        1844
+      ],
+      "red_masks": {
+        "red65": {
+          "pixels": 5243,
+          "bbox_local": [
+            18,
+            0,
+            580,
+            168
+          ],
+          "components": [
+            [
+              9,
+              [
+                18,
+                0,
+                27,
+                1
+              ]
+            ],
+            [
+              9,
+              [
+                137,
+                0,
+                146,
+                1
+              ]
+            ],
+            [
+              9,
+              [
+                273,
+                0,
+                282,
+                1
+              ]
+            ],
+            [
+              9,
+              [
+                425,
+                0,
+                434,
+                1
+              ]
+            ],
+            [
+              5207,
+              [
+                176,
+                77,
+                580,
+                168
+              ]
+            ]
+          ]
+        },
+        "red40": {
+          "pixels": 5287,
+          "bbox_local": [
+            18,
+            0,
+            580,
+            168
+          ],
+          "components": [
+            [
+              9,
+              [
+                18,
+                0,
+                27,
+                1
+              ]
+            ],
+            [
+              9,
+              [
+                137,
+                0,
+                146,
+                1
+              ]
+            ],
+            [
+              9,
+              [
+                273,
+                0,
+                282,
+                1
+              ]
+            ],
+            [
+              9,
+              [
+                425,
+                0,
+                434,
+                1
+              ]
+            ],
+            [
+              5251,
+              [
+                176,
+                77,
+                580,
+                168
+              ]
+            ]
+          ]
+        },
+        "bright_red": {
+          "pixels": 36,
+          "bbox_local": [
+            18,
+            0,
+            434,
+            1
+          ],
+          "components": [
+            [
+              9,
+              [
+                18,
+                0,
+                27,
+                1
+              ]
+            ],
+            [
+              9,
+              [
+                137,
+                0,
+                146,
+                1
+              ]
+            ],
+            [
+              9,
+              [
+                273,
+                0,
+                282,
+                1
+              ]
+            ],
+            [
+              9,
+              [
+                425,
+                0,
+                434,
+                1
+              ]
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "cell": "idx38",
+      "roi_readable": [
+        580,
+        1676,
+        1040,
+        1844
+      ],
+      "red_masks": {
+        "red65": {
+          "pixels": 3084,
+          "bbox_local": [
+            0,
+            3,
+            107,
+            168
+          ],
+          "components": [
+            [
+              3084,
+              [
+                0,
+                3,
+                107,
+                168
+              ]
+            ]
+          ]
+        },
+        "red40": {
+          "pixels": 3128,
+          "bbox_local": [
+            0,
+            3,
+            107,
+            168
+          ],
+          "components": [
+            [
+              3128,
+              [
+                0,
+                3,
+                107,
+                168
+              ]
+            ]
+          ]
+        },
+        "bright_red": {
+          "pixels": 6,
+          "bbox_local": [
+            81,
+            3,
+            87,
+            4
+          ],
+          "components": [
+            [
+              6,
+              [
+                81,
+                3,
+                87,
+                4
+              ]
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "cell": "idx39",
+      "roi_readable": [
+        0,
+        1844,
+        1036,
+        2008
+      ],
+      "red_masks": {
+        "red65": {
+          "pixels": 12221,
+          "bbox_local": [
+            2,
+            0,
+            687,
+            164
+          ],
+          "components": [
+            [
+              12131,
+              [
+                2,
+                0,
+                687,
+                164
+              ]
+            ],
+            [
+              90,
+              [
+                437,
+                159,
+                463,
+                164
+              ]
+            ]
+          ]
+        },
+        "red40": {
+          "pixels": 12352,
+          "bbox_local": [
+            2,
+            0,
+            687,
+            164
+          ],
+          "components": [
+            [
+              12262,
+              [
+                2,
+                0,
+                687,
+                164
+              ]
+            ],
+            [
+              90,
+              [
+                437,
+                159,
+                463,
+                164
+              ]
+            ]
+          ]
+        },
+        "bright_red": {
+          "pixels": 0,
+          "bbox_local": null,
+          "components": []
+        }
+      }
+    },
+    {
+      "cell": "idx40",
+      "roi_readable": [
+        1036,
+        1844,
+        1312,
+        1956
+      ],
+      "red_masks": {
+        "red65": {
+          "pixels": 0,
+          "bbox_local": null,
+          "components": []
+        },
+        "red40": {
+          "pixels": 0,
+          "bbox_local": null,
+          "components": []
+        },
+        "bright_red": {
+          "pixels": 0,
+          "bbox_local": null,
+          "components": []
+        }
+      }
+    }
+  ],
+  "status": "TEXT_CELL_DIAGNOSTIC_READY",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
