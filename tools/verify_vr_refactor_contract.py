@@ -762,6 +762,45 @@ if "R33InstallStatus()" in r33:
 if "R33InstallState" in r33:
     errors.append("R33 retained write-only final install state after observer retirement")
 
+# Post-1100 DirectGPU-owner flattening: R32 keeps transport/fence/ACK semantics
+# as a hook-free helper while R33 owns the physical hook over the R13 transport
+# callback and wraps its trampoline with the R32 owner helper.
+for banned in (
+    "SafetyHookInline R32ResolveDirectR13Hook{};",
+    "ResolveDirectTransportR32(",
+    "safetyhook::create_inline(",
+):
+    if banned in r32:
+        errors.append(f"R32 retained retired physical DirectGPU ownership: {banned}")
+for marker in (
+    "bool R32ResolveDirectTransport(",
+    "R13OverlayReadyForTransport()",
+    "return lowerResolve();",
+    "R32EnsureDirectResources(device)",
+    "R32DrainPendingProducerFence(slotIndex)",
+    "R13TryGetGpuCompletedFrame(slotIndex, gpuCompleted)",
+    "R32WaitProducerFence(slot.fence)",
+    "slot.producerPending = true;",
+    "ActiveDirectTransportSlot = slotIndex;",
+):
+    if marker not in r32:
+        errors.append(f"R32 missing hook-free DirectGPU owner contract: {marker}")
+for marker in (
+    "SafetyHookInline R33ResolveDirectR13Hook{};",
+    "reinterpret_cast<void*>(&ResolveDirectTransportR13)",
+    "ResolveDirectTransportDestR33",
+    "R32ResolveDirectTransport(",
+    "R33ResolveDirectR13Hook.call<bool>",
+):
+    if marker not in r33:
+        errors.append(f"R33 missing final DirectGPU hook contract: {marker}")
+for banned in (
+    "R32ResolveDirectR13Hook",
+    "ResolveDirectTransportR32",
+):
+    if banned in r33:
+        errors.append(f"R33 retained retired R32 physical DirectGPU symbol: {banned}")
+
 # Post-1100 Reset-owner flattening: R32 keeps the corrected reset lifecycle
 # semantics but no longer owns a physical Reset hook. R33 hooks R22 Reset
 # directly and wraps that lower call with the R32 lifecycle owner helper.
