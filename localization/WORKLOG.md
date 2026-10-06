@@ -2232,3 +2232,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Mandatory controller SOURCE/CLEAN/FINAL high-zoom plus raw mirror_y visual review PASS: road and green border are continuous at EASY/HARD, prior white patch/smear is gone, Hangul is intact, and no English residue, clipping, collision, foreign-image intrusion or orientation defect is visible.
 - State synchronized to `A132_SELF_QA_PASS_PENDING_C_AND_INGAME`. Independent C and actual in-game validation remain pending; runtime validation is UNTESTED. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN/A132_33491F83_REPORT.json`; `localization/graphics/role_A/20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN/A132_CONTROLLER_SELF_QA.json`; worker output commit `dbad0d33bdc69f4380c522cf46dc678b81840e01`.
+
+## 2026-10-06T15:18:00+09:00 — B195 remaining even zoom-review closeout
+- Consumed existing B181/B192/B193 exact-HD readable/raw evidence instead of repeating probe compute. Closed indices 166/174/178/180/194/196/202/206/210/238.
+- 166/178 are album/CD/song-title artwork; 180/206 are Ferrari vehicle/model/brand artwork; 238 is OutRun2006 Coast 2 Coast title/logo artwork. Policy requires preserve-original.
+- 174/194/196/202/210 are stage/course imagery with OutRun2/OutRun2SP logos and incidental scene signage only; no localizable UI text.
+- Controller readable + raw mirror_y review PASS 10/10. Localizable segments=0 for all; no Korean DDS candidate is required and no raster bytes were modified.
+- Queue state now has blocked zoom_review=0 globally. A132 concurrently completed index62 33491F83, so B did not duplicate it. Remaining B direct-image hold: index176 75C3586A HOLD_STRICT_RECHECK, not render-ready because canonical source-text glyph/effect evidence is absent.
+- VR/FFB/DX11/DXVK untouched. Evidence: localization/graphics/role_B/20261006-B-CLASSIFY195-EVEN-ZOOM-CLOSEOUT/B195_CONTROLLER_CLASSIFICATION.json.

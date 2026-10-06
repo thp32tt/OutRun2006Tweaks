@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261006-B-CLASSIFY195-EVEN-ZOOM-CLOSEOUT",
+  "timestamp_kst": "2026-10-06T15:18:00+09:00",
+  "base_head": "a2113eaf909f9d2484c254a50ea41d55b08647f8",
+  "source_reports": [
+    "localization/graphics/role_B/20261006-B-PROBE181-ZOOM166172174178180/B181_ZOOM166172174178180_REPORT.json",
+    "localization/graphics/role_B/20261006-B-CLASSIFY192-ZOOM166174178180/B192_RAW_PROOF_REPORT.json",
+    "localization/graphics/role_B/20261006-B-PROBE193-ZOOM194196202206210214238/B193_ZOOM194196202206210214238_REPORT.json"
+  ],
+  "items": [
+    {
+      "queue_index": 166,
+      "asset": "5EBD7FE8",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5EBD7FE8_1024x1024.dds",
+      "source_sha256": "df3cc1db866fb8d04c17ac6d52873771672ca9a4c32c35ec99c1a0893b1a4ce0",
+      "classification": "PRESERVE_ORIGINAL_POLICY",
+      "localizable_segments": 0,
+      "candidate_required": false,
+      "controller_observation": "Album/CD cover montage. OUTRUN/OUTRUN2 title artwork and song titles (e.g. Passing Breeze/Shiny World/Magical Sound Shower) are protected original music/title artwork; no localizable UI text.",
+      "readable_orientation_review": "PASS",
+      "raw_mirror_y_review": "PASS"
+    },
+    {
+      "queue_index": 174,
+      "asset": "73F852A4",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/73F852A4_512x512.dds",
+      "source_sha256": "5c579655cbdd452198e42c7c18282e133bca17a38fcde3fa7dd878f764f033ad",
+      "classification": "NO_LOCALIZABLE_TEXT",
+      "localizable_segments": 0,
+      "candidate_required": false,
+      "controller_observation": "Eight stage screenshots with OutRun2/OutRun2SP logo artwork only; incidental scene signage is environmental artwork, not localizable UI text.",
+      "readable_orientation_review": "PASS",
+      "raw_mirror_y_review": "PASS"
+    },
+    {
+      "queue_index": 178,
+      "asset": "798A1E",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/798A1E_1024x256.dds",
+      "source_sha256": "9d71da325ac22deb67bfb448611c2524719e2c505e0ccd97f86a9407824f3b03",
+      "classification": "PRESERVE_ORIGINAL_POLICY",
+      "localizable_segments": 0,
+      "candidate_required": false,
+      "controller_observation": "CD/postcard montage with OUTRUN2/OutRun2SP titles and song-title artwork; music/title artwork is protected original.",
+      "readable_orientation_review": "PASS",
+      "raw_mirror_y_review": "PASS"
+    },
+    {
+      "queue_index": 180,
+      "asset": "7ABD5110",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/7ABD5110_1024x256.dds",
+      "source_sha256": "1047fda5b4e6baa7a1522205290a06ec775c0da7b74f24438fe7cef1a78a31a9",
+      "classification": "PRESERVE_ORIGINAL_POLICY",
+      "localizable_segments": 0,
+      "candidate_required": false,
+      "controller_observation": "Ferrari vehicle/model artwork, color swatches and OutRun2SP postcard art only; vehicle/model names and brand artwork are protected original.",
+      "readable_orientation_review": "PASS",
+      "raw_mirror_y_review": "PASS"
+    },
+    {
+      "queue_index": 194,
+      "asset": "9AC75730",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9AC75730_512x512.dds",
+      "source_sha256": "a40c30d68742961c4c75b397d05b341e01cbfc22b60d40caa88649e34c5719b0",
+      "classification": "NO_LOCALIZABLE_TEXT",
+      "localizable_segments": 0,
+      "candidate_required": false,
+      "controller_observation": "Four stage/course screenshots plus OutRun2SP logo artwork only; no language-bearing UI label.",
+      "readable_orientation_review": "PASS",
+      "raw_mirror_y_review": "PASS"
+    },
+    {
+      "queue_index": 196,
+      "asset": "9EF903AF",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9EF903AF_512x512.dds",
+      "source_sha256": "4dc7f00c7057064bea082735717eb66867b85c1fd3efafb49a56534100bedac5",
+      "classification": "NO_LOCALIZABLE_TEXT",
+      "localizable_segments": 0,
+      "candidate_required": false,
+      "controller_observation": "Four stage/course screenshots plus OutRun2 logo artwork only; no language-bearing UI label.",
+      "readable_orientation_review": "PASS",
+      "raw_mirror_y_review": "PASS"
+    },
+    {
+      "queue_index": 202,
+      "asset": "AB56F682",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/AB56F682_512x512.dds",
+      "source_sha256": "847088dd71a29a50ccd33c2d52b07dd365f24c3345e7b4cf0531e13e25776655",
+      "classification": "NO_LOCALIZABLE_TEXT",
+      "localizable_segments": 0,
+      "candidate_required": false,
+      "controller_observation": "Four stage/course screenshots plus OutRun2SP logo artwork. Direction signs/neon are part of scene/environment art, not localizable UI text.",
+      "readable_orientation_review": "PASS",
+      "raw_mirror_y_review": "PASS"
+    },
+    {
+      "queue_index": 206,
+      "asset": "AEA507A4",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/AEA507A4_512x256.dds",
+      "source_sha256": "c0655ff7c6aee5d2cf60792f20a2d5e3455f52840b8ca69e69fc341060514dcc",
+      "classification": "PRESERVE_ORIGINAL_POLICY",
+      "localizable_segments": 0,
+      "candidate_required": false,
+      "controller_observation": "F430 SPIDER vehicle/model-name artwork with controller/route icons. Ferrari model name is protected original; no localizable UI text.",
+      "readable_orientation_review": "PASS",
+      "raw_mirror_y_review": "PASS"
+    },
+    {
+      "queue_index": 210,
+      "asset": "B5BB7AB0",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/B5BB7AB0_512x512.dds",
+      "source_sha256": "a14927afd29972f383fcecf4e32a7c60534a030b37b99183390503f24d6f8ff0",
+      "classification": "NO_LOCALIZABLE_TEXT",
+      "localizable_segments": 0,
+      "candidate_required": false,
+      "controller_observation": "Four stage/course screenshots plus OutRun2SP logo artwork only; no language-bearing UI label.",
+      "readable_orientation_review": "PASS",
+      "raw_mirror_y_review": "PASS"
+    },
+    {
+      "queue_index": 238,
+      "asset": "132A1B1F",
+      "path": "textures/load/spr_sprani_sumo_loading_Exst/132A1B1F_512x512.dds",
+      "source_sha256": "48d567d50fe59fd1718c0a7468c2c47fd374e46e008da350d40c5d12e5dec333",
+      "classification": "PRESERVE_ORIGINAL_POLICY",
+      "localizable_segments": 0,
+      "candidate_required": false,
+      "controller_observation": "OutRun2006 Coast 2 Coast game-title/logo artwork on loading background; title/logo is protected original, with no localizable UI text.",
+      "readable_orientation_review": "PASS",
+      "raw_mirror_y_review": "PASS"
+    }
+  ],
+  "controller_visual_qa": "PASS_READABLE_AND_RAW_10_OF_10",
+  "candidate_written": false,
+  "blocked_zoom_review_after": 0,
+  "next_direct_image_state": {
+    "index": 176,
+    "asset": "75C3586A",
+    "status": "HOLD_STRICT_RECHECK",
+    "reason": "Existing B74 state says canonical HD source lacks the transcribed source glyph/effect pixels, so exact source bboxes cannot be established; not render-ready."
+  },
+  "concurrent_work_preserved": "A132 already promoted index62 33491F83 before B195 commit; B195 does not touch or duplicate it.",
+  "status": "B_PRIMARY_EVEN_BLOCKED_ZOOM_REVIEW_SHARD_EXHAUSTED",
+  "runtime_validation": "NOT_REQUIRED_FOR_NO_LOCALIZATION_CLASSIFICATIONS",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
