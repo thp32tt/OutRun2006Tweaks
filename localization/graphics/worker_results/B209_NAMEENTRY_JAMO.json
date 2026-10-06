@@ -1,0 +1,9 @@
+{
+  "role": "B",
+  "run": "20261006-B-PRODUCTION209-NAMEENTRY-JAMO-KEYCAPS",
+  "queue_index": 24,
+  "asset": "textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "candidate_sha256": "c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e",
+  "report": "localization/graphics/role_B/20261006-B-PRODUCTION209-NAMEENTRY-JAMO-KEYCAPS/B209_JAMO_KEYCAP_REPORT.json",
+  "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_INPUT_WIRING_HOLD"
+}

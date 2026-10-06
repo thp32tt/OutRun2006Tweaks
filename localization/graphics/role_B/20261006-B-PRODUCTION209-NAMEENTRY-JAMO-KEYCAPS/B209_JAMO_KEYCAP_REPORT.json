@@ -1,0 +1,1677 @@
+{
+  "schema_version": 1,
+  "run": "B209",
+  "role": "B",
+  "queue_index": 24,
+  "asset": "textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "source": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "8e18676ac303b07a56d81d1d21c5e025e0baf46da49b16ae9d2e411960181f73",
+    "atlas_regions": 49
+  },
+  "semantic_proof": {
+    "runtime": "B207 proves stock base-page selection 10..35 == a..z",
+    "visual": "A135 controller review proves sprite_92..sprite_67 == A..Z",
+    "binding": "case-insensitive key identity: selection 10+n / a+n -> visual A+n / sprite_(92-n)",
+    "keycap_policy": "replace only A-Z visual glyph resources with their standard 2-beolsik base Jamo; digits, punctuation, END and all other textures remain byte/pixel exact"
+  },
+  "mapping": [
+    {
+      "letter": "A",
+      "jamo": "ㅁ",
+      "sprite": "sprite_92",
+      "cell_rect": [
+        0,
+        0,
+        96,
+        96
+      ]
+    },
+    {
+      "letter": "B",
+      "jamo": "ㅠ",
+      "sprite": "sprite_91",
+      "cell_rect": [
+        96,
+        0,
+        192,
+        96
+      ]
+    },
+    {
+      "letter": "C",
+      "jamo": "ㅊ",
+      "sprite": "sprite_90",
+      "cell_rect": [
+        193,
+        0,
+        289,
+        96
+      ]
+    },
+    {
+      "letter": "D",
+      "jamo": "ㅇ",
+      "sprite": "sprite_89",
+      "cell_rect": [
+        289,
+        0,
+        385,
+        96
+      ]
+    },
+    {
+      "letter": "E",
+      "jamo": "ㄷ",
+      "sprite": "sprite_88",
+      "cell_rect": [
+        387,
+        0,
+        483,
+        96
+      ]
+    },
+    {
+      "letter": "F",
+      "jamo": "ㄹ",
+      "sprite": "sprite_87",
+      "cell_rect": [
+        485,
+        0,
+        581,
+        96
+      ]
+    },
+    {
+      "letter": "G",
+      "jamo": "ㅎ",
+      "sprite": "sprite_86",
+      "cell_rect": [
+        581,
+        0,
+        677,
+        96
+      ]
+    },
+    {
+      "letter": "H",
+      "jamo": "ㅗ",
+      "sprite": "sprite_85",
+      "cell_rect": [
+        677,
+        0,
+        773,
+        96
+      ]
+    },
+    {
+      "letter": "I",
+      "jamo": "ㅑ",
+      "sprite": "sprite_84",
+      "cell_rect": [
+        774,
+        0,
+        870,
+        96
+      ]
+    },
+    {
+      "letter": "J",
+      "jamo": "ㅓ",
+      "sprite": "sprite_83",
+      "cell_rect": [
+        871,
+        0,
+        967,
+        96
+      ]
+    },
+    {
+      "letter": "K",
+      "jamo": "ㅏ",
+      "sprite": "sprite_82",
+      "cell_rect": [
+        0,
+        96,
+        96,
+        192
+      ]
+    },
+    {
+      "letter": "L",
+      "jamo": "ㅣ",
+      "sprite": "sprite_81",
+      "cell_rect": [
+        97,
+        96,
+        193,
+        192
+      ]
+    },
+    {
+      "letter": "M",
+      "jamo": "ㅡ",
+      "sprite": "sprite_80",
+      "cell_rect": [
+        197,
+        96,
+        293,
+        192
+      ]
+    },
+    {
+      "letter": "N",
+      "jamo": "ㅜ",
+      "sprite": "sprite_79",
+      "cell_rect": [
+        294,
+        96,
+        390,
+        192
+      ]
+    },
+    {
+      "letter": "O",
+      "jamo": "ㅐ",
+      "sprite": "sprite_78",
+      "cell_rect": [
+        392,
+        96,
+        488,
+        192
+      ]
+    },
+    {
+      "letter": "P",
+      "jamo": "ㅔ",
+      "sprite": "sprite_77",
+      "cell_rect": [
+        491,
+        96,
+        587,
+        192
+      ]
+    },
+    {
+      "letter": "Q",
+      "jamo": "ㅂ",
+      "sprite": "sprite_76",
+      "cell_rect": [
+        589,
+        96,
+        685,
+        192
+      ]
+    },
+    {
+      "letter": "R",
+      "jamo": "ㄱ",
+      "sprite": "sprite_75",
+      "cell_rect": [
+        689,
+        96,
+        785,
+        192
+      ]
+    },
+    {
+      "letter": "S",
+      "jamo": "ㄴ",
+      "sprite": "sprite_74",
+      "cell_rect": [
+        785,
+        96,
+        881,
+        192
+      ]
+    },
+    {
+      "letter": "T",
+      "jamo": "ㅅ",
+      "sprite": "sprite_73",
+      "cell_rect": [
+        883,
+        96,
+        979,
+        192
+      ]
+    },
+    {
+      "letter": "U",
+      "jamo": "ㅕ",
+      "sprite": "sprite_72",
+      "cell_rect": [
+        0,
+        192,
+        96,
+        288
+      ]
+    },
+    {
+      "letter": "V",
+      "jamo": "ㅍ",
+      "sprite": "sprite_71",
+      "cell_rect": [
+        96,
+        192,
+        192,
+        288
+      ]
+    },
+    {
+      "letter": "W",
+      "jamo": "ㅈ",
+      "sprite": "sprite_70",
+      "cell_rect": [
+        194,
+        192,
+        290,
+        288
+      ]
+    },
+    {
+      "letter": "X",
+      "jamo": "ㅌ",
+      "sprite": "sprite_69",
+      "cell_rect": [
+        295,
+        192,
+        391,
+        288
+      ]
+    },
+    {
+      "letter": "Y",
+      "jamo": "ㅛ",
+      "sprite": "sprite_68",
+      "cell_rect": [
+        394,
+        192,
+        490,
+        288
+      ]
+    },
+    {
+      "letter": "Z",
+      "jamo": "ㅋ",
+      "sprite": "sprite_67",
+      "cell_rect": [
+        493,
+        192,
+        589,
+        288
+      ]
+    }
+  ],
+  "palette_rgba": {
+    "outer": [
+      0,
+      20,
+      49,
+      255
+    ],
+    "rim": [
+      222,
+      243,
+      255,
+      255
+    ],
+    "face_mid": [
+      99,
+      170,
+      255,
+      255
+    ],
+    "face_top": [
+      173,
+      202,
+      249,
+      255
+    ],
+    "face_bottom": [
+      65,
+      113,
+      255,
+      255
+    ]
+  },
+  "font": "Noto Sans CJK KR Black",
+  "shear_readable": 0.18,
+  "candidate_sha256": "c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e",
+  "dds_meta": {
+    "width": 1024,
+    "height": 1024,
+    "linear_size": 0,
+    "mips": 0,
+    "fourcc": "DXT3",
+    "compression": "BC2/DXT3",
+    "raw_mode": "DXT3"
+  },
+  "qa": {
+    "rows": [
+      {
+        "letter": "A",
+        "jamo": "ㅁ",
+        "sprite": "sprite_92",
+        "cell_rect": [
+          0,
+          0,
+          96,
+          96
+        ],
+        "original_bbox": [
+          11,
+          7,
+          78,
+          89
+        ],
+        "localized_bbox": [
+          13,
+          24,
+          75,
+          71
+        ],
+        "original_size": [
+          67,
+          82
+        ],
+        "localized_size": [
+          62,
+          47
+        ],
+        "delta_left": 2,
+        "delta_right": 3,
+        "delta_top": 17,
+        "delta_bottom": 18,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          13,
+          24,
+          76,
+          71
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "B",
+        "jamo": "ㅠ",
+        "sprite": "sprite_91",
+        "cell_rect": [
+          96,
+          0,
+          192,
+          96
+        ],
+        "original_bbox": [
+          111,
+          7,
+          177,
+          89
+        ],
+        "localized_bbox": [
+          112,
+          28,
+          176,
+          67
+        ],
+        "original_size": [
+          66,
+          82
+        ],
+        "localized_size": [
+          64,
+          39
+        ],
+        "delta_left": 1,
+        "delta_right": 1,
+        "delta_top": 21,
+        "delta_bottom": 22,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 62,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          112,
+          28,
+          176,
+          67
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "C",
+        "jamo": "ㅊ",
+        "sprite": "sprite_90",
+        "cell_rect": [
+          193,
+          0,
+          289,
+          96
+        ],
+        "original_bbox": [
+          212,
+          4,
+          277,
+          92
+        ],
+        "localized_bbox": [
+          213,
+          21,
+          275,
+          75
+        ],
+        "original_size": [
+          65,
+          88
+        ],
+        "localized_size": [
+          62,
+          54
+        ],
+        "delta_left": 1,
+        "delta_right": 2,
+        "delta_top": 17,
+        "delta_bottom": 17,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          213,
+          21,
+          276,
+          75
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "D",
+        "jamo": "ㅇ",
+        "sprite": "sprite_89",
+        "cell_rect": [
+          289,
+          0,
+          385,
+          96
+        ],
+        "original_bbox": [
+          299,
+          7,
+          368,
+          89
+        ],
+        "localized_bbox": [
+          305,
+          23,
+          361,
+          72
+        ],
+        "original_size": [
+          69,
+          82
+        ],
+        "localized_size": [
+          56,
+          49
+        ],
+        "delta_left": 6,
+        "delta_right": 7,
+        "delta_top": 16,
+        "delta_bottom": 17,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          305,
+          23,
+          361,
+          72
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "E",
+        "jamo": "ㄷ",
+        "sprite": "sprite_88",
+        "cell_rect": [
+          387,
+          0,
+          483,
+          96
+        ],
+        "original_bbox": [
+          402,
+          7,
+          472,
+          89
+        ],
+        "localized_bbox": [
+          407,
+          24,
+          467,
+          71
+        ],
+        "original_size": [
+          70,
+          82
+        ],
+        "localized_size": [
+          60,
+          47
+        ],
+        "delta_left": 5,
+        "delta_right": 5,
+        "delta_top": 17,
+        "delta_bottom": 18,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          407,
+          24,
+          468,
+          71
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "F",
+        "jamo": "ㄹ",
+        "sprite": "sprite_87",
+        "cell_rect": [
+          485,
+          0,
+          581,
+          96
+        ],
+        "original_bbox": [
+          502,
+          7,
+          571,
+          89
+        ],
+        "localized_bbox": [
+          505,
+          23,
+          567,
+          72
+        ],
+        "original_size": [
+          69,
+          82
+        ],
+        "localized_size": [
+          62,
+          49
+        ],
+        "delta_left": 3,
+        "delta_right": 4,
+        "delta_top": 16,
+        "delta_bottom": 17,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          505,
+          23,
+          567,
+          72
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "G",
+        "jamo": "ㅎ",
+        "sprite": "sprite_86",
+        "cell_rect": [
+          581,
+          0,
+          677,
+          96
+        ],
+        "original_bbox": [
+          598,
+          4,
+          663,
+          92
+        ],
+        "localized_bbox": [
+          601,
+          20,
+          659,
+          76
+        ],
+        "original_size": [
+          65,
+          88
+        ],
+        "localized_size": [
+          58,
+          56
+        ],
+        "delta_left": 3,
+        "delta_right": 4,
+        "delta_top": 16,
+        "delta_bottom": 16,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          601,
+          20,
+          660,
+          76
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "H",
+        "jamo": "ㅗ",
+        "sprite": "sprite_85",
+        "cell_rect": [
+          677,
+          0,
+          773,
+          96
+        ],
+        "original_bbox": [
+          688,
+          7,
+          764,
+          89
+        ],
+        "localized_bbox": [
+          689,
+          25,
+          763,
+          71
+        ],
+        "original_size": [
+          76,
+          82
+        ],
+        "localized_size": [
+          74,
+          46
+        ],
+        "delta_left": 1,
+        "delta_right": 1,
+        "delta_top": 18,
+        "delta_bottom": 18,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          689,
+          25,
+          764,
+          71
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "I",
+        "jamo": "ㅑ",
+        "sprite": "sprite_84",
+        "cell_rect": [
+          774,
+          0,
+          870,
+          96
+        ],
+        "original_bbox": [
+          797,
+          7,
+          844,
+          89
+        ],
+        "localized_bbox": [
+          799,
+          8,
+          842,
+          88
+        ],
+        "original_size": [
+          47,
+          82
+        ],
+        "localized_size": [
+          43,
+          80
+        ],
+        "delta_left": 2,
+        "delta_right": 2,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          799,
+          8,
+          843,
+          88
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "J",
+        "jamo": "ㅓ",
+        "sprite": "sprite_83",
+        "cell_rect": [
+          871,
+          0,
+          967,
+          96
+        ],
+        "original_bbox": [
+          887,
+          7,
+          947,
+          92
+        ],
+        "localized_bbox": [
+          896,
+          9,
+          937,
+          89
+        ],
+        "original_size": [
+          60,
+          85
+        ],
+        "localized_size": [
+          41,
+          80
+        ],
+        "delta_left": 9,
+        "delta_right": 10,
+        "delta_top": 2,
+        "delta_bottom": 3,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          896,
+          9,
+          938,
+          89
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "K",
+        "jamo": "ㅏ",
+        "sprite": "sprite_82",
+        "cell_rect": [
+          0,
+          96,
+          96,
+          192
+        ],
+        "original_bbox": [
+          13,
+          103,
+          89,
+          185
+        ],
+        "localized_bbox": [
+          30,
+          104,
+          72,
+          184
+        ],
+        "original_size": [
+          76,
+          82
+        ],
+        "localized_size": [
+          42,
+          80
+        ],
+        "delta_left": 17,
+        "delta_right": 17,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          30,
+          104,
+          72,
+          184
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "L",
+        "jamo": "ㅣ",
+        "sprite": "sprite_81",
+        "cell_rect": [
+          97,
+          96,
+          193,
+          192
+        ],
+        "original_bbox": [
+          117,
+          103,
+          163,
+          185
+        ],
+        "localized_bbox": [
+          124,
+          105,
+          155,
+          183
+        ],
+        "original_size": [
+          46,
+          82
+        ],
+        "localized_size": [
+          31,
+          78
+        ],
+        "delta_left": 7,
+        "delta_right": 8,
+        "delta_top": 2,
+        "delta_bottom": 2,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          124,
+          105,
+          155,
+          183
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "M",
+        "jamo": "ㅡ",
+        "sprite": "sprite_80",
+        "cell_rect": [
+          197,
+          96,
+          293,
+          192
+        ],
+        "original_bbox": [
+          201,
+          103,
+          286,
+          185
+        ],
+        "localized_bbox": [
+          206,
+          136,
+          281,
+          152
+        ],
+        "original_size": [
+          85,
+          82
+        ],
+        "localized_size": [
+          75,
+          16
+        ],
+        "delta_left": 5,
+        "delta_right": 5,
+        "delta_top": 33,
+        "delta_bottom": 33,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          206,
+          136,
+          282,
+          152
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "N",
+        "jamo": "ㅜ",
+        "sprite": "sprite_79",
+        "cell_rect": [
+          294,
+          96,
+          390,
+          192
+        ],
+        "original_bbox": [
+          303,
+          103,
+          379,
+          185
+        ],
+        "localized_bbox": [
+          304,
+          121,
+          378,
+          166
+        ],
+        "original_size": [
+          76,
+          82
+        ],
+        "localized_size": [
+          74,
+          45
+        ],
+        "delta_left": 1,
+        "delta_right": 1,
+        "delta_top": 18,
+        "delta_bottom": 19,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 74,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          304,
+          121,
+          378,
+          166
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "O",
+        "jamo": "ㅐ",
+        "sprite": "sprite_78",
+        "cell_rect": [
+          392,
+          96,
+          488,
+          192
+        ],
+        "original_bbox": [
+          407,
+          100,
+          471,
+          188
+        ],
+        "localized_bbox": [
+          414,
+          104,
+          463,
+          184
+        ],
+        "original_size": [
+          64,
+          88
+        ],
+        "localized_size": [
+          49,
+          80
+        ],
+        "delta_left": 7,
+        "delta_right": 8,
+        "delta_top": 4,
+        "delta_bottom": 4,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          414,
+          104,
+          463,
+          184
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "P",
+        "jamo": "ㅔ",
+        "sprite": "sprite_77",
+        "cell_rect": [
+          491,
+          96,
+          587,
+          192
+        ],
+        "original_bbox": [
+          505,
+          103,
+          571,
+          185
+        ],
+        "localized_bbox": [
+          513,
+          104,
+          563,
+          184
+        ],
+        "original_size": [
+          66,
+          82
+        ],
+        "localized_size": [
+          50,
+          80
+        ],
+        "delta_left": 8,
+        "delta_right": 8,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          513,
+          104,
+          564,
+          184
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "Q",
+        "jamo": "ㅂ",
+        "sprite": "sprite_76",
+        "cell_rect": [
+          589,
+          96,
+          685,
+          192
+        ],
+        "original_bbox": [
+          606,
+          100,
+          667,
+          188
+        ],
+        "localized_bbox": [
+          607,
+          120,
+          666,
+          167
+        ],
+        "original_size": [
+          61,
+          88
+        ],
+        "localized_size": [
+          59,
+          47
+        ],
+        "delta_left": 1,
+        "delta_right": 1,
+        "delta_top": 20,
+        "delta_bottom": 21,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 73,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          607,
+          120,
+          667,
+          167
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "R",
+        "jamo": "ㄱ",
+        "sprite": "sprite_75",
+        "cell_rect": [
+          689,
+          96,
+          785,
+          192
+        ],
+        "original_bbox": [
+          704,
+          103,
+          771,
+          185
+        ],
+        "localized_bbox": [
+          709,
+          120,
+          765,
+          167
+        ],
+        "original_size": [
+          67,
+          82
+        ],
+        "localized_size": [
+          56,
+          47
+        ],
+        "delta_left": 5,
+        "delta_right": 6,
+        "delta_top": 17,
+        "delta_bottom": 18,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          709,
+          120,
+          766,
+          167
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "S",
+        "jamo": "ㄴ",
+        "sprite": "sprite_74",
+        "cell_rect": [
+          785,
+          96,
+          881,
+          192
+        ],
+        "original_bbox": [
+          802,
+          100,
+          864,
+          188
+        ],
+        "localized_bbox": [
+          805,
+          120,
+          861,
+          167
+        ],
+        "original_size": [
+          62,
+          88
+        ],
+        "localized_size": [
+          56,
+          47
+        ],
+        "delta_left": 3,
+        "delta_right": 3,
+        "delta_top": 20,
+        "delta_bottom": 21,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          805,
+          120,
+          862,
+          167
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "T",
+        "jamo": "ㅅ",
+        "sprite": "sprite_73",
+        "cell_rect": [
+          883,
+          96,
+          979,
+          192
+        ],
+        "original_bbox": [
+          907,
+          103,
+          967,
+          185
+        ],
+        "localized_bbox": [
+          908,
+          120,
+          966,
+          167
+        ],
+        "original_size": [
+          60,
+          82
+        ],
+        "localized_size": [
+          58,
+          47
+        ],
+        "delta_left": 1,
+        "delta_right": 1,
+        "delta_top": 17,
+        "delta_bottom": 18,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 72,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          908,
+          120,
+          967,
+          167
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "U",
+        "jamo": "ㅕ",
+        "sprite": "sprite_72",
+        "cell_rect": [
+          0,
+          192,
+          96,
+          288
+        ],
+        "original_bbox": [
+          13,
+          199,
+          83,
+          284
+        ],
+        "localized_bbox": [
+          27,
+          201,
+          69,
+          281
+        ],
+        "original_size": [
+          70,
+          85
+        ],
+        "localized_size": [
+          42,
+          80
+        ],
+        "delta_left": 14,
+        "delta_right": 14,
+        "delta_top": 2,
+        "delta_bottom": 3,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          27,
+          201,
+          70,
+          281
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "V",
+        "jamo": "ㅍ",
+        "sprite": "sprite_71",
+        "cell_rect": [
+          96,
+          192,
+          192,
+          288
+        ],
+        "original_bbox": [
+          108,
+          199,
+          174,
+          281
+        ],
+        "localized_bbox": [
+          109,
+          216,
+          173,
+          264
+        ],
+        "original_size": [
+          66,
+          82
+        ],
+        "localized_size": [
+          64,
+          48
+        ],
+        "delta_left": 1,
+        "delta_right": 1,
+        "delta_top": 17,
+        "delta_bottom": 17,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          109,
+          216,
+          173,
+          264
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "W",
+        "jamo": "ㅈ",
+        "sprite": "sprite_70",
+        "cell_rect": [
+          194,
+          192,
+          290,
+          288
+        ],
+        "original_bbox": [
+          197,
+          199,
+          282,
+          281
+        ],
+        "localized_bbox": [
+          208,
+          215,
+          271,
+          264
+        ],
+        "original_size": [
+          85,
+          82
+        ],
+        "localized_size": [
+          63,
+          49
+        ],
+        "delta_left": 11,
+        "delta_right": 11,
+        "delta_top": 16,
+        "delta_bottom": 17,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          208,
+          215,
+          272,
+          264
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "X",
+        "jamo": "ㅌ",
+        "sprite": "sprite_69",
+        "cell_rect": [
+          295,
+          192,
+          391,
+          288
+        ],
+        "original_bbox": [
+          300,
+          199,
+          377,
+          281
+        ],
+        "localized_bbox": [
+          308,
+          216,
+          369,
+          263
+        ],
+        "original_size": [
+          77,
+          82
+        ],
+        "localized_size": [
+          61,
+          47
+        ],
+        "delta_left": 8,
+        "delta_right": 8,
+        "delta_top": 17,
+        "delta_bottom": 18,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          308,
+          216,
+          370,
+          263
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "Y",
+        "jamo": "ㅛ",
+        "sprite": "sprite_68",
+        "cell_rect": [
+          394,
+          192,
+          490,
+          288
+        ],
+        "original_bbox": [
+          416,
+          199,
+          479,
+          281
+        ],
+        "localized_bbox": [
+          417,
+          220,
+          478,
+          259
+        ],
+        "original_size": [
+          63,
+          82
+        ],
+        "localized_size": [
+          61,
+          39
+        ],
+        "delta_left": 1,
+        "delta_right": 1,
+        "delta_top": 21,
+        "delta_bottom": 22,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 58,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          417,
+          220,
+          478,
+          259
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      },
+      {
+        "letter": "Z",
+        "jamo": "ㅋ",
+        "sprite": "sprite_67",
+        "cell_rect": [
+          493,
+          192,
+          589,
+          288
+        ],
+        "original_bbox": [
+          502,
+          199,
+          575,
+          281
+        ],
+        "localized_bbox": [
+          508,
+          215,
+          568,
+          264
+        ],
+        "original_size": [
+          73,
+          82
+        ],
+        "localized_size": [
+          60,
+          49
+        ],
+        "delta_left": 6,
+        "delta_right": 7,
+        "delta_top": 16,
+        "delta_bottom": 17,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS",
+        "protected_overlap_pixels": 0,
+        "localized_overlap_pixels": 0,
+        "font_size": 76,
+        "shear_readable": 0.18,
+        "decoded_localized_bbox": [
+          508,
+          215,
+          568,
+          264
+        ],
+        "decoded_containment": "PASS",
+        "decoded_size_ceiling": "PASS"
+      }
+    ],
+    "precompression_changed_pixels": 93486,
+    "precompression_changed_pixels_outside_original_bboxes": 0,
+    "precompression_alpha_changed_outside_original_bboxes": 0,
+    "precompression_protected_changed_pixels": 0,
+    "clean_source_residue_pixels": 0,
+    "dds_header_128_exact": true,
+    "compression": "DXT3/BC2",
+    "recompressed_blocks": 10032,
+    "non_target_compressed_blocks_preserved_exact": true,
+    "decoded_visible_changed_outside_original_bboxes": 0,
+    "decoded_alpha_changed_outside_original_bboxes": 0,
+    "decoded_protected_visible_changed_pixels": 0,
+    "decoded_containment": "PASS",
+    "raw_orientation": "mirror_y",
+    "visual_controller_review": "PENDING",
+    "runtime_validation": "UNTESTED"
+  },
+  "promotion": {
+    "status": "HOLD_INPUT_WIRING_REQUIRED",
+    "test_build_selected": false,
+    "reason": "Do not package/promote until B208 composer is wired to the B207 character path and END commits the A141 alias."
+  },
+  "no_vr_ffb_dx11_dxvk_work": true
+}
