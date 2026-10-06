@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 03:01 KST",
+  "updated_at_kst": "2026-10-07 03:19 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -3239,5 +3239,21 @@
     "q236_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/036_q236_FEF70E85.jpg",
     "q236_candidate_sha256": "e0a01c50df1aefb2a174dc318a1f6a041f0cf3b2759fff8fcafba7d134ec44c8",
     "runtime_validation": "UNTESTED"
+  },
+  "a148r_2ea557b4": {
+    "run": "A148R",
+    "timestamp_kst": "2026-10-07 03:19 KST",
+    "queue_index": 55,
+    "asset": "2EA557B4",
+    "trigger": "PRE_INGAME_017_TEXT_SCALE_ALIGNMENT_FALSE_NEGATIVE",
+    "c164_candidate_sha256": "b0cf1dbdd1c73801f3023e9c45af245b4f655f1d4c6f6b0a08e1c1bdae16d7fc",
+    "first_attempt_a148_sha256": "13cf23b401ecf65fa3b2f70af50a5be5e1f07c086d982d634c08d7b8094b477b",
+    "candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
+    "geometry": "source 1089x143; C164 533x127 centered; A148R 881x127 source-left bbox [9,113,890,240]",
+    "qa": "bbox/size/positive-margin PASS; clean/final validators PASS; outside/alpha/protected/residue=0; constrained DXT5/header/raw mirror_y; controller readable/detail/RAW PASS",
+    "producer_status": "A148R_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }
