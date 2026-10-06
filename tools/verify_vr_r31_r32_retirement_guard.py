@@ -231,6 +231,7 @@ if r33.count("R32GetSavedViewport(") < 2:
 expected_owner_calls = {
     "R31BuildFastWorldConstants",
     "R31DiscardUnreliableDrawCaches",
+    "R31InstallStatus",
     "R31ObserveDraw",
     "R31TelemetryNoteFallback",
     "R31TelemetryNoteFastWorld",
@@ -271,6 +272,10 @@ owner_evidence = {
         r31, "void R31DiscardUnreliableDrawCaches(",
         ("StateBlockTracker::Reliable()", "InvalidateEffectStateCache()",
          "InvalidateTrackedRasterShadow()", "InvalidateLiveStateSample()"),
+    ),
+    "R31InstallStatus": (
+        r31, "R31InstallStatus() noexcept",
+        ("R31InstallState.load(std::memory_order_acquire)",),
     ),
     "R31ObserveDraw": (
         r31, "void R31ObserveDraw(",
