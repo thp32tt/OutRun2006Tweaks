@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "B210",
+  "queue_index": 50,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+  "candidate_sha256": "af6a189de92ccade79687c92a46cd2304a5f631f73e96a24a9d6a74844de5c33",
+  "report": "localization/graphics/role_B/20261006-B-MANUALQA210-CBF8ECBF/B210_CBF8ECBF_REPORT.json",
+  "status": "B210_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "runtime_validation": "UNTESTED"
+}

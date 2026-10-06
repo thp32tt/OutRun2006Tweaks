@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B210",
+  "queue_index": 50,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+  "trigger": "B_MANUAL_PRE_INGAME_JPG_REVIEW_013_VISUAL_FALSE_NEGATIVE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/013_q050_CBF8ECBF.jpg",
+  "prior_c_status": "C104_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "defects": [
+    "WRONG_SLANT_DIRECTION",
+    "SOURCE_STYLE_HIERARCHY_MISMATCH"
+  ],
+  "source_sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+  "before_sha256": "ecc4cbb6cdc064d2c7ccccfc378569f1dc7fc8339c46330ec68ec81c8f899df1",
+  "candidate_sha256": "af6a189de92ccade79687c92a46cd2304a5f631f73e96a24a9d6a74844de5c33",
+  "method": "native-HD prior Korean effect raster isolated against validated clean plate -> isotropic max-safe refit -> readable right-lean transform -> exact clean plate relayer -> RGBA32 exact-header DDS",
+  "rows": [
+    {
+      "key": "time_over",
+      "korean": "시간 종료",
+      "source_bbox": [
+        241,
+        1274,
+        1610,
+        1515
+      ],
+      "prior_localized_bbox": [
+        483,
+        1279,
+        1368,
+        1509
+      ],
+      "localized_bbox": [
+        471,
+        1279,
+        1380,
+        1509
+      ],
+      "source_size": [
+        1369,
+        241
+      ],
+      "localized_size": [
+        909,
+        230
+      ],
+      "delta_left": 230,
+      "delta_right": 230,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "readable_right_lean": 0.18,
+      "native_raster_transform": true,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "game_over",
+      "korean": "게임 오버",
+      "source_bbox": [
+        1915,
+        1287,
+        3409,
+        1525
+      ],
+      "prior_localized_bbox": [
+        2225,
+        1292,
+        3099,
+        1520
+      ],
+      "localized_bbox": [
+        2211,
+        1292,
+        3113,
+        1520
+      ],
+      "source_size": [
+        1494,
+        238
+      ],
+      "localized_size": [
+        902,
+        228
+      ],
+      "delta_left": 296,
+      "delta_right": 296,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "readable_right_lean": 0.18,
+      "native_raster_transform": true,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "goal",
+      "korean": "골",
+      "source_bbox": [
+        1620,
+        1660,
+        2814,
+        2024
+      ],
+      "prior_localized_bbox": [
+        2056,
+        1675,
+        2377,
+        2008
+      ],
+      "localized_bbox": [
+        2035,
+        1666,
+        2398,
+        2018
+      ],
+      "source_size": [
+        1194,
+        364
+      ],
+      "localized_size": [
+        363,
+        352
+      ],
+      "delta_left": 415,
+      "delta_right": 416,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "readable_right_lean": 0.18,
+      "native_raster_transform": true,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "qa": {
+    "changed_pixels_outside_three_source_bboxes": 0,
+    "alpha_changed_outside_three_source_bboxes": 0,
+    "untouched_small_rows_pixel_exact_vs_prior_candidate": true,
+    "dds_header_128_exact": true,
+    "rgba32_roundtrip_exact": true,
+    "readable_source_old_new_visual_review": "PENDING_CONTROLLER",
+    "raw_source_old_new_visual_review": "PENDING_CONTROLLER",
+    "ordered_gate": {
+      "plate_restoration": "INHERITED_VALIDATED_CLEAN_PLATE",
+      "source_matching_slant_direction": "REWORKED_PENDING_CONTROLLER_VISUAL",
+      "no_unnecessary_undersizing": "MAX_SAFE_ISOTROPIC_REFIT_WITH_SOURCE_BBOX_CEILING",
+      "weight_outline_shadow": "PRESERVED_FROM_PRIOR_NATIVE_HD_KOREAN_EFFECT_RASTER",
+      "clipping": "PASS_POSITIVE_MARGIN",
+      "protected_art_clearance": "PASS_SCOPE_CONFINED_TO_PRIOR_SOURCE_BBOXES",
+      "flip_y_and_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER_VISUAL",
+      "immediate_readability": "PENDING_CONTROLLER_VISUAL"
+    }
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "B210_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
