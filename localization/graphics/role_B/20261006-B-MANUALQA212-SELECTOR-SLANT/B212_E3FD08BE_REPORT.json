@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B212",
+  "queue_index": 116,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+  "trigger": "B_MANUAL_PRE_INGAME_CONTROLLER_REVIEW_SELECTOR_FAMILY",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/035_q116_E3FD08BE.jpg",
+  "prior_c_status": "C91_PIXEL_VISUAL_PASS_PENDING_INGAME",
+  "defects": [
+    "WRONG_OR_WEAK_SLANT_DIRECTION",
+    "SOURCE_TRANSFORM_FIDELITY_MISMATCH"
+  ],
+  "source_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+  "before_sha256": "3fbf7b03834549de10277947043ca8dd15d05fd729cd8441174b74581b532c9f",
+  "candidate_sha256": "7e42aaa0f8aec535008bb816ec3660e075ce87c56a4ae44170c3340d1a32a6dc",
+  "method": "exact native-HD DXT5 + inherited C91 validated clean plate -> isolate current native-HD Korean raster -> integer scanline readable right-lean correction -> relayer inside exact source bbox -> BC3 scratch recompress -> patch only source-bbox-intersecting blocks -> decoded strict QA",
+  "rows": [
+    {
+      "key": "heart_attack_mode",
+      "source": "Heart Attack Mode",
+      "korean": "하트 어택 모드",
+      "source_bbox": [
+        393,
+        54,
+        1628,
+        200
+      ],
+      "prior_localized_bbox": [
+        648,
+        56,
+        1372,
+        196
+      ],
+      "precompress_localized_bbox": [
+        647,
+        57,
+        1374,
+        197
+      ],
+      "readable_added_right_lean": 0.16,
+      "source_size": [
+        1235,
+        146
+      ],
+      "precompress_size": [
+        727,
+        140
+      ],
+      "localized_bbox": [
+        647,
+        57,
+        1374,
+        197
+      ],
+      "localized_size": [
+        727,
+        140
+      ],
+      "delta_left": 254,
+      "delta_right": 254,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false
+    }
+  ],
+  "qa": {
+    "visible_changed_pixels_outside_source_bboxes": 0,
+    "alpha_changed_pixels_outside_source_bboxes": 0,
+    "header_128_exact_canonical": true,
+    "changed_blocks_outside_patch_set": 0,
+    "changed_blocks_vs_prior_candidate": 6797,
+    "nvcompress_mae_raw_rgba": 1.421534538269043,
+    "nvcompress_mae_if_flipped": 19.36016082763672,
+    "readable_source_old_new_visual_review": "PENDING_CONTROLLER",
+    "raw_source_old_new_visual_review": "PENDING_CONTROLLER",
+    "ordered_gate": {
+      "plate_restoration": "PASS_INHERITED_C91_VALIDATED_CLEAN_PLATE",
+      "source_matching_slant_direction": "REWORKED_PENDING_CONTROLLER_VISUAL",
+      "no_unnecessary_undersizing": "UNCHANGED_NATIVE_HEIGHT_WITHIN_SOURCE_BBOX_CEILING",
+      "weight_outline_shadow": "PRESERVED_FROM_PRIOR_NATIVE_HD_KOREAN_EFFECT_RASTER",
+      "clipping": "PASS_MACHINE_CONTAINMENT",
+      "protected_art_clearance": "PASS_ZERO_OUTSIDE_SOURCE_BBOX",
+      "flip_y_and_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+      "immediate_readability": "PENDING_CONTROLLER"
+    }
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "B212_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

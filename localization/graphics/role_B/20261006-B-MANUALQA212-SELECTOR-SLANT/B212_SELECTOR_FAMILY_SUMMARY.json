@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B212",
+  "scope": "manual PRE_INGAME English-original comparison review; selector mode family q102/q104/q116 weak readable slant correction",
+  "assets": [
+    {
+      "index": 102,
+      "key": "571E78F3",
+      "before": "c4f33f3d98b6d5873d8bb6438d5e649fdaa12c114ed8d34d22a7405d448fc186",
+      "after": "442babea9c5dea9a944dff3d4a6a577f007dad2ae63a9699d380baf0ce7fc05d",
+      "rows": [
+        {
+          "key": "time_attack_mode",
+          "source": "Time Attack Mode",
+          "korean": "타임 어택 모드",
+          "source_bbox": [
+            395,
+            15,
+            1330,
+            140
+          ],
+          "prior_localized_bbox": [
+            532,
+            16,
+            1246,
+            140
+          ],
+          "precompress_localized_bbox": [
+            508,
+            15,
+            1216,
+            139
+          ],
+          "readable_added_right_lean": 0.14,
+          "source_size": [
+            935,
+            125
+          ],
+          "precompress_size": [
+            708,
+            124
+          ],
+          "localized_bbox": [
+            508,
+            15,
+            1252,
+            140
+          ],
+          "localized_size": [
+            744,
+            125
+          ],
+          "delta_left": 113,
+          "delta_right": 78,
+          "delta_top": 0,
+          "delta_bottom": 0,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "edge_touch_high_risk": true
+        },
+        {
+          "key": "continuous_15",
+          "source": "15 Continuous Course",
+          "korean": "15코스 연속",
+          "source_bbox": [
+            520,
+            132,
+            1590,
+            245
+          ],
+          "prior_localized_bbox": [
+            832,
+            132,
+            1277,
+            241
+          ],
+          "precompress_localized_bbox": [
+            830,
+            134,
+            1279,
+            243
+          ],
+          "readable_added_right_lean": 0.14,
+          "source_size": [
+            1070,
+            113
+          ],
+          "precompress_size": [
+            449,
+            109
+          ],
+          "localized_bbox": [
+            830,
+            132,
+            1280,
+            244
+          ],
+          "localized_size": [
+            450,
+            112
+          ],
+          "delta_left": 310,
+          "delta_right": 310,
+          "delta_top": 0,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "edge_touch_high_risk": true
+        }
+      ]
+    },
+    {
+      "index": 104,
+      "key": "62BEBF33",
+      "before": "687ecaad8db7478f4964b11d082f86b21091507bef564cfde3adfb4a1a625e7d",
+      "after": "c84a2703d0a22b36384e07ce72d4e761e651a1a23219cd78153b4a0aff022505",
+      "rows": [
+        {
+          "key": "outrun_mode",
+          "source": "OutRun Mode",
+          "korean": "아웃런 모드",
+          "source_bbox": [
+            392,
+            52,
+            1357,
+            201
+          ],
+          "prior_localized_bbox": [
+            576,
+            56,
+            1172,
+            197
+          ],
+          "precompress_localized_bbox": [
+            574,
+            56,
+            1174,
+            197
+          ],
+          "readable_added_right_lean": 0.16,
+          "source_size": [
+            965,
+            149
+          ],
+          "precompress_size": [
+            600,
+            141
+          ],
+          "localized_bbox": [
+            574,
+            56,
+            1174,
+            197
+          ],
+          "localized_size": [
+            600,
+            141
+          ],
+          "delta_left": 182,
+          "delta_right": 183,
+          "delta_top": 4,
+          "delta_bottom": 4,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "edge_touch_high_risk": false
+        }
+      ]
+    },
+    {
+      "index": 116,
+      "key": "E3FD08BE",
+      "before": "3fbf7b03834549de10277947043ca8dd15d05fd729cd8441174b74581b532c9f",
+      "after": "7e42aaa0f8aec535008bb816ec3660e075ce87c56a4ae44170c3340d1a32a6dc",
+      "rows": [
+        {
+          "key": "heart_attack_mode",
+          "source": "Heart Attack Mode",
+          "korean": "하트 어택 모드",
+          "source_bbox": [
+            393,
+            54,
+            1628,
+            200
+          ],
+          "prior_localized_bbox": [
+            648,
+            56,
+            1372,
+            196
+          ],
+          "precompress_localized_bbox": [
+            647,
+            57,
+            1374,
+            197
+          ],
+          "readable_added_right_lean": 0.16,
+          "source_size": [
+            1235,
+            146
+          ],
+          "precompress_size": [
+            727,
+            140
+          ],
+          "localized_bbox": [
+            647,
+            57,
+            1374,
+            197
+          ],
+          "localized_size": [
+            727,
+            140
+          ],
+          "delta_left": 254,
+          "delta_right": 254,
+          "delta_top": 3,
+          "delta_bottom": 3,
+          "containment": "PASS",
+          "size_ceiling": "PASS",
+          "edge_touch_high_risk": false
+        }
+      ]
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "status": "B212_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

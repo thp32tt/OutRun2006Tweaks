@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "B212",
+  "queue_index": 102,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+  "candidate_sha256": "442babea9c5dea9a944dff3d4a6a577f007dad2ae63a9699d380baf0ce7fc05d",
+  "report": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_571E78F3_REPORT.json",
+  "status": "B212_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "runtime_validation": "UNTESTED"
+}
