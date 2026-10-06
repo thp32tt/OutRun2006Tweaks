@@ -201,7 +201,7 @@ namespace
     // sustained Floral Village stone paving almost disappear on the R3.
     // Keep a modest stage-scoped comfort reduction while restoring a clearly
     // tactile road surface; Deep Lake/Tulip keep normal Road Detail.
-    constexpr float FloralVillageRoughPavingScale = 0.55f;
+    constexpr float FloralVillageRoughPavingScale = 0.50f;
 
     bool is_proven_primary_rough_road(
         const StageSurfaceContext& stage,
@@ -658,7 +658,7 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                 : 1.0f;
 
             desiredRoadAmp = imperialStoneRoad
-                ? 0.30f
+                ? 0.22f
                 : (strongTactile ? 0.30f : 0.22f);
             const float envelope =
                 textureRoughness * roadSpeedGate * outputStrength * coreStageScale;
