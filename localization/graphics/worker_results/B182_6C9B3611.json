@@ -4,7 +4,7 @@
   "queue_index": 172,
   "asset": "6C9B3611",
   "source_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
-  "candidate_sha256": "93adbfe8815ad5f5df33345822e0e9939c082a38273609252554fdb88f27a9df",
+  "candidate_sha256": "0b99dc84817b857af47d6f5bdcf377b802d914476e7a29e40807d7e1c66eaf30",
   "report": "localization/graphics/role_B/20261006-B-PRODUCTION182-6C9B3611-START-GOAL/B182_6C9B3611_REPORT.json",
   "status": "WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA"
 }

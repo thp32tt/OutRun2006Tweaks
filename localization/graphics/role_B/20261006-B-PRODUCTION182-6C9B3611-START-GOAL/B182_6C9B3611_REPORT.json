@@ -2,7 +2,7 @@
   "schema_version": 1,
   "role": "B",
   "run": "20261006-B-PRODUCTION182-6C9B3611-START-GOAL",
-  "base_head": "b8315dd38e42e314dac215565788ab00cd4dbbea",
+  "base_head": "739d8cf6ec4d5ffe39da3af957c03f910ef7437e",
   "queue_index": 172,
   "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
   "classification": {
@@ -55,7 +55,7 @@
         55,
         373,
         136,
-        395
+        396
       ],
       "banner_bbox": [
         52,
@@ -63,52 +63,43 @@
         142,
         398
       ],
-      "source_text_pixels": 1111,
+      "source_text_pixels": 1215,
       "banner_pixels": 2021,
       "component_meta": [
         [
-          450,
+          518,
           [
             15,
             73,
-            70,
-            95
+            86,
+            96
           ]
         ],
         [
-          28,
-          [
-            70,
-            73,
-            85,
-            75
-          ]
-        ],
-        [
-          104,
+          117,
           [
             36,
             80,
             48,
-            95
+            96
           ]
         ],
         [
-          426,
+          464,
           [
-            47,
+            46,
             80,
             85,
-            95
+            96
           ]
         ],
         [
-          103,
+          116,
           [
             84,
             80,
             96,
-            95
+            96
           ]
         ]
       ],
@@ -116,12 +107,12 @@
         55,
         373,
         136,
-        395
+        396
       ],
-      "clean_region_pixels": 1111,
+      "clean_region_pixels": 1215,
       "korean": "출발",
       "font": "Noto Sans CJK KR Black",
-      "font_size": 17,
+      "font_size": 18,
       "shear": 0.17,
       "shadow_offset": 1,
       "fill_rgba": [
@@ -137,17 +128,17 @@
         255
       ],
       "localized_bbox": [
-        80,
+        78,
         375,
-        111,
-        393
+        112,
+        394
       ],
       "source_width": 81,
-      "source_height": 22,
-      "localized_width": 31,
-      "localized_height": 18,
-      "delta_left": 25,
-      "delta_right": 25,
+      "source_height": 23,
+      "localized_width": 34,
+      "localized_height": 19,
+      "delta_left": 23,
+      "delta_right": 24,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -165,10 +156,10 @@
         682
       ],
       "source_bbox": [
-        596,
+        595,
         635,
         672,
-        658
+        659
       ],
       "banner_bbox": [
         591,
@@ -176,47 +167,29 @@
         681,
         661
       ],
-      "source_text_pixels": 1375,
+      "source_text_pixels": 1510,
       "banner_pixels": 2181,
       "component_meta": [
         [
-          383,
+          1510,
           [
-            21,
-            10,
-            44,
-            33
-          ]
-        ],
-        [
-          760,
-          [
-            41,
-            10,
-            84,
-            33
-          ]
-        ],
-        [
-          232,
-          [
-            80,
+            20,
             10,
             97,
-            33
+            34
           ]
         ]
       ],
       "clean_region_bbox": [
-        596,
+        595,
         635,
         672,
-        658
+        659
       ],
-      "clean_region_pixels": 1375,
+      "clean_region_pixels": 1510,
       "korean": "골",
       "font": "Noto Sans CJK KR Black",
-      "font_size": 19,
+      "font_size": 20,
       "shear": 0.17,
       "shadow_offset": 1,
       "fill_rgba": [
@@ -232,15 +205,15 @@
         255
       ],
       "localized_bbox": [
-        625,
+        624,
         637,
         643,
-        656
+        657
       ],
-      "source_width": 76,
-      "source_height": 23,
-      "localized_width": 18,
-      "localized_height": 19,
+      "source_width": 77,
+      "source_height": 24,
+      "localized_width": 19,
+      "localized_height": 20,
       "delta_left": 29,
       "delta_right": 29,
       "delta_top": 2,
@@ -253,7 +226,7 @@
   "static_qa": {
     "elements_total": 2,
     "bbox_size_positive_margin": "2/2 PASS",
-    "clean_source_residue": 115,
+    "clean_source_residue": 210,
     "changed_outside_source_bboxes": 0,
     "alpha_changed_outside": 0,
     "protected_visible_changed": 0,
@@ -264,7 +237,7 @@
     "status": "PASS"
   },
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
-  "candidate_sha256": "93adbfe8815ad5f5df33345822e0e9939c082a38273609252554fdb88f27a9df",
+  "candidate_sha256": "0b99dc84817b857af47d6f5bdcf377b802d914476e7a29e40807d7e1c66eaf30",
   "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
   "runtime_validation": "UNTESTED",
   "status": "B182_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
