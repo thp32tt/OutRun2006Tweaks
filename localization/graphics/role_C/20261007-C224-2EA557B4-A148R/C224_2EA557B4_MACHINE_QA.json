@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261007-C224-2EA557B4-A148R",
+  "qa_id": "C224",
+  "queue_index": 55,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "producer_run": "A148R",
+  "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+  "candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds"
+  },
+  "independent_basis": "canonical pinned source decoded independently; source visible bbox re-derived from alpha; current candidate decoded independently; no producer bbox/mask consumed for containment",
+  "machine_status": "PASS",
+  "structure": {
+    "dimensions": [
+      2048,
+      256
+    ],
+    "format": "DXT5",
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "bytes": 524416
+  },
+  "geometry": {
+    "original_bbox": [
+      1,
+      105,
+      1090,
+      248
+    ],
+    "localized_bbox": [
+      9,
+      113,
+      890,
+      240
+    ],
+    "source_size": [
+      1089,
+      143
+    ],
+    "localized_size": [
+      881,
+      127
+    ],
+    "delta_left": 8,
+    "delta_right": 200,
+    "delta_top": 8,
+    "delta_bottom": 8,
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "source_relative_width": 0.809
+  },
+  "pixel_gates": {
+    "localized_visible_pixels_outside_source_bbox": 0,
+    "clean_visible_alpha_pixels": 0,
+    "changed_dxt5_blocks": 9509,
+    "changed_dxt5_blocks_wholly_outside_allowed": 0,
+    "partial_boundary_changed_blocks": 24,
+    "partial_boundary_endpoint_or_color_drift": 0,
+    "raw_readable_parity": "PASS"
+  },
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA_SOURCE_CLEAN_FINAL_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA_SOURCE_FINAL_DETAIL.jpg",
+    "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA_SOURCE_FINAL_RAW.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}

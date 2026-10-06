@@ -1,0 +1,10 @@
+{
+  "role": "C",
+  "run": "C224",
+  "queue_index": 55,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "candidate_sha256": "ee11a2521e3c79c4d327acab28d87aacdb3f59b31d68c843eac20c7a87e88c5c",
+  "machine_status": "PASS",
+  "report": "localization/graphics/role_C/20261007-C224-2EA557B4-A148R/C224_2EA557B4_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
