@@ -1,0 +1,67 @@
+{
+  "run": "B205",
+  "role": "B",
+  "timestamp_kst": "2026-10-06T17:22:30+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "queue_index": 24,
+  "asset": "textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+  "action": "hangul_name_entry",
+  "scope": "preflight_only_no_candidate",
+  "source_executable": {
+    "origin": "GitHub Actions artifact 11373183170 from Korean Localization Test Build run 37379204466",
+    "artifact_head_sha": "dced451f375ae98e3cc0273caead947f634bff6f",
+    "file": "OR2006C2C.exe",
+    "sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "pe_image_base": "0x00400000",
+    "pe_timestamp_utc": "2006-05-26T17:04:57Z"
+  },
+  "findings": {
+    "player_name_field": {
+      "runtime_va": "0x007C23E0",
+      "module_offset": "0x003C23E0",
+      "length_bytes": 16,
+      "usable_name_bytes": 15,
+      "terminator": "NUL in 16-byte field",
+      "proof": [
+        "EXE VA 0x4DDBE5-0x4DDC02 copies four dwords (16 bytes) from the Edit License text buffer to 0x7C23E0..0x7C23EF on player-name commit.",
+        "EXE VA 0x4DD855-0x4DD872 copies exactly 0x10 bytes from 0x7C23E0 into the Edit License backup/input state.",
+        "EXE VA 0x4DDB4C-0x4DDB59 calls the name-entry bound setter with min=1 and max=0x10; append logic at 0x4692BB-0x4692E3 only appends while length < max-1."
+      ]
+    },
+    "native_input_encoding": {
+      "storage": "single-byte character codes, not UTF-8/UTF-16",
+      "selector_to_byte": "EXE VA 0x468D40 indexes byte table at 0x64C81B + page*0x25 + selection",
+      "default_page": 1,
+      "default_page_bytes": "ASCII 1-0, a-z, space",
+      "upper_pages": "pages 3/4 map ASCII 1-0, A-Z, space",
+      "symbol_page": "page 2 contains punctuation plus game-specific high-byte glyph codes",
+      "append": "EXE VA 0x4692CE-0x4692E3 writes exactly one selected byte per accepted character"
+    },
+    "edit_license_render_use": {
+      "display_source": "0x7C23E0 is passed directly as a string source at EXE VA 0x4DE48A to Edit License text-object setup",
+      "implication": "Raw UTF-8 Hangul in this field would be seen as legacy bytes by stock name rendering unless localization hooks cover the relevant consumers."
+    },
+    "player_save_base_surface": {
+      "direct_static_refs_to_0x7C23E0": 145,
+      "note": "These references include uses of 0x7C23E0 as the player-save structure base, not 145 proven name renderers. Their breadth is sufficient to require consumer classification before changing name encoding."
+    }
+  },
+  "decision": {
+    "result": "PREFLIGHT_PASS_EXACT_FIELD_AND_NATIVE_ENCODING_PROVEN_HOLD_IMPLEMENTATION",
+    "candidate_written": false,
+    "new_status": "b205_hold_korean_name_encoding_consumer_hooks_required",
+    "why_hold": "Exact storage and native byte encoding are now proven, but Hangul cannot be represented natively by the stock one-byte selector. Changing storage without first covering downstream name rendering and replay/ranking/network/save compatibility would be unsafe.",
+    "next_safe_work": "Map/classify direct player-name consumers, then choose a compatible Korean storage/transport policy before changing 66743AA8 or runtime behavior."
+  },
+  "qa": {
+    "executable_sha256_verified": true,
+    "field_width_cross_checked_by_commit_and_load_paths": true,
+    "length_guard_cross_checked": true,
+    "encoding_table_static_trace": true,
+    "artwork_candidate": "NONE",
+    "runtime_behavior_changed": false,
+    "runtime_validation": "UNTESTED_NOT_REQUIRED_FOR_STATIC_PREFLIGHT",
+    "forbidden_scope_touched": false,
+    "repeated_completed_work": false
+  }
+}
