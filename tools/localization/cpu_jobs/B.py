@@ -213,7 +213,22 @@ for row,sm,banner,safe_banner in zip(rows,source_masks,banner_masks,safe_banner_
         clean_arr[sy,sx]=sa[nearest[0,sy,sx],nearest[1,sy,sx]]
         stubborn2=sm & np.all(clean_arr==sa,axis=2)
         if np.any(stubborn2):
-            raise RuntimeError(("nearest donor failed to remove source residue",row["key"],int(stubborn2.sum())))
+            # A nearest donor can legitimately have the exact same RGBA value as the
+            # source effect pixel. For the remaining tiny set, select the closest donor
+            # whose RGBA differs, still strictly inside this sign's red-body donor mask.
+            dyy,dxx=np.nonzero(donor)
+            if not len(dxx):
+                raise RuntimeError(("no alternate donor pixels",row["key"]))
+            for py,px in zip(*np.nonzero(stubborn2)):
+                diff=np.any(sa[dyy,dxx] != sa[py,px],axis=1)
+                if not np.any(diff):
+                    raise RuntimeError(("all donor pixels equal stubborn source pixel",row["key"],int(px),int(py)))
+                yy=dyy[diff]; xx=dxx[diff]
+                k=int(np.argmin((yy-int(py))**2 + (xx-int(px))**2))
+                clean_arr[py,px]=sa[yy[k],xx[k]]
+            stubborn3=sm & np.all(clean_arr==sa,axis=2)
+            if np.any(stubborn3):
+                raise RuntimeError(("alternate donor failed to remove source residue",row["key"],int(stubborn3.sum())))
 clean=Image.fromarray(clean_arr,"RGBA")
 
 # Source effect must be fully changed away in clean plate.
