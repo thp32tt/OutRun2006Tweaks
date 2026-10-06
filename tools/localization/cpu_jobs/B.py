@@ -145,14 +145,18 @@ for row,sm,bm in zip(rows,source_masks,banner_masks):
     clean_arr[:,:,3][sm]=255
 
 clean=Image.fromarray(clean_arr,"RGBA")
-# Clean-plate source-script residue: old pale/orange source-letter class must be eliminated.
+# Clean-plate residue gate: every old source-letter pixel must be replaced by sign-red
+# and no exact source glyph pixel may survive.
 residue_clean=0
+clean_not_red=0
 for row,sm in zip(rows,source_masks):
     rr=clean_arr[:,:,0].astype(np.int16); gg=clean_arr[:,:,1].astype(np.int16); bb=clean_arr[:,:,2].astype(np.int16)
-    old_class=sm & (rr>150) & (gg>58) & (bb>35) & ((gg-bb)>10)
-    residue_clean += int(np.count_nonzero(old_class))
-if residue_clean:
-    raise RuntimeError(("clean residue",residue_clean))
+    sign_red=(rr>110) & (rr>gg+35) & (rr>bb+20) & (gg<130)
+    clean_not_red += int(np.count_nonzero(sm & ~sign_red))
+    unchanged=np.all(clean_arr==sa,axis=2)
+    residue_clean += int(np.count_nonzero(sm & unchanged))
+if residue_clean or clean_not_red:
+    raise RuntimeError(("clean residue",residue_clean,"clean_not_red",clean_not_red))
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
 subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
@@ -245,11 +249,10 @@ introduced=int(np.count_nonzero((da[:,:,3]>8)&(sa[:,:,3]<=8)&~allowed))
 if outside or alpha_out or protected_changed or introduced:
     raise RuntimeError(("static outside gate",outside,alpha_out,protected_changed,introduced))
 
-# Final residue only counts old source-letter-colored pixels not covered by the new Hangul/effect guard.
+# Final residue gate: no exact old source-letter pixel may survive outside the new Hangul/effect guard.
 guard=ndimage.binary_dilation(target,iterations=2)
-rr=da[:,:,0].astype(np.int16); gg=da[:,:,1].astype(np.int16); bb=da[:,:,2].astype(np.int16)
-old_color=(rr>150)&(gg>58)&(bb>35)&((gg-bb)>10)
-residue_final=int(np.count_nonzero(source_mask & old_color & ~guard))
+same_source=np.all(da==sa,axis=2)
+residue_final=int(np.count_nonzero(source_mask & same_source & ~guard))
 if residue_final: raise RuntimeError(("final source residue",residue_final))
 
 # Evidence.
