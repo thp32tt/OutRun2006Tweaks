@@ -180,3 +180,28 @@ N100 exact-SHA verification passed the producer-provenance contract, restored HU
 
 This is static/build/diagnostic instrumentation evidence only. It does not prove the white HUD or vehicle-rank runtime defects fixed, does not reconstruct the missing vehicle/world rank anchor, and does not change R31/R32 physical hook ownership. `RUNTIME_VALIDATION=UNTESTED` until Quest 3/VDXR evidence is supplied. The next runtime session should enable `VRTelemetry` and correlate the one-time `VR R51 C64 FINGERPRINT` and `VR R51 DRAW FINGERPRINT` records plus same/other/no-node/scope-mismatch counters.
 
+
+## 2026-10-07 — CONVERSION-DX9EX-00485 cross-thread semantic registry restoration
+
+**Status:** BUILD_VERIFIED / NEED_HMD_TEST  
+**Validation-bearing SHA:** `3edab9f54806b2ef4141546b3537cfa75c280af6`  
+**Runtime regression evidence:** `ff94725406535793ff7615e69480f55dd4c0ca78`, session `20261006T151027454Z-8f9b3197`
+
+The reopened runtime regression showed 3,858 HUD semantic trace rows all falling to UNKNOWN, zero WorldBillboard observations, and zero producer-fingerprint draws while DirectGPU transport itself remained healthy. Comparison against the HMD-proven `902a89ea` lineage identified one bounded regression: `SpriteNodeSemanticTags` and its count had reverted to `thread_local`, so exact semantic tags published by producer hooks could disappear before the canonical queue renderer on another thread consumed them.
+
+CONVERSION-DX9EX-00485 restores only that lifetime boundary on the current R31/R32/R33 architecture:
+
+- the bounded SpriteNode semantic table is shared and protected by a mutex;
+- acquire/release published-count state keeps the normal no-tag path lock-free;
+- each registration receives a monotonic serial;
+- queue start captures a serial cutoff;
+- queue end removes only pre-existing unconsumed tags, preserving tags concurrently produced for the next frame;
+- exact `ProducerToken` provenance remains attached to the existing explicit `RenderScope`;
+- render-thread `CurrentScope`, queue cursor, and producer cursor remain thread-local;
+- generic untagged queue fallback remains `ScreenOverlay2D`.
+
+A RED verifier was committed first at `52e3202c1fe640f62e695e2712a10f12562a1104`; DX9Ex Active run `37498045406` failed the policy architecture step as expected because the current source still used the thread-local registry. The implementation SHA then passed DX9Ex Active `37498273170` policy/host/game/R33 full-chain/package and HUD Inspector `37498273068`. Package artifact `11428802385` digest is `sha256:a74ab32fe6faff05bd76889f487d0835fd4e859c65e3fa2bb0582f6548e5020f`.
+
+This is not a complete vehicle-marker fix. The user-tested `ProjectedMarkerInfo` / Calc3D2D view-space anchor payload is intentionally not restored here, so rank/rival markers can still be spatially detached even if exact WorldBillboard semantics become observable again. Cadence/fence authority, DirectGPU transport, generic HUD fallback, and R31/R32/R33 physical ownership are unchanged.
+
+`RUNTIME_VALIDATION=UNTESTED`. A Quest 3 / VDXR CORRECTNESS session must confirm exact ScreenHud/WorldBillboard/producer fingerprints return before this semantic-lifetime component can be promoted to runtime PASS.
