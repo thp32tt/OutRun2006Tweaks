@@ -498,6 +498,61 @@ require(
     "candidate.fence",
     "candidate.fence->GetData(nullptr, 0, 0)",
 )
+
+# A producer EVENT hard error is not equivalent to ordinary ring pressure.
+# Once GetData can no longer prove completion, the shared-eye slot must not be
+# recycled or silently cleared. Keep the final R32 owner fail-closed until a
+# reset/interop identity transition revalidates the DirectGPU copy path.
+pending_poll_marker = "if (candidate.producerPending)"
+published_scan_marker = "if (candidate.published && candidate.frameId)"
+pending_poll_pos = resolve_direct_r32.find(pending_poll_marker)
+published_scan_pos = resolve_direct_r32.find(
+    published_scan_marker, pending_poll_pos
+)
+if min(pending_poll_pos, published_scan_pos) < 0:
+    fail("R32 producer EVENT poll scope missing")
+producer_poll_r32 = resolve_direct_r32[pending_poll_pos:published_scan_pos]
+require_order(
+    producer_poll_r32,
+    "R32 producer EVENT hard-error fail-closed",
+    "else if (ready == S_FALSE)",
+    "continue;",
+    "R32DirectCopyPathRejected = true;",
+    "R32DirectCopyRejectHr = ready;",
+    "if (Settings::VRTelemetry) ++R32PendingFenceErrors;",
+    "return false;",
+)
+hard_error_pos = producer_poll_r32.find("R32DirectCopyPathRejected = true;")
+if hard_error_pos < 0:
+    fail("R32 producer EVENT hard-error branch missing")
+forbid(
+    producer_poll_r32[hard_error_pos:],
+    "R32 producer EVENT hard-error must retain quarantined slot",
+    "candidate.producerPending = false;",
+    "candidate.pendingFrameId = 0;",
+    "candidate.frameId = 0;",
+    "candidate.published = false;",
+)
+
+issue_marker = "const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);"
+issue_pos = resolve_direct_r32.find(issue_marker)
+pending_publish_pos = resolve_direct_r32.find(
+    "slot.producerPending = true;", issue_pos
+)
+if min(issue_pos, pending_publish_pos) < 0:
+    fail("R32 producer EVENT issue scope missing")
+issue_r32 = resolve_direct_r32[issue_pos:pending_publish_pos]
+require_order(
+    issue_r32,
+    "R32 producer EVENT issue failure fail-closed",
+    issue_marker,
+    "if (FAILED(issueHr))",
+    "R32DirectCopyPathRejected = true;",
+    "R32DirectCopyRejectHr = issueHr;",
+    "if (Settings::VRTelemetry) ++R32PendingFenceErrors;",
+    "return false;",
+)
+
 forbid(
     resolve_direct_r32,
     "R32 redundant pre-Present producer fence wait",
