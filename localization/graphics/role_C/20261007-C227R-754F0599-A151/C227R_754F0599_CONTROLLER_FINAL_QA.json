@@ -1,0 +1,14 @@
+{
+  "role": "C",
+  "qa_id": "C227R",
+  "queue_index": 175,
+  "candidate_sha256": "f21970a3d6d8ae69954d0159524856b5019cd1445daa65c55d85213f73e431f5",
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "3/3 PASS",
+  "controller_visual_qa": "FAIL_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH",
+  "decision": "C227R_REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH",
+  "required_rework": "Preserve validated geometry, scale, right lean and metallic effects; reconstruct Korean glyph proportions and stroke character closer to the source extended rounded techno family.",
+  "machine_report": "localization/graphics/role_C/20261007-C227R-754F0599-A151/C227R_754F0599_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
