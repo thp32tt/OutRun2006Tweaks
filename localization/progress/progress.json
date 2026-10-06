@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-06T09:49:15+09:00",
+  "updated_at_kst": "2026-10-06T11:15:52+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B180 positively classified even zoom_review indices 146/148/150 as preserve-original/no-localization from exact-HD readable/raw evidence. No Korean DDS is required for those three and they must not be reselected. Index62 33491F83 remains MANUAL_RECONSTRUCTION_REQUIRED; next normal B zoom_review is even index166 5EBD7FE8 unless a higher-priority in-game/C-returned task appears.",
+  "next_checkpoint": "A resolved odd zoom-review indices 103/151/153/155/157/165/169/171/177. Index103 590A4724 uses restored exact A108 candidate bfb50ebd... (self-QA PASS pending C/in-game); the other eight are positively PRESERVE_ORIGINAL/no-localization. Blocked zoom_review=16; next normal A odd rows are 189,191,217,219 unless a higher-priority in-game/C-returned item appears.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -155,11 +155,11 @@
   "graphics": {
     "total_dds": 243,
     "visually_reviewed": 243,
-    "localize_text": 89,
+    "localize_text": 90,
     "preserve_brand_song_credit": 1,
     "font_pipeline": 9,
     "hangul_name_entry": 1,
-    "zoom_review": 37,
+    "zoom_review": 36,
     "no_localization": 74,
     "work_queue_total": 137,
     "work_queue_file": "localization/graphics/asset_queue.csv",
@@ -1875,40 +1875,52 @@
       "runtime_validation": "NOT_REQUIRED_FOR_LOCALIZATION"
     },
     "latest_a_zoom_review": {
-      "run": "A101/A102",
-      "indices": [
-        35,
-        37,
-        45
+      "run": "A103/A108/A109/A110",
+      "resolved_indices": [
+        103,
+        151,
+        153,
+        155,
+        157,
+        165,
+        169,
+        171,
+        177
       ],
-      "assets": {
-        "E989E3B7": {
-          "queue_index": 35,
-          "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
-          "classification": "LOCALIZABLE_TEXT_TOTAL_RANK_X2",
-          "candidate_sha256": "c0e76661ed974cb7c477f172e93fd67645391f1da3e81dcb867d86af3a595622",
-          "producer_self_qa": "PASS_PENDING_C"
-        },
-        "515DCBB2": {
-          "queue_index": 37,
-          "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
-          "candidate_required": false
-        },
-        "1F77CB88": {
-          "queue_index": 45,
-          "classification": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL_TECHNICAL_KEYCAPS",
-          "candidate_required": false
-        }
+      "candidate_index103": {
+        "asset": "590A4724",
+        "source": "Normal Balance",
+        "korean": "일반 밸런스",
+        "candidate_sha256": "bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178",
+        "producer": "A108",
+        "producer_self_qa": "PASS_PENDING_C",
+        "runtime_validation": "UNTESTED",
+        "restore_report": "localization/graphics/role_A/20261006-A-RESTORE108-590A4724/A108_EXACT_RESTORE_REPORT.json"
       },
-      "controller_visual_qa": "PASS_3_OF_3_WITH_A102_SOURCE_CLEAN_FINAL_AND_RAW",
-      "evidence": [
-        "localization/graphics/role_A/20261006-A-PROBE101-ZOOM353745/A101_CONTROLLER_CLASSIFICATION.json",
-        "localization/graphics/role_A/20261006-A-PRODUCTION102-E989E3B7/A102_CONTROLLER_SELF_QA.json"
+      "preserve_original_indices": [
+        151,
+        153,
+        155,
+        157,
+        165,
+        169,
+        171,
+        177
       ],
-      "status": "A102_INDEX35_STATIC_PASS_PENDING_C_37_45_PRESERVE_ORIGINAL",
-      "runtime_validation": "INDEX35_UNTESTED"
+      "evidence": [
+        "localization/graphics/role_A/20261006-A-PROBE103-ZOOM103151153/A103_CONTROLLER_CLASSIFICATION.json",
+        "localization/graphics/role_A/20261006-A-PROBE109-ZOOM155157165/A109_CONTROLLER_CLASSIFICATION.json",
+        "localization/graphics/role_A/20261006-A-PROBE110-ZOOM169171177/A110_CONTROLLER_CLASSIFICATION.json"
+      ],
+      "status": "A108_INDEX103_STATIC_PASS_PENDING_C_8_ZOOM_ROWS_PRESERVE_ORIGINAL",
+      "next_normal_a_blocked_odd": [
+        189,
+        191,
+        217,
+        219
+      ]
     },
-    "current_blocked_zoom_review": 28,
+    "current_blocked_zoom_review": 16,
     "b173_6ab5cee_alias": {
       "timestamp_kst": "2026-10-06T08:17:29+09:00",
       "run": "20261006-B-PRODUCTION173-JENN-ALIAS",
@@ -2087,6 +2099,22 @@
       "controller_report": "localization/graphics/role_B/20261006-B-PROBE180-ZOOM146148150/B180_CONTROLLER_CLASSIFICATION.json",
       "candidate_written": false,
       "next_even_zoom_review_index": 166
+    },
+    "a108_590a4724_production": {
+      "queue_index": 103,
+      "candidate_sha256": "bfb50ebd9a6f9d572ce3349b56f76cf461dabc9e209f6cf0b7f48608d44b5178",
+      "bbox_size_positive_margin": "1/1 PASS",
+      "outside_pixels": 0,
+      "alpha_outside_pixels": 0,
+      "localized_overlap": 0,
+      "controller_visual_qa": "PASS",
+      "rejected_intermediates": [
+        "A104 template mismatch fail-closed",
+        "A106/A107 controller visual fail-closed"
+      ],
+      "status": "A108_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME",
+      "report": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_590A4724_REPORT.json",
+      "controller_report": "localization/graphics/role_A/20261006-A-PRODUCTION108-590A4724/A108_CONTROLLER_SELF_QA.json"
     }
   },
   "data_build": {
