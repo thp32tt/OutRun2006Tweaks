@@ -30,6 +30,14 @@ namespace
     using outrun::vr::dx11::NativeProgrammableShaderPairCache;
     using outrun::vr::dx11::ProgrammableShaderFunctionIdentity;
     using outrun::vr::dx11::ProgrammableShaderRegisterOperandRole;
+    using outrun::vr::dx11::ProgrammableShaderConstantRegisterClass;
+    using outrun::vr::dx11::capture_programmable_shader_function_source_evidence;
+    using outrun::vr::dx11::decode_programmable_shader_instruction_stream;
+    using outrun::vr::dx11::decode_programmable_shader_register_semantics;
+    using outrun::vr::dx11::decode_programmable_shader_interface_semantics;
+    using outrun::vr::dx11::derive_programmable_shader_interface_linkage_evidence;
+    using outrun::vr::dx11::derive_programmable_shader_pair_source_semantic_evidence;
+    using outrun::vr::dx11::derive_programmable_shader_register_mapping_plan;
     using outrun::vr::dx11::NativeSurfacePairReadiness;
     using outrun::vr::dx11::NativeTriangleFanIndexBuffer;
     using outrun::vr::dx11::NativeTriangleFanIndexBufferReadiness;
