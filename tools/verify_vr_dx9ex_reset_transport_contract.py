@@ -418,8 +418,6 @@ require_order(
     "if (candidate.producerPending)",
     "R13TryGetGpuCompletedFrame(index, gpuCompleted)",
     "The host completed this exact published frame. Retire the",
-    "candidate.frameId = 0;",
-    "candidate.published = false;",
     "selected = index;",
     "if (selected >= OutRunVR::RenderFrameRingSize)",
     "++DirectTransportRingBackpressure;",
@@ -427,6 +425,19 @@ require_order(
     "R32ProducerFencePending[selected] = true;",
     "ActiveDirectTransportSlot = selected;",
 )
+ack_retire_marker = "The host completed this exact published frame. Retire the"
+ack_retire_pos = resolve_direct_r32.find(ack_retire_marker)
+if ack_retire_pos < 0:
+    fail("R32 ACK-completed publication retirement marker missing")
+require_order(
+    resolve_direct_r32[ack_retire_pos:],
+    "R32 ACK-completed publication retirement",
+    ack_retire_marker,
+    "candidate.frameId = 0;",
+    "candidate.published = false;",
+    "selected = index;",
+)
+
 if resolve_direct_r32.count("++DirectTransportRingBackpressure;") != 1:
     fail("R32 DirectGPU free-slot scan must count whole-ring backpressure once")
 forbid(
