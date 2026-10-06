@@ -164,10 +164,6 @@ for key,en,ko,comp in specs:
     ys,xs=np.nonzero(effect)
     for yy,xx in zip(ys,xs):
         blocks.add((xx//4,yy//4))
-    for bx,by in blocks:
-        block=np.zeros((H,W),bool); block[by*4:by*4+4,bx*4:bx*4+4]=True
-        if not np.all(banner_full[by*4:by*4+4,bx*4:bx*4+4]):
-            raise RuntimeError(("source effect touches unsafe partial sign block",key,[bx,by],sbx,bbanner))
     safe_source_blocks |= blocks
     source_masks.append(effect); banner_masks.append(banner); safe_banner_masks.append(banner_full)
     rows.append({
@@ -186,7 +182,7 @@ if np.any(source_masks[0]&source_masks[1]):
 # per-scanline red donors. This guarantees English/effect pixels are removed while
 # keeping all changes inside full sign-body blocks.
 clean_arr=sa.copy()
-for row,sm,banner in zip(rows,source_masks,banner_masks):
+for row,sm,banner,safe_banner in zip(rows,source_masks,banner_masks,safe_banner_masks):
     donor=banner & ~sm & (rr>120) & (rr>gg+30) & (rr>bb+15) & (gg<180) & (bb<190)
     samples={}
     ys=np.unique(np.nonzero(banner)[0])
@@ -200,7 +196,10 @@ for row,sm,banner in zip(rows,source_masks,banner_masks):
     for bx,by in {(x//4,y//4) for y,x in zip(*np.nonzero(sm))}:
         for y in range(by*4,by*4+4):
             col=samples[y] if y in samples else samples[min(known,key=lambda z:abs(z-y))]
-            clean_arr[y,bx*4:bx*4+4]=np.clip(np.rint(col),0,255).astype(np.uint8)
+            xs=np.arange(bx*4,bx*4+4)
+            keep=safe_banner[y,bx*4:bx*4+4]
+            if np.any(keep):
+                clean_arr[y,xs[keep]]=np.clip(np.rint(col),0,255).astype(np.uint8)
 clean=Image.fromarray(clean_arr,"RGBA")
 
 # Source effect must be fully changed away in clean plate.
@@ -260,7 +259,7 @@ for row,sm,banner,safe_banner in zip(rows,source_masks,banner_masks,safe_banner_
         if not(lb[0]>=x0+2 and lb[1]>=y0+2 and lb[2]<=x1-2 and lb[3]<=y1-2):
             continue
         blocks={(xx//4,yy//4) for yy,xx in zip(*np.nonzero(lm))}
-        if any(not np.all(safe_banner[by*4:by*4+4,bx*4:bx*4+4]) for bx,by in blocks):
+        if np.any(lm & ~safe_banner):
             continue
         chosen=(glyph,px,py,lm,lb,blocks,fs,off,fill,shadow)
         break
@@ -290,14 +289,77 @@ tb=tmp_dds.read_bytes()
 if tb[:4]!=b"DDS " or tb[84:88]!=b"DXT5" or len(tb)!=len(sb):
     raise RuntimeError(("nvcompress structure",tb[:4],tb[84:88],len(tb),len(sb)))
 
-# Convert readable block coordinates to raw block coordinates (mirror_y).
-allowed_blocks_readable=safe_source_blocks|safe_target_blocks
+# Convert readable patch blocks to raw coordinates (mirror_y). Full sign-body
+# blocks may use the fresh BC3 encode; partial blocks keep original endpoints and
+# outside indices, changing only sign-hull pixels to the nearest palette entry.
+patch_blocks_readable=safe_source_blocks|safe_target_blocks
+banner_union=np.zeros((H,W),bool)
+for bm in safe_banner_masks:
+    banner_union |= bm
+allowed=np.zeros((H,W),bool)
+for bx,by in patch_blocks_readable:
+    allowed[by*4:by*4+4,bx*4:bx*4+4] |= banner_union[by*4:by*4+4,bx*4:bx*4+4]
 bw=W//4; bh=H//4
-allowed_blocks_raw={(bx,bh-1-by) for bx,by in allowed_blocks_readable}
+patch_blocks_raw={(bx,bh-1-by) for bx,by in patch_blocks_readable}
+allowed_raw=np.flipud(allowed)
+desired_raw=np.asarray(raw_final,dtype=np.uint8)
 outb=bytearray(sb)
-for bx,by in allowed_blocks_raw:
+partial_constrained_blocks=0
+full_reencoded_blocks=0
+
+def rgb565(v):
+    return np.array([((v>>11)&31)*255/31.0,((v>>5)&63)*255/63.0,(v&31)*255/31.0],dtype=np.float64)
+
+def color_palette(block):
+    c0=int.from_bytes(block[8:10],"little"); c1=int.from_bytes(block[10:12],"little")
+    p0=rgb565(c0); p1=rgb565(c1)
+    return [p0,p1,(2*p0+p1)/3.0,(p0+2*p1)/3.0]
+
+def alpha_palette(block):
+    a0=block[0]; a1=block[1]
+    if a0>a1:
+        return [float(a0),float(a1)]+[((7-i)*a0+i*a1)/7.0 for i in range(1,7)]
+    return [float(a0),float(a1)]+[((5-i)*a0+i*a1)/5.0 for i in range(1,5)]+[0.0,255.0]
+
+def get_aidx(block):
+    bits=int.from_bytes(block[2:8],"little")
+    return [(bits>>(3*i))&7 for i in range(16)]
+
+def get_cidx(block):
+    bits=int.from_bytes(block[12:16],"little")
+    return [(bits>>(2*i))&3 for i in range(16)]
+
+def set_indices(block,aidx,cidx):
+    nb=bytearray(block)
+    abits=sum((int(v)&7)<<(3*i) for i,v in enumerate(aidx))
+    cbits=sum((int(v)&3)<<(2*i) for i,v in enumerate(cidx))
+    nb[2:8]=abits.to_bytes(6,"little")
+    nb[12:16]=cbits.to_bytes(4,"little")
+    return bytes(nb)
+
+for bx,by in patch_blocks_raw:
     off=128+(by*bw+bx)*16
-    outb[off:off+16]=tb[off:off+16]
+    am=allowed_raw[by*4:by*4+4,bx*4:bx*4+4]
+    if not np.any(am):
+        continue
+    if np.all(am):
+        outb[off:off+16]=tb[off:off+16]
+        full_reencoded_blocks+=1
+        continue
+    ob=bytes(outb[off:off+16])
+    ap=alpha_palette(ob); cp=color_palette(ob)
+    ai=get_aidx(ob); ci=get_cidx(ob)
+    want=desired_raw[by*4:by*4+4,bx*4:bx*4+4]
+    for yy in range(4):
+        for xx in range(4):
+            if not am[yy,xx]:
+                continue
+            i=yy*4+xx
+            rgb=want[yy,xx,:3].astype(np.float64); aa=float(want[yy,xx,3])
+            ai[i]=min(range(8),key=lambda k:abs(ap[k]-aa))
+            ci[i]=min(range(4),key=lambda k:float(np.sum((cp[k]-rgb)**2)))
+    outb[off:off+16]=set_indices(ob,ai,ci)
+    partial_constrained_blocks+=1
 candidate.write_bytes(outb)
 cand_sha=sha256_file(candidate)
 
@@ -305,9 +367,6 @@ dec_raw=Image.open(candidate).convert("RGBA")
 dec=dec_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 da=np.asarray(dec,dtype=np.uint8)
 
-allowed=np.zeros((H,W),bool)
-for bx,by in allowed_blocks_readable:
-    allowed[by*4:by*4+4,bx*4:bx*4+4]=True
 changed=np.any(sa!=da,axis=2)
 outside=int(np.count_nonzero(changed&~allowed))
 alpha_out=int(np.count_nonzero((sa[:,:,3]!=da[:,:,3])&~allowed))
@@ -343,7 +402,7 @@ for by in range(bh):
         off=128+(by*bw+bx)*16
         if sb[off:off+16]!=outb[off:off+16]:
             changed_blocks+=1
-            if (bx,by) not in allowed_blocks_raw:
+            if (bx,by) not in patch_blocks_raw:
                 outside_blocks+=1
 if outside_blocks:
     raise RuntimeError(("compressed block drift",outside_blocks))
@@ -397,14 +456,15 @@ report={
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":"3da79726739ac631d8e2703a65330dbb0c310770","url":url,"sha256":SOURCE_SHA},
  "classification":{"from":"zoom_review","to":"localize_text","segments":[{"source":"START","korean":"출발"},{"source":"GOAL","korean":"골"}],"physical_elements":2,
    "protected":["OutRun2 logos","course-map artwork","stage photos","route artwork","all non-label pixels"]},
- "construction":"Controller-reviewed BF229 route map uses the same START/GOAL red-badge family as B191/A116. Source-effect blocks are detected only inside the upper-right route-map card; every changed BC3 block is required to lie fully inside the eroded red sign body, then clean reconstruction and native Korean lettering are compressed and spliced block-exactly.",
+ "construction":"Controller-reviewed BF229 route map uses the same START/GOAL red-badge family as B191/A116. Source-effect pixels are detected only inside the route-map red signs. Fully permitted BC3 blocks use the fresh encode; sign-edge partial blocks preserve original BC3 endpoints and all outside indices while changing only sign-hull pixel indices, so white rim/map/photo/logo pixels remain exact.",
  "structure":{"width":W,"height":H,"format":"DXT5","mipmaps":MIPS,"header_128_exact":bytes(outb[:128])==sb[:128],"raw_orientation":"mirror_y"},
  "rows":rows,
  "static_qa":{"elements_total":2,"bbox_size_positive_margin":"2/2 PASS","clean_source_residue":clean_residue,
    "changed_outside_allowed_blocks":outside,"alpha_changed_outside_allowed_blocks":alpha_out,
    "introduced_visible_outside_allowed_blocks":introduced,"final_source_residue_exact":residue_exact,
    "final_source_residue_color":residue_color,"localized_overlap":int(np.count_nonzero(source_masks[0]&source_masks[1])),
-   "changed_bc3_blocks":changed_blocks,"changed_bc3_blocks_outside_allowed":outside_blocks,"status":"PASS"},
+   "changed_bc3_blocks":changed_blocks,"changed_bc3_blocks_outside_allowed":outside_blocks,
+   "full_reencoded_blocks":full_reencoded_blocks,"partial_constrained_blocks":partial_constrained_blocks,"status":"PASS"},
  "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "runtime_validation":"UNTESTED",
