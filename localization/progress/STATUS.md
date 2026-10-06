@@ -1778,3 +1778,10 @@ A88 exact-maps screenshot(143) to BA0147DA(212) title + 8C259C68(188) help + D65
 - **index177:** OUTRUN2 cover plus song titles Shiny World / Splash Wave / Night Flight -> **PRESERVE_ORIGINAL_POLICY**.
 - Blocked `zoom_review`: **25 -> 16**. Next A odd rows: **189, 191, 217, 219** unless higher-priority work appears.
 - VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-06 11:58 KST — A111/A113/A116 final odd zoom results
+- **189 8C9E91F8 / 191 94BB6271:** exact-HD readable/raw review → **PRESERVE_ORIGINAL / NO_LOCALIZABLE_TEXT**.
+- **217 D1039D6F:** `START -> 출발`, `GOAL -> 골`; A116 candidate `68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39`. 2/2 bbox/size/positive margins, clean/source-residue/outside/alpha/overlap gates PASS, controller readable/raw PASS. Pending C + in-game.
+- **219 D263B3F1:** `COURSE SELECT -> 코스 선택`; A113 candidate `f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24`. C144-approved silver-techno family, 1/1 bbox/size/positive margins, outside/alpha/residue/overlap=0, controller readable/raw PASS. Pending C + in-game.
+- Blocked `zoom_review`: **12**, with **A odd blocked = 0**. Remaining blocked rows are B/even shard; no work-steal while B is active this cycle.
+- VR/FFB/DX11/DXVK untouched.
