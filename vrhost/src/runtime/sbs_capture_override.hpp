@@ -243,6 +243,7 @@ float4 PSMain(VSOut input) : SV_Target
         std::vector<std::array<ID3D11RenderTargetView*, 2>> rtvs;
         bool acquired = false;
         bool waited = false;
+        bool acquireFaulted = false;
         bool waitFaulted = false;
         bool releaseFaulted = false;
         bool gpuWorkSubmitted = false;
@@ -297,6 +298,7 @@ float4 PSMain(VSOut input) : SV_Target
             format = DXGI_FORMAT_UNKNOWN;
             acquired = false;
             waited = false;
+            acquireFaulted = false;
             waitFaulted = false;
             releaseFaulted = false;
             gpuWorkSubmitted = false;
@@ -623,8 +625,8 @@ float4 PSMain(VSOut input) : SV_Target
     {
         if (swapchain.handle != XR_NULL_HANDLE && swapchain.width == width &&
             swapchain.height == height && swapchain.arraySize == arraySize &&
-            !swapchain.images.empty() && !swapchain.waitFaulted &&
-            !swapchain.releaseFaulted)
+            !swapchain.images.empty() && !swapchain.acquireFaulted &&
+            !swapchain.waitFaulted && !swapchain.releaseFaulted)
             return true;
 
         if (!swapchain.Destroy())
@@ -752,15 +754,23 @@ float4 PSMain(VSOut input) : SV_Target
 
     inline bool Acquire(Swapchain& swapchain, std::uint32_t& image)
     {
-        if (swapchain.waitFaulted || swapchain.releaseFaulted)
+        if (swapchain.acquireFaulted || swapchain.waitFaulted ||
+            swapchain.releaseFaulted)
             return false;
 
         if (!swapchain.acquired)
         {
             XrSwapchainImageAcquireInfo acquire{ XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
-            if (XR_FAILED(::xrAcquireSwapchainImage(swapchain.handle, &acquire,
-                &swapchain.acquiredImage)))
+            const XrResult acquireResult = ::xrAcquireSwapchainImage(
+                swapchain.handle, &acquire, &swapchain.acquiredImage);
+            if (XR_FAILED(acquireResult))
+            {
+                // A hard acquire failure has no useful same-call retry contract.
+                // Fail this swapchain closed so the next EnsureSwapchain call
+                // resolves ownership through transactional Destroy/recreate.
+                swapchain.acquireFaulted = true;
                 return false;
+            }
             swapchain.acquired = true;
             swapchain.waited = false;
         }

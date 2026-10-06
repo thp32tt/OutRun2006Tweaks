@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00462",
+  "production_id": "CONVERSION-DX9EX-00462",
+  "event_id": "CONVERSION-DX9EX-00462-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "VALIDATING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "9a6e954ed52474a7b02cfc6b9d0bc5281519e51f",
+  "material_result_sha": "PENDING_SELF",
+  "validation_bearing_result_sha": "PENDING_SELF",
+  "result_sha": "PENDING_SELF",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00462]",
+  "selected_work_item": "VR-DX9EX-SWAPCHAIN-IMAGE-ACQUIRE-FAIL-CLOSED-0045",
+  "summary": "Fail closed after hard xrAcquireSwapchainImage errors: mark the swapchain acquire-faulted without claiming image ownership, block repeated acquire attempts, and force EnsureSwapchain through transactional Destroy/recreate.",
+  "changed_paths": [
+    "vrhost/src/runtime/sbs_capture_override.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00462.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered latest vr-d3d9ex-focus HEAD 9a6e954ed52474a7b02cfc6b9d0bc5281519e51f; stale 00459-00461 C6 records were finalized from existing exact-SHA PASS evidence before selecting new work. Architecture-v3 live migration remains blocked by ARCH-V3-GATE-001 and structural extraction remains terminal."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R19 wait/release hard failures already fail closed, but xrAcquireSwapchainImage hard failure simply returned false and retried the same broken swapchain each host frame. OpenXR 1.1.63 lists call-order, handle, instance, runtime, session and validation failures for acquire; only XR_SUCCESS and XR_SESSION_LOSS_PENDING are successful results."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added acquireFaulted. Hard acquire failure sets it before returning false, does not mark the image acquired/waited, Acquire rejects all image-flow fault states, EnsureSwapchain bypasses unchanged-handle reuse, and Destroy clears the fault after ownership resolution."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING"
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "standards": [
+      "OpenXR 1.1.63 xrAcquireSwapchainImage returns XR_SUCCESS or XR_SESSION_LOSS_PENDING on success and may fail with call-order, handle, instance, runtime, session or validation errors.",
+      "The application must successfully acquire before waiting or writing the returned image, so a failed acquire does not establish local acquired/waited ownership."
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Validate this exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize C3-C6 bookkeeping and Issue #14 while preserving RUNTIME_VALIDATION=UNTESTED.",
+  "started_at_kst": "2026-10-06T13:47:00+09:00"
+}

@@ -868,15 +868,42 @@ forbid(
 require(
     host_sbs,
     "R19 swapchain image-flow hard-fault state",
+    "bool acquireFaulted = false;",
     "bool waitFaulted = false;",
     "bool releaseFaulted = false;",
 )
 require_order(
     sbs_acquire,
     "R19 prior image-flow hard fault fails closed before acquire",
-    "if (swapchain.waitFaulted || swapchain.releaseFaulted)",
+    "if (swapchain.acquireFaulted || swapchain.waitFaulted ||",
+    "swapchain.releaseFaulted)",
     "return false;",
     "if (!swapchain.acquired)",
+)
+require(
+    sbs_acquire,
+    "R19 hard acquire failure marks swapchain faulted",
+    "const XrResult acquireResult = ::xrAcquireSwapchainImage(",
+    "if (XR_FAILED(acquireResult))",
+    "swapchain.acquireFaulted = true;",
+    "return false;",
+)
+acquire_fail_start = sbs_acquire.find("if (XR_FAILED(acquireResult))")
+acquire_success_start = sbs_acquire.find("swapchain.acquired = true;", acquire_fail_start)
+acquire_fail_path = sbs_acquire[acquire_fail_start:acquire_success_start]
+require_order(
+    acquire_fail_path,
+    "R19 hard acquire fault before frame yield",
+    "swapchain.acquireFaulted = true;",
+    "return false;",
+)
+forbid(
+    acquire_fail_path,
+    "R19 hard acquire failure must not claim image ownership",
+    "swapchain.acquired = true;",
+    "swapchain.waited = true;",
+    "::xrWaitSwapchainImage",
+    "::xrReleaseSwapchainImage",
 )
 hard_wait_start = sbs_acquire.find("if (XR_FAILED(result))")
 wait_success_start = sbs_acquire.find("swapchain.waited = true;", hard_wait_start)
@@ -926,6 +953,7 @@ sbs_swapchain_destroy = body(host_sbs, "bool Destroy(bool parentSessionDestroyin
 require(
     sbs_swapchain_destroy,
     "R19 swapchain image-flow hard-fault reset",
+    "acquireFaulted = false;",
     "waitFaulted = false;",
     "releaseFaulted = false;",
 )
@@ -1024,6 +1052,7 @@ ensure_swapchain = body(host_sbs, "inline bool EnsureSwapchain(")
 require(
     ensure_swapchain,
     "R19 image-flow hard fault bypasses swapchain reuse",
+    "!swapchain.acquireFaulted",
     "!swapchain.waitFaulted",
     "!swapchain.releaseFaulted",
     "if (!swapchain.Destroy())",
