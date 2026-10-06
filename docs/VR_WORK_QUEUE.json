@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-10-06T03:00:54+09:00",
+  "updatedKst": "2026-10-06T13:22:54+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -11,7 +11,7 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "EXCLUSIVE: DX9Ex quality/stability on vr-d3d9ex-focus. Post-1100 structural neutral-helper extraction is complete; continue the highest executable DX9Ex quality/performance/HUD/OpenXR/lifecycle item. DX11 Native and DXVK remain frozen until explicitly reopened.",
+    "primaryBackend": "EXCLUSIVE CURRENT PHASE: DX9Ex quality/stability on vr-d3d9ex-focus. Post-1100 structural extraction is complete. After an accepted Quest3/VDXR DX9Ex baseline opens ARCH-V3-GATE-001, automatically transition to the HMD-gated Architecture v3 migration plan before reopening downstream DX11 Native/DXVK ports.",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -21,7 +21,7 @@
     },
     "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
     "parallelBackendDevelopment": false,
-    "backendReplacementGate": "DX11 Native and DXVK are downstream ports deferred until the stable DX9Ex reference is accepted. DX12/D3D9On12 remains reference-only unless explicitly reopened.",
+    "backendReplacementGate": "DX11 Native and DXVK remain downstream/frozen while DX9Ex stabilization and Architecture v3 migration are incomplete. Reopen downstream porting only after the v3-primary DX9Ex runtime is USER_RUNTIME_VERIFIED and ARCH-V3-008 records the common-contract handoff. DX12/D3D9On12 remains reference-only unless explicitly reopened.",
     "parallelTracks": {
       "HUD": "DX9EX_ONLY: general HUD/visual work may resume after structural completion when it is the highest executable item; do not touch downstream branches.",
       "PERFORMANCE": "DX9EX_ONLY: general performance/telemetry work may resume after structural completion when evidence supports a bounded source/static unit; do not change synchronization semantics without evidence.",
@@ -65,7 +65,7 @@
         "6ab45ed52f548191b94c90af792116fb"
       ],
       "productionIntegrationWip": 1,
-      "rule": "At each cycle, first honor any reopened structural regression. Otherwise select the highest executable bounded DX9Ex quality/performance/HUD/OpenXR/lifecycle item. Do not schedule DX11, DXVK or HMD-matrix work unless explicitly reopened."
+      "rule": "At each cycle, complete any active immutable DX9Ex task first. While ARCH-V3-GATE-001 is closed, select the highest executable bounded DX9Ex quality/performance/HUD/OpenXR/lifecycle item. If only HMD-gated work remains, report the exact HMD gate rather than manufacturing filler. When ARCH-V3-GATE-001 opens, promote ARCH-V3-001 to READY and execute ARCH-V3-001..008 in dependency order before downstream DX11/DXVK porting."
     },
     "implementationFirstEnforcement": {
       "enabled": true,
@@ -92,8 +92,18 @@
         "DXVK",
         "HMD_MATRIX"
       ],
-      "reopenRule": "Only explicit user instruction may reopen a frozen track.",
+      "reopenRule": "DX11/DXVK/HMD-matrix tracks still require their documented gate or explicit user direction. Architecture v3 is a planned next phase and may auto-open only through ARCH-V3-GATE-001; it is not an immediate reopen of DX11/DXVK.",
       "reason": "Post-1100 R31/R32 neutral-helper extraction completed at 8b72853bb775ef77fbe1474da824e5cb513d3c78; serial DX9Ex work now returns to general quality/stability priorities."
+    },
+    "architectureV3Transition": {
+      "enabled": true,
+      "plan": "docs/VR_ARCH_V3_MIGRATION_PLAN.md",
+      "status": "HMD_GATED",
+      "entryGateItem": "ARCH-V3-GATE-001",
+      "firstMigrationItem": "ARCH-V3-001",
+      "autoTransition": true,
+      "rule": "Keep DX9Ex stabilization authoritative until ARCH-V3-GATE-001 is satisfied by exact Quest3/VDXR baseline evidence. Then D promotes ARCH-V3-001 to READY and executes ARCH-V3-001..008 in dependency order. IPC v2 remains live authority until staged v3 cutover evidence permits promotion.",
+      "downstreamPortGate": "Do not automatically reopen DX11 Native or DXVK before ARCH-V3-007 USER_RUNTIME_VERIFIED and ARCH-V3-008 legacy-retirement/handoff readiness."
     }
   },
   "candidateWip": {
@@ -539,6 +549,120 @@
       "attempts": 0,
       "runtimeCandidate": false,
       "blockReason": "Development/build/smoke is allowed; only release/promotion is blocked pending Quest3/VDXR parity with the protected R51 baseline."
+    },
+    {
+      "id": "ARCH-V3-GATE-001",
+      "priority": 14,
+      "status": "NEED_HMD_TEST",
+      "summary": "Phase gate for live Architecture v3 migration: accept one exact DX9Ex Quest3/VDXR baseline and clear blocking P0 lifecycle/resource/reset/recenter/direct-transport regressions before changing live authority.",
+      "testLevel": "LEVEL1",
+      "dependencies": [],
+      "runtimeCandidate": true,
+      "nextAction": "Quest3/VDXR validate the current frozen DX9Ex CORRECTNESS candidate. When the accepted baseline and required protected invariants are recorded, D changes ARCH-V3-001 from BLOCKED to READY; do not change live IPC authority before then."
+    },
+    {
+      "id": "ARCH-V3-001",
+      "priority": 14,
+      "status": "BLOCKED",
+      "summary": "Extend existing IPC v3 shadow infrastructure into live bounded v2-v3 equivalence telemetry for HostState, ClientState, FrameRing and AckState while v2 remains authoritative.",
+      "testLevel": "LEVEL0",
+      "dependencies": [
+        "ARCH-V3-GATE-001"
+      ],
+      "runtimeCandidate": false,
+      "blockReason": "ARCH-V3-GATE-001 is not yet satisfied.",
+      "nextAction": "After the HMD baseline gate opens, prove live shadow parity/mismatch reasons without changing rendered behavior or live authority."
+    },
+    {
+      "id": "ARCH-V3-002",
+      "priority": 14,
+      "status": "BLOCKED",
+      "summary": "Route verified OutRun c64..c67 camera/WVP and one-pose-per-present behavior through IGameAdapter with an equivalence path and no simulation/input/FFB replay.",
+      "testLevel": "LEVEL1",
+      "dependencies": [
+        "ARCH-V3-001"
+      ],
+      "runtimeCandidate": true,
+      "blockReason": "Requires ARCH-V3-001 live shadow equivalence first.",
+      "nextAction": "Extract only the game-specific camera/pose boundary; preserve existing math and compare exact outputs before removing direct upper-layer access."
+    },
+    {
+      "id": "ARCH-V3-003",
+      "priority": 14,
+      "status": "BLOCKED",
+      "summary": "Route draw classification and stereo GPU submission through IStereoBackend using existing owner APIs without reintroducing private R-state access or duplicate physical hooks.",
+      "testLevel": "LEVEL1",
+      "dependencies": [
+        "ARCH-V3-002"
+      ],
+      "runtimeCandidate": true,
+      "blockReason": "Requires IGameAdapter live boundary first.",
+      "nextAction": "Move orchestration behind IStereoBackend in bounded steps while preserving protected classification, StateBlock, HUD/effect and fail-closed behavior."
+    },
+    {
+      "id": "ARCH-V3-004",
+      "priority": 14,
+      "status": "BLOCKED",
+      "summary": "Move D3D9Ex shared transport behind IFrameProducer/IFrameConsumer while preserving run/generation/PID identity, completion fences, ACK and slot-reuse safety.",
+      "testLevel": "LEVEL2",
+      "dependencies": [
+        "ARCH-V3-003"
+      ],
+      "runtimeCandidate": true,
+      "blockReason": "Requires stereo backend boundary first.",
+      "nextAction": "Make transport replaceable without changing camera/stereo policy; keep IPC v2 authority during this extraction."
+    },
+    {
+      "id": "ARCH-V3-005",
+      "priority": 14,
+      "status": "BLOCKED",
+      "summary": "Move OpenXR frame timing, session/reference-space lifecycle, views, swapchain ownership and submission behind IVrRuntime without changing current call ordering or bounded lifetime rules.",
+      "testLevel": "LEVEL2",
+      "dependencies": [
+        "ARCH-V3-004"
+      ],
+      "runtimeCandidate": true,
+      "blockReason": "Requires producer/consumer boundary first.",
+      "nextAction": "Extract runtime ownership with exact call-order/resource-lifetime verifiers and no rendering-policy changes."
+    },
+    {
+      "id": "ARCH-V3-006",
+      "priority": 14,
+      "status": "BLOCKED",
+      "summary": "Perform staged IPC v3 live-authority cutover in order HostState -> ClientState -> FrameRing -> AckState, each with exact parity evidence and rollback to v2.",
+      "testLevel": "LEVEL2",
+      "dependencies": [
+        "ARCH-V3-005"
+      ],
+      "runtimeCandidate": true,
+      "blockReason": "Requires all common live boundaries first.",
+      "nextAction": "Promote one ownership domain at a time. Never switch all four domains in one task and never delete v2 during cutover."
+    },
+    {
+      "id": "ARCH-V3-007",
+      "priority": 14,
+      "status": "BLOCKED",
+      "summary": "Quest3/VDXR acceptance of the v3-primary DX9Ex runtime against the protected baseline: world/HUD/effects/recenter/reset/restart/DirectGPU/frame-pacing/shutdown.",
+      "testLevel": "LEVEL3",
+      "dependencies": [
+        "ARCH-V3-006"
+      ],
+      "runtimeCandidate": true,
+      "blockReason": "Requires v3-primary live authority first.",
+      "nextAction": "Freeze one exact v3-primary CORRECTNESS package and require matching USER_RUNTIME_VERIFIED evidence before legacy retirement."
+    },
+    {
+      "id": "ARCH-V3-008",
+      "priority": 14,
+      "status": "BLOCKED",
+      "summary": "Retire IPC v2 compatibility authority and dead migration shims only after v3-primary USER_RUNTIME_VERIFIED; freeze the common v3 contract for DX11 Native/DXVK downstream ports.",
+      "testLevel": "LEVEL3",
+      "dependencies": [
+        "ARCH-V3-007"
+      ],
+      "runtimeCandidate": false,
+      "blockReason": "Requires ARCH-V3-007 USER_RUNTIME_VERIFIED.",
+      "nextAction": "Remove semantic reserved[] transport use and duplicate ownership paths, retain v3 ABI/regression gates, then reopen DX11/DXVK porting on the common interfaces."
     }
   ],
   "hmdTestMatrix": {
