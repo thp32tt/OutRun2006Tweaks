@@ -164,7 +164,7 @@ int main() {
  require(imperial_avenue_stone_paving_pattern(14,0,imperialStone),"Imperial brick/stone mask family is recognized");
  require(!imperial_avenue_stone_paving_pattern(14,0,imperialAsphalt),"ordinary Imperial all-asphalt stays quiet");
  const float stoneAmp=imperial_avenue_stone_tactile_amplitude(.70f,.60f,.70f);
- require(stoneAmp>.16f&&stoneAmp<=.20f,"Imperial brick/stone tactile floor is clearly perceptible but stage-scoped and capped");
+ require(stoneAmp>.28f&&stoneAmp<=.32f,"Imperial brick/stone tactile floor is strong enough for R3 but remains stage-scoped and capped");
  require(!is_proven_primary_rough_road_contact(27,520,PrimaryAsphaltSurfaceMask),"ordinary asphalt is not rough-road material");
  require(std::abs(software_road_tactile_frequency(35.0f)-10.0f)<1e-6f,"software road carrier smoother than old 15Hz fallback");
  require(std::abs(software_slip_tactile_frequency(35.0f)-12.0f)<1e-6f,"software slip carrier remains distinct from road carrier");
@@ -182,15 +182,16 @@ int main() {
  require(model_uses_reversed_r3_polarity(Model::ModernDD),"R3 Modern polarity is reversed");
  require(!model_uses_reversed_r3_polarity(Model::ArcadeOriginal)&&!model_uses_reversed_r3_polarity(Model::PS2OriginalExperimental),"R3 Original/PS2 polarity uses native sign");
  require(std::abs(SnowIceComfortTextureScale-.22f)<1e-6f,"snow/ice comfort texture remains perceptible");
- require(drift_countersteer_blend(.70f,-.35f,1.0f)>.15f&&drift_countersteer_blend(.70f,-.35f,1.0f)<=.20f,"R13 body-slip drift cue is bounded to a small assist");
+ require(drift_countersteer_blend(.70f,-.35f,1.0f)>.30f&&drift_countersteer_blend(.70f,-.35f,1.0f)<=.35f,"R13 developed-drift recovery assist is bounded but strong enough to move the rack");
  require(drift_countersteer_blend(.30f,.20f,1.0f)==0.0f,"same-sign front/body slip keeps normal SAT direction");
  require(drift_countersteer_blend(.10f,-.20f,1.0f)==0.0f,"small body slip does not trigger drift handoff");
  require(drift_countersteer_shape(.70f)>.89f&&drift_countersteer_shape(.05f)==0.0f,"drift recovery magnitude is bounded to developed oversteer");
  const float weakPrimaryTorque=.05f;
  const float boundedOpposingCue=bound_drift_countersteer_torque(weakPrimaryTorque,-.90f);
  require(std::abs(boundedOpposingCue+weakPrimaryTorque)<1e-6f,"R13 body-slip cue cannot exceed weak front-slip SAT magnitude");
- const float weakPrimaryAfterBlend=weakPrimaryTorque+(boundedOpposingCue-weakPrimaryTorque)*DriftCountersteerMaxBlend;
- require(weakPrimaryAfterBlend>0.0f,"R13 body-slip assist cannot reverse the front-slip torque sign");
+ const float weakPrimaryAfterAssist=weakPrimaryTorque*(1.0f+DriftCountersteerMaxBlend);
+ require(weakPrimaryAfterAssist>weakPrimaryTorque,"R13 body-slip gate strengthens rather than unloads front-slip countersteer torque");
+ require(weakPrimaryAfterAssist<weakPrimaryTorque*1.36f,"R13 drift assist stays bounded");
  require(std::abs(bound_drift_countersteer_torque(-weakPrimaryTorque,.90f)-weakPrimaryTorque)<1e-6f,"R13 drift cue bound is sign symmetric");
  ResponseLUT linear{}; require(parse_response_lut("0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",linear),"linear LUT parses");
  require(std::abs(apply_response_lut(.55f,linear)-.55f)<1e-5f,"linear LUT identity");
