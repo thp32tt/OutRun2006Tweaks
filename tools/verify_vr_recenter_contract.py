@@ -326,9 +326,12 @@ require_order(
 destroy_r26 = body(r26, "inline XrResult XRAPI_CALL DestroySession(")
 require_order(
     destroy_r26,
-    "recenter destroy forwarding",
+    "recenter transactional destroy forwarding",
+    "const XrResult result =",
+    "OutRunVrR24BlackScreenGuard::DestroySession(session);",
+    "if (XR_SUCCEEDED(result))",
     "ResetSessionState();",
-    "return OutRunVrR24BlackScreenGuard::DestroySession(session);",
+    "return result;",
 )
 require(
     r26,

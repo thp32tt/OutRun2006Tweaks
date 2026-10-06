@@ -2,11 +2,11 @@
   "schema_version": 1,
   "task_id": "CONVERSION-DX9EX-00473",
   "production_id": "CONVERSION-DX9EX-00473",
-  "event_id": "CONVERSION-DX9EX-00473-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX9EX-00473-E002",
+  "event_type": "retry",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "status": "VALIDATING",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
@@ -32,9 +32,10 @@
       "evidence": "R26 now forwards to R24 first and calls ResetSessionState only on XR_SUCCESS; deterministic verifier pins ordering."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
+      "status": "RETRYING",
       "automation_validation": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "evidence": "Initial policy failure was verifier-only; production R26 source remains unchanged."
     },
     "C4_COMMIT": {
       "status": "PENDING",
@@ -68,6 +69,8 @@
       "reason": "No Quest3/VDXR or in-game HMD session was performed."
     }
   },
-  "next_action": "Validate this exact material SHA with canonical DX9Ex Active Validation, Domain Isolation and Autodev Coordination. On PASS, finalize C3-C6 while retaining this SHA as validation-bearing result.",
-  "started_at_kst": "2026-10-06T16:12:00+09:00"
+  "next_action": "Run canonical exact-SHA validation for retry 2. Treat source semantics as unchanged from 814bd13b; on PASS, retain retry SHA as validation-bearing result and record 814bd13b as source_material_sha.",
+  "started_at_kst": "2026-10-06T16:12:00+09:00",
+  "source_material_sha": "814bd13b307d1650f46e0011f35ada00df0442f5",
+  "failure_context": "Attempt 1 exact SHA 814bd13b307d1650f46e0011f35ada00df0442f5: Domain Isolation 37428606203 SUCCESS and Autodev Coordination 37428606180 SUCCESS; DX9Ex Active 37428606192 policy failed only because verify_vr_recenter_contract.py pinned the obsolete pre-transactional DestroySession forwarding markers."
 }

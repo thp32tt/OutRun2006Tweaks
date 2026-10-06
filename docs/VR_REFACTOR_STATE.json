@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-06T16:12:00+09:00",
+  "updatedKst": "2026-10-06T16:18:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -116,7 +116,7 @@
     "VR-DX9EX-SWAPCHAIN-DRAIN-PROVENANCE-0051",
     "VR-DX9EX-R24-RENDER-GPU-PROVENANCE-0052"
   ],
-  "next": "CONVERSION-DX9EX-00473 / VR-DX9EX-R26-DESTROY-TRANSACTION-0056 material candidate pending canonical validation. R26 now retains pending/accepted recenter ownership across a failed downstream parent-session destroy and resets/requeues session state only after XR_SUCCESS.",
+  "next": "CONVERSION-DX9EX-00473 retry 2/3: source material 814bd13b307d1650f46e0011f35ada00df0442f5 is unchanged; initial DX9Ex Active run 37428606192 failed only because verify_vr_recenter_contract.py still required the pre-transactional forwarding shape. Retry updates that deterministic verifier and revalidates the same R26 source semantics.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -1203,9 +1203,9 @@
   "post1000Maintenance00473": {
     "taskId": "CONVERSION-DX9EX-00473",
     "productionId": "CONVERSION-DX9EX-00473",
-    "eventId": "CONVERSION-DX9EX-00473-E001",
-    "eventType": "dispatch",
-    "attempt": "1/3",
+    "eventId": "CONVERSION-DX9EX-00473-E002",
+    "eventType": "retry",
+    "attempt": "2/3",
     "item": "VR-DX9EX-R26-DESTROY-TRANSACTION-0056",
     "baseSha": "a5b22f29c7771bb0b2c59a5f3280dd41c67cd8eb",
     "materialResultSha": "PENDING_SELF",
@@ -1214,6 +1214,8 @@
     "runtimeValidation": "UNTESTED",
     "runtimeBehaviorChanged": true,
     "summary": "Make R26 recenter session teardown transactional so failed downstream parent destruction preserves live-session recenter ownership/state for retry.",
-    "status": "VALIDATING"
+    "status": "VALIDATING",
+    "sourceMaterialSha": "814bd13b307d1650f46e0011f35ada00df0442f5",
+    "failureContext": "Attempt 1 exact SHA 814bd13b...: Domain Isolation 37428606203 and Autodev Coordination 37428606180 passed; DX9Ex Active 37428606192 failed policy only because tools/verify_vr_recenter_contract.py still required ResetSessionState before direct forwarding. Runtime source semantics were not reverted."
   }
 }
