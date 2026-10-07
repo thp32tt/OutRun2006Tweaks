@@ -4,6 +4,8 @@
   "asset": "FD90AA9",
   "before": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
   "after": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
-  "status": "A176_Q121_MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
-  "runtime_validation": "UNTESTED"
+  "status": "A176_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "controller_visual_qa": "PASS",
+  "next": "fresh independent C1 -> exact-SHA C3 -> PRE_INGAME -> NEW in-game"
 }
