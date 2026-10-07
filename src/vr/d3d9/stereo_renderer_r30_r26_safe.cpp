@@ -1801,6 +1801,11 @@ namespace OutRunVRStereo
             float hudClipW[2][3]{};
             bool hudWorldLockValid = false;
             bool screenOverlay2D = false;
+            bool projectedWorldMarker = false;
+            float projectedDeltaX[2]{};
+            float projectedDeltaY[2]{};
+            float projectedBaseX = 0.0f;
+            float projectedBaseY = 0.0f;
             bool fullWorldReprojection = false;
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
@@ -2096,6 +2101,9 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticWorld =
                 OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+            const bool semanticProjectedWorld =
+                OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+                    semanticScope);
             const bool semanticOverlay2D =
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
@@ -2109,6 +2117,43 @@ namespace OutRunVRStereo
             state.screenOverlay2D = semanticOverlay2D;
             if (semanticOverlay2D)
                 ++R50SemanticOverlay2DAccepted;
+
+            // 00519 HMD evidence showed ProjectedWorldMarker2D reaching this
+            // fixed-function XYZRHW path while the shader/c64 R57 builder ran
+            // zero times. Preserve the game's sprite geometry but move its
+            // recovered Calc3D2D anchor to the correct per-eye projection.
+            if (semanticProjectedWorld)
+            {
+                if (Settings::VRTelemetry)
+                    ++R57ProjectedSemanticObserved;
+                const auto* marker =
+                    OutRunVR::GameSemantic::CurrentProjectedMarker();
+                if (!marker || !marker->valid ||
+                    !haveBaseProjection || !MatrixFinite(baseProjection))
+                {
+                    if (Settings::VRTelemetry)
+                        ++R57ProjectedPayloadMissing;
+                    return false;
+                }
+
+                state.baseProjection = baseProjection;
+                if (Settings::VRTelemetry)
+                    ++R57ProjectedBuildAttempts;
+                if (!R57BuildProjectedMarkerDelta(
+                        state.stereo, baseProjection,
+                        state.projectedDeltaX, state.projectedDeltaY,
+                        &state.projectedBaseX, &state.projectedBaseY))
+                {
+                    if (Settings::VRTelemetry)
+                        ++R57ProjectedBuildFailures;
+                    return false;
+                }
+                if (Settings::VRTelemetry)
+                    ++R57ProjectedBuildSuccesses;
+                state.projectedWorldMarker = true;
+                state.worldEffect = true;
+                return true;
+            }
 
             if (semanticWorld)
                 state.worldEffect = true;
@@ -2610,7 +2655,24 @@ namespace OutRunVRStereo
 
                 float correctedX = 0.0f;
                 float correctedY = 0.0f;
-                if (state.worldEffect)
+                if (state.projectedWorldMarker)
+                {
+                    // Match the shader/c64 ProjectedWorldMarker2D route:
+                    // scale around the recovered stock anchor, then apply the
+                    // per-eye reprojection delta. This preserves rank digit/
+                    // rival sprite offsets while keeping them attached to the
+                    // same vehicle during head motion.
+                    const float markerScale = R30HudScaleValue();
+                    correctedX =
+                        markerScale * ndcX +
+                        state.projectedDeltaX[eye] +
+                        (1.0f - markerScale) * state.projectedBaseX;
+                    correctedY =
+                        markerScale * ndcY +
+                        state.projectedDeltaY[eye] +
+                        (1.0f - markerScale) * state.projectedBaseY;
+                }
+                else if (state.worldEffect)
                 {
                     correctedX =
                         state.worldScaleX[eye] * ndcX +
