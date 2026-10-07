@@ -138,7 +138,7 @@ for a in ASSETS:
     cur_raw=decode(cur_b); prior_raw=decode(prior_b)
     if cur_raw.size != prior_raw.size:
         raise RuntimeError("dimension drift")
-    ca=np.array(cur_raw); pa=np.array(prior_raw)
+    # Source bboxes are canonical readable/FLIP-Y coordinates, so compare in readable space.\n    ca=np.array(ImageOps.flip(cur_raw)); pa=np.array(ImageOps.flip(prior_raw))
     diff=np.any(ca!=pa,axis=2)
     adiff=ca[:,:,3]!=pa[:,:,3]
     allowed=mask_union(ca.shape,a["bboxes"])
