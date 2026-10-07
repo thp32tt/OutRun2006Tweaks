@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B-MANUALQA228-E95DA5-HELP",
+  "queue_index": 230,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "trigger": "PRE_INGAME_022_CURRENT_POLICY_UNTRANSLATED_VISIBLE_UI_FALSE_NEGATIVE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/022_q230_E95DA5.jpg",
+  "prior_c_status": "C149_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "before_candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
+  "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "reopened_regions": {
+    "20": {
+      "source": "You cannot buy this item yet",
+      "korean": "아직 구매할 수 없습니다"
+    },
+    "21": {
+      "source": "You already own this item",
+      "korean": "이미 보유 중입니다"
+    }
+  },
+  "policy_basis": "ordinary explanatory UI is not song/title/brand/model/legal preserve-original content; current PRE_INGAME hard gate forbids untranslated visible UI labels",
+  "preserved_policy": "Night Flight, Magical Sound Shower, Life Was A Bore, Keep Your Heart and Alberto's Antics titles remain exact English; BGM and prior B73 localized rows remain byte/pixel-exact outside this two-row patch",
+  "rows": [
+    {
+      "region_idx": 20,
+      "source": "You cannot buy this item yet",
+      "korean": "아직 구매할 수 없습니다",
+      "cell": [
+        0,
+        164,
+        864,
+        76
+      ],
+      "original_bbox": [
+        1,
+        182,
+        618,
+        232
+      ],
+      "source_size": [
+        617,
+        50
+      ],
+      "source_mask_pixels": 11407,
+      "localized_bbox": [
+        3,
+        184,
+        465,
+        230
+      ],
+      "localized_size": [
+        462,
+        46
+      ],
+      "margins": [
+        2,
+        153,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 47,
+      "fill_rgba": [
+        82,
+        86,
+        87,
+        255
+      ],
+      "alignment": "left",
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 21,
+      "source": "You already own this item",
+      "korean": "이미 보유 중입니다",
+      "cell": [
+        864,
+        164,
+        864,
+        76
+      ],
+      "original_bbox": [
+        867,
+        182,
+        1422,
+        232
+      ],
+      "source_size": [
+        555,
+        50
+      ],
+      "source_mask_pixels": 10420,
+      "localized_bbox": [
+        869,
+        184,
+        1233,
+        230
+      ],
+      "localized_size": [
+        364,
+        46
+      ],
+      "margins": [
+        2,
+        189,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 47,
+      "fill_rgba": [
+        82,
+        86,
+        87,
+        255
+      ],
+      "alignment": "left",
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_qa": {
+    "bbox_source_size_positive_margin": "2/2 PASS",
+    "clean_validator": "PASS",
+    "final_validator": "PASS",
+    "changed_pixels_outside_selected_bboxes": 0,
+    "alpha_changed_outside_selected_bboxes": 0,
+    "clean_source_alpha_remaining": 0,
+    "existing_material_changed_outside_selected_bboxes": 0,
+    "header_128_exact": true,
+    "raw_mode": "RGBA",
+    "raw_orientation": "mirror_y",
+    "roundtrip": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_SOURCE_HELP_ALPHA_CLEARED_TO_TRANSPARENT",
+    "2_slant_direction": "PASS_SOURCE_UPRIGHT_HELP_FAMILY",
+    "3_no_unnecessary_undersizing": "PASS_LARGEST_NATIVE_PER_ROW_FIT",
+    "4_source_weight_outline_shadow": "PASS_LOW_CONTRAST_PLAIN_SOURCE_FAMILY",
+    "5_no_clipping": "PASS_2_OF_2_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_EXISTING_B73_AND_ALL_OTHER_CONTENT_PIXEL_EXACT",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "status": "B228_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
