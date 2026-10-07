@@ -82,6 +82,13 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('raise SystemExit(75)', SOURCE)
         self.assertIn('browser_fatal_disconnect', SOURCE)
 
+    def test_failed_gate_repair_is_not_dropped_as_stale(self):
+        self.assertIn('repair_send = trigger.startswith("retry-send:")', SOURCE)
+        self.assertIn('and not repair_send', SOURCE)
+        self.assertIn('A failed GitHub validation needs a repair prompt', SOURCE)
+        self.assertIn('page = await replace_with_fresh_slot_page(context, pages, slot)', SOURCE)
+        self.assertIn('repair fresh-chat login required', SOURCE)
+
     def test_rollover_throttle_policy(self):
         self.assertIn('CONVERSATION_ROLLOVER_MIN_SECONDS', SOURCE)
         self.assertIn('conversation_rollover_cooldown', SOURCE)
