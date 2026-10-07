@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 17:03 KST",
+  "updated_at_kst": "2026-10-07 17:45 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4346,25 +4346,25 @@
     "runtime_validation": "UNTESTED"
   },
   "latest_b_manual_visual_rework": {
-    "run": "B234R",
-    "queue_index": 97,
-    "asset": "411827E",
-    "work_stolen_from_lane": "A",
-    "before_candidate_sha256": "c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e",
-    "rejected_intermediate_sha256": "badd611286b63356ea3715f0efd5aafd60241d40544a11fda4d4635a8acde9c3",
-    "candidate_sha256": "e28a12a19466792dc1d6e24dcd81c472ae310ab90e1abb9a5f7b64756946f808",
-    "rows": [
-      "seconds",
-      "TUNED",
-      "NORMAL",
-      "RANDOM"
+    "run": "B235",
+    "queue_index": 26,
+    "asset": "63C91067",
+    "c_return": "C244_VISUAL_FAIL_REWORK_REQUIRED",
+    "before_candidate_sha256": "0281b7b46b5c53598bab2bf4a01f65f391b166345710460c51791da8cf70d530",
+    "candidate_sha256": "2dfc6214ce2383ef01f2739baeff04890d5ff78330b192fcee0d864f6caff719",
+    "source_widths": [
+      524,
+      525
     ],
-    "visual_right_shear": 0.26,
-    "machine_qa": "4/4 PASS_ZERO_BLAST_HEADER_RAW",
-    "controller_visual_qa": "PASS",
-    "status": "B234R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
-    "report": "localization/graphics/role_B/20261007-B234-Q097-411827E-SLANT/B234_411_REPORT.json",
-    "controller_qa": "localization/graphics/role_B/20261007-B234-Q097-411827E-SLANT/B234_CONTROLLER_SELF_QA.json",
+    "localized_widths": [
+      476,
+      476
+    ],
+    "machine_qa": "2/2 PASS; ZERO_OUTSIDE; HEADER/MIP1/RAW PASS",
+    "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_FINAL_ROWS_RAW_PRACTICAL_100_75_50",
+    "worker_run": 37595758124,
+    "worker_commit": "ec1904701422eb340ba1b1146feb4a419ac624d9",
+    "status": "B235_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
     "runtime_validation": "UNTESTED"
   },
   "c241_c2_q232_ebfc709f": {
@@ -4580,5 +4580,27 @@
     "next": "A/B native-HD material rerender -> producer QA -> fresh independent C -> exact-SHA C3 -> regenerated PRE_INGAME user JPG -> NEW actual-game retest",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "b235_q26_c244_rework": {
+    "run": "B235",
+    "queue_index": 26,
+    "asset": "63C91067",
+    "c_return": "C244_VISUAL_FAIL_REWORK_REQUIRED",
+    "before_candidate_sha256": "0281b7b46b5c53598bab2bf4a01f65f391b166345710460c51791da8cf70d530",
+    "candidate_sha256": "2dfc6214ce2383ef01f2739baeff04890d5ff78330b192fcee0d864f6caff719",
+    "source_widths": [
+      524,
+      525
+    ],
+    "localized_widths": [
+      476,
+      476
+    ],
+    "machine_qa": "2/2 PASS; ZERO_OUTSIDE; HEADER/MIP1/RAW PASS",
+    "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_FINAL_ROWS_RAW_PRACTICAL_100_75_50",
+    "worker_run": 37595758124,
+    "worker_commit": "ec1904701422eb340ba1b1146feb4a419ac624d9",
+    "status": "B235_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "runtime_validation": "UNTESTED"
   }
 }
