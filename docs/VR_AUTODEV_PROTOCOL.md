@@ -1,5 +1,18 @@
 # OutRun2 VR Four-Role Autonomous Development Protocol
 
+## DX9Ex R84 production-convergence override — 2026-10-07
+
+This is the newest phase-transition authority.
+
+1. **Execution owner:** production autonomous work is dispatched by the external Docker queue controller. The repository is the durable source of truth; old ChatGPT schedule IDs and historical A/B/C/D clock times are non-authoritative for dispatch.
+2. **Canonical branch:** all new DX9Ex structure/runtime development lands on `vr-d3d9ex-focus`. The R84 branch is read-only donor evidence.
+3. **Immediate blocker:** CONVERSION-DX9EX-00505 changed unresolved post-Present slot ownership but its exact Active Validation run `37554749168` failed the reset/transport verifier. Repair product/verifier agreement without weakening the safety contract; exact-SHA green is required.
+4. **Then reconcile R84:** execute `docs/VR_DX9EX_R84_PRODUCTION_CONVERGENCE.md` and queue items `DX9EX-R84-PORT-INVENTORY-001` through closeout. Do not advance an R84 cycle target and do not raw-merge the divergent donor branch.
+5. **Port rule:** one ownership/interface seam per bounded material task. Re-read current focus before every port because focus has independent post-R84 fixes. Preserve behavior; structural extraction is not permission to alter rendering or synchronization semantics.
+6. **Completion rule:** R84 becomes `SUPERSEDED_BY_DX9EX_FOCUS` only when every inventory item is classified, required seams are present in focus, obsolete compatibility/textual-include ownership is removed or explicitly retained with reason, exact hosted build/contract gates are green, and durable state records the result.
+7. **Priority:** this convergence precedes general DX9Ex feature/performance expansion and precedes the Architecture-v3 live-authority migration. Critical regression/safety repairs that block the convergence may interrupt it.
+8. Quest 3/VDXR remains the only authority for visual/runtime/pacing claims.
+
 This repository-side protocol matches the four Work scheduled roles. The schedule is external; this file defines durable coordination and ownership.
 
 ## Architecture v3 phase-transition override — 2026-10-06

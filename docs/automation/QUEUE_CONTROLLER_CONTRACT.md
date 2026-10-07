@@ -1,5 +1,22 @@
 # Queue Controller Automation Contract
 
+## Docker production-controller override — 2026-10-07
+
+The active production automation runs outside ChatGPT in the user's Docker queue controller.
+
+- Before every dispatch, fetch the latest `vr-d3d9ex-focus` HEAD and read `AGENTS.md`, `docs/VR_AUTODEV_STATE.json`, `docs/VR_WORK_QUEUE.json`, and `docs/VR_DX9EX_R84_PRODUCTION_CONVERGENCE.md`.
+- Do not rely on historical ChatGPT automation IDs, old clock schedules, a local clone, or an R84 cycle counter to select work.
+- Current selection order is:
+  1. finish/repair an immutable in-progress task and its exact validation;
+  2. `DX9EX-R84-PORT-GATE0-00505`;
+  3. the highest-priority executable `DX9EX-R84-PORT-*` item whose dependencies are DONE;
+  4. only after convergence closeout, return to normal DX9Ex queue / HMD-gated Architecture v3 rules.
+- `vr-refactor-r84-2000c-20261001` is read-only donor/reference. Never write new work there and never wholesale merge it into focus.
+- One material structure seam per task. No filler/no-op cycles merely to increase a campaign count.
+- Keep the existing `[AUTO:<TASK_ID>]` marker and durable run-record requirements.
+- A task is not complete while its required exact-SHA gate is red, missing, or belongs to a different SHA.
+- Runtime-visible success remains UNTESTED until exact Quest 3/VDXR evidence exists.
+
 This branch is managed by the ChatGPT queue controller.
 
 ## Required task record

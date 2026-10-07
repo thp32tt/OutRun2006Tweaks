@@ -1,5 +1,9 @@
 # Scheduled Work Durable Records
 
+## Current execution environment — 2026-10-07
+
+Production autonomous development is executed by an external Docker queue controller. Repository state, not ChatGPT scheduled-task state, is authoritative. The Docker worker must recover the latest focus HEAD and consume the queue/controller contract on every cycle. Current DX9Ex work is the R84-to-focus production-convergence plan in `docs/VR_DX9EX_R84_PRODUCTION_CONVERGENCE.md`.
+
 The four external Work schedules coordinate through GitHub, not chat memory.
 
 - A performs architecture/state/lifetime review only and writes per-run records on `vr-d3d9ex-review-a`.

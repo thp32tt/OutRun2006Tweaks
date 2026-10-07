@@ -1,5 +1,23 @@
 # OutRun2 VR Development Execution Contract
 
+## DX9Ex R84 production-convergence override — 2026-10-07
+
+This is the newest DX9Ex execution authority and overrides older backend-allocation/refactor-cycle text when it conflicts.
+
+- **Canonical production/development branch:** `vr-d3d9ex-focus`.
+- **R84 donor/reference branch:** `vr-refactor-r84-2000c-20261001` at recovered donor HEAD `40e998500fc758dd3b078d9df2ecc2a57a19bc5d`. Treat it as read-only design/evidence. Do not continue its cycle counter, merge it wholesale, or develop new runtime behavior there.
+- R84's purpose was structural improvement. It is not complete until the still-useful structure is reconciled into `vr-d3d9ex-focus` and exact build/validation gates pass.
+- Follow `docs/VR_DX9EX_R84_PRODUCTION_CONVERGENCE.md` and the matching `DX9EX-R84-PORT-*` queue items.
+- **Gate 0 comes first:** repair the current CONVERSION-DX9EX-00505 exact-SHA validation failure before introducing structural ports.
+- After Gate 0 is green, inventory R84-only abstractions and classify each as `APPLIED_EQUIVALENT`, `PORT_REQUIRED`, `SUPERSEDED`, or `DEFERRED_RUNTIME_RISK`.
+- Port only `PORT_REQUIRED` structure, one seam at a time, into current focus. Never raw-merge/cherry-pick the divergent R84 branch.
+- Target order: R34/R33 -> R33/R32 -> R32/R31 -> R31/R30 -> R30/R29 -> lower Present/Reset/DirectGPU facades -> CMake/textual-include cleanup.
+- Every seam requires a deterministic fail-before/pass-after contract where practical, exact GitHub-hosted compile/link validation, Domain Isolation, and current DX9Ex regression gates before the next seam.
+- Preserve current DX9Ex runtime semantics: Reset/ResetEx, StateBlock, DirectGPU/ACK/fence/slot ownership, HUD/XYZRHW/SkyGlow, recenter, effects, protected world stereo, and fail-closed fallback.
+- `RUNTIME_VALIDATION=UNTESTED` remains mandatory unless the user actually tests the exact build on Quest 3/VDXR.
+- Architecture v3 live migration and downstream DX11/DXVK porting remain downstream of this production-convergence phase and their existing HMD gates.
+- The production automation executor is the external Docker queue controller. ChatGPT schedule IDs/cadence are not execution authority; GitHub HEAD + queue + this contract are.
+
 This file defines the default execution model for substantial work in this repository, especially the OutRun2 VR/OpenXR backends and build matrix.
 
 ## Core rule
