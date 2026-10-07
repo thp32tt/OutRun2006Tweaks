@@ -1,0 +1,1199 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B-MANUALQA229-FA7BBB13",
+  "queue_index": 54,
+  "asset": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+  "trigger": "PRE_INGAME_004_CURRENT_POLICY_SOURCE_TRANSFORM_AND_SCALE_FALSE_NEGATIVE_RETRY_AFTER_PAIRWISE_COLLISION_GATE",
+  "failed_attempts": [
+    {
+      "workflow_run": 37560975826,
+      "candidate_persisted": false,
+      "reason": "pairwise collision gate rejected first geometry before DDS persistence: match_total/count_gifts and hold_line/honk_horn overlap"
+    },
+    {
+      "workflow_run": 37561234026,
+      "candidate_persisted": false,
+      "reason": "historical helper allowed-mask was narrower than the current exact source-bbox policy and rejected 23,361 newly slanted pixels that were still inside measured original bboxes; retry rebuilds permission/protection from the 17 exact original_bboxes"
+    }
+  ],
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/004_q054_FA7BBB13.jpg",
+  "prior_status": "C_USERPOLICY02_PASS_PENDING_INGAME",
+  "source_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+  "before_candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
+  "candidate_sha256": "5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e",
+  "method": "verified B_RECOVERY01 exact clean plate + native CJK rerender of all 17 text rows; no old Korean bitmap scaling",
+  "current_policy_findings": [
+    "English source family visibly right-italic while B_RECOVERY01 Korean family remained upright; current readable slant-direction gate reopens the asset.",
+    "Slipstream the cars! row used long Korean text with fs61 + 0.7651 width compression and decoded height 74 inside a 103px source bbox, visibly weaker than adjacent/source family. B229 uses concise imperative 슬립스트림하세요! and near-source-height native rendering."
+  ],
+  "palette": {
+    "fill_rgba": [
+      247,
+      198,
+      58,
+      255
+    ],
+    "inner_stroke_rgba": [
+      255,
+      255,
+      255,
+      255
+    ],
+    "outer_stroke_rgba": [
+      16,
+      28,
+      74,
+      255
+    ]
+  },
+  "render_policy": {
+    "font": "NotoSansCJK-Bold.ttc",
+    "font_style": "Bold",
+    "right_shear": 0.16,
+    "minimum_horizontal_scale": 0.8,
+    "fit": "largest native per-row height; only bounded horizontal condensation when required; exact source bbox remains hard ceiling"
+  },
+  "rows": [
+    {
+      "key": "match_total",
+      "source": "Match the total!",
+      "korean": "합계를 맞히세요!",
+      "original_bbox": [
+        119,
+        35,
+        637,
+        123
+      ],
+      "prior_localized_bbox": [
+        122,
+        37,
+        629,
+        121
+      ],
+      "localized_bbox": [
+        127,
+        38,
+        629,
+        120
+      ],
+      "source_size": [
+        518,
+        88
+      ],
+      "localized_size": [
+        502,
+        82
+      ],
+      "margins": [
+        8,
+        8,
+        3,
+        3
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 71,
+      "horizontal_scale": 0.9923,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "count_gifts",
+      "source": "Count the gifts!",
+      "korean": "선물을 세세요!",
+      "original_bbox": [
+        120,
+        110,
+        635,
+        208
+      ],
+      "prior_localized_bbox": [
+        178,
+        121,
+        594,
+        199
+      ],
+      "localized_bbox": [
+        173,
+        122,
+        581,
+        198
+      ],
+      "source_size": [
+        515,
+        98
+      ],
+      "localized_size": [
+        408,
+        76
+      ],
+      "margins": [
+        53,
+        54,
+        12,
+        10
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 65,
+      "horizontal_scale": 1.0,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "hit_boost",
+      "source": "Hit the boost!",
+      "korean": "부스트를 밟으세요!",
+      "original_bbox": [
+        914,
+        35,
+        1363,
+        123
+      ],
+      "prior_localized_bbox": [
+        917,
+        45,
+        1356,
+        113
+      ],
+      "localized_bbox": [
+        918,
+        46,
+        1358,
+        112
+      ],
+      "source_size": [
+        449,
+        88
+      ],
+      "localized_size": [
+        440,
+        66
+      ],
+      "margins": [
+        4,
+        5,
+        11,
+        11
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 56,
+      "horizontal_scale": 0.9653,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "keep_control",
+      "source": "Keep control!",
+      "korean": "차량을 제어하세요!",
+      "original_bbox": [
+        915,
+        110,
+        1363,
+        210
+      ],
+      "prior_localized_bbox": [
+        917,
+        126,
+        1357,
+        194
+      ],
+      "localized_bbox": [
+        919,
+        127,
+        1359,
+        193
+      ],
+      "source_size": [
+        448,
+        100
+      ],
+      "localized_size": [
+        440,
+        66
+      ],
+      "margins": [
+        4,
+        4,
+        17,
+        17
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 56,
+      "horizontal_scale": 0.961,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "hold_line",
+      "source": "Hold the line!",
+      "korean": "라인을 유지하세요!",
+      "original_bbox": [
+        1678,
+        35,
+        2181,
+        116
+      ],
+      "prior_localized_bbox": [
+        1684,
+        39,
+        2174,
+        111
+      ],
+      "localized_bbox": [
+        1682,
+        40,
+        2176,
+        110
+      ],
+      "source_size": [
+        503,
+        81
+      ],
+      "localized_size": [
+        494,
+        70
+      ],
+      "margins": [
+        4,
+        5,
+        5,
+        6
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 61,
+      "horizontal_scale": 1.0,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "honk_horn",
+      "source": "Honk the horn!",
+      "korean": "경적을 울리세요!",
+      "original_bbox": [
+        1882,
+        110,
+        2470,
+        210
+      ],
+      "prior_localized_bbox": [
+        1937,
+        121,
+        2414,
+        199
+      ],
+      "localized_bbox": [
+        1943,
+        122,
+        2409,
+        198
+      ],
+      "source_size": [
+        588,
+        100
+      ],
+      "localized_size": [
+        466,
+        76
+      ],
+      "margins": [
+        61,
+        61,
+        12,
+        12
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 65,
+      "horizontal_scale": 1.0,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "do_math",
+      "source": "Do the math!",
+      "korean": "계산하세요!",
+      "original_bbox": [
+        2683,
+        110,
+        3143,
+        205
+      ],
+      "prior_localized_bbox": [
+        2764,
+        120,
+        3118,
+        205
+      ],
+      "localized_bbox": [
+        2730,
+        121,
+        3096,
+        203
+      ],
+      "source_size": [
+        460,
+        95
+      ],
+      "localized_size": [
+        366,
+        82
+      ],
+      "margins": [
+        47,
+        47,
+        11,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 71,
+      "horizontal_scale": 1.0,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "guess_sound",
+      "source": "Guess the sound!",
+      "korean": "소리를 맞혀 보세요!",
+      "original_bbox": [
+        3398,
+        127,
+        3978,
+        205
+      ],
+      "prior_localized_bbox": [
+        3417,
+        128,
+        3955,
+        204
+      ],
+      "localized_bbox": [
+        3423,
+        129,
+        3952,
+        203
+      ],
+      "source_size": [
+        580,
+        78
+      ],
+      "localized_size": [
+        529,
+        74
+      ],
+      "margins": [
+        25,
+        26,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 63,
+      "horizontal_scale": 1.0,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "count_green",
+      "source": "Count Green Cars!",
+      "korean": "초록색 차를 세세요!",
+      "original_bbox": [
+        51,
+        230,
+        661,
+        307
+      ],
+      "prior_localized_bbox": [
+        89,
+        231,
+        619,
+        306
+      ],
+      "localized_bbox": [
+        95,
+        232,
+        617,
+        305
+      ],
+      "source_size": [
+        610,
+        77
+      ],
+      "localized_size": [
+        522,
+        73
+      ],
+      "margins": [
+        44,
+        44,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 62,
+      "horizontal_scale": 1.0,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "count_blue",
+      "source": "Count Blue Cars!",
+      "korean": "파란색 차를 세세요!",
+      "original_bbox": [
+        803,
+        210,
+        1361,
+        302
+      ],
+      "prior_localized_bbox": [
+        805,
+        216,
+        1355,
+        295
+      ],
+      "localized_bbox": [
+        808,
+        217,
+        1356,
+        294
+      ],
+      "source_size": [
+        558,
+        92
+      ],
+      "localized_size": [
+        548,
+        77
+      ],
+      "margins": [
+        5,
+        5,
+        7,
+        8
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 66,
+      "horizontal_scale": 0.9893,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "count_sheep",
+      "source": "Count the sheep!",
+      "korean": "양을 세세요!",
+      "original_bbox": [
+        2745,
+        223,
+        3314,
+        316
+      ],
+      "prior_localized_bbox": [
+        2819,
+        224,
+        3235,
+        315
+      ],
+      "localized_bbox": [
+        2825,
+        225,
+        3233,
+        314
+      ],
+      "source_size": [
+        569,
+        93
+      ],
+      "localized_size": [
+        408,
+        89
+      ],
+      "margins": [
+        80,
+        81,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 77,
+      "horizontal_scale": 1.0,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "count_red",
+      "source": "Count Red Cars!",
+      "korean": "빨간색 차를 세세요!",
+      "original_bbox": [
+        2802,
+        373,
+        3345,
+        450
+      ],
+      "prior_localized_bbox": [
+        2807,
+        374,
+        3336,
+        449
+      ],
+      "localized_bbox": [
+        2814,
+        375,
+        3332,
+        448
+      ],
+      "source_size": [
+        543,
+        77
+      ],
+      "localized_size": [
+        518,
+        73
+      ],
+      "margins": [
+        12,
+        13,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 62,
+      "horizontal_scale": 1.0,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "memorize_sequence",
+      "source": "Memorize the sequence!",
+      "korean": "순서를 기억하세요!",
+      "original_bbox": [
+        0,
+        456,
+        786,
+        559
+      ],
+      "prior_localized_bbox": [
+        91,
+        468,
+        695,
+        556
+      ],
+      "localized_bbox": [
+        96,
+        469,
+        689,
+        555
+      ],
+      "source_size": [
+        786,
+        103
+      ],
+      "localized_size": [
+        593,
+        86
+      ],
+      "margins": [
+        96,
+        97,
+        13,
+        4
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 73,
+      "horizontal_scale": 1.0,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "drive_above_speed",
+      "source": "Drive above the speed!",
+      "korean": "지정 속도 이상으로 달리세요!",
+      "original_bbox": [
+        786,
+        456,
+        1562,
+        559
+      ],
+      "prior_localized_bbox": [
+        788,
+        468,
+        1560,
+        556
+      ],
+      "localized_bbox": [
+        790,
+        469,
+        1558,
+        555
+      ],
+      "source_size": [
+        776,
+        103
+      ],
+      "localized_size": [
+        768,
+        86
+      ],
+      "margins": [
+        4,
+        4,
+        13,
+        4
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 73,
+      "horizontal_scale": 0.853,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "spot_odd",
+      "source": "Spot the odd one out!",
+      "korean": "다른 하나를 찾으세요!",
+      "original_bbox": [
+        1562,
+        456,
+        2324,
+        559
+      ],
+      "prior_localized_bbox": [
+        1598,
+        466,
+        2288,
+        557
+      ],
+      "localized_bbox": [
+        1591,
+        467,
+        2294,
+        556
+      ],
+      "source_size": [
+        762,
+        103
+      ],
+      "localized_size": [
+        703,
+        89
+      ],
+      "margins": [
+        29,
+        30,
+        11,
+        3
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 76,
+      "horizontal_scale": 1.0,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "slipstream_cars",
+      "source": "Slipstream the cars!",
+      "korean": "슬립스트림하세요!",
+      "original_bbox": [
+        2324,
+        456,
+        2924,
+        559
+      ],
+      "translation_change": "B229 concise imperative prevents long-string height collapse while preserving the established 슬립스트림 term",
+      "prior_localized_bbox": [
+        2326,
+        475,
+        2922,
+        549
+      ],
+      "localized_bbox": [
+        2329,
+        458,
+        2919,
+        557
+      ],
+      "source_size": [
+        600,
+        103
+      ],
+      "localized_size": [
+        590,
+        99
+      ],
+      "margins": [
+        5,
+        5,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 86,
+      "horizontal_scale": 0.8663,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "run_green",
+      "source": "Run through green!",
+      "korean": "초록색을 통과하세요!",
+      "original_bbox": [
+        2924,
+        470,
+        3648,
+        559
+      ],
+      "prior_localized_bbox": [
+        2952,
+        471,
+        3616,
+        558
+      ],
+      "localized_bbox": [
+        2958,
+        472,
+        3613,
+        557
+      ],
+      "source_size": [
+        724,
+        89
+      ],
+      "localized_size": [
+        655,
+        85
+      ],
+      "margins": [
+        34,
+        35,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 72,
+      "horizontal_scale": 1.0,
+      "readable_right_shear": 0.16,
+      "fill_rgba": [
+        247,
+        198,
+        58,
+        255
+      ],
+      "inner_stroke_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer_stroke_rgba": [
+        16,
+        28,
+        74,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "slipstream_before": {
+    "korean": "차량 뒤에서 슬립스트림하세요!",
+    "bbox": [
+      2326,
+      475,
+      2922,
+      549
+    ],
+    "font_size": null,
+    "note": "historical renderer additionally used xscale 0.7651"
+  },
+  "slipstream_after": {
+    "korean": "슬립스트림하세요!",
+    "bbox": [
+      2329,
+      458,
+      2919,
+      557
+    ],
+    "font_size": 86,
+    "horizontal_scale": 0.8663
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "17/17 PASS",
+    "clean_validator": "PASS",
+    "final_validator": "PASS",
+    "changed_pixels_outside_allowed": 0,
+    "alpha_changed_outside_allowed": 0,
+    "protected_changed": 0,
+    "source_residue": 0,
+    "localized_overlap_touch_pairs": [],
+    "old_candidate_changes_outside_allowed": 0,
+    "header_128_exact": true,
+    "raw_mode": "RGBA",
+    "raw_orientation": "mirror_y",
+    "roundtrip": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_VERIFIED_B_RECOVERY01_CLEAN",
+    "2_slant_direction": "PASS_FRESH_RIGHT_LEAN_ALL_17_ROWS",
+    "3_no_unnecessary_undersizing": "PASS_LARGEST_NATIVE_PER_ROW_FIT_WITH_CONCISE_SLIPSTREAM_COPY",
+    "4_source_weight_outline_shadow": "PASS_SOURCE_YELLOW_WHITE_NAVY_EFFECT_FAMILY",
+    "5_no_clipping": "PASS_17_OF_17_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_OUTSIDE_AND_PROTECTED_ZERO",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "status": "B229_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
