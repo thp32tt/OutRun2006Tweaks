@@ -2624,3 +2624,9 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - IGR-002/q212 BA0147DA final producer candidate e3fc3275...; B241 was self-rejected, B242 machine+controller visual PASS.
 - 2/2 containment/size, zero outside/alpha/protected/overlap, exact header/mip1/decode/RAW mirror_y PASS. 150px Bold / 0.76 condensed / whole-word grouping.
 - Next: fresh C2 + exact-SHA C3 -> PRE_INGAME/user review -> NEW in-game retest. RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.
+
+## 2026-10-08 02:05 KST — A176 q121 producer PASS
+- q121 `FD90AA9` -> `d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27`.
+- Transparent-atlas alpha cleanup removes C255 English silhouettes without A171-A174 rectangular plate regression; clean header bboxes contain 0 visible alpha before fresh Korean render.
+- Machine 3/3 + zero outside/alpha/overlap + DDS/RAW PASS; controller SOURCE/A138/CLEAN/A176 + RAW visual PASS.
+- Fresh C1 + exact-SHA C3 + PRE_INGAME/user JPG + NEW in-game retest pending. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
