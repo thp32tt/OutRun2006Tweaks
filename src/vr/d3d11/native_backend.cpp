@@ -10394,6 +10394,46 @@ compose_programmable_dormant_source_revalidation_readiness(
     return out;
 }
 
+std::uint64_t recompute_programmable_dormant_source_revalidation_payload_snapshot(
+    const NativeProgrammableShaderDormantSourceRevalidationReadiness&
+        sourceRevalidation) noexcept {
+    if (sourceRevalidation.kind ==
+        NativeProgrammableShaderDrawCandidateKind::None)
+        return 0;
+
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(
+        token, static_cast<std::uint32_t>(sourceRevalidation.kind));
+    token = mix_readiness_snapshot_token(
+        token, sourceRevalidation.indexed ? 1u : 0u);
+    token = mix_readiness_snapshot_token(token, sourceRevalidation.cacheKey);
+    token = mix_readiness_snapshot_token(
+        token, sourceRevalidation.currentSourceReceiptSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, sourceRevalidation.candidateSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, sourceRevalidation.preActivationSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, sourceRevalidation.elementCount);
+    token = mix_readiness_snapshot_token(
+        token, sourceRevalidation.startLocation);
+    token = mix_readiness_snapshot_token(
+        token,
+        static_cast<std::uint64_t>(
+            static_cast<std::int64_t>(
+                sourceRevalidation.baseVertexIndex)));
+    token = mix_readiness_snapshot_token(
+        token, sourceRevalidation.minVertexIndex);
+    token = mix_readiness_snapshot_token(
+        token, sourceRevalidation.numVertices);
+    token = mix_readiness_snapshot_token(
+        token, static_cast<std::uint32_t>(sourceRevalidation.indexFormat));
+    token = mix_readiness_snapshot_token(
+        token, sourceRevalidation.indexOffset);
+    token = mix_readiness_snapshot_token(token, 0x258u);
+    return token == 0 ? 1 : token;
+}
+
 } // namespace
 
 NativeProgrammableShaderResourceBehaviorReadiness
@@ -13070,8 +13110,14 @@ compose_programmable_activation_prerequisite_handoff(
         out.sourceRevalidationReady &&
         sourceRevalidation.snapshotToken ==
             sourceRevalidationSnapshotToken;
+    out.sourceRevalidationPayloadSnapshotMatches =
+        out.sourceRevalidationReady &&
+        sourceRevalidation.snapshotToken ==
+            recompute_programmable_dormant_source_revalidation_payload_snapshot(
+                sourceRevalidation);
     out.sourceIdentityMatches =
         out.sourceRevalidationSnapshotMatches &&
+        out.sourceRevalidationPayloadSnapshotMatches &&
         out.cacheKey != 0 &&
         inputLayout.cacheKey == out.cacheKey &&
         shaderTranslation.cacheKey == out.cacheKey;
@@ -13199,6 +13245,8 @@ compose_programmable_activation_prerequisite_handoff(
         token = mix_readiness_snapshot_token(token, out.cacheKey);
         token = mix_readiness_snapshot_token(
             token, out.sourceRevalidationSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceRevalidationPayloadSnapshotMatches ? 1u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.resourceBehaviorSnapshotToken);
         token = mix_readiness_snapshot_token(

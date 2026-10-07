@@ -6668,6 +6668,8 @@ int main()
         r259IndexedPrerequisiteHandoff.inputValid &&
         r259IndexedPrerequisiteHandoff.sourceRevalidationReady &&
         r259IndexedPrerequisiteHandoff.sourceRevalidationSnapshotMatches &&
+        r259IndexedPrerequisiteHandoff.
+            sourceRevalidationPayloadSnapshotMatches &&
         r259IndexedPrerequisiteHandoff.sourceIdentityMatches &&
         r259IndexedPrerequisiteHandoff.cacheKey == programmablePair.cacheKey &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorReviewReady &&
@@ -6854,6 +6856,32 @@ int main()
         r259IndexedStaleSource.reviewSnapshotToken == 0 &&
         r259IndexedStaleSource.activationSnapshotToken == 0,
         "R259 rejects stale R258 source-revalidation identity");
+
+    auto r299TamperedR258 = r258IndexedSourceRevalidation;
+    r299TamperedR258.startLocation += 1u;
+    const auto r299TamperedSource =
+        outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
+            r299TamperedR258,
+            r299TamperedR258.snapshotToken,
+            r262IndexedOutputResourceBehavior,
+            r262IndexedOutputResourceBehavior.reviewSnapshotToken,
+            r243InputLayoutReady,
+            r243InputLayoutReady.snapshotToken,
+            r263SemanticTranslation,
+            r263SemanticTranslation.reviewSnapshotToken);
+    require(
+        r299TamperedSource.sourceRevalidationReady &&
+        r299TamperedSource.sourceRevalidationSnapshotMatches &&
+        !r299TamperedSource.sourceRevalidationPayloadSnapshotMatches &&
+        !r299TamperedSource.sourceIdentityMatches &&
+        !r299TamperedSource.sourceIdentityProofPresent &&
+        (r299TamperedSource.missingPrerequisiteMask & 0x8u) != 0 &&
+        !r299TamperedSource.activationPrerequisitesSatisfied &&
+        !r299TamperedSource.boundaryPreserved &&
+        !r299TamperedSource.reviewReady &&
+        r299TamperedSource.reviewSnapshotToken == 0 &&
+        r299TamperedSource.activationSnapshotToken == 0,
+        "R299 rejects R258 payload drift hidden behind an unchanged source-revalidation snapshot token");
 
     const auto staleR261IndexedReviewToken =
         r262IndexedOutputResourceBehavior.reviewSnapshotToken == 1ull

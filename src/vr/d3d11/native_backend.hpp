@@ -2564,6 +2564,7 @@ struct NativeProgrammableShaderActivationPrerequisiteHandoff {
     bool inputValid{};
     bool sourceRevalidationReady{};
     bool sourceRevalidationSnapshotMatches{};
+    bool sourceRevalidationPayloadSnapshotMatches{};
     bool sourceIdentityMatches{};
     bool resourceBehaviorReviewReady{};
     bool resourceBehaviorSnapshotMatches{};
