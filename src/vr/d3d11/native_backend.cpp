@@ -5977,7 +5977,7 @@ materialize_semantic_translation_review_for_observation(
         vertexBytecodeBytes ==
             targetBytecodeMaterialization.vertexTargetBytecodeBytes &&
         vertexBytecodeBytes <=
-            static_cast<std::size_t>(std::numeric_limits<UINT>::max()) &&
+            static_cast<std::size_t>((std::numeric_limits<UINT>::max)()) &&
         hash_observation_payload_bytes(
             targetBytecodeMaterialization.vertexTargetBytecode.data(),
             static_cast<UINT>(vertexBytecodeBytes)) ==
@@ -6201,7 +6201,7 @@ validate_semantic_translation_review_snapshot(
         vertexBytecodeBytes !=
             targetBytecodeMaterialization.vertexTargetBytecodeBytes ||
         vertexBytecodeBytes >
-            static_cast<std::size_t>(std::numeric_limits<UINT>::max()) ||
+            static_cast<std::size_t>((std::numeric_limits<UINT>::max)()) ||
         hash_observation_payload_bytes(
             targetBytecodeMaterialization.vertexTargetBytecode.data(),
             static_cast<UINT>(vertexBytecodeBytes)) !=
