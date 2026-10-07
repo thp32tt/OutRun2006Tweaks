@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 R7_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r7.inc"
 R13_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r13.cpp"
 R22_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r22.cpp"
+R30_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp"
 R32_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r32.cpp"
 HOST_BUNDLE_PATH = ROOT / "vrhost/src/runtime/r23_verified_bundle.hpp"
 HOST_CACHE_PATH = ROOT / "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp"
@@ -80,6 +81,7 @@ def require_order(source: str, label: str, *markers: str) -> None:
 r7 = load(R7_PATH)
 r13 = load(R13_PATH)
 r22 = load(R22_PATH)
+r30 = load(R30_PATH)
 r32 = load(R32_PATH)
 host_bundle = load(HOST_BUNDLE_PATH)
 host_cache = load(HOST_CACHE_PATH)
