@@ -3,6 +3,7 @@
   "run": "20261007-B232-Q107-841E796B-SEMANTIC",
   "queue_index": 107,
   "candidate_sha256": "d6a5cc84e7cf834afe11d8afdc2c0b869b306e75759b71ee392983db8999abda",
-  "status": "B232R_WORKER_PASS_PENDING_CONTROLLER_FRESH_C_C3",
-  "report": "localization/graphics/role_B/20261007-B232-Q107-841E796B-SEMANTIC/B232_841E_REPORT.json"
+  "status": "B232R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+  "report": "localization/graphics/role_B/20261007-B232-Q107-841E796B-SEMANTIC/B232_841E_REPORT.json",
+  "controller_qa": "localization/graphics/role_B/20261007-B232-Q107-841E796B-SEMANTIC/B232_CONTROLLER_SELF_QA.json"
 }
