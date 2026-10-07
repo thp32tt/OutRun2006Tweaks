@@ -1,0 +1,11 @@
+{
+  "role": "A",
+  "run": "20261007-A165-BATCH-Q028-Q030-C245-REWORK",
+  "queue_index": 28,
+  "asset": "A05BF610",
+  "work_stolen_from_lane": "B",
+  "candidate_sha256": "372d2f4056308fbbfef04fdf1735a6c722aecca9246d7b121f27b28f86479a72",
+  "status": "STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL",
+  "report": "localization/graphics/role_A/20261007-A165-BATCH-Q028-Q030-C245-REWORK/A165_Q028_A05BF610_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261007-A165-BATCH-Q028-Q030-C245-REWORK",
+  "queue_index": 30,
+  "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+  "work_stolen_from_lane": "B",
+  "selection_reason": "A odd primary shard exhausted after A164R q197 reconciliation; refreshed branch confirmed direct C245 REWORK_REQUIRED remained unchanged on B-even shard",
+  "execution_backend": "GITHUB_ACTIONS_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILURE_AND_N100_DISK_FULL_MATERIALIZATION_FAILURE",
+  "trigger": "C245_VISUAL_FAIL_REWORK_REQUIRED_TOTAL_RANK_TEXT_TOO_SMALL",
+  "source_sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e",
+  "before_candidate_sha256": "e2eccea39c4241477c5c9743e23ffb69d1cfe785f5186dbd992a865a917d6edc",
+  "candidate_sha256": "fa294ef9bcd4e96db8848da3846cea7d90fd6668e1a30d6957f6e1c881f4a547",
+  "clean_plate": "localization/graphics/role_B/20261005-B-PRODUCTION148-8215-C200-TEMPLATE/B148_CLEAN_PLATE.png",
+  "clean_authority": "TARGET_BBOX_ONLY_AFTER_CONTROLLER_VISUAL_REVIEW; HISTORICAL_CLEAN_NOT_GLOBAL_ATLAS_AUTHORITY",
+  "clean_target_edge_checks": [
+    {
+      "region": 0,
+      "edge_ring_mean_abs_rgb_delta": 3.9625
+    },
+    {
+      "region": 1,
+      "edge_ring_mean_abs_rgb_delta": 0.2683
+    }
+  ],
+  "construction": "fresh native-HD supersampled NotoSansCJK-Bold.ttc face index 1; white face/navy outline; readable-right shear 0.30; ~90% source-width target; no prior Korean bitmap scale/reuse",
+  "rows": [
+    {
+      "region": 0,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        1829,
+        1179,
+        2364,
+        1281
+      ],
+      "localized_bbox": [
+        1853,
+        1184,
+        2339,
+        1276
+      ],
+      "source_size": [
+        535,
+        102
+      ],
+      "localized_size": [
+        486,
+        92
+      ],
+      "margins": [
+        24,
+        25,
+        5,
+        5
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_index": 1,
+      "font_size": 90,
+      "stroke_width": 4,
+      "readable_right_slant": 0.3,
+      "fresh_supersample": 4,
+      "width_ratio": 0.9084,
+      "height_ratio": 0.902,
+      "c245_rejected_width_ratio": 0.5533,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region": 1,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        1682,
+        150,
+        2216,
+        252
+      ],
+      "localized_bbox": [
+        1706,
+        155,
+        2192,
+        247
+      ],
+      "source_size": [
+        534,
+        102
+      ],
+      "localized_size": [
+        486,
+        92
+      ],
+      "margins": [
+        24,
+        24,
+        5,
+        5
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_index": 1,
+      "font_size": 90,
+      "stroke_width": 4,
+      "readable_right_slant": 0.3,
+      "fresh_supersample": 4,
+      "width_ratio": 0.9101,
+      "height_ratio": 0.902,
+      "c245_rejected_width_ratio": 0.5562,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_qa": {
+    "rows": "2/2 PASS",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changes_outside_exact_source_bboxes": 0,
+    "localized_pair_overlap": 0,
+    "header_128_exact": true,
+    "mip_count": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PENDING_CONTROLLER_VISUAL_TARGET_BBOX_ONLY",
+    "2_slant_direction": "PASS_READABLE_RIGHT_0.30",
+    "3_no_undersizing": "PASS_NEAR_90_PERCENT_SOURCE_WIDTH",
+    "4_weight_outline_shadow": "PASS_WHITE_NAVY_SOURCE_FAMILY",
+    "5_no_clipping": "PASS_POSITIVE_MARGINS",
+    "6_protected_clearance": "PASS_ZERO_BLAST_OUTSIDE_EXACT_SOURCE_BBOXES",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER_VISUAL"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3_strict_audit": "REQUIRED_EXACT_SHA_USER_JPG_FALSE_NEGATIVE_HISTORY",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
