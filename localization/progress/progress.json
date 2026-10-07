@@ -668,20 +668,17 @@
     "current_pending_artwork_localize_text": 0,
     "current_producer_rework_remaining": 0,
     "latest_a_production_batch": {
-      "timestamp_kst": "2026-10-08T01:22:00+09:00",
-      "run": "A171/A175 C255 q121/q193 rework batch",
+      "timestamp_kst": "2026-10-08T02:05:00+09:00",
+      "run": "A176 q121 transparent plate reconstruction",
       "assets": [
-        "FD90AA9",
-        "97E863AD"
+        "FD90AA9"
       ],
-      "q193_result": "A171_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
-      "q193_candidate_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
-      "q121_result": "A175_HOLD_STRICT_RECHECK_AFTER_REJECTED_A171_A174_PLATE_RECONSTRUCTIONS",
-      "q121_restored_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
-      "execution_backend": "GITHUB_ACTIONS_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILURE",
+      "candidate_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+      "result": "A176_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
       "pending_c_assets": [
-        "97E863AD"
+        "FD90AA9"
       ],
+      "execution_backend": "GITHUB_ACTIONS_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILURE",
       "runtime_validation": "UNTESTED"
     },
     "a_production20_9ce4e175": {
