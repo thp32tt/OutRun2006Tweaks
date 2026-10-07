@@ -291,5 +291,32 @@ for token in (
 ):
     require(token, analyzer, 'OutRun stage/result canonical producer anchor')
 
+# Canonical executable closure for the OutRun stage/result HUD.
+# The three text calls resolve to Sumo_Printf; its exact glyph producers are
+# already redirected through TextGlyph_putSprite and registered as ScreenHud.
+for contract_id, rva in (
+    ('VR-EXE-STAGE-RESULT-TEXT-975EE', '0x000975EE'),
+    ('VR-EXE-STAGE-RESULT-TEXT-97727', '0x00097727'),
+    ('VR-EXE-STAGE-RESULT-TEXT-977FB', '0x000977FB'),
+    ('VR-EXE-STAGE-RESULT-CLIP-97BB7', '0x00097BB7'),
+    ('VR-EXE-STAGE-RESULT-CLIP-97DA7', '0x00097DA7'),
+):
+    require(contract_id, binary_contract,
+            'canonical stage/result HUD direct-CALL contract')
+    require(rva, binary_contract,
+            'canonical stage/result HUD direct-CALL RVA')
+require('TextGlyph_PutSpriteCalls[] = { 0x2C808, 0x2C9DB }', ui,
+        'stage/result Sumo_Printf glyph route')
+require('TextGlyph_putSprite', ui,
+        'stage/result text ScreenHud wrapper')
+require('ProducerToken::TextGlyphPutSprite', ui,
+        'stage/result text producer token')
+require('RenderScope::ScreenHud', ui,
+        'stage/result text ScreenHud ownership')
+for token in ('0x97BB7', '0x97DA7'):
+    require(token, ui, 'stage/result clip exact ScreenHud route')
+require('ExactScreenHud_putClipSprite', ui,
+        'stage/result clip ScreenHud wrapper')
+
 
 print('P0 visual composition static contract: PASS')

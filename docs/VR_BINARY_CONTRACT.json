@@ -155,6 +155,76 @@
           "needle": "Sumo_DispSelCarModel_HookAddr = 0x6B766"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-STAGE-RESULT-TEXT-975EE",
+      "rva": "0x000975EE",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8dd57f9ff",
+      "purpose": "Canonical OutRun stage/result HUD text producer. Direct CALL resolves to Sumo_Printf RVA 0x0002CDD0.",
+      "sourceBindings": [
+        {
+          "path": "tools/analyze_outrun_exe.py",
+          "needle": "0x000975EE"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-STAGE-RESULT-TEXT-97727",
+      "rva": "0x00097727",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8a456f9ff",
+      "purpose": "Canonical OutRun stage/result HUD text producer. Direct CALL resolves to Sumo_Printf RVA 0x0002CDD0.",
+      "sourceBindings": [
+        {
+          "path": "tools/analyze_outrun_exe.py",
+          "needle": "0x00097727"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-STAGE-RESULT-TEXT-977FB",
+      "rva": "0x000977FB",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8d055f9ff",
+      "purpose": "Canonical OutRun stage/result HUD text producer. Direct CALL resolves to Sumo_Printf RVA 0x0002CDD0.",
+      "sourceBindings": [
+        {
+          "path": "tools/analyze_outrun_exe.py",
+          "needle": "0x000977FB"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-STAGE-RESULT-CLIP-97BB7",
+      "rva": "0x00097BB7",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8c456f9ff",
+      "purpose": "Canonical OutRun stage/result HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x97BB7"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-STAGE-RESULT-CLIP-97DA7",
+      "rva": "0x00097DA7",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8d454f9ff",
+      "purpose": "Canonical OutRun stage/result HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x97DA7"
+        }
+      ]
     }
   ]
 }
