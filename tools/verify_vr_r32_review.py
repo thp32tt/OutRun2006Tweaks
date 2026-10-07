@@ -102,7 +102,7 @@ for banned in (
         raise SystemExit(f"R32 retained retired physical DirectGPU ownership: {banned}")
 for required in (
         "bool R32ResolveDirectTransport(",
-        "R13OverlayReadyForTransport()",
+        "R30SupportOverlayReadyForTransport()",
         "return lowerResolve();",
         "R32EnsureDirectResources(device)",
         "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
