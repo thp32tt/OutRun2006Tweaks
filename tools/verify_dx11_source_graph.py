@@ -11591,6 +11591,37 @@ def main() -> None:
             )
         )
 
+    r308_programmable_production_semantic_review_analyzer_bridge = [
+        ("VR DX11 R291 productionSemanticReview",
+         RUNTIME_CENSUS, "R308 consumes the existing R291 production semantic review"),
+        ("R291_PRODUCTION_SEMANTIC_REVIEW_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R308 parses R291 production semantic evidence"),
+        ('"admission_snapshot_correlated":',
+         DX11_CENSUS_ANALYZER, "R308 correlates R288 admission token presence"),
+        ('"review_state_correlated": review_state_correlated',
+         DX11_CENSUS_ANALYZER, "R308 correlates R289 readiness and token state"),
+        ('"ProductionSemanticReview": production_semantic_review',
+         DX11_CENSUS_ANALYZER, "R308 attaches R291 evidence to the exact signature"),
+        ("r308_production_semantic_review = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R308 exact production semantic-review fixture"),
+        ("r308_inconsistent_semantic_review = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R308 inconsistent semantic-review fixture"),
+        ('r308_evidence["activation_proof"] is False',
+         DX11_CENSUS_ANALYZER_TEST, "R308 analyzer evidence cannot activate draw"),
+    ]
+    missing_r308_programmable_production_semantic_review_analyzer_bridge = [
+        meaning for token, source, meaning
+        in r308_programmable_production_semantic_review_analyzer_bridge
+        if token not in source
+    ]
+    if missing_r308_programmable_production_semantic_review_analyzer_bridge:
+        raise SystemExit(
+            "DX11 R308 programmable production semantic-review analyzer drift: "
+            + ", ".join(
+                missing_r308_programmable_production_semantic_review_analyzer_bridge
+            )
+        )
+
     r307_programmable_production_source_revalidation_analyzer_bridge = [
         ("VR DX11 R297 productionSourceRevalidation",
          RUNTIME_CENSUS, "R307 consumes the existing R297 production source record"),

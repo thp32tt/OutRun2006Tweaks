@@ -2128,6 +2128,79 @@ def main() -> int:
     )
     assert r306_inconsistent_prerequisite["NativeDrawPathActivationAllowed"] is False
 
+    r308_production_semantic_review = run_case(
+        "VR DX11 R291 productionSemanticReview signature#1: "
+        "admissionExact=1 reviewExact=1 inputLayoutReady=1 "
+        "inputLayoutReused=0 semanticReady=1 boundaryPreserved=1 "
+        "admissionSnapshot=0x1111111111111111 "
+        "inputLayoutSnapshot=0x2222222222222222 "
+        "semanticSnapshot=0x3333333333333333 "
+        "reviewSnapshot=0x4444444444444444\n"
+        + r306_signature_tail
+    )
+    r308_inventory = r308_production_semantic_review["ActivationEvidence"][
+        "ProgrammableShaderInventory"
+    ]
+    assert r308_inventory["ProductionSemanticReviewEvidenceSignatures"] == 1
+    assert r308_inventory["ProductionSemanticReviewExactSignatures"] == 1
+    assert r308_inventory["ProductionSemanticReviewFailClosedSignatures"] == 1
+    assert r308_inventory[
+        "ProductionSemanticReviewCorrelationInexactSignatures"
+    ] == []
+    assert r308_inventory[
+        "ProductionSemanticReviewEvidenceCoverageComplete"
+    ] is True
+    r308_evidence = r308_inventory["Pairs"][0]["SemanticTranslationEvidence"][0][
+        "ProductionSemanticReview"
+    ]
+    assert r308_evidence["admission_exact"] is True
+    assert r308_evidence["review_exact"] is True
+    assert r308_evidence["input_layout_ready"] is True
+    assert r308_evidence["semantic_ready"] is True
+    assert r308_evidence["boundary_preserved"] is True
+    assert r308_evidence["admission_snapshot_correlated"] is True
+    assert r308_evidence["review_snapshot_correlated"] is True
+    assert r308_evidence["review_state_correlated"] is True
+    assert r308_evidence["summary_correlation_exact"] is True
+    assert r308_evidence["fail_closed"] is True
+    assert r308_evidence["activation_proof"] is False
+    assert r308_production_semantic_review[
+        "NativeDrawPathActivationAllowed"
+    ] is False
+
+    r308_inconsistent_semantic_review = run_case(
+        "VR DX11 R291 productionSemanticReview signature#1: "
+        "admissionExact=1 reviewExact=1 inputLayoutReady=1 "
+        "inputLayoutReused=0 semanticReady=0 boundaryPreserved=1 "
+        "admissionSnapshot=0x1111111111111111 "
+        "inputLayoutSnapshot=0x2222222222222222 "
+        "semanticSnapshot=0x0000000000000000 "
+        "reviewSnapshot=0x4444444444444444\n"
+        + r306_signature_tail
+    )
+    r308_inconsistent_inventory = r308_inconsistent_semantic_review[
+        "ActivationEvidence"
+    ]["ProgrammableShaderInventory"]
+    assert r308_inconsistent_inventory[
+        "ProductionSemanticReviewCorrelationInexactSignatures"
+    ] == [{"source_log": "OutRun2006Tweaks.log", "startup_epoch": 0, "id": 1}]
+    assert (
+        r308_inconsistent_inventory[
+            "ProductionSemanticReviewEvidenceCoverageComplete"
+        ]
+        is False
+    )
+    r308_inconsistent_evidence = r308_inconsistent_inventory["Pairs"][0][
+        "SemanticTranslationEvidence"
+    ][0]["ProductionSemanticReview"]
+    assert r308_inconsistent_evidence["review_state_correlated"] is False
+    assert r308_inconsistent_evidence["summary_correlation_exact"] is False
+    assert r308_inconsistent_evidence["fail_closed"] is False
+    assert r308_inconsistent_evidence["activation_proof"] is False
+    assert r308_inconsistent_semantic_review[
+        "NativeDrawPathActivationAllowed"
+    ] is False
+
     r307_production_source_revalidation = run_case(
         "VR DX11 R297 productionSourceRevalidation signature#1: "
         "drawExact=1 nativeBufferEligible=1 r258Present=0 r258Contract=0 "

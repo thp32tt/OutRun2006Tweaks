@@ -225,6 +225,19 @@ R275_SEMANTIC_RECEIPT_RE = re.compile(
     r"exact=(?P<exact>[01]) objectReady=(?P<objectReady>[01]) "
     r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
 )
+R291_PRODUCTION_SEMANTIC_REVIEW_RE = re.compile(
+    r"VR DX11 R291 productionSemanticReview signature#(?P<signature>\d+): "
+    r"admissionExact=(?P<admissionExact>[01]) "
+    r"reviewExact=(?P<reviewExact>[01]) "
+    r"inputLayoutReady=(?P<inputLayoutReady>[01]) "
+    r"inputLayoutReused=(?P<inputLayoutReused>[01]) "
+    r"semanticReady=(?P<semanticReady>[01]) "
+    r"boundaryPreserved=(?P<boundaryPreserved>[01]) "
+    r"admissionSnapshot=0x(?P<admissionSnapshot>[0-9A-Fa-f]+) "
+    r"inputLayoutSnapshot=0x(?P<inputLayoutSnapshot>[0-9A-Fa-f]+) "
+    r"semanticSnapshot=0x(?P<semanticSnapshot>[0-9A-Fa-f]+) "
+    r"reviewSnapshot=0x(?P<reviewSnapshot>[0-9A-Fa-f]+)"
+)
 R297_PRODUCTION_SOURCE_REVALIDATION_RE = re.compile(
     r"VR DX11 R297 productionSourceRevalidation signature#(?P<signature>\d+): "
     r"drawExact=(?P<drawExact>[01]) "
@@ -543,6 +556,8 @@ def summarize_programmable_shader_inventory(
     semantic_receipt_missing: list[dict] = []
     production_activation_prerequisite_missing: list[dict] = []
     production_activation_prerequisite_correlation_inexact: list[dict] = []
+    production_semantic_review_missing: list[dict] = []
+    production_semantic_review_correlation_inexact: list[dict] = []
     production_source_revalidation_missing: list[dict] = []
     production_source_revalidation_correlation_inexact: list[dict] = []
     semantic_plan_inexact: list[dict] = []
@@ -567,6 +582,9 @@ def summarize_programmable_shader_inventory(
     production_activation_prerequisite_evidence_signatures = 0
     production_activation_prerequisite_exact_signatures = 0
     production_activation_prerequisite_fail_closed_signatures = 0
+    production_semantic_review_evidence_signatures = 0
+    production_semantic_review_exact_signatures = 0
+    production_semantic_review_fail_closed_signatures = 0
     production_source_revalidation_evidence_signatures = 0
     production_source_revalidation_join_exact_signatures = 0
     production_source_revalidation_fail_closed_signatures = 0
@@ -636,6 +654,9 @@ def summarize_programmable_shader_inventory(
         receipt = signature.get("translated_semantic_receipt")
         production_activation_prerequisite = signature.get(
             "production_activation_prerequisite"
+        )
+        production_semantic_review = signature.get(
+            "production_semantic_review"
         )
         production_source_revalidation = signature.get(
             "production_source_revalidation"
@@ -790,6 +811,17 @@ def summarize_programmable_shader_inventory(
             if production_activation_prerequisite["fail_closed"]:
                 production_activation_prerequisite_fail_closed_signatures += 1
 
+        if production_semantic_review is None:
+            production_semantic_review_missing.append(ref)
+        else:
+            production_semantic_review_evidence_signatures += 1
+            if not production_semantic_review["summary_correlation_exact"]:
+                production_semantic_review_correlation_inexact.append(ref)
+            if production_semantic_review["review_exact"]:
+                production_semantic_review_exact_signatures += 1
+            if production_semantic_review["fail_closed"]:
+                production_semantic_review_fail_closed_signatures += 1
+
         if production_source_revalidation is None:
             production_source_revalidation_missing.append(ref)
         else:
@@ -814,6 +846,7 @@ def summarize_programmable_shader_inventory(
                 "Receipt": receipt,
                 "ProductionActivationPrerequisite":
                     production_activation_prerequisite,
+                "ProductionSemanticReview": production_semantic_review,
                 "ProductionSourceRevalidation": production_source_revalidation,
                 "MissingPrerequisite": missing_prerequisite,
                 "DiagnosticOnly": True,
@@ -844,6 +877,12 @@ def summarize_programmable_shader_inventory(
         and programmable_signatures > 0
         and not production_activation_prerequisite_missing
         and not production_activation_prerequisite_correlation_inexact
+    )
+    production_semantic_review_evidence_coverage_complete = bool(
+        evidence_coverage_complete
+        and programmable_signatures > 0
+        and not production_semantic_review_missing
+        and not production_semantic_review_correlation_inexact
     )
     production_source_revalidation_evidence_coverage_complete = bool(
         evidence_coverage_complete
@@ -906,6 +945,18 @@ def summarize_programmable_shader_inventory(
             production_activation_prerequisite_fail_closed_signatures,
         "ProductionActivationEvidenceCoverageComplete":
             production_activation_evidence_coverage_complete,
+        "ProductionSemanticReviewEvidenceMissingSignatures":
+            production_semantic_review_missing,
+        "ProductionSemanticReviewCorrelationInexactSignatures":
+            production_semantic_review_correlation_inexact,
+        "ProductionSemanticReviewEvidenceSignatures":
+            production_semantic_review_evidence_signatures,
+        "ProductionSemanticReviewExactSignatures":
+            production_semantic_review_exact_signatures,
+        "ProductionSemanticReviewFailClosedSignatures":
+            production_semantic_review_fail_closed_signatures,
+        "ProductionSemanticReviewEvidenceCoverageComplete":
+            production_semantic_review_evidence_coverage_complete,
         "ProductionSourceRevalidationEvidenceMissingSignatures":
             production_source_revalidation_missing,
         "ProductionSourceRevalidationCorrelationInexactSignatures":
@@ -956,6 +1007,7 @@ def main() -> int:
     target_bytecode_materializations: dict[SignatureKey, dict] = {}
     translated_semantic_receipts: dict[SignatureKey, dict] = {}
     production_activation_prerequisites: dict[SignatureKey, dict] = {}
+    production_semantic_reviews: dict[SignatureKey, dict] = {}
     production_source_revalidations: dict[SignatureKey, dict] = {}
     declarations: dict[SignatureKey, list[dict]] = {}
     fixed_function: dict[SignatureKey, list[dict]] = {}
@@ -990,6 +1042,7 @@ def main() -> int:
             and "VR DX11 R194" not in text
             and "VR DX11 R197" not in text
             and "VR DX11 R223" not in text
+            and "VR DX11 R291" not in text
             and "VR DX11 R293" not in text
             and "VR DX11 R297" not in text
         ):
@@ -1253,6 +1306,95 @@ def main() -> int:
                     "object_ready": bool(int(data["objectReady"])),
                     "snapshot": int(data["snapshot"], 16),
                     "snapshot_hex": "0x" + data["snapshot"].upper(),
+                }
+                continue
+
+            match = R291_PRODUCTION_SEMANTIC_REVIEW_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                signature_key = (source_log, startup_epoch, signature_id)
+                admission_exact = bool(int(data["admissionExact"]))
+                review_exact = bool(int(data["reviewExact"]))
+                input_layout_ready = bool(int(data["inputLayoutReady"]))
+                input_layout_reused = bool(int(data["inputLayoutReused"]))
+                semantic_ready = bool(int(data["semanticReady"]))
+                boundary_preserved = bool(int(data["boundaryPreserved"]))
+                admission_snapshot = int(data["admissionSnapshot"], 16)
+                input_layout_snapshot = int(data["inputLayoutSnapshot"], 16)
+                semantic_snapshot = int(data["semanticSnapshot"], 16)
+                review_snapshot = int(data["reviewSnapshot"], 16)
+
+                admission_snapshot_correlated = (
+                    (admission_snapshot != 0) == admission_exact
+                )
+                review_snapshot_correlated = (
+                    (review_snapshot != 0) == review_exact
+                )
+                input_layout_reuse_correlated = (
+                    not input_layout_reused or input_layout_ready
+                )
+                if review_exact:
+                    review_state_correlated = bool(
+                        admission_exact
+                        and input_layout_ready
+                        and semantic_ready
+                        and boundary_preserved
+                        and admission_snapshot != 0
+                        and input_layout_snapshot != 0
+                        and semantic_snapshot != 0
+                        and review_snapshot != 0
+                    )
+                else:
+                    review_state_correlated = bool(
+                        not input_layout_ready
+                        and not input_layout_reused
+                        and not semantic_ready
+                        and not boundary_preserved
+                        and input_layout_snapshot == 0
+                        and semantic_snapshot == 0
+                        and review_snapshot == 0
+                    )
+                summary_correlation_exact = bool(
+                    admission_snapshot_correlated
+                    and review_snapshot_correlated
+                    and input_layout_reuse_correlated
+                    and review_state_correlated
+                )
+                fail_closed = bool(
+                    summary_correlation_exact
+                    and (
+                        (not review_exact and review_snapshot == 0)
+                        or (review_exact and boundary_preserved)
+                    )
+                )
+                production_semantic_reviews[signature_key] = {
+                    "admission_exact": admission_exact,
+                    "review_exact": review_exact,
+                    "input_layout_ready": input_layout_ready,
+                    "input_layout_reused": input_layout_reused,
+                    "semantic_ready": semantic_ready,
+                    "boundary_preserved": boundary_preserved,
+                    "admission_snapshot": admission_snapshot,
+                    "admission_snapshot_hex": f"0x{admission_snapshot:016X}",
+                    "input_layout_snapshot": input_layout_snapshot,
+                    "input_layout_snapshot_hex":
+                        f"0x{input_layout_snapshot:016X}",
+                    "semantic_snapshot": semantic_snapshot,
+                    "semantic_snapshot_hex": f"0x{semantic_snapshot:016X}",
+                    "review_snapshot": review_snapshot,
+                    "review_snapshot_hex": f"0x{review_snapshot:016X}",
+                    "admission_snapshot_correlated":
+                        admission_snapshot_correlated,
+                    "review_snapshot_correlated":
+                        review_snapshot_correlated,
+                    "input_layout_reuse_correlated":
+                        input_layout_reuse_correlated,
+                    "review_state_correlated": review_state_correlated,
+                    "summary_correlation_exact": summary_correlation_exact,
+                    "fail_closed": fail_closed,
+                    "diagnostic_only": True,
+                    "activation_proof": False,
                 }
                 continue
 
@@ -1655,6 +1797,9 @@ def main() -> int:
         )
         signature["production_activation_prerequisite"] = (
             production_activation_prerequisites.get(signature_key)
+        )
+        signature["production_semantic_review"] = (
+            production_semantic_reviews.get(signature_key)
         )
         signature["production_source_revalidation"] = (
             production_source_revalidations.get(signature_key)
