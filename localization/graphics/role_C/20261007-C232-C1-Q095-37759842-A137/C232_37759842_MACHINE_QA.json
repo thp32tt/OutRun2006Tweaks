@@ -1,0 +1,783 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "20261007-C232-C1-Q095-37759842-A137",
+  "qa_id": "C232",
+  "queue_index": 95,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "producer_run": "A137",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "user_ingame_regressions": [
+    "IGR-014",
+    "IGR-015",
+    "IGR-016"
+  ],
+  "source_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+  "prior_candidate_sha256": "2dac8ee099120f2978eaf8ba992ffff11ecad7c11912a98aca9269a1a78f6988",
+  "prior_candidate_git_commit": "ba9c0057d79fd9790c81181806281de4ebfb3e69",
+  "candidate_sha256": "ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "path": "Release/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
+  },
+  "independent_basis": "Pinned canonical English DDS freshly downloaded and decoded; exact C221-approved predecessor recovered by SHA from Git history; current persisted DDS decoded independently. The 16 source effect bboxes come from prior independent C221 provenance, while current localized bboxes are re-derived from current-vs-verified-clean decoded pixels. A137 producer localized bboxes are not consumed.",
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32/BGRA",
+    "header_128_exact": true,
+    "mip_count": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "row_checks": [
+    {
+      "idx": 4,
+      "kind": "continuous",
+      "source_bbox": [
+        642,
+        3272,
+        1027,
+        3576
+      ],
+      "prior_bbox": [
+        646,
+        3280,
+        888,
+        3567
+      ],
+      "localized_bbox": [
+        646,
+        3280,
+        884,
+        3567
+      ],
+      "source_size": [
+        385,
+        304
+      ],
+      "prior_size": [
+        242,
+        287
+      ],
+      "localized_size": [
+        238,
+        287
+      ],
+      "margins": [
+        4,
+        143,
+        8,
+        9
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 5,
+      "kind": "continuous",
+      "source_bbox": [
+        1226,
+        3272,
+        1611,
+        3576
+      ],
+      "prior_bbox": [
+        1230,
+        3280,
+        1415,
+        3567
+      ],
+      "localized_bbox": [
+        1230,
+        3280,
+        1409,
+        3567
+      ],
+      "source_size": [
+        385,
+        304
+      ],
+      "prior_size": [
+        185,
+        287
+      ],
+      "localized_size": [
+        179,
+        287
+      ],
+      "margins": [
+        4,
+        202,
+        8,
+        9
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 6,
+      "kind": "mode",
+      "source_bbox": [
+        1856,
+        3288,
+        2112,
+        3492
+      ],
+      "prior_bbox": [
+        1860,
+        3308,
+        2106,
+        3467
+      ],
+      "localized_bbox": [
+        1860,
+        3308,
+        2103,
+        3467
+      ],
+      "source_size": [
+        256,
+        204
+      ],
+      "prior_size": [
+        246,
+        159
+      ],
+      "localized_size": [
+        243,
+        159
+      ],
+      "margins": [
+        4,
+        9,
+        20,
+        25
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 7,
+      "kind": "mode",
+      "source_bbox": [
+        2440,
+        3288,
+        2696,
+        3492
+      ],
+      "prior_bbox": [
+        2444,
+        3307,
+        2692,
+        3467
+      ],
+      "localized_bbox": [
+        2444,
+        3307,
+        2684,
+        3467
+      ],
+      "source_size": [
+        256,
+        204
+      ],
+      "prior_size": [
+        248,
+        160
+      ],
+      "localized_size": [
+        240,
+        160
+      ],
+      "margins": [
+        4,
+        12,
+        19,
+        25
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 8,
+      "kind": "mode",
+      "source_bbox": [
+        714,
+        3726,
+        1006,
+        3862
+      ],
+      "prior_bbox": [
+        718,
+        3733,
+        870,
+        3850
+      ],
+      "localized_bbox": [
+        718,
+        3733,
+        865,
+        3850
+      ],
+      "source_size": [
+        292,
+        136
+      ],
+      "prior_size": [
+        152,
+        117
+      ],
+      "localized_size": [
+        147,
+        117
+      ],
+      "margins": [
+        4,
+        141,
+        7,
+        12
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 9,
+      "kind": "mode",
+      "source_bbox": [
+        1272,
+        3728,
+        1528,
+        3932
+      ],
+      "prior_bbox": [
+        1276,
+        3748,
+        1522,
+        3907
+      ],
+      "localized_bbox": [
+        1276,
+        3748,
+        1519,
+        3907
+      ],
+      "source_size": [
+        256,
+        204
+      ],
+      "prior_size": [
+        246,
+        159
+      ],
+      "localized_size": [
+        243,
+        159
+      ],
+      "margins": [
+        4,
+        9,
+        20,
+        25
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 10,
+      "kind": "mode",
+      "source_bbox": [
+        1856,
+        3728,
+        2112,
+        3932
+      ],
+      "prior_bbox": [
+        1860,
+        3747,
+        2108,
+        3907
+      ],
+      "localized_bbox": [
+        1860,
+        3747,
+        2100,
+        3907
+      ],
+      "source_size": [
+        256,
+        204
+      ],
+      "prior_size": [
+        248,
+        160
+      ],
+      "localized_size": [
+        240,
+        160
+      ],
+      "margins": [
+        4,
+        12,
+        19,
+        25
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 11,
+      "kind": "mode",
+      "source_bbox": [
+        2466,
+        3726,
+        2758,
+        3862
+      ],
+      "prior_bbox": [
+        2470,
+        3733,
+        2622,
+        3850
+      ],
+      "localized_bbox": [
+        2470,
+        3733,
+        2617,
+        3850
+      ],
+      "source_size": [
+        292,
+        136
+      ],
+      "prior_size": [
+        152,
+        117
+      ],
+      "localized_size": [
+        147,
+        117
+      ],
+      "margins": [
+        4,
+        141,
+        7,
+        12
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 45,
+      "kind": "continuous_small",
+      "source_bbox": [
+        3474,
+        1676,
+        3745,
+        1894
+      ],
+      "prior_bbox": [
+        3478,
+        1683,
+        3644,
+        1887
+      ],
+      "localized_bbox": [
+        3478,
+        1683,
+        3641,
+        1887
+      ],
+      "source_size": [
+        271,
+        218
+      ],
+      "prior_size": [
+        166,
+        204
+      ],
+      "localized_size": [
+        163,
+        204
+      ],
+      "margins": [
+        4,
+        104,
+        7,
+        7
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 46,
+      "kind": "continuous_small",
+      "source_bbox": [
+        3666,
+        2100,
+        3937,
+        2318
+      ],
+      "prior_bbox": [
+        3670,
+        2107,
+        3803,
+        2311
+      ],
+      "localized_bbox": [
+        3670,
+        2107,
+        3798,
+        2311
+      ],
+      "source_size": [
+        271,
+        218
+      ],
+      "prior_size": [
+        133,
+        204
+      ],
+      "localized_size": [
+        128,
+        204
+      ],
+      "margins": [
+        4,
+        139,
+        7,
+        7
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 47,
+      "kind": "mode_small",
+      "source_bbox": [
+        3699,
+        2527,
+        3885,
+        2675
+      ],
+      "prior_bbox": [
+        3703,
+        2541,
+        3881,
+        2657
+      ],
+      "localized_bbox": [
+        3703,
+        2541,
+        3877,
+        2657
+      ],
+      "source_size": [
+        186,
+        148
+      ],
+      "prior_size": [
+        178,
+        116
+      ],
+      "localized_size": [
+        174,
+        116
+      ],
+      "margins": [
+        4,
+        8,
+        14,
+        18
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 48,
+      "kind": "mode_small",
+      "source_bbox": [
+        59,
+        1254,
+        245,
+        1403
+      ],
+      "prior_bbox": [
+        63,
+        1268,
+        241,
+        1384
+      ],
+      "localized_bbox": [
+        63,
+        1268,
+        235,
+        1384
+      ],
+      "source_size": [
+        186,
+        149
+      ],
+      "prior_size": [
+        178,
+        116
+      ],
+      "localized_size": [
+        172,
+        116
+      ],
+      "margins": [
+        4,
+        10,
+        14,
+        19
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 49,
+      "kind": "mode_small",
+      "source_bbox": [
+        470,
+        1253,
+        682,
+        1352
+      ],
+      "prior_bbox": [
+        474,
+        1260,
+        572,
+        1343
+      ],
+      "localized_bbox": [
+        474,
+        1260,
+        568,
+        1343
+      ],
+      "source_size": [
+        212,
+        99
+      ],
+      "prior_size": [
+        98,
+        83
+      ],
+      "localized_size": [
+        94,
+        83
+      ],
+      "margins": [
+        4,
+        114,
+        7,
+        9
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 50,
+      "kind": "mode_small",
+      "source_bbox": [
+        843,
+        1254,
+        1029,
+        1403
+      ],
+      "prior_bbox": [
+        847,
+        1268,
+        1025,
+        1384
+      ],
+      "localized_bbox": [
+        847,
+        1268,
+        1021,
+        1384
+      ],
+      "source_size": [
+        186,
+        149
+      ],
+      "prior_size": [
+        178,
+        116
+      ],
+      "localized_size": [
+        174,
+        116
+      ],
+      "margins": [
+        4,
+        8,
+        14,
+        19
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 51,
+      "kind": "mode_small",
+      "source_bbox": [
+        1235,
+        1254,
+        1421,
+        1403
+      ],
+      "prior_bbox": [
+        1239,
+        1268,
+        1417,
+        1384
+      ],
+      "localized_bbox": [
+        1239,
+        1268,
+        1411,
+        1384
+      ],
+      "source_size": [
+        186,
+        149
+      ],
+      "prior_size": [
+        178,
+        116
+      ],
+      "localized_size": [
+        172,
+        116
+      ],
+      "margins": [
+        4,
+        10,
+        14,
+        19
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    },
+    {
+      "idx": 52,
+      "kind": "mode_small",
+      "source_bbox": [
+        1646,
+        1253,
+        1858,
+        1352
+      ],
+      "prior_bbox": [
+        1650,
+        1260,
+        1748,
+        1343
+      ],
+      "localized_bbox": [
+        1650,
+        1260,
+        1744,
+        1343
+      ],
+      "source_size": [
+        212,
+        99
+      ],
+      "prior_size": [
+        98,
+        83
+      ],
+      "localized_size": [
+        94,
+        83
+      ],
+      "margins": [
+        4,
+        114,
+        7,
+        9
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "exact_source_core_pixels_remaining": 0
+    }
+  ],
+  "machine_checks": {
+    "bbox_size_positive_margin": "16/16 PASS",
+    "visible_changes_outside_16_source_bboxes_vs_C221": 0,
+    "alpha_changes_outside_16_source_bboxes_vs_C221": 0,
+    "protected_visible_pixels_changed_vs_C221": 0,
+    "exact_source_core_residue_pixels": 0,
+    "header_128_exact": true,
+    "mip_count": 1,
+    "post_encode_decode_authority": "PASS"
+  },
+  "machine_status": "PASS",
+  "c3_required": true,
+  "c3_reason": [
+    "USER_INGAME_P0_REGRESSION",
+    "PRIOR_VISUAL_FALSE_NEGATIVE_BAD_SLANT",
+    "TRANSFORMED_MULTILINE_TEXT"
+  ],
+  "c3_visual_priorities": [
+    "slant_direction",
+    "clean_plate_source_removal",
+    "font_style_fidelity",
+    "scale_readability",
+    "glyph_integrity",
+    "protected_art_separation",
+    "source_faithful_placement",
+    "FLIP_Y_RAW_practical_scale"
+  ],
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_SOURCE_CLEAN_OLD_FINAL_FLIPY_12P5.jpg",
+    "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_TRANSFORM_ROWS_SOURCE_CLEAN_OLD_FINAL_2X.jpg",
+    "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_SOURCE_FINAL_PRACTICAL_25PCT.jpg",
+    "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_OLD_FINAL_PRACTICAL_25PCT.jpg",
+    "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_SOURCE_FINAL_RAW_12P5.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER",
+  "backlog_close_allowed": false,
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

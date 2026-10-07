@@ -1,0 +1,13 @@
+{
+  "role": "C",
+  "run": "20261007-C232-C1-Q095-37759842-A137",
+  "queue_index": 95,
+  "asset": "37759842",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "machine_status": "PASS",
+  "candidate_sha256": "ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b",
+  "c3_required": true,
+  "report": "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_37759842_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
