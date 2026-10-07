@@ -1,0 +1,388 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "run": "20261007-C234-C1-Q137-30CF0D-B165",
+  "qa_id": "C234",
+  "queue_index": 137,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+  "producer_run": "B165",
+  "user_ingame_regression": "IGR-005",
+  "priority": "P0",
+  "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+  "prior_candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
+  "candidate_sha256": "0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds"
+  },
+  "independent_basis": "Pinned canonical source re-downloaded; persisted candidate decoded independently. Exact readable source bboxes and verified clean geometry come from prior independent C156 evidence tied to the same canonical source SHA, with explicit readable-to-RAW coordinate conversion. B165 producer bbox/mask data are not consumed for containment. Blast radius is measured against the exact pre-B165 candidate recovered from Git history; zero change outside the two title/subtitle source bboxes protects the four option rows, AT/MT and all unrelated pixels.",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32/BGRA",
+    "mips": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "clean_storage_orientation": "READABLE_FLIPY_CONVERTED_TO_RAW",
+    "clean_alignment_score_vs_C156": 0
+  },
+  "rows": [
+    {
+      "key": "manual_large",
+      "source": "MANUAL",
+      "korean_current": "수동",
+      "source_bbox": [
+        1,
+        235,
+        397,
+        315
+      ],
+      "source_bbox_raw": [
+        1,
+        709,
+        397,
+        789
+      ],
+      "prior_bbox": [
+        130,
+        237,
+        268,
+        313
+      ],
+      "localized_bbox": [
+        130,
+        237,
+        268,
+        313
+      ],
+      "source_size": [
+        396,
+        80
+      ],
+      "prior_size": [
+        138,
+        76
+      ],
+      "localized_size": [
+        138,
+        76
+      ],
+      "margins": [
+        129,
+        129,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "changed_by_B165": false
+    },
+    {
+      "key": "automatic_large",
+      "source": "AUTOMATIC",
+      "korean_current": "자동",
+      "source_bbox": [
+        889,
+        233,
+        1775,
+        315
+      ],
+      "source_bbox_raw": [
+        889,
+        709,
+        1775,
+        791
+      ],
+      "prior_bbox": [
+        1263,
+        235,
+        1401,
+        313
+      ],
+      "localized_bbox": [
+        1263,
+        235,
+        1401,
+        313
+      ],
+      "source_size": [
+        886,
+        82
+      ],
+      "prior_size": [
+        138,
+        78
+      ],
+      "localized_size": [
+        138,
+        78
+      ],
+      "margins": [
+        374,
+        374,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "changed_by_B165": false
+    },
+    {
+      "key": "manual_small",
+      "source": "MANUAL",
+      "korean_current": "수동",
+      "source_bbox": [
+        14,
+        148,
+        339,
+        210
+      ],
+      "source_bbox_raw": [
+        14,
+        814,
+        339,
+        876
+      ],
+      "prior_bbox": [
+        124,
+        150,
+        229,
+        208
+      ],
+      "localized_bbox": [
+        124,
+        150,
+        229,
+        208
+      ],
+      "source_size": [
+        325,
+        62
+      ],
+      "prior_size": [
+        105,
+        58
+      ],
+      "localized_size": [
+        105,
+        58
+      ],
+      "margins": [
+        110,
+        110,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "changed_by_B165": false
+    },
+    {
+      "key": "automatic_small",
+      "source": "AUTOMATIC",
+      "korean_current": "자동",
+      "source_bbox": [
+        822,
+        147,
+        1376,
+        216
+      ],
+      "source_bbox_raw": [
+        822,
+        808,
+        1376,
+        877
+      ],
+      "prior_bbox": [
+        1041,
+        149,
+        1157,
+        214
+      ],
+      "localized_bbox": [
+        1041,
+        149,
+        1157,
+        214
+      ],
+      "source_size": [
+        554,
+        69
+      ],
+      "prior_size": [
+        116,
+        65
+      ],
+      "localized_size": [
+        116,
+        65
+      ],
+      "margins": [
+        219,
+        219,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "changed_by_B165": false
+    },
+    {
+      "key": "select_transmission",
+      "source": "SELECT TRANSMISSION",
+      "korean_current": "변속기 선택",
+      "source_bbox": [
+        5,
+        67,
+        868,
+        130
+      ],
+      "source_bbox_raw": [
+        5,
+        894,
+        868,
+        957
+      ],
+      "prior_bbox": [
+        272,
+        69,
+        601,
+        128
+      ],
+      "localized_bbox": [
+        301,
+        69,
+        572,
+        128
+      ],
+      "source_size": [
+        863,
+        63
+      ],
+      "prior_size": [
+        329,
+        59
+      ],
+      "localized_size": [
+        271,
+        59
+      ],
+      "margins": [
+        296,
+        296,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "changed_by_B165": true
+    },
+    {
+      "key": "transmission_small",
+      "source": "TRANSMISSION",
+      "korean_current": "변속기",
+      "source_bbox": [
+        1288,
+        96,
+        1569,
+        128
+      ],
+      "source_bbox_raw": [
+        1288,
+        896,
+        1569,
+        928
+      ],
+      "prior_bbox": [
+        1379,
+        98,
+        1478,
+        126
+      ],
+      "localized_bbox": [
+        1391,
+        98,
+        1465,
+        126
+      ],
+      "source_size": [
+        281,
+        32
+      ],
+      "prior_size": [
+        99,
+        28
+      ],
+      "localized_size": [
+        74,
+        28
+      ],
+      "margins": [
+        103,
+        104,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "changed_by_B165": true
+    }
+  ],
+  "summary": {
+    "bbox_size_positive_margin": "6/6 PASS",
+    "changed_pixels_outside_two_rework_source_bboxes": 0,
+    "alpha_changed_outside_two_rework_source_bboxes": 0,
+    "protected_and_unrelated_preservation": "PASS_BY_ZERO_BLAST_RADIUS_OUTSIDE_TWO_INDEPENDENT_SOURCE_BBOXES",
+    "changed_inside_each_row": {
+      "manual_large": 0,
+      "automatic_large": 0,
+      "manual_small": 0,
+      "automatic_small": 0,
+      "select_transmission": 14809,
+      "transmission_small": 2067
+    },
+    "preserved_manual_automatic_and_unrelated": "PASS",
+    "persisted_dds_decode_authority": "PASS",
+    "mip_review": "PASS_SINGLE_MIP_NO_ADDITIONAL_TEXT_MIPS"
+  },
+  "coverage": {
+    "visible_localizable_segments": 6,
+    "localized_segments": 6,
+    "protected_at_mt_and_artwork": "PRESERVED",
+    "status": "PASS"
+  },
+  "machine_status": "PASS",
+  "c3_required": true,
+  "c3_reason": [
+    "USER_INGAME_REGRESSION_IGR005",
+    "PRIOR_C156_OVERRIDDEN_BY_LATER_INGAME_EVIDENCE",
+    "STYLE_LOW_RES_COLLISION_HISTORY",
+    "MANDATORY_HIGH_RISK_PRE_INGAME_GATE"
+  ],
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_SOURCE_CLEAN_OLD_FINAL_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_TITLE_SUBTITLE_CONTACT_2X.jpg",
+    "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_SOURCE_FINAL_RAW.jpg",
+    "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_PRACTICAL_100PCT.jpg",
+    "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_PRACTICAL_75PCT.jpg",
+    "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_PRACTICAL_50PCT.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER",
+  "backlog_close_gate": "NEW_ACTUAL_INGAME_RETEST_REQUIRED",
+  "runtime_validation": "PENDING_NEW_INGAME_RETEST",
+  "forbidden_domains_touched": []
+}
