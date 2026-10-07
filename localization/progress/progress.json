@@ -5570,7 +5570,7 @@
   },
   "c257_c2_batch_q188_q220_q222": {
     "run": "20261008-C257-C2-BATCH-Q188-Q220-Q222",
-    "timestamp_kst": "2026-10-08T01:24:00+09:00",
+    "timestamp_kst": "2026-10-08T01:18:00+09:00",
     "role": "C",
     "TEMP_BACKLOG_RELIEF": "C2",
     "SHARD": "EVEN",
