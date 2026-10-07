@@ -225,6 +225,174 @@
           "needle": "0x97DA7"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-CLIP-E358B",
+      "rva": "0x000E358B",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8f09cf4ff",
+      "purpose": "Canonical option/menu arrow HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE358B"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-CLIP-E35A3",
+      "rva": "0x000E35A3",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8d89cf4ff",
+      "purpose": "Canonical option/menu arrow HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE35A3"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-CLIP-E35CC",
+      "rva": "0x000E35CC",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8af9cf4ff",
+      "purpose": "Canonical option/menu arrow HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE35CC"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-CLIP-E35F7",
+      "rva": "0x000E35F7",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8849cf4ff",
+      "purpose": "Canonical option/menu arrow HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE35F7"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-CLIP-E481B",
+      "rva": "0x000E481B",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8608af4ff",
+      "purpose": "Canonical option/menu arrow HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE481B"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-CLIP-E4833",
+      "rva": "0x000E4833",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8488af4ff",
+      "purpose": "Canonical option/menu arrow HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE4833"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-CLIP-E485C",
+      "rva": "0x000E485C",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e81f8af4ff",
+      "purpose": "Canonical option/menu arrow HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE485C"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-CLIP-E4887",
+      "rva": "0x000E4887",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8f489f4ff",
+      "purpose": "Canonical option/menu arrow HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE4887"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-CLIP-EC24C",
+      "rva": "0x000EC24C",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e82f10f4ff",
+      "purpose": "Canonical option/menu arrow HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xEC24C"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-CLIP-EC277",
+      "rva": "0x000EC277",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e80410f4ff",
+      "purpose": "Canonical option/menu arrow HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xEC277"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-CLIP-ED4D4",
+      "rva": "0x000ED4D4",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8a7fdf3ff",
+      "purpose": "Canonical option/menu arrow HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xED4D4"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-CLIP-ED7A3",
+      "rva": "0x000ED7A3",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8d8faf3ff",
+      "purpose": "Canonical option/menu arrow HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xED7A3"
+        }
+      ]
     }
   ]
 }

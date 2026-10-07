@@ -64,6 +64,30 @@ for token in [
 ]:
     require(token, hud, 'semantic baseline family')
 
+# Canonical EXE closure for option/menu arrow clip producers.
+# These exact historical calls were already routed to SCREEN_HUD, but until
+# now only their source literals were guarded. Pin the original executable
+# CALL bytes too so menu-arrow ownership cannot silently drift to another
+# producer while still satisfying the source-only inventory.
+for contract_id, rva in (
+    ('VR-EXE-OPTION-ARROW-CLIP-E358B', '0x000E358B'),
+    ('VR-EXE-OPTION-ARROW-CLIP-E35A3', '0x000E35A3'),
+    ('VR-EXE-OPTION-ARROW-CLIP-E35CC', '0x000E35CC'),
+    ('VR-EXE-OPTION-ARROW-CLIP-E35F7', '0x000E35F7'),
+    ('VR-EXE-OPTION-ARROW-CLIP-E481B', '0x000E481B'),
+    ('VR-EXE-OPTION-ARROW-CLIP-E4833', '0x000E4833'),
+    ('VR-EXE-OPTION-ARROW-CLIP-E485C', '0x000E485C'),
+    ('VR-EXE-OPTION-ARROW-CLIP-E4887', '0x000E4887'),
+    ('VR-EXE-OPTION-ARROW-CLIP-EC24C', '0x000EC24C'),
+    ('VR-EXE-OPTION-ARROW-CLIP-EC277', '0x000EC277'),
+    ('VR-EXE-OPTION-ARROW-CLIP-ED4D4', '0x000ED4D4'),
+    ('VR-EXE-OPTION-ARROW-CLIP-ED7A3', '0x000ED7A3'),
+):
+    require(contract_id, binary_contract, 'canonical option/menu arrow direct-CALL contract')
+    require(rva, binary_contract, 'canonical option/menu arrow direct-CALL RVA')
+require('OptionArrow_ClipSpriteCalls', ui, 'exact option/menu arrow producer set')
+require('ExactScreenHud_putClipSprite', ui, 'option/menu arrow SCREEN_HUD route')
+
 # Canonical disassembly proves 38 direct put_clip_sprite SCREEN_HUD calls.
 # Keep those call sites exact and avoid a hot-path runtime stack walk.
 for token in [
