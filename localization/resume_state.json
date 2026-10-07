@@ -1,5 +1,5 @@
 {
-  "schema_version": 126,
+  "schema_version": 127,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B229 q54 FA7BBB13 current-policy rework PASS: PRE_INGAME #004 exposed upright Korean against right-italic English source and a height-collapsed Slipstream row. Accepted GitHub run 37561543035 produced 5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e; all 17 prompts are native right-lean source-effect rerenders, Slipstream is concise 슬립스트림하세요! and 590x99 inside 600x103. 17/17 exact bbox/size/positive-margin; clean/final/outside/alpha/protected/residue/overlap/raw/controller visual PASS. Fresh C + regenerated English-original JPG/user review + actual-game validation required. RUNTIME_VALIDATION=UNTESTED.",
     "B228 q230 E95DA5 visual-completeness rework PASS: PRE_INGAME #022 showed ordinary explanatory UI rows 20/21 still English under C149. Current a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f localizes them to 아직 구매할 수 없습니다 / 이미 보유 중입니다 while preserving song/named-item titles and all B73 material outside the two exact bboxes. 2/2 exact bbox/size/positive-margin, clean/final/outside/alpha/residue/raw/controller visual gates PASS. Fresh independent C + refreshed English-original JPG/user review + actual-game validation required. RUNTIME_VALIDATION=UNTESTED.",
     "B227 q222 DDF0392A current-policy hierarchy rework PASS: PRE_INGAME #023 exposed old C159/B89 shared-36px undersizing. GitHub-hosted run 37556258475 produced 601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f with native per-row 42/36/50px source-height-aware fits; 3/3 exact bbox/size/positive-margin and all protected/outside/residue/raw gates PASS. Fresh independent C + regenerated English-original JPG/user review + actual-game validation remain required. RUNTIME_VALIDATION=UNTESTED.",
     "A143 index24 input wiring BUILD PASS: exact source 224e3c8fce6c hooks canonical EXE+0x692B6 after selection load, uses B208 two-beolsik composition with transient A142 preview alias, preserves stock page controls, and commits only the A141 14-byte compatibility alias on 0x2B END. Win32 Release 37451825543 + Korean Test Build 37451825561 SUCCESS. B209 DDS c6daaf2e7aa0 was consumed unchanged but independent C QA is PENDING and package_selected=false. Next: C, then NEW actual-game composition/BACKSPACE/page/END/reload/local-display test; RUNTIME_VALIDATION=UNTESTED.",
@@ -4231,7 +4232,8 @@
     "59A79158",
     "4EDA9DE3",
     "DDF0392A",
-    "E95DA5"
+    "E95DA5",
+    "FA7BBB13"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6723,7 +6725,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 10:51 KST",
+  "updated_at_kst": "2026-10-07 11:25 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7269,22 +7271,23 @@
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "latest_b_manual_visual_rework": {
-    "run": "20261007-B-MANUALQA228-E95DA5-HELP",
-    "queue_index": 230,
-    "asset": "E95DA5",
-    "trigger": "PRE_INGAME #022 untranslated ordinary explanatory UI",
-    "before_candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
-    "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
-    "github_hosted_worker_run": 37558820127,
-    "new_semantics": [
-      "You cannot buy this item yet -> 아직 구매할 수 없습니다",
-      "You already own this item -> 이미 보유 중입니다"
-    ],
-    "report": "localization/graphics/role_B/20261007-B-MANUALQA228-E95DA5-HELP/B228_E95_REPORT.json",
-    "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA228-E95DA5-HELP/B228_CONTROLLER_SELF_QA.json",
-    "machine_qa": "2/2 bbox+source-size+positive-margin; clean/final PASS; outside/alpha/residue/existing-material drift=0",
-    "visual_qa": "PASS_SOURCE_B73_CLEAN_B228_ROW_AND_RAW",
-    "status": "B228_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+    "run": "20261007-B-MANUALQA229-FA7BBB13",
+    "queue_index": 54,
+    "asset": "FA7BBB13",
+    "trigger": "PRE_INGAME #004 source right-italic vs upright Korean + Slipstream undersizing",
+    "before_candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
+    "candidate_sha256": "5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e",
+    "github_hosted_worker_runs": {
+      "failed_pairwise": 37560975826,
+      "failed_old_mask": 37561234026,
+      "accepted": 37561543035
+    },
+    "semantic_change": "Slipstream the cars! -> 슬립스트림하세요! (prior 차량 뒤에서 슬립스트림하세요!)",
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA229-FA7BBB13/B229_FA7_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA229-FA7BBB13/B229_CONTROLLER_SELF_QA.json",
+    "machine_qa": "17/17 bbox+size+positive-margin; clean/final PASS; outside/alpha/protected/residue/overlap/touch=0",
+    "visual_qa": "PASS_SOURCE_OLD_FINAL_AND_RAW; all 17 readable right-lean; Slipstream height 74->99",
+    "status": "B229_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
     "RUNTIME_VALIDATION": "UNTESTED"
   },
   "latest_c_pre_ingame_export": {
@@ -7807,5 +7810,25 @@
     "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "b229_fa7bbb13_source_transform_rework": {
+    "run": "20261007-B-MANUALQA229-FA7BBB13",
+    "queue_index": 54,
+    "asset": "FA7BBB13",
+    "trigger": "PRE_INGAME #004 source right-italic vs upright Korean + Slipstream undersizing",
+    "before_candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
+    "candidate_sha256": "5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e",
+    "github_hosted_worker_runs": {
+      "failed_pairwise": 37560975826,
+      "failed_old_mask": 37561234026,
+      "accepted": 37561543035
+    },
+    "semantic_change": "Slipstream the cars! -> 슬립스트림하세요! (prior 차량 뒤에서 슬립스트림하세요!)",
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA229-FA7BBB13/B229_FA7_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA229-FA7BBB13/B229_CONTROLLER_SELF_QA.json",
+    "machine_qa": "17/17 bbox+size+positive-margin; clean/final PASS; outside/alpha/protected/residue/overlap/touch=0",
+    "visual_qa": "PASS_SOURCE_OLD_FINAL_AND_RAW; all 17 readable right-lean; Slipstream height 74->99",
+    "status": "B229_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
