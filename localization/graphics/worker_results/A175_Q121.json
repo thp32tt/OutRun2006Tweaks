@@ -1,0 +1,8 @@
+{
+  "run": "20261008-A175-Q121-FAILCLOSE-RESTORE",
+  "index": 121,
+  "asset": "FD90AA9",
+  "restored_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+  "decision": "HOLD_STRICT_RECHECK",
+  "runtime_validation": "UNTESTED"
+}

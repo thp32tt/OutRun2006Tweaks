@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261008-A175-Q121-FAILCLOSE-RESTORE",
+  "queue_index": 121,
+  "asset": "FD90AA9",
+  "rejected_attempts": [
+    {
+      "run": "A171",
+      "sha256": "7a7d1e6c62dca8d699dac689fabfb4314d7f6a5f35aeac130b9a8817afccea76",
+      "reason": "controller visual FAIL: rectangular plate reconstruction"
+    },
+    {
+      "run": "A172",
+      "sha256": "7a7d1e6c62dca8d699dac689fabfb4314d7f6a5f35aeac130b9a8817afccea76",
+      "reason": "no material correction; same rectangular plate"
+    },
+    {
+      "run": "A173",
+      "sha256": "7a7d1e6c62dca8d699dac689fabfb4314d7f6a5f35aeac130b9a8817afccea76",
+      "reason": "mask selected full bbox due source/prior plate mismatch"
+    },
+    {
+      "run": "A174",
+      "sha256": "fbb99b69a3cd67c070db00fdd68d39daf492e1ea329014f46ae22a5138ac1c53",
+      "reason": "controller visual FAIL: source/prior plate mismatch still produced flat rectangular plate"
+    }
+  ],
+  "restored_candidate_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+  "restore_provenance_commit": "6ec13ee0efd5a8a2895e78050e7293f58f76b2be",
+  "decision": "HOLD_STRICT_RECHECK",
+  "reason": "C255 visual source-residue finding remains authoritative, but all same-invocation reconstruction attempts introduced a worse plate rectangle. Fail-closed restoration prevents regression; requires a source-art-aware reconstruction method before producer PASS.",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
