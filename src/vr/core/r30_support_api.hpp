@@ -58,6 +58,8 @@ namespace OutRunVRStereo
         std::uint32_t slot, std::uint32_t frameId) noexcept;
     HRESULT R30SupportPollDirectTransportSlotProducer(
         std::uint32_t slot) noexcept;
+    void R30SupportRetireDirectTransportSlotPublication(
+        std::uint32_t slot) noexcept;
     struct R30SupportGpuCompletionSnapshot
     {
         std::uint32_t completedFrameId[OutRunVR::RenderFrameRingSize]{};

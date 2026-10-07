@@ -50,6 +50,7 @@ required = (
     "R30SupportSetActiveDirectTransportSlot",
     "R30SupportMarkDirectTransportSlotPending",
     "R30SupportPollDirectTransportSlotProducer",
+    "R30SupportRetireDirectTransportSlotPublication",
     "R30SupportGpuCompletionSnapshot",
     "R30SupportTryGetGpuCompletionSnapshot",
     "R30SupportDirectTransportResourcesReady",
@@ -162,6 +163,11 @@ delegations = {
         "if (!target.published)",
         "target.frameId = 0;",
         "return ready;",
+    ),
+    "R30SupportRetireDirectTransportSlotPublication(": (
+        "auto& target = DirectTransportSlots[slot];",
+        "target.frameId = 0;",
+        "target.published = false;",
     ),
     "R30SupportTryGetGpuCompletionSnapshot(": (
         "R13GpuCompletionSnapshot lower{};",
@@ -276,6 +282,11 @@ for raw_poll in (
 ):
     if raw_poll in resolve_direct:
         errors.append(f"R32 DirectGPU resolve retained raw lower producer-poll state: {raw_poll}")
+if resolve_direct.count("R30SupportRetireDirectTransportSlotPublication(index)") != 1:
+    errors.append("R32 DirectGPU ACK retirement must delegate exactly once to R30 publication owner")
+for raw_retire in ("candidate.frameId = 0;", "candidate.published = false;"):
+    if raw_retire in resolve_direct:
+        errors.append(f"R32 DirectGPU resolve retained raw lower publication retirement: {raw_retire}")
 if "R30SupportGpuCompletionSnapshot ackSnapshot{};" not in resolve_direct:
     errors.append("R32 DirectGPU resolve missing R30 ACK snapshot value type")
 if "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)" not in resolve_direct:

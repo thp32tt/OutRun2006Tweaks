@@ -3365,6 +3365,14 @@ namespace OutRunVRStereo
         return ready;
     }
 
+    void R30SupportRetireDirectTransportSlotPublication(
+        std::uint32_t slot) noexcept
+    {
+        auto& target = DirectTransportSlots[slot];
+        target.frameId = 0;
+        target.published = false;
+    }
+
     bool R30SupportTryGetGpuCompletionSnapshot(
         R30SupportGpuCompletionSnapshot& out) noexcept
     {

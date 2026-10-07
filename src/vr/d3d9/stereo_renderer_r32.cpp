@@ -516,8 +516,7 @@ namespace OutRunVRStereo
                     // The host completed this exact published frame. Retire the
                     // old publication before writing new eye pixels into the
                     // shared textures.
-                    candidate.frameId = 0;
-                    candidate.published = false;
+                    R30SupportRetireDirectTransportSlotPublication(index);
                 }
 
                 selected = index;

@@ -495,12 +495,23 @@ ack_retire_marker = "The host completed this exact published frame. Retire the"
 ack_retire_pos = resolve_direct_r32.find(ack_retire_marker)
 if ack_retire_pos < 0:
     fail("R32 ACK-completed publication retirement marker missing")
+retire_publication_r30 = body(r30, "R30SupportRetireDirectTransportSlotPublication(")
+require_order(
+    retire_publication_r30,
+    "R30 ACK-completed slot publication metadata owner",
+    "auto& target = DirectTransportSlots[slot];",
+    "target.frameId = 0;",
+    "target.published = false;",
+)
+if resolve_direct_r32.count("R30SupportRetireDirectTransportSlotPublication(index)") != 1:
+    fail("R32 ACK publication retirement must use one R30 owner call")
+forbid(resolve_direct_r32, "R32 raw ACK publication retirement reintroduced",
+       "candidate.frameId = 0;", "candidate.published = false;")
 require_order(
     resolve_direct_r32[ack_retire_pos:],
     "R32 ACK-completed publication retirement",
     ack_retire_marker,
-    "candidate.frameId = 0;",
-    "candidate.published = false;",
+    "R30SupportRetireDirectTransportSlotPublication(index);",
     "selected = index;",
 )
 
