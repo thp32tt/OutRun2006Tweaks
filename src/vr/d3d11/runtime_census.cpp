@@ -374,6 +374,27 @@ namespace outrun::vr::dx11
             std::uint64_t shaderTargetPixelProfileHash{};
             std::uint32_t shaderTargetCompileFlags{};
             std::uint64_t shaderTargetMaterializationContractSnapshotToken{};
+            // R283: bounded SM3 DCL+MOV translated source/DXBC evidence.
+            // These fields are diagnostic only; object creation and Draw*
+            // activation remain fail-closed.
+            bool shaderTargetBytecodeMaterializationExact{};
+            bool shaderTargetVertexSubsetSupported{};
+            bool shaderTargetPixelSubsetSupported{};
+            bool shaderTargetVertexCompiled{};
+            bool shaderTargetPixelCompiled{};
+            bool shaderTargetR283BytecodeMaterialized{};
+            bool shaderTargetR283ObjectCreationAuthorized{};
+            UINT shaderTargetVertexTranslatedSourceBytes{};
+            UINT shaderTargetPixelTranslatedSourceBytes{};
+            std::uint64_t shaderTargetVertexTranslatedSourceHash{};
+            std::uint64_t shaderTargetPixelTranslatedSourceHash{};
+            UINT shaderTargetVertexBytecodeBytes{};
+            UINT shaderTargetPixelBytecodeBytes{};
+            std::uint64_t shaderTargetVertexBytecodeHash{};
+            std::uint64_t shaderTargetPixelBytecodeHash{};
+            std::uint64_t shaderTargetVertexMaterializedArtifactIdentity{};
+            std::uint64_t shaderTargetPixelMaterializedArtifactIdentity{};
+            std::uint64_t shaderTargetBytecodeMaterializationSnapshotToken{};
             bool shaderTranslatedSemanticReceiptExact{};
             bool shaderTranslatedSemanticReceiptObjectReady{};
             std::uint64_t shaderTranslatedSemanticReceiptSnapshotToken{};
@@ -898,6 +919,42 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.shaderTargetCompileFlags);
             hash = hash_mix(
                 hash, sig.shaderTargetMaterializationContractSnapshotToken);
+            hash = hash_mix(
+                hash, sig.shaderTargetBytecodeMaterializationExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTargetVertexSubsetSupported ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTargetPixelSubsetSupported ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTargetVertexCompiled ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTargetPixelCompiled ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTargetR283BytecodeMaterialized ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTargetR283ObjectCreationAuthorized ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTargetVertexTranslatedSourceBytes);
+            hash = hash_mix(
+                hash, sig.shaderTargetPixelTranslatedSourceBytes);
+            hash = hash_mix(
+                hash, sig.shaderTargetVertexTranslatedSourceHash);
+            hash = hash_mix(
+                hash, sig.shaderTargetPixelTranslatedSourceHash);
+            hash = hash_mix(
+                hash, sig.shaderTargetVertexBytecodeBytes);
+            hash = hash_mix(
+                hash, sig.shaderTargetPixelBytecodeBytes);
+            hash = hash_mix(
+                hash, sig.shaderTargetVertexBytecodeHash);
+            hash = hash_mix(
+                hash, sig.shaderTargetPixelBytecodeHash);
+            hash = hash_mix(
+                hash, sig.shaderTargetVertexMaterializedArtifactIdentity);
+            hash = hash_mix(
+                hash, sig.shaderTargetPixelMaterializedArtifactIdentity);
+            hash = hash_mix(
+                hash, sig.shaderTargetBytecodeMaterializationSnapshotToken);
             hash = hash_mix(
                 hash, sig.shaderTranslatedSemanticReceiptExact ? 1u : 0u);
             hash = hash_mix(
@@ -1715,6 +1772,65 @@ namespace outrun::vr::dx11
             sig.shaderTargetMaterializationContractSnapshotToken =
                 targetMaterializationContract.reviewSnapshotToken;
 
+            const auto targetBytecodeMaterialization =
+                materialize_programmable_shader_target_bytecode(
+                    programmablePairIdentity,
+                    vertexSourceEvidence,
+                    pixelSourceEvidence,
+                    translatedArtifactReceipt,
+                    translatedArtifactReceipt.reviewSnapshotToken,
+                    targetMaterializationContract,
+                    targetMaterializationContract.reviewSnapshotToken,
+                    semanticTranslationPlan,
+                    semanticTranslationPlan.reviewSnapshotToken);
+            sig.shaderTargetBytecodeMaterializationExact =
+                validate_programmable_shader_target_bytecode_materialization_snapshot(
+                    programmablePairIdentity,
+                    vertexSourceEvidence,
+                    pixelSourceEvidence,
+                    translatedArtifactReceipt,
+                    translatedArtifactReceipt.reviewSnapshotToken,
+                    targetMaterializationContract,
+                    targetMaterializationContract.reviewSnapshotToken,
+                    semanticTranslationPlan,
+                    semanticTranslationPlan.reviewSnapshotToken,
+                    targetBytecodeMaterialization,
+                    targetBytecodeMaterialization.reviewSnapshotToken);
+            sig.shaderTargetVertexSubsetSupported =
+                targetBytecodeMaterialization.vertexSubsetSupported;
+            sig.shaderTargetPixelSubsetSupported =
+                targetBytecodeMaterialization.pixelSubsetSupported;
+            sig.shaderTargetVertexCompiled =
+                targetBytecodeMaterialization.vertexCompilationSucceeded;
+            sig.shaderTargetPixelCompiled =
+                targetBytecodeMaterialization.pixelCompilationSucceeded;
+            sig.shaderTargetR283BytecodeMaterialized =
+                targetBytecodeMaterialization.targetBytecodeMaterialized;
+            sig.shaderTargetR283ObjectCreationAuthorized =
+                targetBytecodeMaterialization.objectCreationAuthorized;
+            sig.shaderTargetVertexTranslatedSourceBytes =
+                targetBytecodeMaterialization.vertexTranslatedSourceBytes;
+            sig.shaderTargetPixelTranslatedSourceBytes =
+                targetBytecodeMaterialization.pixelTranslatedSourceBytes;
+            sig.shaderTargetVertexTranslatedSourceHash =
+                targetBytecodeMaterialization.vertexTranslatedSourceHash;
+            sig.shaderTargetPixelTranslatedSourceHash =
+                targetBytecodeMaterialization.pixelTranslatedSourceHash;
+            sig.shaderTargetVertexBytecodeBytes =
+                targetBytecodeMaterialization.vertexTargetBytecodeBytes;
+            sig.shaderTargetPixelBytecodeBytes =
+                targetBytecodeMaterialization.pixelTargetBytecodeBytes;
+            sig.shaderTargetVertexBytecodeHash =
+                targetBytecodeMaterialization.vertexTargetBytecodeHash;
+            sig.shaderTargetPixelBytecodeHash =
+                targetBytecodeMaterialization.pixelTargetBytecodeHash;
+            sig.shaderTargetVertexMaterializedArtifactIdentity =
+                targetBytecodeMaterialization.vertexMaterializedArtifactIdentity;
+            sig.shaderTargetPixelMaterializedArtifactIdentity =
+                targetBytecodeMaterialization.pixelMaterializedArtifactIdentity;
+            sig.shaderTargetBytecodeMaterializationSnapshotToken =
+                targetBytecodeMaterialization.reviewSnapshotToken;
+
             // R277 deliberately supplies no R242 translated-object ownership.
             // The R275 receipt therefore exposes the exact remaining boundary
             // while retaining the deterministic R276 plan identity.
@@ -2353,6 +2469,31 @@ namespace outrun::vr::dx11
                         sig.shaderTranslatedArtifactReceiptSnapshotToken,
                         sig.shaderSemanticTranslationPlanSnapshotToken,
                         sig.shaderTargetMaterializationContractSnapshotToken);
+                    spdlog::info(
+                        "VR DX11 R283 targetBytecodeMaterialization signature#{}: exact={} vertexSubset={} pixelSubset={} vertexCompiled={} pixelCompiled={} materialized={} createAuthorized={} cacheKey=0x{:016X} vertexSourceBytes={} pixelSourceBytes={} vertexSource=0x{:016X} pixelSource=0x{:016X} vertexBytes={} pixelBytes={} vertexBytecode=0x{:016X} pixelBytecode=0x{:016X} vertexArtifact=0x{:016X} pixelArtifact=0x{:016X} contractSnapshot=0x{:016X} artifactSnapshot=0x{:016X} planSnapshot=0x{:016X} snapshot=0x{:016X}",
+                        unique,
+                        sig.shaderTargetBytecodeMaterializationExact ? 1 : 0,
+                        sig.shaderTargetVertexSubsetSupported ? 1 : 0,
+                        sig.shaderTargetPixelSubsetSupported ? 1 : 0,
+                        sig.shaderTargetVertexCompiled ? 1 : 0,
+                        sig.shaderTargetPixelCompiled ? 1 : 0,
+                        sig.shaderTargetR283BytecodeMaterialized ? 1 : 0,
+                        sig.shaderTargetR283ObjectCreationAuthorized ? 1 : 0,
+                        sig.shaderSourceSemanticPairCacheKey,
+                        sig.shaderTargetVertexTranslatedSourceBytes,
+                        sig.shaderTargetPixelTranslatedSourceBytes,
+                        sig.shaderTargetVertexTranslatedSourceHash,
+                        sig.shaderTargetPixelTranslatedSourceHash,
+                        sig.shaderTargetVertexBytecodeBytes,
+                        sig.shaderTargetPixelBytecodeBytes,
+                        sig.shaderTargetVertexBytecodeHash,
+                        sig.shaderTargetPixelBytecodeHash,
+                        sig.shaderTargetVertexMaterializedArtifactIdentity,
+                        sig.shaderTargetPixelMaterializedArtifactIdentity,
+                        sig.shaderTargetMaterializationContractSnapshotToken,
+                        sig.shaderTranslatedArtifactReceiptSnapshotToken,
+                        sig.shaderSemanticTranslationPlanSnapshotToken,
+                        sig.shaderTargetBytecodeMaterializationSnapshotToken);
                     spdlog::info(
                         "VR DX11 R275 translatedSemanticReceipt signature#{}: exact={} objectReady={} snapshot=0x{:016X}",
                         unique,

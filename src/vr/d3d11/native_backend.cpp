@@ -12,6 +12,7 @@
 #include <d3dcompiler.h>
 #include <dxgi1_2.h>
 #include <limits>
+#include <string>
 #include <utility>
 
 namespace outrun::vr::dx11 {
@@ -254,6 +255,324 @@ bool compile_shader_source(
         0, bytecode.ReleaseAndGetAddressOf(),
         diagnostics.ReleaseAndGetAddressOf());
     return SUCCEEDED(hr) && bytecode;
+}
+
+std::uint64_t r283_materializer_revision_hash() noexcept {
+    static constexpr char kRevision[] =
+        "R283_D3D9_SM3_DCL_MOV_HLSL_MATERIALIZER_V1";
+    return hash_observation_payload_bytes(
+        kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
+}
+
+std::uint64_t r283_semantic_subset_contract_hash() noexcept {
+    static constexpr char kContract[] =
+        "R283_R281_R282_R276_SM3_DCL_MOV_DXBC_PROVENANCE_V1";
+    return hash_observation_payload_bytes(
+        kContract, static_cast<UINT>(sizeof(kContract) - 1u));
+}
+
+D3DSHADER_PARAM_REGISTER_TYPE r283_decode_register_type(DWORD token) noexcept {
+    const DWORD rawType =
+        ((token & D3DSP_REGTYPE_MASK) >> D3DSP_REGTYPE_SHIFT) |
+        ((token & D3DSP_REGTYPE_MASK2) >> D3DSP_REGTYPE_SHIFT2);
+    if (rawType > static_cast<DWORD>(D3DSPR_PREDICATE))
+        return D3DSPR_FORCE_DWORD;
+    return static_cast<D3DSHADER_PARAM_REGISTER_TYPE>(rawType);
+}
+
+bool r283_hlsl_semantic(
+    const ProgrammableShaderInterfaceSemantic& semantic,
+    bool vertexStage,
+    bool output,
+    std::string& label) {
+    label.clear();
+    switch (semantic.usage) {
+    case D3DDECLUSAGE_POSITION:
+        if (output && vertexStage) {
+            if (semantic.usageIndex != 0u)
+                return false;
+            label = "SV_Position";
+            return true;
+        }
+        if (!vertexStage)
+            return false;
+        label = "POSITION" + std::to_string(semantic.usageIndex);
+        return true;
+    case D3DDECLUSAGE_TEXCOORD:
+        label = "TEXCOORD" + std::to_string(semantic.usageIndex);
+        return true;
+    case D3DDECLUSAGE_COLOR:
+        label = "COLOR" + std::to_string(semantic.usageIndex);
+        return true;
+    case D3DDECLUSAGE_NORMAL:
+        if (!vertexStage || output)
+            return false;
+        label = "NORMAL" + std::to_string(semantic.usageIndex);
+        return true;
+    default:
+        return false;
+    }
+}
+
+bool build_r283_sm3_mov_shader_source(
+    const ProgrammableShaderFunctionSourceEvidence& evidence,
+    bool vertexStage,
+    std::string& translated) noexcept {
+    translated.clear();
+    try {
+        if (!evidence.exact() ||
+            evidence.vertexStage != vertexStage ||
+            evidence.versionToken !=
+                (vertexStage ? D3DVS_VERSION(3, 0) : D3DPS_VERSION(3, 0)))
+            return false;
+
+        const auto decode =
+            decode_programmable_shader_instruction_stream(evidence);
+        const auto registers =
+            decode_programmable_shader_register_semantics(decode);
+        const auto interfaceSemantics =
+            decode_programmable_shader_interface_semantics(
+                decode, registers);
+        if (!decode.exact() ||
+            !registers.exact() ||
+            !interfaceSemantics.exact())
+            return false;
+
+        std::vector<ProgrammableShaderInterfaceSemantic> inputs;
+        std::vector<ProgrammableShaderInterfaceSemantic> outputs;
+        for (const auto& semantic : interfaceSemantics.semantics) {
+            if (semantic.writeMask != D3DSP_WRITEMASK_ALL)
+                return false;
+            if (semantic.input)
+                inputs.push_back(semantic);
+            else if (semantic.output)
+                outputs.push_back(semantic);
+            else
+                return false;
+        }
+
+        if (inputs.empty() || inputs.size() > 8u)
+            return false;
+        if (vertexStage) {
+            if (outputs.empty() || outputs.size() > 8u)
+                return false;
+        } else if (!outputs.empty() || inputs.size() != 1u) {
+            return false;
+        }
+
+        struct MovBinding {
+            UINT destinationRegister{};
+            UINT sourceRegister{};
+        };
+        std::vector<MovBinding> moves;
+        for (const auto& instruction : decode.instructions) {
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_DCL))
+                continue;
+            if (instruction.opcode != static_cast<DWORD>(D3DSIO_MOV) ||
+                instruction.operandTokens.size() != 2u)
+                return false;
+
+            const DWORD destination = instruction.operandTokens[0];
+            const DWORD source = instruction.operandTokens[1];
+            if ((destination & 0x80000000u) == 0u ||
+                (source & 0x80000000u) == 0u ||
+                (destination & D3DSP_WRITEMASK_ALL) != D3DSP_WRITEMASK_ALL ||
+                (destination & D3DSP_DSTMOD_MASK) != 0u ||
+                (destination & D3DSP_DSTSHIFT_MASK) != 0u ||
+                (destination & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                (source & D3DSP_SWIZZLE_MASK) != D3DSP_NOSWIZZLE ||
+                (source & D3DSP_SRCMOD_MASK) != 0u ||
+                (source & D3DSHADER_ADDRESSMODE_MASK) != 0u)
+                return false;
+
+            const auto destinationType =
+                r283_decode_register_type(destination);
+            const auto sourceType = r283_decode_register_type(source);
+            const UINT destinationRegister =
+                static_cast<UINT>(destination & D3DSP_REGNUM_MASK);
+            const UINT sourceRegister =
+                static_cast<UINT>(source & D3DSP_REGNUM_MASK);
+            if (sourceType != D3DSPR_INPUT)
+                return false;
+
+            bool sourceDeclared = false;
+            for (const auto& semantic : inputs) {
+                if (semantic.registerType == D3DSPR_INPUT &&
+                    semantic.registerIndex == sourceRegister) {
+                    sourceDeclared = true;
+                    break;
+                }
+            }
+            if (!sourceDeclared)
+                return false;
+
+            if (vertexStage) {
+                if (destinationType != D3DSPR_OUTPUT)
+                    return false;
+                bool destinationDeclared = false;
+                for (const auto& semantic : outputs) {
+                    if (semantic.registerType == D3DSPR_OUTPUT &&
+                        semantic.registerIndex == destinationRegister) {
+                        destinationDeclared = true;
+                        break;
+                    }
+                }
+                if (!destinationDeclared)
+                    return false;
+                for (const auto& existing : moves) {
+                    if (existing.destinationRegister == destinationRegister)
+                        return false;
+                }
+            } else {
+                if (destinationType != D3DSPR_COLOROUT ||
+                    destinationRegister != 0u ||
+                    !moves.empty())
+                    return false;
+            }
+            moves.push_back({ destinationRegister, sourceRegister });
+        }
+
+        if (vertexStage) {
+            if (moves.size() != outputs.size())
+                return false;
+            for (const auto& semantic : outputs) {
+                bool assigned = false;
+                for (const auto& move : moves) {
+                    if (move.destinationRegister == semantic.registerIndex) {
+                        assigned = true;
+                        break;
+                    }
+                }
+                if (!assigned)
+                    return false;
+            }
+        } else if (moves.size() != 1u) {
+            return false;
+        }
+
+        translated = "struct R283Input {\n";
+        for (const auto& semantic : inputs) {
+            std::string label;
+            if (!r283_hlsl_semantic(
+                    semantic, vertexStage, false, label))
+                return false;
+            translated += "    float4 r" +
+                std::to_string(semantic.registerIndex) +
+                " : " + label + ";\n";
+        }
+        translated += "};\n";
+
+        if (vertexStage) {
+            translated += "struct R283Output {\n";
+            for (const auto& semantic : outputs) {
+                std::string label;
+                if (!r283_hlsl_semantic(
+                        semantic, true, true, label))
+                    return false;
+                translated += "    float4 r" +
+                    std::to_string(semantic.registerIndex) +
+                    " : " + label + ";\n";
+            }
+            translated += "};\n";
+            translated += "R283Output main(R283Input input) {\n";
+            translated += "    R283Output output = (R283Output)0;\n";
+            for (const auto& move : moves) {
+                translated += "    output.r" +
+                    std::to_string(move.destinationRegister) +
+                    " = input.r" + std::to_string(move.sourceRegister) +
+                    ";\n";
+            }
+            translated += "    return output;\n}\n";
+        } else {
+            translated += "float4 main(R283Input input) : SV_Target0 {\n";
+            translated += "    return input.r" +
+                std::to_string(moves.front().sourceRegister) + ";\n}\n";
+        }
+        return !translated.empty();
+    } catch (...) {
+        translated.clear();
+        return false;
+    }
+}
+
+bool r283_dxbc_payload(const std::vector<std::uint8_t>& bytes) noexcept {
+    return bytes.size() >= 4u &&
+        bytes[0] == static_cast<std::uint8_t>('D') &&
+        bytes[1] == static_cast<std::uint8_t>('X') &&
+        bytes[2] == static_cast<std::uint8_t>('B') &&
+        bytes[3] == static_cast<std::uint8_t>('C');
+}
+
+std::uint64_t r283_materialized_artifact_identity(
+    std::uint64_t receiptIdentity,
+    std::uint64_t compileContractIdentity,
+    std::uint64_t translatedSourceHash,
+    std::uint64_t targetBytecodeHash,
+    UINT targetBytecodeBytes,
+    std::uint64_t stageTag) noexcept {
+    if (receiptIdentity == 0 ||
+        compileContractIdentity == 0 ||
+        translatedSourceHash == 0 ||
+        targetBytecodeHash == 0 ||
+        targetBytecodeBytes == 0)
+        return 0;
+    std::uint64_t identity = 0xcbf29ce484222325ull;
+    identity = mix_readiness_snapshot_token(identity, receiptIdentity);
+    identity = mix_readiness_snapshot_token(
+        identity, compileContractIdentity);
+    identity = mix_readiness_snapshot_token(
+        identity, translatedSourceHash);
+    identity = mix_readiness_snapshot_token(
+        identity, targetBytecodeHash);
+    identity = mix_readiness_snapshot_token(
+        identity, targetBytecodeBytes);
+    identity = mix_readiness_snapshot_token(identity, stageTag);
+    return identity == 0 ? 1 : identity;
+}
+
+std::uint64_t r283_materialization_snapshot_token(
+    const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+        materialization) noexcept {
+    if (!materialization.reviewReady)
+        return 0;
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(token, materialization.cacheKey);
+    token = mix_readiness_snapshot_token(
+        token, materialization.targetVertexBytecodeReceiptIdentity);
+    token = mix_readiness_snapshot_token(
+        token, materialization.targetPixelBytecodeReceiptIdentity);
+    token = mix_readiness_snapshot_token(
+        token, materialization.vertexCompileContractIdentity);
+    token = mix_readiness_snapshot_token(
+        token, materialization.pixelCompileContractIdentity);
+    token = mix_readiness_snapshot_token(
+        token, materialization.vertexTranslatedSourceHash);
+    token = mix_readiness_snapshot_token(
+        token, materialization.pixelTranslatedSourceHash);
+    token = mix_readiness_snapshot_token(
+        token, materialization.vertexTargetBytecodeHash);
+    token = mix_readiness_snapshot_token(
+        token, materialization.pixelTargetBytecodeHash);
+    token = mix_readiness_snapshot_token(
+        token, materialization.vertexMaterializedArtifactIdentity);
+    token = mix_readiness_snapshot_token(
+        token, materialization.pixelMaterializedArtifactIdentity);
+    token = mix_readiness_snapshot_token(
+        token, materialization.materializerRevisionHash);
+    token = mix_readiness_snapshot_token(
+        token, materialization.semanticSubsetContractHash);
+    token = mix_readiness_snapshot_token(
+        token, materialization.translatedArtifactReceiptSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, materialization.targetMaterializationContractSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, materialization.translationPlanSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, materialization.targetBytecodeMaterialized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, materialization.objectCreationAuthorized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(token, 0x283u);
+    return token == 0 ? 1 : token;
 }
 
 HRESULT create_device(
@@ -10062,6 +10381,393 @@ bool validate_programmable_shader_target_materialization_contract_snapshot(
         !current.compilationAuthorized &&
         !current.objectCreationAuthorized &&
         current.reviewSnapshotToken == reviewSnapshotToken;
+}
+
+NativeProgrammableShaderTargetBytecodeMaterializationEvidence
+materialize_programmable_shader_target_bytecode(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const ProgrammableShaderFunctionSourceEvidence& vertexSource,
+    const ProgrammableShaderFunctionSourceEvidence& pixelSource,
+    const NativeProgrammableShaderTranslatedArtifactReceiptEvidence&
+        translatedArtifactReceipt,
+    std::uint64_t translatedArtifactReceiptSnapshotToken,
+    const NativeProgrammableShaderTargetMaterializationContractEvidence&
+        targetMaterializationContract,
+    std::uint64_t targetMaterializationContractSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken) noexcept {
+    NativeProgrammableShaderTargetBytecodeMaterializationEvidence out{};
+    out.diagnosticOnly = true;
+    out.cacheKey = sourceIdentity.cacheKey;
+    out.vertexVersionToken = sourceIdentity.vertexShader.versionToken;
+    out.pixelVersionToken = sourceIdentity.pixelShader.versionToken;
+    out.sourceVertexBytecodeHash = sourceIdentity.vertexShader.bytecodeHash;
+    out.sourcePixelBytecodeHash = sourceIdentity.pixelShader.bytecodeHash;
+    out.targetVertexBytecodeReceiptIdentity =
+        translatedArtifactReceipt.targetVertexBytecodeReceiptIdentity;
+    out.targetPixelBytecodeReceiptIdentity =
+        translatedArtifactReceipt.targetPixelBytecodeReceiptIdentity;
+    out.vertexCompileContractIdentity =
+        targetMaterializationContract.vertexCompileContractIdentity;
+    out.pixelCompileContractIdentity =
+        targetMaterializationContract.pixelCompileContractIdentity;
+    out.targetVertexSemanticHash = translationPlan.targetVertexSemanticHash;
+    out.targetPixelSemanticHash = translationPlan.targetPixelSemanticHash;
+    out.materializerRevisionHash = r283_materializer_revision_hash();
+    out.semanticSubsetContractHash =
+        r283_semantic_subset_contract_hash();
+    out.translatedArtifactReceiptSnapshotToken =
+        translatedArtifactReceiptSnapshotToken;
+    out.targetMaterializationContractSnapshotToken =
+        targetMaterializationContractSnapshotToken;
+    out.translationPlanSnapshotToken = translationPlanSnapshotToken;
+
+    out.inputValid =
+        translatedArtifactReceiptSnapshotToken != 0 &&
+        targetMaterializationContractSnapshotToken != 0 &&
+        translationPlanSnapshotToken != 0;
+    out.sourceIdentityExact =
+        sourceIdentity.exact_identity() &&
+        !sourceIdentity.translationImplemented;
+    out.vertexSourceExact =
+        validate_programmable_shader_function_source_evidence(
+            vertexSource, sourceIdentity.vertexShader, true);
+    out.pixelSourceExact =
+        validate_programmable_shader_function_source_evidence(
+            pixelSource, sourceIdentity.pixelShader, false);
+    out.translatedArtifactReceiptReady =
+        translatedArtifactReceipt.reviewReady &&
+        translatedArtifactReceipt.boundaryPreserved &&
+        translatedArtifactReceipt.diagnosticOnly &&
+        translatedArtifactReceipt.targetBytecodeReceiptRequired &&
+        !translatedArtifactReceipt.targetBytecodeMaterialized &&
+        !translatedArtifactReceipt.objectCreationAuthorized;
+    out.translatedArtifactReceiptSnapshotMatches =
+        out.translatedArtifactReceiptReady &&
+        translatedArtifactReceipt.reviewSnapshotToken ==
+            translatedArtifactReceiptSnapshotToken;
+    out.targetMaterializationContractReady =
+        targetMaterializationContract.reviewReady &&
+        targetMaterializationContract.boundaryPreserved &&
+        targetMaterializationContract.diagnosticOnly &&
+        targetMaterializationContract.targetBytecodeMaterializationRequired &&
+        !targetMaterializationContract.targetBytecodeMaterialized &&
+        !targetMaterializationContract.compilationAuthorized &&
+        !targetMaterializationContract.objectCreationAuthorized;
+    out.targetMaterializationContractSnapshotMatches =
+        out.targetMaterializationContractReady &&
+        targetMaterializationContract.reviewSnapshotToken ==
+            targetMaterializationContractSnapshotToken;
+    out.translationPlanReady =
+        translationPlan.reviewReady &&
+        translationPlan.boundaryPreserved &&
+        translationPlan.diagnosticOnly &&
+        translationPlan.provenanceMatches &&
+        translationPlan.vertexSemanticExact &&
+        translationPlan.pixelSemanticExact;
+    out.translationPlanSnapshotMatches =
+        out.translationPlanReady &&
+        translationPlan.reviewSnapshotToken == translationPlanSnapshotToken;
+    out.provenanceMatches =
+        out.inputValid &&
+        out.sourceIdentityExact &&
+        out.vertexSourceExact &&
+        out.pixelSourceExact &&
+        out.translatedArtifactReceiptSnapshotMatches &&
+        out.targetMaterializationContractSnapshotMatches &&
+        out.translationPlanSnapshotMatches &&
+        sourceIdentity.cacheKey != 0 &&
+        sourceIdentity.cacheKey == translatedArtifactReceipt.cacheKey &&
+        sourceIdentity.cacheKey == targetMaterializationContract.cacheKey &&
+        sourceIdentity.cacheKey == translationPlan.cacheKey &&
+        translatedArtifactReceipt.targetVertexBytecodeReceiptIdentity ==
+            targetMaterializationContract.targetVertexBytecodeReceiptIdentity &&
+        translatedArtifactReceipt.targetPixelBytecodeReceiptIdentity ==
+            targetMaterializationContract.targetPixelBytecodeReceiptIdentity &&
+        translatedArtifactReceipt.translatorRevisionHash ==
+            translationPlan.translatorRevisionHash &&
+        translatedArtifactReceipt.semanticContractHash ==
+            translationPlan.semanticContractHash &&
+        targetMaterializationContract.translatorRevisionHash ==
+            translationPlan.translatorRevisionHash &&
+        targetMaterializationContract.semanticContractHash ==
+            translationPlan.semanticContractHash &&
+        targetMaterializationContract.vertexCompileContractIdentity != 0 &&
+        targetMaterializationContract.pixelCompileContractIdentity != 0 &&
+        translationPlan.targetVertexSemanticHash != 0 &&
+        translationPlan.targetPixelSemanticHash != 0 &&
+        out.materializerRevisionHash != 0 &&
+        out.semanticSubsetContractHash != 0;
+    if (!out.provenanceMatches)
+        return out;
+
+    try {
+        std::string vertexTranslatedSource;
+        std::string pixelTranslatedSource;
+        out.vertexSubsetSupported =
+            build_r283_sm3_mov_shader_source(
+                vertexSource, true, vertexTranslatedSource);
+        out.pixelSubsetSupported =
+            build_r283_sm3_mov_shader_source(
+                pixelSource, false, pixelTranslatedSource);
+        if (!out.vertexSubsetSupported || !out.pixelSubsetSupported)
+            return out;
+        if (vertexTranslatedSource.size() >
+                (std::numeric_limits<UINT>::max)() ||
+            pixelTranslatedSource.size() >
+                (std::numeric_limits<UINT>::max)())
+            return out;
+
+        out.vertexTranslatedSourceBytes =
+            static_cast<UINT>(vertexTranslatedSource.size());
+        out.pixelTranslatedSourceBytes =
+            static_cast<UINT>(pixelTranslatedSource.size());
+        out.vertexTranslatedSourceHash =
+            hash_observation_payload_bytes(
+                vertexTranslatedSource.data(),
+                out.vertexTranslatedSourceBytes);
+        out.pixelTranslatedSourceHash =
+            hash_observation_payload_bytes(
+                pixelTranslatedSource.data(),
+                out.pixelTranslatedSourceBytes);
+        out.vertexSourceMaterialized =
+            out.vertexTranslatedSourceBytes != 0 &&
+            out.vertexTranslatedSourceHash != 0;
+        out.pixelSourceMaterialized =
+            out.pixelTranslatedSourceBytes != 0 &&
+            out.pixelTranslatedSourceHash != 0;
+        if (!out.vertexSourceMaterialized ||
+            !out.pixelSourceMaterialized)
+            return out;
+
+        Microsoft::WRL::ComPtr<ID3DBlob> vertexBytecode;
+        Microsoft::WRL::ComPtr<ID3DBlob> pixelBytecode;
+        out.vertexCompilationSucceeded =
+            compile_shader_source(
+                vertexTranslatedSource,
+                "r283_programmable_vs",
+                "vs_4_0",
+                vertexBytecode);
+        out.pixelCompilationSucceeded =
+            compile_shader_source(
+                pixelTranslatedSource,
+                "r283_programmable_ps",
+                "ps_4_0",
+                pixelBytecode);
+        if (!out.vertexCompilationSucceeded ||
+            !out.pixelCompilationSucceeded ||
+            !vertexBytecode ||
+            !pixelBytecode ||
+            vertexBytecode->GetBufferSize() >
+                (std::numeric_limits<UINT>::max)() ||
+            pixelBytecode->GetBufferSize() >
+                (std::numeric_limits<UINT>::max)())
+            return out;
+
+        out.vertexTargetBytecodeBytes =
+            static_cast<UINT>(vertexBytecode->GetBufferSize());
+        out.pixelTargetBytecodeBytes =
+            static_cast<UINT>(pixelBytecode->GetBufferSize());
+        const auto* vertexBegin = static_cast<const std::uint8_t*>(
+            vertexBytecode->GetBufferPointer());
+        const auto* pixelBegin = static_cast<const std::uint8_t*>(
+            pixelBytecode->GetBufferPointer());
+        if (!vertexBegin || !pixelBegin ||
+            out.vertexTargetBytecodeBytes == 0 ||
+            out.pixelTargetBytecodeBytes == 0)
+            return out;
+        out.vertexTargetBytecode.assign(
+            vertexBegin,
+            vertexBegin + out.vertexTargetBytecodeBytes);
+        out.pixelTargetBytecode.assign(
+            pixelBegin,
+            pixelBegin + out.pixelTargetBytecodeBytes);
+        if (!r283_dxbc_payload(out.vertexTargetBytecode) ||
+            !r283_dxbc_payload(out.pixelTargetBytecode))
+            return out;
+
+        out.vertexTargetBytecodeHash =
+            hash_observation_payload_bytes(
+                out.vertexTargetBytecode.data(),
+                out.vertexTargetBytecodeBytes);
+        out.pixelTargetBytecodeHash =
+            hash_observation_payload_bytes(
+                out.pixelTargetBytecode.data(),
+                out.pixelTargetBytecodeBytes);
+        out.vertexMaterializedArtifactIdentity =
+            r283_materialized_artifact_identity(
+                out.targetVertexBytecodeReceiptIdentity,
+                out.vertexCompileContractIdentity,
+                out.vertexTranslatedSourceHash,
+                out.vertexTargetBytecodeHash,
+                out.vertexTargetBytecodeBytes,
+                0x28301u);
+        out.pixelMaterializedArtifactIdentity =
+            r283_materialized_artifact_identity(
+                out.targetPixelBytecodeReceiptIdentity,
+                out.pixelCompileContractIdentity,
+                out.pixelTranslatedSourceHash,
+                out.pixelTargetBytecodeHash,
+                out.pixelTargetBytecodeBytes,
+                0x28302u);
+        out.targetBytecodeMaterialized =
+            out.vertexTargetBytecodeHash != 0 &&
+            out.pixelTargetBytecodeHash != 0 &&
+            out.vertexMaterializedArtifactIdentity != 0 &&
+            out.pixelMaterializedArtifactIdentity != 0 &&
+            out.vertexMaterializedArtifactIdentity !=
+                out.pixelMaterializedArtifactIdentity;
+        out.objectCreationAuthorized = false;
+        out.boundaryPreserved =
+            out.provenanceMatches &&
+            out.vertexSubsetSupported &&
+            out.pixelSubsetSupported &&
+            out.vertexSourceMaterialized &&
+            out.pixelSourceMaterialized &&
+            out.vertexCompilationSucceeded &&
+            out.pixelCompilationSucceeded &&
+            out.targetBytecodeMaterialized &&
+            !out.objectCreationAuthorized &&
+            out.diagnosticOnly;
+        out.reviewReady = out.boundaryPreserved;
+        if (out.reviewReady)
+            out.reviewSnapshotToken =
+                r283_materialization_snapshot_token(out);
+        return out;
+    } catch (...) {
+        return {};
+    }
+}
+
+bool validate_programmable_shader_target_bytecode_materialization_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const ProgrammableShaderFunctionSourceEvidence& vertexSource,
+    const ProgrammableShaderFunctionSourceEvidence& pixelSource,
+    const NativeProgrammableShaderTranslatedArtifactReceiptEvidence&
+        translatedArtifactReceipt,
+    std::uint64_t translatedArtifactReceiptSnapshotToken,
+    const NativeProgrammableShaderTargetMaterializationContractEvidence&
+        targetMaterializationContract,
+    std::uint64_t targetMaterializationContractSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken,
+    const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+        materialization,
+    std::uint64_t reviewSnapshotToken) noexcept {
+    if (reviewSnapshotToken == 0 ||
+        !materialization.reviewReady ||
+        !materialization.boundaryPreserved ||
+        !materialization.diagnosticOnly ||
+        materialization.objectCreationAuthorized ||
+        !materialization.targetBytecodeMaterialized ||
+        materialization.reviewSnapshotToken != reviewSnapshotToken)
+        return false;
+
+    if (!sourceIdentity.exact_identity() ||
+        sourceIdentity.translationImplemented ||
+        !validate_programmable_shader_function_source_evidence(
+            vertexSource, sourceIdentity.vertexShader, true) ||
+        !validate_programmable_shader_function_source_evidence(
+            pixelSource, sourceIdentity.pixelShader, false) ||
+        !translatedArtifactReceipt.reviewReady ||
+        translatedArtifactReceipt.reviewSnapshotToken !=
+            translatedArtifactReceiptSnapshotToken ||
+        !targetMaterializationContract.reviewReady ||
+        targetMaterializationContract.reviewSnapshotToken !=
+            targetMaterializationContractSnapshotToken ||
+        !translationPlan.reviewReady ||
+        translationPlan.reviewSnapshotToken != translationPlanSnapshotToken)
+        return false;
+
+    if (materialization.cacheKey != sourceIdentity.cacheKey ||
+        materialization.sourceVertexBytecodeHash !=
+            sourceIdentity.vertexShader.bytecodeHash ||
+        materialization.sourcePixelBytecodeHash !=
+            sourceIdentity.pixelShader.bytecodeHash ||
+        materialization.targetVertexBytecodeReceiptIdentity !=
+            translatedArtifactReceipt.targetVertexBytecodeReceiptIdentity ||
+        materialization.targetPixelBytecodeReceiptIdentity !=
+            translatedArtifactReceipt.targetPixelBytecodeReceiptIdentity ||
+        materialization.vertexCompileContractIdentity !=
+            targetMaterializationContract.vertexCompileContractIdentity ||
+        materialization.pixelCompileContractIdentity !=
+            targetMaterializationContract.pixelCompileContractIdentity ||
+        materialization.targetVertexSemanticHash !=
+            translationPlan.targetVertexSemanticHash ||
+        materialization.targetPixelSemanticHash !=
+            translationPlan.targetPixelSemanticHash ||
+        materialization.materializerRevisionHash !=
+            r283_materializer_revision_hash() ||
+        materialization.semanticSubsetContractHash !=
+            r283_semantic_subset_contract_hash() ||
+        materialization.translatedArtifactReceiptSnapshotToken !=
+            translatedArtifactReceiptSnapshotToken ||
+        materialization.targetMaterializationContractSnapshotToken !=
+            targetMaterializationContractSnapshotToken ||
+        materialization.translationPlanSnapshotToken !=
+            translationPlanSnapshotToken)
+        return false;
+
+    try {
+        std::string vertexTranslatedSource;
+        std::string pixelTranslatedSource;
+        if (!build_r283_sm3_mov_shader_source(
+                vertexSource, true, vertexTranslatedSource) ||
+            !build_r283_sm3_mov_shader_source(
+                pixelSource, false, pixelTranslatedSource) ||
+            vertexTranslatedSource.size() !=
+                materialization.vertexTranslatedSourceBytes ||
+            pixelTranslatedSource.size() !=
+                materialization.pixelTranslatedSourceBytes ||
+            hash_observation_payload_bytes(
+                vertexTranslatedSource.data(),
+                materialization.vertexTranslatedSourceBytes) !=
+                materialization.vertexTranslatedSourceHash ||
+            hash_observation_payload_bytes(
+                pixelTranslatedSource.data(),
+                materialization.pixelTranslatedSourceBytes) !=
+                materialization.pixelTranslatedSourceHash)
+            return false;
+    } catch (...) {
+        return false;
+    }
+
+    if (materialization.vertexTargetBytecode.size() !=
+            materialization.vertexTargetBytecodeBytes ||
+        materialization.pixelTargetBytecode.size() !=
+            materialization.pixelTargetBytecodeBytes ||
+        !r283_dxbc_payload(materialization.vertexTargetBytecode) ||
+        !r283_dxbc_payload(materialization.pixelTargetBytecode) ||
+        hash_observation_payload_bytes(
+            materialization.vertexTargetBytecode.data(),
+            materialization.vertexTargetBytecodeBytes) !=
+            materialization.vertexTargetBytecodeHash ||
+        hash_observation_payload_bytes(
+            materialization.pixelTargetBytecode.data(),
+            materialization.pixelTargetBytecodeBytes) !=
+            materialization.pixelTargetBytecodeHash)
+        return false;
+
+    if (r283_materialized_artifact_identity(
+            materialization.targetVertexBytecodeReceiptIdentity,
+            materialization.vertexCompileContractIdentity,
+            materialization.vertexTranslatedSourceHash,
+            materialization.vertexTargetBytecodeHash,
+            materialization.vertexTargetBytecodeBytes,
+            0x28301u) !=
+            materialization.vertexMaterializedArtifactIdentity ||
+        r283_materialized_artifact_identity(
+            materialization.targetPixelBytecodeReceiptIdentity,
+            materialization.pixelCompileContractIdentity,
+            materialization.pixelTranslatedSourceHash,
+            materialization.pixelTargetBytecodeHash,
+            materialization.pixelTargetBytecodeBytes,
+            0x28302u) !=
+            materialization.pixelMaterializedArtifactIdentity)
+        return false;
+
+    return r283_materialization_snapshot_token(materialization) ==
+        reviewSnapshotToken;
 }
 
 NativeProgrammableShaderTranslatedSemanticReceipt

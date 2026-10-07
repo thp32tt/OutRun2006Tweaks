@@ -11099,6 +11099,59 @@ def main() -> None:
             + ", ".join(missing_r282_programmable_target_materialization_contract)
         )
 
+    r283_programmable_target_bytecode_materialization = [
+        ("struct NativeProgrammableShaderTargetBytecodeMaterializationEvidence",
+         NATIVE_BACKEND_HPP, "R283 materialized bytecode evidence type"),
+        ("materialize_programmable_shader_target_bytecode(",
+         NATIVE_BACKEND_HPP, "R283 materializer declaration"),
+        ("validate_programmable_shader_target_bytecode_materialization_snapshot(",
+         NATIVE_BACKEND_HPP, "R283 materialized bytecode validator declaration"),
+        ("R283_D3D9_SM3_DCL_MOV_HLSL_MATERIALIZER_V1",
+         NATIVE_BACKEND_CPP, "R283 bounded materializer revision"),
+        ("R283_R281_R282_R276_SM3_DCL_MOV_DXBC_PROVENANCE_V1",
+         NATIVE_BACKEND_CPP, "R283 provenance contract"),
+        ("build_r283_sm3_mov_shader_source(",
+         NATIVE_BACKEND_CPP, "R283 SM3 DCL+MOV fail-closed source translator"),
+        ("r283_programmable_vs", NATIVE_BACKEND_CPP,
+         "R283 vertex source is compiled through native compiler policy"),
+        ("r283_programmable_ps", NATIVE_BACKEND_CPP,
+         "R283 pixel source is compiled through native compiler policy"),
+        ("r283_dxbc_payload(", NATIVE_BACKEND_CPP,
+         "R283 validates materialized DXBC payload signature"),
+        ("out.objectCreationAuthorized = false;", NATIVE_BACKEND_CPP,
+         "R283 cannot authorize programmable object creation"),
+        ("token, 0x283u", NATIVE_BACKEND_CPP,
+         "R283 independent materialization snapshot domain"),
+        ("materialize_programmable_shader_target_bytecode(",
+         RUNTIME_CENSUS, "R283 production census materializes bounded target bytes"),
+        ("VR DX11 R283 targetBytecodeMaterialization signature#{}:",
+         RUNTIME_CENSUS, "R283 signature-attributable production materialization log"),
+        ("R283_TARGET_BYTECODE_MATERIALIZATION_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R283 analyzer parser"),
+        ("TargetBytecodeMaterialization", DX11_CENSUS_ANALYZER,
+         "R283 analyzer correlates materialized bytecode evidence"),
+        ("R242_TRANSLATED_OBJECT_OWNERSHIP", DX11_CENSUS_ANALYZER,
+         "R283 advances exact materialization boundary to R242 ownership"),
+        ("TargetBytecodeMaterializationExactSignatures",
+         DX11_CENSUS_ANALYZER_TEST, "R283 analyzer regression coverage"),
+        ("R283 materializes bounded SM3 DCL+MOV HLSL and DXBC while object creation stays disabled",
+         CONSTANT_BUFFER_PROBE, "R283 hosted positive compile/materialization regression"),
+        ("R283 rejects source bytes detached from the R281/R282 provenance",
+         CONSTANT_BUFFER_PROBE, "R283 stale source provenance regression"),
+        ("sig.shaderTranslationExact = false;", RUNTIME_CENSUS,
+         "R283 keeps programmable translation activation fail-closed"),
+    ]
+    missing_r283_programmable_target_bytecode_materialization = [
+        meaning for token, source, meaning
+        in r283_programmable_target_bytecode_materialization
+        if token not in source
+    ]
+    if missing_r283_programmable_target_bytecode_materialization:
+        raise SystemExit(
+            "DX11 R283 programmable target bytecode materialization drift: "
+            + ", ".join(missing_r283_programmable_target_bytecode_materialization)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),

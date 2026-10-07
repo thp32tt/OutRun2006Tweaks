@@ -2235,6 +2235,96 @@ validate_programmable_shader_target_materialization_contract_snapshot(
     std::uint64_t translationPlanSnapshotToken,
     std::uint64_t reviewSnapshotToken) noexcept;
 
+// R283 materializes target HLSL/DXBC only for the bounded SM3 DCL+MOV subset
+// proven by the current source evidence. The resulting bytes are carried in
+// this diagnostic receipt and are sealed to the exact R281/R282/R276
+// provenance. Shader object creation/binding and NativeDrawPath/Draw* remain
+// explicitly unauthorized.
+struct NativeProgrammableShaderTargetBytecodeMaterializationEvidence {
+    bool inputValid{};
+    bool sourceIdentityExact{};
+    bool vertexSourceExact{};
+    bool pixelSourceExact{};
+    bool translatedArtifactReceiptReady{};
+    bool translatedArtifactReceiptSnapshotMatches{};
+    bool targetMaterializationContractReady{};
+    bool targetMaterializationContractSnapshotMatches{};
+    bool translationPlanReady{};
+    bool translationPlanSnapshotMatches{};
+    bool provenanceMatches{};
+    bool vertexSubsetSupported{};
+    bool pixelSubsetSupported{};
+    bool vertexSourceMaterialized{};
+    bool pixelSourceMaterialized{};
+    bool vertexCompilationSucceeded{};
+    bool pixelCompilationSucceeded{};
+    bool targetBytecodeMaterialized{};
+    bool objectCreationAuthorized{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    std::uint64_t cacheKey{};
+    DWORD vertexVersionToken{};
+    DWORD pixelVersionToken{};
+    std::uint64_t sourceVertexBytecodeHash{};
+    std::uint64_t sourcePixelBytecodeHash{};
+    std::uint64_t targetVertexBytecodeReceiptIdentity{};
+    std::uint64_t targetPixelBytecodeReceiptIdentity{};
+    std::uint64_t vertexCompileContractIdentity{};
+    std::uint64_t pixelCompileContractIdentity{};
+    std::uint64_t targetVertexSemanticHash{};
+    std::uint64_t targetPixelSemanticHash{};
+    UINT vertexTranslatedSourceBytes{};
+    UINT pixelTranslatedSourceBytes{};
+    std::uint64_t vertexTranslatedSourceHash{};
+    std::uint64_t pixelTranslatedSourceHash{};
+    UINT vertexTargetBytecodeBytes{};
+    UINT pixelTargetBytecodeBytes{};
+    std::uint64_t vertexTargetBytecodeHash{};
+    std::uint64_t pixelTargetBytecodeHash{};
+    std::uint64_t vertexMaterializedArtifactIdentity{};
+    std::uint64_t pixelMaterializedArtifactIdentity{};
+    std::uint64_t materializerRevisionHash{};
+    std::uint64_t semanticSubsetContractHash{};
+    std::uint64_t translatedArtifactReceiptSnapshotToken{};
+    std::uint64_t targetMaterializationContractSnapshotToken{};
+    std::uint64_t translationPlanSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+    std::vector<std::uint8_t> vertexTargetBytecode;
+    std::vector<std::uint8_t> pixelTargetBytecode;
+};
+
+[[nodiscard]] NativeProgrammableShaderTargetBytecodeMaterializationEvidence
+materialize_programmable_shader_target_bytecode(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const ProgrammableShaderFunctionSourceEvidence& vertexSource,
+    const ProgrammableShaderFunctionSourceEvidence& pixelSource,
+    const NativeProgrammableShaderTranslatedArtifactReceiptEvidence&
+        translatedArtifactReceipt,
+    std::uint64_t translatedArtifactReceiptSnapshotToken,
+    const NativeProgrammableShaderTargetMaterializationContractEvidence&
+        targetMaterializationContract,
+    std::uint64_t targetMaterializationContractSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_shader_target_bytecode_materialization_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const ProgrammableShaderFunctionSourceEvidence& vertexSource,
+    const ProgrammableShaderFunctionSourceEvidence& pixelSource,
+    const NativeProgrammableShaderTranslatedArtifactReceiptEvidence&
+        translatedArtifactReceipt,
+    std::uint64_t translatedArtifactReceiptSnapshotToken,
+    const NativeProgrammableShaderTargetMaterializationContractEvidence&
+        targetMaterializationContract,
+    std::uint64_t targetMaterializationContractSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken,
+    const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+        materialization,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
 // R275 seals one dormant translated-semantic observation into a tamper-evident
 // receipt bound to the exact R239 pair, R242 translated-object ownership, R273
 // source-mapping handoff and R276 source-derived semantic translation plan.

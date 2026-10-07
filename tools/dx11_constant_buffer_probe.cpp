@@ -637,6 +637,10 @@ int main()
         r266ParameterToken(
             D3DSPR_INPUT, 0u, D3DSP_WRITEMASK_ALL),
         static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
+        r267DclSemanticToken(D3DDECLUSAGE_POSITION, 0u),
+        r266ParameterToken(
+            D3DSPR_OUTPUT, 0u, D3DSP_WRITEMASK_ALL),
+        static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
         r267DclSemanticToken(D3DDECLUSAGE_TEXCOORD, 1u),
         r266ParameterToken(
             D3DSPR_OUTPUT, 2u, D3DSP_WRITEMASK_ALL),
@@ -644,6 +648,16 @@ int main()
         0x80000000u | static_cast<DWORD>(D3DSTT_2D),
         r266ParameterToken(
             D3DSPR_SAMPLER, 0u, 0u),
+        static_cast<DWORD>(D3DSIO_MOV) | (2u << 24u),
+        r266ParameterToken(
+            D3DSPR_OUTPUT, 0u, D3DSP_WRITEMASK_ALL),
+        r266ParameterToken(
+            D3DSPR_INPUT, 0u, D3DSP_NOSWIZZLE),
+        static_cast<DWORD>(D3DSIO_MOV) | (2u << 24u),
+        r266ParameterToken(
+            D3DSPR_OUTPUT, 2u, D3DSP_WRITEMASK_ALL),
+        r266ParameterToken(
+            D3DSPR_INPUT, 0u, D3DSP_NOSWIZZLE),
         static_cast<DWORD>(D3DSIO_END),
     };
     const auto r267VsEvidence =
@@ -673,12 +687,12 @@ int main()
         r267VsInterfaceSemantics.sourceBytecodeHash ==
             r267VsEvidence.bytecodeHash &&
         r267VsInterfaceSemantics.shaderModel3 &&
-        r267VsInterfaceSemantics.declarationInstructionCount == 3u &&
-        r267VsInterfaceSemantics.semanticDeclarationCount == 2u &&
+        r267VsInterfaceSemantics.declarationInstructionCount == 4u &&
+        r267VsInterfaceSemantics.semanticDeclarationCount == 3u &&
         r267VsInterfaceSemantics.inputSemanticCount == 1u &&
-        r267VsInterfaceSemantics.outputSemanticCount == 1u &&
+        r267VsInterfaceSemantics.outputSemanticCount == 2u &&
         r267VsInterfaceSemantics.samplerDeclarationCount == 1u &&
-        r267VsInterfaceSemantics.semantics.size() == 2u &&
+        r267VsInterfaceSemantics.semantics.size() == 3u &&
         r267VsInterfaceSemantics.semantics[0].input &&
         !r267VsInterfaceSemantics.semantics[0].output &&
         r267VsInterfaceSemantics.semantics[0].usage ==
@@ -692,12 +706,22 @@ int main()
         !r267VsInterfaceSemantics.semantics[1].input &&
         r267VsInterfaceSemantics.semantics[1].output &&
         r267VsInterfaceSemantics.semantics[1].usage ==
-            D3DDECLUSAGE_TEXCOORD &&
-        r267VsInterfaceSemantics.semantics[1].usageIndex == 1u &&
+            D3DDECLUSAGE_POSITION &&
+        r267VsInterfaceSemantics.semantics[1].usageIndex == 0u &&
         r267VsInterfaceSemantics.semantics[1].registerType ==
             D3DSPR_OUTPUT &&
-        r267VsInterfaceSemantics.semantics[1].registerIndex == 2u &&
+        r267VsInterfaceSemantics.semantics[1].registerIndex == 0u &&
         r267VsInterfaceSemantics.semantics[1].writeMask ==
+            D3DSP_WRITEMASK_ALL &&
+        !r267VsInterfaceSemantics.semantics[2].input &&
+        r267VsInterfaceSemantics.semantics[2].output &&
+        r267VsInterfaceSemantics.semantics[2].usage ==
+            D3DDECLUSAGE_TEXCOORD &&
+        r267VsInterfaceSemantics.semantics[2].usageIndex == 1u &&
+        r267VsInterfaceSemantics.semantics[2].registerType ==
+            D3DSPR_OUTPUT &&
+        r267VsInterfaceSemantics.semantics[2].registerIndex == 2u &&
+        r267VsInterfaceSemantics.semantics[2].writeMask ==
             D3DSP_WRITEMASK_ALL &&
         r267VsInterfaceSemantics.interfaceSemanticsHash != 0 &&
         r267VsInterfaceSemantics.decoderRevisionHash != 0 &&
@@ -848,8 +872,12 @@ int main()
         static_cast<DWORD>(D3DSIO_DCL) | (2u << 24u),
         r267DclSemanticToken(D3DDECLUSAGE_TEXCOORD, 1u),
         r266ParameterToken(
-            D3DSPR_INPUT, 0u,
-            D3DSP_WRITEMASK_0 | D3DSP_WRITEMASK_1),
+            D3DSPR_INPUT, 0u, D3DSP_WRITEMASK_ALL),
+        static_cast<DWORD>(D3DSIO_MOV) | (2u << 24u),
+        r266ParameterToken(
+            D3DSPR_COLOROUT, 0u, D3DSP_WRITEMASK_ALL),
+        r266ParameterToken(
+            D3DSPR_INPUT, 0u, D3DSP_NOSWIZZLE),
         static_cast<DWORD>(D3DSIO_END),
     };
     const auto r268PsEvidence =
@@ -885,7 +913,7 @@ int main()
             r267VsEvidence.bytecodeHash &&
         r268Linkage.pixelSourceBytecodeHash ==
             r268PsDecode.sourceBytecodeHash &&
-        r268Linkage.vertexOutputSemanticCount == 1u &&
+        r268Linkage.vertexOutputSemanticCount == 2u &&
         r268Linkage.pixelInputSemanticCount == 1u &&
         r268Linkage.matchedSemanticCount == 1u &&
         r268Linkage.interfaceLinkHash != 0 &&
@@ -906,7 +934,7 @@ int main()
         "R268 rejects unmatched pixel input semantics");
 
     auto r268NarrowVertex = r267VsInterfaceSemantics;
-    r268NarrowVertex.semantics[1].writeMask =
+    r268NarrowVertex.semantics[2].writeMask =
         D3DSP_WRITEMASK_0 | D3DSP_WRITEMASK_1;
     auto r268WidePixel = r268PsInterfaceSemantics;
     r268WidePixel.semantics[0].writeMask = D3DSP_WRITEMASK_ALL;
@@ -5724,6 +5752,102 @@ int main()
         !r282StaleArtifactContract.reviewReady &&
         r282StaleArtifactContract.reviewSnapshotToken == 0,
         "R282 target materialization contract rejects stale R281 artifact receipt identity");
+
+    const auto r283TargetBytecodeMaterialization =
+        outrun::vr::dx11::
+            materialize_programmable_shader_target_bytecode(
+                programmablePair,
+                r267VsEvidence,
+                r268PsEvidence,
+                r281TranslatedArtifactReceipt,
+                r281TranslatedArtifactReceipt.reviewSnapshotToken,
+                r282TargetMaterializationContract,
+                r282TargetMaterializationContract.reviewSnapshotToken,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken);
+    require(
+        r283TargetBytecodeMaterialization.inputValid &&
+        r283TargetBytecodeMaterialization.sourceIdentityExact &&
+        r283TargetBytecodeMaterialization.vertexSourceExact &&
+        r283TargetBytecodeMaterialization.pixelSourceExact &&
+        r283TargetBytecodeMaterialization.translatedArtifactReceiptReady &&
+        r283TargetBytecodeMaterialization.
+            translatedArtifactReceiptSnapshotMatches &&
+        r283TargetBytecodeMaterialization.targetMaterializationContractReady &&
+        r283TargetBytecodeMaterialization.
+            targetMaterializationContractSnapshotMatches &&
+        r283TargetBytecodeMaterialization.translationPlanReady &&
+        r283TargetBytecodeMaterialization.translationPlanSnapshotMatches &&
+        r283TargetBytecodeMaterialization.provenanceMatches &&
+        r283TargetBytecodeMaterialization.vertexSubsetSupported &&
+        r283TargetBytecodeMaterialization.pixelSubsetSupported &&
+        r283TargetBytecodeMaterialization.vertexSourceMaterialized &&
+        r283TargetBytecodeMaterialization.pixelSourceMaterialized &&
+        r283TargetBytecodeMaterialization.vertexCompilationSucceeded &&
+        r283TargetBytecodeMaterialization.pixelCompilationSucceeded &&
+        r283TargetBytecodeMaterialization.targetBytecodeMaterialized &&
+        !r283TargetBytecodeMaterialization.objectCreationAuthorized &&
+        r283TargetBytecodeMaterialization.diagnosticOnly &&
+        r283TargetBytecodeMaterialization.boundaryPreserved &&
+        r283TargetBytecodeMaterialization.reviewReady &&
+        r283TargetBytecodeMaterialization.vertexTranslatedSourceBytes != 0 &&
+        r283TargetBytecodeMaterialization.pixelTranslatedSourceBytes != 0 &&
+        r283TargetBytecodeMaterialization.vertexTranslatedSourceHash != 0 &&
+        r283TargetBytecodeMaterialization.pixelTranslatedSourceHash != 0 &&
+        r283TargetBytecodeMaterialization.vertexTargetBytecodeBytes >= 4u &&
+        r283TargetBytecodeMaterialization.pixelTargetBytecodeBytes >= 4u &&
+        r283TargetBytecodeMaterialization.vertexTargetBytecodeHash != 0 &&
+        r283TargetBytecodeMaterialization.pixelTargetBytecodeHash != 0 &&
+        r283TargetBytecodeMaterialization.vertexMaterializedArtifactIdentity != 0 &&
+        r283TargetBytecodeMaterialization.pixelMaterializedArtifactIdentity != 0 &&
+        r283TargetBytecodeMaterialization.vertexMaterializedArtifactIdentity !=
+            r283TargetBytecodeMaterialization.pixelMaterializedArtifactIdentity &&
+        r283TargetBytecodeMaterialization.vertexTargetBytecode.size() ==
+            r283TargetBytecodeMaterialization.vertexTargetBytecodeBytes &&
+        r283TargetBytecodeMaterialization.pixelTargetBytecode.size() ==
+            r283TargetBytecodeMaterialization.pixelTargetBytecodeBytes &&
+        r283TargetBytecodeMaterialization.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_shader_target_bytecode_materialization_snapshot(
+                programmablePair,
+                r267VsEvidence,
+                r268PsEvidence,
+                r281TranslatedArtifactReceipt,
+                r281TranslatedArtifactReceipt.reviewSnapshotToken,
+                r282TargetMaterializationContract,
+                r282TargetMaterializationContract.reviewSnapshotToken,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken,
+                r283TargetBytecodeMaterialization,
+                r283TargetBytecodeMaterialization.reviewSnapshotToken),
+        "R283 materializes bounded SM3 DCL+MOV HLSL and DXBC while object creation stays disabled");
+
+    auto r283StaleVertexSource = r267VsEvidence;
+    r283StaleVertexSource.bytecodeHash =
+        r267VsEvidence.bytecodeHash == 1ull
+            ? 2ull
+            : (r267VsEvidence.bytecodeHash ^ 1ull);
+    const auto r283StaleSourceMaterialization =
+        outrun::vr::dx11::
+            materialize_programmable_shader_target_bytecode(
+                programmablePair,
+                r283StaleVertexSource,
+                r268PsEvidence,
+                r281TranslatedArtifactReceipt,
+                r281TranslatedArtifactReceipt.reviewSnapshotToken,
+                r282TargetMaterializationContract,
+                r282TargetMaterializationContract.reviewSnapshotToken,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken);
+    require(
+        r283StaleSourceMaterialization.sourceIdentityExact &&
+        !r283StaleSourceMaterialization.vertexSourceExact &&
+        !r283StaleSourceMaterialization.provenanceMatches &&
+        !r283StaleSourceMaterialization.targetBytecodeMaterialized &&
+        !r283StaleSourceMaterialization.objectCreationAuthorized &&
+        !r283StaleSourceMaterialization.reviewReady &&
+        r283StaleSourceMaterialization.reviewSnapshotToken == 0,
+        "R283 rejects source bytes detached from the R281/R282 provenance");
 
     const auto r275SemanticReceipt =
         outrun::vr::dx11::

@@ -199,8 +199,29 @@ R282_TARGET_MATERIALIZATION_CONTRACT_RE = re.compile(
     r"planSnapshot=0x(?P<planSnapshot>[0-9A-Fa-f]+) "
     r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
 )
+R283_TARGET_BYTECODE_MATERIALIZATION_RE = re.compile(
+    r"VR DX11 R283 targetBytecodeMaterialization signature#(?P<signature>\d+): "
+    r"exact=(?P<exact>[01]) vertexSubset=(?P<vertexSubset>[01]) "
+    r"pixelSubset=(?P<pixelSubset>[01]) vertexCompiled=(?P<vertexCompiled>[01]) "
+    r"pixelCompiled=(?P<pixelCompiled>[01]) materialized=(?P<materialized>[01]) "
+    r"createAuthorized=(?P<createAuthorized>[01]) "
+    r"cacheKey=0x(?P<cacheKey>[0-9A-Fa-f]+) "
+    r"vertexSourceBytes=(?P<vertexSourceBytes>\d+) "
+    r"pixelSourceBytes=(?P<pixelSourceBytes>\d+) "
+    r"vertexSource=0x(?P<vertexSource>[0-9A-Fa-f]+) "
+    r"pixelSource=0x(?P<pixelSource>[0-9A-Fa-f]+) "
+    r"vertexBytes=(?P<vertexBytes>\d+) pixelBytes=(?P<pixelBytes>\d+) "
+    r"vertexBytecode=0x(?P<vertexBytecode>[0-9A-Fa-f]+) "
+    r"pixelBytecode=0x(?P<pixelBytecode>[0-9A-Fa-f]+) "
+    r"vertexArtifact=0x(?P<vertexArtifact>[0-9A-Fa-f]+) "
+    r"pixelArtifact=0x(?P<pixelArtifact>[0-9A-Fa-f]+) "
+    r"contractSnapshot=0x(?P<contractSnapshot>[0-9A-Fa-f]+) "
+    r"artifactSnapshot=0x(?P<artifactSnapshot>[0-9A-Fa-f]+) "
+    r"planSnapshot=0x(?P<planSnapshot>[0-9A-Fa-f]+) "
+    r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
+)
 R275_SEMANTIC_RECEIPT_RE = re.compile(
-    r"VR DX11 R275 translatedSemanticReceipt signature#(?P<signature>\d+): "
+    r"VR DX11 R275 translatedSemanticReceipt signature#(?P<signature>\d+): 
     r"exact=(?P<exact>[01]) objectReady=(?P<objectReady>[01]) "
     r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
 )
@@ -494,12 +515,14 @@ def summarize_programmable_shader_inventory(
     target_materialization_contract_missing: list[dict] = []
     target_materialization_contract_inexact: list[dict] = []
     target_bytecode_materialization_missing: list[dict] = []
+    target_bytecode_materialization_inexact: list[dict] = []
     r242_object_ownership_missing: list[dict] = []
     semantic_plan_exact_signatures = 0
     object_prerequisite_exact_signatures = 0
     object_creation_handoff_exact_signatures = 0
     translated_artifact_receipt_exact_signatures = 0
     target_materialization_contract_exact_signatures = 0
+    target_bytecode_materialization_exact_signatures = 0
     semantic_receipt_exact_signatures = 0
     records_with_identity = 0
     programmable_signatures = 0
@@ -560,6 +583,9 @@ def summarize_programmable_shader_inventory(
         translated_artifact_receipt = signature.get("translated_artifact_receipt")
         target_materialization_contract = signature.get(
             "target_materialization_contract"
+        )
+        target_bytecode_materialization = signature.get(
+            "target_bytecode_materialization"
         )
         receipt = signature.get("translated_semantic_receipt")
         missing_prerequisite = None
@@ -633,9 +659,31 @@ def summarize_programmable_shader_inventory(
                 missing_prerequisite = "R282_TARGET_MATERIALIZATION_CONTRACT_EXACTNESS"
         else:
             target_materialization_contract_exact_signatures += 1
+
+        if target_bytecode_materialization is None:
             target_bytecode_materialization_missing.append(ref)
             if missing_prerequisite is None:
                 missing_prerequisite = "R283_TARGET_BYTECODE_MATERIALIZATION"
+        elif (
+            not target_bytecode_materialization["exact"]
+            or not target_bytecode_materialization["vertex_subset"]
+            or not target_bytecode_materialization["pixel_subset"]
+            or not target_bytecode_materialization["vertex_compiled"]
+            or not target_bytecode_materialization["pixel_compiled"]
+            or not target_bytecode_materialization["materialized"]
+            or target_bytecode_materialization["creation_authorized"]
+            or target_bytecode_materialization["vertex_bytecode_hash"] == 0
+            or target_bytecode_materialization["pixel_bytecode_hash"] == 0
+            or target_bytecode_materialization["vertex_artifact"] == 0
+            or target_bytecode_materialization["pixel_artifact"] == 0
+        ):
+            target_bytecode_materialization_inexact.append(ref)
+            if missing_prerequisite is None:
+                missing_prerequisite = (
+                    "R283_TARGET_BYTECODE_MATERIALIZATION_EXACTNESS"
+                )
+        else:
+            target_bytecode_materialization_exact_signatures += 1
 
         if receipt is None:
             semantic_receipt_missing.append(ref)
@@ -661,9 +709,17 @@ def summarize_programmable_shader_inventory(
                 and target_materialization_contract is not None
                 and target_materialization_contract["exact"]
                 and target_materialization_contract["target_required"]
-                and target_materialization_contract["materialized"]
-                and target_materialization_contract["compile_authorized"]
+                and not target_materialization_contract["materialized"]
+                and not target_materialization_contract["compile_authorized"]
                 and not target_materialization_contract["creation_authorized"]
+                and target_bytecode_materialization is not None
+                and target_bytecode_materialization["exact"]
+                and target_bytecode_materialization["vertex_subset"]
+                and target_bytecode_materialization["pixel_subset"]
+                and target_bytecode_materialization["vertex_compiled"]
+                and target_bytecode_materialization["pixel_compiled"]
+                and target_bytecode_materialization["materialized"]
+                and not target_bytecode_materialization["creation_authorized"]
             ):
                 r242_object_ownership_missing.append(ref)
                 if missing_prerequisite is None:
@@ -680,6 +736,7 @@ def summarize_programmable_shader_inventory(
                 "ObjectCreationHandoff": object_creation_handoff,
                 "TranslatedArtifactReceipt": translated_artifact_receipt,
                 "TargetMaterializationContract": target_materialization_contract,
+                "TargetBytecodeMaterialization": target_bytecode_materialization,
                 "Receipt": receipt,
                 "MissingPrerequisite": missing_prerequisite,
                 "DiagnosticOnly": True,
@@ -702,6 +759,7 @@ def summarize_programmable_shader_inventory(
         and not object_creation_handoff_missing
         and not translated_artifact_receipt_missing
         and not target_materialization_contract_missing
+        and not target_bytecode_materialization_missing
         and not semantic_receipt_missing
     )
     return {
@@ -731,6 +789,8 @@ def summarize_programmable_shader_inventory(
             target_materialization_contract_inexact,
         "TargetBytecodeMaterializationMissingSignatures":
             target_bytecode_materialization_missing,
+        "TargetBytecodeMaterializationInexactSignatures":
+            target_bytecode_materialization_inexact,
         "SemanticReceiptEvidenceMissingSignatures": semantic_receipt_missing,
         "R242ObjectOwnershipMissingSignatures": r242_object_ownership_missing,
         "SemanticPlanExactSignatures": semantic_plan_exact_signatures,
@@ -742,6 +802,8 @@ def summarize_programmable_shader_inventory(
             translated_artifact_receipt_exact_signatures,
         "TargetMaterializationContractExactSignatures":
             target_materialization_contract_exact_signatures,
+        "TargetBytecodeMaterializationExactSignatures":
+            target_bytecode_materialization_exact_signatures,
         "SemanticReceiptExactSignatures": semantic_receipt_exact_signatures,
         "SemanticEvidenceCoverageComplete": semantic_evidence_coverage_complete,
         "EvidenceLimitedBySignatureDetailCap": detail_cap_saturated,
@@ -778,6 +840,7 @@ def main() -> int:
     object_creation_handoffs: dict[SignatureKey, dict] = {}
     translated_artifact_receipts: dict[SignatureKey, dict] = {}
     target_materialization_contracts: dict[SignatureKey, dict] = {}
+    target_bytecode_materializations: dict[SignatureKey, dict] = {}
     translated_semantic_receipts: dict[SignatureKey, dict] = {}
     declarations: dict[SignatureKey, list[dict]] = {}
     fixed_function: dict[SignatureKey, list[dict]] = {}
@@ -1010,6 +1073,59 @@ def main() -> int:
                 }
                 continue
 
+            match = R283_TARGET_BYTECODE_MATERIALIZATION_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                signature_key = (source_log, startup_epoch, signature_id)
+                target_bytecode_materializations[signature_key] = {
+                    "exact": bool(int(data["exact"])),
+                    "vertex_subset": bool(int(data["vertexSubset"])),
+                    "pixel_subset": bool(int(data["pixelSubset"])),
+                    "vertex_compiled": bool(int(data["vertexCompiled"])),
+                    "pixel_compiled": bool(int(data["pixelCompiled"])),
+                    "materialized": bool(int(data["materialized"])),
+                    "creation_authorized": bool(int(data["createAuthorized"])),
+                    "cache_key": int(data["cacheKey"], 16),
+                    "cache_key_hex": "0x" + data["cacheKey"].upper(),
+                    "vertex_source_bytes": int(data["vertexSourceBytes"]),
+                    "pixel_source_bytes": int(data["pixelSourceBytes"]),
+                    "vertex_source_hash": int(data["vertexSource"], 16),
+                    "vertex_source_hash_hex":
+                        "0x" + data["vertexSource"].upper(),
+                    "pixel_source_hash": int(data["pixelSource"], 16),
+                    "pixel_source_hash_hex":
+                        "0x" + data["pixelSource"].upper(),
+                    "vertex_bytecode_bytes": int(data["vertexBytes"]),
+                    "pixel_bytecode_bytes": int(data["pixelBytes"]),
+                    "vertex_bytecode_hash": int(data["vertexBytecode"], 16),
+                    "vertex_bytecode_hash_hex":
+                        "0x" + data["vertexBytecode"].upper(),
+                    "pixel_bytecode_hash": int(data["pixelBytecode"], 16),
+                    "pixel_bytecode_hash_hex":
+                        "0x" + data["pixelBytecode"].upper(),
+                    "vertex_artifact": int(data["vertexArtifact"], 16),
+                    "vertex_artifact_hex":
+                        "0x" + data["vertexArtifact"].upper(),
+                    "pixel_artifact": int(data["pixelArtifact"], 16),
+                    "pixel_artifact_hex":
+                        "0x" + data["pixelArtifact"].upper(),
+                    "target_materialization_contract_snapshot":
+                        int(data["contractSnapshot"], 16),
+                    "target_materialization_contract_snapshot_hex":
+                        "0x" + data["contractSnapshot"].upper(),
+                    "artifact_receipt_snapshot":
+                        int(data["artifactSnapshot"], 16),
+                    "artifact_receipt_snapshot_hex":
+                        "0x" + data["artifactSnapshot"].upper(),
+                    "translation_plan_snapshot": int(data["planSnapshot"], 16),
+                    "translation_plan_snapshot_hex":
+                        "0x" + data["planSnapshot"].upper(),
+                    "snapshot": int(data["snapshot"], 16),
+                    "snapshot_hex": "0x" + data["snapshot"].upper(),
+                }
+                continue
+
             match = R275_SEMANTIC_RECEIPT_RE.search(line)
             if match:
                 data = match.groupdict()
@@ -1169,6 +1285,9 @@ def main() -> int:
         )
         signature["target_materialization_contract"] = (
             target_materialization_contracts.get(signature_key)
+        )
+        signature["target_bytecode_materialization"] = (
+            target_bytecode_materializations.get(signature_key)
         )
         signature["translated_semantic_receipt"] = (
             translated_semantic_receipts.get(signature_key)
