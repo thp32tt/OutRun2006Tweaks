@@ -3254,3 +3254,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Fresh C + mandatory exact-SHA C3 and NEW actual in-game screenshots are still required. RUNTIME_VALIDATION=UNTESTED.
 - Confirmation modal screenshot164 remains separate runtime ID935 fix; Win32 Release and Korean Test Build both PASS.
 
+
+
+## 2026-10-08 01:25 KST — C257 C2 q188/q220/q222 fresh C + exact-SHA C3 PASS
+- `TEMP_BACKLOG_RELIEF=C2`; `SHARD=EVEN`. HEAD/queue refreshed per slot and before synchronization; no C1 shard stolen. Concurrent A/B evidence commits were preserved; selected DDS bytes did not drift.
+- Backend: GitHub source-of-truth. ChatGPT-local binary materialization hit container rate limiting, so N100 MCP fallback was used only for exact persisted DDS/canonical source download, decode/diff and neutral-background SOURCE/CLEAN/CURRENT evidence; no N100 Git worktree state was used.
+- q188 `8C259C68` @ `9fe3804a70d9...`: 6/6 bbox/source-size/positive-margin, changed/alpha outside=0, header/RAW mirror_y PASS; SOURCE/CLEAN/CURRENT practical/RAW visual PASS for B166/A88/B169 native-HD help rows. Fresh C + exact-SHA C3 PASS.
+- q220 `D657C2EB` @ `1a57c385e6c3...`: 7/7 containment/size/positive-margin, outside/alpha=0, header/RAW PASS; A88 C2C selector 420x55 inside 606x64 and preserved C142 red/gray/small families visual PASS. Fresh C + exact-SHA C3 PASS.
+- q222 `DDF0392A` @ `601a979b5ca1...`: DXT5 41,071 decoded changed pixels inside source union, alpha outside=0; exact target 3/3 containment/size/positive-margin; 3,456 changed BC3 blocks, outside patch=0. SOURCE/CLEAN/CURRENT practical/RAW PASS; source row-height hierarchy restored; song titles/Ferrari rows protected. Fresh C + exact-SHA C3 PASS.
+- IGR-001/002 remain open on q212; IGR-019 remains open on newer q193 C1; no in-game row closed. PRE_INGAME English-original refresh/user review + NEW actual-game validation pending. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
