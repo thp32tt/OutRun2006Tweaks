@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00510",
+  "production_id": "CONVERSION-DX9EX-00510",
+  "event_id": "CONVERSION-DX9EX-00510-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "selected_work_item": "DX9EX-R84-PORT-SEAM-R33-R32-SEPARATE-TU-001",
+  "base_sha": "67b6f788505a06240e7e716a6a5228081088df6f",
+  "initial_material_sha": "d1aa51e7c5d6ce38e8c0150b69a9d9dd350ab486",
+  "validation_bearing_result_sha": "44bdc57b24495de4dba27dfbe36cf2943d06c5b3",
+  "material_result_sha": "44bdc57b24495de4dba27dfbe36cf2943d06c5b3",
+  "result_sha": "44bdc57b24495de4dba27dfbe36cf2943d06c5b3",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00510]",
+  "summary": "Completed the R33/R32 separate-translation-unit convergence seam. R33 now reaches lower R31/R30/R29/R22/R13/R9 behavior only through the explicit R32Review split facade while preserving R33 physical hook ownership and lower-layer owner semantics. Structural verifiers were migrated from legacy direct-symbol assumptions to facade delegation/ownership checks. Exact-SHA policy, active game DLL, host/no-HMD smoke, separate-TU full-chain compile, package validation, and Domain Isolation all passed.",
+  "changed_paths": [
+    "src/vr/core/r32_review_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_r32_review.py",
+    "tools/verify_vr_refactor_contract.py",
+    "tools/verify_vr_r31_r32_retirement_guard.py"
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "validation_history": [
+    {
+      "sha": "d1aa51e7c5d6ce38e8c0150b69a9d9dd350ab486",
+      "dx9ex_active_run_id": 37591028720,
+      "result": "FAIL",
+      "classification": "STALE_VERIFIER_ALIGNMENT_REQUIRED",
+      "note": "Material split-facade implementation landed; legacy R32/R33 verifier still required direct lower-layer symbols."
+    },
+    {
+      "sha": "133e1680c974694540479de9d21bd2300a4a7e7c",
+      "dx9ex_active_run_id": 37591207822,
+      "result": "FAIL",
+      "classification": "REFACTOR_CONTRACT_ALIGNMENT_REQUIRED"
+    },
+    {
+      "sha": "0108d45bfded0cdb883b1c3d52e60aac47d1fd57",
+      "dx9ex_active_run_id": 37591340840,
+      "result": "FAIL",
+      "classification": "REFACTOR_CONTRACT_ALIGNMENT_REQUIRED"
+    },
+    {
+      "sha": "ebd2850da872264df7bef9482d5b92c29253cd7d",
+      "dx9ex_active_run_id": 37591489346,
+      "result": "FAIL",
+      "classification": "FACADE_DELEGATION_VERIFIER_ALIGNMENT_REQUIRED"
+    },
+    {
+      "sha": "32f02b3d052fdd5e824a5b0000fd20458a14b3f0",
+      "dx9ex_active_run_id": 37591596598,
+      "result": "FAIL",
+      "classification": "RETIREMENT_GUARD_ALIGNMENT_REQUIRED"
+    },
+    {
+      "sha": "76936379c86dbc1074a9c2a1010b3f11ed6706bc",
+      "dx9ex_active_run_id": 37591721422,
+      "result": "FAIL",
+      "classification": "TERMINAL_CENSUS_ALIGNMENT_REQUIRED"
+    },
+    {
+      "sha": "bfdf6be54fbdca84cff3e448bdfccebf2b81c913",
+      "dx9ex_active_run_id": 37591878490,
+      "result": "FAIL",
+      "classification": "PHYSICAL_TARGET_VERIFIER_ALIGNMENT_REQUIRED"
+    },
+    {
+      "sha": "39b7cf1f65ecfc51c4b2bf221be55784b5c84d46",
+      "dx9ex_active_run_id": 37592017386,
+      "result": "FAIL",
+      "classification": "FALLBACK_VERIFIER_ALIGNMENT_REQUIRED"
+    },
+    {
+      "sha": "44bdc57b24495de4dba27dfbe36cf2943d06c5b3",
+      "dx9ex_active_run_id": 37592122754,
+      "domain_isolation_run_id": 37592122753,
+      "result": "PASS",
+      "jobs": {
+        "policy": 112695868456,
+        "host": 112695998575,
+        "full_chain_compile": 112695998597,
+        "game": 112695998674,
+        "package": 112697764115
+      }
+    }
+  ],
+  "package_artifact": {
+    "id": 11469531673,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-44bdc57b24495de4dba27dfbe36cf2943d06c5b3",
+    "digest": "sha256:7fbd020b9f3a4d619b8dbf1abe08cf82be8f7598edc3d61a4df85f0a825982e4"
+  },
+  "protected_boundaries": [
+    "R33 remains sole physical draw/Reset/Present/DirectGPU hook owner",
+    "R32 split facade delegates to existing lower-layer owner APIs without duplicating their state",
+    "Active DX9Ex game path remains build-compatible",
+    "R33/R32 separate translation units compile successfully under the full-chain gate",
+    "No physical HMD/game runtime claim was made"
+  ],
+  "next_action": "Continue the latest R84-to-focus textual/CMake ownership convergence successor after the verified R33/R32 split; do not repeat this seam."
+}
