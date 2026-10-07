@@ -16,7 +16,9 @@
 // route accounting and diagnostic counter writes are skipped so the steady
 // draw path pays only for correctness checks required by stereo rendering.
 
+#ifndef OUTRUN_VR_REFACTOR_SPLIT_R33_R32
 #include "stereo_renderer_r32.cpp"
+#endif
 #include "../core/r32_review_api.hpp"
 #include "../state/state_block_recovery.hpp"
 #include "../state/state_block_tracker.hpp"
