@@ -6729,7 +6729,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 15:30 KST",
+  "updated_at_kst": "2026-10-07 15:40 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7275,40 +7275,12 @@
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "latest_b_manual_visual_rework": {
-    "run": "20261007-B-MANUALQA231-AA04D779-COVERAGE",
-    "queue_index": 46,
-    "asset": "AA04D779",
-    "trigger": "hardened coverage gate: ordinary lobby/control UI remained English under legacy gray-control preserve",
-    "before_candidate_sha256": "93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e",
-    "candidate_sha256": "d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0",
-    "github_hosted_worker_run": 37572479089,
-    "new_semantic_labels": 9,
-    "new_physical_rows": 13,
-    "new_text": [
-      "게임 전 로비",
-      "오프라인",
-      "브레이크",
-      "가속",
-      "기어 업",
-      "기어 다운",
-      "라이선스 보기",
-      "사용자 음악 / 변경",
-      "일시정지 / 메뉴"
-    ],
-    "explicit_preserve": [
-      "REV",
-      "TOP",
-      "You",
-      "1P/2P/3P/4P",
-      "icons/course symbols/numeric art"
-    ],
-    "report": "localization/graphics/role_B/20261007-B-MANUALQA231-AA04D779-COVERAGE/B231_AA04D779_REPORT.json",
-    "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA231-AA04D779-COVERAGE/B231_CONTROLLER_SELF_QA.json",
-    "machine_qa": "13/13 bbox+size+positive-margin; CLEAN/FINAL PASS; baseline blast-radius/alpha outside=0; residue/overlap=0; persisted DDS exact",
-    "presentation_qa": "PASS decoded persisted DDS + 100/75/50 + SOURCE/OLD/CLEAN/FINAL + RAW mirror_y",
-    "mandatory_c3": "REQUIRED_CURRENT_SHA_BEFORE_PRE_INGAME_EXPORT",
-    "status": "B231_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
-    "RUNTIME_VALIDATION": "UNTESTED"
+    "run": "20261007-B233-Q100-53CE39D5-ANCHOR",
+    "queue_index": 100,
+    "candidate_sha256": "7235731a2add8e947476cd22b971e5b57a7de390ae134609f4254a2f493a557d",
+    "status": "B233_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "next": "fresh independent C -> exact-SHA C3 -> regenerated PRE_INGAME English-original JPG -> user review -> actual-game validation",
+    "runtime_validation": "UNTESTED"
   },
   "latest_c_pre_ingame_export": {
     "timestamp_kst": "2026-10-07T10:17:06+09:00",
@@ -8303,5 +8275,13 @@
     "pre_ingame_manifest_count": 12,
     "pre_ingame_mandatory_c3_blocked_count": 10,
     "pre_ingame_controller_visual_qa": "PASS_FLIPY_RAW_ENGLISH_ORIGINAL_VS_CURRENT"
+  },
+  "b233_q100_53ce39d5_anchor_rework": {
+    "run": "20261007-B233-Q100-53CE39D5-ANCHOR",
+    "queue_index": 100,
+    "candidate_sha256": "7235731a2add8e947476cd22b971e5b57a7de390ae134609f4254a2f493a557d",
+    "status": "B233_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "next": "fresh independent C -> exact-SHA C3 -> regenerated PRE_INGAME English-original JPG -> user review -> actual-game validation",
+    "runtime_validation": "UNTESTED"
   }
 }
