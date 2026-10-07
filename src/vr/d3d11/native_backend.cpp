@@ -774,6 +774,36 @@ std::uint64_t r289_programmable_production_semantic_review_snapshot_token(
     return token == 0 ? 1 : token;
 }
 
+// R303 reconstructs the exact R262 full-resource review payload before the
+// production R292 activation-prerequisite boundary may trust its stored token.
+std::uint64_t recompute_programmable_output_resource_behavior_payload_snapshot(
+    const NativeProgrammableShaderOutputResourceBehaviorReadiness&
+        resourceBehavior) noexcept {
+    if (resourceBehavior.kind ==
+        NativeProgrammableShaderDrawCandidateKind::None)
+        return 0;
+
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(
+        token, static_cast<std::uint32_t>(resourceBehavior.kind));
+    token = mix_readiness_snapshot_token(
+        token, resourceBehavior.indexed ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, resourceBehavior.sourceRevalidationSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, resourceBehavior.textureBehaviorSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, resourceBehavior.texturePayloadSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, resourceBehavior.surfacePairSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, resourceBehavior.surfaceBindingSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, resourceBehavior.missingResourceScopeMask);
+    token = mix_readiness_snapshot_token(token, 0x262u);
+    return token == 0 ? 1 : token;
+}
+
 std::uint64_t r292_programmable_production_activation_prerequisite_snapshot_token(
     const NativeProgrammableShaderProductionActivationPrerequisiteEvidence&
         observation) noexcept {
@@ -787,6 +817,8 @@ std::uint64_t r292_programmable_production_activation_prerequisite_snapshot_toke
         token, observation.sourceRevalidationSnapshotToken);
     token = mix_readiness_snapshot_token(
         token, observation.resourceBehaviorSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.resourceBehaviorPayloadSnapshotMatches ? 1u : 0u);
     token = mix_readiness_snapshot_token(
         token, observation.prerequisiteHandoffSnapshotToken);
     token = mix_readiness_snapshot_token(
@@ -6339,11 +6371,17 @@ observe_programmable_shader_production_activation_prerequisites(
         out.resourceBehaviorReady &&
         resourceBehavior.reviewSnapshotToken ==
             resourceBehaviorSnapshotToken;
+    out.resourceBehaviorPayloadSnapshotMatches =
+        out.resourceBehaviorReady &&
+        resourceBehavior.reviewSnapshotToken ==
+            recompute_programmable_output_resource_behavior_payload_snapshot(
+                resourceBehavior);
 
     if (out.inputValid &&
         out.productionSemanticReviewSnapshotMatches &&
         out.sourceRevalidationSnapshotMatches &&
-        out.resourceBehaviorSnapshotMatches) {
+        out.resourceBehaviorSnapshotMatches &&
+        out.resourceBehaviorPayloadSnapshotMatches) {
         out.prerequisites =
             compose_programmable_activation_prerequisite_handoff(
                 sourceRevalidation,
@@ -6391,6 +6429,7 @@ observe_programmable_shader_production_activation_prerequisites(
         out.productionSemanticReviewSnapshotMatches &&
         out.sourceRevalidationSnapshotMatches &&
         out.resourceBehaviorSnapshotMatches &&
+        out.resourceBehaviorPayloadSnapshotMatches &&
         out.staticPrerequisitesSatisfied &&
         out.prerequisites.boundaryPreserved &&
         out.prerequisites.activationSnapshotToken == 0 &&

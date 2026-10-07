@@ -6792,6 +6792,36 @@ int main()
                 r259IndexedPrerequisiteHandoff.reviewSnapshotToken),
         "R259 indexed review handoff consumes exact F18+F21 while activation remains fail-closed");
 
+    auto r303TamperedR262ForProductionPrerequisites =
+        r262IndexedOutputResourceBehavior;
+    r303TamperedR262ForProductionPrerequisites.surfaceBindingSnapshotToken +=
+        1ull;
+    const auto r303TamperedProductionActivationPrerequisites =
+        outrun::vr::dx11::
+            observe_programmable_shader_production_activation_prerequisites(
+                r289ProductionSemanticReview,
+                r289ProductionSemanticReview.reviewSnapshotToken,
+                r258IndexedSourceRevalidation,
+                r258IndexedSourceRevalidation.snapshotToken,
+                r303TamperedR262ForProductionPrerequisites,
+                r303TamperedR262ForProductionPrerequisites.reviewSnapshotToken);
+    require(
+        r303TamperedProductionActivationPrerequisites.resourceBehaviorReady &&
+        r303TamperedProductionActivationPrerequisites.
+            resourceBehaviorSnapshotMatches &&
+        !r303TamperedProductionActivationPrerequisites.
+            resourceBehaviorPayloadSnapshotMatches &&
+        !r303TamperedProductionActivationPrerequisites.
+            prerequisiteHandoffReady &&
+        !r303TamperedProductionActivationPrerequisites.
+            prerequisiteHandoffSnapshotMatches &&
+        !r303TamperedProductionActivationPrerequisites.
+            staticPrerequisitesSatisfied &&
+        !r303TamperedProductionActivationPrerequisites.boundaryPreserved &&
+        !r303TamperedProductionActivationPrerequisites.reviewReady &&
+        r303TamperedProductionActivationPrerequisites.reviewSnapshotToken == 0,
+        "R303 rejects R262 payload drift before production prerequisite handoff");
+
     const auto r292ProductionActivationPrerequisites =
         outrun::vr::dx11::
             observe_programmable_shader_production_activation_prerequisites(
@@ -6812,6 +6842,8 @@ int main()
         r292ProductionActivationPrerequisites.resourceBehaviorReady &&
         r292ProductionActivationPrerequisites.
             resourceBehaviorSnapshotMatches &&
+        r292ProductionActivationPrerequisites.
+            resourceBehaviorPayloadSnapshotMatches &&
         r292ProductionActivationPrerequisites.prerequisiteHandoffReady &&
         r292ProductionActivationPrerequisites.
             prerequisiteHandoffSnapshotMatches &&

@@ -3702,6 +3702,8 @@ struct NativeProgrammableShaderProductionActivationPrerequisiteEvidence {
     bool sourceRevalidationSnapshotMatches{};
     bool resourceBehaviorReady{};
     bool resourceBehaviorSnapshotMatches{};
+    // R303 requires exact R262 payload reconstruction at the production gate.
+    bool resourceBehaviorPayloadSnapshotMatches{};
     bool prerequisiteHandoffReady{};
     bool prerequisiteHandoffSnapshotMatches{};
     bool staticPrerequisitesSatisfied{};
