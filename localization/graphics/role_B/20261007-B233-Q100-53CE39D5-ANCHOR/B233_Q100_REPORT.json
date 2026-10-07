@@ -792,7 +792,7 @@
     "5_no_clipping": "PASS_18_OF_18_POSITIVE_MARGIN",
     "6_protected_clearance": "PASS_ZERO_PREVIOUS_CANDIDATE_BLAST_OUTSIDE_REWORK",
     "7_flip_y_raw": "EVIDENCE_WRITTEN",
-    "8_immediate_readability": "PENDING_CONTROLLER_VISUAL"
+    "8_immediate_readability": "PASS_CONTROLLER_SOURCE_OLD_CLEAN_FINAL_100_50_25"
   },
   "post_encode_presentation_gate": {
     "decoded_persisted_dds_authority": "PASS",
@@ -805,8 +805,9 @@
     "rework_blast_radius": "PASS_ZERO_OUTSIDE_18_LINE_BBOXES",
     "coverage": "UNCHANGED_7_SEMANTIC_19_PHYSICAL_LINES"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER",
-  "status": "B233_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_FINAL_RAW_PRACTICAL",
+  "status": "B233_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_qa_report": "localization/graphics/role_B/20261007-B233-Q100-53CE39D5-ANCHOR/B233_CONTROLLER_SELF_QA.json"
 }
