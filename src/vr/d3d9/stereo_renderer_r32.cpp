@@ -430,7 +430,7 @@ namespace OutRunVRStereo
                 !R32DirectIdentityMatches())
                 R32InvalidateDirectInteropOnly();
 
-            if (!EnsureDirectTransportResources(device))
+            if (!R30SupportEnsureDirectTransportResources(device))
                 return false;
 
             R30SupportDirectTransportIdentity identity{};

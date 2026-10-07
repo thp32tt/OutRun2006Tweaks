@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00519",
+  "production_id": "CONVERSION-DX9EX-00519",
+  "event_id": "CONVERSION-DX9EX-00519-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "IMPLEMENTED_PENDING_VALIDATION",
+  "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-DIRECTGPU-RESOURCE-ENSURE-FACADE-001",
+  "base_sha": "3e94f788662f0424db4d83c1838162169e6f7b06",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00519]",
+  "summary": "Route R32's DirectGPU resource-ensure mutation call through the behavior-neutral R30 support facade, removing one more lower-owner dependency while preserving ACK/fence/slot/release and copy/publication behavior.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r32_runtime_support_seam.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00519.json"
+  ],
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "predecessor_task": "CONVERSION-DX9EX-00518",
+    "predecessor_validation_bearing_sha": "b4a72f66a59689ebdb6cac025976497a88095b5c",
+    "extracted_private_dependency": "EnsureDirectTransportResources(device)",
+    "intentionally_deferred": [
+      "R13ReleaseAckState",
+      "ReleaseDirectTransportSlots",
+      "ReleaseDirectInteropProbe",
+      "R13 ACK snapshot/backpressure",
+      "DirectTransportSlots/fence ownership",
+      "BackBuffer/RightEyeSurface"
+    ]
+  },
+  "protected_boundaries": [
+    "no ACK/fence/slot reuse or publication change",
+    "no DirectGPU copy/rejection policy change",
+    "no interop invalidation/release ordering change",
+    "no Reset/ResetEx or HUD/stereo policy change"
+  ],
+  "next_action": "Require exact-SHA DX9Ex Active Validation and Domain Isolation. If green, persist result evidence and select one remaining DirectGPU release/transport ownership subset as the next bounded seam."
+}

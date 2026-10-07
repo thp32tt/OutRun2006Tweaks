@@ -43,6 +43,7 @@ required = (
     "R30SupportTryGetEffectTelemetrySnapshot",
     "R30SupportDirectTransportIdentity",
     "R30SupportDirectTransportResourcesReady",
+    "R30SupportEnsureDirectTransportResources",
     "R30SupportTryGetDirectTransportIdentity",
     "R30SupportInvalidateEffectStateCache",
     "R30SupportInvalidateLiveStateSample",
@@ -72,6 +73,7 @@ for regex, label in (
     (r"\bSharedState\b", "SharedState"),
     (r"\bDirectInteropVerified\b", "DirectInteropVerified"),
     (r"\bDirectTransportResourcesReady\b", "DirectTransportResourcesReady"),
+    (r"(?<!R30Support)\bEnsureDirectTransportResources\(", "EnsureDirectTransportResources"),
     (r"(?<!R30Support)\bInvalidateEffectStateCache\(\)", "InvalidateEffectStateCache"),
     (r"(?<!R30Support)\bInvalidateLiveStateSample\(\)", "InvalidateLiveStateSample"),
     (r"OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore\(",
@@ -101,6 +103,9 @@ delegations = {
     ),
     "R30SupportDirectTransportResourcesReady()": (
         "return DirectTransportResourcesReady;",
+    ),
+    "R30SupportEnsureDirectTransportResources(": (
+        "return EnsureDirectTransportResources(device);",
     ),
     "R30SupportTryGetDirectTransportIdentity(": (
         "if (!SharedState || !DirectInteropVerified)",
