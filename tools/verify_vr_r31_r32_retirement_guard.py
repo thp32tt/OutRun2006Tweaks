@@ -645,7 +645,7 @@ lower_fail_closed = function_body(r32, "HRESULT R32LowerFailClosed(")
 require(
     lower_fail_closed,
     "R32 lower fail-close",
-    "!R9StereoBaselineSeeded()",
+    "!R30SupportStereoBaselineSeeded()",
     "R30SupportExchangeVertexShaderIdentity(0)",
     "const HRESULT hr = lowerDraw();",
     "R30SupportRestoreVertexShaderIdentityIfEmpty(savedIdentity)",

@@ -365,7 +365,8 @@ namespace OutRunVRStereo
             LowerDraw&& lowerDraw) noexcept
         {
             if (!R30SupportIsGameDevice(device) || R30SupportInternalStereoPassActive() ||
-                !R30SupportTargetIsBackBuffer() || !R30SupportStereoWanted() || !R9StereoBaselineSeeded())
+                !R30SupportTargetIsBackBuffer() || !R30SupportStereoWanted() ||
+                !R30SupportStereoBaselineSeeded())
                 return lowerDraw();
 
             OutRunVR::D3D9::LiveEffectRenderStateSnapshot snapshot{};

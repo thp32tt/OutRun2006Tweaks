@@ -38,6 +38,7 @@ required = (
     "R30SupportExchangeInternalStereoPass",
     "R30SupportPresentEpoch",
     "R30SupportStereoWanted",
+    "R30SupportStereoBaselineSeeded",
     "R30SupportTargetIsBackBuffer",
     "R30SupportEffectTelemetrySnapshot",
     "R30SupportTryGetEffectTelemetrySnapshot",
@@ -74,6 +75,7 @@ for regex, label in (
     (r"\bInternalStereoPass\b", "InternalStereoPass"),
     (r"\bPresentEpoch\b", "PresentEpoch"),
     (r"(?<!R30Support)\bStereoWanted\(\)", "StereoWanted"),
+    (r"\bR9StereoBaselineSeeded\(\)", "R9StereoBaselineSeeded"),
     (r"(?<!R30Support)\bTargetIsBackBuffer\(\)", "TargetIsBackBuffer"),
     (r"\bR29EffectTelemetrySnapshot\b", "R29EffectTelemetrySnapshot"),
     (r"(?<!R30Support)\bTryGetEffectTelemetrySnapshot\(", "TryGetEffectTelemetrySnapshot"),
@@ -104,6 +106,7 @@ delegations = {
     ),
     "R30SupportPresentEpoch()": ("return PresentEpoch;",),
     "R30SupportStereoWanted()": ("return StereoWanted();",),
+    "R30SupportStereoBaselineSeeded()": ("return R9StereoBaselineSeeded();",),
     "R30SupportTargetIsBackBuffer()": ("return TargetIsBackBuffer();",),
     "R30SupportTryGetEffectTelemetrySnapshot(": (
         "R29EffectTelemetrySnapshot lower{};",
@@ -201,6 +204,8 @@ if any(pos < 0 for pos in source_positions) or source_positions != sorted(source
     errors.append("R32 DirectGPU source-surface facade/check/copy ordering changed")
 
 fail_closed = body(r32, "HRESULT R32LowerFailClosed(")
+if "!R30SupportStereoBaselineSeeded()" not in fail_closed:
+    errors.append("R32 fail-closed baseline gate bypasses R30 owner facade")
 shader_order = (
     "R30SupportExchangeVertexShaderIdentity(0);",
     "const HRESULT hr = lowerDraw();",

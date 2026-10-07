@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00523",
+  "production_id": "CONVERSION-DX9EX-00523",
+  "event_id": "CONVERSION-DX9EX-00523-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "IMPLEMENTED_PENDING_VALIDATION",
+  "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-FAILCLOSE-BASELINE-PREDICATE-FACADE-001",
+  "base_sha": "418e3cf4c1cb6f62cda695ecc7673513393e44ad",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00523]",
+  "summary": "Route R32 lower fail-closed stereo-baseline readiness through the R30 support facade instead of consuming the R9 owner predicate directly, preserving the exact short-circuit eligibility order and read-only semantics.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r32_runtime_support_seam.py",
+    "tools/verify_vr_r31_r32_retirement_guard.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00523.json"
+  ],
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "review_lenses": [
+    "architecture/owner boundary",
+    "read-only predicate ownership",
+    "fail-closed stereo eligibility ordering",
+    "hot-path cost neutrality",
+    "adversarial raw R9 predicate reintroduction"
+  ],
+  "evidence": {
+    "predecessor_task": "CONVERSION-DX9EX-00522",
+    "predecessor_validation_bearing_sha": "73e9aa3ce2fb8cce4ab1bc0d90ee26403ed6045c",
+    "extracted_private_dependency": "R9StereoBaselineSeeded",
+    "facade_semantics": "single read-only forwarding predicate; no state mutation, allocation, COM lifetime, wait, copy or synchronization added",
+    "preserved_fail_closed_order": [
+      "game-device check",
+      "internal-stereo-pass check",
+      "backbuffer-target check",
+      "stereo-wanted check",
+      "stereo-baseline-seeded check",
+      "live-effect snapshot fail-close decision",
+      "shader identity exchange -> lower draw -> conditional restore"
+    ]
+  },
+  "protected_boundaries": [
+    "no R9 baseline state mutation or seeding policy change",
+    "no draw classification/WVP/projection change",
+    "no DirectGPU ACK/fence/slot/publication change",
+    "no Reset/ResetEx, Present, HUD, recenter, or OpenXR behavior change"
+  ],
+  "next_action": "Require exact-SHA DX9Ex Active Validation and Domain Isolation. If green, persist validation evidence and continue another bounded R32 lower-owner seam; runtime remains UNTESTED."
+}

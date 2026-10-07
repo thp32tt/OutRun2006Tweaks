@@ -3275,6 +3275,11 @@ namespace OutRunVRStereo
         return StereoWanted();
     }
 
+    bool R30SupportStereoBaselineSeeded() noexcept
+    {
+        return R9StereoBaselineSeeded();
+    }
+
     bool R30SupportTargetIsBackBuffer() noexcept
     {
         return TargetIsBackBuffer();
