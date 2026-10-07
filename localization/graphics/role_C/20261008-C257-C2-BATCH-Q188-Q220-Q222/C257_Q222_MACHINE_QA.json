@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261008-C257-C2-BATCH-Q188-Q220-Q222",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 222,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+  "candidate_sha256": "601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f",
+  "source_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+  "execution_backend": "GitHub source-of-truth; N100 MCP fallback only for exact GitHub DDS/source download, persisted-DDS decode/diff and visual evidence after ChatGPT-local binary materialization rate-limit.",
+  "independent_machine_qa": {
+    "candidate_sha256": "601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f",
+    "source_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+    "dimensions": [
+      1024,
+      2048
+    ],
+    "header_128_exact": true,
+    "source_clean_changed": 33634,
+    "source_clean_outside_exact_bbox_union": 0,
+    "source_candidate_changed": 41071,
+    "source_candidate_outside_exact_bbox_union": 0,
+    "alpha_changed_outside_exact_bbox_union": 0,
+    "candidate_clean_changed": 20215,
+    "candidate_clean_outside_exact_bbox_union": 0,
+    "exact_source_equal_on_removed_source_pixels": 1461,
+    "rows": [
+      {
+        "region": 0,
+        "original_bbox_raw": [
+          6,
+          1986,
+          548,
+          2038
+        ],
+        "localized_diff_bbox_raw": [
+          8,
+          1988,
+          376,
+          2034
+        ],
+        "source_size": [
+          542,
+          52
+        ],
+        "localized_diff_size": [
+          368,
+          46
+        ],
+        "containment": true,
+        "size_ceiling": true,
+        "positive_margin_diff": true
+      },
+      {
+        "region": 1,
+        "original_bbox_raw": [
+          4,
+          1913,
+          333,
+          1957
+        ],
+        "localized_diff_bbox_raw": [
+          4,
+          1916,
+          200,
+          1956
+        ],
+        "source_size": [
+          329,
+          44
+        ],
+        "localized_diff_size": [
+          196,
+          40
+        ],
+        "containment": true,
+        "size_ceiling": true,
+        "positive_margin_diff": false
+      },
+      {
+        "region": 2,
+        "original_bbox_raw": [
+          2,
+          1830,
+          627,
+          1888
+        ],
+        "localized_diff_bbox_raw": [
+          7,
+          1832,
+          378,
+          1886
+        ],
+        "source_size": [
+          625,
+          58
+        ],
+        "localized_diff_size": [
+          371,
+          54
+        ],
+        "containment": true,
+        "size_ceiling": true,
+        "positive_margin_diff": true
+      }
+    ],
+    "changed_bc3_blocks": 3456,
+    "changed_bc3_blocks_outside_exact_bbox_intersection": 0
+  },
+  "dxt5_exact_target_note": {
+    "producer_decoded_target_bboxes_raw": [
+      [
+        10,
+        1990,
+        376,
+        2034
+      ],
+      [
+        6,
+        1918,
+        199,
+        1954
+      ],
+      [
+        7,
+        1834,
+        378,
+        1886
+      ]
+    ],
+    "producer_positive_margin": "3/3 PASS",
+    "changed_bc3_blocks": 3456,
+    "changed_blocks_outside_patch": 0
+  },
+  "decision": "PASS",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "forbidden_domains_touched": []
+}
