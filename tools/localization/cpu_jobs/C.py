@@ -69,7 +69,7 @@ def load_mask(p,size):
 def comp(im,bg=(56,56,56,255)):
     z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
 def label_card(label,im,target_w=1024):
-    z=comp(im)
+    z=comp(im) if im.mode=="RGBA" else im.convert("RGB")
     if z.width!=target_w:
         h=round(z.height*target_w/z.width); z=z.resize((target_w,h),Image.Resampling.LANCZOS)
     c=Image.new("RGB",(z.width,z.height+28),(20,20,20)); c.paste(z,(0,28))
