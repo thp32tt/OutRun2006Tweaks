@@ -1,0 +1,496 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261007-B237-Q044-19CEDB9-C246-REWORK",
+  "queue_index": 44,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+  "execution_backend": "GITHUB_ACTIONS_REPOSITORY_BACKED_BINARY_PERSISTENCE; CHATGPT_LOCAL_CONTROLLER_VISUAL_REVIEW_REQUIRED",
+  "trigger": "C246_VISUAL_FAIL_REWORK_REQUIRED_TEXT_SCALE_TOO_SMALL_VS_SOURCE",
+  "source_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+  "before_candidate_sha256": "8c6a390cbadae23beff263bb0eea4ca935643d591b45bac9ca474fa108e5a913",
+  "candidate_sha256": "b80c7bf1f469c35b9ae98ae6cf8fb0cc830a93fb2da4d08cee10bd07528a0cc8",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754"
+  },
+  "font": {
+    "file": "NotoSansCJK-Bold.ttc",
+    "ttc_index": 1,
+    "family": "Noto Sans CJK KR Bold"
+  },
+  "construction": "exact pinned HD source -> exact source alpha clean plate -> fresh supersampled native Hangul -> source palette/effects/slant -> source-relative width/height restoration -> exact source-header DDS encode",
+  "rows": [
+    {
+      "key": "sector2",
+      "korean": "섹터 2",
+      "original_bbox": [
+        8,
+        100,
+        190,
+        160
+      ],
+      "localized_bbox": [
+        17,
+        103,
+        181,
+        157
+      ],
+      "source_size": [
+        182,
+        60
+      ],
+      "localized_size": [
+        164,
+        54
+      ],
+      "width_ratio": 0.9011,
+      "height_ratio": 0.9,
+      "margins": [
+        9,
+        9,
+        3,
+        3
+      ],
+      "slant": 0.12,
+      "tracking": 0.22,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "sector1",
+      "korean": "섹터 1",
+      "original_bbox": [
+        208,
+        100,
+        385,
+        160
+      ],
+      "localized_bbox": [
+        217,
+        103,
+        376,
+        157
+      ],
+      "source_size": [
+        177,
+        60
+      ],
+      "localized_size": [
+        159,
+        54
+      ],
+      "width_ratio": 0.8983,
+      "height_ratio": 0.9,
+      "margins": [
+        9,
+        9,
+        3,
+        3
+      ],
+      "slant": 0.12,
+      "tracking": 0.22,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "win",
+      "korean": "승리",
+      "original_bbox": [
+        418,
+        110,
+        500,
+        151
+      ],
+      "localized_bbox": [
+        423,
+        113,
+        495,
+        148
+      ],
+      "source_size": [
+        82,
+        41
+      ],
+      "localized_size": [
+        72,
+        35
+      ],
+      "width_ratio": 0.878,
+      "height_ratio": 0.8537,
+      "margins": [
+        5,
+        5,
+        3,
+        3
+      ],
+      "slant": 0.0,
+      "tracking": 0.28,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "lose",
+      "korean": "패배",
+      "original_bbox": [
+        528,
+        109,
+        635,
+        152
+      ],
+      "localized_bbox": [
+        534,
+        112,
+        628,
+        149
+      ],
+      "source_size": [
+        107,
+        43
+      ],
+      "localized_size": [
+        94,
+        37
+      ],
+      "width_ratio": 0.8785,
+      "height_ratio": 0.8605,
+      "margins": [
+        6,
+        7,
+        3,
+        3
+      ],
+      "slant": 0.0,
+      "tracking": 0.32,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "result",
+      "korean": "결과",
+      "original_bbox": [
+        32,
+        180,
+        247,
+        249
+      ],
+      "localized_bbox": [
+        42,
+        183,
+        236,
+        246
+      ],
+      "source_size": [
+        215,
+        69
+      ],
+      "localized_size": [
+        194,
+        63
+      ],
+      "width_ratio": 0.9023,
+      "height_ratio": 0.913,
+      "margins": [
+        10,
+        11,
+        3,
+        3
+      ],
+      "slant": 0.14,
+      "tracking": 0.58,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "ranking",
+      "korean": "랭킹",
+      "original_bbox": [
+        289,
+        180,
+        555,
+        259
+      ],
+      "localized_bbox": [
+        303,
+        184,
+        541,
+        255
+      ],
+      "source_size": [
+        266,
+        79
+      ],
+      "localized_size": [
+        238,
+        71
+      ],
+      "width_ratio": 0.8947,
+      "height_ratio": 0.8987,
+      "margins": [
+        14,
+        14,
+        4,
+        4
+      ],
+      "slant": 0.14,
+      "tracking": 0.65,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "stage",
+      "korean": "스테이지",
+      "original_bbox": [
+        571,
+        179,
+        765,
+        259
+      ],
+      "localized_bbox": [
+        575,
+        183,
+        761,
+        255
+      ],
+      "source_size": [
+        194,
+        80
+      ],
+      "localized_size": [
+        186,
+        72
+      ],
+      "width_ratio": 0.9588,
+      "height_ratio": 0.9,
+      "margins": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "slant": 0.14,
+      "tracking": 0.16,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "rank",
+      "korean": "랭크",
+      "original_bbox": [
+        788,
+        180,
+        964,
+        249
+      ],
+      "localized_bbox": [
+        796,
+        183,
+        956,
+        246
+      ],
+      "source_size": [
+        176,
+        69
+      ],
+      "localized_size": [
+        160,
+        63
+      ],
+      "width_ratio": 0.9091,
+      "height_ratio": 0.913,
+      "margins": [
+        8,
+        8,
+        3,
+        3
+      ],
+      "slant": 0.12,
+      "tracking": 0.35,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "you",
+      "korean": "나",
+      "original_bbox": [
+        1759,
+        193,
+        1897,
+        260
+      ],
+      "localized_bbox": [
+        1778,
+        196,
+        1878,
+        257
+      ],
+      "source_size": [
+        138,
+        67
+      ],
+      "localized_size": [
+        100,
+        61
+      ],
+      "width_ratio": 0.7246,
+      "height_ratio": 0.9104,
+      "margins": [
+        19,
+        19,
+        3,
+        3
+      ],
+      "slant": 0.12,
+      "tracking": 0.0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "diff",
+      "korean": "차이",
+      "original_bbox": [
+        1853,
+        312,
+        1975,
+        381
+      ],
+      "localized_bbox": [
+        1856,
+        315,
+        1972,
+        378
+      ],
+      "source_size": [
+        122,
+        69
+      ],
+      "localized_size": [
+        116,
+        63
+      ],
+      "width_ratio": 0.9508,
+      "height_ratio": 0.913,
+      "margins": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "slant": 0.12,
+      "tracking": 0.32,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "sector3",
+      "korean": "섹터 3",
+      "original_bbox": [
+        1832,
+        1180,
+        2013,
+        1240
+      ],
+      "localized_bbox": [
+        1841,
+        1183,
+        2004,
+        1237
+      ],
+      "source_size": [
+        181,
+        60
+      ],
+      "localized_size": [
+        163,
+        54
+      ],
+      "width_ratio": 0.9006,
+      "height_ratio": 0.9,
+      "margins": [
+        9,
+        9,
+        3,
+        3
+      ],
+      "slant": 0.12,
+      "tracking": 0.22,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "rival",
+      "korean": "라이벌",
+      "original_bbox": [
+        498,
+        1412,
+        705,
+        1486
+      ],
+      "localized_bbox": [
+        509,
+        1415,
+        694,
+        1483
+      ],
+      "source_size": [
+        207,
+        74
+      ],
+      "localized_size": [
+        185,
+        68
+      ],
+      "width_ratio": 0.8937,
+      "height_ratio": 0.9189,
+      "margins": [
+        11,
+        11,
+        3,
+        3
+      ],
+      "slant": 0.14,
+      "tracking": 0.24,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_qa": {
+    "rows": "12/12 PASS",
+    "changed_pixels_outside_exact_source_bboxes_vs_input": 0,
+    "changed_pixels_outside_exact_source_bboxes_vs_source": 0,
+    "alpha_changes_outside_exact_source_bboxes_vs_input": 0,
+    "alpha_changes_outside_exact_source_bboxes_vs_source": 0,
+    "clean_changed_outside_source_text_mask": 0,
+    "clean_source_residue_pixels": 0,
+    "localized_pair_overlap_pixels": 0,
+    "header_128_exact": true,
+    "mip_count": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_english_removal_plate_restoration": "PASS_EXACT_TRANSPARENT_SOURCE_FOOTPRINT",
+    "2_source_matching_slant": "PASS_SOURCE_FAMILY_PER_ROW",
+    "3_no_undersized_lettering": "PASS_MATERIAL_SOURCE_RELATIVE_SCALE_RESTORATION",
+    "4_source_faithful_weight_effect": "PASS_SOURCE_PALETTE_OUTLINE_INNER_EFFECT",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGIN_12_OF_12",
+    "6_protected_art_clearance": "PASS_ZERO_BLAST_OUTSIDE_EXACT_SOURCE_BBOXES",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER_VISUAL_CONFIRM",
+    "8_immediate_readability": "EVIDENCE_WRITTEN_PENDING_CONTROLLER_VISUAL_CONFIRM"
+  },
+  "controller_visual_qa": "PENDING_CHATGPT_LOCAL_CONTROLLER",
+  "status": "B237_WORKER_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA_AND_FRESH_C",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
