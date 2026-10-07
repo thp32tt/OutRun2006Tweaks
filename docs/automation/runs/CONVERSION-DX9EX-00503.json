@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00503",
+  "production_id": "CONVERSION-DX9EX-00503",
+  "event_id": "CONVERSION-DX9EX-00503-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "base_sha": "959b3605e174c93fc1009da5cbd50e649c6c169b",
+  "source_material_sha": "a402d2d40a5c8584a0c6d16f6c935885f5d4438a",
+  "validation_bearing_result_sha": "ff0b160ee6bff2432d293a2f7e561081781bcbed",
+  "result_sha": "ff0b160ee6bff2432d293a2f7e561081781bcbed",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00503]",
+  "selected_work_item": "DX9EX-STABILITY-R13-DIRECTGPU-HARD-ERROR-QUARANTINE-0085",
+  "summary": "Aligned the R13 physical fallback with the final R32 DirectGPU fail-closed lifetime invariant. Producer EVENT hard errors, partial shared-eye copy failures, and EVENT Issue failures now quarantine the R13 DirectGPU copy path until ResetEx instead of clearing or reusing ownership that GPU completion cannot prove.",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "changed_paths": [
+      "src/vr/d3d9/stereo_renderer_r13.cpp",
+      "tools/verify_vr_dx9ex_reset_transport_contract.py"
+    ],
+    "tdd_red": {
+      "sha": "93ea084a156d9dd22f1ee1f25c37083188e0a9b0",
+      "run_id": 37552991944,
+      "result": "EXPECTED_FAILURE",
+      "signature": "R13 fallback DirectGPU rejection state missing"
+    },
+    "canonical_gate": {
+      "run_id": 37553259311,
+      "result": "SUCCESS",
+      "head_sha": "ff0b160ee6bff2432d293a2f7e561081781bcbed"
+    },
+    "domain_isolation": {
+      "run_id": 37553259331,
+      "result": "SUCCESS",
+      "head_sha": "ff0b160ee6bff2432d293a2f7e561081781bcbed"
+    },
+    "package_artifact_id": 11453847716,
+    "package_artifact_digest": "sha256:755957ea99b7c62df24645ba944ad1f264bbdd842be3f36d126543b21b471b90",
+    "verifier_repairs": [
+      "a402d2d40a5c8584a0c6d16f6c935885f5d4438a implemented the source quarantine.",
+      "6325326d93d4701f3b6cedd064437aabc0aeabca scoped the rejection-gate verifier to avoid an earlier unrelated return false.",
+      "ff0b160ee6bff2432d293a2f7e561081781bcbed split copy-failure and Issue-failure verifier scopes to avoid duplicate marker ambiguity."
+    ]
+  },
+  "next_action": "Continue one bounded statically provable DirectGPU/resource-lifetime/frame-pacing improvement from latest HEAD. RUNTIME_VALIDATION remains UNTESTED."
+}
