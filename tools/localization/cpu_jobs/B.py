@@ -19,7 +19,8 @@ asset="textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds"
 cand=repo/"localization/graphics/hd_candidates"/asset
 clean_path=repo/"localization/graphics/role_A/20261004-A-PRODUCTION16/841E796B_HD_CLEAN_PLATE.png"
 SOURCE_SHA="112f47e7b16ecf21f722738f7fc9053d1a9852d66da9ef9d29fd25dadf2f567e"
-BEFORE_SHA="6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad"
+ORIGINAL_C103_SHA="6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad"
+BEFORE_SHA="5e7af1d49c0ef87406d7a17b4c52fe2044dcd8c9f6fe001a1a89f5a479a5715e"
 SRC_COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 src_url=f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{SRC_COMMIT}/Release/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds"
 tmp=Path("/tmp/b232"); tmp.mkdir(exist_ok=True)
@@ -123,6 +124,10 @@ tile.alpha_composite(fg)
 tbx=tile.getbbox()
 if tbx: tile=tile.crop(tbx)
 aw,ah=no_bb[2]-no_bb[0],no_bb[3]-no_bb[1]
+# Controller visual QA rejected B232 v1 as undersized vs source No / prior accepted 56px top-line hierarchy.
+# Restore the compact one-glyph line to 56px visual width while retaining its native height and positive margins.
+if tile.width < 56:
+    tile=tile.resize((56,tile.height),Image.Resampling.LANCZOS)
 if tile.width>aw-2 or tile.height>ah-2:
     scale=min((aw-2)/tile.width,(ah-2)/tile.height)
     tile=tile.resize((max(1,int(tile.width*scale)),max(1,int(tile.height*scale))),Image.Resampling.LANCZOS)
@@ -186,8 +191,8 @@ ps.save(out/"B232_841E_PRACTICAL_100_75_50.jpg","JPEG",quality=94,subsampling=0)
 report={
  "schema_version":1,"role":"B","run":run,"queue_index":107,"work_stolen_from_lane":"A",
  "selection_reason":"B even-shard actionable producer work exhausted; PRE_INGAME semantic false-negative found on oldest reviewed odd candidate",
- "asset":asset,"source_sha256":SOURCE_SHA,"before_candidate_sha256":BEFORE_SHA,"candidate_sha256":after,
- "defect":"SEMANTIC_ORDER_UNNATURAL: catalog intended 핸디캡 없음 but raster mapping rendered 없음 / 핸디캡",
+ "asset":asset,"source_sha256":SOURCE_SHA,"original_c103_candidate_sha256":ORIGINAL_C103_SHA,"before_candidate_sha256":BEFORE_SHA,"candidate_sha256":after,
+ "defect":"SEMANTIC_ORDER_UNNATURAL plus B232_v1 controller visual hierarchy undersize; v1 rejected before shared-state promotion",
  "translation":{"source":"No Handicap","prior":"없음 / 핸디캡","final":"무 / 핸디캡","read_as":"무 핸디캡",
    "reason":"natural compact Korean compound while preserving narrow upper No line and wide lower Handicap line source geometry"},
  "source_line_bboxes":{"No":no_bb,"Handicap":handicap_bb},
@@ -204,7 +209,7 @@ report={
    "no_undersizing":"PASS_SOURCE_NARROW_LINE_MAX_SAFE_NATIVE","weight_effect":"PASS_REUSED_ACCEPTED_PALETTE",
    "no_clipping":"PASS_POSITIVE_MARGIN","protected_clearance":"PASS_ZERO_OUTSIDE_SOURCE_LINES",
    "raw_flipy":"PASS_EVIDENCE_WRITTEN","immediate_readability":"PENDING_CONTROLLER_VISUAL"},
- "controller_visual_qa":"PENDING_CONTROLLER_VISUAL","status":"B232_WORKER_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+ "controller_visual_qa":"PENDING_CONTROLLER_VISUAL","status":"B232R_WORKER_PASS_PENDING_CONTROLLER_FRESH_C_C3",
  "RUNTIME_VALIDATION":"UNTESTED","no_vr_ffb_dx11_dxvk_work":True}
 (out/"B232_841E_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 (wr/"B232_841E796B.json").write_text(json.dumps({"role":"B","run":run,"queue_index":107,"candidate_sha256":after,
