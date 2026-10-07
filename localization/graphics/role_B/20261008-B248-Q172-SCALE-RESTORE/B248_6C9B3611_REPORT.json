@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261008-B248-Q172-SCALE-RESTORE",
+  "timestamp_kst": "2026-10-08T07:58:06+09:00",
+  "base_head": "374b86ee958c6edef9616de596c02804651e5d70",
+  "queue_index": 172,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "base_candidate_sha256": "963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc",
+  "c_return": "C264_REWORK_REQUIRED_SOURCE_RELATIVE_SCALE",
+  "construction": "Reuse B191 verified clean plate/source bboxes; native rerender reviewed 출발/골 at 1024x1024 with restored source-relative scale and the same pale face/orange shadow/right lean. Preserve all non-label pixels and RGBA32 header/raw mirror_y.",
+  "rows": [
+    {
+      "key": "start",
+      "source": "START",
+      "korean": "출발",
+      "source_bbox": [
+        55,
+        373,
+        136,
+        396
+      ],
+      "localized_bbox": [
+        66,
+        374,
+        125,
+        395
+      ],
+      "source_width": 81,
+      "source_height": 23,
+      "localized_width": 59,
+      "localized_height": 21,
+      "width_ratio_pct": 72.84,
+      "height_ratio_pct": 91.3,
+      "margins": [
+        11,
+        11,
+        1,
+        1
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "goal",
+      "source": "GOAL",
+      "korean": "골",
+      "source_bbox": [
+        595,
+        635,
+        672,
+        659
+      ],
+      "localized_bbox": [
+        613,
+        636,
+        653,
+        658
+      ],
+      "source_width": 77,
+      "source_height": 24,
+      "localized_width": 40,
+      "localized_height": 22,
+      "width_ratio_pct": 51.95,
+      "height_ratio_pct": 91.67,
+      "margins": [
+        18,
+        19,
+        1,
+        1
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "static_qa": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "changed_outside_source_bboxes": 0,
+    "alpha_changed_outside": 0,
+    "protected_non_target_exact": true,
+    "header_128_exact": true,
+    "mipmaps": 1,
+    "persisted_decode_exact": true,
+    "raw_orientation": "mirror_y",
+    "status": "PASS"
+  },
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "candidate_sha256": "51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_B191_B248_PRACTICAL_RAW",
+  "status": "B248_SELF_QA_PASS_PENDING_FRESH_C2_C3_PRE_INGAME_USER_JPG_INGAME",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

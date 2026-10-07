@@ -3424,3 +3424,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - TEMP_BACKLOG_RELIEF=C2, SHARD=EVEN. Live HEAD/queue refresh selected even PRE_INGAME visual-rework candidates q140/q154/q164 only.
 - Hosted worker stayed pending; N100 MCP memory-stream fallback independently verified exact source/candidate SHA. q140 6/6, q154 8/8, q164 1/1 bbox/size/positive-margin PASS; outside/alpha/source-outside/protected=0 in authoritative orientation.
 - Fresh SOURCE/CLEAN/CURRENT controller contacts PASS for all three; exact-SHA C3_STRICT_PASS. PRE_INGAME English-original refresh, user JPG review and NEW actual-game retest remain pending. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+
+### 2026-10-08 07:58:06 KST — B248 q172 6C9B3611 source-scale restore
+- Refreshed exact GitHub branch/queue before selection and before final commit; q172 remained C264 REWORK_REQUIRED on B191 963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc, so completed work was not repeated.
+- Reused B191 verified clean plate/source bboxes; native-rerendered START→출발 / GOAL→골. Accepted candidate 51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd.
+- START 33x19 -> 59x21 in 81x23 (40.74% -> 72.84% width); GOAL 19x20 -> 40x22 in 77x24 (24.68% -> 51.95%). Positive margins retained.
+- Machine QA: 2/2 containment/source-size/positive-margin PASS; changed/alpha outside=0; protected non-target exact; RGBA32 header/mip1/persisted decode/RAW mirror_y PASS.
+- Ordered 8-step producer gate plus SOURCE/CLEAN/B191/B248, practical 100/75/50 and RAW visual review PASS. Fresh C2 -> exact-SHA C3 -> PRE_INGAME/user JPG -> NEW actual-game validation remain. RUNTIME_VALIDATION=UNTESTED.
+- GitHub remained SSOT. N100 MCP fallback was used only after ChatGPT-local GitHub DNS failure, binary connector upload failure, and fresh-clone ENOSPC. VR/FFB/DX11/DXVK untouched.

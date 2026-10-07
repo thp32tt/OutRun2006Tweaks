@@ -4062,35 +4062,24 @@
   "current_producer_rework_remaining": 0,
   "current_producer_rework_assets": [],
   "latest_b_production": {
-    "run": "20261008-B247-Q062-TRANSPARENT-L43-CLEAN",
-    "timestamp_kst": "2026-10-08T05:50:00+09:00",
+    "run": "20261008-B248-Q172-SCALE-RESTORE",
+    "timestamp_kst": "2026-10-08T07:58:06+09:00",
     "role": "B",
-    "queue_index": 62,
-    "asset": "33491F83",
-    "prior_candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
-    "candidate_sha256": "dcec31a16d2a21d34bcf6ef33267b31d2940072ca897060a3ad52147a5d101d4",
-    "material_commit": "18b2151f0adf36cf4f8b91c99274cd77baf4dcc6",
-    "machine_qa": {
-      "rows": "2/2 PASS",
-      "easy_white_to_transparent": 12028,
-      "hard_white_to_transparent": 12267,
-      "opaque_white_background": 0,
-      "changed_outside": 0,
-      "alpha_outside": 0,
-      "non_target_exact": true,
-      "header_exact": true,
-      "mips": 1,
-      "raw_orientation": "mirror_y",
-      "persisted_decode": "PASS"
+    "queue_index": 172,
+    "asset": "6C9B3611",
+    "c_return": "C264_REWORK_REQUIRED_SOURCE_RELATIVE_SCALE",
+    "prior_candidate_sha256": "963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc",
+    "candidate_sha256": "51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd",
+    "scale_restore": {
+      "start": "33x19 -> 59x21; source 81x23; width 40.74% -> 72.84%",
+      "goal": "19x20 -> 40x22; source 77x24; width 24.68% -> 51.95%"
     },
-    "visual_qa": {
-      "decision": "PASS",
-      "source_reject_clean_final": "PASS",
-      "practical": "PASS",
-      "raw": "PASS"
-    },
-    "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
-    "status": "B247_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
+    "machine_qa": "2/2 bbox+size+positive-margin PASS; changed/alpha outside=0; protected non-target exact; header/mip1/persisted decode/raw mirror_y PASS",
+    "controller_visual_qa": "PASS_SOURCE_CLEAN_B191_B248_PRACTICAL_100_75_50_RAW",
+    "report": "localization/graphics/role_B/20261008-B248-Q172-SCALE-RESTORE/B248_6C9B3611_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261008-B248-Q172-SCALE-RESTORE/B248_CONTROLLER_SELF_QA.json",
+    "execution_backend": "N100_MCP_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILURE_AND_FRESH_CLONE_ENOSPC; GITHUB_SSOT_RECONCILED_BEFORE_PUSH",
+    "status": "B248_SELF_QA_PASS_PENDING_FRESH_C2_C3_PRE_INGAME_USER_JPG_INGAME",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
@@ -4233,7 +4222,8 @@
     "39229D64",
     "C4A2937B",
     "EBEF6D20",
-    "A8CE339F"
+    "A8CE339F",
+    "6C9B3611"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6750,7 +6740,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T06:57:54+09:00",
+  "updated_at_kst": "2026-10-08T07:58:06+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -10505,6 +10495,28 @@
     },
     "controller_report": "localization/graphics/role_C/20261008-C267-C2-Q140-Q154-Q164/C267_CONTROLLER_FINAL_QA.json",
     "pre_ingame_export": "PENDING_REFRESH_TRIGGERED_BY_STATE_COMMIT",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "b248_q172_6c9b3611_scale_restore": {
+    "run": "20261008-B248-Q172-SCALE-RESTORE",
+    "timestamp_kst": "2026-10-08T07:58:06+09:00",
+    "role": "B",
+    "queue_index": 172,
+    "asset": "6C9B3611",
+    "c_return": "C264_REWORK_REQUIRED_SOURCE_RELATIVE_SCALE",
+    "prior_candidate_sha256": "963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc",
+    "candidate_sha256": "51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd",
+    "scale_restore": {
+      "start": "33x19 -> 59x21; source 81x23; width 40.74% -> 72.84%",
+      "goal": "19x20 -> 40x22; source 77x24; width 24.68% -> 51.95%"
+    },
+    "machine_qa": "2/2 bbox+size+positive-margin PASS; changed/alpha outside=0; protected non-target exact; header/mip1/persisted decode/raw mirror_y PASS",
+    "controller_visual_qa": "PASS_SOURCE_CLEAN_B191_B248_PRACTICAL_100_75_50_RAW",
+    "report": "localization/graphics/role_B/20261008-B248-Q172-SCALE-RESTORE/B248_6C9B3611_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261008-B248-Q172-SCALE-RESTORE/B248_CONTROLLER_SELF_QA.json",
+    "execution_backend": "N100_MCP_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILURE_AND_FRESH_CLONE_ENOSPC; GITHUB_SSOT_RECONCILED_BEFORE_PUSH",
+    "status": "B248_SELF_QA_PASS_PENDING_FRESH_C2_C3_PRE_INGAME_USER_JPG_INGAME",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }

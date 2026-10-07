@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261008-B248-Q172-SCALE-RESTORE",
+  "timestamp_kst": "2026-10-08T07:58:06+09:00",
+  "base_head": "374b86ee958c6edef9616de596c02804651e5d70",
+  "queue_index": 172,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+  "prior_candidate_sha256": "963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc",
+  "candidate_sha256": "51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd",
+  "c_return": "C264_REWORK_REQUIRED_SOURCE_RELATIVE_SCALE",
+  "machine_qa": "2/2 bbox+size+positive-margin PASS; changed/alpha outside=0; protected non-target exact; header/mip1/persisted decode/raw mirror_y PASS",
+  "ordered_generation_gate": {
+    "1_plate": "PASS_B191_VERIFIED_CLEAN_RECHECKED",
+    "2_slant": "PASS_SOURCE_MATCHING_RIGHT_LEAN",
+    "3_scale": "PASS_START_72.84_PCT_GOAL_51.95_PCT_SOURCE_WIDTH",
+    "4_weight_effects": "PASS_PALE_FACE_ORANGE_SHADOW_FAMILY",
+    "5_clipping": "PASS_POSITIVE_MARGINS",
+    "6_protected": "PASS_ZERO_OUTSIDE_NON_TARGET_EXACT",
+    "7_flip_y_raw": "PASS",
+    "8_practical_readability": "PASS_100_75_50"
+  },
+  "controller_visual_observations": [
+    "SOURCE/CLEAN/B191/B248 contact shows C264 scale defect materially corrected without source residue or plate seams.",
+    "출발 and 골 remain inside exact source bboxes and preserve red-badge family/right lean.",
+    "Practical 100/75/50 and RAW mirror-Y review show no clipping, overlap, broken Hangul, protected-art intrusion or orientation regression."
+  ],
+  "controller_visual_qa": "PASS",
+  "fresh_independent_c": "REQUIRED_C2_EVEN_SHARD",
+  "mandatory_c3": "REQUIRED_EXACT_SHA",
+  "pre_ingame_user_jpg": "PENDING_AFTER_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
