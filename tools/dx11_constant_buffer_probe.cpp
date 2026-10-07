@@ -6146,6 +6146,55 @@ int main()
         r285BackendOwnership.cache().entry_count() == 1,
         "R286 production source-evidence bridge reaches R285 ownership without binding or draw");
 
+    const auto r288TranslationAdmission =
+        outrun::vr::dx11::seal_programmable_shader_translation_admission(
+            programmablePair,
+            r286ProductionObservation,
+            r286ProductionObservation.reviewSnapshotToken);
+    require(
+        r288TranslationAdmission.inputValid &&
+        r288TranslationAdmission.sourceIdentityExact &&
+        r288TranslationAdmission.productionObservationReady &&
+        r288TranslationAdmission.productionObservationSnapshotMatches &&
+        r288TranslationAdmission.translatedSemanticReceiptReady &&
+        r288TranslationAdmission.translatedSemanticReceiptSnapshotMatches &&
+        r288TranslationAdmission.cacheIdentityMatches &&
+        r288TranslationAdmission.translationObjectReady &&
+        !r288TranslationAdmission.objectBindingAuthorized &&
+        !r288TranslationAdmission.nativeDrawPathActivationAllowed &&
+        !r288TranslationAdmission.drawDispatchAuthorized &&
+        r288TranslationAdmission.diagnosticOnly &&
+        r288TranslationAdmission.boundaryPreserved &&
+        r288TranslationAdmission.reviewReady &&
+        r288TranslationAdmission.cacheKey == programmablePair.cacheKey &&
+        r288TranslationAdmission.backendOwnerGeneration ==
+            r286ProductionObservation.backendOwnerGeneration &&
+        r288TranslationAdmission.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_shader_translation_admission_snapshot(
+                programmablePair,
+                r286ProductionObservation,
+                r286ProductionObservation.reviewSnapshotToken,
+                r288TranslationAdmission,
+                r288TranslationAdmission.reviewSnapshotToken),
+        "R288 translation admission seals exact R286/R275 readiness without authorizing binding or draw");
+
+    const auto r288TamperedObservationToken =
+        r286ProductionObservation.reviewSnapshotToken ^ 0x1ull;
+    const auto r288TamperedTranslationAdmission =
+        outrun::vr::dx11::seal_programmable_shader_translation_admission(
+            programmablePair,
+            r286ProductionObservation,
+            r288TamperedObservationToken);
+    require(
+        r288TamperedTranslationAdmission.inputValid &&
+        r288TamperedTranslationAdmission.productionObservationReady &&
+        !r288TamperedTranslationAdmission.productionObservationSnapshotMatches &&
+        !r288TamperedTranslationAdmission.boundaryPreserved &&
+        !r288TamperedTranslationAdmission.reviewReady &&
+        r288TamperedTranslationAdmission.reviewSnapshotToken == 0,
+        "R288 translation admission rejects tampered R286 snapshot");
+
     const auto r286StaleMappingObservation =
         outrun::vr::dx11::
             observe_programmable_shader_production_source_evidence_chain(
