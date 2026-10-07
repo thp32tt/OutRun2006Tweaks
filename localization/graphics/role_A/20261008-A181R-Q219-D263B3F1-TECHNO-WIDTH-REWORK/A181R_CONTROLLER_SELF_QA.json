@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK",
+  "timestamp_kst": "2026-10-08T08:17:00+09:00",
+  "queue_index": 219,
+  "asset": "D263B3F1",
+  "trigger": "C265_REWORK_REQUIRED_SOURCE_RELATIVE_SCALE_AND_TECHNO_FAMILY_FIDELITY",
+  "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+  "rejected_a113_sha256": "f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24",
+  "rejected_a181_wrong_font_sha256": "e4db9a5b759d878469c297854f8b5179bd2b783063553c9cf6ef3520d9864265",
+  "candidate_sha256": "41cf4c15853ec7df777c622cd3d3190e3e7d7a8ed1757902158525cb69d8da19",
+  "machine_qa": {
+    "source_bbox": [
+      6,
+      1011,
+      1473,
+      1129
+    ],
+    "source_size": [
+      1467,
+      118
+    ],
+    "localized_bbox": [
+      152,
+      1018,
+      1326,
+      1121
+    ],
+    "localized_size": [
+      1174,
+      103
+    ],
+    "source_width_ratio": 0.8003,
+    "margins": [
+      146,
+      147,
+      7,
+      8
+    ],
+    "changed_outside_source_bbox": 0,
+    "alpha_changed_outside_source_bbox": 0,
+    "header_128_exact": true,
+    "mips": 1,
+    "persisted_decode": "PASS",
+    "raw_orientation": "mirror_y"
+  },
+  "font_gate": {
+    "a181_result": "REJECTED_DEJAVUSANS_FALLBACK",
+    "a181r_font": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "a181r_font_requirement": "PASS"
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_review": [
+    "SOURCE / rejected A113 / validated CLEAN / A181R FINAL comparison reviewed",
+    "practical-scale comparison reviewed",
+    "RAW DDS orientation comparison reviewed",
+    "C265 27.0% severe hierarchy underfill is materially repaired to 80.03% source width",
+    "right-readable lean and extended silver-techno hierarchy retained",
+    "no visible source residue, clipping, broken Hangul, protected-art intrusion or orientation mismatch"
+  ],
+  "decision": "A181R_SELF_QA_PASS_PENDING_FRESH_C1_C3_PRE_INGAME_USER_JPG_AND_NEW_INGAME_RETEST",
+  "igr_025": "REMAINS_HOLD_FOR_SCREENSHOT_163_REMAINING_RUNTIME_VS_DDS_MAPPING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
