@@ -68,6 +68,17 @@ for r in prior["rows"]:
     rows.append(row)
 if len(rows)!=17: raise RuntimeError(("row count",len(rows)))
 
+# Current contract's hard permitted region is each exact source glyph/effect BBOX, not the
+# historical union-of-old-target-alpha helper mask. Rebuild the permission/protection masks
+# from the 17 measured original_bboxes so a new source-faithful slant may occupy previously
+# empty pixels inside the same source bbox, while every source-visible pixel outside remains protected.
+allowed=Image.new("L",(W,H),0)
+ad=ImageDraw.Draw(allowed)
+for row in rows:
+    x0,y0,x1,y1=row["original_bbox"]
+    ad.rectangle((x0,y0,x1-1,y1-1),fill=255)
+protected=ImageChops.multiply(bmask(src.getchannel("A")),ImageOps.invert(allowed))
+
 # Revalidate the exact verified clean plate before lettering.
 tmp=Path("/tmp/b229"); tmp.mkdir(exist_ok=True)
 sp=tmp/"source.png"; cp=tmp/"clean.png"; smp=tmp/"source_mask.png"; pp=tmp/"protected.png"
@@ -269,7 +280,10 @@ new_slip=next(r for r in outrows if r["key"]=="slipstream_cars")
 report={
  "schema_version":1,"role":"B","run":run,"queue_index":54,"asset":asset,
  "trigger":"PRE_INGAME_004_CURRENT_POLICY_SOURCE_TRANSFORM_AND_SCALE_FALSE_NEGATIVE_RETRY_AFTER_PAIRWISE_COLLISION_GATE",
- "failed_attempt":{"workflow_run":37560975826,"candidate_persisted":False,"reason":"controller/worker pairwise collision gate rejected first geometry before DDS persistence: match_total/count_gifts and hold_line/honk_horn overlap; retry constrains unchanged-scale rows inside prior non-overlapping vertical envelopes"},
+ "failed_attempts":[
+   {"workflow_run":37560975826,"candidate_persisted":False,"reason":"pairwise collision gate rejected first geometry before DDS persistence: match_total/count_gifts and hold_line/honk_horn overlap"},
+   {"workflow_run":37561234026,"candidate_persisted":False,"reason":"historical helper allowed-mask was narrower than the current exact source-bbox policy and rejected 23,361 newly slanted pixels that were still inside measured original bboxes; retry rebuilds permission/protection from the 17 exact original_bboxes"}
+ ],
  "review_jpg":"localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/004_q054_FA7BBB13.jpg",
  "prior_status":"C_USERPOLICY02_PASS_PENDING_INGAME",
  "source_sha256":SOURCE_SHA,"before_candidate_sha256":EXPECTED_BEFORE,"candidate_sha256":AFTER,
