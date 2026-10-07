@@ -116,8 +116,14 @@ require(
 )
 require(
     r33,
-    "R33 neutral shader dependency",
-    "OutRunVR::D3D9::LiveVertexShaderMatches(device, cachedShader)",
+    "R33 split-facade shader dependency",
+    "R32ReviewLiveVertexShaderMatches(device, cachedShader)",
+)
+require(
+    r32,
+    "R32 split facade neutral shader delegation",
+    "R32ReviewLiveVertexShaderMatches",
+    "OutRunVR::D3D9::LiveVertexShaderMatches(d,e)",
 )
 
 # The raw D3D9 c64..c67 batch upload is also a neutral draw-state primitive.
