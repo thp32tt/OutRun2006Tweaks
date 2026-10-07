@@ -1,5 +1,5 @@
 {
-  "schema_version": 124,
+  "schema_version": 125,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B227 q222 DDF0392A current-policy hierarchy rework PASS: PRE_INGAME #023 exposed old C159/B89 shared-36px undersizing. GitHub-hosted run 37556258475 produced 601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f with native per-row 42/36/50px source-height-aware fits; 3/3 exact bbox/size/positive-margin and all protected/outside/residue/raw gates PASS. Fresh independent C + regenerated English-original JPG/user review + actual-game validation remain required. RUNTIME_VALIDATION=UNTESTED.",
     "A143 index24 input wiring BUILD PASS: exact source 224e3c8fce6c hooks canonical EXE+0x692B6 after selection load, uses B208 two-beolsik composition with transient A142 preview alias, preserves stock page controls, and commits only the A141 14-byte compatibility alias on 0x2B END. Win32 Release 37451825543 + Korean Test Build 37451825561 SUCCESS. B209 DDS c6daaf2e7aa0 was consumed unchanged but independent C QA is PENDING and package_selected=false. Next: C, then NEW actual-game composition/BACKSPACE/page/END/reload/local-display test; RUNTIME_VALIDATION=UNTESTED.",
     "B209 index24 Jamo artwork STATIC PASS/HOLD: canonical DXT3 66743AA8 now has an actual source-faithful 26-key two-beolsik base-Jamo candidate c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e. B207 a..z selection semantics + A135 A..Z sprite identity provide the artwork binding. DXT3/BC2 and exact header are preserved; non-target compressed blocks remain byte-exact; decoded 26/26 containment/size and outside/protected gates pass; controller readable/raw visual QA passes. Do not package yet: B208 composer still needs wiring at the B207 character path and END must persist/write the A141 alias. A142 local Korean renderer is already BUILD PASS. RUNTIME_VALIDATION=UNTESTED.",
     "A142 index24 local-name render BUILD PASS: exact local text-object draw path VA 0x48F455 -> Sumo_Printf(\"%s\", object+0x4E) is now intercepted only at return site module+0x8F45A when the %s argument is a valid A141 sidecar alias. The stock alias is hidden, UTF-8 Korean is queued through the existing Korean overlay with the same stock position/font-state/color/alignment, and alias lookup failure leaves stock behavior untouched. Source dbbfdca6... passed Win32 Release 37447477302 and Korean Test Build 37447477392. Native field/save/ranking/network/replay are unchanged. Remaining: source-faithful 66743AA8 Jamo artwork, then wire B208 composer to B207 0x00..0x25 character path and commit A141 alias on 0x2B END; runtime validation remains UNTESTED.",
@@ -4227,7 +4228,8 @@
     "754F0599",
     "9CE4E175",
     "59A79158",
-    "4EDA9DE3"
+    "4EDA9DE3",
+    "DDF0392A"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6719,7 +6721,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 10:11 KST",
+  "updated_at_kst": "2026-10-07 10:19 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7265,32 +7267,18 @@
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "latest_b_manual_visual_rework": {
-    "timestamp_kst": "2026-10-07 09:50 KST",
-    "run": "B226",
-    "queue_index": 226,
-    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
-    "trigger": "NEWER_8_STEP_PRE_INGAME_VISUAL_FALSE_NEGATIVE",
-    "prior_c_pass": "C143_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
-    "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
-    "before_sha256": "1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c",
-    "candidate_sha256": "5449edb846d6ca3a5de1ab1f817a41feb776e9af3bdda2175967312369e5e374",
-    "defects": [
-      "GOAL_A_TO_E_SOURCE_RELATIVE_WIDTH_TOO_WEAK",
-      "15_STAGE_CONTINUOUS_SOURCE_RELATIVE_WIDTH_TOO_WEAK"
-    ],
-    "machine_qa": {
-      "bbox_size": "6/6 PASS",
-      "candidate_outside": 0,
-      "alpha_outside": 0,
-      "protected_outrun_changed": 0,
-      "localized_overlap": 0,
-      "raw_orientation": "mirror_y"
-    },
-    "controller_visual_qa": "PASS_SOURCE_C143_B226_READABLE_ROW_CONTACT_RAW",
-    "status": "B226_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
-    "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_B/20261007-B-MANUALQA226-E3F4BA07/B226_E3F4BA07_REPORT.json",
-    "controller": "localization/graphics/role_B/20261007-B-MANUALQA226-E3F4BA07/B226_CONTROLLER_FINAL_QA.json"
+    "run": "20261007-B-MANUALQA227-DDF0392A",
+    "queue_index": 222,
+    "asset": "DDF0392A",
+    "before_candidate_sha256": "e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea",
+    "candidate_sha256": "601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f",
+    "github_hosted_worker_run": 37556258475,
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA227-DDF0392A/B227_DDF_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA227-DDF0392A/B227_CONTROLLER_SELF_QA.json",
+    "machine_qa": "3/3 bbox+size+positive-margin; clean/final PASS; outside/alpha/residue/protected=0; BC3 outside=0",
+    "visual_qa": "PASS_SOURCE_CLEAN_FINAL_ROW_RAW; per-row source-height hierarchy 42/36/50",
+    "status": "B227_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+    "RUNTIME_VALIDATION": "UNTESTED"
   },
   "latest_c_pre_ingame_export": {
     "timestamp_kst": "2026-10-07T10:17:06+09:00",
@@ -7690,5 +7678,19 @@
     "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "b227_ddf0392a_hierarchy_rework": {
+    "run": "20261007-B-MANUALQA227-DDF0392A",
+    "queue_index": 222,
+    "asset": "DDF0392A",
+    "before_candidate_sha256": "e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea",
+    "candidate_sha256": "601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f",
+    "github_hosted_worker_run": 37556258475,
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA227-DDF0392A/B227_DDF_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA227-DDF0392A/B227_CONTROLLER_SELF_QA.json",
+    "machine_qa": "3/3 bbox+size+positive-margin; clean/final PASS; outside/alpha/residue/protected=0; BC3 outside=0",
+    "visual_qa": "PASS_SOURCE_CLEAN_FINAL_ROW_RAW; per-row source-height hierarchy 42/36/50",
+    "status": "B227_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
