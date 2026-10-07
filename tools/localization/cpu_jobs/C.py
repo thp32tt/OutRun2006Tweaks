@@ -82,7 +82,7 @@ def recover_exact(target_sha,path):
 def comp(im,bg=(102,102,102,255)):
     z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
 def panel(label,im,target_w=900):
-    z=comp(im)
+    z=im.copy() if im.mode=="RGB" else comp(im)
     if z.width!=target_w:
         nh=max(1,round(z.height*target_w/z.width)); z=z.resize((target_w,nh),Image.Resampling.LANCZOS)
     c=Image.new("RGB",(z.width,z.height+28),(20,20,20)); c.paste(z,(0,28)); ImageDraw.Draw(c).text((6,6),label,fill="white"); return c
