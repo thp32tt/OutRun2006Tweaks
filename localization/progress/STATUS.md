@@ -2733,3 +2733,11 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q154 4D38BBB0: Fresh C + C3_STRICT_PASS @ 815f0112…
 - q164 5B65E08C: Fresh C + C3_STRICT_PASS @ 65bad7ee…
 - Next: PRE_INGAME refresh -> user JPG -> NEW in-game retest. RUNTIME_VALIDATION=UNTESTED.
+
+## 2026-10-08 08:18 KST — A181R q219 D263B3F1 hierarchy rework
+- Consumed C265 C1 direct `REWORK_REQUIRED` q219; completed/C3 assets were not repeated.
+- First hosted A181 output `e4db9a5b...` was producer-rejected because the runner resolved DejaVuSans-Bold rather than a Korean Noto face. A181R installed `fonts-noto-cjk` and rerendered from the validated A113 clean plate with exact `NotoSansCJK-Bold.ttc`.
+- Final candidate `41cf4c15853ec7df777c622cd3d3190e3e7d7a8ed1757902158525cb69d8da19`: `코스 선택` 1174x103 inside exact COURSE SELECT 1467x118, width ratio 80.03% versus C265-rejected 27.0%; margins L146/R147/T7/B8.
+- Machine PASS: exact bbox containment/source-size ceiling/positive margins, changed+alpha outside exact source bbox=0, header/mip1/persisted decode/RAW mirror_y PASS. Controller SOURCE/rejected/CLEAN/A181R + practical-scale + RAW visual PASS; hierarchy underfill/generic-caption regression materially repaired.
+- Backend: GitHub remained SSOT. The shared CPU worker was concurrency-blocked by a long-running job, so an isolated one-off GitHub runner produced the exact repository-backed DDS; the temporary workflow is removed after completion.
+- Next: fresh C1 + exact-SHA C3 -> PRE_INGAME/user JPG -> NEW actual-game retest. IGR-025 remains HOLD for screenshot(163) remaining runtime-vs-DDS mapping. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
