@@ -5310,5 +5310,42 @@
     },
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c255_c1_q063_q121_q193": {
+    "run": "20261008-C255-C1-CONSUME-C252-Q063-Q121-Q193",
+    "timestamp_kst": "2026-10-08T00:10:00+09:00",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "source_machine_evidence": "localization/graphics/role_C/20261007-C252-C1-BATCH-Q063-Q121-Q193",
+    "assets": {
+      "q63": {
+        "asset": "48DEBE77",
+        "candidate_sha256": "f92629621d421e924a3f1b9d77252c551832824110e755325bcf0bf4a1af2ad0",
+        "fresh_c": "PASS",
+        "controller_visual_qa": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "status": "C255_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_INGAME_RETEST"
+      },
+      "q121": {
+        "asset": "FD90AA9",
+        "candidate_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+        "machine_qa": "PASS_NUMERIC_FALSE_NEGATIVE",
+        "controller_visual_qa": "FAIL_VISIBLE_ENGLISH_SOURCE_RESIDUE_DOUBLE_DRAW",
+        "c3": "BLOCKED",
+        "status": "REWORK_REQUIRED"
+      },
+      "q193": {
+        "asset": "97E863AD",
+        "candidate_sha256": "f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69",
+        "machine_qa": "PASS_NUMERIC_FALSE_NEGATIVE",
+        "controller_visual_qa": "FAIL_VISIBLE_ENGLISH_SOURCE_RESIDUE_DOUBLE_DRAW",
+        "c3": "BLOCKED",
+        "status": "REWORK_REQUIRED"
+      }
+    },
+    "pre_ingame_export": "PENDING_Q63_REFRESH",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
