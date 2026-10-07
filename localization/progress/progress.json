@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 14:48 KST",
+  "updated_at_kst": "2026-10-07 15:23 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4296,5 +4296,33 @@
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true,
     "export_refresh_timestamp_kst": "2026-10-07T15:15:08+09:00"
+  },
+  "c240_c1_q107_841e796b": {
+    "timestamp_kst": "2026-10-07T15:23:00+09:00",
+    "run": "20261007-C240-C1-Q107-841E796B-B232R",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 107,
+    "asset": "841E796B",
+    "source_sha256": "112f47e7b16ecf21f722738f7fc9053d1a9852d66da9ef9d29fd25dadf2f567e",
+    "candidate_sha256": "d6a5cc84e7cf834afe11d8afdc2c0b869b306e75759b71ee392983db8999abda",
+    "prior_c103_sha256": "6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad",
+    "fresh_c": "PASS",
+    "c3": "C3_STRICT_PASS",
+    "bbox_size_positive_margin": "PASS upper 무 56x30 inside No 68x42 margins [6,6,6,6]",
+    "changed_pixels_outside_top_source_bbox": 0,
+    "alpha_changed_outside_top_source_bbox": 0,
+    "bottom_handicap_pixel_exact_to_c103": true,
+    "source_changes_outside_two_source_boxes": 0,
+    "semantic": "No Handicap -> 무 / 핸디캡 (무 핸디캡)",
+    "controller_visual_qa": "PASS_SOURCE_C103_CURRENT_FLIPY_RAW_PRACTICAL_100_75_50",
+    "machine_report": "localization/graphics/role_C/20261007-C240-C1-Q107-841E796B-B232R/C240_841E796B_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261007-C240-C1-Q107-841E796B-B232R/C240_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "PENDING_REFRESH",
+    "user_jpg_review": "PENDING",
+    "actual_ingame_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
