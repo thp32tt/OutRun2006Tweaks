@@ -143,7 +143,7 @@ namespace Settings
 
     Setting<float> WheelFFBCountersteerStrength{
         "WheelFFB", "CountersteerStrength", WheelFFBMath::DefaultCountersteerStrength,
-        "Developed-drift body-slip countersteer target strength. 0 disables the drift-only recovery target; 1.00 matches the R14 reference. Normal-corner SAT is unchanged.",
+        "Developed-drift body-slip countersteer target strength. 0 disables the drift-only recovery target; 0.72 is the tuned default; 1.00 matches the R14 reference. Normal-corner SAT is unchanged.",
         Range<float>{ 0.0f, 1.50f }
     };
 
