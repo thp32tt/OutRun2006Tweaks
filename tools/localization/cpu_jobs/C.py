@@ -16,7 +16,7 @@ SOURCE_TEXT_MASK=pathlib.Path("localization/graphics/role_C/20261005-C143-E3F4BA
 SOURCE_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds"
 EXPECTED_SOURCE="fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72"
 EXPECTED_CAND="5449edb846d6ca3a5de1ab1f817a41feb776e9af3bdda2175967312369e5e374"
-B226_COMMIT="27815f283c9fc628eb077702c23d1aa0748ee310"
+EXPECTED_OLD="1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c"
 CAND_REPO=str(CAND)
 
 def sha(b): return hashlib.sha256(b).hexdigest()
@@ -53,7 +53,19 @@ with urllib.request.urlopen(SOURCE_URL, timeout=60) as r:
 cand_bytes=CAND.read_bytes()
 if sha(source_bytes)!=EXPECTED_SOURCE: raise SystemExit("source SHA mismatch")
 if sha(cand_bytes)!=EXPECTED_CAND: raise SystemExit("candidate SHA mismatch")
-old_bytes=subprocess.check_output(["git","show",f"{B226_COMMIT}^:{CAND_REPO}"])
+# Locate the exact C143 predecessor by content hash across full Git history.
+# This is robust to the GitHub Actions bot's later rebase of the B226 output commit.
+old_bytes=None; old_commit=None
+hist=subprocess.check_output(["git","log","--format=%H","--all","--",CAND_REPO],text=True).splitlines()
+for h in hist:
+    try:
+        b=subprocess.check_output(["git","show",f"{h}:{CAND_REPO}"],stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError:
+        continue
+    if sha(b)==EXPECTED_OLD:
+        old_bytes=b; old_commit=h; break
+if old_bytes is None:
+    raise SystemExit("exact C143 predecessor SHA not found in git history")
 source=rgba_from_bytes(source_bytes)
 candidate=rgba_from_bytes(cand_bytes)
 old=rgba_from_bytes(old_bytes)
@@ -74,9 +86,12 @@ rows=[
  ("goal_a","GOAL A","골 A",[980,160,1960,244]),
  ("15_stage","15 STAGE CONTINUOUS","15코스 연속",[980,80,1960,160]),
 ]
-final_delta=diffmask(A,K)
-old_delta=diffmask(O,K)
-change_from_old=diffmask(A,O)
+# Visible glyph geometry is alpha-authoritative; transparent hidden RGB must not
+# inflate text bboxes. Blast radius checks both visible RGBA and alpha changes.
+final_delta=(A[:,:,3]!=K[:,:,3])
+old_delta=(O[:,:,3]!=K[:,:,3])
+visible_union=(A[:,:,3]>0)|(O[:,:,3]>0)
+change_from_old=diffmask(A,O) & visible_union
 alpha_change=(A[:,:,3]!=O[:,:,3])
 allowed=np.zeros((H,W),dtype=bool)
 records=[]
@@ -149,7 +164,7 @@ annotate_strip([source,candidate],["SOURCE practical 25%","FINAL practical 25%"]
 report={
  "schema_version":2,"role":"C","run":RUN,"qa_id":"C231","queue_index":226,
  "asset":"textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds","producer_run":"B226",
- "source_sha256":sha(source_bytes),"prior_candidate_sha256":sha(old_bytes),"candidate_sha256":sha(cand_bytes),
+ "source_sha256":sha(source_bytes),"prior_candidate_sha256":sha(old_bytes),"prior_candidate_git_commit":old_commit,"candidate_sha256":sha(cand_bytes),
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6","url":SOURCE_URL},
  "independent_basis":"Pinned source re-downloaded and persisted DDS decoded independently. Exact English source bboxes are freshly re-derived from the prior independent C143 SOURCE_TEXT_MASK tied to the same pinned source SHA; final/old bboxes are then derived from decoded persisted pixels versus the C143 exact clean plate inside those source bboxes. B226 producer bbox records are not consumed. Blast radius is checked against the actual pre-B226 candidate recovered from Git history.",
  "persisted_dds_authority":{"sha256":sha(cand_bytes),"decoded_size":[W,H],"header_128_exact":header_exact,"mip_count":mips,"format_family":"RGBA32/BGRA"},
@@ -190,6 +205,8 @@ print(json.dumps({
     "alpha_outside": alpha_outside,
     "header_exact": header_exact,
     "mips": mips,
+    "old_sha256": sha(old_bytes),
+    "old_git_commit": old_commit,
     "all_rows": all_rows,
     "machine_pass": machine_pass
   }
