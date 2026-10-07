@@ -1,0 +1,197 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C244-C2-Q026-63C91067-A144",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "producer_run": "A144_USERJPG_REWORK",
+  "trigger": "USER_PRE_INGAME_JPG_FAIL_002_TOTAL_RANK_TEXT_TOO_SMALL",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "prior_user_rejected_sha256": "2afae053f48811b79ca3cbcf706e6edf4013e65d012010cb48b681169621f675",
+  "candidate_sha256": "0281b7b46b5c53598bab2bf4a01f65f391b166345710460c51791da8cf70d530",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds"
+  },
+  "prior_candidate_git_commit": "5bd0324d1acb9ce8f9465bb4de282a28a7334e06",
+  "source_geometry_basis": "Exact two source text/effect bboxes were independently established by C193 on the identical canonical source SHA. Fresh C244 re-downloads that source, exact-recovers prior user-rejected bytes by SHA, independently decodes current bytes and re-derives current/prior title dark-outline bboxes from pixels; A144 producer masks/counters are not consumed.",
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "mode": "RGBA",
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ]
+  },
+  "rows": [
+    {
+      "region": 0,
+      "source_text": "Total Rank",
+      "korean": "종합 랭킹",
+      "source_bbox": [
+        747,
+        1174,
+        1271,
+        1275
+      ],
+      "source_dark_bbox_fresh": [
+        749,
+        1187,
+        1268,
+        1272
+      ],
+      "prior_dark_bbox": [
+        872,
+        1179,
+        1146,
+        1270
+      ],
+      "localized_dark_bbox_fresh": [
+        835,
+        1180,
+        1183,
+        1270
+      ],
+      "source_bbox_size": [
+        524,
+        101
+      ],
+      "localized_dark_size": [
+        348,
+        90
+      ],
+      "margins": [
+        88,
+        88,
+        6,
+        5
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region": 1,
+      "source_text": "Total Rank",
+      "korean": "종합 랭킹",
+      "source_bbox": [
+        599,
+        156,
+        1124,
+        246
+      ],
+      "source_dark_bbox_fresh": [
+        602,
+        159,
+        1121,
+        243
+      ],
+      "prior_dark_bbox": [
+        741,
+        161,
+        982,
+        241
+      ],
+      "localized_dark_bbox_fresh": [
+        705,
+        161,
+        1017,
+        241
+      ],
+      "source_bbox_size": [
+        525,
+        90
+      ],
+      "localized_dark_size": [
+        312,
+        80
+      ],
+      "margins": [
+        106,
+        107,
+        5,
+        5
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "material_growth_vs_user_rejected": [
+    {
+      "region": 0,
+      "prior_dark_size": [
+        274,
+        91
+      ],
+      "current_dark_size": [
+        348,
+        90
+      ],
+      "width_gain": 74,
+      "height_gain": -1
+    },
+    {
+      "region": 1,
+      "prior_dark_size": [
+        241,
+        80
+      ],
+      "current_dark_size": [
+        312,
+        80
+      ],
+      "width_gain": 71,
+      "height_gain": 0
+    }
+  ],
+  "summary": {
+    "source_to_current_changed_pixels_outside_two_source_bboxes": 0,
+    "source_to_current_alpha_changed_outside_two_source_bboxes": 0,
+    "prior_to_current_changed_pixels_outside_two_source_bboxes": 0,
+    "prior_to_current_alpha_changed_outside_two_source_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "header_128_exact_source_prior_current": true,
+    "persisted_decode_authority": "PASS"
+  },
+  "machine_status": "PASS",
+  "fresh_c_decision": "PENDING_CONTROLLER",
+  "c3_required": true,
+  "c3_reason": [
+    "PRIOR_USER_PRE_INGAME_JPG_FAIL",
+    "TOTAL_RANK_TEXT_TOO_SMALL",
+    "SOURCE_STYLE_SCALE_FALSE_NEGATIVE_HISTORY"
+  ],
+  "c3_machine_status": "PASS",
+  "c3_visual_priorities": [
+    "plate_restoration",
+    "source_relative_scale",
+    "right_slant_direction",
+    "font_style_weight",
+    "glyph_integrity",
+    "protected_art",
+    "FLIP_Y_RAW_consistency",
+    "practical_scale"
+  ],
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C244-C2-Q026-63C91067-A144/C244_Q26_SOURCE_PRIOR_CURRENT_OVERVIEW.jpg",
+    "localization/graphics/role_C/20261007-C244-C2-Q026-63C91067-A144/C244_Q26_ROW_CONTACTS.jpg",
+    "localization/graphics/role_C/20261007-C244-C2-Q026-63C91067-A144/C244_Q26_RAW_COMPARE.jpg",
+    "localization/graphics/role_C/20261007-C244-C2-Q026-63C91067-A144/C244_Q26_PRACTICAL_100_75_50.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "pre_ingame_export": "BLOCKED_UNTIL_CONTROLLER_C3",
+  "user_jpg_review": "PENDING_NEW_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
