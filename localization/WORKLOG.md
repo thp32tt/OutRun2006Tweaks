@@ -3198,3 +3198,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - q61 C4A2937B @ df250af9...: independent 21/21 PASS with zero outside/alpha/blast. Semantic gate PASS (Cut the line! -> 하트선을 통과하세요!). SOURCE/C250/A166 + producer CLEAN + RAW review PASS: yellow gradient, white keyline, navy outline and readable-right lean restored for Go/Cut/Keep. Fresh C PASS + exact-SHA C3_STRICT_PASS.
 - q65 EBEF6D20 @ 10d0e189...: independent 7/7 PASS with zero outside/alpha/blast. SOURCE/C250/CLEAN/A166 + RAW review PASS: Course/Left/Right/Easy/Hard completeness retained; 쉬움 is restored to the canonical green family and source-family keyline/outline/right lean is present. Fresh C PASS + exact-SHA C3_STRICT_PASS.
 - PRE_INGAME English-original consolidated export refresh is now mandatory before user review/actual-game retest. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+
+## 2026-10-07 23:30 KST — C254 PRE_INGAME export refresh complete
+- TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). Persistent exporter run 37635346311 SUCCESS / output commit c172461764dbc12979f4493118a83e18c785fcca.
+- Consolidated manifest: 34 rows (33 localized, 1 policy-preserved), mandatory-C3-blocked=10. C254 bindings: q57 -> #018 018_q057_39229D64.jpg; q61 -> #019 019_q061_C4A2937B.jpg; q65 -> #020 020_q065_EBEF6D20.jpg.
+- Exact pinned English source/current candidate SHA bindings verified at native dimensions. 000_INDEX consolidated visual review PASS and matches detailed C254 source/current FLIP-Y+RAW evidence.
+- User JPG acceptance + NEW actual-game retest remain pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.

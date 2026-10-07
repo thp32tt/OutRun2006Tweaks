@@ -2576,3 +2576,9 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q61 df250af9...: independent 21/21 PASS; 하트선을 통과하세요! semantic binding and yellow/white/navy source family PASS -> exact-SHA C3_STRICT_PASS.
 - q65 10d0e189...: independent 7/7 PASS; completeness + green 쉬움 + outline/slant family PASS -> exact-SHA C3_STRICT_PASS.
 - PRE_INGAME English-original refresh is pending; user JPG review + NEW actual-game retest remain pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+
+### C254 PRE_INGAME refreshed — 2026-10-07 23:30 KST
+- Exporter run 37635346311 SUCCESS / output c172461764dbc12979f4493118a83e18c785fcca; manifest count 34, localized 33, mandatory-C3-blocked 10.
+- q57 -> #018, q61 -> #019, q65 -> #020; exact source/candidate bindings verified and consolidated index review PASS.
+- User JPG acceptance + NEW actual-game retest pending; RUNTIME_VALIDATION=UNTESTED.

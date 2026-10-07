@@ -9252,18 +9252,26 @@
     "assets": {
       "q57": {
         "candidate_sha256": "d2831fcfd1bb8027fc129ff50e70c90c21094df13765daa3d5fb9c6fda3ae70a",
-        "status": "C254_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+        "status": "C254_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_INGAME"
       },
       "q61": {
         "candidate_sha256": "df250af92785727f38d176f3b2569c9d6d2b0e7a3f7d296adaa2f5c343b1d71e",
-        "status": "C254_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+        "status": "C254_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_INGAME"
       },
       "q65": {
         "candidate_sha256": "10d0e1899d8d167eb1dcb303429dd4dc7bdf09096e6c5720afce884cc32afe1f",
-        "status": "C254_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+        "status": "C254_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_INGAME"
       }
     },
-    "pre_ingame_export": "PENDING_REFRESH",
+    "pre_ingame_export": {
+      "status": "PASS_REFRESHED",
+      "worker_run": 37635346311,
+      "worker_output_commit": "c172461764dbc12979f4493118a83e18c785fcca",
+      "manifest_count": 34,
+      "q57": "018_q057_39229D64.jpg",
+      "q61": "019_q061_C4A2937B.jpg",
+      "q65": "020_q065_EBEF6D20.jpg"
+    },
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
