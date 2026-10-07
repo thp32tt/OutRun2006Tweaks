@@ -19,6 +19,8 @@
 //    work so stage-specific 300 -> 3000+ draw explosions can be diagnosed.
 
 #include "stereo_renderer_r30.cpp"
+#include "../core/r31_support_api.hpp"
+#include <cstring>
 #include "../state/state_block_tracker.hpp"
 #include "../state/state_block_recovery.hpp"
 #include "../state/state_block_events.hpp"
@@ -528,5 +530,98 @@ namespace OutRunVRStereo
     R31InstallStatus() noexcept
     {
         return R31InstallState.load(std::memory_order_acquire);
+    }
+
+    R31SupportFrameSnapshot R31SupportTelemetryFrameSnapshot() noexcept
+    {
+        const auto route = R31TelemetryFrameSnapshot();
+        return {
+            route.main,
+            route.offscreen,
+            route.aux,
+            route.fastWorld,
+            route.hud,
+            route.fallback,
+            route.fragile,
+            route.unstable
+        };
+    }
+
+    std::uint64_t R31SupportTelemetryLiveWvpChecks() noexcept
+    {
+        return R31TelemetryLiveWvpChecks();
+    }
+
+    std::uint64_t R31SupportTelemetryLiveWvpRejects() noexcept
+    {
+        return R31TelemetryLiveWvpRejects();
+    }
+
+    void R31SupportResetFastPathState() noexcept
+    {
+        R31ResetFastPathState();
+    }
+
+    bool R31SupportGetSavedViewport(
+        IDirect3DDevice9* device, D3DVIEWPORT9& viewport) noexcept
+    {
+        return R31GetSavedViewport(device, viewport);
+    }
+
+    void R31SupportObserveDraw(IDirect3DDevice9* device) noexcept
+    {
+        R31ObserveDraw(device);
+    }
+
+    void R31SupportDiscardUnreliableDrawCaches() noexcept
+    {
+        R31DiscardUnreliableDrawCaches();
+    }
+
+    void R31SupportNoteFallback() noexcept
+    {
+        R31TelemetryNoteFallback();
+    }
+
+    void R31SupportNoteFastWorld() noexcept
+    {
+        R31TelemetryNoteFastWorld();
+    }
+
+    void R31SupportNoteFragile() noexcept
+    {
+        R31TelemetryNoteFragile();
+    }
+
+    void R31SupportNoteHud() noexcept
+    {
+        R31TelemetryNoteHud();
+    }
+
+    void R31SupportNoteUnstable() noexcept
+    {
+        R31TelemetryNoteUnstable();
+    }
+
+    bool R31SupportBuildFastWorldConstants(
+        IDirect3DDevice9* device,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo,
+        R31SupportFastWorldConstants& out) noexcept
+    {
+        DrawStereoState draw{};
+        if (!R31BuildFastWorldConstants(device, stereo, draw))
+            return false;
+        std::memcpy(out.originalConstants, draw.originalConstants,
+            sizeof(out.originalConstants));
+        std::memcpy(out.eyeConstants, draw.eyeConstants,
+            sizeof(out.eyeConstants));
+        out.poseSequence = draw.poseSequence;
+        return true;
+    }
+
+    OutRunVR::RuntimeEligibility::InstallState
+    R31SupportInstallStatus() noexcept
+    {
+        return R31InstallStatus();
     }
 }

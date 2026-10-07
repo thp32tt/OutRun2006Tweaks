@@ -220,7 +220,7 @@ require(
     r32_viewport,
     "R32 saved viewport policy",
     "OutRunVR::State::StateBlockTracker::Reliable()",
-    "R31GetSavedViewport(device, viewport)",
+    "R31SupportGetSavedViewport(device, viewport)",
     "OutRunVR::D3D9::ReadViewport(device, viewport)",
 )
 forbid(
@@ -323,7 +323,7 @@ owner_evidence = {
     "R32ReviewGetSavedViewport": (
         r32, "bool R32GetSavedViewport(",
         ("StateBlockTracker::Reliable()",
-         "R31GetSavedViewport(device, viewport)",
+         "R31SupportGetSavedViewport(device, viewport)",
          "OutRunVR::D3D9::ReadViewport(device, viewport)"),
     ),
     "R32ReviewRunLowerFailClosed": (
@@ -707,7 +707,7 @@ require(
     r32,
     "R32 split prerequisite delegation",
     "R32ReviewPrerequisiteStatus() noexcept",
-    "R31InstallStatus()",
+    "R31SupportInstallStatus()",
     "R22InstallStatus()",
     "R13InstallStatus()",
     "R13InstallStatusValue::Failed",

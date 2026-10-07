@@ -6,6 +6,7 @@
 
 #include "r32_policy.hpp"
 #include "../core/r32_review_api.hpp"
+#include "../core/r31_support_api.hpp"
 #include "stereo_renderer_r31.cpp"
 
 namespace OutRunVRStereo
@@ -127,7 +128,7 @@ namespace OutRunVRStereo
 
         R32StereoWorkloadSnapshot R32CaptureStereoWorkload() noexcept
         {
-            const auto route = R31TelemetryFrameSnapshot();
+            const auto route = R31SupportTelemetryFrameSnapshot();
             return {
                 route.main,
                 route.offscreen,
@@ -334,7 +335,7 @@ namespace OutRunVRStereo
             if (!device)
                 return false;
             if (OutRunVR::State::StateBlockTracker::Reliable())
-                return R31GetSavedViewport(device, viewport);
+                return R31SupportGetSavedViewport(device, viewport);
             return OutRunVR::D3D9::ReadViewport(device, viewport);
         }
 
@@ -593,7 +594,7 @@ namespace OutRunVRStereo
         void R32InvalidateResetCaches() noexcept
         {
             InvalidateEffectStateCache();
-            R31ResetFastPathState();
+            R31SupportResetFastPathState();
             InvalidateLiveStateSample();
             OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
             R32ForgetDirectIdentity();
@@ -647,8 +648,8 @@ namespace OutRunVRStereo
             if (R32Counters.lastLogMs == 0)
             {
                 R32Counters.lastLogMs = now;
-                R32Counters.liveWvp = R31TelemetryLiveWvpChecks();
-                R32Counters.liveReject = R31TelemetryLiveWvpRejects();
+                R32Counters.liveWvp = R31SupportTelemetryLiveWvpChecks();
+                R32Counters.liveReject = R31SupportTelemetryLiveWvpRejects();
                 R32Counters.stateRecord = OutRunVR::State::StateBlockTracker::RecordingGeneration();
                 R32Counters.stateApply = OutRunVR::State::StateBlockTracker::ApplyGeneration();
                 R32Counters.batch = R32BatchWvpUploads;
@@ -695,8 +696,8 @@ namespace OutRunVRStereo
                 R32PerfWindowCounters.maxAlphaBlendDraws,
                 R32PerfWindowCounters.maxParticleLikeDraws,
                 R32PerfWindowCounters.maxParticleLikePrimitives,
-                R31TelemetryLiveWvpChecks() - R32Counters.liveWvp,
-                R31TelemetryLiveWvpRejects() - R32Counters.liveReject,
+                R31SupportTelemetryLiveWvpChecks() - R32Counters.liveWvp,
+                R31SupportTelemetryLiveWvpRejects() - R32Counters.liveReject,
                 OutRunVR::State::StateBlockTracker::RecordingGeneration() - R32Counters.stateRecord,
                 OutRunVR::State::StateBlockTracker::ApplyGeneration() - R32Counters.stateApply,
                 R32BatchWvpUploads - R32Counters.batch,
@@ -710,8 +711,8 @@ namespace OutRunVRStereo
                 R32ResetFailures - R32Counters.resetFail);
 
             R32Counters.lastLogMs = now;
-            R32Counters.liveWvp = R31TelemetryLiveWvpChecks();
-            R32Counters.liveReject = R31TelemetryLiveWvpRejects();
+            R32Counters.liveWvp = R31SupportTelemetryLiveWvpChecks();
+            R32Counters.liveReject = R31SupportTelemetryLiveWvpRejects();
             R32Counters.stateRecord = OutRunVR::State::StateBlockTracker::RecordingGeneration();
             R32Counters.stateApply = OutRunVR::State::StateBlockTracker::ApplyGeneration();
             R32Counters.batch = R32BatchWvpUploads;
@@ -908,20 +909,20 @@ namespace OutRunVRStereo
     bool R32ReviewStableStereoBase(IDirect3DDevice9* d) noexcept { return R29StableStereoBase(d); }
     bool R32ReviewFragileEffectCached(IDirect3DDevice9* d, bool& f) noexcept { return R29FragileEffectCached(d,f); }
     void R32ReviewNoteStableTwoEyeDraw() noexcept { R29TelemetryNoteStableTwoEyeDraw(); }
-    void R32ReviewObserveDispatchDraw(IDirect3DDevice9* d) noexcept { R31ObserveDraw(d); }
-    void R32ReviewDiscardUnreliableDrawCaches() noexcept { R31DiscardUnreliableDrawCaches(); }
-    void R32ReviewNoteDispatchFallback() noexcept { R31TelemetryNoteFallback(); }
-    void R32ReviewNoteDispatchFastWorld() noexcept { R31TelemetryNoteFastWorld(); }
-    void R32ReviewNoteDispatchFragile() noexcept { R31TelemetryNoteFragile(); }
-    void R32ReviewNoteDispatchHud() noexcept { R31TelemetryNoteHud(); }
-    void R32ReviewNoteDispatchUnstable() noexcept { R31TelemetryNoteUnstable(); }
+    void R32ReviewObserveDispatchDraw(IDirect3DDevice9* d) noexcept { R31SupportObserveDraw(d); }
+    void R32ReviewDiscardUnreliableDrawCaches() noexcept { R31SupportDiscardUnreliableDrawCaches(); }
+    void R32ReviewNoteDispatchFallback() noexcept { R31SupportNoteFallback(); }
+    void R32ReviewNoteDispatchFastWorld() noexcept { R31SupportNoteFastWorld(); }
+    void R32ReviewNoteDispatchFragile() noexcept { R31SupportNoteFragile(); }
+    void R32ReviewNoteDispatchHud() noexcept { R31SupportNoteHud(); }
+    void R32ReviewNoteDispatchUnstable() noexcept { R31SupportNoteUnstable(); }
 
     bool R32ReviewBuildFastWorldConstants(IDirect3DDevice9* d, const OutRunVRRenderer::LatchedStereoFrame& s, R32ReviewFastWorldConstants& out) noexcept
     {
-        DrawStereoState draw{}; if (!R31BuildFastWorldConstants(d,s,draw)) return false;
+        R31SupportFastWorldConstants draw{}; if (!R31SupportBuildFastWorldConstants(d,s,draw)) return false;
         std::memcpy(out.originalConstants,draw.originalConstants,sizeof(out.originalConstants));
         std::memcpy(out.eyeConstants,draw.eyeConstants,sizeof(out.eyeConstants));
-        out.poseSequence=draw.poseSequence; out.stereoFrame=draw.stereoFrame; return true;
+        out.poseSequence=draw.poseSequence; out.stereoFrame=s; return true;
     }
 
     R32ReviewScreenSpaceKind R32ReviewClassifyScreenSpacePass(IDirect3DDevice9* d) noexcept
@@ -959,7 +960,7 @@ namespace OutRunVRStereo
     OutRunVR::RuntimeEligibility::InstallState R32ReviewPrerequisiteStatus() noexcept
     {
         using State=OutRunVR::RuntimeEligibility::InstallState;
-        const auto a=R31InstallStatus(), b=R22InstallStatus(); const auto c=R13InstallStatus();
+        const auto a=R31SupportInstallStatus(), b=R22InstallStatus(); const auto c=R13InstallStatus();
         if(a==State::Failed||b==State::Failed||c==R13InstallStatusValue::Failed) return State::Failed;
         if(a==State::Ready&&b==State::Ready&&c==R13InstallStatusValue::Ready) return State::Ready;
         return State::Pending;

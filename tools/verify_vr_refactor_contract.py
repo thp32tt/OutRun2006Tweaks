@@ -661,8 +661,8 @@ else:
         errors.append(
             "R31 fast-path reset API must preserve blocked/candidate/eye/telemetry order")
 
-if "R31ResetFastPathState();" not in r32:
-    errors.append("R32 reset path missing R31 fast-path owner reset API")
+if "R31SupportResetFastPathState();" not in r32:
+    errors.append("R32 reset path missing R31 support reset API")
 
 for banned, owner_api in (
     ("R29Effect = {};", "InvalidateEffectStateCache();"),
@@ -770,7 +770,7 @@ for marker, source, owner in (
 ):
     if marker not in source:
         errors.append(f"{owner} missing install-state owner query API: {marker}")
-for marker in ("R13InstallStatus()", "R22InstallStatus()", "R31InstallStatus()"):
+for marker in ("R13InstallStatus()", "R22InstallStatus()", "R31SupportInstallStatus()"):
     if marker not in r32:
         errors.append(f"R32 split facade missing prerequisite owner query: {marker}")
 if "R32ReviewPrerequisiteStatus()" not in r33:
