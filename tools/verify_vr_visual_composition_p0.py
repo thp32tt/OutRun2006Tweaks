@@ -11,6 +11,7 @@ def require(token, source, meaning):
         raise SystemExit(f'P0 visual composition drift: {meaning}: missing {token!r}')
 
 ui = read('src/hooks_uiscaling.cpp')
+textures = read('src/hooks_textures.cpp')
 hud = read('src/vr/hud_semantics.hpp')
 sem = read('src/vr/game/render_semantics.hpp')
 r30 = read('src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp')
@@ -56,6 +57,16 @@ require('ExactScreenHudRight_ClipSpriteCalls', ui, 'right-side SCREEN_HUD produc
 require('ExactScreenHudLeft_ClipSpriteCalls', ui, 'left-side SCREEN_HUD producer set')
 require('ExactScreenHudRight_putClipSprite', ui, 'right-side exact producer wrapper')
 require('ExactScreenHudLeft_putClipSprite', ui, 'left-side exact producer wrapper')
+
+# Direct put_sprite_ex/put_sprite_ex2 producers cover the remaining exact semantic families
+# (WORLD_HEART, C2C speech/hearts, etc.) without hot-path stack walking.
+require('ClassifyDirectVrSpriteCaller', textures, 'direct sprite caller semantic classifier')
+require('TagDirectVrSpriteNodes', textures, 'direct sprite node semantic publication')
+require('OutRunVRHudSemantics::ClassifyCaller', textures, 'shared canonical semantic map')
+require('RenderScope::ScreenHud', textures, 'direct screen-HUD scope')
+require('RenderScope::WorldBillboard', textures, 'direct world-billboard scope')
+if 'RtlCaptureStackBackTrace' in textures:
+    raise SystemExit('P0 visual composition drift: runtime stack-walk HUD classification is forbidden')
 
 # 00519 observed projected semantic ownership but zero build attempts: XYZRHW needs an exact route.
 require('projectedWorldMarker', r30, 'fixed-function projected marker state')
