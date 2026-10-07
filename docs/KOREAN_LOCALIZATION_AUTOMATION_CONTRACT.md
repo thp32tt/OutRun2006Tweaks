@@ -86,8 +86,12 @@ On any of those commands, first fetch the latest `korean-localization-recovery-2
 - Keep total scheduled launches at six per hour: A at :00, C1 at :10, C2 at :20, B at :30, C1 at :40, C2 at :50.
 - C1 and C2 are both full C-role final-QA lanes; all existing C quality, approval, JPG-export, C3, Git synchronization, and runtime-validation rules remain unchanged.
 - To prevent duplicate review, C1 owns ODD numeric `asset_queue.csv` indexes plus unindexed runtime/name-entry/special C work; C2 owns EVEN numeric indexes.
-- Each C lane refreshes branch HEAD and queue state immediately before target selection and again before commit. During this mode neither C lane steals the other lane's indexed shard.
-- If its fresh/pending C shard is empty, that lane may perform C3_STRICT_AUDIT only within its own shard. C1 alone may take unindexed special C work.
+- **Batch size:** each C1/C2 invocation SHOULD process up to **3 eligible assets** from its own shard instead of stopping after one asset. A PASS, REWORK_REQUIRED, or HOLD_STRICT_RECHECK decision with persisted evidence counts as one processed asset. Continue to the next eligible asset until three are materially adjudicated or the shard has no eligible work.
+- Apply the normal C priority independently for every batch slot: new/changed A/B candidate and user/in-game/JPG regression revalidation first; only use C3_STRICT_AUDIT to fill remaining batch slots when no fresh/pending C target remains in that shard.
+- Refresh branch HEAD and queue state **before selecting every asset in the batch** and again immediately before the batch commit/push. If a selected asset changed remotely, skip it and refill that slot from the refreshed queue rather than repeating or overwriting work.
+- A visual/machine FAIL on one asset does **not** normally end the batch: persist that asset as REWORK_REQUIRED/HOLD with evidence, then continue to the next eligible same-shard asset. Stop early only when a required corrective rework is too large/risky for C, a runtime/runner-specific dependency blocks safe continuation, or Git conflict/state drift makes further adjudication unsafe.
+- Keep per-asset machine/controller evidence and queue/state entries distinct even when three assets share one commit. WORKLOG/STATUS must identify every asset handled in the batch plus `TEMP_BACKLOG_RELIEF=C1|C2` and the shard.
+- During this mode neither C lane steals the other lane's indexed shard. If its fresh/pending C shard is empty, that lane may perform C3_STRICT_AUDIT only within its own shard. C1 alone may take unindexed special C work.
 - This mode changes scheduling capacity only. It does not change candidate PASS semantics, in-game closure rules, queue authority, or A/B ownership rules.
 - Exit target: when fresh/pending C backlog is approximately 20 items or fewer, or when the user explicitly ends backlog relief, restore the normal A/B/C schedule above.
 
