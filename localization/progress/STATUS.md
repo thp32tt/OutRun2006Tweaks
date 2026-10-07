@@ -2272,3 +2272,8 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - B228 candidate a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f fresh C PASS: 2/2 bbox/size/positive-margin, 46/50px source-height hierarchy, outside/alpha/residue/overlap/touch=0, exact RGBA header/raw mirror_y.
 - Controller visual PASS: both previously untranslated ordinary help sentences are Korean with no visible English residue, broken Hangul, clipping, intrusion or style/orientation regression; existing B73/song-title/BGM material remains protected.
 - Decision C230_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export/user review + actual-game validation pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-07 12:12 KST — A159 q53 568D3696 Feed row hierarchy producer PASS
+- Feed the girl! Korean row 421x68 inside 457x103 source -> A159 7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33, 여자친구에게 먹이세요!, 448x84 with positive margins.
+- bbox/size/margin 1/1 PASS; outside/alpha/residue=0; all other pixels exact; DXT5 header/13 mips/raw mirror_y preserved; controller SOURCE/OLD/CLEAN/A159 + full + RAW PASS.
+- Fresh C/JPG/in-game required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

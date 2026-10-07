@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07T11:36:19+09:00",
+  "updated_at_kst": "2026-10-07T12:12:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -3016,7 +3016,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED. B218 q228 E7F6E9B7 is newly reopened from C144 under the newer 8-step visual gate and now awaits fresh independent C on candidate 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808. B219 q232 EBFC709F is reopened from C135 for source-left alignment/weight hierarchy and awaits fresh independent C on candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221. B220 q164 5B65E08C is reopened from C108 for source-width hierarchy/left alignment and awaits fresh independent C on candidate 65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f. B221 q92 1A43E9D9 is reopened from C125 for source-relative width/alignment and prior edge-touch risk; fresh independent C is required on candidate c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a. B227 q222 DDF0392A now awaits fresh independent C on 601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f; current producer self-QA PASS does not carry forward C159 because bytes changed. A156 q147 39BCA907 is reopened from C192 for forced-width Hangul distortion and now awaits fresh independent C on ab002e4f172ebe72b593914b92661c4f8137d50f8b073a22005fd175cff0153e; producer controller visual QA PASS does not carry forward C192 because bytes changed. B228 q230 E95DA5 now awaits fresh independent C on a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f; prior C149 is superseded because two ordinary explanatory help rows were materially localized. A157 q161 55B57CDE now awaits fresh independent C on 66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d; prior C201 is superseded because bytes changed. B229 q54 FA7BBB13 now awaits fresh independent C on 5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e; prior C88/USERPOLICY02 bytes were superseded by source-transform/scale rework. A158 q47 AD720950 now awaits fresh independent C on 6386a41ffa4af599cc7076be0cc4ce59729026b4882c437ac397270290b7e4bf; prior C109 is superseded because Shift is newly localized.",
+  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED. B218 q228 E7F6E9B7 is newly reopened from C144 under the newer 8-step visual gate and now awaits fresh independent C on candidate 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808. B219 q232 EBFC709F is reopened from C135 for source-left alignment/weight hierarchy and awaits fresh independent C on candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221. B220 q164 5B65E08C is reopened from C108 for source-width hierarchy/left alignment and awaits fresh independent C on candidate 65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f. B221 q92 1A43E9D9 is reopened from C125 for source-relative width/alignment and prior edge-touch risk; fresh independent C is required on candidate c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a. B227 q222 DDF0392A now awaits fresh independent C on 601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f; current producer self-QA PASS does not carry forward C159 because bytes changed. A156 q147 39BCA907 is reopened from C192 for forced-width Hangul distortion and now awaits fresh independent C on ab002e4f172ebe72b593914b92661c4f8137d50f8b073a22005fd175cff0153e; producer controller visual QA PASS does not carry forward C192 because bytes changed. B228 q230 E95DA5 now awaits fresh independent C on a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f; prior C149 is superseded because two ordinary explanatory help rows were materially localized. A157 q161 55B57CDE now awaits fresh independent C on 66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d; prior C201 is superseded because bytes changed. B229 q54 FA7BBB13 now awaits fresh independent C on 5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e; prior C88/USERPOLICY02 bytes were superseded by source-transform/scale rework. A158 q47 AD720950 now awaits fresh independent C on 6386a41ffa4af599cc7076be0cc4ce59729026b4882c437ac397270290b7e4bf; prior C109 is superseded because Shift is newly localized. A159 q53 568D3696 awaits fresh C on 7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33; prior USERPOLICY02 C-pass superseded.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -3884,5 +3884,55 @@
     "controller_report": "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_E95DA5_CONTROLLER_FINAL_QA.json",
     "pre_ingame_comparison_refresh": "PENDING_C230_EXPORT",
     "runtime_validation": "UNTESTED"
+  },
+  "a159_568d3696": {
+    "run": "A159",
+    "timestamp_kst": "2026-10-07 12:12 KST",
+    "queue_index": 53,
+    "asset": "568D3696",
+    "trigger": "PRE_INGAME_CURRENT_POLICY_R4_TEXT_SCALE_HIERARCHY_FALSE_NEGATIVE",
+    "prior_c_status": "C_USERPOLICY02_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
+    "candidate_sha256": "7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33",
+    "github_worker_run": 37565426289,
+    "worker_output_commit": "8ea9620bbf5cd841e71ded6dd2d5ca4e42843650",
+    "translation_change": "Feed the girl!: 여자친구에게 먹여 주세요! -> 여자친구에게 먹이세요!",
+    "source_bbox": [
+      1988,
+      2061,
+      2445,
+      2164
+    ],
+    "prior_localized_bbox": [
+      2005,
+      2074,
+      2426,
+      2142
+    ],
+    "localized_bbox": [
+      1992,
+      2072,
+      2440,
+      2156
+    ],
+    "source_height": 103,
+    "prior_height": 68,
+    "new_height": 84,
+    "machine_qa": {
+      "bbox_size_positive_margin": "1/1 PASS",
+      "changed_outside": 0,
+      "alpha_outside": 0,
+      "clean_residue": 0,
+      "prior_exact_outside_target": true,
+      "format": "DXT5",
+      "mips": 13,
+      "raw_orientation": "mirror_y"
+    },
+    "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_A159_FULL_AND_RAW",
+    "producer_status": "A159_FEED_HIERARCHY_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }

@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A159",
+  "timestamp_kst": "2026-10-07 12:12 KST",
+  "queue_index": 53,
+  "asset": "textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+  "selection": {
+    "reason": "No active A-owned P0/P1, C-returned REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER row remained. q53 current C-pass had a concrete scale/hierarchy false negative.",
+    "current_pre_ingame_card": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/002_q053_568D3696.jpg",
+    "prior_c_status": "C_USERPOLICY02_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d"
+  },
+  "defect": {
+    "tags": [
+      "TEXT_SCALE_MATERIALLY_UNDERSIZED_VS_SOURCE",
+      "ROW_HIERARCHY_MISMATCH"
+    ],
+    "evidence": "Feed the girl! source 457x103 vs prior Korean 421x68; containment PASS masked weak hierarchy."
+  },
+  "translation_change": {
+    "source": "Feed the girl!",
+    "prior": "여자친구에게 먹여 주세요!",
+    "korean": "여자친구에게 먹이세요!"
+  },
+  "material_rework": {
+    "method": "Validated A_RECOVERY02 clean plate; replace only r4 block-safe interior; fresh native yellow/navy/white layered Hangul; all other bytes/pixels preserved.",
+    "source_size": [
+      457,
+      103
+    ],
+    "prior_size": [
+      421,
+      68
+    ],
+    "final_size": [
+      448,
+      84
+    ],
+    "height_gain_px": 16
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "1/1 PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "clean_residue": 0,
+    "prior_exact_outside_target": true,
+    "format": "DXT5",
+    "mips": 13,
+    "raw_orientation": "mirror_y"
+  },
+  "ordered_generation_gate": {
+    "1_source_text_removed_plate_restored": "PASS_VALIDATED_CLEAN",
+    "2_source_slant_direction": "PASS_UPRIGHT_SOURCE",
+    "3_no_unnecessary_undersizing": "PASS_68_TO_84PX",
+    "4_source_faithful_weight_outline_shadow": "PASS_YELLOW_NAVY_WHITE_FAMILY",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_OUTSIDE_CHANGE",
+    "7_flip_y_and_raw": "PASS_CONTROLLER_BOTH",
+    "8_immediate_readability_vs_source": "PASS_CONTROLLER"
+  },
+  "evidence": {
+    "worker_report": "localization/graphics/role_A/20261007-A-MANUALQA159-568D3696-FEED/A159_568D3696_REPORT.json",
+    "row_compare": "localization/graphics/role_A/20261007-A-MANUALQA159-568D3696-FEED/A159_568D_R4_SOURCE_OLD_CLEAN_FINAL.jpg",
+    "full_compare": "localization/graphics/role_A/20261007-A-MANUALQA159-568D3696-FEED/A159_568D_OLD_FINAL_FULL.jpg",
+    "raw_compare": "localization/graphics/role_A/20261007-A-MANUALQA159-568D3696-FEED/A159_568D_OLD_FINAL_RAW.jpg",
+    "github_worker_run": 37565426289,
+    "worker_output_commit": "8ea9620bbf5cd841e71ded6dd2d5ca4e42843650"
+  },
+  "controller_visual_findings": [
+    "A159 restores materially stronger source-relative height inside exact source bbox.",
+    "Yellow/navy/white effect family remains consistent.",
+    "No residue, broken Hangul, clipping, overlap, protected-art intrusion or unrelated change visible.",
+    "RAW mirror-Y remains correct."
+  ],
+  "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_A159_FULL_AND_RAW",
+  "producer_status": "A159_FEED_HIERARCHY_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

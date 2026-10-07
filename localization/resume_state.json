@@ -7625,15 +7625,15 @@
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "latest_a_manual_visual_rework": {
-    "timestamp_kst": "2026-10-07 11:36 KST",
-    "run": "A158",
-    "queue_index": 47,
-    "asset": "AD720950",
-    "trigger": "PRE_INGAME_002_UNTRANSLATED_VISIBLE_SHIFT_FALSE_NEGATIVE",
-    "before_sha256": "6dad37489e7027b8f546c38b3729167697965fc8e33fcabff46f09aba1677955",
-    "candidate_sha256": "6386a41ffa4af599cc7076be0cc4ce59729026b4882c437ac397270290b7e4bf",
-    "controller_visual_qa": "PASS_SOURCE_C109_CLEAN_A158_FULL_AND_RAW",
-    "status": "A158_SHIFT_LOCALIZATION_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "timestamp_kst": "2026-10-07 12:12 KST",
+    "run": "A159",
+    "queue_index": 53,
+    "asset": "568D3696",
+    "trigger": "PRE_INGAME_R4_TEXT_SCALE_HIERARCHY_FALSE_NEGATIVE",
+    "before_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
+    "candidate_sha256": "7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33",
+    "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_A159_FULL_AND_RAW",
+    "status": "A159_FEED_HIERARCHY_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
     "runtime_validation": "UNTESTED"
   },
   "c228_controller_final_qa": {
@@ -7882,6 +7882,38 @@
     "machine_report": "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_E95DA5_MACHINE_QA.json",
     "controller_report": "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_E95DA5_CONTROLLER_FINAL_QA.json",
     "pre_ingame_comparison_refresh": "PENDING_C230_EXPORT",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "a159_568d3696_feed_hierarchy": {
+    "run": "A159",
+    "timestamp_kst": "2026-10-07 12:12 KST",
+    "role": "A",
+    "queue_index": 53,
+    "asset_key": "568D3696",
+    "asset": "textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+    "trigger": "PRE_INGAME_CURRENT_POLICY_R4_TEXT_SCALE_HIERARCHY_FALSE_NEGATIVE",
+    "prior_c_status": "C_USERPOLICY02_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
+    "candidate_sha256": "7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33",
+    "github_worker_run": 37565426289,
+    "worker_output_commit": "8ea9620bbf5cd841e71ded6dd2d5ca4e42843650",
+    "translation_change": "Feed the girl! -> 여자친구에게 먹이세요!",
+    "machine_qa": {
+      "bbox_size_positive_margin": "1/1 PASS",
+      "changed_outside": 0,
+      "alpha_outside": 0,
+      "clean_residue": 0,
+      "prior_exact_outside_target": true,
+      "format": "DXT5",
+      "mips": 13,
+      "raw_orientation": "mirror_y"
+    },
+    "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_A159_FULL_AND_RAW",
+    "controller_qa": "localization/graphics/role_A/20261007-A-MANUALQA159-568D3696-FEED/A159_CONTROLLER_SELF_QA.json",
+    "status": "A159_FEED_HIERARCHY_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }

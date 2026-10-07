@@ -2815,3 +2815,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Made C3_STRICT_AUDIT mandatory before PRE_INGAME export for high-risk candidates, including prior user-visible failures, BC/DXT or text-bearing mip chains, reconstruction-heavy plates, transformed/multi-line/small text and prior style/typography false-negatives.
 - Extended `validate_clean_plate.py` with previous-candidate + rework-mask blast-radius QA: any collateral pixel change outside the declared repair region is `REWORK_REQUIRED`.
 - This policy hardening does not claim runtime validation; actual game evidence remains the final gate.
+
+## 2026-10-07 12:12 KST — A159 q53 568D3696 Feed-the-girl hierarchy rework
+- Required policies/state/backlog/queue refreshed; no higher-priority A production/rework remained. q53 current C-pass was reopened for a concrete visual false negative rather than repeating completed work.
+- Source 457x103; prior Korean 여자친구에게 먹여 주세요! 421x68. GitHub run 37565426289 SUCCESS produced 7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33, changing only r4 to 여자친구에게 먹이세요! from validated clean plate; final 448x84 (+16px height).
+- QA PASS: bbox/size/margin 1/1; outside/alpha/residue=0; all other pixels exact; DXT5 header+13 mips+RAW mirror_y preserved. Controller SOURCE/OLD/CLEAN/A159, full atlas and RAW PASS; ordered gate 1-8 PASS.
+- Prior C pass superseded; fresh C + English-original JPG/user review + actual game required. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+- Evidence: localization/graphics/role_A/20261007-A-MANUALQA159-568D3696-FEED/A159_CONTROLLER_SELF_QA.json; localization/graphics/role_A/20261007-A-MANUALQA159-568D3696-FEED/A159_568D3696_REPORT.json.
