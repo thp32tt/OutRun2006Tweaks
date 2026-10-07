@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "run": "20261007-C2-Q100-53CE39D5-B233-FRESH-C3-R2",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "timestamp_kst": "2026-10-07T16:41:34+09:00",
+  "queue_index": 100,
+  "asset": "53CE39D5",
+  "producer_run": "B233",
+  "trigger": "PRE_INGAME_005_SOURCE_RELATIVE_PLACEMENT_FALSE_NEGATIVE",
+  "source_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+  "prior_c117_sha256": "08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1",
+  "candidate_sha256": "7235731a2add8e947476cd22b971e5b57a7de390ae134609f4254a2f493a557d",
+  "fresh_independent_c": "PASS",
+  "machine_qa": {
+    "bbox_size_positive_margin": "19/19 PASS",
+    "source_clean_changed_outside_19_derived_bboxes": 0,
+    "current_changed_outside_19_source_bboxes": 0,
+    "current_alpha_changed_outside_19_source_bboxes": 0,
+    "prior_to_current_changed_outside_18_rework_bboxes": 0,
+    "prior_to_current_alpha_changed_outside_18_rework_bboxes": 0,
+    "random_row_pixel_exact_to_C117": true,
+    "localized_pair_overlap_pixels": 0,
+    "dds_header_exact": true,
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "mip_count": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": {
+    "clean_plate": "PASS_NO_SOURCE_RESIDUE_SEAM_HALO_OR_PANEL_DAMAGE",
+    "source_relative_placement": "PASS_18_CHANGED_LINES_SOURCE_LEFT_STAGGER_RESTORED",
+    "slant_style": "PASS_ORANGE_DARK_OUTLINE_SHADOW_READABLE_RIGHT_LEAN",
+    "hierarchy_scale": "PASS_SOURCE_LINE_HIERARCHY_RETAINED_WITH_ACCEPTED_C117_RASTER_SIZES",
+    "glyph_integrity": "PASS_NO_BROKEN_HANGUL_OR_CLIPPED_EFFECT",
+    "protected_art": "PASS_ZERO_BLAST_OUTSIDE_18_REWORK_BBOXES_RANDOM_PIXEL_EXACT",
+    "flip_y_raw": "PASS_MATCHING_CANONICAL_TRANSFORM",
+    "practical_scale": "PASS_100_50_25",
+    "coverage": "PASS_7_SEMANTIC_GROUPS_19_PHYSICAL_LINES"
+  },
+  "c3_strict_audit": "C3_STRICT_PASS",
+  "decision": "C2Q100_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME",
+  "machine_report": "localization/graphics/role_C/20261007-C2-Q100-53CE39D5-B233-FRESH-C3-R2/C2Q100_53CE39D5_MACHINE_QA.json",
+  "pre_ingame_export": "PENDING_REFRESH",
+  "user_jpg_review": "PENDING",
+  "actual_ingame_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
