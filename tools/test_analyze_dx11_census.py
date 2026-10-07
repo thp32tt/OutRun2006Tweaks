@@ -2217,6 +2217,81 @@ def main() -> int:
         "NativeDrawPathActivationAllowed"
     ] is False
 
+
+    r310_source_mapping_support = (
+        "VR DX11 R271 sourceSemanticPair: exact=1 "
+        "cacheKey=0x0102030405060708 pairHash=0x1111111111111111 "
+        "vsRegisterHash=0x2222222222222222 "
+        "psRegisterHash=0x3333333333333333 "
+        "linkHash=0x4444444444444444 "
+        "receiptRevision=0x5555555555555555 "
+        "contract=0x6666666666666666\n"
+        "VR DX11 R276 semanticTranslationPlan signature#1: "
+        "exact=1 snapshot=0x7777777777777777 "
+        "targetVS=0x8888888888888888 targetPS=0x9999999999999999 "
+        "revision=0xAAAAAAAAAAAAAAAA contract=0xBBBBBBBBBBBBBBBB\n"
+    )
+    r310_source_semantic_pair = run_case(
+        r310_source_mapping_support
+        + "VR DX11 R279 translationObjectPrerequisite signature#1: "
+        "exact=1 cacheOwnerGen=1 slotGen=1 receiptGen=1 sameDevicePair=1 "
+        "cacheSnapshot=1 slotSnapshot=1 cacheKey=0x0102030405060708 "
+        "planSnapshot=0x7777777777777777 "
+        "snapshot=0xCCCCCCCCCCCCCCCC\n"
+        + r306_signature_tail
+    )
+    r310_inventory = r310_source_semantic_pair["ActivationEvidence"][
+        "ProgrammableShaderInventory"
+    ]
+    assert r310_inventory["SourceSemanticPairEvidenceSignatures"] == 1
+    assert r310_inventory["SourceSemanticPairExactSignatures"] == 1
+    assert r310_inventory["SourceSemanticPairFailClosedSignatures"] == 1
+    assert r310_inventory["SourceSemanticPairCorrelationInexactSignatures"] == []
+    assert r310_inventory["SourceSemanticPairEvidenceCoverageComplete"] is True
+    r310_evidence = r310_inventory["Pairs"][0]["SemanticTranslationEvidence"][0][
+        "SourceSemanticPair"
+    ]
+    assert r310_evidence["exact"] is True
+    assert r310_evidence["cache_key"] == 0x0102030405060708
+    assert r310_evidence["pair_hash"] == 0x1111111111111111
+    assert r310_evidence["exact_state_correlated"] is True
+    assert r310_evidence["semantic_plan_correlated"] is True
+    assert r310_evidence["object_prerequisite_correlated"] is True
+    assert r310_evidence["summary_correlation_exact"] is True
+    assert r310_evidence["fail_closed"] is True
+    assert r310_evidence["activation_proof"] is False
+    assert r310_source_semantic_pair["NativeDrawPathActivationAllowed"] is False
+
+    r310_inconsistent_source_semantic_pair = run_case(
+        r310_source_mapping_support
+        + "VR DX11 R279 translationObjectPrerequisite signature#1: "
+        "exact=1 cacheOwnerGen=1 slotGen=1 receiptGen=1 sameDevicePair=1 "
+        "cacheSnapshot=1 slotSnapshot=1 cacheKey=0xDEADBEEFDEADBEEF "
+        "planSnapshot=0x7777777777777777 "
+        "snapshot=0xCCCCCCCCCCCCCCCC\n"
+        + r306_signature_tail
+    )
+    r310_inconsistent_inventory = r310_inconsistent_source_semantic_pair[
+        "ActivationEvidence"
+    ]["ProgrammableShaderInventory"]
+    assert r310_inconsistent_inventory[
+        "SourceSemanticPairCorrelationInexactSignatures"
+    ] == [{"source_log": "OutRun2006Tweaks.log", "startup_epoch": 0, "id": 1}]
+    assert (
+        r310_inconsistent_inventory["SourceSemanticPairEvidenceCoverageComplete"]
+        is False
+    )
+    r310_inconsistent_evidence = r310_inconsistent_inventory["Pairs"][0][
+        "SemanticTranslationEvidence"
+    ][0]["SourceSemanticPair"]
+    assert r310_inconsistent_evidence["object_prerequisite_correlated"] is False
+    assert r310_inconsistent_evidence["summary_correlation_exact"] is False
+    assert r310_inconsistent_evidence["fail_closed"] is False
+    assert r310_inconsistent_evidence["activation_proof"] is False
+    assert r310_inconsistent_source_semantic_pair[
+        "NativeDrawPathActivationAllowed"
+    ] is False
+
     r308_production_semantic_review = run_case(
         "VR DX11 R291 productionSemanticReview signature#1: "
         "admissionExact=1 reviewExact=1 inputLayoutReady=1 "

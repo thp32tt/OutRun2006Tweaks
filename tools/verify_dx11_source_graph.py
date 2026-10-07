@@ -11591,6 +11591,38 @@ def main() -> None:
             )
         )
 
+
+    r310_programmable_source_semantic_pair_analyzer_bridge = [
+        ("VR DX11 R271 sourceSemanticPair",
+         RUNTIME_CENSUS, "R310 consumes the existing R271 source semantic pair"),
+        ("R271_SOURCE_SEMANTIC_PAIR_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R310 parses R271 source semantic evidence"),
+        ("pending_source_semantic_pairs",
+         DX11_CENSUS_ANALYZER, "R310 binds unnumbered R271 to following R276 signature"),
+        ('"object_prerequisite_correlated":',
+         DX11_CENSUS_ANALYZER, "R310 correlates R271 cache identity with R279"),
+        ('"SourceSemanticPair": source_semantic_pair',
+         DX11_CENSUS_ANALYZER, "R310 attaches R271 evidence to the exact signature"),
+        ("r310_source_semantic_pair = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R310 exact source-semantic-pair fixture"),
+        ("r310_inconsistent_source_semantic_pair = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R310 mismatched cache-key fixture"),
+        ('r310_evidence["activation_proof"] is False',
+         DX11_CENSUS_ANALYZER_TEST, "R310 analyzer evidence cannot activate draw"),
+    ]
+    missing_r310_programmable_source_semantic_pair_analyzer_bridge = [
+        meaning for token, source, meaning
+        in r310_programmable_source_semantic_pair_analyzer_bridge
+        if token not in source
+    ]
+    if missing_r310_programmable_source_semantic_pair_analyzer_bridge:
+        raise SystemExit(
+            "DX11 R310 programmable source-semantic-pair analyzer drift: "
+            + ", ".join(
+                missing_r310_programmable_source_semantic_pair_analyzer_bridge
+            )
+        )
+
     r309_programmable_production_observation_analyzer_bridge = [
         ("VR DX11 R287 productionObservation",
          RUNTIME_CENSUS, "R309 consumes the existing R287 production observation"),

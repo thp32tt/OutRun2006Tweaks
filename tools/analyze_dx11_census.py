@@ -143,6 +143,16 @@ SIGNATURE_SHADER_RE = re.compile(
     r"psVersion=0x(?P<psVersion>[0-9A-Fa-f]+),"
     r"psHash=0x(?P<psHash>[0-9A-Fa-f]+)\]"
 )
+R271_SOURCE_SEMANTIC_PAIR_RE = re.compile(
+    r"VR DX11 R271 sourceSemanticPair: exact=(?P<exact>[01]) "
+    r"cacheKey=0x(?P<cacheKey>[0-9A-Fa-f]+) "
+    r"pairHash=0x(?P<pairHash>[0-9A-Fa-f]+) "
+    r"vsRegisterHash=0x(?P<vsRegisterHash>[0-9A-Fa-f]+) "
+    r"psRegisterHash=0x(?P<psRegisterHash>[0-9A-Fa-f]+) "
+    r"linkHash=0x(?P<linkHash>[0-9A-Fa-f]+) "
+    r"receiptRevision=0x(?P<receiptRevision>[0-9A-Fa-f]+) "
+    r"contract=0x(?P<contract>[0-9A-Fa-f]+)"
+)
 R276_SEMANTIC_PLAN_RE = re.compile(
     r"VR DX11 R276 semanticTranslationPlan signature#(?P<signature>\d+): "
     r"exact=(?P<exact>[01]) snapshot=0x(?P<snapshot>[0-9A-Fa-f]+) "
@@ -561,6 +571,8 @@ def summarize_programmable_shader_inventory(
     pair_map: dict[tuple[int, int, int, int, int, int], dict] = {}
     identity_missing: list[dict] = []
     identity_blocking: list[dict] = []
+    source_semantic_pair_missing: list[dict] = []
+    source_semantic_pair_correlation_inexact: list[dict] = []
     semantic_plan_missing: list[dict] = []
     semantic_receipt_missing: list[dict] = []
     production_activation_prerequisite_missing: list[dict] = []
@@ -583,6 +595,9 @@ def summarize_programmable_shader_inventory(
     target_bytecode_materialization_missing: list[dict] = []
     target_bytecode_materialization_inexact: list[dict] = []
     r242_object_ownership_missing: list[dict] = []
+    source_semantic_pair_evidence_signatures = 0
+    source_semantic_pair_exact_signatures = 0
+    source_semantic_pair_fail_closed_signatures = 0
     semantic_plan_exact_signatures = 0
     object_prerequisite_exact_signatures = 0
     object_creation_handoff_exact_signatures = 0
@@ -655,6 +670,7 @@ def summarize_programmable_shader_inventory(
                 "TranslationImplemented": False,
             },
         )
+        source_semantic_pair = signature.get("source_semantic_pair")
         plan = signature.get("semantic_translation_plan")
         object_prerequisite = signature.get("translation_object_prerequisite")
         object_creation_handoff = signature.get("object_creation_handoff")
@@ -679,6 +695,17 @@ def summarize_programmable_shader_inventory(
             "production_source_revalidation"
         )
         missing_prerequisite = None
+        if source_semantic_pair is None:
+            source_semantic_pair_missing.append(ref)
+        else:
+            source_semantic_pair_evidence_signatures += 1
+            if not source_semantic_pair["summary_correlation_exact"]:
+                source_semantic_pair_correlation_inexact.append(ref)
+            if source_semantic_pair["exact"]:
+                source_semantic_pair_exact_signatures += 1
+            if source_semantic_pair["fail_closed"]:
+                source_semantic_pair_fail_closed_signatures += 1
+
         if plan is None:
             semantic_plan_missing.append(ref)
             missing_prerequisite = "R276_SEMANTIC_PLAN_EVIDENCE"
@@ -865,6 +892,7 @@ def summarize_programmable_shader_inventory(
         pair.setdefault("SemanticTranslationEvidence", []).append(
             {
                 "SignatureRef": ref,
+                "SourceSemanticPair": source_semantic_pair,
                 "Plan": plan,
                 "ObjectOwnershipPrerequisite": object_prerequisite,
                 "ObjectCreationHandoff": object_creation_handoff,
@@ -889,6 +917,12 @@ def summarize_programmable_shader_inventory(
         and not detail_cap_saturated
         and not identity_missing
         and not identity_blocking
+    )
+    source_semantic_pair_evidence_coverage_complete = bool(
+        evidence_coverage_complete
+        and programmable_signatures > 0
+        and not source_semantic_pair_missing
+        and not source_semantic_pair_correlation_inexact
     )
     semantic_evidence_coverage_complete = bool(
         evidence_coverage_complete
@@ -932,6 +966,18 @@ def summarize_programmable_shader_inventory(
         "CurrentUniqueShaderPairs": len(pairs),
         "ShaderIdentityMissingSignatures": identity_missing,
         "ShaderIdentityBlockingSignatures": identity_blocking,
+        "SourceSemanticPairEvidenceMissingSignatures":
+            source_semantic_pair_missing,
+        "SourceSemanticPairCorrelationInexactSignatures":
+            source_semantic_pair_correlation_inexact,
+        "SourceSemanticPairEvidenceSignatures":
+            source_semantic_pair_evidence_signatures,
+        "SourceSemanticPairExactSignatures":
+            source_semantic_pair_exact_signatures,
+        "SourceSemanticPairFailClosedSignatures":
+            source_semantic_pair_fail_closed_signatures,
+        "SourceSemanticPairEvidenceCoverageComplete":
+            source_semantic_pair_evidence_coverage_complete,
         "SemanticPlanEvidenceMissingSignatures": semantic_plan_missing,
         "SemanticPlanInexactSignatures": semantic_plan_inexact,
         "ObjectOwnershipPrerequisiteEvidenceMissingSignatures":
@@ -1046,6 +1092,8 @@ def main() -> int:
     # startup epoch so separate files and accumulated process restarts cannot
     # overwrite an unrelated signature#N record.
     signatures: dict[SignatureKey, dict] = {}
+    source_semantic_pairs: dict[SignatureKey, dict] = {}
+    pending_source_semantic_pairs: dict[tuple[str, int], dict] = {}
     semantic_translation_plans: dict[SignatureKey, dict] = {}
     translation_object_prerequisites: dict[SignatureKey, dict] = {}
     object_creation_handoffs: dict[SignatureKey, dict] = {}
@@ -1090,6 +1138,7 @@ def main() -> int:
             and "VR DX11 R194" not in text
             and "VR DX11 R197" not in text
             and "VR DX11 R223" not in text
+            and "VR DX11 R271" not in text
             and "VR DX11 R287" not in text
             and "VR DX11 R291" not in text
             and "VR DX11 R293" not in text
@@ -1150,6 +1199,32 @@ def main() -> int:
                 latest_summary_line_by_log[source_log] = line_number
                 continue
 
+            match = R271_SOURCE_SEMANTIC_PAIR_RE.search(line)
+            if match:
+                data = match.groupdict()
+                pending_source_semantic_pairs[(source_log, startup_epoch)] = {
+                    "exact": bool(int(data["exact"])),
+                    "cache_key": int(data["cacheKey"], 16),
+                    "cache_key_hex": "0x" + data["cacheKey"].upper(),
+                    "pair_hash": int(data["pairHash"], 16),
+                    "pair_hash_hex": "0x" + data["pairHash"].upper(),
+                    "vertex_register_hash": int(data["vsRegisterHash"], 16),
+                    "vertex_register_hash_hex":
+                        "0x" + data["vsRegisterHash"].upper(),
+                    "pixel_register_hash": int(data["psRegisterHash"], 16),
+                    "pixel_register_hash_hex":
+                        "0x" + data["psRegisterHash"].upper(),
+                    "link_hash": int(data["linkHash"], 16),
+                    "link_hash_hex": "0x" + data["linkHash"].upper(),
+                    "receipt_revision_hash": int(data["receiptRevision"], 16),
+                    "receipt_revision_hash_hex":
+                        "0x" + data["receiptRevision"].upper(),
+                    "semantic_contract_hash": int(data["contract"], 16),
+                    "semantic_contract_hash_hex":
+                        "0x" + data["contract"].upper(),
+                }
+                continue
+
             match = R276_SEMANTIC_PLAN_RE.search(line)
             if match:
                 data = match.groupdict()
@@ -1168,6 +1243,13 @@ def main() -> int:
                     "semantic_contract_hash": int(data["contract"], 16),
                     "semantic_contract_hash_hex": "0x" + data["contract"].upper(),
                 }
+                pending_source_semantic_pair = pending_source_semantic_pairs.pop(
+                    (source_log, startup_epoch), None
+                )
+                if pending_source_semantic_pair is not None:
+                    source_semantic_pairs[signature_key] = (
+                        pending_source_semantic_pair
+                    )
                 continue
 
             match = R279_OBJECT_PREREQUISITE_RE.search(line)
@@ -1922,6 +2004,63 @@ def main() -> int:
                 fixed_function.setdefault(signature_key, []).append(parsed)
 
     for signature_key, signature in signatures.items():
+        source_semantic_pair = source_semantic_pairs.get(signature_key)
+        if source_semantic_pair is not None:
+            semantic_plan = semantic_translation_plans.get(signature_key)
+            object_prerequisite = translation_object_prerequisites.get(
+                signature_key
+            )
+            exact_state_correlated = bool(
+                not source_semantic_pair["exact"]
+                or (
+                    source_semantic_pair["cache_key"] != 0
+                    and source_semantic_pair["pair_hash"] != 0
+                    and source_semantic_pair["vertex_register_hash"] != 0
+                    and source_semantic_pair["pixel_register_hash"] != 0
+                    and source_semantic_pair["link_hash"] != 0
+                    and source_semantic_pair["receipt_revision_hash"] != 0
+                    and source_semantic_pair["semantic_contract_hash"] != 0
+                )
+            )
+            semantic_plan_correlated = bool(
+                not source_semantic_pair["exact"]
+                or (
+                    semantic_plan is not None
+                    and semantic_plan["exact"]
+                    and semantic_plan["snapshot"] != 0
+                )
+            )
+            object_prerequisite_correlated = bool(
+                not source_semantic_pair["exact"]
+                or (
+                    object_prerequisite is not None
+                    and object_prerequisite["exact"]
+                    and object_prerequisite["cache_key"]
+                        == source_semantic_pair["cache_key"]
+                    and semantic_plan is not None
+                    and object_prerequisite["translation_plan_snapshot"]
+                        == semantic_plan["snapshot"]
+                )
+            )
+            summary_correlation_exact = bool(
+                exact_state_correlated
+                and semantic_plan_correlated
+                and object_prerequisite_correlated
+            )
+            source_semantic_pair.update({
+                "exact_state_correlated": exact_state_correlated,
+                "semantic_plan_correlated": semantic_plan_correlated,
+                "object_prerequisite_correlated":
+                    object_prerequisite_correlated,
+                "summary_correlation_exact": summary_correlation_exact,
+                "fail_closed": bool(
+                    summary_correlation_exact
+                    and source_semantic_pair["exact"]
+                ),
+                "diagnostic_only": True,
+                "activation_proof": False,
+            })
+        signature["source_semantic_pair"] = source_semantic_pair
         signature["semantic_translation_plan"] = (
             semantic_translation_plans.get(signature_key)
         )
