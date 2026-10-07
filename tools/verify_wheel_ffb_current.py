@@ -836,7 +836,7 @@ req(ffb, 'WheelFFBCountersteerStrength', 'runtime registers the adjustable count
 req(ffb, 'Settings::WheelFFBCountersteerStrength', 'runtime applies the live countersteer-strength value only to the drift target')
 req(wheel_ui, 'Countersteer Strength', 'F11 Force Feedback exposes the live countersteer-strength slider')
 req(wheel_ui, 'WheelFFBCountersteerStrength', 'F11 save/restore and presets retain countersteer strength')
-req(profile_store, '{"GripLoss","0.65"}, {"CountersteerStrength","0.90"}', 'named FFB profiles use the tuned countersteer default when older profiles omit it')
+req(profiles, '{"GripLoss","0.65"}, {"CountersteerStrength","0.90"}', 'named FFB profiles use the tuned countersteer default when older profiles omit it')
 req(ini, 'CountersteerStrength = 0.90', 'shipped INI documents the adjustable countersteer default')
 req(ffb, '(driftCountersteerTorque - physicsSatTorque) *\n                        driftCountersteerBlend;', 'developed drift crossfades from front-slip SAT to body-slip countersteer target')
 req(ffb, 'driftBlend={} physicsSat={}', 'hardware telemetry exposes R13 drift assist and final Physics SAT')
