@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -346,6 +347,19 @@ for token in ['0x69EB4','0x6AC76','0x6B766']:
     require(token, graphics, 'original car-base-shadow call site')
 require('ScopedRenderSemantic semantic(', graphics, 'car shadow exact world semantic scope')
 require('RenderScope::WorldParticle', graphics, 'car shadow world ownership')
+
+# The three upstream call sites converge on this exact world-space producer.
+# Prevent a head-following/duplicated shadow caused by an expired semantic
+# scope even when both text tokens still exist elsewhere in the source file.
+shadow_draw = function_body(graphics, 'static void __cdecl CalcPeraShadow(')
+if not re.search(
+    r'OutRunVR::GameSemantic::ScopedRenderSemantic\s+semantic\(\s*'
+    r'OutRunVR::GameSemantic::RenderScope::WorldParticle\s*\);\s*'
+    r'Game::DrawObjectAlpha_Internal\(\s*a1,\s*'
+    r'a4\s*\*\s*Settings::CarBaseShadowOpacity,\s*0,\s*-1\);',
+    shadow_draw, re.S,
+):
+    raise SystemExit('P0 visual composition drift: car shadow draw escaped world-scoped RAII owner')
 for contract_id, rva in (
     ('VR-EXE-CAR-BASE-SHADOW-DISPCAR-CALL', '0x00069EB4'),
     ('VR-EXE-CAR-BASE-SHADOW-O2SP-SELECT-CALL', '0x0006AC76'),
@@ -358,6 +372,23 @@ for contract_id, rva in (
 require('ScopedExternalOverlaySemantic semantic(', overlay, 'F11 external semantic guard')
 require('RenderScope::ScreenOverlay2D', overlay, 'F11 external overlay scope')
 require('ImGui_ImplDX9_RenderDrawData', overlay, 'F11 guarded draw call')
+
+# A token-only check permits an unguarded gameplay draw or a scope that has
+# already destructed before ImGui submits. Pin both gameplay and menu branches
+# in the original D3DEndScene owner, with the semantic RAII scope inside the
+# gameplay branch and immediately enclosing the draw call.
+endscene = function_body(overlay, 'static void D3DEndScene(')
+if not re.search(
+    r'if\s*\(\s*overlayActive\s*&&\s*Game::is_in_game\(\)\s*\)\s*'
+    r'\{\s*OutRunVR::GameSemantic::ScopedExternalOverlaySemantic\s+semantic\(\s*'
+    r'OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D\s*\);\s*'
+    r'ImGui_ImplDX9_RenderDrawData\(ImGui::GetDrawData\(\)\);\s*\}\s*'
+    r'else\s*\{\s*ImGui_ImplDX9_RenderDrawData\(ImGui::GetDrawData\(\)\);\s*\}',
+    endscene, re.S,
+):
+    raise SystemExit(
+        'P0 visual composition drift: F11 gameplay draw must remain RAII-guarded; menu draw stays unguarded'
+    )
 
 # Translated DYNAMIC MANAGED textures must not consume the bounded CPU-shadow pool.
 require('R14TrackDirectLockable', r14, 'dynamic direct-lockable MANAGED texture path')
@@ -456,6 +487,27 @@ require('CorroboratesProjectedScreenEffect', sem, 'projected lens semantic predi
 require('VRLensFlareProjected2D', graphics, 'canonical lens producer hook')
 require('Module::exe_ptr(0xCABE)', graphics, 'canonical EXE+0xCABE lens callsite')
 require('RenderScope::ProjectedScreenEffect2D', graphics, 'exact lens producer scope')
+
+# Canonical EXE+0xCABE must call the exact projection-scoped producer; merely
+# mentioning the scope and CALL-site elsewhere would not protect the effect.
+lens_owner = graphics.split('class VRLensFlareProjected2D : public Hook', 1)
+if len(lens_owner) != 2:
+    raise SystemExit('P0 visual composition drift: exact lens hook owner missing')
+lens_owner = lens_owner[1].split('VRLensFlareProjected2D::instance;', 1)[0]
+if not re.search(
+    r'Memory::VP::InjectHook\(\s*Module::exe_ptr\(0xCABE\),\s*'
+    r'DrawObjectAlphaProjected,\s*Memory::HookType::Call\);',
+    lens_owner, re.S,
+):
+    raise SystemExit('P0 visual composition drift: EXE+0xCABE no longer hooks exact lens producer')
+lens_draw = function_body(graphics, 'static void __cdecl DrawObjectAlphaProjected(')
+if not re.search(
+    r'OutRunVR::GameSemantic::ScopedRenderSemantic\s+semantic\(\s*'
+    r'OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D\s*\);\s*'
+    r'Game::DrawObjectAlpha_Internal\(objectId,\s*alpha,\s*work,\s*flags\);',
+    lens_draw, re.S,
+):
+    raise SystemExit('P0 visual composition drift: lens draw escaped projection-scoped RAII owner')
 require('semanticProjectedScreen', r30, 'exact lens scope classifier')
 require('CorroboratesProjectedScreenEffect', r30, 'exact lens WVP ownership guard')
 require('exactSceneEffect', r30, 'SceneEffect/lens ownership admission')
