@@ -84,7 +84,7 @@
         255
       ],
       "stroke": 3,
-      "slant": 0.0
+      "slant": 0
     }
   },
   "machine_qa": {
@@ -111,8 +111,16 @@
     "8_immediate_readability": "EVIDENCE_WRITTEN_PENDING_CONTROLLER_CONFIRM"
   },
   "execution_backend": "EXACT_CONTROLLER_VALIDATED_B239_BC3_PATCH_REPLAY_ON_GITHUB_HOSTED_WORKER",
-  "controller_visual_qa": "PENDING_CHATGPT_CONTROLLER",
-  "status": "B239_WORKER_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA_AND_FRESH_C",
+  "controller_visual_qa": "PASS",
+  "status": "B239_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_AND_EXACT_SHA_C3",
   "runtime_validation": "UNTESTED",
-  "forbidden_domains_touched": []
+  "forbidden_domains_touched": [],
+  "controller_visual_note": "Persisted exact B239 candidate rechecked in focus, full-readable and RAW evidence. Duplicate Start rows now match at 60x36 with the same white/navy family; no English residue, broken Hangul, clipping, collision, protected-art damage, or RAW orientation regression.",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3": "REQUIRED_EXACT_SHA_DXT5_AND_FAMILY_FALSE_NEGATIVE",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+  "same_cycle_anti_duplication": {
+    "q60": "SKIPPED_NEWER_A167_BYTES_457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+    "q212": "SKIPPED_NEWER_A167R2_BYTES_6e108032df506fd5c3605fd138f878e546ac2c4ee459e0525eae0b6938ddd5ba"
+  }
 }
