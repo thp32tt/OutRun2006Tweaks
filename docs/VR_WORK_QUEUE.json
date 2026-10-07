@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-10-07T14:05:31+09:00",
+  "updatedKst": "2026-10-07T22:35:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -11,7 +11,7 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "EXCLUSIVE CURRENT PHASE: DX9Ex R84 production convergence on vr-d3d9ex-focus. Repair 00505 exact validation first, then selectively port still-required R84 structural boundaries into current production focus. R84 is read-only donor/reference; no cycle chasing or wholesale merge.",
+    "primaryBackend": "EXCLUSIVE P0 PHASE: DX9Ex visual-composition convergence on vr-d3d9ex-focus. Restore menu/car-selection textures and complete HUD/rank/rival/marker/lens-flare ownership before any new HMD candidate. R84 structural convergence is paused.",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -23,8 +23,8 @@
     "parallelBackendDevelopment": false,
     "backendReplacementGate": "DX11 Native and DXVK remain downstream/frozen while DX9Ex stabilization and Architecture v3 migration are incomplete. Reopen downstream porting only after the v3-primary DX9Ex runtime is USER_RUNTIME_VERIFIED and ARCH-V3-008 records the common-contract handoff. DX12/D3D9On12 remains reference-only unless explicitly reopened.",
     "parallelTracks": {
-      "HUD": "DX9EX_ONLY: general HUD/visual work may resume after structural completion when it is the highest executable item; do not touch downstream branches.",
-      "PERFORMANCE": "DX9EX_ONLY: general performance/telemetry work may resume after structural completion when evidence supports a bounded source/static unit; do not change synchronization semantics without evidence.",
+      "HUD": "P0_ACTIVE: authoritative visual-composition lane; complete before HMD packaging or structural/performance work resumes.",
+      "PERFORMANCE": "FROZEN_BEHIND_P0_VISUAL: preserve evidence only until the visual-composition static gate is green.",
       "DXVK": "FROZEN_BY_USER: keep evidence/history only; no implementation or validation scheduling.",
       "DX12": "FROZEN_REFERENCE_ONLY: unchanged; no implementation/build/HMD work."
     },
@@ -55,7 +55,7 @@
       "disabledReason": "Frozen by user while DX9Ex structural refactor is the exclusive active track."
     },
     "automationCycle": {
-      "mode": "DX9EX_R84_PRODUCTION_CONVERGENCE",
+      "mode": "DX9EX_P0_VISUAL_COMPOSITION",
       "executionEnvironment": "EXTERNAL_DOCKER_QUEUE_CONTROLLER",
       "cadenceAuthority": "EXTERNAL_DOCKER",
       "repositorySsot": [
@@ -66,11 +66,10 @@
         "docs/automation/QUEUE_CONTROLLER_CONTRACT.md"
       ],
       "activeTaskIds": [
-        "DX9EX-R84-PORT-GATE0-00505",
-        "DX9EX-R84-PORT-INVENTORY-001"
+        "DX9EX-P0-VISUAL-COMPOSITION-20261007"
       ],
       "productionIntegrationWip": 1,
-      "rule": "Fetch latest focus HEAD before every dispatch. Complete current immutable task first; then Gate0 00505; then highest-priority executable DX9EX-R84-PORT item with DONE dependencies. Do not use old ChatGPT schedule IDs or R84 cycle counts as work authority."
+      "rule": "Fetch latest focus HEAD before every dispatch. Work only P0 visual composition: upstream/fork/disassembly audit -> exact producer/resource fixes -> comprehensive static gate. Do not emit/request an HMD candidate until static closure is green."
     },
     "implementationFirstEnforcement": {
       "enabled": true,
@@ -88,21 +87,20 @@
     },
     "exclusiveFocus": {
       "enabled": true,
-      "mode": "DX9EX_R84_PRODUCTION_CONVERGENCE",
+      "mode": "DX9EX_P0_VISUAL_COMPOSITION",
       "lane": "DX9EX",
       "branch": "vr-d3d9ex-focus",
-      "track": "R84_SELECTIVE_PORT_TO_CURRENT_FOCUS",
-      "donorBranch": "vr-refactor-r84-2000c-20261001",
-      "donorHeadAtPlan": "40e998500fc758dd3b078d9df2ecc2a57a19bc5d",
+      "track": "HUD_MENU_MARKER_EFFECT_TEXTURE_STATIC_CONVERGENCE",
       "frozenTracks": [
+        "DX9EX_R84_PRODUCTION_CONVERGENCE",
+        "ARCH_V3",
+        "DX9EX_GENERAL_PERF_TUNING",
         "DX11",
         "DXVK",
-        "HMD_MATRIX",
-        "DX9EX_GENERAL_PERF_TUNING",
-        "DX9EX_GENERAL_FEATURE_EXPANSION"
+        "HMD_MATRIX"
       ],
-      "reopenRule": "Critical DX9Ex regression/safety repair may preempt convergence. General DX9Ex feature/performance work resumes after R84 convergence closeout. Architecture v3 remains HMD-gated and downstream.",
-      "reason": "User direction 2026-10-07: structural work performed in R84 must be reconciled into production DX9Ex rather than abandoned."
+      "reopenRule": "Resume R84/architecture/performance only after the P0 visual-composition verifier and canonical exact-SHA DX9Ex gates are green. HMD reopens only after static completion.",
+      "reason": "User direction 2026-10-07 after 00519 HMD FAIL: stop trial builds; review upstream/disassembly/R73-era evidence, fix all HUD/display composition paths, finish static validation, then test."
     },
     "architectureV3Transition": {
       "enabled": true,
@@ -178,6 +176,29 @@
     }
   },
   "items": [
+    {
+      "id": "DX9EX-P0-VISUAL-COMPOSITION-20261007",
+      "priority": 100,
+      "status": "IMPLEMENT_NEXT",
+      "preferredRole": "D_INTEGRATION_PLANNER",
+      "summary": "P0 visual-composition convergence: original mod + fork R65-R74/R73-era evidence + canonical disassembly -> menu textures, all HUD families, projected rank/rival markers, arrows/YES-NO, +TIME/results, lens flare/SceneEffect -> complete static gate before HMD.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "runtimeFailureSource": "9a3e08cc62b6a36a8196936eacead8cc08fcc756",
+      "requiredStaticClosure": [
+        "producer inventory reconciled",
+        "fixed-function XYZRHW ScreenHud exact ownership",
+        "fixed-function ProjectedWorldMarker2D route",
+        "MANAGED LockRect resource contract",
+        "lens flare/SceneEffect ownership gate",
+        "pre-launch EXE semantic identity",
+        "asset analyzer packaged",
+        "DX9Ex Active + Domain Isolation + HUD Inspector green"
+      ],
+      "nextAction": "Run visual-composition verifier RED, implement one root-cause unit at a time, keep HMD packaging blocked until exact-SHA static/build closure."
+    },
     {
       "id": "VR-R51-RANK-ANCHOR-PROPAGATION-001",
       "priority": 13,
