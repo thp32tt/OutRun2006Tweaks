@@ -10062,10 +10062,13 @@ template <typename SourceReceipt>
 NativeProgrammableShaderDormantSourceRevalidationReadiness
 compose_programmable_dormant_source_revalidation_readiness(
     const SourceReceipt& sourceReceipt,
+    std::uint64_t cacheKey,
     std::uint64_t candidateSnapshotToken,
     std::uint64_t preActivationSnapshotToken) noexcept {
     NativeProgrammableShaderDormantSourceRevalidationReadiness out{};
+    out.cacheKey = cacheKey;
     out.inputValid =
+        cacheKey != 0 &&
         candidateSnapshotToken != 0 && preActivationSnapshotToken != 0;
     out.sourceReceiptReady = sourceReceipt.ready;
     out.sourceReceiptSnapshotPresent = sourceReceipt.snapshotToken != 0;
@@ -10121,6 +10124,7 @@ compose_programmable_dormant_source_revalidation_readiness(
         token = mix_readiness_snapshot_token(
             token, static_cast<std::uint32_t>(out.kind));
         token = mix_readiness_snapshot_token(token, out.indexed ? 1u : 0u);
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
         token = mix_readiness_snapshot_token(
             token, out.currentSourceReceiptSnapshotToken);
         token = mix_readiness_snapshot_token(token, out.candidateSnapshotToken);
@@ -12789,14 +12793,17 @@ compose_programmable_activation_prerequisite_handoff(
     constexpr std::uint32_t kResourceBehaviorMissing = 1u << 0;
     constexpr std::uint32_t kInputLayoutMissing = 1u << 1;
     constexpr std::uint32_t kShaderTranslationMissing = 1u << 2;
+    constexpr std::uint32_t kSourceIdentityMissing = 1u << 3;
 
     out.kind = sourceRevalidation.kind;
     out.indexed = sourceRevalidation.indexed;
+    out.cacheKey = sourceRevalidation.cacheKey;
     out.sourceRevalidationSnapshotToken = sourceRevalidationSnapshotToken;
     out.resourceBehaviorSnapshotToken = resourceBehaviorSnapshotToken;
     out.inputLayoutSnapshotToken = inputLayoutSnapshotToken;
     out.shaderTranslationSnapshotToken = shaderTranslationSnapshotToken;
     out.inputValid =
+        out.cacheKey != 0 &&
         sourceRevalidationSnapshotToken != 0 &&
         resourceBehaviorSnapshotToken != 0 &&
         inputLayoutSnapshotToken != 0 &&
@@ -12810,6 +12817,11 @@ compose_programmable_activation_prerequisite_handoff(
         out.sourceRevalidationReady &&
         sourceRevalidation.snapshotToken ==
             sourceRevalidationSnapshotToken;
+    out.sourceIdentityMatches =
+        out.sourceRevalidationSnapshotMatches &&
+        out.cacheKey != 0 &&
+        inputLayout.cacheKey == out.cacheKey &&
+        shaderTranslation.cacheKey == out.cacheKey;
 
     out.resourceBehaviorReviewReady =
         resourceBehavior.reviewReady &&
@@ -12881,6 +12893,10 @@ compose_programmable_activation_prerequisite_handoff(
     out.shaderTranslationProofPresent =
         out.shaderTranslationReviewReady &&
         out.shaderTranslationSnapshotMatches;
+    // R290 prevents a valid R258/R262 draw/resource chain from being combined
+    // with equally valid R243/R263 receipts belonging to another R239 pair.
+    out.sourceIdentityProofPresent =
+        out.sourceIdentityMatches;
 
     out.missingPrerequisiteMask = 0;
     if (!out.resourceBehaviorProofPresent)
@@ -12889,11 +12905,14 @@ compose_programmable_activation_prerequisite_handoff(
         out.missingPrerequisiteMask |= kInputLayoutMissing;
     if (!out.shaderTranslationProofPresent)
         out.missingPrerequisiteMask |= kShaderTranslationMissing;
+    if (!out.sourceIdentityProofPresent)
+        out.missingPrerequisiteMask |= kSourceIdentityMissing;
 
     out.activationPrerequisitesSatisfied =
         out.resourceBehaviorProofPresent &&
         out.inputLayoutProofPresent &&
         out.shaderTranslationProofPresent &&
+        out.sourceIdentityProofPresent &&
         out.missingPrerequisiteMask == 0;
 
     out.diagnosticOnly = true;
@@ -12904,6 +12923,7 @@ compose_programmable_activation_prerequisite_handoff(
         out.resourceBehaviorProofPresent &&
         out.inputLayoutProofPresent &&
         out.shaderTranslationProofPresent &&
+        out.sourceIdentityProofPresent &&
         out.diagnosticOnly &&
         !out.nativeDrawPathActivationAllowed &&
         !out.drawDispatchAuthorized;
@@ -12915,6 +12935,7 @@ compose_programmable_activation_prerequisite_handoff(
         out.resourceBehaviorProofPresent &&
         out.inputLayoutProofPresent &&
         out.shaderTranslationProofPresent &&
+        out.sourceIdentityProofPresent &&
         out.boundaryPreserved;
 
     if (out.reviewReady) {
@@ -12922,6 +12943,7 @@ compose_programmable_activation_prerequisite_handoff(
         token = mix_readiness_snapshot_token(
             token, static_cast<std::uint32_t>(out.kind));
         token = mix_readiness_snapshot_token(token, out.indexed ? 1u : 0u);
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
         token = mix_readiness_snapshot_token(
             token, out.sourceRevalidationSnapshotToken);
         token = mix_readiness_snapshot_token(
@@ -12944,7 +12966,10 @@ compose_programmable_activation_prerequisite_handoff(
             token, out.inputLayoutProofPresent ? 1u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.shaderTranslationProofPresent ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceIdentityProofPresent ? 1u : 0u);
         token = mix_readiness_snapshot_token(token, 0x259u);
+        token = mix_readiness_snapshot_token(token, 0x290u);
         out.reviewSnapshotToken = token == 0 ? 1 : token;
     }
 
@@ -12979,6 +13004,7 @@ bool validate_programmable_activation_prerequisite_handoff_snapshot(
         current.resourceBehaviorProofPresent &&
         current.inputLayoutProofPresent &&
         current.shaderTranslationProofPresent &&
+        current.sourceIdentityProofPresent &&
         current.missingPrerequisiteMask == 0 &&
         current.activationPrerequisitesSatisfied &&
         !current.nativeDrawPathActivationAllowed &&
@@ -13022,7 +13048,8 @@ nonindexed_dormant_source_revalidation_readiness(
         nonIndexedGeometryBindingSnapshotToken, primitiveCount,
         startVertexLocation);
     return compose_programmable_dormant_source_revalidation_readiness(
-        currentSource, candidateSnapshotToken, preActivationSnapshotToken);
+        currentSource, identity.cacheKey,
+        candidateSnapshotToken, preActivationSnapshotToken);
 }
 
 NativeProgrammableShaderDormantSourceRevalidationReadiness
