@@ -105,7 +105,7 @@ jobs=[
   "before":"e3854f79be83cdd5fac7e9af91ab8f2beb9707000a7c6abbc564c2ca443fa553",
   "source_sha":"cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
   "source_png":"localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_SOURCE_READABLE.png",
-  "authoritative_clean":null,
+  "authoritative_clean":None,
   "rows":[
     {"bbox":[1829,3227,2364,3329],"old_bbox":[1948,3240,2245,3316],"size":[486,92],"font":90,"stroke":4},
     {"bbox":[594,1622,1128,1724],"old_bbox":[712,1635,1009,1711],"size":[486,92],"font":90,"stroke":4},
