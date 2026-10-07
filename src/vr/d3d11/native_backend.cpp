@@ -804,6 +804,145 @@ std::uint64_t recompute_programmable_output_resource_behavior_payload_snapshot(
     return token == 0 ? 1 : token;
 }
 
+// R305 seals the complete copied R259/R292 observation payload at the
+// validation boundary used by production census. The stored R259/R292 review
+// tokens intentionally remain their original domains; this independent payload
+// identity detects mutation of fields that those historical tokens did not hash.
+std::uint64_t r305_programmable_activation_prerequisite_payload_snapshot_token(
+    const NativeProgrammableShaderActivationPrerequisiteHandoff&
+        prerequisites) noexcept {
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(token, prerequisites.inputValid ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.sourceRevalidationReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.sourceRevalidationSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.sourceRevalidationPayloadSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.sourceIdentityMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.resourceBehaviorReviewReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.resourceBehaviorSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.resourceBehaviorPayloadSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.resourceBehaviorGeometryProofPresent ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.resourceBehaviorTextureProofPresent ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.resourceBehaviorOutputProofPresent ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.resourceBehaviorCoverageComplete ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.inputLayoutOwnershipReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.inputLayoutSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.shaderTranslationReviewReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.shaderTranslationSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.resourceBehaviorProofPresent ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.inputLayoutProofPresent ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.shaderTranslationProofPresent ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.sourceIdentityProofPresent ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.activationPrerequisitesSatisfied ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.diagnosticOnly ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.nativeDrawPathActivationAllowed ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.drawDispatchAuthorized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.boundaryPreserved ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.reviewReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, static_cast<std::uint64_t>(prerequisites.kind));
+    token = mix_readiness_snapshot_token(token, prerequisites.indexed ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.missingPrerequisiteMask);
+    token = mix_readiness_snapshot_token(token, prerequisites.cacheKey);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.sourceRevalidationSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.resourceBehaviorSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.inputLayoutSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.shaderTranslationSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.reviewSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, prerequisites.activationSnapshotToken);
+    token = mix_readiness_snapshot_token(token, 0x305259u);
+    return token == 0 ? 1 : token;
+}
+
+std::uint64_t r305_programmable_production_activation_payload_snapshot_token(
+    const NativeProgrammableShaderProductionActivationPrerequisiteEvidence&
+        observation) noexcept {
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(token, observation.inputValid ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.productionSemanticReviewReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.productionSemanticReviewSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.sourceRevalidationReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.sourceRevalidationSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.resourceBehaviorReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.resourceBehaviorSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.resourceBehaviorPayloadSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.prerequisiteHandoffReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.prerequisiteHandoffSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.staticPrerequisitesSatisfied ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.objectBindingAuthorized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.nativeDrawPathActivationAllowed ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.drawDispatchAuthorized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.diagnosticOnly ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.boundaryPreserved ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.reviewReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.missingPrerequisiteMask);
+    token = mix_readiness_snapshot_token(token, observation.cacheKey);
+    token = mix_readiness_snapshot_token(
+        token, observation.productionSemanticReviewSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.sourceRevalidationSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.resourceBehaviorSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.prerequisiteHandoffSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.reviewSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token,
+        r305_programmable_activation_prerequisite_payload_snapshot_token(
+            observation.prerequisites));
+    token = mix_readiness_snapshot_token(token, 0x305292u);
+    return token == 0 ? 1 : token;
+}
+
 std::uint64_t r292_programmable_production_activation_prerequisite_snapshot_token(
     const NativeProgrammableShaderProductionActivationPrerequisiteEvidence&
         observation) noexcept {
@@ -6482,7 +6621,14 @@ bool validate_programmable_shader_production_activation_prerequisite_snapshot(
             sourceRevalidationSnapshotToken,
             resourceBehavior,
             resourceBehaviorSnapshotToken);
-    if (!current.reviewReady ||
+    const auto currentPayloadSnapshotToken =
+        r305_programmable_production_activation_payload_snapshot_token(current);
+    const auto observedPayloadSnapshotToken =
+        r305_programmable_production_activation_payload_snapshot_token(
+            observation);
+    if (currentPayloadSnapshotToken == 0 ||
+        currentPayloadSnapshotToken != observedPayloadSnapshotToken ||
+        !current.reviewReady ||
         current.cacheKey != observation.cacheKey ||
         current.productionSemanticReviewSnapshotToken !=
             observation.productionSemanticReviewSnapshotToken ||

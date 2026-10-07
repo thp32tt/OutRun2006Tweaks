@@ -6904,6 +6904,39 @@ int main()
                 r292ProductionActivationPrerequisites.reviewSnapshotToken),
         "R292 production activation-prerequisite observation combines exact R289+R258+R262 through R259 without activation");
 
+    auto r305TamperedProductionActivationPayload =
+        r292ProductionActivationPrerequisites;
+    r305TamperedProductionActivationPayload.sourceRevalidationReady = false;
+    require(
+        !outrun::vr::dx11::
+            validate_programmable_shader_production_activation_prerequisite_snapshot(
+                r289ProductionSemanticReview,
+                r289ProductionSemanticReview.reviewSnapshotToken,
+                r258IndexedSourceRevalidation,
+                r258IndexedSourceRevalidation.snapshotToken,
+                r262IndexedOutputResourceBehavior,
+                r262IndexedOutputResourceBehavior.reviewSnapshotToken,
+                r305TamperedProductionActivationPayload,
+                r292ProductionActivationPrerequisites.reviewSnapshotToken),
+        "R305 rejects copied R292 observation payload drift before production census trust");
+
+    auto r305TamperedNestedPrerequisitePayload =
+        r292ProductionActivationPrerequisites;
+    r305TamperedNestedPrerequisitePayload.prerequisites.
+        resourceBehaviorGeometryProofPresent = false;
+    require(
+        !outrun::vr::dx11::
+            validate_programmable_shader_production_activation_prerequisite_snapshot(
+                r289ProductionSemanticReview,
+                r289ProductionSemanticReview.reviewSnapshotToken,
+                r258IndexedSourceRevalidation,
+                r258IndexedSourceRevalidation.snapshotToken,
+                r262IndexedOutputResourceBehavior,
+                r262IndexedOutputResourceBehavior.reviewSnapshotToken,
+                r305TamperedNestedPrerequisitePayload,
+                r292ProductionActivationPrerequisites.reviewSnapshotToken),
+        "R305 rejects copied R259 prerequisite payload drift nested under R292");
+
     const auto r292StaleSemanticReview =
         outrun::vr::dx11::
             observe_programmable_shader_production_activation_prerequisites(

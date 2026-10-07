@@ -11564,6 +11564,33 @@ def main() -> None:
             )
         )
 
+    r305_programmable_production_activation_payload_integrity = [
+        ("r305_programmable_activation_prerequisite_payload_snapshot_token(",
+         NATIVE_BACKEND_CPP, "R305 seals the complete copied R259 prerequisite payload"),
+        ("r305_programmable_production_activation_payload_snapshot_token(",
+         NATIVE_BACKEND_CPP, "R305 seals the complete copied R292 observation payload"),
+        ("currentPayloadSnapshotToken",
+         NATIVE_BACKEND_CPP, "R305 validator recomputes the current complete production payload"),
+        ("observedPayloadSnapshotToken",
+         NATIVE_BACKEND_CPP, "R305 validator recomputes the caller-supplied copied production payload"),
+        ("R305 rejects copied R292 observation payload drift before production census trust",
+         CONSTANT_BUFFER_PROBE, "R305 hosted top-level copied-observation tamper regression"),
+        ("R305 rejects copied R259 prerequisite payload drift nested under R292",
+         CONSTANT_BUFFER_PROBE, "R305 hosted nested prerequisite tamper regression"),
+    ]
+    missing_r305_programmable_production_activation_payload_integrity = [
+        meaning for token, source, meaning
+        in r305_programmable_production_activation_payload_integrity
+        if token not in source
+    ]
+    if missing_r305_programmable_production_activation_payload_integrity:
+        raise SystemExit(
+            "DX11 R305 programmable production activation payload-integrity drift: "
+            + ", ".join(
+                missing_r305_programmable_production_activation_payload_integrity
+            )
+        )
+
     r294_programmable_production_draw_identity = [
         ("enum class SourceDrawKind", RUNTIME_CENSUS_HPP,
          "R294 explicit source draw-kind identity"),
