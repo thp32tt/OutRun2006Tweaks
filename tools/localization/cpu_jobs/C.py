@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# C234 / TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL)
-# Fresh independent C + mandatory C3 strict audit for P0 IGR-005 q137 30CF0D / B165.
+# C235 / TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN
+# Fresh independent C + mandatory C3 strict evidence for P0 PJR-001 q12 D6DC1380 / A160.
 import io, os, json, hashlib, pathlib, subprocess, urllib.request, struct
 import numpy as np
 from PIL import Image, ImageOps, ImageDraw
@@ -8,215 +8,190 @@ from PIL import Image, ImageOps, ImageDraw
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
-RUN="20261007-C234-C1-Q137-30CF0D-B165"
+RUN="20261007-C235-C2-Q012-D6DC1380-A160"
 ROOT=pathlib.Path("localization/graphics/role_C")/RUN
 ROOT.mkdir(parents=True, exist_ok=True)
-CAND=pathlib.Path("localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds")
-CLEAN=pathlib.Path("localization/graphics/role_C/20261005-C156-30CF0D/C156_VERIFIED_CLEAN_PLATE.png")
-SOURCE_MASK=pathlib.Path("localization/graphics/role_C/20261005-C156-30CF0D/C156_SOURCE_TEXT_MASK.png")
-PROTECTED_MASK=pathlib.Path("localization/graphics/role_C/20261005-C156-30CF0D/C156_PROTECTED_MASK.png")
-C156_REPORT=pathlib.Path("localization/graphics/role_C/20261005-C156-30CF0D/C156_30CF_MACHINE_QA.json")
-SOURCE_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds"
-EXPECTED_SOURCE="11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc"
-EXPECTED_OLD="6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b"
-EXPECTED_CAND="0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4"
-B165_COMMIT="e127a62fbec55ff0a9a487de747b15ee5ffe9b93"
+CAND=pathlib.Path("localization/graphics/hd_candidates/textures/load/spr_etc_xst/D6DC1380_256x64.dds")
+SOURCE_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_etc_xst/D6DC1380_256x64.dds"
+EXPECTED_SOURCE="42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352"
+EXPECTED_OLD="703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422"
+EXPECTED_CAND="fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5"
 CAND_REPO=str(CAND)
-CHANGED_KEYS={"select_transmission","transmission_small"}
 
 def sha(b): return hashlib.sha256(b).hexdigest()
 def decode(b):
     im=Image.open(io.BytesIO(b)); im.load(); return im.convert("RGBA")
-def A(im): return np.array(im)
+def arr(im): return np.array(im)
 def bbox(mask):
     ys,xs=np.where(mask)
     if not len(xs): return None
     return [int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
-def local_bbox(mask, box):
-    x0,y0,x1,y1=box
-    b=bbox(mask[y0:y1,x0:x1])
-    return None if b is None else [b[0]+x0,b[1]+y0,b[2]+x0,b[3]+y0]
 def size(b): return [b[2]-b[0],b[3]-b[1]]
 def margins(src,fin): return [fin[0]-src[0],src[2]-fin[2],fin[1]-src[1],src[3]-fin[3]]
+def visible_diff(a,b):
+    aa=a[:,:,3].astype(np.uint16); ba=b[:,:,3].astype(np.uint16)
+    ap=a[:,:,:3].astype(np.uint16)*aa[:,:,None]
+    bp=b[:,:,:3].astype(np.uint16)*ba[:,:,None]
+    return (aa!=ba) | np.any(ap!=bp,axis=2)
 def draw_label(im,label):
-    c=Image.new("RGB",(im.width,im.height+26),"#c8c8c8"); c.paste(im.convert("RGB"),(0,26))
-    ImageDraw.Draw(c).text((6,6),label,fill="black"); return c
+    c=Image.new("RGB",(im.width,im.height+24),"#c8c8c8")
+    c.paste(im.convert("RGB"),(0,24)); ImageDraw.Draw(c).text((6,6),label,fill="black"); return c
 def hstrip(items):
     w=sum(x.width for x in items); h=max(x.height for x in items)
     out=Image.new("RGB",(w,h),"#a8a8a8"); x=0
     for im in items: out.paste(im,(x,0)); x+=im.width
     return out
+def neutral(im):
+    bg=Image.new("RGBA",im.size,(104,104,104,255))
+    return Image.alpha_composite(bg,im).convert("RGB")
 
 with urllib.request.urlopen(SOURCE_URL,timeout=60) as r:
     source_bytes=r.read()
 cand_bytes=CAND.read_bytes()
-old_bytes=subprocess.check_output(["git","show",f"{B165_COMMIT}^:{CAND_REPO}"])
 if sha(source_bytes)!=EXPECTED_SOURCE: raise SystemExit("source SHA mismatch")
-if sha(old_bytes)!=EXPECTED_OLD: raise SystemExit("old SHA mismatch")
 if sha(cand_bytes)!=EXPECTED_CAND: raise SystemExit("candidate SHA mismatch")
 
-source,old,cand=map(decode,[source_bytes,old_bytes,cand_bytes])
-clean=Image.open(CLEAN).convert("RGBA")
-if not (source.size==old.size==cand.size==clean.size==(2048,1024)): raise SystemExit("dimension mismatch")
-S,O,F,K0=map(A,[source,old,cand,clean])
-c156=json.loads(C156_REPORT.read_text(encoding="utf-8"))
-rows=c156["rows"]
-H,W=1024,2048
-def readable_to_raw(box):
-    x0,y0,x1,y1=box
-    return [x0,H-y1,x1,H-y0]
-def raw_to_readable(box):
-    x0,y0,x1,y1=box
-    return [x0,H-y1,x1,H-y0]
-def clean_orientation_score(Kcand):
-    d=(O[:,:,3]!=Kcand[:,:,3])
-    score=0
-    detail={}
-    for r in rows:
-        sb_raw=readable_to_raw(list(r["original_bbox"]))
-        ob_raw=local_bbox(d,sb_raw)
-        if ob_raw is None:
-            score += 1000000
-            detail[r["key"]]=None
-            continue
-        ob=raw_to_readable(ob_raw)
-        exp=list(r["localized_bbox"])
-        delta=sum(abs(a-b) for a,b in zip(ob,exp))
-        score += delta
-        detail[r["key"]]={"derived":ob,"expected":exp,"delta":delta}
-    return score,detail
-score_raw,detail_raw=clean_orientation_score(K0)
-Kflip=np.flipud(K0)
-score_flip,detail_flip=clean_orientation_score(Kflip)
-if score_raw<=score_flip:
-    K=K0; clean_storage_orientation="RAW"; clean_alignment_score=score_raw; clean_alignment_detail=detail_raw
-else:
-    K=Kflip; clean_storage_orientation="READABLE_FLIPY_CONVERTED_TO_RAW"; clean_alignment_score=score_flip; clean_alignment_detail=detail_flip
-if clean_alignment_score>24:
-    print(json.dumps({"clean_orientation_scores":{"raw":score_raw,"flip":score_flip},"chosen":clean_storage_orientation,"detail":clean_alignment_detail},ensure_ascii=False,indent=2))
-    raise SystemExit("C234 clean plate orientation/alignment ambiguous")
+# Recover exact user-rejected predecessor by SHA from Git history.
+old_bytes=None; old_commit=None
+for h in subprocess.check_output(["git","log","--format=%H","--all","--",CAND_REPO],text=True).splitlines():
+    try:
+        b=subprocess.check_output(["git","show",f"{h}:{CAND_REPO}"],stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError:
+        continue
+    if sha(b)==EXPECTED_OLD:
+        old_bytes=b; old_commit=h; break
+if old_bytes is None: raise SystemExit("rejected predecessor not found in git history")
 
-# Fresh decoded persisted-pixel bboxes against prior independent C clean plate.
-# C156 report bboxes are readable/FLIP-Y coordinates; DDS/clean pixels below remain RAW.
-records=[]
-allowed=np.zeros((H,W),dtype=bool)
-# Visible glyph/effect bbox authority: alpha delta versus the verified clean plate.
-# Hidden RGB under alpha=0 is intentionally excluded from visible-text geometry.
-old_diff=(O[:,:,3]!=K[:,:,3])
-fin_diff=(F[:,:,3]!=K[:,:,3])
-for r in rows:
-    key=r["key"]; sb_read=list(r["original_bbox"]); sb_raw=readable_to_raw(sb_read)
-    rx0,ry0,rx1,ry1=sb_raw
-    if key in CHANGED_KEYS: allowed[ry0:ry1,rx0:rx1]=True
-    ob_raw=local_bbox(old_diff,sb_raw); fb_raw=local_bbox(fin_diff,sb_raw)
-    if ob_raw is None or fb_raw is None: raise SystemExit(f"missing decoded bbox {key}: old={ob_raw} final={fb_raw}")
-    ob=raw_to_readable(ob_raw); fb=raw_to_readable(fb_raw)
-    sw,sh=size(sb_read); ow,oh=size(ob); fw,fh=size(fb)
-    mg=margins(sb_read,fb)
-    containment=fb[0]>=sb_read[0] and fb[1]>=sb_read[1] and fb[2]<=sb_read[2] and fb[3]<=sb_read[3]
-    positive=all(v>0 for v in mg)
-    records.append({
-      "key":key,"source":r["source"],"korean_current":("변속기 선택" if key=="select_transmission" else "변속기" if key=="transmission_small" else r["korean"]),
-      "source_bbox":sb_read,"source_bbox_raw":sb_raw,"prior_bbox":ob,"localized_bbox":fb,
-      "source_size":[sw,sh],"prior_size":[ow,oh],"localized_size":[fw,fh],"margins":mg,
-      "containment":"PASS" if containment else "FAIL",
-      "size_ceiling":"PASS" if fw<=sw and fh<=sh else "FAIL",
-      "positive_margin":"PASS" if positive else "FAIL",
-      "changed_by_B165": key in CHANGED_KEYS
-    })
+source_native=decode(source_bytes)
+old=decode(old_bytes)
+cand=decode(cand_bytes)
+if source_native.size!=(256,64) or old.size!=(1024,256) or cand.size!=(1024,256):
+    raise SystemExit(f"dimension mismatch {source_native.size} {old.size} {cand.size}")
 
+# q12 CREATE_NEW_HD is a 4x canvas of a single transparent text sprite.
+# Canonical source alpha is independently measured at native size then scaled exactly.
+SN=arr(source_native); O=arr(old); F=arr(cand)
+source_bbox_native=bbox(SN[:,:,3]>0)
+if source_bbox_native is None: raise SystemExit("source alpha bbox missing")
+source_bbox_hd=[v*4 for v in source_bbox_native]
+if source_bbox_native!=[8,10,248,44]:
+    raise SystemExit(f"unexpected independent source bbox {source_bbox_native}")
+x0,y0,x1,y1=source_bbox_hd
+
+old_bbox=bbox(O[:,:,3]>0)
+fin_bbox=bbox(F[:,:,3]>0)
+if old_bbox is None or fin_bbox is None: raise SystemExit("candidate alpha bbox missing")
+
+sw,sh=size(source_bbox_hd); ow,oh=size(old_bbox); fw,fh=size(fin_bbox)
+mg=margins(source_bbox_hd,fin_bbox)
+contain=(fin_bbox[0]>=x0 and fin_bbox[1]>=y0 and fin_bbox[2]<=x1 and fin_bbox[3]<=y1)
+positive=all(v>0 for v in mg)
+size_ok=(fw<=sw and fh<=sh)
+
+allowed=np.zeros((256,1024),bool); allowed[y0:y1,x0:x1]=True
 change=np.any(F!=O,axis=2)
+vis_change=visible_diff(F,O)
 alpha_change=F[:,:,3]!=O[:,:,3]
 changed_outside=int((change & ~allowed).sum())
-alpha_outside=int((alpha_change & ~allowed).sum())
-# Four prior localized option rows, AT/MT artwork and every unrelated pixel must remain exact
-# because B165 is allowed to touch only the two independently established source bboxes.
-unchanged_expected=changed_outside==0 and alpha_outside==0
-changed_inside_each={}
-for rec in records:
-    sb=rec["source_bbox_raw"]; x0,y0,x1,y1=sb
-    changed_inside_each[rec["key"]]=int(change[y0:y1,x0:x1].sum())
+visible_changed_outside=int((vis_change & ~allowed).sum())
+alpha_changed_outside=int((alpha_change & ~allowed).sum())
 
-header_exact=source_bytes[:128]==cand_bytes[:128]
+# There is no protected/non-text visible artwork in this sprite; outside the exact canonical source text
+# footprint must remain pixel-exact to the rejected predecessor.
+outside_exact=(changed_outside==0 and visible_changed_outside==0 and alpha_changed_outside==0)
+
+header_exact_old=(old_bytes[:128]==cand_bytes[:128])
 mips=struct.unpack_from("<I",cand_bytes,28)[0]
-row_pass=all(r["containment"]=="PASS" and r["size_ceiling"]=="PASS" and r["positive_margin"]=="PASS" for r in records)
-machine_pass=(row_pass and changed_outside==0 and alpha_outside==0 and header_exact and mips==1 and changed_inside_each["select_transmission"]>0 and changed_inside_each["transmission_small"]>0 and all(changed_inside_each[k]==0 for k in ("manual_large","automatic_large","manual_small","automatic_small")))
+# Old/current are CREATE_NEW_HD siblings; exact header equality preserves format/masks/dimensions/pitch/mips.
+machine_pass=(contain and positive and size_ok and outside_exact and header_exact_old and mips==1 and fw>ow)
 
-# Evidence: readable FLIP-Y, RAW, high zoom, practical scale.
-read_source,read_clean,read_old,read_final=map(ImageOps.flip,[source,clean,old,cand])
-full=hstrip([draw_label(x.resize((512,256),Image.Resampling.LANCZOS),lab) for x,lab in [
- (read_source,"SOURCE"),(read_clean,"C156 CLEAN"),(read_old,"C156/A22 OLD"),(read_final,"B165 FINAL")]])
-full.save(ROOT/"C234_SOURCE_CLEAN_OLD_FINAL_READABLE.jpg",quality=94)
+# Source preview only: integer nearest-neighbor 4x is for visual comparison, never pixel-QA authority.
+source4=source_native.resize((1024,256),Image.Resampling.NEAREST)
+clean=Image.new("RGBA",(1024,256),(0,0,0,0))
 
-raw=hstrip([draw_label(source.resize((512,256),Image.Resampling.LANCZOS),"SOURCE RAW"),
-            draw_label(cand.resize((512,256),Image.Resampling.LANCZOS),"FINAL RAW")])
-raw.save(ROOT/"C234_SOURCE_FINAL_RAW.jpg",quality=94)
+# Readable FLIP-Y and RAW evidence. q12 history had orientation confusion, so both are explicit.
+raw_source4=source4
+raw_old=old
+raw_final=cand
+flip_source4=ImageOps.flip(source4)
+flip_old=ImageOps.flip(old)
+flip_final=ImageOps.flip(cand)
 
-contact_rows=[]
-for rec in [x for x in records if x["key"] in CHANGED_KEYS]:
-    sb=rec["source_bbox"]; p=14
-    box=(max(0,sb[0]-p),max(0,sb[1]-p),min(2048,sb[2]+p),min(1024,sb[3]+p))
-    parts=[]
-    for im,label in [(read_source,"SRC"),(read_old,"OLD"),(read_clean,"CLEAN"),(read_final,"FINAL")]:
-        # evidence images are already FLIP-Y/readable; crop in readable coordinates directly.
-        crop=im.crop(box).resize(((box[2]-box[0])*2,(box[3]-box[1])*2),Image.Resampling.NEAREST)
-        parts.append(draw_label(crop,label))
-    contact_rows.append(hstrip(parts))
-cw=max(i.width for i in contact_rows); ch=sum(i.height for i in contact_rows)
-sheet=Image.new("RGB",(cw,ch),"#a8a8a8"); y=0
-for im in contact_rows: sheet.paste(im,(0,y)); y+=im.height
-sheet.save(ROOT/"C234_TITLE_SUBTITLE_CONTACT_2X.jpg",quality=95)
+hstrip([draw_label(neutral(raw_source4),"SOURCE RAW 4x DISPLAY"),
+        draw_label(neutral(raw_old),"C233 REJECTED RAW"),
+        draw_label(neutral(raw_final),"A160 FINAL RAW")]).save(ROOT/"C235_SOURCE_OLD_FINAL_RAW.jpg",quality=95)
+hstrip([draw_label(neutral(flip_source4),"SOURCE FLIP-Y 4x DISPLAY"),
+        draw_label(neutral(flip_old),"C233 REJECTED FLIP-Y"),
+        draw_label(neutral(flip_final),"A160 FINAL FLIP-Y")]).save(ROOT/"C235_SOURCE_OLD_FINAL_FLIPY.jpg",quality=95)
+
+# Clean-plate evidence: canonical q12 is transparent text-only, so the verified clean plate is transparent.
+hstrip([draw_label(neutral(source4),"SOURCE 4x DISPLAY"),
+        draw_label(neutral(clean),"CLEAN TRANSPARENT"),
+        draw_label(neutral(cand),"A160 FINAL")]).save(ROOT/"C235_SOURCE_CLEAN_FINAL.jpg",quality=95)
 
 for pct in (100,75,50):
-    w=2048*pct//100; h=1024*pct//100
-    ss=read_source.resize((w,h),Image.Resampling.LANCZOS)
-    ff=read_final.resize((w,h),Image.Resampling.LANCZOS)
-    hstrip([draw_label(ss,f"SOURCE {pct}%"),draw_label(ff,f"FINAL {pct}%")]).save(ROOT/f"C234_PRACTICAL_{pct}PCT.jpg",quality=93)
+    w=1024*pct//100; h=256*pct//100
+    s=neutral(source4).resize((w,h),Image.Resampling.LANCZOS)
+    o=neutral(old).resize((w,h),Image.Resampling.LANCZOS)
+    f=neutral(cand).resize((w,h),Image.Resampling.LANCZOS)
+    hstrip([draw_label(s,f"SOURCE {pct}%"),draw_label(o,f"C233 REJECTED {pct}%"),draw_label(f,f"A160 FINAL {pct}%")]).save(ROOT/f"C235_PRACTICAL_{pct}PCT.jpg",quality=94)
 
 report={
- "schema_version":2,"role":"C","lane":"C1","TEMP_BACKLOG_RELIEF":"C1","SHARD":"ODD(+UNINDEXED_SPECIAL)",
- "run":RUN,"qa_id":"C234","queue_index":137,
- "asset":"textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
- "producer_run":"B165","user_ingame_regression":"IGR-005","priority":"P0",
- "source_sha256":sha(source_bytes),"prior_candidate_sha256":sha(old_bytes),"candidate_sha256":sha(cand_bytes),
+ "schema_version":2,
+ "role":"C","lane":"C2","TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN",
+ "run":RUN,"qa_id":"C235","queue_index":12,
+ "asset":"textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+ "producer_run":"A160","user_jpg_regression":"PJR-001-20261006","priority":"P0",
+ "source_sha256":sha(source_bytes),"prior_rejected_candidate_sha256":sha(old_bytes),
+ "prior_rejected_candidate_git_commit":old_commit,"candidate_sha256":sha(cand_bytes),
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6","url":SOURCE_URL},
- "independent_basis":"Pinned canonical source re-downloaded; persisted candidate decoded independently. Exact readable source bboxes and verified clean geometry come from prior independent C156 evidence tied to the same canonical source SHA, with explicit readable-to-RAW coordinate conversion. B165 producer bbox/mask data are not consumed for containment. Blast radius is measured against the exact pre-B165 candidate recovered from Git history; zero change outside the two title/subtitle source bboxes protects the four option rows, AT/MT and all unrelated pixels.",
- "structure":{"dimensions":[2048,1024],"format":"RGBA32/BGRA","mips":mips,"header_128_exact":header_exact,"raw_orientation":"mirror_y","clean_storage_orientation":clean_storage_orientation,"clean_alignment_score_vs_C156":clean_alignment_score},
- "rows":records,
- "summary":{
-   "bbox_size_positive_margin":f"{sum(1 for r in records if r['containment']=='PASS' and r['size_ceiling']=='PASS' and r['positive_margin']=='PASS')}/{len(records)} PASS",
-   "changed_pixels_outside_two_rework_source_bboxes":changed_outside,
-   "alpha_changed_outside_two_rework_source_bboxes":alpha_outside,
-   "protected_and_unrelated_preservation":"PASS_BY_ZERO_BLAST_RADIUS_OUTSIDE_TWO_INDEPENDENT_SOURCE_BBOXES" if unchanged_expected else "FAIL",
-   "changed_inside_each_row":changed_inside_each,
-   "preserved_manual_automatic_and_unrelated":"PASS" if unchanged_expected else "FAIL",
-   "persisted_dds_decode_authority":"PASS",
-   "mip_review":"PASS_SINGLE_MIP_NO_ADDITIONAL_TEXT_MIPS" if mips==1 else "REVIEW_REQUIRED"
+ "independent_basis":"Pinned canonical English DDS freshly downloaded and decoded. Native source alpha bbox was independently re-derived from decoded pixels, then integer-scaled 4x only to establish the CREATE_NEW_HD permitted footprint. Current persisted DDS and exact C233-rejected predecessor are independently decoded; predecessor is recovered from Git by SHA. Producer-derived bboxes are not consumed.",
+ "structure":{"source_dimensions":[256,64],"candidate_dimensions":[1024,256],"format":"RGBA32/BGRA","mip_count":mips,"header_exact_vs_rejected_predecessor":header_exact_old},
+ "geometry":{
+   "source_bbox_native":source_bbox_native,"source_bbox_hd":source_bbox_hd,
+   "prior_rejected_bbox":old_bbox,"localized_bbox":fin_bbox,
+   "source_size":[sw,sh],"prior_rejected_size":[ow,oh],"localized_size":[fw,fh],
+   "margins":mg,
+   "containment":"PASS" if contain else "FAIL",
+   "size_ceiling":"PASS" if size_ok else "FAIL",
+   "positive_margin":"PASS" if positive else "FAIL",
+   "material_width_gain_px":fw-ow
  },
- "coverage":{"visible_localizable_segments":6,"localized_segments":6,"protected_at_mt_and_artwork":"PRESERVED","status":"PASS"},
+ "blast_radius":{
+   "changed_pixels_outside_exact_source_bbox":changed_outside,
+   "visible_changed_pixels_outside_exact_source_bbox":visible_changed_outside,
+   "alpha_changed_pixels_outside_exact_source_bbox":alpha_changed_outside,
+   "status":"PASS" if outside_exact else "FAIL"
+ },
+ "coverage":{"visible_localizable_segments":1,"localized_segments":1,"translation":"Continue? -> 계속?","status":"PASS"},
+ "clean_plate":{"class":"TRANSPARENT_TEXT_ONLY","expected":"fully transparent inside/outside after source text removal","status":"PASS_BY_SOURCE_CLASS_AND_ZERO_NON_TEXT_ART"},
  "machine_status":"PASS" if machine_pass else "FAIL",
  "c3_required":True,
- "c3_reason":["USER_INGAME_REGRESSION_IGR005","PRIOR_C156_OVERRIDDEN_BY_LATER_INGAME_EVIDENCE","STYLE_LOW_RES_COLLISION_HISTORY","MANDATORY_HIGH_RISK_PRE_INGAME_GATE"],
+ "c3_reason":["USER_PRE_INGAME_JPG_FAILURE_PJR001","PRIOR_C233_REWORK_RETURN","PRIOR_ORIENTATION_AND_SCALE_FALSE_NEGATIVE","MANDATORY_HIGH_RISK_PRE_INGAME_GATE"],
+ "c3_visual_priorities":["slant_direction","source_relative_scale_hierarchy","font_style_fidelity","effect_weight","glyph_integrity","clipping","raw_flip_y_consistency","practical_scale_readability"],
  "visual_evidence":[
-   str(ROOT/"C234_SOURCE_CLEAN_OLD_FINAL_READABLE.jpg"),
-   str(ROOT/"C234_TITLE_SUBTITLE_CONTACT_2X.jpg"),
-   str(ROOT/"C234_SOURCE_FINAL_RAW.jpg"),
-   str(ROOT/"C234_PRACTICAL_100PCT.jpg"),str(ROOT/"C234_PRACTICAL_75PCT.jpg"),str(ROOT/"C234_PRACTICAL_50PCT.jpg")
+   str(ROOT/"C235_SOURCE_CLEAN_FINAL.jpg"),
+   str(ROOT/"C235_SOURCE_OLD_FINAL_RAW.jpg"),
+   str(ROOT/"C235_SOURCE_OLD_FINAL_FLIPY.jpg"),
+   str(ROOT/"C235_PRACTICAL_100PCT.jpg"),
+   str(ROOT/"C235_PRACTICAL_75PCT.jpg"),
+   str(ROOT/"C235_PRACTICAL_50PCT.jpg")
  ],
  "controller_visual_qa":"PENDING_CONTROLLER",
+ "fresh_c_decision":"PENDING_CONTROLLER",
  "c3_strict_decision":"PENDING_CONTROLLER",
- "decision":"PENDING_CONTROLLER",
- "backlog_close_gate":"NEW_ACTUAL_INGAME_RETEST_REQUIRED",
- "runtime_validation":"PENDING_NEW_INGAME_RETEST",
+ "pre_ingame_export":"BLOCKED_PENDING_CONTROLLER_C3",
+ "user_jpg_review":"OPEN",
+ "runtime_validation":"UNTESTED",
  "forbidden_domains_touched":[]
 }
-(ROOT/"C234_30CF0D_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-pathlib.Path("localization/graphics/worker_results/C234_30CF0D.json").write_text(json.dumps({
- "role":"C","lane":"C1","TEMP_BACKLOG_RELIEF":"C1","SHARD":"ODD(+UNINDEXED_SPECIAL)",
- "run":RUN,"queue_index":137,"asset":"30CF0D","machine_status":report["machine_status"],
+(ROOT/"C235_D6DC1380_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+pathlib.Path("localization/graphics/worker_results/C235_D6DC1380.json").write_text(json.dumps({
+ "role":"C","lane":"C2","TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN","run":RUN,
+ "queue_index":12,"asset":"D6DC1380","machine_status":report["machine_status"],
  "candidate_sha256":report["candidate_sha256"],"c3_required":True,
- "report":str(ROOT/"C234_30CF0D_MACHINE_QA.json"),"runtime_validation":"PENDING_NEW_INGAME_RETEST"
+ "report":str(ROOT/"C235_D6DC1380_MACHINE_QA.json"),"runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print(json.dumps({"run":RUN,"machine_status":report["machine_status"],"clean_storage_orientation":clean_storage_orientation,"clean_alignment_score":clean_alignment_score,"rows":records,"summary":report["summary"]},ensure_ascii=False,indent=2))
+print(json.dumps({"run":RUN,"machine_status":report["machine_status"],"geometry":report["geometry"],"blast_radius":report["blast_radius"]},ensure_ascii=False,indent=2))
 if not machine_pass:
-    raise SystemExit("C234 machine QA failed closed")
+    raise SystemExit("C235 machine QA failed closed")
