@@ -1865,7 +1865,7 @@ def main() -> int:
     assert r278_inventory["SemanticReceiptExactSignatures"] == 0
     assert r278_inventory["SemanticEvidenceCoverageComplete"] is True
     assert r278_inventory["R242ObjectOwnershipMissingSignatures"] == [
-        {"source_log": "runtime.log", "startup_epoch": 0, "id": 1}
+        {"source_log": "OutRun2006Tweaks.log", "startup_epoch": 0, "id": 1}
     ]
     r278_pair_evidence = r278_inventory["Pairs"][0]["SemanticTranslationEvidence"][0]
     assert r278_pair_evidence["Plan"]["exact"] is True
