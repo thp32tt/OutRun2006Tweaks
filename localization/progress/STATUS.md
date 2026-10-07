@@ -2608,3 +2608,8 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - P0 IGR-020..IGR-024 shared runtime fix validated by Win32 Release run 37644400051 SUCCESS on exact source SHA ec2766ca...; artifact 11494226800 digest sha256:d92b8330...1e2068.
 - Semilight-first Korean UI face + ID935 modal keyline exclusion are build-valid. IGR-020/022/023/024 now await NEW in-game retest; IGR-021 additionally awaits exact text-ID capture for spacing/wording.
 - Korean Test Build run 37644400122 package stage exposed a PowerShell interpolation bug; fixed in 7f39a55a...; package rerun pending. RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.
+
+
+### C257 C2 — q188/q220/q222 fresh C + C3 (2026-10-08 01:25 KST)
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN. q188, q220, q222 all fresh C PASS + exact-SHA C3_STRICT_PASS.
+- Composite in-game regressions stay open: q212 blocks IGR-001/002; q193 needs C1 for IGR-019. PRE_INGAME refresh/user review + actual-game retest pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
