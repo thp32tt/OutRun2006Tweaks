@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "A160",
+  "index": 12,
+  "asset": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+  "trigger": "C233_REWORK_REQUIRED_MATERIAL_SCALE_FIX_PENDING_A_B",
+  "user_regression": "PJR-001-20261006",
+  "prior_candidate_sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
+  "candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+  "canonical_source": {
+    "sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_etc_xst/D6DC1380_256x64.dds",
+    "native_size": [
+      256,
+      64
+    ],
+    "display_scale": 4,
+    "source_bbox_native": [
+      8,
+      10,
+      248,
+      44
+    ],
+    "source_bbox_hd": [
+      32,
+      40,
+      992,
+      176
+    ]
+  },
+  "translation": {
+    "source": "Continue?",
+    "korean": "계속?"
+  },
+  "prior_localized_bbox": [
+    207,
+    41,
+    817,
+    175
+  ],
+  "localized_bbox": [
+    117,
+    42,
+    907,
+    174
+  ],
+  "prior_size": [
+    610,
+    134
+  ],
+  "localized_size": [
+    790,
+    132
+  ],
+  "render": {
+    "font_pattern": "Noto Sans CJK KR:style=Black",
+    "font_file": "NotoSansCJK-Black.ttc",
+    "target_width": 790,
+    "target_height": 132,
+    "readable_right_shear": 0.16,
+    "style": "white face + navy border + steel-gray outer halo",
+    "alignment": "centered within exact scaled source bbox"
+  },
+  "machine_qa": {
+    "bbox_containment": "PASS",
+    "positive_margin": "PASS",
+    "changed_pixels_outside_exact_source_bbox": 0,
+    "alpha_changed_outside_exact_source_bbox": 0,
+    "header_128_exact": true,
+    "mip_count": 1,
+    "decoded_persisted_bbox_exact": true,
+    "rawmode": "BGRA",
+    "raw_orientation": "preserve current; readable=FLIP_Y",
+    "practical_scale_reviews": [
+      100,
+      75,
+      50
+    ]
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_TRANSPARENT_TEXT_ONLY_SOURCE_BBOX",
+    "2_slant_direction": "PASS_READABLE_RIGHT_LEAN",
+    "3_no_unnecessary_undersizing": "PASS_MATERIAL_WIDTH_SCALE_INCREASE",
+    "4_weight_outline_shadow": "PASS_SOURCE_WHITE_NAVY_STEEL_FAMILY",
+    "5_clipping": "PASS_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_OUTSIDE_CHANGE",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "status": "A160_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

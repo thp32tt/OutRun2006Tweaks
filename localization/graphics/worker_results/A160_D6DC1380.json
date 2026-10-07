@@ -1,0 +1,20 @@
+{
+  "run": "A160",
+  "index": 12,
+  "asset": "D6DC1380",
+  "candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+  "prior_size": [
+    610,
+    134
+  ],
+  "localized_size": [
+    790,
+    132
+  ],
+  "width_gain": 180,
+  "outside": 0,
+  "alpha_outside": 0,
+  "worker_status": "A160_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_REPORT.json"
+}
