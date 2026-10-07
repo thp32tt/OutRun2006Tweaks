@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "C248",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 36,
+  "asset_key": "06AB5CEE",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+  "candidate_sha256": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
+  "prior_candidate_sha256": "e3854f79be83cdd5fac7e9af91ab8f2beb9707000a7c6abbc564c2ca443fa553",
+  "prior_blob_commit": "57485abbf79cb1ff03325aa312fe85e1103b5f20",
+  "canonical_source_dds_sha256_from_producer_provenance": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+  "source_readable_png": "localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_SOURCE_READABLE.png",
+  "source_readable_png_sha256": "594837f01fe7c532a8f1960bc24f8bda08326ed4d8c11e898ce55c9a91e5d16e",
+  "clean_plate_mode": "INDEPENDENT_C_RECONSTRUCTED_FROM_PRE_B236_GLYPH_MASK",
+  "independent_clean_mask_pixels_removed": 62145,
+  "high_risk_reason": "USER PRE_INGAME #007/#008 TOTAL_RANK_TEXT_TOO_SMALL|PLATE_RECONSTRUCTION_DIRTY|SOURCE_FOOTPRINT_HAZE",
+  "independent_machine_qa": {
+    "candidate_sha_exact": true,
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "mips": 1,
+    "header_128_exact_to_prior": true,
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "localized_pixels_outside_exact_source_bboxes": 0,
+    "bbox_size_positive_margin": "3/3 PASS",
+    "per_region": [
+      {
+        "original_bbox": [
+          1829,
+          3227,
+          2364,
+          3329
+        ],
+        "localized_bbox": [
+          1853,
+          3232,
+          2339,
+          3324
+        ],
+        "source_size": [
+          535,
+          102
+        ],
+        "localized_size": [
+          486,
+          92
+        ],
+        "margins": [
+          24,
+          25,
+          5,
+          5
+        ],
+        "width_ratio": 0.9084,
+        "height_ratio": 0.902,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "original_bbox": [
+          594,
+          1622,
+          1128,
+          1724
+        ],
+        "localized_bbox": [
+          618,
+          1627,
+          1104,
+          1719
+        ],
+        "source_size": [
+          534,
+          102
+        ],
+        "localized_size": [
+          486,
+          92
+        ],
+        "margins": [
+          24,
+          24,
+          5,
+          5
+        ],
+        "width_ratio": 0.9101,
+        "height_ratio": 0.902,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "original_bbox": [
+          2266,
+          1643,
+          2785,
+          1728
+        ],
+        "localized_bbox": [
+          2291,
+          1648,
+          2759,
+          1723
+        ],
+        "source_size": [
+          519,
+          85
+        ],
+        "localized_size": [
+          468,
+          75
+        ],
+        "margins": [
+          25,
+          26,
+          5,
+          5
+        ],
+        "width_ratio": 0.9017,
+        "height_ratio": 0.8824,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      }
+    ],
+    "raw_and_flip_y_evidence": "WRITTEN",
+    "q38_alias_exact_bytes": true
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER_VISUAL_AND_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

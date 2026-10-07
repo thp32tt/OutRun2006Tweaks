@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "C248",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 34,
+  "asset_key": "B7E25BAD",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+  "candidate_sha256": "a23761d1160933d968347c87ca40496b9f8e8257a102f865b2047df2a8d92763",
+  "prior_candidate_sha256": "590f868ac4b99addf1bf41a87de29498584b770e54649809f8398bb699aad467",
+  "prior_blob_commit": "57485abbf79cb1ff03325aa312fe85e1103b5f20",
+  "canonical_source_dds_sha256_from_producer_provenance": "3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
+  "source_readable_png": "localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_SOURCE_READABLE.png",
+  "source_readable_png_sha256": "ba52e00f36d189d5182202474fe1cb3688b62106cd5d4c76ffb960e5ea1eb3f8",
+  "clean_plate_mode": "INDEPENDENT_C_USES_PRIOR_C_APPROVED_CLEAN_PLATE",
+  "independent_clean_mask_pixels_removed": 0,
+  "high_risk_reason": "USER PRE_INGAME #006 TEXT_TOO_SMALL|TOTAL_RANK_TEXT_TOO_SMALL",
+  "independent_machine_qa": {
+    "candidate_sha_exact": true,
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "mips": 1,
+    "header_128_exact_to_prior": true,
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "localized_pixels_outside_exact_source_bboxes": 0,
+    "bbox_size_positive_margin": "1/1 PASS",
+    "per_region": [
+      {
+        "original_bbox": [
+          2021,
+          1179,
+          2556,
+          1281
+        ],
+        "localized_bbox": [
+          2045,
+          1184,
+          2531,
+          1276
+        ],
+        "source_size": [
+          535,
+          102
+        ],
+        "localized_size": [
+          486,
+          92
+        ],
+        "margins": [
+          24,
+          25,
+          5,
+          5
+        ],
+        "width_ratio": 0.9084,
+        "height_ratio": 0.902,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      }
+    ],
+    "raw_and_flip_y_evidence": "WRITTEN",
+    "q38_alias_exact_bytes": null
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER_VISUAL_AND_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

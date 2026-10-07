@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C248",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "assets": [
+    {
+      "index": 32,
+      "key": "DCC7B488",
+      "candidate_sha256": "2bb9d21e95a99da036657da5d696982d5ee44875c91cd798dbcb7b99830757e8",
+      "machine_qa": "PASS",
+      "q38_alias_exact_bytes": null
+    },
+    {
+      "index": 34,
+      "key": "B7E25BAD",
+      "candidate_sha256": "a23761d1160933d968347c87ca40496b9f8e8257a102f865b2047df2a8d92763",
+      "machine_qa": "PASS",
+      "q38_alias_exact_bytes": null
+    },
+    {
+      "index": 36,
+      "key": "06AB5CEE",
+      "candidate_sha256": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
+      "machine_qa": "PASS",
+      "q38_alias_exact_bytes": true
+    }
+  ]
+}

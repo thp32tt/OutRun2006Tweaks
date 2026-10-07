@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "C248",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 32,
+  "asset_key": "DCC7B488",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+  "candidate_sha256": "2bb9d21e95a99da036657da5d696982d5ee44875c91cd798dbcb7b99830757e8",
+  "prior_candidate_sha256": "9e0b5dcd66b1aaeb031f60090d3c8f919cc59f7c6f8860602bcbc9990eb87867",
+  "prior_blob_commit": "57485abbf79cb1ff03325aa312fe85e1103b5f20",
+  "canonical_source_dds_sha256_from_producer_provenance": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+  "source_readable_png": "localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_SOURCE_READABLE.png",
+  "source_readable_png_sha256": "bb27c31a54b46dc6127c6e69c410e2cdb8dd53ed8c55eeb99705875154686319",
+  "clean_plate_mode": "INDEPENDENT_C_USES_PRIOR_C_APPROVED_CLEAN_PLATE",
+  "independent_clean_mask_pixels_removed": 0,
+  "high_risk_reason": "USER PRE_INGAME #005 TEXT_TOO_SMALL|TOTAL_RANK_TEXT_TOO_SMALL",
+  "independent_machine_qa": {
+    "candidate_sha_exact": true,
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "mips": 1,
+    "header_128_exact_to_prior": true,
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "localized_pixels_outside_exact_source_bboxes": 0,
+    "bbox_size_positive_margin": "1/1 PASS",
+    "per_region": [
+      {
+        "original_bbox": [
+          547,
+          164,
+          1065,
+          248
+        ],
+        "localized_bbox": [
+          572,
+          169,
+          1040,
+          243
+        ],
+        "source_size": [
+          518,
+          84
+        ],
+        "localized_size": [
+          468,
+          74
+        ],
+        "margins": [
+          25,
+          25,
+          5,
+          5
+        ],
+        "width_ratio": 0.9035,
+        "height_ratio": 0.881,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      }
+    ],
+    "raw_and_flip_y_evidence": "WRITTEN",
+    "q38_alias_exact_bytes": null
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER_VISUAL_AND_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
