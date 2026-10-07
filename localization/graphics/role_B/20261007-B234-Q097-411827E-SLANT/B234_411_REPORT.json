@@ -12,7 +12,7 @@
   "source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
   "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
   "before_candidate_sha256": "c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e",
-  "candidate_sha256": "badd611286b63356ea3715f0efd5aafd60241d40544a11fda4d4635a8acde9c3",
+  "candidate_sha256": "e28a12a19466792dc1d6e24dcd81c472ae310ab90e1abb9a5f7b64756946f808",
   "rows": [
     {
       "key": "seconds",
@@ -31,9 +31,9 @@
         143
       ],
       "final_localized_bbox": [
-        1368,
+        1366,
         64,
-        1453,
+        1455,
         142
       ],
       "source_size": [
@@ -41,16 +41,16 @@
         82
       ],
       "final_size": [
-        85,
+        89,
         78
       ],
       "margins": [
-        131,
-        131,
+        129,
+        129,
         2,
         2
       ],
-      "visual_right_shear": 0.18,
+      "visual_right_shear": 0.26,
       "fit_scale_after_shear": 0.975,
       "construction": "exact prior Korean raster/effect extracted against A_RECOVERY04 validated CLEAN then right-sheared at native resolution",
       "containment": "PASS",
@@ -74,9 +74,9 @@
         964
       ],
       "final_localized_bbox": [
-        902,
+        900,
         853,
-        1094,
+        1096,
         963
       ],
       "source_size": [
@@ -84,16 +84,16 @@
         114
       ],
       "final_size": [
-        192,
+        196,
         110
       ],
       "margins": [
-        59,
-        60,
+        57,
+        58,
         2,
         2
       ],
-      "visual_right_shear": 0.18,
+      "visual_right_shear": 0.26,
       "fit_scale_after_shear": 0.982143,
       "construction": "exact prior Korean raster/effect extracted against A_RECOVERY04 validated CLEAN then right-sheared at native resolution",
       "containment": "PASS",
@@ -117,9 +117,9 @@
         964
       ],
       "final_localized_bbox": [
-        1292,
+        1290,
         853,
-        1488,
+        1491,
         963
       ],
       "source_size": [
@@ -127,16 +127,16 @@
         114
       ],
       "final_size": [
-        196,
+        201,
         110
       ],
       "margins": [
-        57,
-        58,
+        55,
+        55,
         2,
         2
       ],
-      "visual_right_shear": 0.18,
+      "visual_right_shear": 0.26,
       "fit_scale_after_shear": 0.982143,
       "construction": "exact prior Korean raster/effect extracted against A_RECOVERY04 validated CLEAN then right-sheared at native resolution",
       "containment": "PASS",
@@ -163,7 +163,7 @@
         1629,
         858,
         1899,
-        963
+        962
       ],
       "source_size": [
         274,
@@ -171,16 +171,16 @@
       ],
       "final_size": [
         270,
-        105
+        104
       ],
       "margins": [
         2,
         2,
         2,
-        2
+        3
       ],
-      "visual_right_shear": 0.18,
-      "fit_scale_after_shear": 0.981308,
+      "visual_right_shear": 0.26,
+      "fit_scale_after_shear": 0.967742,
       "construction": "exact prior Korean raster/effect extracted against A_RECOVERY04 validated CLEAN then right-sheared at native resolution",
       "containment": "PASS",
       "size_ceiling": "PASS",
@@ -201,7 +201,7 @@
   },
   "ordered_generation_gate": {
     "1_plate_restoration": "PASS_REUSED_A_RECOVERY04_VALIDATED_CLEAN",
-    "2_slant_direction": "PASS_RIGHT_LEAN_0.18_NATIVE_TRANSFORM",
+    "2_slant_direction": "PASS_RIGHT_LEAN_0.26_NATIVE_TRANSFORM",
     "3_no_unnecessary_undersizing": "PASS_HEIGHT_RETAINED_NEAR_SOURCE; RANDOM_WIDTH_REFIT_ONLY_IF_REQUIRED",
     "4_source_weight_outline_shadow": "PASS_EXACT_C87_RASTER_EFFECT_BASE_TRANSFORMED",
     "5_no_clipping": "PASS_4_OF_4_POSITIVE_MARGIN",
@@ -221,7 +221,7 @@
     "coverage": "UNCHANGED_7_SEMANTIC_ROWS"
   },
   "controller_visual_qa": "PENDING_CONTROLLER",
-  "status": "B234_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "status": "B234R_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
   "RUNTIME_VALIDATION": "UNTESTED",
   "no_vr_ffb_dx11_dxvk_work": true
 }
