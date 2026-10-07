@@ -3205,3 +3205,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Consolidated manifest: 34 rows (33 localized, 1 policy-preserved), mandatory-C3-blocked=10. C254 bindings: q57 -> #018 018_q057_39229D64.jpg; q61 -> #019 019_q061_C4A2937B.jpg; q65 -> #020 020_q065_EBEF6D20.jpg.
 - Exact pinned English source/current candidate SHA bindings verified at native dimensions. 000_INDEX consolidated visual review PASS and matches detailed C254 source/current FLIP-Y+RAW evidence.
 - User JPG acceptance + NEW actual-game retest remain pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+
+## 2026-10-08 00:10 KST — C255 C1 consume C252 q63/q121/q193
+- TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). Latest HEAD/queue were refreshed before each selection and immediately before reconciliation. The unfinished C252 worker evidence was consumed instead of re-running the same bytes; no even C2 shard was touched.
+- ChatGPT-local git access was attempted first and failed github.com DNS resolution. GitHub connector state writes were then used. N100 MCP connectivity was directly verified (`mcp_version=0.3.0`, root `/home/chatgpt-runner2`, port 8765), but its clean fallback worktree pull hit ENOSPC while checking out newer repository evidence, so no heavy N100 compute was performed.
+- q63 `48DEBE77` @ `f9262962...`: C252 independent machine 3/3 bbox/source-size/positive-margin PASS and prior→current changed/alpha outside declared rework union=0. Controller FLIP-Y/CONTACTS/RAW PASS: START x2 and GOAL plates are clean, source English face/outline/shadow is absent, readable source-direction lean/effect is retained, route art is intact. Fresh C PASS + exact-SHA C3_STRICT_PASS.
+- q121 `FD90AA9` @ `03271f4a...`: machine 3/3 PASS is a numeric false-negative. Controller FLIP-Y/CONTACTS/RAW shows black `Select Game Mode`, `Select your car`, `Select Course` source glyph silhouettes visibly remaining behind/around Korean headers. Visual residue/double-draw overrides numeric containment -> REWORK_REQUIRED; C3 blocked.
+- q193 `97E863AD` @ `f1c68aa4...`: machine 3/3 PASS is a numeric false-negative. Controller evidence visibly retains original `WELCOME TO THE`, `MULTIPLAYER`, `SHOWROOM` bodies behind/around Korean text. Severe source-residue/double-draw overlap -> REWORK_REQUIRED; C3 blocked.
+- q63 now requires persistent PRE_INGAME English-original export refresh; q121/q193 are excluded until material producer rework and fresh C. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
