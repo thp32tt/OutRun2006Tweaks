@@ -53,8 +53,14 @@ def rectmask(shape,rects):
         m[y0:y1,x0:x1]=True
     return m
 
+def visible_rgb(im,bg=(72,72,72)):
+    im=im.convert("RGBA")
+    base=Image.new("RGBA",im.size,bg+(255,))
+    base.alpha_composite(im)
+    return base.convert("RGB")
+
 def fit(im,maxw=720,maxh=520):
-    im=im.convert("RGB"); s=min(maxw/im.width,maxh/im.height,1.0)
+    im=visible_rgb(im); s=min(maxw/im.width,maxh/im.height,1.0)
     return im if s>=1 else im.resize((max(1,int(im.width*s)),max(1,int(im.height*s))),Image.Resampling.LANCZOS)
 
 def triptych(src,prior,cur,path,title):
@@ -203,6 +209,7 @@ for a in ASSETS:
         "q241":"producer E1639D2E_HD_CLEAN_PLATE + A146 validation; C controller must re-open before verdict"
       }.get("q"+str(a["index"])),
       "controller_visual_qa":"PENDING_CONTROLLER_REVIEW",
+      "neutral_alpha_visualization":"RGBA composited on neutral RGB(72,72,72); hidden RGB under alpha=0 is not treated as visible residue",
       "mandatory_c3_strict_audit":a["mandatory_c3"],
       "c3_strict_audit":"PENDING_CONTROLLER_REVIEW",
       "runtime_validation":"UNTESTED","forbidden_domains_touched":[]
