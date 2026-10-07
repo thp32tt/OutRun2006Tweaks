@@ -13,7 +13,7 @@ SOURCE_READABLE = ROOT / "localization/graphics/role_A/20261006-A-PRODUCTION76-A
 OUTDIR = ROOT / "localization/graphics/role_B/20261008-B240-Q205-NATIVE-HD"
 OUTDIR.mkdir(parents=True, exist_ok=True)
 
-EXPECTED_PRIOR = "2bbb9d19a833fb6c9ade243eb70132ef5ce46150d1fa1cb9423ff4e5101b770c"
+EXPECTED_PRIOR = "7598af3375cfd96fa83f2ac7610ac1a97dd0fcebd7aa95f3e33a641dbcfbba9e"
 actual_prior = hashlib.sha256(CANDIDATE.read_bytes()).hexdigest()
 if actual_prior != EXPECTED_PRIOR:
     raise SystemExit(f"q205 base drift: expected {EXPECTED_PRIOR}, got {actual_prior}")
@@ -37,7 +37,7 @@ rows = [
     dict(key="rankings", text="랭킹", bbox=(33,1245,930,1388), font=serif, fs=140, color=(186,0,0,255), align="left"),
     dict(key="out_run_1p", text="1인 플레이!", bbox=(1959,1066,2569,1132), font=sans, fs=60, color=(63,71,74,255), align="after_token", token=(1959,1066,2184,1121)),
     dict(key="view_rankings", text="싱글/멀티플레이 랭킹 보기", bbox=(3,911,1334,977), font=sans, fs=60, color=(63,71,74,255), align="left"),
-    dict(key="enjoy_original", text="오리지널 즐기기", bbox=(1807,909,2696,975), font=sans, fs=60, color=(63,71,74,255), align="before_token", token=(2356,909,2696,964)),
+    dict(key="enjoy_original", text="오리지널", bbox=(1807,909,2696,975), font=sans, fs=60, color=(63,71,74,255), align="before_token", token=(2356,909,2696,964), gap=24),
     dict(key="adjust_settings", text="게임 설정 조정", bbox=(1,748,1800,814), font=sans, fs=60, color=(63,71,74,255), align="left"),
 ]
 
@@ -69,9 +69,9 @@ for r in rows:
     if r["align"] == "left":
         x = x0 + 4
     elif r["align"] == "after_token":
-        x = r["token"][2] + 16
+        x = r["token"][2] + r.get("gap", 16)
     elif r["align"] == "before_token":
-        x = r["token"][0] - 16 - glyph.width
+        x = r["token"][0] - r.get("gap", 16) - glyph.width
     else:
         raise RuntimeError(r["align"])
 
@@ -160,7 +160,7 @@ report = {
     "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
     "prior_candidate_sha256": EXPECTED_PRIOR,
     "candidate_sha256": candidate_sha,
-    "method": "replace only six screenshot-visible rows from A76 exact clean plate; render Korean directly at final 4096x2048 with native Noto CJK Medium/Regular; no 33px/12px quarter-size raster and no x4 bitmap upscale; no artificial stroke",
+    "method": "replace only six screenshot-visible rows from A76 exact clean plate; render Korean directly at final 4096x2048 with native Noto CJK Medium/Regular; no 33px/12px quarter-size raster and no x4 bitmap upscale; no artificial stroke; B240R visual correction shortens the constrained protected-token row to 오리지널 + 24px gap + original OutRun2SP",
     "pixel_scale": 1,
     "changed_pixels": int(changed.sum()),
     "changed_outside_rework_bboxes": outside,
