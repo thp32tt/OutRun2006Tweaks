@@ -3289,3 +3289,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Persisted QA: 2/2 bbox/size PASS; changed/alpha outside=0; localized/protected overlap=0; header exact, mip1, RAW mirror_y, roundtrip decode PASS. SOURCE/B241/CLEAN/B242, practical 100/75/50 and RAW controller review PASS.
 - Worker run 37654356700 attempt 1 computed successfully but push lease raced concurrent C; failed job only was rerun. Attempt 2 SUCCESS / output 720de01b.... N100 was used only for small JPG evidence review and Git state reconciliation, not heavy DDS compute.
 - Fresh C + exact-SHA C3 + PRE_INGAME/user JPG + NEW in-game retest pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-08 02:05 KST — A176 q121 FD90AA9 transparent-atlas clean-plate repair
+- Refreshed CONTRACT/required policy/state and skipped completed q193 plus newer B242 q212 work. Highest safe A material target was C255-returned/HOLD q121 IGR-018.
+- ChatGPT-local GitHub access was attempted first and failed DNS resolution. Repository-backed 4096x4096 DDS work therefore used the contract-authorized GitHub-hosted CPU worker; N100 was not used.
+- Root cause of A171-A174 false fixes: neutral QA background was treated like an authored opaque plate. FD90 header cells are sparse transparent text sprites. A176 clears only the union of canonical-source/current visible alpha inside the exact three source header bboxes and never paints an opaque gray rectangle.
+- Candidate `d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27`: source/current alpha coverage remained sparse; clean visible alpha is 0 in Select Game Mode / Select your car / Select Course before lettering. Fresh 108px Noto CJK Black/right-lean family matches accepted A138 geometry. 3/3 bbox/size/positive-margin, changed/alpha outside=0, pair overlap/touch=0, exact header/persisted decode/RAW mirror_y PASS.
+- Controller SOURCE/A138/CLEAN/A176 row contacts, full header family and RAW review PASS: C255 English ghost/double-draw removed; no rectangle/seam, clipping, broken Hangul or protected-art intrusion.
+- Decision: `A176_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME`. Worker run 37656205424 / output commit d38bda3bcbf5ba9ce37c7ea299a67ca7fe95d7e9. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
