@@ -3306,6 +3306,24 @@ namespace OutRunVRStereo
         return true;
     }
 
+    bool R30SupportDirectTransportResourcesReady() noexcept
+    {
+        return DirectTransportResourcesReady;
+    }
+
+    bool R30SupportTryGetDirectTransportIdentity(
+        R30SupportDirectTransportIdentity& out) noexcept
+    {
+        out = {};
+        if (!SharedState || !DirectInteropVerified)
+            return false;
+
+        out.hostPid = SharedState->hostPid;
+        out.hostAdapterLuidLow = SharedState->hostAdapterLuidLow;
+        out.hostAdapterLuidHigh = SharedState->hostAdapterLuidHigh;
+        return true;
+    }
+
     void R30SupportInvalidateEffectStateCache() noexcept
     {
         InvalidateEffectStateCache();

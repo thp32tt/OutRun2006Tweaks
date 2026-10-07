@@ -395,11 +395,12 @@ namespace OutRunVRStereo
 
         bool R32DirectIdentityMatches() noexcept
         {
-            return SharedState && DirectInteropVerified &&
+            R30SupportDirectTransportIdentity identity{};
+            return R30SupportTryGetDirectTransportIdentity(identity) &&
                 R32DirectHostPid != 0 &&
-                R32DirectHostPid == SharedState->hostPid &&
-                R32DirectHostLuidLow == SharedState->hostAdapterLuidLow &&
-                R32DirectHostLuidHigh == SharedState->hostAdapterLuidHigh;
+                R32DirectHostPid == identity.hostPid &&
+                R32DirectHostLuidLow == identity.hostAdapterLuidLow &&
+                R32DirectHostLuidHigh == identity.hostAdapterLuidHigh;
         }
 
         void R32InvalidateDirectInteropOnly() noexcept
@@ -418,23 +419,27 @@ namespace OutRunVRStereo
 
         bool R32EnsureDirectResources(IDirect3DDevice9* device) noexcept
         {
-            if (DirectTransportResourcesReady && R32DirectIdentityMatches())
+            if (R30SupportDirectTransportResourcesReady() &&
+                R32DirectIdentityMatches())
             {
                 if (R30SupportTelemetryEnabled()) ++R32DirectProbeCacheHits;
                 return true;
             }
 
-            if (DirectTransportResourcesReady && !R32DirectIdentityMatches())
+            if (R30SupportDirectTransportResourcesReady() &&
+                !R32DirectIdentityMatches())
                 R32InvalidateDirectInteropOnly();
 
             if (!EnsureDirectTransportResources(device))
                 return false;
-            if (!SharedState || !DirectInteropVerified)
+
+            R30SupportDirectTransportIdentity identity{};
+            if (!R30SupportTryGetDirectTransportIdentity(identity))
                 return false;
 
-            R32DirectHostPid = SharedState->hostPid;
-            R32DirectHostLuidLow = SharedState->hostAdapterLuidLow;
-            R32DirectHostLuidHigh = SharedState->hostAdapterLuidHigh;
+            R32DirectHostPid = identity.hostPid;
+            R32DirectHostLuidLow = identity.hostAdapterLuidLow;
+            R32DirectHostLuidHigh = identity.hostAdapterLuidHigh;
             return true;
         }
 

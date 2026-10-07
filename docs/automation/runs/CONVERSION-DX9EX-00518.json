@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00518",
+  "production_id": "CONVERSION-DX9EX-00518",
+  "event_id": "CONVERSION-DX9EX-00518-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "IMPLEMENTED_PENDING_VALIDATION",
+  "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-DIRECTGPU-IDENTITY-READINESS-FACADE-001",
+  "base_sha": "c196eb7acbc0695011580f4443a9486ba88591b6",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00518]",
+  "summary": "Move R32's read-only DirectGPU transport readiness and host PID/LUID identity inspection behind the behavior-neutral R30 support facade. ACK/fence/slot publication and release ownership remain unchanged.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r32_runtime_support_seam.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00518.json"
+  ],
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "predecessor_task": "CONVERSION-DX9EX-00517",
+    "predecessor_validation_bearing_sha": "65ca55e1aa1319b2dd76e6f77ce3460846bce75a",
+    "extracted_private_dependencies": [
+      "SharedState",
+      "DirectInteropVerified",
+      "DirectTransportResourcesReady"
+    ],
+    "intentionally_deferred": [
+      "EnsureDirectTransportResources mutation",
+      "R13 ACK snapshot/backpressure",
+      "DirectTransportSlots/fence ownership",
+      "ReleaseDirectTransportSlots/ReleaseDirectInteropProbe",
+      "BackBuffer/RightEyeSurface"
+    ]
+  },
+  "protected_boundaries": [
+    "no ACK/fence/slot reuse or publication change",
+    "no DirectGPU copy/rejection policy change",
+    "no Reset/ResetEx order change",
+    "no HUD/effect/stereo policy change"
+  ],
+  "next_action": "Require exact-SHA DX9Ex Active Validation and Domain Isolation. If green, record validation-bearing SHA and continue with one remaining DirectGPU mutation/transport owner subset."
+}

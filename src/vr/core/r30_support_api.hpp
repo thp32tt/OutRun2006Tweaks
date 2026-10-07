@@ -42,6 +42,16 @@ namespace OutRunVRStereo
     bool R30SupportTryGetEffectTelemetrySnapshot(
         R30SupportEffectTelemetrySnapshot& out) noexcept;
 
+    struct R30SupportDirectTransportIdentity
+    {
+        std::uint32_t hostPid = 0;
+        std::uint32_t hostAdapterLuidLow = 0;
+        std::uint32_t hostAdapterLuidHigh = 0;
+    };
+    bool R30SupportDirectTransportResourcesReady() noexcept;
+    bool R30SupportTryGetDirectTransportIdentity(
+        R30SupportDirectTransportIdentity& out) noexcept;
+
     void R30SupportInvalidateEffectStateCache() noexcept;
     void R30SupportInvalidateTrackedRasterShadow() noexcept;
     void R30SupportInvalidateLiveStateSample() noexcept;
