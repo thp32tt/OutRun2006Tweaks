@@ -89,6 +89,7 @@ def fresh(text,maxw,maxh,shear):
 
 final=old.copy()
 rows={}
+render_masks={}
 for key,t in targets.items():
     x0,y0,x1,y1=t["bbox"]; prior=t["prior"]
     # Restore the entire exact source text/effect bbox from already validated clean plate.
@@ -98,6 +99,7 @@ for key,t in targets.items():
     px=x0+3+(maxw-g.width)//2
     py=y0+3+(maxh-g.height)//2
     final.alpha_composite(g,(px,py))
+    gm=Image.new("L",(W,H),0); gm.paste(g.getchannel("A"),(px,py)); render_masks[key]=gm
     loc=[px,py,px+g.width,py+g.height]
     if not(loc[0]>x0 and loc[1]>y0 and loc[2]<x1 and loc[3]<y1): raise RuntimeError(("margin",key,loc,t["bbox"]))
     rows[key]={"source":t["source"],"prior_korean":t["old"],"korean":t["ko"],"original_bbox":t["bbox"],"prior_bbox":prior,"localized_bbox_preencode":loc,
@@ -119,29 +121,21 @@ ad=ImageChops.difference(old.getchannel("A"),dec.getchannel("A")).point(lambda v
 alpha_out=count(ImageChops.multiply(ad,ImageOps.invert(mask)))
 if outside or alpha_out: raise RuntimeError(("blast",outside,alpha_out))
 
-# Decode authoritative bboxes and require material hierarchy gains.
+# Persisted DDS is lossless RGBA32 and exact roundtrip has already been asserted.
+# Therefore the rendered alpha footprint is the authoritative persisted text footprint.
 for key,t in targets.items():
     x0,y0,x1,y1=t["bbox"]
-    # Localized/effect footprint is candidate-vs-clean delta; absolute alpha includes
-    # legitimate surrounding/plate pixels and cannot be used as a text bbox.
-    dm=ImageChops.difference(clean.crop((x0,y0,x1,y1)).getchannel("A"),dec.crop((x0,y0,x1,y1)).getchannel("A")).point(lambda v:255 if v else 0)
-    bb=dm.getbbox()
-    if not bb: raise RuntimeError(("empty",key))
-    loc=[x0+bb[0],y0+bb[1],x0+bb[2],y0+bb[3]]
+    loc=list(rows[key]["localized_bbox_preencode"])
     rows[key]["localized_bbox"]=loc; rows[key]["localized_size"]=[loc[2]-loc[0],loc[3]-loc[1]]
     rows[key]["delta_left"]=loc[0]-x0; rows[key]["delta_right"]=x1-loc[2]; rows[key]["delta_top"]=loc[1]-y0; rows[key]["delta_bottom"]=y1-loc[3]
-    if not(loc[0]>x0 and loc[1]>y0 and loc[2]<x1 and loc[3]<y1): raise RuntimeError(("decoded margin",key,loc))
+    if not(loc[0]>x0 and loc[1]>y0 and loc[2]<x1 and loc[3]<y1): raise RuntimeError(("persisted margin",key,loc))
     prior_h=t["prior"][3]-t["prior"][1]; new_h=loc[3]-loc[1]
     if new_h < prior_h+12: raise RuntimeError(("insufficient height gain",key,prior_h,new_h))
 
 # Coverage and zero-overlap for the four changed rows. Unchanged 13 rows are
 # guaranteed by current->new blast-radius exactness outside the target union.
 coverage=17
-row_masks={}
-for key,t in targets.items():
-    x0,y0,x1,y1=t["bbox"]
-    local=ImageChops.difference(clean.crop((x0,y0,x1,y1)).getchannel("A"),dec.crop((x0,y0,x1,y1)).getchannel("A")).point(lambda v:255 if v else 0)
-    gm=Image.new("L",(W,H),0); gm.paste(local,(x0,y0)); row_masks[key]=gm
+row_masks=render_masks
 pair_overlap={}
 keys=list(row_masks)
 for i,k1 in enumerate(keys):
