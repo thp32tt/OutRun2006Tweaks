@@ -8183,7 +8183,7 @@
     "zero_pixel_gates": "visible/alpha outside=0; protected visible changes=0; source-core residue=0",
     "controller_visual_qa": "PASS_SOURCE_DIRECTION_RIGHT_LEAN_CLEAN_STYLE_SCALE_RAW",
     "c3_strict_status": "C3_STRICT_PASS",
-    "decision": "C232_C3_STRICT_PASS_STATIC_PENDING_PRE_INGAME_USER_JPG_AND_NEW_INGAME_RETEST",
+    "decision": "C232_C3_STRICT_PASS_PENDING_USER_JPG_AND_NEW_INGAME_RETEST",
     "pre_ingame_export_refresh": "PASS_002_q095_37759842.jpg",
     "user_jpg_review": "PENDING",
     "new_actual_ingame_retest": "PENDING",
