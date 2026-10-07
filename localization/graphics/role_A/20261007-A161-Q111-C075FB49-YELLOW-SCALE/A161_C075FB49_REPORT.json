@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A161",
+  "index": 111,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+  "trigger": "POST_ENCODE_PRESENTATION_HARDENING_YELLOW_INSTRUCTION_SCALE_FALSE_NEGATIVE",
+  "prior_c_status": "C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "prior_candidate_sha256": "d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633",
+  "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+  "candidate_sha256": "3e0507cba9e267388edcabb3168e40f5bd847294fe82eb79e948aa89540dc394",
+  "reworked_keys": [
+    "keep_passing",
+    "drift",
+    "dont_crash",
+    "go_gate"
+  ],
+  "translation_change": {
+    "keep_passing": "계속 차량을 추월하세요! -> 계속 추월하세요!"
+  },
+  "rows": {
+    "keep_passing": {
+      "source": "Keep passing the cars!",
+      "prior_korean": "계속 차량을 추월하세요!",
+      "korean": "계속 추월하세요!",
+      "original_bbox": [
+        1,
+        143,
+        520,
+        236
+      ],
+      "prior_bbox": [
+        40,
+        165,
+        491,
+        215
+      ],
+      "localized_bbox_preencode": [
+        4,
+        146,
+        496,
+        233
+      ],
+      "source_size": [
+        519,
+        93
+      ],
+      "prior_size": [
+        451,
+        50
+      ],
+      "preencode_size": [
+        492,
+        87
+      ],
+      "font": "NotoSansCJK-Black.ttc",
+      "font_size": 74,
+      "shear": 0.24,
+      "horizontal_scale": 0.9094,
+      "safe_layout_bbox": [
+        4,
+        146,
+        496,
+        233
+      ],
+      "localized_bbox": [
+        4,
+        146,
+        496,
+        233
+      ],
+      "localized_size": [
+        492,
+        87
+      ],
+      "delta_left": 3,
+      "delta_right": 24,
+      "delta_top": 3,
+      "delta_bottom": 3
+    },
+    "drift": {
+      "source": "Drift!",
+      "prior_korean": "드리프트!",
+      "korean": "드리프트!",
+      "original_bbox": [
+        500,
+        120,
+        720,
+        228
+      ],
+      "prior_bbox": [
+        517,
+        149,
+        707,
+        200
+      ],
+      "localized_bbox_preencode": [
+        503,
+        125,
+        717,
+        222
+      ],
+      "source_size": [
+        220,
+        108
+      ],
+      "prior_size": [
+        190,
+        51
+      ],
+      "preencode_size": [
+        214,
+        97
+      ],
+      "font": "NotoSansCJK-Black.ttc",
+      "font_size": 84,
+      "shear": 0.2,
+      "horizontal_scale": 0.6062,
+      "safe_layout_bbox": [
+        503,
+        123,
+        717,
+        225
+      ],
+      "localized_bbox": [
+        503,
+        125,
+        717,
+        222
+      ],
+      "localized_size": [
+        214,
+        97
+      ],
+      "delta_left": 3,
+      "delta_right": 3,
+      "delta_top": 5,
+      "delta_bottom": 6
+    },
+    "dont_crash": {
+      "source": "Don't crash!",
+      "prior_korean": "충돌하지 마세요!",
+      "korean": "충돌하지 마세요!",
+      "original_bbox": [
+        550,
+        200,
+        1070,
+        370
+      ],
+      "prior_bbox": [
+        602,
+        259,
+        1024,
+        324
+      ],
+      "localized_bbox_preencode": [
+        553,
+        226,
+        1017,
+        344
+      ],
+      "source_size": [
+        520,
+        170
+      ],
+      "prior_size": [
+        422,
+        65
+      ],
+      "preencode_size": [
+        464,
+        118
+      ],
+      "font": "NotoSansCJK-Black.ttc",
+      "font_size": 107,
+      "shear": 0.24,
+      "horizontal_scale": 0.6026,
+      "safe_layout_bbox": [
+        553,
+        203,
+        1017,
+        367
+      ],
+      "localized_bbox": [
+        553,
+        226,
+        1017,
+        344
+      ],
+      "localized_size": [
+        464,
+        118
+      ],
+      "delta_left": 3,
+      "delta_right": 53,
+      "delta_top": 26,
+      "delta_bottom": 26
+    },
+    "go_gate": {
+      "source": "Go through the gate!",
+      "prior_korean": "게이트를 통과하세요!",
+      "korean": "게이트를 통과하세요!",
+      "original_bbox": [
+        1020,
+        200,
+        1590,
+        370
+      ],
+      "prior_bbox": [
+        1077,
+        261,
+        1539,
+        319
+      ],
+      "localized_bbox_preencode": [
+        1023,
+        227,
+        1587,
+        342
+      ],
+      "source_size": [
+        570,
+        170
+      ],
+      "prior_size": [
+        462,
+        58
+      ],
+      "preencode_size": [
+        564,
+        115
+      ],
+      "font": "NotoSansCJK-Black.ttc",
+      "font_size": 103,
+      "shear": 0.24,
+      "horizontal_scale": 0.6039,
+      "safe_layout_bbox": [
+        1023,
+        203,
+        1587,
+        367
+      ],
+      "localized_bbox": [
+        1023,
+        227,
+        1587,
+        342
+      ],
+      "localized_size": [
+        564,
+        115
+      ],
+      "delta_left": 3,
+      "delta_right": 3,
+      "delta_top": 27,
+      "delta_bottom": 28
+    }
+  },
+  "machine_qa": {
+    "coverage": "17/17 PASS",
+    "changed_pixels_outside_declared_rework_mask": 0,
+    "alpha_changed_outside_declared_rework_mask": 0,
+    "localized_pair_overlap": {},
+    "header_128_exact": true,
+    "mip_count": 1,
+    "rgba32_roundtrip_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "ui_family": "selector yellow instruction family",
+  "style_profile": "yellow face + navy keyline + white border + navy outer edge; readable right lean 0.20-0.24",
+  "post_encode": {
+    "authority": "decoded persisted DDS",
+    "practical_scales": [
+      100,
+      75,
+      50
+    ],
+    "text_bearing_mips": 1,
+    "status": "PASS_PENDING_CONTROLLER_VISUAL"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_A_RECOVERY10_VALIDATED_CLEAN",
+    "2_slant_direction": "PASS_RIGHT_LEAN",
+    "3_no_unnecessary_undersizing": "PASS_MATERIAL_HEIGHT_GAIN_ALL_4",
+    "4_weight_outline_shadow": "PASS_SOURCE_YELLOW_NAVY_WHITE_FAMILY",
+    "5_clipping": "PASS_POSITIVE_MARGIN_ALL_4",
+    "6_protected_clearance": "PASS_ZERO_OUTSIDE_REWORK_MASK",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "8_readability": "PENDING_CONTROLLER"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "status": "A161_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
