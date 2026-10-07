@@ -2366,3 +2366,11 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 ## 2026-10-07 15:15 KST — C238 q106 PRE_INGAME refreshed
 - #007 q106 788CE557 English-original vs exact current candidate a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482 exported and controller-reviewed PASS for FLIP-Y/RAW, style/slant and protected-art consistency.
 - Fresh C + C3 complete; user JPG acceptance and NEW actual-game retest remain pending. RUNTIME_VALIDATION=UNTESTED.
+
+## 2026-10-07 15:23 KST — C240 C1 q107 841E796B B232R fresh C + C3 PASS
+- TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). Fresh HEAD/queue selection stayed on odd q107; q51 was skipped because A163 material repair was actively in flight. No even C2 item was touched.
+- GitHub-hosted C240 final worker run 37580910679 SUCCESS after source-probe script retries. Exact B232R candidate `d6a5cc84e7cf834afe11d8afdc2c0b869b306e75759b71ee392983db8999abda`; pinned canonical source `112f47e7b16ecf21f722738f7fc9053d1a9852d66da9ef9d29fd25dadf2f567e`; prior C103 `6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad`.
+- Independent machine QA PASS: source geometry resolved in MIRROR_Y frame; upper `무` localized bbox 56x30 inside source `No` 68x42 with [6,6,6,6] positive margins; changed/alpha pixels outside top source bbox=0; lower `핸디캡` remains pixel-exact to C103; source-vs-current changes outside the two source line boxes=0; header/dimensions/mip1 preserved.
+- Controller SOURCE/C103/CURRENT high-zoom FLIP-Y, full RAW and practical 100/75/50 review PASS. `No Handicap` now reads naturally as `무 핸디캡`; source-direction right lean, orange face/dark shadow, two-level hierarchy and protected Ferrari model cards/pictograms remain source-faithful. No broken Hangul, clipping, residue, overlap or protected-art intrusion visible.
+- Mandatory exact-SHA C3_STRICT_AUDIT PASS. Decision `C240_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME`. PRE_INGAME export refresh, user JPG acceptance and actual-game validation remain pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_C/20261007-C240-C1-Q107-841E796B-B232R/C240_841E796B_MACHINE_QA.json`, `localization/graphics/role_C/20261007-C240-C1-Q107-841E796B-B232R/C240_CONTROLLER_FINAL_QA.json`.
