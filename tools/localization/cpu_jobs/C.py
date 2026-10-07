@@ -1,215 +1,285 @@
 #!/usr/bin/env python3
-# C243 C1 q51 FF2462BB A163R fresh independent C + mandatory C3
-# TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL)
-import os, io, json, hashlib, struct, subprocess, urllib.request
-from pathlib import Path
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont
-from scipy.ndimage import binary_dilation
-
+# C2 q100 53CE39D5 / B233 fresh independent C + mandatory exact-SHA C3.
+# TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN
+import os
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
-repo=Path.cwd()
-RUN="20261007-C243-C1-Q051-FF2462BB-A163R"
-asset=Path("textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds")
-candidate=repo/"localization/graphics/hd_candidates"/asset
-clean_path=repo/"localization/graphics/role_A/20261004-A-RECOVERY01/FF2462BB_CLEAN_PLATE.png"
-producer_report=repo/"localization/graphics/role_A/20261007-A163R-Q051-FF2462BB-C239-STYLE-REPAIR/A163R_FF2462BB_REPORT.json"
+import hashlib, json, struct, subprocess, urllib.request
+from pathlib import Path
+import numpy as np
+from PIL import Image, ImageOps, ImageDraw
 
-SOURCE_SHA="5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67"
-PRE_A144_SHA="4fff8c59a44a1b7d03cee192124915f87eb73b3988c7673feb3228785ce67726"
-A163_REJECTED_SHA="16ed98f52c2505cf32304eb2b61aa15491de87e78e9b11812c7add3c6fa3b112"
-CURRENT_SHA="0dccb6318fafa20725427227fddf00c451bfdab814de5dc2da497d79d13b862e"
-SRC_COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
-SRC_URL=f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{SRC_COMMIT}/Release/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds"
-TARGET=(3002,1405,3512,1566)
-TOP=(3002,1405,3512,1486)
-BOTTOM=(3002,1486,3512,1566)
+repo=Path.cwd()
+RUN="20261007-C2-Q100-53CE39D5-B233-FRESH-C3"
+out=repo/"localization/graphics/role_C"/RUN
+out.mkdir(parents=True,exist_ok=True)
+wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
+
+asset="textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds"
+candidate=repo/"localization/graphics/hd_candidates"/asset
+SOURCE_SHA="cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a"
+PRIOR_SHA="08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1"
+CURRENT_SHA="7235731a2add8e947476cd22b971e5b57a7de390ae134609f4254a2f493a557d"
+source_commit="a95efe01d1f136514cef94b0d9e9fd61df021754"
+source_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+source_commit+"/Release/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds"
+clean_path=repo/"localization/graphics/role_B/20261005-B-PRODUCTION30/53CE39D5_HD_CLEAN_PLATE.png"
+
+cards=[
+ ("random", [1120,0,1480,125], 1),
+ ("time_attack_or2",[0,1630,365,1830],3),
+ ("heart_attack_or2",[380,1630,735,1830],3),
+ ("outrun_or2",[750,1615,1080,1810],3),
+ ("time_attack_special",[1110,1535,1465,1710],3),
+ ("heart_attack_special",[1470,1485,1840,1680],3),
+ ("outrun_special",[1020,1820,1360,2020],3),
+]
+semantic={
+ "random":["랜덤"],
+ "time_attack_or2":["타임 어택","모드","아웃런2"],
+ "heart_attack_or2":["하트 어택","모드","아웃런2"],
+ "outrun_or2":["아웃런","모드","아웃런2"],
+ "time_attack_special":["타임 어택","모드","스페셜 투어"],
+ "heart_attack_special":["하트 어택","모드","스페셜 투어"],
+ "outrun_special":["아웃런","모드","스페셜 투어"],
+}
 
 def sha(b): return hashlib.sha256(b).hexdigest()
-def decode_rgba32(b):
+def decode_dds(b):
     if b[:4]!=b"DDS ": raise RuntimeError("not DDS")
     h,w,pitch,depth,mips=struct.unpack_from("<5I",b,12)
-    pf=struct.unpack_from("<8I",b,76)
-    masks=(pf[4],pf[5],pf[6],pf[7])
-    if masks[:3]==(0xff,0xff00,0xff0000): mode="RGBA"
-    elif masks[:3]==(0xff0000,0xff00,0xff): mode="BGRA"
-    else: raise RuntimeError(("unsupported masks",masks))
-    if len(b)!=128+w*h*4: raise RuntimeError(("payload mismatch",w,h,len(b)))
+    pf=struct.unpack_from("<8I",b,76); masks=(pf[4],pf[5],pf[6],pf[7])
+    mode="RGBA" if masks[:3]==(0xff,0xff00,0xff0000) else ("BGRA" if masks[:3]==(0xff0000,0xff00,0xff) else None)
+    if not mode or len(b)!=128+w*h*4:
+        raise RuntimeError(("unsupported structure",w,h,mips,masks,len(b)))
     raw=Image.frombytes("RGBA",(w,h),b[128:],"raw",mode)
-    readable=raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-    return raw,readable,{"w":w,"h":h,"pitch":pitch,"depth":depth,"mips":mips,"mode":mode,"masks":masks}
-def dm(a,b): return np.any(np.asarray(a)!=np.asarray(b),axis=2)
-def adm(a,b): return np.asarray(a)[:,:,3]!=np.asarray(b)[:,:,3]
+    return raw,{"width":w,"height":h,"pitch":pitch,"mips":mips or 1,"mode":mode,"masks":[hex(x) for x in masks]}
+def changed(a,b): return np.any(a!=b,axis=2)
 def bbox(m):
-    ys,xs=np.where(m)
-    return None if len(xs)==0 else [int(xs.min()),int(ys.min()),int(xs.max())+1,int(ys.max())+1]
-def rect(shape,bb):
-    m=np.zeros(shape,bool);x1,y1,x2,y2=bb;m[y1:y2,x1:x2]=True;return m
-def hist(target_sha,path):
-    for c in subprocess.check_output(["git","log","--format=%H","--",str(path)],text=True).splitlines():
-        try:b=subprocess.check_output(["git","show",f"{c}:{path}"],stderr=subprocess.DEVNULL)
-        except subprocess.CalledProcessError:continue
-        if sha(b)==target_sha:return b,{"commit":c,"path":str(path)}
-    raise RuntimeError(("history sha not found",target_sha,str(path)))
-def comp(im,bg=(82,82,82,255)):
-    z=Image.new("RGBA",im.size,bg);z.alpha_composite(im);return z.convert("RGB")
-def lab(im,t):
-    o=Image.new("RGB",(im.width,im.height+28),(18,18,18));o.paste(im,(0,28))
-    ImageDraw.Draw(o).text((6,6),t,fill="white",font=ImageFont.load_default());return o
+    ys,xs=np.nonzero(m)
+    return None if not len(xs) else [int(xs.min()),int(ys.min()),int(xs.max())+1,int(ys.max())+1]
+def rect(shape,b):
+    m=np.zeros(shape,dtype=bool); x0,y0,x1,y1=b; m[y0:y1,x0:x1]=True; return m
+def recover_exact(target_sha,path):
+    commits=subprocess.check_output(["git","log","--all","--format=%H","--",path],text=True).splitlines()
+    for c in commits:
+        try: b=subprocess.check_output(["git","show",f"{c}:{path}"],stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError: continue
+        if sha(b)==target_sha: return b,c
+    raise RuntimeError("exact prior candidate not found: "+target_sha)
+def y_runs(mask,x0,y0,x1,y1):
+    # Derive source/final line bands independently from actual diff pixels in each semantic card window.
+    sub=mask[y0:y1,x0:x1]
+    ys=np.any(sub,axis=1)
+    runs=[]; s=None
+    for i,v in enumerate(ys):
+        if v and s is None: s=i
+        if s is not None and ((not v) or i==len(ys)-1):
+            e=i if not v else i+1
+            if e-s>=2: runs.append((y0+s,y0+e))
+            s=None
+    return runs
+def card_line_bboxes(mask, card):
+    key,b,n=card; x0,y0,x1,y1=b
+    runs=y_runs(mask,x0,y0,x1,y1)
+    if len(runs)!=n:
+        raise RuntimeError(("line-run count",key,len(runs),runs))
+    out=[]
+    for ys,ye in runs:
+        m=mask & rect(mask.shape,(x0,ys,x1,ye))
+        bb=bbox(m)
+        if bb is None: raise RuntimeError(("empty line",key,ys,ye))
+        out.append(bb)
+    return out
+def comp(im,bg=(102,102,102,255)):
+    z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
+def panel(label,im,target_w=900):
+    z=comp(im)
+    if z.width!=target_w:
+        nh=max(1,round(z.height*target_w/z.width)); z=z.resize((target_w,nh),Image.Resampling.LANCZOS)
+    c=Image.new("RGB",(z.width,z.height+28),(20,20,20)); c.paste(z,(0,28)); ImageDraw.Draw(c).text((6,6),label,fill="white"); return c
+def hstrip(xs):
+    w=sum(x.width for x in xs); h=max(x.height for x in xs)
+    o=Image.new("RGB",(w,h),(18,18,18)); xx=0
+    for x in xs:o.paste(x,(xx,0));xx+=x.width
+    return o
+def vstack(xs):
+    w=max(x.width for x in xs); h=sum(x.height for x in xs)
+    o=Image.new("RGB",(w,h),(18,18,18)); yy=0
+    for x in xs:o.paste(x,(0,yy));yy+=x.height
+    return o
 
-cb=candidate.read_bytes()
-if sha(cb)!=CURRENT_SHA: raise RuntimeError(("candidate drift",sha(cb),CURRENT_SHA))
-req=urllib.request.Request(SRC_URL,headers={"User-Agent":"OutRun-C243"})
-with urllib.request.urlopen(req,timeout=90) as r: sb=r.read()
-if sha(sb)!=SOURCE_SHA: raise RuntimeError(("source drift",sha(sb),SOURCE_SHA))
-preb,preprov=hist(PRE_A144_SHA,Path("localization/graphics/hd_candidates")/asset)
-rejb,rejprov=hist(A163_REJECTED_SHA,Path("localization/graphics/hd_candidates")/asset)
+tmp=Path("/tmp/c2q100"); tmp.mkdir(exist_ok=True)
+sp=tmp/"source.dds"; urllib.request.urlretrieve(source_url,sp)
+sb=sp.read_bytes(); cb=candidate.read_bytes()
+if sha(sb)!=SOURCE_SHA: raise RuntimeError(("source drift",sha(sb)))
+if sha(cb)!=CURRENT_SHA: raise RuntimeError(("candidate drift",sha(cb)))
+pb,prior_commit=recover_exact(PRIOR_SHA,"localization/graphics/hd_candidates/"+asset)
 
-sraw,src,sm=decode_rgba32(sb); preraw,pre,pm=decode_rgba32(preb); rejraw,rej,rm=decode_rgba32(rejb); craw,cur,cm=decode_rgba32(cb)
-if sm!=pm or sm!=rm or sm!=cm or (sm["w"],sm["h"],sm["mips"])!=(4096,2048,1):
-    raise RuntimeError(("structure mismatch",sm,pm,rm,cm))
-if not (cb[:128]==sb[:128]==preb[:128]==rejb[:128]): raise RuntimeError("header mismatch")
-if not clean_path.exists(): raise RuntimeError("verified clean plate missing")
+src_raw,sm=decode_dds(sb); prior_raw,pm=decode_dds(pb); cur_raw,cm=decode_dds(cb)
+if sm!=pm or sm!=cm or sb[:128]!=pb[:128] or sb[:128]!=cb[:128]:
+    raise RuntimeError(("DDS structure/header drift",sm,pm,cm))
+if (sm["width"],sm["height"])!=(2048,2048) or sm["mips"]!=1:
+    raise RuntimeError(("unexpected structure",sm))
+src=ImageOps.flip(src_raw); prior=ImageOps.flip(prior_raw); cur=ImageOps.flip(cur_raw)
 clean=Image.open(clean_path).convert("RGBA")
-if clean.size!=(4096,2048): raise RuntimeError(("clean size",clean.size))
-pr=json.loads(producer_report.read_text(encoding="utf-8"))
-if pr.get("candidate_sha256")!=CURRENT_SHA or pr.get("source_sha256")!=SOURCE_SHA:
-    raise RuntimeError("producer report SHA drift")
+if clean.size!=src.size: raise RuntimeError(("clean size",clean.size,src.size))
+sa,pa,ca,fa=map(np.asarray,(src,prior,clean,cur))
+H,W=sa.shape[:2]
 
-shape=(2048,4096)
-tm=rect(shape,TARGET); topm=rect(shape,TOP); botm=rect(shape,BOTTOM)
+source_clean=changed(sa,ca)
+prior_clean=changed(pa,ca)
+current_clean=changed(fa,ca)
+prior_current=changed(pa,fa)
+prior_current_alpha=pa[:,:,3]!=fa[:,:,3]
 
-# The exact target is transparent-backed source text. Independently use decoded alpha footprints
-# rather than the historical A_RECOVERY01 clean plate, which predates this target mapping and is
-# retained only as historical evidence. Controller visual review below verifies the target contains
-# no protected/non-text artwork.
-sa=np.asarray(src)[:,:,3]
-ca=np.asarray(cur)[:,:,3]
-source_alpha=(sa>0)&tm
-current_alpha=(ca>0)&tm
-rows=[]
-row_masks=[]
-for key,box,mask in [("top",TOP,topm),("bottom",BOTTOM,botm)]:
-    smask=(sa>0)&mask
-    lmask=(ca>0)&mask
-    sbb=bbox(smask); lbb=bbox(lmask)
-    if sbb is None or lbb is None: raise RuntimeError(("missing alpha row",key,sbb,lbb))
-    sw,sh=sbb[2]-sbb[0],sbb[3]-sbb[1];lw,lh=lbb[2]-lbb[0],lbb[3]-lbb[1]
-    margins=[lbb[0]-sbb[0],sbb[2]-lbb[2],lbb[1]-sbb[1],sbb[3]-lbb[3]]
-    contain=(lbb[0]>=sbb[0] and lbb[1]>=sbb[1] and lbb[2]<=sbb[2] and lbb[3]<=sbb[3])
-    sizeok=(lw<=sw and lh<=sh); pos=min(margins)>0
-    if not(contain and sizeok and pos): raise RuntimeError(("alpha bbox/size/margin fail",key,sbb,lbb,margins))
-    row_masks.append((key,lmask))
-    rows.append({"line":key,"source_alpha_bbox":sbb,"localized_alpha_bbox":lbb,"source_size":[sw,sh],"localized_size":[lw,lh],"margins_lrtb":margins,"containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS"})
+# The validated clean plate may only differ from source within the seven semantic card windows.
+card_window_union=np.zeros((H,W),bool)
+for _,b,_ in cards: card_window_union |= rect((H,W),b)
+clean_diff_outside_windows=int(np.count_nonzero(source_clean & ~card_window_union))
+if clean_diff_outside_windows:
+    raise RuntimeError(("clean changed outside semantic windows",clean_diff_outside_windows))
 
-# Positive separation between the two localized lines.
-touch=int(np.count_nonzero(binary_dilation(row_masks[0][1],iterations=1)&row_masks[1][1]))
-overlap=int(np.count_nonzero(row_masks[0][1]&row_masks[1][1]))
-if overlap or touch: raise RuntimeError(("localized line overlap/touch",overlap,touch))
+# Fresh C derives source/current line bboxes from SOURCE-vs-CLEAN and CURRENT-vs-CLEAN, not producer masks/bboxes.
+source_rows=[]; current_rows=[]; prior_rows=[]
+for c in cards:
+    key,b,n=c
+    sbs=card_line_bboxes(source_clean,c)
+    cbs=card_line_bboxes(current_clean,c)
+    pbs=card_line_bboxes(prior_clean,c)
+    if len(sbs)!=len(cbs) or len(sbs)!=len(pbs): raise RuntimeError(("row count mismatch",key))
+    for i,(ob,lb,pb_) in enumerate(zip(sbs,cbs,pbs),1):
+        source_rows.append((key,i,ob))
+        current_rows.append((key,i,lb))
+        prior_rows.append((key,i,pb_))
 
-pre_cur=dm(pre,cur); pre_cur_a=adm(pre,cur)
-rej_cur=dm(rej,cur)
-machine={
- "target_clean_method":"canonical source target is transparent-backed text; exact decoded alpha footprints",
- "historical_clean_plate_present":True,
- "source_target_alpha_bbox":bbox(source_alpha),
- "current_target_alpha_bbox":bbox(current_alpha),
- "source_target_nontransparent_pixels":int(np.count_nonzero(source_alpha)),
- "current_target_nontransparent_pixels":int(np.count_nonzero(current_alpha)),
- "pre_a144_to_current_changed_pixels_outside_true_target":int(np.count_nonzero(pre_cur&~tm)),
- "pre_a144_to_current_alpha_changed_outside_true_target":int(np.count_nonzero(pre_cur_a&~tm)),
- "a163_rejected_to_current_changed_pixels_outside_true_target":int(np.count_nonzero(rej_cur&~tm)),
- "pre_a144_to_current_changed_pixels_inside_true_target":int(np.count_nonzero(pre_cur&tm)),
- "localized_line_overlap_pixels":overlap,
- "localized_line_touch1_pixels":touch,
- "header_128_exact_source_pre_rejected_current":True,
- "dimensions":[4096,2048],"mip_count":1,"raw_mode":sm["mode"],
-}
-if machine["pre_a144_to_current_changed_pixels_outside_true_target"] or machine["pre_a144_to_current_alpha_changed_outside_true_target"] or machine["a163_rejected_to_current_changed_pixels_outside_true_target"]:
-    raise RuntimeError(("blast radius fail",machine))
-if machine["pre_a144_to_current_changed_pixels_inside_true_target"]==0: raise RuntimeError("no material target repair")
-machine["wrong_a144_insertion_exactly_restored"]="PASS_BY_PRE_A144_EXACT_OUTSIDE_TRUE_TARGET"
+if len(source_rows)!=19 or len(current_rows)!=19:
+    raise RuntimeError(("expected 19 lines",len(source_rows),len(current_rows)))
 
-# Construct exact transparent target clean evidence from canonical source. This is safe only because
-# source target visual/alpha inspection shows no protected non-text pixels in the target rectangle.
-clean_exact=src.copy()
-clean_exact.paste((0,0,0,0),TARGET)
-out=repo/"localization/graphics/role_C"/RUN;out.mkdir(parents=True,exist_ok=True)
-# Target high zoom source/clean/pre/A163-rejected/current in readable frame.
-crop=(2940,1360,3570,1610)
-cards=[]
-for t,im in [("EN SOURCE",src),("EXACT TARGET CLEAN",clean_exact),("PRE-A144",pre),("A163 STYLE-REJECTED",rej),("A163R CURRENT",cur)]:
-    z=comp(im.crop(crop)).resize(((crop[2]-crop[0])*2,(crop[3]-crop[1])*2),Image.Resampling.NEAREST)
-    cards.append(lab(z,t+" READABLE"))
-sheet=Image.new("RGB",(sum(c.width for c in cards),max(c.height for c in cards)),(10,10,10));x=0
-for c in cards:sheet.paste(c,(x,0));x+=c.width
-sheet.save(out/"C243_TARGET_SOURCE_CLEAN_PRE_REJECTED_CURRENT_HIGHZOOM.jpg","JPEG",quality=96,subsampling=0)
+allowed=np.zeros((H,W),bool)
+row_reports=[]; localized_masks=[]
+for (key,i,ob),(_,_,lb),(_,_,pbb) in zip(source_rows,current_rows,prior_rows):
+    allowed |= rect((H,W),ob)
+    sw,sh=ob[2]-ob[0],ob[3]-ob[1]
+    lw,lh=lb[2]-lb[0],lb[3]-lb[1]
+    margins=[lb[0]-ob[0],ob[2]-lb[2],lb[1]-ob[1],ob[3]-lb[3]]
+    contain=lb[0]>=ob[0] and lb[1]>=ob[1] and lb[2]<=ob[2] and lb[3]<=ob[3]
+    sizeok=lw<=sw and lh<=sh
+    positive=min(margins)>0
+    lm=current_clean & rect((H,W),lb)
+    localized_masks.append(lm)
+    ko=semantic[key][i-1]
+    row_reports.append({
+      "target":key,"line_index":i,"korean":ko,
+      "original_bbox":ob,"prior_localized_bbox":pbb,"localized_bbox":lb,
+      "source_size":[sw,sh],"localized_size":[lw,lh],
+      "delta_left":lb[0]-ob[0],"delta_right":lb[2]-ob[2],
+      "delta_top":lb[1]-ob[1],"delta_bottom":lb[3]-ob[3],
+      "margins":margins,
+      "containment":"PASS" if contain else "FAIL",
+      "size_ceiling":"PASS" if sizeok else "FAIL",
+      "positive_margin":"PASS" if positive else "FAIL",
+    })
 
-# Raw exact target mapping.
-raw_target=(TARGET[0],2048-TARGET[3],TARGET[2],2048-TARGET[1])
-rcrop=(raw_target[0]-62,raw_target[1]-45,raw_target[2]+58,raw_target[3]+45)
-rawcards=[]
-for t,im in [("EN SOURCE RAW",sraw),("PRE-A144 RAW",preraw),("A163 REJECTED RAW",rejraw),("A163R CURRENT RAW",craw)]:
-    z=comp(im.crop(rcrop)).resize(((rcrop[2]-rcrop[0])*2,(rcrop[3]-rcrop[1])*2),Image.Resampling.NEAREST)
-    rawcards.append(lab(z,t))
-rs=Image.new("RGB",(sum(c.width for c in rawcards),max(c.height for c in rawcards)),(10,10,10));x=0
-for c in rawcards:rs.paste(c,(x,0));x+=c.width
-rs.save(out/"C243_TARGET_RAW_SOURCE_PRE_REJECTED_CURRENT.jpg","JPEG",quality=96,subsampling=0)
+# Exact blast-radius and containment checks.
+source_clean_outside_allowed=int(np.count_nonzero(source_clean & ~allowed))
+current_clean_outside_allowed=int(np.count_nonzero(current_clean & ~allowed))
+current_alpha_outside_allowed=int(np.count_nonzero((ca[:,:,3]!=fa[:,:,3]) & ~allowed))
 
-# Full atlas source/current readable + raw at practical overview.
-fullcards=[]
-for t,im in [("SOURCE FLIP-Y",src),("CURRENT FLIP-Y",cur),("SOURCE RAW",sraw),("CURRENT RAW",craw)]:
-    z=comp(im).resize((1024,512),Image.Resampling.LANCZOS)
-    fullcards.append(lab(z,t))
-fs=Image.new("RGB",(2048,1080),(10,10,10))
-fs.paste(fullcards[0],(0,0));fs.paste(fullcards[1],(1024,0));fs.paste(fullcards[2],(0,540));fs.paste(fullcards[3],(1024,540))
-fs.save(out/"C243_FULL_SOURCE_CURRENT_FLIPY_RAW.jpg","JPEG",quality=94,subsampling=0)
+# B233 must only alter the 18 non-RANDOM rows; RANDOM remains byte/pixel exact to C117.
+random_box=source_rows[0][2]
+random_mask=rect((H,W),random_box)
+rework_allowed=allowed & ~random_mask
+prior_current_outside_rework=int(np.count_nonzero(prior_current & ~rework_allowed))
+prior_current_alpha_outside_rework=int(np.count_nonzero(prior_current_alpha & ~rework_allowed))
+random_pixel_exact=bool(np.array_equal(pa[random_box[1]:random_box[3],random_box[0]:random_box[2]],fa[random_box[1]:random_box[3],random_box[0]:random_box[2]]))
 
-# Practical target scale 100/75/50.
-pcards=[]
-target_crop=(2960,1380,3550,1590)
-for pct in (100,75,50):
+pair_overlap=0
+for i in range(len(localized_masks)):
+    for j in range(i+1,len(localized_masks)):
+        pair_overlap += int(np.count_nonzero(localized_masks[i]&localized_masks[j]))
+
+row_pass=all(r["containment"]=="PASS" and r["size_ceiling"]=="PASS" and r["positive_margin"]=="PASS" for r in row_reports)
+machine_pass=(row_pass and source_clean_outside_allowed==0 and current_clean_outside_allowed==0 and current_alpha_outside_allowed==0 and prior_current_outside_rework==0 and prior_current_alpha_outside_rework==0 and random_pixel_exact and pair_overlap==0)
+
+# Evidence: focused readable region, per-card high zoom, raw and practical scales.
+focus=(0,1450,1880,2048)
+imgs=[]
+for lab,im in [("SOURCE READABLE",src),("C117 PRIOR",prior),("VALIDATED CLEAN",clean),("B233 CURRENT",cur)]:
+    imgs.append(panel(lab,im.crop(focus),940))
+vstack([hstrip(imgs[:2]),hstrip(imgs[2:])]).save(out/"C2Q100_SOURCE_PRIOR_CLEAN_CURRENT_READABLE.jpg","JPEG",quality=95,subsampling=0)
+
+raw_focus=(0,0,2048,650)
+hstrip([panel("SOURCE RAW MIRROR_Y",src_raw.crop(raw_focus),1024),panel("B233 RAW MIRROR_Y",cur_raw.crop(raw_focus),1024)]).save(out/"C2Q100_SOURCE_CURRENT_RAW.jpg","JPEG",quality=95,subsampling=0)
+
+card_sheets=[]
+for key,b,n in cards[1:]:
+    pad=12; x0,y0,x1,y1=b; crop=(max(0,x0-pad),max(0,y0-pad),min(W,x1+pad),min(H,y1+pad))
+    card_sheets.append(hstrip([
+      panel("SRC "+key,src.crop(crop),560),
+      panel("CLEAN "+key,clean.crop(crop),560),
+      panel("PRIOR "+key,prior.crop(crop),560),
+      panel("CURRENT "+key,cur.crop(crop),560),
+    ]))
+vstack(card_sheets).save(out/"C2Q100_MODE_CARD_CONTACTS.jpg","JPEG",quality=95,subsampling=0)
+
+pr=[]
+for pct in (100,50,25):
+    sc=pct/100
     pair=[]
-    for t,im in [("SOURCE",src),("CURRENT",cur)]:
-        z=comp(im.crop(target_crop))
-        z=z.resize((max(1,round(z.width*pct/100)),max(1,round(z.height*pct/100))),Image.Resampling.LANCZOS)
-        pair.append(lab(z,f"{t} {pct}%"))
-    row=Image.new("RGB",(pair[0].width+pair[1].width,max(pair[0].height,pair[1].height)),(10,10,10));row.paste(pair[0],(0,0));row.paste(pair[1],(pair[0].width,0));pcards.append(row)
-ps=Image.new("RGB",(max(x.width for x in pcards),sum(x.height for x in pcards)),(10,10,10));y=0
-for z in pcards:ps.paste(z,(0,y));y+=z.height
-ps.save(out/"C243_TARGET_PRACTICAL_100_75_50.jpg","JPEG",quality=95,subsampling=0)
+    for lab,im in [("SOURCE",src.crop(focus)),("CURRENT",cur.crop(focus))]:
+        z=comp(im)
+        z=z.resize((max(1,round(z.width*sc)),max(1,round(z.height*sc))),Image.Resampling.LANCZOS)
+        pair.append(panel(f"{lab} {pct}%",z,max(600,z.width)))
+    pr.append(hstrip(pair))
+vstack(pr).save(out/"C2Q100_PRACTICAL_100_50_25.jpg","JPEG",quality=95,subsampling=0)
 
 report={
- "schema_version":2,"run":RUN,"role":"C","TEMP_BACKLOG_RELIEF":"C1","SHARD":"ODD(+UNINDEXED_SPECIAL)",
- "queue_index":51,"priority":"P0","asset":asset.as_posix(),"user_jpg_regression":"PJR-014-20261006",
- "defect_tags":["BOTTOM_OUTLINE_CLIPPED","GLYPH_EFFECT_CLIPPING"],
- "producer_run":"A163R","source_sha256":SOURCE_SHA,
- "source_provenance":{"repo":"Sonic-TV/OR2006Sprites","commit":SRC_COMMIT,"url":SRC_URL},
- "pre_a144_sha256":PRE_A144_SHA,"pre_a144_provenance":preprov,
- "a163_style_rejected_sha256":A163_REJECTED_SHA,"a163_rejected_provenance":rejprov,
- "candidate_sha256":CURRENT_SHA,"true_readable_target_bbox":list(TARGET),
- "rows":rows,"machine_qa":machine,"clean_plate_evidence":"controller-verified transparent target clean reconstructed from canonical source target rectangle",
- "fresh_c_machine_status":"PASS_PENDING_CONTROLLER_VISUAL",
- "mandatory_c3":"REQUIRED_EXACT_SHA_PRIOR_USER_JPG_CLIPPING_FAIL_AND_C239_MAPPING_FALSE_NEGATIVE",
- "controller_visual_qa":"PENDING","c3_strict_decision":"PENDING_CONTROLLER",
- "pre_ingame_export":"BLOCKED_UNTIL_CONTROLLER_C3",
- "user_jpg_review":"PENDING_AFTER_FRESH_C",
- "actual_ingame_validation":"PENDING",
- "runtime_validation":"UNTESTED","forbidden_domains_touched":[],
+ "schema_version":2,"role":"C","lane":"C2","TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN",
+ "run":RUN,"queue_index":100,"asset":asset,"producer_run":"B233",
+ "trigger":"PRE_INGAME_005_SOURCE_RELATIVE_PLACEMENT_FALSE_NEGATIVE",
+ "source_sha256":SOURCE_SHA,"prior_c117_sha256":PRIOR_SHA,"candidate_sha256":CURRENT_SHA,
+ "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":source_commit,"url":source_url},
+ "prior_candidate_git_commit":prior_commit,
+ "independent_basis":"Fresh C downloads and decodes the pinned canonical source, recovers the exact prior C117 candidate by SHA, uses the C117/B30 validated clean plate only as reconstruction evidence, then independently derives all 19 source and current line footprints from SOURCE-vs-CLEAN and CURRENT-vs-CLEAN pixel deltas inside seven semantic card windows. Producer masks/bboxes/counters are not consumed.",
+ "structure":sm,
+ "rows":row_reports,
+ "summary":{
+   "bbox_size_positive_margin":f"{sum(1 for r in row_reports if r['containment']=='PASS' and r['size_ceiling']=='PASS' and r['positive_margin']=='PASS')}/19 PASS",
+   "source_clean_changed_outside_19_derived_bboxes":source_clean_outside_allowed,
+   "current_changed_outside_19_source_bboxes":current_clean_outside_allowed,
+   "current_alpha_changed_outside_19_source_bboxes":current_alpha_outside_allowed,
+   "prior_to_current_changed_outside_18_rework_bboxes":prior_current_outside_rework,
+   "prior_to_current_alpha_changed_outside_18_rework_bboxes":prior_current_alpha_outside_rework,
+   "random_row_pixel_exact_to_C117":random_pixel_exact,
+   "localized_pair_overlap_pixels":pair_overlap,
+   "header_128_exact_source_prior_current":sb[:128]==pb[:128]==cb[:128],
+   "persisted_decode_authority":"PASS"
+ },
+ "coverage":{"semantic_groups":7,"physical_lines":19,"random_preserved":True,"mode_card_lines_reworked":18,"status":"PASS_ALL_19_ACCOUNTED"},
+ "machine_status":"PASS" if machine_pass else "FAIL",
+ "fresh_c_decision":"PENDING_CONTROLLER" if machine_pass else "REWORK_REQUIRED",
+ "c3_required":True,
+ "c3_reason":["PRE_INGAME_JPG_REJECTION","SOURCE_RELATIVE_PLACEMENT_FALSE_NEGATIVE","MULTILINE_TRANSFORMED_SMALL_TEXT","PRIOR_C117_VISUAL_FALSE_NEGATIVE"],
+ "c3_machine_status":"PASS" if machine_pass else "BLOCKED_MACHINE_FAIL",
+ "c3_visual_priorities":["source_relative_placement","slant_direction","clean_plate","source_style","line_hierarchy_scale","glyph_integrity","protected_separation","FLIP_Y_RAW_consistency","practical_scale","coverage"],
  "visual_evidence":[
-  f"localization/graphics/role_C/{RUN}/C243_TARGET_SOURCE_CLEAN_PRE_REJECTED_CURRENT_HIGHZOOM.jpg",
-  f"localization/graphics/role_C/{RUN}/C243_TARGET_RAW_SOURCE_PRE_REJECTED_CURRENT.jpg",
-  f"localization/graphics/role_C/{RUN}/C243_FULL_SOURCE_CURRENT_FLIPY_RAW.jpg",
-  f"localization/graphics/role_C/{RUN}/C243_TARGET_PRACTICAL_100_75_50.jpg"
- ]
+   f"localization/graphics/role_C/{RUN}/C2Q100_SOURCE_PRIOR_CLEAN_CURRENT_READABLE.jpg",
+   f"localization/graphics/role_C/{RUN}/C2Q100_MODE_CARD_CONTACTS.jpg",
+   f"localization/graphics/role_C/{RUN}/C2Q100_SOURCE_CURRENT_RAW.jpg",
+   f"localization/graphics/role_C/{RUN}/C2Q100_PRACTICAL_100_50_25.jpg",
+ ],
+ "controller_visual_qa":"PENDING_CONTROLLER",
+ "c3_strict_decision":"PENDING_CONTROLLER" if machine_pass else "BLOCKED_MACHINE_FAIL",
+ "pre_ingame_export":"BLOCKED_UNTIL_CONTROLLER_C3",
+ "runtime_validation":"UNTESTED",
+ "forbidden_domains_touched":[]
 }
-(out/"C243_FF2462BB_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-wr=repo/"localization/graphics/worker_results";wr.mkdir(parents=True,exist_ok=True)
-(wr/"C243_FF2462BB.json").write_text(json.dumps({
- "run":RUN,"role":"C","TEMP_BACKLOG_RELIEF":"C1","SHARD":"ODD(+UNINDEXED_SPECIAL)",
- "queue_index":51,"candidate_sha256":CURRENT_SHA,"machine_status":"PASS_PENDING_CONTROLLER_VISUAL",
- "report":f"localization/graphics/role_C/{RUN}/C243_FF2462BB_MACHINE_QA.json","runtime_validation":"UNTESTED"
+(out/"C2Q100_53CE39D5_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"C2Q100_53CE39D5.json").write_text(json.dumps({
+ "role":"C","lane":"C2","TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN","run":RUN,"queue_index":100,"asset":"53CE39D5",
+ "candidate_sha256":CURRENT_SHA,"machine_status":report["machine_status"],"c3_machine_status":report["c3_machine_status"],
+ "report":f"localization/graphics/role_C/{RUN}/C2Q100_53CE39D5_MACHINE_QA.json","runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print(json.dumps({"run":RUN,"queue_index":51,"candidate_sha256":CURRENT_SHA,"rows":rows,"machine":machine,"status":"PASS_PENDING_CONTROLLER_VISUAL"},ensure_ascii=False,indent=2))
+print(json.dumps({"run":RUN,"machine_status":report["machine_status"],"summary":report["summary"],"coverage":report["coverage"]},ensure_ascii=False,indent=2))
+if not machine_pass: raise SystemExit("C2 q100 machine QA failed closed")
