@@ -25,16 +25,21 @@ source_png_path=repo/"localization/graphics/role_B/20261005-B-PRODUCTION137/63C_
 c244_report=repo/"localization/graphics/role_C/20261007-C244-C2-Q026-63C91067-A144/C244_63C91067_MACHINE_QA.json"
 SOURCE_SHA="d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab"
 BEFORE_SHA="0281b7b46b5c53598bab2bf4a01f65f391b166345710460c51791da8cf70d530"
-FONT=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc")
 FONT_INDEX=1
-if not FONT.exists():
-    # GitHub ubuntu-latest does not include Noto CJK by default. This runner-only
-    # dependency is installed here because the exact source/candidate binary work
-    # could not be materialized in ChatGPT local and N100 fallback was unavailable.
+FONT_CANDIDATES=[
+    Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc"),
+    Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"),
+]
+FONT=next((p for p in FONT_CANDIDATES if p.exists()),None)
+if FONT is None:
+    # ubuntu-latest does not include Noto CJK by default.
     import subprocess
     subprocess.run(["sudo","apt-get","update","-qq"],check=True)
     subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
-if not FONT.exists(): raise RuntimeError(f"required font missing after package install: {FONT}")
+    FONT=next((p for p in FONT_CANDIDATES if p.exists()),None)
+if FONT is None:
+    found=sorted(str(p) for p in Path("/usr/share/fonts").rglob("NotoSansCJK*.ttc"))
+    raise RuntimeError(("required Noto CJK font missing after package install",found))
 
 def sha(b): return hashlib.sha256(b).hexdigest()
 def decode(b):
@@ -226,7 +231,7 @@ report={
  "trigger":"C244_VISUAL_FAIL_REWORK_REQUIRED_TOTAL_RANK_UNDERSIZED_AND_FLAT",
  "source_sha256":SOURCE_SHA,"before_candidate_sha256":BEFORE_SHA,"candidate_sha256":after,
  "clean_plate":"localization/graphics/role_B/20261005-B-PRODUCTION137/63C_CLEAN_PLATE.png",
- "construction":"fresh native-HD supersampled Noto Sans CJK KR Black face index 1; white fill/navy outline; stronger readable-right 0.30 shear; source-relative wide title fit; no reuse/upscale of prior Korean bitmap",
+ "construction":f"fresh native-HD supersampled {FONT.name} Korean face index 1; white fill/navy outline; stronger readable-right 0.30 shear; source-relative wide title fit; no reuse/upscale of prior Korean bitmap",
  "rows":row_out,"dark_outline_rows":dark_rows,
  "machine_qa":{
    "rows":"2/2 PASS","changed_pixels_outside_two_exact_source_bboxes":blast,
