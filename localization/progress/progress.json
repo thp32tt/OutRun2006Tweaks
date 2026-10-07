@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T08:18:00+09:00",
+  "updated_at_kst": "2026-10-08T08:15:50+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -3102,7 +3102,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "B248 q172 6C9B3611 exact 51a636b12d59a024c9eed4ea49b5c2f7a46145d39605f9264062284c9473ebdd is producer-PASS pending fresh independent C2 + exact-SHA C3 before PRE_INGAME/user JPG and NEW actual-game validation. C265 C1 update: q121 FD90AA9 and q201 A9ABD877 passed fresh C + exact-SHA C3 and now await PRE_INGAME/user JPG + NEW actual-game validation. q219 D263B3F1 returned REWORK_REQUIRED for severe source-width hierarchy underfill and silver-techno family mismatch; IGR-025 remains HOLD for missing screenshot/runtime mapping evidence. C265 update: q128 12519155, q130 1762489B, q132 1F5FE6E9 passed fresh independent C + exact-SHA C3 on the B214/B215/B216 bytes and are no longer fresh-C pending. They now await PRE_INGAME English-original refresh, user JPG acceptance and NEW actual-game validation. Other pending-C/rework items are unchanged. RUNTIME_VALIDATION=UNTESTED.",
+  "current_pending_c": "C268 C1 update: q59 7CE1CFC5 returned REWORK_REQUIRED after fresh decode found 7 changed/alpha pixels outside exact source bboxes and 7 protected-source changes; C3 blocked. q89 43B07A77 and q135 2B0863D6 passed fresh C + exact-SHA C3 and now await PRE_INGAME English-original refresh/user JPG and actual-game validation. Other pending-C items are unchanged. RUNTIME_VALIDATION=UNTESTED.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -5135,7 +5135,7 @@
       }
     }
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261008-C265-C1-Q121-Q201-Q219/C265_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261008-C268-C1-Q059-Q089-Q135/C268_CONTROLLER_FINAL_QA.json",
   "c249_c2_batch_q086_q044_q048": {
     "run": "20261007-C249-C2-BATCH-Q086-Q044-Q048",
     "timestamp_kst": "2026-10-07T20:35:35+09:00",
@@ -6280,23 +6280,23 @@
     "forbidden_domains_touched": []
   },
   "latest_c_first_qa": {
-    "run": "C265",
-    "result": "Q128_Q130_Q132_FRESH_C_PLUS_EXACT_SHA_C3_STRICT_PASS",
+    "run": "C268",
+    "result": "Q59_REWORK_REQUIRED_Q89_Q135_FRESH_C_PLUS_EXACT_SHA_C3_STRICT_PASS",
     "assets": {
-      "12519155": {
-        "queue_index": 128,
-        "candidate_sha256": "66f1b9ea8e0d65afef09667ccfd1565e30406f9d08abde75fd3302e2c03e1f16",
-        "status": "C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME"
+      "7CE1CFC5": {
+        "queue_index": 59,
+        "candidate_sha256": "cc8745c36a40422f747fd5ceb66f42f36d165292750765a506a8b1fcba7cb217",
+        "status": "REWORK_REQUIRED_ZERO_PIXEL_OVERFLOW"
       },
-      "1762489B": {
-        "queue_index": 130,
-        "candidate_sha256": "2569b0a2ea319e02d13d04d5cb3ed38bf676d35b3972aa42cab573068238d48a",
-        "status": "C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME"
+      "43B07A77": {
+        "queue_index": 89,
+        "candidate_sha256": "741a05cb632e85a4fea783e51bb2f98678c0510f8b34fc7a73cc39c898c0749c",
+        "status": "C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
       },
-      "1F5FE6E9": {
-        "queue_index": 132,
-        "candidate_sha256": "615281ac66733323221916c506cda2fb9eb2f139866e98f1a9985e56ba7dde90",
-        "status": "C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME"
+      "2B0863D6": {
+        "queue_index": 135,
+        "candidate_sha256": "8657a59f966bb4be994a00ead41d6939a5145efba320deab83cd3ef8af92b0c1",
+        "status": "C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
       }
     },
     "runtime_validation": "UNTESTED"
@@ -6519,5 +6519,42 @@
       "runtime_validation": "UNTESTED",
       "note": "Current queue status only. Declared C PASS is not evidence-backed export or runtime completion."
     }
+  },
+  "c268_c1_q059_q089_q135": {
+    "run": "20261008-C268-C1-Q059-Q089-Q135",
+    "role": "C",
+    "lane": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "pre_commit_refresh_head": "2f4e22c116c7ead2f62e246d9ff085468b8bd2ee",
+    "execution_backend": "N100_MCP_MEMORY_STREAMED_FALLBACK_AFTER_CHATGPT_LOCAL_DNS_BLOCK_AND_GITHUB_CPU_WORKER_CANCELLED",
+    "assets": {
+      "q59": {
+        "asset": "7CE1CFC5",
+        "candidate_sha256": "cc8745c36a40422f747fd5ceb66f42f36d165292750765a506a8b1fcba7cb217",
+        "machine_qa": "FAIL_ZERO_PIXEL_OVERFLOW_7_ALPHA_OUTSIDE_7_PROTECTED_7",
+        "fresh_c": "FAIL_MACHINE_HARD_GATE",
+        "c3": "BLOCKED",
+        "status": "REWORK_REQUIRED"
+      },
+      "q89": {
+        "asset": "43B07A77",
+        "candidate_sha256": "741a05cb632e85a4fea783e51bb2f98678c0510f8b34fc7a73cc39c898c0749c",
+        "machine_qa": "PASS_1_OF_1_EXACT_BBOX_ZERO_OUTSIDE_ALPHA_PROTECTED",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA"
+      },
+      "q135": {
+        "asset": "2B0863D6",
+        "candidate_sha256": "8657a59f966bb4be994a00ead41d6939a5145efba320deab83cd3ef8af92b0c1",
+        "machine_qa": "PASS_10_OF_10_EXACT_BBOX_ZERO_OUTSIDE_ALPHA_PROTECTED",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA"
+      }
+    },
+    "controller_report": "localization/graphics/role_C/20261008-C268-C1-Q059-Q089-Q135/C268_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "PENDING_REFRESH_TRIGGERED_BY_STATE_COMMIT_Q89_Q135",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

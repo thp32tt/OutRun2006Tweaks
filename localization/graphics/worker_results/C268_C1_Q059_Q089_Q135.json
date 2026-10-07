@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "run": "C268",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "execution_backend": "N100_MCP_MEMORY_STREAMED_FALLBACK_AFTER_CHATGPT_LOCAL_DNS_BLOCK_AND_GITHUB_CPU_WORKER_CANCELLED",
+  "pre_commit_refresh_head": "2f4e22c116c7ead2f62e246d9ff085468b8bd2ee",
+  "assets": [
+    {
+      "queue_index": 59,
+      "asset": "7CE1CFC5",
+      "candidate_sha256": "cc8745c36a40422f747fd5ceb66f42f36d165292750765a506a8b1fcba7cb217",
+      "machine_result": "FAIL",
+      "decision": "REWORK_REQUIRED"
+    },
+    {
+      "queue_index": 89,
+      "asset": "43B07A77",
+      "candidate_sha256": "741a05cb632e85a4fea783e51bb2f98678c0510f8b34fc7a73cc39c898c0749c",
+      "machine_result": "PASS",
+      "decision": "C3_STRICT_PASS"
+    },
+    {
+      "queue_index": 135,
+      "asset": "2B0863D6",
+      "candidate_sha256": "8657a59f966bb4be994a00ead41d6939a5145efba320deab83cd3ef8af92b0c1",
+      "machine_result": "PASS",
+      "decision": "C3_STRICT_PASS"
+    }
+  ],
+  "runtime_validation": "UNTESTED"
+}

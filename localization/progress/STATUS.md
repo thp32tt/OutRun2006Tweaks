@@ -2745,3 +2745,11 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - Machine PASS: exact bbox containment/source-size ceiling/positive margins, changed+alpha outside exact source bbox=0, header/mip1/persisted decode/RAW mirror_y PASS. Controller SOURCE/rejected/CLEAN/A181R + practical-scale + RAW visual PASS; hierarchy underfill/generic-caption regression materially repaired.
 - Backend: GitHub remained SSOT. The shared CPU worker was concurrency-blocked by a long-running job, so an isolated one-off GitHub runner produced the exact repository-backed DDS; the temporary workflow is removed after completion.
 - Next: fresh C1 + exact-SHA C3 -> PRE_INGAME/user JPG -> NEW actual-game retest. IGR-025 remains HOLD for screenshot(163) remaining runtime-vs-DDS mapping. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
+### C268 C1 — 2026-10-08T08:15:50+09:00
+- TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL)
+- q59 7CE1CFC5: REWORK_REQUIRED — decoded hard gate FAIL (outside=7, alpha outside=7, protected-source change=7); C3 BLOCKED.
+- q89 43B07A77: fresh C + exact-SHA C3_STRICT_PASS @ 741a05cb632e85a4fea783e51bb2f98678c0510f8b34fc7a73cc39c898c0749c.
+- q135 2B0863D6: fresh C + exact-SHA C3_STRICT_PASS @ 8657a59f966bb4be994a00ead41d6939a5145efba320deab83cd3ef8af92b0c1.
+- PRE_INGAME refresh requested for q89/q135; user JPG acceptance and actual-game validation remain pending. RUNTIME_VALIDATION=UNTESTED.
+

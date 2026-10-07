@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "run": "C268",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "execution_backend": "N100_MCP_MEMORY_STREAMED_FALLBACK_AFTER_CHATGPT_LOCAL_DNS_BLOCK_AND_GITHUB_CPU_WORKER_CANCELLED",
+  "queue_index": 59,
+  "asset": "7CE1CFC5",
+  "candidate_sha256": "cc8745c36a40422f747fd5ceb66f42f36d165292750765a506a8b1fcba7cb217",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "dimensions": [
+    2048,
+    512
+  ],
+  "header_128_exact": true,
+  "raw_orientation": "mirror_y",
+  "format": "DXT5",
+  "source_bboxes": [
+    [
+      8,
+      353,
+      1293,
+      500
+    ],
+    [
+      75,
+      222,
+      625,
+      304
+    ],
+    [
+      119,
+      53,
+      609,
+      137
+    ],
+    [
+      717,
+      225,
+      1408,
+      320
+    ]
+  ],
+  "producer_localized_bboxes": [
+    [
+      396,
+      361,
+      904,
+      492
+    ],
+    [
+      102,
+      227,
+      597,
+      299
+    ],
+    [
+      128,
+      66,
+      599,
+      123
+    ],
+    [
+      727,
+      235,
+      1398,
+      310
+    ]
+  ],
+  "decoded_changed_pixels_outside_source_bbox_union": 7,
+  "alpha_changed_pixels_outside_source_bbox_union": 7,
+  "protected_source_pixels_changed": 7,
+  "exact_source_change_gate": "FAIL",
+  "clean_plate_evidence_note": "A144 did not persist a replacement clean plate; C visual evidence uses the last exact persisted A25 clean plate as context only.",
+  "machine_result": "FAIL",
+  "hard_fail_reason": "ZERO_PIXEL_OVERFLOW_AND_PROTECTED_SOURCE_CHANGE: any 1px decoded escape is FAIL; current candidate has 7 outside/alpha/protected-source changes.",
+  "runtime_validation": "UNTESTED"
+}

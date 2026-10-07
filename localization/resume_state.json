@@ -4061,8 +4061,10 @@
     "runtime_validation": "UNTESTED"
   },
   "current_pending_artwork_localize_text": 0,
-  "current_producer_rework_remaining": 0,
-  "current_producer_rework_assets": [],
+  "current_producer_rework_remaining": 1,
+  "current_producer_rework_assets": [
+    "7CE1CFC5"
+  ],
   "latest_b_production": {
     "run": "20261008-B248-Q172-SCALE-RESTORE",
     "timestamp_kst": "2026-10-08T07:58:06+09:00",
@@ -4124,7 +4126,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261008-C265-C1-Q121-Q201-Q219/C265_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261008-C268-C1-Q059-Q089-Q135/C268_CONTROLLER_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4203,13 +4205,10 @@
     "63C91067",
     "455717B2",
     "FF2462BB",
-    "7CE1CFC5",
-    "43B07A77",
     "E1639D2E",
     "571E78F3",
     "E7F6E9B7",
     "2EA557B4",
-    "2B0863D6",
     "EBFC709F",
     "5B65E08C",
     "1A43E9D9",
@@ -6742,7 +6741,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T08:18:00+09:00",
+  "updated_at_kst": "2026-10-08T08:15:50+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -10645,5 +10644,42 @@
       "runtime_validation": "UNTESTED",
       "note": "Current queue status only. Declared C PASS is not evidence-backed export or runtime completion."
     }
+  },
+  "c268_c1_q059_q089_q135": {
+    "run": "20261008-C268-C1-Q059-Q089-Q135",
+    "role": "C",
+    "lane": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "pre_commit_refresh_head": "2f4e22c116c7ead2f62e246d9ff085468b8bd2ee",
+    "execution_backend": "N100_MCP_MEMORY_STREAMED_FALLBACK_AFTER_CHATGPT_LOCAL_DNS_BLOCK_AND_GITHUB_CPU_WORKER_CANCELLED",
+    "assets": {
+      "q59": {
+        "asset": "7CE1CFC5",
+        "candidate_sha256": "cc8745c36a40422f747fd5ceb66f42f36d165292750765a506a8b1fcba7cb217",
+        "machine_qa": "FAIL_ZERO_PIXEL_OVERFLOW_7_ALPHA_OUTSIDE_7_PROTECTED_7",
+        "fresh_c": "FAIL_MACHINE_HARD_GATE",
+        "c3": "BLOCKED",
+        "status": "REWORK_REQUIRED"
+      },
+      "q89": {
+        "asset": "43B07A77",
+        "candidate_sha256": "741a05cb632e85a4fea783e51bb2f98678c0510f8b34fc7a73cc39c898c0749c",
+        "machine_qa": "PASS_1_OF_1_EXACT_BBOX_ZERO_OUTSIDE_ALPHA_PROTECTED",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA"
+      },
+      "q135": {
+        "asset": "2B0863D6",
+        "candidate_sha256": "8657a59f966bb4be994a00ead41d6939a5145efba320deab83cd3ef8af92b0c1",
+        "machine_qa": "PASS_10_OF_10_EXACT_BBOX_ZERO_OUTSIDE_ALPHA_PROTECTED",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA"
+      }
+    },
+    "controller_report": "localization/graphics/role_C/20261008-C268-C1-Q059-Q089-Q135/C268_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "PENDING_REFRESH_TRIGGERED_BY_STATE_COMMIT_Q89_Q135",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

@@ -3446,3 +3446,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 ## 2026-10-08 — OUTRUN-KOR-QA-EVIDENCE-GATE-20261008
 
 Applied user-authorized production/QA improvements without changing six launches/hour or A/B/C1/C2 ownership. Current export now requires hash-bound source/candidate/clean/final/machine evidence, per-region lossless views, known-defect calibration, and separate eight-item C/C3 observations. Missing DDS is no longer implicit preserve-original. q154 held for native-DDS gray glyph-weight/counter-space review; no DDS repair or in-game success claimed. Legacy JPG set archived, current export awaits new evidence. Local gate tests 17/17 and string-only exporter integration PASS; this does not certify visual calibration. See localization/graphics/role_C/20261008-QA-EVIDENCE-GATE/APPLICATION_REPORT.json. Next: Read docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md; C1/C2 calibrate on known normal/defect controls, C2 native-DDS recheck q154 gray weight/counter-space, then migrate current bytes to per-region C/C3 evidence. A/B repair current owned regressions with source-derived family profiles. Keep schedule and RUNTIME_VALIDATION=UNTESTED.
+
+### C268 C1 — q59/q89/q135 fresh C + C3 (2026-10-08T08:15:50+09:00)
+- `TEMP_BACKLOG_RELIEF=C1`, `SHARD=ODD(+UNINDEXED_SPECIAL)`; per-slot HEAD/queue refresh used; exact selected bytes will be reverified against the pre-commit HEAD.
+- q59 `7CE1CFC5` `cc8745c3...`: fresh independent DXT5 decode **FAIL**. Seven changed pixels and seven alpha changes escape the four exact source glyph/effect bboxes; the same seven hit readable protected-source pixels. `REWORK_REQUIRED`; C3 blocked.
+- q89 `43B07A77` `741a05cb...`: 1/1 exact bbox 1250x226 within 1493x238, positive margins, outside/alpha/protected=0; practical + RAW/FLIP-Y visual review PASS -> fresh C + exact-SHA `C3_STRICT_PASS`.
+- q135 `2B0863D6` `8657a59f...`: 10/10 exact bbox/source-size/positive-margin, outside/alpha/protected=0; practical + RAW/FLIP-Y review PASS -> fresh C + exact-SHA `C3_STRICT_PASS`.
+- ChatGPT local binary materialization was DNS-blocked and GitHub C worker run `37695338433` was cancelled without output; contract-authorized N100 MCP exact-byte in-memory fallback was used. Candidate DDS bytes were not changed.
+- q89/q135 PRE_INGAME refresh triggered; q59 excluded pending A/B rework. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+

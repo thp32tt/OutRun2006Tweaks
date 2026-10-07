@@ -1,0 +1,358 @@
+{
+  "schema_version": 1,
+  "run": "C268",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "execution_backend": "N100_MCP_MEMORY_STREAMED_FALLBACK_AFTER_CHATGPT_LOCAL_DNS_BLOCK_AND_GITHUB_CPU_WORKER_CANCELLED",
+  "queue_index": 135,
+  "asset": "2B0863D6",
+  "candidate_sha256": "8657a59f966bb4be994a00ead41d6939a5145efba320deab83cd3ef8af92b0c1",
+  "source_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+  "dimensions": [
+    2048,
+    256
+  ],
+  "header_128_exact": true,
+  "raw_orientation": "mirror_y",
+  "format": "RGBA32",
+  "rows": [
+    {
+      "key": "professional",
+      "source": "PROFESSIONAL",
+      "korean": "프로",
+      "original_bbox": [
+        189,
+        185,
+        698,
+        245
+      ],
+      "localized_bbox": [
+        370,
+        187,
+        516,
+        243
+      ],
+      "source_size": [
+        509,
+        60
+      ],
+      "localized_size": [
+        146,
+        56
+      ],
+      "delta_left": 181,
+      "delta_right": 182,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "bbox_exact": true
+    },
+    {
+      "key": "novice",
+      "source": "NOVICE",
+      "korean": "초급",
+      "original_bbox": [
+        1154,
+        187,
+        1399,
+        246
+      ],
+      "localized_bbox": [
+        1216,
+        189,
+        1337,
+        244
+      ],
+      "source_size": [
+        245,
+        59
+      ],
+      "localized_size": [
+        121,
+        55
+      ],
+      "delta_left": 62,
+      "delta_right": 62,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "bbox_exact": true
+    },
+    {
+      "key": "outrun",
+      "source": "OUTRUN",
+      "korean": "아웃런",
+      "original_bbox": [
+        423,
+        107,
+        700,
+        166
+      ],
+      "localized_bbox": [
+        477,
+        109,
+        646,
+        164
+      ],
+      "source_size": [
+        277,
+        59
+      ],
+      "localized_size": [
+        169,
+        55
+      ],
+      "delta_left": 54,
+      "delta_right": 54,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "bbox_exact": true
+    },
+    {
+      "key": "intermediate_b",
+      "source": "INTERMEDIATE B",
+      "korean": "중급 B",
+      "original_bbox": [
+        830,
+        108,
+        1396,
+        164
+      ],
+      "localized_bbox": [
+        1026,
+        110,
+        1200,
+        162
+      ],
+      "source_size": [
+        566,
+        56
+      ],
+      "localized_size": [
+        174,
+        52
+      ],
+      "delta_left": 196,
+      "delta_right": 196,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "bbox_exact": true
+    },
+    {
+      "key": "intermediate_a",
+      "source": "INTERMEDIATE A",
+      "korean": "중급 A",
+      "original_bbox": [
+        128,
+        28,
+        696,
+        84
+      ],
+      "localized_bbox": [
+        325,
+        30,
+        499,
+        82
+      ],
+      "source_size": [
+        568,
+        56
+      ],
+      "localized_size": [
+        174,
+        52
+      ],
+      "delta_left": 197,
+      "delta_right": 197,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "bbox_exact": true
+    },
+    {
+      "key": "change_class",
+      "source": "CHANGE CLASS",
+      "korean": "클래스 변경",
+      "original_bbox": [
+        840,
+        38,
+        1243,
+        86
+      ],
+      "localized_bbox": [
+        923,
+        40,
+        1160,
+        84
+      ],
+      "source_size": [
+        403,
+        48
+      ],
+      "localized_size": [
+        237,
+        44
+      ],
+      "delta_left": 83,
+      "delta_right": 83,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "bbox_exact": true
+    },
+    {
+      "key": "class",
+      "source": "CLASS",
+      "korean": "클래스",
+      "original_bbox": [
+        1292,
+        50,
+        1429,
+        87
+      ],
+      "localized_bbox": [
+        1313,
+        52,
+        1407,
+        85
+      ],
+      "source_size": [
+        137,
+        37
+      ],
+      "localized_size": [
+        94,
+        33
+      ],
+      "delta_left": 21,
+      "delta_right": 22,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "bbox_exact": true
+    },
+    {
+      "key": "acceleration",
+      "source": "ACCELERATION",
+      "korean": "가속",
+      "original_bbox": [
+        1475,
+        48,
+        1736,
+        81
+      ],
+      "localized_bbox": [
+        1576,
+        50,
+        1635,
+        79
+      ],
+      "source_size": [
+        261,
+        33
+      ],
+      "localized_size": [
+        59,
+        29
+      ],
+      "delta_left": 101,
+      "delta_right": 101,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "bbox_exact": true
+    },
+    {
+      "key": "max_speed",
+      "source": "MAX SPEED",
+      "korean": "최고 속도",
+      "original_bbox": [
+        1746,
+        48,
+        1962,
+        81
+      ],
+      "localized_bbox": [
+        1793,
+        50,
+        1914,
+        79
+      ],
+      "source_size": [
+        216,
+        33
+      ],
+      "localized_size": [
+        121,
+        29
+      ],
+      "delta_left": 47,
+      "delta_right": 48,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "bbox_exact": true
+    },
+    {
+      "key": "handling",
+      "source": "HANDLING",
+      "korean": "핸들링",
+      "original_bbox": [
+        1412,
+        128,
+        1597,
+        161
+      ],
+      "localized_bbox": [
+        1460,
+        130,
+        1549,
+        159
+      ],
+      "source_size": [
+        185,
+        33
+      ],
+      "localized_size": [
+        89,
+        29
+      ],
+      "delta_left": 48,
+      "delta_right": 48,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "bbox_exact": true
+    }
+  ],
+  "changed_pixels_outside_source_bbox_union": 0,
+  "alpha_changed_pixels_outside_source_bbox_union": 0,
+  "source_pixels_changed_outside_source_bbox_union": 0,
+  "protected_source_pixels_changed": 0,
+  "machine_result": "PASS",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "run": "C268",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "execution_backend": "N100_MCP_MEMORY_STREAMED_FALLBACK_AFTER_CHATGPT_LOCAL_DNS_BLOCK_AND_GITHUB_CPU_WORKER_CANCELLED",
+  "queue_index": 89,
+  "asset": "43B07A77",
+  "candidate_sha256": "741a05cb632e85a4fea783e51bb2f98678c0510f8b34fc7a73cc39c898c0749c",
+  "source_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+  "dimensions": [
+    2048,
+    256
+  ],
+  "header_128_exact": true,
+  "raw_orientation": "mirror_y",
+  "format": "RGBA32",
+  "rows": [
+    {
+      "key": "game_over",
+      "source": "Game Over",
+      "korean": "게임 오버",
+      "original_bbox": [
+        1,
+        13,
+        1494,
+        251
+      ],
+      "localized_bbox": [
+        122,
+        19,
+        1372,
+        245
+      ],
+      "source_size": [
+        1493,
+        238
+      ],
+      "localized_size": [
+        1250,
+        226
+      ],
+      "delta_left": 121,
+      "delta_right": 122,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "bbox_exact": true
+    }
+  ],
+  "changed_pixels_outside_source_bbox_union": 0,
+  "alpha_changed_pixels_outside_source_bbox_union": 0,
+  "source_pixels_changed_outside_source_bbox_union": 0,
+  "protected_source_pixels_changed": 0,
+  "machine_result": "PASS",
+  "runtime_validation": "UNTESTED"
+}
