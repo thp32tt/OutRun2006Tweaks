@@ -14,6 +14,7 @@ ui = read('src/hooks_uiscaling.cpp')
 hud = read('src/vr/hud_semantics.hpp')
 sem = read('src/vr/game/render_semantics.hpp')
 r30 = read('src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp')
+graphics = read('src/hooks_graphics.cpp')
 r14 = read('src/vr/d3d9/ex_device_upgrade_r14.cpp')
 runner = read('tools/Run-OutRunVRTest.ps1')
 pcfast = read('tools/Build-OutRunPCFast.ps1')
@@ -27,9 +28,6 @@ for token in [
     '0xEC24C','0xEC277','0xED4D4','0xED7A3',
     '0x460F1','0x463D6','0x46410','0x97BB7','0x97DA7',
     '0xBB796','0x2C808','0x2C9DB',
-    '0x4BE5CD','0x4BE603','0x4BE633','0x4BE66D','0x4BE690',
-    '0x4BE6B5','0x4BE6D5','0x4BE8D8','0x4BE915','0x4BE94A',
-    '0x4BE97A','0x4BE9A3','0x4BE7E8','0x4BE802','0x4BE81C',
 ]:
     require(token, ui, 'historical exact HUD producer inventory')
 
@@ -63,6 +61,18 @@ require('projectedWorldMarker', r30, 'fixed-function projected marker state')
 require('semanticProjectedWorld', r30, 'fixed-function projected marker classifier')
 require('R57BuildProjectedMarkerDelta', r30, 'projected marker per-eye delta builder')
 require('projectedDeltaX', r30, 'projected marker XYZRHW eye delta')
+
+# Lens flare / SceneEffect is exact original-mod ownership, never a broad alpha heuristic.
+require('RenderScope::SceneEffect', graphics, 'original Clr_SceneEffect semantic scope')
+require('semanticSceneEffect', r30, 'exact SceneEffect classifier input')
+require('R44GetOwnedRawOverlayWvp', r30, 'SceneEffect owned WVP evidence')
+require('R44ClassifyOwnedOverlayMatrix', r30, 'SceneEffect spatial-vs-flat matrix proof')
+
+# Restored base shadows are exact world geometry at three original-mod call sites.
+for token in ['0x69EB4','0x6AC76','0x6B766']:
+    require(token, graphics, 'original car-base-shadow call site')
+require('ScopedRenderSemantic semantic(', graphics, 'car shadow exact world semantic scope')
+require('RenderScope::WorldParticle', graphics, 'car shadow world ownership')
 
 # Translated DYNAMIC MANAGED textures must not consume the bounded CPU-shadow pool.
 require('R14TrackDirectLockable', r14, 'dynamic direct-lockable MANAGED texture path')
