@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # C235 / TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN
+# retry dispatch after GitHub concurrency cancelled run 37571345755 before jobs started
 # Fresh independent C + mandatory C3 strict evidence for P0 PJR-001 q12 D6DC1380 / A160.
 import io, os, json, hashlib, pathlib, subprocess, urllib.request, struct
 import numpy as np
