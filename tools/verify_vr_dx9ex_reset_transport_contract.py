@@ -557,14 +557,19 @@ require(
     "bool R13DirectCopyPathRejected = false;",
     "HRESULT R13DirectCopyRejectHr = D3D_OK;",
 )
+r13_reject_gate = resolve_direct_r13.find("if (R13DirectCopyPathRejected)")
+if r13_reject_gate < 0:
+    fail("R13 fallback DirectGPU rejection gate missing")
 require_order(
-    resolve_direct_r13,
+    resolve_direct_r13[r13_reject_gate:],
     "R13 fallback DirectGPU rejection gate",
-    "EnsureDirectTransportResources(device)",
     "if (R13DirectCopyPathRejected)",
     "return false;",
     "const std::uint32_t preferred =",
 )
+if resolve_direct_r13.find(
+        "EnsureDirectTransportResources(device)") > r13_reject_gate:
+    fail("R13 fallback DirectGPU rejection gate must follow resource validation")
 r13_pending_start = resolve_direct_r13.find("if (slot.producerPending)")
 r13_published_start = resolve_direct_r13.find(
     "if (slot.published && slot.frameId)", r13_pending_start
