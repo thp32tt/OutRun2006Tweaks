@@ -778,18 +778,18 @@ dispatch33 = function_body(
 require(
     dispatch33,
     "R33 dispatch",
-    "R31DiscardUnreliableDrawCaches();",
+    "R32ReviewDiscardUnreliableDrawCaches();",
     "return R32ReviewRunLowerFailClosed(device,",
     "std::forward<LowerR29Draw>(lowerR29Draw)",
 )
 for marker in (
-    "R30CallLowerDrawPrimitive(",
-    "R30CallLowerDrawIndexedPrimitive(",
-    "R30CallLowerDrawPrimitiveUP(",
-    "R30CallLowerDrawIndexedPrimitiveUP(",
+    "R32ReviewCallLowerDrawPrimitive(",
+    "R32ReviewCallLowerDrawIndexedPrimitive(",
+    "R32ReviewCallLowerDrawPrimitiveUP(",
+    "R32ReviewCallLowerDrawIndexedPrimitiveUP(",
 ):
     if marker not in r33:
-        fail(f"R33 final fallback lost R30 owner call: {marker}")
+        fail(f"R33 final fallback lost R32 split facade lower-owner call: {marker}")
 
 for function_marker, owner_marker in (
     ("R30CallLowerDrawPrimitive(", "R30DrawPrimitiveR29Hook.stdcall<HRESULT>"),
