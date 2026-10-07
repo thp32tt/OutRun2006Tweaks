@@ -4225,7 +4225,8 @@
     "5B65E08C",
     "1A43E9D9",
     "754F0599",
-    "9CE4E175"
+    "9CE4E175",
+    "59A79158"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6717,7 +6718,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 08:40 KST",
+  "updated_at_kst": "2026-10-07 09:38 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7583,6 +7584,55 @@
     "trigger": "C227R_REWORK_REQUIRED_SOURCE_TYPOGRAPHY_FAMILY_MISMATCH",
     "status": "A153_C227R_TYPOGRAPHY_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
     "controller_visual_qa": "PASS_SOURCE_A151_REJECTED_A153_READABLE_ROW_RAW",
+    "runtime_validation": "UNTESTED"
+  },
+  "a154_59a79158_native_hd_rework": {
+    "run": "A154",
+    "timestamp_kst": "2026-10-07 09:38 KST",
+    "role": "A",
+    "queue_index": 163,
+    "asset_key": "59A79158",
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+    "trigger": "PRE_INGAME_018_LOWRES_NEAREST_UPSCALE_AND_SOURCE_WEIGHT_FALSE_NEGATIVE",
+    "prior_c_status": "C203_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583",
+    "candidate_sha256": "201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6",
+    "github_worker_run": 37552800527,
+    "worker_output_commit": "6e82e918e72a3f5892aae181fa16321558d8d30c",
+    "rework": "A60 fs9 x4 NEAREST -> direct native Noto CJK Bold fs42 + 1px weight + 0.92 condensed",
+    "machine_qa": {
+      "bbox_size_positive_margin": "24/24 PASS",
+      "clean_validator": "PASS",
+      "final_validator": "PASS",
+      "width_improved": "24/24",
+      "outside": 0,
+      "alpha_outside": 0,
+      "protected": 0,
+      "residue": 0,
+      "render_outside": 0,
+      "overlap": 0,
+      "touch_pairs": 0,
+      "format": "RGBA32/BGRA",
+      "raw_orientation": "mirror_y"
+    },
+    "controller_visual_qa": "PASS_SOURCE_A60_CLEAN_A154_ROWS_AND_RAW",
+    "controller_qa": "localization/graphics/role_A/20261007-A-MANUALQA154-59A79158/A154_CONTROLLER_SELF_QA.json",
+    "status": "A154_NATIVE_HD_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "latest_a_manual_visual_rework": {
+    "timestamp_kst": "2026-10-07 09:38 KST",
+    "run": "A154",
+    "queue_index": 163,
+    "asset": "59A79158",
+    "trigger": "PRE_INGAME_018_LOWRES_NEAREST_UPSCALE_FALSE_NEGATIVE",
+    "before_sha256": "1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583",
+    "candidate_sha256": "201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6",
+    "controller_visual_qa": "PASS_SOURCE_A60_CLEAN_A154_ROWS_AND_RAW",
+    "status": "A154_NATIVE_HD_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
     "runtime_validation": "UNTESTED"
   }
 }
