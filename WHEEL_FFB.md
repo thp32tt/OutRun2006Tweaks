@@ -3,6 +3,10 @@
 [English](#english) | [한국어](#한국어)
 
 <a id="english"></a>
+
+### Countersteer Strength
+Modern Physics SAT exposes `Countersteer Strength` in F11 > Force Feedback and as `[WheelFFB] CountersteerStrength` in the INI. The R20 default is 0.72; 0 disables only the developed-drift body-slip countersteer target, 1.00 matches the earlier R14 reference, and normal-corner SAT is unchanged. Grip recovery uses a slower handoff release and a latched drift direction to reduce left-right rack rebound as traction returns.
+
 ## English
 
 This document describes the release architecture of the `wheel-ffb` branch used for **OutRun2006Tweaks Wheel FFB v0.1**.
