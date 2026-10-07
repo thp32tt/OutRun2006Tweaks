@@ -482,7 +482,7 @@ require_order(
     "The host completed this exact published frame. Retire the",
     "selected = index;",
     "if (selected >= OutRunVR::RenderFrameRingSize)",
-    "++DirectTransportRingBackpressure;",
+    "R30SupportNoteDirectTransportRingBackpressure();",
     "auto& slot = DirectTransportSlots[selected];",
     "slot.fence->Issue(D3DISSUE_END)",
     "DirectTransportFrameReadyAfterPresent() is",
@@ -502,8 +502,10 @@ require_order(
     "selected = index;",
 )
 
-if resolve_direct_r32.count("++DirectTransportRingBackpressure;") != 1:
-    fail("R32 DirectGPU free-slot scan must count whole-ring backpressure once")
+if resolve_direct_r32.count("R30SupportNoteDirectTransportRingBackpressure()") != 1:
+    fail("R32 DirectGPU free-slot scan must count whole-ring backpressure once through the R30 owner facade")
+if "++DirectTransportRingBackpressure;" in resolve_direct_r32:
+    fail("R32 DirectGPU free-slot scan regained raw lower ring-backpressure state")
 
 ack_snapshot_r13 = body(r13, "R13GpuCompletionReadResult R13ReadGpuCompletionSnapshot(")
 require_order(

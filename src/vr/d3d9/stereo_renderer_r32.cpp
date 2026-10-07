@@ -538,7 +538,7 @@ namespace OutRunVRStereo
             {
                 if (ackBlocked)
                     R30SupportNoteSafeAckBackpressure();
-                ++DirectTransportRingBackpressure;
+                R30SupportNoteDirectTransportRingBackpressure();
                 return false;
             }
 
@@ -661,7 +661,8 @@ namespace OutRunVRStereo
                 R32Counters.stateFail = R32StateSnapshotFailures;
                 R32Counters.zeroFallback = R32FailClosedZeroDisparityDraws;
                 R32Counters.directCache = R32DirectProbeCacheHits;
-                R32Counters.directBackpressure = DirectTransportRingBackpressure;
+                R32Counters.directBackpressure =
+                    R30SupportDirectTransportRingBackpressureCount();
                 R32Counters.pendingError = R32PendingFenceErrors;
                 R32Counters.resetRearm = R32ResetEpochRearms;
                 R32Counters.resetFail = R32ResetFailures;
@@ -709,7 +710,8 @@ namespace OutRunVRStereo
                 R32StateSnapshotFailures - R32Counters.stateFail,
                 R32FailClosedZeroDisparityDraws - R32Counters.zeroFallback,
                 R32DirectProbeCacheHits - R32Counters.directCache,
-                DirectTransportRingBackpressure - R32Counters.directBackpressure,
+                R30SupportDirectTransportRingBackpressureCount() -
+                    R32Counters.directBackpressure,
                 R32PendingFenceErrors - R32Counters.pendingError,
                 R32ResetEpochRearms - R32Counters.resetRearm,
                 R32ResetFailures - R32Counters.resetFail);
@@ -724,7 +726,8 @@ namespace OutRunVRStereo
             R32Counters.stateFail = R32StateSnapshotFailures;
             R32Counters.zeroFallback = R32FailClosedZeroDisparityDraws;
             R32Counters.directCache = R32DirectProbeCacheHits;
-            R32Counters.directBackpressure = DirectTransportRingBackpressure;
+            R32Counters.directBackpressure =
+                R30SupportDirectTransportRingBackpressureCount();
             R32Counters.pendingError = R32PendingFenceErrors;
             R32Counters.resetRearm = R32ResetEpochRearms;
             R32Counters.resetFail = R32ResetFailures;

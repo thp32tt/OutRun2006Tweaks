@@ -3321,6 +3321,16 @@ namespace OutRunVRStereo
         R13NoteSafeAckBackpressure();
     }
 
+    void R30SupportNoteDirectTransportRingBackpressure() noexcept
+    {
+        ++DirectTransportRingBackpressure;
+    }
+
+    std::uint64_t R30SupportDirectTransportRingBackpressureCount() noexcept
+    {
+        return static_cast<std::uint64_t>(DirectTransportRingBackpressure);
+    }
+
     bool R30SupportTryGetGpuCompletionSnapshot(
         R30SupportGpuCompletionSnapshot& out) noexcept
     {

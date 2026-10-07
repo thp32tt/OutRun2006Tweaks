@@ -45,6 +45,8 @@ required = (
     "R30SupportDirectTransportIdentity",
     "R30SupportOverlayReadyForTransport",
     "R30SupportNoteSafeAckBackpressure",
+    "R30SupportNoteDirectTransportRingBackpressure",
+    "R30SupportDirectTransportRingBackpressureCount",
     "R30SupportGpuCompletionSnapshot",
     "R30SupportTryGetGpuCompletionSnapshot",
     "R30SupportDirectTransportResourcesReady",
@@ -89,6 +91,7 @@ for regex, label in (
     (r"(?<!R30Support)\bEnsureDirectTransportResources\(", "EnsureDirectTransportResources"),
     (r"\bR13OverlayReadyForTransport\(", "R13OverlayReadyForTransport"),
     (r"\bR13NoteSafeAckBackpressure\(", "R13NoteSafeAckBackpressure"),
+    (r"(?<!R30Support)\bDirectTransportRingBackpressure\b", "DirectTransportRingBackpressure"),
     (r"\bR13GpuCompletionSnapshot\b", "R13GpuCompletionSnapshot"),
     (r"\bR13TryGetGpuCompletionSnapshot\(", "R13TryGetGpuCompletionSnapshot"),
     (r"\bR13ReleaseAckState\(", "R13ReleaseAckState"),
@@ -128,6 +131,12 @@ delegations = {
     ),
     "R30SupportNoteSafeAckBackpressure()": (
         "R13NoteSafeAckBackpressure();",
+    ),
+    "R30SupportNoteDirectTransportRingBackpressure()": (
+        "++DirectTransportRingBackpressure;",
+    ),
+    "R30SupportDirectTransportRingBackpressureCount()": (
+        "return static_cast<std::uint64_t>(DirectTransportRingBackpressure);",
     ),
     "R30SupportTryGetGpuCompletionSnapshot(": (
         "R13GpuCompletionSnapshot lower{};",
@@ -214,6 +223,11 @@ if "R30SupportOverlayReadyForTransport()" not in resolve_direct:
     errors.append("R32 DirectGPU resolve bypasses R30 overlay-readiness facade")
 if "R30SupportNoteSafeAckBackpressure()" not in resolve_direct:
     errors.append("R32 DirectGPU resolve bypasses R30 ACK-backpressure telemetry facade")
+if "R30SupportNoteDirectTransportRingBackpressure()" not in resolve_direct:
+    errors.append("R32 DirectGPU resolve bypasses R30 ring-backpressure owner facade")
+if "DirectTransportRingBackpressure" in resolve_direct.replace(
+        "R30SupportNoteDirectTransportRingBackpressure()", ""):
+    errors.append("R32 DirectGPU resolve retained raw lower ring-backpressure state")
 if "R30SupportGpuCompletionSnapshot ackSnapshot{};" not in resolve_direct:
     errors.append("R32 DirectGPU resolve missing R30 ACK snapshot value type")
 if "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)" not in resolve_direct:
