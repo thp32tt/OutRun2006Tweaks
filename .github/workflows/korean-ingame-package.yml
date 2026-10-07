@@ -1,0 +1,153 @@
+name: Korean Localization In-Game Package
+
+on:
+  push:
+    branches:
+      - korean-localization-recovery-20260928
+    paths:
+      - '.github/workflows/korean-ingame-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout package metadata only
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            localization/graphics/asset_queue.csv
+            localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json
+
+      - name: Download validated runtime base
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_ARTIFACT_ID: '11481770749'
+        run: |
+          set -euo pipefail
+          curl -fL \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASE_ARTIFACT_ID}/zip" \
+            -o base.zip
+          mkdir -p package
+          unzip -q base.zip -d package
+          rm -rf package/textures
+          rm -f package/KOREAN_TEST_GRAPHICS_MANIFEST.csv
+          rm -f package/KOREAN_TEST_BUILD_README.txt
+          rm -f package/dinput8.pdb
+
+      - name: Overlay current PRE_INGAME-approved DDS
+        env:
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          python3 - <<'PY'
+          import csv, hashlib, json, os, pathlib, urllib.request
+
+          root = pathlib.Path('.')
+          package = root / 'package'
+          review = json.loads((root / 'localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json').read_text(encoding='utf-8'))
+          with (root / 'localization/graphics/asset_queue.csv').open(encoding='utf-8-sig', newline='') as f:
+              rows = list(csv.DictReader(f))
+          by_index = {str(r['index']): r for r in rows}
+
+          blocked = {str(x['queue_index']) for x in review.get('mandatory_c3_blocked', [])}
+          selected = []
+          for item in review.get('items', []):
+              if item.get('source_kind') != 'localized_candidate':
+                  continue
+              idx = str(item['queue_index'])
+              if idx in blocked:
+                  continue
+              row = by_index.get(idx)
+              if row is None:
+                  raise SystemExit(f'q{idx}: missing from asset_queue.csv')
+              status = row.get('artwork_status', '')
+              lowered = status.lower()
+              if any(x in lowered for x in ('rework_required', 'hold_strict', 'preserve_original')):
+                  raise SystemExit(f'q{idx}: unsafe queue status {status}')
+
+              rel = pathlib.PurePosixPath(row['path'])
+              url = f"https://raw.githubusercontent.com/{os.environ['REPO']}/{os.environ['SHA']}/localization/graphics/hd_candidates/{rel.as_posix()}"
+              dest = package / pathlib.Path(*rel.parts)
+              dest.parent.mkdir(parents=True, exist_ok=True)
+              print(f'download q{idx}: {rel}')
+              urllib.request.urlretrieve(url, dest)
+
+              actual = hashlib.sha256(dest.read_bytes()).hexdigest()
+              expected = str(item['candidate_sha256']).lower()
+              if actual != expected:
+                  raise SystemExit(f'q{idx}: SHA mismatch expected={expected} actual={actual}')
+              selected.append({
+                  'index': idx,
+                  'path': rel.as_posix(),
+                  'artwork_status': status,
+                  'candidate_sha256': actual,
+              })
+
+          if not selected:
+              raise SystemExit('no PRE_INGAME-approved DDS selected')
+
+          manifest_path = package / 'KOREAN_TEST_GRAPHICS_MANIFEST.csv'
+          with manifest_path.open('w', encoding='utf-8-sig', newline='') as f:
+              w = csv.DictWriter(f, fieldnames=['index','path','artwork_status','candidate_sha256'])
+              w.writeheader()
+              w.writerows(selected)
+
+          readme = package / 'KOREAN_TEST_BUILD_README.txt'
+          readme.write_text(
+              "OutRun 2006 Korean localization in-game test package\n"
+              f"Package metadata commit: {os.environ['SHA']}\n"
+              "Runtime base: Korean Test Build artifact 11481770749 / source 198132609d4f3b788b64512cb5c2886b31581419\n"
+              f"Graphics included: {len(selected)}\n"
+              "Selection: current PRE_INGAME manifest localized candidates excluding mandatory_c3_blocked\n"
+              "Integrity: every included DDS SHA-256 matched PRE_INGAME manifest\n"
+              "Status: TEST BUILD / IN-GAME VALIDATION REQUIRED\n\n"
+              "Install: extract into the OutRun 2006 Coast 2 Coast game folder where OR2006C2C.EXE is located.\n"
+              "Keep OutRun2006Tweaks.log and screenshots for any visual/runtime failures.\n",
+              encoding='utf-8'
+          )
+
+          critical = {'12','28','30','32','34','36','38','44','49','51','95','97','107','137'}
+          got = {x['index'] for x in selected}
+          missing = sorted(critical - got, key=int)
+          if missing:
+              raise SystemExit(f'missing critical current test assets: {missing}')
+          print(f'selected={len(selected)} critical_ok={len(critical)}')
+          PY
+
+      - name: Verify package
+        run: |
+          set -euo pipefail
+          test -f package/dinput8.dll
+          test -f package/OR2006C2C.exe
+          test -f package/localization/text/runtime_ko.tsv
+          python3 - <<'PY'
+          import csv, pathlib
+          p = pathlib.Path('package/KOREAN_TEST_GRAPHICS_MANIFEST.csv')
+          rows = list(csv.DictReader(p.open(encoding='utf-8-sig')))
+          dds = list((pathlib.Path('package')/'textures'/'load').rglob('*.dds'))
+          assert len(rows) == len(dds), (len(rows), len(dds))
+          assert len(rows) >= 14, len(rows)
+          print('manifest rows:', len(rows))
+          print('DDS files:', len(dds))
+          PY
+          sha256sum package/dinput8.dll package/OR2006C2C.exe
+          du -sh package
+
+      - name: Upload in-game test package
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: OutRun2006-Korean-InGame-${{ github.sha }}
+          path: package/
+          compression-level: 9
+          retention-days: 30
