@@ -211,6 +211,41 @@ require('std::shared_ptr<std::vector<uint8_t>> transientTextureData',
 require('FileData.getFileData(', textures, 'replacement file data lookup')
 require('&transientOwner', textures, 'transient owner handoff into file lookup')
 
+# Pin the lifetime fix itself, not just the presence of transient-load symbols.
+# Each wrapper must own the shared buffer in the same function scope that calls
+# D3DX, so an oversized replacement cannot dangle between HandleTexture and the
+# actual texture creation call.
+for marker, d3dx_call in (
+    (
+        'static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Custom_dest(',
+        'return D3DXCreateTextureFromFileInMemoryEx_Custom(',
+    ),
+    (
+        'static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Orig_dest(',
+        'return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(',
+    ),
+    (
+        'static HRESULT __stdcall D3DXCreateTextureFromFileInMemoryEx_Custom_dest(',
+        'return D3DXCreateTextureFromFileInMemoryEx_Custom(',
+    ),
+    (
+        'static HRESULT __stdcall D3DXCreateTextureFromFileInMemoryEx_Orig_dest(',
+        'return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(',
+    ),
+    (
+        'static HRESULT __stdcall D3DXCreateCubeTextureFromFileInMemoryEx_dest(',
+        'return D3DXCreateCubeTextureFromFileInMemoryEx.stdcall<HRESULT>(',
+    ),
+):
+    body = function_body(textures, marker)
+    require_order(
+        body,
+        'transient DDS owner must remain function-scoped through D3DX create',
+        'std::shared_ptr<std::vector<uint8_t>> transientTextureData;',
+        'HandleTexture(&pSrcData, &pSrcDataSize',
+        d3dx_call,
+    )
+
 require('CorroboratesProjectedWorldMarker', sem, 'exact projected marker semantic retained')
 
 print('P0 visual composition static contract: PASS')
