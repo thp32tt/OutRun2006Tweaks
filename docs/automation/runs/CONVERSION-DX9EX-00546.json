@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00546",
+  "production_id": "CONVERSION-DX9EX-00546",
+  "event_id": "CONVERSION-DX9EX-00546-E002",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "eac9ceb2e8b2dd3062f9a962431a7c6a7c07a34f",
+  "material_result_sha": "6161c4a236922d9260472d1be93fba72a4c11605",
+  "validation_bearing_result_sha": "6161c4a236922d9260472d1be93fba72a4c11605",
+  "result_sha": "6161c4a236922d9260472d1be93fba72a4c11605",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00546]",
+  "status": "VALIDATION_IN_PROGRESS",
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+  "selected_work_item": "DX9EX-P0-VISUAL-EXACT-DRAW-SEMANTIC-SCOPE-001",
+  "selection_authority": "AGENTS.md 2026-10-07 P0 visual-composition override supersedes R84 structural-convergence next action",
+  "summary": "Hardens P0 deterministic visual gate to pin real D3DEndScene F11 scoped draw with unguarded menu alternative, the canonical 0xCABE lens hook+projection-scope draw, and original shadow draw inside world-space semantic scope. No runtime code or draw policy changed.",
+  "changed_paths": [
+    "tools/verify_vr_visual_composition_p0.py"
+  ],
+  "deterministic_preflight": {
+    "positive_originals": "PASS: F11 gameplay/menu, lens, shadow, exact lens hook match source",
+    "negative_mutations": "PASS: F11 scope removal, gameplay draw movement, lens scope removal and shadow scope removal are rejected",
+    "github_ci_static": "SUCCESS: HUD Inspector static-exe-analysis job 113064416703 step Verify P0 visual composition contract",
+    "github_ci_policy": "SUCCESS: DX9Ex policy job 113064417599"
+  },
+  "validation_runs": {
+    "dx9ex_active": {
+      "id": 37701084321,
+      "latest_observed": "in_progress",
+      "policy_job": 113064417599,
+      "game_job": 113064580137,
+      "host_job": 113064580237,
+      "full_chain_job": 113064580190
+    },
+    "domain_isolation": {
+      "id": 37701084005,
+      "latest_observed": "in_progress",
+      "job": 113064416649
+    },
+    "hud_inspector": {
+      "id": 37701084171,
+      "latest_observed": "in_progress",
+      "static_job": 113064416703,
+      "build_job": 113064416984
+    }
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "package_requested": false,
+  "ci_gate_complete": false,
+  "protected_boundaries": [
+    "P0 user 00519 visual FAIL remains unresolved until actual Quest3/VDXR evidence",
+    "No R84 structural port, downstream DX11/DXVK change, or new HMD package",
+    "No runtime changes: only canonical P0 scope lifetime verifier strengthening"
+  ],
+  "next_action": "Check exact material SHA 6161c4a2 GitHub Actions 37701084321, 37701084005, 37701084171 until terminal; if all green, update this C6 record to COMPLETE_BUILD_VERIFIED with exact job/artifact evidence. Keep runtime UNTESTED and proceed P0 visual source-evidence closure rather than R84."
+}
