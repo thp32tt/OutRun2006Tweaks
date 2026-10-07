@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00424",
+  "production_id": "CONVERSION-DX11-00424",
+  "event_id": "CONVERSION-DX11-00424-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R286_PRODUCTION_OBSERVATION_BRIDGE",
+  "base_sha": "ad74b0a224d89699fc6ac76372eed0b4ef0b9f05",
+  "result_sha": "6e282e8369cbe13f36f27f7886eec319d233e508",
+  "material_result_sha": "6e282e8369cbe13f36f27f7886eec319d233e508",
+  "validation_bearing_sha": "6e282e8369cbe13f36f27f7886eec319d233e508",
+  "validation_bearing_result_sha": "6e282e8369cbe13f36f27f7886eec319d233e508",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS_RECONCILED_E003_ROLLOVER",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "validation_run_id": 37587672430,
+  "validation_run_attempt": 1,
+  "validation_job_id": 112681487989,
+  "readiness_smoke_job_id": 112683187060,
+  "artifact_id": 11466912902,
+  "artifact_digest": "sha256:bbc316ab97868e1529dff27ce3f97963c7ce7648754f27ecaae67c33d68426b7",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00424.json",
+  "implementation_commits": [
+    "6e282e8369cbe13f36f27f7886eec319d233e508"
+  ],
+  "native_draw_path_activation_changed": false,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE",
+  "state_persisted": true,
+  "summary": "R286 connects the exact R279/R280/R283/R274/R276 evidence chain to the persistent R285 programmable-shader owner through a bounded NativeBackend production observation bridge. It validates the semantic handoff receipt and remains diagnostic-only: no shader/context binding, shaderTranslationExact promotion, NativeDrawPath activation, Draw or DrawIndexed authorization is introduced. E003 is a chat rollover reconciliation only; ATTEMPT remains 1/3 and no material work or validation is repeated.",
+  "evidence": [
+    "Material commit 6e282e8369cbe13f36f27f7886eec319d233e508 contains exact marker [AUTO:CONVERSION-DX11-00424].",
+    "native_backend.hpp/.cpp add NativeProgrammableShaderProductionObservationEvidence, an R286 snapshot domain, the bounded production source-evidence bridge and a NativeBackend entrypoint backed by the persistent R285 owner.",
+    "R286 requires exact nonzero prerequisite/creation/target-bytecode/source-mapping/translation-plan receipts and validates the R285 semantic handoff snapshot before becoming review-ready.",
+    "The bridge accepts no ID3D11DeviceContext and explicitly keeps objectBindingAuthorized, nativeDrawPathActivationAllowed and drawDispatchAuthorized false.",
+    "Hosted regression coverage proves the positive exact-evidence path, stale R274 rejection and fail-closed behavior before NativeBackend device initialization.",
+    "tools/verify_dx11_source_graph.py guards the R286 production observation boundary.",
+    "Backend Conversion Gate 37587672430 completed SUCCESS for exact SHA 6e282e8369cbe13f36f27f7886eec319d233e508; validate 112681487989 and DX11 readiness smoke 112683187060 both succeeded.",
+    "Artifact 11466912902 digest sha256:bbc316ab97868e1529dff27ce3f97963c7ce7648754f27ecaae67c33d68426b7.",
+    "Current branch had already advanced through CONVERSION-DX11-00425 before E003 reconciliation, so no R286 material work was repeated.",
+    "No Quest 3/VDXR or in-game runtime test was performed."
+  ],
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "production_observation_bridge_present": true,
+    "persistent_r285_owner_used": true,
+    "semantic_handoff_snapshot_validated": true,
+    "native_programmable_object_bound": false,
+    "shader_translation_exact_enabled": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "E003 rollover reread GitHub branch HEAD and history. The branch had already advanced to CONVERSION-DX11-00425; material R286 commit 6e282e8369cbe13f36f27f7886eec319d233e508 remained an ancestor. The missing 00424 run record was identified as the only incomplete durable-state item."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Reviewed the R286 material diff and confirmed it routes exact R279/R280/R283/R274/R276 receipts into the R285 owner while preserving no-binding/no-draw fail-closed boundaries."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Existing material commit 6e282e8369cbe13f36f27f7886eec319d233e508 implements R286; no implementation was repeated during rollover."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Existing exact-SHA Backend Conversion Gate 37587672430 is SUCCESS; validate 112681487989 and DX11 readiness smoke 112683187060 are SUCCESS. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material/validation-bearing commit 6e282e8369cbe13f36f27f7886eec319d233e508 contains exact marker [AUTO:CONVERSION-DX11-00424] and no material retry was required."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R286 is a diagnostic production-observation bridge; no user runtime package/HMD deployment is claimed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "E003 rollover metadata, exact material SHA, Gate/jobs/artifact and RUNTIME_VALIDATION=UNTESTED are durably restored without changing ATTEMPT=1/3."
+    }
+  },
+  "exact_next_action": "No remaining CONVERSION-DX11-00424 work. Continue only with later DX11 tasks from current GitHub HEAD; CONVERSION-DX11-00425 is already present and must not be folded back into 00424.",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "validation": {
+    "exact_sha": "6e282e8369cbe13f36f27f7886eec319d233e508",
+    "backend_conversion_gate": {
+      "run_id": 37587672430,
+      "conclusion": "success",
+      "validate_job_id": 112681487989,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112683187060,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11466912902,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-6e282e8369cbe13f36f27f7886eec319d233e508",
+      "artifact_digest": "sha256:bbc316ab97868e1529dff27ce3f97963c7ce7648754f27ecaae67c33d68426b7"
+    }
+  }
+}
