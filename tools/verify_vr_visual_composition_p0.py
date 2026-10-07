@@ -189,6 +189,28 @@ require('analyze_outrun_assets.py', pcfast, 'asset analyzer packaged with test b
 
 # Fail-closed invariants.
 require('RenderScope::ScreenOverlay2D', sem, 'generic 2D fallback retained')
+
+# R73 HMD evidence proved these heuristic fixes were not sufficient. Keep them
+# out of the P0 candidate: ownership must come from exact producer/disassembly
+# evidence, not stage windows or scalar flare tuning.
+for forbidden in (
+    'R73OutRunTransientHudPresents',
+    'R73OutRunTransientHudActive',
+    'R72OutRunTransientHudPresents',
+    'FlareStereoDepth',
+):
+    if forbidden in r30:
+        fail(f'failed R72/R73 heuristic must stay retired: {forbidden}')
+
+# R73 also proved that UI replacement DDS files larger than the VR LRU budget
+# can be valid assets. They must be consumed transiently rather than silently
+# falling back to the original texture solely because they are not cacheable.
+require('transient-load', textures, 'oversized DDS transient-load path')
+require('std::shared_ptr<std::vector<uint8_t>> transientTextureData',
+        textures, 'D3DX-call-bounded transient DDS owner')
+require('FileData.getFileData(', textures, 'replacement file data lookup')
+require('&transientOwner', textures, 'transient owner handoff into file lookup')
+
 require('CorroboratesProjectedWorldMarker', sem, 'exact projected marker semantic retained')
 
 print('P0 visual composition static contract: PASS')
