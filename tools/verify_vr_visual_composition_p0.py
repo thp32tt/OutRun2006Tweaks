@@ -342,6 +342,25 @@ for token in (
 ):
     require(token, analyzer, 'OutRun stage/result canonical producer anchor')
 
+# Canonical executable closure for the common Sumo text-glyph producers.
+# Stage/result/YES-NO and other exact ScreenHud text ultimately reaches these
+# two put_sprite_ex CALLs. Pin the actual EXE bytes so a source-only wrapper
+# list cannot mask a changed call target or displaced producer.
+for contract_id, rva in (
+    ('VR-EXE-TEXT-GLYPH-PUT-SPRITE-2C808', '0x0002C808'),
+    ('VR-EXE-TEXT-GLYPH-PUT-SPRITE-2C9DB', '0x0002C9DB'),
+):
+    require(contract_id, binary_contract,
+            'canonical text glyph direct-CALL contract')
+    require(rva, binary_contract,
+            'canonical text glyph direct-CALL RVA')
+require('TextGlyph_PutSpriteCalls[] = { 0x2C808, 0x2C9DB }', ui,
+        'exact text glyph producer set')
+require('TextGlyph_putSprite', ui,
+        'exact text glyph ScreenHud wrapper')
+require('Module::exe_ptr(0x2CFE0)', ui,
+        'text glyph wrapper original put_sprite_ex target')
+
 # Canonical executable closure for the OutRun stage/result HUD.
 # The three text calls resolve to Sumo_Printf; its exact glyph producers are
 # already redirected through TextGlyph_putSprite and registered as ScreenHud.
