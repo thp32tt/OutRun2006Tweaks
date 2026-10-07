@@ -8,13 +8,13 @@ import numpy as np
 from PIL import Image,ImageChops,ImageDraw,ImageFont
 
 repo=Path.cwd()
-run="20261007-A167R-Q212-WORD-GROUP-TITLE"
+run="20261007-A167R2-Q212-WEIGHT-HIERARCHY"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 rel="textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds"
 cand=repo/"localization/graphics/hd_candidates"/rel
-INPUT="4c772b9329768ad920a5a09b79136dc2da9fde4a5b6c9486bde6952e452eebd8"
+INPUT="08431d269a613083c7047c9a7e8ff5c5391392f4f7ae2306056e926741e99561"
 SOURCE="f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61"
 
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -47,11 +47,11 @@ def maskdiff(a,b):
     return m.point(lambda v:255 if v else 0)
 def count(m): return sum(m.histogram()[1:])
 
-def word_mask(word,target_h,condense=.76):
+def word_mask(word,target_h,condense=.88):
     f=ImageFont.truetype(FONT,220,index=FI)
     p=Image.new("L",(1800,360),0); d=ImageDraw.Draw(p)
-    bb=d.textbbox((0,0),word,font=f,stroke_width=3)
-    d.text((24-bb[0],24-bb[1]),word,font=f,fill=255,stroke_width=3,stroke_fill=255)
+    bb=d.textbbox((0,0),word,font=f,stroke_width=5)
+    d.text((24-bb[0],24-bb[1]),word,font=f,fill=255,stroke_width=5,stroke_fill=255)
     box=p.getbbox()
     if not box: raise RuntimeError(("empty word",word))
     g=p.crop(box)
@@ -80,8 +80,8 @@ clean=Image.open(repo/"localization/graphics/role_B/20261005-B-PRODUCTION85/BA_C
 protected=np.asarray(Image.open(repo/"localization/graphics/role_B/20261005-B-PRODUCTION85/BA_PROTECTED_MASK.png").convert("L"))>0
 if clean.size!=old.size or protected.shape!=(old.height,old.width): raise RuntimeError("evidence size")
 cfg=[
- ("coast2coast_title","코스트 2 코스트",[0,964,1760,1124],146,118),
- ("heart_attack_title","하트 어택",[21,1316,1780,1474],146,108),
+ ("coast2coast_title","코스트 2 코스트",[0,964,1760,1124],146,110),
+ ("heart_attack_title","하트 어택",[21,1316,1780,1474],146,130),
 ]
 final=old.copy()
 allowed=Image.new("L",old.size,0); ad=ImageDraw.Draw(allowed)
@@ -98,7 +98,7 @@ for key,text,bb,th,gap in cfg:
     rows.append({"key":key,"text":text,"source_bbox":bb,"localized_bbox":[x,y,x+layer.width,y+layer.height],
       "source_size":[x1-x0,y1-y0],"localized_size":[layer.width,layer.height],
       "width_ratio":round(layer.width/(x1-x0),4),"height_ratio":round(layer.height/(y1-y0),4),
-      "font":FPAT,"construction":"whole-word groups; no per-syllable tracking; horizontal glyph condense 0.76; source-like inter-word gap",
+      "font":FPAT,"construction":"whole-word groups; no per-syllable tracking; horizontal glyph condense 0.88; heavier same-red stroke; source-like inter-word gap",
       "word_gap_px":gap})
 dm=maskdiff(old,final); outside=count(ImageChops.multiply(dm,ImageChops.invert(allowed)))
 am=ImageChops.difference(old.getchannel("A"),final.getchannel("A")).point(lambda v:255 if v else 0)
@@ -116,7 +116,7 @@ cards=[]
 for r in rows:
     x0,y0,x1,y1=r["source_bbox"]; pad=26; crop=(max(0,x0-pad),max(0,y0-pad),min(src.width,x1+pad),min(src.height,y1+pad))
     ims=[]
-    for lab,im in [("SOURCE",src),("A167_REJECT",old),("CLEAN",clean),("A167R",dec)]:
+    for lab,im in [("SOURCE",src),("A167R_PRIOR",old),("CLEAN",clean),("A167R2",dec)]:
         z=flat(im.crop(crop)); z.thumbnail((720,260),Image.Resampling.LANCZOS)
         c=Image.new("RGB",(z.width,z.height+24),(24,24,24));c.paste(z,(0,24));ImageDraw.Draw(c).text((4,4),lab,fill="white");ims.append(c)
     row=Image.new("RGB",(sum(i.width for i in ims)+12*3,max(i.height for i in ims)+18),(16,16,16)); xx=0
@@ -124,16 +124,16 @@ for r in rows:
     ImageDraw.Draw(row).text((4,row.height-2),r["key"],fill="white",anchor="ls");cards.append(row)
 sh=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+8),(16,16,16)); yy=0
 for c in cards:sh.paste(c,(0,yy));yy+=c.height+8
-sh.save(out/"A167R_Q212_CONTACTS.jpg","JPEG",quality=96,subsampling=0)
+sh.save(out/"A167R2_Q212_CONTACTS.jpg","JPEG",quality=96,subsampling=0)
 s=flat(src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)); f=flat(dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM))
 s.thumbnail((950,950),Image.Resampling.LANCZOS);f.thumbnail((950,950),Image.Resampling.LANCZOS)
 rw=Image.new("RGB",(s.width+f.width+12,max(s.height,f.height)+26),(16,16,16));rw.paste(s,(0,26));rw.paste(f,(s.width+12,26))
-d=ImageDraw.Draw(rw);d.text((4,4),"SOURCE RAW",fill="white");d.text((s.width+16,4),"A167R RAW",fill="white");rw.save(out/"A167R_Q212_RAW.jpg","JPEG",quality=94,subsampling=0)
+d=ImageDraw.Draw(rw);d.text((4,4),"SOURCE RAW",fill="white");d.text((s.width+16,4),"A167R2 RAW",fill="white");rw.save(out/"A167R2_Q212_RAW.jpg","JPEG",quality=94,subsampling=0)
 report={"schema_version":2,"role":"A","run":run,"queue_index":212,"asset":"BA0147DA","work_stolen_from_lane":"B",
- "controller_rejected_sha256":INPUT,"candidate_sha256":csha,"source_sha256":SOURCE,"rows":rows,
+ "controller_rejected_sha256":"4c772b9329768ad920a5a09b79136dc2da9fde4a5b6c9486bde6952e452eebd8","superseded_a167r_sha256":INPUT,"candidate_sha256":csha,"source_sha256":SOURCE,"rows":rows,
  "machine_qa":{"bbox_size_positive_margin":"2/2 PASS","changed_outside":outside,"alpha_outside":alpha_out,"header_128_exact":True,"mips":meta["mips"],"raw_orientation":"mirror_y","persisted_decode":"PASS"},
- "retry_reason":"A167 first pass rejected by controller visual QA: excessive inter-syllable tracking broke source title word grouping. A167R rerenders whole Korean word groups with condensed thick red glyphs and word-only spacing.",
- "controller_visual_qa":"PENDING","runtime_validation":"UNTESTED","forbidden_domains_touched":[],"status":"A167R_MACHINE_PASS_PENDING_CONTROLLER_VISUAL"}
-(out/"A167R_Q212_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A167R_Q212.json").write_text(json.dumps({"run":run,"queue_index":212,"asset":"BA0147DA","candidate_sha256":csha,"status":report["status"],"runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
+ "retry_reason":"A167 first pass rejected for per-syllable tracking. A167R fixed grouping but controller still found title stroke/hierarchy too weak. A167R2 keeps whole-word grouping and increases condensed glyph width/weight while retaining word-only spacing.",
+ "controller_visual_qa":"PENDING","runtime_validation":"UNTESTED","forbidden_domains_touched":[],"status":"A167R2_MACHINE_PASS_PENDING_CONTROLLER_VISUAL"}
+(out/"A167R2_Q212_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"A167R2_Q212.json").write_text(json.dumps({"run":run,"queue_index":212,"asset":"BA0147DA","candidate_sha256":csha,"status":report["status"],"runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n")
 print(json.dumps({"candidate_sha256":csha,"rows":rows},ensure_ascii=False,indent=2))
