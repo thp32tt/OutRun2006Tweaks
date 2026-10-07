@@ -104,7 +104,7 @@ jobs:
             $actualSha = (Get-FileHash $source -Algorithm SHA256).Hash.ToLowerInvariant()
             $expectedSha = ([string]$item.candidate_sha256).ToLowerInvariant()
             if ($actualSha -ne $expectedSha) {
-              throw "Candidate SHA mismatch q$index: expected=$expectedSha actual=$actualSha"
+              throw "Candidate SHA mismatch q${index}: expected=$expectedSha actual=$actualSha"
             }
 
             $dest = Join-Path 'build/bin' ([string]$row.path)
