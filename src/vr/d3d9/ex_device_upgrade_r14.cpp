@@ -114,6 +114,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         std::atomic<std::uint64_t> R14ShadowCreated{0};
         std::atomic<std::uint64_t> R14ShadowCreateFailed{0};
         std::atomic<std::uint64_t> R14DirectOnlyFallbacks{0};
+        std::atomic<std::uint64_t> R14DirectLockableTracked{0};
         std::atomic<std::uint64_t> R14ShadowReleased{0};
         std::atomic<std::uint64_t> R14ShadowRetired{0};
         std::atomic<std::uint64_t> R14DeviceReplacementRetires{0};
@@ -469,6 +470,27 @@ namespace OutRunVRD3D9ExUpgradeR13
                 return false;
             }
             ++R14DirectOnlyFallbacks;
+            return true;
+        }
+
+        bool R14TrackDirectLockable(IDirect3DDevice9* device,
+            IDirect3DTexture9* gpu) noexcept
+        {
+            if (!device || !gpu) return false;
+            D3DSURFACE_DESC desc{};
+            if (FAILED(gpu->GetLevelDesc(0, &desc)) ||
+                (desc.Usage & D3DUSAGE_DYNAMIC) == 0)
+                return false;
+
+            if (!R14TrackDirectOnly(device, gpu))
+                return false;
+
+            ++R14DirectLockableTracked;
+            if (R14DirectLockableTracked.load(std::memory_order_relaxed) == 1)
+            {
+                spdlog::info(
+                    "VR R14 EX: translated DYNAMIC MANAGED texture stays direct-lockable; CPU-shadow budget is reserved for non-dynamic fallback textures");
+            }
             return true;
         }
 
@@ -834,10 +856,32 @@ namespace OutRunVRD3D9ExUpgradeR13
                 !OutRunVRD3D9ExUpgrade::IsCompatDevice(device))
                 return hr;
 
+            D3DSURFACE_DESC translatedDesc{};
+            const HRESULT descHr = (*texture)->GetLevelDesc(
+                0, &translatedDesc);
+            const bool hooksReady = R14EnsureResourceHooks(device, *texture);
+
+            // The base compatibility layer first requests DEFAULT|DYNAMIC.
+            // When that succeeds, LockRect is already a direct-GPU contract:
+            // allocating a second SYSTEMMEM copy only burns the bounded shadow
+            // budget and can starve later non-dynamic selector/menu textures.
+            if (SUCCEEDED(descHr) &&
+                (translatedDesc.Usage & D3DUSAGE_DYNAMIC) != 0)
+            {
+                if (hooksReady &&
+                    R14TrackDirectLockable(device, *texture))
+                    return hr;
+
+                (*texture)->Release();
+                *texture = nullptr;
+                ++R14ShadowCreateFailed;
+                ++OutRunVRD3D9ExUpgrade::ManagedCreateFailures;
+                return D3DERR_NOTAVAILABLE;
+            }
+
             IDirect3DTexture9* shadow = nullptr;
             const HRESULT shadowHr = R14CreateCpuShadow(
                 device, *texture, shadow);
-            const bool hooksReady = R14EnsureResourceHooks(device, *texture);
 
             if (SUCCEEDED(shadowHr) && shadow && hooksReady &&
                 R14Track(device, *texture, shadow))
