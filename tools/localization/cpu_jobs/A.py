@@ -124,7 +124,7 @@ for key,t in targets.items():
     x0,y0,x1,y1=t["bbox"]
     # Localized/effect footprint is candidate-vs-clean delta; absolute alpha includes
     # legitimate surrounding/plate pixels and cannot be used as a text bbox.
-    dm=dmask(clean.crop((x0,y0,x1,y1)),dec.crop((x0,y0,x1,y1)))
+    dm=ImageChops.difference(clean.crop((x0,y0,x1,y1)).getchannel("A"),dec.crop((x0,y0,x1,y1)).getchannel("A")).point(lambda v:255 if v else 0)
     bb=dm.getbbox()
     if not bb: raise RuntimeError(("empty",key))
     loc=[x0+bb[0],y0+bb[1],x0+bb[2],y0+bb[3]]
@@ -140,7 +140,7 @@ coverage=17
 row_masks={}
 for key,t in targets.items():
     x0,y0,x1,y1=t["bbox"]
-    local=dmask(clean.crop((x0,y0,x1,y1)),dec.crop((x0,y0,x1,y1)))
+    local=ImageChops.difference(clean.crop((x0,y0,x1,y1)).getchannel("A"),dec.crop((x0,y0,x1,y1)).getchannel("A")).point(lambda v:255 if v else 0)
     gm=Image.new("L",(W,H),0); gm.paste(local,(x0,y0)); row_masks[key]=gm
 pair_overlap={}
 keys=list(row_masks)
