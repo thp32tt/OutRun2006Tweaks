@@ -9607,5 +9607,43 @@
     "actual_ingame_validation": "PENDING",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "a176_q121_fd90aa9_transparent_plate": {
+    "timestamp_kst": "2026-10-08T02:05:00+09:00",
+    "run": "20261008-A176-Q121-TRANSPARENT-PLATE",
+    "role": "A",
+    "queue_index": 121,
+    "asset": "FD90AA9",
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "prior_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+    "candidate_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+    "execution_backend": "CHATGPT_LOCAL_GITHUB_DNS_FAILURE -> GITHUB_ACTIONS_REPOSITORY_BACKED_CPU_WORKER; N100_NOT_USED",
+    "construction": "transparent-atlas alpha-aware source/current visible-alpha cleanup inside exact three header bboxes; no rectangle fill; fresh native 108px Korean rerender",
+    "machine_qa": "3/3 bbox/size/positive-margin; changed/alpha outside=0; pair overlap/touch=0; clean visible alpha=0 for all three header bboxes; exact header/persisted decode/raw mirror_y PASS",
+    "controller_visual_qa": "PASS_SOURCE_A138_CLEAN_A176_HEADER_FAMILY_AND_RAW",
+    "status": "A176_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
+    "worker_run": 37656205424,
+    "worker_output_commit": "d38bda3bcbf5ba9ce37c7ea299a67ca7fe95d7e9",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "latest_a_production": {
+    "timestamp_kst": "2026-10-08T02:05:00+09:00",
+    "run": "20261008-A176-Q121-TRANSPARENT-PLATE",
+    "role": "A",
+    "queue_index": 121,
+    "asset": "FD90AA9",
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "prior_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+    "candidate_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+    "execution_backend": "CHATGPT_LOCAL_GITHUB_DNS_FAILURE -> GITHUB_ACTIONS_REPOSITORY_BACKED_CPU_WORKER; N100_NOT_USED",
+    "construction": "transparent-atlas alpha-aware source/current visible-alpha cleanup inside exact three header bboxes; no rectangle fill; fresh native 108px Korean rerender",
+    "machine_qa": "3/3 bbox/size/positive-margin; changed/alpha outside=0; pair overlap/touch=0; clean visible alpha=0 for all three header bboxes; exact header/persisted decode/raw mirror_y PASS",
+    "controller_visual_qa": "PASS_SOURCE_A138_CLEAN_A176_HEADER_FAMILY_AND_RAW",
+    "status": "A176_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
+    "worker_run": 37656205424,
+    "worker_output_commit": "d38bda3bcbf5ba9ce37c7ea299a67ca7fe95d7e9",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
