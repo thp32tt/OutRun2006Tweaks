@@ -1,0 +1,161 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261007-B236-BATCH-Q032-Q034-Q036-TOTAL-RANK",
+  "queue_index": 36,
+  "asset": "textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+  "execution_backend": "GITHUB_ACTIONS_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_BLOCKED; N100_AUXILIARY_REVIEW_ONLY",
+  "trigger": "USER_PRE_INGAME_TOTAL_RANK_UNDERSIZED_CURRENT_A144_VISUAL_FALSE_NEGATIVE",
+  "source_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+  "before_candidate_sha256": "e3854f79be83cdd5fac7e9af91ab8f2beb9707000a7c6abbc564c2ca443fa553",
+  "candidate_sha256": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
+  "clean_mode": "A144_PLATE_PLUS_GLYPH_MASK_LOCAL_NEAREST_RECONSTRUCTION",
+  "glyph_mask_pixels_removed": 62145,
+  "construction": "fresh native-HD NotoSansCJK-Bold.ttc KR face index1, white/navy source family, readable-right shear 0.30, ~90% source width",
+  "rows": [
+    {
+      "region": 0,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        1829,
+        3227,
+        2364,
+        3329
+      ],
+      "localized_bbox": [
+        1853,
+        3232,
+        2339,
+        3324
+      ],
+      "source_size": [
+        535,
+        102
+      ],
+      "localized_size": [
+        486,
+        92
+      ],
+      "margins": [
+        24,
+        25,
+        5,
+        5
+      ],
+      "width_ratio": 0.9084,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_index": 1,
+      "font_size": 90,
+      "stroke_width": 4,
+      "readable_right_slant": 0.3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region": 1,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        594,
+        1622,
+        1128,
+        1724
+      ],
+      "localized_bbox": [
+        618,
+        1627,
+        1104,
+        1719
+      ],
+      "source_size": [
+        534,
+        102
+      ],
+      "localized_size": [
+        486,
+        92
+      ],
+      "margins": [
+        24,
+        24,
+        5,
+        5
+      ],
+      "width_ratio": 0.9101,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_index": 1,
+      "font_size": 90,
+      "stroke_width": 4,
+      "readable_right_slant": 0.3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region": 2,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        2266,
+        1643,
+        2785,
+        1728
+      ],
+      "localized_bbox": [
+        2291,
+        1648,
+        2759,
+        1723
+      ],
+      "source_size": [
+        519,
+        85
+      ],
+      "localized_size": [
+        468,
+        75
+      ],
+      "margins": [
+        25,
+        26,
+        5,
+        5
+      ],
+      "width_ratio": 0.9017,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_index": 1,
+      "font_size": 76,
+      "stroke_width": 3,
+      "readable_right_slant": 0.3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_qa": {
+    "rows": "3/3 PASS",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changes_outside_exact_source_bboxes": 0,
+    "localized_pair_overlap": 0,
+    "header_128_exact": true,
+    "mip_count": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "2_slant_direction": "PASS_RIGHT_0.30",
+    "3_no_undersizing": "PASS_NEAR_90_PERCENT_SOURCE_WIDTH",
+    "4_source_faithful_weight_effect": "PASS_WHITE_NAVY",
+    "5_no_clipping": "PASS_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_BLAST_OUTSIDE_SOURCE_BOXES",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "status": "B236_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "forbidden_domains_touched": []
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261007-B236-BATCH-Q032-Q034-Q036-TOTAL-RANK",
+  "queue_index": 32,
+  "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+  "execution_backend": "GITHUB_ACTIONS_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_BLOCKED; N100_AUXILIARY_REVIEW_ONLY",
+  "trigger": "USER_PRE_INGAME_TOTAL_RANK_UNDERSIZED_CURRENT_A144_VISUAL_FALSE_NEGATIVE",
+  "source_sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+  "before_candidate_sha256": "9e0b5dcd66b1aaeb031f60090d3c8f919cc59f7c6f8860602bcbc9990eb87867",
+  "candidate_sha256": "2bb9d21e95a99da036657da5d696982d5ee44875c91cd798dbcb7b99830757e8",
+  "clean_mode": "C_APPROVED_EXACT_BBOX_CLEAN",
+  "glyph_mask_pixels_removed": 0,
+  "construction": "fresh native-HD NotoSansCJK-Bold.ttc KR face index1, white/navy source family, readable-right shear 0.30, ~90% source width",
+  "rows": [
+    {
+      "region": 0,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        547,
+        164,
+        1065,
+        248
+      ],
+      "localized_bbox": [
+        572,
+        169,
+        1040,
+        243
+      ],
+      "source_size": [
+        518,
+        84
+      ],
+      "localized_size": [
+        468,
+        74
+      ],
+      "margins": [
+        25,
+        25,
+        5,
+        5
+      ],
+      "width_ratio": 0.9035,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_index": 1,
+      "font_size": 75,
+      "stroke_width": 3,
+      "readable_right_slant": 0.3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_qa": {
+    "rows": "1/1 PASS",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changes_outside_exact_source_bboxes": 0,
+    "localized_pair_overlap": 0,
+    "header_128_exact": true,
+    "mip_count": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "2_slant_direction": "PASS_RIGHT_0.30",
+    "3_no_undersizing": "PASS_NEAR_90_PERCENT_SOURCE_WIDTH",
+    "4_source_faithful_weight_effect": "PASS_WHITE_NAVY",
+    "5_no_clipping": "PASS_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_BLAST_OUTSIDE_SOURCE_BOXES",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "status": "B236_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "forbidden_domains_touched": []
+}

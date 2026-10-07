@@ -1,0 +1,8 @@
+{
+  "role": "B",
+  "run": "20261007-B236-BATCH-Q032-Q034-Q036-TOTAL-RANK",
+  "queue_index": 32,
+  "candidate_sha256": "2bb9d21e95a99da036657da5d696982d5ee44875c91cd798dbcb7b99830757e8",
+  "status": "B236_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "report": "localization/graphics/role_B/20261007-B236-BATCH-Q032-Q034-Q036-TOTAL-RANK/B236_Q032_DCC7B488_REPORT.json"
+}
