@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00512",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "BLOCKED_BY_LOWER_OWNER_API_EXTRACTION",
+  "failed_result_sha": "b4353c37f2b760ce25be7230a4ca4797cbab2c7d",
+  "failed_run_id": 37594186807,
+  "failed_job_id": 112702805352,
+  "failure_classification": "EXPECTED_COMPILE_OWNERSHIP_DEPENDENCY_DISCOVERY",
+  "summary": "R32/R31 separate-TU activation proved that R32 still obtains lower R30/R29/R22/R13/R9 runtime, draw, reset/present and DirectGPU symbols transitively from the R31 textual implementation chain. Do not replace these with donor runtime policy or bulk facades in one task.",
+  "preserved_progress": [
+    "R31Support API from CONVERSION-DX9EX-00511 remains active and verified",
+    "R32 direct private R31 helper calls remain removed",
+    "R33/R32 separate-TU compile gate remains enabled and verified"
+  ],
+  "observed_dependency_classes": [
+    "runtime/settings/logging declarations inherited through lower textual chain",
+    "R29 effect telemetry and renderer cache owner APIs",
+    "R30 screen-space/lower draw owner APIs",
+    "R22/R9 depth-stencil and recovery owner state",
+    "R13 ACK and Present/DirectGPU transport owner state",
+    "base renderer shared surfaces, hook storage, frame epoch and transport resources"
+  ],
+  "representative_missing_symbols": [
+    "Settings::VRTelemetry",
+    "IsGameDevice",
+    "InternalStereoPass",
+    "R29EffectTelemetrySnapshot",
+    "TryGetEffectTelemetrySnapshot",
+    "CurrentVertexShaderIdentity",
+    "SharedState",
+    "R13GpuCompletionSnapshot",
+    "R13ReleaseAckState",
+    "DirectTransportResourcesReady",
+    "EnsureDirectTransportResources",
+    "BackBuffer",
+    "RightEyeSurface",
+    "InvalidateEffectStateCache",
+    "InvalidateLiveStateSample",
+    "PresentEpoch"
+  ],
+  "required_predecessor_boundaries": [
+    "R31_R30",
+    "R30_R29",
+    "RESET_PRESENT_DIRECTGPU"
+  ],
+  "resolution_rule": "Keep canonical full-chain on the verified R33/R32 split. Re-enable R32/R31 split only after lower owner APIs are extracted in bounded seams and the preflight verifier is intentionally promoted to an active compile gate.",
+  "runtime_validation": "UNTESTED"
+}
