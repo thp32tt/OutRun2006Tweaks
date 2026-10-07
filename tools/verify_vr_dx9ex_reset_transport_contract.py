@@ -479,7 +479,7 @@ require_order(
 if resolve_direct_r32.count("++DirectTransportRingBackpressure;") != 1:
     fail("R32 DirectGPU free-slot scan must count whole-ring backpressure once")
 
-ack_snapshot_r13 = body(r13, "bool R13ReadGpuCompletionSnapshot(")
+ack_snapshot_r13 = body(r13, "R13GpuCompletionReadResult R13ReadGpuCompletionSnapshot(")
 require_order(
     ack_snapshot_r13,
     "R13 whole-ring ACK stable snapshot",
@@ -780,7 +780,7 @@ require_order(
 # The game may only accept a dedicated ACK that belongs to its current Frame.v2
 # game run as well as the current DirectGPU resource generation. This closes the
 # remaining race where an old host completion lands after a fast game restart.
-read_gpu_ack = body(r13, "bool R13ReadGpuCompletionSnapshot(")
+read_gpu_ack = body(r13, "R13GpuCompletionReadResult R13ReadGpuCompletionSnapshot(")
 require(
     read_gpu_ack,
     "game dedicated ACK complete run-identity validation",
