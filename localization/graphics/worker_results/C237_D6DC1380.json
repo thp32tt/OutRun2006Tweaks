@@ -1,0 +1,15 @@
+{
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C237-C2-Q012-D6DC1380-ORIENTATION-PLACEMENT",
+  "queue_index": 12,
+  "asset": "D6DC1380",
+  "input_candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+  "candidate_sha256": "1df64df712f990ee5d92c53998269604ff7b9fc4ccdff8913d648f18aa604013",
+  "machine_status": "PASS",
+  "c3_machine": "PASS_PENDING_CONTROLLER_VISUAL",
+  "report": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_C/20261007-C237-C2-Q012-D6DC1380-ORIENTATION-PLACEMENT/C237_D6DC1380_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
