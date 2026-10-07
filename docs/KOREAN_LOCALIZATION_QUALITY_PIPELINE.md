@@ -243,7 +243,7 @@ The following candidates MUST receive a fresh `C3_STRICT_AUDIT` for the same cur
 - any candidate whose font/style-family mismatch, low-resolution rendering, clipping, residue, color/effect mismatch or hierarchy has previously produced a false-negative;
 - any asset whose correctness materially depends on final runtime composition rather than isolated DDS appearance.
 
-If required C3 evidence is missing, the candidate remains `HOLD_STRICT_RECHECK` or pending C3 and MUST NOT be exported as current C-pass PRE_INGAME evidence.
+If required C3 evidence is missing, the candidate remains `HOLD_STRICT_RECHECK` or pending C3 and MUST NOT be exported as current C-pass PRE_INGAME evidence. For machine-enforced export gating, a high-risk pass must record `C3_STRICT_PASS` together with the exact candidate SHA in the queue/status evidence; a C3 token without the current SHA is stale and does not authorize export.
 
 ### Runtime-composite and golden-screenshot regression
 - Once a defect or approved state has actual in-game screenshot evidence, retain the relevant screen/region as regression evidence tied to the exact asset/runtime mapping and candidate hash.

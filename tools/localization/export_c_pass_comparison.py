@@ -39,6 +39,47 @@ def current_c_pass(row):
     return ((s.startswith("c") and "pass" in s and "pending_c" not in s)
             or ("alias_of_c" in s and "pass" in s))
 
+def dds_metadata(data):
+    if len(data) < 128 or data[:4] != b"DDS ":
+        return {"fourcc": "", "mip_count": 1, "compressed": False}
+    mip_count = int.from_bytes(data[28:32], "little") or 1
+    fourcc = data[84:88].rstrip(b"\x00").decode("ascii", "ignore")
+    compressed = fourcc.startswith("DXT") or fourcc in {"ATI1", "ATI2", "BC4U", "BC5U", "DX10"}
+    return {"fourcc": fourcc, "mip_count": mip_count, "compressed": compressed}
+
+def mandatory_c3_reasons(row, candidate_bytes):
+    text = " ".join((row.get("artwork_status") or "", row.get("notes") or "")).lower()
+    meta = dds_metadata(candidate_bytes)
+    reasons = []
+    if "user pre-ingame jpg review fail" in text:
+        reasons.append("prior_user_jpg_fail")
+    if "user_ingame_fail" in text or "open_user_ingame_fail" in text:
+        reasons.append("prior_ingame_fail")
+    if meta["compressed"]:
+        reasons.append(f"compressed_{meta['fourcc'] or 'dds'}")
+    if meta["mip_count"] > 1:
+        reasons.append(f"text_bearing_mip_chain_{meta['mip_count']}")
+    history_terms = {
+        "wrong_slant": "transform_false_negative_history",
+        "typography": "typography_false_negative_history",
+        "family_mismatch": "family_false_negative_history",
+        "low-resolution": "low_resolution_false_negative_history",
+        "lowres": "low_resolution_false_negative_history",
+        "clipping": "clipping_false_negative_history",
+        "source residue": "residue_false_negative_history",
+        "hierarchy": "hierarchy_false_negative_history",
+        "color mismatch": "color_false_negative_history",
+        "effect mismatch": "effect_false_negative_history",
+    }
+    for token, reason in history_terms.items():
+        if token in text and reason not in reasons:
+            reasons.append(reason)
+    return reasons
+
+def c3_pass_matches_candidate(row, candidate_sha):
+    text = " ".join((row.get("artwork_status") or "", row.get("notes") or "")).lower()
+    return "c3_strict_pass" in text and candidate_sha.lower() in text
+
 def flatten(im, bg=(96, 96, 96)):
     im = im.convert("RGBA")
     base = Image.new("RGB", im.size, bg)
@@ -222,7 +263,8 @@ def main():
         font = small = ImageFont.load_default()
 
     manifest = []
-    for no, row in enumerate(rows, 1):
+    blocked_c3 = []
+    for row in rows:
         idx = int(row["index"])
         asset_path = row["path"]
         key = Path(asset_path).name.split("_", 1)[0]
@@ -232,6 +274,17 @@ def main():
         if candidate.exists():
             candidate_bytes = candidate.read_bytes()
             candidate_sha = sha256_bytes(candidate_bytes)
+            c3_reasons = mandatory_c3_reasons(row, candidate_bytes)
+            if c3_reasons and not c3_pass_matches_candidate(row, candidate_sha):
+                blocked_c3.append({
+                    "queue_index": idx,
+                    "asset_key": key,
+                    "asset_path": asset_path,
+                    "artwork_status": row["artwork_status"],
+                    "candidate_sha256": candidate_sha,
+                    "reasons": c3_reasons,
+                })
+                continue
             with Image.open(candidate) as im:
                 current_native = im.convert("RGBA")
             candidate_size = current_native.size
@@ -242,6 +295,7 @@ def main():
             candidate_size = None
             source_kind = "policy_pass_no_candidate"
 
+        no = len(manifest) + 1
         source = select_english_source(repo, asset_path, key, candidate_size)
         if policy_preserve:
             current_native = source["raw"].copy()
@@ -292,14 +346,16 @@ def main():
             w.writerow({k: row.get(k, "") for k in fields})
 
     (out / "manifest.json").write_text(json.dumps({
-        "schema_version": 3,
-        "selection": "current localize_text C PASS plus exact aliases of C-approved candidate bytes; pending-C rework excluded",
+        "schema_version": 4,
+        "selection": "current localize_text C PASS plus exact aliases; pending-C rework excluded; machine-detectable high-risk candidates require exact-SHA C3_STRICT_PASS before export",
         "public_english_source_repo": SOURCE_REPO,
         "public_english_source_commit": SOURCE_COMMIT,
         "stock_original_zip": STOCK_ZIP_REL.as_posix(),
         "count": len(manifest),
         "localized_candidate_count": sum(x["source_kind"] == "localized_candidate" for x in manifest),
         "policy_pass_no_candidate_count": sum(x["source_kind"] == "policy_pass_no_candidate" for x in manifest),
+        "mandatory_c3_blocked_count": len(blocked_c3),
+        "mandatory_c3_blocked": blocked_c3,
         "layout": "top row English original vs current Korean in FLIP-Y review; bottom row English original vs current Korean in RAW DDS",
         "display_scaling_policy": "Only a proven lower-resolution English source may be integer-nearest-neighbor scaled for review display; source native size and SHA stay recorded and unmodified.",
         "visual_review_checklist": VISUAL_REVIEW_CHECKLIST,
@@ -309,6 +365,7 @@ def main():
     (out / "README.md").write_text(
         "# C QA PASS - English original vs Korean pre-in-game review\n\n"
         f"- Numbered C-pass rows: {len(manifest)}\n"
+        f"- High-risk candidates blocked pending exact-SHA C3_STRICT_PASS: {len(blocked_c3)}\n"
         f"- Primary English source: {SOURCE_REPO} pinned at {SOURCE_COMMIT}\n"
         f"- Exact stock-original fallback: {STOCK_ZIP_REL.as_posix()}\n"
         "- Every JPG contains the English original and current Korean candidate side-by-side.\n"
@@ -317,22 +374,27 @@ def main():
         "- Lower-resolution English originals may be nearest-neighbor scaled only for human display; the English source bytes are never modified or treated as pixel-QA equivalents.\n"
         "- If no proven English source can be aligned to the candidate, export fails closed.\n"
         "- User visual rejection overrides prior C static PASS and reopens the asset for A/B rework before in-game testing.\n"
+        "- High-risk candidates are omitted until their current candidate SHA is explicitly recorded with C3_STRICT_PASS. See manifest.json mandatory_c3_blocked.\n"
         "- C visual checklist: clean plate/source-footprint restoration; source-direction slant; source-relative scale/hierarchy; readable weight/effects; zero clipping; zero protected-art intrusion; no untranslated visible localizable labels.\n"
         "- Report defects by the leading JPG number.\n",
         encoding="utf-8",
     )
 
     thumb_w, thumb_h, cols = 360, 250, 4
-    sheet = Image.new("RGB", (thumb_w*cols, thumb_h*((len(manifest)+cols-1)//cols)), (36,36,36))
+    rows_h = max(1, (len(manifest)+cols-1)//cols)
+    sheet = Image.new("RGB", (thumb_w*cols, thumb_h*rows_h), (36,36,36))
     sd = ImageDraw.Draw(sheet)
-    for i, e in enumerate(manifest):
-        with Image.open(out / e["jpg"]) as im:
-            im = im.convert("RGB")
-            im.thumbnail((thumb_w-12, thumb_h-50), Image.Resampling.LANCZOS)
-        x = (i % cols) * thumb_w
-        y = (i // cols) * thumb_h
-        sheet.paste(im, (x + (thumb_w-im.width)//2, y + 42))
-        sd.text((x+8, y+8), f"{e['number']:03d} q{e['queue_index']:03d} {e['asset_key']}", font=small, fill="white")
+    if manifest:
+        for i, e in enumerate(manifest):
+            with Image.open(out / e["jpg"]) as im:
+                im = im.convert("RGB")
+                im.thumbnail((thumb_w-12, thumb_h-50), Image.Resampling.LANCZOS)
+            x = (i % cols) * thumb_w
+            y = (i // cols) * thumb_h
+            sheet.paste(im, (x + (thumb_w-im.width)//2, y + 42))
+            sd.text((x+8, y+8), f"{e['number']:03d} q{e['queue_index']:03d} {e['asset_key']}", font=small, fill="white")
+    else:
+        sd.text((18, 18), "NO EXPORTABLE C-PASS ITEMS - SEE manifest.json mandatory_c3_blocked", font=font, fill="white")
     sheet.save(out / "000_INDEX.jpg", "JPEG", quality=92, subsampling=0, optimize=True)
 
     print(json.dumps({
@@ -340,6 +402,7 @@ def main():
         "count": len(manifest),
         "localized_candidates": sum(x["source_kind"] == "localized_candidate" for x in manifest),
         "policy_cards": sum(x["source_kind"] == "policy_pass_no_candidate" for x in manifest),
+        "mandatory_c3_blocked": len(blocked_c3),
         "display_scaled_sources": [x["asset_key"] for x in manifest if x["review_display_scale"] > 1],
         "stock_zip_sources": [x["asset_key"] for x in manifest if x["english_source_origin"] == "repository_stock_original_zip"],
     }, ensure_ascii=False))

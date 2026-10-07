@@ -2822,3 +2822,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - QA PASS: bbox/size/margin 1/1; outside/alpha/residue=0; all other pixels exact; DXT5 header+13 mips+RAW mirror_y preserved. Controller SOURCE/OLD/CLEAN/A159, full atlas and RAW PASS; ordered gate 1-8 PASS.
 - Prior C pass superseded; fresh C + English-original JPG/user review + actual game required. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_A/20261007-A-MANUALQA159-568D3696-FEED/A159_CONTROLLER_SELF_QA.json; localization/graphics/role_A/20261007-A-MANUALQA159-568D3696-FEED/A159_568D3696_REPORT.json.
+
+
+## 2026-10-07 12:10 KST - QA-HARDENING-C3-EXPORT-GATE
+
+- Hardened `export_c_pass_comparison.py` so machine-detectable high-risk C-pass candidates are omitted from PRE_INGAME export until the exact current candidate SHA is recorded with `C3_STRICT_PASS`.
+- Machine-detectable triggers include prior user JPG/in-game failure history, BC/DXT/DX10 compression, authored mip chains, and recorded transform/typography/family/low-resolution/clipping/residue/hierarchy/color/effect false-negative history.
+- Export manifest schema v4 records `mandatory_c3_blocked` items and reasons; an all-blocked set now produces a valid index card instead of a zero-height image.
+- This exporter gate does not replace C's subjective high-risk classification required by the quality policy.
