@@ -1750,6 +1750,8 @@ compose_programmable_dormant_pre_activation_readiness(
 // further. The current R251 or R255 receipt is recomputed by the pair cache;
 // success only means that the old R256/R257 identities are still fresh. It
 // remains diagnostic-only and cannot authorize Draw* or NativeDrawPath.
+// R290 additionally seals the exact R239 cache key into this receipt so the
+// later R259 handoff can reject evidence assembled from different shader pairs.
 struct NativeProgrammableShaderDormantSourceRevalidationReadiness {
     bool inputValid{};
     bool sourceReceiptReady{};
@@ -1769,6 +1771,7 @@ struct NativeProgrammableShaderDormantSourceRevalidationReadiness {
     UINT startLocation{};
     DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
     UINT indexOffset{};
+    std::uint64_t cacheKey{};
     std::uint64_t currentSourceReceiptSnapshotToken{};
     std::uint64_t candidateSnapshotToken{};
     std::uint64_t preActivationSnapshotToken{};
@@ -2541,12 +2544,15 @@ validate_programmable_shader_semantic_translation_readiness_snapshot(
 
 // R259 consumes the current R258 source receipt, R262 full F18 resource-behavior
 // review, R243 input-layout ownership and the exact R263 F21 semantic proof into
-// one activation-prerequisite handoff. Static prerequisites may become complete,
-// but activation authority stays off until the separate activation/runtime gate.
+// one activation-prerequisite handoff. R290 requires all shader-side receipts
+// to carry the same R239 cache key before this handoff can become review-ready.
+// Static prerequisites may become complete, but activation authority stays off
+// until the separate activation/runtime gate.
 struct NativeProgrammableShaderActivationPrerequisiteHandoff {
     bool inputValid{};
     bool sourceRevalidationReady{};
     bool sourceRevalidationSnapshotMatches{};
+    bool sourceIdentityMatches{};
     bool resourceBehaviorReviewReady{};
     bool resourceBehaviorSnapshotMatches{};
     bool resourceBehaviorGeometryProofPresent{};
@@ -2560,6 +2566,7 @@ struct NativeProgrammableShaderActivationPrerequisiteHandoff {
     bool resourceBehaviorProofPresent{};
     bool inputLayoutProofPresent{};
     bool shaderTranslationProofPresent{};
+    bool sourceIdentityProofPresent{};
     bool activationPrerequisitesSatisfied{};
     bool diagnosticOnly{};
     bool nativeDrawPathActivationAllowed{};
@@ -2570,6 +2577,7 @@ struct NativeProgrammableShaderActivationPrerequisiteHandoff {
         NativeProgrammableShaderDrawCandidateKind::None;
     bool indexed{};
     std::uint32_t missingPrerequisiteMask{};
+    std::uint64_t cacheKey{};
     std::uint64_t sourceRevalidationSnapshotToken{};
     std::uint64_t resourceBehaviorSnapshotToken{};
     std::uint64_t inputLayoutSnapshotToken{};
