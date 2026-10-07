@@ -2520,3 +2520,5 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - B238 machine QA 12/12 PASS; zero changed/alpha pixels outside exact source bboxes, zero label overlap, exact header/mip1/raw mirror-Y.
 - Controller row/full/RAW/practical 100/75/50 visual QA PASS with natural word grouping and restored source-relative hierarchy.
 - Next: fresh independent C2 -> exact-SHA C3 -> PRE_INGAME English-original JPG -> user review -> NEW in-game retest. `RUNTIME_VALIDATION=UNTESTED`.
+### C247 C1 (2026-10-07 19:58 KST)
+TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh independent C and exact-SHA C3_STRICT_AUDIT: **3/3 PASS**. Exact-source bbox/size/positive-margin gates and zero outside/alpha collateral passed; controller SOURCE/CLEAN/current + RAW/FLIP-Y visual review passed. Next gate: PRE_INGAME English-original export refresh → user JPG review → NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.
