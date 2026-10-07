@@ -471,13 +471,13 @@ require_order(
     "R32 final-owner free-slot scan",
     "const std::uint32_t preferred =",
     "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
-    "R13GpuCompletionSnapshot ackSnapshot{};",
+    "R30SupportGpuCompletionSnapshot ackSnapshot{};",
     "bool ackSnapshotRead = false;",
     "bool ackSnapshotValid = false;",
     "for (std::uint32_t offset = 0;",
     "if (candidate.producerPending)",
     "if (!ackSnapshotRead)",
-    "R13TryGetGpuCompletionSnapshot(ackSnapshot)",
+    "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
     "ackSnapshotRead = true;",
     "The host completed this exact published frame. Retire the",
     "selected = index;",
@@ -520,17 +520,17 @@ require_order(
 require(
     resolve_direct_r32,
     "R32 one-snapshot-per-resolve ACK fast path",
-    "R13GpuCompletionSnapshot ackSnapshot{};",
+    "R30SupportGpuCompletionSnapshot ackSnapshot{};",
     "bool ackSnapshotRead = false;",
     "bool ackSnapshotValid = false;",
     "if (!ackSnapshotRead)",
-    "R13TryGetGpuCompletionSnapshot(ackSnapshot)",
+    "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
     "ackSnapshotRead = true;",
     "const bool ackValid = ackSnapshotValid;",
     "ackSnapshot.completedFrameId[index]",
 )
-if resolve_direct_r32.count("R13TryGetGpuCompletionSnapshot(ackSnapshot)") != 1:
-    fail("R32 DirectGPU ring scan must delegate bounded ACK rebind policy to one R13 snapshot call")
+if resolve_direct_r32.count("R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)") != 1:
+    fail("R32 DirectGPU ring scan must delegate bounded ACK rebind policy to one R30 support snapshot call")
 forbid(
     resolve_direct_r32,
     "R32 repeated per-slot ACK snapshot regression",
