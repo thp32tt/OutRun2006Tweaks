@@ -1782,9 +1782,15 @@ namespace KoreanRuntime
         const float logicalFontHeight =
             cellHeight * (std::max)(0.05f, std::fabs(cmd.scaleY));
 
-        // User in-game regressions IGR-006/007 show the compact runtime path
-        // losing the source HUD/bubble weight. Keep larger menu/body copy
-        // unchanged and reinforce only the small stock cells.
+        // User in-game regressions IGR-006/007 show the compact HUD/bubble path
+        // losing source weight, so those small cells still get a keyline.
+        // The 2026-10-07 in-game confirmation-dialog review showed text ID 935
+        // ("확실합니까?") becoming visibly too heavy because the same HUD
+        // reinforcement was applied to menu/modal copy. Keep that dialog on the
+        // clean Semilight face; do not solve menu readability by thickening it.
+        if (cmd.textId == 935)
+            return false;
+
         return cmd.textId < TextEntryCount && logicalFontHeight <= 24.0f;
     }
 
