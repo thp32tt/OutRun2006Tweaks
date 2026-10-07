@@ -1,0 +1,12 @@
+{
+  "run": "20261007-C243R-C1-Q051-FF2462BB-CORRECTIVE",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 51,
+  "input_candidate_sha256": "0dccb6318fafa20725427227fddf00c451bfdab814de5dc2da497d79d13b862e",
+  "candidate_sha256": "b1c91a8c0050f0f31523afc055185288f2756e4da02014c9597b69cff25fc129",
+  "machine_status": "PASS_AFTER_SMALL_CORRECTIVE_REWORK_PENDING_CONTROLLER_VISUAL",
+  "report": "localization/graphics/role_C/20261007-C243R-C1-Q051-FF2462BB-CORRECTIVE/C243R_FF2462BB_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}

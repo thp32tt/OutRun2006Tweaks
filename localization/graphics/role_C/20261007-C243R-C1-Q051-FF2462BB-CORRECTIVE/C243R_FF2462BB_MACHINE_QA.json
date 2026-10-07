@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "run": "20261007-C243R-C1-Q051-FF2462BB-CORRECTIVE",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 51,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "regression": "PJR-014-20261006",
+  "priority": "P0",
+  "producer_run": "A163R",
+  "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "input_candidate_sha256": "0dccb6318fafa20725427227fddf00c451bfdab814de5dc2da497d79d13b862e",
+  "candidate_sha256": "b1c91a8c0050f0f31523afc055185288f2756e4da02014c9597b69cff25fc129",
+  "initial_independent_c_failure": {
+    "workflow_run": 37589027590,
+    "reason": "BOTTOM_EXACT_SOURCE_BBOX_RIGHT_OVERFLOW_3PX",
+    "evidence": {
+      "top_source_bbox": [
+        3002,
+        1405,
+        3512,
+        1486
+      ],
+      "top_candidate_bbox": [
+        3135,
+        1413,
+        3379,
+        1478
+      ],
+      "top_margins": [
+        133,
+        133,
+        8,
+        8
+      ],
+      "bottom_source_bbox": [
+        3094,
+        1486,
+        3411,
+        1566
+      ],
+      "bottom_candidate_bbox": [
+        3100,
+        1494,
+        3414,
+        1558
+      ],
+      "bottom_margins": [
+        6,
+        -3,
+        8,
+        8
+      ]
+    }
+  },
+  "small_corrective_rework": {
+    "allowed_by_contract": true,
+    "operation": "bottom localized line x shift",
+    "shift_xy": [
+      -4,
+      0
+    ],
+    "top_line_pixel_exact_to_input": true
+  },
+  "lines": [
+    {
+      "line": "top",
+      "source_effect_bbox": [
+        3002,
+        1405,
+        3512,
+        1486
+      ],
+      "localized_effect_bbox": [
+        3135,
+        1413,
+        3379,
+        1478
+      ],
+      "source_size": [
+        510,
+        81
+      ],
+      "localized_size": [
+        244,
+        65
+      ],
+      "margins_lrtb": [
+        133,
+        133,
+        8,
+        8
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "line": "bottom",
+      "source_effect_bbox": [
+        3094,
+        1486,
+        3411,
+        1566
+      ],
+      "localized_effect_bbox": [
+        3096,
+        1494,
+        3410,
+        1558
+      ],
+      "source_size": [
+        317,
+        80
+      ],
+      "localized_size": [
+        314,
+        64
+      ],
+      "margins_lrtb": [
+        2,
+        1,
+        8,
+        8
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_qa": {
+    "changed_pixels_outside_true_target_vs_pre_a144": 0,
+    "corrective_changed_pixels_outside_bottom_line_region": 0,
+    "wrong_a144_insertion_pixel_diff_vs_pre_a144": 0,
+    "alpha_changed_outside_true_target_vs_pre_a144": 0,
+    "top_line_pixel_diff_vs_a163r": 0,
+    "line_overlap_pixels": 0,
+    "line_touch_1px_pixels": 0,
+    "header_128_exact": true,
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "mip_count": 1,
+    "raw_mode": "RGBA",
+    "persisted_decode_exact": true
+  },
+  "fresh_c_machine_status": "PASS_AFTER_SMALL_CORRECTIVE_REWORK_PENDING_CONTROLLER_VISUAL",
+  "mandatory_c3": "REQUIRED_EXACT_SHA_PJR014_MULTI_LINE_STYLE_FALSE_NEGATIVE",
+  "controller_visual_qa": "PENDING",
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "pre_ingame_export": "BLOCKED_UNTIL_CONTROLLER_C3",
+  "user_jpg_review": "PENDING",
+  "actual_ingame_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C243R-C1-Q051-FF2462BB-CORRECTIVE/C243R_TARGET_SOURCE_BEFORE_AFTER_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C243R-C1-Q051-FF2462BB-CORRECTIVE/C243R_TARGET_SOURCE_BEFORE_AFTER_RAW.jpg",
+    "localization/graphics/role_C/20261007-C243R-C1-Q051-FF2462BB-CORRECTIVE/C243R_WRONG_INSERTION_RESTORED.jpg",
+    "localization/graphics/role_C/20261007-C243R-C1-Q051-FF2462BB-CORRECTIVE/C243R_PRACTICAL_100_75_50.jpg"
+  ]
+}
