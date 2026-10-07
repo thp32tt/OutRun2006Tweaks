@@ -4134,7 +4134,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261008-C256-C2-BATCH-Q060-Q212-Q052/C256_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261008-C260-C2-Q092-Q094-Q102/C260_CONTROLLER_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -9758,6 +9758,51 @@
     "blocker": "screenshot(163) pixel payload/per-label transcription is not in Git SSOT; remaining English cannot be safely assigned to runtime IDs or DDS",
     "status": "HOLD_STRICT_RECHECK_MAPPING_EVIDENCE_REQUIRED",
     "new_candidate_count": 0,
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "c260_c2_batch_q092_q094_q102": {
+    "run": "20261008-C260-C2-Q092-Q094-Q102",
+    "timestamp_kst": "2026-10-08T03:33:00+09:00",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "selection_refresh_head": "8cdf518221886a4daaac9d8c418a9698a63ec0f1",
+    "compute_dispatch_commit": "6309804c793f51a733d9a1ffd100e4224149914d",
+    "machine_evidence_commit": "018576877ee53d9093324325a8901fae10a68aad",
+    "pre_commit_refresh_head": "018576877ee53d9093324325a8901fae10a68aad",
+    "execution_backend": "GitHub source-of-truth; repository-backed GitHub Actions worker used for exact DDS decode/evidence; N100 MCP used only for small generated JPG controller review, not heavy compute.",
+    "assets": {
+      "q92": {
+        "asset": "1A43E9D9",
+        "candidate_sha256": "c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a",
+        "fresh_c": "PASS_HIGH_RISK_EDGE_TOUCH",
+        "machine_qa": "PASS_2_OF_2_ZERO_OUTSIDE_ALPHA_HEADER",
+        "controller_visual_qa": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA_HIGH_RISK_EDGE_TOUCH",
+        "status": "C260_C3_STRICT_PASS_HIGH_RISK_EDGE_TOUCH_PENDING_PRE_INGAME_USER_JPG_INGAME"
+      },
+      "q94": {
+        "asset": "2DA43E41",
+        "candidate_sha256": "c36da00d6fa421180f6017fd188e9de783a35eb57a6dcc4927039c663aeee905",
+        "fresh_c": "PASS",
+        "machine_qa": "PASS_7_OF_7_ZERO_OUTSIDE_ALPHA_HEADER",
+        "controller_visual_qa": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "status": "C260_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+      },
+      "q102": {
+        "asset": "571E78F3",
+        "candidate_sha256": "442babea9c5dea9a944dff3d4a6a577f007dad2ae63a9699d380baf0ce7fc05d",
+        "fresh_c": "FAIL_VISUAL_OVERRIDE",
+        "machine_qa": "PASS_HIGH_RISK_EDGE_TOUCH",
+        "controller_visual_qa": "FAIL_TEXT_SCALE_HIERARCHY_UNDERFILL_15_CONTINUOUS",
+        "c3": "BLOCKED",
+        "status": "REWORK_REQUIRED"
+      }
+    },
+    "controller_report": "localization/graphics/role_C/20261008-C260-C2-Q092-Q094-Q102/C260_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "PENDING_REFRESH_Q092_Q094",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }

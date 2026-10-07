@@ -2643,3 +2643,10 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - IGR-025 course-select coverage: q219 COURSE SELECT exact graphics binding -> existing A113 `f6303ee1...` promoted to fresh-C priority; q163 24 stage labels -> existing C228-approved `201044a9...` preserved.
 - Reviewed runtime Korean data exists for major course-selection IDs, but screenshot(163) pixels/per-label mapping are absent from Git SSOT. Remaining visible English is therefore `HOLD_STRICT_RECHECK` rather than guessed runtime/DDS edits.
 - `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
+### C260 C2 — 2026-10-08 03:33 KST
+- `TEMP_BACKLOG_RELIEF=C2` / `SHARD=EVEN`; q92/q94/q102 adjudicated on exact current candidate bytes.
+- q92 c2388834...: fresh C + exact-SHA C3_STRICT_PASS, but 2/2 decoded rows touch exact source top edge -> HIGH_RISK, PRE_INGAME + actual-game mandatory.
+- q94 c36da00d...: fresh C 7/7 zero-outside + controller visual PASS -> exact-SHA C3_STRICT_PASS.
+- q102 442babea...: numeric PASS_HIGH_RISK_EDGE_TOUCH overridden by visual FAIL; 15코스 연속 450/1070px (~42.1%) is materially undersized versus source/same-family q92 -> REWORK_REQUIRED, C3 blocked.
+- PRE_INGAME English-original refresh required for q92/q94. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
