@@ -11590,8 +11590,6 @@ def main() -> None:
          RUNTIME_CENSUS, "R295 join result participates in sampled identity"),
         ("shaderProductionSourceMissingEvidenceMask",
          RUNTIME_CENSUS, "R295 missing evidence participates in sampled identity"),
-        ("VR DX11 R295 productionSourceRevalidation",
-         RUNTIME_CENSUS, "R295 bounded diagnostic output"),
     ]
     missing_r295_programmable_production_source_revalidation_join = [
         meaning for token, source, meaning
