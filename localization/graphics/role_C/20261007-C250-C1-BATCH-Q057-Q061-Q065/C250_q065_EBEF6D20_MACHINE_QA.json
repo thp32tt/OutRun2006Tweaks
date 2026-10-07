@@ -1,0 +1,253 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C250",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 65,
+  "asset_key": "EBEF6D20",
+  "candidate_sha256": "2b39cf005e79149890f0cfee605d29144d7d257e9cc9179b6c1f583ce393fce5",
+  "canonical_source_sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+  "prior_candidate_sha256": "074cf03b504cb715e6b1328ecb33cec46a7b12fe6df74f8261eccfc77242cacc",
+  "prior_blob_commit": "5bd0324d1acb9ce8f9465bb4de282a28a7334e06",
+  "defect_revalidation": "PJR-021 UNTRANSLATED_COURSE_LEFT_RIGHT_EASY_HARD",
+  "machine_qa": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "mips": 1,
+    "header_exact": true,
+    "source_vs_current_changed_outside_exact_source_bboxes": 0,
+    "source_vs_current_alpha_changed_outside_exact_source_bboxes": 0,
+    "prior_vs_current_changed_outside_rework_union": 0,
+    "source_vs_current_changed_bbox": [
+      102,
+      441,
+      1592,
+      1620
+    ],
+    "bbox_size_positive_margin": "7/7 PASS",
+    "per_region": [
+      {
+        "key": "loading_left",
+        "original_bbox": [
+          256,
+          441,
+          672,
+          543
+        ],
+        "localized_bbox": [
+          384,
+          447,
+          544,
+          537
+        ],
+        "source_size": [
+          416,
+          102
+        ],
+        "localized_size": [
+          160,
+          90
+        ],
+        "delta_left": 128,
+        "delta_right": 128,
+        "delta_top": 6,
+        "delta_bottom": 6,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "loading_right",
+        "original_bbox": [
+          1176,
+          441,
+          1592,
+          543
+        ],
+        "localized_bbox": [
+          1304,
+          447,
+          1464,
+          537
+        ],
+        "source_size": [
+          416,
+          102
+        ],
+        "localized_size": [
+          160,
+          90
+        ],
+        "delta_left": 128,
+        "delta_right": 128,
+        "delta_top": 6,
+        "delta_bottom": 6,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "course",
+        "original_bbox": [
+          458,
+          1256,
+          745,
+          1340
+        ],
+        "localized_bbox": [
+          527,
+          1264,
+          676,
+          1331
+        ],
+        "source_size": [
+          287,
+          84
+        ],
+        "localized_size": [
+          149,
+          67
+        ],
+        "delta_left": 69,
+        "delta_right": 69,
+        "delta_top": 8,
+        "delta_bottom": 9,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "left",
+        "original_bbox": [
+          270,
+          1340,
+          520,
+          1470
+        ],
+        "localized_bbox": [
+          290,
+          1348,
+          500,
+          1462
+        ],
+        "source_size": [
+          250,
+          130
+        ],
+        "localized_size": [
+          210,
+          114
+        ],
+        "delta_left": 20,
+        "delta_right": 20,
+        "delta_top": 8,
+        "delta_bottom": 8,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "right",
+        "original_bbox": [
+          685,
+          1405,
+          874,
+          1470
+        ],
+        "localized_bbox": [
+          701,
+          1410,
+          858,
+          1465
+        ],
+        "source_size": [
+          189,
+          65
+        ],
+        "localized_size": [
+          157,
+          55
+        ],
+        "delta_left": 16,
+        "delta_right": 16,
+        "delta_top": 5,
+        "delta_bottom": 5,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "easy",
+        "original_bbox": [
+          102,
+          1470,
+          430,
+          1620
+        ],
+        "localized_bbox": [
+          145,
+          1479,
+          387,
+          1611
+        ],
+        "source_size": [
+          328,
+          150
+        ],
+        "localized_size": [
+          242,
+          132
+        ],
+        "delta_left": 43,
+        "delta_right": 43,
+        "delta_top": 9,
+        "delta_bottom": 9,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "hard",
+        "original_bbox": [
+          720,
+          1470,
+          1058,
+          1618
+        ],
+        "localized_bbox": [
+          725,
+          1484,
+          1052,
+          1603
+        ],
+        "source_size": [
+          338,
+          148
+        ],
+        "localized_size": [
+          327,
+          119
+        ],
+        "delta_left": 5,
+        "delta_right": 6,
+        "delta_top": 14,
+        "delta_bottom": 15,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      }
+    ]
+  },
+  "visual_evidence": [
+    "C250_q065_EBEF6D20_OVERVIEW.jpg",
+    "C250_q065_EBEF6D20_CRITICAL_CONTACTS.jpg",
+    "C250_q065_EBEF6D20_RAW.jpg"
+  ],
+  "controller_visual_qa": "PENDING",
+  "c3_strict_audit": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

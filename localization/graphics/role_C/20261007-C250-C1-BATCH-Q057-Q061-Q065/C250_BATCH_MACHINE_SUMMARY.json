@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C250",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "execution_backend": "github-actions fallback because ChatGPT local git/DDS materialization failed DNS; N100 not used",
+  "assets": [
+    {
+      "index": 57,
+      "key": "39229D64",
+      "candidate_sha256": "3dae27fdeb7d2cde6d440b45f1e94ddafe35a97fe749447fdf0f3974d5e90c16",
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PENDING",
+      "c3": "PENDING"
+    },
+    {
+      "index": 61,
+      "key": "C4A2937B",
+      "candidate_sha256": "fe1e7e7d264694c39f2bdbf50bb0a94ba15b88aea5b52873df4ceae749a8f95e",
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PENDING",
+      "c3": "PENDING"
+    },
+    {
+      "index": 65,
+      "key": "EBEF6D20",
+      "candidate_sha256": "2b39cf005e79149890f0cfee605d29144d7d257e9cc9179b6c1f583ce393fce5",
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PENDING",
+      "c3": "PENDING"
+    }
+  ]
+}
