@@ -4537,5 +4537,48 @@
     "pre_ingame_manifest_count": 14,
     "pre_ingame_mandatory_c3_blocked_count": 10,
     "pre_ingame_controller_visual_qa": "PASS_FLIPY_RAW_ENGLISH_ORIGINAL_VS_CURRENT"
+  },
+  "c244_c2_q026_63c91067": {
+    "timestamp_kst": "2026-10-07T17:26:49+09:00",
+    "run": "20261007-C244-C2-Q026-63C91067-A144",
+    "role": "C",
+    "lane": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "execution_backend": "N100_MCP_FALLBACK_AFTER_CHATGPT_LOCAL_CLONE_DNS_BLOCKED",
+    "queue_index": 26,
+    "asset": "63C91067",
+    "candidate_sha256": "0281b7b46b5c53598bab2bf4a01f65f391b166345710460c51791da8cf70d530",
+    "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+    "prior_user_rejected_sha256": "2afae053f48811b79ca3cbcf706e6edf4013e65d012010cb48b681169621f675",
+    "machine_qa": "PASS",
+    "controller_visual_qa": "FAIL",
+    "failure_tags": [
+      "TOTAL_RANK_TEXT_TOO_SMALL_REMAINS",
+      "SOURCE_RIGHT_SLANT_TOO_WEAK"
+    ],
+    "source_effect_widths": [
+      524,
+      525
+    ],
+    "current_dark_widths": [
+      348,
+      312
+    ],
+    "prior_dark_widths": [
+      274,
+      241
+    ],
+    "width_gain_vs_prior": [
+      74,
+      71
+    ],
+    "c3_strict_audit": "BLOCKED_CONTROLLER_VISUAL_FAIL",
+    "machine_report": "localization/graphics/role_C/20261007-C244-C2-Q026-63C91067-A144/C244_63C91067_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261007-C244-C2-Q026-63C91067-A144/C244_63C91067_CONTROLLER_FINAL_QA.json",
+    "status": "C244_VISUAL_FAIL_REWORK_REQUIRED",
+    "next": "A/B native-HD material rerender -> producer QA -> fresh independent C -> exact-SHA C3 -> regenerated PRE_INGAME user JPG -> NEW actual-game retest",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

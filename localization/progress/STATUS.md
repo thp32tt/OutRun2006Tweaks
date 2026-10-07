@@ -2441,3 +2441,8 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - q51 is PRE_INGAME #004 `004_q051_FF2462BB.jpg`; pinned English source `5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67` and exact corrected Korean candidate `b1c91a8c0050f0f31523afc055185288f2756e4da02014c9597b69cff25fc129`, both native 4096x2048 with display scale 1.
 - Controller final exported-card review PASS: FLIP-Y source/current show the girlfriend instruction only in the correct lower/right source cell, no duplicate upper insertion, source-family yellow/navy/white/navy effect and readable right lean retained, no clipping/broken Hangul/source residue/protected-art intrusion. RAW source/current remain orientation-consistent.
 - Manifest count=14; mandatory C3 blocked=10. User JPG acceptance and NEW actual-game retest remain required; PJR-014 is not closed. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 17:26 KST — C244 C2 q26 63C91067 REWORK_REQUIRED
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN. Fresh machine QA PASS but controller visual QA FAIL on A144 exact candidate 0281b7b46b5c53598bab2bf4a01f65f391b166345710460c51791da8cf70d530.
+- Existing user defect remains materially visible: 종합 랭킹 is still too narrow/small vs canonical Total Rank (348/312px vs source 524/525px widths) and source-right italic/slant is too weak. Numeric PASS does not override the visual failure.
+- q26 returned to A/B material rework; C3/PRE_INGAME promotion blocked. User JPG review and NEW actual-game retest remain pending; RUNTIME_VALIDATION=UNTESTED.

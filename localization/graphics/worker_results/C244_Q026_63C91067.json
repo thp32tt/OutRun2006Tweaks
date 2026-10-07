@@ -10,5 +10,9 @@
   "machine_status": "PASS",
   "c3_machine_status": "PASS",
   "report": "localization/graphics/role_C/20261007-C244-C2-Q026-63C91067-A144/C244_63C91067_MACHINE_QA.json",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "controller_visual_qa": "FAIL",
+  "decision": "C244_VISUAL_FAIL_REWORK_REQUIRED",
+  "controller_report": "localization/graphics/role_C/20261007-C244-C2-Q026-63C91067-A144/C244_63C91067_CONTROLLER_FINAL_QA.json",
+  "c3_strict_audit": "BLOCKED_CONTROLLER_VISUAL_FAIL"
 }

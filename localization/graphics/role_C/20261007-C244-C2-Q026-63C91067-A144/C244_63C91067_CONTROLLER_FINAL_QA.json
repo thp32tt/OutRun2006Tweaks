@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "run": "20261007-C244-C2-Q026-63C91067-A144",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "execution_backend": "N100_MCP_FALLBACK_AFTER_CHATGPT_LOCAL_CLONE_DNS_BLOCKED",
+  "timestamp_kst": "2026-10-07T17:26:49+09:00",
+  "queue_index": 26,
+  "asset": "63C91067",
+  "asset_path": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "producer_run": "A144_USERJPG_REWORK",
+  "trigger": "USER_PRE_INGAME_JPG_FAIL_002_TOTAL_RANK_TEXT_TOO_SMALL",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "prior_user_rejected_sha256": "2afae053f48811b79ca3cbcf706e6edf4013e65d012010cb48b681169621f675",
+  "candidate_sha256": "0281b7b46b5c53598bab2bf4a01f65f391b166345710460c51791da8cf70d530",
+  "machine_qa": "PASS",
+  "controller_visual_qa": {
+    "plate_restoration": "PASS_NO_VISIBLE_SOURCE_RESIDUE_SEAM_HALO_OR_PANEL_DAMAGE",
+    "glyph_integrity": "PASS_NO_BROKEN_HANGUL_OR_CLIPPED_STROKES",
+    "protected_art": "PASS_NO_VISIBLE_STAR_CLOUD_OR_BORDER_INTRUSION",
+    "flip_y_raw": "PASS_SOURCE_AND_CURRENT_SHARE_EXPECTED_RAW_MIRROR_Y_TRANSFORM",
+    "material_growth_vs_prior": "PASS_WIDTH_GAIN_PLUS_74_AND_PLUS_71_PIXELS",
+    "source_relative_scale": "FAIL_CURRENT_DARK_WIDTH_348_OF_524_AND_312_OF_525_SOURCE_BBOXES_REMAINS_VISIBLY_UNDERSIZED",
+    "source_style_slant": "FAIL_CURRENT_HANGUL_IS_MATERIALLY_FLATTER_LESS_RIGHT_ITALIC_THAN_CANONICAL_TOTAL_RANK",
+    "practical_scale": "FAIL_AT_75_AND_50_PERCENT_CURRENT_TOTAL_RANK_REMAINS_VISIBLY_SMALLER_AND_WEAKER_THAN_SOURCE"
+  },
+  "numeric_false_negative": "Machine containment and size gates pass, but the user-reported scale/style defect remains visible. Visual QA overrides numeric PASS per contract.",
+  "required_rework": [
+    "Re-render both 종합 랭킹 rows from the native-HD clean/source basis; do not upscale the current Korean bitmap.",
+    "Increase source-relative visual width materially while remaining fully inside each exact source text/effect bbox with positive margins.",
+    "Match the canonical strong readable right-italic/slant direction and source-family weight/outline hierarchy more closely.",
+    "Re-run producer numeric gates plus SOURCE/CLEAN/FINAL, RAW/FLIP-Y and practical-scale visual QA, then fresh independent C again."
+  ],
+  "c3_strict_audit": "NOT_RUN_BLOCKED_BY_CONTROLLER_VISUAL_FAIL",
+  "decision": "C244_VISUAL_FAIL_REWORK_REQUIRED",
+  "pre_ingame_export": "BLOCKED_REWORK_REQUIRED",
+  "user_jpg_review": "PENDING_NEW_REWORK",
+  "actual_ingame_validation": "PENDING_NEW_REWORK",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
