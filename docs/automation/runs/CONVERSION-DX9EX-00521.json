@@ -7,12 +7,12 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "2/3",
-  "status": "IMPLEMENTED_PENDING_VALIDATION",
+  "status": "COMPLETE",
   "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-SHADER-IDENTITY-FACADE-001",
   "base_sha": "be1f8657a96b356156cce6c7b2f3a7642bddc961",
   "material_result_sha": "e9250e6a9fe5489822d2da970bcefd67b3170f3b",
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "validation_bearing_result_sha": "9a1d47fdc00f88c118ca7ec1cc96a13bbc8fd91b",
+  "result_sha": "9a1d47fdc00f88c118ca7ec1cc96a13bbc8fd91b",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00521]",
   "summary": "Route R32 CurrentVertexShaderIdentity read/exchange/conditional-restore operations through the behavior-neutral R30 support facade while preserving the fail-closed exchange -> lower draw -> restore-if-empty ordering and atomic memory orders.",
   "changed_paths": [
@@ -23,7 +23,7 @@
     "tools/verify_vr_r31_r32_retirement_guard.py",
     "docs/automation/runs/CONVERSION-DX9EX-00521.json"
   ],
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
@@ -63,5 +63,31 @@
     "no DirectGPU ACK/fence/slot/publication change",
     "no Reset/ResetEx, HUD, recenter, or Present policy change"
   ],
-  "next_action": "Re-run exact-SHA DX9Ex Active Validation and Domain Isolation after aligning the stale R31/R32 retirement guard to the new R30 shader-identity facade. Runtime remains UNTESTED."
+  "next_action": "Select the next bounded R32 lower-owner dependency seam. Prefer read-only base DirectGPU source-surface ownership before any fence/slot publication or reset/lifecycle mutation; runtime remains UNTESTED.",
+  "validation_history": [
+    {
+      "sha": "e9250e6a9fe5489822d2da970bcefd67b3170f3b",
+      "dx9ex_active_run_id": 37624212590,
+      "result": "FAIL",
+      "reason": "stale R31/R32 retirement guard expected direct CurrentVertexShaderIdentity.exchange(0)"
+    },
+    {
+      "sha": "9a1d47fdc00f88c118ca7ec1cc96a13bbc8fd91b",
+      "dx9ex_active_run_id": 37624503650,
+      "domain_isolation_run_id": 37624503676,
+      "result": "PASS",
+      "jobs": {
+        "policy": 112802710503,
+        "host": 112802860192,
+        "game": 112802860296,
+        "full_chain_compile": 112802860517,
+        "package": 112805157254
+      }
+    }
+  ],
+  "package_artifact": {
+    "id": 11483149605,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-9a1d47fdc00f88c118ca7ec1cc96a13bbc8fd91b",
+    "digest": "sha256:0380afa853ce4fe2e8a4d41d7956dc6fada93ad41a764dbea6d0e71025a52f27"
+  }
 }
