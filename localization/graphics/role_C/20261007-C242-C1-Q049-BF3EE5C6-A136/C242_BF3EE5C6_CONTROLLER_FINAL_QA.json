@@ -48,11 +48,15 @@
     "preserved_rows": "PASS: TOP Ghost Car!!/최고 고스트 카!! and GOAL!/골! accepted rows are pixel-exact to the A136 input candidate"
   },
   "c3_strict_audit": "C3_STRICT_PASS",
-  "decision": "C242_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_NEW_INGAME_RETEST",
+  "decision": "C242_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_NEW_INGAME_RETEST",
   "machine_report": "localization/graphics/role_C/20261007-C242-C1-Q049-BF3EE5C6-A136/C242_BF3EE5C6_MACHINE_QA.json",
-  "pre_ingame_export": "PENDING_REFRESH",
+  "pre_ingame_export": "PASS_003_q049_BF3EE5C6.jpg",
   "user_jpg_review": "PENDING",
   "actual_ingame_validation": "PENDING",
   "runtime_validation": "UNTESTED",
-  "forbidden_domains_touched": []
+  "forbidden_domains_touched": [],
+  "pre_ingame_export_run": 37584654542,
+  "pre_ingame_manifest_count": 13,
+  "pre_ingame_mandatory_c3_blocked_count": 10,
+  "pre_ingame_controller_visual_qa": "PASS: final English-original vs current Korean card reviewed in FLIP-Y and RAW; right-lean style, hierarchy, glyph integrity and protected art remain correct"
 }
