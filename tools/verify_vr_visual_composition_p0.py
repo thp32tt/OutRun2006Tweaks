@@ -44,6 +44,7 @@ overlay = read('src/overlay/hooks_overlay.cpp')
 r14 = read('src/vr/d3d9/ex_device_upgrade_r14.cpp')
 runner = read('tools/Run-OutRunVRTest.ps1')
 pcfast = read('tools/Build-OutRunPCFast.ps1')
+binary_contract = read('docs/VR_BINARY_CONTRACT.json')
 
 # Exact historical producer inventory recovered from upstream + R65-R74/R73-era work.
 for token in [
@@ -155,6 +156,13 @@ for token in ['0x69EB4','0x6AC76','0x6B766']:
     require(token, graphics, 'original car-base-shadow call site')
 require('ScopedRenderSemantic semantic(', graphics, 'car shadow exact world semantic scope')
 require('RenderScope::WorldParticle', graphics, 'car shadow world ownership')
+for contract_id, rva in (
+    ('VR-EXE-CAR-BASE-SHADOW-DISPCAR-CALL', '0x00069EB4'),
+    ('VR-EXE-CAR-BASE-SHADOW-O2SP-SELECT-CALL', '0x0006AC76'),
+    ('VR-EXE-CAR-BASE-SHADOW-C2C-SELECT-CALL', '0x0006B766'),
+):
+    require(contract_id, binary_contract, 'canonical car-base-shadow direct-CALL contract')
+    require(rva, binary_contract, 'canonical car-base-shadow direct-CALL RVA')
 
 # F11/ImGui is external UI. It must render without consuming pending game semantic tokens.
 require('ScopedExternalOverlaySemantic semantic(', overlay, 'F11 external semantic guard')

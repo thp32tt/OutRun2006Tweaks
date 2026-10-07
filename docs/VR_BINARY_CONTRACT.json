@@ -113,6 +113,48 @@
           "needle": "RankMarker_Truncate = 0xBB046"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-CAR-BASE-SHADOW-DISPCAR-CALL",
+      "rva": "0x00069EB4",
+      "signatureLength": 1,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8",
+      "purpose": "Canonical DispCarModel_Common car-base-shadow call site. The pinned executable must contain a direct CALL at the exact original-mod hook RVA.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_graphics.cpp",
+          "needle": "DispCarModel_Common_HookAddr = 0x69EB4"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-CAR-BASE-SHADOW-O2SP-SELECT-CALL",
+      "rva": "0x0006AC76",
+      "signatureLength": 1,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8",
+      "purpose": "Canonical O2SP DispSelCarModel car-base-shadow call site. The pinned executable must contain a direct CALL at the exact original-mod hook RVA.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_graphics.cpp",
+          "needle": "DispSelCarModel_HookAddr = 0x6AC76"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-CAR-BASE-SHADOW-C2C-SELECT-CALL",
+      "rva": "0x0006B766",
+      "signatureLength": 1,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8",
+      "purpose": "Canonical C2C Sumo_DispSelCarModel car-base-shadow call site. The pinned executable must contain a direct CALL at the exact original-mod hook RVA.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_graphics.cpp",
+          "needle": "Sumo_DispSelCarModel_HookAddr = 0x6B766"
+        }
+      ]
     }
   ]
 }
