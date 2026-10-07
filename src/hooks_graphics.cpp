@@ -252,8 +252,16 @@ class RestoreCarBaseShadow : public Hook
 		Game::mxPushLoadMatrix(&car->matrix_B0);
 		Game::mxTranslate(0.0f, 0.05f, 0.0f);
 
-		// Xbox C2C would multiply a4 by 0.5, halving the opacity, which on PC made it almost invisible..
-		Game::DrawObjectAlpha_Internal(a1, a4 * Settings::CarBaseShadowOpacity, 0, -1);
+		// Xbox C2C would multiply a4 by 0.5, halving the opacity, which on PC made it almost invisible.
+		// These three original-mod call sites are exact car/world geometry, not
+		// screen overlays. Keep the restored base shadow on the verified world
+		// path so R29/R30 never duplicate it as a head-following alpha effect.
+		{
+			OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
+				OutRunVR::GameSemantic::RenderScope::WorldParticle);
+			Game::DrawObjectAlpha_Internal(
+				a1, a4 * Settings::CarBaseShadowOpacity, 0, -1);
+		}
 		Game::mxPopMatrix();
 	}
 
