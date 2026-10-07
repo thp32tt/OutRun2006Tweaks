@@ -1,6 +1,6 @@
 # C QA PASS - English original vs Korean pre-in-game review
 
-- Numbered C-pass rows: 46
+- Numbered C-pass rows: 50
 - High-risk candidates blocked pending exact-SHA C3_STRICT_PASS: 9
 - Primary English source: Sonic-TV/OR2006Sprites pinned at 3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6
 - Exact stock-original fallback: localization/validation/binary_compare/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip
