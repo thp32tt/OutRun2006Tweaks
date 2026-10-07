@@ -488,7 +488,7 @@ require(
     r31_install,
     "R31 install",
     "const auto r30 = R30InstallStatus();",
-    "const auto renderer = OutRunVRRenderer::R29RendererState();",
+    "const auto renderer = R30SupportRendererInstallStatus();",
     "const bool lifecycleReady =",
     "StateBlockTracker::LifecycleHooksReady();",
     "R22 lifecycle hooks are authoritative; R31 is event-consumer only",
@@ -497,6 +497,14 @@ require(
     "StateBlockRecovery::Clear();",
     "StateBlockTracker::MarkCoverageLost();",
 )
+r30_renderer_status = function_body(
+    r30, "R30SupportRendererInstallStatus() noexcept")
+require(
+    r30_renderer_status,
+    "R30 renderer-status support",
+    "return OutRunVRRenderer::R29RendererState();",
+)
+
 forbid(
     r31_install,
     "R31 install",
