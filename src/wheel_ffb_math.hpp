@@ -305,7 +305,7 @@ namespace WheelFFBMath
     constexpr float DriftCountersteerStartRad = 0.16f;
     constexpr float DriftCountersteerFullRad = 0.42f;
     constexpr float DriftCountersteerMaxBlend = 1.00f;
-    constexpr float DriftCountersteerTorqueScale = 0.90f;
+    constexpr float DefaultCountersteerStrength = 0.90f;
 
     inline float drift_countersteer_blend(
         float bodySlip, float frontSlip, float bodySlide)
