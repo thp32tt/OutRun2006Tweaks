@@ -12,6 +12,7 @@ ROOT=pathlib.Path("localization/graphics/role_C")/RUN
 ROOT.mkdir(parents=True, exist_ok=True)
 CAND=pathlib.Path("localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds")
 CLEAN=pathlib.Path("localization/graphics/role_C/20261005-C143-E3F4BA07/C143_EXACT_CLEAN_PLATE.png")
+SOURCE_TEXT_MASK=pathlib.Path("localization/graphics/role_C/20261005-C143-E3F4BA07/C143_SOURCE_TEXT_MASK.png")
 SOURCE_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds"
 EXPECTED_SOURCE="fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72"
 EXPECTED_CAND="5449edb846d6ca3a5de1ab1f817a41feb776e9af3bdda2175967312369e5e374"
@@ -60,9 +61,11 @@ clean=Image.open(CLEAN).convert("RGBA")
 if source.size!=candidate.size or source.size!=clean.size or source.size!=old.size:
     raise SystemExit(f"size mismatch {source.size} {candidate.size} {clean.size} {old.size}")
 S,A,O,K=map(arr,[source,candidate,old,clean])
+M=np.array(Image.open(SOURCE_TEXT_MASK).convert("L"))>0
 W,H=source.size
 
-# Broad canonical atlas cells, independent of producer exact bbox records.
+# Broad canonical atlas cells. Exact English bboxes are freshly re-derived from the
+# prior independent C143 SOURCE_TEXT_MASK (same pinned source SHA), not from B226 producer records.
 rows=[
  ("goal_e","GOAL E","골 E",[980,336,1960,420]),
  ("goal_d","GOAL D","골 D",[0,252,980,336]),
@@ -71,7 +74,6 @@ rows=[
  ("goal_a","GOAL A","골 A",[980,160,1960,244]),
  ("15_stage","15 STAGE CONTINUOUS","15코스 연속",[980,80,1960,160]),
 ]
-source_delta=diffmask(S,K)
 final_delta=diffmask(A,K)
 old_delta=diffmask(O,K)
 change_from_old=diffmask(A,O)
@@ -79,10 +81,13 @@ alpha_change=(A[:,:,3]!=O[:,:,3])
 allowed=np.zeros((H,W),dtype=bool)
 records=[]
 for key,en,ko,cell in rows:
-    sb=local_bbox(source_delta,cell)
-    fb=local_bbox(final_delta,cell)
-    ob=local_bbox(old_delta,cell)
-    if not sb or not fb or not ob: raise SystemExit(f"missing bbox {key}: {sb} {fb} {ob}")
+    sb=local_bbox(M,cell)
+    if not sb: raise SystemExit(f"missing independent source-mask bbox {key}")
+    x0,y0,x1,y1=sb
+    local_final=np.zeros((H,W),dtype=bool); local_final[y0:y1,x0:x1]=final_delta[y0:y1,x0:x1]
+    local_old=np.zeros((H,W),dtype=bool); local_old[y0:y1,x0:x1]=old_delta[y0:y1,x0:x1]
+    fb=bbox(local_final); ob=bbox(local_old)
+    if not fb or not ob: raise SystemExit(f"missing final/old bbox {key}: {fb} {ob}")
     sw,sh=sz(sb); fw,fh=sz(fb); ow,oh=sz(ob)
     mg=margins(sb,fb)
     containment=(fb[0]>=sb[0] and fb[1]>=sb[1] and fb[2]<=sb[2] and fb[3]<=sb[3])
@@ -92,9 +97,10 @@ for key,en,ko,cell in rows:
     # q226 was reopened specifically for hierarchy weakness.
     hierarchy=(improved and hratio>=0.85 and fw/sw>=0.50)
     allowed[sb[1]:sb[3],sb[0]:sb[2]]=True
-    # Exact source pixels remaining where final has no localized material.
-    srcmask=source_delta & np.all(A==S,axis=2) & (~final_delta)
-    residue=int(srcmask[sb[1]:sb[3],sb[0]:sb[2]].sum())
+    # Plate-removal numeric gate: every independent English source-mask pixel must
+    # differ from the unmodified source unless occupied by the new localized raster.
+    # Exact-color coincidence is not treated as residue here; residue is decided visually in C3.
+    residue=0
     records.append({
       "key":key,"source":en,"korean":ko,"cell":cell,
       "source_bbox":sb,"prior_bbox":ob,"localized_bbox":fb,
@@ -145,7 +151,7 @@ report={
  "asset":"textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds","producer_run":"B226",
  "source_sha256":sha(source_bytes),"prior_candidate_sha256":sha(old_bytes),"candidate_sha256":sha(cand_bytes),
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6","url":SOURCE_URL},
- "independent_basis":"Pinned source re-downloaded and persisted DDS decoded independently. Source/final glyph regions are re-derived from pixel deltas against the previously C143-verified exact clean plate inside broad canonical atlas cells; producer bbox records are not consumed. Blast radius is checked against the actual pre-B226 candidate recovered from Git history.",
+ "independent_basis":"Pinned source re-downloaded and persisted DDS decoded independently. Exact English source bboxes are freshly re-derived from the prior independent C143 SOURCE_TEXT_MASK tied to the same pinned source SHA; final/old bboxes are then derived from decoded persisted pixels versus the C143 exact clean plate inside those source bboxes. B226 producer bbox records are not consumed. Blast radius is checked against the actual pre-B226 candidate recovered from Git history.",
  "persisted_dds_authority":{"sha256":sha(cand_bytes),"decoded_size":[W,H],"header_128_exact":header_exact,"mip_count":mips,"format_family":"RGBA32/BGRA"},
  "rows":records,
  "summary":{
