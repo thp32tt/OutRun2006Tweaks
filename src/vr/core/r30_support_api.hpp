@@ -51,6 +51,13 @@ namespace OutRunVRStereo
     bool R30SupportDirectTransportResourcesReady() noexcept;
     bool R30SupportEnsureDirectTransportResources(
         IDirect3DDevice9* device) noexcept;
+    struct R30SupportDirectTransportSourceSurfaces
+    {
+        IDirect3DSurface9* left = nullptr;
+        IDirect3DSurface9* right = nullptr;
+    };
+    bool R30SupportTryGetDirectTransportSourceSurfaces(
+        R30SupportDirectTransportSourceSurfaces& out) noexcept;
     void R30SupportReleaseDirectAckState() noexcept;
     void R30SupportReleaseDirectTransportInterop() noexcept;
     bool R30SupportTryGetDirectTransportIdentity(

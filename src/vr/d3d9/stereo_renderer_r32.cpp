@@ -442,8 +442,9 @@ namespace OutRunVRStereo
         {
             if (!R13OverlayReadyForTransport())
                 return lowerResolve();
+            R30SupportDirectTransportSourceSurfaces sourceSurfaces{};
             if (!frameId || !R32EnsureDirectResources(device) ||
-                !BackBuffer || !RightEyeSurface)
+                !R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces))
                 return false;
             // R32EnsureDirectResources must run before this cached rejection:
             // host PID/LUID or transport-generation changes invalidate the old
@@ -543,10 +544,11 @@ namespace OutRunVRStereo
             auto& slot = DirectTransportSlots[selected];
             {
                 InternalPassScope guard;
-                const HRESULT leftCopy = device->StretchRect(BackBuffer, nullptr,
+                const HRESULT leftCopy = device->StretchRect(
+                    sourceSurfaces.left, nullptr,
                     slot.leftSurface, nullptr, D3DTEXF_NONE);
                 const HRESULT rightCopy = SUCCEEDED(leftCopy)
-                    ? device->StretchRect(RightEyeSurface, nullptr,
+                    ? device->StretchRect(sourceSurfaces.right, nullptr,
                         slot.rightSurface, nullptr, D3DTEXF_NONE)
                     : leftCopy;
                 if (FAILED(leftCopy) || FAILED(rightCopy))

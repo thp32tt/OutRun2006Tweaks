@@ -445,6 +445,27 @@ forbid(
 )
 
 resolve_direct_r32 = body(r32, "bool R32ResolveDirectTransport(")
+
+require_order(
+    resolve_direct_r32,
+    "R32 DirectGPU source-surface owner facade",
+    "R30SupportDirectTransportSourceSurfaces sourceSurfaces{};",
+    "R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces)",
+    "const std::uint32_t preferred =",
+)
+forbid(
+    resolve_direct_r32,
+    "R32 DirectGPU raw lower source-surface dependency",
+    "StretchRect(BackBuffer",
+    "StretchRect(RightEyeSurface",
+)
+require_order(
+    resolve_direct_r32,
+    "R32 DirectGPU left/right source copy order",
+    "device->StretchRect(\n                    sourceSurfaces.left",
+    "device->StretchRect(sourceSurfaces.right",
+    "const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);",
+)
 require_order(
     resolve_direct_r32,
     "R32 final-owner free-slot scan",

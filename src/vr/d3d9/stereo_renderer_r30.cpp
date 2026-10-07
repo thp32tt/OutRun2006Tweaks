@@ -3317,6 +3317,14 @@ namespace OutRunVRStereo
         return EnsureDirectTransportResources(device);
     }
 
+    bool R30SupportTryGetDirectTransportSourceSurfaces(
+        R30SupportDirectTransportSourceSurfaces& out) noexcept
+    {
+        out.left = BackBuffer;
+        out.right = RightEyeSurface;
+        return out.left != nullptr && out.right != nullptr;
+    }
+
     void R30SupportReleaseDirectAckState() noexcept
     {
         R13ReleaseAckState();

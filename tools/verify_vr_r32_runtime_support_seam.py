@@ -44,6 +44,8 @@ required = (
     "R30SupportDirectTransportIdentity",
     "R30SupportDirectTransportResourcesReady",
     "R30SupportEnsureDirectTransportResources",
+    "R30SupportDirectTransportSourceSurfaces",
+    "R30SupportTryGetDirectTransportSourceSurfaces",
     "R30SupportReleaseDirectAckState",
     "R30SupportReleaseDirectTransportInterop",
     "R30SupportTryGetDirectTransportIdentity",
@@ -116,6 +118,11 @@ delegations = {
     "R30SupportEnsureDirectTransportResources(": (
         "return EnsureDirectTransportResources(device);",
     ),
+    "R30SupportTryGetDirectTransportSourceSurfaces(": (
+        "out.left = BackBuffer;",
+        "out.right = RightEyeSurface;",
+        "return out.left != nullptr && out.right != nullptr;",
+    ),
     "R30SupportReleaseDirectAckState()": (
         "R13ReleaseAckState();",
     ),
@@ -173,6 +180,25 @@ ordered = (
 positions = [invalidate_direct.find(token) for token in ordered]
 if any(pos < 0 for pos in positions) or positions != sorted(positions):
     errors.append("R32 direct interop invalidation order changed")
+
+source_surfaces = body(r30, "R30SupportTryGetDirectTransportSourceSurfaces(")
+if "AddRef(" in source_surfaces:
+    errors.append("R30 DirectGPU source-surface facade must preserve borrowed-pointer lifetime semantics")
+
+resolve_direct = body(r32, "bool R32ResolveDirectTransport(")
+for raw in ("BackBuffer", "RightEyeSurface"):
+    if re.search(rf"\b{raw}\b", resolve_direct):
+        errors.append(f"R32 DirectGPU resolve retained raw lower source surface: {raw}")
+source_order = (
+    "R30SupportDirectTransportSourceSurfaces sourceSurfaces{};",
+    "R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces)",
+    "const std::uint32_t preferred =",
+    "device->StretchRect(\n                    sourceSurfaces.left",
+    "device->StretchRect(sourceSurfaces.right",
+)
+source_positions = [resolve_direct.find(token) for token in source_order]
+if any(pos < 0 for pos in source_positions) or source_positions != sorted(source_positions):
+    errors.append("R32 DirectGPU source-surface facade/check/copy ordering changed")
 
 fail_closed = body(r32, "HRESULT R32LowerFailClosed(")
 shader_order = (
