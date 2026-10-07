@@ -1912,6 +1912,8 @@ struct NativeProgrammableShaderOutputResourceBehaviorReadiness {
     bool inputValid{};
     bool textureReviewReady{};
     bool textureSnapshotMatches{};
+    // R302 requires the stored R261 token to match its reconstructed payload.
+    bool texturePayloadSnapshotMatches{};
     bool surfacePairReady{};
     bool surfacePairSnapshotMatches{};
     bool surfaceBindingReady{};

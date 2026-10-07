@@ -10461,6 +10461,37 @@ std::uint64_t recompute_programmable_resource_behavior_payload_snapshot(
     return token == 0 ? 1 : token;
 }
 
+// R302 reconstructs the complete R261 review payload before R262 may consume
+// its stored snapshot token. This keeps derived texture receipts fail-closed
+// against in-memory payload drift without granting any activation authority.
+std::uint64_t recompute_programmable_texture_resource_behavior_payload_snapshot(
+    const NativeProgrammableShaderTextureResourceBehaviorReadiness&
+        textureBehavior) noexcept {
+    if (textureBehavior.kind ==
+        NativeProgrammableShaderDrawCandidateKind::None)
+        return 0;
+
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(
+        token, static_cast<std::uint32_t>(textureBehavior.kind));
+    token = mix_readiness_snapshot_token(
+        token, textureBehavior.indexed ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, textureBehavior.sourceRevalidationSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, textureBehavior.geometrySnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, textureBehavior.geometryPayloadSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, textureBehavior.requiredTextureMask);
+    token = mix_readiness_snapshot_token(
+        token, textureBehavior.textureStageSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, textureBehavior.missingResourceScopeMask);
+    token = mix_readiness_snapshot_token(token, 0x261u);
+    return token == 0 ? 1 : token;
+}
+
 } // namespace
 
 NativeProgrammableShaderResourceBehaviorReadiness
@@ -10820,6 +10851,11 @@ compose_programmable_output_resource_behavior_readiness(
         out.textureReviewReady &&
         textureBehavior.reviewSnapshotToken ==
             textureBehaviorSnapshotToken;
+    out.texturePayloadSnapshotMatches =
+        out.textureReviewReady &&
+        textureBehavior.reviewSnapshotToken ==
+            recompute_programmable_texture_resource_behavior_payload_snapshot(
+                textureBehavior);
 
     out.surfacePairReady =
         surfacePair.ready &&
@@ -10848,10 +10884,12 @@ compose_programmable_output_resource_behavior_readiness(
     out.geometryResourceBehaviorExact =
         out.textureReviewReady &&
         out.textureSnapshotMatches &&
+        out.texturePayloadSnapshotMatches &&
         textureBehavior.geometryResourceBehaviorExact;
     out.textureResourceBehaviorExact =
         out.textureReviewReady &&
         out.textureSnapshotMatches &&
+        out.texturePayloadSnapshotMatches &&
         textureBehavior.textureResourceBehaviorExact;
     out.outputResourceBehaviorExact =
         out.surfacePairReady &&
@@ -10872,12 +10910,14 @@ compose_programmable_output_resource_behavior_readiness(
     out.diagnosticOnly = true;
     out.boundaryPreserved =
         textureBehavior.boundaryPreserved &&
+        out.texturePayloadSnapshotMatches &&
         out.diagnosticOnly &&
         out.fullResourceBehaviorProofPresent;
     out.reviewReady =
         out.inputValid &&
         out.textureReviewReady &&
         out.textureSnapshotMatches &&
+        out.texturePayloadSnapshotMatches &&
         out.fullResourceBehaviorProofPresent &&
         out.boundaryPreserved;
 
@@ -10890,6 +10930,8 @@ compose_programmable_output_resource_behavior_readiness(
             token, out.sourceRevalidationSnapshotToken);
         token = mix_readiness_snapshot_token(
             token, out.textureBehaviorSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.texturePayloadSnapshotMatches ? 1u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.surfacePairSnapshotToken);
         token = mix_readiness_snapshot_token(

@@ -5358,6 +5358,34 @@ int main()
                 r261IndexedTextureResourceBehavior.reviewSnapshotToken),
         "R261 indexed texture resource behavior closes supplied texture scope while output F18 remains fail-closed");
 
+    auto r302TamperedR261ForOutputBehavior =
+        r261IndexedTextureResourceBehavior;
+    r302TamperedR261ForOutputBehavior.requiredTextureMask ^= 0x2u;
+    const auto r302TamperedOutputResourceBehavior =
+        outrun::vr::dx11::
+            compose_programmable_output_resource_behavior_readiness(
+                r302TamperedR261ForOutputBehavior,
+                r302TamperedR261ForOutputBehavior.reviewSnapshotToken,
+                d3d.context, d3d.device,
+                r262SurfacePair, r262SurfacePair.snapshotToken,
+                r262SurfaceBinding,
+                r262OutputColorSurface, r262OutputDepthSurface,
+                r262SurfaceBindingReady.snapshotToken);
+    require(
+        r302TamperedOutputResourceBehavior.textureReviewReady &&
+        r302TamperedOutputResourceBehavior.textureSnapshotMatches &&
+        !r302TamperedOutputResourceBehavior.texturePayloadSnapshotMatches &&
+        !r302TamperedOutputResourceBehavior.geometryResourceBehaviorExact &&
+        !r302TamperedOutputResourceBehavior.textureResourceBehaviorExact &&
+        r302TamperedOutputResourceBehavior.outputResourceBehaviorExact &&
+        !r302TamperedOutputResourceBehavior.fullResourceBehaviorProofPresent &&
+        (r302TamperedOutputResourceBehavior.missingResourceScopeMask & 0x3u) ==
+            0x3u &&
+        !r302TamperedOutputResourceBehavior.boundaryPreserved &&
+        !r302TamperedOutputResourceBehavior.reviewReady &&
+        r302TamperedOutputResourceBehavior.reviewSnapshotToken == 0,
+        "R302 rejects R261 payload drift before minting R262 full resource proof");
+
     const auto r262IndexedOutputResourceBehavior =
         outrun::vr::dx11::
             compose_programmable_output_resource_behavior_readiness(
@@ -5372,6 +5400,7 @@ int main()
         r262IndexedOutputResourceBehavior.inputValid &&
         r262IndexedOutputResourceBehavior.textureReviewReady &&
         r262IndexedOutputResourceBehavior.textureSnapshotMatches &&
+        r262IndexedOutputResourceBehavior.texturePayloadSnapshotMatches &&
         r262IndexedOutputResourceBehavior.surfacePairReady &&
         r262IndexedOutputResourceBehavior.surfacePairSnapshotMatches &&
         r262IndexedOutputResourceBehavior.surfaceBindingReady &&
