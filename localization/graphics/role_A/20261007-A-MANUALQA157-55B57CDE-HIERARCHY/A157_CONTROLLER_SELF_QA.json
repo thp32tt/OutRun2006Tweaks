@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A157",
+  "timestamp_kst": "2026-10-07 11:10 KST",
+  "queue_index": 161,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "selection": {
+    "reason": "No active A-owned P0/P1/C-returned REWORK/RENDER_READY/ONE_STAGE item remained after refreshing the authoritative backlog/queue. Current PRE_INGAME English-original card #017 exposed a concrete source-hierarchy/alignment false negative in C201-approved A56.",
+    "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/017_q161_55B57CDE.jpg",
+    "prior_c_status": "C201_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812"
+  },
+  "defect": {
+    "tags": [
+      "TEXT_SCALE_MATERIALLY_UNDERSIZED_VS_SOURCE",
+      "SOURCE_LEFT_ALIGNMENT_MISMATCH",
+      "SOURCE_HIERARCHY_MISMATCH"
+    ],
+    "evidence": "A56 used an extra 4px-per-side inset inside each already block-safe BC3 interior and centered Korean within the English source bbox. Most Korean rows were 40px high, LEO fell to 25px, while English source rows are 48-54px; PRE_INGAME #017 visibly shows small floating centered Korean labels."
+  },
+  "material_rework": {
+    "method": "Reuse pinned canonical 2048x2048 DXT5 source/atlas and A56 exact source-bbox clean geometry. Render all 38 nationality/zodiac labels freshly at native resolution using Noto Sans CJK KR Black, maximum positive-margin BC3-safe source-height fit and source-left anchoring; horizontally condense only when a Korean string would exceed the exact source width; never enlarge to an English-width quota.",
+    "prior_candidate_sha256": "78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812",
+    "candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+    "height_range_before_px": [
+      25,
+      44
+    ],
+    "height_range_after_px": [
+      46,
+      52
+    ],
+    "source_height_range_px": [
+      48,
+      54
+    ],
+    "horizontal_scale_range": [
+      0.5682,
+      1
+    ]
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "38/38 PASS",
+    "decoded_bbox_exact_match": "38/38 PASS",
+    "height_improved_rows": "38/38",
+    "height_range_px": "46-52 vs source 48-54, prior 25-44",
+    "source_left_anchor_improved_rows": "38/38",
+    "near_source_height_rows": "38/38",
+    "outside": 0,
+    "alpha_outside": 0,
+    "introduced_visible_outside": 0,
+    "source_residue": 0,
+    "decoded_alpha_extra": 0,
+    "decoded_alpha_missing": 0,
+    "overlap": 0,
+    "touch": 0,
+    "format": "DXT5",
+    "raw_orientation": "mirror_y"
+  },
+  "ordered_generation_gate": {
+    "1_source_text_removed_plate_restored": "PASS_A56_EXACT_BBOX_CLEAN_REUSED",
+    "2_source_transform_direction": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "3_no_unnecessary_undersizing": "PASS_38_OF_38_HEIGHT_IMPROVED_AND_NEAR_SOURCE",
+    "4_weight_outline_shadow": "PASS_NATIVE_BLACK_SOURCE_DARK_TEAL_FAMILY",
+    "5_no_clipped_pixels": "PASS_38_OF_38_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_OUTSIDE_CHANGE",
+    "7_flip_y_and_raw": "PASS_CONTROLLER_VISUAL_BOTH",
+    "8_immediate_readability_vs_source": "PASS_CONTROLLER_VISUAL_HIERARCHY_RESTORED"
+  },
+  "evidence": {
+    "worker_report": "localization/graphics/role_A/20261007-A-MANUALQA157-55B57CDE-HIERARCHY/A157_55B57CDE_REPORT.json",
+    "readable_compare": "localization/graphics/role_A/20261007-A-MANUALQA157-55B57CDE-HIERARCHY/A157_55B57CDE_SOURCE_CLEAN_FINAL.jpg",
+    "raw_compare": "localization/graphics/role_A/20261007-A-MANUALQA157-55B57CDE-HIERARCHY/A157_55B57CDE_FINAL_RAW_MIRROR_Y.jpg",
+    "prior_pre_ingame_card": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/017_q161_55B57CDE.jpg",
+    "github_worker_run": 37560161154,
+    "worker_output_commit": "b9b85605cb13cbaaa4c436ba2d31aa2378e9dc61"
+  },
+  "controller_visual_findings": [
+    "A56 Korean rows are visibly undersized and centered within wide English source envelopes, weakening the two-column hierarchy.",
+    "A157 restores near-source text height on all 38 rows and source-left anchoring while keeping natural Hangul width unless condensation is required by the exact source ceiling.",
+    "SOURCE/A56/CLEAN/A157 contacts show complete source removal and no broken Hangul, clipping, collision, residue, or foreign-art intrusion.",
+    "RAW mirror-Y view is consistent with the canonical storage orientation."
+  ],
+  "controller_visual_qa": "PASS_SOURCE_A56_CLEAN_A157_READABLE_AND_RAW",
+  "producer_status": "A157_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

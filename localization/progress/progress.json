@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 10:51 KST",
+  "updated_at_kst": "2026-10-07T11:10:33+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -2998,7 +2998,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED. B218 q228 E7F6E9B7 is newly reopened from C144 under the newer 8-step visual gate and now awaits fresh independent C on candidate 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808. B219 q232 EBFC709F is reopened from C135 for source-left alignment/weight hierarchy and awaits fresh independent C on candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221. B220 q164 5B65E08C is reopened from C108 for source-width hierarchy/left alignment and awaits fresh independent C on candidate 65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f. B221 q92 1A43E9D9 is reopened from C125 for source-relative width/alignment and prior edge-touch risk; fresh independent C is required on candidate c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a. B227 q222 DDF0392A now awaits fresh independent C on 601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f; current producer self-QA PASS does not carry forward C159 because bytes changed. A156 q147 39BCA907 is reopened from C192 for forced-width Hangul distortion and now awaits fresh independent C on ab002e4f172ebe72b593914b92661c4f8137d50f8b073a22005fd175cff0153e; producer controller visual QA PASS does not carry forward C192 because bytes changed. B228 q230 E95DA5 now awaits fresh independent C on a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f; prior C149 is superseded because two ordinary explanatory help rows were materially localized.",
+  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED. B218 q228 E7F6E9B7 is newly reopened from C144 under the newer 8-step visual gate and now awaits fresh independent C on candidate 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808. B219 q232 EBFC709F is reopened from C135 for source-left alignment/weight hierarchy and awaits fresh independent C on candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221. B220 q164 5B65E08C is reopened from C108 for source-width hierarchy/left alignment and awaits fresh independent C on candidate 65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f. B221 q92 1A43E9D9 is reopened from C125 for source-relative width/alignment and prior edge-touch risk; fresh independent C is required on candidate c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a. B227 q222 DDF0392A now awaits fresh independent C on 601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f; current producer self-QA PASS does not carry forward C159 because bytes changed. A156 q147 39BCA907 is reopened from C192 for forced-width Hangul distortion and now awaits fresh independent C on ab002e4f172ebe72b593914b92661c4f8137d50f8b073a22005fd175cff0153e; producer controller visual QA PASS does not carry forward C192 because bytes changed. B228 q230 E95DA5 now awaits fresh independent C on a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f; prior C149 is superseded because two ordinary explanatory help rows were materially localized. A157 q161 55B57CDE now awaits fresh independent C on 66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d; prior C201 is superseded because bytes changed.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -3749,5 +3749,42 @@
     "machine_qa": "PASS",
     "controller_visual_qa": "PASS",
     "runtime_validation": "UNTESTED"
+  },
+  "a157_55b57cde": {
+    "run": "A157",
+    "timestamp_kst": "2026-10-07 11:10 KST",
+    "queue_index": 161,
+    "asset": "55B57CDE",
+    "trigger": "PRE_INGAME_017_C201_A56_UNDERSIZED_CENTERED_HIERARCHY_FALSE_NEGATIVE",
+    "prior_c_status": "C201_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812",
+    "candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+    "github_worker_run": 37560161154,
+    "worker_output_commit": "b9b85605cb13cbaaa4c436ba2d31aa2378e9dc61",
+    "rework": "38 nationality/zodiac rows: remove extra 4px-per-side BC3 inset + centering; maximum positive-margin block-safe source-height fit, source-left anchor, native Noto Sans CJK KR Black, condense only when width requires",
+    "machine_qa": {
+      "bbox_size_positive_margin": "38/38 PASS",
+      "decoded_bbox_exact_match": "38/38 PASS",
+      "height_improved_rows": "38/38",
+      "height_range_px": "46-52 vs source 48-54, prior 25-44",
+      "source_left_anchor_improved_rows": "38/38",
+      "near_source_height_rows": "38/38",
+      "outside": 0,
+      "alpha_outside": 0,
+      "introduced_visible_outside": 0,
+      "source_residue": 0,
+      "decoded_alpha_extra": 0,
+      "decoded_alpha_missing": 0,
+      "overlap": 0,
+      "touch": 0,
+      "format": "DXT5",
+      "raw_orientation": "mirror_y"
+    },
+    "controller_visual_qa": "PASS_SOURCE_A56_CLEAN_A157_READABLE_AND_RAW",
+    "producer_status": "A157_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }
