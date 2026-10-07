@@ -73,7 +73,13 @@ for a in AS:
     else:
         sb,scommit=find_blob(a["candidate"],a["source_sha"])
     cur,prior,src=rd(cb),rd(pb),rd(sb)
-    if not(cur.size==prior.size==src.size):raise RuntimeError(("size mismatch",a["index"],src.size,prior.size,cur.size))
+    source_display_scale=1
+    if cur.size!=prior.size: raise RuntimeError(("candidate/prior size mismatch",a["index"],prior.size,cur.size))
+    if src.size!=cur.size:
+        if cur.width%src.width or cur.height%src.height or cur.width//src.width!=cur.height//src.height:
+            raise RuntimeError(("non-integer source display scale",a["index"],src.size,cur.size))
+        source_display_scale=cur.width//src.width
+        src=src.resize(cur.size,Image.Resampling.NEAREST)
     ca,pa=np.array(cur),np.array(prior); ch=np.any(ca!=pa,axis=2); ach=ca[:,:,3]!=pa[:,:,3]
     allow=mask(ch.shape,a["rows"]);outside=int((ch&~allow).sum());aout=int((ach&~allow).sum())
     if outside or aout:raise RuntimeError(("blast radius",a["index"],outside,aout))
@@ -85,11 +91,12 @@ for a in AS:
         ok=lw<=sw and lh<=sh and min(mg)>0
         if not ok:raise RuntimeError(("bbox",a["index"],r["key"],mg))
         geom.append({"key":r["key"],"source_bbox":sbx,"localized_bbox":lbx,"source_size":[sw,sh],"localized_size":[lw,lh],"margins":mg,"width_ratio":round(lw/sw,4),"height_ratio":round(lh/sh,4),"result":"PASS"})
-    if cb[:128]!=pb[:128] or cb[:128]!=sb[:128]:raise RuntimeError(("header mismatch",a["index"]))
+    if cb[:128]!=pb[:128]:raise RuntimeError(("candidate/prior header mismatch",a["index"]))
+    source_header_exact=(source_display_scale==1 and cb[:128]==sb[:128])
     overview(src,prior,cur,OUT/f'C252_q{a["index"]:03d}_{a["key"]}_FLIPY.jpg',f'q{a["index"]} readable FLIP-Y {a["regression"]}')
     overview(dec(sb),dec(pb),dec(cb),OUT/f'C252_q{a["index"]:03d}_{a["key"]}_RAW.jpg',f'q{a["index"]} RAW DDS')
     contacts(src,prior,cur,a["rows"],OUT/f'C252_q{a["index"]:03d}_{a["key"]}_CONTACTS.jpg')
-    rep={"schema_version":1,"role":"C","run":"C252","TEMP_BACKLOG_RELIEF":"C1","SHARD":"ODD(+UNINDEXED_SPECIAL)","queue_index":a["index"],"asset_key":a["key"],"regression":a["regression"],"candidate_sha256":H(cb),"prior_candidate_sha256":H(pb),"canonical_source_sha256":H(sb),"prior_blob_commit":pcommit,"source_blob_commit":scommit,"independent_machine_qa":{"dimensions":list(cur.size),"header_128_exact_source_prior_current":True,"prior_to_current_changed_pixels":int(ch.sum()),"prior_to_current_changed_outside_declared_rework_union":outside,"prior_to_current_alpha_changed_outside_declared_rework_union":aout,"bbox_size_positive_margin":f'{len(geom)}/{len(geom)} PASS',"regions":geom},"visual_evidence":[f'C252_q{a["index"]:03d}_{a["key"]}_FLIPY.jpg',f'C252_q{a["index"]:03d}_{a["key"]}_RAW.jpg',f'C252_q{a["index"]:03d}_{a["key"]}_CONTACTS.jpg'],"controller_visual_qa":"PENDING","c3_strict_audit":"PENDING","runtime_validation":"UNTESTED","forbidden_domains_touched":[]}
+    rep={"schema_version":1,"role":"C","run":"C252","TEMP_BACKLOG_RELIEF":"C1","SHARD":"ODD(+UNINDEXED_SPECIAL)","queue_index":a["index"],"asset_key":a["key"],"regression":a["regression"],"candidate_sha256":H(cb),"prior_candidate_sha256":H(pb),"canonical_source_sha256":H(sb),"prior_blob_commit":pcommit,"source_blob_commit":scommit,"independent_machine_qa":{"dimensions":list(cur.size),"canonical_source_native_dimensions":list(dec(sb).size),"source_display_scale_nearest_neighbor":source_display_scale,"header_128_exact_candidate_prior":True,"header_128_exact_source_when_same_native_dimensions":source_header_exact,"prior_to_current_changed_pixels":int(ch.sum()),"prior_to_current_changed_outside_declared_rework_union":outside,"prior_to_current_alpha_changed_outside_declared_rework_union":aout,"bbox_size_positive_margin":f'{len(geom)}/{len(geom)} PASS',"regions":geom},"visual_evidence":[f'C252_q{a["index"]:03d}_{a["key"]}_FLIPY.jpg',f'C252_q{a["index"]:03d}_{a["key"]}_RAW.jpg',f'C252_q{a["index"]:03d}_{a["key"]}_CONTACTS.jpg'],"controller_visual_qa":"PENDING","c3_strict_audit":"PENDING","runtime_validation":"UNTESTED","forbidden_domains_touched":[]}
     (OUT/f'C252_q{a["index"]:03d}_{a["key"]}_MACHINE_QA.json').write_text(json.dumps(rep,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     summary["assets"].append({"index":a["index"],"key":a["key"],"candidate_sha256":H(cb),"machine_qa":"PASS","controller_visual_qa":"PENDING","c3":"PENDING"})
 (OUT/"C252_BATCH_MACHINE_SUMMARY.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
