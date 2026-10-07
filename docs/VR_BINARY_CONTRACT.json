@@ -1149,6 +1149,48 @@
           "needle": "0xBE45D"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-LEGACY-SCREENHUD-CLIP-460F1",
+      "rva": "0x000460F1",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e88a71feff",
+      "purpose": "Canonical legacy R65-R74/R73-era ScreenHud clip bridge. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x460F1"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-LEGACY-SCREENHUD-CLIP-463D6",
+      "rva": "0x000463D6",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8a56efeff",
+      "purpose": "Canonical legacy R65-R74/R73-era ScreenHud clip bridge. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x463D6"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-LEGACY-SCREENHUD-CLIP-46410",
+      "rva": "0x00046410",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e86b6efeff",
+      "purpose": "Canonical legacy R65-R74/R73-era ScreenHud clip bridge. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x46410"
+        }
+      ]
     }
   ]
 }

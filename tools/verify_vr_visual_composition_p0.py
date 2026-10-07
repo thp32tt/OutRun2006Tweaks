@@ -138,6 +138,23 @@ require('ExactScreenHudRight_ClipSpriteCalls', ui,
 require('ExactScreenHudRight_putClipSprite', ui,
         'DispRank right-side ScreenHud wrapper')
 
+# Canonical executable closure for the three legacy R65-R74/R73-era
+# ScreenHud clip bridges that were restored during the refactor-divergence
+# recovery. These source literals previously had no pinned EXE byte contract.
+for contract_id, rva in (
+    ('VR-EXE-LEGACY-SCREENHUD-CLIP-460F1', '0x000460F1'),
+    ('VR-EXE-LEGACY-SCREENHUD-CLIP-463D6', '0x000463D6'),
+    ('VR-EXE-LEGACY-SCREENHUD-CLIP-46410', '0x00046410'),
+):
+    require(contract_id, binary_contract,
+            'canonical legacy ScreenHud direct-CALL contract')
+    require(rva, binary_contract,
+            'canonical legacy ScreenHud direct-CALL RVA')
+require('ExactScreenHud_ClipSpriteCalls', ui,
+        'legacy ScreenHud clip producer set')
+require('ExactScreenHud_putClipSprite', ui,
+        'legacy ScreenHud exact producer wrapper')
+
 # Canonical executable closure for the remaining direct SCREEN_HUD clip producers.
 # This closes the source-only gap for REV/gear, C2C warning/slipstream,
 # Ghost/You/Diff and the pre-result TimeAttack calls. All are exact canonical
