@@ -696,6 +696,43 @@ std::uint64_t r286_production_observation_snapshot_token(
     return token == 0 ? 1 : token;
 }
 
+std::uint64_t r288_programmable_translation_admission_snapshot_token(
+    const NativeProgrammableShaderTranslationAdmissionEvidence&
+        admission) noexcept {
+    if (!admission.reviewReady)
+        return 0;
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(token, admission.cacheKey);
+    token = mix_readiness_snapshot_token(
+        token, admission.backendOwnerGeneration);
+    token = mix_readiness_snapshot_token(
+        token, admission.productionObservationSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, admission.translatedSemanticReceiptSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, admission.productionObservationReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, admission.productionObservationSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, admission.translatedSemanticReceiptReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, admission.translatedSemanticReceiptSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, admission.cacheIdentityMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, admission.translationObjectReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, admission.objectBindingAuthorized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, admission.nativeDrawPathActivationAllowed ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, admission.drawDispatchAuthorized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, admission.boundaryPreserved ? 1u : 0u);
+    token = mix_readiness_snapshot_token(token, 0x288u);
+    return token == 0 ? 1 : token;
+}
+
 HRESULT create_device(
     IDXGIAdapter* adapter,
     UINT flags,
@@ -5680,6 +5717,157 @@ observe_programmable_shader_production_source_evidence_chain(
         out.reviewSnapshotToken =
             r286_production_observation_snapshot_token(out);
     return out;
+}
+
+bool validate_programmable_shader_production_observation_snapshot(
+    const NativeProgrammableShaderProductionObservationEvidence& observation,
+    std::uint64_t reviewSnapshotToken) noexcept {
+    if (!observation.reviewReady ||
+        !observation.boundaryPreserved ||
+        !observation.diagnosticOnly ||
+        observation.objectBindingAuthorized ||
+        observation.nativeDrawPathActivationAllowed ||
+        observation.drawDispatchAuthorized ||
+        reviewSnapshotToken == 0 ||
+        observation.reviewSnapshotToken != reviewSnapshotToken ||
+        !observation.semanticHandoffReady ||
+        !observation.semanticHandoffSnapshotMatches ||
+        !observation.semanticHandoff.reviewReady ||
+        observation.semanticHandoff.reviewSnapshotToken !=
+            observation.semanticHandoffSnapshotToken ||
+        !observation.semanticHandoff.translatedSemanticReceiptReady ||
+        !observation.semanticHandoff.translatedSemanticReceiptSnapshotMatches)
+        return false;
+
+    const auto& receipt =
+        observation.semanticHandoff.translatedSemanticReceipt;
+    if (!receipt.reviewReady ||
+        receipt.reviewSnapshotToken !=
+            observation.semanticHandoff.translatedSemanticReceiptSnapshotToken ||
+        !validate_programmable_shader_translated_semantic_receipt_snapshot(
+            receipt, receipt.reviewSnapshotToken))
+        return false;
+
+    return r286_production_observation_snapshot_token(observation) ==
+        reviewSnapshotToken;
+}
+
+NativeProgrammableShaderTranslationAdmissionEvidence
+seal_programmable_shader_translation_admission(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderProductionObservationEvidence& observation,
+    std::uint64_t productionObservationSnapshotToken) noexcept {
+    NativeProgrammableShaderTranslationAdmissionEvidence out{};
+    out.diagnosticOnly = true;
+    out.cacheKey = sourceIdentity.cacheKey;
+    out.backendOwnerGeneration = observation.backendOwnerGeneration;
+    out.productionObservationSnapshotToken =
+        productionObservationSnapshotToken;
+    out.translatedSemanticReceiptSnapshotToken =
+        observation.semanticHandoff.translatedSemanticReceipt.reviewSnapshotToken;
+
+    out.inputValid =
+        sourceIdentity.exact_identity() &&
+        !sourceIdentity.translationImplemented &&
+        productionObservationSnapshotToken != 0;
+    out.sourceIdentityExact =
+        sourceIdentity.exact_identity() &&
+        !sourceIdentity.translationImplemented;
+    out.productionObservationReady =
+        observation.reviewReady &&
+        observation.boundaryPreserved &&
+        observation.diagnosticOnly;
+    out.productionObservationSnapshotMatches =
+        out.productionObservationReady &&
+        validate_programmable_shader_production_observation_snapshot(
+            observation, productionObservationSnapshotToken);
+
+    const auto& receipt =
+        observation.semanticHandoff.translatedSemanticReceipt;
+    out.translatedSemanticReceiptReady =
+        observation.semanticHandoff.translatedSemanticReceiptReady &&
+        receipt.reviewReady &&
+        receipt.boundaryPreserved &&
+        receipt.diagnosticOnly;
+    out.translatedSemanticReceiptSnapshotMatches =
+        out.translatedSemanticReceiptReady &&
+        out.translatedSemanticReceiptSnapshotToken != 0 &&
+        validate_programmable_shader_translated_semantic_receipt_snapshot(
+            receipt, out.translatedSemanticReceiptSnapshotToken);
+    out.cacheIdentityMatches =
+        observation.cacheKey == sourceIdentity.cacheKey &&
+        observation.semanticHandoff.cacheKey == sourceIdentity.cacheKey &&
+        receipt.cacheKey == sourceIdentity.cacheKey;
+    out.translationObjectReady =
+        observation.semanticHandoff.translationObjectReady &&
+        observation.semanticHandoff.translationObjectSnapshotMatches &&
+        receipt.translationObjectReady &&
+        receipt.translationObjectSnapshotMatches;
+
+    out.objectBindingAuthorized =
+        observation.objectBindingAuthorized ||
+        observation.semanticHandoff.objectBindingAuthorized;
+    out.nativeDrawPathActivationAllowed =
+        observation.nativeDrawPathActivationAllowed ||
+        observation.semanticHandoff.nativeDrawPathActivationAllowed;
+    out.drawDispatchAuthorized =
+        observation.drawDispatchAuthorized ||
+        observation.semanticHandoff.drawDispatchAuthorized;
+
+    out.boundaryPreserved =
+        out.inputValid &&
+        out.sourceIdentityExact &&
+        out.productionObservationSnapshotMatches &&
+        out.translatedSemanticReceiptSnapshotMatches &&
+        out.cacheIdentityMatches &&
+        out.translationObjectReady &&
+        !out.objectBindingAuthorized &&
+        !out.nativeDrawPathActivationAllowed &&
+        !out.drawDispatchAuthorized &&
+        out.diagnosticOnly;
+    out.reviewReady =
+        out.productionObservationReady &&
+        out.translatedSemanticReceiptReady &&
+        out.boundaryPreserved;
+    if (out.reviewReady)
+        out.reviewSnapshotToken =
+            r288_programmable_translation_admission_snapshot_token(out);
+    return out;
+}
+
+bool validate_programmable_shader_translation_admission_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderProductionObservationEvidence& observation,
+    std::uint64_t productionObservationSnapshotToken,
+    const NativeProgrammableShaderTranslationAdmissionEvidence& admission,
+    std::uint64_t reviewSnapshotToken) noexcept {
+    if (!admission.reviewReady ||
+        !admission.boundaryPreserved ||
+        !admission.diagnosticOnly ||
+        admission.objectBindingAuthorized ||
+        admission.nativeDrawPathActivationAllowed ||
+        admission.drawDispatchAuthorized ||
+        reviewSnapshotToken == 0 ||
+        admission.reviewSnapshotToken != reviewSnapshotToken)
+        return false;
+
+    const auto current =
+        seal_programmable_shader_translation_admission(
+            sourceIdentity,
+            observation,
+            productionObservationSnapshotToken);
+    if (!current.reviewReady ||
+        current.cacheKey != admission.cacheKey ||
+        current.backendOwnerGeneration != admission.backendOwnerGeneration ||
+        current.productionObservationSnapshotToken !=
+            admission.productionObservationSnapshotToken ||
+        current.translatedSemanticReceiptSnapshotToken !=
+            admission.translatedSemanticReceiptSnapshotToken ||
+        current.reviewSnapshotToken != reviewSnapshotToken)
+        return false;
+
+    return r288_programmable_translation_admission_snapshot_token(admission) ==
+        reviewSnapshotToken;
 }
 
 bool NativeFixedFunctionPipelineBundle::initialize(
