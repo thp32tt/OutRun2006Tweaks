@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 08:40 KST",
+  "updated_at_kst": "2026-10-07 09:38 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -3570,5 +3570,20 @@
     "qa": "3/3 bbox/size/positive-margin; outside/alpha/protected=0; BGRA raw mirror_y; controller visual PASS",
     "status": "PENDING_FRESH_C_USER_JPG_INGAME",
     "runtime_validation": "UNTESTED"
+  },
+  "a154_59a79158": {
+    "run": "A154",
+    "timestamp_kst": "2026-10-07 09:38 KST",
+    "queue_index": 163,
+    "asset": "59A79158",
+    "trigger": "PRE_INGAME_018_LOWRES_NEAREST_UPSCALE_AND_SOURCE_WEIGHT_FALSE_NEGATIVE",
+    "prior_candidate_sha256": "1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583",
+    "candidate_sha256": "201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6",
+    "rework": "24 stage labels direct native fs42 Bold, 1px weight, source dark gray, 0.92 condensed, left +2px; no nearest-neighbor upscale",
+    "qa": "24/24 bbox/size/positive-margin; width improved 24/24; clean/final validators PASS; outside/alpha/protected/residue/render-outside/overlap/touch=0; exact BGRA header/raw mirror_y; controller row/raw PASS",
+    "producer_status": "A154_NATIVE_HD_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }
