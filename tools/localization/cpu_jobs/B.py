@@ -27,9 +27,13 @@ SOURCE_SHA="bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364"
 BEFORE_SHA="c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e"
 SOURCE_COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
 SOURCE_URL=f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{SOURCE_COMMIT}/Release/spr_sprani_selector_cvt_Exst/411827E_512x512.dds"
+CURRENT_INTERMEDIATE_SHA="badd611286b63356ea3715f0efd5aafd60241d40544a11fda4d4635a8acde9c3"
+BASE_C87_COMMIT="4b256ba6927c11a6922f63290eab7c67216a217d"
+BASE_C87_URL=f"https://raw.githubusercontent.com/thp32tt/OutRun2006Tweaks/{BASE_C87_COMMIT}/localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds"
 
 tmp=Path("/tmp/b234"); tmp.mkdir(exist_ok=True)
 src_dds=tmp/"source.dds"; urllib.request.urlretrieve(SOURCE_URL,src_dds)
+base_dds=tmp/"c87_base.dds"; urllib.request.urlretrieve(BASE_C87_URL,base_dds)
 
 def sha(b): return hashlib.sha256(b).hexdigest()
 def decode(b):
@@ -59,7 +63,7 @@ def layer_from_old_vs_clean(oa,ca,bb):
     arr[dm]=o[dm]
     im=Image.fromarray(arr.astype(np.uint8),"RGBA").crop(tuple(b))
     return im,b,dm
-def right_shear_layer(im, visual_shear=0.18):
+def right_shear_layer(im, visual_shear=0.26):
     # PIL uses inverse mapping; negative coefficient produces readable right lean.
     pad=10
     base=Image.new("RGBA",(im.width+pad*2,im.height+pad*2),(0,0,0,0))
@@ -99,7 +103,7 @@ new_masks=[]
 for k in keys:
     r=rows[k]; bb=r["original_bbox"]; x0,y0,x1,y1=bb
     layer,local_diff_bbox,dm=layer_from_old_vs_clean(oa,ca,bb)
-    sheared=right_shear_layer(layer,0.18)
+    sheared=right_shear_layer(layer,0.26)
     maxw=(x1-x0)-4; maxh=(y1-y0)-4
     scale=1.0
     if sheared.width>maxw or sheared.height>maxh:
@@ -126,7 +130,7 @@ for k in keys:
       "final_localized_bbox":nb,
       "source_size":[x1-x0,y1-y0],
       "final_size":[nb[2]-nb[0],nb[3]-nb[1]],
-      "margins":margins,"visual_right_shear":0.18,
+      "margins":margins,"visual_right_shear":0.26,
       "fit_scale_after_shear":round(scale,6),
       "construction":"exact prior Korean raster/effect extracted against A_RECOVERY04 validated CLEAN then right-sheared at native resolution",
       "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS"
@@ -232,7 +236,7 @@ report={
  },
  "ordered_generation_gate":{
    "1_plate_restoration":"PASS_REUSED_A_RECOVERY04_VALIDATED_CLEAN",
-   "2_slant_direction":"PASS_RIGHT_LEAN_0.18_NATIVE_TRANSFORM",
+   "2_slant_direction":"PASS_RIGHT_LEAN_0.26_NATIVE_TRANSFORM",
    "3_no_unnecessary_undersizing":"PASS_HEIGHT_RETAINED_NEAR_SOURCE; RANDOM_WIDTH_REFIT_ONLY_IF_REQUIRED",
    "4_source_weight_outline_shadow":"PASS_EXACT_C87_RASTER_EFFECT_BASE_TRANSFORMED",
    "5_no_clipping":"PASS_4_OF_4_POSITIVE_MARGIN",
@@ -246,7 +250,7 @@ report={
    "coverage":"UNCHANGED_7_SEMANTIC_ROWS"
  },
  "controller_visual_qa":"PENDING_CONTROLLER",
- "status":"B234_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+ "status":"B234R_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
  "RUNTIME_VALIDATION":"UNTESTED","no_vr_ffb_dx11_dxvk_work":True
 }
 (out/"B234_411_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
