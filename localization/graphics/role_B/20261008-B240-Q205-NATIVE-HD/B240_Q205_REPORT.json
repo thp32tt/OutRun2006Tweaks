@@ -6,11 +6,11 @@
   "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
   "trigger": "USER_INGAME_SCREENSHOTS_159_162_LOW_RES_DIRTY_HEAVY_KOREAN",
   "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
-  "prior_candidate_sha256": "2bbb9d19a833fb6c9ade243eb70132ef5ce46150d1fa1cb9423ff4e5101b770c",
-  "candidate_sha256": "7598af3375cfd96fa83f2ac7610ac1a97dd0fcebd7aa95f3e33a641dbcfbba9e",
-  "method": "replace only six screenshot-visible rows from A76 exact clean plate; render Korean directly at final 4096x2048 with native Noto CJK Medium/Regular; no 33px/12px quarter-size raster and no x4 bitmap upscale; no artificial stroke",
+  "prior_candidate_sha256": "7598af3375cfd96fa83f2ac7610ac1a97dd0fcebd7aa95f3e33a641dbcfbba9e",
+  "candidate_sha256": "e3d421a165bdb6e7b3e1bda7b35a6d994d69017407e345d7a339a15d87f79088",
+  "method": "replace only six screenshot-visible rows from A76 exact clean plate; render Korean directly at final 4096x2048 with native Noto CJK Medium/Regular; no 33px/12px quarter-size raster and no x4 bitmap upscale; no artificial stroke; B240R visual correction shortens the constrained protected-token row to 오리지널 + 24px gap + original OutRun2SP",
   "pixel_scale": 1,
-  "changed_pixels": 89267,
+  "changed_pixels": 8809,
   "changed_outside_rework_bboxes": 0,
   "protected_token_changed_pixels": {
     "OutRun": 0,
@@ -143,7 +143,7 @@
     },
     {
       "key": "enjoy_original",
-      "text": "오리지널 즐기기",
+      "text": "오리지널",
       "source_bbox": [
         1807,
         909,
@@ -151,18 +151,18 @@
         975
       ],
       "localized_bbox": [
-        1949,
+        2118,
         913,
-        2340,
+        2332,
         970
       ],
       "localized_size": [
-        391,
+        214,
         57
       ],
       "margins": [
-        142,
-        356,
+        311,
+        364,
         4,
         5
       ],
