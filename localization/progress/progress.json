@@ -4221,7 +4221,7 @@
   },
   "c237_c2_q012_d6dc1380": {
     "timestamp_kst": "2026-10-07T14:27:49+09:00",
-    "status": "C237_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME_RETEST",
+    "status": "C237_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_INGAME_RETEST",
     "queue_index": 12,
     "asset": "D6DC1380",
     "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
@@ -4248,10 +4248,11 @@
       2,
       2
     ],
-    "pre_ingame_export": "PENDING_REFRESH",
+    "pre_ingame_export": "PASS_001_q012_D6DC1380.jpg",
     "user_jpg_review": "PENDING",
     "actual_ingame_retest": "PENDING",
     "runtime_validation": "UNTESTED",
-    "no_vr_ffb_dx11_dxvk_work": true
+    "no_vr_ffb_dx11_dxvk_work": true,
+    "export_refresh_timestamp_kst": "2026-10-07T14:38:54+09:00"
   }
 }

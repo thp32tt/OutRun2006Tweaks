@@ -2925,3 +2925,9 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Small C corrective rework preserved A160 visible RGBA/glyph orientation exactly and translated RAW Y -40 only. Final SHA 1df64df712f990ee5d92c53998269604ff7b9fc4ccdff8913d648f18aa604013. RAW source/final bboxes [32,40,992,176] / [117,42,907,174]; FLIP-Y source/final [32,80,992,216] / [117,82,907,214]; margins [85,85,2,2] in both transforms.
 - Controller RAW/FLIP-Y and practical 100/75/50 visual review PASS: source and Korean share the same transform, right-lean/source-family effects retained, 790x132 scale retained, no clipping/broken Hangul/residue/intrusion. Exact-SHA C3_STRICT_PASS.
 - PRE_INGAME export refresh/user JPG review/NEW actual-game retest remain pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 14:38 KST — C237 q12 PRE_INGAME export refresh complete
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN. Persistent exporter run 37576774054 SUCCESS after C237 C3 promotion.
+- q12 is PRE_INGAME #001 001_q012_D6DC1380.jpg; pinned English source 42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352 native 256x64 is display-only x4, exact Korean candidate 1df64df712f990ee5d92c53998269604ff7b9fc4ccdff8913d648f18aa604013.
+- Controller reviewed final export: FLIP-Y English/Korean are both readable and RAW English/Korean share the same upside-down transform.
+- Manifest count=11; mandatory C3 blocked=10. User JPG review and NEW actual in-game retest remain required; PJR-001 is not closed. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.

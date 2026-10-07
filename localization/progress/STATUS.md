@@ -2344,3 +2344,7 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN. Final candidate 1df64df712f990ee5d92c53998269604ff7b9fc4ccdff8913d648f18aa604013 preserves A160 glyph pixels/style and fixes only RAW vertical placement.
 - RAW and FLIP-Y exact source containment both PASS with [85,85,2,2] positive margins; controller visual orientation/scale/style/glyph/practical-scale review PASS.
 - PRE_INGAME refresh + user JPG + new actual-game retest pending; RUNTIME_VALIDATION=UNTESTED.
+
+## 2026-10-07 14:38 KST — C237 q12 PRE_INGAME refreshed
+- #001 q012 D6DC1380 English-original vs exact current candidate 1df64df712f990ee5d92c53998269604ff7b9fc4ccdff8913d648f18aa604013 exported and controller-reviewed PASS for FLIP-Y/RAW orientation consistency.
+- Static fresh C + C3 are complete; user JPG acceptance and NEW actual-game retest remain pending. RUNTIME_VALIDATION=UNTESTED.

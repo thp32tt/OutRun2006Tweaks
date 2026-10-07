@@ -84,10 +84,25 @@
       "flip_y_raw_consistency": "PASS"
     }
   },
-  "decision": "C237_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME_RETEST",
-  "pre_ingame_export": "PENDING_REFRESH",
+  "decision": "C237_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_INGAME_RETEST",
+  "pre_ingame_export": "REFRESHED_PASS",
   "user_jpg_review": "PENDING_REFRESH_AND_REVIEW",
   "actual_ingame_retest": "PENDING",
   "runtime_validation": "UNTESTED",
-  "forbidden_domains_touched": []
+  "forbidden_domains_touched": [],
+  "pre_ingame_export_evidence": {
+    "worker_run": "20261007-C237-C2-Q012-D6DC1380-EXPORT",
+    "worker_result": "localization/graphics/worker_results/C237_PRE_INGAME_EXPORT.json",
+    "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/001_q012_D6DC1380.jpg",
+    "manifest_count": 11,
+    "mandatory_c3_blocked_count": 10,
+    "english_source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+    "english_source_native_size": [
+      256,
+      64
+    ],
+    "review_display_scale": 4,
+    "candidate_sha256": "1df64df712f990ee5d92c53998269604ff7b9fc4ccdff8913d648f18aa604013",
+    "controller_export_visual_review": "PASS_FLIPY_SOURCE_AND_KOREAN_READABLE_RAW_SOURCE_AND_KOREAN_MATCH_TRANSFORM"
+  }
 }
