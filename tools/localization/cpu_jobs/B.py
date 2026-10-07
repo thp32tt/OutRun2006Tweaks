@@ -27,7 +27,14 @@ SOURCE_SHA="d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab"
 BEFORE_SHA="0281b7b46b5c53598bab2bf4a01f65f391b166345710460c51791da8cf70d530"
 FONT=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc")
 FONT_INDEX=1
-if not FONT.exists(): raise RuntimeError(f"required font missing: {FONT}")
+if not FONT.exists():
+    # GitHub ubuntu-latest does not include Noto CJK by default. This runner-only
+    # dependency is installed here because the exact source/candidate binary work
+    # could not be materialized in ChatGPT local and N100 fallback was unavailable.
+    import subprocess
+    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
+if not FONT.exists(): raise RuntimeError(f"required font missing after package install: {FONT}")
 
 def sha(b): return hashlib.sha256(b).hexdigest()
 def decode(b):
