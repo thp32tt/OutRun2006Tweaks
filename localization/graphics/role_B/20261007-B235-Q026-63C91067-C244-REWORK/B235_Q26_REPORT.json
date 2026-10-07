@@ -1,0 +1,161 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261007-B235-Q026-63C91067-C244-REWORK",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "execution_backend": "GITHUB_ACTIONS_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_BLOCKED_AND_N100_MCP_UNAVAILABLE",
+  "selection_reason": "B primary even shard direct C244 REWORK_REQUIRED; highest producer order after owned in-game rows already have material/build fixes pending C/user/ingame",
+  "trigger": "C244_VISUAL_FAIL_REWORK_REQUIRED_TOTAL_RANK_UNDERSIZED_AND_FLAT",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "before_candidate_sha256": "0281b7b46b5c53598bab2bf4a01f65f391b166345710460c51791da8cf70d530",
+  "candidate_sha256": "2dfc6214ce2383ef01f2739baeff04890d5ff78330b192fcee0d864f6caff719",
+  "clean_plate": "localization/graphics/role_B/20261005-B-PRODUCTION137/63C_CLEAN_PLATE.png",
+  "construction": "fresh native-HD supersampled NotoSansCJK-Bold.ttc Korean face index 1; white fill/navy outline; stronger readable-right 0.30 shear; source-relative wide title fit; no reuse/upscale of prior Korean bitmap",
+  "rows": [
+    {
+      "region": 0,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        747,
+        1174,
+        1271,
+        1275
+      ],
+      "localized_bbox": [
+        771,
+        1179,
+        1247,
+        1270
+      ],
+      "source_size": [
+        524,
+        101
+      ],
+      "localized_size": [
+        476,
+        91
+      ],
+      "margins": [
+        24,
+        24,
+        5,
+        5
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_index": 1,
+      "font_size": 89,
+      "stroke_width": 4,
+      "readable_right_slant": 0.3,
+      "fresh_supersample": 4,
+      "target_width_ratio": 0.9084,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region": 1,
+      "source": "Total Rank",
+      "korean": "종합 랭킹",
+      "original_bbox": [
+        599,
+        156,
+        1124,
+        246
+      ],
+      "localized_bbox": [
+        623,
+        161,
+        1099,
+        241
+      ],
+      "source_size": [
+        525,
+        90
+      ],
+      "localized_size": [
+        476,
+        80
+      ],
+      "margins": [
+        24,
+        25,
+        5,
+        5
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_index": 1,
+      "font_size": 80,
+      "stroke_width": 3,
+      "readable_right_slant": 0.3,
+      "fresh_supersample": 4,
+      "target_width_ratio": 0.9067,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "dark_outline_rows": [
+    {
+      "region": 0,
+      "dark_bbox": [
+        771,
+        1179,
+        1246,
+        1270
+      ],
+      "dark_size": [
+        475,
+        91
+      ]
+    },
+    {
+      "region": 1,
+      "dark_bbox": [
+        623,
+        161,
+        1098,
+        241
+      ],
+      "dark_size": [
+        475,
+        80
+      ]
+    }
+  ],
+  "machine_qa": {
+    "rows": "2/2 PASS",
+    "changed_pixels_outside_two_exact_source_bboxes": 0,
+    "alpha_changes_outside_two_exact_source_bboxes": 0,
+    "localized_pair_overlap": 0,
+    "header_128_exact": true,
+    "mip_count": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_REUSED_B137_C193_VALIDATED_CLEAN",
+    "2_slant_direction": "PASS_STRONG_READABLE_RIGHT_0.30",
+    "3_no_undersizing": "PASS_TARGET_WIDTH_476_OF_524_525_NEAR_SOURCE_HIERARCHY",
+    "4_weight_outline_shadow": "PASS_SOURCE_WHITE_NAVY_BLACK_FAMILY",
+    "5_no_clipping": "PASS_POSITIVE_MARGINS",
+    "6_protected_clearance": "PASS_ZERO_BLAST_OUTSIDE_EXACT_SOURCE_BOXES",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER_VISUAL"
+  },
+  "post_encode_presentation_gate": {
+    "decoded_persisted_dds_authority": "PASS",
+    "practical_scales": [
+      "100%",
+      "75%",
+      "50%"
+    ],
+    "family_profile": "WHITE_NAVY_STRONG_RIGHT_ITALIC_TOTAL_RANK",
+    "blast_radius": "PASS_ZERO_OUTSIDE_TWO_SOURCE_BOXES"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "status": "B235_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
