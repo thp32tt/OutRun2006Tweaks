@@ -846,4 +846,132 @@ namespace OutRunVRStereo
             return callback(context);
         });
     }
+    R32ReviewInternalStereoPassScope::R32ReviewInternalStereoPassScope() noexcept
+        : previous_(InternalStereoPass) { InternalStereoPass = true; }
+    R32ReviewInternalStereoPassScope::~R32ReviewInternalStereoPassScope() { InternalStereoPass = previous_; }
+
+    bool R32ReviewTelemetryEnabled() noexcept { return Settings::VRTelemetry; }
+    bool R32ReviewIsGameDevice(IDirect3DDevice9* d) noexcept { return IsGameDevice(d); }
+    bool R32ReviewInternalStereoPass() noexcept { return InternalStereoPass; }
+    bool R32ReviewStereoWanted() noexcept { return StereoWanted(); }
+    bool R32ReviewTargetIsBackBuffer() noexcept { return TargetIsBackBuffer(); }
+    void R32ReviewFailClosedResetBaselineState() noexcept { FailClosedResetBaselineState(); }
+    void R32ReviewArmStereoRecoverySafety(std::uint64_t n) noexcept { ArmStereoRecoverySafety(n); }
+
+    HRESULT R32ReviewRunRasterReplayGuardCallback(
+        IDirect3DDevice9* d, const char* site,
+        R32VoidCallback active, void* activeCtx,
+        R32HResultCallback draw, void* drawCtx) noexcept
+    {
+        if (!draw) return E_INVALIDARG;
+        R22RasterReplayGuard replay(d, site);
+        if (!replay.StateValid()) return draw(drawCtx);
+        if (active) active(activeCtx);
+        return draw(drawCtx);
+    }
+
+    std::uint64_t R32ReviewMainDepthGeneration() noexcept { return R9MainDepthGenerationValue(); }
+    bool R32ReviewMainDepthHasStencil() noexcept { return R9TrackedMainDepthHasStencil(); }
+    bool R32ReviewLeftDrawMayWriteDepth(IDirect3DDevice9* d) noexcept { return LeftDrawMayWriteDepth(d); }
+    bool R32ReviewLeftDrawMayWriteStencil(IDirect3DDevice9* d) noexcept { return LeftDrawMayWriteStencil(d); }
+    void R32ReviewInvalidateRightDepthStencilSync(bool d, bool s) noexcept { R9InvalidateRightDepthStencilSync(d, s); }
+    bool R32ReviewRightDepthInSync() noexcept { return R9IsRightDepthInSync(); }
+    bool R32ReviewRightStencilInSync() noexcept { return R9IsRightStencilInSync(); }
+    void R32ReviewNoteStereoDrawWithoutMonoBackup() noexcept { R9NoteStereoDrawWithoutMonoBackup(); }
+    void R32ReviewNoteMainDepthContentWrite() noexcept { R9NoteMainDepthContentWrite(); }
+    void R32ReviewReportStereoFailure(OutRunVR::StereoFailureReason r, const char* s, HRESULT hr) noexcept { R9Poison(r,s,hr); }
+    void R32ReviewNoteRestoreFailure(const char* what) noexcept { NoteRestoreFailure(what); }
+
+    IDirect3DSurface9* R32ReviewTrackedRenderTarget() noexcept { return TrackedRenderTarget; }
+    IDirect3DSurface9* R32ReviewTrackedDepthStencil() noexcept { return TrackedDepthStencil; }
+    IDirect3DSurface9* R32ReviewRightEyeSurface() noexcept { return RightEyeSurface; }
+    IDirect3DSurface9* R32ReviewRightEyeDepth() noexcept { return RightEyeDepth; }
+    bool R32ReviewEnsureStereoResources(IDirect3DDevice9* d) noexcept { return EnsureStereoResources(d); }
+    bool R32ReviewTryBootstrapRightDepth(IDirect3DDevice9* d) noexcept { return TryBootstrapRightDepthFromRecentClear(d); }
+    bool R32ReviewDepthTestActive(IDirect3DDevice9* d) noexcept { return DepthTestActive(d); }
+    bool R32ReviewStencilTestActive(IDirect3DDevice9* d) noexcept { return StencilTestActive(d); }
+    HRESULT R32ReviewSetRenderTarget(IDirect3DDevice9* d, DWORD i, IDirect3DSurface9* s) noexcept { return SetRenderTargetHook.stdcall<HRESULT>(d,i,s); }
+    HRESULT R32ReviewSetDepthStencilSurface(IDirect3DDevice9* d, IDirect3DSurface9* s) noexcept { return SetDepthStencilSurfaceHook ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(d,s) : d->SetDepthStencilSurface(s); }
+
+    std::uintptr_t R32ReviewCurrentVertexShaderIdentity() noexcept { return CurrentVertexShaderIdentity.load(std::memory_order_acquire); }
+    bool R32ReviewLiveVertexShaderMatches(IDirect3DDevice9* d, std::uintptr_t e) noexcept { return OutRunVR::D3D9::LiveVertexShaderMatches(d,e); }
+    std::uint32_t R32ReviewFrameStereoPoseSequence() noexcept { return FrameStereoPoseSequence; }
+
+    void R32ReviewRecordWorldStereoDuplicate(std::uint32_t p, const OutRunVRRenderer::LatchedStereoFrame& s) noexcept
+    {
+        FrameHadDuplicatedDraw = true; FrameHadWorldStereo = true; ++DuplicatedDraws; ++WorldStereoDraws;
+        if (FrameStereoPoseSequence == 0) { FrameStereoPoseSequence = p; FrameStereoMetadata = s; }
+    }
+    void R32ReviewRecordHudStereoDuplicate() noexcept { FrameHadDuplicatedDraw = true; ++DuplicatedDraws; ++NonWorldDuplicatedDraws; }
+    void R32ReviewMarkFrameRightDrawFailed() noexcept { FrameRightDrawFailed = true; }
+
+    bool R32ReviewStableStereoBase(IDirect3DDevice9* d) noexcept { return R29StableStereoBase(d); }
+    bool R32ReviewFragileEffectCached(IDirect3DDevice9* d, bool& f) noexcept { return R29FragileEffectCached(d,f); }
+    void R32ReviewNoteStableTwoEyeDraw() noexcept { R29TelemetryNoteStableTwoEyeDraw(); }
+    void R32ReviewObserveDispatchDraw(IDirect3DDevice9* d) noexcept { R31ObserveDraw(d); }
+    void R32ReviewDiscardUnreliableDrawCaches() noexcept { R31DiscardUnreliableDrawCaches(); }
+    void R32ReviewNoteDispatchFallback() noexcept { R31TelemetryNoteFallback(); }
+    void R32ReviewNoteDispatchFastWorld() noexcept { R31TelemetryNoteFastWorld(); }
+    void R32ReviewNoteDispatchFragile() noexcept { R31TelemetryNoteFragile(); }
+    void R32ReviewNoteDispatchHud() noexcept { R31TelemetryNoteHud(); }
+    void R32ReviewNoteDispatchUnstable() noexcept { R31TelemetryNoteUnstable(); }
+
+    bool R32ReviewBuildFastWorldConstants(IDirect3DDevice9* d, const OutRunVRRenderer::LatchedStereoFrame& s, R32ReviewFastWorldConstants& out) noexcept
+    {
+        DrawStereoState draw{}; if (!R31BuildFastWorldConstants(d,s,draw)) return false;
+        std::memcpy(out.originalConstants,draw.originalConstants,sizeof(out.originalConstants));
+        std::memcpy(out.eyeConstants,draw.eyeConstants,sizeof(out.eyeConstants));
+        out.poseSequence=draw.poseSequence; out.stereoFrame=draw.stereoFrame; return true;
+    }
+
+    R32ReviewScreenSpaceKind R32ReviewClassifyScreenSpacePass(IDirect3DDevice9* d) noexcept
+    {
+        switch (R30ClassifyScreenSpacePass(d)) {
+        case R30ScreenSpaceKind::Hud2D: return R32ReviewScreenSpaceKind::Hud2D;
+        case R30ScreenSpaceKind::FlatPerspectiveEffect: return R32ReviewScreenSpaceKind::FlatPerspectiveEffect;
+        default: return R32ReviewScreenSpaceKind::None; }
+    }
+    bool R32ReviewBuildScreenSpaceEyeConstants(IDirect3DDevice9* d, const OutRunVRRenderer::LatchedStereoFrame& s, R32ReviewScreenSpaceKind k, float o[16], float e[2][16], float sc[2], float off[2]) noexcept
+    {
+        R30ScreenSpaceKind lower=R30ScreenSpaceKind::None;
+        if(k==R32ReviewScreenSpaceKind::Hud2D) lower=R30ScreenSpaceKind::Hud2D;
+        else if(k==R32ReviewScreenSpaceKind::FlatPerspectiveEffect) lower=R30ScreenSpaceKind::FlatPerspectiveEffect;
+        return lower!=R30ScreenSpaceKind::None && R30BuildScreenSpaceEyeConstants(d,s,lower,o,e,sc,off);
+    }
+    void R32ReviewNoteScreenSpaceFovDraw() noexcept { R30TelemetryNoteScreenSpaceFovDraw(); }
+
+    HRESULT R32ReviewTryXyzrhwPrimitiveVB(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT s,UINT p) noexcept{return R30TryXyzrhwPrimitiveVB(d,t,s,p);}
+    HRESULT R32ReviewTryXyzrhwIndexedPrimitiveVB(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,INT b,UINT m,UINT n,UINT s,UINT p) noexcept{return R30TryXyzrhwIndexedPrimitiveVB(d,t,b,m,n,s,p);}
+    HRESULT R32ReviewTryXyzrhwPrimitiveUP(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT p,const void* data,UINT st) noexcept{return R30TryXyzrhwPrimitiveUP(d,t,p,data,st);}
+    HRESULT R32ReviewTryXyzrhwIndexedPrimitiveUP(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT m,UINT n,UINT p,const void* idx,D3DFORMAT f,const void* v,UINT st) noexcept{return R30TryXyzrhwIndexedPrimitiveUP(d,t,m,n,p,idx,f,v,st);}
+
+    HRESULT R32ReviewCallRawDrawPrimitive(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT s,UINT p) noexcept{return DrawPrimitiveHook.stdcall<HRESULT>(d,t,s,p);}
+    HRESULT R32ReviewCallRawDrawIndexedPrimitive(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,INT b,UINT m,UINT n,UINT s,UINT p) noexcept{return DrawIndexedPrimitiveHook.stdcall<HRESULT>(d,t,b,m,n,s,p);}
+    HRESULT R32ReviewCallRawDrawPrimitiveUP(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT p,const void* data,UINT st) noexcept{return DrawPrimitiveUPHook.stdcall<HRESULT>(d,t,p,data,st);}
+    HRESULT R32ReviewCallRawDrawIndexedPrimitiveUP(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT m,UINT n,UINT p,const void* idx,D3DFORMAT f,const void* v,UINT st) noexcept{return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(d,t,m,n,p,idx,f,v,st);}
+    HRESULT R32ReviewCallRawPresent(IDirect3DDevice9* d,const RECT* s,const RECT* dst,HWND w,const RGNDATA* r) noexcept{return PresentHook.stdcall<HRESULT>(d,s,dst,w,r);}
+
+    HRESULT R32ReviewCallLowerDrawPrimitive(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT s,UINT p) noexcept{return R30CallLowerDrawPrimitive(d,t,s,p);}
+    HRESULT R32ReviewCallLowerDrawIndexedPrimitive(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,INT b,UINT m,UINT n,UINT s,UINT p) noexcept{return R30CallLowerDrawIndexedPrimitive(d,t,b,m,n,s,p);}
+    HRESULT R32ReviewCallLowerDrawPrimitiveUP(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT p,const void* data,UINT st) noexcept{return R30CallLowerDrawPrimitiveUP(d,t,p,data,st);}
+    HRESULT R32ReviewCallLowerDrawIndexedPrimitiveUP(IDirect3DDevice9* d,D3DPRIMITIVETYPE t,UINT m,UINT n,UINT p,const void* idx,D3DFORMAT f,const void* v,UINT st) noexcept{return R30CallLowerDrawIndexedPrimitiveUP(d,t,m,n,p,idx,f,v,st);}
+
+    OutRunVR::RuntimeEligibility::InstallState R32ReviewPrerequisiteStatus() noexcept
+    {
+        using State=OutRunVR::RuntimeEligibility::InstallState;
+        const auto a=R31InstallStatus(), b=R22InstallStatus(); const auto c=R13InstallStatus();
+        if(a==State::Failed||b==State::Failed||c==R13InstallStatusValue::Failed) return State::Failed;
+        if(a==State::Ready&&b==State::Ready&&c==R13InstallStatusValue::Ready) return State::Ready;
+        return State::Pending;
+    }
+    void* R32ReviewResetTarget() noexcept{return reinterpret_cast<void*>(&ResetDestR22);}
+    void* R32ReviewPresentTarget() noexcept{return reinterpret_cast<void*>(&PresentDestR13);}
+    void* R32ReviewDirectTransportTarget() noexcept{return reinterpret_cast<void*>(&ResolveDirectTransportR13);}
+    void* R32ReviewSetRenderStateTarget() noexcept{return reinterpret_cast<void*>(&SetRenderStateDestR29);}
+    void* R32ReviewDrawPrimitiveTarget() noexcept{return reinterpret_cast<void*>(&DrawPrimitiveDestR30);}
+    void* R32ReviewDrawIndexedPrimitiveTarget() noexcept{return reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR30);}
+    void* R32ReviewDrawPrimitiveUPTarget() noexcept{return reinterpret_cast<void*>(&DrawPrimitiveUPDestR30);}
+    void* R32ReviewDrawIndexedPrimitiveUPTarget() noexcept{return reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30);}
+    IDirect3DDevice9* R32ReviewInstalledDevice() noexcept{return StereoInstalledDevice.load(std::memory_order_acquire);}
+
 }
