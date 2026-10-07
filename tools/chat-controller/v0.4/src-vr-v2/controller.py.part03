@@ -101,19 +101,11 @@ def github_stale_event_guard(active: dict, trigger: str) -> bool:
             )
             return True
 
-        if task_commit and task_commit.get("sha"):
-            active["result_sha"] = task_commit["sha"]
-            active["result_message"] = task_commit.get("message", "")
-            active["phase"] = "WAIT_ACTIONS"
-            active["wait_actions_started_at"] = datetime.now(TZ).isoformat()
-            active["last_gate_poll_at"] = None
-            active["stale_event_drop"] = trigger
-            write_runtime(
-                status="stale_event_drop",
-                last_action=f"{production_id} {trigger} dropped: durable material commit already exists",
-                queue=active,
-            )
-            return True
+        # A durable material commit normally means retry/rollover UI is stale and
+        # should not reopen the same task. A repair send is different: when the
+        # bound validation run has concluded failure, the controller must be
+        # allowed to ask ChatGPT to repair the existing TASK_ID.
+        repair_send = trigger.startswith("retry-send:")
 
         current_number = _production_number(production_id)
         prefix = production_id.rsplit("-", 1)[0] + "-"
@@ -137,6 +129,20 @@ def github_stale_event_guard(active: dict, trigger: str) -> bool:
             write_runtime(
                 status="stale_event_drop",
                 last_action=f"{production_id} {trigger} dropped: same lane already advanced to {latest_id}",
+                queue=active,
+            )
+            return True
+
+        if task_commit and task_commit.get("sha") and not repair_send:
+            active["result_sha"] = task_commit["sha"]
+            active["result_message"] = task_commit.get("message", "")
+            active["phase"] = "WAIT_ACTIONS"
+            active["wait_actions_started_at"] = datetime.now(TZ).isoformat()
+            active["last_gate_poll_at"] = None
+            active["stale_event_drop"] = trigger
+            write_runtime(
+                status="stale_event_drop",
+                last_action=f"{production_id} {trigger} dropped: durable material commit already exists",
                 queue=active,
             )
             return True
@@ -423,8 +429,14 @@ async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], acti
     if await detect_busy(page):
         return False
     if await first_visible(page, RETRY_SELECTORS, total_wait_ms=500) is not None:
-        write_runtime(status="queue_retry_wait", last_action=f"{active['task_id']} repair send deferred because Retry UI is active")
-        return False
+        # A failed GitHub validation needs a repair prompt, not the stale
+        # ChatGPT Retry surface from the previous response. Move to a fresh
+        # project chat so the lane cannot remain permanently blocked.
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+        save_registry(reg)
+        if not await ensure_logged_in(page):
+            write_runtime(status="login_required", last_action=f"{active['task_id']} repair fresh-chat login required")
+            return False
 
     latest_head = github_branch_head(active["branch"])
     if not latest_head:
