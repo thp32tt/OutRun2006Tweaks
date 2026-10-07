@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00448",
+  "production_id": "CONVERSION-DX11-00448",
+  "event_id": "CONVERSION-DX11-00448-E003",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "76d364a884937b1a256823f2b83d7ee8c002ba11",
+  "result_sha": "4ec05714539336e19eaea7ec96608d3cea541ad3",
+  "material_result_sha": "4ec05714539336e19eaea7ec96608d3cea541ad3",
+  "validation_bearing_result_sha": "4ec05714539336e19eaea7ec96608d3cea541ad3",
+  "selected_work_item": "DX11_R310_R271_SOURCE_SEMANTIC_PAIR_ANALYZER_BRIDGE",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "R310 ingests existing unnumbered R271 sourceSemanticPair telemetry, binds it to the following R276 signature within the same source-log/startup epoch, and correlates R271 cache identity with R279 plus the R276 plan snapshot while keeping ActivationProof=false.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "4ec05714539336e19eaea7ec96608d3cea541ad3"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: rollover recovered exact HEAD and confirmed 00448 had not yet been materialized.",
+    "C1_REVIEW": "PASS: selected R271 as the next emitted programmable source-semantic record absent from analyzer coverage.",
+    "C2_IMPLEMENT": "PASS: parser, same-epoch R271->R276 binding, R279/cache correlation, positive/mismatch fixtures and source-graph guard added.",
+    "C3_VALIDATE": "PASS: exact-SHA Backend Conversion Gate 37687926731; validate 113020436051 SUCCESS; DX11 readiness smoke 113022660213 SUCCESS.",
+    "C4_COMMIT": "PASS: material result 4ec05714539336e19eaea7ec96608d3cea541ad3 contains [AUTO:CONVERSION-DX11-00448] and no CI-skip directive.",
+    "C5_PACKAGE": "NOT_REQUIRED: analyzer/static evidence change; CI artifact retained as validation evidence only.",
+    "C6_STATE": "PASS_RECOVERED: exact-SHA validation completed before the next dispatch; durable record restored at 00449 C0."
+  },
+  "evidence": {
+    "backend_conversion_gate_run_id": 37687926731,
+    "validation_job_id": 113020436051,
+    "readiness_smoke_job_id": 113022660213,
+    "artifact_id": 11512103036,
+    "artifact_name": "backend-autovalidated-vr-dx11-native-r71-4ec05714539336e19eaea7ec96608d3cea541ad3",
+    "artifact_digest": "sha256:d09e050658f5a373d9ddca8dc343fe75c5649fdf8de86b24c24cf698977da558",
+    "issue14_comment_id": 6047132787
+  },
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "runtime_test_required": false,
+  "next_action": "Inspect R272 registerMappingPlan telemetry, emitted immediately after R271 but not yet consumed by analyze_dx11_census.py; correlate mapping counts/hashes/revision/contract with R271/R276 without authorizing NativeDrawPath/Draw/DrawIndexed."
+}
