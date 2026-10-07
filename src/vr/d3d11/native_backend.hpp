@@ -1856,6 +1856,7 @@ struct NativeProgrammableShaderTextureResourceBehaviorReadiness {
     bool inputValid{};
     bool geometryReviewReady{};
     bool geometrySnapshotMatches{};
+    bool geometryPayloadSnapshotMatches{};
     bool requiredTextureScopePresent{};
     bool textureStagesInputValid{};
     bool textureStageSnapshotMatches{};

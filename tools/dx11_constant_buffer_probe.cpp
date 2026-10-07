@@ -5292,6 +5292,30 @@ int main()
         r260IndexedStaleVertex.reviewSnapshotToken == 0,
         "R260 indexed resource behavior rejects stale vertex mirror identity");
 
+    auto r301TamperedR260ForTextureBehavior =
+        r260IndexedResourceBehavior;
+    r301TamperedR260ForTextureBehavior.sourceRevalidationSnapshotToken += 1u;
+    const auto r301TamperedTextureBehavior =
+        outrun::vr::dx11::
+            compose_programmable_texture_resource_behavior_readiness(
+                r301TamperedR260ForTextureBehavior,
+                r301TamperedR260ForTextureBehavior.reviewSnapshotToken,
+                r261TextureRegistry,
+                r261TextureKeys.data(), r261TextureKeys.size(),
+                d3d.device,
+                r261TextureStages,
+                r261TextureStages.snapshotToken);
+    require(
+        r301TamperedTextureBehavior.geometryReviewReady &&
+        r301TamperedTextureBehavior.geometrySnapshotMatches &&
+        !r301TamperedTextureBehavior.geometryPayloadSnapshotMatches &&
+        !r301TamperedTextureBehavior.geometryResourceBehaviorExact &&
+        (r301TamperedTextureBehavior.missingResourceScopeMask & 0x1u) != 0 &&
+        !r301TamperedTextureBehavior.boundaryPreserved &&
+        !r301TamperedTextureBehavior.reviewReady &&
+        r301TamperedTextureBehavior.reviewSnapshotToken == 0,
+        "R301 rejects R260 payload drift before minting R261 texture resource proof");
+
     const auto r261IndexedTextureResourceBehavior =
         outrun::vr::dx11::
             compose_programmable_texture_resource_behavior_readiness(
@@ -5306,6 +5330,8 @@ int main()
         r261IndexedTextureResourceBehavior.inputValid &&
         r261IndexedTextureResourceBehavior.geometryReviewReady &&
         r261IndexedTextureResourceBehavior.geometrySnapshotMatches &&
+        r261IndexedTextureResourceBehavior.
+            geometryPayloadSnapshotMatches &&
         r261IndexedTextureResourceBehavior.requiredTextureScopePresent &&
         r261IndexedTextureResourceBehavior.textureStagesInputValid &&
         r261IndexedTextureResourceBehavior.textureStageSnapshotMatches &&
@@ -7849,6 +7875,8 @@ int main()
     require(
         r261NonIndexedTextureResourceBehavior.geometryReviewReady &&
         r261NonIndexedTextureResourceBehavior.geometrySnapshotMatches &&
+        r261NonIndexedTextureResourceBehavior.
+            geometryPayloadSnapshotMatches &&
         r261NonIndexedTextureResourceBehavior.textureStageSnapshotMatches &&
         r261NonIndexedTextureResourceBehavior.geometryResourceBehaviorExact &&
         r261NonIndexedTextureResourceBehavior.textureResourceBehaviorExact &&

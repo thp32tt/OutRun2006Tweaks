@@ -10434,6 +10434,33 @@ std::uint64_t recompute_programmable_dormant_source_revalidation_payload_snapsho
     return token == 0 ? 1 : token;
 }
 
+std::uint64_t recompute_programmable_resource_behavior_payload_snapshot(
+    const NativeProgrammableShaderResourceBehaviorReadiness&
+        geometryBehavior) noexcept {
+    if (geometryBehavior.kind ==
+        NativeProgrammableShaderDrawCandidateKind::None)
+        return 0;
+
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(
+        token, static_cast<std::uint32_t>(geometryBehavior.kind));
+    token = mix_readiness_snapshot_token(
+        token, geometryBehavior.indexed ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, geometryBehavior.sourceRevalidationSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token,
+        geometryBehavior.sourceRevalidationPayloadSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, geometryBehavior.vertexMirrorSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, geometryBehavior.indexMirrorSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, geometryBehavior.missingResourceScopeMask);
+    token = mix_readiness_snapshot_token(token, 0x260u);
+    return token == 0 ? 1 : token;
+}
+
 } // namespace
 
 NativeProgrammableShaderResourceBehaviorReadiness
@@ -10638,6 +10665,11 @@ compose_programmable_texture_resource_behavior_readiness(
     out.geometrySnapshotMatches =
         out.geometryReviewReady &&
         geometryBehavior.reviewSnapshotToken == geometrySnapshotToken;
+    out.geometryPayloadSnapshotMatches =
+        out.geometryReviewReady &&
+        geometryBehavior.reviewSnapshotToken ==
+            recompute_programmable_resource_behavior_payload_snapshot(
+                geometryBehavior);
 
     out.requiredTextureScopePresent = textureStages.requiredMask != 0;
     out.textureStagesInputValid = textureStages.inputValid;
@@ -10663,7 +10695,8 @@ compose_programmable_texture_resource_behavior_readiness(
 
     out.geometryResourceBehaviorExact =
         out.geometryReviewReady &&
-        out.geometrySnapshotMatches;
+        out.geometrySnapshotMatches &&
+        out.geometryPayloadSnapshotMatches;
     out.textureResourceBehaviorExact =
         out.textureStageSnapshotMatches;
 
@@ -10684,6 +10717,7 @@ compose_programmable_texture_resource_behavior_readiness(
     out.diagnosticOnly = true;
     out.boundaryPreserved =
         geometryBehavior.boundaryPreserved &&
+        out.geometryPayloadSnapshotMatches &&
         out.diagnosticOnly &&
         !out.fullResourceBehaviorProofPresent &&
         out.missingResourceScopeMask != 0;
@@ -10691,6 +10725,7 @@ compose_programmable_texture_resource_behavior_readiness(
         out.inputValid &&
         out.geometryReviewReady &&
         out.geometrySnapshotMatches &&
+        out.geometryPayloadSnapshotMatches &&
         out.textureResourceBehaviorExact &&
         out.boundaryPreserved;
 
@@ -10702,6 +10737,8 @@ compose_programmable_texture_resource_behavior_readiness(
         token = mix_readiness_snapshot_token(
             token, out.sourceRevalidationSnapshotToken);
         token = mix_readiness_snapshot_token(token, out.geometrySnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.geometryPayloadSnapshotMatches ? 1u : 0u);
         token = mix_readiness_snapshot_token(token, out.requiredTextureMask);
         token = mix_readiness_snapshot_token(
             token, out.textureStageSnapshotToken);
