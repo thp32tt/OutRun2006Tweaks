@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00416",
+  "production_id": "CONVERSION-DX11-00416",
+  "event_id": "CONVERSION-DX11-00416-E001",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "chat_rollover": 0,
+  "rollover_is_retry": true,
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "failure_context": "Backend Conversion Gate exact run 37480819845 failed at Test DX11 census analyzer: the R278 regression asserted source_log=runtime.log although run_case() canonically writes OutRun2006Tweaks.log.",
+  "selected_work_item": "DX11_R278_PROGRAMMABLE_SEMANTIC_CORRELATION",
+  "base_sha": "ff144e7374c360305a4e71296bf4fac0c3b6f581",
+  "result_sha": "e156c495827602b84c47dd724746d3beaeb28878",
+  "source_implementation_sha": "dbd0bd7eccdd39b1dd0436ec03f08e4484af61b5",
+  "material_result_sha": "e156c495827602b84c47dd724746d3beaeb28878",
+  "validation_bearing_result_sha": "e156c495827602b84c47dd724746d3beaeb28878",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS_AFTER_R278_FIXTURE_REPAIR",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "summary": "R278 makes production DX11 census evidence signature-attributable by correlating R276 semanticTranslationPlan and R275 translatedSemanticReceipt records with current programmable shader-pair inventory, explicitly classifies the missing R242 translated-object ownership prerequisite, and keeps all evidence diagnostic-only. Retry 2/3 repaired a regression-fixture filename mismatch without changing production activation semantics.",
+  "evidence": [
+    "Substantive commit dbd0bd7eccdd39b1dd0436ec03f08e4484af61b5 tags R276/R275 runtime census logs by signature, parses both records, correlates them with programmable shader inventory, and records R242_TRANSLATED_OBJECT_OWNERSHIP as the remaining prerequisite.",
+    "Intermediate commit 344742faed707404afee2928babfbd356c0408f2 aligns the DX11 source-graph verifier with the signature-tagged R276/R275 log contract.",
+    "Failure run 37480819845 reached Test DX11 census analyzer and failed only because the R278 assertion expected runtime.log while run_case() writes OutRun2006Tweaks.log.",
+    "Result/validation-bearing commit e156c495827602b84c47dd724746d3beaeb28878 corrects that fixture expectation and contains [AUTO:CONVERSION-DX11-00416] without a CI-skip directive.",
+    "Exact-SHA Backend Conversion Gate 37556549582 SUCCESS: validate job 112584034545 SUCCESS and DX11 readiness smoke probes 112585505411 SUCCESS, including Win32 build/binary verification and all readiness probes.",
+    "Artifact 11455616202 digest sha256:0cb21a3f93079d70e55c5ad05e496a96c7a0b7ed4121f834137be3f7c00051e9.",
+    "Issue #14 production-change ledger event 6028921611 records the direct-chat repair and exact validation evidence."
+  ],
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "native_programmable_object_created": false,
+    "native_programmable_object_bound": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "shader_translation_exact_enabled": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered branch HEAD 344742faed707404afee2928babfbd356c0408f2, read AGENTS.md, VR backend review index, QUEUE_CONTROLLER_CONTRACT.md, branch-local conversion state and explicit failed Gate 37480819845. Resumed from the failed census-analyzer step."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Traced the failed R278 assertion through run_case()/run_cases and analyzer signature refs; confirmed the analyzer classified R242 ownership correctly and only the fixture expected the wrong source-log filename."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Preserved the R278 substantive semantic-correlation implementation and changed only the incorrect test expectation from runtime.log to the harness canonical OutRun2006Tweaks.log."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA Backend Conversion Gate 37556549582 SUCCESS. validate 112584034545 and DX11 readiness smoke 112585505411 both SUCCESS; artifact 11455616202 produced. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Validation-bearing result e156c495827602b84c47dd724746d3beaeb28878 contains [AUTO:CONVERSION-DX11-00416] and no CI-skip directive."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R278 is diagnostic census/analyzer evidence plus regression-test repair; it does not activate native draw ownership or create a runtime-test candidate."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "This durable run record and branch-local conversion state preserve the exact validation-bearing SHA, Gate/jobs/artifact evidence, UNTESTED runtime status, Issue #14 event and exact next action."
+    }
+  },
+  "exact_next_action": "In the next DX11 conversion task, inspect and model the R242 translated programmable-shader object ownership receipt/lifetime prerequisite consumed by R275, without creating/binding native programmable objects or enabling NativeDrawPath/Draw/DrawIndexed; keep Quest 3/VDXR parity as a separate runtime gate.",
+  "status": "COMPLETE",
+  "implementation_commits": [
+    "dbd0bd7eccdd39b1dd0436ec03f08e4484af61b5",
+    "344742faed707404afee2928babfbd356c0408f2",
+    "e156c495827602b84c47dd724746d3beaeb28878"
+  ],
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "issue14_comment_id": 6028921611,
+  "validation": {
+    "exact_sha": "e156c495827602b84c47dd724746d3beaeb28878",
+    "backend_conversion_gate": {
+      "run_id": 37556549582,
+      "conclusion": "success",
+      "validate_job_id": 112584034545,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112585505411,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11455616202,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-e156c495827602b84c47dd724746d3beaeb28878",
+      "artifact_digest": "sha256:0cb21a3f93079d70e55c5ad05e496a96c7a0b7ed4121f834137be3f7c00051e9"
+    }
+  }
+}
