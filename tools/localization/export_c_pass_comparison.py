@@ -252,6 +252,10 @@ def main():
             p.unlink()
 
     rows = list(csv.DictReader(queue.open(encoding="utf-8-sig", newline="")))
+    # Historical concurrent CSV edits can leave an embedded UTF-8 BOM at a row boundary.
+    # Normalize only the numeric queue index so sorting/export stays deterministic.
+    for row in rows:
+        row["index"] = (row.get("index") or "").lstrip("\ufeff")
     rows = sorted((r for r in rows if current_c_pass(r)), key=lambda r: int(r["index"]))
     if not rows:
         raise RuntimeError("no current C-pass graphics")
