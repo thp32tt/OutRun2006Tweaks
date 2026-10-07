@@ -1,0 +1,431 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C246-C2-BATCH-Q028-Q030-Q044",
+  "queue_index": 44,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+  "asset_key": "19CEDB9",
+  "producer": "A144",
+  "trigger": "USER_JPG_010_TEXT_SCALE_TOO_SMALL_VS_SOURCE",
+  "source_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+  "candidate_sha256": "8c6a390cbadae23beff263bb0eea4ca935643d591b45bac9ca474fa108e5a913",
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "mode": "RGBA",
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ]
+  },
+  "independent_clean_mode": "repo_png",
+  "rows": [
+    {
+      "key": "sector2",
+      "original_bbox": [
+        8,
+        100,
+        190,
+        160
+      ],
+      "localized_bbox": [
+        30,
+        103,
+        168,
+        157
+      ],
+      "source_size": [
+        182,
+        60
+      ],
+      "localized_size": [
+        138,
+        54
+      ],
+      "width_ratio": 0.7582,
+      "height_ratio": 0.9,
+      "delta_left": 22,
+      "delta_right": 22,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "sector1",
+      "original_bbox": [
+        208,
+        100,
+        385,
+        160
+      ],
+      "localized_bbox": [
+        228,
+        103,
+        364,
+        157
+      ],
+      "source_size": [
+        177,
+        60
+      ],
+      "localized_size": [
+        136,
+        54
+      ],
+      "width_ratio": 0.7684,
+      "height_ratio": 0.9,
+      "delta_left": 20,
+      "delta_right": 21,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "win",
+      "original_bbox": [
+        418,
+        110,
+        500,
+        151
+      ],
+      "localized_bbox": [
+        429,
+        113,
+        489,
+        148
+      ],
+      "source_size": [
+        82,
+        41
+      ],
+      "localized_size": [
+        60,
+        35
+      ],
+      "width_ratio": 0.7317,
+      "height_ratio": 0.8537,
+      "delta_left": 11,
+      "delta_right": 11,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "lose",
+      "original_bbox": [
+        528,
+        109,
+        635,
+        152
+      ],
+      "localized_bbox": [
+        549,
+        112,
+        614,
+        149
+      ],
+      "source_size": [
+        107,
+        43
+      ],
+      "localized_size": [
+        65,
+        37
+      ],
+      "width_ratio": 0.6075,
+      "height_ratio": 0.8605,
+      "delta_left": 21,
+      "delta_right": 21,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "result",
+      "original_bbox": [
+        32,
+        180,
+        247,
+        249
+      ],
+      "localized_bbox": [
+        82,
+        183,
+        196,
+        246
+      ],
+      "source_size": [
+        215,
+        69
+      ],
+      "localized_size": [
+        114,
+        63
+      ],
+      "width_ratio": 0.5302,
+      "height_ratio": 0.913,
+      "delta_left": 50,
+      "delta_right": 51,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "ranking",
+      "original_bbox": [
+        289,
+        180,
+        555,
+        259
+      ],
+      "localized_bbox": [
+        356,
+        183,
+        487,
+        256
+      ],
+      "source_size": [
+        266,
+        79
+      ],
+      "localized_size": [
+        131,
+        73
+      ],
+      "width_ratio": 0.4925,
+      "height_ratio": 0.9241,
+      "delta_left": 67,
+      "delta_right": 68,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "stage",
+      "original_bbox": [
+        571,
+        179,
+        765,
+        259
+      ],
+      "localized_bbox": [
+        575,
+        192,
+        761,
+        245
+      ],
+      "source_size": [
+        194,
+        80
+      ],
+      "localized_size": [
+        186,
+        53
+      ],
+      "width_ratio": 0.9588,
+      "height_ratio": 0.6625,
+      "delta_left": 4,
+      "delta_right": 4,
+      "delta_top": 13,
+      "delta_bottom": 14,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "rank",
+      "original_bbox": [
+        788,
+        180,
+        964,
+        249
+      ],
+      "localized_bbox": [
+        796,
+        183,
+        956,
+        246
+      ],
+      "source_size": [
+        176,
+        69
+      ],
+      "localized_size": [
+        160,
+        63
+      ],
+      "width_ratio": 0.9091,
+      "height_ratio": 0.913,
+      "delta_left": 8,
+      "delta_right": 8,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "you",
+      "original_bbox": [
+        1759,
+        193,
+        1897,
+        260
+      ],
+      "localized_bbox": [
+        1799,
+        196,
+        1856,
+        257
+      ],
+      "source_size": [
+        138,
+        67
+      ],
+      "localized_size": [
+        57,
+        61
+      ],
+      "width_ratio": 0.413,
+      "height_ratio": 0.9104,
+      "delta_left": 40,
+      "delta_right": 41,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "diff",
+      "original_bbox": [
+        1853,
+        312,
+        1975,
+        381
+      ],
+      "localized_bbox": [
+        1856,
+        315,
+        1972,
+        378
+      ],
+      "source_size": [
+        122,
+        69
+      ],
+      "localized_size": [
+        116,
+        63
+      ],
+      "width_ratio": 0.9508,
+      "height_ratio": 0.913,
+      "delta_left": 3,
+      "delta_right": 3,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "sector3",
+      "original_bbox": [
+        1832,
+        1180,
+        2013,
+        1240
+      ],
+      "localized_bbox": [
+        1853,
+        1183,
+        1991,
+        1237
+      ],
+      "source_size": [
+        181,
+        60
+      ],
+      "localized_size": [
+        138,
+        54
+      ],
+      "width_ratio": 0.7624,
+      "height_ratio": 0.9,
+      "delta_left": 21,
+      "delta_right": 22,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "rival",
+      "original_bbox": [
+        498,
+        1412,
+        705,
+        1486
+      ],
+      "localized_bbox": [
+        510,
+        1415,
+        693,
+        1483
+      ],
+      "source_size": [
+        207,
+        74
+      ],
+      "localized_size": [
+        183,
+        68
+      ],
+      "width_ratio": 0.8841,
+      "height_ratio": 0.9189,
+      "delta_left": 12,
+      "delta_right": 12,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "checks": {
+    "source_current_changed_outside_source_bboxes": 0,
+    "source_current_alpha_outside_source_bboxes": 0,
+    "source_clean_changed_outside_source_bboxes": 0,
+    "source_clean_alpha_outside_source_bboxes": 0,
+    "clean_current_changed_outside_source_bboxes": 0,
+    "clean_current_alpha_outside_source_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "header_128_exact": true
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_required": true,
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

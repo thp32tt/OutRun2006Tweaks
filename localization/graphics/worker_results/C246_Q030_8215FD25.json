@@ -1,0 +1,13 @@
+{
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C246-C2-BATCH-Q028-Q030-Q044",
+  "queue_index": 30,
+  "asset": "8215FD25",
+  "candidate_sha256": "fa294ef9bcd4e96db8848da3846cea7d90fd6668e1a30d6957f6e1c881f4a547",
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED"
+}

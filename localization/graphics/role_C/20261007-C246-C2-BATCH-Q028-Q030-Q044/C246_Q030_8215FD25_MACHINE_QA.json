@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C246-C2-BATCH-Q028-Q030-Q044",
+  "queue_index": 30,
+  "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+  "asset_key": "8215FD25",
+  "producer": "A165",
+  "trigger": "USER_JPG_004_TOTAL_RANK_TEXT_TOO_SMALL",
+  "source_sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e",
+  "candidate_sha256": "fa294ef9bcd4e96db8848da3846cea7d90fd6668e1a30d6957f6e1c881f4a547",
+  "structure": {
+    "width": 4096,
+    "height": 2048,
+    "pitch": 16384,
+    "mips": 1,
+    "mode": "RGBA",
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ]
+  },
+  "independent_clean_mode": "repo_png",
+  "rows": [
+    {
+      "key": "total_rank_0",
+      "original_bbox": [
+        1829,
+        1179,
+        2364,
+        1281
+      ],
+      "localized_bbox": [
+        1853,
+        1184,
+        2339,
+        1276
+      ],
+      "source_size": [
+        535,
+        102
+      ],
+      "localized_size": [
+        486,
+        92
+      ],
+      "width_ratio": 0.9084,
+      "height_ratio": 0.902,
+      "delta_left": 24,
+      "delta_right": 25,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "total_rank_1",
+      "original_bbox": [
+        1682,
+        150,
+        2216,
+        252
+      ],
+      "localized_bbox": [
+        1706,
+        155,
+        2192,
+        247
+      ],
+      "source_size": [
+        534,
+        102
+      ],
+      "localized_size": [
+        486,
+        92
+      ],
+      "width_ratio": 0.9101,
+      "height_ratio": 0.902,
+      "delta_left": 24,
+      "delta_right": 24,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "checks": {
+    "source_current_changed_outside_source_bboxes": 0,
+    "source_current_alpha_outside_source_bboxes": 0,
+    "source_clean_changed_outside_source_bboxes": 0,
+    "source_clean_alpha_outside_source_bboxes": 0,
+    "clean_current_changed_outside_source_bboxes": 0,
+    "clean_current_alpha_outside_source_bboxes": 0,
+    "localized_pair_overlap_pixels": 0,
+    "header_128_exact": true
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_required": true,
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
