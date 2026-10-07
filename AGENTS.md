@@ -16,6 +16,23 @@ Before substantial work, read:
 
 If the human-readable state files do not exist, create them during the next safe checkpoint.
 
+## Upstream and historical evidence-first rule — HUD / UI / effects
+
+For HUD, menu, rank/position markers, lens flare, shadows, billboards, screen-space effects, camera-dependent effects, or similar visual regressions, do **not** start from broad draw heuristics or a fresh runtime test when precise reverse-engineering evidence already exists.
+
+Use this evidence order before implementation:
+
+1. **Original upstream mod first:** inspect `emoose/OutRun2006Tweaks` and treat its reverse-engineered hooks as the first source map. High-value files include `src/hooks_uiscaling.cpp`, `src/hooks_graphics.cpp`, `src/hooks_bugfixes.cpp`, `src/game_addrs.hpp`, and `src/interpolation.cpp`.
+2. **Fork history second:** inspect this fork's historical VR branches, commits, `docs/VR_HUD_SEMANTIC_BASELINE.md`, EXE/HUD inspector artifacts, problem history, and checked-in reverse-engineering maps. Reuse previously isolated producer/call-site knowledge rather than rediscovering it.
+3. **Canonical EXE proof third:** re-verify every address/call-site that affects a fix against the pinned canonical OR2006C2C.EXE identity, byte signatures, disassembly/XREF evidence, and `docs/VR_BINARY_CONTRACT.json` or equivalent analyzer output. Upstream addresses are strong reverse-engineering evidence, not permission to assume a different binary is identical.
+4. **Exact producer ownership:** map the verified producer/call-site into exactly one intended VR semantic/space policy. Do not replace known exact producers with primitive-count, shader-shape, broad WVP, or queue-wide guesses unless contradictory evidence proves the exact map wrong.
+5. **Static regression gate before HMD:** add or extend a deterministic fail-closed verifier that pins the relevant source binding, producer ownership, ordering/lifetime rule, and canonical EXE evidence. The canonical GitHub Actions gate must pass before routine HMD testing.
+6. **HMD last:** Quest 3/VDXR testing validates hardware-only visual behavior after the source/disassembly/static contract is coherent. Do not use HMD testing as a substitute for available upstream/disassembly/static analysis. An exception is allowed only for an explicitly documented hypothesis that cannot be distinguished statically; such a build must be labeled diagnostic and runtime validation must remain `UNTESTED` until the user supplies evidence.
+
+Known upstream HUD evidence includes the exact rival-rank `Calc3D2D`/rank-marker hooks, the DispRank/POSITION family, Time Attack/result scroll hooks, gear/rev, ghost-gap, goal-time, heart/fruit/rival HUD, control icons, C2C speech bubbles, GF warning, and slipstream paths. Use `docs/VR_HUD_SEMANTIC_BASELINE.md` for the maintained semantic inventory and exact high-value anchors.
+
+This rule is intended to prevent repeated rediscovery and wasted hardware tests: **upstream source map -> fork historical evidence -> canonical disassembly -> current implementation -> deterministic verifier -> HMD**.
+
 ## Mandatory checkpoint flow
 
 Use the following sequence by default:

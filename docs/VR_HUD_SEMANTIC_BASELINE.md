@@ -7,6 +7,27 @@ This file defines the source-level HUD policy inherited from the original
 for scheduled review workers: do not replace these semantic identities with
 primitive-count or broad shader/WVP guesses without contrary runtime evidence.
 
+## Evidence hierarchy and original-upstream source map
+
+HUD work must start from the original mod's reverse-engineered map before adding new heuristics. The authoritative upstream source is `emoose/OutRun2006Tweaks`; re-verify all addresses against the pinned canonical EXE before using them as a current binary contract.
+
+High-value upstream anchors currently include:
+
+- `Calc3D2D = 0x49940` and `RankMarker_Truncate = 0xBB046`.
+- Rival-car rank `sprani` CALLs: `0xBB0FB, 0xBB133, 0xBB16C, 0xBB1A5`.
+- Rival-car rank 4th+ `put_clip_sprite` CALLs: `0xBB21F, 0xBB241, 0xBB271, 0xBB2BC, 0xBB2D0`.
+- DispRank/POSITION scroll CALLs: `0xB9F3A, 0xB9F5E, 0xB9F81, 0xB9FD0, 0xB9FFC, 0xBA01E, 0xBA035, 0xBA052`.
+- Time Attack/result scroll handoffs: `0xBE5CD, 0xBE603, 0xBE633, 0xBE66D, 0xBE690, 0xBE6B5, 0xBE6D5, 0xBE8D8, 0xBE915, 0xBE94A, 0xBE97A, 0xBE9A3, 0xBE7E8, 0xBE802, 0xBE81C`.
+- Additional upstream HUD families are explicitly hooked for gear/rev, ghost gap, Time Attack goal, heart/C2C heart, fruit, rival HUD, control icons, C2C/GF speech bubbles and hearts, Don't Lose GF, and slipstream.
+- Original graphics evidence includes car-base-shadow call sites `0x69EB4, 0x6AC76, 0x6B766` using `DrawObjectAlpha_Internal`.
+- Lens-flare work must combine original upstream lens-flare path/camera/interpolation knowledge with this fork's later exact producer evidence; do not classify all alpha draws as flare.
+
+The maintained workflow for HUD/effects is:
+
+`original upstream map -> fork historical VR evidence -> canonical EXE disassembly/XREF proof -> exact current semantic ownership -> fail-closed verifier -> HMD validation`.
+
+Do not send a routine HMD candidate merely to discover information already obtainable from these source maps or static/disassembly checks.
+
 ## Screen-space HUD
 
 These are common-centre / zero-disparity VR HUD and pass through the existing
