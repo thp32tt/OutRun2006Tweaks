@@ -5,7 +5,7 @@
   "base_sha": "931f83cc9460d1bd6d188d255302da86f31733ae",
   "selected_seam": "R32_LOWER_RUNTIME_PREDICATE_CACHE_SUPPORT",
   "status": "VALIDATED",
-  "summary": "R32 consumes the explicit R30 support facade for runtime predicates/cache invalidation, the R29 effect telemetry snapshot, and DirectGPU transport readiness/host PID-LUID identity reads. DirectGPU mutation/release/ACK-fence-slot, surface/depth, shader, and lower draw/reset dependencies remain intentionally out of scope.",
+  "summary": "R32 consumes the explicit R30 support facade for runtime predicates/cache invalidation, R29 effect telemetry, DirectGPU readiness/host identity reads, and DirectGPU resource-ensure mutation. Release/ACK-fence-slot, render/depth surfaces, shader, and lower draw/reset dependencies remain intentionally out of scope.",
   "removed_private_dependencies": [
     "Settings::VRTelemetry",
     "IsGameDevice",
@@ -20,16 +20,17 @@
     "TryGetEffectTelemetrySnapshot",
     "SharedState",
     "DirectInteropVerified",
-    "DirectTransportResourcesReady"
+    "DirectTransportResourcesReady",
+    "EnsureDirectTransportResources"
   ],
   "deferred_dependency_classes": [
     "shader identity mutation",
-    "base render/depth surfaces and resource ensure/bootstrap",
-    "R13 DirectGPU mutation/ACK/fence/slot/release transport ownership",
+    "base render/depth surfaces and resource bootstrap",
+    "R13 DirectGPU ACK/fence/slot/release transport ownership",
     "lower draw/reset/state-block owner calls"
   ],
   "runtime_validation": "UNTESTED",
-  "next_action": "Extract the DirectGPU resource-ensure mutation call through the R30 owner facade as one bounded seam; do not move ACK/fence/slot/release ownership in the same task.",
+  "next_action": "Extract one interop invalidation/release subset through the R30 owner facade while preserving the current R13ReleaseAckState -> ReleaseDirectTransportSlots -> ReleaseDirectInteropProbe order; keep ACK/fence/slot publication semantics unchanged.",
   "validation_bearing_sha": "b40bb5a3851863de6267ff52acbb1187ce349544",
   "validated_by_task": "CONVERSION-DX9EX-00516",
   "validation": {
@@ -52,6 +53,14 @@
       "validation_bearing_sha": "b4a72f66a59689ebdb6cac025976497a88095b5c",
       "dx9ex_active_run_id": 37610331499,
       "domain_isolation_run_id": 37610331732,
+      "result": "PASS"
+    },
+    {
+      "task_id": "CONVERSION-DX9EX-00519",
+      "seam": "R32_DIRECTGPU_RESOURCE_ENSURE_FACADE",
+      "validation_bearing_sha": "9a3e08cc62b6a36a8196936eacead8cc08fcc756",
+      "dx9ex_active_run_id": 37611267365,
+      "domain_isolation_run_id": 37611267338,
       "result": "PASS"
     }
   ]

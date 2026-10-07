@@ -7,12 +7,12 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "status": "IMPLEMENTED_PENDING_VALIDATION",
+  "status": "COMPLETE",
   "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-DIRECTGPU-RESOURCE-ENSURE-FACADE-001",
   "base_sha": "3e94f788662f0424db4d83c1838162169e6f7b06",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "material_result_sha": "9a3e08cc62b6a36a8196936eacead8cc08fcc756",
+  "validation_bearing_result_sha": "9a3e08cc62b6a36a8196936eacead8cc08fcc756",
+  "result_sha": "9a3e08cc62b6a36a8196936eacead8cc08fcc756",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00519]",
   "summary": "Route R32's DirectGPU resource-ensure mutation call through the behavior-neutral R30 support facade, removing one more lower-owner dependency while preserving ACK/fence/slot/release and copy/publication behavior.",
   "changed_paths": [
@@ -22,7 +22,7 @@
     "tools/verify_vr_r32_runtime_support_seam.py",
     "docs/automation/runs/CONVERSION-DX9EX-00519.json"
   ],
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
@@ -45,5 +45,25 @@
     "no interop invalidation/release ordering change",
     "no Reset/ResetEx or HUD/stereo policy change"
   ],
-  "next_action": "Require exact-SHA DX9Ex Active Validation and Domain Isolation. If green, persist result evidence and select one remaining DirectGPU release/transport ownership subset as the next bounded seam."
+  "next_action": "Continue R32 lower-owner extraction with one interop invalidation/release ownership subset (ACK mapping + direct transport slots/probe release), preserving exact release ordering. Runtime remains UNTESTED.",
+  "validation_history": [
+    {
+      "sha": "9a3e08cc62b6a36a8196936eacead8cc08fcc756",
+      "dx9ex_active_run_id": 37611267365,
+      "domain_isolation_run_id": 37611267338,
+      "result": "PASS",
+      "jobs": {
+        "policy": 112758798435,
+        "game": 112758948347,
+        "full_chain_compile": 112758948423,
+        "host": 112758948480,
+        "package": 112760853361
+      }
+    }
+  ],
+  "package_artifact": {
+    "id": 11477748359,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-9a3e08cc62b6a36a8196936eacead8cc08fcc756",
+    "digest": "sha256:e5761753a9e2d0889cabfda738269863d7d1c46a0a5a06394e69f8d0a387df6d"
+  }
 }
