@@ -330,17 +330,36 @@
   },
   "candidate_sha256": "601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
-  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "semantic_binding": "PASS",
+    "typography": "PASS_DARK_CONDENSED_UPRIGHT_SOURCE_FAMILY",
+    "immediate_readability": "PASS",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "english_residue": "NONE_VISIBLE",
+    "protected_song_titles": "PASS_PIXEL_EXACT_ROWS_3_9",
+    "protected_ferrari_models": "PASS_PIXEL_EXACT_ROWS_10_24",
+    "orientation_regression": "NONE_VISIBLE",
+    "observations": [
+      "OutRun Mode / 15 C. and Journey Mode / Random no longer inherit the short OutRun 1986 row's restrictive shared 36px size.",
+      "The Korean rows now follow the source's intentional 52/44/58px height hierarchy while retaining positive margins.",
+      "Song titles remain English and Ferrari model names remain pixel-exact as required."
+    ]
+  },
   "ordered_generation_gate": {
-    "plate_restoration": "PASS_EXACT_TRANSPARENT_CLEAN_REBUILT",
-    "slant_direction": "PASS_SOURCE_UPRIGHT",
-    "scale_hierarchy": "PENDING_CONTROLLER_MAX_NATIVE_PER_ROW",
-    "weight_effects": "PASS_SOURCE_DARK_PLAIN_FAMILY",
-    "clipping": "PASS_POSITIVE_MARGIN",
-    "protected_art": "PASS_ROWS_3_24_PIXEL_EXACT",
-    "flip_y_raw": "EVIDENCE_WRITTEN",
-    "immediate_readability": "PENDING_CONTROLLER"
+    "english_removal_and_plate_restoration": "PASS",
+    "slant_direction": "PASS_UPRIGHT_SOURCE",
+    "text_scale": "PASS_NO_UNNECESSARY_UNDERSIZING",
+    "weight_outline_shadow": "PASS_SOURCE_PLAIN_DARK_FAMILY",
+    "clipping": "PASS",
+    "protected_graphics": "PASS",
+    "flip_y_and_raw": "PASS",
+    "readability_vs_source": "PASS"
   },
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B227_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B227_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "controller_self_qa_report": "localization/graphics/role_B/20261007-B-MANUALQA227-DDF0392A/B227_CONTROLLER_SELF_QA.json"
 }
