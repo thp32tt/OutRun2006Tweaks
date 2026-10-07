@@ -47,6 +47,19 @@ PRODUCER_WINDOWS = (
             0x00097BB7, 0x00097DA7,
         ),
     },
+    {
+        "name": "NaviPubHud_0xBEA40",
+        "start_rva": 0x000BEA40,
+        "end_rva": 0x000BEE80,
+        "anchors": (
+            0x000BEA64,
+            0x000BEB8E, 0x000BEBAF,
+            0x000BEBE1, 0x000BEBE6,
+            0x000BEC83, 0x000BEC88,
+            0x000BECBA, 0x000BECE0,
+            0x000BED83, 0x000BED9E, 0x000BEDAE,
+        ),
+    },
 )
 
 KNOWN_CALL_SITES = {

@@ -473,6 +473,23 @@ require('SceneEffectLensProducer_sub_40CAE0', analyzer, 'canonical lens producer
 require('0x0000CAE0', analyzer, 'lens producer start RVA')
 require('0x0000CABE', analyzer, 'lens DrawObjectAlpha anchor RVA')
 require('0x0000CF4E', analyzer, 'lens Calc3D2D anchor RVA')
+# NaviPub goal/rival/heart/nav HUD producer window. These screen-HUD
+# state-transition anchors are part of the original UIScaling map but did not
+# previously have a durable canonical disassembly window in the HUD Inspector.
+require('NaviPubHud_0xBEA40', analyzer,
+        'NaviPub goal/rival/heart canonical producer window')
+require('0x000BEA40', analyzer, 'NaviPub HUD producer start RVA')
+require('0x000BEE80', analyzer, 'NaviPub HUD producer end RVA')
+for token in (
+    '0x000BEA64',
+    '0x000BEB8E', '0x000BEBAF',
+    '0x000BEBE1', '0x000BEBE6',
+    '0x000BEC83', '0x000BEC88',
+    '0x000BECBA', '0x000BECE0',
+    '0x000BED83', '0x000BED9E', '0x000BEDAE',
+):
+    require(token, analyzer, 'NaviPub HUD canonical anchor RVA')
+
 require('OutRunStageResultHud_0x97000', analyzer,
         'OutRun stage/result HUD producer window')
 for token in (
