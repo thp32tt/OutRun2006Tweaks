@@ -4,8 +4,8 @@
   "public_english_source_repo": "Sonic-TV/OR2006Sprites",
   "public_english_source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
   "stock_original_zip": "localization/validation/binary_compare/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip",
-  "count": 58,
-  "localized_candidate_count": 57,
+  "count": 60,
+  "localized_candidate_count": 59,
   "policy_pass_no_candidate_count": 1,
   "mandatory_c3_blocked_count": 9,
   "mandatory_c3_blocked": [
@@ -996,6 +996,29 @@
     },
     {
       "number": 39,
+      "queue_index": 121,
+      "asset_key": "FD90AA9",
+      "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+      "artwork_status": "c265_c3_strict_pass_pending_pre_ingame_user_jpg_ingame_retest",
+      "source_kind": "localized_candidate",
+      "english_source_origin": "pinned_public_source",
+      "english_source_location": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+      "english_source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+      "english_source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "english_source_native_size": [
+        4096,
+        4096
+      ],
+      "review_display_scale": 1,
+      "review_display_size": [
+        4096,
+        4096
+      ],
+      "candidate_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+      "jpg": "039_q121_FD90AA9.jpg"
+    },
+    {
+      "number": 40,
       "queue_index": 128,
       "asset_key": "12519155",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
@@ -1015,10 +1038,10 @@
         1024
       ],
       "candidate_sha256": "66f1b9ea8e0d65afef09667ccfd1565e30406f9d08abde75fd3302e2c03e1f16",
-      "jpg": "039_q128_12519155.jpg"
+      "jpg": "040_q128_12519155.jpg"
     },
     {
-      "number": 40,
+      "number": 41,
       "queue_index": 130,
       "asset_key": "1762489B",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
@@ -1038,10 +1061,10 @@
         512
       ],
       "candidate_sha256": "2569b0a2ea319e02d13d04d5cb3ed38bf676d35b3972aa42cab573068238d48a",
-      "jpg": "040_q130_1762489B.jpg"
+      "jpg": "041_q130_1762489B.jpg"
     },
     {
-      "number": 41,
+      "number": 42,
       "queue_index": 132,
       "asset_key": "1F5FE6E9",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
@@ -1061,10 +1084,10 @@
         512
       ],
       "candidate_sha256": "615281ac66733323221916c506cda2fb9eb2f139866e98f1a9985e56ba7dde90",
-      "jpg": "041_q132_1F5FE6E9.jpg"
+      "jpg": "042_q132_1F5FE6E9.jpg"
     },
     {
-      "number": 42,
+      "number": 43,
       "queue_index": 133,
       "asset_key": "25F697C6",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
@@ -1084,10 +1107,10 @@
         2048
       ],
       "candidate_sha256": "08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013",
-      "jpg": "042_q133_25F697C6.jpg"
+      "jpg": "043_q133_25F697C6.jpg"
     },
     {
-      "number": 43,
+      "number": 44,
       "queue_index": 137,
       "asset_key": "30CF0D",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
@@ -1107,10 +1130,10 @@
         1024
       ],
       "candidate_sha256": "0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4",
-      "jpg": "043_q137_30CF0D.jpg"
+      "jpg": "044_q137_30CF0D.jpg"
     },
     {
-      "number": 44,
+      "number": 45,
       "queue_index": 147,
       "asset_key": "39BCA907",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
@@ -1130,10 +1153,10 @@
         1024
       ],
       "candidate_sha256": "ab002e4f172ebe72b593914b92661c4f8137d50f8b073a22005fd175cff0153e",
-      "jpg": "044_q147_39BCA907.jpg"
+      "jpg": "045_q147_39BCA907.jpg"
     },
     {
-      "number": 45,
+      "number": 46,
       "queue_index": 152,
       "asset_key": "49BB5FE5",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
@@ -1153,10 +1176,10 @@
         128
       ],
       "candidate_sha256": "",
-      "jpg": "045_q152_49BB5FE5.jpg"
+      "jpg": "046_q152_49BB5FE5.jpg"
     },
     {
-      "number": 46,
+      "number": 47,
       "queue_index": 173,
       "asset_key": "6DC89C6E",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds",
@@ -1176,10 +1199,10 @@
         2048
       ],
       "candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
-      "jpg": "046_q173_6DC89C6E.jpg"
+      "jpg": "047_q173_6DC89C6E.jpg"
     },
     {
-      "number": 47,
+      "number": 48,
       "queue_index": 188,
       "asset_key": "8C259C68",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
@@ -1199,10 +1222,10 @@
         2048
       ],
       "candidate_sha256": "9fe3804a70d93277ede4e16ac8073057c6a9d969a893d05cde522d14a1f91b4d",
-      "jpg": "047_q188_8C259C68.jpg"
+      "jpg": "048_q188_8C259C68.jpg"
     },
     {
-      "number": 48,
+      "number": 49,
       "queue_index": 193,
       "asset_key": "97E863AD",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
@@ -1222,10 +1245,10 @@
         1024
       ],
       "candidate_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
-      "jpg": "048_q193_97E863AD.jpg"
+      "jpg": "049_q193_97E863AD.jpg"
     },
     {
-      "number": 49,
+      "number": 50,
       "queue_index": 197,
       "asset_key": "9F060EC1",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
@@ -1245,10 +1268,10 @@
         2048
       ],
       "candidate_sha256": "60cfa3ef1257e3bbc50a8c7152aba538837eabd2322c18e098ee7ceb61381fea",
-      "jpg": "049_q197_9F060EC1.jpg"
+      "jpg": "050_q197_9F060EC1.jpg"
     },
     {
-      "number": 50,
+      "number": 51,
       "queue_index": 198,
       "asset_key": "9FC88069",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
@@ -1268,10 +1291,33 @@
         2048
       ],
       "candidate_sha256": "2160e7eef9dd27b028b5adc3df770a508c62891fd21676677365a0f55bee5885",
-      "jpg": "050_q198_9FC88069.jpg"
+      "jpg": "051_q198_9FC88069.jpg"
     },
     {
-      "number": 51,
+      "number": 52,
+      "queue_index": 201,
+      "asset_key": "A9ABD877",
+      "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+      "artwork_status": "c265_c3_strict_pass_pending_pre_ingame_user_jpg_ingame_retest",
+      "source_kind": "localized_candidate",
+      "english_source_origin": "pinned_public_source",
+      "english_source_location": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+      "english_source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+      "english_source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "english_source_native_size": [
+        2048,
+        2048
+      ],
+      "review_display_scale": 1,
+      "review_display_size": [
+        2048,
+        2048
+      ],
+      "candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+      "jpg": "052_q201_A9ABD877.jpg"
+    },
+    {
+      "number": 53,
       "queue_index": 205,
       "asset_key": "ACF61D7C",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
@@ -1291,10 +1337,10 @@
         2048
       ],
       "candidate_sha256": "e3d421a165bdb6e7b3e1bda7b35a6d994d69017407e345d7a339a15d87f79088",
-      "jpg": "051_q205_ACF61D7C.jpg"
+      "jpg": "053_q205_ACF61D7C.jpg"
     },
     {
-      "number": 52,
+      "number": 54,
       "queue_index": 212,
       "asset_key": "BA0147DA",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
@@ -1314,10 +1360,10 @@
         2048
       ],
       "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
-      "jpg": "052_q212_BA0147DA.jpg"
+      "jpg": "054_q212_BA0147DA.jpg"
     },
     {
-      "number": 53,
+      "number": 55,
       "queue_index": 220,
       "asset_key": "D657C2EB",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
@@ -1337,10 +1383,10 @@
         512
       ],
       "candidate_sha256": "1a57c385e6c3ea2cc368888041e7106aab79bc4ab364daf0b51edd4465fcc935",
-      "jpg": "053_q220_D657C2EB.jpg"
+      "jpg": "055_q220_D657C2EB.jpg"
     },
     {
-      "number": 54,
+      "number": 56,
       "queue_index": 222,
       "asset_key": "DDF0392A",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
@@ -1360,10 +1406,10 @@
         2048
       ],
       "candidate_sha256": "601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f",
-      "jpg": "054_q222_DDF0392A.jpg"
+      "jpg": "056_q222_DDF0392A.jpg"
     },
     {
-      "number": 55,
+      "number": 57,
       "queue_index": 226,
       "asset_key": "E3F4BA07",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
@@ -1383,10 +1429,10 @@
         512
       ],
       "candidate_sha256": "5449edb846d6ca3a5de1ab1f817a41feb776e9af3bdda2175967312369e5e374",
-      "jpg": "055_q226_E3F4BA07.jpg"
+      "jpg": "057_q226_E3F4BA07.jpg"
     },
     {
-      "number": 56,
+      "number": 58,
       "queue_index": 228,
       "asset_key": "E7F6E9B7",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
@@ -1406,10 +1452,10 @@
         2048
       ],
       "candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
-      "jpg": "056_q228_E7F6E9B7.jpg"
+      "jpg": "058_q228_E7F6E9B7.jpg"
     },
     {
-      "number": 57,
+      "number": 59,
       "queue_index": 232,
       "asset_key": "EBFC709F",
       "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
@@ -1429,10 +1475,10 @@
         1024
       ],
       "candidate_sha256": "dc76c000cfce17098940f551512e6f746319ba8a1892345eb060693004747ea1",
-      "jpg": "057_q232_EBFC709F.jpg"
+      "jpg": "059_q232_EBFC709F.jpg"
     },
     {
-      "number": 58,
+      "number": 60,
       "queue_index": 241,
       "asset_key": "E1639D2E",
       "asset_path": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
@@ -1452,7 +1498,7 @@
         256
       ],
       "candidate_sha256": "b94f215b889231a7942299d6a2179540425d11538df21feb25565cac13bab037",
-      "jpg": "058_q241_E1639D2E.jpg"
+      "jpg": "060_q241_E1639D2E.jpg"
     }
   ]
 }
