@@ -1,5 +1,5 @@
 {
-  "schema_version": 128,
+  "schema_version": 129,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B231 q46 AA04D779 coverage repair PASS: legacy C90/USERPOLICY02 left ordinary lobby/status and gray control labels in English. Current d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0 localizes 9 semantics/13 physical rows while preserving the prior 21 stage/sector labels outside the exact rework mask. Post-encode, blast-radius, practical-scale and RAW gates PASS. Fresh C then exact-SHA mandatory C3 required before PRE_INGAME export; actual game remains UNTESTED.",
     "B230 q232 EBFC709F coverage repair PASS: PRE_INGAME #019 exposed two untranslated ordinary help sentences. Current dc76c000cfce17098940f551512e6f746319ba8a1892345eb060693004747ea1 adds 게임을 만들고 친구를 초대하세요! / 친구들과 OutRun 게임에 참가하세요!, preserves the four B219 headings outside the exact two-row rework mask, and passes decoded-DDS/blast-radius/100-75-50/RAW gates. Fresh independent C then exact-SHA mandatory C3 are required before PRE_INGAME export; actual-game validation remains pending. RUNTIME_VALIDATION=UNTESTED.",
     "B229 q54 FA7BBB13 current-policy rework PASS: PRE_INGAME #004 exposed upright Korean against right-italic English source and a height-collapsed Slipstream row. Accepted GitHub run 37561543035 produced 5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e; all 17 prompts are native right-lean source-effect rerenders, Slipstream is concise 슬립스트림하세요! and 590x99 inside 600x103. 17/17 exact bbox/size/positive-margin; clean/final/outside/alpha/protected/residue/overlap/raw/controller visual PASS. Fresh C + regenerated English-original JPG/user review + actual-game validation required. RUNTIME_VALIDATION=UNTESTED.",
     "B228 q230 E95DA5 visual-completeness rework PASS: PRE_INGAME #022 showed ordinary explanatory UI rows 20/21 still English under C149. Current a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f localizes them to 아직 구매할 수 없습니다 / 이미 보유 중입니다 while preserving song/named-item titles and all B73 material outside the two exact bboxes. 2/2 exact bbox/size/positive-margin, clean/final/outside/alpha/residue/raw/controller visual gates PASS. Fresh independent C + refreshed English-original JPG/user review + actual-game validation required. RUNTIME_VALIDATION=UNTESTED.",
@@ -4234,7 +4235,8 @@
     "4EDA9DE3",
     "DDF0392A",
     "E95DA5",
-    "FA7BBB13"
+    "FA7BBB13",
+    "AA04D779"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6726,7 +6728,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07T13:31:32+09:00",
+  "updated_at_kst": "2026-10-07 13:46 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7272,23 +7274,39 @@
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "latest_b_manual_visual_rework": {
-    "run": "20261007-B-MANUALQA230-EBFC709F-HELP",
-    "queue_index": 232,
-    "asset": "EBFC709F",
-    "trigger": "PRE_INGAME #019 untranslated ordinary explanatory UI",
-    "before_candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
-    "candidate_sha256": "dc76c000cfce17098940f551512e6f746319ba8a1892345eb060693004747ea1",
-    "github_hosted_worker_run": 37567563727,
-    "new_semantics": [
-      "Create a game and invite your friends! -> 게임을 만들고 친구를 초대하세요!",
-      "Join your friends in a game of OutRun! -> 친구들과 OutRun 게임에 참가하세요!"
+    "run": "20261007-B-MANUALQA231-AA04D779-COVERAGE",
+    "queue_index": 46,
+    "asset": "AA04D779",
+    "trigger": "hardened coverage gate: ordinary lobby/control UI remained English under legacy gray-control preserve",
+    "before_candidate_sha256": "93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e",
+    "candidate_sha256": "d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0",
+    "github_hosted_worker_run": 37572479089,
+    "new_semantic_labels": 9,
+    "new_physical_rows": 13,
+    "new_text": [
+      "게임 전 로비",
+      "오프라인",
+      "브레이크",
+      "가속",
+      "기어 업",
+      "기어 다운",
+      "라이선스 보기",
+      "사용자 음악 / 변경",
+      "일시정지 / 메뉴"
     ],
-    "report": "localization/graphics/role_B/20261007-B-MANUALQA230-EBFC709F-HELP/B230_EBFC_REPORT.json",
-    "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA230-EBFC709F-HELP/B230_CONTROLLER_SELF_QA.json",
-    "machine_qa": "2/2 bbox+size+positive-margin; CLEAN/FINAL PASS; baseline blast-radius/alpha outside=0; source residue/overlap=0; persisted DDS exact",
-    "presentation_qa": "PASS decoded DDS + 100/75/50 + source/old/clean/final + RAW mirror_y",
+    "explicit_preserve": [
+      "REV",
+      "TOP",
+      "You",
+      "1P/2P/3P/4P",
+      "icons/course symbols/numeric art"
+    ],
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA231-AA04D779-COVERAGE/B231_AA04D779_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA231-AA04D779-COVERAGE/B231_CONTROLLER_SELF_QA.json",
+    "machine_qa": "13/13 bbox+size+positive-margin; CLEAN/FINAL PASS; baseline blast-radius/alpha outside=0; residue/overlap=0; persisted DDS exact",
+    "presentation_qa": "PASS decoded persisted DDS + 100/75/50 + SOURCE/OLD/CLEAN/FINAL + RAW mirror_y",
     "mandatory_c3": "REQUIRED_CURRENT_SHA_BEFORE_PRE_INGAME_EXPORT",
-    "status": "B230_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "status": "B231_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
     "RUNTIME_VALIDATION": "UNTESTED"
   },
   "latest_c_pre_ingame_export": {
@@ -8066,5 +8084,41 @@
     "pre_ingame_comparison_refresh": "EXCLUDED_REWORK_REQUIRED",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "b231_aa04d779_coverage_rework": {
+    "run": "20261007-B-MANUALQA231-AA04D779-COVERAGE",
+    "queue_index": 46,
+    "asset": "AA04D779",
+    "trigger": "hardened coverage gate: ordinary lobby/control UI remained English under legacy gray-control preserve",
+    "before_candidate_sha256": "93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e",
+    "candidate_sha256": "d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0",
+    "github_hosted_worker_run": 37572479089,
+    "new_semantic_labels": 9,
+    "new_physical_rows": 13,
+    "new_text": [
+      "게임 전 로비",
+      "오프라인",
+      "브레이크",
+      "가속",
+      "기어 업",
+      "기어 다운",
+      "라이선스 보기",
+      "사용자 음악 / 변경",
+      "일시정지 / 메뉴"
+    ],
+    "explicit_preserve": [
+      "REV",
+      "TOP",
+      "You",
+      "1P/2P/3P/4P",
+      "icons/course symbols/numeric art"
+    ],
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA231-AA04D779-COVERAGE/B231_AA04D779_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA231-AA04D779-COVERAGE/B231_CONTROLLER_SELF_QA.json",
+    "machine_qa": "13/13 bbox+size+positive-margin; CLEAN/FINAL PASS; baseline blast-radius/alpha outside=0; residue/overlap=0; persisted DDS exact",
+    "presentation_qa": "PASS decoded persisted DDS + 100/75/50 + SOURCE/OLD/CLEAN/FINAL + RAW mirror_y",
+    "mandatory_c3": "REQUIRED_CURRENT_SHA_BEFORE_PRE_INGAME_EXPORT",
+    "status": "B231_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
