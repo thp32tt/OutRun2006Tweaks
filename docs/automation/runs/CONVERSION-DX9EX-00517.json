@@ -7,12 +7,12 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "status": "IMPLEMENTED_PENDING_VALIDATION",
+  "status": "COMPLETE",
   "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-EFFECT-TELEMETRY-OWNER-FACADE-001",
   "base_sha": "bce62cab1d34af9708fbc2913625ca0bb0338f0b",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "material_result_sha": "65ca55e1aa1319b2dd76e6f77ce3460846bce75a",
+  "validation_bearing_result_sha": "65ca55e1aa1319b2dd76e6f77ce3460846bce75a",
+  "result_sha": "65ca55e1aa1319b2dd76e6f77ce3460846bce75a",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00517]",
   "summary": "Expose the current R29 effect-state telemetry snapshot through the behavior-neutral R30 support facade so R32 no longer consumes the private R29 snapshot type/function through textual inclusion.",
   "changed_paths": [
@@ -22,7 +22,7 @@
     "tools/verify_vr_r32_runtime_support_seam.py",
     "docs/automation/runs/CONVERSION-DX9EX-00517.json"
   ],
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
@@ -39,5 +39,25 @@
     "no HUD/effect classification policy change",
     "no OpenXR submission/recenter change"
   ],
-  "next_action": "Require exact-SHA DX9Ex Active Validation and Domain Isolation. If green, persist run/job/artifact evidence and keep runtime validation UNTESTED."
+  "next_action": "Continue the R32 lower-owner extraction chain with the DirectGPU readiness/identity probe subset (before ACK/fence/publication ownership), then re-evaluate the R31/R30 split preflight. Runtime remains UNTESTED.",
+  "validation_history": [
+    {
+      "sha": "65ca55e1aa1319b2dd76e6f77ce3460846bce75a",
+      "dx9ex_active_run_id": 37609249044,
+      "domain_isolation_run_id": 37609249036,
+      "result": "PASS",
+      "jobs": {
+        "policy": 112752205933,
+        "full_chain_compile": 112752369413,
+        "game": 112752369482,
+        "host": 112752369520,
+        "package": 112754398839
+      }
+    }
+  ],
+  "package_artifact": {
+    "id": 11477111344,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-65ca55e1aa1319b2dd76e6f77ce3460846bce75a",
+    "digest": "sha256:31f66b5386f1699994acda8dea1f398de980277b0c91c9c47f4d271458524b5e"
+  }
 }

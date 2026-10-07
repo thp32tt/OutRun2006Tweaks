@@ -5,7 +5,7 @@
   "base_sha": "931f83cc9460d1bd6d188d255302da86f31733ae",
   "selected_seam": "R32_LOWER_RUNTIME_PREDICATE_CACHE_SUPPORT",
   "status": "VALIDATED",
-  "summary": "R32 now consumes the explicit R30 support facade for telemetry enablement, game-device identity, internal stereo-pass ownership, Present epoch, stereo-wanted/backbuffer predicates, effect/live-state cache invalidation, and renderer-state invalidation. DirectGPU/surface/depth/shader lower-owner dependencies remain intentionally out of scope.",
+  "summary": "R32 consumes the explicit R30 support facade for runtime predicates/cache invalidation and, via CONVERSION-DX9EX-00517, for the lower R29 effect telemetry snapshot. DirectGPU/surface/depth/shader lower-owner dependencies remain intentionally out of scope.",
   "removed_private_dependencies": [
     "Settings::VRTelemetry",
     "IsGameDevice",
@@ -15,22 +15,33 @@
     "TargetIsBackBuffer",
     "InvalidateEffectStateCache",
     "InvalidateLiveStateSample",
-    "OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore"
+    "OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore",
+    "R29EffectTelemetrySnapshot",
+    "TryGetEffectTelemetrySnapshot"
   ],
   "deferred_dependency_classes": [
-    "R29 effect telemetry snapshot",
     "shader identity mutation",
     "base render/depth surfaces and resource ensure/bootstrap",
     "R13 DirectGPU/ACK/fence/shared-state transport",
     "lower draw/reset/state-block owner calls"
   ],
   "runtime_validation": "UNTESTED",
-  "next_action": "Extract one remaining R32 lower-owner class (prefer DirectGPU transport or render/depth surface facade) before re-enabling OUTRUN_VR_REFACTOR_SPLIT_R31_R30.",
+  "next_action": "Extract the next R32 lower-owner class, preferring the DirectGPU readiness/identity probe subset before ACK/fence/publication ownership; keep OUTRUN_VR_REFACTOR_SPLIT_R31_R30 disabled until the remaining compile dependencies are isolated.",
   "validation_bearing_sha": "b40bb5a3851863de6267ff52acbb1187ce349544",
   "validated_by_task": "CONVERSION-DX9EX-00516",
   "validation": {
     "dx9ex_active_run_id": 37608014439,
     "domain_isolation_run_id": 37608014319,
     "result": "PASS"
-  }
+  },
+  "successor_extractions": [
+    {
+      "task_id": "CONVERSION-DX9EX-00517",
+      "seam": "R32_EFFECT_TELEMETRY_OWNER_FACADE",
+      "validation_bearing_sha": "65ca55e1aa1319b2dd76e6f77ce3460846bce75a",
+      "dx9ex_active_run_id": 37609249044,
+      "domain_isolation_run_id": 37609249036,
+      "result": "PASS"
+    }
+  ]
 }
