@@ -54,11 +54,15 @@
     "flip_y_raw": "PASS: FLIP-Y is readable and RAW remains mirror-Y consistent"
   },
   "c3_strict_audit": "C3_STRICT_PASS",
-  "decision": "C240_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME",
+  "decision": "C240_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_INGAME",
   "machine_report": "localization/graphics/role_C/20261007-C240-C1-Q107-841E796B-B232R/C240_841E796B_MACHINE_QA.json",
-  "pre_ingame_export": "PENDING_REFRESH",
+  "pre_ingame_export": "PASS_008_q107_841E796B.jpg",
   "user_jpg_review": "PENDING",
   "actual_ingame_validation": "PENDING",
   "runtime_validation": "UNTESTED",
-  "forbidden_domains_touched": []
+  "forbidden_domains_touched": [],
+  "pre_ingame_export_run": 37581237970,
+  "pre_ingame_manifest_count": 12,
+  "pre_ingame_mandatory_c3_blocked_count": 10,
+  "pre_ingame_controller_visual_qa": "PASS: English-original vs exact Korean card reviewed in FLIP-Y and RAW; semantic order/style/placement/protected cards remain correct"
 }
