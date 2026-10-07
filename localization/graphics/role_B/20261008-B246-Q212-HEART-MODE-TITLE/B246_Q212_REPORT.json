@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261008-B246-Q212-HEART-MODE-TITLE",
+  "queue_index": 212,
+  "asset": "BA0147DA",
+  "trigger": "B245_MACHINE_PASS_BUT_CONTROLLER_VISUAL_UNDERFILL_REQUIRES_MATERIAL_CHANGE",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "prior_candidate_sha256": "03f058c2eb21fa39a7d27db8159ba0aa2e1c2497ebd51465ca667ed44331605d",
+  "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+  "semantic_basis": {
+    "source_title": "HEART ATTACK",
+    "localized_title": "하트 어택 모드",
+    "context": "IGR-002 Heart Attack mode intro title",
+    "project_precedent": "q116 E3FD08BE exact Heart Attack Mode -> 하트 어택 모드",
+    "reason": "use the established Korean mode name in the intro title; avoids artificial syllable tracking while restoring source title hierarchy"
+  },
+  "heart_attack": {
+    "source_bbox": [
+      21,
+      1316,
+      1780,
+      1474
+    ],
+    "localized_bbox": [
+      26,
+      1318,
+      929,
+      1472
+    ],
+    "source_size": [
+      1759,
+      158
+    ],
+    "localized_size": [
+      903,
+      154
+    ],
+    "width_ratio": 0.5134,
+    "height_ratio": 0.9747,
+    "font": "Noto Sans CJK KR:style=Black",
+    "hscale": 0.94,
+    "target_h": 154,
+    "margins": [
+      5,
+      851,
+      2,
+      2
+    ],
+    "construction": "single whole-phrase native render; natural font spaces only; no manual per-syllable tracking"
+  },
+  "improvement_gate": {
+    "width_vs_b245_px": 180,
+    "width_ratio_vs_b245": 0.1024,
+    "height_vs_b245_px": 0
+  },
+  "coast2coast_region_pixel_exact": true,
+  "machine_qa": {
+    "containment": "PASS",
+    "changed_outside_heart_bbox": 0,
+    "alpha_changed_outside_heart_bbox": 0,
+    "protected_overlap_pixels": 0,
+    "header_128_exact": true,
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_B85_VERIFIED_CLEAN",
+    "2_source_slant": "PASS_UPRIGHT",
+    "3_scale_hierarchy": "PASS_154PX_AND_GT50PCT_SOURCE_WIDTH",
+    "4_weight_effect": "PASS_BLACK_CONDENSED_0.94_SOURCE_RED",
+    "5_clipping": "PASS_POSITIVE_MARGIN",
+    "6_protected": "PASS_ZERO",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "8_readability": "EVIDENCE_WRITTEN_PENDING_CONTROLLER"
+  },
+  "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
+  "fallback_reason": "GitHub-hosted B246 run 37675870154 remained in step 6 for >30 minutes. Exact B245 input SHA 03f058c... and repository evidence were verified before executing the identical pinned B246 script.",
+  "controller_visual_qa": "PENDING_CHATGPT_CONTROLLER",
+  "status": "B246_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

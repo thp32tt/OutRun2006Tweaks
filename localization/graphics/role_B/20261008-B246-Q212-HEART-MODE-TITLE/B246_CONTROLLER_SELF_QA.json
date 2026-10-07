@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261008-B246-Q212-HEART-MODE-TITLE",
+  "queue_index": 212,
+  "asset": "BA0147DA",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "prior_candidate_sha256": "03f058c2eb21fa39a7d27db8159ba0aa2e1c2497ebd51465ca667ed44331605d",
+  "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+  "semantic_basis": {
+    "source_title": "HEART ATTACK",
+    "localized_title": "하트 어택 모드",
+    "project_precedent": "q116 E3FD08BE: Heart Attack Mode -> 하트 어택 모드",
+    "decision": "PASS_CONTEXTUAL_CANONICAL_MODE_NAME"
+  },
+  "machine_qa": {
+    "source_bbox": [
+      21,
+      1316,
+      1780,
+      1474
+    ],
+    "localized_bbox": [
+      26,
+      1318,
+      929,
+      1472
+    ],
+    "localized_size": [
+      903,
+      154
+    ],
+    "width_ratio": 0.5134,
+    "height_ratio": 0.9747,
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "protected_overlap": 0,
+    "header_128_exact": true,
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "visual_qa": {
+    "source_clean_final": "PASS",
+    "practical_100_75_50": "PASS",
+    "raw": "PASS",
+    "source_family": "PASS_TALL_MILDLY_CONDENSED_BLACK_SOURCE_RED",
+    "grouping": "PASS_SINGLE_WHOLE_PHRASE_NATURAL_SPACES_NO_MANUAL_TRACKING",
+    "observations": [
+      "B245 underfill is materially corrected: width 723px -> 903px while height stays near source maximum at 154/158px.",
+      "The phrase is cohesive and no longer uses the artificial 170-300px manual word gaps from B242-B245.",
+      "No source residue, clipping, protected-art intrusion, broken Hangul, wrong orientation, or C2C collateral change is visible."
+    ]
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_B85_VERIFIED_CLEAN",
+    "2_source_matching_slant": "PASS_SOURCE_UPRIGHT",
+    "3_no_unnecessary_undersize": "PASS_903x154_IN_1759x158",
+    "4_source_faithful_weight_outline_shadow": "PASS_BLACK_0.94_CONDENSED_SOURCE_RED",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGINS_5_851_2_2",
+    "6_protected_art_clearance": "PASS_ZERO",
+    "7_flip_y_raw": "PASS_CONTROLLER_REVIEW",
+    "8_immediate_readability": "PASS_CONTROLLER_REVIEW"
+  },
+  "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
+  "fallback_reason": "GitHub-hosted B246 run 37675870154 remained stuck in step 6 for >30 minutes; exact B245 SHA and pinned B246 script were verified before identical fallback execution.",
+  "decision": "B246_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

@@ -1,0 +1,9 @@
+{
+  "role": "B",
+  "run": "20261008-B246-Q212-HEART-MODE-TITLE",
+  "queue_index": 212,
+  "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+  "report": "localization/graphics/role_B/20261008-B246-Q212-HEART-MODE-TITLE/B246_Q212_REPORT.json",
+  "status": "B246_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED"
+}
