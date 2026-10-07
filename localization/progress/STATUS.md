@@ -2557,3 +2557,10 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q60 A064FDFC: REWORK_REQUIRED — Stage/OUTRUN MILES source-relative hierarchy remains undersized.
 - q212 BA0147DA: REWORK_REQUIRED — C2C/Heart Attack title family remains broad/generic vs tall-condensed source.
 - RUNTIME_VALIDATION=UNTESTED; user/new in-game retest pending; forbidden domains untouched.
+
+### C253 C1 — 2026-10-07 22:28 KST
+- TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL); q147 39BCA907, q197 9F060EC1, q241 E1639D2E processed; 3/3 fresh C PASS + exact-SHA C3_STRICT_PASS.
+- Independent machine: q147 15/15, q197 5/5, q241 2/2 bbox/size/positive-margin; all changed/alpha outside allowed scope=0 and DDS header/raw orientation PASS.
+- Neutral-alpha SOURCE/PRIOR/CURRENT plus producer CLEAN/RAW evidence controller-reviewed PASS. q241 direct-RGB white fragments were verified alpha=0 hidden RGB, not visible residue.
+- Next: PRE_INGAME English-original refresh → user JPG review → NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+

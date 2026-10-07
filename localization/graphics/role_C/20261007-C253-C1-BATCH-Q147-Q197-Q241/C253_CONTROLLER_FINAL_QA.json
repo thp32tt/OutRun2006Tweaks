@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C253",
+  "timestamp": "2026-10-07T22:28:00+09:00",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "selection_policy": "odd fresh/new/user-PRE_INGAME regressions; C252 q63/q121/q193 excluded as already active; even shard untouched",
+  "execution_backend": {
+    "preferred": "ChatGPT local",
+    "local_result": "repository materialization attempted but github.com DNS unavailable in local container",
+    "fallback": "GitHub-hosted localization CPU worker",
+    "n100_used": false
+  },
+  "worker_runs": [
+    {
+      "run_id": 37627397103,
+      "dispatch_sha": "7a7be398339eeb1370bc5270221b2a32ac660d1e",
+      "output_sha": "3e6a7166bc87c316e6c85cfb39d79a30ea4266e6",
+      "purpose": "independent exact-hash machine QA + initial visual evidence",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "run_id": 37628151154,
+      "dispatch_sha": "98f071b453ed03f9f07704ce64f5220fbb2d4dda",
+      "output_sha": "ab069065682fcc25f591916f3704122b1960bd27",
+      "purpose": "neutral-alpha visual rerun to suppress hidden RGB under alpha=0",
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "controller_correction": "Initial direct RGB evidence exposed non-visible RGB bytes beneath transparent pixels on q147/q241. No verdict was finalized from that view. Neutral-alpha composite rerun proved the q241 white strokes are alpha=0 hidden RGB and not visible residue.",
+  "assets": [
+    {
+      "index": 147,
+      "key": "39BCA907",
+      "candidate_sha256": "ab002e4f172ebe72b593914b92661c4f8137d50f8b073a22005fd175cff0153e",
+      "canonical_source_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "machine": "PASS_15_OF_15",
+      "outside_changed_pixels": 0,
+      "alpha_outside_pixels": 0,
+      "naming_policy": "PASS_15_OF_15_CANONICAL_PHONETIC_STAGE_NAMES",
+      "controller_visual": "PASS_NEUTRAL_ALPHA_SOURCE_PRIOR_CURRENT_PLUS_A156_CLEAN_RAW",
+      "c3_strict": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 197,
+      "key": "9F060EC1",
+      "candidate_sha256": "60cfa3ef1257e3bbc50a8c7152aba538837eabd2322c18e098ee7ceb61381fea",
+      "canonical_source_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "machine": "PASS_5_OF_5",
+      "outside_changed_pixels": 0,
+      "alpha_outside_pixels": 0,
+      "controller_visual": "PASS_NEUTRAL_ALPHA_SOURCE_PRIOR_CURRENT_PLUS_A164R_SOURCE_OLD_CLEAN_FINAL_PRACTICAL_RAW",
+      "protected_art": "PASS",
+      "c3_strict": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 241,
+      "key": "E1639D2E",
+      "candidate_sha256": "b94f215b889231a7942299d6a2179540425d11538df21feb25565cac13bab037",
+      "canonical_source_sha256": "e250a41e7c59ccd5b8a68a02aace066f6578fbe0d84a365d7a0a27044b353511",
+      "machine": "PASS_2_OF_2",
+      "outside_changed_pixels": 0,
+      "alpha_outside_pixels": 0,
+      "controller_visual": "PASS_NEUTRAL_ALPHA_SOURCE_PRIOR_CURRENT_PLUS_A146_CLEAN_RAW",
+      "hidden_rgb_note": "direct-RGB white fragments have alpha=0 and are not visible when composited",
+      "c3_strict": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "overall": "3/3 FRESH C PASS + 3/3 EXACT-SHA C3_STRICT_PASS",
+  "next_gate": "persistent PRE_INGAME English-original comparison refresh -> user JPG review -> NEW actual-game retest",
+  "forbidden_domains_touched": [],
+  "runtime_validation": "UNTESTED"
+}
