@@ -5,36 +5,36 @@
   "assets": {
     "q198": {
       "candidate_sha256": "2160e7eef9dd27b028b5adc3df770a508c62891fd21676677365a0f55bee5885",
-      "machine_status": "FAIL",
+      "machine_status": "PASS",
       "row_summary": {
-        "pass": 0,
+        "pass": 4,
         "total": 4
       },
       "outside_changed": 0,
       "outside_alpha": 0,
-      "review_orientation": "RAW"
+      "review_orientation": "FLIP_Y"
     },
     "q226": {
       "candidate_sha256": "5449edb846d6ca3a5de1ab1f817a41feb776e9af3bdda2175967312369e5e374",
-      "machine_status": "FAIL",
+      "machine_status": "PASS",
       "row_summary": {
-        "pass": 0,
+        "pass": 8,
         "total": 8
       },
       "outside_changed": 0,
       "outside_alpha": 0,
-      "review_orientation": "RAW"
+      "review_orientation": "FLIP_Y"
     },
     "q228": {
       "candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
-      "machine_status": "FAIL",
+      "machine_status": "PASS",
       "row_summary": {
-        "pass": 1,
+        "pass": 13,
         "total": 13
       },
       "outside_changed": 0,
       "outside_alpha": 0,
-      "review_orientation": "RAW"
+      "review_orientation": "FLIP_Y"
     }
   },
   "controller_visual_qa": "PENDING_CONTROLLER",

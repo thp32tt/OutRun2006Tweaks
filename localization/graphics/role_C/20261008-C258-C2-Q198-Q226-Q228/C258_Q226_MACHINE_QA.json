@@ -12,14 +12,14 @@
     512
   ],
   "header_128_exact": true,
-  "review_coordinate_orientation": "RAW",
+  "review_coordinate_orientation": "FLIP_Y",
   "orientation_probe_outside_allowed": {
     "raw_mismatch": 0,
     "flip_y_mismatch": 0
   },
   "changed_pixels_outside_allowed_bboxes": 0,
   "alpha_changed_pixels_outside_allowed_bboxes": 0,
-  "source_exact_pixel_residue_diagnostic": 46898,
+  "source_exact_pixel_residue_diagnostic": 19717,
   "rows": [
     {
       "key": "STAGE",
@@ -33,15 +33,25 @@
         228,
         64
       ],
-      "localized_bbox": null,
-      "localized_size": [
-        0,
-        0
+      "localized_bbox": [
+        2,
+        438,
+        211,
+        498
       ],
-      "margins": null,
-      "containment": "FAIL",
-      "size_ceiling": "FAIL",
-      "positive_margin": "FAIL"
+      "localized_size": [
+        209,
+        60
+      ],
+      "margins": [
+        2,
+        17,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
     },
     {
       "key": "GOAL E",
@@ -56,24 +66,24 @@
         64
       ],
       "localized_bbox": [
-        987,
-        370,
-        1233,
-        410
+        982,
+        350,
+        1132,
+        406
       ],
       "localized_size": [
-        246,
-        40
+        150,
+        56
       ],
       "margins": [
-        7,
-        0,
-        24,
-        0
+        2,
+        101,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "GOAL D",
@@ -89,23 +99,23 @@
       ],
       "localized_bbox": [
         6,
-        282,
-        159,
-        326
+        266,
+        160,
+        322
       ],
       "localized_size": [
-        153,
-        44
+        154,
+        56
       ],
       "margins": [
         2,
-        97,
-        20,
-        0
+        96,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "GOAL C",
@@ -120,24 +130,24 @@
         64
       ],
       "localized_bbox": [
-        988,
-        282,
-        1142,
-        326
+        985,
+        266,
+        1137,
+        322
       ],
       "localized_size": [
-        154,
-        44
+        152,
+        56
       ],
       "margins": [
-        5,
-        92,
-        20,
-        0
+        2,
+        97,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "GOAL B",
@@ -153,23 +163,23 @@
       ],
       "localized_bbox": [
         6,
-        190,
-        160,
-        234
+        174,
+        159,
+        230
       ],
       "localized_size": [
-        154,
-        44
+        153,
+        56
       ],
       "margins": [
         2,
-        97,
-        20,
-        0
+        98,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "GOAL A",
@@ -184,24 +194,24 @@
         64
       ],
       "localized_bbox": [
-        986,
-        190,
-        1137,
-        234
+        988,
+        174,
+        1142,
+        230
       ],
       "localized_size": [
-        151,
-        44
+        154,
+        56
       ],
       "margins": [
-        0,
-        105,
-        20,
-        0
+        2,
+        100,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "GOAL",
@@ -216,24 +226,24 @@
         64
       ],
       "localized_bbox": [
-        4,
-        102,
-        194,
-        150
+        6,
+        90,
+        59,
+        146
       ],
       "localized_size": [
-        190,
-        48
+        53,
+        56
       ],
       "margins": [
-        0,
-        1,
-        16,
-        0
+        2,
+        136,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "15 STAGE CONTINUOUS",
@@ -248,31 +258,31 @@
         64
       ],
       "localized_bbox": [
-        985,
-        106,
-        1132,
-        150
+        987,
+        88,
+        1437,
+        147
       ],
       "localized_size": [
-        147,
-        44
+        450,
+        59
       ],
       "margins": [
-        0,
-        677,
-        20,
-        0
+        2,
+        372,
+        2,
+        3
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     }
   ],
   "row_summary": {
-    "pass": 0,
+    "pass": 8,
     "total": 8
   },
-  "machine_status": "FAIL",
+  "machine_status": "PASS",
   "controller_visual_qa": "PENDING_CONTROLLER",
   "c3_strict_decision": "PENDING_CONTROLLER",
   "runtime_validation": "UNTESTED",

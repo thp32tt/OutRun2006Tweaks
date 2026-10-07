@@ -12,7 +12,7 @@
     2048
   ],
   "header_128_exact": true,
-  "review_coordinate_orientation": "RAW",
+  "review_coordinate_orientation": "FLIP_Y",
   "orientation_probe_outside_allowed": {
     "raw_mismatch": 0,
     "flip_y_mismatch": 0
@@ -34,24 +34,24 @@
         119
       ],
       "localized_bbox": [
-        10,
-        35,
-        641,
-        145
+        9,
+        30,
+        1048,
+        141
       ],
       "localized_size": [
-        631,
-        110
+        1039,
+        111
       ],
       "margins": [
-        5,
-        815,
-        9,
-        0
+        4,
+        408,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "car select",
@@ -66,24 +66,24 @@
         119
       ],
       "localized_bbox": [
-        6,
-        191,
-        549,
-        301
+        9,
+        186,
+        522,
+        297
       ],
       "localized_size": [
-        543,
-        110
+        513,
+        111
       ],
       "margins": [
-        1,
-        575,
-        9,
-        0
+        4,
+        602,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "license select",
@@ -98,24 +98,24 @@
         119
       ],
       "localized_bbox": [
-        7,
-        338,
-        698,
-        457
+        10,
+        342,
+        756,
+        452
       ],
       "localized_size": [
-        691,
-        119
+        746,
+        110
       ],
       "margins": [
-        1,
-        802,
-        0,
-        0
+        4,
+        744,
+        4,
+        5
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "game lobby",
@@ -130,24 +130,24 @@
         150
       ],
       "localized_bbox": [
-        10,
-        494,
-        466,
-        644
+        11,
+        498,
+        666,
+        640
       ],
       "localized_size": [
-        456,
-        150
+        655,
+        142
       ],
       "margins": [
-        3,
-        666,
-        0,
-        0
+        4,
+        466,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "main menu",
@@ -163,23 +163,23 @@
       ],
       "localized_bbox": [
         10,
-        644,
-        633,
-        769
+        648,
+        550,
+        765
       ],
       "localized_size": [
-        623,
-        125
+        540,
+        117
       ],
       "margins": [
         4,
-        474,
-        0,
-        0
+        557,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "multiplayer",
@@ -195,23 +195,23 @@
       ],
       "localized_bbox": [
         10,
-        806,
-        314,
-        930
+        810,
+        778,
+        952
       ],
       "localized_size": [
-        304,
-        124
+        768,
+        142
       ],
       "margins": [
         4,
-        881,
-        0,
-        26
+        417,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "music select",
@@ -227,23 +227,23 @@
       ],
       "localized_bbox": [
         10,
-        975,
+        960,
         529,
-        1077
+        1073
       ],
       "localized_size": [
         519,
-        102
+        113
       ],
       "margins": [
         4,
         747,
-        19,
-        0
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "options",
@@ -259,23 +259,23 @@
       ],
       "localized_bbox": [
         10,
-        1114,
-        748,
-        1238
+        1118,
+        318,
+        1261
       ],
       "localized_size": [
-        738,
-        124
+        308,
+        143
       ],
       "margins": [
         4,
-        0,
-        0,
-        27
+        430,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "network",
@@ -291,23 +291,23 @@
       ],
       "localized_bbox": [
         10,
-        1283,
-        666,
-        1424
+        1278,
+        633,
+        1420
       ],
       "localized_size": [
-        656,
-        141
+        623,
+        142
       ],
       "margins": [
         4,
-        150,
-        9,
-        0
+        183,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "rankings",
@@ -322,24 +322,24 @@
         156
       ],
       "localized_bbox": [
-        11,
-        1424,
-        664,
-        1550
+        10,
+        1428,
+        313,
+        1576
       ],
       "localized_size": [
-        653,
-        126
+        303,
+        148
       ],
       "margins": [
-        5,
-        128,
-        0,
-        30
+        4,
+        479,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "game select",
@@ -354,20 +354,20 @@
         156
       ],
       "localized_bbox": [
-        10,
-        1596,
-        756,
-        1706
+        7,
+        1584,
+        701,
+        1732
       ],
       "localized_size": [
-        746,
-        110
+        694,
+        148
       ],
       "margins": [
-        7,
-        480,
-        16,
-        30
+        4,
+        535,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
@@ -386,24 +386,24 @@
         125
       ],
       "localized_bbox": [
-        9,
-        1751,
-        522,
-        1861
+        6,
+        1740,
+        549,
+        1857
       ],
       "localized_size": [
-        513,
-        110
+        543,
+        117
       ],
       "margins": [
-        7,
-        730,
-        15,
-        0
+        4,
+        703,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "race select",
@@ -418,31 +418,31 @@
         119
       ],
       "localized_bbox": [
-        9,
-        1907,
-        1048,
-        2017
+        10,
+        1902,
+        641,
+        2013
       ],
       "localized_size": [
-        1039,
-        110
+        631,
+        111
       ],
       "margins": [
-        3,
-        196,
-        9,
-        0
+        4,
+        603,
+        4,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     }
   ],
   "row_summary": {
-    "pass": 1,
+    "pass": 13,
     "total": 13
   },
-  "machine_status": "FAIL",
+  "machine_status": "PASS",
   "controller_visual_qa": "PENDING_CONTROLLER",
   "c3_strict_decision": "PENDING_CONTROLLER",
   "runtime_validation": "UNTESTED",

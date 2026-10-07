@@ -12,14 +12,14 @@
     2048
   ],
   "header_128_exact": true,
-  "review_coordinate_orientation": "RAW",
+  "review_coordinate_orientation": "FLIP_Y",
   "orientation_probe_outside_allowed": {
     "raw_mismatch": 0,
     "flip_y_mismatch": 0
   },
   "changed_pixels_outside_allowed_bboxes": 0,
   "alpha_changed_pixels_outside_allowed_bboxes": 0,
-  "source_exact_pixel_residue_diagnostic": 579464,
+  "source_exact_pixel_residue_diagnostic": 71,
   "rows": [
     {
       "key": "RANDOM",
@@ -34,24 +34,24 @@
         62
       ],
       "localized_bbox": [
-        116,
-        1922,
-        434,
-        1984
+        206,
+        1925,
+        343,
+        1980
       ],
       "localized_size": [
-        318,
-        62
+        137,
+        55
       ],
       "margins": [
-        0,
-        0,
-        0,
-        0
+        90,
+        91,
+        3,
+        4
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "RANDOM PLAY",
@@ -65,15 +65,25 @@
         580,
         52
       ],
-      "localized_bbox": null,
-      "localized_size": [
-        0,
-        0
+      "localized_bbox": [
+        735,
+        1987,
+        940,
+        2033
       ],
-      "margins": null,
-      "containment": "FAIL",
-      "size_ceiling": "FAIL",
-      "positive_margin": "FAIL"
+      "localized_size": [
+        205,
+        46
+      ],
+      "margins": [
+        187,
+        188,
+        3,
+        3
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
     },
     {
       "key": "INTERMEDIATE B",
@@ -87,15 +97,25 @@
         423,
         41
       ],
-      "localized_bbox": null,
-      "localized_size": [
-        0,
-        0
+      "localized_bbox": [
+        1728,
+        46,
+        1816,
+        81
       ],
-      "margins": null,
-      "containment": "FAIL",
-      "size_ceiling": "FAIL",
-      "positive_margin": "FAIL"
+      "localized_size": [
+        88,
+        35
+      ],
+      "margins": [
+        167,
+        168,
+        3,
+        3
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
     },
     {
       "key": "INTERMEDIATE A",
@@ -110,31 +130,31 @@
         41
       ],
       "localized_bbox": [
-        2198,
-        43,
-        2604,
-        64
+        2367,
+        46,
+        2455,
+        81
       ],
       "localized_size": [
-        406,
-        21
+        88,
+        35
       ],
       "margins": [
-        0,
-        20,
-        0,
-        20
+        169,
+        169,
+        3,
+        3
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     }
   ],
   "row_summary": {
-    "pass": 0,
+    "pass": 4,
     "total": 4
   },
-  "machine_status": "FAIL",
+  "machine_status": "PASS",
   "controller_visual_qa": "PENDING_CONTROLLER",
   "c3_strict_decision": "PENDING_CONTROLLER",
   "runtime_validation": "UNTESTED",
