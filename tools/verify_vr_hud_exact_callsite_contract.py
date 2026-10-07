@@ -135,9 +135,9 @@ def check(ui, manifest):
         wrapper = function_body(ui, func).strip()
         expected_spacing = "false" if right else "true"
         direct_bridge = (
-            r"AddSpriteSpacing\\(&x,\\s*" + expected_spacing +
-            r"\\);\\s*return ExactScreenHud_putClipSprite\\(\\s*"
-            r"xstnum,\\s*x,\\s*y,\\s*flags,\\s*priority,\\s*color\\);"
+            r"AddSpriteSpacing\(&x,\s*" + expected_spacing +
+            r"\);\s*return ExactScreenHud_putClipSprite\(\s*"
+            r"xstnum,\s*x,\s*y,\s*flags,\s*priority,\s*color\);"
         )
         if not re.fullmatch(direct_bridge, wrapper, re.S):
             fail(side + " HUD spacing/forwarding must use the exact ScreenHud owner")
@@ -189,11 +189,11 @@ def test_mutations(ui, manifest):
     must_fail("rank world first", ui.replace("if (RankMarkerSubScreenHudDepth != 0)",
                                             "if (RankMarkerSubScreenHudDepth == 0)", 1))
     must_fail("right-side spacing reversed",
-              ui.replace("AddSpriteSpacing(&x, false);\\n\\t\\treturn ExactScreenHud_putClipSprite(",
-                         "AddSpriteSpacing(&x, true);\\n\\t\\treturn ExactScreenHud_putClipSprite(", 1))
+              ui.replace("AddSpriteSpacing(&x, false);\n\t\treturn ExactScreenHud_putClipSprite(",
+                         "AddSpriteSpacing(&x, true);\n\t\treturn ExactScreenHud_putClipSprite(", 1))
     must_fail("left-side semantic owner bypassed",
-              ui.replace("AddSpriteSpacing(&x, true);\\n\\t\\treturn ExactScreenHud_putClipSprite(",
-                         "AddSpriteSpacing(&x, true);\\n\\t\\treturn Game::put_clip_sprite(", 1))
+              ui.replace("AddSpriteSpacing(&x, true);\n\t\treturn ExactScreenHud_putClipSprite(",
+                         "AddSpriteSpacing(&x, true);\n\t\treturn Game::put_clip_sprite(", 1))
     corrupt = copy.deepcopy(manifest)
     next(c for c in corrupt["contracts"] if int(c["rva"], 16) == 0xBB0FB)["expectedBytes"] = "e800000000"
     must_fail("direct CALL changed", changed_manifest=corrupt)
