@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07T19:00:00+09:00",
+  "updated_at_kst": "2026-10-07T19:12:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -3385,16 +3385,30 @@
     "controller": "localization/graphics/role_B/20261007-B-MANUALQA218-E7F6E9B7/B218_CONTROLLER_FINAL_QA.json"
   },
   "latest_c_pre_ingame_export": {
-    "timestamp_kst": "2026-10-07T10:17:06+09:00",
-    "worker_run_id": 37555515782,
-    "worker_output_commit": "1abf93385fd653b18d64423a65cc6aa689284ef3",
-    "count": 25,
-    "localized_candidate_count": 24,
-    "policy_pass_no_candidate_count": 1,
+    "timestamp_kst": "2026-10-07T19:12:00+09:00",
+    "worker_run_id": 37605030145,
+    "worker_output_commit": "ce260d63a7e94c487da6ca6e0949ca90de036202",
     "manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
-    "q163_number": 18,
-    "q163_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/018_q163_59A79158.jpg",
-    "q163_candidate_sha256": "201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6",
+    "count": 17,
+    "localized_candidate_count": 16,
+    "policy_pass_no_candidate_count": 1,
+    "mandatory_c3_blocked_count": 10,
+    "q28": {
+      "number": 3,
+      "asset": "A05BF610",
+      "candidate_sha256": "1ced3cfa2042d7b0d0b708e3521a7043bd7528b0347ddbe38b2b7ee51a4c0d3a",
+      "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/003_q028_A05BF610.jpg",
+      "controller_export_visual_review": "PASS"
+    },
+    "q30": {
+      "number": 4,
+      "asset": "8215FD25",
+      "candidate_sha256": "fa294ef9bcd4e96db8848da3846cea7d90fd6668e1a30d6957f6e1c881f4a547",
+      "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/004_q030_8215FD25.jpg",
+      "controller_export_visual_review": "PASS"
+    },
+    "q44_excluded": true,
+    "q44_reason": "C246_VISUAL_FAIL_REWORK_REQUIRED",
     "runtime_validation": "UNTESTED"
   },
   "a148r_2ea557b4": {
@@ -4884,7 +4898,33 @@
       "stage_height_ratio": 0.6625,
       "status": "C246_VISUAL_FAIL_REWORK_REQUIRED"
     },
-    "pre_ingame_export": "PENDING_REFRESH_Q28_Q30",
+    "pre_ingame_export": {
+      "timestamp_kst": "2026-10-07T19:12:00+09:00",
+      "worker_run_id": 37605030145,
+      "worker_output_commit": "ce260d63a7e94c487da6ca6e0949ca90de036202",
+      "manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
+      "count": 17,
+      "localized_candidate_count": 16,
+      "policy_pass_no_candidate_count": 1,
+      "mandatory_c3_blocked_count": 10,
+      "q28": {
+        "number": 3,
+        "asset": "A05BF610",
+        "candidate_sha256": "1ced3cfa2042d7b0d0b708e3521a7043bd7528b0347ddbe38b2b7ee51a4c0d3a",
+        "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/003_q028_A05BF610.jpg",
+        "controller_export_visual_review": "PASS"
+      },
+      "q30": {
+        "number": 4,
+        "asset": "8215FD25",
+        "candidate_sha256": "fa294ef9bcd4e96db8848da3846cea7d90fd6668e1a30d6957f6e1c881f4a547",
+        "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/004_q030_8215FD25.jpg",
+        "controller_export_visual_review": "PASS"
+      },
+      "q44_excluded": true,
+      "q44_reason": "C246_VISUAL_FAIL_REWORK_REQUIRED",
+      "runtime_validation": "UNTESTED"
+    },
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
