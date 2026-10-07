@@ -2299,3 +2299,9 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - GitHub-hosted run `37569696429` SUCCESS / worker commit `31f49515f62aad3232de9dd8204da54c8e644b42` produced `fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5`. Localized bbox is 790x132 vs rejected 610x134 inside exact allowed 960x136; +180px width with source-direction right lean and source-like white/navy/steel effect.
 - Persisted-DDS decode PASS; bbox/positive-margin PASS; changed/alpha outside exact source bbox=0; header exact; mip1 only; practical 100/75/50 and RAW/FLIP-Y controller visual QA PASS.
 - PJR-001 remains OPEN. Fresh independent C + mandatory exact-SHA C3_STRICT_PASS + regenerated user JPG + NEW in-game retest are required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 13:31 KST — C234 C1 q137 30CF0D C3_STRICT_PASS
+- TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). P0 user in-game regression IGR-005 selected after latest HEAD/queue refresh; q95 already dispatched by another C1, and no C2/even work was touched.
+- B165 candidate `0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4`: final hosted C234 run 37571258371 SUCCESS. 6/6 bbox/source-size/positive-margin; changed/alpha outside title/subtitle source bboxes=0; MANUAL/AUTOMATIC x4 and unrelated/protected pixels exact; persisted decode/header/mip1/RAW mirror_y/coverage PASS.
+- SOURCE/CLEAN/OLD/FINAL + RAW + practical 100/75/50 visual QA PASS. Exact-SHA mandatory C3_STRICT_PASS: clean source removal, source-relative slant/style/scale, glyph integrity, protected separation, placement and both orientations PASS.
+- Decision `C234_C3_STRICT_PASS_STATIC_PENDING_USER_JPG_AND_NEW_INGAME_RETEST`. IGR-005 remains `C_STATIC_PASS_PENDING_INGAME_RETEST`; PRE_INGAME JPG refresh/user review + NEW actual-game retest still required. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
