@@ -947,9 +947,9 @@ class TextureReplacement : public Hook
 	inline static SafetyHookInline D3DXCreateTextureFromFileInMemory = {};
 	static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Custom_dest(LPDIRECT3DDEVICE9 pDevice, void* pSrcData, UINT SrcDataSize, LPDIRECT3DTEXTURE9* ppTexture)
 	{
+		std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 		if (pSrcData && SrcDataSize)
 		{
-			std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 			HandleTexture(&pSrcData, &SrcDataSize, CurrentXstsetFilename, true,
 				transientTextureData);
 		}
@@ -960,9 +960,9 @@ class TextureReplacement : public Hook
 	}
 	static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Orig_dest(LPDIRECT3DDEVICE9 pDevice, void* pSrcData, UINT SrcDataSize, LPDIRECT3DTEXTURE9* ppTexture)
 	{
+		std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 		if (pSrcData && SrcDataSize)
 		{
-			std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 			HandleTexture(&pSrcData, &SrcDataSize, CurrentXstsetFilename, true,
 				transientTextureData);
 		}
@@ -983,9 +983,9 @@ class TextureReplacement : public Hook
 	inline static SafetyHookInline D3DXCreateTextureFromFileInMemoryEx = {};
 	static HRESULT __stdcall D3DXCreateTextureFromFileInMemoryEx_Custom_dest(LPDIRECT3DDEVICE9 pDevice, void* pSrcData, UINT SrcDataSize, UINT Width, UINT Height, UINT MipLevels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, DWORD Filter, DWORD MipFilter, D3DCOLOR ColorKey, struct D3DXIMAGE_INFO* pSrcInfo, PALETTEENTRY* pPalette, LPDIRECT3DTEXTURE9* ppTexture)
 	{
+		std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 		if ((Settings::SceneTextureReplacement || Settings::SceneTextureExtract) && pSrcData && SrcDataSize)
 		{
-			std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 			HandleTexture(&pSrcData, &SrcDataSize, CurrentXmtsetFilename, false,
 				transientTextureData);
 		}
@@ -994,9 +994,9 @@ class TextureReplacement : public Hook
 	}
 	static HRESULT __stdcall D3DXCreateTextureFromFileInMemoryEx_Orig_dest(LPDIRECT3DDEVICE9 pDevice, void* pSrcData, UINT SrcDataSize, UINT Width, UINT Height, UINT MipLevels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, DWORD Filter, DWORD MipFilter, D3DCOLOR ColorKey, struct D3DXIMAGE_INFO* pSrcInfo, PALETTEENTRY* pPalette, LPDIRECT3DTEXTURE9* ppTexture)
 	{
+		std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 		if ((Settings::SceneTextureReplacement || Settings::SceneTextureExtract) && pSrcData && SrcDataSize)
 		{
-			std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 			HandleTexture(&pSrcData, &SrcDataSize, CurrentXmtsetFilename, false,
 				transientTextureData);
 		}
@@ -1007,9 +1007,9 @@ class TextureReplacement : public Hook
 	inline static SafetyHookInline D3DXCreateCubeTextureFromFileInMemoryEx = {};
 	static HRESULT __stdcall D3DXCreateCubeTextureFromFileInMemoryEx_dest(LPDIRECT3DDEVICE9 pDevice, void* pSrcData, UINT SrcDataSize, UINT Size, UINT MipLevels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, DWORD Filter, DWORD MipFilter, D3DCOLOR ColorKey, struct D3DXIMAGE_INFO* pSrcInfo, PALETTEENTRY* pPalette, LPDIRECT3DCUBETEXTURE9* ppCubeTexture)
 	{
+		std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 		if ((Settings::SceneTextureReplacement || Settings::SceneTextureExtract) && pSrcData && SrcDataSize)
 		{
-			std::shared_ptr<std::vector<uint8_t>> transientTextureData;
 			HandleTexture(&pSrcData, &SrcDataSize, CurrentXmtsetFilename, false,
 				transientTextureData);
 		}
