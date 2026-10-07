@@ -53,9 +53,9 @@
   "latest_durable_task": {
     "task_id": "CONVERSION-DX11-00421",
     "production_id": "CONVERSION-DX11-00421",
-    "event_id": "CONVERSION-DX11-00421-E003",
-    "event_type": "rollover",
-    "attempt": "1/3",
+    "event_id": "CONVERSION-DX11-00421-E004",
+    "event_type": "retry",
+    "attempt": "2/3",
     "chat_rollover": 2,
     "rollover_is_retry": false,
     "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
@@ -68,7 +68,7 @@
     "validation_bearing_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
     "validation_bearing_result_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
     "automation_validation": "PASS",
-    "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+    "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS_RECONCILED_E004_STALE_TIMEOUT",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "validation_run_id": 37575812828,
@@ -85,7 +85,10 @@
     "issue14_comment_id": 6031629494,
     "native_draw_path_activation_changed": false,
     "lane": "DX11",
-    "target_branch": "vr-dx11-native-r71"
+    "target_branch": "vr-dx11-native-r71",
+    "retry_of_event_id": "CONVERSION-DX11-00421-E003",
+    "failure_context": "No authoritative Backend Conversion Gate run was created for result SHA 0570e53588c9ae92770825f663e36c8b70f98733 after 623s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
+    "failure_context_resolution": "STALE_TIMEOUT_FALSE_NEGATIVE_EXACT_SHA_FALLBACK_FOUND_AUTHORITATIVE_SUCCESS"
   },
   "runtime_blocker": "R283 now materializes deterministic translated HLSL/DXBC only for the exact bounded SM3 DCL+MOV subset, but D3D11 programmable shader objects are still intentionally not created or bound. shaderTranslationExact and NativeDrawPath/Draw/DrawIndexed remain disabled; Quest 3/VDXR runtime remains UNTESTED.",
   "runtime_next_action": "Keep programmable binding and native draw inactive. The next independent static slice should consume exact R283 DXBC into bounded same-device shader-object materialization/ownership evidence, with object binding and draw dispatch still disabled.",
@@ -3621,9 +3624,9 @@
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00421",
     "production_id": "CONVERSION-DX11-00421",
-    "event_id": "CONVERSION-DX11-00421-E003",
-    "event_type": "rollover",
-    "attempt": "1/3",
+    "event_id": "CONVERSION-DX11-00421-E004",
+    "event_type": "retry",
+    "attempt": "2/3",
     "chat_rollover": 2,
     "rollover_is_retry": false,
     "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
@@ -3636,7 +3639,7 @@
     "validation_bearing_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
     "validation_bearing_result_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
     "automation_validation": "PASS",
-    "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+    "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS_RECONCILED_E004_STALE_TIMEOUT",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "validation_run_id": 37575812828,
@@ -3653,7 +3656,10 @@
     "issue14_comment_id": 6031629494,
     "native_draw_path_activation_changed": false,
     "lane": "DX11",
-    "target_branch": "vr-dx11-native-r71"
+    "target_branch": "vr-dx11-native-r71",
+    "retry_of_event_id": "CONVERSION-DX11-00421-E003",
+    "failure_context": "No authoritative Backend Conversion Gate run was created for result SHA 0570e53588c9ae92770825f663e36c8b70f98733 after 623s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
+    "failure_context_resolution": "STALE_TIMEOUT_FALSE_NEGATIVE_EXACT_SHA_FALLBACK_FOUND_AUTHORITATIVE_SUCCESS"
   },
   "rollover_metadata_correction": {
     "task_id": "CONVERSION-DX11-00371",
@@ -3759,9 +3765,9 @@
     "status": "COMPLETE",
     "task_id": "CONVERSION-DX11-00421",
     "production_id": "CONVERSION-DX11-00421",
-    "event_id": "CONVERSION-DX11-00421-E003",
-    "event_type": "rollover",
-    "attempt": "1/3",
+    "event_id": "CONVERSION-DX11-00421-E004",
+    "event_type": "retry",
+    "attempt": "2/3",
     "chat_rollover": 2,
     "rollover_is_retry": false,
     "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
@@ -3774,7 +3780,7 @@
     "validation_bearing_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
     "validation_bearing_result_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
     "automation_validation": "PASS",
-    "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+    "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS_RECONCILED_E004_STALE_TIMEOUT",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "validation_run_id": 37575812828,
@@ -3805,7 +3811,10 @@
     "shader_translation_exact_enabled": false,
     "native_draw_path_activation_allowed": false,
     "draw_dispatch_authorized": false,
-    "evidence_scope": "PRODUCTION_R283_BOUNDED_TARGET_BYTECODE_MATERIALIZATION_ONLY"
+    "evidence_scope": "PRODUCTION_R283_BOUNDED_TARGET_BYTECODE_MATERIALIZATION_ONLY",
+    "retry_of_event_id": "CONVERSION-DX11-00421-E003",
+    "failure_context": "No authoritative Backend Conversion Gate run was created for result SHA 0570e53588c9ae92770825f663e36c8b70f98733 after 623s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
+    "failure_context_resolution": "STALE_TIMEOUT_FALSE_NEGATIVE_EXACT_SHA_FALLBACK_FOUND_AUTHORITATIVE_SUCCESS"
   },
   "current_task_rollover_reconciliation": {
     "task_id": "CONVERSION-DX11-00421",
@@ -3833,5 +3842,32 @@
     },
     "reason": "E003/CHAT_ROLLOVER=2 is a rollover, not a queue retry, so ATTEMPT remains 1/3. A separate in-turn exact-SHA CI syntax failure was repaired and revalidated without changing the controller ATTEMPT metadata.",
     "material_and_validation_bearing_sha_unchanged": false
+  },
+  "current_task_retry_reconciliation": {
+    "task_id": "CONVERSION-DX11-00421",
+    "production_id": "CONVERSION-DX11-00421",
+    "event_id": "CONVERSION-DX11-00421-E004",
+    "event_type": "retry",
+    "attempt": "2/3",
+    "failure_context": "No authoritative Backend Conversion Gate run was created for result SHA 0570e53588c9ae92770825f663e36c8b70f98733 after 623s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
+    "checked_branch_head": "e2409759be27f00c6b2a46af4ffe5c7846ca8ad4",
+    "validation_bearing_result_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+    "exact_sha_fallback": {
+      "backend_conversion_gate_run_id": 37575812828,
+      "head_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+      "conclusion": "success",
+      "validate_job_id": 112644341530,
+      "validate_conclusion": "success",
+      "readiness_smoke_job_id": 112645775002,
+      "readiness_smoke_conclusion": "success",
+      "artifact_id": 11463037311,
+      "artifact_digest": "sha256:fc2bcfe8357f9b1ca8d00e0315e849f50b10bd0dfc0497c9e0cda64a6577a889"
+    },
+    "disposition": "RESOLVED_STALE_TIMEOUT_NO_MATERIAL_REWORK",
+    "result_sha_changed": false,
+    "material_work_repeated": false,
+    "new_gate_required": false,
+    "runtime_validation": "UNTESTED",
+    "reason": "QUEUE_CONTROLLER_CONTRACT requires exact-SHA fallback before accepting missing-run failure. The canonical successful Gate exists, so E004 only reconciles controller state and preserves the already validated R283 result."
   }
 }
