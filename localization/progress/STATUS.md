@@ -2501,3 +2501,10 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - Controller SOURCE/A144-OLD/CLEAN/B236-FINAL and RAW review PASS. The prior ~55-57% source-width hierarchy is materially restored to ~90%; q32/q34 plates remain seamless and q36/q38 show no visible rectangle, haze, dirty source footprint, English/Korean residue, broken Hangul, clipping or protected rank/character/lens-flare/border/glow intrusion.
 - Decision `B236_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_PRE_INGAME_USER_JPG_AND_INGAME`. Fresh independent C + mandatory exact-SHA C3 + regenerated English-original PRE_INGAME JPG/user review + actual-game validation remain required. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261007-B236-BATCH-Q032-Q034-Q036-TOTAL-RANK/B236_CONTROLLER_SELF_QA.json` and per-asset B236 reports/JPGs.
+
+### C246 C2 batch — 2026-10-07 19:00 KST
+- TEMP_BACKLOG_RELIEF=C2, SHARD=EVEN, processed 3 assets.
+- q28 A05BF610 1ced3cfa...: fresh C PASS + exact-SHA C3_STRICT_PASS; PRE_INGAME/user JPG/new in-game pending.
+- q30 8215FD25 fa294ef9...: fresh C PASS + exact-SHA C3_STRICT_PASS; PRE_INGAME/user JPG/new in-game pending.
+- q44 19CEDB9 8c6a390c...: machine PASS, controller visual scale FAIL -> REWORK_REQUIRED; C3 blocked.
+- RUNTIME_VALIDATION=UNTESTED; no VR/FFB/DX11/DXVK work.

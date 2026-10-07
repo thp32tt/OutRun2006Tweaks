@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "timestamp_kst": "2026-10-07T19:00:00+09:00",
+  "run": "20261007-C246-C2-BATCH-Q028-Q030-Q044",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "worker_run": 37604055569,
+  "worker_output_commit": "c3376ffb7e98309221d67817d854ab51fdc4a8bb",
+  "batch_count": 3,
+  "execution_backend": "GITHUB_ACTIONS_FOR_FRESH_PIXEL_QA; N100_MCP_AUXILIARY_CONTROLLER_VISUAL_REVIEW_ONLY",
+  "q28": {
+    "queue_index": 28,
+    "asset": "A05BF610",
+    "candidate_sha256": "1ced3cfa2042d7b0d0b708e3521a7043bd7528b0347ddbe38b2b7ee51a4c0d3a",
+    "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+    "machine_qa": "PASS",
+    "controller_visual_qa": "PASS",
+    "c3": "C3_STRICT_PASS",
+    "localized_size": [
+      476,
+      80
+    ],
+    "source_size": [
+      525,
+      90
+    ],
+    "width_ratio": 0.9067,
+    "margins": [
+      24,
+      25,
+      5,
+      5
+    ],
+    "outside_pixels": 0,
+    "alpha_outside_pixels": 0,
+    "status": "C246_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME"
+  },
+  "q30": {
+    "queue_index": 30,
+    "asset": "8215FD25",
+    "candidate_sha256": "fa294ef9bcd4e96db8848da3846cea7d90fd6668e1a30d6957f6e1c881f4a547",
+    "source_sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e",
+    "machine_qa": "PASS",
+    "controller_visual_qa": "PASS",
+    "c3": "C3_STRICT_PASS",
+    "localized_sizes": [
+      [
+        486,
+        92
+      ],
+      [
+        486,
+        92
+      ]
+    ],
+    "source_sizes": [
+      [
+        535,
+        102
+      ],
+      [
+        534,
+        102
+      ]
+    ],
+    "width_ratios": [
+      0.9084,
+      0.9101
+    ],
+    "outside_pixels": 0,
+    "alpha_outside_pixels": 0,
+    "overlap_pixels": 0,
+    "status": "C246_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME"
+  },
+  "q44": {
+    "queue_index": 44,
+    "asset": "19CEDB9",
+    "candidate_sha256": "8c6a390cbadae23beff263bb0eea4ca935643d591b45bac9ca474fa108e5a913",
+    "source_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+    "machine_qa": "PASS",
+    "controller_visual_qa": "FAIL_TEXT_SCALE_TOO_SMALL_VS_SOURCE",
+    "c3": "BLOCKED_VISUAL_FAIL",
+    "critical_width_ratios": {
+      "result": 0.5302,
+      "ranking": 0.4925,
+      "you": 0.413,
+      "lose": 0.6075,
+      "win": 0.7317,
+      "sector2": 0.7582,
+      "sector1": 0.7684,
+      "sector3": 0.7624
+    },
+    "stage_height_ratio": 0.6625,
+    "status": "C246_VISUAL_FAIL_REWORK_REQUIRED"
+  },
+  "pre_ingame_export": "PENDING_REFRESH_Q28_Q30",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "decision_summary": {
+    "q28": "FRESH_C_PASS+C3_STRICT_PASS",
+    "q30": "FRESH_C_PASS+C3_STRICT_PASS",
+    "q44": "REWORK_REQUIRED_VISUAL_OVERRIDE"
+  },
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C246-C2-BATCH-Q028-Q030-Q044/C246_Q028_A05BF610_SOURCE_CLEAN_CURRENT.jpg",
+    "localization/graphics/role_C/20261007-C246-C2-BATCH-Q028-Q030-Q044/C246_Q028_A05BF610_PRACTICAL.jpg",
+    "localization/graphics/role_C/20261007-C246-C2-BATCH-Q028-Q030-Q044/C246_Q028_A05BF610_RAW.jpg",
+    "localization/graphics/role_C/20261007-C246-C2-BATCH-Q028-Q030-Q044/C246_Q030_8215FD25_SOURCE_CLEAN_CURRENT.jpg",
+    "localization/graphics/role_C/20261007-C246-C2-BATCH-Q028-Q030-Q044/C246_Q030_8215FD25_PRACTICAL.jpg",
+    "localization/graphics/role_C/20261007-C246-C2-BATCH-Q028-Q030-Q044/C246_Q030_8215FD25_RAW.jpg",
+    "localization/graphics/role_C/20261007-C246-C2-BATCH-Q028-Q030-Q044/C246_Q044_19CEDB9_FULL.jpg",
+    "localization/graphics/role_C/20261007-C246-C2-BATCH-Q028-Q030-Q044/C246_Q044_19CEDB9_ROW_CONTACTS.jpg",
+    "localization/graphics/role_C/20261007-C246-C2-BATCH-Q028-Q030-Q044/C246_Q044_19CEDB9_RAW.jpg"
+  ]
+}
