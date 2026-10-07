@@ -1,0 +1,9 @@
+{
+  "role": "B",
+  "run": "20261008-B245-Q212-HEART-COMPACT-HIERARCHY",
+  "queue_index": 212,
+  "candidate_sha256": "03f058c2eb21fa39a7d27db8159ba0aa2e1c2497ebd51465ca667ed44331605d",
+  "report": "localization/graphics/role_B/20261008-B245-Q212-HEART-COMPACT-HIERARCHY/B245_Q212_REPORT.json",
+  "status": "B245_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED"
+}

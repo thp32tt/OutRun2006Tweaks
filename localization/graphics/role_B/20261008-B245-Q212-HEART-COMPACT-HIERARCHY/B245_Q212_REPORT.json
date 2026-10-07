@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261008-B245-Q212-HEART-COMPACT-HIERARCHY",
+  "queue_index": 212,
+  "asset": "BA0147DA",
+  "trigger": "B243_CONTROLLER_VISUAL_FAIL_GAP_REDUCED_BUT_HIERARCHY_WIDTH_REGRESSED",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "prior_candidate_sha256": "4b967ef09bbbb21d7ecc1496c2ee15395567b526af6cf68f1c22c7549850d518",
+  "candidate_sha256": "03f058c2eb21fa39a7d27db8159ba0aa2e1c2497ebd51465ca667ed44331605d",
+  "heart_attack": {
+    "source_bbox": [
+      21,
+      1316,
+      1780,
+      1474
+    ],
+    "localized_bbox": [
+      26,
+      1318,
+      749,
+      1472
+    ],
+    "source_size": [
+      1759,
+      158
+    ],
+    "localized_size": [
+      723,
+      154
+    ],
+    "width_ratio": 0.411,
+    "height_ratio": 0.9747,
+    "word_gap_px": 170,
+    "b242_word_gap_px": 300,
+    "b243_word_gap_px": 195,
+    "font": "Noto Sans CJK KR:style=Black",
+    "hscale": 0.97,
+    "target_h": 154,
+    "word_boxes": [
+      [
+        26,
+        1318,
+        309,
+        1472
+      ],
+      [
+        479,
+        1318,
+        749,
+        1472
+      ]
+    ],
+    "margins": [
+      5,
+      1031,
+      2,
+      2
+    ],
+    "construction": "whole-word groups only; no per-syllable tracking; mildly condensed 0.97 aspect; near-source-max 154px height; reduced 170px word gap"
+  },
+  "improvement_gate": {
+    "gap_vs_b243_px": 25,
+    "gap_vs_b242_px": 130,
+    "width_vs_b243_px": 16,
+    "width_vs_b242_px": 5,
+    "height_vs_b243_px": 4
+  },
+  "coast2coast_region_pixel_exact": true,
+  "machine_qa": {
+    "containment": "PASS",
+    "changed_outside_heart_bbox": 0,
+    "alpha_changed_outside_heart_bbox": 0,
+    "header_128_exact": true,
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_B85_VERIFIED_CLEAN",
+    "2_source_slant": "PASS_UPRIGHT",
+    "3_scale_hierarchy": "PASS_154PX_NEAR_SOURCE_MAX",
+    "4_weight_effect": "PASS_BLACK_MILD_CONDENSE_0.97",
+    "5_clipping": "PASS_POSITIVE_MARGIN",
+    "6_protected": "PASS_ZERO",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "8_readability": "EVIDENCE_WRITTEN_PENDING_CONTROLLER"
+  },
+  "execution_backend": "GITHUB_HOSTED_CPU_WORKER",
+  "controller_visual_qa": "PENDING_CHATGPT_CONTROLLER",
+  "status": "B245_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
