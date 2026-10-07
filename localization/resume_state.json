@@ -8137,9 +8137,10 @@
     "coverage": "PASS_30_SEMANTIC_PLUS_EXPLICIT_PRESERVES",
     "machine_report": "localization/graphics/role_C/20261007-C236-C2-Q046-AA04D779-B231/C236_AA04D779_MACHINE_QA.json",
     "controller_report": "localization/graphics/role_C/20261007-C236-C2-Q046-AA04D779-B231/C236_AA04D779_CONTROLLER_FINAL_QA.json",
-    "pre_ingame_comparison_refresh": "PENDING_AFTER_C236_PROMOTION",
+    "pre_ingame_comparison_refresh": "PASS_001_q046_AA04D779.jpg",
     "user_jpg_review": "PENDING",
     "runtime_validation": "UNTESTED",
-    "forbidden_domains_touched": []
+    "forbidden_domains_touched": [],
+    "export_refresh_timestamp_kst": "2026-10-07T14:04:05+09:00"
   }
 }

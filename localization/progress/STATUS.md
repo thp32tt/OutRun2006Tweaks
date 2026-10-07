@@ -2325,3 +2325,7 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN. Candidate d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0 fresh independent C + mandatory C3 PASS.
 - 13/13 new physical control rows containment/source-size/positive-margin PASS; zero blast radius, alpha blast, pair overlap and protected overlap. Existing 21 stage/sector localizations unchanged outside rework; coverage now 30 semantic segments plus explicit preserves.
 - PRE_INGAME English-original export refresh is pending; user JPG review and actual game validation remain. RUNTIME_VALIDATION=UNTESTED.
+
+## 2026-10-07 14:04 KST — C236 q46 PRE_INGAME refreshed
+- #001 q046 AA04D779 English-original vs exact current Korean candidate exported successfully after C3_STRICT_PASS.
+- User JPG review and actual in-game validation remain pending; RUNTIME_VALIDATION=UNTESTED.

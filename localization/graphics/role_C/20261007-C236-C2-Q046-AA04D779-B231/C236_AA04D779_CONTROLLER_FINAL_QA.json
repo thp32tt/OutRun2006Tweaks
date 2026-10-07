@@ -51,9 +51,17 @@
       "coverage": "PASS"
     }
   },
-  "decision": "C236_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME",
-  "pre_ingame_export": "PENDING_REFRESH_AFTER_QUEUE_PROMOTION",
+  "decision": "C236_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_INGAME",
+  "pre_ingame_export": "REFRESHED_PASS",
   "user_jpg_review": "PENDING_REFRESH_AND_REVIEW",
   "runtime_validation": "UNTESTED",
-  "forbidden_domains_touched": []
+  "forbidden_domains_touched": [],
+  "pre_ingame_export_evidence": {
+    "worker_run": "20261007-C236-C2-Q046-AA04D779-B231-EXPORT",
+    "worker_result": "localization/graphics/worker_results/C236_PRE_INGAME_EXPORT.json",
+    "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/001_q046_AA04D779.jpg",
+    "manifest_count": 9,
+    "mandatory_c3_blocked_count": 10,
+    "candidate_sha256": "d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0"
+  }
 }

@@ -2891,3 +2891,8 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Coverage PASS: 30 semantic localized segments. REV/TOP/You/player markers/icons/course-symbol/numeric artwork remain explicit preserves.
 - Controller SOURCE/OLD/CLEAN/FINAL, RAW mirror_y and practical 100/75/50 visual review PASS. Mandatory exact-SHA C3_STRICT_PASS: clean removal, source family/style, near-source height/readability, glyph integrity, protected separation, placement, orientation and coverage all PASS.
 - Decision C236_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 14:04 KST — C236 q46 PRE_INGAME export refresh complete
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN. Persistent exporter rerun after C236 queue promotion.
+- Export worker PASS: q46 AA04D779 is #001, exact candidate d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0, pinned English source SHA 1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5, native 2048x2048, display scale 1.
+- Current PRE_INGAME manifest count=9; mandatory C3-blocked candidates=10. q46 remains pending user JPG review and actual in-game validation; RUNTIME_VALIDATION=UNTESTED.

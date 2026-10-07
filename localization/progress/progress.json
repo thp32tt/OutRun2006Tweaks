@@ -4145,7 +4145,7 @@
   },
   "c236_c2_q046_aa04d779": {
     "timestamp_kst": "2026-10-07T13:58:30+09:00",
-    "status": "C236_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME",
+    "status": "C236_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_INGAME",
     "queue_index": 46,
     "asset": "AA04D779",
     "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
@@ -4160,8 +4160,9 @@
     "pair_overlap": 0,
     "protected_overlap": 0,
     "coverage": "PASS_30_SEMANTIC_PLUS_EXPLICIT_PRESERVES",
-    "pre_ingame_export": "PENDING_REFRESH",
+    "pre_ingame_export": "PASS_001_q046_AA04D779.jpg",
     "runtime_validation": "UNTESTED",
-    "no_vr_ffb_dx11_dxvk_work": true
+    "no_vr_ffb_dx11_dxvk_work": true,
+    "export_refresh_timestamp_kst": "2026-10-07T14:04:05+09:00"
   }
 }
