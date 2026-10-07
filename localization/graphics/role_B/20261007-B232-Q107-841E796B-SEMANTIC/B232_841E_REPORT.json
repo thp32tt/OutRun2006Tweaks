@@ -7,9 +7,10 @@
   "selection_reason": "B even-shard actionable producer work exhausted; PRE_INGAME semantic false-negative found on oldest reviewed odd candidate",
   "asset": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
   "source_sha256": "112f47e7b16ecf21f722738f7fc9053d1a9852d66da9ef9d29fd25dadf2f567e",
-  "before_candidate_sha256": "6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad",
-  "candidate_sha256": "5e7af1d49c0ef87406d7a17b4c52fe2044dcd8c9f6fe001a1a89f5a479a5715e",
-  "defect": "SEMANTIC_ORDER_UNNATURAL: catalog intended 핸디캡 없음 but raster mapping rendered 없음 / 핸디캡",
+  "original_c103_candidate_sha256": "6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad",
+  "before_candidate_sha256": "5e7af1d49c0ef87406d7a17b4c52fe2044dcd8c9f6fe001a1a89f5a479a5715e",
+  "candidate_sha256": "d6a5cc84e7cf834afe11d8afdc2c0b869b306e75759b71ee392983db8999abda",
+  "defect": "SEMANTIC_ORDER_UNNATURAL plus B232_v1 controller visual hierarchy undersize; v1 rejected before shared-state promotion",
   "translation": {
     "source": "No Handicap",
     "prior": "없음 / 핸디캡",
@@ -32,14 +33,14 @@
     ]
   },
   "localized_top_bbox": [
-    1553,
+    1540,
     264,
-    1582,
+    1596,
     294
   ],
   "localized_top_margins": [
-    19,
-    20,
+    6,
+    6,
     6,
     6
   ],
@@ -77,8 +78,8 @@
       255
     ],
     "shadow_rgba": [
-      33,
-      33,
+      58,
+      56,
       0,
       255
     ]
@@ -94,7 +95,7 @@
     "immediate_readability": "PENDING_CONTROLLER_VISUAL"
   },
   "controller_visual_qa": "PENDING_CONTROLLER_VISUAL",
-  "status": "B232_WORKER_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "status": "B232R_WORKER_PASS_PENDING_CONTROLLER_FRESH_C_C3",
   "RUNTIME_VALIDATION": "UNTESTED",
   "no_vr_ffb_dx11_dxvk_work": true
 }
