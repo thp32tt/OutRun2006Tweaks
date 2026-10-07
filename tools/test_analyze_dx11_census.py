@@ -2128,6 +2128,95 @@ def main() -> int:
     )
     assert r306_inconsistent_prerequisite["NativeDrawPathActivationAllowed"] is False
 
+    r309_supporting_production_evidence = (
+        "VR DX11 R283 targetBytecodeMaterialization signature#1: "
+        "exact=1 vertexSubset=1 pixelSubset=1 vertexCompiled=1 "
+        "pixelCompiled=1 materialized=1 createAuthorized=0 "
+        "cacheKey=0x0102030405060708 "
+        "vertexSourceBytes=16 pixelSourceBytes=16 "
+        "vertexSource=0x1111111111111111 pixelSource=0x2222222222222222 "
+        "vertexBytes=16 pixelBytes=16 "
+        "vertexBytecode=0x3333333333333333 "
+        "pixelBytecode=0x4444444444444444 "
+        "vertexArtifact=0x5555555555555555 "
+        "pixelArtifact=0x6666666666666666 "
+        "contractSnapshot=0x7777777777777777 "
+        "artifactSnapshot=0x8888888888888888 "
+        "planSnapshot=0x9999999999999999 "
+        "snapshot=0xAAAAAAAAAAAAAAAA\n"
+        "VR DX11 R275 translatedSemanticReceipt signature#1: "
+        "exact=1 objectReady=1 snapshot=0xBBBBBBBBBBBBBBBB\n"
+    )
+    r309_production_observation = run_case(
+        r309_supporting_production_evidence
+        + "VR DX11 R287 productionObservation signature#1: "
+        "exact=1 ownerGeneration=7 materializationReused=0 objectReady=1 "
+        "boundaryPreserved=1 handoffSnapshot=0xCCCCCCCCCCCCCCCC "
+        "snapshot=0xDDDDDDDDDDDDDDDD\n"
+        + r306_signature_tail
+    )
+    r309_inventory = r309_production_observation["ActivationEvidence"][
+        "ProgrammableShaderInventory"
+    ]
+    assert r309_inventory["ProductionObservationEvidenceSignatures"] == 1
+    assert r309_inventory["ProductionObservationExactSignatures"] == 1
+    assert r309_inventory["ProductionObservationFailClosedSignatures"] == 1
+    assert r309_inventory[
+        "ProductionObservationCorrelationInexactSignatures"
+    ] == []
+    assert r309_inventory[
+        "ProductionObservationEvidenceCoverageComplete"
+    ] is True
+    r309_evidence = r309_inventory["Pairs"][0]["SemanticTranslationEvidence"][0][
+        "ProductionObservation"
+    ]
+    assert r309_evidence["exact"] is True
+    assert r309_evidence["owner_generation"] == 7
+    assert r309_evidence["object_ready"] is True
+    assert r309_evidence["boundary_preserved"] is True
+    assert r309_evidence["snapshot_state_correlated"] is True
+    assert r309_evidence["exact_state_correlated"] is True
+    assert r309_evidence["target_materialization_correlated"] is True
+    assert r309_evidence["translated_semantic_receipt_correlated"] is True
+    assert r309_evidence["summary_correlation_exact"] is True
+    assert r309_evidence["fail_closed"] is True
+    assert r309_evidence["activation_proof"] is False
+    assert r309_production_observation[
+        "NativeDrawPathActivationAllowed"
+    ] is False
+
+    r309_inconsistent_production_observation = run_case(
+        r309_supporting_production_evidence
+        + "VR DX11 R287 productionObservation signature#1: "
+        "exact=1 ownerGeneration=0 materializationReused=0 objectReady=0 "
+        "boundaryPreserved=1 handoffSnapshot=0x0000000000000000 "
+        "snapshot=0x0000000000000000\n"
+        + r306_signature_tail
+    )
+    r309_inconsistent_inventory = r309_inconsistent_production_observation[
+        "ActivationEvidence"
+    ]["ProgrammableShaderInventory"]
+    assert r309_inconsistent_inventory[
+        "ProductionObservationCorrelationInexactSignatures"
+    ] == [{"source_log": "OutRun2006Tweaks.log", "startup_epoch": 0, "id": 1}]
+    assert (
+        r309_inconsistent_inventory[
+            "ProductionObservationEvidenceCoverageComplete"
+        ]
+        is False
+    )
+    r309_inconsistent_evidence = r309_inconsistent_inventory["Pairs"][0][
+        "SemanticTranslationEvidence"
+    ][0]["ProductionObservation"]
+    assert r309_inconsistent_evidence["snapshot_state_correlated"] is False
+    assert r309_inconsistent_evidence["exact_state_correlated"] is False
+    assert r309_inconsistent_evidence["summary_correlation_exact"] is False
+    assert r309_inconsistent_evidence["fail_closed"] is False
+    assert r309_inconsistent_evidence["activation_proof"] is False
+    assert r309_inconsistent_production_observation[
+        "NativeDrawPathActivationAllowed"
+    ] is False
+
     r308_production_semantic_review = run_case(
         "VR DX11 R291 productionSemanticReview signature#1: "
         "admissionExact=1 reviewExact=1 inputLayoutReady=1 "

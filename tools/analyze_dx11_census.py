@@ -225,6 +225,15 @@ R275_SEMANTIC_RECEIPT_RE = re.compile(
     r"exact=(?P<exact>[01]) objectReady=(?P<objectReady>[01]) "
     r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
 )
+R287_PRODUCTION_OBSERVATION_RE = re.compile(
+    r"VR DX11 R287 productionObservation signature#(?P<signature>\d+): "
+    r"exact=(?P<exact>[01]) ownerGeneration=(?P<ownerGeneration>\d+) "
+    r"materializationReused=(?P<materializationReused>[01]) "
+    r"objectReady=(?P<objectReady>[01]) "
+    r"boundaryPreserved=(?P<boundaryPreserved>[01]) "
+    r"handoffSnapshot=0x(?P<handoffSnapshot>[0-9A-Fa-f]+) "
+    r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
+)
 R291_PRODUCTION_SEMANTIC_REVIEW_RE = re.compile(
     r"VR DX11 R291 productionSemanticReview signature#(?P<signature>\d+): "
     r"admissionExact=(?P<admissionExact>[01]) "
@@ -556,6 +565,8 @@ def summarize_programmable_shader_inventory(
     semantic_receipt_missing: list[dict] = []
     production_activation_prerequisite_missing: list[dict] = []
     production_activation_prerequisite_correlation_inexact: list[dict] = []
+    production_observation_missing: list[dict] = []
+    production_observation_correlation_inexact: list[dict] = []
     production_semantic_review_missing: list[dict] = []
     production_semantic_review_correlation_inexact: list[dict] = []
     production_source_revalidation_missing: list[dict] = []
@@ -582,6 +593,9 @@ def summarize_programmable_shader_inventory(
     production_activation_prerequisite_evidence_signatures = 0
     production_activation_prerequisite_exact_signatures = 0
     production_activation_prerequisite_fail_closed_signatures = 0
+    production_observation_evidence_signatures = 0
+    production_observation_exact_signatures = 0
+    production_observation_fail_closed_signatures = 0
     production_semantic_review_evidence_signatures = 0
     production_semantic_review_exact_signatures = 0
     production_semantic_review_fail_closed_signatures = 0
@@ -654,6 +668,9 @@ def summarize_programmable_shader_inventory(
         receipt = signature.get("translated_semantic_receipt")
         production_activation_prerequisite = signature.get(
             "production_activation_prerequisite"
+        )
+        production_observation = signature.get(
+            "production_observation"
         )
         production_semantic_review = signature.get(
             "production_semantic_review"
@@ -811,6 +828,17 @@ def summarize_programmable_shader_inventory(
             if production_activation_prerequisite["fail_closed"]:
                 production_activation_prerequisite_fail_closed_signatures += 1
 
+        if production_observation is None:
+            production_observation_missing.append(ref)
+        else:
+            production_observation_evidence_signatures += 1
+            if not production_observation["summary_correlation_exact"]:
+                production_observation_correlation_inexact.append(ref)
+            if production_observation["exact"]:
+                production_observation_exact_signatures += 1
+            if production_observation["fail_closed"]:
+                production_observation_fail_closed_signatures += 1
+
         if production_semantic_review is None:
             production_semantic_review_missing.append(ref)
         else:
@@ -846,6 +874,7 @@ def summarize_programmable_shader_inventory(
                 "Receipt": receipt,
                 "ProductionActivationPrerequisite":
                     production_activation_prerequisite,
+                "ProductionObservation": production_observation,
                 "ProductionSemanticReview": production_semantic_review,
                 "ProductionSourceRevalidation": production_source_revalidation,
                 "MissingPrerequisite": missing_prerequisite,
@@ -877,6 +906,12 @@ def summarize_programmable_shader_inventory(
         and programmable_signatures > 0
         and not production_activation_prerequisite_missing
         and not production_activation_prerequisite_correlation_inexact
+    )
+    production_observation_evidence_coverage_complete = bool(
+        evidence_coverage_complete
+        and programmable_signatures > 0
+        and not production_observation_missing
+        and not production_observation_correlation_inexact
     )
     production_semantic_review_evidence_coverage_complete = bool(
         evidence_coverage_complete
@@ -945,6 +980,18 @@ def summarize_programmable_shader_inventory(
             production_activation_prerequisite_fail_closed_signatures,
         "ProductionActivationEvidenceCoverageComplete":
             production_activation_evidence_coverage_complete,
+        "ProductionObservationEvidenceMissingSignatures":
+            production_observation_missing,
+        "ProductionObservationCorrelationInexactSignatures":
+            production_observation_correlation_inexact,
+        "ProductionObservationEvidenceSignatures":
+            production_observation_evidence_signatures,
+        "ProductionObservationExactSignatures":
+            production_observation_exact_signatures,
+        "ProductionObservationFailClosedSignatures":
+            production_observation_fail_closed_signatures,
+        "ProductionObservationEvidenceCoverageComplete":
+            production_observation_evidence_coverage_complete,
         "ProductionSemanticReviewEvidenceMissingSignatures":
             production_semantic_review_missing,
         "ProductionSemanticReviewCorrelationInexactSignatures":
@@ -1007,6 +1054,7 @@ def main() -> int:
     target_bytecode_materializations: dict[SignatureKey, dict] = {}
     translated_semantic_receipts: dict[SignatureKey, dict] = {}
     production_activation_prerequisites: dict[SignatureKey, dict] = {}
+    production_observations: dict[SignatureKey, dict] = {}
     production_semantic_reviews: dict[SignatureKey, dict] = {}
     production_source_revalidations: dict[SignatureKey, dict] = {}
     declarations: dict[SignatureKey, list[dict]] = {}
@@ -1042,6 +1090,7 @@ def main() -> int:
             and "VR DX11 R194" not in text
             and "VR DX11 R197" not in text
             and "VR DX11 R223" not in text
+            and "VR DX11 R287" not in text
             and "VR DX11 R291" not in text
             and "VR DX11 R293" not in text
             and "VR DX11 R297" not in text
@@ -1306,6 +1355,105 @@ def main() -> int:
                     "object_ready": bool(int(data["objectReady"])),
                     "snapshot": int(data["snapshot"], 16),
                     "snapshot_hex": "0x" + data["snapshot"].upper(),
+                }
+                continue
+
+            match = R287_PRODUCTION_OBSERVATION_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                signature_key = (source_log, startup_epoch, signature_id)
+                exact = bool(int(data["exact"]))
+                owner_generation = int(data["ownerGeneration"])
+                materialization_reused = bool(
+                    int(data["materializationReused"])
+                )
+                object_ready = bool(int(data["objectReady"]))
+                boundary_preserved = bool(int(data["boundaryPreserved"]))
+                handoff_snapshot = int(data["handoffSnapshot"], 16)
+                snapshot = int(data["snapshot"], 16)
+
+                snapshot_state_correlated = (
+                    (snapshot != 0) == exact
+                )
+                exact_state_correlated = bool(
+                    not exact
+                    or (
+                        owner_generation != 0
+                        and object_ready
+                        and boundary_preserved
+                        and handoff_snapshot != 0
+                        and snapshot != 0
+                    )
+                )
+                boundary_state_correlated = bool(
+                    not boundary_preserved or exact
+                )
+                reuse_state_correlated = bool(
+                    not materialization_reused or object_ready
+                )
+                target_materialization = target_bytecode_materializations.get(
+                    signature_key
+                )
+                target_materialization_correlated = bool(
+                    not exact
+                    or (
+                        target_materialization is not None
+                        and target_materialization["exact"]
+                        and target_materialization["materialized"]
+                        and not target_materialization["creation_authorized"]
+                        and target_materialization["snapshot"] != 0
+                    )
+                )
+                translated_receipt = translated_semantic_receipts.get(
+                    signature_key
+                )
+                translated_semantic_receipt_correlated = bool(
+                    not exact
+                    or (
+                        translated_receipt is not None
+                        and translated_receipt["exact"]
+                        and translated_receipt["object_ready"]
+                        and translated_receipt["snapshot"] != 0
+                    )
+                )
+                summary_correlation_exact = bool(
+                    snapshot_state_correlated
+                    and exact_state_correlated
+                    and boundary_state_correlated
+                    and reuse_state_correlated
+                    and target_materialization_correlated
+                    and translated_semantic_receipt_correlated
+                )
+                production_observations[signature_key] = {
+                    "exact": exact,
+                    "owner_generation": owner_generation,
+                    "materialization_reused": materialization_reused,
+                    "object_ready": object_ready,
+                    "boundary_preserved": boundary_preserved,
+                    "handoff_snapshot": handoff_snapshot,
+                    "handoff_snapshot_hex":
+                        f"0x{handoff_snapshot:016X}",
+                    "snapshot": snapshot,
+                    "snapshot_hex": f"0x{snapshot:016X}",
+                    "snapshot_state_correlated":
+                        snapshot_state_correlated,
+                    "exact_state_correlated": exact_state_correlated,
+                    "boundary_state_correlated":
+                        boundary_state_correlated,
+                    "reuse_state_correlated": reuse_state_correlated,
+                    "target_materialization_correlated":
+                        target_materialization_correlated,
+                    "translated_semantic_receipt_correlated":
+                        translated_semantic_receipt_correlated,
+                    "summary_correlation_exact":
+                        summary_correlation_exact,
+                    "fail_closed": bool(
+                        summary_correlation_exact
+                        and (not exact or boundary_preserved)
+                    ),
+                    "diagnostic_only": True,
+                    "activation_proof": False,
                 }
                 continue
 
@@ -1797,6 +1945,9 @@ def main() -> int:
         )
         signature["production_activation_prerequisite"] = (
             production_activation_prerequisites.get(signature_key)
+        )
+        signature["production_observation"] = (
+            production_observations.get(signature_key)
         )
         signature["production_semantic_review"] = (
             production_semantic_reviews.get(signature_key)

@@ -11591,6 +11591,37 @@ def main() -> None:
             )
         )
 
+    r309_programmable_production_observation_analyzer_bridge = [
+        ("VR DX11 R287 productionObservation",
+         RUNTIME_CENSUS, "R309 consumes the existing R287 production observation"),
+        ("R287_PRODUCTION_OBSERVATION_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R309 parses R287 production observation evidence"),
+        ('"target_materialization_correlated":',
+         DX11_CENSUS_ANALYZER, "R309 correlates exact R287 with R283 materialization"),
+        ('"translated_semantic_receipt_correlated":',
+         DX11_CENSUS_ANALYZER, "R309 correlates exact R287 with R275 semantic receipt"),
+        ('"ProductionObservation": production_observation',
+         DX11_CENSUS_ANALYZER, "R309 attaches R287 evidence to the exact signature"),
+        ("r309_production_observation = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R309 exact production-observation fixture"),
+        ("r309_inconsistent_production_observation = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R309 inconsistent production-observation fixture"),
+        ('r309_evidence["activation_proof"] is False',
+         DX11_CENSUS_ANALYZER_TEST, "R309 analyzer evidence cannot activate draw"),
+    ]
+    missing_r309_programmable_production_observation_analyzer_bridge = [
+        meaning for token, source, meaning
+        in r309_programmable_production_observation_analyzer_bridge
+        if token not in source
+    ]
+    if missing_r309_programmable_production_observation_analyzer_bridge:
+        raise SystemExit(
+            "DX11 R309 programmable production-observation analyzer drift: "
+            + ", ".join(
+                missing_r309_programmable_production_observation_analyzer_bridge
+            )
+        )
+
     r308_programmable_production_semantic_review_analyzer_bridge = [
         ("VR DX11 R291 productionSemanticReview",
          RUNTIME_CENSUS, "R308 consumes the existing R291 production semantic review"),
