@@ -894,7 +894,8 @@ namespace
                 ? WheelFFBMath::imperial_avenue_stone_tactile_amplitude(
                     speedNorm, configuredRoadDetail, modelOutputStrength)
                 : 0.0f;
-            float roadAmp = std::max(commonContactTactile, imperialStoneFloor);
+            float roadAmp = WheelFFBMath::modern_road_tactile_amplitude(
+                imperialStonePaving, commonContactTactile, imperialStoneFloor);
             float roadFreq = imperialStonePaving
                 ? (8.0f + 4.0f * speedNorm)
                 : (25.0f + 12.0f * speedNorm);
@@ -1359,7 +1360,8 @@ namespace
                     const float driftCountersteerTorque =
                         (bodySlip > 0.0f ? -1.0f : 1.0f) *
                         driftCountersteerShape * satSpeed * physicsLoad *
-                        rearSlideRelief * satStrength;
+                        rearSlideRelief * satStrength *
+                        WheelFFBMath::DriftCountersteerTorqueScale;
                     physicsSatTorque +=
                         (driftCountersteerTorque - physicsSatTorque) *
                         driftCountersteerBlend;
