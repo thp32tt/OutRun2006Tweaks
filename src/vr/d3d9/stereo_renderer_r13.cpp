@@ -78,6 +78,8 @@ namespace OutRunVRStereo
 
         HANDLE R13AckMapping = nullptr;
         const OutRunVR::R13::DirectGpuAckState* R13AckState = nullptr;
+        bool R13DirectCopyPathRejected = false;
+        HRESULT R13DirectCopyRejectHr = D3D_OK;
 
         void R13ReleaseAckState() noexcept
         {
@@ -224,6 +226,8 @@ namespace OutRunVRStereo
             if (!frameId || !EnsureDirectTransportResources(device) ||
                 !BackBuffer || !RightEyeSurface)
                 return false;
+            if (R13DirectCopyPathRejected)
+                return false;
 
             const std::uint32_t preferred =
                 (frameId - 1u) % OutRunVR::RenderFrameRingSize;
@@ -264,10 +268,16 @@ namespace OutRunVRStereo
                     }
                     else
                     {
-                        slot.producerPending = false;
-                        slot.pendingFrameId = 0;
-                        slot.frameId = 0;
-                        slot.published = false;
+                        // A hard EVENT query error means GPU completion for this
+                        // shared slot is no longer provable. Preserve ownership
+                        // metadata and quarantine the fallback DirectGPU copy
+                        // path until ResetEx recreates transport resources.
+                        R13DirectCopyPathRejected = true;
+                        R13DirectCopyRejectHr = ready;
+                        spdlog::warn(
+                            "VR R13 D3D9Ex: producer EVENT query failed hr=0x{:08X}; DirectGPU fallback copy path quarantined until ResetEx",
+                            static_cast<unsigned>(R13DirectCopyRejectHr));
+                        return false;
                     }
                 }
 
@@ -313,12 +323,37 @@ namespace OutRunVRStereo
             auto& slot = DirectTransportSlots[selected];
             {
                 InternalPassScope guard;
-                if (FAILED(StretchDirectEye(
-                        device, BackBuffer, slot.leftSurface)) ||
-                    FAILED(StretchDirectEye(
-                        device, RightEyeSurface, slot.rightSurface)) ||
-                    FAILED(slot.fence->Issue(D3DISSUE_END)))
+                const HRESULT leftCopy = StretchDirectEye(
+                    device, BackBuffer, slot.leftSurface);
+                const HRESULT rightCopy = SUCCEEDED(leftCopy)
+                    ? StretchDirectEye(device, RightEyeSurface, slot.rightSurface)
+                    : leftCopy;
+                if (FAILED(leftCopy) || FAILED(rightCopy))
+                {
+                    // A partial shared-eye copy can already be queued without
+                    // an EVENT proving completion. Do not recycle this ring
+                    // until ResetEx tears down the fallback transport resources.
+                    R13DirectCopyPathRejected = true;
+                    R13DirectCopyRejectHr = FAILED(leftCopy)
+                        ? leftCopy : rightCopy;
+                    spdlog::warn(
+                        "VR R13 D3D9Ex: shared-eye copy failed hr=0x{:08X}; DirectGPU fallback copy path quarantined until ResetEx",
+                        static_cast<unsigned>(R13DirectCopyRejectHr));
                     return false;
+                }
+
+                const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);
+                if (FAILED(issueHr))
+                {
+                    // Copies are already queued, so failure to arm the EVENT
+                    // removes the only proof that the slot can be overwritten.
+                    R13DirectCopyPathRejected = true;
+                    R13DirectCopyRejectHr = issueHr;
+                    spdlog::warn(
+                        "VR R13 D3D9Ex: producer EVENT Issue failed hr=0x{:08X}; DirectGPU fallback copy path quarantined until ResetEx",
+                        static_cast<unsigned>(R13DirectCopyRejectHr));
+                    return false;
+                }
             }
 
             slot.producerPending = true;
@@ -332,6 +367,8 @@ namespace OutRunVRStereo
         void R13ResetCommonPre(IDirect3DDevice9*)
         {
             R13ForceMonoShadow = false;
+            R13DirectCopyPathRejected = false;
+            R13DirectCopyRejectHr = D3D_OK;
             R9ReleaseMonoResources();
             R9ReleaseDepthIdentity();
             R9StereoSeeded = false;
