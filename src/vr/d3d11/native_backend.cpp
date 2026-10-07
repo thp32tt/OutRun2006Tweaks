@@ -13102,7 +13102,8 @@ indexed_dormant_source_revalidation_readiness(
         directDispatchSnapshotToken, sourceValueSnapshotToken,
         liveIndexBindingSnapshotToken);
     return compose_programmable_dormant_source_revalidation_readiness(
-        currentSource, candidateSnapshotToken, preActivationSnapshotToken);
+        currentSource, identity.cacheKey,
+        candidateSnapshotToken, preActivationSnapshotToken);
 }
 
 NativeFixedFunctionIndexedSourceRangeReadiness
