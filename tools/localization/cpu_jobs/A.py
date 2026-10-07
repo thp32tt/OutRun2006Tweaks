@@ -61,7 +61,7 @@ if clean.size!=(W,H) or source_mask.size!=(W,H): raise RuntimeError("evidence si
 # high versus a 103px source footprint. Rebuild only this row from the already validated
 # A_RECOVERY02 clean plate.
 ob=[1988,2061,2445,2164]
-old_loc=[2005,2074,2425,2141]
+old_loc=[2005,2074,2426,2142]
 x0,y0,x1,y1=ob
 bx0=((x0+3)//4)*4; by0=((y0+3)//4)*4; bx1=(x1//4)*4; by1=(y1//4)*4
 if [bx0,by0,bx1,by1] != [1988,2064,2444,2164]:
