@@ -552,7 +552,7 @@ namespace WheelProfileStore
             {"DamperStrength","0.28"}, {"UseHardwareDamper","true"},
             {"SteeringWeight","1.60"}, {"MechanicalTrail","0.30"},
             {"TrailResponseLead","0.40"}, {"PhysicsSAT","true"},
-            {"GripLoss","0.65"}, {"CountersteerStrength","0.90"},
+            {"GripLoss","0.65"}, {"CountersteerStrength","0.72"},
             {"LateralDeadzone","1.5"},
             {"WeightTransfer","0.15"}, {"WallImpact","0.80"},
             {"GearShift","0.60"}, {"RoadTexture","0.60"},
