@@ -406,17 +406,17 @@ invalidate_direct_r32 = body(
 require(
     invalidate_direct_r32,
     "R32 host-identity interop invalidation",
-    "R13ReleaseAckState();",
-    "ReleaseDirectTransportSlots();",
-    "ReleaseDirectInteropProbe();",
+    "R30SupportReleaseDirectAckState();",
+    "R30SupportReleaseDirectTransportInterop();",
     "R32ForgetDirectIdentity();",
 )
 require_order(
     invalidate_direct_r32,
     "R32 host-identity ACK/transport teardown routing",
-    "R13ReleaseAckState();",
-    "ReleaseDirectTransportSlots();",
-    "ReleaseDirectInteropProbe();",
+    "R30SupportReleaseDirectAckState();",
+    "R32DirectCopyPathRejected = false;",
+    "R32DirectCopyRejectHr = D3D_OK;",
+    "R30SupportReleaseDirectTransportInterop();",
     "R32ForgetDirectIdentity();",
 )
 forbid(
