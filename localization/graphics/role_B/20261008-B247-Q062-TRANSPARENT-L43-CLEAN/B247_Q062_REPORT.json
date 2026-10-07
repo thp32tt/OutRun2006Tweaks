@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261008-B247-Q062-TRANSPARENT-L43-CLEAN",
+  "queue_index": 62,
+  "asset": "33491F83",
+  "trigger": "C261_REWORK_REQUIRED_OPAQUE_WHITE_RECTANGLE_CLEAN_PLATE",
+  "source_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+  "prior_candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
+  "candidate_sha256": "dcec31a16d2a21d34bcf6ef33267b31d2940072ca897060a3ad52147a5d101d4",
+  "root_cause": "B244 treated PSD Layer43 pure-white erase canvas as opaque DDS background. In this atlas those white pixels must be transparent; only Layer43 non-white road/green-edge/lane pixels are authored clean artwork.",
+  "rows": [
+    {
+      "key": "easy_main",
+      "source_bbox": [
+        142,
+        285,
+        385,
+        375
+      ],
+      "localized_bbox": [
+        186,
+        287,
+        329,
+        371
+      ],
+      "source_size": [
+        243,
+        90
+      ],
+      "localized_size": [
+        143,
+        84
+      ],
+      "margins": [
+        44,
+        56,
+        2,
+        4
+      ],
+      "layer43_white_to_transparent_pixels": 12028,
+      "opaque_white_pixels_outside_glyph": 0,
+      "font": "Noto Sans CJK KR Black 73px",
+      "outer_stroke_px": 7,
+      "inner_navy_stroke_px": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "hard_main",
+      "source_bbox": [
+        808,
+        287,
+        1068,
+        373
+      ],
+      "localized_bbox": [
+        829,
+        288,
+        1039,
+        372
+      ],
+      "source_size": [
+        260,
+        86
+      ],
+      "localized_size": [
+        210,
+        84
+      ],
+      "margins": [
+        21,
+        29,
+        1,
+        1
+      ],
+      "layer43_white_to_transparent_pixels": 12267,
+      "opaque_white_pixels_outside_glyph": 0,
+      "font": "Noto Sans CJK KR Black 73px",
+      "outer_stroke_px": 7,
+      "inner_navy_stroke_px": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "machine_qa": {
+    "target_rows": "2/2 PASS",
+    "changed_outside_target_bboxes": 0,
+    "alpha_changed_outside_target_bboxes": 0,
+    "opaque_white_background_pixels_outside_glyph": 0,
+    "non_target_atlas_pixel_exact": true,
+    "header_128_exact": true,
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_LAYER43_WHITE_ERASE_CANVAS_TO_TRANSPARENT",
+    "2_source_slant": "PASS_UPRIGHT_MAIN_FAMILY",
+    "3_scale": "PASS_NATIVE_73PX_A132_FAMILY",
+    "4_weight_outline": "PASS_BLACK_WHITE7_NAVY5_SOURCE_COLORS",
+    "5_clipping": "PASS_POSITIVE_MARGIN",
+    "6_protected": "PASS_NON_TARGET_ATLAS_EXACT",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "8_readability": "EVIDENCE_WRITTEN_PENDING_CONTROLLER"
+  },
+  "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
+  "fallback_reason": "GitHub-hosted B247 run 37683401932 remained pending behind stuck B246 run 37675870154. Exact q62 input SHA fa5cd96f... and pinned B247 script were verified before identical fallback execution.",
+  "controller_visual_qa": "PENDING_CHATGPT_CONTROLLER",
+  "status": "B247_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

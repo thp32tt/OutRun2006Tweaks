@@ -1,0 +1,49 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261008-B247-Q062-TRANSPARENT-L43-CLEAN",
+  "queue_index": 62,
+  "asset": "33491F83",
+  "source_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+  "prior_candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
+  "candidate_sha256": "dcec31a16d2a21d34bcf6ef33267b31d2940072ca897060a3ad52147a5d101d4",
+  "root_cause": "B244 pasted PSD Layer43 white erase canvas as opaque pixels. Those pixels represent transparent atlas background; only non-white authored road/green-edge/lane pixels belong in the clean plate.",
+  "machine_qa": {
+    "rows": "2/2 PASS",
+    "easy_white_to_transparent": 12028,
+    "hard_white_to_transparent": 12267,
+    "opaque_white_background_outside_glyph": 0,
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "non_target_atlas_exact": true,
+    "header_exact": true,
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "visual_qa": {
+    "source_reject_clean_final": "PASS",
+    "full_practical": "PASS",
+    "raw": "PASS",
+    "observations": [
+      "C261/B244 rectangular white patches are absent.",
+      "The gray road and green border continue naturally across both repaired source bboxes.",
+      "Outside-road pixels are transparent/neutral rather than opaque white; no seam, clipping, overlap or broken Hangul is visible."
+    ]
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_TRANSPARENT_LAYER43_ERASE_CANVAS",
+    "2_source_matching_slant": "PASS",
+    "3_no_unnecessary_undersize": "PASS_NATIVE_73PX",
+    "4_source_faithful_weight_outline_shadow": "PASS_BLACK_WHITE7_NAVY5_SOURCE_COLORS",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGIN",
+    "6_protected_art_clearance": "PASS_NON_TARGET_ATLAS_EXACT",
+    "7_flip_y_raw": "PASS_CONTROLLER_REVIEW",
+    "8_immediate_readability": "PASS_CONTROLLER_REVIEW"
+  },
+  "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
+  "fallback_reason": "B247 hosted run 37683401932 remained pending behind stuck B246 run 37675870154; exact fa5cd96f input and pinned B247 script were verified before identical fallback execution.",
+  "decision": "B247_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "20261008-B247-Q062-TRANSPARENT-L43-CLEAN",
+  "queue_index": 62,
+  "asset": "33491F83",
+  "candidate_sha256": "dcec31a16d2a21d34bcf6ef33267b31d2940072ca897060a3ad52147a5d101d4",
+  "report": "localization/graphics/role_B/20261008-B247-Q062-TRANSPARENT-L43-CLEAN/B247_Q062_REPORT.json",
+  "status": "B247_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED"
+}
