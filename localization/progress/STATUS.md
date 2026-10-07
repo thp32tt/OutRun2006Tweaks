@@ -2659,3 +2659,10 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q62 33491F83 -> exact fa5cd96f...: C259 white EASY/HARD patches replaced by PSD-authored Layer43 road/background; A132 73px Black/white+navy lettering family rerendered.
 - QA: 2/2 containment/size/positive margin; 7,788 changed px; outside/alpha=0; non-target exact; authored-background mismatch=0; persisted DDS/RAW + controller visual PASS.
 - Producer PASS pending fresh C + exact-SHA C3 -> PRE_INGAME/user review -> actual-game. RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.
+
+## 2026-10-08 04:16 KST — A179 q102 SELF-QA PASS
+- q102 `571E78F3`: C260 hierarchy failure repaired. Exact candidate `d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db`.
+- `15코스 연속`: 809x104 / source 1070x113, width ratio 75.61%, positive margins L130/R131/T8/B1. Prior rejected width ratio was 42.06%.
+- Time Attack row remains pixel-exact; outside/alpha=0; BC3 changed blocks outside patch=0; header/mip1/RAW PASS; controller contacts/practical/RAW PASS.
+- Work stolen from B only after refreshed A ODD shard exhaustion; q212 was skipped because B changed it in the current cycle.
+- Fresh C + C3 + PRE_INGAME/user review + actual-game pending. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.

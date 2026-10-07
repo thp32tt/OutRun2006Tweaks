@@ -9646,21 +9646,38 @@
     "forbidden_domains_touched": []
   },
   "latest_a_production": {
-    "timestamp_kst": "2026-10-08T02:05:00+09:00",
-    "run": "20261008-A176-Q121-TRANSPARENT-PLATE",
+    "timestamp_kst": "2026-10-08T04:16:20+09:00",
     "role": "A",
-    "queue_index": 121,
-    "asset": "FD90AA9",
-    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
-    "prior_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
-    "candidate_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
-    "execution_backend": "CHATGPT_LOCAL_GITHUB_DNS_FAILURE -> GITHUB_ACTIONS_REPOSITORY_BACKED_CPU_WORKER; N100_NOT_USED",
-    "construction": "transparent-atlas alpha-aware source/current visible-alpha cleanup inside exact three header bboxes; no rectangle fill; fresh native 108px Korean rerender",
-    "machine_qa": "3/3 bbox/size/positive-margin; changed/alpha outside=0; pair overlap/touch=0; clean visible alpha=0 for all three header bboxes; exact header/persisted decode/raw mirror_y PASS",
-    "controller_visual_qa": "PASS_SOURCE_A138_CLEAN_A176_HEADER_FAMILY_AND_RAW",
-    "status": "A176_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
-    "worker_run": 37656205424,
-    "worker_output_commit": "d38bda3bcbf5ba9ce37c7ea299a67ca7fe95d7e9",
+    "run": "20261008-A179-Q102-SELECTOR-HIERARCHY",
+    "queue_index": 102,
+    "asset": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "work_stolen_from_lane": "B",
+    "selection_reason": "A ODD shard exhausted material work; q212 changed in current B cycle; q102 was the oldest unchanged C-returned material REWORK.",
+    "source_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+    "prior_candidate_sha256": "442babea9c5dea9a944dff3d4a6a577f007dad2ae63a9699d380baf0ce7fc05d",
+    "candidate_sha256": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db",
+    "preserved_time_attack": "PIXEL_EXACT",
+    "continuous_15": {
+      "source_size": [
+        1070,
+        113
+      ],
+      "localized_size": [
+        809,
+        104
+      ],
+      "margins": [
+        130,
+        131,
+        8,
+        1
+      ],
+      "width_ratio": 0.7561,
+      "prior_width_ratio": 0.4206
+    },
+    "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_BC3_OUTSIDE_0_HEADER_RAW",
+    "controller_visual_qa": "PASS_SOURCE_STYLE_HIERARCHY_PRACTICAL_RAW",
+    "status": "A179_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
@@ -9951,6 +9968,42 @@
     "mandatory_c3": "REQUIRED_C259_VISUAL_REGRESSION",
     "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
     "actual_ingame_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "a179_q102_selector_hierarchy": {
+    "timestamp_kst": "2026-10-08T04:16:20+09:00",
+    "role": "A",
+    "run": "20261008-A179-Q102-SELECTOR-HIERARCHY",
+    "queue_index": 102,
+    "asset": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "work_stolen_from_lane": "B",
+    "selection_reason": "A ODD shard exhausted material work; q212 changed in current B cycle; q102 was the oldest unchanged C-returned material REWORK.",
+    "source_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+    "prior_candidate_sha256": "442babea9c5dea9a944dff3d4a6a577f007dad2ae63a9699d380baf0ce7fc05d",
+    "candidate_sha256": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db",
+    "preserved_time_attack": "PIXEL_EXACT",
+    "continuous_15": {
+      "source_size": [
+        1070,
+        113
+      ],
+      "localized_size": [
+        809,
+        104
+      ],
+      "margins": [
+        130,
+        131,
+        8,
+        1
+      ],
+      "width_ratio": 0.7561,
+      "prior_width_ratio": 0.4206
+    },
+    "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_BC3_OUTSIDE_0_HEADER_RAW",
+    "controller_visual_qa": "PASS_SOURCE_STYLE_HIERARCHY_PRACTICAL_RAW",
+    "status": "A179_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }

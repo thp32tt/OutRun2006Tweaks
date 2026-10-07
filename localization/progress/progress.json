@@ -1432,17 +1432,16 @@
       "note": "A39/A40 numeric gates pass but C177-focused visual shows source-word/effect-shaped reconstruction still visible in CLEAN/FINAL; nearest-neighbor cleanup rejected."
     },
     "latest_a_production": {
-      "timestamp_kst": "2026-10-06T15:12:29+09:00",
-      "run": "A132",
-      "queue_index": 62,
-      "asset": "33491F83",
-      "classification": "MANUAL_RECONSTRUCTION_RESOLVED_BY_AUTHORED_PSD_STACK",
-      "candidate_sha256": "58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2",
-      "machine_qa": "9/9 bbox+size+positive-margin PASS; changed/alpha/localized outside exact source bboxes=0; overlap=0; DDS roundtrip PASS",
-      "controller_visual_qa": "PASS",
-      "status": "A132_SELF_QA_PASS_PENDING_C_AND_INGAME",
-      "report": "localization/graphics/role_A/20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN/A132_33491F83_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN/A132_CONTROLLER_SELF_QA.json",
+      "timestamp_kst": "2026-10-08T04:16:20+09:00",
+      "run": "A179 q102 selector hierarchy work-steal",
+      "queue_index": 102,
+      "asset": "571E78F3",
+      "before": "442babea9c5dea9a944dff3d4a6a577f007dad2ae63a9699d380baf0ce7fc05d",
+      "after": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db",
+      "result": "SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
+      "hierarchy": "15코스 연속 450x112 -> 809x104 within source 1070x113; width ratio 0.4206 -> 0.7561",
+      "qa": "zero outside/alpha; BC3 outside patch 0; Time Attack exact; contacts/practical/raw visual PASS",
+      "execution_backend": "GitHub Actions fallback because local nvcompress was unavailable and local package installation timed out",
       "runtime_validation": "UNTESTED"
     },
     "latest_a_rework": {

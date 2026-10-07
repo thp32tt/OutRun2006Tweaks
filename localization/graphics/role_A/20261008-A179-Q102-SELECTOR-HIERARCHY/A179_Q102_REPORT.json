@@ -103,10 +103,26 @@
     "8_immediate_readability": "EVIDENCE_WRITTEN_PENDING_CONTROLLER_CONFIRM"
   },
   "execution_backend": "GitHub Actions fallback after ChatGPT local environment lacked nvcompress and package installation timed out; repository-backed BC3 encode required.",
-  "controller_visual_qa": "PENDING_CHATGPT_CONTROLLER",
+  "controller_visual_qa": {
+    "result": "PASS",
+    "evidence": [
+      "A179_Q102_CONTACTS.jpg",
+      "A179_Q102_PRACTICAL.jpg",
+      "A179_Q102_RAW.jpg"
+    ],
+    "source_vs_final_hierarchy": "PASS_15_CONTINUOUS_WIDTH_RATIO_0.7561_CLOSE_TO_SAME_FAMILY_Q92_0.78_REFERENCE",
+    "source_style": "PASS_ORANGE_NAVY_WHITE_EFFECT_AND_READABLE_RIGHT_LEAN",
+    "practical_scale": "PASS_100_75_50",
+    "plate_and_residue": "PASS_NO_VISIBLE_DIRTY_PLATE_OR_SOURCE_RESIDUE_IN_REWORKED_ROW",
+    "glyph_integrity": "PASS_NO_VISIBLE_BROKEN_OR_CLIPPED_HANGUL",
+    "protected_art": "PASS_NO_VISIBLE_INTRUSION",
+    "raw_flip_y": "PASS",
+    "preserved_time_attack": "PASS_PIXEL_EXACT_TO_B212"
+  },
   "fresh_independent_c": "REQUIRED",
   "mandatory_c3": "REQUIRED_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "status": "A179_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
-  "forbidden_domains_touched": []
+  "status": "A179_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
+  "forbidden_domains_touched": [],
+  "controller_timestamp_kst": "2026-10-08T04:16:20+09:00"
 }
