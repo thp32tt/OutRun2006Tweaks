@@ -3546,6 +3546,51 @@ observe_programmable_shader_production_source_evidence_chain(
         translationPlan,
     std::uint64_t translationPlanSnapshotToken) noexcept;
 
+// R288 seals an exact R286 production observation plus its nested R275
+// translated-semantic receipt into one promotion-review admission receipt.
+// This is still diagnostic evidence only: it accepts no device context and
+// cannot bind shaders, enable NativeDrawPath, or authorize Draw/DrawIndexed.
+struct NativeProgrammableShaderTranslationAdmissionEvidence {
+    bool inputValid{};
+    bool sourceIdentityExact{};
+    bool productionObservationReady{};
+    bool productionObservationSnapshotMatches{};
+    bool translatedSemanticReceiptReady{};
+    bool translatedSemanticReceiptSnapshotMatches{};
+    bool cacheIdentityMatches{};
+    bool translationObjectReady{};
+    bool objectBindingAuthorized{};
+    bool nativeDrawPathActivationAllowed{};
+    bool drawDispatchAuthorized{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    std::uint64_t cacheKey{};
+    std::uint64_t backendOwnerGeneration{};
+    std::uint64_t productionObservationSnapshotToken{};
+    std::uint64_t translatedSemanticReceiptSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+};
+
+[[nodiscard]] bool
+validate_programmable_shader_production_observation_snapshot(
+    const NativeProgrammableShaderProductionObservationEvidence& observation,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
+[[nodiscard]] NativeProgrammableShaderTranslationAdmissionEvidence
+seal_programmable_shader_translation_admission(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderProductionObservationEvidence& observation,
+    std::uint64_t productionObservationSnapshotToken) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_shader_translation_admission_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderProductionObservationEvidence& observation,
+    std::uint64_t productionObservationSnapshotToken,
+    const NativeProgrammableShaderTranslationAdmissionEvidence& admission,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
 // input layout, and R96 transform buffer. No game draw path constructs or
 // binds this bundle yet.
