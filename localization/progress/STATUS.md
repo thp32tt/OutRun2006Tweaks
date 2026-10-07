@@ -2389,3 +2389,9 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - Controller SOURCE/C117-OLD/B30-CLEAN/B233-FINAL, full RAW mirror_y and practical 100/50/25 visual review PASS. Source-relative left/stagger anchoring is restored; no source residue, broken Hangul, clipping, overlap, seam, plate damage, protected-art intrusion or orientation regression is visible. Song titles/music credits, Ferrari/model/vehicle artwork, OutRun logos and music-note art remain unchanged.
 - Decision `B233_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME`. Prior C117/PRE_INGAME #005 approval is superseded because bytes changed. Fresh independent C + exact-SHA C3 + regenerated English-original JPG/user review + actual-game validation are mandatory. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261007-B233-Q100-53CE39D5-ANCHOR/B233_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261007-B233-Q100-53CE39D5-ANCHOR/B233_Q100_REPORT.json`.
+
+
+## 2026-10-07 15:44 KST — C241 C2 q232 EBFC709F C3_STRICT_PASS
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN. B230 exact candidate `dc76c000cfce17098940f551512e6f746319ba8a1892345eb060693004747ea1` fresh independent C + mandatory C3 PASS.
+- 2/2 help rows containment/source-size/positive-margin PASS; zero pixel/alpha blast outside exact rework, zero source-help residue, overlap or protected intrusion; four prior Korean headings preserved.
+- Controller source/clean/style/scale/glyph/RAW/practical-scale review PASS. PRE_INGAME refresh + user JPG + actual-game validation pending; RUNTIME_VALIDATION=UNTESTED.
