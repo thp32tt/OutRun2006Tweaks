@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "run": "20261007-C243R-C1-Q051-FF2462BB-CORRECTIVE",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 51,
+  "asset": "FF2462BB",
+  "regression": "PJR-014-20261006",
+  "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "input_a163r_sha256": "0dccb6318fafa20725427227fddf00c451bfdab814de5dc2da497d79d13b862e",
+  "candidate_sha256": "b1c91a8c0050f0f31523afc055185288f2756e4da02014c9597b69cff25fc129",
+  "initial_fresh_c_failure": {
+    "workflow_run": 37589027590,
+    "defect": "BOTTOM_EXACT_SOURCE_BBOX_RIGHT_OVERFLOW_3PX",
+    "source_bottom_bbox": [
+      3094,
+      1486,
+      3411,
+      1566
+    ],
+    "a163r_bottom_bbox": [
+      3100,
+      1494,
+      3414,
+      1558
+    ],
+    "margins_lrtb": [
+      6,
+      -3,
+      8,
+      8
+    ],
+    "policy": "1px overflow is FAIL"
+  },
+  "corrective_rework": {
+    "kind": "C_SMALL_CORRECTIVE_REWORK",
+    "operation": "shift only bottom localized line 4px left",
+    "shift_xy": [
+      -4,
+      0
+    ],
+    "top_line_pixel_exact_to_a163r": true,
+    "changes_outside_bottom_line_region": 0
+  },
+  "post_corrective_machine_qa": {
+    "top": {
+      "source_bbox": [
+        3002,
+        1405,
+        3512,
+        1486
+      ],
+      "localized_bbox": [
+        3135,
+        1413,
+        3379,
+        1478
+      ],
+      "margins": [
+        133,
+        133,
+        8,
+        8
+      ],
+      "status": "PASS"
+    },
+    "bottom": {
+      "source_bbox": [
+        3094,
+        1486,
+        3411,
+        1566
+      ],
+      "localized_bbox": [
+        3096,
+        1494,
+        3410,
+        1558
+      ],
+      "margins": [
+        2,
+        1,
+        8,
+        8
+      ],
+      "status": "PASS"
+    },
+    "changed_pixels_outside_true_target_vs_pre_a144": 0,
+    "alpha_changed_outside_true_target_vs_pre_a144": 0,
+    "wrong_a144_insertion_diff_vs_pre_a144": 0,
+    "line_overlap": 0,
+    "line_touch_1px": 0,
+    "header_dimensions_mips": "PASS 4096x2048 RGBA32 mip1",
+    "persisted_decode": "PASS"
+  },
+  "controller_visual_qa": {
+    "true_source_target": "PASS: girlfriend instruction exists only in lower/right canonical source footprint",
+    "duplicate_removal": "PASS: erroneous A144 upper duplicate remains restored to pre-A144 bytes",
+    "source_style": "PASS: yellow face, navy keyline, white middle border, navy outer edge remain source-family consistent",
+    "slant_direction": "PASS: readable Korean follows source-family right lean; RAW mirrors consistently",
+    "bottom_outline_clipping": "PASS: no clipped outline/effect pixels visible after 4px corrective shift",
+    "glyph_integrity": "PASS: 여자친구를 / 놓치지 마세요! intact at high zoom and practical 100/75/50",
+    "protected_art": "PASS: no unrelated UI/protected-art intrusion; corrective blast radius confined to bottom line region",
+    "placement_hierarchy": "PASS: two-line placement remains centered/readable and source-relative line height is preserved",
+    "raw_flipy": "PASS"
+  },
+  "fresh_independent_c": "PASS_AFTER_SMALL_CORRECTIVE_REWORK",
+  "c3_strict_audit": "C3_STRICT_PASS",
+  "decision": "C243R_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_NEW_INGAME_RETEST",
+  "machine_report": "localization/graphics/role_C/20261007-C243R-C1-Q051-FF2462BB-CORRECTIVE/C243R_FF2462BB_MACHINE_QA.json",
+  "pre_ingame_export": "PENDING_REFRESH",
+  "user_jpg_review": "PENDING",
+  "actual_ingame_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
