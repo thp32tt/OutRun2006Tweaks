@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "run": "20261007-C240-C1-Q107-841E796B-B232R",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 107,
+  "asset": "841E796B",
+  "producer_run": "B232R",
+  "source_sha256": "112f47e7b16ecf21f722738f7fc9053d1a9852d66da9ef9d29fd25dadf2f567e",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "prior_c103_sha256": "6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad",
+  "candidate_sha256": "d6a5cc84e7cf834afe11d8afdc2c0b869b306e75759b71ee392983db8999abda",
+  "fresh_independent_c": "PASS",
+  "machine_qa": {
+    "bbox_frame": "MIRROR_Y",
+    "top_source_bbox": [
+      1534,
+      212,
+      1602,
+      254
+    ],
+    "top_localized_bbox": [
+      1540,
+      218,
+      1596,
+      248
+    ],
+    "top_margins": [
+      6,
+      6,
+      6,
+      6
+    ],
+    "changed_pixels_outside_top_source_bbox": 0,
+    "alpha_changed_outside_top_source_bbox": 0,
+    "bottom_handicap_line_pixel_exact_to_C103": true,
+    "source_vs_current_changes_outside_two_source_boxes": 0,
+    "dds_header_exact": true,
+    "dimensions": [
+      2048,
+      512
+    ],
+    "mip_count": 1
+  },
+  "controller_visual_qa": {
+    "semantic_order": "PASS: upper 무 + lower 핸디캡 reads naturally as 무 핸디캡; prior 없음/핸디캡 false negative removed",
+    "slant_perspective": "PASS: readable right lean remains source-faithful",
+    "source_style": "PASS: orange face/dark shadow and two-level source hierarchy retained",
+    "scale_readability": "PASS: upper 무 remains near-source scale and immediately readable at 100/75/50%",
+    "glyph_integrity": "PASS: no broken Hangul or clipped outline/effect",
+    "protected_art": "PASS: Ferrari model cards/pictograms and unrelated atlas pixels unchanged",
+    "placement": "PASS: upper/lower anchoring follows source No/Handicap geometry",
+    "flip_y_raw": "PASS: FLIP-Y is readable and RAW remains mirror-Y consistent"
+  },
+  "c3_strict_audit": "C3_STRICT_PASS",
+  "decision": "C240_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME",
+  "machine_report": "localization/graphics/role_C/20261007-C240-C1-Q107-841E796B-B232R/C240_841E796B_MACHINE_QA.json",
+  "pre_ingame_export": "PENDING_REFRESH",
+  "user_jpg_review": "PENDING",
+  "actual_ingame_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
