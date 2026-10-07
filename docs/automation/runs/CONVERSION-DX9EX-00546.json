@@ -2,10 +2,10 @@
   "schema_version": 1,
   "task_id": "CONVERSION-DX9EX-00546",
   "production_id": "CONVERSION-DX9EX-00546",
-  "event_id": "CONVERSION-DX9EX-00546-E002",
-  "event_type": "rollover",
+  "event_id": "CONVERSION-DX9EX-00546-E003",
+  "event_type": "retry",
   "chat_rollover": 2,
-  "attempt": "1/3",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "base_sha": "eac9ceb2e8b2dd3062f9a962431a7c6a7c07a34f",
@@ -13,7 +13,7 @@
   "validation_bearing_result_sha": "6161c4a236922d9260472d1be93fba72a4c11605",
   "result_sha": "6161c4a236922d9260472d1be93fba72a4c11605",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00546]",
-  "status": "VALIDATION_IN_PROGRESS",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
   "selected_work_item": "DX9EX-P0-VISUAL-EXACT-DRAW-SEMANTIC-SCOPE-001",
   "selection_authority": "AGENTS.md 2026-10-07 P0 visual-composition override supersedes R84 structural-convergence next action",
@@ -30,33 +30,74 @@
   "validation_runs": {
     "dx9ex_active": {
       "id": 37701084321,
-      "latest_observed": "in_progress",
+      "latest_observed": "completed/success",
       "policy_job": 113064417599,
       "game_job": 113064580137,
       "host_job": 113064580237,
-      "full_chain_job": 113064580190
+      "full_chain_job": 113064580190,
+      "head_sha": "6161c4a236922d9260472d1be93fba72a4c11605",
+      "event": "push",
+      "package_job": 113066344375
     },
     "domain_isolation": {
       "id": 37701084005,
-      "latest_observed": "in_progress",
-      "job": 113064416649
+      "latest_observed": "completed/success",
+      "job": 113064416649,
+      "head_sha": "6161c4a236922d9260472d1be93fba72a4c11605"
     },
     "hud_inspector": {
       "id": 37701084171,
-      "latest_observed": "in_progress",
+      "latest_observed": "completed/success",
       "static_job": 113064416703,
-      "build_job": 113064416984
+      "build_job": 113064416984,
+      "head_sha": "6161c4a236922d9260472d1be93fba72a4c11605"
     }
   },
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "package_requested": false,
-  "ci_gate_complete": false,
+  "ci_gate_complete": true,
   "protected_boundaries": [
     "P0 user 00519 visual FAIL remains unresolved until actual Quest3/VDXR evidence",
     "No R84 structural port, downstream DX11/DXVK change, or new HMD package",
     "No runtime changes: only canonical P0 scope lifetime verifier strengthening"
   ],
-  "next_action": "Check exact material SHA 6161c4a2 GitHub Actions 37701084321, 37701084005, 37701084171 until terminal; if all green, update this C6 record to COMPLETE_BUILD_VERIFIED with exact job/artifact evidence. Keep runtime UNTESTED and proceed P0 visual source-evidence closure rather than R84."
+  "next_action": "Task 00546 build/static proof complete on material SHA 6161c4a2; do not rerun same TASK_ID or raise ATTEMPT. P0 user-runtime status remains UNTESTED; next independent work should address remaining P0 visual defects and separately repair queue status schema drift.",
+  "automation_validation": "PASS",
+  "retry_recovery": {
+    "failure_context": "No authoritative DX9Ex Active Validation run was created for result SHA a56f49f27836071b6ee94150d03f98c780017ee3 after 682s (timeout=600s).",
+    "diagnosis": "a56f49f2 is bookkeeping/checkpoint, not validation-bearing material result. Exact material result 6161c4a2 has successful push-triggered authoritative DX9Ex Active Validation run 37701084321. Controller must resolve validation_bearing_result_sha rather than branch HEAD.",
+    "action": "Recovered existing exact-SHA SUCCESS runs and artifacts; no source reimplementation, new result SHA or HMD test.",
+    "no_duplicate_implementation": true
+  },
+  "package_artifact": {
+    "id": 11516824742,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-6161c4a236922d9260472d1be93fba72a4c11605",
+    "digest": "sha256:39540862b0f5b640e84bc369b2635c7d54491033dc251e38b9cce0174ea5a263",
+    "size_bytes": 2742555
+  },
+  "build_artifacts": [
+    {
+      "id": 11517950754,
+      "name": "dx9ex-active-game",
+      "digest": "sha256:d73cff63fcd089af158b61d19ef6559823f6eb0e4c68b8ab5e042eee57bcc200"
+    },
+    {
+      "id": 11517826395,
+      "name": "dx9ex-active-host",
+      "digest": "sha256:14bf0e3113777431fdad8364213d1d466144ca4056cceb696c06fb1f4915bb78"
+    }
+  ],
+  "auxiliary_workflow_failure": {
+    "head_sha": "a56f49f27836071b6ee94150d03f98c780017ee3",
+    "run_id": 37701267159,
+    "run_name": "VR Autodev Coordination",
+    "job_id": 113064998918,
+    "status": "failure",
+    "signature": "Invalid queue status IMPLEMENT_NEXT for DX9EX-P0-VISUAL-COMPOSITION-20261007",
+    "classification": "SEPARATE_QUEUE_SCHEMA_DRIFT_NOT_DX9EX_MATERIAL_GATE",
+    "followup": "Reconcile Test-VRAutodevCoordination.ps1 allowed statuses with docs/VR_WORK_QUEUE.json in an independently scoped automation/queue task; do not silently treat as DX9Ex gate success."
+  },
+  "completed_at_kst": "2026-10-08 08:29 KST"
 }
