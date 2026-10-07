@@ -2828,6 +2828,16 @@
       "user_jpg_review": "PENDING",
       "new_actual_ingame_retest": "PENDING",
       "runtime_validation": "UNTESTED"
+    },
+    "latest_a_preflight": {
+      "timestamp_kst": "2026-10-08T03:12:00+09:00",
+      "run": "A178 IGR-025 course-select coverage mapping",
+      "result": "PARTIAL_EXACT_GRAPHICS_MAPPING_HOLD_RUNTIME_SCREENSHOT_EVIDENCE",
+      "q219": "A113 current candidate -> fresh C priority",
+      "q163": "C228 current candidate -> preserve/no duplicate",
+      "q212_concurrent_drift": "A177 worker fail-closed; newer B243 bytes observed",
+      "pending": "screenshot(163) visible-label evidence or replacement in-game screenshot/runtime trace",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {

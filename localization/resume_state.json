@@ -9682,5 +9682,83 @@
     "pre_ingame_export": "PENDING_REFRESH_Q050",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "a178_igr025_course_select_coverage_mapping": {
+    "timestamp_kst": "2026-10-08T03:12:00+09:00",
+    "role": "A",
+    "run": "20261008-A178-IGR025-COVERAGE-MAPPING",
+    "source_regression": "IGR-025 screenshot(163) COURSE_SELECT_VISIBLE_COVERAGE",
+    "selection_head": "ae79d464a5d1b049bfef99da31d0c44f79fe284c",
+    "q212_drift_fail_close": {
+      "worker_run": 37663845664,
+      "expected": "e3fc3275e696acb0dc5449908bd3b57a232d842ad51296e888cc7ede6a276863",
+      "observed": "4b967ef09bbbb21d7ecc1496c2ee15395567b526af6cf68f1c22c7549850d518",
+      "decision": "SKIP_NEWER_B243_BYTES"
+    },
+    "exact_graphics": {
+      "q219": {
+        "asset": "D263B3F1",
+        "role": "COURSE SELECT header",
+        "candidate": "f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24",
+        "state": "PENDING_FRESH_C_IGR025"
+      },
+      "q163": {
+        "asset": "59A79158",
+        "role": "24 course/stage labels",
+        "candidate": "201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6",
+        "state": "C228_PASS_PRESERVE"
+      }
+    },
+    "runtime_translation_rows": [
+      "98",
+      "103",
+      "129-158",
+      "195-197",
+      "897"
+    ],
+    "blocker": "screenshot(163) pixel payload/per-label transcription is not in Git SSOT; remaining English cannot be safely assigned to runtime IDs or DDS",
+    "status": "HOLD_STRICT_RECHECK_MAPPING_EVIDENCE_REQUIRED",
+    "new_candidate_count": 0,
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "latest_a_preflight": {
+    "timestamp_kst": "2026-10-08T03:12:00+09:00",
+    "role": "A",
+    "run": "20261008-A178-IGR025-COVERAGE-MAPPING",
+    "source_regression": "IGR-025 screenshot(163) COURSE_SELECT_VISIBLE_COVERAGE",
+    "selection_head": "ae79d464a5d1b049bfef99da31d0c44f79fe284c",
+    "q212_drift_fail_close": {
+      "worker_run": 37663845664,
+      "expected": "e3fc3275e696acb0dc5449908bd3b57a232d842ad51296e888cc7ede6a276863",
+      "observed": "4b967ef09bbbb21d7ecc1496c2ee15395567b526af6cf68f1c22c7549850d518",
+      "decision": "SKIP_NEWER_B243_BYTES"
+    },
+    "exact_graphics": {
+      "q219": {
+        "asset": "D263B3F1",
+        "role": "COURSE SELECT header",
+        "candidate": "f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24",
+        "state": "PENDING_FRESH_C_IGR025"
+      },
+      "q163": {
+        "asset": "59A79158",
+        "role": "24 course/stage labels",
+        "candidate": "201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6",
+        "state": "C228_PASS_PRESERVE"
+      }
+    },
+    "runtime_translation_rows": [
+      "98",
+      "103",
+      "129-158",
+      "195-197",
+      "897"
+    ],
+    "blocker": "screenshot(163) pixel payload/per-label transcription is not in Git SSOT; remaining English cannot be safely assigned to runtime IDs or DDS",
+    "status": "HOLD_STRICT_RECHECK_MAPPING_EVIDENCE_REQUIRED",
+    "new_candidate_count": 0,
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

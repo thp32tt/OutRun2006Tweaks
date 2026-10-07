@@ -2637,3 +2637,9 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q212 BA0147DA e3fc3275...: visual FAIL — HEART ATTACK phrase remains 40.82% source-width with 300px word gap; REWORK_REQUIRED, C3 blocked.
 - q62 33491F83 58fe9ed9...: visual FAIL — EASY/HARD clean plate contains visible white oval road patches; REWORK_REQUIRED, C3 blocked.
 - RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-08 03:12 KST — A178 IGR-025 partial exact mapping / HOLD
+- q212 A177 attempt correctly stopped on concurrent B243 candidate drift; no duplicate overwrite.
+- IGR-025 course-select coverage: q219 COURSE SELECT exact graphics binding -> existing A113 `f6303ee1...` promoted to fresh-C priority; q163 24 stage labels -> existing C228-approved `201044a9...` preserved.
+- Reviewed runtime Korean data exists for major course-selection IDs, but screenshot(163) pixels/per-label mapping are absent from Git SSOT. Remaining visible English is therefore `HOLD_STRICT_RECHECK` rather than guessed runtime/DDS edits.
+- `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
