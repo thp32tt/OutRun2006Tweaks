@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "run": "20261007-C239-C1-Q051-FF2462BB-A144",
+  "queue_index": 51,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "producer_run": "A144",
+  "candidate_sha256": "3a046a8b695ee6b0a766fca223455616a45a9480b72e28b0c39ddf42821d0b6d",
+  "user_regression": "PJR-014-20261006 BOTTOM_OUTLINE_CLIPPED|GLYPH_EFFECT_CLIPPING",
+  "machine_qa": {
+    "status": "PASS",
+    "note": "2/2 A144-declared bboxes contain their changed pixels with positive margins after correcting readable-to-RAW Y mapping; zero changed/alpha pixels outside those declared bboxes; exact DDS header preserved."
+  },
+  "controller_visual_qa": {
+    "status": "FAIL",
+    "failures": [
+      "SOURCE_TARGET_MISMATCH",
+      "DUPLICATED_GIRLFRIEND_INSTRUCTION",
+      "UNRELATED_UI_REPLACED_OR_INTRUDED",
+      "PRODUCER_RAW_READABLE_COORDINATE_CONFUSION"
+    ],
+    "finding": "Fresh English-original vs current Korean readable comparison shows the A144 two-line 여자친구를 / 놓치지 마세요! insertion at an upper atlas location where the pinned English source contains account/menu UI rather than the source Don't lose your girlfriend! instruction. The current Korean atlas also still contains the already-localized girlfriend instruction at the lower/right source-semantic location, so the A144 result visibly duplicates the instruction instead of only repairing its clipped effect.",
+    "visual_over_numeric_policy": "Controller visual failure overrides machine containment PASS."
+  },
+  "decision": "C239_REWORK_REQUIRED",
+  "c3_strict_decision": "BLOCKED_VISUAL_FAIL",
+  "pre_ingame_export": "BLOCKED",
+  "required_rework": [
+    "Restore the erroneous A144 q51 insertion area to the exact pre-A144 bytes/clean source-equivalent pixels.",
+    "Locate the actual English Don't lose your girlfriend! source footprint in the same readable orientation before rendering.",
+    "Repair only the intended lower/right girlfriend instruction clipping/effect footprint; do not create a second semantic copy.",
+    "Re-run RAW and FLIP-Y producer QA, then fresh independent C and mandatory exact-SHA C3 before PRE_INGAME export."
+  ],
+  "evidence": {
+    "machine_report": "localization/graphics/role_C/20261007-C239-C1-Q051-FF2462BB-A144/C239_FF2462BB_MACHINE_QA.json",
+    "readable_source_final": "localization/graphics/role_C/20261007-C239-C1-Q051-FF2462BB-A144/C239_READABLE_SOURCE_FINAL.jpg",
+    "raw_source_final": "localization/graphics/role_C/20261007-C239-C1-Q051-FF2462BB-A144/C239_RAW_SOURCE_FINAL.jpg",
+    "high_zoom": "localization/graphics/role_C/20261007-C239-C1-Q051-FF2462BB-A144/C239_TWO_LINE_HIGH_ZOOM.jpg"
+  },
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
