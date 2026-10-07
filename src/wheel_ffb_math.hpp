@@ -305,7 +305,7 @@ namespace WheelFFBMath
     constexpr float DriftCountersteerStartRad = 0.16f;
     constexpr float DriftCountersteerFullRad = 0.42f;
     constexpr float DriftCountersteerMaxBlend = 1.00f;
-    constexpr float DefaultCountersteerStrength = 0.90f;
+    constexpr float DefaultCountersteerStrength = 0.72f;
 
     inline float drift_countersteer_blend(
         float bodySlip, float frontSlip, float bodySlide)
@@ -320,6 +320,49 @@ namespace WheelFFBMath
         const float slideT = smoothstep01(
             (std::clamp(bodySlide, 0.0f, 1.0f) - 0.20f) / 0.55f);
         return DriftCountersteerMaxBlend * slipT * slideT;
+    }
+
+    inline float drift_countersteer_blend_state_step(
+        float currentBlend, float targetBlend)
+    {
+        if (!std::isfinite(currentBlend))
+            currentBlend = 0.0f;
+        if (!std::isfinite(targetBlend))
+            targetBlend = 0.0f;
+        currentBlend = std::clamp(currentBlend, 0.0f, 1.0f);
+        targetBlend = std::clamp(targetBlend, 0.0f, 1.0f);
+
+        // Enter countersteer quickly, but release it more gently while grip
+        // returns.  The asymmetric release prevents a one/two-frame body-slip
+        // sign change from snapping the rack through centre and rebounding.
+        constexpr float AttackPerTick = 0.30f;
+        constexpr float ReleasePerTick = 0.06f;
+        const float delta = targetBlend - currentBlend;
+        const float step = delta >= 0.0f ? AttackPerTick : ReleasePerTick;
+        return currentBlend + std::clamp(delta, -step, step);
+    }
+
+    inline float drift_countersteer_direction_latch(
+        float bodySlip, float currentDirection, float currentBlend)
+    {
+        if (!std::isfinite(currentDirection) ||
+            std::abs(currentDirection) < 0.5f)
+            currentDirection = 0.0f;
+        if (!std::isfinite(bodySlip))
+            return currentDirection;
+
+        const float candidate = bodySlip > 0.0f
+            ? -1.0f
+            : (bodySlip < 0.0f ? 1.0f : currentDirection);
+
+        // Once a developed drift owns rack direction, hold that direction until
+        // the handoff has almost released.  This adds hysteresis specifically to
+        // grip recovery without delaying the initial countersteer direction.
+        constexpr float RelatchBlendThreshold = 0.12f;
+        if (currentDirection == 0.0f ||
+            currentBlend <= RelatchBlendThreshold)
+            return candidate;
+        return currentDirection;
     }
 
     inline float drift_countersteer_shape(float bodySlip)
