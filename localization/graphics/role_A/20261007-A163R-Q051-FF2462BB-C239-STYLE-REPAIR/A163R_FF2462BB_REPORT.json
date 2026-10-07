@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "A163R",
+  "queue_index": 51,
+  "priority": "P0",
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "trigger": "A163_CONTROLLER_STYLE_REJECT_AFTER_C239_TARGET_MAPPING_FIX",
+  "c239_failure": "SOURCE_TARGET_MISMATCH|DUPLICATED_GIRLFRIEND_INSTRUCTION|UNRELATED_UI_INTRUSION",
+  "a163_retry_reason": "correct target/duplicate removal passed; SOURCE/FINAL zoom found missing source-like white middle border",
+  "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "a163_candidate_sha256": "16ed98f52c2505cf32304eb2b61aa15491de87e78e9b11812c7add3c6fa3b112",
+  "pre_a144_sha256": "4fff8c59a44a1b7d03cee192124915f87eb73b3988c7673feb3228785ce67726",
+  "candidate_sha256": "0dccb6318fafa20725427227fddf00c451bfdab814de5dc2da497d79d13b862e",
+  "mapping": {
+    "raw_source_bbox": [
+      3002,
+      482,
+      3512,
+      643
+    ],
+    "correct_readable_bbox": [
+      3002,
+      1405,
+      3512,
+      1566
+    ]
+  },
+  "render": {
+    "font": "/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc",
+    "font_index": 1,
+    "family": "Noto Sans CJK KR Black",
+    "shear": 0.08,
+    "effect": "yellow face + navy keyline + white middle border + navy outer edge",
+    "top": {
+      "text": "여자친구를",
+      "font_size": 50,
+      "localized_bbox": [
+        3135,
+        1413,
+        3379,
+        1478
+      ],
+      "margins_lrtb": [
+        133,
+        133,
+        8,
+        8
+      ]
+    },
+    "bottom": {
+      "text": "놓치지 마세요!",
+      "font_size": 49,
+      "localized_bbox": [
+        3100,
+        1494,
+        3414,
+        1558
+      ],
+      "margins_lrtb": [
+        98,
+        98,
+        8,
+        8
+      ]
+    }
+  },
+  "machine_qa": {
+    "pre_a144_to_final_changed_pixels_outside_true_target": 0,
+    "wrong_a144_insertion_exactly_restored": true,
+    "header_128_exact": true,
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "mips": 1,
+    "rawmode": "RGBA",
+    "persisted_decode_exact": true,
+    "source_size_ceiling": "PASS_2_OF_2",
+    "positive_margin": "PASS_2_OF_2_MIN_8PX"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_TRUE_TARGET_ONLY; WRONG_A144_INSERTION_RESTORED",
+    "2_slant_direction": "PASS_READABLE_RIGHT_LEAN_0.08",
+    "3_no_unnecessary_undersizing": "PASS_MAX_SAFE_NATIVE_FIT_WITH_8PX_EFFECT_MARGIN",
+    "4_weight_outline_shadow": "PASS_YELLOW_NAVY_WHITE_NAVY_SOURCE_FAMILY",
+    "5_clipping": "PASS_MIN_8PX_EFFECT_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_PRE_A144_DIFF_OUTSIDE_TRUE_TARGET",
+    "7_flip_y_raw": "PASS_EXACT_RAW_TO_READABLE_TARGET_MAPPING",
+    "8_readability": "PENDING_CONTROLLER_VISUAL_CONFIRMATION"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3": "REQUIRED_EXACT_SHA",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

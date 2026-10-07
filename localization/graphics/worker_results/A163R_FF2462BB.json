@@ -1,0 +1,9 @@
+{
+  "run": "A163R",
+  "queue_index": 51,
+  "asset": "FF2462BB",
+  "candidate_sha256": "0dccb6318fafa20725427227fddf00c451bfdab814de5dc2da497d79d13b862e",
+  "worker_status": "STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL",
+  "report": "localization/graphics/role_A/20261007-A163R-Q051-FF2462BB-C239-STYLE-REPAIR/A163R_FF2462BB_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}
