@@ -207,7 +207,7 @@
     "5_no_clipping": "PASS_4_OF_4_POSITIVE_MARGIN",
     "6_protected_clearance": "PASS_ZERO_BLAST_OUTSIDE_FOUR_BBOXES",
     "7_flip_y_raw": "EVIDENCE_WRITTEN",
-    "8_immediate_readability": "PENDING_CONTROLLER_VISUAL"
+    "8_immediate_readability": "PASS_CONTROLLER_SOURCE_OLD_CLEAN_FINAL_100_50_25"
   },
   "post_encode_presentation_gate": {
     "decoded_persisted_dds_authority": "PASS",
@@ -220,8 +220,10 @@
     "blast_radius": "PASS_ZERO_OUTSIDE_REWORK",
     "coverage": "UNCHANGED_7_SEMANTIC_ROWS"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER",
-  "status": "B234R_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_FINAL_ROW_RAW_PRACTICAL",
+  "status": "B234R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_qa_report": "localization/graphics/role_B/20261007-B234-Q097-411827E-SLANT/B234_CONTROLLER_SELF_QA.json",
+  "intermediate_rejected_sha256": "badd611286b63356ea3715f0efd5aafd60241d40544a11fda4d4635a8acde9c3"
 }
