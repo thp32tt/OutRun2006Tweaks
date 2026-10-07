@@ -1,0 +1,15 @@
+{
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "run": "20261007-C240-C1-Q107-841E796B-EXPORT",
+  "queue_index": 107,
+  "candidate_sha256": "d6a5cc84e7cf834afe11d8afdc2c0b869b306e75759b71ee392983db8999abda",
+  "english_source_sha256": "112f47e7b16ecf21f722738f7fc9053d1a9852d66da9ef9d29fd25dadf2f567e",
+  "jpg": "008_q107_841E796B.jpg",
+  "manifest_count": 12,
+  "mandatory_c3_blocked_count": 10,
+  "status": "PRE_INGAME_EXPORT_REFRESH_PASS",
+  "runtime_validation": "UNTESTED"
+}
