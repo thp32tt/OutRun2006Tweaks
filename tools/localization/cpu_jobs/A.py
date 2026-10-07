@@ -29,7 +29,7 @@ CONT_BBOX=[520,132,1590,245]
 OLD_CONT_BBOX=[830,132,1280,244]
 TARGET_TEXT="15코스 연속"
 TARGET_WIDTH=815
-TARGET_PRECOMPRESS_HEIGHT=103
+TARGET_PRECOMPRESS_HEIGHT=96
 LEAN=0.14
 
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -141,16 +141,19 @@ ab=fresh.getchannel("A").getbbox();fresh=fresh.crop(ab)
 
 # Preserve the accepted Time Attack Mode row byte-for-byte in readable pixels.
 final=before.copy()
-# Remove only the prior q102 second-row Korean footprint with a small safe pad,
-# using C91's verified clean plate. The pad remains well inside the exact source bbox.
+# B212's reported second-row bbox overlaps the accepted Time row vertically because
+# cell-alpha measurement included first-row fringe. Preserve y<140 byte-for-byte and
+# clear only the safely separable second-row footprint from y=140 downward.
 cx0=max(CONT_BBOX[0]+4,OLD_CONT_BBOX[0]-8)
-cy0=max(CONT_BBOX[1],OLD_CONT_BBOX[1])
+cy0=max(CONT_BBOX[1],TIME_BBOX[3])
 cx1=min(CONT_BBOX[2]-4,OLD_CONT_BBOX[2]+8)
 cy1=min(CONT_BBOX[3]-1,OLD_CONT_BBOX[3])
-final.paste(clean.crop((cx0,cy0,cx1,cy1)),(cx0,cy0))
+baseline=before.copy()
+baseline.paste(clean.crop((cx0,cy0,cx1,cy1)),(cx0,cy0))
+final=baseline.copy()
 
 px=CONT_BBOX[0]+(sw-fresh.width)//2
-py=CONT_BBOX[1]+(sh-fresh.height)//2
+py=max(TIME_BBOX[3]+2, CONT_BBOX[1]+(sh-fresh.height)//2)
 if px<=CONT_BBOX[0] or py<=CONT_BBOX[1] or px+fresh.width>=CONT_BBOX[2] or py+fresh.height>=CONT_BBOX[3]:
     raise RuntimeError(("no positive precompress margin",fresh.size,[px,py],CONT_BBOX))
 final.alpha_composite(fresh,(px,py))
@@ -208,11 +211,12 @@ if persist_out or alpha_out: raise RuntimeError(("persisted outside",persist_out
 if diffmask(before.crop(tuple(TIME_BBOX)),decoded.crop(tuple(TIME_BBOX))).any():
     raise RuntimeError("persisted Time Attack row drift")
 
-# Measure target alpha bbox independently in the source region.
-aa=np.asarray(decoded.getchannel("A"))>0
-local=np.zeros_like(aa);x0,y0,x1,y1=CONT_BBOX;local[y0:y1,x0:x1]=aa[y0:y1,x0:x1]
+# Measure the new second-row label against the clean/reconstructed baseline rather
+# than raw atlas alpha, because q102 sprite cells overlap in Y.
+td=diffmask(baseline,decoded)
+local=np.zeros_like(td);x0,y0,x1,y1=CONT_BBOX;local[y0:y1,x0:x1]=td[y0:y1,x0:x1]
 lb=bool_bbox(local)
-if not lb: raise RuntimeError("empty persisted label")
+if not lb: raise RuntimeError("empty persisted target diff")
 lw,lh=lb[2]-lb[0],lb[3]-lb[1]
 margins=[lb[0]-x0,x1-lb[2],lb[1]-y0,y1-lb[3]]
 if not(all(v>0 for v in margins) and lw<=sw and lh<=sh):
