@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Fresh independent C should include B231 q46 AA04D779 d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0 plus remaining newest producer candidates. q46 has a legacy policy/coverage false-negative history, so current policy requires normal C PASS followed by exact-current-SHA C3_STRICT_PASS before PRE_INGAME export. Then regenerate English-original JPG/user review and retain actual-game validation as pending.",
+  "next_checkpoint": "TEMP_BACKLOG_RELIEF C1: continue remaining odd fresh/pending C, prioritizing P0 user/in-game regression candidates before generic pending-C/C3. q95 37759842 completed C232 fresh C + exact-SHA C3; PRE_INGAME refresh/user JPG review and NEW actual in-game retest remain pending. Do not steal even C2 shard.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -414,23 +414,17 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C234",
+      "run": "C232",
       "lane": "C1",
-      "TEMP_BACKLOG_RELIEF": "C1",
-      "SHARD": "ODD(+UNINDEXED_SPECIAL)",
-      "report": "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_30CF0D_CONTROLLER_FINAL_QA.json",
-      "result": "C234_C3_STRICT_PASS_STATIC_PENDING_USER_JPG_AND_NEW_INGAME_RETEST",
+      "report": "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_37759842_CONTROLLER_FINAL_QA.json",
+      "result": "C232_C3_STRICT_PASS_STATIC_PENDING_PRE_INGAME_USER_JPG_AND_NEW_INGAME_RETEST",
       "candidate_changed_by_C": false,
       "assets_checked": 1,
-      "physical_elements_checked": 6,
       "pixel_visual_pass_assets": [
-        "30CF0D"
+        "37759842"
       ],
       "rework_required_assets": [],
-      "c3_strict_pass_assets": [
-        "30CF0D"
-      ],
-      "in_game_validation": "UNTESTED; IGR-005 requires NEW actual-game retest before closure."
+      "runtime_validation": "UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_INGAME168",
@@ -2816,6 +2810,26 @@
       "pre_ingame_comparison_refresh": "PENDING_C234_EXPORT",
       "controller_report": "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_30CF0D_CONTROLLER_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
+    },
+    "c232_37759842": {
+      "timestamp_kst": "2026-10-07T14:10:00+09:00",
+      "queue_index": 95,
+      "asset": "37759842",
+      "TEMP_BACKLOG_RELIEF": "C1",
+      "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+      "source_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+      "candidate_sha256": "ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b",
+      "producer_run": "A137",
+      "machine_status": "PASS",
+      "bbox_size_positive_margin": "16/16 PASS",
+      "blast_radius": "visible/alpha outside=0; protected visible changes=0",
+      "controller_visual_qa": "PASS_RIGHT_LEAN_SOURCE_FAMILY_PRACTICAL_SCALE_RAW",
+      "c3_strict_status": "C3_STRICT_PASS",
+      "decision": "C232_C3_STRICT_PASS_STATIC_PENDING_PRE_INGAME_USER_JPG_AND_NEW_INGAME_RETEST",
+      "pre_ingame_export_refresh": "PENDING_C232_EXPORT",
+      "user_jpg_review": "PENDING_REFRESH",
+      "new_actual_ingame_retest": "PENDING",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
@@ -4184,5 +4198,25 @@
     "c3": "BLOCKED_UNTIL_FRESH_C_PASS",
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "c232_37759842": {
+    "timestamp_kst": "2026-10-07T14:10:00+09:00",
+    "queue_index": 95,
+    "asset": "37759842",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "source_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+    "candidate_sha256": "ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b",
+    "producer_run": "A137",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "16/16 PASS",
+    "blast_radius": "visible/alpha outside=0; protected visible changes=0",
+    "controller_visual_qa": "PASS_RIGHT_LEAN_SOURCE_FAMILY_PRACTICAL_SCALE_RAW",
+    "c3_strict_status": "C3_STRICT_PASS",
+    "decision": "C232_C3_STRICT_PASS_STATIC_PENDING_PRE_INGAME_USER_JPG_AND_NEW_INGAME_RETEST",
+    "pre_ingame_export_refresh": "PENDING_C232_EXPORT",
+    "user_jpg_review": "PENDING_REFRESH",
+    "new_actual_ingame_retest": "PENDING",
+    "runtime_validation": "UNTESTED"
   }
 }
