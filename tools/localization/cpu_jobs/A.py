@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# A181: q219 D263B3F1 material rework after C265 visual underfill/family rejection.
+# A181R: q219 D263B3F1 material rework after C265 visual underfill/family rejection.
 import os
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
@@ -10,14 +10,14 @@ import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFont, ImageFilter
 
 repo=Path.cwd()
-RUN="20261008-A181-Q219-D263B3F1-TECHNO-WIDTH-REWORK"
+RUN="20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK"
 out=repo/"localization/graphics/role_A"/RUN
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 
 rel="textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds"
 cand=repo/"localization/graphics/hd_candidates"/rel
-INPUT="f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24"
+INPUT="e4db9a5b759d878469c297854f8b5179bd2b783063553c9cf6ef3520d9864265"
 SOURCE="6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d"
 SRC_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds"
 TEXT="코스 선택"
@@ -129,6 +129,8 @@ def source_palette(src_crop):
 
 def render_extended(source_crop,target_w,max_h):
     fontpath=subprocess.check_output(["fc-match","-f","%{file}","Noto Sans CJK KR:style=Bold"],text=True).strip()
+    if "NotoSansCJK" not in fontpath and "NotoSansKR" not in fontpath:
+        raise RuntimeError(("required Noto CJK Korean font not resolved",fontpath))
     if not fontpath or not Path(fontpath).exists(): raise RuntimeError(("font missing",fontpath))
     # A113 used 100 px. Render 4x to preserve native-quality transform.
     fs=100*SS
@@ -232,7 +234,7 @@ with tempfile.TemporaryDirectory() as td:
         clean=old.copy()
         region=Image.new("RGBA",(db[2]-db[0],db[3]-db[1]),(0,0,0,0))
         clean.paste(region,(x0+db[0],y0+db[1]))
-        clean_path=Path("derived:A181_failclosed_transparent_title_footprint")
+        clean_path=Path("derived:A181R_failclosed_transparent_title_footprint")
 
     source_crop=source.crop(tuple(bbox))
     target_w=int(round((x1-x0)*TARGET_WIDTH_RATIO))
@@ -266,18 +268,18 @@ with tempfile.TemporaryDirectory() as td:
         raise RuntimeError("persisted decode mismatch")
 
     # Evidence.
-    clean.save(out/"A181_Q219_CLEAN_PLATE.png")
-    gm=Image.new("L",old.size,0); gm.paste(glyph.getchannel("A"),(ax,ay)); gm.save(out/"A181_Q219_RENDER_MASK.png")
+    clean.save(out/"A181R_Q219_CLEAN_PLATE.png")
+    gm=Image.new("L",old.size,0); gm.paste(glyph.getchannel("A"),(ax,ay)); gm.save(out/"A181R_Q219_RENDER_MASK.png")
 
     p=48; cropbox=(max(0,x0-p),max(0,y0-p),min(old.width,x1+p),min(old.height,y1+p))
     ims=[]
-    for lab,im in [("SOURCE COURSE SELECT",source),("C265 REJECT A113",old),("VALIDATED CLEAN",clean),("A181 FINAL",decoded)]:
+    for lab,im in [("SOURCE COURSE SELECT",source),("C265 REJECT A113",old),("VALIDATED CLEAN",clean),("A181R FINAL",decoded)]:
         z=flat(im.crop(cropbox)); z=z.resize((z.width*2,z.height*2),Image.Resampling.NEAREST)
         card=Image.new("RGB",(z.width,z.height+30),(20,20,20)); card.paste(z,(0,30)); ImageDraw.Draw(card).text((6,6),lab,fill="white"); ims.append(card)
     sheet=Image.new("RGB",(max(i.width for i in ims)*2+12,max(i.height for i in ims)*2+12),(14,14,14))
     sheet.paste(ims[0],(0,0)); sheet.paste(ims[1],(ims[0].width+12,0))
     sheet.paste(ims[2],(0,ims[0].height+12)); sheet.paste(ims[3],(ims[2].width+12,ims[1].height+12))
-    sheet.save(out/"A181_Q219_SOURCE_OLD_CLEAN_FINAL.jpg","JPEG",quality=96,subsampling=0)
+    sheet.save(out/"A181R_Q219_SOURCE_OLD_CLEAN_FINAL.jpg","JPEG",quality=96,subsampling=0)
 
     pr=[]
     for scale in (1.0,0.75,0.5):
@@ -287,18 +289,18 @@ with tempfile.TemporaryDirectory() as td:
             b=b.resize((max(1,int(b.width*scale)),max(1,int(b.height*scale))),Image.Resampling.LANCZOS)
         row=Image.new("RGB",(a.width+b.width+8,max(a.height,b.height)+26),(18,18,18))
         row.paste(a,(0,26)); row.paste(b,(a.width+8,26))
-        ImageDraw.Draw(row).text((4,5),f"SOURCE | A181 @ {int(scale*100)}%",fill="white")
+        ImageDraw.Draw(row).text((4,5),f"SOURCE | A181R @ {int(scale*100)}%",fill="white")
         pr.append(row)
     practical=Image.new("RGB",(max(i.width for i in pr),sum(i.height for i in pr)+12),(14,14,14)); yy=0
     for z in pr: practical.paste(z,(0,yy)); yy+=z.height+6
-    practical.save(out/"A181_Q219_PRACTICAL.jpg","JPEG",quality=95,subsampling=0)
+    practical.save(out/"A181R_Q219_PRACTICAL.jpg","JPEG",quality=95,subsampling=0)
 
     rs,ro,rn=flat(sraw),flat(raw_old),flat(rraw)
     for z in (rs,ro,rn): z.thumbnail((700,420),Image.Resampling.LANCZOS)
     rw=Image.new("RGB",(rs.width+ro.width+rn.width+24,max(rs.height,ro.height,rn.height)+30),(16,16,16)); xx=0
-    for lab,z in [("SOURCE RAW",rs),("A113 RAW",ro),("A181 RAW",rn)]:
+    for lab,z in [("SOURCE RAW",rs),("A113 RAW",ro),("A181R RAW",rn)]:
         rw.paste(z,(xx,30)); ImageDraw.Draw(rw).text((xx+4,6),lab,fill="white"); xx+=z.width+12
-    rw.save(out/"A181_Q219_RAW.jpg","JPEG",quality=94,subsampling=0)
+    rw.save(out/"A181R_Q219_RAW.jpg","JPEG",quality=94,subsampling=0)
 
     report={
       "schema_version":2,"role":"A","run":RUN,"queue_index":219,"asset":"D263B3F1",
@@ -334,16 +336,16 @@ with tempfile.TemporaryDirectory() as td:
       },
       "execution_backend":"GITHUB_HOSTED_CPU_WORKER_REPOSITORY_BACKED_DDS",
       "controller_visual_qa":"PENDING_CHATGPT_CONTROLLER",
-      "status":"A181_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+      "status":"A181R_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
       "fresh_independent_c":"REQUIRED","mandatory_c3":"REQUIRED_C265_VISUAL_REWORK",
       "igr_025":"REMAINS_MAPPING_HOLD_AND_NEW_INGAME_RETEST_REQUIRED",
       "runtime_validation":"UNTESTED","forbidden_domains_touched":[]
     }
-    (out/"A181_Q219_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    (wr/"A181_Q219.json").write_text(json.dumps({
+    (out/"A181R_Q219_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    (wr/"A181R_Q219.json").write_text(json.dumps({
       "role":"A","run":RUN,"queue_index":219,"asset":"D263B3F1",
       "before":INPUT,"after":csha,"status":report["status"],
-      "report":str((out/"A181_Q219_REPORT.json").relative_to(repo)),
+      "report":str((out/"A181R_Q219_REPORT.json").relative_to(repo)),
       "runtime_validation":"UNTESTED"
     },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps({"run":RUN,"bbox":bbox,"localized_bbox":report["localized_bbox"],
