@@ -2544,3 +2544,9 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q61 `C4A2937B`: machine 21/21 PASS, controller semantic/style FAIL — `Cut the line!` regressed to `라인을 끊으세요!` instead of proven `하트선을 통과하세요!`; source instruction effect family also mismatched -> `REWORK_REQUIRED`.
 - q65 `EBEF6D20`: machine 7/7 PASS and missing-label coverage fixed, but `EASY` green source style became cyan `쉬움` and route-label style/slant is not source-faithful -> `REWORK_REQUIRED`.
 - C3 and PRE_INGAME promotion blocked for all three. q59 P1 remains unprocessed for a later C1 slot. `RUNTIME_VALIDATION=UNTESTED`; no VR/FFB/DX11/DXVK work.
+
+### A166 C250 q57/q61/q65 direct rework — 2026-10-07 22:20 KST
+- q57 `d2831fcfd1bb8027fc129ff50e70c90c21094df13765daa3d5fb9c6fda3ae70a`: source gradient/depth/effect and right-slant family restored; 7/7 machine + controller visual/RAW PASS.
+- q61 `df250af92785727f38d176f3b2569c9d6d2b0e7a3f7d296adaa2f5c343b1d71e`: `하트선을 통과하세요!` semantics and yellow/white/navy instruction family restored; 3/3 machine + controller visual/RAW PASS.
+- q65 `10d0e1899d8d167eb1dcb303429dd4dc7bdf09096e6c5720afce884cc32afe1f`: `쉬움` green source-color family and route-label outline/slant restored; 5/5 machine + controller visual/RAW PASS.
+- Worker 37626933772 / output `19409ca2dcc3c81063ea6d5728b9b65a28166ebf`. Fresh C1 + exact-SHA C3 + PRE_INGAME/user JPG + NEW in-game retest pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.

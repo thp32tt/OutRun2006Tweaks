@@ -4055,12 +4055,8 @@
     "runtime_validation": "UNTESTED"
   },
   "current_pending_artwork_localize_text": 0,
-  "current_producer_rework_remaining": 3,
-  "current_producer_rework_assets": [
-    "39229D64",
-    "C4A2937B",
-    "EBEF6D20"
-  ],
+  "current_producer_rework_remaining": 0,
+  "current_producer_rework_assets": [],
   "latest_b_production": {
     "timestamp_kst": "2026-10-06T09:19:51+09:00",
     "run": "20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE",
@@ -4232,7 +4228,10 @@
     "DDF0392A",
     "E95DA5",
     "FA7BBB13",
-    "AA04D779"
+    "AA04D779",
+    "39229D64",
+    "C4A2937B",
+    "EBEF6D20"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6724,7 +6723,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07T21:07:00+09:00",
+  "updated_at_kst": "2026-10-07T22:20:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -9137,6 +9136,44 @@
     },
     "c3": "BLOCKED_ALL_THREE_BY_VISUAL_OR_SEMANTIC_FAIL",
     "pre_ingame_export": "NOT_RUN_NO_NEW_C_PASS_MEMBERSHIP",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "a166_c250_q057_q061_q065": {
+    "run": "20261007-A166-C250-Q057-Q061-Q065-STYLE-SEMANTIC",
+    "timestamp_kst": "2026-10-07T22:20:00+09:00",
+    "role": "A",
+    "selection": "direct odd C250 REWORK_REQUIRED batch",
+    "execution_backend": "GITHUB_ACTIONS_REPOSITORY_BACKED_CPU_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILURE; N100_MCP_VISUAL_EVIDENCE_TRANSFER_ONLY",
+    "worker_run": 37626933772,
+    "worker_output_commit": "19409ca2dcc3c81063ea6d5728b9b65a28166ebf",
+    "assets": {
+      "q57": {
+        "asset": "39229D64",
+        "candidate_sha256": "d2831fcfd1bb8027fc129ff50e70c90c21094df13765daa3d5fb9c6fda3ae70a",
+        "machine_qa": "7/7 PASS; outside/alpha=0; header/mip1/raw mirror_y/persisted decode PASS",
+        "controller_visual_qa": "PASS",
+        "status": "A166_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME"
+      },
+      "q61": {
+        "asset": "C4A2937B",
+        "candidate_sha256": "df250af92785727f38d176f3b2569c9d6d2b0e7a3f7d296adaa2f5c343b1d71e",
+        "machine_qa": "3/3 PASS; outside/alpha=0; header/mip1/raw mirror_y/persisted decode PASS",
+        "semantic_correction": "Cut the line! -> 하트선을 통과하세요!",
+        "controller_visual_qa": "PASS",
+        "status": "A166_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME"
+      },
+      "q65": {
+        "asset": "EBEF6D20",
+        "candidate_sha256": "10d0e1899d8d167eb1dcb303429dd4dc7bdf09096e6c5720afce884cc32afe1f",
+        "machine_qa": "5/5 PASS; outside/alpha=0; header/mip1/raw mirror_y/persisted decode PASS",
+        "easy_color_gate": "PASS_GREEN_NOT_CYAN",
+        "controller_visual_qa": "PASS",
+        "status": "A166_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME"
+      }
+    },
+    "report": "localization/graphics/role_A/20261007-A166-C250-Q057-Q061-Q065-STYLE-SEMANTIC/A166_BATCH_REPORT.json",
+    "controller_report": "localization/graphics/role_A/20261007-A166-C250-Q057-Q061-Q065-STYLE-SEMANTIC/A166_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }

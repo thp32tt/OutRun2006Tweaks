@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261007-A166-C250-Q057-Q061-Q065-STYLE-SEMANTIC",
+  "timestamp_kst": "2026-10-07 22:20 KST",
+  "base_head_before_reconcile": "3e6a7166bc87c316e6c85cfb39d79a30ea4266e6",
+  "worker_run": 37626933772,
+  "worker_output_commit": "19409ca2dcc3c81063ea6d5728b9b65a28166ebf",
+  "execution_backend": "GITHUB_ACTIONS_REPOSITORY_BACKED_CPU_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILURE; N100_MCP_VISUAL_EVIDENCE_TRANSFER_ONLY",
+  "assets": {
+    "q57": {
+      "asset": "39229D64",
+      "candidate_sha256": "d2831fcfd1bb8027fc129ff50e70c90c21094df13765daa3d5fb9c6fda3ae70a",
+      "machine_qa": "PASS_7_OF_7_ZERO_OUTSIDE",
+      "visual_qa": "PASS",
+      "visual_evidence": [
+        "A166_Q057_OVERVIEW.jpg",
+        "A166_Q057_CONTACTS.jpg",
+        "A166_Q057_RAW.jpg"
+      ]
+    },
+    "q61": {
+      "asset": "C4A2937B",
+      "candidate_sha256": "df250af92785727f38d176f3b2569c9d6d2b0e7a3f7d296adaa2f5c343b1d71e",
+      "machine_qa": "PASS_3_OF_3_ZERO_OUTSIDE",
+      "semantic_correction": "Cut the line! -> 하트선을 통과하세요!",
+      "visual_qa": "PASS",
+      "visual_evidence": [
+        "A166_Q061_OVERVIEW.jpg",
+        "A166_Q061_CONTACTS.jpg",
+        "A166_Q061_RAW.jpg"
+      ]
+    },
+    "q65": {
+      "asset": "EBEF6D20",
+      "candidate_sha256": "10d0e1899d8d167eb1dcb303429dd4dc7bdf09096e6c5720afce884cc32afe1f",
+      "machine_qa": "PASS_5_OF_5_ZERO_OUTSIDE",
+      "easy_color_gate": "PASS_GREEN_NOT_CYAN",
+      "visual_qa": "PASS",
+      "visual_evidence": [
+        "A166_Q065_OVERVIEW.jpg",
+        "A166_Q065_CONTACTS.jpg",
+        "A166_Q065_RAW.jpg"
+      ]
+    }
+  },
+  "ordered_generation_gate": {
+    "plate_restoration": "PASS",
+    "source_matching_slant": "PASS",
+    "no_unnecessary_undersize": "PASS",
+    "source_faithful_weight_effects": "PASS",
+    "no_clipped_pixels": "PASS",
+    "protected_art_clearance": "PASS_ZERO_OUTSIDE",
+    "flip_y_and_raw": "PASS",
+    "immediate_readability": "PASS"
+  },
+  "next": "fresh independent C1 -> exact-SHA C3 -> PRE_INGAME English-original JPG -> user review -> NEW actual-game retest",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
