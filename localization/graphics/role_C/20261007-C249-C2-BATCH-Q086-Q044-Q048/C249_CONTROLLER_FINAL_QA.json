@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "C249",
+  "timestamp_kst": "2026-10-07T20:35:35+09:00",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "selection": {
+    "physical_assets": [
+      86,
+      44,
+      48
+    ],
+    "max_physical_assets": 3,
+    "selection_refreshes": "HEAD/queue refreshed immediately before q44, q86, q48 selection and immediately before state commit",
+    "priority": "P0_USER_JPG_Q86_THEN_FRESH_B238_Q44_THEN_USER_INGAME_Q48; FRESH/REGRESSION_C_BEFORE_C3_ONLY_BACKLOG"
+  },
+  "execution_backend": "CHATGPT_LOCAL_GITHUB_DNS_FAILED; GITHUB_ACTIONS_FALLBACK_FOR_INDEPENDENT_BINARY_QA; N100_MCP_VISUAL_EVIDENCE_AND_STATE_EDIT_ONLY",
+  "worker": {
+    "run_id": 37614477935,
+    "result": "SUCCESS",
+    "output_commit": "a7f9df89d974126f93fb110a8c79125f31178ff9"
+  },
+  "assets": {
+    "q86": {
+      "queue_index": 86,
+      "asset": "C598919A",
+      "source_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "candidate_sha256": "e3631a376fbe9f35d5926c3668033f3f971298e686c5eb14b8a7321feeb7c513",
+      "machine_qa": "PASS_DXT5_41_OF_41_BBOX_SIZE_POSITIVE_MARGIN; CHANGED_DXT5_BLOCKS_OUTSIDE_ALLOWED_RAW_MIRRORY_TARGETS=0",
+      "controller_visual_qa": "PASS_ENGLISH_SOURCE_OLD_REWORK_AND_RAW_FLIPY; FALLBACK_TOFU_CLIPPING_REMOVED; READABLE_RIGHT_LEAN; EFFECTS_RESTRAINED; NO_PROTECTED_INTRUSION",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "decision": "C249_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME"
+    },
+    "q44": {
+      "queue_index": 44,
+      "asset": "19CEDB9",
+      "source_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "candidate_sha256": "2250de2b7fbe1578750c422c05bd5f3b5785a0bd5006a4afcfb4cbc26ebbe620",
+      "machine_qa": "PASS_12_OF_12_BBOX_SIZE_POSITIVE_MARGIN; OUTSIDE=0; ALPHA_OUTSIDE=0; CLEAN_RECOMPARE=PASS",
+      "controller_visual_qa": "PASS_SOURCE_B237_CLEAN_B238_ROWS_RAW_PRACTICAL_100_75_50; SOURCE_RELATIVE_SCALE_RESTORED; NATURAL_WORD_GROUPING; RIGHT_LEAN; NO_CLIPPING_RESIDUE_OR_PROTECTED_INTRUSION",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "decision": "C249_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME"
+    },
+    "q48": {
+      "queue_index": 48,
+      "asset": "B1696633",
+      "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+      "candidate_sha256": "259153b91e330479a4d975037013c77d339ffe3a2781461ebe118bfc04e28824",
+      "machine_qa": "PASS_1_OF_1_POSITIVE_MARGIN; OUTSIDE=0; ALPHA_OUTSIDE=0; PROTECTED=0; OTHER_ROWS_BINARY_PRESERVED",
+      "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_FINAL_2X_RAW; SLIPSTREAM_RIGHT_LEAN_MATCHES_SOURCE; WHITE_NAVY_COBALT_EFFECT_READABLE; NO_CLIPPING_OR_PROTECTED_INTRUSION",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "decision": "C249_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_AND_INGAME_RETEST"
+    }
+  },
+  "pre_ingame_export": {
+    "status": "PENDING_REFRESH"
+  },
+  "runtime_validation": "UNTESTED",
+  "actual_ingame_validation": "PENDING",
+  "forbidden_domains_touched": [],
+  "final_decision": "Q86_Q44_Q48_FRESH_C_PASS_AND_EXACT_SHA_C3_STRICT_PASS; PRE_INGAME_REFRESH_USER_REVIEW_AND_NEW_ACTUAL_GAME_PENDING"
+}
