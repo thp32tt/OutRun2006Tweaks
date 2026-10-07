@@ -668,21 +668,19 @@
     "current_pending_artwork_localize_text": 0,
     "current_producer_rework_remaining": 0,
     "latest_a_production_batch": {
-      "timestamp_kst": "2026-10-05T20:39:22+09:00",
+      "timestamp_kst": "2026-10-08T01:22:00+09:00",
+      "run": "A171/A175 C255 q121/q193 rework batch",
       "assets": [
-        "55B57CDE"
+        "FD90AA9",
+        "97E863AD"
       ],
-      "result": "A54_SELF_QA_PASS_PENDING_C_AND_INGAME",
-      "candidate_sha256": "7569c51cf5ba82ce081bf09d486b8c8869560e7fae71292c613e4bf8a5b51ab8",
-      "report": "localization/graphics/role_A/20261005-A-PRODUCTION54-DXT5/A54_55B57CDE_REPORT.json",
-      "controller_report": "localization/graphics/role_A/20261005-A-PRODUCTION54-DXT5/A54_CONTROLLER_SELF_QA.json",
+      "q193_result": "A171_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
+      "q193_candidate_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
+      "q121_result": "A175_HOLD_STRICT_RECHECK_AFTER_REJECTED_A171_A174_PLATE_RECONSTRUCTIONS",
+      "q121_restored_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+      "execution_backend": "GITHUB_ACTIONS_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILURE",
       "pending_c_assets": [
-        "55B57CDE"
-      ],
-      "pending_artwork_localize_text": 12,
-      "producer_rework_remaining": [
-        "37759842",
-        "8215FD25"
+        "97E863AD"
       ],
       "runtime_validation": "UNTESTED"
     },
