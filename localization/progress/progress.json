@@ -4164,5 +4164,25 @@
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true,
     "export_refresh_timestamp_kst": "2026-10-07T14:04:05+09:00"
+  },
+  "a162_d6dc1380": {
+    "run": "A162",
+    "timestamp_kst": "2026-10-07T14:08:00+09:00",
+    "queue_index": 12,
+    "asset": "D6DC1380",
+    "trigger": "C235_REWORK_REQUIRED_RAW_ORIENTATION_MISMATCH",
+    "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+    "prior_candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+    "attempted_candidate_sha256": "b82e183edf3939b30c0e10270eda2c858cebf7082ba5ab9f3f98dac8e52e2d10",
+    "attempted_machine_qa": "PASS",
+    "controller_visual_qa": "REJECT_A162_ORIENTATION_FLIP_NUMERIC_FALSE_POSITIVE",
+    "visual_finding": "canonical source and A160 share the same RAW/FLIP-Y glyph transform; A162 is opposite under identical transform",
+    "final_candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+    "final_candidate_action": "RESTORED_A160_BYTE_EXACT",
+    "status": "HOLD_STRICT_RECHECK_PENDING_FRESH_C_VISUAL_ORIENTATION",
+    "fresh_c": "REQUIRED",
+    "c3": "BLOCKED_UNTIL_FRESH_C_PASS",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }

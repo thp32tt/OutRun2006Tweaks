@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "A162",
+  "timestamp_kst": "2026-10-07T14:08:00+09:00",
+  "queue_index": 12,
+  "asset": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+  "priority": "P0",
+  "user_jpg_regression": "PJR-001-20261006",
+  "trigger": "C235_REWORK_REQUIRED_RAW_ORIENTATION_MISMATCH",
+  "worker_attempt": {
+    "dispatch_commit": "9df7de9d7b9b9649fac0695ee8e74488575511cf",
+    "output_commit": "4829c4fb5664d7b18198d00834627da12612bf2e",
+    "prior_candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+    "attempted_candidate_sha256": "b82e183edf3939b30c0e10270eda2c858cebf7082ba5ab9f3f98dac8e52e2d10",
+    "machine_result": "PASS_NUMERIC_ORIENTATION_REWRITE"
+  },
+  "controller_visual_qa": {
+    "decision": "REJECT_ATTEMPT_RESTORE_A160_HOLD_STRICT_RECHECK",
+    "visual_overrides_machine_pass": true,
+    "findings": [
+      "A162 RAW SOURCE|A160|A162 evidence shows the canonical English RAW and A160 RAW share the same vertically transformed visual orientation, while A162 is the opposite.",
+      "Applying the identical FLIP-Y review transform makes the canonical English source and A160 readable together, while A162 becomes vertically inverted.",
+      "Therefore C235/A162 bbox-based 'canonical RAW normal/readable' inference is a numeric/orientation-label false positive; glyph orientation must be judged visually, not from bbox coordinates alone.",
+      "A160 scale/hierarchy repair remains materially valid at 790x132 inside the 960x136 source footprint."
+    ],
+    "evidence": [
+      "localization/graphics/role_A/20261007-A162-Q012-D6DC1380-RAW-ORIENTATION/A162_D6DC1380_RAW_SOURCE_OLD_FINAL.jpg",
+      "localization/graphics/role_A/20261007-A162-Q012-D6DC1380-RAW-ORIENTATION/A162_D6DC1380_FLIPY_SOURCE_OLD_FINAL.jpg",
+      "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_RAW_FLIPY.jpg",
+      "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json"
+    ]
+  },
+  "final_candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+  "final_candidate_action": "RESTORED_BYTE_EXACT_A160",
+  "attempted_candidate_disposition": "REJECTED_NOT_PROMOTED",
+  "final_status": "HOLD_STRICT_RECHECK_ORIENTATION_VISUAL_CONFLICT_PENDING_FRESH_C",
+  "required_next": [
+    "Fresh C must compare canonical source and restored A160 using the same RAW and same FLIP-Y transform and judge glyph orientation visually.",
+    "Do not reapply the A162 vertical flip unless fresh visual evidence proves the source requires it.",
+    "If fresh C passes orientation, continue mandatory exact-SHA C3, regenerated PRE_INGAME JPG, user review, and new in-game retest."
+  ],
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

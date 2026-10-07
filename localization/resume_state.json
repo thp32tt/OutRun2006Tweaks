@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A162 q12 D6DC1380 controller visual QA rejected the C235-requested raw flip despite worker numeric PASS. Canonical English RAW and restored A160 RAW share the same visual transform and both become readable under the same FLIP-Y; A162 becomes inverted under that same transform. Attempt b82e183e... was not promoted and A160 fab100b9... was restored byte-exact. HOLD_STRICT_RECHECK pending fresh C visual RAW/FLIP-Y re-evaluation, then exact-SHA C3, PRE_INGAME user JPG and new in-game retest. RUNTIME_VALIDATION=UNTESTED.",
     "B231 q46 AA04D779 coverage repair PASS: legacy C90/USERPOLICY02 left ordinary lobby/status and gray control labels in English. Current d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0 localizes 9 semantics/13 physical rows while preserving the prior 21 stage/sector labels outside the exact rework mask. Post-encode, blast-radius, practical-scale and RAW gates PASS. Fresh C then exact-SHA mandatory C3 required before PRE_INGAME export; actual game remains UNTESTED.",
     "B230 q232 EBFC709F coverage repair PASS: PRE_INGAME #019 exposed two untranslated ordinary help sentences. Current dc76c000cfce17098940f551512e6f746319ba8a1892345eb060693004747ea1 adds 게임을 만들고 친구를 초대하세요! / 친구들과 OutRun 게임에 참가하세요!, preserves the four B219 headings outside the exact two-row rework mask, and passes decoded-DDS/blast-radius/100-75-50/RAW gates. Fresh independent C then exact-SHA mandatory C3 are required before PRE_INGAME export; actual-game validation remains pending. RUNTIME_VALIDATION=UNTESTED.",
     "B229 q54 FA7BBB13 current-policy rework PASS: PRE_INGAME #004 exposed upright Korean against right-italic English source and a height-collapsed Slipstream row. Accepted GitHub run 37561543035 produced 5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e; all 17 prompts are native right-lean source-effect rerenders, Slipstream is concise 슬립스트림하세요! and 590x99 inside 600x103. 17/17 exact bbox/size/positive-margin; clean/final/outside/alpha/protected/residue/overlap/raw/controller visual PASS. Fresh C + regenerated English-original JPG/user review + actual-game validation required. RUNTIME_VALIDATION=UNTESTED.",
@@ -8142,5 +8143,29 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": [],
     "export_refresh_timestamp_kst": "2026-10-07T14:04:05+09:00"
+  },
+  "a162_d6dc1380_orientation_visual_conflict": {
+    "run": "A162",
+    "timestamp_kst": "2026-10-07T14:08:00+09:00",
+    "role": "A",
+    "queue_index": 12,
+    "asset": "D6DC1380",
+    "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+    "c235_candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+    "attempted_candidate_sha256": "b82e183edf3939b30c0e10270eda2c858cebf7082ba5ab9f3f98dac8e52e2d10",
+    "dispatch_commit": "9df7de9d7b9b9649fac0695ee8e74488575511cf",
+    "worker_output_commit": "4829c4fb5664d7b18198d00834627da12612bf2e",
+    "attempted_worker_machine_qa": "PASS",
+    "controller_visual_qa": "FAIL_A162_FLIP_REVERSES_SOURCE_TRANSFORM",
+    "final_candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+    "final_action": "RESTORE_A160_BYTE_EXACT",
+    "status": "HOLD_STRICT_RECHECK_ORIENTATION_VISUAL_CONFLICT_PENDING_FRESH_C",
+    "controller_qa": "localization/graphics/role_A/20261007-A162-Q012-D6DC1380-RAW-ORIENTATION/A162_CONTROLLER_SELF_QA.json",
+    "fresh_independent_c": "REQUIRED_VISUAL_RAW_FLIPY_RECHECK",
+    "mandatory_c3_strict_audit": "BLOCKED_UNTIL_FRESH_C_PASS",
+    "pre_ingame_comparison_refresh": "EXCLUDED_UNTIL_FRESH_C_C3",
+    "user_jpg_review": "OPEN",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
