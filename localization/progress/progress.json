@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 15:30 KST",
+  "updated_at_kst": "2026-10-07 15:40 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4329,5 +4329,35 @@
     "pre_ingame_manifest_count": 12,
     "pre_ingame_mandatory_c3_blocked_count": 10,
     "pre_ingame_controller_visual_qa": "PASS_FLIPY_RAW_ENGLISH_ORIGINAL_VS_CURRENT"
+  },
+  "b233_q100_source_anchor_rework": {
+    "run": "B233",
+    "queue_index": 100,
+    "asset": "53CE39D5",
+    "before_candidate_sha256": "08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1",
+    "candidate_sha256": "7235731a2add8e947476cd22b971e5b57a7de390ae134609f4254a2f493a557d",
+    "lines_reworked": 18,
+    "method": "pixel-exact accepted raster horizontal reposition to source-left+2",
+    "machine_qa": "18/18 PASS_ZERO_BLAST_HEADER_RAW",
+    "controller_visual_qa": "PASS",
+    "status": "B233_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "report": "localization/graphics/role_B/20261007-B233-Q100-53CE39D5-ANCHOR/B233_Q100_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261007-B233-Q100-53CE39D5-ANCHOR/B233_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "latest_b_manual_visual_rework": {
+    "run": "B233",
+    "queue_index": 100,
+    "asset": "53CE39D5",
+    "before_candidate_sha256": "08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1",
+    "candidate_sha256": "7235731a2add8e947476cd22b971e5b57a7de390ae134609f4254a2f493a557d",
+    "lines_reworked": 18,
+    "method": "pixel-exact accepted raster horizontal reposition to source-left+2",
+    "machine_qa": "18/18 PASS_ZERO_BLAST_HEADER_RAW",
+    "controller_visual_qa": "PASS",
+    "status": "B233_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "report": "localization/graphics/role_B/20261007-B233-Q100-53CE39D5-ANCHOR/B233_Q100_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261007-B233-Q100-53CE39D5-ANCHOR/B233_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
   }
 }
