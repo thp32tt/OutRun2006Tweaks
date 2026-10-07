@@ -24,6 +24,11 @@ def rgba_from_bytes(b):
     im=Image.open(io.BytesIO(b)); im.load(); return im.convert("RGBA")
 def arr(im): return np.array(im)
 def diffmask(a,b): return np.any(a!=b,axis=2)
+def visible_diff(a,b):
+    aa=a[:,:,3].astype(np.uint16); ba=b[:,:,3].astype(np.uint16)
+    ap=a[:,:,:3].astype(np.uint16)*aa[:,:,None]
+    bp=b[:,:,:3].astype(np.uint16)*ba[:,:,None]
+    return (aa!=ba) | np.any(ap!=bp,axis=2)
 def bbox(mask):
     ys,xs=np.where(mask)
     if not len(xs): return None
@@ -86,12 +91,11 @@ rows=[
  ("goal_a","GOAL A","골 A",[980,160,1960,244]),
  ("15_stage","15 STAGE CONTINUOUS","15코스 연속",[980,80,1960,160]),
 ]
-# Visible glyph geometry is alpha-authoritative; transparent hidden RGB must not
-# inflate text bboxes. Blast radius checks both visible RGBA and alpha changes.
-final_delta=(A[:,:,3]!=K[:,:,3])
-old_delta=(O[:,:,3]!=K[:,:,3])
-visible_union=(A[:,:,3]>0)|(O[:,:,3]>0)
-change_from_old=diffmask(A,O) & visible_union
+# Geometry and blast radius use premultiplied-visible pixels: transparent hidden
+# RGB is ignored, while RGB differences at nonzero alpha and all alpha changes count.
+final_delta=visible_diff(A,K)
+old_delta=visible_diff(O,K)
+change_from_old=visible_diff(A,O)
 alpha_change=(A[:,:,3]!=O[:,:,3])
 allowed=np.zeros((H,W),dtype=bool)
 records=[]
@@ -128,8 +132,24 @@ for key,en,ko,cell in rows:
       "source_exact_pixels_remaining_without_localized_material":residue
     })
 
-outside=int((change_from_old & (~allowed)).sum())
-alpha_outside=int((alpha_change & (~allowed)).sum())
+outside_mask=change_from_old & (~allowed)
+outside_alpha_mask=alpha_change & (~allowed)
+outside=int(outside_mask.sum())
+alpha_outside=int(outside_alpha_mask.sum())
+# Categorize collateral changes in rows B226 claimed to preserve.
+preserved_regions={
+  "stage":[0,436,228,500],
+  "goal_standalone":[4,86,195,150],
+  "outrun2":[3,346,343,410],
+  "outrun2sp":[983,430,1416,494],
+}
+collateral_by_region={}
+for name,b in preserved_regions.items():
+    x0,y0,x1,y1=b
+    collateral_by_region[name]={
+      "visible_changed":int(change_from_old[y0:y1,x0:x1].sum()),
+      "alpha_changed":int(alpha_change[y0:y1,x0:x1].sum())
+    }
 # Persisted DDS structural checks.
 header_exact=(source_bytes[:128]==cand_bytes[:128])
 mips=struct.unpack_from("<I",cand_bytes,28)[0]
@@ -160,6 +180,13 @@ sheet=Image.new("RGB",(cw,ch),"#b0b0b0"); y=0
 for r in contacts: sheet.paste(r,(0,y)); y+=r.height
 sheet.save(ROOT/"C231_ROW_CONTACT_2X.jpg",quality=95)
 annotate_strip([source,candidate],["SOURCE practical 25%","FINAL practical 25%"],0.25).save(ROOT/"C231_PRACTICAL_SCALE_25PCT.jpg",quality=95)
+# Blast-radius evidence: old/current at readable orientation plus outside-mask overlay.
+annotate_strip([old,candidate],["C143 PREDECESSOR","B226 CURRENT"],0.25).save(ROOT/"C231_OLD_FINAL_BLAST_RADIUS.jpg",quality=95)
+overlay=ImageOps.flip(candidate).convert("RGB")
+om=np.flipud(outside_mask)
+ov=np.array(overlay)
+ov[om]=np.array([255,0,255],dtype=np.uint8)
+Image.fromarray(ov).save(ROOT/"C231_OUTSIDE_REPAIR_MASK_MAGENTA.png")
 
 report={
  "schema_version":2,"role":"C","run":RUN,"qa_id":"C231","queue_index":226,
@@ -173,6 +200,7 @@ report={
    "bbox_size_positive_margin_hierarchy":f"{sum(1 for r in records if r['containment']=='PASS' and r['size_ceiling']=='PASS' and r['positive_margin']=='PASS' and r['hierarchy_repair']=='PASS')}/{len(records)} PASS",
    "changed_pixels_outside_rework_source_regions":outside,
    "alpha_changed_pixels_outside_rework_source_regions":alpha_outside,
+   "collateral_by_preserved_region":collateral_by_region,
    "header_128_exact":header_exact,"mip_count":mips,
    "post_encode_decode_authority":"PASS" if sha(cand_bytes)==EXPECTED_CAND else "FAIL",
    "practical_scale_evidence":"C231_PRACTICAL_SCALE_25PCT.jpg"
@@ -184,7 +212,9 @@ report={
    str(ROOT/"C231_SOURCE_CLEAN_OLD_FINAL_READABLE.jpg"),
    str(ROOT/"C231_ROW_CONTACT_2X.jpg"),
    str(ROOT/"C231_SOURCE_FINAL_RAW.jpg"),
-   str(ROOT/"C231_PRACTICAL_SCALE_25PCT.jpg")
+   str(ROOT/"C231_PRACTICAL_SCALE_25PCT.jpg"),
+   str(ROOT/"C231_OLD_FINAL_BLAST_RADIUS.jpg"),
+   str(ROOT/"C231_OUTSIDE_REPAIR_MASK_MAGENTA.png")
  ],
  "controller_visual_qa":"PENDING_CONTROLLER",
  "c3_strict_decision":"PENDING_CONTROLLER",
@@ -207,9 +237,10 @@ print(json.dumps({
     "mips": mips,
     "old_sha256": sha(old_bytes),
     "old_git_commit": old_commit,
+    "collateral_by_region": collateral_by_region,
     "all_rows": all_rows,
     "machine_pass": machine_pass
   }
 }, ensure_ascii=False, indent=2))
 if not machine_pass:
-    raise SystemExit("C231 machine QA failed closed")
+    print("C231 machine QA FAIL recorded for controller C3/rework decision")
