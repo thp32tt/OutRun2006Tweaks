@@ -1,0 +1,775 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B-MANUALQA231-AA04D779-COVERAGE",
+  "queue_index": 46,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+  "trigger": "QA_HARDENING_LOCALIZATION_COVERAGE_FALSE_NEGATIVE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/001_q046_AA04D779.jpg",
+  "prior_status": "C_USERPOLICY02_PASS_PENDING_INGAME",
+  "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+  "before_candidate_sha256": "93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e",
+  "candidate_sha256": "d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0",
+  "defect": [
+    "UNTRANSLATED_VISIBLE_UI_LOBBY_STATUS",
+    "UNTRANSLATED_VISIBLE_UI_GRAY_CONTROL_LABELS"
+  ],
+  "semantic_additions": {
+    "In pre-game lobby": "게임 전 로비",
+    "Offline": "오프라인",
+    "BRAKE": "브레이크",
+    "ACCELERATE": "가속",
+    "GEAR UP": "기어 업",
+    "GEAR DOWN": "기어 다운",
+    "VIEW LICENSE": "라이선스 보기",
+    "CHANGE CUSTOM SOUNDTRACK": "사용자 음악 / 변경",
+    "PAUSE MENU": "일시정지 / 메뉴"
+  },
+  "explicit_preserve_original": {
+    "REV": "asset-specific gauge abbreviation; prior classification preserve",
+    "TOP": "asset-specific decorative rank emblem; prior classification preserve",
+    "You": "asset-specific player marker paired with 1P/2P/3P/4P; prior classification preserve",
+    "player_numbers": "standard 1P/2P/3P/4P markers preserved",
+    "icons_course_symbols_numeric_art": "non-language/protected artwork"
+  },
+  "method": "current exact candidate + pinned canonical 2048 source; tight source-alpha semantic windows; transparent clean of source-visible control text only; native Noto CJK Bold; prior 21 stage/sector localized pixels exact outside rework mask",
+  "rows": [
+    {
+      "key": "pre_game_lobby",
+      "source": "In pre-game lobby",
+      "ko_lines": [
+        "게임 전 로비"
+      ],
+      "family": "white",
+      "align": "left",
+      "bbox": [
+        10,
+        49,
+        380,
+        88
+      ],
+      "source_size": [
+        370,
+        39
+      ],
+      "source_alpha_pixels": 6028,
+      "localized_bbox": [
+        12,
+        51,
+        190,
+        86
+      ],
+      "localized_size": [
+        178,
+        35
+      ],
+      "margins": [
+        2,
+        190,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 36,
+      "horizontal_scale": 1.0,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "alignment": "left",
+      "line_gap": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "offline",
+      "source": "Offline",
+      "ko_lines": [
+        "오프라인"
+      ],
+      "family": "white",
+      "align": "left",
+      "bbox": [
+        459,
+        47,
+        593,
+        84
+      ],
+      "source_size": [
+        134,
+        37
+      ],
+      "source_alpha_pixels": 2635,
+      "localized_bbox": [
+        461,
+        49,
+        583,
+        82
+      ],
+      "localized_size": [
+        122,
+        33
+      ],
+      "margins": [
+        2,
+        10,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 34,
+      "horizontal_scale": 1.0,
+      "fill_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "alignment": "left",
+      "line_gap": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "brake_left",
+      "source": "BRAKE",
+      "ko_lines": [
+        "브레이크"
+      ],
+      "family": "gray",
+      "align": "center",
+      "bbox": [
+        414,
+        220,
+        586,
+        260
+      ],
+      "source_size": [
+        172,
+        40
+      ],
+      "source_alpha_pixels": 4155,
+      "localized_bbox": [
+        438,
+        222,
+        561,
+        258
+      ],
+      "localized_size": [
+        123,
+        36
+      ],
+      "margins": [
+        24,
+        25,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 37,
+      "horizontal_scale": 0.92,
+      "fill_rgba": [
+        101,
+        108,
+        110,
+        255
+      ],
+      "alignment": "center",
+      "line_gap": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "brake_right",
+      "source": "BRAKE",
+      "ko_lines": [
+        "브레이크"
+      ],
+      "family": "gray",
+      "align": "center",
+      "bbox": [
+        605,
+        220,
+        777,
+        260
+      ],
+      "source_size": [
+        172,
+        40
+      ],
+      "source_alpha_pixels": 4158,
+      "localized_bbox": [
+        629,
+        222,
+        752,
+        258
+      ],
+      "localized_size": [
+        123,
+        36
+      ],
+      "margins": [
+        24,
+        25,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 37,
+      "horizontal_scale": 0.92,
+      "fill_rgba": [
+        101,
+        108,
+        110,
+        255
+      ],
+      "alignment": "center",
+      "line_gap": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "accelerate",
+      "source": "ACCELERATE",
+      "ko_lines": [
+        "가속"
+      ],
+      "family": "gray",
+      "align": "center",
+      "bbox": [
+        1201,
+        221,
+        1524,
+        260
+      ],
+      "source_size": [
+        323,
+        39
+      ],
+      "source_alpha_pixels": 6551,
+      "localized_bbox": [
+        1333,
+        223,
+        1392,
+        258
+      ],
+      "localized_size": [
+        59,
+        35
+      ],
+      "margins": [
+        132,
+        132,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 36,
+      "horizontal_scale": 0.92,
+      "fill_rgba": [
+        101,
+        108,
+        110,
+        255
+      ],
+      "alignment": "center",
+      "line_gap": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "gear_up_left",
+      "source": "GEAR UP",
+      "ko_lines": [
+        "기어 업"
+      ],
+      "family": "gray",
+      "align": "center",
+      "bbox": [
+        7,
+        283,
+        218,
+        323
+      ],
+      "source_size": [
+        211,
+        40
+      ],
+      "source_alpha_pixels": 4625,
+      "localized_bbox": [
+        63,
+        285,
+        161,
+        321
+      ],
+      "localized_size": [
+        98,
+        36
+      ],
+      "margins": [
+        56,
+        57,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 37,
+      "horizontal_scale": 0.92,
+      "fill_rgba": [
+        101,
+        108,
+        110,
+        255
+      ],
+      "alignment": "center",
+      "line_gap": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "gear_down_icon_left",
+      "source": "GEAR",
+      "ko_lines": [
+        "기어"
+      ],
+      "family": "gray",
+      "align": "center",
+      "semantic_parent": "GEAR DOWN",
+      "bbox": [
+        882,
+        282,
+        995,
+        322
+      ],
+      "source_size": [
+        113,
+        40
+      ],
+      "source_alpha_pixels": 2683,
+      "localized_bbox": [
+        909,
+        284,
+        968,
+        320
+      ],
+      "localized_size": [
+        59,
+        36
+      ],
+      "margins": [
+        27,
+        27,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 37,
+      "horizontal_scale": 0.92,
+      "fill_rgba": [
+        101,
+        108,
+        110,
+        255
+      ],
+      "alignment": "center",
+      "line_gap": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "gear_down_icon_right",
+      "source": "DOWN",
+      "ko_lines": [
+        "다운"
+      ],
+      "family": "gray",
+      "align": "center",
+      "semantic_parent": "GEAR DOWN",
+      "bbox": [
+        1037,
+        282,
+        1181,
+        322
+      ],
+      "source_size": [
+        144,
+        40
+      ],
+      "source_alpha_pixels": 3555,
+      "localized_bbox": [
+        1080,
+        284,
+        1138,
+        319
+      ],
+      "localized_size": [
+        58,
+        35
+      ],
+      "margins": [
+        43,
+        43,
+        2,
+        3
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 36,
+      "horizontal_scale": 0.92,
+      "fill_rgba": [
+        101,
+        108,
+        110,
+        255
+      ],
+      "alignment": "center",
+      "line_gap": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "gear_down_right",
+      "source": "GEAR DOWN",
+      "ko_lines": [
+        "기어 다운"
+      ],
+      "family": "gray",
+      "align": "center",
+      "bbox": [
+        1200,
+        284,
+        1499,
+        324
+      ],
+      "source_size": [
+        299,
+        40
+      ],
+      "source_alpha_pixels": 6696,
+      "localized_bbox": [
+        1285,
+        286,
+        1413,
+        321
+      ],
+      "localized_size": [
+        128,
+        35
+      ],
+      "margins": [
+        85,
+        86,
+        2,
+        3
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 36,
+      "horizontal_scale": 0.92,
+      "fill_rgba": [
+        101,
+        108,
+        110,
+        255
+      ],
+      "alignment": "center",
+      "line_gap": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "view_license",
+      "source": "VIEW LICENSE",
+      "ko_lines": [
+        "라이선스 보기"
+      ],
+      "family": "dark",
+      "align": "left",
+      "bbox": [
+        393,
+        355,
+        774,
+        396
+      ],
+      "source_size": [
+        381,
+        41
+      ],
+      "source_alpha_pixels": 7895,
+      "localized_bbox": [
+        395,
+        357,
+        590,
+        394
+      ],
+      "localized_size": [
+        195,
+        37
+      ],
+      "margins": [
+        2,
+        184,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 38,
+      "horizontal_scale": 0.92,
+      "fill_rgba": [
+        47,
+        54,
+        58,
+        255
+      ],
+      "alignment": "left",
+      "line_gap": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "gear_up_right",
+      "source": "GEAR UP",
+      "ko_lines": [
+        "기어 업"
+      ],
+      "family": "gray",
+      "align": "center",
+      "bbox": [
+        1474,
+        359,
+        1689,
+        399
+      ],
+      "source_size": [
+        215,
+        40
+      ],
+      "source_alpha_pixels": 4604,
+      "localized_bbox": [
+        1532,
+        361,
+        1630,
+        397
+      ],
+      "localized_size": [
+        98,
+        36
+      ],
+      "margins": [
+        58,
+        59,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 37,
+      "horizontal_scale": 0.92,
+      "fill_rgba": [
+        101,
+        108,
+        110,
+        255
+      ],
+      "alignment": "center",
+      "line_gap": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "change_soundtrack",
+      "source": "CHANGE CUSTOM / SOUNDTRACK",
+      "ko_lines": [
+        "사용자 음악",
+        "변경"
+      ],
+      "family": "gray",
+      "align": "left",
+      "bbox": [
+        1019,
+        445,
+        1454,
+        544
+      ],
+      "source_size": [
+        435,
+        99
+      ],
+      "source_alpha_pixels": 18339,
+      "localized_bbox": [
+        1021,
+        447,
+        1228,
+        542
+      ],
+      "localized_size": [
+        207,
+        95
+      ],
+      "margins": [
+        2,
+        226,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 47,
+      "horizontal_scale": 0.92,
+      "fill_rgba": [
+        101,
+        108,
+        110,
+        255
+      ],
+      "alignment": "left",
+      "line_gap": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "pause_menu",
+      "source": "PAUSE / MENU",
+      "ko_lines": [
+        "일시정지",
+        "메뉴"
+      ],
+      "family": "gray",
+      "align": "center",
+      "bbox": [
+        1800,
+        454,
+        1981,
+        553
+      ],
+      "source_size": [
+        181,
+        99
+      ],
+      "source_alpha_pixels": 7469,
+      "localized_bbox": [
+        1815,
+        456,
+        1965,
+        550
+      ],
+      "localized_size": [
+        150,
+        94
+      ],
+      "margins": [
+        15,
+        16,
+        2,
+        3
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 46,
+      "horizontal_scale": 0.92,
+      "fill_rgba": [
+        101,
+        108,
+        110,
+        255
+      ],
+      "alignment": "center",
+      "line_gap": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "ui_family_style_profiles": {
+    "white_lobby_status": {
+      "font_impression": "bold upright sans",
+      "alignment": "source-left",
+      "fill": "sampled source white",
+      "effects": "none"
+    },
+    "gray_controls": {
+      "font_impression": "bold condensed upright sans",
+      "alignment": "source-relative left/center",
+      "fill": "sampled source gray/dark",
+      "effects": "none",
+      "multiline": "source line-count preserved"
+    }
+  },
+  "machine_qa": {
+    "new_physical_rows": 13,
+    "bbox_source_size_positive_margin": "13/13 PASS",
+    "clean_validator": "PASS",
+    "final_validator": "PASS",
+    "baseline_changes_outside_rework_mask": 0,
+    "baseline_alpha_changes_outside_rework_mask": 0,
+    "source_control_alpha_remaining": 0,
+    "localized_pair_overlap": 0,
+    "persisted_decode_matches_intended": "PASS",
+    "header_128_exact": true,
+    "raw_mode": "RGBA",
+    "raw_orientation": "mirror_y",
+    "mip_count": 1,
+    "mip_review": "PASS_LEVEL0_ONLY_NO_AUTHORED_EXTRA_MIPS"
+  },
+  "post_encode_presentation_gate": {
+    "decoded_persisted_dds_authority": "PASS",
+    "practical_scales": [
+      "100%",
+      "75%",
+      "50%"
+    ],
+    "family_profile": "RECORDED_TWO_FAMILIES",
+    "rework_blast_radius": "PASS_ZERO_OUTSIDE_13_CONTROL_BBOXES",
+    "coverage": "PASS_21_PRIOR_STAGE_SEGMENTS_PLUS_9_NEW_SEMANTIC_UI_LABELS_WITH_EXPLICIT_ASSET_PRESERVES",
+    "mandatory_c3": "REQUIRED_BEFORE_PRE_INGAME_EXPORT_DUE_PRIOR_POLICY_FALSE_NEGATIVE"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_TRANSPARENT_SOURCE_CONTROL_ALPHA_REMOVED",
+    "2_slant_direction": "PASS_SOURCE_UPRIGHT",
+    "3_no_unnecessary_undersizing": "PASS_MAX_NATIVE_FIT_PER_SOURCE_BBOX",
+    "4_source_weight_outline_shadow": "PASS_SOURCE_FLAT_WHITE_GRAY_FAMILIES",
+    "5_no_clipping": "PASS_13_OF_13_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_BASELINE_AND_PROTECTED_OUTSIDE_ZERO",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "status": "B231_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_FRESH_C_C3",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

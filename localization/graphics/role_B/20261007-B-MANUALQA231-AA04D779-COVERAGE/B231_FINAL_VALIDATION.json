@@ -1,0 +1,29 @@
+{
+  "source": "/tmp/b231/source.png",
+  "candidate": "/tmp/b231/persisted_final.png",
+  "size": [
+    2048,
+    2048
+  ],
+  "changed_pixels": 498639,
+  "changed_bbox": [
+    7,
+    47,
+    1985,
+    1325
+  ],
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "baseline_candidate": "/tmp/b231/baseline.png",
+  "rework_mask": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261007-B-MANUALQA231-AA04D779-COVERAGE/B231_AA04D779_REWORK_MASK.png",
+  "rework_changed_pixels": 90462,
+  "rework_changed_bbox": [
+    7,
+    47,
+    1981,
+    553
+  ],
+  "rework_changed_pixels_outside_mask": 0,
+  "status": "PASS"
+}

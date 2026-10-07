@@ -1,0 +1,16 @@
+{
+  "role": "B",
+  "run": "20261007-B-MANUALQA231-AA04D779-COVERAGE",
+  "queue_index": 46,
+  "asset": "AA04D779",
+  "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+  "before_candidate_sha256": "93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e",
+  "candidate_sha256": "d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0",
+  "new_physical_rows": 13,
+  "bbox_size_positive_margin": "13/13",
+  "blast_outside": 0,
+  "alpha_blast_outside": 0,
+  "worker_status": "B231_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_FRESH_C_C3",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20261007-B-MANUALQA231-AA04D779-COVERAGE/B231_AA04D779_REPORT.json"
+}
