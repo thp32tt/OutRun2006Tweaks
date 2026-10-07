@@ -2329,3 +2329,9 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 ## 2026-10-07 14:04 KST — C236 q46 PRE_INGAME refreshed
 - #001 q046 AA04D779 English-original vs exact current Korean candidate exported successfully after C3_STRICT_PASS.
 - User JPG review and actual in-game validation remain pending; RUNTIME_VALIDATION=UNTESTED.
+
+## 2026-10-07 14:10 KST — C232 C1 q95 37759842 C3_STRICT_PASS
+- TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). A137 exact candidate `ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b` fresh independent C + mandatory C3 PASS.
+- Machine: 16/16 bbox/size/positive-margin; blast radius and alpha blast outside rework=0; protected changes=0; source-core residue=0; persisted decode/header/raw mirror_y PASS.
+- Controller: corrected source-direction right lean, clean removal, source-family style, practical 25% readability and RAW orientation PASS; no clipping/residue/broken Hangul/intrusion.
+- IGR-014/015/016 remain pending NEW actual in-game retest. PRE_INGAME refresh/user JPG review pending; RUNTIME_VALIDATION=UNTESTED.
