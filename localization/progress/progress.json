@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T03:45:00+09:00",
+  "updated_at_kst": "2026-10-08T04:00:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -5401,36 +5401,54 @@
     "runtime_validation": "UNTESTED"
   },
   "latest_b_production": {
-    "run": "20261008-B242-Q212-CONDENSED-WORD-GROUPS",
-    "timestamp_kst": "2026-10-08T01:49:00+09:00",
+    "run": "20261008-B244-Q062-PSD-L43-CLEAN",
+    "timestamp_kst": "2026-10-08T04:00:00+09:00",
     "role": "B",
-    "queue_index": 212,
-    "asset": "BA0147DA",
-    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
-    "c256_rejected_sha256": "3266d0740f9fc5b8d1b0771e2313fe3364e485da06bc5ad578f94999082315c4",
-    "b241_rejected_sha256": "dbebe0684070f75fdae7bc494534a58be1bc5ebceada9418f30604a5307a644f",
-    "candidate_sha256": "e3fc3275e696acb0dc5449908bd3b57a232d842ad51296e888cc7ede6a276863",
-    "worker_run": 37654356700,
-    "worker_attempt": 2,
-    "worker_output_commit": "720de01bb48b59911edc0f544ab36fa5d5c4646a",
+    "queue_index": 62,
+    "asset": "33491F83",
+    "trigger": "C259_REWORK_REQUIRED_CLEAN_PLATE_WHITE_OVAL_PATCHES",
+    "source_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+    "prior_candidate_sha256": "58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2",
+    "candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
+    "material_commit": "a85212a6601408a23b496dfe84356492620bec24",
+    "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
+    "fallback_reason": "GitHub-hosted B244 run 37667995926 remained queued behind C260 PRE_INGAME exporter for >15 minutes; exact prior candidate and authored evidence hashes verified before deterministic fallback.",
     "machine_qa": {
-      "bbox_containment": "2/2 PASS",
-      "changed_outside": 0,
-      "alpha_outside": 0,
-      "localized_overlap": 0,
-      "protected_overlap": 0,
+      "target_rows": "2/2 PASS",
+      "changed_pixels_vs_a132": 7788,
+      "changed_outside_target_bboxes": 0,
+      "alpha_changed_outside_target_bboxes": 0,
+      "background_mismatch_vs_layer43_outside_glyph": 0,
+      "non_target_atlas_pixel_exact": true,
       "header_128_exact": true,
       "mips": 1,
       "raw_orientation": "mirror_y",
       "persisted_decode": "PASS"
     },
     "visual_qa": {
-      "B241": "FAIL_EXCESSIVE_HEART_WORD_GAP",
-      "B242": "PASS_SOURCE_CLEAN_FINAL_PRACTICAL_RAW"
+      "decision": "PASS",
+      "plate_restoration": "PASS_AUTHORED_LAYER43_CONTINUOUS_ROAD_NO_WHITE_PATCH",
+      "easy_bbox": [
+        186,
+        287,
+        329,
+        371
+      ],
+      "hard_bbox": [
+        829,
+        288,
+        1039,
+        372
+      ],
+      "evidence": [
+        "B244_Q062_EASY_HARD_ZOOM.jpg",
+        "B244_Q062_MAIN_COMPARE.jpg",
+        "B244_Q062_RAW.jpg"
+      ]
     },
-    "status": "B242_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME_RETEST",
+    "status": "B244_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
     "fresh_independent_c": "REQUIRED",
-    "mandatory_c3": "REQUIRED_EXACT_SHA_USER_INGAME_REGRESSION",
+    "mandatory_c3": "REQUIRED_C259_VISUAL_REGRESSION",
     "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
     "actual_ingame_validation": "PENDING",
     "runtime_validation": "UNTESTED",
@@ -5832,6 +5850,60 @@
     "status": "B243_CONTROLLER_VISUAL_FAIL_REWORK_REQUIRED",
     "fresh_c": "BLOCKED",
     "c3": "BLOCKED",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "b244_q062_33491f83": {
+    "run": "20261008-B244-Q062-PSD-L43-CLEAN",
+    "timestamp_kst": "2026-10-08T04:00:00+09:00",
+    "role": "B",
+    "queue_index": 62,
+    "asset": "33491F83",
+    "trigger": "C259_REWORK_REQUIRED_CLEAN_PLATE_WHITE_OVAL_PATCHES",
+    "source_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+    "prior_candidate_sha256": "58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2",
+    "candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
+    "material_commit": "a85212a6601408a23b496dfe84356492620bec24",
+    "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
+    "fallback_reason": "GitHub-hosted B244 run 37667995926 remained queued behind C260 PRE_INGAME exporter for >15 minutes; exact prior candidate and authored evidence hashes verified before deterministic fallback.",
+    "machine_qa": {
+      "target_rows": "2/2 PASS",
+      "changed_pixels_vs_a132": 7788,
+      "changed_outside_target_bboxes": 0,
+      "alpha_changed_outside_target_bboxes": 0,
+      "background_mismatch_vs_layer43_outside_glyph": 0,
+      "non_target_atlas_pixel_exact": true,
+      "header_128_exact": true,
+      "mips": 1,
+      "raw_orientation": "mirror_y",
+      "persisted_decode": "PASS"
+    },
+    "visual_qa": {
+      "decision": "PASS",
+      "plate_restoration": "PASS_AUTHORED_LAYER43_CONTINUOUS_ROAD_NO_WHITE_PATCH",
+      "easy_bbox": [
+        186,
+        287,
+        329,
+        371
+      ],
+      "hard_bbox": [
+        829,
+        288,
+        1039,
+        372
+      ],
+      "evidence": [
+        "B244_Q062_EASY_HARD_ZOOM.jpg",
+        "B244_Q062_MAIN_COMPARE.jpg",
+        "B244_Q062_RAW.jpg"
+      ]
+    },
+    "status": "B244_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
+    "fresh_independent_c": "REQUIRED",
+    "mandatory_c3": "REQUIRED_C259_VISUAL_REGRESSION",
+    "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+    "actual_ingame_validation": "PENDING",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }

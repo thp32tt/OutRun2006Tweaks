@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "run": "20261008-B244-Q062-PSD-L43-CLEAN",
+  "timestamp_kst": "2026-10-08T04:00:00+09:00",
+  "role": "B",
+  "queue_index": 62,
+  "asset": "33491F83",
+  "trigger": "C259_REWORK_REQUIRED_CLEAN_PLATE_WHITE_OVAL_PATCHES",
+  "source_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+  "prior_candidate_sha256": "58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2",
+  "candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
+  "material_commit": "a85212a6601408a23b496dfe84356492620bec24",
+  "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
+  "fallback_reason": "GitHub-hosted B244 run 37667995926 remained queued behind C260 PRE_INGAME exporter for >15 minutes; exact prior candidate and authored evidence hashes verified before deterministic fallback.",
+  "machine_qa": {
+    "target_rows": "2/2 PASS",
+    "changed_pixels_vs_a132": 7788,
+    "changed_outside_target_bboxes": 0,
+    "alpha_changed_outside_target_bboxes": 0,
+    "background_mismatch_vs_layer43_outside_glyph": 0,
+    "non_target_atlas_pixel_exact": true,
+    "header_128_exact": true,
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "visual_qa": {
+    "decision": "PASS",
+    "plate_restoration": "PASS_AUTHORED_LAYER43_CONTINUOUS_ROAD_NO_WHITE_PATCH",
+    "easy_bbox": [
+      186,
+      287,
+      329,
+      371
+    ],
+    "hard_bbox": [
+      829,
+      288,
+      1039,
+      372
+    ],
+    "evidence": [
+      "B244_Q062_EASY_HARD_ZOOM.jpg",
+      "B244_Q062_MAIN_COMPARE.jpg",
+      "B244_Q062_RAW.jpg"
+    ]
+  },
+  "status": "B244_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3": "REQUIRED_C259_VISUAL_REGRESSION",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+  "actual_ingame_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "ordered_generation_gate": {
+    "1_english_source_removal_and_plate_restoration": "PASS_AUTHORED_PSD_LAYER43_NO_WHITE_PATCH",
+    "2_source_matching_slant": "PASS_UPRIGHT_MAIN_LABEL_FAMILY",
+    "3_no_unnecessary_undersize": "PASS_A132_NATIVE_73PX_GEOMETRY",
+    "4_source_faithful_weight_outline_shadow": "PASS_BLACK_WHITE7_NAVY5_SOURCE_COLORS",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGINS",
+    "6_protected_art_clearance": "PASS_NON_TARGET_ATLAS_PIXEL_EXACT",
+    "7_flip_y_and_raw": "PASS_CONTROLLER_REVIEW",
+    "8_immediate_readability": "PASS_CONTROLLER_REVIEW"
+  },
+  "evidence": [
+    "B244_Q062_EASY_HARD_ZOOM.jpg",
+    "B244_Q062_MAIN_COMPARE.jpg",
+    "B244_Q062_RAW.jpg",
+    "B244_Q062_REPORT.json"
+  ],
+  "decision": "PRODUCER_PASS_PENDING_FRESH_C_C3"
+}

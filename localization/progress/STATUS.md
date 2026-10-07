@@ -2654,3 +2654,8 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 ### B243 q212 controller FAIL — 2026-10-08 03:45 KST
 - q212 `4b967ef0...`: machine PASS, producer visual FAIL. Gap 195px but title width 707px, still underfilled vs C259 source hierarchy requirement.
 - State: `B243_CONTROLLER_VISUAL_FAIL_REWORK_REQUIRED`; fresh C/C3 blocked until material repair. `RUNTIME_VALIDATION=UNTESTED`.
+
+### B244 q62 — 2026-10-08 04:00 KST
+- q62 33491F83 -> exact fa5cd96f...: C259 white EASY/HARD patches replaced by PSD-authored Layer43 road/background; A132 73px Black/white+navy lettering family rerendered.
+- QA: 2/2 containment/size/positive margin; 7,788 changed px; outside/alpha=0; non-target exact; authored-background mismatch=0; persisted DDS/RAW + controller visual PASS.
+- Producer PASS pending fresh C + exact-SHA C3 -> PRE_INGAME/user review -> actual-game. RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.

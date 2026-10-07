@@ -3325,3 +3325,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Consumed previously unreconciled B243 worker output instead of rerendering it. Exact current q212 candidate `4b967ef09bbbb21d7ecc1496c2ee15395567b526af6cf68f1c22c7549850d518`, worker output `2335bb1f...`.
 - Machine containment/scope remained PASS, but controller SOURCE/C259_REJECT/B243 + practical 100/75/50 + RAW review FAIL. Word gap improved 300->195px, yet total HEART title width regressed 718->707px (40.82%->40.19% of the 1759px source region), so the canonical title hierarchy remains materially underfilled.
 - B243 is not producer PASS and is not handed to C. q212/IGR-002 remains REWORK_REQUIRED. A170 broad/square regression must also not return. `RUNTIME_VALIDATION=UNTESTED`; forbidden domains untouched.
+
+## 2026-10-08 04:00 KST — B244 q62 authored Layer43 clean-plate repair
+- Refreshed CONTRACT/mandatory state and consumed direct B-even C259 REWORK_REQUIRED q62 after fail-closing the already-produced B243 q212 result; completed B/C-pass assets were not repeated.
+- q62 root cause: A132 combined PSD Layer43+Group16 and left conspicuous white rounded EASY/HARD patches. PSD Layer43 alone contains continuous text-free road/background at those exact source positions.
+- B244 exact fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6: only EASY [142,285,385,375] and HARD [808,287,1068,373] source bboxes rebuilt from Layer43. Korean rerendered with proven A132 Noto Sans CJK KR Black 73px, white outer 7px, navy inner 5px, source colors/anchors.
+- Material plate repair: EASY 14,496px / HARD 6,023px clean pixels changed from A132; persisted candidate changed 7,788px. 2/2 bbox+size positive-margin PASS; changed/alpha outside target=0; non-target atlas exact; Layer43 background mismatch outside glyph=0; header/mip1/decode/RAW mirror_y PASS.
+- Controller SOURCE/A132_CLEAN_FAIL/PSD_LAYER43_CLEAN/B244_FINAL zoom + full + RAW PASS: white patches gone, road/green-edge continuity restored, no seam/residue/clipping/overlap.
+- Hosted B244 run 37667995926 was queued >15m behind C260; N100 fallback followed contract after exact input/evidence verification. Material commit a85212a6601408a23b496dfe84356492620bec24. Fresh C + exact-SHA C3 + PRE_INGAME/user JPG + actual-game pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
