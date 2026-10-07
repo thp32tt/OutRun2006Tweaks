@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# C259 post-adjudication persistent PRE_INGAME exporter refresh.
+# C259 post-adjudication persistent PRE_INGAME exporter refresh (BOM-safe retry).
 # TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN
 import os
 import subprocess
