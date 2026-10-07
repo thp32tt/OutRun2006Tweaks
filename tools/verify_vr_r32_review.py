@@ -81,7 +81,7 @@ for banned in (
         "R32ResetR13Hook",
         "R32ResetR22Hook",
         "HRESULT __stdcall ResetDestR32(",
-        "reinterpret_cast<void*>(&ResetDestR22), ResetDestR32"):
+        "R32ReviewResetTarget(), ResetDestR32"):
     if banned in r32:
         raise SystemExit(f"R32 retained retired physical Reset ownership: {banned}")
 reset_owner = r32[r32.find("HRESULT R32WithResetLifecycle("):]
@@ -138,33 +138,29 @@ if min(issue_marker, issue_reject) < 0 or issue_reject < issue_marker:
 r33 = require(
     "src/vr/d3d9/stereo_renderer_r33.cpp",
     '#include "stereo_renderer_r32.cpp"',
-    "R31OwnedResult R33TryFastWorld",
-    "R31OwnedResult R33TryHud",
-    "R31ObserveDraw(device)",
+    "R32ReviewOwnedResult R33TryFastWorld",
+    "R32ReviewOwnedResult R33TryHud",
+    "R32ReviewObserveDispatchDraw(device)",
     "R32ReviewRunLowerFailClosed",
-    "R31DiscardUnreliableDrawCaches();",
+    "R32ReviewDiscardUnreliableDrawCaches();",
     "changing one tracked render state cannot",
-    "R30CallLowerDrawPrimitive(",
-    "R30CallLowerDrawIndexedPrimitive(",
-    "R30CallLowerDrawPrimitiveUP(",
-    "R30CallLowerDrawIndexedPrimitiveUP(",
+    "R32ReviewCallLowerDrawPrimitive(",
+    "R32ReviewCallLowerDrawIndexedPrimitive(",
+    "R32ReviewCallLowerDrawPrimitiveUP(",
+    "R32ReviewCallLowerDrawIndexedPrimitiveUP(",
     "R32ReviewRunResetLifecycle(",
     "R33ResetR22Hook.stdcall<HRESULT>",
-    "reinterpret_cast<void*>(&ResetDestR22)",
+    "R32ReviewResetTarget()",
     "R33 hooks R22 directly and preserves R32 reset lifecycle",
     "SafetyHookInline R33ResolveDirectR13Hook{};",
-    "reinterpret_cast<void*>(&ResolveDirectTransportR13)",
+    "R32ReviewDirectTransportTarget()",
     "ResolveDirectTransportDestR33",
     "R32ReviewResolveDirectTransport(",
     "R33ResolveDirectR13Hook.call<bool>",
     "top-level telemetry counted once",
-    "const auto r31 = R31InstallStatus();",
-    "const auto r22 = R22InstallStatus();",
-    "const auto r13 = R13InstallStatus();",
-    "r31 == State::Failed || r22 == State::Failed",
-    "r13 == R13InstallStatusValue::Failed",
-    "r31 == State::Ready && r22 == State::Ready",
-    "r13 == R13InstallStatusValue::Ready",
+    "const auto prerequisites = R32ReviewPrerequisiteStatus();",
+    "prerequisites == State::Failed",
+    "prerequisites == State::Ready",
 )
 for banned in ("R33ResetR32Hook", "reinterpret_cast<void*>(&ResetDestR32)"):
     if banned in r33:
@@ -334,11 +330,11 @@ r33_guard = require(
     "SetExternalSafetyBlock(!healthy)",
     "R33SynchronizeResetReplayGuardState(",
     "R33ReportInstallResult(",
-    "R9TrackedMainDepthHasStencil()",
+    "R32ReviewMainDepthHasStencil()",
     "Present/pre",
     "R32ReviewRunPresentTelemetry(",
     "R33PresentR13Hook.stdcall<HRESULT>",
-    "reinterpret_cast<void*>(&PresentDestR13)",
+    "R32ReviewPresentTarget()",
 )
 if r33_guard.find("Present/pre") > r33_guard.find("R32ReviewRunPresentTelemetry("):
     raise SystemExit("R33 must reassert Reset replay fail-close before R32 Present telemetry/lower Present")
@@ -348,7 +344,7 @@ r32_source = load("src/vr/d3d9/stereo_renderer_r32.cpp")
 for banned in (
         "SafetyHookInline R32PresentR13Hook{};",
         "HRESULT __stdcall PresentDestR32(",
-        "reinterpret_cast<void*>(&PresentDestR13), PresentDestR32"):
+        "R32ReviewPresentTarget(), PresentDestR32"):
     if banned in r32_source:
         raise SystemExit(f"R32 retained retired physical Present ownership: {banned}")
 for required in (
