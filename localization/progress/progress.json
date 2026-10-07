@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 17:45 KST",
+  "updated_at_kst": "2026-10-07 18:00 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4671,5 +4671,21 @@
     "pre_ingame_export": "PENDING_REFRESH_Q26",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "a164r_q197_9f060ec1": {
+    "run": "A164R",
+    "queue_index": 197,
+    "asset": "9F060EC1",
+    "source_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+    "prior_candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+    "candidate_sha256": "60cfa3ef1257e3bbc50a8c7152aba538837eabd2322c18e098ee7ceb61381fea",
+    "historical_policy_failure": "5/5 old Korean rows violate current exact source bbox/size/containment gate",
+    "first_attempt": "A164 rejected by controller visual QA for horizontal-streak clean plate",
+    "repair": "A164R nearest-background clean reconstruction + native Noto Sans CJK KR Bold shared body family, source-left cadence",
+    "machine_qa": "PASS_5_OF_5; ZERO_OUT_OF_SCOPE_PIXEL_ALPHA_CHANGE; ZERO_OVERLAP; HEADER_MIP1_RAW_PASS",
+    "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_FINAL_ROWS_RAW_PRACTICAL",
+    "status": "A164R_SELF_QA_PASS_PENDING_FRESH_C_C3_USER_JPG_INGAME",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }
