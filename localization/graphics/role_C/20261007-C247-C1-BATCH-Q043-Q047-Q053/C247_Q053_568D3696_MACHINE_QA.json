@@ -1,0 +1,71 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "C247",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 53,
+  "asset_key": "568D3696",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+  "candidate_sha256": "7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33",
+  "prior_candidate_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
+  "prior_blob_commit": "203185a294cc54de4ff044c5cc4645736c51dfb5",
+  "high_risk_reason": "PRE_INGAME TEXT_SCALE/HIERARCHY false-negative",
+  "independent_machine_qa": {
+    "candidate_sha_exact": true,
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "mips": 13,
+    "header_128_exact_to_prior": true,
+    "decoded_changed_pixels": 36191,
+    "decoded_changed_bbox": [
+      1992,
+      2072,
+      2440,
+      2156
+    ],
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "bbox_size_positive_margin": "1/1 PASS",
+    "per_region": [
+      {
+        "source_bbox": [
+          1988,
+          2061,
+          2445,
+          2164
+        ],
+        "localized_bbox": [
+          1992,
+          2072,
+          2440,
+          2156
+        ],
+        "source_size": [
+          457,
+          103
+        ],
+        "localized_size": [
+          448,
+          84
+        ],
+        "margins": [
+          4,
+          5,
+          11,
+          8
+        ],
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      }
+    ],
+    "raw_and_flip_y_evidence": "WRITTEN"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "C3_STRICT_AUDIT": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

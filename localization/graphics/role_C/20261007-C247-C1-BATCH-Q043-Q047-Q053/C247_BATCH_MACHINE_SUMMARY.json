@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C247",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "assets": [
+    {
+      "index": 43,
+      "key": "455717B2",
+      "candidate_sha256": "a2b0db36e0283244037dccae5b65558a70d5b8547da245d92c840e0da3b3327c",
+      "machine_qa": "PASS",
+      "visual": "PENDING",
+      "c3": "PENDING"
+    },
+    {
+      "index": 47,
+      "key": "AD720950",
+      "candidate_sha256": "6386a41ffa4af599cc7076be0cc4ce59729026b4882c437ac397270290b7e4bf",
+      "machine_qa": "PASS",
+      "visual": "PENDING",
+      "c3": "PENDING"
+    },
+    {
+      "index": 53,
+      "key": "568D3696",
+      "candidate_sha256": "7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33",
+      "machine_qa": "PASS",
+      "visual": "PENDING",
+      "c3": "PENDING"
+    }
+  ]
+}
