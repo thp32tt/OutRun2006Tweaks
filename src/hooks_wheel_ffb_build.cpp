@@ -414,6 +414,7 @@ namespace
         Settings::WheelFFBMechanicalTrail = 0.30f;
         Settings::WheelFFBTrailResponseLead = 0.40f;
         Settings::WheelFFBGripLoss = 0.65f;
+        Settings::WheelFFBCountersteerStrength = 0.90f;
         Settings::WheelFFBWeightTransfer = 0.15f;
         Settings::WheelFFBSlewRate = 0.12f;
         Settings::WheelFFBReversalReleaseRate = 0.30f;
