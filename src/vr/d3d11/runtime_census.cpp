@@ -693,6 +693,21 @@ namespace outrun::vr::dx11
             std::uint64_t shaderProductionSemanticReviewInputLayoutSnapshotToken{};
             std::uint64_t shaderProductionSemanticReviewTranslationSnapshotToken{};
             std::uint64_t shaderProductionSemanticReviewSnapshotToken{};
+            // R295 joins the exact R294 source draw identity to an optional
+            // production R258 receipt. Current census does not own that receipt,
+            // so the join remains explicit, diagnostic, and fail closed.
+            bool shaderProductionSourceDrawIdentityExact{};
+            bool shaderProductionSourceNativeBufferEligible{};
+            bool shaderProductionSourceReceiptPresent{};
+            bool shaderProductionSourceReceiptContractReady{};
+            bool shaderProductionSourceKindMatches{};
+            bool shaderProductionSourceStartMatches{};
+            bool shaderProductionSourceCacheKeyMatches{};
+            bool shaderProductionSourceJoinExact{};
+            bool shaderProductionSourceBoundaryPreserved{};
+            std::uint32_t shaderProductionSourceMissingEvidenceMask{};
+            std::uint64_t shaderProductionSourceReceiptSnapshotToken{};
+            std::uint64_t shaderProductionSourceJoinSnapshotToken{};
             // R293 makes the production R292 blocker explicit in census
             // identity. Current production has no exact R258/R262 receipts, so
             // these samples remain prerequisite-pending and fail closed.
@@ -903,6 +918,133 @@ namespace outrun::vr::dx11
             token = hash_mix(token, draw.vertexStride);
             token = hash_mix(token, 0x294u);
             return token == 0 ? 1 : token;
+        }
+
+        // R295 seals the production handoff between the exact R294 D3D9 draw
+        // identity and a future exact R258 source-revalidation receipt. It does
+        // not manufacture R258: an absent receipt is recorded as a bounded
+        // fail-closed state, while a supplied receipt must match source kind,
+        // start location, cache identity, and the dormant R258 boundary.
+        struct ProgrammableProductionSourceRevalidationCensusEvidence
+        {
+            bool sourceDrawIdentityExact{};
+            bool sourceDrawNativeBufferEligible{};
+            bool sourceRevalidationReceiptPresent{};
+            bool sourceRevalidationReceiptContractReady{};
+            bool sourceKindMatches{};
+            bool sourceStartMatches{};
+            bool cacheIdentityMatches{};
+            bool joinValidated{};
+            bool boundaryPreserved{};
+            std::uint32_t missingEvidenceMask{};
+            std::uint64_t sourceDrawIdentitySnapshotToken{};
+            std::uint64_t sourceRevalidationSnapshotToken{};
+            std::uint64_t reviewSnapshotToken{};
+        };
+
+        ProgrammableProductionSourceRevalidationCensusEvidence
+        review_programmable_production_source_revalidation(
+            const SourceDrawObservation& sourceDraw,
+            std::uint64_t sourceDrawIdentitySnapshotToken,
+            std::uint64_t expectedCacheKey,
+            const NativeProgrammableShaderDormantSourceRevalidationReadiness*
+                sourceRevalidation) noexcept
+        {
+            ProgrammableProductionSourceRevalidationCensusEvidence out{};
+            constexpr std::uint32_t kSourceDrawIdentityMissing = 1u << 0;
+            constexpr std::uint32_t kNativeBufferEligibilityMissing = 1u << 1;
+            constexpr std::uint32_t kSourceRevalidationReceiptMissing = 1u << 2;
+            constexpr std::uint32_t kCacheIdentityMissing = 1u << 3;
+
+            out.sourceDrawIdentitySnapshotToken =
+                sourceDrawIdentitySnapshotToken;
+            out.sourceDrawIdentityExact =
+                sourceDrawIdentitySnapshotToken != 0 &&
+                source_draw_identity_exact(sourceDraw) &&
+                source_draw_identity_snapshot_token(sourceDraw) ==
+                    sourceDrawIdentitySnapshotToken;
+            out.sourceDrawNativeBufferEligible =
+                out.sourceDrawIdentityExact &&
+                sourceDraw.native_buffer_eligible();
+            out.sourceRevalidationReceiptPresent =
+                sourceRevalidation != nullptr;
+
+            if (!out.sourceDrawIdentityExact)
+                out.missingEvidenceMask |= kSourceDrawIdentityMissing;
+            if (!out.sourceDrawNativeBufferEligible)
+                out.missingEvidenceMask |= kNativeBufferEligibilityMissing;
+            if (!out.sourceRevalidationReceiptPresent)
+                out.missingEvidenceMask |= kSourceRevalidationReceiptMissing;
+            if (expectedCacheKey == 0)
+                out.missingEvidenceMask |= kCacheIdentityMissing;
+
+            if (sourceRevalidation != nullptr)
+            {
+                out.sourceRevalidationSnapshotToken =
+                    sourceRevalidation->snapshotToken;
+                out.sourceRevalidationReceiptContractReady =
+                    sourceRevalidation->ready &&
+                    sourceRevalidation->boundaryPreserved &&
+                    sourceRevalidation->snapshotToken != 0;
+                const bool sourceIndexed =
+                    sourceDraw.kind == SourceDrawKind::Indexed;
+                const auto expectedKind = sourceIndexed
+                    ? NativeProgrammableShaderDrawCandidateKind::Indexed
+                    : NativeProgrammableShaderDrawCandidateKind::NonIndexed;
+                out.sourceKindMatches =
+                    out.sourceDrawNativeBufferEligible &&
+                    sourceRevalidation->kind == expectedKind &&
+                    sourceRevalidation->indexed == sourceIndexed;
+                out.sourceStartMatches =
+                    out.sourceDrawNativeBufferEligible &&
+                    sourceRevalidation->startLocation ==
+                        (sourceIndexed
+                            ? sourceDraw.startIndex
+                            : sourceDraw.startVertex);
+                out.cacheIdentityMatches =
+                    expectedCacheKey != 0 &&
+                    sourceRevalidation->cacheKey == expectedCacheKey;
+                out.joinValidated =
+                    out.missingEvidenceMask == 0 &&
+                    out.sourceRevalidationReceiptContractReady &&
+                    out.sourceKindMatches &&
+                    out.sourceStartMatches &&
+                    out.cacheIdentityMatches;
+                out.boundaryPreserved =
+                    out.joinValidated &&
+                    sourceRevalidation->boundaryPreserved;
+            }
+            else
+            {
+                // Current production state: the exact R294 source identity is
+                // present, but no R258 producer owns the D3D11 context/buffer
+                // evidence yet. Preserve this as a non-promoting boundary.
+                out.boundaryPreserved =
+                    out.sourceDrawIdentityExact &&
+                    out.sourceDrawNativeBufferEligible &&
+                    expectedCacheKey != 0;
+            }
+
+            if (out.sourceDrawIdentityExact && expectedCacheKey != 0)
+            {
+                std::uint64_t token = 0xcbf29ce484222325ull;
+                token = hash_mix(token, out.sourceDrawIdentitySnapshotToken);
+                token = hash_mix(token, expectedCacheKey);
+                token = hash_mix(
+                    token, out.sourceRevalidationReceiptPresent ? 1u : 0u);
+                token = hash_mix(
+                    token, out.sourceRevalidationReceiptContractReady ? 1u : 0u);
+                token = hash_mix(token, out.sourceKindMatches ? 1u : 0u);
+                token = hash_mix(token, out.sourceStartMatches ? 1u : 0u);
+                token = hash_mix(token, out.cacheIdentityMatches ? 1u : 0u);
+                token = hash_mix(token, out.joinValidated ? 1u : 0u);
+                token = hash_mix(token, out.boundaryPreserved ? 1u : 0u);
+                token = hash_mix(token, out.missingEvidenceMask);
+                token = hash_mix(token, out.sourceRevalidationSnapshotToken);
+                token = hash_mix(token, 0x295u);
+                out.reviewSnapshotToken = token == 0 ? 1 : token;
+            }
+            return out;
         }
 
         std::uint32_t float_bits(float value) noexcept
@@ -1383,6 +1525,30 @@ namespace outrun::vr::dx11
                 sig.shaderProductionSemanticReviewTranslationSnapshotToken);
             hash = hash_mix(
                 hash, sig.shaderProductionSemanticReviewSnapshotToken);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceDrawIdentityExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceNativeBufferEligible ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceReceiptPresent ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceReceiptContractReady ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceKindMatches ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceStartMatches ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceCacheKeyMatches ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceJoinExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceBoundaryPreserved ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceMissingEvidenceMask);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceReceiptSnapshotToken);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceJoinSnapshotToken);
             hash = hash_mix(
                 hash,
                 sig.shaderProductionActivationSourceReceiptPresent ? 1u : 0u);
@@ -3088,6 +3254,21 @@ namespace outrun::vr::dx11
                         sig.shaderProductionSemanticReviewTranslationSnapshotToken,
                         sig.shaderProductionSemanticReviewSnapshotToken);
                     spdlog::info(
+                        "VR DX11 R295 productionSourceRevalidation signature#{}: drawExact={} nativeBufferEligible={} r258Present={} r258Contract={} kindMatch={} startMatch={} cacheMatch={} joinExact={} boundaryPreserved={} missingEvidenceMask=0x{:08X} r258Snapshot=0x{:016X} joinSnapshot=0x{:016X}",
+                        unique,
+                        sig.shaderProductionSourceDrawIdentityExact ? 1 : 0,
+                        sig.shaderProductionSourceNativeBufferEligible ? 1 : 0,
+                        sig.shaderProductionSourceReceiptPresent ? 1 : 0,
+                        sig.shaderProductionSourceReceiptContractReady ? 1 : 0,
+                        sig.shaderProductionSourceKindMatches ? 1 : 0,
+                        sig.shaderProductionSourceStartMatches ? 1 : 0,
+                        sig.shaderProductionSourceCacheKeyMatches ? 1 : 0,
+                        sig.shaderProductionSourceJoinExact ? 1 : 0,
+                        sig.shaderProductionSourceBoundaryPreserved ? 1 : 0,
+                        sig.shaderProductionSourceMissingEvidenceMask,
+                        sig.shaderProductionSourceReceiptSnapshotToken,
+                        sig.shaderProductionSourceJoinSnapshotToken);
+                    spdlog::info(
                         "VR DX11 R293 productionPrerequisiteCensus signature#{}: sourceReceipt={} resourceReceipt={} r292Exact={} staticSatisfied={} boundaryPreserved={} missingReceiptMask=0x{:08X} snapshot=0x{:016X}",
                         unique,
                         sig.shaderProductionActivationSourceReceiptPresent ? 1 : 0,
@@ -4002,6 +4183,44 @@ namespace outrun::vr::dx11
                 signature.sourceDrawIdentityExact
                     ? source_draw_identity_snapshot_token(draw)
                     : 0;
+
+            // R295 deliberately receives no R258 receipt until a production
+            // owner can provide the exact D3D11 context/buffer lineage. The
+            // bridge still seals the expected R294 -> R258 join contract now,
+            // preventing a later producer from substituting a receipt from a
+            // different draw kind/start location or shader-pair cache identity.
+            const NativeProgrammableShaderDormantSourceRevalidationReadiness*
+                productionSourceRevalidation = nullptr;
+            const auto productionSourceJoin =
+                review_programmable_production_source_revalidation(
+                    signature.sourceDraw,
+                    signature.sourceDrawIdentitySnapshotToken,
+                    signature.shaderSourceSemanticPairCacheKey,
+                    productionSourceRevalidation);
+            signature.shaderProductionSourceDrawIdentityExact =
+                productionSourceJoin.sourceDrawIdentityExact;
+            signature.shaderProductionSourceNativeBufferEligible =
+                productionSourceJoin.sourceDrawNativeBufferEligible;
+            signature.shaderProductionSourceReceiptPresent =
+                productionSourceJoin.sourceRevalidationReceiptPresent;
+            signature.shaderProductionSourceReceiptContractReady =
+                productionSourceJoin.sourceRevalidationReceiptContractReady;
+            signature.shaderProductionSourceKindMatches =
+                productionSourceJoin.sourceKindMatches;
+            signature.shaderProductionSourceStartMatches =
+                productionSourceJoin.sourceStartMatches;
+            signature.shaderProductionSourceCacheKeyMatches =
+                productionSourceJoin.cacheIdentityMatches;
+            signature.shaderProductionSourceJoinExact =
+                productionSourceJoin.joinValidated;
+            signature.shaderProductionSourceBoundaryPreserved =
+                productionSourceJoin.boundaryPreserved;
+            signature.shaderProductionSourceMissingEvidenceMask =
+                productionSourceJoin.missingEvidenceMask;
+            signature.shaderProductionSourceReceiptSnapshotToken =
+                productionSourceJoin.sourceRevalidationSnapshotToken;
+            signature.shaderProductionSourceJoinSnapshotToken =
+                productionSourceJoin.reviewSnapshotToken;
         }
 
         signature.shadeModeObservationComplete =
