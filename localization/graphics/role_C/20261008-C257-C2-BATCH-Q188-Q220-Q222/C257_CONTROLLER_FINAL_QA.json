@@ -2,7 +2,7 @@
   "schema_version": 1,
   "role": "C",
   "run": "20261008-C257-C2-BATCH-Q188-Q220-Q222",
-  "timestamp_kst": "2026-10-08T01:22:00+09:00",
+  "timestamp_kst": "2026-10-08T01:18:00+09:00",
   "TEMP_BACKLOG_RELIEF": "C2",
   "SHARD": "EVEN",
   "selection_policy": "Fresh/user-regression even shard targets selected after per-slot HEAD/queue refresh; no C1 shard stolen.",
