@@ -13,20 +13,27 @@ on:
       - 'src/hooks_exceptions.cpp'
       - 'src/hooks_bugfixes.cpp'
       - 'src/hooks_graphics.cpp'
+      - 'src/hooks_uiscaling.cpp'
       - 'src/vr/d3d9/stereo_renderer_r33.cpp'
       - 'src/vr/d3d9/stereo_renderer_r29.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
       - 'src/vr/game/outrun_renderer.cpp'
       - 'src/vr/settings.cpp'
       - 'src/vr/game/render_semantics.hpp'
       - 'src/vr/hud_semantics.hpp'
       - 'src/hooks_textures.cpp'
+      - 'src/overlay/hooks_overlay.cpp'
+      - 'src/vr/d3d9/ex_device_upgrade_r14.cpp'
       - 'CMakeLists.txt'
       - 'cmake.toml'
       - 'tools/analyze_outrun_exe.py'
+      - 'tools/verify_vr_visual_composition_p0.py'
+      - 'tools/Build-OutRunPCFast.ps1'
       - 'tools/Collect-OutRunVRLogs.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
       - 'docs/VR_HUD_SEMANTIC_BASELINE.md'
+      - 'docs/VR_BINARY_CONTRACT.json'
       - '.github/workflows/outrun-exe-hud-inspector.yml'
   pull_request:
     paths:
@@ -39,20 +46,27 @@ on:
       - 'src/hooks_exceptions.cpp'
       - 'src/hooks_bugfixes.cpp'
       - 'src/hooks_graphics.cpp'
+      - 'src/hooks_uiscaling.cpp'
       - 'src/vr/d3d9/stereo_renderer_r33.cpp'
       - 'src/vr/d3d9/stereo_renderer_r29.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
       - 'src/vr/game/outrun_renderer.cpp'
       - 'src/vr/settings.cpp'
       - 'src/vr/game/render_semantics.hpp'
       - 'src/vr/hud_semantics.hpp'
       - 'src/hooks_textures.cpp'
+      - 'src/overlay/hooks_overlay.cpp'
+      - 'src/vr/d3d9/ex_device_upgrade_r14.cpp'
       - 'CMakeLists.txt'
       - 'cmake.toml'
       - 'tools/analyze_outrun_exe.py'
+      - 'tools/verify_vr_visual_composition_p0.py'
+      - 'tools/Build-OutRunPCFast.ps1'
       - 'tools/Collect-OutRunVRLogs.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
       - 'docs/VR_HUD_SEMANTIC_BASELINE.md'
+      - 'docs/VR_BINARY_CONTRACT.json'
       - '.github/workflows/outrun-exe-hud-inspector.yml'
 
 permissions:
@@ -88,6 +102,10 @@ jobs:
       - name: Asset semantic parser self-test
         shell: pwsh
         run: python tools/analyze_outrun_assets.py --self-test
+
+      - name: Verify P0 visual composition contract
+        shell: pwsh
+        run: python tools/verify_vr_visual_composition_p0.py
 
       - name: Download upstream replacement EXE
         shell: pwsh

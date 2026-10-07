@@ -45,6 +45,37 @@ r14 = read('src/vr/d3d9/ex_device_upgrade_r14.cpp')
 runner = read('tools/Run-OutRunVRTest.ps1')
 pcfast = read('tools/Build-OutRunPCFast.ps1')
 binary_contract = read('docs/VR_BINARY_CONTRACT.json')
+hud_inspector_workflow = read('.github/workflows/outrun-exe-hud-inspector.yml')
+dx9ex_active_workflow = read('.github/workflows/vr-dx9ex-active.yml')
+
+# P0 exact-SHA validation graph: every source/contract input consumed by this
+# verifier must also schedule the HUD Inspector on push/PR, and the Inspector
+# must run this verifier itself. CI wiring changes are in turn watched by the
+# canonical DX9Ex Active gate so a green visual contract cannot hide behind a
+# workflow path-filter gap.
+for path in (
+    'src/hooks_uiscaling.cpp',
+    'src/hooks_textures.cpp',
+    'src/vr/hud_semantics.hpp',
+    'src/vr/game/render_semantics.hpp',
+    'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp',
+    'src/hooks_graphics.cpp',
+    'src/overlay/hooks_overlay.cpp',
+    'src/vr/d3d9/ex_device_upgrade_r14.cpp',
+    'tools/Run-OutRunVRTest.ps1',
+    'tools/Build-OutRunPCFast.ps1',
+    'docs/VR_BINARY_CONTRACT.json',
+    'tools/analyze_outrun_exe.py',
+    'tools/verify_vr_visual_composition_p0.py',
+):
+    if hud_inspector_workflow.count(path) < 2:
+        raise SystemExit(
+            f'P0 visual composition drift: HUD Inspector must watch {path!r} on push and PR'
+        )
+require('python tools/verify_vr_visual_composition_p0.py',
+        hud_inspector_workflow, 'HUD Inspector executes the P0 contract')
+require("'.github/workflows/outrun-exe-hud-inspector.yml'",
+        dx9ex_active_workflow, 'DX9Ex Active watches HUD Inspector CI wiring')
 
 # Exact historical producer inventory recovered from upstream + R65-R74/R73-era work.
 for token in [

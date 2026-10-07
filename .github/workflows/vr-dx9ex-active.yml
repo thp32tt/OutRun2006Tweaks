@@ -69,6 +69,7 @@ on:
       - 'tools/Run-OutRunVRTest.ps1'
       - 'tools/OutRunVR-Slot-Selector.ps1'
       - 'tools/Test-VRDXVKBackendContract.ps1'
+      - '.github/workflows/outrun-exe-hud-inspector.yml'
       - '.github/workflows/vr-dx9ex-active.yml'
 
 concurrency:
