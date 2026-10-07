@@ -157,8 +157,28 @@
     ],
     "raw_and_flip_y_evidence": "WRITTEN"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER",
-  "C3_STRICT_AUDIT": "PENDING_CONTROLLER",
+  "controller_visual_qa": {
+    "status": "PASS",
+    "evidence": [
+      "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/009_455717B2_SOURCE_OLD_NEW.jpg",
+      "localization/graphics/role_A/20261004-A-PRODUCTION10/455717B2_HD_CLEAN_PLATE.png",
+      "localization/graphics/role_C/20261007-C247-C1-BATCH-Q043-Q047-Q053/C247_Q043_455717B2_FLIPY.jpg",
+      "localization/graphics/role_C/20261007-C247-C1-BATCH-Q043-Q047-Q053/C247_Q043_455717B2_RAW.jpg"
+    ],
+    "findings": [
+      "scale hierarchy restored near source row height",
+      "readable right lean/effect family retained",
+      "no clipping or protected-art intrusion"
+    ]
+  },
+  "C3_STRICT_AUDIT": {
+    "status": "C3_STRICT_PASS",
+    "exact_candidate_sha256": "a2b0db36e0283244037dccae5b65558a70d5b8547da245d92c840e0da3b3327c",
+    "visual_overrides_numeric": false,
+    "pre_ingame_export": "PENDING_REFRESH"
+  },
   "runtime_validation": "UNTESTED",
-  "forbidden_domains_touched": []
+  "forbidden_domains_touched": [],
+  "decision": "C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME",
+  "user_jpg_review": "PENDING"
 }
