@@ -9926,6 +9926,9 @@ NativeProgrammableShaderPairCache::indexed_pre_draw_readiness(
 
     out.indexCount = dispatch.indexCount;
     out.startIndexLocation = dispatch.startIndexLocation;
+    out.baseVertexIndex = dispatch.baseVertexLocation;
+    out.minVertexIndex = dispatch.minVertexIndex;
+    out.numVertices = dispatch.numVertices;
     out.indexFormat = dispatch.indexFormat;
     out.indexOffset = dispatch.indexOffset;
     out.inputValid =
@@ -9990,6 +9993,12 @@ NativeProgrammableShaderPairCache::indexed_pre_draw_readiness(
             token, out.liveIndexBindingSnapshotToken);
         token = mix_readiness_snapshot_token(token, out.indexCount);
         token = mix_readiness_snapshot_token(token, out.startIndexLocation);
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                static_cast<std::int64_t>(out.baseVertexIndex)));
+        token = mix_readiness_snapshot_token(token, out.minVertexIndex);
+        token = mix_readiness_snapshot_token(token, out.numVertices);
         token = mix_readiness_snapshot_token(
             token, static_cast<std::uint32_t>(out.indexFormat));
         token = mix_readiness_snapshot_token(token, out.indexOffset);
@@ -10096,6 +10105,9 @@ compose_programmable_draw_candidate_readiness(
     out.indexed = true;
     out.elementCount = preDraw.indexCount;
     out.startLocation = preDraw.startIndexLocation;
+    out.baseVertexIndex = preDraw.baseVertexIndex;
+    out.minVertexIndex = preDraw.minVertexIndex;
+    out.numVertices = preDraw.numVertices;
     out.indexFormat = preDraw.indexFormat;
     out.indexOffset = preDraw.indexOffset;
     out.sourceReceiptSnapshotToken = preDrawSnapshotToken;
@@ -10118,6 +10130,12 @@ compose_programmable_draw_candidate_readiness(
             token, out.sourceReceiptSnapshotToken);
         token = mix_readiness_snapshot_token(token, out.elementCount);
         token = mix_readiness_snapshot_token(token, out.startLocation);
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                static_cast<std::int64_t>(out.baseVertexIndex)));
+        token = mix_readiness_snapshot_token(token, out.minVertexIndex);
+        token = mix_readiness_snapshot_token(token, out.numVertices);
         token = mix_readiness_snapshot_token(
             token, static_cast<std::uint32_t>(out.indexFormat));
         token = mix_readiness_snapshot_token(token, out.indexOffset);
@@ -10165,6 +10183,12 @@ std::uint64_t recompute_programmable_draw_candidate_payload_snapshot(
     token = mix_readiness_snapshot_token(token, candidate.startLocation);
     if (candidate.kind == NativeProgrammableShaderDrawCandidateKind::Indexed) {
         token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                static_cast<std::int64_t>(candidate.baseVertexIndex)));
+        token = mix_readiness_snapshot_token(token, candidate.minVertexIndex);
+        token = mix_readiness_snapshot_token(token, candidate.numVertices);
+        token = mix_readiness_snapshot_token(
             token, static_cast<std::uint32_t>(candidate.indexFormat));
         token = mix_readiness_snapshot_token(token, candidate.indexOffset);
     }
@@ -10183,6 +10207,9 @@ compose_programmable_dormant_pre_activation_readiness(
     out.indexed = candidate.indexed;
     out.elementCount = candidate.elementCount;
     out.startLocation = candidate.startLocation;
+    out.baseVertexIndex = candidate.baseVertexIndex;
+    out.minVertexIndex = candidate.minVertexIndex;
+    out.numVertices = candidate.numVertices;
     out.indexFormat = candidate.indexFormat;
     out.indexOffset = candidate.indexOffset;
     out.sourceReceiptSnapshotToken = candidate.sourceReceiptSnapshotToken;
@@ -10201,6 +10228,9 @@ compose_programmable_dormant_pre_activation_readiness(
         (candidate.kind ==
              NativeProgrammableShaderDrawCandidateKind::NonIndexed &&
          !candidate.indexed &&
+         candidate.baseVertexIndex == 0 &&
+         candidate.minVertexIndex == 0u &&
+         candidate.numVertices == 0u &&
          candidate.indexFormat == DXGI_FORMAT_UNKNOWN &&
          candidate.indexOffset == 0u) ||
         (candidate.kind ==
@@ -10240,6 +10270,12 @@ compose_programmable_dormant_pre_activation_readiness(
             token, out.candidateSnapshotToken);
         token = mix_readiness_snapshot_token(token, out.elementCount);
         token = mix_readiness_snapshot_token(token, out.startLocation);
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                static_cast<std::int64_t>(out.baseVertexIndex)));
+        token = mix_readiness_snapshot_token(token, out.minVertexIndex);
+        token = mix_readiness_snapshot_token(token, out.numVertices);
         token = mix_readiness_snapshot_token(
             token, static_cast<std::uint32_t>(out.indexFormat));
         token = mix_readiness_snapshot_token(token, out.indexOffset);
@@ -10290,6 +10326,9 @@ compose_programmable_dormant_source_revalidation_readiness(
     out.indexed = candidate.indexed;
     out.elementCount = candidate.elementCount;
     out.startLocation = candidate.startLocation;
+    out.baseVertexIndex = candidate.baseVertexIndex;
+    out.minVertexIndex = candidate.minVertexIndex;
+    out.numVertices = candidate.numVertices;
     out.indexFormat = candidate.indexFormat;
     out.indexOffset = candidate.indexOffset;
     out.candidateReady = candidate.ready;
@@ -10340,6 +10379,12 @@ compose_programmable_dormant_source_revalidation_readiness(
             token, out.preActivationSnapshotToken);
         token = mix_readiness_snapshot_token(token, out.elementCount);
         token = mix_readiness_snapshot_token(token, out.startLocation);
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                static_cast<std::int64_t>(out.baseVertexIndex)));
+        token = mix_readiness_snapshot_token(token, out.minVertexIndex);
+        token = mix_readiness_snapshot_token(token, out.numVertices);
         token = mix_readiness_snapshot_token(
             token, static_cast<std::uint32_t>(out.indexFormat));
         token = mix_readiness_snapshot_token(token, out.indexOffset);

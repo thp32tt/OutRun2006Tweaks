@@ -1650,6 +1650,9 @@ struct NativeProgrammableShaderIndexedPreDrawReadiness {
     bool ready{};
     UINT indexCount{};
     UINT startIndexLocation{};
+    INT baseVertexIndex{};
+    UINT minVertexIndex{};
+    UINT numVertices{};
     DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
     UINT indexOffset{};
     std::uint64_t directDispatchSnapshotToken{};
@@ -1680,6 +1683,9 @@ struct NativeProgrammableShaderDrawCandidateReadiness {
     bool indexed{};
     UINT elementCount{};
     UINT startLocation{};
+    INT baseVertexIndex{};
+    UINT minVertexIndex{};
+    UINT numVertices{};
     DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
     UINT indexOffset{};
     std::uint64_t sourceReceiptSnapshotToken{};
@@ -1728,6 +1734,9 @@ struct NativeProgrammableShaderDormantPreActivationReadiness {
     bool indexed{};
     UINT elementCount{};
     UINT startLocation{};
+    INT baseVertexIndex{};
+    UINT minVertexIndex{};
+    UINT numVertices{};
     DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
     UINT indexOffset{};
     std::uint64_t sourceReceiptSnapshotToken{};
@@ -1769,6 +1778,9 @@ struct NativeProgrammableShaderDormantSourceRevalidationReadiness {
     bool indexed{};
     UINT elementCount{};
     UINT startLocation{};
+    INT baseVertexIndex{};
+    UINT minVertexIndex{};
+    UINT numVertices{};
     DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
     UINT indexOffset{};
     std::uint64_t cacheKey{};

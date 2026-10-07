@@ -4983,6 +4983,9 @@ int main()
         r256IndexedCandidate.indexed &&
         r256IndexedCandidate.elementCount == 3u &&
         r256IndexedCandidate.startLocation == 0u &&
+        r256IndexedCandidate.baseVertexIndex == 0 &&
+        r256IndexedCandidate.minVertexIndex == 0u &&
+        r256IndexedCandidate.numVertices == 4u &&
         r256IndexedCandidate.indexFormat == DXGI_FORMAT_R16_UINT &&
         r256IndexedCandidate.indexOffset == geometryIndexOffset &&
         r256IndexedCandidate.sourceReceiptSnapshotToken ==
@@ -5048,7 +5051,7 @@ int main()
         "R257 rejects stale R256 indexed candidate token");
 
     auto tamperedR256IndexedCandidate = r256IndexedCandidate;
-    tamperedR256IndexedCandidate.indexOffset ^= 2u;
+    tamperedR256IndexedCandidate.baseVertexIndex += 1;
     const auto r257IndexedTampered =
         outrun::vr::dx11::compose_programmable_dormant_pre_activation_readiness(
             tamperedR256IndexedCandidate,
@@ -5058,7 +5061,7 @@ int main()
         !r257IndexedTampered.candidatePayloadSnapshotMatches &&
         !r257IndexedTampered.ready &&
         r257IndexedTampered.snapshotToken == 0,
-        "R257 rejects payload drift hidden behind an unchanged R256 indexed snapshot token");
+        "R257 rejects indexed source-range drift hidden behind an unchanged R256 snapshot token");
 
     const auto r258IndexedSourceRevalidation =
         programmableCache.indexed_dormant_source_revalidation_readiness(
@@ -5101,6 +5104,9 @@ int main()
         r258IndexedSourceRevalidation.kind ==
             outrun::vr::dx11::NativeProgrammableShaderDrawCandidateKind::Indexed &&
         r258IndexedSourceRevalidation.indexed &&
+        r258IndexedSourceRevalidation.baseVertexIndex == 0 &&
+        r258IndexedSourceRevalidation.minVertexIndex == 0u &&
+        r258IndexedSourceRevalidation.numVertices == 4u &&
         r258IndexedSourceRevalidation.currentSourceReceiptSnapshotToken ==
             firstR255PreDrawSnapshot &&
         r258IndexedSourceRevalidation.candidateSnapshotToken ==

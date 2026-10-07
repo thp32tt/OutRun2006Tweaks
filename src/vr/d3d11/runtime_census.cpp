@@ -710,6 +710,10 @@ namespace outrun::vr::dx11
             bool shaderProductionSourceIndexFormatMatches{};
             bool shaderProductionSourceIndexOffsetMatches{};
             DXGI_FORMAT shaderProductionSourceIndexFormat = DXGI_FORMAT_UNKNOWN;
+            bool shaderProductionSourceBaseVertexMatches{};
+            bool shaderProductionSourceMinVertexMatches{};
+            bool shaderProductionSourceNumVerticesMatches{};
+            bool shaderProductionSourceRangeMatches{};
             bool shaderProductionSourceCacheKeyMatches{};
             bool shaderProductionSourceJoinExact{};
             bool shaderProductionSourceBoundaryPreserved{};
@@ -929,9 +933,9 @@ namespace outrun::vr::dx11
             return token == 0 ? 1 : token;
         }
 
-        // R296 extends the R295 production handoff by sealing the live D3D9
-        // indexed-buffer format and requiring the future R258 receipt to match
-        // the exact index format and zero D3D9-equivalent binding offset. It does
+        // R297 extends the R296 production handoff by retaining the indexed
+        // base/min/count source-vertex range through R255-R258 and requiring
+        // the future production receipt to match the exact R294 range. It does
         // not manufacture R258: an absent receipt is recorded as a bounded
         // fail-closed state, while a supplied receipt must match source kind,
         // start location, element count, cache identity, and the dormant R258
@@ -951,6 +955,10 @@ namespace outrun::vr::dx11
             bool sourceIndexFormatMatches{};
             bool sourceIndexOffsetMatches{};
             DXGI_FORMAT sourceIndexFormat = DXGI_FORMAT_UNKNOWN;
+            bool sourceBaseVertexMatches{};
+            bool sourceMinVertexMatches{};
+            bool sourceNumVerticesMatches{};
+            bool sourceRangeMatches{};
             bool cacheIdentityMatches{};
             bool joinValidated{};
             bool boundaryPreserved{};
@@ -1091,6 +1099,22 @@ namespace outrun::vr::dx11
                 out.sourceIndexOffsetMatches =
                     out.sourceIndexFormatKnown &&
                     sourceRevalidation->indexOffset == 0u;
+                out.sourceBaseVertexMatches =
+                    !sourceIndexed ||
+                    sourceRevalidation->baseVertexIndex ==
+                        sourceDraw.baseVertexIndex;
+                out.sourceMinVertexMatches =
+                    !sourceIndexed ||
+                    sourceRevalidation->minVertexIndex ==
+                        sourceDraw.minVertexIndex;
+                out.sourceNumVerticesMatches =
+                    !sourceIndexed ||
+                    sourceRevalidation->numVertices ==
+                        sourceDraw.numVertices;
+                out.sourceRangeMatches =
+                    out.sourceBaseVertexMatches &&
+                    out.sourceMinVertexMatches &&
+                    out.sourceNumVerticesMatches;
                 out.cacheIdentityMatches =
                     expectedCacheKey != 0 &&
                     sourceRevalidation->cacheKey == expectedCacheKey;
@@ -1102,6 +1126,7 @@ namespace outrun::vr::dx11
                     out.sourceElementCountMatches &&
                     out.sourceIndexFormatMatches &&
                     out.sourceIndexOffsetMatches &&
+                    out.sourceRangeMatches &&
                     out.cacheIdentityMatches;
                 out.boundaryPreserved =
                     out.joinValidated &&
@@ -1139,6 +1164,10 @@ namespace outrun::vr::dx11
                 token = hash_mix(token, out.sourceIndexOffsetMatches ? 1u : 0u);
                 token = hash_mix(
                     token, static_cast<std::uint32_t>(out.sourceIndexFormat));
+                token = hash_mix(token, out.sourceBaseVertexMatches ? 1u : 0u);
+                token = hash_mix(token, out.sourceMinVertexMatches ? 1u : 0u);
+                token = hash_mix(token, out.sourceNumVerticesMatches ? 1u : 0u);
+                token = hash_mix(token, out.sourceRangeMatches ? 1u : 0u);
                 token = hash_mix(token, out.cacheIdentityMatches ? 1u : 0u);
                 token = hash_mix(token, out.joinValidated ? 1u : 0u);
                 token = hash_mix(token, out.boundaryPreserved ? 1u : 0u);
@@ -1656,6 +1685,14 @@ namespace outrun::vr::dx11
                 hash,
                 static_cast<std::uint32_t>(
                     sig.shaderProductionSourceIndexFormat));
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceBaseVertexMatches ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceMinVertexMatches ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceNumVerticesMatches ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceRangeMatches ? 1u : 0u);
             hash = hash_mix(
                 hash, sig.shaderProductionSourceCacheKeyMatches ? 1u : 0u);
             hash = hash_mix(
@@ -3373,7 +3410,7 @@ namespace outrun::vr::dx11
                         sig.shaderProductionSemanticReviewTranslationSnapshotToken,
                         sig.shaderProductionSemanticReviewSnapshotToken);
                     spdlog::info(
-                        "VR DX11 R296 productionSourceRevalidation signature#{}: drawExact={} nativeBufferEligible={} r258Present={} r258Contract={} kindMatch={} startMatch={} countDerivable={} countMatch={} elementCount={} indexFormatKnown={} indexFormatMatch={} indexOffsetMatch={} indexFormat={} cacheMatch={} joinExact={} boundaryPreserved={} missingEvidenceMask=0x{:08X} r258Snapshot=0x{:016X} joinSnapshot=0x{:016X}",
+                        "VR DX11 R297 productionSourceRevalidation signature#{}: drawExact={} nativeBufferEligible={} r258Present={} r258Contract={} kindMatch={} startMatch={} countDerivable={} countMatch={} elementCount={} indexFormatKnown={} indexFormatMatch={} indexOffsetMatch={} indexFormat={} baseMatch={} minMatch={} numMatch={} rangeMatch={} cacheMatch={} joinExact={} boundaryPreserved={} missingEvidenceMask=0x{:08X} r258Snapshot=0x{:016X} joinSnapshot=0x{:016X}",
                         unique,
                         sig.shaderProductionSourceDrawIdentityExact ? 1 : 0,
                         sig.shaderProductionSourceNativeBufferEligible ? 1 : 0,
@@ -3389,6 +3426,10 @@ namespace outrun::vr::dx11
                         sig.shaderProductionSourceIndexOffsetMatches ? 1 : 0,
                         static_cast<unsigned>(
                             sig.shaderProductionSourceIndexFormat),
+                        sig.shaderProductionSourceBaseVertexMatches ? 1 : 0,
+                        sig.shaderProductionSourceMinVertexMatches ? 1 : 0,
+                        sig.shaderProductionSourceNumVerticesMatches ? 1 : 0,
+                        sig.shaderProductionSourceRangeMatches ? 1 : 0,
                         sig.shaderProductionSourceCacheKeyMatches ? 1 : 0,
                         sig.shaderProductionSourceJoinExact ? 1 : 0,
                         sig.shaderProductionSourceBoundaryPreserved ? 1 : 0,
@@ -4365,6 +4406,14 @@ namespace outrun::vr::dx11
                 productionSourceJoin.sourceIndexOffsetMatches;
             signature.shaderProductionSourceIndexFormat =
                 productionSourceJoin.sourceIndexFormat;
+            signature.shaderProductionSourceBaseVertexMatches =
+                productionSourceJoin.sourceBaseVertexMatches;
+            signature.shaderProductionSourceMinVertexMatches =
+                productionSourceJoin.sourceMinVertexMatches;
+            signature.shaderProductionSourceNumVerticesMatches =
+                productionSourceJoin.sourceNumVerticesMatches;
+            signature.shaderProductionSourceRangeMatches =
+                productionSourceJoin.sourceRangeMatches;
             signature.shaderProductionSourceCacheKeyMatches =
                 productionSourceJoin.cacheIdentityMatches;
             signature.shaderProductionSourceJoinExact =
