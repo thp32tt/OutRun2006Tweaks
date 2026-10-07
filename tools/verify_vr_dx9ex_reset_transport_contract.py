@@ -475,7 +475,7 @@ require_order(
     "bool ackSnapshotRead = false;",
     "bool ackSnapshotValid = false;",
     "for (std::uint32_t offset = 0;",
-    "if (candidate.producerPending)",
+    "R30SupportPollDirectTransportSlotProducer(index)",
     "if (!ackSnapshotRead)",
     "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
     "ackSnapshotRead = true;",
@@ -748,16 +748,29 @@ forbid(
 )
 require(
     resolve_direct_r32,
-    "R32 non-blocking producer EVENT poll",
-    "candidate.fence",
-    "candidate.fence->GetData(nullptr, 0, 0)",
+    "R32 non-blocking producer EVENT poll facade",
+    "R30SupportPollDirectTransportSlotProducer(index)",
+)
+producer_poll_r30 = body(r30, "R30SupportPollDirectTransportSlotProducer(")
+require_order(
+    producer_poll_r30,
+    "R30 producer EVENT poll owner semantics",
+    "if (!target.producerPending)",
+    "target.fence",
+    "target.fence->GetData(nullptr, 0, 0)",
+    "if (ready == S_OK)",
+    "target.producerPending = false;",
+    "target.pendingFrameId = 0;",
+    "if (!target.published)",
+    "target.frameId = 0;",
+    "return ready;",
 )
 
 # A producer EVENT hard error is not equivalent to ordinary ring pressure.
 # Once GetData can no longer prove completion, the shared-eye slot must not be
 # recycled or silently cleared. Keep the final R32 owner fail-closed until a
 # reset/interop identity transition revalidates the DirectGPU copy path.
-pending_poll_marker = "if (candidate.producerPending)"
+pending_poll_marker = "const HRESULT ready ="
 published_scan_marker = "if (candidate.published && candidate.frameId)"
 pending_poll_pos = resolve_direct_r32.find(pending_poll_marker)
 published_scan_pos = resolve_direct_r32.find(
@@ -769,8 +782,10 @@ producer_poll_r32 = resolve_direct_r32[pending_poll_pos:published_scan_pos]
 require_order(
     producer_poll_r32,
     "R32 producer EVENT hard-error fail-closed",
-    "else if (ready == S_FALSE)",
+    "R30SupportPollDirectTransportSlotProducer(index)",
+    "if (ready == S_FALSE)",
     "continue;",
+    "if (FAILED(ready))",
     "R32DirectCopyPathRejected = true;",
     "R32DirectCopyRejectHr = ready;",
     "if (R30SupportTelemetryEnabled()) ++R32PendingFenceErrors;",
@@ -779,6 +794,13 @@ require_order(
 hard_error_pos = producer_poll_r32.find("R32DirectCopyPathRejected = true;")
 if hard_error_pos < 0:
     fail("R32 producer EVENT hard-error branch missing")
+forbid(
+    resolve_direct_r32,
+    "R32 producer EVENT poll must remain behind the R30 owner facade",
+    "candidate.producerPending",
+    "candidate.pendingFrameId",
+    "candidate.fence->GetData",
+)
 forbid(
     producer_poll_r32[hard_error_pos:],
     "R32 producer EVENT hard-error must retain quarantined slot",

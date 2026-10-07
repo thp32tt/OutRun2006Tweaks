@@ -475,28 +475,18 @@ namespace OutRunVRStereo
                 // unpublished slot quarantined on S_FALSE. Reclaim it only
                 // after the same EVENT proves completion; a query error keeps
                 // the whole DirectGPU path fail-closed.
-                if (candidate.producerPending)
+                const HRESULT ready =
+                    R30SupportPollDirectTransportSlotProducer(index);
+                if (ready == S_FALSE)
                 {
-                    const HRESULT ready = candidate.fence
-                        ? candidate.fence->GetData(nullptr, 0, 0) : E_FAIL;
-                    if (ready == S_OK)
-                    {
-                        candidate.producerPending = false;
-                        candidate.pendingFrameId = 0;
-                        if (!candidate.published)
-                            candidate.frameId = 0;
-                    }
-                    else if (ready == S_FALSE)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        R32DirectCopyPathRejected = true;
-                        R32DirectCopyRejectHr = ready;
-                        if (R30SupportTelemetryEnabled()) ++R32PendingFenceErrors;
-                        return false;
-                    }
+                    continue;
+                }
+                if (FAILED(ready))
+                {
+                    R32DirectCopyPathRejected = true;
+                    R32DirectCopyRejectHr = ready;
+                    if (R30SupportTelemetryEnabled()) ++R32PendingFenceErrors;
+                    return false;
                 }
 
                 if (candidate.published && candidate.frameId)

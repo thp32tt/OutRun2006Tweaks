@@ -49,6 +49,7 @@ required = (
     "R30SupportDirectTransportRingBackpressureCount",
     "R30SupportSetActiveDirectTransportSlot",
     "R30SupportMarkDirectTransportSlotPending",
+    "R30SupportPollDirectTransportSlotProducer",
     "R30SupportGpuCompletionSnapshot",
     "R30SupportTryGetGpuCompletionSnapshot",
     "R30SupportDirectTransportResourcesReady",
@@ -150,6 +151,17 @@ delegations = {
         "target.pendingFrameId = frameId;",
         "target.frameId = frameId;",
         "target.published = false;",
+    ),
+    "R30SupportPollDirectTransportSlotProducer(": (
+        "auto& target = DirectTransportSlots[slot];",
+        "if (!target.producerPending)",
+        "target.fence->GetData(nullptr, 0, 0)",
+        "if (ready == S_OK)",
+        "target.producerPending = false;",
+        "target.pendingFrameId = 0;",
+        "if (!target.published)",
+        "target.frameId = 0;",
+        "return ready;",
     ),
     "R30SupportTryGetGpuCompletionSnapshot(": (
         "R13GpuCompletionSnapshot lower{};",
@@ -255,6 +267,15 @@ for raw_write in (
 ):
     if raw_write in resolve_direct:
         errors.append(f"R32 DirectGPU resolve retained raw lower pending-slot write: {raw_write}")
+if resolve_direct.count("R30SupportPollDirectTransportSlotProducer(index)") != 1:
+    errors.append("R32 DirectGPU free-slot scan must poll producer completion exactly once through the R30 owner facade")
+for raw_poll in (
+        "candidate.producerPending",
+        "candidate.pendingFrameId",
+        "candidate.fence->GetData",
+):
+    if raw_poll in resolve_direct:
+        errors.append(f"R32 DirectGPU resolve retained raw lower producer-poll state: {raw_poll}")
 if "R30SupportGpuCompletionSnapshot ackSnapshot{};" not in resolve_direct:
     errors.append("R32 DirectGPU resolve missing R30 ACK snapshot value type")
 if "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)" not in resolve_direct:

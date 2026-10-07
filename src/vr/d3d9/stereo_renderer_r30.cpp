@@ -3346,6 +3346,25 @@ namespace OutRunVRStereo
         target.published = false;
     }
 
+    HRESULT R30SupportPollDirectTransportSlotProducer(
+        std::uint32_t slot) noexcept
+    {
+        auto& target = DirectTransportSlots[slot];
+        if (!target.producerPending)
+            return S_OK;
+
+        const HRESULT ready = target.fence
+            ? target.fence->GetData(nullptr, 0, 0) : E_FAIL;
+        if (ready == S_OK)
+        {
+            target.producerPending = false;
+            target.pendingFrameId = 0;
+            if (!target.published)
+                target.frameId = 0;
+        }
+        return ready;
+    }
+
     bool R30SupportTryGetGpuCompletionSnapshot(
         R30SupportGpuCompletionSnapshot& out) noexcept
     {
