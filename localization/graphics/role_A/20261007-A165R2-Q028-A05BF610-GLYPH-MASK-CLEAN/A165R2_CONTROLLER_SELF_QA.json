@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261007-A165R2-Q028-A05BF610-GLYPH-MASK-CLEAN",
+  "queue_index": 28,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+  "work_stolen_from_lane": "B",
+  "candidate_sha256": "1ced3cfa2042d7b0d0b708e3521a7043bd7528b0347ddbe38b2b7ee51a4c0d3a",
+  "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+  "controller_visual_qa": "PASS",
+  "rejected_attempts": [
+    {
+      "candidate_sha256": "372d2f4056308fbbfef04fdf1735a6c722aecca9246d7b121f27b28f86479a72",
+      "reason": "A165 historical target clean pasted as full bbox produced visible rectangular/luminance patch"
+    },
+    {
+      "candidate_sha256": "567f37b20c5dabd377e4c83e14baca52e69552c033dab300bbac5606daa37d90",
+      "reason": "A165R polynomial whole-bbox reconstruction still produced visible rectangular/luminance patch"
+    }
+  ],
+  "findings": {
+    "plate_restoration": "PASS; A165R2 starts from exact A144 smooth plate and removes only the persisted Korean white/navy glyph/effect mask. SOURCE/A144/A165R-bad/CLEAN/FINAL evidence shows no rectangle, seam, haze or source/Korean residue.",
+    "scale_hierarchy": "PASS; 476x80 localized effect inside 525x90 source effect bbox, 90.67% source width, margins [24,25,5,5], materially fixes C245 59.43% width failure.",
+    "slant_style": "PASS; readable-right 0.30 lean and white-face/navy-outline family visually track canonical Total Rank.",
+    "glyph_integrity": "PASS; no broken Hangul, clipping, malformed syllable or low-resolution upscale.",
+    "protected_art": "PASS; zero changed pixels/alpha outside exact source bbox versus A144; oval border/glow and adjacent starburst remain unchanged.",
+    "raw_flipy": "PASS; RAW mirror-Y and readable evidence are consistent and clean.",
+    "practical_scale": "PASS at 100/75/50"
+  },
+  "machine_qa_reference": "localization/graphics/role_A/20261007-A165R2-Q028-A05BF610-GLYPH-MASK-CLEAN/A165R2_Q028_REPORT.json",
+  "producer_decision": "A165R2_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3_strict_audit": "REQUIRED_EXACT_SHA_USER_JPG_FALSE_NEGATIVE_HISTORY",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+  "user_jpg_review": "REQUIRED_AFTER_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
