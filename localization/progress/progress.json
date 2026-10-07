@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07T20:35:35+09:00",
+  "updated_at_kst": "2026-10-07T21:07:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -3057,7 +3057,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED. B218 q228 E7F6E9B7 is newly reopened from C144 under the newer 8-step visual gate and now awaits fresh independent C on candidate 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808. B219 q232 EBFC709F is reopened from C135 for source-left alignment/weight hierarchy and awaits fresh independent C on candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221. B220 q164 5B65E08C is reopened from C108 for source-width hierarchy/left alignment and awaits fresh independent C on candidate 65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f. B221 q92 1A43E9D9 is reopened from C125 for source-relative width/alignment and prior edge-touch risk; fresh independent C is required on candidate c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a. B227 q222 DDF0392A now awaits fresh independent C on 601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f; current producer self-QA PASS does not carry forward C159 because bytes changed. A156 q147 39BCA907 is reopened from C192 for forced-width Hangul distortion and now awaits fresh independent C on ab002e4f172ebe72b593914b92661c4f8137d50f8b073a22005fd175cff0153e; producer controller visual QA PASS does not carry forward C192 because bytes changed. B228 q230 E95DA5 now awaits fresh independent C on a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f; prior C149 is superseded because two ordinary explanatory help rows were materially localized. A157 q161 55B57CDE now awaits fresh independent C on 66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d; prior C201 is superseded because bytes changed. B229 q54 FA7BBB13 now awaits fresh independent C on 5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e; prior C88/USERPOLICY02 bytes were superseded by source-transform/scale rework. A158 q47 AD720950 now awaits fresh independent C on 6386a41ffa4af599cc7076be0cc4ce59729026b4882c437ac397270290b7e4bf; prior C109 is superseded because Shift is newly localized. A159 q53 568D3696 awaits fresh C on 7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33; prior USERPOLICY02 C-pass superseded. B230 q232 EBFC709F awaits fresh C on dc76c000cfce17098940f551512e6f746319ba8a1892345eb060693004747ea1; mandatory exact-SHA C3 follows normal C before PRE_INGAME export. A160 q12 D6DC1380 PJR-001 material scale repair fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5 awaits fresh independent C plus mandatory exact-SHA C3 before PRE_INGAME export; user JPG/new in-game retest remain open. B231 q46 AA04D779 awaits fresh C on d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0; exact-SHA C3 is mandatory before PRE_INGAME export. C246 historical: q28/q30 fresh C + exact-SHA C3_STRICT_PASS; PRE_INGAME/user JPG/actual-game pending. q44 A144 failed source-relative scale and was returned. B238 q44 19CEDB9 now awaits fresh independent C on 2250de2b7fbe1578750c422c05bd5f3b5785a0bd5006a4afcfb4cbc26ebbe620 after controller-rejected B237 tracking attempt; exact-SHA C3 follows fresh C before PRE_INGAME export. C248 resolves q32/q34/q36 fresh C and mandatory exact-SHA C3; q38 inherits by exact-byte alias. These now await PRE_INGAME English-original export refresh, user JPG acceptance and NEW actual-game retest. C248 PRE_INGAME export is now refreshed for q32/#005 q34/#006 q36/#007 q38/#008; only user JPG acceptance and NEW actual-game retest remain for those rows.",
+  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED. B218 q228 E7F6E9B7 is newly reopened from C144 under the newer 8-step visual gate and now awaits fresh independent C on candidate 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808. B219 q232 EBFC709F is reopened from C135 for source-left alignment/weight hierarchy and awaits fresh independent C on candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221. B220 q164 5B65E08C is reopened from C108 for source-width hierarchy/left alignment and awaits fresh independent C on candidate 65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f. B221 q92 1A43E9D9 is reopened from C125 for source-relative width/alignment and prior edge-touch risk; fresh independent C is required on candidate c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a. B227 q222 DDF0392A now awaits fresh independent C on 601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f; current producer self-QA PASS does not carry forward C159 because bytes changed. A156 q147 39BCA907 is reopened from C192 for forced-width Hangul distortion and now awaits fresh independent C on ab002e4f172ebe72b593914b92661c4f8137d50f8b073a22005fd175cff0153e; producer controller visual QA PASS does not carry forward C192 because bytes changed. B228 q230 E95DA5 now awaits fresh independent C on a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f; prior C149 is superseded because two ordinary explanatory help rows were materially localized. A157 q161 55B57CDE now awaits fresh independent C on 66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d; prior C201 is superseded because bytes changed. B229 q54 FA7BBB13 now awaits fresh independent C on 5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e; prior C88/USERPOLICY02 bytes were superseded by source-transform/scale rework. A158 q47 AD720950 now awaits fresh independent C on 6386a41ffa4af599cc7076be0cc4ce59729026b4882c437ac397270290b7e4bf; prior C109 is superseded because Shift is newly localized. A159 q53 568D3696 awaits fresh C on 7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33; prior USERPOLICY02 C-pass superseded. B230 q232 EBFC709F awaits fresh C on dc76c000cfce17098940f551512e6f746319ba8a1892345eb060693004747ea1; mandatory exact-SHA C3 follows normal C before PRE_INGAME export. A160 q12 D6DC1380 PJR-001 material scale repair fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5 awaits fresh independent C plus mandatory exact-SHA C3 before PRE_INGAME export; user JPG/new in-game retest remain open. B231 q46 AA04D779 awaits fresh C on d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0; exact-SHA C3 is mandatory before PRE_INGAME export. C246 historical: q28/q30 fresh C + exact-SHA C3_STRICT_PASS; PRE_INGAME/user JPG/actual-game pending. q44 A144 failed source-relative scale and was returned. B238 q44 19CEDB9 now awaits fresh independent C on 2250de2b7fbe1578750c422c05bd5f3b5785a0bd5006a4afcfb4cbc26ebbe620 after controller-rejected B237 tracking attempt; exact-SHA C3 follows fresh C before PRE_INGAME export. C248 resolves q32/q34/q36 fresh C and mandatory exact-SHA C3; q38 inherits by exact-byte alias. These now await PRE_INGAME English-original export refresh, user JPG acceptance and NEW actual-game retest. C248 PRE_INGAME export is now refreshed for q32/#005 q34/#006 q36/#007 q38/#008; only user JPG acceptance and NEW actual-game retest remain for those rows. C250 authoritative override: q57 39229D64, q61 C4A2937B, q65 EBEF6D20 are no longer fresh-C pending; all three were returned REWORK_REQUIRED by C1 after machine PASS but controller visual/semantic FAIL. q59 remains unprocessed P1 and other pending-C work is unchanged.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -5088,7 +5088,7 @@
       }
     }
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C249-C2-BATCH-Q086-Q044-Q048/C249_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C250-C1-BATCH-Q057-Q061-Q065/C250_CONTROLLER_FINAL_QA.json",
   "c249_c2_batch_q086_q044_q048": {
     "run": "20261007-C249-C2-BATCH-Q086-Q044-Q048",
     "timestamp_kst": "2026-10-07T20:35:35+09:00",
@@ -5133,6 +5133,40 @@
     "pre_ingame_export": "PENDING_REFRESH",
     "user_jpg_review": "PENDING",
     "actual_ingame_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "c250_c1_batch_q057_q061_q065": {
+    "run": "20261007-C250-C1-BATCH-Q057-Q061-Q065",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "batch_count": 3,
+    "worker_run": 37616085223,
+    "worker_output_commit": "1a8966314908fcba499e283484f08c6a9012548a",
+    "alpha_visual_run": 37617965800,
+    "alpha_visual_output_commit": "fabd1e70730d1596404d675d8a3082ade74b547a",
+    "q57": {
+      "asset": "39229D64",
+      "candidate_sha256": "3dae27fdeb7d2cde6d440b45f1e94ddafe35a97fe749447fdf0f3974d5e90c16",
+      "machine_qa": "PASS_16_OF_16_ZERO_OUTSIDE",
+      "controller_visual_qa": "FAIL_SOURCE_STYLE_TRANSFORM_FIDELITY",
+      "status": "REWORK_REQUIRED"
+    },
+    "q61": {
+      "asset": "C4A2937B",
+      "candidate_sha256": "fe1e7e7d264694c39f2bdbf50bb0a94ba15b88aea5b52873df4ceae749a8f95e",
+      "machine_qa": "PASS_21_OF_21_ZERO_OUTSIDE",
+      "controller_visual_qa": "FAIL_SEMANTIC_STYLE_REGRESSION",
+      "status": "REWORK_REQUIRED"
+    },
+    "q65": {
+      "asset": "EBEF6D20",
+      "candidate_sha256": "2b39cf005e79149890f0cfee605d29144d7d257e9cc9179b6c1f583ce393fce5",
+      "machine_qa": "PASS_7_OF_7_ZERO_OUTSIDE",
+      "controller_visual_qa": "FAIL_EASY_COLOR_SOURCE_STYLE_FIDELITY",
+      "status": "REWORK_REQUIRED"
+    },
+    "pre_ingame_export": "NOT_RUN_NO_NEW_C_PASS_MEMBERSHIP",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
