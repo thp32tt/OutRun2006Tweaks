@@ -72,6 +72,17 @@ On any of those commands, first fetch the latest `korean-localization-recovery-2
 - B (:10 / :40): PRODUCTION LANE B + self-QA. B is no longer review-only. Create/rework actual localization assets continuously from B's queue shard, including promoting positively identified `zoom_review` text assets into production. Run the same zero-pixel-overflow QA and immediately fix failures in the same run.
 - C (:20 / :50): CROSS-LANE FINAL QA + approval + Git synchronization. Revalidate new/changed A and B results plus approval candidates. Only exact containment PASS results may advance. C may immediately perform small corrective rework it discovers and revalidate it; larger failures return to `REWORK_REQUIRED` for the next A/B production cycle.
 
+### Temporary C-backlog relief mode
+- This is a temporary scheduler override requested on 2026-10-07. The normal dual-production schedule above remains the baseline plan and MUST be restored when backlog relief ends.
+- Keep total scheduled launches at six per hour: A at :00, C1 at :10, C2 at :20, B at :30, C1 at :40, C2 at :50.
+- C1 and C2 are both full C-role final-QA lanes; all existing C quality, approval, JPG-export, C3, Git synchronization, and runtime-validation rules remain unchanged.
+- To prevent duplicate review, C1 owns ODD numeric `asset_queue.csv` indexes plus unindexed runtime/name-entry/special C work; C2 owns EVEN numeric indexes.
+- Each C lane refreshes branch HEAD and queue state immediately before target selection and again before commit. During this mode neither C lane steals the other lane's indexed shard.
+- If its fresh/pending C shard is empty, that lane may perform C3_STRICT_AUDIT only within its own shard. C1 alone may take unindexed special C work.
+- This mode changes scheduling capacity only. It does not change candidate PASS semantics, in-game closure rules, queue authority, or A/B ownership rules.
+- Exit target: when fresh/pending C backlog is approximately 20 items or fewer, or when the user explicitly ends backlog relief, restore the normal A/B/C schedule above.
+
+
 ## A/B work sharding and anti-duplication
 - Use the stable numeric `index` column in `localization/graphics/asset_queue.csv` to avoid A/B producing the same DDS.
 - A primary shard: rows with an ODD numeric `index`.
