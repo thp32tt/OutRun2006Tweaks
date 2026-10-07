@@ -2867,3 +2867,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Mandatory high-risk C3_STRICT_AUDIT PASS on the exact candidate SHA above: slant/perspective, clean source removal, font/style fidelity, scale/readability, glyph integrity, protected separation, placement, FLIP-Y/RAW and coverage all PASS. Decision `C234_C3_STRICT_PASS_STATIC_PENDING_USER_JPG_AND_NEW_INGAME_RETEST`.
 - IGR-005 advances only to `C_STATIC_PASS_PENDING_INGAME_RETEST`; it is not CLOSED without a NEW actual-game retest. PRE_INGAME English-original export refresh is required next. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_30CF0D_MACHINE_QA.json`, `C234_30CF0D_CONTROLLER_FINAL_QA.json`.
+
+## 2026-10-07 13:41 KST — C235 C2 q12 D6DC1380 fresh C RAW-orientation FAIL
+- TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Latest queue selection stayed on P0 even q12 PJR-001 / A160. Odd/unindexed work was not touched.
+- Independent GitHub-hosted verifier run 37571927601 / job 112632433608 decoded canonical source 42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352 and current fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5. Canonical 4x RAW bbox is [32,40,992,176]; current RAW bbox is [117,82,907,214], which lies in the mirror-Y canonical footprint [32,80,992,216].
+- A160 scale repair itself is material and retained: readable-after-FLIP-Y 790x132 vs rejected 610x134, inside source 960x136. However canonical source is RAW-normal/readable while the current candidate requires FLIP-Y, so the user's ORIENTATION_UP_DOWN_REVERSED defect remains.
+- Decision C235_REWORK_REQUIRED_RAW_ORIENTATION_PENDING_A_B. PRE_INGAME excluded. Required: preserve A160 scale/style, correct persisted RAW orientation to canonical source normal, then producer QA -> fresh C -> mandatory exact-SHA C3 -> user JPG -> new in-game retest.
+- RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched. Evidence: localization/graphics/role_C/20261007-C235-C2-Q012-D6DC1380-A160/C235_D6DC1380_CONTROLLER_FINAL_QA.json.

@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C235-C2-Q012-D6DC1380-A160",
+  "timestamp_kst": "2026-10-07T13:41:55+09:00",
+  "queue_index": 12,
+  "asset": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+  "producer_run": "A160",
+  "priority": "P0",
+  "user_jpg_regression": "PJR-001-20261006",
+  "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+  "prior_rejected_candidate_sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
+  "candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+  "independent_machine_evidence": {
+    "github_actions_run": 37571927601,
+    "github_actions_job": 112632433608,
+    "script_commit": "599edd839881afe46518824da7ebe4ad9f1a9a99",
+    "source_bbox_native_raw": [
+      8,
+      10,
+      248,
+      44
+    ],
+    "canonical_source_bbox_raw_hd": [
+      32,
+      40,
+      992,
+      176
+    ],
+    "prior_candidate_bbox_raw": [
+      207,
+      81,
+      817,
+      215
+    ],
+    "candidate_bbox_raw": [
+      117,
+      82,
+      907,
+      214
+    ],
+    "candidate_bbox_readable_after_flip_y": [
+      117,
+      42,
+      907,
+      174
+    ],
+    "source_size_hd": [
+      960,
+      136
+    ],
+    "candidate_size": [
+      790,
+      132
+    ],
+    "material_width_gain_vs_c233": 180,
+    "raw_normal_footprint_bottom_margin": -38,
+    "raw_changed_pixels_outside_canonical_normal_source_bbox": 24002,
+    "raw_alpha_changed_pixels_outside_canonical_normal_source_bbox": 16486
+  },
+  "controller_reconciliation": {
+    "canonical_source_raw_orientation": "NORMAL_READABLE",
+    "canonical_source_raw_bbox_hd": [
+      32,
+      40,
+      992,
+      176
+    ],
+    "canonical_source_mirror_y_bbox_hd": [
+      32,
+      80,
+      992,
+      216
+    ],
+    "candidate_raw_bbox": [
+      117,
+      82,
+      907,
+      214
+    ],
+    "candidate_relation_to_source": "MIRROR_Y",
+    "candidate_raw_bbox_inside_mirror_y_source_footprint": true,
+    "candidate_raw_bbox_inside_canonical_normal_source_footprint": false,
+    "readable_scale_geometry": "PASS_790x132_INSIDE_960x136_AFTER_FLIP_Y",
+    "interpretation": "A160 materially fixed the text scale, but preserved the C233-rejected mirror-Y raw orientation. The canonical English DDS is raw-normal/readable; the current candidate occupies the vertically mirrored canonical footprint and becomes readable only after FLIP-Y. This preserves the user-reported ORIENTATION_UP_DOWN_REVERSED defect class."
+  },
+  "visual_evidence_reviewed": [
+    "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_SOURCE_OLD_FINAL.jpg",
+    "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_RAW_FLIPY.jpg",
+    "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_PRACTICAL_100.jpg",
+    "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_PRACTICAL_75.jpg",
+    "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_PRACTICAL_50.jpg",
+    "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json"
+  ],
+  "controller_visual_qa": {
+    "scale_hierarchy": "PASS_A160_MATERIALLY_LARGER_AND_READABLE",
+    "glyph_integrity": "PASS",
+    "style_weight": "PASS_NO_NEW_BLOCKER_OBSERVED",
+    "raw_orientation": "FAIL_CURRENT_MIRROR_Y_VS_CANONICAL_SOURCE_NORMAL",
+    "flip_y_consistency": "FAIL_SOURCE_AND_CANDIDATE_REQUIRE_OPPOSITE_READABLE_TRANSFORMS"
+  },
+  "fresh_c_decision": "REWORK_REQUIRED",
+  "failure_reason": "RAW_ORIENTATION_MISMATCH_CANONICAL_SOURCE_NORMAL_VS_CURRENT_MIRROR_Y",
+  "required_rework": [
+    "Rebuild or vertically reorient the persisted q12 candidate so RAW DDS orientation matches the canonical English source (normal/readable), while preserving the A160 material scale improvement and source-faithful styling.",
+    "Re-run producer ordered gate including RAW and readable comparison against the canonical source; do not approve a candidate that needs the opposite vertical transform from the source.",
+    "Then run fresh independent C and mandatory exact-SHA C3_STRICT_AUDIT before PRE_INGAME export."
+  ],
+  "c3_required_after_rework": true,
+  "c3_strict_decision": "BLOCKED_FRESH_C_FAIL",
+  "pre_ingame_export": "EXCLUDED_REWORK_REQUIRED",
+  "user_jpg_review": "OPEN",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

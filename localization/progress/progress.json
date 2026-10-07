@@ -4090,5 +4090,41 @@
     "runtime_validation": "UNTESTED",
     "TEMP_BACKLOG_RELIEF": "C1",
     "SHARD": "ODD(+UNINDEXED_SPECIAL)"
+  },
+  "c235_c2_q012_d6dc1380": {
+    "status": "C235_REWORK_REQUIRED_RAW_ORIENTATION_PENDING_A_B",
+    "timestamp_kst": "2026-10-07T13:41:55+09:00",
+    "queue_index": 12,
+    "asset": "D6DC1380",
+    "candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+    "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "fresh_c": "FAIL_REWORK_REQUIRED",
+    "scale_hierarchy": "PASS",
+    "raw_orientation": "FAIL_CANONICAL_NORMAL_CURRENT_MIRROR_Y",
+    "canonical_raw_bbox_hd": [
+      32,
+      40,
+      992,
+      176
+    ],
+    "candidate_raw_bbox": [
+      117,
+      82,
+      907,
+      214
+    ],
+    "canonical_mirror_y_bbox_hd": [
+      32,
+      80,
+      992,
+      216
+    ],
+    "machine_evidence_run": 37571927601,
+    "c3": "BLOCKED_FRESH_C_FAIL",
+    "pre_ingame_export": "EXCLUDED_REWORK_REQUIRED",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }

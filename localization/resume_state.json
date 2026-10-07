@@ -8025,5 +8025,46 @@
     "pre_ingame_comparison_refresh": "PENDING_C234_EXPORT",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c235_c2_q012_d6dc1380": {
+    "timestamp_kst": "2026-10-07T13:41:55+09:00",
+    "run": "20261007-C235-C2-Q012-D6DC1380-A160",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 12,
+    "asset": "D6DC1380",
+    "candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+    "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+    "producer_run": "A160",
+    "user_jpg_regression": "PJR-001-20261006",
+    "fresh_independent_c": "REWORK_REQUIRED",
+    "scale_hierarchy": "PASS_790x132_INSIDE_960x136",
+    "raw_orientation": "FAIL_CANONICAL_NORMAL_CURRENT_MIRROR_Y",
+    "canonical_raw_bbox_hd": [
+      32,
+      40,
+      992,
+      176
+    ],
+    "candidate_raw_bbox": [
+      117,
+      82,
+      907,
+      214
+    ],
+    "canonical_mirror_y_bbox_hd": [
+      32,
+      80,
+      992,
+      216
+    ],
+    "github_worker_run": 37571927601,
+    "github_worker_job": 112632433608,
+    "c3_strict_audit": "BLOCKED_FRESH_C_FAIL",
+    "controller_qa": "localization/graphics/role_C/20261007-C235-C2-Q012-D6DC1380-A160/C235_D6DC1380_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_comparison_refresh": "EXCLUDED_REWORK_REQUIRED",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

@@ -2305,3 +2305,8 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - B165 candidate `0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4`: final hosted C234 run 37571258371 SUCCESS. 6/6 bbox/source-size/positive-margin; changed/alpha outside title/subtitle source bboxes=0; MANUAL/AUTOMATIC x4 and unrelated/protected pixels exact; persisted decode/header/mip1/RAW mirror_y/coverage PASS.
 - SOURCE/CLEAN/OLD/FINAL + RAW + practical 100/75/50 visual QA PASS. Exact-SHA mandatory C3_STRICT_PASS: clean source removal, source-relative slant/style/scale, glyph integrity, protected separation, placement and both orientations PASS.
 - Decision `C234_C3_STRICT_PASS_STATIC_PENDING_USER_JPG_AND_NEW_INGAME_RETEST`. IGR-005 remains `C_STATIC_PASS_PENDING_INGAME_RETEST`; PRE_INGAME JPG refresh/user review + NEW actual-game retest still required. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-07 13:41 KST — C235 C2 q12 D6DC1380 REWORK_REQUIRED
+- TEMP_BACKLOG_RELIEF=C2, SHARD=EVEN; P0 PJR-001 fresh independent C.
+- Scale/hierarchy repair PASS (610x134 -> 790x132 inside 960x136), but RAW orientation FAIL: canonical source bbox [32,40,992,176] vs current raw [117,82,907,214] in mirror-Y footprint [32,80,992,216].
+- C235_REWORK_REQUIRED_RAW_ORIENTATION_PENDING_A_B; C3 blocked until fresh C passes after orientation rework. PRE_INGAME/user JPG/new actual-game retest remain open; RUNTIME_VALIDATION=UNTESTED.
