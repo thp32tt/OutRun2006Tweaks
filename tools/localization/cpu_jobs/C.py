@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# C258 C2 independent static QA batch for q198/q226/q228.
+# C258 C2 independent static QA batch for q198/q226/q228 (visible-pixel correction).
 # TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN
 import os, json, hashlib, struct, tempfile, urllib.request
 import numpy as np
@@ -126,7 +126,12 @@ with tempfile.TemporaryDirectory() as td:
             review_orientation="FLIP_Y"; S=src[::-1]; C=cand[::-1]
         else:
             review_orientation="RAW"; S=src; C=cand
-        diff=np.any(C!=clean,axis=2); adiff=C[:,:,3]!=clean[:,:,3]
+        # Visible-pixel comparison: DDS may retain arbitrary hidden RGB where alpha==0.
+        # Hidden RGB is not rendered and must not inflate the localized bbox or residue checks.
+        adiff=C[:,:,3]!=clean[:,:,3]
+        rgbdiff=np.any(C[:,:,:3]!=clean[:,:,:3],axis=2)
+        visible_support=(C[:,:,3]>0)|(clean[:,:,3]>0)
+        diff=adiff | (rgbdiff & visible_support)
         outside_changed=int(diff[outside].sum()); outside_alpha=int(adiff[outside].sum())
         row_reports=[]
         for name,b in a["rows"]:
@@ -142,7 +147,11 @@ with tempfile.TemporaryDirectory() as td:
                 "containment":"PASS" if loc and min(margins)>=0 else "FAIL",
                 "size_ceiling":"PASS" if loc and w<=x1-x0 and h<=y1-y0 else "FAIL",
                 "positive_margin":"PASS" if loc and min(margins)>0 else "FAIL"})
-        src_eq=np.all(C==S,axis=2); src_clean_delta=np.any(S!=clean,axis=2)
+        src_alpha=S[:,:,3]>0
+        src_eq=(C[:,:,3]==S[:,:,3]) & np.all(C[:,:,:3]==S[:,:,:3],axis=2) & src_alpha
+        src_clean_alpha=(S[:,:,3]!=clean[:,:,3])
+        src_clean_rgb=np.any(S[:,:,:3]!=clean[:,:,:3],axis=2) & ((S[:,:,3]>0)|(clean[:,:,3]>0))
+        src_clean_delta=src_clean_alpha | src_clean_rgb
         residue_diag=int((src_eq & smask & src_clean_delta).sum())
         passed=sum(r["containment"]=="PASS" and r["size_ceiling"]=="PASS" and r["positive_margin"]=="PASS" for r in row_reports)
         machine="PASS" if passed==len(row_reports) and outside_changed==0 and outside_alpha==0 and sh==ch else "FAIL"
