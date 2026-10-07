@@ -48,6 +48,15 @@ PRODUCER_WINDOWS = (
         ),
     },
     {
+        "name": "GhostTimeAttackHud_0xBD900",
+        "start_rva": 0x000BD900,
+        "end_rva": 0x000BEA40,
+        "anchors": (
+            0x000BDAE8, 0x000BDE3A,
+            0x000BE4BC, 0x000BE4E7,
+        ),
+    },
+    {
         "name": "NaviPubHud_0xBEA40",
         "start_rva": 0x000BEA40,
         "end_rva": 0x000BEE80,

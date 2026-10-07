@@ -493,6 +493,19 @@ for contract_id, rva in (
     require(rva, binary_contract,
             'canonical NaviPub ScreenHud scaling-state RVA')
 
+# Ghost/You/Diff + TimeAttack ScreenHud producer window. These four
+# source-level UIScaling spacing hooks are high-value P0 anchors but previously
+# lacked a durable canonical disassembly window for exact byte recovery.
+require('GhostTimeAttackHud_0xBD900', analyzer,
+        'Ghost/TimeAttack canonical producer window')
+require('0x000BD900', analyzer, 'Ghost/TimeAttack producer start RVA')
+require('0x000BEA40', analyzer, 'Ghost/TimeAttack producer end RVA')
+for token in (
+    '0x000BDAE8', '0x000BDE3A',
+    '0x000BE4BC', '0x000BE4E7',
+):
+    require(token, analyzer, 'Ghost/TimeAttack canonical anchor RVA')
+
 # NaviPub goal/rival/heart/nav HUD producer window. These screen-HUD
 # state-transition anchors are part of the original UIScaling map but did not
 # previously have a durable canonical disassembly window in the HUD Inspector.
