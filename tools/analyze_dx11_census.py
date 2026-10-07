@@ -2154,7 +2154,7 @@ def main() -> int:
                 or (
                     source_semantic_pair is not None
                     and source_semantic_pair["exact"]
-                    and source_semantic_pair["summary_correlation_exact"]
+                    and source_semantic_pair["exact_state_correlated"]
                 )
             )
             semantic_plan_correlated = bool(
