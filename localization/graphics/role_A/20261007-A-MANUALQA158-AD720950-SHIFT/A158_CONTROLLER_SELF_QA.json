@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A158",
+  "timestamp_kst": "2026-10-07 11:36 KST",
+  "queue_index": 47,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+  "selection": {
+    "reason": "After latest refresh there was no active A-owned P0/P1, C-returned REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER asset. PRE_INGAME English-original #002 exposed an untranslated-visible-functional-label false negative in current C109 bytes.",
+    "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/002_q047_AD720950.jpg",
+    "prior_c_status": "C109_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "6dad37489e7027b8f546c38b3729167697965fc8e33fcabff46f09aba1677955"
+  },
+  "defect": {
+    "tags": [
+      "UNTRANSLATED_VISIBLE_UI_LABEL",
+      "FUNCTION_LABEL_COMPLETENESS"
+    ],
+    "evidence": "The keyboard function column localized Symbols/Caps Lock/Backspace/Accents/Done/Space but retained Shift in English. Shift is ordinary functional UI text and is not covered by song/title/brand/model/legal preserve-original policy."
+  },
+  "translation_change": {
+    "source": "Shift",
+    "prior": "Shift",
+    "korean": "시프트"
+  },
+  "material_rework": {
+    "method": "Start from exact C109/A13 candidate, remove only canonical Shift source-alpha pixels, render fresh native Noto Sans CJK KR Black heavy-white 시프트 inside the exact source bbox, preserve all A13 Korean labels and all other artwork byte/pixel-exact outside that bbox.",
+    "source_bbox": [
+      3757,
+      176,
+      3873,
+      222
+    ],
+    "source_size": [
+      116,
+      46
+    ],
+    "localized_bbox": [
+      3759,
+      178,
+      3871,
+      220
+    ],
+    "localized_size": [
+      112,
+      42
+    ],
+    "margins": {
+      "left": 2,
+      "right": 2,
+      "top": 2,
+      "bottom": 2
+    },
+    "font": "Noto Sans CJK KR Black",
+    "font_px": 42,
+    "horizontal_scale": 0.9573,
+    "alignment": "source-left +2px"
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "1/1 PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "clean_residue": 0,
+    "prior_exact_outside": true,
+    "format": "RGBA32",
+    "raw_orientation": "mirror_y"
+  },
+  "ordered_generation_gate": {
+    "1_source_text_removed_plate_restored": "PASS_EXACT_ALPHA_CLEAN",
+    "2_source_slant_direction": "PASS_UPRIGHT_SOURCE",
+    "3_no_unnecessary_undersizing": "PASS_42PX_INSIDE_46PX_SOURCE_HEIGHT",
+    "4_source_faithful_weight_outline_shadow": "PASS_PLAIN_HEAVY_WHITE",
+    "5_no_clipped_pixels": "PASS_2PX_ALL_SIDES",
+    "6_protected_clearance": "PASS_ZERO_CHANGE_OUTSIDE_SHIFT_BBOX",
+    "7_flip_y_and_raw": "PASS_CONTROLLER_VISUAL_BOTH",
+    "8_immediate_readability_vs_source": "PASS_CONTROLLER_VISUAL"
+  },
+  "evidence": {
+    "worker_report": "localization/graphics/role_A/20261007-A-MANUALQA158-AD720950-SHIFT/A158_AD720950_REPORT.json",
+    "shift_contact": "localization/graphics/role_A/20261007-A-MANUALQA158-AD720950-SHIFT/A158_AD720950_SHIFT_SOURCE_OLD_CLEAN_FINAL.jpg",
+    "full_compare": "localization/graphics/role_A/20261007-A-MANUALQA158-AD720950-SHIFT/A158_AD720950_OLD_FINAL_FULL.jpg",
+    "raw_compare": "localization/graphics/role_A/20261007-A-MANUALQA158-AD720950-SHIFT/A158_AD720950_OLD_FINAL_RAW_MIRROR_Y.jpg",
+    "prior_pre_ingame_card": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/002_q047_AD720950.jpg",
+    "github_worker_run": 37562584251,
+    "worker_output_commit": "e571a9dbd75b1a3c79cbf076dd23d2e64674f774"
+  },
+  "controller_visual_findings": [
+    "SOURCE/C109/CLEAN/A158 4x contact confirms complete Shift removal before Korean redraw with no source silhouette.",
+    "시프트 matches the surrounding heavy plain-white keyboard-function family and retains immediate readability at source-relative scale.",
+    "Full readable atlas shows all prior Korean labels and every non-target glyph/artwork unchanged outside the Shift bbox.",
+    "RAW mirror-Y view remains structurally/orientationally consistent."
+  ],
+  "controller_visual_qa": "PASS_SOURCE_C109_CLEAN_A158_FULL_AND_RAW",
+  "producer_status": "A158_SHIFT_LOCALIZATION_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

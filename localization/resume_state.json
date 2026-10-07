@@ -7625,15 +7625,15 @@
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "latest_a_manual_visual_rework": {
-    "timestamp_kst": "2026-10-07 11:10 KST",
-    "run": "A157",
-    "queue_index": 161,
-    "asset": "55B57CDE",
-    "trigger": "PRE_INGAME_017_UNDERSIZED_CENTERED_HIERARCHY_FALSE_NEGATIVE",
-    "before_sha256": "78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812",
-    "candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
-    "controller_visual_qa": "PASS_SOURCE_A56_CLEAN_A157_READABLE_AND_RAW",
-    "status": "A157_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "timestamp_kst": "2026-10-07 11:36 KST",
+    "run": "A158",
+    "queue_index": 47,
+    "asset": "AD720950",
+    "trigger": "PRE_INGAME_002_UNTRANSLATED_VISIBLE_SHIFT_FALSE_NEGATIVE",
+    "before_sha256": "6dad37489e7027b8f546c38b3729167697965fc8e33fcabff46f09aba1677955",
+    "candidate_sha256": "6386a41ffa4af599cc7076be0cc4ce59729026b4882c437ac397270290b7e4bf",
+    "controller_visual_qa": "PASS_SOURCE_C109_CLEAN_A158_FULL_AND_RAW",
+    "status": "A158_SHIFT_LOCALIZATION_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
     "runtime_validation": "UNTESTED"
   },
   "c228_controller_final_qa": {
@@ -7830,5 +7830,36 @@
     "visual_qa": "PASS_SOURCE_OLD_FINAL_AND_RAW; all 17 readable right-lean; Slipstream height 74->99",
     "status": "B229_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a158_ad720950_shift_localization": {
+    "run": "A158",
+    "timestamp_kst": "2026-10-07 11:36 KST",
+    "role": "A",
+    "queue_index": 47,
+    "asset_key": "AD720950",
+    "asset": "textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+    "trigger": "PRE_INGAME_002_UNTRANSLATED_VISIBLE_SHIFT_CURRENT_POLICY_FALSE_NEGATIVE",
+    "prior_c_status": "C109_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "6dad37489e7027b8f546c38b3729167697965fc8e33fcabff46f09aba1677955",
+    "candidate_sha256": "6386a41ffa4af599cc7076be0cc4ce59729026b4882c437ac397270290b7e4bf",
+    "github_worker_run": 37562584251,
+    "worker_output_commit": "e571a9dbd75b1a3c79cbf076dd23d2e64674f774",
+    "translation_change": "Shift -> 시프트",
+    "machine_qa": {
+      "bbox_size_positive_margin": "1/1 PASS",
+      "changed_outside": 0,
+      "alpha_outside": 0,
+      "clean_residue": 0,
+      "prior_exact_outside": true,
+      "format": "RGBA32",
+      "raw_orientation": "mirror_y"
+    },
+    "controller_visual_qa": "PASS_SOURCE_C109_CLEAN_A158_FULL_AND_RAW",
+    "controller_qa": "localization/graphics/role_A/20261007-A-MANUALQA158-AD720950-SHIFT/A158_CONTROLLER_SELF_QA.json",
+    "status": "A158_SHIFT_LOCALIZATION_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "PENDING",
+    "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

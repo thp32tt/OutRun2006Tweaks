@@ -2261,3 +2261,9 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - Controller SOURCE / C88-B_RECOVERY current / B229 final overview plus RAW mirror_y review PASS: all 17 Korean rows now lean in the same readable direction as source, source effect family is retained, Slipstream hierarchy/readability is materially restored, and no broken glyph, clipping, residue, overlap, protected-art intrusion or orientation regression is visible.
 - Decision `B229_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME`. Prior C88/USERPOLICY02 is superseded because candidate bytes changed. Fresh independent C must regenerate the English-original comparison before user review. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261007-B-MANUALQA229-FA7BBB13/B229_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261007-B-MANUALQA229-FA7BBB13/B229_FA7_REPORT.json`.
+
+## 2026-10-07 11:36 KST — A158 q47 AD720950 Shift localization producer PASS
+- PRE_INGAME #002 reopened C109/A13 because the functional keyboard label `Shift` remained English while neighboring function labels were localized.
+- A158 candidate `6386a41ffa4af599cc7076be0cc4ce59729026b4882c437ac397270290b7e4bf` changes only that exact source bbox to `시프트`; all prior Korean labels, character glyph rows and unrelated artwork remain exact outside the bbox.
+- Source 116x46 -> Korean 112x42 with 2px margins all sides; 1/1 bbox/size/positive-margin PASS; changed/alpha outside=0; clean source residue=0; exact RGBA32 header/raw mirror_y.
+- SOURCE/C109/CLEAN/A158 high-zoom, full readable atlas and RAW controller visual QA PASS. Prior C109 is superseded; fresh C + refreshed English-original comparison/user review + actual-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
