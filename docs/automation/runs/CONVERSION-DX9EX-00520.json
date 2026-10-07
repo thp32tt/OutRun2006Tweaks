@@ -7,12 +7,12 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "status": "IMPLEMENTED_PENDING_VALIDATION",
+  "status": "COMPLETE",
   "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-DIRECTGPU-RELEASE-FACADE-001",
   "base_sha": "7fbcb321fe911af12bb7cb94347caa96d755de3c",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "material_result_sha": "2c252f17943fdeac048bb53c16964319adafa380",
+  "validation_bearing_result_sha": "2c252f17943fdeac048bb53c16964319adafa380",
+  "result_sha": "2c252f17943fdeac048bb53c16964319adafa380",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00520]",
   "summary": "Route R32 DirectGPU host-change invalidation releases through explicit R30 owner facades while preserving ACK release, local copy-rejection reset, transport-slot release, interop-probe release, and identity-forget ordering.",
   "changed_paths": [
@@ -22,7 +22,7 @@
     "tools/verify_vr_r32_runtime_support_seam.py",
     "docs/automation/runs/CONVERSION-DX9EX-00520.json"
   ],
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
@@ -53,5 +53,25 @@
     "no DirectGPU copy/rejection policy change",
     "no Reset/ResetEx or HUD/stereo policy change"
   ],
-  "next_action": "Require exact-SHA DX9Ex Active Validation and Domain Isolation. If green, persist validation evidence and continue with the next bounded lower-owner seam. Runtime remains UNTESTED."
+  "next_action": "Select the next bounded R32 lower-owner dependency seam after the validated DirectGPU release facade. Preserve ACK/fence/slot publication semantics. Runtime remains UNTESTED.",
+  "validation_history": [
+    {
+      "sha": "2c252f17943fdeac048bb53c16964319adafa380",
+      "dx9ex_active_run_id": 37622962600,
+      "domain_isolation_run_id": 37622962564,
+      "result": "PASS",
+      "jobs": {
+        "policy": 112797537332,
+        "game": 112797706513,
+        "host": 112797706534,
+        "full_chain_compile": 112797706600,
+        "package": 112799805521
+      }
+    }
+  ],
+  "package_artifact": {
+    "id": 11482788198,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-2c252f17943fdeac048bb53c16964319adafa380",
+    "digest": "sha256:165d01bc86edd8615d0b0ab5cbf431829fea4f476cdd92161c622baabc5a6105"
+  }
 }
