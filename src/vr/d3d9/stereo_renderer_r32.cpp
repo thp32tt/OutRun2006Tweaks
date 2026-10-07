@@ -7,6 +7,7 @@
 #include "r32_policy.hpp"
 #include "../core/r32_review_api.hpp"
 #include "../core/r31_support_api.hpp"
+#include "../core/r30_support_api.hpp"
 #ifndef OUTRUN_VR_REFACTOR_SPLIT_R32_R31
 #include "stereo_renderer_r31.cpp"
 #endif
@@ -150,8 +151,8 @@ namespace OutRunVRStereo
             bool indexed,
             bool up) noexcept
         {
-            if (!Settings::VRTelemetry || !IsGameDevice(device) ||
-                InternalStereoPass)
+            if (!R30SupportTelemetryEnabled() || !R30SupportIsGameDevice(device) ||
+                R30SupportInternalStereoPassActive())
                 return;
 
             auto& frame = R32FrameWorkloadCounters;
@@ -201,7 +202,7 @@ namespace OutRunVRStereo
             LONGLONG presentEndQpc,
             const R32StereoWorkloadSnapshot& stereo) noexcept
         {
-            if (!Settings::VRTelemetry)
+            if (!R30SupportTelemetryEnabled())
             {
                 R32FrameWorkloadCounters = {};
                 R32LastPresentEndQpc = presentEndQpc;
@@ -313,7 +314,7 @@ namespace OutRunVRStereo
         {
             if (!device || !constants)
                 return false;
-            if (Settings::VRTelemetry)
+            if (R30SupportTelemetryEnabled())
                 ++R32BatchWvpUploads;
             if (!OutRunVR::D3D9::SetVertexShaderConstantBatch(
                     device, OutRunWvpRegister, constants,
@@ -322,7 +323,7 @@ namespace OutRunVRStereo
                 ++R32BatchWvpFailures;
                 return false;
             }
-            if (Settings::VRTelemetry && !R32FirstBatchWvpLogged)
+            if (R30SupportTelemetryEnabled() && !R32FirstBatchWvpLogged)
             {
                 R32FirstBatchWvpLogged = true;
                 spdlog::info(
@@ -363,8 +364,8 @@ namespace OutRunVRStereo
         HRESULT R32LowerFailClosed(IDirect3DDevice9* device,
             LowerDraw&& lowerDraw) noexcept
         {
-            if (!IsGameDevice(device) || InternalStereoPass ||
-                !TargetIsBackBuffer() || !StereoWanted() || !R9StereoBaselineSeeded())
+            if (!R30SupportIsGameDevice(device) || R30SupportInternalStereoPassActive() ||
+                !R30SupportTargetIsBackBuffer() || !R30SupportStereoWanted() || !R9StereoBaselineSeeded())
                 return lowerDraw();
 
             OutRunVR::D3D9::LiveEffectRenderStateSnapshot snapshot{};
@@ -419,7 +420,7 @@ namespace OutRunVRStereo
         {
             if (DirectTransportResourcesReady && R32DirectIdentityMatches())
             {
-                if (Settings::VRTelemetry) ++R32DirectProbeCacheHits;
+                if (R30SupportTelemetryEnabled()) ++R32DirectProbeCacheHits;
                 return true;
             }
 
@@ -493,7 +494,7 @@ namespace OutRunVRStereo
                     {
                         R32DirectCopyPathRejected = true;
                         R32DirectCopyRejectHr = ready;
-                        if (Settings::VRTelemetry) ++R32PendingFenceErrors;
+                        if (R30SupportTelemetryEnabled()) ++R32PendingFenceErrors;
                         return false;
                     }
                 }
@@ -573,7 +574,7 @@ namespace OutRunVRStereo
                     // revalidation rather than cycling back into this slot.
                     R32DirectCopyPathRejected = true;
                     R32DirectCopyRejectHr = issueHr;
-                    if (Settings::VRTelemetry) ++R32PendingFenceErrors;
+                    if (R30SupportTelemetryEnabled()) ++R32PendingFenceErrors;
                     return false;
                 }
             }
@@ -595,10 +596,10 @@ namespace OutRunVRStereo
 
         void R32InvalidateResetCaches() noexcept
         {
-            InvalidateEffectStateCache();
+            R30SupportInvalidateEffectStateCache();
             R31SupportResetFastPathState();
-            InvalidateLiveStateSample();
-            OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
+            R30SupportInvalidateLiveStateSample();
+            R30SupportInvalidateRendererStateAfterExternalRestore();
             R32ForgetDirectIdentity();
             R32DirectCopyPathRejected = false;
             R32DirectCopyRejectHr = D3D_OK;
@@ -612,7 +613,7 @@ namespace OutRunVRStereo
         void R32ResetAfterGameReset() noexcept
         {
             SetStereoRecoverySafetyThroughEpoch(
-                OutRunVR::R32::RearmMonoSafetyEpoch(PresentEpoch));
+                OutRunVR::R32::RearmMonoSafetyEpoch(R30SupportPresentEpoch()));
             R32InvalidateResetCaches();
             ++R32ResetEpochRearms;
             if (!R32FirstResetRearmLogged)
@@ -628,7 +629,7 @@ namespace OutRunVRStereo
             LowerReset&& lowerReset) noexcept
         {
             const HRESULT hr = lowerReset();
-            const bool gameDevice = IsGameDevice(device);
+            const bool gameDevice = R30SupportIsGameDevice(device);
             if (gameDevice)
             {
                 if (SUCCEEDED(hr))
@@ -644,7 +645,7 @@ namespace OutRunVRStereo
 
         void R32LogPerfWindow() noexcept
         {
-            if (!Settings::VRTelemetry)
+            if (!R30SupportTelemetryEnabled())
                 return;
             const ULONGLONG now = GetTickCount64();
             if (R32Counters.lastLogMs == 0)
@@ -733,12 +734,12 @@ namespace OutRunVRStereo
         HRESULT R32WithPresentTelemetry(IDirect3DDevice9* device,
             LowerPresent&& lowerPresent) noexcept
         {
-            const bool gameDevice = IsGameDevice(device);
+            const bool gameDevice = R30SupportIsGameDevice(device);
             const R32StereoWorkloadSnapshot stereo =
                 gameDevice ? R32CaptureStereoWorkload()
                            : R32StereoWorkloadSnapshot{};
             LARGE_INTEGER presentStart{};
-            if (gameDevice && Settings::VRTelemetry)
+            if (gameDevice && R30SupportTelemetryEnabled())
                 QueryPerformanceCounter(&presentStart);
 
             const HRESULT hr = lowerPresent();
@@ -746,7 +747,7 @@ namespace OutRunVRStereo
             if (gameDevice)
             {
                 LARGE_INTEGER presentEnd{};
-                if (Settings::VRTelemetry)
+                if (R30SupportTelemetryEnabled())
                     QueryPerformanceCounter(&presentEnd);
                 R32FinalizeFramePerf(
                     presentStart.QuadPart, presentEnd.QuadPart, stereo);
@@ -850,14 +851,17 @@ namespace OutRunVRStereo
         });
     }
     R32ReviewInternalStereoPassScope::R32ReviewInternalStereoPassScope() noexcept
-        : previous_(InternalStereoPass) { InternalStereoPass = true; }
-    R32ReviewInternalStereoPassScope::~R32ReviewInternalStereoPassScope() { InternalStereoPass = previous_; }
+        : previous_(R30SupportExchangeInternalStereoPass(true)) {}
+    R32ReviewInternalStereoPassScope::~R32ReviewInternalStereoPassScope()
+    {
+        R30SupportExchangeInternalStereoPass(previous_);
+    }
 
-    bool R32ReviewTelemetryEnabled() noexcept { return Settings::VRTelemetry; }
-    bool R32ReviewIsGameDevice(IDirect3DDevice9* d) noexcept { return IsGameDevice(d); }
-    bool R32ReviewInternalStereoPass() noexcept { return InternalStereoPass; }
-    bool R32ReviewStereoWanted() noexcept { return StereoWanted(); }
-    bool R32ReviewTargetIsBackBuffer() noexcept { return TargetIsBackBuffer(); }
+    bool R32ReviewTelemetryEnabled() noexcept { return R30SupportTelemetryEnabled(); }
+    bool R32ReviewIsGameDevice(IDirect3DDevice9* d) noexcept { return R30SupportIsGameDevice(d); }
+    bool R32ReviewInternalStereoPass() noexcept { return R30SupportInternalStereoPassActive(); }
+    bool R32ReviewStereoWanted() noexcept { return R30SupportStereoWanted(); }
+    bool R32ReviewTargetIsBackBuffer() noexcept { return R30SupportTargetIsBackBuffer(); }
     void R32ReviewFailClosedResetBaselineState() noexcept { FailClosedResetBaselineState(); }
     void R32ReviewArmStereoRecoverySafety(std::uint64_t n) noexcept { ArmStereoRecoverySafety(n); }
 

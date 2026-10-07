@@ -3258,9 +3258,21 @@ namespace OutRunVRStereo
         return InternalStereoPass;
     }
 
+    bool R30SupportExchangeInternalStereoPass(bool active) noexcept
+    {
+        const bool previous = InternalStereoPass;
+        InternalStereoPass = active;
+        return previous;
+    }
+
     std::uint64_t R30SupportPresentEpoch() noexcept
     {
         return PresentEpoch;
+    }
+
+    bool R30SupportStereoWanted() noexcept
+    {
+        return StereoWanted();
     }
 
     bool R30SupportTargetIsBackBuffer() noexcept

@@ -26,7 +26,9 @@ namespace OutRunVRStereo
     bool R30SupportTelemetryEnabled() noexcept;
     bool R30SupportIsGameDevice(IDirect3DDevice9* device) noexcept;
     bool R30SupportInternalStereoPassActive() noexcept;
+    bool R30SupportExchangeInternalStereoPass(bool active) noexcept;
     std::uint64_t R30SupportPresentEpoch() noexcept;
+    bool R30SupportStereoWanted() noexcept;
     bool R30SupportTargetIsBackBuffer() noexcept;
     bool R30SupportAnyAuxRenderTargetActive() noexcept;
     bool R30SupportTryGetTrackedViewport(D3DVIEWPORT9& viewport) noexcept;

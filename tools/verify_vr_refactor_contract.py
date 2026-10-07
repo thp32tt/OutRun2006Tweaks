@@ -665,9 +665,9 @@ if "R31SupportResetFastPathState();" not in r32:
     errors.append("R32 reset path missing R31 support reset API")
 
 for banned, owner_api in (
-    ("R29Effect = {};", "InvalidateEffectStateCache();"),
-    ("R23LastStateSampleDrawSerial = 0;", "InvalidateLiveStateSample();"),
-    ("R23LastStateSampleEpoch = 0;", "InvalidateLiveStateSample();"),
+    ("R29Effect = {};", "R30SupportInvalidateEffectStateCache();"),
+    ("R23LastStateSampleDrawSerial = 0;", "R30SupportInvalidateLiveStateSample();"),
+    ("R23LastStateSampleEpoch = 0;", "R30SupportInvalidateLiveStateSample();"),
 ):
     if banned in r32:
         errors.append(
