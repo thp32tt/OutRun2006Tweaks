@@ -4,7 +4,7 @@
   "target_branch": "vr-d3d9ex-focus",
   "base_sha": "931f83cc9460d1bd6d188d255302da86f31733ae",
   "selected_seam": "R32_LOWER_RUNTIME_PREDICATE_CACHE_SUPPORT",
-  "status": "IMPLEMENTED_PENDING_VALIDATION",
+  "status": "VALIDATED",
   "summary": "R32 now consumes the explicit R30 support facade for telemetry enablement, game-device identity, internal stereo-pass ownership, Present epoch, stereo-wanted/backbuffer predicates, effect/live-state cache invalidation, and renderer-state invalidation. DirectGPU/surface/depth/shader lower-owner dependencies remain intentionally out of scope.",
   "removed_private_dependencies": [
     "Settings::VRTelemetry",
@@ -25,5 +25,12 @@
     "lower draw/reset/state-block owner calls"
   ],
   "runtime_validation": "UNTESTED",
-  "next_action": "After exact hosted validation, extract one remaining R32 lower-owner class (prefer DirectGPU transport or render/depth surface facade) before re-enabling OUTRUN_VR_REFACTOR_SPLIT_R31_R30."
+  "next_action": "Extract one remaining R32 lower-owner class (prefer DirectGPU transport or render/depth surface facade) before re-enabling OUTRUN_VR_REFACTOR_SPLIT_R31_R30.",
+  "validation_bearing_sha": "b40bb5a3851863de6267ff52acbb1187ce349544",
+  "validated_by_task": "CONVERSION-DX9EX-00516",
+  "validation": {
+    "dx9ex_active_run_id": 37608014439,
+    "domain_isolation_run_id": 37608014319,
+    "result": "PASS"
+  }
 }

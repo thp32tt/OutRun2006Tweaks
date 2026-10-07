@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00516",
+  "production_id": "CONVERSION-DX9EX-00516",
+  "event_id": "CONVERSION-DX9EX-00516-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "selected_work_item": "DX9EX-R84-GATE0-RESET-TRANSPORT-VERIFIER-ALIGNMENT",
+  "base_sha": "d81dd15da0b043a737629dfd0d00f931df0f5311",
+  "material_result_sha": "b40bb5a3851863de6267ff52acbb1187ce349544",
+  "validation_bearing_result_sha": "b40bb5a3851863de6267ff52acbb1187ce349544",
+  "result_sha": "b40bb5a3851863de6267ff52acbb1187ce349544",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00516]",
+  "summary": "Repaired the exact-SHA DX9Ex Gate 0 regression introduced when CONVERSION-DX9EX-00515 moved R32 telemetry/game-device ownership behind the R30 support facade. The reset/transport verifier now validates R30SupportTelemetryEnabled() and R30SupportIsGameDevice(device) while preserving the existing R32 EVENT hard-error quarantine and reset lifecycle ordering. Runtime source behavior was not changed.",
+  "changed_paths": [
+    "tools/verify_vr_dx9ex_reset_transport_contract.py"
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "validation_history": [
+    {
+      "sha": "5007f9625b00f13b465c00bb142a6443391579b3",
+      "dx9ex_active_run_id": 37607894215,
+      "domain_isolation_run_id": 37607894107,
+      "result": "FAIL",
+      "failure": "reset/transport verifier still expected pre-00515 IsGameDevice(device) in the R32 reset lifecycle helper"
+    },
+    {
+      "sha": "b40bb5a3851863de6267ff52acbb1187ce349544",
+      "dx9ex_active_run_id": 37608014439,
+      "domain_isolation_run_id": 37608014319,
+      "result": "PASS",
+      "jobs": {
+        "policy": 112748370856,
+        "game": 112748529739,
+        "full_chain_compile": 112748529821,
+        "host": 112748529827,
+        "package": 112750433484
+      }
+    }
+  ],
+  "package_artifact": {
+    "id": 11475801859,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-b40bb5a3851863de6267ff52acbb1187ce349544",
+    "digest": "sha256:4e0b00e39dbfbe431970969441511bae6039ddaeb8bab48d8884b2141c1476ad"
+  },
+  "predecessor_validation": {
+    "task_id": "CONVERSION-DX9EX-00515",
+    "seam": "R32_LOWER_RUNTIME_PREDICATE_CACHE_SUPPORT",
+    "status": "VALIDATED_BY_00516",
+    "validation_bearing_sha": "b40bb5a3851863de6267ff52acbb1187ce349544"
+  },
+  "next_action": "Continue R84 convergence with the next bounded R32 lower-owner dependency class; prefer DirectGPU transport or render/depth surface facade, then re-evaluate the R31/R30 separate-TU gate."
+}
