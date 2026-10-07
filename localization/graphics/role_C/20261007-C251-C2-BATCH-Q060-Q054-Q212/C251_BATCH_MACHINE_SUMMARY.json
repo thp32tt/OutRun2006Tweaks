@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C251",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "selection_priority": [
+    "q60 IGR-010/012 user regression",
+    "q54 fresh B229 high-risk PRE_INGAME rework",
+    "q212 IGR-001/002 user regressions"
+  ],
+  "assets": [
+    {
+      "index": 60,
+      "key": "A064FDFC",
+      "candidate_sha256": "2d3d7fd7b612cee048067813f150d323be30483042010786168a90fa983386b6",
+      "machine_qa": "PASS"
+    },
+    {
+      "index": 54,
+      "key": "FA7BBB13",
+      "candidate_sha256": "5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e",
+      "machine_qa": "PASS"
+    },
+    {
+      "index": 212,
+      "key": "BA0147DA",
+      "candidate_sha256": "61ae0c45568e023cc258379173f8d80f43cc5257f2d8facefbcf3c87759179e1",
+      "machine_qa": "PASS"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

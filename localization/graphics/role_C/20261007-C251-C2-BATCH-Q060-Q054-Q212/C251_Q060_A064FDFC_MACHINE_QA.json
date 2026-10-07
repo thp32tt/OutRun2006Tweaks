@@ -1,0 +1,200 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "C251",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 60,
+  "asset_key": "A064FDFC",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "candidate_sha256": "2d3d7fd7b612cee048067813f150d323be30483042010786168a90fa983386b6",
+  "prior_candidate_sha256": "a8ffc1f0b14c8c1e3ef5680ea1ae90db3354330404be8ca02e0e336d362331a8",
+  "prior_blob_commit": "c3b3ca49418f017a29340457f96c03ad55ff29b2",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "source_provenance": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "high_risk_reason": "IGR-010 Stage + IGR-012 OUTRUN MILES user in-game/JPG regression",
+  "machine_qa": {
+    "candidate_sha_exact": true,
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "header_128_exact_to_prior": true,
+    "changed_pixels_outside_declared_source_bboxes": 0,
+    "alpha_changed_outside_declared_source_bboxes": 0,
+    "bbox_size_positive_margin": "2/2 PASS",
+    "localized_bbox_pair_overlap": "0 by rectangle gate",
+    "per_region": [
+      {
+        "key": "outrun_miles_white",
+        "source_bbox": [
+          1090,
+          245,
+          1930,
+          385
+        ],
+        "localized_bbox": [
+          1096,
+          262,
+          1562,
+          347
+        ],
+        "source_size": [
+          840,
+          140
+        ],
+        "localized_size": [
+          466,
+          85
+        ],
+        "margins": [
+          6,
+          368,
+          17,
+          38
+        ],
+        "width_ratio": 0.5548,
+        "height_ratio": 0.6071
+      },
+      {
+        "key": "outrun_miles",
+        "source_bbox": [
+          2081,
+          250,
+          2860,
+          370
+        ],
+        "localized_bbox": [
+          2087,
+          268,
+          2508,
+          345
+        ],
+        "source_size": [
+          779,
+          120
+        ],
+        "localized_size": [
+          421,
+          77
+        ],
+        "margins": [
+          6,
+          352,
+          18,
+          25
+        ],
+        "width_ratio": 0.5404,
+        "height_ratio": 0.6417
+      }
+    ],
+    "raw_orientation": "mirror_y",
+    "b204_stage_source_bbox_pixel_exact_after_a139": true,
+    "combined_regions": [
+      {
+        "key": "stage",
+        "source_bbox": [
+          455,
+          245,
+          690,
+          350
+        ],
+        "localized_bbox": [
+          462,
+          265,
+          682,
+          330
+        ],
+        "source_size": [
+          235,
+          105
+        ],
+        "localized_size": [
+          220,
+          65
+        ],
+        "margins": [
+          7,
+          8,
+          20,
+          20
+        ],
+        "width_ratio": 0.9362,
+        "height_ratio": 0.619
+      },
+      {
+        "key": "outrun_miles_white",
+        "source_bbox": [
+          1090,
+          245,
+          1930,
+          385
+        ],
+        "localized_bbox": [
+          1096,
+          262,
+          1562,
+          347
+        ],
+        "source_size": [
+          840,
+          140
+        ],
+        "localized_size": [
+          466,
+          85
+        ],
+        "margins": [
+          6,
+          368,
+          17,
+          38
+        ],
+        "width_ratio": 0.5548,
+        "height_ratio": 0.6071
+      },
+      {
+        "key": "outrun_miles",
+        "source_bbox": [
+          2081,
+          250,
+          2860,
+          370
+        ],
+        "localized_bbox": [
+          2087,
+          268,
+          2508,
+          345
+        ],
+        "source_size": [
+          779,
+          120
+        ],
+        "localized_size": [
+          421,
+          77
+        ],
+        "margins": [
+          6,
+          352,
+          18,
+          25
+        ],
+        "width_ratio": 0.5404,
+        "height_ratio": 0.6417
+      }
+    ]
+  },
+  "visual_evidence": [
+    "C251_Q060_A064FDFC_READABLE.jpg",
+    "C251_Q060_A064FDFC_RAW.jpg",
+    "C251_Q060_A064FDFC_CONTACTS.jpg",
+    "C251_Q060_A064FDFC_COMBINED_CONTACTS.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER_VISUAL_AND_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

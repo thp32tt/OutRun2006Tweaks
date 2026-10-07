@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "C251",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 212,
+  "asset_key": "BA0147DA",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+  "candidate_sha256": "61ae0c45568e023cc258379173f8d80f43cc5257f2d8facefbcf3c87759179e1",
+  "prior_candidate_sha256": "f5838261bd2015ade657d51f45175f1ef1c0351252c6505dc5eaf985be54d5a1",
+  "prior_blob_commit": "6ee689dfeccaceed152b9aa3156f2c21c37f2689",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "source_provenance": "A88/B166 exact English source contact evidence; standalone source DDS at this SHA is not tracked",
+  "high_risk_reason": "IGR-001 C2C title + IGR-002 Heart Attack title user in-game regressions",
+  "machine_qa": {
+    "candidate_sha_exact": true,
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "header_128_exact_to_prior": true,
+    "a88_changed_pixels_outside_c2c_source_bbox": 0,
+    "a88_alpha_changed_outside_c2c_source_bbox": 0,
+    "b166_heart_attack_source_bbox_pixel_exact_after_a88": true,
+    "bbox_size_positive_margin": "2/2 PASS",
+    "combined_regions": [
+      {
+        "key": "heart_attack_title",
+        "source_bbox": [
+          21,
+          1316,
+          1780,
+          1474
+        ],
+        "localized_bbox": [
+          25,
+          1322,
+          618,
+          1468
+        ],
+        "source_size": [
+          1759,
+          158
+        ],
+        "localized_size": [
+          593,
+          146
+        ],
+        "margins": [
+          4,
+          1162,
+          6,
+          6
+        ],
+        "width_ratio": 0.3371,
+        "height_ratio": 0.9241
+      },
+      {
+        "key": "coast2coast_title",
+        "source_bbox": [
+          0,
+          964,
+          1760,
+          1124
+        ],
+        "localized_bbox": [
+          4,
+          982,
+          1033,
+          1105
+        ],
+        "source_size": [
+          1760,
+          160
+        ],
+        "localized_size": [
+          1029,
+          123
+        ],
+        "margins": [
+          4,
+          727,
+          18,
+          19
+        ],
+        "width_ratio": 0.5847,
+        "height_ratio": 0.7688
+      }
+    ],
+    "raw_orientation": "mirror_y"
+  },
+  "visual_evidence": [
+    "C251_Q212_BA0147DA_READABLE_LINEAGE.jpg",
+    "C251_Q212_BA0147DA_RAW_LINEAGE.jpg",
+    "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_BA_coast2coast_title_SOURCE_OLD_CLEAN_FINAL_2X.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_BA_heart_attack_title_SOURCE_OLD_CLEAN_FINAL_2X.jpg",
+    "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_BA_FULL_OLD_FINAL.jpg",
+    "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_BA_RAW_OLD_FINAL.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER_VISUAL_AND_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

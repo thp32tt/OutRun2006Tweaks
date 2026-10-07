@@ -1,0 +1,568 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "C251",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 54,
+  "asset_key": "FA7BBB13",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+  "candidate_sha256": "5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e",
+  "prior_candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
+  "prior_blob_commit": "2758310d90ae925186b4f3cf8127121230be78fa",
+  "source_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+  "source_provenance": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+  "high_risk_reason": "PRE_INGAME current-policy source-transform/slant + Slipstream scale false-negative",
+  "machine_qa": {
+    "candidate_sha_exact": true,
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "header_128_exact_to_prior": true,
+    "changed_pixels_outside_declared_source_bboxes": 0,
+    "alpha_changed_outside_declared_source_bboxes": 0,
+    "bbox_size_positive_margin": "17/17 PASS",
+    "localized_bbox_pair_overlap": "0 by rectangle gate",
+    "per_region": [
+      {
+        "key": "match_total",
+        "source_bbox": [
+          119,
+          35,
+          637,
+          123
+        ],
+        "localized_bbox": [
+          127,
+          38,
+          629,
+          120
+        ],
+        "source_size": [
+          518,
+          88
+        ],
+        "localized_size": [
+          502,
+          82
+        ],
+        "margins": [
+          8,
+          8,
+          3,
+          3
+        ],
+        "width_ratio": 0.9691,
+        "height_ratio": 0.9318
+      },
+      {
+        "key": "count_gifts",
+        "source_bbox": [
+          120,
+          110,
+          635,
+          208
+        ],
+        "localized_bbox": [
+          173,
+          122,
+          581,
+          198
+        ],
+        "source_size": [
+          515,
+          98
+        ],
+        "localized_size": [
+          408,
+          76
+        ],
+        "margins": [
+          53,
+          54,
+          12,
+          10
+        ],
+        "width_ratio": 0.7922,
+        "height_ratio": 0.7755
+      },
+      {
+        "key": "hit_boost",
+        "source_bbox": [
+          914,
+          35,
+          1363,
+          123
+        ],
+        "localized_bbox": [
+          918,
+          46,
+          1358,
+          112
+        ],
+        "source_size": [
+          449,
+          88
+        ],
+        "localized_size": [
+          440,
+          66
+        ],
+        "margins": [
+          4,
+          5,
+          11,
+          11
+        ],
+        "width_ratio": 0.98,
+        "height_ratio": 0.75
+      },
+      {
+        "key": "keep_control",
+        "source_bbox": [
+          915,
+          110,
+          1363,
+          210
+        ],
+        "localized_bbox": [
+          919,
+          127,
+          1359,
+          193
+        ],
+        "source_size": [
+          448,
+          100
+        ],
+        "localized_size": [
+          440,
+          66
+        ],
+        "margins": [
+          4,
+          4,
+          17,
+          17
+        ],
+        "width_ratio": 0.9821,
+        "height_ratio": 0.66
+      },
+      {
+        "key": "hold_line",
+        "source_bbox": [
+          1678,
+          35,
+          2181,
+          116
+        ],
+        "localized_bbox": [
+          1682,
+          40,
+          2176,
+          110
+        ],
+        "source_size": [
+          503,
+          81
+        ],
+        "localized_size": [
+          494,
+          70
+        ],
+        "margins": [
+          4,
+          5,
+          5,
+          6
+        ],
+        "width_ratio": 0.9821,
+        "height_ratio": 0.8642
+      },
+      {
+        "key": "honk_horn",
+        "source_bbox": [
+          1882,
+          110,
+          2470,
+          210
+        ],
+        "localized_bbox": [
+          1943,
+          122,
+          2409,
+          198
+        ],
+        "source_size": [
+          588,
+          100
+        ],
+        "localized_size": [
+          466,
+          76
+        ],
+        "margins": [
+          61,
+          61,
+          12,
+          12
+        ],
+        "width_ratio": 0.7925,
+        "height_ratio": 0.76
+      },
+      {
+        "key": "do_math",
+        "source_bbox": [
+          2683,
+          110,
+          3143,
+          205
+        ],
+        "localized_bbox": [
+          2730,
+          121,
+          3096,
+          203
+        ],
+        "source_size": [
+          460,
+          95
+        ],
+        "localized_size": [
+          366,
+          82
+        ],
+        "margins": [
+          47,
+          47,
+          11,
+          2
+        ],
+        "width_ratio": 0.7957,
+        "height_ratio": 0.8632
+      },
+      {
+        "key": "guess_sound",
+        "source_bbox": [
+          3398,
+          127,
+          3978,
+          205
+        ],
+        "localized_bbox": [
+          3423,
+          129,
+          3952,
+          203
+        ],
+        "source_size": [
+          580,
+          78
+        ],
+        "localized_size": [
+          529,
+          74
+        ],
+        "margins": [
+          25,
+          26,
+          2,
+          2
+        ],
+        "width_ratio": 0.9121,
+        "height_ratio": 0.9487
+      },
+      {
+        "key": "count_green",
+        "source_bbox": [
+          51,
+          230,
+          661,
+          307
+        ],
+        "localized_bbox": [
+          95,
+          232,
+          617,
+          305
+        ],
+        "source_size": [
+          610,
+          77
+        ],
+        "localized_size": [
+          522,
+          73
+        ],
+        "margins": [
+          44,
+          44,
+          2,
+          2
+        ],
+        "width_ratio": 0.8557,
+        "height_ratio": 0.9481
+      },
+      {
+        "key": "count_blue",
+        "source_bbox": [
+          803,
+          210,
+          1361,
+          302
+        ],
+        "localized_bbox": [
+          808,
+          217,
+          1356,
+          294
+        ],
+        "source_size": [
+          558,
+          92
+        ],
+        "localized_size": [
+          548,
+          77
+        ],
+        "margins": [
+          5,
+          5,
+          7,
+          8
+        ],
+        "width_ratio": 0.9821,
+        "height_ratio": 0.837
+      },
+      {
+        "key": "count_sheep",
+        "source_bbox": [
+          2745,
+          223,
+          3314,
+          316
+        ],
+        "localized_bbox": [
+          2825,
+          225,
+          3233,
+          314
+        ],
+        "source_size": [
+          569,
+          93
+        ],
+        "localized_size": [
+          408,
+          89
+        ],
+        "margins": [
+          80,
+          81,
+          2,
+          2
+        ],
+        "width_ratio": 0.717,
+        "height_ratio": 0.957
+      },
+      {
+        "key": "count_red",
+        "source_bbox": [
+          2802,
+          373,
+          3345,
+          450
+        ],
+        "localized_bbox": [
+          2814,
+          375,
+          3332,
+          448
+        ],
+        "source_size": [
+          543,
+          77
+        ],
+        "localized_size": [
+          518,
+          73
+        ],
+        "margins": [
+          12,
+          13,
+          2,
+          2
+        ],
+        "width_ratio": 0.954,
+        "height_ratio": 0.9481
+      },
+      {
+        "key": "memorize_sequence",
+        "source_bbox": [
+          0,
+          456,
+          786,
+          559
+        ],
+        "localized_bbox": [
+          96,
+          469,
+          689,
+          555
+        ],
+        "source_size": [
+          786,
+          103
+        ],
+        "localized_size": [
+          593,
+          86
+        ],
+        "margins": [
+          96,
+          97,
+          13,
+          4
+        ],
+        "width_ratio": 0.7545,
+        "height_ratio": 0.835
+      },
+      {
+        "key": "drive_above_speed",
+        "source_bbox": [
+          786,
+          456,
+          1562,
+          559
+        ],
+        "localized_bbox": [
+          790,
+          469,
+          1558,
+          555
+        ],
+        "source_size": [
+          776,
+          103
+        ],
+        "localized_size": [
+          768,
+          86
+        ],
+        "margins": [
+          4,
+          4,
+          13,
+          4
+        ],
+        "width_ratio": 0.9897,
+        "height_ratio": 0.835
+      },
+      {
+        "key": "spot_odd",
+        "source_bbox": [
+          1562,
+          456,
+          2324,
+          559
+        ],
+        "localized_bbox": [
+          1591,
+          467,
+          2294,
+          556
+        ],
+        "source_size": [
+          762,
+          103
+        ],
+        "localized_size": [
+          703,
+          89
+        ],
+        "margins": [
+          29,
+          30,
+          11,
+          3
+        ],
+        "width_ratio": 0.9226,
+        "height_ratio": 0.8641
+      },
+      {
+        "key": "slipstream_cars",
+        "source_bbox": [
+          2324,
+          456,
+          2924,
+          559
+        ],
+        "localized_bbox": [
+          2329,
+          458,
+          2919,
+          557
+        ],
+        "source_size": [
+          600,
+          103
+        ],
+        "localized_size": [
+          590,
+          99
+        ],
+        "margins": [
+          5,
+          5,
+          2,
+          2
+        ],
+        "width_ratio": 0.9833,
+        "height_ratio": 0.9612
+      },
+      {
+        "key": "run_green",
+        "source_bbox": [
+          2924,
+          470,
+          3648,
+          559
+        ],
+        "localized_bbox": [
+          2958,
+          472,
+          3613,
+          557
+        ],
+        "source_size": [
+          724,
+          89
+        ],
+        "localized_size": [
+          655,
+          85
+        ],
+        "margins": [
+          34,
+          35,
+          2,
+          2
+        ],
+        "width_ratio": 0.9047,
+        "height_ratio": 0.9551
+      }
+    ],
+    "raw_orientation": "mirror_y"
+  },
+  "visual_evidence": [
+    "C251_Q054_FA7BBB13_READABLE.jpg",
+    "C251_Q054_FA7BBB13_RAW.jpg",
+    "C251_Q054_FA7BBB13_CONTACTS.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER_VISUAL_AND_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
