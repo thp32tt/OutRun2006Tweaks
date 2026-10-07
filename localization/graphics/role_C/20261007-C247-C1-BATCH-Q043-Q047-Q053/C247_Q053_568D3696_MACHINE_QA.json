@@ -64,8 +64,27 @@
     ],
     "raw_and_flip_y_evidence": "WRITTEN"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER",
-  "C3_STRICT_AUDIT": "PENDING_CONTROLLER",
+  "controller_visual_qa": {
+    "status": "PASS",
+    "evidence": [
+      "localization/graphics/role_A/20261007-A-MANUALQA159-568D3696-FEED/A159_568D_R4_SOURCE_OLD_CLEAN_FINAL.jpg",
+      "localization/graphics/role_C/20261007-C247-C1-BATCH-Q043-Q047-Q053/C247_Q053_568D3696_FLIPY.jpg",
+      "localization/graphics/role_C/20261007-C247-C1-BATCH-Q043-Q047-Q053/C247_Q053_568D3696_RAW.jpg"
+    ],
+    "findings": [
+      "Feed the girl! hierarchy restored",
+      "yellow/navy/white source family retained",
+      "no clipping, residue, or protected-art intrusion"
+    ]
+  },
+  "C3_STRICT_AUDIT": {
+    "status": "C3_STRICT_PASS",
+    "exact_candidate_sha256": "7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33",
+    "visual_overrides_numeric": false,
+    "pre_ingame_export": "PENDING_REFRESH"
+  },
   "runtime_validation": "UNTESTED",
-  "forbidden_domains_touched": []
+  "forbidden_domains_touched": [],
+  "decision": "C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME",
+  "user_jpg_review": "PENDING"
 }
