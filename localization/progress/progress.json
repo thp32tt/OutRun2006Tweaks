@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T00:07:49+09:00",
+  "updated_at_kst": "2026-10-08 00:31",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -5439,5 +5439,29 @@
     "mandatory_c3": "REQUIRED_EXACT_SHA_DXT5_FAMILY_FALSE_NEGATIVE",
     "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
     "runtime_validation": "UNTESTED"
+  },
+  "b240_user_menu_typography_rework": {
+    "status": "RUNTIME_SOURCE_APPLIED_BUILD_PENDING",
+    "evidence": [
+      "스크린샷(159).png",
+      "스크린샷(160).png",
+      "스크린샷(161).png",
+      "스크린샷(162).png",
+      "스크린샷(164).png"
+    ],
+    "source_changes": {
+      "overlay_font": "prefer malgunsl.ttf before malgun.ttf",
+      "confirm_dialog": "runtime text ID 935 excludes compact HUD keyline"
+    },
+    "backlog": [
+      "IGR-020",
+      "IGR-021",
+      "IGR-022",
+      "IGR-023",
+      "IGR-024",
+      "IGR-025"
+    ],
+    "runtime_validation": "UNTESTED",
+    "next": "Win32 Release + Korean test build, then new in-game screenshot"
   }
 }
