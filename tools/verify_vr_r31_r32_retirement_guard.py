@@ -334,7 +334,7 @@ owner_evidence = {
     ),
     "R32ReviewObserveFrameWorkload": (
         r32, "void R32ObserveFrameWorkload(",
-        ("Settings::VRTelemetry", "R32FrameWorkloadCounters",
+        ("R30SupportTelemetryEnabled()", "R32FrameWorkloadCounters",
          "frame.primitives += primitiveCount",
          "TryGetEffectTelemetrySnapshot(effect)"),
     ),
