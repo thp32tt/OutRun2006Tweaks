@@ -58,7 +58,7 @@ if sha(cand_bytes)!=EXPECTED_CAND: raise SystemExit("candidate SHA mismatch")
 source,old,cand=map(decode,[source_bytes,old_bytes,cand_bytes])
 clean=Image.open(CLEAN).convert("RGBA")
 if not (source.size==old.size==cand.size==clean.size==(2048,1024)): raise SystemExit("dimension mismatch")
-S,O,F,K=map(A,[source,old,cand,clean])
+S,O,F,K0=map(A,[source,old,cand,clean])
 c156=json.loads(C156_REPORT.read_text(encoding="utf-8"))
 rows=c156["rows"]
 H,W=1024,2048
@@ -68,6 +68,33 @@ def readable_to_raw(box):
 def raw_to_readable(box):
     x0,y0,x1,y1=box
     return [x0,H-y1,x1,H-y0]
+def clean_orientation_score(Kcand):
+    d=(O[:,:,3]!=Kcand[:,:,3])
+    score=0
+    detail={}
+    for r in rows:
+        sb_raw=readable_to_raw(list(r["original_bbox"]))
+        ob_raw=local_bbox(d,sb_raw)
+        if ob_raw is None:
+            score += 1000000
+            detail[r["key"]]=None
+            continue
+        ob=raw_to_readable(ob_raw)
+        exp=list(r["localized_bbox"])
+        delta=sum(abs(a-b) for a,b in zip(ob,exp))
+        score += delta
+        detail[r["key"]]={"derived":ob,"expected":exp,"delta":delta}
+    return score,detail
+score_raw,detail_raw=clean_orientation_score(K0)
+Kflip=np.flipud(K0)
+score_flip,detail_flip=clean_orientation_score(Kflip)
+if score_raw<=score_flip:
+    K=K0; clean_storage_orientation="RAW"; clean_alignment_score=score_raw; clean_alignment_detail=detail_raw
+else:
+    K=Kflip; clean_storage_orientation="READABLE_FLIPY_CONVERTED_TO_RAW"; clean_alignment_score=score_flip; clean_alignment_detail=detail_flip
+if clean_alignment_score>24:
+    print(json.dumps({"clean_orientation_scores":{"raw":score_raw,"flip":score_flip},"chosen":clean_storage_orientation,"detail":clean_alignment_detail},ensure_ascii=False,indent=2))
+    raise SystemExit("C234 clean plate orientation/alignment ambiguous")
 
 # Fresh decoded persisted-pixel bboxes against prior independent C clean plate.
 # C156 report bboxes are readable/FLIP-Y coordinates; DDS/clean pixels below remain RAW.
@@ -154,7 +181,7 @@ report={
  "source_sha256":sha(source_bytes),"prior_candidate_sha256":sha(old_bytes),"candidate_sha256":sha(cand_bytes),
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6","url":SOURCE_URL},
  "independent_basis":"Pinned canonical source re-downloaded; persisted candidate decoded independently. Exact readable source bboxes and verified clean geometry come from prior independent C156 evidence tied to the same canonical source SHA, with explicit readable-to-RAW coordinate conversion. B165 producer bbox/mask data are not consumed for containment. Blast radius is measured against the exact pre-B165 candidate recovered from Git history; zero change outside the two title/subtitle source bboxes protects the four option rows, AT/MT and all unrelated pixels.",
- "structure":{"dimensions":[2048,1024],"format":"RGBA32/BGRA","mips":mips,"header_128_exact":header_exact,"raw_orientation":"mirror_y"},
+ "structure":{"dimensions":[2048,1024],"format":"RGBA32/BGRA","mips":mips,"header_128_exact":header_exact,"raw_orientation":"mirror_y","clean_storage_orientation":clean_storage_orientation,"clean_alignment_score_vs_C156":clean_alignment_score},
  "rows":records,
  "summary":{
    "bbox_size_positive_margin":f"{sum(1 for r in records if r['containment']=='PASS' and r['size_ceiling']=='PASS' and r['positive_margin']=='PASS')}/{len(records)} PASS",
@@ -190,6 +217,6 @@ pathlib.Path("localization/graphics/worker_results/C234_30CF0D.json").write_text
  "candidate_sha256":report["candidate_sha256"],"c3_required":True,
  "report":str(ROOT/"C234_30CF0D_MACHINE_QA.json"),"runtime_validation":"PENDING_NEW_INGAME_RETEST"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print(json.dumps({"run":RUN,"machine_status":report["machine_status"],"summary":report["summary"]},ensure_ascii=False,indent=2))
+print(json.dumps({"run":RUN,"machine_status":report["machine_status"],"clean_storage_orientation":clean_storage_orientation,"clean_alignment_score":clean_alignment_score,"rows":records,"summary":report["summary"]},ensure_ascii=False,indent=2))
 if not machine_pass:
     raise SystemExit("C234 machine QA failed closed")
