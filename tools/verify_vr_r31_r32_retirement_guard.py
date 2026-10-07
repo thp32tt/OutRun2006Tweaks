@@ -363,7 +363,7 @@ owner_evidence = {
     ),
     "R32ReviewResolveDirectTransport": (
         r32, "bool R32ResolveDirectTransport(",
-        ("R13OverlayReadyForTransport()",
+        ("R30SupportOverlayReadyForTransport()",
          "return lowerResolve();",
          "R32EnsureDirectResources(device)",
          "R13TryGetGpuCompletionSnapshot(ackSnapshot)",
@@ -626,7 +626,7 @@ resolve32 = function_body(r32, "bool R32ResolveDirectTransport(")
 require(
     resolve32,
     "R32 DirectGPU owner helper",
-    "R13OverlayReadyForTransport()",
+    "R30SupportOverlayReadyForTransport()",
     "return lowerResolve();",
     "R32EnsureDirectResources(device)",
     "R13TryGetGpuCompletionSnapshot(ackSnapshot)",
