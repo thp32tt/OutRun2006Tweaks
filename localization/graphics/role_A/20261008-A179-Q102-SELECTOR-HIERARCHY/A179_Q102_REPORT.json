@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261008-A179-Q102-SELECTOR-HIERARCHY",
+  "queue_index": 102,
+  "asset": "571E78F3",
+  "work_stolen_from_lane": "B",
+  "selection_reason": "A ODD shard had no material RENDER_READY/C-returned item; q212 changed by B in current cycle, so older unchanged q102 C260 REWORK was stolen after live refresh.",
+  "trigger": "C260_REWORK_REQUIRED_TEXT_SCALE_HIERARCHY",
+  "source_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+  "prior_candidate_sha256": "442babea9c5dea9a944dff3d4a6a577f007dad2ae63a9699d380baf0ce7fc05d",
+  "candidate_sha256": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db",
+  "preserved": {
+    "time_attack_mode": "PIXEL_EXACT_TO_B212",
+    "time_attack_readable_diff_pixels": 0
+  },
+  "reworked": {
+    "key": "continuous_15",
+    "source": "15 Continuous Course",
+    "korean": "15코스 연속",
+    "source_bbox": [
+      520,
+      132,
+      1590,
+      245
+    ],
+    "prior_localized_bbox": [
+      830,
+      132,
+      1280,
+      244
+    ],
+    "localized_bbox": [
+      650,
+      140,
+      1459,
+      244
+    ],
+    "source_size": [
+      1070,
+      113
+    ],
+    "localized_size": [
+      809,
+      104
+    ],
+    "margins": [
+      130,
+      131,
+      8,
+      1
+    ],
+    "width_ratio": 0.7561,
+    "prior_width_ratio": 0.4206,
+    "font": "Noto Sans CJK KR:style=Bold",
+    "font_source": "native vector font; no previous Korean bitmap reuse/upscale",
+    "readable_right_lean": 0.14,
+    "effect_family": {
+      "fill_rgb": [
+        236,
+        128,
+        2
+      ],
+      "inner_outline_rgb": [
+        0,
+        9,
+        38
+      ],
+      "keyline_rgb": [
+        255,
+        255,
+        255
+      ],
+      "outer_outline_rgb": [
+        0,
+        9,
+        38
+      ]
+    },
+    "construction": "fresh native Hangul render, source-derived orange/navy/white effect family, readable-right lean, source-relative horizontal hierarchy expansion, centered inside exact source bbox with positive vertical/horizontal margins"
+  },
+  "machine_qa": {
+    "containment": "PASS",
+    "size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "changed_pixels_outside_continuous_source_bbox": 0,
+    "alpha_changed_pixels_outside_continuous_source_bbox": 0,
+    "changed_bc3_blocks": 4534,
+    "changed_bc3_blocks_outside_patch": 0,
+    "header_128_exact": true,
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_english_removal_plate_restoration": "PASS_REUSE_C91_VERIFIED_CLEAN_PLATE_ONLY_FOR_PRIOR_KOREAN_FOOTPRINT",
+    "2_source_matching_slant": "PASS_READABLE_RIGHT_LEAN_0.14",
+    "3_no_undersized_lettering": "PASS_WIDTH_RATIO_MATERIALLY_RAISED_FROM_0.421_TO_0.756",
+    "4_source_faithful_weight_effect": "PASS_SOURCE_DERIVED_ORANGE_NAVY_WHITE_LAYER_FAMILY",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGIN",
+    "6_protected_art_clearance": "PASS_ZERO_OUTSIDE_SOURCE_BBOX_AND_TIME_ROW_EXACT",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER_CONFIRM",
+    "8_immediate_readability": "EVIDENCE_WRITTEN_PENDING_CONTROLLER_CONFIRM"
+  },
+  "execution_backend": "GitHub Actions fallback after ChatGPT local environment lacked nvcompress and package installation timed out; repository-backed BC3 encode required.",
+  "controller_visual_qa": "PENDING_CHATGPT_CONTROLLER",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3": "REQUIRED_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "status": "A179_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "forbidden_domains_touched": []
+}

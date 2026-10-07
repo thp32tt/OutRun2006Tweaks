@@ -1,0 +1,10 @@
+{
+  "role": "A",
+  "run": "20261008-A179-Q102-SELECTOR-HIERARCHY",
+  "queue_index": 102,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+  "candidate_sha256": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db",
+  "report": "localization/graphics/role_A/20261008-A179-Q102-SELECTOR-HIERARCHY/A179_Q102_REPORT.json",
+  "status": "A179_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED"
+}
