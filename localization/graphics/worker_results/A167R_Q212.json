@@ -1,0 +1,8 @@
+{
+  "run": "20261007-A167R-Q212-WORD-GROUP-TITLE",
+  "queue_index": 212,
+  "asset": "BA0147DA",
+  "candidate_sha256": "08431d269a613083c7047c9a7e8ff5c5391392f4f7ae2306056e926741e99561",
+  "status": "A167R_MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
+  "runtime_validation": "UNTESTED"
+}

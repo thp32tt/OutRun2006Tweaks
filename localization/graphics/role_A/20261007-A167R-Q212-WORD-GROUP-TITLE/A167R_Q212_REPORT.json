@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261007-A167R-Q212-WORD-GROUP-TITLE",
+  "queue_index": 212,
+  "asset": "BA0147DA",
+  "work_stolen_from_lane": "B",
+  "controller_rejected_sha256": "4c772b9329768ad920a5a09b79136dc2da9fde4a5b6c9486bde6952e452eebd8",
+  "candidate_sha256": "08431d269a613083c7047c9a7e8ff5c5391392f4f7ae2306056e926741e99561",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "rows": [
+    {
+      "key": "coast2coast_title",
+      "text": "코스트 2 코스트",
+      "source_bbox": [
+        0,
+        964,
+        1760,
+        1124
+      ],
+      "localized_bbox": [
+        5,
+        971,
+        1099,
+        1117
+      ],
+      "source_size": [
+        1760,
+        160
+      ],
+      "localized_size": [
+        1094,
+        146
+      ],
+      "width_ratio": 0.6216,
+      "height_ratio": 0.9125,
+      "font": "Noto Sans CJK KR:style=Black",
+      "construction": "whole-word groups; no per-syllable tracking; horizontal glyph condense 0.76; source-like inter-word gap",
+      "word_gap_px": 118
+    },
+    {
+      "key": "heart_attack_title",
+      "text": "하트 어택",
+      "source_bbox": [
+        21,
+        1316,
+        1780,
+        1474
+      ],
+      "localized_bbox": [
+        26,
+        1322,
+        544,
+        1468
+      ],
+      "source_size": [
+        1759,
+        158
+      ],
+      "localized_size": [
+        518,
+        146
+      ],
+      "width_ratio": 0.2945,
+      "height_ratio": 0.9241,
+      "font": "Noto Sans CJK KR:style=Black",
+      "construction": "whole-word groups; no per-syllable tracking; horizontal glyph condense 0.76; source-like inter-word gap",
+      "word_gap_px": 108
+    }
+  ],
+  "machine_qa": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "header_128_exact": true,
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "retry_reason": "A167 first pass rejected by controller visual QA: excessive inter-syllable tracking broke source title word grouping. A167R rerenders whole Korean word groups with condensed thick red glyphs and word-only spacing.",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "status": "A167R_MACHINE_PASS_PENDING_CONTROLLER_VISUAL"
+}
