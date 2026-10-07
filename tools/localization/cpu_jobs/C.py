@@ -39,10 +39,16 @@ def load_dds(path):
     h=struct.unpack_from("<I",data,12)[0]; w=struct.unpack_from("<I",data,16)[0]
     bpp=struct.unpack_from("<I",data,88)[0]
     masks=struct.unpack_from("<IIII",data,92)
-    if bpp!=32 or masks!=(0x00ff0000,0x0000ff00,0x000000ff,0xff000000):
-        raise RuntimeError("unexpected RGBA32 layout "+repr((bpp,masks)))
+    if bpp!=32:
+        raise RuntimeError("unexpected bpp "+repr(bpp))
     px=np.frombuffer(data,dtype=np.uint8,offset=128,count=w*h*4).reshape(h,w,4)
-    return px[:,:,[2,1,0,3]].copy(), data[:128]
+    if masks==(0x00ff0000,0x0000ff00,0x000000ff,0xff000000):
+        rgba=px[:,:,[2,1,0,3]].copy()
+    elif masks==(0x000000ff,0x0000ff00,0x00ff0000,0xff000000):
+        rgba=px.copy()
+    else:
+        raise RuntimeError("unexpected RGBA32 masks "+repr(masks))
+    return rgba, data[:128]
 
 def read_mask(path):
     a=np.array(Image.open(path).convert("RGBA"))
