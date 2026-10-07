@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261007-B239-Q052-A8CE339F-START-FAMILY",
+  "queue_index": 52,
+  "asset": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+  "trigger": "CURRENT_POLICY_UI_FAMILY_STYLE_PROFILE_FALSE_NEGATIVE_DUPLICATE_START_SCALE_MISMATCH",
+  "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+  "prior_candidate_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
+  "candidate_sha256": "c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e",
+  "prior_family": {
+    "start_left": {
+      "bbox": [
+        46,
+        310,
+        106,
+        346
+      ],
+      "size": [
+        60,
+        36
+      ],
+      "font_size": 30
+    },
+    "start_right": {
+      "bbox": [
+        829,
+        314,
+        882,
+        345
+      ],
+      "size": [
+        53,
+        31
+      ],
+      "font_size": 27
+    }
+  },
+  "repair": {
+    "scope": "right Start only",
+    "korean": "출발",
+    "final_left_bbox": [
+      46,
+      310,
+      106,
+      346
+    ],
+    "final_right_bbox": [
+      826,
+      312,
+      886,
+      348
+    ],
+    "final_duplicate_sizes": {
+      "left": [
+        60,
+        36
+      ],
+      "right": [
+        60,
+        36
+      ]
+    },
+    "right_margins": [
+      25,
+      22,
+      3,
+      2
+    ],
+    "style": {
+      "font": "Noto Sans CJK KR Bold",
+      "ttc_index": 1,
+      "font_size": 30,
+      "fill": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outer": [
+        0,
+        10,
+        65,
+        255
+      ],
+      "stroke": 3,
+      "slant": 0.0
+    }
+  },
+  "machine_qa": {
+    "duplicate_start_size_delta": [
+      0,
+      0
+    ],
+    "changed_pixels_outside_right_start_bbox": 0,
+    "alpha_changed_outside_right_start_bbox": 0,
+    "changed_bc3_blocks": 137,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "extra_time_goal_left_goal_right_left_start_pixel_exact": true,
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_B176_VALIDATED_CLEAN_PLATE_LINEAGE",
+    "2_source_matching_slant": "PASS_UPRIGHT",
+    "3_no_undersized_lettering": "PASS_RIGHT_START_RESTORED_TO_LEFT_START_60x36_FAMILY",
+    "4_source_faithful_weight_effect": "PASS_WHITE_NAVY_3PX_MATCH",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGIN",
+    "6_protected_art_clearance": "PASS_ZERO_DRIFT_OUTSIDE_RIGHT_START_BBOX",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER_CONFIRM",
+    "8_immediate_readability": "EVIDENCE_WRITTEN_PENDING_CONTROLLER_CONFIRM"
+  },
+  "execution_backend": "EXACT_CONTROLLER_VALIDATED_B239_BC3_PATCH_REPLAY_ON_GITHUB_HOSTED_WORKER",
+  "controller_visual_qa": "PENDING_CHATGPT_CONTROLLER",
+  "status": "B239_WORKER_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA_AND_FRESH_C",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
