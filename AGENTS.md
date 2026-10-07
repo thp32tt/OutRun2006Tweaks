@@ -1,3 +1,14 @@
+# P0 visual-composition convergence override — 2026-10-07
+
+This is the newest DX9Ex execution authority and overrides the R84 structural-convergence priority below when they conflict.
+
+- P0 is visual composition before any new HMD candidate. DX9Ex 00519 (9a3e08cc62b6a36a8196936eacead8cc08fcc756) is a user-runtime FAIL: menu/car-selection textures disappeared; HUD/rank/rival/+TIME/menu arrows/YES-NO/lens flare were doubled or head-following; 90 Hz pacing was not met.
+- Do not package or request another routine Quest 3/VDXR test until tools/verify_vr_visual_composition_p0.py and canonical DX9Ex static/build gates pass on the exact candidate SHA.
+- Mandatory evidence order: original emoose/OutRun2006Tweaks hooks -> fork R65-R74/R73-era history -> pinned canonical EXE disassembly/XREF/byte contracts -> current producer/queue/draw ownership -> deterministic static verifier -> HMD last.
+- P0 covers menu/car-selection textures, rank/position/6th/6/+TIME/checkpoint/goal/result HUD, menu arrows/YES-NO, vehicle rank/rival markers including 4th/5th, F11 gameplay overlay, lens flare/SceneEffect, visual shadows, and recenter-visible HUD placement while preserving world stereo.
+- R84 structural convergence, Architecture v3, general performance tuning, DX11/DXVK, and routine HMD packaging are frozen behind this P0 gate.
+- Generic ScreenOverlay2D, automation PASS, or AUTO_ANALYSIS status=OK are not visual acceptance. Future candidates stay RUNTIME_VALIDATION=UNTESTED until exact-build user HMD evidence.
+
 # OutRun2 VR Development Execution Contract
 
 ## DX9Ex R84 production-convergence override — 2026-10-07
