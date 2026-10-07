@@ -225,6 +225,16 @@ R275_SEMANTIC_RECEIPT_RE = re.compile(
     r"exact=(?P<exact>[01]) objectReady=(?P<objectReady>[01]) "
     r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
 )
+R293_PRODUCTION_PREREQUISITE_RE = re.compile(
+    r"VR DX11 R293 productionPrerequisiteCensus signature#(?P<signature>\d+): "
+    r"sourceReceipt=(?P<sourceReceipt>[01]) "
+    r"resourceReceipt=(?P<resourceReceipt>[01]) "
+    r"r292Exact=(?P<r292Exact>[01]) "
+    r"staticSatisfied=(?P<staticSatisfied>[01]) "
+    r"boundaryPreserved=(?P<boundaryPreserved>[01]) "
+    r"missingReceiptMask=0x(?P<missingReceiptMask>[0-9A-Fa-f]+) "
+    r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
+)
 DECL_RE = re.compile(
     r"VR DX11 R72 decl signature#(?P<signature>\d+) elem#(?P<element>\d+): "
     r"stream=(?P<stream>\d+) offset=(?P<offset>\d+) type=(?P<type>\d+) "
@@ -505,6 +515,8 @@ def summarize_programmable_shader_inventory(
     identity_blocking: list[dict] = []
     semantic_plan_missing: list[dict] = []
     semantic_receipt_missing: list[dict] = []
+    production_activation_prerequisite_missing: list[dict] = []
+    production_activation_prerequisite_correlation_inexact: list[dict] = []
     semantic_plan_inexact: list[dict] = []
     object_prerequisite_missing: list[dict] = []
     object_prerequisite_inexact: list[dict] = []
@@ -524,6 +536,9 @@ def summarize_programmable_shader_inventory(
     target_materialization_contract_exact_signatures = 0
     target_bytecode_materialization_exact_signatures = 0
     semantic_receipt_exact_signatures = 0
+    production_activation_prerequisite_evidence_signatures = 0
+    production_activation_prerequisite_exact_signatures = 0
+    production_activation_prerequisite_fail_closed_signatures = 0
     records_with_identity = 0
     programmable_signatures = 0
 
@@ -588,6 +603,9 @@ def summarize_programmable_shader_inventory(
             "target_bytecode_materialization"
         )
         receipt = signature.get("translated_semantic_receipt")
+        production_activation_prerequisite = signature.get(
+            "production_activation_prerequisite"
+        )
         missing_prerequisite = None
         if plan is None:
             semantic_plan_missing.append(ref)
@@ -727,6 +745,17 @@ def summarize_programmable_shader_inventory(
             elif missing_prerequisite is None:
                 missing_prerequisite = "R275_TRANSLATED_SEMANTIC_RECEIPT_EXACTNESS"
 
+        if production_activation_prerequisite is None:
+            production_activation_prerequisite_missing.append(ref)
+        else:
+            production_activation_prerequisite_evidence_signatures += 1
+            if not production_activation_prerequisite["summary_correlation_exact"]:
+                production_activation_prerequisite_correlation_inexact.append(ref)
+            if production_activation_prerequisite["r292_exact"]:
+                production_activation_prerequisite_exact_signatures += 1
+            if production_activation_prerequisite["fail_closed"]:
+                production_activation_prerequisite_fail_closed_signatures += 1
+
         pair["SignatureRefs"].append(ref)
         pair.setdefault("SemanticTranslationEvidence", []).append(
             {
@@ -738,6 +767,8 @@ def summarize_programmable_shader_inventory(
                 "TargetMaterializationContract": target_materialization_contract,
                 "TargetBytecodeMaterialization": target_bytecode_materialization,
                 "Receipt": receipt,
+                "ProductionActivationPrerequisite":
+                    production_activation_prerequisite,
                 "MissingPrerequisite": missing_prerequisite,
                 "DiagnosticOnly": True,
                 "ActivationProof": False,
@@ -761,6 +792,12 @@ def summarize_programmable_shader_inventory(
         and not target_materialization_contract_missing
         and not target_bytecode_materialization_missing
         and not semantic_receipt_missing
+    )
+    production_activation_evidence_coverage_complete = bool(
+        evidence_coverage_complete
+        and programmable_signatures > 0
+        and not production_activation_prerequisite_missing
+        and not production_activation_prerequisite_correlation_inexact
     )
     return {
         "CurrentSignatureRecords": len(signatures),
@@ -792,6 +829,10 @@ def summarize_programmable_shader_inventory(
         "TargetBytecodeMaterializationInexactSignatures":
             target_bytecode_materialization_inexact,
         "SemanticReceiptEvidenceMissingSignatures": semantic_receipt_missing,
+        "ProductionActivationPrerequisiteEvidenceMissingSignatures":
+            production_activation_prerequisite_missing,
+        "ProductionActivationPrerequisiteCorrelationInexactSignatures":
+            production_activation_prerequisite_correlation_inexact,
         "R242ObjectOwnershipMissingSignatures": r242_object_ownership_missing,
         "SemanticPlanExactSignatures": semantic_plan_exact_signatures,
         "ObjectOwnershipPrerequisiteExactSignatures":
@@ -805,6 +846,14 @@ def summarize_programmable_shader_inventory(
         "TargetBytecodeMaterializationExactSignatures":
             target_bytecode_materialization_exact_signatures,
         "SemanticReceiptExactSignatures": semantic_receipt_exact_signatures,
+        "ProductionActivationPrerequisiteEvidenceSignatures":
+            production_activation_prerequisite_evidence_signatures,
+        "ProductionActivationPrerequisiteExactSignatures":
+            production_activation_prerequisite_exact_signatures,
+        "ProductionActivationPrerequisiteFailClosedSignatures":
+            production_activation_prerequisite_fail_closed_signatures,
+        "ProductionActivationEvidenceCoverageComplete":
+            production_activation_evidence_coverage_complete,
         "SemanticEvidenceCoverageComplete": semantic_evidence_coverage_complete,
         "EvidenceLimitedBySignatureDetailCap": detail_cap_saturated,
         "EvidenceCoverageComplete": evidence_coverage_complete,
@@ -842,6 +891,7 @@ def main() -> int:
     target_materialization_contracts: dict[SignatureKey, dict] = {}
     target_bytecode_materializations: dict[SignatureKey, dict] = {}
     translated_semantic_receipts: dict[SignatureKey, dict] = {}
+    production_activation_prerequisites: dict[SignatureKey, dict] = {}
     declarations: dict[SignatureKey, list[dict]] = {}
     fixed_function: dict[SignatureKey, list[dict]] = {}
     fixed_function_texture_factors: dict[SignatureKey, dict] = {}
@@ -875,6 +925,7 @@ def main() -> int:
             and "VR DX11 R194" not in text
             and "VR DX11 R197" not in text
             and "VR DX11 R223" not in text
+            and "VR DX11 R293" not in text
         ):
             continue
         source_logs.append(log_path.name)
@@ -1139,6 +1190,89 @@ def main() -> int:
                 }
                 continue
 
+            match = R293_PRODUCTION_PREREQUISITE_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                signature_key = (source_log, startup_epoch, signature_id)
+                source_receipt = bool(int(data["sourceReceipt"]))
+                resource_receipt = bool(int(data["resourceReceipt"]))
+                r292_exact = bool(int(data["r292Exact"]))
+                static_satisfied = bool(int(data["staticSatisfied"]))
+                boundary_preserved = bool(int(data["boundaryPreserved"]))
+                missing_receipt_mask = int(data["missingReceiptMask"], 16)
+                snapshot = int(data["snapshot"], 16)
+                expected_missing_receipt_mask = (
+                    (0 if source_receipt else 0x1)
+                    | (0 if resource_receipt else 0x2)
+                )
+                receipt_mask_matches = (
+                    missing_receipt_mask == expected_missing_receipt_mask
+                )
+                exact_state_correlated = (
+                    not r292_exact
+                    or (
+                        source_receipt
+                        and resource_receipt
+                        and missing_receipt_mask == 0
+                        and static_satisfied
+                        and boundary_preserved
+                        and snapshot != 0
+                    )
+                )
+                static_state_correlated = (
+                    not static_satisfied
+                    or (r292_exact and missing_receipt_mask == 0)
+                )
+                snapshot_state_correlated = snapshot == 0 or r292_exact
+                missing_state_fail_closed = (
+                    missing_receipt_mask == 0
+                    or (
+                        not r292_exact
+                        and not static_satisfied
+                        and snapshot == 0
+                    )
+                )
+                boundary_state_correlated = (
+                    not boundary_preserved
+                    or missing_receipt_mask != 0
+                    or (r292_exact and static_satisfied)
+                )
+                summary_correlation_exact = bool(
+                    receipt_mask_matches
+                    and exact_state_correlated
+                    and static_state_correlated
+                    and snapshot_state_correlated
+                    and missing_state_fail_closed
+                    and boundary_state_correlated
+                )
+                production_activation_prerequisites[signature_key] = {
+                    "source_receipt_present": source_receipt,
+                    "resource_receipt_present": resource_receipt,
+                    "r292_exact": r292_exact,
+                    "static_prerequisites_satisfied": static_satisfied,
+                    "boundary_preserved": boundary_preserved,
+                    "missing_receipt_mask": missing_receipt_mask,
+                    "missing_receipt_mask_hex":
+                        f"0x{missing_receipt_mask:08X}",
+                    "expected_missing_receipt_mask":
+                        expected_missing_receipt_mask,
+                    "expected_missing_receipt_mask_hex":
+                        f"0x{expected_missing_receipt_mask:08X}",
+                    "receipt_mask_matches": receipt_mask_matches,
+                    "summary_correlation_exact": summary_correlation_exact,
+                    "fail_closed": bool(
+                        not r292_exact
+                        and not static_satisfied
+                        and snapshot == 0
+                    ),
+                    "snapshot": snapshot,
+                    "snapshot_hex": f"0x{snapshot:016X}",
+                    "diagnostic_only": True,
+                    "activation_proof": False,
+                }
+                continue
+
             match = SIGNATURE_RE.search(line)
             if match:
                 signature_id = int(match.group("id"))
@@ -1291,6 +1425,9 @@ def main() -> int:
         )
         signature["translated_semantic_receipt"] = (
             translated_semantic_receipts.get(signature_key)
+        )
+        signature["production_activation_prerequisite"] = (
+            production_activation_prerequisites.get(signature_key)
         )
         signature["declaration"] = sorted(
             declarations.get(signature_key, []), key=lambda item: item["element"]

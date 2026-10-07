@@ -11591,6 +11591,37 @@ def main() -> None:
             )
         )
 
+    r306_programmable_production_prerequisite_analyzer_bridge = [
+        ("VR DX11 R293 productionPrerequisiteCensus",
+         RUNTIME_CENSUS, "R306 consumes the existing R293 production census record"),
+        ("R293_PRODUCTION_PREREQUISITE_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R306 parses R293 production prerequisite evidence"),
+        ('"summary_correlation_exact": summary_correlation_exact',
+         DX11_CENSUS_ANALYZER, "R306 correlates receipt mask, exactness and snapshot state"),
+        ('"ProductionActivationPrerequisite":',
+         DX11_CENSUS_ANALYZER, "R306 attaches R293 evidence to the exact signature"),
+        ('"ProductionActivationEvidenceCoverageComplete":',
+         DX11_CENSUS_ANALYZER, "R306 exports independent diagnostic evidence coverage"),
+        ("r306_production_prerequisite = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R306 fail-closed R293 analyzer regression"),
+        ("r306_inconsistent_prerequisite = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R306 inconsistent receipt-mask regression"),
+        ('r306_evidence["activation_proof"] is False',
+         DX11_CENSUS_ANALYZER_TEST, "R306 never promotes analyzer evidence to activation"),
+    ]
+    missing_r306_programmable_production_prerequisite_analyzer_bridge = [
+        meaning for token, source, meaning
+        in r306_programmable_production_prerequisite_analyzer_bridge
+        if token not in source
+    ]
+    if missing_r306_programmable_production_prerequisite_analyzer_bridge:
+        raise SystemExit(
+            "DX11 R306 programmable production prerequisite analyzer drift: "
+            + ", ".join(
+                missing_r306_programmable_production_prerequisite_analyzer_bridge
+            )
+        )
+
     r294_programmable_production_draw_identity = [
         ("enum class SourceDrawKind", RUNTIME_CENSUS_HPP,
          "R294 explicit source draw-kind identity"),

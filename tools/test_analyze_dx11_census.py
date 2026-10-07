@@ -2048,6 +2048,86 @@ def main() -> int:
     assert r278_pair_evidence["ActivationProof"] is False
     assert r278_programmable_semantic["NativeDrawPathActivationAllowed"] is False
 
+    r306_signature_tail = (
+        "VR DX11 R85 signature#1: primitive=4 fixedFn=0 fvf=0x00000000 "
+        "decl=0 declHash=0x0000000000000000 declElems=0 "
+        "inputLayout[exact=0,elements=0,fvfExact=0,fvfPending=0] "
+        "shader[introspection=1,mixed=0,exact=0,vsPresent=1,vsBytes=16,"
+        "vsVersion=0xFFFE0300,vsHash=0xAAAAAAAAAAAAAAAA,psPresent=1,"
+        "psBytes=16,psVersion=0xFFFF0300,psHash=0xBBBBBBBBBBBBBBBB] "
+        "ffpCoverage[exact=0]\n"
+        "VR DX11 R120 census: samples=1 exact=0 fixedFn=0 programmable=1 "
+        "topologyUnsupported=0 signatures=1 declSamples=0 indexedSamples=0 "
+        "texturedSamples=0 "
+        "resourceExact[indexUnsupported=0,textureUnsupported=0,"
+        "colorUnsupported=0,depthUnsupported=0] "
+        "shaderReadiness[introspectionFailure=0,mixedPair=0,translationExact=0,"
+        "fixedFunctionPending=0,programmablePending=1] "
+        "programmableSemantic[planExact=0,planPending=1,receiptExact=0,"
+        "receiptPending=1] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,stencil=0,"
+        "fog=0,lighting=0,srgb=0,fill=0,blend=0,depthCmp=0,cull=0]\n"
+    )
+    r306_production_prerequisite = run_case(
+        "VR DX11 R293 productionPrerequisiteCensus signature#1: "
+        "sourceReceipt=0 resourceReceipt=0 r292Exact=0 staticSatisfied=0 "
+        "boundaryPreserved=1 missingReceiptMask=0x00000003 "
+        "snapshot=0x0000000000000000\n"
+        + r306_signature_tail
+    )
+    r306_inventory = r306_production_prerequisite["ActivationEvidence"][
+        "ProgrammableShaderInventory"
+    ]
+    assert r306_inventory["ProductionActivationPrerequisiteEvidenceSignatures"] == 1
+    assert r306_inventory["ProductionActivationPrerequisiteExactSignatures"] == 0
+    assert r306_inventory["ProductionActivationPrerequisiteFailClosedSignatures"] == 1
+    assert (
+        r306_inventory[
+            "ProductionActivationPrerequisiteCorrelationInexactSignatures"
+        ]
+        == []
+    )
+    assert r306_inventory["ProductionActivationEvidenceCoverageComplete"] is True
+    r306_evidence = r306_inventory["Pairs"][0]["SemanticTranslationEvidence"][0][
+        "ProductionActivationPrerequisite"
+    ]
+    assert r306_evidence["source_receipt_present"] is False
+    assert r306_evidence["resource_receipt_present"] is False
+    assert r306_evidence["missing_receipt_mask"] == 0x3
+    assert r306_evidence["expected_missing_receipt_mask"] == 0x3
+    assert r306_evidence["receipt_mask_matches"] is True
+    assert r306_evidence["summary_correlation_exact"] is True
+    assert r306_evidence["fail_closed"] is True
+    assert r306_evidence["activation_proof"] is False
+    assert r306_production_prerequisite["NativeDrawPathActivationAllowed"] is False
+
+    r306_inconsistent_prerequisite = run_case(
+        "VR DX11 R293 productionPrerequisiteCensus signature#1: "
+        "sourceReceipt=0 resourceReceipt=0 r292Exact=0 staticSatisfied=0 "
+        "boundaryPreserved=1 missingReceiptMask=0x00000000 "
+        "snapshot=0x0000000000000000\n"
+        + r306_signature_tail
+    )
+    r306_inconsistent_inventory = r306_inconsistent_prerequisite[
+        "ActivationEvidence"
+    ]["ProgrammableShaderInventory"]
+    assert r306_inconsistent_inventory[
+        "ProductionActivationPrerequisiteCorrelationInexactSignatures"
+    ] == [{"source_log": "OutRun2006Tweaks.log", "startup_epoch": 0, "id": 1}]
+    assert (
+        r306_inconsistent_inventory[
+            "ProductionActivationEvidenceCoverageComplete"
+        ]
+        is False
+    )
+    assert (
+        r306_inconsistent_inventory["Pairs"][0]["SemanticTranslationEvidence"][0][
+            "ProductionActivationPrerequisite"
+        ]["summary_correlation_exact"]
+        is False
+    )
+    assert r306_inconsistent_prerequisite["NativeDrawPathActivationAllowed"] is False
+
     r277_programmable_semantic = run_case(
         "VR DX11 R120 census: samples=6 exact=0 fixedFn=0 programmable=6 "
         "topologyUnsupported=0 signatures=2 declSamples=0 indexedSamples=0 texturedSamples=0 "
