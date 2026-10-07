@@ -153,6 +153,14 @@ R271_SOURCE_SEMANTIC_PAIR_RE = re.compile(
     r"receiptRevision=0x(?P<receiptRevision>[0-9A-Fa-f]+) "
     r"contract=0x(?P<contract>[0-9A-Fa-f]+)"
 )
+R272_REGISTER_MAPPING_PLAN_RE = re.compile(
+    r"VR DX11 R272 registerMappingPlan: exact=(?P<exact>[01]) "
+    r"constants=(?P<constants>\d+) samplers=(?P<samplers>\d+) "
+    r"constantHash=0x(?P<constantHash>[0-9A-Fa-f]+) "
+    r"samplerHash=0x(?P<samplerHash>[0-9A-Fa-f]+) "
+    r"planRevision=0x(?P<planRevision>[0-9A-Fa-f]+) "
+    r"contract=0x(?P<contract>[0-9A-Fa-f]+)"
+)
 R276_SEMANTIC_PLAN_RE = re.compile(
     r"VR DX11 R276 semanticTranslationPlan signature#(?P<signature>\d+): "
     r"exact=(?P<exact>[01]) snapshot=0x(?P<snapshot>[0-9A-Fa-f]+) "
@@ -573,6 +581,8 @@ def summarize_programmable_shader_inventory(
     identity_blocking: list[dict] = []
     source_semantic_pair_missing: list[dict] = []
     source_semantic_pair_correlation_inexact: list[dict] = []
+    register_mapping_plan_missing: list[dict] = []
+    register_mapping_plan_correlation_inexact: list[dict] = []
     semantic_plan_missing: list[dict] = []
     semantic_receipt_missing: list[dict] = []
     production_activation_prerequisite_missing: list[dict] = []
@@ -598,6 +608,9 @@ def summarize_programmable_shader_inventory(
     source_semantic_pair_evidence_signatures = 0
     source_semantic_pair_exact_signatures = 0
     source_semantic_pair_fail_closed_signatures = 0
+    register_mapping_plan_evidence_signatures = 0
+    register_mapping_plan_exact_signatures = 0
+    register_mapping_plan_fail_closed_signatures = 0
     semantic_plan_exact_signatures = 0
     object_prerequisite_exact_signatures = 0
     object_creation_handoff_exact_signatures = 0
@@ -671,6 +684,7 @@ def summarize_programmable_shader_inventory(
             },
         )
         source_semantic_pair = signature.get("source_semantic_pair")
+        register_mapping_plan = signature.get("register_mapping_plan")
         plan = signature.get("semantic_translation_plan")
         object_prerequisite = signature.get("translation_object_prerequisite")
         object_creation_handoff = signature.get("object_creation_handoff")
@@ -705,6 +719,17 @@ def summarize_programmable_shader_inventory(
                 source_semantic_pair_exact_signatures += 1
             if source_semantic_pair["fail_closed"]:
                 source_semantic_pair_fail_closed_signatures += 1
+
+        if register_mapping_plan is None:
+            register_mapping_plan_missing.append(ref)
+        else:
+            register_mapping_plan_evidence_signatures += 1
+            if not register_mapping_plan["summary_correlation_exact"]:
+                register_mapping_plan_correlation_inexact.append(ref)
+            if register_mapping_plan["exact"]:
+                register_mapping_plan_exact_signatures += 1
+            if register_mapping_plan["fail_closed"]:
+                register_mapping_plan_fail_closed_signatures += 1
 
         if plan is None:
             semantic_plan_missing.append(ref)
@@ -893,6 +918,7 @@ def summarize_programmable_shader_inventory(
             {
                 "SignatureRef": ref,
                 "SourceSemanticPair": source_semantic_pair,
+                "RegisterMappingPlan": register_mapping_plan,
                 "Plan": plan,
                 "ObjectOwnershipPrerequisite": object_prerequisite,
                 "ObjectCreationHandoff": object_creation_handoff,
@@ -923,6 +949,12 @@ def summarize_programmable_shader_inventory(
         and programmable_signatures > 0
         and not source_semantic_pair_missing
         and not source_semantic_pair_correlation_inexact
+    )
+    register_mapping_plan_evidence_coverage_complete = bool(
+        evidence_coverage_complete
+        and programmable_signatures > 0
+        and not register_mapping_plan_missing
+        and not register_mapping_plan_correlation_inexact
     )
     semantic_evidence_coverage_complete = bool(
         evidence_coverage_complete
@@ -978,6 +1010,18 @@ def summarize_programmable_shader_inventory(
             source_semantic_pair_fail_closed_signatures,
         "SourceSemanticPairEvidenceCoverageComplete":
             source_semantic_pair_evidence_coverage_complete,
+        "RegisterMappingPlanEvidenceMissingSignatures":
+            register_mapping_plan_missing,
+        "RegisterMappingPlanCorrelationInexactSignatures":
+            register_mapping_plan_correlation_inexact,
+        "RegisterMappingPlanEvidenceSignatures":
+            register_mapping_plan_evidence_signatures,
+        "RegisterMappingPlanExactSignatures":
+            register_mapping_plan_exact_signatures,
+        "RegisterMappingPlanFailClosedSignatures":
+            register_mapping_plan_fail_closed_signatures,
+        "RegisterMappingPlanEvidenceCoverageComplete":
+            register_mapping_plan_evidence_coverage_complete,
         "SemanticPlanEvidenceMissingSignatures": semantic_plan_missing,
         "SemanticPlanInexactSignatures": semantic_plan_inexact,
         "ObjectOwnershipPrerequisiteEvidenceMissingSignatures":
@@ -1094,6 +1138,8 @@ def main() -> int:
     signatures: dict[SignatureKey, dict] = {}
     source_semantic_pairs: dict[SignatureKey, dict] = {}
     pending_source_semantic_pairs: dict[tuple[str, int], dict] = {}
+    register_mapping_plans: dict[SignatureKey, dict] = {}
+    pending_register_mapping_plans: dict[tuple[str, int], dict] = {}
     semantic_translation_plans: dict[SignatureKey, dict] = {}
     translation_object_prerequisites: dict[SignatureKey, dict] = {}
     object_creation_handoffs: dict[SignatureKey, dict] = {}
@@ -1225,6 +1271,28 @@ def main() -> int:
                 }
                 continue
 
+            match = R272_REGISTER_MAPPING_PLAN_RE.search(line)
+            if match:
+                data = match.groupdict()
+                pending_register_mapping_plans[(source_log, startup_epoch)] = {
+                    "exact": bool(int(data["exact"])),
+                    "constant_mapping_count": int(data["constants"]),
+                    "sampler_mapping_count": int(data["samplers"]),
+                    "constant_mapping_hash": int(data["constantHash"], 16),
+                    "constant_mapping_hash_hex":
+                        "0x" + data["constantHash"].upper(),
+                    "sampler_mapping_hash": int(data["samplerHash"], 16),
+                    "sampler_mapping_hash_hex":
+                        "0x" + data["samplerHash"].upper(),
+                    "plan_revision_hash": int(data["planRevision"], 16),
+                    "plan_revision_hash_hex":
+                        "0x" + data["planRevision"].upper(),
+                    "semantic_contract_hash": int(data["contract"], 16),
+                    "semantic_contract_hash_hex":
+                        "0x" + data["contract"].upper(),
+                }
+                continue
+
             match = R276_SEMANTIC_PLAN_RE.search(line)
             if match:
                 data = match.groupdict()
@@ -1249,6 +1317,13 @@ def main() -> int:
                 if pending_source_semantic_pair is not None:
                     source_semantic_pairs[signature_key] = (
                         pending_source_semantic_pair
+                    )
+                pending_register_mapping_plan = pending_register_mapping_plans.pop(
+                    (source_log, startup_epoch), None
+                )
+                if pending_register_mapping_plan is not None:
+                    register_mapping_plans[signature_key] = (
+                        pending_register_mapping_plan
                     )
                 continue
 
@@ -2061,6 +2136,55 @@ def main() -> int:
                 "activation_proof": False,
             })
         signature["source_semantic_pair"] = source_semantic_pair
+        register_mapping_plan = register_mapping_plans.get(signature_key)
+        if register_mapping_plan is not None:
+            semantic_plan = semantic_translation_plans.get(signature_key)
+            mapping_identity_present = bool(
+                register_mapping_plan["constant_mapping_hash"] != 0
+                and register_mapping_plan["sampler_mapping_hash"] != 0
+                and register_mapping_plan["plan_revision_hash"] != 0
+                and register_mapping_plan["semantic_contract_hash"] != 0
+            )
+            exact_state_correlated = bool(
+                not register_mapping_plan["exact"]
+                or mapping_identity_present
+            )
+            source_semantic_pair_correlated = bool(
+                not register_mapping_plan["exact"]
+                or (
+                    source_semantic_pair is not None
+                    and source_semantic_pair["exact"]
+                    and source_semantic_pair["summary_correlation_exact"]
+                )
+            )
+            semantic_plan_correlated = bool(
+                not register_mapping_plan["exact"]
+                or (
+                    semantic_plan is not None
+                    and semantic_plan["exact"]
+                    and semantic_plan["snapshot"] != 0
+                )
+            )
+            summary_correlation_exact = bool(
+                exact_state_correlated
+                and source_semantic_pair_correlated
+                and semantic_plan_correlated
+            )
+            register_mapping_plan.update({
+                "mapping_identity_present": mapping_identity_present,
+                "exact_state_correlated": exact_state_correlated,
+                "source_semantic_pair_correlated":
+                    source_semantic_pair_correlated,
+                "semantic_plan_correlated": semantic_plan_correlated,
+                "summary_correlation_exact": summary_correlation_exact,
+                "fail_closed": bool(
+                    summary_correlation_exact
+                    and register_mapping_plan["exact"]
+                ),
+                "diagnostic_only": True,
+                "activation_proof": False,
+            })
+        signature["register_mapping_plan"] = register_mapping_plan
         signature["semantic_translation_plan"] = (
             semantic_translation_plans.get(signature_key)
         )

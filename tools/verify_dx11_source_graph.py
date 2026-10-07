@@ -11592,6 +11592,40 @@ def main() -> None:
         )
 
 
+
+    r311_programmable_register_mapping_plan_analyzer_bridge = [
+        ("VR DX11 R272 registerMappingPlan",
+         RUNTIME_CENSUS, "R311 consumes the existing R272 register mapping plan"),
+        ("R272_REGISTER_MAPPING_PLAN_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R311 parses R272 register mapping evidence"),
+        ("pending_register_mapping_plans",
+         DX11_CENSUS_ANALYZER, "R311 binds unnumbered R272 to following R276 signature"),
+        ('"mapping_identity_present":',
+         DX11_CENSUS_ANALYZER, "R311 checks mapping hashes/revision/contract presence"),
+        ('"source_semantic_pair_correlated":',
+         DX11_CENSUS_ANALYZER, "R311 correlates exact R272 with R271"),
+        ('"RegisterMappingPlan": register_mapping_plan',
+         DX11_CENSUS_ANALYZER, "R311 attaches R272 evidence to the exact signature"),
+        ("r311_register_mapping_plan = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R311 exact register-mapping fixture"),
+        ("r311_inconsistent_register_mapping = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R311 zero-revision inconsistency fixture"),
+        ('r311_evidence["activation_proof"] is False',
+         DX11_CENSUS_ANALYZER_TEST, "R311 analyzer evidence cannot activate draw"),
+    ]
+    missing_r311_programmable_register_mapping_plan_analyzer_bridge = [
+        meaning for token, source, meaning
+        in r311_programmable_register_mapping_plan_analyzer_bridge
+        if token not in source
+    ]
+    if missing_r311_programmable_register_mapping_plan_analyzer_bridge:
+        raise SystemExit(
+            "DX11 R311 programmable register-mapping analyzer drift: "
+            + ", ".join(
+                missing_r311_programmable_register_mapping_plan_analyzer_bridge
+            )
+        )
+
     r310_programmable_source_semantic_pair_analyzer_bridge = [
         ("VR DX11 R271 sourceSemanticPair",
          RUNTIME_CENSUS, "R310 consumes the existing R271 source semantic pair"),

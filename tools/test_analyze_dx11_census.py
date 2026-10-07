@@ -2292,6 +2292,99 @@ def main() -> int:
         "NativeDrawPathActivationAllowed"
     ] is False
 
+
+    r311_register_mapping_support = (
+        "VR DX11 R271 sourceSemanticPair: exact=1 "
+        "cacheKey=0x0102030405060708 pairHash=0x1111111111111111 "
+        "vsRegisterHash=0x2222222222222222 "
+        "psRegisterHash=0x3333333333333333 "
+        "linkHash=0x4444444444444444 "
+        "receiptRevision=0x5555555555555555 "
+        "contract=0x6666666666666666\n"
+        "VR DX11 R272 registerMappingPlan: exact=1 constants=8 samplers=2 "
+        "constantHash=0x1212121212121212 "
+        "samplerHash=0x3434343434343434 "
+        "planRevision=0x5656565656565656 "
+        "contract=0x7878787878787878\n"
+        "VR DX11 R276 semanticTranslationPlan signature#1: "
+        "exact=1 snapshot=0x7777777777777777 "
+        "targetVS=0x8888888888888888 targetPS=0x9999999999999999 "
+        "revision=0xAAAAAAAAAAAAAAAA contract=0xBBBBBBBBBBBBBBBB\n"
+    )
+    r311_register_mapping_plan = run_case(
+        r311_register_mapping_support
+        + r306_signature_tail
+    )
+    r311_inventory = r311_register_mapping_plan["ActivationEvidence"][
+        "ProgrammableShaderInventory"
+    ]
+    assert r311_inventory["RegisterMappingPlanEvidenceSignatures"] == 1
+    assert r311_inventory["RegisterMappingPlanExactSignatures"] == 1
+    assert r311_inventory["RegisterMappingPlanFailClosedSignatures"] == 1
+    assert r311_inventory[
+        "RegisterMappingPlanCorrelationInexactSignatures"
+    ] == []
+    assert r311_inventory[
+        "RegisterMappingPlanEvidenceCoverageComplete"
+    ] is True
+    r311_evidence = r311_inventory["Pairs"][0]["SemanticTranslationEvidence"][0][
+        "RegisterMappingPlan"
+    ]
+    assert r311_evidence["exact"] is True
+    assert r311_evidence["constant_mapping_count"] == 8
+    assert r311_evidence["sampler_mapping_count"] == 2
+    assert r311_evidence["mapping_identity_present"] is True
+    assert r311_evidence["exact_state_correlated"] is True
+    assert r311_evidence["source_semantic_pair_correlated"] is True
+    assert r311_evidence["semantic_plan_correlated"] is True
+    assert r311_evidence["summary_correlation_exact"] is True
+    assert r311_evidence["fail_closed"] is True
+    assert r311_evidence["activation_proof"] is False
+    assert r311_register_mapping_plan["NativeDrawPathActivationAllowed"] is False
+
+    r311_inconsistent_register_mapping = run_case(
+        "VR DX11 R271 sourceSemanticPair: exact=1 "
+        "cacheKey=0x0102030405060708 pairHash=0x1111111111111111 "
+        "vsRegisterHash=0x2222222222222222 "
+        "psRegisterHash=0x3333333333333333 "
+        "linkHash=0x4444444444444444 "
+        "receiptRevision=0x5555555555555555 "
+        "contract=0x6666666666666666\n"
+        "VR DX11 R272 registerMappingPlan: exact=1 constants=8 samplers=2 "
+        "constantHash=0x1212121212121212 "
+        "samplerHash=0x3434343434343434 "
+        "planRevision=0x0000000000000000 "
+        "contract=0x7878787878787878\n"
+        "VR DX11 R276 semanticTranslationPlan signature#1: "
+        "exact=1 snapshot=0x7777777777777777 "
+        "targetVS=0x8888888888888888 targetPS=0x9999999999999999 "
+        "revision=0xAAAAAAAAAAAAAAAA contract=0xBBBBBBBBBBBBBBBB\n"
+        + r306_signature_tail
+    )
+    r311_inconsistent_inventory = r311_inconsistent_register_mapping[
+        "ActivationEvidence"
+    ]["ProgrammableShaderInventory"]
+    assert r311_inconsistent_inventory[
+        "RegisterMappingPlanCorrelationInexactSignatures"
+    ] == [{"source_log": "OutRun2006Tweaks.log", "startup_epoch": 0, "id": 1}]
+    assert (
+        r311_inconsistent_inventory[
+            "RegisterMappingPlanEvidenceCoverageComplete"
+        ]
+        is False
+    )
+    r311_inconsistent_evidence = r311_inconsistent_inventory["Pairs"][0][
+        "SemanticTranslationEvidence"
+    ][0]["RegisterMappingPlan"]
+    assert r311_inconsistent_evidence["mapping_identity_present"] is False
+    assert r311_inconsistent_evidence["exact_state_correlated"] is False
+    assert r311_inconsistent_evidence["summary_correlation_exact"] is False
+    assert r311_inconsistent_evidence["fail_closed"] is False
+    assert r311_inconsistent_evidence["activation_proof"] is False
+    assert r311_inconsistent_register_mapping[
+        "NativeDrawPathActivationAllowed"
+    ] is False
+
     r308_production_semantic_review = run_case(
         "VR DX11 R291 productionSemanticReview signature#1: "
         "admissionExact=1 reviewExact=1 inputLayoutReady=1 "
