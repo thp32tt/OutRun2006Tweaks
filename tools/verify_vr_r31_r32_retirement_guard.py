@@ -301,38 +301,38 @@ owner_evidence = {
         r31, "inline void R31TelemetryNoteUnstable(",
         ("++R31Frame.unstable",),
     ),
-    "R32EffectIsFragileLive": (
+    "R32ReviewEffectIsFragileLive": (
         r32, "bool R32EffectIsFragileLive(",
         ("R32ReadEffectSnapshot(device, state)",
          "PassPolicy::ClassifyEffectStereo(",
          "PassPolicy::AllowsEffectWorldStereo(policy)"),
     ),
-    "R32GetSavedViewport": (
+    "R32ReviewGetSavedViewport": (
         r32, "bool R32GetSavedViewport(",
         ("StateBlockTracker::Reliable()",
          "R31GetSavedViewport(device, viewport)",
          "OutRunVR::D3D9::ReadViewport(device, viewport)"),
     ),
-    "R32LowerFailClosed": (
+    "R32ReviewRunLowerFailClosed": (
         r32, "HRESULT R32LowerFailClosed(",
         ("R32ReadEffectSnapshot(device, snapshot)",
          "CurrentVertexShaderIdentity.exchange(0",
          "R32FailClosedZeroDisparityDraws"),
     ),
-    "R32ObserveFrameWorkload": (
+    "R32ReviewObserveFrameWorkload": (
         r32, "void R32ObserveFrameWorkload(",
         ("Settings::VRTelemetry", "R32FrameWorkloadCounters",
          "frame.primitives += primitiveCount",
          "TryGetEffectTelemetrySnapshot(effect)"),
     ),
-    "R32RestoreRightPassState": (
+    "R32ReviewRestoreRightPassState": (
         r32, "bool R32RestoreRightPassState(",
         ("SetRenderTargetHook.stdcall<HRESULT>",
          "SetDepthStencilSurfaceHook",
          "device->SetViewport(&savedViewport)",
          "R32SetWvpBatch(device, originalConstants)"),
     ),
-    "R32WithPresentTelemetry": (
+    "R32ReviewRunPresentTelemetry": (
         r32, "HRESULT R32WithPresentTelemetry(",
         ("R32CaptureStereoWorkload()",
          "QueryPerformanceCounter(&presentStart)",
@@ -340,14 +340,14 @@ owner_evidence = {
          "R32FinalizeFramePerf(",
          "R32LogPerfWindow()"),
     ),
-    "R32WithResetLifecycle": (
+    "R32ReviewRunResetLifecycle": (
         r32, "HRESULT R32WithResetLifecycle(",
         ("const HRESULT hr = lowerReset();",
          "R32ResetAfterGameReset();",
          "R32InvalidateResetCaches();",
          "++R32ResetFailures"),
     ),
-    "R32ResolveDirectTransport": (
+    "R32ReviewResolveDirectTransport": (
         r32, "bool R32ResolveDirectTransport(",
         ("R13OverlayReadyForTransport()",
          "return lowerResolve();",
@@ -357,7 +357,7 @@ owner_evidence = {
          "slot.producerPending = true;",
          "ActiveDirectTransportSlot = selected;"),
     ),
-    "R32SetWvpBatch": (
+    "R32ReviewSetWvpBatch": (
         r32, "bool R32SetWvpBatch(",
         ("R32BatchWvpUploads",
          "OutRunVR::D3D9::SetVertexShaderConstantBatch(",
