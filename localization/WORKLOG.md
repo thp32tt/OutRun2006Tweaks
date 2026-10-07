@@ -3396,3 +3396,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Owner-override IGR-001/q212 was also refreshed: current queue now has B246 exact candidate `01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6` producer-PASS pending fresh C/C3, so A did not overwrite or repeat it.
 - Reconciled six stale A-owned backlog rows against newer queue/C evidence: IGR-001 q212, IGR-012 q63, PJR-002 q26, PJR-018 q57, PJR-020 q61, PJR-021 q65. q57/q61/q65 are C254 exact-SHA C3 + PRE_INGAME refreshed; q63 is C255 C3; q26 is C245 C3. Their older REWORK/pending-C backlog statuses no longer trigger duplicate producer work.
 - No candidate DDS was changed. This is an allowed zero-candidate producer run because no safe material target exists after current-state refresh. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
+### C264 C2 — 2026-10-08 06:03 KST
+- `TEMP_BACKLOG_RELIEF=C2`, `SHARD=EVEN`; refreshed HEAD/queue before every selection and again before synchronization; completed C263/C262R work was not repeated.
+- q212 `BA0147DA` `01c7aded...`: machine containment/header/zero-outside PASS; SOURCE/CLEAN/CURRENT + practical + RAW/FLIP-Y controller PASS. `하트 어택 모드` is 903x154 in 1759x158 and restores cohesive title hierarchy. Fresh C + exact-SHA `C3_STRICT_PASS`; IGR-001/002 stay open for PRE_INGAME/user JPG + NEW actual-game retest.
+- q62 `33491F83` `dcec31a1...`: 2/2 bbox/size, zero outside/alpha; controller review confirms C261 opaque-white plate is gone via transparent erase-canvas handling while authored road/green/lane pixels remain. Fresh C + exact-SHA `C3_STRICT_PASS`.
+- q172 `6C9B3611` `963445a4...`: machine 2/2 PASS, but visual scale FAIL; 출발 33/81px (40.74%) and 골 19/77px (24.68%) are materially undersized -> `REWORK_REQUIRED`, C3 blocked.
+- Execution backend: N100 MCP exact DDS QA fallback only after ChatGPT-local GitHub DNS failure and hosted worker queue blockage; GitHub remained SSOT. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.

@@ -7,7 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "C263 q104/q112/q116 C3 PASS: refresh PRE_INGAME English-original comparisons, user JPG review, then NEW actual-game validation.",
+    "C264 q212 BA0147DA 01c7aded... and q62 33491F83 dcec31a1... are fresh C + exact-SHA C3_STRICT_PASS. Refresh PRE_INGAME comparisons, user JPG review, then NEW actual-game validation; IGR-001/002 remain open.",
+    "C264 q172 6C9B3611 963445a4... returned REWORK_REQUIRED: START->출발 is 40.74% and GOAL->골 24.68% of source width. Material rework then fresh C2 + C3.",
     "Fresh-C/C3 q205 exact 7598af3375... then regenerate test package; NEW in-game retest screenshots 159-164. IGR-020..023 are GRAPHICS q205, IGR-024 is runtime ID935.",
     "B239 q52 A8CE339F c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e: fresh independent C + exact-SHA C3 required; PRE_INGAME blocked; RUNTIME_VALIDATION=UNTESTED.",
     "C250 returned q57 39229D64, q61 C4A2937B and q65 EBEF6D20 to A/B REWORK_REQUIRED after machine containment PASS but controller visual/semantic failures. q57: restore source slant/gradient/depth/effect family; q61: restore proven Cut the line! -> 하트선을 통과하세요! semantics plus yellow/navy/white instruction style; q65: fix EASY green style and source label slant/outline family. Then producer QA -> fresh C1 -> exact-SHA C3 -> PRE_INGAME/user JPG -> NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
@@ -4195,13 +4196,11 @@
   },
   "current_pending_c": [
     "66743AA8",
-    "33491F83",
     "BF3EE5C6",
     "A064FDFC",
     "48DEBE77",
     "788CE557",
     "FD90AA9",
-    "BA0147DA",
     "8C259C68",
     "D657C2EB",
     "97E863AD",
@@ -6755,7 +6754,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T05:49:36+09:00",
+  "updated_at_kst": "2026-10-08T06:03:11+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -10355,6 +10354,49 @@
     },
     "new_candidate_count": 0,
     "zero_candidate_reason": "No current A-shard RENDER_READY/ONE_STAGE_TO_RENDER or direct C-returned material target after live refresh; repeating C254/C255/C262R-passed bytes is forbidden.",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "c264_c2_q212_q062_q172": {
+    "run": "20261008-C264-C2-Q212-Q062-Q172",
+    "role": "C",
+    "lane": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "selection_head": "dba57555ac3d8112e5c7ddbce28c7b43598da7f9",
+    "pre_commit_refresh_head": "168a94ab4f1e49f24d772588e6895ec2b8a4b386",
+    "execution_backend": "N100_MCP_FALLBACK_EXACT_REPOSITORY_BACKED_DDS_QA_AFTER_CHATGPT_LOCAL_DNS_AND_HOSTED_QUEUE_BLOCK",
+    "assets": {
+      "q212": {
+        "asset": "BA0147DA",
+        "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+        "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_HEADER",
+        "controller_visual_qa": "PASS_COHESIVE_MODE_TITLE_PRACTICAL_RAW",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "status": "C264_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME_RETEST"
+      },
+      "q62": {
+        "asset": "33491F83",
+        "candidate_sha256": "dcec31a16d2a21d34bcf6ef33267b31d2940072ca897060a3ad52147a5d101d4",
+        "machine_qa": "PASS_2_OF_2_ZERO_OUTSIDE_ALPHA_HEADER",
+        "controller_visual_qa": "PASS_TRANSPARENT_ERASE_CANVAS_NO_OPAQUE_WHITE_PATCH",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "status": "C264_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+      },
+      "q172": {
+        "asset": "6C9B3611",
+        "candidate_sha256": "963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc",
+        "machine_qa": "PASS_2_OF_2_ZERO_OUTSIDE_ALPHA_HEADER",
+        "controller_visual_qa": "FAIL_SOURCE_RELATIVE_SCALE_UNDERSIZED_START_GOAL",
+        "fresh_c": "FAIL_VISUAL_OVERRIDE",
+        "c3": "BLOCKED",
+        "status": "REWORK_REQUIRED"
+      }
+    },
+    "controller_report": "localization/graphics/role_C/20261008-C264-C2-Q212-Q062-Q172/C264_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "TRIGGER_WITH_THIS_SYNC_Q212_Q062",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }

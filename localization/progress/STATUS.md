@@ -2706,3 +2706,11 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q57/q61/q65: C254 C3 + PRE_INGAME refreshed; q63: C255 C3; q26: C245 C3; q212: current B246 producer PASS pending fresh C/C3.
 - No safe A material candidate remained after refresh; IGR-025 is still evidence-blocked. No DDS bytes changed.
 - `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
+
+### C264 C2 — 2026-10-08 06:03 KST
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN.
+- q212 BA0147DA: C3_STRICT_PASS @ 01c7aded...; PRE_INGAME/user JPG + NEW in-game retest pending.
+- q62 33491F83: C3_STRICT_PASS @ dcec31a1...; opaque-white clean-plate rectangle resolved; PRE_INGAME/user/ingame pending.
+- q172 6C9B3611: REWORK_REQUIRED despite machine PASS — START/GOAL Korean labels are materially undersized (40.74% / 24.68% source width); C3 blocked.
+- RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.

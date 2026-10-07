@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "run": "C264",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "timestamp_kst": "2026-10-08T06:03:11+09:00",
+  "selection_head": "dba57555ac3d8112e5c7ddbce28c7b43598da7f9",
+  "pre_commit_refresh_head": "168a94ab4f1e49f24d772588e6895ec2b8a4b386",
+  "execution_backend": "N100_MCP_FALLBACK_EXACT_REPOSITORY_BACKED_DDS_QA_AFTER_CHATGPT_LOCAL_DNS_AND_HOSTED_QUEUE_BLOCK",
+  "fallback_reason": "ChatGPT-local github.com DNS resolution failed; hosted localization worker queue was blocked. Exact candidate/source SHA-256s were verified before N100 decode; GitHub remained SSOT.",
+  "decisions": {
+    "q212": {
+      "asset": "BA0147DA",
+      "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+      "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "PASS_COHESIVE_MODE_TITLE_PRACTICAL_RAW",
+      "fresh_c": "PASS",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "status": "C264_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME_RETEST"
+    },
+    "q62": {
+      "asset": "33491F83",
+      "candidate_sha256": "dcec31a16d2a21d34bcf6ef33267b31d2940072ca897060a3ad52147a5d101d4",
+      "machine_qa": "PASS_2_OF_2_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "PASS_TRANSPARENT_ERASE_CANVAS_NO_OPAQUE_WHITE_PATCH",
+      "fresh_c": "PASS",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "status": "C264_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+    },
+    "q172": {
+      "asset": "6C9B3611",
+      "candidate_sha256": "963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc",
+      "machine_qa": "PASS_2_OF_2_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "FAIL_SOURCE_RELATIVE_SCALE_UNDERSIZED_START_GOAL",
+      "fresh_c": "FAIL_VISUAL_OVERRIDE",
+      "c3": "BLOCKED",
+      "status": "REWORK_REQUIRED"
+    }
+  },
+  "evidence": [
+    "localization/graphics/role_C/20261008-C264-C2-Q212-Q062-Q172/q212_CONTACTS.jpg",
+    "localization/graphics/role_C/20261008-C264-C2-Q212-Q062-Q172/q212_PRACTICAL.jpg",
+    "localization/graphics/role_C/20261008-C264-C2-Q212-Q062-Q172/q212_RAW_FLIPY.jpg",
+    "localization/graphics/role_C/20261008-C264-C2-Q212-Q062-Q172/q062_CONTACTS.jpg",
+    "localization/graphics/role_C/20261008-C264-C2-Q212-Q062-Q172/q062_PRACTICAL.jpg",
+    "localization/graphics/role_C/20261008-C264-C2-Q212-Q062-Q172/q062_RAW_FLIPY.jpg",
+    "localization/graphics/role_C/20261008-C264-C2-Q212-Q062-Q172/q172_CONTACTS.jpg",
+    "localization/graphics/role_C/20261008-C264-C2-Q212-Q062-Q172/q172_PRACTICAL.jpg",
+    "localization/graphics/role_C/20261008-C264-C2-Q212-Q062-Q172/q172_RAW_FLIPY.jpg",
+    "localization/graphics/role_C/20261008-C264-C2-Q212-Q062-Q172/C264_BATCH_MACHINE_QA.json"
+  ],
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

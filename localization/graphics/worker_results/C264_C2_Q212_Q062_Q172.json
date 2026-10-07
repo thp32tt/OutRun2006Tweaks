@@ -1,0 +1,38 @@
+{
+  "run": "C264",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "decisions": {
+    "q212": {
+      "asset": "BA0147DA",
+      "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+      "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "PASS_COHESIVE_MODE_TITLE_PRACTICAL_RAW",
+      "fresh_c": "PASS",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "status": "C264_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME_RETEST"
+    },
+    "q62": {
+      "asset": "33491F83",
+      "candidate_sha256": "dcec31a16d2a21d34bcf6ef33267b31d2940072ca897060a3ad52147a5d101d4",
+      "machine_qa": "PASS_2_OF_2_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "PASS_TRANSPARENT_ERASE_CANVAS_NO_OPAQUE_WHITE_PATCH",
+      "fresh_c": "PASS",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "status": "C264_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+    },
+    "q172": {
+      "asset": "6C9B3611",
+      "candidate_sha256": "963445a44888e75aa82df36aa7207fa8de819e155905153fd0c2a8847dd70fbc",
+      "machine_qa": "PASS_2_OF_2_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "FAIL_SOURCE_RELATIVE_SCALE_UNDERSIZED_START_GOAL",
+      "fresh_c": "FAIL_VISUAL_OVERRIDE",
+      "c3": "BLOCKED",
+      "status": "REWORK_REQUIRED"
+    }
+  },
+  "controller_report": "localization/graphics/role_C/20261008-C264-C2-Q212-Q062-Q172/C264_CONTROLLER_FINAL_QA.json",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,514 @@
+{
+  "run": "C264",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "execution_backend": "N100_MCP_FALLBACK_EXACT_DECODE_QA",
+  "assets": [
+    {
+      "queue_index": 212,
+      "asset": "q212",
+      "machine_result": "PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "rows": [
+        {
+          "key": "heart",
+          "source": "HEART ATTACK",
+          "korean": "하트 어택 모드",
+          "source_bbox": [
+            21,
+            1316,
+            1780,
+            1474
+          ],
+          "expected_bbox": [
+            26,
+            1318,
+            929,
+            1472
+          ],
+          "derived_bbox": [
+            26,
+            1318,
+            929,
+            1472
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            5,
+            851,
+            2,
+            2
+          ],
+          "width_ratio": 0.5134,
+          "height_ratio": 0.9747
+        },
+        {
+          "key": "showroom",
+          "source": "SHOWROOM",
+          "korean": "쇼룸",
+          "source_bbox": [
+            14,
+            1148,
+            1760,
+            1296
+          ],
+          "derived_bbox": [
+            18,
+            1154,
+            266,
+            1290
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            4,
+            1494,
+            6,
+            6
+          ],
+          "width_ratio": 0.142,
+          "height_ratio": 0.9189
+        },
+        {
+          "key": "coast2coast",
+          "source": "COAST 2 COAST",
+          "korean": "코스트 2 코스트",
+          "source_bbox": [
+            0,
+            964,
+            1760,
+            1124
+          ],
+          "derived_bbox": [
+            91,
+            966,
+            1344,
+            1120
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            91,
+            416,
+            2,
+            4
+          ],
+          "width_ratio": 0.7119,
+          "height_ratio": 0.9625
+        },
+        {
+          "key": "outrun_big",
+          "source": "OUTRUN",
+          "korean": "아웃런",
+          "source_bbox": [
+            603,
+            1512,
+            1321,
+            1660
+          ],
+          "derived_bbox": [
+            607,
+            1516,
+            979,
+            1656
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            4,
+            342,
+            4,
+            4
+          ],
+          "width_ratio": 0.5181,
+          "height_ratio": 0.9459
+        },
+        {
+          "key": "star_sign",
+          "source": "SELECT STAR SIGN",
+          "korean": "별자리 선택",
+          "source_bbox": [
+            0,
+            788,
+            726,
+            860
+          ],
+          "derived_bbox": [
+            4,
+            796,
+            236,
+            852
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            4,
+            490,
+            8,
+            8
+          ],
+          "width_ratio": 0.3196,
+          "height_ratio": 0.7778
+        },
+        {
+          "key": "photo",
+          "source": "SELECT PHOTO",
+          "korean": "사진 선택",
+          "source_bbox": [
+            0,
+            692,
+            566,
+            758
+          ],
+          "derived_bbox": [
+            4,
+            697,
+            192,
+            753
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            4,
+            374,
+            5,
+            5
+          ],
+          "width_ratio": 0.3322,
+          "height_ratio": 0.8485
+        },
+        {
+          "key": "nationality",
+          "source": "SELECT NATIONALITY",
+          "korean": "국적 선택",
+          "source_bbox": [
+            1,
+            604,
+            845,
+            670
+          ],
+          "derived_bbox": [
+            5,
+            609,
+            193,
+            665
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            4,
+            652,
+            5,
+            5
+          ],
+          "width_ratio": 0.2227,
+          "height_ratio": 0.8485
+        },
+        {
+          "key": "enter_name",
+          "source": "ENTER NAME",
+          "korean": "이름 입력",
+          "source_bbox": [
+            0,
+            496,
+            1081,
+            572
+          ],
+          "derived_bbox": [
+            4,
+            506,
+            188,
+            562
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            4,
+            893,
+            10,
+            10
+          ],
+          "width_ratio": 0.1702,
+          "height_ratio": 0.7368
+        },
+        {
+          "key": "done_large",
+          "source": "DONE",
+          "korean": "완료",
+          "source_bbox": [
+            1080,
+            423,
+            1274,
+            496
+          ],
+          "derived_bbox": [
+            1084,
+            427,
+            1204,
+            491
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            4,
+            70,
+            4,
+            5
+          ],
+          "width_ratio": 0.6186,
+          "height_ratio": 0.8767
+        },
+        {
+          "key": "professional",
+          "source": "PROFESSIONAL",
+          "korean": "프로",
+          "source_bbox": [
+            0,
+            341,
+            638,
+            404
+          ],
+          "derived_bbox": [
+            522,
+            346,
+            634,
+            398
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            522,
+            4,
+            5,
+            6
+          ],
+          "width_ratio": 0.1755,
+          "height_ratio": 0.8254
+        },
+        {
+          "key": "outrun_small",
+          "source": "OUTRUN",
+          "korean": "아웃런",
+          "source_bbox": [
+            1626,
+            524,
+            1837,
+            587
+          ],
+          "derived_bbox": [
+            1701,
+            529,
+            1833,
+            581
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            75,
+            4,
+            5,
+            6
+          ],
+          "width_ratio": 0.6256,
+          "height_ratio": 0.8254
+        },
+        {
+          "key": "done_small",
+          "source": "DONE",
+          "korean": "완료",
+          "source_bbox": [
+            4,
+            78,
+            138,
+            122
+          ],
+          "derived_bbox": [
+            8,
+            84,
+            60,
+            116
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            4,
+            78,
+            6,
+            6
+          ],
+          "width_ratio": 0.3881,
+          "height_ratio": 0.7273
+        }
+      ]
+    },
+    {
+      "queue_index": 62,
+      "asset": "q062",
+      "machine_result": "PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "rows": [
+        {
+          "key": "easy",
+          "source": "EASY",
+          "korean": "쉬움",
+          "source_bbox": [
+            142,
+            285,
+            385,
+            375
+          ],
+          "expected_bbox": [
+            186,
+            287,
+            329,
+            371
+          ],
+          "derived_bbox": [
+            186,
+            287,
+            329,
+            371
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            44,
+            56,
+            2,
+            4
+          ],
+          "width_ratio": 0.5885,
+          "height_ratio": 0.9333
+        },
+        {
+          "key": "hard",
+          "source": "HARD",
+          "korean": "어려움",
+          "source_bbox": [
+            808,
+            287,
+            1068,
+            373
+          ],
+          "expected_bbox": [
+            829,
+            288,
+            1039,
+            372
+          ],
+          "derived_bbox": [
+            829,
+            288,
+            1039,
+            372
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            21,
+            29,
+            1,
+            1
+          ],
+          "width_ratio": 0.8077,
+          "height_ratio": 0.9767
+        }
+      ]
+    },
+    {
+      "queue_index": 172,
+      "asset": "q172",
+      "machine_result": "PASS",
+      "outside": 0,
+      "alpha_outside": 0,
+      "rows": [
+        {
+          "key": "start",
+          "source": "START",
+          "korean": "출발",
+          "source_bbox": [
+            55,
+            373,
+            136,
+            396
+          ],
+          "expected_bbox": [
+            79,
+            375,
+            112,
+            394
+          ],
+          "derived_bbox": [
+            79,
+            375,
+            112,
+            394
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            24,
+            24,
+            2,
+            2
+          ],
+          "width_ratio": 0.4074,
+          "height_ratio": 0.8261
+        },
+        {
+          "key": "goal",
+          "source": "GOAL",
+          "korean": "골",
+          "source_bbox": [
+            595,
+            635,
+            672,
+            659
+          ],
+          "expected_bbox": [
+            624,
+            637,
+            643,
+            657
+          ],
+          "derived_bbox": [
+            624,
+            637,
+            643,
+            657
+          ],
+          "bbox_match_expected": true,
+          "containment": true,
+          "size_ceiling": true,
+          "margins": [
+            29,
+            29,
+            2,
+            2
+          ],
+          "width_ratio": 0.2468,
+          "height_ratio": 0.8333
+        }
+      ]
+    }
+  ]
+}
