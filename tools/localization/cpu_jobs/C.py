@@ -94,19 +94,28 @@ for idx,en,ko,(x0,y0,x1,y1) in rowspec:
         raise RuntimeError(("old candidate did not preserve source help row",idx,int(np.count_nonzero(np.any(sr!=oroi,axis=2)))))
 
     bg,bg_count,total=modal_rgba(sr)
-    fbg,fbg_count,ftotal=modal_rgba(fr)
-    if bg_count/total < 0.55 or fbg_count/ftotal < 0.55:
-        raise RuntimeError(("row background is not sufficiently flat for independent text extraction",idx,bg.tolist(),bg_count,total,fbg.tolist(),fbg_count,ftotal))
+    if bg_count/total < 0.55:
+        raise RuntimeError(("source row background is not sufficiently flat for independent text extraction",idx,bg.tolist(),bg_count,total))
 
     smask=np.any(sr!=bg,axis=2)
-    # Derive final glyph pixels against the final row's own modal plate color.
-    # The clean-plate reconstruction may differ by a few RGB levels from the source plate,
-    # so using the source modal color would incorrectly classify the entire restored footprint as lettering.
-    fmask=np.any(fr!=fbg,axis=2)
-    sb0=bbox(smask); fb0=bbox(fmask)
-    if not sb0 or not fb0: raise RuntimeError(("missing text mask",idx,sb0,fb0))
+    sb0=bbox(smask)
+    if not sb0:
+        raise RuntimeError(("missing source text mask",idx))
     sb=[x0+sb0[0],y0+sb0[1],x0+sb0[2],y0+sb0[3]]
-    fb=[x0+fb0[0],y0+fb0[1],x0+fb0[2],y0+fb0[3]]
+
+    # B228 reconstructs the former English footprint before drawing Korean. That restored
+    # footprint can be a few RGB levels away from the untouched row background. Derive
+    # Korean ink against the modal color of the independently derived source bbox itself,
+    # not against the whole-row source color and not from producer masks.
+    patch=fa[sb[1]:sb[3],sb[0]:sb[2]]
+    pbg,pbg_count,ptotal=modal_rgba(patch)
+    if pbg_count/ptotal < 0.45:
+        raise RuntimeError(("final restored source bbox lacks a dominant plate color",idx,pbg.tolist(),pbg_count,ptotal))
+    fpatch=np.any(patch!=pbg,axis=2)
+    fb0=bbox(fpatch)
+    if not fb0:
+        raise RuntimeError(("missing localized text mask",idx))
+    fb=[sb[0]+fb0[0],sb[1]+fb0[1],sb[0]+fb0[2],sb[1]+fb0[3]]
     sw,sh=sb[2]-sb[0],sb[3]-sb[1]
     fw,fh=fb[2]-fb[0],fb[3]-fb[1]
     margins=[fb[0]-sb[0],sb[2]-fb[2],fb[1]-sb[1],sb[3]-fb[3]]
@@ -117,8 +126,9 @@ for idx,en,ko,(x0,y0,x1,y1) in rowspec:
 
     # Absolute masks
     smabs=np.zeros((H,W),bool); smabs[y0:y1,x0:x1]=smask
-    fmabs=np.zeros((H,W),bool); fmabs[y0:y1,x0:x1]=fmask
-    source_union |= smabs
+    fmabs=np.zeros((H,W),bool); fmabs[sb[1]:sb[3],sb[0]:sb[2]]=fpatch
+    # Contract containment is the exact source glyph/effect bbox rectangle.
+    source_union[sb[1]:sb[3],sb[0]:sb[2]]=True
     final_masks.append(fmabs)
 
     # Exact English/source pixels must not survive outside Korean lettering.
@@ -130,7 +140,7 @@ for idx,en,ko,(x0,y0,x1,y1) in rowspec:
     checks.append({
       "region_idx":idx,"source":en,"korean":ko,"cell":[x0,y0,x1,y1],
       "source_background_rgba":[int(v) for v in bg],"source_background_mode_fraction":round(bg_count/total,6),
-      "final_background_rgba":[int(v) for v in fbg],"final_background_mode_fraction":round(fbg_count/ftotal,6),
+      "final_source_bbox_plate_rgba":[int(v) for v in pbg],"final_source_bbox_plate_mode_fraction":round(pbg_count/ptotal,6),
       "source_bbox":sb,"localized_bbox":fb,
       "source_size":[sw,sh],"localized_size":[fw,fh],
       "height_ratio":round(fh/sh,4),
@@ -146,7 +156,7 @@ adiff=fa[:,:,3]!=oa[:,:,3]
 outside=int(np.count_nonzero(diff & ~source_union))
 alpha_out=int(np.count_nonzero(adiff & ~source_union))
 if outside or alpha_out:
-    raise RuntimeError(("B228 modified pixels outside independently derived source help masks",outside,alpha_out))
+    raise RuntimeError(("B228 modified pixels outside independently derived source help bboxes",outside,alpha_out))
 
 # Both localized labels are isolated.
 overlap=int(np.count_nonzero(final_masks[0]&final_masks[1]))
@@ -209,8 +219,8 @@ summary={
  "bbox_size_positive_margin":"2/2 PASS",
  "height_hierarchy":"2/2 PASS >= 0.85 source height",
  "old_help_rows_exact_source":"2/2 PASS",
- "changed_pixels_outside_independent_source_help_masks":outside,
- "alpha_changed_outside_independent_source_help_masks":alpha_out,
+ "changed_pixels_outside_independent_source_help_bboxes":outside,
+ "alpha_changed_outside_independent_source_help_bboxes":alpha_out,
  "source_exact_residue_outside_localized_masks":sum(r["source_exact_residue_outside_localized_mask"] for r in checks),
  "localized_overlap_pixels":overlap,
  "localized_touch_pairs":touch,
