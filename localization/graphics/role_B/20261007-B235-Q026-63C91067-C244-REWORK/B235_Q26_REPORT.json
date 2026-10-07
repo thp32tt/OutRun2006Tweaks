@@ -142,7 +142,7 @@
     "5_no_clipping": "PASS_POSITIVE_MARGINS",
     "6_protected_clearance": "PASS_ZERO_BLAST_OUTSIDE_EXACT_SOURCE_BOXES",
     "7_flip_y_raw": "EVIDENCE_WRITTEN",
-    "8_immediate_readability": "PENDING_CONTROLLER_VISUAL"
+    "8_immediate_readability": "PASS_CONTROLLER_SOURCE_OLD_CLEAN_FINAL_PRACTICAL"
   },
   "post_encode_presentation_gate": {
     "decoded_persisted_dds_authority": "PASS",
@@ -154,8 +154,9 @@
     "family_profile": "WHITE_NAVY_STRONG_RIGHT_ITALIC_TOTAL_RANK",
     "blast_radius": "PASS_ZERO_OUTSIDE_TWO_SOURCE_BOXES"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER",
-  "status": "B235_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "controller_visual_qa": "PASS",
+  "status": "B235_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_qa_report": "localization/graphics/role_B/20261007-B235-Q026-63C91067-C244-REWORK/B235_CONTROLLER_SELF_QA.json"
 }
