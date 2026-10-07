@@ -115,6 +115,29 @@ for contract_id, rva in (
 require('OptionArrow_ClipSpriteCalls', ui, 'exact option/menu arrow producer set')
 require('ExactScreenHud_putClipSprite', ui, 'option/menu arrow SCREEN_HUD route')
 
+# Canonical executable closure for the DispRank/POSITION HUD family.
+# These eight right-side put_clip_sprite producers cover the on-screen rank
+# digits/position family that regressed to doubled/head-following in 00519.
+# Pin the actual CALL bytes before relying on the ScreenHud wrapper list.
+for contract_id, rva in (
+    ('VR-EXE-DISPRANK-CLIP-B9F3A', '0x000B9F3A'),
+    ('VR-EXE-DISPRANK-CLIP-B9F5E', '0x000B9F5E'),
+    ('VR-EXE-DISPRANK-CLIP-B9F81', '0x000B9F81'),
+    ('VR-EXE-DISPRANK-CLIP-B9FD0', '0x000B9FD0'),
+    ('VR-EXE-DISPRANK-CLIP-B9FFC', '0x000B9FFC'),
+    ('VR-EXE-DISPRANK-CLIP-BA01E', '0x000BA01E'),
+    ('VR-EXE-DISPRANK-CLIP-BA035', '0x000BA035'),
+    ('VR-EXE-DISPRANK-CLIP-BA052', '0x000BA052'),
+):
+    require(contract_id, binary_contract,
+            'canonical DispRank direct-CALL contract')
+    require(rva, binary_contract,
+            'canonical DispRank direct-CALL RVA')
+require('ExactScreenHudRight_ClipSpriteCalls', ui,
+        'DispRank right-side ScreenHud producer set')
+require('ExactScreenHudRight_putClipSprite', ui,
+        'DispRank right-side ScreenHud wrapper')
+
 # Canonical disassembly proves 38 direct put_clip_sprite SCREEN_HUD calls.
 # Keep those call sites exact and avoid a hot-path runtime stack walk.
 for token in [

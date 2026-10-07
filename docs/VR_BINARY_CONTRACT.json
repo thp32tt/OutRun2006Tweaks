@@ -617,6 +617,118 @@
           "needle": "0x2C9DB"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-DISPRANK-CLIP-B9F3A",
+      "rva": "0x000B9F3A",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e84133f7ff",
+      "purpose": "Canonical DispRank/POSITION HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xB9F3A"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-DISPRANK-CLIP-B9F5E",
+      "rva": "0x000B9F5E",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e81d33f7ff",
+      "purpose": "Canonical DispRank/POSITION HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xB9F5E"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-DISPRANK-CLIP-B9F81",
+      "rva": "0x000B9F81",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8fa32f7ff",
+      "purpose": "Canonical DispRank/POSITION HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xB9F81"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-DISPRANK-CLIP-B9FD0",
+      "rva": "0x000B9FD0",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8ab32f7ff",
+      "purpose": "Canonical DispRank/POSITION HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xB9FD0"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-DISPRANK-CLIP-B9FFC",
+      "rva": "0x000B9FFC",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e87f32f7ff",
+      "purpose": "Canonical DispRank/POSITION HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xB9FFC"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-DISPRANK-CLIP-BA01E",
+      "rva": "0x000BA01E",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e85d32f7ff",
+      "purpose": "Canonical DispRank/POSITION HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBA01E"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-DISPRANK-CLIP-BA035",
+      "rva": "0x000BA035",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e84632f7ff",
+      "purpose": "Canonical DispRank/POSITION HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBA035"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-DISPRANK-CLIP-BA052",
+      "rva": "0x000BA052",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e82932f7ff",
+      "purpose": "Canonical DispRank/POSITION HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBA052"
+        }
+      ]
     }
   ]
 }
