@@ -9492,5 +9492,43 @@
     "pre_ingame_export": "PENDING_REFRESH_Q188_Q220_Q222",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "a171_a175_c255_q121_q193_rework": {
+    "timestamp_kst": "2026-10-08T01:22:00+09:00",
+    "role": "A",
+    "execution_backend": "CHATGPT_LOCAL_GITHUB_DNS_FAILURE -> GITHUB_ACTIONS_CPU_WORKER; N100_NOT_USED",
+    "source_c_return": "C255_REWORK_REQUIRED_SOURCE_RESIDUE_DOUBLE_DRAW",
+    "q193": {
+      "asset": "97E863AD",
+      "queue_index": 193,
+      "prior_sha256": "f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69",
+      "candidate_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
+      "machine_qa": "3/3 exact bbox/source-size/positive-margin PASS; changed/alpha outside=0; persisted decode/RAW mirror_y PASS",
+      "controller_visual_qa": "PASS_SOURCE_PRIOR_CLEAN_FINAL_CONTACTS_RAW",
+      "status": "A171_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME"
+    },
+    "q121": {
+      "asset": "FD90AA9",
+      "queue_index": 121,
+      "restored_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+      "rejected_attempts": [
+        "A171",
+        "A172",
+        "A173",
+        "A174"
+      ],
+      "controller_visual_qa": "FAIL_NEW_RECTANGULAR_PLATE_ON_ALL_RECONSTRUCTION_ATTEMPTS",
+      "status": "HOLD_STRICT_RECHECK",
+      "next": "source-art-aware clean plate reconstruction -> producer QA -> fresh C -> exact-SHA C3 -> NEW in-game retest"
+    },
+    "worker_runs": [
+      37649209801,
+      37649719504,
+      37650100275,
+      37650536450,
+      37651156325
+    ],
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
