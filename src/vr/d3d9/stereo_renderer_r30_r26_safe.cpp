@@ -1559,6 +1559,8 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::CurrentScope;
             const bool semanticHud =
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
+            const bool semanticSceneEffect =
+                semanticScope == OutRunVR::GameSemantic::RenderScope::SceneEffect;
             const bool semanticWorld =
                 OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
             const bool semanticProjectedWorld =
@@ -1653,10 +1655,11 @@ namespace OutRunVRStereo
                 return R30ScreenSpaceKind::ScreenOverlay2D;
 
             // R48 final-test policy: screen/perspective HUD ownership comes only
-            // from the canonical EXE sprite queue or exact original-mod semantic
-            // tags. Do not infer HUD from alpha, ZENABLE, cull mode, shader
-            // shape, primitive count or a recently uploaded matrix.
-            if (!semanticHud && !semanticWorld)
+            // from exact game semantics. SceneEffect is separately exact:
+            // hooks_graphics scopes Clr_SceneEffect from the original mod, so
+            // its own recovered WVP may be reviewed without reopening the old
+            // broad alpha-draw heuristic.
+            if (!semanticHud && !semanticWorld && !semanticSceneEffect)
                 return R30ScreenSpaceKind::None;
 
             float projection[16]{};
@@ -1666,6 +1669,35 @@ namespace OutRunVRStereo
             const auto projectionClass =
                 OutRunVR::PassPolicy::ClassifyProjectionSignature(
                     projection[11], projection[15]);
+
+            if (semanticSceneEffect)
+            {
+                // Original FixZBufferPrecision deliberately scopes
+                // Clr_SceneEffect around screen effects/lens flare. Historical
+                // R41 HMD work showed lens-player/billboard effects can carry
+                // a real affine WorldView despite depth-disabled alpha state.
+                // Re-enable that matrix proof only inside this exact scope.
+                if (projectionClass !=
+                    OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
+                    return R30ScreenSpaceKind::None;
+
+                float rawWvp[16]{};
+                if (!R44GetOwnedRawOverlayWvp(rawWvp))
+                    return R30ScreenSpaceKind::None;
+                const auto matrixKind =
+                    R44ClassifyOwnedOverlayMatrix(rawWvp);
+                if (matrixKind == R44OverlayMatrixKind::SpatialBillboard)
+                {
+                    ++R44SpatialBillboardClassifications;
+                    return R30ScreenSpaceKind::WorldBillboard;
+                }
+                if (matrixKind == R44OverlayMatrixKind::FlatHud)
+                {
+                    ++R44FlatOverlayClassifications;
+                    return R30ScreenSpaceKind::PerspectiveHud;
+                }
+                return R30ScreenSpaceKind::None;
+            }
 
             if (semanticWorld)
             {
