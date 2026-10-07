@@ -66,7 +66,7 @@ x0,y0,x1,y1=ob
 bx0=((x0+3)//4)*4; by0=((y0+3)//4)*4; bx1=(x1//4)*4; by1=(y1//4)*4
 if [bx0,by0,bx1,by1] != [1988,2064,2444,2164]:
     raise RuntimeError(("block interior drift",[bx0,by0,bx1,by1]))
-safe=[bx0+2,by0+2,bx1-2,by1-2]
+safe=[bx0+6,by0+4,bx1-4,by1-4]
 sx0,sy0,sx1,sy1=safe
 maxw,maxh=sx1-sx0,sy1-sy0
 
@@ -133,9 +133,15 @@ if not(pre[0]>x0 and pre[1]>y0 and pre[2]<x1 and pre[3]<y1):
 if glyph.height <= (old_loc[3]-old_loc[1])+8:
     raise RuntimeError(("insufficient material height improvement",glyph.height,old_loc[3]-old_loc[1]))
 
-# Rebuild only block-aligned safe interior from validated clean plate then draw new row.
+# Rebuild only blocks needed by the union of old/new glyphs, leaving a full
+# source-bbox margin block untouched at the left/top where possible.
+ux0=min(old_loc[0],pre[0]); uy0=min(old_loc[1],pre[1]); ux1=max(old_loc[2],pre[2]); uy1=max(old_loc[3],pre[3])
+pbx0=max(bx0,(ux0//4)*4); pby0=max(by0,(uy0//4)*4)
+pbx1=min(bx1,((ux1+3)//4)*4); pby1=min(by1,((uy1+3)//4)*4)
+if not(pbx0>x0 and pby0>y0 and pbx1<x1 and pby1<=y1):
+    raise RuntimeError(("patch block margin",ob,[pbx0,pby0,pbx1,pby1]))
 final=old.copy()
-final.paste(clean.crop((bx0,by0,bx1,by1)),(bx0,by0))
+final.paste(clean.crop((pbx0,pby0,pbx1,pby1)),(pbx0,pby0))
 final.alpha_composite(glyph,(px,py))
 
 # Encode top level only, then splice only full BC3 blocks wholly inside exact source bbox.
@@ -153,9 +159,9 @@ src_payload=eb[128:128+top_size]
 bw=W//4
 changed_blocks=0
 # readable y -> raw y conversion for the same block-aligned rectangle
-raw_y0=H-by1; raw_y1=H-by0
+raw_y0=H-pby1; raw_y1=H-pby0
 for ry in range(raw_y0//4,raw_y1//4):
-    for rx in range(bx0//4,bx1//4):
+    for rx in range(pbx0//4,pbx1//4):
         off=128+(ry*bw+rx)*16
         noff=(ry*bw+rx)*16
         nb=src_payload[noff:noff+16]
