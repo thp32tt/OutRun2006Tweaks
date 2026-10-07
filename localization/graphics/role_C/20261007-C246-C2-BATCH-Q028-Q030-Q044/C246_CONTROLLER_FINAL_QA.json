@@ -95,7 +95,28 @@
     "stage_height_ratio": 0.6625,
     "status": "C246_VISUAL_FAIL_REWORK_REQUIRED"
   },
-  "pre_ingame_export": "PENDING_REFRESH_Q28_Q30",
+  "pre_ingame_export": {
+    "timestamp_kst": "2026-10-07T19:12:00+09:00",
+    "worker_run_id": 37605030145,
+    "worker_output_commit": "ce260d63a7e94c487da6ca6e0949ca90de036202",
+    "manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
+    "count": 17,
+    "localized_candidate_count": 16,
+    "policy_pass_no_candidate_count": 1,
+    "mandatory_c3_blocked_count": 10,
+    "q28": {
+      "number": 3,
+      "jpg": "003_q028_A05BF610.jpg",
+      "candidate_sha256": "1ced3cfa2042d7b0d0b708e3521a7043bd7528b0347ddbe38b2b7ee51a4c0d3a"
+    },
+    "q30": {
+      "number": 4,
+      "jpg": "004_q030_8215FD25.jpg",
+      "candidate_sha256": "fa294ef9bcd4e96db8848da3846cea7d90fd6668e1a30d6957f6e1c881f4a547"
+    },
+    "q44_excluded": true,
+    "runtime_validation": "UNTESTED"
+  },
   "runtime_validation": "UNTESTED",
   "forbidden_domains_touched": [],
   "decision_summary": {
@@ -113,5 +134,10 @@
     "localization/graphics/role_C/20261007-C246-C2-BATCH-Q028-Q030-Q044/C246_Q044_19CEDB9_FULL.jpg",
     "localization/graphics/role_C/20261007-C246-C2-BATCH-Q028-Q030-Q044/C246_Q044_19CEDB9_ROW_CONTACTS.jpg",
     "localization/graphics/role_C/20261007-C246-C2-BATCH-Q028-Q030-Q044/C246_Q044_19CEDB9_RAW.jpg"
-  ]
+  ],
+  "exported_card_controller_visual_qa": {
+    "q28": "PASS: English/Korean FLIP-Y and RAW orientation match; plate restoration, source-relative scale, right lean, glyph integrity and protected-art isolation remain acceptable.",
+    "q30": "PASS: English/Korean FLIP-Y and RAW orientation match; both rows retain clean plates, source-family hierarchy/right lean, no clipping or protected-art intrusion.",
+    "q44": "EXCLUDED_REWORK_REQUIRED"
+  }
 }
