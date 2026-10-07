@@ -1,0 +1,40 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261007-A164R-Q197-9F060EC1-EXACT-BBOX",
+  "queue_index": 197,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+  "candidate_sha256": "60cfa3ef1257e3bbc50a8c7152aba538837eabd2322c18e098ee7ceb61381fea",
+  "source_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+  "prior_candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+  "execution_backend": "github-actions fallback after ChatGPT local GitHub clone DNS failure; N100 used only to retrieve/inspect already-produced JPG evidence",
+  "trigger": "historical C85 bytes violate current exact source-bbox ceiling in 5/5 rows; A164 first clean reconstruction visually rejected and superseded by A164R",
+  "controller_visual_qa": "PASS",
+  "findings": {
+    "clean_plate": "PASS; A164R nearest-background reconstruction removes the first-attempt horizontal streaking and shows no visible English/Korean residue, donor seam, rectangular patch, or protected-art damage in SOURCE/OLD/CLEAN/FINAL and row-contact evidence",
+    "source_style": "PASS; source is an upright condensed flat-color license UI family and A164R retains upright orientation, source-relative title/body hierarchy, matching gray title/navy body colors, and shared body style",
+    "scale_readability": "PASS; title is 403x58 inside 584x62 and body rows use shared 42px native rendering with 40-41px height inside 45-47px source heights; Korean remains immediately readable at 100/75/50 practical evidence without enlarging beyond source boxes",
+    "glyph_integrity": "PASS; no broken Hangul, clipped antialias fringe, malformed syllables, or mixed-resolution raster visible",
+    "placement": "PASS; all five rows use source-left cadence with >=2px positive margin and no label collision",
+    "protected_art": "PASS; row numbers, portrait boxes, OM, barcode/legal/watermark/frame and all pixels outside the declared old/source bbox union remain prior-C85 exact by machine evidence and visually intact",
+    "raw_flipy": "PASS; readable and RAW mirror-Y evidence are consistent and clean"
+  },
+  "machine_qa_reference": "localization/graphics/role_A/20261007-A164R-Q197-9F060EC1-EXACT-BBOX/A164R_Q197_REPORT.json",
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS",
+    "2_slant_direction": "PASS_SOURCE_UPRIGHT_FAMILY",
+    "3_no_unnecessary_undersizing": "PASS_SOURCE_HEIGHT_NEAR_MAX_AND_NATURAL_KOREAN_WIDTH",
+    "4_source_weight_effects": "PASS_FLAT_SOURCE_COLOR_FAMILY",
+    "5_no_clipping": "PASS_5_OF_5_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_BLAST_OUTSIDE_DECLARED_REWORK_UNION",
+    "7_flip_y_raw": "PASS",
+    "8_immediate_readability": "PASS_100_75_50"
+  },
+  "prior_c85_invalidated_for_current_bytes": true,
+  "producer_decision": "A164R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3_strict_audit": "REQUIRED_EXACT_SHA_DUE_HISTORICAL_POLICY_FALSE_NEGATIVE_AND_PLATE_RECONSTRUCTION",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_AND_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
