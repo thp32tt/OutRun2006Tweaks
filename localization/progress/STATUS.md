@@ -2267,3 +2267,8 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - A158 candidate `6386a41ffa4af599cc7076be0cc4ce59729026b4882c437ac397270290b7e4bf` changes only that exact source bbox to `시프트`; all prior Korean labels, character glyph rows and unrelated artwork remain exact outside the bbox.
 - Source 116x46 -> Korean 112x42 with 2px margins all sides; 1/1 bbox/size/positive-margin PASS; changed/alpha outside=0; clean source residue=0; exact RGBA32 header/raw mirror_y.
 - SOURCE/C109/CLEAN/A158 high-zoom, full readable atlas and RAW controller visual QA PASS. Prior C109 is superseded; fresh C + refreshed English-original comparison/user review + actual-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 11:39 KST — C230 q230 E95DA5
+- B228 candidate a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f fresh C PASS: 2/2 bbox/size/positive-margin, 46/50px source-height hierarchy, outside/alpha/residue/overlap/touch=0, exact RGBA header/raw mirror_y.
+- Controller visual PASS: both previously untranslated ordinary help sentences are Korean with no visible English residue, broken Hangul, clipping, intrusion or style/orientation regression; existing B73/song-title/BGM material remains protected.
+- Decision C230_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export/user review + actual-game validation pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.

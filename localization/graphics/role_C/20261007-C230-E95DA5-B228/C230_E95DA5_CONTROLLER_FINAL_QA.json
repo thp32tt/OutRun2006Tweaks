@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261007-C230-E95DA5-B228",
+  "qa_id": "C230",
+  "timestamp_kst": "2026-10-07T11:39:07+09:00",
+  "queue_index": 230,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "producer_run": "B228",
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "prior_candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
+  "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "machine_status": "PASS",
+  "machine_report": "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_E95DA5_MACHINE_QA.json",
+  "machine_summary": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "height_hierarchy": "2/2 PASS (46px localized vs 50px source)",
+    "old_help_rows_exact_source": "2/2 PASS",
+    "changed_pixels_outside_independent_source_help_bboxes": 0,
+    "alpha_changed_outside_independent_source_help_bboxes": 0,
+    "source_exact_residue_outside_localized_masks": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "header_128_exact": true,
+    "raw_readable_parity": "PASS",
+    "semantic_binding": "2/2 PASS"
+  },
+  "controller_visual_review": {
+    "evidence": [
+      "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_SOURCE_C149_B228_READABLE.jpg",
+      "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_HELP_ROW_CONTACT.jpg",
+      "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_SOURCE_C149_B228_RAW.jpg"
+    ],
+    "untranslated_visible_ui": "PASS_BOTH_HELP_SENTENCES_NOW_KOREAN",
+    "english_removal_and_plate": "PASS_NO_VISIBLE_ENGLISH_RESIDUE_OR_DIRTY_PATCH",
+    "slant_perspective": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "scale_hierarchy": "PASS_46PX_LOCALIZED_VS_50PX_SOURCE",
+    "weight_effects": "PASS_LOW_CONTRAST_DARK_HELP_FAMILY",
+    "hangul_integrity_clipping": "PASS_NO_BROKEN_OR_CLIPPED_GLYPHS",
+    "protected_intrusion_overlap": "PASS_ZERO_VISIBLE_INTRUSION_OR_COLLISION",
+    "prior_material_preservation": "PASS_ALL_B73_LOCALIZED_ROWS_SONG_TITLES_BGM_AND_ART_UNCHANGED_OUTSIDE_TWO_SOURCE_BBOXES",
+    "flip_y_readable": "PASS",
+    "raw_mirror_y": "PASS",
+    "overall": "PASS"
+  },
+  "verifier_retry_note": "C230 attempts 37561804311/37562002546/37562366800 fail-closed because hidden RGB under transparent pixels made RGB-derived bboxes overly broad. Final run 37562615228 switched to independent alpha-derived visible text bboxes; candidate bytes were never changed by C.",
+  "decision": "C230_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+  "candidate_changed_by_C": false,
+  "pre_ingame_comparison_refresh": "PENDING_C230_EXPORT",
+  "pre_ingame_user_review": "PENDING_REFRESH",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

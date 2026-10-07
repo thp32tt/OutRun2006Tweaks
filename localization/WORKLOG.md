@@ -2798,3 +2798,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/C109/CLEAN/A158 4x contact, full readable atlas and RAW comparison PASS: no English residue, clipping, broken Hangul, collision, protected-art change or orientation defect. Ordered generation gate 1-8 PASS.
 - Prior C109 is superseded because bytes changed. State is `A158_SHIFT_LOCALIZATION_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME`; fresh independent C + regenerated English-original comparison/user review + actual-game validation remain required. `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261007-A-MANUALQA158-AD720950-SHIFT/A158_CONTROLLER_SELF_QA.json`, `localization/graphics/role_A/20261007-A-MANUALQA158-AD720950-SHIFT/A158_AD720950_REPORT.json`.
+
+## 2026-10-07 11:39 KST — C230 q230 E95DA5 fresh independent QA
+
+- Read latest contract/policies/backlog and selected B228 q230 E95DA5; completed C229/q159 and earlier C results were not repeated. GitHub-hosted C worker final run 37562615228 independently downloaded/decoded the pinned source and recovered the pre-B228 C149 candidate from the B228 worker parent.
+- Three verifier retries failed closed before approval because transparent-row hidden RGB polluted RGB-derived glyph bboxes; final verifier correctly derives visible source/final masks from alpha. Candidate bytes were never changed by C during these retries.
+- Machine PASS: prior help rows exact source 2/2; source/final bbox-size-positive-margin 2/2; localized height 46px vs source 50px; changed/alpha outside exact source bboxes=0; visible source residue=0; overlap/touch=0; exact RGBA header/raw mirror_y PASS.
+- Controller SOURCE/C149/B228 full + 2-row + RAW visual PASS: both ordinary explanatory sentences are now Korean, source-like dark upright/low-contrast style and near-source height are preserved, and no English residue, clipping, overlap, protected intrusion or orientation regression is visible. Existing B73 localization, protected song/named-item titles and BGM remain unchanged outside the two source bboxes.
+- Decision C230_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME English-original comparison refresh dispatched next; actual game validation remains UNTESTED. VR/FFB/DX11/DXVK untouched.
