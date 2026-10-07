@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261008-A178-IGR025-COVERAGE-MAPPING",
+  "timestamp_kst": "2026-10-08T03:12:00+09:00",
+  "trigger": {
+    "id": "IGR-025",
+    "screenshot": "스크린샷(163).png",
+    "screen": "COURSE_SELECT_VISIBLE_COVERAGE",
+    "priority": "P1",
+    "domain": "MIXED",
+    "owner_lane": "A",
+    "defect_tags": [
+      "KOREAN_COVERAGE_TOO_SPARSE",
+      "UNTRANSLATED_VISIBLE_UI"
+    ]
+  },
+  "selection": {
+    "refreshed_head": "ae79d464a5d1b049bfef99da31d0c44f79fe284c",
+    "prior_attempt_q212": {
+      "result": "FAIL_CLOSED_ON_CANDIDATE_DRIFT",
+      "worker_run": 37663845664,
+      "expected_candidate": "e3fc3275e696acb0dc5449908bd3b57a232d842ad51296e888cc7ede6a276863",
+      "observed_candidate": "4b967ef09bbbb21d7ecc1496c2ee15395567b526af6cf68f1c22c7549850d518",
+      "reason": "B243 landed a newer material q212 candidate; A skipped overwrite/rework duplication."
+    },
+    "rationale": "After q212 drift refresh, no A-odd RENDER_READY/C-returned material candidate remained. IGR-025 is the next A-owned P1 special mapping task."
+  },
+  "exact_graphics_bindings": [
+    {
+      "queue_index": 219,
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+      "source_role": "COURSE SELECT header",
+      "korean": "코스 선택",
+      "producer": "A113",
+      "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+      "candidate_sha256": "f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24",
+      "current_state": "A113_SELF_QA_PASS_PENDING_INDEPENDENT_C_AND_INGAME",
+      "action": "DO_NOT_RERENDER; REQUIRE_FRESH_C"
+    },
+    {
+      "queue_index": 163,
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+      "source_role": "24 course/stage name list labels",
+      "producer": "A154",
+      "independent_c": "C228",
+      "source_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "candidate_sha256": "201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6",
+      "current_state": "C228_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+      "policy": "24/24 canonical phonetic stage names",
+      "action": "PRESERVE_CURRENT_BYTES; NO_DUPLICATE_PRODUCTION"
+    },
+    {
+      "queue_index": 65,
+      "asset": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+      "source_role": "known Course/Left/Right/Easy/Hard graphics family",
+      "current_state": "C254_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_INGAME",
+      "action": "NOT_PROVEN_VISIBLE_IN_SCREENSHOT_163; DO_NOT_REPEAT"
+    }
+  ],
+  "runtime_translation_evidence": {
+    "source": "localization/text/runtime_ko.tsv + korean_all.jsonl",
+    "reviewed_rows": {
+      "98": "코스 유형:",
+      "103": "코스:",
+      "195": "전체 스테이지",
+      "196": "OUTRUN2 믹스",
+      "197": "OUTRUN2SP 믹스",
+      "897": "코스를 주행해 미션을 잠금 해제하세요!",
+      "129-158": "reviewed Korean course/stage names"
+    },
+    "renderer": "src/hooks_localization.cpp loads runtime_ko.tsv and resolves translated text by stock text pointer/content identity before overlay redraw",
+    "conclusion": "Korean data exists for major course-selection runtime strings, but repository evidence does not identify which of these runtime IDs were the remaining English labels in screenshot(163)."
+  },
+  "blocker": {
+    "kind": "MISSING_SCREENSHOT_PAYLOAD_IN_GIT_SSOT",
+    "detail": "The backlog stores screenshot filename/tags but the actual screenshot pixels or per-label transcription/mapping are not committed in the repository. Current conversation/Project file search also did not expose screenshot(163). Editing runtime IDs or unrelated DDS from inference would violate the exact-mapping and no-guess rules.",
+    "safe_decision": "HOLD_STRICT_RECHECK_MAPPING_EVIDENCE_REQUIRED"
+  },
+  "production_result": {
+    "new_candidate_count": 0,
+    "reason": "No safe new material candidate after q212 concurrent drift; q219 and q163 already contain valid current Korean candidates and must not be repeated.",
+    "next_evidence": "Persist screenshot(163) or a current replacement course-select screenshot/trace with visible English labels, then map each label to runtime ID vs DDS and continue material repair in the same invocation."
+  },
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
