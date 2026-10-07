@@ -1,0 +1,163 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261008-A176-Q121-TRANSPARENT-PLATE",
+  "queue_index": 121,
+  "asset": "FD90AA9",
+  "regression": "IGR-018 / C255 visible English source residue double draw",
+  "input_candidate_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+  "candidate_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "construction": "transparent-atlas alpha-aware reconstruction: clear union of canonical-source and current visible alpha only inside the three exact source header bboxes; no opaque/gray rectangle fill; fresh native A138-family Korean rerender",
+  "alpha_geometry": [
+    {
+      "key": "select_game_mode",
+      "source_alpha_coverage": 0.433968,
+      "prior_alpha_coverage": 0.315071,
+      "cleared_pixels": 98226
+    },
+    {
+      "key": "select_car",
+      "source_alpha_coverage": 0.362207,
+      "prior_alpha_coverage": 0.228735,
+      "cleared_pixels": 79877
+    },
+    {
+      "key": "select_course",
+      "source_alpha_coverage": 0.446686,
+      "prior_alpha_coverage": 0.256806,
+      "cleared_pixels": 72262
+    }
+  ],
+  "clean_visible_alpha_by_row": {
+    "select_game_mode": 0,
+    "select_car": 0,
+    "select_course": 0
+  },
+  "rows": [
+    {
+      "key": "select_game_mode",
+      "source": "Select Game Mode",
+      "korean": "게임 모드 선택",
+      "original_bbox": [
+        166,
+        819,
+        1166,
+        973
+      ],
+      "localized_bbox": [
+        341,
+        846,
+        990,
+        945
+      ],
+      "source_size": [
+        1000,
+        154
+      ],
+      "localized_size": [
+        649,
+        99
+      ],
+      "delta_left": 175,
+      "delta_right": 176,
+      "delta_top": 27,
+      "delta_bottom": 28,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR:style=Black",
+      "native_font_size_px": 108,
+      "shear": 0.28,
+      "alignment": "source-centered-shared-header-family"
+    },
+    {
+      "key": "select_car",
+      "source": "Select your car",
+      "korean": "차량 선택",
+      "original_bbox": [
+        243,
+        947,
+        1156,
+        1111
+      ],
+      "localized_bbox": [
+        485,
+        979,
+        913,
+        1078
+      ],
+      "source_size": [
+        913,
+        164
+      ],
+      "localized_size": [
+        428,
+        99
+      ],
+      "delta_left": 242,
+      "delta_right": 243,
+      "delta_top": 32,
+      "delta_bottom": 33,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR:style=Black",
+      "native_font_size_px": 108,
+      "shear": 0.28,
+      "alignment": "source-centered-shared-header-family"
+    },
+    {
+      "key": "select_course",
+      "source": "Select Course",
+      "korean": "코스 선택",
+      "original_bbox": [
+        302,
+        1062,
+        1085,
+        1213
+      ],
+      "localized_bbox": [
+        478,
+        1088,
+        908,
+        1187
+      ],
+      "source_size": [
+        783,
+        151
+      ],
+      "localized_size": [
+        430,
+        99
+      ],
+      "delta_left": 176,
+      "delta_right": 177,
+      "delta_top": 26,
+      "delta_bottom": 26,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font": "Noto Sans CJK KR:style=Black",
+      "native_font_size_px": 108,
+      "shear": 0.28,
+      "alignment": "source-centered-shared-header-family"
+    }
+  ],
+  "machine_qa": {
+    "bbox_size_positive_margin": "3/3 PASS",
+    "changed_outside_header_union": 0,
+    "alpha_changed_outside_header_union": 0,
+    "localized_pair_overlap": [],
+    "localized_pair_touch_1px": [],
+    "header_128_exact": true,
+    "persisted_decode": "PASS",
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3": "REQUIRED_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "status": "A176_Q121_MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
+  "forbidden_domains_touched": []
+}
