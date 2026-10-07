@@ -729,6 +729,216 @@
           "needle": "0xBA052"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE5CD",
+      "rva": "0x000BE5CD",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8aeecf6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE5CD"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE603",
+      "rva": "0x000BE603",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e878ecf6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE603"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE633",
+      "rva": "0x000BE633",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e848ecf6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE633"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE66D",
+      "rva": "0x000BE66D",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e80eecf6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE66D"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE690",
+      "rva": "0x000BE690",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8ebebf6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE690"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE6B5",
+      "rva": "0x000BE6B5",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8c6ebf6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE6B5"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE6D5",
+      "rva": "0x000BE6D5",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8a6ebf6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE6D5"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE7E8",
+      "rva": "0x000BE7E8",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e893eaf6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE7E8"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE802",
+      "rva": "0x000BE802",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e879eaf6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE802"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE81C",
+      "rva": "0x000BE81C",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e85feaf6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE81C"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE8D8",
+      "rva": "0x000BE8D8",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8a3e9f6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE8D8"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE915",
+      "rva": "0x000BE915",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e866e9f6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE915"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE94A",
+      "rva": "0x000BE94A",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e831e9f6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE94A"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE97A",
+      "rva": "0x000BE97A",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e801e9f6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE97A"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-RESULT-CLIP-BE9A3",
+      "rva": "0x000BE9A3",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8d8e8f6ff",
+      "purpose": "Canonical TimeAttack/checkpoint/goal/result right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE9A3"
+        }
+      ]
     }
   ]
 }

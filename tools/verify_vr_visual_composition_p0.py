@@ -138,6 +138,36 @@ require('ExactScreenHudRight_ClipSpriteCalls', ui,
 require('ExactScreenHudRight_putClipSprite', ui,
         'DispRank right-side ScreenHud wrapper')
 
+# Canonical executable closure for TimeAttack/checkpoint/goal/result HUD.
+# These 15 right-side put_clip_sprite producers are the historical UIScaling
+# handoff restored after the doubled/head-following +TIME/result regression.
+# Pin their actual EXE CALL bytes so source-only call lists cannot mask drift.
+for contract_id, rva in (
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE5CD', '0x000BE5CD'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE603', '0x000BE603'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE633', '0x000BE633'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE66D', '0x000BE66D'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE690', '0x000BE690'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE6B5', '0x000BE6B5'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE6D5', '0x000BE6D5'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE7E8', '0x000BE7E8'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE802', '0x000BE802'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE81C', '0x000BE81C'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE8D8', '0x000BE8D8'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE915', '0x000BE915'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE94A', '0x000BE94A'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE97A', '0x000BE97A'),
+    ('VR-EXE-TIMEATTACK-RESULT-CLIP-BE9A3', '0x000BE9A3'),
+):
+    require(contract_id, binary_contract,
+            'canonical TimeAttack/result direct-CALL contract')
+    require(rva, binary_contract,
+            'canonical TimeAttack/result direct-CALL RVA')
+require('ExactScreenHudRight_ClipSpriteCalls', ui,
+        'TimeAttack/result right-side ScreenHud producer set')
+require('ExactScreenHudRight_putClipSprite', ui,
+        'TimeAttack/result right-side ScreenHud wrapper')
+
 # Canonical disassembly proves 38 direct put_clip_sprite SCREEN_HUD calls.
 # Keep those call sites exact and avoid a hot-path runtime stack walk.
 for token in [
