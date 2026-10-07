@@ -199,11 +199,11 @@ int main() {
  require(drift_countersteer_blend(.30f,.20f,1.0f)>0.0f&&drift_countersteer_blend(.30f,.20f,1.0f)<1.0f,"moderate drift crossfades instead of snapping");
  require(drift_countersteer_blend(.10f,-.20f,1.0f)==0.0f,"small body slip does not trigger drift handoff");
  require(drift_countersteer_shape(.70f)>.89f&&drift_countersteer_shape(.05f)==0.0f,"drift recovery magnitude is bounded to developed oversteer");
- require(std::abs(DriftCountersteerTorqueScale-.90f)<1e-6f,"R18 drift countersteer target is softened by 10 percent without changing handoff direction");
+ require(std::abs(DefaultCountersteerStrength-.90f)<1e-6f,"R19 countersteer option default preserves the R18 90 percent drift target");
  const float weakPrimaryTorque=.05f;
  const float boundedOpposingCue=bound_drift_countersteer_torque(weakPrimaryTorque,-.90f);
  require(std::abs(boundedOpposingCue+weakPrimaryTorque)<1e-6f,"R13 body-slip cue cannot exceed weak front-slip SAT magnitude");
- const float deepBodyTarget=-.80f*DriftCountersteerTorqueScale;
+ const float deepBodyTarget=-.80f*DefaultCountersteerStrength;
  const float deepFrontTorque=.30f;
  const float deepBlend=drift_countersteer_blend(.70f,-.35f,1.0f);
  const float deepHandoff=deepFrontTorque+(deepBodyTarget-deepFrontTorque)*deepBlend;
