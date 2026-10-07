@@ -3350,3 +3350,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - First C261 hosted attempt failed only because q24 used the wrong public source path. Diagnostic SUCCESS pinned the exact A135 stock source and corrected retry 37674838123 SUCCESS / evidence `be538331...`; no candidate bytes changed and retries are not separate material results.
 - Backend: ChatGPT local GitHub DNS unavailable -> GitHub Actions repository-backed C worker; N100 MCP used only to display generated JPG evidence. q102 PRE_INGAME English-original export refresh pending. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Controller report: `localization/graphics/role_C/20261008-C261-C2-Q102-Q062-Q024/C261_CONTROLLER_FINAL_QA.json`.
+
+## 2026-10-08 04:53 KST — C262 C1 q205/q193/q173 fresh-C dispatch (compute pending)
+- `TEMP_BACKLOG_RELIEF=C1`; `SHARD=ODD(+UNINDEXED_SPECIAL)`. Mandatory contract/policy/state were read; HEAD/queue were refreshed before each selection and again before this synchronization. No C2/even asset was selected.
+- Selected priority order: q205 ACF61D7C (P0 screenshots 159-162 / IGR-020~023 B240 native-HD), q193 97E863AD (IGR-003/019 + C255 source-residue rework A171), q173 6DC89C6E (IGR-013 A90 native stage family). Exact expected candidate SHA256: q205 `e3d421a1...`, q193 `e21851f5...`, q173 `8783e565...`.
+- q205 queue prose still names B240 prior `7598af33...`; latest B240 report names `e3d421a1...`. C262 is fail-closed: persisted DDS SHA must match the latest report before any C approval/state correction.
+- GitHub-hosted C worker run `37677039882` is dispatched from `6c886517...` but remains compute-pending behind active localization worker `37675870154`. Contract forbids duplicating already-dispatched heavy DDS QA on N100; no C PASS/REWORK/C3 result is claimed yet.
+- Dispatch record: `localization/graphics/role_C/20261008-C262-C1-Q205-Q193-Q173/C262_DISPATCH.json`. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.

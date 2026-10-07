@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261008-C262-C1-Q205-Q193-Q173",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "selection_head": "9f5beb48328cfefc66bac8919539ab3e5217aaa0",
+  "dispatch_commit": "6c886517bdb78df075d6eb717c497190421e1061",
+  "worker_run_id": 37677039882,
+  "worker_status": "COMPUTE_PENDING_BEHIND_ACTIVE_LOCALIZATION_CPU_RUN_37675870154",
+  "assets": [
+    {
+      "queue_index": 205,
+      "asset": "ACF61D7C_1024x512.dds",
+      "priority": "P0_USER_INGAME_IGR020_IGR021_IGR022_IGR023",
+      "expected_candidate_sha256": "e3d421a165bdb6e7b3e1bda7b35a6d994d69017407e345d7a339a15d87f79088",
+      "note": "asset_queue note still names prior B240 7598af...; C262 worker will hash persisted DDS before adjudication"
+    },
+    {
+      "queue_index": 193,
+      "asset": "97E863AD_512x256.dds",
+      "priority": "P1_USER_INGAME_IGR003_IGR019_C255_REWORK",
+      "expected_candidate_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166"
+    },
+    {
+      "queue_index": 173,
+      "asset": "6DC89C6E_512x512.dds",
+      "priority": "P1_USER_INGAME_IGR013",
+      "expected_candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830"
+    }
+  ],
+  "machine_qa": "PENDING_GITHUB_HOSTED_WORKER",
+  "controller_visual_qa": "PENDING_WORKER_EVIDENCE",
+  "c3_strict": "PENDING_FRESH_C",
+  "processed_assets": 0,
+  "decision": "NO_C_PASS_OR_REWORK_ADJUDICATION_UNTIL_WORKER_OUTPUT_EXISTS",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "timestamp_kst": "2026-10-08T04:53:04+09:00"
+}

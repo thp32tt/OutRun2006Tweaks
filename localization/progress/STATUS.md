@@ -2673,3 +2673,9 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q62 fa5cd96f... -> REWORK_REQUIRED despite machine 9/9 PASS: visible white rectangular EASY/HARD clean-plate patches remain; C3 BLOCKED.
 - q24 c6daaf2e... -> fresh C + exact-SHA C3_STRICT_PASS_HIGH_RISK_EDGE_TOUCH; 26/26 contained, H/Q/T decoded edge-touch only, 2-beolsik mapping/non-target preservation visual PASS.
 - q102 PRE_INGAME English-original refresh pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+### C262 C1 dispatch — 2026-10-08 04:53 KST
+- TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL); q205/q193/q173 selected after live HEAD/queue refresh.
+- GitHub Actions C worker `37677039882` is COMPUTE_PENDING behind active localization CPU run `37675870154`; processed/adjudicated assets = 0 until persisted worker evidence exists.
+- Expected exact candidates: q205 e3d421a1..., q193 e21851f5..., q173 8783e565.... q205 stale queue-note SHA 7598af33... is not treated as authoritative.
+- No C PASS/REWORK/C3 claim yet. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
