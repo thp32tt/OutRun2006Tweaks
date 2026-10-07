@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C252",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 121,
+  "asset_key": "FD90AA9",
+  "regression": "IGR-018 P1 header ghost/low-res/style/slant",
+  "candidate_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+  "prior_candidate_sha256": "3d000de4c8c88645f4f50deb388e2538a00154783a1db4b848f15f7e7bf86894",
+  "canonical_source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "prior_blob_commit": "753b6845e1e41b8e2882081523e232278808b0d3",
+  "source_blob_commit": "current hd_source",
+  "independent_machine_qa": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "canonical_source_native_dimensions": [
+      4096,
+      4096
+    ],
+    "source_display_scale_nearest_neighbor": 1,
+    "header_128_exact_candidate_prior": true,
+    "header_128_exact_source_when_same_native_dimensions": true,
+    "prior_to_current_changed_pixels": 123149,
+    "prior_to_current_changed_outside_declared_rework_union": 0,
+    "prior_to_current_alpha_changed_outside_declared_rework_union": 0,
+    "bbox_size_positive_margin": "3/3 PASS",
+    "regions": [
+      {
+        "key": "select_game_mode",
+        "source_bbox": [
+          166,
+          819,
+          1166,
+          973
+        ],
+        "localized_bbox": [
+          341,
+          846,
+          990,
+          945
+        ],
+        "source_size": [
+          1000,
+          154
+        ],
+        "localized_size": [
+          649,
+          99
+        ],
+        "margins": [
+          175,
+          176,
+          27,
+          28
+        ],
+        "width_ratio": 0.649,
+        "height_ratio": 0.6429,
+        "result": "PASS"
+      },
+      {
+        "key": "select_car",
+        "source_bbox": [
+          243,
+          947,
+          1156,
+          1111
+        ],
+        "localized_bbox": [
+          485,
+          979,
+          913,
+          1078
+        ],
+        "source_size": [
+          913,
+          164
+        ],
+        "localized_size": [
+          428,
+          99
+        ],
+        "margins": [
+          242,
+          243,
+          32,
+          33
+        ],
+        "width_ratio": 0.4688,
+        "height_ratio": 0.6037,
+        "result": "PASS"
+      },
+      {
+        "key": "select_course",
+        "source_bbox": [
+          302,
+          1062,
+          1085,
+          1213
+        ],
+        "localized_bbox": [
+          478,
+          1088,
+          908,
+          1187
+        ],
+        "source_size": [
+          783,
+          151
+        ],
+        "localized_size": [
+          430,
+          99
+        ],
+        "margins": [
+          176,
+          177,
+          26,
+          26
+        ],
+        "width_ratio": 0.5492,
+        "height_ratio": 0.6556,
+        "result": "PASS"
+      }
+    ]
+  },
+  "visual_evidence": [
+    "C252_q121_FD90AA9_FLIPY.jpg",
+    "C252_q121_FD90AA9_RAW.jpg",
+    "C252_q121_FD90AA9_CONTACTS.jpg"
+  ],
+  "controller_visual_qa": "PENDING",
+  "c3_strict_audit": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

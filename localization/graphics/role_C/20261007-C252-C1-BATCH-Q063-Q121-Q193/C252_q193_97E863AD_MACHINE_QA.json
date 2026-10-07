@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C252",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 193,
+  "asset_key": "97E863AD",
+  "regression": "IGR-003 + IGR-019 P1 low-res showroom/multiplayer body",
+  "candidate_sha256": "f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69",
+  "prior_candidate_sha256": "b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d",
+  "canonical_source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "prior_blob_commit": "d5ac436cdea7e2db9d38373a568014f6c06c2f76",
+  "source_blob_commit": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "independent_machine_qa": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "canonical_source_native_dimensions": [
+      2048,
+      1024
+    ],
+    "source_display_scale_nearest_neighbor": 1,
+    "header_128_exact_candidate_prior": true,
+    "header_128_exact_source_when_same_native_dimensions": true,
+    "prior_to_current_changed_pixels": 17918,
+    "prior_to_current_changed_outside_declared_rework_union": 0,
+    "prior_to_current_alpha_changed_outside_declared_rework_union": 0,
+    "bbox_size_positive_margin": "3/3 PASS",
+    "regions": [
+      {
+        "key": "welcome",
+        "source_bbox": [
+          3,
+          148,
+          476,
+          195
+        ],
+        "localized_bbox": [
+          5,
+          150,
+          202,
+          193
+        ],
+        "source_size": [
+          473,
+          47
+        ],
+        "localized_size": [
+          197,
+          43
+        ],
+        "margins": [
+          2,
+          274,
+          2,
+          2
+        ],
+        "width_ratio": 0.4165,
+        "height_ratio": 0.9149,
+        "result": "PASS"
+      },
+      {
+        "key": "multiplayer_intro_title",
+        "source_bbox": [
+          8,
+          297,
+          540,
+          359
+        ],
+        "localized_bbox": [
+          10,
+          300,
+          274,
+          356
+        ],
+        "source_size": [
+          532,
+          62
+        ],
+        "localized_size": [
+          264,
+          56
+        ],
+        "margins": [
+          2,
+          266,
+          3,
+          3
+        ],
+        "width_ratio": 0.4962,
+        "height_ratio": 0.9032,
+        "result": "PASS"
+      },
+      {
+        "key": "showroom_body",
+        "source_bbox": [
+          1205,
+          957,
+          1594,
+          1011
+        ],
+        "localized_bbox": [
+          1207,
+          959,
+          1302,
+          1009
+        ],
+        "source_size": [
+          389,
+          54
+        ],
+        "localized_size": [
+          95,
+          50
+        ],
+        "margins": [
+          2,
+          292,
+          2,
+          2
+        ],
+        "width_ratio": 0.2442,
+        "height_ratio": 0.9259,
+        "result": "PASS"
+      }
+    ]
+  },
+  "visual_evidence": [
+    "C252_q193_97E863AD_FLIPY.jpg",
+    "C252_q193_97E863AD_RAW.jpg",
+    "C252_q193_97E863AD_CONTACTS.jpg"
+  ],
+  "controller_visual_qa": "PENDING",
+  "c3_strict_audit": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

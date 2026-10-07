@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C252",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "execution_backend": "github-actions fallback: ChatGPT local git ls-remote failed DNS resolution; N100 not used",
+  "assets": [
+    {
+      "index": 63,
+      "key": "48DEBE77",
+      "candidate_sha256": "f92629621d421e924a3f1b9d77252c551832824110e755325bcf0bf4a1af2ad0",
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PENDING",
+      "c3": "PENDING"
+    },
+    {
+      "index": 121,
+      "key": "FD90AA9",
+      "candidate_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PENDING",
+      "c3": "PENDING"
+    },
+    {
+      "index": 193,
+      "key": "97E863AD",
+      "candidate_sha256": "f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69",
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PENDING",
+      "c3": "PENDING"
+    }
+  ]
+}

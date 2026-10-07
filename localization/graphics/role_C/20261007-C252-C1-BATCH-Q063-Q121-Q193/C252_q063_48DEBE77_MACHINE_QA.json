@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C252",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 63,
+  "asset_key": "48DEBE77",
+  "regression": "IGR-012 P0 START/GOAL residue/slant/layout",
+  "candidate_sha256": "f92629621d421e924a3f1b9d77252c551832824110e755325bcf0bf4a1af2ad0",
+  "prior_candidate_sha256": "a6161cfaedb9ab83c311b3aa78cf3ae3e18ca333fc52e1e31a8d6055e21797ea",
+  "canonical_source_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+  "prior_blob_commit": "1c8a6e460a8f80c6fde6a5edc52c883e10525619",
+  "source_blob_commit": "current hd_source",
+  "independent_machine_qa": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "canonical_source_native_dimensions": [
+      512,
+      512
+    ],
+    "source_display_scale_nearest_neighbor": 4,
+    "header_128_exact_candidate_prior": true,
+    "header_128_exact_source_when_same_native_dimensions": false,
+    "prior_to_current_changed_pixels": 6762,
+    "prior_to_current_changed_outside_declared_rework_union": 0,
+    "prior_to_current_alpha_changed_outside_declared_rework_union": 0,
+    "bbox_size_positive_margin": "3/3 PASS",
+    "regions": [
+      {
+        "key": "start_top",
+        "source_bbox": [
+          124,
+          502,
+          348,
+          566
+        ],
+        "localized_bbox": [
+          176,
+          504,
+          295,
+          564
+        ],
+        "source_size": [
+          224,
+          64
+        ],
+        "localized_size": [
+          119,
+          60
+        ],
+        "margins": [
+          52,
+          53,
+          2,
+          2
+        ],
+        "width_ratio": 0.5312,
+        "height_ratio": 0.9375,
+        "result": "PASS"
+      },
+      {
+        "key": "start_bottom",
+        "source_bbox": [
+          124,
+          1540,
+          348,
+          1596
+        ],
+        "localized_bbox": [
+          184,
+          1542,
+          287,
+          1594
+        ],
+        "source_size": [
+          224,
+          56
+        ],
+        "localized_size": [
+          103,
+          52
+        ],
+        "margins": [
+          60,
+          61,
+          2,
+          2
+        ],
+        "width_ratio": 0.4598,
+        "height_ratio": 0.9286,
+        "result": "PASS"
+      },
+      {
+        "key": "goal",
+        "source_bbox": [
+          1650,
+          26,
+          1802,
+          62
+        ],
+        "localized_bbox": [
+          1710,
+          28,
+          1741,
+          60
+        ],
+        "source_size": [
+          152,
+          36
+        ],
+        "localized_size": [
+          31,
+          32
+        ],
+        "margins": [
+          60,
+          61,
+          2,
+          2
+        ],
+        "width_ratio": 0.2039,
+        "height_ratio": 0.8889,
+        "result": "PASS"
+      }
+    ]
+  },
+  "visual_evidence": [
+    "C252_q063_48DEBE77_FLIPY.jpg",
+    "C252_q063_48DEBE77_RAW.jpg",
+    "C252_q063_48DEBE77_CONTACTS.jpg"
+  ],
+  "controller_visual_qa": "PENDING",
+  "c3_strict_audit": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
