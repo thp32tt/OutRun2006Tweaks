@@ -93,10 +93,7 @@ delegations = {
     "R31SupportNoteHud(": ("R31TelemetryNoteHud()",),
     "R31SupportNoteUnstable(": ("R31TelemetryNoteUnstable()",),
     "R31SupportBuildFastWorldConstants(": (
-        "R31BuildFastWorldConstants(device, stereo, draw)",
-        "std::memcpy(out.originalConstants",
-        "std::memcpy(out.eyeConstants",
-        "out.poseSequence = draw.poseSequence",
+        "return R31BuildFastWorldConstants(device, stereo, out);",
     ),
     "R31SupportInstallStatus(": ("R31InstallStatus()",),
 }
