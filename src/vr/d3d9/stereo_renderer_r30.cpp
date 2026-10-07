@@ -12,6 +12,7 @@
 // perspective effects remain entirely owned by R29/R13.
 
 #include "stereo_renderer_r29.cpp"
+#include "../core/r30_support_api.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -3194,7 +3195,7 @@ namespace OutRunVRStereo
         VRStereoR30HudHook VRStereoR30HudHook::instance;
     }
 
-    inline OutRunVR::RuntimeEligibility::InstallState
+    OutRunVR::RuntimeEligibility::InstallState
     R30InstallStatus() noexcept
     {
         return R30InstallState.load(std::memory_order_acquire);
@@ -3240,5 +3241,159 @@ namespace OutRunVRStereo
     inline void R30TelemetryNoteScreenSpaceFovDraw() noexcept
     {
         ++R30ScreenSpaceFovDraws;
+    }
+
+    bool R30SupportTelemetryEnabled() noexcept
+    {
+        return Settings::VRTelemetry;
+    }
+
+    bool R30SupportIsGameDevice(IDirect3DDevice9* device) noexcept
+    {
+        return IsGameDevice(device);
+    }
+
+    bool R30SupportInternalStereoPassActive() noexcept
+    {
+        return InternalStereoPass;
+    }
+
+    std::uint64_t R30SupportPresentEpoch() noexcept
+    {
+        return PresentEpoch;
+    }
+
+    bool R30SupportTargetIsBackBuffer() noexcept
+    {
+        return TargetIsBackBuffer();
+    }
+
+    bool R30SupportAnyAuxRenderTargetActive() noexcept
+    {
+        return AnyAuxRenderTargetActive();
+    }
+
+    bool R30SupportTryGetTrackedViewport(D3DVIEWPORT9& viewport) noexcept
+    {
+        return TryGetTrackedViewport(viewport);
+    }
+
+    void R30SupportInvalidateEffectStateCache() noexcept
+    {
+        InvalidateEffectStateCache();
+    }
+
+    void R30SupportInvalidateTrackedRasterShadow() noexcept
+    {
+        InvalidateTrackedRasterShadow();
+    }
+
+    void R30SupportInvalidateLiveStateSample() noexcept
+    {
+        InvalidateLiveStateSample();
+    }
+
+    float R30SupportWorldScale() noexcept
+    {
+        return Settings::VRWorldScale;
+    }
+
+    D3DMATRIX R30SupportMatrixFromQuaternionTranslation(
+        const float orientation[4], const float position[3],
+        float positionScale) noexcept
+    {
+        return MatrixFromQuaternionTranslation(
+            orientation, position, positionScale);
+    }
+
+    D3DMATRIX R30SupportInverseRigid(const D3DMATRIX& matrix) noexcept
+    {
+        return InverseRigid(matrix);
+    }
+
+    D3DMATRIX R30SupportProjectionFromFov(
+        const D3DMATRIX& base, const OutRunVR::SharedFov& fov) noexcept
+    {
+        return ProjectionFromFov(base, fov);
+    }
+
+    D3DMATRIX R30SupportMultiplyMatrix(
+        const D3DMATRIX& a, const D3DMATRIX& b) noexcept
+    {
+        return MultiplyMatrix(a, b);
+    }
+
+    D3DMATRIX R30SupportTransposeMatrix(const D3DMATRIX& matrix) noexcept
+    {
+        return TransposeMatrix(matrix);
+    }
+
+    bool R30SupportMatrixFinite(const D3DMATRIX& matrix) noexcept
+    {
+        return MatrixFinite(matrix);
+    }
+
+    bool R30SupportGetInverseProjection(
+        const D3DMATRIX& projection, D3DMATRIX& inverse) noexcept
+    {
+        return GetInverseProjection(projection, inverse);
+    }
+
+    bool R30SupportValidateVerifiedWvp(
+        IDirect3DDevice9* device, const float verified[16],
+        float live[16]) noexcept
+    {
+        return device && verified && live &&
+            SUCCEEDED(device->GetVertexShaderConstantF(
+                OutRunWvpRegister, live, OutRunWvpRegisterCount)) &&
+            FloatArrayNear(live, verified, 16, VerifiedWvpEpsilon);
+    }
+
+    bool R30SupportGetVerifiedProjection(
+        float outProjection[16], std::uint32_t& generation,
+        std::uint32_t& poseSequence) noexcept
+    {
+        return OutRunVRRenderer::GetR28VerifiedProjection(
+            outProjection, generation, poseSequence);
+    }
+
+    void R30SupportResynchronizeShaderEpoch(
+        IDirect3DDevice9* device) noexcept
+    {
+        IDirect3DVertexShader9* shader = nullptr;
+        const HRESULT hr = device
+            ? device->GetVertexShader(&shader) : D3DERR_INVALIDCALL;
+        const std::uintptr_t identity = SUCCEEDED(hr)
+            ? reinterpret_cast<std::uintptr_t>(shader) : 0;
+        if (shader)
+            shader->Release();
+
+        const std::uintptr_t previous =
+            CurrentVertexShaderIdentity.exchange(identity,
+                std::memory_order_acq_rel);
+        if (previous != identity)
+        {
+            std::uint64_t serial = VertexShaderSerial.fetch_add(
+                1, std::memory_order_acq_rel) + 1;
+            if (serial == 0)
+                VertexShaderSerial.fetch_add(1, std::memory_order_acq_rel);
+        }
+    }
+
+    void R30SupportInvalidateRendererStateAfterExternalRestore() noexcept
+    {
+        OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
+    }
+
+    OutRunVR::RuntimeEligibility::InstallState
+    R30SupportRendererInstallStatus() noexcept
+    {
+        return OutRunVRRenderer::R29RendererState();
+    }
+
+    bool R30SupportPrimeTrackedRasterShadow(
+        IDirect3DDevice9* device) noexcept
+    {
+        return PrimeTrackedRasterShadow(device);
     }
 }

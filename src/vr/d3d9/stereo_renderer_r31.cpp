@@ -21,7 +21,11 @@
 #ifndef OUTRUN_VR_REFACTOR_SPLIT_R31_R30
 #include "stereo_renderer_r30.cpp"
 #endif
+#include "../core/r30_support_api.hpp"
 #include "../core/r31_support_api.hpp"
+#include "../../hook_mgr.hpp"
+#include <algorithm>
+#include <atomic>
 #include <cstring>
 #include "../state/state_block_tracker.hpp"
 #include "../state/state_block_recovery.hpp"
@@ -164,7 +168,7 @@ namespace OutRunVRStereo
             const ULONGLONG now = GetTickCount64();
             if (R31Window.lastLogMs == 0)
                 R31Window.lastLogMs = now;
-            if (Settings::VRTelemetry && now - R31Window.lastLogMs >= 5000 &&
+            if (R30SupportTelemetryEnabled() && now - R31Window.lastLogMs >= 5000 &&
                 R31Window.presents != 0)
             {
                 const double avg = static_cast<double>(R31Window.draws) /
@@ -185,24 +189,24 @@ namespace OutRunVRStereo
 
         void R31ObserveDraw(IDirect3DDevice9* device) noexcept
         {
-            if (!IsGameDevice(device) || InternalStereoPass)
+            if (!R30SupportIsGameDevice(device) || R30SupportInternalStereoPassActive())
                 return;
-            if (R31Frame.epoch != PresentEpoch)
+            if (R31Frame.epoch != R30SupportPresentEpoch())
             {
                 R31FinalizePerfFrame();
                 R31Frame = {};
-                R31Frame.epoch = PresentEpoch;
+                R31Frame.epoch = R30SupportPresentEpoch();
             }
             ++R31Frame.draws;
-            if (TargetIsBackBuffer()) ++R31Frame.main;
+            if (R30SupportTargetIsBackBuffer()) ++R31Frame.main;
             else ++R31Frame.offscreen;
-            if (AnyAuxRenderTargetActive()) ++R31Frame.aux;
+            if (R30SupportAnyAuxRenderTargetActive()) ++R31Frame.aux;
         }
 
         bool R31GetSavedViewport(IDirect3DDevice9* device,
             D3DVIEWPORT9& viewport) noexcept
         {
-            if (TryGetTrackedViewport(viewport))
+            if (R30SupportTryGetTrackedViewport(viewport))
                 return true;
             return OutRunVR::D3D9::ReadViewport(device, viewport);
         }
@@ -217,9 +221,9 @@ namespace OutRunVRStereo
         {
             if (OutRunVR::State::StateBlockTracker::Reliable())
                 return;
-            InvalidateEffectStateCache();
-            InvalidateTrackedRasterShadow();
-            InvalidateLiveStateSample();
+            R30SupportInvalidateEffectStateCache();
+            R30SupportInvalidateTrackedRasterShadow();
+            R30SupportInvalidateLiveStateSample();
         }
 
         bool R31PrepareEyeTailCache(
@@ -227,7 +231,7 @@ namespace OutRunVRStereo
             const D3DMATRIX& projection,
             const D3DMATRIX& inverseProjection) noexcept
         {
-            const float worldScale = Settings::VRWorldScale;
+            const float worldScale = R30SupportWorldScale();
             if (R31EyeCache.valid &&
                 R31EyeCache.poseSequence == stereo.poseSequence &&
                 R31EyeCache.worldScale == worldScale &&
@@ -241,13 +245,13 @@ namespace OutRunVRStereo
             next.inverseProjection = inverseProjection;
             for (int eye = 0; eye < 2; ++eye)
             {
-                const D3DMATRIX eyePose = MatrixFromQuaternionTranslation(
+                const D3DMATRIX eyePose = R30SupportMatrixFromQuaternionTranslation(
                     stereo.eyeOrientation[eye], stereo.eyeOffset[eye], worldScale);
-                const D3DMATRIX eyeInverse = InverseRigid(eyePose);
-                const D3DMATRIX eyeProjection = ProjectionFromFov(
+                const D3DMATRIX eyeInverse = R30SupportInverseRigid(eyePose);
+                const D3DMATRIX eyeProjection = R30SupportProjectionFromFov(
                     projection, stereo.eyeFov[eye]);
-                next.eyeTail[eye] = MultiplyMatrix(eyeInverse, eyeProjection);
-                if (!MatrixFinite(next.eyeTail[eye]))
+                next.eyeTail[eye] = R30SupportMultiplyMatrix(eyeInverse, eyeProjection);
+                if (!R30SupportMatrixFinite(next.eyeTail[eye]))
                     return false;
             }
             next.valid = true;
@@ -257,7 +261,7 @@ namespace OutRunVRStereo
 
         bool R31BuildFastWorldConstants(IDirect3DDevice9* device,
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
-            DrawStereoState& draw) noexcept
+            R31SupportFastWorldConstants& draw) noexcept
         {
             float verified[16]{};
             std::uint32_t generation = 0;
@@ -289,9 +293,8 @@ namespace OutRunVRStereo
                 (R31FastWorldCandidates % LiveWvpValidationInterval) == 0)
             {
                 ++R31FastWorldLiveValidations;
-                if (FAILED(device->GetVertexShaderConstantF(
-                        OutRunWvpRegister, live, OutRunWvpRegisterCount)) ||
-                    !FloatArrayNear(live, verified, 16, VerifiedWvpEpsilon))
+                if (!R30SupportValidateVerifiedWvp(
+                        device, verified, live))
                 {
                     R31BlockedVerifiedGeneration = generation;
                     ++R31FastWorldValidationRejects;
@@ -305,15 +308,15 @@ namespace OutRunVRStereo
             float verifiedProjection[16]{};
             std::uint32_t projectionGeneration = 0;
             std::uint32_t projectionPoseSequence = 0;
-            if (!OutRunVRRenderer::GetR28VerifiedProjection(
+            if (!R30SupportGetVerifiedProjection(
                     verifiedProjection, projectionGeneration,
                     projectionPoseSequence) ||
                 projectionGeneration != generation ||
                 projectionPoseSequence != poseSequence)
                 return false;
             std::memcpy(&projection, verifiedProjection, sizeof(projection));
-            if (!MatrixFinite(projection) ||
-                !GetInverseProjection(projection, inverseProjection) ||
+            if (!R30SupportMatrixFinite(projection) ||
+                !R30SupportGetInverseProjection(projection, inverseProjection) ||
                 !R31PrepareEyeTailCache(stereo, projection, inverseProjection))
                 return false;
 
@@ -321,25 +324,23 @@ namespace OutRunVRStereo
                 liveValidated ? live : verified, sizeof(verified));
             D3DMATRIX uploadedT{};
             std::memcpy(&uploadedT, verified, sizeof(uploadedT));
-            const D3DMATRIX currentWvp = TransposeMatrix(uploadedT);
-            const D3DMATRIX correctedWorldView = MultiplyMatrix(
+            const D3DMATRIX currentWvp = R30SupportTransposeMatrix(uploadedT);
+            const D3DMATRIX correctedWorldView = R30SupportMultiplyMatrix(
                 currentWvp, R31EyeCache.inverseProjection);
-            if (!MatrixFinite(correctedWorldView))
+            if (!R30SupportMatrixFinite(correctedWorldView))
                 return false;
 
             for (int eye = 0; eye < 2; ++eye)
             {
-                const D3DMATRIX eyeWvp = MultiplyMatrix(
+                const D3DMATRIX eyeWvp = R30SupportMultiplyMatrix(
                     correctedWorldView, R31EyeCache.eyeTail[eye]);
-                if (!MatrixFinite(eyeWvp))
+                if (!R30SupportMatrixFinite(eyeWvp))
                     return false;
-                const D3DMATRIX eyeWvpT = TransposeMatrix(eyeWvp);
+                const D3DMATRIX eyeWvpT = R30SupportTransposeMatrix(eyeWvp);
                 std::memcpy(draw.eyeConstants[eye], &eyeWvpT,
                     sizeof(eyeWvpT));
             }
-            draw.worldStereo = true;
             draw.poseSequence = stereo.poseSequence;
-            draw.stereoFrame = stereo;
             return true;
         }
 
@@ -363,32 +364,16 @@ namespace OutRunVRStereo
 
         void R31ResynchronizeShaderEpoch(IDirect3DDevice9* device) noexcept
         {
-            IDirect3DVertexShader9* shader = nullptr;
-            const HRESULT hr = device
-                ? device->GetVertexShader(&shader) : D3DERR_INVALIDCALL;
-            const std::uintptr_t identity = SUCCEEDED(hr)
-                ? reinterpret_cast<std::uintptr_t>(shader) : 0;
-            if (shader) shader->Release();
-
-            const std::uintptr_t previous =
-                CurrentVertexShaderIdentity.exchange(identity,
-                    std::memory_order_acq_rel);
-            if (previous != identity)
-            {
-                std::uint64_t serial = VertexShaderSerial.fetch_add(
-                    1, std::memory_order_acq_rel) + 1;
-                if (serial == 0)
-                    VertexShaderSerial.fetch_add(1, std::memory_order_acq_rel);
-            }
+            R30SupportResynchronizeShaderEpoch(device);
         }
 
         void R31MarkStateBlockCachesDirty() noexcept
         {
             R31BlockCurrentVerifiedGeneration();
-            OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
-            InvalidateEffectStateCache();
-            InvalidateTrackedRasterShadow();
-            InvalidateLiveStateSample();
+            R30SupportInvalidateRendererStateAfterExternalRestore();
+            R30SupportInvalidateEffectStateCache();
+            R30SupportInvalidateTrackedRasterShadow();
+            R30SupportInvalidateLiveStateSample();
             R31EyeCache.valid = false;
             OutRunVR::State::StateBlockTracker::RequireResync();
         }
@@ -434,7 +419,7 @@ namespace OutRunVRStereo
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 const auto r30 = R30InstallStatus();
-                const auto renderer = OutRunVRRenderer::R29RendererState();
+                const auto renderer = R30SupportRendererInstallStatus();
                 if (r30 == State::Failed || renderer == State::Failed)
                 {
                     R31InstallState.store(State::Failed, std::memory_order_release);
@@ -460,7 +445,7 @@ namespace OutRunVRStereo
                     OutRunVR::State::StateBlockTracker::SetEventConsumerReady(false);
                     OutRunVR::State::StateBlockTracker::ResetCoverageLoss();
                     OutRunVR::State::StateBlockRecovery::Configure(
-                        &R31ResynchronizeShaderEpoch, &PrimeTrackedRasterShadow);
+                        &R31ResynchronizeShaderEpoch, &R30SupportPrimeTrackedRasterShadow);
                     OutRunVR::State::StateBlockEvents::Configure(
                         &R31OnStateBlockBegin,
                         &R31OnStateBlockEnd,
@@ -610,15 +595,7 @@ namespace OutRunVRStereo
         const OutRunVRRenderer::LatchedStereoFrame& stereo,
         R31SupportFastWorldConstants& out) noexcept
     {
-        DrawStereoState draw{};
-        if (!R31BuildFastWorldConstants(device, stereo, draw))
-            return false;
-        std::memcpy(out.originalConstants, draw.originalConstants,
-            sizeof(out.originalConstants));
-        std::memcpy(out.eyeConstants, draw.eyeConstants,
-            sizeof(out.eyeConstants));
-        out.poseSequence = draw.poseSequence;
-        return true;
+        return R31BuildFastWorldConstants(device, stereo, out);
     }
 
     OutRunVR::RuntimeEligibility::InstallState
