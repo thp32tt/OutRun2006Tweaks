@@ -7626,15 +7626,15 @@
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "latest_a_manual_visual_rework": {
-    "timestamp_kst": "2026-10-07 12:12 KST",
-    "run": "A159",
-    "queue_index": 53,
-    "asset": "568D3696",
-    "trigger": "PRE_INGAME_R4_TEXT_SCALE_HIERARCHY_FALSE_NEGATIVE",
-    "before_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
-    "candidate_sha256": "7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33",
-    "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_A159_FULL_AND_RAW",
-    "status": "A159_FEED_HIERARCHY_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+    "timestamp_kst": "2026-10-07 13:08 KST",
+    "run": "A160",
+    "queue_index": 12,
+    "asset": "D6DC1380",
+    "trigger": "PJR-001_C233_MATERIAL_SCALE_REWORK",
+    "before_sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
+    "candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+    "controller_visual_qa": "PASS_SOURCE_C233_REJECTED_A160_PRACTICAL_RAW_FLIPY",
+    "status": "A160_MATERIAL_SCALE_STATIC_PASS_PENDING_FRESH_C_C3_USER_JPG_INGAME_RETEST",
     "runtime_validation": "UNTESTED"
   },
   "c228_controller_final_qa": {
@@ -7953,6 +7953,53 @@
     "reason": "A144 before_sha256 == after_sha256; only orientation evidence changed while TEXT_TOO_SMALL/TOTAL_RANK_SIZE_FAMILY_REVIEW remained a user rejection.",
     "controller_qa": "localization/graphics/role_C/20261007-C233-C2-Q012-D6DC1380-A144/C233_D6DC1380_CONTROLLER_FINAL_QA.json",
     "pre_ingame_comparison_refresh": "BLOCKED_REWORK_REQUIRED",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "a160_d6dc1380_pjr001_scale_rework": {
+    "run": "A160",
+    "timestamp_kst": "2026-10-07 13:08 KST",
+    "role": "A",
+    "queue_index": 12,
+    "asset_key": "D6DC1380",
+    "asset": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+    "user_regression": "PJR-001-20261006",
+    "trigger": "C233_REWORK_REQUIRED_MATERIAL_SCALE_FIX_PENDING_A_B",
+    "prior_candidate_sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
+    "candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+    "github_worker_run": 37569696429,
+    "worker_output_commit": "31f49515f62aad3232de9dd8204da54c8e644b42",
+    "prior_size": [
+      610,
+      134
+    ],
+    "localized_size": [
+      790,
+      132
+    ],
+    "material_width_gain": 180,
+    "machine_qa": {
+      "bbox_containment": "PASS",
+      "positive_margin": "PASS",
+      "changed_pixels_outside_exact_source_bbox": 0,
+      "alpha_changed_outside_exact_source_bbox": 0,
+      "header_128_exact": true,
+      "mip_count": 1,
+      "decoded_persisted_bbox_exact": true,
+      "rawmode": "BGRA",
+      "raw_orientation": "preserve current; readable=FLIP_Y",
+      "practical_scale_reviews": [
+        100,
+        75,
+        50
+      ]
+    },
+    "controller_visual_qa": "PASS_SOURCE_C233_REJECTED_A160_PRACTICAL_RAW_FLIPY",
+    "controller_qa": "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_CONTROLLER_SELF_QA.json",
+    "status": "A160_MATERIAL_SCALE_STATIC_PASS_PENDING_FRESH_C_C3_USER_JPG_INGAME_RETEST",
+    "fresh_independent_c": "PENDING",
+    "mandatory_c3_strict_audit": "PENDING_EXACT_SHA",
+    "user_jpg_review": "OPEN",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }

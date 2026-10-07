@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "A160",
+  "timestamp_kst": "2026-10-07 13:08 KST",
+  "queue_index": 12,
+  "asset": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+  "selection": {
+    "priority": "P0",
+    "user_regression": "PJR-001-20261006",
+    "owner_lane": "A",
+    "reason": "C233 returned exact q12 user-JPG scale/hierarchy defect as material REWORK_REQUIRED; backlog owner A overrides even queue parity.",
+    "prior_c_rejection": "C233_REWORK_REQUIRED_MATERIAL_SCALE_FIX_PENDING_A_B",
+    "prior_candidate_sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422"
+  },
+  "material_rework": {
+    "canonical_source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+    "canonical_source_native_size": [
+      256,
+      64
+    ],
+    "exact_source_bbox_native": [
+      8,
+      10,
+      248,
+      44
+    ],
+    "exact_permitted_hd_bbox": [
+      32,
+      40,
+      992,
+      176
+    ],
+    "translation": "Continue? -> 계속?",
+    "prior_localized_bbox": [
+      207,
+      41,
+      817,
+      175
+    ],
+    "prior_size": [
+      610,
+      134
+    ],
+    "localized_bbox": [
+      117,
+      42,
+      907,
+      174
+    ],
+    "localized_size": [
+      790,
+      132
+    ],
+    "material_width_gain": 180,
+    "render": "Noto Sans CJK KR Black; readable right shear 0.16; white face/navy border/steel-gray outer halo; centered in exact source footprint"
+  },
+  "machine_qa": {
+    "bbox_containment": "PASS",
+    "positive_margin": "PASS",
+    "changed_pixels_outside_exact_source_bbox": 0,
+    "alpha_changed_outside_exact_source_bbox": 0,
+    "header_128_exact": true,
+    "mip_count": 1,
+    "decoded_persisted_bbox_exact": true,
+    "rawmode": "BGRA",
+    "raw_orientation": "preserve current; readable=FLIP_Y",
+    "practical_scale_reviews": [
+      100,
+      75,
+      50
+    ]
+  },
+  "post_encode_presentation_gate": {
+    "persisted_dds_decode": "PASS",
+    "authored_mips": "PASS_MIP1_ONLY",
+    "practical_scales": [
+      "100% PASS",
+      "75% PASS",
+      "50% PASS"
+    ],
+    "blast_radius": "PASS_ZERO_OUTSIDE_DECLARED_SOURCE_BBOX",
+    "coverage": "PASS_SINGLE_VISIBLE_LOCALIZABLE_SEGMENT"
+  },
+  "ordered_generation_gate": {
+    "1_source_removal_plate": "PASS_TEXT_ONLY_TRANSPARENT_PLATE",
+    "2_slant_direction": "PASS_READABLE_RIGHT_LEAN_MATCHES_SOURCE",
+    "3_no_unnecessary_undersizing": "PASS_MATERIAL_610_TO_790_WIDTH_AT_NEAR_MAX_HEIGHT",
+    "4_weight_outline_shadow": "PASS_WHITE_NAVY_STEEL_SOURCE_FAMILY",
+    "5_no_clipping": "PASS_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_OUTSIDE_CHANGE",
+    "7_flip_y_raw": "PASS_CONTROLLER_VISUAL_BOTH",
+    "8_immediate_readability": "PASS_CONTROLLER_AT_100_75_50_PERCENT"
+  },
+  "evidence": {
+    "worker_report": "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_REPORT.json",
+    "source_old_final": "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_SOURCE_OLD_FINAL.jpg",
+    "practical_100": "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_PRACTICAL_100.jpg",
+    "practical_75": "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_PRACTICAL_75.jpg",
+    "practical_50": "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_PRACTICAL_50.jpg",
+    "raw_flipy": "localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_RAW_FLIPY.jpg",
+    "c233_rejection": "localization/graphics/role_C/20261007-C233-C2-Q012-D6DC1380-A144/C233_D6DC1380_CONTROLLER_FINAL_QA.json",
+    "github_worker_run": 37569696429,
+    "worker_output_commit": "31f49515f62aad3232de9dd8204da54c8e644b42"
+  },
+  "controller_visual_findings": [
+    "A160 is materially larger than the C233-rejected bytes: width 610 -> 790px while retaining 132px height inside the exact 136px source-height ceiling.",
+    "Readable orientation now presents a source-direction right lean and a stronger source-like white/navy/steel techno family.",
+    "At 100%, 75% and 50% practical scales the Korean is immediately readable and no longer visually small relative to the English source.",
+    "No clipping, broken Hangul, source residue, protected-art intrusion or unintended pixels are visible; RAW/FLIP-Y behavior remains correct."
+  ],
+  "controller_visual_qa": "PASS_SOURCE_C233_REJECTED_A160_PRACTICAL_RAW_FLIPY",
+  "producer_status": "A160_MATERIAL_SCALE_STATIC_PASS_PENDING_FRESH_C_C3_USER_JPG_INGAME_RETEST",
+  "fresh_independent_c": "PENDING",
+  "mandatory_c3_strict_audit": "PENDING_EXACT_SHA",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_AND_C3",
+  "user_jpg_review": "OPEN",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

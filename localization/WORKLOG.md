@@ -2848,3 +2848,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Decision C233_REWORK_REQUIRED_MATERIAL_SCALE_FIX_PENDING_A_B. q12 remains excluded from PRE_INGAME export. Required next: materially larger source-faithful max-safe rerender within exact bbox -> producer QA -> fresh C + mandatory C3 -> user JPG review -> new in-game retest.
 - RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
 - Evidence: localization/graphics/role_C/20261007-C233-C2-Q012-D6DC1380-A144/C233_D6DC1380_CONTROLLER_FINAL_QA.json.
+
+## 2026-10-07 13:08 KST — A160 q12 D6DC1380 material scale rework
+- Refreshed CONTRACT/required policies, backlog, queue and live HEAD. PJR-001 was the active P0 owned by A and therefore overrode q12 even parity. Completed/fresh-C-pending A work was not repeated.
+- C233 established that A144 had not changed q12 bytes for the user's TEXT_TOO_SMALL/TOTAL_RANK_SIZE_FAMILY_REVIEW rejection. A160 used the pinned exact source SHA `42aa10e0...`, native source bbox [8,10,248,44] / HD permitted [32,40,992,176], and rebuilt the text-only transparent plate directly.
+- Worker run `37569696429` SUCCESS produced `fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5`: Noto Sans CJK KR Black, white face/navy border/steel outer halo, readable right shear 0.16. Persisted bbox [117,42,907,174] = 790x132 versus prior 610x134, a material +180px width increase while remaining below source width/height ceilings with positive margins.
+- Post-encode QA: persisted decoded bbox exact, changed/alpha outside exact source bbox=0, header exact, one mip only, practical-scale 100/75/50 PASS, coverage 1/1, RAW/FLIP-Y PASS. Controller SOURCE/C233-old/A160 review confirms stronger source-relative scale and no clipping/residue/broken Hangul/intrusion. Ordered gate 1-8 PASS.
+- Backlog is not closed: state `A160_MATERIAL_SCALE_STATIC_PASS_PENDING_FRESH_C_C3_USER_JPG_INGAME_RETEST`. Fresh independent C then exact-SHA C3 are mandatory before PRE_INGAME export; user JPG and NEW actual-game retest remain open. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_CONTROLLER_SELF_QA.json`, `localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_REPORT.json`.

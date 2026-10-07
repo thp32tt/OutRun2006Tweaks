@@ -2293,3 +2293,9 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - Current/A144 SHA 703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422 is byte-identical before/after A144; only orientation evidence was corrected.
 - RAW/FLIP-Y and glyph integrity PASS, but user TEXT_TOO_SMALL|TOTAL_RANK_SIZE_FAMILY_REVIEW remains unaddressed by material bytes. Fresh C FAIL -> A/B material scale rework required.
 - PRE_INGAME excluded; fresh C+C3, user JPG review and actual-game retest still required. RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.
+
+## 2026-10-07 13:08 KST — A160 P0 q12 D6DC1380 PJR-001 material scale repair
+- C233 returned q12 because A144 left the user-rejected bytes unchanged for TEXT_TOO_SMALL/TOTAL_RANK_SIZE_FAMILY_REVIEW. A160 materially rerendered the single Continue? -> 계속? label from the exact canonical source footprint.
+- GitHub-hosted run `37569696429` SUCCESS / worker commit `31f49515f62aad3232de9dd8204da54c8e644b42` produced `fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5`. Localized bbox is 790x132 vs rejected 610x134 inside exact allowed 960x136; +180px width with source-direction right lean and source-like white/navy/steel effect.
+- Persisted-DDS decode PASS; bbox/positive-margin PASS; changed/alpha outside exact source bbox=0; header exact; mip1 only; practical 100/75/50 and RAW/FLIP-Y controller visual QA PASS.
+- PJR-001 remains OPEN. Fresh independent C + mandatory exact-SHA C3_STRICT_PASS + regenerated user JPG + NEW in-game retest are required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
