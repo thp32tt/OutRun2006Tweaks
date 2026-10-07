@@ -164,7 +164,7 @@ def jlines(path,fn):
 
 def state(ns):
     q=R/"localization/graphics/asset_queue.csv"
-    with q.open(encoding="utf-8-sig",newline="") as f: rows=list(csv.DictReader(f)); fields=list(rows[0])
+    with q.open(encoding="utf-8-sig",newline="") as f:\n        reader=csv.DictReader(f); fields=[x for x in reader.fieldnames if x is not None]; rows=[]\n        for row in reader:\n            row.pop(None,None); rows.append(row)
     for x in rows:
         if x["index"]=="205": x["artwork_status"]="a167_user_ingame_native_rework_self_qa_pass_pending_fresh_c"; x["notes"]+=" USER_INGAME_20261007: screenshots 159-163 override C217; lowres x4 raster was a visual false-negative. A167 native 4096x2048 AA candidate "+ns+"; protected OutRun/OutRun2SP tokens exact with positive spacing. Fresh C+C3+PRE_INGAME+NEW actual-game retest required."
     with q.open("w",encoding="utf-8-sig",newline="") as f: w=csv.DictWriter(f,fieldnames=fields,lineterminator="\r\n"); w.writeheader(); w.writerows(rows)
@@ -183,7 +183,7 @@ def state(ns):
         return o
     jlines(R/"localization/graphics/artwork_plan.jsonl",pfn)
     b=R/"localization/graphics/INGAME_REWORK_BACKLOG.csv"
-    with b.open(encoding="utf-8-sig",newline="") as f: br=list(csv.DictReader(f)); bf=list(br[0])
+    with b.open(encoding="utf-8-sig",newline="") as f:\n        reader=csv.DictReader(f); bf=[x for x in reader.fieldnames if x is not None]; br=[]\n        for row in reader:\n            row.pop(None,None); br.append(row)
     ids={x["id"] for x in br}
     if "IGR-020" not in ids: br.append(dict(zip(bf,["IGR-020","스크린샷(159)-스크린샷(163).png","MAIN_MENU_Q205","P0","GRAPHICS","A","205",REL.as_posix(),"EXACT_Q205_ACF61D7C","LOW_RES_FONT|UPSCALED_BITMAP|PIXELATED_HANGUL|DIRTY_RASTER|MAIN_MENU_STYLE_MISMATCH|AWKWARD_TOKEN_SPACING","Native 4096x2048 rerender; preserve product tokens; fresh C+C3 and new game retest.","A167_STATIC_PASS_PENDING_FRESH_C_C3_INGAME_RETEST","FRESH_C + EXACT_SHA_C3 + PRE_INGAME_USER_REVIEW + NEW_INGAME_RETEST"])))
     if "IGR-021" not in ids: br.append(dict(zip(bf,["IGR-021","스크린샷(164).png","INGAME_CONFIRM_DIALOG_RUNTIME_TEXT","P0","RUNTIME_TEXT","A","","src/hooks_localization.cpp|src/overlay/overlay.cpp","EXACT_K4_RUNTIME_OVERLAY","OVERWEIGHT_FONT|EXCESSIVE_STROKE|READABILITY_DEGRADED","Semilight first; dark dialog/menu gets no synthetic stroke; bright compact stroke reduced.","A167_SOURCE_FIX_PENDING_WIN32_BUILD_AND_INGAME_RETEST","CURRENT_WIN32_RELEASE_BUILD_PASS + NEW_INGAME_RETEST"])))
