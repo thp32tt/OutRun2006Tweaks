@@ -349,6 +349,12 @@ namespace outrun::vr::dx11
             bool shaderTranslationObjectCacheSnapshotRequired{};
             bool shaderTranslationObjectSlotSnapshotRequired{};
             std::uint64_t shaderTranslationObjectPrerequisiteSnapshotToken{};
+            bool shaderObjectCreationHandoffExact{};
+            bool shaderObjectCreationHandoffVertexSourceExact{};
+            bool shaderObjectCreationHandoffPixelSourceExact{};
+            bool shaderObjectCreationHandoffOwnershipPrerequisiteMatches{};
+            bool shaderObjectCreationAuthorized{};
+            std::uint64_t shaderObjectCreationHandoffSnapshotToken{};
             bool shaderTranslatedSemanticReceiptExact{};
             bool shaderTranslatedSemanticReceiptObjectReady{};
             std::uint64_t shaderTranslatedSemanticReceiptSnapshotToken{};
@@ -825,6 +831,19 @@ namespace outrun::vr::dx11
             hash = hash_mix(
                 hash, sig.shaderTranslationObjectPrerequisiteSnapshotToken);
             hash = hash_mix(
+                hash, sig.shaderObjectCreationHandoffExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderObjectCreationHandoffVertexSourceExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderObjectCreationHandoffPixelSourceExact ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderObjectCreationHandoffOwnershipPrerequisiteMatches ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderObjectCreationAuthorized ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderObjectCreationHandoffSnapshotToken);
+            hash = hash_mix(
                 hash, sig.shaderTranslatedSemanticReceiptExact ? 1u : 0u);
             hash = hash_mix(
                 hash, sig.shaderTranslatedSemanticReceiptObjectReady ? 1u : 0u);
@@ -1299,12 +1318,16 @@ namespace outrun::vr::dx11
             ProgrammableShaderInterfaceSemantics*
                 interfaceSemanticsOut = nullptr,
             ProgrammableShaderRegisterSemantics*
-                registerSemanticsOut = nullptr) noexcept
+                registerSemanticsOut = nullptr,
+            ProgrammableShaderFunctionSourceEvidence*
+                sourceEvidenceOut = nullptr) noexcept
         {
             if (interfaceSemanticsOut)
                 *interfaceSemanticsOut = {};
             if (registerSemanticsOut)
                 *registerSemanticsOut = {};
+            if (sourceEvidenceOut)
+                *sourceEvidenceOut = {};
             ShaderFunctionSignature out{};
             out.present = shader != nullptr;
             if (!shader)
@@ -1330,6 +1353,8 @@ namespace outrun::vr::dx11
             const auto evidence =
                 capture_programmable_shader_function_source_evidence(
                     bytecode.data(), actual, vertexStage);
+            if (sourceEvidenceOut)
+                *sourceEvidenceOut = evidence;
             out.observed = evidence.observed;
             out.sourceEvidenceExact = evidence.exact();
             out.byteSize = evidence.byteSize;
@@ -1416,14 +1441,16 @@ namespace outrun::vr::dx11
             ProgrammableShaderInterfaceSemantics pixelInterfaceSemantics{};
             ProgrammableShaderRegisterSemantics vertexRegisterSemantics{};
             ProgrammableShaderRegisterSemantics pixelRegisterSemantics{};
+            ProgrammableShaderFunctionSourceEvidence vertexSourceEvidence{};
+            ProgrammableShaderFunctionSourceEvidence pixelSourceEvidence{};
             sig.vertexShader =
                 inspect_shader_function(
                     vertexShader, true, &vertexInterfaceSemantics,
-                    &vertexRegisterSemantics);
+                    &vertexRegisterSemantics, &vertexSourceEvidence);
             sig.pixelShader =
                 inspect_shader_function(
                     pixelShader, false, &pixelInterfaceSemantics,
-                    &pixelRegisterSemantics);
+                    &pixelRegisterSemantics, &pixelSourceEvidence);
             const auto shaderInterfaceLinkage =
                 derive_programmable_shader_interface_linkage_evidence(
                     vertexInterfaceSemantics, pixelInterfaceSemantics);
@@ -1556,6 +1583,28 @@ namespace outrun::vr::dx11
                 translationObjectPrerequisite.slotSnapshotRequired;
             sig.shaderTranslationObjectPrerequisiteSnapshotToken =
                 translationObjectPrerequisite.reviewSnapshotToken;
+
+            const auto objectCreationHandoff =
+                compose_programmable_shader_object_creation_handoff(
+                    programmablePairIdentity,
+                    vertexSourceEvidence,
+                    pixelSourceEvidence,
+                    semanticTranslationPlan,
+                    semanticTranslationPlan.reviewSnapshotToken,
+                    translationObjectPrerequisite,
+                    translationObjectPrerequisite.reviewSnapshotToken);
+            sig.shaderObjectCreationHandoffExact =
+                objectCreationHandoff.reviewReady;
+            sig.shaderObjectCreationHandoffVertexSourceExact =
+                objectCreationHandoff.vertexSourceExact;
+            sig.shaderObjectCreationHandoffPixelSourceExact =
+                objectCreationHandoff.pixelSourceExact;
+            sig.shaderObjectCreationHandoffOwnershipPrerequisiteMatches =
+                objectCreationHandoff.objectPrerequisiteSnapshotMatches;
+            sig.shaderObjectCreationAuthorized =
+                objectCreationHandoff.objectCreationAuthorized;
+            sig.shaderObjectCreationHandoffSnapshotToken =
+                objectCreationHandoff.reviewSnapshotToken;
 
             // R277 deliberately supplies no R242 translated-object ownership.
             // The R275 receipt therefore exposes the exact remaining boundary
@@ -2152,6 +2201,18 @@ namespace outrun::vr::dx11
                         sig.shaderSourceSemanticPairCacheKey,
                         sig.shaderSemanticTranslationPlanSnapshotToken,
                         sig.shaderTranslationObjectPrerequisiteSnapshotToken);
+                    spdlog::info(
+                        "VR DX11 R280 objectCreationHandoff signature#{}: exact={} vertexSource={} pixelSource={} ownershipPrerequisite={} createAuthorized={} cacheKey=0x{:016X} planSnapshot=0x{:016X} ownershipSnapshot=0x{:016X} snapshot=0x{:016X}",
+                        unique,
+                        sig.shaderObjectCreationHandoffExact ? 1 : 0,
+                        sig.shaderObjectCreationHandoffVertexSourceExact ? 1 : 0,
+                        sig.shaderObjectCreationHandoffPixelSourceExact ? 1 : 0,
+                        sig.shaderObjectCreationHandoffOwnershipPrerequisiteMatches ? 1 : 0,
+                        sig.shaderObjectCreationAuthorized ? 1 : 0,
+                        sig.shaderSourceSemanticPairCacheKey,
+                        sig.shaderSemanticTranslationPlanSnapshotToken,
+                        sig.shaderTranslationObjectPrerequisiteSnapshotToken,
+                        sig.shaderObjectCreationHandoffSnapshotToken);
                     spdlog::info(
                         "VR DX11 R275 translatedSemanticReceipt signature#{}: exact={} objectReady={} snapshot=0x{:016X}",
                         unique,

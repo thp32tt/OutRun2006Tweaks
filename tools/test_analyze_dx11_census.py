@@ -1842,6 +1842,12 @@ def main() -> int:
         "cacheOwnerGen=1 slotGen=1 receiptGen=1 sameDevicePair=1 "
         "cacheSnapshot=1 slotSnapshot=1 cacheKey=0x6666666666666666 "
         "planSnapshot=0x1111111111111111 snapshot=0x7777777777777777\n"
+        "VR DX11 R280 objectCreationHandoff signature#1: exact=1 "
+        "vertexSource=1 pixelSource=1 ownershipPrerequisite=1 "
+        "createAuthorized=0 cacheKey=0x6666666666666666 "
+        "planSnapshot=0x1111111111111111 "
+        "ownershipSnapshot=0x7777777777777777 "
+        "snapshot=0x8888888888888888\n"
         "VR DX11 R275 translatedSemanticReceipt signature#1: exact=0 "
         "objectReady=0 snapshot=0x0000000000000000\n"
         "VR DX11 R85 signature#1: primitive=4 fixedFn=0 fvf=0x00000000 "
@@ -1867,6 +1873,7 @@ def main() -> int:
     assert r278_inventory["CurrentUniqueShaderPairs"] == 1
     assert r278_inventory["SemanticPlanExactSignatures"] == 1
     assert r278_inventory["ObjectOwnershipPrerequisiteExactSignatures"] == 1
+    assert r278_inventory["ObjectCreationHandoffExactSignatures"] == 1
     assert r278_inventory["SemanticReceiptExactSignatures"] == 0
     assert r278_inventory["SemanticEvidenceCoverageComplete"] is True
     assert r278_inventory["R242ObjectOwnershipMissingSignatures"] == [
@@ -1896,6 +1903,24 @@ def main() -> int:
         r278_pair_evidence["ObjectOwnershipPrerequisite"][
             "same_device_object_pair_required"
         ] is True
+    )
+    assert r278_pair_evidence["ObjectCreationHandoff"]["exact"] is True
+    assert (
+        r278_pair_evidence["ObjectCreationHandoff"]["vertex_source_exact"]
+        is True
+    )
+    assert (
+        r278_pair_evidence["ObjectCreationHandoff"]["pixel_source_exact"]
+        is True
+    )
+    assert (
+        r278_pair_evidence["ObjectCreationHandoff"][
+            "ownership_prerequisite_matches"
+        ] is True
+    )
+    assert (
+        r278_pair_evidence["ObjectCreationHandoff"]["creation_authorized"]
+        is False
     )
     assert (
         r278_pair_evidence["Plan"]["target_vertex_semantic_hash"]

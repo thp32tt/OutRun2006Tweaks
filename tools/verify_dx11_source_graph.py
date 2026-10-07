@@ -10952,6 +10952,53 @@ def main() -> None:
             + ", ".join(missing_r279_programmable_object_prerequisite)
         )
 
+    r280_programmable_object_creation_handoff_contract = [
+        ("struct NativeProgrammableShaderObjectCreationHandoffEvidence",
+         NATIVE_BACKEND_HPP, "R280 source-to-object handoff evidence type"),
+        ("compose_programmable_shader_object_creation_handoff(",
+         NATIVE_BACKEND_HPP, "R280 handoff composer declaration"),
+        ("validate_programmable_shader_object_creation_handoff_snapshot(",
+         NATIVE_BACKEND_HPP, "R280 handoff snapshot validator declaration"),
+        ("validate_programmable_shader_function_source_evidence(",
+         NATIVE_BACKEND_CPP, "R280 exact R264 source binding"),
+        ("out.objectCreationAuthorized = false;", NATIVE_BACKEND_CPP,
+         "R280 cannot authorize shader object creation"),
+        ("token, 0x280u", NATIVE_BACKEND_CPP,
+         "R280 independent handoff snapshot domain"),
+        ("ProgrammableShaderFunctionSourceEvidence vertexSourceEvidence{};",
+         RUNTIME_CENSUS, "R280 production census retains vertex R264 evidence"),
+        ("ProgrammableShaderFunctionSourceEvidence pixelSourceEvidence{};",
+         RUNTIME_CENSUS, "R280 production census retains pixel R264 evidence"),
+        ("compose_programmable_shader_object_creation_handoff(",
+         RUNTIME_CENSUS, "R280 production census composes handoff"),
+        ("VR DX11 R280 objectCreationHandoff signature#{}:",
+         RUNTIME_CENSUS, "R280 signature-attributable production log"),
+        ("R280_OBJECT_CREATION_HANDOFF_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R280 analyzer parser"),
+        ("ObjectCreationHandoff", DX11_CENSUS_ANALYZER,
+         "R280 analyzer correlates handoff evidence"),
+        ("R280_OBJECT_CREATION_HANDOFF_EVIDENCE",
+         DX11_CENSUS_ANALYZER, "R280 missing handoff classification"),
+        ("ObjectCreationHandoffExactSignatures",
+         DX11_CENSUS_ANALYZER_TEST, "R280 analyzer regression coverage"),
+        ("R280 object creation handoff binds exact R264 source bytes",
+         CONSTANT_BUFFER_PROBE, "R280 hosted positive regression"),
+        ("R280 object creation handoff rejects stale R264 source identity",
+         CONSTANT_BUFFER_PROBE, "R280 source drift regression"),
+        ("sig.shaderTranslationExact = false;", RUNTIME_CENSUS,
+         "R280 keeps programmable translation fail-closed"),
+    ]
+    missing_r280_programmable_object_creation_handoff = [
+        meaning for token, source, meaning
+        in r280_programmable_object_creation_handoff_contract
+        if token not in source
+    ]
+    if missing_r280_programmable_object_creation_handoff:
+        raise SystemExit(
+            "DX11 R280 programmable object creation handoff drift: "
+            + ", ".join(missing_r280_programmable_object_creation_handoff)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),

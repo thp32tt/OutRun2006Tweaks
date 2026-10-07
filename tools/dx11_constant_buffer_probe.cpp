@@ -852,12 +852,14 @@ int main()
             D3DSP_WRITEMASK_0 | D3DSP_WRITEMASK_1),
         static_cast<DWORD>(D3DSIO_END),
     };
+    const auto r268PsEvidence =
+        outrun::vr::dx11::
+            capture_programmable_shader_function_source_evidence(
+                r268PsTokens, sizeof(r268PsTokens), false);
     const auto r268PsDecode =
         outrun::vr::dx11::
             decode_programmable_shader_instruction_stream(
-                outrun::vr::dx11::
-                    capture_programmable_shader_function_source_evidence(
-                        r268PsTokens, sizeof(r268PsTokens), false));
+                r268PsEvidence);
     const auto r268PsRegisterSemantics =
         outrun::vr::dx11::
             decode_programmable_shader_register_semantics(
@@ -5504,6 +5506,96 @@ int main()
         !r279StaleObjectPrerequisite.reviewReady &&
         r279StaleObjectPrerequisite.reviewSnapshotToken == 0,
         "R279 translated object prerequisite rejects stale R276 plan identity");
+
+    const auto r280ObjectCreationHandoff =
+        outrun::vr::dx11::
+            compose_programmable_shader_object_creation_handoff(
+                programmablePair,
+                r267VsEvidence,
+                r268PsEvidence,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken,
+                r279ObjectPrerequisite,
+                r279ObjectPrerequisite.reviewSnapshotToken);
+    require(
+        r280ObjectCreationHandoff.inputValid &&
+        r280ObjectCreationHandoff.sourceIdentityExact &&
+        r280ObjectCreationHandoff.vertexSourceExact &&
+        r280ObjectCreationHandoff.pixelSourceExact &&
+        r280ObjectCreationHandoff.sourcePairMatches &&
+        r280ObjectCreationHandoff.translationPlanReady &&
+        r280ObjectCreationHandoff.translationPlanSnapshotMatches &&
+        r280ObjectCreationHandoff.objectPrerequisiteReady &&
+        r280ObjectCreationHandoff.objectPrerequisiteSnapshotMatches &&
+        r280ObjectCreationHandoff.cacheIdentityMatches &&
+        !r280ObjectCreationHandoff.objectCreationAuthorized &&
+        r280ObjectCreationHandoff.diagnosticOnly &&
+        r280ObjectCreationHandoff.boundaryPreserved &&
+        r280ObjectCreationHandoff.reviewReady &&
+        r280ObjectCreationHandoff.cacheKey == programmablePair.cacheKey &&
+        r280ObjectCreationHandoff.vertexBytecodeHash ==
+            programmablePair.vertexShader.bytecodeHash &&
+        r280ObjectCreationHandoff.pixelBytecodeHash ==
+            programmablePair.pixelShader.bytecodeHash &&
+        r280ObjectCreationHandoff.targetVertexSemanticHash ==
+            r276TranslationPlan.targetVertexSemanticHash &&
+        r280ObjectCreationHandoff.targetPixelSemanticHash ==
+            r276TranslationPlan.targetPixelSemanticHash &&
+        r280ObjectCreationHandoff.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_shader_object_creation_handoff_snapshot(
+                programmablePair,
+                r267VsEvidence,
+                r268PsEvidence,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken,
+                r279ObjectPrerequisite,
+                r279ObjectPrerequisite.reviewSnapshotToken,
+                r280ObjectCreationHandoff.reviewSnapshotToken),
+        "R280 object creation handoff binds exact R264 source bytes to R276 R279 without creation authority");
+
+    auto r280StaleVertexSource = r267VsEvidence;
+    r280StaleVertexSource.bytecodeHash ^= 1ull;
+    const auto r280StaleSourceHandoff =
+        outrun::vr::dx11::
+            compose_programmable_shader_object_creation_handoff(
+                programmablePair,
+                r280StaleVertexSource,
+                r268PsEvidence,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken,
+                r279ObjectPrerequisite,
+                r279ObjectPrerequisite.reviewSnapshotToken);
+    require(
+        r280StaleVertexSource.exact() &&
+        !r280StaleSourceHandoff.vertexSourceExact &&
+        !r280StaleSourceHandoff.sourcePairMatches &&
+        !r280StaleSourceHandoff.cacheIdentityMatches &&
+        !r280StaleSourceHandoff.reviewReady &&
+        r280StaleSourceHandoff.reviewSnapshotToken == 0,
+        "R280 object creation handoff rejects stale R264 source identity");
+
+    const auto staleR280OwnershipToken =
+        r279ObjectPrerequisite.reviewSnapshotToken == 1ull
+            ? 2ull
+            : (r279ObjectPrerequisite.reviewSnapshotToken ^ 1ull);
+    const auto r280StaleOwnershipHandoff =
+        outrun::vr::dx11::
+            compose_programmable_shader_object_creation_handoff(
+                programmablePair,
+                r267VsEvidence,
+                r268PsEvidence,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken,
+                r279ObjectPrerequisite,
+                staleR280OwnershipToken);
+    require(
+        r280StaleOwnershipHandoff.objectPrerequisiteReady &&
+        !r280StaleOwnershipHandoff.objectPrerequisiteSnapshotMatches &&
+        !r280StaleOwnershipHandoff.cacheIdentityMatches &&
+        !r280StaleOwnershipHandoff.reviewReady &&
+        r280StaleOwnershipHandoff.reviewSnapshotToken == 0,
+        "R280 object creation handoff rejects stale R279 ownership prerequisite");
 
     const auto r275SemanticReceipt =
         outrun::vr::dx11::

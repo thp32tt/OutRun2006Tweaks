@@ -28,6 +28,7 @@ struct VertexInputLayoutTranslation;
 struct FixedFunctionStageState;
 struct PipelineTranslation;
 struct ProgrammableShaderPairCacheIdentity;
+struct ProgrammableShaderFunctionSourceEvidence;
 struct ProgrammableShaderInterfaceLinkageEvidence;
 struct ProgrammableShaderPairSourceSemanticEvidence;
 struct ProgrammableShaderRegisterMappingPlanEvidence;
@@ -2062,6 +2063,63 @@ validate_programmable_shader_translation_object_prerequisite_snapshot(
     const ProgrammableShaderPairCacheIdentity& sourceIdentity,
     const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
     std::uint64_t translationPlanSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
+// R280 seals the exact source-to-object creation handoff that must precede
+// any future R242 programmable VS/PS object creation. It binds exact R264
+// source bytes to the R276 target-semantic plan and R279 ownership/lifetime
+// prerequisite. This remains diagnostic-only: it never compiles/creates/binds
+// D3D11 shaders and never authorizes NativeDrawPath/Draw*.
+struct NativeProgrammableShaderObjectCreationHandoffEvidence {
+    bool inputValid{};
+    bool sourceIdentityExact{};
+    bool vertexSourceExact{};
+    bool pixelSourceExact{};
+    bool sourcePairMatches{};
+    bool translationPlanReady{};
+    bool translationPlanSnapshotMatches{};
+    bool objectPrerequisiteReady{};
+    bool objectPrerequisiteSnapshotMatches{};
+    bool cacheIdentityMatches{};
+    bool objectCreationAuthorized{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    std::uint64_t cacheKey{};
+    DWORD vertexVersionToken{};
+    DWORD pixelVersionToken{};
+    UINT vertexByteSize{};
+    UINT pixelByteSize{};
+    std::uint64_t vertexBytecodeHash{};
+    std::uint64_t pixelBytecodeHash{};
+    std::uint64_t targetVertexSemanticHash{};
+    std::uint64_t targetPixelSemanticHash{};
+    std::uint64_t translationPlanSnapshotToken{};
+    std::uint64_t objectPrerequisiteSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderObjectCreationHandoffEvidence
+compose_programmable_shader_object_creation_handoff(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const ProgrammableShaderFunctionSourceEvidence& vertexSource,
+    const ProgrammableShaderFunctionSourceEvidence& pixelSource,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken,
+    const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+        objectPrerequisite,
+    std::uint64_t objectPrerequisiteSnapshotToken) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_shader_object_creation_handoff_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const ProgrammableShaderFunctionSourceEvidence& vertexSource,
+    const ProgrammableShaderFunctionSourceEvidence& pixelSource,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken,
+    const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+        objectPrerequisite,
+    std::uint64_t objectPrerequisiteSnapshotToken,
     std::uint64_t reviewSnapshotToken) noexcept;
 
 // R275 seals one dormant translated-semantic observation into a tamper-evident

@@ -9516,6 +9516,167 @@ bool validate_programmable_shader_translation_object_prerequisite_snapshot(
         current.reviewSnapshotToken == reviewSnapshotToken;
 }
 
+NativeProgrammableShaderObjectCreationHandoffEvidence
+compose_programmable_shader_object_creation_handoff(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const ProgrammableShaderFunctionSourceEvidence& vertexSource,
+    const ProgrammableShaderFunctionSourceEvidence& pixelSource,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken,
+    const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+        objectPrerequisite,
+    std::uint64_t objectPrerequisiteSnapshotToken) noexcept {
+    NativeProgrammableShaderObjectCreationHandoffEvidence out{};
+
+    out.cacheKey = sourceIdentity.cacheKey;
+    out.vertexVersionToken = sourceIdentity.vertexShader.versionToken;
+    out.pixelVersionToken = sourceIdentity.pixelShader.versionToken;
+    out.vertexByteSize = sourceIdentity.vertexShader.byteSize;
+    out.pixelByteSize = sourceIdentity.pixelShader.byteSize;
+    out.vertexBytecodeHash = sourceIdentity.vertexShader.bytecodeHash;
+    out.pixelBytecodeHash = sourceIdentity.pixelShader.bytecodeHash;
+    out.targetVertexSemanticHash =
+        translationPlan.targetVertexSemanticHash;
+    out.targetPixelSemanticHash =
+        translationPlan.targetPixelSemanticHash;
+    out.translationPlanSnapshotToken = translationPlanSnapshotToken;
+    out.objectPrerequisiteSnapshotToken =
+        objectPrerequisiteSnapshotToken;
+
+    out.inputValid =
+        translationPlanSnapshotToken != 0 &&
+        objectPrerequisiteSnapshotToken != 0;
+    out.sourceIdentityExact =
+        sourceIdentity.exact_identity() &&
+        !sourceIdentity.translationImplemented;
+    out.vertexSourceExact =
+        out.sourceIdentityExact &&
+        validate_programmable_shader_function_source_evidence(
+            vertexSource, sourceIdentity.vertexShader, true);
+    out.pixelSourceExact =
+        out.sourceIdentityExact &&
+        validate_programmable_shader_function_source_evidence(
+            pixelSource, sourceIdentity.pixelShader, false);
+    out.sourcePairMatches =
+        out.vertexSourceExact &&
+        out.pixelSourceExact &&
+        vertexSource.byteSize == sourceIdentity.vertexShader.byteSize &&
+        pixelSource.byteSize == sourceIdentity.pixelShader.byteSize &&
+        vertexSource.versionToken == sourceIdentity.vertexShader.versionToken &&
+        pixelSource.versionToken == sourceIdentity.pixelShader.versionToken &&
+        vertexSource.bytecodeHash == sourceIdentity.vertexShader.bytecodeHash &&
+        pixelSource.bytecodeHash == sourceIdentity.pixelShader.bytecodeHash;
+    out.translationPlanReady =
+        translationPlan.reviewReady &&
+        translationPlan.boundaryPreserved &&
+        translationPlan.diagnosticOnly &&
+        translationPlan.provenanceMatches &&
+        translationPlan.vertexSemanticExact &&
+        translationPlan.pixelSemanticExact &&
+        translationPlan.reviewSnapshotToken != 0;
+    out.translationPlanSnapshotMatches =
+        out.translationPlanReady &&
+        translationPlan.reviewSnapshotToken ==
+            translationPlanSnapshotToken;
+    out.objectPrerequisiteReady =
+        objectPrerequisite.reviewReady &&
+        objectPrerequisite.boundaryPreserved &&
+        objectPrerequisite.diagnosticOnly &&
+        objectPrerequisite.cacheOwnerGenerationRequired &&
+        objectPrerequisite.translationSlotGenerationRequired &&
+        objectPrerequisite.translationObjectReceiptGenerationRequired &&
+        objectPrerequisite.sameDeviceObjectPairRequired &&
+        objectPrerequisite.cacheSnapshotRequired &&
+        objectPrerequisite.slotSnapshotRequired &&
+        objectPrerequisite.reviewSnapshotToken != 0;
+    out.objectPrerequisiteSnapshotMatches =
+        out.objectPrerequisiteReady &&
+        objectPrerequisite.reviewSnapshotToken ==
+            objectPrerequisiteSnapshotToken;
+    out.cacheIdentityMatches =
+        out.sourcePairMatches &&
+        out.translationPlanSnapshotMatches &&
+        out.objectPrerequisiteSnapshotMatches &&
+        sourceIdentity.cacheKey != 0 &&
+        sourceIdentity.cacheKey == translationPlan.cacheKey &&
+        sourceIdentity.cacheKey == objectPrerequisite.cacheKey &&
+        translationPlan.targetVertexSemanticHash != 0 &&
+        translationPlan.targetVertexSemanticHash ==
+            objectPrerequisite.targetVertexSemanticHash &&
+        translationPlan.targetPixelSemanticHash != 0 &&
+        translationPlan.targetPixelSemanticHash ==
+            objectPrerequisite.targetPixelSemanticHash;
+
+    // R280 is intentionally evidence-only. A future implementation must add
+    // a separate creation authority before any D3D11 programmable object call.
+    out.objectCreationAuthorized = false;
+    out.diagnosticOnly = true;
+    out.boundaryPreserved =
+        out.cacheIdentityMatches &&
+        !out.objectCreationAuthorized &&
+        out.diagnosticOnly;
+    out.reviewReady =
+        out.inputValid &&
+        out.boundaryPreserved;
+
+    if (out.reviewReady) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
+        token = mix_readiness_snapshot_token(token, out.vertexVersionToken);
+        token = mix_readiness_snapshot_token(token, out.pixelVersionToken);
+        token = mix_readiness_snapshot_token(token, out.vertexByteSize);
+        token = mix_readiness_snapshot_token(token, out.pixelByteSize);
+        token = mix_readiness_snapshot_token(token, out.vertexBytecodeHash);
+        token = mix_readiness_snapshot_token(token, out.pixelBytecodeHash);
+        token = mix_readiness_snapshot_token(
+            token, out.targetVertexSemanticHash);
+        token = mix_readiness_snapshot_token(
+            token, out.targetPixelSemanticHash);
+        token = mix_readiness_snapshot_token(
+            token, out.translationPlanSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.objectPrerequisiteSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.objectCreationAuthorized ? 1u : 0u);
+        token = mix_readiness_snapshot_token(token, 0x280u);
+        out.reviewSnapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_programmable_shader_object_creation_handoff_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const ProgrammableShaderFunctionSourceEvidence& vertexSource,
+    const ProgrammableShaderFunctionSourceEvidence& pixelSource,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken,
+    const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+        objectPrerequisite,
+    std::uint64_t objectPrerequisiteSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept {
+    if (reviewSnapshotToken == 0)
+        return false;
+    const auto current =
+        compose_programmable_shader_object_creation_handoff(
+            sourceIdentity,
+            vertexSource,
+            pixelSource,
+            translationPlan,
+            translationPlanSnapshotToken,
+            objectPrerequisite,
+            objectPrerequisiteSnapshotToken);
+    return current.reviewReady &&
+        current.boundaryPreserved &&
+        current.vertexSourceExact &&
+        current.pixelSourceExact &&
+        current.sourcePairMatches &&
+        current.translationPlanSnapshotMatches &&
+        current.objectPrerequisiteSnapshotMatches &&
+        current.cacheIdentityMatches &&
+        !current.objectCreationAuthorized &&
+        current.reviewSnapshotToken == reviewSnapshotToken;
+}
+
 NativeProgrammableShaderTranslatedSemanticReceipt
 compose_programmable_shader_translated_semantic_receipt(
     const ProgrammableShaderPairCacheIdentity& sourceIdentity,

@@ -161,6 +161,17 @@ R279_OBJECT_PREREQUISITE_RE = re.compile(
     r"planSnapshot=0x(?P<planSnapshot>[0-9A-Fa-f]+) "
     r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
 )
+R280_OBJECT_CREATION_HANDOFF_RE = re.compile(
+    r"VR DX11 R280 objectCreationHandoff signature#(?P<signature>\d+): "
+    r"exact=(?P<exact>[01]) vertexSource=(?P<vertexSource>[01]) "
+    r"pixelSource=(?P<pixelSource>[01]) "
+    r"ownershipPrerequisite=(?P<ownershipPrerequisite>[01]) "
+    r"createAuthorized=(?P<createAuthorized>[01]) "
+    r"cacheKey=0x(?P<cacheKey>[0-9A-Fa-f]+) "
+    r"planSnapshot=0x(?P<planSnapshot>[0-9A-Fa-f]+) "
+    r"ownershipSnapshot=0x(?P<ownershipSnapshot>[0-9A-Fa-f]+) "
+    r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
+)
 R275_SEMANTIC_RECEIPT_RE = re.compile(
     r"VR DX11 R275 translatedSemanticReceipt signature#(?P<signature>\d+): "
     r"exact=(?P<exact>[01]) objectReady=(?P<objectReady>[01]) "
@@ -449,9 +460,12 @@ def summarize_programmable_shader_inventory(
     semantic_plan_inexact: list[dict] = []
     object_prerequisite_missing: list[dict] = []
     object_prerequisite_inexact: list[dict] = []
+    object_creation_handoff_missing: list[dict] = []
+    object_creation_handoff_inexact: list[dict] = []
     r242_object_ownership_missing: list[dict] = []
     semantic_plan_exact_signatures = 0
     object_prerequisite_exact_signatures = 0
+    object_creation_handoff_exact_signatures = 0
     semantic_receipt_exact_signatures = 0
     records_with_identity = 0
     programmable_signatures = 0
@@ -508,6 +522,7 @@ def summarize_programmable_shader_inventory(
         )
         plan = signature.get("semantic_translation_plan")
         object_prerequisite = signature.get("translation_object_prerequisite")
+        object_creation_handoff = signature.get("object_creation_handoff")
         receipt = signature.get("translated_semantic_receipt")
         missing_prerequisite = None
         if plan is None:
@@ -534,6 +549,20 @@ def summarize_programmable_shader_inventory(
         else:
             object_prerequisite_exact_signatures += 1
 
+        if object_creation_handoff is None:
+            object_creation_handoff_missing.append(ref)
+            if missing_prerequisite is None:
+                missing_prerequisite = "R280_OBJECT_CREATION_HANDOFF_EVIDENCE"
+        elif (
+            not object_creation_handoff["exact"]
+            or object_creation_handoff["creation_authorized"]
+        ):
+            object_creation_handoff_inexact.append(ref)
+            if missing_prerequisite is None:
+                missing_prerequisite = "R280_OBJECT_CREATION_HANDOFF_EXACTNESS"
+        else:
+            object_creation_handoff_exact_signatures += 1
+
         if receipt is None:
             semantic_receipt_missing.append(ref)
             if missing_prerequisite is None:
@@ -547,6 +576,9 @@ def summarize_programmable_shader_inventory(
                 and plan["exact"]
                 and object_prerequisite is not None
                 and object_prerequisite["exact"]
+                and object_creation_handoff is not None
+                and object_creation_handoff["exact"]
+                and not object_creation_handoff["creation_authorized"]
             ):
                 r242_object_ownership_missing.append(ref)
                 if missing_prerequisite is None:
@@ -560,6 +592,7 @@ def summarize_programmable_shader_inventory(
                 "SignatureRef": ref,
                 "Plan": plan,
                 "ObjectOwnershipPrerequisite": object_prerequisite,
+                "ObjectCreationHandoff": object_creation_handoff,
                 "Receipt": receipt,
                 "MissingPrerequisite": missing_prerequisite,
                 "DiagnosticOnly": True,
@@ -578,6 +611,8 @@ def summarize_programmable_shader_inventory(
         evidence_coverage_complete
         and programmable_signatures > 0
         and not semantic_plan_missing
+        and not object_prerequisite_missing
+        and not object_creation_handoff_missing
         and not semantic_receipt_missing
     )
     return {
@@ -593,11 +628,17 @@ def summarize_programmable_shader_inventory(
             object_prerequisite_missing,
         "ObjectOwnershipPrerequisiteInexactSignatures":
             object_prerequisite_inexact,
+        "ObjectCreationHandoffEvidenceMissingSignatures":
+            object_creation_handoff_missing,
+        "ObjectCreationHandoffInexactSignatures":
+            object_creation_handoff_inexact,
         "SemanticReceiptEvidenceMissingSignatures": semantic_receipt_missing,
         "R242ObjectOwnershipMissingSignatures": r242_object_ownership_missing,
         "SemanticPlanExactSignatures": semantic_plan_exact_signatures,
         "ObjectOwnershipPrerequisiteExactSignatures":
             object_prerequisite_exact_signatures,
+        "ObjectCreationHandoffExactSignatures":
+            object_creation_handoff_exact_signatures,
         "SemanticReceiptExactSignatures": semantic_receipt_exact_signatures,
         "SemanticEvidenceCoverageComplete": semantic_evidence_coverage_complete,
         "EvidenceLimitedBySignatureDetailCap": detail_cap_saturated,
@@ -631,6 +672,7 @@ def main() -> int:
     signatures: dict[SignatureKey, dict] = {}
     semantic_translation_plans: dict[SignatureKey, dict] = {}
     translation_object_prerequisites: dict[SignatureKey, dict] = {}
+    object_creation_handoffs: dict[SignatureKey, dict] = {}
     translated_semantic_receipts: dict[SignatureKey, dict] = {}
     declarations: dict[SignatureKey, list[dict]] = {}
     fixed_function: dict[SignatureKey, list[dict]] = {}
@@ -766,6 +808,34 @@ def main() -> int:
                         int(data["planSnapshot"], 16),
                     "translation_plan_snapshot_hex":
                         "0x" + data["planSnapshot"].upper(),
+                    "snapshot": int(data["snapshot"], 16),
+                    "snapshot_hex": "0x" + data["snapshot"].upper(),
+                }
+                continue
+
+            match = R280_OBJECT_CREATION_HANDOFF_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                signature_key = (source_log, startup_epoch, signature_id)
+                object_creation_handoffs[signature_key] = {
+                    "exact": bool(int(data["exact"])),
+                    "vertex_source_exact": bool(int(data["vertexSource"])),
+                    "pixel_source_exact": bool(int(data["pixelSource"])),
+                    "ownership_prerequisite_matches":
+                        bool(int(data["ownershipPrerequisite"])),
+                    "creation_authorized":
+                        bool(int(data["createAuthorized"])),
+                    "cache_key": int(data["cacheKey"], 16),
+                    "cache_key_hex": "0x" + data["cacheKey"].upper(),
+                    "translation_plan_snapshot":
+                        int(data["planSnapshot"], 16),
+                    "translation_plan_snapshot_hex":
+                        "0x" + data["planSnapshot"].upper(),
+                    "ownership_prerequisite_snapshot":
+                        int(data["ownershipSnapshot"], 16),
+                    "ownership_prerequisite_snapshot_hex":
+                        "0x" + data["ownershipSnapshot"].upper(),
                     "snapshot": int(data["snapshot"], 16),
                     "snapshot_hex": "0x" + data["snapshot"].upper(),
                 }
@@ -921,6 +991,9 @@ def main() -> int:
         )
         signature["translation_object_prerequisite"] = (
             translation_object_prerequisites.get(signature_key)
+        )
+        signature["object_creation_handoff"] = (
+            object_creation_handoffs.get(signature_key)
         )
         signature["translated_semantic_receipt"] = (
             translated_semantic_receipts.get(signature_key)
