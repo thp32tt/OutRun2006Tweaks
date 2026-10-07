@@ -2961,3 +2961,9 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/C103/CURRENT high-zoom FLIP-Y, full RAW and practical 100/75/50 review PASS. `No Handicap` now reads naturally as `무 핸디캡`; source-direction right lean, orange face/dark shadow, two-level hierarchy and protected Ferrari model cards/pictograms remain source-faithful. No broken Hangul, clipping, residue, overlap or protected-art intrusion visible.
 - Mandatory exact-SHA C3_STRICT_AUDIT PASS. Decision `C240_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME`. PRE_INGAME export refresh, user JPG acceptance and actual-game validation remain pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_C/20261007-C240-C1-Q107-841E796B-B232R/C240_841E796B_MACHINE_QA.json`, `localization/graphics/role_C/20261007-C240-C1-Q107-841E796B-B232R/C240_CONTROLLER_FINAL_QA.json`.
+
+## 2026-10-07 15:30 KST — C240 q107 PRE_INGAME export refresh complete
+- TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). Persistent exporter run `37581237970` SUCCESS after q107 C240 fresh C + exact-SHA C3 promotion.
+- q107 is PRE_INGAME #008 `008_q107_841E796B.jpg`; pinned English source `112f47e7b16ecf21f722738f7fc9053d1a9852d66da9ef9d29fd25dadf2f567e` and exact Korean candidate `d6a5cc84e7cf834afe11d8afdc2c0b869b306e75759b71ee392983db8999abda`, both native 2048x512, display scale 1.
+- Controller final exported-card review PASS: FLIP-Y source/current show natural `무 핸디캡` order with source-family right lean/orange-shadow hierarchy and unchanged Ferrari model cards; RAW source/current retain matching mirror-Y orientation. No broken Hangul, clipping, residue, overlap or protected-art intrusion visible.
+- Manifest count=12; mandatory C3 blocked=10. User JPG acceptance and NEW actual-game validation remain pending; no in-game closure claimed. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
