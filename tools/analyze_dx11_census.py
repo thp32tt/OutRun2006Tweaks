@@ -172,6 +172,17 @@ R280_OBJECT_CREATION_HANDOFF_RE = re.compile(
     r"ownershipSnapshot=0x(?P<ownershipSnapshot>[0-9A-Fa-f]+) "
     r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
 )
+R281_TRANSLATED_ARTIFACT_RECEIPT_RE = re.compile(
+    r"VR DX11 R281 translatedArtifactReceipt signature#(?P<signature>\d+): "
+    r"exact=(?P<exact>[01]) targetBytecodeRequired=(?P<targetRequired>[01]) "
+    r"materialized=(?P<materialized>[01]) createAuthorized=(?P<createAuthorized>[01]) "
+    r"cacheKey=0x(?P<cacheKey>[0-9A-Fa-f]+) "
+    r"vertexIdentity=0x(?P<vertexIdentity>[0-9A-Fa-f]+) "
+    r"pixelIdentity=0x(?P<pixelIdentity>[0-9A-Fa-f]+) "
+    r"handoffSnapshot=0x(?P<handoffSnapshot>[0-9A-Fa-f]+) "
+    r"planSnapshot=0x(?P<planSnapshot>[0-9A-Fa-f]+) "
+    r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
+)
 R275_SEMANTIC_RECEIPT_RE = re.compile(
     r"VR DX11 R275 translatedSemanticReceipt signature#(?P<signature>\d+): "
     r"exact=(?P<exact>[01]) objectReady=(?P<objectReady>[01]) "
@@ -462,10 +473,13 @@ def summarize_programmable_shader_inventory(
     object_prerequisite_inexact: list[dict] = []
     object_creation_handoff_missing: list[dict] = []
     object_creation_handoff_inexact: list[dict] = []
+    translated_artifact_receipt_missing: list[dict] = []
+    translated_artifact_receipt_inexact: list[dict] = []
     r242_object_ownership_missing: list[dict] = []
     semantic_plan_exact_signatures = 0
     object_prerequisite_exact_signatures = 0
     object_creation_handoff_exact_signatures = 0
+    translated_artifact_receipt_exact_signatures = 0
     semantic_receipt_exact_signatures = 0
     records_with_identity = 0
     programmable_signatures = 0
@@ -523,6 +537,7 @@ def summarize_programmable_shader_inventory(
         plan = signature.get("semantic_translation_plan")
         object_prerequisite = signature.get("translation_object_prerequisite")
         object_creation_handoff = signature.get("object_creation_handoff")
+        translated_artifact_receipt = signature.get("translated_artifact_receipt")
         receipt = signature.get("translated_semantic_receipt")
         missing_prerequisite = None
         if plan is None:
@@ -563,6 +578,22 @@ def summarize_programmable_shader_inventory(
         else:
             object_creation_handoff_exact_signatures += 1
 
+        if translated_artifact_receipt is None:
+            translated_artifact_receipt_missing.append(ref)
+            if missing_prerequisite is None:
+                missing_prerequisite = "R281_TRANSLATED_ARTIFACT_RECEIPT_EVIDENCE"
+        elif (
+            not translated_artifact_receipt["exact"]
+            or not translated_artifact_receipt["target_bytecode_required"]
+            or translated_artifact_receipt["materialized"]
+            or translated_artifact_receipt["creation_authorized"]
+        ):
+            translated_artifact_receipt_inexact.append(ref)
+            if missing_prerequisite is None:
+                missing_prerequisite = "R281_TRANSLATED_ARTIFACT_RECEIPT_EXACTNESS"
+        else:
+            translated_artifact_receipt_exact_signatures += 1
+
         if receipt is None:
             semantic_receipt_missing.append(ref)
             if missing_prerequisite is None:
@@ -579,6 +610,11 @@ def summarize_programmable_shader_inventory(
                 and object_creation_handoff is not None
                 and object_creation_handoff["exact"]
                 and not object_creation_handoff["creation_authorized"]
+                and translated_artifact_receipt is not None
+                and translated_artifact_receipt["exact"]
+                and translated_artifact_receipt["target_bytecode_required"]
+                and not translated_artifact_receipt["materialized"]
+                and not translated_artifact_receipt["creation_authorized"]
             ):
                 r242_object_ownership_missing.append(ref)
                 if missing_prerequisite is None:
@@ -593,6 +629,7 @@ def summarize_programmable_shader_inventory(
                 "Plan": plan,
                 "ObjectOwnershipPrerequisite": object_prerequisite,
                 "ObjectCreationHandoff": object_creation_handoff,
+                "TranslatedArtifactReceipt": translated_artifact_receipt,
                 "Receipt": receipt,
                 "MissingPrerequisite": missing_prerequisite,
                 "DiagnosticOnly": True,
@@ -613,6 +650,7 @@ def summarize_programmable_shader_inventory(
         and not semantic_plan_missing
         and not object_prerequisite_missing
         and not object_creation_handoff_missing
+        and not translated_artifact_receipt_missing
         and not semantic_receipt_missing
     )
     return {
@@ -632,6 +670,10 @@ def summarize_programmable_shader_inventory(
             object_creation_handoff_missing,
         "ObjectCreationHandoffInexactSignatures":
             object_creation_handoff_inexact,
+        "TranslatedArtifactReceiptEvidenceMissingSignatures":
+            translated_artifact_receipt_missing,
+        "TranslatedArtifactReceiptInexactSignatures":
+            translated_artifact_receipt_inexact,
         "SemanticReceiptEvidenceMissingSignatures": semantic_receipt_missing,
         "R242ObjectOwnershipMissingSignatures": r242_object_ownership_missing,
         "SemanticPlanExactSignatures": semantic_plan_exact_signatures,
@@ -639,6 +681,8 @@ def summarize_programmable_shader_inventory(
             object_prerequisite_exact_signatures,
         "ObjectCreationHandoffExactSignatures":
             object_creation_handoff_exact_signatures,
+        "TranslatedArtifactReceiptExactSignatures":
+            translated_artifact_receipt_exact_signatures,
         "SemanticReceiptExactSignatures": semantic_receipt_exact_signatures,
         "SemanticEvidenceCoverageComplete": semantic_evidence_coverage_complete,
         "EvidenceLimitedBySignatureDetailCap": detail_cap_saturated,
@@ -673,6 +717,7 @@ def main() -> int:
     semantic_translation_plans: dict[SignatureKey, dict] = {}
     translation_object_prerequisites: dict[SignatureKey, dict] = {}
     object_creation_handoffs: dict[SignatureKey, dict] = {}
+    translated_artifact_receipts: dict[SignatureKey, dict] = {}
     translated_semantic_receipts: dict[SignatureKey, dict] = {}
     declarations: dict[SignatureKey, list[dict]] = {}
     fixed_function: dict[SignatureKey, list[dict]] = {}
@@ -841,6 +886,34 @@ def main() -> int:
                 }
                 continue
 
+            match = R281_TRANSLATED_ARTIFACT_RECEIPT_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                signature_key = (source_log, startup_epoch, signature_id)
+                translated_artifact_receipts[signature_key] = {
+                    "exact": bool(int(data["exact"])),
+                    "target_bytecode_required": bool(int(data["targetRequired"])),
+                    "materialized": bool(int(data["materialized"])),
+                    "creation_authorized": bool(int(data["createAuthorized"])),
+                    "cache_key": int(data["cacheKey"], 16),
+                    "cache_key_hex": "0x" + data["cacheKey"].upper(),
+                    "vertex_identity": int(data["vertexIdentity"], 16),
+                    "vertex_identity_hex": "0x" + data["vertexIdentity"].upper(),
+                    "pixel_identity": int(data["pixelIdentity"], 16),
+                    "pixel_identity_hex": "0x" + data["pixelIdentity"].upper(),
+                    "object_creation_handoff_snapshot":
+                        int(data["handoffSnapshot"], 16),
+                    "object_creation_handoff_snapshot_hex":
+                        "0x" + data["handoffSnapshot"].upper(),
+                    "translation_plan_snapshot": int(data["planSnapshot"], 16),
+                    "translation_plan_snapshot_hex":
+                        "0x" + data["planSnapshot"].upper(),
+                    "snapshot": int(data["snapshot"], 16),
+                    "snapshot_hex": "0x" + data["snapshot"].upper(),
+                }
+                continue
+
             match = R275_SEMANTIC_RECEIPT_RE.search(line)
             if match:
                 data = match.groupdict()
@@ -994,6 +1067,9 @@ def main() -> int:
         )
         signature["object_creation_handoff"] = (
             object_creation_handoffs.get(signature_key)
+        )
+        signature["translated_artifact_receipt"] = (
+            translated_artifact_receipts.get(signature_key)
         )
         signature["translated_semantic_receipt"] = (
             translated_semantic_receipts.get(signature_key)

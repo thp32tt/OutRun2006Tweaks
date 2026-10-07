@@ -5597,6 +5597,66 @@ int main()
         r280StaleOwnershipHandoff.reviewSnapshotToken == 0,
         "R280 object creation handoff rejects stale R279 ownership prerequisite");
 
+    const auto r281TranslatedArtifactReceipt =
+        outrun::vr::dx11::
+            derive_programmable_shader_translated_artifact_receipt(
+                programmablePair,
+                r280ObjectCreationHandoff,
+                r280ObjectCreationHandoff.reviewSnapshotToken,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken);
+    require(
+        r281TranslatedArtifactReceipt.inputValid &&
+        r281TranslatedArtifactReceipt.sourceIdentityExact &&
+        r281TranslatedArtifactReceipt.objectCreationHandoffReady &&
+        r281TranslatedArtifactReceipt.objectCreationHandoffSnapshotMatches &&
+        r281TranslatedArtifactReceipt.translationPlanReady &&
+        r281TranslatedArtifactReceipt.translationPlanSnapshotMatches &&
+        r281TranslatedArtifactReceipt.cacheIdentityMatches &&
+        r281TranslatedArtifactReceipt.targetVertexIdentityDefined &&
+        r281TranslatedArtifactReceipt.targetPixelIdentityDefined &&
+        r281TranslatedArtifactReceipt.targetBytecodeReceiptRequired &&
+        !r281TranslatedArtifactReceipt.targetBytecodeMaterialized &&
+        !r281TranslatedArtifactReceipt.objectCreationAuthorized &&
+        r281TranslatedArtifactReceipt.diagnosticOnly &&
+        r281TranslatedArtifactReceipt.boundaryPreserved &&
+        r281TranslatedArtifactReceipt.reviewReady &&
+        r281TranslatedArtifactReceipt.targetVertexBytecodeReceiptIdentity != 0 &&
+        r281TranslatedArtifactReceipt.targetPixelBytecodeReceiptIdentity != 0 &&
+        r281TranslatedArtifactReceipt.targetVertexBytecodeReceiptIdentity !=
+            r281TranslatedArtifactReceipt.targetPixelBytecodeReceiptIdentity &&
+        r281TranslatedArtifactReceipt.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_shader_translated_artifact_receipt_snapshot(
+                programmablePair,
+                r280ObjectCreationHandoff,
+                r280ObjectCreationHandoff.reviewSnapshotToken,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken,
+                r281TranslatedArtifactReceipt.reviewSnapshotToken),
+        "R281 translated artifact receipt defines target bytecode identity without materializing shaders");
+
+    const auto staleR281HandoffToken =
+        r280ObjectCreationHandoff.reviewSnapshotToken == 1ull
+            ? 2ull
+            : (r280ObjectCreationHandoff.reviewSnapshotToken ^ 1ull);
+    const auto r281StaleHandoffReceipt =
+        outrun::vr::dx11::
+            derive_programmable_shader_translated_artifact_receipt(
+                programmablePair,
+                r280ObjectCreationHandoff,
+                staleR281HandoffToken,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken);
+    require(
+        r281StaleHandoffReceipt.objectCreationHandoffReady &&
+        !r281StaleHandoffReceipt.objectCreationHandoffSnapshotMatches &&
+        !r281StaleHandoffReceipt.cacheIdentityMatches &&
+        !r281StaleHandoffReceipt.targetBytecodeReceiptRequired &&
+        !r281StaleHandoffReceipt.reviewReady &&
+        r281StaleHandoffReceipt.reviewSnapshotToken == 0,
+        "R281 translated artifact receipt rejects stale R280 handoff identity");
+
     const auto r275SemanticReceipt =
         outrun::vr::dx11::
             compose_programmable_shader_translated_semantic_receipt(

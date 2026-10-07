@@ -2122,6 +2122,59 @@ validate_programmable_shader_object_creation_handoff_snapshot(
     std::uint64_t objectPrerequisiteSnapshotToken,
     std::uint64_t reviewSnapshotToken) noexcept;
 
+// R281 defines the provenance identity that a future translated VS/PS
+// bytecode artifact receipt must carry before R242 object creation can be
+// considered. It intentionally does not materialize target bytecode, compile
+// shaders, create/bind D3D11 objects or authorize NativeDrawPath/Draw*.
+struct NativeProgrammableShaderTranslatedArtifactReceiptEvidence {
+    bool inputValid{};
+    bool sourceIdentityExact{};
+    bool objectCreationHandoffReady{};
+    bool objectCreationHandoffSnapshotMatches{};
+    bool translationPlanReady{};
+    bool translationPlanSnapshotMatches{};
+    bool cacheIdentityMatches{};
+    bool targetVertexIdentityDefined{};
+    bool targetPixelIdentityDefined{};
+    bool targetBytecodeReceiptRequired{};
+    bool targetBytecodeMaterialized{};
+    bool objectCreationAuthorized{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    std::uint64_t cacheKey{};
+    DWORD vertexVersionToken{};
+    DWORD pixelVersionToken{};
+    std::uint64_t sourceVertexBytecodeHash{};
+    std::uint64_t sourcePixelBytecodeHash{};
+    std::uint64_t targetVertexSemanticHash{};
+    std::uint64_t targetPixelSemanticHash{};
+    std::uint64_t translatorRevisionHash{};
+    std::uint64_t semanticContractHash{};
+    std::uint64_t targetVertexBytecodeReceiptIdentity{};
+    std::uint64_t targetPixelBytecodeReceiptIdentity{};
+    std::uint64_t objectCreationHandoffSnapshotToken{};
+    std::uint64_t translationPlanSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderTranslatedArtifactReceiptEvidence
+derive_programmable_shader_translated_artifact_receipt(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderObjectCreationHandoffEvidence& creationHandoff,
+    std::uint64_t creationHandoffSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_shader_translated_artifact_receipt_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderObjectCreationHandoffEvidence& creationHandoff,
+    std::uint64_t creationHandoffSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
 // R275 seals one dormant translated-semantic observation into a tamper-evident
 // receipt bound to the exact R239 pair, R242 translated-object ownership, R273
 // source-mapping handoff and R276 source-derived semantic translation plan.

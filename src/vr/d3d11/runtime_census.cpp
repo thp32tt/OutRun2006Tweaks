@@ -355,6 +355,13 @@ namespace outrun::vr::dx11
             bool shaderObjectCreationHandoffOwnershipPrerequisiteMatches{};
             bool shaderObjectCreationAuthorized{};
             std::uint64_t shaderObjectCreationHandoffSnapshotToken{};
+            bool shaderTranslatedArtifactReceiptExact{};
+            bool shaderTranslatedArtifactReceiptTargetBytecodeRequired{};
+            bool shaderTranslatedArtifactReceiptMaterialized{};
+            bool shaderTranslatedArtifactCreationAuthorized{};
+            std::uint64_t shaderTranslatedVertexArtifactIdentity{};
+            std::uint64_t shaderTranslatedPixelArtifactIdentity{};
+            std::uint64_t shaderTranslatedArtifactReceiptSnapshotToken{};
             bool shaderTranslatedSemanticReceiptExact{};
             bool shaderTranslatedSemanticReceiptObjectReady{};
             std::uint64_t shaderTranslatedSemanticReceiptSnapshotToken{};
@@ -843,6 +850,21 @@ namespace outrun::vr::dx11
                 hash, sig.shaderObjectCreationAuthorized ? 1u : 0u);
             hash = hash_mix(
                 hash, sig.shaderObjectCreationHandoffSnapshotToken);
+            hash = hash_mix(
+                hash, sig.shaderTranslatedArtifactReceiptExact ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderTranslatedArtifactReceiptTargetBytecodeRequired ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTranslatedArtifactReceiptMaterialized ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTranslatedArtifactCreationAuthorized ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTranslatedVertexArtifactIdentity);
+            hash = hash_mix(
+                hash, sig.shaderTranslatedPixelArtifactIdentity);
+            hash = hash_mix(
+                hash, sig.shaderTranslatedArtifactReceiptSnapshotToken);
             hash = hash_mix(
                 hash, sig.shaderTranslatedSemanticReceiptExact ? 1u : 0u);
             hash = hash_mix(
@@ -1606,6 +1628,28 @@ namespace outrun::vr::dx11
             sig.shaderObjectCreationHandoffSnapshotToken =
                 objectCreationHandoff.reviewSnapshotToken;
 
+            const auto translatedArtifactReceipt =
+                derive_programmable_shader_translated_artifact_receipt(
+                    programmablePairIdentity,
+                    objectCreationHandoff,
+                    objectCreationHandoff.reviewSnapshotToken,
+                    semanticTranslationPlan,
+                    semanticTranslationPlan.reviewSnapshotToken);
+            sig.shaderTranslatedArtifactReceiptExact =
+                translatedArtifactReceipt.reviewReady;
+            sig.shaderTranslatedArtifactReceiptTargetBytecodeRequired =
+                translatedArtifactReceipt.targetBytecodeReceiptRequired;
+            sig.shaderTranslatedArtifactReceiptMaterialized =
+                translatedArtifactReceipt.targetBytecodeMaterialized;
+            sig.shaderTranslatedArtifactCreationAuthorized =
+                translatedArtifactReceipt.objectCreationAuthorized;
+            sig.shaderTranslatedVertexArtifactIdentity =
+                translatedArtifactReceipt.targetVertexBytecodeReceiptIdentity;
+            sig.shaderTranslatedPixelArtifactIdentity =
+                translatedArtifactReceipt.targetPixelBytecodeReceiptIdentity;
+            sig.shaderTranslatedArtifactReceiptSnapshotToken =
+                translatedArtifactReceipt.reviewSnapshotToken;
+
             // R277 deliberately supplies no R242 translated-object ownership.
             // The R275 receipt therefore exposes the exact remaining boundary
             // while retaining the deterministic R276 plan identity.
@@ -2213,6 +2257,19 @@ namespace outrun::vr::dx11
                         sig.shaderSemanticTranslationPlanSnapshotToken,
                         sig.shaderTranslationObjectPrerequisiteSnapshotToken,
                         sig.shaderObjectCreationHandoffSnapshotToken);
+                    spdlog::info(
+                        "VR DX11 R281 translatedArtifactReceipt signature#{}: exact={} targetBytecodeRequired={} materialized={} createAuthorized={} cacheKey=0x{:016X} vertexIdentity=0x{:016X} pixelIdentity=0x{:016X} handoffSnapshot=0x{:016X} planSnapshot=0x{:016X} snapshot=0x{:016X}",
+                        unique,
+                        sig.shaderTranslatedArtifactReceiptExact ? 1 : 0,
+                        sig.shaderTranslatedArtifactReceiptTargetBytecodeRequired ? 1 : 0,
+                        sig.shaderTranslatedArtifactReceiptMaterialized ? 1 : 0,
+                        sig.shaderTranslatedArtifactCreationAuthorized ? 1 : 0,
+                        sig.shaderSourceSemanticPairCacheKey,
+                        sig.shaderTranslatedVertexArtifactIdentity,
+                        sig.shaderTranslatedPixelArtifactIdentity,
+                        sig.shaderObjectCreationHandoffSnapshotToken,
+                        sig.shaderSemanticTranslationPlanSnapshotToken,
+                        sig.shaderTranslatedArtifactReceiptSnapshotToken);
                     spdlog::info(
                         "VR DX11 R275 translatedSemanticReceipt signature#{}: exact={} objectReady={} snapshot=0x{:016X}",
                         unique,

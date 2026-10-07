@@ -10999,6 +10999,53 @@ def main() -> None:
             + ", ".join(missing_r280_programmable_object_creation_handoff)
         )
 
+    r281_programmable_translated_artifact_receipt_contract = [
+        ("struct NativeProgrammableShaderTranslatedArtifactReceiptEvidence",
+         NATIVE_BACKEND_HPP, "R281 translated artifact receipt evidence type"),
+        ("derive_programmable_shader_translated_artifact_receipt(",
+         NATIVE_BACKEND_HPP, "R281 receipt composer declaration"),
+        ("validate_programmable_shader_translated_artifact_receipt_snapshot(",
+         NATIVE_BACKEND_HPP, "R281 receipt snapshot validator declaration"),
+        ("targetVertexBytecodeReceiptIdentity", NATIVE_BACKEND_HPP,
+         "R281 target vertex bytecode identity requirement"),
+        ("targetPixelBytecodeReceiptIdentity", NATIVE_BACKEND_HPP,
+         "R281 target pixel bytecode identity requirement"),
+        ("out.targetBytecodeMaterialized = false;", NATIVE_BACKEND_CPP,
+         "R281 cannot claim target bytecode materialization"),
+        ("out.objectCreationAuthorized = false;", NATIVE_BACKEND_CPP,
+         "R281 cannot authorize programmable object creation"),
+        ("token, 0x281u", NATIVE_BACKEND_CPP,
+         "R281 independent receipt snapshot domain"),
+        ("derive_programmable_shader_translated_artifact_receipt(",
+         RUNTIME_CENSUS, "R281 production census derives receipt"),
+        ("VR DX11 R281 translatedArtifactReceipt signature#{}:",
+         RUNTIME_CENSUS, "R281 signature-attributable production receipt log"),
+        ("R281_TRANSLATED_ARTIFACT_RECEIPT_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R281 analyzer parser"),
+        ("TranslatedArtifactReceipt", DX11_CENSUS_ANALYZER,
+         "R281 analyzer correlates artifact receipt"),
+        ("R281_TRANSLATED_ARTIFACT_RECEIPT_EVIDENCE",
+         DX11_CENSUS_ANALYZER, "R281 missing receipt classification"),
+        ("TranslatedArtifactReceiptExactSignatures",
+         DX11_CENSUS_ANALYZER_TEST, "R281 analyzer regression coverage"),
+        ("R281 translated artifact receipt defines target bytecode identity",
+         CONSTANT_BUFFER_PROBE, "R281 hosted positive regression"),
+        ("R281 translated artifact receipt rejects stale R280 handoff identity",
+         CONSTANT_BUFFER_PROBE, "R281 stale handoff regression"),
+        ("sig.shaderTranslationExact = false;", RUNTIME_CENSUS,
+         "R281 keeps programmable translation fail-closed"),
+    ]
+    missing_r281_programmable_translated_artifact_receipt = [
+        meaning for token, source, meaning
+        in r281_programmable_translated_artifact_receipt_contract
+        if token not in source
+    ]
+    if missing_r281_programmable_translated_artifact_receipt:
+        raise SystemExit(
+            "DX11 R281 programmable translated artifact receipt drift: "
+            + ", ".join(missing_r281_programmable_translated_artifact_receipt)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
