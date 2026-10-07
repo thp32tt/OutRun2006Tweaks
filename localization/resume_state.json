@@ -8352,5 +8352,32 @@
     "pre_ingame_manifest_count": 13,
     "pre_ingame_mandatory_c3_blocked_count": 10,
     "pre_ingame_controller_visual_qa": "PASS_FLIPY_RAW_ENGLISH_ORIGINAL_VS_CURRENT"
+  },
+  "a163r_ff2462bb": {
+    "run": "A163R",
+    "timestamp_kst": "2026-10-07 16:05 KST",
+    "queue_index": 51,
+    "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+    "trigger": "PJR-014 after C239 source-target mismatch / A163 controller style rejection",
+    "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "a144_rejected_candidate_sha256": "3a046a8b695ee6b0a766fca223455616a45a9480b72e28b0c39ddf42821d0b6d",
+    "a163_intermediate_sha256": "16ed98f52c2505cf32304eb2b61aa15491de87e78e9b11812c7add3c6fa3b112",
+    "candidate_sha256": "0dccb6318fafa20725427227fddf00c451bfdab814de5dc2da497d79d13b862e",
+    "source_target_mapping": "correct readable bbox [3002,1405,3512,1566] from historical RAW bbox [3002,482,3512,643]",
+    "wrong_upper_insertion_restored_exact": true,
+    "machine_qa": {
+      "outside_true_target_vs_pre_a144": 0,
+      "source_size_ceiling": "PASS_2_OF_2",
+      "positive_effect_margin": "PASS_MIN_8PX",
+      "persisted_decode": "PASS"
+    },
+    "controller_visual_qa": "PASS",
+    "producer_status": "A163R_SELF_QA_PASS_PENDING_FRESH_C_C3_USER_JPG_INGAME",
+    "fresh_independent_c": "REQUIRED",
+    "mandatory_c3_strict_audit": "REQUIRED_EXACT_SHA",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true,
+    "report": "localization/graphics/role_A/20261007-A163R-Q051-FF2462BB-C239-STYLE-REPAIR/A163R_FF2462BB_REPORT.json",
+    "controller_qa": "localization/graphics/role_A/20261007-A163R-Q051-FF2462BB-C239-STYLE-REPAIR/A163R_CONTROLLER_SELF_QA.json"
   }
 }

@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "A163R",
+  "queue_index": 51,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "candidate_sha256": "0dccb6318fafa20725427227fddf00c451bfdab814de5dc2da497d79d13b862e",
+  "controller_visual_qa": "PASS",
+  "reviewed_evidence": [
+    "A163R_FF2462_TARGET_SOURCE_PRIOR_A163_FINAL.jpg",
+    "A163R_FF2462_WRONG_INSERTION_RESTORED.jpg",
+    "A163R_FF2462_RAW_SOURCE_A163_FINAL.jpg",
+    "A163R_FF2462_PRACTICAL_100.jpg",
+    "A163R_FF2462_PRACTICAL_75.jpg",
+    "A163R_FF2462_PRACTICAL_50.jpg"
+  ],
+  "findings": {
+    "source_target_mapping": "PASS; girlfriend instruction exists only in the true lower/right source footprint",
+    "wrong_a144_insertion_restored": "PASS; erroneous upper insertion restored to pre-A144 bytes",
+    "source_style_family": "PASS; yellow face + navy keyline + white middle border + navy outer edge visually restores English-source family",
+    "readable_slant_direction": "PASS; Korean readable orientation follows source right-lean family",
+    "glyph_integrity": "PASS; no broken Hangul or clipped effect pixels visible",
+    "bottom_outline_clipping": "PASS; persisted render retains >=8 px line-effect margins",
+    "protected_art_clearance": "PASS; machine blast-radius outside true target is 0 and visual review shows no unrelated UI intrusion",
+    "raw_flipy": "PASS; RAW and readable/FLIP-Y evidence are semantically consistent",
+    "practical_scale": "PASS at 100/75/50 evidence scales"
+  },
+  "machine_qa_reference": "A163R_FF2462BB_REPORT.json",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3_strict_audit": "REQUIRED_EXACT_SHA",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_AND_C3",
+  "user_jpg_review": "REQUIRED_AFTER_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
