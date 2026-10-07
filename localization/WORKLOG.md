@@ -3280,3 +3280,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Exact-source-pixel coincidence counts (q198=71, q226=19717, q228=647) are not visible-residue evidence because same-color localized strokes can share exact source RGB at overlapping coordinates; alpha-composited visual inspection shows no surviving English glyph bodies.
 - PRE_INGAME English-original export refresh is mandatory next; user JPG acceptance + NEW actual-game validation remain pending. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Controller report: `localization/graphics/role_C/20261008-C258-C2-Q198-Q226-Q228/C258_CONTROLLER_FINAL_QA.json`.
+
+
+## 2026-10-08 01:49 KST — B242 q212 BA0147DA condensed title-family rework
+- B-owned P1 IGR-002/q212 selected; completed B240 P0 work was not repeated.
+- C256 rejected A170 3266d074... for broad/square 1.15x Hangul. B241 dbebe068... machine-PASS draft was producer-rejected for excessive HEART↔ATTACK gap before shared promotion.
+- Final B242 e3fc3275e696acb0dc5449908bd3b57a232d842ad51296e888cc7ede6a276863: native 150px Bold, 0.76 condensed aspect; C2C source word anchors + canonical source numeral 2 preserved; HEART ATTACK whole-word groups + bounded 300px gap; no per-syllable tracking.
+- Persisted QA: 2/2 bbox/size PASS; changed/alpha outside=0; localized/protected overlap=0; header exact, mip1, RAW mirror_y, roundtrip decode PASS. SOURCE/B241/CLEAN/B242, practical 100/75/50 and RAW controller review PASS.
+- Worker run 37654356700 attempt 1 computed successfully but push lease raced concurrent C; failed job only was rerun. Attempt 2 SUCCESS / output 720de01b.... N100 was used only for small JPG evidence review and Git state reconciliation, not heavy DDS compute.
+- Fresh C + exact-SHA C3 + PRE_INGAME/user JPG + NEW in-game retest pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08",
+  "updated_at_kst": "2026-10-08T01:49:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -5394,49 +5394,40 @@
     "runtime_validation": "UNTESTED"
   },
   "latest_b_production": {
-    "run": "20261007-B239-Q052-A8CE339F-START-FAMILY",
-    "timestamp_kst": "2026-10-08T00:07:49+09:00",
+    "run": "20261008-B242-Q212-CONDENSED-WORD-GROUPS",
+    "timestamp_kst": "2026-10-08T01:49:00+09:00",
     "role": "B",
-    "queue_index": 52,
-    "asset": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
-    "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
-    "prior_candidate_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
-    "candidate_sha256": "c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e",
-    "reason": "duplicate Start UI-family mismatch 60x36 vs 53x31 on identical 107x41 source cells",
-    "repair": "right Start only; final left/right 출발 = 60x36/60x36",
+    "queue_index": 212,
+    "asset": "BA0147DA",
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "c256_rejected_sha256": "3266d0740f9fc5b8d1b0771e2313fe3364e485da06bc5ad578f94999082315c4",
+    "b241_rejected_sha256": "dbebe0684070f75fdae7bc494534a58be1bc5ebceada9418f30604a5307a644f",
+    "candidate_sha256": "e3fc3275e696acb0dc5449908bd3b57a232d842ad51296e888cc7ede6a276863",
+    "worker_run": 37654356700,
+    "worker_attempt": 2,
+    "worker_output_commit": "720de01bb48b59911edc0f544ab36fa5d5c4646a",
     "machine_qa": {
-      "right_bbox": [
-        826,
-        312,
-        886,
-        348
-      ],
-      "right_source_bbox": [
-        801,
-        309,
-        908,
-        350
-      ],
-      "margins": [
-        25,
-        22,
-        3,
-        2
-      ],
-      "outside": 0,
+      "bbox_containment": "2/2 PASS",
+      "changed_outside": 0,
       "alpha_outside": 0,
-      "changed_bc3_blocks": 137,
+      "localized_overlap": 0,
+      "protected_overlap": 0,
       "header_128_exact": true,
+      "mips": 1,
       "raw_orientation": "mirror_y",
-      "non_target_b176_rows_pixel_exact": true,
       "persisted_decode": "PASS"
     },
-    "controller_visual_qa": "PASS_FOCUS_READABLE_RAW",
-    "status": "B239_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_AND_EXACT_SHA_C3",
+    "visual_qa": {
+      "B241": "FAIL_EXCESSIVE_HEART_WORD_GAP",
+      "B242": "PASS_SOURCE_CLEAN_FINAL_PRACTICAL_RAW"
+    },
+    "status": "B242_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME_RETEST",
     "fresh_independent_c": "REQUIRED",
-    "mandatory_c3": "REQUIRED_EXACT_SHA_DXT5_FAMILY_FALSE_NEGATIVE",
+    "mandatory_c3": "REQUIRED_EXACT_SHA_USER_INGAME_REGRESSION",
     "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
-    "runtime_validation": "UNTESTED"
+    "actual_ingame_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   },
   "b240_user_menu_typography_rework": {
     "status": "Q205_NATIVE_HD_SELF_QA_PASS_PENDING_FRESH_C_C3_AND_INGAME_RETEST",
@@ -5640,6 +5631,42 @@
     },
     "controller_report": "localization/graphics/role_C/20261008-C258-C2-Q198-Q226-Q228/C258_CONTROLLER_FINAL_QA.json",
     "pre_ingame_export": "PENDING_REFRESH_Q198_Q226_Q228",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "b242_q212_ba0147da": {
+    "run": "20261008-B242-Q212-CONDENSED-WORD-GROUPS",
+    "timestamp_kst": "2026-10-08T01:49:00+09:00",
+    "role": "B",
+    "queue_index": 212,
+    "asset": "BA0147DA",
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "c256_rejected_sha256": "3266d0740f9fc5b8d1b0771e2313fe3364e485da06bc5ad578f94999082315c4",
+    "b241_rejected_sha256": "dbebe0684070f75fdae7bc494534a58be1bc5ebceada9418f30604a5307a644f",
+    "candidate_sha256": "e3fc3275e696acb0dc5449908bd3b57a232d842ad51296e888cc7ede6a276863",
+    "worker_run": 37654356700,
+    "worker_attempt": 2,
+    "worker_output_commit": "720de01bb48b59911edc0f544ab36fa5d5c4646a",
+    "machine_qa": {
+      "bbox_containment": "2/2 PASS",
+      "changed_outside": 0,
+      "alpha_outside": 0,
+      "localized_overlap": 0,
+      "protected_overlap": 0,
+      "header_128_exact": true,
+      "mips": 1,
+      "raw_orientation": "mirror_y",
+      "persisted_decode": "PASS"
+    },
+    "visual_qa": {
+      "B241": "FAIL_EXCESSIVE_HEART_WORD_GAP",
+      "B242": "PASS_SOURCE_CLEAN_FINAL_PRACTICAL_RAW"
+    },
+    "status": "B242_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME_RETEST",
+    "fresh_independent_c": "REQUIRED",
+    "mandatory_c3": "REQUIRED_EXACT_SHA_USER_INGAME_REGRESSION",
+    "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+    "actual_ingame_validation": "PENDING",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }

@@ -2618,3 +2618,9 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q193 `97E863AD`: A171 candidate `e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166` clears WELCOME TO THE / MULTIPLAYER / SHOWROOM source footprints and rerenders native Korean. Machine 3/3 + zero outside/alpha + persisted DDS/RAW PASS; controller visual PASS. Fresh C + exact-SHA C3 + PRE_INGAME + NEW in-game retest pending.
 - q121 `FD90AA9`: A171-A174 attempts were controller-rejected for rectangular plate reconstruction. A175 restored exact prior `03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433` and set `HOLD_STRICT_RECHECK`; C255 source-residue defect remains open.
 - GitHub Actions CPU-worker fallback used after ChatGPT-local GitHub DNS failure. N100 not used. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
+
+### B242 q212 — 2026-10-08 01:49 KST
+- IGR-002/q212 BA0147DA final producer candidate e3fc3275...; B241 was self-rejected, B242 machine+controller visual PASS.
+- 2/2 containment/size, zero outside/alpha/protected/overlap, exact header/mip1/decode/RAW mirror_y PASS. 150px Bold / 0.76 condensed / whole-word grouping.
+- Next: fresh C2 + exact-SHA C3 -> PRE_INGAME/user review -> NEW in-game retest. RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.
