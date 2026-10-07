@@ -1264,16 +1264,11 @@ namespace OutRunVRStereo
 			}
 
 			++DirectTransportFenceTimeouts;
-			const HRESULT status=slot.fence->GetData(nullptr,0,0);
-			if(status!=S_FALSE)
-			{
-				slot.producerPending=false;
-				slot.pendingFrameId=0;
-				slot.frameId=0;
-				slot.published=false;
-			}
-			// S_FALSE stays quarantined. A later slot scan reclaims it as soon as
-			// the query completes; it is never published and therefore needs no ACK.
+			// Any unresolved EVENT stays quarantined here. Do not issue a second
+			// GetData or clear producer ownership after the bounded wait: the next
+			// ring scan is the single owner that distinguishes S_OK, S_FALSE, and
+			// hard errors. This keeps an unproven shared slot immutable and lets
+			// R13/R32 fail-closed rejection handle hard query failures.
 			return false;
 		}
 
