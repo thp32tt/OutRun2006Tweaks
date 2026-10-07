@@ -305,6 +305,7 @@ namespace WheelFFBMath
     constexpr float DriftCountersteerStartRad = 0.16f;
     constexpr float DriftCountersteerFullRad = 0.42f;
     constexpr float DriftCountersteerMaxBlend = 1.00f;
+    constexpr float DriftCountersteerTorqueScale = 0.90f;
 
     inline float drift_countersteer_blend(
         float bodySlip, float frontSlip, float bodySlide)
@@ -536,6 +537,23 @@ namespace WheelFFBMath
             0.28f * std::clamp(contactEnvelope, 0.0f, 1.0f) *
                 speedGate * roadScale * gainScale,
             0.0f, 0.32f);
+    }
+
+    inline float modern_road_tactile_amplitude(
+        bool imperialStonePaving,
+        float commonContactTactile,
+        float imperialStoneTactile)
+    {
+        if (!std::isfinite(commonContactTactile))
+            commonContactTactile = 0.0f;
+        if (!std::isfinite(imperialStoneTactile))
+            imperialStoneTactile = 0.0f;
+        const float common = std::clamp(commonContactTactile, 0.0f, 1.0f);
+        const float imperial = std::clamp(imperialStoneTactile, 0.0f, 1.0f);
+        // Imperial Avenue is a sustained primary-road texture, not a curb.
+        // Do not let the generic 4-wheel contact layer (~0.23 at roughness 0.35)
+        // dominate its deliberately subtle ~0.05 stone carrier.
+        return imperialStonePaving ? imperial : common;
     }
 
     // Direction-independent collision texture.  The directional rack kick is
