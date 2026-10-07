@@ -1,0 +1,14 @@
+{
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C241-C2-Q232-EBFC709F-B230",
+  "queue_index": 232,
+  "asset": "EBFC709F",
+  "candidate_sha256": "dc76c000cfce17098940f551512e6f746319ba8a1892345eb060693004747ea1",
+  "machine_status": "PASS",
+  "c3_machine_status": "PASS",
+  "report": "localization/graphics/role_C/20261007-C241-C2-Q232-EBFC709F-B230/C241_EBFC709F_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C241-C2-Q232-EBFC709F-B230",
+  "qa_id": "C241",
+  "queue_index": 232,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "producer_run": "B230",
+  "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+  "prior_candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
+  "candidate_sha256": "dc76c000cfce17098940f551512e6f746319ba8a1892345eb060693004747ea1",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds"
+  },
+  "prior_candidate_git_commit": "1efc4fd48b0fb0cd1a1c191a3d1d7058924c3b6a",
+  "independent_basis": "C freshly downloads/decodes pinned canonical source, recovers exact C225R prior bytes by SHA from Git history, independently derives the two help source-alpha bboxes from fixed semantic windows, reconstructs clean from prior bytes, and re-derives persisted current localized geometry/diff scope without consuming producer masks or bbox counters.",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "mip_count": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "key": "create_help",
+      "source": "Create a game and invite your friends!",
+      "korean": "게임을 만들고 친구를 초대하세요!",
+      "original_bbox": [
+        7,
+        367,
+        1120,
+        437
+      ],
+      "source_size": [
+        1113,
+        70
+      ],
+      "localized_bbox": [
+        9,
+        369,
+        887,
+        435
+      ],
+      "localized_size": [
+        878,
+        66
+      ],
+      "margins": [
+        2,
+        233,
+        2,
+        2
+      ],
+      "delta_left": 2,
+      "delta_right": -233,
+      "delta_top": 2,
+      "delta_bottom": -2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "join_help",
+      "source": "Join your friends in a game of OutRun!",
+      "korean": "친구들과 OutRun 게임에 참가하세요!",
+      "original_bbox": [
+        4,
+        527,
+        1138,
+        597
+      ],
+      "source_size": [
+        1134,
+        70
+      ],
+      "localized_bbox": [
+        6,
+        529,
+        1006,
+        595
+      ],
+      "localized_size": [
+        1000,
+        66
+      ],
+      "margins": [
+        2,
+        132,
+        2,
+        2
+      ],
+      "delta_left": 2,
+      "delta_right": -132,
+      "delta_top": 2,
+      "delta_bottom": -2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "summary": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "prior_to_current_changed_pixels_outside_two_source_bboxes": 0,
+    "prior_to_current_alpha_changed_outside_two_source_bboxes": 0,
+    "independent_clean_source_alpha_remaining": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_to_protected_outside_rework_pixels": 0,
+    "prior_four_Korean_headings_preserved": "PASS_BY_ZERO_BLAST_RADIUS",
+    "brand_policy_OutRun_preserved_English": "PASS"
+  },
+  "coverage": {
+    "newly_localized_help": [
+      "Create a game and invite your friends!",
+      "Join your friends in a game of OutRun!"
+    ],
+    "prior_localized_headings_preserved": [
+      "JOIN GAME small",
+      "CREATE GAME small",
+      "CREATE GAME large",
+      "JOIN GAME large"
+    ],
+    "status": "PASS_ALL_VISIBLE_LOCALIZABLE_SEGMENTS_ACCOUNTED"
+  },
+  "machine_status": "PASS",
+  "fresh_c_decision": "PENDING_CONTROLLER",
+  "c3_required": true,
+  "c3_reason": [
+    "PRE_INGAME_HUMAN_REJECTION_COVERAGE_FALSE_NEGATIVE",
+    "PRIOR_C225R_VISUAL_POLICY_FALSE_NEGATIVE",
+    "SMALL_DARK_HELP_TEXT",
+    "CHANGED_BYTES_AFTER_PRIOR_C_PASS"
+  ],
+  "c3_machine_status": "PASS",
+  "c3_visual_priorities": [
+    "coverage",
+    "clean_plate",
+    "source_style",
+    "scale_readability",
+    "glyph_integrity",
+    "protected_separation",
+    "source_placement",
+    "FLIP_Y_RAW_consistency",
+    "practical_scale"
+  ],
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C241-C2-Q232-EBFC709F-B230/C241_SOURCE_PRIOR_CLEAN_FINAL_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C241-C2-Q232-EBFC709F-B230/C241_HELP_ROW_CONTACTS.jpg",
+    "localization/graphics/role_C/20261007-C241-C2-Q232-EBFC709F-B230/C241_SOURCE_FINAL_RAW.jpg",
+    "localization/graphics/role_C/20261007-C241-C2-Q232-EBFC709F-B230/C241_PRACTICAL_100_75_50.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "pre_ingame_export": "BLOCKED_UNTIL_CONTROLLER_C_AND_C3_PASS",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
