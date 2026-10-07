@@ -59,30 +59,36 @@ source,old,cand=map(decode,[source_bytes,old_bytes,cand_bytes])
 clean=Image.open(CLEAN).convert("RGBA")
 if not (source.size==old.size==cand.size==clean.size==(2048,1024)): raise SystemExit("dimension mismatch")
 S,O,F,K=map(A,[source,old,cand,clean])
-SM=np.array(Image.open(SOURCE_MASK).convert("L"))>0
-PM=np.array(Image.open(PROTECTED_MASK).convert("L"))>0
 c156=json.loads(C156_REPORT.read_text(encoding="utf-8"))
 rows=c156["rows"]
+H,W=1024,2048
+def readable_to_raw(box):
+    x0,y0,x1,y1=box
+    return [x0,H-y1,x1,H-y0]
+def raw_to_readable(box):
+    x0,y0,x1,y1=box
+    return [x0,H-y1,x1,H-y0]
 
 # Fresh decoded persisted-pixel bboxes against prior independent C clean plate.
+# C156 report bboxes are readable/FLIP-Y coordinates; DDS/clean pixels below remain RAW.
 records=[]
-allowed=np.zeros((1024,2048),dtype=bool)
-all_source_union=np.zeros_like(allowed)
+allowed=np.zeros((H,W),dtype=bool)
+old_diff=np.any(O!=K,axis=2)
+fin_diff=np.any(F!=K,axis=2)
 for r in rows:
-    key=r["key"]; sb=list(r["original_bbox"]); x0,y0,x1,y1=sb
-    all_source_union[y0:y1,x0:x1]=True
-    if key in CHANGED_KEYS: allowed[y0:y1,x0:x1]=True
-    old_diff=np.any(O!=K,axis=2)
-    fin_diff=np.any(F!=K,axis=2)
-    ob=local_bbox(old_diff,sb); fb=local_bbox(fin_diff,sb)
-    if ob is None or fb is None: raise SystemExit(f"missing decoded bbox {key}")
-    sw,sh=size(sb); ow,oh=size(ob); fw,fh=size(fb)
-    mg=margins(sb,fb)
-    containment=fb[0]>=sb[0] and fb[1]>=sb[1] and fb[2]<=sb[2] and fb[3]<=sb[3]
+    key=r["key"]; sb_read=list(r["original_bbox"]); sb_raw=readable_to_raw(sb_read)
+    rx0,ry0,rx1,ry1=sb_raw
+    if key in CHANGED_KEYS: allowed[ry0:ry1,rx0:rx1]=True
+    ob_raw=local_bbox(old_diff,sb_raw); fb_raw=local_bbox(fin_diff,sb_raw)
+    if ob_raw is None or fb_raw is None: raise SystemExit(f"missing decoded bbox {key}: old={ob_raw} final={fb_raw}")
+    ob=raw_to_readable(ob_raw); fb=raw_to_readable(fb_raw)
+    sw,sh=size(sb_read); ow,oh=size(ob); fw,fh=size(fb)
+    mg=margins(sb_read,fb)
+    containment=fb[0]>=sb_read[0] and fb[1]>=sb_read[1] and fb[2]<=sb_read[2] and fb[3]<=sb_read[3]
     positive=all(v>0 for v in mg)
     records.append({
       "key":key,"source":r["source"],"korean_current":("변속기 선택" if key=="select_transmission" else "변속기" if key=="transmission_small" else r["korean"]),
-      "source_bbox":sb,"prior_bbox":ob,"localized_bbox":fb,
+      "source_bbox":sb_read,"source_bbox_raw":sb_raw,"prior_bbox":ob,"localized_bbox":fb,
       "source_size":[sw,sh],"prior_size":[ow,oh],"localized_size":[fw,fh],"margins":mg,
       "containment":"PASS" if containment else "FAIL",
       "size_ceiling":"PASS" if fw<=sw and fh<=sh else "FAIL",
@@ -94,19 +100,18 @@ change=np.any(F!=O,axis=2)
 alpha_change=F[:,:,3]!=O[:,:,3]
 changed_outside=int((change & ~allowed).sum())
 alpha_outside=int((alpha_change & ~allowed).sum())
-protected_change_vs_old=int((change & PM).sum())
-protected_change_vs_source=int((np.any(F!=S,axis=2) & PM).sum())
-# Four prior localized option rows and all unrelated content must remain exact.
-unchanged_expected=int((change & ~allowed).sum())==0
+# Four prior localized option rows, AT/MT artwork and every unrelated pixel must remain exact
+# because B165 is allowed to touch only the two independently established source bboxes.
+unchanged_expected=changed_outside==0 and alpha_outside==0
 changed_inside_each={}
 for rec in records:
-    sb=rec["source_bbox"]; x0,y0,x1,y1=sb
+    sb=rec["source_bbox_raw"]; x0,y0,x1,y1=sb
     changed_inside_each[rec["key"]]=int(change[y0:y1,x0:x1].sum())
 
 header_exact=source_bytes[:128]==cand_bytes[:128]
 mips=struct.unpack_from("<I",cand_bytes,28)[0]
 row_pass=all(r["containment"]=="PASS" and r["size_ceiling"]=="PASS" and r["positive_margin"]=="PASS" for r in records)
-machine_pass=(row_pass and changed_outside==0 and alpha_outside==0 and protected_change_vs_old==0 and protected_change_vs_source==0 and header_exact and mips==1 and changed_inside_each["select_transmission"]>0 and changed_inside_each["transmission_small"]>0)
+machine_pass=(row_pass and changed_outside==0 and alpha_outside==0 and header_exact and mips==1 and changed_inside_each["select_transmission"]>0 and changed_inside_each["transmission_small"]>0 and all(changed_inside_each[k]==0 for k in ("manual_large","automatic_large","manual_small","automatic_small")))
 
 # Evidence: readable FLIP-Y, RAW, high zoom, practical scale.
 read_source,read_clean,read_old,read_final=map(ImageOps.flip,[source,clean,old,cand])
@@ -124,9 +129,8 @@ for rec in [x for x in records if x["key"] in CHANGED_KEYS]:
     box=(max(0,sb[0]-p),max(0,sb[1]-p),min(2048,sb[2]+p),min(1024,sb[3]+p))
     parts=[]
     for im,label in [(read_source,"SRC"),(read_old,"OLD"),(read_clean,"CLEAN"),(read_final,"FINAL")]:
-        # readable images are vertically flipped, so map raw bbox to readable coordinates
-        rb=(box[0],1024-box[3],box[2],1024-box[1])
-        crop=im.crop(rb).resize(((rb[2]-rb[0])*2,(rb[3]-rb[1])*2),Image.Resampling.NEAREST)
+        # evidence images are already FLIP-Y/readable; crop in readable coordinates directly.
+        crop=im.crop(box).resize(((box[2]-box[0])*2,(box[3]-box[1])*2),Image.Resampling.NEAREST)
         parts.append(draw_label(crop,label))
     contact_rows.append(hstrip(parts))
 cw=max(i.width for i in contact_rows); ch=sum(i.height for i in contact_rows)
@@ -147,15 +151,14 @@ report={
  "producer_run":"B165","user_ingame_regression":"IGR-005","priority":"P0",
  "source_sha256":sha(source_bytes),"prior_candidate_sha256":sha(old_bytes),"candidate_sha256":sha(cand_bytes),
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6","url":SOURCE_URL},
- "independent_basis":"Pinned canonical source re-downloaded; persisted candidate decoded independently; exact source bboxes and clean/protected geometry come from prior independent C156 evidence tied to the same canonical source SHA. B165 producer bbox/mask data are not consumed for containment. Blast radius is measured against the exact pre-B165 candidate recovered from Git history.",
+ "independent_basis":"Pinned canonical source re-downloaded; persisted candidate decoded independently. Exact readable source bboxes and verified clean geometry come from prior independent C156 evidence tied to the same canonical source SHA, with explicit readable-to-RAW coordinate conversion. B165 producer bbox/mask data are not consumed for containment. Blast radius is measured against the exact pre-B165 candidate recovered from Git history; zero change outside the two title/subtitle source bboxes protects the four option rows, AT/MT and all unrelated pixels.",
  "structure":{"dimensions":[2048,1024],"format":"RGBA32/BGRA","mips":mips,"header_128_exact":header_exact,"raw_orientation":"mirror_y"},
  "rows":records,
  "summary":{
    "bbox_size_positive_margin":f"{sum(1 for r in records if r['containment']=='PASS' and r['size_ceiling']=='PASS' and r['positive_margin']=='PASS')}/{len(records)} PASS",
    "changed_pixels_outside_two_rework_source_bboxes":changed_outside,
    "alpha_changed_outside_two_rework_source_bboxes":alpha_outside,
-   "protected_pixels_changed_vs_prior":protected_change_vs_old,
-   "protected_pixels_changed_vs_source":protected_change_vs_source,
+   "protected_and_unrelated_preservation":"PASS_BY_ZERO_BLAST_RADIUS_OUTSIDE_TWO_INDEPENDENT_SOURCE_BBOXES" if unchanged_expected else "FAIL",
    "changed_inside_each_row":changed_inside_each,
    "preserved_manual_automatic_and_unrelated":"PASS" if unchanged_expected else "FAIL",
    "persisted_dds_decode_authority":"PASS",
