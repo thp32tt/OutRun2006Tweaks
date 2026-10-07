@@ -31,6 +31,15 @@ KNOWN_TARGETS = {
     0x0BAD20: "RankMarker_sub_4BAD20",
 }
 
+PRODUCER_WINDOWS = (
+    {
+        "name": "SceneEffectLensProducer_sub_40CAE0",
+        "start_rva": 0x0000CAE0,
+        "end_rva": 0x0000D100,
+        "anchors": (0x0000CABE, 0x0000CF4E),
+    },
+)
+
 KNOWN_CALL_SITES = {
     0x0BB0FB: "RankMarker sprani #1",
     0x0BB133: "RankMarker sprani #2",
@@ -230,6 +239,65 @@ def find_calls(pe: PE) -> list[dict]:
     return found
 
 
+def extract_producer_windows(pe: PE) -> list[dict]:
+    """Capture exact code bytes and every direct CALL in narrow P0 producer windows."""
+    out: list[dict] = []
+    text_section = pe.section(".text")
+    if not text_section:
+        return out
+    text = pe.data[
+        text_section.raw_pointer :
+        text_section.raw_pointer + text_section.raw_size
+    ]
+    text_begin = text_section.virtual_address
+    text_end = text_begin + len(text)
+    for spec in PRODUCER_WINDOWS:
+        start = max(spec["start_rva"], text_begin)
+        end = min(spec["end_rva"], text_end)
+        if start >= end:
+            continue
+        blob = pe.bytes_at_rva(start, end - start)
+        calls = []
+        for off in range(0, max(0, len(blob) - 5)):
+            if blob[off] != 0xE8:
+                continue
+            rel = struct.unpack_from("<i", blob, off + 1)[0]
+            call_rva = start + off
+            target_va = (pe.image_base + call_rva + 5 + rel) & 0xFFFFFFFF
+            target_rva = (target_va - pe.image_base) & 0xFFFFFFFF
+            calls.append(
+                {
+                    "call_rva": call_rva,
+                    "target_rva": target_rva,
+                    "known_target": KNOWN_TARGETS.get(target_rva, ""),
+                    "context_start_rva": max(start, call_rva - 16),
+                    "context_hex": pe.bytes_at_rva(
+                        max(start, call_rva - 16), 37
+                    ).hex(),
+                }
+            )
+        anchors = []
+        for rva in spec["anchors"]:
+            anchors.append(
+                {
+                    "rva": rva,
+                    "bytes32": pe.bytes_at_rva(rva, 32).hex(),
+                }
+            )
+        out.append(
+            {
+                "name": spec["name"],
+                "start_rva": start,
+                "end_rva": end,
+                "bytes_sha256": hashlib.sha256(blob).hexdigest(),
+                "bytes_hex": blob.hex(),
+                "anchors": anchors,
+                "direct_calls": calls,
+            }
+        )
+    return out
+
+
 def extract_hud_strings(pe: PE) -> list[dict]:
     results: list[dict] = []
     for section in pe.sections:
@@ -290,6 +358,25 @@ def render_markdown(report: dict) -> str:
         lines.append(
             f"| {hexrva(sym['rva'])} | {sym['name']} | {sym['bytes24']} |"
         )
+
+    if report.get("producer_windows"):
+        lines += ["", "## P0 producer windows", ""]
+        for window in report["producer_windows"]:
+            lines += [
+                f"### {window['name']}",
+                "",
+                f"- Range: {hexrva(window['start_rva'])}..{hexrva(window['end_rva'])}",
+                f"- Byte SHA-256: {window['bytes_sha256']}",
+                f"- Direct CALL count: {len(window['direct_calls'])}",
+                "",
+                "| Call RVA | Target RVA | Known target |",
+                "|---:|---:|---|",
+            ]
+            for call in window["direct_calls"]:
+                lines.append(
+                    f"| {hexrva(call['call_rva'])} | {hexrva(call['target_rva'])} | {call['known_target'] or '-'} |"
+                )
+            lines.append("")
 
     lines += [
         "",
@@ -363,6 +450,7 @@ def main() -> int:
             "sections": [s.__dict__ for s in pe.sections],
         },
         "symbols": symbol_fingerprints(pe),
+        "producer_windows": extract_producer_windows(pe),
         "calls": calls,
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
