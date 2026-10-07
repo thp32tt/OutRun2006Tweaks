@@ -1,0 +1,63 @@
+name: Korean Localization User In-Game Rework
+
+on:
+  push:
+    branches:
+      - korean-localization-recovery-20260928
+    paths:
+      - 'tools/localization/user_ingame_rework_20261007.py'
+      - '.github/workflows/localization-user-ingame-rework.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localization-user-ingame-rework-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  rework:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout triggering revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install image/font dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk fontconfig
+          python -m pip install --disable-pip-version-check pillow numpy
+
+      - name: Apply user in-game rework
+        run: python tools/localization/user_ingame_rework_20261007.py
+
+      - name: Commit outputs
+        run: |
+          set -euo pipefail
+          git add src/overlay/overlay.cpp src/hooks_localization.cpp \
+            docs/KOREAN_RUNTIME_K4_OVERLAY_TEST.md docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md \
+            localization/graphics/hd_candidates localization/graphics/role_A \
+            localization/graphics/asset_queue.csv localization/graphics/transcriptions.jsonl \
+            localization/graphics/artwork_plan.jsonl localization/graphics/INGAME_REWORK_BACKLOG.csv \
+            localization/WORKLOG.md localization/progress/progress.json \
+            localization/progress/STATUS.md localization/resume_state.json
+          if git diff --cached --quiet; then
+            echo "No rework output."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix(localization): apply 20261007 in-game readability rework"
+          git fetch origin korean-localization-recovery-20260928
+          git rebase origin/korean-localization-recovery-20260928
+          git push origin HEAD:korean-localization-recovery-20260928
