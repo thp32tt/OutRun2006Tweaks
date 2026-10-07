@@ -1,6 +1,8 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
+#include "vr/hud_semantics.hpp"
+#include "vr/game/render_semantics.hpp"
 #include <fstream>
 #include <xxhash.h>
 #include <d3d9.h>
@@ -616,10 +618,89 @@ class TextureReplacement : public Hook
 		a1->top_9C = a1->top_9C * scaleY;
 	}
 
+	using VrSpriteTailSnapshot =
+		std::array<SpriteNode*, Game::SpritePriorityCount>;
+
+	static VrSpriteTailSnapshot SnapshotVrSpriteTails()
+	{
+		VrSpriteTailSnapshot before{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			before[prio] = root ? root->tail_4 : nullptr;
+		}
+		return before;
+	}
+
+	static OutRunVRHudSemantics::SemanticInfo
+		ClassifyDirectVrSpriteCaller(const void* returnAddress) noexcept
+	{
+		const auto base =
+			reinterpret_cast<std::uintptr_t>(Module::ExeHandle);
+		const auto ret =
+			reinterpret_cast<std::uintptr_t>(returnAddress);
+		if (!base || ret < base + 5)
+			return OutRunVRHudSemantics::UnknownInfo();
+
+		const auto offset = ret - base;
+		if (offset > 0xFFFFFFFFull)
+			return OutRunVRHudSemantics::UnknownInfo();
+
+		const auto callRva =
+			static_cast<std::uint32_t>(offset) - 5u;
+		return OutRunVRHudSemantics::ClassifyCaller(callRva);
+	}
+
+	static void TagDirectVrSpriteNodes(
+		const VrSpriteTailSnapshot& before,
+		const void* returnAddress) noexcept
+	{
+		if (!Settings::VREnabled)
+			return;
+
+		const auto semantic =
+			ClassifyDirectVrSpriteCaller(returnAddress);
+		OutRunVR::GameSemantic::RenderScope scope =
+			OutRunVR::GameSemantic::RenderScope::None;
+		switch (semantic.space)
+		{
+		case OutRunVRHudSemantics::SpacePolicy::ScreenHud:
+			scope = OutRunVR::GameSemantic::RenderScope::ScreenHud;
+			break;
+		case OutRunVRHudSemantics::SpacePolicy::WorldBillboard:
+			scope = OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+			break;
+		default:
+			return;
+		}
+
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+			if (!root || !tailAfter || tailAfter == before[prio])
+				continue;
+
+			SpriteNode* node = before[prio]
+				? before[prio]->next_0 : root->next_0;
+			for (unsigned guard = 0;
+				node && guard < Game::SpriteNodeMax; ++guard)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, scope);
+				if (node == tailAfter)
+					break;
+				node = node->next_0;
+			}
+		}
+	}
+
 	inline static SafetyHookInline put_sprite_ex2 = {};
 	static int __cdecl put_sprite_ex2_dest(SPRARGS2* a1, float a2)
 	{
-		OutRunVRHudInspector::TracePutSprite2(a1, a2, _ReturnAddress());
+		const void* returnAddress = _ReturnAddress();
+		const auto vrTailsBefore = SnapshotVrSpriteTails();
+		OutRunVRHudInspector::TracePutSprite2(a1, a2, returnAddress);
 		int xstnum = a1->xstnum_0;
 
 		if (a1->d3dtexture_ptr_C == prevTexture && sprite_scales.contains(prevTextureId))
@@ -647,13 +728,17 @@ class TextureReplacement : public Hook
 			}
 		}
 
-		return put_sprite_ex2.call<int>(a1, a2);
+		const int result = put_sprite_ex2.call<int>(a1, a2);
+		TagDirectVrSpriteNodes(vrTailsBefore, returnAddress);
+		return result;
 	}
 
 	inline static SafetyHookInline put_sprite_ex = {};
 	static int __cdecl put_sprite_ex_dest(SPRARGS* a1, float a2)
 	{
-		OutRunVRHudInspector::TracePutSprite(a1, a2, _ReturnAddress());
+		const void* returnAddress = _ReturnAddress();
+		const auto vrTailsBefore = SnapshotVrSpriteTails();
+		OutRunVRHudInspector::TracePutSprite(a1, a2, returnAddress);
 		int xstnum = a1->xstnum_0;
 		if (sprite_scales.contains(xstnum))
 		{
@@ -666,7 +751,9 @@ class TextureReplacement : public Hook
 			a1->scaleX = a1->scaleX / scaleX;
 			a1->scaleY = a1->scaleY / scaleY;
 		}
-		return put_sprite_ex.call<int>(a1, a2);
+		const int result = put_sprite_ex.call<int>(a1, a2);
+		TagDirectVrSpriteNodes(vrTailsBefore, returnAddress);
+		return result;
 	}
 
 	inline static SafetyHookMid LoadXstsetSprite_hook = {};
