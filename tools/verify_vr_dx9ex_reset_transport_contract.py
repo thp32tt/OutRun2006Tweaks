@@ -653,11 +653,22 @@ require_order(
     "slot.pendingFrameId=0;",
     "slot.published=true;",
     "++DirectTransportFenceTimeouts;",
-    "const HRESULT status=slot.fence->GetData(nullptr,0,0);",
-    "if(status!=S_FALSE)",
+    "return false;",
 )
 if post_present_r7.count("WaitForEventQuery(") != 1:
     fail("DirectGPU post-Present publication must keep exactly one bounded EVENT wait")
+timeout_pos = post_present_r7.find("++DirectTransportFenceTimeouts;")
+if timeout_pos < 0:
+    fail("DirectGPU post-Present timeout quarantine scope missing")
+forbid(
+    post_present_r7[timeout_pos:],
+    "DirectGPU post-Present unresolved EVENT must preserve producer ownership",
+    "GetData(",
+    "slot.producerPending=false;",
+    "slot.pendingFrameId=0;",
+    "slot.frameId=0;",
+    "slot.published=false;",
+)
 forbid(
     post_present_r7,
     "DirectGPU post-Present publication wait",
