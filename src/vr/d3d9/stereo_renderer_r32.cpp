@@ -7,7 +7,9 @@
 #include "r32_policy.hpp"
 #include "../core/r32_review_api.hpp"
 #include "../core/r31_support_api.hpp"
+#ifndef OUTRUN_VR_REFACTOR_SPLIT_R32_R31
 #include "stereo_renderer_r31.cpp"
+#endif
 
 namespace OutRunVRStereo
 {
