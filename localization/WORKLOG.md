@@ -3222,3 +3222,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Persisted DXT5 QA PASS: changed/alpha pixels outside the exact right-Start bbox=0; 137 BC3 blocks changed; header/raw mirror_y and decode PASS; Extra Time, both Goal rows and the left Start remain B176-exact. Controller focus/full-readable/RAW visual QA PASS with no residue, broken glyph, clipping, collision or protected-art regression.
 - Decision: `B239_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_AND_EXACT_SHA_C3`. Compressed-text/family-false-negative risk requires fresh C + exact-SHA C3 before PRE_INGAME. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 
+## 2026-10-08 00:27 KST — user in-game typography/coverage regression applied
+- Evidence: screenshots (159)–(164).
+- Runtime menu quality: switched Korean UI font preference to Windows `malgunsl.ttf` before `malgun.ttf` to reduce the heavy/rough mismatch against stock high-resolution English UI.
+- Confirmation modal: exact runtime text ID 935 (`확실합니까?`) is excluded from the compact HUD/speech-bubble 8-direction readability keyline; this prevents modal text from becoming over-bold.
+- Added IGR-020..IGR-025 to `INGAME_REWORK_BACKLOG.csv`; screenshots 159–162 are P0 runtime font-quality regressions, 164 is P0 exact ID935 weight/readability regression, 163 is a P1 visible-coverage mapping task.
+- Added runtime UI 1x visual-parity QA gate. User screenshot visual defects override earlier static/build PASS.
+- Win32 Release validation is required because runtime source changed. RUNTIME_VALIDATION=UNTESTED until a new game retest.
+- VR/FFB/DX11/DXVK untouched.
+
