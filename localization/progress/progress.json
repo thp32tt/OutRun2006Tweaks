@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 15:40 KST",
+  "updated_at_kst": "2026-10-07 15:52 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4389,5 +4389,39 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": [],
     "status": "C241_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME"
+  },
+  "c242_c1_q049_bf3ee5c6": {
+    "timestamp_kst": "2026-10-07T15:52:00+09:00",
+    "run": "20261007-C242-C1-Q049-BF3EE5C6-A136",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 49,
+    "asset": "BF3EE5C6",
+    "regressions": [
+      "IGR-008",
+      "IGR-011"
+    ],
+    "source_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+    "prior_candidate_sha256": "3d5d132b8aada285bd6efebdb2d8cd9dd3f6625f2f8b4ca26420cd26712efb37",
+    "candidate_sha256": "a7eb06e2441956f4418f4cc95da52313696bc13d7864f7c7f76c8efdf909f85d",
+    "fresh_independent_c": "PASS",
+    "c3_strict_audit": "C3_STRICT_PASS",
+    "bbox_size_positive_margin": "13/13 PASS",
+    "source_clean_outside": 0,
+    "current_clean_outside": 0,
+    "source_current_outside": 0,
+    "prior_current_outside_11_reworked": 0,
+    "preserved_top_ghost_goal_pixel_exact": true,
+    "localized_pair_overlap": 0,
+    "localized_pair_touch1": 0,
+    "controller_visual_qa": "PASS_SOURCE_CLEAN_INPUT_CURRENT_HIGHZOOM_FLIPY_RAW_PRACTICAL_50_25",
+    "machine_report": "localization/graphics/role_C/20261007-C242-C1-Q049-BF3EE5C6-A136/C242_BF3EE5C6_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261007-C242-C1-Q049-BF3EE5C6-A136/C242_BF3EE5C6_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "PENDING_REFRESH",
+    "user_jpg_review": "PENDING",
+    "actual_ingame_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
