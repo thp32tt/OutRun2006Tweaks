@@ -8914,5 +8914,38 @@
     },
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "b238_q44_19cedb9_c246_scale_rework": {
+    "run": "20261007-B238-Q044-19CEDB9-C246-REWORK",
+    "role": "B",
+    "queue_index": 44,
+    "asset": "19CEDB9",
+    "source_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+    "c246_rejected_candidate_sha256": "8c6a390cbadae23beff263bb0eea4ca935643d591b45bac9ca474fa108e5a913",
+    "b237_controller_rejected_sha256": "b80c7bf1f469c35b9ae98ae6cf8fb0cc830a93fb2da4d08cee10bd07528a0cc8",
+    "candidate_sha256": "2250de2b7fbe1578750c422c05bd5f3b5785a0bd5006a4afcfb4cbc26ebbe620",
+    "execution_backend": "GITHUB_ACTIONS_REPOSITORY_BACKED_BINARY_PERSISTENCE; CHATGPT_LOCAL_CONTROLLER_WITH_N100_MCP_VISUAL_EVIDENCE_TRANSFER_ONLY",
+    "machine_qa": "12/12 containment/source-size/positive-margin PASS; changed+alpha outside exact source bboxes=0; pair overlap=0; exact header/mip1/raw mirror_y/persisted decode PASS",
+    "controller_visual_qa": "PASS_SOURCE_B237_CLEAN_B238_ROWS_RAW_PRACTICAL_100_75_50",
+    "b237_rejection": "FAIL_EXCESSIVE_INTER_SYLLABLE_TRACKING_SPLIT_WORD_APPEARANCE",
+    "material_scale_restoration": {
+      "sector2_width_ratio": 0.8681,
+      "sector1_width_ratio": 0.8701,
+      "win_width_ratio": 0.8537,
+      "lose_width_ratio": 0.8411,
+      "result_width_ratio": 0.8372,
+      "ranking_width_ratio": 0.8045,
+      "stage_height_ratio": 0.9,
+      "you_width_ratio": 0.6522
+    },
+    "fresh_independent_c": "REQUIRED",
+    "mandatory_c3": "REQUIRED_EXACT_SHA",
+    "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+    "user_jpg_review": "PENDING",
+    "actual_ingame_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": [],
+    "machine_report": "localization/graphics/role_B/20261007-B238-Q044-19CEDB9-C246-REWORK/B238_19CEDB9_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_B/20261007-B238-Q044-19CEDB9-C246-REWORK/B238_CONTROLLER_SELF_QA.json"
   }
 }

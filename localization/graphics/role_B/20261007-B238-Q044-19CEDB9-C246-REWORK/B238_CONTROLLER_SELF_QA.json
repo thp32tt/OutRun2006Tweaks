@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B238-Q044-19CEDB9-C246-REWORK",
+  "queue_index": 44,
+  "asset": "19CEDB9",
+  "base_head_before_reconcile": "8e5d17ed55929055fceff464ef0d8960c4b18b08",
+  "source_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+  "c246_rejected_candidate_sha256": "8c6a390cbadae23beff263bb0eea4ca935643d591b45bac9ca474fa108e5a913",
+  "b237_rejected_candidate": {
+    "sha256": "b80c7bf1f469c35b9ae98ae6cf8fb0cc830a93fb2da4d08cee10bd07528a0cc8",
+    "decision": "FAIL_EXCESSIVE_INTER_SYLLABLE_TRACKING_SPLIT_WORD_APPEARANCE"
+  },
+  "candidate_sha256": "2250de2b7fbe1578750c422c05bd5f3b5785a0bd5006a4afcfb4cbc26ebbe620",
+  "execution_backend": "GitHub Actions generated repository-backed binary; N100 MCP used only to transfer completed JPG evidence for controller vision because ChatGPT local GitHub binary DNS/materialization was unavailable; no N100 render/recompute",
+  "evidence": [
+    "B238_19CEDB9_ROW_CONTACTS.jpg",
+    "B238_19CEDB9_SOURCE_CURRENT_CLEAN_FINAL.jpg",
+    "B238_19CEDB9_RAW.jpg",
+    "B238_19CEDB9_PRACTICAL.jpg"
+  ],
+  "controller_checks": {
+    "source_relative_hierarchy": "PASS",
+    "natural_word_grouping": "PASS_NO_ARTIFICIAL_INTER_SYLLABLE_TRACKING",
+    "source_family_palette_outline_effect": "PASS",
+    "readable_right_slant": "PASS",
+    "english_source_residue": "NONE_OBSERVED",
+    "broken_hangul": "NONE_OBSERVED",
+    "clipping": "NONE_OBSERVED",
+    "overlap": "NONE_OBSERVED",
+    "plate_or_background_seam": "NONE_OBSERVED",
+    "protected_vehicle_number_icon_damage": "NONE_OBSERVED",
+    "raw_flip_y_orientation": "PASS",
+    "practical_scale_100_75_50": "PASS"
+  },
+  "scale_evidence": {
+    "sector2_width_ratio": 0.8681,
+    "sector1_width_ratio": 0.8701,
+    "win_width_ratio": 0.8537,
+    "lose_width_ratio": 0.8411,
+    "result_width_ratio": 0.8372,
+    "ranking_width_ratio": 0.8045,
+    "you_width_ratio": 0.6522,
+    "you_height_ratio": 0.9104,
+    "stage_height_ratio": 0.9
+  },
+  "machine_report": "B238_19CEDB9_MACHINE_QA.json",
+  "decision": "B238_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "REQUIRED_C2_EVEN",
+  "mandatory_c3": "REQUIRED_EXACT_SHA",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+  "user_jpg_review": "PENDING",
+  "actual_ingame_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

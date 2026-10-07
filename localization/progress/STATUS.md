@@ -2513,3 +2513,10 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - Exporter run 37605030145 SUCCESS, output ce260d63a7e94c487da6ca6e0949ca90de036202.
 - q28 -> #003, q30 -> #004; exact English-source/current-candidate bindings verified and exported-card FLIP-Y/RAW controller review PASS.
 - q44 excluded as REWORK_REQUIRED. User review + actual-game validation remain pending; RUNTIME_VALIDATION=UNTESTED.
+
+## 2026-10-07 19:45 KST — B238 q44 19CEDB9 producer self-QA PASS
+- q44 C246 scale failure materially repaired. Final candidate: `2250de2b7fbe1578750c422c05bd5f3b5785a0bd5006a4afcfb4cbc26ebbe620`.
+- B237 intermediate `b80c7bf1...` was controller-rejected for excessive inter-syllable spacing and is superseded.
+- B238 machine QA 12/12 PASS; zero changed/alpha pixels outside exact source bboxes, zero label overlap, exact header/mip1/raw mirror-Y.
+- Controller row/full/RAW/practical 100/75/50 visual QA PASS with natural word grouping and restored source-relative hierarchy.
+- Next: fresh independent C2 -> exact-SHA C3 -> PRE_INGAME English-original JPG -> user review -> NEW in-game retest. `RUNTIME_VALIDATION=UNTESTED`.
