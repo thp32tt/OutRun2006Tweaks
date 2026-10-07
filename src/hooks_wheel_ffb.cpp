@@ -1034,7 +1034,8 @@ namespace
             // stronger, but the common DD contact layer fills silent curb/contact
             // gaps.  In particular, PS2 raw magnitudes below its recovered retail
             // Type-4 threshold still get a modest PC tactile cue instead of silence.
-            roadAmp = std::max(roadAmp, commonContactTactile);
+            if (!(modernStructural && imperialStonePaving))
+                roadAmp = std::max(roadAmp, commonContactTactile);
 
             if (!arcadeEffects && !ps2Original &&
                 waterFlag && roughness > 0.7f && speedNorm > 0.70f && splashTimer_ <= 0)
@@ -1342,10 +1343,31 @@ namespace
             const float trailShape = pneumaticSatShape; // legacy telemetry field name
             const float physicsLoad = 0.62f + 0.48f * lateralLoadSmooth;
             const float rearSlideRelief = 1.0f - 0.15f * gripLoss * bodySlide;
-            const float driftCountersteerBlend =
-                WheelFFBMath::drift_countersteer_blend(
-                    bodySlip, frontSlip, bodySlide);
-            if (vehicleDynamics_.calibrated() && vehicleDynamics_.sampleValid())
+            const bool physicsSampleValid =
+                vehicleDynamics_.calibrated() && vehicleDynamics_.sampleValid();
+            const float driftCountersteerBlendTarget = physicsSampleValid
+                ? WheelFFBMath::drift_countersteer_blend(
+                    bodySlip, frontSlip, bodySlide)
+                : 0.0f;
+            if (physicsSampleValid)
+            {
+                driftCountersteerDirection_ =
+                    WheelFFBMath::drift_countersteer_direction_latch(
+                        bodySlip, driftCountersteerDirection_,
+                        driftCountersteerBlendState_);
+            }
+            driftCountersteerBlendState_ =
+                WheelFFBMath::drift_countersteer_blend_state_step(
+                    driftCountersteerBlendState_,
+                    driftCountersteerBlendTarget);
+            if (driftCountersteerBlendState_ < 0.001f &&
+                driftCountersteerBlendTarget <= 0.0f)
+            {
+                driftCountersteerBlendState_ = 0.0f;
+                driftCountersteerDirection_ = 0.0f;
+            }
+            const float driftCountersteerBlend = driftCountersteerBlendState_;
+            if (physicsSampleValid)
             {
                 const float physicsReturnRelief =
                     WheelFFBMath::physics_return_relief(frontSlip, steerRate);
@@ -1366,10 +1388,14 @@ namespace
                     const float countersteerStrength = std::clamp(
                         static_cast<float>(Settings::WheelFFBCountersteerStrength),
                         0.0f, 1.50f);
+                    const float driftDirection =
+                        std::abs(driftCountersteerDirection_) >= 0.5f
+                            ? driftCountersteerDirection_
+                            : (bodySlip > 0.0f ? -1.0f : 1.0f);
                     const float driftCountersteerTorque =
-                        (bodySlip > 0.0f ? -1.0f : 1.0f) *
-                        driftCountersteerShape * satSpeed * physicsLoad *
-                        rearSlideRelief * satStrength * countersteerStrength;
+                        driftDirection * driftCountersteerShape *
+                        satSpeed * physicsLoad * rearSlideRelief *
+                        satStrength * countersteerStrength;
                     physicsSatTorque +=
                         (driftCountersteerTorque - physicsSatTorque) *
                         driftCountersteerBlend;
@@ -4185,6 +4211,8 @@ namespace
             crashArcadeStrength_ = 0.0f;
             speedFallbackCooldown_ = 0;
             reversalBuildAssistFrames_ = 0;
+            driftCountersteerBlendState_ = 0.0f;
+            driftCountersteerDirection_ = 0.0f;
             gearShiftTimer_ = 0;
             warmupFrames_ = 0;
             roadPhase_ = 0.0f;
@@ -4614,6 +4642,8 @@ namespace
         float smoothedEngineAmp_ = 0.0f;
         float smoothedEngineFreq_ = 0.0f;
         float splashAmp_ = 0.0f;
+        float driftCountersteerBlendState_ = 0.0f;
+        float driftCountersteerDirection_ = 0.0f;
 
         bool prevArcadeLeftRough_ = false;
         bool prevArcadeRightRough_ = false;
