@@ -138,6 +138,44 @@ require('ExactScreenHudRight_ClipSpriteCalls', ui,
 require('ExactScreenHudRight_putClipSprite', ui,
         'DispRank right-side ScreenHud wrapper')
 
+# Canonical executable closure for the remaining direct SCREEN_HUD clip producers.
+# This closes the source-only gap for REV/gear, C2C warning/slipstream,
+# Ghost/You/Diff and the pre-result TimeAttack calls. All are exact canonical
+# put_clip_sprite CALLs already routed through the dedicated ScreenHud wrappers.
+for contract_id, rva in (
+    ('VR-EXE-GEAR-REV-CLIP-B9096', '0x000B9096'),
+    ('VR-EXE-GEAR-REV-CLIP-B90B3', '0x000B90B3'),
+    ('VR-EXE-SLIPSTREAM-CLIP-BD32E', '0x000BD32E'),
+    ('VR-EXE-GF-WARNING-CLIP-BD397', '0x000BD397'),
+    ('VR-EXE-GF-WARNING-CLIP-BD414', '0x000BD414'),
+    ('VR-EXE-GF-WARNING-CLIP-BD472', '0x000BD472'),
+    ('VR-EXE-GHOST-CLIP-BDB0E', '0x000BDB0E'),
+    ('VR-EXE-GHOST-CLIP-BDB2D', '0x000BDB2D'),
+    ('VR-EXE-GHOST-CLIP-BDB4C', '0x000BDB4C'),
+    ('VR-EXE-GHOST-CLIP-BDB8E', '0x000BDB8E'),
+    ('VR-EXE-TIMEATTACK-CLIP-BE311', '0x000BE311'),
+    ('VR-EXE-TIMEATTACK-CLIP-BE343', '0x000BE343'),
+    ('VR-EXE-TIMEATTACK-CLIP-BE3E3', '0x000BE3E3'),
+    ('VR-EXE-TIMEATTACK-CLIP-BE424', '0x000BE424'),
+    ('VR-EXE-TIMEATTACK-CLIP-BE45D', '0x000BE45D'),
+):
+    require(contract_id, binary_contract,
+            'canonical remaining ScreenHud direct-CALL contract')
+    require(rva, binary_contract,
+            'canonical remaining ScreenHud direct-CALL RVA')
+require('ExactScreenHud_ClipSpriteCalls', ui,
+        'Ghost/TimeAttack generic ScreenHud producer set')
+require('ExactScreenHudRight_ClipSpriteCalls', ui,
+        'C2C warning/slipstream right-side ScreenHud producer set')
+require('ExactScreenHudLeft_ClipSpriteCalls', ui,
+        'REV/gear left-side ScreenHud producer set')
+require('ExactScreenHud_putClipSprite', ui,
+        'generic exact ScreenHud wrapper')
+require('ExactScreenHudRight_putClipSprite', ui,
+        'right-side exact ScreenHud wrapper')
+require('ExactScreenHudLeft_putClipSprite', ui,
+        'left-side exact ScreenHud wrapper')
+
 # Canonical executable closure for TimeAttack/checkpoint/goal/result HUD.
 # These 15 right-side put_clip_sprite producers are the historical UIScaling
 # handoff restored after the doubled/head-following +TIME/result regression.

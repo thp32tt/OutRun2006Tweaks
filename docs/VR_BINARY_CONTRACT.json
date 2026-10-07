@@ -939,6 +939,216 @@
           "needle": "0xBE9A3"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-GEAR-REV-CLIP-B9096",
+      "rva": "0x000B9096",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8e541f7ff",
+      "purpose": "Canonical REV/gear left-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudLeft_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xB9096"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GEAR-REV-CLIP-B90B3",
+      "rva": "0x000B90B3",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8c841f7ff",
+      "purpose": "Canonical REV/gear left-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudLeft_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xB90B3"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-SLIPSTREAM-CLIP-BD32E",
+      "rva": "0x000BD32E",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e84dfff6ff",
+      "purpose": "Canonical C2C slipstream right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBD32E"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GF-WARNING-CLIP-BD397",
+      "rva": "0x000BD397",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8e4fef6ff",
+      "purpose": "Canonical C2C Don't Lose GF right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBD397"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GF-WARNING-CLIP-BD414",
+      "rva": "0x000BD414",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e867fef6ff",
+      "purpose": "Canonical C2C Don't Lose GF right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBD414"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GF-WARNING-CLIP-BD472",
+      "rva": "0x000BD472",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e809fef6ff",
+      "purpose": "Canonical C2C Don't Lose GF right-side HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHudRight_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBD472"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GHOST-CLIP-BDB0E",
+      "rva": "0x000BDB0E",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e86df7f6ff",
+      "purpose": "Canonical Ghost/You/Diff HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBDB0E"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GHOST-CLIP-BDB2D",
+      "rva": "0x000BDB2D",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e84ef7f6ff",
+      "purpose": "Canonical Ghost/You/Diff HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBDB2D"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GHOST-CLIP-BDB4C",
+      "rva": "0x000BDB4C",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e82ff7f6ff",
+      "purpose": "Canonical Ghost/You/Diff HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBDB4C"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GHOST-CLIP-BDB8E",
+      "rva": "0x000BDB8E",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8edf6f6ff",
+      "purpose": "Canonical Ghost/You/Diff HUD clip producer. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBDB8E"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-CLIP-BE311",
+      "rva": "0x000BE311",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e86aeff6ff",
+      "purpose": "Canonical TimeAttack HUD clip producer before the result-scroll family. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE311"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-CLIP-BE343",
+      "rva": "0x000BE343",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e838eff6ff",
+      "purpose": "Canonical TimeAttack HUD clip producer before the result-scroll family. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE343"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-CLIP-BE3E3",
+      "rva": "0x000BE3E3",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e898eef6ff",
+      "purpose": "Canonical TimeAttack HUD clip producer before the result-scroll family. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE3E3"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-CLIP-BE424",
+      "rva": "0x000BE424",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e857eef6ff",
+      "purpose": "Canonical TimeAttack HUD clip producer before the result-scroll family. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE424"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-CLIP-BE45D",
+      "rva": "0x000BE45D",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e81eeef6ff",
+      "purpose": "Canonical TimeAttack HUD clip producer before the result-scroll family. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through ExactScreenHud_putClipSprite as ScreenHud.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBE45D"
+        }
+      ]
     }
   ]
 }
