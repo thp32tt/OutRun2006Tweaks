@@ -199,7 +199,12 @@ int main() {
  require(drift_countersteer_blend(.30f,.20f,1.0f)>0.0f&&drift_countersteer_blend(.30f,.20f,1.0f)<1.0f,"moderate drift crossfades instead of snapping");
  require(drift_countersteer_blend(.10f,-.20f,1.0f)==0.0f,"small body slip does not trigger drift handoff");
  require(drift_countersteer_shape(.70f)>.89f&&drift_countersteer_shape(.05f)==0.0f,"drift recovery magnitude is bounded to developed oversteer");
- require(std::abs(DefaultCountersteerStrength-.90f)<1e-6f,"R19 countersteer option default preserves the R18 90 percent drift target");
+ require(std::abs(DefaultCountersteerStrength-.72f)<1e-6f,"R20 countersteer option default is 20 percent below the R18 0.90 target");
+ require(std::abs(drift_countersteer_blend_state_step(0.0f,1.0f)-0.30f)<1e-6f,"drift countersteer engages promptly");
+ require(std::abs(drift_countersteer_blend_state_step(1.0f,0.0f)-0.94f)<1e-6f,"grip recovery releases drift handoff gradually");
+ require(drift_countersteer_direction_latch(.70f,0.0f,0.0f)<-.99f,"new positive-body-slip drift latches counter direction");
+ require(drift_countersteer_direction_latch(-.70f,-1.0f,.80f)<-.99f,"grip-recovery sign noise cannot flip an active counter direction");
+ require(drift_countersteer_direction_latch(-.70f,-1.0f,.10f)>.99f,"direction may relatch only after the drift handoff is nearly released");
  const float weakPrimaryTorque=.05f;
  const float boundedOpposingCue=bound_drift_countersteer_torque(weakPrimaryTorque,-.90f);
  require(std::abs(boundedOpposingCue+weakPrimaryTorque)<1e-6f,"R13 body-slip cue cannot exceed weak front-slip SAT magnitude");
@@ -207,7 +212,7 @@ int main() {
  const float deepFrontTorque=.30f;
  const float deepBlend=drift_countersteer_blend(.70f,-.35f,1.0f);
  const float deepHandoff=deepFrontTorque+(deepBodyTarget-deepFrontTorque)*deepBlend;
- require(deepHandoff<-.71f,"R18 developed drift keeps the correct countersteer sign with a slightly softer target");
+ require(deepHandoff<-.56f&&deepHandoff>-.59f,"R20 developed drift keeps the correct countersteer sign at the 0.72 default strength");
  require(std::abs(bound_drift_countersteer_torque(-weakPrimaryTorque,.90f)-weakPrimaryTorque)<1e-6f,"R13 drift cue bound is sign symmetric");
  ResponseLUT linear{}; require(parse_response_lut("0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",linear),"linear LUT parses");
  require(std::abs(apply_response_lut(.55f,linear)-.55f)<1e-5f,"linear LUT identity");
