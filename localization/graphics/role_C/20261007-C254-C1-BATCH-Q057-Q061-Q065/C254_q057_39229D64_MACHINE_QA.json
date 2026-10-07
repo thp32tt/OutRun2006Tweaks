@@ -1,0 +1,521 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C254",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 57,
+  "asset_key": "39229D64",
+  "candidate_sha256": "d2831fcfd1bb8027fc129ff50e70c90c21094df13765daa3d5fb9c6fda3ae70a",
+  "canonical_source_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+  "prior_c250_rejected_sha256": "3dae27fdeb7d2cde6d440b45f1e94ddafe35a97fe749447fdf0f3974d5e90c16",
+  "prior_blob_commit": "57485abbf79cb1ff03325aa312fe85e1103b5f20",
+  "trigger": "C250 source-style/slant/gradient-depth FAIL -> A166 repair",
+  "machine_qa": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "mips": 1,
+    "header_128_exact_source_current": true,
+    "source_vs_current_changed_outside_all_exact_source_bboxes": 0,
+    "source_vs_current_alpha_changed_outside_all_exact_source_bboxes": 0,
+    "c250_prior_vs_a166_current_changed_outside_touched_rework_bboxes": 0,
+    "c250_prior_vs_a166_current_alpha_changed_outside_touched_rework_bboxes": 0,
+    "full_geometry_count": 16,
+    "touched_geometry_count": 7,
+    "bbox_size_positive_margin": "16/16 PASS",
+    "geometry_binding_note": "unchanged rows are byte-identical to C250 rejected candidate outside A166 touched source bboxes; touched localized bboxes are exact A166 producer report bound to current candidate SHA",
+    "per_region": [
+      {
+        "key": "hearts",
+        "original_bbox": [
+          1715,
+          5,
+          2048,
+          102
+        ],
+        "localized_bbox": [
+          1803,
+          10,
+          1959,
+          97
+        ],
+        "source_size": [
+          333,
+          97
+        ],
+        "localized_size": [
+          156,
+          87
+        ],
+        "delta_left": 88,
+        "delta_right": 89,
+        "delta_top": 5,
+        "delta_bottom": 5,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "technical_bonus",
+        "original_bbox": [
+          2393,
+          77,
+          3610,
+          259
+        ],
+        "localized_bbox": [
+          2435,
+          83,
+          3567,
+          252
+        ],
+        "source_size": [
+          1217,
+          182
+        ],
+        "localized_size": [
+          1132,
+          169
+        ],
+        "delta_left": 42,
+        "delta_right": 43,
+        "delta_top": 6,
+        "delta_bottom": 7,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "mission_cleared",
+        "original_bbox": [
+          128,
+          256,
+          1587,
+          787
+        ],
+        "localized_bbox": [
+          186,
+          314,
+          1528,
+          728
+        ],
+        "source_size": [
+          1459,
+          531
+        ],
+        "localized_size": [
+          1342,
+          414
+        ],
+        "delta_left": 58,
+        "delta_right": 59,
+        "delta_top": 58,
+        "delta_bottom": 59,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "total_rank_green",
+        "original_bbox": [
+          512,
+          896,
+          1101,
+          1075
+        ],
+        "localized_bbox": [
+          535,
+          908,
+          1077,
+          1062
+        ],
+        "source_size": [
+          589,
+          179
+        ],
+        "localized_size": [
+          542,
+          154
+        ],
+        "delta_left": 23,
+        "delta_right": 24,
+        "delta_top": 12,
+        "delta_bottom": 13,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "storing",
+        "original_bbox": [
+          1652,
+          858,
+          2975,
+          998
+        ],
+        "localized_bbox": [
+          1758,
+          864,
+          2868,
+          987
+        ],
+        "source_size": [
+          1323,
+          140
+        ],
+        "localized_size": [
+          1110,
+          123
+        ],
+        "delta_left": 106,
+        "delta_right": 107,
+        "delta_top": 6,
+        "delta_bottom": 11,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "special_request",
+        "original_bbox": [
+          1644,
+          1114,
+          2624,
+          1267
+        ],
+        "localized_bbox": [
+          1703,
+          1124,
+          2565,
+          1256
+        ],
+        "source_size": [
+          980,
+          153
+        ],
+        "localized_size": [
+          862,
+          132
+        ],
+        "delta_left": 59,
+        "delta_right": 59,
+        "delta_top": 10,
+        "delta_bottom": 11,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "target",
+        "original_bbox": [
+          2625,
+          555,
+          2825,
+          640
+        ],
+        "localized_bbox": [
+          2660,
+          563,
+          2789,
+          632
+        ],
+        "source_size": [
+          200,
+          85
+        ],
+        "localized_size": [
+          129,
+          69
+        ],
+        "delta_left": 35,
+        "delta_right": 36,
+        "delta_top": 8,
+        "delta_bottom": 8,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "start",
+        "original_bbox": [
+          2487,
+          1016,
+          2662,
+          1085
+        ],
+        "localized_bbox": [
+          2519,
+          1021,
+          2629,
+          1079
+        ],
+        "source_size": [
+          175,
+          69
+        ],
+        "localized_size": [
+          110,
+          58
+        ],
+        "delta_left": 32,
+        "delta_right": 33,
+        "delta_top": 5,
+        "delta_bottom": 6,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "goal",
+        "original_bbox": [
+          2975,
+          1016,
+          3131,
+          1085
+        ],
+        "localized_bbox": [
+          3024,
+          1021,
+          3081,
+          1080
+        ],
+        "source_size": [
+          156,
+          69
+        ],
+        "localized_size": [
+          57,
+          59
+        ],
+        "delta_left": 49,
+        "delta_right": 50,
+        "delta_top": 5,
+        "delta_bottom": 5,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "hit_ghost",
+        "original_bbox": [
+          3163,
+          1017,
+          3633,
+          1106
+        ],
+        "localized_bbox": [
+          3168,
+          1032,
+          3628,
+          1090
+        ],
+        "source_size": [
+          470,
+          89
+        ],
+        "localized_size": [
+          460,
+          58
+        ],
+        "delta_left": 5,
+        "delta_right": 5,
+        "delta_top": 15,
+        "delta_bottom": 16,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "exit",
+        "original_bbox": [
+          3083,
+          1143,
+          3494,
+          1281
+        ],
+        "localized_bbox": [
+          3169,
+          1149,
+          3408,
+          1275
+        ],
+        "source_size": [
+          411,
+          138
+        ],
+        "localized_size": [
+          239,
+          126
+        ],
+        "delta_left": 86,
+        "delta_right": 86,
+        "delta_top": 6,
+        "delta_bottom": 6,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "collect_stars",
+        "original_bbox": [
+          3469,
+          1172,
+          3998,
+          1267
+        ],
+        "localized_bbox": [
+          3474,
+          1177,
+          3993,
+          1262
+        ],
+        "source_size": [
+          529,
+          95
+        ],
+        "localized_size": [
+          519,
+          85
+        ],
+        "delta_left": 5,
+        "delta_right": 5,
+        "delta_top": 5,
+        "delta_bottom": 5,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "mission_failed",
+        "original_bbox": [
+          1984,
+          1280,
+          3187,
+          1792
+        ],
+        "localized_bbox": [
+          2032,
+          1336,
+          3139,
+          1735
+        ],
+        "source_size": [
+          1203,
+          512
+        ],
+        "localized_size": [
+          1107,
+          399
+        ],
+        "delta_left": 48,
+        "delta_right": 48,
+        "delta_top": 56,
+        "delta_bottom": 57,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "total_rank_brown",
+        "original_bbox": [
+          717,
+          1915,
+          1318,
+          2099
+        ],
+        "localized_bbox": [
+          741,
+          1928,
+          1294,
+          2086
+        ],
+        "source_size": [
+          601,
+          184
+        ],
+        "localized_size": [
+          553,
+          158
+        ],
+        "delta_left": 24,
+        "delta_right": 24,
+        "delta_top": 13,
+        "delta_bottom": 13,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "total_rank_pink",
+        "original_bbox": [
+          2598,
+          1900,
+          3238,
+          2099
+        ],
+        "localized_bbox": [
+          2623,
+          1914,
+          3212,
+          2085
+        ],
+        "source_size": [
+          640,
+          199
+        ],
+        "localized_size": [
+          589,
+          171
+        ],
+        "delta_left": 25,
+        "delta_right": 26,
+        "delta_top": 14,
+        "delta_bottom": 14,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "special_request_alt",
+        "original_bbox": [
+          2280,
+          361,
+          3269,
+          514
+        ],
+        "localized_bbox": [
+          2339,
+          371,
+          3209,
+          503
+        ],
+        "source_size": [
+          989,
+          153
+        ],
+        "localized_size": [
+          870,
+          132
+        ],
+        "delta_left": 59,
+        "delta_right": 60,
+        "delta_top": 10,
+        "delta_bottom": 11,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      }
+    ]
+  },
+  "visual_evidence": [
+    "C254_q057_39229D64_ALPHA_OVERVIEW.jpg",
+    "C254_q057_39229D64_ALPHA_CONTACTS.jpg",
+    "C254_q057_39229D64_RAW.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "c3_strict_audit": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

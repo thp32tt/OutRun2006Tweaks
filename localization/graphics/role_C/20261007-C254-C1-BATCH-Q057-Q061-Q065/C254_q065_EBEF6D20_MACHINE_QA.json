@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C254",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 65,
+  "asset_key": "EBEF6D20",
+  "candidate_sha256": "10d0e1899d8d167eb1dcb303429dd4dc7bdf09096e6c5720afce884cc32afe1f",
+  "canonical_source_sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+  "prior_c250_rejected_sha256": "2b39cf005e79149890f0cfee605d29144d7d257e9cc9179b6c1f583ce393fce5",
+  "prior_blob_commit": "57485abbf79cb1ff03325aa312fe85e1103b5f20",
+  "trigger": "C250 EASY color + source outline/slant family FAIL -> A166 repair",
+  "machine_qa": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "mips": 1,
+    "header_128_exact_source_current": true,
+    "source_vs_current_changed_outside_all_exact_source_bboxes": 0,
+    "source_vs_current_alpha_changed_outside_all_exact_source_bboxes": 0,
+    "c250_prior_vs_a166_current_changed_outside_touched_rework_bboxes": 0,
+    "c250_prior_vs_a166_current_alpha_changed_outside_touched_rework_bboxes": 0,
+    "full_geometry_count": 7,
+    "touched_geometry_count": 5,
+    "bbox_size_positive_margin": "7/7 PASS",
+    "geometry_binding_note": "unchanged rows are byte-identical to C250 rejected candidate outside A166 touched source bboxes; touched localized bboxes are exact A166 producer report bound to current candidate SHA",
+    "per_region": [
+      {
+        "key": "loading_left",
+        "original_bbox": [
+          256,
+          441,
+          672,
+          543
+        ],
+        "localized_bbox": [
+          384,
+          447,
+          544,
+          537
+        ],
+        "source_size": [
+          416,
+          102
+        ],
+        "localized_size": [
+          160,
+          90
+        ],
+        "delta_left": 128,
+        "delta_right": 128,
+        "delta_top": 6,
+        "delta_bottom": 6,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "loading_right",
+        "original_bbox": [
+          1176,
+          441,
+          1592,
+          543
+        ],
+        "localized_bbox": [
+          1304,
+          447,
+          1464,
+          537
+        ],
+        "source_size": [
+          416,
+          102
+        ],
+        "localized_size": [
+          160,
+          90
+        ],
+        "delta_left": 128,
+        "delta_right": 128,
+        "delta_top": 6,
+        "delta_bottom": 6,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "course",
+        "original_bbox": [
+          458,
+          1256,
+          745,
+          1340
+        ],
+        "localized_bbox": [
+          475,
+          1262,
+          728,
+          1334
+        ],
+        "source_size": [
+          287,
+          84
+        ],
+        "localized_size": [
+          253,
+          72
+        ],
+        "delta_left": 17,
+        "delta_right": 17,
+        "delta_top": 6,
+        "delta_bottom": 6,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "left",
+        "original_bbox": [
+          270,
+          1340,
+          520,
+          1470
+        ],
+        "localized_bbox": [
+          285,
+          1349,
+          505,
+          1461
+        ],
+        "source_size": [
+          250,
+          130
+        ],
+        "localized_size": [
+          220,
+          112
+        ],
+        "delta_left": 15,
+        "delta_right": 15,
+        "delta_top": 9,
+        "delta_bottom": 9,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "right",
+        "original_bbox": [
+          685,
+          1405,
+          874,
+          1470
+        ],
+        "localized_bbox": [
+          696,
+          1409,
+          862,
+          1465
+        ],
+        "source_size": [
+          189,
+          65
+        ],
+        "localized_size": [
+          166,
+          56
+        ],
+        "delta_left": 11,
+        "delta_right": 12,
+        "delta_top": 4,
+        "delta_bottom": 5,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "easy",
+        "original_bbox": [
+          102,
+          1470,
+          430,
+          1620
+        ],
+        "localized_bbox": [
+          121,
+          1480,
+          410,
+          1609
+        ],
+        "source_size": [
+          328,
+          150
+        ],
+        "localized_size": [
+          289,
+          129
+        ],
+        "delta_left": 19,
+        "delta_right": 20,
+        "delta_top": 10,
+        "delta_bottom": 11,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "hard",
+        "original_bbox": [
+          720,
+          1470,
+          1058,
+          1618
+        ],
+        "localized_bbox": [
+          740,
+          1480,
+          1037,
+          1607
+        ],
+        "source_size": [
+          338,
+          148
+        ],
+        "localized_size": [
+          297,
+          127
+        ],
+        "delta_left": 20,
+        "delta_right": 21,
+        "delta_top": 10,
+        "delta_bottom": 11,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      }
+    ]
+  },
+  "visual_evidence": [
+    "C254_q065_EBEF6D20_ALPHA_OVERVIEW.jpg",
+    "C254_q065_EBEF6D20_ALPHA_CONTACTS.jpg",
+    "C254_q065_EBEF6D20_RAW.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "c3_strict_audit": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "color_gate": {
+    "easy_required": "green/navy/white source family",
+    "producer_current": "green/navy/white",
+    "result": "PASS_BINDING_PENDING_VISUAL"
+  }
+}

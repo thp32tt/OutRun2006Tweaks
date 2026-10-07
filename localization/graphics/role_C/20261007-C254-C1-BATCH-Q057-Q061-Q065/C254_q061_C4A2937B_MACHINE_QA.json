@@ -1,0 +1,677 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C254",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 61,
+  "asset_key": "C4A2937B",
+  "candidate_sha256": "df250af92785727f38d176f3b2569c9d6d2b0e7a3f7d296adaa2f5c343b1d71e",
+  "canonical_source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+  "prior_c250_rejected_sha256": "fe1e7e7d264694c39f2bdbf50bb0a94ba15b88aea5b52873df4ceae749a8f95e",
+  "prior_blob_commit": "57485abbf79cb1ff03325aa312fe85e1103b5f20",
+  "trigger": "C250 semantic + yellow/white/navy source-family FAIL -> A166 repair",
+  "machine_qa": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "mips": 1,
+    "header_128_exact_source_current": true,
+    "source_vs_current_changed_outside_all_exact_source_bboxes": 0,
+    "source_vs_current_alpha_changed_outside_all_exact_source_bboxes": 0,
+    "c250_prior_vs_a166_current_changed_outside_touched_rework_bboxes": 0,
+    "c250_prior_vs_a166_current_alpha_changed_outside_touched_rework_bboxes": 0,
+    "full_geometry_count": 21,
+    "touched_geometry_count": 3,
+    "bbox_size_positive_margin": "21/21 PASS",
+    "geometry_binding_note": "unchanged rows are byte-identical to C250 rejected candidate outside A166 touched source bboxes; touched localized bboxes are exact A166 producer report bound to current candidate SHA",
+    "per_region": [
+      {
+        "key": "go_gate",
+        "original_bbox": [
+          2066,
+          998,
+          2548,
+          1106
+        ],
+        "localized_bbox": [
+          2080,
+          1010,
+          2533,
+          1094
+        ],
+        "source_size": [
+          482,
+          108
+        ],
+        "localized_size": [
+          453,
+          84
+        ],
+        "delta_left": 14,
+        "delta_right": 15,
+        "delta_top": 12,
+        "delta_bottom": 12,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "cut_line",
+        "original_bbox": [
+          2595,
+          998,
+          3029,
+          1106
+        ],
+        "localized_bbox": [
+          2608,
+          1010,
+          3016,
+          1094
+        ],
+        "source_size": [
+          434,
+          108
+        ],
+        "localized_size": [
+          408,
+          84
+        ],
+        "delta_left": 13,
+        "delta_right": 13,
+        "delta_top": 12,
+        "delta_bottom": 12,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "keep_passing",
+        "original_bbox": [
+          3067,
+          1022,
+          3568,
+          1106
+        ],
+        "localized_bbox": [
+          3082,
+          1031,
+          3553,
+          1097
+        ],
+        "source_size": [
+          501,
+          84
+        ],
+        "localized_size": [
+          471,
+          66
+        ],
+        "delta_left": 15,
+        "delta_right": 15,
+        "delta_top": 9,
+        "delta_bottom": 9,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "double_speed",
+        "original_bbox": [
+          3607,
+          1025,
+          4032,
+          1106
+        ],
+        "localized_bbox": [
+          3617,
+          1030,
+          4021,
+          1101
+        ],
+        "source_size": [
+          425,
+          81
+        ],
+        "localized_size": [
+          404,
+          71
+        ],
+        "delta_left": 10,
+        "delta_right": 11,
+        "delta_top": 5,
+        "delta_bottom": 5,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "hit_blue_cone",
+        "original_bbox": [
+          1038,
+          1486,
+          1511,
+          1568
+        ],
+        "localized_bbox": [
+          1045,
+          1499,
+          1503,
+          1555
+        ],
+        "source_size": [
+          473,
+          82
+        ],
+        "localized_size": [
+          458,
+          56
+        ],
+        "delta_left": 7,
+        "delta_right": 8,
+        "delta_top": 13,
+        "delta_bottom": 13,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "dont_crash",
+        "original_bbox": [
+          1566,
+          1487,
+          1990,
+          1567
+        ],
+        "localized_bbox": [
+          1572,
+          1498,
+          1984,
+          1556
+        ],
+        "source_size": [
+          424,
+          80
+        ],
+        "localized_size": [
+          412,
+          58
+        ],
+        "delta_left": 6,
+        "delta_right": 6,
+        "delta_top": 11,
+        "delta_bottom": 11,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "collect_coins",
+        "original_bbox": [
+          2053,
+          1486,
+          2517,
+          1568
+        ],
+        "localized_bbox": [
+          2059,
+          1494,
+          2510,
+          1559
+        ],
+        "source_size": [
+          464,
+          82
+        ],
+        "localized_size": [
+          451,
+          65
+        ],
+        "delta_left": 6,
+        "delta_right": 7,
+        "delta_top": 8,
+        "delta_bottom": 9,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "run_red",
+        "original_bbox": [
+          1030,
+          1603,
+          1554,
+          1696
+        ],
+        "localized_bbox": [
+          1036,
+          1621,
+          1547,
+          1678
+        ],
+        "source_size": [
+          524,
+          93
+        ],
+        "localized_size": [
+          511,
+          57
+        ],
+        "delta_left": 6,
+        "delta_right": 7,
+        "delta_top": 18,
+        "delta_bottom": 18,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "run_blue",
+        "original_bbox": [
+          1554,
+          1603,
+          2053,
+          1696
+        ],
+        "localized_bbox": [
+          1560,
+          1622,
+          2047,
+          1677
+        ],
+        "source_size": [
+          499,
+          93
+        ],
+        "localized_size": [
+          487,
+          55
+        ],
+        "delta_left": 6,
+        "delta_right": 6,
+        "delta_top": 19,
+        "delta_bottom": 19,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "pass_convoy",
+        "original_bbox": [
+          2053,
+          1603,
+          2573,
+          1695
+        ],
+        "localized_bbox": [
+          2058,
+          1623,
+          2568,
+          1674
+        ],
+        "source_size": [
+          520,
+          92
+        ],
+        "localized_size": [
+          510,
+          51
+        ],
+        "delta_left": 5,
+        "delta_right": 5,
+        "delta_top": 20,
+        "delta_bottom": 21,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "catch_heart",
+        "original_bbox": [
+          2555,
+          1606,
+          3067,
+          1688
+        ],
+        "localized_bbox": [
+          2563,
+          1611,
+          3058,
+          1683
+        ],
+        "source_size": [
+          512,
+          82
+        ],
+        "localized_size": [
+          495,
+          72
+        ],
+        "delta_left": 8,
+        "delta_right": 9,
+        "delta_top": 5,
+        "delta_bottom": 5,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "beat_car_1",
+        "original_bbox": [
+          3054,
+          1607,
+          3526,
+          1687
+        ],
+        "localized_bbox": [
+          3061,
+          1615,
+          3519,
+          1679
+        ],
+        "source_size": [
+          472,
+          80
+        ],
+        "localized_size": [
+          458,
+          64
+        ],
+        "delta_left": 7,
+        "delta_right": 7,
+        "delta_top": 8,
+        "delta_bottom": 8,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "red",
+        "original_bbox": [
+          3110,
+          1446,
+          3443,
+          1584
+        ],
+        "localized_bbox": [
+          3158,
+          1452,
+          3394,
+          1578
+        ],
+        "source_size": [
+          333,
+          138
+        ],
+        "localized_size": [
+          236,
+          126
+        ],
+        "delta_left": 48,
+        "delta_right": 49,
+        "delta_top": 6,
+        "delta_bottom": 6,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "blue",
+        "original_bbox": [
+          3571,
+          1446,
+          3904,
+          1582
+        ],
+        "localized_bbox": [
+          3620,
+          1452,
+          3855,
+          1576
+        ],
+        "source_size": [
+          333,
+          136
+        ],
+        "localized_size": [
+          235,
+          124
+        ],
+        "delta_left": 49,
+        "delta_right": 49,
+        "delta_top": 6,
+        "delta_bottom": 6,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "drift",
+        "original_bbox": [
+          3707,
+          1607,
+          3881,
+          1688
+        ],
+        "localized_bbox": [
+          3713,
+          1627,
+          3875,
+          1668
+        ],
+        "source_size": [
+          174,
+          81
+        ],
+        "localized_size": [
+          162,
+          41
+        ],
+        "delta_left": 6,
+        "delta_right": 6,
+        "delta_top": 20,
+        "delta_bottom": 20,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "stage_bonus",
+        "original_bbox": [
+          3814,
+          1798,
+          4076,
+          1894
+        ],
+        "localized_bbox": [
+          3821,
+          1827,
+          4069,
+          1865
+        ],
+        "source_size": [
+          262,
+          96
+        ],
+        "localized_size": [
+          248,
+          38
+        ],
+        "delta_left": 7,
+        "delta_right": 7,
+        "delta_top": 29,
+        "delta_bottom": 29,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "get",
+        "original_bbox": [
+          3594,
+          1894,
+          3930,
+          2034
+        ],
+        "localized_bbox": [
+          3600,
+          1900,
+          3924,
+          2027
+        ],
+        "source_size": [
+          336,
+          140
+        ],
+        "localized_size": [
+          324,
+          127
+        ],
+        "delta_left": 6,
+        "delta_right": 6,
+        "delta_top": 6,
+        "delta_bottom": 7,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "beat_car_2",
+        "original_bbox": [
+          3518,
+          2060,
+          3990,
+          2140
+        ],
+        "localized_bbox": [
+          3525,
+          2068,
+          3983,
+          2132
+        ],
+        "source_size": [
+          472,
+          80
+        ],
+        "localized_size": [
+          458,
+          64
+        ],
+        "delta_left": 7,
+        "delta_right": 7,
+        "delta_top": 8,
+        "delta_bottom": 8,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "next_stage",
+        "original_bbox": [
+          2557,
+          2179,
+          3015,
+          2272
+        ],
+        "localized_bbox": [
+          2563,
+          2186,
+          3008,
+          2265
+        ],
+        "source_size": [
+          458,
+          93
+        ],
+        "localized_size": [
+          445,
+          79
+        ],
+        "delta_left": 6,
+        "delta_right": 7,
+        "delta_top": 7,
+        "delta_bottom": 7,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "drift_and",
+        "original_bbox": [
+          3052,
+          2185,
+          3400,
+          2266
+        ],
+        "localized_bbox": [
+          3058,
+          2195,
+          3394,
+          2255
+        ],
+        "source_size": [
+          348,
+          81
+        ],
+        "localized_size": [
+          336,
+          60
+        ],
+        "delta_left": 6,
+        "delta_right": 6,
+        "delta_top": 10,
+        "delta_bottom": 11,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      },
+      {
+        "key": "position",
+        "original_bbox": [
+          1394,
+          2720,
+          1726,
+          2829
+        ],
+        "localized_bbox": [
+          1469,
+          2725,
+          1651,
+          2824
+        ],
+        "source_size": [
+          332,
+          109
+        ],
+        "localized_size": [
+          182,
+          99
+        ],
+        "delta_left": 75,
+        "delta_right": 75,
+        "delta_top": 5,
+        "delta_bottom": 5,
+        "containment": "PASS",
+        "size_ceiling": "PASS",
+        "positive_margin": "PASS"
+      }
+    ]
+  },
+  "visual_evidence": [
+    "C254_q061_C4A2937B_ALPHA_OVERVIEW.jpg",
+    "C254_q061_C4A2937B_ALPHA_CONTACTS.jpg",
+    "C254_q061_C4A2937B_RAW.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "c3_strict_audit": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "semantic_gate": {
+    "cut_line_source": "Cut the line!",
+    "required_proven_translation": "하트선을 통과하세요!",
+    "producer_current": "하트선을 통과하세요!",
+    "result": "PASS_BINDING_PENDING_VISUAL"
+  }
+}
