@@ -51,6 +51,8 @@ namespace OutRunVRStereo
     bool R30SupportDirectTransportResourcesReady() noexcept;
     bool R30SupportEnsureDirectTransportResources(
         IDirect3DDevice9* device) noexcept;
+    void R30SupportReleaseDirectAckState() noexcept;
+    void R30SupportReleaseDirectTransportInterop() noexcept;
     bool R30SupportTryGetDirectTransportIdentity(
         R30SupportDirectTransportIdentity& out) noexcept;
 
