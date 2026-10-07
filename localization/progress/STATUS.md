@@ -2522,3 +2522,10 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - Next: fresh independent C2 -> exact-SHA C3 -> PRE_INGAME English-original JPG -> user review -> NEW in-game retest. `RUNTIME_VALIDATION=UNTESTED`.
 ### C247 C1 (2026-10-07 19:58 KST)
 TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh independent C and exact-SHA C3_STRICT_AUDIT: **3/3 PASS**. Exact-source bbox/size/positive-margin gates and zero outside/alpha collateral passed; controller SOURCE/CLEAN/current + RAW/FLIP-Y visual review passed. Next gate: PRE_INGAME English-original export refresh → user JPG review → NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.
+
+## 2026-10-07 20:04 KST — C248 C2 q32/q34/q36 C3 strict PASS
+- TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Three physical even assets processed: q32, q34, q36; q38 exact-byte alias inherits q36 evidence without consuming a fourth physical slot.
+- q32 2bb9d21e... PASS: 468x74 / 518x84, positive 25/25/5/5 margins, zero outside/alpha drift; source-relative visual hierarchy/right lean clean.
+- q34 a23761d1... PASS: 486x92 / 535x102, positive 24/25/5/5 margins, zero outside/alpha drift; starburst plate/style clean.
+- q36/q38 7503318f... PASS: 3/3 rows ~90.17-91.01% source width, positive margins, zero outside/alpha drift; prior user-reported dirty/hazy source-footprint issue absent in controller full/contact/RAW review.
+- All three physical candidates: fresh independent C PASS + exact-SHA C3_STRICT_PASS. Next mandatory step is persistent PRE_INGAME English-original export refresh, then user JPG review and NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.

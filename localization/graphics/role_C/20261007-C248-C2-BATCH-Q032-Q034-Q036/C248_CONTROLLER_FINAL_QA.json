@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "C248",
+  "timestamp_kst": "2026-10-07T20:04:00+09:00",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "selection": {
+    "physical_assets": [
+      32,
+      34,
+      36
+    ],
+    "alias_inheritance": [
+      38
+    ],
+    "max_physical_assets": 3,
+    "selection_refreshes": "HEAD/queue refreshed separately immediately before q32/q34/q36 selection; final HEAD/queue lease refreshed immediately before this atomic state commit",
+    "priority": "FRESH_CHANGED_B236_USER_PRE_INGAME_REGRESSIONS_BEFORE_C3_ONLY_BACKLOG"
+  },
+  "execution_backend": "CHATGPT_LOCAL_ATTEMPTED_FIRST_GITHUB_DNS_BLOCKED; GITHUB_ACTIONS_FALLBACK_FOR_REPOSITORY_BINARY_QA; N100_MCP_AUXILIARY_VISUAL_REVIEW_ONLY",
+  "worker": {
+    "first_run_id": 37610463780,
+    "first_run_result": "VERIFIER_ONLY_FAIL_NO_PROMOTION_LOCALIZED_CLEAN_SCOPE_FALSE_POSITIVE",
+    "retry_run_id": 37610726989,
+    "retry_result": "SUCCESS",
+    "output_commit": "cbc7ae28cf4ac69189d071a8be49444a038244d8"
+  },
+  "assets": {
+    "q32": {
+      "queue_index": 32,
+      "asset": "DCC7B488",
+      "candidate_sha256": "2bb9d21e95a99da036657da5d696982d5ee44875c91cd798dbcb7b99830757e8",
+      "source_sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+      "machine_qa": "PASS_1_OF_1_EXACT_BBOX_SIZE_POSITIVE_MARGIN; OUTSIDE=0; ALPHA_OUTSIDE=0; HEADER_MIP1_RAW_MIRRORY_PASS",
+      "localized_size": [
+        468,
+        74
+      ],
+      "source_size": [
+        518,
+        84
+      ],
+      "width_ratio": 0.9035,
+      "margins": [
+        25,
+        25,
+        5,
+        5
+      ],
+      "controller_visual_qa": "PASS_SOURCE_PRIOR_CLEAN_CURRENT_CONTACTS_RAW; SOURCE_RELATIVE_SCALE_RIGHT_LEAN_WHITE_NAVY_STYLE_READABILITY_CLEAN; NO_RESIDUE_SEAM_CLIPPING_PROTECTED_ART_INTRUSION",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "decision": "PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_NEW_INGAME"
+    },
+    "q34": {
+      "queue_index": 34,
+      "asset": "B7E25BAD",
+      "candidate_sha256": "a23761d1160933d968347c87ca40496b9f8e8257a102f865b2047df2a8d92763",
+      "source_sha256": "3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
+      "machine_qa": "PASS_1_OF_1_EXACT_BBOX_SIZE_POSITIVE_MARGIN; OUTSIDE=0; ALPHA_OUTSIDE=0; HEADER_MIP1_RAW_MIRRORY_PASS",
+      "localized_size": [
+        486,
+        92
+      ],
+      "source_size": [
+        535,
+        102
+      ],
+      "width_ratio": 0.9084,
+      "margins": [
+        24,
+        25,
+        5,
+        5
+      ],
+      "controller_visual_qa": "PASS_SOURCE_PRIOR_CLEAN_CURRENT_CONTACTS_RAW; SOURCE_RELATIVE_SCALE_RIGHT_LEAN_STYLE_CLEAN; NO_RESIDUE_SEAM_CLIPPING_PROTECTED_ART_INTRUSION",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "decision": "PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_NEW_INGAME"
+    },
+    "q36": {
+      "queue_index": 36,
+      "asset": "06AB5CEE",
+      "candidate_sha256": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
+      "source_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+      "machine_qa": "PASS_3_OF_3_EXACT_BBOX_SIZE_POSITIVE_MARGIN; OUTSIDE=0; ALPHA_OUTSIDE=0; HEADER_MIP1_RAW_MIRRORY_PASS",
+      "localized_sizes": [
+        [
+          486,
+          92
+        ],
+        [
+          486,
+          92
+        ],
+        [
+          468,
+          75
+        ]
+      ],
+      "source_sizes": [
+        [
+          535,
+          102
+        ],
+        [
+          534,
+          102
+        ],
+        [
+          519,
+          85
+        ]
+      ],
+      "width_ratios": [
+        0.9084,
+        0.9101,
+        0.9017
+      ],
+      "controller_visual_qa": "PASS_FULL_CONTACTS_RAW_AND_B236_ACTUAL_CLEAN_FINAL; PRIOR_DIRTY_HAZY_FOOTPRINT_REMOVED; NO_RECTANGLE_RESIDUE_CLIPPING_OR_PROTECTED_CHARACTER_RANK_LENS_FLARE_UI_DAMAGE",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "decision": "PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_NEW_INGAME"
+    },
+    "q38": {
+      "queue_index": 38,
+      "asset": "6AB5CEE",
+      "candidate_sha256": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
+      "source_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+      "inheritance": "EXACT_BYTE_ALIAS_OF_Q36; MACHINE_Q38_ALIAS_EXACT_BYTES_TRUE; NO_FOURTH_PHYSICAL_CANDIDATE_SELECTION",
+      "controller_visual_qa": "PASS_BY_EXACT_BYTE_ALIAS_Q36_EVIDENCE",
+      "c3": "C3_STRICT_PASS_EXACT_SHA_BY_ALIAS",
+      "decision": "PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_NEW_INGAME"
+    }
+  },
+  "pre_ingame_export": "REQUIRED_AFTER_STATE_PROMOTION",
+  "runtime_validation": "UNTESTED",
+  "actual_ingame_validation": "PENDING",
+  "forbidden_domains_touched": []
+}
