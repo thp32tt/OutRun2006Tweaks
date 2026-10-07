@@ -9530,5 +9530,55 @@
     ],
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c258_c2_batch_q198_q226_q228": {
+    "run": "20261008-C258-C2-Q198-Q226-Q228",
+    "timestamp_kst": "2026-10-08T01:43:00+09:00",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "machine_evidence_commit": "43bd2c9bb4731e9297b17abeb059def6cd752a03",
+    "selection_refresh_head": "2c87096a8391dc4d0a500f724a1dacd57d17e6e7",
+    "pre_commit_refresh_head": "012122c41530296e182f058eaf98744044668af5",
+    "assets": {
+      "q198": {
+        "asset": "9FC88069",
+        "queue_index": 198,
+        "candidate_sha256": "2160e7eef9dd27b028b5adc3df770a508c62891fd21676677365a0f55bee5885",
+        "machine_qa": "PASS_4_OF_4_ZERO_OUTSIDE_ALPHA",
+        "source_height_vs_localized": [
+          "62->55",
+          "52->46",
+          "41->35",
+          "41->35"
+        ],
+        "controller_visual_qa": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "decision": "C258_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+      },
+      "q226": {
+        "asset": "E3F4BA07",
+        "queue_index": 226,
+        "candidate_sha256": "5449edb846d6ca3a5de1ab1f817a41feb776e9af3bdda2175967312369e5e374",
+        "machine_qa": "PASS_8_OF_8_ZERO_OUTSIDE_ALPHA",
+        "controller_visual_qa": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "decision": "C258_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+      },
+      "q228": {
+        "asset": "E7F6E9B7",
+        "queue_index": 228,
+        "candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+        "machine_qa": "PASS_13_OF_13_ZERO_OUTSIDE_ALPHA",
+        "controller_visual_qa": "PASS",
+        "style_gate": "PASS_SOURCE_TECHNO_SILVER_OUTLINE_SHADOW_RIGHTWARD_FAMILY",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "decision": "C258_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+      }
+    },
+    "controller_report": "localization/graphics/role_C/20261008-C258-C2-Q198-Q226-Q228/C258_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "PENDING_REFRESH_Q198_Q226_Q228",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
