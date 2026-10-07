@@ -251,9 +251,9 @@ for banned in ("RightDepthSynchronized = false;",
     if banned in r33:
         errors.append(
             f"R33 retained direct R9 right-depth sync mutation: {banned}")
-if r33.count("R9InvalidateRightDepthStencilSync(") < 2:
+if r33.count("R32ReviewInvalidateRightDepthStencilSync(") < 2:
     errors.append(
-        "R33 missing R9 right-depth sync owner API at left-write and fail-close boundaries")
+        "R33 missing R32 review facade for right-depth sync invalidation at left-write and fail-close boundaries")
 
 # Post-1000 successor: R33 may consult right depth/stencil synchronization
 # readiness only through R9 owner queries. Direct reads split ownership just as
@@ -1024,21 +1024,16 @@ if install_start < 0 or install_end <= install_start:
     errors.append("R33 install transaction body missing")
 else:
     install_body = r33[install_start:install_end]
-    prerequisite_order = [
-        install_body.find("const auto r31 = R31InstallStatus();"),
-        install_body.find("const auto r22 = R22InstallStatus();"),
-        install_body.find("const auto r13 = R13InstallStatus();"),
-    ]
-    if min(prerequisite_order) < 0 or prerequisite_order != sorted(prerequisite_order):
-        errors.append("R33 must query R31/R22/R13 prerequisite owner APIs directly")
+    prerequisite_facade = install_body.find(
+        "const auto prerequisites = R32ReviewPrerequisiteStatus();")
+    if prerequisite_facade < 0:
+        errors.append("R33 must query lower prerequisite readiness through the R32 split facade")
     for retired in ("R32InstallStatus()", "R32InstallState"):
         if retired in install_body:
             errors.append(f"R33 install retained retired R32 readiness relay: {retired}")
     for marker in (
-        "r31 == State::Failed || r22 == State::Failed",
-        "r13 == R13InstallStatusValue::Failed",
-        "r31 == State::Ready && r22 == State::Ready",
-        "r13 == R13InstallStatusValue::Ready",
+        "prerequisites == State::Failed",
+        "prerequisites == State::Ready",
     ):
         if marker not in install_body:
             errors.append(f"R33 install missing direct prerequisite gate: {marker}")
@@ -1062,7 +1057,7 @@ else:
     depth_body = fail_closed_depth.group("body")
     depth_order = [
         depth_body.find("R33InvalidateDepthStencilCache();"),
-        depth_body.find("R9InvalidateRightDepthStencilSync(true, true);"),
+        depth_body.find("R32ReviewInvalidateRightDepthStencilSync(true, true);"),
     ]
     if min(depth_order) < 0 or depth_order != sorted(depth_order):
         errors.append(
