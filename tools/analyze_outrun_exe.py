@@ -209,9 +209,13 @@ def find_calls(pe: PE) -> list[dict]:
         if not name:
             continue
         area, semantic, space_policy = classify_semantic(call_rva)
+        context_begin = max(0, i - 32)
+        context_end = min(len(text), i + 21)
         found.append(
             {
                 "call_rva": call_rva,
+                "context_start_rva": text_section.virtual_address + context_begin,
+                "context_hex": text[context_begin:context_end].hex(),
                 "target_rva": target_rva,
                 "target": name,
                 "function_start_guess_rva": guess_function_start(
