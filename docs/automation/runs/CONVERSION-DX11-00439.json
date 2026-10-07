@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00439",
+  "production_id": "CONVERSION-DX11-00439",
+  "event_id": "CONVERSION-DX11-00439-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "daeb79f306254938847c83504705d6cbc1f620a3",
+  "result_sha": "f6e88e83e28574e8923a154c781ae4fc4c8d3045",
+  "material_result_sha": "f6e88e83e28574e8923a154c781ae4fc4c8d3045",
+  "validation_bearing_result_sha": "f6e88e83e28574e8923a154c781ae4fc4c8d3045",
+  "selected_work_item": "DX11_R301_R260_TO_R261_PAYLOAD_INTEGRITY_GUARD",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "R301 propagates R260 payload self-integrity into the R261 F18 texture resource-behavior gate. R261 independently reconstructs the complete R260 review payload and rejects a copied/tampered geometry receipt even when its stored review token is retained.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "f6e88e83e28574e8923a154c781ae4fc4c8d3045"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: recovered DX11 branch/lane state and prior exact-SHA result history",
+    "C1_REVIEW": "PASS: selected R261 intermediate-proof gap where R260 stored/caller review-token equality could mint texture resource evidence without R260 payload reconstruction",
+    "C2_IMPLEMENT": "PASS: R261 exposes geometryPayloadSnapshotMatches, recomputes the R260 payload identity, gates geometry exactness/boundary/review readiness on self-integrity, and adds a tamper regression plus source-graph registration",
+    "C3_VALIDATE": "PASS: exact-SHA Backend Conversion Gate 37662406407; validate job 112932991267 SUCCESS; DX11 readiness smoke job 112935877047 SUCCESS including Build/Run DX11 constant buffer probe",
+    "C4_COMMIT": "PASS: material/validation-bearing result f6e88e83e28574e8923a154c781ae4fc4c8d3045 contains [AUTO:CONVERSION-DX11-00439] and no CI-skip directive",
+    "C5_PACKAGE": "NOT_REQUIRED: bounded diagnostic/static receipt-integrity change; no runtime candidate requested",
+    "C6_STATE": "PASS: durable task record and lane-state bookkeeping persisted after exact-SHA Gate"
+  },
+  "evidence": {
+    "backend_conversion_gate_run_id": 37662406407,
+    "validation_job_id": 112932991267,
+    "readiness_smoke_job_id": 112935877047,
+    "artifact_id": 11502081389,
+    "artifact_name": "backend-autovalidated-vr-dx11-native-r71-f6e88e83e28574e8923a154c781ae4fc4c8d3045",
+    "artifact_digest": "sha256:ff570d8bdb1425b23411175388f4d6aa2c5350bbe32f80f18db39aa7eec00700",
+    "issue14_comment_id": 6043637231
+  },
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "runtime_test_required": false,
+  "next_action": "From the current DX11 HEAD, inspect R262 and other downstream consumers for derived R261 receipt-token trust without payload self-validation; keep programmable binding and NativeDrawPath/Draw/DrawIndexed authorization fail-closed."
+}
