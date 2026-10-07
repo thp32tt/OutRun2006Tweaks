@@ -2719,3 +2719,10 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - `TEMP_BACKLOG_RELIEF=C2`, `SHARD=EVEN`: q128 B214 `66f1b9ea8e0d...`, q130 B215 `2569b0a2ea31...`, q132 B216 `615281ac6673...` → fresh independent C PASS + exact-SHA **C3_STRICT_PASS**.
 - Visual recheck PASS: q128 source-left shared stage family; q130 source-left width hierarchy; q132 18px request family scale/weight. Exact containment remains q128 7/7, q130 5/5, q132 4/4 with positive margins and zero outside/alpha/protected/residue/overlap/touch.
 - PRE_INGAME refresh/user JPG/NEW actual-game retest pending. `RUNTIME_VALIDATION=UNTESTED`.
+
+### C265 C1 — 2026-10-08 06:57 KST
+- TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL); q121/q201/q219 processed after per-slot and pre-sync HEAD/queue refresh.
+- q121 d1bb0c7c... -> fresh C + exact-SHA C3_STRICT_PASS: 3/3 exact target runs, zero outside/overlap, transparent clean target alpha=0; source ghost/rectangle regression absent in practical/RAW review.
+- q201 a7a4ea10... -> fresh C + exact-SHA C3_STRICT_PASS: 17/17 exact bbox, zero outside/protected/overlap; canonical stage transliteration and protected Night Bird/Radiation visual preservation PASS.
+- q219 f6303ee1... -> REWORK_REQUIRED despite machine PASS: 코스 선택 uses 396/1467px (27.0%) source width and does not preserve the dominant extended silver-techno title family/hierarchy; C3 BLOCKED.
+- q121/q201 PRE_INGAME English-original refresh/user JPG + NEW actual-game retest pending. IGR-025 remains mapping HOLD plus q219 material rework. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.

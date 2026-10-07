@@ -4133,7 +4133,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261008-C262R-C1-Q205-Q193-Q173/C262R_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261008-C265-C1-Q121-Q201-Q219/C265_CONTROLLER_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -4200,7 +4200,6 @@
     "A064FDFC",
     "48DEBE77",
     "788CE557",
-    "FD90AA9",
     "8C259C68",
     "D657C2EB",
     "97E863AD",
@@ -6751,7 +6750,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T06:41:49+09:00",
+  "updated_at_kst": "2026-10-08T06:57:54+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -10428,5 +10427,43 @@
     "pre_ingame_export": "TRIGGERED_BY_C265_COMMIT",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c265_c1_q121_q201_q219": {
+    "run": "20261008-C265-C1-Q121-Q201-Q219",
+    "role": "C",
+    "lane": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "selection_head": "308eb8651a679f26c6c0d45a0c00e693fcd27efa",
+    "pre_commit_refresh_head": "a51b61e988d70ea8997097aa7bbe3d62a8e170bf",
+    "execution_backend": "N100_MCP_FALLBACK_EXACT_REPOSITORY_BYTES_AFTER_CHATGPT_LOCAL_BINARY_MATERIALIZATION_UNAVAILABLE_AND_HOSTED_CPU_WORKER_QUEUE_BLOCKED",
+    "assets": {
+      "q121": {
+        "asset": "FD90AA9",
+        "candidate_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "status": "C265_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME_RETEST"
+      },
+      "q201": {
+        "asset": "A9ABD877",
+        "candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "status": "C265_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME_RETEST"
+      },
+      "q219": {
+        "asset": "D263B3F1",
+        "candidate_sha256": "f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24",
+        "fresh_c": "FAIL_VISUAL_OVERRIDE",
+        "c3": "BLOCKED",
+        "status": "REWORK_REQUIRED_SOURCE_RELATIVE_SCALE_AND_TECHNO_FAMILY"
+      }
+    },
+    "controller_report": "localization/graphics/role_C/20261008-C265-C1-Q121-Q201-Q219/C265_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "TRIGGER_WITH_THIS_SYNC_Q121_Q201",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": [],
+    "updated_at_kst": "2026-10-08T06:57:54+09:00"
   }
 }

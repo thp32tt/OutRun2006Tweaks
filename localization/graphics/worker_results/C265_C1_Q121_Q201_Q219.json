@@ -1,0 +1,28 @@
+{
+  "role": "C",
+  "run": "C265",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "status": "Q121_Q201_C3_PASS_Q219_REWORK_REQUIRED",
+  "controller_report": "localization/graphics/role_C/20261008-C265-C1-Q121-Q201-Q219/C265_CONTROLLER_FINAL_QA.json",
+  "assets": [
+    {
+      "queue_index": 121,
+      "candidate_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+      "decision": "C3_STRICT_PASS"
+    },
+    {
+      "queue_index": 201,
+      "candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+      "decision": "C3_STRICT_PASS"
+    },
+    {
+      "queue_index": 219,
+      "candidate_sha256": "f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24",
+      "decision": "REWORK_REQUIRED_VISUAL_OVERRIDE"
+    }
+  ],
+  "pre_ingame_export": "TRIGGER_REQUIRED_Q121_Q201",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T06:41:49+09:00",
+  "updated_at_kst": "2026-10-08T06:57:54+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -3101,7 +3101,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "C265 update: q128 12519155, q130 1762489B, q132 1F5FE6E9 passed fresh independent C + exact-SHA C3 on the B214/B215/B216 bytes and are no longer fresh-C pending. They now await PRE_INGAME English-original refresh, user JPG acceptance and NEW actual-game validation. Other pending-C/rework items are unchanged. RUNTIME_VALIDATION=UNTESTED.",
+  "current_pending_c": "C265 C1 update: q121 FD90AA9 and q201 A9ABD877 passed fresh C + exact-SHA C3 and now await PRE_INGAME/user JPG + NEW actual-game validation. q219 D263B3F1 returned REWORK_REQUIRED for severe source-width hierarchy underfill and silver-techno family mismatch; IGR-025 remains HOLD for missing screenshot/runtime mapping evidence. C265 update: q128 12519155, q130 1762489B, q132 1F5FE6E9 passed fresh independent C + exact-SHA C3 on the B214/B215/B216 bytes and are no longer fresh-C pending. They now await PRE_INGAME English-original refresh, user JPG acceptance and NEW actual-game validation. Other pending-C/rework items are unchanged. RUNTIME_VALIDATION=UNTESTED.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -5134,7 +5134,7 @@
       }
     }
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261008-C262R-C1-Q205-Q193-Q173/C262R_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261008-C265-C1-Q121-Q201-Q219/C265_CONTROLLER_FINAL_QA.json",
   "c249_c2_batch_q086_q044_q048": {
     "run": "20261007-C249-C2-BATCH-Q086-Q044-Q048",
     "timestamp_kst": "2026-10-07T20:35:35+09:00",
@@ -6310,5 +6310,36 @@
       }
     },
     "runtime_validation": "UNTESTED"
+  },
+  "c265_c1_q121_q201_q219": {
+    "run": "20261008-C265-C1-Q121-Q201-Q219",
+    "role": "C",
+    "lane": "C1",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "selection_head": "308eb8651a679f26c6c0d45a0c00e693fcd27efa",
+    "pre_commit_refresh_head": "a51b61e988d70ea8997097aa7bbe3d62a8e170bf",
+    "execution_backend": "N100_MCP_FALLBACK_EXACT_REPOSITORY_BYTES_AFTER_CHATGPT_LOCAL_BINARY_MATERIALIZATION_UNAVAILABLE_AND_HOSTED_CPU_WORKER_QUEUE_BLOCKED",
+    "assets": {
+      "q121": {
+        "asset": "FD90AA9",
+        "candidate_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+        "status": "C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME_RETEST"
+      },
+      "q201": {
+        "asset": "A9ABD877",
+        "candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+        "status": "C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME_RETEST"
+      },
+      "q219": {
+        "asset": "D263B3F1",
+        "candidate_sha256": "f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24",
+        "status": "REWORK_REQUIRED_SOURCE_RELATIVE_SCALE_AND_TECHNO_FAMILY"
+      }
+    },
+    "controller_report": "localization/graphics/role_C/20261008-C265-C1-Q121-Q201-Q219/C265_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "TRIGGER_WITH_THIS_SYNC_Q121_Q201",
+    "runtime_validation": "UNTESTED",
+    "updated_at_kst": "2026-10-08T06:57:54+09:00"
   }
 }

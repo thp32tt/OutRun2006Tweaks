@@ -1,0 +1,50 @@
+{
+  "queue_index": 219,
+  "asset": "D263B3F1_512x512.dds",
+  "candidate_sha256": "f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24",
+  "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "header_128_exact": true,
+  "row": {
+    "source": "COURSE SELECT",
+    "korean": "코스 선택",
+    "original_bbox": [
+      6,
+      1011,
+      1473,
+      1129
+    ],
+    "derived_localized_bbox": [
+      10,
+      1015,
+      406,
+      1125
+    ],
+    "producer_localized_bbox": [
+      10,
+      1015,
+      406,
+      1125
+    ],
+    "bbox_exact": true,
+    "containment": true,
+    "size_ceiling": true,
+    "positive_margin": true,
+    "margins": [
+      4,
+      1067,
+      4,
+      4
+    ]
+  },
+  "changed_outside_allowed": 0,
+  "alpha_changed_outside_allowed": 0,
+  "protected_changed_pixels": 0,
+  "clean_changed_outside_allowed": 0,
+  "clean_protected_changed_pixels": 0,
+  "machine_result": "PASS",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "run": "C265",
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "timestamp_kst": "2026-10-08T06:57:54+09:00",
+  "selection_head": "308eb8651a679f26c6c0d45a0c00e693fcd27efa",
+  "pre_commit_refresh_head": "a51b61e988d70ea8997097aa7bbe3d62a8e170bf",
+  "queue_sanity": {
+    "total": 137,
+    "localize_text": 94,
+    "zoom_review": 32,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_brand_song_credit": 1
+  },
+  "execution_backend": "N100_MCP_FALLBACK_EXACT_REPOSITORY_BYTES_AFTER_CHATGPT_LOCAL_BINARY_MATERIALIZATION_UNAVAILABLE_AND_HOSTED_CPU_WORKER_QUEUE_BLOCKED",
+  "fallback_reason": "ChatGPT local container could not materialize large GitHub DDS bytes through the available repository connector path; localization CPU worker already had a long-lived pending run. N100 MCP was used only in isolated tmp/c265 with SHA-pinned GitHub bytes; GitHub remained SSOT.",
+  "decisions": {
+    "q121": {
+      "asset": "FD90AA9",
+      "user_regression": "IGR-018",
+      "candidate_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+      "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "machine_qa": "PASS_3_OF_3_EXACT_BBOX_ZERO_OUTSIDE_ZERO_OVERLAP_CLEAN_TARGET_ALPHA_ZERO",
+      "controller_visual_qa": "PASS_SOURCE_CLEAN_CURRENT_PRACTICAL_RAW_FLIPY",
+      "visual_notes": "C255 English header silhouettes/double-draw are absent; transparent plate has no opaque rectangle/seam; shared Korean header family retains readable right lean and remains legible at practical scales.",
+      "fresh_c": "PASS",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "status": "C265_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME_RETEST"
+    },
+    "q201": {
+      "asset": "A9ABD877",
+      "user_regression": "IGR-004",
+      "candidate_sha256": "a7a4ea10fead816cd5bc8fe4011f31b9b2c308f61ab2bdbf0de233bc557a03c8",
+      "source_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "machine_qa": "PASS_17_OF_17_EXACT_BBOX_ZERO_OUTSIDE_ZERO_PROTECTED_ZERO_OVERLAP",
+      "controller_visual_qa": "PASS_SOURCE_CLEAN_CURRENT_PRACTICAL_RAW_FLIPY",
+      "visual_notes": "native 2048 stage/UI family is clean and readable; canonical phonetic stage naming is preserved; Night Bird and Radiation protected song-title artwork is unchanged; no low-resolution upscale, residue, clipping, overlap or orientation defect observed.",
+      "fresh_c": "PASS",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "status": "C265_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME_RETEST"
+    },
+    "q219": {
+      "asset": "D263B3F1",
+      "user_regression": "IGR-025",
+      "candidate_sha256": "f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24",
+      "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+      "machine_qa": "PASS_1_OF_1_EXACT_BBOX_ZERO_OUTSIDE_ZERO_PROTECTED",
+      "controller_visual_qa": "FAIL_SOURCE_RELATIVE_SCALE_AND_TECHNO_FAMILY_FIDELITY",
+      "visual_notes": "numeric containment is a false negative for presentation quality: 코스 선택 is 396x110 inside the 1467x118 source bbox (27.0% source width) and reads as a compact generic Hangul caption while COURSE SELECT is a dominant extended rounded silver-techno title. Practical-scale comparison shows severe hierarchy underfill and family/proportion mismatch.",
+      "fresh_c": "FAIL_VISUAL_OVERRIDE",
+      "c3": "BLOCKED",
+      "status": "REWORK_REQUIRED",
+      "required_rework": "Preserve the validated clean plate and OutRun2/OutRun2SP artwork, but rerender 코스 선택 with a materially more extended source-techno Korean treatment, source-faithful readable right lean/effects and substantially restored width/hierarchy while remaining inside the exact 1467x118 source bbox. Then fresh C1 + exact-SHA C3."
+    }
+  },
+  "batch_decision": "Q121_PASS_C3_Q201_PASS_C3_Q219_REWORK_REQUIRED",
+  "pre_ingame_export": "TRIGGER_REQUIRED_FOR_Q121_Q201_MEMBERSHIP_CHANGE",
+  "backlog_closure": "NONE_STATIC_ONLY",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

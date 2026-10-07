@@ -1,1 +1,1 @@
-2026-10-08T06:41:49+09:00 C265 C2 q128 q130 q132 fresh C + exact-SHA C3 pass refresh
+2026-10-08T06:57:54+09:00 C265 C1 q121 q201 C3 pass membership refresh; q219 visual rework excluded

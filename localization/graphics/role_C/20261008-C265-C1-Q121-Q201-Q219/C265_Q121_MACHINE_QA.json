@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "run": "C265",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 121,
+  "asset": "FD90AA9_1024x1024.dds",
+  "candidate_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "header_128_exact": true,
+  "independent_row_method": "candidate-vs-A176-clean y-projection separates the three localized glyph/effect runs despite overlapping source bboxes",
+  "rows": [
+    {
+      "key": "select_game_mode",
+      "original_bbox": [
+        166,
+        819,
+        1166,
+        973
+      ],
+      "derived_localized_bbox": [
+        341,
+        846,
+        990,
+        945
+      ],
+      "producer_localized_bbox": [
+        341,
+        846,
+        990,
+        945
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margin": true,
+      "margins": [
+        175,
+        176,
+        27,
+        28
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "select_car",
+      "original_bbox": [
+        243,
+        947,
+        1156,
+        1111
+      ],
+      "derived_localized_bbox": [
+        485,
+        979,
+        913,
+        1078
+      ],
+      "producer_localized_bbox": [
+        485,
+        979,
+        913,
+        1078
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margin": true,
+      "margins": [
+        242,
+        243,
+        32,
+        33
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "select_course",
+      "original_bbox": [
+        302,
+        1062,
+        1085,
+        1213
+      ],
+      "derived_localized_bbox": [
+        478,
+        1088,
+        908,
+        1187
+      ],
+      "producer_localized_bbox": [
+        478,
+        1088,
+        908,
+        1187
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margin": true,
+      "margins": [
+        176,
+        177,
+        26,
+        26
+      ],
+      "result": "PASS"
+    }
+  ],
+  "row_y_runs": [
+    [
+      846,
+      945
+    ],
+    [
+      979,
+      1078
+    ],
+    [
+      1088,
+      1187
+    ]
+  ],
+  "changed_outside_source_bbox_union": 0,
+  "clean_visible_alpha_by_row": {
+    "select_game_mode": 0,
+    "select_car": 0,
+    "select_course": 0
+  },
+  "localized_pair_overlap_pixels": 0,
+  "machine_result": "PASS",
+  "diagnostic_note": "source-vs-clean outside the three header bboxes is not a valid blast-radius gate because A176 clean intentionally inherits unrelated pre-existing localized atlas content; target clean alpha=0 and candidate-vs-clean blast radius are authoritative for this repair.",
+  "runtime_validation": "UNTESTED"
+}
