@@ -138,14 +138,18 @@ def main() -> None:
     # bridge hooks must still feed observe_source_draw. Losing one family would
     # silently weaken readiness evidence while the analyzer continues to report
     # non-exhaustive coverage.
-    observed_draw_functions = [
-        "DrawPrimitiveDest",
-        "DrawIndexedPrimitiveDest",
-        "DrawPrimitiveUPDest",
-        "DrawIndexedPrimitiveUPDest",
-    ]
+    observed_draw_functions = {
+        "DrawPrimitiveDest":
+            "make_nonindexed_source_draw_observation(",
+        "DrawIndexedPrimitiveDest":
+            "make_indexed_source_draw_observation(",
+        "DrawPrimitiveUPDest":
+            "make_nonindexed_up_source_draw_observation(",
+        "DrawIndexedPrimitiveUPDest":
+            "make_indexed_up_source_draw_observation(",
+    }
     missing_observers: list[str] = []
-    for function_name in observed_draw_functions:
+    for function_name, expected_factory in observed_draw_functions.items():
         marker = f"HRESULT __stdcall {function_name}("
         start = bridge.find(marker)
         if start < 0:
@@ -153,8 +157,12 @@ def main() -> None:
             continue
         next_start = bridge.find("HRESULT __stdcall ", start + len(marker))
         block = bridge[start:] if next_start < 0 else bridge[start:next_start]
-        if "outrun::vr::dx11::observe_source_draw(device, type);" not in block:
+        if "outrun::vr::dx11::observe_source_draw(" not in block:
             missing_observers.append(function_name + ":missing-observer")
+        if expected_factory not in block:
+            missing_observers.append(
+                function_name + ":wrong-source-draw-identity"
+            )
     if missing_observers:
         raise SystemExit(
             "DX11 census source-draw coverage drift: " + ", ".join(missing_observers)
