@@ -3317,6 +3317,17 @@ namespace OutRunVRStereo
         return EnsureDirectTransportResources(device);
     }
 
+    void R30SupportReleaseDirectAckState() noexcept
+    {
+        R13ReleaseAckState();
+    }
+
+    void R30SupportReleaseDirectTransportInterop() noexcept
+    {
+        ReleaseDirectTransportSlots();
+        ReleaseDirectInteropProbe();
+    }
+
     bool R30SupportTryGetDirectTransportIdentity(
         R30SupportDirectTransportIdentity& out) noexcept
     {
