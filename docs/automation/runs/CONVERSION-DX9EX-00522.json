@@ -7,12 +7,12 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "status": "IMPLEMENTED_PENDING_VALIDATION",
+  "status": "COMPLETE",
   "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-DIRECTGPU-SOURCE-SURFACE-FACADE-001",
   "base_sha": "7f4c4024f8fe68268052fd4d2e3c4bcac98dfb78",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "material_result_sha": "73e9aa3ce2fb8cce4ab1bc0d90ee26403ed6045c",
+  "validation_bearing_result_sha": "73e9aa3ce2fb8cce4ab1bc0d90ee26403ed6045c",
+  "result_sha": "73e9aa3ce2fb8cce4ab1bc0d90ee26403ed6045c",
   "result_marker": "[AUTO:CONVERSION-DX9EX-00522]",
   "summary": "Move R32 DirectGPU reads of the lower-owned BackBuffer and RightEyeSurface behind a borrowed-pointer R30 support facade while preserving source readiness timing, left/right StretchRect order, fence issue, ACK/slot publication, and failure policy.",
   "changed_paths": [
@@ -23,7 +23,7 @@
     "tools/verify_vr_dx9ex_reset_transport_contract.py",
     "docs/automation/runs/CONVERSION-DX9EX-00522.json"
   ],
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
@@ -59,5 +59,25 @@
     "no fence issue/wait/publication change",
     "no Reset/ResetEx, Present, HUD, projection, recenter, or stereo classification change"
   ],
-  "next_action": "Require exact-SHA DX9Ex Active Validation and Domain Isolation. If green, persist validation evidence and continue the next bounded R32 lower-owner dependency seam; runtime remains UNTESTED."
+  "next_action": "Continue one bounded R32 lower-owner dependency seam; prefer read-only owner predicates/facades before DirectTransportSlots/fence/publication ownership. Runtime remains UNTESTED.",
+  "validation_history": [
+    {
+      "sha": "73e9aa3ce2fb8cce4ab1bc0d90ee26403ed6045c",
+      "dx9ex_active_run_id": 37626058866,
+      "domain_isolation_run_id": 37626058730,
+      "result": "PASS",
+      "jobs": {
+        "policy": 112807982253,
+        "host": 112808181374,
+        "game": 112808181154,
+        "full_chain_compile": 112808181099,
+        "package": 112811043668
+      }
+    }
+  ],
+  "package_artifact": {
+    "id": 11483964164,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-73e9aa3ce2fb8cce4ab1bc0d90ee26403ed6045c",
+    "digest": "sha256:7d0759c702a65d37ec5fcedd03156de02a5dac5e07fd1f273f94264f75e4695a"
+  }
 }
