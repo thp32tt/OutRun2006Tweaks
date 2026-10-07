@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261008-A180-BACKLOG-SSOT-RECONCILE",
+  "timestamp_kst": "2026-10-08T05:00:00+09:00",
+  "base_head": "feda04ce1a4ae6f151d60ba5008f051b3e509b4c",
+  "queue_selection_result": "NO_SAFE_MATERIAL_TARGET",
+  "reconciled": [
+    {
+      "id": "IGR-001",
+      "status": "B246_STATIC_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_NEW_INGAME_RETEST",
+      "close_gate": "FRESH_C_Q212 + EXACT_SHA_C3 + PRE_INGAME_USER_JPG + NEW_INGAME_RETEST"
+    },
+    {
+      "id": "IGR-012",
+      "status": "C255_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_NEW_INGAME_RETEST",
+      "close_gate": "PRE_INGAME_REFRESH + USER_JPG_REVIEW + NEW_INGAME_RETEST"
+    },
+    {
+      "id": "PJR-002-20261006",
+      "status": "C245_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_NEW_INGAME_RETEST",
+      "close_gate": "PRE_INGAME_REFRESH + USER_JPG_REVIEW + NEW_INGAME_RETEST"
+    },
+    {
+      "id": "PJR-018-20261006",
+      "status": "C254_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_NEW_INGAME_RETEST",
+      "close_gate": "USER_JPG_REVIEW + NEW_INGAME_RETEST"
+    },
+    {
+      "id": "PJR-020-20261006",
+      "status": "C254_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_NEW_INGAME_RETEST",
+      "close_gate": "USER_JPG_REVIEW + NEW_INGAME_RETEST"
+    },
+    {
+      "id": "PJR-021-20261006",
+      "status": "C254_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_NEW_INGAME_RETEST",
+      "close_gate": "USER_JPG_REVIEW + NEW_INGAME_RETEST"
+    }
+  ],
+  "q212_current_candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+  "new_candidate_count": 0,
+  "reason": "Current A shard has no material REWORK/RENDER_READY/ONE_STAGE target; stale backlog state was the only actionable A-controller defect and was repaired to prevent duplicate production.",
+  "igr025": "HOLD_STRICT_RECHECK_SCREENSHOT_OR_RUNTIME_TRACE_REQUIRED",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

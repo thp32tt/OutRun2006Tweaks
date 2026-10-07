@@ -10308,5 +10308,54 @@
     "pre_ingame_refresh": "TRIGGER_WITH_THIS_SYNC",
     "runtime_validation": "UNTESTED",
     "updated_at_kst": "2026-10-08T05:49:36+09:00"
+  },
+  "a180_backlog_ssot_reconcile": {
+    "timestamp_kst": "2026-10-08T05:00:00+09:00",
+    "role": "A",
+    "run": "20261008-A180-BACKLOG-SSOT-RECONCILE",
+    "base_head": "feda04ce1a4ae6f151d60ba5008f051b3e509b4c",
+    "reason": "A shard refresh found no safe RENDER_READY/ONE_STAGE_TO_RENDER material work; six A-owned backlog rows were stale relative to newer queue/C evidence and would cause duplicate production selection.",
+    "reconciled": [
+      {
+        "id": "IGR-001",
+        "queue_index": 212,
+        "new_state": "B246_STATIC_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_NEW_INGAME_RETEST",
+        "current_candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6"
+      },
+      {
+        "id": "IGR-012",
+        "queue_index": 63,
+        "new_state": "C255_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_NEW_INGAME_RETEST"
+      },
+      {
+        "id": "PJR-002-20261006",
+        "queue_index": 26,
+        "new_state": "C245_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_NEW_INGAME_RETEST"
+      },
+      {
+        "id": "PJR-018-20261006",
+        "queue_index": 57,
+        "new_state": "C254_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_NEW_INGAME_RETEST"
+      },
+      {
+        "id": "PJR-020-20261006",
+        "queue_index": 61,
+        "new_state": "C254_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_NEW_INGAME_RETEST"
+      },
+      {
+        "id": "PJR-021-20261006",
+        "queue_index": 65,
+        "new_state": "C254_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_NEW_INGAME_RETEST"
+      }
+    ],
+    "current_a_material_state": {
+      "odd_shard": "NO_CURRENT_REWORK_REQUIRED_OR_RENDER_READY; remaining A-produced rows await C/user/in-game gates",
+      "igr025": "HOLD_STRICT_RECHECK_SCREENSHOT_PAYLOAD_OR_RUNTIME_TRACE_REQUIRED",
+      "q212": "B246_PRODUCER_PASS_PENDING_FRESH_C; owner A must not overwrite current B246 bytes"
+    },
+    "new_candidate_count": 0,
+    "zero_candidate_reason": "No current A-shard RENDER_READY/ONE_STAGE_TO_RENDER or direct C-returned material target after live refresh; repeating C254/C255/C262R-passed bytes is forbidden.",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

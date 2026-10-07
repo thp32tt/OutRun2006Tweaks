@@ -3389,3 +3389,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - q173 `6DC89C6E` @ `8783e565...`: independent 21/21 bbox/size/positive-margin PASS, outside=0, overlap=0, header/RAW PASS. Fresh visual review confirms native canonical phonetic stage names with no ghost, clipping, broken Hangul, overlap, or direction defect. Fresh C + exact-SHA `C3_STRICT_PASS`.
 - All linked user regressions remain open until PRE_INGAME English-original/user JPG review and a NEW actual-game retest. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Controller report: `localization/graphics/role_C/20261008-C262R-C1-Q205-Q193-Q173/C262R_CONTROLLER_FINAL_QA.json`.
+
+## 2026-10-08 05:00 KST — A180 backlog SSOT reconciliation / duplicate-work prevention
+- Refreshed CONTRACT, all required policy/state files, live queue/backlog and remote HEAD before selection.
+- A odd shard has no current `REWORK_REQUIRED` / `RENDER_READY` / `ONE_STAGE_TO_RENDER` material item. Remaining A candidates are waiting for C, PRE_INGAME/user review, or actual-game retest. IGR-025 remains HOLD because screenshot(163) pixel/per-label evidence is absent; no guessing.
+- Owner-override IGR-001/q212 was also refreshed: current queue now has B246 exact candidate `01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6` producer-PASS pending fresh C/C3, so A did not overwrite or repeat it.
+- Reconciled six stale A-owned backlog rows against newer queue/C evidence: IGR-001 q212, IGR-012 q63, PJR-002 q26, PJR-018 q57, PJR-020 q61, PJR-021 q65. q57/q61/q65 are C254 exact-SHA C3 + PRE_INGAME refreshed; q63 is C255 C3; q26 is C245 C3. Their older REWORK/pending-C backlog statuses no longer trigger duplicate producer work.
+- No candidate DDS was changed. This is an allowed zero-candidate producer run because no safe material target exists after current-state refresh. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.

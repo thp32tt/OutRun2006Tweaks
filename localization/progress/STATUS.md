@@ -2700,3 +2700,9 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q193 e21851f5...: 3/3 exact bbox, zero outside/overlap + fresh visual/RAW PASS; C255 English ghost/double-draw absent -> fresh C + exact-SHA C3_STRICT_PASS.
 - q173 8783e565...: 21/21 exact bbox, zero outside/overlap + native canonical stage-family visual/RAW PASS -> fresh C + exact-SHA C3_STRICT_PASS.
 - PRE_INGAME English-original export/user JPG and NEW actual-game retest remain mandatory; static C does not close IGR-003/013/019/020/021/022/023. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-08 05:00 KST — A180 queue/backlog state corrected
+- Six stale A-owned regression rows reconciled to current queue/C evidence, preventing already-fixed assets from being selected again.
+- q57/q61/q65: C254 C3 + PRE_INGAME refreshed; q63: C255 C3; q26: C245 C3; q212: current B246 producer PASS pending fresh C/C3.
+- No safe A material candidate remained after refresh; IGR-025 is still evidence-blocked. No DDS bytes changed.
+- `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.

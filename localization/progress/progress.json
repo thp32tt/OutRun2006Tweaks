@@ -668,17 +668,20 @@
     "current_pending_artwork_localize_text": 0,
     "current_producer_rework_remaining": 0,
     "latest_a_production_batch": {
-      "timestamp_kst": "2026-10-08T02:05:00+09:00",
-      "run": "A176 q121 transparent plate reconstruction",
-      "assets": [
-        "FD90AA9"
+      "timestamp_kst": "2026-10-08T05:00:00+09:00",
+      "run": "A180 backlog SSOT reconciliation",
+      "result": "ZERO_CANDIDATE_ALLOWED_NO_SAFE_RENDER_READY_OR_ONE_STAGE_TARGET",
+      "material_candidate_count": 0,
+      "reconciled_backlog_rows": [
+        "IGR-001",
+        "IGR-012",
+        "PJR-002-20261006",
+        "PJR-018-20261006",
+        "PJR-020-20261006",
+        "PJR-021-20261006"
       ],
-      "candidate_sha256": "d1bb0c7cc22a398b47085445787bc15fc10db1125b5298d1c38d1f5deaf7dc27",
-      "result": "A176_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
-      "pending_c_assets": [
-        "FD90AA9"
-      ],
-      "execution_backend": "GITHUB_ACTIONS_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILURE",
+      "q212": "B246 producer PASS pending fresh C/C3; no duplicate A production",
+      "igr025": "HOLD_STRICT_RECHECK pending screenshot/runtime evidence",
       "runtime_validation": "UNTESTED"
     },
     "a_production20_9ce4e175": {
