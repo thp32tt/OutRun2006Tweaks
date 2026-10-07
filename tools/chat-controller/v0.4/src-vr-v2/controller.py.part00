@@ -925,16 +925,49 @@ def github_action_jobs_summary(run_id: int) -> list[dict]:
 
 
 def github_gate_run(branch: str, sha: str, workflow_name: str, run_id: Optional[int] = None, force_discovery: bool = False) -> Optional[dict]:
+    # A persisted run id is only a fast path. Result-SHA rebinding can leave the
+    # previous test/repair run id behind, so a mismatch must fall through to
+    # immutable exact-SHA discovery instead of being treated as "no run".
     if run_id:
-        return github_action_run_by_id(int(run_id), sha, workflow_name)
+        bound = github_action_run_by_id(int(run_id), sha, workflow_name)
+        if bound is not None:
+            return bound
+        log.info(
+            "bound actions run stale/mismatched id=%s sha=%s workflow=%s; falling back to exact-SHA discovery",
+            run_id, sha, workflow_name,
+        )
+        force_discovery = True
+
     try:
+        # Exact head_sha is the authoritative lookup. Never rely on the latest
+        # N branch runs for this check: one commit can fan out into many workflows
+        # and push the required material run outside a small branch result window.
+        exact_q = urllib.parse.urlencode({"head_sha": sha, "per_page": 100})
+        exact_payload = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs?{exact_q}")
+        exact_matches = [
+            r for r in exact_payload.get("workflow_runs", [])
+            if r.get("head_sha") == sha and r.get("name") == workflow_name
+        ]
+        if exact_matches:
+            exact_matches.sort(
+                key=lambda r: (
+                    r.get("created_at", ""),
+                    int(r.get("run_attempt") or 1),
+                    int(r.get("id") or 0),
+                ),
+                reverse=True,
+            )
+            return _normalize_github_run(exact_matches[0])
+
+        # Keep the broader branch scan only as a compatibility fallback for
+        # API/proxy implementations that do not honor head_sha filtering.
         now_mono = time.monotonic()
         cached = _github_actions_cache.get(branch)
         if cached and not force_discovery and now_mono - cached[0] < GITHUB_ACTIONS_CACHE_SECONDS:
             payload = cached[1]
         else:
-            q = urllib.parse.urlencode({"branch": branch, "per_page": 30})
-            payload = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs?{q}")
+            branch_q = urllib.parse.urlencode({"branch": branch, "per_page": 100})
+            payload = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs?{branch_q}")
             if isinstance(payload, dict):
                 _github_actions_cache[branch] = (now_mono, payload)
         matches = [
@@ -943,7 +976,14 @@ def github_gate_run(branch: str, sha: str, workflow_name: str, run_id: Optional[
         ]
         if not matches:
             return None
-        matches.sort(key=lambda r: r.get("created_at", ""), reverse=True)
+        matches.sort(
+            key=lambda r: (
+                r.get("created_at", ""),
+                int(r.get("run_attempt") or 1),
+                int(r.get("id") or 0),
+            ),
+            reverse=True,
+        )
         return _normalize_github_run(matches[0])
     except Exception as e:
         log.warning("github actions discovery failed branch=%s sha=%s error=%r", branch, sha, e)

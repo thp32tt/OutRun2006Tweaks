@@ -89,6 +89,15 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('page = await replace_with_fresh_slot_page(context, pages, slot)', SOURCE)
         self.assertIn('repair fresh-chat login required', SOURCE)
 
+    def test_exact_sha_actions_lookup_recovers_from_stale_bound_run(self):
+        self.assertIn('bound = github_action_run_by_id(int(run_id), sha, workflow_name)', SOURCE)
+        self.assertIn('if bound is not None:', SOURCE)
+        self.assertIn('falling back to exact-SHA discovery', SOURCE)
+        self.assertIn('{"head_sha": sha, "per_page": 100}', SOURCE)
+        self.assertIn('exact_matches', SOURCE)
+        self.assertIn('{"branch": branch, "per_page": 100}', SOURCE)
+        self.assertNotIn('{"branch": branch, "per_page": 30}', SOURCE)
+
     def test_rollover_throttle_policy(self):
         self.assertIn('CONVERSATION_ROLLOVER_MIN_SECONDS', SOURCE)
         self.assertIn('conversation_rollover_cooldown', SOURCE)
