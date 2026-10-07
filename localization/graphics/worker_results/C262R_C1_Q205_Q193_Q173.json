@@ -1,0 +1,28 @@
+{
+  "role": "C",
+  "run": "20261008-C262R-C1-Q205-Q193-Q173",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "processed_assets": 3,
+  "status": "C262R_C3_STRICT_PASS_3_OF_3_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME_RETEST",
+  "controller_report": "localization/graphics/role_C/20261008-C262R-C1-Q205-Q193-Q173/C262R_CONTROLLER_FINAL_QA.json",
+  "assets": [
+    {
+      "queue_index": 205,
+      "candidate_sha256": "e3d421a165bdb6e7b3e1bda7b35a6d994d69017407e345d7a339a15d87f79088",
+      "c3_strict": "PASS_EXACT_SHA"
+    },
+    {
+      "queue_index": 193,
+      "candidate_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
+      "c3_strict": "PASS_EXACT_SHA"
+    },
+    {
+      "queue_index": 173,
+      "candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
+      "c3_strict": "PASS_EXACT_SHA"
+    }
+  ],
+  "runtime_validation": "UNTESTED"
+}

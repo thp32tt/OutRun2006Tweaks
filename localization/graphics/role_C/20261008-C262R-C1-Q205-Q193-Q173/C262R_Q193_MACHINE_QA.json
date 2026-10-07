@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261008-C262R-C1-Q205-Q193-Q173",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "fallback_backend": "N100_MCP_AFTER_HOSTED_C262_CANCELLED_BEFORE_START",
+  "queue_index": 193,
+  "asset": "97E863AD_512x256.dds",
+  "candidate_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
+  "expected_candidate_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "expected_source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "header_128_exact": true,
+  "dimensions": [
+    2048,
+    1024
+  ],
+  "raw_orientation": "mirror_y",
+  "rows": [
+    {
+      "key": "welcome",
+      "source_bbox": [
+        3,
+        148,
+        476,
+        195
+      ],
+      "producer_localized_bbox": [
+        5,
+        150,
+        210,
+        193
+      ],
+      "derived_localized_bbox": [
+        5,
+        150,
+        210,
+        193
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        266,
+        2,
+        2
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "multiplayer_intro_title",
+      "source_bbox": [
+        8,
+        297,
+        540,
+        359
+      ],
+      "producer_localized_bbox": [
+        10,
+        300,
+        274,
+        356
+      ],
+      "derived_localized_bbox": [
+        10,
+        300,
+        274,
+        356
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        266,
+        3,
+        3
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "showroom_body",
+      "source_bbox": [
+        1205,
+        957,
+        1594,
+        1011
+      ],
+      "producer_localized_bbox": [
+        1207,
+        959,
+        1304,
+        1009
+      ],
+      "derived_localized_bbox": [
+        1207,
+        959,
+        1304,
+        1009
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        290,
+        2,
+        2
+      ],
+      "result": "PASS"
+    }
+  ],
+  "changed_pixels_outside_allowed": 0,
+  "protected_mask_changed_pixels": 0,
+  "localized_overlap_pairs": [],
+  "protected_tokens": [],
+  "source_residue_diagnostic": [
+    {
+      "key": "welcome",
+      "source_footprint_pixels": 11697,
+      "exact_source_pixels_retained": 850,
+      "ratio": 0.072668
+    },
+    {
+      "key": "multiplayer_intro_title",
+      "source_footprint_pixels": 17402,
+      "exact_source_pixels_retained": 1783,
+      "ratio": 0.102459
+    },
+    {
+      "key": "showroom_body",
+      "source_footprint_pixels": 11379,
+      "exact_source_pixels_retained": 453,
+      "ratio": 0.03981
+    }
+  ],
+  "machine_result": "PASS",
+  "controller_visual_qa": "PENDING",
+  "c3_strict": "PENDING",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,831 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261008-C262R-C1-Q205-Q193-Q173",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "fallback_backend": "N100_MCP_AFTER_HOSTED_C262_CANCELLED_BEFORE_START",
+  "queue_index": 173,
+  "asset": "6DC89C6E_512x512.dds",
+  "candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
+  "expected_candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
+  "source_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+  "expected_source_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+  "header_128_exact": true,
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "raw_orientation": "mirror_y",
+  "rows": [
+    {
+      "key": "region_00",
+      "source_bbox": [
+        2,
+        1962,
+        585,
+        2042
+      ],
+      "producer_localized_bbox": [
+        4,
+        1968,
+        261,
+        2036
+      ],
+      "derived_localized_bbox": [
+        4,
+        1968,
+        261,
+        2036
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        324,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_01",
+      "source_bbox": [
+        2,
+        1862,
+        626,
+        1942
+      ],
+      "producer_localized_bbox": [
+        4,
+        1868,
+        272,
+        1936
+      ],
+      "derived_localized_bbox": [
+        4,
+        1868,
+        272,
+        1936
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        354,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_02",
+      "source_bbox": [
+        2,
+        1766,
+        638,
+        1846
+      ],
+      "producer_localized_bbox": [
+        4,
+        1772,
+        588,
+        1840
+      ],
+      "derived_localized_bbox": [
+        4,
+        1772,
+        588,
+        1840
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        50,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_03",
+      "source_bbox": [
+        8,
+        1674,
+        706,
+        1754
+      ],
+      "producer_localized_bbox": [
+        10,
+        1680,
+        345,
+        1748
+      ],
+      "derived_localized_bbox": [
+        10,
+        1680,
+        345,
+        1748
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        361,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_04",
+      "source_bbox": [
+        8,
+        1580,
+        516,
+        1656
+      ],
+      "producer_localized_bbox": [
+        10,
+        1584,
+        274,
+        1652
+      ],
+      "derived_localized_bbox": [
+        10,
+        1584,
+        274,
+        1652
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        242,
+        4,
+        4
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_05",
+      "source_bbox": [
+        7,
+        1478,
+        461,
+        1558
+      ],
+      "producer_localized_bbox": [
+        9,
+        1484,
+        342,
+        1552
+      ],
+      "derived_localized_bbox": [
+        9,
+        1484,
+        342,
+        1552
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        119,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_06",
+      "source_bbox": [
+        6,
+        1382,
+        360,
+        1462
+      ],
+      "producer_localized_bbox": [
+        8,
+        1388,
+        198,
+        1456
+      ],
+      "derived_localized_bbox": [
+        8,
+        1388,
+        198,
+        1456
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        162,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_07",
+      "source_bbox": [
+        1,
+        1286,
+        351,
+        1366
+      ],
+      "producer_localized_bbox": [
+        3,
+        1292,
+        129,
+        1360
+      ],
+      "derived_localized_bbox": [
+        3,
+        1292,
+        129,
+        1360
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        222,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_08",
+      "source_bbox": [
+        8,
+        1190,
+        468,
+        1270
+      ],
+      "producer_localized_bbox": [
+        10,
+        1196,
+        462,
+        1264
+      ],
+      "derived_localized_bbox": [
+        10,
+        1196,
+        462,
+        1264
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        6,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_09",
+      "source_bbox": [
+        6,
+        1094,
+        690,
+        1174
+      ],
+      "producer_localized_bbox": [
+        8,
+        1100,
+        543,
+        1168
+      ],
+      "derived_localized_bbox": [
+        8,
+        1100,
+        543,
+        1168
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        147,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_10",
+      "source_bbox": [
+        5,
+        1002,
+        735,
+        1082
+      ],
+      "producer_localized_bbox": [
+        7,
+        1008,
+        406,
+        1076
+      ],
+      "derived_localized_bbox": [
+        7,
+        1008,
+        406,
+        1076
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        329,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_11",
+      "source_bbox": [
+        5,
+        906,
+        613,
+        986
+      ],
+      "producer_localized_bbox": [
+        7,
+        912,
+        345,
+        980
+      ],
+      "derived_localized_bbox": [
+        7,
+        912,
+        345,
+        980
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        268,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_12",
+      "source_bbox": [
+        5,
+        810,
+        361,
+        890
+      ],
+      "producer_localized_bbox": [
+        7,
+        816,
+        196,
+        884
+      ],
+      "derived_localized_bbox": [
+        7,
+        816,
+        196,
+        884
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        165,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_13",
+      "source_bbox": [
+        7,
+        714,
+        512,
+        794
+      ],
+      "producer_localized_bbox": [
+        9,
+        720,
+        343,
+        788
+      ],
+      "derived_localized_bbox": [
+        9,
+        720,
+        343,
+        788
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        169,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_14",
+      "source_bbox": [
+        0,
+        618,
+        643,
+        698
+      ],
+      "producer_localized_bbox": [
+        2,
+        624,
+        274,
+        692
+      ],
+      "derived_localized_bbox": [
+        2,
+        624,
+        274,
+        692
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        369,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_15",
+      "source_bbox": [
+        1,
+        522,
+        769,
+        602
+      ],
+      "producer_localized_bbox": [
+        3,
+        528,
+        338,
+        596
+      ],
+      "derived_localized_bbox": [
+        3,
+        528,
+        338,
+        596
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        431,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_16",
+      "source_bbox": [
+        6,
+        426,
+        572,
+        506
+      ],
+      "producer_localized_bbox": [
+        8,
+        432,
+        211,
+        500
+      ],
+      "derived_localized_bbox": [
+        8,
+        432,
+        211,
+        500
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        361,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_17",
+      "source_bbox": [
+        7,
+        330,
+        571,
+        410
+      ],
+      "producer_localized_bbox": [
+        9,
+        336,
+        395,
+        404
+      ],
+      "derived_localized_bbox": [
+        9,
+        336,
+        395,
+        404
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        176,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_18",
+      "source_bbox": [
+        7,
+        234,
+        1017,
+        314
+      ],
+      "producer_localized_bbox": [
+        9,
+        240,
+        673,
+        308
+      ],
+      "derived_localized_bbox": [
+        9,
+        240,
+        673,
+        308
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        344,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_19",
+      "source_bbox": [
+        12,
+        140,
+        844,
+        218
+      ],
+      "producer_localized_bbox": [
+        14,
+        145,
+        482,
+        213
+      ],
+      "derived_localized_bbox": [
+        14,
+        145,
+        482,
+        213
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        362,
+        5,
+        5
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "region_20",
+      "source_bbox": [
+        12,
+        42,
+        666,
+        122
+      ],
+      "producer_localized_bbox": [
+        14,
+        48,
+        483,
+        116
+      ],
+      "derived_localized_bbox": [
+        14,
+        48,
+        483,
+        116
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        2,
+        183,
+        6,
+        6
+      ],
+      "result": "PASS"
+    }
+  ],
+  "changed_pixels_outside_allowed": 0,
+  "protected_mask_changed_pixels": 0,
+  "localized_overlap_pairs": [],
+  "protected_tokens": [],
+  "source_residue_diagnostic": [
+    {
+      "key": "region_00",
+      "source_footprint_pixels": 25213,
+      "exact_source_pixels_retained": 3258,
+      "ratio": 0.129219
+    },
+    {
+      "key": "region_01",
+      "source_footprint_pixels": 27639,
+      "exact_source_pixels_retained": 2423,
+      "ratio": 0.087666
+    },
+    {
+      "key": "region_02",
+      "source_footprint_pixels": 29072,
+      "exact_source_pixels_retained": 5777,
+      "ratio": 0.198714
+    },
+    {
+      "key": "region_03",
+      "source_footprint_pixels": 30680,
+      "exact_source_pixels_retained": 4145,
+      "ratio": 0.135104
+    },
+    {
+      "key": "region_04",
+      "source_footprint_pixels": 20772,
+      "exact_source_pixels_retained": 3344,
+      "ratio": 0.160986
+    },
+    {
+      "key": "region_05",
+      "source_footprint_pixels": 17426,
+      "exact_source_pixels_retained": 2090,
+      "ratio": 0.119936
+    },
+    {
+      "key": "region_06",
+      "source_footprint_pixels": 16424,
+      "exact_source_pixels_retained": 1815,
+      "ratio": 0.110509
+    },
+    {
+      "key": "region_07",
+      "source_footprint_pixels": 15193,
+      "exact_source_pixels_retained": 1700,
+      "ratio": 0.111894
+    },
+    {
+      "key": "region_08",
+      "source_footprint_pixels": 19997,
+      "exact_source_pixels_retained": 4375,
+      "ratio": 0.218783
+    },
+    {
+      "key": "region_09",
+      "source_footprint_pixels": 29533,
+      "exact_source_pixels_retained": 5184,
+      "ratio": 0.175532
+    },
+    {
+      "key": "region_10",
+      "source_footprint_pixels": 30304,
+      "exact_source_pixels_retained": 4569,
+      "ratio": 0.150772
+    },
+    {
+      "key": "region_11",
+      "source_footprint_pixels": 27218,
+      "exact_source_pixels_retained": 3614,
+      "ratio": 0.13278
+    },
+    {
+      "key": "region_12",
+      "source_footprint_pixels": 16245,
+      "exact_source_pixels_retained": 1670,
+      "ratio": 0.102801
+    },
+    {
+      "key": "region_13",
+      "source_footprint_pixels": 23185,
+      "exact_source_pixels_retained": 3994,
+      "ratio": 0.172267
+    },
+    {
+      "key": "region_14",
+      "source_footprint_pixels": 28278,
+      "exact_source_pixels_retained": 3020,
+      "ratio": 0.106797
+    },
+    {
+      "key": "region_15",
+      "source_footprint_pixels": 34507,
+      "exact_source_pixels_retained": 3367,
+      "ratio": 0.097574
+    },
+    {
+      "key": "region_16",
+      "source_footprint_pixels": 24950,
+      "exact_source_pixels_retained": 2234,
+      "ratio": 0.089539
+    },
+    {
+      "key": "region_17",
+      "source_footprint_pixels": 26316,
+      "exact_source_pixels_retained": 5359,
+      "ratio": 0.20364
+    },
+    {
+      "key": "region_18",
+      "source_footprint_pixels": 43528,
+      "exact_source_pixels_retained": 7571,
+      "ratio": 0.173934
+    },
+    {
+      "key": "region_19",
+      "source_footprint_pixels": 36766,
+      "exact_source_pixels_retained": 5706,
+      "ratio": 0.155198
+    },
+    {
+      "key": "region_20",
+      "source_footprint_pixels": 28897,
+      "exact_source_pixels_retained": 4513,
+      "ratio": 0.156175
+    }
+  ],
+  "machine_result": "PASS",
+  "controller_visual_qa": "PENDING",
+  "c3_strict": "PENDING",
+  "runtime_validation": "UNTESTED"
+}

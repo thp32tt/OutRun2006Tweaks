@@ -2693,3 +2693,10 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 ### B247 q62 — 2026-10-08 05:50 KST
 - q62 dcec31a1... producer machine+visual PASS: opaque Layer43 erase rectangles replaced by transparent atlas background; road/green edge continuous.
 - Fresh C + exact-SHA C3 -> PRE_INGAME/user review -> actual-game pending. RUNTIME_VALIDATION=UNTESTED.
+
+### C262R C1 — 2026-10-08 05:49 KST
+- TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL); resumed unfinished C262 q205/q193/q173 rather than duplicating completed work.
+- q205 e3d421a1...: 23/23 exact bbox, zero outside/protected/overlap/token change + fresh SOURCE/CLEAN/CURRENT/RAW visual PASS -> fresh C + exact-SHA C3_STRICT_PASS.
+- q193 e21851f5...: 3/3 exact bbox, zero outside/overlap + fresh visual/RAW PASS; C255 English ghost/double-draw absent -> fresh C + exact-SHA C3_STRICT_PASS.
+- q173 8783e565...: 21/21 exact bbox, zero outside/overlap + native canonical stage-family visual/RAW PASS -> fresh C + exact-SHA C3_STRICT_PASS.
+- PRE_INGAME English-original export/user JPG and NEW actual-game retest remain mandatory; static C does not close IGR-003/013/019/020/021/022/023. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.

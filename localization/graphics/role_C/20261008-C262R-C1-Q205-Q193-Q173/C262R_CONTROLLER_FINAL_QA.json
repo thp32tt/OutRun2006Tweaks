@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261008-C262R-C1-Q205-Q193-Q173",
+  "resumed_from": "20261008-C262-C1-Q205-Q193-Q173",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "selection_priority": "P0_USER_INGAME_THEN_P1_USER_INGAME",
+  "initial_selection_head": "158ed8b79d023bd75fef6b426ca72a862195b9d7",
+  "hosted_worker": {
+    "run_id": 37677039882,
+    "result": "CANCELLED_BEFORE_JOB_START",
+    "reason": "newer C2 dispatch replaced the single pending localization CPU concurrency slot"
+  },
+  "execution_backend": {
+    "primary_attempt": "CHATGPT_LOCAL",
+    "primary_result": "BLOCKED_GITHUB_DNS",
+    "fallback": "N100_MCP",
+    "fallback_reason": "hosted C262 cancelled before execution; exact candidate/source/clean/mask bytes were SHA-pinned and reverified before fallback",
+    "n100_scope": "isolated tmp/c262 and tmp/c264verify only; existing dirty worktrees untouched"
+  },
+  "assets": [
+    {
+      "queue_index": 205,
+      "asset": "ACF61D7C_1024x512.dds",
+      "user_regressions": [
+        "IGR-020",
+        "IGR-021",
+        "IGR-022",
+        "IGR-023"
+      ],
+      "candidate_sha256": "e3d421a165bdb6e7b3e1bda7b35a6d994d69017407e345d7a339a15d87f79088",
+      "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "machine_qa": "PASS_23_OF_23_EXACT_BBOX_ZERO_OUTSIDE_ZERO_PROTECTED_ZERO_OVERLAP",
+      "protected_tokens": {
+        "OutRun_changed_pixels": 0,
+        "OutRun2SP_changed_pixels": 0
+      },
+      "controller_visual_qa": "PASS_SOURCE_CLEAN_CURRENT_AND_RAW_FLIPY",
+      "visual_notes": "six B240 user-visible rows are native final-resolution; no enlarged-raster artifact, source ghost, clipping, broken Hangul, protected-token collision, or orientation defect observed",
+      "c3_strict": "PASS_EXACT_SHA",
+      "pre_ingame": "REFRESH_REQUIRED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "queue_index": 193,
+      "asset": "97E863AD_512x256.dds",
+      "user_regressions": [
+        "IGR-003",
+        "IGR-019"
+      ],
+      "candidate_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
+      "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "machine_qa": "PASS_3_OF_3_EXACT_BBOX_ZERO_OUTSIDE_ZERO_OVERLAP",
+      "controller_visual_qa": "PASS_SOURCE_CLEAN_CURRENT_AND_RAW_FLIPY",
+      "visual_notes": "C255 WELCOME/MULTIPLAYER/SHOWROOM English ghost and double-draw are absent; no rectangular clean-plate seam, clipping, or orientation defect observed",
+      "c3_strict": "PASS_EXACT_SHA",
+      "pre_ingame": "REFRESH_REQUIRED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "queue_index": 173,
+      "asset": "6DC89C6E_512x512.dds",
+      "user_regressions": [
+        "IGR-013"
+      ],
+      "candidate_sha256": "8783e565f205e03a805a9d2d9a78bd8f20a3896da52afe1a4c11d2d38be61830",
+      "source_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "machine_qa": "PASS_21_OF_21_EXACT_BBOX_ZERO_OUTSIDE_ZERO_OVERLAP",
+      "controller_visual_qa": "PASS_SOURCE_CLEAN_CURRENT_AND_RAW_FLIPY",
+      "visual_notes": "native canonical phonetic stage-name family is clean and readable; no source ghost, clipping, broken Hangul, overlap, or RAW/FLIP-Y direction defect observed",
+      "c3_strict": "PASS_EXACT_SHA",
+      "pre_ingame": "REFRESH_REQUIRED",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "decision": "3_OF_3_FRESH_C_PASS_AND_EXACT_SHA_C3_STRICT_PASS",
+  "source_residue_diagnostic_interpretation": "exact source-pixel coincidences in machine diagnostics are not morphology-specific residue detections; fresh visual SOURCE/CLEAN/CURRENT and RAW/FLIP-Y review found no visible surviving English glyphs",
+  "backlog_closure": "NOT_CLOSED_STATIC_ONLY",
+  "next_gate": "PRE_INGAME_ENGLISH_ORIGINAL_EXPORT_USER_REVIEW_THEN_NEW_ACTUAL_GAME_RETEST",
+  "forbidden_domains_touched": [],
+  "timestamp_kst": "2026-10-08T05:49:36+09:00"
+}

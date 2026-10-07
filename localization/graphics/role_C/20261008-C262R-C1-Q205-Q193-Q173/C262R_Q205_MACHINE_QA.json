@@ -1,0 +1,930 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261008-C262R-C1-Q205-Q193-Q173",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "fallback_backend": "N100_MCP_AFTER_HOSTED_C262_CANCELLED_BEFORE_START",
+  "queue_index": 205,
+  "asset": "ACF61D7C_1024x512.dds",
+  "candidate_sha256": "e3d421a165bdb6e7b3e1bda7b35a6d994d69017407e345d7a339a15d87f79088",
+  "expected_candidate_sha256": "e3d421a165bdb6e7b3e1bda7b35a6d994d69017407e345d7a339a15d87f79088",
+  "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+  "expected_source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+  "header_128_exact": true,
+  "dimensions": [
+    4096,
+    2048
+  ],
+  "raw_orientation": "mirror_y",
+  "rows": [
+    {
+      "key": "sorry_title",
+      "source_bbox": [
+        1846,
+        1893,
+        2097,
+        1946
+      ],
+      "producer_localized_bbox": [
+        1850,
+        1897,
+        2026,
+        1941
+      ],
+      "derived_localized_bbox": [
+        1850,
+        1897,
+        2026,
+        1941
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        71,
+        4,
+        5
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "sorry_body",
+      "source_bbox": [
+        1843,
+        1973,
+        2412,
+        2025
+      ],
+      "producer_localized_bbox": [
+        1847,
+        1977,
+        2175,
+        2021
+      ],
+      "derived_localized_bbox": [
+        1847,
+        1977,
+        2175,
+        2021
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        237,
+        4,
+        4
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "congrats_title",
+      "source_bbox": [
+        17,
+        1388,
+        891,
+        1470
+      ],
+      "producer_localized_bbox": [
+        21,
+        1393,
+        357,
+        1465
+      ],
+      "derived_localized_bbox": [
+        21,
+        1393,
+        357,
+        1465
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        534,
+        5,
+        5
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "congrats_body",
+      "source_bbox": [
+        11,
+        1503,
+        459,
+        1559
+      ],
+      "producer_localized_bbox": [
+        15,
+        1509,
+        399,
+        1553
+      ],
+      "derived_localized_bbox": [
+        15,
+        1509,
+        399,
+        1553
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        60,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "options",
+      "source_bbox": [
+        1591,
+        1423,
+        2316,
+        1568
+      ],
+      "producer_localized_bbox": [
+        1595,
+        1427,
+        1854,
+        1564
+      ],
+      "derived_localized_bbox": [
+        1595,
+        1427,
+        1854,
+        1564
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        462,
+        4,
+        4
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "rankings",
+      "source_bbox": [
+        33,
+        1245,
+        930,
+        1388
+      ],
+      "producer_localized_bbox": [
+        37,
+        1249,
+        275,
+        1384
+      ],
+      "derived_localized_bbox": [
+        37,
+        1249,
+        275,
+        1384
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        655,
+        4,
+        4
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "out_run_1p",
+      "source_bbox": [
+        1959,
+        1066,
+        2569,
+        1132
+      ],
+      "producer_localized_bbox": [
+        2200,
+        1071,
+        2477,
+        1127
+      ],
+      "derived_localized_bbox": [
+        2200,
+        1071,
+        2477,
+        1127
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        241,
+        92,
+        5,
+        5
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "view_rankings",
+      "source_bbox": [
+        3,
+        911,
+        1334,
+        977
+      ],
+      "producer_localized_bbox": [
+        7,
+        915,
+        612,
+        973
+      ],
+      "derived_localized_bbox": [
+        7,
+        915,
+        612,
+        973
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        722,
+        4,
+        4
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "enjoy_original",
+      "source_bbox": [
+        1807,
+        909,
+        2696,
+        975
+      ],
+      "producer_localized_bbox": [
+        2118,
+        913,
+        2332,
+        970
+      ],
+      "derived_localized_bbox": [
+        2118,
+        913,
+        2332,
+        970
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        311,
+        364,
+        4,
+        5
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "adjust_settings",
+      "source_bbox": [
+        1,
+        748,
+        1800,
+        814
+      ],
+      "producer_localized_bbox": [
+        5,
+        753,
+        353,
+        809
+      ],
+      "derived_localized_bbox": [
+        5,
+        753,
+        353,
+        809
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        1447,
+        5,
+        5
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "exchange_line1",
+      "source_bbox": [
+        10,
+        598,
+        641,
+        655
+      ],
+      "producer_localized_bbox": [
+        87,
+        602,
+        597,
+        650
+      ],
+      "derived_localized_bbox": [
+        87,
+        602,
+        597,
+        650
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        77,
+        44,
+        4,
+        5
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "exchange_line2",
+      "source_bbox": [
+        7,
+        670,
+        360,
+        717
+      ],
+      "producer_localized_bbox": [
+        11,
+        675,
+        155,
+        711
+      ],
+      "derived_localized_bbox": [
+        11,
+        675,
+        155,
+        711
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        205,
+        5,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "license_details",
+      "source_bbox": [
+        864,
+        435,
+        1383,
+        486
+      ],
+      "producer_localized_bbox": [
+        868,
+        440,
+        1056,
+        480
+      ],
+      "derived_localized_bbox": [
+        868,
+        440,
+        1056,
+        480
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        327,
+        5,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "yes",
+      "source_bbox": [
+        1512,
+        425,
+        1632,
+        478
+      ],
+      "producer_localized_bbox": [
+        1516,
+        435,
+        1540,
+        467
+      ],
+      "derived_localized_bbox": [
+        1516,
+        435,
+        1540,
+        467
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        92,
+        10,
+        11
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "no",
+      "source_bbox": [
+        1849,
+        425,
+        1925,
+        478
+      ],
+      "producer_localized_bbox": [
+        1853,
+        435,
+        1921,
+        467
+      ],
+      "derived_localized_bbox": [
+        1853,
+        435,
+        1921,
+        467
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        4,
+        10,
+        11
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "reverse",
+      "source_bbox": [
+        3624,
+        434,
+        3864,
+        478
+      ],
+      "producer_localized_bbox": [
+        3812,
+        440,
+        3860,
+        472
+      ],
+      "derived_localized_bbox": [
+        3812,
+        440,
+        3860,
+        472
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        188,
+        4,
+        6,
+        6
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "your_position",
+      "source_bbox": [
+        2544,
+        363,
+        2907,
+        401
+      ],
+      "producer_localized_bbox": [
+        2548,
+        368,
+        2628,
+        396
+      ],
+      "derived_localized_bbox": [
+        2548,
+        368,
+        2628,
+        396
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        279,
+        5,
+        5
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "ok",
+      "source_bbox": [
+        2933,
+        363,
+        2991,
+        401
+      ],
+      "producer_localized_bbox": [
+        2937,
+        368,
+        2977,
+        396
+      ],
+      "derived_localized_bbox": [
+        2937,
+        368,
+        2977,
+        396
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        14,
+        5,
+        5
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "local_mixed",
+      "source_bbox": [
+        4,
+        297,
+        328,
+        337
+      ],
+      "producer_localized_bbox": [
+        8,
+        301,
+        104,
+        333
+      ],
+      "derived_localized_bbox": [
+        8,
+        301,
+        104,
+        333
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        224,
+        4,
+        4
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "local_mt",
+      "source_bbox": [
+        389,
+        297,
+        625,
+        337
+      ],
+      "producer_localized_bbox": [
+        393,
+        301,
+        481,
+        333
+      ],
+      "derived_localized_bbox": [
+        393,
+        301,
+        481,
+        333
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        144,
+        4,
+        4
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "local_at",
+      "source_bbox": [
+        777,
+        297,
+        1001,
+        337
+      ],
+      "producer_localized_bbox": [
+        781,
+        301,
+        861,
+        333
+      ],
+      "derived_localized_bbox": [
+        781,
+        301,
+        861,
+        333
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        140,
+        4,
+        4
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "friends",
+      "source_bbox": [
+        1165,
+        296,
+        1372,
+        337
+      ],
+      "producer_localized_bbox": [
+        1169,
+        300,
+        1217,
+        332
+      ],
+      "derived_localized_bbox": [
+        1169,
+        300,
+        1217,
+        332
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        155,
+        4,
+        5
+      ],
+      "result": "PASS"
+    },
+    {
+      "key": "cancel",
+      "source_bbox": [
+        1559,
+        297,
+        1743,
+        337
+      ],
+      "producer_localized_bbox": [
+        1563,
+        301,
+        1611,
+        333
+      ],
+      "derived_localized_bbox": [
+        1563,
+        301,
+        1611,
+        333
+      ],
+      "bbox_exact": true,
+      "containment": true,
+      "size_ceiling": true,
+      "positive_margins": true,
+      "margins": [
+        4,
+        132,
+        4,
+        4
+      ],
+      "result": "PASS"
+    }
+  ],
+  "changed_pixels_outside_allowed": 0,
+  "protected_mask_changed_pixels": 0,
+  "localized_overlap_pairs": [],
+  "protected_tokens": [
+    {
+      "name": "OutRun",
+      "bbox": [
+        1959,
+        1066,
+        2184,
+        1121
+      ],
+      "changed_pixels": 0,
+      "result": "PASS"
+    },
+    {
+      "name": "OutRun2SP",
+      "bbox": [
+        2356,
+        909,
+        2696,
+        964
+      ],
+      "changed_pixels": 0,
+      "result": "PASS"
+    }
+  ],
+  "source_residue_diagnostic": [
+    {
+      "key": "sorry_title",
+      "source_footprint_pixels": 6428,
+      "exact_source_pixels_retained": 558,
+      "ratio": 0.086808
+    },
+    {
+      "key": "sorry_body",
+      "source_footprint_pixels": 13006,
+      "exact_source_pixels_retained": 630,
+      "ratio": 0.048439
+    },
+    {
+      "key": "congrats_title",
+      "source_footprint_pixels": 19245,
+      "exact_source_pixels_retained": 2186,
+      "ratio": 0.113588
+    },
+    {
+      "key": "congrats_body",
+      "source_footprint_pixels": 8823,
+      "exact_source_pixels_retained": 1105,
+      "ratio": 0.125241
+    },
+    {
+      "key": "options",
+      "source_footprint_pixels": 56371,
+      "exact_source_pixels_retained": 1550,
+      "ratio": 0.027496
+    },
+    {
+      "key": "rankings",
+      "source_footprint_pixels": 68359,
+      "exact_source_pixels_retained": 1834,
+      "ratio": 0.026829
+    },
+    {
+      "key": "out_run_1p",
+      "source_footprint_pixels": 8241,
+      "exact_source_pixels_retained": 1129,
+      "ratio": 0.136998
+    },
+    {
+      "key": "view_rankings",
+      "source_footprint_pixels": 31273,
+      "exact_source_pixels_retained": 149,
+      "ratio": 0.004764
+    },
+    {
+      "key": "enjoy_original",
+      "source_footprint_pixels": 13202,
+      "exact_source_pixels_retained": 1212,
+      "ratio": 0.091804
+    },
+    {
+      "key": "adjust_settings",
+      "source_footprint_pixels": 19406,
+      "exact_source_pixels_retained": 1223,
+      "ratio": 0.063022
+    },
+    {
+      "key": "exchange_line1",
+      "source_footprint_pixels": 8729,
+      "exact_source_pixels_retained": 817,
+      "ratio": 0.093596
+    },
+    {
+      "key": "exchange_line2",
+      "source_footprint_pixels": 6944,
+      "exact_source_pixels_retained": 1,
+      "ratio": 0.000144
+    },
+    {
+      "key": "license_details",
+      "source_footprint_pixels": 13574,
+      "exact_source_pixels_retained": 311,
+      "ratio": 0.022911
+    },
+    {
+      "key": "yes",
+      "source_footprint_pixels": 3218,
+      "exact_source_pixels_retained": 5,
+      "ratio": 0.001554
+    },
+    {
+      "key": "no",
+      "source_footprint_pixels": 2602,
+      "exact_source_pixels_retained": 0,
+      "ratio": 0.0
+    },
+    {
+      "key": "reverse",
+      "source_footprint_pixels": 5852,
+      "exact_source_pixels_retained": 16,
+      "ratio": 0.002734
+    },
+    {
+      "key": "your_position",
+      "source_footprint_pixels": 7404,
+      "exact_source_pixels_retained": 0,
+      "ratio": 0.0
+    },
+    {
+      "key": "ok",
+      "source_footprint_pixels": 1359,
+      "exact_source_pixels_retained": 0,
+      "ratio": 0.0
+    },
+    {
+      "key": "local_mixed",
+      "source_footprint_pixels": 7040,
+      "exact_source_pixels_retained": 1,
+      "ratio": 0.000142
+    },
+    {
+      "key": "local_mt",
+      "source_footprint_pixels": 4804,
+      "exact_source_pixels_retained": 1,
+      "ratio": 0.000208
+    },
+    {
+      "key": "local_at",
+      "source_footprint_pixels": 4423,
+      "exact_source_pixels_retained": 1,
+      "ratio": 0.000226
+    },
+    {
+      "key": "friends",
+      "source_footprint_pixels": 5009,
+      "exact_source_pixels_retained": 8,
+      "ratio": 0.001597
+    },
+    {
+      "key": "cancel",
+      "source_footprint_pixels": 4159,
+      "exact_source_pixels_retained": 1,
+      "ratio": 0.00024
+    }
+  ],
+  "machine_result": "PASS",
+  "controller_visual_qa": "PENDING",
+  "c3_strict": "PENDING",
+  "runtime_validation": "UNTESTED"
+}

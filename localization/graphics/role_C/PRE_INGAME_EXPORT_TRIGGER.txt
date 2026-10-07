@@ -1,6 +1,1 @@
-run=C263
-timestamp_kst=2026-10-08T05:03:26+09:00
-TEMP_BACKLOG_RELIEF=C2
-SHARD=EVEN
-queue_indices=104,112,116
-controller_report=localization/graphics/role_C/20261008-C263-C2-Q104-Q112-Q116/C263_CONTROLLER_FINAL_QA.json
+2026-10-08T05:49:36+09:00 C262R C1 q205 q193 q173 C3 pass refresh
