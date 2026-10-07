@@ -103,7 +103,16 @@ for spec in assets:
     asset=spec["asset"]; cand=repo/"localization/graphics/hd_candidates"/asset
     source_path=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"/asset
     clean_path=repo/spec["clean"]
-    cb=cand.read_bytes(); sb=source_path.read_bytes()
+    cb=cand.read_bytes()
+    if source_path.exists():
+        sb=source_path.read_bytes()
+    else:
+        import urllib.request
+        rel=asset.split("textures/load/",1)[1]
+        url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/"+rel
+        tmp=Path("/tmp")/(spec["key"]+"_source.dds")
+        urllib.request.urlretrieve(url,tmp)
+        sb=tmp.read_bytes()
     if sha(cb)!=spec["before_sha"]: raise RuntimeError((spec["key"],"candidate drift",sha(cb),spec["before_sha"]))
     if sha(sb)!=spec["source_sha"]: raise RuntimeError((spec["key"],"source drift",sha(sb),spec["source_sha"]))
     raw,old,meta=decode(cb,spec["expect_wh"]); sraw,source,smeta=decode(sb,spec["expect_wh"])
