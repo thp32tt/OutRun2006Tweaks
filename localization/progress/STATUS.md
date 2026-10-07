@@ -2714,3 +2714,8 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q62 33491F83: C3_STRICT_PASS @ dcec31a1...; opaque-white clean-plate rectangle resolved; PRE_INGAME/user/ingame pending.
 - q172 6C9B3611: REWORK_REQUIRED despite machine PASS — START/GOAL Korean labels are materially undersized (40.74% / 24.68% source width); C3 blocked.
 - RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.
+
+### C265 C2 q128/q130/q132 — 2026-10-08 06:41 KST
+- `TEMP_BACKLOG_RELIEF=C2`, `SHARD=EVEN`: q128 B214 `66f1b9ea8e0d...`, q130 B215 `2569b0a2ea31...`, q132 B216 `615281ac6673...` → fresh independent C PASS + exact-SHA **C3_STRICT_PASS**.
+- Visual recheck PASS: q128 source-left shared stage family; q130 source-left width hierarchy; q132 18px request family scale/weight. Exact containment remains q128 7/7, q130 5/5, q132 4/4 with positive margins and zero outside/alpha/protected/residue/overlap/touch.
+- PRE_INGAME refresh/user JPG/NEW actual-game retest pending. `RUNTIME_VALIDATION=UNTESTED`.

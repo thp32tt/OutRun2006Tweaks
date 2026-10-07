@@ -1,1 +1,1 @@
-2026-10-08T06:03:11+09:00 C264 C2 q212 q062 C3 pass refresh
+2026-10-08T06:41:49+09:00 C265 C2 q128 q130 q132 fresh C + exact-SHA C3 pass refresh

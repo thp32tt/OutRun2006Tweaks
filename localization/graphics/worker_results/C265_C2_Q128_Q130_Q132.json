@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "run": "C265",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "timestamp_kst": "2026-10-08T06:41:49+09:00",
+  "assets": [
+    {
+      "queue_index": 128,
+      "asset_key": "12519155",
+      "candidate_sha256": "66f1b9ea8e0d65afef09667ccfd1565e30406f9d08abde75fd3302e2c03e1f16",
+      "result": "C3_STRICT_PASS"
+    },
+    {
+      "queue_index": 130,
+      "asset_key": "1762489B",
+      "candidate_sha256": "2569b0a2ea319e02d13d04d5cb3ed38bf676d35b3972aa42cab573068238d48a",
+      "result": "C3_STRICT_PASS"
+    },
+    {
+      "queue_index": 132,
+      "asset_key": "1F5FE6E9",
+      "candidate_sha256": "615281ac66733323221916c506cda2fb9eb2f139866e98f1a9985e56ba7dde90",
+      "result": "C3_STRICT_PASS"
+    }
+  ],
+  "runtime_validation": "UNTESTED"
+}
