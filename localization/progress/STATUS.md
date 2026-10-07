@@ -2582,3 +2582,11 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - Exporter run 37635346311 SUCCESS / output c172461764dbc12979f4493118a83e18c785fcca; manifest count 34, localized 33, mandatory-C3-blocked 10.
 - q57 -> #018, q61 -> #019, q65 -> #020; exact source/candidate bindings verified and consolidated index review PASS.
 - User JPG acceptance + NEW actual-game retest pending; RUNTIME_VALIDATION=UNTESTED.
+
+
+### C255 C1 — 2026-10-08 00:10 KST
+- `TEMP_BACKLOG_RELIEF=C1` / `SHARD=ODD(+UNINDEXED_SPECIAL)`; unfinished C252 q63/q121/q193 evidence materially adjudicated.
+- q63 `48DEBE77` `f9262962...`: machine 3/3 PASS + FLIP-Y/CONTACTS/RAW controller PASS -> exact-SHA `C3_STRICT_PASS`; PRE_INGAME refresh pending.
+- q121 `FD90AA9` `03271f4a...`: visible English header silhouettes remain under Korean -> `REWORK_REQUIRED`, C3 blocked.
+- q193 `97E863AD` `f1c68aa4...`: WELCOME/MULTIPLAYER/SHOWROOM English bodies remain under Korean -> `REWORK_REQUIRED`, C3 blocked.
+- RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
