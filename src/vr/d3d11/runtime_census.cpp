@@ -1982,8 +1982,7 @@ namespace outrun::vr::dx11
                 productionObservation.semanticHandoffSnapshotMatches)
             {
                 translatedSemanticReceipt =
-                    productionObservation.semanticHandoff.
-                        translatedSemanticReceipt;
+                    productionObservation.semanticHandoff.translatedSemanticReceipt;
             }
             else
             {
