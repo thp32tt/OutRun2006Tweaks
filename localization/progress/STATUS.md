@@ -2335,3 +2335,7 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - Machine: 16/16 bbox/size/positive-margin; blast radius and alpha blast outside rework=0; protected changes=0; source-core residue=0; persisted decode/header/raw mirror_y PASS.
 - Controller: corrected source-direction right lean, clean removal, source-family style, practical 25% readability and RAW orientation PASS; no clipping/residue/broken Hangul/intrusion.
 - IGR-014/015/016 remain pending NEW actual in-game retest. PRE_INGAME refresh/user JPG review pending; RUNTIME_VALIDATION=UNTESTED.
+
+## 2026-10-07 14:10 KST — C232 q95 PRE_INGAME refreshed
+- GitHub worker 37575540241 SUCCESS; q95 exported as #002 `002_q095_37759842.jpg` with exact source/candidate SHA binding.
+- C232 C3 remains PASS; user JPG review + NEW actual in-game retest pending. RUNTIME_VALIDATION=UNTESTED.
