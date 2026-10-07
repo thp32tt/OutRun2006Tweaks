@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A156",
+  "timestamp_kst": "2026-10-07 10:35 KST",
+  "queue_index": 147,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+  "selection": {
+    "reason": "No active A-owned P0/P1, C-returned REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER row remained. Current PRE_INGAME English-original card #014 exposed a concrete source-proportion false negative in the historical C192-approved A49 candidate.",
+    "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/014_q147_39BCA907.jpg",
+    "prior_c_status": "C192_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b"
+  },
+  "defect": {
+    "tags": [
+      "HANGUL_HORIZONTAL_STRETCH",
+      "SOURCE_PROPORTION_FAMILY_MISMATCH"
+    ],
+    "evidence": "A49 forced each Korean stage row to approximately 92% of its English source bbox width. PRE_INGAME #014 shows unnaturally expanded Hangul skeletons despite numeric containment PASS."
+  },
+  "source_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+  "material_rework": {
+    "method": "Pinned canonical 2048x1024 RGBA32 source; exact source-alpha clean geometry; re-render all 15 canonical phonetic stage names directly in native Noto Sans CJK KR Black, source-height driven, 1px weight reinforcement, source-left +2px; no English-width quota.",
+    "prior_candidate_sha256": "6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b",
+    "candidate_sha256": "ab002e4f172ebe72b593914b92661c4f8137d50f8b073a22005fd175cff0153e",
+    "artificial_width_target_removed_rows": 15
+  },
+  "machine_qa": {
+    "target_occurrences": 15,
+    "bbox_source_size_positive_margin": "15/15 PASS",
+    "clean_changed_outside_source_text_mask": 0,
+    "decoded_changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_pixels_changed": 0,
+    "clean_source_pixels_unchanged": 0,
+    "final_source_residue_outside_korean": 0,
+    "localized_overlap_pairs": 0,
+    "localized_1px_touch_pairs": 0,
+    "stage_name_policy": "PASS_CANONICAL_PHONETIC_TRANSLITERATION",
+    "structure": "2048x1024 RGBA32 mip1 exact header",
+    "raw_orientation": "mirror_y"
+  },
+  "ordered_generation_gate": {
+    "1_source_text_removed_plate_restored": "PASS_EXACT_SOURCE_ALPHA_CLEAN",
+    "2_source_transform_direction": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "3_no_unnecessary_undersizing": "PASS_SOURCE_HEIGHT_DRIVEN_NATIVE_ASPECT",
+    "4_weight_outline_shadow": "PASS_NATIVE_BLACK_PLUS_1PX_WEIGHT_SOURCE_PROFILE",
+    "5_no_clipped_pixels": "PASS_15_OF_15_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_PROTECTED_CHANGE",
+    "7_flip_y_and_raw": "PASS_CONTROLLER_VISUAL_BOTH",
+    "8_immediate_readability_vs_source": "PASS_CONTROLLER_VISUAL_PROPORTION_REPAIRED"
+  },
+  "evidence": {
+    "worker_report": "localization/graphics/role_A/20261007-A-MANUALQA156-39BCA907/A156_39BCA907_REPORT.json",
+    "readable_compare": "localization/graphics/role_A/20261007-A-MANUALQA156-39BCA907/A156_39BCA907_SOURCE_CLEAN_FINAL.jpg",
+    "raw_compare": "localization/graphics/role_A/20261007-A-MANUALQA156-39BCA907/A156_39BCA907_FINAL_RAW_MIRROR_Y.jpg",
+    "prior_pre_ingame_card": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/014_q147_39BCA907.jpg"
+  },
+  "controller_visual_findings": [
+    "A49 forced-width Korean rows are visibly stretched versus natural Hangul proportions.",
+    "A156 restores natural Hangul aspect while keeping source-relative text height and left anchoring.",
+    "CLEAN plate is empty of source glyph residue; FINAL shows no clipping, overlap or protected-art intrusion.",
+    "RAW mirror_y evidence matches the source storage orientation policy."
+  ],
+  "controller_visual_qa": "PASS_SOURCE_A49_CLEAN_A156_READABLE_AND_RAW",
+  "producer_status": "A156_MANUAL_VISUAL_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
