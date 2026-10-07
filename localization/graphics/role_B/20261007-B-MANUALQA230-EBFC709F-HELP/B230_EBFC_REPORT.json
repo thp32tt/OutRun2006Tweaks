@@ -169,20 +169,41 @@
     "family_profile": "RECORDED",
     "rework_blast_radius": "PASS_ZERO_OUTSIDE_EXACT_TWO_HELP_BBOXES",
     "coverage": "PASS_6_PHYSICAL_LOCALIZED_TEXT_OCCURRENCES_ACROSS_4_SEMANTIC_SEGMENTS",
-    "mandatory_c3": "REQUIRED_BEFORE_PRE_INGAME_EXPORT_DUE_PRIOR_STYLE_FALSE_NEGATIVE_HISTORY"
+    "mandatory_c3": "REQUIRED_BEFORE_PRE_INGAME_EXPORT_DUE_PRIOR_STYLE_FALSE_NEGATIVE_HISTORY",
+    "controller_practical_scale_review": "PASS"
   },
   "ordered_generation_gate": {
-    "1_plate_restoration": "PASS_TRANSPARENT_HELP_PLATE",
-    "2_slant_direction": "PASS_SOURCE_UPRIGHT",
-    "3_no_unnecessary_undersizing": "PASS_MAX_NATIVE_HEIGHT_WITH_SOURCE_CONDENSED_PROFILE",
-    "4_source_weight_outline_shadow": "PASS_DARK_BOLD_NO_EXTRA_EFFECTS",
-    "5_no_clipping": "PASS_2_OF_2_POSITIVE_MARGIN",
-    "6_protected_clearance": "PASS_BASELINE_AND_PROTECTED_OUTSIDE_ZERO",
-    "7_flip_y_raw": "EVIDENCE_WRITTEN",
-    "8_immediate_readability": "PENDING_CONTROLLER"
+    "english_removal_and_plate_restoration": "PASS",
+    "slant_direction": "PASS_SOURCE_UPRIGHT",
+    "text_scale": "PASS_MAX_NATIVE_HEIGHT_WITH_SOURCE_CONDENSED_PROFILE",
+    "weight_outline_shadow": "PASS_DARK_BOLD_NO_EXTRA_EFFECTS",
+    "clipping": "PASS",
+    "protected_graphics": "PASS",
+    "flip_y_and_raw": "PASS",
+    "readability_vs_source": "PASS"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER",
-  "status": "B230_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_FRESH_C_C3",
+  "controller_visual_qa": {
+    "source_old_clean_final": "PASS",
+    "practical_scale_contact": "PASS_100_75_50",
+    "raw_mirror_y": "PASS",
+    "source_removal": "PASS_NO_VISIBLE_ENGLISH_HELP_RESIDUE",
+    "hierarchy": "PASS_HELP_ROWS_NEAR_SOURCE_HEIGHT_66_VS_70",
+    "typography": "PASS_SOURCE_DARK_CONDENSED_UPRIGHT_FAMILY",
+    "placement": "PASS_SOURCE_LEFT_2PX",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "protected_intrusion": "NONE_VISIBLE",
+    "glyph_integrity": "PASS",
+    "orientation_regression": "NONE_VISIBLE",
+    "observations": [
+      "C225R numeric/static pass had intentionally preserved two ordinary explanatory sentences in English; current coverage gate classifies both as localization omissions.",
+      "B230 removes only those two exact source-visible rows while preserving all four B219 Korean JOIN/CREATE headings pixel-exact outside the declared rework mask.",
+      "At 100%, 75% and 50% proxy display scales both Korean help rows remain immediately readable with source-like dark condensed hierarchy; no source residue or halo is visible.",
+      "RAW mirror-Y remains consistent with readable orientation."
+    ]
+  },
+  "status": "B230_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_self_qa_report": "localization/graphics/role_B/20261007-B-MANUALQA230-EBFC709F-HELP/B230_CONTROLLER_SELF_QA.json"
 }
