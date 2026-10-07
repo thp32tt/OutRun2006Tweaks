@@ -3184,3 +3184,8 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - PRE_INGAME English-original export refresh, user JPG acceptance and NEW actual-game retest remain pending. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Controller report: `localization/graphics/role_C/20261007-C253-C1-BATCH-Q147-Q197-Q241/C253_CONTROLLER_FINAL_QA.json`.
 
+
+### C251 PRE_INGAME refresh completion — 2026-10-07 22:44 KST
+- Persistent exporter run 37628830317 SUCCESS; worker output f9f7e5e19bb466807fddd068512d73941ef9e87a.
+- q54 FA7BBB13 is #017 017_q054_FA7BBB13.jpg: pinned English SHA 61c82072... native 4096x2048 scale1 vs exact candidate 5107c15a.... Controller final FLIP-Y+RAW exported-card review PASS.
+- q54 now C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_INGAME. q60/q212 remain blocked REWORK_REQUIRED. RUNTIME_VALIDATION=UNTESTED.

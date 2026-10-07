@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07T22:25:59+09:00",
+  "updated_at_kst": "2026-10-07T22:44:21+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -5217,7 +5217,7 @@
         "machine_qa": "PASS_17_OF_17_ZERO_SCOPE",
         "controller_visual_qa": "PASS",
         "c3_strict": "C3_STRICT_PASS_EXACT_SHA",
-        "decision": "PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_INGAME"
+        "decision": "C251_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_INGAME"
       },
       "q60": {
         "asset": "A064FDFC",
@@ -5244,13 +5244,19 @@
       }
     },
     "pre_ingame_export": {
-      "q54": "PENDING_REFRESH",
+      "q54": "PASS_REFRESHED_017_q054_FA7BBB13.jpg",
       "q60": "BLOCKED_REWORK_REQUIRED",
-      "q212": "BLOCKED_REWORK_REQUIRED"
+      "q212": "BLOCKED_REWORK_REQUIRED",
+      "worker_run": 37628830317,
+      "worker_output_commit": "f9f7e5e19bb466807fddd068512d73941ef9e87a",
+      "manifest_count": 28,
+      "q54_english_source_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "q54_candidate_sha256": "5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e",
+      "controller_export_review": "PASS_FLIPY_AND_RAW"
     },
     "runtime_validation": "UNTESTED",
     "actual_ingame_validation": "PENDING",
     "forbidden_domains_touched": [],
-    "final_decision": "Q54 PASS+C3; Q60 REWORK_REQUIRED; Q212 REWORK_REQUIRED"
+    "final_decision": "Q54 PASS+C3+PRE_INGAME_REFRESHED; Q60 REWORK_REQUIRED; Q212 REWORK_REQUIRED"
   }
 }

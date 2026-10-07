@@ -2564,3 +2564,7 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - Neutral-alpha SOURCE/PRIOR/CURRENT plus producer CLEAN/RAW evidence controller-reviewed PASS. q241 direct-RGB white fragments were verified alpha=0 hidden RGB, not visible residue.
 - Next: PRE_INGAME English-original refresh → user JPG review → NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
 
+
+### C251 exporter completion — 2026-10-07 22:44 KST
+- q54 PRE_INGAME refreshed as #017; exact source/candidate binding and FLIP-Y+RAW review PASS.
+- q60/q212 remain REWORK_REQUIRED; no runtime/in-game closure.
