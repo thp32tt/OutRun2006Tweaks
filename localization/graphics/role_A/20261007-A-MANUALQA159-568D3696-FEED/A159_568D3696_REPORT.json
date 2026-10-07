@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A159",
+  "index": 53,
+  "asset": "textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+  "trigger": "PRE_INGAME_CURRENT_POLICY_R4_TEXT_SCALE_HIERARCHY_FALSE_NEGATIVE",
+  "prior_c_status": "C_USERPOLICY02_PASS_PENDING_INGAME",
+  "prior_candidate_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
+  "source_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+  "candidate_sha256": "7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33",
+  "source_bbox": [
+    1988,
+    2061,
+    2445,
+    2164
+  ],
+  "prior_localized_bbox": [
+    2005,
+    2074,
+    2426,
+    2142
+  ],
+  "localized_bbox": [
+    1992,
+    2072,
+    2440,
+    2156
+  ],
+  "source_size": [
+    457,
+    103
+  ],
+  "prior_localized_size": [
+    421,
+    68
+  ],
+  "localized_size": [
+    448,
+    84
+  ],
+  "translation_change": {
+    "source": "Feed the girl!",
+    "prior": "여자친구에게 먹여 주세요!",
+    "korean": "여자친구에게 먹이세요!"
+  },
+  "render": {
+    "font_pattern": "Noto Sans CJK KR:style=Black",
+    "font_file": "NotoSansCJK-Regular.ttc",
+    "font_size": 69,
+    "horizontal_scale": 0.6578,
+    "style": "yellow fill + navy/white/navy layered outline",
+    "alignment": "source-left block-safe +2px"
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "1/1 PASS",
+    "changed_pixels_outside_exact_source_bbox": 0,
+    "alpha_changed_outside_exact_source_bbox": 0,
+    "clean_source_residue": 0,
+    "prior_candidate_exact_outside_target": true,
+    "changed_top_level_bc3_blocks": 2352,
+    "header_128_exact": true,
+    "mip_count_preserved": 13,
+    "raw_orientation": "mirror_y"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_VALIDATED_A_RECOVERY02_CLEAN",
+    "2_slant_direction": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "3_no_unnecessary_undersizing": "PASS_MATERIAL_HEIGHT_IMPROVEMENT",
+    "4_weight_outline_shadow": "PASS_SOURCE_YELLOW_NAVY_WHITE_FAMILY",
+    "5_clipping": "PASS_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_OUTSIDE_CHANGE",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "status": "A159_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
