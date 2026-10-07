@@ -10,6 +10,7 @@
 #include <unordered_set>
 #include <array>
 #include <new>
+#include <memory>
 #include <intrin.h>
 
 namespace OutRunVRHudInspector
@@ -440,8 +441,12 @@ public:
 		}
 	}
 
-	const uint8_t* getFileData(std::filesystem::path filename, size_t* size)
+	const uint8_t* getFileData(
+		std::filesystem::path filename, size_t* size,
+		std::shared_ptr<std::vector<uint8_t>>* transientOwner = nullptr)
 	{
+		if (transientOwner)
+			transientOwner->reset();
 		std::lock_guard _(mtx2);
 		auto it = cache.find(filename);
 		if (it == cache.end())
@@ -453,7 +458,47 @@ public:
 			cacheFile(filename);
 			it = cache.find(filename);
 			if (it == cache.end())
-				return nullptr;
+			{
+				// P0 visual-composition rule: an oversized replacement must not
+				// disappear merely because it is intentionally excluded from the
+				// bounded 32-bit VR LRU. Load it transiently for this D3DX create
+				// call; the wrapper keeps the owner alive until D3DX has consumed
+				// the memory, then releases it instead of retaining it in cache.
+				if (!transientOwner)
+					return nullptr;
+				std::ifstream file(filename, std::ios::binary | std::ios::ate);
+				if (!file)
+					return nullptr;
+				const std::streamsize streamSize = file.tellg();
+				if (streamSize <= 0)
+					return nullptr;
+				try
+				{
+					auto transient = std::make_shared<std::vector<uint8_t>>(
+						static_cast<std::size_t>(streamSize));
+					file.seekg(0, std::ios::beg);
+					if (!file.read(
+							reinterpret_cast<char*>(transient->data()), streamSize))
+						return nullptr;
+					if (size)
+						*size = transient->size();
+					*transientOwner = std::move(transient);
+					spdlog::info(
+						"VR texture replacement: transient-load {} ({} MiB) outside the {} MiB LRU; data lifetime is bounded to the D3DX create call",
+						filename.string(),
+						static_cast<std::size_t>(streamSize) / (1024 * 1024),
+						max_cache_size / (1024 * 1024));
+					return (*transientOwner)->data();
+				}
+				catch (const std::bad_alloc&)
+				{
+					spdlog::warn(
+						"VR texture replacement: transient allocation failed for {} ({} MiB); preserving original texture",
+						filename.string(),
+						static_cast<std::size_t>(streamSize) / (1024 * 1024));
+					return nullptr;
+				}
+			}
 		}
 
 		// Move the accessed file to the front of the LRU list
@@ -772,7 +817,10 @@ class TextureReplacement : public Hook
 
 	inline static const char* padType = nullptr;
 
-	static void HandleTexture(void** ppSrcData, UINT* pSrcDataSize, std::filesystem::path texturePackName, bool isUITexture)
+	static void HandleTexture(
+		void** ppSrcData, UINT* pSrcDataSize,
+		std::filesystem::path texturePackName, bool isUITexture,
+		std::shared_ptr<std::vector<uint8_t>>& transientOwner)
 	{
 		if (!*ppSrcData || !*pSrcDataSize) [[unlikely]]
 			return;
@@ -845,7 +893,8 @@ class TextureReplacement : public Hook
 			if (FileSystem.exists(path_load))
 			{
 				size_t size = 0;
-				const uint8_t* file = FileData.getFileData(path_load, &size);
+				const uint8_t* file = FileData.getFileData(
+					path_load, &size, &transientOwner);
 				if (file)
 				{
 					const DDS_FILE* newhead = (const DDS_FILE*)file;
@@ -900,7 +949,9 @@ class TextureReplacement : public Hook
 	{
 		if (pSrcData && SrcDataSize)
 		{
-			HandleTexture(&pSrcData, &SrcDataSize, CurrentXstsetFilename, true);
+			std::shared_ptr<std::vector<uint8_t>> transientTextureData;
+			HandleTexture(&pSrcData, &SrcDataSize, CurrentXstsetFilename, true,
+				transientTextureData);
 		}
 
 		// Call D3DXCreateTextureFromFileInMemoryEx instead of D3DXCreateTextureFromFileInMemory, so we can specify no mipmaps
@@ -911,7 +962,9 @@ class TextureReplacement : public Hook
 	{
 		if (pSrcData && SrcDataSize)
 		{
-			HandleTexture(&pSrcData, &SrcDataSize, CurrentXstsetFilename, true);
+			std::shared_ptr<std::vector<uint8_t>> transientTextureData;
+			HandleTexture(&pSrcData, &SrcDataSize, CurrentXstsetFilename, true,
+				transientTextureData);
 		}
 
 		// Call D3DXCreateTextureFromFileInMemoryEx instead of D3DXCreateTextureFromFileInMemory, so we can specify no mipmaps
@@ -932,7 +985,9 @@ class TextureReplacement : public Hook
 	{
 		if ((Settings::SceneTextureReplacement || Settings::SceneTextureExtract) && pSrcData && SrcDataSize)
 		{
-			HandleTexture(&pSrcData, &SrcDataSize, CurrentXmtsetFilename, false);
+			std::shared_ptr<std::vector<uint8_t>> transientTextureData;
+			HandleTexture(&pSrcData, &SrcDataSize, CurrentXmtsetFilename, false,
+				transientTextureData);
 		}
 
 		return D3DXCreateTextureFromFileInMemoryEx_Custom(pDevice, pSrcData, SrcDataSize, Width, Height, MipLevels, Usage, Format, Pool, Filter, MipFilter, ppTexture);
@@ -941,7 +996,9 @@ class TextureReplacement : public Hook
 	{
 		if ((Settings::SceneTextureReplacement || Settings::SceneTextureExtract) && pSrcData && SrcDataSize)
 		{
-			HandleTexture(&pSrcData, &SrcDataSize, CurrentXmtsetFilename, false);
+			std::shared_ptr<std::vector<uint8_t>> transientTextureData;
+			HandleTexture(&pSrcData, &SrcDataSize, CurrentXmtsetFilename, false,
+				transientTextureData);
 		}
 
 		return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(pDevice, pSrcData, SrcDataSize, Width, Height, MipLevels, Usage, Format, Pool, Filter, MipFilter, ColorKey, pSrcInfo, pPalette, ppTexture);
@@ -952,7 +1009,9 @@ class TextureReplacement : public Hook
 	{
 		if ((Settings::SceneTextureReplacement || Settings::SceneTextureExtract) && pSrcData && SrcDataSize)
 		{
-			HandleTexture(&pSrcData, &SrcDataSize, CurrentXmtsetFilename, false);
+			std::shared_ptr<std::vector<uint8_t>> transientTextureData;
+			HandleTexture(&pSrcData, &SrcDataSize, CurrentXmtsetFilename, false,
+				transientTextureData);
 		}
 
 		return D3DXCreateCubeTextureFromFileInMemoryEx.stdcall<HRESULT>(pDevice, pSrcData, SrcDataSize, Size, MipLevels, Usage, Format, Pool, Filter, MipFilter, ColorKey, pSrcInfo, pPalette, ppCubeTexture);
