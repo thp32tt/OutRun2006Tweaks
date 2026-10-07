@@ -74,9 +74,10 @@ def right_shear_layer(im, visual_shear=0.26):
     if bb is None: raise RuntimeError("empty transformed layer")
     return tr.crop(bb)
 
-sb=src_dds.read_bytes(); ob=cand.read_bytes()
+sb=src_dds.read_bytes(); currentb=cand.read_bytes(); ob=base_dds.read_bytes()
 if sha(sb)!=SOURCE_SHA: raise RuntimeError(("source drift",sha(sb)))
-if sha(ob)!=BEFORE_SHA: raise RuntimeError(("candidate drift",sha(ob)))
+if sha(currentb)!=CURRENT_INTERMEDIATE_SHA: raise RuntimeError(("current intermediate drift",sha(currentb),CURRENT_INTERMEDIATE_SHA))
+if sha(ob)!=BEFORE_SHA: raise RuntimeError(("C87 base drift",sha(ob),BEFORE_SHA))
 sraw,src,meta=decode(sb); oraw,old,ometa=decode(ob)
 if meta!=ometa or sb[:128]!=ob[:128]: raise RuntimeError("header/structure drift")
 if meta["mips"]!=1: raise RuntimeError(("unexpected mips",meta["mips"]))
