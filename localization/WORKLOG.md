@@ -2913,3 +2913,8 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Mandatory high-risk C3_STRICT_AUDIT PASS bound to exact candidate SHA `ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b`: slant/perspective, source removal, font/style fidelity, scale/readability, glyph integrity, protected separation, placement/hierarchy and FLIP-Y/RAW/practical-scale all PASS.
 - Decision `C232_C3_STRICT_PASS_STATIC_PENDING_PRE_INGAME_USER_JPG_AND_NEW_INGAME_RETEST`. IGR-014/015/016 advance only to C_STATIC_PASS_PENDING_INGAME_RETEST; they are not CLOSED without NEW actual-game evidence. PRE_INGAME English-original refresh/user JPG review remains pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_37759842_MACHINE_QA.json`, `localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_37759842_CONTROLLER_FINAL_QA.json`.
+
+## 2026-10-07 14:10 KST — C232 q95 PRE_INGAME export refresh complete
+- TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). GitHub-hosted exporter run `37575540241` SUCCESS.
+- q95 37759842 is PRE_INGAME #002 `002_q095_37759842.jpg`; English source SHA `7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5` and current Korean candidate SHA `ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b` verified in manifest.
+- Fresh C + C3 + English-original comparison export are complete. User JPG review and NEW actual in-game retest remain required; IGR-014/015/016 are not closed. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
