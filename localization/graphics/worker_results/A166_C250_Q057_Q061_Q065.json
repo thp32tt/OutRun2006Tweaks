@@ -1,0 +1,16 @@
+{
+  "role": "A",
+  "run": "20261007-A166-C250-Q057-Q061-Q065-STYLE-SEMANTIC",
+  "queue_indices": [
+    57,
+    61,
+    65
+  ],
+  "candidate_sha256": {
+    "q57": "d2831fcfd1bb8027fc129ff50e70c90c21094df13765daa3d5fb9c6fda3ae70a",
+    "q61": "df250af92785727f38d176f3b2569c9d6d2b0e7a3f7d296adaa2f5c343b1d71e",
+    "q65": "10d0e1899d8d167eb1dcb303429dd4dc7bdf09096e6c5720afce884cc32afe1f"
+  },
+  "status": "MACHINE_SELF_QA_PASS_PENDING_CONTROLLER_VISUAL",
+  "runtime_validation": "UNTESTED"
+}

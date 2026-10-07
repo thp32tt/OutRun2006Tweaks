@@ -1,0 +1,1031 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261007-A166-C250-Q057-Q061-Q065-STYLE-SEMANTIC",
+  "selection": {
+    "queue_indices": [
+      57,
+      61,
+      65
+    ],
+    "reason": "direct odd C250 REWORK_REQUIRED"
+  },
+  "execution_backend": "GITHUB_ACTIONS_REPOSITORY_BACKED_CPU_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILURE",
+  "assets": {
+    "q57": {
+      "queue_index": 57,
+      "asset": "39229D64",
+      "candidate_sha256": "d2831fcfd1bb8027fc129ff50e70c90c21094df13765daa3d5fb9c6fda3ae70a",
+      "source_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "machine_qa": {
+        "bbox_size_positive_margin": "7/7 PASS",
+        "changed_outside": 0,
+        "alpha_outside": 0,
+        "header_128_exact": true,
+        "mips": 1,
+        "raw_orientation": "mirror_y",
+        "persisted_decode": "PASS",
+        "per_region": [
+          {
+            "key": "mission_cleared",
+            "original_bbox": [
+              128,
+              256,
+              1587,
+              787
+            ],
+            "localized_bbox": [
+              186,
+              314,
+              1528,
+              728
+            ],
+            "source_size": [
+              1459,
+              531
+            ],
+            "localized_size": [
+              1342,
+              414
+            ],
+            "delta_left": 58,
+            "delta_right": 59,
+            "delta_top": 58,
+            "delta_bottom": 59,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          },
+          {
+            "key": "total_rank_green",
+            "original_bbox": [
+              512,
+              896,
+              1101,
+              1075
+            ],
+            "localized_bbox": [
+              535,
+              908,
+              1077,
+              1062
+            ],
+            "source_size": [
+              589,
+              179
+            ],
+            "localized_size": [
+              542,
+              154
+            ],
+            "delta_left": 23,
+            "delta_right": 24,
+            "delta_top": 12,
+            "delta_bottom": 13,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          },
+          {
+            "key": "special_request",
+            "original_bbox": [
+              1644,
+              1114,
+              2624,
+              1267
+            ],
+            "localized_bbox": [
+              1703,
+              1124,
+              2565,
+              1256
+            ],
+            "source_size": [
+              980,
+              153
+            ],
+            "localized_size": [
+              862,
+              132
+            ],
+            "delta_left": 59,
+            "delta_right": 59,
+            "delta_top": 10,
+            "delta_bottom": 11,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          },
+          {
+            "key": "mission_failed",
+            "original_bbox": [
+              1984,
+              1280,
+              3187,
+              1792
+            ],
+            "localized_bbox": [
+              2032,
+              1336,
+              3139,
+              1735
+            ],
+            "source_size": [
+              1203,
+              512
+            ],
+            "localized_size": [
+              1107,
+              399
+            ],
+            "delta_left": 48,
+            "delta_right": 48,
+            "delta_top": 56,
+            "delta_bottom": 57,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          },
+          {
+            "key": "total_rank_brown",
+            "original_bbox": [
+              717,
+              1915,
+              1318,
+              2099
+            ],
+            "localized_bbox": [
+              741,
+              1928,
+              1294,
+              2086
+            ],
+            "source_size": [
+              601,
+              184
+            ],
+            "localized_size": [
+              553,
+              158
+            ],
+            "delta_left": 24,
+            "delta_right": 24,
+            "delta_top": 13,
+            "delta_bottom": 13,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          },
+          {
+            "key": "total_rank_pink",
+            "original_bbox": [
+              2598,
+              1900,
+              3238,
+              2099
+            ],
+            "localized_bbox": [
+              2623,
+              1914,
+              3212,
+              2085
+            ],
+            "source_size": [
+              640,
+              199
+            ],
+            "localized_size": [
+              589,
+              171
+            ],
+            "delta_left": 25,
+            "delta_right": 26,
+            "delta_top": 14,
+            "delta_bottom": 14,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          },
+          {
+            "key": "special_request_alt",
+            "original_bbox": [
+              2280,
+              361,
+              3269,
+              514
+            ],
+            "localized_bbox": [
+              2339,
+              371,
+              3209,
+              503
+            ],
+            "source_size": [
+              989,
+              153
+            ],
+            "localized_size": [
+              870,
+              132
+            ],
+            "delta_left": 59,
+            "delta_right": 60,
+            "delta_top": 10,
+            "delta_bottom": 11,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          }
+        ]
+      },
+      "rows": [
+        {
+          "key": "mission_cleared",
+          "original_bbox": [
+            128,
+            256,
+            1587,
+            787
+          ],
+          "localized_bbox": [
+            186,
+            314,
+            1528,
+            728
+          ],
+          "text": "미션 성공!",
+          "right_slant": 0.18,
+          "fill_gradient": [
+            [
+              255,
+              196,
+              125
+            ],
+            [
+              255,
+              221,
+              164
+            ],
+            [
+              254,
+              167,
+              51
+            ]
+          ],
+          "inner": [
+            255,
+            227,
+            180,
+            255
+          ],
+          "outer": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "key": "total_rank_green",
+          "original_bbox": [
+            512,
+            896,
+            1101,
+            1075
+          ],
+          "localized_bbox": [
+            535,
+            908,
+            1077,
+            1062
+          ],
+          "text": "종합 랭크",
+          "right_slant": 0.18,
+          "fill_gradient": [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "inner": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "outer": [
+            8,
+            16,
+            57,
+            255
+          ]
+        },
+        {
+          "key": "special_request",
+          "original_bbox": [
+            1644,
+            1114,
+            2624,
+            1267
+          ],
+          "localized_bbox": [
+            1703,
+            1124,
+            2565,
+            1256
+          ],
+          "text": "스페셜 요청",
+          "right_slant": 0.17,
+          "fill_gradient": [
+            [
+              217,
+              189,
+              125
+            ],
+            [
+              235,
+              230,
+              189
+            ],
+            [
+              218,
+              199,
+              120
+            ]
+          ],
+          "inner": [
+            247,
+            239,
+            206,
+            255
+          ],
+          "outer": [
+            0,
+            2,
+            23,
+            255
+          ]
+        },
+        {
+          "key": "mission_failed",
+          "original_bbox": [
+            1984,
+            1280,
+            3187,
+            1792
+          ],
+          "localized_bbox": [
+            2032,
+            1336,
+            3139,
+            1735
+          ],
+          "text": "미션 실패!",
+          "right_slant": 0.18,
+          "fill_gradient": [
+            [
+              196,
+              227,
+              250
+            ],
+            [
+              230,
+              244,
+              254
+            ],
+            [
+              124,
+              197,
+              243
+            ]
+          ],
+          "inner": [
+            232,
+            247,
+            255,
+            255
+          ],
+          "outer": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "key": "total_rank_brown",
+          "original_bbox": [
+            717,
+            1915,
+            1318,
+            2099
+          ],
+          "localized_bbox": [
+            741,
+            1928,
+            1294,
+            2086
+          ],
+          "text": "종합 랭크",
+          "right_slant": 0.18,
+          "fill_gradient": [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "inner": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "outer": [
+            8,
+            16,
+            57,
+            255
+          ]
+        },
+        {
+          "key": "total_rank_pink",
+          "original_bbox": [
+            2598,
+            1900,
+            3238,
+            2099
+          ],
+          "localized_bbox": [
+            2623,
+            1914,
+            3212,
+            2085
+          ],
+          "text": "종합 랭크",
+          "right_slant": 0.18,
+          "fill_gradient": [
+            [
+              248,
+              190,
+              221
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "inner": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "outer": [
+            8,
+            16,
+            57,
+            255
+          ]
+        },
+        {
+          "key": "special_request_alt",
+          "original_bbox": [
+            2280,
+            361,
+            3269,
+            514
+          ],
+          "localized_bbox": [
+            2339,
+            371,
+            3209,
+            503
+          ],
+          "text": "스페셜 요청",
+          "right_slant": 0.17,
+          "fill_gradient": [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "inner": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "outer": [
+            18,
+            28,
+            70,
+            255
+          ]
+        }
+      ],
+      "trigger": "C250 style/slant/gradient-depth FAIL",
+      "controller_visual_qa": "PENDING"
+    },
+    "q61": {
+      "queue_index": 61,
+      "asset": "C4A2937B",
+      "candidate_sha256": "df250af92785727f38d176f3b2569c9d6d2b0e7a3f7d296adaa2f5c343b1d71e",
+      "source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "machine_qa": {
+        "bbox_size_positive_margin": "3/3 PASS",
+        "changed_outside": 0,
+        "alpha_outside": 0,
+        "header_128_exact": true,
+        "mips": 1,
+        "raw_orientation": "mirror_y",
+        "persisted_decode": "PASS",
+        "per_region": [
+          {
+            "key": "go_gate",
+            "original_bbox": [
+              2066,
+              998,
+              2548,
+              1106
+            ],
+            "localized_bbox": [
+              2080,
+              1010,
+              2533,
+              1094
+            ],
+            "source_size": [
+              482,
+              108
+            ],
+            "localized_size": [
+              453,
+              84
+            ],
+            "delta_left": 14,
+            "delta_right": 15,
+            "delta_top": 12,
+            "delta_bottom": 12,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          },
+          {
+            "key": "cut_line",
+            "original_bbox": [
+              2595,
+              998,
+              3029,
+              1106
+            ],
+            "localized_bbox": [
+              2608,
+              1010,
+              3016,
+              1094
+            ],
+            "source_size": [
+              434,
+              108
+            ],
+            "localized_size": [
+              408,
+              84
+            ],
+            "delta_left": 13,
+            "delta_right": 13,
+            "delta_top": 12,
+            "delta_bottom": 12,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          },
+          {
+            "key": "keep_passing",
+            "original_bbox": [
+              3067,
+              1022,
+              3568,
+              1106
+            ],
+            "localized_bbox": [
+              3082,
+              1031,
+              3553,
+              1097
+            ],
+            "source_size": [
+              501,
+              84
+            ],
+            "localized_size": [
+              471,
+              66
+            ],
+            "delta_left": 15,
+            "delta_right": 15,
+            "delta_top": 9,
+            "delta_bottom": 9,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          }
+        ]
+      },
+      "rows": [
+        {
+          "key": "go_gate",
+          "original_bbox": [
+            2066,
+            998,
+            2548,
+            1106
+          ],
+          "localized_bbox": [
+            2080,
+            1010,
+            2533,
+            1094
+          ],
+          "text": "게이트를 통과하세요!",
+          "style": "yellow gradient + white inner keyline + navy outer outline + right lean"
+        },
+        {
+          "key": "cut_line",
+          "original_bbox": [
+            2595,
+            998,
+            3029,
+            1106
+          ],
+          "localized_bbox": [
+            2608,
+            1010,
+            3016,
+            1094
+          ],
+          "text": "하트선을 통과하세요!",
+          "style": "yellow gradient + white inner keyline + navy outer outline + right lean"
+        },
+        {
+          "key": "keep_passing",
+          "original_bbox": [
+            3067,
+            1022,
+            3568,
+            1106
+          ],
+          "localized_bbox": [
+            3082,
+            1031,
+            3553,
+            1097
+          ],
+          "text": "계속 차량을 추월하세요!",
+          "style": "yellow gradient + white inner keyline + navy outer outline + right lean"
+        }
+      ],
+      "semantic_correction": {
+        "source": "Cut the line!",
+        "rejected": "라인을 끊으세요!",
+        "restored": "하트선을 통과하세요!"
+      },
+      "trigger": "C250 semantic + yellow/navy/white family FAIL",
+      "controller_visual_qa": "PENDING"
+    },
+    "q65": {
+      "queue_index": 65,
+      "asset": "EBEF6D20",
+      "candidate_sha256": "10d0e1899d8d167eb1dcb303429dd4dc7bdf09096e6c5720afce884cc32afe1f",
+      "source_sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+      "machine_qa": {
+        "bbox_size_positive_margin": "5/5 PASS",
+        "changed_outside": 0,
+        "alpha_outside": 0,
+        "header_128_exact": true,
+        "mips": 1,
+        "raw_orientation": "mirror_y",
+        "persisted_decode": "PASS",
+        "per_region": [
+          {
+            "key": "course",
+            "original_bbox": [
+              458,
+              1256,
+              745,
+              1340
+            ],
+            "localized_bbox": [
+              475,
+              1262,
+              728,
+              1334
+            ],
+            "source_size": [
+              287,
+              84
+            ],
+            "localized_size": [
+              253,
+              72
+            ],
+            "delta_left": 17,
+            "delta_right": 17,
+            "delta_top": 6,
+            "delta_bottom": 6,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          },
+          {
+            "key": "left",
+            "original_bbox": [
+              270,
+              1340,
+              520,
+              1470
+            ],
+            "localized_bbox": [
+              285,
+              1349,
+              505,
+              1461
+            ],
+            "source_size": [
+              250,
+              130
+            ],
+            "localized_size": [
+              220,
+              112
+            ],
+            "delta_left": 15,
+            "delta_right": 15,
+            "delta_top": 9,
+            "delta_bottom": 9,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          },
+          {
+            "key": "right",
+            "original_bbox": [
+              685,
+              1405,
+              874,
+              1470
+            ],
+            "localized_bbox": [
+              696,
+              1409,
+              862,
+              1465
+            ],
+            "source_size": [
+              189,
+              65
+            ],
+            "localized_size": [
+              166,
+              56
+            ],
+            "delta_left": 11,
+            "delta_right": 12,
+            "delta_top": 4,
+            "delta_bottom": 5,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          },
+          {
+            "key": "easy",
+            "original_bbox": [
+              102,
+              1470,
+              430,
+              1620
+            ],
+            "localized_bbox": [
+              121,
+              1480,
+              410,
+              1609
+            ],
+            "source_size": [
+              328,
+              150
+            ],
+            "localized_size": [
+              289,
+              129
+            ],
+            "delta_left": 19,
+            "delta_right": 20,
+            "delta_top": 10,
+            "delta_bottom": 11,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          },
+          {
+            "key": "hard",
+            "original_bbox": [
+              720,
+              1470,
+              1058,
+              1618
+            ],
+            "localized_bbox": [
+              740,
+              1480,
+              1037,
+              1607
+            ],
+            "source_size": [
+              338,
+              148
+            ],
+            "localized_size": [
+              297,
+              127
+            ],
+            "delta_left": 20,
+            "delta_right": 21,
+            "delta_top": 10,
+            "delta_bottom": 11,
+            "containment": "PASS",
+            "size_ceiling": "PASS",
+            "positive_margin": "PASS"
+          }
+        ]
+      },
+      "rows": [
+        {
+          "key": "course",
+          "original_bbox": [
+            458,
+            1256,
+            745,
+            1340
+          ],
+          "localized_bbox": [
+            475,
+            1262,
+            728,
+            1334
+          ],
+          "text": "코스",
+          "fill": [
+            255,
+            220,
+            40
+          ],
+          "style": "source-color gradient + white inner keyline + navy outer outline + right lean"
+        },
+        {
+          "key": "left",
+          "original_bbox": [
+            270,
+            1340,
+            520,
+            1470
+          ],
+          "localized_bbox": [
+            285,
+            1349,
+            505,
+            1461
+          ],
+          "text": "왼쪽",
+          "fill": [
+            50,
+            195,
+            240
+          ],
+          "style": "source-color gradient + white inner keyline + navy outer outline + right lean"
+        },
+        {
+          "key": "right",
+          "original_bbox": [
+            685,
+            1405,
+            874,
+            1470
+          ],
+          "localized_bbox": [
+            696,
+            1409,
+            862,
+            1465
+          ],
+          "text": "오른쪽",
+          "fill": [
+            245,
+            75,
+            95
+          ],
+          "style": "source-color gradient + white inner keyline + navy outer outline + right lean"
+        },
+        {
+          "key": "easy",
+          "original_bbox": [
+            102,
+            1470,
+            430,
+            1620
+          ],
+          "localized_bbox": [
+            121,
+            1480,
+            410,
+            1609
+          ],
+          "text": "쉬움",
+          "fill": [
+            105,
+            220,
+            60
+          ],
+          "style": "source-color gradient + white inner keyline + navy outer outline + right lean"
+        },
+        {
+          "key": "hard",
+          "original_bbox": [
+            720,
+            1470,
+            1058,
+            1618
+          ],
+          "localized_bbox": [
+            740,
+            1480,
+            1037,
+            1607
+          ],
+          "text": "어려움",
+          "fill": [
+            245,
+            75,
+            65
+          ],
+          "style": "source-color gradient + white inner keyline + navy outer outline + right lean"
+        }
+      ],
+      "easy_color_gate": "PASS_GREEN_NOT_CYAN",
+      "trigger": "C250 EASY green->cyan + slant/outline family FAIL",
+      "controller_visual_qa": "PENDING"
+    }
+  },
+  "ordered_generation_gate": {
+    "plate_restoration": "PASS",
+    "source_matching_slant": "PASS_STRENGTHENED_RIGHT_LEAN",
+    "no_undersizing": "PASS_POSITIVE_MARGIN",
+    "source_faithful_weight_effects": "PASS_GRADIENT_KEYLINE_OUTLINE_DEPTH",
+    "no_clipping": "PASS",
+    "protected_clearance": "PASS_ZERO_OUTSIDE",
+    "flip_y_raw": "EVIDENCE_WRITTEN",
+    "immediate_readability": "PENDING_CONTROLLER_VISUAL"
+  },
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "status": "A166_MACHINE_SELF_QA_PASS_PENDING_CONTROLLER_VISUAL"
+}
