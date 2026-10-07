@@ -143,17 +143,34 @@
     "roundtrip": "PASS"
   },
   "ordered_generation_gate": {
-    "1_plate_restoration": "PASS_SOURCE_HELP_ALPHA_CLEARED_TO_TRANSPARENT",
-    "2_slant_direction": "PASS_SOURCE_UPRIGHT_HELP_FAMILY",
-    "3_no_unnecessary_undersizing": "PASS_LARGEST_NATIVE_PER_ROW_FIT",
-    "4_source_weight_outline_shadow": "PASS_LOW_CONTRAST_PLAIN_SOURCE_FAMILY",
-    "5_no_clipping": "PASS_2_OF_2_POSITIVE_MARGIN",
-    "6_protected_clearance": "PASS_EXISTING_B73_AND_ALL_OTHER_CONTENT_PIXEL_EXACT",
-    "7_flip_y_raw": "EVIDENCE_WRITTEN",
-    "8_immediate_readability": "PENDING_CONTROLLER"
+    "english_removal_and_plate_restoration": "PASS",
+    "slant_direction": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "text_scale": "PASS_NATIVE_NEAR_SOURCE_HEIGHT",
+    "weight_outline_shadow": "PASS_SOURCE_LOW_CONTRAST_PLAIN",
+    "clipping": "PASS",
+    "protected_graphics": "PASS",
+    "flip_y_and_raw": "PASS",
+    "readability_vs_source": "PASS"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER",
+  "controller_visual_qa": {
+    "row_contact": "PASS_SOURCE_B73_CLEAN_B228",
+    "raw_mirror_y": "PASS",
+    "english_removal": "PASS_NO_VISIBLE_HELP_TEXT_RESIDUE",
+    "source_style": "PASS_LOW_CONTRAST_DARK_UPRIGHT_HELP_FAMILY",
+    "scale": "PASS_NEAR_SOURCE_HEIGHT_NATIVE_RENDER",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "protected_intrusion": "NONE_VISIBLE",
+    "orientation_regression": "NONE_VISIBLE",
+    "immediate_readability": "PASS",
+    "observations": [
+      "PRE_INGAME #022 showed two ordinary explanatory UI sentences still in English under C149; they are not song/title/brand/model/legal preserve-original content.",
+      "Both rows are now freshly native-rendered at 46px decoded height against 50px source height with positive margins and source-left placement.",
+      "The prior B73 localized headings, red pill labels, song titles, Alberto titles, BGM and unrelated artwork are pixel-exact outside the two selected source bboxes."
+    ]
+  },
   "runtime_validation": "UNTESTED",
-  "status": "B228_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "status": "B228_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_self_qa_report": "localization/graphics/role_B/20261007-B-MANUALQA228-E95DA5-HELP/B228_CONTROLLER_SELF_QA.json"
 }
