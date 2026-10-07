@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261008-A173-Q121-RESTORE-PRIOR-PLATE",
+  "queue_index": 121,
+  "asset": "FD90AA9",
+  "regression": "C255 English residue; A171/A172 rejected full-bbox plate rectangle",
+  "rejected_current_sha256": "7a7d1e6c62dca8d699dac689fabfb4314d7f6a5f35aeac130b9a8817afccea76",
+  "restored_prior_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+  "candidate_sha256": "7a7d1e6c62dca8d699dac689fabfb4314d7f6a5f35aeac130b9a8817afccea76",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "rows": [
+    {
+      "key": "select_game_mode",
+      "text": "게임 모드 선택",
+      "source_bbox": [
+        166,
+        819,
+        1166,
+        973
+      ],
+      "localized_bbox": [
+        341,
+        846,
+        990,
+        945
+      ],
+      "plate_rgba": [
+        115,
+        115,
+        115,
+        255
+      ],
+      "font": "Noto Sans CJK KR:style=Black",
+      "font_size": 108,
+      "shear": 0.28,
+      "removal_pixels": 154000,
+      "result": "PASS"
+    },
+    {
+      "key": "select_car",
+      "text": "차량 선택",
+      "source_bbox": [
+        243,
+        947,
+        1156,
+        1111
+      ],
+      "localized_bbox": [
+        485,
+        979,
+        913,
+        1078
+      ],
+      "plate_rgba": [
+        115,
+        115,
+        115,
+        255
+      ],
+      "font": "Noto Sans CJK KR:style=Black",
+      "font_size": 108,
+      "shear": 0.28,
+      "removal_pixels": 149732,
+      "result": "PASS"
+    },
+    {
+      "key": "select_course",
+      "text": "코스 선택",
+      "source_bbox": [
+        302,
+        1062,
+        1085,
+        1213
+      ],
+      "localized_bbox": [
+        478,
+        1088,
+        908,
+        1187
+      ],
+      "plate_rgba": [
+        115,
+        115,
+        115,
+        255
+      ],
+      "font": "Noto Sans CJK KR:style=Black",
+      "font_size": 108,
+      "shear": 0.28,
+      "removal_pixels": 118233,
+      "result": "PASS"
+    }
+  ],
+  "construction": "restore true pre-A171 A138 atlas plate, remove source+Korean text/effects with text-shaped masks only, locally rebuild masked pixels, then fresh native Korean render",
+  "machine_qa": {
+    "bbox_size_positive_margin": "3/3 PASS",
+    "changed_outside_vs_A138_prior": 0,
+    "alpha_outside_vs_A138_prior": 0,
+    "header_128_exact": true,
+    "persisted_decode": "PASS",
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "status": "A173_Q121_MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
+  "forbidden_domains_touched": []
+}

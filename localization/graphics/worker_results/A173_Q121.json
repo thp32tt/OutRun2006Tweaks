@@ -1,0 +1,10 @@
+{
+  "run": "20261008-A173-Q121-RESTORE-PRIOR-PLATE",
+  "index": 121,
+  "asset": "FD90AA9",
+  "rejected_current": "7a7d1e6c62dca8d699dac689fabfb4314d7f6a5f35aeac130b9a8817afccea76",
+  "restored_prior": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+  "after": "7a7d1e6c62dca8d699dac689fabfb4314d7f6a5f35aeac130b9a8817afccea76",
+  "status": "A173_Q121_MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
+  "runtime_validation": "UNTESTED"
+}
