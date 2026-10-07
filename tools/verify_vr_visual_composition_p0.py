@@ -81,6 +81,24 @@ require('ExactScreenHudRight_ClipSpriteCalls', ui, 'right-side SCREEN_HUD produc
 require('ExactScreenHudLeft_ClipSpriteCalls', ui, 'left-side SCREEN_HUD producer set')
 require('ExactScreenHudRight_putClipSprite', ui, 'right-side exact producer wrapper')
 require('ExactScreenHudLeft_putClipSprite', ui, 'left-side exact producer wrapper')
+for token in ['0xBEB98','0xBED83','0xBED9E','0xBEDAE']:
+    require(token, ui, 'canonical NaviPub -> sub_4BAD20 SCREEN_HUD call site')
+require('RankMarkerSubScreenHudCall', ui, 'NaviPub exact sub_4BAD20 screen ownership predicate')
+require('RankMarkerSubSemanticDest', ui, 'sub_4BAD20 caller semantic wrapper')
+rank_sprani = function_body(ui, 'static int __cdecl RankMarker_sprani(')
+require_order(
+    rank_sprani, 'screen-owned sub_4BAD20 must outrank projected/world marker tagging',
+    'if (RankMarkerSubScreenHudDepth != 0)',
+    'RenderScope::ScreenHud',
+    'const bool projected = RankMarkerProjectedInfo.valid'
+)
+rank_clip = function_body(ui, 'static int __cdecl RankMarker_putClipSprite(')
+require_order(
+    rank_clip, 'screen-owned 4th+ rank digits must outrank projected/world tagging',
+    'if (RankMarkerSubScreenHudDepth != 0)',
+    'RenderScope::ScreenHud',
+    'const bool projected = RankMarkerProjectedInfo.valid'
+)
 
 # Direct put_sprite_ex/put_sprite_ex2 producers cover the remaining exact semantic families
 # (WORLD_HEART, C2C speech/hearts, etc.) without hot-path stack walking.
