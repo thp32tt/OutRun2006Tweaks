@@ -1,0 +1,11 @@
+{
+  "role": "A",
+  "run": "20261007-A165R-Q028-A05BF610-CLEAN-RETRY",
+  "queue_index": 28,
+  "asset": "A05BF610",
+  "work_stolen_from_lane": "B",
+  "candidate_sha256": "567f37b20c5dabd377e4c83e14baca52e69552c033dab300bbac5606daa37d90",
+  "status": "STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL",
+  "report": "localization/graphics/role_A/20261007-A165R-Q028-A05BF610-CLEAN-RETRY/A165R_Q028_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}

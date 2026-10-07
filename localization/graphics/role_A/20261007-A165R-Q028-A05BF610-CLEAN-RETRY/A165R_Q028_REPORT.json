@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261007-A165R-Q028-A05BF610-CLEAN-RETRY",
+  "queue_index": 28,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+  "work_stolen_from_lane": "B",
+  "trigger": "A165_CONTROLLER_CLEAN_PLATE_RECTANGLE_REJECT_AFTER_C245_UNDERSIZE_REWORK",
+  "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+  "a144_candidate_sha256": "aa0692a2918326a494c1b04837603313faac7bdd9b7f043d4b679a8e8b1493f9",
+  "a165_rejected_candidate_sha256": "372d2f4056308fbbfef04fdf1735a6c722aecca9246d7b121f27b28f86479a72",
+  "candidate_sha256": "567f37b20c5dabd377e4c83e14baca52e69552c033dab300bbac5606daa37d90",
+  "clean_plate": {
+    "method": "local cubic polynomial fit from 32px intact canonical-source ring; exact source bbox only",
+    "edge_mean_abs_rgb_delta": 1.4265,
+    "edge_p95_abs_rgb_delta": 4.0
+  },
+  "row": {
+    "original_bbox": [
+      543,
+      1185,
+      1068,
+      1275
+    ],
+    "localized_bbox": [
+      567,
+      1190,
+      1043,
+      1270
+    ],
+    "source_size": [
+      525,
+      90
+    ],
+    "localized_size": [
+      476,
+      80
+    ],
+    "margins": [
+      24,
+      25,
+      5,
+      5
+    ],
+    "width_ratio": 0.9067,
+    "font_file": "NotoSansCJK-Bold.ttc",
+    "font_index": 1,
+    "font_size": 80,
+    "stroke": 3,
+    "readable_right_slant": 0.3
+  },
+  "machine_qa": {
+    "bbox_size_positive_margin": "PASS",
+    "changed_pixels_outside_box_vs_a165": 0,
+    "changed_pixels_outside_box_vs_a144": 0,
+    "alpha_changes_outside_box": 0,
+    "header_128_exact": true,
+    "mip_count": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PENDING_CONTROLLER_VISUAL_POLYNOMIAL_CLEAN",
+    "2_slant_direction": "PASS_RIGHT_0.30",
+    "3_no_undersizing": "PASS_NEAR_90_PERCENT_SOURCE_WIDTH",
+    "4_weight_outline_shadow": "PASS_WHITE_NAVY_SOURCE_FAMILY",
+    "5_no_clipping": "PASS_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_OUTSIDE_BOX",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER_VISUAL"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3_strict_audit": "REQUIRED_EXACT_SHA",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
