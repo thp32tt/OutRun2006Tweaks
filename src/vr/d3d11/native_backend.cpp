@@ -9850,6 +9850,220 @@ bool validate_programmable_shader_translated_artifact_receipt_snapshot(
         current.reviewSnapshotToken == reviewSnapshotToken;
 }
 
+NativeProgrammableShaderTargetMaterializationContractEvidence
+derive_programmable_shader_target_materialization_contract(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslatedArtifactReceiptEvidence&
+        translatedArtifactReceipt,
+    std::uint64_t translatedArtifactReceiptSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken) noexcept {
+    NativeProgrammableShaderTargetMaterializationContractEvidence out{};
+
+    constexpr char kEntryPoint[] = "main";
+    constexpr char kVertexTargetProfile[] = "vs_4_0";
+    constexpr char kPixelTargetProfile[] = "ps_4_0";
+    constexpr std::uint32_t kCompileFlags =
+        D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3;
+
+    out.cacheKey = sourceIdentity.cacheKey;
+    out.targetVertexBytecodeReceiptIdentity =
+        translatedArtifactReceipt.targetVertexBytecodeReceiptIdentity;
+    out.targetPixelBytecodeReceiptIdentity =
+        translatedArtifactReceipt.targetPixelBytecodeReceiptIdentity;
+    out.entryPointHash = hash_observation_payload_bytes(
+        kEntryPoint, static_cast<UINT>(sizeof(kEntryPoint) - 1));
+    out.vertexTargetProfileHash = hash_observation_payload_bytes(
+        kVertexTargetProfile,
+        static_cast<UINT>(sizeof(kVertexTargetProfile) - 1));
+    out.pixelTargetProfileHash = hash_observation_payload_bytes(
+        kPixelTargetProfile,
+        static_cast<UINT>(sizeof(kPixelTargetProfile) - 1));
+    out.compileFlags = kCompileFlags;
+    out.translatorRevisionHash = translationPlan.translatorRevisionHash;
+    out.semanticContractHash = translationPlan.semanticContractHash;
+    out.translatedArtifactReceiptSnapshotToken =
+        translatedArtifactReceiptSnapshotToken;
+    out.translationPlanSnapshotToken = translationPlanSnapshotToken;
+
+    out.inputValid =
+        translatedArtifactReceiptSnapshotToken != 0 &&
+        translationPlanSnapshotToken != 0;
+    out.sourceIdentityExact =
+        sourceIdentity.exact_identity() &&
+        !sourceIdentity.translationImplemented;
+    out.translatedArtifactReceiptReady =
+        translatedArtifactReceipt.reviewReady &&
+        translatedArtifactReceipt.boundaryPreserved &&
+        translatedArtifactReceipt.diagnosticOnly &&
+        translatedArtifactReceipt.cacheIdentityMatches &&
+        translatedArtifactReceipt.targetVertexIdentityDefined &&
+        translatedArtifactReceipt.targetPixelIdentityDefined &&
+        translatedArtifactReceipt.targetBytecodeReceiptRequired &&
+        !translatedArtifactReceipt.targetBytecodeMaterialized &&
+        !translatedArtifactReceipt.objectCreationAuthorized &&
+        translatedArtifactReceipt.reviewSnapshotToken != 0;
+    out.translatedArtifactReceiptSnapshotMatches =
+        out.translatedArtifactReceiptReady &&
+        translatedArtifactReceipt.reviewSnapshotToken ==
+            translatedArtifactReceiptSnapshotToken;
+    out.translationPlanReady =
+        translationPlan.reviewReady &&
+        translationPlan.boundaryPreserved &&
+        translationPlan.diagnosticOnly &&
+        translationPlan.provenanceMatches &&
+        translationPlan.vertexSemanticExact &&
+        translationPlan.pixelSemanticExact &&
+        translationPlan.translatorRevisionHash != 0 &&
+        translationPlan.semanticContractHash != 0 &&
+        translationPlan.reviewSnapshotToken != 0;
+    out.translationPlanSnapshotMatches =
+        out.translationPlanReady &&
+        translationPlan.reviewSnapshotToken == translationPlanSnapshotToken;
+    out.cacheIdentityMatches =
+        out.sourceIdentityExact &&
+        out.translatedArtifactReceiptSnapshotMatches &&
+        out.translationPlanSnapshotMatches &&
+        sourceIdentity.cacheKey != 0 &&
+        sourceIdentity.cacheKey == translatedArtifactReceipt.cacheKey &&
+        sourceIdentity.cacheKey == translationPlan.cacheKey;
+    out.targetArtifactIdentityMatches =
+        out.cacheIdentityMatches &&
+        translatedArtifactReceipt.targetVertexBytecodeReceiptIdentity != 0 &&
+        translatedArtifactReceipt.targetPixelBytecodeReceiptIdentity != 0 &&
+        translatedArtifactReceipt.targetVertexBytecodeReceiptIdentity !=
+            translatedArtifactReceipt.targetPixelBytecodeReceiptIdentity &&
+        translatedArtifactReceipt.translatorRevisionHash ==
+            translationPlan.translatorRevisionHash &&
+        translatedArtifactReceipt.semanticContractHash ==
+            translationPlan.semanticContractHash;
+
+    out.entryPointExact = out.entryPointHash != 0;
+    out.vertexTargetProfileExact = out.vertexTargetProfileHash != 0;
+    out.pixelTargetProfileExact = out.pixelTargetProfileHash != 0;
+    out.compileFlagsExact =
+        out.compileFlags ==
+            (D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3);
+
+    if (out.targetArtifactIdentityMatches &&
+        out.entryPointExact &&
+        out.vertexTargetProfileExact &&
+        out.pixelTargetProfileExact &&
+        out.compileFlagsExact) {
+        std::uint64_t vertexContract = 0xcbf29ce484222325ull;
+        vertexContract = mix_readiness_snapshot_token(
+            vertexContract, out.targetVertexBytecodeReceiptIdentity);
+        vertexContract = mix_readiness_snapshot_token(
+            vertexContract, out.entryPointHash);
+        vertexContract = mix_readiness_snapshot_token(
+            vertexContract, out.vertexTargetProfileHash);
+        vertexContract = mix_readiness_snapshot_token(
+            vertexContract, out.compileFlags);
+        vertexContract = mix_readiness_snapshot_token(
+            vertexContract, out.translatorRevisionHash);
+        vertexContract = mix_readiness_snapshot_token(
+            vertexContract, out.semanticContractHash);
+        vertexContract = mix_readiness_snapshot_token(vertexContract, 0x28201u);
+        out.vertexCompileContractIdentity =
+            vertexContract == 0 ? 1 : vertexContract;
+
+        std::uint64_t pixelContract = 0xcbf29ce484222325ull;
+        pixelContract = mix_readiness_snapshot_token(
+            pixelContract, out.targetPixelBytecodeReceiptIdentity);
+        pixelContract = mix_readiness_snapshot_token(
+            pixelContract, out.entryPointHash);
+        pixelContract = mix_readiness_snapshot_token(
+            pixelContract, out.pixelTargetProfileHash);
+        pixelContract = mix_readiness_snapshot_token(
+            pixelContract, out.compileFlags);
+        pixelContract = mix_readiness_snapshot_token(
+            pixelContract, out.translatorRevisionHash);
+        pixelContract = mix_readiness_snapshot_token(
+            pixelContract, out.semanticContractHash);
+        pixelContract = mix_readiness_snapshot_token(pixelContract, 0x28202u);
+        out.pixelCompileContractIdentity =
+            pixelContract == 0 ? 1 : pixelContract;
+    }
+
+    out.targetBytecodeMaterializationRequired =
+        out.vertexCompileContractIdentity != 0 &&
+        out.pixelCompileContractIdentity != 0 &&
+        out.vertexCompileContractIdentity != out.pixelCompileContractIdentity;
+
+    // R282 defines only the exact compiler/materialization identity. Actual
+    // translated source/bytecode production is a later boundary.
+    out.targetBytecodeMaterialized = false;
+    out.compilationAuthorized = false;
+    out.objectCreationAuthorized = false;
+    out.diagnosticOnly = true;
+    out.boundaryPreserved =
+        out.targetArtifactIdentityMatches &&
+        out.targetBytecodeMaterializationRequired &&
+        !out.targetBytecodeMaterialized &&
+        !out.compilationAuthorized &&
+        !out.objectCreationAuthorized &&
+        out.diagnosticOnly;
+    out.reviewReady = out.inputValid && out.boundaryPreserved;
+
+    if (out.reviewReady) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
+        token = mix_readiness_snapshot_token(
+            token, out.vertexCompileContractIdentity);
+        token = mix_readiness_snapshot_token(
+            token, out.pixelCompileContractIdentity);
+        token = mix_readiness_snapshot_token(
+            token, out.translatedArtifactReceiptSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.translationPlanSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.targetBytecodeMaterializationRequired ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.targetBytecodeMaterialized ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.compilationAuthorized ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.objectCreationAuthorized ? 1u : 0u);
+        token = mix_readiness_snapshot_token(token, 0x282u);
+        out.reviewSnapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_programmable_shader_target_materialization_contract_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslatedArtifactReceiptEvidence&
+        translatedArtifactReceipt,
+    std::uint64_t translatedArtifactReceiptSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept {
+    if (reviewSnapshotToken == 0)
+        return false;
+    const auto current =
+        derive_programmable_shader_target_materialization_contract(
+            sourceIdentity,
+            translatedArtifactReceipt,
+            translatedArtifactReceiptSnapshotToken,
+            translationPlan,
+            translationPlanSnapshotToken);
+    return current.reviewReady &&
+        current.boundaryPreserved &&
+        current.translatedArtifactReceiptSnapshotMatches &&
+        current.translationPlanSnapshotMatches &&
+        current.cacheIdentityMatches &&
+        current.targetArtifactIdentityMatches &&
+        current.entryPointExact &&
+        current.vertexTargetProfileExact &&
+        current.pixelTargetProfileExact &&
+        current.compileFlagsExact &&
+        current.targetBytecodeMaterializationRequired &&
+        !current.targetBytecodeMaterialized &&
+        !current.compilationAuthorized &&
+        !current.objectCreationAuthorized &&
+        current.reviewSnapshotToken == reviewSnapshotToken;
+}
+
 NativeProgrammableShaderTranslatedSemanticReceipt
 compose_programmable_shader_translated_semantic_receipt(
     const ProgrammableShaderPairCacheIdentity& sourceIdentity,

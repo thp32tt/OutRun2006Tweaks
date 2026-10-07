@@ -5657,6 +5657,74 @@ int main()
         r281StaleHandoffReceipt.reviewSnapshotToken == 0,
         "R281 translated artifact receipt rejects stale R280 handoff identity");
 
+    const auto r282TargetMaterializationContract =
+        outrun::vr::dx11::
+            derive_programmable_shader_target_materialization_contract(
+                programmablePair,
+                r281TranslatedArtifactReceipt,
+                r281TranslatedArtifactReceipt.reviewSnapshotToken,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken);
+    require(
+        r282TargetMaterializationContract.inputValid &&
+        r282TargetMaterializationContract.sourceIdentityExact &&
+        r282TargetMaterializationContract.translatedArtifactReceiptReady &&
+        r282TargetMaterializationContract.
+            translatedArtifactReceiptSnapshotMatches &&
+        r282TargetMaterializationContract.translationPlanReady &&
+        r282TargetMaterializationContract.translationPlanSnapshotMatches &&
+        r282TargetMaterializationContract.cacheIdentityMatches &&
+        r282TargetMaterializationContract.targetArtifactIdentityMatches &&
+        r282TargetMaterializationContract.entryPointExact &&
+        r282TargetMaterializationContract.vertexTargetProfileExact &&
+        r282TargetMaterializationContract.pixelTargetProfileExact &&
+        r282TargetMaterializationContract.compileFlagsExact &&
+        r282TargetMaterializationContract.targetBytecodeMaterializationRequired &&
+        !r282TargetMaterializationContract.targetBytecodeMaterialized &&
+        !r282TargetMaterializationContract.compilationAuthorized &&
+        !r282TargetMaterializationContract.objectCreationAuthorized &&
+        r282TargetMaterializationContract.diagnosticOnly &&
+        r282TargetMaterializationContract.boundaryPreserved &&
+        r282TargetMaterializationContract.reviewReady &&
+        r282TargetMaterializationContract.vertexCompileContractIdentity != 0 &&
+        r282TargetMaterializationContract.pixelCompileContractIdentity != 0 &&
+        r282TargetMaterializationContract.vertexCompileContractIdentity !=
+            r282TargetMaterializationContract.pixelCompileContractIdentity &&
+        r282TargetMaterializationContract.compileFlags ==
+            (D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3) &&
+        r282TargetMaterializationContract.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_shader_target_materialization_contract_snapshot(
+                programmablePair,
+                r281TranslatedArtifactReceipt,
+                r281TranslatedArtifactReceipt.reviewSnapshotToken,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken,
+                r282TargetMaterializationContract.reviewSnapshotToken),
+        "R282 target materialization contract seals main vs_4_0 ps_4_0 strict O3 without compiling");
+
+    const auto staleR282ArtifactToken =
+        r281TranslatedArtifactReceipt.reviewSnapshotToken == 1ull
+            ? 2ull
+            : (r281TranslatedArtifactReceipt.reviewSnapshotToken ^ 1ull);
+    const auto r282StaleArtifactContract =
+        outrun::vr::dx11::
+            derive_programmable_shader_target_materialization_contract(
+                programmablePair,
+                r281TranslatedArtifactReceipt,
+                staleR282ArtifactToken,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken);
+    require(
+        r282StaleArtifactContract.translatedArtifactReceiptReady &&
+        !r282StaleArtifactContract.translatedArtifactReceiptSnapshotMatches &&
+        !r282StaleArtifactContract.cacheIdentityMatches &&
+        !r282StaleArtifactContract.targetArtifactIdentityMatches &&
+        !r282StaleArtifactContract.targetBytecodeMaterializationRequired &&
+        !r282StaleArtifactContract.reviewReady &&
+        r282StaleArtifactContract.reviewSnapshotToken == 0,
+        "R282 target materialization contract rejects stale R281 artifact receipt identity");
+
     const auto r275SemanticReceipt =
         outrun::vr::dx11::
             compose_programmable_shader_translated_semantic_receipt(

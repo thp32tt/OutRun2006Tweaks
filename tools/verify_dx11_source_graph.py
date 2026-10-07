@@ -11046,6 +11046,59 @@ def main() -> None:
             + ", ".join(missing_r281_programmable_translated_artifact_receipt)
         )
 
+    r282_programmable_target_materialization_contract = [
+        ("struct NativeProgrammableShaderTargetMaterializationContractEvidence",
+         NATIVE_BACKEND_HPP, "R282 target materialization contract evidence type"),
+        ("derive_programmable_shader_target_materialization_contract(",
+         NATIVE_BACKEND_HPP, "R282 contract composer declaration"),
+        ("validate_programmable_shader_target_materialization_contract_snapshot(",
+         NATIVE_BACKEND_HPP, "R282 contract snapshot validator declaration"),
+        ("constexpr char kEntryPoint[] = \"main\";", NATIVE_BACKEND_CPP,
+         "R282 deterministic entrypoint"),
+        ("constexpr char kVertexTargetProfile[] = \"vs_4_0\";", NATIVE_BACKEND_CPP,
+         "R282 deterministic vertex profile"),
+        ("constexpr char kPixelTargetProfile[] = \"ps_4_0\";", NATIVE_BACKEND_CPP,
+         "R282 deterministic pixel profile"),
+        ("D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3",
+         NATIVE_BACKEND_CPP, "R282 deterministic compile flags"),
+        ("out.targetBytecodeMaterialized = false;", NATIVE_BACKEND_CPP,
+         "R282 cannot claim target bytecode materialization"),
+        ("out.compilationAuthorized = false;", NATIVE_BACKEND_CPP,
+         "R282 cannot authorize programmable compilation"),
+        ("out.objectCreationAuthorized = false;", NATIVE_BACKEND_CPP,
+         "R282 cannot authorize programmable object creation"),
+        ("token, 0x282u", NATIVE_BACKEND_CPP,
+         "R282 independent contract snapshot domain"),
+        ("derive_programmable_shader_target_materialization_contract(",
+         RUNTIME_CENSUS, "R282 production census derives contract"),
+        ("VR DX11 R282 targetMaterializationContract signature#{}:",
+         RUNTIME_CENSUS, "R282 signature-attributable production contract log"),
+        ("R282_TARGET_MATERIALIZATION_CONTRACT_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R282 analyzer parser"),
+        ("TargetMaterializationContract", DX11_CENSUS_ANALYZER,
+         "R282 analyzer correlates materialization contract"),
+        ("R283_TARGET_BYTECODE_MATERIALIZATION", DX11_CENSUS_ANALYZER,
+         "R282 advances missing boundary to target bytecode materialization"),
+        ("TargetMaterializationContractExactSignatures",
+         DX11_CENSUS_ANALYZER_TEST, "R282 analyzer regression coverage"),
+        ("R282 target materialization contract seals main vs_4_0 ps_4_0 strict O3 without compiling",
+         CONSTANT_BUFFER_PROBE, "R282 hosted positive regression"),
+        ("R282 target materialization contract rejects stale R281 artifact receipt identity",
+         CONSTANT_BUFFER_PROBE, "R282 stale artifact regression"),
+        ("sig.shaderTranslationExact = false;", RUNTIME_CENSUS,
+         "R282 keeps programmable translation fail-closed"),
+    ]
+    missing_r282_programmable_target_materialization_contract = [
+        meaning for token, source, meaning
+        in r282_programmable_target_materialization_contract
+        if token not in source
+    ]
+    if missing_r282_programmable_target_materialization_contract:
+        raise SystemExit(
+            "DX11 R282 programmable target materialization contract drift: "
+            + ", ".join(missing_r282_programmable_target_materialization_contract)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),

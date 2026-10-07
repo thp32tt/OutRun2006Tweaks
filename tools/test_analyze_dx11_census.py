@@ -1854,6 +1854,14 @@ def main() -> int:
         "vertexIdentity=0x9999999999999999 pixelIdentity=0xAAAAAAAAAAAAAAA1 "
         "handoffSnapshot=0x8888888888888888 "
         "planSnapshot=0x1111111111111111 snapshot=0xABABABABABABABAB\n"
+        "VR DX11 R282 targetMaterializationContract signature#1: exact=1 "
+        "targetRequired=1 materialized=0 compileAuthorized=0 createAuthorized=0 "
+        "cacheKey=0x6666666666666666 "
+        "vertexContract=0xBCBCBCBCBCBCBCB1 pixelContract=0xCDCDCDCDCDCDCDC2 "
+        "entry=0x1010101010101010 vsProfile=0x2020202020202020 "
+        "psProfile=0x3030303030303030 flags=0x00008001 "
+        "artifactSnapshot=0xABABABABABABABAB "
+        "planSnapshot=0x1111111111111111 snapshot=0xEFEFEFEFEFEFEFEF\n"
         "VR DX11 R275 translatedSemanticReceipt signature#1: exact=0 "
         "objectReady=0 snapshot=0x0000000000000000\n"
         "VR DX11 R85 signature#1: primitive=4 fixedFn=0 fvf=0x00000000 "
@@ -1881,11 +1889,13 @@ def main() -> int:
     assert r278_inventory["ObjectOwnershipPrerequisiteExactSignatures"] == 1
     assert r278_inventory["ObjectCreationHandoffExactSignatures"] == 1
     assert r278_inventory["TranslatedArtifactReceiptExactSignatures"] == 1
+    assert r278_inventory["TargetMaterializationContractExactSignatures"] == 1
     assert r278_inventory["SemanticReceiptExactSignatures"] == 0
     assert r278_inventory["SemanticEvidenceCoverageComplete"] is True
-    assert r278_inventory["R242ObjectOwnershipMissingSignatures"] == [
+    assert r278_inventory["TargetBytecodeMaterializationMissingSignatures"] == [
         {"source_log": "OutRun2006Tweaks.log", "startup_epoch": 0, "id": 1}
     ]
+    assert r278_inventory["R242ObjectOwnershipMissingSignatures"] == []
     r278_pair_evidence = r278_inventory["Pairs"][0]["SemanticTranslationEvidence"][0]
     assert r278_pair_evidence["Plan"]["exact"] is True
     assert (
@@ -1947,6 +1957,31 @@ def main() -> int:
         r278_pair_evidence["TranslatedArtifactReceipt"]["pixel_identity"]
         == 0xAAAAAAAAAAAAAAA1
     )
+    assert r278_pair_evidence["TargetMaterializationContract"]["exact"] is True
+    assert (
+        r278_pair_evidence["TargetMaterializationContract"]["target_required"]
+        is True
+    )
+    assert (
+        r278_pair_evidence["TargetMaterializationContract"]["materialized"]
+        is False
+    )
+    assert (
+        r278_pair_evidence["TargetMaterializationContract"]["compile_authorized"]
+        is False
+    )
+    assert (
+        r278_pair_evidence["TargetMaterializationContract"]["creation_authorized"]
+        is False
+    )
+    assert (
+        r278_pair_evidence["TargetMaterializationContract"]["vertex_contract"]
+        == 0xBCBCBCBCBCBCBCB1
+    )
+    assert (
+        r278_pair_evidence["TargetMaterializationContract"]["pixel_contract"]
+        == 0xCDCDCDCDCDCDCDC2
+    )
     assert (
         r278_pair_evidence["Plan"]["target_vertex_semantic_hash"]
         == 0x2222222222222222
@@ -1957,7 +1992,7 @@ def main() -> int:
     )
     assert r278_pair_evidence["Receipt"]["exact"] is False
     assert r278_pair_evidence["Receipt"]["object_ready"] is False
-    assert r278_pair_evidence["MissingPrerequisite"] == "R242_TRANSLATED_OBJECT_OWNERSHIP"
+    assert r278_pair_evidence["MissingPrerequisite"] == "R283_TARGET_BYTECODE_MATERIALIZATION"
     assert r278_pair_evidence["ActivationProof"] is False
     assert r278_programmable_semantic["NativeDrawPathActivationAllowed"] is False
 
