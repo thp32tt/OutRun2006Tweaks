@@ -33,6 +33,15 @@ namespace OutRunVRStereo
     bool R30SupportAnyAuxRenderTargetActive() noexcept;
     bool R30SupportTryGetTrackedViewport(D3DVIEWPORT9& viewport) noexcept;
 
+    struct R30SupportEffectTelemetrySnapshot
+    {
+        DWORD alphaBlend = FALSE;
+        DWORD alphaTest = FALSE;
+        DWORD zWrite = TRUE;
+    };
+    bool R30SupportTryGetEffectTelemetrySnapshot(
+        R30SupportEffectTelemetrySnapshot& out) noexcept;
+
     void R30SupportInvalidateEffectStateCache() noexcept;
     void R30SupportInvalidateTrackedRasterShadow() noexcept;
     void R30SupportInvalidateLiveStateSample() noexcept;

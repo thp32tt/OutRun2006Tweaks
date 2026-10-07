@@ -170,8 +170,8 @@ namespace OutRunVRStereo
             else
                 frame.pointLinePrimitives += primitiveCount;
 
-            R29EffectTelemetrySnapshot effect{};
-            if (!TryGetEffectTelemetrySnapshot(effect))
+            R30SupportEffectTelemetrySnapshot effect{};
+            if (!R30SupportTryGetEffectTelemetrySnapshot(effect))
             {
                 ++frame.effectUnknownDraws;
                 return;

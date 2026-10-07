@@ -3290,6 +3290,22 @@ namespace OutRunVRStereo
         return TryGetTrackedViewport(viewport);
     }
 
+    bool R30SupportTryGetEffectTelemetrySnapshot(
+        R30SupportEffectTelemetrySnapshot& out) noexcept
+    {
+        R29EffectTelemetrySnapshot lower{};
+        if (!TryGetEffectTelemetrySnapshot(lower))
+        {
+            out = {};
+            return false;
+        }
+
+        out.alphaBlend = lower.alphaBlend;
+        out.alphaTest = lower.alphaTest;
+        out.zWrite = lower.zWrite;
+        return true;
+    }
+
     void R30SupportInvalidateEffectStateCache() noexcept
     {
         InvalidateEffectStateCache();

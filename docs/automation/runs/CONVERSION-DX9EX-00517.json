@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00517",
+  "production_id": "CONVERSION-DX9EX-00517",
+  "event_id": "CONVERSION-DX9EX-00517-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "IMPLEMENTED_PENDING_VALIDATION",
+  "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-EFFECT-TELEMETRY-OWNER-FACADE-001",
+  "base_sha": "bce62cab1d34af9708fbc2913625ca0bb0338f0b",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00517]",
+  "summary": "Expose the current R29 effect-state telemetry snapshot through the behavior-neutral R30 support facade so R32 no longer consumes the private R29 snapshot type/function through textual inclusion.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r32_runtime_support_seam.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00517.json"
+  ],
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "predecessor_failed_run_id": 37603476477,
+    "predecessor_failed_job_id": 112733404581,
+    "first_remaining_r32_compile_dependency": "R29EffectTelemetrySnapshot / TryGetEffectTelemetrySnapshot",
+    "prior_runtime_predicate_extraction_task": "CONVERSION-DX9EX-00515",
+    "prior_verifier_alignment_task": "CONVERSION-DX9EX-00516"
+  },
+  "protected_boundaries": [
+    "no DirectGPU/ACK/fence/slot ownership change",
+    "no Reset/ResetEx order change",
+    "no HUD/effect classification policy change",
+    "no OpenXR submission/recenter change"
+  ],
+  "next_action": "Require exact-SHA DX9Ex Active Validation and Domain Isolation. If green, persist run/job/artifact evidence and keep runtime validation UNTESTED."
+}
