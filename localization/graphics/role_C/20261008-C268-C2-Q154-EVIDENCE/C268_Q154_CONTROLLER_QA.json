@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "run": "20261008-C268-C2-Q154-EVIDENCE",
+  "timestamp_kst": "2026-10-08T08:39:00+09:00",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "policy_version": "visual-evidence-v1-20261008",
+  "selection_head": "7cbc675c02fa61d1735a447387d4d58a9bcb71d5",
+  "dispatch_commits": [
+    "aa3172cb1e10e3483ab3fc5dc5a217345f63835e",
+    "0792817f19f86e4ddeafc623ec14b15b00a623a3"
+  ],
+  "pre_commit_refresh_head": "0792817f19f86e4ddeafc623ec14b15b00a623a3",
+  "hosted_worker_run_id": 37702806216,
+  "hosted_worker_state_at_decision": "PENDING",
+  "execution_backend": "N100_MCP_MEMORY_STREAM_FALLBACK_AFTER_HOSTED_CPU_WORKER_UNAVAILABLE",
+  "fallback_reason": "GitHub Localization CPU Worker repeatedly remained pending/cancelled for over one hour. ChatGPT local could not materialize the 16 MiB DDS through the available connector. N100 streamed exact bytes in memory and verified candidate/source SHA before decode; no repository writes occurred on N100.",
+  "queue_index": 154,
+  "candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "machine_result": "PASS",
+  "calibration_result": "PASS_5_OF_5_BLIND_KNOWN_DEFECT_CONTROLS",
+  "approval_eligible": false,
+  "pixels_before_producer_verdict": false,
+  "approval_blocker_procedure": "Producer report prose had already been read earlier in this invocation; therefore PASS approval would be forbidden even without the visual defect.",
+  "native_visual_evidence": {
+    "native_1x": {
+      "storage": "N100_MCP",
+      "path": "c268_q154/C268_Q154_GRAY_NATIVE_1X.png",
+      "sha256": "9269c6c76acfbf29527298919362ff7e24e25e4621fb90562911654b7e9b8b0d"
+    },
+    "zoom_2x": {
+      "storage": "N100_MCP",
+      "path": "c268_q154/C268_Q154_GRAY_ZOOM_2X.png",
+      "sha256": "0cc27b984760e4c46eb275ed2de2ba1a9a54f8e22f399f56130e3fe2b64b061c"
+    },
+    "practical_50": {
+      "storage": "N100_MCP",
+      "path": "c268_q154/C268_Q154_GRAY_PRACTICAL_50.png",
+      "sha256": "275cdda7835fb13197ef9f62cf0921ba78e9929c601495b68e77f6dfdc25df34"
+    },
+    "raw_1x": {
+      "storage": "N100_MCP",
+      "path": "c268_q154/C268_Q154_GRAY_RAW_1X.png",
+      "sha256": "6e701e7f318439558ac727569f83d5b6a059fd9ae20f386cdefc23ff13a9be9a"
+    }
+  },
+  "findings": {
+    "single_player_gray": {
+      "slant": "PASS",
+      "clean_plate": "PASS",
+      "style": "FAIL_EXCESSIVE_WEIGHT_REDUCED_COUNTER_SPACE",
+      "readability": "FAIL_AT_50_PERCENT",
+      "glyph_integrity": "PASS",
+      "protected_art": "PASS",
+      "placement": "PASS",
+      "orientation": "PASS"
+    },
+    "showroom_gray": {
+      "slant": "PASS",
+      "clean_plate": "PASS",
+      "style": "FAIL_EXCESSIVE_WEIGHT_COUNTER_SPACE_COLLAPSE",
+      "readability": "FAIL_AT_50_PERCENT",
+      "glyph_integrity": "PASS",
+      "protected_art": "PASS",
+      "placement": "PASS",
+      "orientation": "PASS"
+    },
+    "multiplayer_gray": {
+      "slant": "PASS",
+      "clean_plate": "PASS",
+      "style": "FAIL_EXCESSIVE_WEIGHT_REDUCED_COUNTER_SPACE",
+      "readability": "FAIL_AT_50_PERCENT",
+      "glyph_integrity": "PASS",
+      "protected_art": "PASS",
+      "placement": "PASS",
+      "orientation": "PASS"
+    }
+  },
+  "decision": "REWORK_REQUIRED",
+  "required_fix": "B lane rerender only gray labels with lighter/narrower source-faithful strokes and more open counter-space; preserve red rows, C141 clean plate, source-left/upright layout, gray color, exact bboxes, positive margins and raw mirror-Y.",
+  "c3": "BLOCKED",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "run": "C268",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "policy_version": "visual-evidence-v1-20261008",
+  "queue_index": 154,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "header_128_exact": true,
+  "dimensions": [
+    4096,
+    1024
+  ],
+  "raw_orientation": "mirror_y",
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "overlap": 0,
+  "clipping": 0,
+  "result": "PASS",
+  "gray_rows": [
+    {
+      "id": "single_player_gray",
+      "source": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "original_bbox": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "localized_bbox": [
+        1612,
+        289,
+        2023,
+        347
+      ],
+      "margins": [
+        2,
+        174,
+        3,
+        3
+      ],
+      "localized_bbox_alpha_density_vs_source_bbox_density_ratio": 1.3933
+    },
+    {
+      "id": "showroom_gray",
+      "source": "SHOWROOM",
+      "korean": "쇼룸",
+      "original_bbox": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "localized_bbox": [
+        2676,
+        291,
+        2886,
+        346
+      ],
+      "margins": [
+        2,
+        208,
+        3,
+        4
+      ],
+      "localized_bbox_alpha_density_vs_source_bbox_density_ratio": 1.2361
+    },
+    {
+      "id": "multiplayer_gray",
+      "source": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "original_bbox": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "localized_bbox": [
+        2568,
+        954,
+        2932,
+        1012
+      ],
+      "margins": [
+        2,
+        154,
+        2,
+        2
+      ],
+      "localized_bbox_alpha_density_vs_source_bbox_density_ratio": 1.3872
+    }
+  ],
+  "runtime_validation": "UNTESTED"
+}

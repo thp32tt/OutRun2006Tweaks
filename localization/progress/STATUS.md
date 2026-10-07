@@ -2753,3 +2753,7 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q135 2B0863D6: fresh C + exact-SHA C3_STRICT_PASS @ 8657a59f966bb4be994a00ead41d6939a5145efba320deab83cd3ef8af92b0c1.
 - PRE_INGAME refresh requested for q89/q135; user JPG acceptance and actual-game validation remain pending. RUNTIME_VALIDATION=UNTESTED.
 
+### C268 C2 — q154 native evidence recheck (2026-10-08)
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN
+- q154 4D38BBB0: machine PASS, controller visual FAIL -> REWORK_REQUIRED (gray-family excessive weight/counter-space collapse at native/practical scale).
+- C3 BLOCKED until B produces materially repaired gray-only bytes. RUNTIME_VALIDATION=UNTESTED.

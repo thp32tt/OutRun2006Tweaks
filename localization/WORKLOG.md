@@ -3455,3 +3455,8 @@ Applied user-authorized production/QA improvements without changing six launches
 - ChatGPT local binary materialization was DNS-blocked and GitHub C worker run `37695338433` was cancelled without output; contract-authorized N100 MCP exact-byte in-memory fallback was used. Candidate DDS bytes were not changed.
 - q89/q135 PRE_INGAME refresh triggered; q59 excluded pending A/B rework. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 
+### 2026-10-08 C268 C2 q154 evidence-gate native recheck
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN. New evidence policy priority q154 4D38BBB0 selected after live HEAD/queue refresh.
+- Blind calibration 5/5 PASS before answer key. Exact current/source SHA + native persisted DDS re-decode: machine gates still PASS (outside/alpha/protected=0).
+- Native 1x/2x/50%/RAW visual review FAILS all three gray rows for excessive block weight and reduced counter-space versus source; visual FAIL overrides numeric PASS. q154 -> REWORK_REQUIRED, C3 BLOCKED. Red rows/candidate bytes were not modified.
+- Required B repair: gray rows only, lighter/narrower source-faithful strokes and open counters while preserving C141 clean, gray color, source-left/upright layout, bbox/margins and mirror-Y. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

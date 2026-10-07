@@ -6556,5 +6556,26 @@
     "pre_ingame_export": "PENDING_REFRESH_TRIGGERED_BY_STATE_COMMIT_Q89_Q135",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c268_c2_q154_evidence_gate": {
+    "run": "20261008-C268-C2-Q154-EVIDENCE",
+    "timestamp_kst": "2026-10-08T08:39:00+09:00",
+    "role": "C",
+    "lane": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "pre_commit_refresh_head": "0792817f19f86e4ddeafc623ec14b15b00a623a3",
+    "queue_index": 154,
+    "candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+    "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_PROTECTED",
+    "calibration": "PASS_5_OF_5",
+    "controller_visual_qa": "FAIL_GRAY_WEIGHT_COUNTER_SPACE",
+    "decision": "REWORK_REQUIRED",
+    "c3": "BLOCKED",
+    "execution_backend": "N100_MCP_MEMORY_STREAM_FALLBACK_AFTER_HOSTED_CPU_WORKER_UNAVAILABLE",
+    "controller_report": "localization/graphics/role_C/20261008-C268-C2-Q154-EVIDENCE/C268_Q154_CONTROLLER_QA.json",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

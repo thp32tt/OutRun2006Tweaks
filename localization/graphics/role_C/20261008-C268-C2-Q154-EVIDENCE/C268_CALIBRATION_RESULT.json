@@ -1,0 +1,40 @@
+{
+  "policy_version": "visual-evidence-v1-20261008",
+  "reviewer": "ChatGPT AI 1",
+  "blind_review_completed": true,
+  "approval_calibration_usable": false,
+  "reason": "Exact calibration PNGs were reviewed from N100 MCP fallback and are pending repository materialization by hosted worker run 37702806216; this record is evidence of the rejection workflow only and MUST NOT be used for PASS approval.",
+  "first_look_recorded_before_answer_key": true,
+  "cases": [
+    {
+      "kind": "residue",
+      "observed": "FAIL",
+      "sha256": "974fbec06c9272f45a964ffdc57e5b32cd237a9ac81936ce93c13667d721dd19",
+      "observation": "Offset duplicate/ghost letterforms visible."
+    },
+    {
+      "kind": "excessive_weight",
+      "observed": "FAIL",
+      "sha256": "849aada7a00b249e5c39171843efeb4881e18de5ebe9dea2767e4a8d9516106c",
+      "observation": "Stroke materially heavier than source; counters constricted."
+    },
+    {
+      "kind": "clipped_stroke",
+      "observed": "FAIL",
+      "sha256": "16ad91885e7a843725aab2127dbe52f497bf155787bebe3aa2e5137d7f60f636",
+      "observation": "Lower/terminal strokes visibly cut."
+    },
+    {
+      "kind": "normal",
+      "observed": "PASS",
+      "sha256": "821f2584bdbc22db60250442f0456b57ee49cdb7abef1ab2200f02314b5fea3d",
+      "observation": "Lean/weight/strokes match source."
+    },
+    {
+      "kind": "opposite_slant",
+      "observed": "FAIL",
+      "sha256": "9e6d7688af37d14d18891532abccf0588d89be9f759414eccc2da253925450b3",
+      "observation": "Readable lean direction opposite source."
+    }
+  ]
+}
