@@ -1,0 +1,379 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261007-A164-Q197-9F060EC1-EXACT-BBOX",
+  "queue_index": 197,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+  "execution_backend": "github-actions because repository-backed 16MiB DDS bytes are not directly materialized in ChatGPT local runtime; N100 heavy image processing not used",
+  "trigger": "CURRENT_POLICY_ZERO_PIXEL_SIZE_CEILING_RECHECK_OF_HISTORICAL_C85_PASS",
+  "source_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+  "prior_candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+  "candidate_sha256": "99aa4d5d74d4330e2f2cd44598e0ed66a2a2494345caec3afffa0f64b0c7e4cf",
+  "historical_current_policy_check": [
+    {
+      "key": "license",
+      "source_size": [
+        584,
+        62
+      ],
+      "old_size": [
+        471,
+        69
+      ],
+      "old_delta_left": -16,
+      "old_delta_right": 129,
+      "old_delta_top": -15,
+      "old_delta_bottom": 8,
+      "current_policy_pass": false
+    },
+    {
+      "key": "complete",
+      "source_size": [
+        280,
+        47
+      ],
+      "old_size": [
+        148,
+        49
+      ],
+      "old_delta_left": -1,
+      "old_delta_right": 133,
+      "old_delta_top": -3,
+      "old_delta_bottom": 1,
+      "current_policy_pass": false
+    },
+    {
+      "key": "vs_rank",
+      "source_size": [
+        228,
+        47
+      ],
+      "old_size": [
+        176,
+        46
+      ],
+      "old_delta_left": 1,
+      "old_delta_right": 51,
+      "old_delta_top": -1,
+      "old_delta_bottom": 2,
+      "current_policy_pass": false
+    },
+    {
+      "key": "win_ratio",
+      "source_size": [
+        279,
+        47
+      ],
+      "old_size": [
+        104,
+        48
+      ],
+      "old_delta_left": 1,
+      "old_delta_right": 174,
+      "old_delta_top": -1,
+      "old_delta_bottom": 0,
+      "current_policy_pass": false
+    },
+    {
+      "key": "drive_time",
+      "source_size": [
+        308,
+        45
+      ],
+      "old_size": [
+        208,
+        49
+      ],
+      "old_delta_left": -1,
+      "old_delta_right": 101,
+      "old_delta_top": -2,
+      "old_delta_bottom": -2,
+      "current_policy_pass": false
+    }
+  ],
+  "repair": "reconstruct only old Korean raster footprints from current clean-background context, then native Noto Sans CJK KR Bold rerender; shared body font size; exact source-left cadence",
+  "font": {
+    "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "font_index": 1,
+    "title_size": 61,
+    "shared_body_size": 42
+  },
+  "clean_plate": {
+    "method": "same-row immediate-neighbor interpolation restricted to old Korean glyph masks; no canonical artwork outside declared correction rectangles modified",
+    "mask_debug": [
+      {
+        "key": "license",
+        "threshold_bbox_local": [
+          0,
+          0,
+          471,
+          69
+        ],
+        "masked_pixels": 14291
+      },
+      {
+        "key": "complete",
+        "threshold_bbox_local": [
+          0,
+          0,
+          148,
+          49
+        ],
+        "masked_pixels": 4401
+      },
+      {
+        "key": "vs_rank",
+        "threshold_bbox_local": [
+          0,
+          0,
+          176,
+          46
+        ],
+        "masked_pixels": 3643
+      },
+      {
+        "key": "win_ratio",
+        "threshold_bbox_local": [
+          0,
+          0,
+          104,
+          48
+        ],
+        "masked_pixels": 3014
+      },
+      {
+        "key": "drive_time",
+        "threshold_bbox_local": [
+          0,
+          0,
+          208,
+          49
+        ],
+        "masked_pixels": 4620
+      }
+    ]
+  },
+  "rows": [
+    {
+      "key": "license",
+      "text": "아웃런 라이선스",
+      "source_bbox": [
+        41,
+        1285,
+        625,
+        1347
+      ],
+      "old_bbox": [
+        25,
+        1270,
+        496,
+        1339
+      ],
+      "localized_bbox": [
+        43,
+        1287,
+        446,
+        1345
+      ],
+      "source_size": [
+        584,
+        62
+      ],
+      "localized_size": [
+        403,
+        58
+      ],
+      "delta_left": 2,
+      "delta_right": 179,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_size": 61
+    },
+    {
+      "key": "complete",
+      "text": "달성률:",
+      "source_bbox": [
+        399,
+        1561,
+        679,
+        1608
+      ],
+      "old_bbox": [
+        398,
+        1558,
+        546,
+        1607
+      ],
+      "localized_bbox": [
+        401,
+        1564,
+        525,
+        1604
+      ],
+      "source_size": [
+        280,
+        47
+      ],
+      "localized_size": [
+        124,
+        40
+      ],
+      "delta_left": 2,
+      "delta_right": 154,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_size": 42
+    },
+    {
+      "key": "vs_rank",
+      "text": "VS 랭크:",
+      "source_bbox": [
+        397,
+        1652,
+        625,
+        1699
+      ],
+      "old_bbox": [
+        398,
+        1651,
+        574,
+        1697
+      ],
+      "localized_bbox": [
+        399,
+        1655,
+        550,
+        1695
+      ],
+      "source_size": [
+        228,
+        47
+      ],
+      "localized_size": [
+        151,
+        40
+      ],
+      "delta_left": 2,
+      "delta_right": 75,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_size": 42
+    },
+    {
+      "key": "win_ratio",
+      "text": "승률:",
+      "source_bbox": [
+        398,
+        1742,
+        677,
+        1789
+      ],
+      "old_bbox": [
+        399,
+        1741,
+        503,
+        1789
+      ],
+      "localized_bbox": [
+        400,
+        1745,
+        487,
+        1785
+      ],
+      "source_size": [
+        279,
+        47
+      ],
+      "localized_size": [
+        87,
+        40
+      ],
+      "delta_left": 2,
+      "delta_right": 190,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_size": 42
+    },
+    {
+      "key": "drive_time",
+      "text": "주행 시간:",
+      "source_bbox": [
+        400,
+        1834,
+        708,
+        1879
+      ],
+      "old_bbox": [
+        399,
+        1832,
+        607,
+        1881
+      ],
+      "localized_bbox": [
+        402,
+        1836,
+        576,
+        1877
+      ],
+      "source_size": [
+        308,
+        45
+      ],
+      "localized_size": [
+        174,
+        41
+      ],
+      "delta_left": 2,
+      "delta_right": 132,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_size": 42
+    }
+  ],
+  "machine_qa": {
+    "bbox_size_positive_margin": "5/5 PASS",
+    "changed_pixels_outside_declared_rework_union": 0,
+    "alpha_changed_outside_declared_rework_union": 0,
+    "localized_pair_overlap": 0,
+    "header_128_exact": true,
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode_matches_intended": "PASS",
+    "row_numbers_OM_barcode_legal_watermark_frame_outside_rework": "PIXEL_EXACT_TO_PRIOR_C85"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PENDING_CONTROLLER_VISUAL; MACHINE_SCOPE_ZERO_BLAST",
+    "2_slant_direction": "PASS_SOURCE_UPRIGHT_FAMILY",
+    "3_no_unnecessary_undersizing": "PASS_MAX_SHARED_NATIVE_FONT_WITH_2PX_MIN_MARGIN",
+    "4_source_weight_effects": "PASS_FLAT_SOURCE_COLOR_FAMILY; NO_INVENTED_OUTLINE_SHADOW",
+    "5_no_clipping": "PASS_5_OF_5_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_BLAST_OUTSIDE_DECLARED_REWORK",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER_VISUAL"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3_strict_audit": "REQUIRED_EXACT_SHA_DUE_HISTORICAL_POLICY_FALSE_NEGATIVE",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

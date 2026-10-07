@@ -1,0 +1,10 @@
+{
+  "role": "A",
+  "run": "20261007-A164-Q197-9F060EC1-EXACT-BBOX",
+  "queue_index": 197,
+  "asset": "9F060EC1",
+  "candidate_sha256": "99aa4d5d74d4330e2f2cd44598e0ed66a2a2494345caec3afffa0f64b0c7e4cf",
+  "worker_status": "STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL",
+  "report": "localization/graphics/role_A/20261007-A164-Q197-9F060EC1-EXACT-BBOX/A164_Q197_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}
