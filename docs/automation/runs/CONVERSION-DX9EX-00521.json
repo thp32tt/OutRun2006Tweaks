@@ -2,15 +2,15 @@
   "schema_version": 1,
   "task_id": "CONVERSION-DX9EX-00521",
   "production_id": "CONVERSION-DX9EX-00521",
-  "event_id": "CONVERSION-DX9EX-00521-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX9EX-00521-E002",
+  "event_type": "retry",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "status": "IMPLEMENTED_PENDING_VALIDATION",
   "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-SHADER-IDENTITY-FACADE-001",
   "base_sha": "be1f8657a96b356156cce6c7b2f3a7642bddc961",
-  "material_result_sha": null,
+  "material_result_sha": "e9250e6a9fe5489822d2da970bcefd67b3170f3b",
   "validation_bearing_result_sha": null,
   "result_sha": null,
   "result_marker": "[AUTO:CONVERSION-DX9EX-00521]",
@@ -20,6 +20,7 @@
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/stereo_renderer_r32.cpp",
     "tools/verify_vr_r32_runtime_support_seam.py",
+    "tools/verify_vr_r31_r32_retirement_guard.py",
     "docs/automation/runs/CONVERSION-DX9EX-00521.json"
   ],
   "automation_validation": "PENDING",
@@ -47,7 +48,14 @@
       "exchange identity to 0",
       "execute lower draw",
       "restore saved identity only if destination remains 0"
-    ]
+    ],
+    "initial_validation": {
+      "sha": "e9250e6a9fe5489822d2da970bcefd67b3170f3b",
+      "dx9ex_active_run_id": 37624212590,
+      "policy_job_id": 112801733505,
+      "result": "FAIL",
+      "reason": "tools/verify_vr_r31_r32_retirement_guard.py retained the pre-facade CurrentVertexShaderIdentity.exchange(0 literal; the new R32 runtime-support seam verifier itself passed."
+    }
   },
   "protected_boundaries": [
     "no WVP/projection or stereo classification change",
@@ -55,5 +63,5 @@
     "no DirectGPU ACK/fence/slot/publication change",
     "no Reset/ResetEx, HUD, recenter, or Present policy change"
   ],
-  "next_action": "Require exact-SHA DX9Ex Active Validation and Domain Isolation. If green, persist validation evidence and continue with the next bounded R32 lower-owner dependency class; runtime remains UNTESTED."
+  "next_action": "Re-run exact-SHA DX9Ex Active Validation and Domain Isolation after aligning the stale R31/R32 retirement guard to the new R30 shader-identity facade. Runtime remains UNTESTED."
 }

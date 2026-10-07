@@ -329,7 +329,8 @@ owner_evidence = {
     "R32ReviewRunLowerFailClosed": (
         r32, "HRESULT R32LowerFailClosed(",
         ("R32ReadEffectSnapshot(device, snapshot)",
-         "CurrentVertexShaderIdentity.exchange(0",
+         "R30SupportExchangeVertexShaderIdentity(0)",
+         "R30SupportRestoreVertexShaderIdentityIfEmpty(savedIdentity)",
          "R32FailClosedZeroDisparityDraws"),
     ),
     "R32ReviewObserveFrameWorkload": (
@@ -418,7 +419,8 @@ require(
     function_body(r32, "HRESULT R32LowerFailClosed("),
     "R32 fail-close owner",
     "R32ReadEffectSnapshot(device, snapshot)",
-    "CurrentVertexShaderIdentity.exchange(0",
+    "R30SupportExchangeVertexShaderIdentity(0)",
+    "R30SupportRestoreVertexShaderIdentityIfEmpty(savedIdentity)",
     "R32FailClosedZeroDisparityDraws",
 )
 require(
@@ -644,8 +646,9 @@ require(
     lower_fail_closed,
     "R32 lower fail-close",
     "!R9StereoBaselineSeeded()",
-    "CurrentVertexShaderIdentity.exchange(0",
+    "R30SupportExchangeVertexShaderIdentity(0)",
     "const HRESULT hr = lowerDraw();",
+    "R30SupportRestoreVertexShaderIdentityIfEmpty(savedIdentity)",
     "R32FailClosedZeroDisparityDraws",
 )
 
