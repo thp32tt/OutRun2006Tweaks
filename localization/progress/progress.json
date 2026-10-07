@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 15:52 KST",
+  "updated_at_kst": "2026-10-07 16:07 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4418,10 +4418,15 @@
     "controller_visual_qa": "PASS_SOURCE_CLEAN_INPUT_CURRENT_HIGHZOOM_FLIPY_RAW_PRACTICAL_50_25",
     "machine_report": "localization/graphics/role_C/20261007-C242-C1-Q049-BF3EE5C6-A136/C242_BF3EE5C6_MACHINE_QA.json",
     "controller_report": "localization/graphics/role_C/20261007-C242-C1-Q049-BF3EE5C6-A136/C242_BF3EE5C6_CONTROLLER_FINAL_QA.json",
-    "pre_ingame_export": "PENDING_REFRESH",
+    "pre_ingame_export": "PASS_003_q049_BF3EE5C6.jpg",
     "user_jpg_review": "PENDING",
     "actual_ingame_validation": "PENDING",
     "runtime_validation": "UNTESTED",
-    "forbidden_domains_touched": []
+    "forbidden_domains_touched": [],
+    "status": "C242_C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_NEW_INGAME_RETEST",
+    "pre_ingame_export_run": 37584654542,
+    "pre_ingame_manifest_count": 13,
+    "pre_ingame_mandatory_c3_blocked_count": 10,
+    "pre_ingame_controller_visual_qa": "PASS_FLIPY_RAW_ENGLISH_ORIGINAL_VS_CURRENT"
   }
 }
