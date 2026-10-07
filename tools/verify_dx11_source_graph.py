@@ -11344,9 +11344,9 @@ def main() -> None:
         ("out.drawDispatchAuthorized =",
          NATIVE_BACKEND_CPP, "R288 propagates and refuses Draw/DrawIndexed authority"),
         ("R288 translation admission seals exact R286/R275 readiness without authorizing binding or draw",
-         DX11_CONSTANT_BUFFER_PROBE, "R288 exact admission hosted regression"),
+         CONSTANT_BUFFER_PROBE, "R288 exact admission hosted regression"),
         ("R288 translation admission rejects tampered R286 snapshot",
-         DX11_CONSTANT_BUFFER_PROBE, "R288 stale/tampered R286 hosted regression"),
+         CONSTANT_BUFFER_PROBE, "R288 stale/tampered R286 hosted regression"),
     ]
     missing_r288_programmable_translation_admission_contract = [
         meaning for token, source, meaning
