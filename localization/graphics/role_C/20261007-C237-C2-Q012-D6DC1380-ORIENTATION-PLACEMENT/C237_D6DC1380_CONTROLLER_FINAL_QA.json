@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C237-C2-Q012-D6DC1380-ORIENTATION-PLACEMENT",
+  "timestamp_kst": "2026-10-07T14:27:49+09:00",
+  "queue_index": 12,
+  "asset": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+  "priority": "P0",
+  "user_jpg_regression": "PJR-001-20261006",
+  "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+  "input_candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+  "candidate_sha256": "1df64df712f990ee5d92c53998269604ff7b9fc4ccdff8913d648f18aa604013",
+  "machine_report": "localization/graphics/role_C/20261007-C237-C2-Q012-D6DC1380-ORIENTATION-PLACEMENT/C237_D6DC1380_MACHINE_QA.json",
+  "fresh_c_resolution": {
+    "c235_numeric_false_positive": "C235 conflated absolute RAW bbox position with glyph orientation and incorrectly treated canonical RAW as readable-normal.",
+    "a162_visual_false_fix": "A162 vertically flipped glyph pixels; this fixed the numeric bbox but made source and candidate require opposite transforms.",
+    "c237_small_corrective_rework": "Preserved every visible A160 RGBA glyph/effect pixel and glyph orientation; translated RAW by Y=-40 only. No flip/rotation/rerender.",
+    "raw_source_bbox_hd": [
+      32,
+      40,
+      992,
+      176
+    ],
+    "c237_raw_bbox": [
+      117,
+      42,
+      907,
+      174
+    ],
+    "raw_margins": [
+      85,
+      85,
+      2,
+      2
+    ],
+    "flipy_source_bbox_hd": [
+      32,
+      80,
+      992,
+      216
+    ],
+    "c237_flipy_bbox": [
+      117,
+      82,
+      907,
+      214
+    ],
+    "flipy_margins": [
+      85,
+      85,
+      2,
+      2
+    ]
+  },
+  "controller_visual_qa": {
+    "raw_same_transform_as_source": "PASS",
+    "flipy_same_transform_as_source": "PASS",
+    "readable_orientation": "PASS_SOURCE_AND_KOREAN_BOTH_READABLE_AFTER_IDENTICAL_FLIP_Y",
+    "slant_direction": "PASS_SOURCE_RIGHT_ITALIC_AND_KOREAN_RIGHT_LEAN",
+    "scale_hierarchy": "PASS_790x132_INSIDE_960x136_NEAR_MAX_HEIGHT",
+    "weight_outline_shadow": "PASS_WHITE_FACE_NAVY_BORDER_STEEL_OUTER_EFFECT_SOURCE_FAMILY",
+    "glyph_integrity": "PASS_NO_BROKEN_OR_CLIPPED_HANGUL",
+    "clean_plate": "PASS_TEXT_ONLY_TRANSPARENT_ASSET_NO_SOURCE_RESIDUE",
+    "protected_separation": "PASS_TEXT_ONLY_ASSET",
+    "placement": "PASS_2PX_VERTICAL_AND_85PX_HORIZONTAL_POSITIVE_MARGIN_IN_RAW_AND_FLIPY",
+    "practical_100_75_50": "PASS_IMMEDIATE_READABILITY"
+  },
+  "fresh_independent_c": "PASS_AFTER_SMALL_CORRECTIVE_REWORK",
+  "c3_strict_audit": {
+    "required": true,
+    "result": "C3_STRICT_PASS",
+    "candidate_sha256": "1df64df712f990ee5d92c53998269604ff7b9fc4ccdff8913d648f18aa604013",
+    "visual_priorities": {
+      "slant_perspective": "PASS",
+      "clean_plate_source_removal": "PASS",
+      "font_style_fidelity": "PASS",
+      "scale_readability": "PASS",
+      "glyph_integrity": "PASS",
+      "protected_art_separation": "PASS",
+      "source_faithful_placement": "PASS",
+      "flip_y_raw_consistency": "PASS"
+    }
+  },
+  "decision": "C237_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME_RETEST",
+  "pre_ingame_export": "PENDING_REFRESH",
+  "user_jpg_review": "PENDING_REFRESH_AND_REVIEW",
+  "actual_ingame_retest": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

@@ -2918,3 +2918,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). GitHub-hosted exporter run `37575540241` SUCCESS.
 - q95 37759842 is PRE_INGAME #002 `002_q095_37759842.jpg`; English source SHA `7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5` and current Korean candidate SHA `ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b` verified in manifest.
 - Fresh C + C3 + English-original comparison export are complete. User JPG review and NEW actual in-game retest remain required; IGR-014/015/016 are not closed. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 14:27 KST — C237 C2 q12 D6DC1380 orientation-placement correction + C3 PASS
+- TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. P0 PJR-001 / q12 selected after fresh HEAD+queue review; no odd/unindexed work touched.
+- Fresh C resolved the C235/A162 conflict: C235's bbox label was a numeric false positive for glyph orientation; A162's vertical flip visibly inverted the Korean under the source's FLIP-Y transform.
+- Small C corrective rework preserved A160 visible RGBA/glyph orientation exactly and translated RAW Y -40 only. Final SHA 1df64df712f990ee5d92c53998269604ff7b9fc4ccdff8913d648f18aa604013. RAW source/final bboxes [32,40,992,176] / [117,42,907,174]; FLIP-Y source/final [32,80,992,216] / [117,82,907,214]; margins [85,85,2,2] in both transforms.
+- Controller RAW/FLIP-Y and practical 100/75/50 visual review PASS: source and Korean share the same transform, right-lean/source-family effects retained, 790x132 scale retained, no clipping/broken Hangul/residue/intrusion. Exact-SHA C3_STRICT_PASS.
+- PRE_INGAME export refresh/user JPG review/NEW actual-game retest remain pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.

@@ -4218,5 +4218,40 @@
     "user_jpg_review": "PENDING",
     "new_actual_ingame_retest": "PENDING",
     "runtime_validation": "UNTESTED"
+  },
+  "c237_c2_q012_d6dc1380": {
+    "timestamp_kst": "2026-10-07T14:27:49+09:00",
+    "status": "C237_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME_RETEST",
+    "queue_index": 12,
+    "asset": "D6DC1380",
+    "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+    "candidate_sha256": "1df64df712f990ee5d92c53998269604ff7b9fc4ccdff8913d648f18aa604013",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "fresh_c": "PASS_AFTER_SMALL_CORRECTIVE_REWORK",
+    "c3": "C3_STRICT_PASS",
+    "raw_shift_xy": [
+      0,
+      -40
+    ],
+    "raw_containment": "PASS",
+    "flipy_containment": "PASS",
+    "raw_margins": [
+      85,
+      85,
+      2,
+      2
+    ],
+    "flipy_margins": [
+      85,
+      85,
+      2,
+      2
+    ],
+    "pre_ingame_export": "PENDING_REFRESH",
+    "user_jpg_review": "PENDING",
+    "actual_ingame_retest": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }
