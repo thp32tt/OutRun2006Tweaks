@@ -4602,5 +4602,74 @@
     "worker_commit": "ec1904701422eb340ba1b1146feb4a419ac624d9",
     "status": "B235_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
     "runtime_validation": "UNTESTED"
+  },
+  "c245_c2_batch_q026_q028_q030": {
+    "timestamp_kst": "2026-10-07T18:05:00+09:00",
+    "run": "20261007-C245-C2-BATCH-Q026-Q028-Q030",
+    "role": "C",
+    "lane": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "worker_run": 37597844654,
+    "batch_count": 3,
+    "q26": {
+      "queue_index": 26,
+      "asset": "63C91067",
+      "candidate_sha256": "2dfc6214ce2383ef01f2739baeff04890d5ff78330b192fcee0d864f6caff719",
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PASS",
+      "c3": "C3_STRICT_PASS",
+      "localized_dark_widths": [
+        475,
+        475
+      ],
+      "source_bbox_widths": [
+        524,
+        525
+      ],
+      "width_ratios": [
+        0.9065,
+        0.9048
+      ],
+      "outside_pixels": 0,
+      "alpha_outside_pixels": 0,
+      "clean_authoritative": true,
+      "status": "C245_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME"
+    },
+    "q28": {
+      "queue_index": 28,
+      "asset": "A05BF610",
+      "candidate_sha256": "aa0692a2918326a494c1b04837603313faac7bdd9b7f043d4b679a8e8b1493f9",
+      "machine_qa": "PASS_BOUNDARY",
+      "controller_visual_qa": "FAIL_TOTAL_RANK_TEXT_TOO_SMALL",
+      "localized_dark_width": 312,
+      "source_bbox_width": 525,
+      "width_ratio": 0.5943,
+      "historical_clean_authoritative": false,
+      "status": "C245_VISUAL_FAIL_REWORK_REQUIRED"
+    },
+    "q30": {
+      "queue_index": 30,
+      "asset": "8215FD25",
+      "candidate_sha256": "e2eccea39c4241477c5c9743e23ffb69d1cfe785f5186dbd992a865a917d6edc",
+      "machine_qa": "PASS_BOUNDARY",
+      "controller_visual_qa": "FAIL_TOTAL_RANK_TEXT_TOO_SMALL",
+      "localized_dark_widths": [
+        296,
+        297
+      ],
+      "source_bbox_widths": [
+        535,
+        534
+      ],
+      "width_ratios": [
+        0.5533,
+        0.5562
+      ],
+      "status": "C245_VISUAL_FAIL_REWORK_REQUIRED"
+    },
+    "pre_ingame_export": "PENDING_REFRESH_Q26",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
