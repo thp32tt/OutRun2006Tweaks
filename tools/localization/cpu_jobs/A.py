@@ -46,10 +46,10 @@ if not FONT or not Path(FONT).exists(): raise RuntimeError(("font",FONT))
 # Concrete current-policy false negatives visible in A_RECOVERY12 SOURCE|OLD|NEW:
 # these yellow instruction rows are roughly half the source-family height.
 targets={
- "keep_passing":{"source":"Keep passing the cars!","old":"계속 차량을 추월하세요!","ko":"계속 추월하세요!","bbox":[1,143,520,236],"prior":[40,165,491,215],"shear":0.24},
- "drift":{"source":"Drift!","old":"드리프트!","ko":"드리프트!","bbox":[500,120,720,228],"prior":[517,149,707,200],"shear":0.20},
- "dont_crash":{"source":"Don't crash!","old":"충돌하지 마세요!","ko":"충돌하지 마세요!","bbox":[550,200,1070,370],"prior":[602,259,1024,324],"shear":0.24},
- "go_gate":{"source":"Go through the gate!","old":"게이트를 통과하세요!","ko":"게이트를 통과하세요!","bbox":[1020,200,1590,370],"prior":[1077,261,1539,319],"shear":0.24}
+ "keep_passing":{"source":"Keep passing the cars!","old":"계속 차량을 추월하세요!","ko":"계속 추월하세요!","bbox":[1,143,520,236],"safe":[4,146,496,233],"prior":[40,165,491,215],"shear":0.24},
+ "drift":{"source":"Drift!","old":"드리프트!","ko":"드리프트!","bbox":[500,120,720,228],"safe":[503,123,717,225],"prior":[517,149,707,200],"shear":0.20},
+ "dont_crash":{"source":"Don't crash!","old":"충돌하지 마세요!","ko":"충돌하지 마세요!","bbox":[550,200,1070,370],"safe":[553,203,1017,367],"prior":[602,259,1024,324],"shear":0.24},
+ "go_gate":{"source":"Go through the gate!","old":"게이트를 통과하세요!","ko":"게이트를 통과하세요!","bbox":[1020,200,1590,370],"safe":[1023,203,1587,367],"prior":[1077,261,1539,319],"shear":0.24}
 }
 
 def shear_rgba(im,s):
@@ -94,17 +94,18 @@ for key,t in targets.items():
     x0,y0,x1,y1=t["bbox"]; prior=t["prior"]
     # Restore the entire exact source text/effect bbox from already validated clean plate.
     final.paste(clean.crop((x0,y0,x1,y1)),(x0,y0))
-    maxw=(x1-x0)-6; maxh=(y1-y0)-6
+    sx0,sy0,sx1,sy1=t["safe"]
+    maxw=sx1-sx0; maxh=sy1-sy0
     fs,g,hs=fresh(t["ko"],maxw,maxh,t["shear"])
-    px=x0+3+(maxw-g.width)//2
-    py=y0+3+(maxh-g.height)//2
+    px=sx0+(maxw-g.width)//2
+    py=sy0+(maxh-g.height)//2
     final.alpha_composite(g,(px,py))
     gm=Image.new("L",(W,H),0); gm.paste(g.getchannel("A"),(px,py)); render_masks[key]=gm
     loc=[px,py,px+g.width,py+g.height]
     if not(loc[0]>x0 and loc[1]>y0 and loc[2]<x1 and loc[3]<y1): raise RuntimeError(("margin",key,loc,t["bbox"]))
     rows[key]={"source":t["source"],"prior_korean":t["old"],"korean":t["ko"],"original_bbox":t["bbox"],"prior_bbox":prior,"localized_bbox_preencode":loc,
                "source_size":[x1-x0,y1-y0],"prior_size":[prior[2]-prior[0],prior[3]-prior[1]],"preencode_size":[g.width,g.height],
-               "font":Path(FONT).name,"font_size":fs,"shear":t["shear"],"horizontal_scale":round(hs,4)}
+               "font":Path(FONT).name,"font_size":fs,"shear":t["shear"],"horizontal_scale":round(hs,4),"safe_layout_bbox":t["safe"]}
 
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 outb=sb[:128]+raw_final.tobytes("raw","RGBA")
