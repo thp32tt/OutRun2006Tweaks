@@ -1,0 +1,520 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C253",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 147,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+  "asset_key": "39BCA907",
+  "trigger": "PRE_INGAME #014 forced-width Hangul distortion; A156 natural-aspect height-driven rerender",
+  "candidate_sha256": "ab002e4f172ebe72b593914b92661c4f8137d50f8b073a22005fd175cff0153e",
+  "prior_candidate_sha256": "6f59084b340a2a2bc56bd72b276c4cd264aaabfb7e76b013fe190a8f9cb0417b",
+  "canonical_source_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+  "prior_provenance": "git-history:8bce96623a51eb4e09a9a067d0bce172687fe3b5",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6:Release/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+  "independent_machine_qa": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "header_128_exact_source_prior_current": true,
+    "prior_to_current_changed_pixels": 249857,
+    "prior_to_current_changed_outside_declared_rework_union": 0,
+    "prior_to_current_alpha_changed_outside_declared_rework_union": 0,
+    "bbox_size_positive_margin": "15/15 PASS",
+    "regions": [
+      {
+        "key": "TULIP_GARDEN",
+        "source_bbox": [
+          3,
+          811,
+          502,
+          874
+        ],
+        "localized_bbox": [
+          5,
+          813,
+          239,
+          872
+        ],
+        "source_size": [
+          499,
+          63
+        ],
+        "localized_size": [
+          234,
+          59
+        ],
+        "margins": [
+          2,
+          263,
+          2,
+          2
+        ],
+        "width_ratio": 0.4689,
+        "height_ratio": 0.9365,
+        "result": "PASS"
+      },
+      {
+        "key": "SNOW_MOUNTAIN",
+        "source_bbox": [
+          981,
+          813,
+          1576,
+          876
+        ],
+        "localized_bbox": [
+          983,
+          815,
+          1270,
+          874
+        ],
+        "source_size": [
+          595,
+          63
+        ],
+        "localized_size": [
+          287,
+          59
+        ],
+        "margins": [
+          2,
+          306,
+          2,
+          2
+        ],
+        "width_ratio": 0.4824,
+        "height_ratio": 0.9365,
+        "result": "PASS"
+      },
+      {
+        "key": "PALM_BEACH",
+        "source_bbox": [
+          0,
+          724,
+          439,
+          786
+        ],
+        "localized_bbox": [
+          2,
+          726,
+          170,
+          784
+        ],
+        "source_size": [
+          439,
+          62
+        ],
+        "localized_size": [
+          168,
+          58
+        ],
+        "margins": [
+          2,
+          269,
+          2,
+          2
+        ],
+        "width_ratio": 0.3827,
+        "height_ratio": 0.9355,
+        "result": "PASS"
+      },
+      {
+        "key": "METROPOLIS",
+        "source_bbox": [
+          985,
+          723,
+          1422,
+          786
+        ],
+        "localized_bbox": [
+          987,
+          725,
+          1319,
+          784
+        ],
+        "source_size": [
+          437,
+          63
+        ],
+        "localized_size": [
+          332,
+          59
+        ],
+        "margins": [
+          2,
+          103,
+          2,
+          2
+        ],
+        "width_ratio": 0.7597,
+        "height_ratio": 0.9365,
+        "result": "PASS"
+      },
+      {
+        "key": "INDUSTRIAL_COMPLEX",
+        "source_bbox": [
+          8,
+          635,
+          790,
+          698
+        ],
+        "localized_bbox": [
+          10,
+          637,
+          581,
+          696
+        ],
+        "source_size": [
+          782,
+          63
+        ],
+        "localized_size": [
+          571,
+          59
+        ],
+        "margins": [
+          2,
+          209,
+          2,
+          2
+        ],
+        "width_ratio": 0.7302,
+        "height_ratio": 0.9365,
+        "result": "PASS"
+      },
+      {
+        "key": "IMPERIAL_AVENUE",
+        "source_bbox": [
+          986,
+          639,
+          1630,
+          701
+        ],
+        "localized_bbox": [
+          988,
+          641,
+          1377,
+          699
+        ],
+        "source_size": [
+          644,
+          62
+        ],
+        "localized_size": [
+          389,
+          58
+        ],
+        "margins": [
+          2,
+          253,
+          2,
+          2
+        ],
+        "width_ratio": 0.604,
+        "height_ratio": 0.9355,
+        "result": "PASS"
+      },
+      {
+        "key": "GHOST_FOREST",
+        "source_bbox": [
+          11,
+          551,
+          517,
+          613
+        ],
+        "localized_bbox": [
+          13,
+          553,
+          411,
+          611
+        ],
+        "source_size": [
+          506,
+          62
+        ],
+        "localized_size": [
+          398,
+          58
+        ],
+        "margins": [
+          2,
+          106,
+          2,
+          2
+        ],
+        "width_ratio": 0.7866,
+        "height_ratio": 0.9355,
+        "result": "PASS"
+      },
+      {
+        "key": "DESERT",
+        "source_bbox": [
+          981,
+          547,
+          1260,
+          610
+        ],
+        "localized_bbox": [
+          983,
+          549,
+          1146,
+          608
+        ],
+        "source_size": [
+          279,
+          63
+        ],
+        "localized_size": [
+          163,
+          59
+        ],
+        "margins": [
+          2,
+          114,
+          2,
+          2
+        ],
+        "width_ratio": 0.5842,
+        "height_ratio": 0.9365,
+        "result": "PASS"
+      },
+      {
+        "key": "DEEP_LAKE",
+        "source_bbox": [
+          6,
+          466,
+          401,
+          528
+        ],
+        "localized_bbox": [
+          8,
+          468,
+          236,
+          526
+        ],
+        "source_size": [
+          395,
+          62
+        ],
+        "localized_size": [
+          228,
+          58
+        ],
+        "margins": [
+          2,
+          165,
+          2,
+          2
+        ],
+        "width_ratio": 0.5772,
+        "height_ratio": 0.9355,
+        "result": "PASS"
+      },
+      {
+        "key": "CONIFEROUS_FOREST",
+        "source_bbox": [
+          980,
+          457,
+          1731,
+          522
+        ],
+        "localized_bbox": [
+          982,
+          459,
+          1514,
+          520
+        ],
+        "source_size": [
+          751,
+          65
+        ],
+        "localized_size": [
+          532,
+          61
+        ],
+        "margins": [
+          2,
+          217,
+          2,
+          2
+        ],
+        "width_ratio": 0.7084,
+        "height_ratio": 0.9385,
+        "result": "PASS"
+      },
+      {
+        "key": "CLOUDY_HIGHLAND",
+        "source_bbox": [
+          3,
+          373,
+          675,
+          438
+        ],
+        "localized_bbox": [
+          5,
+          375,
+          479,
+          436
+        ],
+        "source_size": [
+          672,
+          65
+        ],
+        "localized_size": [
+          474,
+          61
+        ],
+        "margins": [
+          2,
+          196,
+          2,
+          2
+        ],
+        "width_ratio": 0.7054,
+        "height_ratio": 0.9385,
+        "result": "PASS"
+      },
+      {
+        "key": "CASTLE_WALL",
+        "source_bbox": [
+          980,
+          371,
+          1485,
+          437
+        ],
+        "localized_bbox": [
+          982,
+          373,
+          1166,
+          435
+        ],
+        "source_size": [
+          505,
+          66
+        ],
+        "localized_size": [
+          184,
+          62
+        ],
+        "margins": [
+          2,
+          319,
+          2,
+          2
+        ],
+        "width_ratio": 0.3644,
+        "height_ratio": 0.9394,
+        "result": "PASS"
+      },
+      {
+        "key": "CAPE_WAY",
+        "source_bbox": [
+          0,
+          285,
+          375,
+          350
+        ],
+        "localized_bbox": [
+          2,
+          287,
+          297,
+          348
+        ],
+        "source_size": [
+          375,
+          65
+        ],
+        "localized_size": [
+          295,
+          61
+        ],
+        "margins": [
+          2,
+          78,
+          2,
+          2
+        ],
+        "width_ratio": 0.7867,
+        "height_ratio": 0.9385,
+        "result": "PASS"
+      },
+      {
+        "key": "ANCIENT_RUINS",
+        "source_bbox": [
+          982,
+          285,
+          1554,
+          350
+        ],
+        "localized_bbox": [
+          984,
+          287,
+          1400,
+          348
+        ],
+        "source_size": [
+          572,
+          65
+        ],
+        "localized_size": [
+          416,
+          61
+        ],
+        "margins": [
+          2,
+          154,
+          2,
+          2
+        ],
+        "width_ratio": 0.7273,
+        "height_ratio": 0.9385,
+        "result": "PASS"
+      },
+      {
+        "key": "ALPINE",
+        "source_bbox": [
+          6,
+          194,
+          282,
+          256
+        ],
+        "localized_bbox": [
+          8,
+          196,
+          167,
+          254
+        ],
+        "source_size": [
+          276,
+          62
+        ],
+        "localized_size": [
+          159,
+          58
+        ],
+        "margins": [
+          2,
+          115,
+          2,
+          2
+        ],
+        "width_ratio": 0.5761,
+        "height_ratio": 0.9355,
+        "result": "PASS"
+      }
+    ]
+  },
+  "visual_evidence": [
+    "C253_q147_39BCA907_FLIPY.jpg",
+    "C253_q147_39BCA907_RAW.jpg",
+    "C253_q147_39BCA907_CONTACTS.jpg"
+  ],
+  "verified_clean_plate_evidence": "producer A156_SOURCE_CLEAN_FINAL; C controller must re-open before verdict",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "mandatory_c3_strict_audit": true,
+  "c3_strict_audit": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

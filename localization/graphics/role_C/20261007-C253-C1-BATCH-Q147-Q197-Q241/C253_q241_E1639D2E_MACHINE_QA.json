@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C253",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 241,
+  "asset": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+  "asset_key": "E1639D2E",
+  "trigger": "PRE_INGAME #062 Loading hierarchy undersize; A146 native-HD hierarchy rework",
+  "candidate_sha256": "b94f215b889231a7942299d6a2179540425d11538df21feb25565cac13bab037",
+  "prior_candidate_sha256": "fe9bb931d94a13a44a08bcf61b6325c01080b462afff84f92c97205cbe0eea65",
+  "canonical_source_sha256": "e250a41e7c59ccd5b8a68a02aace066f6578fbe0d84a365d7a0a27044b353511",
+  "prior_provenance": "git-history:a2bada8ba61aacde1791a71d8af8af8f345a7ca6",
+  "source_provenance": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6:Release/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+  "independent_machine_qa": {
+    "dimensions": [
+      1024,
+      256
+    ],
+    "header_128_exact_source_prior_current": true,
+    "prior_to_current_changed_pixels": 43102,
+    "prior_to_current_changed_outside_declared_rework_union": 0,
+    "prior_to_current_alpha_changed_outside_declared_rework_union": 0,
+    "bbox_size_positive_margin": "2/2 PASS",
+    "regions": [
+      {
+        "key": "loading",
+        "source_bbox": [
+          1,
+          110,
+          731,
+          256
+        ],
+        "localized_bbox": [
+          9,
+          116,
+          413,
+          250
+        ],
+        "source_size": [
+          730,
+          146
+        ],
+        "localized_size": [
+          404,
+          134
+        ],
+        "margins": [
+          8,
+          318,
+          6,
+          6
+        ],
+        "width_ratio": 0.5534,
+        "height_ratio": 0.9178,
+        "result": "PASS"
+      },
+      {
+        "key": "please_wait",
+        "source_bbox": [
+          4,
+          50,
+          375,
+          98
+        ],
+        "localized_bbox": [
+          6,
+          52,
+          163,
+          96
+        ],
+        "source_size": [
+          371,
+          48
+        ],
+        "localized_size": [
+          157,
+          44
+        ],
+        "margins": [
+          2,
+          212,
+          2,
+          2
+        ],
+        "width_ratio": 0.4232,
+        "height_ratio": 0.9167,
+        "result": "PASS"
+      }
+    ]
+  },
+  "visual_evidence": [
+    "C253_q241_E1639D2E_FLIPY.jpg",
+    "C253_q241_E1639D2E_RAW.jpg",
+    "C253_q241_E1639D2E_CONTACTS.jpg"
+  ],
+  "verified_clean_plate_evidence": "producer E1639D2E_HD_CLEAN_PLATE + A146 validation; C controller must re-open before verdict",
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "mandatory_c3_strict_audit": true,
+  "c3_strict_audit": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C253",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "execution_backend": "github-actions independent repository-backed pixel QA after ChatGPT-local GitHub DNS failure",
+  "assets": [
+    {
+      "index": 147,
+      "key": "39BCA907",
+      "candidate_sha256": "ab002e4f172ebe72b593914b92661c4f8137d50f8b073a22005fd175cff0153e",
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PENDING",
+      "c3": "PENDING"
+    },
+    {
+      "index": 197,
+      "key": "9F060EC1",
+      "candidate_sha256": "60cfa3ef1257e3bbc50a8c7152aba538837eabd2322c18e098ee7ceb61381fea",
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PENDING",
+      "c3": "PENDING"
+    },
+    {
+      "index": 241,
+      "key": "E1639D2E",
+      "candidate_sha256": "b94f215b889231a7942299d6a2179540425d11538df21feb25565cac13bab037",
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PENDING",
+      "c3": "PENDING"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
