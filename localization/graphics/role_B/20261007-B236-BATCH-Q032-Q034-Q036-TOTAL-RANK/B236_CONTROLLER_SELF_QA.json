@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B236-BATCH-Q032-Q034-Q036-TOTAL-RANK",
+  "timestamp_kst": "2026-10-07T18:48:00+09:00",
+  "execution_backend": "GITHUB_ACTIONS_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_BLOCKED; N100_AUXILIARY_JPG_REVIEW_ONLY",
+  "worker": {
+    "first_run": 37602538239,
+    "first_result": "FAIL_NO_OUTPUT_PYTHON_NULL_SENTINEL",
+    "final_run": 37602831593,
+    "final_result": "SUCCESS",
+    "worker_commit": "7cd5fc1ee773e9f160faf09d66b50afe1b5e7dbf"
+  },
+  "assets": [
+    {
+      "queue_index": 32,
+      "key": "DCC7B488",
+      "before": "9e0b5dcd66b1aaeb031f60090d3c8f919cc59f7c6f8860602bcbc9990eb87867",
+      "candidate": "2bb9d21e95a99da036657da5d696982d5ee44875c91cd798dbcb7b99830757e8",
+      "rows": "1/1 PASS",
+      "scale": "468x74 inside 518x84; width 90.35%; margins 25/25/5/5",
+      "plate": "PASS C206/B152 independently approved clean reused only inside exact source effect bbox"
+    },
+    {
+      "queue_index": 34,
+      "key": "B7E25BAD",
+      "before": "590f868ac4b99addf1bf41a87de29498584b770e54649809f8398bb699aad467",
+      "candidate": "a23761d1160933d968347c87ca40496b9f8e8257a102f865b2047df2a8d92763",
+      "rows": "1/1 PASS",
+      "scale": "486x92 inside 535x102; width 90.84%; margins 24/25/5/5",
+      "plate": "PASS C209/B154 independently approved clean reused only inside exact source effect bbox"
+    },
+    {
+      "queue_index": 36,
+      "key": "06AB5CEE",
+      "before": "e3854f79be83cdd5fac7e9af91ab8f2beb9707000a7c6abbc564c2ca443fa553",
+      "candidate": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
+      "rows": "3/3 PASS",
+      "scale": "486x92/486x92/468x75 inside 535x102/534x102/519x85; ~90.2-91.0% width; >=5px vertical margins",
+      "plate": "PASS current A144 user-restored plates retained; only persisted Korean glyph/effect masks removed with 2px dilation + nearest intact local fill; controller sees no rectangle, haze, seam or source footprint"
+    },
+    {
+      "queue_index": 38,
+      "key": "6AB5CEE",
+      "candidate": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
+      "alias_of_queue_index": 36,
+      "alias_exact_bytes": true
+    }
+  ],
+  "machine_qa": {
+    "containment_size_positive_margin": "5/5 PASS",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changes_outside_exact_source_bboxes": 0,
+    "localized_pair_overlap": 0,
+    "header_mip1_persisted_decode": "PASS",
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "total_rank_hierarchy": "PASS: prior A144 55-57% width family is replaced by ~90% source-width family",
+    "readable_slant": "PASS: source-directed right lean 0.30",
+    "plate_restoration": "PASS: q32/q34 no patch/residue; q36/q38 no haze/dirty source footprint after glyph-mask local reconstruction",
+    "glyph_integrity": "PASS: no broken Hangul or clipping",
+    "protected_art": "PASS: no rank/character/lens-flare/border/glow intrusion",
+    "raw_flip_y": "PASS",
+    "immediate_readability": "PASS"
+  },
+  "ordered_generation_gate": "8/8 PASS",
+  "decision": "B236_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
