@@ -1,0 +1,15 @@
+{
+  "run": "A158",
+  "index": 47,
+  "asset": "AD720950",
+  "candidate_sha256": "6386a41ffa4af599cc7076be0cc4ce59729026b4882c437ac397270290b7e4bf",
+  "translation": "Shift -> 시프트",
+  "bbox_size_positive_margin": "1/1 PASS",
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "clean_residue": 0,
+  "prior_exact_outside": true,
+  "worker_status": "A158_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261007-A-MANUALQA158-AD720950-SHIFT/A158_AD720950_REPORT.json"
+}
