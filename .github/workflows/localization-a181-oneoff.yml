@@ -1,0 +1,38 @@
+name: Localization A181 Oneoff
+on:
+  push:
+    branches: [korean-localization-recovery-20260928]
+    paths: ['.github/workflows/localization-a181-oneoff.yml']
+permissions:
+  contents: write
+jobs:
+  a181:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check pillow numpy scipy
+      - name: Run A181
+        env:
+          OUTRUN_CPU_WORKER: github-actions
+          OUTRUN_CPU_ROLE: A
+        run: python tools/localization/cpu_jobs/A.py
+      - name: Commit A181 outputs
+        run: |
+          set -euo pipefail
+          git add -A localization/graphics/hd_candidates localization/graphics/role_A localization/graphics/worker_results
+          if git diff --cached --quiet; then
+            echo "No A181 output changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "localization(A181): worker q219 output"
+          git fetch origin korean-localization-recovery-20260928
+          git rebase origin/korean-localization-recovery-20260928
+          git push origin HEAD:korean-localization-recovery-20260928
