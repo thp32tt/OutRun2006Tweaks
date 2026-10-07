@@ -493,6 +493,20 @@ for contract_id, rva in (
     require(rva, binary_contract,
             'canonical NaviPub ScreenHud scaling-state RVA')
 
+# Canonical byte closure for the four active Ghost/TimeAttack ScreenHud
+# spacing-state hooks. Bytes come from HUD Inspector artifact 11502720199
+# against the pinned canonical OR2006C2C.EXE.
+for contract_id, rva in (
+    ('VR-EXE-GHOST-SUB-ADJUST-BDAE8', '0x000BDAE8'),
+    ('VR-EXE-GHOST-ADJUST-BDE3A', '0x000BDE3A'),
+    ('VR-EXE-TIMEATTACK-FORCE-RIGHT-BE4BC', '0x000BE4BC'),
+    ('VR-EXE-TIMEATTACK-FORCE-LEFT-BE4E7', '0x000BE4E7'),
+):
+    require(contract_id, binary_contract,
+            'canonical Ghost/TimeAttack ScreenHud spacing contract')
+    require(rva, binary_contract,
+            'canonical Ghost/TimeAttack ScreenHud spacing RVA')
+
 # Ghost/You/Diff + TimeAttack ScreenHud producer window. These four
 # source-level UIScaling spacing hooks are high-value P0 anchors but previously
 # lacked a durable canonical disassembly window for exact byte recovery.
