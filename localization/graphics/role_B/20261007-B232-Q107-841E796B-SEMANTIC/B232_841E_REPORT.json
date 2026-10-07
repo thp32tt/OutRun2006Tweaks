@@ -92,10 +92,11 @@
     "no_clipping": "PASS_POSITIVE_MARGIN",
     "protected_clearance": "PASS_ZERO_OUTSIDE_SOURCE_LINES",
     "raw_flipy": "PASS_EVIDENCE_WRITTEN",
-    "immediate_readability": "PENDING_CONTROLLER_VISUAL"
+    "immediate_readability": "PASS_CONTROLLER_100_75_50"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_VISUAL",
-  "status": "B232R_WORKER_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_FINAL_RAW_PRACTICAL",
+  "status": "B232R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_qa_report": "localization/graphics/role_B/20261007-B232-Q107-841E796B-SEMANTIC/B232_CONTROLLER_SELF_QA.json"
 }
