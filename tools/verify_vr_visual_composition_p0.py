@@ -249,4 +249,31 @@ for marker, d3dx_call in (
 
 require('CorroboratesProjectedWorldMarker', sem, 'exact projected marker semantic retained')
 
+# Lens flare P0: R73 HMD proved scalar disparity tuning was not a fix.
+# Ownership must come from the canonical sub_40CAE0 producer: EXE+0xCABE
+# DrawObjectAlpha call, then pass the same exact semantic through the WVP proof.
+require('ProjectedScreenEffect2D', sem, 'exact projected lens semantic')
+require('CorroboratesProjectedScreenEffect', sem, 'projected lens semantic predicate')
+require('VRLensFlareProjected2D', graphics, 'canonical lens producer hook')
+require('Module::exe_ptr(0xCABE)', graphics, 'canonical EXE+0xCABE lens callsite')
+require('RenderScope::ProjectedScreenEffect2D', graphics, 'exact lens producer scope')
+require('semanticProjectedScreen', r30, 'exact lens scope classifier')
+require('CorroboratesProjectedScreenEffect', r30, 'exact lens WVP ownership guard')
+require('exactSceneEffect', r30, 'SceneEffect/lens ownership admission')
+require_order(
+    r30,
+    'lens ownership must be semantic before WVP classification',
+    'const bool semanticProjectedScreen',
+    'if (!semanticHud && !semanticWorld && !semanticSceneEffect',
+    'if (semanticProjectedScreen || semanticSceneEffect)',
+    'R44GetOwnedRawOverlayWvp(rawWvp)',
+    'R44ClassifyOwnedOverlayMatrix(rawWvp)',
+)
+analyzer = read('tools/analyze_outrun_exe.py')
+require('SceneEffectLensProducer_sub_40CAE0', analyzer, 'canonical lens producer window')
+require('0x0000CAE0', analyzer, 'lens producer start RVA')
+require('0x0000CABE', analyzer, 'lens DrawObjectAlpha anchor RVA')
+require('0x0000CF4E', analyzer, 'lens Calc3D2D anchor RVA')
+
+
 print('P0 visual composition static contract: PASS')
