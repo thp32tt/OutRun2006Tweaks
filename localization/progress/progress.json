@@ -3956,5 +3956,21 @@
     "blast_radius": "PASS",
     "mandatory_c3": "REQUIRED_CURRENT_SHA_BEFORE_EXPORT",
     "runtime_validation": "UNTESTED"
+  },
+  "c233_c2_q012_d6dc1380": {
+    "status": "C233_REWORK_REQUIRED_MATERIAL_SCALE_FIX_PENDING_A_B",
+    "timestamp_kst": "2026-10-07T12:58:01+09:00",
+    "queue_index": 12,
+    "asset": "D6DC1380",
+    "candidate_sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "independent_c": "FAIL",
+    "raw_flipy_orientation": "PASS",
+    "glyph_integrity": "PASS",
+    "material_scale_rework": "FAIL_UNCHANGED_REJECTED_BYTES",
+    "pre_ingame_export": "BLOCKED",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }

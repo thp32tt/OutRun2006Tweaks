@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "20261007-C233-C2-Q012-D6DC1380-A144",
+  "timestamp_kst": "2026-10-07T12:58:01+09:00",
+  "queue_index": 12,
+  "asset": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+  "producer_run": "A144",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "candidate_sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
+  "user_jpg_regression": "PJR-001-20261006",
+  "user_rejection_tags": [
+    "ORIENTATION_UP_DOWN_REVERSED",
+    "TEXT_TOO_SMALL",
+    "TOTAL_RANK_SIZE_FAMILY_REVIEW"
+  ],
+  "independent_evidence": {
+    "a144_rework_report": "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A_USERJPG144_REWORK_REPORT.json",
+    "a144_before_sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
+    "a144_after_sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
+    "a144_recorded_fixes": [
+      "orientation_up_down_reversed"
+    ],
+    "raw_flipy_report": "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_RAW_FLIPY_QA.json",
+    "raw_flipy_proof": "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/A144_PJR001_SOURCE_CANDIDATE_RAW_FLIPY.jpg",
+    "source_old_new": "localization/graphics/role_A/20261006-A-USERJPG144-CLEANUP/001_D6DC1380_SOURCE_OLD_NEW.jpg"
+  },
+  "controller_visual_qa": {
+    "raw_orientation": "PASS_CURRENT_BYTES_MATCH_SOURCE_RAW_ORIENTATION",
+    "flip_y_readable_orientation": "PASS_CURRENT_BYTES_READABLE_AFTER_FLIP_Y",
+    "glyph_integrity": "PASS_NO_TOFU_OR_BROKEN_HANGUL_IN_CORRECTED_A144_EVIDENCE",
+    "material_scale_rework": "FAIL",
+    "reason": "PJR-001 rejected TEXT_TOO_SMALL/TOTAL_RANK_SIZE_FAMILY_REVIEW. A144 proves q12 before_sha256 == after_sha256 and records only orientation_up_down_reversed; no material glyph-scale candidate change addresses the user scale rejection."
+  },
+  "policy_basis": [
+    "User PRE_INGAME JPG rejection overrides prior C PASS.",
+    "A/B after a user rejection must materially change candidate bytes or exact rendering evidence for the rejected defect; status-only or re-running unchanged bytes is not completion.",
+    "Fresh C cannot clear TEXT_TOO_SMALL/TOTAL_RANK_SIZE_FAMILY_REVIEW on the exact same rejected candidate bytes without material scale correction and fresh review."
+  ],
+  "decision": "REWORK_REQUIRED",
+  "rework_required": [
+    "Materially rerender q12 Korean lettering at source-faithful maximum readable scale while remaining within the exact permitted source glyph/effect bbox.",
+    "Preserve the now-demonstrated RAW/FLIP-Y orientation behavior.",
+    "Run producer ordered gate, then fresh independent C and mandatory C3 before PRE_INGAME export."
+  ],
+  "pre_ingame_export": "EXCLUDED_UNTIL_FRESH_C3_PASS",
+  "user_jpg_review": "STILL_OPEN",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

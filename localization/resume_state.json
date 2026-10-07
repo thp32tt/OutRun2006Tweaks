@@ -7937,5 +7937,23 @@
     "mandatory_c3": "REQUIRED_CURRENT_SHA_BEFORE_PRE_INGAME_EXPORT",
     "status": "B230_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c233_c2_q012_d6dc1380": {
+    "timestamp_kst": "2026-10-07T12:58:01+09:00",
+    "run": "20261007-C233-C2-Q012-D6DC1380-A144",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 12,
+    "asset": "D6DC1380",
+    "candidate_sha256": "703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422",
+    "producer_run": "A144",
+    "user_jpg_regression": "PJR-001-20261006",
+    "fresh_independent_c": "FAIL_REWORK_REQUIRED",
+    "reason": "A144 before_sha256 == after_sha256; only orientation evidence changed while TEXT_TOO_SMALL/TOTAL_RANK_SIZE_FAMILY_REVIEW remained a user rejection.",
+    "controller_qa": "localization/graphics/role_C/20261007-C233-C2-Q012-D6DC1380-A144/C233_D6DC1380_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_comparison_refresh": "BLOCKED_REWORK_REQUIRED",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

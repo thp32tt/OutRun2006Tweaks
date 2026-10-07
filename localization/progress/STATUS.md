@@ -2287,3 +2287,9 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - Post-encode/controller QA PASS: SOURCE/C225R/CLEAN/B230 full comparison, decoded-persisted 100%/75%/50% practical-scale contacts and RAW mirror_y were inspected. Both new rows are immediately readable, source-like dark/condensed/upright, and show no English residue, clipping, overlap, broken Hangul, protected intrusion or orientation regression. Coverage now accounts for 4 semantic segments / 6 visible physical localized occurrences.
 - Decision `B230_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME`. Prior C225R is superseded because q232 candidate bytes changed. Due q232's prior style/hierarchy false-negative history, current policy requires normal fresh C followed by `C3_STRICT_PASS` tied to this exact candidate SHA before PRE_INGAME export. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261007-B-MANUALQA230-EBFC709F-HELP/B230_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261007-B-MANUALQA230-EBFC709F-HELP/B230_EBFC_REPORT.json`.
+
+## 2026-10-07 12:58 KST — C233 C2 q12 D6DC1380 REWORK_REQUIRED
+- TEMP_BACKLOG_RELIEF=C2, SHARD=EVEN; q12 P0 PJR-001 fresh C review.
+- Current/A144 SHA 703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422 is byte-identical before/after A144; only orientation evidence was corrected.
+- RAW/FLIP-Y and glyph integrity PASS, but user TEXT_TOO_SMALL|TOTAL_RANK_SIZE_FAMILY_REVIEW remains unaddressed by material bytes. Fresh C FAIL -> A/B material scale rework required.
+- PRE_INGAME excluded; fresh C+C3, user JPG review and actual-game retest still required. RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.
