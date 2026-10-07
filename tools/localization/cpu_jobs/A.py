@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# retry-after-C254-head-lease
 import os
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
