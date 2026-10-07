@@ -221,7 +221,7 @@ R283_TARGET_BYTECODE_MATERIALIZATION_RE = re.compile(
     r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
 )
 R275_SEMANTIC_RECEIPT_RE = re.compile(
-    r"VR DX11 R275 translatedSemanticReceipt signature#(?P<signature>\d+): 
+    r"VR DX11 R275 translatedSemanticReceipt signature#(?P<signature>\d+): "
     r"exact=(?P<exact>[01]) objectReady=(?P<objectReady>[01]) "
     r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
 )
