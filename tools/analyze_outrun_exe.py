@@ -38,6 +38,15 @@ PRODUCER_WINDOWS = (
         "end_rva": 0x0000D100,
         "anchors": (0x0000CABE, 0x0000CF4E),
     },
+    {
+        "name": "OutRunStageResultHud_0x97000",
+        "start_rva": 0x00097000,
+        "end_rva": 0x00098000,
+        "anchors": (
+            0x000975EE, 0x00097727, 0x000977FB,
+            0x00097BB7, 0x00097DA7,
+        ),
+    },
 )
 
 KNOWN_CALL_SITES = {
