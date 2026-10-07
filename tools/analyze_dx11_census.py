@@ -225,6 +225,32 @@ R275_SEMANTIC_RECEIPT_RE = re.compile(
     r"exact=(?P<exact>[01]) objectReady=(?P<objectReady>[01]) "
     r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
 )
+R297_PRODUCTION_SOURCE_REVALIDATION_RE = re.compile(
+    r"VR DX11 R297 productionSourceRevalidation signature#(?P<signature>\d+): "
+    r"drawExact=(?P<drawExact>[01]) "
+    r"nativeBufferEligible=(?P<nativeBufferEligible>[01]) "
+    r"r258Present=(?P<r258Present>[01]) "
+    r"r258Contract=(?P<r258Contract>[01]) "
+    r"kindMatch=(?P<kindMatch>[01]) "
+    r"startMatch=(?P<startMatch>[01]) "
+    r"countDerivable=(?P<countDerivable>[01]) "
+    r"countMatch=(?P<countMatch>[01]) "
+    r"elementCount=(?P<elementCount>\d+) "
+    r"indexFormatKnown=(?P<indexFormatKnown>[01]) "
+    r"indexFormatMatch=(?P<indexFormatMatch>[01]) "
+    r"indexOffsetMatch=(?P<indexOffsetMatch>[01]) "
+    r"indexFormat=(?P<indexFormat>\d+) "
+    r"baseMatch=(?P<baseMatch>[01]) "
+    r"minMatch=(?P<minMatch>[01]) "
+    r"numMatch=(?P<numMatch>[01]) "
+    r"rangeMatch=(?P<rangeMatch>[01]) "
+    r"cacheMatch=(?P<cacheMatch>[01]) "
+    r"joinExact=(?P<joinExact>[01]) "
+    r"boundaryPreserved=(?P<boundaryPreserved>[01]) "
+    r"missingEvidenceMask=0x(?P<missingEvidenceMask>[0-9A-Fa-f]+) "
+    r"r258Snapshot=0x(?P<r258Snapshot>[0-9A-Fa-f]+) "
+    r"joinSnapshot=0x(?P<joinSnapshot>[0-9A-Fa-f]+)"
+)
 R293_PRODUCTION_PREREQUISITE_RE = re.compile(
     r"VR DX11 R293 productionPrerequisiteCensus signature#(?P<signature>\d+): "
     r"sourceReceipt=(?P<sourceReceipt>[01]) "
@@ -517,6 +543,8 @@ def summarize_programmable_shader_inventory(
     semantic_receipt_missing: list[dict] = []
     production_activation_prerequisite_missing: list[dict] = []
     production_activation_prerequisite_correlation_inexact: list[dict] = []
+    production_source_revalidation_missing: list[dict] = []
+    production_source_revalidation_correlation_inexact: list[dict] = []
     semantic_plan_inexact: list[dict] = []
     object_prerequisite_missing: list[dict] = []
     object_prerequisite_inexact: list[dict] = []
@@ -539,6 +567,9 @@ def summarize_programmable_shader_inventory(
     production_activation_prerequisite_evidence_signatures = 0
     production_activation_prerequisite_exact_signatures = 0
     production_activation_prerequisite_fail_closed_signatures = 0
+    production_source_revalidation_evidence_signatures = 0
+    production_source_revalidation_join_exact_signatures = 0
+    production_source_revalidation_fail_closed_signatures = 0
     records_with_identity = 0
     programmable_signatures = 0
 
@@ -605,6 +636,9 @@ def summarize_programmable_shader_inventory(
         receipt = signature.get("translated_semantic_receipt")
         production_activation_prerequisite = signature.get(
             "production_activation_prerequisite"
+        )
+        production_source_revalidation = signature.get(
+            "production_source_revalidation"
         )
         missing_prerequisite = None
         if plan is None:
@@ -756,6 +790,17 @@ def summarize_programmable_shader_inventory(
             if production_activation_prerequisite["fail_closed"]:
                 production_activation_prerequisite_fail_closed_signatures += 1
 
+        if production_source_revalidation is None:
+            production_source_revalidation_missing.append(ref)
+        else:
+            production_source_revalidation_evidence_signatures += 1
+            if not production_source_revalidation["summary_correlation_exact"]:
+                production_source_revalidation_correlation_inexact.append(ref)
+            if production_source_revalidation["join_exact"]:
+                production_source_revalidation_join_exact_signatures += 1
+            if production_source_revalidation["fail_closed"]:
+                production_source_revalidation_fail_closed_signatures += 1
+
         pair["SignatureRefs"].append(ref)
         pair.setdefault("SemanticTranslationEvidence", []).append(
             {
@@ -769,6 +814,7 @@ def summarize_programmable_shader_inventory(
                 "Receipt": receipt,
                 "ProductionActivationPrerequisite":
                     production_activation_prerequisite,
+                "ProductionSourceRevalidation": production_source_revalidation,
                 "MissingPrerequisite": missing_prerequisite,
                 "DiagnosticOnly": True,
                 "ActivationProof": False,
@@ -798,6 +844,12 @@ def summarize_programmable_shader_inventory(
         and programmable_signatures > 0
         and not production_activation_prerequisite_missing
         and not production_activation_prerequisite_correlation_inexact
+    )
+    production_source_revalidation_evidence_coverage_complete = bool(
+        evidence_coverage_complete
+        and programmable_signatures > 0
+        and not production_source_revalidation_missing
+        and not production_source_revalidation_correlation_inexact
     )
     return {
         "CurrentSignatureRecords": len(signatures),
@@ -854,6 +906,18 @@ def summarize_programmable_shader_inventory(
             production_activation_prerequisite_fail_closed_signatures,
         "ProductionActivationEvidenceCoverageComplete":
             production_activation_evidence_coverage_complete,
+        "ProductionSourceRevalidationEvidenceMissingSignatures":
+            production_source_revalidation_missing,
+        "ProductionSourceRevalidationCorrelationInexactSignatures":
+            production_source_revalidation_correlation_inexact,
+        "ProductionSourceRevalidationEvidenceSignatures":
+            production_source_revalidation_evidence_signatures,
+        "ProductionSourceRevalidationJoinExactSignatures":
+            production_source_revalidation_join_exact_signatures,
+        "ProductionSourceRevalidationFailClosedSignatures":
+            production_source_revalidation_fail_closed_signatures,
+        "ProductionSourceRevalidationEvidenceCoverageComplete":
+            production_source_revalidation_evidence_coverage_complete,
         "SemanticEvidenceCoverageComplete": semantic_evidence_coverage_complete,
         "EvidenceLimitedBySignatureDetailCap": detail_cap_saturated,
         "EvidenceCoverageComplete": evidence_coverage_complete,
@@ -892,6 +956,7 @@ def main() -> int:
     target_bytecode_materializations: dict[SignatureKey, dict] = {}
     translated_semantic_receipts: dict[SignatureKey, dict] = {}
     production_activation_prerequisites: dict[SignatureKey, dict] = {}
+    production_source_revalidations: dict[SignatureKey, dict] = {}
     declarations: dict[SignatureKey, list[dict]] = {}
     fixed_function: dict[SignatureKey, list[dict]] = {}
     fixed_function_texture_factors: dict[SignatureKey, dict] = {}
@@ -926,6 +991,7 @@ def main() -> int:
             and "VR DX11 R197" not in text
             and "VR DX11 R223" not in text
             and "VR DX11 R293" not in text
+            and "VR DX11 R297" not in text
         ):
             continue
         source_logs.append(log_path.name)
@@ -1190,6 +1256,167 @@ def main() -> int:
                 }
                 continue
 
+            match = R297_PRODUCTION_SOURCE_REVALIDATION_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                signature_key = (source_log, startup_epoch, signature_id)
+                draw_exact = bool(int(data["drawExact"]))
+                native_buffer_eligible = bool(int(data["nativeBufferEligible"]))
+                r258_present = bool(int(data["r258Present"]))
+                r258_contract = bool(int(data["r258Contract"]))
+                kind_match = bool(int(data["kindMatch"]))
+                start_match = bool(int(data["startMatch"]))
+                count_derivable = bool(int(data["countDerivable"]))
+                count_match = bool(int(data["countMatch"]))
+                element_count = int(data["elementCount"])
+                index_format_known = bool(int(data["indexFormatKnown"]))
+                index_format_match = bool(int(data["indexFormatMatch"]))
+                index_offset_match = bool(int(data["indexOffsetMatch"]))
+                index_format = int(data["indexFormat"])
+                base_match = bool(int(data["baseMatch"]))
+                min_match = bool(int(data["minMatch"]))
+                num_match = bool(int(data["numMatch"]))
+                range_match = bool(int(data["rangeMatch"]))
+                cache_match = bool(int(data["cacheMatch"]))
+                join_exact = bool(int(data["joinExact"]))
+                boundary_preserved = bool(int(data["boundaryPreserved"]))
+                missing_evidence_mask = int(data["missingEvidenceMask"], 16)
+                r258_snapshot = int(data["r258Snapshot"], 16)
+                join_snapshot = int(data["joinSnapshot"], 16)
+
+                expected_observable_mask = (
+                    (0 if draw_exact else 0x01)
+                    | (0 if native_buffer_eligible else 0x02)
+                    | (0 if r258_present else 0x04)
+                    | (0 if count_derivable else 0x10)
+                    | (0 if index_format_known else 0x20)
+                )
+                observable_mask_matches = (
+                    (missing_evidence_mask & ~0x08)
+                    == expected_observable_mask
+                )
+                cache_missing = bool(missing_evidence_mask & 0x08)
+                join_snapshot_correlated = (
+                    (join_snapshot != 0)
+                    == (draw_exact and not cache_missing)
+                )
+                receipt_absence_fail_closed = bool(
+                    r258_present
+                    or (
+                        not r258_contract
+                        and not kind_match
+                        and not start_match
+                        and not count_match
+                        and not index_format_match
+                        and not index_offset_match
+                        and not base_match
+                        and not min_match
+                        and not num_match
+                        and not range_match
+                        and not cache_match
+                        and not join_exact
+                        and r258_snapshot == 0
+                    )
+                )
+                exact_join_correlated = bool(
+                    not join_exact
+                    or (
+                        draw_exact
+                        and native_buffer_eligible
+                        and r258_present
+                        and r258_contract
+                        and kind_match
+                        and start_match
+                        and count_derivable
+                        and count_match
+                        and index_format_known
+                        and index_format_match
+                        and index_offset_match
+                        and base_match
+                        and min_match
+                        and num_match
+                        and range_match
+                        and cache_match
+                        and missing_evidence_mask == 0
+                        and r258_snapshot != 0
+                        and join_snapshot != 0
+                        and boundary_preserved
+                    )
+                )
+                boundary_state_correlated = bool(
+                    not boundary_preserved
+                    or (
+                        (r258_present and join_exact)
+                        or (
+                            not r258_present
+                            and draw_exact
+                            and native_buffer_eligible
+                            and count_derivable
+                            and index_format_known
+                            and not cache_missing
+                            and join_snapshot != 0
+                        )
+                    )
+                )
+                summary_correlation_exact = bool(
+                    observable_mask_matches
+                    and join_snapshot_correlated
+                    and receipt_absence_fail_closed
+                    and exact_join_correlated
+                    and boundary_state_correlated
+                )
+                production_source_revalidations[signature_key] = {
+                    "draw_identity_exact": draw_exact,
+                    "native_buffer_eligible": native_buffer_eligible,
+                    "r258_receipt_present": r258_present,
+                    "r258_receipt_contract_ready": r258_contract,
+                    "kind_matches": kind_match,
+                    "start_matches": start_match,
+                    "element_count_derivable": count_derivable,
+                    "element_count_matches": count_match,
+                    "element_count": element_count,
+                    "index_format_known": index_format_known,
+                    "index_format_matches": index_format_match,
+                    "index_offset_matches": index_offset_match,
+                    "index_format": index_format,
+                    "base_vertex_matches": base_match,
+                    "min_vertex_matches": min_match,
+                    "num_vertices_matches": num_match,
+                    "range_matches": range_match,
+                    "cache_identity_matches": cache_match,
+                    "join_exact": join_exact,
+                    "boundary_preserved": boundary_preserved,
+                    "missing_evidence_mask": missing_evidence_mask,
+                    "missing_evidence_mask_hex":
+                        f"0x{missing_evidence_mask:08X}",
+                    "expected_observable_missing_evidence_mask":
+                        expected_observable_mask,
+                    "expected_observable_missing_evidence_mask_hex":
+                        f"0x{expected_observable_mask:08X}",
+                    "observable_mask_matches": observable_mask_matches,
+                    "cache_identity_missing": cache_missing,
+                    "join_snapshot_correlated": join_snapshot_correlated,
+                    "receipt_absence_fail_closed": receipt_absence_fail_closed,
+                    "exact_join_correlated": exact_join_correlated,
+                    "boundary_state_correlated": boundary_state_correlated,
+                    "summary_correlation_exact": summary_correlation_exact,
+                    "r258_snapshot": r258_snapshot,
+                    "r258_snapshot_hex": f"0x{r258_snapshot:016X}",
+                    "join_snapshot": join_snapshot,
+                    "join_snapshot_hex": f"0x{join_snapshot:016X}",
+                    "fail_closed": bool(
+                        not join_exact
+                        and (
+                            not r258_present
+                            or missing_evidence_mask != 0
+                        )
+                    ),
+                    "diagnostic_only": True,
+                    "activation_proof": False,
+                }
+                continue
+
             match = R293_PRODUCTION_PREREQUISITE_RE.search(line)
             if match:
                 data = match.groupdict()
@@ -1428,6 +1655,9 @@ def main() -> int:
         )
         signature["production_activation_prerequisite"] = (
             production_activation_prerequisites.get(signature_key)
+        )
+        signature["production_source_revalidation"] = (
+            production_source_revalidations.get(signature_key)
         )
         signature["declaration"] = sorted(
             declarations.get(signature_key, []), key=lambda item: item["element"]

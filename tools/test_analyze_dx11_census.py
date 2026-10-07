@@ -2128,6 +2128,84 @@ def main() -> int:
     )
     assert r306_inconsistent_prerequisite["NativeDrawPathActivationAllowed"] is False
 
+    r307_production_source_revalidation = run_case(
+        "VR DX11 R297 productionSourceRevalidation signature#1: "
+        "drawExact=1 nativeBufferEligible=1 r258Present=0 r258Contract=0 "
+        "kindMatch=0 startMatch=0 countDerivable=1 countMatch=0 "
+        "elementCount=6 indexFormatKnown=1 indexFormatMatch=0 "
+        "indexOffsetMatch=0 indexFormat=0 baseMatch=0 minMatch=0 "
+        "numMatch=0 rangeMatch=0 cacheMatch=0 joinExact=0 "
+        "boundaryPreserved=1 missingEvidenceMask=0x00000004 "
+        "r258Snapshot=0x0000000000000000 "
+        "joinSnapshot=0x1111111111111111\n"
+        + r306_signature_tail
+    )
+    r307_inventory = r307_production_source_revalidation["ActivationEvidence"][
+        "ProgrammableShaderInventory"
+    ]
+    assert r307_inventory["ProductionSourceRevalidationEvidenceSignatures"] == 1
+    assert r307_inventory["ProductionSourceRevalidationJoinExactSignatures"] == 0
+    assert r307_inventory["ProductionSourceRevalidationFailClosedSignatures"] == 1
+    assert (
+        r307_inventory["ProductionSourceRevalidationCorrelationInexactSignatures"]
+        == []
+    )
+    assert r307_inventory[
+        "ProductionSourceRevalidationEvidenceCoverageComplete"
+    ] is True
+    r307_evidence = r307_inventory["Pairs"][0]["SemanticTranslationEvidence"][0][
+        "ProductionSourceRevalidation"
+    ]
+    assert r307_evidence["draw_identity_exact"] is True
+    assert r307_evidence["native_buffer_eligible"] is True
+    assert r307_evidence["r258_receipt_present"] is False
+    assert r307_evidence["missing_evidence_mask"] == 0x4
+    assert r307_evidence["expected_observable_missing_evidence_mask"] == 0x4
+    assert r307_evidence["observable_mask_matches"] is True
+    assert r307_evidence["join_snapshot_correlated"] is True
+    assert r307_evidence["receipt_absence_fail_closed"] is True
+    assert r307_evidence["summary_correlation_exact"] is True
+    assert r307_evidence["fail_closed"] is True
+    assert r307_evidence["activation_proof"] is False
+    assert r307_production_source_revalidation[
+        "NativeDrawPathActivationAllowed"
+    ] is False
+
+    r307_inconsistent_source_revalidation = run_case(
+        "VR DX11 R297 productionSourceRevalidation signature#1: "
+        "drawExact=1 nativeBufferEligible=1 r258Present=0 r258Contract=0 "
+        "kindMatch=0 startMatch=0 countDerivable=1 countMatch=0 "
+        "elementCount=6 indexFormatKnown=1 indexFormatMatch=0 "
+        "indexOffsetMatch=0 indexFormat=0 baseMatch=0 minMatch=0 "
+        "numMatch=0 rangeMatch=0 cacheMatch=0 joinExact=0 "
+        "boundaryPreserved=1 missingEvidenceMask=0x00000000 "
+        "r258Snapshot=0x2222222222222222 "
+        "joinSnapshot=0x1111111111111111\n"
+        + r306_signature_tail
+    )
+    r307_inconsistent_inventory = r307_inconsistent_source_revalidation[
+        "ActivationEvidence"
+    ]["ProgrammableShaderInventory"]
+    assert r307_inconsistent_inventory[
+        "ProductionSourceRevalidationCorrelationInexactSignatures"
+    ] == [{"source_log": "OutRun2006Tweaks.log", "startup_epoch": 0, "id": 1}]
+    assert (
+        r307_inconsistent_inventory[
+            "ProductionSourceRevalidationEvidenceCoverageComplete"
+        ]
+        is False
+    )
+    r307_inconsistent_evidence = r307_inconsistent_inventory["Pairs"][0][
+        "SemanticTranslationEvidence"
+    ][0]["ProductionSourceRevalidation"]
+    assert r307_inconsistent_evidence["observable_mask_matches"] is False
+    assert r307_inconsistent_evidence["receipt_absence_fail_closed"] is False
+    assert r307_inconsistent_evidence["summary_correlation_exact"] is False
+    assert r307_inconsistent_evidence["activation_proof"] is False
+    assert r307_inconsistent_source_revalidation[
+        "NativeDrawPathActivationAllowed"
+    ] is False
+
     r277_programmable_semantic = run_case(
         "VR DX11 R120 census: samples=6 exact=0 fixedFn=0 programmable=6 "
         "topologyUnsupported=0 signatures=2 declSamples=0 indexedSamples=0 texturedSamples=0 "

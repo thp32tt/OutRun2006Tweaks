@@ -11591,6 +11591,39 @@ def main() -> None:
             )
         )
 
+    r307_programmable_production_source_revalidation_analyzer_bridge = [
+        ("VR DX11 R297 productionSourceRevalidation",
+         RUNTIME_CENSUS, "R307 consumes the existing R297 production source record"),
+        ("R297_PRODUCTION_SOURCE_REVALIDATION_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R307 parses R297 production source evidence"),
+        ('"observable_mask_matches": observable_mask_matches',
+         DX11_CENSUS_ANALYZER, "R307 correlates observable missing-evidence mask bits"),
+        ('"join_snapshot_correlated": join_snapshot_correlated',
+         DX11_CENSUS_ANALYZER, "R307 correlates R294/cache readiness with R297 join token"),
+        ('"receipt_absence_fail_closed": receipt_absence_fail_closed',
+         DX11_CENSUS_ANALYZER, "R307 validates missing R258 remains non-promoting"),
+        ('"ProductionSourceRevalidation": production_source_revalidation',
+         DX11_CENSUS_ANALYZER, "R307 attaches R297 evidence to the exact signature"),
+        ("r307_production_source_revalidation = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R307 production missing-R258 fail-closed fixture"),
+        ("r307_inconsistent_source_revalidation = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R307 inconsistent mask/snapshot fixture"),
+        ('r307_evidence["activation_proof"] is False',
+         DX11_CENSUS_ANALYZER_TEST, "R307 analyzer evidence cannot activate draw"),
+    ]
+    missing_r307_programmable_production_source_revalidation_analyzer_bridge = [
+        meaning for token, source, meaning
+        in r307_programmable_production_source_revalidation_analyzer_bridge
+        if token not in source
+    ]
+    if missing_r307_programmable_production_source_revalidation_analyzer_bridge:
+        raise SystemExit(
+            "DX11 R307 programmable production source-revalidation analyzer drift: "
+            + ", ".join(
+                missing_r307_programmable_production_source_revalidation_analyzer_bridge
+            )
+        )
+
     r306_programmable_production_prerequisite_analyzer_bridge = [
         ("VR DX11 R293 productionPrerequisiteCensus",
          RUNTIME_CENSUS, "R306 consumes the existing R293 production census record"),
