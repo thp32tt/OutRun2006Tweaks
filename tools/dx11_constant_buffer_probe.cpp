@@ -5095,6 +5095,7 @@ int main()
         r258IndexedSourceRevalidation.preActivationSnapshotMatches &&
         r258IndexedSourceRevalidation.sourceLineageMatches &&
         r258IndexedSourceRevalidation.candidateLineageMatches &&
+        r258IndexedSourceRevalidation.cacheKey == programmablePair.cacheKey &&
         r258IndexedSourceRevalidation.boundaryPreserved &&
         r258IndexedSourceRevalidation.ready &&
         r258IndexedSourceRevalidation.kind ==
@@ -6661,6 +6662,8 @@ int main()
         r259IndexedPrerequisiteHandoff.inputValid &&
         r259IndexedPrerequisiteHandoff.sourceRevalidationReady &&
         r259IndexedPrerequisiteHandoff.sourceRevalidationSnapshotMatches &&
+        r259IndexedPrerequisiteHandoff.sourceIdentityMatches &&
+        r259IndexedPrerequisiteHandoff.cacheKey == programmablePair.cacheKey &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorReviewReady &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorSnapshotMatches &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorGeometryProofPresent &&
@@ -6674,6 +6677,7 @@ int main()
         r259IndexedPrerequisiteHandoff.resourceBehaviorProofPresent &&
         r259IndexedPrerequisiteHandoff.inputLayoutProofPresent &&
         r259IndexedPrerequisiteHandoff.shaderTranslationProofPresent &&
+        r259IndexedPrerequisiteHandoff.sourceIdentityProofPresent &&
         r259IndexedPrerequisiteHandoff.activationPrerequisitesSatisfied &&
         r259IndexedPrerequisiteHandoff.diagnosticOnly &&
         !r259IndexedPrerequisiteHandoff.nativeDrawPathActivationAllowed &&
@@ -6698,6 +6702,40 @@ int main()
                 r263SemanticTranslation.reviewSnapshotToken,
                 r259IndexedPrerequisiteHandoff.reviewSnapshotToken),
         "R259 indexed review handoff consumes exact F18+F21 while activation remains fail-closed");
+
+    auto r290ForeignPairInputLayout = r243InputLayoutReady;
+    r290ForeignPairInputLayout.cacheKey ^= 0x1ull;
+    if (r290ForeignPairInputLayout.cacheKey == 0)
+        r290ForeignPairInputLayout.cacheKey = 1;
+    auto r290ForeignPairSemanticTranslation = r263SemanticTranslation;
+    r290ForeignPairSemanticTranslation.cacheKey =
+        r290ForeignPairInputLayout.cacheKey;
+    const auto r290CrossPairPrerequisiteHandoff =
+        outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
+            r258IndexedSourceRevalidation,
+            r258IndexedSourceRevalidation.snapshotToken,
+            r262IndexedOutputResourceBehavior,
+            r262IndexedOutputResourceBehavior.reviewSnapshotToken,
+            r290ForeignPairInputLayout,
+            r243InputLayoutReady.snapshotToken,
+            r290ForeignPairSemanticTranslation,
+            r263SemanticTranslation.reviewSnapshotToken);
+    require(
+        r290CrossPairPrerequisiteHandoff.inputValid &&
+        r290CrossPairPrerequisiteHandoff.sourceRevalidationReady &&
+        r290CrossPairPrerequisiteHandoff.sourceRevalidationSnapshotMatches &&
+        !r290CrossPairPrerequisiteHandoff.sourceIdentityMatches &&
+        r290CrossPairPrerequisiteHandoff.resourceBehaviorProofPresent &&
+        r290CrossPairPrerequisiteHandoff.inputLayoutProofPresent &&
+        r290CrossPairPrerequisiteHandoff.shaderTranslationProofPresent &&
+        !r290CrossPairPrerequisiteHandoff.sourceIdentityProofPresent &&
+        (r290CrossPairPrerequisiteHandoff.missingPrerequisiteMask & 0x8u) != 0 &&
+        !r290CrossPairPrerequisiteHandoff.activationPrerequisitesSatisfied &&
+        !r290CrossPairPrerequisiteHandoff.boundaryPreserved &&
+        !r290CrossPairPrerequisiteHandoff.reviewReady &&
+        r290CrossPairPrerequisiteHandoff.reviewSnapshotToken == 0 &&
+        r290CrossPairPrerequisiteHandoff.activationSnapshotToken == 0,
+        "R290 rejects cross-pair R258 versus R243/R263 prerequisite evidence");
 
     const auto staleR263ReviewToken =
         r263SemanticTranslation.reviewSnapshotToken == 1ull
