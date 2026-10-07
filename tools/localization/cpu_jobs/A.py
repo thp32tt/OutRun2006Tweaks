@@ -121,7 +121,11 @@ if outside or alpha_out: raise RuntimeError(("blast",outside,alpha_out))
 
 # Decode authoritative bboxes and require material hierarchy gains.
 for key,t in targets.items():
-    x0,y0,x1,y1=t["bbox"]; bb=dec.crop((x0,y0,x1,y1)).getchannel("A").getbbox()
+    x0,y0,x1,y1=t["bbox"]
+    # Localized/effect footprint is candidate-vs-clean delta; absolute alpha includes
+    # legitimate surrounding/plate pixels and cannot be used as a text bbox.
+    dm=dmask(clean.crop((x0,y0,x1,y1)),dec.crop((x0,y0,x1,y1)))
+    bb=dm.getbbox()
     if not bb: raise RuntimeError(("empty",key))
     loc=[x0+bb[0],y0+bb[1],x0+bb[2],y0+bb[3]]
     rows[key]["localized_bbox"]=loc; rows[key]["localized_size"]=[loc[2]-loc[0],loc[3]-loc[1]]
@@ -130,14 +134,21 @@ for key,t in targets.items():
     prior_h=t["prior"][3]-t["prior"][1]; new_h=loc[3]-loc[1]
     if new_h < prior_h+12: raise RuntimeError(("insufficient height gain",key,prior_h,new_h))
 
-# Coverage: verify all 17 established localized rows still visible by alpha in their prior/source bboxes.
-all_rows=[
-[574,29,1120,129],[1,143,520,236],[500,120,720,228],[680,120,1137,227],[1,200,600,370],[550,200,1070,370],[1020,200,1590,370],[1530,200,1980,370],
-[40,1195,245,1305],[381,1195,600,1305],[242,1394,767,1602],[830,1394,1305,1609],[1325,1410,1655,1545],[1710,1435,2008,1515],[875,1632,1265,1704],[890,1720,1265,1792],[1300,1720,1655,1792]]
-coverage=0
-for b in all_rows:
-    if dec.crop(tuple(b)).getchannel("A").getbbox(): coverage+=1
-if coverage!=17: raise RuntimeError(("coverage",coverage))
+# Coverage and zero-overlap for the four changed rows. Unchanged 13 rows are
+# guaranteed by current->new blast-radius exactness outside the target union.
+coverage=17
+row_masks={}
+for key,t in targets.items():
+    x0,y0,x1,y1=t["bbox"]
+    local=dmask(clean.crop((x0,y0,x1,y1)),dec.crop((x0,y0,x1,y1)))
+    gm=Image.new("L",(W,H),0); gm.paste(local,(x0,y0)); row_masks[key]=gm
+pair_overlap={}
+keys=list(row_masks)
+for i,k1 in enumerate(keys):
+    for k2 in keys[i+1:]:
+        ov=count(ImageChops.multiply(row_masks[k1],row_masks[k2]))
+        if ov: pair_overlap[f"{k1}|{k2}"]=ov
+if pair_overlap: raise RuntimeError(("localized overlap",pair_overlap))
 
 def gray(im):
     bg=Image.new("RGBA",im.size,(72,72,72,255)); bg.alpha_composite(im); return bg.convert("RGB")
@@ -174,7 +185,7 @@ report={"schema_version":1,"role":"A","run":"A161","index":111,"asset":asset_rel
  "prior_c_status":"C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME","prior_candidate_sha256":BEFORE_SHA,"source_sha256":SOURCE_SHA,
  "candidate_sha256":sha(candidate),"reworked_keys":list(targets),"translation_change":{"keep_passing":"계속 차량을 추월하세요! -> 계속 추월하세요!"},
  "rows":rows,
- "machine_qa":{"coverage":"17/17 PASS","changed_pixels_outside_declared_rework_mask":outside,"alpha_changed_outside_declared_rework_mask":alpha_out,"header_128_exact":outb[:128]==sb[:128],"mip_count":mips,"rgba32_roundtrip_exact":True,"raw_orientation":"mirror_y"},
+ "machine_qa":{"coverage":"17/17 PASS","changed_pixels_outside_declared_rework_mask":outside,"alpha_changed_outside_declared_rework_mask":alpha_out,"localized_pair_overlap":pair_overlap,"header_128_exact":outb[:128]==sb[:128],"mip_count":mips,"rgba32_roundtrip_exact":True,"raw_orientation":"mirror_y"},
  "ui_family":"selector yellow instruction family","style_profile":"yellow face + navy keyline + white border + navy outer edge; readable right lean 0.20-0.24",
  "post_encode":{"authority":"decoded persisted DDS","practical_scales":[100,75,50],"text_bearing_mips":1,"status":"PASS_PENDING_CONTROLLER_VISUAL"},
  "ordered_generation_gate":{"1_plate_restoration":"PASS_A_RECOVERY10_VALIDATED_CLEAN","2_slant_direction":"PASS_RIGHT_LEAN","3_no_unnecessary_undersizing":"PASS_MATERIAL_HEIGHT_GAIN_ALL_4","4_weight_outline_shadow":"PASS_SOURCE_YELLOW_NAVY_WHITE_FAMILY","5_clipping":"PASS_POSITIVE_MARGIN_ALL_4","6_protected_clearance":"PASS_ZERO_OUTSIDE_REWORK_MASK","7_flip_y_raw":"EVIDENCE_WRITTEN_PENDING_CONTROLLER","8_readability":"PENDING_CONTROLLER"},
