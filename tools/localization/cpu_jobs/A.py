@@ -18,16 +18,16 @@ wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=T
 def sha(b): return hashlib.sha256(b).hexdigest()
 
 def font_path():
-    for pat in ["Noto Sans CJK KR:style=Bold","Noto Sans CJK KR:style=Black","Noto Sans CJK KR"]:
-        try: p=subprocess.check_output(["fc-match","-f","%{file}",pat],text=True).strip()
-        except Exception: p=""
-        if p and Path(p).exists(): return Path(p)
-    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
-    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
-    p=subprocess.check_output(["fc-match","-f","%{file}","Noto Sans CJK KR:style=Bold"],text=True).strip()
-    if not p or not Path(p).exists(): raise RuntimeError("Noto CJK font unavailable")
-    return Path(p)
+    candidates=[Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"),Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")]
+    p=next((x for x in candidates if x.exists()),None)
+    if p is None:
+        subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+        subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
+        p=next((x for x in candidates if x.exists()),None)
+    if p is None: raise RuntimeError("Noto CJK TTC unavailable")
+    return p
 FONT=font_path()
+FONT_INDEX=1 if FONT.suffix.lower()==".ttc" else 0
 
 def decode(path):
     b=Path(path).read_bytes()
@@ -74,7 +74,7 @@ def gradient(size,cols):
 
 def styled(text,bbox,cols,inner,outer,shadow,slant=.15,wr=.9,hr=.84,ow=6,iw=2):
     x0,y0,x1,y1=bbox; aw=x1-x0; ah=y1-y0; ss=3
-    font=ImageFont.truetype(str(FONT),max(24,int(ah*.82))*ss,index=1)
+    font=ImageFont.truetype(str(FONT),max(24,int(ah*.82))*ss,index=FONT_INDEX)
     d=ImageDraw.Draw(Image.new("L",(8,8),0))
     bb=d.textbbox((0,0),text,font=font,stroke_width=ow*ss); pad=max(48,ow*ss*4)
     W=bb[2]-bb[0]+2*pad; H=bb[3]-bb[1]+2*pad; xy=(pad-bb[0],pad-bb[1])
