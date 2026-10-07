@@ -4121,7 +4121,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_30CF0D_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_37759842_CONTROLLER_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -8167,5 +8167,28 @@
     "user_jpg_review": "OPEN",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c232_controller_final_qa": {
+    "timestamp_kst": "2026-10-07T14:10:00+09:00",
+    "run": "20261007-C232-C1-Q095-37759842-A137",
+    "queue_index": 95,
+    "asset": "37759842",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "source_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+    "candidate_sha256": "ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b",
+    "producer_run": "A137",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "16/16 PASS",
+    "zero_pixel_gates": "visible/alpha outside=0; protected visible changes=0; source-core residue=0",
+    "controller_visual_qa": "PASS_SOURCE_DIRECTION_RIGHT_LEAN_CLEAN_STYLE_SCALE_RAW",
+    "c3_strict_status": "C3_STRICT_PASS",
+    "decision": "C232_C3_STRICT_PASS_STATIC_PENDING_PRE_INGAME_USER_JPG_AND_NEW_INGAME_RETEST",
+    "pre_ingame_export_refresh": "PENDING_C232_EXPORT",
+    "user_jpg_review": "PENDING_REFRESH",
+    "new_actual_ingame_retest": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "controller_report": "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_37759842_CONTROLLER_FINAL_QA.json",
+    "machine_report": "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_37759842_MACHINE_QA.json"
   }
 }
