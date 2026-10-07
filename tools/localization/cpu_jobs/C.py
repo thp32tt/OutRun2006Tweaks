@@ -104,23 +104,36 @@ for pct in (100,75,50):
     out=Image.new("RGB",(ims[0].width*2,ims[0].height),(96,96,96)); out.paste(ims[0],(0,0));out.paste(ims[1],(ims[0].width,0))
     out.save(OUT/f"C268_Q154_PRACTICAL_{pct}.png")
 
-# Blind calibration controls. Answer key is written separately and is not printed.
+# Blind calibration controls. Each case shows SOURCE(left) and TEST(right); answer key stays separate.
 font="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 F=ImageFont.truetype(font,64)
-base=Image.new("RGBA",(520,150),(96,96,96,255)); d=ImageDraw.Draw(base); d.text((70,34),"MENU",font=F,fill=(235,235,235,255),stroke_width=1,stroke_fill=(25,25,25,255))
-def shear(im,k):
-    pad=70; canvas=Image.new("RGBA",(im.width+pad*2,im.height),(96,96,96,255));canvas.paste(im,(pad,0))
-    return canvas.transform(canvas.size,Image.Transform.AFFINE,(1,k,-k*canvas.height/2,0,1,0),Image.Resampling.BICUBIC).crop((pad,0,pad+im.width,im.height))
-normal=shear(base,-0.14)
-opp=shear(base,0.14)
-clip=normal.copy(); clip=clip.crop((0,0,clip.width-18,clip.height-10)).resize(normal.size)
-res=normal.copy(); rd=ImageDraw.Draw(res); rd.text((76,40),"MENU",font=F,fill=(120,120,120,150),stroke_width=1,stroke_fill=(20,20,20,130))
-heavy=Image.new("RGBA",normal.size,(96,96,96,255)); hd=ImageDraw.Draw(heavy); hd.text((70,34),"MENU",font=F,fill=(235,235,235,255),stroke_width=8,stroke_fill=(20,20,20,255)); heavy=shear(heavy,-0.14)
+def cal_base(stroke=1):
+    im=Image.new("RGBA",(430,140),(96,96,96,255))
+    ImageDraw.Draw(im).text((70,28),"MENU",font=F,fill=(235,235,235,255),stroke_width=stroke,stroke_fill=(25,25,25,255))
+    return im
+def cal_shear(im,k):
+    pad=60
+    c=Image.new("RGBA",(im.width+2*pad,im.height),(96,96,96,255)); c.paste(im,(pad,0))
+    return c.transform(c.size,Image.Transform.AFFINE,(1,k,-k*c.height/2,0,1,0),Image.Resampling.BICUBIC).crop((pad,0,pad+im.width,im.height))
+cal_src=cal_shear(cal_base(),-0.16)
+normal=cal_src.copy()
+opp=cal_shear(cal_base(),0.16)
+a=np.array(normal); mm=np.any(a[:,:,:3]!=96,axis=2); yy,xx=np.where(mm); bg=np.array([96,96,96,255],dtype=np.uint8)
+a[yy.max()-8:yy.max()+1,xx.min():xx.max()+1]=bg; a[yy.min():yy.max()+1,xx.max()-5:xx.max()+1]=bg
+clip=Image.fromarray(a)
+ghost=Image.new("RGBA",normal.size,(96,96,96,255)); gd=ImageDraw.Draw(ghost)
+gd.text((84,39),"MENU",font=F,fill=(150,150,150,160),stroke_width=1,stroke_fill=(35,35,35,130))
+gd.text((70,28),"MENU",font=F,fill=(235,235,235,255),stroke_width=1,stroke_fill=(25,25,25,255))
+res=cal_shear(ghost,-0.16)
+heavy=cal_shear(cal_base(stroke=9),-0.16)
 items=[("normal",normal),("opposite_slant",opp),("clipped_stroke",clip),("residue",res),("excessive_weight",heavy)]
 secrets.SystemRandom().shuffle(items)
-key={}
-for i,(kind,im) in enumerate(items):
-    name=f"case_{i:02d}.png"; im.save(CAL/name); key[name]=kind
-(CAL/"ANSWER_KEY_DO_NOT_READ_BEFORE_FIRST_LOOK.json").write_text(json.dumps(key,indent=2)+"\n")
+answer={}
+for i,(kind,test) in enumerate(items):
+    card=Image.new("RGB",(cal_src.width*2,cal_src.height+26),(80,80,80)); d=ImageDraw.Draw(card)
+    d.text((4,4),"SOURCE",fill="white"); d.text((cal_src.width+4,4),"TEST",fill="white")
+    card.paste(cal_src.convert("RGB"),(0,24)); card.paste(test.convert("RGB"),(cal_src.width,24))
+    name=f"case_{i:02d}.png"; card.save(CAL/name); answer[name]=kind
+(CAL/"ANSWER_KEY_DO_NOT_READ_BEFORE_FIRST_LOOK.json").write_text(json.dumps(answer,indent=2)+"\n")
 (OUT/"C268_EVIDENCE_SUMMARY.json").write_text(json.dumps({"run":"C268","TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN","queue_index":154,"machine_result":rep["machine_result"],"calibration_cases":5,"answer_key_separate":True,"runtime_validation":"UNTESTED"},indent=2)+"\n")
 print(json.dumps({"q154_machine":rep["machine_result"],"candidate_sha":rep["candidate_sha256"],"source_sha":rep["source_sha256"],"gray_rows":[r for r in rowrep if r["kind"]=="gray"]},ensure_ascii=False))
