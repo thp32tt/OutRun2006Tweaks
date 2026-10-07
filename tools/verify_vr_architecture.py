@@ -46,6 +46,7 @@ required = [
     "src/vr/ipc/protocol_v3.hpp",
     "src/vr/ipc/direct_ack_r13.hpp",
     "src/vr/core/frame_types.hpp",
+    "src/vr/core/r30_support_api.hpp",
     "src/vr/core/matrix.hpp",
     "src/vr/core/transport.hpp",
     "src/vr/game/game_adapter.hpp",
@@ -210,7 +211,7 @@ require(
 )
 require(
     "src/vr/d3d9/stereo_renderer_r31.cpp",
-    "GetR28VerifiedProjection",
+    "R30SupportGetVerifiedProjection",
     "projectionGeneration != generation",
     "R31OnStateBlockBegin",
     "StateBlockTracker::SetRecording(true)",
@@ -218,6 +219,11 @@ require(
     "StateBlockTracker::LifecycleHooksReady()",
     "R31 physical StateBlock fallback retired; fast-path trust remains disabled",
     "StateBlockTracker::Reliable()",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "R30SupportGetVerifiedProjection",
+    "OutRunVRRenderer::GetR28VerifiedProjection",
 )
 require(
     "src/vr/d3d9/stereo_renderer_r33.cpp",
