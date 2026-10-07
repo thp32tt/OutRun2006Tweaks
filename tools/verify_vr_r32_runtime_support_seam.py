@@ -44,6 +44,8 @@ required = (
     "R30SupportDirectTransportIdentity",
     "R30SupportDirectTransportResourcesReady",
     "R30SupportEnsureDirectTransportResources",
+    "R30SupportReleaseDirectAckState",
+    "R30SupportReleaseDirectTransportInterop",
     "R30SupportTryGetDirectTransportIdentity",
     "R30SupportInvalidateEffectStateCache",
     "R30SupportInvalidateLiveStateSample",
@@ -74,6 +76,9 @@ for regex, label in (
     (r"\bDirectInteropVerified\b", "DirectInteropVerified"),
     (r"\bDirectTransportResourcesReady\b", "DirectTransportResourcesReady"),
     (r"(?<!R30Support)\bEnsureDirectTransportResources\(", "EnsureDirectTransportResources"),
+    (r"\bR13ReleaseAckState\(", "R13ReleaseAckState"),
+    (r"\bReleaseDirectTransportSlots\(", "ReleaseDirectTransportSlots"),
+    (r"\bReleaseDirectInteropProbe\(", "ReleaseDirectInteropProbe"),
     (r"(?<!R30Support)\bInvalidateEffectStateCache\(\)", "InvalidateEffectStateCache"),
     (r"(?<!R30Support)\bInvalidateLiveStateSample\(\)", "InvalidateLiveStateSample"),
     (r"OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore\(",
@@ -107,6 +112,13 @@ delegations = {
     "R30SupportEnsureDirectTransportResources(": (
         "return EnsureDirectTransportResources(device);",
     ),
+    "R30SupportReleaseDirectAckState()": (
+        "R13ReleaseAckState();",
+    ),
+    "R30SupportReleaseDirectTransportInterop()": (
+        "ReleaseDirectTransportSlots();",
+        "ReleaseDirectInteropProbe();",
+    ),
     "R30SupportTryGetDirectTransportIdentity(": (
         "if (!SharedState || !DirectInteropVerified)",
         "out.hostPid = SharedState->hostPid;",
@@ -128,6 +140,22 @@ for marker, tokens in delegations.items():
     for token in tokens:
         if token not in fn:
             errors.append(f"{marker} lost lower delegation: {token}")
+
+release_transport = body(r30, "R30SupportReleaseDirectTransportInterop()")
+if release_transport.find("ReleaseDirectTransportSlots();") >= release_transport.find("ReleaseDirectInteropProbe();"):
+    errors.append("R30 DirectGPU release facade changed slots -> probe ordering")
+
+invalidate_direct = body(r32, "R32InvalidateDirectInteropOnly()")
+ordered = (
+    "R30SupportReleaseDirectAckState();",
+    "R32DirectCopyPathRejected = false;",
+    "R32DirectCopyRejectHr = D3D_OK;",
+    "R30SupportReleaseDirectTransportInterop();",
+    "R32ForgetDirectIdentity();",
+)
+positions = [invalidate_direct.find(token) for token in ordered]
+if any(pos < 0 for pos in positions) or positions != sorted(positions):
+    errors.append("R32 direct interop invalidation order changed")
 
 if ": previous_(R30SupportExchangeInternalStereoPass(true))" not in r32:
     errors.append("R32 internal-pass scope no longer acquires through owner exchange")
