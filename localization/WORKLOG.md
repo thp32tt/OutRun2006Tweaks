@@ -3189,3 +3189,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Persistent exporter run 37628830317 SUCCESS; worker output f9f7e5e19bb466807fddd068512d73941ef9e87a.
 - q54 FA7BBB13 is #017 017_q054_FA7BBB13.jpg: pinned English SHA 61c82072... native 4096x2048 scale1 vs exact candidate 5107c15a.... Controller final FLIP-Y+RAW exported-card review PASS.
 - q54 now C3_STRICT_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_INGAME. q60/q212 remain blocked REWORK_REQUIRED. RUNTIME_VALIDATION=UNTESTED.
+
+
+## 2026-10-07 23:13 KST — C254 C1 q57/q61/q65 fresh C + exact-SHA C3 PASS
+- TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). Consumed the already-completed C254 worker result instead of relaunching duplicate QA. Current HEAD/queue were refreshed for q57/q61/q65 and again immediately before this reconciliation; all three rows remained the same A166 candidates. No even C2 shard was touched.
+- ChatGPT-local execution was attempted first (git ls-remote) but github.com DNS resolution failed. Repository-backed independent pixel QA therefore used worker run 37630984426 / output ea09e2f81f7d356c767e3347aca95d00ef8aa99c. N100 was not used.
+- q57 39229D64 @ d2831fcf...: independent 16/16 bbox/source-size/positive-margin PASS; source/current outside=0, alpha outside=0, C250-prior/A166 blast outside=0, header/mip1/raw mirror_y PASS. Alpha-composited SOURCE/C250/A166 + producer CLEAN + RAW review PASS: source-right slant plus orange/blue/pink gradient-depth/effect hierarchy restored; no residue, haze/rectangle, text-box/vehicle/Alberto intrusion, clipping or overlap. Fresh C PASS + exact-SHA C3_STRICT_PASS.
+- q61 C4A2937B @ df250af9...: independent 21/21 PASS with zero outside/alpha/blast. Semantic gate PASS (Cut the line! -> 하트선을 통과하세요!). SOURCE/C250/A166 + producer CLEAN + RAW review PASS: yellow gradient, white keyline, navy outline and readable-right lean restored for Go/Cut/Keep. Fresh C PASS + exact-SHA C3_STRICT_PASS.
+- q65 EBEF6D20 @ 10d0e189...: independent 7/7 PASS with zero outside/alpha/blast. SOURCE/C250/CLEAN/A166 + RAW review PASS: Course/Left/Right/Easy/Hard completeness retained; 쉬움 is restored to the canonical green family and source-family keyline/outline/right lean is present. Fresh C PASS + exact-SHA C3_STRICT_PASS.
+- PRE_INGAME English-original consolidated export refresh is now mandatory before user review/actual-game retest. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.

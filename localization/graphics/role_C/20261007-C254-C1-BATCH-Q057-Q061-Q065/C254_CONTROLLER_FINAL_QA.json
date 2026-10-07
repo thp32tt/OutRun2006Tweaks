@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "20261007-C254-C1-BATCH-Q057-Q061-Q065",
+  "timestamp_kst": "2026-10-07 23:13 KST",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "selection": {
+    "queue_indices": [
+      57,
+      61,
+      65
+    ],
+    "priority": "fresh A166 repairs of C250 user-PRE_INGAME regressions before generic pending-C/C3",
+    "current_turn_selection_refresh_head": "9e6309ecf68584255505f04b949735f53cd230ed",
+    "pre_commit_refresh_head": "1413e5df1c0568e930053694e3ee3e16e1825173",
+    "queue_rows_unchanged_at_pre_commit": true
+  },
+  "execution_backend": "ChatGPT local first attempted git ls-remote but github.com DNS resolution failed; consumed already-completed repository-backed GitHub-hosted C254 worker evidence. N100 not used.",
+  "worker_run": 37630984426,
+  "worker_output_commit": "ea09e2f81f7d356c767e3347aca95d00ef8aa99c",
+  "assets": {
+    "q57": {
+      "asset": "39229D64",
+      "candidate_sha256": "d2831fcfd1bb8027fc129ff50e70c90c21094df13765daa3d5fb9c6fda3ae70a",
+      "canonical_source_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "machine_qa": "PASS_16_OF_16_ZERO_OUTSIDE",
+      "controller_visual_qa": "PASS_SOURCE_C250_A166_PLUS_PRODUCER_CLEAN_RAW",
+      "c3_strict": "C3_STRICT_PASS_EXACT_SHA",
+      "decision": "C254_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+    },
+    "q61": {
+      "asset": "C4A2937B",
+      "candidate_sha256": "df250af92785727f38d176f3b2569c9d6d2b0e7a3f7d296adaa2f5c343b1d71e",
+      "canonical_source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "machine_qa": "PASS_21_OF_21_ZERO_OUTSIDE",
+      "semantic_gate": "PASS_Cut_the_line_to_하트선을_통과하세요",
+      "controller_visual_qa": "PASS_YELLOW_WHITE_NAVY_RIGHT_LEAN",
+      "c3_strict": "C3_STRICT_PASS_EXACT_SHA",
+      "decision": "C254_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+    },
+    "q65": {
+      "asset": "EBEF6D20",
+      "candidate_sha256": "10d0e1899d8d167eb1dcb303429dd4dc7bdf09096e6c5720afce884cc32afe1f",
+      "canonical_source_sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+      "machine_qa": "PASS_7_OF_7_ZERO_OUTSIDE",
+      "color_gate": "PASS_EASY_GREEN_NOT_CYAN",
+      "controller_visual_qa": "PASS_COMPLETENESS_COLOR_KEYLINE_OUTLINE_RIGHT_LEAN",
+      "c3_strict": "C3_STRICT_PASS_EXACT_SHA",
+      "decision": "C254_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+    }
+  },
+  "controller_evidence": "localization/graphics/role_C/20261007-C254-C1-BATCH-Q057-Q061-Q065/",
+  "pre_ingame_export": "PENDING_REFRESH",
+  "user_jpg_review": "PENDING",
+  "actual_ingame_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

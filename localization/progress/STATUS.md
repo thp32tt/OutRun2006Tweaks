@@ -2568,3 +2568,11 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 ### C251 exporter completion — 2026-10-07 22:44 KST
 - q54 PRE_INGAME refreshed as #017; exact source/candidate binding and FLIP-Y+RAW review PASS.
 - q60/q212 remain REWORK_REQUIRED; no runtime/in-game closure.
+
+
+### C254 C1 — 2026-10-07 23:13 KST
+- TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL); q57 39229D64, q61 C4A2937B, q65 EBEF6D20 processed as the fresh A166 repair batch.
+- q57 d2831fcf...: independent 16/16 machine PASS + controller source/clean/current/RAW PASS -> exact-SHA C3_STRICT_PASS.
+- q61 df250af9...: independent 21/21 PASS; 하트선을 통과하세요! semantic binding and yellow/white/navy source family PASS -> exact-SHA C3_STRICT_PASS.
+- q65 10d0e189...: independent 7/7 PASS; completeness + green 쉬움 + outline/slant family PASS -> exact-SHA C3_STRICT_PASS.
+- PRE_INGAME English-original refresh is pending; user JPG review + NEW actual-game retest remain pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.

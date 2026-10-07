@@ -5258,5 +5258,46 @@
     "actual_ingame_validation": "PENDING",
     "forbidden_domains_touched": [],
     "final_decision": "Q54 PASS+C3+PRE_INGAME_REFRESHED; Q60 REWORK_REQUIRED; Q212 REWORK_REQUIRED"
+  },
+  "c254_c1_batch_q057_q061_q065": {
+    "run": "20261007-C254-C1-BATCH-Q057-Q061-Q065",
+    "timestamp_kst": "2026-10-07T23:13:00+09:00",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "worker_run": 37630984426,
+    "worker_output_commit": "ea09e2f81f7d356c767e3347aca95d00ef8aa99c",
+    "assets": {
+      "q57": {
+        "asset": "39229D64",
+        "candidate_sha256": "d2831fcfd1bb8027fc129ff50e70c90c21094df13765daa3d5fb9c6fda3ae70a",
+        "fresh_c": "PASS",
+        "controller_visual_qa": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "status": "C254_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+      },
+      "q61": {
+        "asset": "C4A2937B",
+        "candidate_sha256": "df250af92785727f38d176f3b2569c9d6d2b0e7a3f7d296adaa2f5c343b1d71e",
+        "fresh_c": "PASS",
+        "semantic_gate": "PASS",
+        "controller_visual_qa": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "status": "C254_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+      },
+      "q65": {
+        "asset": "EBEF6D20",
+        "candidate_sha256": "10d0e1899d8d167eb1dcb303429dd4dc7bdf09096e6c5720afce884cc32afe1f",
+        "fresh_c": "PASS",
+        "color_gate": "PASS_GREEN_NOT_CYAN",
+        "controller_visual_qa": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "status": "C254_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+      }
+    },
+    "controller_report": "localization/graphics/role_C/20261007-C254-C1-BATCH-Q057-Q061-Q065/C254_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "PENDING_REFRESH",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
