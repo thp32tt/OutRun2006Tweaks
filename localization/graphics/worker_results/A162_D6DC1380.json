@@ -1,0 +1,21 @@
+{
+  "run": "A162",
+  "queue_index": 12,
+  "asset": "D6DC1380",
+  "prior_candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+  "candidate_sha256": "b82e183edf3939b30c0e10270eda2c858cebf7082ba5ab9f3f98dac8e52e2d10",
+  "raw_orientation": "PASS_CANONICAL_NORMAL",
+  "localized_raw_bbox": [
+    117,
+    42,
+    907,
+    174
+  ],
+  "size": [
+    790,
+    132
+  ],
+  "worker_status": "STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261007-A162-Q012-D6DC1380-RAW-ORIENTATION/A162_D6DC1380_REPORT.json"
+}

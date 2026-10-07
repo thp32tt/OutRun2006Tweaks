@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A162",
+  "queue_index": 12,
+  "asset": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+  "priority": "P0",
+  "trigger": "C235_REWORK_REQUIRED_RAW_ORIENTATION_MISMATCH",
+  "user_jpg_regression": "PJR-001-20261006",
+  "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_etc_xst/D6DC1380_256x64.dds",
+  "prior_candidate_sha256": "fab100b99f42b773d820be5145866b07830637a2bee060ebbba133d1555739e5",
+  "candidate_sha256": "b82e183edf3939b30c0e10270eda2c858cebf7082ba5ab9f3f98dac8e52e2d10",
+  "canonical_source_raw_bbox_hd": [
+    32,
+    40,
+    992,
+    176
+  ],
+  "prior_candidate_raw_bbox": [
+    117,
+    82,
+    907,
+    214
+  ],
+  "localized_raw_bbox": [
+    117,
+    42,
+    907,
+    174
+  ],
+  "localized_size": [
+    790,
+    132
+  ],
+  "machine_qa": {
+    "source_bbox_containment": "PASS",
+    "positive_margin": "PASS",
+    "final_alpha_pixels_outside_canonical_raw_bbox": 0,
+    "changed_pixels_outside_declared_orientation_union": 0,
+    "dds_header_128_exact": true,
+    "mip_count": 1,
+    "rawmode": "BGRA",
+    "pixel_multiset_preserved": true,
+    "vertical_reorientation_exact": true,
+    "source_and_candidate_same_raw_orientation": "PASS_NORMAL_READABLE"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_TEXT_ONLY_TRANSPARENT_PLATE_UNCHANGED",
+    "2_slant_direction": "PASS_A160_PIXELS_PRESERVED_EXACTLY",
+    "3_no_unnecessary_undersizing": "PASS_A160_790x132_PRESERVED",
+    "4_weight_outline_shadow": "PASS_A160_STYLE_PIXELS_PRESERVED_EXACTLY",
+    "5_clipping": "PASS_POSITIVE_MARGIN_85_2_85_2",
+    "6_protected_clearance": "PASS_TEXT_ONLY_ASSET_FINAL_ALPHA_INSIDE_CANONICAL_SOURCE_BBOX",
+    "7_flip_y_raw": "PASS_SOURCE_AND_A162_USE_SAME_RAW_NORMAL_ORIENTATION",
+    "8_readability": "PASS_A160_SCALE_STYLE_PRESERVED_PENDING_CONTROLLER_VISUAL_CONFIRMATION"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_exact_sha_c3_after_fresh_c": "REQUIRED",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_AND_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
