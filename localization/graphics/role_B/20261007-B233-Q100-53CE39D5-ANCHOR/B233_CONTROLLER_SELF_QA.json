@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B233-Q100-53CE39D5-ANCHOR",
+  "queue_index": 100,
+  "candidate_sha256": "7235731a2add8e947476cd22b971e5b57a7de390ae134609f4254a2f493a557d",
+  "supersedes_c117_sha256": "08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1",
+  "review": {
+    "defect": "C117/B30 centered each shortened Korean mode-card line within its English glyph bbox, shifting a visibly left-anchored source family inward and compressing the per-line placement hierarchy",
+    "source_old_clean_final": "PASS: B233 restores source-relative left anchoring for all 18 orange mode-card lines; RANDOM and all other atlas material remain unchanged",
+    "style": "PASS: exact previously C117-accepted Korean raster/effects reused pixel-for-pixel, retaining orange fill, dark outline/shadow and readable right slant",
+    "clean_plate": "PASS: C117/B30 validated clean plate reused; no source residue, patch rectangle, seam or panel damage visible",
+    "hierarchy": "PASS: line-specific English source bboxes preserve the source's staggered layout; B233 places each Korean line at source-left+2 instead of re-centering it",
+    "protected": "PASS: changed/alpha pixels outside the 18 exact rework source bboxes are zero; RANDOM, song titles, Ferrari/model/vehicle art, logos and music-note art are unchanged",
+    "raw_flipy": "PASS: SOURCE/B233 RAW mirror_y review retains the same atlas transform and no orientation regression",
+    "practical_scale": "PASS: source-vs-final at 100/50/25% remains readable; no broken Hangul, clipping, overlap, residue or protected intrusion"
+  },
+  "machine_qa": {
+    "lines_reworked": 18,
+    "bbox_size_positive_margin": "18/18 PASS",
+    "previous_candidate_changed_pixels_outside_rework_bboxes": 0,
+    "previous_candidate_alpha_changes_outside_rework_bboxes": 0,
+    "source_vs_final_changes_outside_all_19_source_bboxes": 0,
+    "localized_pair_overlap": 0,
+    "header_128_exact": true,
+    "mip_count": 1,
+    "persisted_decode_identity": "PASS"
+  },
+  "decision": "B233_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
