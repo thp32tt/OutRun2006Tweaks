@@ -1,0 +1,3009 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261007-A-MANUALQA157-55B57CDE-HIERARCHY",
+  "index": 161,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "blob_sha1": "0b12c672224ce05acb9470af895bbda335cc5543",
+    "sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d"
+  },
+  "atlas_provenance": {
+    "blob_sha1": "70001b44445f3e10b46eb7e3480abdece8eda790",
+    "sha256": "a03ea7ee20dd214e7c1cbf69460d70e74f1fa840a720d90a75971434f4b4e982",
+    "regions": 38
+  },
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "binding": {
+    "localized_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37
+    ],
+    "semantic_strings": 38,
+    "policy": "A52 controller contact fixed nationality/zodiac physical mapping"
+  },
+  "trigger": "PRE_INGAME_017_C201_A56_UNDERSIZED_CENTERED_HIERARCHY_FALSE_NEGATIVE",
+  "prior_c_status": "C201_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "prior_candidate_sha256": "78ec82df081e753b51d24dffde05d069371c027b537b44b70a5b5837a6dd4812",
+  "elements": [
+    {
+      "idx": 0,
+      "source": "VIRGO",
+      "korean": "처녀자리",
+      "cell": [
+        0,
+        1984,
+        716,
+        64
+      ],
+      "original_bbox": [
+        1,
+        1991,
+        177,
+        2042
+      ],
+      "source_mask_pixels": 5253,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        4,
+        1992,
+        176,
+        2040
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        4,
+        1992,
+        176,
+        2040
+      ],
+      "render_safe_bbox": [
+        4,
+        1992,
+        176,
+        2040
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 175,
+      "horizontal_scale": 0.9829,
+      "prior_localized_bbox": [
+        17,
+        1996,
+        162,
+        2036
+      ],
+      "prior_localized_width": 145,
+      "prior_localized_height": 40,
+      "prior_delta_left": 16,
+      "localized_bbox": [
+        4,
+        1992,
+        176,
+        2040
+      ],
+      "localized_width": 172,
+      "localized_height": 48,
+      "source_width": 176,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 1,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 1,
+      "source": "TAURUS",
+      "korean": "황소자리",
+      "cell": [
+        716,
+        1984,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1991,
+        948,
+        2042
+      ],
+      "source_mask_pixels": 6433,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1992,
+        895,
+        2040
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        1992,
+        948,
+        2040
+      ],
+      "render_safe_bbox": [
+        720,
+        1992,
+        947,
+        2040
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 175,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        761,
+        1996,
+        906,
+        2036
+      ],
+      "prior_localized_width": 145,
+      "prior_localized_height": 40,
+      "prior_delta_left": 44,
+      "localized_bbox": [
+        720,
+        1992,
+        895,
+        2040
+      ],
+      "localized_width": 175,
+      "localized_height": 48,
+      "source_width": 231,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 53,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 2,
+      "source": "SCORPIO",
+      "korean": "전갈자리",
+      "cell": [
+        0,
+        1920,
+        716,
+        64
+      ],
+      "original_bbox": [
+        2,
+        1927,
+        246,
+        1978
+      ],
+      "source_mask_pixels": 7349,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        4,
+        1928,
+        179,
+        1976
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        4,
+        1928,
+        244,
+        1976
+      ],
+      "render_safe_bbox": [
+        4,
+        1928,
+        244,
+        1976
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 175,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        51,
+        1932,
+        196,
+        1972
+      ],
+      "prior_localized_width": 145,
+      "prior_localized_height": 40,
+      "prior_delta_left": 49,
+      "localized_bbox": [
+        4,
+        1928,
+        179,
+        1976
+      ],
+      "localized_width": 175,
+      "localized_height": 48,
+      "source_width": 244,
+      "source_height": 51,
+      "delta_left": 2,
+      "delta_right": 67,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 3,
+      "source": "SAGITTARIUS",
+      "korean": "사수자리",
+      "cell": [
+        716,
+        1920,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1927,
+        1089,
+        1978
+      ],
+      "source_mask_pixels": 10617,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1928,
+        896,
+        1976
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        1928,
+        1088,
+        1976
+      ],
+      "render_safe_bbox": [
+        720,
+        1928,
+        1088,
+        1976
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 176,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        831,
+        1932,
+        976,
+        1972
+      ],
+      "prior_localized_width": 145,
+      "prior_localized_height": 40,
+      "prior_delta_left": 114,
+      "localized_bbox": [
+        720,
+        1928,
+        896,
+        1976
+      ],
+      "localized_width": 176,
+      "localized_height": 48,
+      "source_width": 372,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 193,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 4,
+      "source": "PISCES",
+      "korean": "물고기자리",
+      "cell": [
+        0,
+        1856,
+        716,
+        64
+      ],
+      "original_bbox": [
+        6,
+        1863,
+        209,
+        1914
+      ],
+      "source_mask_pixels": 5892,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        1864,
+        208,
+        1912
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        8,
+        1864,
+        208,
+        1912
+      ],
+      "render_safe_bbox": [
+        8,
+        1864,
+        208,
+        1912
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 220,
+      "horizontal_scale": 0.9091,
+      "prior_localized_bbox": [
+        16,
+        1868,
+        199,
+        1908
+      ],
+      "prior_localized_width": 183,
+      "prior_localized_height": 40,
+      "prior_delta_left": 10,
+      "localized_bbox": [
+        8,
+        1864,
+        208,
+        1912
+      ],
+      "localized_width": 200,
+      "localized_height": 48,
+      "source_width": 203,
+      "source_height": 51,
+      "delta_left": 2,
+      "delta_right": 1,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 5,
+      "source": "LIBRA",
+      "korean": "천칭자리",
+      "cell": [
+        716,
+        1856,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1864,
+        888,
+        1912
+      ],
+      "source_mask_pixels": 4909,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1865,
+        887,
+        1911
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 47,
+      "block_safe_bbox": [
+        720,
+        1864,
+        888,
+        1912
+      ],
+      "render_safe_bbox": [
+        720,
+        1865,
+        887,
+        1911
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 168,
+      "horizontal_scale": 0.994,
+      "prior_localized_bbox": [
+        731,
+        1868,
+        876,
+        1908
+      ],
+      "prior_localized_width": 145,
+      "prior_localized_height": 40,
+      "prior_delta_left": 14,
+      "localized_bbox": [
+        720,
+        1865,
+        887,
+        1911
+      ],
+      "localized_width": 167,
+      "localized_height": 46,
+      "source_width": 171,
+      "source_height": 48,
+      "delta_left": 3,
+      "delta_right": 1,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 6,
+      "source": "LEO",
+      "korean": "사자자리",
+      "cell": [
+        0,
+        1792,
+        716,
+        64
+      ],
+      "original_bbox": [
+        5,
+        1799,
+        110,
+        1850
+      ],
+      "source_mask_pixels": 3062,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        1800,
+        108,
+        1848
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        8,
+        1800,
+        108,
+        1848
+      ],
+      "render_safe_bbox": [
+        8,
+        1800,
+        108,
+        1848
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 176,
+      "horizontal_scale": 0.5682,
+      "prior_localized_bbox": [
+        12,
+        1811,
+        104,
+        1836
+      ],
+      "prior_localized_width": 92,
+      "prior_localized_height": 25,
+      "prior_delta_left": 7,
+      "localized_bbox": [
+        8,
+        1800,
+        108,
+        1848
+      ],
+      "localized_width": 100,
+      "localized_height": 48,
+      "source_width": 105,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 2,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 7,
+      "source": "GEMINI",
+      "korean": "쌍둥이자리",
+      "cell": [
+        716,
+        1792,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1799,
+        924,
+        1850
+      ],
+      "source_mask_pixels": 6502,
+      "source_rgba_median": [
+        57,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1800,
+        923,
+        1848
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        1800,
+        924,
+        1848
+      ],
+      "render_safe_bbox": [
+        720,
+        1800,
+        923,
+        1848
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 221,
+      "horizontal_scale": 0.9186,
+      "prior_localized_bbox": [
+        730,
+        1804,
+        913,
+        1844
+      ],
+      "prior_localized_width": 183,
+      "prior_localized_height": 40,
+      "prior_delta_left": 13,
+      "localized_bbox": [
+        720,
+        1800,
+        923,
+        1848
+      ],
+      "localized_width": 203,
+      "localized_height": 48,
+      "source_width": 207,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 1,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 8,
+      "source": "CAPRICORN",
+      "korean": "염소자리",
+      "cell": [
+        0,
+        1728,
+        716,
+        64
+      ],
+      "original_bbox": [
+        5,
+        1735,
+        332,
+        1786
+      ],
+      "source_mask_pixels": 9666,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        1736,
+        182,
+        1784
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        8,
+        1736,
+        332,
+        1784
+      ],
+      "render_safe_bbox": [
+        8,
+        1736,
+        331,
+        1784
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 174,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        98,
+        1740,
+        242,
+        1780
+      ],
+      "prior_localized_width": 144,
+      "prior_localized_height": 40,
+      "prior_delta_left": 93,
+      "localized_bbox": [
+        8,
+        1736,
+        182,
+        1784
+      ],
+      "localized_width": 174,
+      "localized_height": 48,
+      "source_width": 327,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 150,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 9,
+      "source": "CANCER",
+      "korean": "게자리",
+      "cell": [
+        716,
+        1728,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1735,
+        952,
+        1786
+      ],
+      "source_mask_pixels": 6735,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1736,
+        851,
+        1784
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        1736,
+        952,
+        1784
+      ],
+      "render_safe_bbox": [
+        720,
+        1736,
+        951,
+        1784
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 131,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        782,
+        1740,
+        890,
+        1780
+      ],
+      "prior_localized_width": 108,
+      "prior_localized_height": 40,
+      "prior_delta_left": 65,
+      "localized_bbox": [
+        720,
+        1736,
+        851,
+        1784
+      ],
+      "localized_width": 131,
+      "localized_height": 48,
+      "source_width": 235,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 101,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 10,
+      "source": "ARIES",
+      "korean": "양자리",
+      "cell": [
+        0,
+        1664,
+        716,
+        64
+      ],
+      "original_bbox": [
+        1,
+        1671,
+        174,
+        1722
+      ],
+      "source_mask_pixels": 5083,
+      "source_rgba_median": [
+        57,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        4,
+        1672,
+        134,
+        1720
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        4,
+        1672,
+        172,
+        1720
+      ],
+      "render_safe_bbox": [
+        4,
+        1672,
+        172,
+        1720
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 130,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        34,
+        1676,
+        141,
+        1716
+      ],
+      "prior_localized_width": 107,
+      "prior_localized_height": 40,
+      "prior_delta_left": 33,
+      "localized_bbox": [
+        4,
+        1672,
+        134,
+        1720
+      ],
+      "localized_width": 130,
+      "localized_height": 48,
+      "source_width": 173,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 40,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 11,
+      "source": "AQUARIUS",
+      "korean": "물병자리",
+      "cell": [
+        716,
+        1664,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1671,
+        1013,
+        1725
+      ],
+      "source_mask_pixels": 8694,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1672,
+        909,
+        1724
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 53,
+      "block_safe_bbox": [
+        720,
+        1672,
+        1012,
+        1724
+      ],
+      "render_safe_bbox": [
+        720,
+        1672,
+        1012,
+        1724
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 189,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        785,
+        1676,
+        947,
+        1720
+      ],
+      "prior_localized_width": 162,
+      "prior_localized_height": 44,
+      "prior_delta_left": 68,
+      "localized_bbox": [
+        720,
+        1672,
+        909,
+        1724
+      ],
+      "localized_width": 189,
+      "localized_height": 52,
+      "source_width": 296,
+      "source_height": 54,
+      "delta_left": 3,
+      "delta_right": 104,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 12,
+      "source": "THAILAND",
+      "korean": "태국",
+      "cell": [
+        0,
+        1600,
+        716,
+        64
+      ],
+      "original_bbox": [
+        0,
+        1608,
+        288,
+        1656
+      ],
+      "source_mask_pixels": 7995,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        1,
+        1609,
+        84,
+        1655
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 47,
+      "block_safe_bbox": [
+        0,
+        1608,
+        288,
+        1656
+      ],
+      "render_safe_bbox": [
+        1,
+        1609,
+        287,
+        1655
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 83,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        108,
+        1612,
+        180,
+        1652
+      ],
+      "prior_localized_width": 72,
+      "prior_localized_height": 40,
+      "prior_delta_left": 108,
+      "localized_bbox": [
+        1,
+        1609,
+        84,
+        1655
+      ],
+      "localized_width": 83,
+      "localized_height": 46,
+      "source_width": 288,
+      "source_height": 48,
+      "delta_left": 1,
+      "delta_right": 204,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 13,
+      "source": "SWITZERLAND",
+      "korean": "스위스",
+      "cell": [
+        716,
+        1600,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1607,
+        1137,
+        1658
+      ],
+      "source_mask_pixels": 11750,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1608,
+        853,
+        1656
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        1608,
+        1136,
+        1656
+      ],
+      "render_safe_bbox": [
+        720,
+        1608,
+        1136,
+        1656
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 133,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        871,
+        1612,
+        984,
+        1652
+      ],
+      "prior_localized_width": 113,
+      "prior_localized_height": 40,
+      "prior_delta_left": 154,
+      "localized_bbox": [
+        720,
+        1608,
+        853,
+        1656
+      ],
+      "localized_width": 133,
+      "localized_height": 48,
+      "source_width": 420,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 284,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 14,
+      "source": "SWEDEN",
+      "korean": "스웨덴",
+      "cell": [
+        0,
+        1536,
+        716,
+        64
+      ],
+      "original_bbox": [
+        2,
+        1543,
+        251,
+        1594
+      ],
+      "source_mask_pixels": 7371,
+      "source_rgba_median": [
+        57,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        4,
+        1544,
+        136,
+        1592
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        4,
+        1544,
+        248,
+        1592
+      ],
+      "render_safe_bbox": [
+        4,
+        1544,
+        248,
+        1592
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 132,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        71,
+        1548,
+        181,
+        1588
+      ],
+      "prior_localized_width": 110,
+      "prior_localized_height": 40,
+      "prior_delta_left": 69,
+      "localized_bbox": [
+        4,
+        1544,
+        136,
+        1592
+      ],
+      "localized_width": 132,
+      "localized_height": 48,
+      "source_width": 249,
+      "source_height": 51,
+      "delta_left": 2,
+      "delta_right": 115,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 15,
+      "source": "SPAIN",
+      "korean": "스페인",
+      "cell": [
+        716,
+        1536,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1543,
+        884,
+        1594
+      ],
+      "source_mask_pixels": 5005,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1544,
+        851,
+        1592
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        1544,
+        884,
+        1592
+      ],
+      "render_safe_bbox": [
+        720,
+        1544,
+        883,
+        1592
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 131,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        747,
+        1548,
+        856,
+        1588
+      ],
+      "prior_localized_width": 109,
+      "prior_localized_height": 40,
+      "prior_delta_left": 30,
+      "localized_bbox": [
+        720,
+        1544,
+        851,
+        1592
+      ],
+      "localized_width": 131,
+      "localized_height": 48,
+      "source_width": 167,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 33,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 16,
+      "source": "SOUTH KOREA",
+      "korean": "대한민국",
+      "cell": [
+        0,
+        1472,
+        716,
+        64
+      ],
+      "original_bbox": [
+        2,
+        1479,
+        403,
+        1530
+      ],
+      "source_mask_pixels": 11140,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        4,
+        1480,
+        181,
+        1528
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        4,
+        1480,
+        400,
+        1528
+      ],
+      "render_safe_bbox": [
+        4,
+        1480,
+        400,
+        1528
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 177,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        127,
+        1484,
+        277,
+        1524
+      ],
+      "prior_localized_width": 150,
+      "prior_localized_height": 40,
+      "prior_delta_left": 125,
+      "localized_bbox": [
+        4,
+        1480,
+        181,
+        1528
+      ],
+      "localized_width": 177,
+      "localized_height": 48,
+      "source_width": 401,
+      "source_height": 51,
+      "delta_left": 2,
+      "delta_right": 222,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 17,
+      "source": "SINGAPORE",
+      "korean": "싱가포르",
+      "cell": [
+        716,
+        1472,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1479,
+        1047,
+        1530
+      ],
+      "source_mask_pixels": 9732,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1480,
+        898,
+        1528
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        1480,
+        1044,
+        1528
+      ],
+      "render_safe_bbox": [
+        720,
+        1480,
+        1044,
+        1528
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 178,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        806,
+        1484,
+        957,
+        1524
+      ],
+      "prior_localized_width": 151,
+      "prior_localized_height": 40,
+      "prior_delta_left": 89,
+      "localized_bbox": [
+        720,
+        1480,
+        898,
+        1528
+      ],
+      "localized_width": 178,
+      "localized_height": 48,
+      "source_width": 330,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 149,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 18,
+      "source": "OTHER",
+      "korean": "기타",
+      "cell": [
+        0,
+        1408,
+        716,
+        64
+      ],
+      "original_bbox": [
+        5,
+        1415,
+        194,
+        1466
+      ],
+      "source_mask_pixels": 5547,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        1416,
+        97,
+        1464
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        8,
+        1416,
+        192,
+        1464
+      ],
+      "render_safe_bbox": [
+        8,
+        1416,
+        192,
+        1464
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 89,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        64,
+        1420,
+        136,
+        1460
+      ],
+      "prior_localized_width": 72,
+      "prior_localized_height": 40,
+      "prior_delta_left": 59,
+      "localized_bbox": [
+        8,
+        1416,
+        97,
+        1464
+      ],
+      "localized_width": 89,
+      "localized_height": 48,
+      "source_width": 189,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 97,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 19,
+      "source": "NORWAY",
+      "korean": "노르웨이",
+      "cell": [
+        716,
+        1408,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1415,
+        964,
+        1466
+      ],
+      "source_mask_pixels": 7157,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1416,
+        895,
+        1464
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        1416,
+        964,
+        1464
+      ],
+      "render_safe_bbox": [
+        720,
+        1416,
+        963,
+        1464
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 175,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        769,
+        1420,
+        914,
+        1460
+      ],
+      "prior_localized_width": 145,
+      "prior_localized_height": 40,
+      "prior_delta_left": 52,
+      "localized_bbox": [
+        720,
+        1416,
+        895,
+        1464
+      ],
+      "localized_width": 175,
+      "localized_height": 48,
+      "source_width": 247,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 69,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 20,
+      "source": "NORTH KOREA",
+      "korean": "북한",
+      "cell": [
+        0,
+        1344,
+        716,
+        64
+      ],
+      "original_bbox": [
+        6,
+        1351,
+        404,
+        1402
+      ],
+      "source_mask_pixels": 11396,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        1352,
+        96,
+        1400
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        8,
+        1352,
+        404,
+        1400
+      ],
+      "render_safe_bbox": [
+        8,
+        1352,
+        403,
+        1400
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 88,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        169,
+        1356,
+        242,
+        1396
+      ],
+      "prior_localized_width": 73,
+      "prior_localized_height": 40,
+      "prior_delta_left": 163,
+      "localized_bbox": [
+        8,
+        1352,
+        96,
+        1400
+      ],
+      "localized_width": 88,
+      "localized_height": 48,
+      "source_width": 398,
+      "source_height": 51,
+      "delta_left": 2,
+      "delta_right": 308,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 21,
+      "source": "NEW ZEALAND",
+      "korean": "뉴질랜드",
+      "cell": [
+        716,
+        1344,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1352,
+        1132,
+        1400
+      ],
+      "source_mask_pixels": 11445,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1353,
+        891,
+        1399
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 47,
+      "block_safe_bbox": [
+        720,
+        1352,
+        1132,
+        1400
+      ],
+      "render_safe_bbox": [
+        720,
+        1353,
+        1131,
+        1399
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 171,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        852,
+        1356,
+        1000,
+        1396
+      ],
+      "prior_localized_width": 148,
+      "prior_localized_height": 40,
+      "prior_delta_left": 135,
+      "localized_bbox": [
+        720,
+        1353,
+        891,
+        1399
+      ],
+      "localized_width": 171,
+      "localized_height": 46,
+      "source_width": 415,
+      "source_height": 48,
+      "delta_left": 3,
+      "delta_right": 241,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 22,
+      "source": "MEXICO",
+      "korean": "멕시코",
+      "cell": [
+        0,
+        1280,
+        716,
+        64
+      ],
+      "original_bbox": [
+        6,
+        1287,
+        230,
+        1338
+      ],
+      "source_mask_pixels": 6708,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        1288,
+        139,
+        1336
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        8,
+        1288,
+        228,
+        1336
+      ],
+      "render_safe_bbox": [
+        8,
+        1288,
+        228,
+        1336
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 131,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        63,
+        1292,
+        172,
+        1332
+      ],
+      "prior_localized_width": 109,
+      "prior_localized_height": 40,
+      "prior_delta_left": 57,
+      "localized_bbox": [
+        8,
+        1288,
+        139,
+        1336
+      ],
+      "localized_width": 131,
+      "localized_height": 48,
+      "source_width": 224,
+      "source_height": 51,
+      "delta_left": 2,
+      "delta_right": 91,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 23,
+      "source": "JAPAN",
+      "korean": "일본",
+      "cell": [
+        716,
+        1280,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1288,
+        898,
+        1338
+      ],
+      "source_mask_pixels": 5095,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1289,
+        807,
+        1336
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        1288,
+        896,
+        1336
+      ],
+      "render_safe_bbox": [
+        720,
+        1289,
+        896,
+        1336
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 87,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        771,
+        1292,
+        844,
+        1332
+      ],
+      "prior_localized_width": 73,
+      "prior_localized_height": 40,
+      "prior_delta_left": 54,
+      "localized_bbox": [
+        720,
+        1289,
+        807,
+        1336
+      ],
+      "localized_width": 87,
+      "localized_height": 47,
+      "source_width": 181,
+      "source_height": 50,
+      "delta_left": 3,
+      "delta_right": 91,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 24,
+      "source": "ITALY",
+      "korean": "이탈리아",
+      "cell": [
+        0,
+        1216,
+        716,
+        64
+      ],
+      "original_bbox": [
+        6,
+        1224,
+        160,
+        1272
+      ],
+      "source_mask_pixels": 4047,
+      "source_rgba_median": [
+        57,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        1225,
+        159,
+        1271
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 47,
+      "block_safe_bbox": [
+        8,
+        1224,
+        160,
+        1272
+      ],
+      "render_safe_bbox": [
+        8,
+        1225,
+        159,
+        1271
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 171,
+      "horizontal_scale": 0.883,
+      "prior_localized_bbox": [
+        12,
+        1228,
+        156,
+        1267
+      ],
+      "prior_localized_width": 144,
+      "prior_localized_height": 39,
+      "prior_delta_left": 6,
+      "localized_bbox": [
+        8,
+        1225,
+        159,
+        1271
+      ],
+      "localized_width": 151,
+      "localized_height": 46,
+      "source_width": 154,
+      "source_height": 48,
+      "delta_left": 2,
+      "delta_right": 1,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 25,
+      "source": "HONG KONG",
+      "korean": "홍콩",
+      "cell": [
+        716,
+        1216,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1223,
+        1052,
+        1274
+      ],
+      "source_mask_pixels": 9647,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1224,
+        808,
+        1271
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        1224,
+        1052,
+        1272
+      ],
+      "render_safe_bbox": [
+        720,
+        1224,
+        1051,
+        1272
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 88,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        849,
+        1228,
+        923,
+        1268
+      ],
+      "prior_localized_width": 74,
+      "prior_localized_height": 40,
+      "prior_delta_left": 132,
+      "localized_bbox": [
+        720,
+        1224,
+        808,
+        1271
+      ],
+      "localized_width": 88,
+      "localized_height": 47,
+      "source_width": 335,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 244,
+      "delta_top": 1,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 26,
+      "source": "GERMANY",
+      "korean": "독일",
+      "cell": [
+        0,
+        1152,
+        716,
+        64
+      ],
+      "original_bbox": [
+        5,
+        1159,
+        293,
+        1210
+      ],
+      "source_mask_pixels": 8361,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        1160,
+        94,
+        1208
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        8,
+        1160,
+        292,
+        1208
+      ],
+      "render_safe_bbox": [
+        8,
+        1160,
+        292,
+        1208
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 86,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        114,
+        1164,
+        185,
+        1204
+      ],
+      "prior_localized_width": 71,
+      "prior_localized_height": 40,
+      "prior_delta_left": 109,
+      "localized_bbox": [
+        8,
+        1160,
+        94,
+        1208
+      ],
+      "localized_width": 86,
+      "localized_height": 48,
+      "source_width": 288,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 199,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 27,
+      "source": "FRANCE",
+      "korean": "프랑스",
+      "cell": [
+        716,
+        1152,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1159,
+        945,
+        1210
+      ],
+      "source_mask_pixels": 6572,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1160,
+        853,
+        1207
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        1160,
+        944,
+        1208
+      ],
+      "render_safe_bbox": [
+        720,
+        1160,
+        944,
+        1208
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 133,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        775,
+        1164,
+        888,
+        1204
+      ],
+      "prior_localized_width": 113,
+      "prior_localized_height": 40,
+      "prior_delta_left": 58,
+      "localized_bbox": [
+        720,
+        1160,
+        853,
+        1207
+      ],
+      "localized_width": 133,
+      "localized_height": 47,
+      "source_width": 228,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 92,
+      "delta_top": 1,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 28,
+      "source": "FINLAND",
+      "korean": "핀란드",
+      "cell": [
+        0,
+        1088,
+        716,
+        64
+      ],
+      "original_bbox": [
+        5,
+        1096,
+        254,
+        1144
+      ],
+      "source_mask_pixels": 7078,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        1097,
+        137,
+        1143
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 48,
+      "block_safe_bbox": [
+        8,
+        1096,
+        252,
+        1144
+      ],
+      "render_safe_bbox": [
+        8,
+        1097,
+        252,
+        1143
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 129,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        72,
+        1100,
+        187,
+        1140
+      ],
+      "prior_localized_width": 115,
+      "prior_localized_height": 40,
+      "prior_delta_left": 67,
+      "localized_bbox": [
+        8,
+        1097,
+        137,
+        1143
+      ],
+      "localized_width": 129,
+      "localized_height": 46,
+      "source_width": 249,
+      "source_height": 48,
+      "delta_left": 3,
+      "delta_right": 117,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 29,
+      "source": "NETHERLANDS",
+      "korean": "네덜란드",
+      "cell": [
+        716,
+        1088,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1095,
+        1137,
+        1146
+      ],
+      "source_mask_pixels": 12026,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1096,
+        896,
+        1144
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        1096,
+        1136,
+        1144
+      ],
+      "render_safe_bbox": [
+        720,
+        1096,
+        1136,
+        1144
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 176,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        853,
+        1100,
+        1003,
+        1140
+      ],
+      "prior_localized_width": 150,
+      "prior_localized_height": 40,
+      "prior_delta_left": 136,
+      "localized_bbox": [
+        720,
+        1096,
+        896,
+        1144
+      ],
+      "localized_width": 176,
+      "localized_height": 48,
+      "source_width": 420,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 241,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 30,
+      "source": "DENMARK",
+      "korean": "덴마크",
+      "cell": [
+        0,
+        1024,
+        716,
+        64
+      ],
+      "original_bbox": [
+        5,
+        1032,
+        294,
+        1080
+      ],
+      "source_mask_pixels": 8719,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        1033,
+        133,
+        1079
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 47,
+      "block_safe_bbox": [
+        8,
+        1032,
+        292,
+        1080
+      ],
+      "render_safe_bbox": [
+        8,
+        1033,
+        292,
+        1079
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 125,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        94,
+        1036,
+        205,
+        1076
+      ],
+      "prior_localized_width": 111,
+      "prior_localized_height": 40,
+      "prior_delta_left": 89,
+      "localized_bbox": [
+        8,
+        1033,
+        133,
+        1079
+      ],
+      "localized_width": 125,
+      "localized_height": 46,
+      "source_width": 289,
+      "source_height": 48,
+      "delta_left": 3,
+      "delta_right": 161,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 31,
+      "source": "CHINA",
+      "korean": "중국",
+      "cell": [
+        716,
+        1024,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        1031,
+        899,
+        1082
+      ],
+      "source_mask_pixels": 5197,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        1032,
+        812,
+        1080
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 51,
+      "block_safe_bbox": [
+        720,
+        1032,
+        896,
+        1080
+      ],
+      "render_safe_bbox": [
+        720,
+        1032,
+        896,
+        1080
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 92,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        769,
+        1036,
+        847,
+        1076
+      ],
+      "prior_localized_width": 78,
+      "prior_localized_height": 40,
+      "prior_delta_left": 52,
+      "localized_bbox": [
+        720,
+        1032,
+        812,
+        1080
+      ],
+      "localized_width": 92,
+      "localized_height": 48,
+      "source_width": 182,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 87,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 32,
+      "source": "CANADA",
+      "korean": "캐나다",
+      "cell": [
+        0,
+        960,
+        716,
+        64
+      ],
+      "original_bbox": [
+        5,
+        967,
+        241,
+        1018
+      ],
+      "source_mask_pixels": 6725,
+      "source_rgba_median": [
+        57,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        968,
+        142,
+        1016
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        8,
+        968,
+        240,
+        1016
+      ],
+      "render_safe_bbox": [
+        8,
+        968,
+        240,
+        1016
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 134,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        68,
+        972,
+        180,
+        1012
+      ],
+      "prior_localized_width": 112,
+      "prior_localized_height": 40,
+      "prior_delta_left": 63,
+      "localized_bbox": [
+        8,
+        968,
+        142,
+        1016
+      ],
+      "localized_width": 134,
+      "localized_height": 48,
+      "source_width": 236,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 99,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 33,
+      "source": "BRITAIN",
+      "korean": "영국",
+      "cell": [
+        716,
+        960,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        968,
+        944,
+        1016
+      ],
+      "source_mask_pixels": 6873,
+      "source_rgba_median": [
+        57,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        969,
+        803,
+        1015
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 47,
+      "block_safe_bbox": [
+        720,
+        968,
+        944,
+        1016
+      ],
+      "render_safe_bbox": [
+        720,
+        969,
+        943,
+        1015
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 83,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        795,
+        972,
+        868,
+        1012
+      ],
+      "prior_localized_width": 73,
+      "prior_localized_height": 40,
+      "prior_delta_left": 78,
+      "localized_bbox": [
+        720,
+        969,
+        803,
+        1015
+      ],
+      "localized_width": 83,
+      "localized_height": 46,
+      "source_width": 227,
+      "source_height": 48,
+      "delta_left": 3,
+      "delta_right": 141,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 34,
+      "source": "BELGIUM",
+      "korean": "벨기에",
+      "cell": [
+        0,
+        896,
+        716,
+        64
+      ],
+      "original_bbox": [
+        6,
+        903,
+        262,
+        954
+      ],
+      "source_mask_pixels": 7795,
+      "source_rgba_median": [
+        57,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        8,
+        904,
+        137,
+        952
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        8,
+        904,
+        260,
+        952
+      ],
+      "render_safe_bbox": [
+        8,
+        904,
+        260,
+        952
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 129,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        79,
+        908,
+        189,
+        948
+      ],
+      "prior_localized_width": 110,
+      "prior_localized_height": 40,
+      "prior_delta_left": 73,
+      "localized_bbox": [
+        8,
+        904,
+        137,
+        952
+      ],
+      "localized_width": 129,
+      "localized_height": 48,
+      "source_width": 256,
+      "source_height": 51,
+      "delta_left": 2,
+      "delta_right": 125,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 35,
+      "source": "AUSTRIA",
+      "korean": "오스트리아",
+      "cell": [
+        716,
+        896,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        903,
+        970,
+        954
+      ],
+      "source_mask_pixels": 6975,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        904,
+        944,
+        952
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        904,
+        968,
+        952
+      ],
+      "render_safe_bbox": [
+        720,
+        904,
+        968,
+        952
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 224,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        751,
+        908,
+        937,
+        948
+      ],
+      "prior_localized_width": 186,
+      "prior_localized_height": 40,
+      "prior_delta_left": 34,
+      "localized_bbox": [
+        720,
+        904,
+        944,
+        952
+      ],
+      "localized_width": 224,
+      "localized_height": 48,
+      "source_width": 253,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 26,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 36,
+      "source": "AUSTRALIA",
+      "korean": "호주",
+      "cell": [
+        0,
+        832,
+        716,
+        64
+      ],
+      "original_bbox": [
+        1,
+        839,
+        337,
+        890
+      ],
+      "source_mask_pixels": 8774,
+      "source_rgba_median": [
+        57,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        4,
+        840,
+        92,
+        888
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        4,
+        840,
+        336,
+        888
+      ],
+      "render_safe_bbox": [
+        4,
+        840,
+        336,
+        888
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 88,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        133,
+        844,
+        207,
+        884
+      ],
+      "prior_localized_width": 74,
+      "prior_localized_height": 40,
+      "prior_delta_left": 132,
+      "localized_bbox": [
+        4,
+        840,
+        92,
+        888
+      ],
+      "localized_width": 88,
+      "localized_height": 48,
+      "source_width": 336,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 245,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    },
+    {
+      "idx": 37,
+      "source": "USA",
+      "korean": "미국",
+      "cell": [
+        716,
+        832,
+        716,
+        64
+      ],
+      "original_bbox": [
+        717,
+        839,
+        832,
+        890
+      ],
+      "source_mask_pixels": 3281,
+      "source_rgba_median": [
+        60,
+        71,
+        74,
+        255
+      ],
+      "localized_bbox_preencode": [
+        720,
+        840,
+        806,
+        888
+      ],
+      "font_file": "NotoSansCJK-Black.ttc",
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 49,
+      "block_safe_bbox": [
+        720,
+        840,
+        832,
+        888
+      ],
+      "render_safe_bbox": [
+        720,
+        840,
+        831,
+        888
+      ],
+      "render_method": "SOURCE_HEIGHT_MAX_SAFE_LEFT_ANCHORED_CONDENSE_ONLY",
+      "natural_width_before_condense": 86,
+      "horizontal_scale": 1.0,
+      "prior_localized_bbox": [
+        740,
+        844,
+        811,
+        884
+      ],
+      "prior_localized_width": 71,
+      "prior_localized_height": 40,
+      "prior_delta_left": 23,
+      "localized_bbox": [
+        720,
+        840,
+        806,
+        888
+      ],
+      "localized_width": 86,
+      "localized_height": 48,
+      "source_width": 115,
+      "source_height": 51,
+      "delta_left": 3,
+      "delta_right": 26,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "decoded_alpha_extra_pixels": 0,
+      "decoded_alpha_missing_pixels": 0
+    }
+  ],
+  "machine_checks": {
+    "decoded_changed_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "introduced_visible_outside_exact_source_bboxes": 0,
+    "source_residue_pixels": 0,
+    "decoded_alpha_extra_pixels": 0,
+    "decoded_alpha_missing_pixels": 0,
+    "decoded_bbox_exact_match": "38/38 PASS",
+    "localized_overlap_pairs": 0,
+    "localized_1px_touch_pairs": 0,
+    "height_improved_rows": 38,
+    "height_not_worse_rows": 38,
+    "source_left_anchor_improved_rows": 38,
+    "near_source_height_rows": 38
+  },
+  "compressed_patch": {
+    "target_reencoded_blocks": 11681,
+    "source_only_full_alpha_blocks": 17408,
+    "boundary_alpha_index_only_blocks": 4744,
+    "changed_blocks": 33833,
+    "changed_blocks_outside_patch": 0,
+    "target_and_full_source_blocks_alpha_mode": "BC3_ALPHA_255_0_EXACT_ZERO_NON_TARGET",
+    "clean_scope": "EXACT_SOURCE_BBOX_RECTANGLES",
+    "boundary_endpoints_and_color_bytes_preserved": true
+  },
+  "candidate_sha256": "66a893853d812ff1bad90a5838d33876847bf0b677ee2ba48f76a0f24e9e772d",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+  "rework": {
+    "prior_behavior": "A56 centered each Korean row inside an extra 4px-per-side BC3-safe inset, forcing most rows to 40px and LEO to 25px despite ~48-54px English source heights",
+    "current_behavior": "use maximum positive-margin BC3-safe pixel interior, source-left anchor, source-height-driven native Black Hangul, horizontal condense only when required by source width",
+    "no_english_width_expansion": true
+  },
+  "ordered_generation_gate": {
+    "plate_restoration": "PASS_A56_EXACT_BBOX_CLEAN",
+    "slant_direction": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "no_unnecessary_undersizing": "PASS_PENDING_CONTROLLER",
+    "weight_outline_shadow": "PASS_NATIVE_BLACK_SOURCE_COLOR",
+    "clipping": "PASS_38_OF_38_POSITIVE_MARGIN",
+    "protected_clearance": "PASS_ZERO_OUTSIDE_CHANGE",
+    "flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "immediate_readability": "PENDING_CONTROLLER"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "status": "A157_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
