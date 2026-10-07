@@ -4119,7 +4119,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_E95DA5_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_30CF0D_CONTROLLER_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -6726,7 +6726,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 12:40 KST",
+  "updated_at_kst": "2026-10-07T13:31:32+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -8000,6 +8000,29 @@
     "fresh_independent_c": "PENDING",
     "mandatory_c3_strict_audit": "PENDING_EXACT_SHA",
     "user_jpg_review": "OPEN",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "c234_c1_q137_30cf0d": {
+    "timestamp_kst": "2026-10-07T13:31:32+09:00",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 137,
+    "asset": "30CF0D",
+    "user_ingame_regression": "IGR-005",
+    "producer_run": "B165",
+    "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+    "prior_candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
+    "candidate_sha256": "0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "6/6 PASS",
+    "blast_radius": "changed/alpha outside two exact B165 rework source bboxes=0; MANUAL/AUTOMATIC x4 and unrelated/protected pixels exact",
+    "controller_visual_qa": "PASS_SOURCE_CLEAN_OLD_FINAL_RAW_PRACTICAL_100_75_50",
+    "c3_strict": "C3_STRICT_PASS exact candidate SHA 0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4",
+    "decision": "C234_C3_STRICT_PASS_STATIC_PENDING_USER_JPG_AND_NEW_INGAME_RETEST",
+    "backlog_status": "C_STATIC_PASS_PENDING_INGAME_RETEST",
+    "controller_report": "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_30CF0D_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_comparison_refresh": "PENDING_C234_EXPORT",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
