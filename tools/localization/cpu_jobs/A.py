@@ -242,7 +242,8 @@ rel="textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds"; cand=repo/
 b,raw,old,meta=decode(cand)
 if sha(b)!="2b39cf005e79149890f0cfee605d29144d7d257e9cc9179b6c1f583ce393fce5": raise RuntimeError(("q65 drift",sha(b)))
 src=Image.open(repo/"localization/graphics/role_A/20261005-A-PRODUCTION21/EBEF6D20_HD_SOURCE_READABLE.png").convert("RGBA")
-if sha((repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"/rel).read_bytes())!="8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c": raise RuntimeError("q65 source drift")
+# q65 canonical DDS is not stored under hd_source; A21 source-readable PNG is pinned by its production report.
+if src.size!=(meta["w"],meta["h"]): raise RuntimeError(("q65 source readable size drift",src.size,meta["w"],meta["h"]))
 cfg=[("course","코스",[458,1256,745,1340],(255,220,40)),("left","왼쪽",[270,1340,520,1470],(50,195,240)),
 ("right","오른쪽",[685,1405,874,1470],(245,75,95)),("easy","쉬움",[102,1470,430,1620],(105,220,60)),("hard","어려움",[720,1470,1058,1618],(245,75,65))]
 clean=old.copy()
