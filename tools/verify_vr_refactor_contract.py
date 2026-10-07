@@ -299,9 +299,10 @@ if "R9NoteMainDepthContentWrite()" not in r29:
     errors.append("R29 missing R9 main-depth write owner API")
 if "R32ReviewNoteMainDepthContentWrite()" not in r33:
     errors.append("R33 missing R32 review facade for R9 main-depth write owner API")
-for rel, source in (("R31", r31), ("R32", r32)):
-    if "R9NoteMainDepthContentWrite()" in source:
-        errors.append(f"{rel} regained retired draw-side main-depth accounting")
+if "R9NoteMainDepthContentWrite()" in r31:
+    errors.append("R31 regained retired draw-side main-depth accounting")
+if "void R32ReviewNoteMainDepthContentWrite() noexcept { R9NoteMainDepthContentWrite(); }" not in r32:
+    errors.append("R32 split facade must delegate main-depth accounting to the R9 owner API")
 
 for banned in ("R23GameDrawSerial", "R23BeforeTopLevelDraw", "GetTopLevelDrawSerial()"):
     if banned in r26:
@@ -536,12 +537,13 @@ for rel, source in (
     if expected not in source:
         errors.append(
             f"{rel} missing stereo-draw accounting owner API use: {expected}")
-for rel, source in (("R31", r31), ("R32", r32)):
-    for banned in ("++R9DrawCalls;", "R9MonoBackupGap = true;",
-                   "R9NoteStereoDrawWithoutMonoBackup();"):
-        if banned in source:
-            errors.append(
-                f"{rel} regained retired stereo-draw accounting: {banned}")
+for banned in ("++R9DrawCalls;", "R9MonoBackupGap = true;",
+               "R9NoteStereoDrawWithoutMonoBackup();"):
+    if banned in r31:
+        errors.append(
+            f"R31 regained retired stereo-draw accounting: {banned}")
+if "void R32ReviewNoteStereoDrawWithoutMonoBackup() noexcept { R9NoteStereoDrawWithoutMonoBackup(); }" not in r32:
+    errors.append("R32 split facade must delegate stereo-draw accounting to the R9 owner API")
 if "R9NoteStereoDrawWithoutMonoBackup()" not in r9:
     errors.append("R9 missing stereo-draw accounting owner API")
 
@@ -711,9 +713,9 @@ for banned in ("R29ArmMonoSafety(", "R29MonoSafetyThroughEpoch"):
     if banned in r32:
         errors.append(
             f"R32 retained private R29 recovery-safety dependency: {banned}")
-if "ArmStereoRecoverySafety(" in r32:
+if "void R32ReviewArmStereoRecoverySafety(std::uint64_t n) noexcept { ArmStereoRecoverySafety(n); }" not in r32:
     errors.append(
-        "R32 regained final-draw recovery-safety arming after R33 ownership")
+        "R32 split facade must delegate final-draw recovery-safety arming to the lower owner API")
 if "SetStereoRecoverySafetyThroughEpoch(" not in r32:
     errors.append(
         "R32 missing exact-epoch R29 recovery-safety owner API")
