@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B-MANUALQA231-AA04D779-COVERAGE",
+  "timestamp_kst": "2026-10-07T13:46:09+09:00",
+  "queue_index": 46,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+  "trigger": "QA hardening coverage gate found ordinary lobby/control UI preserved in English",
+  "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+  "before_candidate_sha256": "93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e",
+  "candidate_sha256": "d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0",
+  "github_hosted_worker_run": 37572479089,
+  "semantic_additions": [
+    {
+      "source": "In pre-game lobby",
+      "korean": "게임 전 로비"
+    },
+    {
+      "source": "Offline",
+      "korean": "오프라인"
+    },
+    {
+      "source": "BRAKE",
+      "korean": "브레이크"
+    },
+    {
+      "source": "ACCELERATE",
+      "korean": "가속"
+    },
+    {
+      "source": "GEAR UP",
+      "korean": "기어 업"
+    },
+    {
+      "source": "GEAR DOWN",
+      "korean": "기어 다운"
+    },
+    {
+      "source": "VIEW LICENSE",
+      "korean": "라이선스 보기"
+    },
+    {
+      "source": "CHANGE CUSTOM SOUNDTRACK",
+      "korean": "사용자 음악 / 변경"
+    },
+    {
+      "source": "PAUSE MENU",
+      "korean": "일시정지 / 메뉴"
+    }
+  ],
+  "explicit_preserve_original": {
+    "REV": "gauge abbreviation / prior asset classification",
+    "TOP": "decorative rank emblem / prior asset classification",
+    "You": "player marker paired with 1P/2P/3P/4P / prior asset classification",
+    "player_numbers": "1P/2P/3P/4P standard player markers",
+    "icons_course_symbols_numeric_art": "non-language/protected artwork"
+  },
+  "machine_qa": {
+    "new_physical_rows": 13,
+    "bbox_source_size_positive_margin": "13/13 PASS",
+    "clean_validator": "PASS",
+    "final_validator": "PASS",
+    "previous_candidate_changed_outside_rework_mask": 0,
+    "previous_candidate_alpha_changed_outside_rework_mask": 0,
+    "source_control_alpha_remaining": 0,
+    "localized_pair_overlap": 0,
+    "persisted_decode_matches_intended": "PASS",
+    "mip_count": 1,
+    "mip_review": "PASS_LEVEL0_ONLY_NO_AUTHORED_EXTRA_MIPS",
+    "header_128_exact": true,
+    "raw_mode": "RGBA",
+    "raw_orientation": "mirror_y"
+  },
+  "post_encode_presentation_gate": {
+    "decoded_persisted_dds_authority": "PASS",
+    "practical_scale_100_75_50": "PASS",
+    "ui_family_profiles": [
+      "white lobby/status: bold upright source-left white sans",
+      "gray controls: bold condensed upright source-relative gray/dark sans; source multiline count preserved"
+    ],
+    "rework_blast_radius": "PASS_ZERO_OUTSIDE_13_CONTROL_BBOXES",
+    "coverage": "PASS_21_PRIOR_STAGE_SEMANTICS_PLUS_9_NEW_UI_SEMANTICS_WITH_EXPLICIT_ASSET_PRESERVES",
+    "mandatory_c3": "REQUIRED_FOR_CURRENT_SHA_BEFORE_PRE_INGAME_EXPORT_DUE_PRIOR_POLICY_FALSE_NEGATIVE"
+  },
+  "controller_visual_qa": {
+    "source_old_clean_final": "PASS",
+    "practical_scale_contact": "PASS_100_75_50",
+    "raw_mirror_y": "PASS",
+    "source_removal": "PASS_NO_VISIBLE_OLD_CONTROL_TEXT_RESIDUE",
+    "glyph_integrity": "PASS",
+    "source_style": "PASS_TWO_SOURCE_FAMILIES",
+    "source_relative_height": "PASS_13_OF_13_NEAR_SOURCE_HEIGHT",
+    "multiline_relationship": "PASS_CHANGE_SOUNDTRACK_AND_PAUSE_MENU_KEEP_TWO_LINES",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "protected_intrusion": "NONE_VISIBLE",
+    "stage_regression": "NONE_VISIBLE_21_EXISTING_STAGE_SECTOR_LABELS_UNCHANGED",
+    "observations": [
+      "The old q46 policy explicitly preserved gray control labels; the current coverage gate no longer allows ordinary localizable UI to disappear behind that legacy classification.",
+      "The lobby/status labels and all visible gray/dark control labels in the upper atlas are now Korean while source-specific height, upright orientation and low-contrast family are retained.",
+      "The first GEAR DOWN remains split around the preserved red icon, so the icon is not erased or overdrawn.",
+      "REV/TOP/You/player markers remain explicit asset-specific preserves rather than unaccounted omissions.",
+      "Readable and RAW views show no source residue, clipping, broken Hangul, layer collision or orientation regression."
+    ]
+  },
+  "ordered_generation_gate": {
+    "english_removal_and_plate_restoration": "PASS",
+    "slant_direction": "PASS_SOURCE_UPRIGHT",
+    "text_scale": "PASS_MAX_NATIVE_SOURCE_BBOX_FIT",
+    "weight_outline_shadow": "PASS_FLAT_SOURCE_FAMILIES_NO_INVENTED_EFFECT",
+    "clipping": "PASS_13_OF_13_POSITIVE_MARGIN",
+    "protected_graphics": "PASS",
+    "flip_y_and_raw": "PASS",
+    "readability_vs_source": "PASS"
+  },
+  "decision": "B231_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
