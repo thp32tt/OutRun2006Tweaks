@@ -1,0 +1,182 @@
+{
+  "run": "20261008-C261-C2-Q102-Q062-Q024",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "checks": {
+    "q102_source": {
+      "ok": true,
+      "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+      "mode": "RGBA",
+      "size": [
+        2048,
+        256
+      ],
+      "sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121"
+    },
+    "q102_candidate": {
+      "ok": true,
+      "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+      "mode": "RGBA",
+      "size": [
+        2048,
+        256
+      ],
+      "sha256": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db"
+    },
+    "q102_clean": {
+      "ok": true,
+      "path": "localization/graphics/role_C/20261004-1720-C91/C91_571E78F3_CLEAN_PLATE.png",
+      "mode": "RGBA",
+      "size": [
+        2048,
+        256
+      ],
+      "sha256": "ae251bdbf52b2a9783ff8eaf56fe4069e432380f389109e7c6e7f31350ccf4d5"
+    },
+    "q62_candidate": {
+      "ok": true,
+      "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+      "mode": "RGBA",
+      "size": [
+        2048,
+        1024
+      ],
+      "sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6"
+    },
+    "q62_a132_clean": {
+      "ok": true,
+      "path": "localization/graphics/role_A/20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN/A132_CLEAN_PLATE.png",
+      "mode": "RGBA",
+      "size": [
+        2048,
+        1024
+      ],
+      "sha256": "18cd10ab48a329449bd8e4b54b5bf7342181c52add3bf36c5c8f0464ea2cb9bb"
+    },
+    "q62_b244_clean": {
+      "ok": true,
+      "path": "localization/graphics/role_B/20261008-B244-Q062-PSD-L43-CLEAN/B244_Q062_CLEAN_PLATE.png",
+      "mode": "RGBA",
+      "size": [
+        2048,
+        1024
+      ],
+      "sha256": "542ad0b5076a33e9b9e2b07d2ba0c00e7c5fbe43e786a08c26697e41944fa760"
+    },
+    "q24_candidate": {
+      "ok": true,
+      "path": "localization/graphics/hd_candidates/textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1024
+      ],
+      "sha256": "c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e"
+    },
+    "q24_clean": {
+      "ok": true,
+      "path": "localization/graphics/role_B/20261006-B-PRODUCTION209-NAMEENTRY-JAMO-KEYCAPS/B209_CLEAN_PLATE.png",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1024
+      ],
+      "sha256": "9dbd9516059f296c1981ba257a69d8144ffed83b40bb8f71db90c10ad82787b2"
+    },
+    "q62_source": {
+      "ok": true,
+      "path": "/tmp/tmpcocqs_mj/q62_source.dds",
+      "mode": "RGBA",
+      "size": [
+        2048,
+        1024
+      ],
+      "sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+      "expected_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+      "sha_match": true
+    },
+    "q24_source": {
+      "ok": true,
+      "path": "/tmp/tmpcocqs_mj/q24_source.dds",
+      "mode": "RGBA",
+      "size": [
+        4096,
+        4096
+      ],
+      "sha256": "7aa21de138af2d7f2aae54022a08f0aca79093a2a34a2bd74a87a442efaa60aa",
+      "expected_sha256": "8e18676ac303b07a56d81d1d21c5e025e0baf46da49b16ae9d2e411960181f73",
+      "sha_match": false
+    },
+    "b212_report": {
+      "ok": true,
+      "path": "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_571E78F3_REPORT.json",
+      "keys": [
+        "schema_version",
+        "role",
+        "run",
+        "queue_index",
+        "asset",
+        "trigger",
+        "review_jpg",
+        "prior_c_status",
+        "defects",
+        "source_sha256",
+        "before_sha256",
+        "candidate_sha256",
+        "method",
+        "rows",
+        "qa",
+        "runtime_validation",
+        "status",
+        "no_vr_ffb_dx11_dxvk_work"
+      ]
+    },
+    "a132_report": {
+      "ok": true,
+      "path": "localization/graphics/role_A/20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN/A132_33491F83_REPORT.json",
+      "keys": [
+        "schema_version",
+        "role",
+        "run",
+        "queue_index",
+        "asset",
+        "work_stolen_from_lane",
+        "work_steal_reason",
+        "source_provenance",
+        "translation",
+        "construction",
+        "structure",
+        "rows",
+        "static_qa",
+        "candidate_path",
+        "candidate_sha256",
+        "controller_visual_qa",
+        "runtime_validation",
+        "status",
+        "no_vr_ffb_dx11_dxvk_work"
+      ]
+    },
+    "b209_report": {
+      "ok": true,
+      "path": "localization/graphics/role_B/20261006-B-PRODUCTION209-NAMEENTRY-JAMO-KEYCAPS/B209_JAMO_KEYCAP_REPORT.json",
+      "keys": [
+        "schema_version",
+        "run",
+        "role",
+        "queue_index",
+        "asset",
+        "source",
+        "semantic_proof",
+        "mapping",
+        "palette_rgba",
+        "font",
+        "shear_readable",
+        "candidate_sha256",
+        "dds_meta",
+        "qa",
+        "promotion",
+        "no_vr_ffb_dx11_dxvk_work"
+      ]
+    }
+  }
+}
