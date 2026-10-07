@@ -10,7 +10,7 @@
   "status": "IMPLEMENTED_PENDING_VALIDATION",
   "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-FAILCLOSE-BASELINE-PREDICATE-FACADE-001",
   "base_sha": "418e3cf4c1cb6f62cda695ecc7673513393e44ad",
-  "material_result_sha": null,
+  "material_result_sha": "25f3d09cdd1bd7e7094ba411c18980c74785e94f",
   "validation_bearing_result_sha": null,
   "result_sha": null,
   "result_marker": "[AUTO:CONVERSION-DX9EX-00523]",
@@ -21,6 +21,7 @@
     "src/vr/d3d9/stereo_renderer_r32.cpp",
     "tools/verify_vr_r32_runtime_support_seam.py",
     "tools/verify_vr_r31_r32_retirement_guard.py",
+    "tools/verify_vr_refactor_contract.py",
     "docs/automation/runs/CONVERSION-DX9EX-00523.json"
   ],
   "automation_validation": "PENDING",
@@ -47,7 +48,14 @@
       "stereo-baseline-seeded check",
       "live-effect snapshot fail-close decision",
       "shader identity exchange -> lower draw -> conditional restore"
-    ]
+    ],
+    "initial_validation": {
+      "sha": "25f3d09cdd1bd7e7094ba411c18980c74785e94f",
+      "dx9ex_active_run_id": 37627496145,
+      "policy_job_id": 112812935930,
+      "result": "FAIL",
+      "reason": "tools/verify_vr_refactor_contract.py retained the pre-facade requirement that R32 directly contain R9StereoBaselineSeeded(); the new runtime-support seam contract itself is consistent with R30 delegation."
+    }
   },
   "protected_boundaries": [
     "no R9 baseline state mutation or seeding policy change",
@@ -55,5 +63,5 @@
     "no DirectGPU ACK/fence/slot/publication change",
     "no Reset/ResetEx, Present, HUD, recenter, or OpenXR behavior change"
   ],
-  "next_action": "Require exact-SHA DX9Ex Active Validation and Domain Isolation. If green, persist validation evidence and continue another bounded R32 lower-owner seam; runtime remains UNTESTED."
+  "next_action": "Re-run exact-SHA DX9Ex Active Validation and Domain Isolation after aligning the stale refactor verifier to the R30 stereo-baseline facade. Runtime remains UNTESTED."
 }

@@ -201,19 +201,30 @@ if status_start < 0 or status_end < 0 or \
     errors.append("R30 install-state owner query lost acquire-load semantics")
 
 # R32 fail-closed gating may ask whether the R9 stereo baseline is seeded, but
-# the seed flag itself remains R9-owned.
+# the seed flag and the R9 query remain lower-owned. R32 must consume that
+# predicate through the explicit R30 support boundary.
 if re.search(r"\bR9StereoSeeded\b", r32):
     errors.append("R32 retained direct R9 stereo-seed dependency")
 if "R9StereoBaselineSeeded()" not in r9:
     errors.append("R9 missing stereo-seed owner query")
-if "R9StereoBaselineSeeded()" not in r32:
-    errors.append("R32 missing R9 stereo-seed owner query")
+if "R30SupportStereoBaselineSeeded()" not in r30:
+    errors.append("R30 missing R9 stereo-seed support facade")
+if "R30SupportStereoBaselineSeeded()" not in r32:
+    errors.append("R32 missing R30 stereo-seed support facade")
+if "R9StereoBaselineSeeded()" in r32:
+    errors.append("R32 bypassed R30 and regained direct R9 stereo-seed owner query")
 
 seed_start = r9.find("R9StereoBaselineSeeded()")
 seed_end = r9.find("\n\t}", seed_start)
 if seed_start < 0 or seed_end < 0 or \
         "return R9StereoSeeded;" not in r9[seed_start:seed_end]:
     errors.append("R9 stereo-seed owner query lost direct baseline-state semantics")
+
+support_seed_start = r30.find("R30SupportStereoBaselineSeeded()")
+support_seed_end = r30.find("\n    }", support_seed_start)
+if support_seed_start < 0 or support_seed_end < 0 or \
+        "return R9StereoBaselineSeeded();" not in r30[support_seed_start:support_seed_end]:
+    errors.append("R30 stereo-seed support facade lost exact R9 owner delegation")
 
 # Post-1000 R33 owner-boundary continuation: the final dispatcher may ask R9
 # whether the currently tracked main depth carries stencil, but must not read
