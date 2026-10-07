@@ -5,7 +5,7 @@ from pathlib import Path
 import hashlib, json
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[2]
+# Runner font package: full Noto CJK including Medium/Serif.\nROOT = Path(__file__).resolve().parents[2]
 CANDIDATE = ROOT / "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds"
 CLEAN = ROOT / "localization/graphics/role_A/20261006-A-PRODUCTION76-ACF/A76_ACF_CLEAN_PLATE.png"
 SOURCE_READABLE = ROOT / "localization/graphics/role_A/20261006-A-PRODUCTION76-ACF/A76_ACF_SOURCE_READABLE.png"
