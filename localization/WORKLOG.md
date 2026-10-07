@@ -3244,3 +3244,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Korean Test Build run 37644400122 reached post-build packaging but failed on a PowerShell parser bug in the PRE_INGAME copy error message (q$index:). Workflow fix committed as 7f39a55a7803ab42f5be1bb592f1f624e4f5ae73 using q${index}:; package revalidation remains pending and does not invalidate the independent Win32 Release PASS.
 - IGR-020/022/023/024 -> B240_BUILD_PASS_PENDING_INGAME_RETEST. IGR-021 -> B240_BUILD_PASS_PENDING_TEXT_ID_CAPTURE_AND_INGAME_RETEST. No row is closed without a new actual-game screenshot.
 - RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-08 — B240 q205 native-HD main-menu rework
+- User screenshots 159-162 were remapped from RUNTIME_TEXT to exact graphics asset q205 `ACF61D7C_1024x512.dds`.
+- Root cause confirmed in A76 report: screenshot-visible headings/help were produced as 33px/12px low-resolution rasters and scaled x4.
+- GitHub runner B240 rebuilt only six visible rows directly at final 4096x2048 resolution. Headings: Noto Serif CJK Medium 140/142px. Help copy: Noto Sans CJK Regular 60px. No artificial stroke; pixel_scale=1.
+- Candidate `7598af3375cfd96fa83f2ac7610ac1a97dd0fcebd7aa95f3e33a641dbcfbba9e`; worker run 37647627102 SUCCESS; material commit `dab95ca4c899fa4f3f1b216a74a45289d6ded921`.
+- Changed outside exact six source bboxes=0; protected OutRun and OutRun2SP token changes=0. Controller SOURCE/C217/B240 comparison reviewed PASS.
+- Fresh C + mandatory exact-SHA C3 and NEW actual in-game screenshots are still required. RUNTIME_VALIDATION=UNTESTED.
+- Confirmation modal screenshot164 remains separate runtime ID935 fix; Win32 Release and Korean Test Build both PASS.
+
