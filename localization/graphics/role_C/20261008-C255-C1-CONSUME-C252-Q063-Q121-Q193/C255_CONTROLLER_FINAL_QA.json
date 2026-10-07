@@ -1,0 +1,48 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "20261008-C255-C1-CONSUME-C252-Q063-Q121-Q193",
+  "timestamp_kst": "2026-10-08 00:10 KST",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "selection": {
+    "queue_indices": [
+      63,
+      121,
+      193
+    ],
+    "priority": "unfinished fresh/user-regression C252 evidence before generic pending-C and C3 fallback",
+    "selection_head": "53607f109702ed0523c27b05dfa5a122c1957111"
+  },
+  "execution_backend": "ChatGPT local git access attempted first and failed github.com DNS resolution. GitHub connector state write was attempted; N100 MCP fallback verified online but its existing worktree pull hit ENOSPC, so no heavy N100 compute was used. Existing repository-backed C252 machine evidence was consumed without duplicate recompute.",
+  "source_machine_evidence": "localization/graphics/role_C/20261007-C252-C1-BATCH-Q063-Q121-Q193",
+  "assets": {
+    "q63": {
+      "asset": "48DEBE77",
+      "candidate_sha256": "f92629621d421e924a3f1b9d77252c551832824110e755325bcf0bf4a1af2ad0",
+      "machine_qa": "PASS_3_OF_3_ZERO_BLAST",
+      "controller_visual_qa": "PASS_CLEAN_PLATE_NO_SOURCE_RESIDUE_FLIPY_CONTACTS_RAW",
+      "c3_strict": "C3_STRICT_PASS_EXACT_SHA",
+      "decision": "PASS_PENDING_PRE_INGAME_USER_JPG_INGAME_RETEST"
+    },
+    "q121": {
+      "asset": "FD90AA9",
+      "candidate_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+      "machine_qa": "PASS_3_OF_3_ZERO_BLAST_NUMERIC_FALSE_NEGATIVE",
+      "controller_visual_qa": "FAIL_VISIBLE_ENGLISH_SOURCE_RESIDUE_DOUBLE_DRAW",
+      "c3_strict": "BLOCKED",
+      "decision": "REWORK_REQUIRED"
+    },
+    "q193": {
+      "asset": "97E863AD",
+      "candidate_sha256": "f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69",
+      "machine_qa": "PASS_3_OF_3_ZERO_BLAST_NUMERIC_FALSE_NEGATIVE",
+      "controller_visual_qa": "FAIL_VISIBLE_ENGLISH_SOURCE_RESIDUE_DOUBLE_DRAW",
+      "c3_strict": "BLOCKED",
+      "decision": "REWORK_REQUIRED"
+    }
+  },
+  "pre_ingame_export": "REQUIRED_FOR_Q63_AFTER_QUEUE_STATE",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
