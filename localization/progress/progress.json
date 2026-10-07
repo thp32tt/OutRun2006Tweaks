@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 16:50 KST",
+  "updated_at_kst": "2026-10-07 16:53 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4489,5 +4489,48 @@
     "report": "localization/graphics/role_B/20261007-B234-Q097-411827E-SLANT/B234_411_REPORT.json",
     "controller_qa": "localization/graphics/role_B/20261007-B234-Q097-411827E-SLANT/B234_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
+  },
+  "c243r_c1_q051_ff2462bb": {
+    "timestamp_kst": "2026-10-07T16:53:31+09:00",
+    "run": "20261007-C243R-C1-Q051-FF2462BB-CORRECTIVE",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 51,
+    "asset": "FF2462BB",
+    "regression": "PJR-014-20261006",
+    "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "input_candidate_sha256": "0dccb6318fafa20725427227fddf00c451bfdab814de5dc2da497d79d13b862e",
+    "candidate_sha256": "b1c91a8c0050f0f31523afc055185288f2756e4da02014c9597b69cff25fc129",
+    "initial_fresh_c": "FAIL_BOTTOM_EXACT_SOURCE_BBOX_RIGHT_OVERFLOW_3PX",
+    "corrective_rework": "bottom localized line shifted 4px left",
+    "fresh_c": "PASS_AFTER_SMALL_CORRECTIVE_REWORK",
+    "c3": "C3_STRICT_PASS",
+    "top_margins": [
+      133,
+      133,
+      8,
+      8
+    ],
+    "bottom_margins": [
+      2,
+      1,
+      8,
+      8
+    ],
+    "changed_pixels_outside_true_target": 0,
+    "alpha_changed_outside_true_target": 0,
+    "wrong_a144_insertion_diff_vs_pre_a144": 0,
+    "top_line_pixel_diff_vs_a163r": 0,
+    "line_overlap": 0,
+    "line_touch_1px": 0,
+    "controller_visual_qa": "PASS_SOURCE_A163R_C243R_HIGHZOOM_RAW_PRACTICAL_100_75_50",
+    "machine_report": "localization/graphics/role_C/20261007-C243R-C1-Q051-FF2462BB-CORRECTIVE/C243R_FF2462BB_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261007-C243R-C1-Q051-FF2462BB-CORRECTIVE/C243R_FF2462BB_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "PENDING_REFRESH",
+    "user_jpg_review": "PENDING",
+    "actual_ingame_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
