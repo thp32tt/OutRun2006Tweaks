@@ -142,7 +142,7 @@ forbid(
     "R32 WVP telemetry wrapper",
     "device->SetVertexShaderConstantF(",
 )
-if r33.count("R32SetWvpBatch(") < 4:
+if r33.count("R32ReviewSetWvpBatch(") < 4:
     fail("R33 WVP sites unexpectedly stopped using the telemetry-preserving wrapper")
 
 # Raw live effect render-state reads are ownership-neutral D3D9 observations.
@@ -222,7 +222,7 @@ forbid(
     "R32 saved viewport policy",
     "device->GetViewport(&viewport)",
 )
-if r33.count("R32GetSavedViewport(") < 2:
+if r33.count("R32ReviewGetSavedViewport(") < 2:
     fail("R33 viewport sites unexpectedly stopped using the R32 StateBlock-aware wrapper")
 
 # Terminal post-1100 dependency census: every remaining R33 -> R31/R32 call is
@@ -238,15 +238,15 @@ expected_owner_calls = {
     "R31TelemetryNoteFragile",
     "R31TelemetryNoteHud",
     "R31TelemetryNoteUnstable",
-    "R32EffectIsFragileLive",
-    "R32GetSavedViewport",
-    "R32LowerFailClosed",
-    "R32ObserveFrameWorkload",
-    "R32RestoreRightPassState",
-    "R32WithPresentTelemetry",
-    "R32WithResetLifecycle",
-    "R32ResolveDirectTransport",
-    "R32SetWvpBatch",
+    "R32ReviewEffectIsFragileLive",
+    "R32ReviewGetSavedViewport",
+    "R32ReviewRunLowerFailClosed",
+    "R32ReviewObserveFrameWorkload",
+    "R32ReviewRestoreRightPassState",
+    "R32ReviewRunPresentTelemetry",
+    "R32ReviewRunResetLifecycle",
+    "R32ReviewResolveDirectTransport",
+    "R32ReviewSetWvpBatch",
 }
 observed_owner_calls = set(re.findall(r"\b(R3[12]\w+)\s*\(", r33))
 if observed_owner_calls != expected_owner_calls:
@@ -663,16 +663,16 @@ require(
     "reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30)",
     "SafetyHookInline R33ResetR22Hook{};",
     "reinterpret_cast<void*>(&ResetDestR22)",
-    "R32WithResetLifecycle(",
+    "R32ReviewRunResetLifecycle(",
     "R33ResetR22Hook.stdcall<HRESULT>",
     "SafetyHookInline R33PresentR13Hook{};",
     "reinterpret_cast<void*>(&PresentDestR13)",
-    "R32WithPresentTelemetry(",
+    "R32ReviewRunPresentTelemetry(",
     "R33PresentR13Hook.stdcall<HRESULT>",
     "SafetyHookInline R33ResolveDirectR13Hook{};",
     "reinterpret_cast<void*>(&ResolveDirectTransportR13)",
     "ResolveDirectTransportDestR33",
-    "R32ResolveDirectTransport(",
+    "R32ReviewResolveDirectTransport(",
     "R33ResolveDirectR13Hook.call<bool>",
 )
 
@@ -701,10 +701,10 @@ direct33 = function_body(r33, "bool ResolveDirectTransportDestR33(")
 require(
     direct33,
     "R33 direct DirectGPU owner",
-    "R32ResolveDirectTransport(",
+    "R32ReviewResolveDirectTransport(",
     "R33ResolveDirectR13Hook.call<bool>",
 )
-if direct33.find("R32ResolveDirectTransport(") > direct33.find(
+if direct33.find("R32ReviewResolveDirectTransport(") > direct33.find(
         "R33ResolveDirectR13Hook.call<bool>"):
     fail("R32 DirectGPU helper must own the direct R13 trampoline call")
 
@@ -712,12 +712,12 @@ reset33 = function_body(r33, "HRESULT __stdcall ResetDestR33(")
 require(
     reset33,
     "R33 direct Reset owner",
-    "R32WithResetLifecycle(",
+    "R32ReviewRunResetLifecycle(",
     "R33ResetR22Hook.stdcall<HRESULT>",
     "R33InvalidateDepthStencilCache();",
     "R33SetResetReplayGuardState(",
 )
-if reset33.find("R32WithResetLifecycle(") > reset33.find(
+if reset33.find("R32ReviewRunResetLifecycle(") > reset33.find(
         "R33ResetR22Hook.stdcall<HRESULT>"):
     fail("R32 Reset lifecycle helper must own the direct R22 Reset call")
 if reset33.find("R33ResetR22Hook.stdcall<HRESULT>") > reset33.find(
@@ -728,22 +728,22 @@ present33 = function_body(r33, "HRESULT __stdcall PresentDestR33(")
 require(
     present33,
     "R33 direct Present owner",
-    "R32WithPresentTelemetry(",
+    "R32ReviewRunPresentTelemetry(",
     "R33PresentR13Hook.stdcall<HRESULT>",
 )
-if present33.find("Present/pre") > present33.find("R32WithPresentTelemetry("):
+if present33.find("Present/pre") > present33.find("R32ReviewRunPresentTelemetry("):
     fail("R33 must reassert Reset replay fail-close before R32 Present telemetry/lower Present")
-if present33.find("R32WithPresentTelemetry(") > present33.find(
+if present33.find("R32ReviewRunPresentTelemetry(") > present33.find(
         "R33PresentR13Hook.stdcall<HRESULT>"):
     fail("R32 Present telemetry wrapper must own the direct R13 Present call")
 
 # R32 workload telemetry used to live at its draw entry. Once R33 hooks R30
 # directly, R33 must preserve the same one-call-per-top-level-draw accounting.
 for marker, expected in (
-    ("HRESULT __stdcall DrawPrimitiveDestR33(", "R32ObserveFrameWorkload(device, type, primitiveCount, false, false);"),
-    ("HRESULT __stdcall DrawIndexedPrimitiveDestR33(", "R32ObserveFrameWorkload(device, type, primitiveCount, true, false);"),
-    ("HRESULT __stdcall DrawPrimitiveUPDestR33(", "R32ObserveFrameWorkload(device, type, primitiveCount, false, true);"),
-    ("HRESULT __stdcall DrawIndexedPrimitiveUPDestR33(", "R32ObserveFrameWorkload(device, type, primitiveCount, true, true);"),
+    ("HRESULT __stdcall DrawPrimitiveDestR33(", "R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, false);"),
+    ("HRESULT __stdcall DrawIndexedPrimitiveDestR33(", "R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, false);"),
+    ("HRESULT __stdcall DrawPrimitiveUPDestR33(", "R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, true);"),
+    ("HRESULT __stdcall DrawIndexedPrimitiveUPDestR33(", "R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, true);"),
 ):
     body = function_body(r33, marker)
     if expected not in body:
@@ -756,7 +756,7 @@ require(
     dispatch33,
     "R33 dispatch",
     "R31DiscardUnreliableDrawCaches();",
-    "return R32LowerFailClosed(device,",
+    "return R32ReviewRunLowerFailClosed(device,",
     "std::forward<LowerR29Draw>(lowerR29Draw)",
 )
 for marker in (

@@ -141,21 +141,21 @@ r33 = require(
     "R31OwnedResult R33TryFastWorld",
     "R31OwnedResult R33TryHud",
     "R31ObserveDraw(device)",
-    "R32LowerFailClosed",
+    "R32ReviewRunLowerFailClosed",
     "R31DiscardUnreliableDrawCaches();",
     "changing one tracked render state cannot",
     "R30CallLowerDrawPrimitive(",
     "R30CallLowerDrawIndexedPrimitive(",
     "R30CallLowerDrawPrimitiveUP(",
     "R30CallLowerDrawIndexedPrimitiveUP(",
-    "R32WithResetLifecycle(",
+    "R32ReviewRunResetLifecycle(",
     "R33ResetR22Hook.stdcall<HRESULT>",
     "reinterpret_cast<void*>(&ResetDestR22)",
     "R33 hooks R22 directly and preserves R32 reset lifecycle",
     "SafetyHookInline R33ResolveDirectR13Hook{};",
     "reinterpret_cast<void*>(&ResolveDirectTransportR13)",
     "ResolveDirectTransportDestR33",
-    "R32ResolveDirectTransport(",
+    "R32ReviewResolveDirectTransport(",
     "R33ResolveDirectR13Hook.call<bool>",
     "top-level telemetry counted once",
     "const auto r31 = R31InstallStatus();",
@@ -170,7 +170,7 @@ for banned in ("R33ResetR32Hook", "reinterpret_cast<void*>(&ResetDestR32)"):
     if banned in r33:
         raise SystemExit(f"R33 retained retired R32 Reset chain: {banned}")
 reset33_start = r33.find("HRESULT __stdcall ResetDestR33(")
-reset_helper = r33.find("R32WithResetLifecycle(", reset33_start)
+reset_helper = r33.find("R32ReviewRunResetLifecycle(", reset33_start)
 reset_lower = r33.find("R33ResetR22Hook.stdcall<HRESULT>", reset_helper)
 reset_post = r33.find("R33InvalidateDepthStencilCache();", reset_lower)
 if min(reset33_start, reset_helper, reset_lower, reset_post) < 0 or not (
@@ -178,7 +178,7 @@ if min(reset33_start, reset_helper, reset_lower, reset_post) < 0 or not (
     raise SystemExit("R33 direct Reset owner must preserve R32 wrapper around lower R22 Reset before R33 post-processing")
 
 direct33_start = r33.find("bool ResolveDirectTransportDestR33(")
-direct_helper = r33.find("R32ResolveDirectTransport(", direct33_start)
+direct_helper = r33.find("R32ReviewResolveDirectTransport(", direct33_start)
 direct_lower = r33.find("R33ResolveDirectR13Hook.call<bool>", direct_helper)
 if min(direct33_start, direct_helper, direct_lower) < 0 or not (
         direct33_start < direct_helper < direct_lower):
@@ -336,13 +336,13 @@ r33_guard = require(
     "R33ReportInstallResult(",
     "R9TrackedMainDepthHasStencil()",
     "Present/pre",
-    "R32WithPresentTelemetry(",
+    "R32ReviewRunPresentTelemetry(",
     "R33PresentR13Hook.stdcall<HRESULT>",
     "reinterpret_cast<void*>(&PresentDestR13)",
 )
-if r33_guard.find("Present/pre") > r33_guard.find("R32WithPresentTelemetry("):
+if r33_guard.find("Present/pre") > r33_guard.find("R32ReviewRunPresentTelemetry("):
     raise SystemExit("R33 must reassert Reset replay fail-close before R32 Present telemetry/lower Present")
-if r33_guard.find("R32WithPresentTelemetry(") > r33_guard.find("R33PresentR13Hook.stdcall<HRESULT>"):
+if r33_guard.find("R32ReviewRunPresentTelemetry(") > r33_guard.find("R33PresentR13Hook.stdcall<HRESULT>"):
     raise SystemExit("R32 Present telemetry wrapper must own the direct R13 Present call")
 r32_source = load("src/vr/d3d9/stereo_renderer_r32.cpp")
 for banned in (

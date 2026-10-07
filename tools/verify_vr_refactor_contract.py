@@ -815,7 +815,7 @@ for marker in (
     "SafetyHookInline R33ResolveDirectR13Hook{};",
     "reinterpret_cast<void*>(&ResolveDirectTransportR13)",
     "ResolveDirectTransportDestR33",
-    "R32ResolveDirectTransport(",
+    "R32ReviewResolveDirectTransport(",
     "R33ResolveDirectR13Hook.call<bool>",
 ):
     if marker not in r33:
@@ -849,7 +849,7 @@ for marker in (
 for marker in (
     "SafetyHookInline R33ResetR22Hook{};",
     "reinterpret_cast<void*>(&ResetDestR22)",
-    "R32WithResetLifecycle(",
+    "R32ReviewRunResetLifecycle(",
     "R33ResetR22Hook.stdcall<HRESULT>",
 ):
     if marker not in r33:
@@ -882,7 +882,7 @@ for marker in (
 for marker in (
     "SafetyHookInline R33PresentR13Hook{};",
     "reinterpret_cast<void*>(&PresentDestR13)",
-    "R32WithPresentTelemetry(",
+    "R32ReviewRunPresentTelemetry(",
     "R33PresentR13Hook.stdcall<HRESULT>",
 ):
     if marker not in r33:
