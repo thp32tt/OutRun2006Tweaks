@@ -73,8 +73,10 @@ def raw_to_readable(box):
 # C156 report bboxes are readable/FLIP-Y coordinates; DDS/clean pixels below remain RAW.
 records=[]
 allowed=np.zeros((H,W),dtype=bool)
-old_diff=np.any(O!=K,axis=2)
-fin_diff=np.any(F!=K,axis=2)
+# Visible glyph/effect bbox authority: alpha delta versus the verified clean plate.
+# Hidden RGB under alpha=0 is intentionally excluded from visible-text geometry.
+old_diff=(O[:,:,3]!=K[:,:,3])
+fin_diff=(F[:,:,3]!=K[:,:,3])
 for r in rows:
     key=r["key"]; sb_read=list(r["original_bbox"]); sb_raw=readable_to_raw(sb_read)
     rx0,ry0,rx1,ry1=sb_raw
