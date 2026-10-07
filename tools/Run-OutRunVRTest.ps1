@@ -159,6 +159,7 @@ $oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
 $oldTestProfile = $env:OUTRUN_VR_TEST_PROFILE
 $oldPerformanceProfile = $env:OUTRUN_VR_PERFORMANCE_PROFILE
 $oldShaderFingerprint = $env:OUTRUN_VR_SHADER_FINGERPRINT
+$oldExeSemanticsVerified = $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED
 $identityKeys = @(
     'OUTRUN_VR_SESSION_ID',
     'OUTRUN_VR_VARIANT_ID',
@@ -181,6 +182,20 @@ $env:OUTRUN_VR_MATRIX_ID=[string]$state.BuildMatrixId
 $env:OUTRUN_VR_BACKEND=[string]$backend
 $env:OUTRUN_VR_CONFIG_SHA256=[string]$state.ConfigSha256
 $env:OUTRUN_VR_SOURCE_SHA=$sourceSha
+
+# HUD/world semantic promotion is valid only for the pinned canonical EXE.
+# Establish the gate before process creation so the runtime inspector and
+# renderer see the same identity decision as the post-run collector.
+$canonicalExeSha='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
+$launchExeSha=(Get-FileHash $game -Algorithm SHA256).Hash.ToLowerInvariant()
+if($backend -ne '2d' -and $launchExeSha -ne $canonicalExeSha){
+    throw "VR semantic identity mismatch before launch. Expected $canonicalExeSha, got $launchExeSha"
+}
+if($backend -ne '2d'){
+    $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED='1'
+}else{
+    $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$null
+}
 
 if($backend -eq '2d'){
     $env:OUTRUN_VR_FORCE_DISABLED='1'
@@ -219,6 +234,7 @@ try{
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
     $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$oldShaderFingerprint
+    $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$oldExeSemanticsVerified
     foreach($key in $identityKeys){
         [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
     }
