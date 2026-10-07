@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B234-Q097-411827E-SLANT",
+  "queue_index": 97,
+  "work_stolen_from_lane": "A",
+  "candidate_sha256": "e28a12a19466792dc1d6e24dcd81c472ae310ab90e1abb9a5f7b64756946f808",
+  "supersedes_c87_sha256": "c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e",
+  "rejected_same_task_intermediate_sha256": "badd611286b63356ea3715f0efd5aafd60241d40544a11fda4d4635a8acde9c3",
+  "worker_runs": {
+    "initial_0_18": {
+      "run_id": 37588512343,
+      "result": "SUCCESS_BUT_CONTROLLER_REJECTED_UNDER_SLANT"
+    },
+    "retry_script_base_bug": {
+      "run_id": 37588980872,
+      "result": "FAIL_NO_SHARED_STATE_PROMOTION"
+    },
+    "final_0_26": {
+      "run_id": 37589275151,
+      "result": "SUCCESS",
+      "worker_commit": "d596144768c89adb9e0782be090901023f04581d"
+    }
+  },
+  "review": {
+    "trigger": "PRE_INGAME #005 English-original comparison exposed source-style/slant false negative in four A_RECOVERY04 rows",
+    "source_old_clean_final": "PASS: seconds/TUNED/NORMAL/RANDOM now visibly follow the canonical English readable right-italic direction; 0.18 intermediate was rejected as too weak and final 0.26 transform retained",
+    "typography": "PASS: exact C87 Korean fill/outline/shadow raster is reused, transformed natively; source-family colors/effects are unchanged rather than redrawn with a different font",
+    "scale_hierarchy": "PASS: near-source heights retained; RANDOM refit only to preserve 2px margins; no row exceeds source bbox",
+    "clean_plate": "PASS: A_RECOVERY04 validated CLEAN reused for exactly the four touched rows; no English residue, seam, patch or panel damage visible",
+    "protected": "PASS: changed/alpha pixels outside four exact source bboxes are zero; Automatic/More Engine Sound/Recommendation, Ferrari/model labels, vehicles, controller art and 1P-4P are pixel-exact to C87",
+    "raw_flipy": "PASS: RAW mirror_y and readable FLIP-Y share the canonical atlas transform; no inversion or placement regression",
+    "practical_scale": "PASS: 100/50/25% source-vs-final review remains immediately readable; no broken Hangul, clipping, overlap, residue or protected intrusion"
+  },
+  "machine_qa": {
+    "lines_reworked": 4,
+    "bbox_source_size_positive_margin": "4/4 PASS",
+    "changed_pixels_outside_four_exact_source_bboxes": 0,
+    "alpha_changes_outside_four_exact_source_bboxes": 0,
+    "localized_pair_overlap": 0,
+    "header_128_exact": true,
+    "mip_count": 1,
+    "persisted_decode_identity": "PASS"
+  },
+  "decision": "B234R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
