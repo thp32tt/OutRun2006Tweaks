@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00535",
+  "production_id": "CONVERSION-DX9EX-00535",
+  "event_id": "CONVERSION-DX9EX-00535-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "selected_work_item": "DX9EX-P0-NAVIPUB-HUD-CANONICAL-PRODUCER-AND-SCALING-ANCHOR-CLOSURE",
+  "base_sha": "d8556fe3ae14cf3eadd4cd61c9977ec7d86d4334",
+  "discovery_sha": "e61f5a78a5fe285656c2172fe9177a6f5c6f464e",
+  "material_result_sha": "b0207ae545dabd7931ec05357c073830b2f8d089",
+  "validation_bearing_result_sha": "b0207ae545dabd7931ec05357c073830b2f8d089",
+  "result_sha": "b0207ae545dabd7931ec05357c073830b2f8d089",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00535]",
+  "summary": "Added a canonical NaviPub HUD producer window for goal/rival/heart/nav families, recovered its exact bytes from the pinned EXE through HUD Inspector, and promoted nine active UIScaling goal/rival/heart scaling-state mid-hook anchors to strict 8-byte binary contracts.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_visual_composition_p0.py",
+    "docs/VR_BINARY_CONTRACT.json"
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "discovery_hud_inspector_run_id": 37663202641,
+    "discovery_hud_analysis_artifact_id": 11501098116,
+    "discovery_hud_analysis_artifact_digest": "sha256:db15a5e9404f48a873f171b1f8dc10ab0f79c12252730845cf4addf44ab4ab23",
+    "navipub_window": {
+      "start_rva": "0x000BEA40",
+      "end_rva": "0x000BEE80",
+      "size_bytes": 1088,
+      "bytes_sha256": "2c6c6f73068c6a30a92c9577a2301e2fc5f35e59bc9436f9f5daeb3ae4e42c6c"
+    },
+    "contracts_added": 9,
+    "dx9ex_active_run_id": 37663422123,
+    "jobs": {
+      "policy": 112937050831,
+      "full_chain_compile": 112937228333,
+      "host": 112937228490,
+      "game": 112937228516,
+      "package": 112939521943
+    },
+    "domain_isolation_run_id": 37663422091,
+    "hud_inspector_run_id": 37663422114,
+    "hud_inspector_jobs": {
+      "static_exe_analysis": 112936452397,
+      "build_hud_inspector": 112936452934
+    },
+    "package_artifact_id": 11501259255,
+    "package_artifact_digest": "sha256:2d59209bcdb89a62f1361abf32aeb16e75436b8ead23d347585a911fabdabd00",
+    "hud_analysis_artifact_id": 11501393335,
+    "hud_analysis_artifact_digest": "sha256:566b5cfc43e6d7af115acda9baa71b1a85977d9f89a34435254c0cc53951443e",
+    "hud_inspector_game_artifact_id": 11501403898,
+    "hud_inspector_game_artifact_digest": "sha256:a5ae511423a0f7a7be67c66c0f43bad6fc0eb43d79eb97631de6bf9b218182f1",
+    "superseded_discovery_active_run_id": 37663202486,
+    "superseded_discovery_active_conclusion": "cancelled_by_newer_validation_bearing_sha"
+  },
+  "protected_boundaries": [
+    "runtime render source unchanged",
+    "HUD spacing behavior unchanged; only canonical identity proof strengthened",
+    "Reset/Present/OpenXR/DirectGPU behavior unchanged",
+    "no HMD/runtime success claim"
+  ],
+  "next_action": "P0 NaviPub ScreenHud source/disassembly/binary identity is now stronger. Continue static visual-composition closure or, if no source-static gap remains, treat visual acceptance as Quest3/VDXR-only without claiming runtime PASS."
+}
