@@ -242,6 +242,7 @@ for marker, d3dx_call in (
         body,
         'transient DDS owner must remain function-scoped through D3DX create',
         'std::shared_ptr<std::vector<uint8_t>> transientTextureData;',
+        'if (',
         'HandleTexture(&pSrcData, &SrcDataSize',
         'transientTextureData);',
         d3dx_call,
