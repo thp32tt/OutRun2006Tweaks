@@ -250,3 +250,16 @@ If required C3 evidence is missing, the candidate remains `HOLD_STRICT_RECHECK` 
 - For later changes, compare the same UI region at equivalent game state/resolution when reproducible. Mask dynamic scenery/vehicles/timers only when necessary; never mask the localized label, its plate, or adjacent protected UI.
 - New clipping, collision, residue, hierarchy change, contrast loss, wrong color/effect, or newly untranslated text relative to the accepted screen is FAIL.
 - Golden screenshot regression supplements but does not replace a fresh human in-game review when candidate bytes or runtime draw behavior change.
+
+## Runtime UI in-game visual parity gate — 2026-10-08
+
+User in-game screenshots are authoritative for runtime Korean typography as well as DDS artwork.
+
+- At native screenshot scale, Korean runtime text next to stock English UI must not look visibly lower-resolution, blurrier, more jagged, or materially heavier than the surrounding source UI.
+- Main-menu/body/modal Korean uses the lightest source-faithful Korean-capable UI face available. On Windows the localization runtime prefers `malgunsl.ttf` before regular Malgun; fallback order is allowed only when Semilight is unavailable.
+- HUD/speech-bubble readability reinforcement is **not** a global Korean-text effect. Menu/modal text must not inherit the compact HUD keyline merely because its logical cell height is small.
+- Any runtime text with excessive outline/keyline, black fill clumping, stroke merge, or reduced counter-space is a visual FAIL even when the text rectangle and stock layout are numerically correct.
+- Review runtime text at 1x final screenshot scale, not only zoomed crops. Compare Korean and nearby untouched English for perceived sharpness, weight, baseline, spacing and hierarchy.
+- A user screenshot reporting low-resolution/dirty/heavy Korean invalidates earlier build/static PASS for that visual state. Reopen the regression and require a NEW in-game screenshot before closure.
+- Sparse visible localization is a coverage signal, not permission to translate protected brands, vehicle/model names, song titles, product names or scene/environment artwork. Map every visible English item to runtime/DDS and protection policy before changing it.
+
