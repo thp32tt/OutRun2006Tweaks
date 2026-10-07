@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T07:58:06+09:00",
+  "updated_at_kst": "2026-10-08T08:18:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "TEMP_BACKLOG_RELIEF C2: refresh HEAD/queue and continue the next even fresh/pending C candidate (q140/q154/q164 are currently ahead of generic C3); do not steal C1 odd/unindexed work. q128/q130/q132 exact bytes must not be re-reviewed unless they materially change or a new regression is reported.",
+  "next_checkpoint": "A181R q219 producer PASS pending fresh C1 + exact-SHA C3; IGR-025 remains HOLD for screenshot(163) remaining runtime-vs-DDS mapping and later NEW in-game retest. Do not repeat q219 unless C returns it.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
