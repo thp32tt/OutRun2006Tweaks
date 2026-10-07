@@ -2630,3 +2630,10 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - Transparent-atlas alpha cleanup removes C255 English silhouettes without A171-A174 rectangular plate regression; clean header bboxes contain 0 visible alpha before fresh Korean render.
 - Machine 3/3 + zero outside/alpha/overlap + DDS/RAW PASS; controller SOURCE/A138/CLEAN/A176 + RAW visual PASS.
 - Fresh C1 + exact-SHA C3 + PRE_INGAME/user JPG + NEW in-game retest pending. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
+### C259 C2 — 2026-10-08 02:33 KST
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN; q212, q50, q62 processed.
+- q50 CBF8ECBF af6a189d...: fresh independent C 7/7 zero-outside PASS + controller RAW/FLIP-Y PASS -> exact-SHA C3_STRICT_PASS; PRE_INGAME/user JPG/actual-game pending.
+- q212 BA0147DA e3fc3275...: visual FAIL — HEART ATTACK phrase remains 40.82% source-width with 300px word gap; REWORK_REQUIRED, C3 blocked.
+- q62 33491F83 58fe9ed9...: visual FAIL — EASY/HARD clean plate contains visible white oval road patches; REWORK_REQUIRED, C3 blocked.
+- RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.

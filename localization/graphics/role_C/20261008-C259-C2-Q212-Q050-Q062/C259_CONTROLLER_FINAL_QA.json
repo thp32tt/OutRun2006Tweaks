@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261008-C259-C2-Q212-Q050-Q062",
+  "timestamp_kst": "2026-10-08T02:33:52+09:00",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "selection_refresh_head": "9758888d531c958b3d5287b4f6e432a53b4f7663",
+  "pre_commit_refresh_head": "1fdf7d4c873f361c07933f55e28d998edba29de6",
+  "execution_backend": "GitHub SSOT; N100 MCP used for exact-byte/image fallback review only; q50 repository-backed independent machine QA via GitHub Actions run 37659419579 after one validator-only channel-mask retry.",
+  "assets": {
+    "q212": {
+      "queue_index": 212,
+      "asset": "BA0147DA",
+      "candidate_sha256": "e3fc3275e696acb0dc5449908bd3b57a232d842ad51296e888cc7ede6a276863",
+      "producer_machine_qa": "PASS_2_OF_2_ZERO_OUTSIDE_ALPHA_PROTECTED_OVERLAP",
+      "controller_visual_qa": "FAIL_HEART_ATTACK_WORD_GAP_AND_SOURCE_HIERARCHY_UNDERFILL",
+      "evidence": {
+        "source_size": [
+          1759,
+          158
+        ],
+        "localized_size": [
+          718,
+          150
+        ],
+        "width_ratio": 0.4082,
+        "word_gap_px": 300
+      },
+      "decision": "REWORK_REQUIRED",
+      "c3": "BLOCKED"
+    },
+    "q50": {
+      "queue_index": 50,
+      "asset": "CBF8ECBF",
+      "candidate_sha256": "af6a189de92ccade79687c92a46cd2304a5f631f73e96a24a9d6a74844de5c33",
+      "machine_report": "localization/graphics/role_C/20261008-C259-C2-Q212-Q050-Q062/C259_Q050_MACHINE_QA.json",
+      "machine_qa": "PASS_7_OF_7_ZERO_OUTSIDE_ALPHA_HEADER_EXACT",
+      "controller_visual_qa": "PASS_SOURCE_CURRENT_CONTACTS_RAW_FLIPY_RIGHT_LEAN_EFFECT_READABILITY",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "decision": "C259_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+    },
+    "q62": {
+      "queue_index": 62,
+      "asset": "33491F83",
+      "candidate_sha256": "58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2",
+      "producer_machine_qa": "PASS_9_OF_9_ZERO_OUTSIDE_ALPHA",
+      "controller_visual_qa": "FAIL_CLEAN_PLATE_WHITE_OVAL_PATCH_EASY_HARD",
+      "decision": "REWORK_REQUIRED",
+      "c3": "BLOCKED"
+    }
+  },
+  "q50_worker": {
+    "failed_validator_run": 37659109919,
+    "failure": "VALIDATOR_ONLY_RGBA_CHANNEL_MASK_ASSUMPTION",
+    "successful_run": 37659419579,
+    "worker_output_head": "1fdf7d4c873f361c07933f55e28d998edba29de6"
+  },
+  "pre_ingame_export": "REQUIRED_REFRESH_Q050_ONLY",
+  "user_jpg_acceptance": "PENDING",
+  "actual_ingame_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
