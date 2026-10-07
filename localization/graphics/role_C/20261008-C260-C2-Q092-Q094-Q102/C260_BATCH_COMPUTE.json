@@ -1,0 +1,49 @@
+{
+  "run": "20261008-C260-C2-Q092-Q094-Q102",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "assets": {
+    "q092": {
+      "candidate_sha256": "c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a",
+      "source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+      "machine_status": "PASS_HIGH_RISK_EDGE_TOUCH",
+      "row_summary": {
+        "pass": 2,
+        "total": 2,
+        "edge_touch_high_risk": 2
+      },
+      "outside_changed": 0,
+      "outside_alpha": 0,
+      "header_128_exact": true
+    },
+    "q094": {
+      "candidate_sha256": "c36da00d6fa421180f6017fd188e9de783a35eb57a6dcc4927039c663aeee905",
+      "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "machine_status": "PASS",
+      "row_summary": {
+        "pass": 7,
+        "total": 7,
+        "edge_touch_high_risk": 0
+      },
+      "outside_changed": 0,
+      "outside_alpha": 0,
+      "header_128_exact": true
+    },
+    "q102": {
+      "candidate_sha256": "442babea9c5dea9a944dff3d4a6a577f007dad2ae63a9699d380baf0ce7fc05d",
+      "source_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+      "machine_status": "PASS_HIGH_RISK_EDGE_TOUCH",
+      "row_summary": {
+        "pass": 2,
+        "total": 2,
+        "edge_touch_high_risk": 2
+      },
+      "outside_changed": 0,
+      "outside_alpha": 0,
+      "header_128_exact": true
+    }
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

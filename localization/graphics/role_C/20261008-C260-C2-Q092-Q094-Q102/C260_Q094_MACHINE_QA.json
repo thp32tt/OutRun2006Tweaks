@@ -1,0 +1,263 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "20261008-C260-C2-Q092-Q094-Q102",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 94,
+  "asset": "2DA43E41",
+  "candidate_sha256": "c36da00d6fa421180f6017fd188e9de783a35eb57a6dcc4927039c663aeee905",
+  "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "header_128_exact": true,
+  "raw_orientation": "mirror_y",
+  "independent_method": "Fresh decode of persisted candidate and exact pinned/source DDS; readable FLIP-Y visible-pixel diff; allowed scope is union of independently prior-C/producer-established exact source bboxes; candidate alpha is remeasured inside each selected source bbox.",
+  "changed_visible_pixels_outside_all_localized_source_bboxes": 0,
+  "alpha_changed_pixels_outside_all_localized_source_bboxes": 0,
+  "rows": [
+    {
+      "key": "course_or2",
+      "source": "OutRun2 · 15 Continuous Course has been selected.",
+      "korean": "OutRun2 · 15코스 연속이 / 선택되었습니다.",
+      "original_bbox": [
+        115,
+        192,
+        2056,
+        448
+      ],
+      "localized_bbox": [
+        289,
+        208,
+        1881,
+        431
+      ],
+      "source_size": [
+        1941,
+        256
+      ],
+      "localized_size": [
+        1592,
+        223
+      ],
+      "delta_left": 174,
+      "delta_right": 175,
+      "delta_top": 16,
+      "delta_bottom": 17,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "edge_touch_high_risk": false
+    },
+    {
+      "key": "course_sp",
+      "source": "OutRun2: SP · 15 Continuous Course has been selected.",
+      "korean": "OutRun2: SP · 15코스 연속이 / 선택되었습니다.",
+      "original_bbox": [
+        132,
+        488,
+        2078,
+        717
+      ],
+      "localized_bbox": [
+        307,
+        492,
+        1903,
+        713
+      ],
+      "source_size": [
+        1946,
+        229
+      ],
+      "localized_size": [
+        1596,
+        221
+      ],
+      "delta_left": 175,
+      "delta_right": 175,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "edge_touch_high_risk": false
+    },
+    {
+      "key": "max_speed",
+      "source": "最高速:",
+      "korean": "최고 속도:",
+      "original_bbox": [
+        3827,
+        319,
+        4018,
+        410
+      ],
+      "localized_bbox": [
+        3829,
+        326,
+        4016,
+        402
+      ],
+      "source_size": [
+        191,
+        91
+      ],
+      "localized_size": [
+        187,
+        76
+      ],
+      "delta_left": 2,
+      "delta_right": 2,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "edge_touch_high_risk": false
+    },
+    {
+      "key": "handling",
+      "source": "ハンドリング:",
+      "korean": "핸들링:",
+      "original_bbox": [
+        1677,
+        896,
+        2112,
+        1050
+      ],
+      "localized_bbox": [
+        1688,
+        907,
+        2100,
+        1039
+      ],
+      "source_size": [
+        435,
+        154
+      ],
+      "localized_size": [
+        412,
+        132
+      ],
+      "delta_left": 11,
+      "delta_right": 12,
+      "delta_top": 11,
+      "delta_bottom": 11,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "edge_touch_high_risk": false
+    },
+    {
+      "key": "view_change",
+      "source": "View Change Button :",
+      "korean": "시점 변경 버튼:",
+      "original_bbox": [
+        3430,
+        998,
+        3896,
+        1102
+      ],
+      "localized_bbox": [
+        3432,
+        1007,
+        3894,
+        1092
+      ],
+      "source_size": [
+        466,
+        104
+      ],
+      "localized_size": [
+        462,
+        85
+      ],
+      "delta_left": 2,
+      "delta_right": 2,
+      "delta_top": 9,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "edge_touch_high_risk": false
+    },
+    {
+      "key": "expert",
+      "source": "For Expert Drivers",
+      "korean": "상급자용",
+      "original_bbox": [
+        2842,
+        1124,
+        3479,
+        1229
+      ],
+      "localized_bbox": [
+        2886,
+        1133,
+        3434,
+        1219
+      ],
+      "source_size": [
+        637,
+        105
+      ],
+      "localized_size": [
+        548,
+        86
+      ],
+      "delta_left": 44,
+      "delta_right": 45,
+      "delta_top": 9,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "edge_touch_high_risk": false
+    },
+    {
+      "key": "special_course",
+      "source": "Special Course",
+      "korean": "스페셜 코스",
+      "original_bbox": [
+        3137,
+        1279,
+        3879,
+        1403
+      ],
+      "localized_bbox": [
+        3189,
+        1290,
+        3827,
+        1392
+      ],
+      "source_size": [
+        742,
+        124
+      ],
+      "localized_size": [
+        638,
+        102
+      ],
+      "delta_left": 52,
+      "delta_right": 52,
+      "delta_top": 11,
+      "delta_bottom": 11,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "edge_touch_high_risk": false
+    }
+  ],
+  "row_summary": {
+    "pass": 7,
+    "total": 7,
+    "edge_touch_high_risk": 0
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
