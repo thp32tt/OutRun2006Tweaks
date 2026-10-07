@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from pathlib import Path
 import re
+import json
+from verify_vr_hud_exact_callsite_contract import check as verify_hud_callsite_contract
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -46,6 +48,7 @@ r14 = read('src/vr/d3d9/ex_device_upgrade_r14.cpp')
 runner = read('tools/Run-OutRunVRTest.ps1')
 pcfast = read('tools/Build-OutRunPCFast.ps1')
 binary_contract = read('docs/VR_BINARY_CONTRACT.json')
+verify_hud_callsite_contract(ui, json.loads(binary_contract))
 hud_inspector_workflow = read('.github/workflows/outrun-exe-hud-inspector.yml')
 dx9ex_active_workflow = read('.github/workflows/vr-dx9ex-active.yml')
 
@@ -68,6 +71,7 @@ for path in (
     'docs/VR_BINARY_CONTRACT.json',
     'tools/analyze_outrun_exe.py',
     'tools/verify_vr_visual_composition_p0.py',
+    'tools/verify_vr_hud_exact_callsite_contract.py',
 ):
     if hud_inspector_workflow.count(path) < 2:
         raise SystemExit(

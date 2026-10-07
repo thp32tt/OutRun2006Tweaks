@@ -28,6 +28,7 @@ on:
       - 'cmake.toml'
       - 'tools/analyze_outrun_exe.py'
       - 'tools/verify_vr_visual_composition_p0.py'
+      - 'tools/verify_vr_hud_exact_callsite_contract.py'
       - 'tools/Build-OutRunPCFast.ps1'
       - 'tools/Collect-OutRunVRLogs.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
@@ -61,6 +62,7 @@ on:
       - 'cmake.toml'
       - 'tools/analyze_outrun_exe.py'
       - 'tools/verify_vr_visual_composition_p0.py'
+      - 'tools/verify_vr_hud_exact_callsite_contract.py'
       - 'tools/Build-OutRunPCFast.ps1'
       - 'tools/Collect-OutRunVRLogs.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
@@ -102,6 +104,10 @@ jobs:
       - name: Asset semantic parser self-test
         shell: pwsh
         run: python tools/analyze_outrun_assets.py --self-test
+
+      - name: Reject corrupted HUD producer mutations
+        shell: pwsh
+        run: python tools/verify_vr_hud_exact_callsite_contract.py --self-test
 
       - name: Verify P0 visual composition contract
         shell: pwsh

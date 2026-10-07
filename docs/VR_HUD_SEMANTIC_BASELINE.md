@@ -72,3 +72,7 @@ direct-CALL inventory, so CI artifacts and runtime logs use the same names.
 Preserve semantic separation first. A source change may refine an exact
 call-site or split a category, but broad promotion of screen HUD to world 3D or
 world billboards to zero-disparity HUD requires specific runtime evidence.
+
+## P0 exact producer static gate — 2026-10-08
+
+`tools/verify_vr_hud_exact_callsite_contract.py --self-test` checks 71 canonical direct CALL addresses, relative CALL destinations, `VR_BINARY_CONTRACT.json` entries, disjoint physical UIScaling hooks and correct screen/world semantic tag publication. Eight intentionally corrupted cases must FAIL. It runs with `tools/verify_vr_visual_composition_p0.py` and exact canonical EXE verification in the GitHub HUD Inspector gate. Do not ask for repeated hardware runs while code/binary evidence can discriminate the fault; CI success remains `RUNTIME_VALIDATION=UNTESTED` until exact Quest 3/VDXR testing.
