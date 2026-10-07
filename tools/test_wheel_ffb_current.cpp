@@ -166,6 +166,14 @@ int main() {
  require(!imperial_avenue_stone_paving_pattern(13,0,imperialAsphalt),"continuous-stone override stays scoped to Imperial Avenue");
  const float stoneAmp=imperial_avenue_stone_tactile_amplitude(.70f,.60f,.70f);
  require(stoneAmp>=.049f&&stoneAmp<=.051f,"Imperial stone tactile is a subtle ~0.05 road texture below curb/off-road");
+ const std::array<float,4> imperialNormalizedRough={.35f,.35f,.35f,.35f};
+ const float imperialCommon=common_contact_tactile_amplitude(
+     contact_tactile_envelope(imperialNormalizedRough,0),.70f,.60f,.70f);
+ require(imperialCommon>.20f,"generic 4-wheel contact layer would overpower Imperial stone if not bypassed");
+ require(std::abs(modern_road_tactile_amplitude(true,imperialCommon,stoneAmp)-stoneAmp)<1e-6f,
+     "Imperial stone bypasses generic curb/contact amplitude instead of max-combining with it");
+ require(std::abs(modern_road_tactile_amplitude(false,imperialCommon,stoneAmp)-imperialCommon)<1e-6f,
+     "ordinary Modern contact still uses the generic tactile amplitude");
  require(road_motion_gate(0.0f)==0.0f,"stationary car has zero road-texture gate");
  require(road_motion_gate(.08f)>.999f,"road texture reaches full motion authority once clearly moving");
  require(imperial_avenue_stone_tactile_amplitude(0.0f,.60f,.70f)*road_motion_gate(0.0f)==0.0f,"Imperial stone cannot vibrate while parked");
@@ -191,14 +199,15 @@ int main() {
  require(drift_countersteer_blend(.30f,.20f,1.0f)>0.0f&&drift_countersteer_blend(.30f,.20f,1.0f)<1.0f,"moderate drift crossfades instead of snapping");
  require(drift_countersteer_blend(.10f,-.20f,1.0f)==0.0f,"small body slip does not trigger drift handoff");
  require(drift_countersteer_shape(.70f)>.89f&&drift_countersteer_shape(.05f)==0.0f,"drift recovery magnitude is bounded to developed oversteer");
+ require(std::abs(DriftCountersteerTorqueScale-.90f)<1e-6f,"R18 drift countersteer target is softened by 10 percent without changing handoff direction");
  const float weakPrimaryTorque=.05f;
  const float boundedOpposingCue=bound_drift_countersteer_torque(weakPrimaryTorque,-.90f);
  require(std::abs(boundedOpposingCue+weakPrimaryTorque)<1e-6f,"R13 body-slip cue cannot exceed weak front-slip SAT magnitude");
- const float deepBodyTarget=-.80f;
+ const float deepBodyTarget=-.80f*DriftCountersteerTorqueScale;
  const float deepFrontTorque=.30f;
  const float deepBlend=drift_countersteer_blend(.70f,-.35f,1.0f);
  const float deepHandoff=deepFrontTorque+(deepBodyTarget-deepFrontTorque)*deepBlend;
- require(deepHandoff<-.79f,"R14 developed drift must reverse from front-slip torque to body-slip countersteer target");
+ require(deepHandoff<-.71f,"R18 developed drift keeps the correct countersteer sign with a slightly softer target");
  require(std::abs(bound_drift_countersteer_torque(-weakPrimaryTorque,.90f)-weakPrimaryTorque)<1e-6f,"R13 drift cue bound is sign symmetric");
  ResponseLUT linear{}; require(parse_response_lut("0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",linear),"linear LUT parses");
  require(std::abs(apply_response_lut(.55f,linear)-.55f)<1e-5f,"linear LUT identity");
