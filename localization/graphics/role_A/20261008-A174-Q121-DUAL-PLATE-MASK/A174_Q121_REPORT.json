@@ -1,0 +1,126 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261008-A174-Q121-DUAL-PLATE-MASK",
+  "queue_index": 121,
+  "asset": "FD90AA9",
+  "regression": "C255 English residue; A171/A172/A173 full-bbox plate rectangle rejected",
+  "rejected_current_sha256": "7a7d1e6c62dca8d699dac689fabfb4314d7f6a5f35aeac130b9a8817afccea76",
+  "restored_prior_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+  "candidate_sha256": "fbb99b69a3cd67c070db00fdd68d39daf492e1ea329014f46ae22a5138ac1c53",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "rows": [
+    {
+      "key": "select_game_mode",
+      "text": "게임 모드 선택",
+      "source_bbox": [
+        166,
+        819,
+        1166,
+        973
+      ],
+      "localized_bbox": [
+        341,
+        846,
+        990,
+        945
+      ],
+      "source_plate_rgba": [
+        115,
+        115,
+        115,
+        255
+      ],
+      "prior_plate_rgba": [
+        173,
+        173,
+        174,
+        255
+      ],
+      "font": "Noto Sans CJK KR:style=Black",
+      "font_size": 108,
+      "shear": 0.28,
+      "removal_pixels": 154000,
+      "result": "PASS"
+    },
+    {
+      "key": "select_car",
+      "text": "차량 선택",
+      "source_bbox": [
+        243,
+        947,
+        1156,
+        1111
+      ],
+      "localized_bbox": [
+        485,
+        979,
+        913,
+        1078
+      ],
+      "source_plate_rgba": [
+        115,
+        115,
+        115,
+        255
+      ],
+      "prior_plate_rgba": [
+        174,
+        174,
+        175,
+        255
+      ],
+      "font": "Noto Sans CJK KR:style=Black",
+      "font_size": 108,
+      "shear": 0.28,
+      "removal_pixels": 149732,
+      "result": "PASS"
+    },
+    {
+      "key": "select_course",
+      "text": "코스 선택",
+      "source_bbox": [
+        302,
+        1062,
+        1085,
+        1213
+      ],
+      "localized_bbox": [
+        478,
+        1088,
+        908,
+        1187
+      ],
+      "source_plate_rgba": [
+        115,
+        115,
+        115,
+        255
+      ],
+      "prior_plate_rgba": [
+        172,
+        172,
+        173,
+        255
+      ],
+      "font": "Noto Sans CJK KR:style=Black",
+      "font_size": 108,
+      "shear": 0.28,
+      "removal_pixels": 118233,
+      "result": "PASS"
+    }
+  ],
+  "construction": "derive source glyph mask against source plate and prior glyph mask against prior plate independently; replace only union text/effect pixels with prior plate color; fresh native Korean render",
+  "machine_qa": {
+    "bbox_size_positive_margin": "3/3 PASS",
+    "changed_outside_vs_A138_prior": 0,
+    "alpha_outside_vs_A138_prior": 0,
+    "header_128_exact": true,
+    "persisted_decode": "PASS",
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "status": "A174_Q121_MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
+  "forbidden_domains_touched": []
+}
