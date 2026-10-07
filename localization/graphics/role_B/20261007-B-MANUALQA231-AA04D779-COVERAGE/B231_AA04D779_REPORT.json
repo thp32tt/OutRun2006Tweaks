@@ -73,7 +73,7 @@
       "font_face_index": 1,
       "font_style": "Bold",
       "font_size": 36,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "fill_rgba": [
         255,
         255,
@@ -125,7 +125,7 @@
       "font_face_index": 1,
       "font_style": "Bold",
       "font_size": 34,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "fill_rgba": [
         255,
         255,
@@ -756,20 +756,42 @@
     "family_profile": "RECORDED_TWO_FAMILIES",
     "rework_blast_radius": "PASS_ZERO_OUTSIDE_13_CONTROL_BBOXES",
     "coverage": "PASS_21_PRIOR_STAGE_SEGMENTS_PLUS_9_NEW_SEMANTIC_UI_LABELS_WITH_EXPLICIT_ASSET_PRESERVES",
-    "mandatory_c3": "REQUIRED_BEFORE_PRE_INGAME_EXPORT_DUE_PRIOR_POLICY_FALSE_NEGATIVE"
+    "mandatory_c3": "REQUIRED_BEFORE_PRE_INGAME_EXPORT_DUE_PRIOR_POLICY_FALSE_NEGATIVE",
+    "controller_practical_scale_review": "PASS"
   },
   "ordered_generation_gate": {
-    "1_plate_restoration": "PASS_TRANSPARENT_SOURCE_CONTROL_ALPHA_REMOVED",
-    "2_slant_direction": "PASS_SOURCE_UPRIGHT",
-    "3_no_unnecessary_undersizing": "PASS_MAX_NATIVE_FIT_PER_SOURCE_BBOX",
-    "4_source_weight_outline_shadow": "PASS_SOURCE_FLAT_WHITE_GRAY_FAMILIES",
-    "5_no_clipping": "PASS_13_OF_13_POSITIVE_MARGIN",
-    "6_protected_clearance": "PASS_BASELINE_AND_PROTECTED_OUTSIDE_ZERO",
-    "7_flip_y_raw": "EVIDENCE_WRITTEN",
-    "8_immediate_readability": "PENDING_CONTROLLER"
+    "english_removal_and_plate_restoration": "PASS",
+    "slant_direction": "PASS_SOURCE_UPRIGHT",
+    "text_scale": "PASS_MAX_NATIVE_SOURCE_BBOX_FIT",
+    "weight_outline_shadow": "PASS_FLAT_SOURCE_FAMILIES_NO_INVENTED_EFFECT",
+    "clipping": "PASS_13_OF_13_POSITIVE_MARGIN",
+    "protected_graphics": "PASS",
+    "flip_y_and_raw": "PASS",
+    "readability_vs_source": "PASS"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER",
-  "status": "B231_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_FRESH_C_C3",
+  "controller_visual_qa": {
+    "source_old_clean_final": "PASS",
+    "practical_scale_contact": "PASS_100_75_50",
+    "raw_mirror_y": "PASS",
+    "source_removal": "PASS_NO_VISIBLE_OLD_CONTROL_TEXT_RESIDUE",
+    "glyph_integrity": "PASS",
+    "source_style": "PASS_TWO_SOURCE_FAMILIES",
+    "source_relative_height": "PASS_13_OF_13_NEAR_SOURCE_HEIGHT",
+    "multiline_relationship": "PASS_CHANGE_SOUNDTRACK_AND_PAUSE_MENU_KEEP_TWO_LINES",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "protected_intrusion": "NONE_VISIBLE",
+    "stage_regression": "NONE_VISIBLE_21_EXISTING_STAGE_SECTOR_LABELS_UNCHANGED",
+    "observations": [
+      "The old q46 policy explicitly preserved gray control labels; the current coverage gate no longer allows ordinary localizable UI to disappear behind that legacy classification.",
+      "The lobby/status labels and all visible gray/dark control labels in the upper atlas are now Korean while source-specific height, upright orientation and low-contrast family are retained.",
+      "The first GEAR DOWN remains split around the preserved red icon, so the icon is not erased or overdrawn.",
+      "REV/TOP/You/player markers remain explicit asset-specific preserves rather than unaccounted omissions.",
+      "Readable and RAW views show no source residue, clipping, broken Hangul, layer collision or orientation regression."
+    ]
+  },
+  "status": "B231_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_self_qa_report": "localization/graphics/role_B/20261007-B-MANUALQA231-AA04D779-COVERAGE/B231_CONTROLLER_SELF_QA.json"
 }
