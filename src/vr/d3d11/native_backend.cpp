@@ -625,6 +625,41 @@ std::uint64_t r284_object_materialization_snapshot_token(
     return token == 0 ? 1 : token;
 }
 
+std::uint64_t r285_backend_semantic_handoff_snapshot_token(
+    const NativeProgrammableShaderBackendSemanticHandoffEvidence&
+        handoff) noexcept {
+    if (!handoff.reviewReady)
+        return 0;
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(token, handoff.cacheKey);
+    token = mix_readiness_snapshot_token(
+        token, handoff.backendOwnerGeneration);
+    token = mix_readiness_snapshot_token(
+        token, handoff.cacheOwnerGeneration);
+    token = mix_readiness_snapshot_token(
+        token, handoff.objectMaterializationSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, handoff.cacheSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, handoff.slotSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, handoff.translationObjectSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, handoff.translatedSemanticReceiptSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, handoff.translationObjectReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, handoff.translatedSemanticReceiptReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, handoff.objectBindingAuthorized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, handoff.nativeDrawPathActivationAllowed ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, handoff.drawDispatchAuthorized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(token, 0x285u);
+    return token == 0 ? 1 : token;
+}
+
 HRESULT create_device(
     IDXGIAdapter* adapter,
     UINT flags,
@@ -5137,6 +5172,327 @@ validate_nonindexed_geometry_binding_snapshot(
 void NativeProgrammableShaderPairCache::shutdown() noexcept {
     entries_.clear();
     device_.Reset();
+}
+
+bool NativeProgrammableShaderBackendOwnership::initialize(
+    ID3D11Device* device) noexcept {
+    shutdown();
+    if (!device || !cache_.initialize(device))
+        return false;
+    device_ = device;
+    ++owner_generation_;
+    if (owner_generation_ == 0)
+        ++owner_generation_;
+    return true;
+}
+
+void NativeProgrammableShaderBackendOwnership::shutdown() noexcept {
+    materializations_.clear();
+    cache_.shutdown();
+    device_.Reset();
+}
+
+NativeProgrammableShaderBackendSemanticHandoffEvidence
+NativeProgrammableShaderBackendOwnership::
+materialize_semantic_handoff_for_observation(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+        objectPrerequisite,
+    std::uint64_t objectPrerequisiteSnapshotToken,
+    const NativeProgrammableShaderObjectCreationHandoffEvidence& creationHandoff,
+    std::uint64_t creationHandoffSnapshotToken,
+    const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+        targetBytecodeMaterialization,
+    std::uint64_t targetBytecodeMaterializationSnapshotToken,
+    const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff,
+    std::uint64_t sourceMappingHandoffSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence&
+        translationPlan,
+    std::uint64_t translationPlanSnapshotToken) noexcept {
+    NativeProgrammableShaderBackendSemanticHandoffEvidence out{};
+    out.diagnosticOnly = true;
+    out.objectBindingAuthorized = false;
+    out.nativeDrawPathActivationAllowed = false;
+    out.drawDispatchAuthorized = false;
+    out.cacheKey = sourceIdentity.cacheKey;
+    out.backendOwnerGeneration = owner_generation_;
+    out.inputValid =
+        sourceIdentity.exact_identity() &&
+        !sourceIdentity.translationImplemented &&
+        objectPrerequisiteSnapshotToken != 0 &&
+        creationHandoffSnapshotToken != 0 &&
+        targetBytecodeMaterializationSnapshotToken != 0 &&
+        sourceMappingHandoffSnapshotToken != 0 &&
+        translationPlanSnapshotToken != 0;
+    out.ownerReady = ready();
+    out.deviceMatches =
+        out.ownerReady &&
+        device_.Get() != nullptr &&
+        cache_.device() == device_.Get();
+    if (!out.inputValid || !out.ownerReady || !out.deviceMatches)
+        return out;
+
+    const NativeProgrammableShaderObjectMaterializationEvidence*
+        materialization = nullptr;
+    const auto existing = materializations_.find(sourceIdentity.cacheKey);
+    if (existing != materializations_.end()) {
+        if (!validate_programmable_shader_object_materialization_snapshot(
+                device_.Get(),
+                cache_,
+                sourceIdentity,
+                objectPrerequisite,
+                objectPrerequisiteSnapshotToken,
+                creationHandoff,
+                creationHandoffSnapshotToken,
+                targetBytecodeMaterialization,
+                targetBytecodeMaterializationSnapshotToken,
+                existing->second,
+                existing->second.reviewSnapshotToken))
+            return out;
+        materialization = &existing->second;
+        out.materializationReused = true;
+    } else {
+        const auto created =
+            materialize_programmable_shader_translation_objects(
+                device_.Get(),
+                cache_,
+                sourceIdentity,
+                objectPrerequisite,
+                objectPrerequisiteSnapshotToken,
+                creationHandoff,
+                creationHandoffSnapshotToken,
+                targetBytecodeMaterialization,
+                targetBytecodeMaterializationSnapshotToken);
+        if (!created.reviewReady ||
+            !validate_programmable_shader_object_materialization_snapshot(
+                device_.Get(),
+                cache_,
+                sourceIdentity,
+                objectPrerequisite,
+                objectPrerequisiteSnapshotToken,
+                creationHandoff,
+                creationHandoffSnapshotToken,
+                targetBytecodeMaterialization,
+                targetBytecodeMaterializationSnapshotToken,
+                created,
+                created.reviewSnapshotToken))
+            return out;
+        try {
+            const auto inserted =
+                materializations_.emplace(sourceIdentity.cacheKey, created);
+            if (!inserted.second)
+                return out;
+            materialization = &inserted.first->second;
+        } catch (...) {
+            return out;
+        }
+    }
+
+    if (!materialization)
+        return out;
+
+    out.materializationReady =
+        materialization->reviewReady &&
+        materialization->translationObjectReceiptReady &&
+        !materialization->objectBindingAuthorized;
+    out.materializationSnapshotMatches =
+        out.materializationReady &&
+        materialization->reviewSnapshotToken != 0 &&
+        validate_programmable_shader_object_materialization_snapshot(
+            device_.Get(),
+            cache_,
+            sourceIdentity,
+            objectPrerequisite,
+            objectPrerequisiteSnapshotToken,
+            creationHandoff,
+            creationHandoffSnapshotToken,
+            targetBytecodeMaterialization,
+            targetBytecodeMaterializationSnapshotToken,
+            *materialization,
+            materialization->reviewSnapshotToken);
+    out.objectMaterializationSnapshotToken =
+        materialization->reviewSnapshotToken;
+    out.cacheSnapshotToken = materialization->cacheSnapshotToken;
+    out.slotSnapshotToken = materialization->slotSnapshotToken;
+    out.cacheOwnerGeneration = materialization->ownerGeneration;
+    if (!out.materializationSnapshotMatches)
+        return out;
+
+    const auto translationObject =
+        cache_.translation_object_readiness(
+            device_.Get(),
+            sourceIdentity,
+            out.cacheSnapshotToken,
+            out.slotSnapshotToken);
+    out.translationObjectReady =
+        translationObject.attachmentReady &&
+        translationObject.objectsAttached &&
+        translationObject.objectDevicesMatch &&
+        translationObject.cacheKey == sourceIdentity.cacheKey;
+    out.translationObjectSnapshotToken = translationObject.snapshotToken;
+    out.translationObjectSnapshotMatches =
+        out.translationObjectReady &&
+        out.translationObjectSnapshotToken != 0 &&
+        out.translationObjectSnapshotToken ==
+            materialization->translationObjectSnapshotToken &&
+        cache_.validate_translation_object_snapshot(
+            device_.Get(),
+            sourceIdentity,
+            out.cacheSnapshotToken,
+            out.slotSnapshotToken,
+            out.translationObjectSnapshotToken);
+    if (!out.translationObjectSnapshotMatches)
+        return out;
+
+    out.translatedSemanticReceipt =
+        compose_programmable_shader_translated_semantic_receipt(
+            sourceIdentity,
+            translationObject,
+            out.translationObjectSnapshotToken,
+            sourceMappingHandoff,
+            sourceMappingHandoffSnapshotToken,
+            translationPlan,
+            translationPlanSnapshotToken);
+    out.translatedSemanticReceiptSnapshotToken =
+        out.translatedSemanticReceipt.reviewSnapshotToken;
+    out.translatedSemanticReceiptReady =
+        out.translatedSemanticReceipt.reviewReady &&
+        validate_programmable_shader_translated_semantic_receipt_snapshot(
+            out.translatedSemanticReceipt,
+            out.translatedSemanticReceiptSnapshotToken);
+    out.translatedSemanticReceiptSnapshotMatches =
+        out.translatedSemanticReceiptReady &&
+        out.translatedSemanticReceipt.translationObjectSnapshotToken ==
+            out.translationObjectSnapshotToken &&
+        out.translatedSemanticReceipt.sourceMappingHandoffSnapshotToken ==
+            sourceMappingHandoffSnapshotToken &&
+        out.translatedSemanticReceipt.translationPlanSnapshotToken ==
+            translationPlanSnapshotToken &&
+        out.translatedSemanticReceipt.cacheKey == sourceIdentity.cacheKey;
+
+    out.boundaryPreserved =
+        out.materializationSnapshotMatches &&
+        out.translationObjectSnapshotMatches &&
+        out.translatedSemanticReceiptSnapshotMatches &&
+        !out.objectBindingAuthorized &&
+        !out.nativeDrawPathActivationAllowed &&
+        !out.drawDispatchAuthorized &&
+        out.diagnosticOnly;
+    out.reviewReady =
+        out.inputValid &&
+        out.ownerReady &&
+        out.deviceMatches &&
+        out.boundaryPreserved;
+    if (out.reviewReady)
+        out.reviewSnapshotToken =
+            r285_backend_semantic_handoff_snapshot_token(out);
+    return out;
+}
+
+bool NativeProgrammableShaderBackendOwnership::
+validate_semantic_handoff_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+        objectPrerequisite,
+    std::uint64_t objectPrerequisiteSnapshotToken,
+    const NativeProgrammableShaderObjectCreationHandoffEvidence& creationHandoff,
+    std::uint64_t creationHandoffSnapshotToken,
+    const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+        targetBytecodeMaterialization,
+    std::uint64_t targetBytecodeMaterializationSnapshotToken,
+    const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff,
+    std::uint64_t sourceMappingHandoffSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence&
+        translationPlan,
+    std::uint64_t translationPlanSnapshotToken,
+    const NativeProgrammableShaderBackendSemanticHandoffEvidence& handoff,
+    std::uint64_t reviewSnapshotToken) const noexcept {
+    if (reviewSnapshotToken == 0 ||
+        !handoff.reviewReady ||
+        !handoff.boundaryPreserved ||
+        !handoff.diagnosticOnly ||
+        handoff.objectBindingAuthorized ||
+        handoff.nativeDrawPathActivationAllowed ||
+        handoff.drawDispatchAuthorized ||
+        handoff.reviewSnapshotToken != reviewSnapshotToken ||
+        !ready() ||
+        handoff.backendOwnerGeneration != owner_generation_ ||
+        handoff.cacheKey != sourceIdentity.cacheKey)
+        return false;
+
+    const auto found = materializations_.find(sourceIdentity.cacheKey);
+    if (found == materializations_.end())
+        return false;
+    const auto& materialization = found->second;
+    if (materialization.reviewSnapshotToken !=
+            handoff.objectMaterializationSnapshotToken ||
+        materialization.cacheSnapshotToken != handoff.cacheSnapshotToken ||
+        materialization.slotSnapshotToken != handoff.slotSnapshotToken ||
+        materialization.ownerGeneration != handoff.cacheOwnerGeneration ||
+        !validate_programmable_shader_object_materialization_snapshot(
+            device_.Get(),
+            cache_,
+            sourceIdentity,
+            objectPrerequisite,
+            objectPrerequisiteSnapshotToken,
+            creationHandoff,
+            creationHandoffSnapshotToken,
+            targetBytecodeMaterialization,
+            targetBytecodeMaterializationSnapshotToken,
+            materialization,
+            handoff.objectMaterializationSnapshotToken))
+        return false;
+
+    const auto translationObject =
+        cache_.translation_object_readiness(
+            device_.Get(),
+            sourceIdentity,
+            handoff.cacheSnapshotToken,
+            handoff.slotSnapshotToken);
+    if (!translationObject.attachmentReady ||
+        !translationObject.objectsAttached ||
+        !translationObject.objectDevicesMatch ||
+        translationObject.snapshotToken !=
+            handoff.translationObjectSnapshotToken ||
+        !cache_.validate_translation_object_snapshot(
+            device_.Get(),
+            sourceIdentity,
+            handoff.cacheSnapshotToken,
+            handoff.slotSnapshotToken,
+            handoff.translationObjectSnapshotToken))
+        return false;
+
+    const auto currentReceipt =
+        compose_programmable_shader_translated_semantic_receipt(
+            sourceIdentity,
+            translationObject,
+            handoff.translationObjectSnapshotToken,
+            sourceMappingHandoff,
+            sourceMappingHandoffSnapshotToken,
+            translationPlan,
+            translationPlanSnapshotToken);
+    if (!currentReceipt.reviewReady ||
+        !validate_programmable_shader_translated_semantic_receipt_snapshot(
+            currentReceipt,
+            currentReceipt.reviewSnapshotToken) ||
+        currentReceipt.reviewSnapshotToken !=
+            handoff.translatedSemanticReceiptSnapshotToken ||
+        currentReceipt.reviewSnapshotToken !=
+            handoff.translatedSemanticReceipt.reviewSnapshotToken ||
+        currentReceipt.cacheKey != handoff.translatedSemanticReceipt.cacheKey ||
+        currentReceipt.translationObjectSnapshotToken !=
+            handoff.translatedSemanticReceipt.translationObjectSnapshotToken ||
+        currentReceipt.sourceMappingHandoffSnapshotToken !=
+            handoff.translatedSemanticReceipt.sourceMappingHandoffSnapshotToken ||
+        currentReceipt.translationPlanSnapshotToken !=
+            handoff.translatedSemanticReceipt.translationPlanSnapshotToken ||
+        !validate_programmable_shader_translated_semantic_receipt_snapshot(
+            handoff.translatedSemanticReceipt,
+            handoff.translatedSemanticReceiptSnapshotToken))
+        return false;
+
+    return r285_backend_semantic_handoff_snapshot_token(handoff) ==
+        reviewSnapshotToken;
 }
 
 bool NativeFixedFunctionPipelineBundle::initialize(
@@ -13240,6 +13596,10 @@ bool NativeBackend::initialize(const NativeBackendConfig& config) noexcept {
     }
 
     config_ = config;
+    if (!programmable_shader_ownership_.initialize(device_.Get())) {
+        shutdown();
+        return false;
+    }
     if (!create_color_target(config.width, config.height, config.color_format)) {
         shutdown();
         return false;
@@ -13276,6 +13636,7 @@ void NativeBackend::begin_frame(const std::array<float, 4>& clear_color) noexcep
 }
 
 void NativeBackend::shutdown() noexcept {
+    programmable_shader_ownership_.shutdown();
     color_srv_.Reset();
     color_rtv_.Reset();
     color_texture_.Reset();

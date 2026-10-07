@@ -11191,6 +11191,55 @@ def main() -> None:
             + ", ".join(missing_r284_programmable_shader_object_materialization)
         )
 
+    r285_programmable_backend_semantic_handoff = [
+        ("struct NativeProgrammableShaderBackendSemanticHandoffEvidence",
+         NATIVE_BACKEND_HPP, "R285 persistent backend handoff evidence type"),
+        ("class NativeProgrammableShaderBackendOwnership",
+         NATIVE_BACKEND_HPP, "R285 persistent native-device owner"),
+        ("materialize_semantic_handoff_for_observation(",
+         NATIVE_BACKEND_HPP, "R285 persistent ownership-to-R275 entrypoint"),
+        ("validate_semantic_handoff_snapshot(",
+         NATIVE_BACKEND_HPP, "R285 persistent handoff validator"),
+        ("r285_backend_semantic_handoff_snapshot_token(",
+         NATIVE_BACKEND_CPP, "R285 tamper-evident handoff snapshot"),
+        ("token, 0x285u",
+         NATIVE_BACKEND_CPP, "R285 independent snapshot domain"),
+        ("materializations_.emplace(sourceIdentity.cacheKey, created)",
+         NATIVE_BACKEND_CPP, "R285 persists exact R284 receipt per pair"),
+        ("compose_programmable_shader_translated_semantic_receipt(",
+         NATIVE_BACKEND_CPP, "R285 feeds current R242 object receipt into R275"),
+        ("out.objectBindingAuthorized = false;",
+         NATIVE_BACKEND_CPP, "R285 keeps shader/context binding unauthorized"),
+        ("out.nativeDrawPathActivationAllowed = false;",
+         NATIVE_BACKEND_CPP, "R285 keeps NativeDrawPath inactive"),
+        ("out.drawDispatchAuthorized = false;",
+         NATIVE_BACKEND_CPP, "R285 keeps Draw/DrawIndexed dispatch unauthorized"),
+        ("programmable_shader_ownership_.initialize(device_.Get())",
+         NATIVE_BACKEND_CPP, "NativeBackend initializes R285 owner on its native device"),
+        ("programmable_shader_ownership_.shutdown();",
+         NATIVE_BACKEND_CPP, "NativeBackend invalidates R285 ownership before device release"),
+        ("R285 native owner feeds exact persistent R242 ownership into R275 without binding",
+         CONSTANT_BUFFER_PROBE, "R285 hosted positive ownership-to-R275 regression"),
+        ("R285 repeated pair reuses exact R284/R242 receipt instead of recreating shaders",
+         CONSTANT_BUFFER_PROBE, "R285 persistent receipt reuse regression"),
+        ("R285 persistent ownership handoff must not bind VS or PS to the immediate context",
+         CONSTANT_BUFFER_PROBE, "R285 explicit no-binding regression"),
+        ("R285 rejects stale R274 mapping identity after safe R284 receipt reuse",
+         CONSTANT_BUFFER_PROBE, "R285 stale R275 provenance regression"),
+        ("R285 native-device generation change invalidates prior persistent ownership handoff",
+         CONSTANT_BUFFER_PROBE, "R285 device-generation invalidation regression"),
+    ]
+    missing_r285_programmable_backend_semantic_handoff = [
+        meaning for token, source, meaning
+        in r285_programmable_backend_semantic_handoff
+        if token not in source
+    ]
+    if missing_r285_programmable_backend_semantic_handoff:
+        raise SystemExit(
+            "DX11 R285 programmable backend semantic handoff drift: "
+            + ", ".join(missing_r285_programmable_backend_semantic_handoff)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),

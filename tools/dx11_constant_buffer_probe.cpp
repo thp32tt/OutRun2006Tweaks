@@ -5983,6 +5983,189 @@ int main()
         r284StaleObjectMaterialization.reviewSnapshotToken == 0,
         "R284 rejects stale/tampered R283 bytecode provenance before object creation");
 
+    outrun::vr::dx11::NativeProgrammableShaderBackendOwnership
+        r285BackendOwnership;
+    require(
+        !r285BackendOwnership.ready() &&
+        r285BackendOwnership.initialize(r284Device.device) &&
+        r285BackendOwnership.ready() &&
+        r285BackendOwnership.device() == r284Device.device &&
+        r285BackendOwnership.cache().entry_count() == 0 &&
+        r285BackendOwnership.owner_generation() != 0,
+        "R285 native-device programmable owner initializes with persistent empty cache");
+    const auto r285FirstOwnerGeneration =
+        r285BackendOwnership.owner_generation();
+
+    const auto r285FirstHandoff =
+        r285BackendOwnership.materialize_semantic_handoff_for_observation(
+            programmablePair,
+            r279ObjectPrerequisite,
+            r279ObjectPrerequisite.reviewSnapshotToken,
+            r280ObjectCreationHandoff,
+            r280ObjectCreationHandoff.reviewSnapshotToken,
+            r283TargetBytecodeMaterialization,
+            r283TargetBytecodeMaterialization.reviewSnapshotToken,
+            r274SourceMappingHandoff,
+            r274SourceMappingHandoff.reviewSnapshotToken,
+            r276TranslationPlan,
+            r276TranslationPlan.reviewSnapshotToken);
+    require(
+        r285FirstHandoff.inputValid &&
+        r285FirstHandoff.ownerReady &&
+        r285FirstHandoff.deviceMatches &&
+        r285FirstHandoff.materializationReady &&
+        r285FirstHandoff.materializationSnapshotMatches &&
+        !r285FirstHandoff.materializationReused &&
+        r285FirstHandoff.translationObjectReady &&
+        r285FirstHandoff.translationObjectSnapshotMatches &&
+        r285FirstHandoff.translatedSemanticReceiptReady &&
+        r285FirstHandoff.translatedSemanticReceiptSnapshotMatches &&
+        !r285FirstHandoff.objectBindingAuthorized &&
+        !r285FirstHandoff.nativeDrawPathActivationAllowed &&
+        !r285FirstHandoff.drawDispatchAuthorized &&
+        r285FirstHandoff.diagnosticOnly &&
+        r285FirstHandoff.boundaryPreserved &&
+        r285FirstHandoff.reviewReady &&
+        r285FirstHandoff.cacheKey == programmablePair.cacheKey &&
+        r285FirstHandoff.backendOwnerGeneration ==
+            r285FirstOwnerGeneration &&
+        r285FirstHandoff.cacheOwnerGeneration != 0 &&
+        r285FirstHandoff.objectMaterializationSnapshotToken != 0 &&
+        r285FirstHandoff.cacheSnapshotToken != 0 &&
+        r285FirstHandoff.slotSnapshotToken != 0 &&
+        r285FirstHandoff.translationObjectSnapshotToken != 0 &&
+        r285FirstHandoff.translatedSemanticReceiptSnapshotToken != 0 &&
+        r285FirstHandoff.translatedSemanticReceipt.reviewReady &&
+        r285FirstHandoff.translatedSemanticReceipt.
+            translationObjectSnapshotToken ==
+            r285FirstHandoff.translationObjectSnapshotToken &&
+        r285FirstHandoff.reviewSnapshotToken != 0 &&
+        r285BackendOwnership.cache().entry_count() == 1 &&
+        r285BackendOwnership.validate_semantic_handoff_snapshot(
+            programmablePair,
+            r279ObjectPrerequisite,
+            r279ObjectPrerequisite.reviewSnapshotToken,
+            r280ObjectCreationHandoff,
+            r280ObjectCreationHandoff.reviewSnapshotToken,
+            r283TargetBytecodeMaterialization,
+            r283TargetBytecodeMaterialization.reviewSnapshotToken,
+            r274SourceMappingHandoff,
+            r274SourceMappingHandoff.reviewSnapshotToken,
+            r276TranslationPlan,
+            r276TranslationPlan.reviewSnapshotToken,
+            r285FirstHandoff,
+            r285FirstHandoff.reviewSnapshotToken),
+        "R285 native owner feeds exact persistent R242 ownership into R275 without binding");
+
+    const auto r285RepeatedHandoff =
+        r285BackendOwnership.materialize_semantic_handoff_for_observation(
+            programmablePair,
+            r279ObjectPrerequisite,
+            r279ObjectPrerequisite.reviewSnapshotToken,
+            r280ObjectCreationHandoff,
+            r280ObjectCreationHandoff.reviewSnapshotToken,
+            r283TargetBytecodeMaterialization,
+            r283TargetBytecodeMaterialization.reviewSnapshotToken,
+            r274SourceMappingHandoff,
+            r274SourceMappingHandoff.reviewSnapshotToken,
+            r276TranslationPlan,
+            r276TranslationPlan.reviewSnapshotToken);
+    require(
+        r285RepeatedHandoff.reviewReady &&
+        r285RepeatedHandoff.materializationReused &&
+        r285RepeatedHandoff.backendOwnerGeneration ==
+            r285FirstHandoff.backendOwnerGeneration &&
+        r285RepeatedHandoff.cacheOwnerGeneration ==
+            r285FirstHandoff.cacheOwnerGeneration &&
+        r285RepeatedHandoff.objectMaterializationSnapshotToken ==
+            r285FirstHandoff.objectMaterializationSnapshotToken &&
+        r285RepeatedHandoff.translationObjectSnapshotToken ==
+            r285FirstHandoff.translationObjectSnapshotToken &&
+        r285RepeatedHandoff.translatedSemanticReceiptSnapshotToken ==
+            r285FirstHandoff.translatedSemanticReceiptSnapshotToken &&
+        r285RepeatedHandoff.reviewSnapshotToken ==
+            r285FirstHandoff.reviewSnapshotToken &&
+        r285BackendOwnership.cache().entry_count() == 1 &&
+        r285BackendOwnership.validate_semantic_handoff_snapshot(
+            programmablePair,
+            r279ObjectPrerequisite,
+            r279ObjectPrerequisite.reviewSnapshotToken,
+            r280ObjectCreationHandoff,
+            r280ObjectCreationHandoff.reviewSnapshotToken,
+            r283TargetBytecodeMaterialization,
+            r283TargetBytecodeMaterialization.reviewSnapshotToken,
+            r274SourceMappingHandoff,
+            r274SourceMappingHandoff.reviewSnapshotToken,
+            r276TranslationPlan,
+            r276TranslationPlan.reviewSnapshotToken,
+            r285RepeatedHandoff,
+            r285RepeatedHandoff.reviewSnapshotToken),
+        "R285 repeated pair reuses exact R284/R242 receipt instead of recreating shaders");
+
+    ID3D11VertexShader* r285BoundVertex = nullptr;
+    ID3D11PixelShader* r285BoundPixel = nullptr;
+    r284Device.context->VSGetShader(&r285BoundVertex, nullptr, nullptr);
+    r284Device.context->PSGetShader(&r285BoundPixel, nullptr, nullptr);
+    require(
+        r285BoundVertex == nullptr &&
+        r285BoundPixel == nullptr,
+        "R285 persistent ownership handoff must not bind VS or PS to the immediate context");
+    if (r285BoundVertex)
+        r285BoundVertex->Release();
+    if (r285BoundPixel)
+        r285BoundPixel->Release();
+
+    const auto r285StaleMappingHandoff =
+        r285BackendOwnership.materialize_semantic_handoff_for_observation(
+            programmablePair,
+            r279ObjectPrerequisite,
+            r279ObjectPrerequisite.reviewSnapshotToken,
+            r280ObjectCreationHandoff,
+            r280ObjectCreationHandoff.reviewSnapshotToken,
+            r283TargetBytecodeMaterialization,
+            r283TargetBytecodeMaterialization.reviewSnapshotToken,
+            r274SourceMappingHandoff,
+            staleR274MappingToken,
+            r276TranslationPlan,
+            r276TranslationPlan.reviewSnapshotToken);
+    require(
+        r285StaleMappingHandoff.materializationReady &&
+        r285StaleMappingHandoff.materializationReused &&
+        r285StaleMappingHandoff.translationObjectReady &&
+        !r285StaleMappingHandoff.translatedSemanticReceiptReady &&
+        !r285StaleMappingHandoff.translatedSemanticReceiptSnapshotMatches &&
+        !r285StaleMappingHandoff.reviewReady &&
+        r285StaleMappingHandoff.reviewSnapshotToken == 0 &&
+        r285BackendOwnership.cache().entry_count() == 1,
+        "R285 rejects stale R274 mapping identity after safe R284 receipt reuse");
+
+    DevicePair r285NextDevice = create_warp_device();
+    require(
+        r285BackendOwnership.initialize(r285NextDevice.device) &&
+        r285BackendOwnership.ready() &&
+        r285BackendOwnership.device() == r285NextDevice.device &&
+        r285BackendOwnership.owner_generation() !=
+            r285FirstOwnerGeneration &&
+        r285BackendOwnership.cache().entry_count() == 0 &&
+        !r285BackendOwnership.validate_semantic_handoff_snapshot(
+            programmablePair,
+            r279ObjectPrerequisite,
+            r279ObjectPrerequisite.reviewSnapshotToken,
+            r280ObjectCreationHandoff,
+            r280ObjectCreationHandoff.reviewSnapshotToken,
+            r283TargetBytecodeMaterialization,
+            r283TargetBytecodeMaterialization.reviewSnapshotToken,
+            r274SourceMappingHandoff,
+            r274SourceMappingHandoff.reviewSnapshotToken,
+            r276TranslationPlan,
+            r276TranslationPlan.reviewSnapshotToken,
+            r285FirstHandoff,
+            r285FirstHandoff.reviewSnapshotToken),
+        "R285 native-device generation change invalidates prior persistent ownership handoff");
+    r285BackendOwnership.shutdown();
+    r285NextDevice.context->Release();
+    r285NextDevice.device->Release();
+
     r284Device.context->Release();
     r284Device.device->Release();
 

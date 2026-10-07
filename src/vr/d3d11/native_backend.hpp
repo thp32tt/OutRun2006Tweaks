@@ -3386,6 +3386,112 @@ private:
     std::uint64_t nonindexed_geometry_binding_receipt_generation_counter_ = 0;
 };
 
+// R285 turns the one-shot R284 materializer into a persistent native-device
+// ownership boundary. The owner reuses an exact validated R284 receipt for a
+// repeatedly observed programmable pair and immediately feeds the current R242
+// object receipt into R275. No ID3D11DeviceContext is accepted here, so shader
+// binding, NativeDrawPath and Draw/DrawIndexed remain structurally unavailable.
+struct NativeProgrammableShaderBackendSemanticHandoffEvidence {
+    bool inputValid{};
+    bool ownerReady{};
+    bool deviceMatches{};
+    bool materializationReady{};
+    bool materializationSnapshotMatches{};
+    bool materializationReused{};
+    bool translationObjectReady{};
+    bool translationObjectSnapshotMatches{};
+    bool translatedSemanticReceiptReady{};
+    bool translatedSemanticReceiptSnapshotMatches{};
+    bool objectBindingAuthorized{};
+    bool nativeDrawPathActivationAllowed{};
+    bool drawDispatchAuthorized{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    std::uint64_t cacheKey{};
+    std::uint64_t backendOwnerGeneration{};
+    std::uint64_t cacheOwnerGeneration{};
+    std::uint64_t objectMaterializationSnapshotToken{};
+    std::uint64_t cacheSnapshotToken{};
+    std::uint64_t slotSnapshotToken{};
+    std::uint64_t translationObjectSnapshotToken{};
+    std::uint64_t translatedSemanticReceiptSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+    NativeProgrammableShaderTranslatedSemanticReceipt translatedSemanticReceipt{};
+};
+
+class NativeProgrammableShaderBackendOwnership final {
+public:
+    NativeProgrammableShaderBackendOwnership() = default;
+    ~NativeProgrammableShaderBackendOwnership() = default;
+    NativeProgrammableShaderBackendOwnership(
+        const NativeProgrammableShaderBackendOwnership&) = delete;
+    NativeProgrammableShaderBackendOwnership& operator=(
+        const NativeProgrammableShaderBackendOwnership&) = delete;
+
+    bool initialize(ID3D11Device* device) noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] NativeProgrammableShaderBackendSemanticHandoffEvidence
+    materialize_semantic_handoff_for_observation(
+        const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+        const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+            objectPrerequisite,
+        std::uint64_t objectPrerequisiteSnapshotToken,
+        const NativeProgrammableShaderObjectCreationHandoffEvidence&
+            creationHandoff,
+        std::uint64_t creationHandoffSnapshotToken,
+        const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+            targetBytecodeMaterialization,
+        std::uint64_t targetBytecodeMaterializationSnapshotToken,
+        const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff,
+        std::uint64_t sourceMappingHandoffSnapshotToken,
+        const NativeProgrammableShaderSemanticTranslationPlanEvidence&
+            translationPlan,
+        std::uint64_t translationPlanSnapshotToken) noexcept;
+
+    [[nodiscard]] bool validate_semantic_handoff_snapshot(
+        const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+        const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+            objectPrerequisite,
+        std::uint64_t objectPrerequisiteSnapshotToken,
+        const NativeProgrammableShaderObjectCreationHandoffEvidence&
+            creationHandoff,
+        std::uint64_t creationHandoffSnapshotToken,
+        const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+            targetBytecodeMaterialization,
+        std::uint64_t targetBytecodeMaterializationSnapshotToken,
+        const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff,
+        std::uint64_t sourceMappingHandoffSnapshotToken,
+        const NativeProgrammableShaderSemanticTranslationPlanEvidence&
+            translationPlan,
+        std::uint64_t translationPlanSnapshotToken,
+        const NativeProgrammableShaderBackendSemanticHandoffEvidence& handoff,
+        std::uint64_t reviewSnapshotToken) const noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && cache_.ready() && cache_.device() == device_.Get() &&
+            owner_generation_ != 0;
+    }
+    [[nodiscard]] ID3D11Device* device() const noexcept {
+        return device_.Get();
+    }
+    [[nodiscard]] std::uint64_t owner_generation() const noexcept {
+        return owner_generation_;
+    }
+    [[nodiscard]] const NativeProgrammableShaderPairCache& cache() const noexcept {
+        return cache_;
+    }
+
+private:
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    NativeProgrammableShaderPairCache cache_;
+    std::unordered_map<
+        std::uint64_t,
+        NativeProgrammableShaderObjectMaterializationEvidence> materializations_;
+    std::uint64_t owner_generation_ = 0;
+};
+
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
 // input layout, and R96 transform buffer. No game draw path constructs or
 // binds this bundle yet.
@@ -4385,6 +4491,14 @@ public:
     [[nodiscard]] ID3D11Texture2D* color_texture() const noexcept { return color_texture_.Get(); }
     [[nodiscard]] ID3D11RenderTargetView* color_rtv() const noexcept { return color_rtv_.Get(); }
     [[nodiscard]] ID3D11ShaderResourceView* color_srv() const noexcept { return color_srv_.Get(); }
+    [[nodiscard]] NativeProgrammableShaderBackendOwnership&
+    programmable_shader_ownership() noexcept {
+        return programmable_shader_ownership_;
+    }
+    [[nodiscard]] const NativeProgrammableShaderBackendOwnership&
+    programmable_shader_ownership() const noexcept {
+        return programmable_shader_ownership_;
+    }
     [[nodiscard]] bool selected_adapter_luid_valid() const noexcept {
         return selected_adapter_luid_valid_;
     }
@@ -4399,6 +4513,7 @@ private:
     D3D_FEATURE_LEVEL feature_level_ = D3D_FEATURE_LEVEL_9_1;
     LUID selected_adapter_luid_{};
     bool selected_adapter_luid_valid_ = false;
+    NativeProgrammableShaderBackendOwnership programmable_shader_ownership_;
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> context_;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> color_texture_;
