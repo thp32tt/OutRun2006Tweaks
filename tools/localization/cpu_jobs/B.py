@@ -142,30 +142,43 @@ def shear_right(im):
 
 def fit(row):
     x0,y0,x1,y1=row["original_bbox"]; aw=x1-x0; ah=y1-y0
+    oldrow=next(x for x in prior["rows"] if x["key"]==row["key"])
+    prior_bb=oldrow.get("new_localized_bbox") or oldrow.get("localized_bbox")
+    # Most rows already had acceptable scale; B229's material family fix is readable slant.
+    # Keep their vertical envelope slightly inside the prior non-overlapping envelope so
+    # adjacent atlas labels cannot collide. Slipstream alone is deliberately expanded because
+    # the concise copy removes the historical long-string height collapse.
+    max_h=(ah-2*MARGIN) if row["key"]=="slipstream_cars" else max(12,(prior_bb[3]-prior_bb[1])-2)
     best=None
     for fs in range(min(110,ah+12),23,-1):
         base=native_tile(row["korean"],fs)
-        # Preserve height first; condense width only as much as required.
-        if base.height>ah-2*MARGIN: continue
+        if base.height>max_h: continue
         avail=aw-2*MARGIN
         scale=min(1.0,avail/max(1,base.width+int(round(SLANT*(base.height-1)))))
         if scale<MIN_XSCALE: continue
         t=shear_right(xscale(base,scale))
-        if t.width<=avail and t.height<=ah-2*MARGIN:
-            best=(fs,scale,t)
+        if t.width<=avail and t.height<=max_h:
+            best=(fs,scale,t,prior_bb)
             break
-    if best is None: raise RuntimeError(("fit failed",row["key"],row["korean"],row["original_bbox"]))
+    if best is None: raise RuntimeError(("fit failed",row["key"],row["korean"],row["original_bbox"],prior_bb,max_h))
     return best
 
 final=clean.copy()
 layers=[]
 outrows=[]
 for row in rows:
-    fs,xs,tile=fit(row)
+    fs,xs,tile,prior_bb=fit(row)
     x0,y0,x1,y1=row["original_bbox"]; aw=x1-x0; ah=y1-y0
-    # Source prompts are centered within each source effect bbox.
+    # Center horizontally in the exact source effect bbox. For previously accepted rows keep
+    # the vertical placement inside the old non-overlapping envelope; Slipstream may use the
+    # larger source-height envelope because adjacent bottom-row labels are horizontally disjoint.
     px=x0+(aw-tile.width)//2
-    py=y0+(ah-tile.height)//2
+    if row["key"]=="slipstream_cars":
+        py=y0+(ah-tile.height)//2
+    else:
+        prior_center=(prior_bb[1]+prior_bb[3])//2
+        py=prior_center-tile.height//2
+        py=max(y0+MARGIN,prior_bb[1]+1,min(py,prior_bb[3]-1-tile.height,y1-MARGIN-tile.height))
     layer=Image.new("RGBA",(W,H),(0,0,0,0)); layer.alpha_composite(tile,(px,py))
     lb=list(layer.getchannel("A").getbbox())
     margins=[lb[0]-x0,x1-lb[2],lb[1]-y0,y1-lb[3]]
@@ -255,7 +268,8 @@ old_slip=next(r for r in prior["rows"] if r["key"]=="slipstream_cars")
 new_slip=next(r for r in outrows if r["key"]=="slipstream_cars")
 report={
  "schema_version":1,"role":"B","run":run,"queue_index":54,"asset":asset,
- "trigger":"PRE_INGAME_004_CURRENT_POLICY_SOURCE_TRANSFORM_AND_SCALE_FALSE_NEGATIVE",
+ "trigger":"PRE_INGAME_004_CURRENT_POLICY_SOURCE_TRANSFORM_AND_SCALE_FALSE_NEGATIVE_RETRY_AFTER_PAIRWISE_COLLISION_GATE",
+ "failed_attempt":{"workflow_run":37560975826,"candidate_persisted":False,"reason":"controller/worker pairwise collision gate rejected first geometry before DDS persistence: match_total/count_gifts and hold_line/honk_horn overlap; retry constrains unchanged-scale rows inside prior non-overlapping vertical envelopes"},
  "review_jpg":"localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/004_q054_FA7BBB13.jpg",
  "prior_status":"C_USERPOLICY02_PASS_PENDING_INGAME",
  "source_sha256":SOURCE_SHA,"before_candidate_sha256":EXPECTED_BEFORE,"candidate_sha256":AFTER,
