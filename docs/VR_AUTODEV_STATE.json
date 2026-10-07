@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-10-07T05:05:31Z",
+  "updatedUtc": "2026-10-07T13:36:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
-  "phase": "DX9Ex R84 production convergence -> Quest3/VDXR baseline gate -> Architecture v3 migration -> downstream DX11/DXVK",
-  "checkpoint": "C6_STATE",
+  "phase": "P0 DX9Ex visual-composition convergence -> exact static/build gate -> Quest3/VDXR candidate -> paused R84 convergence",
+  "checkpoint": "C2_IMPLEMENT",
   "policy": {
-    "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host on vr-d3d9ex-focus; current engineering phase is selective R84 structural convergence into the production DX9Ex branch.",
+    "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host on vr-d3d9ex-focus; EXCLUSIVE CURRENT PHASE is P0 visual-composition convergence after 00519 HMD failure.",
     "blockedBackends": [
       "DX11_NATIVE_DOWNSTREAM_PORT",
       "DXVK_DOWNSTREAM_PORT",
@@ -16,7 +16,7 @@
     "blockedBackendAction": "Keep DX11 Native and DXVK frozen during DX9Ex stabilization and the Architecture v3 live migration. After ARCH-V3-007 USER_RUNTIME_VERIFIED and ARCH-V3-008 handoff, port the proven common contract downstream. DX12/D3D9On12 remains reference-only unless explicitly reopened.",
     "genericBuildDisabled": true,
     "dedicatedWorkflow": ".github/workflows/vr-dx9ex-active.yml",
-    "runtimeTesting": "Quest 3/VDXR DX9Ex gate: prioritize CORRECTNESS and D_PERF, including dense-building and sand/smoke/spray scenes. DX11/DXVK runtime validation is deferred until the DX9Ex reference is stable.",
+    "runtimeTesting": "BLOCKED_BY_P0_STATIC_GATE: no new routine Quest3/VDXR candidate until upstream/fork/disassembly visual evidence is reconciled and the comprehensive static/build gate is green.",
     "profileModel": {
       "default": "A_CONTROL",
       "profiles": [
@@ -710,5 +710,39 @@
     "runtimeTestRequired": true,
     "runtimeValidation": "UNTESTED",
     "pcRunnerUsed": false
+  },
+  "p0VisualComposition": {
+    "status": "ACTIVE_NO_HMD_BUILD",
+    "triggerSourceSha": "9a3e08cc62b6a36a8196936eacead8cc08fcc756",
+    "triggerResult": "USER_RUNTIME_FAIL",
+    "priority": "P0",
+    "evidenceOrder": [
+      "emoose upstream hooks",
+      "fork R65-R74/R73-era history",
+      "canonical EXE disassembly/XREF",
+      "current producer/queue/draw ownership",
+      "deterministic verifier",
+      "HMD last"
+    ],
+    "blockedUntilStaticGreen": [
+      "R84 structural convergence",
+      "Architecture v3",
+      "general performance tuning",
+      "DX11",
+      "DXVK",
+      "routine HMD packaging"
+    ],
+    "requiredAreas": [
+      "menu/car-selection textures",
+      "screen HUD/rank/6th/6",
+      "rival/vehicle rank markers incl 4th/5th",
+      "extra time/checkpoint/goal/results",
+      "menu arrows/YES-NO",
+      "F11 gameplay overlay",
+      "lens flare/SceneEffect",
+      "shadow/start visual regressions",
+      "recenter-visible HUD placement"
+    ],
+    "verifier": "tools/verify_vr_visual_composition_p0.py"
   }
 }
