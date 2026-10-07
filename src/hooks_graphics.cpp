@@ -290,6 +290,41 @@ public:
 };
 RestoreCarBaseShadow RestoreCarBaseShadow::instance;
 
+// Canonical SceneEffect/lens producer proof:
+//   sub_40CAE0 owns the effect loop,
+//   EXE+0xCABE is the single DrawObjectAlpha_Internal producer call,
+//   EXE+0xCF4E calls Calc3D2D for its projected anchor.
+// Do not infer lens ownership from generic alpha state or tune disparity scalars.
+class VRLensFlareProjected2D : public Hook
+{
+	static void __cdecl DrawObjectAlphaProjected(
+		int objectId, float alpha, void* work, int flags)
+	{
+		OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
+			OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D);
+		Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
+	}
+
+public:
+	std::string_view description() override
+	{
+		return "VRLensFlareProjected2D";
+	}
+
+	bool apply() override
+	{
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xCABE), DrawObjectAlphaProjected,
+			Memory::HookType::Call);
+		spdlog::info(
+			"VR P0 FLARE: exact EXE+0xCABE producer -> PROJECTED_SCREEN_EFFECT_2D; placement remains WVP-proven");
+		return true;
+	}
+
+	static VRLensFlareProjected2D instance;
+};
+VRLensFlareProjected2D VRLensFlareProjected2D::instance;
+
 // Restores the console's lighting dynamic range, which the PC port didn't make
 // use of, costing roughly a third of the sun on surfaces facing it.
 //
