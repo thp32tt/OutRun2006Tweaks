@@ -1,0 +1,11 @@
+{
+  "role": "A",
+  "run": "20261007-A165R2-Q028-A05BF610-GLYPH-MASK-CLEAN",
+  "queue_index": 28,
+  "asset": "A05BF610",
+  "work_stolen_from_lane": "B",
+  "candidate_sha256": "1ced3cfa2042d7b0d0b708e3521a7043bd7528b0347ddbe38b2b7ee51a4c0d3a",
+  "status": "STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL",
+  "report": "localization/graphics/role_A/20261007-A165R2-Q028-A05BF610-GLYPH-MASK-CLEAN/A165R2_Q028_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}

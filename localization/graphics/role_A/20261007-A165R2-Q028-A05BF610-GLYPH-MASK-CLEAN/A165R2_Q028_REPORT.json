@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261007-A165R2-Q028-A05BF610-GLYPH-MASK-CLEAN",
+  "queue_index": 28,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+  "work_stolen_from_lane": "B",
+  "trigger": "A165_AND_A165R_CONTROLLER_CLEAN_PLATE_VISUAL_REJECTS_AFTER_C245_UNDERSIZE",
+  "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+  "a144_candidate_sha256": "aa0692a2918326a494c1b04837603313faac7bdd9b7f043d4b679a8e8b1493f9",
+  "a165r_rejected_candidate_sha256": "567f37b20c5dabd377e4c83e14baca52e69552c033dab300bbac5606daa37d90",
+  "candidate_sha256": "1ced3cfa2042d7b0d0b708e3521a7043bd7528b0347ddbe38b2b7ee51a4c0d3a",
+  "clean_plate": {
+    "method": "remove only A144 Korean white/navy glyph/effect mask inside persisted old bbox; 2px dilation; nearest intact local plate fill; no whole-bbox replacement",
+    "masked_pixels": 18314,
+    "remaining_dark_core_pixels": 0,
+    "remaining_white_core_pixels": 0
+  },
+  "row": {
+    "original_bbox": [
+      543,
+      1185,
+      1068,
+      1275
+    ],
+    "localized_bbox": [
+      567,
+      1190,
+      1043,
+      1270
+    ],
+    "localized_size": [
+      476,
+      80
+    ],
+    "source_size": [
+      525,
+      90
+    ],
+    "margins": [
+      24,
+      25,
+      5,
+      5
+    ],
+    "width_ratio": 0.9067,
+    "font_file": "NotoSansCJK-Bold.ttc",
+    "font_index": 1,
+    "font_size": 80,
+    "stroke": 3,
+    "readable_right_slant": 0.3
+  },
+  "machine_qa": {
+    "changed_pixels_outside_source_box_vs_a144": 0,
+    "changed_pixels_outside_source_box_vs_a165r_bad": 0,
+    "alpha_changes_outside_source_box": 0,
+    "bbox_size_positive_margin": "PASS",
+    "header_128_exact": true,
+    "mip_count": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PENDING_CONTROLLER_VISUAL_GLYPH_MASK_ONLY",
+    "2_slant_direction": "PASS_RIGHT_0.30",
+    "3_no_undersizing": "PASS_NEAR_90_PERCENT_SOURCE_WIDTH",
+    "4_weight_outline_shadow": "PASS_WHITE_NAVY_SOURCE_FAMILY",
+    "5_no_clipping": "PASS_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_OUTSIDE_SOURCE_BOX",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER_VISUAL"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3_strict_audit": "REQUIRED_EXACT_SHA",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
