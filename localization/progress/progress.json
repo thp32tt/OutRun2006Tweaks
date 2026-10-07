@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07T13:08:00+09:00",
+  "updated_at_kst": "2026-10-07T13:31:32+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Fresh independent C should include B230 q232 EBFC709F dc76c000cfce17098940f551512e6f746319ba8a1892345eb060693004747ea1 and remaining newest producer candidates. Because q232 has prior style/hierarchy false-negative history, normal C PASS must be followed by exact-current-SHA C3_STRICT_PASS before it may re-enter PRE_INGAME export. q232 then needs regenerated English-original JPG/user review and actual in-game validation. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C1 should continue only remaining odd-index fresh-C/user-regression work after refreshing HEAD/queue; q137 30CF0D has C234 normal C + exact-SHA C3_STRICT_PASS and now waits PRE_INGAME JPG refresh/user review plus NEW actual in-game retest. C2/even work remains separate. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -414,17 +414,23 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C230",
-      "report": "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_E95DA5_CONTROLLER_FINAL_QA.json",
-      "result": "C230_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+      "run": "C234",
+      "lane": "C1",
+      "TEMP_BACKLOG_RELIEF": "C1",
+      "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+      "report": "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_30CF0D_CONTROLLER_FINAL_QA.json",
+      "result": "C234_C3_STRICT_PASS_STATIC_PENDING_USER_JPG_AND_NEW_INGAME_RETEST",
       "candidate_changed_by_C": false,
       "assets_checked": 1,
-      "physical_elements_checked": 2,
+      "physical_elements_checked": 6,
       "pixel_visual_pass_assets": [
-        "E95DA5"
+        "30CF0D"
       ],
       "rework_required_assets": [],
-      "in_game_validation": "UNTESTED; PRE_INGAME user JPG review and actual-game validation pending."
+      "c3_strict_pass_assets": [
+        "30CF0D"
+      ],
+      "in_game_validation": "UNTESTED; IGR-005 requires NEW actual-game retest before closure."
     },
     "latest_b_first_qa": {
       "run": "B_INGAME168",
@@ -2789,6 +2795,27 @@
       "controller_report": "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_E95DA5_CONTROLLER_FINAL_QA.json",
       "pre_ingame_comparison_refresh": "PENDING_C230_EXPORT",
       "runtime_validation": "UNTESTED"
+    },
+    "c234_c1_q137_30cf0d": {
+      "timestamp_kst": "2026-10-07T13:31:32+09:00",
+      "queue_index": 137,
+      "asset": "30CF0D",
+      "producer_run": "B165",
+      "user_ingame_regression": "IGR-005",
+      "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+      "prior_candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
+      "candidate_sha256": "0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4",
+      "machine_status": "PASS",
+      "bbox_size_positive_margin": "6/6 PASS",
+      "zero_blast_radius": "changed/alpha outside exact title/subtitle rework source bboxes=0; MANUAL/AUTOMATIC x4 and unrelated/protected content exact",
+      "practical_scale": "PASS 100/75/50",
+      "controller_visual_qa": "PASS",
+      "c3_strict": "C3_STRICT_PASS",
+      "decision": "C234_C3_STRICT_PASS_STATIC_PENDING_USER_JPG_AND_NEW_INGAME_RETEST",
+      "backlog_status": "C_STATIC_PASS_PENDING_INGAME_RETEST",
+      "pre_ingame_comparison_refresh": "PENDING_C234_EXPORT",
+      "controller_report": "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_30CF0D_CONTROLLER_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
@@ -4040,5 +4067,28 @@
     "user_jpg_review": "OPEN",
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "c234_c1_q137_30cf0d": {
+    "timestamp_kst": "2026-10-07T13:31:32+09:00",
+    "queue_index": 137,
+    "asset": "30CF0D",
+    "producer_run": "B165",
+    "user_ingame_regression": "IGR-005",
+    "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+    "prior_candidate_sha256": "6d58a2c39020629daa995d01cdaf09ad50b3d62a92dd9d8db68a1978b4ac812b",
+    "candidate_sha256": "0550123e82d255cd0db3e848bc03b11cf6d6eaf89fc55eb1f17824a75257bfc4",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "6/6 PASS",
+    "zero_blast_radius": "changed/alpha outside exact title/subtitle rework source bboxes=0; MANUAL/AUTOMATIC x4 and unrelated/protected content exact",
+    "practical_scale": "PASS 100/75/50",
+    "controller_visual_qa": "PASS",
+    "c3_strict": "C3_STRICT_PASS",
+    "decision": "C234_C3_STRICT_PASS_STATIC_PENDING_USER_JPG_AND_NEW_INGAME_RETEST",
+    "backlog_status": "C_STATIC_PASS_PENDING_INGAME_RETEST",
+    "pre_ingame_comparison_refresh": "PENDING_C234_EXPORT",
+    "controller_report": "localization/graphics/role_C/20261007-C234-C1-Q137-30CF0D-B165/C234_30CF0D_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)"
   }
 }
