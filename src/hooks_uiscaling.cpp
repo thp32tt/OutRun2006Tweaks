@@ -90,6 +90,12 @@ class UIScaling : public Hook
 		// REV/gear calls proven by the canonical EXE HUD map.
 		0xB9096, 0xB90B3
 	};
+	// Canonical NaviPub calls into sub_4BAD20 are screen HUD, even though the
+	// same subroutine is also used for vehicle-attached world rank markers.
+	static constexpr int RankMarkerSubScreenHudCalls[] = {
+		0xBEB98, 0xBED83, 0xBED9E, 0xBEDAE
+	};
+	inline static thread_local unsigned RankMarkerSubScreenHudDepth = 0;
 	static constexpr int RivalMarker_SpraniCall = 0xBB796;
 	static constexpr int TextGlyph_PutSpriteCalls[] = { 0x2C808, 0x2C9DB };
 
@@ -293,6 +299,18 @@ class UIScaling : public Hook
 		RankMarkerFracY = ((240.0f - y) - 32.0f) - float(int(ctx.ebp));
 	}
 
+	using RankMarkerSubFn = int(__cdecl*)(std::uint32_t);
+	static int __cdecl RankMarkerSubSemanticDest(std::uint32_t arg)
+	{
+		struct ScreenHudScope
+		{
+			ScreenHudScope() noexcept { ++RankMarkerSubScreenHudDepth; }
+			~ScreenHudScope() { --RankMarkerSubScreenHudDepth; }
+		} scope;
+		auto original = reinterpret_cast<RankMarkerSubFn>(Module::exe_ptr(0xBAD20));
+		return original(arg);
+	}
+
 	// 1st, 2nd and 3rd are each a single sprite, and this call takes its
 	// position as floats, so the discarded fraction goes straight back on.
 	static int __cdecl RankMarker_sprani(uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
@@ -307,11 +325,20 @@ class UIScaling : public Hook
 		const int result = Game::sprani_play_ae_auth_alpha(
 			spriteId, x + RankMarkerFracX, y + RankMarkerFracY, a4, a5, alpha);
 
-		const bool projected = RankMarkerProjectedInfo.valid;
-		const auto scope = projected
-			? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
-			: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
-		const auto* marker = projected ? &RankMarkerProjectedInfo : nullptr;
+		OutRunVR::GameSemantic::RenderScope scope{};
+		const OutRunVR::GameSemantic::ProjectedMarkerInfo* marker = nullptr;
+		if (RankMarkerSubScreenHudDepth != 0)
+		{
+			scope = OutRunVR::GameSemantic::RenderScope::ScreenHud;
+		}
+		else
+		{
+			const bool projected = RankMarkerProjectedInfo.valid;
+			scope = projected
+				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+			marker = projected ? &RankMarkerProjectedInfo : nullptr;
+		}
 
 		// These four exact producer callsites own the vehicle-relative rank
 		// markers. Prefer the recovered Calc3D2D anchor; retain the current
@@ -351,14 +378,24 @@ class UIScaling : public Hook
 		{
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
-			const bool projected = RankMarkerProjectedInfo.valid;
-			const auto scope = projected
-				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
-				: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+			OutRunVR::GameSemantic::RenderScope scope{};
+			const OutRunVR::GameSemantic::ProjectedMarkerInfo* marker = nullptr;
+			if (RankMarkerSubScreenHudDepth != 0)
+			{
+				scope = OutRunVR::GameSemantic::RenderScope::ScreenHud;
+			}
+			else
+			{
+				const bool projected = RankMarkerProjectedInfo.valid;
+				scope = projected
+					? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+					: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+				marker = projected ? &RankMarkerProjectedInfo : nullptr;
+			}
 			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
 				node, scope,
 				OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite,
-				projected ? &RankMarkerProjectedInfo : nullptr);
+				marker);
 		}
 
 		return result;
@@ -825,6 +862,10 @@ public:
 		Calc3D2D_hk = safetyhook::create_inline(Module::exe_ptr(Calc3D2D_Addr), Calc3D2D_dest);
 
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
+		for (int addr : RankMarkerSubScreenHudCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), RankMarkerSubSemanticDest,
+				Memory::HookType::Call);
 		for (int addr : RankMarker_SpraniCalls)
 			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_sprani, Memory::HookType::Call);
 		for (int addr : RankMarker_ClipSpriteCalls)
