@@ -1,0 +1,9 @@
+{
+  "role": "B",
+  "run": "20261007-B238-Q044-19CEDB9-C246-REWORK",
+  "queue_index": 44,
+  "candidate_sha256": "2250de2b7fbe1578750c422c05bd5f3b5785a0bd5006a4afcfb4cbc26ebbe620",
+  "status": "B238_WORKER_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA_AND_FRESH_C",
+  "report": "localization/graphics/role_B/20261007-B238-Q044-19CEDB9-C246-REWORK/B238_19CEDB9_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
