@@ -15,6 +15,7 @@ hud = read('src/vr/hud_semantics.hpp')
 sem = read('src/vr/game/render_semantics.hpp')
 r30 = read('src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp')
 graphics = read('src/hooks_graphics.cpp')
+overlay = read('src/overlay/hooks_overlay.cpp')
 r14 = read('src/vr/d3d9/ex_device_upgrade_r14.cpp')
 runner = read('tools/Run-OutRunVRTest.ps1')
 pcfast = read('tools/Build-OutRunPCFast.ps1')
@@ -73,6 +74,11 @@ for token in ['0x69EB4','0x6AC76','0x6B766']:
     require(token, graphics, 'original car-base-shadow call site')
 require('ScopedRenderSemantic semantic(', graphics, 'car shadow exact world semantic scope')
 require('RenderScope::WorldParticle', graphics, 'car shadow world ownership')
+
+# F11/ImGui is external UI. It must render without consuming pending game semantic tokens.
+require('ScopedExternalOverlaySemantic semantic(', overlay, 'F11 external semantic guard')
+require('RenderScope::ScreenOverlay2D', overlay, 'F11 external overlay scope')
+require('ImGui_ImplDX9_RenderDrawData', overlay, 'F11 guarded draw call')
 
 # Translated DYNAMIC MANAGED textures must not consume the bounded CPU-shadow pool.
 require('R14TrackDirectLockable', r14, 'dynamic direct-lockable MANAGED texture path')
