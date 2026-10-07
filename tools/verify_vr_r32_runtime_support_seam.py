@@ -44,6 +44,7 @@ required = (
     "R30SupportTryGetEffectTelemetrySnapshot",
     "R30SupportDirectTransportIdentity",
     "R30SupportOverlayReadyForTransport",
+    "R30SupportNoteSafeAckBackpressure",
     "R30SupportDirectTransportResourcesReady",
     "R30SupportEnsureDirectTransportResources",
     "R30SupportDirectTransportSourceSurfaces",
@@ -85,6 +86,7 @@ for regex, label in (
     (r"\bDirectTransportResourcesReady\b", "DirectTransportResourcesReady"),
     (r"(?<!R30Support)\bEnsureDirectTransportResources\(", "EnsureDirectTransportResources"),
     (r"\bR13OverlayReadyForTransport\(", "R13OverlayReadyForTransport"),
+    (r"\bR13NoteSafeAckBackpressure\(", "R13NoteSafeAckBackpressure"),
     (r"\bR13ReleaseAckState\(", "R13ReleaseAckState"),
     (r"\bReleaseDirectTransportSlots\(", "ReleaseDirectTransportSlots"),
     (r"\bReleaseDirectInteropProbe\(", "ReleaseDirectInteropProbe"),
@@ -119,6 +121,9 @@ delegations = {
     ),
     "R30SupportOverlayReadyForTransport()": (
         "return R13OverlayReadyForTransport();",
+    ),
+    "R30SupportNoteSafeAckBackpressure()": (
+        "R13NoteSafeAckBackpressure();",
     ),
     "R30SupportDirectTransportResourcesReady()": (
         "return DirectTransportResourcesReady;",
@@ -196,8 +201,12 @@ if "AddRef(" in source_surfaces:
 resolve_direct = body(r32, "bool R32ResolveDirectTransport(")
 if "R30SupportOverlayReadyForTransport()" not in resolve_direct:
     errors.append("R32 DirectGPU resolve bypasses R30 overlay-readiness facade")
+if "R30SupportNoteSafeAckBackpressure()" not in resolve_direct:
+    errors.append("R32 DirectGPU resolve bypasses R30 ACK-backpressure telemetry facade")
 if "R13OverlayReadyForTransport()" in resolve_direct:
     errors.append("R32 DirectGPU resolve regained direct R13 overlay-readiness dependency")
+if "R13NoteSafeAckBackpressure()" in resolve_direct:
+    errors.append("R32 DirectGPU resolve regained direct R13 ACK-backpressure telemetry dependency")
 for raw in ("BackBuffer", "RightEyeSurface"):
     if re.search(rf"\b{raw}\b", resolve_direct):
         errors.append(f"R32 DirectGPU resolve retained raw lower source surface: {raw}")

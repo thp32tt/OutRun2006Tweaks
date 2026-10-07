@@ -3316,6 +3316,11 @@ namespace OutRunVRStereo
         return R13OverlayReadyForTransport();
     }
 
+    void R30SupportNoteSafeAckBackpressure() noexcept
+    {
+        R13NoteSafeAckBackpressure();
+    }
+
     bool R30SupportDirectTransportResourcesReady() noexcept
     {
         return DirectTransportResourcesReady;

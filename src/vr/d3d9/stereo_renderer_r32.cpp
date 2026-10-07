@@ -537,7 +537,7 @@ namespace OutRunVRStereo
             if (selected >= OutRunVR::RenderFrameRingSize)
             {
                 if (ackBlocked)
-                    R13NoteSafeAckBackpressure();
+                    R30SupportNoteSafeAckBackpressure();
                 ++DirectTransportRingBackpressure;
                 return false;
             }
