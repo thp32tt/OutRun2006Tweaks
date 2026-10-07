@@ -2590,3 +2590,11 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q121 `FD90AA9` `03271f4a...`: visible English header silhouettes remain under Korean -> `REWORK_REQUIRED`, C3 blocked.
 - q193 `97E863AD` `f1c68aa4...`: WELCOME/MULTIPLAYER/SHOWROOM English bodies remain under Korean -> `REWORK_REQUIRED`, C3 blocked.
 - RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-08 00:07 KST — B239 q52 A8CE339F
+- Candidate: `c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e` (supersedes B176 `d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8`).
+- Duplicate Start family repaired: left/right `출발` = 60x36 / 60x36; repaired right bbox [826,312,886,348], margins [25,22,3,2].
+- QA PASS: outside/alpha outside=0; 137 BC3 blocks; exact header/raw mirror_y/persisted decode; non-target B176 rows exact; controller readable/RAW PASS.
+- q60/q212 skipped after same-cycle A byte changes; no overwrite/repeat.
+- Next: fresh independent C + exact-SHA C3 -> PRE_INGAME/user review -> actual-game validation. `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
+
