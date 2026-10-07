@@ -1,0 +1,8 @@
+{
+  "run": "20261008-A168-Q212-TITLE-FAMILY",
+  "queue_index": 212,
+  "asset": "BA0147DA",
+  "candidate_sha256": "2a9f1f841cc9d05b851d8edc630b6c2d9eaea5aa14a90ec13c47a51bdf1b9a9a",
+  "status": "A168_MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
+  "runtime_validation": "UNTESTED"
+}
