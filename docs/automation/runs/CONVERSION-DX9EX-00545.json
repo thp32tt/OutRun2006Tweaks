@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00545",
+  "production_id": "CONVERSION-DX9EX-00545",
+  "event_id": "CONVERSION-DX9EX-00545-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-ACK-PUBLICATION-RETIREMENT-001",
+  "base_sha": "a3c7d5ab13a082e715e9a12709fb5e4fb6e09167",
+  "material_result_sha": "9d1c4d62b23afc0c22cf5f5030e9d33416402aa7",
+  "validation_bearing_result_sha": "9d1c4d62b23afc0c22cf5f5030e9d33416402aa7",
+  "result_sha": "9d1c4d62b23afc0c22cf5f5030e9d33416402aa7",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00545]",
+  "summary": "Moved R32 DirectGPU ACK-completed slot publication metadata retirement (frameId reset, published clear) behind the R30 owner facade without changing ACK, fence, ring scan, or slot reuse order. Tightened both R32 support and reset transport deterministic verifiers.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r32_runtime_support_seam.py",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py"
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "validation_history": [
+    {
+      "sha": "9d1c4d62b23afc0c22cf5f5030e9d33416402aa7",
+      "dx9ex_active_run_id": 37693879270,
+      "domain_isolation_run_id": 37693879235,
+      "result": "PASS",
+      "jobs": {
+        "policy": 113040507162,
+        "host": 113040680019,
+        "game": 113040679810,
+        "full_chain_compile": 113040679942,
+        "package": 113042596761
+      }
+    }
+  ],
+  "package_artifact": {
+    "id": 11514488423,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-9d1c4d62b23afc0c22cf5f5030e9d33416402aa7",
+    "digest": "sha256:2190d6066306fb0ffaf56d194a24cb3255753e72590f3d146c3593d3a891101a"
+  },
+  "protected_boundaries": [
+    "R32 still makes the same single whole-ring ACK snapshot and FrameIdAtOrAfter decision",
+    "retirement only after an ACK-confirmed published frame and before new eye texture overwrite",
+    "producer S_FALSE quarantine and EVENT failure remain fail-closed",
+    "R30 owner resets frameId before clearing published, matching previous R32 assignment order",
+    "no runtime/HMD correctness claim"
+  ],
+  "next_action": "Continue the remaining R32 DirectGPU lower-slot ownership seams after latest focus HEAD; preserve the P0 visual-composition gating and do not request routine HMD testing until exact static visual checks pass."
+}
