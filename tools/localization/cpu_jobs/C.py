@@ -177,5 +177,16 @@ pathlib.Path("localization/graphics/worker_results/C231_E3F4BA07.json").write_te
  "candidate_sha256":report["candidate_sha256"],"c3_required":True,
  "report":str(ROOT/"C231_E3F4BA07_MACHINE_QA.json"),"runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+print(json.dumps({
+  "C231_diagnostic": {
+    "rows": records,
+    "outside": outside,
+    "alpha_outside": alpha_outside,
+    "header_exact": header_exact,
+    "mips": mips,
+    "all_rows": all_rows,
+    "machine_pass": machine_pass
+  }
+}, ensure_ascii=False, indent=2))
 if not machine_pass:
     raise SystemExit("C231 machine QA failed closed")
