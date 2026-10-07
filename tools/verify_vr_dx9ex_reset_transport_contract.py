@@ -605,16 +605,29 @@ r13_pending_publish = resolve_direct_r13.find(
 if min(r13_copy_start, r13_pending_publish) < 0:
     fail("R13 fallback copy/Issue scope missing")
 r13_copy_issue = resolve_direct_r13[r13_copy_start:r13_pending_publish]
+copy_fail_marker = "if (FAILED(leftCopy) || FAILED(rightCopy))"
+issue_decl_marker = "const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);"
+copy_fail_pos = r13_copy_issue.find(copy_fail_marker)
+issue_decl_pos = r13_copy_issue.find(issue_decl_marker)
+if min(copy_fail_pos, issue_decl_pos) < 0 or issue_decl_pos <= copy_fail_pos:
+    fail("R13 fallback shared-eye copy failure scope missing")
 require_order(
-    r13_copy_issue,
-    "R13 fallback shared-eye copy/Issue fail-closed",
+    r13_copy_issue[:issue_decl_pos],
+    "R13 fallback shared-eye copy failure fail-closed",
     "const HRESULT leftCopy = StretchDirectEye(",
     "const HRESULT rightCopy = SUCCEEDED(leftCopy)",
-    "if (FAILED(leftCopy) || FAILED(rightCopy))",
+    copy_fail_marker,
     "R13DirectCopyPathRejected = true;",
     "R13DirectCopyRejectHr = FAILED(leftCopy)",
     "return false;",
-    "const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);",
+)
+issue_fail_pos = r13_copy_issue.find("if (FAILED(issueHr))", issue_decl_pos)
+if issue_fail_pos < 0:
+    fail("R13 fallback EVENT Issue failure scope missing")
+require_order(
+    r13_copy_issue[issue_decl_pos:],
+    "R13 fallback EVENT Issue failure fail-closed",
+    issue_decl_marker,
     "if (FAILED(issueHr))",
     "R13DirectCopyPathRejected = true;",
     "R13DirectCopyRejectHr = issueHr;",
