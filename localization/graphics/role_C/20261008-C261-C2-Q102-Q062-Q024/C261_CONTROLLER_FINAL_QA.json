@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "20261008-C261-C2-Q102-Q062-Q024",
+  "timestamp_kst": "2026-10-08T04:38:00+09:00",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "selection_refresh_head": "473facf942806b35e7c9f3e59479df4133bca924",
+  "compute_dispatch_commit": "1f0a95bc210222a550f599e380bd9c5c87166366",
+  "diagnostic_worker_output": "87b8b96488cf4966b2de5069b54cfa5cd7fc29ac",
+  "machine_evidence_commit": "be538331721df2cc2868f5b69d1ad5fb6bb9fb8c",
+  "pre_commit_refresh_head": "be538331721df2cc2868f5b69d1ad5fb6bb9fb8c",
+  "execution_backend": "ChatGPT local github.com DNS unavailable -> repository-backed GitHub Actions C worker. First hosted attempt used the wrong q24 public source path; a diagnostic SUCCESS pinned the A135 stock source and the corrected retry SUCCESS produced authoritative evidence. N100 MCP was used only to display generated JPG controller evidence, not heavy QA compute.",
+  "assets": {
+    "q102": {
+      "asset": "571E78F3",
+      "queue_index": 102,
+      "candidate_sha256": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db",
+      "raw_machine_report": "SCRIPT_FAIL_POSITIVE_MARGIN_ONLY_ON_CONTINUOUS_15_AFTER_BC3_DECODE",
+      "controller_machine_adjudication": "PASS_HIGH_RISK_EDGE_TOUCH_2_OF_2_CONTAINMENT_SIZE_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "PASS_SOURCE_CLEAN_CURRENT_PRACTICAL_RAW",
+      "finding": "C260 underfill fixed: 15코스 연속 restored from ~42.1% to ~75.6% source-width family hierarchy. Decoded edge-touch remains high-risk but no pixels escape source bboxes.",
+      "fresh_c": "PASS_HIGH_RISK_EDGE_TOUCH",
+      "c3": "C3_STRICT_PASS_EXACT_SHA_HIGH_RISK_EDGE_TOUCH",
+      "decision": "C261_C3_STRICT_PASS_HIGH_RISK_EDGE_TOUCH_PENDING_PRE_INGAME_USER_JPG_INGAME"
+    },
+    "q62": {
+      "asset": "33491F83",
+      "queue_index": 62,
+      "candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
+      "machine_qa": "PASS_9_OF_9_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "FAIL_CLEAN_PLATE_WHITE_RECTANGLE_PATCH_EASY_HARD",
+      "finding": "SOURCE/CLEAN/CURRENT practical and RAW/FLIP-Y evidence shows opaque white rectangular patches behind 쉬움/어려움; visible clean-plate defect overrides numeric PASS.",
+      "fresh_c": "FAIL_VISUAL_OVERRIDE",
+      "c3": "BLOCKED",
+      "decision": "REWORK_REQUIRED"
+    },
+    "q24": {
+      "asset": "66743AA8",
+      "queue_index": 24,
+      "source_sha256": "8e18676ac303b07a56d81d1d21c5e025e0baf46da49b16ae9d2e411960181f73",
+      "candidate_sha256": "c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e",
+      "raw_machine_report": "SCRIPT_FAIL_POSITIVE_MARGIN_ONLY_H_Q_T_DECODED_RIGHT_EDGE_TOUCH",
+      "controller_machine_adjudication": "PASS_HIGH_RISK_EDGE_TOUCH_26_OF_26_CONTAINMENT_SIZE_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "PASS_2BEOLSIK_BINDING_SOURCE_STYLE_PRACTICAL_RAW",
+      "finding": "A-Z visual keycaps map to standard 2-beolsik base Jamo; H/Q/T decoded alpha reaches exact source edge with zero escape. Digits/punctuation/END remain source-exact outside target cells.",
+      "fresh_c": "PASS_HIGH_RISK_EDGE_TOUCH",
+      "c3": "C3_STRICT_PASS_EXACT_SHA_HIGH_RISK_EDGE_TOUCH",
+      "decision": "C261_C3_STRICT_PASS_HIGH_RISK_EDGE_TOUCH_PENDING_INGAME_RETEST"
+    }
+  },
+  "retry_note": "Failed first C261 worker and diagnostic retry are the same QA task; no candidate bytes changed and no duplicate score event applies.",
+  "evidence": [
+    "C261_Q102_MACHINE_QA.json",
+    "C261_Q102_CONTACTS.jpg",
+    "C261_Q102_PRACTICAL.jpg",
+    "C261_Q102_RAW_FLIPY.jpg",
+    "C261_Q062_MACHINE_QA.json",
+    "C261_Q062_CONTACTS.jpg",
+    "C261_Q062_PRACTICAL.jpg",
+    "C261_Q062_RAW_FLIPY.jpg",
+    "C261_Q024_MACHINE_QA.json",
+    "C261_Q024_CONTACTS.jpg",
+    "C261_Q024_PRACTICAL.jpg",
+    "C261_Q024_RAW_FLIPY.jpg"
+  ],
+  "pre_ingame_export": "PENDING_REFRESH_Q102",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
