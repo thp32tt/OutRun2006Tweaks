@@ -2650,3 +2650,7 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q94 c36da00d...: fresh C 7/7 zero-outside + controller visual PASS -> exact-SHA C3_STRICT_PASS.
 - q102 442babea...: numeric PASS_HIGH_RISK_EDGE_TOUCH overridden by visual FAIL; 15코스 연속 450/1070px (~42.1%) is materially undersized versus source/same-family q92 -> REWORK_REQUIRED, C3 blocked.
 - PRE_INGAME English-original refresh required for q92/q94. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
+### B243 q212 controller FAIL — 2026-10-08 03:45 KST
+- q212 `4b967ef0...`: machine PASS, producer visual FAIL. Gap 195px but title width 707px, still underfilled vs C259 source hierarchy requirement.
+- State: `B243_CONTROLLER_VISUAL_FAIL_REWORK_REQUIRED`; fresh C/C3 blocked until material repair. `RUNTIME_VALIDATION=UNTESTED`.

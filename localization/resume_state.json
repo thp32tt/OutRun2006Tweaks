@@ -6759,7 +6759,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T01:49:00+09:00",
+  "updated_at_kst": "2026-10-08T03:45:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -9803,6 +9803,82 @@
     },
     "controller_report": "localization/graphics/role_C/20261008-C260-C2-Q092-Q094-Q102/C260_CONTROLLER_FINAL_QA.json",
     "pre_ingame_export": "PENDING_REFRESH_Q092_Q094",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "b243_q212_controller_fail": {
+    "run": "20261008-B243-Q212-HEART-GROUPING-CONTROLLER",
+    "timestamp_kst": "2026-10-08T03:45:00+09:00",
+    "role": "B",
+    "queue_index": 212,
+    "asset": "BA0147DA",
+    "trigger": "CONSUME_UNRECONCILED_B243_WORKER_RESULT_AFTER_C259",
+    "prior_candidate_sha256": "e3fc3275e696acb0dc5449908bd3b57a232d842ad51296e888cc7ede6a276863",
+    "candidate_sha256": "4b967ef09bbbb21d7ecc1496c2ee15395567b526af6cf68f1c22c7549850d518",
+    "worker_output_commit": "2335bb1fd25b8d23965057736a3efce83a1829eb",
+    "machine_qa": "PASS",
+    "visual_qa": {
+      "decision": "FAIL",
+      "reason": "C259 gap reduction achieved but source-hierarchy fill regressed",
+      "gap_px": {
+        "B242": 300,
+        "B243": 195
+      },
+      "localized_width_px": {
+        "B242": 718,
+        "B243": 707
+      },
+      "width_ratio": {
+        "B242": 0.4082,
+        "B243": 0.4019
+      },
+      "evidence": [
+        "B243_Q212_HEART_CONTACTS.jpg",
+        "B243_Q212_HEART_PRACTICAL.jpg",
+        "B243_Q212_RAW.jpg"
+      ]
+    },
+    "status": "B243_CONTROLLER_VISUAL_FAIL_REWORK_REQUIRED",
+    "fresh_c": "BLOCKED",
+    "c3": "BLOCKED",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "latest_b_attempt": {
+    "run": "20261008-B243-Q212-HEART-GROUPING-CONTROLLER",
+    "timestamp_kst": "2026-10-08T03:45:00+09:00",
+    "role": "B",
+    "queue_index": 212,
+    "asset": "BA0147DA",
+    "trigger": "CONSUME_UNRECONCILED_B243_WORKER_RESULT_AFTER_C259",
+    "prior_candidate_sha256": "e3fc3275e696acb0dc5449908bd3b57a232d842ad51296e888cc7ede6a276863",
+    "candidate_sha256": "4b967ef09bbbb21d7ecc1496c2ee15395567b526af6cf68f1c22c7549850d518",
+    "worker_output_commit": "2335bb1fd25b8d23965057736a3efce83a1829eb",
+    "machine_qa": "PASS",
+    "visual_qa": {
+      "decision": "FAIL",
+      "reason": "C259 gap reduction achieved but source-hierarchy fill regressed",
+      "gap_px": {
+        "B242": 300,
+        "B243": 195
+      },
+      "localized_width_px": {
+        "B242": 718,
+        "B243": 707
+      },
+      "width_ratio": {
+        "B242": 0.4082,
+        "B243": 0.4019
+      },
+      "evidence": [
+        "B243_Q212_HEART_CONTACTS.jpg",
+        "B243_Q212_HEART_PRACTICAL.jpg",
+        "B243_Q212_RAW.jpg"
+      ]
+    },
+    "status": "B243_CONTROLLER_VISUAL_FAIL_REWORK_REQUIRED",
+    "fresh_c": "BLOCKED",
+    "c3": "BLOCKED",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
