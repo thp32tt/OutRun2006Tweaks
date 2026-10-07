@@ -21,6 +21,10 @@ namespace OutRunVR::GameSemantic
         // Exact vehicle-relative world anchor that the game already projected
         // into its 640x480 sprite coordinate system before queueing.
         ProjectedWorldMarker2D,
+        // Canonical lens/SceneEffect producer at EXE+0xCABE: the game has
+        // already projected the light/effect into screen-oriented geometry,
+        // but the draw still needs an exact VR owner rather than generic alpha.
+        ProjectedScreenEffect2D,
         ReflectionCube,
         // Generic canonical 2D queue content. It needs only per-eye
         // asymmetric-FOV alignment, never head/IPD/world-plane placement.
@@ -63,6 +67,7 @@ namespace OutRunVR::GameSemantic
         case RenderScope::WorldParticle: return "WORLD_PARTICLE";
         case RenderScope::WorldBillboard: return "WORLD_BILLBOARD";
         case RenderScope::ProjectedWorldMarker2D: return "PROJECTED_WORLD_MARKER_2D";
+        case RenderScope::ProjectedScreenEffect2D: return "PROJECTED_SCREEN_EFFECT_2D";
         case RenderScope::ReflectionCube: return "REFLECTION_CUBE";
         case RenderScope::ScreenOverlay2D: return "SCREEN_OVERLAY_2D";
         case RenderScope::ScreenHud: return "SCREEN_HUD";
@@ -155,6 +160,11 @@ namespace OutRunVR::GameSemantic
     inline bool CorroboratesProjectedWorldMarker(RenderScope scope) noexcept
     {
         return scope == RenderScope::ProjectedWorldMarker2D;
+    }
+
+    inline bool CorroboratesProjectedScreenEffect(RenderScope scope) noexcept
+    {
+        return scope == RenderScope::ProjectedScreenEffect2D;
     }
 
     inline bool CorroboratesScreenOverlay2D(RenderScope scope) noexcept
