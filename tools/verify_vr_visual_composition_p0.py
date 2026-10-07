@@ -175,7 +175,13 @@ require_order(
 # Runtime evidence must be valid before launch and the analyzer must ship with the package.
 require('OUTRUN_VR_EXE_SEMANTICS_VERIFIED', runner, 'pre-launch EXE semantic identity environment')
 require('68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3', runner, 'canonical EXE SHA gate')
-launch_pos = runner.find('& $game @Arguments')
+launch_markers = [
+    '& $game @Arguments',
+    'Start-Process -FilePath $game -ArgumentList $gameArgs',
+]
+launch_positions = [runner.find(marker) for marker in launch_markers]
+launch_positions = [pos for pos in launch_positions if pos >= 0]
+launch_pos = min(launch_positions) if launch_positions else -1
 semantic_pos = runner.find("$env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED='1'")
 if launch_pos < 0 or semantic_pos < 0 or semantic_pos >= launch_pos:
     raise SystemExit('P0 visual composition drift: EXE semantic identity must be established before game launch')
