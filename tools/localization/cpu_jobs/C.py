@@ -94,11 +94,15 @@ for idx,en,ko,(x0,y0,x1,y1) in rowspec:
         raise RuntimeError(("old candidate did not preserve source help row",idx,int(np.count_nonzero(np.any(sr!=oroi,axis=2)))))
 
     bg,bg_count,total=modal_rgba(sr)
-    if bg_count/total < 0.55:
-        raise RuntimeError(("row background is not sufficiently flat for independent text extraction",idx,bg.tolist(),bg_count,total))
+    fbg,fbg_count,ftotal=modal_rgba(fr)
+    if bg_count/total < 0.55 or fbg_count/ftotal < 0.55:
+        raise RuntimeError(("row background is not sufficiently flat for independent text extraction",idx,bg.tolist(),bg_count,total,fbg.tolist(),fbg_count,ftotal))
 
     smask=np.any(sr!=bg,axis=2)
-    fmask=np.any(fr!=bg,axis=2)
+    # Derive final glyph pixels against the final row's own modal plate color.
+    # The clean-plate reconstruction may differ by a few RGB levels from the source plate,
+    # so using the source modal color would incorrectly classify the entire restored footprint as lettering.
+    fmask=np.any(fr!=fbg,axis=2)
     sb0=bbox(smask); fb0=bbox(fmask)
     if not sb0 or not fb0: raise RuntimeError(("missing text mask",idx,sb0,fb0))
     sb=[x0+sb0[0],y0+sb0[1],x0+sb0[2],y0+sb0[3]]
@@ -125,7 +129,8 @@ for idx,en,ko,(x0,y0,x1,y1) in rowspec:
 
     checks.append({
       "region_idx":idx,"source":en,"korean":ko,"cell":[x0,y0,x1,y1],
-      "background_rgba":[int(v) for v in bg],"background_mode_fraction":round(bg_count/total,6),
+      "source_background_rgba":[int(v) for v in bg],"source_background_mode_fraction":round(bg_count/total,6),
+      "final_background_rgba":[int(v) for v in fbg],"final_background_mode_fraction":round(fbg_count/ftotal,6),
       "source_bbox":sb,"localized_bbox":fb,
       "source_size":[sw,sh],"localized_size":[fw,fh],
       "height_ratio":round(fh/sh,4),
