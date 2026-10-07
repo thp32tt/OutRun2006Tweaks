@@ -1,0 +1,8 @@
+{
+  "run": "20261007-A167R2-Q212-WEIGHT-HIERARCHY",
+  "queue_index": 212,
+  "asset": "BA0147DA",
+  "candidate_sha256": "6e108032df506fd5c3605fd138f878e546ac2c4ee459e0525eae0b6938ddd5ba",
+  "status": "A167R2_MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
+  "runtime_validation": "UNTESTED"
+}
