@@ -2613,3 +2613,8 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 ### C257 C2 — q188/q220/q222 fresh C + C3 (2026-10-08 01:18 KST)
 - TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN. q188, q220, q222 all fresh C PASS + exact-SHA C3_STRICT_PASS.
 - Composite in-game regressions stay open: q212 blocks IGR-001/002; q193 needs C1 for IGR-019. PRE_INGAME refresh/user review + actual-game retest pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-08 01:22 KST — A C255 q121/q193 material rework
+- q193 `97E863AD`: A171 candidate `e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166` clears WELCOME TO THE / MULTIPLAYER / SHOWROOM source footprints and rerenders native Korean. Machine 3/3 + zero outside/alpha + persisted DDS/RAW PASS; controller visual PASS. Fresh C + exact-SHA C3 + PRE_INGAME + NEW in-game retest pending.
+- q121 `FD90AA9`: A171-A174 attempts were controller-rejected for rectangular plate reconstruction. A175 restored exact prior `03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433` and set `HOLD_STRICT_RECHECK`; C255 source-residue defect remains open.
+- GitHub Actions CPU-worker fallback used after ChatGPT-local GitHub DNS failure. N100 not used. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
