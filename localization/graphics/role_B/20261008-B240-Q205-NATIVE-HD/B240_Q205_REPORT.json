@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B240",
+  "queue_index": 205,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+  "trigger": "USER_INGAME_SCREENSHOTS_159_162_LOW_RES_DIRTY_HEAVY_KOREAN",
+  "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+  "prior_candidate_sha256": "2bbb9d19a833fb6c9ade243eb70132ef5ce46150d1fa1cb9423ff4e5101b770c",
+  "candidate_sha256": "7598af3375cfd96fa83f2ac7610ac1a97dd0fcebd7aa95f3e33a641dbcfbba9e",
+  "method": "replace only six screenshot-visible rows from A76 exact clean plate; render Korean directly at final 4096x2048 with native Noto CJK Medium/Regular; no 33px/12px quarter-size raster and no x4 bitmap upscale; no artificial stroke",
+  "pixel_scale": 1,
+  "changed_pixels": 89267,
+  "changed_outside_rework_bboxes": 0,
+  "protected_token_changed_pixels": {
+    "OutRun": 0,
+    "OutRun2SP": 0
+  },
+  "rows": [
+    {
+      "key": "options",
+      "text": "옵션",
+      "source_bbox": [
+        1591,
+        1423,
+        2316,
+        1568
+      ],
+      "localized_bbox": [
+        1595,
+        1427,
+        1854,
+        1564
+      ],
+      "localized_size": [
+        259,
+        137
+      ],
+      "margins": [
+        4,
+        462,
+        4,
+        4
+      ],
+      "font": "NotoSerifCJK-Medium.ttc",
+      "font_size": 142,
+      "pixel_scale": 1,
+      "stroke_width": 0,
+      "alignment": "left"
+    },
+    {
+      "key": "rankings",
+      "text": "랭킹",
+      "source_bbox": [
+        33,
+        1245,
+        930,
+        1388
+      ],
+      "localized_bbox": [
+        37,
+        1249,
+        275,
+        1384
+      ],
+      "localized_size": [
+        238,
+        135
+      ],
+      "margins": [
+        4,
+        655,
+        4,
+        4
+      ],
+      "font": "NotoSerifCJK-Medium.ttc",
+      "font_size": 140,
+      "pixel_scale": 1,
+      "stroke_width": 0,
+      "alignment": "left"
+    },
+    {
+      "key": "out_run_1p",
+      "text": "1인 플레이!",
+      "source_bbox": [
+        1959,
+        1066,
+        2569,
+        1132
+      ],
+      "localized_bbox": [
+        2200,
+        1071,
+        2477,
+        1127
+      ],
+      "localized_size": [
+        277,
+        56
+      ],
+      "margins": [
+        241,
+        92,
+        5,
+        5
+      ],
+      "font": "NotoSansCJK-Regular.ttc",
+      "font_size": 60,
+      "pixel_scale": 1,
+      "stroke_width": 0,
+      "alignment": "after_token"
+    },
+    {
+      "key": "view_rankings",
+      "text": "싱글/멀티플레이 랭킹 보기",
+      "source_bbox": [
+        3,
+        911,
+        1334,
+        977
+      ],
+      "localized_bbox": [
+        7,
+        915,
+        612,
+        973
+      ],
+      "localized_size": [
+        605,
+        58
+      ],
+      "margins": [
+        4,
+        722,
+        4,
+        4
+      ],
+      "font": "NotoSansCJK-Regular.ttc",
+      "font_size": 60,
+      "pixel_scale": 1,
+      "stroke_width": 0,
+      "alignment": "left"
+    },
+    {
+      "key": "enjoy_original",
+      "text": "오리지널 즐기기",
+      "source_bbox": [
+        1807,
+        909,
+        2696,
+        975
+      ],
+      "localized_bbox": [
+        1949,
+        913,
+        2340,
+        970
+      ],
+      "localized_size": [
+        391,
+        57
+      ],
+      "margins": [
+        142,
+        356,
+        4,
+        5
+      ],
+      "font": "NotoSansCJK-Regular.ttc",
+      "font_size": 60,
+      "pixel_scale": 1,
+      "stroke_width": 0,
+      "alignment": "before_token"
+    },
+    {
+      "key": "adjust_settings",
+      "text": "게임 설정 조정",
+      "source_bbox": [
+        1,
+        748,
+        1800,
+        814
+      ],
+      "localized_bbox": [
+        5,
+        753,
+        353,
+        809
+      ],
+      "localized_size": [
+        348,
+        56
+      ],
+      "margins": [
+        4,
+        1447,
+        5,
+        5
+      ],
+      "font": "NotoSansCJK-Regular.ttc",
+      "font_size": 60,
+      "pixel_scale": 1,
+      "stroke_width": 0,
+      "alignment": "left"
+    }
+  ],
+  "contacts": [
+    "B240_Q205_options_1X.jpg",
+    "B240_Q205_rankings_1X.jpg",
+    "B240_Q205_out_run_1p_1X.jpg",
+    "B240_Q205_view_rankings_1X.jpg",
+    "B240_Q205_enjoy_original_1X.jpg",
+    "B240_Q205_adjust_settings_1X.jpg"
+  ],
+  "controller_visual_qa": "PENDING_FRESH_CONTROLLER_AFTER_WORKER",
+  "fresh_c_required": true,
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
