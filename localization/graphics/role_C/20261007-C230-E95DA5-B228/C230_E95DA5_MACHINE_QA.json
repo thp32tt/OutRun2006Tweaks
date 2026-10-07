@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261007-C230-E95DA5-B228",
+  "qa_id": "C230",
+  "queue_index": 230,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "producer_run": "B228",
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "prior_candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
+  "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds"
+  },
+  "independent_basis": "Pinned canonical source independently downloaded/decoded. Prior C149-approved candidate is recovered from B228 worker parent and proven exact to source in both help rows. Broad atlas cells only are fixed; background/text masks and source/final bboxes are re-derived from pixels without producer masks.",
+  "machine_status": "PASS",
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "pitch": 8192,
+    "depth": 1,
+    "mips": 1,
+    "raw_mode": "RGBA"
+  },
+  "rows": [
+    {
+      "region_idx": 20,
+      "source": "You cannot buy this item yet",
+      "korean": "아직 구매할 수 없습니다",
+      "cell": [
+        0,
+        164,
+        864,
+        240
+      ],
+      "source_background_rgba": [
+        82,
+        86,
+        87,
+        0
+      ],
+      "source_background_mode_fraction": 0.826282,
+      "source_background_alpha": 0,
+      "final_source_bbox_plate_rgba_mode": [
+        82,
+        86,
+        87,
+        0
+      ],
+      "final_background_alpha": 0,
+      "final_background_alpha_mode_fraction": 0.72175,
+      "source_bbox": [
+        1,
+        182,
+        618,
+        232
+      ],
+      "localized_bbox": [
+        3,
+        184,
+        465,
+        230
+      ],
+      "source_size": [
+        617,
+        50
+      ],
+      "localized_size": [
+        462,
+        46
+      ],
+      "height_ratio": 0.92,
+      "delta_left": 2,
+      "delta_right": 153,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "old_row_exact_source": true,
+      "source_exact_residue_outside_localized_mask": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "height_hierarchy": "PASS"
+    },
+    {
+      "region_idx": 21,
+      "source": "You already own this item",
+      "korean": "이미 보유 중입니다",
+      "cell": [
+        864,
+        164,
+        1728,
+        240
+      ],
+      "source_background_rgba": [
+        82,
+        86,
+        87,
+        0
+      ],
+      "source_background_mode_fraction": 0.841313,
+      "source_background_alpha": 0,
+      "final_source_bbox_plate_rgba_mode": [
+        82,
+        86,
+        87,
+        0
+      ],
+      "final_background_alpha": 0,
+      "final_background_alpha_mode_fraction": 0.75445,
+      "source_bbox": [
+        867,
+        182,
+        1422,
+        232
+      ],
+      "localized_bbox": [
+        869,
+        184,
+        1233,
+        230
+      ],
+      "source_size": [
+        555,
+        50
+      ],
+      "localized_size": [
+        364,
+        46
+      ],
+      "height_ratio": 0.92,
+      "delta_left": 2,
+      "delta_right": 189,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "old_row_exact_source": true,
+      "source_exact_residue_outside_localized_mask": 0,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "height_hierarchy": "PASS"
+    }
+  ],
+  "summary": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "height_hierarchy": "2/2 PASS >= 0.85 source height",
+    "old_help_rows_exact_source": "2/2 PASS",
+    "changed_pixels_outside_independent_source_help_bboxes": 0,
+    "alpha_changed_outside_independent_source_help_bboxes": 0,
+    "source_exact_residue_outside_localized_masks": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "header_128_exact": true,
+    "raw_readable_parity": "PASS",
+    "semantic_binding": "2/2 PASS"
+  },
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_SOURCE_C149_B228_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_HELP_ROW_CONTACT.jpg",
+    "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_SOURCE_C149_B228_RAW.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}

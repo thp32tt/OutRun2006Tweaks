@@ -1,0 +1,12 @@
+{
+  "role": "C",
+  "run": "C230",
+  "queue_index": 230,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "prior_candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
+  "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "machine_status": "PASS",
+  "report": "localization/graphics/role_C/20261007-C230-E95DA5-B228/C230_E95DA5_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
