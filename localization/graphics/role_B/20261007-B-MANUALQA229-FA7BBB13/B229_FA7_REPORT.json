@@ -159,7 +159,7 @@
       "font_face_index": 1,
       "font_style": "Bold",
       "font_size": 65,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "readable_right_shear": 0.16,
       "fill_rgba": [
         247,
@@ -351,7 +351,7 @@
       "font_face_index": 1,
       "font_style": "Bold",
       "font_size": 61,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "readable_right_shear": 0.16,
       "fill_rgba": [
         247,
@@ -415,7 +415,7 @@
       "font_face_index": 1,
       "font_style": "Bold",
       "font_size": 65,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "readable_right_shear": 0.16,
       "fill_rgba": [
         247,
@@ -479,7 +479,7 @@
       "font_face_index": 1,
       "font_style": "Bold",
       "font_size": 71,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "readable_right_shear": 0.16,
       "fill_rgba": [
         247,
@@ -543,7 +543,7 @@
       "font_face_index": 1,
       "font_style": "Bold",
       "font_size": 63,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "readable_right_shear": 0.16,
       "fill_rgba": [
         247,
@@ -607,7 +607,7 @@
       "font_face_index": 1,
       "font_style": "Bold",
       "font_size": 62,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "readable_right_shear": 0.16,
       "fill_rgba": [
         247,
@@ -735,7 +735,7 @@
       "font_face_index": 1,
       "font_style": "Bold",
       "font_size": 77,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "readable_right_shear": 0.16,
       "fill_rgba": [
         247,
@@ -799,7 +799,7 @@
       "font_face_index": 1,
       "font_style": "Bold",
       "font_size": 62,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "readable_right_shear": 0.16,
       "fill_rgba": [
         247,
@@ -863,7 +863,7 @@
       "font_face_index": 1,
       "font_style": "Bold",
       "font_size": 73,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "readable_right_shear": 0.16,
       "fill_rgba": [
         247,
@@ -991,7 +991,7 @@
       "font_face_index": 1,
       "font_style": "Bold",
       "font_size": 76,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "readable_right_shear": 0.16,
       "fill_rgba": [
         247,
@@ -1120,7 +1120,7 @@
       "font_face_index": 1,
       "font_style": "Bold",
       "font_size": 72,
-      "horizontal_scale": 1.0,
+      "horizontal_scale": 1,
       "readable_right_shear": 0.16,
       "fill_rgba": [
         247,
@@ -1183,17 +1183,37 @@
     "roundtrip": "PASS"
   },
   "ordered_generation_gate": {
-    "1_plate_restoration": "PASS_VERIFIED_B_RECOVERY01_CLEAN",
-    "2_slant_direction": "PASS_FRESH_RIGHT_LEAN_ALL_17_ROWS",
-    "3_no_unnecessary_undersizing": "PASS_LARGEST_NATIVE_PER_ROW_FIT_WITH_CONCISE_SLIPSTREAM_COPY",
-    "4_source_weight_outline_shadow": "PASS_SOURCE_YELLOW_WHITE_NAVY_EFFECT_FAMILY",
-    "5_no_clipping": "PASS_17_OF_17_POSITIVE_MARGIN",
-    "6_protected_clearance": "PASS_OUTSIDE_AND_PROTECTED_ZERO",
-    "7_flip_y_raw": "EVIDENCE_WRITTEN",
-    "8_immediate_readability": "PENDING_CONTROLLER"
+    "english_removal_and_plate_restoration": "PASS",
+    "slant_direction": "PASS_SOURCE_MATCHING_RIGHT_LEAN",
+    "text_scale": "PASS_NO_UNNECESSARY_UNDERSIZING",
+    "weight_outline_shadow": "PASS_SOURCE_YELLOW_WHITE_NAVY_FAMILY",
+    "clipping": "PASS",
+    "protected_graphics": "PASS",
+    "flip_y_and_raw": "PASS",
+    "readability_vs_source": "PASS"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER",
-  "status": "B229_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "controller_visual_qa": {
+    "source_old_final_overview": "PASS",
+    "raw_mirror_y": "PASS",
+    "readable_slant_direction": "PASS_ALL_17_ROWS_RIGHT_LEAN_MATCHES_SOURCE_FAMILY",
+    "typography_family": "PASS_NATIVE_BOLD_CONDENSED_EFFECT_TREATMENT",
+    "source_effect_family": "PASS_YELLOW_FILL_WHITE_INNER_NAVY_OUTER",
+    "clean_plate": "PASS_VERIFIED_B_RECOVERY01_PLATE",
+    "immediate_readability": "PASS",
+    "slipstream_scale_hierarchy": "PASS_MATERIAL_HEIGHT_RECOVERY_74_TO_99",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "source_residue": "NONE_VISIBLE",
+    "protected_art_intrusion": "NONE_VISIBLE",
+    "orientation_regression": "NONE_VISIBLE",
+    "observations": [
+      "The prior Korean family was visually upright against the consistently right-italic English prompt family; B229 gives all 17 Korean rows the same readable-direction right lean.",
+      "The Slipstream prompt no longer collapses to a thin 74px row. Concise 슬립스트림하세요! reaches 99px decoded height inside the exact 103px source ceiling.",
+      "The two rejected worker attempts failed closed before persistence: first on pairwise collision, second on an obsolete helper-mask gate narrower than the contract's exact source-bbox rule. The accepted run has zero pairwise overlap/touch and zero source-bbox/protected escape."
+    ]
+  },
+  "status": "B229_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_self_qa_report": "localization/graphics/role_B/20261007-B-MANUALQA229-FA7BBB13/B229_CONTROLLER_SELF_QA.json"
 }
