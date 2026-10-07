@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# C231 independent final QA + mandatory C3 strict audit for B226 / q226 E3F4BA07.
+# C232 / TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL)
+# Fresh independent C + mandatory C3 strict audit for q95 37759842 / A137.
 import io, os, json, hashlib, pathlib, subprocess, urllib.request, struct
 import numpy as np
 from PIL import Image, ImageOps, ImageDraw
@@ -7,23 +8,24 @@ from PIL import Image, ImageOps, ImageDraw
 if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
-RUN="20261007-C231-E3F4BA07-B226"
+RUN="20261007-C232-C1-Q095-37759842-A137"
 ROOT=pathlib.Path("localization/graphics/role_C")/RUN
 ROOT.mkdir(parents=True, exist_ok=True)
-CAND=pathlib.Path("localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds")
-CLEAN=pathlib.Path("localization/graphics/role_C/20261005-C143-E3F4BA07/C143_EXACT_CLEAN_PLATE.png")
-SOURCE_TEXT_MASK=pathlib.Path("localization/graphics/role_C/20261005-C143-E3F4BA07/C143_SOURCE_TEXT_MASK.png")
-SOURCE_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds"
-EXPECTED_SOURCE="fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72"
-EXPECTED_CAND="5449edb846d6ca3a5de1ab1f817a41feb776e9af3bdda2175967312369e5e374"
-EXPECTED_OLD="1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c"
+CAND=pathlib.Path("localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds")
+CLEAN=pathlib.Path("localization/graphics/role_A/20261006-A-PRODUCTION81-3775-BBOX/37759842_HD_CLEAN_PLATE.png")
+PROTECTED=pathlib.Path("localization/graphics/role_A/20261006-A-PRODUCTION81-3775-BBOX/37759842_HD_PROTECTED_VISIBLE_MASK.png")
+SOURCE_CORE=pathlib.Path("localization/graphics/role_A/20261006-A-PRODUCTION81-3775-BBOX/37759842_HD_SOURCE_CORE_MASK.png")
+C221=pathlib.Path("localization/graphics/role_C/20261006-C221-37759842-A83/C221_37759842_MACHINE_QA.json")
+SOURCE_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
+EXPECTED_SOURCE="7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5"
+EXPECTED_CAND="ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b"
+EXPECTED_OLD="2dac8ee099120f2978eaf8ba992ffff11ecad7c11912a98aca9269a1a78f6988"
 CAND_REPO=str(CAND)
 
 def sha(b): return hashlib.sha256(b).hexdigest()
-def rgba_from_bytes(b):
+def rgba_bytes(b):
     im=Image.open(io.BytesIO(b)); im.load(); return im.convert("RGBA")
 def arr(im): return np.array(im)
-def diffmask(a,b): return np.any(a!=b,axis=2)
 def visible_diff(a,b):
     aa=a[:,:,3].astype(np.uint16); ba=b[:,:,3].astype(np.uint16)
     ap=a[:,:,:3].astype(np.uint16)*aa[:,:,None]
@@ -33,214 +35,160 @@ def bbox(mask):
     ys,xs=np.where(mask)
     if not len(xs): return None
     return [int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
-def local_bbox(mask, cell):
-    x0,y0,x1,y1=cell
-    b=bbox(mask[y0:y1,x0:x1])
-    return None if b is None else [b[0]+x0,b[1]+y0,b[2]+x0,b[3]+y0]
-def sz(b): return [b[2]-b[0],b[3]-b[1]]
-def margins(src, fin):
-    return [fin[0]-src[0],src[2]-fin[2],fin[1]-src[1],src[3]-fin[3]]
-def annotate_strip(images, labels, scale=0.25):
-    ims=[]
+def local_bbox(mask,b):
+    x0,y0,x1,y1=b
+    bb=bbox(mask[y0:y1,x0:x1])
+    return None if bb is None else [bb[0]+x0,bb[1]+y0,bb[2]+x0,bb[3]+y0]
+def size(b): return [b[2]-b[0],b[3]-b[1]]
+def margins(src,fin): return [fin[0]-src[0],src[2]-fin[2],fin[1]-src[1],src[3]-fin[3]]
+def strip(images, labels, scale, flip=True):
+    parts=[]
     for im,label in zip(images,labels):
-        q=ImageOps.flip(im).resize((max(1,int(im.width*scale)),max(1,int(im.height*scale))),Image.Resampling.LANCZOS)
-        canvas=Image.new("RGB",(q.width,q.height+24),"#d0d0d0")
-        canvas.paste(q.convert("RGB"),(0,24))
-        ImageDraw.Draw(canvas).text((6,6),label,fill="black")
-        ims.append(canvas)
-    out=Image.new("RGB",(sum(i.width for i in ims),max(i.height for i in ims)),"#b0b0b0")
+        q=ImageOps.flip(im) if flip else im
+        q=q.resize((max(1,round(q.width*scale)),max(1,round(q.height*scale))),Image.Resampling.LANCZOS)
+        cv=Image.new("RGB",(q.width,q.height+24),"#cfcfcf")
+        cv.paste(q.convert("RGB"),(0,24)); ImageDraw.Draw(cv).text((6,6),label,fill="black")
+        parts.append(cv)
+    out=Image.new("RGB",(sum(x.width for x in parts),max(x.height for x in parts)),"#b0b0b0")
     x=0
-    for im in ims: out.paste(im,(x,0)); x+=im.width
+    for p in parts: out.paste(p,(x,0)); x+=p.width
     return out
 
-with urllib.request.urlopen(SOURCE_URL, timeout=60) as r:
-    source_bytes=r.read()
+with urllib.request.urlopen(SOURCE_URL,timeout=90) as r: source_bytes=r.read()
 cand_bytes=CAND.read_bytes()
-if sha(source_bytes)!=EXPECTED_SOURCE: raise SystemExit("source SHA mismatch")
-if sha(cand_bytes)!=EXPECTED_CAND: raise SystemExit("candidate SHA mismatch")
-# Locate the exact C143 predecessor by content hash across full Git history.
-# This is robust to the GitHub Actions bot's later rebase of the B226 output commit.
+if sha(source_bytes)!=EXPECTED_SOURCE: raise SystemExit(f"source SHA mismatch {sha(source_bytes)}")
+if sha(cand_bytes)!=EXPECTED_CAND: raise SystemExit(f"candidate SHA mismatch {sha(cand_bytes)}")
+
+# Recover exact C221-approved predecessor by content hash across Git history.
 old_bytes=None; old_commit=None
-hist=subprocess.check_output(["git","log","--format=%H","--all","--",CAND_REPO],text=True).splitlines()
-for h in hist:
-    try:
-        b=subprocess.check_output(["git","show",f"{h}:{CAND_REPO}"],stderr=subprocess.DEVNULL)
-    except subprocess.CalledProcessError:
-        continue
+for h in subprocess.check_output(["git","log","--format=%H","--all","--",CAND_REPO],text=True).splitlines():
+    try: b=subprocess.check_output(["git","show",f"{h}:{CAND_REPO}"],stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError: continue
     if sha(b)==EXPECTED_OLD:
         old_bytes=b; old_commit=h; break
-if old_bytes is None:
-    raise SystemExit("exact C143 predecessor SHA not found in git history")
-source=rgba_from_bytes(source_bytes)
-candidate=rgba_from_bytes(cand_bytes)
-old=rgba_from_bytes(old_bytes)
+if old_bytes is None: raise SystemExit("exact C221 predecessor not found in git history")
+
+source=rgba_bytes(source_bytes); cand=rgba_bytes(cand_bytes); old=rgba_bytes(old_bytes)
 clean=Image.open(CLEAN).convert("RGBA")
-if source.size!=candidate.size or source.size!=clean.size or source.size!=old.size:
-    raise SystemExit(f"size mismatch {source.size} {candidate.size} {clean.size} {old.size}")
-S,A,O,K=map(arr,[source,candidate,old,clean])
-M=np.array(Image.open(SOURCE_TEXT_MASK).convert("L"))>0
+if not (source.size==cand.size==old.size==clean.size==(4096,4096)):
+    raise SystemExit(f"decoded dimension mismatch {source.size} {cand.size} {old.size} {clean.size}")
+S,A,O,K=map(arr,[source,cand,old,clean])
+P=np.array(Image.open(PROTECTED).convert("L"))>0
+SC=np.array(Image.open(SOURCE_CORE).convert("L"))>0
 W,H=source.size
 
-# Broad canonical atlas cells. Exact English bboxes are freshly re-derived from the
-# prior independent C143 SOURCE_TEXT_MASK (same pinned source SHA), not from B226 producer records.
-rows=[
- ("goal_e","GOAL E","골 E",[980,336,1960,420]),
- ("goal_d","GOAL D","골 D",[0,252,980,336]),
- ("goal_c","GOAL C","골 C",[980,252,1960,336]),
- ("goal_b","GOAL B","골 B",[0,160,980,244]),
- ("goal_a","GOAL A","골 A",[980,160,1960,244]),
- ("15_stage","15 STAGE CONTINUOUS","15코스 연속",[980,80,1960,160]),
-]
-# Geometry and blast radius use premultiplied-visible pixels: transparent hidden
-# RGB is ignored, while RGB differences at nonzero alpha and all alpha changes count.
+prior=json.loads(C221.read_text(encoding="utf-8"))
+if prior.get("source_sha256")!=EXPECTED_SOURCE or prior.get("candidate_sha256")!=EXPECTED_OLD:
+    raise SystemExit("C221 prior provenance mismatch")
+rows=[]
+for r in prior["row_checks"]:
+    rows.append({"idx":int(r["idx"]),"kind":r["kind"],"source_bbox":[int(x) for x in r["source_effect_bbox"]]})
+if len(rows)!=16: raise SystemExit(f"expected 16 transformed rows, got {len(rows)}")
+
 final_delta=visible_diff(A,K)
 old_delta=visible_diff(O,K)
-change_from_old=visible_diff(A,O)
-alpha_change=(A[:,:,3]!=O[:,:,3])
-allowed=np.zeros((H,W),dtype=bool)
-records=[]
-for key,en,ko,cell in rows:
-    sb=local_bbox(M,cell)
-    if not sb: raise SystemExit(f"missing independent source-mask bbox {key}")
-    x0,y0,x1,y1=sb
-    local_final=np.zeros((H,W),dtype=bool); local_final[y0:y1,x0:x1]=final_delta[y0:y1,x0:x1]
-    local_old=np.zeros((H,W),dtype=bool); local_old[y0:y1,x0:x1]=old_delta[y0:y1,x0:x1]
-    fb=bbox(local_final); ob=bbox(local_old)
-    if not fb or not ob: raise SystemExit(f"missing final/old bbox {key}: {fb} {ob}")
-    sw,sh=sz(sb); fw,fh=sz(fb); ow,oh=sz(ob)
+change=visible_diff(A,O)
+alpha_change=A[:,:,3]!=O[:,:,3]
+allowed=np.zeros((H,W),bool)
+checks=[]
+for r in rows:
+    sb=r["source_bbox"]; x0,y0,x1,y1=sb
+    allowed[y0:y1,x0:x1]=True
+    fb=local_bbox(final_delta,sb); ob=local_bbox(old_delta,sb)
+    if fb is None or ob is None: raise SystemExit(f"missing localized bbox idx {r['idx']} {fb} {ob}")
     mg=margins(sb,fb)
-    containment=(fb[0]>=sb[0] and fb[1]>=sb[1] and fb[2]<=sb[2] and fb[3]<=sb[3])
+    containment=fb[0]>=x0 and fb[1]>=y0 and fb[2]<=x1 and fb[3]<=y1
     positive=all(v>0 for v in mg)
-    improved=(fw>ow)
-    hratio=fh/sh
-    # q226 was reopened specifically for hierarchy weakness.
-    hierarchy=(improved and hratio>=0.85 and fw/sw>=0.50)
-    allowed[sb[1]:sb[3],sb[0]:sb[2]]=True
-    # Plate-removal numeric gate: every independent English source-mask pixel must
-    # differ from the unmodified source unless occupied by the new localized raster.
-    # Exact-color coincidence is not treated as residue here; residue is decided visually in C3.
-    residue=0
-    records.append({
-      "key":key,"source":en,"korean":ko,"cell":cell,
-      "source_bbox":sb,"prior_bbox":ob,"localized_bbox":fb,
+    sw,sh=size(sb); fw,fh=size(fb); ow,oh=size(ob)
+    exact_source_residue=int((SC[y0:y1,x0:x1] & np.all(A[y0:y1,x0:x1]==S[y0:y1,x0:x1],axis=2)).sum())
+    checks.append({
+      "idx":r["idx"],"kind":r["kind"],"source_bbox":sb,
+      "prior_bbox":ob,"localized_bbox":fb,
       "source_size":[sw,sh],"prior_size":[ow,oh],"localized_size":[fw,fh],
-      "width_source_ratio":round(fw/sw,4),"height_source_ratio":round(fh/sh,4),
-      "margins":mg,"containment":"PASS" if containment else "FAIL",
+      "margins":mg,
+      "containment":"PASS" if containment else "FAIL",
       "size_ceiling":"PASS" if fw<=sw and fh<=sh else "FAIL",
       "positive_margin":"PASS" if positive else "FAIL",
-      "hierarchy_repair":"PASS" if hierarchy else "FAIL",
-      "source_exact_pixels_remaining_without_localized_material":residue
+      "exact_source_core_pixels_remaining":exact_source_residue
     })
 
-outside_mask=change_from_old & (~allowed)
-outside_alpha_mask=alpha_change & (~allowed)
-outside=int(outside_mask.sum())
-alpha_outside=int(outside_alpha_mask.sum())
-# Categorize collateral changes in rows B226 claimed to preserve.
-preserved_regions={
-  "stage":[0,436,228,500],
-  "goal_standalone":[4,86,195,150],
-  "outrun2":[3,346,343,410],
-  "outrun2sp":[983,430,1416,494],
-}
-collateral_by_region={}
-for name,b in preserved_regions.items():
-    x0,y0,x1,y1=b
-    collateral_by_region[name]={
-      "visible_changed":int(change_from_old[y0:y1,x0:x1].sum()),
-      "alpha_changed":int(alpha_change[y0:y1,x0:x1].sum())
-    }
-# Persisted DDS structural checks.
-header_exact=(source_bytes[:128]==cand_bytes[:128])
+outside=int((change & ~allowed).sum())
+alpha_outside=int((alpha_change & ~allowed).sum())
+protected_changed=int((change & P).sum())
+residue_total=sum(x["exact_source_core_pixels_remaining"] for x in checks)
+header_exact=source_bytes[:128]==cand_bytes[:128]
 mips=struct.unpack_from("<I",cand_bytes,28)[0]
-all_rows=all(r["containment"]=="PASS" and r["size_ceiling"]=="PASS" and r["positive_margin"]=="PASS" and r["hierarchy_repair"]=="PASS" and r["source_exact_pixels_remaining_without_localized_material"]==0 for r in records)
-machine_pass=all_rows and outside==0 and alpha_outside==0 and header_exact and mips==1
+row_pass=all(x["containment"]=="PASS" and x["size_ceiling"]=="PASS" and x["positive_margin"]=="PASS" for x in checks)
+machine_pass=row_pass and outside==0 and alpha_outside==0 and protected_changed==0 and residue_total==0 and header_exact and mips==1
 
-# Evidence: matched SOURCE/CLEAN/OLD/FINAL, RAW, rows, and practical quarter-scale.
-annotate_strip([source,clean,old,candidate],["SOURCE","CLEAN","C143 OLD","B226 FINAL"],0.25).save(ROOT/"C231_SOURCE_CLEAN_OLD_FINAL_READABLE.jpg",quality=94)
-raw_strip=Image.new("RGB",(W*2,H),"#b0b0b0")
-raw_strip.paste(source.convert("RGB"),(0,0)); raw_strip.paste(candidate.convert("RGB"),(W,0))
-raw_strip.save(ROOT/"C231_SOURCE_FINAL_RAW.jpg",quality=94)
+# Evidence: full matched views, target contacts, practical display scale and RAW orientation.
+strip([source,clean,old,cand],["SOURCE","CLEAN","C221 OLD","A137 CURRENT"],0.125,True).save(ROOT/"C232_SOURCE_CLEAN_OLD_FINAL_FLIPY_12P5.jpg",quality=94)
+strip([source,cand],["SOURCE practical 25%","A137 practical 25%"],0.25,True).save(ROOT/"C232_SOURCE_FINAL_PRACTICAL_25PCT.jpg",quality=94)
+strip([old,cand],["C221 old practical 25%","A137 current practical 25%"],0.25,True).save(ROOT/"C232_OLD_FINAL_PRACTICAL_25PCT.jpg",quality=94)
+strip([source,cand],["SOURCE RAW","A137 RAW"],0.125,False).save(ROOT/"C232_SOURCE_FINAL_RAW_12P5.jpg",quality=94)
 
 contacts=[]
-for rec in records:
-    sb=rec["source_bbox"]; pad=8
-    box=(max(0,sb[0]-pad),max(0,sb[1]-pad),min(W,sb[2]+pad),min(H,sb[3]+pad))
-    parts=[]
-    for im in (source,clean,old,candidate):
-        crop=im.crop(box)
-        crop=ImageOps.flip(crop).resize((crop.width*2,crop.height*2),Image.Resampling.NEAREST)
-        parts.append(crop.convert("RGB"))
-    row=Image.new("RGB",(sum(x.width for x in parts),max(x.height for x in parts)),"#b0b0b0")
+for r in checks:
+    x0,y0,x1,y1=r["source_bbox"]; pad=12
+    box=(max(0,x0-pad),max(0,y0-pad),min(W,x1+pad),min(H,y1+pad))
+    ims=[]
+    for im in (source,clean,old,cand):
+        q=ImageOps.flip(im.crop(box)).resize(((box[2]-box[0])*2,(box[3]-box[1])*2),Image.Resampling.NEAREST).convert("RGB")
+        ims.append(q)
+    row=Image.new("RGB",(sum(i.width for i in ims),max(i.height for i in ims)),"#b0b0b0")
     x=0
-    for p in parts: row.paste(p,(x,0)); x+=p.width
+    for im in ims: row.paste(im,(x,0)); x+=im.width
     contacts.append(row)
-cw=max(x.width for x in contacts); ch=sum(x.height for x in contacts)
-sheet=Image.new("RGB",(cw,ch),"#b0b0b0"); y=0
-for r in contacts: sheet.paste(r,(0,y)); y+=r.height
-sheet.save(ROOT/"C231_ROW_CONTACT_2X.jpg",quality=95)
-annotate_strip([source,candidate],["SOURCE practical 25%","FINAL practical 25%"],0.25).save(ROOT/"C231_PRACTICAL_SCALE_25PCT.jpg",quality=95)
-# Blast-radius evidence: old/current at readable orientation plus outside-mask overlay.
-annotate_strip([old,candidate],["C143 PREDECESSOR","B226 CURRENT"],0.25).save(ROOT/"C231_OLD_FINAL_BLAST_RADIUS.jpg",quality=95)
-overlay=ImageOps.flip(candidate).convert("RGB")
-om=np.flipud(outside_mask)
-ov=np.array(overlay)
-ov[om]=np.array([255,0,255],dtype=np.uint8)
-Image.fromarray(ov).save(ROOT/"C231_OUTSIDE_REPAIR_MASK_MAGENTA.png")
+sheet=Image.new("RGB",(max(x.width for x in contacts),sum(x.height for x in contacts)),"#b0b0b0")
+y=0
+for im in contacts: sheet.paste(im,(0,y)); y+=im.height
+sheet.save(ROOT/"C232_TRANSFORM_ROWS_SOURCE_CLEAN_OLD_FINAL_2X.jpg",quality=95)
 
 report={
- "schema_version":2,"role":"C","run":RUN,"qa_id":"C231","queue_index":226,
- "asset":"textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds","producer_run":"B226",
- "source_sha256":sha(source_bytes),"prior_candidate_sha256":sha(old_bytes),"prior_candidate_git_commit":old_commit,"candidate_sha256":sha(cand_bytes),
- "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6","url":SOURCE_URL},
- "independent_basis":"Pinned source re-downloaded and persisted DDS decoded independently. Exact English source bboxes are freshly re-derived from the prior independent C143 SOURCE_TEXT_MASK tied to the same pinned source SHA; final/old bboxes are then derived from decoded persisted pixels versus the C143 exact clean plate inside those source bboxes. B226 producer bbox records are not consumed. Blast radius is checked against the actual pre-B226 candidate recovered from Git history.",
- "persisted_dds_authority":{"sha256":sha(cand_bytes),"decoded_size":[W,H],"header_128_exact":header_exact,"mip_count":mips,"format_family":"RGBA32/BGRA"},
- "rows":records,
- "summary":{
-   "bbox_size_positive_margin_hierarchy":f"{sum(1 for r in records if r['containment']=='PASS' and r['size_ceiling']=='PASS' and r['positive_margin']=='PASS' and r['hierarchy_repair']=='PASS')}/{len(records)} PASS",
-   "changed_pixels_outside_rework_source_regions":outside,
-   "alpha_changed_pixels_outside_rework_source_regions":alpha_outside,
-   "collateral_by_preserved_region":collateral_by_region,
+ "schema_version":2,"role":"C","run":RUN,"qa_id":"C232","queue_index":95,
+ "asset":"textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+ "producer_run":"A137","TEMP_BACKLOG_RELIEF":"C1","SHARD":"ODD(+UNINDEXED_SPECIAL)",
+ "user_ingame_regressions":["IGR-014","IGR-015","IGR-016"],
+ "source_sha256":sha(source_bytes),"prior_candidate_sha256":sha(old_bytes),"prior_candidate_git_commit":old_commit,
+ "candidate_sha256":sha(cand_bytes),
+ "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":"3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6","path":"Release/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds","url":SOURCE_URL},
+ "independent_basis":"Pinned canonical English DDS freshly downloaded and decoded; exact C221-approved predecessor recovered by SHA from Git history; current persisted DDS decoded independently. The 16 source effect bboxes come from prior independent C221 provenance, while current localized bboxes are re-derived from current-vs-verified-clean decoded pixels. A137 producer localized bboxes are not consumed.",
+ "structure":{"dimensions":[W,H],"format":"RGBA32/BGRA","header_128_exact":header_exact,"mip_count":mips,"raw_orientation":"mirror_y"},
+ "row_checks":checks,
+ "machine_checks":{
+   "bbox_size_positive_margin":f"{sum(1 for x in checks if x['containment']=='PASS' and x['size_ceiling']=='PASS' and x['positive_margin']=='PASS')}/{len(checks)} PASS",
+   "visible_changes_outside_16_source_bboxes_vs_C221":outside,
+   "alpha_changes_outside_16_source_bboxes_vs_C221":alpha_outside,
+   "protected_visible_pixels_changed_vs_C221":protected_changed,
+   "exact_source_core_residue_pixels":residue_total,
    "header_128_exact":header_exact,"mip_count":mips,
-   "post_encode_decode_authority":"PASS" if sha(cand_bytes)==EXPECTED_CAND else "FAIL",
-   "practical_scale_evidence":"C231_PRACTICAL_SCALE_25PCT.jpg"
+   "post_encode_decode_authority":"PASS" if sha(cand_bytes)==EXPECTED_CAND else "FAIL"
  },
  "machine_status":"PASS" if machine_pass else "FAIL",
  "c3_required":True,
- "c3_reason":["PRIOR_PRE_INGAME_VISUAL_FALSE_NEGATIVE","SOURCE_HIERARCHY_REWORK","CURRENT_QA_POLICY_REQUIRES_C3_BEFORE_EXPORT"],
+ "c3_reason":["USER_INGAME_P0_REGRESSION","PRIOR_VISUAL_FALSE_NEGATIVE_BAD_SLANT","TRANSFORMED_MULTILINE_TEXT"],
+ "c3_visual_priorities":["slant_direction","clean_plate_source_removal","font_style_fidelity","scale_readability","glyph_integrity","protected_art_separation","source_faithful_placement","FLIP_Y_RAW_practical_scale"],
  "visual_evidence":[
-   str(ROOT/"C231_SOURCE_CLEAN_OLD_FINAL_READABLE.jpg"),
-   str(ROOT/"C231_ROW_CONTACT_2X.jpg"),
-   str(ROOT/"C231_SOURCE_FINAL_RAW.jpg"),
-   str(ROOT/"C231_PRACTICAL_SCALE_25PCT.jpg"),
-   str(ROOT/"C231_OLD_FINAL_BLAST_RADIUS.jpg"),
-   str(ROOT/"C231_OUTSIDE_REPAIR_MASK_MAGENTA.png")
+   str(ROOT/"C232_SOURCE_CLEAN_OLD_FINAL_FLIPY_12P5.jpg"),
+   str(ROOT/"C232_TRANSFORM_ROWS_SOURCE_CLEAN_OLD_FINAL_2X.jpg"),
+   str(ROOT/"C232_SOURCE_FINAL_PRACTICAL_25PCT.jpg"),
+   str(ROOT/"C232_OLD_FINAL_PRACTICAL_25PCT.jpg"),
+   str(ROOT/"C232_SOURCE_FINAL_RAW_12P5.jpg")
  ],
  "controller_visual_qa":"PENDING_CONTROLLER",
  "c3_strict_decision":"PENDING_CONTROLLER",
  "decision":"PENDING_CONTROLLER",
+ "backlog_close_allowed":False,
  "runtime_validation":"UNTESTED",
  "forbidden_domains_touched":[]
 }
-(ROOT/"C231_E3F4BA07_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-pathlib.Path("localization/graphics/worker_results/C231_E3F4BA07.json").write_text(json.dumps({
- "role":"C","run":RUN,"queue_index":226,"asset":"E3F4BA07","machine_status":report["machine_status"],
- "candidate_sha256":report["candidate_sha256"],"c3_required":True,
- "report":str(ROOT/"C231_E3F4BA07_MACHINE_QA.json"),"runtime_validation":"UNTESTED"
+(ROOT/"C232_37759842_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+pathlib.Path("localization/graphics/worker_results/C232_37759842.json").write_text(json.dumps({
+ "role":"C","run":RUN,"queue_index":95,"asset":"37759842",
+ "TEMP_BACKLOG_RELIEF":"C1","SHARD":"ODD(+UNINDEXED_SPECIAL)",
+ "machine_status":report["machine_status"],"candidate_sha256":report["candidate_sha256"],
+ "c3_required":True,"report":str(ROOT/"C232_37759842_MACHINE_QA.json"),
+ "runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print(json.dumps({
-  "C231_diagnostic": {
-    "rows": records,
-    "outside": outside,
-    "alpha_outside": alpha_outside,
-    "header_exact": header_exact,
-    "mips": mips,
-    "old_sha256": sha(old_bytes),
-    "old_git_commit": old_commit,
-    "collateral_by_region": collateral_by_region,
-    "all_rows": all_rows,
-    "machine_pass": machine_pass
-  }
-}, ensure_ascii=False, indent=2))
-if not machine_pass:
-    print("C231 machine QA FAIL recorded for controller C3/rework decision")
+print(json.dumps({"run":RUN,"machine_status":report["machine_status"],"outside":outside,"alpha_outside":alpha_outside,"protected_changed":protected_changed,"residue":residue_total},ensure_ascii=False))
+if not machine_pass: raise SystemExit("C232 machine QA failed closed")
