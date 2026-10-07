@@ -735,7 +735,7 @@ require_order(
     "continue;",
     "R32DirectCopyPathRejected = true;",
     "R32DirectCopyRejectHr = ready;",
-    "if (Settings::VRTelemetry) ++R32PendingFenceErrors;",
+    "if (R30SupportTelemetryEnabled()) ++R32PendingFenceErrors;",
     "return false;",
 )
 hard_error_pos = producer_poll_r32.find("R32DirectCopyPathRejected = true;")
@@ -765,7 +765,7 @@ require_order(
     "if (FAILED(issueHr))",
     "R32DirectCopyPathRejected = true;",
     "R32DirectCopyRejectHr = issueHr;",
-    "if (Settings::VRTelemetry) ++R32PendingFenceErrors;",
+    "if (R30SupportTelemetryEnabled()) ++R32PendingFenceErrors;",
     "return false;",
 )
 
