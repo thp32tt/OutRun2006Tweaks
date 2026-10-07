@@ -69,7 +69,26 @@ class UIScaling : public Hook
 		0xEC24C, 0xEC277, 0xED4D4, 0xED7A3
 	};
 	static constexpr int ExactScreenHud_ClipSpriteCalls[] = {
-		0x460F1, 0x463D6, 0x46410, 0x97BB7, 0x97DA7
+		// Existing R65-R74/R73-era menu/result/control bridges.
+		0x460F1, 0x463D6, 0x46410, 0x97BB7, 0x97DA7,
+		// Canonical EXE direct calls proven SCREEN_HUD by the static HUD map.
+		0xBDB0E, 0xBDB2D, 0xBDB4C, 0xBDB8E,
+		0xBE311, 0xBE343, 0xBE3E3, 0xBE424, 0xBE45D
+	};
+	static constexpr int ExactScreenHudRight_ClipSpriteCalls[] = {
+		// DispRank.
+		0xB9F3A, 0xB9F5E, 0xB9F81, 0xB9FD0,
+		0xB9FFC, 0xBA01E, 0xBA035, 0xBA052,
+		// C2C warnings / slipstream.
+		0xBD32E, 0xBD397, 0xBD414, 0xBD472,
+		// TimeAttack/result records: preserve the original right-side spacing.
+		0xBE5CD, 0xBE603, 0xBE633, 0xBE66D, 0xBE690,
+		0xBE6B5, 0xBE6D5, 0xBE7E8, 0xBE802, 0xBE81C,
+		0xBE8D8, 0xBE915, 0xBE94A, 0xBE97A, 0xBE9A3
+	};
+	static constexpr int ExactScreenHudLeft_ClipSpriteCalls[] = {
+		// REV/gear calls proven by the canonical EXE HUD map.
+		0xB9096, 0xB90B3
 	};
 	static constexpr int RivalMarker_SpraniCall = 0xBB796;
 	static constexpr int TextGlyph_PutSpriteCalls[] = { 0x2C808, 0x2C9DB };
@@ -642,6 +661,24 @@ class UIScaling : public Hook
 		AddSpriteSpacing((int*)(ctx.esp + 4), true);
 	}
 
+	static int __cdecl ExactScreenHudRight_putClipSprite(
+		int xstnum, int x, int y, uint32_t flags,
+		float priority, uint32_t color)
+	{
+		AddSpriteSpacing(&x, false);
+		return ExactScreenHud_putClipSprite(
+			xstnum, x, y, flags, priority, color);
+	}
+
+	static int __cdecl ExactScreenHudLeft_putClipSprite(
+		int xstnum, int x, int y, uint32_t flags,
+		float priority, uint32_t color)
+	{
+		AddSpriteSpacing(&x, true);
+		return ExactScreenHud_putClipSprite(
+			xstnum, x, y, flags, priority, color);
+	}
+
 	// PutGhostGapInfo
 	static inline SafetyHookMid PutGhostGapInfo_AdjustPosition_hk{};
 	static void PutGhostGapInfo_AdjustPosition(safetyhook::Context& ctx)
@@ -800,6 +837,14 @@ public:
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), ExactScreenHud_putClipSprite,
 				Memory::HookType::Call);
+		for (int addr : ExactScreenHudRight_ClipSpriteCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), ExactScreenHudRight_putClipSprite,
+				Memory::HookType::Call);
+		for (int addr : ExactScreenHudLeft_ClipSpriteCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), ExactScreenHudLeft_putClipSprite,
+				Memory::HookType::Call);
 		Memory::VP::InjectHook(
 			Module::exe_ptr(RivalMarker_SpraniCall),
 			RivalMarker_sprani, Memory::HookType::Call);
@@ -847,34 +892,34 @@ public:
 		DispTimeAttack2D_SpriteScalingForceLeft_hk = safetyhook::create_mid((void*)0x4BE4E7, SpriteSpacingForceLeft);
 		DispTimeAttack2D_SpriteScalingForceEnable_hk = safetyhook::create_mid((void*)0x4BE575, SpriteSpacingEnable);
 
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BE5CD, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BE603, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BE633, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4BE66D, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4BE690, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BE6B5, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BE6D5, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BE8D8, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk9 = safetyhook::create_mid((void*)0x4BE915, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk10 = safetyhook::create_mid((void*)0x4BE94A, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk11 = safetyhook::create_mid((void*)0x4BE97A, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk12 = safetyhook::create_mid((void*)0x4BE9A3, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk13 = safetyhook::create_mid((void*)0x4BE7E8, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, TimeRecord_AdjustPositionAndHud);
 
-		DispRank_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9F3A, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B9F5E, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B9F81, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4B9FD0, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4B9FFC, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BA01E, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BA035, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BA052, put_scroll_AdjustPositionRight);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 		// REV indicator
-		DispGearPosition_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9096, put_scroll_AdjustPositionLeft);
-		DispGearPosition_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B90B3, put_scroll_AdjustPositionLeft);
+
+
 		DispGearPosition_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B90F6, put_scroll_AdjustPositionLeft);
 
 		// Fix ghost car info text positions
@@ -935,12 +980,12 @@ public:
 		C2CSpeechBubbleGF_AdjustPositionESP0_hk14 = safetyhook::create_mid((void*)0x4FCB20, C2CSpeechBubble_AdjustPositionESP4);
 
 		// "don't lose your girlfriend" UI sprites
-		C2CDontLoseGF_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4BD397, put_scroll_AdjustPositionRight);
-		C2CDontLoseGF_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BD414, put_scroll_AdjustPositionRight);
-		C2CDontLoseGF_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BD472, put_scroll_AdjustPositionRight);
+
+
+
 
 		// "test your slipstream" rival text
-		C2CTestSlipstream_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BD32E, put_scroll_AdjustPositionRight);
+
 
 		return true;
 	}
