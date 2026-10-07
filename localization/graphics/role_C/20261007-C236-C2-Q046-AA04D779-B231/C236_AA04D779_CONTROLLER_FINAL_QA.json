@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C236-C2-Q046-AA04D779-B231",
+  "timestamp_kst": "2026-10-07T13:58:30+09:00",
+  "queue_index": 46,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+  "producer_run": "B231",
+  "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+  "prior_candidate_sha256": "93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e",
+  "candidate_sha256": "d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0",
+  "machine_report": "localization/graphics/role_C/20261007-C236-C2-Q046-AA04D779-B231/C236_AA04D779_MACHINE_QA.json",
+  "machine_status": "PASS",
+  "controller_visual_review": {
+    "source_old_clean_final_readable": "PASS",
+    "raw_source_final": "PASS_MIRROR_Y_CONSISTENT",
+    "practical_scale_100_75_50": "PASS_SOURCE_RELATIVE",
+    "coverage": "PASS_30_SEMANTIC_SEGMENTS_PLUS_EXPLICIT_PRESERVES",
+    "clean_plate": "PASS_NO_VISIBLE_SOURCE_RESIDUE_OR_PATCH_ARTIFACT",
+    "source_style": "PASS_WHITE_AND_LOW_CONTRAST_GRAY_DARK_FAMILIES_MATCH_SOURCE_INTENT",
+    "scale_readability": "PASS_NEAR_SOURCE_HEIGHT_WITH_NATURAL_KOREAN_WIDTH",
+    "glyph_integrity": "PASS_NO_BROKEN_OR_CLIPPED_HANGUL",
+    "protected_separation": "PASS_NO_VISIBLE_ICON_ART_OR_PRIOR_STAGE_INTRUSION",
+    "placement": "PASS_SOURCE_RELATIVE_LEFT_CENTER_AND_TWO_LINE_HIERARCHY",
+    "observations": [
+      "The previously untranslated lobby/status and gray control labels are now Korean and remain inside their exact source footprints.",
+      "Short Korean words such as 가속 and 기어 업/다운 are naturally narrower than the English labels but retain near-source text height, so the width reduction is not an undersizing failure.",
+      "The first GEAR DOWN stays split around the protected red icon; the icon remains untouched.",
+      "REV, TOP, You, player markers, icons, course symbols and numeric artwork remain explicit preserve-original content.",
+      "RAW source and final share the same mirror-Y orientation; readable and practical-scale views show no orientation regression."
+    ]
+  },
+  "fresh_independent_c": "PASS",
+  "c3_strict_audit": {
+    "required": true,
+    "result": "C3_STRICT_PASS",
+    "candidate_sha256": "d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0",
+    "prior_false_negative": "ordinary visible UI labels were incorrectly preserved in English by earlier policy state",
+    "visual_priorities": {
+      "slant_perspective": "PASS_SOURCE_UPRIGHT",
+      "clean_plate_source_removal": "PASS",
+      "font_style_fidelity": "PASS",
+      "scale_readability": "PASS",
+      "glyph_integrity": "PASS",
+      "protected_art_separation": "PASS",
+      "source_faithful_placement": "PASS",
+      "flip_y_raw_consistency": "PASS",
+      "coverage": "PASS"
+    }
+  },
+  "decision": "C236_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME",
+  "pre_ingame_export": "PENDING_REFRESH_AFTER_QUEUE_PROMOTION",
+  "user_jpg_review": "PENDING_REFRESH_AND_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

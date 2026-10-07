@@ -2320,3 +2320,8 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - Controller/post-encode review PASS: SOURCE/C90-old/CLEAN/B231 full comparison, top-control practical 100%/75%/50% sheet and RAW mirror_y were reviewed. White lobby/status and gray/dark control families retain source upright direction, height hierarchy, low-contrast fill and source multiline relationships. No broken Hangul, clipping, English residue, overlap, protected intrusion or orientation regression is visible.
 - Decision `B231_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME`. Prior C90/USERPOLICY02 approval is superseded because bytes changed. Fresh independent C and then `C3_STRICT_PASS` tied to this exact candidate SHA are mandatory before PRE_INGAME export. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261007-B-MANUALQA231-AA04D779-COVERAGE/B231_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261007-B-MANUALQA231-AA04D779-COVERAGE/B231_AA04D779_REPORT.json`.
+
+## 2026-10-07 13:58 KST — C236 C2 q46 AA04D779 C3_STRICT_PASS
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN. Candidate d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0 fresh independent C + mandatory C3 PASS.
+- 13/13 new physical control rows containment/source-size/positive-margin PASS; zero blast radius, alpha blast, pair overlap and protected overlap. Existing 21 stage/sector localizations unchanged outside rework; coverage now 30 semantic segments plus explicit preserves.
+- PRE_INGAME English-original export refresh is pending; user JPG review and actual game validation remain. RUNTIME_VALIDATION=UNTESTED.

@@ -4142,5 +4142,26 @@
     "blast_radius": "PASS",
     "mandatory_c3": "REQUIRED_CURRENT_SHA_BEFORE_EXPORT",
     "runtime_validation": "UNTESTED"
+  },
+  "c236_c2_q046_aa04d779": {
+    "timestamp_kst": "2026-10-07T13:58:30+09:00",
+    "status": "C236_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME",
+    "queue_index": 46,
+    "asset": "AA04D779",
+    "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+    "candidate_sha256": "d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "fresh_c": "PASS",
+    "c3": "C3_STRICT_PASS",
+    "bbox_size_positive_margin": "13/13",
+    "blast_outside": 0,
+    "alpha_blast_outside": 0,
+    "pair_overlap": 0,
+    "protected_overlap": 0,
+    "coverage": "PASS_30_SEMANTIC_PLUS_EXPLICIT_PRESERVES",
+    "pre_ingame_export": "PENDING_REFRESH",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }

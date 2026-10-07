@@ -8120,5 +8120,26 @@
     "mandatory_c3": "REQUIRED_CURRENT_SHA_BEFORE_PRE_INGAME_EXPORT",
     "status": "B231_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c236_c2_q046_aa04d779": {
+    "timestamp_kst": "2026-10-07T13:58:30+09:00",
+    "run": "20261007-C236-C2-Q046-AA04D779-B231",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 46,
+    "asset": "AA04D779",
+    "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+    "prior_candidate_sha256": "93eb895d890bd0f41b4427346e3a7a2fe5538b4a1f4164991a480b424b1fc36e",
+    "candidate_sha256": "d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0",
+    "fresh_independent_c": "PASS",
+    "c3_strict_audit": "C3_STRICT_PASS",
+    "coverage": "PASS_30_SEMANTIC_PLUS_EXPLICIT_PRESERVES",
+    "machine_report": "localization/graphics/role_C/20261007-C236-C2-Q046-AA04D779-B231/C236_AA04D779_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261007-C236-C2-Q046-AA04D779-B231/C236_AA04D779_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_comparison_refresh": "PENDING_AFTER_C236_PROMOTION",
+    "user_jpg_review": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
