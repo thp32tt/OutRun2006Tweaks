@@ -223,10 +223,12 @@ namespace OutRunVRStereo
             if (!R13OverlayReady.load(std::memory_order_acquire))
                 return R13ResolveDirectHook.call<bool>(device, frameId);
 
-            if (!frameId || !EnsureDirectTransportResources(device) ||
-                !BackBuffer || !RightEyeSurface)
+            if (!frameId)
                 return false;
             if (R13DirectCopyPathRejected)
+                return false;
+            if (!EnsureDirectTransportResources(device) ||
+                !BackBuffer || !RightEyeSurface)
                 return false;
 
             const std::uint32_t preferred =
