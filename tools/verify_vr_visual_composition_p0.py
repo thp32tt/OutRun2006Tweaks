@@ -473,6 +473,26 @@ require('SceneEffectLensProducer_sub_40CAE0', analyzer, 'canonical lens producer
 require('0x0000CAE0', analyzer, 'lens producer start RVA')
 require('0x0000CABE', analyzer, 'lens DrawObjectAlpha anchor RVA')
 require('0x0000CF4E', analyzer, 'lens Calc3D2D anchor RVA')
+# Canonical byte closure for the NaviPub ScreenHud scaling-state hooks.
+# Bytes are taken from HUD Inspector artifact 11501098116 for canonical
+# OR2006C2C.EXE SHA-256 68ceb386... and must remain bound to the exact current
+# UIScaling mid-hook addresses.
+for contract_id, rva in (
+    ('VR-EXE-NAVIPUB-GOAL-SCALING-BEA64', '0x000BEA64'),
+    ('VR-EXE-NAVIPUB-RIVAL-DISABLE-BEB8E', '0x000BEB8E'),
+    ('VR-EXE-NAVIPUB-RIVAL-ENABLE-BEBAF', '0x000BEBAF'),
+    ('VR-EXE-NAVIPUB-HEART-DISABLE-BEBE1', '0x000BEBE1'),
+    ('VR-EXE-NAVIPUB-HEART-ENABLE-BEBE6', '0x000BEBE6'),
+    ('VR-EXE-NAVIPUB-RIVAL-ONLINE-DISABLE-BEC83', '0x000BEC83'),
+    ('VR-EXE-NAVIPUB-RIVAL-ONLINE-ENABLE-BEC88', '0x000BEC88'),
+    ('VR-EXE-NAVIPUB-C2C-HEART-ENABLE-BECBA', '0x000BECBA'),
+    ('VR-EXE-NAVIPUB-C2C-HEART-ENABLE2-BECE0', '0x000BECE0'),
+):
+    require(contract_id, binary_contract,
+            'canonical NaviPub ScreenHud scaling-state contract')
+    require(rva, binary_contract,
+            'canonical NaviPub ScreenHud scaling-state RVA')
+
 # NaviPub goal/rival/heart/nav HUD producer window. These screen-HUD
 # state-transition anchors are part of the original UIScaling map but did not
 # previously have a durable canonical disassembly window in the HUD Inspector.

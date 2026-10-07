@@ -1191,6 +1191,132 @@
           "needle": "0x46410"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-NAVIPUB-GOAL-SCALING-BEA64",
+      "rva": "0x000BEA64",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "b801000000c333c0",
+      "purpose": "Canonical NaviPub TimeAttack goal ScreenHud scaling-disable mid-hook anchor from the pinned 0xBEA40 HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BEA64"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-NAVIPUB-RIVAL-DISABLE-BEB8E",
+      "rva": "0x000BEB8E",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "a114fb800085c074",
+      "purpose": "Canonical NaviPub rival HUD scaling-disable mid-hook anchor from the pinned 0xBEA40 HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BEB8E"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-NAVIPUB-RIVAL-ENABLE-BEBAF",
+      "rva": "0x000BEBAF",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8dcccffffe90402",
+      "purpose": "Canonical NaviPub rival HUD scaling-enable mid-hook anchor from the pinned 0xBEA40 HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BEBAF"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-NAVIPUB-HEART-DISABLE-BEBE1",
+      "rva": "0x000BEBE1",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8ea40faffe815ed",
+      "purpose": "Canonical NaviPub heart-total HUD scaling-disable mid-hook anchor from the pinned 0xBEA40 HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BEBE1"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-NAVIPUB-HEART-ENABLE-BEBE6",
+      "rva": "0x000BEBE6",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e815edffffe9cd01",
+      "purpose": "Canonical NaviPub heart-total HUD scaling-enable mid-hook anchor from the pinned 0xBEA40 HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BEBE6"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-NAVIPUB-RIVAL-ONLINE-DISABLE-BEC83",
+      "rva": "0x000BEC83",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e878c6ffff56e852",
+      "purpose": "Canonical NaviPub online rival HUD scaling-disable mid-hook anchor from the pinned 0xBEA40 HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BEC83"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-NAVIPUB-RIVAL-ONLINE-ENABLE-BEC88",
+      "rva": "0x000BEC88",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "56e852adffff83c4",
+      "purpose": "Canonical NaviPub online rival HUD scaling-enable mid-hook anchor from the pinned 0xBEA40 HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BEC88"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-NAVIPUB-C2C-HEART-ENABLE-BECBA",
+      "rva": "0x000BECBA",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e841d8faff85c074",
+      "purpose": "Canonical NaviPub C2C heart HUD scaling-enable mid-hook anchor from the pinned 0xBEA40 HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BECBA"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-NAVIPUB-C2C-HEART-ENABLE2-BECE0",
+      "rva": "0x000BECE0",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e90b01000083fb10",
+      "purpose": "Canonical NaviPub C2C heart HUD second scaling-enable mid-hook anchor from the pinned 0xBEA40 HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BECE0"
+        }
+      ]
     }
   ]
 }
