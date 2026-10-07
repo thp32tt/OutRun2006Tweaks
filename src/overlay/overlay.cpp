@@ -159,8 +159,12 @@ void Overlay::rebuild_fonts()
 		{
 			const std::filesystem::path fontsDir = std::filesystem::path(windowsDir) / "Fonts";
 			const std::filesystem::path candidates[] = {
-				fontsDir / "malgun.ttf",
+				// In-game review 2026-10-07: the regular Malgun face reads
+				// visibly heavier/rougher than the stock high-resolution menu
+				// typography. Prefer Semilight for Korean UI text, while retaining
+				// regular Malgun and the legacy fallbacks for systems without it.
 				fontsDir / "malgunsl.ttf",
+				fontsDir / "malgun.ttf",
 				fontsDir / "gulim.ttc",
 				fontsDir / "batang.ttc",
 				fontsDir / "segoeui.ttf"
