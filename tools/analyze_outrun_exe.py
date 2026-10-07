@@ -53,7 +53,8 @@ PRODUCER_WINDOWS = (
         "end_rva": 0x000BEA40,
         "anchors": (
             0x000BDAE8, 0x000BDE3A,
-            0x000BE4BC, 0x000BE4E7,
+            0x000BE045, 0x000BE067, 0x000BE083, 0x000BE0A5,
+            0x000BE4BC, 0x000BE4C1, 0x000BE4E7, 0x000BE575,
         ),
     },
     {

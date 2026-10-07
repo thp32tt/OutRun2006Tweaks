@@ -493,14 +493,20 @@ for contract_id, rva in (
     require(rva, binary_contract,
             'canonical NaviPub ScreenHud scaling-state RVA')
 
-# Canonical byte closure for the four active Ghost/TimeAttack ScreenHud
-# spacing-state hooks. Bytes come from HUD Inspector artifact 11502720199
-# against the pinned canonical OR2006C2C.EXE.
+# Canonical byte closure for the ten active Ghost/TimeAttack ScreenHud
+# spacing-state hooks. The original four anchors plus the remaining six are
+# recovered from the pinned GhostTimeAttackHud window in HUD Inspector evidence.
 for contract_id, rva in (
     ('VR-EXE-GHOST-SUB-ADJUST-BDAE8', '0x000BDAE8'),
     ('VR-EXE-GHOST-ADJUST-BDE3A', '0x000BDE3A'),
+    ('VR-EXE-GHOST-FORCE-LEFT-BE045', '0x000BE045'),
+    ('VR-EXE-GHOST-FORCE-RIGHT2-BE067', '0x000BE067'),
+    ('VR-EXE-GHOST-FORCE-LEFT2-BE083', '0x000BE083'),
+    ('VR-EXE-GHOST-FORCE-RIGHT-BE0A5', '0x000BE0A5'),
     ('VR-EXE-TIMEATTACK-FORCE-RIGHT-BE4BC', '0x000BE4BC'),
+    ('VR-EXE-TIMEATTACK-DISABLE-BE4C1', '0x000BE4C1'),
     ('VR-EXE-TIMEATTACK-FORCE-LEFT-BE4E7', '0x000BE4E7'),
+    ('VR-EXE-TIMEATTACK-FORCE-ENABLE-BE575', '0x000BE575'),
 ):
     require(contract_id, binary_contract,
             'canonical Ghost/TimeAttack ScreenHud spacing contract')
@@ -516,7 +522,8 @@ require('0x000BD900', analyzer, 'Ghost/TimeAttack producer start RVA')
 require('0x000BEA40', analyzer, 'Ghost/TimeAttack producer end RVA')
 for token in (
     '0x000BDAE8', '0x000BDE3A',
-    '0x000BE4BC', '0x000BE4E7',
+    '0x000BE045', '0x000BE067', '0x000BE083', '0x000BE0A5',
+    '0x000BE4BC', '0x000BE4C1', '0x000BE4E7', '0x000BE575',
 ):
     require(token, analyzer, 'Ghost/TimeAttack canonical anchor RVA')
 

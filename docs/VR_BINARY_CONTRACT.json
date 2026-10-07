@@ -1373,6 +1373,90 @@
           "needle": "0x4BE4E7"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-GHOST-FORCE-LEFT-BE045",
+      "rva": "0x000BE045",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e866fdffffa0a648",
+      "purpose": "Canonical Ghost/You/Diff ScreenHud force-left spacing mid-hook anchor from the pinned Ghost/TimeAttack HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BE045"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GHOST-FORCE-RIGHT2-BE067",
+      "rva": "0x000BE067",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e844fdffff83c408",
+      "purpose": "Canonical Ghost/You/Diff ScreenHud second force-right spacing mid-hook anchor from the pinned Ghost/TimeAttack HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BE067"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GHOST-FORCE-LEFT2-BE083",
+      "rva": "0x000BE083",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e828fdffffa09448",
+      "purpose": "Canonical Ghost/You/Diff ScreenHud second force-left spacing mid-hook anchor from the pinned Ghost/TimeAttack HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BE083"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GHOST-FORCE-RIGHT-BE0A5",
+      "rva": "0x000BE0A5",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e806fdffff83c408",
+      "purpose": "Canonical Ghost/You/Diff ScreenHud force-right spacing mid-hook anchor from the pinned Ghost/TimeAttack HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BE0A5"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-DISABLE-BE4C1",
+      "rva": "0x000BE4C1",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "a0a648840084c074",
+      "purpose": "Canonical TimeAttack ScreenHud spacing-disable mid-hook anchor from the pinned Ghost/TimeAttack HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BE4C1"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-TIMEATTACK-FORCE-ENABLE-BE575",
+      "rva": "0x000BE575",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8c6e3f8ff8bd883",
+      "purpose": "Canonical TimeAttack ScreenHud force-enable spacing mid-hook anchor from the pinned Ghost/TimeAttack HUD producer window.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x4BE575"
+        }
+      ]
     }
   ]
 }
