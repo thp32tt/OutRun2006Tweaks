@@ -1,0 +1,232 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261008-B241-Q212-CONDENSED-SOURCE-ANCHORS",
+  "queue_index": 212,
+  "asset": "BA0147DA",
+  "trigger": "C256_VISUAL_FAIL_SOURCE_TITLE_GLYPH_PROPORTION",
+  "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+  "prior_candidate_sha256": "3266d0740f9fc5b8d1b0771e2313fe3364e485da06bc5ad578f94999082315c4",
+  "candidate_sha256": "dbebe0684070f75fdae7bc494534a58be1bc5ebceada9418f30604a5307a644f",
+  "rows": [
+    {
+      "key": "coast2coast_title",
+      "source_text": "COAST 2 COAST",
+      "text": "코스트 2 코스트",
+      "source_bbox": [
+        0,
+        964,
+        1760,
+        1124
+      ],
+      "localized_bbox": [
+        131,
+        966,
+        1304,
+        1120
+      ],
+      "source_size": [
+        1760,
+        160
+      ],
+      "localized_size": [
+        1173,
+        154
+      ],
+      "delta_left": 131,
+      "delta_right": 456,
+      "delta_top": 2,
+      "delta_bottom": 4,
+      "width_ratio": 0.6665,
+      "height_ratio": 0.9625,
+      "source_word_groups_x": [
+        [
+          7,
+          565
+        ],
+        [
+          662,
+          755
+        ],
+        [
+          870,
+          1428
+        ]
+      ],
+      "source_run_count": 11,
+      "source_largest_word_gaps": [
+        [
+          115,
+          5
+        ],
+        [
+          97,
+          4
+        ]
+      ],
+      "words": [
+        {
+          "word": "코스트",
+          "mode": "NATIVE_BOLD_CONDENSED",
+          "source_group_x": [
+            7,
+            565
+          ],
+          "placed_bbox": [
+            131,
+            971,
+            441,
+            1117
+          ],
+          "hscale": 0.62,
+          "target_h": 146,
+          "stroke": 2
+        },
+        {
+          "word": "2",
+          "mode": "PRESERVE_CANONICAL_SOURCE_TOKEN",
+          "source_group_x": [
+            662,
+            755
+          ],
+          "placed_x": [
+            656,
+            761
+          ]
+        },
+        {
+          "word": "코스트",
+          "mode": "NATIVE_BOLD_CONDENSED",
+          "source_group_x": [
+            870,
+            1428
+          ],
+          "placed_bbox": [
+            994,
+            971,
+            1304,
+            1117
+          ],
+          "hscale": 0.62,
+          "target_h": 146,
+          "stroke": 2
+        }
+      ],
+      "font": "Noto Sans CJK KR:style=Bold",
+      "construction": "source-word-anchor reconstruction; Korean glyphs horizontally condensed to 0.62 at native height; unchanged numeral 2 preserved from canonical source; no per-syllable spacing hack"
+    },
+    {
+      "key": "heart_attack_title",
+      "source_text": "HEART ATTACK",
+      "text": "하트 어택",
+      "source_bbox": [
+        21,
+        1316,
+        1780,
+        1474
+      ],
+      "localized_bbox": [
+        224,
+        1322,
+        1059,
+        1468
+      ],
+      "source_size": [
+        1759,
+        158
+      ],
+      "localized_size": [
+        835,
+        146
+      ],
+      "delta_left": 203,
+      "delta_right": 721,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "width_ratio": 0.4747,
+      "height_ratio": 0.9241,
+      "source_word_groups_x": [
+        [
+          21,
+          597
+        ],
+        [
+          645,
+          1311
+        ]
+      ],
+      "source_run_count": 9,
+      "source_largest_word_gaps": [
+        [
+          48,
+          4
+        ]
+      ],
+      "words": [
+        {
+          "word": "하트",
+          "mode": "NATIVE_BOLD_CONDENSED",
+          "source_group_x": [
+            21,
+            597
+          ],
+          "placed_bbox": [
+            224,
+            1322,
+            393,
+            1468
+          ],
+          "hscale": 0.62,
+          "target_h": 146,
+          "stroke": 2
+        },
+        {
+          "word": "어택",
+          "mode": "NATIVE_BOLD_CONDENSED",
+          "source_group_x": [
+            645,
+            1311
+          ],
+          "placed_bbox": [
+            896,
+            1322,
+            1059,
+            1468
+          ],
+          "hscale": 0.62,
+          "target_h": 146,
+          "stroke": 2
+        }
+      ],
+      "font": "Noto Sans CJK KR:style=Bold",
+      "construction": "source-word-anchor reconstruction; Korean glyphs horizontally condensed to 0.62 at native height; unchanged numeral 2 preserved from canonical source; no per-syllable spacing hack"
+    }
+  ],
+  "machine_qa": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "localized_pair_overlap_pixels": 0,
+    "protected_overlap_pixels": 0,
+    "header_128_exact": true,
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_REUSE_B85_VERIFIED_CLEAN_PLATE",
+    "2_source_matching_slant": "PASS_SOURCE_TITLE_UPRIGHT",
+    "3_no_undersized_lettering": "PASS_NATIVE_146PX_HEIGHT_WITH_SOURCE_WORD_ANCHORS",
+    "4_source_faithful_weight_effect": "PASS_BOLD_CONDENSED_NO_EXCESSIVE_A170_REINFORCEMENT",
+    "5_no_clipped_pixels": "PASS_POSITIVE_FULL_TITLE_MARGIN",
+    "6_protected_art_clearance": "PASS_ZERO_PROTECTED_OVERLAP",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER_CONFIRM",
+    "8_immediate_readability": "EVIDENCE_WRITTEN_PENDING_CONTROLLER_CONFIRM"
+  },
+  "c256_correction": "A170 1.15 horizontal expansion removed. B241 uses 0.62 horizontal glyph aspect and source-derived English word anchors; canonical numeral 2 is preserved pixel-faithfully instead of redrawn.",
+  "execution_backend": "GITHUB_HOSTED_CPU_WORKER_REQUIRED_FOR_REPOSITORY_BACKED_DDS",
+  "controller_visual_qa": "PENDING_CHATGPT_CONTROLLER",
+  "status": "B241_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

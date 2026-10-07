@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "20261008-B241-Q212-CONDENSED-SOURCE-ANCHORS",
+  "queue_index": 212,
+  "asset": "BA0147DA",
+  "candidate_sha256": "dbebe0684070f75fdae7bc494534a58be1bc5ebceada9418f30604a5307a644f",
+  "report": "localization/graphics/role_B/20261008-B241-Q212-CONDENSED-SOURCE-ANCHORS/B241_Q212_REPORT.json",
+  "status": "B241_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED"
+}
