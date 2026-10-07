@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# C258 C2 independent static QA batch for q198/q226/q228 (visible-pixel correction).
+# C258 C2 independent static QA batch for q198/q226/q228 (visible-pixel + mirror-Y correction).
 # TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN
 import os, json, hashlib, struct, tempfile, urllib.request
 import numpy as np
@@ -73,10 +73,15 @@ def bbox(m):
     if not len(xs): return None
     return [int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
 
+def render_rgba(a, bg=(112,112,112,255)):
+    fg=Image.fromarray(a,"RGBA")
+    base=Image.new("RGBA",fg.size,bg)
+    return Image.alpha_composite(base,fg).convert("RGB")
+
 def full_sheet(src,cand,key):
     cards=[]
     for title,a,b in [("RAW",src,cand),("FLIP-Y",src[::-1],cand[::-1])]:
-        ia=Image.fromarray(a,"RGBA").convert("RGB"); ib=Image.fromarray(b,"RGBA").convert("RGB")
+        ia=render_rgba(a); ib=render_rgba(b)
         scale=min(1.0,900/max(ia.width,ib.width))
         if scale<1:
             size=(max(1,int(ia.width*scale)),max(1,int(ia.height*scale)))
@@ -94,8 +99,8 @@ def contacts(src,cand,rows,key):
     for name,b in rows:
         x0,y0,x1,y1=b; p=12
         xx0=max(0,x0-p); yy0=max(0,y0-p); xx1=min(src.shape[1],x1+p); yy1=min(src.shape[0],y1+p)
-        ia=Image.fromarray(src[yy0:yy1,xx0:xx1],"RGBA").convert("RGB")
-        ib=Image.fromarray(cand[yy0:yy1,xx0:xx1],"RGBA").convert("RGB")
+        ia=render_rgba(src[yy0:yy1,xx0:xx1])
+        ib=render_rgba(cand[yy0:yy1,xx0:xx1])
         scale=min(3.0,1100/max(1,ia.width+ib.width))
         if scale>1:
             ia=ia.resize((int(ia.width*scale),int(ia.height*scale)),Image.Resampling.NEAREST)
@@ -122,10 +127,10 @@ with tempfile.TemporaryDirectory() as td:
         outside=~allowed
         raw_mismatch=int(np.any(src!=clean,axis=2)[outside].sum())
         flip_mismatch=int(np.any(src[::-1]!=clean,axis=2)[outside].sum())
-        if flip_mismatch < raw_mismatch:
-            review_orientation="FLIP_Y"; S=src[::-1]; C=cand[::-1]
-        else:
-            review_orientation="RAW"; S=src; C=cand
+        # ORIENTATION_POLICY: these spr_sprani_sumo_fe_cvt_Exst DDS atlases are persisted mirror-Y.
+        # The exact source bboxes / clean plates from C143/C144/C150 are in readable coordinates.
+        # Outside-only auto detection is ambiguous because both orientations can be identical there.
+        review_orientation="FLIP_Y"; S=src[::-1]; C=cand[::-1]
         # Visible-pixel comparison: DDS may retain arbitrary hidden RGB where alpha==0.
         # Hidden RGB is not rendered and must not inflate the localized bbox or residue checks.
         adiff=C[:,:,3]!=clean[:,:,3]
