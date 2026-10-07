@@ -65,17 +65,18 @@
     "persisted_decode": "PASS"
   },
   "ordered_generation_gate": {
-    "1_plate_restoration": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "1_plate_restoration": "PASS_CONTROLLER_VISUAL",
     "2_slant_direction": "PASS_RIGHT_0.30",
     "3_no_undersizing": "PASS_NEAR_90_PERCENT_SOURCE_WIDTH",
     "4_source_faithful_weight_effect": "PASS_WHITE_NAVY",
     "5_no_clipping": "PASS_POSITIVE_MARGIN",
     "6_protected_clearance": "PASS_ZERO_BLAST_OUTSIDE_SOURCE_BOXES",
     "7_flip_y_raw": "EVIDENCE_WRITTEN",
-    "8_immediate_readability": "PENDING_CONTROLLER"
+    "8_immediate_readability": "PASS_CONTROLLER_SOURCE_OLD_CLEAN_FINAL"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER",
-  "status": "B236_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "controller_visual_qa": "PASS",
+  "status": "B236_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "forbidden_domains_touched": []
+  "forbidden_domains_touched": [],
+  "controller_qa_report": "localization/graphics/role_B/20261007-B236-BATCH-Q032-Q034-Q036-TOTAL-RANK/B236_CONTROLLER_SELF_QA.json"
 }
