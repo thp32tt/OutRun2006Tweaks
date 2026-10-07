@@ -182,14 +182,12 @@ report={
  "status":"B239_WORKER_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA_AND_FRESH_C",
  "runtime_validation":"UNTESTED","forbidden_domains_touched":[]
 }
-(out/"B239_Q052_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"
-",encoding="utf-8")
+(out/"B239_Q052_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+chr(10),encoding="utf-8")
 (wr/"B239_Q052_A8CE339F.json").write_text(json.dumps({
  "role":"B","run":RUN,"queue_index":52,"candidate_sha256":FINAL_SHA,
  "report":str((out/"B239_Q052_MACHINE_QA.json").relative_to(repo)),
  "status":report["status"],"runtime_validation":"UNTESTED"
-},ensure_ascii=False,indent=2)+"
-",encoding="utf-8")
+},ensure_ascii=False,indent=2)+chr(10),encoding="utf-8")
 print(json.dumps({"run":RUN,"prior":PRIOR_SHA,"candidate":FINAL_SHA,
  "left_prior":left_prior,"right_prior":right_prior,"left_final":left_final,"right_final":right_final,
  "duplicate_sizes":{"left":ls,"right":rs},"margins":margins,"outside":outside,"alpha_out":alpha_out,
