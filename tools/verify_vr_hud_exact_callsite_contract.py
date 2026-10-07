@@ -141,12 +141,17 @@ def check(ui, manifest):
                 "RenderScope::ProjectedWorldMarker2D", "RenderScope::WorldBillboard")
         if "ProducerToken::" + token not in chunk or "RegisterSpriteNodeScope(" not in chunk:
             fail(func + " marker registration missing")
+    # Rival's actual producer uses a bounded multi-node tagging helper,
+    # unlike the single-node rank wrappers. Guard this real ownership path.
     rival = function_body(ui, "static int __cdecl RivalMarker_sprani(")
     for token in ("RivalMarkerProjectedInfo.valid", "RenderScope::ProjectedWorldMarker2D",
                   "RenderScope::WorldBillboard", "ProducerToken::RivalMarkerSprani",
-                  "RegisterSpriteNodeScope("):
+                  "TagAppendedNodes("):
         if token not in rival:
             fail("rival world marker lost " + token)
+    tag_nodes = function_body(ui, "static void TagAppendedNodes(")
+    ordered(tag_nodes, "rival multi-node producer tagging",
+            "tailAfter", "node = before[prio]", "RegisterSpriteNodeScope(")
     return len(owned)
 
 
