@@ -141,6 +141,12 @@ namespace Settings
         "How strongly real chassis/front-slip signals release damping and unload SAT. Lateral G is load only, never a drift detector.", Range<float>{ 0.0f, 1.0f }
     };
 
+    Setting<float> WheelFFBCountersteerStrength{
+        "WheelFFB", "CountersteerStrength", 0.90f,
+        "Developed-drift body-slip countersteer target strength. 0 disables the drift-only recovery target; 1.00 matches the R14 reference. Normal-corner SAT is unchanged.",
+        Range<float>{ 0.0f, 1.50f }
+    };
+
     Setting<float> WheelFFBLateralDeadzone{
         "WheelFFB", "LateralDeadzone", 1.5f,
         "Subtractive noise floor for the game's lateral-G/load signal.", Range<float>{ 0.0f, 8.0f }
@@ -1357,11 +1363,13 @@ namespace
                 {
                     const float driftCountersteerShape =
                         WheelFFBMath::drift_countersteer_shape(bodySlip);
+                    const float countersteerStrength = std::clamp(
+                        static_cast<float>(Settings::WheelFFBCountersteerStrength),
+                        0.0f, 1.50f);
                     const float driftCountersteerTorque =
                         (bodySlip > 0.0f ? -1.0f : 1.0f) *
                         driftCountersteerShape * satSpeed * physicsLoad *
-                        rearSlideRelief * satStrength *
-                        WheelFFBMath::DriftCountersteerTorqueScale;
+                        rearSlideRelief * satStrength * countersteerStrength;
                     physicsSatTorque +=
                         (driftCountersteerTorque - physicsSatTorque) *
                         driftCountersteerBlend;
