@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "20261008-B244-Q062-PSD-L43-CLEAN",
+  "queue_index": 62,
+  "asset": "33491F83",
+  "candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
+  "report": "localization/graphics/role_B/20261008-B244-Q062-PSD-L43-CLEAN/B244_Q062_REPORT.json",
+  "status": "B244_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED"
+}

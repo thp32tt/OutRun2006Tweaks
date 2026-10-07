@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "20261008-B244-Q062-PSD-L43-CLEAN",
+  "queue_index": 62,
+  "asset": "33491F83",
+  "trigger": "C259_REWORK_REQUIRED_CLEAN_PLATE_WHITE_OVAL_PATCHES",
+  "source_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+  "prior_candidate_sha256": "58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2",
+  "candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
+  "repair_basis": {
+    "rejected": "A132 Layer43+Group16 produced visible white rounded EASY/HARD plate patches",
+    "replacement": "PSD-authored Layer43 clean road/background only inside exact EASY/HARD source-effect bboxes",
+    "lettering": "fresh native rerender using exact A132 family/style parameters: Noto Sans CJK KR Black 73px, white outer 7px, navy inner 5px, source colors and A132 anchors"
+  },
+  "rows": [
+    {
+      "key": "easy_main",
+      "source_bbox": [
+        142,
+        285,
+        385,
+        375
+      ],
+      "localized_bbox": [
+        186,
+        287,
+        329,
+        371
+      ],
+      "a132_expected_bbox": [
+        186,
+        287,
+        329,
+        371
+      ],
+      "source_size": [
+        243,
+        90
+      ],
+      "localized_size": [
+        143,
+        84
+      ],
+      "delta_left": 44,
+      "delta_right": 56,
+      "delta_top": 2,
+      "delta_bottom": 4,
+      "font": "Noto Sans CJK KR Black",
+      "font_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc",
+      "font_size": 73,
+      "outer_stroke_px": 7,
+      "navy_stroke_px": 5,
+      "a132_clean_to_layer43_patch_pixels": 14496,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "background_mismatch_vs_layer43_outside_glyph": 0
+    },
+    {
+      "key": "hard_main",
+      "source_bbox": [
+        808,
+        287,
+        1068,
+        373
+      ],
+      "localized_bbox": [
+        829,
+        288,
+        1039,
+        372
+      ],
+      "a132_expected_bbox": [
+        829,
+        288,
+        1039,
+        372
+      ],
+      "source_size": [
+        260,
+        86
+      ],
+      "localized_size": [
+        210,
+        84
+      ],
+      "delta_left": 21,
+      "delta_right": 29,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "font": "Noto Sans CJK KR Black",
+      "font_path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc",
+      "font_size": 73,
+      "outer_stroke_px": 7,
+      "navy_stroke_px": 5,
+      "a132_clean_to_layer43_patch_pixels": 6023,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "background_mismatch_vs_layer43_outside_glyph": 0
+    }
+  ],
+  "machine_qa": {
+    "target_rows": "2/2 PASS",
+    "changed_pixels_vs_a132": 7788,
+    "changed_outside_target_bboxes": 0,
+    "alpha_changed_outside_target_bboxes": 0,
+    "background_mismatch_vs_authored_layer43_outside_glyph": 0,
+    "non_target_atlas_pixel_exact": true,
+    "header_128_exact": true,
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_AUTHORED_PSD_LAYER43_CONTINUOUS_ROAD_NO_WHITE_PATCH",
+    "2_source_matching_slant": "PASS_UPRIGHT_MAIN_LABEL_FAMILY",
+    "3_no_undersized_lettering": "PASS_A132_73PX_NATIVE_FAMILY",
+    "4_source_faithful_weight_effect": "PASS_A132_BLACK_WHITE_NAVY_STROKE_FAMILY",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGIN",
+    "6_protected_art_clearance": "PASS_NON_TARGET_ATLAS_PIXEL_EXACT",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "8_immediate_readability": "EVIDENCE_WRITTEN_PENDING_CONTROLLER"
+  },
+  "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
+  "fallback_reason": "GitHub-hosted B244 run 37667995926 stayed queued behind unrelated C260 PRE_INGAME exporter for >15 minutes. Exact q62 input SHA 58fe9ed9... and authored A132/A124 evidence hashes were verified before fallback.",
+  "controller_visual_qa": "PENDING_CHATGPT_CONTROLLER",
+  "status": "B244_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
