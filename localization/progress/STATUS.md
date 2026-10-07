@@ -2357,3 +2357,8 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - Controller SOURCE/OLD/CLEAN/FINAL, RAW mirror_y and practical 100/75/50 review PASS: no English/source residue, broken Hangul, clipping, overlap, plate/border damage, opposite slant, protected intrusion or readability regression.
 - Decision `B232R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME`. Prior C103 approval/PRE_INGAME artifact is superseded because bytes changed. Fresh C + exact-SHA C3 + regenerated English-original JPG/user review + actual-game validation are mandatory. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261007-B232-Q107-841E796B-SEMANTIC/B232_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261007-B232-Q107-841E796B-SEMANTIC/B232_841E_REPORT.json`.
+
+## 2026-10-07 15:04 KST — C238 C2 q106 788CE557 C3_STRICT_PASS
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN; P0 IGR-017. Exact candidate a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482 fresh C + mandatory C3 PASS.
+- 5/5 bbox/source-size/positive-margin PASS; clean/final/alpha scope checks zero outside policy regions; pair/protected overlap=0; controller source-style/slant/glyph/RAW/practical-scale visual PASS.
+- PRE_INGAME refresh + user JPG + NEW actual-game retest pending; RUNTIME_VALIDATION=UNTESTED.

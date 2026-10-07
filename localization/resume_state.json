@@ -8240,5 +8240,32 @@
     "status": "B232R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
     "next": "fresh independent C -> exact-SHA C3 -> regenerated PRE_INGAME English-original comparison -> user JPG -> actual-game retest",
     "runtime_validation": "UNTESTED"
+  },
+  "c238_c2_q106_788ce557": {
+    "timestamp_kst": "2026-10-07T15:04:17+09:00",
+    "run": "20261007-C238-C2-Q106-788CE557-B202",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "queue_index": 106,
+    "asset": "788CE557",
+    "source_sha256": "4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b",
+    "candidate_sha256": "a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482",
+    "user_ingame_regression": "IGR-017",
+    "fresh_independent_c": "PASS",
+    "c3_strict_audit": "C3_STRICT_PASS",
+    "bbox_size_positive_margin": "5/5",
+    "clean_changed_outside_source_pixel_masks": 0,
+    "final_changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "pair_overlap": 0,
+    "protected_overlap": 0,
+    "machine_report": "localization/graphics/role_C/20261007-C238-C2-Q106-788CE557-B202/C238_788CE557_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261007-C238-C2-Q106-788CE557-B202/C238_788CE557_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_comparison_refresh": "PENDING_AFTER_C238_PROMOTION",
+    "user_jpg_review": "PENDING",
+    "actual_ingame_retest": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

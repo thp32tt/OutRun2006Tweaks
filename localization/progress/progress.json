@@ -4272,5 +4272,28 @@
     "report": "localization/graphics/role_B/20261007-B232-Q107-841E796B-SEMANTIC/B232_841E_REPORT.json",
     "controller_qa": "localization/graphics/role_B/20261007-B232-Q107-841E796B-SEMANTIC/B232_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
+  },
+  "c238_c2_q106_788ce557": {
+    "timestamp_kst": "2026-10-07T15:04:17+09:00",
+    "status": "C238_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME_RETEST",
+    "queue_index": 106,
+    "asset": "788CE557",
+    "source_sha256": "4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b",
+    "candidate_sha256": "a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "fresh_c": "PASS",
+    "c3": "C3_STRICT_PASS",
+    "bbox_size_positive_margin": "5/5",
+    "clean_changed_outside_source_pixel_masks": 0,
+    "final_changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "pair_overlap": 0,
+    "protected_overlap": 0,
+    "pre_ingame_export": "PENDING_REFRESH",
+    "user_jpg_review": "PENDING",
+    "actual_ingame_retest": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }

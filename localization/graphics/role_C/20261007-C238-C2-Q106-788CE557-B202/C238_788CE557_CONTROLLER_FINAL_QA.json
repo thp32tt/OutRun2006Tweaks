@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C238-C2-Q106-788CE557-B202",
+  "timestamp_kst": "2026-10-07T15:04:17+09:00",
+  "queue_index": 106,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+  "producer_run": "B202",
+  "priority": "P0",
+  "user_ingame_regression": "IGR-017",
+  "source_sha256": "4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b",
+  "candidate_sha256": "a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482",
+  "machine_report": "localization/graphics/role_C/20261007-C238-C2-Q106-788CE557-B202/C238_788CE557_MACHINE_QA.json",
+  "independent_machine_status": "PASS",
+  "controller_visual_review": {
+    "source_clean_final": "PASS",
+    "row_contacts": "PASS",
+    "raw_source_final": "PASS_MIRROR_Y_CONSISTENT",
+    "practical_scale_100_75_50": "PASS",
+    "coverage": "PASS_5_LOCALIZED_SEMANTIC_ROWS_PLUS_EXPLICIT_PROTECTED_ART",
+    "clean_plate": "PASS_NO_VISIBLE_ENGLISH_RESIDUE_SEAM_PATCH_OR_GHOST",
+    "slant_perspective": "PASS_SOURCE_MATCHING_READABLE_RIGHT_LEAN_ON_ITALIC_ROWS",
+    "source_style": "PASS_RED_WHITE_NAVY_BLACK_WHITE_SHADOW_FAMILIES_RETAINED",
+    "scale_readability": "PASS_NEAR_SOURCE_HEIGHT_NATURAL_HANGUL_WIDTH",
+    "glyph_integrity": "PASS_NO_BROKEN_CLIPPED_OR_MALFORMED_HANGUL",
+    "protected_separation": "PASS_OUTRUN2SP_ICONS_VEHICLES_WHEELS_NUMBERS_UNTOUCHED",
+    "placement": "PASS_SOURCE_RELATIVE_ALIGNMENT_AND_POSITIVE_MARGINS",
+    "observations": [
+      "For Experts -> 상급자용 retains the red-face outlined selector family and source-matching readable right lean without touching protected OutRun2SP artwork.",
+      "Both Transmission variants use natural short Hangul width while retaining near-source height; the large unused horizontal source width is not an undersizing defect.",
+      "Music Change -> 음악 변경 and Time remaining : -> 남은 시간: remain immediately readable at 100/75/50 practical scales with source-family contrast/effects.",
+      "RAW source/current share the same mirror-Y atlas transform; readable FLIP-Y source/current are both semantically correct."
+    ]
+  },
+  "fresh_independent_c": "PASS",
+  "c3_strict_audit": {
+    "required": true,
+    "result": "C3_STRICT_PASS",
+    "candidate_sha256": "a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482",
+    "reason": [
+      "USER_INGAME_FAIL_IGR_017",
+      "PRIOR_BAD_SLANT",
+      "MULTI_STYLE_SELECTOR_ATLAS",
+      "TIGHT_PROTECTED_OUTRUN2SP_AND_ICONS"
+    ],
+    "visual_priorities": {
+      "slant_perspective": "PASS",
+      "clean_plate_source_removal": "PASS",
+      "font_style_fidelity": "PASS",
+      "scale_readability": "PASS",
+      "glyph_integrity": "PASS",
+      "protected_art_separation": "PASS",
+      "source_faithful_placement": "PASS",
+      "flip_y_raw_consistency": "PASS",
+      "coverage": "PASS"
+    }
+  },
+  "verifier_retry_history": {
+    "37578592021": "FAIL_C_VERIFIER_FALSE_POSITIVE_SPARSE_GLYPH_MASK_USED_AS_FINAL_PLACEMENT_SCOPE_NO_STATE_CHANGE",
+    "37578864259": "FAIL_EVIDENCE_RENDER_HELPER_RGB_RGBA_MISMATCH_NO_STATE_CHANGE",
+    "37579183740": "SUCCESS_FINAL_MACHINE_EVIDENCE"
+  },
+  "decision": "C238_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_NEW_INGAME_RETEST",
+  "pre_ingame_export": "PENDING_REFRESH",
+  "user_jpg_review": "PENDING_REFRESH_AND_REVIEW",
+  "actual_ingame_retest": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
