@@ -10165,6 +10165,8 @@ def main() -> None:
          CONSTANT_BUFFER_PROBE, "R257/R297 indexed range payload-tamper regression"),
         ("R257 non-indexed candidate seals dormant pre-activation review without draw authorization",
          CONSTANT_BUFFER_PROBE, "R257 non-indexed positive dormant review regression"),
+        ("R298 rejects non-indexed source-start drift hidden behind an unchanged R256 snapshot token",
+         CONSTANT_BUFFER_PROBE, "R298 non-indexed payload-tamper regression"),
         ("R257 rejects non-indexed R256 branch-tag mismatch",
          CONSTANT_BUFFER_PROBE, "R257 branch-tag mismatch regression"),
     ]
