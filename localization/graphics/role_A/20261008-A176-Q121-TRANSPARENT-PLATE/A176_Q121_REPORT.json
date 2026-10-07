@@ -154,10 +154,12 @@
     "persisted_decode": "PASS",
     "raw_orientation": "mirror_y"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_A138_CLEAN_A176_HEADER_FAMILY_AND_RAW",
   "fresh_independent_c": "REQUIRED",
   "mandatory_c3": "REQUIRED_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "status": "A176_Q121_MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
-  "forbidden_domains_touched": []
+  "status": "A176_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
+  "forbidden_domains_touched": [],
+  "controller_visual_note": "PASS. C255 black English silhouettes are absent after alpha-aware transparent cleanup. The clean view has no opaque/gray rectangle or donor seam; final Korean retains the accepted shared 108px right-lean family, positive separation and intact neighboring artwork in readable and RAW views.",
+  "next": "fresh independent C1 -> exact-SHA C3 -> PRE_INGAME English-original JPG/user review -> NEW actual-game retest"
 }
