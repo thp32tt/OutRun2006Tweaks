@@ -19,7 +19,7 @@
   },
   "changed_pixels_outside_allowed_bboxes": 0,
   "alpha_changed_pixels_outside_allowed_bboxes": 0,
-  "source_exact_pixel_residue_diagnostic": 411491,
+  "source_exact_pixel_residue_diagnostic": 647,
   "rows": [
     {
       "key": "coast 2 coast",
@@ -34,19 +34,19 @@
         119
       ],
       "localized_bbox": [
-        5,
-        26,
-        1456,
+        10,
+        35,
+        641,
         145
       ],
       "localized_size": [
-        1451,
-        119
+        631,
+        110
       ],
       "margins": [
-        0,
-        0,
-        0,
+        5,
+        815,
+        9,
         0
       ],
       "containment": "PASS",
@@ -66,19 +66,19 @@
         119
       ],
       "localized_bbox": [
-        5,
-        182,
-        1124,
+        6,
+        191,
+        549,
         301
       ],
       "localized_size": [
-        1119,
-        119
+        543,
+        110
       ],
       "margins": [
-        0,
-        0,
-        0,
+        1,
+        575,
+        9,
         0
       ],
       "containment": "PASS",
@@ -98,18 +98,18 @@
         119
       ],
       "localized_bbox": [
-        6,
+        7,
         338,
-        1500,
+        698,
         457
       ],
       "localized_size": [
-        1494,
+        691,
         119
       ],
       "margins": [
-        0,
-        0,
+        1,
+        802,
         0,
         0
       ],
@@ -130,18 +130,18 @@
         150
       ],
       "localized_bbox": [
-        7,
+        10,
         494,
-        1132,
+        466,
         644
       ],
       "localized_size": [
-        1125,
+        456,
         150
       ],
       "margins": [
-        0,
-        0,
+        3,
+        666,
         0,
         0
       ],
@@ -162,18 +162,18 @@
         125
       ],
       "localized_bbox": [
-        6,
+        10,
         644,
-        1107,
+        633,
         769
       ],
       "localized_size": [
-        1101,
+        623,
         125
       ],
       "margins": [
-        0,
-        0,
+        4,
+        474,
         0,
         0
       ],
@@ -194,20 +194,20 @@
         150
       ],
       "localized_bbox": [
-        6,
+        10,
         806,
-        1195,
-        956
+        314,
+        930
       ],
       "localized_size": [
-        1189,
-        150
+        304,
+        124
       ],
       "margins": [
+        4,
+        881,
         0,
-        0,
-        0,
-        0
+        26
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
@@ -226,19 +226,19 @@
         121
       ],
       "localized_bbox": [
-        6,
-        956,
-        1276,
+        10,
+        975,
+        529,
         1077
       ],
       "localized_size": [
-        1270,
-        121
+        519,
+        102
       ],
       "margins": [
-        0,
-        0,
-        0,
+        4,
+        747,
+        19,
         0
       ],
       "containment": "PASS",
@@ -258,20 +258,20 @@
         151
       ],
       "localized_bbox": [
-        6,
+        10,
         1114,
         748,
-        1265
+        1238
       ],
       "localized_size": [
-        742,
-        151
+        738,
+        124
       ],
       "margins": [
+        4,
         0,
         0,
-        0,
-        0
+        27
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
@@ -290,19 +290,19 @@
         150
       ],
       "localized_bbox": [
-        6,
-        1274,
-        816,
+        10,
+        1283,
+        666,
         1424
       ],
       "localized_size": [
-        810,
-        150
+        656,
+        141
       ],
       "margins": [
-        0,
-        0,
-        0,
+        4,
+        150,
+        9,
         0
       ],
       "containment": "PASS",
@@ -322,20 +322,20 @@
         156
       ],
       "localized_bbox": [
-        6,
+        11,
         1424,
-        792,
-        1580
+        664,
+        1550
       ],
       "localized_size": [
-        786,
-        156
+        653,
+        126
       ],
       "margins": [
+        5,
+        128,
         0,
-        0,
-        0,
-        0
+        30
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
@@ -354,24 +354,24 @@
         156
       ],
       "localized_bbox": [
-        3,
-        1580,
-        1236,
-        1736
+        10,
+        1596,
+        756,
+        1706
       ],
       "localized_size": [
-        1233,
-        156
+        746,
+        110
       ],
       "margins": [
-        0,
-        0,
-        0,
-        0
+        7,
+        480,
+        16,
+        30
       ],
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "positive_margin": "FAIL"
+      "positive_margin": "PASS"
     },
     {
       "key": "mode select",
@@ -386,19 +386,19 @@
         125
       ],
       "localized_bbox": [
-        2,
-        1736,
-        1252,
+        9,
+        1751,
+        522,
         1861
       ],
       "localized_size": [
-        1250,
-        125
+        513,
+        110
       ],
       "margins": [
-        0,
-        0,
-        0,
+        7,
+        730,
+        15,
         0
       ],
       "containment": "PASS",
@@ -418,19 +418,19 @@
         119
       ],
       "localized_bbox": [
-        6,
-        1898,
-        1244,
+        9,
+        1907,
+        1048,
         2017
       ],
       "localized_size": [
-        1238,
-        119
+        1039,
+        110
       ],
       "margins": [
-        0,
-        0,
-        0,
+        3,
+        196,
+        9,
         0
       ],
       "containment": "PASS",
@@ -439,7 +439,7 @@
     }
   ],
   "row_summary": {
-    "pass": 0,
+    "pass": 1,
     "total": 13
   },
   "machine_status": "FAIL",

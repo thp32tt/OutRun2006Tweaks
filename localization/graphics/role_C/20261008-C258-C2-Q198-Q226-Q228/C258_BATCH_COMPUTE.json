@@ -29,7 +29,7 @@
       "candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
       "machine_status": "FAIL",
       "row_summary": {
-        "pass": 0,
+        "pass": 1,
         "total": 13
       },
       "outside_changed": 0,
