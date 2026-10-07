@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261008-C259-C2-Q212-Q050-Q062",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 50,
+  "asset": "CBF8ECBF",
+  "candidate_sha256": "af6a189de92ccade79687c92a46cd2304a5f631f73e96a24a9d6a74844de5c33",
+  "source_sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+  "dimensions": [
+    4096,
+    2048
+  ],
+  "header_128_exact": true,
+  "review_coordinate_orientation": "FLIP_Y",
+  "independent_basis": "C104-established exact source bboxes + canonical source + validated clean plate; current persisted DDS independently decoded and remeasured.",
+  "changed_pixels_outside_allowed_bboxes": 0,
+  "alpha_changed_pixels_outside_allowed_bboxes": 0,
+  "source_exact_pixel_residue_diagnostic": 15982,
+  "rows": [
+    {
+      "key": "friend_request",
+      "source_bbox": [
+        646,
+        1017,
+        1345,
+        1090
+      ],
+      "source_size": [
+        699,
+        73
+      ],
+      "localized_bbox": [
+        865,
+        1021,
+        1126,
+        1086
+      ],
+      "localized_size": [
+        261,
+        65
+      ],
+      "margins": [
+        219,
+        219,
+        4,
+        4
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "players",
+      "source_bbox": [
+        1647,
+        1017,
+        2021,
+        1090
+      ],
+      "source_size": [
+        374,
+        73
+      ],
+      "localized_bbox": [
+        1711,
+        1021,
+        1957,
+        1086
+      ],
+      "localized_size": [
+        246,
+        65
+      ],
+      "margins": [
+        64,
+        64,
+        4,
+        4
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "your_friends",
+      "source_bbox": [
+        2668,
+        1023,
+        3244,
+        1092
+      ],
+      "source_size": [
+        576,
+        69
+      ],
+      "localized_bbox": [
+        2862,
+        1027,
+        3050,
+        1088
+      ],
+      "localized_size": [
+        188,
+        61
+      ],
+      "margins": [
+        194,
+        194,
+        4,
+        4
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "please_wait",
+      "source_bbox": [
+        1928,
+        1124,
+        2660,
+        1224
+      ],
+      "source_size": [
+        732,
+        100
+      ],
+      "localized_bbox": [
+        2121,
+        1130,
+        2466,
+        1218
+      ],
+      "localized_size": [
+        345,
+        88
+      ],
+      "margins": [
+        193,
+        194,
+        6,
+        6
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "time_over",
+      "source_bbox": [
+        241,
+        1274,
+        1610,
+        1515
+      ],
+      "source_size": [
+        1369,
+        241
+      ],
+      "localized_bbox": [
+        471,
+        1279,
+        1380,
+        1509
+      ],
+      "localized_size": [
+        909,
+        230
+      ],
+      "margins": [
+        230,
+        230,
+        5,
+        6
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "game_over",
+      "source_bbox": [
+        1915,
+        1287,
+        3409,
+        1525
+      ],
+      "source_size": [
+        1494,
+        238
+      ],
+      "localized_bbox": [
+        2211,
+        1292,
+        3113,
+        1520
+      ],
+      "localized_size": [
+        902,
+        228
+      ],
+      "margins": [
+        296,
+        296,
+        5,
+        5
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "goal",
+      "source_bbox": [
+        1620,
+        1660,
+        2814,
+        2024
+      ],
+      "source_size": [
+        1194,
+        364
+      ],
+      "localized_bbox": [
+        2035,
+        1666,
+        2398,
+        2018
+      ],
+      "localized_size": [
+        363,
+        352
+      ],
+      "margins": [
+        415,
+        416,
+        6,
+        6
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "row_summary": {
+    "pass": 7,
+    "total": 7
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
