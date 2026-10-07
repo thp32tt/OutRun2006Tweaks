@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 10:11 KST",
+  "updated_at_kst": "2026-10-07 10:19 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Fresh independent C should continue with remaining materially reworked producer candidates (including A153 q175, A152R q195, B226 q226 and other pending fresh-C outputs). q163 59A79158 passed C228; English-original PRE_INGAME comparison is refreshed as #018 and now awaits user JPG review plus actual in-game validation. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "Fresh independent C should include B227 q222 DDF0392A 601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f, plus remaining materially changed producer candidates such as A153 q175, A152R q195, B226 q226, and A155 q159. q222 requires regenerated English-original PRE_INGAME JPG/user review after C and actual in-game validation. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -2980,7 +2980,7 @@
     },
     "runtime_validation": "UNTESTED"
   },
-  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED. B218 q228 E7F6E9B7 is newly reopened from C144 under the newer 8-step visual gate and now awaits fresh independent C on candidate 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808. B219 q232 EBFC709F is reopened from C135 for source-left alignment/weight hierarchy and awaits fresh independent C on candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221. B220 q164 5B65E08C is reopened from C108 for source-width hierarchy/left alignment and awaits fresh independent C on candidate 65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f. B221 q92 1A43E9D9 is reopened from C125 for source-relative width/alignment and prior edge-touch risk; fresh independent C is required on candidate c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a.",
+  "current_pending_c": "A144/A145/A146, B210/B211/B212/B214/B215/B216, and A147R q236 FEF70E85 are pending fresh independent C. C222's q236 source-style rejection was materially repaired by A147R; no C pass is claimed yet. RUNTIME_VALIDATION=UNTESTED. B218 q228 E7F6E9B7 is newly reopened from C144 under the newer 8-step visual gate and now awaits fresh independent C on candidate 28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808. B219 q232 EBFC709F is reopened from C135 for source-left alignment/weight hierarchy and awaits fresh independent C on candidate 54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221. B220 q164 5B65E08C is reopened from C108 for source-width hierarchy/left alignment and awaits fresh independent C on candidate 65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f. B221 q92 1A43E9D9 is reopened from C125 for source-relative width/alignment and prior edge-touch risk; fresh independent C is required on candidate c23888347f446a0acd65667624bd3ee210f7d9a84b5f7adafeb746c94676a43a. B227 q222 DDF0392A now awaits fresh independent C on 601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f; current producer self-QA PASS does not carry forward C159 because bytes changed.",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -3661,5 +3661,18 @@
     "fresh_independent_c": "PENDING",
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "b227_q222_manual_visual_rework": {
+    "status": "B227_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+    "queue_index": 222,
+    "asset": "DDF0392A",
+    "candidate_sha256": "601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f",
+    "worker_run": 37556258475,
+    "report": "localization/graphics/role_B/20261007-B-MANUALQA227-DDF0392A/B227_DDF_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261007-B-MANUALQA227-DDF0392A/B227_CONTROLLER_SELF_QA.json",
+    "source_height_hierarchy": "52/44/58 source -> 44/36/52 decoded Korean; native font 42/36/50",
+    "machine_qa": "PASS",
+    "controller_visual_qa": "PASS",
+    "runtime_validation": "UNTESTED"
   }
 }
