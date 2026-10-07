@@ -64,8 +64,27 @@
     ],
     "raw_and_flip_y_evidence": "WRITTEN"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER",
-  "C3_STRICT_AUDIT": "PENDING_CONTROLLER",
+  "controller_visual_qa": {
+    "status": "PASS",
+    "evidence": [
+      "localization/graphics/role_A/20261007-A-MANUALQA158-AD720950-SHIFT/A158_AD720950_SHIFT_SOURCE_OLD_CLEAN_FINAL.jpg",
+      "localization/graphics/role_C/20261007-C247-C1-BATCH-Q043-Q047-Q053/C247_Q047_AD720950_FLIPY.jpg",
+      "localization/graphics/role_C/20261007-C247-C1-BATCH-Q043-Q047-Q053/C247_Q047_AD720950_RAW.jpg"
+    ],
+    "findings": [
+      "functional Shift localized to 시프트",
+      "plain heavy-white family matches neighboring labels",
+      "no clipping or collateral atlas damage"
+    ]
+  },
+  "C3_STRICT_AUDIT": {
+    "status": "C3_STRICT_PASS",
+    "exact_candidate_sha256": "6386a41ffa4af599cc7076be0cc4ce59729026b4882c437ac397270290b7e4bf",
+    "visual_overrides_numeric": false,
+    "pre_ingame_export": "PENDING_REFRESH"
+  },
   "runtime_validation": "UNTESTED",
-  "forbidden_domains_touched": []
+  "forbidden_domains_touched": [],
+  "decision": "C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME",
+  "user_jpg_review": "PENDING"
 }
