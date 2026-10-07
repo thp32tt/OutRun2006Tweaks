@@ -3256,7 +3256,7 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 
 
 
-## 2026-10-08 01:25 KST — C257 C2 q188/q220/q222 fresh C + exact-SHA C3 PASS
+## 2026-10-08 01:18 KST — C257 C2 q188/q220/q222 fresh C + exact-SHA C3 PASS
 - `TEMP_BACKLOG_RELIEF=C2`; `SHARD=EVEN`. HEAD/queue refreshed per slot and before synchronization; no C1 shard stolen. Concurrent A/B evidence commits were preserved; selected DDS bytes did not drift.
 - Backend: GitHub source-of-truth. ChatGPT-local binary materialization hit container rate limiting, so N100 MCP fallback was used only for exact persisted DDS/canonical source download, decode/diff and neutral-background SOURCE/CLEAN/CURRENT evidence; no N100 Git worktree state was used.
 - q188 `8C259C68` @ `9fe3804a70d9...`: 6/6 bbox/source-size/positive-margin, changed/alpha outside=0, header/RAW mirror_y PASS; SOURCE/CLEAN/CURRENT practical/RAW visual PASS for B166/A88/B169 native-HD help rows. Fresh C + exact-SHA C3 PASS.
