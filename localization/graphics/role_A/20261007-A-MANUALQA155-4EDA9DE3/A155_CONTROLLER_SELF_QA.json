@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A155",
+  "timestamp_kst": "2026-10-07 10:11 KST",
+  "queue_index": 159,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+  "selection": {
+    "reason": "No active A-owned P0/P1, C-returned REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER row remained. Current PRE_INGAME English-original card #016 exposed a source-proportion false negative in the historical C195-approved candidate.",
+    "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/016_q159_4EDA9DE3.jpg",
+    "prior_c_status": "C195_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5"
+  },
+  "defect": {
+    "tags": [
+      "HANGUL_HORIZONTAL_STRETCH",
+      "SOURCE_PROPORTION_FAMILY_MISMATCH"
+    ],
+    "evidence": "A51 render_mask hard-forced target_w=(source_bbox_width-4)*0.92 for every Korean stage name, regardless of native Hangul aspect. PRE_INGAME #016 visibly shows stretched syllable skeletons (notably WATERFALLS/ICE SCAPE/FLORAL VILLAGE). Numeric containment had masked the distortion."
+  },
+  "material_rework": {
+    "method": "Reuse pinned canonical 2048x1024 RGBA32/BGRA source, exact source-alpha clean geometry and source vertical RGBA profile. Re-render all 15 canonical phonetic stage names directly in native Noto Sans CJK KR Black, size by source HEIGHT only, 1px weight reinforcement, source-left +2px; never expand to an English-width quota.",
+    "prior_candidate_sha256": "8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5",
+    "candidate_sha256": "47f64c6733774d713b34dd4424fe87a50a55f17ee70cfdb0df5b63d1c797e461",
+    "artificial_width_target_removed_rows": 15,
+    "prior_width_ratio": "~0.90-0.92 source width on every row",
+    "new_width_ratio_range": [
+      0.2301,
+      0.9714
+    ],
+    "native_height_range_px": [
+      56,
+      60
+    ]
+  },
+  "machine_qa": {
+    "target_occurrences": 15,
+    "bbox_source_size_positive_margin": "15/15 PASS",
+    "clean_changed_outside_source_text_mask": 0,
+    "decoded_changed_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "clean_source_pixels_unchanged": 0,
+    "final_source_residue_outside_korean": 0,
+    "localized_overlap_pairs": 0,
+    "localized_1px_touch_pairs": 0,
+    "stage_name_policy": "PASS_CANONICAL_PHONETIC_TRANSLITERATION",
+    "structure": "2048x1024 RGBA32/BGRA mip1 exact header",
+    "raw_orientation": "mirror_y"
+  },
+  "ordered_generation_gate": {
+    "1_source_text_removed_plate_restored": "PASS_EXACT_SOURCE_ALPHA_CLEAN",
+    "2_source_transform_direction": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "3_no_unnecessary_undersizing": "PASS_NATIVE_HEIGHT_56_60PX_VS_SOURCE_60_64PX",
+    "4_weight_outline_shadow": "PASS_NATIVE_BLACK_PLUS_1PX_WEIGHT_SOURCE_PROFILE",
+    "5_no_clipped_pixels": "PASS_15_OF_15_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_OUTSIDE_CHANGE",
+    "7_flip_y_and_raw": "PASS_CONTROLLER_VISUAL_BOTH",
+    "8_immediate_readability_vs_source": "PASS_CONTROLLER_VISUAL_PROPORTION_REPAIRED"
+  },
+  "evidence": {
+    "worker_report": "localization/graphics/role_A/20261007-A-MANUALQA155-4EDA9DE3/A155_4EDA9DE3_REPORT.json",
+    "readable_compare": "localization/graphics/role_A/20261007-A-MANUALQA155-4EDA9DE3/A155_4EDA9DE3_SOURCE_CLEAN_FINAL.jpg",
+    "raw_compare": "localization/graphics/role_A/20261007-A-MANUALQA155-4EDA9DE3/A155_4EDA9DE3_FINAL_RAW_MIRROR_Y.jpg",
+    "prior_pre_ingame_card": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/016_q159_4EDA9DE3.jpg",
+    "github_worker_run": 37555230963,
+    "worker_output_commit": "b2a98721d60c499ffc23684661e52eac53c10e55"
+  },
+  "controller_visual_qa": "PASS_SOURCE_A51_CLEAN_A155_READABLE_AND_RAW",
+  "producer_status": "A155_PROPORTION_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
