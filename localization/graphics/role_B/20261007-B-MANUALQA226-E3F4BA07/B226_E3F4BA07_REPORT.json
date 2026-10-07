@@ -1,0 +1,483 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B226",
+  "queue_index": 226,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+  "trigger": "STRICT_PRE_INGAME_8_STEP_VISUAL_FALSE_NEGATIVE_HIERARCHY",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/024_q226_E3F4BA07.jpg",
+  "prior_c_status": "C143_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+  "before_sha256": "1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c",
+  "candidate_sha256": "5449edb846d6ca3a5de1ab1f817a41feb776e9af3bdda2175967312369e5e374",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+  "defects": [
+    "GOAL_A_TO_E_SOURCE_RELATIVE_WIDTH_TOO_WEAK",
+    "15_STAGE_CONTINUOUS_SOURCE_RELATIVE_WIDTH_TOO_WEAK"
+  ],
+  "preserved": {
+    "stage": "스테이지",
+    "goal": "골",
+    "outrun2": "protected",
+    "outrun2sp": "protected"
+  },
+  "method": "exact pinned 2048x512 RGBA32/BGRA source + C143 independently verified exact clean plate; only GOAL A-E and 15 STAGE CONTINUOUS exact source bboxes rebuilt from fresh native Noto Sans CJK KR Bold 58px, same gray-blue fill and 2px same-color weight; source-left anchors and native height preserved; moderate fresh-raster horizontal shaping restores practical source hierarchy without changing STAGE, standalone GOAL, OUTRUN2 or OUTRUN2SP",
+  "rows": [
+    {
+      "key": "goal_e",
+      "source": "GOAL E",
+      "korean": "골 E",
+      "source_bbox": [
+        980,
+        346,
+        1233,
+        410
+      ],
+      "source_size": [
+        253,
+        64
+      ],
+      "prior_bbox": [
+        982,
+        350,
+        1084,
+        406
+      ],
+      "prior_size": [
+        102,
+        56
+      ],
+      "localized_bbox": [
+        982,
+        350,
+        1132,
+        406
+      ],
+      "localized_size": [
+        150,
+        56
+      ],
+      "margins": [
+        2,
+        101,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.5929,
+      "height_source_ratio": 0.875,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        982,
+        350,
+        1132,
+        406
+      ],
+      "decoded_size": [
+        150,
+        56
+      ],
+      "decoded_margins": [
+        2,
+        101,
+        4,
+        4
+      ]
+    },
+    {
+      "key": "goal_d",
+      "source": "GOAL D",
+      "korean": "골 D",
+      "source_bbox": [
+        4,
+        262,
+        256,
+        326
+      ],
+      "source_size": [
+        252,
+        64
+      ],
+      "prior_bbox": [
+        6,
+        266,
+        114,
+        322
+      ],
+      "prior_size": [
+        108,
+        56
+      ],
+      "localized_bbox": [
+        6,
+        266,
+        160,
+        322
+      ],
+      "localized_size": [
+        154,
+        56
+      ],
+      "margins": [
+        2,
+        96,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.6111,
+      "height_source_ratio": 0.875,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        6,
+        266,
+        160,
+        322
+      ],
+      "decoded_size": [
+        154,
+        56
+      ],
+      "decoded_margins": [
+        2,
+        96,
+        4,
+        4
+      ]
+    },
+    {
+      "key": "goal_c",
+      "source": "GOAL C",
+      "korean": "골 C",
+      "source_bbox": [
+        983,
+        262,
+        1234,
+        326
+      ],
+      "source_size": [
+        251,
+        64
+      ],
+      "prior_bbox": [
+        985,
+        266,
+        1091,
+        322
+      ],
+      "prior_size": [
+        106,
+        56
+      ],
+      "localized_bbox": [
+        985,
+        266,
+        1137,
+        322
+      ],
+      "localized_size": [
+        152,
+        56
+      ],
+      "margins": [
+        2,
+        97,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.6056,
+      "height_source_ratio": 0.875,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        985,
+        266,
+        1137,
+        322
+      ],
+      "decoded_size": [
+        152,
+        56
+      ],
+      "decoded_margins": [
+        2,
+        97,
+        4,
+        4
+      ]
+    },
+    {
+      "key": "goal_b",
+      "source": "GOAL B",
+      "korean": "골 B",
+      "source_bbox": [
+        4,
+        170,
+        257,
+        234
+      ],
+      "source_size": [
+        253,
+        64
+      ],
+      "prior_bbox": [
+        6,
+        174,
+        113,
+        230
+      ],
+      "prior_size": [
+        107,
+        56
+      ],
+      "localized_bbox": [
+        6,
+        174,
+        159,
+        230
+      ],
+      "localized_size": [
+        153,
+        56
+      ],
+      "margins": [
+        2,
+        98,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.6047,
+      "height_source_ratio": 0.875,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        6,
+        174,
+        159,
+        230
+      ],
+      "decoded_size": [
+        153,
+        56
+      ],
+      "decoded_margins": [
+        2,
+        98,
+        4,
+        4
+      ]
+    },
+    {
+      "key": "goal_a",
+      "source": "GOAL A",
+      "korean": "골 A",
+      "source_bbox": [
+        986,
+        170,
+        1242,
+        234
+      ],
+      "source_size": [
+        256,
+        64
+      ],
+      "prior_bbox": [
+        988,
+        174,
+        1095,
+        230
+      ],
+      "prior_size": [
+        107,
+        56
+      ],
+      "localized_bbox": [
+        988,
+        174,
+        1142,
+        230
+      ],
+      "localized_size": [
+        154,
+        56
+      ],
+      "margins": [
+        2,
+        100,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.6016,
+      "height_source_ratio": 0.875,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        988,
+        174,
+        1142,
+        230
+      ],
+      "decoded_size": [
+        154,
+        56
+      ],
+      "decoded_margins": [
+        2,
+        100,
+        4,
+        4
+      ]
+    },
+    {
+      "key": "15_stage",
+      "source": "15 STAGE CONTINUOUS",
+      "korean": "15코스 연속",
+      "source_bbox": [
+        985,
+        86,
+        1809,
+        150
+      ],
+      "source_size": [
+        824,
+        64
+      ],
+      "prior_bbox": [
+        987,
+        88,
+        1280,
+        147
+      ],
+      "prior_size": [
+        293,
+        59
+      ],
+      "localized_bbox": [
+        987,
+        88,
+        1437,
+        147
+      ],
+      "localized_size": [
+        450,
+        59
+      ],
+      "margins": [
+        2,
+        372,
+        2,
+        3
+      ],
+      "width_source_ratio": 0.5461,
+      "height_source_ratio": 0.9219,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 58,
+      "stroke_width": 2,
+      "fill_rgba": [
+        79,
+        97,
+        101,
+        255
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_bbox": [
+        987,
+        88,
+        1437,
+        147
+      ],
+      "decoded_size": [
+        450,
+        59
+      ],
+      "decoded_margins": [
+        2,
+        372,
+        2,
+        3
+      ]
+    }
+  ],
+  "machine_qa": {
+    "bbox_source_size_positive_margin": "6/6 PASS",
+    "candidate_changes_outside_selected_source_bboxes": 0,
+    "alpha_changes_outside_selected_source_bboxes": 0,
+    "protected_outrun_changed": 0,
+    "localized_overlap_pixels": 0,
+    "header_128_exact": true,
+    "raw_mode": "BGRA",
+    "raw_orientation": "mirror_y",
+    "roundtrip": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_C143_EXACT_CLEAN_REUSED_AND_REVALIDATED",
+    "2_slant_direction": "PASS_SOURCE_UPRIGHT_FAMILY",
+    "3_no_unnecessary_undersizing": "PASS_MODERATE_HIERARCHY_RESTORATION",
+    "4_source_weight_outline_shadow": "PASS_SHARED_GRAY_BLUE_SOURCE_FAMILY",
+    "5_no_clipping": "PASS_6_OF_6_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_OUTRUN_PROTECTED_CHANGE",
+    "7_flip_y_raw": "PASS_RAW_EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "B226_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

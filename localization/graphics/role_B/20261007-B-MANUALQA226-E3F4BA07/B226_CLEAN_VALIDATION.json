@@ -1,0 +1,19 @@
+{
+  "source": "/tmp/b226/source.png",
+  "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_C/20261005-C143-E3F4BA07/C143_EXACT_CLEAN_PLATE.png",
+  "size": [
+    2048,
+    512
+  ],
+  "changed_pixels": 84629,
+  "changed_bbox": [
+    0,
+    86,
+    1809,
+    500
+  ],
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "status": "PASS"
+}
