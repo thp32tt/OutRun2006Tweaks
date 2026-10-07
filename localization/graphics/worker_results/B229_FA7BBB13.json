@@ -15,5 +15,7 @@
   "overlap_touch_pairs": 0,
   "worker_status": "B229_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
   "runtime_validation": "UNTESTED",
-  "report": "localization/graphics/role_B/20261007-B-MANUALQA229-FA7BBB13/B229_FA7_REPORT.json"
+  "report": "localization/graphics/role_B/20261007-B-MANUALQA229-FA7BBB13/B229_FA7_REPORT.json",
+  "controller_status": "B229_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "controller_report": "localization/graphics/role_B/20261007-B-MANUALQA229-FA7BBB13/B229_CONTROLLER_SELF_QA.json"
 }
