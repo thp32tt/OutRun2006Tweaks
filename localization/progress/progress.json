@@ -5567,5 +5567,32 @@
     },
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c257_c2_batch_q188_q220_q222": {
+    "run": "20261008-C257-C2-BATCH-Q188-Q220-Q222",
+    "timestamp_kst": "2026-10-08T01:24:00+09:00",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "assets": {
+      "q188": {
+        "candidate_sha256": "9fe3804a70d93277ede4e16ac8073057c6a9d969a893d05cde522d14a1f91b4d",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA"
+      },
+      "q220": {
+        "candidate_sha256": "1a57c385e6c3ea2cc368888041e7106aab79bc4ab364daf0b51edd4465fcc935",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA"
+      },
+      "q222": {
+        "candidate_sha256": "601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA"
+      }
+    },
+    "pre_ingame_export": "PENDING_REFRESH_Q188_Q220_Q222",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }
