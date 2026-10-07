@@ -2947,3 +2947,9 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/CLEAN/FINAL, row contacts, RAW mirror_y and practical 100/75/50 review PASS. Source-matching readable right lean, source-family effects, natural Hangul width with near-source height, no broken/clipped glyph, residue, collision or protected OutRun2SP/icon/vehicle damage. Exact-SHA C3_STRICT_PASS.
 - Worker runs 37578592021 and 37578864259 were C-verifier/evidence-script retries only (sparse glyph mask scope false-positive; RGB/RGBA evidence helper mismatch); candidate bytes were unchanged and neither retry produced shared-state changes.
 - PRE_INGAME export refresh/user JPG review/NEW actual-game retest remain pending. IGR-017 not closed. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 15:15 KST — C238 q106 PRE_INGAME export refresh complete
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN. Persistent exporter run 37579672552 SUCCESS after C238 C3 promotion.
+- q106 is PRE_INGAME #007 007_q106_788CE557.jpg; pinned English source 4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b and exact Korean candidate a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482 are both native 2048x1024 with display scale 1.
+- Controller final export review PASS: FLIP-Y source/current retain clean plate, source-matching readable right lean, selector hierarchy and protected OutRun2SP/icons; RAW source/current share mirror-Y orientation.
+- Manifest count=11; mandatory C3 blocked=10. User JPG review and NEW actual in-game retest remain required; IGR-017 not closed. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.

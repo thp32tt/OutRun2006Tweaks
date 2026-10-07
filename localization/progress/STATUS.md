@@ -2362,3 +2362,7 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN; P0 IGR-017. Exact candidate a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482 fresh C + mandatory C3 PASS.
 - 5/5 bbox/source-size/positive-margin PASS; clean/final/alpha scope checks zero outside policy regions; pair/protected overlap=0; controller source-style/slant/glyph/RAW/practical-scale visual PASS.
 - PRE_INGAME refresh + user JPG + NEW actual-game retest pending; RUNTIME_VALIDATION=UNTESTED.
+
+## 2026-10-07 15:15 KST — C238 q106 PRE_INGAME refreshed
+- #007 q106 788CE557 English-original vs exact current candidate a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482 exported and controller-reviewed PASS for FLIP-Y/RAW, style/slant and protected-art consistency.
+- Fresh C + C3 complete; user JPG acceptance and NEW actual-game retest remain pending. RUNTIME_VALIDATION=UNTESTED.

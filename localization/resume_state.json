@@ -8262,10 +8262,13 @@
     "protected_overlap": 0,
     "machine_report": "localization/graphics/role_C/20261007-C238-C2-Q106-788CE557-B202/C238_788CE557_MACHINE_QA.json",
     "controller_report": "localization/graphics/role_C/20261007-C238-C2-Q106-788CE557-B202/C238_788CE557_CONTROLLER_FINAL_QA.json",
-    "pre_ingame_comparison_refresh": "PENDING_AFTER_C238_PROMOTION",
+    "pre_ingame_comparison_refresh": "PASS_007_q106_788CE557.jpg",
     "user_jpg_review": "PENDING",
     "actual_ingame_retest": "PENDING",
     "runtime_validation": "UNTESTED",
-    "forbidden_domains_touched": []
+    "forbidden_domains_touched": [],
+    "pre_ingame_manifest_count": 11,
+    "pre_ingame_c3_blocked_count": 10,
+    "export_refresh_timestamp_kst": "2026-10-07T15:15:08+09:00"
   }
 }
