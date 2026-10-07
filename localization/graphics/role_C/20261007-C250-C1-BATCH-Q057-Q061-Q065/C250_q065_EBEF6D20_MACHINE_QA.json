@@ -249,5 +249,9 @@
   "controller_visual_qa": "PENDING",
   "c3_strict_audit": "PENDING",
   "runtime_validation": "UNTESTED",
-  "forbidden_domains_touched": []
+  "forbidden_domains_touched": [],
+  "alpha_composited_visual_evidence": [
+    "C250V_q065_EBEF6D20_ALPHA_OVERVIEW.jpg",
+    "C250V_q065_EBEF6D20_ALPHA_CONTACTS.jpg"
+  ]
 }
