@@ -5097,7 +5097,7 @@
       }
     }
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261008-C260-C2-Q092-Q094-Q102/C260_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261008-C261-C2-Q102-Q062-Q024/C261_CONTROLLER_FINAL_QA.json",
   "c249_c2_batch_q086_q044_q048": {
     "run": "20261007-C249-C2-BATCH-Q086-Q044-Q048",
     "timestamp_kst": "2026-10-07T20:35:35+09:00",
@@ -5903,6 +5903,54 @@
     "mandatory_c3": "REQUIRED_C259_VISUAL_REGRESSION",
     "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
     "actual_ingame_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "c261_c2_batch_q102_q062_q024": {
+    "run": "20261008-C261-C2-Q102-Q062-Q024",
+    "timestamp_kst": "2026-10-08T04:38:00+09:00",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "selection_refresh_head": "473facf942806b35e7c9f3e59479df4133bca924",
+    "compute_dispatch_commit": "1f0a95bc210222a550f599e380bd9c5c87166366",
+    "machine_evidence_commit": "be538331721df2cc2868f5b69d1ad5fb6bb9fb8c",
+    "pre_commit_refresh_head": "be538331721df2cc2868f5b69d1ad5fb6bb9fb8c",
+    "assets": {
+      "q102": {
+        "asset": "571E78F3",
+        "queue_index": 102,
+        "candidate_sha256": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db",
+        "fresh_c": "PASS_HIGH_RISK_EDGE_TOUCH",
+        "machine_qa": "2/2 containment+size; zero outside/alpha; decoded edge touch high-risk",
+        "controller_visual_qa": "PASS_SOURCE_CLEAN_CURRENT_PRACTICAL_RAW",
+        "c3": "C3_STRICT_PASS_EXACT_SHA_HIGH_RISK_EDGE_TOUCH",
+        "status": "C261_C3_STRICT_PASS_HIGH_RISK_EDGE_TOUCH_PENDING_PRE_INGAME_USER_JPG_INGAME"
+      },
+      "q62": {
+        "asset": "33491F83",
+        "queue_index": 62,
+        "candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
+        "fresh_c": "FAIL_VISUAL_OVERRIDE",
+        "machine_qa": "PASS_9_OF_9_ZERO_OUTSIDE_ALPHA_HEADER",
+        "controller_visual_qa": "FAIL_CLEAN_PLATE_WHITE_RECTANGLE_PATCH_EASY_HARD",
+        "c3": "BLOCKED",
+        "status": "REWORK_REQUIRED"
+      },
+      "q24": {
+        "asset": "66743AA8",
+        "queue_index": 24,
+        "candidate_sha256": "c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e",
+        "source_sha256": "8e18676ac303b07a56d81d1d21c5e025e0baf46da49b16ae9d2e411960181f73",
+        "fresh_c": "PASS_HIGH_RISK_EDGE_TOUCH",
+        "machine_qa": "26/26 containment+size; zero outside/alpha; H/Q/T decoded edge touch high-risk",
+        "controller_visual_qa": "PASS_2BEOLSIK_BINDING_SOURCE_STYLE_PRACTICAL_RAW",
+        "c3": "C3_STRICT_PASS_EXACT_SHA_HIGH_RISK_EDGE_TOUCH",
+        "status": "C261_C3_STRICT_PASS_HIGH_RISK_EDGE_TOUCH_PENDING_INGAME_RETEST"
+      }
+    },
+    "controller_report": "localization/graphics/role_C/20261008-C261-C2-Q102-Q062-Q024/C261_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "PENDING_REFRESH_Q102",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
