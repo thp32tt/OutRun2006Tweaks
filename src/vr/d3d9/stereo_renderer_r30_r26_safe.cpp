@@ -1561,6 +1561,9 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticSceneEffect =
                 semanticScope == OutRunVR::GameSemantic::RenderScope::SceneEffect;
+            const bool semanticProjectedScreen =
+                OutRunVR::GameSemantic::CorroboratesProjectedScreenEffect(
+                    semanticScope);
             const bool semanticWorld =
                 OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
             const bool semanticProjectedWorld =
@@ -1659,7 +1662,8 @@ namespace OutRunVRStereo
             // hooks_graphics scopes Clr_SceneEffect from the original mod, so
             // its own recovered WVP may be reviewed without reopening the old
             // broad alpha-draw heuristic.
-            if (!semanticHud && !semanticWorld && !semanticSceneEffect)
+            if (!semanticHud && !semanticWorld && !semanticSceneEffect &&
+                !semanticProjectedScreen)
                 return R30ScreenSpaceKind::None;
 
             float projection[16]{};
@@ -1670,8 +1674,11 @@ namespace OutRunVRStereo
                 OutRunVR::PassPolicy::ClassifyProjectionSignature(
                     projection[11], projection[15]);
 
-            if (semanticSceneEffect)
+            if (semanticProjectedScreen || semanticSceneEffect)
             {
+                // P0: EXE+0xCABE is the exact lens producer. SceneEffect remains
+                // the original-mod scope for other screen effects. Both routes
+                // require an owned game WVP; neither may promote generic alpha.
                 // Original FixZBufferPrecision deliberately scopes
                 // Clr_SceneEffect around screen effects/lens flare. Historical
                 // R41 HMD work showed lens-player/billboard effects can carry
@@ -3689,10 +3696,14 @@ namespace OutRunVRStereo
             // Promotion requires the canonical EXE/original-mod semantic scope.
             const auto semanticScope =
                 OutRunVR::GameSemantic::CurrentScope;
+            const bool exactSceneEffect =
+                semanticScope == OutRunVR::GameSemantic::RenderScope::SceneEffect ||
+                OutRunVR::GameSemantic::CorroboratesProjectedScreenEffect(
+                    semanticScope);
             if (screenKind == R30ScreenSpaceKind::WorldBillboard)
             {
                 if (!OutRunVR::GameSemantic::CorroboratesWorld(
-                        semanticScope))
+                        semanticScope) && !exactSceneEffect)
                     return E_NOTIMPL;
             }
             else if (screenKind ==
@@ -3710,7 +3721,7 @@ namespace OutRunVRStereo
                     return E_NOTIMPL;
             }
             else if (!OutRunVR::GameSemantic::CorroboratesHud(
-                         semanticScope))
+                         semanticScope) && !exactSceneEffect)
             {
                 return E_NOTIMPL;
             }
