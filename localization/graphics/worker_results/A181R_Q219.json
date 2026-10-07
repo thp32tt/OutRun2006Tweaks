@@ -5,7 +5,8 @@
   "asset": "D263B3F1",
   "before": "e4db9a5b759d878469c297854f8b5179bd2b783063553c9cf6ef3520d9864265",
   "after": "41cf4c15853ec7df777c622cd3d3190e3e7d7a8ed1757902158525cb69d8da19",
-  "status": "A181R_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "status": "A181R_SELF_QA_PASS_PENDING_FRESH_C1_C3_PRE_INGAME_USER_JPG_AND_INGAME",
   "report": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_Q219_REPORT.json",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "controller_qa": "localization/graphics/role_A/20261008-A181R-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181R_CONTROLLER_SELF_QA.json"
 }
