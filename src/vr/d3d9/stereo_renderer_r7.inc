@@ -1331,7 +1331,10 @@ namespace OutRunVRStereo
 			D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
 		{
 			if (!InternalStereoPass)
-				outrun::vr::dx11::observe_source_draw(device, type);
+				outrun::vr::dx11::observe_source_draw(
+                    device,
+                    outrun::vr::dx11::make_nonindexed_source_draw_observation(
+                        type, startVertex, primitiveCount));
 			auto call = [&]() {
 				return DrawPrimitiveHook.stdcall<HRESULT>(
 					device, type, startVertex, primitiveCount);
@@ -1344,7 +1347,11 @@ namespace OutRunVRStereo
 			UINT numVertices, UINT startIndex, UINT primitiveCount)
 		{
 			if (!InternalStereoPass)
-				outrun::vr::dx11::observe_source_draw(device, type);
+				outrun::vr::dx11::observe_source_draw(
+                    device,
+                    outrun::vr::dx11::make_indexed_source_draw_observation(
+                        type, baseVertexIndex, minVertexIndex, numVertices,
+                        startIndex, primitiveCount));
 			auto call = [&]() {
 				return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
 					device, type, baseVertexIndex, minVertexIndex, numVertices,
@@ -1360,7 +1367,10 @@ namespace OutRunVRStereo
 			if (InternalStereoPass)
 				return DrawPrimitiveUPHook.stdcall<HRESULT>(
 					device, type, primitiveCount, data, stride);
-			outrun::vr::dx11::observe_source_draw(device, type);
+			outrun::vr::dx11::observe_source_draw(
+                device,
+                outrun::vr::dx11::make_nonindexed_up_source_draw_observation(
+                    type, primitiveCount, stride));
 			auto call = [&]() {
 				return DrawPrimitiveUPHook.stdcall<HRESULT>(
 					device, type, primitiveCount, data, stride);
@@ -1374,7 +1384,11 @@ namespace OutRunVRStereo
 			const void* vertexData, UINT stride)
 		{
 			if (!InternalStereoPass)
-				outrun::vr::dx11::observe_source_draw(device, type);
+				outrun::vr::dx11::observe_source_draw(
+                    device,
+                    outrun::vr::dx11::make_indexed_up_source_draw_observation(
+                        type, minVertexIndex, numVertices, primitiveCount,
+                        indexFormat, stride));
 			auto call = [&]() {
 				return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
 					device, type, minVertexIndex, numVertices, primitiveCount,

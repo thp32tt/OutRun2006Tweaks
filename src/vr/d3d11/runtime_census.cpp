@@ -508,6 +508,13 @@ namespace outrun::vr::dx11
 
         struct SourceSignature
         {
+            // R294 seals the exact D3D9 draw-call parameters needed by a
+            // future production R258 source-revalidation producer. This does
+            // not imply that native buffer mirrors or R258 itself exist yet.
+            SourceDrawObservation sourceDraw{};
+            bool sourceDrawIdentityExact{};
+            bool sourceDrawNativeBufferEligible{};
+            std::uint64_t sourceDrawIdentitySnapshotToken{};
             DWORD fvf{};
             std::uint64_t vertexDeclHash{};
             UINT vertexDeclElements{};
@@ -842,6 +849,62 @@ namespace outrun::vr::dx11
             return hash;
         }
 
+        bool source_draw_identity_exact(
+            const SourceDrawObservation& draw) noexcept
+        {
+            if (draw.primitive == D3DPT_FORCE_DWORD)
+                return false;
+            switch (draw.kind)
+            {
+            case SourceDrawKind::NonIndexed:
+                return draw.baseVertexIndex == 0 &&
+                    draw.minVertexIndex == 0 && draw.numVertices == 0 &&
+                    draw.startIndex == 0 && draw.indexFormat == D3DFMT_UNKNOWN &&
+                    draw.vertexStride == 0;
+            case SourceDrawKind::Indexed:
+                return draw.startVertex == 0 &&
+                    draw.indexFormat == D3DFMT_UNKNOWN &&
+                    draw.vertexStride == 0;
+            case SourceDrawKind::NonIndexedUserMemory:
+                return draw.startVertex == 0 && draw.baseVertexIndex == 0 &&
+                    draw.minVertexIndex == 0 && draw.numVertices == 0 &&
+                    draw.startIndex == 0 && draw.indexFormat == D3DFMT_UNKNOWN &&
+                    draw.vertexStride != 0;
+            case SourceDrawKind::IndexedUserMemory:
+                return draw.startVertex == 0 && draw.baseVertexIndex == 0 &&
+                    draw.startIndex == 0 &&
+                    (draw.indexFormat == D3DFMT_INDEX16 ||
+                     draw.indexFormat == D3DFMT_INDEX32) &&
+                    draw.vertexStride != 0;
+            case SourceDrawKind::Unknown:
+            default:
+                return false;
+            }
+        }
+
+        std::uint64_t source_draw_identity_snapshot_token(
+            const SourceDrawObservation& draw) noexcept
+        {
+            if (!source_draw_identity_exact(draw))
+                return 0;
+            std::uint64_t token = 0xcbf29ce484222325ull;
+            token = hash_mix(token, static_cast<std::uint32_t>(draw.kind));
+            token = hash_mix(token, static_cast<std::uint32_t>(draw.primitive));
+            token = hash_mix(token, draw.primitiveCount);
+            token = hash_mix(token, draw.startVertex);
+            token = hash_mix(
+                token,
+                static_cast<std::uint64_t>(
+                    static_cast<std::int64_t>(draw.baseVertexIndex)));
+            token = hash_mix(token, draw.minVertexIndex);
+            token = hash_mix(token, draw.numVertices);
+            token = hash_mix(token, draw.startIndex);
+            token = hash_mix(token, static_cast<std::uint32_t>(draw.indexFormat));
+            token = hash_mix(token, draw.vertexStride);
+            token = hash_mix(token, 0x294u);
+            return token == 0 ? 1 : token;
+        }
+
         std::uint32_t float_bits(float value) noexcept
         {
             static_assert(sizeof(std::uint32_t) == sizeof(float));
@@ -868,6 +931,26 @@ namespace outrun::vr::dx11
         {
             std::uint64_t hash = 0xcbf29ce484222325ull;
             hash = hash_mix(hash, static_cast<std::uint32_t>(primitive));
+            if (sig.sourceDrawIdentityExact)
+            {
+                hash = hash_mix(
+                    hash, static_cast<std::uint32_t>(sig.sourceDraw.kind));
+                hash = hash_mix(hash, sig.sourceDraw.primitiveCount);
+                hash = hash_mix(hash, sig.sourceDraw.startVertex);
+                hash = hash_mix(
+                    hash,
+                    static_cast<std::uint64_t>(
+                        static_cast<std::int64_t>(sig.sourceDraw.baseVertexIndex)));
+                hash = hash_mix(hash, sig.sourceDraw.minVertexIndex);
+                hash = hash_mix(hash, sig.sourceDraw.numVertices);
+                hash = hash_mix(hash, sig.sourceDraw.startIndex);
+                hash = hash_mix(
+                    hash, static_cast<std::uint32_t>(sig.sourceDraw.indexFormat));
+                hash = hash_mix(hash, sig.sourceDraw.vertexStride);
+                hash = hash_mix(
+                    hash, sig.sourceDrawNativeBufferEligible ? 1u : 0u);
+                hash = hash_mix(hash, sig.sourceDrawIdentitySnapshotToken);
+            }
             hash = hash_mix(hash, sig.fvf);
             hash = hash_mix(hash, sig.vertexDeclHash);
             hash = hash_mix(hash, sig.vertexDeclElements);
@@ -2623,8 +2706,10 @@ namespace outrun::vr::dx11
                     : 0;
 
             // R293 does not manufacture production R258/R262 receipts from
-            // descriptor-level census data. Until their exact producers are
-            // wired, pass explicit absence into the R292 census gate.
+            // descriptor-level census data. R294 now preserves the exact
+            // source draw-call identity needed by the future R258 producer,
+            // but native buffer mirrors/binding receipts are still not owned
+            // here; keep explicit absence until that full producer exists.
             const NativeProgrammableShaderDormantSourceRevalidationReadiness*
                 productionSourceRevalidation = nullptr;
             const NativeProgrammableShaderOutputResourceBehaviorReadiness*
@@ -3791,10 +3876,12 @@ namespace outrun::vr::dx11
 
     void observe_source_draw(
         IDirect3DDevice9* device,
-        D3DPRIMITIVETYPE primitive) noexcept
+        const SourceDrawObservation& draw) noexcept
     {
         if (!device || !census_enabled())
             return;
+
+        const auto primitive = draw.primitive;
 
         thread_local std::uint64_t drawOrdinal = 0;
         DrawCallsSeen.fetch_add(1, std::memory_order_relaxed);
@@ -3898,6 +3985,24 @@ namespace outrun::vr::dx11
             fixedFunctionLighting);
         if (vs) vs->Release();
         if (ps) ps->Release();
+
+        // R294 captures call-site geometry identity only for programmable
+        // pairs. Fixed-function signature cardinality and its compile cache are
+        // intentionally unchanged. UP draws retain exact call identity but are
+        // never eligible to stand in for native managed-buffer evidence.
+        if (programmablePair)
+        {
+            signature.sourceDraw = draw;
+            signature.sourceDrawIdentityExact =
+                source_draw_identity_exact(draw);
+            signature.sourceDrawNativeBufferEligible =
+                signature.sourceDrawIdentityExact &&
+                draw.native_buffer_eligible();
+            signature.sourceDrawIdentitySnapshotToken =
+                signature.sourceDrawIdentityExact
+                    ? source_draw_identity_snapshot_token(draw)
+                    : 0;
+        }
 
         signature.shadeModeObservationComplete =
             captured && source.complete;

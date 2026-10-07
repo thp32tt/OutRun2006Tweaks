@@ -89,6 +89,9 @@ D3D9_RENDER_STATE_CAPTURE = (
 RUNTIME_CENSUS = (
     ROOT / "src" / "vr" / "d3d11" / "runtime_census.cpp"
 ).read_text(encoding="utf-8")
+RUNTIME_CENSUS_HPP = (
+    ROOT / "src" / "vr" / "d3d11" / "runtime_census.hpp"
+).read_text(encoding="utf-8")
 DX11_CENSUS_ANALYZER = (
     ROOT / "tools" / "analyze_dx11_census.py"
 ).read_text(encoding="utf-8")
@@ -11501,6 +11504,45 @@ def main() -> None:
             + ", ".join(
                 missing_r292_programmable_production_activation_prerequisite
             )
+        )
+
+    r294_programmable_production_draw_identity = [
+        ("enum class SourceDrawKind", RUNTIME_CENSUS_HPP,
+         "R294 explicit source draw-kind identity"),
+        ("struct SourceDrawObservation", RUNTIME_CENSUS_HPP,
+         "R294 exact source draw-call payload"),
+        ("make_nonindexed_source_draw_observation(", RUNTIME_CENSUS_HPP,
+         "R294 non-indexed draw factory"),
+        ("make_indexed_source_draw_observation(", RUNTIME_CENSUS_HPP,
+         "R294 indexed draw factory"),
+        ("make_nonindexed_up_source_draw_observation(", RUNTIME_CENSUS_HPP,
+         "R294 UP draw is a distinct source kind"),
+        ("make_indexed_up_source_draw_observation(", RUNTIME_CENSUS_HPP,
+         "R294 indexed-UP draw is a distinct source kind"),
+        ("source_draw_identity_snapshot_token(", RUNTIME_CENSUS,
+         "R294 tamper-evident source draw identity"),
+        ("token = hash_mix(token, 0x294u);", RUNTIME_CENSUS,
+         "R294 independent snapshot-domain tag"),
+        ("sourceDrawNativeBufferEligible", RUNTIME_CENSUS,
+         "R294 keeps UP memory draws ineligible for native-buffer evidence"),
+        ("make_indexed_source_draw_observation(", D3D9_RENDER_STATE_CAPTURE,
+         "R294 indexed hook forwards complete draw range"),
+        ("baseVertexIndex, minVertexIndex, numVertices", D3D9_RENDER_STATE_CAPTURE,
+         "R294 indexed source range is not discarded"),
+        ("make_indexed_up_source_draw_observation(", D3D9_RENDER_STATE_CAPTURE,
+         "R294 indexed UP hook remains explicitly separate"),
+        ("productionSourceRevalidation = nullptr", RUNTIME_CENSUS,
+         "R294 does not fabricate R258 from draw identity alone"),
+    ]
+    missing_r294_programmable_production_draw_identity = [
+        meaning for token, source, meaning
+        in r294_programmable_production_draw_identity
+        if token not in source
+    ]
+    if missing_r294_programmable_production_draw_identity:
+        raise SystemExit(
+            "DX11 R294 programmable production draw-identity drift: "
+            + ", ".join(missing_r294_programmable_production_draw_identity)
         )
 
     r293_programmable_production_prerequisite_census_gate = [

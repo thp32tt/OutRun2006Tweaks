@@ -1,14 +1,108 @@
 #pragma once
 
+#include <cstdint>
 #include <d3d9.h>
 
 namespace outrun::vr::dx11
 {
+    // R294 preserves the exact source draw-call identity required by the
+    // future production R258 revalidation producer. User-memory draws remain
+    // explicitly ineligible for native-buffer evidence even though their call
+    // identity is complete. This is diagnostic metadata only.
+    enum class SourceDrawKind : std::uint8_t
+    {
+        Unknown = 0,
+        NonIndexed,
+        Indexed,
+        NonIndexedUserMemory,
+        IndexedUserMemory,
+    };
+
+    struct SourceDrawObservation
+    {
+        SourceDrawKind kind = SourceDrawKind::Unknown;
+        D3DPRIMITIVETYPE primitive = D3DPT_FORCE_DWORD;
+        UINT primitiveCount{};
+        UINT startVertex{};
+        INT baseVertexIndex{};
+        UINT minVertexIndex{};
+        UINT numVertices{};
+        UINT startIndex{};
+        D3DFORMAT indexFormat = D3DFMT_UNKNOWN;
+        UINT vertexStride{};
+
+        [[nodiscard]] bool native_buffer_eligible() const noexcept
+        {
+            return kind == SourceDrawKind::NonIndexed ||
+                kind == SourceDrawKind::Indexed;
+        }
+    };
+
+    [[nodiscard]] inline SourceDrawObservation
+    make_nonindexed_source_draw_observation(
+        D3DPRIMITIVETYPE primitive, UINT startVertex,
+        UINT primitiveCount) noexcept
+    {
+        SourceDrawObservation out{};
+        out.kind = SourceDrawKind::NonIndexed;
+        out.primitive = primitive;
+        out.primitiveCount = primitiveCount;
+        out.startVertex = startVertex;
+        return out;
+    }
+
+    [[nodiscard]] inline SourceDrawObservation
+    make_indexed_source_draw_observation(
+        D3DPRIMITIVETYPE primitive, INT baseVertexIndex,
+        UINT minVertexIndex, UINT numVertices, UINT startIndex,
+        UINT primitiveCount) noexcept
+    {
+        SourceDrawObservation out{};
+        out.kind = SourceDrawKind::Indexed;
+        out.primitive = primitive;
+        out.primitiveCount = primitiveCount;
+        out.baseVertexIndex = baseVertexIndex;
+        out.minVertexIndex = minVertexIndex;
+        out.numVertices = numVertices;
+        out.startIndex = startIndex;
+        return out;
+    }
+
+    [[nodiscard]] inline SourceDrawObservation
+    make_nonindexed_up_source_draw_observation(
+        D3DPRIMITIVETYPE primitive, UINT primitiveCount,
+        UINT vertexStride) noexcept
+    {
+        SourceDrawObservation out{};
+        out.kind = SourceDrawKind::NonIndexedUserMemory;
+        out.primitive = primitive;
+        out.primitiveCount = primitiveCount;
+        out.vertexStride = vertexStride;
+        return out;
+    }
+
+    [[nodiscard]] inline SourceDrawObservation
+    make_indexed_up_source_draw_observation(
+        D3DPRIMITIVETYPE primitive, UINT minVertexIndex,
+        UINT numVertices, UINT primitiveCount, D3DFORMAT indexFormat,
+        UINT vertexStride) noexcept
+    {
+        SourceDrawObservation out{};
+        out.kind = SourceDrawKind::IndexedUserMemory;
+        out.primitive = primitive;
+        out.primitiveCount = primitiveCount;
+        out.minVertexIndex = minVertexIndex;
+        out.numVertices = numVertices;
+        out.indexFormat = indexFormat;
+        out.vertexStride = vertexStride;
+        return out;
+    }
+
     // Passive R72-R77 census. Enabled only when OUTRUN_VR_DX11_CENSUS=1.
     // It never mutates D3D9 state and never routes a draw to D3D11.
     void observe_source_draw(
         IDirect3DDevice9* device,
-        D3DPRIMITIVETYPE primitive) noexcept;
+        const SourceDrawObservation& draw) noexcept;
 
     // R74 consumes the already-installed R30 VB/IB hooks as observation points.
     // A successful non-READONLY Lock followed by a successful Unlock is evidence
