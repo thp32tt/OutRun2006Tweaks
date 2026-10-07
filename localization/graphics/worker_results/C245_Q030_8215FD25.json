@@ -1,0 +1,12 @@
+{
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C245-C2-BATCH-Q026-Q028-Q030",
+  "queue_index": 30,
+  "asset": "8215FD25",
+  "candidate_sha256": "e2eccea39c4241477c5c9743e23ffb69d1cfe785f5186dbd992a865a917d6edc",
+  "machine_status": "PASS",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C245-C2-BATCH-Q026-Q028-Q030",
+  "queue_index": 30,
+  "asset": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+  "asset_key": "8215FD25",
+  "producer": "A144",
+  "trigger": "USER JPG #004 TOTAL_RANK_TEXT_TOO_SMALL",
+  "source_sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e",
+  "candidate_sha256": "e2eccea39c4241477c5c9743e23ffb69d1cfe785f5186dbd992a865a917d6edc",
+  "source_provenance": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds"
+  },
+  "clean_evidence": "localization/graphics/role_B/20261005-B-PRODUCTION148-8215-C200-TEMPLATE/B148_CLEAN_PLATE.png",
+  "clean_evidence_authority": "HISTORICAL_NONAUTHORITATIVE_FOR_CURRENT_SOURCE",
+  "structure": {
+    "width": 4096,
+    "height": 2048,
+    "mips": 1,
+    "mode": "RGBA"
+  },
+  "rows": [
+    {
+      "region": 0,
+      "source_bbox": [
+        1829,
+        1179,
+        2364,
+        1281
+      ],
+      "source_dark_bbox": [
+        1837,
+        1187,
+        2356,
+        1272
+      ],
+      "localized_dark_bbox": [
+        1948,
+        1192,
+        2244,
+        1268
+      ],
+      "source_size": [
+        535,
+        102
+      ],
+      "localized_dark_size": [
+        296,
+        76
+      ],
+      "width_ratio": 0.5533,
+      "height_ratio": 0.7451,
+      "margins": [
+        119,
+        120,
+        13,
+        13
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region": 1,
+      "source_bbox": [
+        1682,
+        150,
+        2216,
+        252
+      ],
+      "source_dark_bbox": [
+        1690,
+        159,
+        2209,
+        243
+      ],
+      "localized_dark_bbox": [
+        1800,
+        163,
+        2097,
+        239
+      ],
+      "source_size": [
+        534,
+        102
+      ],
+      "localized_dark_size": [
+        297,
+        76
+      ],
+      "width_ratio": 0.5562,
+      "height_ratio": 0.7451,
+      "margins": [
+        118,
+        119,
+        13,
+        13
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "checks": {
+    "source_current_changed_outside_source_bboxes": 0,
+    "source_current_alpha_outside_source_bboxes": 0,
+    "clean_current_changed_outside_source_bboxes": 0,
+    "clean_current_alpha_outside_source_bboxes": 0,
+    "clean_source_changed_outside_source_bboxes": 0,
+    "clean_orientation_selected": "AS_STORED",
+    "clean_authoritative_for_pass": false,
+    "localized_pair_overlap_pixels": 0,
+    "header_128_exact": true
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER",
+  "c3_required": false,
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

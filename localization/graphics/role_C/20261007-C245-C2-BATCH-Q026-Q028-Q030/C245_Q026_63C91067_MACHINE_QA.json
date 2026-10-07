@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C245-C2-BATCH-Q026-Q028-Q030",
+  "queue_index": 26,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+  "asset_key": "63C91067",
+  "producer": "B235",
+  "trigger": "C244 visual fail scale/slant; B235 material rerender",
+  "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+  "candidate_sha256": "2dfc6214ce2383ef01f2739baeff04890d5ff78330b192fcee0d864f6caff719",
+  "source_provenance": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds"
+  },
+  "clean_evidence": "localization/graphics/role_B/20261005-B-PRODUCTION137/63C_CLEAN_PLATE.png",
+  "clean_evidence_authority": "AUTHORITATIVE",
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "mips": 1,
+    "mode": "RGBA"
+  },
+  "rows": [
+    {
+      "region": 0,
+      "source_bbox": [
+        747,
+        1174,
+        1271,
+        1275
+      ],
+      "source_dark_bbox": [
+        749,
+        1187,
+        1268,
+        1272
+      ],
+      "localized_dark_bbox": [
+        771,
+        1179,
+        1246,
+        1270
+      ],
+      "source_size": [
+        524,
+        101
+      ],
+      "localized_dark_size": [
+        475,
+        91
+      ],
+      "width_ratio": 0.9065,
+      "height_ratio": 0.901,
+      "margins": [
+        24,
+        25,
+        5,
+        5
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region": 1,
+      "source_bbox": [
+        599,
+        156,
+        1124,
+        246
+      ],
+      "source_dark_bbox": [
+        602,
+        159,
+        1121,
+        243
+      ],
+      "localized_dark_bbox": [
+        623,
+        161,
+        1098,
+        241
+      ],
+      "source_size": [
+        525,
+        90
+      ],
+      "localized_dark_size": [
+        475,
+        80
+      ],
+      "width_ratio": 0.9048,
+      "height_ratio": 0.8889,
+      "margins": [
+        24,
+        26,
+        5,
+        5
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "checks": {
+    "source_current_changed_outside_source_bboxes": 0,
+    "source_current_alpha_outside_source_bboxes": 0,
+    "clean_current_changed_outside_source_bboxes": 0,
+    "clean_current_alpha_outside_source_bboxes": 0,
+    "clean_source_changed_outside_source_bboxes": 0,
+    "clean_orientation_selected": "AS_STORED",
+    "clean_authoritative_for_pass": true,
+    "localized_pair_overlap_pixels": 0,
+    "header_128_exact": true
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER",
+  "c3_required": true,
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

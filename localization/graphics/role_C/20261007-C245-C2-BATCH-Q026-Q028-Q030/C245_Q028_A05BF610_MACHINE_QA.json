@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C245-C2-BATCH-Q026-Q028-Q030",
+  "queue_index": 28,
+  "asset": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+  "asset_key": "A05BF610",
+  "producer": "A144",
+  "trigger": "USER JPG #003 TOTAL_RANK_TEXT_TOO_SMALL",
+  "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+  "candidate_sha256": "aa0692a2918326a494c1b04837603313faac7bdd9b7f043d4b679a8e8b1493f9",
+  "source_provenance": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds"
+  },
+  "clean_evidence": "localization/graphics/role_C/20261005-C175-A05BF610/C175_A05_CLEAN_PLATE.png",
+  "clean_evidence_authority": "HISTORICAL_NONAUTHORITATIVE_FOR_CURRENT_SOURCE",
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "mips": 1,
+    "mode": "RGBA"
+  },
+  "rows": [
+    {
+      "region": 0,
+      "source_bbox": [
+        543,
+        1185,
+        1068,
+        1275
+      ],
+      "source_dark_bbox": [
+        546,
+        1188,
+        1065,
+        1272
+      ],
+      "localized_dark_bbox": [
+        649,
+        1190,
+        961,
+        1270
+      ],
+      "source_size": [
+        525,
+        90
+      ],
+      "localized_dark_size": [
+        312,
+        80
+      ],
+      "width_ratio": 0.5943,
+      "height_ratio": 0.8889,
+      "margins": [
+        106,
+        107,
+        5,
+        5
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "checks": {
+    "source_current_changed_outside_source_bboxes": 0,
+    "source_current_alpha_outside_source_bboxes": 0,
+    "clean_current_changed_outside_source_bboxes": 57748,
+    "clean_current_alpha_outside_source_bboxes": 51343,
+    "clean_source_changed_outside_source_bboxes": 57748,
+    "clean_orientation_selected": "AS_STORED",
+    "clean_authoritative_for_pass": false,
+    "localized_pair_overlap_pixels": 0,
+    "header_128_exact": true
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER",
+  "c3_required": false,
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
