@@ -2385,6 +2385,56 @@ def main() -> int:
         "NativeDrawPathActivationAllowed"
     ] is False
 
+    # R312: an exact R272 must have one adjacent R271 producer in the same
+    # startup epoch. Duplicate or stale upstream mapping evidence is unsafe.
+    r312_parts = r311_register_mapping_support.split(
+        "VR DX11 R272 registerMappingPlan:", 1
+    )
+    r312_source = r312_parts[0]
+    r312_rest = "VR DX11 R272 registerMappingPlan:" + r312_parts[1]
+    r312_map_parts = r312_rest.split(
+        "VR DX11 R276 semanticTranslationPlan signature#1:", 1
+    )
+    r312_mapping = r312_map_parts[0]
+    r312_plan = (
+        "VR DX11 R276 semanticTranslationPlan signature#1:"
+        + r312_map_parts[1]
+    )
+    r312_ambiguous_register_mapping = run_case(
+        r312_source + r312_mapping + r312_mapping
+        + r312_plan + r306_signature_tail
+    )
+    r312_ambiguous_inventory = r312_ambiguous_register_mapping[
+        "ActivationEvidence"
+    ]["ProgrammableShaderInventory"]
+    r312_ambiguous_evidence = r312_ambiguous_inventory["Pairs"][0][
+        "SemanticTranslationEvidence"
+    ][0]["RegisterMappingPlan"]
+    assert r312_ambiguous_evidence["producer_order_valid"] is False
+    assert r312_ambiguous_evidence["summary_correlation_exact"] is False
+    assert r312_ambiguous_evidence["fail_closed"] is False
+    assert r312_ambiguous_inventory[
+        "RegisterMappingPlanEvidenceCoverageComplete"
+    ] is False
+    assert r312_ambiguous_register_mapping[
+        "NativeDrawPathActivationAllowed"
+    ] is False
+
+    r312_stale_register_mapping = run_case(
+        r312_source + r312_mapping + r312_source
+        + r312_plan + r306_signature_tail
+    )
+    r312_stale_inventory = r312_stale_register_mapping[
+        "ActivationEvidence"
+    ]["ProgrammableShaderInventory"]
+    assert r312_stale_inventory[
+        "RegisterMappingPlanEvidenceMissingSignatures"
+    ] == [{"source_log": "OutRun2006Tweaks.log", "startup_epoch": 0, "id": 1}]
+    assert r312_stale_inventory[
+        "RegisterMappingPlanEvidenceCoverageComplete"
+    ] is False
+    assert r312_stale_register_mapping["NativeDrawPathActivationAllowed"] is False
+
     r308_production_semantic_review = run_case(
         "VR DX11 R291 productionSemanticReview signature#1: "
         "admissionExact=1 reviewExact=1 inputLayoutReady=1 "

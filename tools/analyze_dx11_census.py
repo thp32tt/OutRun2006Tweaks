@@ -1247,6 +1247,9 @@ def main() -> int:
 
             match = R271_SOURCE_SEMANTIC_PAIR_RE.search(line)
             if match:
+                # A new R271 producer invalidates any earlier R272 in this epoch.
+                # Otherwise a stale mapping can attach to the next R276 signature.
+                pending_register_mapping_plans.pop((source_log, startup_epoch), None)
                 data = match.groupdict()
                 pending_source_semantic_pairs[(source_log, startup_epoch)] = {
                     "exact": bool(int(data["exact"])),
@@ -1273,8 +1276,16 @@ def main() -> int:
 
             match = R272_REGISTER_MAPPING_PLAN_RE.search(line)
             if match:
+                # R272 must follow a unique R271 producer before R276. Do not
+                # silently replace duplicate or orphan mapping evidence.
+                producer_key = (source_log, startup_epoch)
+                producer_order_valid = bool(
+                    producer_key in pending_source_semantic_pairs
+                    and producer_key not in pending_register_mapping_plans
+                )
                 data = match.groupdict()
-                pending_register_mapping_plans[(source_log, startup_epoch)] = {
+                pending_register_mapping_plans[producer_key] = {
+                    "producer_order_valid": producer_order_valid,
                     "exact": bool(int(data["exact"])),
                     "constant_mapping_count": int(data["constants"]),
                     "sampler_mapping_count": int(data["samplers"]),
@@ -2147,7 +2158,10 @@ def main() -> int:
             )
             exact_state_correlated = bool(
                 not register_mapping_plan["exact"]
-                or mapping_identity_present
+                or (
+                    mapping_identity_present
+                    and register_mapping_plan["producer_order_valid"]
+                )
             )
             source_semantic_pair_correlated = bool(
                 not register_mapping_plan["exact"]
