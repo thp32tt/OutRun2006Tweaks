@@ -1,0 +1,10 @@
+{
+  "role": "B",
+  "run": "20261008-B242-Q212-CONDENSED-WORD-GROUPS",
+  "queue_index": 212,
+  "asset": "BA0147DA",
+  "candidate_sha256": "e3fc3275e696acb0dc5449908bd3b57a232d842ad51296e888cc7ede6a276863",
+  "report": "localization/graphics/role_B/20261008-B242-Q212-CONDENSED-WORD-GROUPS/B242_Q212_REPORT.json",
+  "status": "B242_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED"
+}
