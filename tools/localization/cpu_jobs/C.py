@@ -68,7 +68,9 @@ for h in subprocess.check_output(["git","log","--format=%H","--all","--",CAND_RE
         old_bytes=b; old_commit=h; break
 if old_bytes is None: raise SystemExit("exact C221 predecessor not found in git history")
 
-source=rgba_bytes(source_bytes); cand=rgba_bytes(cand_bytes); old=rgba_bytes(old_bytes)
+source_raw=rgba_bytes(source_bytes); cand_raw=rgba_bytes(cand_bytes); old_raw=rgba_bytes(old_bytes)
+# Canonical evidence/masks and all recorded text bboxes are in readable FLIP-Y orientation.
+source=ImageOps.flip(source_raw); cand=ImageOps.flip(cand_raw); old=ImageOps.flip(old_raw)
 clean=Image.open(CLEAN).convert("RGBA")
 if not (source.size==cand.size==old.size==clean.size==(4096,4096)):
     raise SystemExit(f"decoded dimension mismatch {source.size} {cand.size} {old.size} {clean.size}")
@@ -122,10 +124,10 @@ row_pass=all(x["containment"]=="PASS" and x["size_ceiling"]=="PASS" and x["posit
 machine_pass=row_pass and outside==0 and alpha_outside==0 and protected_changed==0 and residue_total==0 and header_exact and mips==1
 
 # Evidence: full matched views, target contacts, practical display scale and RAW orientation.
-strip([source,clean,old,cand],["SOURCE","CLEAN","C221 OLD","A137 CURRENT"],0.125,True).save(ROOT/"C232_SOURCE_CLEAN_OLD_FINAL_FLIPY_12P5.jpg",quality=94)
-strip([source,cand],["SOURCE practical 25%","A137 practical 25%"],0.25,True).save(ROOT/"C232_SOURCE_FINAL_PRACTICAL_25PCT.jpg",quality=94)
-strip([old,cand],["C221 old practical 25%","A137 current practical 25%"],0.25,True).save(ROOT/"C232_OLD_FINAL_PRACTICAL_25PCT.jpg",quality=94)
-strip([source,cand],["SOURCE RAW","A137 RAW"],0.125,False).save(ROOT/"C232_SOURCE_FINAL_RAW_12P5.jpg",quality=94)
+strip([source,clean,old,cand],["SOURCE","CLEAN","C221 OLD","A137 CURRENT"],0.125,False).save(ROOT/"C232_SOURCE_CLEAN_OLD_FINAL_FLIPY_12P5.jpg",quality=94)
+strip([source,cand],["SOURCE practical 25%","A137 practical 25%"],0.25,False).save(ROOT/"C232_SOURCE_FINAL_PRACTICAL_25PCT.jpg",quality=94)
+strip([old,cand],["C221 old practical 25%","A137 current practical 25%"],0.25,False).save(ROOT/"C232_OLD_FINAL_PRACTICAL_25PCT.jpg",quality=94)
+strip([source_raw,cand_raw],["SOURCE RAW","A137 RAW"],0.125,False).save(ROOT/"C232_SOURCE_FINAL_RAW_12P5.jpg",quality=94)
 
 contacts=[]
 for r in checks:
@@ -133,7 +135,7 @@ for r in checks:
     box=(max(0,x0-pad),max(0,y0-pad),min(W,x1+pad),min(H,y1+pad))
     ims=[]
     for im in (source,clean,old,cand):
-        q=ImageOps.flip(im.crop(box)).resize(((box[2]-box[0])*2,(box[3]-box[1])*2),Image.Resampling.NEAREST).convert("RGB")
+        q=im.crop(box).resize(((box[2]-box[0])*2,(box[3]-box[1])*2),Image.Resampling.NEAREST).convert("RGB")
         ims.append(q)
     row=Image.new("RGB",(sum(i.width for i in ims),max(i.height for i in ims)),"#b0b0b0")
     x=0
