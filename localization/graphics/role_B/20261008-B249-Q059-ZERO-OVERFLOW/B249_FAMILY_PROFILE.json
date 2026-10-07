@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "family_id": "game_mission_prompt_7ce1cfc5",
+  "queue_index": 59,
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "candidate_sha256": "4a657e39e886ed2a38f660730431b15f02b902b06d86beb2c1018c2df2bd67f8",
+  "reference_observation": "Exact English source has a large right-italic NEXT MISSION in orange-white-yellow gradient with white keyline/navy outline/lower-right shadow; three mission labels share heavy yellow fill with navy outline and soft white halo. B249 does not rerender lettering; it preserves A144's readability/shading repair pixel-exact inside all four source bboxes while removing only DXT5 decoded leakage outside the Slipstream source boundary.",
+  "reference_image": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg",
+  "regions": [
+    {
+      "id": "next_mission",
+      "source": "NEXT MISSION",
+      "korean": "다음 미션",
+      "bbox": [
+        8,
+        353,
+        1293,
+        500
+      ],
+      "source_transform": "right_italic",
+      "family": "big"
+    },
+    {
+      "id": "race_rivals",
+      "source": "Race The Rivals!",
+      "korean": "라이벌과 레이스!",
+      "bbox": [
+        75,
+        222,
+        625,
+        304
+      ],
+      "source_transform": "upright_heavy",
+      "family": "small"
+    },
+    {
+      "id": "drift_score",
+      "source": "Drift To Score!",
+      "korean": "드리프트 점수 도전!",
+      "bbox": [
+        119,
+        53,
+        609,
+        137
+      ],
+      "source_transform": "upright_heavy",
+      "family": "small"
+    },
+    {
+      "id": "slipstream_score",
+      "source": "Slipstream To Score!",
+      "korean": "슬립스트림 점수 도전!",
+      "bbox": [
+        717,
+        225,
+        1408,
+        320
+      ],
+      "source_transform": "upright_heavy",
+      "family": "small"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "base_head_at_commit": "430743f1a143893a2c02b31458f8834c940e0fbc"
+}

@@ -1,0 +1,15 @@
+{
+  "run": "20261008-B249-Q059-ZERO-OVERFLOW",
+  "role": "B",
+  "queue_index": 59,
+  "asset": "7CE1CFC5",
+  "work_stolen_from_lane": "A",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "prior_candidate_sha256": "cc8745c36a40422f747fd5ceb66f42f36d165292750765a506a8b1fcba7cb217",
+  "candidate_sha256": "4a657e39e886ed2a38f660730431b15f02b902b06d86beb2c1018c2df2bd67f8",
+  "machine_status": "PASS",
+  "controller_visual_qa": "PASS",
+  "status": "B249_SELF_QA_PASS_PENDING_FRESH_C1_C3_PRE_INGAME_USER_JPG_INGAME_RETEST",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_CONTROLLER_SELF_QA.json"
+}

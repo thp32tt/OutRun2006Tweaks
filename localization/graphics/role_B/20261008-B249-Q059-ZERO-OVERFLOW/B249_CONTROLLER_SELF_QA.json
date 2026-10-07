@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "run": "20261008-B249-Q059-ZERO-OVERFLOW",
+  "role": "B",
+  "timestamp_kst": "2026-10-08T08:40:51+09:00",
+  "queue_index": 59,
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+  "work_stolen_from_lane": "A",
+  "selection_reason": "B primary even shard had no material REWORK_REQUIRED/RENDER_READY/ONE_STAGE_TO_RENDER candidate after live refresh; q59 was the oldest directly repairable current C-returned REWORK_REQUIRED with unchanged exact candidate bytes.",
+  "base_head_at_selection": "0792817f19f86e4ddeafc623ec14b15b00a623a3",
+  "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+  "prior_candidate_sha256": "cc8745c36a40422f747fd5ceb66f42f36d165292750765a506a8b1fcba7cb217",
+  "candidate_sha256": "4a657e39e886ed2a38f660730431b15f02b902b06d86beb2c1018c2df2bd67f8",
+  "c_return": "C268_REWORK_REQUIRED_ZERO_PIXEL_OVERFLOW",
+  "repair": {
+    "summary": "Retain A144 readability/shading repair byte/pixel-identical inside all four exact source glyph/effect bboxes; revert only four DXT5 blocks wholly outside the Slipstream source bbox to exact canonical source block bytes.",
+    "reverted_raw_blocks": [
+      [
+        352,
+        65
+      ],
+      [
+        352,
+        66
+      ],
+      [
+        352,
+        67
+      ],
+      [
+        352,
+        68
+      ]
+    ],
+    "affected_raw_x": 1408,
+    "source_bbox_readable": [
+      717,
+      225,
+      1408,
+      320
+    ],
+    "interior_lettering_pixels_changed": 0,
+    "current_to_fixed_pixels_changed_outside_allowed_union": 10
+  },
+  "exact_machine_qa": {
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "decoded_changed_outside_source_bbox_union": 0,
+    "alpha_changed_outside_source_bbox_union": 0,
+    "visible_changed_outside_source_bbox_union": 0,
+    "current_to_fixed_changed_inside_allowed_union": 0,
+    "result": "PASS"
+  },
+  "clean_plate_provenance": {
+    "exact_verified_plate": "localization/graphics/role_A/20261005-A-PRODUCTION25/7CE_CLEAN_PLATE.png",
+    "provenance_note": "A144 changed lettering style/readability but did not persist a new clean plate. B249 does not reconstruct or redraw interior lettering; it preserves the A144 interior exactly and only restores canonical source bytes outside all source bboxes, so A25 remains the exact source-removal plate provenance."
+  },
+  "ordered_generation_gate": {
+    "1_english_removal_plate_restoration": "PASS_A25_VERIFIED_CLEAN_PLATE_REUSED_AS_PROVENANCE",
+    "2_source_matching_slant_direction": "PASS_UNCHANGED_FROM_A144; SOURCE/CURRENT/FIXED_READABLE_REVIEW",
+    "3_no_undersized_lettering": "PASS_UNCHANGED_FROM_A144; PRACTICAL_100_75_50_READABLE",
+    "4_source_faithful_weight_effects": "PASS_A144_INTERIOR_PIXEL_EXACT; NO_NEW_RENDER",
+    "5_no_clipped_pixels": "PASS; FIX CHANGES ONLY OUTSIDE-BOUNDARY SOURCE BLOCKS",
+    "6_protected_art_clearance": "PASS_ZERO_DECODED_OUTSIDE_AND_ZERO_INTERIOR_DELTA",
+    "7_flip_y_and_raw_clean": "PASS_RAW_MIRROR_Y_AND_READABLE_REVIEW",
+    "8_immediate_readability": "PASS_SOURCE_VS_FIXED_PRACTICAL_100_75_50"
+  },
+  "controller_visual_observations": [
+    "SOURCE/C268-rejected/B249 readable contact confirms the A144 readability improvement is preserved; B249 introduces no visible typography or artwork regression.",
+    "Boundary high-zoom confirms the correction is confined to the right boundary of the Slipstream source region; Korean interior pixels remain unchanged.",
+    "Practical 100/75/50 review keeps 다음 미션 and the three mission labels immediately readable with no new low-resolution, clipping, residue, overlap or layer intrusion.",
+    "RAW/FLIP-Y review preserves mirror-Y construction and readable orientation.",
+    "Black/white/gray alpha-composite review shows no visible halo introduced by the repaired boundary."
+  ],
+  "controller_visual_qa": "PASS",
+  "family_profile": "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_FAMILY_PROFILE.json",
+  "evidence": [
+    "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_SOURCE_CURRENT_FIXED_READABLE.jpg",
+    "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_BOUNDARY_REPAIR_ZOOM.png",
+    "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_PRACTICAL_100_75_50.jpg",
+    "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_RAW_FLIPY.jpg",
+    "localization/graphics/role_B/20261008-B249-Q059-ZERO-OVERFLOW/B249_BLACK_WHITE_GRAY.png"
+  ],
+  "fresh_independent_c": "REQUIRED_C1_ODD_SHARD",
+  "c3": "REQUIRED_AFTER_FRESH_C",
+  "pre_ingame_user_jpg": "PENDING_AFTER_C_C3_EVIDENCE",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "base_head_at_commit": "430743f1a143893a2c02b31458f8834c940e0fbc"
+}
