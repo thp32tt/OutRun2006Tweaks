@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 13:46 KST",
+  "updated_at_kst": "2026-10-07 14:48 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4254,5 +4254,23 @@
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true,
     "export_refresh_timestamp_kst": "2026-10-07T14:38:54+09:00"
+  },
+  "b232r_q107_semantic_order_rework": {
+    "run": "B232R",
+    "queue_index": 107,
+    "asset": "841E796B",
+    "work_stolen_from_lane": "A",
+    "source": "No Handicap",
+    "prior_raster": "없음 / 핸디캡",
+    "final_raster": "무 / 핸디캡",
+    "read_as": "무 핸디캡",
+    "candidate_sha256": "d6a5cc84e7cf834afe11d8afdc2c0b869b306e75759b71ee392983db8999abda",
+    "rejected_same_task_v1_sha256": "5e7af1d49c0ef87406d7a17b4c52fe2044dcd8c9f6fe001a1a89f5a479a5715e",
+    "machine_qa": "PASS_ZERO_BLAST_POSITIVE_MARGIN_HEADER_RAW",
+    "controller_visual_qa": "PASS",
+    "status": "B232R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "report": "localization/graphics/role_B/20261007-B232-Q107-841E796B-SEMANTIC/B232_841E_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261007-B232-Q107-841E796B-SEMANTIC/B232_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
   }
 }
