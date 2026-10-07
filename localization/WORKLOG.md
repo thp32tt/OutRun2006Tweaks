@@ -3237,3 +3237,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - q52 A8CE339F `c37ce8cc...`: independent DXT5 diff PASS, 1,779 changed pixels wholly inside right Start source bbox; duplicate Start rows now 60x36/60x36, focus/full/RAW visual PASS. Fresh C + exact-SHA C3_STRICT_PASS; PRE_INGAME/user JPG/actual-game pending.
 - Evidence: `localization/graphics/role_C/20261008-C256-C2-BATCH-Q060-Q212-Q052/C256_CONTROLLER_FINAL_QA.json` plus per-asset machine reports. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 
+## 2026-10-08 00:39 KST — B240 P0 runtime menu typography build validation
+- IGR-020..IGR-024 user in-game regressions consumed as one shared runtime-material fix. Korean UI font selection now prefers Windows malgunsl.ttf before malgun.ttf; exact runtime text ID 935 (확실합니까?) bypasses the compact HUD/speech-bubble keyline.
+- Exact runtime source blob 954f09987228b5aeb221ea0aa90edb6072f36b5f is unchanged on the current branch from validation SHA ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653.
+- Win32 Release run 37644400051 SUCCESS, job 112871291499; artifact 11494226800, digest sha256:d92b8330353720ce800adcde0485fd29a2096abd23b773b5e8bc5671691e2068.
+- Korean Test Build run 37644400122 reached post-build packaging but failed on a PowerShell parser bug in the PRE_INGAME copy error message (q$index:). Workflow fix committed as 7f39a55a7803ab42f5be1bb592f1f624e4f5ae73 using q${index}:; package revalidation remains pending and does not invalidate the independent Win32 Release PASS.
+- IGR-020/022/023/024 -> B240_BUILD_PASS_PENDING_INGAME_RETEST. IGR-021 -> B240_BUILD_PASS_PENDING_TEXT_ID_CAPTURE_AND_INGAME_RETEST. No row is closed without a new actual-game screenshot.
+- RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

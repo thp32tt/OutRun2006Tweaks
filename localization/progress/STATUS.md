@@ -2604,3 +2604,7 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q52 A8CE339F `c37ce8cc...`: independent DXT5 diff PASS, 1,779 changed pixels wholly inside right Start source bbox; duplicate Start rows now 60x36/60x36, focus/full/RAW visual PASS. Fresh C + exact-SHA C3_STRICT_PASS; PRE_INGAME/user JPG/actual-game pending.
 - Evidence: `localization/graphics/role_C/20261008-C256-C2-BATCH-Q060-Q212-Q052/C256_CONTROLLER_FINAL_QA.json` plus per-asset machine reports. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 
+### B240 runtime typography — 2026-10-08 00:39 KST
+- P0 IGR-020..IGR-024 shared runtime fix validated by Win32 Release run 37644400051 SUCCESS on exact source SHA ec2766ca...; artifact 11494226800 digest sha256:d92b8330...1e2068.
+- Semilight-first Korean UI face + ID935 modal keyline exclusion are build-valid. IGR-020/022/023/024 now await NEW in-game retest; IGR-021 additionally awaits exact text-ID capture for spacing/wording.
+- Korean Test Build run 37644400122 package stage exposed a PowerShell interpolation bug; fixed in 7f39a55a...; package rerun pending. RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.

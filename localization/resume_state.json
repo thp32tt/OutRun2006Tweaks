@@ -5532,28 +5532,53 @@
     "runtime_validation": "PENDING_NEW_INGAME_RETEST"
   },
   "latest_b_runtime_rework": {
-    "timestamp_kst": "2026-10-06T07:20:25+09:00",
-    "run": "20261006-B-INGAME171-IGR007-SPEECH-BUBBLE-RUNTIME",
-    "regression": "IGR-007",
-    "screen": "HEART_ATTACK_SPEECH_BUBBLE",
-    "decision": "EXACT_RUNTIME_RENDER_PATH_SHARED_COMPACT_POLICY",
-    "shared_material_origin": "B170",
-    "source_commit": "dced451f375ae98e3cc0273caead947f634bff6f",
-    "source_file": "src/hooks_localization.cpp",
-    "source_sha256": "12fefb1554428245d8b593203188ae683858784c35f4440b7f7571b700a32889",
-    "current_source_hash_exact": true,
-    "supporting_graphics_index": 51,
-    "supporting_graphics_path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
-    "build_validation": {
-      "win32_release_run": 37379204456,
-      "korean_test_build_run": 37379204466,
-      "result": "PASS_EXACT_SOURCE_REUSE"
+    "run": "20261008-B240-IGR020-024-RUNTIME-TYPOGRAPHY",
+    "timestamp_kst": "2026-10-08T00:39:00+09:00",
+    "role": "B",
+    "priority": "P0_USER_INGAME",
+    "evidence": [
+      "스크린샷(159).png",
+      "스크린샷(160).png",
+      "스크린샷(161).png",
+      "스크린샷(162).png",
+      "스크린샷(164).png"
+    ],
+    "source_commits": {
+      "semilight": "f5c96c538f2cbe75e6ba680f18214b7e94fe2963",
+      "confirm_dialog": "ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653",
+      "current_source_blob": "954f09987228b5aeb221ea0aa90edb6072f36b5f"
     },
-    "status": "B171_SHARED_RUNTIME_FIX_BUILD_PASS_PENDING_C_AND_INGAME_RETEST",
-    "pending_independent_c_review": true,
-    "pending_new_ingame_retest": true,
-    "report": "localization/runtime/B171_IGR007_SPEECH_BUBBLE_RUNTIME_RECONCILE.json",
-    "runtime_validation": "PENDING_NEW_INGAME_RETEST"
+    "source_changes": {
+      "overlay_font": "prefer Windows malgunsl.ttf before malgun.ttf",
+      "confirm_dialog": "runtime text ID 935 excluded from compact HUD/speech-bubble keyline"
+    },
+    "win32_release": {
+      "run_id": 37644400051,
+      "job_id": 112871291499,
+      "head_sha": "ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653",
+      "conclusion": "SUCCESS",
+      "artifact_id": 11494226800,
+      "artifact_name": "outrun2006tweaks-ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653",
+      "artifact_digest": "sha256:d92b8330353720ce800adcde0485fd29a2096abd23b773b5e8bc5671691e2068"
+    },
+    "korean_test_build": {
+      "run_id": 37644400122,
+      "head_sha": "ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653",
+      "compile_reached": "PASS_BEFORE_PACKAGING",
+      "conclusion": "FAIL_PACKAGING_POWERSHELL_PARSER",
+      "failure": "Candidate SHA mismatch q$index: interpolation parser error in PRE_INGAME copy step",
+      "workflow_fix_commit": "7f39a55a7803ab42f5be1bb592f1f624e4f5ae73",
+      "package_revalidation": "PENDING"
+    },
+    "backlog": {
+      "IGR-020": "BUILD_PASS_PENDING_INGAME_RETEST",
+      "IGR-021": "BUILD_PASS_PENDING_TEXT_ID_CAPTURE_AND_INGAME_RETEST",
+      "IGR-022": "BUILD_PASS_PENDING_INGAME_RETEST",
+      "IGR-023": "BUILD_PASS_PENDING_INGAME_RETEST",
+      "IGR-024": "BUILD_PASS_PENDING_INGAME_RETEST"
+    },
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   },
   "b171_igr007_runtime_reconcile": {
     "timestamp_kst": "2026-10-06T07:20:25+09:00",
@@ -6743,7 +6768,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T00:37:20+09:00",
+  "updated_at_kst": "2026-10-08T00:39:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -9363,7 +9388,7 @@
     "runtime_validation": "UNTESTED"
   },
   "b240_user_menu_typography_rework": {
-    "status": "RUNTIME_SOURCE_APPLIED_BUILD_PENDING",
+    "status": "B240_BUILD_PASS_PENDING_INGAME_RETEST",
     "evidence": [
       "스크린샷(159).png",
       "스크린샷(160).png",
@@ -9372,19 +9397,46 @@
       "스크린샷(164).png"
     ],
     "source_changes": {
-      "overlay_font": "prefer malgunsl.ttf before malgun.ttf",
-      "confirm_dialog": "runtime text ID 935 excludes compact HUD keyline"
+      "overlay_font": "prefer Windows malgunsl.ttf before malgun.ttf",
+      "confirm_dialog": "runtime text ID 935 excluded from compact HUD/speech-bubble keyline"
     },
-    "backlog": [
-      "IGR-020",
-      "IGR-021",
-      "IGR-022",
-      "IGR-023",
-      "IGR-024",
-      "IGR-025"
-    ],
+    "backlog": {
+      "IGR-020": "BUILD_PASS_PENDING_INGAME_RETEST",
+      "IGR-021": "BUILD_PASS_PENDING_TEXT_ID_CAPTURE_AND_INGAME_RETEST",
+      "IGR-022": "BUILD_PASS_PENDING_INGAME_RETEST",
+      "IGR-023": "BUILD_PASS_PENDING_INGAME_RETEST",
+      "IGR-024": "BUILD_PASS_PENDING_INGAME_RETEST"
+    },
     "runtime_validation": "UNTESTED",
-    "next": "Win32 Release + Korean test build, then new in-game screenshot"
+    "next": "Win32 Release + Korean test build, then new in-game screenshot",
+    "run": "20261008-B240-IGR020-024-RUNTIME-TYPOGRAPHY",
+    "timestamp_kst": "2026-10-08T00:39:00+09:00",
+    "role": "B",
+    "priority": "P0_USER_INGAME",
+    "source_commits": {
+      "semilight": "f5c96c538f2cbe75e6ba680f18214b7e94fe2963",
+      "confirm_dialog": "ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653",
+      "current_source_blob": "954f09987228b5aeb221ea0aa90edb6072f36b5f"
+    },
+    "win32_release": {
+      "run_id": 37644400051,
+      "job_id": 112871291499,
+      "head_sha": "ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653",
+      "conclusion": "SUCCESS",
+      "artifact_id": 11494226800,
+      "artifact_name": "outrun2006tweaks-ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653",
+      "artifact_digest": "sha256:d92b8330353720ce800adcde0485fd29a2096abd23b773b5e8bc5671691e2068"
+    },
+    "korean_test_build": {
+      "run_id": 37644400122,
+      "head_sha": "ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653",
+      "compile_reached": "PASS_BEFORE_PACKAGING",
+      "conclusion": "FAIL_PACKAGING_POWERSHELL_PARSER",
+      "failure": "Candidate SHA mismatch q$index: interpolation parser error in PRE_INGAME copy step",
+      "workflow_fix_commit": "7f39a55a7803ab42f5be1bb592f1f624e4f5ae73",
+      "package_revalidation": "PENDING"
+    },
+    "forbidden_domains_touched": []
   },
   "c256_c2_batch_q060_q212_q052": {
     "run": "20261008-C256-C2-BATCH-Q060-Q212-Q052",
