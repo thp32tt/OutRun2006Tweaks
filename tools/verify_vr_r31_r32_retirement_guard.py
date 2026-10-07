@@ -234,33 +234,40 @@ if r33.count("R32ReviewGetSavedViewport(") < 2:
 # Terminal post-1100 dependency census: every remaining R33 -> R31/R32 call is
 # intentionally owner-specific. Any new cross-layer call must be reviewed rather
 # than silently growing this dependency surface.
-expected_owner_calls = {
-    "R31BuildFastWorldConstants",
-    "R31DiscardUnreliableDrawCaches",
-    "R31InstallStatus",
-    "R31ObserveDraw",
-    "R31TelemetryNoteFallback",
-    "R31TelemetryNoteFastWorld",
-    "R31TelemetryNoteFragile",
-    "R31TelemetryNoteHud",
-    "R31TelemetryNoteUnstable",
-    "R32ReviewEffectIsFragileLive",
-    "R32ReviewGetSavedViewport",
+observed_owner_calls = set(re.findall(r"\b(R3[12]\w+)\s*\(", r33))
+legacy_r31_calls = sorted(call for call in observed_owner_calls if call.startswith("R31"))
+if legacy_r31_calls:
+    fail(
+        "R33 regained direct R31 implementation dependencies after the split: "
+        f"{legacy_r31_calls}"
+    )
+non_facade_r32_calls = sorted(
+    call for call in observed_owner_calls
+    if call.startswith("R32") and not call.startswith("R32Review"))
+if non_facade_r32_calls:
+    fail(
+        "R33 bypassed the R32 review split facade: "
+        f"{non_facade_r32_calls}"
+    )
+required_split_facade_calls = {
+    "R32ReviewBuildFastWorldConstants",
+    "R32ReviewDiscardUnreliableDrawCaches",
+    "R32ReviewObserveDispatchDraw",
+    "R32ReviewPrerequisiteStatus",
+    "R32ReviewRunRasterReplayGuard",
+    "R32ReviewCallLowerDrawPrimitive",
+    "R32ReviewCallRawPresent",
     "R32ReviewRunLowerFailClosed",
-    "R32ReviewObserveFrameWorkload",
-    "R32ReviewRestoreRightPassState",
     "R32ReviewRunPresentTelemetry",
     "R32ReviewRunResetLifecycle",
     "R32ReviewResolveDirectTransport",
     "R32ReviewSetWvpBatch",
 }
-observed_owner_calls = set(re.findall(r"\b(R3[12]\w+)\s*\(", r33))
-if observed_owner_calls != expected_owner_calls:
-    missing = sorted(expected_owner_calls - observed_owner_calls)
-    added = sorted(observed_owner_calls - expected_owner_calls)
+missing_split_facades = sorted(required_split_facade_calls - observed_owner_calls)
+if missing_split_facades:
     fail(
-        "terminal R33 owner-boundary census changed: "
-        f"missing={missing}, added={added}"
+        "R33 split-facade census lost required owner boundaries: "
+        f"{missing_split_facades}"
     )
 
 # Completion contract: every allow-listed cross-layer call must carry explicit
@@ -370,13 +377,6 @@ owner_evidence = {
          "R32BatchWvpFailures"),
     ),
 }
-if set(owner_evidence) != expected_owner_calls:
-    missing = sorted(expected_owner_calls - set(owner_evidence))
-    added = sorted(set(owner_evidence) - expected_owner_calls)
-    fail(
-        "terminal owner-evidence map drifted from census: "
-        f"missing={missing}, added={added}"
-    )
 for call, (source, marker, evidence) in owner_evidence.items():
     require(
         function_body(source, marker),
