@@ -11439,6 +11439,39 @@ def main() -> None:
             + ", ".join(missing_r290_programmable_activation_pair_identity)
         )
 
+    r291_programmable_runtime_semantic_review_bridge = [
+        ("ProgrammableProductionSemanticReviewCensusEvidence",
+         RUNTIME_CENSUS, "R291 production census bundle for R288/R289 evidence"),
+        ("review_programmable_production_semantics(",
+         RUNTIME_CENSUS, "R291 serialized production semantic review helper"),
+        ("seal_programmable_shader_translation_admission(",
+         RUNTIME_CENSUS, "R291 production path seals current R288 admission"),
+        ("validate_programmable_shader_translation_admission_snapshot(",
+         RUNTIME_CENSUS, "R291 validates exact R288 admission snapshot"),
+        ("materialize_semantic_translation_review_for_observation(",
+         RUNTIME_CENSUS, "R291 production path materializes R289 semantic review"),
+        ("validate_semantic_translation_review_snapshot(",
+         RUNTIME_CENSUS, "R291 validates exact R289 review snapshot"),
+        ("sig.shaderTranslationAdmissionExact =",
+         RUNTIME_CENSUS, "R291 census records R288 exactness"),
+        ("sig.shaderProductionSemanticReviewExact =",
+         RUNTIME_CENSUS, "R291 census records R289 exactness"),
+        ("VR DX11 R291 productionSemanticReview",
+         RUNTIME_CENSUS, "R291 bounded detailed-signature diagnostic"),
+        ("sig.shaderTranslationExact = false;",
+         RUNTIME_CENSUS, "R291 keeps programmable translation promotion fail-closed"),
+    ]
+    missing_r291_programmable_runtime_semantic_review = [
+        meaning for token, source, meaning
+        in r291_programmable_runtime_semantic_review_bridge
+        if token not in source
+    ]
+    if missing_r291_programmable_runtime_semantic_review:
+        raise SystemExit(
+            "DX11 R291 programmable runtime semantic-review bridge drift: "
+            + ", ".join(missing_r291_programmable_runtime_semantic_review)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),

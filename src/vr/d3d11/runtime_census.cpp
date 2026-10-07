@@ -264,6 +264,91 @@ namespace outrun::vr::dx11
                     translationPlanSnapshotToken);
         }
 
+        // R291 carries the exact R288 admission and R289 semantic review into
+        // the sampled production census. The helper is serialized with the
+        // R287 observation owner so Reset/device-generation changes cannot
+        // race a semantic review. It creates/owns only the R289 input-layout
+        // object and never binds IA/VS/PS or authorizes Draw*.
+        struct ProgrammableProductionSemanticReviewCensusEvidence
+        {
+            NativeProgrammableShaderTranslationAdmissionEvidence admission{};
+            NativeProgrammableShaderProductionSemanticReviewEvidence review{};
+            bool admissionValidated{};
+            bool reviewValidated{};
+        };
+
+        ProgrammableProductionSemanticReviewCensusEvidence
+        review_programmable_production_semantics(
+            IDirect3DDevice9* sourceDevice,
+            const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+            const NativeProgrammableShaderProductionObservationEvidence&
+                observation,
+            const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+                targetBytecodeMaterialization,
+            const VertexInputLayoutTranslation& layout,
+            const ProgrammableShaderInterfaceLinkageEvidence&
+                sourceInterfaceLinkage) noexcept
+        {
+            ProgrammableProductionSemanticReviewCensusEvidence out{};
+            if (!sourceDevice ||
+                !sourceIdentity.exact_identity() ||
+                sourceIdentity.translationImplemented ||
+                !observation.reviewReady ||
+                observation.reviewSnapshotToken == 0 ||
+                !targetBytecodeMaterialization.reviewReady ||
+                !layout.exact ||
+                !sourceInterfaceLinkage.exact())
+                return out;
+
+            std::lock_guard<std::mutex> lock(
+                NativeProgrammableObservationMutex);
+            if (NativeProgrammableObservationSourceDevice != sourceDevice ||
+                !NativeProgrammableObservationBackend.ready())
+                return out;
+
+            out.admission =
+                seal_programmable_shader_translation_admission(
+                    sourceIdentity,
+                    observation,
+                    observation.reviewSnapshotToken);
+            out.admissionValidated =
+                validate_programmable_shader_translation_admission_snapshot(
+                    sourceIdentity,
+                    observation,
+                    observation.reviewSnapshotToken,
+                    out.admission,
+                    out.admission.reviewSnapshotToken);
+            if (!out.admissionValidated)
+                return out;
+
+            auto& ownership =
+                NativeProgrammableObservationBackend.
+                    programmable_shader_ownership();
+            out.review =
+                ownership.materialize_semantic_translation_review_for_observation(
+                    sourceIdentity,
+                    observation,
+                    observation.reviewSnapshotToken,
+                    out.admission,
+                    out.admission.reviewSnapshotToken,
+                    targetBytecodeMaterialization,
+                    layout,
+                    sourceInterfaceLinkage);
+            out.reviewValidated =
+                ownership.validate_semantic_translation_review_snapshot(
+                    sourceIdentity,
+                    observation,
+                    observation.reviewSnapshotToken,
+                    out.admission,
+                    out.admission.reviewSnapshotToken,
+                    targetBytecodeMaterialization,
+                    layout,
+                    sourceInterfaceLinkage,
+                    out.review,
+                    out.review.reviewSnapshotToken);
+            return out;
+        }
+
         struct TextureMutationEvidence
         {
             bool descriptorObserved{};
@@ -494,6 +579,19 @@ namespace outrun::vr::dx11
             std::uint64_t shaderProductionObservationOwnerGeneration{};
             std::uint64_t shaderProductionSemanticHandoffSnapshotToken{};
             std::uint64_t shaderProductionObservationSnapshotToken{};
+            // R291 observes the exact production R288/R289 admission/review
+            // chain in census identity without promoting programmable draws.
+            bool shaderTranslationAdmissionExact{};
+            bool shaderTranslationAdmissionBoundaryPreserved{};
+            std::uint64_t shaderTranslationAdmissionSnapshotToken{};
+            bool shaderProductionSemanticReviewExact{};
+            bool shaderProductionSemanticReviewInputLayoutReady{};
+            bool shaderProductionSemanticReviewInputLayoutReused{};
+            bool shaderProductionSemanticReviewTranslationReady{};
+            bool shaderProductionSemanticReviewBoundaryPreserved{};
+            std::uint64_t shaderProductionSemanticReviewInputLayoutSnapshotToken{};
+            std::uint64_t shaderProductionSemanticReviewTranslationSnapshotToken{};
+            std::uint64_t shaderProductionSemanticReviewSnapshotToken{};
             bool shaderTranslatedSemanticReceiptExact{};
             bool shaderTranslatedSemanticReceiptObjectReady{};
             std::uint64_t shaderTranslatedSemanticReceiptSnapshotToken{};
@@ -1070,6 +1168,34 @@ namespace outrun::vr::dx11
                 hash, sig.shaderProductionSemanticHandoffSnapshotToken);
             hash = hash_mix(
                 hash, sig.shaderProductionObservationSnapshotToken);
+            hash = hash_mix(
+                hash, sig.shaderTranslationAdmissionExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTranslationAdmissionBoundaryPreserved ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTranslationAdmissionSnapshotToken);
+            hash = hash_mix(
+                hash, sig.shaderProductionSemanticReviewExact ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionSemanticReviewInputLayoutReady ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionSemanticReviewInputLayoutReused ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionSemanticReviewTranslationReady ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionSemanticReviewBoundaryPreserved ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionSemanticReviewInputLayoutSnapshotToken);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionSemanticReviewTranslationSnapshotToken);
+            hash = hash_mix(
+                hash, sig.shaderProductionSemanticReviewSnapshotToken);
             hash = hash_mix(
                 hash, sig.shaderTranslatedSemanticReceiptExact ? 1u : 0u);
             hash = hash_mix(
@@ -2321,6 +2447,55 @@ namespace outrun::vr::dx11
             sig.inputLayoutFvfExact = inputLayout.fvfPath && inputLayout.exact;
             sig.inputLayoutFvfPending = inputLayout.fvfPending;
             sig.inputLayoutElements = inputLayout.elementCount;
+
+            const auto productionSemanticReview =
+                review_programmable_production_semantics(
+                    device,
+                    programmablePairIdentity,
+                    productionObservation,
+                    targetBytecodeMaterialization,
+                    inputLayout,
+                    shaderInterfaceLinkage);
+            sig.shaderTranslationAdmissionExact =
+                productionSemanticReview.admissionValidated;
+            sig.shaderTranslationAdmissionBoundaryPreserved =
+                productionSemanticReview.admissionValidated &&
+                productionSemanticReview.admission.boundaryPreserved;
+            sig.shaderTranslationAdmissionSnapshotToken =
+                productionSemanticReview.admissionValidated
+                    ? productionSemanticReview.admission.reviewSnapshotToken
+                    : 0;
+            sig.shaderProductionSemanticReviewExact =
+                productionSemanticReview.reviewValidated;
+            sig.shaderProductionSemanticReviewInputLayoutReady =
+                productionSemanticReview.reviewValidated &&
+                productionSemanticReview.review.inputLayoutReceiptReady &&
+                productionSemanticReview.review.inputLayoutSnapshotMatches;
+            sig.shaderProductionSemanticReviewInputLayoutReused =
+                productionSemanticReview.reviewValidated &&
+                productionSemanticReview.review.inputLayoutReused;
+            sig.shaderProductionSemanticReviewTranslationReady =
+                productionSemanticReview.reviewValidated &&
+                productionSemanticReview.review.semanticTranslationReady &&
+                productionSemanticReview.review.semanticTranslationSnapshotMatches;
+            sig.shaderProductionSemanticReviewBoundaryPreserved =
+                productionSemanticReview.reviewValidated &&
+                productionSemanticReview.review.boundaryPreserved &&
+                !productionSemanticReview.review.objectBindingAuthorized &&
+                !productionSemanticReview.review.nativeDrawPathActivationAllowed &&
+                !productionSemanticReview.review.drawDispatchAuthorized;
+            sig.shaderProductionSemanticReviewInputLayoutSnapshotToken =
+                productionSemanticReview.reviewValidated
+                    ? productionSemanticReview.review.inputLayoutSnapshotToken
+                    : 0;
+            sig.shaderProductionSemanticReviewTranslationSnapshotToken =
+                productionSemanticReview.reviewValidated
+                    ? productionSemanticReview.review.semanticTranslationSnapshotToken
+                    : 0;
+            sig.shaderProductionSemanticReviewSnapshotToken =
+                productionSemanticReview.reviewValidated
+                    ? productionSemanticReview.review.reviewSnapshotToken
+                    : 0;
             return sig;
         }
 
@@ -2657,6 +2832,19 @@ namespace outrun::vr::dx11
                         sig.shaderProductionObservationBoundaryPreserved ? 1 : 0,
                         sig.shaderProductionSemanticHandoffSnapshotToken,
                         sig.shaderProductionObservationSnapshotToken);
+                    spdlog::info(
+                        "VR DX11 R291 productionSemanticReview signature#{}: admissionExact={} reviewExact={} inputLayoutReady={} inputLayoutReused={} semanticReady={} boundaryPreserved={} admissionSnapshot=0x{:016X} inputLayoutSnapshot=0x{:016X} semanticSnapshot=0x{:016X} reviewSnapshot=0x{:016X}",
+                        unique,
+                        sig.shaderTranslationAdmissionExact ? 1 : 0,
+                        sig.shaderProductionSemanticReviewExact ? 1 : 0,
+                        sig.shaderProductionSemanticReviewInputLayoutReady ? 1 : 0,
+                        sig.shaderProductionSemanticReviewInputLayoutReused ? 1 : 0,
+                        sig.shaderProductionSemanticReviewTranslationReady ? 1 : 0,
+                        sig.shaderProductionSemanticReviewBoundaryPreserved ? 1 : 0,
+                        sig.shaderTranslationAdmissionSnapshotToken,
+                        sig.shaderProductionSemanticReviewInputLayoutSnapshotToken,
+                        sig.shaderProductionSemanticReviewTranslationSnapshotToken,
+                        sig.shaderProductionSemanticReviewSnapshotToken);
                     spdlog::info(
                         "VR DX11 R275 translatedSemanticReceipt signature#{}: exact={} objectReady={} snapshot=0x{:016X}",
                         unique,
