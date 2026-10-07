@@ -1,0 +1,211 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261007-A167-WORKSTEAL-C251-Q060-Q212",
+  "selection": {
+    "primary_shard": "ODD",
+    "odd_actionable_count": 0,
+    "work_stolen_from_lane": "B",
+    "queue_indices": [
+      60,
+      212
+    ],
+    "reason": "A primary shard exhausted; C251 direct even REWORK_REQUIRED remained unchanged after latest HEAD refresh"
+  },
+  "execution_backend": "GITHUB_ACTIONS_REPOSITORY_BACKED_CPU_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILURE",
+  "assets": {
+    "q60": {
+      "queue_index": 60,
+      "asset": "A064FDFC",
+      "input_candidate_sha256": "2d3d7fd7b612cee048067813f150d323be30483042010786168a90fa983386b6",
+      "candidate_sha256": "457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+      "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "rows": [
+        {
+          "key": "stage",
+          "text": "스테이지",
+          "source_bbox": [
+            455,
+            245,
+            690,
+            350
+          ],
+          "localized_bbox": [
+            463,
+            252,
+            679,
+            342
+          ],
+          "source_size": [
+            235,
+            105
+          ],
+          "localized_size": [
+            216,
+            90
+          ],
+          "width_ratio": 0.9191,
+          "height_ratio": 0.8571,
+          "style": "stage",
+          "right_shear": 0.26
+        },
+        {
+          "key": "outrun_miles_white",
+          "text": "아웃런 마일!",
+          "source_bbox": [
+            1090,
+            245,
+            1930,
+            385
+          ],
+          "localized_bbox": [
+            1096,
+            256,
+            1816,
+            374
+          ],
+          "source_size": [
+            840,
+            140
+          ],
+          "localized_size": [
+            720,
+            118
+          ],
+          "width_ratio": 0.8571,
+          "height_ratio": 0.8429,
+          "style": "white",
+          "right_shear": 0.3
+        },
+        {
+          "key": "outrun_miles",
+          "text": "아웃런 마일:",
+          "source_bbox": [
+            2081,
+            250,
+            2860,
+            370
+          ],
+          "localized_bbox": [
+            2087,
+            259,
+            2752,
+            361
+          ],
+          "source_size": [
+            779,
+            120
+          ],
+          "localized_size": [
+            665,
+            102
+          ],
+          "width_ratio": 0.8537,
+          "height_ratio": 0.85,
+          "style": "yellow",
+          "right_shear": 0.3
+        }
+      ],
+      "machine_qa": {
+        "changed_outside": 0,
+        "alpha_outside": 0,
+        "header_128_exact": true,
+        "mips": 1,
+        "raw_orientation": "mirror_y",
+        "persisted_decode": "PASS",
+        "bbox_size_positive_margin": "3/3 PASS"
+      },
+      "controller_visual_qa": "PENDING",
+      "fix": "C251 source-relative hierarchy scale return: Stage height ~86%; OUTRUN MILES rows ~85% source width/~84-85% source height with source-family right lean/effects"
+    },
+    "q212": {
+      "queue_index": 212,
+      "asset": "BA0147DA",
+      "input_candidate_sha256": "61ae0c45568e023cc258379173f8d80f43cc5257f2d8facefbcf3c87759179e1",
+      "candidate_sha256": "4c772b9329768ad920a5a09b79136dc2da9fde4a5b6c9486bde6952e452eebd8",
+      "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "rows": [
+        {
+          "key": "coast2coast_title",
+          "text": "코스트 2 코스트",
+          "source_bbox": [
+            0,
+            964,
+            1760,
+            1124
+          ],
+          "localized_bbox": [
+            5,
+            971,
+            1304,
+            1117
+          ],
+          "source_size": [
+            1760,
+            160
+          ],
+          "localized_size": [
+            1299,
+            146
+          ],
+          "width_ratio": 0.7381,
+          "height_ratio": 0.9125,
+          "style": "solid red tall-condensed display, per-glyph horizontal condense 0.78 + source-title tracking",
+          "font": "Noto Sans CJK KR:style=Black"
+        },
+        {
+          "key": "heart_attack_title",
+          "text": "하트 어택",
+          "source_bbox": [
+            21,
+            1316,
+            1780,
+            1474
+          ],
+          "localized_bbox": [
+            26,
+            1322,
+            847,
+            1468
+          ],
+          "source_size": [
+            1759,
+            158
+          ],
+          "localized_size": [
+            821,
+            146
+          ],
+          "width_ratio": 0.4667,
+          "height_ratio": 0.9241,
+          "style": "solid red tall-condensed display, per-glyph horizontal condense 0.78 + source-title tracking",
+          "font": "Noto Sans CJK KR:style=Black"
+        }
+      ],
+      "machine_qa": {
+        "changed_outside": 0,
+        "alpha_outside": 0,
+        "header_128_exact": true,
+        "mips": 1,
+        "raw_orientation": "mirror_y",
+        "persisted_decode": "PASS",
+        "bbox_size_positive_margin": "2/2 PASS"
+      },
+      "controller_visual_qa": "PENDING",
+      "fix": "C251 title-family proportion return: tall-condensed red display geometry with materially stronger source-relative height/width hierarchy"
+    }
+  },
+  "ordered_generation_gate": {
+    "plate_restoration": "PASS_REUSED_VERIFIED_CLEAN",
+    "source_matching_slant": "PASS",
+    "no_unnecessary_undersize": "PASS_MATERIALLY_UPSCALED_WITHIN_SOURCE_BBOX",
+    "source_faithful_weight_effects": "PASS",
+    "no_clipping": "PASS",
+    "protected_art_clearance": "PASS_ZERO_OUTSIDE",
+    "flip_y_raw": "EVIDENCE_WRITTEN",
+    "immediate_readability": "PENDING_CONTROLLER_VISUAL"
+  },
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "status": "A167_MACHINE_SELF_QA_PASS_PENDING_CONTROLLER_VISUAL"
+}

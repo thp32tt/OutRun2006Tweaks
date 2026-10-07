@@ -1,0 +1,15 @@
+{
+  "role": "A",
+  "run": "20261007-A167-WORKSTEAL-C251-Q060-Q212",
+  "queue_indices": [
+    60,
+    212
+  ],
+  "work_stolen_from_lane": "B",
+  "candidates": {
+    "A064FDFC": "457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+    "BA0147DA": "4c772b9329768ad920a5a09b79136dc2da9fde4a5b6c9486bde6952e452eebd8"
+  },
+  "status": "MACHINE_SELF_QA_PASS_PENDING_CONTROLLER_VISUAL",
+  "runtime_validation": "UNTESTED"
+}
