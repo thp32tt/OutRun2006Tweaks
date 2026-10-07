@@ -4124,7 +4124,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C250-C1-BATCH-Q057-Q061-Q065/C250_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C251-C2-BATCH-Q060-Q054-Q212/C251_CONTROLLER_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -6723,7 +6723,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07T22:20:00+09:00",
+  "updated_at_kst": "2026-10-07T22:25:59+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -9176,5 +9176,62 @@
     "controller_report": "localization/graphics/role_A/20261007-A166-C250-Q057-Q061-Q065-STYLE-SEMANTIC/A166_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "c251_c2_batch_q060_q054_q212": {
+    "run": "20261007-C251-C2-BATCH-Q060-Q054-Q212",
+    "timestamp_kst": "2026-10-07T22:25:59+09:00",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "machine_evidence_commit": "f7905f7d8af1",
+    "selection_refresh_heads": {
+      "q60": "98f071b453ed03f9f07704ce64f5220fbb2d4dda",
+      "q54": "98f071b453ed03f9f07704ce64f5220fbb2d4dda",
+      "q212": "98f071b453ed03f9f07704ce64f5220fbb2d4dda",
+      "pre_commit": "ab069065682fcc25f591916f3704122b1960bd27"
+    },
+    "execution_backend": "ChatGPT local first attempted: github.com DNS unavailable. Persisted GitHub-hosted C251 machine evidence consumed without recompute. N100 MCP used only for seven small JPG evidence transfers for controller visual review.",
+    "assets": {
+      "q54": {
+        "asset": "FA7BBB13",
+        "candidate_sha256": "5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e",
+        "machine_qa": "PASS_17_OF_17_ZERO_SCOPE",
+        "controller_visual_qa": "PASS",
+        "c3_strict": "C3_STRICT_PASS_EXACT_SHA",
+        "decision": "PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_INGAME"
+      },
+      "q60": {
+        "asset": "A064FDFC",
+        "candidate_sha256": "2d3d7fd7b612cee048067813f150d323be30483042010786168a90fa983386b6",
+        "machine_qa": "PASS_ZERO_SCOPE",
+        "controller_visual_qa": "FAIL_SOURCE_RELATIVE_HIERARCHY_SCALE",
+        "metrics": {
+          "stage": "220x65/235x105",
+          "outrun_white": "466x85/840x140",
+          "outrun_yellow": "421x77/779x120"
+        },
+        "decision": "REWORK_REQUIRED"
+      },
+      "q212": {
+        "asset": "BA0147DA",
+        "candidate_sha256": "61ae0c45568e023cc258379173f8d80f43cc5257f2d8facefbcf3c87759179e1",
+        "machine_qa": "PASS_ZERO_SCOPE",
+        "controller_visual_qa": "FAIL_SOURCE_TITLE_FAMILY_PROPORTION_HIERARCHY",
+        "metrics": {
+          "heart_attack": "593x146/1759x158",
+          "coast2coast": "1029x123/1760x160"
+        },
+        "decision": "REWORK_REQUIRED"
+      }
+    },
+    "pre_ingame_export": {
+      "q54": "PENDING_REFRESH",
+      "q60": "BLOCKED_REWORK_REQUIRED",
+      "q212": "BLOCKED_REWORK_REQUIRED"
+    },
+    "runtime_validation": "UNTESTED",
+    "actual_ingame_validation": "PENDING",
+    "forbidden_domains_touched": [],
+    "final_decision": "Q54 PASS+C3; Q60 REWORK_REQUIRED; Q212 REWORK_REQUIRED"
   }
 }

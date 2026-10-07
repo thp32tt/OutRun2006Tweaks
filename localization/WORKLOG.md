@@ -3166,3 +3166,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - q61 C4A2937B -> `df250af92785727f38d176f3b2569c9d6d2b0e7a3f7d296adaa2f5c343b1d71e`: `Cut the line!` restored from rejected `라인을 끊으세요!` to repository-proven `하트선을 통과하세요!`; Go/Cut/Keep yellow gradient + white keyline + navy outline/right lean restored. 3/3 bbox/size/margin; outside/alpha=0; controller/RAW PASS.
 - q65 EBEF6D20 -> `10d0e1899d8d167eb1dcb303429dd4dc7bdf09096e6c5720afce884cc32afe1f`: Course/Left/Right/Easy/Hard source-family style rebuilt; `쉬움` green instead of cyan; existing `로딩` rows preserved. 5/5 bbox/size/margin; outside/alpha=0; controller/RAW PASS.
 - All three now A166 self-QA PASS pending fresh independent C1 + exact-SHA C3 + regenerated PRE_INGAME English-original JPG/user review + NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 22:25 KST — C251 C2 q60/q54/q212 fresh C adjudication
+- TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. HEAD/queue refreshed before each selected asset and again pre-commit; no odd/unindexed C1 shard taken.
+- Backend: ChatGPT local GitHub DNS failed; existing GitHub-hosted C251 evidence f7905f7d8af1 consumed. N100 MCP only transferred seven small JPGs for visual review; no heavy render/scan ran there.
+- q54 FA7BBB13 @ 5107c15a…: 17/17 machine containment/size/margin and zero-scope PASS; controller readable+RAW PASS for right lean, yellow/white/navy family, clean plate, glyph/clipping/protected separation and prompt hierarchy. Mandatory exact-SHA C3_STRICT_PASS. PRE_INGAME refresh/user JPG/new in-game pending.
+- q60 A064FDFC @ 2d3d7fd7…: machine PASS but controller visual FAIL. Stage 220x65 inside 235x105; OUTRUN MILES 466x85 inside 840x140 and 421x77 inside 779x120 remain materially undersized/weaker than source HUD hierarchy. REWORK_REQUIRED.
+- q212 BA0147DA @ 61ae0c45…: machine PASS but controller visual FAIL. Canonical C2C/Heart Attack title family is tall condensed red display type; current Korean remains broad generic/block proportion and underfills horizontal hierarchy (Heart 593/1759, C2C 1029/1760). REWORK_REQUIRED.
+- q60/q212 blocked from PRE_INGAME until producer rework -> fresh C -> exact-SHA C3. Backlog remains open; RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

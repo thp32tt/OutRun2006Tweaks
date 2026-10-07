@@ -2550,3 +2550,10 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q61 `df250af92785727f38d176f3b2569c9d6d2b0e7a3f7d296adaa2f5c343b1d71e`: `하트선을 통과하세요!` semantics and yellow/white/navy instruction family restored; 3/3 machine + controller visual/RAW PASS.
 - q65 `10d0e1899d8d167eb1dcb303429dd4dc7bdf09096e6c5720afce884cc32afe1f`: `쉬움` green source-color family and route-label outline/slant restored; 5/5 machine + controller visual/RAW PASS.
 - Worker 37626933772 / output `19409ca2dcc3c81063ea6d5728b9b65a28166ebf`. Fresh C1 + exact-SHA C3 + PRE_INGAME/user JPG + NEW in-game retest pending. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## C251 C2 — 2026-10-07 22:25 KST
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN.
+- q54 FA7BBB13: fresh C + exact-SHA C3_STRICT_PASS; PRE_INGAME refresh pending.
+- q60 A064FDFC: REWORK_REQUIRED — Stage/OUTRUN MILES source-relative hierarchy remains undersized.
+- q212 BA0147DA: REWORK_REQUIRED — C2C/Heart Attack title family remains broad/generic vs tall-condensed source.
+- RUNTIME_VALIDATION=UNTESTED; user/new in-game retest pending; forbidden domains untouched.
