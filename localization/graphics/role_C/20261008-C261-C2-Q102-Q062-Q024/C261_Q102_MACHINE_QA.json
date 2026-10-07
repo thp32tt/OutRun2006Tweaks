@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "20261008-C261-C2-Q102-Q062-Q024",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 102,
+  "source_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+  "candidate_sha256": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db",
+  "dimensions": [
+    2048,
+    256
+  ],
+  "header_128_exact": true,
+  "review_coordinate_orientation": "FLIP_Y",
+  "rows": [
+    {
+      "key": "time_attack_mode",
+      "source_bbox": [
+        395,
+        15,
+        1330,
+        140
+      ],
+      "source_size": [
+        935,
+        125
+      ],
+      "localized_bbox": [
+        508,
+        15,
+        1252,
+        140
+      ],
+      "localized_size": [
+        744,
+        125
+      ],
+      "margins": [
+        113,
+        78,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "HIGH_RISK_EDGE_TOUCH"
+    },
+    {
+      "key": "continuous_15",
+      "source_bbox": [
+        520,
+        132,
+        1590,
+        245
+      ],
+      "source_size": [
+        1070,
+        113
+      ],
+      "localized_bbox": [
+        650,
+        132,
+        1459,
+        238
+      ],
+      "localized_size": [
+        809,
+        106
+      ],
+      "margins": [
+        130,
+        131,
+        0,
+        7
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    }
+  ],
+  "row_summary": {
+    "pass": 1,
+    "total": 2
+  },
+  "changed_pixels_outside_source_bbox_union": 0,
+  "alpha_changed_pixels_outside_source_bbox_union": 0,
+  "machine_status": "FAIL",
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "producer_binding": "A179 exact candidate; Time Attack row preserved from B212; continuous row materially rerendered."
+}

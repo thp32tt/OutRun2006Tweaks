@@ -1,0 +1,37 @@
+{
+  "run": "20261008-C261-C2-Q102-Q062-Q024",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "execution_backend": "GitHub Actions fallback because ChatGPT local github.com DNS resolution failed; first hosted attempt diagnosed incorrect q24 source URL and this retry uses A135 pinned canonical stock source.",
+  "assets": {
+    "q102": {
+      "candidate_sha256": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db",
+      "machine_status": "FAIL",
+      "row_summary": {
+        "pass": 1,
+        "total": 2
+      },
+      "outside": 0
+    },
+    "q62": {
+      "candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
+      "machine_status": "PASS",
+      "row_summary": {
+        "pass": 9,
+        "total": 9
+      },
+      "outside": 0
+    },
+    "q24": {
+      "candidate_sha256": "c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e",
+      "machine_status": "FAIL",
+      "row_summary": {
+        "pass": 23,
+        "total": 26
+      },
+      "outside": 0
+    }
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED"
+}

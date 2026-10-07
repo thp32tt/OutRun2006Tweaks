@@ -1,0 +1,862 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "20261008-C261-C2-Q102-Q062-Q024",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 24,
+  "source_sha256": "8e18676ac303b07a56d81d1d21c5e025e0baf46da49b16ae9d2e411960181f73",
+  "candidate_sha256": "c6daaf2e7aa0bb20714e257bf47b0a99e8faee3d46bd2c1382e3a92bd7da485e",
+  "dimensions": [
+    1024,
+    1024
+  ],
+  "header_128_exact": true,
+  "review_coordinate_orientation": "FLIP_Y",
+  "rows": [
+    {
+      "key": "A_ㅁ",
+      "source_bbox": [
+        11,
+        7,
+        78,
+        89
+      ],
+      "source_size": [
+        67,
+        82
+      ],
+      "localized_bbox": [
+        13,
+        24,
+        76,
+        71
+      ],
+      "localized_size": [
+        63,
+        47
+      ],
+      "margins": [
+        2,
+        2,
+        17,
+        18
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "B_ㅠ",
+      "source_bbox": [
+        111,
+        7,
+        177,
+        89
+      ],
+      "source_size": [
+        66,
+        82
+      ],
+      "localized_bbox": [
+        112,
+        28,
+        176,
+        67
+      ],
+      "localized_size": [
+        64,
+        39
+      ],
+      "margins": [
+        1,
+        1,
+        21,
+        22
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "C_ㅊ",
+      "source_bbox": [
+        212,
+        4,
+        277,
+        92
+      ],
+      "source_size": [
+        65,
+        88
+      ],
+      "localized_bbox": [
+        213,
+        21,
+        276,
+        75
+      ],
+      "localized_size": [
+        63,
+        54
+      ],
+      "margins": [
+        1,
+        1,
+        17,
+        17
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "D_ㅇ",
+      "source_bbox": [
+        299,
+        7,
+        368,
+        89
+      ],
+      "source_size": [
+        69,
+        82
+      ],
+      "localized_bbox": [
+        305,
+        23,
+        361,
+        72
+      ],
+      "localized_size": [
+        56,
+        49
+      ],
+      "margins": [
+        6,
+        7,
+        16,
+        17
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "E_ㄷ",
+      "source_bbox": [
+        402,
+        7,
+        472,
+        89
+      ],
+      "source_size": [
+        70,
+        82
+      ],
+      "localized_bbox": [
+        407,
+        24,
+        468,
+        71
+      ],
+      "localized_size": [
+        61,
+        47
+      ],
+      "margins": [
+        5,
+        4,
+        17,
+        18
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "F_ㄹ",
+      "source_bbox": [
+        502,
+        7,
+        571,
+        89
+      ],
+      "source_size": [
+        69,
+        82
+      ],
+      "localized_bbox": [
+        505,
+        23,
+        567,
+        72
+      ],
+      "localized_size": [
+        62,
+        49
+      ],
+      "margins": [
+        3,
+        4,
+        16,
+        17
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "G_ㅎ",
+      "source_bbox": [
+        598,
+        4,
+        663,
+        92
+      ],
+      "source_size": [
+        65,
+        88
+      ],
+      "localized_bbox": [
+        601,
+        20,
+        660,
+        76
+      ],
+      "localized_size": [
+        59,
+        56
+      ],
+      "margins": [
+        3,
+        3,
+        16,
+        16
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "H_ㅗ",
+      "source_bbox": [
+        688,
+        7,
+        764,
+        89
+      ],
+      "source_size": [
+        76,
+        82
+      ],
+      "localized_bbox": [
+        689,
+        25,
+        764,
+        71
+      ],
+      "localized_size": [
+        75,
+        46
+      ],
+      "margins": [
+        1,
+        0,
+        18,
+        18
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "I_ㅑ",
+      "source_bbox": [
+        797,
+        7,
+        844,
+        89
+      ],
+      "source_size": [
+        47,
+        82
+      ],
+      "localized_bbox": [
+        799,
+        8,
+        843,
+        88
+      ],
+      "localized_size": [
+        44,
+        80
+      ],
+      "margins": [
+        2,
+        1,
+        1,
+        1
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "J_ㅓ",
+      "source_bbox": [
+        887,
+        7,
+        947,
+        92
+      ],
+      "source_size": [
+        60,
+        85
+      ],
+      "localized_bbox": [
+        896,
+        9,
+        938,
+        89
+      ],
+      "localized_size": [
+        42,
+        80
+      ],
+      "margins": [
+        9,
+        9,
+        2,
+        3
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "K_ㅏ",
+      "source_bbox": [
+        13,
+        103,
+        89,
+        185
+      ],
+      "source_size": [
+        76,
+        82
+      ],
+      "localized_bbox": [
+        30,
+        104,
+        72,
+        184
+      ],
+      "localized_size": [
+        42,
+        80
+      ],
+      "margins": [
+        17,
+        17,
+        1,
+        1
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "L_ㅣ",
+      "source_bbox": [
+        117,
+        103,
+        163,
+        185
+      ],
+      "source_size": [
+        46,
+        82
+      ],
+      "localized_bbox": [
+        124,
+        105,
+        155,
+        183
+      ],
+      "localized_size": [
+        31,
+        78
+      ],
+      "margins": [
+        7,
+        8,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "M_ㅡ",
+      "source_bbox": [
+        201,
+        103,
+        286,
+        185
+      ],
+      "source_size": [
+        85,
+        82
+      ],
+      "localized_bbox": [
+        206,
+        136,
+        282,
+        152
+      ],
+      "localized_size": [
+        76,
+        16
+      ],
+      "margins": [
+        5,
+        4,
+        33,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "N_ㅜ",
+      "source_bbox": [
+        303,
+        103,
+        379,
+        185
+      ],
+      "source_size": [
+        76,
+        82
+      ],
+      "localized_bbox": [
+        304,
+        121,
+        378,
+        166
+      ],
+      "localized_size": [
+        74,
+        45
+      ],
+      "margins": [
+        1,
+        1,
+        18,
+        19
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "O_ㅐ",
+      "source_bbox": [
+        407,
+        100,
+        471,
+        188
+      ],
+      "source_size": [
+        64,
+        88
+      ],
+      "localized_bbox": [
+        414,
+        104,
+        463,
+        184
+      ],
+      "localized_size": [
+        49,
+        80
+      ],
+      "margins": [
+        7,
+        8,
+        4,
+        4
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "P_ㅔ",
+      "source_bbox": [
+        505,
+        103,
+        571,
+        185
+      ],
+      "source_size": [
+        66,
+        82
+      ],
+      "localized_bbox": [
+        513,
+        104,
+        564,
+        184
+      ],
+      "localized_size": [
+        51,
+        80
+      ],
+      "margins": [
+        8,
+        7,
+        1,
+        1
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "Q_ㅂ",
+      "source_bbox": [
+        606,
+        100,
+        667,
+        188
+      ],
+      "source_size": [
+        61,
+        88
+      ],
+      "localized_bbox": [
+        607,
+        120,
+        667,
+        167
+      ],
+      "localized_size": [
+        60,
+        47
+      ],
+      "margins": [
+        1,
+        0,
+        20,
+        21
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "R_ㄱ",
+      "source_bbox": [
+        704,
+        103,
+        771,
+        185
+      ],
+      "source_size": [
+        67,
+        82
+      ],
+      "localized_bbox": [
+        709,
+        120,
+        766,
+        167
+      ],
+      "localized_size": [
+        57,
+        47
+      ],
+      "margins": [
+        5,
+        5,
+        17,
+        18
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "S_ㄴ",
+      "source_bbox": [
+        802,
+        100,
+        864,
+        188
+      ],
+      "source_size": [
+        62,
+        88
+      ],
+      "localized_bbox": [
+        805,
+        120,
+        862,
+        167
+      ],
+      "localized_size": [
+        57,
+        47
+      ],
+      "margins": [
+        3,
+        2,
+        20,
+        21
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "T_ㅅ",
+      "source_bbox": [
+        907,
+        103,
+        967,
+        185
+      ],
+      "source_size": [
+        60,
+        82
+      ],
+      "localized_bbox": [
+        908,
+        120,
+        967,
+        167
+      ],
+      "localized_size": [
+        59,
+        47
+      ],
+      "margins": [
+        1,
+        0,
+        17,
+        18
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "U_ㅕ",
+      "source_bbox": [
+        13,
+        199,
+        83,
+        284
+      ],
+      "source_size": [
+        70,
+        85
+      ],
+      "localized_bbox": [
+        27,
+        201,
+        70,
+        281
+      ],
+      "localized_size": [
+        43,
+        80
+      ],
+      "margins": [
+        14,
+        13,
+        2,
+        3
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "V_ㅍ",
+      "source_bbox": [
+        108,
+        199,
+        174,
+        281
+      ],
+      "source_size": [
+        66,
+        82
+      ],
+      "localized_bbox": [
+        109,
+        216,
+        173,
+        264
+      ],
+      "localized_size": [
+        64,
+        48
+      ],
+      "margins": [
+        1,
+        1,
+        17,
+        17
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "W_ㅈ",
+      "source_bbox": [
+        197,
+        199,
+        282,
+        281
+      ],
+      "source_size": [
+        85,
+        82
+      ],
+      "localized_bbox": [
+        208,
+        215,
+        272,
+        264
+      ],
+      "localized_size": [
+        64,
+        49
+      ],
+      "margins": [
+        11,
+        10,
+        16,
+        17
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "X_ㅌ",
+      "source_bbox": [
+        300,
+        199,
+        377,
+        281
+      ],
+      "source_size": [
+        77,
+        82
+      ],
+      "localized_bbox": [
+        308,
+        216,
+        370,
+        263
+      ],
+      "localized_size": [
+        62,
+        47
+      ],
+      "margins": [
+        8,
+        7,
+        17,
+        18
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "Y_ㅛ",
+      "source_bbox": [
+        416,
+        199,
+        479,
+        281
+      ],
+      "source_size": [
+        63,
+        82
+      ],
+      "localized_bbox": [
+        417,
+        220,
+        478,
+        259
+      ],
+      "localized_size": [
+        61,
+        39
+      ],
+      "margins": [
+        1,
+        1,
+        21,
+        22
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "Z_ㅋ",
+      "source_bbox": [
+        502,
+        199,
+        575,
+        281
+      ],
+      "source_size": [
+        73,
+        82
+      ],
+      "localized_bbox": [
+        508,
+        215,
+        568,
+        264
+      ],
+      "localized_size": [
+        60,
+        49
+      ],
+      "margins": [
+        6,
+        7,
+        16,
+        17
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "row_summary": {
+    "pass": 23,
+    "total": 26
+  },
+  "changed_pixels_outside_source_bbox_union": 0,
+  "alpha_changed_pixels_outside_source_bbox_union": 0,
+  "machine_status": "FAIL",
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "semantic_binding": "A-Z visual keycaps mapped to standard 2-beolsik base Jamo; non-target symbols remain source-exact."
+}

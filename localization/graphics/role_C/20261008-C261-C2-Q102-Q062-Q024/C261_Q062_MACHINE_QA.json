@@ -1,0 +1,318 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "20261008-C261-C2-Q102-Q062-Q024",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 62,
+  "source_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+  "candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
+  "dimensions": [
+    2048,
+    1024
+  ],
+  "header_128_exact": true,
+  "review_coordinate_orientation": "FLIP_Y",
+  "rows": [
+    {
+      "key": "diverge_main",
+      "source_bbox": [
+        456,
+        14,
+        755,
+        113
+      ],
+      "source_size": [
+        299,
+        99
+      ],
+      "localized_bbox": [
+        519,
+        15,
+        680,
+        112
+      ],
+      "localized_size": [
+        161,
+        97
+      ],
+      "margins": [
+        63,
+        75,
+        1,
+        1
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "left_main",
+      "source_bbox": [
+        322,
+        161,
+        478,
+        245
+      ],
+      "source_size": [
+        156,
+        84
+      ],
+      "localized_bbox": [
+        328,
+        162,
+        469,
+        244
+      ],
+      "localized_size": [
+        141,
+        82
+      ],
+      "margins": [
+        6,
+        9,
+        1,
+        1
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "right_main",
+      "source_bbox": [
+        682,
+        163,
+        885,
+        257
+      ],
+      "source_size": [
+        203,
+        94
+      ],
+      "localized_bbox": [
+        710,
+        165,
+        850,
+        247
+      ],
+      "localized_size": [
+        140,
+        82
+      ],
+      "margins": [
+        28,
+        35,
+        2,
+        10
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "easy_main",
+      "source_bbox": [
+        142,
+        285,
+        385,
+        375
+      ],
+      "source_size": [
+        243,
+        90
+      ],
+      "localized_bbox": [
+        188,
+        287,
+        329,
+        370
+      ],
+      "localized_size": [
+        141,
+        83
+      ],
+      "margins": [
+        46,
+        56,
+        2,
+        5
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "hard_main",
+      "source_bbox": [
+        808,
+        287,
+        1068,
+        373
+      ],
+      "source_size": [
+        260,
+        86
+      ],
+      "localized_bbox": [
+        829,
+        288,
+        1037,
+        372
+      ],
+      "localized_size": [
+        208,
+        84
+      ],
+      "margins": [
+        21,
+        31,
+        1,
+        1
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "hard_arrow",
+      "source_bbox": [
+        1367,
+        19,
+        1645,
+        105
+      ],
+      "source_size": [
+        278,
+        86
+      ],
+      "localized_bbox": [
+        1407,
+        20,
+        1607,
+        104
+      ],
+      "localized_size": [
+        200,
+        84
+      ],
+      "margins": [
+        40,
+        38,
+        1,
+        1
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "easy_arrow",
+      "source_bbox": [
+        1364,
+        145,
+        1635,
+        235
+      ],
+      "source_size": [
+        271,
+        90
+      ],
+      "localized_bbox": [
+        1428,
+        147,
+        1561,
+        231
+      ],
+      "localized_size": [
+        133,
+        84
+      ],
+      "margins": [
+        64,
+        74,
+        2,
+        4
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "hard_alone",
+      "source_bbox": [
+        1748,
+        19,
+        2008,
+        105
+      ],
+      "source_size": [
+        260,
+        86
+      ],
+      "localized_bbox": [
+        1769,
+        20,
+        1979,
+        104
+      ],
+      "localized_size": [
+        210,
+        84
+      ],
+      "margins": [
+        21,
+        29,
+        1,
+        1
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "easy_alone",
+      "source_bbox": [
+        1754,
+        145,
+        1997,
+        235
+      ],
+      "source_size": [
+        243,
+        90
+      ],
+      "localized_bbox": [
+        1798,
+        147,
+        1941,
+        231
+      ],
+      "localized_size": [
+        143,
+        84
+      ],
+      "margins": [
+        44,
+        56,
+        2,
+        4
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "row_summary": {
+    "pass": 9,
+    "total": 9
+  },
+  "changed_pixels_outside_source_bbox_union": 0,
+  "alpha_changed_pixels_outside_source_bbox_union": 0,
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "clean_plate_basis": "A132 all-label clean with EASY/HARD exact source bboxes replaced by B244 PSD Layer43 clean."
+}
