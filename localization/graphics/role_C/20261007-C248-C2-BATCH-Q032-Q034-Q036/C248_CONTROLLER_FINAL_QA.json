@@ -131,8 +131,49 @@
       "decision": "PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_NEW_INGAME"
     }
   },
-  "pre_ingame_export": "REQUIRED_AFTER_STATE_PROMOTION",
+  "pre_ingame_export": {
+    "status": "REFRESHED_PASS",
+    "timestamp_kst": "2026-10-07T20:18:00+09:00",
+    "trigger_run_id": 37612113130,
+    "trigger_result": "SUCCESS",
+    "applied_export_commit": "222971652b6c2007f9da9bf67cbfaf92a90f918b",
+    "dedup_note": "C248 exporter produced the same tree as concurrent C1 exporter; worker rebase skipped previously applied commit and push was already up-to-date",
+    "manifest_count": 24,
+    "localized_candidate_count": 23,
+    "mandatory_c3_blocked_count": 10,
+    "items": {
+      "q32": {
+        "number": 5,
+        "jpg": "005_q032_DCC7B488.jpg",
+        "candidate_sha256": "2bb9d21e95a99da036657da5d696982d5ee44875c91cd798dbcb7b99830757e8",
+        "english_source_sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+        "controller_export_visual_review": "PASS"
+      },
+      "q34": {
+        "number": 6,
+        "jpg": "006_q034_B7E25BAD.jpg",
+        "candidate_sha256": "a23761d1160933d968347c87ca40496b9f8e8257a102f865b2047df2a8d92763",
+        "english_source_sha256": "3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
+        "controller_export_visual_review": "PASS"
+      },
+      "q36": {
+        "number": 7,
+        "jpg": "007_q036_06AB5CEE.jpg",
+        "candidate_sha256": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
+        "english_source_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+        "controller_export_visual_review": "PASS"
+      },
+      "q38": {
+        "number": 8,
+        "jpg": "008_q038_6AB5CEE.jpg",
+        "candidate_sha256": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
+        "english_source_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+        "controller_export_visual_review": "PASS_BY_EXACT_Q36_ALIAS_AND_MANIFEST_BINDING"
+      }
+    }
+  },
   "runtime_validation": "UNTESTED",
   "actual_ingame_validation": "PENDING",
-  "forbidden_domains_touched": []
+  "forbidden_domains_touched": [],
+  "final_decision": "Q32_Q34_Q36_FRESH_C_PASS_AND_EXACT_SHA_C3_STRICT_PASS; Q38_EXACT_ALIAS_INHERITS; PRE_INGAME_REFRESHED; USER_JPG_AND_NEW_ACTUAL_GAME_PENDING"
 }

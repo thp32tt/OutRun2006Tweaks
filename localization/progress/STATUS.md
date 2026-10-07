@@ -2529,3 +2529,7 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q34 a23761d1... PASS: 486x92 / 535x102, positive 24/25/5/5 margins, zero outside/alpha drift; starburst plate/style clean.
 - q36/q38 7503318f... PASS: 3/3 rows ~90.17-91.01% source width, positive margins, zero outside/alpha drift; prior user-reported dirty/hazy source-footprint issue absent in controller full/contact/RAW review.
 - All three physical candidates: fresh independent C PASS + exact-SHA C3_STRICT_PASS. Next mandatory step is persistent PRE_INGAME English-original export refresh, then user JPG review and NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+### C248 PRE_INGAME refreshed — 2026-10-07 20:18 KST
+- TEMP_BACKLOG_RELIEF=C2; SHARD=EVEN. Exported q32=#005, q34=#006, q36=#007, q38=#008 with exact pinned English source/current candidate bindings; controller review PASS (q38 by exact alias identity).
+- Exporter trigger 37612113130 SUCCESS; duplicate output was skipped after identical concurrent export commit 222971652b6c2007f9da9bf67cbfaf92a90f918b had already landed. User JPG + NEW actual-game validation remain pending; RUNTIME_VALIDATION=UNTESTED.
