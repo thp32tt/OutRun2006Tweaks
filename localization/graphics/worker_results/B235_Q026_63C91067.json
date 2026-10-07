@@ -3,6 +3,7 @@
   "run": "20261007-B235-Q026-63C91067-C244-REWORK",
   "queue_index": 26,
   "candidate_sha256": "2dfc6214ce2383ef01f2739baeff04890d5ff78330b192fcee0d864f6caff719",
-  "status": "B235_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
-  "report": "localization/graphics/role_B/20261007-B235-Q026-63C91067-C244-REWORK/B235_Q26_REPORT.json"
+  "status": "B235_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+  "report": "localization/graphics/role_B/20261007-B235-Q026-63C91067-C244-REWORK/B235_Q26_REPORT.json",
+  "controller_qa": "localization/graphics/role_B/20261007-B235-Q026-63C91067-C244-REWORK/B235_CONTROLLER_SELF_QA.json"
 }
