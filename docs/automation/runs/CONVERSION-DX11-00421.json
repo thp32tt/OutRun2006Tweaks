@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00421",
+  "production_id": "CONVERSION-DX11-00421",
+  "event_id": "CONVERSION-DX11-00421-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R283_PROGRAMMABLE_TARGET_BYTECODE_MATERIALIZATION",
+  "base_sha": "b954a0e34fce4619266e55c19107836bfe3252eb",
+  "result_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+  "material_result_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+  "validation_bearing_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+  "validation_bearing_result_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "validation_run_id": 37575812828,
+  "validation_run_attempt": 1,
+  "validation_job_id": 112644341530,
+  "readiness_smoke_job_id": 112645775002,
+  "artifact_id": 11463037311,
+  "artifact_digest": "sha256:fc2bcfe8357f9b1ca8d00e0315e849f50b10bd0dfc0497c9e0cda64a6577a889",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00421.json",
+  "implementation_commits": [
+    "eb9532f4c0bd59c23164683ba880870aa9a474c7",
+    "0570e53588c9ae92770825f663e36c8b70f98733"
+  ],
+  "issue14_comment_id": 6031629494,
+  "native_draw_path_activation_changed": false,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE",
+  "summary": "R283 materializes deterministic translated HLSL and DXBC for the exact, bounded SM3 DCL+MOV programmable subset. It binds the produced source/bytecode hashes and artifact identities to the exact R281 translated-artifact receipt, R282 compiler contract, and R276 semantic plan, while keeping D3D11 shader object creation/binding and NativeDrawPath/Draw/DrawIndexed activation unauthorized.",
+  "evidence": [
+    "native_backend.hpp/.cpp define NativeProgrammableShaderTargetBytecodeMaterializationEvidence and a fail-closed SM3 DCL+MOV materializer using the existing strictness+O3 D3DCompile path for vs_4_0/ps_4_0.",
+    "R283 validates generated DXBC payloads, hashes translated source and target bytecode, and seals per-stage materialized artifact identities to R281 receipt identities plus R282 compile-contract identities.",
+    "runtime_census.cpp derives, hashes and logs signature-attributable R283 evidence while keeping sig.shaderTranslationExact=false and object creation unauthorized.",
+    "analyze_dx11_census.py correlates exact R283 evidence and advances the next missing prerequisite to R242_TRANSLATED_OBJECT_OWNERSHIP; source-graph and analyzer regressions passed.",
+    "tools/dx11_constant_buffer_probe.cpp compiles the bounded synthetic SM3 DCL+MOV pair, verifies non-empty DXBC/hash/artifact identities, and rejects stale detached source provenance.",
+    "Initial material SHA eb9532f4c0bd59c23164683ba880870aa9a474c7 failed Backend Conversion Gate 37575640067 at one-click Python syntax validation due an unterminated R275 analyzer regex; repair SHA 0570e53588c9ae92770825f663e36c8b70f98733 fixes only that parser syntax.",
+    "Exact-SHA Backend Conversion Gate 37575812828 completed success for 0570e53588c9ae92770825f663e36c8b70f98733; validate 112644341530 and DX11 readiness smoke 112645775002 both succeeded, including the R283 constant-buffer hosted probe.",
+    "Artifact 11463037311 digest sha256:fc2bcfe8357f9b1ca8d00e0315e849f50b10bd0dfc0497c9e0cda64a6577a889.",
+    "Issue #14 production change ledger event 6031629494 records the material change."
+  ],
+  "validation_history": [
+    {
+      "sha": "eb9532f4c0bd59c23164683ba880870aa9a474c7",
+      "run_id": 37575640067,
+      "validate_job_id": 112643800537,
+      "conclusion": "failure",
+      "failure_step": "Verify one-click structure contract",
+      "failure_detail": "Python SyntaxError in tools/analyze_dx11_census.py line 224: unterminated R275 regex string.",
+      "queue_attempt_incremented": false,
+      "reason": "In-turn validation repair; rollover metadata itself did not increment ATTEMPT."
+    },
+    {
+      "sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+      "run_id": 37575812828,
+      "validate_job_id": 112644341530,
+      "readiness_smoke_job_id": 112645775002,
+      "conclusion": "success"
+    }
+  ],
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "bounded_sm3_dcl_mov_materializer_present": true,
+    "target_bytecode_materialized": true,
+    "diagnostic_d3dcompile_performed": true,
+    "native_programmable_object_created": false,
+    "native_programmable_object_bound": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "shader_translation_exact_enabled": false,
+    "object_creation_authorized": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub branch HEAD b954a0e34fce4619266e55c19107836bfe3252eb and confirmed no durable 00421 run record existed. R282/00420 exact_next_action identified R283 target-bytecode materialization as the next independent slice."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Reviewed R281/R282/R276 provenance and selected a fail-closed SM3 DCL+MOV subset that can be translated to deterministic HLSL/DXBC without shader-object creation or draw activation."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R283 translated-source/DXBC materialization, provenance receipts, runtime census/analyzer correlation, static guards and hosted positive/stale-source regressions."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "After one in-turn parser-syntax repair, Backend Conversion Gate 37575812828 exact-SHA success; validate 112644341530 and DX11 readiness smoke 112645775002 succeeded; artifact 11463037311 produced. No HMD/game runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Final material/validation-bearing SHA 0570e53588c9ae92770825f663e36c8b70f98733 descends from the R283 implementation commit and both material commits contain [AUTO:CONVERSION-DX11-00421]."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R283 is a diagnostic target-bytecode materialization slice; no user runtime package/HMD deployment is claimed. CI validation artifact was produced separately."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "Durable run/lane state records final exact SHA, failed intermediate validation and repair, successful Gate/jobs/artifact, Issue #14 ledger entry, UNTESTED runtime status, and the next independent action."
+    }
+  },
+  "exact_next_action": "Implement a bounded R284 programmable shader-object materialization/ownership receipt that consumes exact R283 DXBC and same-device/cache provenance, while keeping shader binding, shaderTranslationExact, NativeDrawPath, Draw and DrawIndexed disabled until separate activation evidence exists.",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "validation": {
+    "exact_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+    "backend_conversion_gate": {
+      "run_id": 37575812828,
+      "conclusion": "success",
+      "validate_job_id": 112644341530,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112645775002,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11463037311,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-0570e53588c9ae92770825f663e36c8b70f98733",
+      "artifact_digest": "sha256:fc2bcfe8357f9b1ca8d00e0315e849f50b10bd0dfc0497c9e0cda64a6577a889"
+    }
+  }
+}
