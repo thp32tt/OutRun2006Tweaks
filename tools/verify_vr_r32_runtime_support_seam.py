@@ -98,8 +98,7 @@ for marker, tokens in delegations.items():
         if token not in fn:
             errors.append(f"{marker} lost lower delegation: {token}")
 
-scope = body(r32, "R32ReviewInternalStereoPassScope::R32ReviewInternalStereoPassScope()")
-if "R30SupportExchangeInternalStereoPass(true)" not in scope:
+if ": previous_(R30SupportExchangeInternalStereoPass(true))" not in r32:
     errors.append("R32 internal-pass scope no longer acquires through owner exchange")
 destructor = body(r32, "R32ReviewInternalStereoPassScope::~R32ReviewInternalStereoPassScope()")
 if "R30SupportExchangeInternalStereoPass(previous_)" not in destructor:
