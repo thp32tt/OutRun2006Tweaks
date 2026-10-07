@@ -6,10 +6,24 @@
 // prevents R33 from depending on R32 anonymous/private helper names so the
 // textual implementation include can be retired in a later bounded seam.
 
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include <cstdint>
 #include <d3d9.h>
 #include <type_traits>
 #include <utility>
+
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
 
 namespace OutRunVRStereo
 {
