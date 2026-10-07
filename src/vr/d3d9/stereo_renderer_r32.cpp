@@ -5,6 +5,7 @@
 // DirectGPU producer slot while a timed-out D3D9 EVENT query is still pending.
 
 #include "r32_policy.hpp"
+#include "../core/r32_review_api.hpp"
 #include "stereo_renderer_r31.cpp"
 
 namespace OutRunVRStereo
@@ -753,5 +754,96 @@ namespace OutRunVRStereo
 
         // R32 is a hook-free functional owner. Its helpers are consumed by
         // the R33 final dispatcher after R33 verifies R31/R22/R13 readiness.
+    }
+
+    bool R32ReviewEffectIsFragileLive(
+        IDirect3DDevice9* device, bool& fragile) noexcept
+    {
+        return R32EffectIsFragileLive(device, fragile);
+    }
+
+    bool R32ReviewGetSavedViewport(
+        IDirect3DDevice9* device, D3DVIEWPORT9& viewport) noexcept
+    {
+        return R32GetSavedViewport(device, viewport);
+    }
+
+    bool R32ReviewSetWvpBatch(
+        IDirect3DDevice9* device, const float* constants) noexcept
+    {
+        return R32SetWvpBatch(device, constants);
+    }
+
+    bool R32ReviewRestoreRightPassState(
+        IDirect3DDevice9* device,
+        IDirect3DSurface9* savedRt,
+        IDirect3DSurface9* savedDepth,
+        const D3DVIEWPORT9& savedViewport,
+        const float* originalConstants,
+        bool restoreWvp) noexcept
+    {
+        return R32RestoreRightPassState(
+            device, savedRt, savedDepth, savedViewport,
+            originalConstants, restoreWvp);
+    }
+
+    void R32ReviewObserveFrameWorkload(
+        IDirect3DDevice9* device,
+        D3DPRIMITIVETYPE type,
+        UINT primitiveCount,
+        bool indexed,
+        bool up) noexcept
+    {
+        R32ObserveFrameWorkload(device, type, primitiveCount, indexed, up);
+    }
+
+    HRESULT R32ReviewRunLowerFailClosedCallback(
+        IDirect3DDevice9* device,
+        R32HResultCallback callback,
+        void* context) noexcept
+    {
+        if (!callback)
+            return E_INVALIDARG;
+        return R32LowerFailClosed(device, [callback, context]() noexcept {
+            return callback(context);
+        });
+    }
+
+    bool R32ReviewResolveDirectTransportCallback(
+        IDirect3DDevice9* device,
+        std::uint32_t frameId,
+        R32BoolCallback callback,
+        void* context) noexcept
+    {
+        if (!callback)
+            return false;
+        return R32ResolveDirectTransport(
+            device, frameId, [callback, context]() noexcept {
+                return callback(context);
+            });
+    }
+
+    HRESULT R32ReviewRunResetLifecycleCallback(
+        IDirect3DDevice9* device,
+        R32HResultCallback callback,
+        void* context) noexcept
+    {
+        if (!callback)
+            return E_INVALIDARG;
+        return R32WithResetLifecycle(device, [callback, context]() noexcept {
+            return callback(context);
+        });
+    }
+
+    HRESULT R32ReviewRunPresentTelemetryCallback(
+        IDirect3DDevice9* device,
+        R32HResultCallback callback,
+        void* context) noexcept
+    {
+        if (!callback)
+            return E_INVALIDARG;
+        return R32WithPresentTelemetry(device, [callback, context]() noexcept {
+            return callback(context);
+        });
     }
 }

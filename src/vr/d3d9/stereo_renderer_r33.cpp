@@ -17,6 +17,7 @@
 // draw path pays only for correctness checks required by stereo rendering.
 
 #include "stereo_renderer_r32.cpp"
+#include "../core/r32_review_api.hpp"
 #include "../state/state_block_recovery.hpp"
 #include "../state/state_block_tracker.hpp"
 
@@ -395,7 +396,7 @@ namespace OutRunVRStereo
                 OutRunVR::State::StateBlockTracker::Reliable();
             const bool effectKnown = stateBlocksReliable
                 ? R29FragileEffectCached(device, fragile)
-                : R32EffectIsFragileLive(device, fragile);
+                : R32ReviewEffectIsFragileLive(device, fragile);
             if (!effectKnown)
                 return {};
             if (fragile)
@@ -430,7 +431,7 @@ namespace OutRunVRStereo
                 return {};
 
             D3DVIEWPORT9 savedViewport{};
-            if (!R32GetSavedViewport(device, savedViewport))
+            if (!R32ReviewGetSavedViewport(device, savedViewport))
                 return {};
 
             bool mayWriteDepth = false;
@@ -441,14 +442,14 @@ namespace OutRunVRStereo
             bool leftWvpOk = false;
             {
                 InternalPassScope guard;
-                leftWvpOk = R32SetWvpBatch(device, draw.eyeConstants[0]);
+                leftWvpOk = R32ReviewSetWvpBatch(device, draw.eyeConstants[0]);
             }
             if (!leftWvpOk)
             {
                 bool rolledBack = false;
                 {
                     InternalPassScope guard;
-                    rolledBack = R32SetWvpBatch(device, draw.originalConstants);
+                    rolledBack = R32ReviewSetWvpBatch(device, draw.originalConstants);
                 }
                 if (!rolledBack)
                 {
@@ -474,7 +475,7 @@ namespace OutRunVRStereo
                 bool restored = false;
                 {
                     InternalPassScope guard;
-                    restored = R32SetWvpBatch(device, draw.originalConstants);
+                    restored = R32ReviewSetWvpBatch(device, draw.originalConstants);
                 }
                 if (!restored)
                     NoteRestoreFailure("R33 fast left draw c64");
@@ -498,7 +499,7 @@ namespace OutRunVRStereo
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) &&
-                    !R32SetWvpBatch(device, draw.eyeConstants[1]))
+                    !R32ReviewSetWvpBatch(device, draw.eyeConstants[1]))
                 {
                     rightFailure =
                         OutRunVR::StereoFailureRightWvpUploadFailed;
@@ -509,7 +510,7 @@ namespace OutRunVRStereo
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;
                     rightHr = actualDraw();
                 }
-                restoreOk = R32RestoreRightPassState(
+                restoreOk = R32ReviewRestoreRightPassState(
                     device, savedRt, savedDepth, savedViewport,
                     draw.originalConstants, true);
             }
@@ -596,7 +597,7 @@ namespace OutRunVRStereo
                 return {};
 
             D3DVIEWPORT9 savedViewport{};
-            if (!R32GetSavedViewport(device, savedViewport))
+            if (!R32ReviewGetSavedViewport(device, savedViewport))
                 return {};
 
             bool mayWriteDepth = false;
@@ -607,14 +608,14 @@ namespace OutRunVRStereo
             bool leftWvpOk = false;
             {
                 InternalPassScope guard;
-                leftWvpOk = R32SetWvpBatch(device, eyeConstants[0]);
+                leftWvpOk = R32ReviewSetWvpBatch(device, eyeConstants[0]);
             }
             if (!leftWvpOk)
             {
                 bool rolledBack = false;
                 {
                     InternalPassScope guard;
-                    rolledBack = R32SetWvpBatch(device, original);
+                    rolledBack = R32ReviewSetWvpBatch(device, original);
                 }
                 if (!rolledBack)
                 {
@@ -639,7 +640,7 @@ namespace OutRunVRStereo
                 bool restored = false;
                 {
                     InternalPassScope guard;
-                    restored = R32SetWvpBatch(device, original);
+                    restored = R32ReviewSetWvpBatch(device, original);
                 }
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
                     site, result.hr);
@@ -665,7 +666,7 @@ namespace OutRunVRStereo
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) &&
-                    !R32SetWvpBatch(device, eyeConstants[1]))
+                    !R32ReviewSetWvpBatch(device, eyeConstants[1]))
                 {
                     rightFailure =
                         OutRunVR::StereoFailureRightWvpUploadFailed;
@@ -676,7 +677,7 @@ namespace OutRunVRStereo
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;
                     rightHr = actualDraw();
                 }
-                restoreOk = R32RestoreRightPassState(
+                restoreOk = R32ReviewRestoreRightPassState(
                     device, savedRt, savedDepth, savedViewport, original, true);
             }
 
@@ -747,14 +748,14 @@ namespace OutRunVRStereo
             R31DiscardUnreliableDrawCaches();
             if (telemetry)
                 R31TelemetryNoteFallback();
-            return R32LowerFailClosed(device,
+            return R32ReviewRunLowerFailClosed(device,
                 std::forward<LowerR29Draw>(lowerR29Draw));
         }
 
         HRESULT __stdcall DrawPrimitiveDestR33(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
-            R32ObserveFrameWorkload(device, type, primitiveCount, false, false);
+            R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, false);
             auto call = [&]() {
                 const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                     device, type, startVertex, primitiveCount);
@@ -780,7 +781,7 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
-            R32ObserveFrameWorkload(device, type, primitiveCount, true, false);
+            R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, false);
             auto call = [&]() {
                 const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                     device, type, baseVertexIndex, minVertexIndex,
@@ -809,7 +810,7 @@ namespace OutRunVRStereo
             D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
             UINT stride)
         {
-            R32ObserveFrameWorkload(device, type, primitiveCount, false, true);
+            R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, true);
             auto call = [&]() {
                 const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                     device, type, primitiveCount, data, stride);
@@ -836,7 +837,7 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
-            R32ObserveFrameWorkload(device, type, primitiveCount, true, true);
+            R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, true);
             auto call = [&]() {
                 const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                     device, type, minVertexIndex, numVertices, primitiveCount,
@@ -864,7 +865,7 @@ namespace OutRunVRStereo
         bool ResolveDirectTransportDestR33(IDirect3DDevice9* device,
             std::uint32_t frameId) noexcept
         {
-            return R32ResolveDirectTransport(
+            return R32ReviewResolveDirectTransport(
                 device, frameId, [&]() noexcept {
                     return R33ResolveDirectR13Hook.call<bool>(device, frameId);
                 });
@@ -874,7 +875,7 @@ namespace OutRunVRStereo
             D3DPRESENT_PARAMETERS* params)
         {
             const bool gameDevice = IsGameDevice(device);
-            const HRESULT hr = R32WithResetLifecycle(
+            const HRESULT hr = R32ReviewRunResetLifecycle(
                 device, [&]() noexcept {
                     return R33ResetR22Hook.stdcall<HRESULT>(device, params);
                 });
@@ -972,7 +973,7 @@ namespace OutRunVRStereo
             if (blocked)
                 R33ForceResetReplayFailClosed(device, "Present/pre");
 
-            const HRESULT hr = R32WithPresentTelemetry(
+            const HRESULT hr = R32ReviewRunPresentTelemetry(
                 device, [&]() noexcept {
                     return R33PresentR13Hook.stdcall<HRESULT>(device,
                         sourceRect, destRect, destWindowOverride, dirtyRegion);
