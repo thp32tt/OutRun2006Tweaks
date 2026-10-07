@@ -31,16 +31,17 @@ jobs:
           bad=0
           { git diff --name-only; git ls-files --others --exclude-standard; } | sort -u | while read -r p; do
             [ -z "$p" ] && continue
-            case "$p" in localization/graphics/role_C/20261007-C247-C1-BATCH-Q043-Q047-Q053/*) ;; *) echo "::error::forbidden write $p"; bad=1 ;; esac
+            case "$p" in localization/graphics/role_C/20261007-C247-C1-BATCH-Q043-Q047-Q053/*|localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/*) ;; *) echo "::error::forbidden write $p"; bad=1 ;; esac
           done
       - name: Commit C1 evidence
         shell: bash
         run: |
           set -euo pipefail
-          git add localization/graphics/role_C/20261007-C247-C1-BATCH-Q043-Q047-Q053
+          git add localization/graphics/role_C/20261007-C247-C1-BATCH-Q043-Q047-Q053 localization/graphics/role_C/PRE_INGAME_JPG_REVIEW
+          if git diff --cached --quiet; then echo "No C1 output changes."; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "localization(cpu): C247 C1 q43 q47 q53 evidence"
+          git commit -m "localization(cpu): C247 C1 PRE_INGAME refresh"
           git fetch origin korean-localization-recovery-20260928
           git rebase origin/korean-localization-recovery-20260928
           git push origin HEAD:korean-localization-recovery-20260928
