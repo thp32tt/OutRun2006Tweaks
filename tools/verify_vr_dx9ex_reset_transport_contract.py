@@ -337,11 +337,16 @@ require_order(
     "R13ReleaseAckState();",
     "return R13GpuCompletionReadResult::RetryAfterRebind;",
     "snapshot.transportGeneration != DirectTransportGeneration",
-    "return R13GpuCompletionReadResult::Unavailable;",
     "completed.completedFrameId,",
     "snapshot.completedFrameId,",
     "return R13GpuCompletionReadResult::Ready;",
 )
+identity_pos = read_ack.find("snapshot.transportGeneration != DirectTransportGeneration")
+copy_pos = read_ack.find("completed.completedFrameId,", identity_pos)
+if min(identity_pos, copy_pos) < 0:
+    fail("R13 ACK run-identity scope missing")
+if "return R13GpuCompletionReadResult::Unavailable;" not in read_ack[identity_pos:copy_pos]:
+    fail("R13 ACK run-identity mismatch must fail closed without requesting rebind")
 if read_ack.count("R13ReleaseAckState();") != 1:
     fail("R13 ACK snapshot path must retire a stale host mapping exactly once")
 
