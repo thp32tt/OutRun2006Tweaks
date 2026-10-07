@@ -1,204 +1,188 @@
 #!/usr/bin/env python3
-# C247 C1 fresh independent QA batch: q43/q47/q53
-# TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL)
-import hashlib, io, json, os, struct, subprocess
+# C248 C2 fresh independent QA batch: q32/q34/q36 (+q38 exact alias evidence)
+# TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN
+import hashlib, io, json, os, struct, subprocess, math
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageOps, ImageDraw
+from scipy import ndimage
 
-if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "C":
+if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
-OUT = Path("localization/graphics/role_C/20261007-C247-C1-BATCH-Q043-Q047-Q053")
-OUT.mkdir(parents=True, exist_ok=True)
+RUN="20261007-C248-C2-BATCH-Q032-Q034-Q036"
+OUT=Path("localization/graphics/role_C")/RUN
+OUT.mkdir(parents=True,exist_ok=True)
 
-ASSETS = [
-    {
-        "index":43, "key":"455717B2",
-        "path":"localization/graphics/hd_candidates/textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
-        "candidate_sha":"a2b0db36e0283244037dccae5b65558a70d5b8547da245d92c840e0da3b3327c",
-        "prior_sha":"c158430f8a4f3730fa3c7067b0d20db97af8fddf6c830ddeb80e2d16820368ae",
-        "source_ref":"localization/graphics/role_A/20261004-A-PRODUCTION10/455717B2_HD_SOURCE_READABLE.png",
-        "source_ref_orientation":"readable",
-        "bboxes":[[4,256,558,351],[113,352,1302,560],[6,560,2024,788],[44,788,1579,1026]],
-        "localized_bboxes":[[122,261,439,346],[495,359,920,552],[493,568,1537,779],[567,796,1056,1017]],
-        "high_risk_reason":"USER PRE_INGAME JPG REVIEW FAIL #009 TEXT_SCALE_TOO_SMALL_VS_SOURCE"
-    },
-    {
-        "index":47, "key":"AD720950",
-        "path":"localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
-        "candidate_sha":"6386a41ffa4af599cc7076be0cc4ce59729026b4882c437ac397270290b7e4bf",
-        "prior_sha":"6dad37489e7027b8f546c38b3729167697965fc8e33fcabff46f09aba1677955",
-        "source_ref":"localization/graphics/role_A/20261004-A-PRODUCTION13/AD720950_HD_SOURCE_READABLE.png",
-        "source_ref_orientation":"readable",
-        "bboxes":[[3757,176,3873,222]],
-        "localized_bboxes":[[3759,178,3871,220]],
-        "high_risk_reason":"PRE_INGAME completeness false-negative: visible functional Shift remained English"
-    },
-    {
-        "index":53, "key":"568D3696",
-        "path":"localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
-        "candidate_sha":"7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33",
-        "prior_sha":"2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
-        "source_ref":"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
-        "source_ref_orientation":"raw_mirror_y",
-        "bboxes":[[1988,2061,2445,2164]],
-        "localized_bboxes":[[1992,2072,2440,2156]],
-        "high_risk_reason":"PRE_INGAME text-scale/hierarchy false-negative"
-    },
+ASSETS=[
+ {"index":32,"key":"DCC7B488",
+  "path":"localization/graphics/hd_candidates/textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+  "candidate_sha":"2bb9d21e95a99da036657da5d696982d5ee44875c91cd798dbcb7b99830757e8",
+  "prior_sha":"9e0b5dcd66b1aaeb031f60090d3c8f919cc59f7c6f8860602bcbc9990eb87867",
+  "source_sha":"ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+  "source_png":"localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_SOURCE_READABLE.png",
+  "clean_png":"localization/graphics/role_B/20261005-B-PRODUCTION152-DCC7/B152_CLEAN_PLATE.png",
+  "source_bboxes":[[547,164,1065,248]],"old_bboxes":[],
+  "high_risk":"USER PRE_INGAME #005 TEXT_TOO_SMALL|TOTAL_RANK_TEXT_TOO_SMALL"},
+ {"index":34,"key":"B7E25BAD",
+  "path":"localization/graphics/hd_candidates/textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+  "candidate_sha":"a23761d1160933d968347c87ca40496b9f8e8257a102f865b2047df2a8d92763",
+  "prior_sha":"590f868ac4b99addf1bf41a87de29498584b770e54649809f8398bb699aad467",
+  "source_sha":"3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
+  "source_png":"localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_SOURCE_READABLE.png",
+  "clean_png":"localization/graphics/role_B/20261005-B-PRODUCTION154-HOLL/B154_CLEAN_PLATE.png",
+  "source_bboxes":[[2021,1179,2556,1281]],"old_bboxes":[],
+  "high_risk":"USER PRE_INGAME #006 TEXT_TOO_SMALL|TOTAL_RANK_TEXT_TOO_SMALL"},
+ {"index":36,"key":"06AB5CEE",
+  "path":"localization/graphics/hd_candidates/textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+  "alias_path":"localization/graphics/hd_candidates/textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+  "candidate_sha":"7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
+  "prior_sha":"e3854f79be83cdd5fac7e9af91ab8f2beb9707000a7c6abbc564c2ca443fa553",
+  "source_sha":"cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+  "source_png":"localization/graphics/role_B/20261006-B-PRODUCTION157-JENN/B157_SOURCE_READABLE.png",
+  "clean_png":None,
+  "source_bboxes":[[1829,3227,2364,3329],[594,1622,1128,1724],[2266,1643,2785,1728]],
+  "old_bboxes":[[1948,3240,2245,3316],[712,1635,1009,1711],[2378,1648,2672,1723]],
+  "high_risk":"USER PRE_INGAME #007/#008 TOTAL_RANK_TEXT_TOO_SMALL|PLATE_RECONSTRUCTION_DIRTY|SOURCE_FOOTPRINT_HAZE"}
 ]
 
 def sha(b): return hashlib.sha256(b).hexdigest()
-
-def git_blob_with_sha(path, wanted):
-    commits = subprocess.check_output(["git","rev-list","HEAD","--",path], text=True).splitlines()
-    for c in commits:
-        try:
-            b = subprocess.check_output(["git","show",f"{c}:{path}"])
-        except subprocess.CalledProcessError:
-            continue
-        if sha(b) == wanted:
-            return b, c
-    raise RuntimeError(f"historical blob {wanted} not found for {path}")
-
+def git_blob(path,wanted):
+    for c in subprocess.check_output(["git","rev-list","HEAD","--",path],text=True).splitlines():
+        try:b=subprocess.check_output(["git","show",f"{c}:{path}"])
+        except subprocess.CalledProcessError:continue
+        if sha(b)==wanted:return b,c
+    raise RuntimeError(f"historical blob not found {path} {wanted}")
 def decode(b):
-    return Image.open(io.BytesIO(b)).convert("RGBA")
-
-def dds_meta(b):
-    if b[:4] != b"DDS ":
-        raise RuntimeError("not DDS")
-    return {
-        "height": struct.unpack_from("<I",b,12)[0],
-        "width": struct.unpack_from("<I",b,16)[0],
-        "mips": struct.unpack_from("<I",b,28)[0] or 1,
-        "header_sha256": sha(b[:128]),
-    }
-
-def mask_union(shape, boxes):
-    h,w = shape[:2]
-    m=np.zeros((h,w),dtype=bool)
-    for x0,y0,x1,y1 in boxes:
-        m[max(0,y0):min(h,y1),max(0,x0):min(w,x1)] = True
+    if b[:4]!=b"DDS ": raise RuntimeError("not DDS")
+    h,w,pitch,depth,mips=struct.unpack_from("<5I",b,12)
+    pf=struct.unpack_from("<8I",b,76); masks=(pf[4],pf[5],pf[6],pf[7])
+    mode="RGBA" if masks[:3]==(0xff,0xff00,0xff0000) else ("BGRA" if masks[:3]==(0xff0000,0xff00,0xff) else None)
+    if not mode or len(b)!=128+w*h*4: raise RuntimeError(("unsupported DDS",w,h,mips,masks,len(b)))
+    raw=Image.frombytes("RGBA",(w,h),b[128:],"raw",mode)
+    return raw,ImageOps.flip(raw),{"w":w,"h":h,"mips":mips or 1,"mode":mode,"header_sha":sha(b[:128])}
+def rectmask(h,w,boxes):
+    m=np.zeros((h,w),bool)
+    for x0,y0,x1,y1 in boxes:m[y0:y1,x0:x1]=True
     return m
-
-def bbox_from_mask(m):
-    ys,xs=np.where(m)
-    if len(xs)==0:return None
-    return [int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
-
-def fit_panel(im, maxw=1100, maxh=700):
-    im=im.convert("RGB")
-    scale=min(maxw/im.width,maxh/im.height,1.0)
-    if scale<1:
-        im=im.resize((max(1,int(im.width*scale)),max(1,int(im.height*scale))),Image.Resampling.LANCZOS)
+def bbox(m):
+    ys,xs=np.nonzero(m)
+    return None if not len(xs) else [int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
+def glyph_clean(old,boxes):
+    out=old.copy(); total=0
+    for x0,y0,x1,y1 in boxes:
+        a=np.array(out); crop=a[y0:y1,x0:x1]
+        rgb=crop[:,:,:3].astype(np.int16); al=crop[:,:,3]
+        white=(al>20)&(rgb.min(axis=2)>145)
+        navy=(al>20)&(rgb[:,:,0]<75)&(rgb[:,:,1]<90)&(rgb[:,:,2]<145)
+        m=ndimage.binary_dilation(white|navy,iterations=2)
+        if int(m.sum())<200: raise RuntimeError(("clean mask too small",int(m.sum())))
+        _,inds=ndimage.distance_transform_edt(m,return_indices=True)
+        fixed=crop.copy(); yy,xx=np.nonzero(m)
+        fixed[yy,xx]=crop[inds[0,yy,xx],inds[1,yy,xx]]
+        out.paste(Image.fromarray(fixed,"RGBA"),(x0,y0)); total+=int(m.sum())
+    return out,total
+def panel(im,maxw=1000,maxh=700):
+    im=im.convert("RGB"); s=min(maxw/im.width,maxh/im.height,1)
+    if s<1: im=im.resize((max(1,int(im.width*s)),max(1,int(im.height*s))),Image.Resampling.LANCZOS)
     return im
-
-def save_triptych(source, prior, current, path, title):
-    panels=[fit_panel(source),fit_panel(prior),fit_panel(current)]
-    W=sum(p.width for p in panels)+20*(len(panels)-1)
-    H=max(p.height for p in panels)+44
-    out=Image.new("RGB",(W,H),(35,35,35)); d=ImageDraw.Draw(out)
-    x=0
-    for label,p in zip(["SOURCE","PRIOR","CURRENT"],panels):
-        d.text((x+4,6),label,fill=(255,255,255))
-        out.paste(p,(x,38)); x+=p.width+20
-    d.text((4,H-3),title,fill=(255,255,255),anchor="ls")
-    out.save(path,quality=92,subsampling=0)
-
-def save_contacts(source, prior, current, boxes, path):
-    crops=[]
+def save_quad(src,prior,clean,current,path,title):
+    ims=[panel(x) for x in [src,prior,clean,current]]
+    labs=["SOURCE","PRIOR","CLEAN","CURRENT"]
+    W=sum(x.width for x in ims)+18*3; H=max(x.height for x in ims)+42
+    out=Image.new("RGB",(W,H),(28,28,28)); d=ImageDraw.Draw(out); x=0
+    for lab,im in zip(labs,ims):
+        d.text((x+4,5),lab,fill="white"); out.paste(im,(x,30)); x+=im.width+18
+    d.text((4,H-3),title,fill="white",anchor="ls"); out.save(path,quality=94,subsampling=0)
+def save_contacts(src,prior,clean,current,boxes,path):
+    rows=[]
     for i,(x0,y0,x1,y1) in enumerate(boxes):
-        pad=18
-        bb=(max(0,x0-pad),max(0,y0-pad),min(source.width,x1+pad),min(source.height,y1+pad))
-        trio=[source.crop(bb),prior.crop(bb),current.crop(bb)]
-        maxh=max(x.height for x in trio)
-        scale=min(1,280/maxh)
-        trio=[x.resize((max(1,int(x.width*scale)),max(1,int(x.height*scale))),Image.Resampling.NEAREST).convert("RGB") for x in trio]
-        W=sum(x.width for x in trio)+12*2; H=max(x.height for x in trio)+30
-        row=Image.new("RGB",(W,H),(45,45,45)); d=ImageDraw.Draw(row)
-        xx=0
-        for lab,im in zip(["SRC","PRIOR","CUR"],trio):
-            d.text((xx+3,3),lab,fill="white"); row.paste(im,(xx,24)); xx+=im.width+12
-        crops.append(row)
-    W=max(r.width for r in crops); H=sum(r.height for r in crops)+8*(len(crops)-1)
-    out=Image.new("RGB",(W,H),(20,20,20)); y=0
-    for r in crops: out.paste(r,(0,y)); y+=r.height+8
-    out.save(path,quality=94,subsampling=0)
+        pad=24; bb=(max(0,x0-pad),max(0,y0-pad),min(src.width,x1+pad),min(src.height,y1+pad))
+        ims=[src.crop(bb),prior.crop(bb),clean.crop(bb),current.crop(bb)]
+        sc=min(1,340/max(x.height for x in ims))
+        ims=[x.resize((max(1,int(x.width*sc)),max(1,int(x.height*sc))),Image.Resampling.NEAREST).convert("RGB") for x in ims]
+        W=sum(x.width for x in ims)+12*3; H=max(x.height for x in ims)+25
+        row=Image.new("RGB",(W,H),(35,35,35));d=ImageDraw.Draw(row);xx=0
+        for lab,im in zip(["SRC","PRIOR","CLEAN","CUR"],ims):
+            d.text((xx+3,3),lab,fill="white");row.paste(im,(xx,20));xx+=im.width+12
+        rows.append(row)
+    W=max(x.width for x in rows); H=sum(x.height for x in rows)+8*(len(rows)-1)
+    out=Image.new("RGB",(W,H),(20,20,20));y=0
+    for r in rows:out.paste(r,(0,y));y+=r.height+8
+    out.save(path,quality=95,subsampling=0)
 
-summary={"schema_version":1,"role":"C","run":"C247","temp_backlog_relief":"C1","shard":"ODD(+UNINDEXED_SPECIAL)","assets":[]}
+summary={"schema_version":1,"role":"C","run":"C248","TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN","assets":[]}
 for a in ASSETS:
     cur_b=Path(a["path"]).read_bytes()
-    prior_b, prior_commit=git_blob_with_sha(a["path"],a["prior_sha"])
-    actual=sha(cur_b)
-    if actual != a["candidate_sha"]:
-        raise RuntimeError(f'q{a["index"]} candidate drift {actual}')
-    if sha(prior_b) != a["prior_sha"]:
-        raise RuntimeError("prior SHA mismatch")
-    cm,pm=dds_meta(cur_b),dds_meta(prior_b)
-    cur_raw=decode(cur_b); prior_raw=decode(prior_b)
-    if cur_raw.size != prior_raw.size:
-        raise RuntimeError("dimension drift")
-    # Source bboxes are canonical readable/FLIP-Y coordinates, so compare in readable space.\n    ca=np.array(ImageOps.flip(cur_raw)); pa=np.array(ImageOps.flip(prior_raw))
-    diff=np.any(ca!=pa,axis=2)
-    adiff=ca[:,:,3]!=pa[:,:,3]
-    allowed=mask_union(ca.shape,a["bboxes"])
-    outside=int((diff & ~allowed).sum())
-    alpha_out=int((adiff & ~allowed).sum())
-    if outside or alpha_out:
-        raise RuntimeError(f'q{a["index"]} change outside source bbox: {outside}/{alpha_out}')
-    changed_bbox=bbox_from_mask(diff)
-    per=[]
-    for sb,lb in zip(a["bboxes"],a["localized_bboxes"]):
-        sx0,sy0,sx1,sy1=sb; lx0,ly0,lx1,ly1=lb
-        entry={
-            "source_bbox":sb,"localized_bbox":lb,
-            "source_size":[sx1-sx0,sy1-sy0],"localized_size":[lx1-lx0,ly1-ly0],
-            "delta_left":lx0-sx0,"delta_right":sx1-lx1,"delta_top":ly0-sy0,"delta_bottom":sy1-ly1,
-        }
-        entry["containment"]="PASS" if min(entry["delta_left"],entry["delta_right"],entry["delta_top"],entry["delta_bottom"])>=0 else "FAIL"
-        entry["size_ceiling"]="PASS" if entry["localized_size"][0]<=entry["source_size"][0] and entry["localized_size"][1]<=entry["source_size"][1] else "FAIL"
-        entry["positive_margin"]="PASS" if min(entry["delta_left"],entry["delta_right"],entry["delta_top"],entry["delta_bottom"])>0 else "FAIL"
-        per.append(entry)
-    if any(x["containment"]!="PASS" or x["size_ceiling"]!="PASS" or x["positive_margin"]!="PASS" for x in per):
-        raise RuntimeError(f'q{a["index"]} bbox gate fail')
-
-    # Readable orientation is FLIP-Y for current/prior raw DDS.
-    cur_read=ImageOps.flip(cur_raw)
-    prior_read=ImageOps.flip(prior_raw)
-    sr=Image.open(a["source_ref"]).convert("RGBA")
-    src_read=ImageOps.flip(sr) if a["source_ref_orientation"]=="raw_mirror_y" else sr
-    if src_read.size != cur_read.size:
-        raise RuntimeError(f'q{a["index"]} source/current dimension mismatch {src_read.size} {cur_read.size}')
-
-    save_triptych(src_read,prior_read,cur_read,OUT/f'C247_Q{a["index"]:03d}_{a["key"]}_FLIPY.jpg',f'q{a["index"]} readable/FLIP-Y')
-    # For source reference that is readable-only, RAW source is mirror-y of it.
-    src_raw=ImageOps.flip(src_read)
-    save_triptych(src_raw,prior_raw,cur_raw,OUT/f'C247_Q{a["index"]:03d}_{a["key"]}_RAW.jpg',f'q{a["index"]} RAW DDS orientation')
-    save_contacts(src_read,prior_read,cur_read,a["bboxes"],OUT/f'C247_Q{a["index"]:03d}_{a["key"]}_CONTACTS.jpg')
-
+    if sha(cur_b)!=a["candidate_sha"]: raise RuntimeError(("candidate drift",a["index"],sha(cur_b)))
+    prior_b,prior_commit=git_blob(a["path"],a["prior_sha"])
+    cur_raw,cur,cm=decode(cur_b); prior_raw,prior,pm=decode(prior_b)
+    if cm["w"]!=pm["w"] or cm["h"]!=pm["h"] or cm["header_sha"]!=pm["header_sha"]: raise RuntimeError(("header/dim drift",a["index"]))
+    src=Image.open(a["source_png"]).convert("RGBA")
+    if src.size!=cur.size: raise RuntimeError(("source png dimension",a["index"],src.size,cur.size))
+    if a["clean_png"]:
+        clean=Image.open(a["clean_png"]).convert("RGBA")
+        clean_mode="INDEPENDENT_C_USES_PRIOR_C_APPROVED_CLEAN_PLATE"
+        removed=0
+    else:
+        clean,removed=glyph_clean(prior,a["old_bboxes"])
+        clean_mode="INDEPENDENT_C_RECONSTRUCTED_FROM_PRE_B236_GLYPH_MASK"
+    if clean.size!=cur.size: raise RuntimeError(("clean dimension",a["index"]))
+    ca=np.array(cur); pa=np.array(prior); cla=np.array(clean)
+    allowed=rectmask(cm["h"],cm["w"],a["source_bboxes"])
+    prevdiff=np.any(ca!=pa,axis=2); alphadiff=ca[:,:,3]!=pa[:,:,3]
+    outside=int((prevdiff & ~allowed).sum()); alpha_out=int((alphadiff & ~allowed).sum())
+    if outside or alpha_out: raise RuntimeError(("blast outside",a["index"],outside,alpha_out))
+    localized=np.any(ca!=cla,axis=2)
+    per=[]; loc_union=np.zeros_like(allowed)
+    for sb in a["source_bboxes"]:
+        x0,y0,x1,y1=sb
+        local=localized & rectmask(cm["h"],cm["w"],[sb])
+        lb=bbox(local)
+        if lb is None: raise RuntimeError(("no localized pixels",a["index"],sb))
+        sx,sy=x1-x0,y1-y0; lw,lh=lb[2]-lb[0],lb[3]-lb[1]
+        margins=[lb[0]-x0,x1-lb[2],lb[1]-y0,y1-lb[3]]
+        status="PASS" if min(margins)>0 and lw<=sx and lh<=sy else "FAIL"
+        per.append({"original_bbox":sb,"localized_bbox":lb,"source_size":[sx,sy],"localized_size":[lw,lh],
+                    "margins":margins,"width_ratio":round(lw/sx,4),"height_ratio":round(lh/sy,4),
+                    "containment":"PASS" if min(margins)>=0 else "FAIL","size_ceiling":"PASS" if lw<=sx and lh<=sy else "FAIL",
+                    "positive_margin":"PASS" if min(margins)>0 else "FAIL"})
+        if status!="PASS": raise RuntimeError(("bbox gate",a["index"],per[-1]))
+        loc_union|=local
+    # pair overlap cannot occur for disjoint source boxes; still assert localized pixels do not escape allowed.
+    localized_outside=int((localized & ~allowed).sum())
+    if localized_outside: raise RuntimeError(("localized outside",a["index"],localized_outside))
+    alias_exact=None
+    if a.get("alias_path"):
+        alias_exact=sha(Path(a["alias_path"]).read_bytes())==a["candidate_sha"]
+        if not alias_exact: raise RuntimeError("q38 alias drift")
+    save_quad(src,prior,clean,cur,OUT/f"C248_Q{a['index']:03d}_{a['key']}_SOURCE_PRIOR_CLEAN_CURRENT.jpg",f"q{a['index']} readable/FLIP-Y")
+    save_quad(ImageOps.flip(src),prior_raw,ImageOps.flip(clean),cur_raw,OUT/f"C248_Q{a['index']:03d}_{a['key']}_RAW.jpg",f"q{a['index']} RAW DDS")
+    save_contacts(src,prior,clean,cur,a["source_bboxes"],OUT/f"C248_Q{a['index']:03d}_{a['key']}_CONTACTS.jpg")
     report={
-        "schema_version":1,"role":"C","run":"C247",
-        "TEMP_BACKLOG_RELIEF":"C1","SHARD":"ODD(+UNINDEXED_SPECIAL)",
-        "queue_index":a["index"],"asset_key":a["key"],"candidate_path":a["path"],
-        "candidate_sha256":actual,"prior_candidate_sha256":a["prior_sha"],"prior_blob_commit":prior_commit,
-        "high_risk_reason":a["high_risk_reason"],
-        "independent_machine_qa":{
-            "candidate_sha_exact":True,
-            "dimensions":[cm["width"],cm["height"]],
-            "mips":cm["mips"],
-            "header_128_exact_to_prior":cm["header_sha256"]==pm["header_sha256"],
-            "decoded_changed_pixels":int(diff.sum()),
-            "decoded_changed_bbox":changed_bbox,
-            "changed_pixels_outside_exact_source_bboxes":outside,
-            "alpha_changed_outside_exact_source_bboxes":alpha_out,
-            "bbox_size_positive_margin":f'{len(per)}/{len(per)} PASS',
-            "per_region":per,
-            "raw_and_flip_y_evidence":"WRITTEN_FOR_CONTROLLER_REVIEW",
-        },
-        "decision":"PENDING_CONTROLLER_VISUAL_AND_C3",
-        "runtime_validation":"UNTESTED",
-        "forbidden_domains_touched":[]
+      "schema_version":2,"role":"C","run":"C248","TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN",
+      "queue_index":a["index"],"asset_key":a["key"],"candidate_path":a["path"],
+      "candidate_sha256":a["candidate_sha"],"prior_candidate_sha256":a["prior_sha"],"prior_blob_commit":prior_commit,
+      "canonical_source_dds_sha256_from_producer_provenance":a["source_sha"],
+      "source_readable_png":a["source_png"],"source_readable_png_sha256":sha(Path(a["source_png"]).read_bytes()),
+      "clean_plate_mode":clean_mode,"independent_clean_mask_pixels_removed":removed,
+      "high_risk_reason":a["high_risk"],
+      "independent_machine_qa":{
+        "candidate_sha_exact":True,"dimensions":[cm["w"],cm["h"]],"mips":cm["mips"],
+        "header_128_exact_to_prior":cm["header_sha"]==pm["header_sha"],
+        "changed_pixels_outside_exact_source_bboxes":outside,
+        "alpha_changed_outside_exact_source_bboxes":alpha_out,
+        "localized_pixels_outside_exact_source_bboxes":localized_outside,
+        "bbox_size_positive_margin":f"{len(per)}/{len(per)} PASS","per_region":per,
+        "raw_and_flip_y_evidence":"WRITTEN",
+        "q38_alias_exact_bytes":alias_exact
+      },
+      "controller_visual_qa":"PENDING_CONTROLLER",
+      "c3_strict":"PENDING_CONTROLLER",
+      "decision":"PENDING_CONTROLLER_VISUAL_AND_C3",
+      "runtime_validation":"UNTESTED","forbidden_domains_touched":[]
     }
-    (OUT/f'C247_Q{a["index"]:03d}_{a["key"]}_MACHINE_QA.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    summary["assets"].append({"index":a["index"],"key":a["key"],"candidate_sha256":actual,"machine_qa":"PASS","controller_visual":"PENDING","c3":"PENDING"})
-(OUT/"C247_BATCH_MACHINE_SUMMARY.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    (OUT/f"C248_Q{a['index']:03d}_{a['key']}_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    summary["assets"].append({"index":a["index"],"key":a["key"],"candidate_sha256":a["candidate_sha"],"machine_qa":"PASS","q38_alias_exact_bytes":alias_exact})
+(OUT/"C248_BATCH_MACHINE_SUMMARY.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+print(json.dumps(summary,ensure_ascii=False))
