@@ -59,33 +59,76 @@ jobs:
           Copy-Item localization/text/runtime_ko.tsv build/bin/localization/text/runtime_ko.tsv -Force
           Invoke-WebRequest -Uri https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE -OutFile build/bin/OR2006C2C.exe
 
-      - name: Copy QA-passed Korean graphics
+      - name: Copy PRE_INGAME-approved Korean graphics
         shell: pwsh
         run: |
           $rows = Import-Csv localization/graphics/asset_queue.csv
-          $selected = @()
+          $review = Get-Content localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json -Raw | ConvertFrom-Json
+
+          $queueByIndex = @{}
           foreach ($row in $rows) {
+            $queueByIndex[[string]$row.index] = $row
+          }
+
+          $blocked = @{}
+          foreach ($item in $review.mandatory_c3_blocked) {
+            $blocked[[string]$item.queue_index] = $true
+          }
+
+          $selected = @()
+          foreach ($item in $review.items) {
+            if ([string]$item.source_kind -ne 'localized_candidate') {
+              continue
+            }
+
+            $index = [string]$item.queue_index
+            if ($blocked.ContainsKey($index)) {
+              Write-Host "Skip mandatory-C3-blocked q$index"
+              continue
+            }
+            if (-not $queueByIndex.ContainsKey($index)) {
+              throw "PRE_INGAME q$index missing from asset_queue.csv"
+            }
+
+            $row = $queueByIndex[$index]
             $status = [string]$row.artwork_status
-            if ($status -like '*pass_pending_ingame*' -and $status -notlike '*preserve_original*') {
-              $source = Join-Path 'localization/graphics/hd_candidates' $row.path
-              if (-not (Test-Path $source)) {
-                throw "Missing promoted candidate: $source"
-              }
-              $dest = Join-Path 'build/bin' $row.path
-              New-Item -ItemType Directory -Force -Path (Split-Path $dest -Parent) | Out-Null
-              Copy-Item $source $dest -Force
-              $selected += $row
+            if ($status -match '(?i)rework_required|hold_strict|preserve_original') {
+              throw "Unsafe PRE_INGAME q$index status: $status"
+            }
+
+            $source = Join-Path 'localization/graphics/hd_candidates' ([string]$row.path)
+            if (-not (Test-Path $source)) {
+              throw "Missing PRE_INGAME candidate: $source"
+            }
+
+            $actualSha = (Get-FileHash $source -Algorithm SHA256).Hash.ToLowerInvariant()
+            $expectedSha = ([string]$item.candidate_sha256).ToLowerInvariant()
+            if ($actualSha -ne $expectedSha) {
+              throw "Candidate SHA mismatch q$index: expected=$expectedSha actual=$actualSha"
+            }
+
+            $dest = Join-Path 'build/bin' ([string]$row.path)
+            New-Item -ItemType Directory -Force -Path (Split-Path $dest -Parent) | Out-Null
+            Copy-Item $source $dest -Force
+            $selected += [pscustomobject]@{
+              index = $row.index
+              path = $row.path
+              artwork_status = $row.artwork_status
+              candidate_sha256 = $actualSha
             }
           }
+
           if ($selected.Count -eq 0) {
-            throw 'No QA-passed Korean graphics selected.'
+            throw 'No PRE_INGAME-approved Korean graphics selected.'
           }
+
           $selected | Export-Csv build/bin/KOREAN_TEST_GRAPHICS_MANIFEST.csv -NoTypeInformation -Encoding UTF8
           @(
             'OutRun 2006 Korean localization test build'
             "Source commit: $env:GITHUB_SHA"
             "Graphics included: $($selected.Count)"
-            'Selection: artwork_status contains pass_pending_ingame and excludes preserve_original'
+            'Selection: PRE_INGAME manifest localized candidates, excluding mandatory_c3_blocked'
+            'Integrity: every included DDS SHA-256 must match PRE_INGAME manifest'
             'Runtime text: localization/text/runtime_ko.tsv'
             'Status: TEST BUILD / IN-GAME VALIDATION REQUIRED'
             ''
