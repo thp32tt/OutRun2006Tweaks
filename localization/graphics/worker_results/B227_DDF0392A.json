@@ -17,5 +17,7 @@
   "worker_status": "B227_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
   "runtime_validation": "UNTESTED",
   "before_candidate_sha256": "e0d04c144aec92aad090dd2d5f7895f956a1001cafca319d1b0f4681fd7e0fea",
-  "report": "localization/graphics/role_B/20261007-B-MANUALQA227-DDF0392A/B227_DDF_REPORT.json"
+  "report": "localization/graphics/role_B/20261007-B-MANUALQA227-DDF0392A/B227_DDF_REPORT.json",
+  "controller_status": "B227_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "controller_report": "localization/graphics/role_B/20261007-B-MANUALQA227-DDF0392A/B227_CONTROLLER_SELF_QA.json"
 }
