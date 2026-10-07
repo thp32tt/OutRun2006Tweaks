@@ -546,6 +546,85 @@ require_order(
     "slot.published = false;",
 )
 
+# The R13 physical fallback owns DirectGPU before the final R33/R32 owner is
+# available. It must preserve the same fail-closed resource-lifetime invariant:
+# an EVENT hard error, a partial shared-eye copy failure, or EVENT Issue failure
+# cannot make an unproven shared slot reusable. Quarantine the fallback copy
+# path until ResetEx recreates the transport resources.
+require(
+    r13,
+    "R13 fallback DirectGPU rejection state",
+    "bool R13DirectCopyPathRejected = false;",
+    "HRESULT R13DirectCopyRejectHr = D3D_OK;",
+)
+require_order(
+    resolve_direct_r13,
+    "R13 fallback DirectGPU rejection gate",
+    "EnsureDirectTransportResources(device)",
+    "if (R13DirectCopyPathRejected)",
+    "return false;",
+    "const std::uint32_t preferred =",
+)
+r13_pending_start = resolve_direct_r13.find("if (slot.producerPending)")
+r13_published_start = resolve_direct_r13.find(
+    "if (slot.published && slot.frameId)", r13_pending_start
+)
+if min(r13_pending_start, r13_published_start) < 0:
+    fail("R13 fallback producer EVENT poll scope missing")
+r13_pending_poll = resolve_direct_r13[r13_pending_start:r13_published_start]
+require_order(
+    r13_pending_poll,
+    "R13 fallback producer EVENT hard-error fail-closed",
+    "else if (ready == S_FALSE)",
+    "continue;",
+    "R13DirectCopyPathRejected = true;",
+    "R13DirectCopyRejectHr = ready;",
+    "return false;",
+)
+r13_hard_error = r13_pending_poll.find("R13DirectCopyPathRejected = true;")
+if r13_hard_error < 0:
+    fail("R13 fallback producer EVENT hard-error branch missing")
+forbid(
+    r13_pending_poll[r13_hard_error:],
+    "R13 fallback producer EVENT hard-error must retain quarantined slot",
+    "slot.producerPending = false;",
+    "slot.pendingFrameId = 0;",
+    "slot.frameId = 0;",
+    "slot.published = false;",
+)
+
+r13_copy_start = resolve_direct_r13.find("auto& slot = DirectTransportSlots[selected];")
+r13_pending_publish = resolve_direct_r13.find(
+    "slot.producerPending = true;", r13_copy_start
+)
+if min(r13_copy_start, r13_pending_publish) < 0:
+    fail("R13 fallback copy/Issue scope missing")
+r13_copy_issue = resolve_direct_r13[r13_copy_start:r13_pending_publish]
+require_order(
+    r13_copy_issue,
+    "R13 fallback shared-eye copy/Issue fail-closed",
+    "const HRESULT leftCopy = StretchDirectEye(",
+    "const HRESULT rightCopy = SUCCEEDED(leftCopy)",
+    "if (FAILED(leftCopy) || FAILED(rightCopy))",
+    "R13DirectCopyPathRejected = true;",
+    "R13DirectCopyRejectHr = FAILED(leftCopy)",
+    "return false;",
+    "const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);",
+    "if (FAILED(issueHr))",
+    "R13DirectCopyPathRejected = true;",
+    "R13DirectCopyRejectHr = issueHr;",
+    "return false;",
+)
+reset_r13_common = body(r13, "void R13ResetCommonPre(IDirect3DDevice9*)")
+require_order(
+    reset_r13_common,
+    "R13 fallback DirectGPU rejection reset",
+    "R13DirectCopyPathRejected = false;",
+    "R13DirectCopyRejectHr = D3D_OK;",
+    "R13ReleaseAckState();",
+    "ReleaseStereoResources();",
+)
+
 post_present_r7 = body(r7, "bool DirectTransportFrameReadyAfterPresent(")
 require_order(
     post_present_r7,
