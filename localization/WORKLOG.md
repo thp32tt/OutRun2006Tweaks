@@ -3419,3 +3419,8 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - q219 `D263B3F1` @ `f6303ee1...`: machine 1/1 containment and all zero-pixel/protected gates PASS, but visual QA overrides numeric PASS. `코스 선택` is 396x110 inside the 1467x118 source bbox (27.0% source width) and reads as a compact generic Hangul caption versus the dominant extended rounded silver-techno `COURSE SELECT` source title. `REWORK_REQUIRED`; C3 blocked. Preserve the validated clean plate/OutRun2 artwork and materially restore source-techno proportions, right lean/effects and hierarchy inside the exact bbox, then fresh C1 + C3.
 - IGR-018 and IGR-004 remain open for PRE_INGAME/user review + NEW actual-game retest despite static C3 PASS. IGR-025 remains HOLD because q219 now needs material rework and screenshot(163)/remaining runtime-vs-DDS mapping evidence is still missing. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Controller report: `localization/graphics/role_C/20261008-C265-C1-Q121-Q201-Q219/C265_CONTROLLER_FINAL_QA.json`.
+
+### 2026-10-08 C267 C2 q140/q154/q164
+- TEMP_BACKLOG_RELIEF=C2, SHARD=EVEN. Live HEAD/queue refresh selected even PRE_INGAME visual-rework candidates q140/q154/q164 only.
+- Hosted worker stayed pending; N100 MCP memory-stream fallback independently verified exact source/candidate SHA. q140 6/6, q154 8/8, q164 1/1 bbox/size/positive-margin PASS; outside/alpha/source-outside/protected=0 in authoritative orientation.
+- Fresh SOURCE/CLEAN/CURRENT controller contacts PASS for all three; exact-SHA C3_STRICT_PASS. PRE_INGAME English-original refresh, user JPG review and NEW actual-game retest remain pending. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

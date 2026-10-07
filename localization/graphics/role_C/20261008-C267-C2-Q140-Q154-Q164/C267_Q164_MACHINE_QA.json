@@ -1,0 +1,29 @@
+{
+  "run": "C267",
+  "queue_index": 164,
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "candidate_sha256": "65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f",
+  "source_sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+  "rows": "1/1 PASS",
+  "localized_size": [
+    722,
+    90
+  ],
+  "source_size": [
+    903,
+    94
+  ],
+  "margins": [
+    2,
+    179,
+    2,
+    2
+  ],
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "source_changed_outside": 0,
+  "protected_changed_authoritative": 0,
+  "machine_result": "PASS",
+  "runtime_validation": "UNTESTED"
+}

@@ -2726,3 +2726,10 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - q201 a7a4ea10... -> fresh C + exact-SHA C3_STRICT_PASS: 17/17 exact bbox, zero outside/protected/overlap; canonical stage transliteration and protected Night Bird/Radiation visual preservation PASS.
 - q219 f6303ee1... -> REWORK_REQUIRED despite machine PASS: 코스 선택 uses 396/1467px (27.0%) source width and does not preserve the dominant extended silver-techno title family/hierarchy; C3 BLOCKED.
 - q121/q201 PRE_INGAME English-original refresh/user JPG + NEW actual-game retest pending. IGR-025 remains mapping HOLD plus q219 material rework. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+### C267 C2 backlog relief — q140/q154/q164 (2026-10-08)
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN
+- q140 31C58963: Fresh C + C3_STRICT_PASS @ 588eb51d…
+- q154 4D38BBB0: Fresh C + C3_STRICT_PASS @ 815f0112…
+- q164 5B65E08C: Fresh C + C3_STRICT_PASS @ 65bad7ee…
+- Next: PRE_INGAME refresh -> user JPG -> NEW in-game retest. RUNTIME_VALIDATION=UNTESTED.

@@ -6341,5 +6341,47 @@
     "pre_ingame_export": "TRIGGER_WITH_THIS_SYNC_Q121_Q201",
     "runtime_validation": "UNTESTED",
     "updated_at_kst": "2026-10-08T06:57:54+09:00"
+  },
+  "c267_c2_q140_q154_q164": {
+    "run": "20261008-C267-C2-Q140-Q154-Q164",
+    "role": "C",
+    "lane": "C2",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "pre_commit_refresh_head": "4469fc526857d1f8c25e5b10f2f123da3385e5c1",
+    "execution_backend": "N100_MCP_MEMORY_STREAMED_EXACT_REPOSITORY_BYTES_FALLBACK",
+    "assets": {
+      "q140": {
+        "asset": "31C58963",
+        "candidate_sha256": "588eb51d554c8adeef850bd53d665ed9f4a4d1c3389b9e67dcdd4be9f4dd635c",
+        "source_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+        "machine_qa": "PASS_6_OF_6_ZERO_OUTSIDE_ALPHA_SOURCE_OUTSIDE_PROTECTED",
+        "controller_visual_qa": "PASS_SOURCE_CLEAN_CURRENT_HIERARCHY_ENTER_ICON",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA"
+      },
+      "q154": {
+        "asset": "4D38BBB0",
+        "candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+        "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+        "machine_qa": "PASS_8_OF_8_ZERO_OUTSIDE_ALPHA_SOURCE_OUTSIDE_PROTECTED",
+        "controller_visual_qa": "PASS_RED_GRAY_HIERARCHY_FERRARI_PROTECTED",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA"
+      },
+      "q164": {
+        "asset": "5B65E08C",
+        "candidate_sha256": "65bad7ee4e2f74bb859f4b993a046fd11747cc416e3192d2e671fd621593ee5f",
+        "source_sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+        "machine_qa": "PASS_1_OF_1_ZERO_OUTSIDE_ALPHA_SOURCE_OUTSIDE_PROTECTED",
+        "controller_visual_qa": "PASS_SOURCE_LEFT_HIERARCHY_RED_PANEL",
+        "fresh_c": "PASS",
+        "c3": "C3_STRICT_PASS_EXACT_SHA"
+      }
+    },
+    "controller_report": "localization/graphics/role_C/20261008-C267-C2-Q140-Q154-Q164/C267_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "PENDING_REFRESH_TRIGGERED_BY_STATE_COMMIT",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

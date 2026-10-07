@@ -1,0 +1,15 @@
+{
+  "run": "C267",
+  "queue_index": 154,
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "candidate_sha256": "815f0112c772ef1a99b5cb86639415701582301edaaf3ac5bec276e69a475288",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "rows": "8/8 PASS",
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "source_changed_outside": 0,
+  "protected_changed_authoritative": 0,
+  "machine_result": "PASS",
+  "runtime_validation": "UNTESTED"
+}
