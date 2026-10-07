@@ -10,10 +10,11 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
 import hashlib, json, struct, subprocess
 from pathlib import Path
 import numpy as np
+from scipy.ndimage import distance_transform_edt
 from PIL import Image, ImageDraw, ImageFont, ImageChops
 
 repo=Path.cwd()
-run="20261007-A164-Q197-9F060EC1-EXACT-BBOX"
+run="20261007-A164R-Q197-9F060EC1-EXACT-BBOX"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -55,40 +56,19 @@ def dilate1(m):
             xx0=max(0,dx); xx1=m.shape[1]+min(0,dx)
             z[yy0:yy1,xx0:xx1] |= m[yy0-dy:yy1-dy,xx0-dx:xx1-dx]
     return z
-def inpaint_horizontal(arr,mask):
+def inpaint_nearest(arr,mask):
+    # Euclidean nearest-background fill avoids the horizontal streaking that
+    # controller visual QA rejected in A164's first clean reconstruction.
+    if not np.any(mask): return arr.copy()
+    _,inds=distance_transform_edt(mask,return_indices=True)
     out=arr.copy()
-    H,W=mask.shape
-    for y in range(H):
-        xs=np.flatnonzero(mask[y])
-        if len(xs)==0: continue
-        start=prev=int(xs[0])
-        runs=[]
-        for x in xs[1:]:
-            x=int(x)
-            if x!=prev+1:
-                runs.append((start,prev)); start=x
-            prev=x
-        runs.append((start,prev))
-        for a,b in runs:
-            l=a-1
-            while l>=0 and mask[y,l]: l-=1
-            r=b+1
-            while r<W and mask[y,r]: r+=1
-            if l>=0 and r<W:
-                lv=out[y,l].astype(np.float32); rv=out[y,r].astype(np.float32)
-                den=max(1,r-l)
-                for x in range(a,b+1):
-                    t=(x-l)/den
-                    out[y,x]=np.clip(np.rint(lv*(1-t)+rv*t),0,255).astype(np.uint8)
-            elif l>=0:
-                out[y,a:b+1]=out[y,l]
-            elif r<W:
-                out[y,a:b+1]=out[y,r]
-            else:
-                raise RuntimeError(("inpaint full row",y,a,b))
+    yy,xx=np.nonzero(mask)
+    out[yy,xx]=arr[inds[0,yy,xx],inds[1,yy,xx]]
     return out
 
-sb=source_path.read_bytes(); ob=candidate.read_bytes()
+sb=source_path.read_bytes()
+OLD_COMMIT="882f5a5d5daff5fe00d3da1d0775127c4948cfd9"
+ob=subprocess.check_output(["git","show",OLD_COMMIT+":localization/graphics/hd_candidates/"+asset])
 if sha(sb)!=SOURCE_SHA: raise RuntimeError(("source drift",sha(sb)))
 if sha(ob)!=BEFORE_SHA: raise RuntimeError(("candidate drift",sha(ob)))
 sraw,source,meta=decode(sb); oraw,old,ometa=decode(ob)
@@ -149,12 +129,12 @@ for r in rows:
     global_mask[y0:y1,x0:x1]=local
     old_masks.append(global_mask)
     mask_debug.append({"key":r["key"],"threshold_bbox_local":bb_local,"masked_pixels":int(local.sum())})
-    # Horizontal interpolation operates on a padded local crop so each glyph
-    # stroke run is restored from immediate same-row plate pixels.
+    # Nearest-background reconstruction operates on a padded local crop and fills
+    # each glyph footprint from the closest intact plate pixels in 2D.
     px0=max(0,x0-8); py0=max(0,y0-3); px1=min(W,x1+8); py1=min(H,y1+3)
     local_arr=clean_np[py0:py1,px0:px1].copy()
     local_mask=global_mask[py0:py1,px0:px1]
-    clean_np[py0:py1,px0:px1]=inpaint_horizontal(local_arr,local_mask)
+    clean_np[py0:py1,px0:px1]=inpaint_nearest(local_arr,local_mask)
 
 clean=Image.fromarray(clean_np.astype(np.uint8),"RGBA")
 
@@ -280,7 +260,7 @@ def card(label,im,w=900):
 cards=[card("SOURCE",src_rgb),card("A88/C85 OLD",old_rgb),card("A164 CLEAN",clean_rgb),card("A164 FINAL",new_rgb)]
 sheet=Image.new("RGB",(1800,cards[0].height*2),(16,16,16))
 for i,c in enumerate(cards): sheet.paste(c,((i%2)*900,(i//2)*c.height))
-sheet.save(out/"A164_Q197_SOURCE_OLD_CLEAN_FINAL.jpg","JPEG",quality=96,subsampling=0)
+sheet.save(out/"A164R_Q197_SOURCE_OLD_CLEAN_FINAL.jpg","JPEG",quality=96,subsampling=0)
 
 rowcards=[]
 for r in rows:
@@ -297,7 +277,7 @@ for r in rows:
 rw=max(x.width for x in rowcards); rh=sum(x.height for x in rowcards)
 rs=Image.new("RGB",(rw,rh),(16,16,16)); yy=0
 for c in rowcards: rs.paste(c,(0,yy)); yy+=c.height
-rs.save(out/"A164_Q197_ROW_CONTACTS.jpg","JPEG",quality=97,subsampling=0)
+rs.save(out/"A164R_Q197_ROW_CONTACTS.jpg","JPEG",quality=97,subsampling=0)
 
 raw_roi=(0,88,900,888)  # mirror-Y of readable lower card
 raws=[]
@@ -306,7 +286,7 @@ for lab,im in [("SOURCE RAW",sraw),("OLD RAW",oraw),("A164 RAW",praw)]:
     z=Image.new("RGB",(900,830),(20,20,20));z.paste(c,(0,30));ImageDraw.Draw(z).text((6,6),lab,fill="white");raws.append(z)
 rawsheet=Image.new("RGB",(2700,830),(16,16,16))
 for i,c in enumerate(raws):rawsheet.paste(c,(i*900,0))
-rawsheet.save(out/"A164_Q197_RAW_COMPARE.jpg","JPEG",quality=95,subsampling=0)
+rawsheet.save(out/"A164R_Q197_RAW_COMPARE.jpg","JPEG",quality=95,subsampling=0)
 
 pcs=[]
 pr=src_rgb.crop(roi); pf=new_rgb.crop(roi)
@@ -318,24 +298,24 @@ for pct in (100,75,50):
 pw=max(x.width for x in pcs); ph=sum(x.height+4 for x in pcs)
 ps=Image.new("RGB",(pw,ph),(16,16,16)); yy=0
 for c in pcs:ps.paste(c,(0,yy));yy+=c.height+4
-ps.save(out/"A164_Q197_PRACTICAL_100_75_50.jpg","JPEG",quality=95,subsampling=0)
+ps.save(out/"A164R_Q197_PRACTICAL_100_75_50.jpg","JPEG",quality=95,subsampling=0)
 
 report={
  "schema_version":2,"role":"A","run":run,"queue_index":197,"asset":asset,
  "execution_backend":"github-actions because repository-backed 16MiB DDS bytes are not directly materialized in ChatGPT local runtime; N100 heavy image processing not used",
- "trigger":"CURRENT_POLICY_ZERO_PIXEL_SIZE_CEILING_RECHECK_OF_HISTORICAL_C85_PASS",
+ "trigger":"A164_CONTROLLER_CLEAN_PLATE_VISUAL_REJECT_RETRY_CURRENT_POLICY_ZERO_PIXEL_SIZE_CEILING",
  "source_sha256":SOURCE_SHA,"prior_candidate_sha256":BEFORE_SHA,"candidate_sha256":newsha,
  "historical_current_policy_check":historical,
  "repair":"reconstruct only old Korean raster footprints from current clean-background context, then native Noto Sans CJK KR Bold rerender; shared body font size; exact source-left cadence",
  "font":{"path":FONT,"font_index":font_index,"title_size":title_fs,"shared_body_size":body_fs},
- "clean_plate":{"method":"same-row immediate-neighbor interpolation restricted to old Korean glyph masks; no canonical artwork outside declared correction rectangles modified","mask_debug":mask_debug},
+ "clean_plate":{"method":"Euclidean nearest-background reconstruction restricted to old Korean glyph masks; A164 horizontal-streak reconstruction rejected and superseded; no artwork outside declared correction rectangles modified","mask_debug":mask_debug},
  "rows":results,
  "machine_qa":{"bbox_size_positive_margin":"5/5 PASS","changed_pixels_outside_declared_rework_union":blast,
    "alpha_changed_outside_declared_rework_union":alpha_blast,"localized_pair_overlap":0,
    "header_128_exact":pb[:128]==sb[:128],"dimensions":[meta["w"],meta["h"]],"mips":meta["mips"],
    "raw_orientation":"mirror_y","persisted_decode_matches_intended":"PASS",
    "row_numbers_OM_barcode_legal_watermark_frame_outside_rework":"PIXEL_EXACT_TO_PRIOR_C85"},
- "ordered_generation_gate":{"1_plate_restoration":"PENDING_CONTROLLER_VISUAL; MACHINE_SCOPE_ZERO_BLAST",
+ "ordered_generation_gate":{"1_plate_restoration":"PENDING_CONTROLLER_VISUAL; A164_HORIZONTAL_STREAK_METHOD_SUPERSEDED; MACHINE_SCOPE_ZERO_BLAST",
    "2_slant_direction":"PASS_SOURCE_UPRIGHT_FAMILY","3_no_unnecessary_undersizing":"PASS_MAX_SHARED_NATIVE_FONT_WITH_2PX_MIN_MARGIN",
    "4_source_weight_effects":"PASS_FLAT_SOURCE_COLOR_FAMILY; NO_INVENTED_OUTLINE_SHADOW",
    "5_no_clipping":"PASS_5_OF_5_POSITIVE_MARGIN","6_protected_clearance":"PASS_ZERO_BLAST_OUTSIDE_DECLARED_REWORK",
@@ -344,8 +324,8 @@ report={
  "mandatory_c3_strict_audit":"REQUIRED_EXACT_SHA_DUE_HISTORICAL_POLICY_FALSE_NEGATIVE",
  "pre_ingame_export":"BLOCKED_UNTIL_FRESH_C_C3","runtime_validation":"UNTESTED","forbidden_domains_touched":[]
 }
-(out/"A164_Q197_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"A164R_Q197_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 summary={"role":"A","run":run,"queue_index":197,"asset":"9F060EC1","candidate_sha256":newsha,
- "worker_status":"STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL","report":"localization/graphics/role_A/"+run+"/A164_Q197_REPORT.json","runtime_validation":"UNTESTED"}
-(wr/"A164_Q197_9F060EC1.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+ "worker_status":"STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL","report":"localization/graphics/role_A/"+run+"/A164R_Q197_REPORT.json","runtime_validation":"UNTESTED"}
+(wr/"A164R_Q197_9F060EC1.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False))
