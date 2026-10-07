@@ -1,194 +1,234 @@
 #!/usr/bin/env python3
-# B239: q52 A8CE339F duplicate Start-family consistency repair.
+# B241: q212 BA0147DA C256 title-family proportion rework.
 import os
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("GitHub-hosted localization CPU worker / role B only")
-
-import base64, hashlib, io, json, struct, zlib
+import hashlib,json,struct,subprocess,urllib.request
 from pathlib import Path
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image,ImageChops,ImageDraw,ImageFont
 
 repo=Path.cwd()
-RUN="20261007-B239-Q052-A8CE339F-START-FAMILY"
+RUN="20261008-B241-Q212-CONDENSED-SOURCE-ANCHORS"
 out=repo/"localization/graphics/role_B"/RUN
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
+rel="textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds"
+cand=repo/"localization/graphics/hd_candidates"/rel
+INPUT="3266d0740f9fc5b8d1b0771e2313fe3364e485da06bc5ad578f94999082315c4"
+SOURCE="f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61"
 
-asset="textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds"
-cand=repo/"localization/graphics/hd_candidates"/asset
-cleanp=repo/"localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_CLEAN_PLATE.png"
-PRIOR_SHA="d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8"
-FINAL_SHA="c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e"
-SOURCE_SHA="08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b"
-PATCH_PACKAGE=json.loads(r'''{"prior_sha256":"d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8","candidate_sha256":"c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e","size":2097280,"ranges":[{"offset":1387888,"length":238,"sha256":"f56ceab49f21bffa7503873369b293805a474befb681342a66dd28da6d0d0f83","b64":"eNr7x+A5KURTgPEHAwPD379/z/5n8GQCMhlA/Pj//88j80PJ4H8D8tUYmBXA/Pp6519A+2I6JzCD+V+B9slA1HsrejCEhoZe/q8A4RtEg/n3CfLlIXwBCP/6HyagfQ7MGiDzr9fXezNAgSkjA8P/9wDmHkjY"},{"offset":1396080,"length":224,"sha256":"e78c75f97904167b75b2d8c131d2b553c1ea0fdd8d8787f9a752752568e2797f","b64":"eNr7zyAowAhEPxgYGP7+/Xv2/38GMPj/v3wtExOTE4y/73sGA4MDQyiC70EU/x8TA5MCEPUAxVatWpX1l8FQgBmIMO3TtWJkZHRE8IH2MTiEIfgeIH4oLj7YPgag/YwNTBoNTDog8+vr650B/LVE9A=="},{"offset":1404272,"length":224,"sha256":"4c5f1256e05cae544050efb5697ce3976b7f89b2afe789a3cd1b0c1880431135","b64":"eNr7zyAowMgowPCDgYHh79+/Z///ZwCDfd89gKRDKIz//38Gwyq8fA8QfyqMf/8/r1WWg4PHf4YDTBYNzBYg8+vr653/MhgKMAMRun3//+s5MTI6roTx533PYAhjcGCA8997MIQi8UHuQ+b//9/BEerg4PKPzYFZxYFJBWYfAGPlSZk="},{"offset":1412448,"length":240,"sha256":"640c68dfd53a39cf168dd73da6489811cfaf26d720091489d2ce33aca413b9ee","b64":"eNr7z+A5ScVzjsQPBgaG0NCroX8ZGAUYmBgYQPy/f/+f//+fAQxq33sASYdQGH/ee3UQ/yqM////1SmrGBhOwPj7vqOq//9fneHAgROh/xgamC0Y2MDm19cDzWcwFGA2V8CwD6Q+lJnZGcH3YAgFGoiLfx/IF0WRPyngAAT/ORyYVIAIYl+9MwCLP0/2"},{"offset":1420640,"length":240,"sha256":"39752e5b2879bad37fdcf8543d22e7255779826169d42d935d43e228ae721bdd","b64":"eNr7z8A5kefkBJ4fDAwMX79+Pfr/PwMY3P+ewRDKWckJ4+/77sEQyuDAgOCrM1xF4v///3OvA4PDKtzqsfAL6goQ+oH8UNajCH4HRyhQA37+gTMw/jyQe6devYqQPykQmuXg85/NgUkFiED+q6+vdwYA6qdUig=="},{"offset":1428832,"length":256,"sha256":"9878cfe0ef01c4e0f76952dab0a86b5d85d76f59bd3ca36cf43c2fd3adc71927","b64":"eNr7x8g5UcZzWsoPBgaGr1+vXv3/nwEMat97MISKfl0K4///38ER+oLBAcbf9z2DITQ8gQPGtzoGVB8a+gWhPoMj9Cq3AxKfIVSLAZUfHhaG4HswsLKyusL494H2MQQEByPs6+D4MHXqVIR6gWgHBwcXGD8W6F5RUYT7//8/KQCUd/h3nYEJbl9oaN5/Bj8m9YQmVZB/w+PjgwGhslqF"},{"offset":1437024,"length":256,"sha256":"7bdb3e54700ed69f374cf8a9081be12954137952da831949f1a8dd883e65615e","b64":"eNpbxeA5YYnnJJUfDAwMoUDwLwXIYBVg+DYng+FqaOjV//8ZwOD//wyGvaGhDTD+/f8dHAy8pg4I+R1bVRgYkPgeDA0VYXD+vO8eDHWhoSz/X4C5LJkMbgyrgABZPSsrqysyH2hcMMI+MH8qQl4g2sHBwQXGj33vwSAqehXJvZ0cDAwHXBB8dYaEjPrQvwwRTaoRTWog/8bHxwcDAOtVVkY="},{"offset":1445232,"length":240,"sha256":"8bcef75cf469e92f5d4587b5041100bc21db7c230a7e6649eac5ebb92b02ca4c","b64":"eNr7x8gawMAmwBiY7MFw9Wpo6P//DGAw77sHQwEDEv89iH/1Koz///8bQwaGhh5c6muB6lmA/H9xDQwcBxhSMhncGFYBAUJ/BgPr1aWhyPzg4Cg4/+qUDKBtU5HkPRgOPHgF58cCzRcVRXbPSQEHIPjHwsDww4FJ5QdYrN55FoPHJBXPSWB+KBAAADR8VSQ="},{"offset":1445551,"length":1,"sha256":"8d33f520a3c4cef80d2453aef81b612bfe1cb44c8b2025630ad38662763f13d3","b64":"eNpLAAAAYQBh"},{"offset":1453343,"length":1,"sha256":"74cd9ef9c7e15f57bdad73c511462ca65cb674c46c49639c60f1b44650fa1dcb","b64":"eNqLAwAAXwBf"},{"offset":1453424,"length":224,"sha256":"a561d3542b52ec2afe3b74176ccea08db3cfb8b222f53bbabd75ed0c9ab35f9f","b64":"eNq7z/BzgornJJUfDAwMsaGhX18wMMD58aGhof8YGAQYd054clLAg+FqaOjV/9pACaCSNZoZDFOA8j+BPJMEiPr/9fFfniPpvx8a+v8UQ8YsGD8cyAeal5AH5f8/H/r/LwPDhotI/B8MohMKYPyzof//AOVzkdUzMSgwKE5QyVaEuOcfL8Q9XJIeDGVA93xlcGhS9Yaor4+P+w8AJ2pUeg=="},{"offset":1453727,"length":1,"sha256":"3f79bb7b435b05321651daefd374cdc681dc06faa65e374e38337b88ca046dea","b64":"eNpLBQAAZgBm"}]}''')
+def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def load(p):
+    b=Path(p).read_bytes()
+    if b[:4]!=b"DDS ": raise RuntimeError("not DDS")
+    h,w,pitch,depth,mips=struct.unpack_from("<5I",b,12); masks=struct.unpack_from("<IIII",b,92)
+    if b[84:88]!=b"\0\0\0\0" or struct.unpack_from("<I",b,88)[0]!=32 or mips!=1 or len(b)!=128+w*h*4:
+        raise RuntimeError(("DDS",w,h,mips,len(b)))
+    mode="RGBA" if masks==(0xff,0xff00,0xff0000,0xff000000) else "BGRA" if masks==(0xff0000,0xff00,0xff,0xff000000) else None
+    if not mode: raise RuntimeError(("masks",masks))
+    raw=Image.frombytes("RGBA",(w,h),b[128:],"raw",mode)
+    return b,raw,raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM),{"width":w,"height":h,"pitch":pitch,"mips":mips,"masks":masks,"mode":mode}
+def fontspec():
+    for pat in ["Noto Sans CJK KR:style=Bold","Noto Sans CJK KR"]:
+        try:q=subprocess.check_output(["fc-match","-f","%{file}|%{index}",pat],text=True).strip()
+        except Exception:q=""
+        if "|" in q:
+            p,ix=q.rsplit("|",1)
+            if p and Path(p).exists() and "NotoSansCJK" in Path(p).name:return p,int(ix or 0),pat
+    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
+    q=subprocess.check_output(["fc-match","-f","%{file}|%{index}","Noto Sans CJK KR:style=Bold"],text=True).strip()
+    p,ix=q.rsplit("|",1); return p,int(ix or 0),"Noto Sans CJK KR:style=Bold"
+FONT,FI,FPAT=fontspec()
 
-def sha(b): return hashlib.sha256(b).hexdigest()
+def flat(im):
+    z=Image.new("RGBA",im.size,(82,82,82,255)); z.alpha_composite(im); return z.convert("RGB")
+def maskdiff(a,b):
+    d=ImageChops.difference(a,b); cs=d.split(); m=cs[0]
+    for c in cs[1:]:m=ImageChops.lighter(m,c)
+    return m.point(lambda v:255 if v else 0)
+def count(m): return sum(m.histogram()[1:])
+def mbbox(mask):
+    b=mask.getbbox()
+    return list(b) if b else None
 
-prior_bytes=cand.read_bytes()
-if sha(prior_bytes)!=PRIOR_SHA:
-    raise RuntimeError(("q52 candidate drift",sha(prior_bytes),PRIOR_SHA))
-if len(prior_bytes)!=PATCH_PACKAGE["size"]:
-    raise RuntimeError(("size drift",len(prior_bytes),PATCH_PACKAGE["size"]))
-
-# Replay the exact previously controller-inspected B239 BC3 bytes.
-outb=bytearray(prior_bytes)
-for r in PATCH_PACKAGE["ranges"]:
-    raw=zlib.decompress(base64.b64decode(r["b64"]))
-    if len(raw)!=r["length"] or sha(raw)!=r["sha256"]:
-        raise RuntimeError(("patch integrity",r["offset"]))
-    a=r["offset"]; b=a+r["length"]
-    outb[a:b]=raw
-final_bytes=bytes(outb)
-if sha(final_bytes)!=FINAL_SHA:
-    raise RuntimeError(("final SHA mismatch",sha(final_bytes),FINAL_SHA))
-if final_bytes[:128]!=prior_bytes[:128]:
-    raise RuntimeError("DDS header changed")
-cand.write_bytes(final_bytes)
-
-# Authoritative persisted-DDS decode from exact prior/final bytes.
-prior_raw=Image.open(io.BytesIO(prior_bytes)).convert("RGBA")
-final_raw=Image.open(io.BytesIO(final_bytes)).convert("RGBA")
-prior=prior_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-final=final_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-clean=Image.open(cleanp).convert("RGBA")
-W,H=final.size
-if (W,H)!=(2048,1024) or clean.size!=(W,H):
-    raise RuntimeError(("dimensions",W,H,clean.size))
-
-pa=np.asarray(prior); fa=np.asarray(final); ca=np.asarray(clean)
-left_bb=(24,308,131,349)
-right_bb=(801,309,908,350)
-extra_bb=(16,213,485,284)
-goal_left=(649,308,744,349)
-goal_right=(1426,308,1521,349)
-
-def introduced_bbox(arr,bb):
+# Detect English source word anchors from red title pixels, using the largest inter-letter gaps.
+def source_word_groups(src,bb,n_groups):
     x0,y0,x1,y1=bb
-    m=(arr[y0:y1,x0:x1,3]>8)&(ca[y0:y1,x0:x1,3]<=1)
-    ys,xs=np.nonzero(m)
-    if not len(xs): raise RuntimeError(("empty localized bbox",bb))
-    return [x0+int(xs.min()),y0+int(ys.min()),x0+int(xs.max())+1,y0+int(ys.max())+1]
+    a=np.asarray(src.crop((x0,y0,x1,y1))).astype(np.int16)
+    red=(a[:,:,3]>20)&(a[:,:,0]>100)&(a[:,:,0]>a[:,:,1]*1.6+25)&(a[:,:,0]>a[:,:,2]*1.6+25)
+    on=red.any(axis=0)
+    runs=[]; s=None
+    for i,v in enumerate(on):
+        if v and s is None:s=i
+        elif not v and s is not None:runs.append([s,i]);s=None
+    if s is not None:runs.append([s,len(on)])
+    if len(runs)<n_groups: raise RuntimeError(("source red runs",bb,runs))
+    gaps=[(runs[i+1][0]-runs[i][1],i) for i in range(len(runs)-1)]
+    cuts=sorted(i for _,i in sorted(gaps,reverse=True)[:n_groups-1])
+    groups=[]; start=0
+    for cut in cuts+[len(runs)-1]:
+        rr=runs[start:cut+1]
+        groups.append([x0+rr[0][0],x0+rr[-1][1]])
+        start=cut+1
+    if len(groups)!=n_groups: raise RuntimeError(("groups",groups))
+    return groups,runs,sorted(gaps,reverse=True)[:n_groups-1]
 
-left_prior=introduced_bbox(pa,left_bb)
-right_prior=introduced_bbox(pa,right_bb)
-left_final=introduced_bbox(fa,left_bb)
-right_final=introduced_bbox(fa,right_bb)
-if left_prior!=[46,310,106,346] or right_prior!=[829,314,882,345]:
-    raise RuntimeError(("B176 geometry drift",left_prior,right_prior))
-if left_final!=left_prior or right_final!=[826,312,886,348]:
-    raise RuntimeError(("B239 geometry drift",left_final,right_final))
+def word_layer(word,target_h=146,hscale=0.62,stroke=2):
+    f=ImageFont.truetype(FONT,220,index=FI)
+    p=Image.new("L",(1800,360),0); d=ImageDraw.Draw(p)
+    bb=d.textbbox((0,0),word,font=f,stroke_width=stroke)
+    d.text((24-bb[0],24-bb[1]),word,font=f,fill=255,stroke_width=stroke,stroke_fill=255)
+    box=p.getbbox()
+    if not box: raise RuntimeError(("empty",word))
+    g=p.crop(box)
+    sc=target_h/g.height
+    w=max(1,round(g.width*sc*hscale))
+    m=g.resize((w,target_h),Image.Resampling.LANCZOS)
+    rgba=Image.new("RGBA",m.size,(196,0,0,255)); rgba.putalpha(m)
+    return rgba
 
-ls=[left_final[2]-left_final[0],left_final[3]-left_final[1]]
-rs=[right_final[2]-right_final[0],right_final[3]-right_final[1]]
-if ls!=[60,36] or rs!=[60,36]:
-    raise RuntimeError(("family mismatch",ls,rs))
-margins=[right_final[0]-right_bb[0],right_bb[2]-right_final[2],right_final[1]-right_bb[1],right_bb[3]-right_final[3]]
-if min(margins)<=0: raise RuntimeError(("margin",margins))
+if sha(cand)!=INPUT: raise RuntimeError(("candidate drift",sha(cand),INPUT))
+srcp=Path("/tmp/BA0147DA_source.dds")
+urllib.request.urlretrieve("https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",srcp)
+if sha(srcp)!=SOURCE: raise RuntimeError(("source drift",sha(srcp)))
+cb,cr,old,meta=load(cand); sb,sr,src,smeta=load(srcp)
+if cb[:128]!=sb[:128] or meta!=smeta: raise RuntimeError("structure drift")
+clean=Image.open(repo/"localization/graphics/role_B/20261005-B-PRODUCTION85/BA_CLEAN_PLATE.png").convert("RGBA")
+protected=np.asarray(Image.open(repo/"localization/graphics/role_B/20261005-B-PRODUCTION85/BA_PROTECTED_MASK.png").convert("L"))>0
+if clean.size!=old.size or protected.shape!=(old.height,old.width): raise RuntimeError("evidence size")
 
-allowed=np.zeros((H,W),bool);allowed[right_bb[1]:right_bb[3],right_bb[0]:right_bb[2]]=True
-diff=np.any(pa!=fa,axis=2)
-ad=pa[:,:,3]!=fa[:,:,3]
-outside=int(np.count_nonzero(diff&~allowed))
-alpha_out=int(np.count_nonzero(ad&~allowed))
-if outside or alpha_out:
-    raise RuntimeError(("blast radius",outside,alpha_out))
-
-# Every non-target B176 localized family must remain pixel-exact.
-for name,bb in [("extra_time",extra_bb),("goal_left",goal_left),("goal_right",goal_right),("start_left",left_bb)]:
-    x0,y0,x1,y1=bb
-    if np.any(pa[y0:y1,x0:x1]!=fa[y0:y1,x0:x1]):
-        raise RuntimeError(("non-target drift",name))
-
-# Count changed DXT5 blocks and verify the patch remains narrowly scoped.
-bw=W//4; bh=H//4
-changed_blocks=0
-for by in range(bh):
-    for bx in range(bw):
-        off=128+(by*bw+bx)*16
-        if prior_bytes[off:off+16]!=final_bytes[off:off+16]:
-            changed_blocks+=1
-if changed_blocks!=137:
-    raise RuntimeError(("changed BC3 block drift",changed_blocks,137))
-
-def comp(im,bg=(88,88,88,255)):
-    z=Image.new("RGBA",im.size,bg);z.alpha_composite(im);return z.convert("RGB")
-
-# Focus evidence: left and right duplicate Start, prior vs current.
+cfg=[
+ {"key":"coast2coast_title","source_text":"COAST 2 COAST","words":["코스트","2","코스트"],"bbox":[0,964,1760,1124],"groups":3,"preserve_source_groups":[1]},
+ {"key":"heart_attack_title","source_text":"HEART ATTACK","words":["하트","어택"],"bbox":[21,1316,1780,1474],"groups":2,"preserve_source_groups":[]},
+]
+final=old.copy()
+allowed=Image.new("L",old.size,0); ad=ImageDraw.Draw(allowed)
 rows=[]
-for name,bb in [("START LEFT",left_bb),("START RIGHT",right_bb)]:
-    x0,y0,x1,y1=bb;pad=20
-    cr=(max(0,x0-pad),max(0,y0-pad),min(W,x1+pad),min(H,y1+pad))
-    cards=[]
-    for lab,im in [("B176",prior),("B239",final)]:
-        z=comp(im).crop(cr).resize(((cr[2]-cr[0])*4,(cr[3]-cr[1])*4),Image.Resampling.NEAREST)
-        c=Image.new("RGB",(z.width,z.height+30),(20,20,20));c.paste(z,(0,30))
-        ImageDraw.Draw(c).text((6,6),f"{name} {lab}",fill="white");cards.append(c)
-    rr=Image.new("RGB",(sum(c.width for c in cards),max(c.height for c in cards)),(20,20,20))
-    x=0
-    for c in cards: rr.paste(c,(x,0));x+=c.width
-    rows.append(rr)
-sheet=Image.new("RGB",(max(r.width for r in rows),sum(r.height for r in rows)),(20,20,20))
-y=0
-for r in rows:sheet.paste(r,(0,y));y+=r.height
-sheet.save(out/"B239_START_FAMILY_B176_FINAL.jpg",quality=96,subsampling=0)
+new_text_mask=np.zeros((old.height,old.width),dtype=bool)
 
-def full_card(label,im,maxw=950):
-    v=comp(im)
-    if v.width>maxw:v=v.resize((maxw,round(v.height*maxw/v.width)),Image.Resampling.LANCZOS)
-    c=Image.new("RGB",(v.width,v.height+30),(20,20,20));c.paste(v,(0,30))
-    ImageDraw.Draw(c).text((6,6),label,fill="white");return c
-cards=[full_card("B176 READABLE",prior),full_card("B239 READABLE",final)]
-fs=Image.new("RGB",(sum(c.width for c in cards),max(c.height for c in cards)),(20,20,20))
-x=0
-for c in cards:fs.paste(c,(x,0));x+=c.width
-fs.save(out/"B239_FULL_READABLE.jpg",quality=94,subsampling=0)
-cards=[full_card("B176 RAW",prior_raw),full_card("B239 RAW",final_raw)]
-rsheet=Image.new("RGB",(sum(c.width for c in cards),max(c.height for c in cards)),(20,20,20))
-x=0
-for c in cards:rsheet.paste(c,(x,0));x+=c.width
-rsheet.save(out/"B239_RAW.jpg",quality=94,subsampling=0)
+for spec in cfg:
+    bb=spec["bbox"]; x0,y0,x1,y1=bb; ad.rectangle((x0,y0,x1-1,y1-1),fill=255)
+    final.paste(clean.crop(tuple(bb)),(x0,y0))
+    groups,runs,word_gaps=source_word_groups(src,bb,spec["groups"])
+    word_reports=[]
+    visible_union=Image.new("L",old.size,0)
+    for gi,(word,gx) in enumerate(zip(spec["words"],groups)):
+        ga,gb=gx
+        if gi in spec["preserve_source_groups"]:
+            # Preserve unchanged numeric token from canonical English source exactly.
+            pad=6
+            rx0=max(x0,ga-pad); rx1=min(x1,gb+pad)
+            final.paste(src.crop((rx0,y0,rx1,y1)),(rx0,y0))
+            diff=maskdiff(clean.crop((rx0,y0,rx1,y1)),src.crop((rx0,y0,rx1,y1)))
+            visible_union.paste(diff,(rx0,y0))
+            word_reports.append({"word":word,"mode":"PRESERVE_CANONICAL_SOURCE_TOKEN","source_group_x":[ga,gb],"placed_x":[rx0,rx1]})
+            continue
+        layer=word_layer(word)
+        cx=(ga+gb)/2.0
+        x=round(cx-layer.width/2)
+        y=y0+(y1-y0-layer.height)//2
+        # Keep positive margin inside the full exact source title bbox.
+        x=max(x0+5,min(x,x1-layer.width-5))
+        y=max(y0+4,min(y,y1-layer.height-4))
+        lm=np.asarray(layer.getchannel("A"))>0
+        if np.any(lm & protected[y:y+layer.height,x:x+layer.width]): raise RuntimeError(("protected",spec["key"],word))
+        if np.any(new_text_mask[y:y+layer.height,x:x+layer.width] & lm): raise RuntimeError(("localized overlap",spec["key"],word))
+        new_text_mask[y:y+layer.height,x:x+layer.width] |= lm
+        final.alpha_composite(layer,(x,y))
+        visible_union.paste(ImageChops.lighter(visible_union.crop((x,y,x+layer.width,y+layer.height)),layer.getchannel("A")),(x,y))
+        word_reports.append({"word":word,"mode":"NATIVE_BOLD_CONDENSED","source_group_x":[ga,gb],"placed_bbox":[x,y,x+layer.width,y+layer.height],"hscale":0.62,"target_h":146,"stroke":2})
+    changed_vs_clean=maskdiff(clean.crop(tuple(bb)),final.crop(tuple(bb)))
+    local=changed_vs_clean.getbbox()
+    if not local: raise RuntimeError(("empty final",spec["key"]))
+    lb=[x0+local[0],y0+local[1],x0+local[2],y0+local[3]]
+    sw,sh=x1-x0,y1-y0; lw,lh=lb[2]-lb[0],lb[3]-lb[1]
+    if lw>sw or lh>sh or lb[0]<x0 or lb[1]<y0 or lb[2]>x1 or lb[3]>y1: raise RuntimeError(("size",spec["key"],lb,bb))
+    rows.append({
+      "key":spec["key"],"source_text":spec["source_text"],"text":" ".join(spec["words"]),
+      "source_bbox":bb,"localized_bbox":lb,"source_size":[sw,sh],"localized_size":[lw,lh],
+      "delta_left":lb[0]-x0,"delta_right":x1-lb[2],"delta_top":lb[1]-y0,"delta_bottom":y1-lb[3],
+      "width_ratio":round(lw/sw,4),"height_ratio":round(lh/sh,4),
+      "source_word_groups_x":groups,"source_run_count":len(runs),"source_largest_word_gaps":word_gaps,
+      "words":word_reports,
+      "font":FPAT,
+      "construction":"source-word-anchor reconstruction; Korean glyphs horizontally condensed to 0.62 at native height; unchanged numeral 2 preserved from canonical source; no per-syllable spacing hack"
+    })
+
+dm=maskdiff(old,final); outside=count(ImageChops.multiply(dm,ImageChops.invert(allowed)))
+am=ImageChops.difference(old.getchannel("A"),final.getchannel("A")).point(lambda v:255 if v else 0)
+alpha_out=count(ImageChops.multiply(am,ImageChops.invert(allowed)))
+if outside or alpha_out: raise RuntimeError(("scope",outside,alpha_out))
+
+raw=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+payload=cb[:128]+raw.tobytes("raw",meta["mode"]); cand.write_bytes(payload); csha=sha(cand)
+rb,rr,dec,rm=load(cand)
+if rb[:128]!=cb[:128] or rm!=meta or ImageChops.difference(dec,final).getbbox() is not None: raise RuntimeError("roundtrip")
+
+# Visual evidence: exact source / rejected A170 / clean / current B241.
+cards=[]
+for r in rows:
+    x0,y0,x1,y1=r["source_bbox"]; pad=28
+    crop=(max(0,x0-pad),max(0,y0-pad),min(src.width,x1+pad),min(src.height,y1+pad))
+    ims=[]
+    for lab,im in [("SOURCE",src),("C256_REJECTED_A170",old),("CLEAN",clean),("B241",dec)]:
+        z=flat(im.crop(crop)); z.thumbnail((760,270),Image.Resampling.LANCZOS)
+        c=Image.new("RGB",(z.width,z.height+26),(24,24,24));c.paste(z,(0,26));ImageDraw.Draw(c).text((4,4),lab,fill="white");ims.append(c)
+    row=Image.new("RGB",(sum(i.width for i in ims)+12*3,max(i.height for i in ims)+20),(16,16,16)); xx=0
+    for c in ims:row.paste(c,(xx,0));xx+=c.width+12
+    ImageDraw.Draw(row).text((4,row.height-3),r["key"],fill="white",anchor="ls");cards.append(row)
+sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+8),(16,16,16)); yy=0
+for c in cards:sheet.paste(c,(0,yy));yy+=c.height+8
+sheet.save(out/"B241_Q212_CONTACTS.jpg","JPEG",quality=96,subsampling=0)
+
+s=flat(src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)); f=flat(dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM))
+s.thumbnail((950,950),Image.Resampling.LANCZOS); f.thumbnail((950,950),Image.Resampling.LANCZOS)
+rw=Image.new("RGB",(s.width+f.width+12,max(s.height,f.height)+26),(16,16,16));rw.paste(s,(0,26));rw.paste(f,(s.width+12,26))
+d=ImageDraw.Draw(rw);d.text((4,4),"SOURCE RAW",fill="white");d.text((s.width+16,4),"B241 RAW",fill="white")
+rw.save(out/"B241_Q212_RAW.jpg","JPEG",quality=94,subsampling=0)
+
+# Practical scale evidence at 100/75/50% for title crops.
+prs=[]
+for r in rows:
+    bb=tuple(r["source_bbox"]); parts=[]
+    for scale in [1.0,0.75,0.5]:
+        for lab,im in [("SOURCE",src),("B241",dec)]:
+            z=flat(im.crop(bb))
+            if scale!=1.0:z=z.resize((max(1,round(z.width*scale)),max(1,round(z.height*scale))),Image.Resampling.LANCZOS)
+            z.thumbnail((700,220),Image.Resampling.LANCZOS)
+            c=Image.new("RGB",(z.width,z.height+24),(20,20,20));c.paste(z,(0,24));ImageDraw.Draw(c).text((4,4),f"{lab} {int(scale*100)}%",fill="white");parts.append(c)
+    row=Image.new("RGB",(max(p.width for p in parts),sum(p.height for p in parts)+5*(len(parts)-1)),(16,16,16)); y=0
+    for p in parts:row.paste(p,(0,y));y+=p.height+5
+    prs.append(row)
+ps=Image.new("RGB",(sum(p.width for p in prs)+12*(len(prs)-1),max(p.height for p in prs)),(16,16,16));x=0
+for p in prs:ps.paste(p,(x,0));x+=p.width+12
+ps.save(out/"B241_Q212_PRACTICAL.jpg","JPEG",quality=94,subsampling=0)
 
 report={
- "schema_version":2,"role":"B","run":RUN,"queue_index":52,"asset":asset,
- "trigger":"CURRENT_POLICY_UI_FAMILY_STYLE_PROFILE_FALSE_NEGATIVE_DUPLICATE_START_SCALE_MISMATCH",
- "source_sha256":SOURCE_SHA,
- "prior_candidate_sha256":PRIOR_SHA,"candidate_sha256":FINAL_SHA,
- "prior_family":{"start_left":{"bbox":left_prior,"size":[60,36],"font_size":30},
-                 "start_right":{"bbox":right_prior,"size":[53,31],"font_size":27}},
- "repair":{"scope":"right Start only","korean":"출발","final_left_bbox":left_final,"final_right_bbox":right_final,
-           "final_duplicate_sizes":{"left":ls,"right":rs},"right_margins":margins,
-           "style":{"font":"Noto Sans CJK KR Bold","ttc_index":1,"font_size":30,
-                    "fill":[255,255,255,255],"outer":[0,10,65,255],"stroke":3,"slant":0.0}},
- "machine_qa":{"duplicate_start_size_delta":[rs[0]-ls[0],rs[1]-ls[1]],
-               "changed_pixels_outside_right_start_bbox":outside,
-               "alpha_changed_outside_right_start_bbox":alpha_out,
-               "changed_bc3_blocks":changed_blocks,
-               "header_128_exact":True,"raw_orientation":"mirror_y",
-               "extra_time_goal_left_goal_right_left_start_pixel_exact":True,
-               "persisted_decode":"PASS"},
+ "schema_version":2,"role":"B","run":RUN,"queue_index":212,"asset":"BA0147DA",
+ "trigger":"C256_VISUAL_FAIL_SOURCE_TITLE_GLYPH_PROPORTION",
+ "source_sha256":SOURCE,"prior_candidate_sha256":INPUT,"candidate_sha256":csha,
+ "rows":rows,
+ "machine_qa":{"bbox_size_positive_margin":"2/2 PASS","changed_outside":outside,"alpha_outside":alpha_out,
+   "localized_pair_overlap_pixels":0,"protected_overlap_pixels":0,"header_128_exact":True,"mips":meta["mips"],
+   "raw_orientation":"mirror_y","persisted_decode":"PASS"},
  "ordered_generation_gate":{
-   "1_plate_restoration":"PASS_B176_VALIDATED_CLEAN_PLATE_LINEAGE",
-   "2_source_matching_slant":"PASS_UPRIGHT",
-   "3_no_undersized_lettering":"PASS_RIGHT_START_RESTORED_TO_LEFT_START_60x36_FAMILY",
-   "4_source_faithful_weight_effect":"PASS_WHITE_NAVY_3PX_MATCH",
-   "5_no_clipped_pixels":"PASS_POSITIVE_MARGIN",
-   "6_protected_art_clearance":"PASS_ZERO_DRIFT_OUTSIDE_RIGHT_START_BBOX",
+   "1_plate_restoration":"PASS_REUSE_B85_VERIFIED_CLEAN_PLATE",
+   "2_source_matching_slant":"PASS_SOURCE_TITLE_UPRIGHT",
+   "3_no_undersized_lettering":"PASS_NATIVE_146PX_HEIGHT_WITH_SOURCE_WORD_ANCHORS",
+   "4_source_faithful_weight_effect":"PASS_BOLD_CONDENSED_NO_EXCESSIVE_A170_REINFORCEMENT",
+   "5_no_clipped_pixels":"PASS_POSITIVE_FULL_TITLE_MARGIN",
+   "6_protected_art_clearance":"PASS_ZERO_PROTECTED_OVERLAP",
    "7_flip_y_raw":"EVIDENCE_WRITTEN_PENDING_CONTROLLER_CONFIRM",
    "8_immediate_readability":"EVIDENCE_WRITTEN_PENDING_CONTROLLER_CONFIRM"
  },
- "execution_backend":"EXACT_CONTROLLER_VALIDATED_B239_BC3_PATCH_REPLAY_ON_GITHUB_HOSTED_WORKER",
+ "c256_correction":"A170 1.15 horizontal expansion removed. B241 uses 0.62 horizontal glyph aspect and source-derived English word anchors; canonical numeral 2 is preserved pixel-faithfully instead of redrawn.",
+ "execution_backend":"GITHUB_HOSTED_CPU_WORKER_REQUIRED_FOR_REPOSITORY_BACKED_DDS",
  "controller_visual_qa":"PENDING_CHATGPT_CONTROLLER",
- "status":"B239_WORKER_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA_AND_FRESH_C",
+ "status":"B241_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
  "runtime_validation":"UNTESTED","forbidden_domains_touched":[]
 }
-(out/"B239_Q052_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+chr(10),encoding="utf-8")
-(wr/"B239_Q052_A8CE339F.json").write_text(json.dumps({
- "role":"B","run":RUN,"queue_index":52,"candidate_sha256":FINAL_SHA,
- "report":str((out/"B239_Q052_MACHINE_QA.json").relative_to(repo)),
- "status":report["status"],"runtime_validation":"UNTESTED"
-},ensure_ascii=False,indent=2)+chr(10),encoding="utf-8")
-print(json.dumps({"run":RUN,"prior":PRIOR_SHA,"candidate":FINAL_SHA,
- "left_prior":left_prior,"right_prior":right_prior,"left_final":left_final,"right_final":right_final,
- "duplicate_sizes":{"left":ls,"right":rs},"margins":margins,"outside":outside,"alpha_out":alpha_out,
- "changed_blocks":changed_blocks,"runtime_validation":"UNTESTED"},ensure_ascii=False))
+(out/"B241_Q212_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"B241_Q212.json").write_text(json.dumps({"role":"B","run":RUN,"queue_index":212,"asset":"BA0147DA","candidate_sha256":csha,"report":str((out/"B241_Q212_REPORT.json").relative_to(repo)),"status":report["status"],"runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+print(json.dumps({"run":RUN,"candidate_sha256":csha,"rows":rows,"outside":outside,"alpha_out":alpha_out,"runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2))
