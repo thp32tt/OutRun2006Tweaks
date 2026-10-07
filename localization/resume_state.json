@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B240 user menu typography runtime fix is applied: Semilight-first Korean UI font + ID935 modal keyline exclusion. Wait for exact source Win32 Release/Korean test build PASS, then package and NEW in-game retest screenshots 159-164; keep IGR-020..025 open until retest.",
     "B239 q52 A8CE339F c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e: fresh independent C + exact-SHA C3 required; PRE_INGAME blocked; RUNTIME_VALIDATION=UNTESTED.",
     "C250 returned q57 39229D64, q61 C4A2937B and q65 EBEF6D20 to A/B REWORK_REQUIRED after machine containment PASS but controller visual/semantic failures. q57: restore source slant/gradient/depth/effect family; q61: restore proven Cut the line! -> 하트선을 통과하세요! semantics plus yellow/navy/white instruction style; q65: fix EASY green style and source label slant/outline family. Then producer QA -> fresh C1 -> exact-SHA C3 -> PRE_INGAME/user JPG -> NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
     "A165 work-steal batch resolved C245 q28/q30 Total Rank hierarchy failures. q28 final A165R2 1ced3cfa... uses glyph-mask-only plate repair after two whole-bbox clean attempts were visually rejected; 476x80 in 525x90. q30 final A165 fa294ef9... has two 486x92 rows in 535x102/534x102. Both producer machine/controller visual QA PASS; fresh independent C -> exact-SHA C3 -> PRE_INGAME JPG/user review -> actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
@@ -6742,7 +6743,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T00:07:49+09:00",
+  "updated_at_kst": "2026-10-08 00:31",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -9360,5 +9361,29 @@
     "mandatory_c3": "REQUIRED_EXACT_SHA_DXT5_FAMILY_FALSE_NEGATIVE",
     "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
     "runtime_validation": "UNTESTED"
+  },
+  "b240_user_menu_typography_rework": {
+    "status": "RUNTIME_SOURCE_APPLIED_BUILD_PENDING",
+    "evidence": [
+      "스크린샷(159).png",
+      "스크린샷(160).png",
+      "스크린샷(161).png",
+      "스크린샷(162).png",
+      "스크린샷(164).png"
+    ],
+    "source_changes": {
+      "overlay_font": "prefer malgunsl.ttf before malgun.ttf",
+      "confirm_dialog": "runtime text ID 935 excludes compact HUD keyline"
+    },
+    "backlog": [
+      "IGR-020",
+      "IGR-021",
+      "IGR-022",
+      "IGR-023",
+      "IGR-024",
+      "IGR-025"
+    ],
+    "runtime_validation": "UNTESTED",
+    "next": "Win32 Release + Korean test build, then new in-game screenshot"
   }
 }
