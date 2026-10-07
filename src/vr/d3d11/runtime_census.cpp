@@ -706,6 +706,10 @@ namespace outrun::vr::dx11
             bool shaderProductionSourceElementCountDerivable{};
             bool shaderProductionSourceElementCountMatches{};
             UINT shaderProductionSourceElementCount{};
+            bool shaderProductionSourceIndexFormatKnown{};
+            bool shaderProductionSourceIndexFormatMatches{};
+            bool shaderProductionSourceIndexOffsetMatches{};
+            DXGI_FORMAT shaderProductionSourceIndexFormat = DXGI_FORMAT_UNKNOWN;
             bool shaderProductionSourceCacheKeyMatches{};
             bool shaderProductionSourceJoinExact{};
             bool shaderProductionSourceBoundaryPreserved{};
@@ -882,7 +886,8 @@ namespace outrun::vr::dx11
                     draw.vertexStride == 0;
             case SourceDrawKind::Indexed:
                 return draw.startVertex == 0 &&
-                    draw.indexFormat == D3DFMT_UNKNOWN &&
+                    (draw.indexFormat == D3DFMT_INDEX16 ||
+                     draw.indexFormat == D3DFMT_INDEX32) &&
                     draw.vertexStride == 0;
             case SourceDrawKind::NonIndexedUserMemory:
                 return draw.startVertex == 0 && draw.baseVertexIndex == 0 &&
@@ -924,8 +929,9 @@ namespace outrun::vr::dx11
             return token == 0 ? 1 : token;
         }
 
-        // R295 seals the production handoff between the exact R294 D3D9 draw
-        // identity and a future exact R258 source-revalidation receipt. It does
+        // R296 extends the R295 production handoff by sealing the live D3D9
+        // indexed-buffer format and requiring the future R258 receipt to match
+        // the exact index format and zero D3D9-equivalent binding offset. It does
         // not manufacture R258: an absent receipt is recorded as a bounded
         // fail-closed state, while a supplied receipt must match source kind,
         // start location, element count, cache identity, and the dormant R258
@@ -941,6 +947,10 @@ namespace outrun::vr::dx11
             bool sourceElementCountDerivable{};
             bool sourceElementCountMatches{};
             UINT sourceElementCount{};
+            bool sourceIndexFormatKnown{};
+            bool sourceIndexFormatMatches{};
+            bool sourceIndexOffsetMatches{};
+            DXGI_FORMAT sourceIndexFormat = DXGI_FORMAT_UNKNOWN;
             bool cacheIdentityMatches{};
             bool joinValidated{};
             bool boundaryPreserved{};
@@ -1004,6 +1014,7 @@ namespace outrun::vr::dx11
             constexpr std::uint32_t kSourceRevalidationReceiptMissing = 1u << 2;
             constexpr std::uint32_t kCacheIdentityMissing = 1u << 3;
             constexpr std::uint32_t kSourceElementCountMissing = 1u << 4;
+            constexpr std::uint32_t kSourceIndexFormatMissing = 1u << 5;
 
             out.sourceDrawIdentitySnapshotToken =
                 sourceDrawIdentitySnapshotToken;
@@ -1021,6 +1032,19 @@ namespace outrun::vr::dx11
                     sourceDraw.primitive,
                     sourceDraw.primitiveCount,
                     out.sourceElementCount);
+            const bool sourceIndexed =
+                sourceDraw.kind == SourceDrawKind::Indexed;
+            out.sourceIndexFormat =
+                !sourceIndexed
+                    ? DXGI_FORMAT_UNKNOWN
+                    : sourceDraw.indexFormat == D3DFMT_INDEX16
+                        ? DXGI_FORMAT_R16_UINT
+                        : sourceDraw.indexFormat == D3DFMT_INDEX32
+                            ? DXGI_FORMAT_R32_UINT
+                            : DXGI_FORMAT_UNKNOWN;
+            out.sourceIndexFormatKnown =
+                !sourceIndexed ||
+                out.sourceIndexFormat != DXGI_FORMAT_UNKNOWN;
             out.sourceRevalidationReceiptPresent =
                 sourceRevalidation != nullptr;
 
@@ -1034,6 +1058,8 @@ namespace outrun::vr::dx11
                 out.missingEvidenceMask |= kCacheIdentityMissing;
             if (!out.sourceElementCountDerivable)
                 out.missingEvidenceMask |= kSourceElementCountMissing;
+            if (!out.sourceIndexFormatKnown)
+                out.missingEvidenceMask |= kSourceIndexFormatMissing;
 
             if (sourceRevalidation != nullptr)
             {
@@ -1043,8 +1069,6 @@ namespace outrun::vr::dx11
                     sourceRevalidation->ready &&
                     sourceRevalidation->boundaryPreserved &&
                     sourceRevalidation->snapshotToken != 0;
-                const bool sourceIndexed =
-                    sourceDraw.kind == SourceDrawKind::Indexed;
                 const auto expectedKind = sourceIndexed
                     ? NativeProgrammableShaderDrawCandidateKind::Indexed
                     : NativeProgrammableShaderDrawCandidateKind::NonIndexed;
@@ -1061,6 +1085,12 @@ namespace outrun::vr::dx11
                 out.sourceElementCountMatches =
                     out.sourceElementCountDerivable &&
                     sourceRevalidation->elementCount == out.sourceElementCount;
+                out.sourceIndexFormatMatches =
+                    out.sourceIndexFormatKnown &&
+                    sourceRevalidation->indexFormat == out.sourceIndexFormat;
+                out.sourceIndexOffsetMatches =
+                    out.sourceIndexFormatKnown &&
+                    sourceRevalidation->indexOffset == 0u;
                 out.cacheIdentityMatches =
                     expectedCacheKey != 0 &&
                     sourceRevalidation->cacheKey == expectedCacheKey;
@@ -1070,6 +1100,8 @@ namespace outrun::vr::dx11
                     out.sourceKindMatches &&
                     out.sourceStartMatches &&
                     out.sourceElementCountMatches &&
+                    out.sourceIndexFormatMatches &&
+                    out.sourceIndexOffsetMatches &&
                     out.cacheIdentityMatches;
                 out.boundaryPreserved =
                     out.joinValidated &&
@@ -1084,6 +1116,7 @@ namespace outrun::vr::dx11
                     out.sourceDrawIdentityExact &&
                     out.sourceDrawNativeBufferEligible &&
                     out.sourceElementCountDerivable &&
+                    out.sourceIndexFormatKnown &&
                     expectedCacheKey != 0;
             }
 
@@ -1101,6 +1134,11 @@ namespace outrun::vr::dx11
                 token = hash_mix(token, out.sourceElementCountDerivable ? 1u : 0u);
                 token = hash_mix(token, out.sourceElementCountMatches ? 1u : 0u);
                 token = hash_mix(token, out.sourceElementCount);
+                token = hash_mix(token, out.sourceIndexFormatKnown ? 1u : 0u);
+                token = hash_mix(token, out.sourceIndexFormatMatches ? 1u : 0u);
+                token = hash_mix(token, out.sourceIndexOffsetMatches ? 1u : 0u);
+                token = hash_mix(
+                    token, static_cast<std::uint32_t>(out.sourceIndexFormat));
                 token = hash_mix(token, out.cacheIdentityMatches ? 1u : 0u);
                 token = hash_mix(token, out.joinValidated ? 1u : 0u);
                 token = hash_mix(token, out.boundaryPreserved ? 1u : 0u);
@@ -1608,6 +1646,16 @@ namespace outrun::vr::dx11
                 hash, sig.shaderProductionSourceElementCountMatches ? 1u : 0u);
             hash = hash_mix(
                 hash, sig.shaderProductionSourceElementCount);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceIndexFormatKnown ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceIndexFormatMatches ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionSourceIndexOffsetMatches ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                static_cast<std::uint32_t>(
+                    sig.shaderProductionSourceIndexFormat));
             hash = hash_mix(
                 hash, sig.shaderProductionSourceCacheKeyMatches ? 1u : 0u);
             hash = hash_mix(
@@ -3325,7 +3373,7 @@ namespace outrun::vr::dx11
                         sig.shaderProductionSemanticReviewTranslationSnapshotToken,
                         sig.shaderProductionSemanticReviewSnapshotToken);
                     spdlog::info(
-                        "VR DX11 R295 productionSourceRevalidation signature#{}: drawExact={} nativeBufferEligible={} r258Present={} r258Contract={} kindMatch={} startMatch={} countDerivable={} countMatch={} elementCount={} cacheMatch={} joinExact={} boundaryPreserved={} missingEvidenceMask=0x{:08X} r258Snapshot=0x{:016X} joinSnapshot=0x{:016X}",
+                        "VR DX11 R296 productionSourceRevalidation signature#{}: drawExact={} nativeBufferEligible={} r258Present={} r258Contract={} kindMatch={} startMatch={} countDerivable={} countMatch={} elementCount={} indexFormatKnown={} indexFormatMatch={} indexOffsetMatch={} indexFormat={} cacheMatch={} joinExact={} boundaryPreserved={} missingEvidenceMask=0x{:08X} r258Snapshot=0x{:016X} joinSnapshot=0x{:016X}",
                         unique,
                         sig.shaderProductionSourceDrawIdentityExact ? 1 : 0,
                         sig.shaderProductionSourceNativeBufferEligible ? 1 : 0,
@@ -3336,6 +3384,11 @@ namespace outrun::vr::dx11
                         sig.shaderProductionSourceElementCountDerivable ? 1 : 0,
                         sig.shaderProductionSourceElementCountMatches ? 1 : 0,
                         sig.shaderProductionSourceElementCount,
+                        sig.shaderProductionSourceIndexFormatKnown ? 1 : 0,
+                        sig.shaderProductionSourceIndexFormatMatches ? 1 : 0,
+                        sig.shaderProductionSourceIndexOffsetMatches ? 1 : 0,
+                        static_cast<unsigned>(
+                            sig.shaderProductionSourceIndexFormat),
                         sig.shaderProductionSourceCacheKeyMatches ? 1 : 0,
                         sig.shaderProductionSourceJoinExact ? 1 : 0,
                         sig.shaderProductionSourceBoundaryPreserved ? 1 : 0,
@@ -4136,7 +4189,8 @@ namespace outrun::vr::dx11
         if (!device || !census_enabled())
             return;
 
-        const auto primitive = draw.primitive;
+        auto sampledDraw = draw;
+        const auto primitive = sampledDraw.primitive;
 
         thread_local std::uint64_t drawOrdinal = 0;
         DrawCallsSeen.fetch_add(1, std::memory_order_relaxed);
@@ -4149,6 +4203,20 @@ namespace outrun::vr::dx11
                 (static_cast<std::uint64_t>(GetCurrentThreadId()) << 32));
             if ((sampleKey & (sampleStride - 1u)) != 0u)
                 return;
+        }
+
+        if (sampledDraw.kind == SourceDrawKind::Indexed)
+        {
+            IDirect3DIndexBuffer9* indexBuffer = nullptr;
+            if (SUCCEEDED(device->GetIndices(&indexBuffer)) && indexBuffer)
+            {
+                D3DINDEXBUFFER_DESC indexDesc{};
+                if (SUCCEEDED(indexBuffer->GetDesc(&indexDesc)) &&
+                    (indexDesc.Format == D3DFMT_INDEX16 ||
+                     indexDesc.Format == D3DFMT_INDEX32))
+                    sampledDraw.indexFormat = indexDesc.Format;
+                indexBuffer->Release();
+            }
         }
 
         OutRunVR::DrawState::RenderStateSnapshot source{};
@@ -4247,15 +4315,15 @@ namespace outrun::vr::dx11
         // never eligible to stand in for native managed-buffer evidence.
         if (programmablePair)
         {
-            signature.sourceDraw = draw;
+            signature.sourceDraw = sampledDraw;
             signature.sourceDrawIdentityExact =
-                source_draw_identity_exact(draw);
+                source_draw_identity_exact(sampledDraw);
             signature.sourceDrawNativeBufferEligible =
                 signature.sourceDrawIdentityExact &&
-                draw.native_buffer_eligible();
+                sampledDraw.native_buffer_eligible();
             signature.sourceDrawIdentitySnapshotToken =
                 signature.sourceDrawIdentityExact
-                    ? source_draw_identity_snapshot_token(draw)
+                    ? source_draw_identity_snapshot_token(sampledDraw)
                     : 0;
 
             // R295 deliberately receives no R258 receipt until a production
@@ -4289,6 +4357,14 @@ namespace outrun::vr::dx11
                 productionSourceJoin.sourceElementCountMatches;
             signature.shaderProductionSourceElementCount =
                 productionSourceJoin.sourceElementCount;
+            signature.shaderProductionSourceIndexFormatKnown =
+                productionSourceJoin.sourceIndexFormatKnown;
+            signature.shaderProductionSourceIndexFormatMatches =
+                productionSourceJoin.sourceIndexFormatMatches;
+            signature.shaderProductionSourceIndexOffsetMatches =
+                productionSourceJoin.sourceIndexOffsetMatches;
+            signature.shaderProductionSourceIndexFormat =
+                productionSourceJoin.sourceIndexFormat;
             signature.shaderProductionSourceCacheKeyMatches =
                 productionSourceJoin.cacheIdentityMatches;
             signature.shaderProductionSourceJoinExact =
