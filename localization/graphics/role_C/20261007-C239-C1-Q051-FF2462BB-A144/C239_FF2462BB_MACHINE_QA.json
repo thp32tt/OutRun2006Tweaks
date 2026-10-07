@@ -1,0 +1,158 @@
+{
+  "schema_version": 2,
+  "run": "20261007-C239-C1-Q051-FF2462BB-A144",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 51,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "producer_run": "A144",
+  "user_jpg_regression": "PJR-014-20261006",
+  "prior_candidate_sha256": "4fff8c59a44a1b7d03cee192124915f87eb73b3988c7673feb3228785ce67726",
+  "prior_candidate_commit": "5bd0324d1acb9ce8f9465bb4de282a28a7334e06",
+  "candidate_sha256": "3a046a8b695ee6b0a766fca223455616a45a9480b72e28b0c39ddf42821d0b6d",
+  "english_source": {
+    "repo": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "native_size": [
+      4096,
+      2048
+    ],
+    "display_scale_visual_only": 1
+  },
+  "orientation_note": "A144/source bboxes are readable coordinates; independent blast-radius is evaluated in RAW after exact Y-flip conversion.",
+  "rows": [
+    {
+      "line": 1,
+      "readable_source_bbox": [
+        3002,
+        482,
+        3512,
+        562
+      ],
+      "readable_localized_bbox": [
+        3117,
+        491,
+        3397,
+        553
+      ],
+      "raw_source_bbox": [
+        3002,
+        1486,
+        3512,
+        1566
+      ],
+      "raw_localized_bbox": [
+        3117,
+        1495,
+        3397,
+        1557
+      ],
+      "raw_changed_bbox": [
+        3117,
+        1495,
+        3397,
+        1557
+      ],
+      "changed_positive_margins_raw": [
+        115,
+        115,
+        9,
+        9
+      ],
+      "localized_positive_margins_readable": [
+        115,
+        115,
+        9,
+        9
+      ],
+      "source_size": [
+        510,
+        80
+      ],
+      "localized_size": [
+        280,
+        62
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "line": 2,
+      "readable_source_bbox": [
+        3002,
+        562,
+        3512,
+        643
+      ],
+      "readable_localized_bbox": [
+        3068,
+        571,
+        3445,
+        634
+      ],
+      "raw_source_bbox": [
+        3002,
+        1405,
+        3512,
+        1486
+      ],
+      "raw_localized_bbox": [
+        3068,
+        1414,
+        3445,
+        1477
+      ],
+      "raw_changed_bbox": [
+        3068,
+        1414,
+        3445,
+        1477
+      ],
+      "changed_positive_margins_raw": [
+        66,
+        67,
+        9,
+        9
+      ],
+      "localized_positive_margins_readable": [
+        66,
+        67,
+        9,
+        9
+      ],
+      "source_size": [
+        510,
+        81
+      ],
+      "localized_size": [
+        377,
+        63
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "summary": {
+    "2_of_2_bbox_size_positive_margin": "PASS",
+    "changed_pixels": 28867,
+    "changed_pixels_outside_exact_raw_source_bboxes": 0,
+    "alpha_changed_outside_exact_raw_source_bboxes": 0,
+    "header_exact_vs_prior": true,
+    "mips": 1,
+    "fourcc": ""
+  },
+  "machine_status": "PASS",
+  "controller_visual_decision": "PENDING",
+  "mandatory_c3": "REQUIRED_EXACT_SHA_PRIOR_USER_JPG_CLIPPING_FAIL",
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C239-C1-Q051-FF2462BB-A144/C239_READABLE_SOURCE_FINAL.jpg",
+    "localization/graphics/role_C/20261007-C239-C1-Q051-FF2462BB-A144/C239_RAW_SOURCE_FINAL.jpg",
+    "localization/graphics/role_C/20261007-C239-C1-Q051-FF2462BB-A144/C239_TWO_LINE_HIGH_ZOOM.jpg"
+  ],
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

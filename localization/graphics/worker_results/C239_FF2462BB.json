@@ -1,0 +1,9 @@
+{
+  "run": "20261007-C239-C1-Q051-FF2462BB-A144",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 51,
+  "candidate_sha256": "3a046a8b695ee6b0a766fca223455616a45a9480b72e28b0c39ddf42821d0b6d",
+  "machine_status": "PASS",
+  "runtime_validation": "UNTESTED"
+}
