@@ -3492,6 +3492,60 @@ private:
     std::uint64_t owner_generation_ = 0;
 };
 
+
+struct NativeProgrammableShaderProductionObservationEvidence {
+    bool inputValid{};
+    bool ownerReady{};
+    bool deviceMatches{};
+    bool objectPrerequisiteReady{};
+    bool creationHandoffReady{};
+    bool targetBytecodeMaterializationReady{};
+    bool sourceMappingHandoffReady{};
+    bool translationPlanReady{};
+    bool semanticHandoffReady{};
+    bool semanticHandoffSnapshotMatches{};
+    bool objectBindingAuthorized{};
+    bool nativeDrawPathActivationAllowed{};
+    bool drawDispatchAuthorized{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    std::uint64_t cacheKey{};
+    std::uint64_t backendOwnerGeneration{};
+    std::uint64_t objectPrerequisiteSnapshotToken{};
+    std::uint64_t creationHandoffSnapshotToken{};
+    std::uint64_t targetBytecodeMaterializationSnapshotToken{};
+    std::uint64_t sourceMappingHandoffSnapshotToken{};
+    std::uint64_t translationPlanSnapshotToken{};
+    std::uint64_t semanticHandoffSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+    NativeProgrammableShaderBackendSemanticHandoffEvidence semanticHandoff{};
+};
+
+// R286 is the bounded production-side observation bridge from the exact
+// R279/R280/R283/R274/R276 evidence chain into the persistent R285 owner.
+// It intentionally accepts no ID3D11DeviceContext and cannot bind shaders,
+// enable NativeDrawPath, or issue Draw/DrawIndexed.
+[[nodiscard]] NativeProgrammableShaderProductionObservationEvidence
+observe_programmable_shader_production_source_evidence_chain(
+    NativeProgrammableShaderBackendOwnership& ownership,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+        objectPrerequisite,
+    std::uint64_t objectPrerequisiteSnapshotToken,
+    const NativeProgrammableShaderObjectCreationHandoffEvidence&
+        creationHandoff,
+    std::uint64_t creationHandoffSnapshotToken,
+    const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+        targetBytecodeMaterialization,
+    std::uint64_t targetBytecodeMaterializationSnapshotToken,
+    const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff,
+    std::uint64_t sourceMappingHandoffSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence&
+        translationPlan,
+    std::uint64_t translationPlanSnapshotToken) noexcept;
+
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
 // input layout, and R96 transform buffer. No game draw path constructs or
 // binds this bundle yet.
@@ -4479,6 +4533,24 @@ public:
     bool initialize(const NativeBackendConfig& config) noexcept;
     bool resize(std::uint32_t width, std::uint32_t height) noexcept;
     void begin_frame(const std::array<float, 4>& clear_color) noexcept;
+
+    [[nodiscard]] NativeProgrammableShaderProductionObservationEvidence
+    observe_programmable_shader_source_evidence_chain(
+        const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+        const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+            objectPrerequisite,
+        std::uint64_t objectPrerequisiteSnapshotToken,
+        const NativeProgrammableShaderObjectCreationHandoffEvidence&
+            creationHandoff,
+        std::uint64_t creationHandoffSnapshotToken,
+        const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+            targetBytecodeMaterialization,
+        std::uint64_t targetBytecodeMaterializationSnapshotToken,
+        const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff,
+        std::uint64_t sourceMappingHandoffSnapshotToken,
+        const NativeProgrammableShaderSemanticTranslationPlanEvidence&
+            translationPlan,
+        std::uint64_t translationPlanSnapshotToken) noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {

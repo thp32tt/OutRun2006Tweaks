@@ -660,6 +660,42 @@ std::uint64_t r285_backend_semantic_handoff_snapshot_token(
     return token == 0 ? 1 : token;
 }
 
+
+std::uint64_t r286_production_observation_snapshot_token(
+    const NativeProgrammableShaderProductionObservationEvidence&
+        observation) noexcept {
+    if (!observation.reviewReady)
+        return 0;
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(token, observation.cacheKey);
+    token = mix_readiness_snapshot_token(
+        token, observation.backendOwnerGeneration);
+    token = mix_readiness_snapshot_token(
+        token, observation.objectPrerequisiteSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.creationHandoffSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.targetBytecodeMaterializationSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.sourceMappingHandoffSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.translationPlanSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.semanticHandoffSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.semanticHandoffReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.semanticHandoffSnapshotMatches ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.objectBindingAuthorized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.nativeDrawPathActivationAllowed ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.drawDispatchAuthorized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(token, 0x286u);
+    return token == 0 ? 1 : token;
+}
+
 HRESULT create_device(
     IDXGIAdapter* adapter,
     UINT flags,
@@ -5493,6 +5529,157 @@ validate_semantic_handoff_snapshot(
 
     return r285_backend_semantic_handoff_snapshot_token(handoff) ==
         reviewSnapshotToken;
+}
+
+
+NativeProgrammableShaderProductionObservationEvidence
+observe_programmable_shader_production_source_evidence_chain(
+    NativeProgrammableShaderBackendOwnership& ownership,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+        objectPrerequisite,
+    std::uint64_t objectPrerequisiteSnapshotToken,
+    const NativeProgrammableShaderObjectCreationHandoffEvidence& creationHandoff,
+    std::uint64_t creationHandoffSnapshotToken,
+    const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+        targetBytecodeMaterialization,
+    std::uint64_t targetBytecodeMaterializationSnapshotToken,
+    const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff,
+    std::uint64_t sourceMappingHandoffSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence&
+        translationPlan,
+    std::uint64_t translationPlanSnapshotToken) noexcept {
+    NativeProgrammableShaderProductionObservationEvidence out{};
+    out.diagnosticOnly = true;
+    out.objectBindingAuthorized = false;
+    out.nativeDrawPathActivationAllowed = false;
+    out.drawDispatchAuthorized = false;
+    out.cacheKey = sourceIdentity.cacheKey;
+    out.backendOwnerGeneration = ownership.owner_generation();
+    out.objectPrerequisiteSnapshotToken = objectPrerequisiteSnapshotToken;
+    out.creationHandoffSnapshotToken = creationHandoffSnapshotToken;
+    out.targetBytecodeMaterializationSnapshotToken =
+        targetBytecodeMaterializationSnapshotToken;
+    out.sourceMappingHandoffSnapshotToken = sourceMappingHandoffSnapshotToken;
+    out.translationPlanSnapshotToken = translationPlanSnapshotToken;
+
+    out.inputValid =
+        expectedDevice != nullptr &&
+        sourceIdentity.exact_identity() &&
+        !sourceIdentity.translationImplemented &&
+        objectPrerequisiteSnapshotToken != 0 &&
+        creationHandoffSnapshotToken != 0 &&
+        targetBytecodeMaterializationSnapshotToken != 0 &&
+        sourceMappingHandoffSnapshotToken != 0 &&
+        translationPlanSnapshotToken != 0;
+    out.ownerReady = ownership.ready();
+    out.deviceMatches =
+        out.ownerReady && ownership.device() == expectedDevice;
+    out.objectPrerequisiteReady =
+        objectPrerequisite.reviewReady &&
+        objectPrerequisite.boundaryPreserved &&
+        objectPrerequisite.diagnosticOnly &&
+        objectPrerequisite.reviewSnapshotToken ==
+            objectPrerequisiteSnapshotToken;
+    out.creationHandoffReady =
+        creationHandoff.reviewReady &&
+        creationHandoff.boundaryPreserved &&
+        creationHandoff.diagnosticOnly &&
+        !creationHandoff.objectCreationAuthorized &&
+        creationHandoff.reviewSnapshotToken == creationHandoffSnapshotToken;
+    out.targetBytecodeMaterializationReady =
+        targetBytecodeMaterialization.reviewReady &&
+        targetBytecodeMaterialization.boundaryPreserved &&
+        targetBytecodeMaterialization.diagnosticOnly &&
+        targetBytecodeMaterialization.targetBytecodeMaterialized &&
+        !targetBytecodeMaterialization.objectCreationAuthorized &&
+        targetBytecodeMaterialization.reviewSnapshotToken ==
+            targetBytecodeMaterializationSnapshotToken;
+    out.sourceMappingHandoffReady =
+        sourceMappingHandoff.reviewReady &&
+        sourceMappingHandoff.boundaryPreserved &&
+        sourceMappingHandoff.diagnosticOnly &&
+        sourceMappingHandoff.reviewSnapshotToken ==
+            sourceMappingHandoffSnapshotToken;
+    out.translationPlanReady =
+        translationPlan.reviewReady &&
+        translationPlan.boundaryPreserved &&
+        translationPlan.diagnosticOnly &&
+        translationPlan.reviewSnapshotToken == translationPlanSnapshotToken;
+
+    if (!out.inputValid ||
+        !out.ownerReady ||
+        !out.deviceMatches ||
+        !out.objectPrerequisiteReady ||
+        !out.creationHandoffReady ||
+        !out.targetBytecodeMaterializationReady ||
+        !out.sourceMappingHandoffReady ||
+        !out.translationPlanReady)
+        return out;
+
+    out.semanticHandoff =
+        ownership.materialize_semantic_handoff_for_observation(
+            sourceIdentity,
+            objectPrerequisite,
+            objectPrerequisiteSnapshotToken,
+            creationHandoff,
+            creationHandoffSnapshotToken,
+            targetBytecodeMaterialization,
+            targetBytecodeMaterializationSnapshotToken,
+            sourceMappingHandoff,
+            sourceMappingHandoffSnapshotToken,
+            translationPlan,
+            translationPlanSnapshotToken);
+    out.semanticHandoffSnapshotToken =
+        out.semanticHandoff.reviewSnapshotToken;
+    out.semanticHandoffReady =
+        out.semanticHandoff.reviewReady &&
+        out.semanticHandoff.boundaryPreserved &&
+        out.semanticHandoff.diagnosticOnly;
+    out.semanticHandoffSnapshotMatches =
+        out.semanticHandoffReady &&
+        out.semanticHandoffSnapshotToken != 0 &&
+        ownership.validate_semantic_handoff_snapshot(
+            sourceIdentity,
+            objectPrerequisite,
+            objectPrerequisiteSnapshotToken,
+            creationHandoff,
+            creationHandoffSnapshotToken,
+            targetBytecodeMaterialization,
+            targetBytecodeMaterializationSnapshotToken,
+            sourceMappingHandoff,
+            sourceMappingHandoffSnapshotToken,
+            translationPlan,
+            translationPlanSnapshotToken,
+            out.semanticHandoff,
+            out.semanticHandoffSnapshotToken);
+    out.objectBindingAuthorized =
+        out.semanticHandoff.objectBindingAuthorized;
+    out.nativeDrawPathActivationAllowed =
+        out.semanticHandoff.nativeDrawPathActivationAllowed;
+    out.drawDispatchAuthorized =
+        out.semanticHandoff.drawDispatchAuthorized;
+    out.boundaryPreserved =
+        out.semanticHandoffSnapshotMatches &&
+        !out.objectBindingAuthorized &&
+        !out.nativeDrawPathActivationAllowed &&
+        !out.drawDispatchAuthorized &&
+        out.diagnosticOnly;
+    out.reviewReady =
+        out.inputValid &&
+        out.ownerReady &&
+        out.deviceMatches &&
+        out.objectPrerequisiteReady &&
+        out.creationHandoffReady &&
+        out.targetBytecodeMaterializationReady &&
+        out.sourceMappingHandoffReady &&
+        out.translationPlanReady &&
+        out.boundaryPreserved;
+    if (out.reviewReady)
+        out.reviewSnapshotToken =
+            r286_production_observation_snapshot_token(out);
+    return out;
 }
 
 bool NativeFixedFunctionPipelineBundle::initialize(
@@ -13605,6 +13792,41 @@ bool NativeBackend::initialize(const NativeBackendConfig& config) noexcept {
         return false;
     }
     return true;
+}
+
+
+NativeProgrammableShaderProductionObservationEvidence
+NativeBackend::observe_programmable_shader_source_evidence_chain(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+        objectPrerequisite,
+    std::uint64_t objectPrerequisiteSnapshotToken,
+    const NativeProgrammableShaderObjectCreationHandoffEvidence& creationHandoff,
+    std::uint64_t creationHandoffSnapshotToken,
+    const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+        targetBytecodeMaterialization,
+    std::uint64_t targetBytecodeMaterializationSnapshotToken,
+    const NativeProgrammableShaderSourceMappingHandoff& sourceMappingHandoff,
+    std::uint64_t sourceMappingHandoffSnapshotToken,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence&
+        translationPlan,
+    std::uint64_t translationPlanSnapshotToken) noexcept {
+    if (!ready())
+        return {};
+    return observe_programmable_shader_production_source_evidence_chain(
+        programmable_shader_ownership(),
+        device_.Get(),
+        sourceIdentity,
+        objectPrerequisite,
+        objectPrerequisiteSnapshotToken,
+        creationHandoff,
+        creationHandoffSnapshotToken,
+        targetBytecodeMaterialization,
+        targetBytecodeMaterializationSnapshotToken,
+        sourceMappingHandoff,
+        sourceMappingHandoffSnapshotToken,
+        translationPlan,
+        translationPlanSnapshotToken);
 }
 
 bool NativeBackend::resize(std::uint32_t width, std::uint32_t height) noexcept {

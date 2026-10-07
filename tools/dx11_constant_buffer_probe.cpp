@@ -6102,6 +6102,98 @@ int main()
             r285RepeatedHandoff.reviewSnapshotToken),
         "R285 repeated pair reuses exact R284/R242 receipt instead of recreating shaders");
 
+
+    const auto r286ProductionObservation =
+        outrun::vr::dx11::
+            observe_programmable_shader_production_source_evidence_chain(
+                r285BackendOwnership,
+                r284Device.device,
+                programmablePair,
+                r279ObjectPrerequisite,
+                r279ObjectPrerequisite.reviewSnapshotToken,
+                r280ObjectCreationHandoff,
+                r280ObjectCreationHandoff.reviewSnapshotToken,
+                r283TargetBytecodeMaterialization,
+                r283TargetBytecodeMaterialization.reviewSnapshotToken,
+                r274SourceMappingHandoff,
+                r274SourceMappingHandoff.reviewSnapshotToken,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken);
+    require(
+        r286ProductionObservation.inputValid &&
+        r286ProductionObservation.ownerReady &&
+        r286ProductionObservation.deviceMatches &&
+        r286ProductionObservation.objectPrerequisiteReady &&
+        r286ProductionObservation.creationHandoffReady &&
+        r286ProductionObservation.targetBytecodeMaterializationReady &&
+        r286ProductionObservation.sourceMappingHandoffReady &&
+        r286ProductionObservation.translationPlanReady &&
+        r286ProductionObservation.semanticHandoffReady &&
+        r286ProductionObservation.semanticHandoffSnapshotMatches &&
+        r286ProductionObservation.semanticHandoff.materializationReused &&
+        !r286ProductionObservation.objectBindingAuthorized &&
+        !r286ProductionObservation.nativeDrawPathActivationAllowed &&
+        !r286ProductionObservation.drawDispatchAuthorized &&
+        r286ProductionObservation.diagnosticOnly &&
+        r286ProductionObservation.boundaryPreserved &&
+        r286ProductionObservation.reviewReady &&
+        r286ProductionObservation.cacheKey == programmablePair.cacheKey &&
+        r286ProductionObservation.backendOwnerGeneration ==
+            r285BackendOwnership.owner_generation() &&
+        r286ProductionObservation.semanticHandoffSnapshotToken ==
+            r286ProductionObservation.semanticHandoff.reviewSnapshotToken &&
+        r286ProductionObservation.reviewSnapshotToken != 0 &&
+        r285BackendOwnership.cache().entry_count() == 1,
+        "R286 production source-evidence bridge reaches R285 ownership without binding or draw");
+
+    const auto r286StaleMappingObservation =
+        outrun::vr::dx11::
+            observe_programmable_shader_production_source_evidence_chain(
+                r285BackendOwnership,
+                r284Device.device,
+                programmablePair,
+                r279ObjectPrerequisite,
+                r279ObjectPrerequisite.reviewSnapshotToken,
+                r280ObjectCreationHandoff,
+                r280ObjectCreationHandoff.reviewSnapshotToken,
+                r283TargetBytecodeMaterialization,
+                r283TargetBytecodeMaterialization.reviewSnapshotToken,
+                r274SourceMappingHandoff,
+                staleR274MappingToken,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken);
+    require(
+        r286StaleMappingObservation.inputValid &&
+        r286StaleMappingObservation.ownerReady &&
+        r286StaleMappingObservation.deviceMatches &&
+        !r286StaleMappingObservation.sourceMappingHandoffReady &&
+        !r286StaleMappingObservation.semanticHandoffReady &&
+        !r286StaleMappingObservation.boundaryPreserved &&
+        !r286StaleMappingObservation.reviewReady &&
+        r286StaleMappingObservation.reviewSnapshotToken == 0 &&
+        r285BackendOwnership.cache().entry_count() == 1,
+        "R286 production bridge rejects stale R274 evidence before R285 handoff");
+
+    outrun::vr::dx11::NativeBackend r286UninitializedBackend;
+    const auto r286UninitializedObservation =
+        r286UninitializedBackend.observe_programmable_shader_source_evidence_chain(
+            programmablePair,
+            r279ObjectPrerequisite,
+            r279ObjectPrerequisite.reviewSnapshotToken,
+            r280ObjectCreationHandoff,
+            r280ObjectCreationHandoff.reviewSnapshotToken,
+            r283TargetBytecodeMaterialization,
+            r283TargetBytecodeMaterialization.reviewSnapshotToken,
+            r274SourceMappingHandoff,
+            r274SourceMappingHandoff.reviewSnapshotToken,
+            r276TranslationPlan,
+            r276TranslationPlan.reviewSnapshotToken);
+    require(
+        !r286UninitializedObservation.inputValid &&
+        !r286UninitializedObservation.reviewReady &&
+        r286UninitializedObservation.reviewSnapshotToken == 0,
+        "R286 NativeBackend entrypoint fails closed before native-device initialization");
+
     ID3D11VertexShader* r285BoundVertex = nullptr;
     ID3D11PixelShader* r285BoundPixel = nullptr;
     r284Device.context->VSGetShader(&r285BoundVertex, nullptr, nullptr);

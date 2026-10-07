@@ -11240,6 +11240,48 @@ def main() -> None:
             + ", ".join(missing_r285_programmable_backend_semantic_handoff)
         )
 
+
+    r286_programmable_production_observation_bridge = [
+        ("struct NativeProgrammableShaderProductionObservationEvidence",
+         NATIVE_BACKEND_HPP, "R286 production observation evidence type"),
+        ("observe_programmable_shader_production_source_evidence_chain(",
+         NATIVE_BACKEND_HPP, "R286 bounded source-evidence bridge declaration"),
+        ("observe_programmable_shader_source_evidence_chain(",
+         NATIVE_BACKEND_HPP, "R286 NativeBackend production entrypoint"),
+        ("r286_production_observation_snapshot_token(",
+         NATIVE_BACKEND_CPP, "R286 tamper-evident production observation snapshot"),
+        ("token, 0x286u",
+         NATIVE_BACKEND_CPP, "R286 independent snapshot domain"),
+        ("ownership.materialize_semantic_handoff_for_observation(",
+         NATIVE_BACKEND_CPP, "R286 routes exact evidence into persistent R285 owner"),
+        ("ownership.validate_semantic_handoff_snapshot(",
+         NATIVE_BACKEND_CPP, "R286 validates exact R285 handoff receipt"),
+        ("programmable_shader_ownership(),",
+         NATIVE_BACKEND_CPP, "NativeBackend delegates through its persistent R285 owner"),
+        ("out.objectBindingAuthorized =",
+         NATIVE_BACKEND_CPP, "R286 carries explicit no-binding authority"),
+        ("out.nativeDrawPathActivationAllowed =",
+         NATIVE_BACKEND_CPP, "R286 keeps NativeDrawPath inactive"),
+        ("out.drawDispatchAuthorized =",
+         NATIVE_BACKEND_CPP, "R286 keeps Draw/DrawIndexed unauthorized"),
+        ("R286 production source-evidence bridge reaches R285 ownership without binding or draw",
+         CONSTANT_BUFFER_PROBE, "R286 positive hosted bridge regression"),
+        ("R286 production bridge rejects stale R274 evidence before R285 handoff",
+         CONSTANT_BUFFER_PROBE, "R286 stale source-evidence regression"),
+        ("R286 NativeBackend entrypoint fails closed before native-device initialization",
+         CONSTANT_BUFFER_PROBE, "R286 uninitialized production entrypoint regression"),
+    ]
+    missing_r286_programmable_production_observation_bridge = [
+        meaning for token, source, meaning
+        in r286_programmable_production_observation_bridge
+        if token not in source
+    ]
+    if missing_r286_programmable_production_observation_bridge:
+        raise SystemExit(
+            "DX11 R286 programmable production observation bridge drift: "
+            + ", ".join(missing_r286_programmable_production_observation_bridge)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
