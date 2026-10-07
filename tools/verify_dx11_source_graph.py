@@ -11503,6 +11503,41 @@ def main() -> None:
             )
         )
 
+    r293_programmable_production_prerequisite_census_gate = [
+        ("ProgrammableProductionActivationPrerequisiteCensusEvidence",
+         RUNTIME_CENSUS, "R293 explicit production prerequisite census evidence"),
+        ("review_programmable_production_activation_prerequisites(",
+         RUNTIME_CENSUS, "R293 bounded census prerequisite gate"),
+        ("kSourceRevalidationReceiptMissing",
+         RUNTIME_CENSUS, "R293 explicit missing R258 receipt bit"),
+        ("kResourceBehaviorReceiptMissing",
+         RUNTIME_CENSUS, "R293 explicit missing R262 receipt bit"),
+        ("observe_programmable_shader_production_activation_prerequisites(",
+         RUNTIME_CENSUS, "R293 delegates exact complete inputs to R292"),
+        ("validate_programmable_shader_production_activation_prerequisite_snapshot(",
+         RUNTIME_CENSUS, "R293 validates exact R292 snapshot before success"),
+        ("productionSourceRevalidation = nullptr",
+         RUNTIME_CENSUS, "R293 current production census must not fabricate R258"),
+        ("productionResourceBehavior = nullptr",
+         RUNTIME_CENSUS, "R293 current production census must not fabricate R262"),
+        ("shaderProductionActivationMissingReceiptMask",
+         RUNTIME_CENSUS, "R293 missing receipt state participates in signature identity"),
+        ("VR DX11 R293 productionPrerequisiteCensus",
+         RUNTIME_CENSUS, "R293 bounded diagnostic output"),
+    ]
+    missing_r293_programmable_production_prerequisite_census_gate = [
+        meaning for token, source, meaning
+        in r293_programmable_production_prerequisite_census_gate
+        if token not in source
+    ]
+    if missing_r293_programmable_production_prerequisite_census_gate:
+        raise SystemExit(
+            "DX11 R293 programmable production prerequisite census drift: "
+            + ", ".join(
+                missing_r293_programmable_production_prerequisite_census_gate
+            )
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),

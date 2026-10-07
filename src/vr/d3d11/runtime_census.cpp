@@ -349,6 +349,100 @@ namespace outrun::vr::dx11
             return out;
         }
 
+        // R293 exposes the R292 production activation-prerequisite boundary to
+        // sampled census identity without fabricating the exact R258/R262
+        // receipts that production does not own yet. Callers must provide both
+        // receipts explicitly; missing inputs are recorded and fail closed.
+        struct ProgrammableProductionActivationPrerequisiteCensusEvidence
+        {
+            NativeProgrammableShaderProductionActivationPrerequisiteEvidence
+                observation{};
+            bool productionSemanticReviewReady{};
+            bool sourceRevalidationReceiptPresent{};
+            bool resourceBehaviorReceiptPresent{};
+            bool observationValidated{};
+            bool staticPrerequisitesSatisfied{};
+            bool boundaryPreserved{};
+            std::uint32_t missingReceiptMask{};
+        };
+
+        ProgrammableProductionActivationPrerequisiteCensusEvidence
+        review_programmable_production_activation_prerequisites(
+            const NativeProgrammableShaderProductionSemanticReviewEvidence&
+                productionSemanticReview,
+            const NativeProgrammableShaderDormantSourceRevalidationReadiness*
+                sourceRevalidation,
+            const NativeProgrammableShaderOutputResourceBehaviorReadiness*
+                resourceBehavior) noexcept
+        {
+            ProgrammableProductionActivationPrerequisiteCensusEvidence out{};
+            constexpr std::uint32_t kSourceRevalidationReceiptMissing =
+                1u << 0;
+            constexpr std::uint32_t kResourceBehaviorReceiptMissing =
+                1u << 1;
+
+            out.productionSemanticReviewReady =
+                productionSemanticReview.reviewReady &&
+                productionSemanticReview.reviewSnapshotToken != 0 &&
+                productionSemanticReview.diagnosticOnly &&
+                productionSemanticReview.boundaryPreserved &&
+                !productionSemanticReview.objectBindingAuthorized &&
+                !productionSemanticReview.nativeDrawPathActivationAllowed &&
+                !productionSemanticReview.drawDispatchAuthorized;
+            out.sourceRevalidationReceiptPresent =
+                sourceRevalidation != nullptr;
+            out.resourceBehaviorReceiptPresent =
+                resourceBehavior != nullptr;
+
+            if (!out.sourceRevalidationReceiptPresent)
+                out.missingReceiptMask |=
+                    kSourceRevalidationReceiptMissing;
+            if (!out.resourceBehaviorReceiptPresent)
+                out.missingReceiptMask |=
+                    kResourceBehaviorReceiptMissing;
+
+            // Missing production receipts are a valid diagnostic state but
+            // never an R292 success or activation signal.
+            out.boundaryPreserved =
+                out.productionSemanticReviewReady &&
+                out.missingReceiptMask != 0;
+            if (!out.productionSemanticReviewReady ||
+                out.missingReceiptMask != 0)
+                return out;
+
+            out.observation =
+                observe_programmable_shader_production_activation_prerequisites(
+                    productionSemanticReview,
+                    productionSemanticReview.reviewSnapshotToken,
+                    *sourceRevalidation,
+                    sourceRevalidation->snapshotToken,
+                    *resourceBehavior,
+                    resourceBehavior->reviewSnapshotToken);
+            out.observationValidated =
+                validate_programmable_shader_production_activation_prerequisite_snapshot(
+                    productionSemanticReview,
+                    productionSemanticReview.reviewSnapshotToken,
+                    *sourceRevalidation,
+                    sourceRevalidation->snapshotToken,
+                    *resourceBehavior,
+                    resourceBehavior->reviewSnapshotToken,
+                    out.observation,
+                    out.observation.reviewSnapshotToken);
+            out.staticPrerequisitesSatisfied =
+                out.observationValidated &&
+                out.observation.staticPrerequisitesSatisfied &&
+                out.observation.missingPrerequisiteMask == 0;
+            out.boundaryPreserved =
+                out.observationValidated &&
+                out.staticPrerequisitesSatisfied &&
+                out.observation.boundaryPreserved &&
+                out.observation.prerequisites.activationSnapshotToken == 0 &&
+                !out.observation.objectBindingAuthorized &&
+                !out.observation.nativeDrawPathActivationAllowed &&
+                !out.observation.drawDispatchAuthorized;
+            return out;
+        }
+
         struct TextureMutationEvidence
         {
             bool descriptorObserved{};
@@ -592,6 +686,16 @@ namespace outrun::vr::dx11
             std::uint64_t shaderProductionSemanticReviewInputLayoutSnapshotToken{};
             std::uint64_t shaderProductionSemanticReviewTranslationSnapshotToken{};
             std::uint64_t shaderProductionSemanticReviewSnapshotToken{};
+            // R293 makes the production R292 blocker explicit in census
+            // identity. Current production has no exact R258/R262 receipts, so
+            // these samples remain prerequisite-pending and fail closed.
+            bool shaderProductionActivationSourceReceiptPresent{};
+            bool shaderProductionActivationResourceReceiptPresent{};
+            bool shaderProductionActivationPrerequisiteExact{};
+            bool shaderProductionActivationStaticPrerequisitesSatisfied{};
+            bool shaderProductionActivationBoundaryPreserved{};
+            std::uint32_t shaderProductionActivationMissingReceiptMask{};
+            std::uint64_t shaderProductionActivationPrerequisiteSnapshotToken{};
             bool shaderTranslatedSemanticReceiptExact{};
             bool shaderTranslatedSemanticReceiptObjectReady{};
             std::uint64_t shaderTranslatedSemanticReceiptSnapshotToken{};
@@ -1196,6 +1300,27 @@ namespace outrun::vr::dx11
                 sig.shaderProductionSemanticReviewTranslationSnapshotToken);
             hash = hash_mix(
                 hash, sig.shaderProductionSemanticReviewSnapshotToken);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionActivationSourceReceiptPresent ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionActivationResourceReceiptPresent ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionActivationPrerequisiteExact ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionActivationStaticPrerequisitesSatisfied
+                    ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionActivationBoundaryPreserved ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionActivationMissingReceiptMask);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionActivationPrerequisiteSnapshotToken);
             hash = hash_mix(
                 hash, sig.shaderTranslatedSemanticReceiptExact ? 1u : 0u);
             hash = hash_mix(
@@ -2496,6 +2621,38 @@ namespace outrun::vr::dx11
                 productionSemanticReview.reviewValidated
                     ? productionSemanticReview.review.reviewSnapshotToken
                     : 0;
+
+            // R293 does not manufacture production R258/R262 receipts from
+            // descriptor-level census data. Until their exact producers are
+            // wired, pass explicit absence into the R292 census gate.
+            const NativeProgrammableShaderDormantSourceRevalidationReadiness*
+                productionSourceRevalidation = nullptr;
+            const NativeProgrammableShaderOutputResourceBehaviorReadiness*
+                productionResourceBehavior = nullptr;
+            const auto productionActivationPrerequisites =
+                review_programmable_production_activation_prerequisites(
+                    productionSemanticReview.review,
+                    productionSourceRevalidation,
+                    productionResourceBehavior);
+            sig.shaderProductionActivationSourceReceiptPresent =
+                productionActivationPrerequisites.
+                    sourceRevalidationReceiptPresent;
+            sig.shaderProductionActivationResourceReceiptPresent =
+                productionActivationPrerequisites.
+                    resourceBehaviorReceiptPresent;
+            sig.shaderProductionActivationPrerequisiteExact =
+                productionActivationPrerequisites.observationValidated;
+            sig.shaderProductionActivationStaticPrerequisitesSatisfied =
+                productionActivationPrerequisites.staticPrerequisitesSatisfied;
+            sig.shaderProductionActivationBoundaryPreserved =
+                productionActivationPrerequisites.boundaryPreserved;
+            sig.shaderProductionActivationMissingReceiptMask =
+                productionActivationPrerequisites.missingReceiptMask;
+            sig.shaderProductionActivationPrerequisiteSnapshotToken =
+                productionActivationPrerequisites.observationValidated
+                    ? productionActivationPrerequisites.
+                        observation.reviewSnapshotToken
+                    : 0;
             return sig;
         }
 
@@ -2845,6 +3002,16 @@ namespace outrun::vr::dx11
                         sig.shaderProductionSemanticReviewInputLayoutSnapshotToken,
                         sig.shaderProductionSemanticReviewTranslationSnapshotToken,
                         sig.shaderProductionSemanticReviewSnapshotToken);
+                    spdlog::info(
+                        "VR DX11 R293 productionPrerequisiteCensus signature#{}: sourceReceipt={} resourceReceipt={} r292Exact={} staticSatisfied={} boundaryPreserved={} missingReceiptMask=0x{:08X} snapshot=0x{:016X}",
+                        unique,
+                        sig.shaderProductionActivationSourceReceiptPresent ? 1 : 0,
+                        sig.shaderProductionActivationResourceReceiptPresent ? 1 : 0,
+                        sig.shaderProductionActivationPrerequisiteExact ? 1 : 0,
+                        sig.shaderProductionActivationStaticPrerequisitesSatisfied ? 1 : 0,
+                        sig.shaderProductionActivationBoundaryPreserved ? 1 : 0,
+                        sig.shaderProductionActivationMissingReceiptMask,
+                        sig.shaderProductionActivationPrerequisiteSnapshotToken);
                     spdlog::info(
                         "VR DX11 R275 translatedSemanticReceipt signature#{}: exact={} objectReady={} snapshot=0x{:016X}",
                         unique,
