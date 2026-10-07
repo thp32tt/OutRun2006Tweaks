@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B-MANUALQA230-EBFC709F-HELP",
+  "queue_index": 232,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "trigger": "PRE_INGAME_019_LOCALIZATION_COVERAGE_FALSE_NEGATIVE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/019_q232_EBFC709F.jpg",
+  "prior_c_status": "C225R_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+  "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+  "before_candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
+  "candidate_sha256": "dc76c000cfce17098940f551512e6f746319ba8a1892345eb060693004747ea1",
+  "defect": [
+    "UNTRANSLATED_VISIBLE_UI_CREATE_HELP",
+    "UNTRANSLATED_VISIBLE_UI_JOIN_HELP"
+  ],
+  "semantic_binding": [
+    {
+      "source": "Create a game and invite your friends!",
+      "korean": "게임을 만들고 친구를 초대하세요!"
+    },
+    {
+      "source": "Join your friends in a game of OutRun!",
+      "korean": "친구들과 OutRun 게임에 참가하세요!"
+    }
+  ],
+  "brand_policy": "OutRun retained in English inside the Korean explanatory sentence",
+  "method": "current C225R candidate + exact canonical source alpha help rows; clear only exact source-visible help pixels; native Noto Sans CJK KR Bold rerender; prior four B219 headings preserved pixel-exact",
+  "rows": [
+    {
+      "key": "create_help",
+      "source": "Create a game and invite your friends!",
+      "ko": "게임을 만들고 친구를 초대하세요!",
+      "window": [
+        0,
+        360,
+        1250,
+        450
+      ],
+      "bbox": [
+        7,
+        367,
+        1120,
+        437
+      ],
+      "source_size": [
+        1113,
+        70
+      ],
+      "source_alpha_pixels": 26222,
+      "localized_bbox": [
+        9,
+        369,
+        887,
+        435
+      ],
+      "localized_size": [
+        878,
+        66
+      ],
+      "margins": [
+        2,
+        233,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 69,
+      "horizontal_scale": 0.92,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "alignment": "source_left",
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "join_help",
+      "source": "Join your friends in a game of OutRun!",
+      "ko": "친구들과 OutRun 게임에 참가하세요!",
+      "window": [
+        0,
+        500,
+        1650,
+        620
+      ],
+      "bbox": [
+        4,
+        527,
+        1138,
+        597
+      ],
+      "source_size": [
+        1134,
+        70
+      ],
+      "source_alpha_pixels": 26671,
+      "localized_bbox": [
+        6,
+        529,
+        1006,
+        595
+      ],
+      "localized_size": [
+        1000,
+        66
+      ],
+      "margins": [
+        2,
+        132,
+        2,
+        2
+      ],
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_style": "Bold",
+      "font_size": 69,
+      "horizontal_scale": 0.92,
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "alignment": "source_left",
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "ui_family_style_profile": {
+    "family": "EBFC small dark explanatory UI",
+    "font_impression": "bold condensed sans",
+    "slant": "upright",
+    "alignment": "source_left",
+    "fill": "sampled exact source dark-gray per row",
+    "outline": "none",
+    "shadow_glow": "none",
+    "horizontal_profile": "shared 0.92 condensation, reduced only if exact source width requires"
+  },
+  "machine_qa": {
+    "bbox_source_size_positive_margin": "2/2 PASS",
+    "clean_validator": "PASS",
+    "final_validator": "PASS",
+    "baseline_changes_outside_rework_mask": 0,
+    "baseline_alpha_changes_outside_rework_mask": 0,
+    "clean_source_help_alpha_remaining": 0,
+    "localized_help_overlap": 0,
+    "header_128_exact": true,
+    "raw_mode": "BGRA",
+    "raw_orientation": "mirror_y",
+    "persisted_decode_matches_intended": "PASS",
+    "mip_count": 1,
+    "mip_review": "PASS_LEVEL0_ONLY_NO_AUTHORED_EXTRA_MIPS"
+  },
+  "post_encode_presentation_gate": {
+    "decoded_persisted_dds_authority": "PASS",
+    "practical_scales": [
+      "100%",
+      "75%",
+      "50%"
+    ],
+    "family_profile": "RECORDED",
+    "rework_blast_radius": "PASS_ZERO_OUTSIDE_EXACT_TWO_HELP_BBOXES",
+    "coverage": "PASS_6_PHYSICAL_LOCALIZED_TEXT_OCCURRENCES_ACROSS_4_SEMANTIC_SEGMENTS",
+    "mandatory_c3": "REQUIRED_BEFORE_PRE_INGAME_EXPORT_DUE_PRIOR_STYLE_FALSE_NEGATIVE_HISTORY"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_TRANSPARENT_HELP_PLATE",
+    "2_slant_direction": "PASS_SOURCE_UPRIGHT",
+    "3_no_unnecessary_undersizing": "PASS_MAX_NATIVE_HEIGHT_WITH_SOURCE_CONDENSED_PROFILE",
+    "4_source_weight_outline_shadow": "PASS_DARK_BOLD_NO_EXTRA_EFFECTS",
+    "5_no_clipping": "PASS_2_OF_2_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_BASELINE_AND_PROTECTED_OUTSIDE_ZERO",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "status": "B230_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_FRESH_C_C3",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

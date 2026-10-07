@@ -1,0 +1,29 @@
+{
+  "source": "/tmp/b230/source.png",
+  "candidate": "/tmp/b230/persisted_final.png",
+  "size": [
+    2048,
+    1024
+  ],
+  "changed_pixels": 281831,
+  "changed_bbox": [
+    4,
+    287,
+    1420,
+    1019
+  ],
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "baseline_candidate": "/tmp/b230/baseline.png",
+  "rework_mask": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261007-B-MANUALQA230-EBFC709F-HELP/B230_EBFC_REWORK_MASK.png",
+  "rework_changed_pixels": 79554,
+  "rework_changed_bbox": [
+    4,
+    367,
+    1138,
+    597
+  ],
+  "rework_changed_pixels_outside_mask": 0,
+  "status": "PASS"
+}
