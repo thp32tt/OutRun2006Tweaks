@@ -13,7 +13,7 @@ repo=Path.cwd()
 run="20261007-A166-C250-Q057-Q061-Q065-STYLE-SEMANTIC"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
-wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
+WR=repo/"localization/graphics/worker_results"; WR.mkdir(parents=True,exist_ok=True)
 
 def sha(b): return hashlib.sha256(b).hexdigest()
 
@@ -265,6 +265,6 @@ report={"schema_version":2,"role":"A","run":run,"selection":{"queue_indices":[57
 "flip_y_raw":"EVIDENCE_WRITTEN","immediate_readability":"PENDING_CONTROLLER_VISUAL"},
 "runtime_validation":"UNTESTED","forbidden_domains_touched":[],"status":"A166_MACHINE_SELF_QA_PASS_PENDING_CONTROLLER_VISUAL"}
 (out/"A166_BATCH_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A166_C250_Q057_Q061_Q065.json").write_text(json.dumps({"role":"A","run":run,"queue_indices":[57,61,65],
+(WR/"A166_C250_Q057_Q061_Q065.json").write_text(json.dumps({"role":"A","run":run,"queue_indices":[57,61,65],
 "candidate_sha256":{k:v["candidate_sha256"] for k,v in assets.items()},"status":"MACHINE_SELF_QA_PASS_PENDING_CONTROLLER_VISUAL","runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps({"run":run,"font":str(FONT),"assets":{k:v["candidate_sha256"] for k,v in assets.items()}},ensure_ascii=False,indent=2))
