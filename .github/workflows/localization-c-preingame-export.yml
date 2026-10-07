@@ -1,0 +1,63 @@
+name: Localization C PRE_INGAME Export
+on:
+  workflow_dispatch:
+  push:
+    branches: [korean-localization-recovery-20260928]
+    paths:
+      - 'localization/graphics/role_C/PRE_INGAME_EXPORT_TRIGGER.txt'
+      - '.github/workflows/localization-c-preingame-export.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localization-c-preingame-export-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  export:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install export dependencies
+        run: python -m pip install --disable-pip-version-check pillow numpy
+      - name: Export current C-pass English-original comparisons
+        env:
+          OUTRUN_CPU_WORKER: github-actions
+          OUTRUN_CPU_ROLE: C
+        run: python tools/localization/export_c_pass_comparison.py
+      - name: Enforce export-only write boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          bad=0
+          while IFS= read -r p; do
+            [ -z "$p" ] && continue
+            case "$p" in
+              localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/*) ;;
+              *) echo "::error::forbidden export write: $p"; bad=1 ;;
+            esac
+          done < <({ git diff --name-only; git ls-files --others --exclude-standard; } | sort -u)
+          test "$bad" -eq 0
+      - name: Commit refreshed PRE_INGAME export
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add localization/graphics/role_C/PRE_INGAME_JPG_REVIEW
+          if git diff --cached --quiet; then
+            echo "PRE_INGAME export already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "localization(C): refresh PRE_INGAME C-pass review"
+          git fetch origin korean-localization-recovery-20260928
+          git rebase origin/korean-localization-recovery-20260928
+          git push origin HEAD:korean-localization-recovery-20260928
