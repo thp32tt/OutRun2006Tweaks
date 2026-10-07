@@ -824,14 +824,15 @@
     "plate_restoration": "PASS_EXACT_SOURCE_ALPHA_CLEAN",
     "slant_direction": "PASS_SOURCE_UPRIGHT_FAMILY",
     "no_unnecessary_undersizing": "PASS_NATIVE_HEIGHT_DRIVEN_WITH_POSITIVE_MARGIN",
-    "source_weight_outline_shadow": "REWORKED_NATIVE_BLACK_PLUS_1PX_WEIGHT_PENDING_CONTROLLER",
+    "source_weight_outline_shadow": "PASS_NATIVE_BLACK_PLUS_1PX_WEIGHT_SOURCE_PROFILE",
     "clipping": "PASS_15_OF_15_POSITIVE_MARGIN",
     "protected_clearance": "PASS_ZERO_PROTECTED_CHANGE",
-    "flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
-    "immediate_readability": "PENDING_CONTROLLER"
+    "flip_y_raw": "PASS_CONTROLLER_VISUAL_BOTH",
+    "immediate_readability": "PASS_CONTROLLER_VISUAL_PROPORTION_REPAIRED"
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_A51_CLEAN_A155_READABLE_AND_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A155_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
-  "no_vr_ffb_dx11_dxvk_work": true
+  "status": "A155_PROPORTION_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "no_vr_ffb_dx11_dxvk_work": true,
+  "controller_qa": "localization/graphics/role_A/20261007-A-MANUALQA155-4EDA9DE3/A155_CONTROLLER_SELF_QA.json"
 }
