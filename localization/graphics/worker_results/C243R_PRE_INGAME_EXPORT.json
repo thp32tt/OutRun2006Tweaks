@@ -1,0 +1,14 @@
+{
+  "run": "20261007-C243R-C1-Q051-FF2462BB-EXPORT",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 51,
+  "candidate_sha256": "b1c91a8c0050f0f31523afc055185288f2756e4da02014c9597b69cff25fc129",
+  "english_source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "jpg": "004_q051_FF2462BB.jpg",
+  "manifest_count": 14,
+  "mandatory_c3_blocked_count": 10,
+  "status": "PRE_INGAME_EXPORT_REFRESH_PASS",
+  "runtime_validation": "UNTESTED"
+}
