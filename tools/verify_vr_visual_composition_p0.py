@@ -11,7 +11,6 @@ def require(token, source, meaning):
         raise SystemExit(f'P0 visual composition drift: {meaning}: missing {token!r}')
 
 ui = read('src/hooks_uiscaling.cpp')
-textures = read('src/hooks_textures.cpp')
 hud = read('src/vr/hud_semantics.hpp')
 sem = read('src/vr/game/render_semantics.hpp')
 r30 = read('src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp')
@@ -40,12 +39,24 @@ for token in [
 ]:
     require(token, hud, 'semantic baseline family')
 
-# Fixed-function sprite producers must consume the same canonical semantic map.
-require('ClassifyVrSpriteProducer', textures, 'common sprite producer semantic classifier')
-require('TagAppendedVrSemanticNodes', textures, 'common sprite producer node tagging')
-require('OutRunVRHudSemantics::ClassifyCaller', textures, 'canonical HUD semantic map consumption')
-require('RenderScope::ScreenHud', textures, 'fixed-function screen HUD mapping')
-require('RenderScope::WorldBillboard', textures, 'fixed-function world billboard mapping')
+# Canonical disassembly proves 38 direct put_clip_sprite SCREEN_HUD calls.
+# Keep those call sites exact and avoid a hot-path runtime stack walk.
+for token in [
+    '0xB9096','0xB90B3',
+    '0xB9F3A','0xB9F5E','0xB9F81','0xB9FD0',
+    '0xB9FFC','0xBA01E','0xBA035','0xBA052',
+    '0xBD32E','0xBD397','0xBD414','0xBD472',
+    '0xBDB0E','0xBDB2D','0xBDB4C','0xBDB8E',
+    '0xBE311','0xBE343','0xBE3E3','0xBE424','0xBE45D',
+    '0xBE5CD','0xBE603','0xBE633','0xBE66D','0xBE690',
+    '0xBE6B5','0xBE6D5','0xBE7E8','0xBE802','0xBE81C',
+    '0xBE8D8','0xBE915','0xBE94A','0xBE97A','0xBE9A3',
+]:
+    require(token, ui, 'canonical SCREEN_HUD put_clip_sprite call site')
+require('ExactScreenHudRight_ClipSpriteCalls', ui, 'right-side SCREEN_HUD producer set')
+require('ExactScreenHudLeft_ClipSpriteCalls', ui, 'left-side SCREEN_HUD producer set')
+require('ExactScreenHudRight_putClipSprite', ui, 'right-side exact producer wrapper')
+require('ExactScreenHudLeft_putClipSprite', ui, 'left-side exact producer wrapper')
 
 # 00519 observed projected semantic ownership but zero build attempts: XYZRHW needs an exact route.
 require('projectedWorldMarker', r30, 'fixed-function projected marker state')
