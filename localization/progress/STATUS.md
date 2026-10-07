@@ -2230,3 +2230,8 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - Exporter 37555515782 SUCCESS; worker 1abf93385fd653b18d64423a65cc6aa689284ef3; current C-pass set 25 rows.
 - q163 59A79158 is #018 with source 7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d and A154 candidate 201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6; FLIP-Y and RAW card rechecked.
 - User JPG review and in-game validation pending. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-07 10:27 KST — C229 q159 4EDA9DE3
+- A155 47f64c6733774d713b34dd4424fe87a50a55f17ee70cfdb0df5b63d1c797e461 fresh C machine PASS: 15/15 bbox/size/positive-margin + source-height hierarchy; outside/alpha/residue/overlap/touch gates zero; exact BGRA header/raw mirror_y PASS.
+- Controller visual PASS: prior forced horizontal stretching is removed; native Hangul proportions/readability and source dark-teal upright family are preserved with no English residue, broken glyph, clipping or intrusion.
+- Decision C229_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export/user review + actual-game validation pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.

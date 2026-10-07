@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Fresh independent C should include B227 q222 DDF0392A 601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f, plus remaining materially changed producer candidates such as A153 q175, A152R q195, B226 q226, and A155 q159. q222 requires regenerated English-original PRE_INGAME JPG/user review after C and actual in-game validation. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "Fresh independent C should continue with remaining materially reworked producer candidates, prioritizing B227 q222 DDF0392A and then A153 q175, A152R q195, B226 q226 and other pending fresh-C outputs. q159 4EDA9DE3 passed C229 and now requires refreshed PRE_INGAME English-original comparison/user review plus actual in-game validation. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -414,14 +414,14 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C228",
-      "report": "localization/graphics/role_C/20261007-C228-59A79158-A154/C228_59A79158_CONTROLLER_FINAL_QA.json",
-      "result": "C228_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+      "run": "C229",
+      "report": "localization/graphics/role_C/20261007-C229-4EDA9DE3-A155/C229_4EDA9DE3_CONTROLLER_FINAL_QA.json",
+      "result": "C229_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
       "candidate_changed_by_C": false,
       "assets_checked": 1,
-      "physical_elements_checked": 24,
+      "physical_elements_checked": 15,
       "pixel_visual_pass_assets": [
-        "59A79158"
+        "4EDA9DE3"
       ],
       "rework_required_assets": [],
       "in_game_validation": "UNTESTED; PRE_INGAME user JPG review and actual-game validation pending."
@@ -2753,6 +2753,24 @@
       "pre_ingame_review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/018_q163_59A79158.jpg",
       "pre_ingame_manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
       "pre_ingame_user_review": "PENDING_USER_REVIEW"
+    },
+    "c229_4eda9de3": {
+      "timestamp_kst": "2026-10-07T10:27:03+09:00",
+      "queue_index": 159,
+      "asset": "4EDA9DE3",
+      "source_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "prior_candidate_sha256": "8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5",
+      "candidate_sha256": "47f64c6733774d713b34dd4424fe87a50a55f17ee70cfdb0df5b63d1c797e461",
+      "producer_run": "A155",
+      "machine_status": "PASS",
+      "bbox_size_positive_margin": "15/15 PASS",
+      "zero_pixel_gates": "changed/alpha outside exact source bboxes=0; exact-source residue outside localized bboxes=0; overlap/touch=0; exact header/raw mirror_y",
+      "controller_visual_qa": "PASS_NATIVE_ASPECT_STAGE_LABEL_PROPORTION_REWORK",
+      "decision": "C229_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+      "machine_report": "localization/graphics/role_C/20261007-C229-4EDA9DE3-A155/C229_4EDA9DE3_MACHINE_QA.json",
+      "controller_report": "localization/graphics/role_C/20261007-C229-4EDA9DE3-A155/C229_4EDA9DE3_CONTROLLER_FINAL_QA.json",
+      "pre_ingame_comparison_refresh": "PENDING_C229_EXPORT",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
@@ -3657,10 +3675,12 @@
     "candidate_sha256": "47f64c6733774d713b34dd4424fe87a50a55f17ee70cfdb0df5b63d1c797e461",
     "rework": "15 canonical stage names: forced ~92% English-width stretching removed; native source-height-driven Black render with 1px weight and left anchoring",
     "qa": "15/15 bbox/size/positive-margin; outside/alpha/residue/overlap/touch=0; exact BGRA header/raw mirror_y; SOURCE/A51/CLEAN/A155 + RAW controller PASS",
-    "producer_status": "A155_PROPORTION_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
-    "fresh_independent_c": "PENDING",
+    "producer_status": "C229_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "C229_PASS",
     "runtime_validation": "UNTESTED",
-    "no_vr_ffb_dx11_dxvk_work": true
+    "no_vr_ffb_dx11_dxvk_work": true,
+    "pre_ingame_comparison_refresh": "PENDING_C229_EXPORT",
+    "c_pass_report": "localization/graphics/role_C/20261007-C229-4EDA9DE3-A155/C229_4EDA9DE3_CONTROLLER_FINAL_QA.json"
   },
   "b227_q222_manual_visual_rework": {
     "status": "B227_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
@@ -3673,6 +3693,24 @@
     "source_height_hierarchy": "52/44/58 source -> 44/36/52 decoded Korean; native font 42/36/50",
     "machine_qa": "PASS",
     "controller_visual_qa": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "c229_4eda9de3": {
+    "timestamp_kst": "2026-10-07T10:27:03+09:00",
+    "queue_index": 159,
+    "asset": "4EDA9DE3",
+    "source_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+    "prior_candidate_sha256": "8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5",
+    "candidate_sha256": "47f64c6733774d713b34dd4424fe87a50a55f17ee70cfdb0df5b63d1c797e461",
+    "producer_run": "A155",
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "15/15 PASS",
+    "zero_pixel_gates": "changed/alpha outside exact source bboxes=0; exact-source residue outside localized bboxes=0; overlap/touch=0; exact header/raw mirror_y",
+    "controller_visual_qa": "PASS_NATIVE_ASPECT_STAGE_LABEL_PROPORTION_REWORK",
+    "decision": "C229_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+    "machine_report": "localization/graphics/role_C/20261007-C229-4EDA9DE3-A155/C229_4EDA9DE3_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261007-C229-4EDA9DE3-A155/C229_4EDA9DE3_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_comparison_refresh": "PENDING_C229_EXPORT",
     "runtime_validation": "UNTESTED"
   }
 }

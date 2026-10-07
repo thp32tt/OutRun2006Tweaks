@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261007-C229-4EDA9DE3-A155",
+  "qa_id": "C229",
+  "timestamp_kst": "2026-10-07T10:27:03+09:00",
+  "queue_index": 159,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+  "producer_run": "A155",
+  "source_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+  "prior_candidate_sha256": "8c9ba9886d993b30cc304d658fea0f180ca715dbe4ae31c181e7cd66c11c9fd5",
+  "candidate_sha256": "47f64c6733774d713b34dd4424fe87a50a55f17ee70cfdb0df5b63d1c797e461",
+  "machine_status": "PASS",
+  "machine_report": "localization/graphics/role_C/20261007-C229-4EDA9DE3-A155/C229_4EDA9DE3_MACHINE_QA.json",
+  "machine_summary": {
+    "bbox_size_positive_margin": "15/15 PASS",
+    "height_hierarchy": "15/15 PASS >= 0.87 source height",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_pixels_outside_exact_source_bboxes": 0,
+    "source_exact_residue_outside_localized_bbox_total": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "header_128_exact": true,
+    "raw_readable_parity": "PASS",
+    "canonical_stage_name_mapping": "15/15 PASS"
+  },
+  "controller_visual_review": {
+    "evidence": [
+      "localization/graphics/role_C/20261007-C229-4EDA9DE3-A155/C229_SOURCE_OLD_FINAL_READABLE.jpg",
+      "localization/graphics/role_C/20261007-C229-4EDA9DE3-A155/C229_ROW_CONTACT.jpg",
+      "localization/graphics/role_C/20261007-C229-4EDA9DE3-A155/C229_SOURCE_OLD_FINAL_RAW.jpg"
+    ],
+    "old_stretch_defect": "CONFIRMED_C195_OLD_FORCED_WIDTH_VISIBLE",
+    "plate_source_residue": "PASS_NO_VISIBLE_ENGLISH_RESIDUE_OR_DIRTY_PATCH",
+    "slant_perspective": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "proportion_style": "PASS_A155_NATIVE_HANGUL_ASPECT_REMOVES_FORCED_HORIZONTAL_STRETCH",
+    "scale_hierarchy": "PASS_HEIGHT_56_60_VS_SOURCE_60_64_AND_READABLE",
+    "weight_effects": "PASS_DARK_TEAL_SOURCE_FAMILY_WITHOUT_EXCESS",
+    "hangul_integrity_clipping": "PASS_NO_BROKEN_OR_CLIPPED_GLYPHS",
+    "protected_intrusion_overlap": "PASS_ZERO_VISIBLE_INTRUSION_OR_COLLISION",
+    "flip_y_readable": "PASS",
+    "raw_mirror_y": "PASS",
+    "overall": "PASS"
+  },
+  "decision": "C229_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+  "candidate_changed_by_C": false,
+  "pre_ingame_comparison_refresh": "PENDING_C229_EXPORT",
+  "pre_ingame_user_review": "PENDING_REFRESH",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
