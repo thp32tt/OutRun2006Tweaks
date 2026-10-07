@@ -2208,3 +2208,9 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - A154 candidate `201044a91730...`: all 24 canonical stage names rerendered directly at native resolution with Noto CJK Bold fs42 + 1px weight + source dark-gray fill + 0.92 condensed geometry; no low-resolution bitmap upscale.
 - 24/24 bbox/size/positive-margin and 24/24 width-improvement PASS; clean/final validators PASS; outside/alpha/protected/residue/render-outside/overlap/touch=0; exact BGRA header/raw mirror_y; controller 24-row+RAW visual QA PASS.
 - Fresh C + refreshed English-original comparison/user review + actual in-game validation required. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
+### B226 q226 E3F4BA07 hierarchy rework — 2026-10-07 09:50 KST
+- q226: C143 1042102e5f29... -> B226 5449edb846d6....
+- GOAL A-E 102/108/106/107/107px -> 150/154/152/153/154px; 15코스 연속 293px -> 450px. STAGE/standalone GOAL/OUTRUN2/OUTRUN2SP preserved.
+- 6/6 bbox/size/positive-margin; outside/alpha/protected/overlap=0; exact BGRA header/raw mirror_y plus clean/final validators PASS. Controller readable/3x-row/RAW visual QA PASS.
+- Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.

@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B226",
+  "timestamp_kst": "2026-10-07 09:50 KST",
+  "queue_index": 226,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+  "trigger": "NEWER_8_STEP_PRE_INGAME_VISUAL_FALSE_NEGATIVE",
+  "prior_c_pass": "C143_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+  "prior_candidate_sha256": "1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c",
+  "candidate_sha256": "5449edb846d6ca3a5de1ab1f817a41feb776e9af3bdda2175967312369e5e374",
+  "worker_run": {
+    "workflow_run_id": 37553726156,
+    "worker_commit": "27815f283c9fc628eb077702c23d1aa0748ee310",
+    "result": "SUCCESS"
+  },
+  "evidence": {
+    "readable": "localization/graphics/role_B/20261007-B-MANUALQA226-E3F4BA07/B226_E3F4_SOURCE_C143_NEW_READABLE.jpg",
+    "row_contact": "localization/graphics/role_B/20261007-B-MANUALQA226-E3F4BA07/B226_E3F4_ROW_CONTACT_3X.jpg",
+    "raw": "localization/graphics/role_B/20261007-B-MANUALQA226-E3F4BA07/B226_E3F4_SOURCE_NEW_RAW.jpg",
+    "clean_validation": "localization/graphics/role_B/20261007-B-MANUALQA226-E3F4BA07/B226_CLEAN_VALIDATION.json",
+    "final_validation": "localization/graphics/role_B/20261007-B-MANUALQA226-E3F4BA07/B226_FINAL_VALIDATION.json"
+  },
+  "machine_qa": {
+    "bbox_source_size_positive_margin": "6/6 PASS",
+    "candidate_changes_outside_selected_source_bboxes": 0,
+    "alpha_changes_outside_selected_source_bboxes": 0,
+    "protected_outrun_changed": 0,
+    "localized_overlap_pixels": 0,
+    "header_128_exact": true,
+    "raw_mode": "BGRA",
+    "raw_orientation": "mirror_y",
+    "roundtrip": "PASS"
+  },
+  "rows": [
+    {
+      "key": "goal_e",
+      "source": "GOAL E",
+      "korean": "골 E",
+      "source_size": [
+        253,
+        64
+      ],
+      "prior_size": [
+        102,
+        56
+      ],
+      "final_size": [
+        150,
+        56
+      ],
+      "margins": [
+        2,
+        101,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.5929
+    },
+    {
+      "key": "goal_d",
+      "source": "GOAL D",
+      "korean": "골 D",
+      "source_size": [
+        252,
+        64
+      ],
+      "prior_size": [
+        108,
+        56
+      ],
+      "final_size": [
+        154,
+        56
+      ],
+      "margins": [
+        2,
+        96,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.6111
+    },
+    {
+      "key": "goal_c",
+      "source": "GOAL C",
+      "korean": "골 C",
+      "source_size": [
+        251,
+        64
+      ],
+      "prior_size": [
+        106,
+        56
+      ],
+      "final_size": [
+        152,
+        56
+      ],
+      "margins": [
+        2,
+        97,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.6056
+    },
+    {
+      "key": "goal_b",
+      "source": "GOAL B",
+      "korean": "골 B",
+      "source_size": [
+        253,
+        64
+      ],
+      "prior_size": [
+        107,
+        56
+      ],
+      "final_size": [
+        153,
+        56
+      ],
+      "margins": [
+        2,
+        98,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.6047
+    },
+    {
+      "key": "goal_a",
+      "source": "GOAL A",
+      "korean": "골 A",
+      "source_size": [
+        256,
+        64
+      ],
+      "prior_size": [
+        107,
+        56
+      ],
+      "final_size": [
+        154,
+        56
+      ],
+      "margins": [
+        2,
+        100,
+        4,
+        4
+      ],
+      "width_source_ratio": 0.6016
+    },
+    {
+      "key": "15_stage",
+      "source": "15 STAGE CONTINUOUS",
+      "korean": "15코스 연속",
+      "source_size": [
+        824,
+        64
+      ],
+      "prior_size": [
+        293,
+        59
+      ],
+      "final_size": [
+        450,
+        59
+      ],
+      "margins": [
+        2,
+        372,
+        2,
+        3
+      ],
+      "width_source_ratio": 0.5461
+    }
+  ],
+  "controller_visual_qa": {
+    "result": "PASS",
+    "observations": [
+      "PRE_INGAME #024 showed a source-hierarchy false negative that numeric containment did not catch: GOAL A-E occupied only 102-108px inside 251-256px source envelopes, and 15코스 연속 occupied 293px inside the 824px 15 STAGE CONTINUOUS envelope.",
+      "B226 preserves the already-strong 스테이지 row, standalone 골 row and protected OUTRUN2/OUTRUN2SP bytes. Only GOAL A-E and 15 STAGE CONTINUOUS are rebuilt from fresh native Noto Sans CJK KR Bold at the existing 58px gray-blue source-family height/weight and source-left anchors.",
+      "Final GOAL A-E widths 150-154px restore a moderate ~59-61% source-relative hierarchy without visibly distorting the Hangul/Latin skeleton; 15코스 연속 grows to 450px (~55%) and remains substantially below its exact source ceiling.",
+      "SOURCE/C143/B226 readable, 3x row-contact and SOURCE/B226 RAW mirror-Y evidence show no English residue, clipping, broken Hangul, overlap, protected OutRun change, seam/halo, wrong orientation or visually excessive stretch."
+    ]
+  },
+  "ordered_generation_gate": {
+    "english_removal_plate_restoration": "PASS",
+    "source_matching_slant_direction": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "no_unnecessary_undersizing": "PASS",
+    "source_faithful_weight_outline_shadow": "PASS",
+    "no_clipped_pixels": "PASS",
+    "protected_graphics_clearance": "PASS",
+    "flip_y_and_raw": "PASS",
+    "immediate_readability_vs_english": "PASS"
+  },
+  "decision": "B226_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
