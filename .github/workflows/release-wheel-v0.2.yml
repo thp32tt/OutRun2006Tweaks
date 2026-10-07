@@ -76,3 +76,22 @@ jobs:
             --title 'OutRun2006Tweaks Wheel FFB v0.2' `
             --notes-file RELEASE_NOTES_v0.2.md `
             --latest
+
+
+  sync-release-notes:
+    if: "${{ github.event.head_commit.message == 'docs: update v0.2 release notes' }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release notes
+        uses: actions/checkout@v7.0.1
+
+      - name: Update GitHub release v0.2 notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release edit v0.2 \
+            --repo "$GITHUB_REPOSITORY" \
+            --title 'OutRun2006Tweaks Wheel FFB v0.2' \
+            --notes-file RELEASE_NOTES_v0.2.md \
+            --prerelease=false \
+            --latest
