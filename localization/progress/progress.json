@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "TEMP_BACKLOG_RELIEF C1: continue remaining odd fresh/pending C, prioritizing P0 user/in-game regression candidates before generic pending-C/C3. q95 37759842 completed C232 fresh C + exact-SHA C3; PRE_INGAME refresh/user JPG review and NEW actual in-game retest remain pending. Do not steal even C2 shard.",
+  "next_checkpoint": "TEMP_BACKLOG_RELIEF C1: continue remaining odd fresh/pending C, prioritizing P0 user/in-game regression candidates. q95 C232 fresh C + exact-SHA C3 + PRE_INGAME #002 export are complete; only user JPG review and NEW actual in-game retest remain. Do not steal even C2 shard.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -2826,8 +2826,8 @@
       "controller_visual_qa": "PASS_RIGHT_LEAN_SOURCE_FAMILY_PRACTICAL_SCALE_RAW",
       "c3_strict_status": "C3_STRICT_PASS",
       "decision": "C232_C3_STRICT_PASS_STATIC_PENDING_PRE_INGAME_USER_JPG_AND_NEW_INGAME_RETEST",
-      "pre_ingame_export_refresh": "PENDING_C232_EXPORT",
-      "user_jpg_review": "PENDING_REFRESH",
+      "pre_ingame_export_refresh": "PASS_002_q095_37759842.jpg",
+      "user_jpg_review": "PENDING",
       "new_actual_ingame_retest": "PENDING",
       "runtime_validation": "UNTESTED"
     }
@@ -4214,8 +4214,8 @@
     "controller_visual_qa": "PASS_RIGHT_LEAN_SOURCE_FAMILY_PRACTICAL_SCALE_RAW",
     "c3_strict_status": "C3_STRICT_PASS",
     "decision": "C232_C3_STRICT_PASS_STATIC_PENDING_PRE_INGAME_USER_JPG_AND_NEW_INGAME_RETEST",
-    "pre_ingame_export_refresh": "PENDING_C232_EXPORT",
-    "user_jpg_review": "PENDING_REFRESH",
+    "pre_ingame_export_refresh": "PASS_002_q095_37759842.jpg",
+    "user_jpg_review": "PENDING",
     "new_actual_ingame_retest": "PENDING",
     "runtime_validation": "UNTESTED"
   }
