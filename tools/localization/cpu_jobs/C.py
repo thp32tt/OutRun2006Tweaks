@@ -93,6 +93,7 @@ for a in ASSETS:
     clean_outside,clean_orientation,clean=min(scored,key=lambda x:x[0])
     k=np.asarray(clean)
     row_reports=[]; localized_masks=[]
+    for i,b in enumerate(a["rows"]):
         x0,y0,x1,y1=b
         diff=np.any(ca!=k,axis=2)&mask_rect((H,W),b)
         lbox=bbox(diff); localized_masks.append(diff)
