@@ -1,0 +1,9 @@
+{
+  "run": "A163",
+  "queue_index": 51,
+  "asset": "FF2462BB",
+  "candidate_sha256": "16ed98f52c2505cf32304eb2b61aa15491de87e78e9b11812c7add3c6fa3b112",
+  "worker_status": "STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL",
+  "report": "localization/graphics/role_A/20261007-A163-Q051-FF2462BB-C239-REWORK/A163_FF2462BB_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}

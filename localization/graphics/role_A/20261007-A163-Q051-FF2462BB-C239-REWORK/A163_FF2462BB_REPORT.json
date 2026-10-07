@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "A163",
+  "queue_index": 51,
+  "priority": "P0",
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "trigger": "C239_REWORK_REQUIRED_SOURCE_TARGET_MISMATCH_DUPLICATED_GIRLFRIEND",
+  "user_regression": "PJR-014-20261006 BOTTOM_OUTLINE_CLIPPED|GLYPH_EFFECT_CLIPPING",
+  "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "rejected_candidate_sha256": "3a046a8b695ee6b0a766fca223455616a45a9480b72e28b0c39ddf42821d0b6d",
+  "pre_a144_candidate": {
+    "commit": "5bd0324d1acb9ce8f9465bb4de282a28a7334e06",
+    "sha256": "4fff8c59a44a1b7d03cee192124915f87eb73b3988c7673feb3228785ce67726"
+  },
+  "candidate_sha256": "16ed98f52c2505cf32304eb2b61aa15491de87e78e9b11812c7add3c6fa3b112",
+  "mapping_correction": {
+    "historical_raw_source_box": [
+      3002,
+      482,
+      3512,
+      643
+    ],
+    "wrong_a144_readable_box": [
+      3002,
+      482,
+      3512,
+      643
+    ],
+    "correct_readable_box": [
+      3002,
+      1405,
+      3512,
+      1566
+    ],
+    "proof": "correct_readable_y = H - raw_y; C239 showed A144 had treated RAW y as readable y"
+  },
+  "repair": {
+    "restore_wrong_insertion": "PASS_EXACT_PRE_A144_BYTES",
+    "correct_target": "lower/right Don't lose your girlfriend! source footprint only",
+    "top_line": {
+      "text": "여자친구를",
+      "source_box": [
+        3002,
+        1405,
+        3512,
+        1486
+      ],
+      "localized_bbox": [
+        3117,
+        1414,
+        3397,
+        1476
+      ],
+      "margins_lrtb": [
+        115,
+        115,
+        9,
+        10
+      ]
+    },
+    "bottom_line": {
+      "text": "놓치지 마세요!",
+      "source_box": [
+        3002,
+        1486,
+        3512,
+        1566
+      ],
+      "localized_bbox": [
+        3068,
+        1494,
+        3445,
+        1557
+      ],
+      "margins_lrtb": [
+        66,
+        67,
+        8,
+        9
+      ]
+    },
+    "glyph_source": "A144 fresh unclipped Korean glyph/effect pixels reused losslessly; location corrected"
+  },
+  "machine_qa": {
+    "current_to_final_changed_pixels_outside_declared_union": 0,
+    "pre_a144_to_final_changed_pixels_outside_correct_target": 0,
+    "wrong_insertion_exactly_restored": true,
+    "header_128_exact": true,
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "mips": 1,
+    "rawmode": "RGBA",
+    "persisted_decode_exact": true,
+    "source_size_ceiling": "PASS_2_OF_2",
+    "positive_margin": "PASS_2_OF_2_MIN_8PX"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_TRANSPARENT_SOURCE_CELL_CLEARED_ONLY_AT_TRUE_TARGET_AND_WRONG_A144_INSERTION_RESTORED",
+    "2_slant_direction": "PASS_REUSED_A144_SOURCE_FAMILY_GLYPH_PIXELS",
+    "3_no_unnecessary_undersizing": "PASS_SOURCE_RELATIVE_TWO_LINE_SCALE_WITH_POSITIVE_MARGINS",
+    "4_weight_outline_shadow": "PASS_A144_YELLOW_NAVY_SOURCE_FAMILY_REUSED",
+    "5_clipping": "PASS_MIN_8PX_LINE_EFFECT_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_CHANGE_OUTSIDE_DECLARED_RESTORE_PLUS_TARGET_UNION",
+    "7_flip_y_raw": "PASS_EXACT_RAW_SOURCE_CELL_MAPPING_AND_EVIDENCE",
+    "8_readability": "PENDING_CONTROLLER_VISUAL_CONFIRMATION"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3": "REQUIRED_EXACT_SHA",
+  "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
