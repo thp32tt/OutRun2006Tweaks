@@ -97,7 +97,10 @@ for idx,en,ko,(x0,y0,x1,y1) in rowspec:
     if bg_count/total < 0.55:
         raise RuntimeError(("source row background is not sufficiently flat for independent text extraction",idx,bg.tolist(),bg_count,total))
 
-    smask=np.any(sr!=bg,axis=2)
+    # These help rows are transparent sprite text. Use alpha against the modal
+    # background alpha so hidden RGB under transparent pixels cannot pollute the bbox.
+    source_bg_alpha=int(bg[3])
+    smask=sr[:,:,3] != source_bg_alpha
     sb0=bbox(smask)
     if not sb0:
         raise RuntimeError(("missing source text mask",idx))
@@ -109,9 +112,13 @@ for idx,en,ko,(x0,y0,x1,y1) in rowspec:
     # not against the whole-row source color and not from producer masks.
     patch=fa[sb[1]:sb[3],sb[0]:sb[2]]
     pbg,pbg_count,ptotal=modal_rgba(patch)
-    if pbg_count/ptotal < 0.45:
-        raise RuntimeError(("final restored source bbox lacks a dominant plate color",idx,pbg.tolist(),pbg_count,ptotal))
-    fpatch=np.any(patch!=pbg,axis=2)
+    avals,acounts=np.unique(patch[:,:,3],return_counts=True)
+    ai=int(np.argmax(acounts))
+    final_bg_alpha=int(avals[ai])
+    final_bg_alpha_count=int(acounts[ai])
+    if final_bg_alpha_count/ptotal < 0.45:
+        raise RuntimeError(("final source bbox lacks dominant background alpha",idx,final_bg_alpha,final_bg_alpha_count,ptotal))
+    fpatch=patch[:,:,3] != final_bg_alpha
     fb0=bbox(fpatch)
     if not fb0:
         raise RuntimeError(("missing localized text mask",idx))
@@ -140,7 +147,10 @@ for idx,en,ko,(x0,y0,x1,y1) in rowspec:
     checks.append({
       "region_idx":idx,"source":en,"korean":ko,"cell":[x0,y0,x1,y1],
       "source_background_rgba":[int(v) for v in bg],"source_background_mode_fraction":round(bg_count/total,6),
-      "final_source_bbox_plate_rgba":[int(v) for v in pbg],"final_source_bbox_plate_mode_fraction":round(pbg_count/ptotal,6),
+      "source_background_alpha":source_bg_alpha,
+      "final_source_bbox_plate_rgba_mode":[int(v) for v in pbg],
+      "final_background_alpha":final_bg_alpha,
+      "final_background_alpha_mode_fraction":round(final_bg_alpha_count/ptotal,6),
       "source_bbox":sb,"localized_bbox":fb,
       "source_size":[sw,sh],"localized_size":[fw,fh],
       "height_ratio":round(fh/sh,4),
