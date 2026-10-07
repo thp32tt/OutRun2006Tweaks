@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "lane": "C1",
+  "run": "20261007-C232-C1-Q095-37759842-A137",
+  "qa_id": "C232",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "timestamp_kst": "2026-10-07T14:10:00+09:00",
+  "queue_index": 95,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "producer_run": "A137",
+  "user_ingame_regressions": [
+    "IGR-014",
+    "IGR-015",
+    "IGR-016"
+  ],
+  "source_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+  "prior_candidate_sha256": "2dac8ee099120f2978eaf8ba992ffff11ecad7c11912a98aca9269a1a78f6988",
+  "candidate_sha256": "ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b",
+  "candidate_changed_by_C": false,
+  "machine_qa": {
+    "report": "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_37759842_MACHINE_QA.json",
+    "status": "PASS",
+    "bbox_size_positive_margin": "16/16 PASS",
+    "visible_changes_outside_16_source_bboxes_vs_C221": 0,
+    "alpha_changes_outside_16_source_bboxes_vs_C221": 0,
+    "protected_visible_pixels_changed_vs_C221": 0,
+    "exact_source_core_residue_pixels": 0,
+    "header_128_exact": true,
+    "mip_count": 1,
+    "post_encode_decode_authority": "PASS"
+  },
+  "controller_visual_review": {
+    "evidence": [
+      "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_SOURCE_CLEAN_OLD_FINAL_FLIPY_12P5.jpg",
+      "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_TRANSFORM_ROWS_SOURCE_CLEAN_OLD_FINAL_2X.jpg",
+      "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_SOURCE_FINAL_PRACTICAL_25PCT.jpg",
+      "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_OLD_FINAL_PRACTICAL_25PCT.jpg",
+      "localization/graphics/role_C/20261007-C232-C1-Q095-37759842-A137/C232_SOURCE_FINAL_RAW_12P5.jpg"
+    ],
+    "source_clean_old_final": "PASS",
+    "clean_plate_source_removal": "PASS_NO_VISIBLE_SOURCE_RESIDUE_OR_DIRTY_PLATE",
+    "transformed_rows": "PASS_16_OF_16_CURRENT_RIGHT_LEAN_MATCHES_SOURCE_DIRECTION",
+    "style_family": "PASS_BLACK_CARD_WHITE_GRAY_AND_BLUE_CARD_ORANGE_NAVY_SOURCE_FAMILIES_PRESERVED",
+    "scale_readability": "PASS_AT_PRACTICAL_25_PERCENT",
+    "glyph_integrity": "PASS_NO_BROKEN_OR_CLIPPED_HANGUL",
+    "protected_art_separation": "PASS_NO_VISIBLE_INTRUSION_COLLISION_OR_UNRELATED_CHANGE",
+    "raw_orientation": "PASS_SOURCE_AND_FINAL_SHARE_RAW_MIRROR_Y_RELATION",
+    "overall": "PASS"
+  },
+  "c3_strict_audit": {
+    "required": true,
+    "exact_candidate_sha256": "ced8da1cbe46732f5f3793f9ddf63060efb6c856bb414b30499e2b39e2fa925b",
+    "status": "C3_STRICT_PASS",
+    "gates": {
+      "slant_perspective": "PASS",
+      "clean_plate_source_removal": "PASS",
+      "font_style_fidelity": "PASS",
+      "scale_readability": "PASS",
+      "glyph_integrity_clipping": "PASS",
+      "protected_separation": "PASS",
+      "placement_hierarchy": "PASS",
+      "flip_y_raw_practical_scale": "PASS"
+    }
+  },
+  "decision": "C232_C3_STRICT_PASS_STATIC_PENDING_PRE_INGAME_USER_JPG_AND_NEW_INGAME_RETEST",
+  "backlog_status": "C_STATIC_PASS_PENDING_INGAME_RETEST",
+  "pre_ingame_export_refresh": "PENDING_C232_EXPORT",
+  "user_jpg_review": "PENDING_REFRESH",
+  "new_actual_ingame_retest": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
