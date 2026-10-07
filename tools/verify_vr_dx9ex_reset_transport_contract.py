@@ -487,7 +487,7 @@ require_order(
     "slot.fence->Issue(D3DISSUE_END)",
     "DirectTransportFrameReadyAfterPresent() is",
     "slot.producerPending = true;",
-    "ActiveDirectTransportSlot = selected;",
+    "R30SupportSetActiveDirectTransportSlot(selected);",
 )
 ack_retire_marker = "The host completed this exact published frame. Retire the"
 ack_retire_pos = resolve_direct_r32.find(ack_retire_marker)
@@ -504,6 +504,10 @@ require_order(
 
 if resolve_direct_r32.count("R30SupportNoteDirectTransportRingBackpressure()") != 1:
     fail("R32 DirectGPU free-slot scan must count whole-ring backpressure once through the R30 owner facade")
+if resolve_direct_r32.count("R30SupportSetActiveDirectTransportSlot(selected)") != 1:
+    fail("R32 DirectGPU publish path must set the active slot exactly once through the R30 owner facade")
+if "ActiveDirectTransportSlot" in resolve_direct_r32:
+    fail("R32 DirectGPU publish path regained raw lower active-slot state")
 if "++DirectTransportRingBackpressure;" in resolve_direct_r32:
     fail("R32 DirectGPU free-slot scan regained raw lower ring-backpressure state")
 

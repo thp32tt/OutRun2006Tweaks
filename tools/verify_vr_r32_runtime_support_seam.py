@@ -47,6 +47,7 @@ required = (
     "R30SupportNoteSafeAckBackpressure",
     "R30SupportNoteDirectTransportRingBackpressure",
     "R30SupportDirectTransportRingBackpressureCount",
+    "R30SupportSetActiveDirectTransportSlot",
     "R30SupportGpuCompletionSnapshot",
     "R30SupportTryGetGpuCompletionSnapshot",
     "R30SupportDirectTransportResourcesReady",
@@ -92,6 +93,7 @@ for regex, label in (
     (r"\bR13OverlayReadyForTransport\(", "R13OverlayReadyForTransport"),
     (r"\bR13NoteSafeAckBackpressure\(", "R13NoteSafeAckBackpressure"),
     (r"(?<!R30Support)\bDirectTransportRingBackpressure\b", "DirectTransportRingBackpressure"),
+    (r"\bActiveDirectTransportSlot\b", "ActiveDirectTransportSlot"),
     (r"\bR13GpuCompletionSnapshot\b", "R13GpuCompletionSnapshot"),
     (r"\bR13TryGetGpuCompletionSnapshot\(", "R13TryGetGpuCompletionSnapshot"),
     (r"\bR13ReleaseAckState\(", "R13ReleaseAckState"),
@@ -137,6 +139,9 @@ delegations = {
     ),
     "R30SupportDirectTransportRingBackpressureCount()": (
         "return static_cast<std::uint64_t>(DirectTransportRingBackpressure);",
+    ),
+    "R30SupportSetActiveDirectTransportSlot(": (
+        "ActiveDirectTransportSlot = slot;",
     ),
     "R30SupportTryGetGpuCompletionSnapshot(": (
         "R13GpuCompletionSnapshot lower{};",
@@ -228,6 +233,10 @@ if "R30SupportNoteDirectTransportRingBackpressure()" not in resolve_direct:
 if "DirectTransportRingBackpressure" in resolve_direct.replace(
         "R30SupportNoteDirectTransportRingBackpressure()", ""):
     errors.append("R32 DirectGPU resolve retained raw lower ring-backpressure state")
+if "R30SupportSetActiveDirectTransportSlot(selected)" not in resolve_direct:
+    errors.append("R32 DirectGPU resolve bypasses R30 active-slot owner facade")
+if "ActiveDirectTransportSlot" in resolve_direct:
+    errors.append("R32 DirectGPU resolve retained raw lower active-slot state")
 if "R30SupportGpuCompletionSnapshot ackSnapshot{};" not in resolve_direct:
     errors.append("R32 DirectGPU resolve missing R30 ACK snapshot value type")
 if "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)" not in resolve_direct:

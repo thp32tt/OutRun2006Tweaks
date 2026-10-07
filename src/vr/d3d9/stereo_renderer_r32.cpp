@@ -591,7 +591,7 @@ namespace OutRunVRStereo
             slot.pendingFrameId = frameId;
             slot.frameId = frameId;
             slot.published = false;
-            ActiveDirectTransportSlot = selected;
+            R30SupportSetActiveDirectTransportSlot(selected);
             return true;
         }
 

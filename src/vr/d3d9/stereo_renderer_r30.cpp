@@ -3331,6 +3331,11 @@ namespace OutRunVRStereo
         return static_cast<std::uint64_t>(DirectTransportRingBackpressure);
     }
 
+    void R30SupportSetActiveDirectTransportSlot(std::uint32_t slot) noexcept
+    {
+        ActiveDirectTransportSlot = slot;
+    }
+
     bool R30SupportTryGetGpuCompletionSnapshot(
         R30SupportGpuCompletionSnapshot& out) noexcept
     {

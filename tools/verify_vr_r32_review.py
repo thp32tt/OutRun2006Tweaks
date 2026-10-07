@@ -109,7 +109,7 @@ for required in (
         "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
         "DirectTransportFrameReadyAfterPresent() is",
         "slot.producerPending = true;",
-        "ActiveDirectTransportSlot = selected;"):
+        "R30SupportSetActiveDirectTransportSlot(selected);"):
     if required not in r32:
         raise SystemExit(f"R32 DirectGPU owner helper contract missing: {required}")
 resolve_start = r32.find("bool R32ResolveDirectTransport(")

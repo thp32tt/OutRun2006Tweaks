@@ -828,7 +828,7 @@ for marker in (
     "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
     "DirectTransportFrameReadyAfterPresent() is",
     "slot.producerPending = true;",
-    "ActiveDirectTransportSlot = selected;",
+    "R30SupportSetActiveDirectTransportSlot(selected);",
 ):
     if marker not in r32:
         errors.append(f"R32 missing hook-free DirectGPU owner contract: {marker}")
