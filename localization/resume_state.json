@@ -4143,7 +4143,7 @@
     "report": "localization/graphics/role_C/20261005-C179-560FA536/C179_560FA536_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   },
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20261007-C251-C2-BATCH-Q060-Q054-Q212/C251_CONTROLLER_FINAL_QA.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20261008-C256-C2-BATCH-Q060-Q212-Q052/C256_CONTROLLER_FINAL_QA.json",
   "a_production45_37759842_rework": {
     "run": "20261005-A-PRODUCTION45",
     "index": 95,
@@ -6743,7 +6743,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08 00:31",
+  "updated_at_kst": "2026-10-08T00:37:20+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -9385,5 +9385,49 @@
     ],
     "runtime_validation": "UNTESTED",
     "next": "Win32 Release + Korean test build, then new in-game screenshot"
+  },
+  "c256_c2_batch_q060_q212_q052": {
+    "run": "20261008-C256-C2-BATCH-Q060-Q212-Q052",
+    "timestamp_kst": "2026-10-08T00:37:20+09:00",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C2",
+    "SHARD": "EVEN",
+    "selection_refresh_head": "eae3a50c4da4cf03ee42c53e9f389bfa82caf90e",
+    "execution_backend": "GitHub source-of-truth; ChatGPT-local binary materialization unavailable due GitHub DNS; N100 MCP fallback used only for exact persisted DDS download/decode/diff and visual evidence; no C256 GitHub Actions dispatch.",
+    "assets": {
+      "q60": {
+        "asset": "A064FDFC",
+        "candidate_sha256": "457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+        "prior_sha256": "2d3d7fd7b612cee048067813f150d323be30483042010786168a90fa983386b6",
+        "fresh_c": "PASS",
+        "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_HEADER",
+        "controller_visual_qa": "PASS_SOURCE_C251_CLEAN_A167_RAW",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "status": "C256_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+      },
+      "q212": {
+        "asset": "BA0147DA",
+        "candidate_sha256": "3266d0740f9fc5b8d1b0771e2313fe3364e485da06bc5ad578f94999082315c4",
+        "prior_sha256": "d1884bd89e8686c323251d5cab903c80410040ade7ced16a69fb8cbef6599a53",
+        "fresh_c": "FAIL_VISUAL_OVERRIDE",
+        "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_HEADER",
+        "controller_visual_qa": "FAIL_SOURCE_TITLE_GLYPH_PROPORTION",
+        "c3": "BLOCKED",
+        "status": "REWORK_REQUIRED"
+      },
+      "q52": {
+        "asset": "A8CE339F",
+        "candidate_sha256": "c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e",
+        "prior_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
+        "fresh_c": "PASS",
+        "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_HEADER",
+        "controller_visual_qa": "PASS_DUPLICATE_START_FAMILY_FLIPY_RAW",
+        "c3": "C3_STRICT_PASS_EXACT_SHA",
+        "status": "C256_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME"
+      }
+    },
+    "pre_ingame_export": "PENDING_REFRESH_Q060_Q052",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

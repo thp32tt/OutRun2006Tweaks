@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "run": "20261008-C256-C2-BATCH-Q060-Q212-Q052",
+  "timestamp_kst": "2026-10-08T00:37:20+09:00",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "base_head": "eae3a50c4da4cf03ee42c53e9f389bfa82caf90e",
+  "queue_blob_sha": "40c68e29e33f00e5278974e71f2570dafa5180d1",
+  "execution_backend": "GitHub source-of-truth; ChatGPT-local binary materialization unavailable due GitHub DNS; N100 MCP fallback used only for exact persisted DDS download/decode/diff and visual evidence; no C256 GitHub Actions dispatch.",
+  "selection_priority": "fresh/new A/B and user-regression revalidation before C3-only work",
+  "assets": {
+    "q60": {
+      "asset": "A064FDFC",
+      "candidate_sha256": "457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+      "prior_sha256": "2d3d7fd7b612cee048067813f150d323be30483042010786168a90fa983386b6",
+      "fresh_c": "PASS",
+      "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "PASS_SOURCE_C251_CLEAN_A167_RAW",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "status": "C256_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME",
+      "decision": "PASS_C3_PENDING_PRE_INGAME_AND_NEW_INGAME"
+    },
+    "q212": {
+      "asset": "BA0147DA",
+      "candidate_sha256": "3266d0740f9fc5b8d1b0771e2313fe3364e485da06bc5ad578f94999082315c4",
+      "prior_sha256": "d1884bd89e8686c323251d5cab903c80410040ade7ced16a69fb8cbef6599a53",
+      "fresh_c": "FAIL_VISUAL_OVERRIDE",
+      "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "FAIL_SOURCE_TITLE_GLYPH_PROPORTION",
+      "c3": "BLOCKED",
+      "status": "REWORK_REQUIRED",
+      "decision": "REWORK_REQUIRED"
+    },
+    "q52": {
+      "asset": "A8CE339F",
+      "candidate_sha256": "c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e",
+      "prior_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
+      "fresh_c": "PASS",
+      "machine_qa": "PASS_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "PASS_DUPLICATE_START_FAMILY_FLIPY_RAW",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "status": "C256_C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_INGAME",
+      "decision": "PASS_C3_PENDING_PRE_INGAME_AND_INGAME"
+    }
+  },
+  "pre_ingame_export": {
+    "q60": "PENDING_REFRESH",
+    "q212": "BLOCKED_REWORK_REQUIRED",
+    "q52": "PENDING_REFRESH"
+  },
+  "actual_ingame_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

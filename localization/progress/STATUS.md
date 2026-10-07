@@ -2597,4 +2597,10 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - QA PASS: outside/alpha outside=0; 137 BC3 blocks; exact header/raw mirror_y/persisted decode; non-target B176 rows exact; controller readable/RAW PASS.
 - q60/q212 skipped after same-cycle A byte changes; no overwrite/repeat.
 - Next: fresh independent C + exact-SHA C3 -> PRE_INGAME/user review -> actual-game validation. `RUNTIME_VALIDATION=UNTESTED`. VR/FFB/DX11/DXVK untouched.
+## 2026-10-08 00:37 KST — C256 C2 q60/q212/q52 fresh C batch
+- `TEMP_BACKLOG_RELIEF=C2`; `SHARD=EVEN`. Per-slot/current-HEAD refresh caught stale q60/q212 queue prose and a newer A170 q212 candidate, so C256 pinned actual persisted bytes and did not repeat C251/A168R results.
+- q60 A064FDFC `457f29f6...`: independent persisted diff PASS, 136,807 changed pixels, changed/alpha outside 3 authoritative source bboxes=0; SOURCE/C251/CLEAN/A167 + RAW visual PASS. Fresh C + exact-SHA C3_STRICT_PASS; PRE_INGAME/user JPG/NEW in-game retest pending.
+- q212 BA0147DA `3266d074...`: independent machine PASS, 164,577 changed pixels, changed/alpha outside both title bboxes=0. Visual FAIL overrides numeric PASS: 1.15 horizontal glyph scaling improves fill but makes Hangul broader/squarer than canonical tall-condensed red glyph proportions. REWORK_REQUIRED; C3 blocked.
+- q52 A8CE339F `c37ce8cc...`: independent DXT5 diff PASS, 1,779 changed pixels wholly inside right Start source bbox; duplicate Start rows now 60x36/60x36, focus/full/RAW visual PASS. Fresh C + exact-SHA C3_STRICT_PASS; PRE_INGAME/user JPG/actual-game pending.
+- Evidence: `localization/graphics/role_C/20261008-C256-C2-BATCH-Q060-Q212-Q052/C256_CONTROLLER_FINAL_QA.json` plus per-asset machine reports. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 

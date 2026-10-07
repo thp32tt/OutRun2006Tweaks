@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "run": "20261008-C256-C2-BATCH-Q060-Q212-Q052",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 60,
+  "asset": "A064FDFC",
+  "current_sha256": "457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+  "prior_sha256": "2d3d7fd7b612cee048067813f150d323be30483042010786168a90fa983386b6",
+  "size": [
+    4096,
+    2048
+  ],
+  "header_128_equal_prior": true,
+  "changed_pixels_total": 136807,
+  "diff_bbox_readable": [
+    462,
+    245,
+    2752,
+    374
+  ],
+  "changed_pixels_outside_allowed": 0,
+  "alpha_changed_outside_allowed": 0,
+  "per_region": [
+    {
+      "key": "stage",
+      "source_bbox": [
+        455,
+        245,
+        690,
+        350
+      ],
+      "diff_bbox": [
+        462,
+        252,
+        682,
+        342
+      ],
+      "changed_pixels": 14835,
+      "localized_size": [
+        216,
+        90
+      ],
+      "source_size": [
+        235,
+        105
+      ]
+    },
+    {
+      "key": "outrun_miles_white",
+      "source_bbox": [
+        1090,
+        245,
+        1930,
+        385
+      ],
+      "diff_bbox": [
+        1096,
+        245,
+        1914,
+        374
+      ],
+      "changed_pixels": 67499,
+      "localized_size": [
+        720,
+        118
+      ],
+      "source_size": [
+        840,
+        140
+      ]
+    },
+    {
+      "key": "outrun_miles_yellow",
+      "source_bbox": [
+        2081,
+        250,
+        2860,
+        370
+      ],
+      "diff_bbox": [
+        2087,
+        259,
+        2752,
+        370
+      ],
+      "changed_pixels": 54473,
+      "localized_size": [
+        665,
+        102
+      ],
+      "source_size": [
+        779,
+        120
+      ]
+    }
+  ],
+  "machine_status": "PASS",
+  "runtime_validation": "UNTESTED"
+}

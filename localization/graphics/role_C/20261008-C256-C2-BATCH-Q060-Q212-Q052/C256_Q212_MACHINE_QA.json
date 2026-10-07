@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "run": "20261008-C256-C2-BATCH-Q060-Q212-Q052",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 212,
+  "asset": "BA0147DA",
+  "current_sha256": "3266d0740f9fc5b8d1b0771e2313fe3364e485da06bc5ad578f94999082315c4",
+  "prior_sha256": "d1884bd89e8686c323251d5cab903c80410040ade7ced16a69fb8cbef6599a53",
+  "size": [
+    2048,
+    2048
+  ],
+  "header_128_equal_prior": true,
+  "changed_pixels_total": 164577,
+  "diff_bbox_readable": [
+    5,
+    969,
+    1557,
+    1470
+  ],
+  "changed_pixels_outside_allowed": 0,
+  "alpha_changed_outside_allowed": 0,
+  "per_region": [
+    {
+      "key": "coast2coast_title",
+      "source_bbox": [
+        0,
+        964,
+        1760,
+        1124
+      ],
+      "diff_bbox": [
+        5,
+        969,
+        1557,
+        1119
+      ],
+      "changed_pixels": 113011,
+      "localized_size": [
+        1552,
+        150
+      ],
+      "source_size": [
+        1760,
+        160
+      ],
+      "width_ratio": 0.8818,
+      "height_ratio": 0.9375
+    },
+    {
+      "key": "heart_attack_title",
+      "source_bbox": [
+        21,
+        1316,
+        1780,
+        1474
+      ],
+      "diff_bbox": [
+        26,
+        1320,
+        894,
+        1470
+      ],
+      "changed_pixels": 51566,
+      "localized_size": [
+        868,
+        150
+      ],
+      "source_size": [
+        1759,
+        158
+      ],
+      "width_ratio": 0.4935,
+      "height_ratio": 0.9494
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "FAIL_SOURCE_TITLE_GLYPH_PROPORTION",
+  "visual_finding": "A170 uses 1.15 horizontal glyph scaling. Phrase fill improves, but individual Hangul remains materially broader/squarer than the canonical tall-condensed red English title glyph family.",
+  "decision": "REWORK_REQUIRED",
+  "c3": "BLOCKED",
+  "runtime_validation": "UNTESTED"
+}

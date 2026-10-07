@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "run": "20261008-C256-C2-BATCH-Q060-Q212-Q052",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 52,
+  "asset": "A8CE339F",
+  "current_sha256": "c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e",
+  "prior_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
+  "size": [
+    2048,
+    1024
+  ],
+  "format": "DXT5",
+  "header_128_equal_prior": true,
+  "changed_pixels_total": 1779,
+  "source_bbox": [
+    801,
+    309,
+    908,
+    350
+  ],
+  "diff_bbox_readable": [
+    804,
+    312,
+    907,
+    348
+  ],
+  "changed_pixels_outside_allowed": 0,
+  "alpha_changed_outside_allowed": 0,
+  "family_gate": {
+    "left_start_size": [
+      60,
+      36
+    ],
+    "right_start_size": [
+      60,
+      36
+    ],
+    "status": "PASS"
+  },
+  "machine_status": "PASS",
+  "runtime_validation": "UNTESTED"
+}
