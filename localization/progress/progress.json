@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 16:07 KST",
+  "updated_at_kst": "2026-10-07 16:50 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4346,18 +4346,25 @@
     "runtime_validation": "UNTESTED"
   },
   "latest_b_manual_visual_rework": {
-    "run": "B233",
-    "queue_index": 100,
-    "asset": "53CE39D5",
-    "before_candidate_sha256": "08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1",
-    "candidate_sha256": "7235731a2add8e947476cd22b971e5b57a7de390ae134609f4254a2f493a557d",
-    "lines_reworked": 18,
-    "method": "pixel-exact accepted raster horizontal reposition to source-left+2",
-    "machine_qa": "18/18 PASS_ZERO_BLAST_HEADER_RAW",
+    "run": "B234R",
+    "queue_index": 97,
+    "asset": "411827E",
+    "work_stolen_from_lane": "A",
+    "before_candidate_sha256": "c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e",
+    "rejected_intermediate_sha256": "badd611286b63356ea3715f0efd5aafd60241d40544a11fda4d4635a8acde9c3",
+    "candidate_sha256": "e28a12a19466792dc1d6e24dcd81c472ae310ab90e1abb9a5f7b64756946f808",
+    "rows": [
+      "seconds",
+      "TUNED",
+      "NORMAL",
+      "RANDOM"
+    ],
+    "visual_right_shear": 0.26,
+    "machine_qa": "4/4 PASS_ZERO_BLAST_HEADER_RAW",
     "controller_visual_qa": "PASS",
-    "status": "B233_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
-    "report": "localization/graphics/role_B/20261007-B233-Q100-53CE39D5-ANCHOR/B233_Q100_REPORT.json",
-    "controller_qa": "localization/graphics/role_B/20261007-B233-Q100-53CE39D5-ANCHOR/B233_CONTROLLER_SELF_QA.json",
+    "status": "B234R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "report": "localization/graphics/role_B/20261007-B234-Q097-411827E-SLANT/B234_411_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261007-B234-Q097-411827E-SLANT/B234_CONTROLLER_SELF_QA.json",
     "runtime_validation": "UNTESTED"
   },
   "c241_c2_q232_ebfc709f": {
@@ -4460,5 +4467,27 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": [],
     "status": "C2Q100_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME"
+  },
+  "b234r_q97_source_slant_rework": {
+    "run": "B234R",
+    "queue_index": 97,
+    "asset": "411827E",
+    "work_stolen_from_lane": "A",
+    "before_candidate_sha256": "c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e",
+    "rejected_intermediate_sha256": "badd611286b63356ea3715f0efd5aafd60241d40544a11fda4d4635a8acde9c3",
+    "candidate_sha256": "e28a12a19466792dc1d6e24dcd81c472ae310ab90e1abb9a5f7b64756946f808",
+    "rows": [
+      "seconds",
+      "TUNED",
+      "NORMAL",
+      "RANDOM"
+    ],
+    "visual_right_shear": 0.26,
+    "machine_qa": "4/4 PASS_ZERO_BLAST_HEADER_RAW",
+    "controller_visual_qa": "PASS",
+    "status": "B234R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "report": "localization/graphics/role_B/20261007-B234-Q097-411827E-SLANT/B234_411_REPORT.json",
+    "controller_qa": "localization/graphics/role_B/20261007-B234-Q097-411827E-SLANT/B234_CONTROLLER_SELF_QA.json",
+    "runtime_validation": "UNTESTED"
   }
 }
