@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B-MANUALQA229-FA7BBB13",
+  "timestamp_kst": "2026-10-07T11:24:45+09:00",
+  "queue_index": 54,
+  "asset": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+  "trigger": "PRE_INGAME #004 current-policy source-transform/slant + Slipstream scale false negative",
+  "source_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+  "before_candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
+  "candidate_sha256": "5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e",
+  "github_hosted_worker_runs": {
+    "rejected_pairwise_collision": 37560975826,
+    "rejected_historical_mask_mismatch": 37561234026,
+    "accepted": 37561543035
+  },
+  "semantic_change": {
+    "source": "Slipstream the cars!",
+    "before_korean": "차량 뒤에서 슬립스트림하세요!",
+    "final_korean": "슬립스트림하세요!",
+    "rationale": "concise imperative preserves established 슬립스트림 terminology while allowing source-relative native height instead of severe long-string compression"
+  },
+  "machine_qa": {
+    "bbox_source_size_positive_margin": "17/17 PASS",
+    "clean_validator": "PASS",
+    "final_validator": "PASS",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "source_residue": 0,
+    "localized_overlap_touch_pairs": 0,
+    "old_candidate_changes_outside_allowed": 0,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "roundtrip": "PASS",
+    "slipstream_before": "596x74 inside 600x103 source footprint",
+    "slipstream_after": "590x99 inside 600x103 source footprint"
+  },
+  "controller_visual_qa": {
+    "source_old_final_overview": "PASS",
+    "raw_mirror_y": "PASS",
+    "readable_slant_direction": "PASS_ALL_17_ROWS_RIGHT_LEAN_MATCHES_SOURCE_FAMILY",
+    "typography_family": "PASS_NATIVE_BOLD_CONDENSED_EFFECT_TREATMENT",
+    "source_effect_family": "PASS_YELLOW_FILL_WHITE_INNER_NAVY_OUTER",
+    "clean_plate": "PASS_VERIFIED_B_RECOVERY01_PLATE",
+    "immediate_readability": "PASS",
+    "slipstream_scale_hierarchy": "PASS_MATERIAL_HEIGHT_RECOVERY_74_TO_99",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "source_residue": "NONE_VISIBLE",
+    "protected_art_intrusion": "NONE_VISIBLE",
+    "orientation_regression": "NONE_VISIBLE",
+    "observations": [
+      "The prior Korean family was visually upright against the consistently right-italic English prompt family; B229 gives all 17 Korean rows the same readable-direction right lean.",
+      "The Slipstream prompt no longer collapses to a thin 74px row. Concise 슬립스트림하세요! reaches 99px decoded height inside the exact 103px source ceiling.",
+      "The two rejected worker attempts failed closed before persistence: first on pairwise collision, second on an obsolete helper-mask gate narrower than the contract's exact source-bbox rule. The accepted run has zero pairwise overlap/touch and zero source-bbox/protected escape."
+    ]
+  },
+  "ordered_generation_gate": {
+    "english_removal_and_plate_restoration": "PASS",
+    "slant_direction": "PASS_SOURCE_MATCHING_RIGHT_LEAN",
+    "text_scale": "PASS_NO_UNNECESSARY_UNDERSIZING",
+    "weight_outline_shadow": "PASS_SOURCE_YELLOW_WHITE_NAVY_FAMILY",
+    "clipping": "PASS",
+    "protected_graphics": "PASS",
+    "flip_y_and_raw": "PASS",
+    "readability_vs_source": "PASS"
+  },
+  "decision": "B229_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
