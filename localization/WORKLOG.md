@@ -3357,3 +3357,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - q205 queue prose still names B240 prior `7598af33...`; latest B240 report names `e3d421a1...`. C262 is fail-closed: persisted DDS SHA must match the latest report before any C approval/state correction.
 - GitHub-hosted C worker run `37677039882` is dispatched from `6c886517...` but remains compute-pending behind active localization worker `37675870154`. Contract forbids duplicating already-dispatched heavy DDS QA on N100; no C PASS/REWORK/C3 result is claimed yet.
 - Dispatch record: `localization/graphics/role_C/20261008-C262-C1-Q205-Q193-Q173/C262_DISPATCH.json`. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
+
+## 2026-10-08 05:03 KST — C263 C2 q104/q112/q116 fresh C + C3
+- `TEMP_BACKLOG_RELIEF=C2`; `SHARD=EVEN`. Per-slot HEAD/queue refresh selected only fresh even B candidates q104/q112/q116; C261 completed work was not repeated and no odd/unindexed C1 asset was processed.
+- Local GitHub DNS materialization failed and hosted C run `37678019755` remained queued behind B run `37675870154`; contract fallback used N100 MCP for exact decode/QA only. GitHub remained SSOT for state/commit.
+- Independent neutral-alpha visible source/current comparison avoids transparent hidden-RGB/BC3 false positives: all 3 have visible changes outside exact source union=0 and alpha outside=0, exact candidate/source SHA and DDS header parity PASS.
+- q104 `62BEBF33` @ `c84a2703...`: [574,56,1174,197] in source [392,52,1357,201], margins 182/183/4/4, 141/149px height; source-family right lean/color/effect visual PASS -> fresh C + exact-SHA C3_STRICT_PASS.
+- q112 `D41D0B1` @ `7714bd71...`: two independently visible bboxes remain contained with positive margins; shared two-line white/navy/right-lean hierarchy, spacing, practical-scale and RAW evidence visual PASS -> fresh C + exact-SHA C3_STRICT_PASS.
+- q116 `E3FD08BE` @ `7e42aaa0...`: [647,57,1374,197] in source [393,54,1628,200], margins 254/254/3/3, 140/146px height; source-family right lean/color/effect visual PASS -> fresh C + exact-SHA C3_STRICT_PASS.
+- PRE_INGAME English-original comparison refresh/user review/actual-game validation remain pending. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.

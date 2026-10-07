@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "run": "C263",
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "timestamp_kst": "2026-10-08T05:03:26+09:00",
+  "selection_head": "6c886517bdb78df075d6eb717c497190421e1061",
+  "dispatch_commit": "a4efee775d878bff18f552c7b4bea3988440333d",
+  "pre_commit_refresh_head": "a4efee775d878bff18f552c7b4bea3988440333d",
+  "execution_backend": "N100_MCP_FALLBACK_EXACT_DECODE_QA_ONLY",
+  "fallback_reason": "ChatGPT-local GitHub DNS unavailable; hosted C run 37678019755 pending behind active localization B run 37675870154.",
+  "scope_method": "neutral-alpha composited visible source/current diff; transparent hidden RGB ignored",
+  "assets": {
+    "q104": {
+      "asset": "62BEBF33",
+      "candidate_sha256": "c84a2703d0a22b36384e07ce72d4e761e651a1a23219cd78153b4a0aff022505",
+      "source_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+      "source_bboxes": [
+        [
+          392,
+          52,
+          1357,
+          201
+        ]
+      ],
+      "visible_bboxes": [
+        [
+          574,
+          56,
+          1174,
+          197
+        ]
+      ],
+      "visual": "PASS_SOURCE_ORANGE_NAVY_WHITE_RIGHT_LEAN_HEIGHT_141_OF_149",
+      "candidate_sha_verified": true,
+      "source_sha_verified": true,
+      "header_128_exact": true,
+      "visible_changed_outside_source_union": 0,
+      "alpha_changed_outside_source_union": 0,
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PASS_SOURCE_ORANGE_NAVY_WHITE_RIGHT_LEAN_HEIGHT_141_OF_149",
+      "fresh_c": "PASS",
+      "c3": "C3_STRICT_PASS_EXACT_SHA"
+    },
+    "q112": {
+      "asset": "D41D0B1",
+      "candidate_sha256": "7714bd71b38bd38852ce6497695d872d7ba6b669fd2c6efdb43ba87dd1f3734d",
+      "source_sha256": "524de4c0db3db69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+      "source_bboxes": [
+        [
+          435,
+          19,
+          1346,
+          122
+        ],
+        [
+          499,
+          122,
+          1357,
+          238
+        ]
+      ],
+      "visible_bboxes": [
+        [
+          526,
+          20,
+          1256,
+          120
+        ],
+        [
+          584,
+          132,
+          1271,
+          228
+        ]
+      ],
+      "visual": "PASS_TWO_LINE_WHITE_NAVY_RIGHT_LEAN_HIERARCHY",
+      "candidate_sha_verified": true,
+      "source_sha_verified": true,
+      "header_128_exact": true,
+      "visible_changed_outside_source_union": 0,
+      "alpha_changed_outside_source_union": 0,
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PASS_TWO_LINE_WHITE_NAVY_RIGHT_LEAN_HIERARCHY",
+      "fresh_c": "PASS",
+      "c3": "C3_STRICT_PASS_EXACT_SHA"
+    },
+    "q116": {
+      "asset": "E3FD08BE",
+      "candidate_sha256": "7e42aaa0f8aec535008bb816ec3660e075ce87c56a4ae44170c3340d1a32a6dc",
+      "source_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+      "source_bboxes": [
+        [
+          393,
+          54,
+          1628,
+          200
+        ]
+      ],
+      "visible_bboxes": [
+        [
+          647,
+          57,
+          1374,
+          197
+        ]
+      ],
+      "visual": "PASS_SOURCE_ORANGE_NAVY_WHITE_RIGHT_LEAN_HEIGHT_140_OF_146",
+      "candidate_sha_verified": true,
+      "source_sha_verified": true,
+      "header_128_exact": true,
+      "visible_changed_outside_source_union": 0,
+      "alpha_changed_outside_source_union": 0,
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PASS_SOURCE_ORANGE_NAVY_WHITE_RIGHT_LEAN_HEIGHT_140_OF_146",
+      "fresh_c": "PASS",
+      "c3": "C3_STRICT_PASS_EXACT_SHA"
+    }
+  },
+  "raw_evidence": [
+    "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_62BEBF33_SOURCE_OLD_NEW_RAW.jpg",
+    "localization/graphics/role_B/20261007-B-MANUALQA223-D41D0B1/B223_D41_SOURCE_NEW_RAW.jpg",
+    "localization/graphics/role_B/20261006-B-MANUALQA212-SELECTOR-SLANT/B212_E3FD08BE_SOURCE_OLD_NEW_RAW.jpg"
+  ],
+  "discarded_probe": "Raw-RGB current/clean diff rejected because transparent hidden RGB/BC3 noise creates false positives; not used for approval.",
+  "pre_ingame_export": "PENDING_REFRESH_Q104_Q112_Q116",
+  "user_review": "PENDING",
+  "actual_ingame_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

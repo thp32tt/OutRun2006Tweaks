@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "run": "C263",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "timestamp_kst": "2026-10-08T05:03:26+09:00",
+  "execution_backend": "N100_MCP_FALLBACK_EXACT_DECODE_QA_ONLY",
+  "assets": [
+    {
+      "queue_index": 104,
+      "asset": "62BEBF33",
+      "candidate_sha256": "c84a2703d0a22b36384e07ce72d4e761e651a1a23219cd78153b4a0aff022505",
+      "machine_result": "PASS",
+      "controller_visual_qa": "PASS",
+      "c3": "C3_STRICT_PASS_EXACT_SHA"
+    },
+    {
+      "queue_index": 112,
+      "asset": "D41D0B1",
+      "candidate_sha256": "7714bd71b38bd38852ce6497695d872d7ba6b669fd2c6efdb43ba87dd1f3734d",
+      "machine_result": "PASS",
+      "controller_visual_qa": "PASS",
+      "c3": "C3_STRICT_PASS_EXACT_SHA"
+    },
+    {
+      "queue_index": 116,
+      "asset": "E3FD08BE",
+      "candidate_sha256": "7e42aaa0f8aec535008bb816ec3660e075ce87c56a4ae44170c3340d1a32a6dc",
+      "machine_result": "PASS",
+      "controller_visual_qa": "PASS",
+      "c3": "C3_STRICT_PASS_EXACT_SHA"
+    }
+  ],
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "run": "C263",
+  "queue_index": 104,
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "scope_method": "neutral-alpha composited visible source/current diff; transparent hidden RGB ignored",
+  "asset": "62BEBF33",
+  "candidate_sha256": "c84a2703d0a22b36384e07ce72d4e761e651a1a23219cd78153b4a0aff022505",
+  "source_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+  "source_bboxes": [
+    [
+      392,
+      52,
+      1357,
+      201
+    ]
+  ],
+  "visible_bboxes": [
+    [
+      574,
+      56,
+      1174,
+      197
+    ]
+  ],
+  "visual": "PASS_SOURCE_ORANGE_NAVY_WHITE_RIGHT_LEAN_HEIGHT_141_OF_149",
+  "candidate_sha_verified": true,
+  "source_sha_verified": true,
+  "header_128_exact": true,
+  "visible_changed_outside_source_union": 0,
+  "alpha_changed_outside_source_union": 0,
+  "machine_qa": "PASS",
+  "controller_visual_qa": "PASS_SOURCE_ORANGE_NAVY_WHITE_RIGHT_LEAN_HEIGHT_141_OF_149",
+  "fresh_c": "PASS",
+  "c3": "C3_STRICT_PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED"
+}

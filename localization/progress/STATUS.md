@@ -2679,3 +2679,9 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - GitHub Actions C worker `37677039882` is COMPUTE_PENDING behind active localization CPU run `37675870154`; processed/adjudicated assets = 0 until persisted worker evidence exists.
 - Expected exact candidates: q205 e3d421a1..., q193 e21851f5..., q173 8783e565.... q205 stale queue-note SHA 7598af33... is not treated as authoritative.
 - No C PASS/REWORK/C3 claim yet. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+
+### C263 C2 — 2026-10-08 05:03 KST
+- TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN; q104 c84a2703..., q112 7714bd71..., q116 7e42aaa0... fresh C + exact-SHA C3_STRICT_PASS.
+- Exact source/candidate SHA/header + neutral-alpha visible outside=0/alpha outside=0; source/clean/current + practical + exact-current RAW controller review PASS. PRE_INGAME/user JPG/actual-game pending.
+- N100 fallback performed exact decode/QA only because hosted C worker was queued; GitHub remains SSOT. RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.
