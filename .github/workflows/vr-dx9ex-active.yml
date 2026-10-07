@@ -43,6 +43,7 @@ on:
       - 'tools/verify_vr_refactor_contract.py'
       - 'tools/verify_vr_r84_focus_inventory.py'
       - 'tools/verify_vr_r32_review_api_seam.py'
+      - 'tools/verify_vr_r33_r32_tu_split.py'
       - 'src/vr/core/r32_review_api.hpp'
       - 'docs/automation/r84-port/**'
       - 'tools/verify_vr_sumo_replay_semantics.py'
@@ -100,6 +101,7 @@ jobs:
             'tools/verify_vr_refactor_contract.py',
             'tools/verify_vr_r84_focus_inventory.py',
             'tools/verify_vr_r32_review_api_seam.py',
+            'tools/verify_vr_r33_r32_tu_split.py',
             'tools/verify_vr_sumo_replay_semantics.py',
             'tools/verify_vr_hud_cadence_restore.py',
             'tools/verify_vr_producer_provenance.py',
@@ -214,7 +216,7 @@ jobs:
         shell: pwsh
         run: |
           Remove-Item Env:CI -ErrorAction SilentlyContinue
-          cmake -S . -B build-full-chain -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+          cmake -S . -B build-full-chain -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=ON
       - name: Apply VC2022 dependency workarounds for full-chain gate
         shell: pwsh
         run: |
