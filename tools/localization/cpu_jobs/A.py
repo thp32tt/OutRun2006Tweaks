@@ -1,206 +1,185 @@
 #!/usr/bin/env python3
-import os, json, hashlib, struct, subprocess, urllib.request
+import os,json,hashlib,struct,subprocess,math
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont, ImageChops, ImageOps, ImageFilter
+from PIL import Image,ImageDraw,ImageFont,ImageChops,ImageOps
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
 
 repo=Path.cwd()
-run="20261007-A160-Q012-D6DC1380-SCALE"
-out=repo/"localization/graphics/role_A"/run
-out.mkdir(parents=True,exist_ok=True)
+run="20261007-A161-Q111-C075FB49-YELLOW-SCALE"
+out=repo/"localization/graphics/role_A"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
-asset_rel="textures/load/spr_etc_xst/D6DC1380_256x64.dds"
+asset_rel="textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds"
+source=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"/asset_rel
 candidate=repo/"localization/graphics/hd_candidates"/asset_rel
-EXPECTED_BEFORE="703374404675cff67309fd25ee22ee57483af2136b76ebe9ea152c5ba4d00422"
-SOURCE_SHA="42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352"
-SOURCE_BBOX=[8,10,248,44]
-ALLOWED=[32,40,992,176]
-TEXT="계속?"
-work=Path("/tmp/outrun_A160"); work.mkdir(parents=True,exist_ok=True)
+a10=repo/"localization/graphics/role_A/20261004-A-RECOVERY10"
+clean_path=a10/"C075FB49_CLEAN_PLATE.png"
 
-def sha(b): return hashlib.sha256(b).hexdigest()
-def cnt(mask): return sum(mask.histogram()[1:])
-def diffmask(a,b):
+SOURCE_SHA="a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036"
+BEFORE_SHA="d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633"
+def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def dmask(a,b):
     d=ImageChops.difference(a,b); bands=d.split(); m=bands[0]
     for z in bands[1:]: m=ImageChops.lighter(m,z)
     return m.point(lambda v:255 if v else 0)
-def dds_meta(b):
-    if b[:4]!=b"DDS ": raise RuntimeError("not DDS")
-    h,w,pitch,depth,mips=struct.unpack_from("<5I",b,12)
-    pf_flags=struct.unpack_from("<I",b,80)[0]
-    fourcc=b[84:88]
-    masks=struct.unpack_from("<4I",b,92)
-    return w,h,pitch,depth,mips,pf_flags,fourcc,masks
+def count(m): return sum(m.histogram()[1:])
 
-oldb=candidate.read_bytes()
-if sha(oldb)!=EXPECTED_BEFORE: raise RuntimeError(("candidate drift",sha(oldb),EXPECTED_BEFORE))
-W,H,pitch,depth,mips,pff,fourcc,masks=dds_meta(oldb)
-if (W,H,mips)!=(1024,256,1): raise RuntimeError(("unexpected candidate",W,H,mips,fourcc,masks))
-if len(oldb)!=128+W*H*4: raise RuntimeError(("unexpected payload",len(oldb)))
-
-# Recover exact stock source from pinned public revision. Release and Original both exist;
-# accept only the SHA recorded by A89.
-urls=[
- "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_etc_xst/D6DC1380_256x64.dds",
- "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_etc_xst/D6DC1380_256x64.dds"
-]
-source=None; source_url=None
-for i,u in enumerate(urls):
-    p=work/f"source{i}.dds"
-    try:
-        urllib.request.urlretrieve(u,p)
-        if sha(p.read_bytes())==SOURCE_SHA:
-            source=p; source_url=u; break
-    except Exception:
-        pass
-if source is None: raise RuntimeError("canonical source SHA not found")
-sb=source.read_bytes()
-sW,sH,_,_,sM,_,_,_=dds_meta(sb)
-if (sW,sH)!=(256,64): raise RuntimeError(("source dimensions",sW,sH))
-
-raw_old=Image.open(candidate).convert("RGBA")
-# Current C233 evidence established readable view is FLIP-Y relative to stored DDS.
-old=raw_old.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-raw_source=Image.open(source).convert("RGBA")
-src=raw_source.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-src4=src.resize((1024,256),Image.Resampling.NEAREST)
-
-# Find raw pixel byte order that reconstructs the current payload exactly.
-rawmode=None
-for mode in ("BGRA","RGBA"):
-    try:
-        payload=raw_old.tobytes("raw",mode)
-        if payload==oldb[128:]:
-            rawmode=mode; break
-    except Exception:
-        pass
-if rawmode is None: raise RuntimeError(("cannot infer rawmode",masks))
-
-# Check current localized alpha bbox.
-obb=old.getchannel("A").getbbox()
-if not obb: raise RuntimeError("current candidate empty")
-old_bbox=list(obb)
-if old_bbox!=[207,41,817,175]:
-    raise RuntimeError(("current bbox drift",old_bbox))
+if sha(source)!=SOURCE_SHA: raise RuntimeError(("source drift",sha(source)))
+if sha(candidate)!=BEFORE_SHA: raise RuntimeError(("candidate drift",sha(candidate)))
+sb=source.read_bytes(); ib=candidate.read_bytes()
+if sb[:4]!=b"DDS " or ib[:4]!=b"DDS ": raise RuntimeError("not DDS")
+H,W,pitch,depth,mips=struct.unpack_from("<5I",sb,12)
+if (W,H,pitch,depth,mips)!=(2048,2048,8192,1,1): raise RuntimeError((W,H,pitch,depth,mips))
+if ib[:128]!=sb[:128] or len(ib)!=len(sb): raise RuntimeError("header/size drift")
+src_raw=Image.frombytes("RGBA",(W,H),sb[128:],"raw","RGBA"); src=src_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+old_raw=Image.frombytes("RGBA",(W,H),ib[128:],"raw","RGBA"); old=old_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+clean=Image.open(clean_path).convert("RGBA")
+if clean.size!=(W,H): raise RuntimeError("clean size")
 
 subprocess.run(["sudo","apt-get","update","-qq"],check=True)
 subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk","fonts-noto-cjk-extra"],check=True)
 FONT_PATTERN="Noto Sans CJK KR:style=Black"
 FONT=subprocess.check_output(["fc-match","-f","%{file}",FONT_PATTERN],text=True).strip()
-if not FONT or not Path(FONT).exists(): raise RuntimeError(("font missing",FONT))
+if not FONT or not Path(FONT).exists(): raise RuntimeError(("font",FONT))
 
-# Render from scratch on transparent plate. Height already nearly max in A89; PJR-001
-# specifically requires a material scale fix, so use max-safe height plus wider techno
-# proportions and source-matching readable right lean instead of reusing unchanged bytes.
-target_h=132
-target_w=790
-font=ImageFont.truetype(FONT,150)
-scratch=Image.new("RGBA",(1800,400),(0,0,0,0))
-d=ImageDraw.Draw(scratch)
-bb=d.textbbox((40,40),TEXT,font=font,stroke_width=9)
-base=Image.new("RGBA",(bb[2]-bb[0]+80,bb[3]-bb[1]+80),(0,0,0,0))
-bd=ImageDraw.Draw(base)
-xy=(40-bb[0],40-bb[1])
-# outer steel-gray halo, navy main border, white face
-bd.text(xy,TEXT,font=font,fill=(250,250,250,255),stroke_width=11,stroke_fill=(103,108,126,255))
-bd.text(xy,TEXT,font=font,fill=(250,250,250,255),stroke_width=7,stroke_fill=(10,22,76,255))
-gb=base.getchannel("A").getbbox()
-base=base.crop(gb)
-scale_h=target_h/base.height
-nw=max(1,round(base.width*scale_h)); nh=target_h
-g=base.resize((nw,nh),Image.Resampling.LANCZOS)
-# readable right lean matching English source
-shear=0.16
-extra=round(g.height*shear)+4
-sl=Image.new("RGBA",(g.width+extra,g.height),(0,0,0,0))
-sl=g.transform(sl.size,Image.Transform.AFFINE,(1,-shear,extra-2,0,1,0),Image.Resampling.BICUBIC)
-gb=sl.getchannel("A").getbbox(); sl=sl.crop(gb)
-if sl.width<target_w:
-    sl=sl.resize((target_w,sl.height),Image.Resampling.LANCZOS)
-elif sl.width>target_w:
-    sl=sl.resize((target_w,sl.height),Image.Resampling.LANCZOS)
-gb=sl.getchannel("A").getbbox(); sl=sl.crop(gb)
+# Concrete current-policy false negatives visible in A_RECOVERY12 SOURCE|OLD|NEW:
+# these yellow instruction rows are roughly half the source-family height.
+targets={
+ "keep_passing":{"source":"Keep passing the cars!","old":"계속 차량을 추월하세요!","ko":"계속 추월하세요!","bbox":[1,143,520,236],"prior":[40,165,491,215],"shear":0.24},
+ "drift":{"source":"Drift!","old":"드리프트!","ko":"드리프트!","bbox":[500,120,720,228],"prior":[517,149,707,200],"shear":0.20},
+ "dont_crash":{"source":"Don't crash!","old":"충돌하지 마세요!","ko":"충돌하지 마세요!","bbox":[550,200,1070,370],"prior":[602,259,1024,324],"shear":0.24},
+ "go_gate":{"source":"Go through the gate!","old":"게이트를 통과하세요!","ko":"게이트를 통과하세요!","bbox":[1020,200,1590,370],"prior":[1077,261,1539,319],"shear":0.24}
+}
 
-aw=ALLOWED[2]-ALLOWED[0]; ah=ALLOWED[3]-ALLOWED[1]
-if sl.width>=aw or sl.height>=ah: raise RuntimeError(("render exceeds allowed",sl.size,aw,ah))
-px=ALLOWED[0]+(aw-sl.width)//2
-py=ALLOWED[1]+(ah-sl.height)//2
+def shear_rgba(im,s):
+    extra=max(8,int(math.ceil(abs(s)*im.height))+8)
+    c=Image.new("RGBA",(im.width+extra*2,im.height),(0,0,0,0)); c.paste(im,(extra,0),im)
+    coeff=(1,-s,s*c.height,0,1,0)
+    x=c.transform(c.size,Image.Transform.AFFINE,coeff,resample=Image.Resampling.BICUBIC)
+    bb=x.getchannel("A").getbbox()
+    return x.crop(bb) if bb else x
+
+# Source yellow family: yellow face, dark navy keyline, white border, navy outside/depth.
+Y=(255,215,52,255); N=(20,31,65,255); WHT=(248,248,248,255)
+def fresh(text,maxw,maxh,shear):
+    for fs in range(min(120,int(maxh*1.15)),34,-1):
+        font=ImageFont.truetype(FONT,fs)
+        tmp=Image.new("RGBA",(maxw*3,maxh*3),(0,0,0,0)); d=ImageDraw.Draw(tmp)
+        bb=d.textbbox((18,18),text,font=font,stroke_width=8)
+        x=18-bb[0]; y=18-bb[1]
+        d.text((x,y),text,font=font,fill=Y,stroke_width=8,stroke_fill=N)
+        d.text((x,y),text,font=font,fill=Y,stroke_width=6,stroke_fill=WHT)
+        d.text((x,y),text,font=font,fill=Y,stroke_width=3,stroke_fill=N)
+        gb=tmp.getchannel("A").getbbox()
+        if not gb: continue
+        g=tmp.crop(gb)
+        g=shear_rgba(g,shear)
+        hscale=1.0
+        if g.height>maxh: continue
+        if g.width>maxw:
+            hscale=maxw/g.width
+            if hscale<0.60: continue
+            g=g.resize((maxw,g.height),Image.Resampling.LANCZOS)
+            gb=g.getchannel("A").getbbox()
+            if gb:g=g.crop(gb)
+        if g.width<=maxw and g.height<=maxh:
+            return fs,g,hscale
+    raise RuntimeError(("fit",text,maxw,maxh))
+
 final=old.copy()
-# q12 is text-only transparent plate; clear only exact permitted source bbox.
-final.paste(Image.new("RGBA",(aw,ah),(0,0,0,0)),(ALLOWED[0],ALLOWED[1]))
-final.alpha_composite(sl,(px,py))
-fb=final.getchannel("A").getbbox()
-if not fb: raise RuntimeError("final empty")
-loc=list(fb)
-if not(loc[0]>=ALLOWED[0] and loc[1]>=ALLOWED[1] and loc[2]<=ALLOWED[2] and loc[3]<=ALLOWED[3]):
-    raise RuntimeError(("bbox overflow",loc,ALLOWED))
-if (loc[2]-loc[0])<=old_bbox[2]-old_bbox[0]+100:
-    raise RuntimeError(("material width gain insufficient",old_bbox,loc))
-if (loc[3]-loc[1])<128:
-    raise RuntimeError(("height too small",loc))
+rows={}
+for key,t in targets.items():
+    x0,y0,x1,y1=t["bbox"]; prior=t["prior"]
+    # Restore the entire exact source text/effect bbox from already validated clean plate.
+    final.paste(clean.crop((x0,y0,x1,y1)),(x0,y0))
+    maxw=(x1-x0)-6; maxh=(y1-y0)-6
+    fs,g,hs=fresh(t["ko"],maxw,maxh,t["shear"])
+    px=x0+3+(maxw-g.width)//2
+    py=y0+3+(maxh-g.height)//2
+    final.alpha_composite(g,(px,py))
+    loc=[px,py,px+g.width,py+g.height]
+    if not(loc[0]>x0 and loc[1]>y0 and loc[2]<x1 and loc[3]<y1): raise RuntimeError(("margin",key,loc,t["bbox"]))
+    rows[key]={"source":t["source"],"prior_korean":t["old"],"korean":t["ko"],"original_bbox":t["bbox"],"prior_bbox":prior,"localized_bbox_preencode":loc,
+               "source_size":[x1-x0,y1-y0],"prior_size":[prior[2]-prior[0],prior[3]-prior[1]],"preencode_size":[g.width,g.height],
+               "font":Path(FONT).name,"font_size":fs,"shear":t["shear"],"horizontal_scale":round(hs,4)}
 
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-newb=oldb[:128]+raw_final.tobytes("raw",rawmode)
-if newb[:128]!=oldb[:128] or len(newb)!=len(oldb): raise RuntimeError("structure changed")
-candidate.write_bytes(newb)
-dec_raw=Image.open(candidate).convert("RGBA")
-dec=dec_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-db=list(dec.getchannel("A").getbbox() or ())
-if db!=loc: raise RuntimeError(("decoded bbox drift",loc,db))
+outb=sb[:128]+raw_final.tobytes("raw","RGBA")
+candidate.write_bytes(outb)
+raw_dec=Image.frombytes("RGBA",(W,H),outb[128:],"raw","RGBA"); dec=raw_dec.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+if ImageChops.difference(dec,final).getbbox() is not None: raise RuntimeError("roundtrip")
 
-allowed=Image.new("L",(W,H),0); ImageDraw.Draw(allowed).rectangle((ALLOWED[0],ALLOWED[1],ALLOWED[2]-1,ALLOWED[3]-1),fill=255)
-dm=diffmask(old,dec)
-outside=cnt(ImageChops.multiply(dm,ImageOps.invert(allowed)))
+# Blast radius is exactly the four source bboxes.
+mask=Image.new("L",(W,H),0); md=ImageDraw.Draw(mask)
+for t in targets.values():
+    x0,y0,x1,y1=t["bbox"]; md.rectangle((x0,y0,x1-1,y1-1),fill=255)
+diff=dmask(old,dec); outside=count(ImageChops.multiply(diff,ImageOps.invert(mask)))
 ad=ImageChops.difference(old.getchannel("A"),dec.getchannel("A")).point(lambda v:255 if v else 0)
-alpha_out=cnt(ImageChops.multiply(ad,ImageOps.invert(allowed)))
-if outside or alpha_out: raise RuntimeError(("blast radius",outside,alpha_out))
-if db[0]<=ALLOWED[0] or db[1]<=ALLOWED[1] or db[2]>=ALLOWED[2] or db[3]>=ALLOWED[3]:
-    raise RuntimeError(("positive margin",db,ALLOWED))
+alpha_out=count(ImageChops.multiply(ad,ImageOps.invert(mask)))
+if outside or alpha_out: raise RuntimeError(("blast",outside,alpha_out))
 
-# Practical-scale and raw evidence decoded from persisted DDS.
-def comp(im):
-    bg=Image.new("RGBA",im.size,(96,96,96,255)); bg.alpha_composite(im); return bg.convert("RGB")
-source_hd=comp(src4); old_rgb=comp(old); final_rgb=comp(dec)
-sheet=Image.new("RGB",(3072,768),"white")
-for i,img in enumerate((source_hd,old_rgb,final_rgb)):
-    sheet.paste(img,(i*1024,0))
-ImageDraw.Draw(sheet).text((8,4),"SOURCE 4x DISPLAY | C233 REJECTED | A160 FINAL",fill="black")
-sheet.save(out/"A160_D6DC1380_SOURCE_OLD_FINAL.jpg",quality=95)
+# Decode authoritative bboxes and require material hierarchy gains.
+for key,t in targets.items():
+    x0,y0,x1,y1=t["bbox"]; bb=dec.crop((x0,y0,x1,y1)).getchannel("A").getbbox()
+    if not bb: raise RuntimeError(("empty",key))
+    loc=[x0+bb[0],y0+bb[1],x0+bb[2],y0+bb[3]]
+    rows[key]["localized_bbox"]=loc; rows[key]["localized_size"]=[loc[2]-loc[0],loc[3]-loc[1]]
+    rows[key]["delta_left"]=loc[0]-x0; rows[key]["delta_right"]=x1-loc[2]; rows[key]["delta_top"]=loc[1]-y0; rows[key]["delta_bottom"]=y1-loc[3]
+    if not(loc[0]>x0 and loc[1]>y0 and loc[2]<x1 and loc[3]<y1): raise RuntimeError(("decoded margin",key,loc))
+    prior_h=t["prior"][3]-t["prior"][1]; new_h=loc[3]-loc[1]
+    if new_h < prior_h+12: raise RuntimeError(("insufficient height gain",key,prior_h,new_h))
 
+# Coverage: verify all 17 established localized rows still visible by alpha in their prior/source bboxes.
+all_rows=[
+[574,29,1120,129],[1,143,520,236],[500,120,720,228],[680,120,1137,227],[1,200,600,370],[550,200,1070,370],[1020,200,1590,370],[1530,200,1980,370],
+[40,1195,245,1305],[381,1195,600,1305],[242,1394,767,1602],[830,1394,1305,1609],[1325,1410,1655,1545],[1710,1435,2008,1515],[875,1632,1265,1704],[890,1720,1265,1792],[1300,1720,1655,1792]]
+coverage=0
+for b in all_rows:
+    if dec.crop(tuple(b)).getchannel("A").getbbox(): coverage+=1
+if coverage!=17: raise RuntimeError(("coverage",coverage))
+
+def gray(im):
+    bg=Image.new("RGBA",im.size,(72,72,72,255)); bg.alpha_composite(im); return bg.convert("RGB")
+
+# SOURCE|OLD|CLEAN|FINAL row contacts.
+contacts=[]
+for key,t in targets.items():
+    x0,y0,x1,y1=t["bbox"]; m=16; box=(max(0,x0-m),max(0,y0-m),min(W,x1+m),min(H,y1+m))
+    ims=[gray(z.crop(box)) for z in (src,old,clean,dec)]
+    sc=min(1.0,1800/(sum(i.width for i in ims)+30))
+    if sc<1: ims=[i.resize((int(i.width*sc),int(i.height*sc)),Image.Resampling.LANCZOS) for i in ims]
+    row=Image.new("RGB",(sum(i.width for i in ims)+30,max(i.height for i in ims)+28),(235,235,235)); xx=0
+    ImageDraw.Draw(row).text((3,3),key+" SOURCE | C111 OLD | CLEAN | A161",fill="black")
+    for im in ims: row.paste(im,(xx,28)); xx+=im.width+10
+    contacts.append(row)
+cw=max(i.width for i in contacts); ch=sum(i.height for i in contacts)+4*(len(contacts)-1)
+sheet=Image.new("RGB",(cw,ch),(235,235,235)); yy=0
+for im in contacts: sheet.paste(im,(0,yy)); yy+=im.height+4
+sheet.save(out/"A161_C075_YELLOW_SOURCE_OLD_CLEAN_FINAL.jpg",quality=95)
+
+# Full/practical and raw evidence.
+full=Image.new("RGB",(2048,1024),(50,50,50)); full.paste(gray(old).resize((1024,1024),Image.Resampling.LANCZOS),(0,0)); full.paste(gray(dec).resize((1024,1024),Image.Resampling.LANCZOS),(1024,0)); full.save(out/"A161_C075_OLD_FINAL_FULL.jpg",quality=94)
+raws=Image.new("RGB",(2048,1024),(50,50,50)); raws.paste(gray(old_raw).resize((1024,1024),Image.Resampling.LANCZOS),(0,0)); raws.paste(gray(raw_dec).resize((1024,1024),Image.Resampling.LANCZOS),(1024,0)); raws.save(out/"A161_C075_OLD_FINAL_RAW.jpg",quality=94)
+pr=[]
 for pct in (100,75,50):
-    sz=(round(W*pct/100),round(H*pct/100))
-    trio=[x.resize(sz,Image.Resampling.LANCZOS) for x in (source_hd,old_rgb,final_rgb)]
-    ev=Image.new("RGB",(sum(x.width for x in trio),max(x.height for x in trio)),"white")
-    xx=0
-    for x in trio: ev.paste(x,(xx,0)); xx+=x.width
-    ev.save(out/f"A160_D6DC1380_PRACTICAL_{pct}.jpg",quality=94)
+    crop=gray(dec.crop((0,100,1600,390))); size=(int(crop.width*pct/100),int(crop.height*pct/100)); pr.append(crop.resize(size,Image.Resampling.LANCZOS))
+pw=max(i.width for i in pr); ph=sum(i.height for i in pr)+50
+ps=Image.new("RGB",(pw,ph),"white"); yy=0; d=ImageDraw.Draw(ps)
+for pct,im in zip((100,75,50),pr): d.text((2,yy),f"{pct}% decoded persisted",fill="black"); yy+=18; ps.paste(im,(0,yy)); yy+=im.height+8
+ps.save(out/"A161_C075_PRACTICAL_100_75_50.jpg",quality=94)
 
-raw_sheet=Image.new("RGB",(2048,512),(64,64,64))
-raw_sheet.paste(comp(raw_old).resize((1024,256),Image.Resampling.NEAREST),(0,0))
-raw_sheet.paste(comp(dec_raw).resize((1024,256),Image.Resampling.NEAREST),(1024,0))
-raw_sheet.paste(old_rgb.resize((1024,256),Image.Resampling.NEAREST),(0,256))
-raw_sheet.paste(final_rgb.resize((1024,256),Image.Resampling.NEAREST),(1024,256))
-raw_sheet.save(out/"A160_D6DC1380_RAW_FLIPY.jpg",quality=95)
-
-report={
- "schema_version":2,"role":"A","run":"A160","index":12,"asset":asset_rel,
- "trigger":"C233_REWORK_REQUIRED_MATERIAL_SCALE_FIX_PENDING_A_B",
- "user_regression":"PJR-001-20261006",
- "prior_candidate_sha256":EXPECTED_BEFORE,"candidate_sha256":sha(newb),
- "canonical_source":{"sha256":SOURCE_SHA,"url":source_url,"native_size":[256,64],"display_scale":4,"source_bbox_native":SOURCE_BBOX,"source_bbox_hd":ALLOWED},
- "translation":{"source":"Continue?","korean":"계속?"},
- "prior_localized_bbox":old_bbox,"localized_bbox":db,
- "prior_size":[old_bbox[2]-old_bbox[0],old_bbox[3]-old_bbox[1]],
- "localized_size":[db[2]-db[0],db[3]-db[1]],
- "render":{"font_pattern":FONT_PATTERN,"font_file":Path(FONT).name,"target_width":target_w,"target_height":target_h,"readable_right_shear":shear,"style":"white face + navy border + steel-gray outer halo","alignment":"centered within exact scaled source bbox"},
- "machine_qa":{"bbox_containment":"PASS","positive_margin":"PASS","changed_pixels_outside_exact_source_bbox":outside,"alpha_changed_outside_exact_source_bbox":alpha_out,"header_128_exact":newb[:128]==oldb[:128],"mip_count":mips,"decoded_persisted_bbox_exact":db==loc,"rawmode":rawmode,"raw_orientation":"preserve current; readable=FLIP_Y","practical_scale_reviews":[100,75,50]},
- "ordered_generation_gate":{"1_plate_restoration":"PASS_TRANSPARENT_TEXT_ONLY_SOURCE_BBOX","2_slant_direction":"PASS_READABLE_RIGHT_LEAN","3_no_unnecessary_undersizing":"PASS_MATERIAL_WIDTH_SCALE_INCREASE","4_weight_outline_shadow":"PASS_SOURCE_WHITE_NAVY_STEEL_FAMILY","5_clipping":"PASS_POSITIVE_MARGIN","6_protected_clearance":"PASS_ZERO_OUTSIDE_CHANGE","7_flip_y_raw":"EVIDENCE_WRITTEN_PENDING_CONTROLLER","8_immediate_readability":"PENDING_CONTROLLER"},
- "status":"A160_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
- "runtime_validation":"UNTESTED","no_vr_ffb_dx11_dxvk_work":True
-}
-(out/"A160_D6DC1380_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-summary={"run":"A160","index":12,"asset":"D6DC1380","candidate_sha256":report["candidate_sha256"],"prior_size":report["prior_size"],"localized_size":report["localized_size"],"width_gain":report["localized_size"][0]-report["prior_size"][0],"outside":outside,"alpha_outside":alpha_out,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_A/20261007-A160-Q012-D6DC1380-SCALE/A160_D6DC1380_REPORT.json"}
-(wr/"A160_D6DC1380.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+report={"schema_version":1,"role":"A","run":"A161","index":111,"asset":asset_rel,
+ "trigger":"POST_ENCODE_PRESENTATION_HARDENING_YELLOW_INSTRUCTION_SCALE_FALSE_NEGATIVE",
+ "prior_c_status":"C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME","prior_candidate_sha256":BEFORE_SHA,"source_sha256":SOURCE_SHA,
+ "candidate_sha256":sha(candidate),"reworked_keys":list(targets),"translation_change":{"keep_passing":"계속 차량을 추월하세요! -> 계속 추월하세요!"},
+ "rows":rows,
+ "machine_qa":{"coverage":"17/17 PASS","changed_pixels_outside_declared_rework_mask":outside,"alpha_changed_outside_declared_rework_mask":alpha_out,"header_128_exact":outb[:128]==sb[:128],"mip_count":mips,"rgba32_roundtrip_exact":True,"raw_orientation":"mirror_y"},
+ "ui_family":"selector yellow instruction family","style_profile":"yellow face + navy keyline + white border + navy outer edge; readable right lean 0.20-0.24",
+ "post_encode":{"authority":"decoded persisted DDS","practical_scales":[100,75,50],"text_bearing_mips":1,"status":"PASS_PENDING_CONTROLLER_VISUAL"},
+ "ordered_generation_gate":{"1_plate_restoration":"PASS_A_RECOVERY10_VALIDATED_CLEAN","2_slant_direction":"PASS_RIGHT_LEAN","3_no_unnecessary_undersizing":"PASS_MATERIAL_HEIGHT_GAIN_ALL_4","4_weight_outline_shadow":"PASS_SOURCE_YELLOW_NAVY_WHITE_FAMILY","5_clipping":"PASS_POSITIVE_MARGIN_ALL_4","6_protected_clearance":"PASS_ZERO_OUTSIDE_REWORK_MASK","7_flip_y_raw":"EVIDENCE_WRITTEN_PENDING_CONTROLLER","8_readability":"PENDING_CONTROLLER"},
+ "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","status":"A161_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA","runtime_validation":"UNTESTED","no_vr_ffb_dx11_dxvk_work":True}
+(out/"A161_C075FB49_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+summary={"run":"A161","index":111,"asset":"C075FB49","candidate_sha256":report["candidate_sha256"],"reworked_keys":list(targets),"coverage":"17/17 PASS","outside":outside,"alpha_outside":alpha_out,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_A/20261007-A161-Q111-C075FB49-YELLOW-SCALE/A161_C075FB49_REPORT.json"}
+(wr/"A161_C075FB49.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False,indent=2))
