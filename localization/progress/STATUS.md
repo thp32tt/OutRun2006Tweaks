@@ -2435,3 +2435,9 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - Controller SOURCE/A163R/C243R readable high-zoom, RAW mirror and practical 100/75/50 visual QA PASS: girlfriend instruction exists only in the true lower/right cell, source-family yellow/navy/white/navy effect and readable right lean are retained, no broken Hangul/source residue/outline clipping/protected-art intrusion is visible.
 - Exact-SHA mandatory C3_STRICT_AUDIT PASS. PJR-014 remains open only for regenerated PRE_INGAME user JPG acceptance and NEW actual-game retest; no runtime closure claimed. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_C/20261007-C243R-C1-Q051-FF2462BB-CORRECTIVE/C243R_FF2462BB_MACHINE_QA.json`, `C243R_FF2462BB_CONTROLLER_FINAL_QA.json`.
+
+## 2026-10-07 17:03 KST — C243R q51 PRE_INGAME export refresh complete
+- TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). Persistent exporter run `37590319267` SUCCESS after q51 C243R corrective fresh-C + exact-SHA C3 promotion.
+- q51 is PRE_INGAME #004 `004_q051_FF2462BB.jpg`; pinned English source `5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67` and exact corrected Korean candidate `b1c91a8c0050f0f31523afc055185288f2756e4da02014c9597b69cff25fc129`, both native 4096x2048 with display scale 1.
+- Controller final exported-card review PASS: FLIP-Y source/current show the girlfriend instruction only in the correct lower/right source cell, no duplicate upper insertion, source-family yellow/navy/white/navy effect and readable right lean retained, no clipping/broken Hangul/source residue/protected-art intrusion. RAW source/current remain orientation-consistent.
+- Manifest count=14; mandatory C3 blocked=10. User JPG acceptance and NEW actual-game retest remain required; PJR-014 is not closed. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
