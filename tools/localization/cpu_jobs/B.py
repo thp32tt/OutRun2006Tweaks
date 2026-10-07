@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# B237: C246-returned q44 19CEDB9 source-relative hierarchy/scale rework.
+# B238: C246-returned q44 19CEDB9 controller-rejected tracking repair.
 import os
 if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "B":
     raise SystemExit("GitHub-hosted localization CPU worker / role B only")
@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageChops
 
 repo = Path.cwd()
-RUN = "20261007-B237-Q044-19CEDB9-C246-REWORK"
+RUN = "20261007-B238-Q044-19CEDB9-C246-REWORK"
 out = repo / "localization/graphics/role_B" / RUN
 out.mkdir(parents=True, exist_ok=True)
 wr = repo / "localization/graphics/worker_results"
@@ -20,7 +20,7 @@ asset_rel = "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds"
 srcp = repo / "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a" / asset_rel
 candp = repo / "localization/graphics/hd_candidates" / asset_rel
 EXPECTED_SOURCE = "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e"
-EXPECTED_BEFORE = "8c6a390cbadae23beff263bb0eea4ca935643d591b45bac9ca474fa108e5a913"
+EXPECTED_BEFORE = "b80c7bf1f469c35b9ae98ae6cf8fb0cc830a93fb2da4d08cee10bd07528a0cc8"
 
 def sha_bytes(b):
     return hashlib.sha256(b).hexdigest()
@@ -83,54 +83,37 @@ def comp(im,bg=(72,72,72,255)):
     z.alpha_composite(im)
     return z.convert("RGB")
 
-def tracked_glyph(text, font_px, fill, outer, outer_w, inner=None, inner_w=0, tracking=0.20, slant=0.0):
+def whole_glyph(text, font_px, fill, outer, outer_w, inner=None, inner_w=0, slant=0.0):
     font=ImageFont.truetype(str(FONT), font_px*SS, index=FONT_INDEX)
     ow=outer_w*SS
     iw=inner_w*SS
-    track=max(0,int(round(font_px*tracking*SS)))
-    glyphs=[]
-    for ch in text:
-        if ch == " ":
-            glyphs.append((None, max(1,int(round(font_px*0.45*SS)))))
-            continue
-        d0=ImageDraw.Draw(Image.new("L",(2,2),0))
-        tb=d0.textbbox((0,0),ch,font=font,stroke_width=ow)
-        pad=(outer_w+8)*SS
-        g=Image.new("RGBA",(tb[2]-tb[0]+pad*2,tb[3]-tb[1]+pad*2),(0,0,0,0))
-        d=ImageDraw.Draw(g)
-        pos=(pad-tb[0],pad-tb[1])
-        d.text(pos,ch,font=font,fill=fill,stroke_width=ow,stroke_fill=outer)
-        if inner is not None:
-            d.text(pos,ch,font=font,fill=fill,stroke_width=iw,stroke_fill=inner)
-        bb=g.getchannel("A").getbbox()
-        g=g.crop(bb)
-        glyphs.append((g,g.width))
-    total=sum(w for _,w in glyphs)+track*max(0,len(glyphs)-1)
-    height=max(g.height for g,_ in glyphs if g is not None)
-    layer=Image.new("RGBA",(total,height),(0,0,0,0))
-    x=0
-    for g,w in glyphs:
-        if g is not None:
-            layer.alpha_composite(g,(x,(height-g.height)//2))
-        x+=w+track
-    bb=layer.getchannel("A").getbbox()
-    layer=layer.crop(bb)
+    d0=ImageDraw.Draw(Image.new("L",(4,4),0))
+    tb=d0.textbbox((0,0),text,font=font,stroke_width=ow)
+    pad=(outer_w+10)*SS
+    g=Image.new("RGBA",(tb[2]-tb[0]+pad*2,tb[3]-tb[1]+pad*2),(0,0,0,0))
+    d=ImageDraw.Draw(g)
+    pos=(pad-tb[0],pad-tb[1])
+    d.text(pos,text,font=font,fill=fill,stroke_width=ow,stroke_fill=outer)
+    if inner is not None:
+        d.text(pos,text,font=font,fill=fill,stroke_width=iw,stroke_fill=inner)
+    bb=g.getchannel("A").getbbox()
+    g=g.crop(bb)
     if slant:
-        shift=max(1,int(math.ceil(abs(slant)*(layer.height-1))))
-        sh=Image.new("RGBA",(layer.width+shift,layer.height),(0,0,0,0))
-        for y in range(layer.height):
-            dx=int(round(slant*(layer.height-1-y)))
+        shift=max(1,int(math.ceil(abs(slant)*(g.height-1))))
+        sh=Image.new("RGBA",(g.width+shift,g.height),(0,0,0,0))
+        for y in range(g.height):
+            dx=int(round(slant*(g.height-1-y)))
             if dx < 0:
                 dx += shift
-            sh.alpha_composite(layer.crop((0,y,layer.width,y+1)),(dx,y))
-        layer=sh.crop(sh.getchannel("A").getbbox())
-    return layer
+            sh.alpha_composite(g.crop((0,y,g.width,y+1)),(dx,y))
+        g=sh.crop(sh.getchannel("A").getbbox())
+    return g
 
 def render_target(text, target_w, target_h, fill, outer, outer_w, inner=None, inner_w=0, slant=0.0, tracking=0.20):
     # Fresh supersampled glyph construction. Horizontal restoration is applied only
     # to this fresh layer; no historical Korean bitmap is upscaled.
     probe=max(12,int(round(target_h*1.10)))
-    g=tracked_glyph(text,probe,fill,outer,outer_w,inner,inner_w,tracking,slant)
+    g=whole_glyph(text,probe,fill,outer,outer_w,inner,inner_w,slant)
     return g.resize((target_w,target_h),Image.Resampling.LANCZOS)
 
 source_bytes, source_raw, source, meta = decode_dds(srcp)
@@ -179,18 +162,18 @@ YELLOW2=(245,204,12,255); WHITE=(255,255,255,255); ORANGE=(255,158,41,255)
 # >=2px margins. The single-glyph YOU->나 row is deliberately not stretched
 # to 90% width; it is materially enlarged to 72.5% while preserving a credible glyph proportion.
 spec={
- "sector2":("섹터 2",(164,54),YELLOW,NAVY,5,None,0,0.12,0.22),
- "sector1":("섹터 1",(159,54),YELLOW,NAVY,5,None,0,0.12,0.22),
- "win":("승리",(72,35),WHITE,NAVY,4,None,0,0.00,0.28),
- "lose":("패배",(94,37),WHITE,NAVY,4,None,0,0.00,0.32),
- "result":("결과",(194,63),YELLOW2,NAVY,7,WHITE,3,0.14,0.58),
- "ranking":("랭킹",(238,71),YELLOW2,NAVY,7,WHITE,3,0.14,0.65),
- "stage":("스테이지",(186,72),YELLOW2,NAVY,7,WHITE,3,0.14,0.16),
- "rank":("랭크",(160,63),WHITE,NAVY,6,None,0,0.12,0.35),
- "you":("나",(100,61),YELLOW,NAVY,6,None,0,0.12,0.00),
- "diff":("차이",(116,63),YELLOW,NAVY,5,None,0,0.12,0.32),
- "sector3":("섹터 3",(163,54),YELLOW,NAVY,5,None,0,0.12,0.22),
- "rival":("라이벌",(185,68),ORANGE,NAVY,6,None,0,0.14,0.24),
+ "sector2":("섹터 2",(158,54),YELLOW,NAVY,5,None,0,0.12,0.0),
+ "sector1":("섹터 1",(154,54),YELLOW,NAVY,5,None,0,0.12,0.0),
+ "win":("승리",(70,35),WHITE,NAVY,4,None,0,0.00,0.0),
+ "lose":("패배",(90,37),WHITE,NAVY,4,None,0,0.00,0.0),
+ "result":("결과",(180,63),YELLOW2,NAVY,7,WHITE,3,0.14,0.0),
+ "ranking":("랭킹",(214,71),YELLOW2,NAVY,7,WHITE,3,0.14,0.0),
+ "stage":("스테이지",(184,72),YELLOW2,NAVY,7,WHITE,3,0.14,0.0),
+ "rank":("랭크",(158,63),WHITE,NAVY,6,None,0,0.12,0.0),
+ "you":("나",(90,61),YELLOW,NAVY,6,None,0,0.12,0.00),
+ "diff":("차이",(116,63),YELLOW,NAVY,5,None,0,0.12,0.0),
+ "sector3":("섹터 3",(158,54),YELLOW,NAVY,5,None,0,0.12,0.0),
+ "rival":("라이벌",(183,68),ORANGE,NAVY,6,None,0,0.14,0.0),
 }
 
 # Exact clean plate from the pinned English source: this atlas is transparent
@@ -282,14 +265,14 @@ if clean_out or clean_residue:
 # Evidence masks.
 def mask_img(m):
     return Image.fromarray((m.astype(np.uint8)*255),"L")
-mask_img(source_text_mask).save(out/"B237_19CEDB9_SOURCE_TEXT_MASK.png")
-mask_img(allowed).save(out/"B237_19CEDB9_ALLOWED_REGION_MASK.png")
-mask_img(~allowed).save(out/"B237_19CEDB9_PROTECTED_MASK.png")
+mask_img(source_text_mask).save(out/"B238_19CEDB9_SOURCE_TEXT_MASK.png")
+mask_img(allowed).save(out/"B238_19CEDB9_ALLOWED_REGION_MASK.png")
+mask_img(~allowed).save(out/"B238_19CEDB9_PROTECTED_MASK.png")
 target=np.zeros_like(allowed)
 for _,lm in layers:
     target |= lm
-mask_img(target).save(out/"B237_19CEDB9_TARGET_TEXT_MASK.png")
-clean.save(out/"B237_19CEDB9_CLEAN_PLATE.png")
+mask_img(target).save(out/"B238_19CEDB9_TARGET_TEXT_MASK.png")
+clean.save(out/"B238_19CEDB9_CLEAN_PLATE.png")
 
 # Readable overview evidence.
 def labeled(im,label,maxw=900):
@@ -302,12 +285,12 @@ def labeled(im,label,maxw=900):
     ImageDraw.Draw(card).text((8,8),label,fill="white")
     return card
 
-cards=[labeled(source,"SOURCE"),labeled(before,"A144/C246 INPUT"),labeled(clean,"CLEAN"),labeled(persist,"B237 FINAL")]
+cards=[labeled(source,"SOURCE"),labeled(before,"A144/C246 INPUT"),labeled(clean,"CLEAN"),labeled(persist,"B238 FINAL")]
 sheet=Image.new("RGB",(sum(c.width for c in cards),max(c.height for c in cards)),(18,18,18))
 xx=0
 for c in cards:
     sheet.paste(c,(xx,0)); xx+=c.width
-sheet.save(out/"B237_19CEDB9_SOURCE_CURRENT_CLEAN_FINAL.jpg","JPEG",quality=95,subsampling=0)
+sheet.save(out/"B238_19CEDB9_SOURCE_CURRENT_CLEAN_FINAL.jpg","JPEG",quality=95,subsampling=0)
 
 # High-zoom row contacts.
 row_cards=[]
@@ -331,15 +314,15 @@ rw=max(c.width for c in row_cards); rh=sum(c.height for c in row_cards)
 rowsheet=Image.new("RGB",(rw,rh),(16,16,16)); yy=0
 for c in row_cards:
     rowsheet.paste(c,(0,yy)); yy+=c.height
-rowsheet.save(out/"B237_19CEDB9_ROW_CONTACTS.jpg","JPEG",quality=95,subsampling=0)
+rowsheet.save(out/"B238_19CEDB9_ROW_CONTACTS.jpg","JPEG",quality=95,subsampling=0)
 
 # RAW source/input/final orientation evidence.
-raw_cards=[labeled(source_raw,"SOURCE RAW"),labeled(before_raw,"INPUT RAW"),labeled(persist_raw,"B237 FINAL RAW")]
+raw_cards=[labeled(source_raw,"SOURCE RAW"),labeled(before_raw,"INPUT RAW"),labeled(persist_raw,"B238 FINAL RAW")]
 rawsheet=Image.new("RGB",(sum(c.width for c in raw_cards),max(c.height for c in raw_cards)),(18,18,18))
 xx=0
 for c in raw_cards:
     rawsheet.paste(c,(xx,0));xx+=c.width
-rawsheet.save(out/"B237_19CEDB9_RAW.jpg","JPEG",quality=94,subsampling=0)
+rawsheet.save(out/"B238_19CEDB9_RAW.jpg","JPEG",quality=94,subsampling=0)
 
 # Practical-scale evidence.
 pr=[]
@@ -349,22 +332,22 @@ for scale in (1.0,0.75,0.5):
     if im.width>1000:
         im=im.resize((1000,round(im.height*1000/im.width)),Image.Resampling.LANCZOS)
     c=Image.new("RGB",(im.width,im.height+28),(20,20,20));c.paste(im,(0,28))
-    ImageDraw.Draw(c).text((6,5),f"B237 FINAL practical {int(scale*100)}%",fill="white")
+    ImageDraw.Draw(c).text((6,5),f"B238 FINAL practical {int(scale*100)}%",fill="white")
     pr.append(c)
 pw=max(x.width for x in pr);ph=sum(x.height for x in pr)
 ps=Image.new("RGB",(pw,ph),(18,18,18));yy=0
 for c in pr:
     ps.paste(c,(0,yy));yy+=c.height
-ps.save(out/"B237_19CEDB9_PRACTICAL.jpg","JPEG",quality=94,subsampling=0)
+ps.save(out/"B238_19CEDB9_PRACTICAL.jpg","JPEG",quality=94,subsampling=0)
 
 report={
  "schema_version":2,"role":"B","run":RUN,"queue_index":44,"asset":asset_rel,
  "execution_backend":"GITHUB_ACTIONS_REPOSITORY_BACKED_BINARY_PERSISTENCE; CHATGPT_LOCAL_CONTROLLER_VISUAL_REVIEW_REQUIRED",
- "trigger":"C246_VISUAL_FAIL_REWORK_REQUIRED_TEXT_SCALE_TOO_SMALL_VS_SOURCE",
+ "trigger":"B237_CONTROLLER_SELF_QA_FAIL_EXCESSIVE_INTER_SYLLABLE_TRACKING_AFTER_C246_SCALE_REWORK",
  "source_sha256":EXPECTED_SOURCE,"before_candidate_sha256":EXPECTED_BEFORE,"candidate_sha256":after_sha,
  "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":"a95efe01d1f136514cef94b0d9e9fd61df021754"},
  "font":{"file":FONT.name,"ttc_index":FONT_INDEX,"family":"Noto Sans CJK KR Bold"},
- "construction":"exact pinned HD source -> exact source alpha clean plate -> fresh supersampled native Hangul -> source palette/effects/slant -> source-relative width/height restoration -> exact source-header DDS encode",
+ "construction":"exact pinned HD source -> exact source alpha clean plate -> fresh supersampled whole-string Hangul (no artificial inter-syllable tracking) -> source palette/effects/slant -> source-relative width/height restoration -> exact source-header DDS encode",
  "rows":rows,
  "machine_qa":{
    "rows":"12/12 PASS","changed_pixels_outside_exact_source_bboxes_vs_input":blast_old,
@@ -378,21 +361,21 @@ report={
  "ordered_generation_gate":{
    "1_english_removal_plate_restoration":"PASS_EXACT_TRANSPARENT_SOURCE_FOOTPRINT",
    "2_source_matching_slant":"PASS_SOURCE_FAMILY_PER_ROW",
-   "3_no_undersized_lettering":"PASS_MATERIAL_SOURCE_RELATIVE_SCALE_RESTORATION",
+   "3_no_undersized_lettering":"PASS_MATERIAL_SOURCE_RELATIVE_SCALE_RESTORATION_WITH_NATURAL_WORD_SHAPE",
    "4_source_faithful_weight_effect":"PASS_SOURCE_PALETTE_OUTLINE_INNER_EFFECT",
    "5_no_clipped_pixels":"PASS_POSITIVE_MARGIN_12_OF_12",
    "6_protected_art_clearance":"PASS_ZERO_BLAST_OUTSIDE_EXACT_SOURCE_BBOXES",
    "7_flip_y_raw":"EVIDENCE_WRITTEN_PENDING_CONTROLLER_VISUAL_CONFIRM",
    "8_immediate_readability":"EVIDENCE_WRITTEN_PENDING_CONTROLLER_VISUAL_CONFIRM"
  },
- "controller_visual_qa":"PENDING_CHATGPT_LOCAL_CONTROLLER",
- "status":"B237_WORKER_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA_AND_FRESH_C",
+ "controller_visual_qa":"PENDING_CHATGPT_LOCAL_CONTROLLER","supersedes":"B237_CONTROLLER_REJECT_EXCESSIVE_INTER_SYLLABLE_TRACKING",
+ "status":"B238_WORKER_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA_AND_FRESH_C",
  "runtime_validation":"UNTESTED","forbidden_domains_touched":[]
 }
-(out/"B237_19CEDB9_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"B237_Q044_19CEDB9.json").write_text(json.dumps({
+(out/"B238_19CEDB9_MACHINE_QA.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"B238_Q044_19CEDB9.json").write_text(json.dumps({
  "role":"B","run":RUN,"queue_index":44,"candidate_sha256":after_sha,
- "status":report["status"],"report":str((out/"B237_19CEDB9_MACHINE_QA.json").relative_to(repo)),
+ "status":report["status"],"report":str((out/"B238_19CEDB9_MACHINE_QA.json").relative_to(repo)),
  "runtime_validation":"UNTESTED"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps({"run":RUN,"source":EXPECTED_SOURCE,"before":EXPECTED_BEFORE,"after":after_sha,
