@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00528",
+  "production_id": "CONVERSION-DX9EX-00528",
+  "event_id": "CONVERSION-DX9EX-00528-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "selected_work_item": "DX9EX-P0-CANONICAL-RANK-RIVAL-CALLSITE-CONTRACT",
+  "base_sha": "87de3f98656724a5bdda56b1671b8cc3d23ffdee",
+  "material_result_sha": "40fc38dc4abaee8558034e4bff551dbc42218419",
+  "validation_bearing_result_sha": "40fc38dc4abaee8558034e4bff551dbc42218419",
+  "result_sha": "40fc38dc4abaee8558034e4bff551dbc42218419",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00528]",
+  "summary": "Pin 14 canonical OR2006C2C.EXE direct-CALL contracts for rank/rival marker producers and NaviPub screen-HUD sub_4BAD20 callers, and require them in the P0 visual-composition verifier. Runtime render code is unchanged.",
+  "changed_paths": [
+    "docs/VR_BINARY_CONTRACT.json",
+    "tools/verify_vr_visual_composition_p0.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00528.json"
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "dx9ex_active_run_id": 37645531658,
+    "jobs": {
+      "policy": 112875236693,
+      "game": 112875484522,
+      "full_chain_compile": 112875484544,
+      "host": 112875484721,
+      "package": 112878035425
+    },
+    "domain_isolation_run_id": 37645531775,
+    "package_artifact_id": 11494911677,
+    "package_artifact_digest": "sha256:26e281ef76dfea8e5ce035f4389d3611076ee871701a7b8d746ac8ea1640a4f9",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "issue14_comment_id": 6041291651
+  },
+  "protected_boundaries": [
+    "no runtime render-path source changed",
+    "no HUD/marker projection policy changed",
+    "no Reset/Present/OpenXR/DirectGPU behavior changed"
+  ],
+  "next_action": "Continue P0 visual-composition static closure from the latest focus HEAD. Do not request HMD validation until the full exact-SHA closure matrix is green."
+}
