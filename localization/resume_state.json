@@ -6731,7 +6731,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 18:12 KST",
+  "updated_at_kst": "2026-10-07 18:50 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7277,10 +7277,24 @@
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "latest_b_manual_visual_rework": {
-    "run": "20261007-B235-Q026-63C91067-C244-REWORK",
-    "queue_index": 26,
-    "candidate_sha256": "2dfc6214ce2383ef01f2739baeff04890d5ff78330b192fcee0d864f6caff719",
-    "status": "B235_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "run": "20261007-B236-BATCH-Q032-Q034-Q036-TOTAL-RANK",
+    "queue_indices": [
+      32,
+      34,
+      36,
+      38
+    ],
+    "candidates": {
+      "32": "2bb9d21e95a99da036657da5d696982d5ee44875c91cd798dbcb7b99830757e8",
+      "34": "a23761d1160933d968347c87ca40496b9f8e8257a102f865b2047df2a8d92763",
+      "36": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
+      "38": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8"
+    },
+    "result": "B236_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
+    "machine_qa": "5/5 containment/source-size/positive-margin; changed/alpha outside exact source boxes=0; overlap=0; header/mip1/raw mirror_y/persisted decode PASS",
+    "controller_visual_qa": "PASS SOURCE/A144/CLEAN/B236 + RAW; q32/q34 clean; q36/q38 no haze/dirty source footprint; ~90% source width; right slant 0.30",
+    "worker_run": 37602831593,
+    "worker_commit": "7cd5fc1ee773e9f160faf09d66b50afe1b5e7dbf",
     "next": "fresh independent C -> exact-SHA C3 -> regenerated PRE_INGAME English-original JPG -> user review -> actual-game validation",
     "runtime_validation": "UNTESTED"
   },
@@ -8741,5 +8755,27 @@
     "mandatory_c3": "REQUIRED_EXACT_SHA",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "b236_total_rank_batch": {
+    "run": "20261007-B236-BATCH-Q032-Q034-Q036-TOTAL-RANK",
+    "queue_indices": [
+      32,
+      34,
+      36,
+      38
+    ],
+    "candidates": {
+      "32": "2bb9d21e95a99da036657da5d696982d5ee44875c91cd798dbcb7b99830757e8",
+      "34": "a23761d1160933d968347c87ca40496b9f8e8257a102f865b2047df2a8d92763",
+      "36": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
+      "38": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8"
+    },
+    "result": "B236_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
+    "machine_qa": "5/5 containment/source-size/positive-margin; changed/alpha outside exact source boxes=0; overlap=0; header/mip1/raw mirror_y/persisted decode PASS",
+    "controller_visual_qa": "PASS SOURCE/A144/CLEAN/B236 + RAW; q32/q34 clean; q36/q38 no haze/dirty source footprint; ~90% source width; right slant 0.30",
+    "worker_run": 37602831593,
+    "worker_commit": "7cd5fc1ee773e9f160faf09d66b50afe1b5e7dbf",
+    "next": "fresh independent C -> exact-SHA C3 -> regenerated PRE_INGAME English-original JPG -> user review -> actual-game validation",
+    "runtime_validation": "UNTESTED"
   }
 }
