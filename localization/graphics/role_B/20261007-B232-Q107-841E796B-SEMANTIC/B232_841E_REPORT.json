@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B232-Q107-841E796B-SEMANTIC",
+  "queue_index": 107,
+  "work_stolen_from_lane": "A",
+  "selection_reason": "B even-shard actionable producer work exhausted; PRE_INGAME semantic false-negative found on oldest reviewed odd candidate",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+  "source_sha256": "112f47e7b16ecf21f722738f7fc9053d1a9852d66da9ef9d29fd25dadf2f567e",
+  "before_candidate_sha256": "6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad",
+  "candidate_sha256": "5e7af1d49c0ef87406d7a17b4c52fe2044dcd8c9f6fe001a1a89f5a479a5715e",
+  "defect": "SEMANTIC_ORDER_UNNATURAL: catalog intended 핸디캡 없음 but raster mapping rendered 없음 / 핸디캡",
+  "translation": {
+    "source": "No Handicap",
+    "prior": "없음 / 핸디캡",
+    "final": "무 / 핸디캡",
+    "read_as": "무 핸디캡",
+    "reason": "natural compact Korean compound while preserving narrow upper No line and wide lower Handicap line source geometry"
+  },
+  "source_line_bboxes": {
+    "No": [
+      1534,
+      258,
+      1602,
+      300
+    ],
+    "Handicap": [
+      1548,
+      303,
+      1768,
+      353
+    ]
+  },
+  "localized_top_bbox": [
+    1553,
+    264,
+    1582,
+    294
+  ],
+  "localized_top_margins": [
+    19,
+    20,
+    6,
+    6
+  ],
+  "bottom_handicap_line_pixel_exact_to_C103": true,
+  "machine_qa": {
+    "header_128_exact": true,
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "RGBA",
+    "mip_count": 1,
+    "raw_orientation": "mirror_y",
+    "changed_pixels_outside_rework_bbox": 0,
+    "changed_pixels_outside_two_source_line_bboxes": 0,
+    "positive_margin": "PASS",
+    "source_size_ceiling": "PASS",
+    "persisted_decode_identity": "PASS",
+    "protected_ferrari_model_card_art": "PIXEL_EXACT_OUTSIDE_TWO_SOURCE_LINE_BBOXES"
+  },
+  "style": {
+    "font": "NotoSansCJK-Black.ttc",
+    "font_face_index": 1,
+    "font_style": "Black,Regular",
+    "font_size": 30,
+    "readable_shear": 0.15,
+    "shadow_offset": [
+      2,
+      2
+    ],
+    "face_rgba": [
+      241,
+      178,
+      0,
+      255
+    ],
+    "shadow_rgba": [
+      33,
+      33,
+      0,
+      255
+    ]
+  },
+  "ordered_rework_gate": {
+    "plate_restoration": "PASS_REUSED_C103_VALIDATED_CLEAN",
+    "slant_direction": "PASS_RIGHT_LEAN",
+    "no_undersizing": "PASS_SOURCE_NARROW_LINE_MAX_SAFE_NATIVE",
+    "weight_effect": "PASS_REUSED_ACCEPTED_PALETTE",
+    "no_clipping": "PASS_POSITIVE_MARGIN",
+    "protected_clearance": "PASS_ZERO_OUTSIDE_SOURCE_LINES",
+    "raw_flipy": "PASS_EVIDENCE_WRITTEN",
+    "immediate_readability": "PENDING_CONTROLLER_VISUAL"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_VISUAL",
+  "status": "B232_WORKER_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

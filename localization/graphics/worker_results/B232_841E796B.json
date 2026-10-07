@@ -1,0 +1,8 @@
+{
+  "role": "B",
+  "run": "20261007-B232-Q107-841E796B-SEMANTIC",
+  "queue_index": 107,
+  "candidate_sha256": "5e7af1d49c0ef87406d7a17b4c52fe2044dcd8c9f6fe001a1a89f5a479a5715e",
+  "status": "B232_WORKER_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "report": "localization/graphics/role_B/20261007-B232-Q107-841E796B-SEMANTIC/B232_841E_REPORT.json"
+}
