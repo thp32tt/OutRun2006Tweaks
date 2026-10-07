@@ -2508,3 +2508,8 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - q30 8215FD25 fa294ef9...: fresh C PASS + exact-SHA C3_STRICT_PASS; PRE_INGAME/user JPG/new in-game pending.
 - q44 19CEDB9 8c6a390c...: machine PASS, controller visual scale FAIL -> REWORK_REQUIRED; C3 blocked.
 - RUNTIME_VALIDATION=UNTESTED; no VR/FFB/DX11/DXVK work.
+
+### C246 PRE_INGAME refresh — 2026-10-07 19:12 KST
+- Exporter run 37605030145 SUCCESS, output ce260d63a7e94c487da6ca6e0949ca90de036202.
+- q28 -> #003, q30 -> #004; exact English-source/current-candidate bindings verified and exported-card FLIP-Y/RAW controller review PASS.
+- q44 excluded as REWORK_REQUIRED. User review + actual-game validation remain pending; RUNTIME_VALIDATION=UNTESTED.
