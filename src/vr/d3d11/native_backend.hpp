@@ -3420,6 +3420,10 @@ struct NativeProgrammableShaderBackendSemanticHandoffEvidence {
     NativeProgrammableShaderTranslatedSemanticReceipt translatedSemanticReceipt{};
 };
 
+struct NativeProgrammableShaderProductionObservationEvidence;
+struct NativeProgrammableShaderTranslationAdmissionEvidence;
+struct NativeProgrammableShaderProductionSemanticReviewEvidence;
+
 class NativeProgrammableShaderBackendOwnership final {
 public:
     NativeProgrammableShaderBackendOwnership() = default;
@@ -3469,6 +3473,33 @@ public:
         const NativeProgrammableShaderBackendSemanticHandoffEvidence& handoff,
         std::uint64_t reviewSnapshotToken) const noexcept;
 
+    [[nodiscard]] NativeProgrammableShaderProductionSemanticReviewEvidence
+    materialize_semantic_translation_review_for_observation(
+        const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+        const NativeProgrammableShaderProductionObservationEvidence& observation,
+        std::uint64_t productionObservationSnapshotToken,
+        const NativeProgrammableShaderTranslationAdmissionEvidence& admission,
+        std::uint64_t admissionSnapshotToken,
+        const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+            targetBytecodeMaterialization,
+        const VertexInputLayoutTranslation& layout,
+        const ProgrammableShaderInterfaceLinkageEvidence&
+            sourceInterfaceLinkage) noexcept;
+
+    [[nodiscard]] bool validate_semantic_translation_review_snapshot(
+        const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+        const NativeProgrammableShaderProductionObservationEvidence& observation,
+        std::uint64_t productionObservationSnapshotToken,
+        const NativeProgrammableShaderTranslationAdmissionEvidence& admission,
+        std::uint64_t admissionSnapshotToken,
+        const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+            targetBytecodeMaterialization,
+        const VertexInputLayoutTranslation& layout,
+        const ProgrammableShaderInterfaceLinkageEvidence&
+            sourceInterfaceLinkage,
+        const NativeProgrammableShaderProductionSemanticReviewEvidence& review,
+        std::uint64_t reviewSnapshotToken) const noexcept;
+
     [[nodiscard]] bool ready() const noexcept {
         return device_ && cache_.ready() && cache_.device() == device_.Get() &&
             owner_generation_ != 0;
@@ -3489,6 +3520,9 @@ private:
     std::unordered_map<
         std::uint64_t,
         NativeProgrammableShaderObjectMaterializationEvidence> materializations_;
+    std::unordered_map<
+        std::uint64_t,
+        Microsoft::WRL::ComPtr<ID3D11InputLayout>> semantic_input_layouts_;
     std::uint64_t owner_generation_ = 0;
 };
 
@@ -3590,6 +3624,45 @@ validate_programmable_shader_translation_admission_snapshot(
     std::uint64_t productionObservationSnapshotToken,
     const NativeProgrammableShaderTranslationAdmissionEvidence& admission,
     std::uint64_t reviewSnapshotToken) noexcept;
+
+// R289 materializes only the D3D11 input-layout object required to review the
+// exact R288 production admission through the existing R263 semantic gate.
+// It reuses the persistent R285/R242 ownership, never accepts a device context,
+// never binds IA/VS/PS state, and cannot authorize NativeDrawPath/Draw*.
+struct NativeProgrammableShaderProductionSemanticReviewEvidence {
+    bool inputValid{};
+    bool ownerReady{};
+    bool admissionReady{};
+    bool admissionSnapshotMatches{};
+    bool targetVertexBytecodeReady{};
+    bool inputLayoutDescriptorExact{};
+    bool inputLayoutObjectReady{};
+    bool inputLayoutReused{};
+    bool translationObjectReady{};
+    bool translationObjectSnapshotMatches{};
+    bool inputLayoutReceiptReady{};
+    bool inputLayoutSnapshotMatches{};
+    bool semanticTranslationReady{};
+    bool semanticTranslationSnapshotMatches{};
+    bool objectBindingAuthorized{};
+    bool nativeDrawPathActivationAllowed{};
+    bool drawDispatchAuthorized{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    std::uint64_t cacheKey{};
+    std::uint64_t backendOwnerGeneration{};
+    std::uint64_t admissionSnapshotToken{};
+    std::uint64_t targetBytecodeMaterializationSnapshotToken{};
+    std::uint64_t cacheSnapshotToken{};
+    std::uint64_t slotSnapshotToken{};
+    std::uint64_t translationObjectSnapshotToken{};
+    std::uint64_t inputLayoutSnapshotToken{};
+    std::uint64_t semanticTranslationSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+    NativeProgrammableShaderInputLayoutReadiness inputLayout{};
+    NativeProgrammableShaderSemanticTranslationReadiness semanticTranslation{};
+};
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
 // input layout, and R96 transform buffer. No game draw path constructs or

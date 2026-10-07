@@ -6195,6 +6195,126 @@ int main()
         r288TamperedTranslationAdmission.reviewSnapshotToken == 0,
         "R288 translation admission rejects tampered R286 snapshot");
 
+    const auto r289ProductionSemanticReview =
+        r285BackendOwnership.
+            materialize_semantic_translation_review_for_observation(
+                programmablePair,
+                r286ProductionObservation,
+                r286ProductionObservation.reviewSnapshotToken,
+                r288TranslationAdmission,
+                r288TranslationAdmission.reviewSnapshotToken,
+                r283TargetBytecodeMaterialization,
+                inputLayout,
+                r268Linkage);
+    require(
+        r289ProductionSemanticReview.inputValid &&
+        r289ProductionSemanticReview.ownerReady &&
+        r289ProductionSemanticReview.admissionReady &&
+        r289ProductionSemanticReview.admissionSnapshotMatches &&
+        r289ProductionSemanticReview.targetVertexBytecodeReady &&
+        r289ProductionSemanticReview.inputLayoutDescriptorExact &&
+        r289ProductionSemanticReview.inputLayoutObjectReady &&
+        !r289ProductionSemanticReview.inputLayoutReused &&
+        r289ProductionSemanticReview.translationObjectReady &&
+        r289ProductionSemanticReview.translationObjectSnapshotMatches &&
+        r289ProductionSemanticReview.inputLayoutReceiptReady &&
+        r289ProductionSemanticReview.inputLayoutSnapshotMatches &&
+        r289ProductionSemanticReview.semanticTranslationReady &&
+        r289ProductionSemanticReview.semanticTranslationSnapshotMatches &&
+        r289ProductionSemanticReview.semanticTranslation.semanticProofPresent &&
+        !r289ProductionSemanticReview.objectBindingAuthorized &&
+        !r289ProductionSemanticReview.nativeDrawPathActivationAllowed &&
+        !r289ProductionSemanticReview.drawDispatchAuthorized &&
+        r289ProductionSemanticReview.diagnosticOnly &&
+        r289ProductionSemanticReview.boundaryPreserved &&
+        r289ProductionSemanticReview.reviewReady &&
+        r289ProductionSemanticReview.reviewSnapshotToken != 0 &&
+        r285BackendOwnership.validate_semantic_translation_review_snapshot(
+            programmablePair,
+            r286ProductionObservation,
+            r286ProductionObservation.reviewSnapshotToken,
+            r288TranslationAdmission,
+            r288TranslationAdmission.reviewSnapshotToken,
+            r283TargetBytecodeMaterialization,
+            inputLayout,
+            r268Linkage,
+            r289ProductionSemanticReview,
+            r289ProductionSemanticReview.reviewSnapshotToken),
+        "R289 production semantic review materializes R243 and validates R263 without binding or draw");
+
+    const auto r289RepeatedSemanticReview =
+        r285BackendOwnership.
+            materialize_semantic_translation_review_for_observation(
+                programmablePair,
+                r286ProductionObservation,
+                r286ProductionObservation.reviewSnapshotToken,
+                r288TranslationAdmission,
+                r288TranslationAdmission.reviewSnapshotToken,
+                r283TargetBytecodeMaterialization,
+                inputLayout,
+                r268Linkage);
+    require(
+        r289RepeatedSemanticReview.reviewReady &&
+        r289RepeatedSemanticReview.inputLayoutReused &&
+        r289RepeatedSemanticReview.inputLayoutSnapshotToken ==
+            r289ProductionSemanticReview.inputLayoutSnapshotToken &&
+        r289RepeatedSemanticReview.semanticTranslationSnapshotToken ==
+            r289ProductionSemanticReview.semanticTranslationSnapshotToken &&
+        r285BackendOwnership.validate_semantic_translation_review_snapshot(
+            programmablePair,
+            r286ProductionObservation,
+            r286ProductionObservation.reviewSnapshotToken,
+            r288TranslationAdmission,
+            r288TranslationAdmission.reviewSnapshotToken,
+            r283TargetBytecodeMaterialization,
+            inputLayout,
+            r268Linkage,
+            r289RepeatedSemanticReview,
+            r289RepeatedSemanticReview.reviewSnapshotToken),
+        "R289 repeated review reuses the persistent R243 input-layout receipt");
+
+    const auto r289StaleAdmissionToken =
+        r288TranslationAdmission.reviewSnapshotToken ^ 0x1ull;
+    const auto r289StaleAdmissionReview =
+        r285BackendOwnership.
+            materialize_semantic_translation_review_for_observation(
+                programmablePair,
+                r286ProductionObservation,
+                r286ProductionObservation.reviewSnapshotToken,
+                r288TranslationAdmission,
+                r289StaleAdmissionToken,
+                r283TargetBytecodeMaterialization,
+                inputLayout,
+                r268Linkage);
+    require(
+        r289StaleAdmissionReview.inputValid &&
+        r289StaleAdmissionReview.ownerReady &&
+        r289StaleAdmissionReview.admissionReady &&
+        !r289StaleAdmissionReview.admissionSnapshotMatches &&
+        !r289StaleAdmissionReview.semanticTranslationReady &&
+        !r289StaleAdmissionReview.boundaryPreserved &&
+        !r289StaleAdmissionReview.reviewReady &&
+        r289StaleAdmissionReview.reviewSnapshotToken == 0,
+        "R289 production semantic review rejects stale R288 admission before layout mutation");
+
+    ID3D11InputLayout* r289BoundInputLayout = nullptr;
+    ID3D11VertexShader* r289BoundVertex = nullptr;
+    ID3D11PixelShader* r289BoundPixel = nullptr;
+    r284Device.context->IAGetInputLayout(&r289BoundInputLayout);
+    r284Device.context->VSGetShader(&r289BoundVertex, nullptr, nullptr);
+    r284Device.context->PSGetShader(&r289BoundPixel, nullptr, nullptr);
+    require(
+        r289BoundInputLayout == nullptr &&
+        r289BoundVertex == nullptr &&
+        r289BoundPixel == nullptr,
+        "R289 production semantic review must not bind IA/VS/PS state");
+    if (r289BoundInputLayout)
+        r289BoundInputLayout->Release();
+    if (r289BoundVertex)
+        r289BoundVertex->Release();
+    if (r289BoundPixel)
+        r289BoundPixel->Release();
+
     const auto r286StaleMappingObservation =
         outrun::vr::dx11::
             observe_programmable_shader_production_source_evidence_chain(

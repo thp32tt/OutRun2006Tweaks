@@ -11359,6 +11359,53 @@ def main() -> None:
             + ", ".join(missing_r288_programmable_translation_admission_contract)
         )
 
+    r289_programmable_production_semantic_review_contract = [
+        ("struct NativeProgrammableShaderProductionSemanticReviewEvidence",
+         NATIVE_BACKEND_HPP, "R289 production semantic review evidence type"),
+        ("materialize_semantic_translation_review_for_observation(",
+         NATIVE_BACKEND_HPP, "R289 persistent owner review materializer declaration"),
+        ("validate_semantic_translation_review_snapshot(",
+         NATIVE_BACKEND_HPP, "R289 review snapshot validator declaration"),
+        ("semantic_input_layouts_",
+         NATIVE_BACKEND_HPP, "R289 persistent R243 input-layout object ownership"),
+        ("r289_programmable_production_semantic_review_snapshot_token(",
+         NATIVE_BACKEND_CPP, "R289 tamper-evident review snapshot"),
+        ("token, 0x289u",
+         NATIVE_BACKEND_CPP, "R289 independent snapshot domain"),
+        ("device_->CreateInputLayout(",
+         NATIVE_BACKEND_CPP, "R289 creates only the admitted input-layout object"),
+        ("cache_.attach_input_layout_for_observation(",
+         NATIVE_BACKEND_CPP, "R289 feeds the created layout into existing R243 ownership"),
+        ("compose_programmable_shader_semantic_translation_readiness(",
+         NATIVE_BACKEND_CPP, "R289 feeds R288/R243/R268 evidence into R263"),
+        ("validate_programmable_shader_semantic_translation_readiness_snapshot(",
+         NATIVE_BACKEND_CPP, "R289 validates the exact R263 review snapshot"),
+        ("out.objectBindingAuthorized =",
+         NATIVE_BACKEND_CPP, "R289 propagates and refuses object-binding authority"),
+        ("out.nativeDrawPathActivationAllowed =",
+         NATIVE_BACKEND_CPP, "R289 propagates and refuses NativeDrawPath authority"),
+        ("out.drawDispatchAuthorized =",
+         NATIVE_BACKEND_CPP, "R289 propagates and refuses Draw/DrawIndexed authority"),
+        ("R289 production semantic review materializes R243 and validates R263 without binding or draw",
+         CONSTANT_BUFFER_PROBE, "R289 positive hosted regression"),
+        ("R289 repeated review reuses the persistent R243 input-layout receipt",
+         CONSTANT_BUFFER_PROBE, "R289 persistent ownership regression"),
+        ("R289 production semantic review rejects stale R288 admission before layout mutation",
+         CONSTANT_BUFFER_PROBE, "R289 stale-admission fail-closed regression"),
+        ("R289 production semantic review must not bind IA/VS/PS state",
+         CONSTANT_BUFFER_PROBE, "R289 context-binding negative regression"),
+    ]
+    missing_r289_programmable_production_semantic_review_contract = [
+        meaning for token, source, meaning
+        in r289_programmable_production_semantic_review_contract
+        if token not in source
+    ]
+    if missing_r289_programmable_production_semantic_review_contract:
+        raise SystemExit(
+            "DX11 R289 programmable production semantic review drift: "
+            + ", ".join(missing_r289_programmable_production_semantic_review_contract)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
