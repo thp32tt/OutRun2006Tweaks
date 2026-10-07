@@ -827,7 +827,7 @@ for marker in (
     "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
     "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
     "DirectTransportFrameReadyAfterPresent() is",
-    "slot.producerPending = true;",
+    "R30SupportMarkDirectTransportSlotPending(selected, frameId);",
     "R30SupportSetActiveDirectTransportSlot(selected);",
 ):
     if marker not in r32:

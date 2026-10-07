@@ -368,7 +368,7 @@ owner_evidence = {
          "R32EnsureDirectResources(device)",
          "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
          "DirectTransportFrameReadyAfterPresent() is",
-         "slot.producerPending = true;",
+         "R30SupportMarkDirectTransportSlotPending(selected, frameId);",
          "R30SupportSetActiveDirectTransportSlot(selected);"),
     ),
     "R32ReviewSetWvpBatch": (
@@ -631,7 +631,7 @@ require(
     "R32EnsureDirectResources(device)",
     "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
     "DirectTransportFrameReadyAfterPresent() is",
-    "slot.producerPending = true;",
+    "R30SupportMarkDirectTransportSlotPending(selected, frameId);",
     "R30SupportSetActiveDirectTransportSlot(selected);",
 )
 forbid(

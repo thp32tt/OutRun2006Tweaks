@@ -48,6 +48,7 @@ required = (
     "R30SupportNoteDirectTransportRingBackpressure",
     "R30SupportDirectTransportRingBackpressureCount",
     "R30SupportSetActiveDirectTransportSlot",
+    "R30SupportMarkDirectTransportSlotPending",
     "R30SupportGpuCompletionSnapshot",
     "R30SupportTryGetGpuCompletionSnapshot",
     "R30SupportDirectTransportResourcesReady",
@@ -143,6 +144,13 @@ delegations = {
     "R30SupportSetActiveDirectTransportSlot(": (
         "ActiveDirectTransportSlot = slot;",
     ),
+    "R30SupportMarkDirectTransportSlotPending(": (
+        "auto& target = DirectTransportSlots[slot];",
+        "target.producerPending = true;",
+        "target.pendingFrameId = frameId;",
+        "target.frameId = frameId;",
+        "target.published = false;",
+    ),
     "R30SupportTryGetGpuCompletionSnapshot(": (
         "R13GpuCompletionSnapshot lower{};",
         "R13TryGetGpuCompletionSnapshot(lower)",
@@ -237,6 +245,16 @@ if "R30SupportSetActiveDirectTransportSlot(selected)" not in resolve_direct:
     errors.append("R32 DirectGPU resolve bypasses R30 active-slot owner facade")
 if re.search(r"\bActiveDirectTransportSlot\b", resolve_direct):
     errors.append("R32 DirectGPU resolve retained raw lower active-slot state")
+if "R30SupportMarkDirectTransportSlotPending(selected, frameId)" not in resolve_direct:
+    errors.append("R32 DirectGPU resolve bypasses R30 pending-slot metadata owner facade")
+for raw_write in (
+        "slot.producerPending = true;",
+        "slot.pendingFrameId = frameId;",
+        "slot.frameId = frameId;",
+        "slot.published = false;",
+):
+    if raw_write in resolve_direct:
+        errors.append(f"R32 DirectGPU resolve retained raw lower pending-slot write: {raw_write}")
 if "R30SupportGpuCompletionSnapshot ackSnapshot{};" not in resolve_direct:
     errors.append("R32 DirectGPU resolve missing R30 ACK snapshot value type")
 if "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)" not in resolve_direct:

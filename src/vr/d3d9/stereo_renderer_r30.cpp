@@ -3336,6 +3336,16 @@ namespace OutRunVRStereo
         ActiveDirectTransportSlot = slot;
     }
 
+    void R30SupportMarkDirectTransportSlotPending(
+        std::uint32_t slot, std::uint32_t frameId) noexcept
+    {
+        auto& target = DirectTransportSlots[slot];
+        target.producerPending = true;
+        target.pendingFrameId = frameId;
+        target.frameId = frameId;
+        target.published = false;
+    }
+
     bool R30SupportTryGetGpuCompletionSnapshot(
         R30SupportGpuCompletionSnapshot& out) noexcept
     {

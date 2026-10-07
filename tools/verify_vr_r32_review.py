@@ -108,7 +108,7 @@ for required in (
         "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
         "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
         "DirectTransportFrameReadyAfterPresent() is",
-        "slot.producerPending = true;",
+        "R30SupportMarkDirectTransportSlotPending(selected, frameId);",
         "R30SupportSetActiveDirectTransportSlot(selected);"):
     if required not in r32:
         raise SystemExit(f"R32 DirectGPU owner helper contract missing: {required}")

@@ -54,6 +54,8 @@ namespace OutRunVRStereo
     void R30SupportNoteDirectTransportRingBackpressure() noexcept;
     std::uint64_t R30SupportDirectTransportRingBackpressureCount() noexcept;
     void R30SupportSetActiveDirectTransportSlot(std::uint32_t slot) noexcept;
+    void R30SupportMarkDirectTransportSlotPending(
+        std::uint32_t slot, std::uint32_t frameId) noexcept;
     struct R30SupportGpuCompletionSnapshot
     {
         std::uint32_t completedFrameId[OutRunVR::RenderFrameRingSize]{};

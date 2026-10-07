@@ -486,7 +486,7 @@ require_order(
     "auto& slot = DirectTransportSlots[selected];",
     "slot.fence->Issue(D3DISSUE_END)",
     "DirectTransportFrameReadyAfterPresent() is",
-    "slot.producerPending = true;",
+    "R30SupportMarkDirectTransportSlotPending(selected, frameId);",
     "R30SupportSetActiveDirectTransportSlot(selected);",
 )
 ack_retire_marker = "The host completed this exact published frame. Retire the"
@@ -504,6 +504,16 @@ require_order(
 
 if resolve_direct_r32.count("R30SupportNoteDirectTransportRingBackpressure()") != 1:
     fail("R32 DirectGPU free-slot scan must count whole-ring backpressure once through the R30 owner facade")
+if resolve_direct_r32.count("R30SupportMarkDirectTransportSlotPending(selected, frameId)") != 1:
+    fail("R32 DirectGPU publish path must mark pending slot metadata exactly once through the R30 owner facade")
+for raw_write in (
+    "slot.producerPending = true;",
+    "slot.pendingFrameId = frameId;",
+    "slot.frameId = frameId;",
+    "slot.published = false;",
+):
+    if raw_write in resolve_direct_r32:
+        fail(f"R32 DirectGPU publish path regained raw lower pending-slot write: {raw_write}")
 if resolve_direct_r32.count("R30SupportSetActiveDirectTransportSlot(selected)") != 1:
     fail("R32 DirectGPU publish path must set the active slot exactly once through the R30 owner facade")
 if "ActiveDirectTransportSlot" in resolve_direct_r32.replace(
@@ -781,7 +791,7 @@ forbid(
 issue_marker = "const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);"
 issue_pos = resolve_direct_r32.find(issue_marker)
 pending_publish_pos = resolve_direct_r32.find(
-    "slot.producerPending = true;", issue_pos
+    "R30SupportMarkDirectTransportSlotPending(selected, frameId);", issue_pos
 )
 if min(issue_pos, pending_publish_pos) < 0:
     fail("R32 producer EVENT issue scope missing")

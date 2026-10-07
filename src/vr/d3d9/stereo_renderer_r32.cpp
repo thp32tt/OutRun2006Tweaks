@@ -587,10 +587,7 @@ namespace OutRunVRStereo
             // quarantined for the next ring scan. Avoiding the redundant
             // pre-Present 2 ms wait removes a frame-pacing stall without
             // weakening shared-eye immutability or host ACK ownership.
-            slot.producerPending = true;
-            slot.pendingFrameId = frameId;
-            slot.frameId = frameId;
-            slot.published = false;
+            R30SupportMarkDirectTransportSlotPending(selected, frameId);
             R30SupportSetActiveDirectTransportSlot(selected);
             return true;
         }
