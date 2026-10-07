@@ -1,0 +1,14 @@
+{
+  "role": "C",
+  "lane": "C2",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "run": "20261007-C237-C2-Q012-D6DC1380-EXPORT",
+  "queue_index": 12,
+  "candidate_sha256": "1df64df712f990ee5d92c53998269604ff7b9fc4ccdff8913d648f18aa604013",
+  "jpg": "001_q012_D6DC1380.jpg",
+  "manifest_count": 11,
+  "mandatory_c3_blocked_count": 10,
+  "status": "PRE_INGAME_EXPORT_REFRESH_PASS",
+  "runtime_validation": "UNTESTED"
+}
