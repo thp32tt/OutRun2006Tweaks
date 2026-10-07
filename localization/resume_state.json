@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A164R q197 9F060EC1 current-policy producer repair PASS on exact candidate 60cfa3ef1257e3bbc50a8c7152aba538837eabd2322c18e098ee7ceb61381fea. Historical C85/A88 bytes failed today's exact source-bbox rule in 5/5 rows; A164 first clean reconstruction was visually rejected, A164R nearest-background clean plate and native shared-family rerender pass controller SOURCE/OLD/CLEAN/FINAL + RAW + practical 100/75/50 review. Fresh independent C -> exact-SHA C3 -> regenerated PRE_INGAME English-original JPG/user review -> actual-game validation. RUNTIME_VALIDATION=UNTESTED.",
     "A162 q12 D6DC1380 controller visual QA rejected the C235-requested raw flip despite worker numeric PASS. Canonical English RAW and restored A160 RAW share the same visual transform and both become readable under the same FLIP-Y; A162 becomes inverted under that same transform. Attempt b82e183e... was not promoted and A160 fab100b9... was restored byte-exact. HOLD_STRICT_RECHECK pending fresh C visual RAW/FLIP-Y re-evaluation, then exact-SHA C3, PRE_INGAME user JPG and new in-game retest. RUNTIME_VALIDATION=UNTESTED.",
     "B231 q46 AA04D779 coverage repair PASS: legacy C90/USERPOLICY02 left ordinary lobby/status and gray control labels in English. Current d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0 localizes 9 semantics/13 physical rows while preserving the prior 21 stage/sector labels outside the exact rework mask. Post-encode, blast-radius, practical-scale and RAW gates PASS. Fresh C then exact-SHA mandatory C3 required before PRE_INGAME export; actual game remains UNTESTED.",
     "B230 q232 EBFC709F coverage repair PASS: PRE_INGAME #019 exposed two untranslated ordinary help sentences. Current dc76c000cfce17098940f551512e6f746319ba8a1892345eb060693004747ea1 adds 게임을 만들고 친구를 초대하세요! / 친구들과 OutRun 게임에 참가하세요!, preserves the four B219 headings outside the exact two-row rework mask, and passes decoded-DDS/blast-radius/100-75-50/RAW gates. Fresh independent C then exact-SHA mandatory C3 are required before PRE_INGAME export; actual-game validation remains pending. RUNTIME_VALIDATION=UNTESTED.",
@@ -8588,5 +8589,29 @@
     "pre_ingame_export": "PENDING_REFRESH_Q26",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "a164r_q197_9f060ec1": {
+    "timestamp_kst": "2026-10-07T18:00:00+09:00",
+    "run": "20261007-A164R-Q197-9F060EC1-EXACT-BBOX",
+    "role": "A",
+    "queue_index": 197,
+    "asset": "9F060EC1",
+    "execution_backend": "GITHUB_ACTIONS_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILURE; N100_VISUAL_EVIDENCE_ONLY",
+    "source_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+    "prior_candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+    "a164_rejected_candidate_sha256": "99aa4d5d74d4330e2f2cd44598e0ed66a2a2494345caec3afffa0f64b0c7e4cf",
+    "candidate_sha256": "60cfa3ef1257e3bbc50a8c7152aba538837eabd2322c18e098ee7ceb61381fea",
+    "historical_current_policy_fail_rows": 5,
+    "machine_qa": "5/5 BBOX_SIZE_POSITIVE_MARGIN_PASS; ZERO_PIXEL_ALPHA_BLAST_OUTSIDE_DECLARED_REWORK_UNION; ZERO_PAIR_OVERLAP; HEADER_MIP1_RAW_PASS",
+    "controller_visual_qa": "PASS_SOURCE_OLD_CLEAN_FINAL_ROWS_RAW_PRACTICAL_100_75_50",
+    "a164_first_attempt": "REJECTED_HORIZONTAL_STREAK_CLEAN_PLATE",
+    "status": "A164R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "fresh_independent_c": "REQUIRED",
+    "mandatory_c3_strict_audit": "REQUIRED_EXACT_SHA",
+    "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": [],
+    "report": "localization/graphics/role_A/20261007-A164R-Q197-9F060EC1-EXACT-BBOX/A164R_Q197_REPORT.json",
+    "controller_qa": "localization/graphics/role_A/20261007-A164R-Q197-9F060EC1-EXACT-BBOX/A164R_CONTROLLER_SELF_QA.json"
   }
 }
