@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B239 q52 A8CE339F c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e: fresh independent C + exact-SHA C3 required; PRE_INGAME blocked; RUNTIME_VALIDATION=UNTESTED.",
     "C250 returned q57 39229D64, q61 C4A2937B and q65 EBEF6D20 to A/B REWORK_REQUIRED after machine containment PASS but controller visual/semantic failures. q57: restore source slant/gradient/depth/effect family; q61: restore proven Cut the line! -> 하트선을 통과하세요! semantics plus yellow/navy/white instruction style; q65: fix EASY green style and source label slant/outline family. Then producer QA -> fresh C1 -> exact-SHA C3 -> PRE_INGAME/user JPG -> NEW actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
     "A165 work-steal batch resolved C245 q28/q30 Total Rank hierarchy failures. q28 final A165R2 1ced3cfa... uses glyph-mask-only plate repair after two whole-bbox clean attempts were visually rejected; 476x80 in 525x90. q30 final A165 fa294ef9... has two 486x92 rows in 535x102/534x102. Both producer machine/controller visual QA PASS; fresh independent C -> exact-SHA C3 -> PRE_INGAME JPG/user review -> actual-game retest. RUNTIME_VALIDATION=UNTESTED.",
     "A164R q197 9F060EC1 current-policy producer repair PASS on exact candidate 60cfa3ef1257e3bbc50a8c7152aba538837eabd2322c18e098ee7ceb61381fea. Historical C85/A88 bytes failed today's exact source-bbox rule in 5/5 rows; A164 first clean reconstruction was visually rejected, A164R nearest-background clean plate and native shared-family rerender pass controller SOURCE/OLD/CLEAN/FINAL + RAW + practical 100/75/50 review. Fresh independent C -> exact-SHA C3 -> regenerated PRE_INGAME English-original JPG/user review -> actual-game validation. RUNTIME_VALIDATION=UNTESTED.",
@@ -4058,32 +4059,49 @@
   "current_producer_rework_remaining": 0,
   "current_producer_rework_assets": [],
   "latest_b_production": {
-    "timestamp_kst": "2026-10-06T09:19:51+09:00",
-    "run": "20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE",
+    "run": "20261007-B239-Q052-A8CE339F-START-FAMILY",
+    "timestamp_kst": "2026-10-08T00:07:49+09:00",
+    "role": "B",
     "queue_index": 52,
     "asset": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
     "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
-    "candidate_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
-    "classification": "ZOOM_REVIEW_TO_LOCALIZE_TEXT",
-    "segments": {
-      "Extra Time": "추가 시간",
-      "Start x2": "출발",
-      "Goal x2": "골"
-    },
-    "b175_rejected_numeric_false_negative": true,
+    "prior_candidate_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
+    "candidate_sha256": "c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e",
+    "reason": "duplicate Start UI-family mismatch 60x36 vs 53x31 on identical 107x41 source cells",
+    "repair": "right Start only; final left/right 출발 = 60x36/60x36",
     "machine_qa": {
-      "bbox_size_positive_margin": "5/5 PASS",
+      "right_bbox": [
+        826,
+        312,
+        886,
+        348
+      ],
+      "right_source_bbox": [
+        801,
+        309,
+        908,
+        350
+      ],
+      "margins": [
+        25,
+        22,
+        3,
+        2
+      ],
       "outside": 0,
       "alpha_outside": 0,
-      "visible_outside": 0,
-      "source_residue": 0,
-      "compressed_outside_patch": 0
+      "changed_bc3_blocks": 137,
+      "header_128_exact": true,
+      "raw_orientation": "mirror_y",
+      "non_target_b176_rows_pixel_exact": true,
+      "persisted_decode": "PASS"
     },
-    "controller_visual_qa": "PASS_AFTER_SOURCE_RESIDUE_REPAIR",
-    "status": "B176_SELF_QA_PASS_PENDING_C_AND_INGAME",
-    "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_A8CE339F_REPORT.json",
-    "controller_report": "localization/graphics/role_B/20261006-B-PRODUCTION176-A8CE339F-DXT5-RESIDUE/B176_CONTROLLER_SELF_QA.json"
+    "controller_visual_qa": "PASS_FOCUS_READABLE_RAW",
+    "status": "B239_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_AND_EXACT_SHA_C3",
+    "fresh_independent_c": "REQUIRED",
+    "mandatory_c3": "REQUIRED_EXACT_SHA_DXT5_FAMILY_FALSE_NEGATIVE",
+    "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+    "runtime_validation": "UNTESTED"
   },
   "c177_controller_final_qa": {
     "timestamp_kst": "2026-10-05T17:56:29+09:00",
@@ -4231,7 +4249,8 @@
     "AA04D779",
     "39229D64",
     "C4A2937B",
-    "EBEF6D20"
+    "EBEF6D20",
+    "A8CE339F"
   ],
   "c180_controller_final_qa": {
     "timestamp_kst": "2026-10-05T19:02:14+09:00",
@@ -6723,7 +6742,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07T22:44:21+09:00",
+  "updated_at_kst": "2026-10-08T00:07:49+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7269,25 +7288,21 @@
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "latest_b_manual_visual_rework": {
-    "run": "20261007-B236-BATCH-Q032-Q034-Q036-TOTAL-RANK",
+    "run": "20261007-B239-Q052-A8CE339F-START-FAMILY",
     "queue_indices": [
-      32,
-      34,
-      36,
-      38
+      52
     ],
     "candidates": {
-      "32": "2bb9d21e95a99da036657da5d696982d5ee44875c91cd798dbcb7b99830757e8",
-      "34": "a23761d1160933d968347c87ca40496b9f8e8257a102f865b2047df2a8d92763",
-      "36": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
-      "38": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8"
+      "52": "c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e"
     },
-    "result": "B236_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
-    "machine_qa": "5/5 containment/source-size/positive-margin; changed/alpha outside exact source boxes=0; overlap=0; header/mip1/raw mirror_y/persisted decode PASS",
-    "controller_visual_qa": "PASS SOURCE/A144/CLEAN/B236 + RAW; q32/q34 clean; q36/q38 no haze/dirty source footprint; ~90% source width; right slant 0.30",
-    "worker_run": 37602831593,
-    "worker_commit": "7cd5fc1ee773e9f160faf09d66b50afe1b5e7dbf",
-    "next": "fresh independent C -> exact-SHA C3 -> regenerated PRE_INGAME English-original JPG -> user review -> actual-game validation",
+    "result": "B239_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_AND_EXACT_SHA_C3",
+    "machine_qa": "duplicate Start 60x36/60x36; right bbox/size/margin PASS; outside/alpha=0; 137 BC3 blocks; non-target B176 exact; persisted DXT5/header/raw mirror_y PASS",
+    "controller_visual_qa": "PASS focus/full readable/RAW",
+    "skipped_same_cycle": [
+      "q60 A064FDFC changed by A167 to 457f29f6e3a42b674411baae993c6660addca8e6aa4c0f3904af60ec4e0a20e2",
+      "q212 BA0147DA changed by A167R2 to 6e108032df506fd5c3605fd138f878e546ac2c4ee459e0525eae0b6938ddd5ba"
+    ],
+    "next": "fresh independent C -> exact-SHA C3 -> PRE_INGAME/user review -> actual-game validation",
     "runtime_validation": "UNTESTED"
   },
   "latest_c_pre_ingame_export": {
@@ -9300,5 +9315,50 @@
     "pre_ingame_export": "PENDING_Q63_REFRESH",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "b239_q52_a8ce339f": {
+    "run": "20261007-B239-Q052-A8CE339F-START-FAMILY",
+    "timestamp_kst": "2026-10-08T00:07:49+09:00",
+    "role": "B",
+    "queue_index": 52,
+    "asset": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+    "source_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+    "prior_candidate_sha256": "d9e590a8e36a735d1edb116ee606aa486e85de8b926bab3a95a741cbfca66fd8",
+    "candidate_sha256": "c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e",
+    "reason": "duplicate Start UI-family mismatch 60x36 vs 53x31 on identical 107x41 source cells",
+    "repair": "right Start only; final left/right 출발 = 60x36/60x36",
+    "machine_qa": {
+      "right_bbox": [
+        826,
+        312,
+        886,
+        348
+      ],
+      "right_source_bbox": [
+        801,
+        309,
+        908,
+        350
+      ],
+      "margins": [
+        25,
+        22,
+        3,
+        2
+      ],
+      "outside": 0,
+      "alpha_outside": 0,
+      "changed_bc3_blocks": 137,
+      "header_128_exact": true,
+      "raw_orientation": "mirror_y",
+      "non_target_b176_rows_pixel_exact": true,
+      "persisted_decode": "PASS"
+    },
+    "controller_visual_qa": "PASS_FOCUS_READABLE_RAW",
+    "status": "B239_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_AND_EXACT_SHA_C3",
+    "fresh_independent_c": "REQUIRED",
+    "mandatory_c3": "REQUIRED_EXACT_SHA_DXT5_FAMILY_FALSE_NEGATIVE",
+    "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
+    "runtime_validation": "UNTESTED"
   }
 }
