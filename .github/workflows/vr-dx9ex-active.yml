@@ -41,6 +41,8 @@ on:
       - 'tools/verify_vr_nearplane_active_gate.py'
       - 'tools/verify_vr_hook_graph.py'
       - 'tools/verify_vr_refactor_contract.py'
+      - 'tools/verify_vr_r84_focus_inventory.py'
+      - 'docs/automation/r84-port/**'
       - 'tools/verify_vr_sumo_replay_semantics.py'
       - 'tools/verify_vr_hud_cadence_restore.py'
       - 'tools/verify_vr_producer_provenance.py'
@@ -94,6 +96,7 @@ jobs:
             'tools/verify_vr_r32_review.py',
             'tools/verify_vr_hook_graph.py',
             'tools/verify_vr_refactor_contract.py',
+            'tools/verify_vr_r84_focus_inventory.py',
             'tools/verify_vr_sumo_replay_semantics.py',
             'tools/verify_vr_hud_cadence_restore.py',
             'tools/verify_vr_producer_provenance.py',
