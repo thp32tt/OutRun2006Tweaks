@@ -8,16 +8,21 @@
       "asset": "FD90AA9",
       "before": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
       "after": "7a7d1e6c62dca8d699dac689fabfb4314d7f6a5f35aeac130b9a8817afccea76",
-      "machine": "PASS"
+      "machine": "PASS",
+      "controller_visual_qa": "REJECTED_RECTANGULAR_PLATE",
+      "status": "SUPERSEDED_BY_A175_RESTORE_HOLD_STRICT_RECHECK"
     },
     {
       "index": 193,
       "asset": "97E863AD",
       "before": "f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69",
       "after": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
-      "machine": "PASS"
+      "machine": "PASS",
+      "controller_visual_qa": "PASS",
+      "status": "A171_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME"
     }
   ],
   "runtime_validation": "UNTESTED",
-  "status": "A171_BATCH_MACHINE_PASS_PENDING_CONTROLLER_VISUAL"
+  "status": "MIXED_Q193_SELF_QA_PASS_Q121_SUPERSEDED_BY_A175_HOLD_STRICT_RECHECK",
+  "q121_final_restore_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433"
 }
