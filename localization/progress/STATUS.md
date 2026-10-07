@@ -2689,3 +2689,7 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 ### B246 q212 — 2026-10-08 05:40 KST
 - q212 BA0147DA exact 01c7aded...: 하트 어택 모드 whole-phrase 903x154 / source 1759x158, producer machine+visual PASS; B245 underfill superseded.
 - Next: fresh C2 + exact-SHA C3 -> PRE_INGAME/user review -> NEW in-game retest. RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.
+
+### B247 q62 — 2026-10-08 05:50 KST
+- q62 dcec31a1... producer machine+visual PASS: opaque Layer43 erase rectangles replaced by transparent atlas background; road/green edge continuous.
+- Fresh C + exact-SHA C3 -> PRE_INGAME/user review -> actual-game pending. RUNTIME_VALIDATION=UNTESTED.

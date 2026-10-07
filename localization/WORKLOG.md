@@ -3374,3 +3374,9 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Exact candidate 01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6: 903x154 inside source 1759x158 (51.34% width, +180px vs B245), margins 5/851/2/2, Noto Sans CJK KR Black at 0.94 aspect/source red. changed/alpha outside=0; protected overlap=0; C2C byte region exact; header/mip1/decode/RAW mirror_y PASS.
 - Controller SOURCE/B245/CLEAN/B246 + 100/75/50 practical + RAW visual PASS: cohesive phrase, tall mild-condensed family, no residue/clipping/broken glyph/collision.
 - Hosted run 37675870154 remained stuck in step 6 >30m; contract fallback used the identical pinned script/input on N100 after exact SHA verification. Material commit adfe59f7.... Fresh C + exact-SHA C3 + PRE_INGAME/user JPG + NEW actual-game retest remain. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-08 05:50 KST — B247 q62 transparent Layer43 clean repair
+- Consumed C261 q62 REWORK_REQUIRED after q212 B246 completion; no completed C-pass asset repeated.
+- Root cause: B244 treated PSD Layer43 white erase canvas as opaque. B247 exact dcec31a16d2a21d34bcf6ef33267b31d2940072ca897060a3ad52147a5d101d4 converts only those white erase pixels in EASY/HARD source bboxes to transparent, preserves authored road/green-edge/lane pixels, and rerenders the proven 73px Black/white7/navy5 labels.
+- EASY 12,028 / HARD 12,267 white pixels -> transparent; opaque white outside glyph=0; 2/2 containment/size/margins; changed/alpha outside=0; non-target atlas exact; header/mip1/decode/RAW PASS.
+- SOURCE/B244 reject/B247 clean/final, full practical and RAW controller review PASS: C261 white rectangles are gone; road continuity is clean. Hosted B247 remained pending behind stuck B246, so identical pinned script/input used N100 fallback. Material commit 18b2151f.... Fresh C/C3/PRE_INGAME/actual-game pending. RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.

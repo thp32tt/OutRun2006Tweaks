@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T05:40:00+09:00",
+  "updated_at_kst": "2026-10-08T05:50:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -5400,38 +5400,22 @@
     "runtime_validation": "UNTESTED"
   },
   "latest_b_production": {
-    "run": "20261008-B246-Q212-HEART-MODE-TITLE",
-    "timestamp_kst": "2026-10-08T05:40:00+09:00",
+    "run": "20261008-B247-Q062-TRANSPARENT-L43-CLEAN",
+    "timestamp_kst": "2026-10-08T05:50:00+09:00",
     "role": "B",
-    "queue_index": 212,
-    "asset": "BA0147DA",
-    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
-    "prior_candidate_sha256": "03f058c2eb21fa39a7d27db8159ba0aa2e1c2497ebd51465ca667ed44331605d",
-    "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
-    "material_commit": "adfe59f7ec80d5d9e7e0e98595ab33b67333f3a5",
-    "semantic": "HEART ATTACK contextual intro -> 하트 어택 모드 using q116 canonical project precedent",
+    "queue_index": 62,
+    "asset": "33491F83",
+    "prior_candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
+    "candidate_sha256": "dcec31a16d2a21d34bcf6ef33267b31d2940072ca897060a3ad52147a5d101d4",
+    "material_commit": "18b2151f0adf36cf4f8b91c99274cd77baf4dcc6",
     "machine_qa": {
-      "source_bbox": [
-        21,
-        1316,
-        1780,
-        1474
-      ],
-      "localized_bbox": [
-        26,
-        1318,
-        929,
-        1472
-      ],
-      "localized_size": [
-        903,
-        154
-      ],
-      "width_ratio": 0.5134,
-      "height_ratio": 0.9747,
+      "rows": "2/2 PASS",
+      "easy_white_to_transparent": 12028,
+      "hard_white_to_transparent": 12267,
+      "opaque_white_background": 0,
       "changed_outside": 0,
       "alpha_outside": 0,
-      "protected_overlap": 0,
+      "non_target_exact": true,
       "header_exact": true,
       "mips": 1,
       "raw_orientation": "mirror_y",
@@ -5439,13 +5423,12 @@
     },
     "visual_qa": {
       "decision": "PASS",
-      "source_clean_final": "PASS",
-      "practical_100_75_50": "PASS",
+      "source_reject_clean_final": "PASS",
+      "practical": "PASS",
       "raw": "PASS"
     },
     "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
-    "fallback_reason": "GitHub-hosted run 37675870154 stuck in step 6 >30m; identical pinned B246 script/input executed after exact SHA verification",
-    "status": "B246_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
+    "status": "B247_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
@@ -6157,6 +6140,39 @@
     "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
     "fallback_reason": "GitHub-hosted run 37675870154 stuck in step 6 >30m; identical pinned B246 script/input executed after exact SHA verification",
     "status": "B246_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
+  },
+  "b247_q062_33491f83": {
+    "run": "20261008-B247-Q062-TRANSPARENT-L43-CLEAN",
+    "timestamp_kst": "2026-10-08T05:50:00+09:00",
+    "role": "B",
+    "queue_index": 62,
+    "asset": "33491F83",
+    "prior_candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
+    "candidate_sha256": "dcec31a16d2a21d34bcf6ef33267b31d2940072ca897060a3ad52147a5d101d4",
+    "material_commit": "18b2151f0adf36cf4f8b91c99274cd77baf4dcc6",
+    "machine_qa": {
+      "rows": "2/2 PASS",
+      "easy_white_to_transparent": 12028,
+      "hard_white_to_transparent": 12267,
+      "opaque_white_background": 0,
+      "changed_outside": 0,
+      "alpha_outside": 0,
+      "non_target_exact": true,
+      "header_exact": true,
+      "mips": 1,
+      "raw_orientation": "mirror_y",
+      "persisted_decode": "PASS"
+    },
+    "visual_qa": {
+      "decision": "PASS",
+      "source_reject_clean_final": "PASS",
+      "practical": "PASS",
+      "raw": "PASS"
+    },
+    "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
+    "status": "B247_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
