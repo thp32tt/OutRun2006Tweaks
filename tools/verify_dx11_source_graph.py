@@ -11320,6 +11320,45 @@ def main() -> None:
             + ", ".join(missing_r287_programmable_runtime_census_bridge)
         )
 
+    r288_programmable_translation_admission_contract = [
+        ("struct NativeProgrammableShaderTranslationAdmissionEvidence",
+         NATIVE_BACKEND_HPP, "R288 promotion-review admission evidence type"),
+        ("validate_programmable_shader_production_observation_snapshot(",
+         NATIVE_BACKEND_HPP, "R288 validates the exact R286 production observation"),
+        ("seal_programmable_shader_translation_admission(",
+         NATIVE_BACKEND_HPP, "R288 admission receipt declaration"),
+        ("validate_programmable_shader_translation_admission_snapshot(",
+         NATIVE_BACKEND_HPP, "R288 admission snapshot validator declaration"),
+        ("r288_programmable_translation_admission_snapshot_token(",
+         NATIVE_BACKEND_CPP, "R288 tamper-evident admission snapshot"),
+        ("token, 0x288u",
+         NATIVE_BACKEND_CPP, "R288 independent snapshot domain"),
+        ("validate_programmable_shader_production_observation_snapshot(",
+         NATIVE_BACKEND_CPP, "R288 seals the current R286 observation snapshot"),
+        ("validate_programmable_shader_translated_semantic_receipt_snapshot(",
+         NATIVE_BACKEND_CPP, "R288 validates the nested exact R275 semantic receipt"),
+        ("out.objectBindingAuthorized =",
+         NATIVE_BACKEND_CPP, "R288 propagates and refuses shader binding authority"),
+        ("out.nativeDrawPathActivationAllowed =",
+         NATIVE_BACKEND_CPP, "R288 propagates and refuses NativeDrawPath authority"),
+        ("out.drawDispatchAuthorized =",
+         NATIVE_BACKEND_CPP, "R288 propagates and refuses Draw/DrawIndexed authority"),
+        ("R288 translation admission seals exact R286/R275 readiness without authorizing binding or draw",
+         DX11_CONSTANT_BUFFER_PROBE, "R288 exact admission hosted regression"),
+        ("R288 translation admission rejects tampered R286 snapshot",
+         DX11_CONSTANT_BUFFER_PROBE, "R288 stale/tampered R286 hosted regression"),
+    ]
+    missing_r288_programmable_translation_admission_contract = [
+        meaning for token, source, meaning
+        in r288_programmable_translation_admission_contract
+        if token not in source
+    ]
+    if missing_r288_programmable_translation_admission_contract:
+        raise SystemExit(
+            "DX11 R288 programmable translation admission drift: "
+            + ", ".join(missing_r288_programmable_translation_admission_contract)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
