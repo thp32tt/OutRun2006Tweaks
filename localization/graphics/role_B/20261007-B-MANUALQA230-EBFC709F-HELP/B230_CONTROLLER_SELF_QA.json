@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B-MANUALQA230-EBFC709F-HELP",
+  "timestamp_kst": "2026-10-07T12:40:07+09:00",
+  "queue_index": 232,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "trigger": "PRE_INGAME #019 localization coverage false negative",
+  "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+  "before_candidate_sha256": "54ed1e64dde7be9686b882748ab934d3e465d9966289c6ec7772daeeef8f7221",
+  "candidate_sha256": "dc76c000cfce17098940f551512e6f746319ba8a1892345eb060693004747ea1",
+  "github_hosted_worker_run": 37567563727,
+  "coverage_repair": [
+    {
+      "source": "Create a game and invite your friends!",
+      "korean": "게임을 만들고 친구를 초대하세요!"
+    },
+    {
+      "source": "Join your friends in a game of OutRun!",
+      "korean": "친구들과 OutRun 게임에 참가하세요!"
+    }
+  ],
+  "brand_policy": "OutRun retained in English inside Korean explanatory UI sentence",
+  "machine_qa": {
+    "source_bboxes": [
+      "[7,367,1120,437]",
+      "[4,527,1138,597]"
+    ],
+    "final_bboxes": [
+      "[9,369,887,435]",
+      "[6,529,1006,595]"
+    ],
+    "source_sizes": [
+      "1113x70",
+      "1134x70"
+    ],
+    "final_sizes": [
+      "878x66",
+      "1000x66"
+    ],
+    "bbox_source_size_positive_margin": "2/2 PASS",
+    "clean_validator": "PASS",
+    "final_validator": "PASS",
+    "baseline_changes_outside_rework_mask": 0,
+    "baseline_alpha_changes_outside_rework_mask": 0,
+    "clean_source_help_alpha_remaining": 0,
+    "localized_help_overlap": 0,
+    "persisted_decode_matches_intended": "PASS",
+    "mip_review": "PASS_LEVEL0_ONLY_NO_AUTHORED_EXTRA_MIPS",
+    "header_128_exact": true,
+    "raw_mode": "BGRA",
+    "raw_orientation": "mirror_y"
+  },
+  "post_encode_presentation_gate": {
+    "decoded_persisted_dds_authority": "PASS",
+    "practical_scale_100_75_50": "PASS",
+    "ui_family_style_profile": "PASS_DARK_CONDENSED_BOLD_UPRIGHT_LEFT_ANCHORED_NO_EXTRA_EFFECTS",
+    "rework_blast_radius": "PASS_ZERO_OUTSIDE_TWO_EXACT_HELP_BBOXES",
+    "localization_coverage": "PASS_ALL_VISIBLE_LOCALIZABLE_SEGMENTS_ACCOUNTED",
+    "mandatory_c3": "REQUIRED_BEFORE_PRE_INGAME_EXPORT_FOR_CURRENT_SHA_DUE_PRIOR_STYLE_FALSE_NEGATIVE_HISTORY"
+  },
+  "controller_visual_qa": {
+    "source_old_clean_final": "PASS",
+    "practical_scale_contact": "PASS_100_75_50",
+    "raw_mirror_y": "PASS",
+    "source_removal": "PASS_NO_VISIBLE_ENGLISH_HELP_RESIDUE",
+    "hierarchy": "PASS_HELP_ROWS_NEAR_SOURCE_HEIGHT_66_VS_70",
+    "typography": "PASS_SOURCE_DARK_CONDENSED_UPRIGHT_FAMILY",
+    "placement": "PASS_SOURCE_LEFT_2PX",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "protected_intrusion": "NONE_VISIBLE",
+    "glyph_integrity": "PASS",
+    "orientation_regression": "NONE_VISIBLE",
+    "observations": [
+      "C225R numeric/static pass had intentionally preserved two ordinary explanatory sentences in English; current coverage gate classifies both as localization omissions.",
+      "B230 removes only those two exact source-visible rows while preserving all four B219 Korean JOIN/CREATE headings pixel-exact outside the declared rework mask.",
+      "At 100%, 75% and 50% proxy display scales both Korean help rows remain immediately readable with source-like dark condensed hierarchy; no source residue or halo is visible.",
+      "RAW mirror-Y remains consistent with readable orientation."
+    ]
+  },
+  "ordered_generation_gate": {
+    "english_removal_and_plate_restoration": "PASS",
+    "slant_direction": "PASS_SOURCE_UPRIGHT",
+    "text_scale": "PASS_MAX_NATIVE_HEIGHT_WITH_SOURCE_CONDENSED_PROFILE",
+    "weight_outline_shadow": "PASS_DARK_BOLD_NO_EXTRA_EFFECTS",
+    "clipping": "PASS",
+    "protected_graphics": "PASS",
+    "flip_y_and_raw": "PASS",
+    "readability_vs_source": "PASS"
+  },
+  "decision": "B230_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
