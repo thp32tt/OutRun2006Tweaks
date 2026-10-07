@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "timestamp_kst": "2026-10-08T01:22:00+09:00",
+  "execution_backend": "GITHUB_ACTIONS_FALLBACK_AFTER_CHATGPT_LOCAL_GITHUB_DNS_FAILURE",
+  "q193": {
+    "queue_index": 193,
+    "asset": "97E863AD",
+    "candidate_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
+    "machine_qa": "PASS_3_OF_3_ZERO_OUTSIDE",
+    "controller_visual_qa": "PASS_SOURCE_PRIOR_CLEAN_FINAL_RAW",
+    "decision": "SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME"
+  },
+  "q121": {
+    "queue_index": 121,
+    "asset": "FD90AA9",
+    "restored_sha256": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+    "attempts_rejected": [
+      "A171",
+      "A172",
+      "A173",
+      "A174"
+    ],
+    "decision": "HOLD_STRICT_RECHECK",
+    "reason": "visual rectangular plate regression; restored prior bytes"
+  },
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
