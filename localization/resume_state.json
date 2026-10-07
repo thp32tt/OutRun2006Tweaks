@@ -4061,56 +4061,52 @@
   "current_producer_rework_remaining": 0,
   "current_producer_rework_assets": [],
   "latest_b_production": {
-    "run": "20261008-B244-Q062-PSD-L43-CLEAN",
-    "timestamp_kst": "2026-10-08T04:00:00+09:00",
+    "run": "20261008-B246-Q212-HEART-MODE-TITLE",
+    "timestamp_kst": "2026-10-08T05:40:00+09:00",
     "role": "B",
-    "queue_index": 62,
-    "asset": "33491F83",
-    "trigger": "C259_REWORK_REQUIRED_CLEAN_PLATE_WHITE_OVAL_PATCHES",
-    "source_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
-    "prior_candidate_sha256": "58fe9ed97494a2026a671e777c2af7da75a33bdd9432e5ab1fa4b547f1cd54b2",
-    "candidate_sha256": "fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6",
-    "material_commit": "a85212a6601408a23b496dfe84356492620bec24",
-    "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
-    "fallback_reason": "GitHub-hosted B244 run 37667995926 remained queued behind C260 PRE_INGAME exporter for >15 minutes; exact prior candidate and authored evidence hashes verified before deterministic fallback.",
+    "queue_index": 212,
+    "asset": "BA0147DA",
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "prior_candidate_sha256": "03f058c2eb21fa39a7d27db8159ba0aa2e1c2497ebd51465ca667ed44331605d",
+    "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+    "material_commit": "adfe59f7ec80d5d9e7e0e98595ab33b67333f3a5",
+    "semantic": "HEART ATTACK contextual intro -> 하트 어택 모드 using q116 canonical project precedent",
     "machine_qa": {
-      "target_rows": "2/2 PASS",
-      "changed_pixels_vs_a132": 7788,
-      "changed_outside_target_bboxes": 0,
-      "alpha_changed_outside_target_bboxes": 0,
-      "background_mismatch_vs_layer43_outside_glyph": 0,
-      "non_target_atlas_pixel_exact": true,
-      "header_128_exact": true,
+      "source_bbox": [
+        21,
+        1316,
+        1780,
+        1474
+      ],
+      "localized_bbox": [
+        26,
+        1318,
+        929,
+        1472
+      ],
+      "localized_size": [
+        903,
+        154
+      ],
+      "width_ratio": 0.5134,
+      "height_ratio": 0.9747,
+      "changed_outside": 0,
+      "alpha_outside": 0,
+      "protected_overlap": 0,
+      "header_exact": true,
       "mips": 1,
       "raw_orientation": "mirror_y",
       "persisted_decode": "PASS"
     },
     "visual_qa": {
       "decision": "PASS",
-      "plate_restoration": "PASS_AUTHORED_LAYER43_CONTINUOUS_ROAD_NO_WHITE_PATCH",
-      "easy_bbox": [
-        186,
-        287,
-        329,
-        371
-      ],
-      "hard_bbox": [
-        829,
-        288,
-        1039,
-        372
-      ],
-      "evidence": [
-        "B244_Q062_EASY_HARD_ZOOM.jpg",
-        "B244_Q062_MAIN_COMPARE.jpg",
-        "B244_Q062_RAW.jpg"
-      ]
+      "source_clean_final": "PASS",
+      "practical_100_75_50": "PASS",
+      "raw": "PASS"
     },
-    "status": "B244_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
-    "fresh_independent_c": "REQUIRED",
-    "mandatory_c3": "REQUIRED_C259_VISUAL_REGRESSION",
-    "pre_ingame_export": "BLOCKED_UNTIL_FRESH_C_C3",
-    "actual_ingame_validation": "PENDING",
+    "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
+    "fallback_reason": "GitHub-hosted run 37675870154 stuck in step 6 >30m; identical pinned B246 script/input executed after exact SHA verification",
+    "status": "B246_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   },
@@ -6776,7 +6772,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T05:03:26+09:00",
+  "updated_at_kst": "2026-10-08T05:40:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -10213,5 +10209,55 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": [],
     "controller_report": "localization/graphics/role_C/20261008-C263-C2-Q104-Q112-Q116/C263_CONTROLLER_FINAL_QA.json"
+  },
+  "b246_q212_ba0147da": {
+    "run": "20261008-B246-Q212-HEART-MODE-TITLE",
+    "timestamp_kst": "2026-10-08T05:40:00+09:00",
+    "role": "B",
+    "queue_index": 212,
+    "asset": "BA0147DA",
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "prior_candidate_sha256": "03f058c2eb21fa39a7d27db8159ba0aa2e1c2497ebd51465ca667ed44331605d",
+    "candidate_sha256": "01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6",
+    "material_commit": "adfe59f7ec80d5d9e7e0e98595ab33b67333f3a5",
+    "semantic": "HEART ATTACK contextual intro -> 하트 어택 모드 using q116 canonical project precedent",
+    "machine_qa": {
+      "source_bbox": [
+        21,
+        1316,
+        1780,
+        1474
+      ],
+      "localized_bbox": [
+        26,
+        1318,
+        929,
+        1472
+      ],
+      "localized_size": [
+        903,
+        154
+      ],
+      "width_ratio": 0.5134,
+      "height_ratio": 0.9747,
+      "changed_outside": 0,
+      "alpha_outside": 0,
+      "protected_overlap": 0,
+      "header_exact": true,
+      "mips": 1,
+      "raw_orientation": "mirror_y",
+      "persisted_decode": "PASS"
+    },
+    "visual_qa": {
+      "decision": "PASS",
+      "source_clean_final": "PASS",
+      "practical_100_75_50": "PASS",
+      "raw": "PASS"
+    },
+    "execution_backend": "N100_MCP_FALLBACK_REPOSITORY_BACKED_DDS",
+    "fallback_reason": "GitHub-hosted run 37675870154 stuck in step 6 >30m; identical pinned B246 script/input executed after exact SHA verification",
+    "status": "B246_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_INGAME",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": []
   }
 }

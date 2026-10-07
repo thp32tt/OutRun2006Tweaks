@@ -2685,3 +2685,7 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 - TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN; q104 c84a2703..., q112 7714bd71..., q116 7e42aaa0... fresh C + exact-SHA C3_STRICT_PASS.
 - Exact source/candidate SHA/header + neutral-alpha visible outside=0/alpha outside=0; source/clean/current + practical + exact-current RAW controller review PASS. PRE_INGAME/user JPG/actual-game pending.
 - N100 fallback performed exact decode/QA only because hosted C worker was queued; GitHub remains SSOT. RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.
+
+### B246 q212 — 2026-10-08 05:40 KST
+- q212 BA0147DA exact 01c7aded...: 하트 어택 모드 whole-phrase 903x154 / source 1759x158, producer machine+visual PASS; B245 underfill superseded.
+- Next: fresh C2 + exact-SHA C3 -> PRE_INGAME/user review -> NEW in-game retest. RUNTIME_VALIDATION=UNTESTED; forbidden domains untouched.

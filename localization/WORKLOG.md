@@ -3367,3 +3367,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - q112 `D41D0B1` @ `7714bd71...`: two independently visible bboxes remain contained with positive margins; shared two-line white/navy/right-lean hierarchy, spacing, practical-scale and RAW evidence visual PASS -> fresh C + exact-SHA C3_STRICT_PASS.
 - q116 `E3FD08BE` @ `7e42aaa0...`: [647,57,1374,197] in source [393,54,1628,200], margins 254/254/3/3, 140/146px height; source-family right lean/color/effect visual PASS -> fresh C + exact-SHA C3_STRICT_PASS.
 - PRE_INGAME English-original comparison refresh/user review/actual-game validation remain pending. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-08 05:40 KST — B246 q212 canonical Heart Attack mode title
+- Consumed the already-produced B245 worker result first instead of repeating it. B245 exact 03f058c2... passed machine QA but controller review still showed source-hierarchy underfill, so it was not promoted.
+- B246 materially reworks only q212 HEART title. Project precedent q116 binds Heart Attack Mode -> 하트 어택 모드, so the intro title now uses that established mode name as one native whole phrase with normal font spaces; no artificial 170-300px word gap or per-syllable tracking.
+- Exact candidate 01c7aded0bbaa393351d1b191dc08cfbd24fa542160f6a60d5584abd1bc0f1e6: 903x154 inside source 1759x158 (51.34% width, +180px vs B245), margins 5/851/2/2, Noto Sans CJK KR Black at 0.94 aspect/source red. changed/alpha outside=0; protected overlap=0; C2C byte region exact; header/mip1/decode/RAW mirror_y PASS.
+- Controller SOURCE/B245/CLEAN/B246 + 100/75/50 practical + RAW visual PASS: cohesive phrase, tall mild-condensed family, no residue/clipping/broken glyph/collision.
+- Hosted run 37675870154 remained stuck in step 6 >30m; contract fallback used the identical pinned script/input on N100 after exact SHA verification. Material commit adfe59f7.... Fresh C + exact-SHA C3 + PRE_INGAME/user JPG + NEW actual-game retest remain. RUNTIME_VALIDATION=UNTESTED; VR/FFB/DX11/DXVK untouched.
