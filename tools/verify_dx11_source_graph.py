@@ -11545,6 +11545,47 @@ def main() -> None:
             + ", ".join(missing_r294_programmable_production_draw_identity)
         )
 
+    r295_programmable_production_source_revalidation_join = [
+        ("ProgrammableProductionSourceRevalidationCensusEvidence",
+         RUNTIME_CENSUS, "R295 explicit production source-revalidation join evidence"),
+        ("review_programmable_production_source_revalidation(",
+         RUNTIME_CENSUS, "R295 bounded R294-to-R258 join review"),
+        ("kSourceDrawIdentityMissing",
+         RUNTIME_CENSUS, "R295 explicit missing R294 identity bit"),
+        ("kNativeBufferEligibilityMissing",
+         RUNTIME_CENSUS, "R295 explicit native-buffer eligibility bit"),
+        ("kSourceRevalidationReceiptMissing",
+         RUNTIME_CENSUS, "R295 explicit missing R258 receipt bit"),
+        ("sourceRevalidation->kind == expectedKind",
+         RUNTIME_CENSUS, "R295 R258 draw-kind lineage gate"),
+        ("sourceRevalidation->startLocation ==",
+         RUNTIME_CENSUS, "R295 R258 source-start lineage gate"),
+        ("sourceRevalidation->cacheKey == expectedCacheKey",
+         RUNTIME_CENSUS, "R295 shader-pair cache lineage gate"),
+        ("token = hash_mix(token, 0x295u);",
+         RUNTIME_CENSUS, "R295 independent snapshot-domain tag"),
+        ("productionSourceRevalidation = nullptr",
+         RUNTIME_CENSUS, "R295 current production path cannot fabricate R258"),
+        ("shaderProductionSourceJoinExact",
+         RUNTIME_CENSUS, "R295 join result participates in sampled identity"),
+        ("shaderProductionSourceMissingEvidenceMask",
+         RUNTIME_CENSUS, "R295 missing evidence participates in sampled identity"),
+        ("VR DX11 R295 productionSourceRevalidation",
+         RUNTIME_CENSUS, "R295 bounded diagnostic output"),
+    ]
+    missing_r295_programmable_production_source_revalidation_join = [
+        meaning for token, source, meaning
+        in r295_programmable_production_source_revalidation_join
+        if token not in source
+    ]
+    if missing_r295_programmable_production_source_revalidation_join:
+        raise SystemExit(
+            "DX11 R295 programmable production source-revalidation join drift: "
+            + ", ".join(
+                missing_r295_programmable_production_source_revalidation_join
+            )
+        )
+
     r293_programmable_production_prerequisite_census_gate = [
         ("ProgrammableProductionActivationPrerequisiteCensusEvidence",
          RUNTIME_CENSUS, "R293 explicit production prerequisite census evidence"),
