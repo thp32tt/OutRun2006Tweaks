@@ -2537,3 +2537,10 @@ TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL). q43, q47, q53 fresh inde
 ## C249 C2 (2026-10-07T20:35:35+09:00)
 - q86 C598919A, q44 19CEDB9, q48 B1696633: fresh independent C PASS + exact-SHA C3_STRICT_PASS. TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN.
 - PRE_INGAME refresh / user JPG review / NEW actual-game validation pending; RUNTIME_VALIDATION=UNTESTED.
+
+### C250 C1 — q57/q61/q65 returned to rework (2026-10-07 21:07 KST)
+- `TEMP_BACKLOG_RELIEF=C1`, `SHARD=ODD(+UNINDEXED_SPECIAL)`; 3 P0 odd user-JPG regressions processed.
+- q57 `39229D64`: machine 16/16 PASS, controller visual FAIL — source slant/gradient/depth/effect family still mismatched -> `REWORK_REQUIRED`.
+- q61 `C4A2937B`: machine 21/21 PASS, controller semantic/style FAIL — `Cut the line!` regressed to `라인을 끊으세요!` instead of proven `하트선을 통과하세요!`; source instruction effect family also mismatched -> `REWORK_REQUIRED`.
+- q65 `EBEF6D20`: machine 7/7 PASS and missing-label coverage fixed, but `EASY` green source style became cyan `쉬움` and route-label style/slant is not source-faithful -> `REWORK_REQUIRED`.
+- C3 and PRE_INGAME promotion blocked for all three. q59 P1 remains unprocessed for a later C1 slot. `RUNTIME_VALIDATION=UNTESTED`; no VR/FFB/DX11/DXVK work.
