@@ -3121,3 +3121,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/B237/CLEAN/B238 row contacts, full readable overview, RAW mirror-Y and practical 100/75/50 review PASS. Scale/hierarchy is materially restored without split-word spacing; no broken Hangul, clipping, English residue, plate seam, overlap or protected vehicle/number/icon damage is visible.
 - Decision `B238_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_PRE_INGAME_USER_JPG_AND_INGAME`. q44 must receive fresh independent C2 and exact-SHA C3 before PRE_INGAME English-original export/user review. Actual-game validation remains pending. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_B/20261007-B238-Q044-19CEDB9-C246-REWORK/B238_19CEDB9_MACHINE_QA.json`, `B238_CONTROLLER_SELF_QA.json`, row/overview/RAW/practical JPGs.
+## 2026-10-07 19:58 KST — C247 C1 q43/q47/q53 fresh C + exact-SHA C3
+
+- TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL); selected after per-slot HEAD/queue refresh. No even-index C2 work was taken.
+- q43 455717B2 @ a2b0db36…: independent 4/4 bbox/size/positive-margin PASS; decoded changed/alpha outside exact source boxes=0; SOURCE/A144 clean/current + FLIP-Y/RAW visual PASS; C3_STRICT_PASS.
+- q47 AD720950 @ 6386a41f…: Shift→시프트 116x46→112x42, 2px margins, outside/alpha=0; SOURCE/CLEAN/current + FLIP-Y/RAW visual PASS; C3_STRICT_PASS.
+- q53 568D3696 @ 7df7e030…: 457x103→448x84 with positive margins, outside/alpha=0; SOURCE/OLD/CLEAN/current + FLIP-Y/RAW visual PASS; C3_STRICT_PASS.
+- PRE_INGAME English-original comparison export refresh remains required before user review. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
