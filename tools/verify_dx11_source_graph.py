@@ -11152,6 +11152,45 @@ def main() -> None:
             + ", ".join(missing_r283_programmable_target_bytecode_materialization)
         )
 
+    r284_programmable_shader_object_materialization = [
+        ("struct NativeProgrammableShaderObjectMaterializationEvidence",
+         NATIVE_BACKEND_HPP, "R284 object-materialization evidence type"),
+        ("materialize_programmable_shader_translation_objects(",
+         NATIVE_BACKEND_HPP, "R284 object materializer declaration"),
+        ("validate_programmable_shader_object_materialization_snapshot(",
+         NATIVE_BACKEND_HPP, "R284 object-materialization validator declaration"),
+        ("R284_R283_DXBC_R240_R241_R242_OBJECT_MATERIALIZER_V1",
+         NATIVE_BACKEND_CPP, "R284 materializer revision/provenance domain"),
+        ("expectedDevice->CreateVertexShader(",
+         NATIVE_BACKEND_CPP, "R284 creates VS only from exact R283 DXBC"),
+        ("expectedDevice->CreatePixelShader(",
+         NATIVE_BACKEND_CPP, "R284 creates PS only from exact R283 DXBC"),
+        ("cache.attach_translation_objects_for_observation(",
+         NATIVE_BACKEND_CPP, "R284 reuses R242 same-device ownership attachment"),
+        ("out.objectBindingAuthorized = false;",
+         NATIVE_BACKEND_CPP, "R284 cannot authorize shader/context binding"),
+        ("token, 0x284u",
+         NATIVE_BACKEND_CPP, "R284 independent materialization snapshot domain"),
+        ("R284 materializes exact R283 DXBC into same-device R242 object ownership",
+         CONSTANT_BUFFER_PROBE, "R284 hosted positive creation/ownership regression"),
+        ("R284 object materialization must not bind VS or PS to the immediate context",
+         CONSTANT_BUFFER_PROBE, "R284 explicit no-binding regression"),
+        ("R284 ownership receipt rejects a foreign D3D11 device",
+         CONSTANT_BUFFER_PROBE, "R284 foreign-device rejection regression"),
+        ("R284 rejects stale/tampered R283 bytecode provenance before object creation",
+         CONSTANT_BUFFER_PROBE, "R284 stale R283 provenance regression"),
+    ]
+    missing_r284_programmable_shader_object_materialization = [
+        meaning for token, source, meaning
+        in r284_programmable_shader_object_materialization
+        if token not in source
+    ]
+    if missing_r284_programmable_shader_object_materialization:
+        raise SystemExit(
+            "DX11 R284 programmable shader object materialization drift: "
+            + ", ".join(missing_r284_programmable_shader_object_materialization)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),

@@ -575,6 +575,56 @@ std::uint64_t r283_materialization_snapshot_token(
     return token == 0 ? 1 : token;
 }
 
+std::uint64_t r284_object_materializer_revision_hash() noexcept {
+    static constexpr char kRevision[] =
+        "R284_R283_DXBC_R240_R241_R242_OBJECT_MATERIALIZER_V1";
+    return hash_observation_payload_bytes(
+        kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
+}
+
+std::uint64_t r284_object_materialization_snapshot_token(
+    const NativeProgrammableShaderObjectMaterializationEvidence&
+        materialization) noexcept {
+    if (!materialization.reviewReady)
+        return 0;
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(token, materialization.cacheKey);
+    token = mix_readiness_snapshot_token(
+        token, materialization.targetVertexBytecodeHash);
+    token = mix_readiness_snapshot_token(
+        token, materialization.targetPixelBytecodeHash);
+    token = mix_readiness_snapshot_token(
+        token, materialization.vertexMaterializedArtifactIdentity);
+    token = mix_readiness_snapshot_token(
+        token, materialization.pixelMaterializedArtifactIdentity);
+    token = mix_readiness_snapshot_token(
+        token, materialization.ownerGeneration);
+    token = mix_readiness_snapshot_token(
+        token, materialization.slotGeneration);
+    token = mix_readiness_snapshot_token(
+        token, materialization.translationObjectReceiptGeneration);
+    token = mix_readiness_snapshot_token(
+        token, materialization.objectMaterializerRevisionHash);
+    token = mix_readiness_snapshot_token(
+        token, materialization.objectPrerequisiteSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, materialization.creationHandoffSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, materialization.targetBytecodeMaterializationSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, materialization.cacheSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, materialization.slotSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, materialization.translationObjectSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, materialization.translationObjectReceiptReady ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, materialization.objectBindingAuthorized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(token, 0x284u);
+    return token == 0 ? 1 : token;
+}
+
 HRESULT create_device(
     IDXGIAdapter* adapter,
     UINT flags,
@@ -10767,6 +10817,384 @@ bool validate_programmable_shader_target_bytecode_materialization_snapshot(
         return false;
 
     return r283_materialization_snapshot_token(materialization) ==
+        reviewSnapshotToken;
+}
+
+NativeProgrammableShaderObjectMaterializationEvidence
+materialize_programmable_shader_translation_objects(
+    ID3D11Device* expectedDevice,
+    NativeProgrammableShaderPairCache& cache,
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+        objectPrerequisite,
+    std::uint64_t objectPrerequisiteSnapshotToken,
+    const NativeProgrammableShaderObjectCreationHandoffEvidence& creationHandoff,
+    std::uint64_t creationHandoffSnapshotToken,
+    const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+        targetBytecodeMaterialization,
+    std::uint64_t targetBytecodeMaterializationSnapshotToken) noexcept {
+    NativeProgrammableShaderObjectMaterializationEvidence out{};
+    out.diagnosticOnly = true;
+    out.objectBindingAuthorized = false;
+    out.cacheKey = sourceIdentity.cacheKey;
+    out.targetVertexBytecodeHash =
+        targetBytecodeMaterialization.vertexTargetBytecodeHash;
+    out.targetPixelBytecodeHash =
+        targetBytecodeMaterialization.pixelTargetBytecodeHash;
+    out.vertexMaterializedArtifactIdentity =
+        targetBytecodeMaterialization.vertexMaterializedArtifactIdentity;
+    out.pixelMaterializedArtifactIdentity =
+        targetBytecodeMaterialization.pixelMaterializedArtifactIdentity;
+    out.objectMaterializerRevisionHash =
+        r284_object_materializer_revision_hash();
+    out.objectPrerequisiteSnapshotToken = objectPrerequisiteSnapshotToken;
+    out.creationHandoffSnapshotToken = creationHandoffSnapshotToken;
+    out.targetBytecodeMaterializationSnapshotToken =
+        targetBytecodeMaterializationSnapshotToken;
+
+    out.inputValid =
+        expectedDevice != nullptr &&
+        objectPrerequisiteSnapshotToken != 0 &&
+        creationHandoffSnapshotToken != 0 &&
+        targetBytecodeMaterializationSnapshotToken != 0;
+    out.sourceIdentityExact =
+        sourceIdentity.exact_identity() &&
+        !sourceIdentity.translationImplemented;
+    out.objectPrerequisiteReady =
+        objectPrerequisite.reviewReady &&
+        objectPrerequisite.boundaryPreserved &&
+        objectPrerequisite.diagnosticOnly &&
+        objectPrerequisite.cacheOwnerGenerationRequired &&
+        objectPrerequisite.translationSlotGenerationRequired &&
+        objectPrerequisite.translationObjectReceiptGenerationRequired &&
+        objectPrerequisite.sameDeviceObjectPairRequired &&
+        objectPrerequisite.cacheSnapshotRequired &&
+        objectPrerequisite.slotSnapshotRequired;
+    out.objectPrerequisiteSnapshotMatches =
+        out.objectPrerequisiteReady &&
+        objectPrerequisite.reviewSnapshotToken ==
+            objectPrerequisiteSnapshotToken;
+    out.creationHandoffReady =
+        creationHandoff.reviewReady &&
+        creationHandoff.boundaryPreserved &&
+        creationHandoff.diagnosticOnly &&
+        creationHandoff.sourcePairMatches &&
+        creationHandoff.objectPrerequisiteReady &&
+        creationHandoff.objectPrerequisiteSnapshotMatches &&
+        !creationHandoff.objectCreationAuthorized;
+    out.creationHandoffSnapshotMatches =
+        out.creationHandoffReady &&
+        creationHandoff.reviewSnapshotToken ==
+            creationHandoffSnapshotToken;
+    out.targetBytecodeMaterializationReady =
+        targetBytecodeMaterialization.reviewReady &&
+        targetBytecodeMaterialization.boundaryPreserved &&
+        targetBytecodeMaterialization.diagnosticOnly &&
+        targetBytecodeMaterialization.provenanceMatches &&
+        targetBytecodeMaterialization.vertexSubsetSupported &&
+        targetBytecodeMaterialization.pixelSubsetSupported &&
+        targetBytecodeMaterialization.vertexCompilationSucceeded &&
+        targetBytecodeMaterialization.pixelCompilationSucceeded &&
+        targetBytecodeMaterialization.targetBytecodeMaterialized &&
+        !targetBytecodeMaterialization.objectCreationAuthorized &&
+        targetBytecodeMaterialization.vertexTargetBytecodeBytes != 0 &&
+        targetBytecodeMaterialization.pixelTargetBytecodeBytes != 0 &&
+        targetBytecodeMaterialization.vertexTargetBytecode.size() ==
+            targetBytecodeMaterialization.vertexTargetBytecodeBytes &&
+        targetBytecodeMaterialization.pixelTargetBytecode.size() ==
+            targetBytecodeMaterialization.pixelTargetBytecodeBytes &&
+        targetBytecodeMaterialization.vertexTargetBytecodeHash != 0 &&
+        targetBytecodeMaterialization.pixelTargetBytecodeHash != 0 &&
+        targetBytecodeMaterialization.vertexMaterializedArtifactIdentity != 0 &&
+        targetBytecodeMaterialization.pixelMaterializedArtifactIdentity != 0;
+    out.targetBytecodeMaterializationSnapshotMatches =
+        out.targetBytecodeMaterializationReady &&
+        targetBytecodeMaterialization.reviewSnapshotToken ==
+            targetBytecodeMaterializationSnapshotToken &&
+        r283_materialization_snapshot_token(targetBytecodeMaterialization) ==
+            targetBytecodeMaterializationSnapshotToken;
+    out.provenanceMatches =
+        out.inputValid &&
+        out.sourceIdentityExact &&
+        out.objectPrerequisiteSnapshotMatches &&
+        out.creationHandoffSnapshotMatches &&
+        out.targetBytecodeMaterializationSnapshotMatches &&
+        sourceIdentity.cacheKey != 0 &&
+        objectPrerequisite.cacheKey == sourceIdentity.cacheKey &&
+        creationHandoff.cacheKey == sourceIdentity.cacheKey &&
+        targetBytecodeMaterialization.cacheKey == sourceIdentity.cacheKey &&
+        creationHandoff.objectPrerequisiteSnapshotToken ==
+            objectPrerequisiteSnapshotToken &&
+        creationHandoff.vertexBytecodeHash ==
+            sourceIdentity.vertexShader.bytecodeHash &&
+        creationHandoff.pixelBytecodeHash ==
+            sourceIdentity.pixelShader.bytecodeHash &&
+        targetBytecodeMaterialization.sourceVertexBytecodeHash ==
+            sourceIdentity.vertexShader.bytecodeHash &&
+        targetBytecodeMaterialization.sourcePixelBytecodeHash ==
+            sourceIdentity.pixelShader.bytecodeHash &&
+        out.objectMaterializerRevisionHash != 0;
+    if (!out.provenanceMatches)
+        return out;
+
+    if (!cache.ready()) {
+        out.cacheInitialized = cache.initialize(expectedDevice);
+    } else {
+        out.cacheInitialized = cache.device() == expectedDevice;
+    }
+    if (!out.cacheInitialized ||
+        cache.device() != expectedDevice ||
+        !cache.cache_for_observation(sourceIdentity))
+        return out;
+
+    const auto cacheReady = cache.readiness(expectedDevice, sourceIdentity);
+    out.cacheEntryReady = cacheReady.ready;
+    out.cacheSnapshotToken = cacheReady.snapshotToken;
+    out.cacheSnapshotMatches =
+        cacheReady.ready &&
+        cache.validate_snapshot(
+            expectedDevice, sourceIdentity, cacheReady.snapshotToken);
+    out.ownerGeneration = cacheReady.ownerGeneration;
+    if (!out.cacheEntryReady ||
+        !out.cacheSnapshotMatches ||
+        out.cacheSnapshotToken == 0 ||
+        out.ownerGeneration == 0)
+        return out;
+
+    out.translationSlotReserved =
+        cache.reserve_translation_slot_for_observation(
+            expectedDevice, sourceIdentity, out.cacheSnapshotToken);
+    const auto slotReady =
+        cache.translation_slot_ownership_readiness(
+            expectedDevice, sourceIdentity, out.cacheSnapshotToken);
+    out.translationSlotReady = slotReady.ownershipReady;
+    out.slotSnapshotToken = slotReady.snapshotToken;
+    out.slotSnapshotMatches =
+        slotReady.ownershipReady &&
+        slotReady.snapshotToken != 0 &&
+        cache.validate_translation_slot_snapshot(
+            expectedDevice,
+            sourceIdentity,
+            out.cacheSnapshotToken,
+            slotReady.snapshotToken);
+    out.slotGeneration = slotReady.slotGeneration;
+    if (!out.translationSlotReserved ||
+        !out.translationSlotReady ||
+        !out.slotSnapshotMatches ||
+        out.slotGeneration == 0)
+        return out;
+
+    const auto beforeObjects =
+        cache.translation_object_readiness(
+            expectedDevice,
+            sourceIdentity,
+            out.cacheSnapshotToken,
+            out.slotSnapshotToken);
+    out.objectsAbsentBeforeMaterialization =
+        !beforeObjects.objectsAttached &&
+        !beforeObjects.attachmentReady &&
+        beforeObjects.translationObjectReceiptGeneration == 0 &&
+        beforeObjects.snapshotToken == 0;
+    if (!out.objectsAbsentBeforeMaterialization)
+        return out;
+
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
+    out.vertexObjectCreated =
+        SUCCEEDED(expectedDevice->CreateVertexShader(
+            targetBytecodeMaterialization.vertexTargetBytecode.data(),
+            targetBytecodeMaterialization.vertexTargetBytecodeBytes,
+            nullptr,
+            vertexShader.ReleaseAndGetAddressOf())) &&
+        vertexShader;
+    out.pixelObjectCreated =
+        SUCCEEDED(expectedDevice->CreatePixelShader(
+            targetBytecodeMaterialization.pixelTargetBytecode.data(),
+            targetBytecodeMaterialization.pixelTargetBytecodeBytes,
+            nullptr,
+            pixelShader.ReleaseAndGetAddressOf())) &&
+        pixelShader;
+    if (!out.vertexObjectCreated || !out.pixelObjectCreated)
+        return out;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> vertexDevice;
+    Microsoft::WRL::ComPtr<ID3D11Device> pixelDevice;
+    vertexShader->GetDevice(vertexDevice.ReleaseAndGetAddressOf());
+    pixelShader->GetDevice(pixelDevice.ReleaseAndGetAddressOf());
+    out.objectDevicesMatch =
+        vertexDevice.Get() == expectedDevice &&
+        pixelDevice.Get() == expectedDevice;
+    if (!out.objectDevicesMatch)
+        return out;
+
+    out.objectsAttached =
+        cache.attach_translation_objects_for_observation(
+            expectedDevice,
+            sourceIdentity,
+            out.cacheSnapshotToken,
+            out.slotSnapshotToken,
+            vertexShader.Get(),
+            pixelShader.Get());
+    if (!out.objectsAttached)
+        return out;
+
+    const auto objectReady =
+        cache.translation_object_readiness(
+            expectedDevice,
+            sourceIdentity,
+            out.cacheSnapshotToken,
+            out.slotSnapshotToken);
+    out.translationObjectReceiptReady =
+        objectReady.attachmentReady &&
+        objectReady.objectsAttached &&
+        objectReady.objectDevicesMatch &&
+        objectReady.cacheKey == sourceIdentity.cacheKey &&
+        objectReady.ownerGeneration == out.ownerGeneration &&
+        objectReady.slotGeneration == out.slotGeneration &&
+        objectReady.translationObjectReceiptGeneration != 0 &&
+        objectReady.snapshotToken != 0 &&
+        cache.validate_translation_object_snapshot(
+            expectedDevice,
+            sourceIdentity,
+            out.cacheSnapshotToken,
+            out.slotSnapshotToken,
+            objectReady.snapshotToken);
+    out.translationObjectReceiptGeneration =
+        objectReady.translationObjectReceiptGeneration;
+    out.translationObjectSnapshotToken = objectReady.snapshotToken;
+
+    out.boundaryPreserved =
+        out.provenanceMatches &&
+        out.cacheSnapshotMatches &&
+        out.slotSnapshotMatches &&
+        out.objectsAbsentBeforeMaterialization &&
+        out.vertexObjectCreated &&
+        out.pixelObjectCreated &&
+        out.objectsAttached &&
+        out.objectDevicesMatch &&
+        out.translationObjectReceiptReady &&
+        !out.objectBindingAuthorized &&
+        out.diagnosticOnly;
+    out.reviewReady = out.boundaryPreserved;
+    if (out.reviewReady)
+        out.reviewSnapshotToken =
+            r284_object_materialization_snapshot_token(out);
+    return out;
+}
+
+bool validate_programmable_shader_object_materialization_snapshot(
+    ID3D11Device* expectedDevice,
+    const NativeProgrammableShaderPairCache& cache,
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+        objectPrerequisite,
+    std::uint64_t objectPrerequisiteSnapshotToken,
+    const NativeProgrammableShaderObjectCreationHandoffEvidence& creationHandoff,
+    std::uint64_t creationHandoffSnapshotToken,
+    const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+        targetBytecodeMaterialization,
+    std::uint64_t targetBytecodeMaterializationSnapshotToken,
+    const NativeProgrammableShaderObjectMaterializationEvidence& materialization,
+    std::uint64_t reviewSnapshotToken) noexcept {
+    if (!expectedDevice ||
+        reviewSnapshotToken == 0 ||
+        materialization.reviewSnapshotToken != reviewSnapshotToken ||
+        !materialization.reviewReady ||
+        !materialization.boundaryPreserved ||
+        !materialization.diagnosticOnly ||
+        materialization.objectBindingAuthorized ||
+        !materialization.translationObjectReceiptReady)
+        return false;
+
+    if (!sourceIdentity.exact_identity() ||
+        sourceIdentity.translationImplemented ||
+        !objectPrerequisite.reviewReady ||
+        objectPrerequisite.reviewSnapshotToken !=
+            objectPrerequisiteSnapshotToken ||
+        !creationHandoff.reviewReady ||
+        creationHandoff.reviewSnapshotToken !=
+            creationHandoffSnapshotToken ||
+        creationHandoff.objectCreationAuthorized ||
+        !targetBytecodeMaterialization.reviewReady ||
+        !targetBytecodeMaterialization.targetBytecodeMaterialized ||
+        targetBytecodeMaterialization.objectCreationAuthorized ||
+        targetBytecodeMaterialization.reviewSnapshotToken !=
+            targetBytecodeMaterializationSnapshotToken ||
+        r283_materialization_snapshot_token(targetBytecodeMaterialization) !=
+            targetBytecodeMaterializationSnapshotToken)
+        return false;
+
+    if (!cache.ready() ||
+        cache.device() != expectedDevice ||
+        materialization.cacheKey != sourceIdentity.cacheKey ||
+        materialization.cacheKey != objectPrerequisite.cacheKey ||
+        materialization.cacheKey != creationHandoff.cacheKey ||
+        materialization.cacheKey != targetBytecodeMaterialization.cacheKey ||
+        materialization.targetVertexBytecodeHash !=
+            targetBytecodeMaterialization.vertexTargetBytecodeHash ||
+        materialization.targetPixelBytecodeHash !=
+            targetBytecodeMaterialization.pixelTargetBytecodeHash ||
+        materialization.vertexMaterializedArtifactIdentity !=
+            targetBytecodeMaterialization.vertexMaterializedArtifactIdentity ||
+        materialization.pixelMaterializedArtifactIdentity !=
+            targetBytecodeMaterialization.pixelMaterializedArtifactIdentity ||
+        materialization.objectMaterializerRevisionHash !=
+            r284_object_materializer_revision_hash() ||
+        materialization.objectPrerequisiteSnapshotToken !=
+            objectPrerequisiteSnapshotToken ||
+        materialization.creationHandoffSnapshotToken !=
+            creationHandoffSnapshotToken ||
+        materialization.targetBytecodeMaterializationSnapshotToken !=
+            targetBytecodeMaterializationSnapshotToken)
+        return false;
+
+    const auto cacheReady = cache.readiness(expectedDevice, sourceIdentity);
+    if (!cacheReady.ready ||
+        cacheReady.ownerGeneration != materialization.ownerGeneration ||
+        cacheReady.snapshotToken != materialization.cacheSnapshotToken ||
+        !cache.validate_snapshot(
+            expectedDevice,
+            sourceIdentity,
+            materialization.cacheSnapshotToken))
+        return false;
+
+    const auto slotReady =
+        cache.translation_slot_ownership_readiness(
+            expectedDevice,
+            sourceIdentity,
+            materialization.cacheSnapshotToken);
+    if (!slotReady.ownershipReady ||
+        slotReady.slotGeneration != materialization.slotGeneration ||
+        slotReady.snapshotToken != materialization.slotSnapshotToken ||
+        !cache.validate_translation_slot_snapshot(
+            expectedDevice,
+            sourceIdentity,
+            materialization.cacheSnapshotToken,
+            materialization.slotSnapshotToken))
+        return false;
+
+    const auto objectReady =
+        cache.translation_object_readiness(
+            expectedDevice,
+            sourceIdentity,
+            materialization.cacheSnapshotToken,
+            materialization.slotSnapshotToken);
+    if (!objectReady.attachmentReady ||
+        !objectReady.objectsAttached ||
+        !objectReady.objectDevicesMatch ||
+        objectReady.translationObjectReceiptGeneration !=
+            materialization.translationObjectReceiptGeneration ||
+        objectReady.snapshotToken !=
+            materialization.translationObjectSnapshotToken ||
+        !cache.validate_translation_object_snapshot(
+            expectedDevice,
+            sourceIdentity,
+            materialization.cacheSnapshotToken,
+            materialization.slotSnapshotToken,
+            materialization.translationObjectSnapshotToken))
+        return false;
+
+    return r284_object_materialization_snapshot_token(materialization) ==
         reviewSnapshotToken;
 }
 

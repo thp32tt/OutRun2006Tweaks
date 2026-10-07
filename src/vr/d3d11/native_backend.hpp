@@ -2325,6 +2325,87 @@ validate_programmable_shader_target_bytecode_materialization_snapshot(
         materialization,
     std::uint64_t reviewSnapshotToken) noexcept;
 
+// R284 consumes exact R283 DXBC into a real same-device D3D11 VS/PS pair and
+// attaches it to the existing R240/R241 cache ownership boundary, yielding the
+// concrete R242 translation-object receipt. It creates/owns shader objects only:
+// no shader/context binding, shaderTranslationExact promotion, NativeDrawPath,
+// Draw or DrawIndexed authority is granted here.
+class NativeProgrammableShaderPairCache;
+
+struct NativeProgrammableShaderObjectMaterializationEvidence {
+    bool inputValid{};
+    bool sourceIdentityExact{};
+    bool objectPrerequisiteReady{};
+    bool objectPrerequisiteSnapshotMatches{};
+    bool creationHandoffReady{};
+    bool creationHandoffSnapshotMatches{};
+    bool targetBytecodeMaterializationReady{};
+    bool targetBytecodeMaterializationSnapshotMatches{};
+    bool provenanceMatches{};
+    bool cacheInitialized{};
+    bool cacheEntryReady{};
+    bool cacheSnapshotMatches{};
+    bool translationSlotReserved{};
+    bool translationSlotReady{};
+    bool slotSnapshotMatches{};
+    bool objectsAbsentBeforeMaterialization{};
+    bool vertexObjectCreated{};
+    bool pixelObjectCreated{};
+    bool objectsAttached{};
+    bool objectDevicesMatch{};
+    bool translationObjectReceiptReady{};
+    bool objectBindingAuthorized{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    std::uint64_t cacheKey{};
+    std::uint64_t targetVertexBytecodeHash{};
+    std::uint64_t targetPixelBytecodeHash{};
+    std::uint64_t vertexMaterializedArtifactIdentity{};
+    std::uint64_t pixelMaterializedArtifactIdentity{};
+    std::uint64_t ownerGeneration{};
+    std::uint64_t slotGeneration{};
+    std::uint64_t translationObjectReceiptGeneration{};
+    std::uint64_t objectMaterializerRevisionHash{};
+    std::uint64_t objectPrerequisiteSnapshotToken{};
+    std::uint64_t creationHandoffSnapshotToken{};
+    std::uint64_t targetBytecodeMaterializationSnapshotToken{};
+    std::uint64_t cacheSnapshotToken{};
+    std::uint64_t slotSnapshotToken{};
+    std::uint64_t translationObjectSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderObjectMaterializationEvidence
+materialize_programmable_shader_translation_objects(
+    ID3D11Device* expectedDevice,
+    NativeProgrammableShaderPairCache& cache,
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+        objectPrerequisite,
+    std::uint64_t objectPrerequisiteSnapshotToken,
+    const NativeProgrammableShaderObjectCreationHandoffEvidence& creationHandoff,
+    std::uint64_t creationHandoffSnapshotToken,
+    const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+        targetBytecodeMaterialization,
+    std::uint64_t targetBytecodeMaterializationSnapshotToken) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_shader_object_materialization_snapshot(
+    ID3D11Device* expectedDevice,
+    const NativeProgrammableShaderPairCache& cache,
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+        objectPrerequisite,
+    std::uint64_t objectPrerequisiteSnapshotToken,
+    const NativeProgrammableShaderObjectCreationHandoffEvidence& creationHandoff,
+    std::uint64_t creationHandoffSnapshotToken,
+    const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+        targetBytecodeMaterialization,
+    std::uint64_t targetBytecodeMaterializationSnapshotToken,
+    const NativeProgrammableShaderObjectMaterializationEvidence& materialization,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
 // R275 seals one dormant translated-semantic observation into a tamper-evident
 // receipt bound to the exact R239 pair, R242 translated-object ownership, R273
 // source-mapping handoff and R276 source-derived semantic translation plan.

@@ -5849,6 +5849,143 @@ int main()
         r283StaleSourceMaterialization.reviewSnapshotToken == 0,
         "R283 rejects source bytes detached from the R281/R282 provenance");
 
+    DevicePair r284Device = create_warp_device();
+    NativeProgrammableShaderPairCache r284Cache;
+    const auto r284ObjectMaterialization =
+        outrun::vr::dx11::
+            materialize_programmable_shader_translation_objects(
+                r284Device.device,
+                r284Cache,
+                programmablePair,
+                r279ObjectPrerequisite,
+                r279ObjectPrerequisite.reviewSnapshotToken,
+                r280ObjectCreationHandoff,
+                r280ObjectCreationHandoff.reviewSnapshotToken,
+                r283TargetBytecodeMaterialization,
+                r283TargetBytecodeMaterialization.reviewSnapshotToken);
+    require(
+        r284ObjectMaterialization.inputValid &&
+        r284ObjectMaterialization.sourceIdentityExact &&
+        r284ObjectMaterialization.objectPrerequisiteReady &&
+        r284ObjectMaterialization.objectPrerequisiteSnapshotMatches &&
+        r284ObjectMaterialization.creationHandoffReady &&
+        r284ObjectMaterialization.creationHandoffSnapshotMatches &&
+        r284ObjectMaterialization.targetBytecodeMaterializationReady &&
+        r284ObjectMaterialization.targetBytecodeMaterializationSnapshotMatches &&
+        r284ObjectMaterialization.provenanceMatches &&
+        r284ObjectMaterialization.cacheInitialized &&
+        r284ObjectMaterialization.cacheEntryReady &&
+        r284ObjectMaterialization.cacheSnapshotMatches &&
+        r284ObjectMaterialization.translationSlotReserved &&
+        r284ObjectMaterialization.translationSlotReady &&
+        r284ObjectMaterialization.slotSnapshotMatches &&
+        r284ObjectMaterialization.objectsAbsentBeforeMaterialization &&
+        r284ObjectMaterialization.vertexObjectCreated &&
+        r284ObjectMaterialization.pixelObjectCreated &&
+        r284ObjectMaterialization.objectsAttached &&
+        r284ObjectMaterialization.objectDevicesMatch &&
+        r284ObjectMaterialization.translationObjectReceiptReady &&
+        !r284ObjectMaterialization.objectBindingAuthorized &&
+        r284ObjectMaterialization.diagnosticOnly &&
+        r284ObjectMaterialization.boundaryPreserved &&
+        r284ObjectMaterialization.reviewReady &&
+        r284ObjectMaterialization.cacheKey == programmablePair.cacheKey &&
+        r284ObjectMaterialization.targetVertexBytecodeHash ==
+            r283TargetBytecodeMaterialization.vertexTargetBytecodeHash &&
+        r284ObjectMaterialization.targetPixelBytecodeHash ==
+            r283TargetBytecodeMaterialization.pixelTargetBytecodeHash &&
+        r284ObjectMaterialization.vertexMaterializedArtifactIdentity ==
+            r283TargetBytecodeMaterialization.vertexMaterializedArtifactIdentity &&
+        r284ObjectMaterialization.pixelMaterializedArtifactIdentity ==
+            r283TargetBytecodeMaterialization.pixelMaterializedArtifactIdentity &&
+        r284ObjectMaterialization.ownerGeneration != 0 &&
+        r284ObjectMaterialization.slotGeneration != 0 &&
+        r284ObjectMaterialization.translationObjectReceiptGeneration != 0 &&
+        r284ObjectMaterialization.objectMaterializerRevisionHash != 0 &&
+        r284ObjectMaterialization.cacheSnapshotToken != 0 &&
+        r284ObjectMaterialization.slotSnapshotToken != 0 &&
+        r284ObjectMaterialization.translationObjectSnapshotToken != 0 &&
+        r284ObjectMaterialization.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_shader_object_materialization_snapshot(
+                r284Device.device,
+                r284Cache,
+                programmablePair,
+                r279ObjectPrerequisite,
+                r279ObjectPrerequisite.reviewSnapshotToken,
+                r280ObjectCreationHandoff,
+                r280ObjectCreationHandoff.reviewSnapshotToken,
+                r283TargetBytecodeMaterialization,
+                r283TargetBytecodeMaterialization.reviewSnapshotToken,
+                r284ObjectMaterialization,
+                r284ObjectMaterialization.reviewSnapshotToken),
+        "R284 materializes exact R283 DXBC into same-device R242 object ownership");
+
+    ID3D11VertexShader* r284BoundVertex = nullptr;
+    ID3D11PixelShader* r284BoundPixel = nullptr;
+    r284Device.context->VSGetShader(&r284BoundVertex, nullptr, nullptr);
+    r284Device.context->PSGetShader(&r284BoundPixel, nullptr, nullptr);
+    require(
+        r284BoundVertex == nullptr &&
+        r284BoundPixel == nullptr,
+        "R284 object materialization must not bind VS or PS to the immediate context");
+    if (r284BoundVertex)
+        r284BoundVertex->Release();
+    if (r284BoundPixel)
+        r284BoundPixel->Release();
+
+    DevicePair r284ForeignDevice = create_warp_device();
+    require(
+        !outrun::vr::dx11::
+            validate_programmable_shader_object_materialization_snapshot(
+                r284ForeignDevice.device,
+                r284Cache,
+                programmablePair,
+                r279ObjectPrerequisite,
+                r279ObjectPrerequisite.reviewSnapshotToken,
+                r280ObjectCreationHandoff,
+                r280ObjectCreationHandoff.reviewSnapshotToken,
+                r283TargetBytecodeMaterialization,
+                r283TargetBytecodeMaterialization.reviewSnapshotToken,
+                r284ObjectMaterialization,
+                r284ObjectMaterialization.reviewSnapshotToken),
+        "R284 ownership receipt rejects a foreign D3D11 device");
+    r284ForeignDevice.context->Release();
+    r284ForeignDevice.device->Release();
+
+    auto r284StaleBytecodeMaterialization =
+        r283TargetBytecodeMaterialization;
+    r284StaleBytecodeMaterialization.vertexTargetBytecodeHash ^=
+        0x1ull;
+    NativeProgrammableShaderPairCache r284StaleCache;
+    const auto r284StaleObjectMaterialization =
+        outrun::vr::dx11::
+            materialize_programmable_shader_translation_objects(
+                r284Device.device,
+                r284StaleCache,
+                programmablePair,
+                r279ObjectPrerequisite,
+                r279ObjectPrerequisite.reviewSnapshotToken,
+                r280ObjectCreationHandoff,
+                r280ObjectCreationHandoff.reviewSnapshotToken,
+                r284StaleBytecodeMaterialization,
+                r283TargetBytecodeMaterialization.reviewSnapshotToken);
+    require(
+        r284StaleObjectMaterialization.targetBytecodeMaterializationReady &&
+        !r284StaleObjectMaterialization.
+            targetBytecodeMaterializationSnapshotMatches &&
+        !r284StaleObjectMaterialization.provenanceMatches &&
+        !r284StaleObjectMaterialization.cacheInitialized &&
+        !r284StaleObjectMaterialization.vertexObjectCreated &&
+        !r284StaleObjectMaterialization.pixelObjectCreated &&
+        !r284StaleObjectMaterialization.translationObjectReceiptReady &&
+        !r284StaleObjectMaterialization.reviewReady &&
+        r284StaleObjectMaterialization.reviewSnapshotToken == 0,
+        "R284 rejects stale/tampered R283 bytecode provenance before object creation");
+
+    r284Device.context->Release();
+    r284Device.device->Release();
+
     const auto r275SemanticReceipt =
         outrun::vr::dx11::
             compose_programmable_shader_translated_semantic_receipt(
