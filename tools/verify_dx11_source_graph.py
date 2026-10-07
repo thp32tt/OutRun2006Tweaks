@@ -11282,6 +11282,44 @@ def main() -> None:
             + ", ".join(missing_r286_programmable_production_observation_bridge)
         )
 
+
+    r287_programmable_runtime_census_bridge = [
+        ('#include "startup_census.hpp"',
+         RUNTIME_CENSUS, "R287 runtime census can derive exact native bootstrap identity"),
+        ("NativeBackend NativeProgrammableObservationBackend;",
+         RUNTIME_CENSUS, "R287 owns one persistent dormant native backend"),
+        ("NativeProgrammableObservationSourceDevice",
+         RUNTIME_CENSUS, "R287 seals source-device lifetime identity"),
+        ("!sourceIdentity.exact_identity()",
+         RUNTIME_CENSUS, "R287 refuses native bootstrap for non-exact programmable pairs"),
+        ("inspect_source_device(sourceDevice)",
+         RUNTIME_CENSUS, "R287 derives adapter LUID and backbuffer bootstrap contract"),
+        ("NativeProgrammableObservationBackend.initialize(config)",
+         RUNTIME_CENSUS, "R287 initializes the dormant native backend on the source adapter"),
+        ("observe_programmable_shader_source_evidence_chain(",
+         RUNTIME_CENSUS, "R287 routes sampled production evidence through R286"),
+        ("sig.shaderProductionObservationExact =",
+         RUNTIME_CENSUS, "R287 persists production-observation readiness in signature identity"),
+        ("productionObservation.semanticHandoff.translatedSemanticReceipt",
+         RUNTIME_CENSUS, "R287 consumes exact R285/R275 semantic receipt"),
+        ("VR DX11 R287 productionObservation signature#{}:",
+         RUNTIME_CENSUS, "R287 emits bounded runtime census evidence"),
+        ("NativeProgrammableObservationBackend.shutdown();",
+         RUNTIME_CENSUS, "R287 invalidates native-device ownership on D3D9 Reset"),
+        ("sig.shaderTranslationExact = false;",
+         RUNTIME_CENSUS, "R287 cannot promote programmable translation or draw routing"),
+    ]
+    missing_r287_programmable_runtime_census_bridge = [
+        meaning for token, source, meaning
+        in r287_programmable_runtime_census_bridge
+        if token not in source
+    ]
+    if missing_r287_programmable_runtime_census_bridge:
+        raise SystemExit(
+            "DX11 R287 programmable runtime census bridge drift: "
+            + ", ".join(missing_r287_programmable_runtime_census_bridge)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),

@@ -6,6 +6,7 @@
 #include "fixed_function_pipeline.hpp"
 #include "native_backend.hpp"
 #include "resource_translation.hpp"
+#include "startup_census.hpp"
 
 #include <array>
 #include <atomic>
@@ -174,6 +175,94 @@ namespace outrun::vr::dx11
         BufferMutationRegistry IndexMutationEvidence;
         ManagedMirrorLifetimeState ManagedLifetimeEvidence{};
         NativeManagedTextureRegistry ManagedTextureShadowRegistry{};
+
+        // R287 owns one dormant native backend for sampled production-census
+        // observations. It exists only while DX11 census is enabled, never
+        // receives an ID3D11DeviceContext from the D3D9 draw path, and is
+        // invalidated on every successful D3D9 Reset.
+        std::mutex NativeProgrammableObservationMutex;
+        NativeBackend NativeProgrammableObservationBackend;
+        IDirect3DDevice9* NativeProgrammableObservationSourceDevice = nullptr;
+
+        NativeProgrammableShaderProductionObservationEvidence
+        observe_programmable_production_chain(
+            IDirect3DDevice9* sourceDevice,
+            const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+            const NativeProgrammableShaderTranslationObjectPrerequisiteEvidence&
+                objectPrerequisite,
+            std::uint64_t objectPrerequisiteSnapshotToken,
+            const NativeProgrammableShaderObjectCreationHandoffEvidence&
+                creationHandoff,
+            std::uint64_t creationHandoffSnapshotToken,
+            const NativeProgrammableShaderTargetBytecodeMaterializationEvidence&
+                targetBytecodeMaterialization,
+            std::uint64_t targetBytecodeMaterializationSnapshotToken,
+            const NativeProgrammableShaderSourceMappingHandoff&
+                sourceMappingHandoff,
+            std::uint64_t sourceMappingHandoffSnapshotToken,
+            const NativeProgrammableShaderSemanticTranslationPlanEvidence&
+                translationPlan,
+            std::uint64_t translationPlanSnapshotToken) noexcept
+        {
+            NativeProgrammableShaderProductionObservationEvidence out{};
+            if (!sourceDevice ||
+                !sourceIdentity.exact_identity() ||
+                sourceIdentity.translationImplemented ||
+                objectPrerequisiteSnapshotToken == 0 ||
+                creationHandoffSnapshotToken == 0 ||
+                targetBytecodeMaterializationSnapshotToken == 0 ||
+                sourceMappingHandoffSnapshotToken == 0 ||
+                translationPlanSnapshotToken == 0)
+                return out;
+
+            std::lock_guard<std::mutex> lock(
+                NativeProgrammableObservationMutex);
+
+            if (NativeProgrammableObservationSourceDevice != sourceDevice ||
+                !NativeProgrammableObservationBackend.ready())
+            {
+                NativeProgrammableObservationBackend.shutdown();
+                NativeProgrammableObservationSourceDevice = nullptr;
+
+                const auto source = inspect_source_device(sourceDevice);
+                if (!source.native_bootstrap_compatible ||
+                    !source.adapter_luid_valid)
+                    return out;
+
+                NativeBackendConfig config{};
+                config.width = source.width;
+                config.height = source.height;
+                config.color_format = source.native_format;
+                config.adapter_luid_valid = true;
+                config.require_adapter_luid = true;
+                config.adapter_luid = source.adapter_luid;
+                if (!NativeProgrammableObservationBackend.initialize(config))
+                    return out;
+
+                NativeProgrammableObservationSourceDevice = sourceDevice;
+                spdlog::info(
+                    "VR DX11 R287 production observer backend: ready=1 size={}x{} format={} ownerGeneration={}",
+                    source.width,
+                    source.height,
+                    static_cast<int>(source.native_format),
+                    NativeProgrammableObservationBackend.
+                        programmable_shader_ownership().owner_generation());
+            }
+
+            return NativeProgrammableObservationBackend.
+                observe_programmable_shader_source_evidence_chain(
+                    sourceIdentity,
+                    objectPrerequisite,
+                    objectPrerequisiteSnapshotToken,
+                    creationHandoff,
+                    creationHandoffSnapshotToken,
+                    targetBytecodeMaterialization,
+                    targetBytecodeMaterializationSnapshotToken,
+                    sourceMappingHandoff,
+                    sourceMappingHandoffSnapshotToken,
+                    translationPlan,
+                    translationPlanSnapshotToken);
+        }
 
         struct TextureMutationEvidence
         {
@@ -395,6 +484,16 @@ namespace outrun::vr::dx11
             std::uint64_t shaderTargetVertexMaterializedArtifactIdentity{};
             std::uint64_t shaderTargetPixelMaterializedArtifactIdentity{};
             std::uint64_t shaderTargetBytecodeMaterializationSnapshotToken{};
+            // R287 carries the exact sampled production chain through R286
+            // into the persistent native-device R285 owner. This remains
+            // diagnostic-only and cannot authorize binding or Draw*.
+            bool shaderProductionObservationExact{};
+            bool shaderProductionObservationMaterializationReused{};
+            bool shaderProductionObservationObjectReady{};
+            bool shaderProductionObservationBoundaryPreserved{};
+            std::uint64_t shaderProductionObservationOwnerGeneration{};
+            std::uint64_t shaderProductionSemanticHandoffSnapshotToken{};
+            std::uint64_t shaderProductionObservationSnapshotToken{};
             bool shaderTranslatedSemanticReceiptExact{};
             bool shaderTranslatedSemanticReceiptObjectReady{};
             std::uint64_t shaderTranslatedSemanticReceiptSnapshotToken{};
@@ -955,6 +1054,22 @@ namespace outrun::vr::dx11
                 hash, sig.shaderTargetPixelMaterializedArtifactIdentity);
             hash = hash_mix(
                 hash, sig.shaderTargetBytecodeMaterializationSnapshotToken);
+            hash = hash_mix(
+                hash, sig.shaderProductionObservationExact ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionObservationMaterializationReused ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionObservationObjectReady ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderProductionObservationBoundaryPreserved ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderProductionObservationOwnerGeneration);
+            hash = hash_mix(
+                hash, sig.shaderProductionSemanticHandoffSnapshotToken);
+            hash = hash_mix(
+                hash, sig.shaderProductionObservationSnapshotToken);
             hash = hash_mix(
                 hash, sig.shaderTranslatedSemanticReceiptExact ? 1u : 0u);
             hash = hash_mix(
@@ -1831,20 +1946,59 @@ namespace outrun::vr::dx11
             sig.shaderTargetBytecodeMaterializationSnapshotToken =
                 targetBytecodeMaterialization.reviewSnapshotToken;
 
-            // R277 deliberately supplies no R242 translated-object ownership.
-            // The R275 receipt therefore exposes the exact remaining boundary
-            // while retaining the deterministic R276 plan identity.
-            const NativeProgrammableShaderTranslationObjectReadiness
-                unavailableTranslationObject{};
-            const auto translatedSemanticReceipt =
-                compose_programmable_shader_translated_semantic_receipt(
+            const auto productionObservation =
+                observe_programmable_production_chain(
+                    device,
                     programmablePairIdentity,
-                    unavailableTranslationObject,
-                    0,
+                    translationObjectPrerequisite,
+                    translationObjectPrerequisite.reviewSnapshotToken,
+                    objectCreationHandoff,
+                    objectCreationHandoff.reviewSnapshotToken,
+                    targetBytecodeMaterialization,
+                    targetBytecodeMaterialization.reviewSnapshotToken,
                     sourceMappingHandoff,
                     sourceMappingHandoff.reviewSnapshotToken,
                     semanticTranslationPlan,
                     semanticTranslationPlan.reviewSnapshotToken);
+            sig.shaderProductionObservationExact =
+                productionObservation.reviewReady;
+            sig.shaderProductionObservationMaterializationReused =
+                productionObservation.semanticHandoff.materializationReused;
+            sig.shaderProductionObservationObjectReady =
+                productionObservation.semanticHandoff.translationObjectReady;
+            sig.shaderProductionObservationBoundaryPreserved =
+                productionObservation.boundaryPreserved;
+            sig.shaderProductionObservationOwnerGeneration =
+                productionObservation.backendOwnerGeneration;
+            sig.shaderProductionSemanticHandoffSnapshotToken =
+                productionObservation.semanticHandoffSnapshotToken;
+            sig.shaderProductionObservationSnapshotToken =
+                productionObservation.reviewSnapshotToken;
+
+            NativeProgrammableShaderTranslatedSemanticReceipt
+                translatedSemanticReceipt{};
+            if (productionObservation.reviewReady &&
+                productionObservation.semanticHandoffReady &&
+                productionObservation.semanticHandoffSnapshotMatches)
+            {
+                translatedSemanticReceipt =
+                    productionObservation.semanticHandoff.
+                        translatedSemanticReceipt;
+            }
+            else
+            {
+                const NativeProgrammableShaderTranslationObjectReadiness
+                    unavailableTranslationObject{};
+                translatedSemanticReceipt =
+                    compose_programmable_shader_translated_semantic_receipt(
+                        programmablePairIdentity,
+                        unavailableTranslationObject,
+                        0,
+                        sourceMappingHandoff,
+                        sourceMappingHandoff.reviewSnapshotToken,
+                        semanticTranslationPlan,
+                        semanticTranslationPlan.reviewSnapshotToken);
+            }
             sig.shaderTranslatedSemanticReceiptExact =
                 translatedSemanticReceipt.reviewReady;
             sig.shaderTranslatedSemanticReceiptObjectReady =
@@ -2494,6 +2648,16 @@ namespace outrun::vr::dx11
                         sig.shaderTranslatedArtifactReceiptSnapshotToken,
                         sig.shaderSemanticTranslationPlanSnapshotToken,
                         sig.shaderTargetBytecodeMaterializationSnapshotToken);
+                    spdlog::info(
+                        "VR DX11 R287 productionObservation signature#{}: exact={} ownerGeneration={} materializationReused={} objectReady={} boundaryPreserved={} handoffSnapshot=0x{:016X} snapshot=0x{:016X}",
+                        unique,
+                        sig.shaderProductionObservationExact ? 1 : 0,
+                        sig.shaderProductionObservationOwnerGeneration,
+                        sig.shaderProductionObservationMaterializationReused ? 1 : 0,
+                        sig.shaderProductionObservationObjectReady ? 1 : 0,
+                        sig.shaderProductionObservationBoundaryPreserved ? 1 : 0,
+                        sig.shaderProductionSemanticHandoffSnapshotToken,
+                        sig.shaderProductionObservationSnapshotToken);
                     spdlog::info(
                         "VR DX11 R275 translatedSemanticReceipt signature#{}: exact={} objectReady={} snapshot=0x{:016X}",
                         unique,
@@ -3248,6 +3412,12 @@ namespace outrun::vr::dx11
         ResourceManagedResetSuccesses.fetch_add(
             1, std::memory_order_relaxed);
         ManagedTextureShadowRegistry.observe_device_reset();
+        {
+            std::lock_guard<std::mutex> lock(
+                NativeProgrammableObservationMutex);
+            NativeProgrammableObservationBackend.shutdown();
+            NativeProgrammableObservationSourceDevice = nullptr;
+        }
         bool shadowPreserved = false;
         {
             std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
