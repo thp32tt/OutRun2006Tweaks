@@ -11406,6 +11406,39 @@ def main() -> None:
             + ", ".join(missing_r289_programmable_production_semantic_review_contract)
         )
 
+    r290_programmable_activation_pair_identity_contract = [
+        ("R290 additionally seals the exact R239 cache key",
+         NATIVE_BACKEND_HPP, "R290 R258 receipt carries explicit programmable-pair identity"),
+        ("bool sourceIdentityMatches{};",
+         NATIVE_BACKEND_HPP, "R290 R259 correlation result is explicit"),
+        ("bool sourceIdentityProofPresent{};",
+         NATIVE_BACKEND_HPP, "R290 identity proof is a distinct activation prerequisite"),
+        ("out.cacheKey = cacheKey;",
+         NATIVE_BACKEND_CPP, "R290 seals the source cache key into R258"),
+        ("currentSource, identity.cacheKey,",
+         NATIVE_BACKEND_CPP, "R290 both R258 revalidation paths receive exact R239 identity"),
+        ("constexpr std::uint32_t kSourceIdentityMissing = 1u << 3;",
+         NATIVE_BACKEND_CPP, "R290 reserves an independent missing-prerequisite bit"),
+        ("out.sourceIdentityMatches =",
+         NATIVE_BACKEND_CPP, "R290 compares R258 identity against R243/R263 evidence"),
+        ("out.sourceIdentityProofPresent =",
+         NATIVE_BACKEND_CPP, "R290 gates activation prerequisites on pair correlation"),
+        ("token, 0x290u",
+         NATIVE_BACKEND_CPP, "R290 extends the R259 snapshot domain"),
+        ("R290 rejects cross-pair R258 versus R243/R263 prerequisite evidence",
+         CONSTANT_BUFFER_PROBE, "R290 cross-pair hosted regression"),
+    ]
+    missing_r290_programmable_activation_pair_identity = [
+        meaning for token, source, meaning
+        in r290_programmable_activation_pair_identity_contract
+        if token not in source
+    ]
+    if missing_r290_programmable_activation_pair_identity:
+        raise SystemExit(
+            "DX11 R290 programmable activation pair-identity drift: "
+            + ", ".join(missing_r290_programmable_activation_pair_identity)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
