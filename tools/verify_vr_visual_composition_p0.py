@@ -10,6 +10,30 @@ def require(token, source, meaning):
     if token not in source:
         raise SystemExit(f'P0 visual composition drift: {meaning}: missing {token!r}')
 
+def function_body(source, marker):
+    start = source.find(marker)
+    if start < 0:
+        raise SystemExit(f'P0 visual composition drift: missing function {marker!r}')
+    brace = source.find('{', start)
+    if brace < 0:
+        raise SystemExit(f'P0 visual composition drift: missing body for {marker!r}')
+    depth = 0
+    for i in range(brace, len(source)):
+        if source[i] == '{':
+            depth += 1
+        elif source[i] == '}':
+            depth -= 1
+            if depth == 0:
+                return source[brace + 1:i]
+    raise SystemExit(f'P0 visual composition drift: unterminated body for {marker!r}')
+
+def require_order(source, meaning, *tokens):
+    positions = [source.find(token) for token in tokens]
+    if min(positions) < 0 or positions != sorted(positions):
+        raise SystemExit(
+            f'P0 visual composition drift: {meaning}: ordering {tokens} -> {positions}'
+        )
+
 ui = read('src/hooks_uiscaling.cpp')
 textures = read('src/hooks_textures.cpp')
 hud = read('src/vr/hud_semantics.hpp')
@@ -67,12 +91,40 @@ require('RenderScope::ScreenHud', textures, 'direct screen-HUD scope')
 require('RenderScope::WorldBillboard', textures, 'direct world-billboard scope')
 if 'RtlCaptureStackBackTrace' in textures:
     raise SystemExit('P0 visual composition drift: runtime stack-walk HUD classification is forbidden')
+direct_put = function_body(textures, 'static int __cdecl put_sprite_ex_dest(')
+require_order(
+    direct_put, 'put_sprite_ex semantic publication must follow the real producer draw',
+    'const int result = put_sprite_ex.call<int>(a1, a2);',
+    'TagDirectVrSpriteNodes(vrTailsBefore, returnAddress);',
+    'return result;'
+)
+direct_put2 = function_body(textures, 'static int __cdecl put_sprite_ex2_dest(')
+require_order(
+    direct_put2, 'put_sprite_ex2 semantic publication must follow the real producer draw',
+    'const int result = put_sprite_ex2.call<int>(a1, a2);',
+    'TagDirectVrSpriteNodes(vrTailsBefore, returnAddress);',
+    'return result;'
+)
 
 # 00519 observed projected semantic ownership but zero build attempts: XYZRHW needs an exact route.
 require('projectedWorldMarker', r30, 'fixed-function projected marker state')
 require('semanticProjectedWorld', r30, 'fixed-function projected marker classifier')
 require('R57BuildProjectedMarkerDelta', r30, 'projected marker per-eye delta builder')
 require('projectedDeltaX', r30, 'projected marker XYZRHW eye delta')
+xy_body = function_body(r30, 'bool R30ConfigureXyzrhwWorldEffect(')
+require_order(
+    xy_body, 'projected marker must resolve exact payload before generic world classification',
+    'if (semanticProjectedWorld)',
+    'R57BuildProjectedMarkerDelta(',
+    'state.projectedWorldMarker = true;',
+    'if (semanticWorld)'
+)
+xy_transform = function_body(r30, 'bool R30TransformXyzrhwVertices(')
+require_order(
+    xy_transform, 'projected fixed-function transform must outrank generic world transform',
+    'if (state.projectedWorldMarker)',
+    'else if (state.worldEffect)'
+)
 
 # Lens flare / SceneEffect is exact original-mod ownership, never a broad alpha heuristic.
 require('RenderScope::SceneEffect', graphics, 'original Clr_SceneEffect semantic scope')
@@ -94,10 +146,21 @@ require('ImGui_ImplDX9_RenderDrawData', overlay, 'F11 guarded draw call')
 # Translated DYNAMIC MANAGED textures must not consume the bounded CPU-shadow pool.
 require('R14TrackDirectLockable', r14, 'dynamic direct-lockable MANAGED texture path')
 require('D3DUSAGE_DYNAMIC', r14, 'dynamic texture distinction')
+create_texture = function_body(r14, 'HRESULT __stdcall CreateTextureCompatDestR14(')
+require_order(
+    create_texture, 'DYNAMIC MANAGED textures must bypass CPU-shadow allocation',
+    '(translatedDesc.Usage & D3DUSAGE_DYNAMIC) != 0',
+    'R14TrackDirectLockable(device, *texture)',
+    'R14CreateCpuShadow('
+)
 
 # Runtime evidence must be valid before launch and the analyzer must ship with the package.
 require('OUTRUN_VR_EXE_SEMANTICS_VERIFIED', runner, 'pre-launch EXE semantic identity environment')
 require('68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3', runner, 'canonical EXE SHA gate')
+launch_pos = runner.find('& $game @Arguments')
+semantic_pos = runner.find("$env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED='1'")
+if launch_pos < 0 or semantic_pos < 0 or semantic_pos >= launch_pos:
+    raise SystemExit('P0 visual composition drift: EXE semantic identity must be established before game launch')
 require('analyze_outrun_assets.py', pcfast, 'asset analyzer packaged with test build')
 
 # Fail-closed invariants.
