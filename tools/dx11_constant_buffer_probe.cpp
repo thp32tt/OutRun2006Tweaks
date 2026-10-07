@@ -7674,6 +7674,20 @@ int main()
             r257NonIndexedPreActivation.snapshotToken),
         "R257 non-indexed candidate seals dormant pre-activation review without draw authorization");
 
+    auto tamperedR256NonIndexedCandidate = r256NonIndexedCandidate;
+    tamperedR256NonIndexedCandidate.startLocation += 1u;
+    const auto r257NonIndexedTampered =
+        outrun::vr::dx11::compose_programmable_dormant_pre_activation_readiness(
+            tamperedR256NonIndexedCandidate,
+            tamperedR256NonIndexedCandidate.snapshotToken);
+    require(
+        r257NonIndexedTampered.candidateSnapshotMatches &&
+        !r257NonIndexedTampered.candidatePayloadSnapshotMatches &&
+        r257NonIndexedTampered.candidateKindValid &&
+        !r257NonIndexedTampered.ready &&
+        r257NonIndexedTampered.snapshotToken == 0,
+        "R298 rejects non-indexed source-start drift hidden behind an unchanged R256 snapshot token");
+
     auto malformedR256NonIndexedCandidate = r256NonIndexedCandidate;
     malformedR256NonIndexedCandidate.indexed = true;
     const auto r257NonIndexedMalformed =
