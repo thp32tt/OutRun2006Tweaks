@@ -1,0 +1,8 @@
+{
+  "role": "B",
+  "run": "20261008-B243-Q212-HEART-GROUPING",
+  "queue_index": 212,
+  "candidate_sha256": "4b967ef09bbbb21d7ecc1496c2ee15395567b526af6cf68f1c22c7549850d518",
+  "status": "B243_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "runtime_validation": "UNTESTED"
+}
