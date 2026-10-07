@@ -575,8 +575,10 @@ for marker in (
 ):
     if marker not in r13:
         errors.append(f"R13 missing DirectGPU owner API: {marker}")
-if "R13TryGetGpuCompletionSnapshot(" not in r32:
-    errors.append("R32 missing R13 DirectGPU ACK snapshot owner API use")
+if "R30SupportTryGetGpuCompletionSnapshot(" not in r32:
+    errors.append("R32 missing R30 facade for R13 ACK snapshot/rebind")
+if "R13TryGetGpuCompletionSnapshot(" in r32 or "R13GpuCompletionSnapshot" in r32:
+    errors.append("R32 regained direct R13 ACK snapshot/rebind dependency")
 if "R30SupportNoteSafeAckBackpressure()" not in r32:
     errors.append("R32 missing R30 facade for R13 ACK-backpressure telemetry")
 if "R13NoteSafeAckBackpressure()" in r32:
@@ -823,7 +825,7 @@ for marker in (
     "return lowerResolve();",
     "R32EnsureDirectResources(device)",
     "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
-    "R13TryGetGpuCompletionSnapshot(ackSnapshot)",
+    "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
     "DirectTransportFrameReadyAfterPresent() is",
     "slot.producerPending = true;",
     "ActiveDirectTransportSlot = selected;",

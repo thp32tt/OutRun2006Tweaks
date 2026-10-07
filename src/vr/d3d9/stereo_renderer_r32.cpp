@@ -457,7 +457,7 @@ namespace OutRunVRStereo
                 (frameId - 1u) % OutRunVR::RenderFrameRingSize;
             std::uint32_t selected = OutRunVR::RenderFrameRingSize;
             bool ackBlocked = false;
-            R13GpuCompletionSnapshot ackSnapshot{};
+            R30SupportGpuCompletionSnapshot ackSnapshot{};
             bool ackSnapshotRead = false;
             bool ackSnapshotValid = false;
 
@@ -501,14 +501,14 @@ namespace OutRunVRStereo
 
                 if (candidate.published && candidate.frameId)
                 {
-                    // R13 owns ACK mapping/rebind policy. Its snapshot API
-                    // performs at most one bounded stale-mapping reopen/retry,
+                    // R13 still owns ACK mapping/rebind policy behind the R30
+                    // support facade. It performs at most one bounded stale-mapping reopen/retry,
                     // so this final owner samples that whole-ring state exactly
                     // once per resolve scan and reuses it for every candidate.
                     if (!ackSnapshotRead)
                     {
                         ackSnapshotValid =
-                            R13TryGetGpuCompletionSnapshot(ackSnapshot);
+                            R30SupportTryGetGpuCompletionSnapshot(ackSnapshot);
                         ackSnapshotRead = true;
                     }
 

@@ -106,7 +106,7 @@ for required in (
         "return lowerResolve();",
         "R32EnsureDirectResources(device)",
         "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
-        "R13TryGetGpuCompletionSnapshot(ackSnapshot)",
+        "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
         "DirectTransportFrameReadyAfterPresent() is",
         "slot.producerPending = true;",
         "ActiveDirectTransportSlot = selected;"):

@@ -45,6 +45,8 @@ required = (
     "R30SupportDirectTransportIdentity",
     "R30SupportOverlayReadyForTransport",
     "R30SupportNoteSafeAckBackpressure",
+    "R30SupportGpuCompletionSnapshot",
+    "R30SupportTryGetGpuCompletionSnapshot",
     "R30SupportDirectTransportResourcesReady",
     "R30SupportEnsureDirectTransportResources",
     "R30SupportDirectTransportSourceSurfaces",
@@ -87,6 +89,8 @@ for regex, label in (
     (r"(?<!R30Support)\bEnsureDirectTransportResources\(", "EnsureDirectTransportResources"),
     (r"\bR13OverlayReadyForTransport\(", "R13OverlayReadyForTransport"),
     (r"\bR13NoteSafeAckBackpressure\(", "R13NoteSafeAckBackpressure"),
+    (r"\bR13GpuCompletionSnapshot\b", "R13GpuCompletionSnapshot"),
+    (r"\bR13TryGetGpuCompletionSnapshot\(", "R13TryGetGpuCompletionSnapshot"),
     (r"\bR13ReleaseAckState\(", "R13ReleaseAckState"),
     (r"\bReleaseDirectTransportSlots\(", "ReleaseDirectTransportSlots"),
     (r"\bReleaseDirectInteropProbe\(", "ReleaseDirectInteropProbe"),
@@ -124,6 +128,13 @@ delegations = {
     ),
     "R30SupportNoteSafeAckBackpressure()": (
         "R13NoteSafeAckBackpressure();",
+    ),
+    "R30SupportTryGetGpuCompletionSnapshot(": (
+        "R13GpuCompletionSnapshot lower{};",
+        "R13TryGetGpuCompletionSnapshot(lower)",
+        "out = {};",
+        "out.completedFrameId[i] = lower.completedFrameId[i];",
+        "return true;",
     ),
     "R30SupportDirectTransportResourcesReady()": (
         "return DirectTransportResourcesReady;",
@@ -203,10 +214,16 @@ if "R30SupportOverlayReadyForTransport()" not in resolve_direct:
     errors.append("R32 DirectGPU resolve bypasses R30 overlay-readiness facade")
 if "R30SupportNoteSafeAckBackpressure()" not in resolve_direct:
     errors.append("R32 DirectGPU resolve bypasses R30 ACK-backpressure telemetry facade")
+if "R30SupportGpuCompletionSnapshot ackSnapshot{};" not in resolve_direct:
+    errors.append("R32 DirectGPU resolve missing R30 ACK snapshot value type")
+if "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)" not in resolve_direct:
+    errors.append("R32 DirectGPU resolve bypasses R30 ACK snapshot/rebind facade")
 if "R13OverlayReadyForTransport()" in resolve_direct:
     errors.append("R32 DirectGPU resolve regained direct R13 overlay-readiness dependency")
 if "R13NoteSafeAckBackpressure()" in resolve_direct:
     errors.append("R32 DirectGPU resolve regained direct R13 ACK-backpressure telemetry dependency")
+if "R13TryGetGpuCompletionSnapshot(" in resolve_direct or "R13GpuCompletionSnapshot" in resolve_direct:
+    errors.append("R32 DirectGPU resolve regained direct R13 ACK snapshot dependency")
 for raw in ("BackBuffer", "RightEyeSurface"):
     if re.search(rf"\b{raw}\b", resolve_direct):
         errors.append(f"R32 DirectGPU resolve retained raw lower source surface: {raw}")
@@ -217,6 +234,16 @@ source_order = (
     "device->StretchRect(\n                    sourceSurfaces.left",
     "device->StretchRect(sourceSurfaces.right",
 )
+ack_snapshot_order = (
+    "R30SupportGpuCompletionSnapshot ackSnapshot{};",
+    "if (!ackSnapshotRead)",
+    "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
+    "ackSnapshotRead = true;",
+    "ackSnapshot.completedFrameId[index]",
+)
+ack_positions = [resolve_direct.find(token) for token in ack_snapshot_order]
+if any(pos < 0 for pos in ack_positions) or ack_positions != sorted(ack_positions):
+    errors.append("R32 ACK snapshot facade changed one-snapshot-per-resolve ordering")
 source_positions = [resolve_direct.find(token) for token in source_order]
 if any(pos < 0 for pos in source_positions) or source_positions != sorted(source_positions):
     errors.append("R32 DirectGPU source-surface facade/check/copy ordering changed")

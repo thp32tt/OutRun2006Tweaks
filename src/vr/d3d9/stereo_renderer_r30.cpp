@@ -3321,6 +3321,21 @@ namespace OutRunVRStereo
         R13NoteSafeAckBackpressure();
     }
 
+    bool R30SupportTryGetGpuCompletionSnapshot(
+        R30SupportGpuCompletionSnapshot& out) noexcept
+    {
+        R13GpuCompletionSnapshot lower{};
+        if (!R13TryGetGpuCompletionSnapshot(lower))
+        {
+            out = {};
+            return false;
+        }
+
+        for (std::uint32_t i = 0; i < OutRunVR::RenderFrameRingSize; ++i)
+            out.completedFrameId[i] = lower.completedFrameId[i];
+        return true;
+    }
+
     bool R30SupportDirectTransportResourcesReady() noexcept
     {
         return DirectTransportResourcesReady;
