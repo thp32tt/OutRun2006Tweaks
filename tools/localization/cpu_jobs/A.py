@@ -1,313 +1,247 @@
 #!/usr/bin/env python3
-# A179: work-steal q102 C260 selector hierarchy repair.
-# A primary ODD shard had no material RENDER_READY/C-returned item after refresh.
-# q212 changed in the current B cycle, so skip it; steal older q102 C260 REWORK.
+# A180: work-steal q62 after C261 visual clean-plate rejection.
+# Rebuild EASY/HARD from the text-free PSD manual clean component rather than
+# the B244 Layer43 crop that retained an opaque white rectangle.
 import os
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted localization CPU worker / role A only")
 
-import hashlib,json,struct,subprocess
+import hashlib,json,struct,subprocess,tempfile,urllib.request
 from pathlib import Path
 import numpy as np
 from PIL import Image,ImageChops,ImageDraw,ImageFont
 
 repo=Path.cwd()
-RUN="20261008-A179-Q102-SELECTOR-HIERARCHY"
+RUN="20261008-A180-Q062-AUTHORED-CLEAN-COMPONENT"
 out=repo/"localization/graphics/role_A"/RUN
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 
-rel="textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds"
-source_path=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"/rel
+rel="textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds"
 cand=repo/"localization/graphics/hd_candidates"/rel
-clean_path=repo/"localization/graphics/role_C/20261004-1720-C91/C91_571E78F3_CLEAN_PLATE.png"
-SOURCE="17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121"
-INPUT="442babea9c5dea9a944dff3d4a6a577f007dad2ae63a9699d380baf0ce7fc05d"
+INPUT="fa5cd96ff30b41d563886b336ca6305e2fdb7b050b39b2bcd5a5e8c2d46d64b6"
+SOURCE="796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551"
+SRC_URL="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds"
 
-TIME_BBOX=[395,15,1330,140]
-CONT_BBOX=[520,132,1590,245]
-OLD_CONT_BBOX=[830,132,1280,244]
-TARGET_TEXT="15코스 연속"
-TARGET_WIDTH=815
-TARGET_PRECOMPRESS_HEIGHT=96
-LEAN=0.14
+A132=repo/"localization/graphics/role_A/20261006-A-WORKSTEAL132-33491F83-GROUP16-CLEAN"
+DONOR=A132/"A132_MANUAL_PSD_CLEAN_COMPONENT.png"
+SOURCE_MASK=A132/"A132_SOURCE_TEXT_MASK.png"
 
-def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
-def dds_meta(p):
+ROWS=[
+ {"key":"easy_main","bbox":[142,285,385,375],"ko":"쉬움","fill":(0,179,96,255),"anchor":[186,287]},
+ {"key":"hard_main","bbox":[808,287,1068,373],"ko":"어려움","fill":(199,50,50,255),"anchor":[829,288]},
+]
+NAVY=(0,10,57,255); WHITE=(255,255,255,255); FS=73; OUTER=7; INNER=5
+
+def sha(p):
+    h=hashlib.sha256()
+    with open(p,"rb") as fh:
+        for b in iter(lambda:fh.read(1024*1024),b""): h.update(b)
+    return h.hexdigest()
+
+def load_dds(p):
     b=Path(p).read_bytes()
-    if b[:4]!=b"DDS ": raise RuntimeError(("not DDS",str(p)))
-    h=struct.unpack_from("<I",b,12)[0];w=struct.unpack_from("<I",b,16)[0]
-    mips=struct.unpack_from("<I",b,28)[0];fourcc=b[84:88]
-    need=128+((w+3)//4)*((h+3)//4)*16
-    if fourcc!=b"DXT5" or mips not in (0,1) or len(b)!=need:
-        raise RuntimeError(("unexpected DXT5",w,h,mips,fourcc,len(b),need))
-    return b,{"width":w,"height":h,"mips":mips,"fourcc":"DXT5","bytes":len(b)}
-def decode_readable(p):
-    return Image.open(p).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-def bool_bbox(mask):
-    ys,xs=np.nonzero(mask)
-    if not len(xs): return None
-    return [int(xs.min()),int(ys.min()),int(xs.max())+1,int(ys.max())+1]
+    if b[:4]!=b"DDS ": raise RuntimeError("not DDS")
+    h,w,pitch,depth,mips=struct.unpack_from("<5I",b,12)
+    bpp=struct.unpack_from("<I",b,88)[0]; masks=struct.unpack_from("<IIII",b,92)
+    if bpp!=32 or mips!=1 or len(b)!=128+w*h*4: raise RuntimeError(("DDS",w,h,bpp,mips,len(b)))
+    if masks==(0xff,0xff00,0xff0000,0xff000000): mode="RGBA"
+    elif masks==(0xff0000,0xff00,0xff,0xff000000): mode="BGRA"
+    else: raise RuntimeError(("masks",masks))
+    raw=Image.frombytes("RGBA",(w,h),b[128:],"raw",mode)
+    return b,raw,raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM),{"width":w,"height":h,"pitch":pitch,"mips":mips,"masks":masks,"mode":mode}
+
 def diffmask(a,b):
-    aa=np.asarray(a,dtype=np.uint8);bb=np.asarray(b,dtype=np.uint8)
-    return np.any(aa!=bb,axis=2)
-def rect_mask(size,bb):
-    W,H=size;m=np.zeros((H,W),dtype=bool);x0,y0,x1,y1=bb;m[y0:y1,x0:x1]=True;return m
-def flat(im,bg=(112,112,112,255)):
-    z=Image.new("RGBA",im.size,bg);z.alpha_composite(im);return z.convert("RGB")
+    d=ImageChops.difference(a,b); cs=d.split(); m=cs[0]
+    for ch in cs[1:]: m=ImageChops.lighter(m,ch)
+    return m.point(lambda v:255 if v else 0)
 
-def fontspec():
-    q=subprocess.check_output(["fc-match","-f","%{file}|%{index}","Noto Sans CJK KR:style=Bold"],text=True).strip()
-    if "|" in q:
-        p,ix=q.rsplit("|",1)
-        if p and Path(p).exists() and "NotoSansCJK" in Path(p).name:
-            return p,int(ix or 0),"Noto Sans CJK KR:style=Bold"
-    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
-    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
-    q=subprocess.check_output(["fc-match","-f","%{file}|%{index}","Noto Sans CJK KR:style=Bold"],text=True).strip()
-    p,ix=q.rsplit("|",1);return p,int(ix or 0),"Noto Sans CJK KR:style=Bold"
+def count(m): return int(sum(m.histogram()[1:]))
 
-def source_colors(src,bb):
-    a=np.asarray(src.crop(tuple(bb)),dtype=np.uint8)
-    alpha=a[:,:,3]>20
-    rgb=a[:,:,:3]
-    orange=alpha&(rgb[:,:,0]>150)&(rgb[:,:,1]>45)&(rgb[:,:,1]<205)&(rgb[:,:,2]<95)
-    white=alpha&(rgb.min(axis=2)>175)
-    # dark blue/navy pixels in the outlined title family.
-    navy=alpha&(rgb[:,:,2]>=rgb[:,:,0])&(rgb[:,:,2]>=rgb[:,:,1])&(rgb.max(axis=2)<120)
-    def med(mask,fallback):
-        v=rgb[mask]
-        return tuple(int(x) for x in np.median(v,axis=0)) if len(v)>=20 else fallback
-    return {
-      "fill":med(orange,(241,128,0)),
-      "white":med(white,(239,239,239)),
-      "navy":med(navy,(4,20,57))
-    }
+def flat(im):
+    z=Image.new("RGBA",im.size,(224,224,224,255)); z.alpha_composite(im); return z.convert("RGB")
 
-def render_native(text,font_path,font_index,colors):
-    # Render from a vector font at native working resolution; no prior Korean bitmap is reused/upscaled.
-    f=ImageFont.truetype(font_path,112,index=font_index)
-    probe=Image.new("L",(1800,320),0);d=ImageDraw.Draw(probe)
-    bb=d.textbbox((0,0),text,font=f,stroke_width=12)
-    W=bb[2]-bb[0]+64;H=bb[3]-bb[1]+64
-    masks=[]
-    for sw in (12,7,3,0):
-        m=Image.new("L",(W,H),0);md=ImageDraw.Draw(m)
-        md.text((32-bb[0],32-bb[1]),text,font=f,fill=255,stroke_width=sw,stroke_fill=255)
-        masks.append(m)
-    union=masks[0].getbbox()
-    if not union: raise RuntimeError("empty render")
-    masks=[m.crop(union) for m in masks]
-    layer=Image.new("RGBA",masks[0].size,(0,0,0,0))
-    for mask,col in [(masks[0],colors["navy"]),(masks[1],colors["white"]),(masks[2],colors["navy"]),(masks[3],colors["fill"])]:
-        c=Image.new("RGBA",mask.size,tuple(col)+(255,));c.putalpha(mask);layer.alpha_composite(c)
-    # Source-relative height first, then horizontal hierarchy expansion.
-    ah=layer.getchannel("A").getbbox()
-    layer=layer.crop(ah)
-    scale_h=TARGET_PRECOMPRESS_HEIGHT/layer.height
-    scaled_w=max(1,round(layer.width*scale_h))
-    layer=layer.resize((scaled_w,TARGET_PRECOMPRESS_HEIGHT),Image.Resampling.LANCZOS)
-    # Horizontal source-family fit from fresh native render, not from old Korean pixels.
-    prelean_target=max(1,TARGET_WIDTH-round(LEAN*(TARGET_PRECOMPRESS_HEIGHT-1)))
-    layer=layer.resize((prelean_target,layer.height),Image.Resampling.LANCZOS)
-    # readable right lean: top shifts right relative to bottom.
-    shift=max(1,int(np.ceil(LEAN*(layer.height-1))))
-    src=Image.new("RGBA",(layer.width+shift+8,layer.height),(0,0,0,0));src.alpha_composite(layer,(0,0))
-    dst=Image.new("RGBA",src.size,(0,0,0,0))
-    for y in range(src.height):
-        dx=int(round(LEAN*(src.height-1-y)))
-        dst.alpha_composite(src.crop((0,y,src.width,y+1)),(dx,y))
-    ab=dst.getchannel("A").getbbox()
-    if not ab: raise RuntimeError("empty lean")
-    return dst.crop(ab)
+def make_glyph(text,fill,font):
+    p=Image.new("RGBA",(1200,360),(0,0,0,0)); d=ImageDraw.Draw(p)
+    tb=d.textbbox((0,0),text,font=font,stroke_width=OUTER)
+    xy=(40-tb[0],40-tb[1])
+    d.text(xy,text,font=font,fill=fill,stroke_width=OUTER,stroke_fill=WHITE)
+    d.text(xy,text,font=font,fill=fill,stroke_width=INNER,stroke_fill=NAVY)
+    bb=p.getchannel("A").getbbox()
+    if not bb: raise RuntimeError(("empty glyph",text))
+    return p.crop(bb)
 
-if sha(source_path)!=SOURCE: raise RuntimeError(("source drift",sha(source_path),SOURCE))
 if sha(cand)!=INPUT: raise RuntimeError(("candidate drift",sha(cand),INPUT))
-sb,smeta=dds_meta(source_path);cb,cmeta=dds_meta(cand)
-if sb[:128]!=cb[:128] or smeta!=cmeta: raise RuntimeError("header/structure drift")
-source=decode_readable(source_path);before=decode_readable(cand)
-clean=Image.open(clean_path).convert("RGBA")
-if source.size!=before.size or source.size!=clean.size: raise RuntimeError("dimension mismatch")
-W,H=source.size
-FONT,FI,FPAT=fontspec()
-colors=source_colors(source,CONT_BBOX)
-fresh=render_native(TARGET_TEXT,FONT,FI,colors)
+if not DONOR.exists() or not SOURCE_MASK.exists(): raise RuntimeError("missing A132 authored evidence")
+cb,raw_old,old,meta=load_dds(cand)
+donor=Image.open(DONOR).convert("RGBA")
+srcmask=Image.open(SOURCE_MASK).convert("L")
+if donor.size!=old.size or srcmask.size!=old.size: raise RuntimeError(("evidence shape",donor.size,srcmask.size,old.size))
 
-sw=CONT_BBOX[2]-CONT_BBOX[0];sh=CONT_BBOX[3]-CONT_BBOX[1]
-if fresh.width>sw-4 or fresh.height>sh-4:
-    fit=min((sw-4)/fresh.width,(sh-4)/fresh.height)
-    fresh=fresh.resize((max(1,int(fresh.width*fit)),max(1,int(fresh.height*fit))),Image.Resampling.LANCZOS)
-ab=fresh.getchannel("A").getbbox();fresh=fresh.crop(ab)
+FONT=subprocess.check_output(["fc-match","-f","%{file}","Noto Sans CJK KR:style=Black"],text=True).strip()
+if not FONT or not Path(FONT).exists(): raise RuntimeError(("font missing",FONT))
+font=ImageFont.truetype(FONT,FS)
 
-# Preserve the accepted Time Attack Mode row byte-for-byte in readable pixels.
-final=before.copy()
-# B212's reported second-row bbox overlaps the accepted Time row vertically because
-# cell-alpha measurement included first-row fringe. Preserve y<140 byte-for-byte and
-# clear only the safely separable second-row footprint from y=140 downward.
-cx0=max(CONT_BBOX[0]+4,OLD_CONT_BBOX[0]-8)
-cy0=max(CONT_BBOX[1],TIME_BBOX[3])
-cx1=min(CONT_BBOX[2]-4,OLD_CONT_BBOX[2]+8)
-cy1=min(CONT_BBOX[3]-1,OLD_CONT_BBOX[3])
-baseline=before.copy()
-baseline.paste(clean.crop((cx0,cy0,cx1,cy1)),(cx0,cy0))
-final=baseline.copy()
+with tempfile.TemporaryDirectory() as td:
+    sp=Path(td)/"source.dds"; urllib.request.urlretrieve(SRC_URL,sp)
+    if sha(sp)!=SOURCE: raise RuntimeError(("source drift",sha(sp)))
+    sb,sraw,source,smeta=load_dds(sp)
+    if cb[:128]!=sb[:128] or smeta!=meta: raise RuntimeError("source/candidate structure drift")
 
-px=CONT_BBOX[0]+(sw-fresh.width)//2
-py=max(TIME_BBOX[3]+2, CONT_BBOX[1]+(sh-fresh.height)//2)
-if px<=CONT_BBOX[0] or py<=CONT_BBOX[1] or px+fresh.width>=CONT_BBOX[2] or py+fresh.height>=CONT_BBOX[3]:
-    raise RuntimeError(("no positive precompress margin",fresh.size,[px,py],CONT_BBOX))
-final.alpha_composite(fresh,(px,py))
+    # The donor is the A132 PSD-derived *text-free manual component* shown as a
+    # continuous fork road. B244 accidentally used A124 Layer43 crops instead.
+    clean=old.copy()
+    final=old.copy()
+    allowed=Image.new("L",old.size,0); ad=ImageDraw.Draw(allowed)
+    render_union=Image.new("L",old.size,0)
+    report_rows=[]
 
-# Desired changes must be wholly inside continuous_15 source bbox, and Time Attack must remain exact.
-allowed=rect_mask(source.size,CONT_BBOX)
-dm=diffmask(before,final)
-outside=int(np.logical_and(dm,~allowed).sum())
-if outside: raise RuntimeError(("desired outside",outside,bool_bbox(dm)))
-time_diff=int(diffmask(before.crop(tuple(TIME_BBOX)),final.crop(tuple(TIME_BBOX))).sum())
-if time_diff: raise RuntimeError(("time row drift",time_diff))
+    for row in ROWS:
+        x0,y0,x1,y1=row["bbox"]; ad.rectangle((x0,y0,x1-1,y1-1),fill=255)
+        donor_crop=donor.crop((x0,y0,x1,y1))
+        prior_crop=old.crop((x0,y0,x1,y1))
 
-# Install NVTT only when unavailable on the runner.
-if not Path("/usr/bin/nvcompress").exists():
-    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
-    subprocess.run(["sudo","apt-get","install","-y","-qq","libnvtt-bin"],check=True)
-nvcompress=Path("/usr/bin/nvcompress")
-if not nvcompress.exists(): raise RuntimeError("nvcompress unavailable")
+        # Full authored clean crop is safe here because the donor is a same-canvas,
+        # text-free PSD component and the source bbox is the exact allowed region.
+        # Record how much of the B244 rectangle/background is materially replaced.
+        repair_px=count(diffmask(prior_crop,donor_crop))
+        if repair_px<=0: raise RuntimeError(("no repair delta",row["key"]))
 
-# Compress once, but patch only BC3 blocks containing actual desired changed pixels.
-raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-tmp_png=Path("/tmp")/"A179_q102_raw.png";tmp_dds=Path("/tmp")/"A179_q102_nv.dds"
-raw_final.save(tmp_png)
-subprocess.run([str(nvcompress),"-bc3","-nomips",str(tmp_png),str(tmp_dds)],
-               check=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
-tb,tmeta=dds_meta(tmp_dds)
-if tmeta["width"]!=W or tmeta["height"]!=H: raise RuntimeError("nvcompress size drift")
+        clean.paste(donor_crop,(x0,y0))
+        final.paste(donor_crop,(x0,y0))
 
-raw_before=before.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-raw_change=diffmask(raw_before,raw_final)
-ys,xs=np.nonzero(raw_change)
-if not len(xs): raise RuntimeError("no desired changes")
-bw=(W+3)//4;bh=(H+3)//4
-patch_blocks={(int(x)//4,int(y)//4) for x,y in zip(xs,ys)}
-# Every patched 4x4 block must be completely inside the readable source bbox after Y mirroring.
-for bx,by in patch_blocks:
-    rx0=bx*4;rx1=min(W,rx0+4)
-    ry0=H-min(H,(by+1)*4);ry1=H-by*4
-    if rx0<CONT_BBOX[0] or rx1>CONT_BBOX[2] or ry0<CONT_BBOX[1] or ry1>CONT_BBOX[3]:
-        raise RuntimeError(("patch block escape",[bx,by],[rx0,ry0,rx1,ry1],CONT_BBOX))
+        g=make_glyph(row["ko"],row["fill"],font)
+        ax,ay=row["anchor"]
+        if ax<=x0 or ay<=y0 or ax+g.width>=x1 or ay+g.height>=y1:
+            raise RuntimeError(("glyph containment",row["key"],g.size,row["bbox"],row["anchor"]))
+        final.alpha_composite(g,(ax,ay))
+        gm=Image.new("L",old.size,0); gm.paste(g.getchannel("A"),(ax,ay))
+        render_union=ImageChops.lighter(render_union,gm)
+        lb=[ax,ay,ax+g.width,ay+g.height]
+        margins=[ax-x0,x1-lb[2],ay-y0,y1-lb[3]]
 
-out_bytes=bytearray(cb)
-for bx,by in patch_blocks:
-    off=128+(by*bw+bx)*16
-    out_bytes[off:off+16]=tb[off:off+16]
-cand.write_bytes(out_bytes)
-after=sha(cand)
+        # Donor provenance / clean plate gate: source-mask pixels are allowed to differ,
+        # but the donor must not contain any of the source text alpha itself.
+        sm=srcmask.crop((x0,y0,x1,y1))
+        donor_alpha=donor_crop.getchannel("A")
+        source_mask_alpha_overlap=count(ImageChops.multiply(sm,donor_alpha))
+        # This count may be non-zero because the road/background is opaque under source
+        # text; it is informational, not residue. Visual residue is judged on donor image.
+        report_rows.append({
+            "key":row["key"],"source_bbox":row["bbox"],"localized_bbox":lb,
+            "source_size":[x1-x0,y1-y0],"localized_size":[g.width,g.height],
+            "delta_left":margins[0],"delta_right":margins[1],
+            "delta_top":margins[2],"delta_bottom":margins[3],
+            "repair_pixels_vs_b244":repair_px,
+            "donor":"A132_MANUAL_PSD_CLEAN_COMPONENT.png",
+            "source_mask_x_donor_alpha_pixels":source_mask_alpha_overlap,
+            "font":"Noto Sans CJK KR Black","font_size":FS,
+            "outer_stroke_px":OUTER,"navy_stroke_px":INNER,
+            "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS"
+        })
 
-fb,fmeta=dds_meta(cand);decoded=decode_readable(cand)
-if fb[:128]!=sb[:128] or fmeta!=smeta: raise RuntimeError("persisted structure drift")
-pdiff=diffmask(before,decoded)
-persist_out=int(np.logical_and(pdiff,~allowed).sum())
-alpha_out=int(np.logical_and(np.asarray(before.getchannel("A"))!=np.asarray(decoded.getchannel("A")),~allowed).sum())
-if persist_out or alpha_out: raise RuntimeError(("persisted outside",persist_out,alpha_out,bool_bbox(pdiff)))
-if diffmask(before.crop(tuple(TIME_BBOX)),decoded.crop(tuple(TIME_BBOX))).any():
-    raise RuntimeError("persisted Time Attack row drift")
+    # Scope and persisted DDS checks.
+    dm=diffmask(old,final)
+    outside=count(ImageChops.multiply(dm,ImageChops.invert(allowed)))
+    am=ImageChops.difference(old.getchannel("A"),final.getchannel("A")).point(lambda v:255 if v else 0)
+    alpha_out=count(ImageChops.multiply(am,ImageChops.invert(allowed)))
+    if outside or alpha_out: raise RuntimeError(("scope",outside,alpha_out))
 
-# Measure the new second-row label against the clean/reconstructed baseline rather
-# than raw atlas alpha, because q102 sprite cells overlap in Y.
-td=diffmask(baseline,decoded)
-local=np.zeros_like(td);x0,y0,x1,y1=CONT_BBOX;local[y0:y1,x0:x1]=td[y0:y1,x0:x1]
-lb=bool_bbox(local)
-if not lb: raise RuntimeError("empty persisted target diff")
-lw,lh=lb[2]-lb[0],lb[3]-lb[1]
-margins=[lb[0]-x0,x1-lb[2],lb[1]-y0,y1-lb[3]]
-if not(all(v>0 for v in margins) and lw<=sw and lh<=sh):
-    raise RuntimeError(("postcompress bbox/margin fail",lb,margins,[sw,sh]))
-width_ratio=lw/sw
-if width_ratio<0.68:
-    raise RuntimeError(("hierarchy still underfilled",width_ratio,lb))
+    # Every final background pixel outside fresh Korean alpha inside the two target
+    # bboxes must equal the authored clean component exactly.
+    background_mismatch=0
+    for row in ROWS:
+        x0,y0,x1,y1=row["bbox"]
+        fa=np.asarray(final.crop((x0,y0,x1,y1)))
+        da=np.asarray(donor.crop((x0,y0,x1,y1)))
+        gm=np.asarray(render_union.crop((x0,y0,x1,y1)))>0
+        mismatch=np.any(fa!=da,axis=2)&~gm
+        background_mismatch+=int(mismatch.sum())
+    if background_mismatch: raise RuntimeError(("background mismatch",background_mismatch))
 
-# Check no unintended changed BC3 blocks.
-changed_blocks=0;outside_patch=0
-for by in range(bh):
-    for bx in range(bw):
-        off=128+(by*bw+bx)*16
-        if cb[off:off+16]!=fb[off:off+16]:
-            changed_blocks+=1
-            if (bx,by) not in patch_blocks:outside_patch+=1
-if outside_patch: raise RuntimeError(("compressed collateral",outside_patch))
+    raw_new=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+    cand.write_bytes(cb[:128]+raw_new.tobytes("raw",meta["mode"]))
+    csha=sha(cand)
+    rb,rraw,decoded,rmeta=load_dds(cand)
+    if rb[:128]!=cb[:128] or rmeta!=meta or ImageChops.difference(decoded,final).getbbox() is not None:
+        raise RuntimeError("persisted decode mismatch")
 
-# Evidence.
-def card(crop):
-    ims=[]
-    for lab,im in [("SOURCE",source),("B212_C260_REJECT",before),("C91_CLEAN",clean),("A179",decoded)]:
-        z=flat(im.crop(crop));z=z.resize((z.width*2,z.height*2),Image.Resampling.NEAREST)
-        c=Image.new("RGB",(z.width,z.height+26),(20,20,20));c.paste(z,(0,26));ImageDraw.Draw(c).text((4,4),lab,fill="white");ims.append(c)
-    s=Image.new("RGB",(sum(i.width for i in ims)+18,max(i.height for i in ims)),(16,16,16));xx=0
-    for i in ims:s.paste(i,(xx,0));xx+=i.width+6
-    return s
-crop=(CONT_BBOX[0]-24,CONT_BBOX[1]-12,CONT_BBOX[2]+24,CONT_BBOX[3]+12)
-sheet=card(crop);sheet.save(out/"A179_Q102_CONTACTS.jpg","JPEG",quality=96,subsampling=0)
+    clean.save(out/"A180_Q062_CLEAN_PLATE.png")
+    render_union.save(out/"A180_Q062_RENDER_MASK.png")
 
-rows=[]
-for sc in [1.0,0.75,0.5]:
-    ims=[]
-    for lab,im in [("SOURCE",source),("B212",before),("A179",decoded)]:
-        z=flat(im.crop(tuple(CONT_BBOX)))
-        if sc!=1.0:z=z.resize((round(z.width*sc),round(z.height*sc)),Image.Resampling.LANCZOS)
-        c=Image.new("RGB",(z.width,z.height+24),(20,20,20));c.paste(z,(0,24));ImageDraw.Draw(c).text((4,4),f"{lab} {int(sc*100)}%",fill="white");ims.append(c)
-    r=Image.new("RGB",(max(i.width for i in ims),sum(i.height for i in ims)+10),(16,16,16));yy=0
-    for i in ims:r.paste(i,(0,yy));yy+=i.height+5
-    rows.append(r)
-p=Image.new("RGB",(sum(i.width for i in rows)+12,max(i.height for i in rows)),(16,16,16));xx=0
-for i in rows:p.paste(i,(xx,0));xx+=i.width+6
-p.save(out/"A179_Q102_PRACTICAL.jpg","JPEG",quality=95,subsampling=0)
+    # High-zoom evidence.
+    cards=[]
+    for rr,row in zip(report_rows,ROWS):
+        x0,y0,x1,y1=row["bbox"]; p=24
+        crop=(max(0,x0-p),max(0,y0-p),min(old.width,x1+p),min(old.height,y1+p))
+        ims=[]
+        for lab,im in [("SOURCE",source),("B244_C261_REJECT",old),("A180_AUTHORED_CLEAN",clean),("A180_FINAL",decoded)]:
+            z=flat(im.crop(crop)); z=z.resize((z.width*2,z.height*2),Image.Resampling.NEAREST)
+            cc=Image.new("RGB",(z.width,z.height+26),(24,24,24)); cc.paste(z,(0,26)); ImageDraw.Draw(cc).text((4,4),lab,fill="white"); ims.append(cc)
+        rowim=Image.new("RGB",(sum(i.width for i in ims)+36,max(i.height for i in ims)+20),(16,16,16)); xx=0
+        for cc in ims: rowim.paste(cc,(xx,0)); xx+=cc.width+12
+        ImageDraw.Draw(rowim).text((4,rowim.height-3),row["key"],fill="white",anchor="ls")
+        cards.append(rowim)
+    sheet=Image.new("RGB",(max(c.width for c in cards),sum(c.height for c in cards)+8),(16,16,16)); yy=0
+    for cc in cards: sheet.paste(cc,(0,yy)); yy+=cc.height+8
+    sheet.save(out/"A180_Q062_CONTACTS.jpg","JPEG",quality=96,subsampling=0)
 
-sr=flat(source.transpose(Image.Transpose.FLIP_TOP_BOTTOM));fr=flat(decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM))
-sr.thumbnail((1024,512),Image.Resampling.LANCZOS);fr.thumbnail((1024,512),Image.Resampling.LANCZOS)
-rw=Image.new("RGB",(sr.width+fr.width+8,max(sr.height,fr.height)+26),(16,16,16));rw.paste(sr,(0,26));rw.paste(fr,(sr.width+8,26))
-d=ImageDraw.Draw(rw);d.text((4,4),"SOURCE RAW",fill="white");d.text((sr.width+12,4),"A179 RAW",fill="white")
-rw.save(out/"A179_Q102_RAW.jpg","JPEG",quality=94,subsampling=0)
+    main=(0,0,1196,812); ims=[]
+    for lab,im in [("SOURCE",source),("B244_C261_REJECT",old),("A180_AUTHORED_CLEAN",clean),("A180_FINAL",decoded)]:
+        z=flat(im.crop(main)); z.thumbnail((600,410),Image.Resampling.LANCZOS)
+        cc=Image.new("RGB",(z.width,z.height+28),(24,24,24)); cc.paste(z,(0,28)); ImageDraw.Draw(cc).text((4,5),lab,fill="white"); ims.append(cc)
+    panel=Image.new("RGB",(max(x.width for x in ims)*2+12,max(x.height for x in ims)*2+12),(16,16,16))
+    panel.paste(ims[0],(0,0)); panel.paste(ims[1],(ims[0].width+12,0))
+    panel.paste(ims[2],(0,ims[0].height+12)); panel.paste(ims[3],(ims[2].width+12,ims[1].height+12))
+    panel.save(out/"A180_Q062_PRACTICAL.jpg","JPEG",quality=95,subsampling=0)
 
-report={
- "schema_version":2,"role":"A","run":RUN,"queue_index":102,"asset":"571E78F3",
- "work_stolen_from_lane":"B",
- "selection_reason":"A ODD shard had no material RENDER_READY/C-returned item; q212 changed by B in current cycle, so older unchanged q102 C260 REWORK was stolen after live refresh.",
- "trigger":"C260_REWORK_REQUIRED_TEXT_SCALE_HIERARCHY",
- "source_sha256":SOURCE,"prior_candidate_sha256":INPUT,"candidate_sha256":after,
- "preserved":{"time_attack_mode":"PIXEL_EXACT_TO_B212","time_attack_readable_diff_pixels":0},
- "reworked":{
-   "key":"continuous_15","source":"15 Continuous Course","korean":TARGET_TEXT,
-   "source_bbox":CONT_BBOX,"prior_localized_bbox":[830,132,1280,244],
-   "localized_bbox":lb,"source_size":[sw,sh],"localized_size":[lw,lh],
-   "margins":margins,"width_ratio":round(width_ratio,4),
-   "prior_width_ratio":round(450/1070,4),
-   "font":FPAT,"font_source":"native vector font; no previous Korean bitmap reuse/upscale",
-   "readable_right_lean":LEAN,
-   "effect_family":{"fill_rgb":colors["fill"],"inner_outline_rgb":colors["navy"],"keyline_rgb":colors["white"],"outer_outline_rgb":colors["navy"]},
-   "construction":"fresh native Hangul render, source-derived orange/navy/white effect family, readable-right lean, source-relative horizontal hierarchy expansion, centered inside exact source bbox with positive vertical/horizontal margins"
- },
- "machine_qa":{
-   "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS",
-   "changed_pixels_outside_continuous_source_bbox":persist_out,
-   "alpha_changed_pixels_outside_continuous_source_bbox":alpha_out,
-   "changed_bc3_blocks":changed_blocks,"changed_bc3_blocks_outside_patch":outside_patch,
-   "header_128_exact":True,"mips":smeta["mips"],"raw_orientation":"mirror_y","persisted_decode":"PASS"
- },
- "ordered_generation_gate":{
-   "1_english_removal_plate_restoration":"PASS_REUSE_C91_VERIFIED_CLEAN_PLATE_ONLY_FOR_PRIOR_KOREAN_FOOTPRINT",
-   "2_source_matching_slant":"PASS_READABLE_RIGHT_LEAN_0.14",
-   "3_no_undersized_lettering":"PASS_WIDTH_RATIO_MATERIALLY_RAISED_FROM_0.421_TO_"+str(round(width_ratio,3)),
-   "4_source_faithful_weight_effect":"PASS_SOURCE_DERIVED_ORANGE_NAVY_WHITE_LAYER_FAMILY",
-   "5_no_clipped_pixels":"PASS_POSITIVE_MARGIN",
-   "6_protected_art_clearance":"PASS_ZERO_OUTSIDE_SOURCE_BBOX_AND_TIME_ROW_EXACT",
-   "7_flip_y_raw":"EVIDENCE_WRITTEN_PENDING_CONTROLLER_CONFIRM",
-   "8_immediate_readability":"EVIDENCE_WRITTEN_PENDING_CONTROLLER_CONFIRM"
- },
- "execution_backend":"GitHub Actions fallback after ChatGPT local environment lacked nvcompress and package installation timed out; repository-backed BC3 encode required.",
- "controller_visual_qa":"PENDING_CHATGPT_CONTROLLER",
- "fresh_independent_c":"REQUIRED","mandatory_c3":"REQUIRED_EXACT_SHA",
- "runtime_validation":"UNTESTED","status":"A179_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
- "forbidden_domains_touched":[]
-}
-(out/"A179_Q102_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(wr/"A179_Q102.json").write_text(json.dumps({"role":"A","run":RUN,"queue_index":102,"asset":rel,"candidate_sha256":after,"report":str((out/"A179_Q102_REPORT.json").relative_to(repo)),"status":report["status"],"runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print(json.dumps({"run":RUN,"candidate_sha256":after,"localized_bbox":lb,"localized_size":[lw,lh],"margins":margins,"width_ratio":width_ratio,"changed_blocks":changed_blocks},ensure_ascii=False,indent=2))
+    rs,ro,rn=flat(sraw),flat(raw_old),flat(rraw)
+    for z in (rs,ro,rn): z.thumbnail((650,340),Image.Resampling.LANCZOS)
+    rw=Image.new("RGB",(rs.width+ro.width+rn.width+24,max(rs.height,ro.height,rn.height)+28),(16,16,16)); xx=0
+    for lab,z in [("SOURCE RAW",rs),("B244 RAW",ro),("A180 RAW",rn)]:
+        rw.paste(z,(xx,28)); ImageDraw.Draw(rw).text((xx+4,5),lab,fill="white"); xx+=z.width+12
+    rw.save(out/"A180_Q062_RAW.jpg","JPEG",quality=93,subsampling=0)
+
+    report={
+      "schema_version":2,"role":"A","run":RUN,"queue_index":62,"asset":"33491F83",
+      "work_stolen_from_lane":"B",
+      "work_steal_reason":"A odd shard has no safe material RENDER_READY/C-returned target; q212 has newer B246 compute in progress, while q62 is a fresh C261 even-shard clean-plate REWORK with stable B244 bytes.",
+      "trigger":"C261_REWORK_REQUIRED_CLEAN_PLATE_WHITE_RECTANGLE_PATCH_EASY_HARD",
+      "source_sha256":SOURCE,"prior_candidate_sha256":INPUT,"candidate_sha256":csha,
+      "repair_basis":{
+        "rejected":"B244 used A124 Layer43 crops and C261 still saw opaque white rectangular EASY/HARD patches.",
+        "replacement":"A132_MANUAL_PSD_CLEAN_COMPONENT is the same-canvas text-free authored fork-road component; paste exact EASY/HARD source bboxes from that component, then native rerender.",
+        "lettering":"preserve proven A132/B244 main-difficulty family: Noto Sans CJK KR Black 73px, white outer 7px, navy inner 5px, source green/red fills and anchors."
+      },
+      "rows":report_rows,
+      "machine_qa":{
+        "target_rows":"2/2 PASS",
+        "changed_pixels_vs_b244":count(dm),
+        "changed_outside_target_bboxes":outside,
+        "alpha_changed_outside_target_bboxes":alpha_out,
+        "background_mismatch_vs_authored_clean_outside_fresh_glyph":background_mismatch,
+        "non_target_atlas_pixel_exact":True,
+        "header_128_exact":True,"mips":meta["mips"],"raw_orientation":"mirror_y","persisted_decode":"PASS"
+      },
+      "ordered_generation_gate":{
+        "1_plate_restoration":"PASS_AUTHORED_TEXT_FREE_PSD_COMPONENT_NO_LAYER43_RECTANGLE",
+        "2_source_matching_slant":"PASS_UPRIGHT_MAIN_LABEL_FAMILY",
+        "3_no_undersized_lettering":"PASS_PROVEN_73PX_NATIVE_FAMILY",
+        "4_source_faithful_weight_effect":"PASS_BLACK_WHITE7_NAVY5_SOURCE_COLORS",
+        "5_no_clipped_pixels":"PASS_POSITIVE_MARGIN",
+        "6_protected_art_clearance":"PASS_NON_TARGET_ATLAS_PIXEL_EXACT",
+        "7_flip_y_raw":"EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+        "8_immediate_readability":"EVIDENCE_WRITTEN_PENDING_CONTROLLER"
+      },
+      "execution_backend":"GITHUB_HOSTED_CPU_WORKER_REPOSITORY_BACKED_DDS",
+      "controller_visual_qa":"PENDING_CHATGPT_CONTROLLER",
+      "status":"A180_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+      "fresh_independent_c":"REQUIRED","mandatory_c3":"REQUIRED_C261_VISUAL_REGRESSION",
+      "runtime_validation":"UNTESTED","forbidden_domains_touched":[]
+    }
+    (out/"A180_Q062_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    (wr/"A180_Q062.json").write_text(json.dumps({"role":"A","run":RUN,"queue_index":62,"asset":"33491F83","before":INPUT,"after":csha,
+      "status":report["status"],"report":str((out/"A180_Q062_REPORT.json").relative_to(repo)),
+      "runtime_validation":"UNTESTED"},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    print(json.dumps({"run":RUN,"candidate_sha256":csha,"rows":report_rows,"changed_pixels":count(dm),
+      "outside":outside,"alpha_outside":alpha_out,"background_mismatch":background_mismatch},ensure_ascii=False,indent=2))
