@@ -275,6 +275,13 @@ require('SceneEffectLensProducer_sub_40CAE0', analyzer, 'canonical lens producer
 require('0x0000CAE0', analyzer, 'lens producer start RVA')
 require('0x0000CABE', analyzer, 'lens DrawObjectAlpha anchor RVA')
 require('0x0000CF4E', analyzer, 'lens Calc3D2D anchor RVA')
+require('OutRunStageResultHud_0x97000', analyzer,
+        'OutRun stage/result HUD producer window')
+for token in (
+    '0x000975EE', '0x00097727', '0x000977FB',
+    '0x00097BB7', '0x00097DA7',
+):
+    require(token, analyzer, 'OutRun stage/result canonical producer anchor')
 
 
 print('P0 visual composition static contract: PASS')
