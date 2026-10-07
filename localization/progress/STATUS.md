@@ -2225,3 +2225,8 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - A155 candidate `47f64c673377...`: 15 canonical stage names rebuilt at native source-height-driven aspect using Noto CJK KR Black + 1px source-family weight; English-width forcing removed.
 - 15/15 bbox/size/positive-margin PASS; outside/alpha/residue/overlap/touch=0; exact BGRA header/raw mirror_y; SOURCE/A51/CLEAN/A155 + RAW controller visual QA PASS.
 - Fresh C + refreshed English-original comparison/user review + actual in-game validation required. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 10:17 KST — C228 PRE_INGAME export refreshed
+- Exporter 37555515782 SUCCESS; worker 1abf93385fd653b18d64423a65cc6aa689284ef3; current C-pass set 25 rows.
+- q163 59A79158 is #018 with source 7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d and A154 candidate 201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6; FLIP-Y and RAW card rechecked.
+- User JPG review and in-game validation pending. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.

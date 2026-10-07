@@ -40,8 +40,15 @@
   },
   "decision": "C228_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
   "candidate_changed_by_C": false,
-  "pre_ingame_comparison_refresh": "PENDING_C228_EXPORT",
-  "pre_ingame_user_review": "PENDING_REFRESH",
+  "pre_ingame_comparison_refresh": "REFRESHED_C228_EXPORT_018",
+  "pre_ingame_user_review": "PENDING_USER_REVIEW",
   "runtime_validation": "UNTESTED",
-  "forbidden_domains_touched": []
+  "forbidden_domains_touched": [],
+  "pre_ingame_review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/018_q163_59A79158.jpg",
+  "pre_ingame_manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
+  "pre_ingame_export_worker": {
+    "run_id": 37555515782,
+    "worker_output_commit": "1abf93385fd653b18d64423a65cc6aa689284ef3",
+    "manifest_count": 25
+  }
 }

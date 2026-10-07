@@ -2729,3 +2729,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/A51/CLEAN/A155 row contact + RAW review PASS: natural Hangul proportions replace the visibly stretched A51 skeletons while final heights remain 56-60px against 60-64px source heights. No residue, clipping, overlap or orientation regression. Ordered generation gate 1-8 producer PASS.
 - Prior C195 is superseded because q159 bytes changed. Fresh independent C + regenerated PRE_INGAME English comparison/user review + actual-game validation remain required. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261007-A-MANUALQA155-4EDA9DE3/A155_CONTROLLER_SELF_QA.json`, `localization/graphics/role_A/20261007-A-MANUALQA155-4EDA9DE3/A155_4EDA9DE3_REPORT.json`.
+
+## 2026-10-07 10:17 KST — C228 PRE_INGAME export synchronization
+
+- GitHub-hosted C exporter run 37555515782 completed SUCCESS and worker commit 1abf93385fd653b18d64423a65cc6aa689284ef3 rebuilt the current C-pass English-original comparison set.
+- Current manifest contains 25 rows (24 localized candidates + 1 policy-preserved original). q163 59A79158 is review #018 at localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/018_q163_59A79158.jpg.
+- #018 pins English source SHA 7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d at native 1024x2048/display scale 1 and current A154 candidate SHA 201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6. Controller reopened the generated FLIP-Y/RAW card and verified the intended source/current pair.
+- q163 remains C228 static PASS pending user JPG review and actual in-game validation. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
