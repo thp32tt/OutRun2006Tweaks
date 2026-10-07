@@ -134,12 +134,19 @@ namespace OutRunVRStereo
             return true;
         }
 
-        bool R13ReadGpuCompletionSnapshot(
+        enum class R13GpuCompletionReadResult : std::uint8_t
+        {
+            Unavailable,
+            Ready,
+            RetryAfterRebind
+        };
+
+        R13GpuCompletionReadResult R13ReadGpuCompletionSnapshot(
             R13GpuCompletionSnapshot& completed) noexcept
         {
             completed = {};
             if (!R13EnsureAckState())
-                return false;
+                return R13GpuCompletionReadResult::Unavailable;
 
             for (int attempt = 0; attempt < 4; ++attempt)
             {
@@ -159,20 +166,19 @@ namespace OutRunVRStereo
                 if (snapshot.magic != OutRunVR::R13::DirectGpuAckMagic ||
                     snapshot.version != OutRunVR::R13::DirectGpuAckVersion ||
                     snapshot.structSize != sizeof(snapshot))
-                    return false;
+                    return R13GpuCompletionReadResult::Unavailable;
 
                 const std::uint32_t expectedHostPid =
                     SharedState ? SharedState->hostPid : 0;
                 if (!snapshot.hostPid || !expectedHostPid)
-                    return false;
+                    return R13GpuCompletionReadResult::Unavailable;
                 if (snapshot.hostPid != expectedHostPid)
                 {
                     // The snapshot is stable but belongs to a different host
-                    // process. Retire our read-only mapping so the next ACK
-                    // read can rebind to the current host mapping even when
-                    // the R32 transport-ready identity path was not active.
+                    // process. Retire our read-only mapping so the bounded ACK
+                    // owner can reopen exactly once against the current host.
                     R13ReleaseAckState();
-                    return false;
+                    return R13GpuCompletionReadResult::RetryAfterRebind;
                 }
 
                 if (snapshot.transportGeneration != DirectTransportGeneration ||
@@ -183,27 +189,31 @@ namespace OutRunVRStereo
                     snapshot.reserved[
                         OutRunVR::R13::DirectGpuAckGamePidIndex] !=
                         GetCurrentProcessId())
-                    return false;
+                    return R13GpuCompletionReadResult::Unavailable;
 
                 std::memcpy(
                     completed.completedFrameId,
                     snapshot.completedFrameId,
                     sizeof(completed.completedFrameId));
-                return true;
+                return R13GpuCompletionReadResult::Ready;
             }
-            return false;
+            return R13GpuCompletionReadResult::Unavailable;
         }
 
         bool R13ReadGpuCompletionSnapshotWithRebind(
             R13GpuCompletionSnapshot& completed) noexcept
         {
-            if (R13ReadGpuCompletionSnapshot(completed))
+            const auto first = R13ReadGpuCompletionSnapshot(completed);
+            if (first == R13GpuCompletionReadResult::Ready)
                 return true;
+            if (first != R13GpuCompletionReadResult::RetryAfterRebind)
+                return false;
 
-            // A stable snapshot from the wrong host releases the stale mapping.
-            // Give the ACK owner one bounded reopen/retry so upper layers do not
-            // need to repeat mapping/seqlock policy per ring slot.
-            return R13ReadGpuCompletionSnapshot(completed);
+            // Only a stable snapshot from the wrong host retires the mapping.
+            // Retry exactly that case once; generic seqlock/identity failures
+            // stay fail-closed without repeating the whole-ring snapshot work.
+            return R13ReadGpuCompletionSnapshot(completed) ==
+                R13GpuCompletionReadResult::Ready;
         }
 
         bool ResolveDirectTransportR13(IDirect3DDevice9* device, std::uint32_t frameId)
