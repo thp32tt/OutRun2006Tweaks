@@ -1,0 +1,412 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "C249",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 44,
+  "asset_key": "19CEDB9",
+  "candidate_sha256": "2250de2b7fbe1578750c422c05bd5f3b5785a0bd5006a4afcfb4cbc26ebbe620",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+  "prior_candidate_sha256": "b80c7bf1f469c35b9ae98ae6cf8fb0cc830a93fb2da4d08cee10bd07528a0cc8",
+  "prior_blob_commit": "ec806c6d891d18bff218971976f20f65487063a9",
+  "high_risk_reason": "PJR-010 TEXT_SCALE_TOO_SMALL_VS_SOURCE after prior C pass",
+  "independent_machine_qa": {
+    "candidate_sha_exact": true,
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "mips": 1,
+    "header_128_exact_to_prior": true,
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "bbox_size_positive_margin": "12/12 PASS",
+    "per_region": [
+      {
+        "key": "sector2",
+        "source_bbox": [
+          8,
+          100,
+          190,
+          160
+        ],
+        "localized_bbox": [
+          20,
+          103,
+          178,
+          157
+        ],
+        "source_size": [
+          182,
+          60
+        ],
+        "localized_size": [
+          158,
+          54
+        ],
+        "margins": [
+          12,
+          12,
+          3,
+          3
+        ],
+        "width_ratio": 0.8681,
+        "height_ratio": 0.9
+      },
+      {
+        "key": "sector1",
+        "source_bbox": [
+          208,
+          100,
+          385,
+          160
+        ],
+        "localized_bbox": [
+          219,
+          103,
+          373,
+          157
+        ],
+        "source_size": [
+          177,
+          60
+        ],
+        "localized_size": [
+          154,
+          54
+        ],
+        "margins": [
+          11,
+          12,
+          3,
+          3
+        ],
+        "width_ratio": 0.8701,
+        "height_ratio": 0.9
+      },
+      {
+        "key": "win",
+        "source_bbox": [
+          418,
+          110,
+          500,
+          151
+        ],
+        "localized_bbox": [
+          424,
+          113,
+          494,
+          148
+        ],
+        "source_size": [
+          82,
+          41
+        ],
+        "localized_size": [
+          70,
+          35
+        ],
+        "margins": [
+          6,
+          6,
+          3,
+          3
+        ],
+        "width_ratio": 0.8537,
+        "height_ratio": 0.8537
+      },
+      {
+        "key": "lose",
+        "source_bbox": [
+          528,
+          109,
+          635,
+          152
+        ],
+        "localized_bbox": [
+          536,
+          112,
+          626,
+          149
+        ],
+        "source_size": [
+          107,
+          43
+        ],
+        "localized_size": [
+          90,
+          37
+        ],
+        "margins": [
+          8,
+          9,
+          3,
+          3
+        ],
+        "width_ratio": 0.8411,
+        "height_ratio": 0.8605
+      },
+      {
+        "key": "result",
+        "source_bbox": [
+          32,
+          180,
+          247,
+          249
+        ],
+        "localized_bbox": [
+          49,
+          183,
+          229,
+          246
+        ],
+        "source_size": [
+          215,
+          69
+        ],
+        "localized_size": [
+          180,
+          63
+        ],
+        "margins": [
+          17,
+          18,
+          3,
+          3
+        ],
+        "width_ratio": 0.8372,
+        "height_ratio": 0.913
+      },
+      {
+        "key": "ranking",
+        "source_bbox": [
+          289,
+          180,
+          555,
+          259
+        ],
+        "localized_bbox": [
+          315,
+          184,
+          529,
+          255
+        ],
+        "source_size": [
+          266,
+          79
+        ],
+        "localized_size": [
+          214,
+          71
+        ],
+        "margins": [
+          26,
+          26,
+          4,
+          4
+        ],
+        "width_ratio": 0.8045,
+        "height_ratio": 0.8987
+      },
+      {
+        "key": "stage",
+        "source_bbox": [
+          571,
+          179,
+          765,
+          259
+        ],
+        "localized_bbox": [
+          576,
+          183,
+          760,
+          255
+        ],
+        "source_size": [
+          194,
+          80
+        ],
+        "localized_size": [
+          184,
+          72
+        ],
+        "margins": [
+          5,
+          5,
+          4,
+          4
+        ],
+        "width_ratio": 0.9485,
+        "height_ratio": 0.9
+      },
+      {
+        "key": "rank",
+        "source_bbox": [
+          788,
+          180,
+          964,
+          249
+        ],
+        "localized_bbox": [
+          797,
+          183,
+          955,
+          246
+        ],
+        "source_size": [
+          176,
+          69
+        ],
+        "localized_size": [
+          158,
+          63
+        ],
+        "margins": [
+          9,
+          9,
+          3,
+          3
+        ],
+        "width_ratio": 0.8977,
+        "height_ratio": 0.913
+      },
+      {
+        "key": "you",
+        "source_bbox": [
+          1759,
+          193,
+          1897,
+          260
+        ],
+        "localized_bbox": [
+          1783,
+          196,
+          1873,
+          257
+        ],
+        "source_size": [
+          138,
+          67
+        ],
+        "localized_size": [
+          90,
+          61
+        ],
+        "margins": [
+          24,
+          24,
+          3,
+          3
+        ],
+        "width_ratio": 0.6522,
+        "height_ratio": 0.9104
+      },
+      {
+        "key": "diff",
+        "source_bbox": [
+          1853,
+          312,
+          1975,
+          381
+        ],
+        "localized_bbox": [
+          1856,
+          315,
+          1972,
+          378
+        ],
+        "source_size": [
+          122,
+          69
+        ],
+        "localized_size": [
+          116,
+          63
+        ],
+        "margins": [
+          3,
+          3,
+          3,
+          3
+        ],
+        "width_ratio": 0.9508,
+        "height_ratio": 0.913
+      },
+      {
+        "key": "sector3",
+        "source_bbox": [
+          1832,
+          1180,
+          2013,
+          1240
+        ],
+        "localized_bbox": [
+          1843,
+          1183,
+          2001,
+          1237
+        ],
+        "source_size": [
+          181,
+          60
+        ],
+        "localized_size": [
+          158,
+          54
+        ],
+        "margins": [
+          11,
+          12,
+          3,
+          3
+        ],
+        "width_ratio": 0.8729,
+        "height_ratio": 0.9
+      },
+      {
+        "key": "rival",
+        "source_bbox": [
+          498,
+          1412,
+          705,
+          1486
+        ],
+        "localized_bbox": [
+          510,
+          1415,
+          693,
+          1483
+        ],
+        "source_size": [
+          207,
+          74
+        ],
+        "localized_size": [
+          183,
+          68
+        ],
+        "margins": [
+          12,
+          12,
+          3,
+          3
+        ],
+        "width_ratio": 0.8841,
+        "height_ratio": 0.9189
+      }
+    ],
+    "clean_plate_recomparison": "PASS",
+    "raw_orientation": "mirror_y"
+  },
+  "visual_evidence": [
+    "localization/graphics/role_B/20261007-B238-Q044-19CEDB9-C246-REWORK/B238_19CEDB9_ROW_CONTACTS.jpg",
+    "localization/graphics/role_B/20261007-B238-Q044-19CEDB9-C246-REWORK/B238_19CEDB9_RAW.jpg",
+    "localization/graphics/role_B/20261007-B238-Q044-19CEDB9-C246-REWORK/B238_19CEDB9_PRACTICAL.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER_VISUAL_AND_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

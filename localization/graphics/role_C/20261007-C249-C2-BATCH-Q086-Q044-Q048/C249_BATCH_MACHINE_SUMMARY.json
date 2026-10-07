@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C249",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "selection_priority": [
+    "q86 P0 user JPG regression",
+    "q44 fresh B238/PJR-010",
+    "q48 IGR-009"
+  ],
+  "assets": [
+    {
+      "index": 86,
+      "key": "C598919A",
+      "candidate_sha256": "e3631a376fbe9f35d5926c3668033f3f971298e686c5eb14b8a7321feeb7c513",
+      "machine_qa": "PASS"
+    },
+    {
+      "index": 44,
+      "key": "19CEDB9",
+      "candidate_sha256": "2250de2b7fbe1578750c422c05bd5f3b5785a0bd5006a4afcfb4cbc26ebbe620",
+      "machine_qa": "PASS"
+    },
+    {
+      "index": 48,
+      "key": "B1696633",
+      "candidate_sha256": "259153b91e330479a4d975037013c77d339ffe3a2781461ebe118bfc04e28824",
+      "machine_qa": "PASS"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "C249",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 48,
+  "asset_key": "B1696633",
+  "candidate_sha256": "259153b91e330479a4d975037013c77d339ffe3a2781461ebe118bfc04e28824",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+  "prior_candidate_sha256": "31a73348657620a4e7c7adc66a65e07f95a35a6b61266b48f9409e835b7f12be",
+  "prior_blob_commit": "002ae0c5c6dabfee07f531ea29874327fdbbf885",
+  "high_risk_reason": "IGR-009 USER_INGAME_FAIL Slipstream + slant/readability follow-up",
+  "independent_machine_qa": {
+    "candidate_sha_exact": true,
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "mips": 1,
+    "header_128_exact_to_prior": true,
+    "changed_pixels_outside_exact_source_bbox": 0,
+    "alpha_changed_outside_exact_source_bbox": 0,
+    "protected_changed_pixels": 0,
+    "changed_pixel_bbox": [
+      954,
+      1722,
+      1323,
+      1821
+    ],
+    "source_bbox": [
+      889,
+      1718,
+      1388,
+      1825
+    ],
+    "localized_bbox": [
+      954,
+      1722,
+      1323,
+      1821
+    ],
+    "positive_margin": "PASS",
+    "margins": [
+      65,
+      65,
+      4,
+      4
+    ],
+    "other_rows_preserved_by_binary_scope": "PASS",
+    "raw_orientation": "mirror_y"
+  },
+  "visual_evidence": [
+    "localization/graphics/role_B/20261006-B-USERREWORK203-B169-SLIPSTREAM-SLANT/B203_SLIPSTREAM_SOURCE_OLD_CLEAN_FINAL.jpg",
+    "localization/graphics/role_B/20261006-B-USERREWORK203-B169-SLIPSTREAM-SLANT/B203_RAW_COMPARE.jpg",
+    "localization/graphics/role_B/20261006-B-USERREWORK203-B169-SLIPSTREAM-SLANT/B203_SLIPSTREAM_2X.jpg"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER_VISUAL_AND_C3",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
