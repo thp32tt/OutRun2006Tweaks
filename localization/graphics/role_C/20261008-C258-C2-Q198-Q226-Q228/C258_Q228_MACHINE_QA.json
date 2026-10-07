@@ -1,0 +1,450 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261008-C258-C2-Q198-Q226-Q228",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "queue_index": 228,
+  "candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+  "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "header_128_exact": true,
+  "review_coordinate_orientation": "RAW",
+  "orientation_probe_outside_allowed": {
+    "raw_mismatch": 0,
+    "flip_y_mismatch": 0
+  },
+  "changed_pixels_outside_allowed_bboxes": 0,
+  "alpha_changed_pixels_outside_allowed_bboxes": 0,
+  "source_exact_pixel_residue_diagnostic": 411491,
+  "rows": [
+    {
+      "key": "coast 2 coast",
+      "source_bbox": [
+        5,
+        26,
+        1456,
+        145
+      ],
+      "source_size": [
+        1451,
+        119
+      ],
+      "localized_bbox": [
+        5,
+        26,
+        1456,
+        145
+      ],
+      "localized_size": [
+        1451,
+        119
+      ],
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "car select",
+      "source_bbox": [
+        5,
+        182,
+        1124,
+        301
+      ],
+      "source_size": [
+        1119,
+        119
+      ],
+      "localized_bbox": [
+        5,
+        182,
+        1124,
+        301
+      ],
+      "localized_size": [
+        1119,
+        119
+      ],
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "license select",
+      "source_bbox": [
+        6,
+        338,
+        1500,
+        457
+      ],
+      "source_size": [
+        1494,
+        119
+      ],
+      "localized_bbox": [
+        6,
+        338,
+        1500,
+        457
+      ],
+      "localized_size": [
+        1494,
+        119
+      ],
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "game lobby",
+      "source_bbox": [
+        7,
+        494,
+        1132,
+        644
+      ],
+      "source_size": [
+        1125,
+        150
+      ],
+      "localized_bbox": [
+        7,
+        494,
+        1132,
+        644
+      ],
+      "localized_size": [
+        1125,
+        150
+      ],
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "main menu",
+      "source_bbox": [
+        6,
+        644,
+        1107,
+        769
+      ],
+      "source_size": [
+        1101,
+        125
+      ],
+      "localized_bbox": [
+        6,
+        644,
+        1107,
+        769
+      ],
+      "localized_size": [
+        1101,
+        125
+      ],
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "multiplayer",
+      "source_bbox": [
+        6,
+        806,
+        1195,
+        956
+      ],
+      "source_size": [
+        1189,
+        150
+      ],
+      "localized_bbox": [
+        6,
+        806,
+        1195,
+        956
+      ],
+      "localized_size": [
+        1189,
+        150
+      ],
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "music select",
+      "source_bbox": [
+        6,
+        956,
+        1276,
+        1077
+      ],
+      "source_size": [
+        1270,
+        121
+      ],
+      "localized_bbox": [
+        6,
+        956,
+        1276,
+        1077
+      ],
+      "localized_size": [
+        1270,
+        121
+      ],
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "options",
+      "source_bbox": [
+        6,
+        1114,
+        748,
+        1265
+      ],
+      "source_size": [
+        742,
+        151
+      ],
+      "localized_bbox": [
+        6,
+        1114,
+        748,
+        1265
+      ],
+      "localized_size": [
+        742,
+        151
+      ],
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "network",
+      "source_bbox": [
+        6,
+        1274,
+        816,
+        1424
+      ],
+      "source_size": [
+        810,
+        150
+      ],
+      "localized_bbox": [
+        6,
+        1274,
+        816,
+        1424
+      ],
+      "localized_size": [
+        810,
+        150
+      ],
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "rankings",
+      "source_bbox": [
+        6,
+        1424,
+        792,
+        1580
+      ],
+      "source_size": [
+        786,
+        156
+      ],
+      "localized_bbox": [
+        6,
+        1424,
+        792,
+        1580
+      ],
+      "localized_size": [
+        786,
+        156
+      ],
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "game select",
+      "source_bbox": [
+        3,
+        1580,
+        1236,
+        1736
+      ],
+      "source_size": [
+        1233,
+        156
+      ],
+      "localized_bbox": [
+        3,
+        1580,
+        1236,
+        1736
+      ],
+      "localized_size": [
+        1233,
+        156
+      ],
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "mode select",
+      "source_bbox": [
+        2,
+        1736,
+        1252,
+        1861
+      ],
+      "source_size": [
+        1250,
+        125
+      ],
+      "localized_bbox": [
+        2,
+        1736,
+        1252,
+        1861
+      ],
+      "localized_size": [
+        1250,
+        125
+      ],
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    },
+    {
+      "key": "race select",
+      "source_bbox": [
+        6,
+        1898,
+        1244,
+        2017
+      ],
+      "source_size": [
+        1238,
+        119
+      ],
+      "localized_bbox": [
+        6,
+        1898,
+        1244,
+        2017
+      ],
+      "localized_size": [
+        1238,
+        119
+      ],
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL"
+    }
+  ],
+  "row_summary": {
+    "pass": 0,
+    "total": 13
+  },
+  "machine_status": "FAIL",
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

@@ -1,0 +1,42 @@
+{
+  "run": "20261008-C258-C2-Q198-Q226-Q228",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "assets": {
+    "q198": {
+      "candidate_sha256": "2160e7eef9dd27b028b5adc3df770a508c62891fd21676677365a0f55bee5885",
+      "machine_status": "FAIL",
+      "row_summary": {
+        "pass": 0,
+        "total": 4
+      },
+      "outside_changed": 0,
+      "outside_alpha": 0,
+      "review_orientation": "RAW"
+    },
+    "q226": {
+      "candidate_sha256": "5449edb846d6ca3a5de1ab1f817a41feb776e9af3bdda2175967312369e5e374",
+      "machine_status": "FAIL",
+      "row_summary": {
+        "pass": 0,
+        "total": 8
+      },
+      "outside_changed": 0,
+      "outside_alpha": 0,
+      "review_orientation": "RAW"
+    },
+    "q228": {
+      "candidate_sha256": "28e814599105600eb0222eb1ffe0057dc1e108520580a958ae3b3b7ec08f2808",
+      "machine_status": "FAIL",
+      "row_summary": {
+        "pass": 0,
+        "total": 13
+      },
+      "outside_changed": 0,
+      "outside_alpha": 0,
+      "review_orientation": "RAW"
+    }
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED"
+}
