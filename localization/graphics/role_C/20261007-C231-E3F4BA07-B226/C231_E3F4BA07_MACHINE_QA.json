@@ -1,0 +1,402 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "run": "20261007-C231-E3F4BA07-B226",
+  "qa_id": "C231",
+  "queue_index": 226,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+  "producer_run": "B226",
+  "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+  "prior_candidate_sha256": "1042102e5f298628ce874fe86a5562211f8a02c87fdd4de55324679f84d8f12c",
+  "prior_candidate_git_commit": "659635f6cb39c3f55c7f2d2418815d91593dc3a4",
+  "candidate_sha256": "5449edb846d6ca3a5de1ab1f817a41feb776e9af3bdda2175967312369e5e374",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds"
+  },
+  "independent_basis": "Pinned source re-downloaded and persisted DDS decoded independently. Exact English source bboxes are freshly re-derived from the prior independent C143 SOURCE_TEXT_MASK tied to the same pinned source SHA; final/old bboxes are then derived from decoded persisted pixels versus the C143 exact clean plate inside those source bboxes. B226 producer bbox records are not consumed. Blast radius is checked against the actual pre-B226 candidate recovered from Git history.",
+  "persisted_dds_authority": {
+    "sha256": "5449edb846d6ca3a5de1ab1f817a41feb776e9af3bdda2175967312369e5e374",
+    "decoded_size": [
+      2048,
+      512
+    ],
+    "header_128_exact": true,
+    "mip_count": 1,
+    "format_family": "RGBA32/BGRA"
+  },
+  "rows": [
+    {
+      "key": "goal_e",
+      "source": "GOAL E",
+      "korean": "골 E",
+      "cell": [
+        980,
+        336,
+        1960,
+        420
+      ],
+      "source_bbox": [
+        980,
+        346,
+        1233,
+        410
+      ],
+      "prior_bbox": [
+        987,
+        366,
+        1233,
+        410
+      ],
+      "localized_bbox": [
+        987,
+        370,
+        1233,
+        410
+      ],
+      "source_size": [
+        253,
+        64
+      ],
+      "prior_size": [
+        246,
+        44
+      ],
+      "localized_size": [
+        246,
+        40
+      ],
+      "width_source_ratio": 0.9723,
+      "height_source_ratio": 0.625,
+      "margins": [
+        7,
+        0,
+        24,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL",
+      "hierarchy_repair": "FAIL",
+      "source_exact_pixels_remaining_without_localized_material": 0
+    },
+    {
+      "key": "goal_d",
+      "source": "GOAL D",
+      "korean": "골 D",
+      "cell": [
+        0,
+        252,
+        980,
+        336
+      ],
+      "source_bbox": [
+        4,
+        262,
+        256,
+        326
+      ],
+      "prior_bbox": [
+        6,
+        282,
+        113,
+        326
+      ],
+      "localized_bbox": [
+        6,
+        282,
+        159,
+        326
+      ],
+      "source_size": [
+        252,
+        64
+      ],
+      "prior_size": [
+        107,
+        44
+      ],
+      "localized_size": [
+        153,
+        44
+      ],
+      "width_source_ratio": 0.6071,
+      "height_source_ratio": 0.6875,
+      "margins": [
+        2,
+        97,
+        20,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL",
+      "hierarchy_repair": "FAIL",
+      "source_exact_pixels_remaining_without_localized_material": 0
+    },
+    {
+      "key": "goal_c",
+      "source": "GOAL C",
+      "korean": "골 C",
+      "cell": [
+        980,
+        252,
+        1960,
+        336
+      ],
+      "source_bbox": [
+        983,
+        262,
+        1234,
+        326
+      ],
+      "prior_bbox": [
+        988,
+        282,
+        1095,
+        326
+      ],
+      "localized_bbox": [
+        988,
+        282,
+        1142,
+        326
+      ],
+      "source_size": [
+        251,
+        64
+      ],
+      "prior_size": [
+        107,
+        44
+      ],
+      "localized_size": [
+        154,
+        44
+      ],
+      "width_source_ratio": 0.6135,
+      "height_source_ratio": 0.6875,
+      "margins": [
+        5,
+        92,
+        20,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL",
+      "hierarchy_repair": "FAIL",
+      "source_exact_pixels_remaining_without_localized_material": 0
+    },
+    {
+      "key": "goal_b",
+      "source": "GOAL B",
+      "korean": "골 B",
+      "cell": [
+        0,
+        160,
+        980,
+        244
+      ],
+      "source_bbox": [
+        4,
+        170,
+        257,
+        234
+      ],
+      "prior_bbox": [
+        6,
+        190,
+        114,
+        234
+      ],
+      "localized_bbox": [
+        6,
+        190,
+        160,
+        234
+      ],
+      "source_size": [
+        253,
+        64
+      ],
+      "prior_size": [
+        108,
+        44
+      ],
+      "localized_size": [
+        154,
+        44
+      ],
+      "width_source_ratio": 0.6087,
+      "height_source_ratio": 0.6875,
+      "margins": [
+        2,
+        97,
+        20,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL",
+      "hierarchy_repair": "FAIL",
+      "source_exact_pixels_remaining_without_localized_material": 0
+    },
+    {
+      "key": "goal_a",
+      "source": "GOAL A",
+      "korean": "골 A",
+      "cell": [
+        980,
+        160,
+        1960,
+        244
+      ],
+      "source_bbox": [
+        986,
+        170,
+        1242,
+        234
+      ],
+      "prior_bbox": [
+        986,
+        190,
+        1091,
+        234
+      ],
+      "localized_bbox": [
+        986,
+        190,
+        1137,
+        234
+      ],
+      "source_size": [
+        256,
+        64
+      ],
+      "prior_size": [
+        105,
+        44
+      ],
+      "localized_size": [
+        151,
+        44
+      ],
+      "width_source_ratio": 0.5898,
+      "height_source_ratio": 0.6875,
+      "margins": [
+        0,
+        105,
+        20,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL",
+      "hierarchy_repair": "FAIL",
+      "source_exact_pixels_remaining_without_localized_material": 0
+    },
+    {
+      "key": "15_stage",
+      "source": "15 STAGE CONTINUOUS",
+      "korean": "15코스 연속",
+      "cell": [
+        980,
+        80,
+        1960,
+        160
+      ],
+      "source_bbox": [
+        985,
+        86,
+        1809,
+        150
+      ],
+      "prior_bbox": [
+        985,
+        106,
+        1084,
+        150
+      ],
+      "localized_bbox": [
+        985,
+        106,
+        1132,
+        150
+      ],
+      "source_size": [
+        824,
+        64
+      ],
+      "prior_size": [
+        99,
+        44
+      ],
+      "localized_size": [
+        147,
+        44
+      ],
+      "width_source_ratio": 0.1784,
+      "height_source_ratio": 0.6875,
+      "margins": [
+        0,
+        677,
+        20,
+        0
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "FAIL",
+      "hierarchy_repair": "FAIL",
+      "source_exact_pixels_remaining_without_localized_material": 0
+    }
+  ],
+  "summary": {
+    "bbox_size_positive_margin_hierarchy": "0/6 PASS",
+    "changed_pixels_outside_rework_source_regions": 14743,
+    "alpha_changed_pixels_outside_rework_source_regions": 14442,
+    "collateral_by_preserved_region": {
+      "stage": {
+        "visible_changed": 0,
+        "alpha_changed": 0
+      },
+      "goal_standalone": {
+        "visible_changed": 0,
+        "alpha_changed": 0
+      },
+      "outrun2": {
+        "visible_changed": 0,
+        "alpha_changed": 0
+      },
+      "outrun2sp": {
+        "visible_changed": 0,
+        "alpha_changed": 0
+      }
+    },
+    "header_128_exact": true,
+    "mip_count": 1,
+    "post_encode_decode_authority": "PASS",
+    "practical_scale_evidence": "C231_PRACTICAL_SCALE_25PCT.jpg"
+  },
+  "machine_status": "FAIL",
+  "c3_required": true,
+  "c3_reason": [
+    "PRIOR_PRE_INGAME_VISUAL_FALSE_NEGATIVE",
+    "SOURCE_HIERARCHY_REWORK",
+    "CURRENT_QA_POLICY_REQUIRES_C3_BEFORE_EXPORT"
+  ],
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C231-E3F4BA07-B226/C231_SOURCE_CLEAN_OLD_FINAL_READABLE.jpg",
+    "localization/graphics/role_C/20261007-C231-E3F4BA07-B226/C231_ROW_CONTACT_2X.jpg",
+    "localization/graphics/role_C/20261007-C231-E3F4BA07-B226/C231_SOURCE_FINAL_RAW.jpg",
+    "localization/graphics/role_C/20261007-C231-E3F4BA07-B226/C231_PRACTICAL_SCALE_25PCT.jpg",
+    "localization/graphics/role_C/20261007-C231-E3F4BA07-B226/C231_OLD_FINAL_BLAST_RADIUS.jpg",
+    "localization/graphics/role_C/20261007-C231-E3F4BA07-B226/C231_OUTSIDE_REPAIR_MASK_MAGENTA.png"
+  ],
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "c3_strict_decision": "PENDING_CONTROLLER",
+  "decision": "PENDING_CONTROLLER",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

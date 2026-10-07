@@ -1,0 +1,11 @@
+{
+  "role": "C",
+  "run": "20261007-C231-E3F4BA07-B226",
+  "queue_index": 226,
+  "asset": "E3F4BA07",
+  "machine_status": "FAIL",
+  "candidate_sha256": "5449edb846d6ca3a5de1ab1f817a41feb776e9af3bdda2175967312369e5e374",
+  "c3_required": true,
+  "report": "localization/graphics/role_C/20261007-C231-E3F4BA07-B226/C231_E3F4BA07_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
