@@ -2219,3 +2219,9 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - A154 201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6 fresh C machine PASS: 24/24 bbox/size/positive-margin; outside/alpha/residue/overlap/touch gates zero; exact BGRA header/raw mirror_y PASS.
 - Controller visual PASS: 24 native-HD stage labels preserve dark-gray bold condensed family/readability with no source residue, broken Hangul, clipping, intrusion or orientation regression.
 - Decision C228_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export/user review + actual-game validation pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-07 10:11 KST — A155 q159 proportion producer PASS
+- PRE_INGAME #016 reopened C195/A51 q159 because its renderer forced all Korean labels to ~92% of English bbox width, causing visible horizontal Hangul distortion.
+- A155 candidate `47f64c673377...`: 15 canonical stage names rebuilt at native source-height-driven aspect using Noto CJK KR Black + 1px source-family weight; English-width forcing removed.
+- 15/15 bbox/size/positive-margin PASS; outside/alpha/residue/overlap/touch=0; exact BGRA header/raw mirror_y; SOURCE/A51/CLEAN/A155 + RAW controller visual QA PASS.
+- Fresh C + refreshed English-original comparison/user review + actual in-game validation required. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
