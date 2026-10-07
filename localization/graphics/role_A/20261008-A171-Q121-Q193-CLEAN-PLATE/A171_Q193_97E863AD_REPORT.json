@@ -1,0 +1,132 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261008-A171-Q121-Q193-CLEAN-PLATE",
+  "queue_index": 193,
+  "asset": "97E863AD",
+  "regressions": [
+    "IGR-003",
+    "IGR-019",
+    "C255_VISIBLE_ENGLISH_SOURCE_RESIDUE_DOUBLE_DRAW"
+  ],
+  "input_candidate_sha256": "f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69",
+  "candidate_sha256": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "rows": [
+    {
+      "key": "welcome",
+      "text": "환영합니다",
+      "source_bbox": [
+        3,
+        148,
+        476,
+        195
+      ],
+      "localized_bbox": [
+        5,
+        150,
+        210,
+        193
+      ],
+      "source_size": [
+        473,
+        47
+      ],
+      "localized_size": [
+        205,
+        43
+      ],
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "font": "Noto Sans CJK KR:style=Black",
+      "font_size": 45,
+      "alignment": "left",
+      "result": "PASS"
+    },
+    {
+      "key": "multiplayer_intro_title",
+      "text": "멀티플레이",
+      "source_bbox": [
+        8,
+        297,
+        540,
+        359
+      ],
+      "localized_bbox": [
+        10,
+        300,
+        274,
+        356
+      ],
+      "source_size": [
+        532,
+        62
+      ],
+      "localized_size": [
+        264,
+        56
+      ],
+      "fill_rgba": [
+        78,
+        96,
+        100,
+        255
+      ],
+      "font": "Noto Sans CJK KR:style=Black",
+      "font_size": 60,
+      "alignment": "left",
+      "result": "PASS"
+    },
+    {
+      "key": "showroom_body",
+      "text": "쇼룸",
+      "source_bbox": [
+        1205,
+        957,
+        1594,
+        1011
+      ],
+      "localized_bbox": [
+        1207,
+        959,
+        1304,
+        1009
+      ],
+      "source_size": [
+        389,
+        54
+      ],
+      "localized_size": [
+        97,
+        50
+      ],
+      "fill_rgba": [
+        46,
+        53,
+        57,
+        255
+      ],
+      "font": "Noto Sans CJK KR:style=Black",
+      "font_size": 55,
+      "alignment": "left",
+      "result": "PASS"
+    }
+  ],
+  "construction": "clear each exact canonical source text bbox to transparent atlas plate, then native Noto CJK dark source-color rerender; no old Korean bitmap reuse",
+  "machine_qa": {
+    "bbox_size_positive_margin": "3/3 PASS",
+    "changed_outside": 0,
+    "alpha_outside": 0,
+    "header_128_exact": true,
+    "persisted_decode": "PASS",
+    "raw_orientation": "mirror_y"
+  },
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "status": "A171_Q193_MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
+  "forbidden_domains_touched": []
+}

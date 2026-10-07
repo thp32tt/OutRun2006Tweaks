@@ -1,0 +1,23 @@
+{
+  "run": "20261008-A171-Q121-Q193-CLEAN-PLATE",
+  "role": "A",
+  "backend": "github_actions_fallback_after_chatgpt_local_github_dns_failure",
+  "assets": [
+    {
+      "index": 121,
+      "asset": "FD90AA9",
+      "before": "03271f4a84d5d69a162debc6490fa04f839487e4c9b03cbdcc64e66856dd1433",
+      "after": "7a7d1e6c62dca8d699dac689fabfb4314d7f6a5f35aeac130b9a8817afccea76",
+      "machine": "PASS"
+    },
+    {
+      "index": 193,
+      "asset": "97E863AD",
+      "before": "f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69",
+      "after": "e21851f5d35ca41bdab1cbfa45db4c1266bc6d0ba03b8bc5791ff785bf313166",
+      "machine": "PASS"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "status": "A171_BATCH_MACHINE_PASS_PENDING_CONTROLLER_VISUAL"
+}
