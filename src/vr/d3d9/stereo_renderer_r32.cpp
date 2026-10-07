@@ -441,7 +441,7 @@ namespace OutRunVRStereo
         bool R32ResolveDirectTransport(IDirect3DDevice9* device,
             std::uint32_t frameId, LowerResolve&& lowerResolve) noexcept
         {
-            if (!R13OverlayReadyForTransport())
+            if (!R30SupportOverlayReadyForTransport())
                 return lowerResolve();
             R30SupportDirectTransportSourceSurfaces sourceSurfaces{};
             if (!frameId || !R32EnsureDirectResources(device) ||

@@ -3311,6 +3311,11 @@ namespace OutRunVRStereo
         return true;
     }
 
+    bool R30SupportOverlayReadyForTransport() noexcept
+    {
+        return R13OverlayReadyForTransport();
+    }
+
     bool R30SupportDirectTransportResourcesReady() noexcept
     {
         return DirectTransportResourcesReady;

@@ -575,8 +575,16 @@ for marker in (
 ):
     if marker not in r13:
         errors.append(f"R13 missing DirectGPU owner API: {marker}")
+for marker in (
+    "R13TryGetGpuCompletionSnapshot(",
+    "R13NoteSafeAckBackpressure()",
+):
     if marker not in r32:
         errors.append(f"R32 missing R13 DirectGPU owner API use: {marker}")
+if "R30SupportOverlayReadyForTransport()" not in r32:
+    errors.append("R32 missing R30 facade for R13 overlay readiness")
+if "R13OverlayReadyForTransport()" in r32:
+    errors.append("R32 regained direct R13 overlay-readiness dependency")
 for retired in (
     "R13ReadGpuCompletedFrame(",
     "R13TryGetGpuCompletedFrame(",

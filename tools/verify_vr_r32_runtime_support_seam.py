@@ -43,6 +43,7 @@ required = (
     "R30SupportEffectTelemetrySnapshot",
     "R30SupportTryGetEffectTelemetrySnapshot",
     "R30SupportDirectTransportIdentity",
+    "R30SupportOverlayReadyForTransport",
     "R30SupportDirectTransportResourcesReady",
     "R30SupportEnsureDirectTransportResources",
     "R30SupportDirectTransportSourceSurfaces",
@@ -83,6 +84,7 @@ for regex, label in (
     (r"\bDirectInteropVerified\b", "DirectInteropVerified"),
     (r"\bDirectTransportResourcesReady\b", "DirectTransportResourcesReady"),
     (r"(?<!R30Support)\bEnsureDirectTransportResources\(", "EnsureDirectTransportResources"),
+    (r"\bR13OverlayReadyForTransport\(", "R13OverlayReadyForTransport"),
     (r"\bR13ReleaseAckState\(", "R13ReleaseAckState"),
     (r"\bReleaseDirectTransportSlots\(", "ReleaseDirectTransportSlots"),
     (r"\bReleaseDirectInteropProbe\(", "ReleaseDirectInteropProbe"),
@@ -114,6 +116,9 @@ delegations = {
         "out.alphaBlend = lower.alphaBlend;",
         "out.alphaTest = lower.alphaTest;",
         "out.zWrite = lower.zWrite;",
+    ),
+    "R30SupportOverlayReadyForTransport()": (
+        "return R13OverlayReadyForTransport();",
     ),
     "R30SupportDirectTransportResourcesReady()": (
         "return DirectTransportResourcesReady;",
@@ -189,6 +194,10 @@ if "AddRef(" in source_surfaces:
     errors.append("R30 DirectGPU source-surface facade must preserve borrowed-pointer lifetime semantics")
 
 resolve_direct = body(r32, "bool R32ResolveDirectTransport(")
+if "R30SupportOverlayReadyForTransport()" not in resolve_direct:
+    errors.append("R32 DirectGPU resolve bypasses R30 overlay-readiness facade")
+if "R13OverlayReadyForTransport()" in resolve_direct:
+    errors.append("R32 DirectGPU resolve regained direct R13 overlay-readiness dependency")
 for raw in ("BackBuffer", "RightEyeSurface"):
     if re.search(rf"\b{raw}\b", resolve_direct):
         errors.append(f"R32 DirectGPU resolve retained raw lower source surface: {raw}")

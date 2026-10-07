@@ -49,6 +49,7 @@ namespace OutRunVRStereo
         std::uint32_t hostAdapterLuidLow = 0;
         std::uint32_t hostAdapterLuidHigh = 0;
     };
+    bool R30SupportOverlayReadyForTransport() noexcept;
     bool R30SupportDirectTransportResourcesReady() noexcept;
     bool R30SupportEnsureDirectTransportResources(
         IDirect3DDevice9* device) noexcept;
