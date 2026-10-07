@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261007-C228-59A79158-A154",
+  "qa_id": "C228",
+  "timestamp_kst": "2026-10-07T10:06:28+09:00",
+  "queue_index": 163,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+  "producer_run": "A154",
+  "source_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+  "candidate_sha256": "201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6",
+  "machine_status": "PASS",
+  "machine_report": "localization/graphics/role_C/20261007-C228-59A79158-A154/C228_59A79158_MACHINE_QA.json",
+  "machine_summary": {
+    "bbox_size_positive_margin": "24/24 PASS",
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_pixels_outside_exact_source_bboxes": 0,
+    "clean_source_alpha_residue_total": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "header_128_exact": true,
+    "raw_readable_parity": "PASS",
+    "canonical_stage_name_mapping": "24/24 PASS"
+  },
+  "controller_visual_review": {
+    "evidence": [
+      "localization/graphics/role_C/20261007-C228-59A79158-A154/C228_59A_SOURCE_CLEAN_FINAL_READABLE.jpg",
+      "localization/graphics/role_C/20261007-C228-59A79158-A154/C228_59A_ROW_CONTACT.jpg",
+      "localization/graphics/role_C/20261007-C228-59A79158-A154/C228_59A_SOURCE_FINAL_RAW.jpg"
+    ],
+    "source_text_removal_and_plate": "PASS_NO_VISIBLE_ENGLISH_RESIDUE_OR_DIRTY_PLATE",
+    "slant_perspective": "PASS_UPRIGHT_CONDENSED_SOURCE_FAMILY",
+    "font_style_similarity": "PASS_DARK_GRAY_BOLD_CONDENSED_NATIVE_HD",
+    "scale_readability": "PASS_SHARED_NATIVE_HEIGHT_WITH_SOURCE_RELATIVE_READABILITY",
+    "hangul_integrity_clipping": "PASS_NO_BROKEN_OR_CLIPPED_GLYPHS",
+    "protected_graphics_intrusion": "PASS_ZERO_INTRUSION",
+    "flip_y_readable": "PASS",
+    "raw_mirror_y": "PASS",
+    "overall": "PASS"
+  },
+  "decision": "C228_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME",
+  "candidate_changed_by_C": false,
+  "pre_ingame_comparison_refresh": "PENDING_C228_EXPORT",
+  "pre_ingame_user_review": "PENDING_REFRESH",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

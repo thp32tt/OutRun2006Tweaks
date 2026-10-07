@@ -2214,3 +2214,8 @@ Machine PASS; controller visual REWORK_REQUIRED for source typography family mis
 - GOAL A-E 102/108/106/107/107px -> 150/154/152/153/154px; 15코스 연속 293px -> 450px. STAGE/standalone GOAL/OUTRUN2/OUTRUN2SP preserved.
 - 6/6 bbox/size/positive-margin; outside/alpha/protected/overlap=0; exact BGRA header/raw mirror_y plus clean/final validators PASS. Controller readable/3x-row/RAW visual QA PASS.
 - Fresh independent C + regenerated English-original comparison/user review + actual in-game validation required. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+## 2026-10-07 10:06 KST — C228 q163 59A79158
+- A154 201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6 fresh C machine PASS: 24/24 bbox/size/positive-margin; outside/alpha/residue/overlap/touch gates zero; exact BGRA header/raw mirror_y PASS.
+- Controller visual PASS: 24 native-HD stage labels preserve dark-gray bold condensed family/readability with no source residue, broken Hangul, clipping, intrusion or orientation regression.
+- Decision C228_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME export/user review + actual-game validation pending; RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.

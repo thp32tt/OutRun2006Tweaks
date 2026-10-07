@@ -2713,3 +2713,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Machine QA PASS: 6/6 bbox+source-size+positive-margin; changed/alpha outside selected exact source bboxes=0; protected OutRun pixels changed=0; localized overlap=0; exact BGRA header/raw mirror_y roundtrip; C143 exact-clean and full-final validators PASS.
 - Controller SOURCE/C143/B226 full readable, 3x row-contact and SOURCE/B226 RAW review PASS: hierarchy/readability materially improved with no source residue, clipping, broken Hangul, overlap, protected-art damage, seam/halo, wrong orientation or excessive stretch.
 - Decision B226_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched. Evidence: localization/graphics/role_B/20261007-B-MANUALQA226-E3F4BA07/B226_CONTROLLER_FINAL_QA.json.
+
+## 2026-10-07 10:06 KST — C228 q163 59A79158 fresh independent QA
+
+- Selected A154 q163 native-HD stage-label rework; completed C work was not repeated. GitHub-hosted C worker run 37554756804 independently downloaded/decoded pinned canonical source and current candidate without producer masks for containment.
+- Machine PASS: 24/24 bbox/source-size/positive-margin; changed/alpha outside exact source bboxes=0; clean source residue=0; overlap/touch=0; canonical stage-name binding 24/24; exact BGRA header/raw mirror_y parity PASS.
+- Controller SOURCE/CLEAN/FINAL, all 24 row contacts and RAW review PASS: direct native-HD dark-gray bold condensed Hangul is smooth/readable, source-left aligned, and shows no English residue, clipping, broken glyphs, protected-art intrusion or orientation regression.
+- Decision C228_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME English-original comparison refresh is dispatched next; actual game validation remains UNTESTED. VR/FFB/DX11/DXVK untouched.
