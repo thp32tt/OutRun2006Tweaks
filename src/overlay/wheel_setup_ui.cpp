@@ -51,6 +51,7 @@ namespace Settings
     extern Setting<float> WheelFFBTrailResponseLead;
     extern Setting<bool> WheelFFBPhysicsSat;
     extern Setting<float> WheelFFBGripLoss;
+    extern Setting<float> WheelFFBCountersteerStrength;
     extern Setting<float> WheelFFBLateralDeadzone;
     extern Setting<float> WheelFFBWeightTransfer;
     extern Setting<float> WheelFFBGearShift;
@@ -824,6 +825,7 @@ namespace
             float mechanical = 0.25f;
             float trailLead = 0.25f;
             float gripLoss = 0.65f;
+            float countersteer = 0.90f;
             float lateralDeadzone = 1.5f;
             float weightTransfer = 0.15f;
             float gearShift = 0.18f;
@@ -860,6 +862,7 @@ namespace
             savedFfb_.mechanical = Settings::WheelFFBMechanicalTrail;
             savedFfb_.trailLead = Settings::WheelFFBTrailResponseLead;
             savedFfb_.gripLoss = Settings::WheelFFBGripLoss;
+            savedFfb_.countersteer = Settings::WheelFFBCountersteerStrength;
             savedFfb_.lateralDeadzone = Settings::WheelFFBLateralDeadzone;
             savedFfb_.weightTransfer = Settings::WheelFFBWeightTransfer;
             savedFfb_.gearShift = Settings::WheelFFBGearShift;
@@ -897,6 +900,7 @@ namespace
             Settings::WheelFFBMechanicalTrail = savedFfb_.mechanical;
             Settings::WheelFFBTrailResponseLead = savedFfb_.trailLead;
             Settings::WheelFFBGripLoss = savedFfb_.gripLoss;
+            Settings::WheelFFBCountersteerStrength = savedFfb_.countersteer;
             Settings::WheelFFBLateralDeadzone = savedFfb_.lateralDeadzone;
             Settings::WheelFFBWeightTransfer = savedFfb_.weightTransfer;
             Settings::WheelFFBGearShift = savedFfb_.gearShift;
@@ -1691,6 +1695,7 @@ namespace
                     Settings::WheelFFBMechanicalTrail = 0.30f;
                     Settings::WheelFFBTrailResponseLead = 0.40f;
                     Settings::WheelFFBGripLoss = 0.65f;
+                    Settings::WheelFFBCountersteerStrength = 0.90f;
                     Settings::WheelFFBWeightTransfer = 0.15f;
                     Settings::WheelFFBSlewRate = 0.12f;
                     Settings::WheelFFBReversalReleaseRate = 0.30f;
@@ -1820,6 +1825,9 @@ namespace
                 track_ffb_change(ImGui::SliderFloat("Mechanical / Caster Trail", Settings::WheelFFBMechanicalTrail.ptr(), 0.0f, 0.60f, "%.2f"));
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip("Normalized mechanical/caster trail acts with front lateral force throughout a corner. 0 disables it; this is not a centre spring.");
+                track_ffb_change(ImGui::SliderFloat("Countersteer Strength", Settings::WheelFFBCountersteerStrength.ptr(), 0.0f, 1.50f, "%.2f"));
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Scales only the developed-drift body-slip countersteer target. 0 = off, 0.90 = current R18 default, 1.00 = R14 reference. Normal-corner SAT is unchanged.");
             }
             track_ffb_change(ImGui::SliderFloat("Grip-loss Response", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f"));
             if (!modelUsesModernSat) ImGui::EndDisabled();
@@ -2069,6 +2077,7 @@ namespace
                 Settings::WheelFFBMechanicalTrail = 0.30f;
                 Settings::WheelFFBTrailResponseLead = 0.40f;
                 Settings::WheelFFBGripLoss = 0.65f;
+                Settings::WheelFFBCountersteerStrength = 0.90f;
                 Settings::WheelFFBWeightTransfer = 0.15f;
                 Settings::WheelFFBSlewRate = 0.12f;
                 Settings::WheelFFBReversalReleaseRate = 0.30f;
