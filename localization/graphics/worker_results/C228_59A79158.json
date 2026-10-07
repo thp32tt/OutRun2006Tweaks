@@ -1,0 +1,11 @@
+{
+  "role": "C",
+  "run": "C228",
+  "queue_index": 163,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+  "source_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+  "candidate_sha256": "201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6",
+  "machine_status": "PASS",
+  "report": "localization/graphics/role_C/20261007-C228-59A79158-A154/C228_59A79158_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
