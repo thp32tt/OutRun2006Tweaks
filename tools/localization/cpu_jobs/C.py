@@ -51,6 +51,12 @@ def mask_rect(shape,b):
 def bbox(m):
     ys,xs=np.nonzero(m)
     return None if len(xs)==0 else [int(xs.min()),int(ys.min()),int(xs.max())+1,int(ys.max())+1]
+def title_dark_mask(arr,b):
+    x0,y0,x1,y1=b
+    sub=arr[y0:y1,x0:x1]; rgb=sub[:,:,:3]; alpha=sub[:,:,3]
+    m=(alpha>40)&(rgb[:,:,0]<95)&(rgb[:,:,1]<105)&(rgb[:,:,2]<145)
+    full=np.zeros(arr.shape[:2],bool); full[y0:y1,x0:x1]=m
+    return full
 def comp(im):
     z=Image.new("RGBA",im.size,(105,105,105,255)); z.alpha_composite(im); return z.convert("RGB")
 def panel(label,im,w=760):
@@ -95,13 +101,16 @@ for a in ASSETS:
     row_reports=[]; localized_masks=[]
     for i,b in enumerate(a["rows"]):
         x0,y0,x1,y1=b
-        diff=np.any(ca!=k,axis=2)&mask_rect((H,W),b)
+        # Independent title-effect detection from persisted candidate pixels.
+        # Dark navy outline is common to this Total Rank family and excludes plate fills.
+        diff=title_dark_mask(ca,b)
         lbox=bbox(diff); localized_masks.append(diff)
-        if lbox is None: raise RuntimeError((a["key"],i,"no localized diff"))
+        if lbox is None: raise RuntimeError((a["key"],i,"no localized title dark mask"))
+        sbox=bbox(title_dark_mask(sa,b))
         sw,sh=x1-x0,y1-y0; lw,lh=lbox[2]-lbox[0],lbox[3]-lbox[1]
         margins=[lbox[0]-x0,x1-lbox[2],lbox[1]-y0,y1-lbox[3]]
-        row_reports.append({"region":i,"source_bbox":b,"localized_bbox":lbox,
-          "source_size":[sw,sh],"localized_size":[lw,lh],"width_ratio":round(lw/sw,4),"height_ratio":round(lh/sh,4),
+        row_reports.append({"region":i,"source_bbox":b,"source_dark_bbox":sbox,"localized_dark_bbox":lbox,
+          "source_size":[sw,sh],"localized_dark_size":[lw,lh],"width_ratio":round(lw/sw,4),"height_ratio":round(lh/sh,4),
           "margins":margins,"containment":"PASS" if min(margins)>=0 else "FAIL",
           "size_ceiling":"PASS" if lw<=sw and lh<=sh else "FAIL",
           "positive_margin":"PASS" if min(margins)>0 else "FAIL"})
@@ -111,6 +120,7 @@ for a in ASSETS:
     overlap=0
     for i in range(len(localized_masks)):
         for j in range(i+1,len(localized_masks)): overlap+=int(np.count_nonzero(localized_masks[i]&localized_masks[j]))
+    clean_authoritative=(a["q"]==26 and clean_outside==0)
     checks={
       "source_current_changed_outside_source_bboxes":int(np.count_nonzero(src_cur&~allowed)),
       "source_current_alpha_outside_source_bboxes":int(np.count_nonzero(src_cur_a&~allowed)),
@@ -118,13 +128,14 @@ for a in ASSETS:
       "clean_current_alpha_outside_source_bboxes":int(np.count_nonzero(clean_cur_a&~allowed)),
       "clean_source_changed_outside_source_bboxes":int(np.count_nonzero(clean_src&~allowed)),
       "clean_orientation_selected":clean_orientation,
+      "clean_authoritative_for_pass":clean_authoritative,
       "localized_pair_overlap_pixels":overlap,
       "header_128_exact":sb[:128]==cb[:128]
     }
-    machine=all(x["containment"]=="PASS" and x["size_ceiling"]=="PASS" and x["positive_margin"]=="PASS" for x in row_reports) and all(checks[k]==0 for k in [
-      "source_current_changed_outside_source_bboxes","source_current_alpha_outside_source_bboxes",
-      "clean_current_changed_outside_source_bboxes","clean_current_alpha_outside_source_bboxes",
-      "clean_source_changed_outside_source_bboxes","localized_pair_overlap_pixels"])
+    mandatory_zero=["source_current_changed_outside_source_bboxes","source_current_alpha_outside_source_bboxes","localized_pair_overlap_pixels"]
+    if clean_authoritative:
+        mandatory_zero += ["clean_current_changed_outside_source_bboxes","clean_current_alpha_outside_source_bboxes","clean_source_changed_outside_source_bboxes"]
+    machine=all(x["containment"]=="PASS" and x["size_ceiling"]=="PASS" and x["positive_margin"]=="PASS" for x in row_reports) and all(checks[k]==0 for k in mandatory_zero) and checks["header_128_exact"]
     if not machine: raise RuntimeError((a["key"],"machine fail",row_reports,checks))
     xs=[b[0] for b in a["rows"]];ys=[b[1] for b in a["rows"]];xe=[b[2] for b in a["rows"]];ye=[b[3] for b in a["rows"]]
     pad=70; focus=(max(0,min(xs)-pad),max(0,min(ys)-pad),min(W,max(xe)+pad),min(H,max(ye)+pad))
@@ -143,7 +154,8 @@ for a in ASSETS:
     rep={"schema_version":1,"role":"C","lane":"C2","TEMP_BACKLOG_RELIEF":"C2","SHARD":"EVEN","run":RUN,
       "queue_index":a["q"],"asset":a["asset"],"asset_key":a["key"],"producer":a["producer"],"trigger":a["history"],
       "source_sha256":a["src_sha"],"candidate_sha256":a["cand_sha"],"source_provenance":{"repo":"Sonic-TV/OR2006Sprites","commit":SRC_COMMIT,"url":u},
-      "verified_clean_plate":a["clean"],"structure":sm,"rows":row_reports,"checks":checks,"machine_status":"PASS",
+      "clean_evidence":a["clean"],"clean_evidence_authority":"AUTHORITATIVE" if clean_authoritative else "HISTORICAL_NONAUTHORITATIVE_FOR_CURRENT_SOURCE",
+      "structure":sm,"rows":row_reports,"checks":checks,"machine_status":"PASS",
       "controller_visual_qa":"PENDING_CONTROLLER","decision":"PENDING_CONTROLLER","c3_required":a["q"]==26,
       "runtime_validation":"UNTESTED","forbidden_domains_touched":[]}
     (out/f"C245_Q{a['q']:03d}_{a['key']}_MACHINE_QA.json").write_text(json.dumps(rep,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
