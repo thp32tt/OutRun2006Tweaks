@@ -64,6 +64,33 @@ for token in [
 ]:
     require(token, hud, 'semantic baseline family')
 
+# Canonical EXE closure for rank/rival marker producers.
+# The source already routes these exact call sites through projected/world
+# marker ownership, but the binary contract must also prove each CALL target.
+# This prevents a matching source literal from masking canonical-EXE drift.
+for contract_id, rva in (
+    ('VR-EXE-RANK-MARKER-SPRANI-BB0FB', '0x000BB0FB'),
+    ('VR-EXE-RANK-MARKER-SPRANI-BB133', '0x000BB133'),
+    ('VR-EXE-RANK-MARKER-SPRANI-BB16C', '0x000BB16C'),
+    ('VR-EXE-RANK-MARKER-SPRANI-BB1A5', '0x000BB1A5'),
+    ('VR-EXE-RANK-MARKER-CLIP-BB21F', '0x000BB21F'),
+    ('VR-EXE-RANK-MARKER-CLIP-BB241', '0x000BB241'),
+    ('VR-EXE-RANK-MARKER-CLIP-BB271', '0x000BB271'),
+    ('VR-EXE-RANK-MARKER-CLIP-BB2BC', '0x000BB2BC'),
+    ('VR-EXE-RANK-MARKER-CLIP-BB2D0', '0x000BB2D0'),
+    ('VR-EXE-RIVAL-MARKER-SPRANI-BB796', '0x000BB796'),
+    ('VR-EXE-RANK-SUB-SCREEN-HUD-BEB98', '0x000BEB98'),
+    ('VR-EXE-RANK-SUB-SCREEN-HUD-BED83', '0x000BED83'),
+    ('VR-EXE-RANK-SUB-SCREEN-HUD-BED9E', '0x000BED9E'),
+    ('VR-EXE-RANK-SUB-SCREEN-HUD-BEDAE', '0x000BEDAE'),
+):
+    require(contract_id, binary_contract, 'canonical rank/rival direct-CALL contract')
+    require(rva, binary_contract, 'canonical rank/rival direct-CALL RVA')
+require('RankMarker_SpraniCalls', ui, 'exact 1st-3rd rank marker sprani producer set')
+require('RankMarker_ClipSpriteCalls', ui, 'exact 4th+ rank marker clip producer set')
+require('RivalMarker_SpraniCall', ui, 'exact rival marker sprani producer')
+require('RankMarkerSubScreenHudCalls', ui, 'exact screen-HUD sub_4BAD20 caller set')
+
 # Canonical EXE closure for option/menu arrow clip producers.
 # These exact historical calls were already routed to SCREEN_HUD, but until
 # now only their source literals were guarded. Pin the original executable

@@ -393,6 +393,202 @@
           "needle": "0xED7A3"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-RANK-MARKER-SPRANI-BB0FB",
+      "rva": "0x000BB0FB",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e880e4f6ff",
+      "purpose": "Canonical rival-car rank marker sprani producer #1. Direct CALL resolves to sprani_play_ae_auth_alpha RVA 0x00029580 and is routed through RankMarker_sprani.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBB0FB"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RANK-MARKER-SPRANI-BB133",
+      "rva": "0x000BB133",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e848e4f6ff",
+      "purpose": "Canonical rival-car rank marker sprani producer #2. Direct CALL resolves to sprani_play_ae_auth_alpha RVA 0x00029580 and is routed through RankMarker_sprani.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBB133"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RANK-MARKER-SPRANI-BB16C",
+      "rva": "0x000BB16C",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e80fe4f6ff",
+      "purpose": "Canonical rival-car rank marker sprani producer #3. Direct CALL resolves to sprani_play_ae_auth_alpha RVA 0x00029580 and is routed through RankMarker_sprani.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBB16C"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RANK-MARKER-SPRANI-BB1A5",
+      "rva": "0x000BB1A5",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8d6e3f6ff",
+      "purpose": "Canonical rival-car rank marker sprani producer #4. Direct CALL resolves to sprani_play_ae_auth_alpha RVA 0x00029580 and is routed through RankMarker_sprani.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBB1A5"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RANK-MARKER-CLIP-BB21F",
+      "rva": "0x000BB21F",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e85c20f7ff",
+      "purpose": "Canonical 4th+ rival-car rank marker clip producer #1. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through RankMarker_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBB21F"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RANK-MARKER-CLIP-BB241",
+      "rva": "0x000BB241",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e83a20f7ff",
+      "purpose": "Canonical 4th+ rival-car rank marker clip producer #2. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through RankMarker_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBB241"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RANK-MARKER-CLIP-BB271",
+      "rva": "0x000BB271",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e80a20f7ff",
+      "purpose": "Canonical 4th+ rival-car rank marker clip producer #3. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through RankMarker_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBB271"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RANK-MARKER-CLIP-BB2BC",
+      "rva": "0x000BB2BC",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8bf1ff7ff",
+      "purpose": "Canonical 4th+ rival-car rank marker clip producer #4. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through RankMarker_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBB2BC"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RANK-MARKER-CLIP-BB2D0",
+      "rva": "0x000BB2D0",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8ab1ff7ff",
+      "purpose": "Canonical 4th+ rival-car rank marker clip producer #5. Direct CALL resolves to put_clip_sprite RVA 0x0002D280 and is routed through RankMarker_putClipSprite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBB2D0"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RIVAL-MARKER-SPRANI-BB796",
+      "rva": "0x000BB796",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8e5ddf6ff",
+      "purpose": "Canonical rival marker sprani producer. Direct CALL resolves to sprani_play_ae_auth_alpha RVA 0x00029580 and is routed through RivalMarker_sprani.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBB796"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RANK-SUB-SCREEN-HUD-BEB98",
+      "rva": "0x000BEB98",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e883c1ffff",
+      "purpose": "Canonical NaviPub screen-HUD call into sub_4BAD20. This call must enter RankMarkerSubSemanticDest so screen rank HUD is not mistaken for vehicle-attached projected markers.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBEB98"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RANK-SUB-SCREEN-HUD-BED83",
+      "rva": "0x000BED83",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e898bfffff",
+      "purpose": "Canonical NaviPub screen-HUD call into sub_4BAD20. This call must enter RankMarkerSubSemanticDest so screen rank HUD is not mistaken for vehicle-attached projected markers.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBED83"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RANK-SUB-SCREEN-HUD-BED9E",
+      "rva": "0x000BED9E",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e87dbfffff",
+      "purpose": "Canonical NaviPub screen-HUD call into sub_4BAD20. This call must enter RankMarkerSubSemanticDest so screen rank HUD is not mistaken for vehicle-attached projected markers.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBED9E"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RANK-SUB-SCREEN-HUD-BEDAE",
+      "rva": "0x000BEDAE",
+      "signatureLength": 5,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e86dbfffff",
+      "purpose": "Canonical NaviPub screen-HUD call into sub_4BAD20. This call must enter RankMarkerSubSemanticDest so screen rank HUD is not mistaken for vehicle-attached projected markers.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xBEDAE"
+        }
+      ]
     }
   ]
 }
