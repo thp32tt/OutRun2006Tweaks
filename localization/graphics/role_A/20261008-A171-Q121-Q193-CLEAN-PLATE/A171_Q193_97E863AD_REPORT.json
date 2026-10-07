@@ -125,8 +125,9 @@
     "persisted_decode": "PASS",
     "raw_orientation": "mirror_y"
   },
-  "controller_visual_qa": "PENDING",
+  "controller_visual_qa": "PASS_SOURCE_PRIOR_CLEAN_FINAL_CONTACTS_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A171_Q193_MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
-  "forbidden_domains_touched": []
+  "status": "A171_SELF_QA_PASS_PENDING_FRESH_C_C3_PRE_INGAME_USER_JPG_AND_INGAME",
+  "forbidden_domains_touched": [],
+  "next": "fresh independent C -> exact-SHA C3 -> PRE_INGAME English-original JPG/user review -> NEW actual-game retest"
 }
