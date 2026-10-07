@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-08T00:39:00+09:00",
+  "updated_at_kst": "2026-10-08",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -5441,10 +5441,7 @@
     "runtime_validation": "UNTESTED"
   },
   "b240_user_menu_typography_rework": {
-    "run": "20261008-B240-IGR020-024-RUNTIME-TYPOGRAPHY",
-    "timestamp_kst": "2026-10-08T00:39:00+09:00",
-    "role": "B",
-    "priority": "P0_USER_INGAME",
+    "status": "Q205_NATIVE_HD_SELF_QA_PASS_PENDING_FRESH_C_C3_AND_INGAME_RETEST",
     "evidence": [
       "스크린샷(159).png",
       "스크린샷(160).png",
@@ -5452,42 +5449,31 @@
       "스크린샷(162).png",
       "스크린샷(164).png"
     ],
-    "source_commits": {
-      "semilight": "f5c96c538f2cbe75e6ba680f18214b7e94fe2963",
-      "confirm_dialog": "ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653",
-      "current_source_blob": "954f09987228b5aeb221ea0aa90edb6072f36b5f"
+    "corrected_mapping": {
+      "screenshots_159_162": "GRAPHICS q205 ACF61D7C",
+      "screenshot_164": "RUNTIME_TEXT id 935"
     },
-    "source_changes": {
-      "overlay_font": "prefer Windows malgunsl.ttf before malgun.ttf",
-      "confirm_dialog": "runtime text ID 935 excluded from compact HUD/speech-bubble keyline"
+    "q205": {
+      "prior_sha256": "2bbb9d19a833fb6c9ade243eb70132ef5ce46150d1fa1cb9423ff4e5101b770c",
+      "candidate_sha256": "7598af3375cfd96fa83f2ac7610ac1a97dd0fcebd7aa95f3e33a641dbcfbba9e",
+      "material_commit": "dab95ca4c899fa4f3f1b216a74a45289d6ded921",
+      "workflow_run": 37647627102,
+      "pixel_scale": 1,
+      "changed_outside_rework_bboxes": 0,
+      "protected_token_changed_pixels": {
+        "OutRun": 0,
+        "OutRun2SP": 0
+      },
+      "next": "fresh C + exact-SHA C3 + new in-game retest"
     },
-    "win32_release": {
-      "run_id": 37644400051,
-      "job_id": 112871291499,
-      "head_sha": "ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653",
-      "conclusion": "SUCCESS",
-      "artifact_id": 11494226800,
-      "artifact_name": "outrun2006tweaks-ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653",
-      "artifact_digest": "sha256:d92b8330353720ce800adcde0485fd29a2096abd23b773b5e8bc5671691e2068"
+    "runtime_id935": {
+      "source_fix_commit": "ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653",
+      "win32_release_run": 37645785737,
+      "korean_test_build_run": 37645785906,
+      "build_status": "PASS",
+      "next": "new in-game retest"
     },
-    "korean_test_build": {
-      "run_id": 37644400122,
-      "head_sha": "ec2766ca9e10345d7a5d3c4d89fd2cfb95ffd653",
-      "compile_reached": "PASS_BEFORE_PACKAGING",
-      "conclusion": "FAIL_PACKAGING_POWERSHELL_PARSER",
-      "failure": "Candidate SHA mismatch q$index: interpolation parser error in PRE_INGAME copy step",
-      "workflow_fix_commit": "7f39a55a7803ab42f5be1bb592f1f624e4f5ae73",
-      "package_revalidation": "PENDING"
-    },
-    "backlog": {
-      "IGR-020": "BUILD_PASS_PENDING_INGAME_RETEST",
-      "IGR-021": "BUILD_PASS_PENDING_TEXT_ID_CAPTURE_AND_INGAME_RETEST",
-      "IGR-022": "BUILD_PASS_PENDING_INGAME_RETEST",
-      "IGR-023": "BUILD_PASS_PENDING_INGAME_RETEST",
-      "IGR-024": "BUILD_PASS_PENDING_INGAME_RETEST"
-    },
-    "runtime_validation": "UNTESTED",
-    "forbidden_domains_touched": []
+    "runtime_validation": "UNTESTED"
   },
   "c256_c2_batch_q060_q212_q052": {
     "run": "20261008-C256-C2-BATCH-Q060-Q212-Q052",
