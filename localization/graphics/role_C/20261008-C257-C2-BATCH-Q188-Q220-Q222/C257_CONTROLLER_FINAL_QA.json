@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261008-C257-C2-BATCH-Q188-Q220-Q222",
+  "timestamp_kst": "2026-10-08T01:22:00+09:00",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "selection_policy": "Fresh/user-regression even shard targets selected after per-slot HEAD/queue refresh; no C1 shard stolen.",
+  "assets": {
+    "q188": {
+      "candidate_sha256": "9fe3804a70d93277ede4e16ac8073057c6a9d969a893d05cde522d14a1f91b4d",
+      "fresh_c": "PASS",
+      "machine_qa": "PASS_6_OF_6_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "PASS_NATIVE_HD_DARK_HELP_FAMILY_FLIPY_RAW",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "remaining": "q212 blocks IGR-001/002; q193 C1 blocks IGR-019; PRE_INGAME/user/NEW in-game pending"
+    },
+    "q220": {
+      "candidate_sha256": "1a57c385e6c3ea2cc368888041e7106aab79bc4ab364daf0b51edd4465fcc935",
+      "fresh_c": "PASS",
+      "machine_qa": "PASS_7_OF_7_ZERO_OUTSIDE_ALPHA_HEADER",
+      "controller_visual_qa": "PASS_RED_GRAY_SMALL_FAMILY_FLIPY_RAW",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "remaining": "q212 blocks IGR-001/002; PRE_INGAME/user/NEW in-game pending"
+    },
+    "q222": {
+      "candidate_sha256": "601a979b5ca1f41b381c714dd6a5b25fd86d1a32927b0e2a90c2b049f6c8209f",
+      "fresh_c": "PASS",
+      "machine_qa": "PASS_DXT5_3_OF_3_3456_BLOCKS_OUTSIDE_0",
+      "controller_visual_qa": "PASS_SOURCE_RELATIVE_HEIGHT_HIERARCHY_DXT5_FLIPY_RAW",
+      "c3": "C3_STRICT_PASS_EXACT_SHA",
+      "remaining": "PRE_INGAME English-original refresh/user review + actual-game pending"
+    }
+  },
+  "pre_ingame_export": "PENDING_REFRESH_Q188_Q220_Q222",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
