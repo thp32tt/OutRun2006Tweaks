@@ -3356,6 +3356,29 @@ namespace OutRunVRStereo
         InvalidateLiveStateSample();
     }
 
+    std::uintptr_t R30SupportCurrentVertexShaderIdentity() noexcept
+    {
+        return CurrentVertexShaderIdentity.load(std::memory_order_acquire);
+    }
+
+    std::uintptr_t R30SupportExchangeVertexShaderIdentity(
+        std::uintptr_t identity) noexcept
+    {
+        return CurrentVertexShaderIdentity.exchange(
+            identity, std::memory_order_acq_rel);
+    }
+
+    void R30SupportRestoreVertexShaderIdentityIfEmpty(
+        std::uintptr_t identity) noexcept
+    {
+        if (!identity)
+            return;
+        std::uintptr_t expected = 0;
+        CurrentVertexShaderIdentity.compare_exchange_strong(
+            expected, identity,
+            std::memory_order_acq_rel, std::memory_order_acquire);
+    }
+
     float R30SupportWorldScale() noexcept
     {
         return Settings::VRWorldScale;

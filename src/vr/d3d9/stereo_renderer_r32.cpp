@@ -373,15 +373,9 @@ namespace OutRunVRStereo
                 return lowerDraw();
 
             const std::uintptr_t savedIdentity =
-                CurrentVertexShaderIdentity.exchange(0, std::memory_order_acq_rel);
+                R30SupportExchangeVertexShaderIdentity(0);
             const HRESULT hr = lowerDraw();
-            if (savedIdentity != 0)
-            {
-                std::uintptr_t expected = 0;
-                CurrentVertexShaderIdentity.compare_exchange_strong(
-                    expected, savedIdentity,
-                    std::memory_order_acq_rel, std::memory_order_acquire);
-            }
+            R30SupportRestoreVertexShaderIdentityIfEmpty(savedIdentity);
             ++R32FailClosedZeroDisparityDraws;
             return hr;
         }
@@ -904,7 +898,7 @@ namespace OutRunVRStereo
     HRESULT R32ReviewSetRenderTarget(IDirect3DDevice9* d, DWORD i, IDirect3DSurface9* s) noexcept { return SetRenderTargetHook.stdcall<HRESULT>(d,i,s); }
     HRESULT R32ReviewSetDepthStencilSurface(IDirect3DDevice9* d, IDirect3DSurface9* s) noexcept { return SetDepthStencilSurfaceHook ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(d,s) : d->SetDepthStencilSurface(s); }
 
-    std::uintptr_t R32ReviewCurrentVertexShaderIdentity() noexcept { return CurrentVertexShaderIdentity.load(std::memory_order_acquire); }
+    std::uintptr_t R32ReviewCurrentVertexShaderIdentity() noexcept { return R30SupportCurrentVertexShaderIdentity(); }
     bool R32ReviewLiveVertexShaderMatches(IDirect3DDevice9* d, std::uintptr_t e) noexcept { return OutRunVR::D3D9::LiveVertexShaderMatches(d,e); }
     std::uint32_t R32ReviewFrameStereoPoseSequence() noexcept { return FrameStereoPoseSequence; }
 

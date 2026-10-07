@@ -59,6 +59,11 @@ namespace OutRunVRStereo
     void R30SupportInvalidateEffectStateCache() noexcept;
     void R30SupportInvalidateTrackedRasterShadow() noexcept;
     void R30SupportInvalidateLiveStateSample() noexcept;
+    std::uintptr_t R30SupportCurrentVertexShaderIdentity() noexcept;
+    std::uintptr_t R30SupportExchangeVertexShaderIdentity(
+        std::uintptr_t identity) noexcept;
+    void R30SupportRestoreVertexShaderIdentityIfEmpty(
+        std::uintptr_t identity) noexcept;
     float R30SupportWorldScale() noexcept;
 
     D3DMATRIX R30SupportMatrixFromQuaternionTranslation(

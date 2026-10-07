@@ -49,6 +49,9 @@ required = (
     "R30SupportTryGetDirectTransportIdentity",
     "R30SupportInvalidateEffectStateCache",
     "R30SupportInvalidateLiveStateSample",
+    "R30SupportCurrentVertexShaderIdentity",
+    "R30SupportExchangeVertexShaderIdentity",
+    "R30SupportRestoreVertexShaderIdentityIfEmpty",
     "R30SupportInvalidateRendererStateAfterExternalRestore",
 )
 for name in required:
@@ -81,6 +84,7 @@ for regex, label in (
     (r"\bReleaseDirectInteropProbe\(", "ReleaseDirectInteropProbe"),
     (r"(?<!R30Support)\bInvalidateEffectStateCache\(\)", "InvalidateEffectStateCache"),
     (r"(?<!R30Support)\bInvalidateLiveStateSample\(\)", "InvalidateLiveStateSample"),
+    (r"\bCurrentVertexShaderIdentity\b", "CurrentVertexShaderIdentity"),
     (r"OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore\(",
      "R29 renderer invalidation"),
 ):
@@ -127,6 +131,19 @@ delegations = {
     ),
     "R30SupportInvalidateEffectStateCache()": ("InvalidateEffectStateCache();",),
     "R30SupportInvalidateLiveStateSample()": ("InvalidateLiveStateSample();",),
+    "R30SupportCurrentVertexShaderIdentity()": (
+        "CurrentVertexShaderIdentity.load(std::memory_order_acquire)",
+    ),
+    "R30SupportExchangeVertexShaderIdentity(": (
+        "CurrentVertexShaderIdentity.exchange(",
+        "identity, std::memory_order_acq_rel",
+    ),
+    "R30SupportRestoreVertexShaderIdentityIfEmpty(": (
+        "if (!identity)",
+        "std::uintptr_t expected = 0;",
+        "CurrentVertexShaderIdentity.compare_exchange_strong(",
+        "std::memory_order_acq_rel, std::memory_order_acquire",
+    ),
     "R30SupportInvalidateRendererStateAfterExternalRestore()": (
         "OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();",
     ),
@@ -156,6 +173,18 @@ ordered = (
 positions = [invalidate_direct.find(token) for token in ordered]
 if any(pos < 0 for pos in positions) or positions != sorted(positions):
     errors.append("R32 direct interop invalidation order changed")
+
+fail_closed = body(r32, "HRESULT R32LowerFailClosed(")
+shader_order = (
+    "R30SupportExchangeVertexShaderIdentity(0);",
+    "const HRESULT hr = lowerDraw();",
+    "R30SupportRestoreVertexShaderIdentityIfEmpty(savedIdentity);",
+)
+shader_positions = [fail_closed.find(token) for token in shader_order]
+if any(pos < 0 for pos in shader_positions) or shader_positions != sorted(shader_positions):
+    errors.append("R32 fail-closed shader identity exchange/draw/restore order changed")
+if "return R30SupportCurrentVertexShaderIdentity();" not in r32:
+    errors.append("R32 review shader identity read bypasses R30 owner facade")
 
 if ": previous_(R30SupportExchangeInternalStereoPass(true))" not in r32:
     errors.append("R32 internal-pass scope no longer acquires through owner exchange")
