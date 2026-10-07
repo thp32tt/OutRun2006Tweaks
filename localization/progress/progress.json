@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 18:12 KST",
+  "updated_at_kst": "2026-10-07 18:30 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4741,5 +4741,29 @@
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": [],
     "status": "C1Q97_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME"
+  },
+  "a165_worksteal_q028_q030": {
+    "role": "A",
+    "work_stolen_from_lane": "B",
+    "q28": {
+      "asset": "A05BF610",
+      "candidate_sha256": "1ced3cfa2042d7b0d0b708e3521a7043bd7528b0347ddbe38b2b7ee51a4c0d3a",
+      "c245_failure": "TOTAL_RANK_TEXT_TOO_SMALL_59.43_PERCENT_SOURCE_WIDTH",
+      "repair": "A165R2 glyph-mask-only plate cleanup + fresh native right-lean 476x80 render",
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PASS",
+      "status": "PENDING_FRESH_C_C3_USER_JPG_INGAME"
+    },
+    "q30": {
+      "asset": "8215FD25",
+      "candidate_sha256": "fa294ef9bcd4e96db8848da3846cea7d90fd6668e1a30d6957f6e1c881f4a547",
+      "c245_failure": "TOTAL_RANK_TEXT_TOO_SMALL_55.33_55.62_PERCENT_SOURCE_WIDTH",
+      "repair": "fresh native right-lean 486x92 x2 render over target-box clean",
+      "machine_qa": "PASS_2_OF_2",
+      "controller_visual_qa": "PASS",
+      "status": "PENDING_FRESH_C_C3_USER_JPG_INGAME"
+    },
+    "runtime_validation": "UNTESTED",
+    "no_vr_ffb_dx11_dxvk_work": true
   }
 }
