@@ -235,7 +235,7 @@ if "DirectTransportRingBackpressure" in resolve_direct.replace(
     errors.append("R32 DirectGPU resolve retained raw lower ring-backpressure state")
 if "R30SupportSetActiveDirectTransportSlot(selected)" not in resolve_direct:
     errors.append("R32 DirectGPU resolve bypasses R30 active-slot owner facade")
-if "ActiveDirectTransportSlot" in resolve_direct:
+if re.search(r"\bActiveDirectTransportSlot\b", resolve_direct):
     errors.append("R32 DirectGPU resolve retained raw lower active-slot state")
 if "R30SupportGpuCompletionSnapshot ackSnapshot{};" not in resolve_direct:
     errors.append("R32 DirectGPU resolve missing R30 ACK snapshot value type")
