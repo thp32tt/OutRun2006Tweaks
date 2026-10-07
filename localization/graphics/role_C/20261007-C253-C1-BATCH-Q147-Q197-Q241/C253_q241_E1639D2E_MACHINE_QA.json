@@ -97,6 +97,7 @@
   ],
   "verified_clean_plate_evidence": "producer E1639D2E_HD_CLEAN_PLATE + A146 validation; C controller must re-open before verdict",
   "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "neutral_alpha_visualization": "RGBA composited on neutral RGB(72,72,72); hidden RGB under alpha=0 is not treated as visible residue",
   "mandatory_c3_strict_audit": true,
   "c3_strict_audit": "PENDING_CONTROLLER_REVIEW",
   "runtime_validation": "UNTESTED",
