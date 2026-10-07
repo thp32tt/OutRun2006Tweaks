@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-# C251 C2 PRE_INGAME refresh after q54 C3 pass
-# TEMP_BACKLOG_RELIEF=C2 / SHARD=EVEN
+# C253 post-pass persistent PRE_INGAME exporter refresh
+# TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL)
 import os, subprocess
-if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
+if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
-subprocess.run(["python","tools/localization/export_c_pass_comparison.py"],check=True)
+subprocess.run(["python", "tools/localization/export_c_pass_comparison.py"], check=True)
