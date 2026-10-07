@@ -131,13 +131,17 @@ for rel, source in (("R30", r30), ("R30_SAFE", r30_safe)):
     if "R9NoteMainDepthContentWrite()" not in source:
         errors.append(f"{rel} missing R9 main-depth write owner API")
 
-for rel, source in (("R20", r20), ("R23", r23), ("R33", r33)):
+for rel, source in (("R20", r20), ("R23", r23)):
     if re.search(r"\bR9MainDepthGeneration\b", source):
         errors.append(
             f"{rel} retained direct R9 main-depth generation dependency")
     if "R9MainDepthGenerationValue()" not in source:
         errors.append(
             f"{rel} missing R9 main-depth generation owner query")
+if re.search(r"\bR9MainDepthGeneration\b", r33):
+    errors.append("R33 retained direct R9 main-depth generation dependency")
+if "R32ReviewMainDepthGeneration()" not in r33:
+    errors.append("R33 missing R32 review facade for main-depth generation")
 if "R9MainDepthGenerationValue()" not in r9:
     errors.append("R9 missing main-depth generation owner query API")
 
@@ -154,16 +158,16 @@ for rel, source in (("R31", r31), ("R33", r33)):
         if banned in source:
             errors.append(
                 f"{rel} retained direct R30 lower-hook storage dependency: {banned}")
-for marker in (
-    "R30CallLowerDrawPrimitive(",
-    "R30CallLowerDrawIndexedPrimitive(",
-    "R30CallLowerDrawPrimitiveUP(",
-    "R30CallLowerDrawIndexedPrimitiveUP(",
+for marker, facade in (
+    ("R30CallLowerDrawPrimitive(", "R32ReviewCallLowerDrawPrimitive("),
+    ("R30CallLowerDrawIndexedPrimitive(", "R32ReviewCallLowerDrawIndexedPrimitive("),
+    ("R30CallLowerDrawPrimitiveUP(", "R32ReviewCallLowerDrawPrimitiveUP("),
+    ("R30CallLowerDrawIndexedPrimitiveUP(", "R32ReviewCallLowerDrawIndexedPrimitiveUP("),
 ):
     if marker not in r30:
         errors.append(f"R30 missing lower-draw owner boundary: {marker}")
-    if marker not in r33:
-        errors.append(f"R33 missing R30 lower-draw owner boundary use: {marker}")
+    if facade not in r33:
+        errors.append(f"R33 missing R32 split facade for lower-draw owner boundary: {facade}")
     if marker in r31:
         errors.append(f"R31 regained retired R30 lower-draw owner boundary use: {marker}")
 
@@ -216,8 +220,8 @@ if seed_start < 0 or seed_end < 0 or \
 # R9's private identity/descriptor/known-state tuple directly.
 if "inline bool R9TrackedMainDepthHasStencil() noexcept" not in r9:
     errors.append("R9 missing tracked-main-depth stencil owner query API")
-if "R9TrackedMainDepthHasStencil()" not in r33:
-    errors.append("R33 missing R9 tracked-main-depth stencil owner query")
+if "R32ReviewMainDepthHasStencil()" not in r33:
+    errors.append("R33 missing R32 review facade for tracked-main-depth stencil owner query")
 for banned in ("R9MainDepthKnown", "R9MainDepthIdentity", "R9MainDepthDesc"):
     if banned in r33:
         errors.append(
@@ -267,10 +271,10 @@ for marker in (
 for raw in ("RightDepthSynchronized", "RightStencilSynchronized"):
     if re.search(rf"\b{raw}\b", r33):
         errors.append(f"R33 retained direct R9 right-depth sync read: {raw}")
-if r33.count("R9IsRightDepthInSync()") < 4:
-    errors.append("R33 missing R9 depth-sync owner query at both world/HUD readiness gates")
-if r33.count("R9IsRightStencilInSync()") < 4:
-    errors.append("R33 missing R9 stencil-sync owner query at both world/HUD readiness gates")
+if r33.count("R32ReviewRightDepthInSync()") < 4:
+    errors.append("R33 missing R32 review facade depth-sync query at both world/HUD readiness gates")
+if r33.count("R32ReviewRightStencilInSync()") < 4:
+    errors.append("R33 missing R32 review facade stencil-sync query at both world/HUD readiness gates")
 if "return RightDepthSynchronized;" not in r9:
     errors.append("R9 depth-sync owner query no longer preserves tracked-state read")
 if "return RightStencilSynchronized;" not in r9:
@@ -291,9 +295,10 @@ for rel, source in (("R30", r30), ("R30_SAFE", r30_safe)):
 if "R9UndoStereoDrawCount()" not in r9:
     errors.append("R9 missing draw-count rollback owner API")
 
-for rel, source in (("R29", r29), ("R33", r33)):
-    if "R9NoteMainDepthContentWrite()" not in source:
-        errors.append(f"{rel} missing R9 main-depth write owner API")
+if "R9NoteMainDepthContentWrite()" not in r29:
+    errors.append("R29 missing R9 main-depth write owner API")
+if "R32ReviewNoteMainDepthContentWrite()" not in r33:
+    errors.append("R33 missing R32 review facade for R9 main-depth write owner API")
 for rel, source in (("R31", r31), ("R32", r32)):
     if "R9NoteMainDepthContentWrite()" in source:
         errors.append(f"{rel} regained retired draw-side main-depth accounting")
@@ -525,9 +530,12 @@ for rel, source in (
         if banned in source:
             errors.append(
                 f"{rel} retained direct R9 stereo-draw accounting mutation: {banned}")
-    if "R9NoteStereoDrawWithoutMonoBackup();" not in source:
+    expected = (
+        "R32ReviewNoteStereoDrawWithoutMonoBackup();"
+        if rel == "R33" else "R9NoteStereoDrawWithoutMonoBackup();")
+    if expected not in source:
         errors.append(
-            f"{rel} missing R9 stereo-draw accounting owner API use")
+            f"{rel} missing stereo-draw accounting owner API use: {expected}")
 for rel, source in (("R31", r31), ("R32", r32)):
     for banned in ("++R9DrawCalls;", "R9MonoBackupGap = true;",
                    "R9NoteStereoDrawWithoutMonoBackup();"):
@@ -690,13 +698,15 @@ for banned in ("R22ReplayScope", "R22FailClosedReplayState"):
             f"R33 final dispatcher retained private R22 raster-replay dependency: {banned}")
 if "class R22RasterReplayGuard" not in r22:
     errors.append("R22 missing public raster-replay owner guard")
-if "R22RasterReplayGuard replay(" not in r33:
-    errors.append("R33 final dispatcher missing R22 raster-replay owner guard")
+if "R22RasterReplayGuard replay(" not in r32:
+    errors.append("R32 split facade missing R22 raster-replay owner guard delegation")
+if "R32ReviewRunRasterReplayGuard(" not in r33:
+    errors.append("R33 final dispatcher missing R32 raster-replay split facade")
 
 if "R29ArmMonoSafety(" in r33:
     errors.append("R33 retained private R29 mono-safety helper dependency")
-if "ArmStereoRecoverySafety(" not in r33:
-    errors.append("R33 missing R29 owner stereo-recovery safety API")
+if "R32ReviewArmStereoRecoverySafety(" not in r33:
+    errors.append("R33 missing R32 review facade for stereo-recovery safety API")
 for banned in ("R29ArmMonoSafety(", "R29MonoSafetyThroughEpoch"):
     if banned in r32:
         errors.append(
@@ -759,8 +769,10 @@ for marker, source, owner in (
     if marker not in source:
         errors.append(f"{owner} missing install-state owner query API: {marker}")
 for marker in ("R13InstallStatus()", "R22InstallStatus()", "R31InstallStatus()"):
-    if marker not in r33:
-        errors.append(f"R33 missing direct prerequisite owner query: {marker}")
+    if marker not in r32:
+        errors.append(f"R32 split facade missing prerequisite owner query: {marker}")
+if "R32ReviewPrerequisiteStatus()" not in r33:
+    errors.append("R33 missing R32 split facade prerequisite query")
 
 for banned in (
     "R13InstallState", "R13InstallReady", "R13InstallFailed",
@@ -813,7 +825,7 @@ else:
 
 for marker in (
     "SafetyHookInline R33ResolveDirectR13Hook{};",
-    "reinterpret_cast<void*>(&ResolveDirectTransportR13)",
+    "R32ReviewDirectTransportTarget()",
     "ResolveDirectTransportDestR33",
     "R32ReviewResolveDirectTransport(",
     "R33ResolveDirectR13Hook.call<bool>",
@@ -848,7 +860,7 @@ for marker in (
         errors.append(f"R32 missing Reset lifecycle owner contract: {marker}")
 for marker in (
     "SafetyHookInline R33ResetR22Hook{};",
-    "reinterpret_cast<void*>(&ResetDestR22)",
+    "R32ReviewResetTarget()",
     "R32ReviewRunResetLifecycle(",
     "R33ResetR22Hook.stdcall<HRESULT>",
 ):
@@ -881,7 +893,7 @@ for marker in (
         errors.append(f"R32 missing Present telemetry owner contract: {marker}")
 for marker in (
     "SafetyHookInline R33PresentR13Hook{};",
-    "reinterpret_cast<void*>(&PresentDestR13)",
+    "R32ReviewPresentTarget()",
     "R32ReviewRunPresentTelemetry(",
     "R33PresentR13Hook.stdcall<HRESULT>",
 ):
@@ -904,10 +916,10 @@ for marker in (
     "R33ResetReplayBlocked",
     "LastResetStateReplaySucceeded()",
     "TestCooperativeLevel()",
-    "R30TryXyzrhwPrimitiveVB(",
-    "R30TryXyzrhwIndexedPrimitiveVB(",
-    "R30TryXyzrhwPrimitiveUP(",
-    "R30TryXyzrhwIndexedPrimitiveUP(",
+    "R32ReviewTryXyzrhwPrimitiveVB(",
+    "R32ReviewTryXyzrhwIndexedPrimitiveVB(",
+    "R32ReviewTryXyzrhwPrimitiveUP(",
+    "R32ReviewTryXyzrhwIndexedPrimitiveUP(",
 ):
     if marker not in r33:
         errors.append(f"R33 missing folded final-dispatch responsibility: {marker}")
