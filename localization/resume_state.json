@@ -6728,7 +6728,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07T19:00:00+09:00",
+  "updated_at_kst": "2026-10-07T19:12:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7296,20 +7296,32 @@
     "runtime_validation": "UNTESTED"
   },
   "latest_c_pre_ingame_export": {
-    "timestamp_kst": "2026-10-07T10:17:06+09:00",
-    "worker_run_id": 37555515782,
-    "worker_output_commit": "1abf93385fd653b18d64423a65cc6aa689284ef3",
+    "timestamp_kst": "2026-10-07T19:12:00+09:00",
+    "worker_run_id": 37605030145,
+    "worker_output_commit": "ce260d63a7e94c487da6ca6e0949ca90de036202",
     "manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
-    "count": 25,
-    "localized_candidate_count": 24,
+    "count": 17,
+    "localized_candidate_count": 16,
     "policy_pass_no_candidate_count": 1,
-    "q163": {
-      "number": 18,
-      "asset": "59A79158",
-      "source_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
-      "candidate_sha256": "201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6",
-      "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/018_q163_59A79158.jpg"
+    "mandatory_c3_blocked_count": 10,
+    "q28": {
+      "number": 3,
+      "asset": "A05BF610",
+      "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+      "candidate_sha256": "1ced3cfa2042d7b0d0b708e3521a7043bd7528b0347ddbe38b2b7ee51a4c0d3a",
+      "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/003_q028_A05BF610.jpg",
+      "controller_export_visual_review": "PASS"
     },
+    "q30": {
+      "number": 4,
+      "asset": "8215FD25",
+      "source_sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e",
+      "candidate_sha256": "fa294ef9bcd4e96db8848da3846cea7d90fd6668e1a30d6957f6e1c881f4a547",
+      "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/004_q030_8215FD25.jpg",
+      "controller_export_visual_review": "PASS"
+    },
+    "q44_excluded": true,
+    "q44_reason": "C246_VISUAL_FAIL_REWORK_REQUIRED",
     "runtime_validation": "UNTESTED"
   },
   "a148r_2ea557b4_manual_visual_rework": {
@@ -8871,7 +8883,35 @@
       "stage_height_ratio": 0.6625,
       "status": "C246_VISUAL_FAIL_REWORK_REQUIRED"
     },
-    "pre_ingame_export": "PENDING_REFRESH_Q28_Q30",
+    "pre_ingame_export": {
+      "timestamp_kst": "2026-10-07T19:12:00+09:00",
+      "worker_run_id": 37605030145,
+      "worker_output_commit": "ce260d63a7e94c487da6ca6e0949ca90de036202",
+      "manifest": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/manifest.json",
+      "count": 17,
+      "localized_candidate_count": 16,
+      "policy_pass_no_candidate_count": 1,
+      "mandatory_c3_blocked_count": 10,
+      "q28": {
+        "number": 3,
+        "asset": "A05BF610",
+        "source_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+        "candidate_sha256": "1ced3cfa2042d7b0d0b708e3521a7043bd7528b0347ddbe38b2b7ee51a4c0d3a",
+        "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/003_q028_A05BF610.jpg",
+        "controller_export_visual_review": "PASS"
+      },
+      "q30": {
+        "number": 4,
+        "asset": "8215FD25",
+        "source_sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e",
+        "candidate_sha256": "fa294ef9bcd4e96db8848da3846cea7d90fd6668e1a30d6957f6e1c881f4a547",
+        "jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/004_q030_8215FD25.jpg",
+        "controller_export_visual_review": "PASS"
+      },
+      "q44_excluded": true,
+      "q44_reason": "C246_VISUAL_FAIL_REWORK_REQUIRED",
+      "runtime_validation": "UNTESTED"
+    },
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
   }
