@@ -1,0 +1,338 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "run": "20261007-C1Q97-C1-Q097-411827E-B234R",
+  "queue_index": 97,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+  "producer_run": "20261007-B234-Q097-411827E-SLANT",
+  "selection_reason": "Fresh odd-index producer candidate requiring independent C outranks C3 fallback.",
+  "source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+  "prior_c87_sha256": "c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e",
+  "candidate_sha256": "e28a12a19466792dc1d6e24dcd81c472ae310ab90e1abb9a5f7b64756946f808",
+  "prior_provenance": {
+    "commit": "cedeacaee6c9b4074304fcef06b0cd37d6b2ec09",
+    "prior_c_report": "localization/graphics/role_C/20261004-1509-C87/C87_RECOVERY_CROSS_LANE_FINAL_QA.json"
+  },
+  "source_geometry_basis": "Four exact source text/effect bboxes were independently established in A_RECOVERY04 and rechecked by C87 against the identical canonical source SHA. C1Q97 independently decodes source/prior/current bytes and recomputes the complete prior->current RGBA blast radius; producer counters are not consumed for this calculation.",
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "mode": "RGBA",
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ]
+  },
+  "rows": [
+    {
+      "key": "seconds",
+      "source": "seconds",
+      "korean": "초",
+      "source_bbox": [
+        1237,
+        62,
+        1584,
+        144
+      ],
+      "prior_to_current_changed_bbox": [
+        1366,
+        63,
+        1455,
+        143
+      ],
+      "changed_pixels": 3553,
+      "alpha_changed_pixels": 1519,
+      "blast_radius_margins": [
+        129,
+        129,
+        1,
+        1
+      ],
+      "changed_bbox_strictly_inside_source_bbox": "PASS",
+      "source_bbox_size": [
+        347,
+        82
+      ],
+      "changed_bbox_size": [
+        89,
+        80
+      ]
+    },
+    {
+      "key": "tuned",
+      "source": "TUNED",
+      "korean": "튜닝",
+      "source_bbox": [
+        843,
+        851,
+        1154,
+        965
+      ],
+      "prior_to_current_changed_bbox": [
+        900,
+        852,
+        1096,
+        964
+      ],
+      "changed_pixels": 13541,
+      "alpha_changed_pixels": 937,
+      "blast_radius_margins": [
+        57,
+        58,
+        1,
+        1
+      ],
+      "changed_bbox_strictly_inside_source_bbox": "PASS",
+      "source_bbox_size": [
+        311,
+        114
+      ],
+      "changed_bbox_size": [
+        196,
+        112
+      ]
+    },
+    {
+      "key": "normal",
+      "source": "NORMAL",
+      "korean": "일반",
+      "source_bbox": [
+        1235,
+        851,
+        1546,
+        965
+      ],
+      "prior_to_current_changed_bbox": [
+        1290,
+        852,
+        1491,
+        964
+      ],
+      "changed_pixels": 14362,
+      "alpha_changed_pixels": 1065,
+      "blast_radius_margins": [
+        55,
+        55,
+        1,
+        1
+      ],
+      "changed_bbox_strictly_inside_source_bbox": "PASS",
+      "source_bbox_size": [
+        311,
+        114
+      ],
+      "changed_bbox_size": [
+        201,
+        112
+      ]
+    },
+    {
+      "key": "random",
+      "source": "RANDOM",
+      "korean": "무작위",
+      "source_bbox": [
+        1627,
+        856,
+        1901,
+        965
+      ],
+      "prior_to_current_changed_bbox": [
+        1629,
+        857,
+        1899,
+        964
+      ],
+      "changed_pixels": 17238,
+      "alpha_changed_pixels": 1955,
+      "blast_radius_margins": [
+        2,
+        2,
+        1,
+        1
+      ],
+      "changed_bbox_strictly_inside_source_bbox": "PASS",
+      "source_bbox_size": [
+        274,
+        109
+      ],
+      "changed_bbox_size": [
+        270,
+        107
+      ]
+    }
+  ],
+  "summary": {
+    "prior_to_current_changed_pixels_outside_four_exact_source_bboxes": 0,
+    "prior_to_current_alpha_changed_outside_four_exact_source_bboxes": 0,
+    "protected_and_untouched_rows_pixel_exact_to_prior_c87": true,
+    "header_128_exact_source_prior_current": true,
+    "raw_orientation": "mirror_y",
+    "persisted_decode_authority": "PASS"
+  },
+  "machine_status": "PASS",
+  "fresh_c_decision": "PASS",
+  "mandatory_c3": true,
+  "c3_reason": [
+    "SLANTED_ITALIC_TYPOGRAPHY",
+    "PRIOR_PRE_INGAME_STYLE_FALSE_NEGATIVE",
+    "CURRENT_MATERIAL_STYLE_REWORK"
+  ],
+  "c3_machine_status": "PASS",
+  "visual_evidence": [
+    "localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_SOURCE_PRIOR_CURRENT_CONTACT.jpg",
+    "localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_ROW_CONTACTS.jpg",
+    "localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_RAW_COMPARE.jpg",
+    "localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_PRACTICAL_100_50_25.jpg"
+  ],
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_PRIOR_CURRENT_HIGHZOOM_FLIPY_RAW_PRACTICAL_100_50_25",
+  "c3_strict_decision": "C3_STRICT_PASS",
+  "pre_ingame_export": "PENDING_REFRESH",
+  "user_jpg_review": "PENDING_NEW_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "controller_report": "localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_411827E_CONTROLLER_FINAL_QA.json",
+  "clean_plate_evidence": "localization/graphics/role_A/20261004-A-RECOVERY04/411827E_CLEAN_PLATE.png",
+  "controller_visual_findings": {
+    "source_clean_current": "PASS: pinned English source, verified A_RECOVERY04 clean plate, prior C87 and exact B234R current bytes reviewed side by side; no English residue, patch seam, damaged panel or unrelated-art change.",
+    "slant_perspective": "PASS: seconds/TUNED/NORMAL/RANDOM now visibly lean right in the same readable direction as canonical English; the 0.26 material transform is no longer upright and is not visibly over-slanted.",
+    "typography_effects": "PASS: prior Korean face/outline/shadow/color families are preserved while slant is corrected; no mixed-resolution/tofu/broken Hangul visible.",
+    "scale_placement": "PASS: source-relative placement remains inside the exact source text/effect footprints with positive margins; RANDOM remains readable and the question-mark icon/plate is visibly intact without glyph collision.",
+    "raw_flipy": "PASS: canonical RAW mirror_y transform is preserved; source and Korean require the same vertical flip for readable orientation.",
+    "practical_scale": "PASS: 100/50/25 percent evidence remains readable relative to the source family with no clipping or disappearance.",
+    "protected_art": "PASS: Ferrari/model/controller/vehicle/1P-4P and unaffected localized rows remain visually intact; independent prior-to-current decoded diff is zero outside the four exact source bboxes."
+  },
+  "independent_source_clean_current_rows": [
+    {
+      "key": "seconds",
+      "source_vs_verified_clean_bbox": [
+        1237,
+        62,
+        1584,
+        144
+      ],
+      "current_vs_verified_clean_bbox": [
+        1366,
+        64,
+        1455,
+        142
+      ],
+      "current_bbox_size": [
+        89,
+        78
+      ],
+      "source_cell_size": [
+        347,
+        82
+      ],
+      "positive_margins": [
+        129,
+        129,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "tuned",
+      "source_vs_verified_clean_bbox": [
+        896,
+        873,
+        1120,
+        935
+      ],
+      "current_vs_verified_clean_bbox": [
+        900,
+        853,
+        1096,
+        963
+      ],
+      "current_bbox_size": [
+        196,
+        110
+      ],
+      "source_cell_size": [
+        311,
+        114
+      ],
+      "positive_margins": [
+        57,
+        58,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "normal",
+      "source_vs_verified_clean_bbox": [
+        1275,
+        873,
+        1508,
+        936
+      ],
+      "current_vs_verified_clean_bbox": [
+        1290,
+        853,
+        1491,
+        963
+      ],
+      "current_bbox_size": [
+        201,
+        110
+      ],
+      "source_cell_size": [
+        311,
+        114
+      ],
+      "positive_margins": [
+        55,
+        55,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "random",
+      "source_vs_verified_clean_bbox": [
+        1655,
+        863,
+        1889,
+        922
+      ],
+      "current_vs_verified_clean_bbox": [
+        1629,
+        858,
+        1899,
+        962
+      ],
+      "current_bbox_size": [
+        270,
+        104
+      ],
+      "source_cell_size": [
+        274,
+        109
+      ],
+      "positive_margins": [
+        2,
+        2,
+        2,
+        3
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "independent_clean_plate_gate": "PASS"
+}

@@ -3071,3 +3071,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/OLD/CLEAN/FINAL, per-row high zoom, RAW and practical 100/75/50 review PASS. A164R clean plate has no visible streak/seam/residue; title/body hierarchy, gray/navy flat-color family, upright source transform, shared body style and source-left cadence are retained; no broken Hangul, clipping or protected-art intrusion is visible.
 - Decision `A164R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME`. Prior C82/C85 approval is superseded because bytes changed. Fresh independent C + mandatory exact-SHA C3 + regenerated English-original PRE_INGAME JPG/user review + actual-game validation remain required. `RUNTIME_VALIDATION=UNTESTED`; VR/FFB/DX11/DXVK untouched.
 - Evidence: `localization/graphics/role_A/20261007-A164R-Q197-9F060EC1-EXACT-BBOX/A164R_Q197_REPORT.json`, `A164R_CONTROLLER_SELF_QA.json`.
+
+
+## 2026-10-07 18:12 KST — C1 q97 411827E fresh C + mandatory C3
+- TEMP_BACKLOG_RELIEF=C1; SHARD=ODD(+UNINDEXED_SPECIAL). Final selection refresh pinned HEAD `db1dc20045bf1eb7190cc0ffb9cf944f7ef23eba`; q97 remained a fresh odd B234R candidate. Completed C1 work and all C2-even work were skipped.
+- Exact candidate `e28a12a19466792dc1d6e24dcd81c472ae310ab90e1abb9a5f7b64756946f808`: independent source/verified-clean/current 4/4 containment+size+positive-margin PASS; margins seconds [129,129,2,2], TUNED [57,58,2,2], NORMAL [55,55,2,2], RANDOM [2,2,2,3]. Prior-C87→current changed/alpha pixels outside all four exact source bboxes=0; exact DDS header/2048x2048 RGBA32/mip1/raw mirror_y preserved; untouched/protected content remains pixel-exact.
+- Controller SOURCE/CLEAN/C87/B234R high-zoom, FLIP-Y/RAW and practical 100/50/25 review PASS. All four rows now use canonical readable right lean without visible over-slant, clipping, English residue, broken Hangul, question-mark/icon collision or collateral art regression.
+- Decision: fresh independent C PASS + exact-SHA C3_STRICT_PASS. PRE_INGAME English-original refresh, user JPG review and actual-game validation remain pending. RUNTIME_VALIDATION=UNTESTED. VR/FFB/DX11/DXVK untouched.
+- Evidence: `localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_411827E_CONTROLLER_FINAL_QA.json`.

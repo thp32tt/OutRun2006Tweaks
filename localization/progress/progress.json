@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-07 18:00 KST",
+  "updated_at_kst": "2026-10-07 18:12 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -4687,5 +4687,59 @@
     "status": "A164R_SELF_QA_PASS_PENDING_FRESH_C_C3_USER_JPG_INGAME",
     "runtime_validation": "UNTESTED",
     "no_vr_ffb_dx11_dxvk_work": true
+  },
+  "c1q97_c1_q097_411827e": {
+    "timestamp_kst": "2026-10-07T18:12:45+09:00",
+    "base_head_at_final_refresh": "db1dc20045bf1eb7190cc0ffb9cf944f7ef23eba",
+    "run": "20261007-C1Q97-C1-Q097-411827E-B234R",
+    "role": "C",
+    "TEMP_BACKLOG_RELIEF": "C1",
+    "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+    "queue_index": 97,
+    "asset": "411827E",
+    "source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "prior_c87_sha256": "c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e",
+    "candidate_sha256": "e28a12a19466792dc1d6e24dcd81c472ae310ab90e1abb9a5f7b64756946f808",
+    "fresh_independent_c": "PASS",
+    "c3_strict_audit": "C3_STRICT_PASS",
+    "independent_clean_plate_gate": "4/4 PASS",
+    "clean_current_positive_margins": {
+      "seconds": [
+        129,
+        129,
+        2,
+        2
+      ],
+      "tuned": [
+        57,
+        58,
+        2,
+        2
+      ],
+      "normal": [
+        55,
+        55,
+        2,
+        2
+      ],
+      "random": [
+        2,
+        2,
+        2,
+        3
+      ]
+    },
+    "prior_to_current_changed_pixels_outside_four_source_bboxes": 0,
+    "prior_to_current_alpha_changed_pixels_outside_four_source_bboxes": 0,
+    "untouched_and_protected_pixel_exact_to_prior_c87": true,
+    "controller_visual_qa": "PASS_SOURCE_CLEAN_PRIOR_CURRENT_HIGHZOOM_FLIPY_RAW_PRACTICAL_100_50_25",
+    "machine_report": "localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_411827E_MACHINE_QA.json",
+    "controller_report": "localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_411827E_CONTROLLER_FINAL_QA.json",
+    "pre_ingame_export": "PENDING_REFRESH",
+    "user_jpg_review": "PENDING",
+    "actual_ingame_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "forbidden_domains_touched": [],
+    "status": "C1Q97_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME"
   }
 }

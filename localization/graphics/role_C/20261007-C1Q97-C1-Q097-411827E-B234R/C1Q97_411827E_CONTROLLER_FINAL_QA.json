@@ -1,0 +1,173 @@
+{
+  "schema_version": 2,
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "run": "20261007-C1Q97-C1-Q097-411827E-B234R",
+  "timestamp_kst": "2026-10-07T18:12:45+09:00",
+  "queue_index": 97,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+  "producer_run": "20261007-B234-Q097-411827E-SLANT",
+  "source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+  "prior_c87_sha256": "c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e",
+  "candidate_sha256": "e28a12a19466792dc1d6e24dcd81c472ae310ab90e1abb9a5f7b64756946f808",
+  "independent_machine_qa": {
+    "bbox_and_positive_margin": "4/4 PASS",
+    "prior_to_current_changed_pixels_outside_four_exact_source_bboxes": 0,
+    "prior_to_current_alpha_changed_outside_four_exact_source_bboxes": 0,
+    "protected_and_untouched_rows_pixel_exact_to_prior_c87": true,
+    "header_128_exact_source_prior_current": true,
+    "raw_orientation": "mirror_y",
+    "persisted_decode_authority": "PASS"
+  },
+  "per_row_conservative_diff_margins": {
+    "seconds": [
+      129,
+      129,
+      1,
+      1
+    ],
+    "tuned": [
+      57,
+      58,
+      1,
+      1
+    ],
+    "normal": [
+      55,
+      55,
+      1,
+      1
+    ],
+    "random": [
+      2,
+      2,
+      1,
+      1
+    ]
+  },
+  "clean_plate_evidence": "localization/graphics/role_A/20261004-A-RECOVERY04/411827E_CLEAN_PLATE.png",
+  "prior_c_provenance": "localization/graphics/role_C/20261004-1509-C87/C87_RECOVERY_CROSS_LANE_FINAL_QA.json",
+  "visual_review": {
+    "source_clean_prior_current": "PASS",
+    "readable_slant_direction_and_amount": "PASS_SOURCE_DIRECTION_RIGHT_LEAN",
+    "font_style_weight_effect_hierarchy": "PASS",
+    "glyph_integrity": "PASS",
+    "source_residue_plate_seams": "PASS_NONE_VISIBLE",
+    "protected_art_and_question_mark_icon": "PASS_INTACT_NO_VISIBLE_GLYPH_COLLISION",
+    "flip_y": "PASS",
+    "raw_mirror_y": "PASS",
+    "practical_100_50_25": "PASS"
+  },
+  "visual_evidence": [
+    "localization/graphics/role_B/20261007-B234-Q097-411827E-SLANT/B234_411_SOURCE_OLD_CLEAN_FINAL.jpg",
+    "localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_SOURCE_PRIOR_CURRENT_CONTACT.jpg",
+    "localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_ROW_CONTACTS.jpg",
+    "localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_RAW_COMPARE.jpg",
+    "localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_PRACTICAL_100_50_25.jpg"
+  ],
+  "fresh_independent_c": "PASS",
+  "c3_strict_audit": "C3_STRICT_PASS",
+  "decision": "C1Q97_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME",
+  "pre_ingame_export": "PENDING_REFRESH",
+  "user_jpg_review": "PENDING",
+  "actual_ingame_validation": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "forbidden_domains_touched": [],
+  "independent_clean_plate_gate": "PASS_4_OF_4_SOURCE_CLEAN_CURRENT",
+  "independent_clean_current_rows": [
+    {
+      "key": "seconds",
+      "source_vs_verified_clean_bbox": [
+        1237,
+        62,
+        1584,
+        144
+      ],
+      "current_vs_verified_clean_bbox": [
+        1366,
+        64,
+        1455,
+        142
+      ],
+      "positive_margins": [
+        129,
+        129,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "tuned",
+      "source_vs_verified_clean_bbox": [
+        896,
+        873,
+        1120,
+        935
+      ],
+      "current_vs_verified_clean_bbox": [
+        900,
+        853,
+        1096,
+        963
+      ],
+      "positive_margins": [
+        57,
+        58,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "normal",
+      "source_vs_verified_clean_bbox": [
+        1275,
+        873,
+        1508,
+        936
+      ],
+      "current_vs_verified_clean_bbox": [
+        1290,
+        853,
+        1491,
+        963
+      ],
+      "positive_margins": [
+        55,
+        55,
+        2,
+        2
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "random",
+      "source_vs_verified_clean_bbox": [
+        1655,
+        863,
+        1889,
+        922
+      ],
+      "current_vs_verified_clean_bbox": [
+        1629,
+        858,
+        1899,
+        962
+      ],
+      "positive_margins": [
+        2,
+        2,
+        2,
+        3
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ]
+}

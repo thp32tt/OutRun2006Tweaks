@@ -1,0 +1,19 @@
+{
+  "role": "C",
+  "lane": "C1",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "run": "20261007-C1Q97-C1-Q097-411827E-B234R",
+  "queue_index": 97,
+  "asset": "411827E",
+  "candidate_sha256": "e28a12a19466792dc1d6e24dcd81c472ae310ab90e1abb9a5f7b64756946f808",
+  "machine_status": "PASS",
+  "c3_machine_status": "PASS",
+  "report": "localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_411827E_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED",
+  "fresh_independent_c": "PASS",
+  "c3": "C3_STRICT_PASS",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_PRIOR_CURRENT_HIGHZOOM_FLIPY_RAW_PRACTICAL_100_50_25",
+  "controller_report": "localization/graphics/role_C/20261007-C1Q97-C1-Q097-411827E-B234R/C1Q97_411827E_CONTROLLER_FINAL_QA.json",
+  "status": "C1Q97_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_INGAME"
+}
