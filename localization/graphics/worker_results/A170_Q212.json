@@ -1,0 +1,8 @@
+{
+  "run": "20261008-A170-Q212-TITLE-BALANCE",
+  "queue_index": 212,
+  "asset": "BA0147DA",
+  "candidate_sha256": "3266d0740f9fc5b8d1b0771e2313fe3364e485da06bc5ad578f94999082315c4",
+  "status": "A170_MACHINE_PASS_PENDING_CONTROLLER_VISUAL",
+  "runtime_validation": "UNTESTED"
+}
