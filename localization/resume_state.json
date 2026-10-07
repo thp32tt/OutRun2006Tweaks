@@ -6729,7 +6729,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-07 17:03 KST",
+  "updated_at_kst": "2026-10-07 17:45 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -7275,11 +7275,10 @@
     "pre_ingame_user_review": "PENDING_USER_REVIEW"
   },
   "latest_b_manual_visual_rework": {
-    "run": "20261007-B234-Q097-411827E-SLANT",
-    "queue_index": 97,
-    "work_stolen_from_lane": "A",
-    "candidate_sha256": "e28a12a19466792dc1d6e24dcd81c472ae310ab90e1abb9a5f7b64756946f808",
-    "status": "B234R_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "run": "20261007-B235-Q026-63C91067-C244-REWORK",
+    "queue_index": 26,
+    "candidate_sha256": "2dfc6214ce2383ef01f2739baeff04890d5ff78330b192fcee0d864f6caff719",
+    "status": "B235_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
     "next": "fresh independent C -> exact-SHA C3 -> regenerated PRE_INGAME English-original JPG -> user review -> actual-game validation",
     "runtime_validation": "UNTESTED"
   },
@@ -8512,5 +8511,13 @@
     "next": "A/B native-HD material rerender -> producer QA -> fresh independent C -> exact-SHA C3 -> regenerated PRE_INGAME user JPG -> NEW actual-game retest",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "b235_q26_63c91067_c244_rework": {
+    "run": "20261007-B235-Q026-63C91067-C244-REWORK",
+    "queue_index": 26,
+    "candidate_sha256": "2dfc6214ce2383ef01f2739baeff04890d5ff78330b192fcee0d864f6caff719",
+    "status": "B235_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_C3_USER_JPG_AND_INGAME",
+    "next": "fresh independent C -> exact-SHA C3 -> regenerated PRE_INGAME English-original JPG -> user review -> actual-game validation",
+    "runtime_validation": "UNTESTED"
   }
 }
