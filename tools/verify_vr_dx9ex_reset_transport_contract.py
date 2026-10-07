@@ -318,7 +318,16 @@ for marker in (
     if marker in ensure_ack:
         fail(f"R13 ACK ensure path regained duplicate teardown: {marker}")
 
-read_ack = body(r13, "bool R13ReadGpuCompletionSnapshot(")
+for marker in (
+    "enum class R13GpuCompletionReadResult",
+    "Unavailable",
+    "Ready",
+    "RetryAfterRebind",
+):
+    if marker not in r13:
+        fail(f"R13 ACK snapshot result contract missing: {marker}")
+
+read_ack = body(r13, "R13GpuCompletionReadResult R13ReadGpuCompletionSnapshot(")
 require_order(
     read_ack,
     "R13 stale-host ACK mapping retirement",
@@ -326,9 +335,12 @@ require_order(
     "if (!snapshot.hostPid || !expectedHostPid)",
     "if (snapshot.hostPid != expectedHostPid)",
     "R13ReleaseAckState();",
+    "return R13GpuCompletionReadResult::RetryAfterRebind;",
     "snapshot.transportGeneration != DirectTransportGeneration",
+    "return R13GpuCompletionReadResult::Unavailable;",
     "completed.completedFrameId,",
     "snapshot.completedFrameId,",
+    "return R13GpuCompletionReadResult::Ready;",
 )
 if read_ack.count("R13ReleaseAckState();") != 1:
     fail("R13 ACK snapshot path must retire a stale host mapping exactly once")
@@ -336,13 +348,17 @@ if read_ack.count("R13ReleaseAckState();") != 1:
 read_ack_rebind = body(r13, "bool R13ReadGpuCompletionSnapshotWithRebind(")
 require_order(
     read_ack_rebind,
-    "R13 bounded ACK stale-mapping rebind owner",
-    "if (R13ReadGpuCompletionSnapshot(completed))",
+    "R13 stale-only bounded ACK rebind owner",
+    "const auto first = R13ReadGpuCompletionSnapshot(completed);",
+    "if (first == R13GpuCompletionReadResult::Ready)",
     "return true;",
-    "return R13ReadGpuCompletionSnapshot(completed);",
+    "if (first != R13GpuCompletionReadResult::RetryAfterRebind)",
+    "return false;",
+    "return R13ReadGpuCompletionSnapshot(completed) ==",
+    "R13GpuCompletionReadResult::Ready;",
 )
 if read_ack_rebind.count("R13ReadGpuCompletionSnapshot(completed)") != 2:
-    fail("R13 ACK rebind owner must perform initial + one bounded recovery snapshot")
+    fail("R13 ACK rebind owner must keep one initial read plus one stale-host recovery read")
 
 # R13 is the lower reset/resource owner. It releases shared resources and
 # publishes a disabled frame before ResetEx; recreation occurs only on success.
