@@ -1,0 +1,11 @@
+{
+  "run": "20261007-C242-C1-Q049-BF3EE5C6-A136",
+  "role": "C",
+  "TEMP_BACKLOG_RELIEF": "C1",
+  "SHARD": "ODD(+UNINDEXED_SPECIAL)",
+  "queue_index": 49,
+  "candidate_sha256": "a7eb06e2441956f4418f4cc95da52313696bc13d7864f7c7f76c8efdf909f85d",
+  "machine_status": "PASS_PENDING_CONTROLLER_VISUAL",
+  "report": "localization/graphics/role_C/20261007-C242-C1-Q049-BF3EE5C6-A136/C242_BF3EE5C6_MACHINE_QA.json",
+  "runtime_validation": "UNTESTED"
+}
