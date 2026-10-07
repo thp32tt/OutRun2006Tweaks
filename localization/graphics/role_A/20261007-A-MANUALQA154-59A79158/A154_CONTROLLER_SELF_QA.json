@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A154",
+  "timestamp_kst": "2026-10-07 09:38 KST",
+  "queue_index": 163,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+  "selection": {
+    "reason": "No active A-owned P0/P1, C-returned REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER item remained after refresh. Current PRE_INGAME English-original card #018 exposed a current-policy low-resolution false negative.",
+    "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/018_q163_59A79158.jpg",
+    "prior_c_status": "C203_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "prior_candidate_sha256": "1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583"
+  },
+  "defect": {
+    "tags": [
+      "LOW_RESOLUTION_NEAREST_NEIGHBOR_HANGUL",
+      "SOURCE_WEIGHT_READABILITY_WEAK"
+    ],
+    "evidence": "A60 report explicitly used shared_lowres_font_size=9, pixel_scale=4 and Image.Resampling.NEAREST. Current contract forbids low-resolution Korean bitmap upscaling even when bbox QA passes."
+  },
+  "material_rework": {
+    "method": "Canonical 1024x2048 RGBA32 source + exact A60 source masks/clean plate; fresh direct native-resolution Noto Sans CJK KR Bold render, native fs42, 1px weight reinforcement, source median dark-gray RGB, 0.92 shared condensed geometry, source-left +2px anchors.",
+    "prior_candidate_sha256": "1ea13a96c0f1e670b7455561b747e1bc85871e3e9419d52cd1ee493afd94b583",
+    "candidate_sha256": "201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6",
+    "native_direct_render": true,
+    "nearest_neighbor_upscale": false,
+    "width_improved_rows": "24/24",
+    "width_gain_range_px": [
+      4,
+      24
+    ],
+    "height_preserved_rows": "24/24 >= prior-1px"
+  },
+  "machine_qa": {
+    "target_occurrences": 24,
+    "bbox_source_size_positive_margin": "24/24 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "exact_source_residue": 0,
+    "render_outside_target": 0,
+    "localized_overlap": 0,
+    "touch_pairs": [],
+    "stage_name_policy": "PASS_CANONICAL_PHONETIC_TRANSLITERATION",
+    "structure": "1024x2048 RGBA32/BGRA mip1 header exact",
+    "raw_orientation": "mirror_y"
+  },
+  "ordered_generation_gate": {
+    "1_source_text_removed_plate_restored": "PASS_CANONICAL_SOURCE_ALPHA_CLEAR",
+    "2_source_transform_direction": "PASS_UPRIGHT_CONDENSED_FAMILY",
+    "3_no_unnecessary_undersizing": "PASS_NATIVE_FS42_HEIGHT_WITH_POSITIVE_MARGIN_AND_WIDTH_GAIN_24_OF_24",
+    "4_weight_outline_shadow": "PASS_NATIVE_BOLD_PLUS_1PX_SOURCE_WEIGHT",
+    "5_no_clipped_pixels": "PASS_24_OF_24_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_PROTECTED_CHANGE",
+    "7_flip_y_and_raw": "PASS_CONTROLLER_VISUAL_BOTH",
+    "8_immediate_readability_vs_source": "PASS_CONTROLLER_VISUAL_NATIVE_HD_IMPROVEMENT"
+  },
+  "evidence": {
+    "worker_report": "localization/graphics/role_A/20261007-A-MANUALQA154-59A79158/A154_59A79158_REPORT.json",
+    "row_contact": "localization/graphics/role_A/20261007-A-MANUALQA154-59A79158/A154_ROW_CONTACTS.jpg",
+    "raw_compare": "localization/graphics/role_A/20261007-A-MANUALQA154-59A79158/A154_RAW_COMPARE.jpg",
+    "prior_pre_ingame_card": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/018_q163_59A79158.jpg",
+    "github_worker_run": 37552800527,
+    "worker_output_commit": "6e82e918e72a3f5892aae181fa16321558d8d30c"
+  },
+  "controller_visual_qa": "PASS_SOURCE_A60_CLEAN_A154_ROWS_AND_RAW",
+  "producer_status": "A154_NATIVE_HD_REWORK_SELF_QA_PASS_PENDING_FRESH_C_USER_JPG_AND_INGAME",
+  "fresh_independent_c": "PENDING",
+  "pre_ingame_comparison_refresh": "PENDING_FRESH_C",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}
