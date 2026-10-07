@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261008-A181-Q219-D263B3F1-TECHNO-WIDTH-REWORK",
+  "queue_index": 219,
+  "asset": "D263B3F1",
+  "trigger": "C265_REWORK_REQUIRED_SOURCE_RELATIVE_SCALE_AND_TECHNO_FAMILY_FIDELITY",
+  "source_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
+  "prior_candidate_sha256": "f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24",
+  "candidate_sha256": "e4db9a5b759d878469c297854f8b5179bd2b783063553c9cf6ef3520d9864265",
+  "source_bbox": [
+    6,
+    1011,
+    1473,
+    1129
+  ],
+  "source_size": [
+    1467,
+    118
+  ],
+  "localized_bbox": [
+    152,
+    1021,
+    1326,
+    1119
+  ],
+  "localized_size": [
+    1174,
+    98
+  ],
+  "width_ratio": 0.8003,
+  "margins": {
+    "left": 146,
+    "right": 147,
+    "top": 10,
+    "bottom": 10
+  },
+  "clean_plate_provenance": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261006-A-PRODUCTION113-D263-D103-DIAG/A113_D263_CLEAN_PLATE.png",
+  "bbox_provenance": "localization/graphics/role_C/20261008-C265-C1-Q121-Q201-Q219/C265_Q219_MACHINE_QA.json:row.original_bbox",
+  "render": {
+    "text": "코스 선택",
+    "font": "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "base_font_px": 100,
+    "supersample": 4,
+    "horizontal_target_ratio": 0.8,
+    "readable_right_shear": 0.12,
+    "stroke_px": 5,
+    "shadow_offset": [
+      4,
+      5
+    ],
+    "palette_from_source": {
+      "bright": [
+        230,
+        230,
+        230,
+        255
+      ],
+      "outline": [
+        1,
+        1,
+        1,
+        255
+      ],
+      "shadow": [
+        0,
+        0,
+        0,
+        180
+      ]
+    },
+    "method": "fresh native glyph render at 4x -> explicit readable-right shear -> horizontal techno extension -> downsample"
+  },
+  "machine_qa": {
+    "bbox_containment": "PASS",
+    "source_size_ceiling": "PASS",
+    "positive_margin": "PASS",
+    "changed_outside_source_bbox": 0,
+    "alpha_changed_outside_source_bbox": 0,
+    "header_128_exact": true,
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_PRESERVED_VALIDATED_CLEAN_PLATE",
+    "2_source_matching_slant": "PASS_READABLE_RIGHT_0.12",
+    "3_no_undersized_lettering": "PASS_WIDTH_RESTORED_TO_80_PERCENT_SOURCE",
+    "4_source_faithful_weight_effect": "PASS_SILVER_TECHNO_SOURCE_PALETTE_STROKE_SHADOW",
+    "5_no_clipped_pixels": "PASS_POSITIVE_MARGIN",
+    "6_protected_art_clearance": "PASS_ZERO_CHANGES_OUTSIDE_EXACT_SOURCE_BBOX",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN_PENDING_CONTROLLER",
+    "8_immediate_readability": "EVIDENCE_WRITTEN_PENDING_CONTROLLER"
+  },
+  "execution_backend": "GITHUB_HOSTED_CPU_WORKER_REPOSITORY_BACKED_DDS",
+  "controller_visual_qa": "PENDING_CHATGPT_CONTROLLER",
+  "status": "A181_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "fresh_independent_c": "REQUIRED",
+  "mandatory_c3": "REQUIRED_C265_VISUAL_REWORK",
+  "igr_025": "REMAINS_MAPPING_HOLD_AND_NEW_INGAME_RETEST_REQUIRED",
+  "runtime_validation": "UNTESTED",
+  "forbidden_domains_touched": []
+}

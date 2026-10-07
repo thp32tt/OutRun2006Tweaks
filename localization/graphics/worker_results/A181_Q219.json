@@ -1,0 +1,11 @@
+{
+  "role": "A",
+  "run": "20261008-A181-Q219-D263B3F1-TECHNO-WIDTH-REWORK",
+  "queue_index": 219,
+  "asset": "D263B3F1",
+  "before": "f6303ee1469665779cca31f3e89c2fd20144d579b8fc2ffb9e98f0a036aa5a24",
+  "after": "e4db9a5b759d878469c297854f8b5179bd2b783063553c9cf6ef3520d9864265",
+  "status": "A181_MACHINE_PASS_PENDING_CONTROLLER_SELF_QA",
+  "report": "localization/graphics/role_A/20261008-A181-Q219-D263B3F1-TECHNO-WIDTH-REWORK/A181_Q219_REPORT.json",
+  "runtime_validation": "UNTESTED"
+}
