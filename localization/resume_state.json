@@ -1,5 +1,5 @@
 {
-  "schema_version": 130,
+  "schema_version": 131,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A181R q219 D263B3F1 41cf4c15853e producer machine+controller visual PASS with exact Noto CJK Bold. 코스 선택 is 80.03% source width inside exact 1467x118 with positive margins; validated A113 clean/right-silver-techno family preserved. Next fresh C1 + exact-SHA C3 -> PRE_INGAME/user JPG -> NEW in-game retest. IGR-025 overall mapping HOLD remains for screenshot(163) unresolved labels. RUNTIME_VALIDATION=UNTESTED.",
     "C264 q212 BA0147DA 01c7aded... and q62 33491F83 dcec31a1... are fresh C + exact-SHA C3_STRICT_PASS. Refresh PRE_INGAME comparisons, user JPG review, then NEW actual-game validation; IGR-001/002 remain open.",
     "C264 q172 6C9B3611 963445a4... returned REWORK_REQUIRED: START->출발 is 40.74% and GOAL->골 24.68% of source width. Material rework then fresh C2 + C3.",
     "Fresh-C/C3 q205 exact 7598af3375... then regenerate test package; NEW in-game retest screenshots 159-164. IGR-020..023 are GRAPHICS q205, IGR-024 is runtime ID935.",
@@ -6740,7 +6741,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-08T07:58:06+09:00",
+  "updated_at_kst": "2026-10-08T08:18:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
