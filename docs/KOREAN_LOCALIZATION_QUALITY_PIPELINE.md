@@ -2,6 +2,13 @@
 
 This document is a quality-only layer for `korean-localization-recovery-20260928`. It intentionally does not define controller scheduling, retries, rollovers, task IDs or orchestration.
 
+## Evidence enforcement update — 2026-10-08
+
+Follow `docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md`. It supersedes historical
+string-token C3 approval: calibration, per-region lossless evidence, separate C/C3
+observations and exact source/candidate binding are mandatory for current export.
+The evidence validator does not replace visual judgment or actual game testing.
+
 ## Required construction flow
 
 For every newly localized or materially reworked graphics element:

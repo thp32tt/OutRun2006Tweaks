@@ -1,3 +1,7 @@
+## 2026-10-08 — OUTRUN-KOR-QA-EVIDENCE-GATE-20261008
+
+Applied user-authorized production/QA improvements without changing six launches/hour or A/B/C1/C2 ownership. Current export now requires hash-bound source/candidate/clean/final/machine evidence, per-region lossless views, known-defect calibration, and separate eight-item C/C3 observations. Missing DDS is no longer implicit preserve-original. q154 held for native-DDS gray glyph-weight/counter-space review; no DDS repair or in-game success claimed. Legacy JPG set archived, current export awaits new evidence. Local gate tests 17/17 and string-only exporter integration PASS; this does not certify visual calibration. See localization/graphics/role_C/20261008-QA-EVIDENCE-GATE/APPLICATION_REPORT.json. Next: Read docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md; C1/C2 calibrate on known normal/defect controls, C2 native-DDS recheck q154 gray weight/counter-space, then migrate current bytes to per-region C/C3 evidence. A/B repair current owned regressions with source-derived family profiles. Keep schedule and RUNTIME_VALIDATION=UNTESTED.
+
 # Korean Localization Status
 
 Updated: 2026-09-28T09:10:45+09:00

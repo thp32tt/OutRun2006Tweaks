@@ -1,15 +1,7 @@
-# C QA PASS - English original vs Korean pre-in-game review
+# Current pre-in-game evidence review
 
-- Numbered C-pass rows: 63
-- High-risk candidates blocked pending exact-SHA C3_STRICT_PASS: 9
-- Primary English source: Sonic-TV/OR2006Sprites pinned at 3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6
-- Exact stock-original fallback: localization/validation/binary_compare/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip
-- Every JPG contains the English original and current Korean candidate side-by-side.
-- Top: FLIP-Y review comparison. Bottom: RAW DDS comparison.
-- English source SHA-256, native dimensions, origin, and any review-only display scale are recorded in the manifests.
-- Lower-resolution English originals may be nearest-neighbor scaled only for human display; the English source bytes are never modified or treated as pixel-QA equivalents.
-- If no proven English source can be aligned to the candidate, export fails closed.
-- User visual rejection overrides prior C static PASS and reopens the asset for A/B rework before in-game testing.
-- High-risk candidates are omitted until their current candidate SHA is explicitly recorded with C3_STRICT_PASS. See manifest.json mandatory_c3_blocked.
-- C visual checklist: clean plate/source-footprint restoration; source-direction slant; source-relative scale/hierarchy; readable weight/effects; zero clipping; zero protected-art intrusion; no untranslated visible localizable labels.
-- Report defects by the leading JPG number.
+The previous JPG set is retained in `../PRE_INGAME_JPG_REVIEW_ARCHIVE/20261008-before-evidence-gate/` as historical, unverified-under-current-policy evidence.
+
+Current export is empty pending `visual-evidence-v1-20261008` per-region approval and known-defect calibration. This does not delete or undo DDS production. q154 additionally requires native-DDS gray-menu weight/counter-space recheck.
+
+C must follow `docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md` and run `tools/localization/export_c_pass_comparison.py` after verified approvals exist. JPG is overview only; lossless region PNGs are the QA evidence. RUNTIME_VALIDATION=UNTESTED.

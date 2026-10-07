@@ -248,7 +248,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A181R q219 producer PASS pending fresh C1 + exact-SHA C3; IGR-025 remains HOLD for screenshot(163) remaining runtime-vs-DDS mapping and later NEW in-game retest. Do not repeat q219 unless C returns it.",
+  "next_checkpoint": "Read docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md; C1/C2 calibrate on known normal/defect controls, C2 native-DDS recheck q154 gray weight/counter-space, then migrate current bytes to per-region C/C3 evidence. A/B repair current owned regressions with source-derived family profiles. Keep schedule and RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -2874,7 +2874,8 @@
       },
       "status": "C3_STRICT_PASS_PENDING_PRE_INGAME_USER_JPG_NEW_INGAME",
       "execution_backend": "github_ssot_plus_n100_mcp_readonly_fallback"
-    }
+    },
+    "current_evidence_hold": 1
   },
   "data_build": {
     "draft_bin_entries": 1356,
@@ -6394,5 +6395,129 @@
     "status": "B248_SELF_QA_PASS_PENDING_FRESH_C2_C3_PRE_INGAME_USER_JPG_INGAME",
     "runtime_validation": "UNTESTED",
     "forbidden_domains_touched": []
+  },
+  "qa_evidence_gate": {
+    "TASK_ID": "OUTRUN-KOR-QA-EVIDENCE-GATE-20261008",
+    "policy_version": "visual-evidence-v1-20261008",
+    "report": "localization/graphics/role_C/20261008-QA-EVIDENCE-GATE/APPLICATION_REPORT.json",
+    "next_action": "Read docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md; C1/C2 calibrate on known normal/defect controls, C2 native-DDS recheck q154 gray weight/counter-space, then migrate current bytes to per-region C/C3 evidence. A/B repair current owned regressions with source-derived family profiles. Keep schedule and RUNTIME_VALIDATION=UNTESTED.",
+    "current_summary": {
+      "source": "localization/graphics/asset_queue.csv",
+      "base_head": "d06c1601cc68029f86e0993d45a60dd3b55d5eea",
+      "queue_total": 137,
+      "localize_text_total": 94,
+      "current_status_counts": {
+        "declared_c_pass_not_final_approval": 71,
+        "pending_c": 19,
+        "declared_preserve_original": 3,
+        "hold_strict_recheck": 1
+      },
+      "members": {
+        "declared_c_pass_not_final_approval": [
+          12,
+          26,
+          28,
+          30,
+          32,
+          34,
+          36,
+          38,
+          43,
+          44,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          57,
+          60,
+          61,
+          62,
+          63,
+          65,
+          86,
+          92,
+          94,
+          95,
+          97,
+          98,
+          100,
+          101,
+          102,
+          104,
+          106,
+          107,
+          111,
+          112,
+          116,
+          121,
+          128,
+          130,
+          132,
+          133,
+          137,
+          139,
+          140,
+          147,
+          152,
+          159,
+          163,
+          164,
+          173,
+          188,
+          193,
+          197,
+          198,
+          201,
+          205,
+          212,
+          215,
+          220,
+          222,
+          226,
+          228,
+          230,
+          232,
+          236,
+          241
+        ],
+        "pending_c": [
+          35,
+          59,
+          89,
+          99,
+          103,
+          119,
+          135,
+          161,
+          172,
+          175,
+          176,
+          195,
+          214,
+          217,
+          219,
+          225,
+          227,
+          231,
+          237
+        ],
+        "declared_preserve_original": [
+          143,
+          182,
+          209
+        ],
+        "hold_strict_recheck": [
+          154
+        ]
+      },
+      "runtime_validation": "UNTESTED",
+      "note": "Current queue status only. Declared C PASS is not evidence-backed export or runtime completion."
+    }
   }
 }

@@ -3,12 +3,12 @@ import csv
 import hashlib
 import io
 import json
-import os
 import urllib.request
 import zipfile
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
+from qa_evidence_gate import POLICY, verify_approval
 
 SOURCE_REPO = "Sonic-TV/OR2006Sprites"
 SOURCE_COMMIT = "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
@@ -36,6 +36,8 @@ def current_c_pass(row):
     if row.get("action") != "localize_text":
         return False
     s = (row.get("artwork_status") or "").lower()
+    if any(token in s for token in ("rework_required", "hold", "visual_fail", "pending_c3")):
+        return False
     return ((s.startswith("c") and "pass" in s and "pending_c" not in s)
             or ("alias_of_c" in s and "pass" in s))
 
@@ -75,10 +77,6 @@ def mandatory_c3_reasons(row, candidate_bytes):
         if token in text and reason not in reasons:
             reasons.append(reason)
     return reasons
-
-def c3_pass_matches_candidate(row, candidate_sha):
-    text = " ".join((row.get("artwork_status") or "", row.get("notes") or "")).lower()
-    return "c3_strict_pass" in text and candidate_sha.lower() in text
 
 def flatten(im, bg=(96, 96, 96)):
     im = im.convert("RGBA")
@@ -240,9 +238,6 @@ def make_pair_card(no, idx, key, status, source_raw, current_raw, source_native_
     return canvas
 
 def main():
-    if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "C":
-        raise SystemExit("GitHub-hosted role C required")
-
     repo = Path.cwd()
     queue = repo / "localization/graphics/asset_queue.csv"
     out = repo / OUTPUT_REL
@@ -257,8 +252,6 @@ def main():
     for row in rows:
         row["index"] = (row.get("index") or "").lstrip("\ufeff")
     rows = sorted((r for r in rows if current_c_pass(r)), key=lambda r: int(r["index"]))
-    if not rows:
-        raise RuntimeError("no current C-pass graphics")
 
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 28)
@@ -278,17 +271,6 @@ def main():
         if candidate.exists():
             candidate_bytes = candidate.read_bytes()
             candidate_sha = sha256_bytes(candidate_bytes)
-            c3_reasons = mandatory_c3_reasons(row, candidate_bytes)
-            if c3_reasons and not c3_pass_matches_candidate(row, candidate_sha):
-                blocked_c3.append({
-                    "queue_index": idx,
-                    "asset_key": key,
-                    "asset_path": asset_path,
-                    "artwork_status": row["artwork_status"],
-                    "candidate_sha256": candidate_sha,
-                    "reasons": c3_reasons,
-                })
-                continue
             with Image.open(candidate) as im:
                 current_native = im.convert("RGBA")
             candidate_size = current_native.size
@@ -299,8 +281,23 @@ def main():
             candidate_size = None
             source_kind = "policy_pass_no_candidate"
 
+        approval, reasons = verify_approval(repo, row, candidate_sha, candidate_image=current_native,
+                                           mip_count=dds_metadata(candidate_bytes)["mip_count"] if candidate_sha else 1)
+        if reasons:
+            blocked_c3.append({"queue_index": idx, "asset_key": key,
+                               "candidate_sha256": candidate_sha,
+                               "status": "HOLD_STRICT_RECHECK", "reasons": reasons})
+            continue
         no = len(manifest) + 1
         source = select_english_source(repo, asset_path, key, candidate_size)
+        approval, reasons = verify_approval(repo, row, candidate_sha,
+                                           source_sha=source["sha256"], candidate_image=current_native,
+                                           mip_count=dds_metadata(candidate_bytes)["mip_count"] if candidate_sha else 1)
+        if reasons:
+            blocked_c3.append({"queue_index": idx, "asset_key": key,
+                               "candidate_sha256": candidate_sha,
+                               "status": "HOLD_STRICT_RECHECK", "reasons": reasons})
+            continue
         if policy_preserve:
             current_native = source["raw"].copy()
             candidate_size = current_native.size
@@ -332,13 +329,14 @@ def main():
             "review_display_size": list(candidate_size),
             "candidate_sha256": candidate_sha,
             "jpg": name,
+            "approval_path": f"localization/graphics/role_C/APPROVALS/q{idx:03d}.json",
         })
 
     fields = [
         "number","queue_index","asset_key","asset_path","artwork_status","source_kind",
         "english_source_origin","english_source_location","english_source_commit",
         "english_source_sha256","english_source_native_size","review_display_scale",
-        "review_display_size","candidate_sha256","jpg"
+        "review_display_size","candidate_sha256","jpg","approval_path"
     ]
     with (out / "manifest.csv").open("w", encoding="utf-8", newline="") as fp:
         w = csv.DictWriter(fp, fieldnames=fields)
@@ -350,8 +348,9 @@ def main():
             w.writerow({k: row.get(k, "") for k in fields})
 
     (out / "manifest.json").write_text(json.dumps({
-        "schema_version": 4,
-        "selection": "current localize_text C PASS plus exact aliases; pending-C rework excluded; machine-detectable high-risk candidates require exact-SHA C3_STRICT_PASS before export",
+        "schema_version": 5,
+        "evidence_policy": POLICY,
+        "selection": "current C-pass rows with validated per-asset evidence; legacy string-only approvals are HOLD; explicit preserve policy required",
         "public_english_source_repo": SOURCE_REPO,
         "public_english_source_commit": SOURCE_COMMIT,
         "stock_original_zip": STOCK_ZIP_REL.as_posix(),
@@ -360,6 +359,7 @@ def main():
         "policy_pass_no_candidate_count": sum(x["source_kind"] == "policy_pass_no_candidate" for x in manifest),
         "mandatory_c3_blocked_count": len(blocked_c3),
         "mandatory_c3_blocked": blocked_c3,
+        "qa_authority": "Hash-bound per-region lossless PNG evidence in APPROVALS; JPG is overview only",
         "layout": "top row English original vs current Korean in FLIP-Y review; bottom row English original vs current Korean in RAW DDS",
         "display_scaling_policy": "Only a proven lower-resolution English source may be integer-nearest-neighbor scaled for review display; source native size and SHA stay recorded and unmodified.",
         "visual_review_checklist": VISUAL_REVIEW_CHECKLIST,
@@ -380,7 +380,8 @@ def main():
         "- User visual rejection overrides prior C static PASS and reopens the asset for A/B rework before in-game testing.\n"
         "- High-risk candidates are omitted until their current candidate SHA is explicitly recorded with C3_STRICT_PASS. See manifest.json mandatory_c3_blocked.\n"
         "- C visual checklist: clean plate/source-footprint restoration; source-direction slant; source-relative scale/hierarchy; readable weight/effects; zero clipping; zero protected-art intrusion; no untranslated visible localizable labels.\n"
-        "- Report defects by the leading JPG number.\n",
+        "- JPG is an overview only; authoritative QA uses native/zoom/practical/RAW and black/white/gray PNG region evidence.\n"
+        "- Report defects by queue index + asset key + candidate SHA; leading JPG numbers may change.\n",
         encoding="utf-8",
     )
 
