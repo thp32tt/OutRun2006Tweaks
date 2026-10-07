@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B-MANUALQA228-E95DA5-HELP",
+  "timestamp_kst": "2026-10-07T10:51:00+09:00",
+  "queue_index": 230,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+  "trigger": "PRE_INGAME #022 current hard gate: untranslated visible explanatory UI",
+  "source_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+  "before_candidate_sha256": "d039f8d01ea744224caff7bb6c4f5d72233cd9bde48555dcb642008df91ac92b",
+  "candidate_sha256": "a680ae4b7b7c48e2e6200ca766431a725e189297c6acf31badf677b98270428f",
+  "github_hosted_worker_run": 37558820127,
+  "semantic_binding": [
+    {
+      "source": "You cannot buy this item yet",
+      "korean": "아직 구매할 수 없습니다"
+    },
+    {
+      "source": "You already own this item",
+      "korean": "이미 보유 중입니다"
+    }
+  ],
+  "preserve_exact": [
+    "Night Flight",
+    "Magical Sound Shower",
+    "Life Was A Bore",
+    "Keep Your Heart",
+    "Alberto's Antics Vol.1/2/3/4/5",
+    "BGM",
+    "all existing B73 localized rows and unrelated artwork"
+  ],
+  "machine_qa": {
+    "bbox_source_size_positive_margin": "2/2 PASS",
+    "row_sizes": "462x46 within 617x50; 364x46 within 555x50",
+    "clean_validator": "PASS",
+    "final_validator": "PASS",
+    "changed_pixels_outside_selected_bboxes": 0,
+    "alpha_changed_outside_selected_bboxes": 0,
+    "clean_source_alpha_remaining": 0,
+    "existing_material_changed_outside_selected_bboxes": 0,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "roundtrip": "PASS"
+  },
+  "controller_visual_qa": {
+    "row_contact": "PASS_SOURCE_B73_CLEAN_B228",
+    "raw_mirror_y": "PASS",
+    "english_removal": "PASS_NO_VISIBLE_HELP_TEXT_RESIDUE",
+    "source_style": "PASS_LOW_CONTRAST_DARK_UPRIGHT_HELP_FAMILY",
+    "scale": "PASS_NEAR_SOURCE_HEIGHT_NATIVE_RENDER",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "protected_intrusion": "NONE_VISIBLE",
+    "orientation_regression": "NONE_VISIBLE",
+    "immediate_readability": "PASS",
+    "observations": [
+      "PRE_INGAME #022 showed two ordinary explanatory UI sentences still in English under C149; they are not song/title/brand/model/legal preserve-original content.",
+      "Both rows are now freshly native-rendered at 46px decoded height against 50px source height with positive margins and source-left placement.",
+      "The prior B73 localized headings, red pill labels, song titles, Alberto titles, BGM and unrelated artwork are pixel-exact outside the two selected source bboxes."
+    ]
+  },
+  "ordered_generation_gate": {
+    "english_removal_and_plate_restoration": "PASS",
+    "slant_direction": "PASS_UPRIGHT_SOURCE_FAMILY",
+    "text_scale": "PASS_NATIVE_NEAR_SOURCE_HEIGHT",
+    "weight_outline_shadow": "PASS_SOURCE_LOW_CONTRAST_PLAIN",
+    "clipping": "PASS",
+    "protected_graphics": "PASS",
+    "flip_y_and_raw": "PASS",
+    "readability_vs_source": "PASS"
+  },
+  "decision": "B228_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
