@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # C252 C1 fresh independent QA batch: q63/q121/q193
 # TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL)
-import hashlib, io, json, os, subprocess
+import hashlib, io, json, os, subprocess, urllib.request
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageOps, ImageDraw
@@ -55,7 +55,7 @@ AS=[
 {"key":"select_game_mode","source_bbox":[166,819,1166,973],"localized_bbox":[341,846,990,945]},
 {"key":"select_car","source_bbox":[243,947,1156,1111],"localized_bbox":[485,979,913,1078]},
 {"key":"select_course","source_bbox":[302,1062,1085,1213],"localized_bbox":[478,1088,908,1187]}]},
-{"index":193,"key":"97E863AD","candidate":"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds","candidate_sha":"f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69","prior_sha":"b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d","source_sha":"d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451","regression":"IGR-003 + IGR-019 P1 low-res showroom/multiplayer body","rows":[
+{"index":193,"key":"97E863AD","candidate":"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds","candidate_sha":"f1c68aa4211e81fae2444e4d0172a06709cd5dd98e8f85deba68bbce73ce7c69","prior_sha":"b17c26ad47611de67365449d2fed5cd4d17114cb3d4eb3fcd8cd373afacf8d1d","source_sha":"d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451","source_url":"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds","regression":"IGR-003 + IGR-019 P1 low-res showroom/multiplayer body","rows":[
 {"key":"welcome","source_bbox":[3,148,476,195],"localized_bbox":[5,150,202,193]},
 {"key":"multiplayer_intro_title","source_bbox":[8,297,540,359],"localized_bbox":[10,300,274,356]},
 {"key":"showroom_body","source_bbox":[1205,957,1594,1011],"localized_bbox":[1207,959,1302,1009]}]}
@@ -70,6 +70,10 @@ for a in AS:
         sb=Path(a["source_path"]).read_bytes()
         if H(sb)!=a["source_sha"]:raise RuntimeError(("source drift",a["index"],H(sb)))
         scommit="current hd_source"
+    elif "source_url" in a:
+        with urllib.request.urlopen(a["source_url"], timeout=60) as resp: sb=resp.read()
+        if H(sb)!=a["source_sha"]: raise RuntimeError(("external source drift",a["index"],H(sb)))
+        scommit="Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
     else:
         sb,scommit=find_blob(a["candidate"],a["source_sha"])
     cur,prior,src=rd(cb),rd(pb),rd(sb)
