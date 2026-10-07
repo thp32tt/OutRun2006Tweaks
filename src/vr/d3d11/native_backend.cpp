@@ -13266,17 +13266,28 @@ compose_programmable_activation_prerequisite_handoff(
         out.resourceBehaviorReviewReady &&
         resourceBehavior.reviewSnapshotToken ==
             resourceBehaviorSnapshotToken;
+    // R304: the public R259 handoff must not trust stored/caller R262 token
+    // equality alone. Reconstruct the complete R262 payload before any F18
+    // proof bit may contribute to an activation prerequisite.
+    out.resourceBehaviorPayloadSnapshotMatches =
+        out.resourceBehaviorReviewReady &&
+        resourceBehavior.reviewSnapshotToken ==
+            recompute_programmable_output_resource_behavior_payload_snapshot(
+                resourceBehavior);
     out.resourceBehaviorGeometryProofPresent =
         out.resourceBehaviorReviewReady &&
         out.resourceBehaviorSnapshotMatches &&
+        out.resourceBehaviorPayloadSnapshotMatches &&
         resourceBehavior.geometryResourceBehaviorExact;
     out.resourceBehaviorTextureProofPresent =
         out.resourceBehaviorReviewReady &&
         out.resourceBehaviorSnapshotMatches &&
+        out.resourceBehaviorPayloadSnapshotMatches &&
         resourceBehavior.textureResourceBehaviorExact;
     out.resourceBehaviorOutputProofPresent =
         out.resourceBehaviorReviewReady &&
         out.resourceBehaviorSnapshotMatches &&
+        out.resourceBehaviorPayloadSnapshotMatches &&
         resourceBehavior.outputResourceBehaviorExact;
     out.resourceBehaviorCoverageComplete =
         out.resourceBehaviorGeometryProofPresent &&
@@ -13376,6 +13387,8 @@ compose_programmable_activation_prerequisite_handoff(
             token, out.sourceRevalidationPayloadSnapshotMatches ? 1u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.resourceBehaviorSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.resourceBehaviorPayloadSnapshotMatches ? 1u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.inputLayoutSnapshotToken);
         token = mix_readiness_snapshot_token(

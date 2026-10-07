@@ -2572,6 +2572,8 @@ struct NativeProgrammableShaderActivationPrerequisiteHandoff {
     bool sourceIdentityMatches{};
     bool resourceBehaviorReviewReady{};
     bool resourceBehaviorSnapshotMatches{};
+    // R304 requires exact R262 payload reconstruction at the shared R259 gate.
+    bool resourceBehaviorPayloadSnapshotMatches{};
     bool resourceBehaviorGeometryProofPresent{};
     bool resourceBehaviorTextureProofPresent{};
     bool resourceBehaviorOutputProofPresent{};

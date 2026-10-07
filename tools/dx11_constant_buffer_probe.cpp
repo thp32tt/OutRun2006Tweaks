@@ -6735,6 +6735,37 @@ int main()
         r263MissingSamplerMapping.reviewSnapshotToken == 0,
         "R263 rejects incomplete programmable sampler semantic proof");
 
+    auto r304TamperedR262ForDirectPrerequisite =
+        r262IndexedOutputResourceBehavior;
+    r304TamperedR262ForDirectPrerequisite.surfacePairSnapshotToken += 1ull;
+    const auto r304TamperedDirectPrerequisite =
+        outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
+            r258IndexedSourceRevalidation,
+            r258IndexedSourceRevalidation.snapshotToken,
+            r304TamperedR262ForDirectPrerequisite,
+            r304TamperedR262ForDirectPrerequisite.reviewSnapshotToken,
+            r243InputLayoutReady,
+            r243InputLayoutReady.snapshotToken,
+            r263SemanticTranslation,
+            r263SemanticTranslation.reviewSnapshotToken);
+    require(
+        r304TamperedDirectPrerequisite.resourceBehaviorReviewReady &&
+        r304TamperedDirectPrerequisite.resourceBehaviorSnapshotMatches &&
+        !r304TamperedDirectPrerequisite.
+            resourceBehaviorPayloadSnapshotMatches &&
+        !r304TamperedDirectPrerequisite.resourceBehaviorGeometryProofPresent &&
+        !r304TamperedDirectPrerequisite.resourceBehaviorTextureProofPresent &&
+        !r304TamperedDirectPrerequisite.resourceBehaviorOutputProofPresent &&
+        !r304TamperedDirectPrerequisite.resourceBehaviorCoverageComplete &&
+        !r304TamperedDirectPrerequisite.resourceBehaviorProofPresent &&
+        (r304TamperedDirectPrerequisite.missingPrerequisiteMask & 0x1u) != 0 &&
+        !r304TamperedDirectPrerequisite.activationPrerequisitesSatisfied &&
+        !r304TamperedDirectPrerequisite.boundaryPreserved &&
+        !r304TamperedDirectPrerequisite.reviewReady &&
+        r304TamperedDirectPrerequisite.reviewSnapshotToken == 0 &&
+        r304TamperedDirectPrerequisite.activationSnapshotToken == 0,
+        "R304 rejects R262 payload drift at shared R259 prerequisite gate");
+
     const auto r259IndexedPrerequisiteHandoff =
         outrun::vr::dx11::compose_programmable_activation_prerequisite_handoff(
             r258IndexedSourceRevalidation,
@@ -6755,6 +6786,8 @@ int main()
         r259IndexedPrerequisiteHandoff.cacheKey == programmablePair.cacheKey &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorReviewReady &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorSnapshotMatches &&
+        r259IndexedPrerequisiteHandoff.
+            resourceBehaviorPayloadSnapshotMatches &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorGeometryProofPresent &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorTextureProofPresent &&
         r259IndexedPrerequisiteHandoff.resourceBehaviorOutputProofPresent &&
