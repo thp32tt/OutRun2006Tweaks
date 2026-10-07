@@ -1,0 +1,8 @@
+{
+  "role": "B",
+  "run": "20261007-B234-Q097-411827E-SLANT",
+  "queue_index": 97,
+  "candidate_sha256": "badd611286b63356ea3715f0efd5aafd60241d40544a11fda4d4635a8acde9c3",
+  "status": "B234_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "report": "localization/graphics/role_B/20261007-B234-Q097-411827E-SLANT/B234_411_REPORT.json"
+}

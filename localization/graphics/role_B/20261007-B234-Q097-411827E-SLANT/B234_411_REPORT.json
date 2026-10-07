@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261007-B234-Q097-411827E-SLANT",
+  "queue_index": 97,
+  "work_stolen_from_lane": "A",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+  "selection_reason": "B even shard exhausted active material P0/P1, direct C REWORK, RENDER_READY and ONE_STAGE; oldest current PRE_INGAME style false-negative selected from A shard after fresh queue/HEAD check",
+  "trigger": "PRE_INGAME_005_CURRENT_POLICY_SLANT_FALSE_NEGATIVE",
+  "review_jpg": "localization/graphics/role_C/PRE_INGAME_JPG_REVIEW/005_q097_411827E.jpg",
+  "defect": "A_RECOVERY04 rows seconds/TUNED/NORMAL/RANDOM were native but upright while canonical English source is visibly right-italic; current readable-slant/source-style hard gate invalidates C87 visual PASS for those four rows",
+  "source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+  "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "before_candidate_sha256": "c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e",
+  "candidate_sha256": "badd611286b63356ea3715f0efd5aafd60241d40544a11fda4d4635a8acde9c3",
+  "rows": [
+    {
+      "key": "seconds",
+      "source": "seconds",
+      "korean": "초",
+      "original_bbox": [
+        1237,
+        62,
+        1584,
+        144
+      ],
+      "before_localized_bbox": [
+        1368,
+        63,
+        1452,
+        143
+      ],
+      "final_localized_bbox": [
+        1368,
+        64,
+        1453,
+        142
+      ],
+      "source_size": [
+        347,
+        82
+      ],
+      "final_size": [
+        85,
+        78
+      ],
+      "margins": [
+        131,
+        131,
+        2,
+        2
+      ],
+      "visual_right_shear": 0.18,
+      "fit_scale_after_shear": 0.975,
+      "construction": "exact prior Korean raster/effect extracted against A_RECOVERY04 validated CLEAN then right-sheared at native resolution",
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "tuned",
+      "source": "TUNED",
+      "korean": "튜닝",
+      "original_bbox": [
+        843,
+        851,
+        1154,
+        965
+      ],
+      "before_localized_bbox": [
+        904,
+        852,
+        1093,
+        964
+      ],
+      "final_localized_bbox": [
+        902,
+        853,
+        1094,
+        963
+      ],
+      "source_size": [
+        311,
+        114
+      ],
+      "final_size": [
+        192,
+        110
+      ],
+      "margins": [
+        59,
+        60,
+        2,
+        2
+      ],
+      "visual_right_shear": 0.18,
+      "fit_scale_after_shear": 0.982143,
+      "construction": "exact prior Korean raster/effect extracted against A_RECOVERY04 validated CLEAN then right-sheared at native resolution",
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "normal",
+      "source": "NORMAL",
+      "korean": "일반",
+      "original_bbox": [
+        1235,
+        851,
+        1546,
+        965
+      ],
+      "before_localized_bbox": [
+        1292,
+        852,
+        1488,
+        964
+      ],
+      "final_localized_bbox": [
+        1292,
+        853,
+        1488,
+        963
+      ],
+      "source_size": [
+        311,
+        114
+      ],
+      "final_size": [
+        196,
+        110
+      ],
+      "margins": [
+        57,
+        58,
+        2,
+        2
+      ],
+      "visual_right_shear": 0.18,
+      "fit_scale_after_shear": 0.982143,
+      "construction": "exact prior Korean raster/effect extracted against A_RECOVERY04 validated CLEAN then right-sheared at native resolution",
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "random",
+      "source": "RANDOM",
+      "korean": "무작위",
+      "original_bbox": [
+        1627,
+        856,
+        1901,
+        965
+      ],
+      "before_localized_bbox": [
+        1630,
+        857,
+        1898,
+        964
+      ],
+      "final_localized_bbox": [
+        1629,
+        858,
+        1899,
+        963
+      ],
+      "source_size": [
+        274,
+        109
+      ],
+      "final_size": [
+        270,
+        105
+      ],
+      "margins": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "visual_right_shear": 0.18,
+      "fit_scale_after_shear": 0.981308,
+      "construction": "exact prior Korean raster/effect extracted against A_RECOVERY04 validated CLEAN then right-sheared at native resolution",
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_qa": {
+    "lines_reworked": 4,
+    "bbox_source_size_positive_margin": "4/4 PASS",
+    "changed_pixels_outside_four_exact_source_bboxes": 0,
+    "alpha_changes_outside_four_exact_source_bboxes": 0,
+    "localized_pair_overlap": 0,
+    "untouched_automatic_engine_recommendation_and_protected_art": "PIXEL_EXACT_TO_C87",
+    "header_128_exact": true,
+    "mip_count": 1,
+    "raw_orientation": "mirror_y",
+    "persisted_decode_matches_intended": "PASS"
+  },
+  "ordered_generation_gate": {
+    "1_plate_restoration": "PASS_REUSED_A_RECOVERY04_VALIDATED_CLEAN",
+    "2_slant_direction": "PASS_RIGHT_LEAN_0.18_NATIVE_TRANSFORM",
+    "3_no_unnecessary_undersizing": "PASS_HEIGHT_RETAINED_NEAR_SOURCE; RANDOM_WIDTH_REFIT_ONLY_IF_REQUIRED",
+    "4_source_weight_outline_shadow": "PASS_EXACT_C87_RASTER_EFFECT_BASE_TRANSFORMED",
+    "5_no_clipping": "PASS_4_OF_4_POSITIVE_MARGIN",
+    "6_protected_clearance": "PASS_ZERO_BLAST_OUTSIDE_FOUR_BBOXES",
+    "7_flip_y_raw": "EVIDENCE_WRITTEN",
+    "8_immediate_readability": "PENDING_CONTROLLER_VISUAL"
+  },
+  "post_encode_presentation_gate": {
+    "decoded_persisted_dds_authority": "PASS",
+    "practical_scales": [
+      "100%",
+      "50%",
+      "25%"
+    ],
+    "family_profile": "SOURCE_RIGHT_ITALIC_SELECTOR_LABELS",
+    "blast_radius": "PASS_ZERO_OUTSIDE_REWORK",
+    "coverage": "UNCHANGED_7_SEMANTIC_ROWS"
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER",
+  "status": "B234_WORKER_STATIC_PASS_PENDING_CONTROLLER_FRESH_C_C3",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
