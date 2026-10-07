@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # C240 C1 q107 841E796B fresh independent C + C3 evidence
 # TEMP_BACKLOG_RELIEF=C1 / SHARD=ODD(+UNINDEXED_SPECIAL)
-import os, io, json, hashlib, subprocess
+import os, io, json, hashlib, subprocess, urllib.request
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageOps, ImageDraw, ImageFont
@@ -47,8 +47,7 @@ def flip_box(box,H):
 
 cb=candidate.read_bytes()
 if sha(cb)!=CURRENT_SHA: raise SystemExit("candidate SHA drift: "+sha(cb))
-sb,source_prov=find_exact(SOURCE_SHA,asset.name)
-pb,prior_prov=find_exact(PRIOR_C103_SHA,asset.name)
+SRC_COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"\nsrc_url=f"https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/{SRC_COMMIT}/Release/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds"\nreq=urllib.request.Request(src_url,headers={"User-Agent":"OutRun-C240"})\nwith urllib.request.urlopen(req,timeout=90) as resp: sb=resp.read()\nif sha(sb)!=SOURCE_SHA: raise SystemExit(f"source SHA drift {sha(sb)}")\nsource_prov={"repo":"Sonic-TV/OR2006Sprites","commit":SRC_COMMIT,"url":src_url}\npb,prior_prov=find_exact(PRIOR_C103_SHA,asset.name)
 src=decode(sb); prior=decode(pb); cur=decode(cb)
 if src.size!=prior.size or prior.size!=cur.size: raise SystemExit(f"dimension mismatch {src.size} {prior.size} {cur.size}")
 W,H=cur.size
