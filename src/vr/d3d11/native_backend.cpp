@@ -774,6 +774,37 @@ std::uint64_t r289_programmable_production_semantic_review_snapshot_token(
     return token == 0 ? 1 : token;
 }
 
+std::uint64_t r292_programmable_production_activation_prerequisite_snapshot_token(
+    const NativeProgrammableShaderProductionActivationPrerequisiteEvidence&
+        observation) noexcept {
+    if (!observation.reviewReady)
+        return 0;
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(token, observation.cacheKey);
+    token = mix_readiness_snapshot_token(
+        token, observation.productionSemanticReviewSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.sourceRevalidationSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.resourceBehaviorSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.prerequisiteHandoffSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, observation.missingPrerequisiteMask);
+    token = mix_readiness_snapshot_token(
+        token, observation.staticPrerequisitesSatisfied ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.objectBindingAuthorized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.nativeDrawPathActivationAllowed ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.drawDispatchAuthorized ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, observation.boundaryPreserved ? 1u : 0u);
+    token = mix_readiness_snapshot_token(token, 0x292u);
+    return token == 0 ? 1 : token;
+}
+
 HRESULT create_device(
     IDXGIAdapter* adapter,
     UINT flags,
@@ -6250,6 +6281,183 @@ validate_semantic_translation_review_snapshot(
 
     return r289_programmable_production_semantic_review_snapshot_token(review) ==
         reviewSnapshotToken;
+}
+
+NativeProgrammableShaderProductionActivationPrerequisiteEvidence
+observe_programmable_shader_production_activation_prerequisites(
+    const NativeProgrammableShaderProductionSemanticReviewEvidence&
+        productionSemanticReview,
+    std::uint64_t productionSemanticReviewSnapshotToken,
+    const NativeProgrammableShaderDormantSourceRevalidationReadiness&
+        sourceRevalidation,
+    std::uint64_t sourceRevalidationSnapshotToken,
+    const NativeProgrammableShaderOutputResourceBehaviorReadiness&
+        resourceBehavior,
+    std::uint64_t resourceBehaviorSnapshotToken) noexcept {
+    NativeProgrammableShaderProductionActivationPrerequisiteEvidence out{};
+    out.diagnosticOnly = true;
+    out.cacheKey = productionSemanticReview.cacheKey;
+    out.productionSemanticReviewSnapshotToken =
+        productionSemanticReviewSnapshotToken;
+    out.sourceRevalidationSnapshotToken = sourceRevalidationSnapshotToken;
+    out.resourceBehaviorSnapshotToken = resourceBehaviorSnapshotToken;
+
+    out.inputValid =
+        productionSemanticReviewSnapshotToken != 0 &&
+        sourceRevalidationSnapshotToken != 0 &&
+        resourceBehaviorSnapshotToken != 0 &&
+        out.cacheKey != 0;
+    out.productionSemanticReviewReady =
+        productionSemanticReview.reviewReady &&
+        productionSemanticReview.diagnosticOnly &&
+        productionSemanticReview.boundaryPreserved &&
+        !productionSemanticReview.objectBindingAuthorized &&
+        !productionSemanticReview.nativeDrawPathActivationAllowed &&
+        !productionSemanticReview.drawDispatchAuthorized;
+    out.productionSemanticReviewSnapshotMatches =
+        out.productionSemanticReviewReady &&
+        productionSemanticReview.reviewSnapshotToken ==
+            productionSemanticReviewSnapshotToken &&
+        r289_programmable_production_semantic_review_snapshot_token(
+            productionSemanticReview) ==
+            productionSemanticReviewSnapshotToken;
+
+    out.sourceRevalidationReady =
+        sourceRevalidation.ready &&
+        sourceRevalidation.boundaryPreserved &&
+        sourceRevalidation.cacheKey != 0;
+    out.sourceRevalidationSnapshotMatches =
+        out.sourceRevalidationReady &&
+        sourceRevalidation.snapshotToken ==
+            sourceRevalidationSnapshotToken;
+    out.resourceBehaviorReady =
+        resourceBehavior.reviewReady &&
+        resourceBehavior.boundaryPreserved &&
+        resourceBehavior.fullResourceBehaviorProofPresent &&
+        resourceBehavior.missingResourceScopeMask == 0;
+    out.resourceBehaviorSnapshotMatches =
+        out.resourceBehaviorReady &&
+        resourceBehavior.reviewSnapshotToken ==
+            resourceBehaviorSnapshotToken;
+
+    if (out.inputValid &&
+        out.productionSemanticReviewSnapshotMatches &&
+        out.sourceRevalidationSnapshotMatches &&
+        out.resourceBehaviorSnapshotMatches) {
+        out.prerequisites =
+            compose_programmable_activation_prerequisite_handoff(
+                sourceRevalidation,
+                sourceRevalidationSnapshotToken,
+                resourceBehavior,
+                resourceBehaviorSnapshotToken,
+                productionSemanticReview.inputLayout,
+                productionSemanticReview.inputLayoutSnapshotToken,
+                productionSemanticReview.semanticTranslation,
+                productionSemanticReview.semanticTranslationSnapshotToken);
+        out.prerequisiteHandoffReady =
+            out.prerequisites.reviewReady &&
+            out.prerequisites.diagnosticOnly;
+        out.prerequisiteHandoffSnapshotToken =
+            out.prerequisites.reviewSnapshotToken;
+        out.prerequisiteHandoffSnapshotMatches =
+            out.prerequisiteHandoffReady &&
+            validate_programmable_activation_prerequisite_handoff_snapshot(
+                sourceRevalidation,
+                sourceRevalidationSnapshotToken,
+                resourceBehavior,
+                resourceBehaviorSnapshotToken,
+                productionSemanticReview.inputLayout,
+                productionSemanticReview.inputLayoutSnapshotToken,
+                productionSemanticReview.semanticTranslation,
+                productionSemanticReview.semanticTranslationSnapshotToken,
+                out.prerequisiteHandoffSnapshotToken);
+    }
+
+    out.missingPrerequisiteMask =
+        out.prerequisites.missingPrerequisiteMask;
+    out.staticPrerequisitesSatisfied =
+        out.prerequisiteHandoffSnapshotMatches &&
+        out.prerequisites.activationPrerequisitesSatisfied &&
+        out.missingPrerequisiteMask == 0;
+    out.objectBindingAuthorized =
+        productionSemanticReview.objectBindingAuthorized;
+    out.nativeDrawPathActivationAllowed =
+        productionSemanticReview.nativeDrawPathActivationAllowed ||
+        out.prerequisites.nativeDrawPathActivationAllowed;
+    out.drawDispatchAuthorized =
+        productionSemanticReview.drawDispatchAuthorized ||
+        out.prerequisites.drawDispatchAuthorized;
+    out.boundaryPreserved =
+        out.productionSemanticReviewSnapshotMatches &&
+        out.sourceRevalidationSnapshotMatches &&
+        out.resourceBehaviorSnapshotMatches &&
+        out.staticPrerequisitesSatisfied &&
+        out.prerequisites.boundaryPreserved &&
+        out.prerequisites.activationSnapshotToken == 0 &&
+        out.diagnosticOnly &&
+        !out.objectBindingAuthorized &&
+        !out.nativeDrawPathActivationAllowed &&
+        !out.drawDispatchAuthorized;
+    out.reviewReady =
+        out.inputValid &&
+        out.prerequisiteHandoffSnapshotMatches &&
+        out.boundaryPreserved;
+    if (out.reviewReady)
+        out.reviewSnapshotToken =
+            r292_programmable_production_activation_prerequisite_snapshot_token(
+                out);
+    return out;
+}
+
+bool validate_programmable_shader_production_activation_prerequisite_snapshot(
+    const NativeProgrammableShaderProductionSemanticReviewEvidence&
+        productionSemanticReview,
+    std::uint64_t productionSemanticReviewSnapshotToken,
+    const NativeProgrammableShaderDormantSourceRevalidationReadiness&
+        sourceRevalidation,
+    std::uint64_t sourceRevalidationSnapshotToken,
+    const NativeProgrammableShaderOutputResourceBehaviorReadiness&
+        resourceBehavior,
+    std::uint64_t resourceBehaviorSnapshotToken,
+    const NativeProgrammableShaderProductionActivationPrerequisiteEvidence&
+        observation,
+    std::uint64_t reviewSnapshotToken) noexcept {
+    if (!observation.reviewReady ||
+        !observation.boundaryPreserved ||
+        !observation.diagnosticOnly ||
+        observation.objectBindingAuthorized ||
+        observation.nativeDrawPathActivationAllowed ||
+        observation.drawDispatchAuthorized ||
+        !observation.staticPrerequisitesSatisfied ||
+        observation.missingPrerequisiteMask != 0 ||
+        observation.prerequisites.activationSnapshotToken != 0 ||
+        reviewSnapshotToken == 0 ||
+        observation.reviewSnapshotToken != reviewSnapshotToken)
+        return false;
+
+    const auto current =
+        observe_programmable_shader_production_activation_prerequisites(
+            productionSemanticReview,
+            productionSemanticReviewSnapshotToken,
+            sourceRevalidation,
+            sourceRevalidationSnapshotToken,
+            resourceBehavior,
+            resourceBehaviorSnapshotToken);
+    if (!current.reviewReady ||
+        current.cacheKey != observation.cacheKey ||
+        current.productionSemanticReviewSnapshotToken !=
+            observation.productionSemanticReviewSnapshotToken ||
+        current.sourceRevalidationSnapshotToken !=
+            observation.sourceRevalidationSnapshotToken ||
+        current.resourceBehaviorSnapshotToken !=
+            observation.resourceBehaviorSnapshotToken ||
+        current.prerequisiteHandoffSnapshotToken !=
+            observation.prerequisiteHandoffSnapshotToken ||
+        current.reviewSnapshotToken != reviewSnapshotToken)
+        return false;
+
+    return r292_programmable_production_activation_prerequisite_snapshot_token(
+        observation) == reviewSnapshotToken;
 }
 
 bool NativeFixedFunctionPipelineBundle::initialize(

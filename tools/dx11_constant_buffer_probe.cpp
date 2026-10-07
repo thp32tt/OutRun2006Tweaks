@@ -6703,6 +6703,71 @@ int main()
                 r259IndexedPrerequisiteHandoff.reviewSnapshotToken),
         "R259 indexed review handoff consumes exact F18+F21 while activation remains fail-closed");
 
+    const auto r292ProductionActivationPrerequisites =
+        outrun::vr::dx11::
+            observe_programmable_shader_production_activation_prerequisites(
+                r289ProductionSemanticReview,
+                r289ProductionSemanticReview.reviewSnapshotToken,
+                r258IndexedSourceRevalidation,
+                r258IndexedSourceRevalidation.snapshotToken,
+                r262IndexedOutputResourceBehavior,
+                r262IndexedOutputResourceBehavior.reviewSnapshotToken);
+    require(
+        r292ProductionActivationPrerequisites.inputValid &&
+        r292ProductionActivationPrerequisites.productionSemanticReviewReady &&
+        r292ProductionActivationPrerequisites.
+            productionSemanticReviewSnapshotMatches &&
+        r292ProductionActivationPrerequisites.sourceRevalidationReady &&
+        r292ProductionActivationPrerequisites.
+            sourceRevalidationSnapshotMatches &&
+        r292ProductionActivationPrerequisites.resourceBehaviorReady &&
+        r292ProductionActivationPrerequisites.
+            resourceBehaviorSnapshotMatches &&
+        r292ProductionActivationPrerequisites.prerequisiteHandoffReady &&
+        r292ProductionActivationPrerequisites.
+            prerequisiteHandoffSnapshotMatches &&
+        r292ProductionActivationPrerequisites.staticPrerequisitesSatisfied &&
+        r292ProductionActivationPrerequisites.missingPrerequisiteMask == 0 &&
+        !r292ProductionActivationPrerequisites.objectBindingAuthorized &&
+        !r292ProductionActivationPrerequisites.
+            nativeDrawPathActivationAllowed &&
+        !r292ProductionActivationPrerequisites.drawDispatchAuthorized &&
+        r292ProductionActivationPrerequisites.diagnosticOnly &&
+        r292ProductionActivationPrerequisites.boundaryPreserved &&
+        r292ProductionActivationPrerequisites.reviewReady &&
+        r292ProductionActivationPrerequisites.reviewSnapshotToken != 0 &&
+        r292ProductionActivationPrerequisites.prerequisites.
+            activationSnapshotToken == 0 &&
+        outrun::vr::dx11::
+            validate_programmable_shader_production_activation_prerequisite_snapshot(
+                r289ProductionSemanticReview,
+                r289ProductionSemanticReview.reviewSnapshotToken,
+                r258IndexedSourceRevalidation,
+                r258IndexedSourceRevalidation.snapshotToken,
+                r262IndexedOutputResourceBehavior,
+                r262IndexedOutputResourceBehavior.reviewSnapshotToken,
+                r292ProductionActivationPrerequisites,
+                r292ProductionActivationPrerequisites.reviewSnapshotToken),
+        "R292 production activation-prerequisite observation combines exact R289+R258+R262 through R259 without activation");
+
+    const auto r292StaleSemanticReview =
+        outrun::vr::dx11::
+            observe_programmable_shader_production_activation_prerequisites(
+                r289ProductionSemanticReview,
+                r289ProductionSemanticReview.reviewSnapshotToken ^ 0x1ull,
+                r258IndexedSourceRevalidation,
+                r258IndexedSourceRevalidation.snapshotToken,
+                r262IndexedOutputResourceBehavior,
+                r262IndexedOutputResourceBehavior.reviewSnapshotToken);
+    require(
+        r292StaleSemanticReview.productionSemanticReviewReady &&
+        !r292StaleSemanticReview.productionSemanticReviewSnapshotMatches &&
+        !r292StaleSemanticReview.staticPrerequisitesSatisfied &&
+        !r292StaleSemanticReview.boundaryPreserved &&
+        !r292StaleSemanticReview.reviewReady &&
+        r292StaleSemanticReview.reviewSnapshotToken == 0,
+        "R292 rejects stale R289 production semantic review before R259 composition");
+
     auto r290ForeignPairInputLayout = r243InputLayoutReady;
     r290ForeignPairInputLayout.cacheKey ^= 0x1ull;
     if (r290ForeignPairInputLayout.cacheKey == 0)

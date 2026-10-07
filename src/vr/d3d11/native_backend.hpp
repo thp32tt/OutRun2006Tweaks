@@ -3637,6 +3637,7 @@ validate_programmable_shader_translation_admission_snapshot(
 // exact R288 production admission through the existing R263 semantic gate.
 // It reuses the persistent R285/R242 ownership, never accepts a device context,
 // never binds IA/VS/PS state, and cannot authorize NativeDrawPath/Draw*.
+
 struct NativeProgrammableShaderProductionSemanticReviewEvidence {
     bool inputValid{};
     bool ownerReady{};
@@ -3671,6 +3672,64 @@ struct NativeProgrammableShaderProductionSemanticReviewEvidence {
     NativeProgrammableShaderInputLayoutReadiness inputLayout{};
     NativeProgrammableShaderSemanticTranslationReadiness semanticTranslation{};
 };
+
+// R292 combines the current R289 production semantic review with the exact
+// dormant R258 source and R262 full-F18 resource receipts, then reuses the
+// R259/R290 prerequisite gate. Static prerequisites may be observed complete,
+// but this evidence is diagnostic-only and never creates binding/draw authority.
+struct NativeProgrammableShaderProductionActivationPrerequisiteEvidence {
+    bool inputValid{};
+    bool productionSemanticReviewReady{};
+    bool productionSemanticReviewSnapshotMatches{};
+    bool sourceRevalidationReady{};
+    bool sourceRevalidationSnapshotMatches{};
+    bool resourceBehaviorReady{};
+    bool resourceBehaviorSnapshotMatches{};
+    bool prerequisiteHandoffReady{};
+    bool prerequisiteHandoffSnapshotMatches{};
+    bool staticPrerequisitesSatisfied{};
+    bool objectBindingAuthorized{};
+    bool nativeDrawPathActivationAllowed{};
+    bool drawDispatchAuthorized{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    std::uint32_t missingPrerequisiteMask{};
+    std::uint64_t cacheKey{};
+    std::uint64_t productionSemanticReviewSnapshotToken{};
+    std::uint64_t sourceRevalidationSnapshotToken{};
+    std::uint64_t resourceBehaviorSnapshotToken{};
+    std::uint64_t prerequisiteHandoffSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+    NativeProgrammableShaderActivationPrerequisiteHandoff prerequisites{};
+};
+
+[[nodiscard]] NativeProgrammableShaderProductionActivationPrerequisiteEvidence
+observe_programmable_shader_production_activation_prerequisites(
+    const NativeProgrammableShaderProductionSemanticReviewEvidence&
+        productionSemanticReview,
+    std::uint64_t productionSemanticReviewSnapshotToken,
+    const NativeProgrammableShaderDormantSourceRevalidationReadiness&
+        sourceRevalidation,
+    std::uint64_t sourceRevalidationSnapshotToken,
+    const NativeProgrammableShaderOutputResourceBehaviorReadiness&
+        resourceBehavior,
+    std::uint64_t resourceBehaviorSnapshotToken) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_shader_production_activation_prerequisite_snapshot(
+    const NativeProgrammableShaderProductionSemanticReviewEvidence&
+        productionSemanticReview,
+    std::uint64_t productionSemanticReviewSnapshotToken,
+    const NativeProgrammableShaderDormantSourceRevalidationReadiness&
+        sourceRevalidation,
+    std::uint64_t sourceRevalidationSnapshotToken,
+    const NativeProgrammableShaderOutputResourceBehaviorReadiness&
+        resourceBehavior,
+    std::uint64_t resourceBehaviorSnapshotToken,
+    const NativeProgrammableShaderProductionActivationPrerequisiteEvidence&
+        observation,
+    std::uint64_t reviewSnapshotToken) noexcept;
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
 // input layout, and R96 transform buffer. No game draw path constructs or

@@ -11472,6 +11472,37 @@ def main() -> None:
             + ", ".join(missing_r291_programmable_runtime_semantic_review)
         )
 
+    r292_programmable_production_activation_prerequisite = [
+        ("NativeProgrammableShaderProductionActivationPrerequisiteEvidence",
+         NATIVE_BACKEND_HPP, "R292 explicit production prerequisite observation"),
+        ("observe_programmable_shader_production_activation_prerequisites(",
+         NATIVE_BACKEND_HPP, "R292 production prerequisite observer declaration"),
+        ("validate_programmable_shader_production_activation_prerequisite_snapshot(",
+         NATIVE_BACKEND_HPP, "R292 production prerequisite validator declaration"),
+        ("r292_programmable_production_activation_prerequisite_snapshot_token(",
+         NATIVE_BACKEND_CPP, "R292 independent observation snapshot domain"),
+        ("compose_programmable_activation_prerequisite_handoff(",
+         NATIVE_BACKEND_CPP, "R292 reuses exact R259/R290 static prerequisite gate"),
+        ("out.prerequisites.activationSnapshotToken == 0",
+         NATIVE_BACKEND_CPP, "R292 keeps activation authority fail-closed"),
+        ("R292 production activation-prerequisite observation combines exact R289+R258+R262 through R259 without activation",
+         CONSTANT_BUFFER_PROBE, "R292 exact hosted production prerequisite regression"),
+        ("R292 rejects stale R289 production semantic review before R259 composition",
+         CONSTANT_BUFFER_PROBE, "R292 stale production semantic review regression"),
+    ]
+    missing_r292_programmable_production_activation_prerequisite = [
+        meaning for token, source, meaning
+        in r292_programmable_production_activation_prerequisite
+        if token not in source
+    ]
+    if missing_r292_programmable_production_activation_prerequisite:
+        raise SystemExit(
+            "DX11 R292 programmable production activation-prerequisite drift: "
+            + ", ".join(
+                missing_r292_programmable_production_activation_prerequisite
+            )
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),
