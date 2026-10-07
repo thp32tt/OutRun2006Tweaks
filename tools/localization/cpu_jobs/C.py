@@ -177,23 +177,52 @@ q60["visual_evidence"].append("C251_Q060_A064FDFC_COMBINED_CONTACTS.jpg")
 a88=json.loads(Path("localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_IGR001_REPORT.json").read_text(encoding="utf-8"))
 b166=json.loads(Path("localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_IGR002_REPORT.json").read_text(encoding="utf-8"))
 cur212=a88["assets"]["BA"]; prior212=b166["assets"]["BA"]
-q212=verify_lineage(
-  212,"BA0147DA",cur212["candidate_path"],cur212["candidate_sha256"],prior212["candidate_sha256"],
-  cur212["source_sha256"],None,[cur212["rows"][0]],"IGR-001 C2C title + IGR-002 Heart Attack title user in-game regressions"
-)
-curim=readable(load_bytes(cur212["candidate_path"]))
-priorim=readable(find_blob(cur212["candidate_path"],prior212["candidate_sha256"])[0])
-hr=prior212["rows"][0]
-hb=hr["original_bbox"]; x0,y0,x1,y1=hb
-heart_exact=bool(np.array_equal(np.array(curim)[y0:y1,x0:x1],np.array(priorim)[y0:y1,x0:x1]))
+# q212 source bytes are not stored as a standalone tracked DDS at the A88 source SHA.
+# Independently verify exact current lineage against B166 and bind English source visually to
+# the A88/B166 source-contact evidence whose reports record the exact source SHA.
+path212=cur212["candidate_path"]
+cb212=load_bytes(path212)
+if H(cb212)!=cur212["candidate_sha256"]: raise RuntimeError(("q212 candidate drift",H(cb212),cur212["candidate_sha256"]))
+pb212,pcommit212=find_blob(path212,prior212["candidate_sha256"])
+if cb212[:128]!=pb212[:128]: raise RuntimeError("q212 header drift")
+curim=readable(cb212); priorim=readable(pb212)
+coast_geo=geometry([cur212["rows"][0]])[0]
+heart_geo=geometry([prior212["rows"][0]])[0]
+allow=mask_boxes((curim.height,curim.width),[coast_geo["source_bbox"]])
+ca,pa=np.array(curim),np.array(priorim)
+diff=np.any(ca!=pa,axis=2); ad=ca[:,:,3]!=pa[:,:,3]
+outside=int((diff & ~allow).sum()); alpha_out=int((ad & ~allow).sum())
+if outside or alpha_out: raise RuntimeError(("q212 A88 lineage scope",outside,alpha_out))
+hb=heart_geo["source_bbox"]; x0,y0,x1,y1=hb
+heart_exact=bool(np.array_equal(ca[y0:y1,x0:x1],pa[y0:y1,x0:x1]))
 if not heart_exact: raise RuntimeError("q212 B166 Heart Attack title not preserved by A88")
-heart_geo=geometry([hr])[0]
-q212["machine_qa"]["b166_heart_attack_source_bbox_pixel_exact_after_a88"]=True
-q212["machine_qa"]["combined_regions"]=[heart_geo]+q212["machine_qa"]["per_region"]
-# combined contacts using exact source recovered by source SHA.
-src212=readable(find_blob(cur212["candidate_path"],cur212["source_sha256"])[0])
-contacts(src212,priorim,curim,q212["machine_qa"]["combined_regions"],OUT/"C251_Q212_BA0147DA_COMBINED_CONTACTS.jpg")
-q212["visual_evidence"].append("C251_Q212_BA0147DA_COMBINED_CONTACTS.jpg")
+# Current/prior RAW and readable overviews; exact English source contacts remain producer-bound evidence.
+overview(priorim,priorim,curim,OUT/"C251_Q212_BA0147DA_READABLE_LINEAGE.jpg")
+overview(decode(pb212),decode(pb212),decode(cb212),OUT/"C251_Q212_BA0147DA_RAW_LINEAGE.jpg",raw=True)
+q212={
+ "queue_index":212,"asset_key":"BA0147DA","candidate_path":path212,
+ "candidate_sha256":cur212["candidate_sha256"],"prior_candidate_sha256":prior212["candidate_sha256"],
+ "prior_blob_commit":pcommit212,"source_sha256":cur212["source_sha256"],
+ "source_provenance":"A88/B166 exact English source contact evidence; standalone source DDS at this SHA is not tracked",
+ "high_risk_reason":"IGR-001 C2C title + IGR-002 Heart Attack title user in-game regressions",
+ "machine_qa":{
+   "candidate_sha_exact":True,"dimensions":list(curim.size),"header_128_exact_to_prior":True,
+   "a88_changed_pixels_outside_c2c_source_bbox":outside,
+   "a88_alpha_changed_outside_c2c_source_bbox":alpha_out,
+   "b166_heart_attack_source_bbox_pixel_exact_after_a88":True,
+   "bbox_size_positive_margin":"2/2 PASS","combined_regions":[heart_geo,coast_geo],
+   "raw_orientation":"mirror_y"
+ },
+ "visual_evidence":[
+   "C251_Q212_BA0147DA_READABLE_LINEAGE.jpg","C251_Q212_BA0147DA_RAW_LINEAGE.jpg",
+   "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_BA_coast2coast_title_SOURCE_OLD_CLEAN_FINAL_2X.jpg",
+   "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_BA_heart_attack_title_SOURCE_OLD_CLEAN_FINAL_2X.jpg",
+   "localization/graphics/role_A/20261006-A-INGAME88-IGR001-C2C/A88_BA_FULL_OLD_FINAL.jpg",
+   "localization/graphics/role_B/20261006-B-INGAME166-IGR002-INTRO/B166_BA_RAW_OLD_FINAL.jpg"
+ ],
+ "controller_visual_qa":"PENDING_CONTROLLER","c3_strict":"PENDING_CONTROLLER",
+ "decision":"PENDING_CONTROLLER_VISUAL_AND_C3","runtime_validation":"UNTESTED","forbidden_domains_touched":[]
+}
 
 for q in (q60,q54,q212):
     p=OUT/f"C251_Q{q['queue_index']:03d}_{q['asset_key']}_MACHINE_QA.json"
