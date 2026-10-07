@@ -50,3 +50,19 @@ The analyzer extracts:
 - active font handle/texture/cell/scale/spacing state.
 
 This is the preferred input to K3-A implementation decisions.
+
+
+## Rework blast-radius QA
+
+When repairing only part of an existing localized candidate, validate both normal source containment and collateral changes against the previous candidate:
+
+```bash
+python tools/localization/validate_clean_plate.py \
+  source.png new_candidate.png edit_mask.png \
+  --protected-mask protected.png \
+  --baseline-candidate previous_candidate.png \
+  --rework-mask intended_rework_mask.png \
+  --report qa.json
+```
+
+The command fails when the new candidate changes any pixel outside `intended_rework_mask.png` relative to the previous candidate. This catches collateral regressions that ordinary source-vs-candidate edit containment cannot detect.

@@ -198,3 +198,55 @@ For the same candidate SHA, inspect:
 - A previous C3 pass is invalidated when candidate bytes, source/clean provenance, user/JPG/in-game evidence, or this quality policy materially changes.
 - C3 does not imply runtime/in-game validation. Keep runtime state unchanged unless the game was actually tested.
 - Record candidate/source hashes, comparison evidence, the eight ordered findings, and final C3 result in role_C evidence/WORKLOG so unchanged assets are rotated rather than repeatedly rechecked.
+
+
+## Post-encode and presentation hardening gate
+
+This gate closes false negatives that survive source/CLEAN/FINAL static review but appear after DDS encoding, scaling, family comparison, or actual game composition. It applies to every new or materially reworked graphics candidate in addition to the existing containment, visual, C, C3 and in-game gates.
+
+### Decoded-DDS authority
+- The QA image for a deployable candidate MUST be decoded from the exact persisted DDS candidate bytes. A pre-encode PNG/render is construction evidence only and cannot be the final QA authority.
+- Preserve and verify DDS dimensions, pixel format/compression, alpha semantics, mip count/order and raw orientation against the exact source.
+- For uncompressed/lossless DDS paths, unexpected pixel differences between the intended pre-encode image and the decoded persisted DDS are FAIL.
+- For BC/DXT or other lossy paths, inspect the decoded persisted pixels for broken Hangul strokes, ringing/block artifacts, alpha halos, outline/shadow loss, color shift and new edge contact. Numeric format/header success cannot override a visible decoded-pixel defect.
+
+### Mip and practical-display-scale gate
+- When the source/candidate uses authored mip levels, inspect every text-bearing mip that can be selected by the game. Missing decoded evidence for a text-bearing mip is `HOLD_STRICT_RECHECK`, not PASS.
+- A mip is FAIL if a Hangul stroke/effect disappears, merges with a neighbor, becomes clipped, gains a block/halo artifact, loses required outline/shadow hierarchy, or becomes materially less readable than the corresponding source presentation.
+- In addition to native/high-zoom review, inspect the decoded final at the known runtime render scale when known. When that scale is not known, retain practical-size review evidence at 100%, 75% and 50% as a proxy. Proxy scaling never substitutes for actual in-game validation.
+- Practical-size review is judged on immediate readability, glyph integrity, color/contrast, outline/effect survival and separation from nearby/protected artwork.
+
+### UI-family style-profile gate
+- Every localized graphics asset MUST be assigned to a source UI family or explicitly marked standalone.
+- For a shared family, record/reuse a source-derived style profile covering font-family impression, width/height proportion, weight, readable slant/perspective direction, baseline/alignment, fill/gradient family, outline thickness, shadow/glow direction and relative text hierarchy.
+- C must compare each candidate against both its English source and already accepted members of the same family. A candidate that is individually contained but visibly looks like a different font/resolution/effect family is FAIL.
+- Do not impose arbitrary global numeric tolerances where the source family intentionally varies; the source family is the reference.
+
+### Rework blast-radius gate
+- A material rework MUST pin the immediately preceding candidate bytes when they exist and define the intended rework mask/region.
+- Compare previous candidate -> new candidate. Any changed pixel outside the declared rework mask is FAIL unless that extra region is explicitly documented as part of the same repair.
+- This check is independent of source-vs-candidate edit containment: a pixel may be inside the historical source edit region yet still be an unintended collateral change for the current rework.
+- Use `tools/localization/validate_clean_plate.py --baseline-candidate ... --rework-mask ...` where decoded RGBA evidence is available.
+
+### Localization coverage / omission gate
+- Every visible source segment classified as localizable must resolve to exactly one current outcome: localized Korean, explicit policy-approved preserve-original, or a fail-closed blocker/HOLD.
+- An unaccounted English UI label is FAIL even when every rendered Korean segment passes. Preserve-brand/song/credit exceptions must remain explicit and traceable to policy.
+- A/B/C must check the asset transcription/segment specification against the final candidate so a skipped cell/row cannot disappear from QA merely because no Korean pixels were produced there.
+
+### Mandatory C3 for high-risk candidates
+The following candidates MUST receive a fresh `C3_STRICT_AUDIT` for the same current candidate bytes before entering the current PRE_INGAME JPG set, even when normal C static QA passes:
+- any asset previously rejected by actual in-game review or PRE_INGAME JPG review;
+- BC/DXT-compressed text or text-bearing authored mip chains;
+- textured/gradient/transparent clean-plate reconstruction;
+- slanted, italic, perspective, rotated or multi-line typography;
+- small text or text close to protected artwork/neighboring atlas content;
+- any candidate whose font/style-family mismatch, low-resolution rendering, clipping, residue, color/effect mismatch or hierarchy has previously produced a false-negative;
+- any asset whose correctness materially depends on final runtime composition rather than isolated DDS appearance.
+
+If required C3 evidence is missing, the candidate remains `HOLD_STRICT_RECHECK` or pending C3 and MUST NOT be exported as current C-pass PRE_INGAME evidence.
+
+### Runtime-composite and golden-screenshot regression
+- Once a defect or approved state has actual in-game screenshot evidence, retain the relevant screen/region as regression evidence tied to the exact asset/runtime mapping and candidate hash.
+- For later changes, compare the same UI region at equivalent game state/resolution when reproducible. Mask dynamic scenery/vehicles/timers only when necessary; never mask the localized label, its plate, or adjacent protected UI.
+- New clipping, collision, residue, hierarchy change, contrast loss, wrong color/effect, or newly untranslated text relative to the accepted screen is FAIL.
+- Golden screenshot regression supplements but does not replace a fresh human in-game review when candidate bytes or runtime draw behavior change.

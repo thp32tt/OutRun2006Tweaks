@@ -2806,3 +2806,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Machine PASS: prior help rows exact source 2/2; source/final bbox-size-positive-margin 2/2; localized height 46px vs source 50px; changed/alpha outside exact source bboxes=0; visible source residue=0; overlap/touch=0; exact RGBA header/raw mirror_y PASS.
 - Controller SOURCE/C149/B228 full + 2-row + RAW visual PASS: both ordinary explanatory sentences are now Korean, source-like dark upright/low-contrast style and near-source height are preserved, and no English residue, clipping, overlap, protected intrusion or orientation regression is visible. Existing B73 localization, protected song/named-item titles and BGM remain unchanged outside the two source bboxes.
 - Decision C230_PIXEL_VISUAL_POLICY_PASS_PENDING_USER_JPG_AND_INGAME. PRE_INGAME English-original comparison refresh dispatched next; actual game validation remains UNTESTED. VR/FFB/DX11/DXVK untouched.
+
+
+## 2026-10-07 12:10 KST - QA-HARDENING-POST-ENCODE
+
+- Reviewed actual in-game/PRE_INGAME JPG false-negative patterns against the current graphics QA pipeline.
+- Added decoded-persisted-DDS authority, text-bearing mip review, practical display-scale review, UI-family style-profile consistency, localization coverage/omission checks, rework blast-radius isolation and runtime/golden-screenshot regression requirements.
+- Made C3_STRICT_AUDIT mandatory before PRE_INGAME export for high-risk candidates, including prior user-visible failures, BC/DXT or text-bearing mip chains, reconstruction-heavy plates, transformed/multi-line/small text and prior style/typography false-negatives.
+- Extended `validate_clean_plate.py` with previous-candidate + rework-mask blast-radius QA: any collateral pixel change outside the declared repair region is `REWORK_REQUIRED`.
+- This policy hardening does not claim runtime validation; actual game evidence remains the final gate.
