@@ -78,13 +78,21 @@ for a in ASSETS:
     sr,sm=decode_dds(sb); cr,cm=decode_dds(cb)
     if sm!=cm or sb[:128]!=cb[:128]: raise RuntimeError((a["key"],"structure/header drift",sm,cm))
     src=ImageOps.flip(sr); cur=ImageOps.flip(cr)
-    clean=Image.open(repo/a["clean"]).convert("RGBA")
-    if clean.size!=src.size: raise RuntimeError((a["key"],"clean size",clean.size,src.size))
-    sa,ca,k=np.asarray(src),np.asarray(cur),np.asarray(clean)
+    clean0=Image.open(repo/a["clean"]).convert("RGBA")
+    if clean0.size!=src.size: raise RuntimeError((a["key"],"clean size",clean0.size,src.size))
+    sa,ca=np.asarray(src),np.asarray(cur)
     H,W=sa.shape[:2]; allowed=np.zeros((H,W),bool)
+    for b in a["rows"]: allowed|=mask_rect((H,W),b)
+    # Historical clean evidence can be stored in RAW or readable orientation.
+    # Choose orientation only by minimum canonical-source difference OUTSIDE exact source text bboxes.
+    clean_candidates=[("AS_STORED",clean0),("FLIP_Y",ImageOps.flip(clean0))]
+    scored=[]
+    for tag,im in clean_candidates:
+        arr=np.asarray(im)
+        scored.append((int(np.count_nonzero(np.any(arr!=sa,axis=2)&~allowed)),tag,im))
+    clean_outside,clean_orientation,clean=min(scored,key=lambda x:x[0])
+    k=np.asarray(clean)
     row_reports=[]; localized_masks=[]
-    for i,b in enumerate(a["rows"]):
-        allowed|=mask_rect((H,W),b)
         x0,y0,x1,y1=b
         diff=np.any(ca!=k,axis=2)&mask_rect((H,W),b)
         lbox=bbox(diff); localized_masks.append(diff)
@@ -108,6 +116,7 @@ for a in ASSETS:
       "clean_current_changed_outside_source_bboxes":int(np.count_nonzero(clean_cur&~allowed)),
       "clean_current_alpha_outside_source_bboxes":int(np.count_nonzero(clean_cur_a&~allowed)),
       "clean_source_changed_outside_source_bboxes":int(np.count_nonzero(clean_src&~allowed)),
+      "clean_orientation_selected":clean_orientation,
       "localized_pair_overlap_pixels":overlap,
       "header_128_exact":sb[:128]==cb[:128]
     }
