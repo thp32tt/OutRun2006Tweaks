@@ -71,7 +71,24 @@ exact_int_array(
 exact_int_array(
     uiscale,
     "ExactScreenHud_ClipSpriteCalls",
-    [0x460F1, 0x463D6, 0x46410, 0x97BB7, 0x97DA7],
+    [0x460F1, 0x463D6, 0x46410, 0x97BB7, 0x97DA7,
+     0xBDB0E, 0xBDB2D, 0xBDB4C, 0xBDB8E,
+     0xBE311, 0xBE343, 0xBE3E3, 0xBE424, 0xBE45D],
+)
+exact_int_array(
+    uiscale,
+    "ExactScreenHudRight_ClipSpriteCalls",
+    [0xB9F3A, 0xB9F5E, 0xB9F81, 0xB9FD0,
+     0xB9FFC, 0xBA01E, 0xBA035, 0xBA052,
+     0xBD32E, 0xBD397, 0xBD414, 0xBD472,
+     0xBE5CD, 0xBE603, 0xBE633, 0xBE66D, 0xBE690,
+     0xBE6B5, 0xBE6D5, 0xBE7E8, 0xBE802, 0xBE81C,
+     0xBE8D8, 0xBE915, 0xBE94A, 0xBE97A, 0xBE9A3],
+)
+exact_int_array(
+    uiscale,
+    "ExactScreenHudLeft_ClipSpriteCalls",
+    [0xB9096, 0xB90B3],
 )
 exact_int_array(uiscale, "TextGlyph_PutSpriteCalls", [0x2C808, 0x2C9DB])
 
@@ -119,17 +136,22 @@ glyph_pos = [glyph_body.find(m) for m in glyph_markers]
 if min(glyph_pos) < 0 or glyph_pos != sorted(glyph_pos):
     fail("exact text glyph producer must tag only the newly appended node as ScreenHud")
 
-time_body = function_body(uiscale, "static void TimeRecord_AdjustPositionAndHud(")
-if "AddSpriteSpacing((int*)(ctx.esp + 4), false);" not in time_body:
-    fail("TimeRecord HUD hook lost its original position adjustment")
-if "OutRunVR::GameSemantic::ArmNextDraw(" not in time_body or         "OutRunVR::GameSemantic::RenderScope::ScreenHud" not in time_body:
-    fail("TimeRecord HUD hook must arm the next draw as ScreenHud")
+right_clip = function_body(uiscale, "static int __cdecl ExactScreenHudRight_putClipSprite(")
+if "AddSpriteSpacing(&x, false);" not in right_clip or "ExactScreenHud_putClipSprite(" not in right_clip:
+    fail("right-side exact HUD wrapper must preserve spacing then register ScreenHud")
+left_clip = function_body(uiscale, "static int __cdecl ExactScreenHudLeft_putClipSprite(")
+if "AddSpriteSpacing(&x, true);" not in left_clip or "ExactScreenHud_putClipSprite(" not in left_clip:
+    fail("left-side exact HUD wrapper must preserve spacing then register ScreenHud")
 
 apply_body = function_body(uiscale, "bool apply() override")
 for marker in (
     "for (int addr : OptionArrow_ClipSpriteCalls)",
     "Module::exe_ptr(addr), ExactScreenHud_putClipSprite",
     "for (int addr : ExactScreenHud_ClipSpriteCalls)",
+    "for (int addr : ExactScreenHudRight_ClipSpriteCalls)",
+    "Module::exe_ptr(addr), ExactScreenHudRight_putClipSprite",
+    "for (int addr : ExactScreenHudLeft_ClipSpriteCalls)",
+    "Module::exe_ptr(addr), ExactScreenHudLeft_putClipSprite",
     "Module::exe_ptr(RivalMarker_SpraniCall)",
     "RivalMarker_sprani, Memory::HookType::Call",
     "for (int addr : TextGlyph_PutSpriteCalls)",
@@ -138,19 +160,18 @@ for marker in (
     if marker not in apply_body:
         fail(f"restored HUD producer install path missing: {marker}")
 
-time_matches = re.findall(
-    r"DispTimeAttack2D_put_scroll_AdjustPosition_hk\d*\s*=\s*"
-    r"safetyhook::create_mid\(\(void\*\)(0x[0-9A-Fa-f]+),\s*"
-    r"TimeRecord_AdjustPositionAndHud\);",
-    apply_body,
-)
-expected_time = [
-    0x4BE5CD, 0x4BE603, 0x4BE633, 0x4BE66D, 0x4BE690,
-    0x4BE6B5, 0x4BE6D5, 0x4BE8D8, 0x4BE915, 0x4BE94A,
-    0x4BE97A, 0x4BE9A3, 0x4BE7E8, 0x4BE802, 0x4BE81C,
-]
-if [int(v, 16) for v in time_matches] != expected_time:
-    fail("the 15 proven TimeAttack/result HUD handoffs changed")
+for legacy_mid in (
+    "create_mid((void*)0x4BE5CD", "create_mid((void*)0x4BE603",
+    "create_mid((void*)0x4BE633", "create_mid((void*)0x4BE66D",
+    "create_mid((void*)0x4BE690", "create_mid((void*)0x4BE6B5",
+    "create_mid((void*)0x4BE6D5", "create_mid((void*)0x4BE7E8",
+    "create_mid((void*)0x4BE802", "create_mid((void*)0x4BE81C",
+    "create_mid((void*)0x4BE8D8", "create_mid((void*)0x4BE915",
+    "create_mid((void*)0x4BE94A", "create_mid((void*)0x4BE97A",
+    "create_mid((void*)0x4BE9A3",
+):
+    if legacy_mid in apply_body:
+        fail(f"exact TimeAttack call must not stack a mid-hook with its call-site producer: {legacy_mid}")
 
 if "RenderScope fallback = RenderScope::ScreenOverlay2D" not in semantics:
     fail("generic SpriteNode fallback must remain ScreenOverlay2D")
