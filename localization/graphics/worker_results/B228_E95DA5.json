@@ -13,5 +13,7 @@
   "clean_source_remaining": 0,
   "worker_status": "B228_WORKER_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_FRESH_C",
   "runtime_validation": "UNTESTED",
-  "report": "localization/graphics/role_B/20261007-B-MANUALQA228-E95DA5-HELP/B228_E95_REPORT.json"
+  "report": "localization/graphics/role_B/20261007-B-MANUALQA228-E95DA5-HELP/B228_E95_REPORT.json",
+  "controller_status": "B228_SELF_QA_PASS_PENDING_FRESH_INDEPENDENT_C_USER_JPG_AND_INGAME",
+  "controller_report": "localization/graphics/role_B/20261007-B-MANUALQA228-E95DA5-HELP/B228_CONTROLLER_SELF_QA.json"
 }
