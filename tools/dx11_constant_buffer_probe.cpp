@@ -5452,6 +5452,59 @@ int main()
         r276StaleMappingPlan.reviewSnapshotToken == 0,
         "R276 rejects stale R273 mapping snapshot before target semantic derivation");
 
+    const auto r279ObjectPrerequisite =
+        outrun::vr::dx11::
+            derive_programmable_shader_translation_object_prerequisite(
+                programmablePair,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken);
+    require(
+        r279ObjectPrerequisite.inputValid &&
+        r279ObjectPrerequisite.sourceIdentityExact &&
+        r279ObjectPrerequisite.translationPlanReady &&
+        r279ObjectPrerequisite.translationPlanSnapshotMatches &&
+        r279ObjectPrerequisite.cacheIdentityMatches &&
+        r279ObjectPrerequisite.cacheOwnerGenerationRequired &&
+        r279ObjectPrerequisite.translationSlotGenerationRequired &&
+        r279ObjectPrerequisite.translationObjectReceiptGenerationRequired &&
+        r279ObjectPrerequisite.sameDeviceObjectPairRequired &&
+        r279ObjectPrerequisite.cacheSnapshotRequired &&
+        r279ObjectPrerequisite.slotSnapshotRequired &&
+        r279ObjectPrerequisite.diagnosticOnly &&
+        r279ObjectPrerequisite.boundaryPreserved &&
+        r279ObjectPrerequisite.reviewReady &&
+        r279ObjectPrerequisite.cacheKey == programmablePair.cacheKey &&
+        r279ObjectPrerequisite.targetVertexSemanticHash ==
+            r276TranslationPlan.targetVertexSemanticHash &&
+        r279ObjectPrerequisite.targetPixelSemanticHash ==
+            r276TranslationPlan.targetPixelSemanticHash &&
+        r279ObjectPrerequisite.reviewSnapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_programmable_shader_translation_object_prerequisite_snapshot(
+                programmablePair,
+                r276TranslationPlan,
+                r276TranslationPlan.reviewSnapshotToken,
+                r279ObjectPrerequisite.reviewSnapshotToken),
+        "R279 translated object prerequisite seals R240 R241 R242 lifetime requirements");
+
+    const auto staleR279PlanToken =
+        r276TranslationPlan.reviewSnapshotToken == 1ull
+            ? 2ull
+            : (r276TranslationPlan.reviewSnapshotToken ^ 1ull);
+    const auto r279StaleObjectPrerequisite =
+        outrun::vr::dx11::
+            derive_programmable_shader_translation_object_prerequisite(
+                programmablePair,
+                r276TranslationPlan,
+                staleR279PlanToken);
+    require(
+        r279StaleObjectPrerequisite.translationPlanReady &&
+        !r279StaleObjectPrerequisite.translationPlanSnapshotMatches &&
+        !r279StaleObjectPrerequisite.cacheIdentityMatches &&
+        !r279StaleObjectPrerequisite.reviewReady &&
+        r279StaleObjectPrerequisite.reviewSnapshotToken == 0,
+        "R279 translated object prerequisite rejects stale R276 plan identity");
+
     const auto r275SemanticReceipt =
         outrun::vr::dx11::
             compose_programmable_shader_translated_semantic_receipt(

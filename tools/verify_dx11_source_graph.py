@@ -10909,6 +10909,49 @@ def main() -> None:
             + ", ".join(missing_r278_programmable_semantic_correlation)
         )
 
+    r279_programmable_object_prerequisite_contract = [
+        ("struct NativeProgrammableShaderTranslationObjectPrerequisiteEvidence",
+         NATIVE_BACKEND_HPP, "R279 explicit R242 ownership/lifetime prerequisite type"),
+        ("derive_programmable_shader_translation_object_prerequisite(",
+         NATIVE_BACKEND_HPP, "R279 prerequisite derivation declaration"),
+        ("validate_programmable_shader_translation_object_prerequisite_snapshot(",
+         NATIVE_BACKEND_HPP, "R279 prerequisite snapshot validator declaration"),
+        ("token, 0x279u", NATIVE_BACKEND_CPP,
+         "R279 independent prerequisite snapshot domain"),
+        ("cacheOwnerGenerationRequired", NATIVE_BACKEND_HPP,
+         "R279 requires R240 owner generation"),
+        ("translationSlotGenerationRequired", NATIVE_BACKEND_HPP,
+         "R279 requires R241 slot generation"),
+        ("translationObjectReceiptGenerationRequired", NATIVE_BACKEND_HPP,
+         "R279 requires R242 object receipt generation"),
+        ("sameDeviceObjectPairRequired", NATIVE_BACKEND_HPP,
+         "R279 requires same-device VS/PS pair"),
+        ("VR DX11 R279 translationObjectPrerequisite signature#{}:",
+         RUNTIME_CENSUS, "R279 signature-attributable production prerequisite log"),
+        ("R279_OBJECT_PREREQUISITE_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R279 analyzer parser"),
+        ("ObjectOwnershipPrerequisite", DX11_CENSUS_ANALYZER,
+         "R279 analyzer correlates prerequisite evidence"),
+        ("R279_TRANSLATION_OBJECT_PREREQUISITE_EVIDENCE",
+         DX11_CENSUS_ANALYZER, "R279 missing prerequisite evidence classification"),
+        ("ObjectOwnershipPrerequisiteExactSignatures",
+         DX11_CENSUS_ANALYZER_TEST, "R279 analyzer regression coverage"),
+        ("R279 translated object prerequisite", CONSTANT_BUFFER_PROBE,
+         "R279 hosted prerequisite regression"),
+        ("sig.shaderTranslationExact = false;", RUNTIME_CENSUS,
+         "R279 keeps programmable translation fail-closed"),
+    ]
+    missing_r279_programmable_object_prerequisite = [
+        meaning for token, source, meaning
+        in r279_programmable_object_prerequisite_contract
+        if token not in source
+    ]
+    if missing_r279_programmable_object_prerequisite:
+        raise SystemExit(
+            "DX11 R279 programmable object prerequisite drift: "
+            + ", ".join(missing_r279_programmable_object_prerequisite)
+        )
+
     r259_programmable_activation_prerequisite_contract = [
         ("struct NativeProgrammableShaderActivationPrerequisiteHandoff",
          NATIVE_BACKEND_HPP, "R259 explicit prerequisite review handoff type"),

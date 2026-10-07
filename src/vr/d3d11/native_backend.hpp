@@ -2024,6 +2024,46 @@ validate_programmable_shader_semantic_translation_plan_snapshot(
     const NativeProgrammableShaderSemanticTranslationPlanEvidence& plan,
     std::uint64_t reviewSnapshotToken) noexcept;
 
+// R279 seals the exact ownership/lifetime prerequisites that a future R242
+// translated programmable VS/PS object receipt must prove. It binds the R239
+// pair identity to the R276 target-semantic plan and records the required
+// owner/slot/object generations and same-device attachment boundary without
+// creating or binding any D3D11 object.
+struct NativeProgrammableShaderTranslationObjectPrerequisiteEvidence {
+    bool inputValid{};
+    bool sourceIdentityExact{};
+    bool translationPlanReady{};
+    bool translationPlanSnapshotMatches{};
+    bool cacheIdentityMatches{};
+    bool cacheOwnerGenerationRequired{};
+    bool translationSlotGenerationRequired{};
+    bool translationObjectReceiptGenerationRequired{};
+    bool sameDeviceObjectPairRequired{};
+    bool cacheSnapshotRequired{};
+    bool slotSnapshotRequired{};
+    bool diagnosticOnly{};
+    bool boundaryPreserved{};
+    bool reviewReady{};
+    std::uint64_t cacheKey{};
+    std::uint64_t targetVertexSemanticHash{};
+    std::uint64_t targetPixelSemanticHash{};
+    std::uint64_t translationPlanSnapshotToken{};
+    std::uint64_t reviewSnapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderTranslationObjectPrerequisiteEvidence
+derive_programmable_shader_translation_object_prerequisite(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken) noexcept;
+
+[[nodiscard]] bool
+validate_programmable_shader_translation_object_prerequisite_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept;
+
 // R275 seals one dormant translated-semantic observation into a tamper-evident
 // receipt bound to the exact R239 pair, R242 translated-object ownership, R273
 // source-mapping handoff and R276 source-derived semantic translation plan.

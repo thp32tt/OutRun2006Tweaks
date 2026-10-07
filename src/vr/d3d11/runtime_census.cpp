@@ -333,12 +333,22 @@ namespace outrun::vr::dx11
             std::uint64_t shaderSourceMappingHandoffSnapshotToken{};
             // R277 seals source-derived R276 plan identity into the sampled
             // programmable signature and observes the R275 receipt boundary.
+            // R279 separately seals the exact R240/R241/R242 ownership/lifetime
+            // prerequisites without creating or binding programmable objects.
             bool shaderSemanticTranslationPlanExact{};
             std::uint64_t shaderSemanticTranslationPlanSnapshotToken{};
             std::uint64_t shaderTranslatedVertexSemanticHash{};
             std::uint64_t shaderTranslatedPixelSemanticHash{};
             std::uint64_t shaderTranslatorRevisionHash{};
             std::uint64_t shaderTranslationSemanticContractHash{};
+            bool shaderTranslationObjectPrerequisiteExact{};
+            bool shaderTranslationObjectCacheOwnerGenerationRequired{};
+            bool shaderTranslationObjectSlotGenerationRequired{};
+            bool shaderTranslationObjectReceiptGenerationRequired{};
+            bool shaderTranslationObjectSameDevicePairRequired{};
+            bool shaderTranslationObjectCacheSnapshotRequired{};
+            bool shaderTranslationObjectSlotSnapshotRequired{};
+            std::uint64_t shaderTranslationObjectPrerequisiteSnapshotToken{};
             bool shaderTranslatedSemanticReceiptExact{};
             bool shaderTranslatedSemanticReceiptObjectReady{};
             std::uint64_t shaderTranslatedSemanticReceiptSnapshotToken{};
@@ -792,6 +802,28 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.shaderTranslatorRevisionHash);
             hash = hash_mix(
                 hash, sig.shaderTranslationSemanticContractHash);
+            hash = hash_mix(
+                hash, sig.shaderTranslationObjectPrerequisiteExact ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderTranslationObjectCacheOwnerGenerationRequired ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderTranslationObjectSlotGenerationRequired ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderTranslationObjectReceiptGenerationRequired ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderTranslationObjectSameDevicePairRequired ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderTranslationObjectCacheSnapshotRequired ? 1u : 0u);
+            hash = hash_mix(
+                hash,
+                sig.shaderTranslationObjectSlotSnapshotRequired ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shaderTranslationObjectPrerequisiteSnapshotToken);
             hash = hash_mix(
                 hash, sig.shaderTranslatedSemanticReceiptExact ? 1u : 0u);
             hash = hash_mix(
@@ -1502,6 +1534,29 @@ namespace outrun::vr::dx11
             sig.shaderTranslationSemanticContractHash =
                 semanticTranslationPlan.semanticContractHash;
 
+            const auto translationObjectPrerequisite =
+                derive_programmable_shader_translation_object_prerequisite(
+                    programmablePairIdentity,
+                    semanticTranslationPlan,
+                    semanticTranslationPlan.reviewSnapshotToken);
+            sig.shaderTranslationObjectPrerequisiteExact =
+                translationObjectPrerequisite.reviewReady;
+            sig.shaderTranslationObjectCacheOwnerGenerationRequired =
+                translationObjectPrerequisite.cacheOwnerGenerationRequired;
+            sig.shaderTranslationObjectSlotGenerationRequired =
+                translationObjectPrerequisite.translationSlotGenerationRequired;
+            sig.shaderTranslationObjectReceiptGenerationRequired =
+                translationObjectPrerequisite.
+                    translationObjectReceiptGenerationRequired;
+            sig.shaderTranslationObjectSameDevicePairRequired =
+                translationObjectPrerequisite.sameDeviceObjectPairRequired;
+            sig.shaderTranslationObjectCacheSnapshotRequired =
+                translationObjectPrerequisite.cacheSnapshotRequired;
+            sig.shaderTranslationObjectSlotSnapshotRequired =
+                translationObjectPrerequisite.slotSnapshotRequired;
+            sig.shaderTranslationObjectPrerequisiteSnapshotToken =
+                translationObjectPrerequisite.reviewSnapshotToken;
+
             // R277 deliberately supplies no R242 translated-object ownership.
             // The R275 receipt therefore exposes the exact remaining boundary
             // while retaining the deterministic R276 plan identity.
@@ -2084,6 +2139,19 @@ namespace outrun::vr::dx11
                         sig.shaderTranslatedPixelSemanticHash,
                         sig.shaderTranslatorRevisionHash,
                         sig.shaderTranslationSemanticContractHash);
+                    spdlog::info(
+                        "VR DX11 R279 translationObjectPrerequisite signature#{}: exact={} cacheOwnerGen={} slotGen={} receiptGen={} sameDevicePair={} cacheSnapshot={} slotSnapshot={} cacheKey=0x{:016X} planSnapshot=0x{:016X} snapshot=0x{:016X}",
+                        unique,
+                        sig.shaderTranslationObjectPrerequisiteExact ? 1 : 0,
+                        sig.shaderTranslationObjectCacheOwnerGenerationRequired ? 1 : 0,
+                        sig.shaderTranslationObjectSlotGenerationRequired ? 1 : 0,
+                        sig.shaderTranslationObjectReceiptGenerationRequired ? 1 : 0,
+                        sig.shaderTranslationObjectSameDevicePairRequired ? 1 : 0,
+                        sig.shaderTranslationObjectCacheSnapshotRequired ? 1 : 0,
+                        sig.shaderTranslationObjectSlotSnapshotRequired ? 1 : 0,
+                        sig.shaderSourceSemanticPairCacheKey,
+                        sig.shaderSemanticTranslationPlanSnapshotToken,
+                        sig.shaderTranslationObjectPrerequisiteSnapshotToken);
                     spdlog::info(
                         "VR DX11 R275 translatedSemanticReceipt signature#{}: exact={} objectReady={} snapshot=0x{:016X}",
                         unique,

@@ -1838,6 +1838,10 @@ def main() -> int:
         "snapshot=0x1111111111111111 targetVS=0x2222222222222222 "
         "targetPS=0x3333333333333333 revision=0x4444444444444444 "
         "contract=0x5555555555555555\n"
+        "VR DX11 R279 translationObjectPrerequisite signature#1: exact=1 "
+        "cacheOwnerGen=1 slotGen=1 receiptGen=1 sameDevicePair=1 "
+        "cacheSnapshot=1 slotSnapshot=1 cacheKey=0x6666666666666666 "
+        "planSnapshot=0x1111111111111111 snapshot=0x7777777777777777\n"
         "VR DX11 R275 translatedSemanticReceipt signature#1: exact=0 "
         "objectReady=0 snapshot=0x0000000000000000\n"
         "VR DX11 R85 signature#1: primitive=4 fixedFn=0 fvf=0x00000000 "
@@ -1862,6 +1866,7 @@ def main() -> int:
     assert r278_inventory["CurrentProgrammableSignatures"] == 1
     assert r278_inventory["CurrentUniqueShaderPairs"] == 1
     assert r278_inventory["SemanticPlanExactSignatures"] == 1
+    assert r278_inventory["ObjectOwnershipPrerequisiteExactSignatures"] == 1
     assert r278_inventory["SemanticReceiptExactSignatures"] == 0
     assert r278_inventory["SemanticEvidenceCoverageComplete"] is True
     assert r278_inventory["R242ObjectOwnershipMissingSignatures"] == [
@@ -1869,6 +1874,29 @@ def main() -> int:
     ]
     r278_pair_evidence = r278_inventory["Pairs"][0]["SemanticTranslationEvidence"][0]
     assert r278_pair_evidence["Plan"]["exact"] is True
+    assert (
+        r278_pair_evidence["ObjectOwnershipPrerequisite"]["exact"] is True
+    )
+    assert (
+        r278_pair_evidence["ObjectOwnershipPrerequisite"][
+            "cache_owner_generation_required"
+        ] is True
+    )
+    assert (
+        r278_pair_evidence["ObjectOwnershipPrerequisite"][
+            "translation_slot_generation_required"
+        ] is True
+    )
+    assert (
+        r278_pair_evidence["ObjectOwnershipPrerequisite"][
+            "translation_object_receipt_generation_required"
+        ] is True
+    )
+    assert (
+        r278_pair_evidence["ObjectOwnershipPrerequisite"][
+            "same_device_object_pair_required"
+        ] is True
+    )
     assert (
         r278_pair_evidence["Plan"]["target_vertex_semantic_hash"]
         == 0x2222222222222222

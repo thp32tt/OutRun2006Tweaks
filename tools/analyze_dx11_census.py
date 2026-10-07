@@ -151,6 +151,16 @@ R276_SEMANTIC_PLAN_RE = re.compile(
     r"revision=0x(?P<revision>[0-9A-Fa-f]+) "
     r"contract=0x(?P<contract>[0-9A-Fa-f]+)"
 )
+R279_OBJECT_PREREQUISITE_RE = re.compile(
+    r"VR DX11 R279 translationObjectPrerequisite signature#(?P<signature>\d+): "
+    r"exact=(?P<exact>[01]) cacheOwnerGen=(?P<cacheOwnerGen>[01]) "
+    r"slotGen=(?P<slotGen>[01]) receiptGen=(?P<receiptGen>[01]) "
+    r"sameDevicePair=(?P<sameDevicePair>[01]) "
+    r"cacheSnapshot=(?P<cacheSnapshot>[01]) slotSnapshot=(?P<slotSnapshot>[01]) "
+    r"cacheKey=0x(?P<cacheKey>[0-9A-Fa-f]+) "
+    r"planSnapshot=0x(?P<planSnapshot>[0-9A-Fa-f]+) "
+    r"snapshot=0x(?P<snapshot>[0-9A-Fa-f]+)"
+)
 R275_SEMANTIC_RECEIPT_RE = re.compile(
     r"VR DX11 R275 translatedSemanticReceipt signature#(?P<signature>\d+): "
     r"exact=(?P<exact>[01]) objectReady=(?P<objectReady>[01]) "
@@ -437,8 +447,11 @@ def summarize_programmable_shader_inventory(
     semantic_plan_missing: list[dict] = []
     semantic_receipt_missing: list[dict] = []
     semantic_plan_inexact: list[dict] = []
+    object_prerequisite_missing: list[dict] = []
+    object_prerequisite_inexact: list[dict] = []
     r242_object_ownership_missing: list[dict] = []
     semantic_plan_exact_signatures = 0
+    object_prerequisite_exact_signatures = 0
     semantic_receipt_exact_signatures = 0
     records_with_identity = 0
     programmable_signatures = 0
@@ -494,6 +507,7 @@ def summarize_programmable_shader_inventory(
             },
         )
         plan = signature.get("semantic_translation_plan")
+        object_prerequisite = signature.get("translation_object_prerequisite")
         receipt = signature.get("translated_semantic_receipt")
         missing_prerequisite = None
         if plan is None:
@@ -505,6 +519,21 @@ def summarize_programmable_shader_inventory(
         else:
             semantic_plan_exact_signatures += 1
 
+        if object_prerequisite is None:
+            object_prerequisite_missing.append(ref)
+            if missing_prerequisite is None:
+                missing_prerequisite = (
+                    "R279_TRANSLATION_OBJECT_PREREQUISITE_EVIDENCE"
+                )
+        elif not object_prerequisite["exact"]:
+            object_prerequisite_inexact.append(ref)
+            if missing_prerequisite is None:
+                missing_prerequisite = (
+                    "R279_TRANSLATION_OBJECT_PREREQUISITE_EXACTNESS"
+                )
+        else:
+            object_prerequisite_exact_signatures += 1
+
         if receipt is None:
             semantic_receipt_missing.append(ref)
             if missing_prerequisite is None:
@@ -512,7 +541,13 @@ def summarize_programmable_shader_inventory(
         else:
             if receipt["exact"]:
                 semantic_receipt_exact_signatures += 1
-            elif not receipt["object_ready"] and plan is not None and plan["exact"]:
+            elif (
+                not receipt["object_ready"]
+                and plan is not None
+                and plan["exact"]
+                and object_prerequisite is not None
+                and object_prerequisite["exact"]
+            ):
                 r242_object_ownership_missing.append(ref)
                 if missing_prerequisite is None:
                     missing_prerequisite = "R242_TRANSLATED_OBJECT_OWNERSHIP"
@@ -524,6 +559,7 @@ def summarize_programmable_shader_inventory(
             {
                 "SignatureRef": ref,
                 "Plan": plan,
+                "ObjectOwnershipPrerequisite": object_prerequisite,
                 "Receipt": receipt,
                 "MissingPrerequisite": missing_prerequisite,
                 "DiagnosticOnly": True,
@@ -553,9 +589,15 @@ def summarize_programmable_shader_inventory(
         "ShaderIdentityBlockingSignatures": identity_blocking,
         "SemanticPlanEvidenceMissingSignatures": semantic_plan_missing,
         "SemanticPlanInexactSignatures": semantic_plan_inexact,
+        "ObjectOwnershipPrerequisiteEvidenceMissingSignatures":
+            object_prerequisite_missing,
+        "ObjectOwnershipPrerequisiteInexactSignatures":
+            object_prerequisite_inexact,
         "SemanticReceiptEvidenceMissingSignatures": semantic_receipt_missing,
         "R242ObjectOwnershipMissingSignatures": r242_object_ownership_missing,
         "SemanticPlanExactSignatures": semantic_plan_exact_signatures,
+        "ObjectOwnershipPrerequisiteExactSignatures":
+            object_prerequisite_exact_signatures,
         "SemanticReceiptExactSignatures": semantic_receipt_exact_signatures,
         "SemanticEvidenceCoverageComplete": semantic_evidence_coverage_complete,
         "EvidenceLimitedBySignatureDetailCap": detail_cap_saturated,
@@ -588,6 +630,7 @@ def main() -> int:
     # overwrite an unrelated signature#N record.
     signatures: dict[SignatureKey, dict] = {}
     semantic_translation_plans: dict[SignatureKey, dict] = {}
+    translation_object_prerequisites: dict[SignatureKey, dict] = {}
     translated_semantic_receipts: dict[SignatureKey, dict] = {}
     declarations: dict[SignatureKey, list[dict]] = {}
     fixed_function: dict[SignatureKey, list[dict]] = {}
@@ -695,6 +738,36 @@ def main() -> int:
                     "translator_revision_hash_hex": "0x" + data["revision"].upper(),
                     "semantic_contract_hash": int(data["contract"], 16),
                     "semantic_contract_hash_hex": "0x" + data["contract"].upper(),
+                }
+                continue
+
+            match = R279_OBJECT_PREREQUISITE_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                signature_key = (source_log, startup_epoch, signature_id)
+                translation_object_prerequisites[signature_key] = {
+                    "exact": bool(int(data["exact"])),
+                    "cache_owner_generation_required":
+                        bool(int(data["cacheOwnerGen"])),
+                    "translation_slot_generation_required":
+                        bool(int(data["slotGen"])),
+                    "translation_object_receipt_generation_required":
+                        bool(int(data["receiptGen"])),
+                    "same_device_object_pair_required":
+                        bool(int(data["sameDevicePair"])),
+                    "cache_snapshot_required":
+                        bool(int(data["cacheSnapshot"])),
+                    "slot_snapshot_required":
+                        bool(int(data["slotSnapshot"])),
+                    "cache_key": int(data["cacheKey"], 16),
+                    "cache_key_hex": "0x" + data["cacheKey"].upper(),
+                    "translation_plan_snapshot":
+                        int(data["planSnapshot"], 16),
+                    "translation_plan_snapshot_hex":
+                        "0x" + data["planSnapshot"].upper(),
+                    "snapshot": int(data["snapshot"], 16),
+                    "snapshot_hex": "0x" + data["snapshot"].upper(),
                 }
                 continue
 
@@ -845,6 +918,9 @@ def main() -> int:
     for signature_key, signature in signatures.items():
         signature["semantic_translation_plan"] = (
             semantic_translation_plans.get(signature_key)
+        )
+        signature["translation_object_prerequisite"] = (
+            translation_object_prerequisites.get(signature_key)
         )
         signature["translated_semantic_receipt"] = (
             translated_semantic_receipts.get(signature_key)

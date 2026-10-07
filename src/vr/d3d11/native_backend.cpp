@@ -9405,6 +9405,117 @@ bool validate_programmable_shader_semantic_translation_plan_snapshot(
         expected == reviewSnapshotToken;
 }
 
+NativeProgrammableShaderTranslationObjectPrerequisiteEvidence
+derive_programmable_shader_translation_object_prerequisite(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken) noexcept {
+    NativeProgrammableShaderTranslationObjectPrerequisiteEvidence out{};
+
+    out.cacheKey = sourceIdentity.cacheKey;
+    out.targetVertexSemanticHash =
+        translationPlan.targetVertexSemanticHash;
+    out.targetPixelSemanticHash =
+        translationPlan.targetPixelSemanticHash;
+    out.translationPlanSnapshotToken = translationPlanSnapshotToken;
+
+    out.inputValid = translationPlanSnapshotToken != 0;
+    out.sourceIdentityExact =
+        sourceIdentity.exact_identity() &&
+        !sourceIdentity.translationImplemented;
+    out.translationPlanReady =
+        translationPlan.reviewReady &&
+        translationPlan.boundaryPreserved &&
+        translationPlan.diagnosticOnly &&
+        translationPlan.provenanceMatches &&
+        translationPlan.vertexSemanticExact &&
+        translationPlan.pixelSemanticExact &&
+        translationPlan.reviewSnapshotToken != 0;
+    out.translationPlanSnapshotMatches =
+        out.translationPlanReady &&
+        translationPlan.reviewSnapshotToken ==
+            translationPlanSnapshotToken;
+    out.cacheIdentityMatches =
+        out.sourceIdentityExact &&
+        out.translationPlanSnapshotMatches &&
+        sourceIdentity.cacheKey != 0 &&
+        sourceIdentity.cacheKey == translationPlan.cacheKey &&
+        translationPlan.targetVertexSemanticHash != 0 &&
+        translationPlan.targetPixelSemanticHash != 0;
+
+    // These booleans describe mandatory R240/R241/R242 lifetime evidence.
+    // They are requirements, not claims that those generations/objects exist.
+    out.cacheOwnerGenerationRequired = out.cacheIdentityMatches;
+    out.translationSlotGenerationRequired = out.cacheIdentityMatches;
+    out.translationObjectReceiptGenerationRequired =
+        out.cacheIdentityMatches;
+    out.sameDeviceObjectPairRequired = out.cacheIdentityMatches;
+    out.cacheSnapshotRequired = out.cacheIdentityMatches;
+    out.slotSnapshotRequired = out.cacheIdentityMatches;
+    out.diagnosticOnly = true;
+    out.boundaryPreserved =
+        out.cacheIdentityMatches &&
+        out.cacheOwnerGenerationRequired &&
+        out.translationSlotGenerationRequired &&
+        out.translationObjectReceiptGenerationRequired &&
+        out.sameDeviceObjectPairRequired &&
+        out.cacheSnapshotRequired &&
+        out.slotSnapshotRequired &&
+        out.diagnosticOnly;
+    out.reviewReady =
+        out.inputValid &&
+        out.boundaryPreserved;
+
+    if (out.reviewReady) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
+        token = mix_readiness_snapshot_token(
+            token, out.targetVertexSemanticHash);
+        token = mix_readiness_snapshot_token(
+            token, out.targetPixelSemanticHash);
+        token = mix_readiness_snapshot_token(
+            token, out.translationPlanSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.cacheOwnerGenerationRequired ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.translationSlotGenerationRequired ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.translationObjectReceiptGenerationRequired ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.sameDeviceObjectPairRequired ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.cacheSnapshotRequired ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.slotSnapshotRequired ? 1u : 0u);
+        token = mix_readiness_snapshot_token(token, 0x279u);
+        out.reviewSnapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_programmable_shader_translation_object_prerequisite_snapshot(
+    const ProgrammableShaderPairCacheIdentity& sourceIdentity,
+    const NativeProgrammableShaderSemanticTranslationPlanEvidence& translationPlan,
+    std::uint64_t translationPlanSnapshotToken,
+    std::uint64_t reviewSnapshotToken) noexcept {
+    if (reviewSnapshotToken == 0)
+        return false;
+    const auto current =
+        derive_programmable_shader_translation_object_prerequisite(
+            sourceIdentity,
+            translationPlan,
+            translationPlanSnapshotToken);
+    return current.reviewReady &&
+        current.boundaryPreserved &&
+        current.cacheOwnerGenerationRequired &&
+        current.translationSlotGenerationRequired &&
+        current.translationObjectReceiptGenerationRequired &&
+        current.sameDeviceObjectPairRequired &&
+        current.cacheSnapshotRequired &&
+        current.slotSnapshotRequired &&
+        current.reviewSnapshotToken == reviewSnapshotToken;
+}
+
 NativeProgrammableShaderTranslatedSemanticReceipt
 compose_programmable_shader_translated_semantic_receipt(
     const ProgrammableShaderPairCacheIdentity& sourceIdentity,
