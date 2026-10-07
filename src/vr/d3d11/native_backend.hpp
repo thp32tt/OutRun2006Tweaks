@@ -1800,6 +1800,7 @@ struct NativeProgrammableShaderResourceBehaviorReadiness {
     bool inputValid{};
     bool sourceRevalidationReady{};
     bool sourceRevalidationSnapshotMatches{};
+    bool sourceRevalidationPayloadSnapshotMatches{};
     bool vertexMirrorReady{};
     bool vertexMirrorSnapshotMatches{};
     bool indexMirrorRequired{};

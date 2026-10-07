@@ -5219,6 +5219,8 @@ int main()
         r260IndexedResourceBehavior.inputValid &&
         r260IndexedResourceBehavior.sourceRevalidationReady &&
         r260IndexedResourceBehavior.sourceRevalidationSnapshotMatches &&
+        r260IndexedResourceBehavior.
+            sourceRevalidationPayloadSnapshotMatches &&
         r260IndexedResourceBehavior.vertexMirrorReady &&
         r260IndexedResourceBehavior.vertexMirrorSnapshotMatches &&
         r260IndexedResourceBehavior.indexMirrorRequired &&
@@ -5244,6 +5246,30 @@ int main()
                 managedIndexReady.snapshotToken,
                 r260IndexedResourceBehavior.reviewSnapshotToken),
         "R260 indexed geometry resource behavior is exact while texture/output F18 scopes remain fail-closed");
+
+    auto r300TamperedR258ForResourceBehavior =
+        r258IndexedSourceRevalidation;
+    r300TamperedR258ForResourceBehavior.startLocation += 1u;
+    const auto r300TamperedResourceBehavior =
+        outrun::vr::dx11::compose_programmable_resource_behavior_readiness(
+            r300TamperedR258ForResourceBehavior,
+            r300TamperedR258ForResourceBehavior.snapshotToken,
+            d3d.device,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            &managedIndexBuffer,
+            managedIndexReady.snapshotToken);
+    require(
+        r300TamperedResourceBehavior.sourceRevalidationReady &&
+        r300TamperedResourceBehavior.sourceRevalidationSnapshotMatches &&
+        !r300TamperedResourceBehavior.
+            sourceRevalidationPayloadSnapshotMatches &&
+        !r300TamperedResourceBehavior.geometryResourceBehaviorExact &&
+        (r300TamperedResourceBehavior.missingResourceScopeMask & 0x1u) != 0 &&
+        !r300TamperedResourceBehavior.boundaryPreserved &&
+        !r300TamperedResourceBehavior.reviewReady &&
+        r300TamperedResourceBehavior.reviewSnapshotToken == 0,
+        "R300 rejects R258 payload drift before minting R260 geometry resource proof");
 
     const auto staleR260IndexedVertexToken =
         managedVertexPostResetReady.snapshotToken == 1ull
@@ -7786,6 +7812,8 @@ int main()
     require(
         r260NonIndexedResourceBehavior.sourceRevalidationReady &&
         r260NonIndexedResourceBehavior.sourceRevalidationSnapshotMatches &&
+        r260NonIndexedResourceBehavior.
+            sourceRevalidationPayloadSnapshotMatches &&
         r260NonIndexedResourceBehavior.vertexMirrorReady &&
         r260NonIndexedResourceBehavior.vertexMirrorSnapshotMatches &&
         !r260NonIndexedResourceBehavior.indexMirrorRequired &&

@@ -10482,6 +10482,11 @@ compose_programmable_resource_behavior_readiness(
         out.sourceRevalidationReady &&
         sourceRevalidation.snapshotToken ==
             sourceRevalidationSnapshotToken;
+    out.sourceRevalidationPayloadSnapshotMatches =
+        out.sourceRevalidationReady &&
+        sourceRevalidation.snapshotToken ==
+            recompute_programmable_dormant_source_revalidation_payload_snapshot(
+                sourceRevalidation);
 
     const auto vertex = vertexMirror.mirror_readiness(expectedDevice);
     out.vertexMirrorReady =
@@ -10517,6 +10522,7 @@ compose_programmable_resource_behavior_readiness(
     }
 
     out.geometryResourceBehaviorExact =
+        out.sourceRevalidationPayloadSnapshotMatches &&
         out.vertexMirrorReady &&
         out.vertexMirrorSnapshotMatches &&
         out.indexMirrorReady &&
@@ -10540,6 +10546,7 @@ compose_programmable_resource_behavior_readiness(
     out.diagnosticOnly = true;
     out.boundaryPreserved =
         sourceRevalidation.boundaryPreserved &&
+        out.sourceRevalidationPayloadSnapshotMatches &&
         out.diagnosticOnly &&
         !out.fullResourceBehaviorProofPresent &&
         out.missingResourceScopeMask != 0;
@@ -10557,6 +10564,8 @@ compose_programmable_resource_behavior_readiness(
         token = mix_readiness_snapshot_token(token, out.indexed ? 1u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.sourceRevalidationSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceRevalidationPayloadSnapshotMatches ? 1u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.vertexMirrorSnapshotToken);
         token = mix_readiness_snapshot_token(
