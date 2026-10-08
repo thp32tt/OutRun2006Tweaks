@@ -1,0 +1,250 @@
+{
+  "schema_version": 2,
+  "policy_version": "visual-evidence-v1-20261008",
+  "run": "C306-C2",
+  "run_key": "OUTRUN-KOR-C306-C2-Q154-GRAY-NATIVE-LOSSLESS-20261008-2220",
+  "TEMP_BACKLOG_RELIEF": "C2",
+  "SHARD": "EVEN",
+  "role": "C",
+  "queue_index": 154,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "backend": "GitHub Actions Ubuntu worker native PNG production + ChatGPT controller direct pixel viewing",
+  "worker_run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37784106115",
+  "selection_refresh_head": "b433e4bea6ccbaf519a84acbdf831bd3a3e9be53",
+  "queue_blob_sha": "4fddcb848526127011e5fd734de240fa3aa9f5d6",
+  "triage": {
+    "index": 154,
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+    "current_status": "c305_c2_hold_authored_clean_bgw_eight_review_no_c_pass",
+    "next_action": "EVIDENCE_ONLY_HOLD",
+    "repeated_root_causes": [],
+    "reason": "Inspect unchanged DDS and complete exact-byte evidence; do not rerender without actual pixel defect",
+    "runtime_validation": "UNTESTED"
+  },
+  "shas": {
+    "source": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "clean": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+    "final": "94678124f6cddaeb44520c6419f4b475d1452866c052ff301a4859dddf38cb1f"
+  },
+  "worker_machine": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/C306_Q154_GRAY_NATIVE_MACHINE.json",
+  "new_evidence": {
+    "native_lossless_png_files": 30,
+    "regions": 3,
+    "scale_pct": [
+      100,
+      75,
+      50
+    ],
+    "background": [
+      "BLACK",
+      "GRAY",
+      "WHITE"
+    ],
+    "raw_per_region": true,
+    "new_candidate_dds": 0
+  },
+  "first_look": {
+    "pixels_before_producer_verdict": false,
+    "qualified_blind_calibration": false,
+    "reason": "Historic C298/C305 notes and producer source context were seen before this C306 direct source/CLEAN/final image inspection; do not claim blind independence."
+  },
+  "regions": [
+    {
+      "id": "06_single_player_gray",
+      "english": "SINGLE PLAYER",
+      "korean": "싱글 플레이",
+      "bbox_readable": [
+        1610,
+        286,
+        2197,
+        350
+      ],
+      "raw_bbox": [
+        1610,
+        674,
+        2197,
+        738
+      ],
+      "source_alpha_nonzero": 19100,
+      "clean_alpha_nonzero": 0,
+      "final_alpha_nonzero": 13360,
+      "native_views": {
+        "white_100": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/06_single_player_gray_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+        "gray_100": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/06_single_player_gray_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+        "black_100": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/06_single_player_gray_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+        "white_75": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/06_single_player_gray_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+        "white_50": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/06_single_player_gray_WHITE_50pct_SOURCE_CLEAN_FINAL.png",
+        "black_50": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/06_single_player_gray_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+        "raw": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/06_single_player_gray_RAW_ORIENTATION.png"
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD_NOT_MEASURED",
+          "observation": "Original gray family appears upright in readable orientation and Korean not opposite lean; stem-anchor top-minus-bottom measurement not established."
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPE_GRAY_REGION",
+          "observation": "Original vs authored clean comparison has zero CLEAN alpha across region and visually uniform black/gray/white alpha-composited plate; no visible source-shaped glyph/rectangle at native pixels."
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY",
+          "observation": "English bold condensed gray vs Korean gray Hangul appear approximately matched in hue/height; dense internal Hangul counter shapes require glyph-level native family analysis."
+        },
+        "readability": {
+          "result": "HOLD_PRACTICAL",
+          "observation": "White 100/75/50 legible; gray/black 50% low contrast like source, cannot certify game-scale readability."
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_FAILURE",
+          "observation": "100% white-native observed no definite missing Hangul strokes; 75/50 proof exists but not calibrated per-stroke native pixel certification."
+        },
+        "protected_art": {
+          "result": "PARTIAL_OUTSIDE_NUMERIC_C305_ONLY",
+          "observation": "Earlier exact SHA C305 source/CLEAN/FINAL outside 8-box union zero, not re-scanned entire atlas as part of C306."
+        },
+        "placement": {
+          "result": "PARTIAL_SOURCE_REGION",
+          "observation": "New exact source/clean/final matched crop shows near-source text height, no visible overlap within this crop; historic C298 positive margins retained."
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "RAW paired original and Korean PNG generated from exact decoded persisted source/final DDS, same Y-flip relation; not live game UV/texture sample verification."
+        }
+      }
+    },
+    {
+      "id": "07_showroom_gray",
+      "english": "SHOWROOM",
+      "korean": "쇼룸",
+      "bbox_readable": [
+        2674,
+        288,
+        3094,
+        350
+      ],
+      "raw_bbox": [
+        2674,
+        674,
+        3094,
+        736
+      ],
+      "source_alpha_nonzero": 15231,
+      "clean_alpha_nonzero": 0,
+      "final_alpha_nonzero": 6628,
+      "native_views": {
+        "white_100": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/07_showroom_gray_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+        "gray_100": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/07_showroom_gray_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+        "black_100": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/07_showroom_gray_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+        "white_75": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/07_showroom_gray_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+        "white_50": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/07_showroom_gray_WHITE_50pct_SOURCE_CLEAN_FINAL.png",
+        "black_50": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/07_showroom_gray_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+        "raw": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/07_showroom_gray_RAW_ORIENTATION.png"
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD_NOT_MEASURED",
+          "observation": "Original gray family appears upright in readable orientation and Korean not opposite lean; stem-anchor top-minus-bottom measurement not established."
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPE_GRAY_REGION",
+          "observation": "Original vs authored clean comparison has zero CLEAN alpha across region and visually uniform black/gray/white alpha-composited plate; no visible source-shaped glyph/rectangle at native pixels."
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY",
+          "observation": "Korean 2-syllable word is shorter than English but near source height; deliberate natural-width short translation not treated as width FAIL; exact source-family weight/counter shape not certified."
+        },
+        "readability": {
+          "result": "HOLD_PRACTICAL",
+          "observation": "White 100% legible; black 50% low contrast, further runtime check needed."
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_FAILURE",
+          "observation": "100% white-native observed no definite missing Hangul strokes; 75/50 proof exists but not calibrated per-stroke native pixel certification."
+        },
+        "protected_art": {
+          "result": "PARTIAL_OUTSIDE_NUMERIC_C305_ONLY",
+          "observation": "Earlier exact SHA C305 source/CLEAN/FINAL outside 8-box union zero, not re-scanned entire atlas as part of C306."
+        },
+        "placement": {
+          "result": "PARTIAL_SOURCE_REGION",
+          "observation": "New exact source/clean/final matched crop shows near-source text height, no visible overlap within this crop; historic C298 positive margins retained."
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "RAW paired original and Korean PNG generated from exact decoded persisted source/final DDS, same Y-flip relation; not live game UV/texture sample verification."
+        }
+      }
+    },
+    {
+      "id": "08_multiplayer_gray",
+      "english": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "bbox_readable": [
+        2566,
+        952,
+        3086,
+        1014
+      ],
+      "raw_bbox": [
+        2566,
+        10,
+        3086,
+        72
+      ],
+      "source_alpha_nonzero": 17402,
+      "clean_alpha_nonzero": 0,
+      "final_alpha_nonzero": 12757,
+      "native_views": {
+        "white_100": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/08_multiplayer_gray_WHITE_100pct_SOURCE_CLEAN_FINAL.png",
+        "gray_100": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/08_multiplayer_gray_GRAY_100pct_SOURCE_CLEAN_FINAL.png",
+        "black_100": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/08_multiplayer_gray_BLACK_100pct_SOURCE_CLEAN_FINAL.png",
+        "white_75": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/08_multiplayer_gray_WHITE_75pct_SOURCE_CLEAN_FINAL.png",
+        "white_50": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/08_multiplayer_gray_WHITE_50pct_SOURCE_CLEAN_FINAL.png",
+        "black_50": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/08_multiplayer_gray_BLACK_50pct_SOURCE_CLEAN_FINAL.png",
+        "raw": "localization/graphics/role_C/20261008-C306-C2-Q154-GRAY-LOSSLESS-100-75-50/08_multiplayer_gray_RAW_ORIENTATION.png"
+      },
+      "checks": {
+        "slant": {
+          "result": "HOLD_NOT_MEASURED",
+          "observation": "Original gray family appears upright in readable orientation and Korean not opposite lean; stem-anchor top-minus-bottom measurement not established."
+        },
+        "clean_plate": {
+          "result": "PASS_SCOPE_GRAY_REGION",
+          "observation": "Original vs authored clean comparison has zero CLEAN alpha across region and visually uniform black/gray/white alpha-composited plate; no visible source-shaped glyph/rectangle at native pixels."
+        },
+        "style": {
+          "result": "HOLD_SOURCE_FAMILY",
+          "observation": "English condensed bold original and Korean glyphs remain roughly height-aligned, gray face; check individual Korean horizontal joins and counter openings before approval."
+        },
+        "readability": {
+          "result": "HOLD_PRACTICAL",
+          "observation": "100% visible and 50% still decipherable against white; dark-bg/practical-size legibility not signed off."
+        },
+        "glyph_integrity": {
+          "result": "PARTIAL_NO_DEFINITE_FAILURE",
+          "observation": "100% white-native observed no definite missing Hangul strokes; 75/50 proof exists but not calibrated per-stroke native pixel certification."
+        },
+        "protected_art": {
+          "result": "PARTIAL_OUTSIDE_NUMERIC_C305_ONLY",
+          "observation": "Earlier exact SHA C305 source/CLEAN/FINAL outside 8-box union zero, not re-scanned entire atlas as part of C306."
+        },
+        "placement": {
+          "result": "PARTIAL_SOURCE_REGION",
+          "observation": "New exact source/clean/final matched crop shows near-source text height, no visible overlap within this crop; historic C298 positive margins retained."
+        },
+        "orientation": {
+          "result": "PARTIAL_RAW_REFERENCE",
+          "observation": "RAW paired original and Korean PNG generated from exact decoded persisted source/final DDS, same Y-flip relation; not live game UV/texture sample verification."
+        }
+      }
+    }
+  ],
+  "visual_summary": "Actual controller native WHITE_100 for all 3 and BLACK_50 source/clean/final inspected. CLEAN plate transparent and visually clear, no obvious ghost/foreign rectangle in those displayed crops. Gray Hangul weight, interior counter-space and family hierarchy cannot be marked PASS without a calibrated independent source-derived profile and full plate/protected/mip/RAW game view; visual uncertainty remains HOLD. Numeric region bounds do not override style check.",
+  "C": "HOLD_STRICT_RECHECK",
+  "C3": "BLOCKED_UNTIL_C_PASS_AND_CALIBRATION",
+  "APPROVALS": "NOT_AUTHORIZED",
+  "PRE_INGAME_EXPORT": "BLOCKED_CURRENT_POLICY",
+  "USER_ACCEPTANCE": "NOT_TESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "Qualified blind calibration and semantic source-family glyph-anchor/counter-space comparison, complete independent all-8 native region + whole-atlas/protected review; no material rerender absent actual defect."
+}
