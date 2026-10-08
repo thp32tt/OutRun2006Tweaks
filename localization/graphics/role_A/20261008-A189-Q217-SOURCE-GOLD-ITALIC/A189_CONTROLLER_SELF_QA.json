@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261008-A189-Q217-SOURCE-GOLD-ITALIC",
+  "queue_index": 217,
+  "policy_version": "visual-evidence-v1-20261008",
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "replaced_candidate_sha256": "68bd22192de5e4a5133869790a042c410970858006d1afcf613f2b2f7140ab39",
+  "candidate_sha256": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+  "worker_run": 37741430790,
+  "triage": "MATERIAL_REWORK --require-safe-rerender exit 0",
+  "render": "Native x4 NanumSquareRound Bold, creamy-gold source-sampled face, warm orange lower bevel, readable right lean 0.28. Source red badge convex hull reused; no forced English-width stretch.",
+  "regions": [
+    {
+      "id": "start",
+      "english": "START",
+      "korean": "출발",
+      "source_bbox": [
+        803,
+        509,
+        884,
+        532
+      ],
+      "localized_bbox": [
+        824,
+        510,
+        863,
+        531
+      ]
+    },
+    {
+      "id": "goal",
+      "english": "GOAL",
+      "korean": "골",
+      "source_bbox": [
+        1343,
+        771,
+        1420,
+        795
+      ],
+      "localized_bbox": [
+        1371,
+        772,
+        1392,
+        794
+      ]
+    }
+  ],
+  "machine": {
+    "bbox_size_positive_margin": "2/2 PASS",
+    "clean_residue": 0,
+    "clean_nonred": 0,
+    "changed_outside_badges": 0,
+    "alpha_outside_badges": 0,
+    "final_source_color_residue": 0,
+    "overlap": 0,
+    "persisted_dds_roundtrip": "PASS",
+    "width": 2048,
+    "height": 2048,
+    "format": "RGBA32",
+    "mips": 1,
+    "raw_orientation": "mirror_y"
+  },
+  "visual": {
+    "source_clean_final": "A189_D103_SOURCE_CLEAN_FINAL_CONTACT.jpg",
+    "english_korean_4x_100_75_50": "A189_SOURCE_EN_KO_4X_100_75_50.jpg",
+    "raw": "A189_D103_RAW_COMPARE.jpg",
+    "self_observation": "Improved cream/gold bevel and readable right slant; shorter Korean relative word widths and exact isolated source glyph lean not fully certified.",
+    "decision": "PRODUCER_HOLD_SOURCE_HIERARCHY_PENDING_FRESH_C1"
+  },
+  "C1": "PENDING",
+  "C3": "BLOCKED",
+  "pre_ingame": "BLOCKED",
+  "runtime_validation": "UNTESTED",
+  "backend": "GitHub Actions ephemeral runner (local GitHub DNS blocked), no N100",
+  "forbidden_domains_touched": [],
+  "cleanup": "Hosted runner ephemeral scratch discarded"
+}
