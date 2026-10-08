@@ -311,9 +311,9 @@ class UIScaling : public Hook
 				if (std::isfinite(projectedX) &&
 					std::isfinite(projectedY) &&
 					std::fabs(projectedX - out->x) <=
-						std::max(0.25f, std::fabs(out->x) * 0.002f) &&
+						std::fmax(0.25f, std::fabs(out->x) * 0.002f) &&
 					std::fabs(projectedY - out->y) <=
-						std::max(0.25f, std::fabs(out->y) * 0.002f))
+						std::fmax(0.25f, std::fabs(out->y) * 0.002f))
 				{
 					info.viewX = originalInput.x;
 					info.viewY = originalInput.y;
